@@ -35,6 +35,8 @@
 ## 修改规则
 
 - 默认最小改动。不要重构无关模块，不移动已归档数据、checkpoint 或历史实验产物。
+- 每次完成代码、配置、脚本或长期文档更新后，必须在匹配验证通过后提交到 Git，并执行 `git push` 同步到 GitHub 远程；若 push 因认证、网络或远程状态失败，最终回复必须说明失败命令、错误原因、本地 commit 状态和用户需要执行的后续命令。
+- 提交和 push 前必须检查 `git status`，只纳入本次任务相关文件；不得把无关未跟踪文件、真实数据、checkpoint、缓存或历史实验产物混入提交。
 - 新增脚本、配置和文档文件默认使用小写 `snake_case`；已有入口为兼容可以保留原名。
 - `src/agents/` 只按算法分文件：主方法和对比方法都直接放在根目录算法文件中，`registry.py` 直接导入算法文件并映射 agent 名称。
 - PPO / MAPPO 必须分别由 `ppo_agent.py` / `mappo_agent.py` 承载，不再通过 `ppo_family.py`、`baselines/` 或 `marl/` package 包装组织。
