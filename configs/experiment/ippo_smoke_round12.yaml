@@ -1,0 +1,75 @@
+proposal_only: true
+do_not_use_for_freeze: true
+profile_name: ippo_smoke_round12
+benchmark_config: configs/benchmark/multi_adapter_hard_joint_proposal.yaml
+round10_smoke_config: configs/experiment/multi_adapter_hard_joint_smoke_round10.yaml
+
+scope:
+  training_run: true
+  training_type: ippo_smoke_training_only
+  freeze_candidate: false
+  note: >
+    This profile trains only a short IPPO smoke checkpoint and evaluates it on
+    the proposal-only multi-adapter hard-joint smoke. It is not formal training
+    and must not be used as a paper-freeze result.
+
+adapter_assignment_profile: semantic_ai_service
+cache_capacity_profile:
+  enabled: true
+  unit: adapter_slots
+  rsu_adapter_slots: 2
+  count_base_model_separately: false
+  eviction_policy: lru
+  telemetry_enabled: true
+
+data:
+  mobility_source: ngsim
+  workflow_csv_path: data/raw/workflow/alibaba2018/batch_task.csv
+  max_mobility_rows: 2500
+  rsu_layout: auto_dominant_tight
+  frame_offset: 0
+  window_length: 24
+  window_count: 1
+  window_scan_stride: 2
+  window_selector: max_handoff_candidate
+  window_mode: activating_only
+  workflow_ids:
+    - j_3
+    - j_8
+  min_tasks: 5
+  max_tasks: 20
+  max_steps: 12
+
+training:
+  seeds:
+    - 7
+  episodes: 6
+  update_every: 2
+  batch_size: 16
+  learning_rate: 0.0003
+  clip_ratio: 0.2
+  entropy_coef: 0.01
+  value_coef: 0.5
+  gamma: 0.99
+  gae_lambda: 0.95
+  eval_after_train: true
+
+evaluation:
+  seeds:
+    - 7
+    - 13
+    - 29
+  policies:
+    - ippo
+    - sa_ghmappo
+    - ppo
+    - popularity_cache_heuristic
+    - reactive_greedy
+
+checkpoint_manifests:
+  sa_ghmappo: artifacts/training/sa_mechanism_policy_round2/seed_checkpoint_manifest_sa_mechanism_policy_round2_best_by_round2_mechanism_score.json
+  ppo: artifacts/experiments/baseline/baseline_minimal_ngsim_alibaba_20260424_145836/seed_checkpoint_manifest_formal_round1_3seed.json
+
+output_dir: artifacts/analysis/ippo_live_eval_rows_round12
+training_output_dir: artifacts/training/ippo_smoke_round12
+report_path: docs/agent/ippo_live_eval_rows_round12_report.md

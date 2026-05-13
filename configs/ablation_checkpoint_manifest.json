@@ -1,0 +1,34 @@
+{
+  "sa_ghmappo_full": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_path": "artifacts/training/main_agents/sa_ghmappo/sa_ghmappo_train_20260406_194007/checkpoints/best_by_continuity.pt",
+    "run_id": "sa_ghmappo_train_20260406_194007",
+    "config_profile": "formal_main",
+    "removed_module": "none",
+    "paper_contribution": "full sa_ghmappo"
+  },
+  "no_prediction": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_path": "artifacts/training/main_agents/sa_ghmappo/sa_ghmappo_train_20260406_194259_005055_seed11/checkpoints/best_by_continuity.pt",
+    "run_id": "sa_ghmappo_train_20260406_194259_005055_seed11",
+    "config_profile": "baseline_safe",
+    "removed_module": "surrogate-assisted prediction",
+    "paper_contribution": "remove prediction module"
+  },
+  "no_hierarchy": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_path": "artifacts/training/main_agents/sa_ghmappo/sa_ghmappo_train_20260406_194156/checkpoints/best_by_continuity.pt",
+    "run_id": "sa_ghmappo_train_20260406_194156",
+    "config_profile": "baseline_safe",
+    "removed_module": "multi-timescale hierarchy",
+    "paper_contribution": "remove hierarchy"
+  },
+  "no_event_agent": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_path": "artifacts/training/main_agents/sa_ghmappo/sa_ghmappo_train_20260406_194342_808961_seed17/checkpoints/best_by_continuity.pt",
+    "run_id": "sa_ghmappo_train_20260406_194342_808961_seed17",
+    "config_profile": "baseline_safe",
+    "removed_module": "handoff-aware event controller",
+    "paper_contribution": "remove handoff event controller"
+  }
+}

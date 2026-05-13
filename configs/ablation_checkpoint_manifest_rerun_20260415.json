@@ -1,0 +1,23 @@
+{
+  "sa_ghmappo_full": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_path": "artifacts/training/main_agents/sa_ghmappo/sa_ghmappo_train_20260415_154335_734767_seed7/checkpoints/best_by_reward.pt",
+    "run_id": "sa_ghmappo_train_20260415_154335_734767_seed7",
+    "removed_module": "none",
+    "paper_contribution": "full sa_ghmappo rerun under positive-reward v2 protocol"
+  },
+  "w/o_handoff_migration": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_path": "artifacts/training/main_agents/sa_ghmappo/sa_ghmappo_train_20260415_155058_184029_seed7/checkpoints/best_by_reward.pt",
+    "run_id": "sa_ghmappo_train_20260415_155058_184029_seed7",
+    "removed_module": "handoff migration event controller",
+    "paper_contribution": "disable event head to remove handoff migration decisions"
+  },
+  "flat_or_no_hierarchy": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_path": "artifacts/training/main_agents/sa_ghmappo/sa_ghmappo_train_20260415_155058_172882_seed7/checkpoints/best_by_reward.pt",
+    "run_id": "sa_ghmappo_train_20260415_155058_172882_seed7",
+    "removed_module": "multi-timescale hierarchy",
+    "paper_contribution": "disable hierarchy to obtain flat/no-hierarchy ablation"
+  }
+}

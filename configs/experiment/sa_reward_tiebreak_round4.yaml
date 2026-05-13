@@ -1,0 +1,81 @@
+experiment_name: sa_reward_tiebreak_round4
+inherits: configs/experiment/sa_mechanism_policy_round2.yaml
+output_root: artifacts/training/sa_reward_tiebreak_round4
+seeds: [7, 13, 29]
+
+scope:
+  objective: mixed_informative_reward_tiebreak_with_full_stratified_safety
+  frozen_components:
+    - VecWorkflowCoreEnv semantics
+    - reward main definition
+    - benchmark split
+    - popularity_cache_heuristic policy
+    - benchmark metric definitions
+
+training:
+  script: scripts/train_sa_ghmappo_real_sample.py
+  profile: sa_reward_tiebreak_round4
+  warm_start_source: sa_mechanism_policy_round2 best_by_round2_mechanism_score per seed
+  episodes: 16
+  update_every: 4
+  batch_size: 32
+  learning_rate: 0.00003
+  clip_ratio: 0.06
+  entropy_coef: 0.0008
+  value_coef: 0.85
+  auxiliary_coef: 0.18
+  checkpoint_selection:
+    - best_by_advantage_score
+    - best_by_mechanism_advantage_score
+    - best_by_round2_mechanism_score
+    - best_by_reward_tiebreak_score
+  reward_tiebreak:
+    checkpoint_label: best_by_reward_tiebreak_score
+    selection_intent: prefer mixed reward after continuity/failure/backhaul safety guardrails
+    full_safety_check: final mixed/full benchmark remains authoritative
+  mechanism_policy_guidance:
+    mechanism_aux_coef: 0.04
+    mechanism_window_weight: 1.15
+    prepare_action_prior_weight: 0.25
+    mechanism_entropy_coef: 0.0003
+    heuristic_imitation_coef: 0.05
+    heuristic_imitation_warmup_updates: 2
+    heuristic_imitation_decay: 0.55
+  mechanism_sampling:
+    mechanism_window_oversample_ratio: 1.2
+    handoff_imminent_oversample_ratio: 1.0
+    target_mismatch_sample_weight: 1.0
+    min_mechanism_activating_windows: 2
+
+data:
+  mobility_source: ngsim
+  workflow_csv_path: data/raw/workflow/alibaba2018/batch_task.csv
+  max_mobility_rows: 2500
+  max_workflows: 2
+  workflow_selector: ordered
+  min_tasks: 5
+  max_tasks: 20
+
+scenario:
+  rsu_layout: auto_dominant_tight
+  frame_offset: 0
+  window_length: 24
+  window_selector: max_handoff_candidate
+  window_count: 3
+  window_scan_stride: 2
+  train_window_mode: sampled
+  eval_window_modes:
+    - mixed_informative
+    - full_stratified
+  max_steps: 12
+
+benchmark:
+  script: scripts/benchmark_main_results.py
+  agents:
+    - sa_ghmappo
+    - reactive_greedy
+    - popularity_cache_heuristic
+  seeds: [7, 13, 29]
+  window_modes:
+    - mixed_informative
+    - full_stratified

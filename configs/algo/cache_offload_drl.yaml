@@ -1,0 +1,43 @@
+algorithm: cache_offload_drl
+support_level: trainable
+priority_tier: tier1_domain
+family: domain_ppo_actor_critic
+observation_contract: flat_semantic_plus_cache_offload_v1
+action_contract: semantic_discrete_5_cache_offload_3head
+checkpoint_required: true
+paper_grade_independent_baseline: true
+policy:
+  graph_encoder: false
+  hierarchy: true
+  event_head_enabled: true
+  multi_controller_ctde: true
+  controller_agents:
+    - cache_agent
+    - execution_agent
+    - handoff_event_agent
+  domain_focus: model_adapter_cache_and_computation_offloading
+  cache_scalar_features: true
+  surrogate_enhanced_head: false
+  centralized_critic: true
+  ctde_scope: controller_level_cache_execution_handoff
+  excluded_sa_mechanisms:
+    - graph_encoder
+    - surrogate_prediction_features
+    - uncertainty_signal
+    - dag_dependency_aware_features
+    - mechanism_auxiliary_loss
+    - heuristic_imitation
+    - continuity_guard
+    - backhaul_guard
+    - cache_warm_start_guard
+training:
+  trainer: marl_on_policy_trainer
+  learning_rate: 0.0003
+  clip_ratio: 0.2
+  entropy_coef: 0.01
+  value_coef: 0.5
+  batch_size: 32
+export:
+  train_csv: train.csv
+  eval_csv: eval.csv
+  summary_json: summary.json

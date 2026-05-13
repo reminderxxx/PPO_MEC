@@ -1,0 +1,13 @@
+algorithm: ippo
+support_level: diagnostic
+priority_tier: contract_blocked
+family: independent_ppo
+observation_contract: flat_semantic_encoder_v1
+action_contract: semantic_discrete_5
+checkpoint_required: true
+paper_grade_independent_baseline: false
+contract_blocked_reason: single_wrapper_decision_stream_has_no_independent_per_agent_action_surface
+notes: >
+  Diagnostic IPPO placeholder over the current single wrapper decision stream.
+  It is not a paper-grade independent multi-agent PPO comparator until a stable
+  multi-agent wrapper exposes independent per-agent observations/actions.

@@ -1,0 +1,64 @@
+proposal_only: true
+do_not_use_for_freeze: true
+profile_name: multi_adapter_hard_joint_smoke_round10
+source_proposal_config: configs/benchmark/multi_adapter_hard_joint_proposal.yaml
+
+scope:
+  note: >
+    Small smoke benchmark over real NGSIM mobility and real Alibaba DAG structure.
+    Adapter assignment and cache capacity stress are controlled AI-service settings,
+    not original dataset labels and not paper-freeze results.
+  training_run: false
+  freeze_candidate: false
+
+data:
+  mobility_source: ngsim
+  workflow_csv_path: data/raw/workflow/alibaba2018/batch_task.csv
+  max_mobility_rows: 2500
+  rsu_layout: auto_dominant_tight
+  frame_offset: 0
+  window_length: 24
+  window_count: 1
+  window_scan_stride: 2
+  window_selector: max_handoff_candidate
+  window_mode: activating_only
+  workflow_ids:
+    - j_3
+    - j_8
+  min_tasks: 5
+  max_tasks: 20
+  max_steps: 12
+
+adapter_assignment_profile: semantic_ai_service
+cache_capacity_profile:
+  enabled: true
+  unit: adapter_slots
+  rsu_adapter_slots: 2
+  count_base_model_separately: false
+  eviction_policy: lru
+  telemetry_enabled: true
+
+seeds:
+  - 7
+  - 13
+  - 29
+
+policies:
+  requested:
+    - sa_ghmappo
+    - ippo
+    - ppo
+    - popularity_cache_heuristic
+    - reactive_greedy
+  evaluate_if_available:
+    - sa_ghmappo
+    - ppo
+    - popularity_cache_heuristic
+    - reactive_greedy
+
+checkpoint_manifests:
+  sa_ghmappo: artifacts/training/sa_mechanism_policy_round2/seed_checkpoint_manifest_sa_mechanism_policy_round2_best_by_round2_mechanism_score.json
+  ppo: artifacts/experiments/baseline/baseline_minimal_ngsim_alibaba_20260424_145836/seed_checkpoint_manifest_formal_round1_3seed.json
+
+output_dir: artifacts/analysis/multi_adapter_hard_joint_smoke_round10
+report_path: docs/agent/multi_adapter_hard_joint_smoke_round10_report.md

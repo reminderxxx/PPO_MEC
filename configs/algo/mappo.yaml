@@ -1,0 +1,50 @@
+algorithm: mappo
+support_level: trainable
+priority_tier: tier1
+family: mappo
+observation_contract: flat_semantic_multi_controller_ctde_v1
+action_contract: semantic_discrete_5_multi_controller_3head
+checkpoint_required: true
+paper_grade_independent_baseline: true
+policy:
+  graph_encoder: false
+  hierarchy: true
+  event_head_enabled: true
+  controller_head_credit: true
+  head_credit_protocol: aggregation_reason_weighted_ppo_v2
+  multi_controller_ctde: true
+  controller_agents:
+    - cache_agent
+    - execution_agent
+    - handoff_event_agent
+  surrogate_enhanced_head: false
+  centralized_critic: true
+  centralized_critic_context: global_semantic_flat_v1
+  ctde_scope: controller_level_cache_execution_handoff
+  vehicle_or_rsu_agent_ctde: false
+  contract_blocked_reason: ""
+  excluded_sa_mechanisms:
+    - graph_encoder
+    - surrogate_prediction_features
+    - uncertainty_signal
+    - dag_dependency_aware_features
+    - mechanism_auxiliary_loss
+    - heuristic_imitation
+    - continuity_guard
+    - backhaul_guard
+    - cache_warm_start_guard
+training:
+  trainer: marl_on_policy_trainer
+  learning_rate: 0.0003
+  clip_ratio: 0.2
+  entropy_coef: 0.01
+  value_coef: 0.5
+  batch_size: 32
+  head_credit_enabled: true
+  event_policy_credit_floor: 0.05
+  event_entropy_credit_floor: 0.05
+  event_advantage_blend: 1.0
+export:
+  train_csv: train.csv
+  eval_csv: eval.csv
+  summary_json: summary.json

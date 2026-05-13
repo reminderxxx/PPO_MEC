@@ -1,0 +1,21 @@
+algorithm: popularity_cache_heuristic
+support_level: heuristic
+priority_tier: heuristic
+family: rule_based
+observation_contract: semantic_state_info_v1
+action_contract: semantic_discrete_5
+checkpoint_required: false
+policy:
+  graph_encoder: false
+  hierarchy: false
+  popularity_prefetch_threshold: 2
+  rule_order:
+    - vehicle_fallback_when_no_current_rsu
+    - current_rsu_cache_fill_on_cache_miss
+    - predictive_prefetch_for_popular_adapter
+    - handoff_migration_prepare_on_predicted_target
+    - current_rsu_steady_offload
+export:
+  eval_csv: eval.csv
+  summary_json: summary.json
+

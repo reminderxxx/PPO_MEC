@@ -1,0 +1,43 @@
+algorithm: qmix
+support_level: trainable
+priority_tier: tier1
+family: value_decomposition
+observation_contract: flat_semantic_multi_controller_ctde_v1
+action_contract: semantic_discrete_5_multi_controller_3head_qmix
+checkpoint_required: true
+paper_grade_independent_baseline: true
+policy:
+  graph_encoder: false
+  hierarchy: true
+  multi_controller_ctde: true
+  controller_agents:
+    - cache_agent
+    - execution_agent
+    - handoff_event_agent
+  centralized_mixer: true
+  mixer: qmix
+  monotonic_mixing: true
+  surrogate_enhanced_head: false
+  vehicle_or_rsu_agent_ctde: false
+  excluded_sa_mechanisms:
+    - graph_encoder
+    - surrogate_prediction_features
+    - uncertainty_signal
+    - dag_dependency_aware_features
+    - mechanism_auxiliary_loss
+    - heuristic_imitation
+    - continuity_guard
+    - backhaul_guard
+    - cache_warm_start_guard
+training:
+  trainer: replay_qmix_inside_algo_pool
+  learning_rate: 0.0003
+  gamma: 0.99
+  batch_size: 32
+  replay_capacity: 4096
+  min_replay_size: 16
+  target_update_interval: 4
+export:
+  train_csv: train.csv
+  eval_csv: eval.csv
+  summary_json: summary.json

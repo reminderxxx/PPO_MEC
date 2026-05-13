@@ -1,0 +1,25 @@
+algorithm: dueling_dqn
+support_level: trainable
+priority_tier: tier1
+family: value_based
+observation_contract: flat_semantic_encoder_v1
+action_contract: semantic_discrete_5
+checkpoint_required: true
+policy:
+  graph_encoder: false
+  hierarchy: false
+  surrogate_enhanced_head: false
+  double_dqn: false
+  dueling: true
+training:
+  trainer: replay_dqn_inside_algo_pool
+  learning_rate: 0.0003
+  gamma: 0.99
+  batch_size: 32
+  replay_capacity: 4096
+  min_replay_size: 16
+  target_update_interval: 4
+export:
+  train_csv: train.csv
+  eval_csv: eval.csv
+  summary_json: summary.json

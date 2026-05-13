@@ -1,0 +1,23 @@
+algorithm: ppo
+support_level: trainable
+priority_tier: tier1
+family: ppo
+observation_contract: flat_semantic_encoder_v1
+action_contract: semantic_discrete_5
+checkpoint_required: true
+policy:
+  graph_encoder: false
+  hierarchy: false
+  surrogate_enhanced_head: false
+  centralized_critic: false
+training:
+  trainer: marl_on_policy_trainer
+  learning_rate: 0.0003
+  clip_ratio: 0.2
+  entropy_coef: 0.01
+  value_coef: 0.5
+  batch_size: 32
+export:
+  train_csv: train.csv
+  eval_csv: eval.csv
+  summary_json: summary.json

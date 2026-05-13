@@ -1,0 +1,66 @@
+experiment_name: top_journal_mechanism_v1
+output_root: artifacts/training/top_journal_mechanism_v1
+seeds: [7, 13, 29]
+
+scope:
+  objective: top_journal_mechanism_stability_and_ctde_baseline_audit
+  frozen_components:
+    - VecWorkflowCoreEnv semantics
+    - reward main definition
+    - benchmark split
+    - popularity_cache_heuristic policy
+    - benchmark metric definitions
+
+training:
+  script: scripts/train_sa_ghmappo_real_sample.py
+  profile: top_journal_mechanism_v1
+  episodes: 96
+  update_every: 4
+  batch_size: 32
+  learning_rate: 0.00005
+  clip_ratio: 0.08
+  entropy_coef: 0.0012
+  value_coef: 0.85
+  auxiliary_coef: 0.30
+  mechanism_policy_guidance:
+    heuristic_imitation_coef: 0.10
+    heuristic_imitation_warmup_updates: 6
+    heuristic_imitation_decay: 0.88
+    mechanism_aux_coef: 0.09
+    mechanism_window_weight: 1.50
+    prepare_action_prior_weight: 0.60
+    mechanism_entropy_coef: 0.0006
+    mechanism_aux_current_cache_fill_enabled: true
+    backhaul_guard_enabled: true
+    backhaul_guard_max_reactive_fills_per_adapter: 1
+    cache_warm_start_guard_enabled: true
+    cache_warm_start_guard_min_countdown: 0.0
+  late_training_retention:
+    mechanism_retention_start_update: 6
+    mechanism_aux_coef_floor_after_update: 0.08
+    mechanism_window_weight_floor_after_update: 1.50
+    mechanism_entropy_floor_after_update: 0.0006
+  mechanism_sampling:
+    mechanism_window_oversample_ratio: 2.0
+    handoff_imminent_oversample_ratio: 1.5
+    target_mismatch_sample_weight: 1.5
+    min_mechanism_activating_windows: 2
+
+baseline_audit:
+  mappo:
+    centralized_critic_context: global_semantic_flat_v1
+    ctde_scope: centralized_critic_under_single_wrapper_decision_stream
+    full_ctde_blocker: stable_multi_agent_wrapper_missing
+
+benchmark:
+  script: scripts/benchmark_main_results.py
+  agents:
+    - sa_ghmappo
+    - reactive_greedy
+    - popularity_cache_heuristic
+    - ppo
+    - mappo
+  seeds: [7, 13, 29]
+  window_modes:
+    - mixed_informative
+    - full_stratified

@@ -1,0 +1,49 @@
+experiment_name: baseline_minimal_ngsim_alibaba
+output_root: artifacts/experiments/baseline
+seeds: [7, 13]
+
+data:
+  mobility_source: ngsim
+  mobility_csv_path: ""
+  workflow_csv_path: data/raw/workflow/alibaba2018/batch_task.csv
+  max_mobility_rows: 1500
+  max_workflows: 1
+  workflow_selector: ordered
+  min_tasks: 5
+  max_tasks: 20
+
+scenario:
+  rsu_layout: auto_dominant_tight
+  frame_offset: 0
+  window_length: 16
+  window_selector: max_handoff_candidate
+  window_count: 3
+  window_scan_stride: 2
+  window_mode: mixed_informative
+  max_steps: 6
+
+training:
+  profile: baseline_safe
+  episodes: 2
+  update_every: 1
+  batch_size: 8
+  eval_frequency: after_training
+  checkpoint_rule: latest
+
+agents:
+  - name: sa_ghmappo
+    role: main_method
+    train: false
+    checkpoint_path: artifacts/training/main_agents/sa_ghmappo/sa_ghmappo_train_20260415_154335_734767_seed7/checkpoints/best_by_reward.pt
+  - name: reactive_greedy
+    role: heuristic_baseline
+    train: false
+  - name: popularity_cache_heuristic
+    role: heuristic_baseline
+    train: false
+  - name: ppo
+    role: rl_baseline
+    train: true
+  - name: dqn
+    role: rl_baseline
+    train: true

@@ -1,0 +1,42 @@
+{
+  "sa_ghmappo_full": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_path": "artifacts/training/main_agents/sa_ghmappo/sa_ghmappo_train_20260408_093313_055500_seed7/checkpoints/best_by_mechanism_balanced.pt",
+    "run_id": "sa_ghmappo_train_20260408_093313_055500_seed7",
+    "config_profile": "formal_main_stable",
+    "removed_module": "none",
+    "paper_contribution": "full SA-GHMAPPO with surrogate-assisted prediction, hierarchy, prefetch and handoff migration"
+  },
+  "w/o_dt_predictor": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_path": "artifacts/training/main_agents/sa_ghmappo/sa_ghmappo_train_20260406_194259_005055_seed11/checkpoints/best_by_continuity.pt",
+    "run_id": "sa_ghmappo_train_20260406_194259_005055_seed11",
+    "config_profile": "baseline_safe",
+    "removed_module": "surrogate-assisted prediction",
+    "paper_contribution": "removes DT/surrogate-assisted prediction branch"
+  },
+  "w/o_adapter_prefetch_or_cache": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_path": "artifacts/training/main_agents/sa_ghmappo/sa_ghmappo_train_20260409_135732_445661_seed7/checkpoints/best_by_continuity.pt",
+    "run_id": "sa_ghmappo_train_20260409_135732_445661_seed7",
+    "config_profile": "baseline_safe",
+    "removed_module": "adapter prefetch / proactive cache placement",
+    "paper_contribution": "removes adapter prefetch and proactive cache placement branch"
+  },
+  "w/o_handoff_migration": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_path": "artifacts/training/main_agents/sa_ghmappo/sa_ghmappo_train_20260406_194342_808961_seed17/checkpoints/best_by_continuity.pt",
+    "run_id": "sa_ghmappo_train_20260406_194342_808961_seed17",
+    "config_profile": "baseline_safe",
+    "removed_module": "handoff-aware event controller",
+    "paper_contribution": "removes handoff migration / readiness controller"
+  },
+  "flat_or_no_hierarchy": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_path": "artifacts/training/main_agents/sa_ghmappo/sa_ghmappo_train_20260406_194156/checkpoints/best_by_continuity.pt",
+    "run_id": "sa_ghmappo_train_20260406_194156",
+    "config_profile": "baseline_safe",
+    "removed_module": "multi-timescale hierarchy",
+    "paper_contribution": "removes hierarchical slow/fast/event control decomposition"
+  }
+}

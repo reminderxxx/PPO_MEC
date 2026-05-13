@@ -1,0 +1,54 @@
+proposal_only: true
+do_not_use_for_freeze: true
+profile_name: multi_adapter_hard_joint_proposal
+
+data_boundary:
+  real_components:
+    mobility_trace: NGSIM mobility trace
+    workflow_dag_structure: Alibaba batch_task DAG structure
+    task_type_field: Alibaba task_type raw field
+  controlled_ai_service_profile_components:
+    workflow_to_adapter_assignment: semantic_ai_service
+    adapter_model_size_profile: sample_model_catalog aligned AI-service adapters
+    cache_capacity_stress_setting: controlled cache stress setting, proposal only
+  note: >
+    This is not a new real dataset. It is a proposal for a controlled
+    AI-service stress profile over real mobility traces and real DAG structure.
+
+adapter_assignment_profile: semantic_ai_service
+adapter_assignment_profile_enabled_by_default: false
+legacy_compatibility_profile: legacy_batch_type
+
+semantic_ai_service_mapping:
+  source_or_input_nodes: adapter_perception
+  single_parent_middle_nodes:
+    - adapter_tracking
+    - adapter_intent
+  multi_parent_fusion_nodes: adapter_fusion
+  late_or_sink_nodes:
+    late_nodes: adapter_intent
+    sink_or_output_nodes: adapter_control
+  deterministic: true
+  random_seed_required: false
+
+cache_capacity_profile:
+  enabled: true
+  unit: adapter_slots
+  profile_name: multi_adapter_capacity_stress
+  rsu_adapter_slots: 2
+  count_base_model_separately: false
+  eviction_policy: lru
+  admission_policy: controlled_by_policy
+  count_eviction_telemetry: true
+  telemetry_enabled: true
+  proposal_only: true
+  controlled_cache_stress_setting: true
+  note: >
+    This cache capacity profile is a controlled stress setting for this proposal.
+    It must not be treated as a new real dataset and does not replace mixed/full
+    benchmark defaults.
+
+required_followup_before_freeze:
+  - validate proposal-only cache capacity before benchmark use
+  - keep mixed/full defaults unchanged
+  - run validation before any benchmark claim

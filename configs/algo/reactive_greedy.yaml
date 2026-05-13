@@ -1,0 +1,19 @@
+algorithm: reactive_greedy
+support_level: heuristic
+priority_tier: heuristic
+family: rule_based
+observation_contract: semantic_state_info_v1
+action_contract: semantic_discrete_5
+checkpoint_required: false
+policy:
+  uses_prediction: false
+  graph_encoder: false
+  hierarchy: false
+  rule_order:
+    - vehicle_fallback_when_no_current_rsu
+    - current_rsu_cache_fill_on_cache_miss
+    - current_rsu_steady_offload
+export:
+  eval_csv: eval.csv
+  summary_json: summary.json
+

@@ -1,0 +1,115 @@
+experiment_name: sa_ghmappo_advantage_round1
+output_root: artifacts/experiments/sa_advantage_round1
+seeds: [7, 13, 29]
+
+scope:
+  objective: agent_side_sa_ghmappo_advantage_optimization
+  frozen_components:
+    - VecWorkflowCoreEnv semantics
+    - reward definition
+    - handoff and migration semantics
+    - adapter cache metrics
+    - benchmark metric definitions
+
+data:
+  mobility_source: ngsim
+  mobility_csv_path: ""
+  workflow_csv_path: data/raw/workflow/alibaba2018/batch_task.csv
+  max_mobility_rows: 2500
+  max_workflows: 2
+  workflow_selector: ordered
+  min_tasks: 5
+  max_tasks: 20
+
+scenario:
+  rsu_layout: auto_dominant_tight
+  frame_offset: 0
+  window_length: 24
+  window_selector: max_handoff_candidate
+  window_count: 3
+  window_scan_stride: 2
+  train_window_mode: sampled
+  eval_window_modes:
+    - mixed_informative
+    - full_stratified
+  max_steps: 12
+
+training:
+  script: scripts/train_sa_ghmappo_real_sample.py
+  profile: sa_advantage_round1
+  episodes: 64
+  update_every: 4
+  batch_size: 32
+  learning_rate: 0.00006
+  clip_ratio: 0.08
+  entropy_coef: 0.001
+  value_coef: 0.85
+  auxiliary_coef: 0.28
+  checkpoint_selection:
+    - latest
+    - best_by_reward
+    - best_by_continuity
+    - best_by_mechanism_balanced
+    - best_by_advantage_score
+    - best_by_mechanism_advantage_score
+  mechanism_sampling:
+    mechanism_window_oversample_ratio: 2.0
+    handoff_imminent_oversample_ratio: 1.5
+    target_mismatch_sample_weight: 1.5
+    min_mechanism_activating_windows: 2
+
+sa_ghmappo_options:
+  continuity_guard_enabled: true
+  handoff_target_alignment_guard_enabled: true
+  continuity_guard_logit_penalty: 1.25
+  continuity_guard_prepare_boost: 1.55
+  continuity_guard_confidence_threshold: 0.38
+  continuity_guard_prepare_score_threshold: 0.24
+  continuity_guard_hard_override_enabled: false
+  heuristic_imitation_coef: 0.12
+  heuristic_imitation_warmup_updates: 3
+  heuristic_imitation_decay: 0.65
+
+ablation_variants:
+  - name: original_formal_checkpoint
+    continuity_guard_enabled: false
+    heuristic_imitation_coef: 0.0
+    checkpoint_source: existing_formal_checkpoint
+  - name: guard
+    continuity_guard_enabled: true
+    handoff_target_alignment_guard_enabled: true
+    heuristic_imitation_coef: 0.0
+  - name: imitation
+    continuity_guard_enabled: false
+    handoff_target_alignment_guard_enabled: false
+    heuristic_imitation_coef: 0.12
+    heuristic_imitation_warmup_updates: 3
+    heuristic_imitation_decay: 0.65
+  - name: guard_plus_imitation
+    continuity_guard_enabled: true
+    handoff_target_alignment_guard_enabled: true
+    heuristic_imitation_coef: 0.12
+    heuristic_imitation_warmup_updates: 3
+    heuristic_imitation_decay: 0.65
+
+benchmark:
+  script: scripts/benchmark_main_results.py
+  agents:
+    - sa_ghmappo
+    - reactive_greedy
+    - popularity_cache_heuristic
+    - ppo
+    - mappo
+  provisional_agents:
+    - mappo
+  seeds: [7, 13, 29]
+  window_modes:
+    - mixed_informative
+    - full_stratified
+  required_outputs:
+    - aggregate_summary.json
+    - benchmark_rows.csv
+    - comparison_against_popularity.json
+    - sa_advantage_diagnosis.json
+    - ablation_summary.csv
+    - ablation_summary.json
