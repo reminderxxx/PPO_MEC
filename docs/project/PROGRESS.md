@@ -2,6 +2,38 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-05-15: v5 性能/robustness 候选实验维护启动
+
+已完成维护：
+
+- `GymVecEnv` observation 中当前 RSU cache size 改为按 `state["primary_vehicle_id"]` 解析主车辆；缺失时才 fallback 到 `vehicles[0]`。
+- `PredictorManager` 增加 oracle 请求但 oracle frames 不可用时的 audit 字段：`requested_predictor_kind`、`oracle_requested`、`oracle_available`、`oracle_fallback_to_baseline`。
+- `_prediction_history` 增加长度上限，最多保留 `prediction_delay_steps + 1` 条，避免长跑累计。
+- 新增 SA-GHMAPPO 训练 profile `top_journal_mechanism_v5_perf_robust` 和实验配置 `configs/experiment/top_journal_mechanism_v5_perf_robust.yaml`；保持 `semantic_discrete_5` action contract、reward 定义和 baseline contract 不变。
+- 新增 contract 测试覆盖 primary vehicle observation cache、oracle fallback audit 和 prediction history trim。
+
+已验证：
+
+- `python -m py_compile src\envs\wrappers\gym_vec_env.py src\envs\core\predictor_manager.py scripts\train_sa_ghmappo_real_sample.py`
+- `python -m pytest tests\test_env_contract.py tests\test_algo_pool_contract.py`：32 passed；仍有既有 `.pytest_cache` WinError 183 warning，不影响 contract 结果。
+- `python scripts\smoke_test.py`
+- `python scripts\run_top_journal_closed_loop.py --quick --run_id top_journal_mechanism_v5_perf_robust_quick_20260515 --seeds 7 --sa_profile top_journal_mechanism_v5_perf_robust --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure`：脚本链通过；quick/debug gate 不作为论文结论。
+- `python scripts\run_top_journal_closed_loop.py --run_id top_journal_mechanism_v5_perf_robust_20260515_v1 --seeds 7 13 29 --sa_profile top_journal_mechanism_v5_perf_robust --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --resume_training`：首次运行在 `train_dueling_dqn_seed_29` 出现一次 `import torch` 异常，原命令 resume 后完成；`formal_contract_ready=true`，`paper_claim_ready=false`。
+- `python scripts\run_top_journal_final_submission_loop.py --run_id final_submission_v5_perf_robust_20260515_v1 --base_manifest_path artifacts\experiments\top_journal_closed_loop\top_journal_mechanism_v5_perf_robust_20260515_v1\seed_checkpoint_manifest.json --force_retrain_learned --resume_training --resume_benchmark --resume_support --command_retries 2 --baseline_episodes 96 --baseline_update_every 6 --baseline_batch_size 32 --minimum_reward_delta 0.5 --holdout_offsets 3 --seeds 7 13 29`：命令级 retry 后完成，`formal_training_provenance.passed=true`，但 `target_reached=false`、`paper_claim_ready=false`。
+- `python scripts\build_top_journal_comparison_report.py --final_run_root artifacts\experiments\top_journal_final_submission\final_submission_v5_perf_robust_20260515_v1 --bootstrap_samples 5000`：完成，`review_ready=false`、`paper_ready_package_ready=false`。
+
+关键结果：
+
+- Final gate blockers：`offset_0:cluster_ci_not_positive:cache_offload_drl:ci95_low=-1.008212`；`offset_3:cluster_ci_not_positive:cache_offload_drl:ci95_low=-3.372274`。
+- comparison self-review：`blocker_count=3`、`limitation_count=1`、`pass_count=14`。
+- 主 split 相对最强 learned baseline 的 reward margin：Formal Mixed `+7.845556`，Formal Full `+0.837777`，Holdout Mixed `+1.443333`，Holdout Full `+1.360953`；最弱项低于当前 canonical promotion threshold `+3.703148`。
+- support weakest all-setting reward delta：Prediction `+1.687778`、Robustness `+6.910833`、Scalability `+1.752685`；Prediction 和 Scalability 低于当前 canonical references，Robustness 略高于 `+6.879236`。
+
+结论边界：
+
+- v5 不通过 promotion gate，不替换当前 canonical；继续保留 `final_submission_full_current_baselines_20260511_v1` 为正式 canonical。
+- 本轮 v5 记录为性能/robustness 候选失败结果；不更新 `README.md`、`ARTIFACT_RECORDS.md`、`RUNBOOK.md` 或 `DIRECTORY_STRUCTURE.md` 的 canonical 指向。
+
 ## 2026-05-12: SA-GHMAPPO 主算法 contract 闭环修补
 
 已完成：

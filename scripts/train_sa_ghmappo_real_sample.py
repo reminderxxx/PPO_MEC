@@ -311,6 +311,18 @@ PROFILE_DEFAULTS = {
         "max_steps": 16,
         "train_window_count": 5,
     },
+    "top_journal_mechanism_v5_perf_robust": {
+        "episodes": 96,
+        "update_every": 4,
+        "batch_size": 32,
+        "learning_rate": 5e-5,
+        "clip_ratio": 0.08,
+        "entropy_coef": 0.0012,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.30,
+        "max_steps": 16,
+        "train_window_count": 5,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -329,7 +341,7 @@ PROFILE_DEFAULTS = {
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="训练 SA-GHMAPPO 主方法")
     parser.add_argument("--agent_name", type=str, default="sa_ghmappo", choices=["sa_ghmappo"])
-    parser.add_argument("--profile", type=str, default="baseline_safe", choices=["smoke", "baseline_safe", "formal_main", "formal_main_stable", "sa_advantage_round1", "sa_mechanism_policy_round2", "sa_mechanism_retention_round3", "top_journal_mechanism_v1", "top_journal_mechanism_v2", "top_journal_mechanism_v3", "sa_reward_tiebreak_round4"])
+    parser.add_argument("--profile", type=str, default="baseline_safe", choices=["smoke", "baseline_safe", "formal_main", "formal_main_stable", "sa_advantage_round1", "sa_mechanism_policy_round2", "sa_mechanism_retention_round3", "top_journal_mechanism_v1", "top_journal_mechanism_v2", "top_journal_mechanism_v3", "top_journal_mechanism_v5_perf_robust", "sa_reward_tiebreak_round4"])
     parser.add_argument("--train_window_mode", type=str, default="rotate", choices=["fixed", "rotate", "sampled"])
     parser.add_argument("--train_window_count", type=int, default=None)
     parser.add_argument("--window_mode", type=str, default="activating_only", choices=["activating_only", "mixed", "full", "mixed_informative", "full_stratified"])
@@ -409,13 +421,13 @@ def parse_args() -> argparse.Namespace:
     for field_name in ["episodes", "update_every", "batch_size", "learning_rate", "clip_ratio", "entropy_coef", "value_coef", "auxiliary_coef", "max_steps", "train_window_count"]:
         if getattr(args, field_name) is None:
             setattr(args, field_name, profile_defaults[field_name])
-    if args.profile in {"top_journal_mechanism_v1", "top_journal_mechanism_v2", "top_journal_mechanism_v3"}:
+    if args.profile in {"top_journal_mechanism_v1", "top_journal_mechanism_v2", "top_journal_mechanism_v3", "top_journal_mechanism_v5_perf_robust"}:
         if float(args.mechanism_window_oversample_ratio) == 1.0:
-            args.mechanism_window_oversample_ratio = 2.0
+            args.mechanism_window_oversample_ratio = 2.5 if args.profile == "top_journal_mechanism_v5_perf_robust" else 2.0
         if float(args.handoff_imminent_oversample_ratio) == 1.0:
-            args.handoff_imminent_oversample_ratio = 1.5
+            args.handoff_imminent_oversample_ratio = 1.75 if args.profile == "top_journal_mechanism_v5_perf_robust" else 1.5
         if float(args.target_mismatch_sample_weight) == 1.0:
-            args.target_mismatch_sample_weight = 1.5
+            args.target_mismatch_sample_weight = 1.75 if args.profile == "top_journal_mechanism_v5_perf_robust" else 1.5
         if int(args.min_mechanism_activating_windows) == 0:
             args.min_mechanism_activating_windows = 2
     return args
@@ -1227,6 +1239,22 @@ def build_episode_metric(summary: dict[str, Any], episode_index: int, updated: b
 
 
 def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
+    if profile == "top_journal_mechanism_v5_perf_robust":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v1")
+        kwargs.update(
+            {
+                "event_prepare_margin_boost": 0.60,
+                "temporal_prepare_activation_threshold": 0.28,
+                "event_logit_temperature_final": 0.72,
+                "event_logit_sharpening_final_scale": 2.75,
+                "mechanism_window_weight": 1.75,
+                "prepare_action_prior_weight": 0.65,
+                "heuristic_imitation_warmup_updates": 8,
+                "heuristic_imitation_decay": 0.92,
+                "predictive_prepare_hard_override_enabled": False,
+            }
+        )
+        return kwargs
     if profile == "top_journal_mechanism_v2":
         kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v1")
         kwargs.update(

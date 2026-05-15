@@ -316,6 +316,10 @@ class PredictorManager:
         current_associations: dict[str, str | None],
     ) -> dict[str, Any]:
         predictor_kind = self._effective_predictor_kind(predictions)
+        oracle_requested = bool(
+            self._requested_predictor_kind == "oracle" or self._oracle_prediction_enabled
+        )
+        oracle_available = bool(self._oracle_prediction_enabled and self._oracle_future_frames)
         claim_boundary_by_kind = {
             "baseline": "prediction_aware_surrogate_feature_assisted",
             "oracle": "oracle_diagnostic_not_learned_policy_claim",
@@ -332,6 +336,12 @@ class PredictorManager:
             predictions["predictor_note"] = (
                 "baseline short-horizon predictor; use prediction-aware/surrogate-feature-assisted wording"
             )
+        predictions["requested_predictor_kind"] = self._requested_predictor_kind
+        predictions["oracle_requested"] = oracle_requested
+        predictions["oracle_available"] = oracle_available
+        predictions["oracle_fallback_to_baseline"] = bool(
+            oracle_requested and predictor_kind == "baseline"
+        )
         predictions["predictor_kind"] = predictor_kind
         predictions["predictor_interfaces_available"] = [
             "baseline",
@@ -584,6 +594,9 @@ class PredictorManager:
         }
         perturbed.pop("_current_associations", None)
         self._prediction_history.append(perturbed)
+        history_limit = max(self._prediction_delay_steps + 1, 1)
+        if len(self._prediction_history) > history_limit:
+            self._prediction_history = self._prediction_history[-history_limit:]
         if self._prediction_delay_steps > 0 and len(self._prediction_history) > self._prediction_delay_steps:
             delayed = self._prediction_history[-(self._prediction_delay_steps + 1)]
             return {

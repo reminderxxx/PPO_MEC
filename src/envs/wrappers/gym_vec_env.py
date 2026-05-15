@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import numpy as np
 from typing import Any
 
 from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv
@@ -68,6 +69,9 @@ class GymVecEnv(gym.Env):
         self._action_mask_builder = ActionMaskBuilder(self._action_schema)
         self._last_state: dict[str, Any] | None = None
         self._episode_step_index = 0
+        # 初始化随机状态生成器，用于可复现性
+        self._np_random: np.random.RandomState | None = None
+        self._current_seed: int | None = None
         self.action_space = spaces.Discrete(self._action_schema.discrete_action_count)
         self.observation_space = spaces.Box(
             low=-1.0,
@@ -91,15 +95,33 @@ class GymVecEnv(gym.Env):
         """Return the semantic action contract exposed by this wrapper."""
         return self._action_schema
 
+    @property
+    def current_seed(self) -> int | None:
+        """返回当前使用的随机种子，用于可复现性追踪。"""
+        return self._current_seed
+
     def reset(
         self,
         *,
         seed: int | None = None,
         options: dict[str, Any] | None = None,
     ) -> tuple[list[float], dict[str, Any]]:
-        del seed
-        del options
-        state, info = self._core_env.reset()
+        # 使用 seed 参数初始化随机状态生成器，确保可复现性
+        if seed is not None:
+            self._np_random = np.random.RandomState(seed)
+            self._current_seed = seed
+        else:
+            # 如果没有提供 seed，创建一个独立的随机状态
+            self._np_random = np.random.RandomState()
+            self._current_seed = None
+
+        # 将随机状态传递给核心环境（如果支持）
+        import inspect
+        core_reset_sig = inspect.signature(self._core_env.reset)
+        if 'seed' in core_reset_sig.parameters:
+            state, info = self._core_env.reset(seed=seed, options=options)
+        else:
+            state, info = self._core_env.reset()
         self._last_state = state
         self._episode_step_index = 0
         self._normalizer.reset(state)
@@ -164,9 +186,10 @@ class GymVecEnv(gym.Env):
         rsus = state.get("rsus", [])
         predictions = state.get("predictions", {})
         current_node = state.get("current_workflow_node")
+        primary_vehicle = self._resolve_primary_vehicle_for_observation(state)
         current_rsu_cache_size = 0.0
-        if vehicles and vehicles[0].get("associated_rsu_id"):
-            associated_rsu_id = vehicles[0]["associated_rsu_id"]
+        if primary_vehicle.get("associated_rsu_id"):
+            associated_rsu_id = primary_vehicle["associated_rsu_id"]
             for rsu in rsus:
                 if rsu.get("rsu_id") == associated_rsu_id:
                     current_rsu_cache_size = float(len(rsu.get("cached_adapter_ids", [])))
@@ -196,6 +219,15 @@ class GymVecEnv(gym.Env):
             episode_step_index=self._episode_step_index,
             max_steps=getattr(self._core_env, "_max_steps", 16),
         )
+
+    def _resolve_primary_vehicle_for_observation(self, state: dict[str, Any]) -> dict[str, Any]:
+        vehicles = list(state.get("vehicles", []))
+        primary_vehicle_id = state.get("primary_vehicle_id")
+        if primary_vehicle_id is not None:
+            for vehicle in vehicles:
+                if str(vehicle.get("vehicle_id")) == str(primary_vehicle_id):
+                    return dict(vehicle)
+        return dict(vehicles[0]) if vehicles else {}
 
     def _build_compatible_semantic_state(self, state: dict[str, Any]) -> dict[str, Any]:
         """仅在包装层提供旧字段兼容，不回写到底层环境状态。"""

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import sys
 import unittest
 from pathlib import Path
@@ -14,6 +15,7 @@ from src.data.mobility.replay_provider import ReplayProvider
 from src.envs.core.predictor_manager import PredictorManager
 from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv, make_toy_vec_env
 from src.envs.specs import ControlAction, RSUState
+from src.envs.wrappers.gym_vec_env import GymVecEnv
 
 
 def 构造控制动作(state: dict) -> ControlAction:
@@ -84,6 +86,65 @@ class EnvContractTestCase(unittest.TestCase):
         self.assertFalse(predictions["learned_predictor_attached"])
         self.assertIn("prediction_quality_audit", predictions)
         self.assertIn("brier_score_proxy", predictions["prediction_quality_audit"])
+
+    def test_predictor_manager_audits_oracle_fallback(self) -> None:
+        env = VecWorkflowCoreEnv(
+            predictor_manager=PredictorManager(
+                predictor_kind="oracle",
+                oracle_prediction_enabled=True,
+            )
+        )
+
+        state, _ = env.reset()
+
+        predictions = state["predictions"]
+        self.assertEqual(predictions["requested_predictor_kind"], "oracle")
+        self.assertTrue(predictions["oracle_requested"])
+        self.assertFalse(predictions["oracle_available"])
+        self.assertTrue(predictions["oracle_fallback_to_baseline"])
+        self.assertEqual(predictions["predictor_kind"], "baseline")
+
+    def test_predictor_manager_trims_prediction_history(self) -> None:
+        predictor_manager = PredictorManager(prediction_delay_steps=2)
+        env = VecWorkflowCoreEnv(predictor_manager=predictor_manager, max_steps=5)
+
+        state, _ = env.reset()
+        for _ in range(4):
+            state, _, terminated, _, _ = env.step(构造控制动作(state))
+            if terminated:
+                break
+
+        self.assertLessEqual(len(predictor_manager._prediction_history), 3)
+
+    def test_gym_observation_uses_primary_vehicle_cache_context(self) -> None:
+        env = GymVecEnv(core_env=make_toy_vec_env())
+        state = {
+            "time_index": 0,
+            "workflow": {"completed_node_ids": [], "execution_order": ["n1"]},
+            "vehicles": [
+                {"vehicle_id": "veh_a", "associated_rsu_id": "rsu_a"},
+                {"vehicle_id": "veh_b", "associated_rsu_id": "rsu_b"},
+            ],
+            "primary_vehicle_id": "veh_b",
+            "rsus": [
+                {"rsu_id": "rsu_a", "cached_adapter_ids": ["adapter_a"]},
+                {
+                    "rsu_id": "rsu_b",
+                    "cached_adapter_ids": ["adapter_b1", "adapter_b2", "adapter_b3"],
+                },
+            ],
+            "predictions": {
+                "predicted_handoff_vehicle_ids": [],
+                "future_load": {},
+            },
+            "current_workflow_node": {"node_id": "n1"},
+            "handoff_events": [],
+        }
+
+        env._normalizer.reset(state)
+        observation = env._encode_observation(state)
+
+        self.assertAlmostEqual(observation[7], math.tanh(3.0 / 8.0), places=6)
 
     def test_handoff_pressure_primary_vehicle_selection(self) -> None:
         frames = [
