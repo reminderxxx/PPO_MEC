@@ -9,6 +9,7 @@
 - `PROGRESS.md`：已确认阶段事实和整理动作
 - `BUGS.md`：当前有效问题、风险和禁止误读项
 - `ARTIFACT_RECORDS.md`：从 `artifacts/` 整理出的规范化实验记录
+- `current_results_audit_20260527.md`：当前 canonical / v5 / MAPPO v3 / SA v6 结果状态、缺口和阻塞审计表
 - `CLEANUP_LOG.md`：旧文档和旧产物清理记录
 - `DIRECTORY_STRUCTURE.md`：目录边界和产物写入位置
 - `DATASET_SOURCES.md`：当前数据集名称、角色、本地路径和下载页声明
@@ -33,6 +34,5 @@
 ## 模板来源
 
 通用模板内容已整理进本目录。当前事实来源只保留 `docs/project/` 和根目录 `AGENTS.md`。
-
 
 
