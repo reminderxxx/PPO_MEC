@@ -276,15 +276,22 @@ class 分层PPO基类(BaseAgent):
         value_coef: float = 0.5,
         auxiliary_coef: float = 0.0,
         head_credit_enabled: bool = False,
+        head_credit_protocol: str = "aggregation_reason_weighted_ppo_v2",
         mechanism_logit_bias_strength: float = 0.0,
         mechanism_confidence_floor: float = 0.0,
         prediction_feature_dim: int = 13,
         prediction_gate_min_leak: float = 0.0,
+        slow_entropy_coef_scale: float = 1.0,
+        fast_entropy_coef_scale: float = 1.0,
         event_entropy_coef_scale: float = 1.0,
+        slow_entropy_credit_floor: float = 0.0,
+        fast_entropy_credit_floor: float = 0.0,
         event_entropy_credit_floor: float = 0.0,
         event_logit_temperature: float = 1.0,
         event_logit_temperature_final: float | None = None,
         event_temperature_decay_updates: int = 0,
+        slow_policy_credit_floor: float = 0.0,
+        fast_policy_credit_floor: float = 0.0,
         event_policy_credit_floor: float = 0.0,
         event_advantage_blend: float = 1.0,
         event_logit_sharpening_final_scale: float = 1.0,
@@ -368,18 +375,40 @@ class 分层PPO基类(BaseAgent):
         self._value_coef = float(value_coef)
         self._auxiliary_coef = float(auxiliary_coef)
         self._head_credit_enabled = bool(head_credit_enabled)
+        self._head_credit_protocol = str(head_credit_protocol or "aggregation_reason_weighted_ppo_v2")
         self._mechanism_logit_bias_strength = float(mechanism_logit_bias_strength)
         self._mechanism_confidence_floor = float(mechanism_confidence_floor)
         self._prediction_feature_dim = int(prediction_feature_dim)
         self._prediction_gate_min_leak = max(0.0, min(float(prediction_gate_min_leak), 1.0))
+        self._slow_entropy_coef_scale = max(float(slow_entropy_coef_scale), 0.0)
+        self._fast_entropy_coef_scale = max(float(fast_entropy_coef_scale), 0.0)
         self._event_entropy_coef_scale = max(float(event_entropy_coef_scale), 0.0)
+        self._slow_entropy_credit_floor = max(0.0, min(float(slow_entropy_credit_floor), 1.0))
+        self._fast_entropy_credit_floor = max(0.0, min(float(fast_entropy_credit_floor), 1.0))
         self._event_entropy_credit_floor = max(0.0, min(float(event_entropy_credit_floor), 1.0))
         self._event_logit_temperature = max(float(event_logit_temperature), 0.25)
         if event_logit_temperature_final is None:
             event_logit_temperature_final = min(self._event_logit_temperature, 1.0)
         self._event_logit_temperature_final = max(float(event_logit_temperature_final), 0.25)
         self._event_temperature_decay_updates = max(int(event_temperature_decay_updates), 0)
+        self._slow_policy_credit_floor = max(0.0, min(float(slow_policy_credit_floor), 1.0))
+        self._fast_policy_credit_floor = max(0.0, min(float(fast_policy_credit_floor), 1.0))
         self._event_policy_credit_floor = max(0.0, min(float(event_policy_credit_floor), 1.0))
+        self._policy_credit_floor_by_head = {
+            "slow": self._slow_policy_credit_floor,
+            "fast": self._fast_policy_credit_floor,
+            "event": self._event_policy_credit_floor,
+        }
+        self._entropy_credit_floor_by_head = {
+            "slow": self._slow_entropy_credit_floor,
+            "fast": self._fast_entropy_credit_floor,
+            "event": self._event_entropy_credit_floor,
+        }
+        self._entropy_coef_scale_by_head = {
+            "slow": self._slow_entropy_coef_scale,
+            "fast": self._fast_entropy_coef_scale,
+            "event": self._event_entropy_coef_scale,
+        }
         self._event_advantage_blend = max(float(event_advantage_blend), 0.0)
         self._event_logit_sharpening_final_scale = max(float(event_logit_sharpening_final_scale), 1.0)
         self._event_logit_sharpening_timing_gain = max(float(event_logit_sharpening_timing_gain), 0.0)
@@ -685,7 +714,13 @@ class 分层PPO基类(BaseAgent):
             "predicted_sequence_contains_other_rsu": bool(prediction_target_diagnostics["predicted_sequence_contains_other_rsu"]),
             "predicted_first_non_current_rsu": prediction_target_diagnostics["predicted_first_non_current_rsu"],
             "predicted_first_non_current_eta": int(prediction_target_diagnostics["predicted_first_non_current_eta"]),
+            "head_credit_protocol": self._head_credit_protocol,
             "head_credit_weights": head_credit_weights,
+            "effective_head_credit_floors": {
+                "policy": dict(self._policy_credit_floor_by_head),
+                "entropy": dict(self._entropy_credit_floor_by_head),
+                "entropy_scale": dict(self._entropy_coef_scale_by_head),
+            },
             "deterministic_temporal_smoothing": smoothing_info,
             "cache_warm_start_guard": cache_warm_guard_info,
             "backhaul_guard": backhaul_guard_info,
@@ -1004,10 +1039,17 @@ class 分层PPO基类(BaseAgent):
             "uncertainty_aware_event_scaling_enabled": self._uncertainty_aware_event_scaling_enabled,
             "uncertainty_aware_critic_enabled": self._uncertainty_aware_critic_enabled,
             "head_credit_enabled": self._head_credit_enabled,
+            "head_credit_protocol": self._head_credit_protocol,
             "prediction_gate_min_leak": self._prediction_gate_min_leak,
+            "slow_policy_credit_floor": self._slow_policy_credit_floor,
+            "fast_policy_credit_floor": self._fast_policy_credit_floor,
             "event_policy_credit_floor": self._event_policy_credit_floor,
             "event_advantage_blend": self._event_advantage_blend,
+            "slow_entropy_coef_scale": self._slow_entropy_coef_scale,
+            "fast_entropy_coef_scale": self._fast_entropy_coef_scale,
             "event_entropy_coef_scale": self._event_entropy_coef_scale,
+            "slow_entropy_credit_floor": self._slow_entropy_credit_floor,
+            "fast_entropy_credit_floor": self._fast_entropy_credit_floor,
             "event_entropy_credit_floor": self._event_entropy_credit_floor,
             "event_logit_temperature": self._event_logit_temperature,
             "event_logit_temperature_final": self._event_logit_temperature_final,
@@ -1911,24 +1953,33 @@ class 分层PPO基类(BaseAgent):
         return joint_log_prob, entropy
 
     def _resolve_actor_weight(self, head_name: str, base_weight: torch.Tensor | float) -> torch.Tensor | float:
-        if head_name != "event":
+        floor = float(self._policy_credit_floor_by_head.get(head_name, 0.0))
+        if floor <= 0.0:
             return base_weight
         if isinstance(base_weight, torch.Tensor):
-            return torch.clamp(base_weight, min=self._event_policy_credit_floor)
-        return max(float(base_weight), self._event_policy_credit_floor)
+            return torch.clamp(base_weight, min=floor)
+        return max(float(base_weight), floor)
 
     def _resolve_entropy_weight(self, head_name: str, base_weight: torch.Tensor | float) -> torch.Tensor | float:
-        if head_name != "event":
-            return base_weight
+        floor = float(self._entropy_credit_floor_by_head.get(head_name, 0.0))
+        scale = float(self._entropy_coef_scale_by_head.get(head_name, 1.0))
         if isinstance(base_weight, torch.Tensor):
-            effective_weight = torch.clamp(base_weight, min=self._event_entropy_credit_floor)
-            return effective_weight * self._event_entropy_coef_scale
-        effective_weight = max(float(base_weight), self._event_entropy_credit_floor)
-        return effective_weight * self._event_entropy_coef_scale
+            effective_weight = torch.clamp(base_weight, min=floor) if floor > 0.0 else base_weight
+            return effective_weight * scale
+        effective_weight = max(float(base_weight), floor)
+        return effective_weight * scale
 
     def _build_head_credit_weights(self, aggregation_reason: str) -> dict[str, float]:
         if not self._use_hierarchy or not self._head_credit_enabled:
             return {"slow": 1.0, "fast": 1.0, "event": 1.0}
+        if self._head_credit_protocol == "aggregation_reason_weighted_controller_ppo_v3":
+            if aggregation_reason == "event_head_prepare":
+                return {"slow": 0.3, "fast": 0.1, "event": 1.0}
+            if aggregation_reason in {"slow_head_prefetch", "slow_head_cache_fill"}:
+                return {"slow": 1.0, "fast": 0.2, "event": 0.15}
+            if aggregation_reason in {"fast_head_vehicle_fallback", "fast_head_steady_offload"}:
+                return {"slow": 0.3, "fast": 1.0, "event": 0.15}
+            return {"slow": 0.35, "fast": 1.0, "event": 0.25}
         if aggregation_reason == "event_head_prepare":
             return {"slow": 0.2, "fast": 0.0, "event": 1.0}
         if aggregation_reason in {"slow_head_prefetch", "slow_head_cache_fill"}:
@@ -2782,13 +2833,20 @@ class 分层PPO基类(BaseAgent):
             "event_head_enabled": self._event_head_enabled,
             "adapter_prefetch_enabled": self._adapter_prefetch_enabled,
             "head_credit_enabled": self._head_credit_enabled,
+            "head_credit_protocol": self._head_credit_protocol,
             "mechanism_logit_bias_strength": self._mechanism_logit_bias_strength,
             "mechanism_confidence_floor": self._mechanism_confidence_floor,
             "prediction_feature_dim": self._prediction_feature_dim,
             "prediction_gate_min_leak": self._prediction_gate_min_leak,
+            "slow_policy_credit_floor": self._slow_policy_credit_floor,
+            "fast_policy_credit_floor": self._fast_policy_credit_floor,
             "event_policy_credit_floor": self._event_policy_credit_floor,
             "event_advantage_blend": self._event_advantage_blend,
+            "slow_entropy_coef_scale": self._slow_entropy_coef_scale,
+            "fast_entropy_coef_scale": self._fast_entropy_coef_scale,
             "event_entropy_coef_scale": self._event_entropy_coef_scale,
+            "slow_entropy_credit_floor": self._slow_entropy_credit_floor,
+            "fast_entropy_credit_floor": self._fast_entropy_credit_floor,
             "event_entropy_credit_floor": self._event_entropy_credit_floor,
             "event_logit_temperature": self._event_logit_temperature,
             "event_logit_temperature_final": self._event_logit_temperature_final,

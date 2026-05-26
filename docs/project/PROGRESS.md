@@ -2,6 +2,20 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-05-27: MAPPO v3 强对照与 SA v6 候选入口
+
+已完成维护：
+
+- `mappo` 升级为 `aggregation_reason_weighted_controller_ppo_v3`：slow / fast / event 三个 controller head 均有 policy credit floor、entropy credit floor 和 entropy scale，降低 MAPPO action-mix collapse 风险。
+- 新增 baseline profile `mappo_strong_audit`，并让 learned-baseline suite、final-submission loop 和 closed-loop 默认对 MAPPO 使用该 profile。
+- `real_eval_support`、checkpoint config、learn/action info 和 comparison protocol audit 均保留并检查 v3 字段。
+- 新增主算法 profile `top_journal_mechanism_v6_strong_competition` 与配置 `configs/experiment/top_journal_mechanism_v6_strong_competition.yaml`，用于后续与优化后 learned baselines 同预算重跑。
+
+结论边界：
+
+- 本轮只更新算法实现、训练入口、审计协议和文档；尚未重跑正式 formal/holdout final-submission benchmark。
+- 现有已验证 canonical 仍是 `final_submission_full_current_baselines_20260511_v1`；新的 MAPPO v3 / SA v6 论文 claim 必须等 v6 final-submission package 通过 `paper_claim_ready=true` 后再替换。
+
 ## 2026-05-15: v5 性能/robustness 候选实验维护启动
 
 已完成维护：
@@ -87,7 +101,7 @@
 - 新增 canonical paper-ready run：`artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/`。
 - 以 `top_journal_closed_loop_formal_20260505_v2/seed_checkpoint_manifest.json` 为 base manifest，执行 `force_retrain_learned`，对 `ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl` 做同环境交互预算 clean retrain。
 - formal offset 0、holdout offset 3、prediction robustness、system robustness 和 scalability support suite 均完成。
-- `baseline_protocol_versions.mappo` 记录当前 head-credit protocol：`head_credit_enabled=True`、`event_policy_credit_floor=0.05`、`event_entropy_credit_floor=0.05`、`event_advantage_blend=1.0`。
+- `baseline_protocol_versions.mappo` 记录当时的 head-credit protocol：`head_credit_enabled=True`、`event_policy_credit_floor=0.05`、`event_entropy_credit_floor=0.05`、`event_advantage_blend=1.0`；2026-05-27 之后新的 MAPPO claim 需使用 v3 protocol 重跑。
 - 新 comparison package：`artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/comparison_report/`，其中 `review_ready=true`、`paper_ready_package_ready=true`。
 
 已验证：
@@ -129,7 +143,7 @@
 
 结论边界：
 
-- 当前审计产物 `comparison_report_mappo_head_credit_audit_200_direct_new` 的 `review_ready=true`，但 `paper_ready_package_ready=false`，原因是旧 MAPPO checkpoint 缺少当前 head-credit protocol 记录。
+- 当时审计产物 `comparison_report_mappo_head_credit_audit_200_direct_new` 的 `review_ready=true`，但 `paper_ready_package_ready=false`，原因是旧 MAPPO checkpoint 缺少该轮要求的 head-credit protocol 记录。
 - 可声明子集仅为该 artifact 中 contract-valid 的 `ppo`、`dqn`、`dueling_dqn`、`qmix`；含当前 MAPPO、Controller-MAT、DAG/cache/DT 领域对照的正式主表仍需重新跑 final-submission loop。
 
 ## 2026-05-10: 新增 DAG/cache/DT 领域专项 learned baselines
@@ -746,7 +760,7 @@
 结论边界：
 
 - `final_submission_controller_mappo_qmix_20260509_v1` 是 pre-MAPPO-head-credit package；其中 MAPPO 结果只作历史归档，不再作为当前顶刊主表的 MAPPO 强对照。
-- 新的顶刊主表必须重跑 final-submission loop，并要求 `baseline_protocol_versions.mappo` 记录 `head_credit_enabled=True`、`event_policy_credit_floor=0.05`、`event_entropy_credit_floor=0.05`、`event_advantage_blend=1.0`。
+- 新的顶刊主表必须重跑 final-submission loop，并要求 `baseline_protocol_versions.mappo` 记录当前 MAPPO v3 protocol。
 - 若新版 MAPPO 变强导致 SA-GHMAPPO margin 变小，应以新版结果为准；不能为突出主算法而保留弱 MAPPO。
 
 已验证：

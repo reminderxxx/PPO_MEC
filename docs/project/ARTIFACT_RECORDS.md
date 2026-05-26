@@ -13,8 +13,8 @@
 
 关键事实：
 - `final_submission_gate_report.json` 中 `paper_claim_ready=true`、`target_reached=true`、`blockers=[]`。
-- comparison report 中 `review_ready=true`、`paper_ready_package_ready=true`；自审 `blocker_count=0`、`limitation_count=4`、`pass_count=13`。
-- MAPPO 为当前 controller-level CTDE + aggregation-reason controller head-credit protocol，`baseline_protocol_versions.mappo` 记录 `head_credit_enabled=True`、`event_policy_credit_floor=0.05`、`event_entropy_credit_floor=0.05`、`event_advantage_blend=1.0`。
+- comparison report 中 `review_ready=true`、`paper_ready_package_ready=true`；自审 `blocker_count=0`、`limitation_count=5`、`pass_count=13`。
+- 该 artifact 中 MAPPO 为 controller-level CTDE + 当时的 aggregation-reason controller head-credit protocol，`baseline_protocol_versions.mappo` 记录 `head_credit_enabled=True`、`event_policy_credit_floor=0.05`、`event_entropy_credit_floor=0.05`、`event_advantage_blend=1.0`。2026-05-27 之后新的 MAPPO claim 必须使用 v3 protocol 重新跑 final-submission gate。
 - Formal / holdout 主表中 SA-GHMAPPO 均超过最强 learned baseline；最强 learned baseline 均为 `ppo`，reward margin 范围为 `+3.703148` 到 `+10.097777`。
 - Cluster-bootstrap paired total reward 对全部 9 个 learned baselines 均为 positive CI；formal 最弱 vs `ppo` mean delta `+4.745278`，95% CI `[2.3372, 7.028835]`；holdout 最弱 vs `ppo` mean delta `+6.975`，95% CI `[4.155505, 9.63982]`。
 - Prediction / robustness / scalability support suites 对全部 9 个 learned baselines 均为 positive CI；最弱项分别为 vs `ppo`：`+2.794583`、`+6.879236`、`+2.159306`。

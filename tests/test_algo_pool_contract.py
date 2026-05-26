@@ -194,15 +194,24 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(mappo.baseline_config["ctde_scope"], "controller_level_cache_execution_handoff")
         self.assertTrue(mappo.baseline_config["paper_grade_independent_baseline"])
         self.assertTrue(mappo.baseline_config["controller_head_credit"])
-        self.assertEqual(mappo.baseline_config["head_credit_protocol"], "aggregation_reason_weighted_ppo_v2")
+        self.assertEqual(
+            mappo.baseline_config["head_credit_protocol"],
+            "aggregation_reason_weighted_controller_ppo_v3",
+        )
+        self.assertEqual(
+            mappo.baseline_config["controller_head_credit_floors"],
+            {"slow": 0.25, "fast": 0.10, "event": 0.12},
+        )
         self.assertEqual(
             mappo._build_head_credit_weights("event_head_prepare"),
-            {"slow": 0.2, "fast": 0.0, "event": 1.0},
+            {"slow": 0.3, "fast": 0.1, "event": 1.0},
         )
         self.assertEqual(
             mappo._build_head_credit_weights("fast_head_steady_offload"),
-            {"slow": 0.15, "fast": 1.0, "event": 0.0},
+            {"slow": 0.3, "fast": 1.0, "event": 0.15},
         )
+        self.assertEqual(mappo._resolve_actor_weight("slow", 0.0), 0.25)
+        self.assertAlmostEqual(mappo._resolve_entropy_weight("event", 0.0), 0.162)
 
     def test_mappo_action_exposes_three_controller_agents(self) -> None:
         state = _minimal_semantic_state()
@@ -219,7 +228,30 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(action_info["critic_mode"], "centralized")
         self.assertEqual(action_info["critic_context_key"], "centralized_critic_context")
         self.assertEqual(action_info["policy_type"], "mappo_policy")
+        self.assertEqual(action_info["head_credit_protocol"], "aggregation_reason_weighted_controller_ppo_v3")
         self.assertIn("head_credit_weights", action_info)
+        self.assertEqual(action_info["effective_head_credit_floors"]["policy"]["slow"], 0.25)
+
+    def test_mappo_strong_audit_training_profile_sets_v3_protocol(self) -> None:
+        from scripts.train_algo_pool_real_sample import agent_profile_kwargs
+
+        kwargs = agent_profile_kwargs("mappo", "mappo_strong_audit")
+        self.assertEqual(kwargs["head_credit_protocol"], "aggregation_reason_weighted_controller_ppo_v3")
+        self.assertEqual(kwargs["slow_policy_credit_floor"], 0.25)
+        self.assertEqual(kwargs["event_advantage_blend"], 0.85)
+        self.assertEqual(agent_profile_kwargs("ppo", "mappo_strong_audit"), {})
+
+    def test_sa_v6_profile_is_registered_for_strong_competition(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        self.assertIn("top_journal_mechanism_v6_strong_competition", PROFILE_DEFAULTS)
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v6_strong_competition"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["train_window_count"], 6)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v6_strong_competition")
+        self.assertEqual(kwargs["mechanism_window_weight"], 1.65)
+        self.assertEqual(kwargs["mechanism_window_weight_floor_after_update"], 1.60)
+        self.assertFalse(kwargs["predictive_prepare_hard_override_enabled"])
 
     def test_qmix_uses_controller_level_value_decomposition_contract(self) -> None:
         state = _minimal_semantic_state()

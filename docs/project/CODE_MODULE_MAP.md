@@ -39,10 +39,12 @@
 - `reactive_greedy` -> `src/agents/reactive_greedy_agent.py`
 - `popularity_cache_heuristic` -> `src/agents/popularity_cache_heuristic_agent.py`
 
-2026-05-10 MAPPO protocol update：
-- `src/agents/mappo_agent.py` 当前负责 controller-level CTDE MAPPO + aggregation-reason controller head-credit。
-- `scripts/run_top_journal_learned_baseline_suite.py`、`scripts/run_top_journal_final_submission_loop.py`、`scripts/run_top_journal_closed_loop.py` 和 `scripts/build_top_journal_comparison_report.py` 负责审计 `mappo` checkpoint protocol，避免 pre-head-credit MAPPO 进入新版主表。
-- `src/evaluators/real_eval_support.py` 在恢复 `mappo` checkpoint 时保留 head-credit 相关 config 字段。
+2026-05-27 MAPPO protocol update：
+- `src/agents/mappo_agent.py` 当前负责 controller-level CTDE MAPPO + `aggregation_reason_weighted_controller_ppo_v3` controller head-credit。
+- `src/agents/sa_ghmappo_core.py` 承载通用 controller head credit floors / entropy floors / entropy scales；默认仍兼容旧 v2 行为，`mappo` 显式启用 v3。
+- `scripts/train_algo_pool_real_sample.py` 提供 `mappo_strong_audit` profile。
+- `scripts/run_top_journal_learned_baseline_suite.py`、`scripts/run_top_journal_final_submission_loop.py`、`scripts/run_top_journal_closed_loop.py` 和 `scripts/build_top_journal_comparison_report.py` 负责审计 `mappo` checkpoint protocol，避免 pre-v3/pre-head-credit MAPPO 进入新版主表。
+- `src/evaluators/real_eval_support.py` 在恢复 `mappo` checkpoint 时保留 v3 head-credit 相关 config 字段。
 
 `flat_ppo` / `flat_mappo` 只表示历史 artifact run 名称，不再作为 live agent 注册。
 

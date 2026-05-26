@@ -62,9 +62,17 @@ FORMAL_MIN_SETTINGS = {
 CURRENT_BASELINE_PROTOCOLS = {
     "mappo": {
         "head_credit_enabled": True,
-        "event_policy_credit_floor": 0.05,
-        "event_entropy_credit_floor": 0.05,
-        "event_advantage_blend": 1.0,
+        "head_credit_protocol": "aggregation_reason_weighted_controller_ppo_v3",
+        "slow_policy_credit_floor": 0.25,
+        "fast_policy_credit_floor": 0.10,
+        "event_policy_credit_floor": 0.12,
+        "slow_entropy_coef_scale": 1.25,
+        "fast_entropy_coef_scale": 1.00,
+        "event_entropy_coef_scale": 1.35,
+        "slow_entropy_credit_floor": 0.20,
+        "fast_entropy_credit_floor": 0.08,
+        "event_entropy_credit_floor": 0.12,
+        "event_advantage_blend": 0.85,
     },
 }
 
@@ -104,6 +112,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_selector", type=str, default="max_handoff_candidate")
     parser.add_argument("--window_mode_for_training", type=str, default="mixed_informative")
     parser.add_argument("--sa_profile", type=str, default="top_journal_mechanism_v1")
+    parser.add_argument("--mappo_baseline_profile", type=str, default="mappo_strong_audit")
     parser.add_argument("--sa_episodes", type=int, default=None)
     parser.add_argument("--baseline_episodes", type=int, default=None)
     parser.add_argument("--sa_update_every", type=int, default=None)
@@ -411,13 +420,14 @@ def train_baseline_for_seed(
     command_log: list[dict[str, Any]],
 ) -> dict[str, Any]:
     training_root = run_root / "training" / "algo_pool"
+    profile = args.mappo_baseline_profile if agent_name == "mappo" else "baseline_safe"
     cmd = [
         args.python_executable,
         "scripts/train_algo_pool_real_sample.py",
         "--agent_name",
         agent_name,
         "--profile",
-        "baseline_safe",
+        profile,
         "--episodes",
         str(settings["baseline_episodes"]),
         "--update_every",
@@ -731,6 +741,7 @@ def build_gate_report(
         "primary_vehicle_selection": args.primary_vehicle_selection,
         "seeds": args.seeds,
         "baseline_agents": args.baseline_agents,
+        "mappo_baseline_profile": args.mappo_baseline_profile,
         "benchmark_modes": args.benchmark_modes,
         "seed_checkpoint_manifest_path": str(manifest_path),
         "training_records": training_records,

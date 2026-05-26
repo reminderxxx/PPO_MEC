@@ -1,8 +1,16 @@
 # Algorithm Pool
 
-更新日期：2026-05-10
+更新日期：2026-05-27
 
 用途：记录方向匹配型强化学习对照算法池的 live 接入状态、动作边界和运行入口。
+
+## 2026-05-27 MAPPO v3 protocol
+
+- `mappo` 仍是 controller-level CTDE baseline：flat semantic encoder、cache / execution-offload / handoff-event 三 controller actor、centralized flat semantic critic。
+- 当前 paper-grade `mappo` 使用 `aggregation_reason_weighted_controller_ppo_v3`，在 aggregation-reason head-credit 基础上加入 slow / fast / event 三头的 policy credit floor、entropy credit floor 和 entropy scale，目标是降低 action-mix collapse 风险。
+- `mappo_strong_audit` 是正式强对照训练 profile；learned suite、final-submission loop 和 closed-loop 入口会对 MAPPO 默认使用该 profile。
+- v3 仍不使用 SA-GHMAPPO 的 graph encoder、surrogate prediction features、uncertainty-aware scaling、mechanism auxiliary loss、heuristic imitation 或 guards；它不是 vehicle-agent / RSU-agent full MAPPO wrapper。
+- 旧 pre-v3/pre-head-credit MAPPO checkpoint 只保留为历史 artifact；新的 MAPPO 论文 claim 必须来自 v3 checkpoint protocol 审计通过的 final-submission package。
 
 ## 2026-05-10 MAPPO protocol
 
@@ -102,7 +110,7 @@ python scripts/train_ippo_smoke_round12.py
 训练 MAPPO：
 
 ```bash
-python scripts/train_algo_pool_real_sample.py --agent_name mappo --profile smoke
+python scripts/train_algo_pool_real_sample.py --agent_name mappo --profile mappo_strong_audit
 ```
 
 训练 QMIX：

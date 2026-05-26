@@ -42,9 +42,17 @@ CONTRACT_BLOCKED_LEARNED_BASELINES = {
 CURRENT_BASELINE_PROTOCOLS = {
     "mappo": {
         "head_credit_enabled": True,
-        "event_policy_credit_floor": 0.05,
-        "event_entropy_credit_floor": 0.05,
-        "event_advantage_blend": 1.0,
+        "head_credit_protocol": "aggregation_reason_weighted_controller_ppo_v3",
+        "slow_policy_credit_floor": 0.25,
+        "fast_policy_credit_floor": 0.10,
+        "event_policy_credit_floor": 0.12,
+        "slow_entropy_coef_scale": 1.25,
+        "fast_entropy_coef_scale": 1.00,
+        "event_entropy_coef_scale": 1.35,
+        "slow_entropy_credit_floor": 0.20,
+        "fast_entropy_credit_floor": 0.08,
+        "event_entropy_credit_floor": 0.12,
+        "event_advantage_blend": 0.85,
     },
 }
 FORMAL_MIN_SETTINGS = {
@@ -93,6 +101,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--resume_benchmark", action="store_true")
     parser.add_argument("--command_retries", type=int, default=0)
     parser.add_argument("--baseline_profile", type=str, default="baseline_safe")
+    parser.add_argument("--mappo_baseline_profile", type=str, default="mappo_strong_audit")
     parser.add_argument(
         "--force_retrain_agents",
         nargs="*",
@@ -310,13 +319,14 @@ def train_missing_baseline(
     command_log: list[dict[str, Any]],
 ) -> dict[str, Any]:
     training_root = run_root / "training" / "algo_pool"
+    profile = args.mappo_baseline_profile if agent_name == "mappo" else args.baseline_profile
     cmd = [
         args.python_executable,
         "scripts/train_algo_pool_real_sample.py",
         "--agent_name",
         agent_name,
         "--profile",
-        args.baseline_profile,
+        profile,
         "--episodes",
         str(args.baseline_episodes),
         "--update_every",
@@ -664,6 +674,7 @@ def build_gate_report(
         "benchmark_modes": args.benchmark_modes,
         "window_rank_offset": args.window_rank_offset,
         "baseline_profile": args.baseline_profile,
+        "mappo_baseline_profile": args.mappo_baseline_profile,
         "baseline_episodes": args.baseline_episodes,
         "baseline_protocol_versions": CURRENT_BASELINE_PROTOCOLS,
         "minimum_reward_delta": args.minimum_reward_delta,
@@ -676,7 +687,7 @@ def build_gate_report(
             ),
             "reference_basis": [
                 "PPO-style on-policy baselines follow matched rollout budgets.",
-                "Controller-level MAPPO must use aggregation-reason head-credit under the current multi-controller action contract.",
+                "Controller-level MAPPO must use aggregation-reason controller head-credit v3 under the current multi-controller action contract.",
                 "Replay/value-decomposition baselines follow matched environment interactions rather than copied Atari frame counts.",
                 "Transformer/MARL baselines are adapted at the controller-agent level under the same action contract.",
                 "Domain VEC baselines for DAG offloading, model cache/offloading, and digital-twin handoff use the same NGSIM+Alibaba interaction budget.",
@@ -693,7 +704,7 @@ def build_gate_report(
             "Main learned-baseline claim is gated against learned baselines only.",
             "Heuristic agents are supplementary reference lines, not the top-journal primary comparator.",
             "Continuous-control baselines remain blocked by the current semantic_discrete_5 action contract.",
-            "MAPPO claims require the current controller head-credit checkpoint protocol; pre-head-credit MAPPO checkpoints are archived only.",
+            "MAPPO claims require the current controller head-credit v3 checkpoint protocol; pre-v3/pre-head-credit MAPPO checkpoints are archived only.",
             "When force_retrain_* is used, learned baselines in the manifest are refreshed under the current suite budget.",
         ],
         "command_log": command_log,

@@ -40,6 +40,7 @@ REPLAY_BASELINES = {"dqn", "ddqn", "dueling_dqn", "dueling_ddqn", "qmix"}
 PROFILE_DEFAULTS = {
     "smoke": {"episodes": 2, "update_every": 1, "max_steps": 6, "batch_size": 8},
     "baseline_safe": {"episodes": 12, "update_every": 3, "max_steps": 12, "batch_size": 24},
+    "mappo_strong_audit": {"episodes": 96, "update_every": 6, "max_steps": 16, "batch_size": 32},
 }
 SUMMARY_METRICS = [
     "total_reward",
@@ -105,6 +106,33 @@ def parse_args() -> argparse.Namespace:
         if getattr(args, field_name) is None:
             setattr(args, field_name, defaults[field_name])
     return args
+
+
+def agent_profile_kwargs(agent_name: str, profile: str) -> dict[str, Any]:
+    if agent_name != "mappo" or profile != "mappo_strong_audit":
+        return {}
+    return {
+        "learning_rate": 2e-4,
+        "clip_ratio": 0.16,
+        "entropy_coef": 0.015,
+        "value_coef": 0.65,
+        "train_epochs": 8,
+        "target_kl": 0.018,
+        "kl_early_stop_enabled": True,
+        "max_grad_norm": 0.7,
+        "head_credit_enabled": True,
+        "head_credit_protocol": "aggregation_reason_weighted_controller_ppo_v3",
+        "slow_policy_credit_floor": 0.25,
+        "fast_policy_credit_floor": 0.10,
+        "event_policy_credit_floor": 0.12,
+        "slow_entropy_coef_scale": 1.25,
+        "fast_entropy_coef_scale": 1.00,
+        "event_entropy_coef_scale": 1.35,
+        "slow_entropy_credit_floor": 0.20,
+        "fast_entropy_credit_floor": 0.08,
+        "event_entropy_credit_floor": 0.12,
+        "event_advantage_blend": 0.85,
+    }
 
 
 def build_summary_row(summary: dict[str, Any], *, episode_index: int, updated: bool) -> dict[str, Any]:
@@ -223,6 +251,7 @@ def main() -> None:
         "batch_size": args.batch_size,
         "deterministic_action": False,
     }
+    agent_kwargs.update(agent_profile_kwargs(args.agent_name, args.profile))
     if args.profile == "smoke" and args.agent_name in REPLAY_BASELINES:
         smoke_rollout_capacity = max(int(args.max_steps) * max(int(args.update_every), 1), 1)
         agent_kwargs["min_replay_size"] = max(1, min(int(args.batch_size), smoke_rollout_capacity))

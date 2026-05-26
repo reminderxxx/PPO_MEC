@@ -1,5 +1,21 @@
 ﻿# Decision Log
 
+## 2026-05-27: MAPPO 强对照升级为 controller head-credit v3
+
+决策：`mappo` 继续保持 controller-level CTDE baseline，但 paper-grade 强对照协议升级为 `aggregation_reason_weighted_controller_ppo_v3`，并新增 `mappo_strong_audit` 训练 profile。主算法新增 `top_journal_mechanism_v6_strong_competition` profile，用于后续与优化后的 learned baselines 同预算重跑。
+
+原因：
+
+- 2026-05-11 canonical 审计显示 MAPPO 虽然 protocol-valid，但存在 action-mix collapse，不能作为主优势证据。
+- 若论文把 MAPPO 写入主表，必须给 MAPPO 合理的 controller-head credit floor、entropy floor/scale 和更稳健的 PPO 更新配置，避免弱化对照。
+- 这些增强只属于 MAPPO 的通用 controller credit assignment，不引入 SA-GHMAPPO 的 graph/surrogate/guard/auxiliary 专属机制。
+
+影响：
+
+- `scripts/run_top_journal_learned_baseline_suite.py`、`scripts/run_top_journal_final_submission_loop.py`、`scripts/run_top_journal_closed_loop.py` 和 `scripts/build_top_journal_comparison_report.py` 的 MAPPO protocol audit 均要求 v3 字段。
+- 旧 pre-v3 MAPPO checkpoint 只能作为历史 artifact；新的 MAPPO 论文 claim 必须来自 v3 final-submission package。
+- 本次只是协议和训练入口更新；在 v6 + MAPPO v3 正式 final-submission gate 通过前，不替换 `final_submission_full_current_baselines_20260511_v1` 的已验证结果。
+
 ## 2026-05-12: SA-GHMAPPO 先修补 semantic_discrete_5 闭环，不切换 parameterized DAG action
 
 决策：近期主算法保持 `semantic_discrete_5`，先补强 predictive action mask、invalid reason、predictor audit、mechanism success gate、DAG diagnostics 和 guard/projection delta；不在本轮引入 `target_node` / `target_rsu` parameterized action，也不改成 full vehicle/RSU multi-agent wrapper。

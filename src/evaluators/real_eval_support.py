@@ -88,10 +88,20 @@ def _filter_checkpoint_config(agent_name: str, checkpoint_config: dict[str, Any]
     if agent_name == "mappo":
         mappo_fields = {
             "head_credit_enabled",
+            "head_credit_protocol",
+            "slow_policy_credit_floor",
+            "fast_policy_credit_floor",
             "event_policy_credit_floor",
             "event_advantage_blend",
+            "slow_entropy_coef_scale",
+            "fast_entropy_coef_scale",
             "event_entropy_coef_scale",
+            "slow_entropy_credit_floor",
+            "fast_entropy_credit_floor",
             "event_entropy_credit_floor",
+            "event_logit_temperature",
+            "event_logit_temperature_final",
+            "event_temperature_decay_updates",
         }
         return {
             key: value
@@ -152,13 +162,20 @@ def _filter_checkpoint_config(agent_name: str, checkpoint_config: dict[str, Any]
     extra_fields = {
         "auxiliary_coef",
         "head_credit_enabled",
+        "head_credit_protocol",
         "mechanism_logit_bias_strength",
         "mechanism_confidence_floor",
         "prediction_feature_dim",
         "prediction_gate_min_leak",
+        "slow_policy_credit_floor",
+        "fast_policy_credit_floor",
         "event_policy_credit_floor",
         "event_advantage_blend",
+        "slow_entropy_coef_scale",
+        "fast_entropy_coef_scale",
         "event_entropy_coef_scale",
+        "slow_entropy_credit_floor",
+        "fast_entropy_credit_floor",
         "event_entropy_credit_floor",
         "event_logit_temperature",
         "event_logit_temperature_final",

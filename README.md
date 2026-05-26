@@ -1,5 +1,12 @@
 # PPO_MEC
 
+## 2026-05-27 MAPPO v3 / SA v6 update
+
+- `mappo` live baseline now uses `aggregation_reason_weighted_controller_ppo_v3`: controller-head credit floors and entropy floors/scales are applied to slow / fast / event heads to reduce action-mix collapse while keeping MAPPO free of SA-GHMAPPO-only graph/surrogate/guard mechanisms.
+- Paper-grade learned-baseline loops accept `--mappo_baseline_profile mappo_strong_audit`; this profile is the default MAPPO profile inside the learned-suite/final-loop wrappers.
+- Main-method optimization adds `top_journal_mechanism_v6_strong_competition` and `configs/experiment/top_journal_mechanism_v6_strong_competition.yaml` for a future same-budget rerun against optimized baselines.
+- No new formal benchmark result is claimed by this code change alone. The last verified canonical result remains `final_submission_full_current_baselines_20260511_v1` until a v6 + MAPPO v3 final-submission package passes formal and holdout gates.
+
 PPO_MEC 是面向 AI-driven VEC 的研究原型，主线围绕跨 RSU 连续 DAG workflow 执行、车载 base model 与路侧 adapter cache 协同、handoff 状态迁移、surrogate prediction 和多时间尺度控制。
 
 当前正式数据主线是 `NGSIM + Alibaba`。`LuST` 与 `highD` 保留 provider / 检查骨架，但不阻塞正式主线。
