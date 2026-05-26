@@ -9,6 +9,7 @@
 - `PROGRESS.md`：已确认阶段事实和整理动作
 - `BUGS.md`：当前有效问题、风险和禁止误读项
 - `ARTIFACT_RECORDS.md`：从 `artifacts/` 整理出的规范化实验记录
+- `current_results_review_20260526.md`：当前 canonical/v5 结果审查、漏洞和阻塞点
 - `CLEANUP_LOG.md`：旧文档和旧产物清理记录
 - `DIRECTORY_STRUCTURE.md`：目录边界和产物写入位置
 - `DATASET_SOURCES.md`：当前数据集名称、角色、本地路径和下载页声明
@@ -17,6 +18,7 @@
 - `CODE_MODULE_MAP.md`：代码模块职责和主要依赖方向
 - `RUNBOOK.md`：常用运行、验证、训练和 benchmark 命令
 - `DECISION_LOG.md`：长期有效的设计和流程决策
+- `GIT_WORKFLOW.md`：Git 分支、提交、验证和推送规范
 - `STATUS_TAGS.md`：文档状态标签约定
 - `ALGO_POOL.md`：方向匹配型强化学习对照算法池状态和运行入口
 - `../benchmark_plan_or_baseline_plan.md`：baseline 盘点、对照矩阵和统一训练评估协议

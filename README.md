@@ -28,14 +28,19 @@ PPO_MEC 是面向 AI-driven VEC 的研究原型，主线围绕跨 RSU 连续 DAG
 - `registry.py`
 - `sa_ghmappo_agent.py`
 - `sa_ghmappo_core.py`
-- `ippo_agent.py`
 - `ppo_agent.py`
 - `mappo_agent.py`
+- `ippo_agent.py`
 - `dqn_agent.py`
+- `qmix_agent.py`
+- `mat_agent.py`
+- `dag_offload_agent.py`
+- `cache_offload_agent.py`
+- `dt_handoff_agent.py`
 - `reactive_greedy_agent.py`
 - `popularity_cache_heuristic_agent.py`
 
-`registry.py` 直接导入算法文件。PPO / MAPPO 不再通过 `ppo_family.py` 或分类 package 组织。
+`registry.py` 直接导入算法文件。PPO / MAPPO 不再通过 `ppo_family.py` 或分类 package 组织。`qmix_agent.py` 和 `mat_agent.py` 分别实现 controller-level value-decomposition 和 transformer CTDE baseline；`dag_offload_agent.py`、`cache_offload_agent.py`、`dt_handoff_agent.py` 分别作为 DAG offloading、model/adapter cache offloading 和 Digital Twin handoff 领域专项 DRL baseline。
 
 ## 目录概览
 
@@ -46,6 +51,7 @@ PPO_MEC 是面向 AI-driven VEC 的研究原型，主线围绕跨 RSU 连续 DAG
 - `src/agents/`：主方法和对照算法 agent 接入
 - `src/trainers/`：训练驱动协议
 - `src/evaluators/`：benchmark、checkpoint 和真实 sample 辅助模块
+- `src/metrics/`：论文指标计算、记录和归约模块
 - `scripts/`：数据检查、dry-run、训练、评估和 benchmark 脚本
 - `artifacts/`：训练 checkpoint、benchmark 报告和论文表格产物
 - `docs/project/`：长期项目文档入口
@@ -56,6 +62,22 @@ PPO_MEC 是面向 AI-driven VEC 的研究原型，主线围绕跨 RSU 连续 DAG
 python scripts/smoke_test.py
 python -m pytest tests/test_env_contract.py
 ```
+
+完整测试套件：
+
+```bash
+python -m pytest tests/ -v
+```
+
+当前测试文件：
+
+- `test_env_contract.py`：环境契约验证
+- `test_algo_pool_contract.py`：算法池契约验证
+- `test_alibaba_dag_parser.py`：Alibaba DAG 解析器测试
+- `test_checkpoint_compat.py`：checkpoint 兼容性测试
+- `test_model_catalog_sources.py`：模型目录数据源测试
+- `test_top_journal_closed_loop.py`：顶刊闭环集成测试
+- `test_window_selection_contract.py`：窗口选择契约验证
 
 真实数据链路最小检查：
 
@@ -177,6 +199,19 @@ Latest expanded artifacts:
 - formal plus-dueling gate: `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v3_eval_bias_guarded_prefetch_plus_dueling_gate_20260506/learned_baseline_gate_report.json`
 - holdout plus-dueling gate: `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v3_eval_bias_guarded_prefetch_plus_dueling_holdout_offset3_20260506/learned_baseline_gate_report.json`
 
+## Current v4 Eval-Bias Candidate
+
+v4 系列是 v3 eval-bias 的后续迭代，当前处于准备阶段：
+
+- `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v4_prepare_eval_bias/`
+- `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v4_prepare_eval_bias_support/`
+
+## Current Support Suite
+
+顶刊 support suite 包含 ablation 和 support 实验，用于论文补充材料：
+
+- `artifacts/experiments/top_journal_support_suite/`
+
 ## Current Final-Submission Loop
 
 当前可交稿闭环入口为：
@@ -193,13 +228,17 @@ python scripts/build_top_journal_comparison_report.py --final_run_root artifacts
 
 当前正式产物：
 
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/final_submission_gate_report.json`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/comparison_report/top_journal_comparison_report.json`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/comparison_report/top_journal_comparison_report.md`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/comparison_report/paper_ready/paper_ready_main_comparison.tex`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/comparison_report/paper_ready/paper_ready_paired_reward_statistics.tex`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/comparison_report/paper_ready/paper_ready_report.md`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/learned_suites/final_submission_controller_mappo_qmix_20260509_v1_iter1_formal/learned_baseline_gate_report.json`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/learned_suites/final_submission_controller_mappo_qmix_20260509_v1_iter1_holdout_offset3/learned_baseline_gate_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/final_submission_gate_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/comparison_report/top_journal_comparison_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/comparison_report/top_journal_comparison_report.md`
+- `artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/comparison_report/paper_ready/paper_ready_main_comparison.tex`
+- `artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/comparison_report/paper_ready/paper_ready_paired_reward_statistics.tex`
+- `artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/comparison_report/paper_ready/paper_ready_report.md`
 
-`final_submission_controller_mappo_qmix_20260509_v1` 当前为 pre-Controller-MAT / pre-DAG-cache-DT-domain-baseline / pre-MAPPO-head-credit final-submission package：旧数值可用于追溯，但不能再作为当前 MAPPO 强对照的 canonical 主表。新增 `controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl` 以及 MAPPO head-credit 协议后，论文主表必须重跑 final-submission loop。`mappo`、`qmix` 和 `controller_mat` 是 controller-level learned baselines，不应写成 vehicle-agent / RSU-agent full MARL wrappers。旧 `final_submission_clean_retrain_repaired_baselines_20260507_v1` 是 pre-MAPPO/QMIX-controller-level package；旧 `final_submission_clean_equal_budget_20260506_v1` 因 duplicate trace 已作废。
+`final_submission_full_current_baselines_20260511_v1` 是当前包含完整 baseline set（`ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl`）的 canonical final-submission package。`mappo`、`qmix` 和 `controller_mat` 是 controller-level learned baselines，不应写成 vehicle-agent / RSU-agent full MARL wrappers。
+
+历史产物（可用于追溯，但不再作为 canonical 主表）：
+
+- `final_submission_controller_mappo_qmix_20260509_v1`：pre-完整-domain-baseline package
+- `final_submission_clean_retrain_repaired_baselines_20260507_v1`：pre-MAPPO/QMIX-controller-level package
+- `final_submission_clean_equal_budget_20260506_v1`：因 duplicate trace 已作废

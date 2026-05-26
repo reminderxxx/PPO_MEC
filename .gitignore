@@ -40,8 +40,12 @@ dist/
 *.onnx
 
 # Editor and OS metadata
+.trae/
 .idea/
 .vscode/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Local review exports
+PPO_MEC_experiment_issue_summary_*.docx
