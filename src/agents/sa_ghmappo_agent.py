@@ -65,6 +65,9 @@ class SAGHMAPPOAgent(SAGHMAPPOBaseAgent):
         cache_warm_start_guard_enabled: bool = False,
         cache_warm_start_guard_min_countdown: float = 1.5,
         cache_warm_start_guard_max_prefetch_countdown: float = 0.0,
+        predictive_prefetch_admission_guard_enabled: bool = False,
+        predictive_prefetch_admission_min_confidence: float = 0.55,
+        predictive_prefetch_admission_require_distinct_next: bool = True,
         **kwargs,
     ) -> None:
         super().__init__(
@@ -120,6 +123,9 @@ class SAGHMAPPOAgent(SAGHMAPPOBaseAgent):
             cache_warm_start_guard_enabled=cache_warm_start_guard_enabled,
             cache_warm_start_guard_min_countdown=cache_warm_start_guard_min_countdown,
             cache_warm_start_guard_max_prefetch_countdown=cache_warm_start_guard_max_prefetch_countdown,
+            predictive_prefetch_admission_guard_enabled=predictive_prefetch_admission_guard_enabled,
+            predictive_prefetch_admission_min_confidence=predictive_prefetch_admission_min_confidence,
+            predictive_prefetch_admission_require_distinct_next=predictive_prefetch_admission_require_distinct_next,
             **kwargs,
         )
         self.ablation_config = {
@@ -171,5 +177,14 @@ class SAGHMAPPOAgent(SAGHMAPPOBaseAgent):
             "cache_warm_start_guard_min_countdown": float(cache_warm_start_guard_min_countdown),
             "cache_warm_start_guard_max_prefetch_countdown": float(
                 cache_warm_start_guard_max_prefetch_countdown
+            ),
+            "predictive_prefetch_admission_guard_enabled": bool(
+                predictive_prefetch_admission_guard_enabled
+            ),
+            "predictive_prefetch_admission_min_confidence": float(
+                predictive_prefetch_admission_min_confidence
+            ),
+            "predictive_prefetch_admission_require_distinct_next": bool(
+                predictive_prefetch_admission_require_distinct_next
             ),
         }

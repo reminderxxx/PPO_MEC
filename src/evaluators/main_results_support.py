@@ -66,6 +66,8 @@ MAIN_RESULT_METRICS = [
     "backhaul_guard_rate",
     "cache_warm_start_guard_count",
     "cache_warm_start_guard_rate",
+    "predictive_prefetch_admission_guard_count",
+    "predictive_prefetch_admission_guard_rate",
 ]
 ACTIONMIX_DIAGNOSTIC_METRICS = [
     "service_success_count",
@@ -1445,6 +1447,12 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         "backhaul_guard_rate": float(agent_action_diagnostics.get("backhaul_guard_rate", 0.0) or 0.0),
         "cache_warm_start_guard_count": int(agent_action_diagnostics.get("cache_warm_start_guard_count", 0) or 0),
         "cache_warm_start_guard_rate": float(agent_action_diagnostics.get("cache_warm_start_guard_rate", 0.0) or 0.0),
+        "predictive_prefetch_admission_guard_count": int(
+            agent_action_diagnostics.get("predictive_prefetch_admission_guard_count", 0) or 0
+        ),
+        "predictive_prefetch_admission_guard_rate": float(
+            agent_action_diagnostics.get("predictive_prefetch_admission_guard_rate", 0.0) or 0.0
+        ),
         "total_reward": summary["reward_breakdown"]["total"]["sum"],
         "end_to_end_workflow_delay": metrics["end_to_end_workflow_delay"],
         "workflow_continuity_rate": metrics["workflow_continuity_rate"],

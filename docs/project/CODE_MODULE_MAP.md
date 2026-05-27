@@ -1,5 +1,12 @@
 # Code Module Map
 
+## 2026-05-27 SA confidence-aware prefetch admission guard
+
+- `src/agents/sa_ghmappo_core.py`：新增 `predictive_prefetch_admission_guard_*`，在低置信度且 next-RSU / prefetch target 未对齐时把 selected predictive prefetch 延期为 event prepare；默认关闭，v6 profile 显式开启。
+- `src/agents/sa_ghmappo_agent.py`、`scripts/train_sa_ghmappo_real_sample.py`、`src/evaluators/real_eval_support.py`：同步维护该字段的构造参数、profile 默认值、checkpoint config、训练 summary 和 benchmark 恢复路径。
+- `src/trainers/marl_on_policy_trainer.py`、`src/evaluators/main_results_support.py`：新增 `predictive_prefetch_admission_guard_count/rate` 诊断消费，避免 formal benchmark rows 丢失 guard 触发计数。
+- `configs/experiment/top_journal_mechanism_v6_strong_competition.yaml` 和 `configs/algo/*.yaml`：v6 记录 admission guard 参数；learned/domain baselines 继续声明排除该 SA-only guard。
+
 ## 2026-05-27 SA freshness-aware prefetch guard
 
 - `src/agents/sa_ghmappo_core.py`：`cache_warm_start_guard` 新增 `cache_warm_start_guard_max_prefetch_countdown`，用于把 target-adapter prefetch 限制在 freshness window 内；默认 `0.0` 保持历史无上界行为。

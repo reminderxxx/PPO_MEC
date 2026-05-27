@@ -1,5 +1,21 @@
 ﻿# Decision Log
 
+## 2026-05-27: SA predictive prefetch 增加 confidence/alignment admission guard
+
+决策：`top_journal_mechanism_v6_strong_competition` 增加 `predictive_prefetch_admission_guard_enabled=true`，并采用 `predictive_prefetch_admission_min_confidence=0.55`、`predictive_prefetch_admission_require_distinct_next=true`。当 selected action 为 predictive prefetch，但 `predicted_next_rsu_id` 仍未离开当前 RSU、prefetch target 仅来自后续序列或 handoff target，且预测置信度低于阈值时，将 prefetch 延期为 `handoff_migration_prepare`。
+
+原因：
+
+- `top_journal_mechanism_v6_freshness_guard_20260527_v1` 仍未通过 gate，剩余 gap 与 freshness 上界无关，而是低置信度/next-RSU 未对齐时的过早 prefetch realization gap。
+- 负例 `window_off246_len24_t293_316` / `j_8` / seed `13` 中，SA 在 `prediction_confidence=0.383` 且 `predicted_next_rsu_id` 为当前 RSU 时 prefetch，最终 `expired_miss`；popularity heuristic 等到后续 `prediction_confidence=0.611` 且 next-RSU 已对齐时 prefetch 并命中。
+- 该策略对应 VEC service caching / handoff migration 中常见的 confidence-aware admission control：在预测未稳定前优先准备迁移，不提前占用 prefetch freshness window。
+
+影响：
+
+- 默认关闭，历史 checkpoint 和旧 profile 行为不变；v6 profile 显式开启。
+- 训练 summary、checkpoint 恢复、benchmark rows 和 eval-bias manifest builder 必须保留该字段，否则复现会丢失 admission 行为。
+- 该决策只修正 policy-side admission，不改变 action schema、reward 或 formal gate；正式效果仍需重新跑 3-seed closed-loop / final-submission gate。
+
 ## 2026-05-27: SA cache-warm guard 增加 freshness window 上界
 
 决策：`top_journal_mechanism_v6_strong_competition` 的 cache-warm start guard 增加 `cache_warm_start_guard_max_prefetch_countdown=6.0`。当 target adapter 未 warm 但预测 handoff countdown 超出该上界时，guard 不再把 event prepare 强制替换为 predictive prefetch，而是等待进入 freshness window 后再触发 prefetch。

@@ -342,6 +342,9 @@ class 分层PPO基类(BaseAgent):
         cache_warm_start_guard_enabled: bool = False,
         cache_warm_start_guard_min_countdown: float = 1.5,
         cache_warm_start_guard_max_prefetch_countdown: float = 0.0,
+        predictive_prefetch_admission_guard_enabled: bool = False,
+        predictive_prefetch_admission_min_confidence: float = 0.55,
+        predictive_prefetch_admission_require_distinct_next: bool = True,
         auxiliary_slow_weight: float = 1.0,
         auxiliary_fast_weight: float = 0.5,
         auxiliary_event_weight: float = 1.0,
@@ -504,6 +507,16 @@ class 分层PPO基类(BaseAgent):
             float(cache_warm_start_guard_max_prefetch_countdown),
             0.0,
         )
+        self._predictive_prefetch_admission_guard_enabled = bool(
+            predictive_prefetch_admission_guard_enabled
+        )
+        self._predictive_prefetch_admission_min_confidence = max(
+            0.0,
+            min(float(predictive_prefetch_admission_min_confidence), 1.0),
+        )
+        self._predictive_prefetch_admission_require_distinct_next = bool(
+            predictive_prefetch_admission_require_distinct_next
+        )
         self._auxiliary_slow_weight = float(auxiliary_slow_weight)
         self._auxiliary_fast_weight = float(auxiliary_fast_weight)
         self._auxiliary_event_weight = float(auxiliary_event_weight)
@@ -594,6 +607,16 @@ class 分层PPO基类(BaseAgent):
                 selected_actions=selected_actions,
             )
             if cache_warm_guard_info.get("guarded", False):
+                head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                    policy_output=policy_output,
+                    selected_actions=selected_actions,
+                    action_mask=action_mask,
+                )
+            prefetch_admission_guard_info = self._apply_predictive_prefetch_admission_guard_to_actions(
+                semantic_state=semantic_state,
+                selected_actions=selected_actions,
+            )
+            if prefetch_admission_guard_info.get("guarded", False):
                 head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
                     policy_output=policy_output,
                     selected_actions=selected_actions,
@@ -728,6 +751,7 @@ class 分层PPO基类(BaseAgent):
             },
             "deterministic_temporal_smoothing": smoothing_info,
             "cache_warm_start_guard": cache_warm_guard_info,
+            "predictive_prefetch_admission_guard": prefetch_admission_guard_info,
             "backhaul_guard": backhaul_guard_info,
             "deterministic_event_prepare_overridden": bool(smoothing_info.get("override_triggered", False)),
             "deterministic_event_prepare_smoothed": bool(smoothing_info.get("borderline_triggered", False)),
@@ -2458,6 +2482,161 @@ class 分层PPO基类(BaseAgent):
             "max_prefetch_countdown": max_prefetch_countdown,
         }
 
+    def _apply_predictive_prefetch_admission_guard_to_actions(
+        self,
+        *,
+        semantic_state: dict[str, Any],
+        selected_actions: dict[str, int],
+    ) -> dict[str, Any]:
+        if not self._predictive_prefetch_admission_guard_enabled or not self._use_hierarchy:
+            return {"enabled": False, "guarded": False, "reason": "disabled"}
+        if int(selected_actions.get("event", 0)) == 1:
+            return {"enabled": True, "guarded": False, "reason": "event_prepare_selected"}
+        if int(selected_actions.get("slow", 0)) != 2:
+            return {"enabled": True, "guarded": False, "reason": "not_predictive_prefetch_selected"}
+
+        current_node = semantic_state.get("current_workflow_node") or {}
+        required_adapter = current_node.get("required_adapter")
+        if not required_adapter:
+            return {"enabled": True, "guarded": False, "reason": "missing_required_adapter"}
+        required_adapter = str(required_adapter)
+        primary_vehicle, _ = _resolve_primary_vehicle_from_semantic_state(semantic_state)
+        vehicle_id = str(primary_vehicle.get("vehicle_id", ""))
+        current_rsu_id = primary_vehicle.get("associated_rsu_id")
+        if current_rsu_id is None or not vehicle_id:
+            return {"enabled": True, "guarded": False, "reason": "missing_vehicle_or_current_rsu"}
+
+        rsu_map = {
+            str(rsu.get("rsu_id")): rsu
+            for rsu in semantic_state.get("rsus", [])
+            if isinstance(rsu, dict)
+        }
+        current_rsu = rsu_map.get(str(current_rsu_id), {})
+        current_cache_ready = required_adapter in {
+            str(adapter_id)
+            for adapter_id in current_rsu.get("cached_adapter_ids", [])
+        }
+        if not current_cache_ready:
+            return {"enabled": True, "guarded": False, "reason": "current_adapter_not_warm"}
+
+        predictions = semantic_state.get("predictions", {})
+        if not isinstance(predictions, dict):
+            return {"enabled": True, "guarded": False, "reason": "missing_predictions"}
+        predicted_next_rsu_id = predictions.get("predicted_next_rsu_by_vehicle", {}).get(vehicle_id)
+        predicted_handoff_target_rsu_id = (
+            predictions.get("predicted_first_handoff_rsu_by_vehicle", {}).get(vehicle_id)
+            or predictions.get("predicted_handoff_target_rsu_id_by_vehicle", {}).get(vehicle_id)
+        )
+        next_rsu_sequence = predictions.get("next_rsu_sequence", {}).get(vehicle_id, [])
+        predicted_prefetch_target_rsu_id = predicted_next_rsu_id
+        if predicted_prefetch_target_rsu_id is None and isinstance(next_rsu_sequence, list) and next_rsu_sequence:
+            predicted_prefetch_target_rsu_id = next_rsu_sequence[0]
+        if (
+            predicted_prefetch_target_rsu_id is None
+            or str(predicted_prefetch_target_rsu_id) == str(current_rsu_id)
+        ):
+            for candidate_rsu_id in next_rsu_sequence if isinstance(next_rsu_sequence, list) else []:
+                if candidate_rsu_id is not None and str(candidate_rsu_id) != str(current_rsu_id):
+                    predicted_prefetch_target_rsu_id = candidate_rsu_id
+                    break
+        if (
+            predicted_prefetch_target_rsu_id is None
+            or str(predicted_prefetch_target_rsu_id) == str(current_rsu_id)
+        ):
+            return {
+                "enabled": True,
+                "guarded": False,
+                "reason": "missing_distinct_prefetch_target",
+                "current_rsu_id": current_rsu_id,
+                "predicted_next_rsu_id": predicted_next_rsu_id,
+            }
+
+        distinct_handoff_target = bool(
+            predicted_handoff_target_rsu_id is not None
+            and str(predicted_handoff_target_rsu_id) != str(current_rsu_id)
+        )
+        if not distinct_handoff_target:
+            return {
+                "enabled": True,
+                "guarded": False,
+                "reason": "missing_distinct_handoff_target_for_prepare",
+                "current_rsu_id": current_rsu_id,
+                "predicted_prefetch_target_rsu_id": predicted_prefetch_target_rsu_id,
+            }
+
+        target_rsu = rsu_map.get(str(predicted_prefetch_target_rsu_id), {})
+        target_cache_ready = required_adapter in {
+            str(adapter_id)
+            for adapter_id in target_rsu.get("cached_adapter_ids", [])
+        }
+        if target_cache_ready:
+            return {
+                "enabled": True,
+                "guarded": False,
+                "reason": "target_adapter_ready",
+                "required_adapter": required_adapter,
+                "predicted_prefetch_target_rsu_id": predicted_prefetch_target_rsu_id,
+            }
+
+        prediction_confidence = max(
+            0.0,
+            min(
+                float(predictions.get("prediction_confidence_by_vehicle", {}).get(vehicle_id, 0.0) or 0.0),
+                1.0,
+            ),
+        )
+        predicted_next_distinct = bool(
+            predicted_next_rsu_id is not None and str(predicted_next_rsu_id) != str(current_rsu_id)
+        )
+        predicted_next_aligned = bool(
+            predicted_next_distinct
+            and str(predicted_next_rsu_id) == str(predicted_prefetch_target_rsu_id)
+        )
+        handoff_target_aligned = bool(
+            str(predicted_handoff_target_rsu_id) == str(predicted_prefetch_target_rsu_id)
+        )
+        alignment_ready = bool(
+            (not self._predictive_prefetch_admission_require_distinct_next or predicted_next_aligned)
+            and handoff_target_aligned
+        )
+        low_confidence = prediction_confidence < self._predictive_prefetch_admission_min_confidence
+        if low_confidence and not alignment_ready:
+            original = dict(selected_actions)
+            selected_actions["slow"] = 0
+            selected_actions["event"] = 1
+            return {
+                "enabled": True,
+                "guarded": True,
+                "reason": "low_confidence_unaligned_prefetch_deferred_to_prepare",
+                "required_adapter": required_adapter,
+                "current_rsu_id": current_rsu_id,
+                "predicted_next_rsu_id": predicted_next_rsu_id,
+                "predicted_handoff_target_rsu_id": predicted_handoff_target_rsu_id,
+                "predicted_prefetch_target_rsu_id": predicted_prefetch_target_rsu_id,
+                "prediction_confidence": round(prediction_confidence, 6),
+                "min_confidence": self._predictive_prefetch_admission_min_confidence,
+                "predicted_next_aligned": predicted_next_aligned,
+                "handoff_target_aligned": handoff_target_aligned,
+                "require_distinct_next": self._predictive_prefetch_admission_require_distinct_next,
+                "original_actions": original,
+                "guarded_actions": dict(selected_actions),
+            }
+        return {
+            "enabled": True,
+            "guarded": False,
+            "reason": "prefetch_admitted",
+            "required_adapter": required_adapter,
+            "current_rsu_id": current_rsu_id,
+            "predicted_next_rsu_id": predicted_next_rsu_id,
+            "predicted_handoff_target_rsu_id": predicted_handoff_target_rsu_id,
+            "predicted_prefetch_target_rsu_id": predicted_prefetch_target_rsu_id,
+            "prediction_confidence": round(prediction_confidence, 6),
+            "min_confidence": self._predictive_prefetch_admission_min_confidence,
+            "predicted_next_aligned": predicted_next_aligned,
+            "handoff_target_aligned": handoff_target_aligned,
+            "require_distinct_next": self._predictive_prefetch_admission_require_distinct_next,
+        }
+
     def _apply_backhaul_guard_to_actions(
         self,
         *,
@@ -2974,6 +3153,9 @@ class 分层PPO基类(BaseAgent):
             "cache_warm_start_guard_enabled": self._cache_warm_start_guard_enabled,
             "cache_warm_start_guard_min_countdown": self._cache_warm_start_guard_min_countdown,
             "cache_warm_start_guard_max_prefetch_countdown": self._cache_warm_start_guard_max_prefetch_countdown,
+            "predictive_prefetch_admission_guard_enabled": self._predictive_prefetch_admission_guard_enabled,
+            "predictive_prefetch_admission_min_confidence": self._predictive_prefetch_admission_min_confidence,
+            "predictive_prefetch_admission_require_distinct_next": self._predictive_prefetch_admission_require_distinct_next,
             "auxiliary_slow_weight": self._auxiliary_slow_weight,
             "auxiliary_fast_weight": self._auxiliary_fast_weight,
             "auxiliary_event_weight": self._auxiliary_event_weight,

@@ -1,5 +1,28 @@
 # Artifact Records
 
+## 2026-05-27 Top Journal Mechanism v6 Freshness Guard Closed Loop
+
+状态：`[negative-result]` `[audit]` `[optimization-diagnosis]`
+
+路径：
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_freshness_guard_20260527_v1/`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_freshness_guard_20260527_v1/gate_report.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_freshness_guard_20260527_v1/gate_summary.csv`
+- `artifacts/analysis/top_journal_mechanism_v6_freshness_guard_actionmix_diagnosis_20260527/`
+
+用途：记录 freshness-aware cache-warm guard 加入后的一次 3-seed formal closed-loop 结果，并作为后续 confidence/alignment prefetch admission guard 的诊断依据。该 run 不是 final-submission package，也不是当前 canonical。
+
+确认结果：
+- `formal_contract.ready=true`，但 `passed=false`、`paper_claim_ready=false`。
+- `mixed_informative`：SA `98.091111`，`popularity_cache_heuristic` `98.146667`，SA 差值 `-0.055556`。
+- `full_stratified`：SA `90.153148`，`popularity_cache_heuristic` `90.171667`，SA 差值 `-0.018519`。
+- blockers 为 `sa_total_reward_not_above_popularity` 与 `benchmark_minimum_success_not_reached`；SA 仍超过所有 learned baselines，但未超过 supplementary heuristic。
+- action-mix 诊断定位到 `window_off246_len24_t293_316` / `j_8` / seed `13` 的 prefetch realization gap：低置信度且 next-RSU 未对齐时过早 prefetch 导致 `expired_miss`。
+
+结论边界：
+- 该 artifact 证明 freshness countdown guard 单独不足以通过 gate。
+- 后续新增 `predictive_prefetch_admission_guard_*` 只完成 quick/debug chain 验证，不能把 quick 结果写成 formal improvement。
+
 ## 2026-05-27 Top Journal Mechanism v6 Masked Fulltrain Closed Loop
 
 状态：`[negative-result]` `[audit]` `[repair-validation]`

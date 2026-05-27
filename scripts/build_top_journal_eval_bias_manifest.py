@@ -50,6 +50,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--predictive_prepare_hard_override_confidence_threshold", type=float, default=0.70)
     parser.add_argument("--cache_warm_start_guard_min_countdown", type=float, default=None)
     parser.add_argument("--cache_warm_start_guard_max_prefetch_countdown", type=float, default=None)
+    parser.add_argument("--predictive_prefetch_admission_guard_enabled", action="store_true")
+    parser.add_argument("--predictive_prefetch_admission_min_confidence", type=float, default=None)
+    parser.add_argument("--predictive_prefetch_admission_require_distinct_next", type=int, choices=[0, 1], default=None)
     return parser.parse_args()
 
 
@@ -97,6 +100,16 @@ def main() -> None:
             config["cache_warm_start_guard_max_prefetch_countdown"] = float(
                 args.cache_warm_start_guard_max_prefetch_countdown
             )
+        if args.predictive_prefetch_admission_guard_enabled:
+            config["predictive_prefetch_admission_guard_enabled"] = True
+        if args.predictive_prefetch_admission_min_confidence is not None:
+            config["predictive_prefetch_admission_min_confidence"] = float(
+                args.predictive_prefetch_admission_min_confidence
+            )
+        if args.predictive_prefetch_admission_require_distinct_next is not None:
+            config["predictive_prefetch_admission_require_distinct_next"] = bool(
+                int(args.predictive_prefetch_admission_require_distinct_next)
+            )
         payload["config"] = config
         payload["derived_checkpoint"] = {
             "source_checkpoint_path": str(source_path),
@@ -124,6 +137,19 @@ def main() -> None:
                 None
                 if args.cache_warm_start_guard_max_prefetch_countdown is None
                 else float(args.cache_warm_start_guard_max_prefetch_countdown)
+            ),
+            "predictive_prefetch_admission_guard_enabled": bool(
+                args.predictive_prefetch_admission_guard_enabled
+            ),
+            "predictive_prefetch_admission_min_confidence": (
+                None
+                if args.predictive_prefetch_admission_min_confidence is None
+                else float(args.predictive_prefetch_admission_min_confidence)
+            ),
+            "predictive_prefetch_admission_require_distinct_next": (
+                None
+                if args.predictive_prefetch_admission_require_distinct_next is None
+                else bool(int(args.predictive_prefetch_admission_require_distinct_next))
             ),
         }
         target_path = checkpoint_dir / f"sa_ghmappo_seed{seed}_{args.label}.pt"

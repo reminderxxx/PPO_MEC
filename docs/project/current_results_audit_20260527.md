@@ -1,5 +1,16 @@
 # Current Results Audit
 
+## 2026-05-27 freshness guard formal run 与 admission-guard 后续状态
+
+本节优先于下方 v6 masked full-train 段落读取。
+
+- 最新完成的 3-seed formal run 为 `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_freshness_guard_20260527_v1/`。
+- Gate: `formal_contract.ready=true`，`passed=false`，`paper_claim_ready=false`。
+- `mixed_informative`：SA `98.091111`，`popularity_cache_heuristic` `98.146667`，差值 `-0.055556`；blockers 为 `sa_total_reward_not_above_popularity` 与 `benchmark_minimum_success_not_reached`。
+- `full_stratified`：SA `90.153148`，`popularity_cache_heuristic` `90.171667`，差值 `-0.018519`；blockers 相同。
+- 诊断 `artifacts/analysis/top_journal_mechanism_v6_freshness_guard_actionmix_diagnosis_20260527/` 显示剩余负例来自低置信度、next-RSU 未对齐时的过早 prefetch；因此代码已新增 `predictive_prefetch_admission_guard_*`，但该新增 guard 目前只有 quick/debug chain 验证，不构成新的 formal 结果。
+- 当前 canonical 仍为 `final_submission_full_current_baselines_20260511_v1`；v6 必须重新通过 3-seed formal/holdout gate 后才能替换。
+
 ## 2026-05-27 最新修复版 v6 closed-loop 审计结论
 
 本节优先于下方旧 v6 审计段落读取。旧 run `top_journal_mechanism_v6_strong_competition_20260527_v1` 保留为修复前 negative baseline；最新修复版为：

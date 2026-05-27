@@ -6,6 +6,8 @@
 - Paper-grade learned-baseline loops accept `--mappo_baseline_profile mappo_strong_audit`; this profile is the default MAPPO profile inside the learned-suite/final-loop wrappers.
 - Main-method optimization adds `top_journal_mechanism_v6_strong_competition` and `configs/experiment/top_journal_mechanism_v6_strong_competition.yaml` for a future same-budget rerun against optimized baselines.
 - SA v6 now uses a freshness-aware cache-warm guard (`cache_warm_start_guard_max_prefetch_countdown=6.0`) so predictive prefetch is not forced before the recorder validation window.
+- SA v6 also uses a confidence/alignment prefetch admission guard (`predictive_prefetch_admission_min_confidence=0.55`) so low-confidence prefetch is deferred until next-RSU and handoff-target evidence align.
+- The latest 3-seed freshness-guard closed loop (`top_journal_mechanism_v6_freshness_guard_20260527_v1`) remains a negative candidate: SA still trails `popularity_cache_heuristic` by `0.055556` mixed / `0.018519` full reward and is not paper-ready.
 - No new formal benchmark result is claimed by this code change alone. The last verified canonical result remains `final_submission_full_current_baselines_20260511_v1` until a v6 + MAPPO v3 final-submission package passes formal and holdout gates.
 
 PPO_MEC 是面向 AI-driven VEC 的研究原型，主线围绕跨 RSU 连续 DAG workflow 执行、车载 base model 与路侧 adapter cache 协同、handoff 状态迁移、surrogate prediction 和多时间尺度控制。

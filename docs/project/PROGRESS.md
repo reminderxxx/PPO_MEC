@@ -2,6 +2,34 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-05-27: SA v6 confidence-aware prefetch admission guard
+
+已完成审计：
+
+- 正式 closed-loop `top_journal_mechanism_v6_freshness_guard_20260527_v1` 已完成，`formal_contract.ready=true`，但 `passed=false`、`paper_claim_ready=false`。
+- gate blocker 仍为 `sa_total_reward_not_above_popularity` 和 `benchmark_minimum_success_not_reached`：mixed SA `98.091111` vs popularity `98.146667`；full SA `90.153148` vs popularity `90.171667`。
+- 诊断产物 `artifacts/analysis/top_journal_mechanism_v6_freshness_guard_actionmix_diagnosis_20260527/` 显示剩余负例集中在 `window_off246_len24_t293_316` / `j_8` / seed `13`：SA 在低置信度且 `predicted_next_rsu_id` 仍为当前 RSU 时提前 prefetch，最终 `expired_miss`；heuristic 等到后续更高置信度、next-RSU 对齐时 prefetch 并命中。
+
+已完成维护：
+
+- `src/agents/sa_ghmappo_core.py` 新增 `predictive_prefetch_admission_guard_*`，默认关闭；v6 profile 显式开启 `predictive_prefetch_admission_guard_enabled=true`、`predictive_prefetch_admission_min_confidence=0.55`、`predictive_prefetch_admission_require_distinct_next=true`。
+- guard 只在 selected action 为 predictive prefetch、当前 adapter 已 warm、target adapter 未 warm、存在 distinct handoff target，且 prediction confidence 低于阈值并且 next-RSU / prefetch target 未对齐时触发；触发后把动作延期为 `handoff_migration_prepare`。
+- 训练 summary、checkpoint 恢复、main-results benchmark rows、eval-bias manifest builder、baseline excluded-SA-mechanism 配置和 contract tests 已同步新增字段。
+
+已完成验证：
+
+- `python -m py_compile src\agents\sa_ghmappo_core.py src\agents\sa_ghmappo_agent.py src\evaluators\real_eval_support.py src\evaluators\main_results_support.py src\trainers\marl_on_policy_trainer.py scripts\train_sa_ghmappo_real_sample.py scripts\build_top_journal_eval_bias_manifest.py`
+- `python -m pytest tests\test_algo_pool_contract.py`
+- `python -m pytest tests\test_env_contract.py`
+- `python -m pytest tests\test_top_journal_closed_loop.py`
+- `python scripts\smoke_test.py`
+- `python scripts\run_top_journal_closed_loop.py --quick --run_id top_journal_mechanism_v6_prefetch_admission_quick_20260527 --seeds 7 --sa_profile top_journal_mechanism_v6_strong_competition --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified`
+
+结论边界：
+
+- quick run 仅验证训练、checkpoint、恢复和 benchmark 消费链路；`paper_claim_ready=false`、`passed=false` 不构成论文结论。
+- 该维护是低置信度预测下的 policy-side admission control，不修改 `semantic_discrete_5` action contract、环境 reward 或 formal gate；仍需后续 3-seed formal/holdout 验证才能判断是否缩小 popularity gap。
+
 ## 2026-05-27: SA v6 freshness-aware prefetch guard
 
 已完成维护：

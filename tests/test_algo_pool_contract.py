@@ -253,6 +253,9 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(kwargs["mechanism_window_weight_floor_after_update"], 1.60)
         self.assertFalse(kwargs["predictive_prepare_hard_override_enabled"])
         self.assertEqual(kwargs["cache_warm_start_guard_max_prefetch_countdown"], 6.0)
+        self.assertTrue(kwargs["predictive_prefetch_admission_guard_enabled"])
+        self.assertEqual(kwargs["predictive_prefetch_admission_min_confidence"], 0.55)
+        self.assertTrue(kwargs["predictive_prefetch_admission_require_distinct_next"])
 
     def test_qmix_uses_controller_level_value_decomposition_contract(self) -> None:
         state = _minimal_semantic_state()
@@ -667,6 +670,60 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertTrue(guard_info["guarded"])
         self.assertEqual(guard_info["reason"], "target_adapter_not_warm_prefetch_first")
         self.assertEqual(guard_info["handoff_countdown_steps"], 6.0)
+        self.assertEqual(actions["slow"], 2)
+        self.assertEqual(actions["event"], 0)
+
+    def test_predictive_prefetch_admission_guard_defers_low_confidence_unaligned_prefetch(self) -> None:
+        state = _minimal_semantic_state()
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["predictions"]["predicted_next_rsu_by_vehicle"]["veh_1"] = "rsu_a"
+        state["predictions"]["predicted_first_handoff_rsu_by_vehicle"]["veh_1"] = "rsu_b"
+        state["predictions"]["next_rsu_sequence"]["veh_1"] = ["rsu_a", "rsu_b"]
+        state["predictions"]["prediction_confidence_by_vehicle"]["veh_1"] = 0.38
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=1,
+            predictive_prefetch_admission_guard_enabled=True,
+            predictive_prefetch_admission_min_confidence=0.55,
+            predictive_prefetch_admission_require_distinct_next=True,
+        )
+        actions = {"slow": 2, "fast": 0, "event": 0}
+
+        guard_info = agent._apply_predictive_prefetch_admission_guard_to_actions(
+            semantic_state=state,
+            selected_actions=actions,
+        )
+
+        self.assertTrue(guard_info["guarded"])
+        self.assertEqual(guard_info["reason"], "low_confidence_unaligned_prefetch_deferred_to_prepare")
+        self.assertFalse(guard_info["predicted_next_aligned"])
+        self.assertEqual(actions["slow"], 0)
+        self.assertEqual(actions["event"], 1)
+
+    def test_predictive_prefetch_admission_guard_admits_confident_aligned_prefetch(self) -> None:
+        state = _minimal_semantic_state()
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["predictions"]["predicted_next_rsu_by_vehicle"]["veh_1"] = "rsu_b"
+        state["predictions"]["predicted_first_handoff_rsu_by_vehicle"]["veh_1"] = "rsu_b"
+        state["predictions"]["next_rsu_sequence"]["veh_1"] = ["rsu_b"]
+        state["predictions"]["prediction_confidence_by_vehicle"]["veh_1"] = 0.61
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=1,
+            predictive_prefetch_admission_guard_enabled=True,
+            predictive_prefetch_admission_min_confidence=0.55,
+            predictive_prefetch_admission_require_distinct_next=True,
+        )
+        actions = {"slow": 2, "fast": 0, "event": 0}
+
+        guard_info = agent._apply_predictive_prefetch_admission_guard_to_actions(
+            semantic_state=state,
+            selected_actions=actions,
+        )
+
+        self.assertFalse(guard_info["guarded"])
+        self.assertEqual(guard_info["reason"], "prefetch_admitted")
+        self.assertTrue(guard_info["predicted_next_aligned"])
         self.assertEqual(actions["slow"], 2)
         self.assertEqual(actions["event"], 0)
 

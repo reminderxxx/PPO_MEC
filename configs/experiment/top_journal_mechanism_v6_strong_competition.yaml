@@ -41,6 +41,9 @@ training:
     cache_warm_start_guard_enabled: true
     cache_warm_start_guard_min_countdown: 0.0
     cache_warm_start_guard_max_prefetch_countdown: 6.0
+    predictive_prefetch_admission_guard_enabled: true
+    predictive_prefetch_admission_min_confidence: 0.55
+    predictive_prefetch_admission_require_distinct_next: true
   event_retention:
     event_prepare_margin_boost: 0.55
     temporal_prepare_activation_threshold: 0.30

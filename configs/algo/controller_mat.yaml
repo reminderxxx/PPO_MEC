@@ -34,6 +34,7 @@ policy:
     - continuity_guard
     - backhaul_guard
     - cache_warm_start_guard
+    - predictive_prefetch_admission_guard
 training:
   trainer: marl_on_policy_trainer
   learning_rate: 0.0003

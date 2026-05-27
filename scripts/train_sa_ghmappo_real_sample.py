@@ -185,6 +185,8 @@ POLICY_DIAGNOSTIC_FIELDS = [
     "backhaul_guard_rate",
     "cache_warm_start_guard_count",
     "cache_warm_start_guard_rate",
+    "predictive_prefetch_admission_guard_count",
+    "predictive_prefetch_admission_guard_rate",
     "dag_frontier_size_mean",
     "dag_critical_path_pressure_mean",
     "dag_current_node_dependency_pressure_mean",
@@ -420,6 +422,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mechanism_window_weight_floor_after_update", type=float, default=None)
     parser.add_argument("--mechanism_entropy_floor_after_update", type=float, default=None)
     parser.add_argument("--cache_warm_start_guard_max_prefetch_countdown", type=float, default=None)
+    parser.add_argument("--predictive_prefetch_admission_guard_enabled", action="store_true", default=None)
+    parser.add_argument("--predictive_prefetch_admission_min_confidence", type=float, default=None)
+    parser.add_argument("--predictive_prefetch_admission_require_distinct_next", type=int, choices=[0, 1], default=None)
     parser.add_argument("--mechanism_window_oversample_ratio", type=float, default=1.0)
     parser.add_argument("--handoff_imminent_oversample_ratio", type=float, default=1.0)
     parser.add_argument("--target_mismatch_sample_weight", type=float, default=1.0)
@@ -893,6 +898,7 @@ def build_policy_step_diagnostic(
     guard_info = dict(action_info.get("continuity_guard", {}))
     guard_triggered = bool(action_info.get("guard_triggered", False))
     cache_warm_guard_info = dict(action_info.get("cache_warm_start_guard", {}))
+    prefetch_admission_guard_info = dict(action_info.get("predictive_prefetch_admission_guard", {}))
     backhaul_guard_info = dict(action_info.get("backhaul_guard", {}))
     action_projection_applied = bool(action_info.get("action_projection_applied", False))
     invalid_action_attempt_count = int(action_info.get("invalid_action_attempt_count", 0) or 0)
@@ -993,6 +999,7 @@ def build_policy_step_diagnostic(
         "invalid_action_attempt_count": float(invalid_action_attempt_count),
         "guard_action_delta": 1.0 if guard_action_delta else 0.0,
         "cache_warm_start_guarded": 1.0 if bool(cache_warm_guard_info.get("guarded", False)) else 0.0,
+        "predictive_prefetch_admission_guarded": 1.0 if bool(prefetch_admission_guard_info.get("guarded", False)) else 0.0,
         "backhaul_guarded": 1.0 if bool(backhaul_guard_info.get("guarded", False)) else 0.0,
         "dag_frontier_size": float(metrics_protocol.get("dag_frontier_size", 0.0) or 0.0),
         "dag_critical_path_pressure": float(metrics_protocol.get("dag_critical_path_pressure", 0.0) or 0.0),
@@ -1084,6 +1091,7 @@ def aggregate_policy_diagnostics(step_rows: list[dict[str, Any]]) -> dict[str, f
     invalid_action_attempt_count = int(round(sum(float(row.get("invalid_action_attempt_count", 0.0)) for row in step_rows)))
     guard_action_delta_count = int(round(sum(float(row.get("guard_action_delta", 0.0)) for row in step_rows)))
     cache_warm_start_guard_count = int(round(sum(float(row.get("cache_warm_start_guarded", 0.0)) for row in step_rows)))
+    predictive_prefetch_admission_guard_count = int(round(sum(float(row.get("predictive_prefetch_admission_guarded", 0.0)) for row in step_rows)))
     backhaul_guard_count = int(round(sum(float(row.get("backhaul_guarded", 0.0)) for row in step_rows)))
     dag_frontier_sizes = [float(row.get("dag_frontier_size", 0.0)) for row in step_rows]
     dag_critical_path_pressures = [float(row.get("dag_critical_path_pressure", 0.0)) for row in step_rows]
@@ -1193,6 +1201,11 @@ def aggregate_policy_diagnostics(step_rows: list[dict[str, Any]]) -> dict[str, f
         "guard_action_delta_rate": round(float(guard_action_delta_count) / float(total_steps), 6),
         "cache_warm_start_guard_count": cache_warm_start_guard_count,
         "cache_warm_start_guard_rate": round(float(cache_warm_start_guard_count) / float(total_steps), 6),
+        "predictive_prefetch_admission_guard_count": predictive_prefetch_admission_guard_count,
+        "predictive_prefetch_admission_guard_rate": round(
+            float(predictive_prefetch_admission_guard_count) / float(total_steps),
+            6,
+        ),
         "backhaul_guard_count": backhaul_guard_count,
         "backhaul_guard_rate": round(float(backhaul_guard_count) / float(total_steps), 6),
         "dag_frontier_size_mean": safe_mean(dag_frontier_sizes),
@@ -1296,6 +1309,9 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "predictive_prepare_hard_override_enabled": False,
                 "latency_fallback_bias_enabled": False,
                 "cache_warm_start_guard_max_prefetch_countdown": 6.0,
+                "predictive_prefetch_admission_guard_enabled": True,
+                "predictive_prefetch_admission_min_confidence": 0.55,
+                "predictive_prefetch_admission_require_distinct_next": True,
             }
         )
         return kwargs
@@ -1701,10 +1717,15 @@ def build_agent_kwargs(args: argparse.Namespace) -> dict[str, Any]:
         "latency_fallback_confidence_floor",
         "latency_fallback_slow_suppression_strength",
         "cache_warm_start_guard_max_prefetch_countdown",
+        "predictive_prefetch_admission_guard_enabled",
+        "predictive_prefetch_admission_min_confidence",
+        "predictive_prefetch_admission_require_distinct_next",
     ]
     for field_name in optional_agent_fields:
         value = getattr(args, field_name, None)
         if value is not None:
+            if field_name == "predictive_prefetch_admission_require_distinct_next":
+                value = bool(int(value))
             kwargs[field_name] = value
     return kwargs
 
@@ -4446,6 +4467,15 @@ def main() -> None:
             ),
             "cache_warm_start_guard_max_prefetch_countdown": float(
                 getattr(agent, "_cache_warm_start_guard_max_prefetch_countdown", 0.0)
+            ),
+            "predictive_prefetch_admission_guard_enabled": bool(
+                getattr(agent, "_predictive_prefetch_admission_guard_enabled", False)
+            ),
+            "predictive_prefetch_admission_min_confidence": float(
+                getattr(agent, "_predictive_prefetch_admission_min_confidence", 0.0)
+            ),
+            "predictive_prefetch_admission_require_distinct_next": bool(
+                getattr(agent, "_predictive_prefetch_admission_require_distinct_next", True)
             ),
         },
         "predictor_runtime_config": build_predictor_runtime_kwargs(args, random_seed=args.random_seed),
