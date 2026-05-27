@@ -1,5 +1,33 @@
 # Artifact Records
 
+## 2026-05-27 Top Journal Mechanism v6 Strong-Competition Closed Loop
+
+状态：`[negative-result]` `[audit]`
+
+路径：
+
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/gate_report.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/gate_summary.csv`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/seed_checkpoint_manifest.json`
+
+用途：记录 SA v6 与 MAPPO v3 强对照 profile 的最新 closed-loop 结果。该 run 不是 final-submission package，也不是当前 canonical。
+
+确认结果：
+
+- `formal_contract.ready=true`，正式 seed、预算、benchmark modes 和 `primary_vehicle_selection=handoff_pressure` 合同满足。
+- `baseline_protocol_audit.passed=true`，MAPPO v3 checkpoint protocol 记录为 `aggregation_reason_weighted_controller_ppo_v3`。
+- gate 未通过：`passed=false`、`paper_claim_ready=false`。
+- `mixed_informative`：SA `96.874444`，`popularity_cache_heuristic` `98.146667`，`cache_offload_drl` `92.024444`；blockers 为 `sa_total_reward_not_above_popularity` 和 `benchmark_minimum_success_not_reached`。
+- `full_stratified`：SA `89.692037`，`popularity_cache_heuristic` `90.171667`，`cache_offload_drl` `90.168889`；blockers 为 `sa_total_reward_not_above_cache_offload_drl`、`sa_total_reward_not_above_popularity` 和 `benchmark_minimum_success_not_reached`。
+- MAPPO v3 本轮 closed-loop 中 mixed reward `83.435`、full reward `84.999259`；协议可运行，但不能支撑 paper-ready MAPPO 性能 claim。
+
+结论边界：
+
+- 该结果只能作为 negative candidate / optimization diagnosis，不替换 `final_submission_full_current_baselines_20260511_v1`。
+- 后续若要把 MAPPO v3 和 SA v6 写进主论文结果，需要先生成新的 final-submission package，并要求 final gate `paper_claim_ready=true`、comparison package `paper_ready_package_ready=true`。
+- 当前已知 blocker 是 SA v6 在 full split 下落后 `cache_offload_drl`，并且在 mixed/full 下均没有超过 supplementary `popularity_cache_heuristic`。
+
 ## 2026-05-11 Full Current-Baseline Final Submission
 
 状态：`[canonical]` `[paper-grade]`

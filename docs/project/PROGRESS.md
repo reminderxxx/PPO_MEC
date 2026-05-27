@@ -2,6 +2,33 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-05-27: v6 强竞争 closed-loop 结果审计
+
+已完成运行：
+
+- `python scripts\run_top_journal_closed_loop.py --run_id top_journal_mechanism_v6_strong_competition_20260527_v1 --seeds 7 13 29 --sa_profile top_journal_mechanism_v6_strong_competition --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure`
+
+核心产物：
+
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/gate_report.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/gate_summary.csv`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/seed_checkpoint_manifest.json`
+
+关键结果：
+
+- 本轮 run 完成且 `formal_contract.ready=true`，MAPPO v3 的 `baseline_protocol_audit.passed=true`，`baseline_protocol_versions.mappo.head_credit_protocol=aggregation_reason_weighted_controller_ppo_v3`。
+- closed-loop gate 未通过：`passed=false`、`paper_claim_ready=false`。
+- `mixed_informative` blocker：`sa_total_reward_not_above_popularity`、`benchmark_minimum_success_not_reached`。SA `96.874444`，`popularity_cache_heuristic` `98.146667`，差值 `-1.272223`；SA 仍高于 strongest learned baseline `cache_offload_drl=92.024444`，差值 `+4.85`。
+- `full_stratified` blocker：`sa_total_reward_not_above_cache_offload_drl`、`sa_total_reward_not_above_popularity`、`benchmark_minimum_success_not_reached`。SA `89.692037`，`popularity_cache_heuristic` `90.171667`，`cache_offload_drl` `90.168889`；SA 相对 strongest learned baseline 差值 `-0.476852`。
+- v6 对 PPO 仍有明显优势：mixed `+26.327222`，full `+19.590185`；但本轮 strongest learned baseline 已变为 `cache_offload_drl`，不能再把 PPO 写成默认最强对照。
+- MAPPO v3 协议可运行，但 closed-loop 结果还不是 paper-ready：mixed reward `83.435`，full reward `84.999259`，本轮 benchmark 中 prefetch count 仍为 `0.0`。
+
+结论边界：
+
+- `top_journal_mechanism_v6_strong_competition_20260527_v1` 是 negative candidate，不替换当前 canonical。
+- 当前可写入主论文的正式结果仍是 `final_submission_full_current_baselines_20260511_v1`。
+- 暂不继续运行 v6 final-submission promotion；需要先降低 SA invalid action / action projection，并修复 full split 下相对 `cache_offload_drl` 的 reward 与 continuity 弱项。
+
 ## 2026-05-27: MAPPO v3 强对照与 SA v6 候选入口
 
 已完成维护：
