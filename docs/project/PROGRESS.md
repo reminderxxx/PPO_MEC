@@ -2,6 +2,33 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-05-27: SA v6 freshness-aware prefetch guard
+
+已完成维护：
+
+- `src/agents/sa_ghmappo_core.py` 为 `cache_warm_start_guard` 增加 `cache_warm_start_guard_max_prefetch_countdown`，默认 `0.0` 表示保持历史无上界行为；当显式设置为正数时，target adapter 未 warm 但 handoff countdown 超过 freshness window 时不再把 prepare 强制改成 predictive prefetch。
+- `top_journal_mechanism_v6_strong_competition` profile 将该上界设为 `6.0`，与当前 `EpisodeRecorder(prefetch_validation_window=6)` 对齐，减少机制窗口中过早 prefetch 变成 `expired_miss` 的风险。
+- `real_eval_support`、训练 summary、eval-bias manifest builder、配置文件和 contract tests 已同步识别该字段，保持 checkpoint 生产端/消费端一致。
+
+已完成验证：
+
+- `python -m py_compile src\agents\sa_ghmappo_core.py src\agents\sa_ghmappo_agent.py src\evaluators\real_eval_support.py scripts\train_sa_ghmappo_real_sample.py scripts\build_top_journal_eval_bias_manifest.py`
+- `python -m pytest tests\test_algo_pool_contract.py`
+- `python -m pytest tests\test_env_contract.py`
+- `python -m pytest tests\test_top_journal_closed_loop.py`
+- `python scripts\smoke_test.py`
+- `python scripts\run_top_journal_closed_loop.py --quick --run_id top_journal_mechanism_v6_freshness_guard_quick_20260527 --seeds 7 --sa_profile top_journal_mechanism_v6_strong_competition --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified`
+
+quick run 结果边界：
+
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_freshness_guard_quick_20260527/` 可执行完成；训练 summary 记录 `cache_warm_start_guard_max_prefetch_countdown=6.0`。
+- quick/debug run 的 `paper_claim_ready=false`、`passed=false` 符合预期；不得作为论文结果或 v6 promotion 依据。
+
+结论边界：
+
+- 本次是方向匹配的 policy-side freshness gating，小步修复 v6 机制窗口诊断中暴露的 prefetch timing 问题；不修改 `semantic_discrete_5` action contract、环境 reward 或 benchmark gate。
+- 该代码变更本身不构成新的论文结果；仍需 formal/holdout v3 final-submission protocol 重跑后，才能判断是否替代当前 canonical。
+
 ## 2026-05-27: SA v6 action-mask 修复与 full-stratified closed-loop 重跑
 
 已完成维护：

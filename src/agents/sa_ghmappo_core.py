@@ -341,6 +341,7 @@ class 分层PPO基类(BaseAgent):
         backhaul_guard_max_reactive_fills_per_adapter: int = 1,
         cache_warm_start_guard_enabled: bool = False,
         cache_warm_start_guard_min_countdown: float = 1.5,
+        cache_warm_start_guard_max_prefetch_countdown: float = 0.0,
         auxiliary_slow_weight: float = 1.0,
         auxiliary_fast_weight: float = 0.5,
         auxiliary_event_weight: float = 1.0,
@@ -497,6 +498,10 @@ class 分层PPO基类(BaseAgent):
         self._cache_warm_start_guard_enabled = bool(cache_warm_start_guard_enabled)
         self._cache_warm_start_guard_min_countdown = max(
             float(cache_warm_start_guard_min_countdown),
+            0.0,
+        )
+        self._cache_warm_start_guard_max_prefetch_countdown = max(
+            float(cache_warm_start_guard_max_prefetch_countdown),
             0.0,
         )
         self._auxiliary_slow_weight = float(auxiliary_slow_weight)
@@ -2399,10 +2404,31 @@ class 分层PPO基类(BaseAgent):
             sigma=self._temporal_prepare_sigma,
         )
         countdown_steps = float(timing_features.get("countdown_steps", 0.0) or 0.0)
+        max_prefetch_countdown = self._cache_warm_start_guard_max_prefetch_countdown
+        event_prepare_selected = int(selected_actions.get("event", 0)) == 1
+        if (
+            not target_cache_ready
+            and event_prepare_selected
+            and max_prefetch_countdown > 0.0
+            and countdown_steps > max_prefetch_countdown
+        ):
+            return {
+                "enabled": True,
+                "guarded": False,
+                "reason": "target_prefetch_deferred_until_freshness_window",
+                "required_adapter": required_adapter,
+                "current_rsu_id": current_rsu_id,
+                "predicted_target_rsu_id": predicted_target,
+                "current_cache_ready": True,
+                "target_cache_ready": False,
+                "handoff_countdown_steps": round(countdown_steps, 6),
+                "min_countdown": self._cache_warm_start_guard_min_countdown,
+                "max_prefetch_countdown": max_prefetch_countdown,
+            }
         if (
             not target_cache_ready
             and countdown_steps >= self._cache_warm_start_guard_min_countdown
-            and int(selected_actions.get("event", 0)) == 1
+            and event_prepare_selected
         ):
             original = dict(selected_actions)
             selected_actions["slow"] = 2
@@ -2416,6 +2442,7 @@ class 分层PPO基类(BaseAgent):
                 "predicted_target_rsu_id": predicted_target,
                 "handoff_countdown_steps": round(countdown_steps, 6),
                 "min_countdown": self._cache_warm_start_guard_min_countdown,
+                "max_prefetch_countdown": max_prefetch_countdown,
                 "original_actions": original,
                 "guarded_actions": dict(selected_actions),
             }
@@ -2427,6 +2454,8 @@ class 分层PPO基类(BaseAgent):
             "current_cache_ready": True,
             "target_cache_ready": bool(target_cache_ready),
             "handoff_countdown_steps": round(countdown_steps, 6),
+            "min_countdown": self._cache_warm_start_guard_min_countdown,
+            "max_prefetch_countdown": max_prefetch_countdown,
         }
 
     def _apply_backhaul_guard_to_actions(
@@ -2944,6 +2973,7 @@ class 分层PPO基类(BaseAgent):
             "backhaul_guard_max_reactive_fills_per_adapter": self._backhaul_guard_max_reactive_fills_per_adapter,
             "cache_warm_start_guard_enabled": self._cache_warm_start_guard_enabled,
             "cache_warm_start_guard_min_countdown": self._cache_warm_start_guard_min_countdown,
+            "cache_warm_start_guard_max_prefetch_countdown": self._cache_warm_start_guard_max_prefetch_countdown,
             "auxiliary_slow_weight": self._auxiliary_slow_weight,
             "auxiliary_fast_weight": self._auxiliary_fast_weight,
             "auxiliary_event_weight": self._auxiliary_event_weight,

@@ -1,5 +1,21 @@
 ﻿# Decision Log
 
+## 2026-05-27: SA cache-warm guard 增加 freshness window 上界
+
+决策：`top_journal_mechanism_v6_strong_competition` 的 cache-warm start guard 增加 `cache_warm_start_guard_max_prefetch_countdown=6.0`。当 target adapter 未 warm 但预测 handoff countdown 超出该上界时，guard 不再把 event prepare 强制替换为 predictive prefetch，而是等待进入 freshness window 后再触发 prefetch。
+
+原因：
+
+- v6 masked full-train 诊断显示剩余 popularity gap 集中在单个 mechanism window：SA 过早 prefetch 后 validation expired，而 heuristic 在更接近 handoff 的 step prefetch 并命中。
+- 当前 recorder 的 `prefetch_validation_window=6` 已定义 prefetch 的有效兑现窗口；policy-side guard 应与该 freshness contract 对齐，避免奖励/环境不变时制造过早机制动作。
+- 该设计贴合 VEC service caching / service migration 文献中的 deadline-aware、freshness-aware placement 思路，但不引入新动作空间或 reward 改写。
+
+影响：
+
+- 历史 profile 和 checkpoint 默认上界为 `0.0`，语义为禁用该上界；只有 v6 profile 显式启用。
+- 训练、checkpoint 恢复、eval-bias manifest 和配置文件需要保留该字段，否则 benchmark 复现会丢失 guard 行为。
+- 本决策只解决 timing guard，不代表 v6 已 paper-ready；仍需通过 formal/holdout gate 后才能替换 canonical。
+
 ## 2026-05-27: MAPPO 强对照升级为 controller head-credit v3
 
 决策：`mappo` 继续保持 controller-level CTDE baseline，但 paper-grade 强对照协议升级为 `aggregation_reason_weighted_controller_ppo_v3`，并新增 `mappo_strong_audit` 训练 profile。主算法新增 `top_journal_mechanism_v6_strong_competition` profile，用于后续与优化后的 learned baselines 同预算重跑。

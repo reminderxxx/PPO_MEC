@@ -40,6 +40,7 @@ training:
     backhaul_guard_max_reactive_fills_per_adapter: 1
     cache_warm_start_guard_enabled: true
     cache_warm_start_guard_min_countdown: 0.0
+    cache_warm_start_guard_max_prefetch_countdown: 6.0
   event_retention:
     event_prepare_margin_boost: 0.55
     temporal_prepare_activation_threshold: 0.30

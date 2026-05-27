@@ -419,6 +419,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mechanism_aux_coef_floor_after_update", type=float, default=None)
     parser.add_argument("--mechanism_window_weight_floor_after_update", type=float, default=None)
     parser.add_argument("--mechanism_entropy_floor_after_update", type=float, default=None)
+    parser.add_argument("--cache_warm_start_guard_max_prefetch_countdown", type=float, default=None)
     parser.add_argument("--mechanism_window_oversample_ratio", type=float, default=1.0)
     parser.add_argument("--handoff_imminent_oversample_ratio", type=float, default=1.0)
     parser.add_argument("--target_mismatch_sample_weight", type=float, default=1.0)
@@ -1294,6 +1295,7 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "mechanism_entropy_floor_after_update": 0.0007,
                 "predictive_prepare_hard_override_enabled": False,
                 "latency_fallback_bias_enabled": False,
+                "cache_warm_start_guard_max_prefetch_countdown": 6.0,
             }
         )
         return kwargs
@@ -1698,6 +1700,7 @@ def build_agent_kwargs(args: argparse.Namespace) -> dict[str, Any]:
         "latency_fallback_bias_strength",
         "latency_fallback_confidence_floor",
         "latency_fallback_slow_suppression_strength",
+        "cache_warm_start_guard_max_prefetch_countdown",
     ]
     for field_name in optional_agent_fields:
         value = getattr(args, field_name, None)
@@ -4440,6 +4443,9 @@ def main() -> None:
             ),
             "cache_warm_start_guard_min_countdown": float(
                 getattr(agent, "_cache_warm_start_guard_min_countdown", 0.0)
+            ),
+            "cache_warm_start_guard_max_prefetch_countdown": float(
+                getattr(agent, "_cache_warm_start_guard_max_prefetch_countdown", 0.0)
             ),
         },
         "predictor_runtime_config": build_predictor_runtime_kwargs(args, random_seed=args.random_seed),

@@ -252,6 +252,7 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(kwargs["mechanism_window_weight"], 1.65)
         self.assertEqual(kwargs["mechanism_window_weight_floor_after_update"], 1.60)
         self.assertFalse(kwargs["predictive_prepare_hard_override_enabled"])
+        self.assertEqual(kwargs["cache_warm_start_guard_max_prefetch_countdown"], 6.0)
 
     def test_qmix_uses_controller_level_value_decomposition_contract(self) -> None:
         state = _minimal_semantic_state()
@@ -618,6 +619,54 @@ class AlgoPoolContractTestCase(unittest.TestCase):
 
         self.assertTrue(guard_info["guarded"])
         self.assertEqual(guard_info["reason"], "target_adapter_not_warm_prefetch_first")
+        self.assertEqual(actions["slow"], 2)
+        self.assertEqual(actions["event"], 0)
+
+    def test_cache_warm_start_guard_defers_prefetch_outside_freshness_window(self) -> None:
+        state = _minimal_semantic_state()
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["predictions"]["next_rsu_sequence"]["veh_1"] = ["rsu_a"] * 7 + ["rsu_b"]
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=1,
+            cache_warm_start_guard_enabled=True,
+            cache_warm_start_guard_min_countdown=0.0,
+            cache_warm_start_guard_max_prefetch_countdown=6.0,
+        )
+        actions = {"slow": 0, "fast": 0, "event": 1}
+
+        guard_info = agent._apply_cache_warm_start_guard_to_actions(
+            semantic_state=state,
+            selected_actions=actions,
+        )
+
+        self.assertFalse(guard_info["guarded"])
+        self.assertEqual(guard_info["reason"], "target_prefetch_deferred_until_freshness_window")
+        self.assertEqual(guard_info["handoff_countdown_steps"], 8.0)
+        self.assertEqual(actions["slow"], 0)
+        self.assertEqual(actions["event"], 1)
+
+    def test_cache_warm_start_guard_prefetches_inside_freshness_window(self) -> None:
+        state = _minimal_semantic_state()
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["predictions"]["next_rsu_sequence"]["veh_1"] = ["rsu_a"] * 5 + ["rsu_b"]
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=1,
+            cache_warm_start_guard_enabled=True,
+            cache_warm_start_guard_min_countdown=0.0,
+            cache_warm_start_guard_max_prefetch_countdown=6.0,
+        )
+        actions = {"slow": 0, "fast": 0, "event": 1}
+
+        guard_info = agent._apply_cache_warm_start_guard_to_actions(
+            semantic_state=state,
+            selected_actions=actions,
+        )
+
+        self.assertTrue(guard_info["guarded"])
+        self.assertEqual(guard_info["reason"], "target_adapter_not_warm_prefetch_first")
+        self.assertEqual(guard_info["handoff_countdown_steps"], 6.0)
         self.assertEqual(actions["slow"], 2)
         self.assertEqual(actions["event"], 0)
 

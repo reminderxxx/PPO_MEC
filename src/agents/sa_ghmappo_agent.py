@@ -62,6 +62,9 @@ class SAGHMAPPOAgent(SAGHMAPPOBaseAgent):
         mechanism_aux_coef_floor_after_update: float = 0.0,
         mechanism_window_weight_floor_after_update: float = 1.0,
         mechanism_entropy_floor_after_update: float = 0.0,
+        cache_warm_start_guard_enabled: bool = False,
+        cache_warm_start_guard_min_countdown: float = 1.5,
+        cache_warm_start_guard_max_prefetch_countdown: float = 0.0,
         **kwargs,
     ) -> None:
         super().__init__(
@@ -114,6 +117,9 @@ class SAGHMAPPOAgent(SAGHMAPPOBaseAgent):
             mechanism_aux_coef_floor_after_update=mechanism_aux_coef_floor_after_update,
             mechanism_window_weight_floor_after_update=mechanism_window_weight_floor_after_update,
             mechanism_entropy_floor_after_update=mechanism_entropy_floor_after_update,
+            cache_warm_start_guard_enabled=cache_warm_start_guard_enabled,
+            cache_warm_start_guard_min_countdown=cache_warm_start_guard_min_countdown,
+            cache_warm_start_guard_max_prefetch_countdown=cache_warm_start_guard_max_prefetch_countdown,
             **kwargs,
         )
         self.ablation_config = {
@@ -161,4 +167,9 @@ class SAGHMAPPOAgent(SAGHMAPPOBaseAgent):
             "mechanism_aux_coef_floor_after_update": float(mechanism_aux_coef_floor_after_update),
             "mechanism_window_weight_floor_after_update": float(mechanism_window_weight_floor_after_update),
             "mechanism_entropy_floor_after_update": float(mechanism_entropy_floor_after_update),
+            "cache_warm_start_guard_enabled": bool(cache_warm_start_guard_enabled),
+            "cache_warm_start_guard_min_countdown": float(cache_warm_start_guard_min_countdown),
+            "cache_warm_start_guard_max_prefetch_countdown": float(
+                cache_warm_start_guard_max_prefetch_countdown
+            ),
         }

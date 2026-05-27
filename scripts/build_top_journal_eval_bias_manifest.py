@@ -49,6 +49,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--predictive_prepare_hard_override_score_threshold", type=float, default=0.55)
     parser.add_argument("--predictive_prepare_hard_override_confidence_threshold", type=float, default=0.70)
     parser.add_argument("--cache_warm_start_guard_min_countdown", type=float, default=None)
+    parser.add_argument("--cache_warm_start_guard_max_prefetch_countdown", type=float, default=None)
     return parser.parse_args()
 
 
@@ -92,6 +93,10 @@ def main() -> None:
             config["cache_warm_start_guard_min_countdown"] = float(
                 args.cache_warm_start_guard_min_countdown
             )
+        if args.cache_warm_start_guard_max_prefetch_countdown is not None:
+            config["cache_warm_start_guard_max_prefetch_countdown"] = float(
+                args.cache_warm_start_guard_max_prefetch_countdown
+            )
         payload["config"] = config
         payload["derived_checkpoint"] = {
             "source_checkpoint_path": str(source_path),
@@ -114,6 +119,11 @@ def main() -> None:
                 None
                 if args.cache_warm_start_guard_min_countdown is None
                 else float(args.cache_warm_start_guard_min_countdown)
+            ),
+            "cache_warm_start_guard_max_prefetch_countdown": (
+                None
+                if args.cache_warm_start_guard_max_prefetch_countdown is None
+                else float(args.cache_warm_start_guard_max_prefetch_countdown)
             ),
         }
         target_path = checkpoint_dir / f"sa_ghmappo_seed{seed}_{args.label}.pt"

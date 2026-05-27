@@ -1,5 +1,11 @@
 # Code Module Map
 
+## 2026-05-27 SA freshness-aware prefetch guard
+
+- `src/agents/sa_ghmappo_core.py`：`cache_warm_start_guard` 新增 `cache_warm_start_guard_max_prefetch_countdown`，用于把 target-adapter prefetch 限制在 freshness window 内；默认 `0.0` 保持历史无上界行为。
+- `src/agents/sa_ghmappo_agent.py`、`scripts/train_sa_ghmappo_real_sample.py`、`src/evaluators/real_eval_support.py`：共同维护该字段的训练 profile、checkpoint config 和 benchmark 恢复路径。
+- `configs/experiment/top_journal_mechanism_v6_strong_competition.yaml`：v6 profile 显式设置上界 `6.0`，与 `EpisodeRecorder(prefetch_validation_window=6)` 对齐；该机制属于 policy guard，不修改环境 reward 或 `semantic_discrete_5` schema。
+
 ## 2026-05-12 SA-GHMAPPO contract notes
 
 - `src/envs/specs/action_schema.py`：维护 `semantic_discrete_5` action schema、precondition mask、invalid reason 和 `ActionAdapter` 到 `ControlAction` 的转换；`build_mask_info()` 是 wrapper/policy/report 消费 action legality 的来源。
