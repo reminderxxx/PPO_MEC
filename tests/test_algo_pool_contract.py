@@ -647,6 +647,39 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(no_handoff_info["mask"], [True, True, True, True, False])
         self.assertEqual(no_handoff_info["invalid_reasons"]["4"], "missing_distinct_handoff_target")
 
+    def test_action_mask_builder_uses_first_non_current_rsu_for_prefetch(self) -> None:
+        state = _minimal_semantic_state()
+        state["predictions"]["predicted_next_rsu_by_vehicle"]["veh_1"] = "rsu_a"
+        state["predictions"]["next_rsu_sequence"]["veh_1"] = ["rsu_a", "rsu_b"]
+
+        mask_info = ActionMaskBuilder().build_mask_info(state)
+        control = ActionAdapter().decode(1, state)
+
+        self.assertTrue(mask_info["mask"][1])
+        self.assertEqual(mask_info["semantic_preconditions"]["predicted_next_rsu_id"], "rsu_b")
+        self.assertEqual(control.cache_action["rsu_id"], "rsu_b")
+        self.assertFalse(control.metadata["invalid_action"])
+
+    def test_hierarchical_policy_samples_masked_env_actions_without_projection(self) -> None:
+        agent = build_agent("sa_ghmappo", random_seed=1)
+        policy_output = {
+            "slow_logits": torch.tensor([0.0, 0.0, 8.0]),
+            "fast_logits": torch.tensor([2.0, 0.0]),
+            "event_logits": torch.tensor([0.0, 8.0]),
+        }
+
+        actions, _, _, _, projection_info = agent._sample_actions(
+            policy_output,
+            deterministic=True,
+            action_mask=[True, False, True, True, False],
+        )
+
+        self.assertIn(projection_info["projected_env_action"], {0, 2, 3})
+        self.assertEqual(actions, agent._head_targets_for_env_action(projection_info["projected_env_action"]))
+        self.assertFalse(projection_info["projection_applied"])
+        self.assertEqual(projection_info["invalid_attempt_count"], 0)
+        self.assertTrue(projection_info["masked_hierarchical_env_action_sampling"])
+
     def test_action_adapter_decodes_core_control_action(self) -> None:
         state = {
             "current_workflow_node": {"required_adapter": "adapter_tracking"},

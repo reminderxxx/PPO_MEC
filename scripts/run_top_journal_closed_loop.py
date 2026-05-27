@@ -59,6 +59,12 @@ FORMAL_MIN_SETTINGS = {
     "min_tasks": 5,
     "max_tasks": 20,
 }
+SA_PROFILE_SETTING_OVERRIDES = {
+    "top_journal_mechanism_v6_strong_competition": {
+        "sa_episodes": 128,
+        "train_window_count": 6,
+    },
+}
 CURRENT_BASELINE_PROTOCOLS = {
     "mappo": {
         "head_credit_enabled": True,
@@ -173,6 +179,10 @@ def effective_settings(args: argparse.Namespace) -> dict[str, int]:
             "min_tasks": 5,
             "max_tasks": 20,
         }
+        profile_overrides = SA_PROFILE_SETTING_OVERRIDES.get(str(args.sa_profile), {})
+        for key, value in profile_overrides.items():
+            if getattr(args, key, None) is None:
+                defaults[key] = int(value)
     return {
         key: int(getattr(args, key)) if getattr(args, key) is not None else value
         for key, value in defaults.items()

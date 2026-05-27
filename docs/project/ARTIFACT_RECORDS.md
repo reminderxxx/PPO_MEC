@@ -1,5 +1,30 @@
 # Artifact Records
 
+## 2026-05-27 Top Journal Mechanism v6 Masked Fulltrain Closed Loop
+
+状态：`[negative-result]` `[audit]` `[repair-validation]`
+
+路径：
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/gate_report.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/gate_summary.csv`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/seed_checkpoint_manifest.json`
+
+用途：记录 SA v6 invalid action / action projection 修复后，使用 full-stratified training windows 与 v6 budget 的最新 closed-loop 结果。该 run 不是 final-submission package，也不是当前 canonical。
+
+确认结果：
+- `formal_contract.ready=true`，正式 seed、预算、benchmark modes 与 `primary_vehicle_selection=handoff_pressure` 合同满足。
+- `baseline_protocol_audit.passed=true`，MAPPO v3 checkpoint protocol 记录为 `aggregation_reason_weighted_controller_ppo_v3`。
+- gate 未通过：`passed=false`、`paper_claim_ready=false`。
+- `mixed_informative`：SA `98.091111`，`popularity_cache_heuristic` `98.146667`，SA 差值 `-0.055556`；strongest learned baseline 为 `mappo=82.555000`，SA 差值 `+15.536111`。
+- `full_stratified`：SA `90.153148`，`popularity_cache_heuristic` `90.171667`，SA 差值 `-0.018519`；strongest learned baseline 为 `mappo=86.142222`，SA 差值 `+4.010926`。
+- formal benchmark aggregate 中 `action_projection_count=0.0`、`invalid_action_attempt_count=0.0`；修复前 v6 run 的 gate total 为 mixed `85/85`、full `432/432`。
+- mechanism success gate 未达标：mixed `18/125=0.144000`，full `33/188=0.175532`。
+
+结论边界：
+- 该结果确认 SA v6 的 invalid action / projection 问题已修复，且 SA 重新超过所有 learned baselines。
+- 当前 blocker 已收窄为 supplementary `popularity_cache_heuristic` 的极小 reward gap 和 mechanism success gate；在两者通过前，不替换 `final_submission_full_current_baselines_20260511_v1`，也不运行 v6 final-submission promotion。
+
 ## 2026-05-27 Top Journal Mechanism v6 Strong-Competition Closed Loop
 
 状态：`[negative-result]` `[audit]`

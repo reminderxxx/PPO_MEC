@@ -1,5 +1,30 @@
 # Current Results Audit
 
+## 2026-05-27 最新修复版 v6 closed-loop 审计结论
+
+本节优先于下方旧 v6 审计段落读取。旧 run `top_journal_mechanism_v6_strong_competition_20260527_v1` 保留为修复前 negative baseline；最新修复版为：
+
+- Run root: `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/`
+- Gate: `formal_contract.ready=true`、`baseline_protocol_audit.passed=true`、`passed=false`、`paper_claim_ready=false`
+- Settings: `sa_episodes=128`、`train_window_count=6`、`window_mode_for_training=full_stratified`、seeds `7/13/29`
+
+| Benchmark mode | Gate blockers | SA reward | Popularity reward | SA - Popularity | Strongest learned | SA - strongest learned | Projection / invalid | Mechanism success gate |
+|---|---|---:|---:|---:|---|---:|---:|---|
+| `mixed_informative` | `sa_total_reward_not_above_popularity`; `benchmark_minimum_success_not_reached` | `98.091111` | `98.146667` | `-0.055556` | `mappo=82.555000` | `+15.536111` | `0.0 / 0.0` | `18/125=0.144000` |
+| `full_stratified` | `sa_total_reward_not_above_popularity`; `benchmark_minimum_success_not_reached` | `90.153148` | `90.171667` | `-0.018519` | `mappo=86.142222` | `+4.010926` | `0.0 / 0.0` | `33/188=0.175532` |
+
+修复确认：
+
+- invalid action / action projection 已在 formal benchmark 中归零。旧 v6 run 的 gate total 为 mixed `85/85`、full `432/432`；新 run 为 mixed `0/0`、full `0/0`。
+- full split continuity 已与 popularity heuristic 持平：SA `workflow_continuity_rate=0.927399`、`handoff_failure_rate=0.123148`；本轮不再存在旧 v6 的 `cache_offload_drl` learned-side blocker。
+- SA 在本轮超过所有 learned baselines，但仍没有超过 supplementary `popularity_cache_heuristic`，且 mechanism success gate 未达标。因此该 run 仍不能替换 canonical。
+
+当前处理：
+
+- 主论文 canonical 仍是 `final_submission_full_current_baselines_20260511_v1`。
+- `top_journal_mechanism_v6_masked_fulltrain_20260527_v1` 可作为“修复 invalid/projection 后的最新 negative candidate”和下一轮优化起点。
+- 下一步应优先提高 validated mechanism success rate，并检查 reward shaping / guard-delta 计分，使 SA 在不依赖非法动作投影的情况下稳定超过 `popularity_cache_heuristic`。
+
 更新日期：2026-05-27
 
 用途：给论文写作和下一轮实验调度提供明确状态判定。本文只汇总已存在 artifact 与已实现代码能力；所有数值结论以 `artifacts/` 下 JSON/CSV 为准。

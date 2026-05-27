@@ -61,6 +61,9 @@ closed_loop:
   sa_profile: top_journal_mechanism_v6_strong_competition
   mappo_baseline_profile: mappo_strong_audit
   primary_vehicle_selection: handoff_pressure
+  window_mode_for_training: full_stratified
+  sa_episodes: 128
+  train_window_count: 6
 
 final_submission:
   script: scripts/run_top_journal_final_submission_loop.py

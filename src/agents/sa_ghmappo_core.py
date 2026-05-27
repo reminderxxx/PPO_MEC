@@ -1153,10 +1153,14 @@ class 分层PPO基类(BaseAgent):
         if not self._use_hierarchy:
             masked_logits = self._masked_flat_logits(policy_output["flat_logits"], action_mask)
             return int(torch.argmax(masked_logits, dim=-1).item())
+        masked_scores = self._masked_flat_logits(self._hierarchical_env_action_scores(policy_output), action_mask)
+        return int(torch.argmax(masked_scores, dim=-1).item())
+
+    def _hierarchical_env_action_scores(self, policy_output: dict[str, Any]) -> torch.Tensor:
         event_log_probs = torch.log_softmax(policy_output["event_logits"], dim=-1)
         slow_log_probs = torch.log_softmax(policy_output["slow_logits"], dim=-1)
         fast_log_probs = torch.log_softmax(policy_output["fast_logits"], dim=-1)
-        env_scores = torch.stack(
+        return torch.stack(
             [
                 event_log_probs[0] + slow_log_probs[1],
                 event_log_probs[0] + slow_log_probs[2],
@@ -1166,8 +1170,6 @@ class 分层PPO基类(BaseAgent):
             ],
             dim=0,
         )
-        masked_scores = self._masked_flat_logits(env_scores, action_mask)
-        return int(torch.argmax(masked_scores, dim=-1).item())
 
     def _project_head_actions_to_valid_env_action(
         self,
@@ -1745,6 +1747,50 @@ class 分层PPO基类(BaseAgent):
                 {"flat": [round(float(item), 6) for item in torch.softmax(flat_logits, dim=-1).tolist()]},
                 projection_info,
             )
+
+        if self._action_mask_has_valid_action(action_mask):
+            assert action_mask is not None
+            env_scores = self._masked_flat_logits(
+                self._hierarchical_env_action_scores(policy_output),
+                action_mask,
+            )
+            distribution = Categorical(logits=env_scores)
+            if deterministic:
+                env_action_tensor = torch.argmax(env_scores, dim=-1)
+            else:
+                env_action_tensor = distribution.sample()
+            env_action = int(env_action_tensor.item())
+            selected_actions = self._head_targets_for_env_action(env_action)
+            projected_env_action, projected_aggregation_reason = 聚合层级动作(
+                head_actions=selected_actions,
+                use_hierarchy=self._use_hierarchy,
+                event_head_enabled=self._event_head_enabled,
+                adapter_prefetch_enabled=self._adapter_prefetch_enabled,
+            )
+            head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                policy_output=policy_output,
+                selected_actions=selected_actions,
+                action_mask=action_mask,
+            )
+            projection_info = self._build_action_projection_info(
+                raw_actions=selected_actions,
+                projected_actions=selected_actions,
+                raw_env_action=projected_env_action,
+                raw_aggregation_reason=projected_aggregation_reason,
+                projected_env_action=projected_env_action,
+                projected_aggregation_reason=projected_aggregation_reason,
+                action_mask=action_mask,
+            )
+            projection_info["masked_hierarchical_env_action_sampling"] = True
+            projection_info["masked_env_action_log_prob"] = round(
+                float(distribution.log_prob(env_action_tensor).item()),
+                6,
+            )
+            projection_info["masked_env_action_probs"] = [
+                round(float(item), 6)
+                for item in torch.softmax(env_scores, dim=-1).tolist()
+            ]
+            return selected_actions, head_log_probs, head_entropies, action_prob_payload, projection_info
 
         selected_actions: dict[str, int] = {}
         head_log_probs: dict[str, torch.Tensor] = {}

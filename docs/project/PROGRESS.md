@@ -2,6 +2,39 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-05-27: SA v6 action-mask 修复与 full-stratified closed-loop 重跑
+
+已完成维护：
+
+- `src/envs/specs/action_schema.py` 的 predictive prefetch precondition 改为优先读取 `predicted_next_rsu_by_vehicle`，并在预测序列首项仍为当前 RSU 时扫描第一个 non-current RSU，避免把后续真实 handoff target 误判为 invalid。
+- `src/agents/sa_ghmappo_core.py` 的层级策略在存在有效 `action_mask` 时先在 masked env-action score 上采样/argmax，再反解为 slow/fast/event head target，避免训练和评估阶段先采样非法 head 组合再投影。
+- `scripts/run_top_journal_closed_loop.py` 对 `top_journal_mechanism_v6_strong_competition` profile 使用 v6 预算默认值：`sa_episodes=128`、`train_window_count=6`；配置文件同步记录 closed-loop full-stratified 训练窗口。
+
+已完成运行：
+
+- `python scripts\run_top_journal_closed_loop.py --quick --run_id top_journal_mechanism_v6_masked_fulltrain_quick_20260527 --seeds 7 --sa_profile top_journal_mechanism_v6_strong_competition --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified`
+- `python scripts\run_top_journal_closed_loop.py --run_id top_journal_mechanism_v6_masked_fulltrain_20260527_v1 --seeds 7 13 29 --sa_profile top_journal_mechanism_v6_strong_competition --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified --sa_episodes 128 --train_window_count 6`
+
+核心产物：
+
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/gate_report.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/gate_summary.csv`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/seed_checkpoint_manifest.json`
+
+关键结果：
+
+- 修复版 run 完成且 `formal_contract.ready=true`，`baseline_protocol_audit.passed=true`；但 closed-loop gate 仍未通过：`passed=false`、`paper_claim_ready=false`。
+- `action_projection_count` 和 `invalid_action_attempt_count` 在 formal benchmark 的 `mixed_informative` 与 `full_stratified` 下均为 `0.0`；旧 v6 run 的 gate total 分别为 mixed `85/85`、full `432/432`。
+- `mixed_informative`：SA reward `98.091111`，`popularity_cache_heuristic` `98.146667`，差值 `-0.055556`；strongest learned baseline 为 `mappo=82.555`，SA 差值 `+15.536111`。
+- `full_stratified`：SA reward `90.153148`，`popularity_cache_heuristic` `90.171667`，差值 `-0.018519`；strongest learned baseline 为 `mappo=86.142222`，SA 差值 `+4.010926`。
+- full split continuity 已恢复到 heuristic 同形：SA `workflow_continuity_rate=0.927399`、`handoff_failure_rate=0.123148`，与 `popularity_cache_heuristic` 持平；旧 v6 的 full learned-side blocker `cache_offload_drl` 已不再是本轮 strongest learned baseline。
+- 新 blocker 集中在 supplementary popularity 的极小 reward gap 和 mechanism success gate：mixed success `18/125=0.144`，full success `33/188=0.175532`，均未达到 benchmark minimum success gate。
+
+结论边界：
+
+- `top_journal_mechanism_v6_masked_fulltrain_20260527_v1` 证明 invalid action / projection 问题已修复，且 SA 在本轮重新超过所有 learned baselines。
+- 该 run 仍是 negative candidate，不替换 `final_submission_full_current_baselines_20260511_v1`；在超过 `popularity_cache_heuristic` 并通过 mechanism success gate 前，不运行 v6 final-submission promotion。
+
 ## 2026-05-27: v6 强竞争 closed-loop 结果审计
 
 已完成运行：
