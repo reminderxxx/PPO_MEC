@@ -2,6 +2,34 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-05-28: SA v7 latency fallback clean-retrain formal pass
+
+已完成：
+
+- 新增 `top_journal_mechanism_v7_latency_fallback` profile 和 `configs/experiment/top_journal_mechanism_v7_latency_fallback.yaml`。v7 以 v6 strong-competition profile 为基线，保留 freshness / confidence-aware prefetch admission guards，并重新启用 clean-retrain latency fallback：`latency_fallback_bias_enabled=true`、`latency_fallback_bias_strength=1.20`、`latency_fallback_confidence_floor=0.62`、`latency_fallback_slow_suppression_strength=1.20`。
+- `scripts/run_top_journal_closed_loop.py` 已把 v7 纳入 formal budget override：`sa_episodes=128`、`train_window_count=6`。
+- `tests/test_algo_pool_contract.py` 和 `tests/test_top_journal_closed_loop.py` 已覆盖 v7 profile 参数与 formal budget。
+
+已完成验证：
+
+- `python -m py_compile scripts\train_sa_ghmappo_real_sample.py scripts\run_top_journal_closed_loop.py`
+- `python -m pytest tests/test_algo_pool_contract.py::AlgoPoolContractTestCase::test_sa_v6_profile_is_registered_for_strong_competition tests/test_algo_pool_contract.py::AlgoPoolContractTestCase::test_sa_v7_profile_combines_v6_guards_with_latency_fallback tests/test_top_journal_closed_loop.py::test_effective_settings_honor_v6_sa_profile_budget tests/test_top_journal_closed_loop.py::test_effective_settings_honor_v7_sa_profile_budget`
+- `python scripts\run_top_journal_closed_loop.py --quick --run_id top_journal_mechanism_v7_latency_fallback_quick_20260528 --seeds 7 --sa_profile top_journal_mechanism_v7_latency_fallback --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified`
+- `python scripts\run_top_journal_closed_loop.py --run_id top_journal_mechanism_v7_latency_fallback_20260528_v1 --seeds 7 13 29 --sa_profile top_journal_mechanism_v7_latency_fallback --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified --sa_episodes 128 --train_window_count 6 --resume_training`
+- `python scripts\analyze_mechanism_actionmix_gap.py --mixed_benchmark_dir artifacts\experiments\top_journal_closed_loop\top_journal_mechanism_v7_latency_fallback_20260528_v1\benchmarks\mixed_informative\main_results_mixed_informative_20260528_200213_838926 --full_benchmark_dir artifacts\experiments\top_journal_closed_loop\top_journal_mechanism_v7_latency_fallback_20260528_v1\benchmarks\full_stratified\main_results_full_stratified_20260528_200240_428173 --output_dir artifacts\analysis\top_journal_mechanism_v7_latency_fallback_actionmix_diagnosis_20260528`
+
+关键结果：
+
+- `top_journal_mechanism_v7_latency_fallback_20260528_v1`：`formal_contract.ready=true`、`baseline_protocol_audit.passed=true`、`passed=true`、`paper_claim_ready=true`。
+- `mixed_informative`：SA `98.396667` vs `popularity_cache_heuristic` `98.146667`，delta `+0.250000`；continuity、handoff failure 和 backhaul 均与 popularity 持平；strongest learned baseline 为 `mappo=82.555000`。
+- `full_stratified`：SA `90.651296` vs `popularity_cache_heuristic` `90.171667`，delta `+0.479629`；continuity、handoff failure 和 backhaul 均与 popularity 持平；strongest learned baseline 为 `mappo=86.142222`。
+- action-mix 诊断显示主要收益来自 placement/action mix：SA 在 active/idle 非机制窗口用 `vehicle_fallback` 替换一部分 current-RSU steady execution，降低 delay reward penalty；cache/backhaul/handoff 指标未被改写。
+
+结论边界：
+
+- 这是 closed-loop formal pass，不是 final-submission package，也不是新的 canonical。
+- 论文主结果替换前仍必须跑 final-submission/holdout/support，并生成新的 comparison report / paper-ready package；当前 canonical 仍不自动替换。
+
 ## 2026-05-27: SA v6 confidence-aware prefetch admission guard
 
 已完成审计：

@@ -1,5 +1,12 @@
 # Code Module Map
 
+## 2026-05-28 SA v7 latency fallback clean-retrain profile
+
+- `scripts/train_sa_ghmappo_real_sample.py`：新增 `top_journal_mechanism_v7_latency_fallback` profile；继承 v6 guards，并启用 `latency_fallback_bias_*` / `latency_fallback_slow_suppression_strength`，用于 clean retrain 而非旧 eval-bias 复用。
+- `scripts/run_top_journal_closed_loop.py`：将 v7 纳入 formal budget override，默认 `sa_episodes=128`、`train_window_count=6`。
+- `configs/experiment/top_journal_mechanism_v7_latency_fallback.yaml`：记录 v7 训练、closed-loop、final-submission 和 promotion gate 参数；不修改 reward、action schema 或 baseline contract。
+- `tests/test_algo_pool_contract.py`、`tests/test_top_journal_closed_loop.py`：覆盖 v7 profile 参数和 closed-loop budget。
+
 ## 2026-05-27 SA confidence-aware prefetch admission guard
 
 - `src/agents/sa_ghmappo_core.py`：新增 `predictive_prefetch_admission_guard_*`，在低置信度且 next-RSU / prefetch target 未对齐时把 selected predictive prefetch 延期为 event prepare；默认关闭，v6 profile 显式开启。

@@ -337,6 +337,18 @@ PROFILE_DEFAULTS = {
         "max_steps": 16,
         "train_window_count": 6,
     },
+    "top_journal_mechanism_v7_latency_fallback": {
+        "episodes": 128,
+        "update_every": 4,
+        "batch_size": 32,
+        "learning_rate": 4.5e-5,
+        "clip_ratio": 0.075,
+        "entropy_coef": 0.0012,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.32,
+        "max_steps": 16,
+        "train_window_count": 6,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -445,11 +457,16 @@ def parse_args() -> argparse.Namespace:
         "top_journal_mechanism_v3",
         "top_journal_mechanism_v5_perf_robust",
         "top_journal_mechanism_v6_strong_competition",
+        "top_journal_mechanism_v7_latency_fallback",
     }:
+        strong_competition_profiles = {
+            "top_journal_mechanism_v6_strong_competition",
+            "top_journal_mechanism_v7_latency_fallback",
+        }
         if float(args.mechanism_window_oversample_ratio) == 1.0:
             args.mechanism_window_oversample_ratio = (
                 2.75
-                if args.profile == "top_journal_mechanism_v6_strong_competition"
+                if args.profile in strong_competition_profiles
                 else 2.5
                 if args.profile == "top_journal_mechanism_v5_perf_robust"
                 else 2.0
@@ -457,7 +474,7 @@ def parse_args() -> argparse.Namespace:
         if float(args.handoff_imminent_oversample_ratio) == 1.0:
             args.handoff_imminent_oversample_ratio = (
                 1.90
-                if args.profile == "top_journal_mechanism_v6_strong_competition"
+                if args.profile in strong_competition_profiles
                 else 1.75
                 if args.profile == "top_journal_mechanism_v5_perf_robust"
                 else 1.5
@@ -465,14 +482,14 @@ def parse_args() -> argparse.Namespace:
         if float(args.target_mismatch_sample_weight) == 1.0:
             args.target_mismatch_sample_weight = (
                 1.90
-                if args.profile == "top_journal_mechanism_v6_strong_competition"
+                if args.profile in strong_competition_profiles
                 else 1.75
                 if args.profile == "top_journal_mechanism_v5_perf_robust"
                 else 1.5
             )
         if int(args.min_mechanism_activating_windows) == 0:
             args.min_mechanism_activating_windows = (
-                3 if args.profile == "top_journal_mechanism_v6_strong_competition" else 2
+                3 if args.profile in strong_competition_profiles else 2
             )
     return args
 
@@ -1312,6 +1329,17 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "predictive_prefetch_admission_guard_enabled": True,
                 "predictive_prefetch_admission_min_confidence": 0.55,
                 "predictive_prefetch_admission_require_distinct_next": True,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v7_latency_fallback":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v6_strong_competition")
+        kwargs.update(
+            {
+                "latency_fallback_bias_enabled": True,
+                "latency_fallback_bias_strength": 1.20,
+                "latency_fallback_confidence_floor": 0.62,
+                "latency_fallback_slow_suppression_strength": 1.20,
             }
         )
         return kwargs

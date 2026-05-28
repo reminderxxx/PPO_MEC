@@ -1,5 +1,21 @@
 ﻿# Decision Log
 
+## 2026-05-28: v7 clean-retrain 启用 latency fallback 快时标控制
+
+决策：新增主方法 profile `top_journal_mechanism_v7_latency_fallback`，以 `top_journal_mechanism_v6_strong_competition` 为基线，保留 freshness / confidence-aware prefetch admission guards，并重新启用 `latency_fallback_bias_enabled=true`、`latency_fallback_bias_strength=1.20`、`latency_fallback_confidence_floor=0.62`、`latency_fallback_slow_suppression_strength=1.20`。该 profile 必须作为 clean retrain 候选运行，不复用旧 v3 eval-bias 结论。
+
+原因：
+
+- `top_journal_mechanism_v6_prefetch_admission_20260528_v1` 已消除相对 `popularity_cache_heuristic` 的负收益，但 mixed/full 仍与 heuristic 严格打平，无法通过要求 total reward 严格 win 的 gate。
+- formal trace 里低风险快时标机会主要出现在 current adapter 已 warm、无 handoff pressure 的 steady execution 步；将这类步切换为 `vehicle_fallback` 可以降低 delay penalty，同时不改变 cache/backhaul/migration/handoff contract。
+- 旧 `top_journal_mechanism_v3_eval_bias` 已证明 latency fallback 有潜力，但它是 inference calibration artifact；v7 的目的就是把该机制纳入独立 profile 和 clean-retrain 证据链。
+
+影响：
+
+- 不修改 `VecWorkflowCoreEnv` reward、不修改 `semantic_discrete_5` action schema、不修改 learned/domain baseline contract。
+- `scripts/train_sa_ghmappo_real_sample.py`、`scripts/run_top_journal_closed_loop.py`、`configs/experiment/top_journal_mechanism_v7_latency_fallback.yaml` 和 profile contract tests 需要同步维护 v7 参数。
+- `top_journal_mechanism_v7_latency_fallback_20260528_v1` closed-loop formal 已通过，但仍不是 final-submission canonical；替换 canonical 前必须继续跑 final-submission/holdout/support package。
+
 ## 2026-05-27: SA predictive prefetch 增加 confidence/alignment admission guard
 
 决策：`top_journal_mechanism_v6_strong_competition` 增加 `predictive_prefetch_admission_guard_enabled=true`，并采用 `predictive_prefetch_admission_min_confidence=0.55`、`predictive_prefetch_admission_require_distinct_next=true`。当 selected action 为 predictive prefetch，但 `predicted_next_rsu_id` 仍未离开当前 RSU、prefetch target 仅来自后续序列或 handoff target，且预测置信度低于阈值时，将 prefetch 延期为 `handoff_migration_prepare`。

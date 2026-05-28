@@ -1,5 +1,28 @@
 # Current Results Audit
 
+## 2026-05-28 v7 latency fallback closed-loop formal pass
+
+本节优先于下方旧 v6 审计段落读取。
+
+- Run root: `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/`
+- Gate: `formal_contract.ready=true`、`baseline_protocol_audit.passed=true`、`passed=true`、`paper_claim_ready=true`
+- Settings: seeds `7/13/29`、`sa_episodes=128`、`train_window_count=6`、`window_mode_for_training=full_stratified`、`primary_vehicle_selection=handoff_pressure`
+
+| Benchmark mode | Gate blockers | SA reward | Popularity reward | SA - Popularity | Strongest learned | SA - strongest learned | Continuity / failure / backhaul vs popularity |
+|---|---|---:|---:|---:|---|---:|---|
+| `mixed_informative` | none | `98.396667` | `98.146667` | `+0.250000` | `mappo=82.555000` | `+15.841667` | tie / tie / tie |
+| `full_stratified` | none | `90.651296` | `90.171667` | `+0.479629` | `mappo=86.142222` | `+4.509074` | tie / tie / tie |
+
+关键诊断：
+
+- v7 的优势来自 clean-retrain latency fallback：`sa_ghmappo` 在 mixed/full 的 `local_exec_count` 分别为 `3.055556` / `4.981481`，而 `popularity_cache_heuristic` 为 `0.0`；cache/backhaul/handoff 指标与 popularity 持平。
+- `artifacts/analysis/top_journal_mechanism_v7_latency_fallback_actionmix_diagnosis_20260528/` 显示 active/idle 非机制窗口贡献主要正收益；mechanism_activating 窗口基本持平，mixed 下仍有一个轻微 losing pair。
+- 该 run 通过 closed-loop formal gate，但尚未生成 final-submission/holdout/support/comparison package；因此当前 canonical 不自动替换。
+
+下一步：
+
+- 使用 `seed_checkpoint_manifest.json` 跑 final-submission loop，要求 formal + holdout + support + comparison report 全部通过后，才可升级为新的 paper-grade canonical。
+
 ## 2026-05-27 freshness guard formal run 与 admission-guard 后续状态
 
 本节优先于下方 v6 masked full-train 段落读取。

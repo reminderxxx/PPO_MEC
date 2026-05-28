@@ -64,6 +64,10 @@ SA_PROFILE_SETTING_OVERRIDES = {
         "sa_episodes": 128,
         "train_window_count": 6,
     },
+    "top_journal_mechanism_v7_latency_fallback": {
+        "sa_episodes": 128,
+        "train_window_count": 6,
+    },
 }
 CURRENT_BASELINE_PROTOCOLS = {
     "mappo": {

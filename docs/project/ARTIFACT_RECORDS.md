@@ -1,5 +1,29 @@
 # Artifact Records
 
+## 2026-05-28 Top Journal Mechanism v7 Latency Fallback Closed Loop
+
+状态：`[formal-pass]` `[candidate]` `[optimization-validation]`
+
+路径：
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/gate_report.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/gate_summary.csv`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/seed_checkpoint_manifest.json`
+- `artifacts/analysis/top_journal_mechanism_v7_latency_fallback_actionmix_diagnosis_20260528/`
+
+用途：记录 v6 guards + clean-retrain latency fallback 的 3-seed formal closed-loop 结果。该 run 通过 closed-loop formal gate，但尚未生成 final-submission holdout/support/comparison package，因此不是当前 canonical。
+
+确认结果：
+- `formal_contract.ready=true`、`baseline_protocol_audit.passed=true`、`passed=true`、`paper_claim_ready=true`。
+- `mixed_informative`：SA `98.396667`，`popularity_cache_heuristic` `98.146667`，SA delta `+0.250000`；strongest learned baseline `mappo=82.555000`。
+- `full_stratified`：SA `90.651296`，`popularity_cache_heuristic` `90.171667`，SA delta `+0.479629`；strongest learned baseline `mappo=86.142222`。
+- 两个 benchmark mode 下 SA 与 popularity 的 continuity、handoff failure、backhaul 均持平；收益来自 latency fallback 带来的 delay penalty 下降。
+- action-mix 诊断：active/idle 非机制窗口贡献主要正收益；mechanism_activating 窗口基本持平，mixed 下有一个轻微 losing pair，后续 final-submission 仍需检查 holdout 稳定性。
+
+结论边界：
+- 该 artifact 可作为 v7 候选优化证据；不能单独替换 `final_submission_full_current_baselines_20260511_v1` 或写成最终 paper-grade package。
+- 下一步必须运行 final-submission/holdout/support，并生成 comparison report / paper-ready package。
+
 ## 2026-05-27 Top Journal Mechanism v6 Freshness Guard Closed Loop
 
 状态：`[negative-result]` `[audit]` `[optimization-diagnosis]`

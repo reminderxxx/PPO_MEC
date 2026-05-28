@@ -257,6 +257,22 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(kwargs["predictive_prefetch_admission_min_confidence"], 0.55)
         self.assertTrue(kwargs["predictive_prefetch_admission_require_distinct_next"])
 
+    def test_sa_v7_profile_combines_v6_guards_with_latency_fallback(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        self.assertIn("top_journal_mechanism_v7_latency_fallback", PROFILE_DEFAULTS)
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v7_latency_fallback"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["train_window_count"], 6)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v7_latency_fallback")
+        self.assertEqual(kwargs["mechanism_window_weight"], 1.65)
+        self.assertEqual(kwargs["cache_warm_start_guard_max_prefetch_countdown"], 6.0)
+        self.assertTrue(kwargs["predictive_prefetch_admission_guard_enabled"])
+        self.assertTrue(kwargs["latency_fallback_bias_enabled"])
+        self.assertEqual(kwargs["latency_fallback_bias_strength"], 1.20)
+        self.assertEqual(kwargs["latency_fallback_confidence_floor"], 0.62)
+        self.assertEqual(kwargs["latency_fallback_slow_suppression_strength"], 1.20)
+
     def test_qmix_uses_controller_level_value_decomposition_contract(self) -> None:
         state = _minimal_semantic_state()
         agent = build_agent("qmix", random_seed=1, deterministic_action=True)
