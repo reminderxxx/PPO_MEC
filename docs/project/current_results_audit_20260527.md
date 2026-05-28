@@ -1,5 +1,35 @@
 # Current Results Audit
 
+## 2026-05-28 v7 final-submission canonical
+
+本节优先于下方所有旧 v5/v6/v7 closed-loop 审计段落读取。
+
+- Run root: `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/`
+- Final gate: `target_reached=true`、`paper_claim_ready=true`、`blockers=[]`
+- Comparison package: `review_ready=true`、`paper_ready_package_ready=true`
+- Self-review: `blocker_count=0`、`limitation_count=3`、`pass_count=15`
+- Learned baselines: `ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl`
+
+| Split | Strongest learned baseline | SA reward | Strongest learned reward | SA margin | Strongest heuristic | SA heuristic margin |
+|---|---|---:|---:|---:|---|---:|
+| Formal / Mixed | `dt_handoff_drl` | `98.396667` | `87.220556` | `+11.176111` | `popularity_cache_heuristic` | `+0.250000` |
+| Formal / Full | `dt_handoff_drl` | `90.651296` | `87.273889` | `+3.377407` | `popularity_cache_heuristic` | `+0.479629` |
+| Holdout offset=3 / Mixed | `dt_handoff_drl` | `99.758889` | `91.316111` | `+8.442778` | `popularity_cache_heuristic` | `+0.355556` |
+| Holdout offset=3 / Full | `dt_handoff_drl` | `93.149762` | `87.907619` | `+5.242143` | `popularity_cache_heuristic` | `+0.376191` |
+
+CI / support 结论：
+
+- Formal total reward paired CI 对全部 learned baselines 为正；最弱为 vs `dt_handoff_drl` mean `+5.327083`、95% CI `[1.594094, 8.963719]`。
+- Holdout offset=3 total reward paired CI 对全部 learned baselines 为正；最弱为 vs `dt_handoff_drl` mean `+6.202333`、95% CI `[1.607076, 10.593939]`。
+- Support suites 对全部 primary learned baselines 为正；最弱项分别为 prediction vs `dt_handoff_drl` `+4.833472`、robustness vs `dt_handoff_drl` `+9.799097`、scalability vs `dt_handoff_drl` `+4.133380`。
+
+论文写作边界：
+
+- 当前主结果 canonical 升级为 `final_submission_v7_latency_fallback_20260528_v1`。
+- `popularity_cache_heuristic` 仍然非常接近，只能作为 supplementary close reference 报告，不得写成大幅领先。
+- 需保留 3 个 limitation：heuristic gap close、mechanism realization rate 不是每个 split 的 standalone CI-positive 优势、backhaul savings 不是 universal headline。
+- 所有 MAPPO/QMIX/Controller-MAT 表述保持 controller-level，DAG/cache/DT baseline 保持当前 semantic-discrete contract 边界。
+
 ## 2026-05-28 v7 latency fallback closed-loop formal pass
 
 本节优先于下方旧 v6 审计段落读取。
@@ -32,7 +62,7 @@
 - `mixed_informative`：SA `98.091111`，`popularity_cache_heuristic` `98.146667`，差值 `-0.055556`；blockers 为 `sa_total_reward_not_above_popularity` 与 `benchmark_minimum_success_not_reached`。
 - `full_stratified`：SA `90.153148`，`popularity_cache_heuristic` `90.171667`，差值 `-0.018519`；blockers 相同。
 - 诊断 `artifacts/analysis/top_journal_mechanism_v6_freshness_guard_actionmix_diagnosis_20260527/` 显示剩余负例来自低置信度、next-RSU 未对齐时的过早 prefetch；因此代码已新增 `predictive_prefetch_admission_guard_*`，但该新增 guard 目前只有 quick/debug chain 验证，不构成新的 formal 结果。
-- 当前 canonical 仍为 `final_submission_full_current_baselines_20260511_v1`；v6 必须重新通过 3-seed formal/holdout gate 后才能替换。
+- 当时 canonical 仍为 `final_submission_full_current_baselines_20260511_v1`；该判断已被上方 v7 final-submission canonical 段落取代。
 
 ## 2026-05-27 最新修复版 v6 closed-loop 审计结论
 
@@ -55,7 +85,7 @@
 
 当前处理：
 
-- 主论文 canonical 仍是 `final_submission_full_current_baselines_20260511_v1`。
+- 当时主论文 canonical 仍是 `final_submission_full_current_baselines_20260511_v1`；当前以本文顶部 v7 final-submission 段落为准。
 - `top_journal_mechanism_v6_masked_fulltrain_20260527_v1` 可作为“修复 invalid/projection 后的最新 negative candidate”和下一轮优化起点。
 - 下一步应优先提高 validated mechanism success rate，并检查 reward shaping / guard-delta 计分，使 SA 在不依赖非法动作投影的情况下稳定超过 `popularity_cache_heuristic`。
 
@@ -125,7 +155,7 @@ python scripts/run_top_journal_closed_loop.py --run_id top_journal_mechanism_v6_
 
 | Run | Gate 状态 | Strongest learned baseline | 最弱主 split margin | MAPPO 状态 | 论文处理 |
 |---|---|---|---:|---|---|
-| `final_submission_full_current_baselines_20260511_v1` | `paper_claim_ready=true` | `ppo` | `+3.703148` | action-mix `high` risk；prefetch `0.0` | 当前唯一主论文 canonical |
+| `final_submission_full_current_baselines_20260511_v1` | `paper_claim_ready=true` | `ppo` | `+3.703148` | action-mix `high` risk；prefetch `0.0` | 历史 canonical；当前已被 v7 final-submission 取代 |
 | `final_submission_v5_perf_robust_20260515_v1` | `paper_claim_ready=false` | `cache_offload_drl` | `+0.837777` | action-mix 降为 `tracked`；prefetch `0.24` 到 `0.5` | negative / appendix |
 | `top_journal_mechanism_v6_strong_competition_20260527_v1` | `paper_claim_ready=false` | `cache_offload_drl` | `-0.476852` | v3 协议审计通过；closed-loop 中仍 prefetch `0.0` | negative / appendix；暂不跑 final-submission promotion |
 
@@ -149,4 +179,4 @@ python scripts/run_top_journal_closed_loop.py --run_id top_journal_mechanism_v6_
 2. 修 SA v6 的可执行动作学习：降低 invalid action attempt 与 action projection，重点查 `event_logit_temperature_final`、event head credit、guard-delta 后的学习信号，以及 cache/prefetch/action mask 的训练分布。
 3. 对 full split 单独优化 `cache_offload_drl` blocker：full 下 SA 的 continuity `0.927399` 低于 `cache_offload_drl` 的 `0.982744`，handoff failure `0.123148` 高于 `0.037037`，需要提高 full-stratified 下的 service continuity 和 migration timing。
 4. MAPPO v3 继续保留为强对照实现，但不能急着写入主结果。下一轮要看 `mappo_action_mix_audit` 是否不再 prefetch 全 0，并确认 MAPPO v3 是否成为 strongest learned baseline。
-5. 论文当前主结果仍用 `final_submission_full_current_baselines_20260511_v1`；v5 和 v6 都只作为失败筛选、审计表和改进路径。
+5. 当时论文主结果仍用 `final_submission_full_current_baselines_20260511_v1`；当前主结果以本文顶部 v7 final-submission 段落为准。

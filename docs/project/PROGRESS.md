@@ -2,6 +2,34 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-05-28: v7 final-submission paper-ready package
+
+已完成：
+
+- 使用 `top_journal_mechanism_v7_latency_fallback_20260528_v1/seed_checkpoint_manifest.json` 作为 SA 基础，运行 final-submission loop：`final_submission_v7_latency_fallback_20260528_v1`。
+- final suite clean retrain 9 个 learned baselines 的 3 个 seed：`ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl`；`formal_training_provenance.passed=true`，`record_count=27`。
+- 运行 comparison package builder，生成 `comparison_report/` 和 `comparison_report/paper_ready/`。
+
+已完成验证：
+
+- `python scripts\run_top_journal_final_submission_loop.py --run_id final_submission_v7_latency_fallback_20260528_v1 --base_manifest_path artifacts\experiments\top_journal_closed_loop\top_journal_mechanism_v7_latency_fallback_20260528_v1\seed_checkpoint_manifest.json --force_retrain_learned --resume_training --resume_benchmark --resume_support --command_retries 2 --baseline_episodes 96 --baseline_update_every 6 --baseline_batch_size 32 --minimum_reward_delta 0.5 --holdout_offsets 3 --seeds 7 13 29 --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified`
+- `python scripts\build_top_journal_comparison_report.py --final_run_root artifacts\experiments\top_journal_final_submission\final_submission_v7_latency_fallback_20260528_v1`
+
+关键结果：
+
+- Final gate：`target_reached=true`、`paper_claim_ready=true`、`blockers=[]`。
+- Comparison package：`review_ready=true`、`paper_ready_package_ready=true`；self-review `blocker_count=0`、`limitation_count=3`、`pass_count=15`。
+- Formal split margins over strongest learned baseline `dt_handoff_drl`：mixed `+11.176111`，full `+3.377407`。
+- Holdout offset=3 split margins over strongest learned baseline `dt_handoff_drl`：mixed `+8.442778`，full `+5.242143`。
+- Cluster-bootstrap paired total reward CI 均为正；最弱 formal learned CI 为 vs `dt_handoff_drl` mean `+5.327083`、95% CI `[1.594094, 8.963719]`，最弱 holdout learned CI 为 vs `dt_handoff_drl` mean `+6.202333`、95% CI `[1.607076, 10.593939]`。
+- Support suites 对全部 primary learned baselines 也为正：最弱 prediction vs `dt_handoff_drl` mean `+4.833472`、95% CI `[3.170913, 6.600080]`；robustness `+9.799097`、95% CI `[8.329792, 11.297618]`；scalability `+4.133380`、95% CI `[3.245373, 5.016079]`。
+- Supplementary `popularity_cache_heuristic` 仍很接近：formal/holdout mixed/full reward margins 分别为 `+0.250000`、`+0.479629`、`+0.355556`、`+0.376191`。
+
+结论边界：
+
+- `final_submission_v7_latency_fallback_20260528_v1` 是当前 paper-ready canonical final-submission package。
+- 论文表述必须保留 generated self-review 的 3 个 limitation：heuristic gap close、mechanism realization rate 不构成每个 split 的 standalone CI-positive 优势、backhaul savings 不作为 universal headline。
+
 ## 2026-05-28: SA v7 latency fallback clean-retrain formal pass
 
 已完成：

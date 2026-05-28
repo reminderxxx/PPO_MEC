@@ -1,5 +1,22 @@
 ﻿# Decision Log
 
+## 2026-05-28: v7 final-submission package 升级为当前 canonical
+
+决策：`final_submission_v7_latency_fallback_20260528_v1` 升级为当前 paper-ready canonical final-submission package。旧 `final_submission_full_current_baselines_20260511_v1` 和 `final_submission_controller_mappo_qmix_20260509_v1` 降为历史 package；后续论文主表优先引用 v7 final-submission 的 `comparison_report/paper_ready/`。
+
+原因：
+
+- v7 final gate `target_reached=true`、`paper_claim_ready=true`、`blockers=[]`。
+- formal 与 offset=3 holdout learned gates 均通过 contract、duplicate-trace independence、cluster-bootstrap reward CI；learned baselines 在 final suite 内 clean retrain，`formal_training_provenance.passed=true`、`record_count=27`。
+- v7 package 覆盖当前 paper-grade learned set：PPO、controller-level MAPPO、DQN、Dueling-DQN、controller-level QMIX、Controller-MAT、DAG-Offload-DRL、Cache-Offload-DRL、DT-Handoff-DRL。
+- comparison package `review_ready=true`、`paper_ready_package_ready=true`，作者自审无 blocker。
+
+影响：
+
+- `README.md`、`docs/project/PROGRESS.md`、`docs/project/ARTIFACT_RECORDS.md`、`docs/project/current_results_audit_20260527.md`、`docs/project/DIRECTORY_STRUCTURE.md` 和 `docs/project/RUNBOOK.md` 需要把当前 canonical 指向 v7。
+- 论文主结果可写“SA-GHMAPPO ranks first among clean-retrained primary learned baselines in all formal and offset-3 holdout splits”，但必须保留 generated self-review 中的 3 个 limitation。
+- `popularity_cache_heuristic` 继续作为 close supplementary reference，而非 primary learned-baseline blocker；不得写成大幅超过手写 heuristic。
+
 ## 2026-05-28: v7 clean-retrain 启用 latency fallback 快时标控制
 
 决策：新增主方法 profile `top_journal_mechanism_v7_latency_fallback`，以 `top_journal_mechanism_v6_strong_competition` 为基线，保留 freshness / confidence-aware prefetch admission guards，并重新启用 `latency_fallback_bias_enabled=true`、`latency_fallback_bias_strength=1.20`、`latency_fallback_confidence_floor=0.62`、`latency_fallback_slow_suppression_strength=1.20`。该 profile 必须作为 clean retrain 候选运行，不复用旧 v3 eval-bias 结论。

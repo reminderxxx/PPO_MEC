@@ -1,5 +1,40 @@
 # Artifact Records
 
+## 2026-05-28 Top Journal Final Submission v7 Latency Fallback
+
+状态：`[canonical]` `[paper-grade]` `[final-submission]`
+
+路径：
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/final_submission_gate_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/learned_suites/final_submission_v7_latency_fallback_20260528_v1_iter1_formal/learned_baseline_gate_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/learned_suites/final_submission_v7_latency_fallback_20260528_v1_iter1_holdout_offset3/learned_baseline_gate_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/support/prediction/prediction_robustness_20260528_202640_186901/prediction_robustness_summary.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/support/robustness/robustness_20260528_202823/aggregate_summary.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/support/scalability/scalability_20260528_203154/aggregate_summary.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/top_journal_comparison_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_report.md`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_main_comparison.tex`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_paired_reward_statistics.tex`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_support_reward_statistics.tex`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_self_review.json`
+
+用途：当前 paper-ready canonical final-submission package。使用 v7 latency fallback clean-retrain SA checkpoint，并在 final suite 内 clean retrain 9 个 primary learned baselines 的 3 个 seed。
+
+确认结果：
+- Final gate：`target_reached=true`、`paper_claim_ready=true`、`blockers=[]`。
+- Comparison package：`review_ready=true`、`paper_ready_package_ready=true`，self-review `blocker_count=0`、`limitation_count=3`、`pass_count=15`。
+- Formal learned gate 与 offset=3 holdout learned gate 均为 `passed=true`、`paper_claim_ready=true`。
+- `formal_training_provenance.passed=true`，required agents 为 `ppo/mappo/dqn/dueling_dqn/qmix/controller_mat/dag_offload_drl/cache_offload_drl/dt_handoff_drl`，`record_count=27`。
+- Formal split：strongest learned baseline 均为 `dt_handoff_drl`；mixed margin `+11.176111`，full margin `+3.377407`。
+- Holdout offset=3：strongest learned baseline 均为 `dt_handoff_drl`；mixed margin `+8.442778`，full margin `+5.242143`。
+- Paired CI：formal weakest vs `dt_handoff_drl` mean `+5.327083`、95% CI `[1.594094, 8.963719]`；holdout weakest vs `dt_handoff_drl` mean `+6.202333`、95% CI `[1.607076, 10.593939]`。
+- Support weakest learned margins：prediction vs `dt_handoff_drl` `+4.833472` CI `[3.170913, 6.600080]`；robustness `+9.799097` CI `[8.329792, 11.297618]`；scalability `+4.133380` CI `[3.245373, 5.016079]`。
+
+结论边界：
+- `popularity_cache_heuristic` 是 close supplementary reference，formal/holdout mixed/full margins 分别为 `+0.250000`、`+0.479629`、`+0.355556`、`+0.376191`；不要写成大幅超过手写 heuristic。
+- 论文中必须保留 comparison self-review 的限制项：heuristic gap close、mechanism realization rate 不构成每个 split 的 standalone CI-positive 优势、backhaul savings 不是 universal headline。
+- MAPPO/QMIX/Controller-MAT/DAG/cache/DT 均按 controller-level 或 semantic-discrete contract 表述，不得写成 vehicle/RSU-level full MARL wrapper。
+
 ## 2026-05-28 Top Journal Mechanism v7 Latency Fallback Closed Loop
 
 状态：`[formal-pass]` `[candidate]` `[optimization-validation]`
