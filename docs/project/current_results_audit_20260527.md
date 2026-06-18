@@ -2,14 +2,14 @@
 
 ## 2026-06-18 TMC reviewer evidence status
 
-本机当前缺少下述两个 v7 artifact root，Git 历史也不包含对应文件：
+本机已独立 clean retrain：
 
-- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/`
-- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260618_rebuild_v1/`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260618_rebuild_v1/`
 
-因此下方 v7 数值继续作为 2026-05-28 的历史项目记录，但按 `top_journal_review_policy.md` 只能达到 `E1_DOCUMENTED`，本轮 TMC readiness verdict 为 `Unverifiable`。最新证据审查见 `top_journal_readiness_audit_20260618.md`；恢复完整 artifact、SHA-256、checkpoint/manifest/command log/formal/holdout/support 并重建 comparison report 后才能升级判断。
+rebuild 复现了下方 legacy v7 数值，SHA-256、checkpoint provenance、manifest references 和 comparison rebuild 均通过，证据升级为 `E3_REPRODUCED`。但 interval audit 发现 legacy offset-3 与 formal 滑动窗口重叠。严格 non-overlap 下 mixed formal/holdout 对 DT 的 CI 为正，而 full formal/holdout CI 跨 0；本轮 verdict 因 scientific blocker 为 `Not TMC-ready`。最新证据和安全表述见 `top_journal_readiness_audit_20260618.md`。
 
-## 2026-05-28 v7 final-submission canonical
+## 2026-05-28 v7 legacy final-submission package
 
 本节优先于下方所有旧 v5/v6/v7 closed-loop 审计段落读取。
 
@@ -23,8 +23,8 @@
 |---|---|---:|---:|---:|---|---:|
 | Formal / Mixed | `dt_handoff_drl` | `98.396667` | `87.220556` | `+11.176111` | `popularity_cache_heuristic` | `+0.250000` |
 | Formal / Full | `dt_handoff_drl` | `90.651296` | `87.273889` | `+3.377407` | `popularity_cache_heuristic` | `+0.479629` |
-| Holdout offset=3 / Mixed | `dt_handoff_drl` | `99.758889` | `91.316111` | `+8.442778` | `popularity_cache_heuristic` | `+0.355556` |
-| Holdout offset=3 / Full | `dt_handoff_drl` | `93.149762` | `87.907619` | `+5.242143` | `popularity_cache_heuristic` | `+0.376191` |
+| Offset-3 sensitivity / Mixed | `dt_handoff_drl` | `99.758889` | `91.316111` | `+8.442778` | `popularity_cache_heuristic` | `+0.355556` |
+| Offset-3 sensitivity / Full | `dt_handoff_drl` | `93.149762` | `87.907619` | `+5.242143` | `popularity_cache_heuristic` | `+0.376191` |
 
 CI / support 结论：
 

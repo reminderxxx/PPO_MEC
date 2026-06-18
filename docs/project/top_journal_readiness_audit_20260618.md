@@ -3,144 +3,119 @@
 - `reviewed_at`: `2026-06-18`
 - `literature_cutoff`: `2026-06-18`
 - `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`
-- `artifact_run_id`: `final_submission_v7_latency_fallback_20260528_v1`
-- `policy_version`: `tmc_review_policy_v1_20260618`
-- `git_commit_at_review`: `dd40c8f`
-- `evidence_level`: `E1_DOCUMENTED`
-- `verdict`: `Unverifiable`
+- `artifact_run_id`: `final_submission_v7_latency_fallback_20260618_rebuild_v1`
+- `policy_version`: `tmc_review_policy_v2_20260618`
+- `git_commit_at_review`: `pending_this_change`
+- `evidence_level`: `E3_REPRODUCED`
+- `verdict`: `Not TMC-ready`
 
 ## Executive Verdict
 
-本轮不能把 PPO_MEC 判为 `TMC-ready candidate`。原因不是已发现 canonical v7 数值失败，而是本机缺少两个正式 run root，Git 历史也没有这些 artifact：
+本机已独立 clean retrain 并重建 v7 closed-loop、9 个 learned baselines、formal/offset-3、prediction/system robustness、scalability 和 comparison package；旧文档中的核心 v7 数值能够复现，artifact 清单、manifest 引用和 checkpoint provenance 均可追溯。因此上一版 `Unverifiable` 结论已被新的 `E3_REPRODUCED` 证据取代。
 
-- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/`
-- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/`
-
-因此无法核验 checkpoint provenance、command log、formal/holdout/support 原始 rows、paired cluster unit、bootstrap 输入、comparison report 重建和 manifest 外部引用。`ARTIFACT_RECORDS.md`、`PROGRESS.md` 与 `current_results_audit_20260527.md` 的摘要只能支持条件性 desk review，不能替代硬审。
-
-若上述 artifacts 完整恢复且摘要结论全部复核通过，当前研究显示出接近 TMC 投稿候选的实验框架；但 novelty 防线、极小 heuristic margin、机制独立贡献、外部泛化和统计报告仍是 major-revision 风险。
+但硬审发现旧协议的 `offset=3 holdout` 与 formal 使用相邻且重叠的滑动窗口，不能作为独立 holdout；同一 split 内的部分 ranked windows也相互重叠。应用时间不重叠选择和 formal/holdout 排除后，SA-GHMAPPO 在 mixed 模式对 strongest learned baseline `dt_handoff_drl` 的 CI 为正，但 full 模式的 95% CI 跨 0。独立 holdout 是主 claim 的硬要求，因此即使 legacy gate 仍显示 `paper_claim_ready=true`，本轮 verdict 仍为 `Not TMC-ready`。
 
 ## Evidence Inventory
 
 | 证据 | 状态 | 结论 |
 |---|---|---|
-| 源码、配置、测试、NGSIM/Alibaba 数据 | available | 全量单元测试和真实 dry-run 可执行，只证明当前代码/数据链可运行 |
-| v7 closed-loop run root | missing | 无法核验 SA seed checkpoint、formal gate 和 action-mix 原始结果 |
-| v7 final-submission run root | missing | 无法核验 27 个 baseline checkpoint、holdout/support 和 comparison package |
-| SHA-256 文件清单 | missing | 无法判断 artifact 是否完整或被后续修改 |
-| 文档化 canonical 摘要 | available | 记录了 3 seed、formal/holdout、paired CI、support 和 limitation；属于 `E1` |
-| 论文正文 | not in scope / unavailable | 本轮不评价写作质量、图表清晰度和整篇论证结构 |
+| v7 closed-loop rebuild | complete | `paper_claim_ready=true`；formal mixed/full 核心数值复现 |
+| v7 final-submission rebuild | complete | 27 个 baseline checkpoint provenance、formal/legacy holdout/support 完整 |
+| comparison package rebuild | complete | `review_ready=true`、legacy `paper_ready_package_ready=true`，但不覆盖严格窗口独立性 |
+| artifact integrity | passed | SHA-256 inventory、JSON 引用、外部依赖和 checkpoint 路径无缺失 |
+| strict non-overlap formal/holdout | complete | split 内和 split 间窗口均不重叠；full CI 暴露弱证据 |
+| current-contract ablations | complete | 5 个机制变体、3 seeds、formal/legacy offset-3 均完成 |
+| external mobility transfer | complete with limitation | LuST + Alibaba + `auto_grid_tight` 可运行；reward 对 learned baselines 为正，backhaul 对 heuristic 更差 |
+| manuscript | not supplied | 不评价论文写作、公式陈述与图表质量 |
 
-Artifact 恢复时必须在源主机生成全文件 SHA-256 清单，复制两个完整 run root，并递归补齐 manifest 引用的外部 checkpoint、数据和 analysis 路径。目标主机校验哈希后，才能进入 `E2_ARTIFACT_AUDITED`。
+主要路径：
 
-## Literature-Level Assessment
+- closed-loop：`artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260618_rebuild_v1/`
+- final-submission：`artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260618_rebuild_v1/`
+- mechanism ablation：`artifacts/experiments/top_journal_support_suite/top_journal_v7_mechanism_ablation_20260618_v1/`
+- integrity：`artifacts/analysis/top_journal_v7_rebuild_integrity_20260618/`
 
-最近邻文献已覆盖单独或两两组合的关键子问题：
+## Reproduced Legacy Results
 
-- TMC 2025 的 dual dependency-aware service caching + task offloading 已覆盖 DAG/task dependency、service dependency、hierarchical caching 与 PPO。
-- TMC 2025 的 trajectory prediction + migration-assisted offloading 已覆盖 mobility prediction、migration 与 MARL。
-- TNSM 2025 的 mobility-aware online DAG offloading 已覆盖 vehicle-edge DAG 和在线 mobility-aware 决策。
-- TMC/TITS 2025–2026 工作已覆盖 mixed-timescale offloading、service fetching、DT-assisted caching/offloading 和 vehicle-assisted service caching。
-- IET ITS 2025 已出现 DAG offloading、跨 edge migration 与 multi-agent cooperative control 的直接近邻组合。
+- Closed-loop formal：mixed `98.396667`，full `90.651296`，与 2026-05-28 记录一致。
+- Final legacy protocol：`target_reached=true`、`paper_claim_ready=true`、`blockers=[]`，9 个 learned baselines × 3 seeds clean retrain provenance 完整。
+- Comparison package：`review_ready=true`、`paper_ready_package_ready=true`；self-review 为 0 blockers、3 limitations、15 pass。
+- Support weakest learned-baseline delta：prediction vs DT `+4.819583`，95% CI `[3.160903, 6.582726]`；system robustness `+9.792153`，95% CI `[8.322102, 11.292569]`；scalability `+4.133380`，95% CI `[3.245373, 5.016079]`。
 
-因此仅声称“DAG + caching + mobility + RL”不足以构成 TMC novelty。PPO_MEC 必须把贡献限定为并证明以下交集：跨 RSU 连续 DAG workflow 状态、车载 base model / 路侧 adapter cache warm state、handoff prepare/migration、预测辅助多控制器 contract，以及 NGSIM + Alibaba 下的联合机制兑现。adapter cache 与 service/model/KV cache 的差异必须落实为状态、动作、成本和指标，而不能只更换术语。
+这些结果可用于说明旧 package 已被独立复现，不能用于证明旧 holdout 独立。
 
-## Conditional Experimental Assessment
+## Strict Window-Independence Re-audit
 
-以下只复述并审查仓库文档，不确认原始数值：
+严格协议要求：split 内窗口不重叠；holdout 与 formal 的 frame interval 不相交；mixed/full 若复用窗口则分别报告，不能当独立 cluster 合并。
 
-### Documented strengths
+| Split | SA | DT | paired total-reward delta vs DT (95% CI) |
+|---|---:|---:|---:|
+| Formal mixed | `92.993` | `85.318` | `+7.675556 [2.775486, 13.401764]` |
+| Formal full | `88.052` | `85.088` | `+2.964167 [-0.202500, 6.453132]` |
+| Holdout mixed | `90.436` | `84.837` | `+5.598889 [2.429972, 9.186167]` |
+| Holdout full | `85.732` | `84.468` | `+1.263333 [-0.816132, 3.512965]` |
 
-- 文档记录 3 seeds、formal + offset=3 holdout、9 个 clean-retrained learned baselines、paired cluster-bootstrap CI，以及 prediction/system robustness 和 scalability support。
-- 文档明确 MAPPO/QMIX/Controller-MAT 只是 controller-level baseline，DAG/cache/DT baseline 受 `semantic_discrete_5` contract 限制，避免夸大为 full vehicle/RSU MARL。
-- 文档记录 strongest learned baseline 为 `dt_handoff_drl`，并报告 formal/holdout weakest paired CI 下界为正，而不是只挑弱 MAPPO 比较。
-- 文档保留 heuristic gap close、mechanism realization 非逐 split 独立正 CI、backhaul 非 universal headline 三项 limitation。
+Formal full 和 holdout full 的 CI 均跨 0。点估计仍为正，但不能声称“formal/independent holdout 所有模式均显著优于 strongest learned baseline”。
 
-### Major concerns
+## Mechanism and External Evidence
 
-1. **Heuristic margin 极小。** 文档化 formal/holdout mixed/full 对 popularity heuristic 的 reward margin仅约 `+0.25` 至 `+0.48`，不支持“大幅优于规则方法”。
-2. **主要收益与核心机制存在错位风险。** v7 文档将收益归因于 latency fallback / local execution action mix，而 cache/backhaul/handoff 与 heuristic 基本持平；需要证明论文 headline 不是由通用 reward tie-break 主导。
-3. **机制独立贡献不足。** 文档已承认 mechanism realization rate 不是每个 split 的 standalone CI-positive 优势，部分早期 DAG/uncertainty 消融 CI 跨 0。
-4. **泛化边界窄。** 正式主线只有 NGSIM mobility + Alibaba workflow；offset holdout 仍来自同一数据源和窗口生成协议，不等价于跨城市、跨轨迹集或跨 workflow domain 泛化。
-5. **统计透明度待硬审。** 需要确认 paired cluster 的独立单位、bootstrap 层级、窗口/seed 嵌套关系、多个 baseline/metric/split 比较的 family-wise 风险，以及 hyperparameter selection 是否使用了 holdout 信息。
-6. **算法命名与 contract 风险。** 主方法名称含 hierarchical multi-agent PPO，但 live wrapper 和强基线均为 controller-level；论文必须用可验证的 agent/controller 定义消除“full MARL”误读。
-7. **可复现性证据缺失。** 当前主机无法从 canonical package 重建论文表，尚不满足 `E2/E3`。
+当前 v7 profile 的 3-seed 消融在 formal 合并口径下，full method 相对变体的 reward delta 为：
 
-### Minor concerns
+- no latency fallback：`+0.422 [0.268, 0.580]`
+- no prediction：`+10.847 [6.465, 15.024]`
+- no hierarchy：`+13.176 [7.111, 19.228]`
+- no event agent：`+8.127 [4.957, 11.117]`
+- no adapter prefetch：`+10.503 [6.085, 14.696]`
 
-- 需要报告训练/评估 wall-clock、硬件、峰值内存、总调参计算量和失败实验选择过程。
-- 需要明确 NGSIM 与 Alibaba 数据许可、预处理、窗口扫描和 workflow selector 对样本分布的影响。
-- 需要说明 3 seeds 的计算约束及其对 CI 稳定性的影响，避免把“3 seed + bootstrap”写成普适统计充分性。
-- `baseline_predictor_v2` / calibrated interface 不能写成已加载 learned surrogate checkpoint。
+`no_prediction` 与 `no_adapter_prefetch` 的多项结果高度相似，说明预测与 prefetch 在当前 policy 中存在机制耦合，不能把两者的 delta 相加或解释为正交因果贡献。
+
+LuST 一维 RSU 布局会导致全程无 association，已判为无效诊断配置。新增二维 `auto_grid_tight` 后，LuST external mobility benchmark 中 SA reward `94.053889`，对 DT 的 paired delta 为 `+5.831944 [4.424042, 7.209472]`；但 SA backhaul `101.333` 高于 popularity heuristic `90.667`，因此只能作为外部 mobility transfer 的初步证据，不能写成全面系统效率优势。
 
 ## Scorecard
 
-| 维度 | 分值 | 本轮结果 | 原因 |
-|---|---:|---|---|
-| Novelty 与近邻文献定位 | 20 | `N/S` | 可做 desk review，但需要论文贡献陈述和最近邻逐项证据 |
-| 技术正确性与问题建模 | 15 | `N/S` | 源码可运行，canonical protocol 与论文形式化尚未硬对照 |
-| Baseline 公平性与独立性 | 15 | `N/S` | 文档称已通过，27 个 checkpoint 与 manifest 缺失 |
-| 实验设计、统计与 holdout | 20 | `N/S` | 原始 rows、cluster unit 和 bootstrap 输入缺失 |
-| 机制兑现与系统指标 | 10 | `N/S` | 只有文档摘要，且已知逐 split 独立贡献有限 |
-| 鲁棒性、泛化与可扩展性 | 10 | `N/S` | support artifact 缺失；外部数据泛化未覆盖 |
-| 可复现性与 claim 完整性 | 10 | `N/S` | canonical artifacts 不可用 |
+| 维度 | 得分 | 依据与扣分 |
+|---|---:|---|
+| Novelty 与近邻文献定位 | 14/20 | 联合问题有区分空间；DAG/cache/migration/mixed-timescale 最近邻密集，尚缺论文逐项 claim matrix |
+| 技术正确性与问题建模 | 12/15 | contract 与实现可追溯；controller-level、action granularity 和 predictor 边界需严格表述 |
+| Baseline 公平性与独立性 | 14/15 | 9 个 learned baselines clean retrain、预算与 provenance 完整；continuous-control/full-MARL contract 不适配 |
+| 实验设计、统计与 holdout | 10/20 | 修复窗口泄漏后 full CI 跨 0；仅 3 seeds；多重比较未校正 |
+| 机制兑现与系统指标 | 7/10 | 消融和系统指标已补；机制耦合、heuristic/backhaul 边界仍明显 |
+| 鲁棒性、泛化与可扩展性 | 8/10 | prediction/system/scale 和 LuST 已覆盖；外部验证仍是单一 LuST 布局 |
+| 可复现性与 claim 完整性 | 9/10 | E3、hash/provenance/command 完整；环境计算成本报告仍可加强 |
 
-总分：`N/S (not scored)`。根据 `tmc_review_policy_v1_20260618`，缺少关键 artifact 时不得给出伪精确分数。
+总分：`74/100`。此外存在独立 holdout 科学性 blocker，故 verdict 为 `Not TMC-ready`。
 
-## Hard Blockers
+## Hard Blockers and Concerns
 
-- `evidence_blocker:canonical_v7_closed_loop_artifact_missing`
-- `evidence_blocker:canonical_v7_final_submission_artifact_missing`
-- `evidence_blocker:artifact_sha256_inventory_missing`
-- `evidence_blocker:comparison_rebuild_not_possible`
+硬 blocker：
 
-当前未确认额外科学性 blocker；这不代表它们不存在，而是证据不足以完成判断。
+- `science_blocker:strict_full_formal_ci_crosses_zero_against_dt_handoff_drl`
+- `science_blocker:strict_full_holdout_ci_crosses_zero_against_dt_handoff_drl`
+
+Major concerns：仅 3 seeds；多个 baseline/metric/split 未做 family-wise/FDR 处理；popularity heuristic reward 很接近；机制耦合削弱单组件因果表述；LuST 只有一个有效二维布局；论文正文尚未接受 claim consistency 审查。
 
 ## Safe Claims
 
-恢复 artifacts 前只能写成“仓库文档记录”或“待原始 artifact 复核”：
-
-- PPO_MEC 面向跨 RSU 连续 DAG workflow、adapter cache warm state 与 handoff/migration 的联合控制问题。
-- 当前实现和测试支持 NGSIM + Alibaba 的真实数据 dry-run。
-- 仓库文档记录 v7 在 formal/holdout 中超过所有列出的 learned baselines，并保留 close heuristic 与机制边界；数值尚未在本机硬复核。
+- v7 legacy pipeline 已在当前主机独立 clean retrain，并复现 2026-05-28 的核心 formal 结果。
+- 严格非重叠 formal/holdout 的 mixed 模式中，SA 对 DT 的 paired reward CI 为正。
+- 当前 contract 下的 latency fallback、prediction、hierarchy、event controller 和 adapter prefetch 消融均显示正 reward delta，但 prediction/prefetch 不是正交机制。
+- LuST 二维 grid 场景提供了初步外部 mobility transfer 证据，同时暴露 backhaul trade-off。
 
 ## Prohibited Claims
 
-- 不得称当前已通过本轮 TMC-level hard review 或已达到 TMC 官方录用标准。
-- 不得称全面、大幅优于 heuristic、oracle prediction 或所有场景。
-- 不得把 reward 增益直接解释为 adapter prefetch/migration 的独立因果收益。
-- 不得把 controller-level MAPPO/QMIX/MAT 写成 vehicle-agent / RSU-agent full MARL。
-- 不得把 `baseline_predictor_v2` 或 calibrated interface 写成已训练 learned surrogate。
-- 不得把 NGSIM + Alibaba 单一组合外推为跨城市、跨数据集或真实部署普适结论。
+- 不得把 legacy `offset=3` 称为独立 holdout，也不得用其正 CI 宣称所有独立 split 显著领先。
+- 不得声称当前已经达到、预计达到或保证达到 TMC 录用标准。
+- 不得声称全面、大幅优于 heuristic、所有 learned baselines、所有场景或所有系统指标。
+- 不得把相关消融 delta 相加，或将 reward 增益直接解释为单一 adapter cache/migration 机制的因果收益。
+- 不得把 controller-level MAPPO/QMIX/MAT 写成 vehicle/RSU-level full MARL。
 
 ## Required Actions Before Re-review
 
-1. 恢复两个完整 v7 run root、所有 manifest 外部引用和 SHA-256 清单。
-2. 校验 final gate、formal/holdout learned gate、27 个 baseline checkpoint provenance、command log 和 protocol version。
-3. 在新的临时目录重建 comparison report，逐字段比对 JSON/CSV/LaTeX 与原 package。
-4. 审计 formal/holdout 窗口集合是否重叠，确认 selection/hyperparameter tuning 未使用 holdout。
-5. 重算 paired/cluster bootstrap，并记录 cluster unit、sample size、CI 方法与多重比较处理。
-6. 将 latency fallback、adapter cache、handoff prepare/migration 的收益拆解到机制窗口和非机制窗口，避免 reward-only 归因。
-7. 补充至少一个外部 mobility 或 workflow domain，或者把单数据组合明确列为投稿 limitation。
-8. 提供论文正文后另做 contribution、formalization、图表、related work 和 claim consistency 审查。
+1. 以严格非重叠协议重新训练/选择 checkpoint；不能只在旧 checkpoint 上反复筛选 holdout。
+2. 提高 strict full formal 与 strict full holdout 对 DT 的最弱 CI 下界至正值，并用预先冻结的 selection rule 复核。
+3. 将 strict protocol 集成到 final-submission gate，使 legacy offset gate 不再产生 paper-ready 判定。
+4. 报告 multiplicity 策略、seed/window/workflow 的层级结构、effect size 和计算成本。
+5. 扩展至少一个外部 mobility/workflow 组合，并报告 reward、continuity、failure、backhaul、cache/migration trade-off。
+6. 提供论文正文后审查 formalization、contribution、related work、图表和 claim-artifact 映射。
 
-## Policy Exercise
-
-- `final_submission_v7_latency_fallback_20260528_v1`：当前为 `Unverifiable`，因为 canonical artifact 缺失；文档中的 `paper_claim_ready=true` 不覆盖本规范的证据要求。
-- `top_journal_mechanism_v6_strong_competition_20260527_v1`：仓库文档已记录 `paper_claim_ready=false` 和 learned/heuristic blockers，因此即使恢复 artifact，也不能作为 TMC-ready canonical；它应保留为 negative/diagnostic evidence。
-
-该演练确认本规范可以区分“项目 gate 通过但证据未恢复”和“项目 gate 已明确失败”两类状态。
-
-## TITS / TVT Fit Note
-
-若后续仍缺少更强的外部泛化和机制因果证据，TITS/TVT 的场景化 VEC 叙事可能比 TMC 更匹配；但 TITS 同样会关注交通场景真实性和指标意义，TVT 也不应以较低门槛为由省略 baseline 公平性、统计和复现证据。投稿方向只能在 artifacts 硬审和论文正文审查后决定。
-
-## Validation Performed On This Host
-
-- `.venv/bin/python -m pytest tests -q`：`58 passed`。
-- `.venv/bin/python scripts/smoke_test.py`：通过；仅证明 toy 链路。
-- `.venv/bin/python scripts/run_ngsim_sample.py --max_rows 500`：通过。
-- `.venv/bin/python scripts/run_alibaba_sample.py --limit_jobs 3 --min_tasks 5 --max_tasks 20`：通过。
-- `.venv/bin/python scripts/run_real_sample_dryrun.py ...`：通过，episode success、continuity `1.0`；dry-run 不作为论文结论。
-- `build_top_journal_comparison_report.py --final_run_root ...final_submission_v7...`：因 `final_submission_gate_report.json` 不存在而失败，直接确认 comparison package 无法重建。
-- 文献表标题与 URL 去重检查：未发现重复项；待核验 venue/DOI 条目继续显式保留。
+TITS/TVT 可作为场景适配参考，但不能用 venue 调整来绕过窗口独立性和统计证据 blocker。

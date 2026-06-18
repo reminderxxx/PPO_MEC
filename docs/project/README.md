@@ -11,7 +11,7 @@
 - `ARTIFACT_RECORDS.md`：从 `artifacts/` 整理出的规范化实验记录
 - `current_results_audit_20260527.md`：当前 canonical / v5 / MAPPO v3 / SA v6 结果状态、缺口和阻塞审计表
 - `top_journal_review_policy.md`：以 IEEE TMC 为主目标的长期 AI reviewer 证据等级、blocker、评分和固定输出规范
-- `top_journal_readiness_audit_20260618.md`：按上述规范对 canonical v7 做的最新审查；当前因正式 artifact 未恢复而判定 `Unverifiable`
+- `top_journal_readiness_audit_20260618.md`：v7 独立重建、严格非重叠 holdout、机制消融与 LuST 外部迁移的最新审查；当前 verdict 为 `Not TMC-ready`
 - `CLEANUP_LOG.md`：旧文档和旧产物清理记录
 - `DIRECTORY_STRUCTURE.md`：目录边界和产物写入位置
 - `DATASET_SOURCES.md`：当前数据集名称、角色、本地路径和下载页声明
@@ -36,4 +36,3 @@
 ## 模板来源
 
 通用模板内容已整理进本目录。当前事实来源只保留 `docs/project/` 和根目录 `AGENTS.md`。
-

@@ -78,6 +78,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_selector", type=str, default="max_handoff_candidate", choices=["ordered", "random", "max_handoff_candidate", "max_axis_crossing"])
     parser.add_argument("--window_mode", type=str, default="mixed_informative", choices=["activating_only", "mixed", "full", "mixed_informative", "full_stratified"])
     parser.add_argument("--window_rank_offset", type=int, default=0)
+    parser.add_argument("--exclude_window_plan_path", action="append", default=[])
+    parser.add_argument("--holdout_min_gap_frames", type=int, default=0)
+    parser.add_argument("--enforce_non_overlapping_selection", action="store_true")
     parser.add_argument("--activating_handoff_threshold", type=int, default=2)
     parser.add_argument("--activating_vehicle_threshold", type=float, default=2.0)
     parser.add_argument("--activating_predicted_next_ratio_threshold", type=float, default=0.3)
@@ -95,6 +98,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max_tasks", type=int, default=20)
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "artifacts" / "benchmarks" / "main_results"))
     return parser.parse_args()
+
+
+def load_excluded_window_intervals(paths: list[str]) -> list[tuple[int, int]]:
+    intervals: set[tuple[int, int]] = set()
+    for raw_path in paths:
+        path = Path(raw_path)
+        payload = json.loads(path.read_text(encoding="utf-8-sig"))
+        if isinstance(payload, list):
+            plan = payload
+        else:
+            plan = payload.get("selected_window_plan", payload.get("selected_windows", []))
+        for item in plan:
+            start = int(item["frame_offset"])
+            end = start + int(item["window_length"]) - 1
+            intervals.add((start, end))
+    return sorted(intervals)
 
 
 def build_checkpoint_map(args: argparse.Namespace) -> dict[str, str]:
@@ -336,6 +355,7 @@ def build_sa_advantage_diagnosis(
 
 def main() -> None:
     args = parse_args()
+    excluded_window_intervals = load_excluded_window_intervals(args.exclude_window_plan_path)
     mainline_label = "LuST(SUMO) + Alibaba" if args.mobility_source == "lust" else "NGSIM + Alibaba"
     base_checkpoint_map = expand_checkpoint_aliases(build_checkpoint_map(args))
     seed_checkpoint_manifest = load_seed_checkpoint_manifest(args.seed_checkpoint_manifest_path)
@@ -359,6 +379,9 @@ def main() -> None:
         random_seed=args.seeds[0] if args.seeds else 7,
         window_mode=args.window_mode,
         window_rank_offset=args.window_rank_offset,
+        excluded_window_intervals=excluded_window_intervals,
+        holdout_min_gap_frames=args.holdout_min_gap_frames,
+        enforce_non_overlapping_selection=args.enforce_non_overlapping_selection,
         activating_handoff_threshold=args.activating_handoff_threshold,
         activating_vehicle_threshold=args.activating_vehicle_threshold,
         activating_predicted_next_ratio_threshold=args.activating_predicted_next_ratio_threshold,
@@ -478,6 +501,12 @@ def main() -> None:
         "config_profile": infer_benchmark_config_profile(checkpoint_audit, args.agents),
         "window_mode": args.window_mode,
         "window_rank_offset": args.window_rank_offset,
+        "exclude_window_plan_paths": list(args.exclude_window_plan_path),
+        "excluded_window_intervals": [list(interval) for interval in excluded_window_intervals],
+        "holdout_min_gap_frames": args.holdout_min_gap_frames,
+        "enforce_non_overlapping_selection": args.enforce_non_overlapping_selection,
+        "excluded_window_count": window_payload.get("excluded_window_count", 0),
+        "excluded_window_ids": window_payload.get("excluded_window_ids", []),
         "primary_vehicle_selection": args.primary_vehicle_selection,
         "mainline": mainline_label,
         "agents": args.agents,

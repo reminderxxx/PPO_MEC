@@ -131,7 +131,9 @@
 - `scripts/build_top_journal_eval_bias_manifest.py` 从已有 seed checkpoint manifest 派生启用 latency fallback calibration 的 SA checkpoint manifest，用于候选验证。
 ## 2026-05-06 Holdout And Eval-Bias Support
 
-- `src/evaluators/main_results_support.py` 的 `resolve_window_candidates()` 支持 `window_rank_offset`，按 stratum 跳过 ranked prefix，用于 formal window 之外的 holdout。
+- `src/evaluators/main_results_support.py` 的 `resolve_window_candidates()` 支持 ranked offset、formal interval exclusion、minimum gap 和 greedy non-overlap selection；独立 holdout 必须使用 interval 约束，不能只使用 offset。
+- `scripts/audit_window_independence.py` 对两个 aggregate summary 的 selected window plans 做 split 内/跨 split interval 审计。
+- `src/evaluators/real_sample_support.py` 的 `auto_grid_tight` 为 LuST 等二维 mobility 建立 RSU grid；一维 NGSIM 仍可使用 `auto_dominant_tight`。
 - `scripts/benchmark_main_results.py`、`scripts/run_top_journal_learned_baseline_suite.py` 和 `scripts/benchmark_ablation.py` 消费 `--window_rank_offset`。
 - `src/agents/sa_ghmappo_core.py` 增加 predictive prepare hard override 配置字段；默认关闭，只用于派生候选筛选。continuity guard 现在在 target cache ready 前不压制 prefetch。
 - `src/evaluators/real_eval_support.py` 从 checkpoint config 恢复新增的 predictive prepare override 字段。

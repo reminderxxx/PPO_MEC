@@ -761,6 +761,9 @@ def resolve_window_candidates(
     idle_or_sparse_vehicle_max: float = 1.5,
     idle_or_sparse_association_change_max: int = 0,
     window_rank_offset: int = 0,
+    excluded_window_intervals: list[tuple[int, int]] | None = None,
+    holdout_min_gap_frames: int = 0,
+    enforce_non_overlapping_selection: bool = False,
 ) -> tuple[str, dict[str, Any]]:
     raw_frames, source_path = load_real_source_frames(
         root_dir=root_dir,
@@ -868,6 +871,21 @@ def resolve_window_candidates(
             }
         )
 
+    excluded_intervals = list(excluded_window_intervals or [])
+    gap = max(0, int(holdout_min_gap_frames))
+    excluded_windows = [
+        item
+        for item in enriched_windows
+        if any(
+            int(item["frame_offset"]) <= int(excluded_end) + gap
+            and int(item["frame_offset"]) + int(item["window_length"]) - 1 >= int(excluded_start) - gap
+            for excluded_start, excluded_end in excluded_intervals
+        )
+    ]
+    if excluded_intervals:
+        excluded_ids = {str(item["window_id"]) for item in excluded_windows}
+        enriched_windows = [item for item in enriched_windows if str(item["window_id"]) not in excluded_ids]
+
     mechanism_activating_windows = [item for item in enriched_windows if item["window_class"] == "mechanism_activating"]
     active_non_mechanism_windows = [item for item in enriched_windows if item["window_class"] == "active_non_mechanism"]
     idle_or_sparse_windows = [item for item in enriched_windows if item["window_class"] == "idle_or_sparse"]
@@ -876,8 +894,26 @@ def resolve_window_candidates(
     active_non_mechanism_selection_pool = active_non_mechanism_windows[selection_offset:]
     idle_or_sparse_selection_pool = idle_or_sparse_windows[selection_offset:]
 
+    occupied_intervals: list[tuple[int, int]] = []
+
+    def select_from_pool(pool: list[dict[str, Any]], count: int) -> list[dict[str, Any]]:
+        selected: list[dict[str, Any]] = []
+        for item in pool:
+            if len(selected) >= count:
+                break
+            start = int(item["frame_offset"])
+            end = start + int(item["window_length"]) - 1
+            if enforce_non_overlapping_selection and any(
+                start <= occupied_end + gap and end >= occupied_start - gap
+                for occupied_start, occupied_end in occupied_intervals
+            ):
+                continue
+            selected.append(item)
+            occupied_intervals.append((start, end))
+        return selected
+
     if window_mode == "activating_only":
-        selected_windows = mechanism_selection_pool[: max(1, window_count)]
+        selected_windows = select_from_pool(mechanism_selection_pool, max(1, window_count))
         selected_window_plan_by_strata = {
             "mechanism_activating": list(selected_windows),
             "active_non_mechanism": [],
@@ -890,18 +926,14 @@ def resolve_window_candidates(
         target_count = max(1, window_count)
         activating_target = max(1, (target_count + 1) // 2)
         active_non_mechanism_target = max(1, target_count - activating_target)
-        selected_windows = (
-            mechanism_selection_pool[:activating_target]
-            + active_non_mechanism_selection_pool[:active_non_mechanism_target]
-        )
+        selected_windows = select_from_pool(mechanism_selection_pool, activating_target)
+        selected_windows += select_from_pool(active_non_mechanism_selection_pool, active_non_mechanism_target)
         if len(selected_windows) < target_count:
-            for item in (
+            selected_windows += select_from_pool(
                 mechanism_selection_pool[activating_target:]
-                + active_non_mechanism_selection_pool[active_non_mechanism_target:]
-            ):
-                if len(selected_windows) >= target_count:
-                    break
-                selected_windows.append(item)
+                + active_non_mechanism_selection_pool[active_non_mechanism_target:],
+                target_count - len(selected_windows),
+            )
         if not selected_windows:
             raise RuntimeError("window_mode=mixed_informative ?????? mechanism_activating / active_non_mechanism windows?")
         selected_window_plan_by_strata = {
@@ -911,9 +943,9 @@ def resolve_window_candidates(
         }
     elif window_mode in {"full", "full_stratified"}:
         selected_window_plan_by_strata = {
-            "mechanism_activating": mechanism_selection_pool[: max(1, window_count)],
-            "active_non_mechanism": active_non_mechanism_selection_pool[: max(1, window_count)],
-            "idle_or_sparse": idle_or_sparse_selection_pool[: max(1, window_count)],
+            "mechanism_activating": select_from_pool(mechanism_selection_pool, max(1, window_count)),
+            "active_non_mechanism": select_from_pool(active_non_mechanism_selection_pool, max(1, window_count)),
+            "idle_or_sparse": select_from_pool(idle_or_sparse_selection_pool, max(1, window_count)),
         }
         selected_windows = (
             list(selected_window_plan_by_strata["mechanism_activating"])
@@ -928,6 +960,11 @@ def resolve_window_candidates(
     return source_path, {
         "window_mode": window_mode,
         "window_rank_offset": selection_offset,
+        "excluded_window_intervals": [list(interval) for interval in excluded_intervals],
+        "holdout_min_gap_frames": gap,
+        "enforce_non_overlapping_selection": bool(enforce_non_overlapping_selection),
+        "excluded_window_count": len(excluded_windows),
+        "excluded_window_ids": [str(item["window_id"]) for item in excluded_windows],
         "selected_windows": selected_windows,
         "selected_window_plan_by_strata": selected_window_plan_by_strata,
         "mechanism_activating_windows": mechanism_activating_windows,

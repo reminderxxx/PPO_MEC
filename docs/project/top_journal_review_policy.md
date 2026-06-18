@@ -1,6 +1,6 @@
 # Top Journal Review Policy
 
-- `policy_version`: `tmc_review_policy_v1_20260618`
+- `policy_version`: `tmc_review_policy_v2_20260618`
 - `updated_at`: `2026-06-18`
 - `primary_target`: `IEEE Transactions on Mobile Computing (TMC)`
 - `secondary_fit_targets`: `IEEE TITS / IEEE TVT`
@@ -49,6 +49,14 @@ Artifact 审查必须覆盖：
 
 缺失正式 checkpoint、manifest、command log、formal/holdout/support 任一关键证据时，不得用文档摘要补位。
 
+### 窗口独立性协议
+
+- formal/holdout 的独立性按原始时间区间判断，不能只按 `window_id`、rank 或 `window_rank_offset` 判断。
+- 同一 split 中作为独立 cluster 使用的窗口不得重叠；holdout 窗口还必须与全部 formal 窗口不重叠，并记录最小 frame gap。
+- mixed/full 若复用同一时间窗口，不得把两种 mode 当作独立样本合并扩大样本量；应分别报告 CI，或使用显式建模 mode 依赖的层级统计。
+- 任何窗口扫描、checkpoint selection、hyperparameter tuning 或 promotion gate 都不能读取 strict holdout 结果；规则必须先冻结再评估。
+- `scripts/audit_window_independence.py` 的通过是窗口独立性的最低自动检查，不替代对数据源、workflow 和选择过程的人工审计。
+
 ## 硬性 Blocker
 
 任一科学性 blocker 成立即不得判为 `TMC-ready candidate`：
@@ -57,6 +65,7 @@ Artifact 审查必须覆盖：
 - baseline contract 不匹配、训练预算明显不公平、重复 trace/策略未排除，或把 diagnostic baseline 当 paper-grade baseline；
 - 主 claim 只依赖单 seed、point estimate，缺少变异来源、CI/error bar 或适当统计检验；
 - training / checkpoint selection / formal / holdout 存在数据泄漏，或没有独立 holdout；
+- formal/holdout 时间窗口重叠，或把同一 split 内的重叠窗口当成独立 cluster；
 - 主优势依赖 reward shaping、evaluation-only bias 或 cherry-pick，且缺少真实机制兑现指标；
 - 对 cache、handoff、migration、prediction、DAG 或 multi-agent 的 claim 没有对应可观测指标与消融证据；
 - 结论超出数据范围，例如把 controller-level baseline 写成 vehicle/RSU-level full MARL，或把 NGSIM + Alibaba 写成普适真实部署；
@@ -94,7 +103,7 @@ AI 不得输出“会被 TMC 接收”“达到 TMC 官方分数线”。TITS/TV
 2. 核验 artifact 存在性和完整性，确定 `E0–E3`；证据不足立即标 `Unverifiable`。
 3. 检索最近 5 年一手出版页面，按标题/DOI/arXiv ID 查重，并更新 `literature_reference_table.md`。
 4. 建立最近邻矩阵：问题、控制对象、动作粒度、cache 语义、mobility/handoff、数据、算法和指标。
-5. 审查数据划分、seed、budget、checkpoint selection、baseline contract、统计单位与 CI。
+5. 审查数据划分、窗口区间重叠、seed、budget、checkpoint selection、baseline contract、统计单位与 CI。
 6. 将每个 claim 映射到 artifact 字段；reward shaping 不能代替机制兑现。
 7. 检查 prediction、robustness、scalability、ablation、weak split、negative result 和 limitation。
 8. 输出 blocker、major concern、minor concern、安全 claim、禁止表述、评分/未评分理由与投稿建议。

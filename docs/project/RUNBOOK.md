@@ -391,7 +391,7 @@ python scripts/build_top_journal_eval_bias_ablation_manifest.py
 
 Notes:
 
-- `--window_rank_offset` skips the first N ranked windows inside each selected stratum and is intended for independent holdout validation, not for replacing the formal frozen window protocol.
+- `--window_rank_offset` 只表示 ranked-window sensitivity，不能单独证明 independent holdout；历史 offset-3 结果与 formal 时间窗口存在重叠。
 - Current v3 candidate has formal + holdout + latency fallback ablation support, but remains an inference-calibrated formal_v2-weight result rather than clean retrain.
 - To reproduce pre-audit 20260506 diagnostic gates, pass `--allow_contract_blocked_baselines --learned_baseline_agents ippo ppo mappo dqn ddqn`; such runs are diagnostic-only and cannot be promoted to paper-ready.
 - Do not promote `top_journal_mechanism_v4_prepare_eval_bias`; prediction robustness screening was negative.
@@ -399,6 +399,26 @@ Notes:
 ## Top Journal Final Submission Loop
 
 用途：按最终交稿口径执行 learned-primary gate。`popularity_cache_heuristic` 和 `reactive_greedy` 只作为 supplementary heuristic reference，不作为主 claim 的阻塞条件。
+
+警告：当前 final-submission loop 的 legacy offset gate 不检查 frame interval 独立性，其 `paper_claim_ready=true` 不能直接升级为 TMC-ready。正式审查必须另跑下述 strict protocol。
+
+### Strict non-overlap formal/holdout
+
+先用 `--enforce_non_overlapping_selection` 生成 formal；再将 formal 的 `aggregate_summary.json` 传给 holdout 的 `--exclude_window_plan_path`，同时设置 `--holdout_min_gap_frames` 和非重叠选择。mixed/full 必须分别统计。
+
+```bash
+python scripts/benchmark_main_results.py --help
+python scripts/audit_window_independence.py --formal_summary <formal_full_aggregate_summary.json> --holdout_summary <holdout_full_aggregate_summary.json> --minimum_gap_frames 0 --output artifacts/analysis/<run_id>/window_independence.json
+```
+
+Artifact 完整性审计：
+
+```bash
+python scripts/audit_artifact_integrity.py --run_root <closed_loop_root> --run_root <final_submission_root> --run_root <ablation_root> --output_dir artifacts/analysis/<run_id>_integrity
+shasum -a 256 --check --quiet artifacts/analysis/<run_id>_integrity/sha256_manifest.txt
+```
+
+LuST 为二维轨迹，必须使用 `--rsu_layout auto_grid_tight`；`auto_dominant_tight` 的一维线性 RSU 可能造成全程无 association，应视为无效配置。
 
 当前 final-submission 复跑入口：
 
@@ -412,7 +432,7 @@ python scripts/run_top_journal_final_submission_loop.py --run_id <new_run_id> --
 python scripts/run_top_journal_final_submission_loop.py --run_id final_submission_repaired_baselines_20260507_v1 --base_manifest_path artifacts/experiments/top_journal_final_submission/final_submission_clean_equal_budget_20260506_v1/learned_suites/final_submission_clean_equal_budget_20260506_v1_iter1_formal/seed_checkpoint_manifest_learned_baselines.json --skip_training --command_retries 1 --minimum_reward_delta 0.5 --holdout_offsets 3
 ```
 
-当前 canonical clean retrain run：
+Legacy canonical clean retrain run（可复现，但未通过 strict reviewer protocol）：
 
 ```bash
 python scripts/run_top_journal_final_submission_loop.py --run_id final_submission_v7_latency_fallback_20260528_v1 --base_manifest_path artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/seed_checkpoint_manifest.json --force_retrain_learned --resume_training --resume_benchmark --resume_support --command_retries 2 --baseline_episodes 96 --baseline_update_every 6 --baseline_batch_size 32 --minimum_reward_delta 0.5 --holdout_offsets 3 --seeds 7 13 29 --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified
@@ -442,13 +462,13 @@ python scripts/build_top_journal_comparison_report.py --final_run_root artifacts
 - `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/learned_suites/final_submission_v7_latency_fallback_20260528_v1_iter1_formal/learned_baseline_gate_report.json`
 - `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/learned_suites/final_submission_v7_latency_fallback_20260528_v1_iter1_holdout_offset3/learned_baseline_gate_report.json`
 
-当前 gate 结论：
+Legacy gate 结论：
 
 - `target_reached=true`
 - `paper_claim_ready=true`
 - comparison report `review_ready=true`
 - paper-ready package `paper_ready_package_ready=true`
-- formal 与 offset=3 holdout learned gate 均通过。
+- formal 与 offset=3 sensitivity gate 均通过；offset=3 不得再称 independent holdout。
 - 当前 canonical learned baseline set 为 `ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl`。
 - `formal_training_provenance.passed=true`，`record_count=27`，说明 formal learned checkpoint 来自本次 final suite clean retrain。
 - total_reward 的 cluster bootstrap 使用 `seed window_id workflow_id`。

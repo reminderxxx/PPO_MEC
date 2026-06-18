@@ -1,8 +1,21 @@
 # Artifact Records
 
+## 2026-06-18 v7 independent rebuild and strict review
+
+状态：`[E3-reproduced]` `[legacy-gate-pass]` `[strict-review-not-ready]`
+
+路径：
+
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260618_rebuild_v1/`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260618_rebuild_v1/`
+- `artifacts/experiments/top_journal_support_suite/top_journal_v7_mechanism_ablation_20260618_v1/`
+- `artifacts/analysis/top_journal_v7_rebuild_integrity_20260618/`
+
+旧 v7 formal 核心值和 final gate 已独立 clean retrain 复现；SHA-256、manifest references、27 个 baseline checkpoint provenance 和 comparison rebuild 均通过。旧 offset-3 与 formal 时间窗口重叠。严格 non-overlap formal/holdout 中 mixed 对 DT 的 CI 为正，但 full formal/holdout CI 跨 0，因此此 rebuild 不是新的 TMC-ready canonical。完整数值见 `top_journal_readiness_audit_20260618.md`。
+
 ## 2026-05-28 Top Journal Final Submission v7 Latency Fallback
 
-状态：`[canonical]` `[paper-grade]` `[final-submission]`
+状态：`[legacy-paper-ready]` `[reproduced]` `[strict-review-not-ready]`
 
 路径：
 - `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/final_submission_gate_report.json`
@@ -23,7 +36,7 @@
 确认结果：
 - Final gate：`target_reached=true`、`paper_claim_ready=true`、`blockers=[]`。
 - Comparison package：`review_ready=true`、`paper_ready_package_ready=true`，self-review `blocker_count=0`、`limitation_count=3`、`pass_count=15`。
-- Formal learned gate 与 offset=3 holdout learned gate 均为 `passed=true`、`paper_claim_ready=true`。
+- Formal learned gate 与 offset=3 sensitivity gate 均为 `passed=true`、legacy `paper_claim_ready=true`；offset-3 与 formal 时间窗口重叠，不是 independent holdout。
 - `formal_training_provenance.passed=true`，required agents 为 `ppo/mappo/dqn/dueling_dqn/qmix/controller_mat/dag_offload_drl/cache_offload_drl/dt_handoff_drl`，`record_count=27`。
 - Formal split：strongest learned baseline 均为 `dt_handoff_drl`；mixed margin `+11.176111`，full margin `+3.377407`。
 - Holdout offset=3：strongest learned baseline 均为 `dt_handoff_drl`；mixed margin `+8.442778`，full margin `+5.242143`。
@@ -539,7 +552,7 @@ Run root：
 
 状态：`[invalidated-baseline-duplicate-trace]`
 
-用途：在当前代码下复跑 v3 eval-bias formal gate、offset=3 independent holdout、latency fallback holdout ablation、prediction robustness、robustness 和 scalability。
+用途：在当时代码下复跑 v3 eval-bias formal gate、offset=3 ranked-window sensitivity、latency fallback ablation、prediction robustness、robustness 和 scalability。2026-06-18 interval audit 后不得再称 independent holdout。
 
 核心产物：
 

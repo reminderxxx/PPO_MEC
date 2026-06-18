@@ -794,7 +794,7 @@ class 分层PPO基类(BaseAgent):
         effective_mechanism_entropy_coef = self._effective_mechanism_entropy_coef()
         mechanism_guidance_annotations = [
             self._build_mechanism_guidance_annotation(semantic_state, row)
-            for semantic_state, row in zip(semantic_states, rollout, strict=False)
+            for semantic_state, row in zip(semantic_states, rollout)
         ]
         mechanism_transition_weights = np.asarray(
             [
@@ -932,7 +932,7 @@ class 分层PPO基类(BaseAgent):
                     logits = torch.stack(
                         [
                             self._masked_flat_logits(output["flat_logits"], mask)
-                            for output, mask in zip(batch_outputs, batch_action_masks, strict=False)
+                            for output, mask in zip(batch_outputs, batch_action_masks)
                         ],
                         dim=0,
                     )
@@ -2253,7 +2253,7 @@ class 分层PPO基类(BaseAgent):
     ) -> dict[str, float]:
         guided_states = [
             semantic_state
-            for semantic_state, annotation in zip(semantic_states, annotations, strict=False)
+            for semantic_state, annotation in zip(semantic_states, annotations)
             if bool(annotation.get("apply", False))
         ]
         if not guided_states or not self._use_hierarchy:
@@ -2286,7 +2286,7 @@ class 分层PPO基类(BaseAgent):
             return zero, zero
         loss_terms: list[torch.Tensor] = []
         entropy_terms: list[torch.Tensor] = []
-        for policy_output, annotation in zip(batch_outputs, batch_annotations, strict=False):
+        for policy_output, annotation in zip(batch_outputs, batch_annotations):
             if not bool(annotation.get("apply", False)):
                 continue
             event_logits = policy_output["event_logits"]
@@ -2974,7 +2974,7 @@ class 分层PPO基类(BaseAgent):
         if self._heuristic_imitation_coef <= 0.0:
             return torch.tensor(0.0, dtype=torch.float32, device=self._device)
         loss_terms: list[torch.Tensor] = []
-        for policy_output, row in zip(batch_outputs, batch_rows, strict=False):
+        for policy_output, row in zip(batch_outputs, batch_rows):
             if not bool(row.get("imitation_applied", False)):
                 continue
             teacher_action = int(row.get("teacher_action", 3))
@@ -3185,7 +3185,7 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
         if not self._use_hierarchy:
             return torch.tensor(0.0, dtype=torch.float32, device=self._device)
         loss_terms: list[torch.Tensor] = []
-        for semantic_state, policy_output in zip(batch_states, batch_outputs, strict=False):
+        for semantic_state, policy_output in zip(batch_states, batch_outputs):
             pseudo_targets = self._build_mechanism_targets(semantic_state)
             confidence = float(pseudo_targets["confidence_weight"])
             if confidence <= 1e-6:

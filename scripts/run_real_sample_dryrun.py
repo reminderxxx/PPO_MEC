@@ -55,7 +55,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         default="auto_dominant_tight",
         help=(
-            "RSU 布局，支持 auto / auto_dominant_tight / auto_dominant_wide / "
+            "RSU 布局，支持 auto / auto_dominant_tight / auto_dominant_wide / auto_grid_tight / "
             "tight_x / tight_y / wide_x / wide_y / custom:axis=x,count=4,coverage=10,spacing=8"
         ),
     )
@@ -239,5 +239,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
 

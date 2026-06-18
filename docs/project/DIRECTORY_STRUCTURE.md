@@ -14,6 +14,8 @@
 - `scripts/`：数据检查、dry-run、训练、评估和 benchmark 入口
 - `scripts/run_top_journal_final_submission_loop.py`：最终交稿 learned-primary 自循环入口，编排 learned baseline 重训、formal/holdout gate、cluster bootstrap statistics 和 support suites
 - `scripts/build_top_journal_comparison_report.py`：最终交稿 comparison package 生成入口，汇总 baseline protocol matrix、reward margins、mechanism paired statistics、support statistics、paper-ready LaTeX 表格和作者自审报告
+- `scripts/audit_artifact_integrity.py`：run-root SHA-256、JSON path reference、external dependency 和 parse error 审计
+- `scripts/audit_window_independence.py`：formal/holdout selected window plan 的 split 内与 split 间 frame interval 独立性审计
 - `src/`：核心实现
 - `tests/`：自动化测试
 - `artifacts/`：当前保留的训练 checkpoint、benchmark 报告和论文表格产物
@@ -54,12 +56,11 @@
 - `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v3_eval_bias_guarded_prefetch_*`：当前 v3 eval-bias formal/holdout gate refresh。
 - `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v3_eval_bias_support/`：v3 eval-bias latency fallback 消融、prediction robustness、robustness 和 scalability 支撑产物。
 - `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v4_prepare_eval_bias*`：v4 prepare override 负向筛选产物，不作为主结果。
-- `artifacts/experiments/top_journal_final_submission/`：最终交稿闭环产物；当前 canonical 为 `final_submission_v7_latency_fallback_20260528_v1`，包含 v7 SA-GHMAPPO、9 个 clean-retrained primary learned baselines、formal/offset=3 holdout gate、prediction/robustness/scalability support suites 和 `comparison_report/paper_ready/`。`final_submission_controller_mappo_qmix_20260509_v1` 是 pre-Controller-MAT / pre-DAG-cache-DT-domain-baseline historical package；`final_submission_full_current_baselines_20260511_v1` 是 v7 前的 historical canonical；旧 `final_submission_clean_retrain_repaired_baselines_20260507_v1` 是 pre-MAPPO/QMIX-controller-level package；旧 `final_submission_clean_equal_budget_20260506_v1` 已被 baseline duplicate trace audit 否决，`final_submission_repaired_baselines_20260507_v1` 已被 clean retrain run 取代
+- `artifacts/experiments/top_journal_final_submission/`：最终交稿闭环产物；`final_submission_v7_latency_fallback_20260528_v1` 是 legacy paper-ready package，`final_submission_v7_latency_fallback_20260618_rebuild_v1` 为 E3 independent rebuild。旧 offset=3 与 formal 重叠，不能作为 strict canonical holdout；最新 readiness 以 `top_journal_readiness_audit_20260618.md` 为准。
 - `artifacts/benchmarks/`：当前可引用的主结果、预测鲁棒性、消融、robustness 和可扩展性 benchmark
 - `artifacts/analysis/hf_model_cache_dataset_audit_round14/`：HF model-cache 候选适配性审计产物
-- `artifacts/paper/`：历史 paper export；当前 canonical paper-ready 表格优先使用 `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/`
+- `artifacts/paper/`：历史 paper export；legacy v7 表格只能在明确标注 overlap limitation 时使用，strict reviewer 结论以最新审计为准
 
 新产物应写入明确的 run 目录，不应散落到仓库根目录。
-
 
 

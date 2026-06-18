@@ -15,6 +15,11 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 
 
 VARIANTS: dict[str, dict[str, Any]] = {
+    "no_latency_fallback": {
+        "disable_flags": ["--no-latency_fallback_bias_enabled"],
+        "removed_module": "inference-calibrated latency fallback",
+        "paper_contribution": "removes latency-fallback action calibration while retaining the v7 training contract",
+    },
     "no_prediction": {
         "disable_flags": ["--disable_prediction"],
         "removed_module": "surrogate-assisted prediction",
@@ -59,6 +64,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--run_id", type=str, default="")
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "artifacts" / "experiments" / "top_journal_support_suite"))
     parser.add_argument("--full_seed_manifest_path", type=str, required=True)
+    parser.add_argument("--profile", type=str, default="top_journal_mechanism_v1")
     parser.add_argument("--variants", nargs="+", default=list(VARIANTS.keys()), choices=list(VARIANTS.keys()))
     parser.add_argument("--seeds", nargs="+", type=int, default=[7, 13, 29])
     parser.add_argument("--episodes", type=int, default=96)
@@ -114,7 +120,7 @@ def build_train_command(args: argparse.Namespace, variant: str, seed: int, varia
         "--agent_name",
         "sa_ghmappo",
         "--profile",
-        "top_journal_mechanism_v1",
+        args.profile,
         "--episodes",
         str(args.episodes),
         "--update_every",
@@ -178,6 +184,7 @@ def main() -> None:
         "checkpoint_by_seed": full_seed_manifest.get("sa_ghmappo", {}),
         "removed_module": "none",
         "paper_contribution": "full current-contract SA-GHMAPPO",
+        "profile": args.profile,
     }
     command_log: list[dict[str, Any]] = []
     if command_log_path.exists():
@@ -193,6 +200,7 @@ def main() -> None:
             "removed_module": VARIANTS[variant]["removed_module"],
             "paper_contribution": VARIANTS[variant]["paper_contribution"],
             "predictor_kwargs": dict(VARIANTS[variant].get("predictor_kwargs", {})),
+            "profile": args.profile,
         }
         for seed in args.seeds:
             existing_summary = find_latest_summary(variant_root, seed) if args.resume else None

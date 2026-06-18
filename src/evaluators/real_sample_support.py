@@ -338,44 +338,70 @@ def build_sample_rsus(
         y_range=y_range,
     )
     axis = str(layout_config["axis"])
-    rsu_count = int(layout_config["count"])
-    if axis == "x":
+    if axis == "grid":
+        x_count = int(layout_config["x_count"])
+        y_count = int(layout_config["y_count"])
+        x_spacing = x_range / max(x_count - 1, 1)
+        y_spacing = y_range / max(y_count - 1, 1)
+        spacing = max(x_spacing, y_spacing)
+        coverage = max(
+            ((x_spacing / 2.0) ** 2 + (y_spacing / 2.0) ** 2) ** 0.5
+            * float(layout_config["coverage_factor"]),
+            float(layout_config.get("min_coverage", 8.0)),
+        )
+        rsu_states = []
+        for x_index in range(x_count):
+            for y_index in range(y_count):
+                index = x_index * y_count + y_index
+                rsu_states.append(
+                    RSUState(
+                        rsu_id=f"rsu_{chr(ord('a') + index)}",
+                        position_x=round(x_min + x_spacing * x_index, 3),
+                        position_y=round(y_min + y_spacing * y_index, 3),
+                        coverage_radius=round(coverage, 3),
+                    )
+                )
+        rsu_count = len(rsu_states)
+    elif axis == "x":
+        rsu_count = int(layout_config["count"])
         span = max(x_range, float(layout_config.get("min_span", 60.0)))
         start_value = x_min
         fixed_value = center_y
     else:
+        rsu_count = int(layout_config["count"])
         span = max(y_range, float(layout_config.get("min_span", 60.0)))
         start_value = y_min
         fixed_value = center_x
 
-    spacing = float(layout_config["spacing"]) if layout_config.get("spacing") is not None else span / max(rsu_count - 1, 1)
-    coverage = float(layout_config["coverage"]) if layout_config.get("coverage") is not None else max(
-        spacing * float(layout_config["coverage_factor"]),
-        float(layout_config.get("min_coverage", 8.0)),
-    )
+    if axis != "grid":
+        spacing = float(layout_config["spacing"]) if layout_config.get("spacing") is not None else span / max(rsu_count - 1, 1)
+        coverage = float(layout_config["coverage"]) if layout_config.get("coverage") is not None else max(
+            spacing * float(layout_config["coverage_factor"]),
+            float(layout_config.get("min_coverage", 8.0)),
+        )
 
-    rsu_states: list[RSUState] = []
-    for index in range(rsu_count):
-        along_value = start_value + spacing * index
-        rsu_id = f"rsu_{chr(ord('a') + index)}"
-        if axis == "x":
-            rsu_states.append(
-                RSUState(
-                    rsu_id=rsu_id,
-                    position_x=round(along_value, 3),
-                    position_y=round(fixed_value, 3),
-                    coverage_radius=round(coverage, 3),
+        rsu_states = []
+        for index in range(rsu_count):
+            along_value = start_value + spacing * index
+            rsu_id = f"rsu_{chr(ord('a') + index)}"
+            if axis == "x":
+                rsu_states.append(
+                    RSUState(
+                        rsu_id=rsu_id,
+                        position_x=round(along_value, 3),
+                        position_y=round(fixed_value, 3),
+                        coverage_radius=round(coverage, 3),
+                    )
                 )
-            )
-        else:
-            rsu_states.append(
-                RSUState(
-                    rsu_id=rsu_id,
-                    position_x=round(fixed_value, 3),
-                    position_y=round(along_value, 3),
-                    coverage_radius=round(coverage, 3),
+            else:
+                rsu_states.append(
+                    RSUState(
+                        rsu_id=rsu_id,
+                        position_x=round(fixed_value, 3),
+                        position_y=round(along_value, 3),
+                        coverage_radius=round(coverage, 3),
+                    )
                 )
-            )
 
     metadata = {
         "requested_rsu_layout": rsu_layout,
@@ -536,6 +562,14 @@ def _resolve_rsu_layout(
             "spacing": None,
             "coverage": None,
         },
+        "auto_grid_tight": {
+            "layout_name": "auto_grid_tight",
+            "axis": "grid",
+            "x_count": 4,
+            "y_count": 4,
+            "coverage_factor": 1.05,
+            "min_coverage": 8.0,
+        },
         "lust_micro": {
             "layout_name": "lust_micro",
             "axis": dominant_axis,
@@ -625,7 +659,7 @@ def _resolve_rsu_layout(
         return config
 
     raise ValueError(
-        "未知 rsu_layout。支持: auto, auto_dominant_tight, auto_dominant_wide, lust_micro, "
+        "未知 rsu_layout。支持: auto, auto_dominant_tight, auto_dominant_wide, auto_grid_tight, lust_micro, "
         "tight_x, tight_y, wide_x, wide_y, custom:axis=x,count=4,coverage=10,spacing=8"
     )
 

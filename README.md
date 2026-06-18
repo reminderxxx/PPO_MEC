@@ -12,13 +12,19 @@ python scripts/check_data_ready.py
 
 若未执行 `git lfs pull`，`data/` 下只会保留 LFS 指针，真实数据链路无法运行。当前正式主线所需的 NGSIM、Alibaba 和 LuST 数据已纳入；highD 仍是未提供的后补数据源。
 
-## 2026-05-28 SA v7 final-submission canonical
+## 2026-06-18 v7 独立重建与严格审查
+
+当前主机已用 `top_journal_mechanism_v7_latency_fallback_20260618_rebuild_v1` 和 `final_submission_v7_latency_fallback_20260618_rebuild_v1` 独立 clean retrain，复现 2026-05-28 legacy formal/final gate，并完成 SHA-256、manifest、checkpoint provenance、机制消融和 LuST external mobility 检查。
+
+严格审查发现旧 `offset=3 holdout` 与 formal 滑动窗口重叠，不能称独立 holdout。改用 split 内及 split 间时间不重叠窗口后，mixed formal/holdout 对 `dt_handoff_drl` 的 paired CI 为正，但 full formal/holdout CI 跨 0。因此项目当前 reviewer verdict 为 `Not TMC-ready`；legacy `paper_claim_ready=true` 只说明旧项目 gate 可复现，不再代表顶刊 readiness。详见 `docs/project/top_journal_readiness_audit_20260618.md`。
+
+## 2026-05-28 SA v7 legacy final-submission package
 
 - Current paper-ready package: `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/`.
 - Final gate: `target_reached=true`, `paper_claim_ready=true`, `blockers=[]`; comparison package: `review_ready=true`, `paper_ready_package_ready=true`.
 - Main method profile: `top_journal_mechanism_v7_latency_fallback`, a clean-retrain profile that keeps v6 freshness/admission guards and enables latency fallback fast-timescale execution control.
 - Paper-grade learned baselines in this package: `ppo`, `mappo`, `dqn`, `dueling_dqn`, `qmix`, `controller_mat`, `dag_offload_drl`, `cache_offload_drl`, `dt_handoff_drl`.
-- SA-GHMAPPO ranks first in all formal and offset-3 holdout splits. The weakest split-level margin over the strongest learned baseline is `+3.377407`; cluster-bootstrap paired CIs are positive against all learned baselines in formal and holdout.
+- 在 legacy formal/offset-3 协议中，SA-GHMAPPO ranks first；这些数值已复现，但 offset-3 不能再标为 independent holdout。
 - `popularity_cache_heuristic` remains a close supplementary reference, not a learned-baseline gate blocker: SA margins are `+0.250000`, `+0.479629`, `+0.355556`, and `+0.376191` across formal/holdout mixed/full.
 - Reviewer-facing limitations from the generated self-review must be preserved: heuristic gap is close, mechanism realization is not uniformly a standalone CI-positive advantage, and backhaul savings are not universal.
 
@@ -30,7 +36,7 @@ python scripts/check_data_ready.py
 - SA v6 now uses a freshness-aware cache-warm guard (`cache_warm_start_guard_max_prefetch_countdown=6.0`) so predictive prefetch is not forced before the recorder validation window.
 - SA v6 also uses a confidence/alignment prefetch admission guard (`predictive_prefetch_admission_min_confidence=0.55`) so low-confidence prefetch is deferred until next-RSU and handoff-target evidence align.
 - The latest 3-seed freshness-guard closed loop (`top_journal_mechanism_v6_freshness_guard_20260527_v1`) remains a negative candidate: SA still trails `popularity_cache_heuristic` by `0.055556` mixed / `0.018519` full reward and is not paper-ready.
-- This v6 note is historical. The current verified canonical result is now `final_submission_v7_latency_fallback_20260528_v1`.
+- This v6 note is historical. The v7 legacy result has been reproduced, but the current strict reviewer verdict is `Not TMC-ready`.
 
 PPO_MEC 是面向 AI-driven VEC 的研究原型，主线围绕跨 RSU 连续 DAG workflow 执行、车载 base model 与路侧 adapter cache 协同、handoff 状态迁移、surrogate prediction 和多时间尺度控制。
 
@@ -234,4 +240,4 @@ python scripts/build_top_journal_comparison_report.py --final_run_root artifacts
 - `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/learned_suites/final_submission_v7_latency_fallback_20260528_v1_iter1_formal/learned_baseline_gate_report.json`
 - `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/learned_suites/final_submission_v7_latency_fallback_20260528_v1_iter1_holdout_offset3/learned_baseline_gate_report.json`
 
-`final_submission_v7_latency_fallback_20260528_v1` 当前为 paper-ready canonical final-submission package。`final_submission_controller_mappo_qmix_20260509_v1`、`final_submission_full_current_baselines_20260511_v1` 和更早 package 只用于历史追溯。`mappo`、`qmix` 和 `controller_mat` 是 controller-level learned baselines，不应写成 vehicle-agent / RSU-agent full MARL wrappers；`popularity_cache_heuristic` 是 close supplementary reference，不是 learned-baseline gate blocker。
+`final_submission_v7_latency_fallback_20260528_v1` 是 legacy paper-ready package，2026-06-18 rebuild 证明它可复现；但严格非重叠 holdout 审查已否决其当前 TMC-ready 状态。`final_submission_controller_mappo_qmix_20260509_v1`、`final_submission_full_current_baselines_20260511_v1` 和更早 package 只用于历史追溯。`mappo`、`qmix` 和 `controller_mat` 是 controller-level learned baselines，不应写成 vehicle-agent / RSU-agent full MARL wrappers；`popularity_cache_heuristic` 是 close supplementary reference。

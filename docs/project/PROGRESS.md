@@ -2,6 +2,19 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-06-18: v7 独立重建、严格 holdout 与外部迁移补证
+
+已完成：
+
+- 独立 clean retrain `top_journal_mechanism_v7_latency_fallback_20260618_rebuild_v1` 与 `final_submission_v7_latency_fallback_20260618_rebuild_v1`，复现旧 v7 formal 核心数值和 legacy final gate；27 个 learned-baseline checkpoint provenance 完整。
+- 新增 artifact SHA-256/引用审计及 frame interval 窗口独立性审计；missing reference 与 JSON parse error 均为 0。
+- `benchmark_main_results.py` 新增 formal plan exclusion、minimum gap 和 split 内非重叠选择。旧 `offset=3 holdout` 与 formal 重叠，已降级为 near-window sensitivity。
+- 严格非重叠结果中，mixed formal/holdout 对 DT 的 CI 为正；full formal `+2.964167 [-0.202500, 6.453132]`，full holdout `+1.263333 [-0.816132, 3.512965]`，均跨 0。
+- 补齐五项 current-contract 机制消融；新增 LuST 二维 `auto_grid_tight` 外部 mobility benchmark，并记录其 backhaul trade-off。
+- reviewer policy 升级到 `tmc_review_policy_v2_20260618`；最新 verdict 为 `Not TMC-ready (74/100 + scientific blocker)`。
+
+结论边界：legacy `paper_claim_ready=true` 只证明旧 gate 可复现；不得把 offset-3 写成 independent holdout，也不得声称所有 strict split 显著优于 strongest learned baseline。
+
 ## 2026-06-18: TMC 级 AI reviewer 规范与证据审查
 
 已完成：
@@ -902,7 +915,7 @@ quick run 结果边界：
 
 结论边界：
 
-- v3 eval-bias 已从“只过 formal windows 的候选”推进到“formal + independent holdout + 机制消融成立”的强候选，但仍是 formal_v2 权重上的 inference calibration，不是 clean retrain。
+- 当时 v3 eval-bias 被记录为“formal + offset holdout + 机制消融成立”的强候选；2026-06-18 interval audit 已证明 offset 不能作为 independent holdout，该历史判断降级为 ranked-window sensitivity。
 - prediction robustness 汇总中 SA `89.927917` 低于 popularity `90.94375`，主要由 `oracle_prediction` setting 拖累；该项不能写成全面优于 oracle/heuristic upper-bound。
 - v4 prepare hard-override 筛选失败：prediction robustness 中 SA `89.45625` 仍低于 popularity `90.94375`，oracle setting SA `85.163333` vs popularity `93.188333`，不推广。
 

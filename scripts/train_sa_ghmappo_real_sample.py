@@ -410,6 +410,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--disable_adapter_prefetch", action="store_true")
     parser.add_argument("--disable_dag_dependency_aware", action="store_true")
     parser.add_argument("--disable_uncertainty_signal", action="store_true")
+    parser.add_argument("--latency_fallback_bias_enabled", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--prediction_noise_std", type=float, default=0.0)
     parser.add_argument("--prediction_confidence_scale", type=float, default=1.0)
     parser.add_argument("--prediction_delay_steps", type=int, default=0)

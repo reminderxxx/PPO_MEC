@@ -31,16 +31,21 @@
 - `top_journal_mechanism_v3_eval_bias` 的 prediction robustness 不满足“全面优于 heuristic upper-bound”：四类 prediction setting 汇总 SA `89.927917` 低于 popularity `90.94375`，主要由 `oracle_prediction` setting 拖累；不能写成 oracle 条件也全面领先。
 - `top_journal_mechanism_v4_prepare_eval_bias` 是负向筛选结果；predictive prepare hard override 没有修复 oracle setting，反而使 prediction robustness 总 reward 低于 v3，不应推广或写入主结果。
 - 当前 pre-Controller-MAT canonical `final_submission_controller_mappo_qmix_20260509_v1/comparison_report/paper_ready/paper_ready_report.md` 的自审没有 blocker，但有 4 个必须随论文主张保留的限制：`popularity_cache_heuristic` 与 SA-GHMAPPO reward 很接近；`no_prediction` / `oracle_prediction` 不支持全面预测条件优势；`mechanism_realization_rate` 不是每个 split 上的独立正向优势；holdout backhaul 对 PPO 不具备正 CI。新增 `controller_mat` 后需要重跑 final-submission loop 才能升级 canonical。
-- `final_submission_clean_retrain_repaired_baselines_20260507_v1` 是 pre-MAPPO/QMIX-controller-level package，已被 `final_submission_controller_mappo_qmix_20260509_v1` 取代为当前 canonical final package。
+- `final_submission_clean_retrain_repaired_baselines_20260507_v1` 是 pre-MAPPO/QMIX-controller-level historical package；所有 legacy canonical 标签均受 2026-06-18 strict window audit 结论约束。
 
 ## 当前风险
 
-- 当前主机缺少 `top_journal_mechanism_v7_latency_fallback_20260528_v1` 与 `final_submission_v7_latency_fallback_20260528_v1` 两个 canonical 证据根目录，Git 历史也不包含这些 artifacts。按 `top_journal_review_policy.md`，当前只能做 `E1_DOCUMENTED` desk review，TMC readiness 必须标为 `Unverifiable`；恢复完整 run root、SHA-256、checkpoint/manifest/command log/formal/holdout/support 后才能硬审。
+- 2026-06-18 rebuild 已达到 `E3_REPRODUCED`，但旧 `window_rank_offset=3` formal/holdout 时间区间重叠；历史 offset holdout 只能作为 near-window sensitivity，不能作为 independent holdout。
+- 严格非重叠协议下，SA 对 `dt_handoff_drl` 的 formal-full 与 holdout-full total-reward 95% CI 均跨 0；这是当前 TMC-ready scientific blocker，不得用 legacy gate 的正 CI 覆盖。
+- mixed/full 会复用部分窗口，必须按 mode 分开报告，不能把 mode 当独立 cluster 合并扩大样本量。
+- `no_prediction` 与 `no_adapter_prefetch` 消融高度耦合，不能解释为正交因果贡献或将 delta 相加。
+- LuST grid 外部迁移的 reward 对 learned baselines 为正，但 backhaul 高于 popularity heuristic；不得声称全面改善系统指标。
+- paired comparisons 尚未做 family-wise/FDR 校正，论文必须说明 multiplicity 策略。
 - 若继续删除 artifacts，需要先确认对应路径没有被 `ARTIFACT_RECORDS.md` 的保留记录引用。
 - 若重新生成主表，必须同步更新 `paper_main_table.json`、`paper_claim_summary.json` 和本目录下的整理记录。
 - 若更换 checkpoint，必须同步检查 benchmark 消费端、manifest 和训练审计字段。
 - 当前 reward 中 `mechanism_exploration_bonus` 会奖励预测 handoff 信号下的 prepare/prefetch 选择，未区分 prepare 是否最终成功；分析 heuristic reference 时需要同时报告 `migration_success_count`、`migration_failed_count`、handoff ready 和 continuity，避免把失败 prepare 尝试误读成真实系统收益。
-- 使用 `--window_rank_offset` 生成 holdout 时，应报告 offset 和实际 selected windows；`full_stratified` 在 offset=3 下 active-non-mechanism 可用窗口少于 3 个，不能把 holdout episode count 写成 formal full 的同等规模。
+- `--window_rank_offset` 只能用于 ranked-window sensitivity；独立 holdout 必须同时使用 interval exclusion、非重叠选择和 `scripts/audit_window_independence.py` 校验。
 - 根目录下少数 `pytest-cache-files-*` 临时目录在本次清洗中被系统权限锁定，内容无法枚举；它们不属于项目 live 逻辑，但仍需在句柄释放后删除。
 - 若后续启用 MADDPG 或 full vehicle/RSU-level QMIX，需要先冻结 multi-agent observation/action schema，再接入训练和 benchmark；当前 `qmix` 仅是 controller-level value-decomposition baseline。
 
@@ -49,4 +54,3 @@
 - 通用模板目录不再作为 live 文档入口。
 - 旧阶段文档不再作为事实来源。
 - toy / tmp / quickcheck / 单次 dry-run 产物不再参与当前结论。
-

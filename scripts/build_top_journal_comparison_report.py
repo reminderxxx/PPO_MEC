@@ -1213,7 +1213,7 @@ def build_claim_checks(
         ]
         missing_agents = [
             agent_name
-            for agent_name, stat in zip(learned_agents, reward_stats, strict=False)
+            for agent_name, stat in zip(learned_agents, reward_stats)
             if not stat
         ]
         weak_stats = [
