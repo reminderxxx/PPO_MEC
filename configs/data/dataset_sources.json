@@ -1,0 +1,115 @@
+{
+  "schema_version": "dataset_sources_v1",
+  "updated_at": "2026-04-27",
+  "purpose": "Dataset/source declaration for PPO_MEC reports and data readiness checks.",
+  "datasets": [
+    {
+      "dataset_key": "ngsim_vehicle_trajectories",
+      "dataset_name": "Next Generation Simulation (NGSIM) Vehicle Trajectories and Supporting Data",
+      "provider": "Federal Highway Administration / U.S. Department of Transportation",
+      "source_role": "active_mobility_trace",
+      "local_path": "data/raw/mobility/ngsim",
+      "download_page_url": "https://catalog.data.gov/dataset/next-generation-simulation-ngsim-vehicle-trajectories-and-supporting-data",
+      "current_status": "active_mainline",
+      "notes": "Formal mobility source for the current NGSIM + Alibaba mainline."
+    },
+    {
+      "dataset_key": "alibaba_cluster_trace_v2018",
+      "dataset_name": "Alibaba Cluster Trace Program - cluster-trace-v2018",
+      "provider": "Alibaba Group",
+      "source_role": "active_workflow_dag_trace",
+      "local_path": "data/raw/workflow/alibaba2018/batch_task.csv",
+      "download_page_url": "https://github.com/alibaba/clusterdata/tree/master/cluster-trace-v2018",
+      "current_status": "active_mainline",
+      "notes": "Formal workflow DAG source; the project currently consumes batch_task.csv."
+    },
+    {
+      "dataset_key": "lust_scenario",
+      "dataset_name": "Luxembourg SUMO Traffic (LuST) Scenario",
+      "provider": "University of Luxembourg / VehicularLab",
+      "source_role": "retained_mobility_provider",
+      "local_path": "data/raw/mobility/LuSTScenario",
+      "download_page_url": "https://github.com/lcodeca/LuSTScenario",
+      "current_status": "retained_not_mainline",
+      "notes": "Provider and converted trace support are retained, but LuST is not a current paper mainline blocker."
+    },
+    {
+      "dataset_key": "highd_vehicle_trajectories",
+      "dataset_name": "The highD Dataset: A Drone Dataset of Naturalistic Vehicle Trajectories on German Highways",
+      "provider": "RWTH Aachen University / fka",
+      "source_role": "retained_mobility_provider_skeleton",
+      "local_path": "data/raw/mobility/highD",
+      "download_page_url": "https://levelxdata.com/highd-dataset/",
+      "current_status": "retained_not_mainline",
+      "notes": "Provider skeleton is retained as a later supplemental mobility source."
+    },
+    {
+      "dataset_key": "hf_qwen_model_cache",
+      "dataset_name": "ClemSummer/qwen-model-cache",
+      "provider": "Hugging Face Datasets",
+      "source_role": "external_real_model_cache_reference",
+      "local_path": "data/raw/model_cache/huggingface_model_cache_sources.json",
+      "download_page_url": "https://huggingface.co/datasets/ClemSummer/qwen-model-cache",
+      "current_status": "audited_file_metadata_declared_only",
+      "notes": "Audited as Qwen model/tokenizer files. Safe for future cache-object size profiling only; no automatic download and no default benchmark behavior change."
+    },
+    {
+      "dataset_key": "hf_cbow_model_cache",
+      "dataset_name": "ClemSummer/cbow-model-cache",
+      "provider": "Hugging Face Datasets",
+      "source_role": "external_real_model_cache_reference",
+      "local_path": "data/raw/model_cache/huggingface_model_cache_sources.json",
+      "download_page_url": "https://huggingface.co/datasets/ClemSummer/cbow-model-cache",
+      "current_status": "audited_file_metadata_declared_only",
+      "notes": "Audited as CBOW embedding cache files. Safe for future cache-object size profiling only; not a VEC cache request trace."
+    },
+    {
+      "dataset_key": "hf_imagenet_llamagen_cache",
+      "dataset_name": "Efficient-Large-Model/imagenet-llamagen-cache",
+      "provider": "Hugging Face Datasets",
+      "source_role": "external_real_cache_like_volume_reference",
+      "local_path": "data/raw/model_cache/huggingface_model_cache_sources.json",
+      "download_page_url": "https://huggingface.co/datasets/Efficient-Large-Model/imagenet-llamagen-cache",
+      "current_status": "audited_large_webdataset_not_vec_cache_trace",
+      "notes": "Audited as a large WebDataset cache-like source with Dataset Viewer rows. It is not a model/adapter cache event trace."
+    },
+    {
+      "dataset_key": "hf_bert_model_cache",
+      "dataset_name": "Kuperberg/bert-model-cache",
+      "provider": "Hugging Face Datasets",
+      "source_role": "external_real_chunked_model_cache_reference",
+      "local_path": "data/raw/model_cache/huggingface_model_cache_sources.json",
+      "download_page_url": "https://huggingface.co/datasets/Kuperberg/bert-model-cache",
+      "current_status": "audited_file_metadata_declared_only",
+      "notes": "Audited as chunked BERT model files. Candidate for chunk-level cache-object size profiling after explicit importer/projection."
+    },
+    {
+      "dataset_key": "hf_examsathi_model_cache",
+      "dataset_name": "amansapkota/examsathi-model-cache",
+      "provider": "Hugging Face Datasets",
+      "source_role": "external_model_cache_candidate_rejected",
+      "local_path": "data/raw/model_cache/huggingface_model_cache_sources.json",
+      "download_page_url": "https://huggingface.co/datasets/amansapkota/examsathi-model-cache",
+      "current_status": "audited_not_benchmark_ready",
+      "notes": "Audited repo exposes no usable cache/model files beyond .gitattributes at audit time; retained only for traceability."
+    }
+  ],
+  "controlled_profiles": [
+    {
+      "profile_key": "sample_model_catalog",
+      "profile_name": "PPO_MEC sample_model_catalog AI-service adapter profile",
+      "local_path": "src/data/model_catalog/sample_model_catalog.json",
+      "status": "repo_local_controlled_profile",
+      "not_a_real_dataset": true,
+      "notes": "Defines local base model, adapter cache, state bundle, and cache object semantics used by the environment."
+    },
+    {
+      "profile_key": "multi_adapter_hard_joint_proposal",
+      "profile_name": "multi_adapter_hard_joint_proposal",
+      "local_path": "configs/benchmark/multi_adapter_hard_joint_proposal.yaml",
+      "status": "proposal_only_controlled_stress_profile",
+      "not_a_real_dataset": true,
+      "notes": "Controlled AI-service/cache-capacity stress profile over real NGSIM mobility and Alibaba DAG structure; not a new real dataset."
+    }
+  ]
+}

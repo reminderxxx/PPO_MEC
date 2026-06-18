@@ -9,7 +9,7 @@
 - `configs/algo/`：方向匹配对照算法配置
 - `configs/experiment/baseline/`：baseline 训练、评估和 benchmark 闭环配置
 - `configs/experiment/top_journal_mechanism_v1.yaml`：顶刊路线机制训练 profile 与 benchmark 计划
-- `data/`：原始数据与处理后数据
+- `data/`：原始数据与处理后数据；通过 Git LFS 版本化，完整克隆后需执行 `git lfs pull`
 - `docs/`：长期维护文档，`docs/project/` 为事实来源，`docs/project/DATASET_SOURCES.md` 记录数据源声明，`docs/project/literature_reference_table.md` 记录顶刊/顶会 related-work 参考表，`docs/benchmark_plan_or_baseline_plan.md`、`docs/baseline_formalization_round1.md`、`docs/experiment_status_round1.md`、`docs/mechanism_activation_check_round1.md` 和 `docs/experiment_runbook_round1.md` 记录 baseline 计划、round1 状态、机制诊断与复跑命令
 - `scripts/`：数据检查、dry-run、训练、评估和 benchmark 入口
 - `scripts/run_top_journal_final_submission_loop.py`：最终交稿 learned-primary 自循环入口，编排 learned baseline 重训、formal/holdout gate、cluster bootstrap statistics 和 support suites

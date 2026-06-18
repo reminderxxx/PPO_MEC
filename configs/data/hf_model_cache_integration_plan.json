@@ -1,0 +1,112 @@
+{
+  "schema_version": "hf_model_cache_integration_plan_v1",
+  "updated_at": "2026-04-27",
+  "decision": "Do not feed Hugging Face model-cache datasets into formal benchmarks until an explicit importer projects audited file metadata into PPO_MEC cache_objects.",
+  "current_safe_scope": [
+    "dataset/source declaration",
+    "Hub file metadata audit",
+    "real model/cache-object size reference",
+    "separate future cache-size stress profile"
+  ],
+  "not_supported_by_current_hf_candidates": [
+    "real cache hit/miss sequence",
+    "RSU locality trace",
+    "vehicle handoff demand trace",
+    "adapter state migration trace",
+    "workflow-to-adapter request labels"
+  ],
+  "contract_mapping": [
+    {
+      "hf_metadata": "dataset_id",
+      "ppo_mec_target": "ModelCacheDatasetProfile.dataset_id",
+      "status": "implemented"
+    },
+    {
+      "hf_metadata": "download_page_url",
+      "ppo_mec_target": "ModelCacheDatasetProfile.download_page_url",
+      "status": "implemented"
+    },
+    {
+      "hf_metadata": "Hub sibling file size",
+      "ppo_mec_target": "CacheObject.size_mb",
+      "status": "planned_explicit_importer_required",
+      "guardrail": "Do not infer adapter_id automatically; require a documented mapping table."
+    },
+    {
+      "hf_metadata": "Hub sibling file path",
+      "ppo_mec_target": "CacheObject.object_id and CacheObject.source",
+      "status": "planned_explicit_importer_required",
+      "guardrail": "Keep source as hf_dataset:<dataset_id>:<path>."
+    }
+  ],
+  "integration_stages": [
+    {
+      "stage": "audit",
+      "status": "completed_for_candidate_set",
+      "outputs": [
+        "data/raw/model_cache/huggingface_model_cache_sources.json",
+        "artifacts/analysis/hf_model_cache_dataset_audit_round14"
+      ]
+    },
+    {
+      "stage": "metadata_manifest",
+      "status": "implemented",
+      "outputs": [
+        "configs/data/dataset_sources.json",
+        "src/data/model_catalog/sample_model_catalog.json"
+      ]
+    },
+    {
+      "stage": "file_size_importer",
+      "status": "planned",
+      "required_checks": [
+        "license is declared or manually approved",
+        "dataset exposes usable model/cache files",
+        "file sizes and checksums are present",
+        "adapter_id mapping is explicit",
+        "benchmark output labels distinguish HF file-size profile from real cache-event traces"
+      ]
+    },
+    {
+      "stage": "benchmark_consumption",
+      "status": "blocked_until_file_size_importer",
+      "required_cli_surface": [
+        "--adapter_catalog_path or equivalent catalog override",
+        "--model_cache_profile hf_file_size_profile",
+        "separate output_root under artifacts/benchmarks/hf_model_cache_*"
+      ]
+    }
+  ],
+  "candidate_policy": [
+    {
+      "dataset_id": "ClemSummer/qwen-model-cache",
+      "current_decision": "metadata_and_file_size_reference",
+      "benchmark_readiness": "not_ready",
+      "reason": "Model/tokenizer files are real, but no VEC cache demand trace is present."
+    },
+    {
+      "dataset_id": "ClemSummer/cbow-model-cache",
+      "current_decision": "metadata_and_file_size_reference",
+      "benchmark_readiness": "not_ready",
+      "reason": "Embedding files are real, but no VEC cache demand trace is present."
+    },
+    {
+      "dataset_id": "Efficient-Large-Model/imagenet-llamagen-cache",
+      "current_decision": "large_cache_like_volume_reference",
+      "benchmark_readiness": "limited_not_vec_semantic",
+      "reason": "Large WebDataset cache rows are available, but they represent image-generation cache content rather than model/adapter cache events."
+    },
+    {
+      "dataset_id": "Kuperberg/bert-model-cache",
+      "current_decision": "metadata_and_chunked_file_size_reference",
+      "benchmark_readiness": "not_ready",
+      "reason": "Chunked model files are real and useful for object-size stress tests, but request/locality semantics are absent."
+    },
+    {
+      "dataset_id": "amansapkota/examsathi-model-cache",
+      "current_decision": "audit_record_only",
+      "benchmark_readiness": "not_suitable",
+      "reason": "No usable model/cache data files were visible in the audited repo metadata."
+    }
+  ]
+}

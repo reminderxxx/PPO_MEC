@@ -1,6 +1,5 @@
 # Runtime data and experiment outputs
-data/
-artifacts/
+/artifacts/
 
 # Python caches and test output
 __pycache__/

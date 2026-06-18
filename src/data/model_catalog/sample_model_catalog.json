@@ -1,0 +1,108 @@
+﻿{
+  "vehicle_base_models": [
+    {
+      "base_model_id": "veh_base_v1",
+      "family": "车载轻量感知基座",
+      "memory_mb": 768.0
+    }
+  ],
+  "rsu_adapter_caches": [
+    {
+      "rsu_id": "rsu_a",
+      "cached_adapter_ids": [
+        "adapter_perception"
+      ]
+    },
+    {
+      "rsu_id": "rsu_b",
+      "cached_adapter_ids": [
+        "adapter_tracking",
+        "adapter_fusion"
+      ]
+    },
+    {
+      "rsu_id": "rsu_c",
+      "cached_adapter_ids": [
+        "adapter_intent",
+        "adapter_control"
+      ]
+    }
+  ],
+  "adapter_state_bundles": [
+    {
+      "bundle_id": "bundle_tracking_hot",
+      "adapter_id": "adapter_tracking",
+      "state_version": "v1",
+      "continuity_token": "token_tracking_hot",
+      "serialized_state_ref": "cache://bundle_tracking_hot"
+    },
+    {
+      "bundle_id": "bundle_control_warm",
+      "adapter_id": "adapter_control",
+      "state_version": "v1",
+      "continuity_token": "token_control_warm",
+      "serialized_state_ref": "cache://bundle_control_warm"
+    }
+  ],
+  "cache_objects": [
+    {
+      "object_id": "cache_obj_tracking",
+      "adapter_id": "adapter_tracking",
+      "size_mb": 128.0,
+      "source": "rsu_cache"
+    },
+    {
+      "object_id": "cache_obj_control",
+      "adapter_id": "adapter_control",
+      "size_mb": 96.0,
+      "source": "adapter_state_bundle"
+    }
+  ],
+  "model_cache_datasets": [
+    {
+      "dataset_id": "ClemSummer/qwen-model-cache",
+      "dataset_name": "qwen-model-cache",
+      "provider": "Hugging Face Datasets",
+      "download_page_url": "https://huggingface.co/datasets/ClemSummer/qwen-model-cache",
+      "local_status": "audited_file_metadata_declared_only",
+      "usage_scope": "real_model_file_size_reference_only",
+      "notes": "真实 HF model-cache dataset 页面与文件 metadata 已接入；当前不自动下载模型文件，不改变正式 benchmark 默认 cache 行为。"
+    },
+    {
+      "dataset_id": "ClemSummer/cbow-model-cache",
+      "dataset_name": "cbow-model-cache",
+      "provider": "Hugging Face Datasets",
+      "download_page_url": "https://huggingface.co/datasets/ClemSummer/cbow-model-cache",
+      "local_status": "audited_file_metadata_declared_only",
+      "usage_scope": "real_embedding_file_size_reference_only",
+      "notes": "可作为未来 cache-object size profile 的真实文件大小参考；不是 VEC cache request trace。"
+    },
+    {
+      "dataset_id": "Efficient-Large-Model/imagenet-llamagen-cache",
+      "dataset_name": "imagenet-llamagen-cache",
+      "provider": "Hugging Face Datasets",
+      "download_page_url": "https://huggingface.co/datasets/Efficient-Large-Model/imagenet-llamagen-cache",
+      "local_status": "audited_large_webdataset_not_vec_cache_trace",
+      "usage_scope": "large_cache_like_volume_reference_only",
+      "notes": "有 Dataset Viewer 和大规模 WebDataset 行，但语义是图像生成 cache，不是 model/adapter cache demand。"
+    },
+    {
+      "dataset_id": "Kuperberg/bert-model-cache",
+      "dataset_name": "bert-model-cache",
+      "provider": "Hugging Face Datasets",
+      "download_page_url": "https://huggingface.co/datasets/Kuperberg/bert-model-cache",
+      "local_status": "audited_file_metadata_declared_only",
+      "usage_scope": "chunked_model_file_size_reference_only",
+      "notes": "可作为未来分块模型 cache-object size profile 的真实文件大小参考；需要显式 importer 和 adapter 映射。"
+    },
+    {
+      "dataset_id": "amansapkota/examsathi-model-cache",
+      "dataset_name": "examsathi-model-cache",
+      "provider": "Hugging Face Datasets",
+      "download_page_url": "https://huggingface.co/datasets/amansapkota/examsathi-model-cache",
+      "local_status": "audited_not_benchmark_ready",
+      "usage_scope": "audit_record_only",
+      "notes": "审计时没有可用模型/cache 文件，保留为候选排除记录，不进入 benchmark profile。"
+    }
+  ]
+}
