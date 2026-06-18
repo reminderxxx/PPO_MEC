@@ -1,0 +1,8 @@
+# Direct runtime dependencies used by src/ and scripts/.
+# Validated with Python 3.9.6 on macOS arm64.
+numpy==2.0.2
+pandas==2.3.3
+torch==2.8.0
+
+# Test dependency used by the documented validation commands.
+pytest==8.4.2
