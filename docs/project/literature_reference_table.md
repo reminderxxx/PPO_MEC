@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-05-29
+更新日期：2026-06-18
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -25,6 +25,25 @@
 6. 更新日期：新增或大幅修订本表后，同步更新文件顶部 `更新日期`。
 7. 范围控制：无关论文不加入；边缘相关但可能影响审稿回应的论文可以加入，并在 `论文写作位置` 中标注为 `Discussion / reviewer response`。
 
+## 2026-06-18 文献质量审计摘要
+
+- `literature_cutoff`: `2026-06-18`
+- `primary_target`: `IEEE TMC`
+- 检索主题：VEC/MEC DAG workflow offloading、service/model/adapter caching、handoff/migration、mobility prediction、multi-timescale control、MARL baseline、edge AI/LoRA/KV-cache serving。
+- 核验来源优先级：IEEE Xplore / ACM DL / 期刊或出版社 DOI 页面；DBLP、arXiv 和聚合页面不能单独确认正式 venue。
+
+质量等级只表示 venue 证据和与本项目主 claim 的关系，不代表对单篇论文方法质量的最终评分：
+
+| 等级 | 本表使用口径 | 本轮审计结论 |
+|---|---|---|
+| `A-Core` | TMC 或直接支撑主 claim 的同级 Transactions 最近邻 | dual dependency-aware caching/offloading、trajectory-prediction migration、mixed-timescale VEC、dynamic vehicular AI task 等是必须正面对比的核心文献 |
+| `A-Adjacent` | TITS、ToN、TSC、TNSM 等高水平近邻 | DAG online offloading、service fetching、DT caching/offloading、workflow scheduling 可支撑问题定位和 baseline rationale |
+| `B-Supporting` | TVT、其他可靠期刊或非核心机制工作 | 用于补足 proactive reservation、domain baseline、迁移实现和场景背景，不单独支撑 TMC novelty |
+| `C-Context` | 预印本、辅助期刊、Discussion/reviewer-response 材料 | LoRA/KV-cache serving 和部分 2026 辅助工作只能做系统类比或未来工作 |
+| `Unverified` | venue、DOI、卷期或正式录用状态尚未由一手页面确认 | `Digital Twin-Enabled Mobility-Aware Cooperative Caching`、`H2O` DOI、`POLAR`、`LRAgent` 继续保留待核验标签 |
+
+本轮新增两篇近邻工作：TNSM 2025 的 mobility-aware online DAG offloading，以及 IET ITS 2025 的 DAG offloading + cross-edge migration + multi-agent control。它们进一步收紧 novelty 边界：不能只把“DAG、mobility、migration、MARL”并列当作创新，必须证明 adapter warm-state 与连续 workflow/handoff 联合 contract 带来的新增问题和机制证据。
+
 ## VEC/MEC Offloading, Caching, Migration
 
 | 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
@@ -43,7 +62,9 @@
 | cache-assisted VEC offloading | [Caching-Assisted Collaborative Task Offloading for Vehicular Edge Computing: A Deep Reinforcement Learning-Based Approach](https://doi.org/10.1109/TMC.2025.3650617) | IEEE TMC, 2026 early access | caching-assisted collaborative offloading；MINLP 分解为 task offloading/service caching、resource allocation、service component assignment；PPO 解决核心 offloading/caching 子问题。 | PPO_MEC 的 cache 对象是 AI adapter/base-model 相关状态，并显式建模 warm hit、backhaul、prefetch 和 handoff continuity；workflow 是连续 DAG，而不是单次服务组件协作。 | Related Work 中作为最接近的 service caching + PPO 类工作；Method 中说明 adapter cache 语义更细。 |
 | dynamic heterogeneous VEC | [Game in Motion: Heterogeneous Task Offloading in Dynamic Vehicular Edge Computing](https://doi.org/10.1109/TON.2025.3645865) | IEEE/ACM ToN, 2026 | 动态 VEC 中 vehicle-RSU 交互、异构 QoE、两阶段优化和 game/TD3 类方法；强调 mobility 和 RSU 动态资源带来的耦合。 | PPO_MEC 不以价格/收益博弈为核心，而是优化跨 RSU workflow execution continuity、DAG 依赖和 adapter cache 状态；当前动作 contract 是 `semantic_discrete_5`，不伪造 TD3/SAC 连续动作 baseline。 | Related Work 中对比 dynamic VEC offloading；Baseline rationale 中解释为什么不用 TD3 作为当前主对照。 |
 | dependency-aware service caching | [Dual Dependency-Awared Collaborative Service Caching and Task Offloading in Vehicular Edge Computing](https://doi.org/10.1109/TMC.2025.3573379) | IEEE TMC, 2025 | 同时考虑 task dependency 和 service dependency；GGRN 感知关键服务需求；hierarchical active-passive caching；PPO 驱动 collaborative optimization。 | 这是最接近 DAG + service cache 的论文。PPO_MEC 的差异在于：工作流跨 RSU 连续执行，主 vehicle 绑定 handoff pressure；cache 行为对应 adapter/predictive prefetch；同时加入 handoff preparation、state migration 和真实 NGSIM + Alibaba 主线。 | Related Work 的核心对比项；Problem Formulation 中说明 dual dependency 与 continuous handoff workflow 的差异。 |
+| mobility-aware online DAG offloading | [Online Offloading and Mobility Awareness of DAG Tasks for Vehicle Edge Computing](https://ieeexplore.ieee.org/document/10700794) | IEEE TNSM, 2025, 22(1):675-690 | 面向 vehicle edge computing 的 DAG task 在线 offloading，并把 mobility awareness 纳入实时决策；是“DAG + vehicle mobility + online offloading”的直接近邻。 | PPO_MEC 不能把 DAG 与 mobility 的简单组合写成 novelty；新增边界必须落在跨 RSU 连续 workflow state、adapter warm cache、handoff prepare/migration 和多控制器联合 contract。 | Related Work 核心近邻；Problem Formulation 中逐项对比状态连续性、cache 对象与 handoff action。 |
 | trajectory prediction + migration | [Multi-Agent Deep Reinforcement Learning With Trajectory Prediction for Task Migration-Assisted Computation Offloading](https://doi.org/10.1109/TMC.2025.3539945) | IEEE TMC, 2025 | 车辆轨迹预测指导 migration direction；MARL 生成 offloading 和 migration 决策；解决 mobility 引发的 edge-server load imbalance。 | PPO_MEC 将 migration 与 DAG task state、adapter cache warm state、handoff prepare/prefetch 联动；不是只迁移负载或任务，而是维护跨 RSU workflow continuity 和 AI-service 状态。 | Related Work 中支撑 handoff/migration 必要性；Method 中解释 handoff-event controller。 |
+| DAG offloading + cross-edge migration MARL | [Multi-Agent Based Online Cooperative Computation Offloading and Migration Strategy for Vehicular Edge Computing](https://doi.org/10.1049/itr2.70083) | IET Intelligent Transport Systems, 2025 | 面向多车辆、多 edge server 的 DAG task offloading 与未完成任务迁移，使用多智能体 cooperative control，并以容器/状态同步维持连续执行。 | 该工作已覆盖 DAG、online offloading、migration 和 multi-agent 的交集；PPO_MEC 的差异必须由 adapter/base-model cache 语义、RSU predictive prepare、三控制器 contract 与 NGSIM + Alibaba 机制兑现证据支撑。 | Discussion / reviewer response；作为高近邻但非 TMC 核心 venue 的 `B-Supporting` 工作。 |
 | vehicle-assisted service caching | [Vehicle-Assisted Service Caching for Task Offloading in Vehicular Edge Computing](https://doi.org/10.1109/TMC.2025.3545444) | IEEE TMC, 2025 | 利用车辆存储资源辅助 VEC service content caching；缓解 RSU 存储受限；强调 AI-enabled service content 部署压力。 | PPO_MEC 更关注路侧 adapter cache 与车载 base model 的协同，不把车辆只当作服务内容仓库；同时把 cache admission/eviction、backhaul 和 handoff readiness 纳入 RL 控制。 | Motivation 中说明 RSU 存储受限和车路协同缓存背景。 |
 | AI/DNN task in vehicular networks | [DNN Partitioning, Task Offloading, and Resource Allocation in Dynamic Vehicular Networks](https://doi.org/10.1109/TMC.2024.3486728) | IEEE TMC, 2025 | DNN-based vehicular tasks；DNN partitioning + offloading + resource allocation；Lyapunov-guided diffusion-based RL。 | PPO_MEC 不做 DNN layer partition，而是面向 AI-driven DAG workflow 和 adapter cache lifecycle；优化目标覆盖 continuity、handoff failure、backhaul、cache warm hit 和 workflow reward。 | Introduction 中支撑 AI-driven VEC 的应用背景；Related Work 中区分 DNN partitioning 与 adapter-cache workflow control。 |
 | model-data fusion MARL | [Task Offloading Based on the Fusion of Model- and Data-Driven Intelligence for Vehicular Edge Computing Networks](https://doi.org/10.1109/TITS.2025.3546304) | IEEE TITS, 2025 | model-driven queue/transmission/computation/energy/cost 建模与 data-driven MARL 结合；城市 VEC task offloading。 | PPO_MEC 的 surrogate-assisted 机制也是模型/学习融合，但进一步加入 DAG graph encoder、surrogate prediction、uncertainty/dependency-aware features 和 handoff/cache 多控制器；注意当前 `no_uncertainty_signal` 不能单独声明显著 reward 来源。 | Related Work 中作为 model-driven + data-driven VEC MARL 参考；Ablation discussion 中谨慎表述 surrogate/uncertainty。 |

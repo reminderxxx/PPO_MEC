@@ -35,6 +35,7 @@
 
 ## 当前风险
 
+- 当前主机缺少 `top_journal_mechanism_v7_latency_fallback_20260528_v1` 与 `final_submission_v7_latency_fallback_20260528_v1` 两个 canonical 证据根目录，Git 历史也不包含这些 artifacts。按 `top_journal_review_policy.md`，当前只能做 `E1_DOCUMENTED` desk review，TMC readiness 必须标为 `Unverifiable`；恢复完整 run root、SHA-256、checkpoint/manifest/command log/formal/holdout/support 后才能硬审。
 - 若继续删除 artifacts，需要先确认对应路径没有被 `ARTIFACT_RECORDS.md` 的保留记录引用。
 - 若重新生成主表，必须同步更新 `paper_main_table.json`、`paper_claim_summary.json` 和本目录下的整理记录。
 - 若更换 checkpoint，必须同步检查 benchmark 消费端、manifest 和训练审计字段。
@@ -48,5 +49,4 @@
 - 通用模板目录不再作为 live 文档入口。
 - 旧阶段文档不再作为事实来源。
 - toy / tmp / quickcheck / 单次 dry-run 产物不再参与当前结论。
-
 

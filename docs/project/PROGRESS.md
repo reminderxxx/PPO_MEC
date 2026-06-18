@@ -2,6 +2,21 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-06-18: TMC 级 AI reviewer 规范与证据审查
+
+已完成：
+
+- 新增 `docs/project/top_journal_review_policy.md`，以 IEEE TMC 为主审口径，区分外部官方定性要求与 PPO_MEC 内部 operational rubric；建立 `E0-E3` 证据等级、硬 blocker、100 分评分和固定审查模板。
+- 根目录 `AGENTS.md` 增加顶刊审查强制入口：先核验 artifact，再审 protocol/statistics/baseline/mechanism/claim；缺少关键证据必须标 `Unverifiable`。
+- `docs/project/literature_reference_table.md` 增加文献质量等级和 2026-06-18 检索摘要，并补充 TNSM 2025 mobility-aware DAG offloading 与 IET ITS 2025 DAG offloading/migration MARL 两篇近邻工作。
+- 新增 `docs/project/top_journal_readiness_audit_20260618.md`。本机缺少 canonical v7 closed-loop 与 final-submission 两个 run root，且 Git 历史无对应 artifact，因此证据等级为 `E1_DOCUMENTED`，正式 verdict 为 `Unverifiable`，不对 TMC readiness 打伪精确分数。
+
+审查边界：
+
+- 现有文档记录的 v7 `paper_claim_ready=true` 继续作为历史项目记录，但不能替代本机 checkpoint/provenance/原始统计硬审。
+- 条件性 desk review 识别出 close heuristic margin、latency fallback 与核心机制归因错位、机制逐 split 独立贡献、单一 NGSIM + Alibaba 组合、统计层级和 controller-level 命名等 major concerns。
+- 只有恢复完整 artifacts、SHA-256 清单、manifest 外部引用并在临时目录重建 comparison report 后，才能升级为 `E2/E3` 并判定是否达到 `TMC-ready candidate`。
+
 ## 2026-05-28: v7 final-submission paper-ready package
 
 已完成：

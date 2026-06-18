@@ -1,6 +1,6 @@
 ﻿# Context
 
-更新日期：2026-04-22
+更新日期：2026-06-18
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
@@ -14,6 +14,8 @@
 - 当前外部 model-cache metadata source：Hugging Face `model-cache` 候选全集已审计并 metadata-only 接入；当前只支持数据源声明和真实 file-size/cache-volume profile 设计，不替换 benchmark 默认 cache 行为
 - 当前论文协议：`paper_protocol_v1_20260409`
 - 当前正式结果入口：`docs/project/ARTIFACT_RECORDS.md`
+- 当前顶刊审查规范：`docs/project/top_journal_review_policy.md`；最新审查为 `docs/project/top_journal_readiness_audit_20260618.md`。
+- 文档记录的 canonical 为 `final_submission_v7_latency_fallback_20260528_v1`，但当前主机缺少其 closed-loop/final-submission 原始 artifact root；在恢复并校验前，TMC readiness 只能标 `Unverifiable`。
 - 当前 live 模型层：主方法 `sa_ghmappo` + 方向匹配型对照算法池；`mappo` 对照采用 controller-level CTDE + `aggregation_reason_weighted_controller_ppo_v3`。
 - 当前新增后 live paper-grade learned 对照算法池：`ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl`
 - 当前 optional learned 变体：`ddqn`、`dueling_ddqn`；只有 duplicate trace audit 证明独立后才能作为补充对照。
@@ -38,8 +40,8 @@
 
 ## 当前可引用结论边界
 
-- 可引用：`NGSIM + Alibaba` 下 frozen paper protocol 的主表、补充表、消融、预测鲁棒性和可扩展性记录；当前已验证 canonical final comparison package 为 `artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/comparison_report/top_journal_comparison_report.json`，论文可直接使用的表格和自审报告在 `artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/comparison_report/paper_ready/`。
-- 当前主结果 claim 边界：`final_submission_full_current_baselines_20260511_v1` 是当前已验证 canonical；2026-05-27 起新的 MAPPO claim 需要 v3 protocol 重新跑 final-submission loop 后才能替换。`mappo` / `qmix` / `controller_mat` 是 controller-level baselines，不是 vehicle-agent / RSU-agent full MARL wrappers；`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl` 是当前 contract 下的领域专项 learned baselines；`ippo` 仍为 diagnostic/contract-blocked；`reactive_greedy` / `popularity_cache_heuristic` 只作 supplementary reference。
+- 文档化结果：`final_submission_v7_latency_fallback_20260528_v1` 是 2026-05-28 记录的 paper-ready canonical，正式摘要见 `ARTIFACT_RECORDS.md`；当前主机未恢复原始 artifact，不能把文档化数值写成本轮已硬复核结论。
+- 当前主结果 claim 边界：恢复 artifact 后必须按 `top_journal_review_policy.md` 重新核验 formal/holdout/support、统计和 checkpoint provenance。`mappo` / `qmix` / `controller_mat` 是 controller-level baselines，不是 vehicle-agent / RSU-agent full MARL wrappers；`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl` 是当前 contract 下的领域专项 learned baselines；`ippo` 仍为 diagnostic/contract-blocked；`reactive_greedy` / `popularity_cache_heuristic` 只作 supplementary reference。
 - 注意：历史记录可包含旧对比算法；这些只代表归档结果，不代表当前方向匹配算法池的 live 结果。
 - 可引用但需说明限制：早期 robustness 最新保留记录，协议早于 frozen main table，不应单独支撑最终主张。
 - 不再引用：toy benchmark、tmp quickcheck、LuST micro 激活窗口试验、早期 dry-run、阶段性 reward shaping / recalibration / uncertainty tuning。
@@ -51,5 +53,4 @@
 - `artifacts/training/` 只保留被保留 benchmark 引用的 checkpoint run。
 - `docs/project/` 是唯一长期文档目录。
 - `maintainable_engineering_docs(1)/` 和旧 `docs/*.md` 阶段文档不再作为事实来源。
-
 

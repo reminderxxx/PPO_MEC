@@ -1,5 +1,14 @@
 # Current Results Audit
 
+## 2026-06-18 TMC reviewer evidence status
+
+本机当前缺少下述两个 v7 artifact root，Git 历史也不包含对应文件：
+
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/`
+
+因此下方 v7 数值继续作为 2026-05-28 的历史项目记录，但按 `top_journal_review_policy.md` 只能达到 `E1_DOCUMENTED`，本轮 TMC readiness verdict 为 `Unverifiable`。最新证据审查见 `top_journal_readiness_audit_20260618.md`；恢复完整 artifact、SHA-256、checkpoint/manifest/command log/formal/holdout/support 并重建 comparison report 后才能升级判断。
+
 ## 2026-05-28 v7 final-submission canonical
 
 本节优先于下方所有旧 v5/v6/v7 closed-loop 审计段落读取。
