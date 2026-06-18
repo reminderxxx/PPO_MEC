@@ -1,5 +1,4 @@
 # Runtime data and experiment outputs
-/data/
 /artifacts/
 
 # Python caches and test output

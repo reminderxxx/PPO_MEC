@@ -1,5 +1,17 @@
 # Runbook
 
+## Git LFS 数据恢复
+
+`data/` 由 Git LFS 管理。新主机首次检出后执行：
+
+```bash
+git lfs install
+git lfs pull
+python scripts/check_data_ready.py
+```
+
+`git lfs pull` 完成前不要运行真实数据训练或 benchmark。当前仓库包含 NGSIM、Alibaba、LuST 和 model-cache audit metadata；highD 尚未提供，不阻塞当前 `NGSIM + Alibaba` 正式主线。
+
 ## MAPPO 对照协议
 
 当前 `mappo` paper-grade 对照必须使用 controller-level CTDE + `aggregation_reason_weighted_controller_ppo_v3`。正式 final-submission loop 会审计 `baseline_protocol_versions.mappo`，要求 checkpoint 配置包含 `head_credit_enabled=True`、`head_credit_protocol=aggregation_reason_weighted_controller_ppo_v3`、`slow_policy_credit_floor=0.25`、`fast_policy_credit_floor=0.10`、`event_policy_credit_floor=0.12`、`slow_entropy_credit_floor=0.20`、`fast_entropy_credit_floor=0.08`、`event_entropy_credit_floor=0.12`、`event_advantage_blend=0.85`。旧 pre-v3/pre-head-credit MAPPO 结果只作归档，不再进入新版论文主表。

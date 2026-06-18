@@ -1,5 +1,17 @@
 # PPO_MEC
 
+## 完整克隆（含真实数据）
+
+仓库中的 `data/` 通过 Git LFS 版本化。首次克隆或切换到包含数据的分支前，需先安装 Git LFS，然后执行：
+
+```bash
+git lfs install
+git lfs pull
+python scripts/check_data_ready.py
+```
+
+若未执行 `git lfs pull`，`data/` 下只会保留 LFS 指针，真实数据链路无法运行。当前正式主线所需的 NGSIM、Alibaba 和 LuST 数据已纳入；highD 仍是未提供的后补数据源。
+
 ## 2026-05-28 SA v7 final-submission canonical
 
 - Current paper-ready package: `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/`.
