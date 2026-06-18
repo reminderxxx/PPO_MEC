@@ -14,7 +14,7 @@
 - 当前外部 model-cache metadata source：Hugging Face `model-cache` 候选全集已审计并 metadata-only 接入；当前只支持数据源声明和真实 file-size/cache-volume profile 设计，不替换 benchmark 默认 cache 行为
 - 当前论文协议：`paper_protocol_v1_20260409`
 - 当前正式结果入口：`docs/project/ARTIFACT_RECORDS.md`
-- 当前 live 模型层：主方法 `sa_ghmappo` + 方向匹配型对照算法池；`mappo` 对照采用 controller-level CTDE + aggregation-reason controller head-credit。
+- 当前 live 模型层：主方法 `sa_ghmappo` + 方向匹配型对照算法池；`mappo` 对照采用 controller-level CTDE + `aggregation_reason_weighted_controller_ppo_v3`。
 - 当前新增后 live paper-grade learned 对照算法池：`ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl`
 - 当前 optional learned 变体：`ddqn`、`dueling_ddqn`；只有 duplicate trace audit 证明独立后才能作为补充对照。
 - 当前 diagnostic / contract-blocked 对照：`ippo`；当前 single-wrapper contract 不支撑独立 IPPO。`mappo` / `qmix` / `controller_mat` 已实现为 controller-level CTDE / value-decomposition / transformer baselines，不是 vehicle-agent / RSU-agent full MARL wrapper。
@@ -38,8 +38,8 @@
 
 ## 当前可引用结论边界
 
-- 可引用：`NGSIM + Alibaba` 下 frozen paper protocol 的主表、补充表、消融、预测鲁棒性和可扩展性记录；当前 canonical final comparison package 为 `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/comparison_report/top_journal_comparison_report.json`，论文可直接使用的表格和自审报告在 `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/comparison_report/paper_ready/`。
-- 当前主结果 claim 边界：`final_submission_controller_mappo_qmix_20260509_v1` 是 pre-Controller-MAT / pre-DAG-cache-DT / pre-MAPPO-head-credit package，旧数值只作历史归档。当前 canonical 主表必须重跑 final-submission loop，并要求 `mappo` checkpoint 通过 head-credit protocol 审计。`mappo` / `qmix` / `controller_mat` 是 controller-level baselines，不是 vehicle-agent / RSU-agent full MARL wrappers；`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl` 是当前 contract 下的领域专项 learned baselines；`ippo` 仍为 diagnostic/contract-blocked；`reactive_greedy` / `popularity_cache_heuristic` 只作 supplementary reference。
+- 可引用：`NGSIM + Alibaba` 下 frozen paper protocol 的主表、补充表、消融、预测鲁棒性和可扩展性记录；当前已验证 canonical final comparison package 为 `artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/comparison_report/top_journal_comparison_report.json`，论文可直接使用的表格和自审报告在 `artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/comparison_report/paper_ready/`。
+- 当前主结果 claim 边界：`final_submission_full_current_baselines_20260511_v1` 是当前已验证 canonical；2026-05-27 起新的 MAPPO claim 需要 v3 protocol 重新跑 final-submission loop 后才能替换。`mappo` / `qmix` / `controller_mat` 是 controller-level baselines，不是 vehicle-agent / RSU-agent full MARL wrappers；`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl` 是当前 contract 下的领域专项 learned baselines；`ippo` 仍为 diagnostic/contract-blocked；`reactive_greedy` / `popularity_cache_heuristic` 只作 supplementary reference。
 - 注意：历史记录可包含旧对比算法；这些只代表归档结果，不代表当前方向匹配算法池的 live 结果。
 - 可引用但需说明限制：早期 robustness 最新保留记录，协议早于 frozen main table，不应单独支撑最终主张。
 - 不再引用：toy benchmark、tmp quickcheck、LuST micro 激活窗口试验、早期 dry-run、阶段性 reward shaping / recalibration / uncertainty tuning。

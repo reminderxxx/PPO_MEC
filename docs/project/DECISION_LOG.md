@@ -1,5 +1,86 @@
 ﻿# Decision Log
 
+## 2026-05-28: v7 final-submission package 升级为当前 canonical
+
+决策：`final_submission_v7_latency_fallback_20260528_v1` 升级为当前 paper-ready canonical final-submission package。旧 `final_submission_full_current_baselines_20260511_v1` 和 `final_submission_controller_mappo_qmix_20260509_v1` 降为历史 package；后续论文主表优先引用 v7 final-submission 的 `comparison_report/paper_ready/`。
+
+原因：
+
+- v7 final gate `target_reached=true`、`paper_claim_ready=true`、`blockers=[]`。
+- formal 与 offset=3 holdout learned gates 均通过 contract、duplicate-trace independence、cluster-bootstrap reward CI；learned baselines 在 final suite 内 clean retrain，`formal_training_provenance.passed=true`、`record_count=27`。
+- v7 package 覆盖当前 paper-grade learned set：PPO、controller-level MAPPO、DQN、Dueling-DQN、controller-level QMIX、Controller-MAT、DAG-Offload-DRL、Cache-Offload-DRL、DT-Handoff-DRL。
+- comparison package `review_ready=true`、`paper_ready_package_ready=true`，作者自审无 blocker。
+
+影响：
+
+- `README.md`、`docs/project/PROGRESS.md`、`docs/project/ARTIFACT_RECORDS.md`、`docs/project/current_results_audit_20260527.md`、`docs/project/DIRECTORY_STRUCTURE.md` 和 `docs/project/RUNBOOK.md` 需要把当前 canonical 指向 v7。
+- 论文主结果可写“SA-GHMAPPO ranks first among clean-retrained primary learned baselines in all formal and offset-3 holdout splits”，但必须保留 generated self-review 中的 3 个 limitation。
+- `popularity_cache_heuristic` 继续作为 close supplementary reference，而非 primary learned-baseline blocker；不得写成大幅超过手写 heuristic。
+
+## 2026-05-28: v7 clean-retrain 启用 latency fallback 快时标控制
+
+决策：新增主方法 profile `top_journal_mechanism_v7_latency_fallback`，以 `top_journal_mechanism_v6_strong_competition` 为基线，保留 freshness / confidence-aware prefetch admission guards，并重新启用 `latency_fallback_bias_enabled=true`、`latency_fallback_bias_strength=1.20`、`latency_fallback_confidence_floor=0.62`、`latency_fallback_slow_suppression_strength=1.20`。该 profile 必须作为 clean retrain 候选运行，不复用旧 v3 eval-bias 结论。
+
+原因：
+
+- `top_journal_mechanism_v6_prefetch_admission_20260528_v1` 已消除相对 `popularity_cache_heuristic` 的负收益，但 mixed/full 仍与 heuristic 严格打平，无法通过要求 total reward 严格 win 的 gate。
+- formal trace 里低风险快时标机会主要出现在 current adapter 已 warm、无 handoff pressure 的 steady execution 步；将这类步切换为 `vehicle_fallback` 可以降低 delay penalty，同时不改变 cache/backhaul/migration/handoff contract。
+- 旧 `top_journal_mechanism_v3_eval_bias` 已证明 latency fallback 有潜力，但它是 inference calibration artifact；v7 的目的就是把该机制纳入独立 profile 和 clean-retrain 证据链。
+
+影响：
+
+- 不修改 `VecWorkflowCoreEnv` reward、不修改 `semantic_discrete_5` action schema、不修改 learned/domain baseline contract。
+- `scripts/train_sa_ghmappo_real_sample.py`、`scripts/run_top_journal_closed_loop.py`、`configs/experiment/top_journal_mechanism_v7_latency_fallback.yaml` 和 profile contract tests 需要同步维护 v7 参数。
+- `top_journal_mechanism_v7_latency_fallback_20260528_v1` closed-loop formal 已通过，但仍不是 final-submission canonical；替换 canonical 前必须继续跑 final-submission/holdout/support package。
+
+## 2026-05-27: SA predictive prefetch 增加 confidence/alignment admission guard
+
+决策：`top_journal_mechanism_v6_strong_competition` 增加 `predictive_prefetch_admission_guard_enabled=true`，并采用 `predictive_prefetch_admission_min_confidence=0.55`、`predictive_prefetch_admission_require_distinct_next=true`。当 selected action 为 predictive prefetch，但 `predicted_next_rsu_id` 仍未离开当前 RSU、prefetch target 仅来自后续序列或 handoff target，且预测置信度低于阈值时，将 prefetch 延期为 `handoff_migration_prepare`。
+
+原因：
+
+- `top_journal_mechanism_v6_freshness_guard_20260527_v1` 仍未通过 gate，剩余 gap 与 freshness 上界无关，而是低置信度/next-RSU 未对齐时的过早 prefetch realization gap。
+- 负例 `window_off246_len24_t293_316` / `j_8` / seed `13` 中，SA 在 `prediction_confidence=0.383` 且 `predicted_next_rsu_id` 为当前 RSU 时 prefetch，最终 `expired_miss`；popularity heuristic 等到后续 `prediction_confidence=0.611` 且 next-RSU 已对齐时 prefetch 并命中。
+- 该策略对应 VEC service caching / handoff migration 中常见的 confidence-aware admission control：在预测未稳定前优先准备迁移，不提前占用 prefetch freshness window。
+
+影响：
+
+- 默认关闭，历史 checkpoint 和旧 profile 行为不变；v6 profile 显式开启。
+- 训练 summary、checkpoint 恢复、benchmark rows 和 eval-bias manifest builder 必须保留该字段，否则复现会丢失 admission 行为。
+- 该决策只修正 policy-side admission，不改变 action schema、reward 或 formal gate；正式效果仍需重新跑 3-seed closed-loop / final-submission gate。
+
+## 2026-05-27: SA cache-warm guard 增加 freshness window 上界
+
+决策：`top_journal_mechanism_v6_strong_competition` 的 cache-warm start guard 增加 `cache_warm_start_guard_max_prefetch_countdown=6.0`。当 target adapter 未 warm 但预测 handoff countdown 超出该上界时，guard 不再把 event prepare 强制替换为 predictive prefetch，而是等待进入 freshness window 后再触发 prefetch。
+
+原因：
+
+- v6 masked full-train 诊断显示剩余 popularity gap 集中在单个 mechanism window：SA 过早 prefetch 后 validation expired，而 heuristic 在更接近 handoff 的 step prefetch 并命中。
+- 当前 recorder 的 `prefetch_validation_window=6` 已定义 prefetch 的有效兑现窗口；policy-side guard 应与该 freshness contract 对齐，避免奖励/环境不变时制造过早机制动作。
+- 该设计贴合 VEC service caching / service migration 文献中的 deadline-aware、freshness-aware placement 思路，但不引入新动作空间或 reward 改写。
+
+影响：
+
+- 历史 profile 和 checkpoint 默认上界为 `0.0`，语义为禁用该上界；只有 v6 profile 显式启用。
+- 训练、checkpoint 恢复、eval-bias manifest 和配置文件需要保留该字段，否则 benchmark 复现会丢失 guard 行为。
+- 本决策只解决 timing guard，不代表 v6 已 paper-ready；仍需通过 formal/holdout gate 后才能替换 canonical。
+
+## 2026-05-27: MAPPO 强对照升级为 controller head-credit v3
+
+决策：`mappo` 继续保持 controller-level CTDE baseline，但 paper-grade 强对照协议升级为 `aggregation_reason_weighted_controller_ppo_v3`，并新增 `mappo_strong_audit` 训练 profile。主算法新增 `top_journal_mechanism_v6_strong_competition` profile，用于后续与优化后的 learned baselines 同预算重跑。
+
+原因：
+
+- 2026-05-11 canonical 审计显示 MAPPO 虽然 protocol-valid，但存在 action-mix collapse，不能作为主优势证据。
+- 若论文把 MAPPO 写入主表，必须给 MAPPO 合理的 controller-head credit floor、entropy floor/scale 和更稳健的 PPO 更新配置，避免弱化对照。
+- 这些增强只属于 MAPPO 的通用 controller credit assignment，不引入 SA-GHMAPPO 的 graph/surrogate/guard/auxiliary 专属机制。
+
+影响：
+
+- `scripts/run_top_journal_learned_baseline_suite.py`、`scripts/run_top_journal_final_submission_loop.py`、`scripts/run_top_journal_closed_loop.py` 和 `scripts/build_top_journal_comparison_report.py` 的 MAPPO protocol audit 均要求 v3 字段。
+- 旧 pre-v3 MAPPO checkpoint 只能作为历史 artifact；新的 MAPPO 论文 claim 必须来自 v3 final-submission package。
+- 本次只是协议和训练入口更新；在 v6 + MAPPO v3 正式 final-submission gate 通过前，不替换 `final_submission_full_current_baselines_20260511_v1` 的已验证结果。
+
 ## 2026-05-12: SA-GHMAPPO 先修补 semantic_discrete_5 闭环，不切换 parameterized DAG action
 
 决策：近期主算法保持 `semantic_discrete_5`，先补强 predictive action mask、invalid reason、predictor audit、mechanism success gate、DAG diagnostics 和 guard/projection delta；不在本轮引入 `target_node` / `target_rsu` parameterized action，也不改成 full vehicle/RSU multi-agent wrapper。

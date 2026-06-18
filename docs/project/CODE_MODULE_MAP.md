@@ -1,5 +1,25 @@
 # Code Module Map
 
+## 2026-05-28 SA v7 latency fallback clean-retrain profile
+
+- `scripts/train_sa_ghmappo_real_sample.py`：新增 `top_journal_mechanism_v7_latency_fallback` profile；继承 v6 guards，并启用 `latency_fallback_bias_*` / `latency_fallback_slow_suppression_strength`，用于 clean retrain 而非旧 eval-bias 复用。
+- `scripts/run_top_journal_closed_loop.py`：将 v7 纳入 formal budget override，默认 `sa_episodes=128`、`train_window_count=6`。
+- `configs/experiment/top_journal_mechanism_v7_latency_fallback.yaml`：记录 v7 训练、closed-loop、final-submission 和 promotion gate 参数；不修改 reward、action schema 或 baseline contract。
+- `tests/test_algo_pool_contract.py`、`tests/test_top_journal_closed_loop.py`：覆盖 v7 profile 参数和 closed-loop budget。
+
+## 2026-05-27 SA confidence-aware prefetch admission guard
+
+- `src/agents/sa_ghmappo_core.py`：新增 `predictive_prefetch_admission_guard_*`，在低置信度且 next-RSU / prefetch target 未对齐时把 selected predictive prefetch 延期为 event prepare；默认关闭，v6 profile 显式开启。
+- `src/agents/sa_ghmappo_agent.py`、`scripts/train_sa_ghmappo_real_sample.py`、`src/evaluators/real_eval_support.py`：同步维护该字段的构造参数、profile 默认值、checkpoint config、训练 summary 和 benchmark 恢复路径。
+- `src/trainers/marl_on_policy_trainer.py`、`src/evaluators/main_results_support.py`：新增 `predictive_prefetch_admission_guard_count/rate` 诊断消费，避免 formal benchmark rows 丢失 guard 触发计数。
+- `configs/experiment/top_journal_mechanism_v6_strong_competition.yaml` 和 `configs/algo/*.yaml`：v6 记录 admission guard 参数；learned/domain baselines 继续声明排除该 SA-only guard。
+
+## 2026-05-27 SA freshness-aware prefetch guard
+
+- `src/agents/sa_ghmappo_core.py`：`cache_warm_start_guard` 新增 `cache_warm_start_guard_max_prefetch_countdown`，用于把 target-adapter prefetch 限制在 freshness window 内；默认 `0.0` 保持历史无上界行为。
+- `src/agents/sa_ghmappo_agent.py`、`scripts/train_sa_ghmappo_real_sample.py`、`src/evaluators/real_eval_support.py`：共同维护该字段的训练 profile、checkpoint config 和 benchmark 恢复路径。
+- `configs/experiment/top_journal_mechanism_v6_strong_competition.yaml`：v6 profile 显式设置上界 `6.0`，与 `EpisodeRecorder(prefetch_validation_window=6)` 对齐；该机制属于 policy guard，不修改环境 reward 或 `semantic_discrete_5` schema。
+
 ## 2026-05-12 SA-GHMAPPO contract notes
 
 - `src/envs/specs/action_schema.py`：维护 `semantic_discrete_5` action schema、precondition mask、invalid reason 和 `ActionAdapter` 到 `ControlAction` 的转换；`build_mask_info()` 是 wrapper/policy/report 消费 action legality 的来源。
@@ -39,10 +59,12 @@
 - `reactive_greedy` -> `src/agents/reactive_greedy_agent.py`
 - `popularity_cache_heuristic` -> `src/agents/popularity_cache_heuristic_agent.py`
 
-2026-05-10 MAPPO protocol update：
-- `src/agents/mappo_agent.py` 当前负责 controller-level CTDE MAPPO + aggregation-reason controller head-credit。
-- `scripts/run_top_journal_learned_baseline_suite.py`、`scripts/run_top_journal_final_submission_loop.py`、`scripts/run_top_journal_closed_loop.py` 和 `scripts/build_top_journal_comparison_report.py` 负责审计 `mappo` checkpoint protocol，避免 pre-head-credit MAPPO 进入新版主表。
-- `src/evaluators/real_eval_support.py` 在恢复 `mappo` checkpoint 时保留 head-credit 相关 config 字段。
+2026-05-27 MAPPO protocol update：
+- `src/agents/mappo_agent.py` 当前负责 controller-level CTDE MAPPO + `aggregation_reason_weighted_controller_ppo_v3` controller head-credit。
+- `src/agents/sa_ghmappo_core.py` 承载通用 controller head credit floors / entropy floors / entropy scales；默认仍兼容旧 v2 行为，`mappo` 显式启用 v3。
+- `scripts/train_algo_pool_real_sample.py` 提供 `mappo_strong_audit` profile。
+- `scripts/run_top_journal_learned_baseline_suite.py`、`scripts/run_top_journal_final_submission_loop.py`、`scripts/run_top_journal_closed_loop.py` 和 `scripts/build_top_journal_comparison_report.py` 负责审计 `mappo` checkpoint protocol，避免 pre-v3/pre-head-credit MAPPO 进入新版主表。
+- `src/evaluators/real_eval_support.py` 在恢复 `mappo` checkpoint 时保留 v3 head-credit 相关 config 字段。
 
 `flat_ppo` / `flat_mappo` 只表示历史 artifact run 名称，不再作为 live agent 注册。
 

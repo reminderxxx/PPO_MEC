@@ -276,15 +276,22 @@ class 分层PPO基类(BaseAgent):
         value_coef: float = 0.5,
         auxiliary_coef: float = 0.0,
         head_credit_enabled: bool = False,
+        head_credit_protocol: str = "aggregation_reason_weighted_ppo_v2",
         mechanism_logit_bias_strength: float = 0.0,
         mechanism_confidence_floor: float = 0.0,
         prediction_feature_dim: int = 13,
         prediction_gate_min_leak: float = 0.0,
+        slow_entropy_coef_scale: float = 1.0,
+        fast_entropy_coef_scale: float = 1.0,
         event_entropy_coef_scale: float = 1.0,
+        slow_entropy_credit_floor: float = 0.0,
+        fast_entropy_credit_floor: float = 0.0,
         event_entropy_credit_floor: float = 0.0,
         event_logit_temperature: float = 1.0,
         event_logit_temperature_final: float | None = None,
         event_temperature_decay_updates: int = 0,
+        slow_policy_credit_floor: float = 0.0,
+        fast_policy_credit_floor: float = 0.0,
         event_policy_credit_floor: float = 0.0,
         event_advantage_blend: float = 1.0,
         event_logit_sharpening_final_scale: float = 1.0,
@@ -334,6 +341,10 @@ class 分层PPO基类(BaseAgent):
         backhaul_guard_max_reactive_fills_per_adapter: int = 1,
         cache_warm_start_guard_enabled: bool = False,
         cache_warm_start_guard_min_countdown: float = 1.5,
+        cache_warm_start_guard_max_prefetch_countdown: float = 0.0,
+        predictive_prefetch_admission_guard_enabled: bool = False,
+        predictive_prefetch_admission_min_confidence: float = 0.55,
+        predictive_prefetch_admission_require_distinct_next: bool = True,
         auxiliary_slow_weight: float = 1.0,
         auxiliary_fast_weight: float = 0.5,
         auxiliary_event_weight: float = 1.0,
@@ -368,18 +379,40 @@ class 分层PPO基类(BaseAgent):
         self._value_coef = float(value_coef)
         self._auxiliary_coef = float(auxiliary_coef)
         self._head_credit_enabled = bool(head_credit_enabled)
+        self._head_credit_protocol = str(head_credit_protocol or "aggregation_reason_weighted_ppo_v2")
         self._mechanism_logit_bias_strength = float(mechanism_logit_bias_strength)
         self._mechanism_confidence_floor = float(mechanism_confidence_floor)
         self._prediction_feature_dim = int(prediction_feature_dim)
         self._prediction_gate_min_leak = max(0.0, min(float(prediction_gate_min_leak), 1.0))
+        self._slow_entropy_coef_scale = max(float(slow_entropy_coef_scale), 0.0)
+        self._fast_entropy_coef_scale = max(float(fast_entropy_coef_scale), 0.0)
         self._event_entropy_coef_scale = max(float(event_entropy_coef_scale), 0.0)
+        self._slow_entropy_credit_floor = max(0.0, min(float(slow_entropy_credit_floor), 1.0))
+        self._fast_entropy_credit_floor = max(0.0, min(float(fast_entropy_credit_floor), 1.0))
         self._event_entropy_credit_floor = max(0.0, min(float(event_entropy_credit_floor), 1.0))
         self._event_logit_temperature = max(float(event_logit_temperature), 0.25)
         if event_logit_temperature_final is None:
             event_logit_temperature_final = min(self._event_logit_temperature, 1.0)
         self._event_logit_temperature_final = max(float(event_logit_temperature_final), 0.25)
         self._event_temperature_decay_updates = max(int(event_temperature_decay_updates), 0)
+        self._slow_policy_credit_floor = max(0.0, min(float(slow_policy_credit_floor), 1.0))
+        self._fast_policy_credit_floor = max(0.0, min(float(fast_policy_credit_floor), 1.0))
         self._event_policy_credit_floor = max(0.0, min(float(event_policy_credit_floor), 1.0))
+        self._policy_credit_floor_by_head = {
+            "slow": self._slow_policy_credit_floor,
+            "fast": self._fast_policy_credit_floor,
+            "event": self._event_policy_credit_floor,
+        }
+        self._entropy_credit_floor_by_head = {
+            "slow": self._slow_entropy_credit_floor,
+            "fast": self._fast_entropy_credit_floor,
+            "event": self._event_entropy_credit_floor,
+        }
+        self._entropy_coef_scale_by_head = {
+            "slow": self._slow_entropy_coef_scale,
+            "fast": self._fast_entropy_coef_scale,
+            "event": self._event_entropy_coef_scale,
+        }
         self._event_advantage_blend = max(float(event_advantage_blend), 0.0)
         self._event_logit_sharpening_final_scale = max(float(event_logit_sharpening_final_scale), 1.0)
         self._event_logit_sharpening_timing_gain = max(float(event_logit_sharpening_timing_gain), 0.0)
@@ -469,6 +502,20 @@ class 分层PPO基类(BaseAgent):
         self._cache_warm_start_guard_min_countdown = max(
             float(cache_warm_start_guard_min_countdown),
             0.0,
+        )
+        self._cache_warm_start_guard_max_prefetch_countdown = max(
+            float(cache_warm_start_guard_max_prefetch_countdown),
+            0.0,
+        )
+        self._predictive_prefetch_admission_guard_enabled = bool(
+            predictive_prefetch_admission_guard_enabled
+        )
+        self._predictive_prefetch_admission_min_confidence = max(
+            0.0,
+            min(float(predictive_prefetch_admission_min_confidence), 1.0),
+        )
+        self._predictive_prefetch_admission_require_distinct_next = bool(
+            predictive_prefetch_admission_require_distinct_next
         )
         self._auxiliary_slow_weight = float(auxiliary_slow_weight)
         self._auxiliary_fast_weight = float(auxiliary_fast_weight)
@@ -560,6 +607,16 @@ class 分层PPO基类(BaseAgent):
                 selected_actions=selected_actions,
             )
             if cache_warm_guard_info.get("guarded", False):
+                head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                    policy_output=policy_output,
+                    selected_actions=selected_actions,
+                    action_mask=action_mask,
+                )
+            prefetch_admission_guard_info = self._apply_predictive_prefetch_admission_guard_to_actions(
+                semantic_state=semantic_state,
+                selected_actions=selected_actions,
+            )
+            if prefetch_admission_guard_info.get("guarded", False):
                 head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
                     policy_output=policy_output,
                     selected_actions=selected_actions,
@@ -685,9 +742,16 @@ class 分层PPO基类(BaseAgent):
             "predicted_sequence_contains_other_rsu": bool(prediction_target_diagnostics["predicted_sequence_contains_other_rsu"]),
             "predicted_first_non_current_rsu": prediction_target_diagnostics["predicted_first_non_current_rsu"],
             "predicted_first_non_current_eta": int(prediction_target_diagnostics["predicted_first_non_current_eta"]),
+            "head_credit_protocol": self._head_credit_protocol,
             "head_credit_weights": head_credit_weights,
+            "effective_head_credit_floors": {
+                "policy": dict(self._policy_credit_floor_by_head),
+                "entropy": dict(self._entropy_credit_floor_by_head),
+                "entropy_scale": dict(self._entropy_coef_scale_by_head),
+            },
             "deterministic_temporal_smoothing": smoothing_info,
             "cache_warm_start_guard": cache_warm_guard_info,
+            "predictive_prefetch_admission_guard": prefetch_admission_guard_info,
             "backhaul_guard": backhaul_guard_info,
             "deterministic_event_prepare_overridden": bool(smoothing_info.get("override_triggered", False)),
             "deterministic_event_prepare_smoothed": bool(smoothing_info.get("borderline_triggered", False)),
@@ -1004,10 +1068,17 @@ class 分层PPO基类(BaseAgent):
             "uncertainty_aware_event_scaling_enabled": self._uncertainty_aware_event_scaling_enabled,
             "uncertainty_aware_critic_enabled": self._uncertainty_aware_critic_enabled,
             "head_credit_enabled": self._head_credit_enabled,
+            "head_credit_protocol": self._head_credit_protocol,
             "prediction_gate_min_leak": self._prediction_gate_min_leak,
+            "slow_policy_credit_floor": self._slow_policy_credit_floor,
+            "fast_policy_credit_floor": self._fast_policy_credit_floor,
             "event_policy_credit_floor": self._event_policy_credit_floor,
             "event_advantage_blend": self._event_advantage_blend,
+            "slow_entropy_coef_scale": self._slow_entropy_coef_scale,
+            "fast_entropy_coef_scale": self._fast_entropy_coef_scale,
             "event_entropy_coef_scale": self._event_entropy_coef_scale,
+            "slow_entropy_credit_floor": self._slow_entropy_credit_floor,
+            "fast_entropy_credit_floor": self._fast_entropy_credit_floor,
             "event_entropy_credit_floor": self._event_entropy_credit_floor,
             "event_logit_temperature": self._event_logit_temperature,
             "event_logit_temperature_final": self._event_logit_temperature_final,
@@ -1111,10 +1182,14 @@ class 分层PPO基类(BaseAgent):
         if not self._use_hierarchy:
             masked_logits = self._masked_flat_logits(policy_output["flat_logits"], action_mask)
             return int(torch.argmax(masked_logits, dim=-1).item())
+        masked_scores = self._masked_flat_logits(self._hierarchical_env_action_scores(policy_output), action_mask)
+        return int(torch.argmax(masked_scores, dim=-1).item())
+
+    def _hierarchical_env_action_scores(self, policy_output: dict[str, Any]) -> torch.Tensor:
         event_log_probs = torch.log_softmax(policy_output["event_logits"], dim=-1)
         slow_log_probs = torch.log_softmax(policy_output["slow_logits"], dim=-1)
         fast_log_probs = torch.log_softmax(policy_output["fast_logits"], dim=-1)
-        env_scores = torch.stack(
+        return torch.stack(
             [
                 event_log_probs[0] + slow_log_probs[1],
                 event_log_probs[0] + slow_log_probs[2],
@@ -1124,8 +1199,6 @@ class 分层PPO基类(BaseAgent):
             ],
             dim=0,
         )
-        masked_scores = self._masked_flat_logits(env_scores, action_mask)
-        return int(torch.argmax(masked_scores, dim=-1).item())
 
     def _project_head_actions_to_valid_env_action(
         self,
@@ -1704,6 +1777,50 @@ class 分层PPO基类(BaseAgent):
                 projection_info,
             )
 
+        if self._action_mask_has_valid_action(action_mask):
+            assert action_mask is not None
+            env_scores = self._masked_flat_logits(
+                self._hierarchical_env_action_scores(policy_output),
+                action_mask,
+            )
+            distribution = Categorical(logits=env_scores)
+            if deterministic:
+                env_action_tensor = torch.argmax(env_scores, dim=-1)
+            else:
+                env_action_tensor = distribution.sample()
+            env_action = int(env_action_tensor.item())
+            selected_actions = self._head_targets_for_env_action(env_action)
+            projected_env_action, projected_aggregation_reason = 聚合层级动作(
+                head_actions=selected_actions,
+                use_hierarchy=self._use_hierarchy,
+                event_head_enabled=self._event_head_enabled,
+                adapter_prefetch_enabled=self._adapter_prefetch_enabled,
+            )
+            head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                policy_output=policy_output,
+                selected_actions=selected_actions,
+                action_mask=action_mask,
+            )
+            projection_info = self._build_action_projection_info(
+                raw_actions=selected_actions,
+                projected_actions=selected_actions,
+                raw_env_action=projected_env_action,
+                raw_aggregation_reason=projected_aggregation_reason,
+                projected_env_action=projected_env_action,
+                projected_aggregation_reason=projected_aggregation_reason,
+                action_mask=action_mask,
+            )
+            projection_info["masked_hierarchical_env_action_sampling"] = True
+            projection_info["masked_env_action_log_prob"] = round(
+                float(distribution.log_prob(env_action_tensor).item()),
+                6,
+            )
+            projection_info["masked_env_action_probs"] = [
+                round(float(item), 6)
+                for item in torch.softmax(env_scores, dim=-1).tolist()
+            ]
+            return selected_actions, head_log_probs, head_entropies, action_prob_payload, projection_info
+
         selected_actions: dict[str, int] = {}
         head_log_probs: dict[str, torch.Tensor] = {}
         head_entropies: dict[str, torch.Tensor] = {}
@@ -1911,24 +2028,33 @@ class 分层PPO基类(BaseAgent):
         return joint_log_prob, entropy
 
     def _resolve_actor_weight(self, head_name: str, base_weight: torch.Tensor | float) -> torch.Tensor | float:
-        if head_name != "event":
+        floor = float(self._policy_credit_floor_by_head.get(head_name, 0.0))
+        if floor <= 0.0:
             return base_weight
         if isinstance(base_weight, torch.Tensor):
-            return torch.clamp(base_weight, min=self._event_policy_credit_floor)
-        return max(float(base_weight), self._event_policy_credit_floor)
+            return torch.clamp(base_weight, min=floor)
+        return max(float(base_weight), floor)
 
     def _resolve_entropy_weight(self, head_name: str, base_weight: torch.Tensor | float) -> torch.Tensor | float:
-        if head_name != "event":
-            return base_weight
+        floor = float(self._entropy_credit_floor_by_head.get(head_name, 0.0))
+        scale = float(self._entropy_coef_scale_by_head.get(head_name, 1.0))
         if isinstance(base_weight, torch.Tensor):
-            effective_weight = torch.clamp(base_weight, min=self._event_entropy_credit_floor)
-            return effective_weight * self._event_entropy_coef_scale
-        effective_weight = max(float(base_weight), self._event_entropy_credit_floor)
-        return effective_weight * self._event_entropy_coef_scale
+            effective_weight = torch.clamp(base_weight, min=floor) if floor > 0.0 else base_weight
+            return effective_weight * scale
+        effective_weight = max(float(base_weight), floor)
+        return effective_weight * scale
 
     def _build_head_credit_weights(self, aggregation_reason: str) -> dict[str, float]:
         if not self._use_hierarchy or not self._head_credit_enabled:
             return {"slow": 1.0, "fast": 1.0, "event": 1.0}
+        if self._head_credit_protocol == "aggregation_reason_weighted_controller_ppo_v3":
+            if aggregation_reason == "event_head_prepare":
+                return {"slow": 0.3, "fast": 0.1, "event": 1.0}
+            if aggregation_reason in {"slow_head_prefetch", "slow_head_cache_fill"}:
+                return {"slow": 1.0, "fast": 0.2, "event": 0.15}
+            if aggregation_reason in {"fast_head_vehicle_fallback", "fast_head_steady_offload"}:
+                return {"slow": 0.3, "fast": 1.0, "event": 0.15}
+            return {"slow": 0.35, "fast": 1.0, "event": 0.25}
         if aggregation_reason == "event_head_prepare":
             return {"slow": 0.2, "fast": 0.0, "event": 1.0}
         if aggregation_reason in {"slow_head_prefetch", "slow_head_cache_fill"}:
@@ -2302,10 +2428,31 @@ class 分层PPO基类(BaseAgent):
             sigma=self._temporal_prepare_sigma,
         )
         countdown_steps = float(timing_features.get("countdown_steps", 0.0) or 0.0)
+        max_prefetch_countdown = self._cache_warm_start_guard_max_prefetch_countdown
+        event_prepare_selected = int(selected_actions.get("event", 0)) == 1
+        if (
+            not target_cache_ready
+            and event_prepare_selected
+            and max_prefetch_countdown > 0.0
+            and countdown_steps > max_prefetch_countdown
+        ):
+            return {
+                "enabled": True,
+                "guarded": False,
+                "reason": "target_prefetch_deferred_until_freshness_window",
+                "required_adapter": required_adapter,
+                "current_rsu_id": current_rsu_id,
+                "predicted_target_rsu_id": predicted_target,
+                "current_cache_ready": True,
+                "target_cache_ready": False,
+                "handoff_countdown_steps": round(countdown_steps, 6),
+                "min_countdown": self._cache_warm_start_guard_min_countdown,
+                "max_prefetch_countdown": max_prefetch_countdown,
+            }
         if (
             not target_cache_ready
             and countdown_steps >= self._cache_warm_start_guard_min_countdown
-            and int(selected_actions.get("event", 0)) == 1
+            and event_prepare_selected
         ):
             original = dict(selected_actions)
             selected_actions["slow"] = 2
@@ -2319,6 +2466,7 @@ class 分层PPO基类(BaseAgent):
                 "predicted_target_rsu_id": predicted_target,
                 "handoff_countdown_steps": round(countdown_steps, 6),
                 "min_countdown": self._cache_warm_start_guard_min_countdown,
+                "max_prefetch_countdown": max_prefetch_countdown,
                 "original_actions": original,
                 "guarded_actions": dict(selected_actions),
             }
@@ -2330,6 +2478,163 @@ class 分层PPO基类(BaseAgent):
             "current_cache_ready": True,
             "target_cache_ready": bool(target_cache_ready),
             "handoff_countdown_steps": round(countdown_steps, 6),
+            "min_countdown": self._cache_warm_start_guard_min_countdown,
+            "max_prefetch_countdown": max_prefetch_countdown,
+        }
+
+    def _apply_predictive_prefetch_admission_guard_to_actions(
+        self,
+        *,
+        semantic_state: dict[str, Any],
+        selected_actions: dict[str, int],
+    ) -> dict[str, Any]:
+        if not self._predictive_prefetch_admission_guard_enabled or not self._use_hierarchy:
+            return {"enabled": False, "guarded": False, "reason": "disabled"}
+        if int(selected_actions.get("event", 0)) == 1:
+            return {"enabled": True, "guarded": False, "reason": "event_prepare_selected"}
+        if int(selected_actions.get("slow", 0)) != 2:
+            return {"enabled": True, "guarded": False, "reason": "not_predictive_prefetch_selected"}
+
+        current_node = semantic_state.get("current_workflow_node") or {}
+        required_adapter = current_node.get("required_adapter")
+        if not required_adapter:
+            return {"enabled": True, "guarded": False, "reason": "missing_required_adapter"}
+        required_adapter = str(required_adapter)
+        primary_vehicle, _ = _resolve_primary_vehicle_from_semantic_state(semantic_state)
+        vehicle_id = str(primary_vehicle.get("vehicle_id", ""))
+        current_rsu_id = primary_vehicle.get("associated_rsu_id")
+        if current_rsu_id is None or not vehicle_id:
+            return {"enabled": True, "guarded": False, "reason": "missing_vehicle_or_current_rsu"}
+
+        rsu_map = {
+            str(rsu.get("rsu_id")): rsu
+            for rsu in semantic_state.get("rsus", [])
+            if isinstance(rsu, dict)
+        }
+        current_rsu = rsu_map.get(str(current_rsu_id), {})
+        current_cache_ready = required_adapter in {
+            str(adapter_id)
+            for adapter_id in current_rsu.get("cached_adapter_ids", [])
+        }
+        if not current_cache_ready:
+            return {"enabled": True, "guarded": False, "reason": "current_adapter_not_warm"}
+
+        predictions = semantic_state.get("predictions", {})
+        if not isinstance(predictions, dict):
+            return {"enabled": True, "guarded": False, "reason": "missing_predictions"}
+        predicted_next_rsu_id = predictions.get("predicted_next_rsu_by_vehicle", {}).get(vehicle_id)
+        predicted_handoff_target_rsu_id = (
+            predictions.get("predicted_first_handoff_rsu_by_vehicle", {}).get(vehicle_id)
+            or predictions.get("predicted_handoff_target_rsu_id_by_vehicle", {}).get(vehicle_id)
+        )
+        next_rsu_sequence = predictions.get("next_rsu_sequence", {}).get(vehicle_id, [])
+        predicted_prefetch_target_rsu_id = predicted_next_rsu_id
+        if predicted_prefetch_target_rsu_id is None and isinstance(next_rsu_sequence, list) and next_rsu_sequence:
+            predicted_prefetch_target_rsu_id = next_rsu_sequence[0]
+        if (
+            predicted_prefetch_target_rsu_id is None
+            or str(predicted_prefetch_target_rsu_id) == str(current_rsu_id)
+        ):
+            for candidate_rsu_id in next_rsu_sequence if isinstance(next_rsu_sequence, list) else []:
+                if candidate_rsu_id is not None and str(candidate_rsu_id) != str(current_rsu_id):
+                    predicted_prefetch_target_rsu_id = candidate_rsu_id
+                    break
+        if (
+            predicted_prefetch_target_rsu_id is None
+            or str(predicted_prefetch_target_rsu_id) == str(current_rsu_id)
+        ):
+            return {
+                "enabled": True,
+                "guarded": False,
+                "reason": "missing_distinct_prefetch_target",
+                "current_rsu_id": current_rsu_id,
+                "predicted_next_rsu_id": predicted_next_rsu_id,
+            }
+
+        distinct_handoff_target = bool(
+            predicted_handoff_target_rsu_id is not None
+            and str(predicted_handoff_target_rsu_id) != str(current_rsu_id)
+        )
+        if not distinct_handoff_target:
+            return {
+                "enabled": True,
+                "guarded": False,
+                "reason": "missing_distinct_handoff_target_for_prepare",
+                "current_rsu_id": current_rsu_id,
+                "predicted_prefetch_target_rsu_id": predicted_prefetch_target_rsu_id,
+            }
+
+        target_rsu = rsu_map.get(str(predicted_prefetch_target_rsu_id), {})
+        target_cache_ready = required_adapter in {
+            str(adapter_id)
+            for adapter_id in target_rsu.get("cached_adapter_ids", [])
+        }
+        if target_cache_ready:
+            return {
+                "enabled": True,
+                "guarded": False,
+                "reason": "target_adapter_ready",
+                "required_adapter": required_adapter,
+                "predicted_prefetch_target_rsu_id": predicted_prefetch_target_rsu_id,
+            }
+
+        prediction_confidence = max(
+            0.0,
+            min(
+                float(predictions.get("prediction_confidence_by_vehicle", {}).get(vehicle_id, 0.0) or 0.0),
+                1.0,
+            ),
+        )
+        predicted_next_distinct = bool(
+            predicted_next_rsu_id is not None and str(predicted_next_rsu_id) != str(current_rsu_id)
+        )
+        predicted_next_aligned = bool(
+            predicted_next_distinct
+            and str(predicted_next_rsu_id) == str(predicted_prefetch_target_rsu_id)
+        )
+        handoff_target_aligned = bool(
+            str(predicted_handoff_target_rsu_id) == str(predicted_prefetch_target_rsu_id)
+        )
+        alignment_ready = bool(
+            (not self._predictive_prefetch_admission_require_distinct_next or predicted_next_aligned)
+            and handoff_target_aligned
+        )
+        low_confidence = prediction_confidence < self._predictive_prefetch_admission_min_confidence
+        if low_confidence and not alignment_ready:
+            original = dict(selected_actions)
+            selected_actions["slow"] = 0
+            selected_actions["event"] = 1
+            return {
+                "enabled": True,
+                "guarded": True,
+                "reason": "low_confidence_unaligned_prefetch_deferred_to_prepare",
+                "required_adapter": required_adapter,
+                "current_rsu_id": current_rsu_id,
+                "predicted_next_rsu_id": predicted_next_rsu_id,
+                "predicted_handoff_target_rsu_id": predicted_handoff_target_rsu_id,
+                "predicted_prefetch_target_rsu_id": predicted_prefetch_target_rsu_id,
+                "prediction_confidence": round(prediction_confidence, 6),
+                "min_confidence": self._predictive_prefetch_admission_min_confidence,
+                "predicted_next_aligned": predicted_next_aligned,
+                "handoff_target_aligned": handoff_target_aligned,
+                "require_distinct_next": self._predictive_prefetch_admission_require_distinct_next,
+                "original_actions": original,
+                "guarded_actions": dict(selected_actions),
+            }
+        return {
+            "enabled": True,
+            "guarded": False,
+            "reason": "prefetch_admitted",
+            "required_adapter": required_adapter,
+            "current_rsu_id": current_rsu_id,
+            "predicted_next_rsu_id": predicted_next_rsu_id,
+            "predicted_handoff_target_rsu_id": predicted_handoff_target_rsu_id,
+            "predicted_prefetch_target_rsu_id": predicted_prefetch_target_rsu_id,
+            "prediction_confidence": round(prediction_confidence, 6),
+            "min_confidence": self._predictive_prefetch_admission_min_confidence,
+            "predicted_next_aligned": predicted_next_aligned,
+            "handoff_target_aligned": handoff_target_aligned,
+            "require_distinct_next": self._predictive_prefetch_admission_require_distinct_next,
         }
 
     def _apply_backhaul_guard_to_actions(
@@ -2782,13 +3087,20 @@ class 分层PPO基类(BaseAgent):
             "event_head_enabled": self._event_head_enabled,
             "adapter_prefetch_enabled": self._adapter_prefetch_enabled,
             "head_credit_enabled": self._head_credit_enabled,
+            "head_credit_protocol": self._head_credit_protocol,
             "mechanism_logit_bias_strength": self._mechanism_logit_bias_strength,
             "mechanism_confidence_floor": self._mechanism_confidence_floor,
             "prediction_feature_dim": self._prediction_feature_dim,
             "prediction_gate_min_leak": self._prediction_gate_min_leak,
+            "slow_policy_credit_floor": self._slow_policy_credit_floor,
+            "fast_policy_credit_floor": self._fast_policy_credit_floor,
             "event_policy_credit_floor": self._event_policy_credit_floor,
             "event_advantage_blend": self._event_advantage_blend,
+            "slow_entropy_coef_scale": self._slow_entropy_coef_scale,
+            "fast_entropy_coef_scale": self._fast_entropy_coef_scale,
             "event_entropy_coef_scale": self._event_entropy_coef_scale,
+            "slow_entropy_credit_floor": self._slow_entropy_credit_floor,
+            "fast_entropy_credit_floor": self._fast_entropy_credit_floor,
             "event_entropy_credit_floor": self._event_entropy_credit_floor,
             "event_logit_temperature": self._event_logit_temperature,
             "event_logit_temperature_final": self._event_logit_temperature_final,
@@ -2840,6 +3152,10 @@ class 分层PPO基类(BaseAgent):
             "backhaul_guard_max_reactive_fills_per_adapter": self._backhaul_guard_max_reactive_fills_per_adapter,
             "cache_warm_start_guard_enabled": self._cache_warm_start_guard_enabled,
             "cache_warm_start_guard_min_countdown": self._cache_warm_start_guard_min_countdown,
+            "cache_warm_start_guard_max_prefetch_countdown": self._cache_warm_start_guard_max_prefetch_countdown,
+            "predictive_prefetch_admission_guard_enabled": self._predictive_prefetch_admission_guard_enabled,
+            "predictive_prefetch_admission_min_confidence": self._predictive_prefetch_admission_min_confidence,
+            "predictive_prefetch_admission_require_distinct_next": self._predictive_prefetch_admission_require_distinct_next,
             "auxiliary_slow_weight": self._auxiliary_slow_weight,
             "auxiliary_fast_weight": self._auxiliary_fast_weight,
             "auxiliary_event_weight": self._auxiliary_event_weight,

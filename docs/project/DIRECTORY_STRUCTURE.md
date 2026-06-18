@@ -54,10 +54,10 @@
 - `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v3_eval_bias_guarded_prefetch_*`：当前 v3 eval-bias formal/holdout gate refresh。
 - `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v3_eval_bias_support/`：v3 eval-bias latency fallback 消融、prediction robustness、robustness 和 scalability 支撑产物。
 - `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v4_prepare_eval_bias*`：v4 prepare override 负向筛选产物，不作为主结果。
-- `artifacts/experiments/top_journal_final_submission/`：最终交稿闭环产物；`final_submission_controller_mappo_qmix_20260509_v1` 是 pre-Controller-MAT / pre-DAG-cache-DT-domain-baseline canonical run，包含 `ppo` / `mappo` / `dqn` / `dueling_dqn` / `qmix` clean-retrained learned baselines、formal/holdout gate、support suites 和 `comparison_report/`。新增 `controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl` 后，含这些新增 baseline 的 canonical package 需要重新跑 final-submission loop 生成。旧 `final_submission_clean_retrain_repaired_baselines_20260507_v1` 是 pre-MAPPO/QMIX-controller-level package；旧 `final_submission_clean_equal_budget_20260506_v1` 已被 baseline duplicate trace audit 否决，`final_submission_repaired_baselines_20260507_v1` 已被 clean retrain run 取代
+- `artifacts/experiments/top_journal_final_submission/`：最终交稿闭环产物；当前 canonical 为 `final_submission_v7_latency_fallback_20260528_v1`，包含 v7 SA-GHMAPPO、9 个 clean-retrained primary learned baselines、formal/offset=3 holdout gate、prediction/robustness/scalability support suites 和 `comparison_report/paper_ready/`。`final_submission_controller_mappo_qmix_20260509_v1` 是 pre-Controller-MAT / pre-DAG-cache-DT-domain-baseline historical package；`final_submission_full_current_baselines_20260511_v1` 是 v7 前的 historical canonical；旧 `final_submission_clean_retrain_repaired_baselines_20260507_v1` 是 pre-MAPPO/QMIX-controller-level package；旧 `final_submission_clean_equal_budget_20260506_v1` 已被 baseline duplicate trace audit 否决，`final_submission_repaired_baselines_20260507_v1` 已被 clean retrain run 取代
 - `artifacts/benchmarks/`：当前可引用的主结果、预测鲁棒性、消融、robustness 和可扩展性 benchmark
 - `artifacts/analysis/hf_model_cache_dataset_audit_round14/`：HF model-cache 候选适配性审计产物
-- `artifacts/paper/`：当前 canonical 论文表格和 claim summary
+- `artifacts/paper/`：历史 paper export；当前 canonical paper-ready 表格优先使用 `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/`
 
 新产物应写入明确的 run 目录，不应散落到仓库根目录。
 

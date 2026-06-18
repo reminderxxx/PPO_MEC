@@ -22,10 +22,22 @@ class MAPPOAgent(PPOBaseAgent):
 
     def __init__(self, **kwargs: Any) -> None:
         head_credit_enabled = bool(kwargs.pop("head_credit_enabled", True))
-        event_entropy_coef_scale = float(kwargs.pop("event_entropy_coef_scale", 1.0))
-        event_entropy_credit_floor = float(kwargs.pop("event_entropy_credit_floor", 0.05))
-        event_policy_credit_floor = float(kwargs.pop("event_policy_credit_floor", 0.05))
-        event_advantage_blend = float(kwargs.pop("event_advantage_blend", 1.0))
+        head_credit_protocol = str(
+            kwargs.pop("head_credit_protocol", "aggregation_reason_weighted_controller_ppo_v3")
+        )
+        slow_policy_credit_floor = float(kwargs.pop("slow_policy_credit_floor", 0.25))
+        fast_policy_credit_floor = float(kwargs.pop("fast_policy_credit_floor", 0.10))
+        event_policy_credit_floor = float(kwargs.pop("event_policy_credit_floor", 0.12))
+        slow_entropy_coef_scale = float(kwargs.pop("slow_entropy_coef_scale", 1.25))
+        fast_entropy_coef_scale = float(kwargs.pop("fast_entropy_coef_scale", 1.0))
+        event_entropy_coef_scale = float(kwargs.pop("event_entropy_coef_scale", 1.35))
+        slow_entropy_credit_floor = float(kwargs.pop("slow_entropy_credit_floor", 0.20))
+        fast_entropy_credit_floor = float(kwargs.pop("fast_entropy_credit_floor", 0.08))
+        event_entropy_credit_floor = float(kwargs.pop("event_entropy_credit_floor", 0.12))
+        event_advantage_blend = float(kwargs.pop("event_advantage_blend", 0.85))
+        event_logit_temperature = float(kwargs.pop("event_logit_temperature", 1.0))
+        event_logit_temperature_final = float(kwargs.pop("event_logit_temperature_final", 1.0))
+        event_temperature_decay_updates = int(kwargs.pop("event_temperature_decay_updates", 0))
         super().__init__(
             agent_name="mappo",
             policy_type="mappo_policy",
@@ -43,13 +55,20 @@ class MAPPOAgent(PPOBaseAgent):
             adapter_prefetch_enabled=True,
             auxiliary_coef=0.0,
             head_credit_enabled=head_credit_enabled,
+            head_credit_protocol=head_credit_protocol,
+            slow_policy_credit_floor=slow_policy_credit_floor,
+            fast_policy_credit_floor=fast_policy_credit_floor,
+            slow_entropy_coef_scale=slow_entropy_coef_scale,
+            fast_entropy_coef_scale=fast_entropy_coef_scale,
             event_entropy_coef_scale=event_entropy_coef_scale,
+            slow_entropy_credit_floor=slow_entropy_credit_floor,
+            fast_entropy_credit_floor=fast_entropy_credit_floor,
             event_entropy_credit_floor=event_entropy_credit_floor,
             event_policy_credit_floor=event_policy_credit_floor,
             event_advantage_blend=event_advantage_blend,
-            event_logit_temperature=1.0,
-            event_logit_temperature_final=1.0,
-            event_temperature_decay_updates=0,
+            event_logit_temperature=event_logit_temperature,
+            event_logit_temperature_final=event_logit_temperature_final,
+            event_temperature_decay_updates=event_temperature_decay_updates,
             event_logit_sharpening_final_scale=1.0,
             event_logit_sharpening_timing_gain=0.0,
             event_actor_loss_extra_gain=1.0,
@@ -76,8 +95,25 @@ class MAPPOAgent(PPOBaseAgent):
             "hierarchy": True,
             "event_head_enabled": True,
             "controller_head_credit": head_credit_enabled,
-            "head_credit_protocol": "aggregation_reason_weighted_ppo_v2",
-            "head_credit_basis": "generic_controller_credit_assignment_not_sa_specific",
+            "head_credit_protocol": head_credit_protocol,
+            "head_credit_basis": "controller_head_anti_collapse_credit_assignment_not_sa_specific",
+            "controller_head_credit_floors": {
+                "slow": slow_policy_credit_floor,
+                "fast": fast_policy_credit_floor,
+                "event": event_policy_credit_floor,
+            },
+            "controller_entropy_credit_floors": {
+                "slow": slow_entropy_credit_floor,
+                "fast": fast_entropy_credit_floor,
+                "event": event_entropy_credit_floor,
+            },
+            "controller_entropy_scales": {
+                "slow": slow_entropy_coef_scale,
+                "fast": fast_entropy_coef_scale,
+                "event": event_entropy_coef_scale,
+            },
+            "event_advantage_blend": event_advantage_blend,
+            "action_mix_audit_target": "avoid_controller_head_collapse_without_sa_graph_surrogate_guard_mechanisms",
             "surrogate_enhanced_head": False,
             "centralized_critic": True,
             "centralized_critic_context": "global_semantic_flat_v1",

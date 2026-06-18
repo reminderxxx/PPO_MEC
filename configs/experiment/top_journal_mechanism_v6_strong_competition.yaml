@@ -1,0 +1,86 @@
+experiment_name: top_journal_mechanism_v6_strong_competition
+output_root: artifacts/training/top_journal_mechanism_v6_strong_competition
+seeds: [7, 13, 29]
+
+scope:
+  objective: sa_ghmappo_strong_competition_candidate_against_current_optimized_baselines
+  promotion_policy: keep_current_canonical_unless_v6_passes_full_final_submission_gate
+  frozen_components:
+    - VecWorkflowCoreEnv reward main definition
+    - semantic_discrete_5 action contract
+    - controller-level MAPPO v3/QMIX/Controller-MAT contracts
+    - benchmark split definitions
+    - paper claim boundary for surrogate prediction
+
+training:
+  script: scripts/train_sa_ghmappo_real_sample.py
+  profile: top_journal_mechanism_v6_strong_competition
+  episodes: 128
+  update_every: 4
+  batch_size: 32
+  learning_rate: 0.000045
+  clip_ratio: 0.075
+  entropy_coef: 0.0012
+  value_coef: 0.85
+  auxiliary_coef: 0.32
+  max_steps: 16
+  train_window_count: 6
+  mechanism_policy_guidance:
+    heuristic_imitation_coef: 0.10
+    heuristic_imitation_warmup_updates: 8
+    heuristic_imitation_decay: 0.90
+    mechanism_aux_coef: 0.09
+    mechanism_window_weight: 1.65
+    prepare_action_prior_weight: 0.62
+    mechanism_entropy_coef: 0.0006
+    predictive_prepare_hard_override_enabled: false
+    latency_fallback_bias_enabled: false
+    mechanism_aux_current_cache_fill_enabled: true
+    backhaul_guard_enabled: true
+    backhaul_guard_max_reactive_fills_per_adapter: 1
+    cache_warm_start_guard_enabled: true
+    cache_warm_start_guard_min_countdown: 0.0
+    cache_warm_start_guard_max_prefetch_countdown: 6.0
+    predictive_prefetch_admission_guard_enabled: true
+    predictive_prefetch_admission_min_confidence: 0.55
+    predictive_prefetch_admission_require_distinct_next: true
+  event_retention:
+    event_prepare_margin_boost: 0.55
+    temporal_prepare_activation_threshold: 0.30
+    event_logit_temperature_final: 0.74
+    event_logit_sharpening_final_scale: 2.65
+  late_training_retention:
+    mechanism_retention_start_update: 6
+    mechanism_aux_coef_floor_after_update: 0.09
+    mechanism_window_weight_floor_after_update: 1.60
+    mechanism_entropy_floor_after_update: 0.0007
+  mechanism_sampling:
+    mechanism_window_oversample_ratio: 2.75
+    handoff_imminent_oversample_ratio: 1.90
+    target_mismatch_sample_weight: 1.90
+    min_mechanism_activating_windows: 3
+
+closed_loop:
+  script: scripts/run_top_journal_closed_loop.py
+  sa_profile: top_journal_mechanism_v6_strong_competition
+  mappo_baseline_profile: mappo_strong_audit
+  primary_vehicle_selection: handoff_pressure
+  window_mode_for_training: full_stratified
+  sa_episodes: 128
+  train_window_count: 6
+
+final_submission:
+  script: scripts/run_top_journal_final_submission_loop.py
+  force_retrain_learned: true
+  baseline_episodes: 96
+  baseline_update_every: 6
+  baseline_batch_size: 32
+  mappo_baseline_profile: mappo_strong_audit
+  minimum_reward_delta: 0.5
+  holdout_offsets: [3]
+
+promotion_gate:
+  current_canonical: final_submission_full_current_baselines_20260511_v1
+  require_paper_ready_package_ready: true
+  require_blocker_count: 0
+  require_formal_and_holdout_cluster_ci_positive: true

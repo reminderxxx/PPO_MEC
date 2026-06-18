@@ -173,9 +173,17 @@ SUPPORT_ROW_FILES = {
 }
 CURRENT_MAPPO_PROTOCOL = {
     "head_credit_enabled": True,
-    "event_policy_credit_floor": 0.05,
-    "event_entropy_credit_floor": 0.05,
-    "event_advantage_blend": 1.0,
+    "head_credit_protocol": "aggregation_reason_weighted_controller_ppo_v3",
+    "slow_policy_credit_floor": 0.25,
+    "fast_policy_credit_floor": 0.10,
+    "event_policy_credit_floor": 0.12,
+    "slow_entropy_coef_scale": 1.25,
+    "fast_entropy_coef_scale": 1.00,
+    "event_entropy_coef_scale": 1.35,
+    "slow_entropy_credit_floor": 0.20,
+    "fast_entropy_credit_floor": 0.08,
+    "event_entropy_credit_floor": 0.12,
+    "event_advantage_blend": 0.85,
 }
 ALGORITHM_COMPARISON_METADATA = {
     "sa_ghmappo": {
@@ -199,7 +207,7 @@ ALGORITHM_COMPARISON_METADATA = {
         "learning_type": "on-policy CTDE",
         "contract_granularity": "three controller heads with centralized critic",
         "uses_sa_only_mechanisms": "no",
-        "main_difference": "generic aggregation-reason head-credit without graph/surrogate/guard mechanisms",
+        "main_difference": "controller-head anti-collapse credit without graph/surrogate/guard mechanisms",
         "literature_anchor": "standard CTDE MAPPO-family comparator",
     },
     "dqn": {
@@ -1022,11 +1030,15 @@ def build_protocol_rows(final_gate: dict[str, Any]) -> list[dict[str, Any]]:
         protocol_version = ""
         comparison_note = "Clean retrained by the final-submission suite and audited by duplicate-trace and provenance gates."
         if agent_name == "mappo":
-            protocol_version = "aggregation_reason_weighted_ppo_v2" if mappo_protocol_current else "missing_or_pre_head_credit"
+            protocol_version = (
+                "aggregation_reason_weighted_controller_ppo_v3"
+                if mappo_protocol_current
+                else "missing_or_pre_v3_head_credit"
+            )
             contract_status = "valid" if mappo_protocol_current else "pre_head_credit_protocol_missing"
             comparison_note = (
-                "Controller-level CTDE MAPPO with aggregation-reason controller head-credit. "
-                "Pre-head-credit MAPPO checkpoints are archived only and cannot support a current MAPPO claim."
+                "Controller-level CTDE MAPPO with aggregation-reason controller head-credit v3. "
+                "Pre-v3/pre-head-credit MAPPO checkpoints are archived only and cannot support a current MAPPO claim."
             )
         rows.append(
             {
@@ -1061,8 +1073,8 @@ def build_protocol_rows(final_gate: dict[str, Any]) -> list[dict[str, Any]]:
                 "included_in_primary_gate": False,
                 "trainable_now": True,
                 "contract_status": "valid_controller_level_ctde_head_credit",
-                "protocol_version": "aggregation_reason_weighted_ppo_v2",
-                "comparison_note": "Controller-level MAPPO is available for new runs with aggregation-reason controller head-credit; this artifact does not include it unless listed in learned_baseline_agents.",
+                "protocol_version": "aggregation_reason_weighted_controller_ppo_v3",
+                "comparison_note": "Controller-level MAPPO is available for new runs with aggregation-reason controller head-credit v3; this artifact does not include it unless listed in learned_baseline_agents.",
             }
         )
     if "qmix" not in learned_agents:
@@ -2013,13 +2025,13 @@ def build_self_review_rows(
         if ippo_excluded_ok and mappo_contract_ok
         else "block",
         "critical",
-        "IPPO remains excluded; controller-level MAPPO must be included with the current head-credit protocol or explicitly marked as not covered by this artifact.",
+        "IPPO remains excluded; controller-level MAPPO must be included with the current head-credit v3 protocol or explicitly marked as not covered by this artifact.",
         (
             f"ippo:{ippo_row.get('contract_status')}, primary={ippo_row.get('included_in_primary_gate')}; "
             f"mappo:{mappo_row.get('contract_status')}, primary={mappo_row.get('included_in_primary_gate')}, "
             f"protocol={mappo_row.get('protocol_version', '')}"
         ),
-        "Do not cite MAPPO results unless the artifact includes mappo, duplicate-trace audit passes, and the checkpoint protocol records controller head-credit.",
+        "Do not cite MAPPO results unless the artifact includes mappo, duplicate-trace audit passes, and the checkpoint protocol records controller head-credit v3.",
     )
     high_risk_mappo_rows = [
         row
@@ -2626,7 +2638,7 @@ def build_paper_result_summary(
     mappo_contract_status = str(mappo_row.get("contract_status", ""))
     mappo_protocol_version = str(mappo_row.get("protocol_version", ""))
     if primary_mappo_included and mappo_contract_status == "valid":
-        mappo_status_line = "- MAPPO status: included as a controller-level CTDE baseline with controller head-credit"
+        mappo_status_line = "- MAPPO status: included as a controller-level CTDE baseline with controller head-credit v3"
     elif primary_mappo_included:
         mappo_status_line = (
             "- MAPPO status: numeric row is present but blocked for paper claim "
@@ -2795,7 +2807,7 @@ def build_paper_result_summary(
             "## Required Claim Boundary",
             "",
             "- Do not report IPPO as a formal baseline until a true independent per-agent wrapper is implemented.",
-            "- Cite MAPPO only when the current artifact includes `mappo` in `learned_baseline_agents`, duplicate-trace audit passes, and `baseline_protocol_versions.mappo` records the current controller head-credit protocol.",
+            "- Cite MAPPO only when the current artifact includes `mappo` in `learned_baseline_agents`, duplicate-trace audit passes, and `baseline_protocol_versions.mappo` records the current controller head-credit v3 protocol.",
             "- If MAPPO is weaker than PPO/DQN, include the action-mix audit and avoid framing MAPPO weakness as the main evidence for SA-GHMAPPO.",
             "- Cite Controller-MAT only when the current artifact includes `controller_mat` in `learned_baseline_agents` and duplicate-trace audit passes.",
             "- Cite DAG/cache/DT domain baselines only when the current artifact includes `dag_offload_drl`, `cache_offload_drl`, and `dt_handoff_drl` in `learned_baseline_agents` and duplicate-trace audit passes.",
@@ -3108,7 +3120,7 @@ def main() -> None:
         "claim_boundary": [
             "Primary claims are against the clean-retrained learned baselines listed in learned_baseline_agents.",
             "IPPO remains contract-blocked until a true independent per-agent wrapper is implemented.",
-            "MAPPO is claimable only for artifacts that include mappo in learned_baseline_agents, pass duplicate-trace independence audits, and record the current controller head-credit checkpoint protocol.",
+            "MAPPO is claimable only for artifacts that include mappo in learned_baseline_agents, pass duplicate-trace independence audits, and record the current controller head-credit v3 checkpoint protocol.",
             "If MAPPO underperforms PPO/DQN, the paper must include or cite the MAPPO action-mix audit and phrase the strongest learned-baseline claim against PPO.",
             "Controller-MAT is claimable only for artifacts that include controller_mat in learned_baseline_agents and pass duplicate-trace independence audits.",
             "DAG/cache/DT domain baselines are claimable only for artifacts that include dag_offload_drl, cache_offload_drl, and dt_handoff_drl in learned_baseline_agents and pass duplicate-trace independence audits.",

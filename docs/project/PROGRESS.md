@@ -2,6 +2,191 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-05-28: v7 final-submission paper-ready package
+
+已完成：
+
+- 使用 `top_journal_mechanism_v7_latency_fallback_20260528_v1/seed_checkpoint_manifest.json` 作为 SA 基础，运行 final-submission loop：`final_submission_v7_latency_fallback_20260528_v1`。
+- final suite clean retrain 9 个 learned baselines 的 3 个 seed：`ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl`；`formal_training_provenance.passed=true`，`record_count=27`。
+- 运行 comparison package builder，生成 `comparison_report/` 和 `comparison_report/paper_ready/`。
+
+已完成验证：
+
+- `python scripts\run_top_journal_final_submission_loop.py --run_id final_submission_v7_latency_fallback_20260528_v1 --base_manifest_path artifacts\experiments\top_journal_closed_loop\top_journal_mechanism_v7_latency_fallback_20260528_v1\seed_checkpoint_manifest.json --force_retrain_learned --resume_training --resume_benchmark --resume_support --command_retries 2 --baseline_episodes 96 --baseline_update_every 6 --baseline_batch_size 32 --minimum_reward_delta 0.5 --holdout_offsets 3 --seeds 7 13 29 --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified`
+- `python scripts\build_top_journal_comparison_report.py --final_run_root artifacts\experiments\top_journal_final_submission\final_submission_v7_latency_fallback_20260528_v1`
+
+关键结果：
+
+- Final gate：`target_reached=true`、`paper_claim_ready=true`、`blockers=[]`。
+- Comparison package：`review_ready=true`、`paper_ready_package_ready=true`；self-review `blocker_count=0`、`limitation_count=3`、`pass_count=15`。
+- Formal split margins over strongest learned baseline `dt_handoff_drl`：mixed `+11.176111`，full `+3.377407`。
+- Holdout offset=3 split margins over strongest learned baseline `dt_handoff_drl`：mixed `+8.442778`，full `+5.242143`。
+- Cluster-bootstrap paired total reward CI 均为正；最弱 formal learned CI 为 vs `dt_handoff_drl` mean `+5.327083`、95% CI `[1.594094, 8.963719]`，最弱 holdout learned CI 为 vs `dt_handoff_drl` mean `+6.202333`、95% CI `[1.607076, 10.593939]`。
+- Support suites 对全部 primary learned baselines 也为正：最弱 prediction vs `dt_handoff_drl` mean `+4.833472`、95% CI `[3.170913, 6.600080]`；robustness `+9.799097`、95% CI `[8.329792, 11.297618]`；scalability `+4.133380`、95% CI `[3.245373, 5.016079]`。
+- Supplementary `popularity_cache_heuristic` 仍很接近：formal/holdout mixed/full reward margins 分别为 `+0.250000`、`+0.479629`、`+0.355556`、`+0.376191`。
+
+结论边界：
+
+- `final_submission_v7_latency_fallback_20260528_v1` 是当前 paper-ready canonical final-submission package。
+- 论文表述必须保留 generated self-review 的 3 个 limitation：heuristic gap close、mechanism realization rate 不构成每个 split 的 standalone CI-positive 优势、backhaul savings 不作为 universal headline。
+
+## 2026-05-28: SA v7 latency fallback clean-retrain formal pass
+
+已完成：
+
+- 新增 `top_journal_mechanism_v7_latency_fallback` profile 和 `configs/experiment/top_journal_mechanism_v7_latency_fallback.yaml`。v7 以 v6 strong-competition profile 为基线，保留 freshness / confidence-aware prefetch admission guards，并重新启用 clean-retrain latency fallback：`latency_fallback_bias_enabled=true`、`latency_fallback_bias_strength=1.20`、`latency_fallback_confidence_floor=0.62`、`latency_fallback_slow_suppression_strength=1.20`。
+- `scripts/run_top_journal_closed_loop.py` 已把 v7 纳入 formal budget override：`sa_episodes=128`、`train_window_count=6`。
+- `tests/test_algo_pool_contract.py` 和 `tests/test_top_journal_closed_loop.py` 已覆盖 v7 profile 参数与 formal budget。
+
+已完成验证：
+
+- `python -m py_compile scripts\train_sa_ghmappo_real_sample.py scripts\run_top_journal_closed_loop.py`
+- `python -m pytest tests/test_algo_pool_contract.py::AlgoPoolContractTestCase::test_sa_v6_profile_is_registered_for_strong_competition tests/test_algo_pool_contract.py::AlgoPoolContractTestCase::test_sa_v7_profile_combines_v6_guards_with_latency_fallback tests/test_top_journal_closed_loop.py::test_effective_settings_honor_v6_sa_profile_budget tests/test_top_journal_closed_loop.py::test_effective_settings_honor_v7_sa_profile_budget`
+- `python scripts\run_top_journal_closed_loop.py --quick --run_id top_journal_mechanism_v7_latency_fallback_quick_20260528 --seeds 7 --sa_profile top_journal_mechanism_v7_latency_fallback --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified`
+- `python scripts\run_top_journal_closed_loop.py --run_id top_journal_mechanism_v7_latency_fallback_20260528_v1 --seeds 7 13 29 --sa_profile top_journal_mechanism_v7_latency_fallback --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified --sa_episodes 128 --train_window_count 6 --resume_training`
+- `python scripts\analyze_mechanism_actionmix_gap.py --mixed_benchmark_dir artifacts\experiments\top_journal_closed_loop\top_journal_mechanism_v7_latency_fallback_20260528_v1\benchmarks\mixed_informative\main_results_mixed_informative_20260528_200213_838926 --full_benchmark_dir artifacts\experiments\top_journal_closed_loop\top_journal_mechanism_v7_latency_fallback_20260528_v1\benchmarks\full_stratified\main_results_full_stratified_20260528_200240_428173 --output_dir artifacts\analysis\top_journal_mechanism_v7_latency_fallback_actionmix_diagnosis_20260528`
+
+关键结果：
+
+- `top_journal_mechanism_v7_latency_fallback_20260528_v1`：`formal_contract.ready=true`、`baseline_protocol_audit.passed=true`、`passed=true`、`paper_claim_ready=true`。
+- `mixed_informative`：SA `98.396667` vs `popularity_cache_heuristic` `98.146667`，delta `+0.250000`；continuity、handoff failure 和 backhaul 均与 popularity 持平；strongest learned baseline 为 `mappo=82.555000`。
+- `full_stratified`：SA `90.651296` vs `popularity_cache_heuristic` `90.171667`，delta `+0.479629`；continuity、handoff failure 和 backhaul 均与 popularity 持平；strongest learned baseline 为 `mappo=86.142222`。
+- action-mix 诊断显示主要收益来自 placement/action mix：SA 在 active/idle 非机制窗口用 `vehicle_fallback` 替换一部分 current-RSU steady execution，降低 delay reward penalty；cache/backhaul/handoff 指标未被改写。
+
+结论边界：
+
+- 这是 closed-loop formal pass，不是 final-submission package，也不是新的 canonical。
+- 论文主结果替换前仍必须跑 final-submission/holdout/support，并生成新的 comparison report / paper-ready package；当前 canonical 仍不自动替换。
+
+## 2026-05-27: SA v6 confidence-aware prefetch admission guard
+
+已完成审计：
+
+- 正式 closed-loop `top_journal_mechanism_v6_freshness_guard_20260527_v1` 已完成，`formal_contract.ready=true`，但 `passed=false`、`paper_claim_ready=false`。
+- gate blocker 仍为 `sa_total_reward_not_above_popularity` 和 `benchmark_minimum_success_not_reached`：mixed SA `98.091111` vs popularity `98.146667`；full SA `90.153148` vs popularity `90.171667`。
+- 诊断产物 `artifacts/analysis/top_journal_mechanism_v6_freshness_guard_actionmix_diagnosis_20260527/` 显示剩余负例集中在 `window_off246_len24_t293_316` / `j_8` / seed `13`：SA 在低置信度且 `predicted_next_rsu_id` 仍为当前 RSU 时提前 prefetch，最终 `expired_miss`；heuristic 等到后续更高置信度、next-RSU 对齐时 prefetch 并命中。
+
+已完成维护：
+
+- `src/agents/sa_ghmappo_core.py` 新增 `predictive_prefetch_admission_guard_*`，默认关闭；v6 profile 显式开启 `predictive_prefetch_admission_guard_enabled=true`、`predictive_prefetch_admission_min_confidence=0.55`、`predictive_prefetch_admission_require_distinct_next=true`。
+- guard 只在 selected action 为 predictive prefetch、当前 adapter 已 warm、target adapter 未 warm、存在 distinct handoff target，且 prediction confidence 低于阈值并且 next-RSU / prefetch target 未对齐时触发；触发后把动作延期为 `handoff_migration_prepare`。
+- 训练 summary、checkpoint 恢复、main-results benchmark rows、eval-bias manifest builder、baseline excluded-SA-mechanism 配置和 contract tests 已同步新增字段。
+
+已完成验证：
+
+- `python -m py_compile src\agents\sa_ghmappo_core.py src\agents\sa_ghmappo_agent.py src\evaluators\real_eval_support.py src\evaluators\main_results_support.py src\trainers\marl_on_policy_trainer.py scripts\train_sa_ghmappo_real_sample.py scripts\build_top_journal_eval_bias_manifest.py`
+- `python -m pytest tests\test_algo_pool_contract.py`
+- `python -m pytest tests\test_env_contract.py`
+- `python -m pytest tests\test_top_journal_closed_loop.py`
+- `python scripts\smoke_test.py`
+- `python scripts\run_top_journal_closed_loop.py --quick --run_id top_journal_mechanism_v6_prefetch_admission_quick_20260527 --seeds 7 --sa_profile top_journal_mechanism_v6_strong_competition --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified`
+
+结论边界：
+
+- quick run 仅验证训练、checkpoint、恢复和 benchmark 消费链路；`paper_claim_ready=false`、`passed=false` 不构成论文结论。
+- 该维护是低置信度预测下的 policy-side admission control，不修改 `semantic_discrete_5` action contract、环境 reward 或 formal gate；仍需后续 3-seed formal/holdout 验证才能判断是否缩小 popularity gap。
+
+## 2026-05-27: SA v6 freshness-aware prefetch guard
+
+已完成维护：
+
+- `src/agents/sa_ghmappo_core.py` 为 `cache_warm_start_guard` 增加 `cache_warm_start_guard_max_prefetch_countdown`，默认 `0.0` 表示保持历史无上界行为；当显式设置为正数时，target adapter 未 warm 但 handoff countdown 超过 freshness window 时不再把 prepare 强制改成 predictive prefetch。
+- `top_journal_mechanism_v6_strong_competition` profile 将该上界设为 `6.0`，与当前 `EpisodeRecorder(prefetch_validation_window=6)` 对齐，减少机制窗口中过早 prefetch 变成 `expired_miss` 的风险。
+- `real_eval_support`、训练 summary、eval-bias manifest builder、配置文件和 contract tests 已同步识别该字段，保持 checkpoint 生产端/消费端一致。
+
+已完成验证：
+
+- `python -m py_compile src\agents\sa_ghmappo_core.py src\agents\sa_ghmappo_agent.py src\evaluators\real_eval_support.py scripts\train_sa_ghmappo_real_sample.py scripts\build_top_journal_eval_bias_manifest.py`
+- `python -m pytest tests\test_algo_pool_contract.py`
+- `python -m pytest tests\test_env_contract.py`
+- `python -m pytest tests\test_top_journal_closed_loop.py`
+- `python scripts\smoke_test.py`
+- `python scripts\run_top_journal_closed_loop.py --quick --run_id top_journal_mechanism_v6_freshness_guard_quick_20260527 --seeds 7 --sa_profile top_journal_mechanism_v6_strong_competition --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified`
+
+quick run 结果边界：
+
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_freshness_guard_quick_20260527/` 可执行完成；训练 summary 记录 `cache_warm_start_guard_max_prefetch_countdown=6.0`。
+- quick/debug run 的 `paper_claim_ready=false`、`passed=false` 符合预期；不得作为论文结果或 v6 promotion 依据。
+
+结论边界：
+
+- 本次是方向匹配的 policy-side freshness gating，小步修复 v6 机制窗口诊断中暴露的 prefetch timing 问题；不修改 `semantic_discrete_5` action contract、环境 reward 或 benchmark gate。
+- 该代码变更本身不构成新的论文结果；仍需 formal/holdout v3 final-submission protocol 重跑后，才能判断是否替代当前 canonical。
+
+## 2026-05-27: SA v6 action-mask 修复与 full-stratified closed-loop 重跑
+
+已完成维护：
+
+- `src/envs/specs/action_schema.py` 的 predictive prefetch precondition 改为优先读取 `predicted_next_rsu_by_vehicle`，并在预测序列首项仍为当前 RSU 时扫描第一个 non-current RSU，避免把后续真实 handoff target 误判为 invalid。
+- `src/agents/sa_ghmappo_core.py` 的层级策略在存在有效 `action_mask` 时先在 masked env-action score 上采样/argmax，再反解为 slow/fast/event head target，避免训练和评估阶段先采样非法 head 组合再投影。
+- `scripts/run_top_journal_closed_loop.py` 对 `top_journal_mechanism_v6_strong_competition` profile 使用 v6 预算默认值：`sa_episodes=128`、`train_window_count=6`；配置文件同步记录 closed-loop full-stratified 训练窗口。
+
+已完成运行：
+
+- `python scripts\run_top_journal_closed_loop.py --quick --run_id top_journal_mechanism_v6_masked_fulltrain_quick_20260527 --seeds 7 --sa_profile top_journal_mechanism_v6_strong_competition --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified`
+- `python scripts\run_top_journal_closed_loop.py --run_id top_journal_mechanism_v6_masked_fulltrain_20260527_v1 --seeds 7 13 29 --sa_profile top_journal_mechanism_v6_strong_competition --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified --sa_episodes 128 --train_window_count 6`
+
+核心产物：
+
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/gate_report.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/gate_summary.csv`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/seed_checkpoint_manifest.json`
+
+关键结果：
+
+- 修复版 run 完成且 `formal_contract.ready=true`，`baseline_protocol_audit.passed=true`；但 closed-loop gate 仍未通过：`passed=false`、`paper_claim_ready=false`。
+- `action_projection_count` 和 `invalid_action_attempt_count` 在 formal benchmark 的 `mixed_informative` 与 `full_stratified` 下均为 `0.0`；旧 v6 run 的 gate total 分别为 mixed `85/85`、full `432/432`。
+- `mixed_informative`：SA reward `98.091111`，`popularity_cache_heuristic` `98.146667`，差值 `-0.055556`；strongest learned baseline 为 `mappo=82.555`，SA 差值 `+15.536111`。
+- `full_stratified`：SA reward `90.153148`，`popularity_cache_heuristic` `90.171667`，差值 `-0.018519`；strongest learned baseline 为 `mappo=86.142222`，SA 差值 `+4.010926`。
+- full split continuity 已恢复到 heuristic 同形：SA `workflow_continuity_rate=0.927399`、`handoff_failure_rate=0.123148`，与 `popularity_cache_heuristic` 持平；旧 v6 的 full learned-side blocker `cache_offload_drl` 已不再是本轮 strongest learned baseline。
+- 新 blocker 集中在 supplementary popularity 的极小 reward gap 和 mechanism success gate：mixed success `18/125=0.144`，full success `33/188=0.175532`，均未达到 benchmark minimum success gate。
+
+结论边界：
+
+- `top_journal_mechanism_v6_masked_fulltrain_20260527_v1` 证明 invalid action / projection 问题已修复，且 SA 在本轮重新超过所有 learned baselines。
+- 该 run 仍是 negative candidate，不替换 `final_submission_full_current_baselines_20260511_v1`；在超过 `popularity_cache_heuristic` 并通过 mechanism success gate 前，不运行 v6 final-submission promotion。
+
+## 2026-05-27: v6 强竞争 closed-loop 结果审计
+
+已完成运行：
+
+- `python scripts\run_top_journal_closed_loop.py --run_id top_journal_mechanism_v6_strong_competition_20260527_v1 --seeds 7 13 29 --sa_profile top_journal_mechanism_v6_strong_competition --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure`
+
+核心产物：
+
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/gate_report.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/gate_summary.csv`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/seed_checkpoint_manifest.json`
+
+关键结果：
+
+- 本轮 run 完成且 `formal_contract.ready=true`，MAPPO v3 的 `baseline_protocol_audit.passed=true`，`baseline_protocol_versions.mappo.head_credit_protocol=aggregation_reason_weighted_controller_ppo_v3`。
+- closed-loop gate 未通过：`passed=false`、`paper_claim_ready=false`。
+- `mixed_informative` blocker：`sa_total_reward_not_above_popularity`、`benchmark_minimum_success_not_reached`。SA `96.874444`，`popularity_cache_heuristic` `98.146667`，差值 `-1.272223`；SA 仍高于 strongest learned baseline `cache_offload_drl=92.024444`，差值 `+4.85`。
+- `full_stratified` blocker：`sa_total_reward_not_above_cache_offload_drl`、`sa_total_reward_not_above_popularity`、`benchmark_minimum_success_not_reached`。SA `89.692037`，`popularity_cache_heuristic` `90.171667`，`cache_offload_drl` `90.168889`；SA 相对 strongest learned baseline 差值 `-0.476852`。
+- v6 对 PPO 仍有明显优势：mixed `+26.327222`，full `+19.590185`；但本轮 strongest learned baseline 已变为 `cache_offload_drl`，不能再把 PPO 写成默认最强对照。
+- MAPPO v3 协议可运行，但 closed-loop 结果还不是 paper-ready：mixed reward `83.435`，full reward `84.999259`，本轮 benchmark 中 prefetch count 仍为 `0.0`。
+
+结论边界：
+
+- `top_journal_mechanism_v6_strong_competition_20260527_v1` 是 negative candidate，不替换当前 canonical。
+- 当前可写入主论文的正式结果仍是 `final_submission_full_current_baselines_20260511_v1`。
+- 暂不继续运行 v6 final-submission promotion；需要先降低 SA invalid action / action projection，并修复 full split 下相对 `cache_offload_drl` 的 reward 与 continuity 弱项。
+
+## 2026-05-27: MAPPO v3 强对照与 SA v6 候选入口
+
+已完成维护：
+
+- `mappo` 升级为 `aggregation_reason_weighted_controller_ppo_v3`：slow / fast / event 三个 controller head 均有 policy credit floor、entropy credit floor 和 entropy scale，降低 MAPPO action-mix collapse 风险。
+- 新增 baseline profile `mappo_strong_audit`，并让 learned-baseline suite、final-submission loop 和 closed-loop 默认对 MAPPO 使用该 profile。
+- `real_eval_support`、checkpoint config、learn/action info 和 comparison protocol audit 均保留并检查 v3 字段。
+- 新增主算法 profile `top_journal_mechanism_v6_strong_competition` 与配置 `configs/experiment/top_journal_mechanism_v6_strong_competition.yaml`，用于后续与优化后 learned baselines 同预算重跑。
+
+结论边界：
+
+- 本轮只更新算法实现、训练入口、审计协议和文档；尚未重跑正式 formal/holdout final-submission benchmark。
+- 现有已验证 canonical 仍是 `final_submission_full_current_baselines_20260511_v1`；新的 MAPPO v3 / SA v6 论文 claim 必须等 v6 final-submission package 通过 `paper_claim_ready=true` 后再替换。
+
 ## 2026-05-15: v5 性能/robustness 候选实验维护启动
 
 已完成维护：
@@ -87,7 +272,7 @@
 - 新增 canonical paper-ready run：`artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/`。
 - 以 `top_journal_closed_loop_formal_20260505_v2/seed_checkpoint_manifest.json` 为 base manifest，执行 `force_retrain_learned`，对 `ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl` 做同环境交互预算 clean retrain。
 - formal offset 0、holdout offset 3、prediction robustness、system robustness 和 scalability support suite 均完成。
-- `baseline_protocol_versions.mappo` 记录当前 head-credit protocol：`head_credit_enabled=True`、`event_policy_credit_floor=0.05`、`event_entropy_credit_floor=0.05`、`event_advantage_blend=1.0`。
+- `baseline_protocol_versions.mappo` 记录当时的 head-credit protocol：`head_credit_enabled=True`、`event_policy_credit_floor=0.05`、`event_entropy_credit_floor=0.05`、`event_advantage_blend=1.0`；2026-05-27 之后新的 MAPPO claim 需使用 v3 protocol 重跑。
 - 新 comparison package：`artifacts/experiments/top_journal_final_submission/final_submission_full_current_baselines_20260511_v1/comparison_report/`，其中 `review_ready=true`、`paper_ready_package_ready=true`。
 
 已验证：
@@ -129,7 +314,7 @@
 
 结论边界：
 
-- 当前审计产物 `comparison_report_mappo_head_credit_audit_200_direct_new` 的 `review_ready=true`，但 `paper_ready_package_ready=false`，原因是旧 MAPPO checkpoint 缺少当前 head-credit protocol 记录。
+- 当时审计产物 `comparison_report_mappo_head_credit_audit_200_direct_new` 的 `review_ready=true`，但 `paper_ready_package_ready=false`，原因是旧 MAPPO checkpoint 缺少该轮要求的 head-credit protocol 记录。
 - 可声明子集仅为该 artifact 中 contract-valid 的 `ppo`、`dqn`、`dueling_dqn`、`qmix`；含当前 MAPPO、Controller-MAT、DAG/cache/DT 领域对照的正式主表仍需重新跑 final-submission loop。
 
 ## 2026-05-10: 新增 DAG/cache/DT 领域专项 learned baselines
@@ -746,7 +931,7 @@
 结论边界：
 
 - `final_submission_controller_mappo_qmix_20260509_v1` 是 pre-MAPPO-head-credit package；其中 MAPPO 结果只作历史归档，不再作为当前顶刊主表的 MAPPO 强对照。
-- 新的顶刊主表必须重跑 final-submission loop，并要求 `baseline_protocol_versions.mappo` 记录 `head_credit_enabled=True`、`event_policy_credit_floor=0.05`、`event_entropy_credit_floor=0.05`、`event_advantage_blend=1.0`。
+- 新的顶刊主表必须重跑 final-submission loop，并要求 `baseline_protocol_versions.mappo` 记录当前 MAPPO v3 protocol。
 - 若新版 MAPPO 变强导致 SA-GHMAPPO margin 变小，应以新版结果为准；不能为突出主算法而保留弱 MAPPO。
 
 已验证：

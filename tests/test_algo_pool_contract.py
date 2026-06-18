@@ -194,15 +194,24 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(mappo.baseline_config["ctde_scope"], "controller_level_cache_execution_handoff")
         self.assertTrue(mappo.baseline_config["paper_grade_independent_baseline"])
         self.assertTrue(mappo.baseline_config["controller_head_credit"])
-        self.assertEqual(mappo.baseline_config["head_credit_protocol"], "aggregation_reason_weighted_ppo_v2")
+        self.assertEqual(
+            mappo.baseline_config["head_credit_protocol"],
+            "aggregation_reason_weighted_controller_ppo_v3",
+        )
+        self.assertEqual(
+            mappo.baseline_config["controller_head_credit_floors"],
+            {"slow": 0.25, "fast": 0.10, "event": 0.12},
+        )
         self.assertEqual(
             mappo._build_head_credit_weights("event_head_prepare"),
-            {"slow": 0.2, "fast": 0.0, "event": 1.0},
+            {"slow": 0.3, "fast": 0.1, "event": 1.0},
         )
         self.assertEqual(
             mappo._build_head_credit_weights("fast_head_steady_offload"),
-            {"slow": 0.15, "fast": 1.0, "event": 0.0},
+            {"slow": 0.3, "fast": 1.0, "event": 0.15},
         )
+        self.assertEqual(mappo._resolve_actor_weight("slow", 0.0), 0.25)
+        self.assertAlmostEqual(mappo._resolve_entropy_weight("event", 0.0), 0.162)
 
     def test_mappo_action_exposes_three_controller_agents(self) -> None:
         state = _minimal_semantic_state()
@@ -219,7 +228,50 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(action_info["critic_mode"], "centralized")
         self.assertEqual(action_info["critic_context_key"], "centralized_critic_context")
         self.assertEqual(action_info["policy_type"], "mappo_policy")
+        self.assertEqual(action_info["head_credit_protocol"], "aggregation_reason_weighted_controller_ppo_v3")
         self.assertIn("head_credit_weights", action_info)
+        self.assertEqual(action_info["effective_head_credit_floors"]["policy"]["slow"], 0.25)
+
+    def test_mappo_strong_audit_training_profile_sets_v3_protocol(self) -> None:
+        from scripts.train_algo_pool_real_sample import agent_profile_kwargs
+
+        kwargs = agent_profile_kwargs("mappo", "mappo_strong_audit")
+        self.assertEqual(kwargs["head_credit_protocol"], "aggregation_reason_weighted_controller_ppo_v3")
+        self.assertEqual(kwargs["slow_policy_credit_floor"], 0.25)
+        self.assertEqual(kwargs["event_advantage_blend"], 0.85)
+        self.assertEqual(agent_profile_kwargs("ppo", "mappo_strong_audit"), {})
+
+    def test_sa_v6_profile_is_registered_for_strong_competition(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        self.assertIn("top_journal_mechanism_v6_strong_competition", PROFILE_DEFAULTS)
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v6_strong_competition"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["train_window_count"], 6)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v6_strong_competition")
+        self.assertEqual(kwargs["mechanism_window_weight"], 1.65)
+        self.assertEqual(kwargs["mechanism_window_weight_floor_after_update"], 1.60)
+        self.assertFalse(kwargs["predictive_prepare_hard_override_enabled"])
+        self.assertEqual(kwargs["cache_warm_start_guard_max_prefetch_countdown"], 6.0)
+        self.assertTrue(kwargs["predictive_prefetch_admission_guard_enabled"])
+        self.assertEqual(kwargs["predictive_prefetch_admission_min_confidence"], 0.55)
+        self.assertTrue(kwargs["predictive_prefetch_admission_require_distinct_next"])
+
+    def test_sa_v7_profile_combines_v6_guards_with_latency_fallback(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        self.assertIn("top_journal_mechanism_v7_latency_fallback", PROFILE_DEFAULTS)
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v7_latency_fallback"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["train_window_count"], 6)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v7_latency_fallback")
+        self.assertEqual(kwargs["mechanism_window_weight"], 1.65)
+        self.assertEqual(kwargs["cache_warm_start_guard_max_prefetch_countdown"], 6.0)
+        self.assertTrue(kwargs["predictive_prefetch_admission_guard_enabled"])
+        self.assertTrue(kwargs["latency_fallback_bias_enabled"])
+        self.assertEqual(kwargs["latency_fallback_bias_strength"], 1.20)
+        self.assertEqual(kwargs["latency_fallback_confidence_floor"], 0.62)
+        self.assertEqual(kwargs["latency_fallback_slow_suppression_strength"], 1.20)
 
     def test_qmix_uses_controller_level_value_decomposition_contract(self) -> None:
         state = _minimal_semantic_state()
@@ -589,6 +641,108 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(actions["slow"], 2)
         self.assertEqual(actions["event"], 0)
 
+    def test_cache_warm_start_guard_defers_prefetch_outside_freshness_window(self) -> None:
+        state = _minimal_semantic_state()
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["predictions"]["next_rsu_sequence"]["veh_1"] = ["rsu_a"] * 7 + ["rsu_b"]
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=1,
+            cache_warm_start_guard_enabled=True,
+            cache_warm_start_guard_min_countdown=0.0,
+            cache_warm_start_guard_max_prefetch_countdown=6.0,
+        )
+        actions = {"slow": 0, "fast": 0, "event": 1}
+
+        guard_info = agent._apply_cache_warm_start_guard_to_actions(
+            semantic_state=state,
+            selected_actions=actions,
+        )
+
+        self.assertFalse(guard_info["guarded"])
+        self.assertEqual(guard_info["reason"], "target_prefetch_deferred_until_freshness_window")
+        self.assertEqual(guard_info["handoff_countdown_steps"], 8.0)
+        self.assertEqual(actions["slow"], 0)
+        self.assertEqual(actions["event"], 1)
+
+    def test_cache_warm_start_guard_prefetches_inside_freshness_window(self) -> None:
+        state = _minimal_semantic_state()
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["predictions"]["next_rsu_sequence"]["veh_1"] = ["rsu_a"] * 5 + ["rsu_b"]
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=1,
+            cache_warm_start_guard_enabled=True,
+            cache_warm_start_guard_min_countdown=0.0,
+            cache_warm_start_guard_max_prefetch_countdown=6.0,
+        )
+        actions = {"slow": 0, "fast": 0, "event": 1}
+
+        guard_info = agent._apply_cache_warm_start_guard_to_actions(
+            semantic_state=state,
+            selected_actions=actions,
+        )
+
+        self.assertTrue(guard_info["guarded"])
+        self.assertEqual(guard_info["reason"], "target_adapter_not_warm_prefetch_first")
+        self.assertEqual(guard_info["handoff_countdown_steps"], 6.0)
+        self.assertEqual(actions["slow"], 2)
+        self.assertEqual(actions["event"], 0)
+
+    def test_predictive_prefetch_admission_guard_defers_low_confidence_unaligned_prefetch(self) -> None:
+        state = _minimal_semantic_state()
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["predictions"]["predicted_next_rsu_by_vehicle"]["veh_1"] = "rsu_a"
+        state["predictions"]["predicted_first_handoff_rsu_by_vehicle"]["veh_1"] = "rsu_b"
+        state["predictions"]["next_rsu_sequence"]["veh_1"] = ["rsu_a", "rsu_b"]
+        state["predictions"]["prediction_confidence_by_vehicle"]["veh_1"] = 0.38
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=1,
+            predictive_prefetch_admission_guard_enabled=True,
+            predictive_prefetch_admission_min_confidence=0.55,
+            predictive_prefetch_admission_require_distinct_next=True,
+        )
+        actions = {"slow": 2, "fast": 0, "event": 0}
+
+        guard_info = agent._apply_predictive_prefetch_admission_guard_to_actions(
+            semantic_state=state,
+            selected_actions=actions,
+        )
+
+        self.assertTrue(guard_info["guarded"])
+        self.assertEqual(guard_info["reason"], "low_confidence_unaligned_prefetch_deferred_to_prepare")
+        self.assertFalse(guard_info["predicted_next_aligned"])
+        self.assertEqual(actions["slow"], 0)
+        self.assertEqual(actions["event"], 1)
+
+    def test_predictive_prefetch_admission_guard_admits_confident_aligned_prefetch(self) -> None:
+        state = _minimal_semantic_state()
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["predictions"]["predicted_next_rsu_by_vehicle"]["veh_1"] = "rsu_b"
+        state["predictions"]["predicted_first_handoff_rsu_by_vehicle"]["veh_1"] = "rsu_b"
+        state["predictions"]["next_rsu_sequence"]["veh_1"] = ["rsu_b"]
+        state["predictions"]["prediction_confidence_by_vehicle"]["veh_1"] = 0.61
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=1,
+            predictive_prefetch_admission_guard_enabled=True,
+            predictive_prefetch_admission_min_confidence=0.55,
+            predictive_prefetch_admission_require_distinct_next=True,
+        )
+        actions = {"slow": 2, "fast": 0, "event": 0}
+
+        guard_info = agent._apply_predictive_prefetch_admission_guard_to_actions(
+            semantic_state=state,
+            selected_actions=actions,
+        )
+
+        self.assertFalse(guard_info["guarded"])
+        self.assertEqual(guard_info["reason"], "prefetch_admitted")
+        self.assertTrue(guard_info["predicted_next_aligned"])
+        self.assertEqual(actions["slow"], 2)
+        self.assertEqual(actions["event"], 0)
+
     def test_action_schema_declares_discrete_contract(self) -> None:
         schema = ActionSchema.default_vec_workflow_schema()
         self.assertEqual(schema.discrete_action_count, 5)
@@ -614,6 +768,39 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         no_handoff_info = ActionMaskBuilder().build_mask_info(no_handoff_state)
         self.assertEqual(no_handoff_info["mask"], [True, True, True, True, False])
         self.assertEqual(no_handoff_info["invalid_reasons"]["4"], "missing_distinct_handoff_target")
+
+    def test_action_mask_builder_uses_first_non_current_rsu_for_prefetch(self) -> None:
+        state = _minimal_semantic_state()
+        state["predictions"]["predicted_next_rsu_by_vehicle"]["veh_1"] = "rsu_a"
+        state["predictions"]["next_rsu_sequence"]["veh_1"] = ["rsu_a", "rsu_b"]
+
+        mask_info = ActionMaskBuilder().build_mask_info(state)
+        control = ActionAdapter().decode(1, state)
+
+        self.assertTrue(mask_info["mask"][1])
+        self.assertEqual(mask_info["semantic_preconditions"]["predicted_next_rsu_id"], "rsu_b")
+        self.assertEqual(control.cache_action["rsu_id"], "rsu_b")
+        self.assertFalse(control.metadata["invalid_action"])
+
+    def test_hierarchical_policy_samples_masked_env_actions_without_projection(self) -> None:
+        agent = build_agent("sa_ghmappo", random_seed=1)
+        policy_output = {
+            "slow_logits": torch.tensor([0.0, 0.0, 8.0]),
+            "fast_logits": torch.tensor([2.0, 0.0]),
+            "event_logits": torch.tensor([0.0, 8.0]),
+        }
+
+        actions, _, _, _, projection_info = agent._sample_actions(
+            policy_output,
+            deterministic=True,
+            action_mask=[True, False, True, True, False],
+        )
+
+        self.assertIn(projection_info["projected_env_action"], {0, 2, 3})
+        self.assertEqual(actions, agent._head_targets_for_env_action(projection_info["projected_env_action"]))
+        self.assertFalse(projection_info["projection_applied"])
+        self.assertEqual(projection_info["invalid_attempt_count"], 0)
+        self.assertTrue(projection_info["masked_hierarchical_env_action_sampling"])
 
     def test_action_adapter_decodes_core_control_action(self) -> None:
         state = {

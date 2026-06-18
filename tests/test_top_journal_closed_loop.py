@@ -7,6 +7,7 @@ from scripts.run_top_journal_closed_loop import (
     FORMAL_MIN_SETTINGS,
     ROOT_DIR,
     audit_formal_contract,
+    effective_settings,
     evaluate_mode_gate,
     latest_training_summary_for_seed,
     select_sa_checkpoint,
@@ -153,6 +154,58 @@ def test_formal_contract_accepts_canonical_formal_budget() -> None:
 
     assert audit["ready"] is True
     assert audit["blockers"] == []
+
+
+def test_effective_settings_honor_v6_sa_profile_budget() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v6_strong_competition"
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["train_window_count"] == 6
+
+
+def test_effective_settings_honor_v7_sa_profile_budget() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v7_latency_fallback"
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["train_window_count"] == 6
 
 
 def test_latest_training_summary_for_seed_filters_seed_suffix() -> None:

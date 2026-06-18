@@ -32,6 +32,8 @@ dist/
 *.swp
 *.swo
 ~$*
+.trae/
+PPO_MEC_experiment_issue_summary_*.docx
 
 # Model/checkpoint binaries should stay in artifacts or external storage
 *.pt

@@ -140,6 +140,15 @@ class MARLOnPolicyTrainer(BaseTrainer):
             for row in rollout
             if bool(row.get("action_info", {}).get("cache_warm_start_guard", {}).get("guarded", False))
         ]
+        prefetch_admission_guard_rows = [
+            row
+            for row in rollout
+            if bool(
+                row.get("action_info", {})
+                .get("predictive_prefetch_admission_guard", {})
+                .get("guarded", False)
+            )
+        ]
         action_projection_rows = [
             row
             for row in rollout
@@ -179,6 +188,11 @@ class MARLOnPolicyTrainer(BaseTrainer):
             "backhaul_guard_rate": round(float(len(backhaul_guard_rows)) / float(total_steps), 6),
             "cache_warm_start_guard_count": len(cache_warm_guard_rows),
             "cache_warm_start_guard_rate": round(float(len(cache_warm_guard_rows)) / float(total_steps), 6),
+            "predictive_prefetch_admission_guard_count": len(prefetch_admission_guard_rows),
+            "predictive_prefetch_admission_guard_rate": round(
+                float(len(prefetch_admission_guard_rows)) / float(total_steps),
+                6,
+            ),
             "dag_frontier_size_mean": metric_mean("dag_frontier_size"),
             "dag_critical_path_pressure_mean": metric_mean("dag_critical_path_pressure"),
             "dag_current_node_dependency_pressure_mean": metric_mean("dag_current_node_dependency_pressure"),

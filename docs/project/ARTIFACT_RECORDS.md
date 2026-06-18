@@ -1,5 +1,140 @@
 # Artifact Records
 
+## 2026-05-28 Top Journal Final Submission v7 Latency Fallback
+
+状态：`[canonical]` `[paper-grade]` `[final-submission]`
+
+路径：
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/final_submission_gate_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/learned_suites/final_submission_v7_latency_fallback_20260528_v1_iter1_formal/learned_baseline_gate_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/learned_suites/final_submission_v7_latency_fallback_20260528_v1_iter1_holdout_offset3/learned_baseline_gate_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/support/prediction/prediction_robustness_20260528_202640_186901/prediction_robustness_summary.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/support/robustness/robustness_20260528_202823/aggregate_summary.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/support/scalability/scalability_20260528_203154/aggregate_summary.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/top_journal_comparison_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_report.md`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_main_comparison.tex`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_paired_reward_statistics.tex`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_support_reward_statistics.tex`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_self_review.json`
+
+用途：当前 paper-ready canonical final-submission package。使用 v7 latency fallback clean-retrain SA checkpoint，并在 final suite 内 clean retrain 9 个 primary learned baselines 的 3 个 seed。
+
+确认结果：
+- Final gate：`target_reached=true`、`paper_claim_ready=true`、`blockers=[]`。
+- Comparison package：`review_ready=true`、`paper_ready_package_ready=true`，self-review `blocker_count=0`、`limitation_count=3`、`pass_count=15`。
+- Formal learned gate 与 offset=3 holdout learned gate 均为 `passed=true`、`paper_claim_ready=true`。
+- `formal_training_provenance.passed=true`，required agents 为 `ppo/mappo/dqn/dueling_dqn/qmix/controller_mat/dag_offload_drl/cache_offload_drl/dt_handoff_drl`，`record_count=27`。
+- Formal split：strongest learned baseline 均为 `dt_handoff_drl`；mixed margin `+11.176111`，full margin `+3.377407`。
+- Holdout offset=3：strongest learned baseline 均为 `dt_handoff_drl`；mixed margin `+8.442778`，full margin `+5.242143`。
+- Paired CI：formal weakest vs `dt_handoff_drl` mean `+5.327083`、95% CI `[1.594094, 8.963719]`；holdout weakest vs `dt_handoff_drl` mean `+6.202333`、95% CI `[1.607076, 10.593939]`。
+- Support weakest learned margins：prediction vs `dt_handoff_drl` `+4.833472` CI `[3.170913, 6.600080]`；robustness `+9.799097` CI `[8.329792, 11.297618]`；scalability `+4.133380` CI `[3.245373, 5.016079]`。
+
+结论边界：
+- `popularity_cache_heuristic` 是 close supplementary reference，formal/holdout mixed/full margins 分别为 `+0.250000`、`+0.479629`、`+0.355556`、`+0.376191`；不要写成大幅超过手写 heuristic。
+- 论文中必须保留 comparison self-review 的限制项：heuristic gap close、mechanism realization rate 不构成每个 split 的 standalone CI-positive 优势、backhaul savings 不是 universal headline。
+- MAPPO/QMIX/Controller-MAT/DAG/cache/DT 均按 controller-level 或 semantic-discrete contract 表述，不得写成 vehicle/RSU-level full MARL wrapper。
+
+## 2026-05-28 Top Journal Mechanism v7 Latency Fallback Closed Loop
+
+状态：`[formal-pass]` `[candidate]` `[optimization-validation]`
+
+路径：
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/gate_report.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/gate_summary.csv`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/seed_checkpoint_manifest.json`
+- `artifacts/analysis/top_journal_mechanism_v7_latency_fallback_actionmix_diagnosis_20260528/`
+
+用途：记录 v6 guards + clean-retrain latency fallback 的 3-seed formal closed-loop 结果。该 run 通过 closed-loop formal gate，但尚未生成 final-submission holdout/support/comparison package，因此不是当前 canonical。
+
+确认结果：
+- `formal_contract.ready=true`、`baseline_protocol_audit.passed=true`、`passed=true`、`paper_claim_ready=true`。
+- `mixed_informative`：SA `98.396667`，`popularity_cache_heuristic` `98.146667`，SA delta `+0.250000`；strongest learned baseline `mappo=82.555000`。
+- `full_stratified`：SA `90.651296`，`popularity_cache_heuristic` `90.171667`，SA delta `+0.479629`；strongest learned baseline `mappo=86.142222`。
+- 两个 benchmark mode 下 SA 与 popularity 的 continuity、handoff failure、backhaul 均持平；收益来自 latency fallback 带来的 delay penalty 下降。
+- action-mix 诊断：active/idle 非机制窗口贡献主要正收益；mechanism_activating 窗口基本持平，mixed 下有一个轻微 losing pair，后续 final-submission 仍需检查 holdout 稳定性。
+
+结论边界：
+- 该 artifact 可作为 v7 候选优化证据；不能单独替换 `final_submission_full_current_baselines_20260511_v1` 或写成最终 paper-grade package。
+- 下一步必须运行 final-submission/holdout/support，并生成 comparison report / paper-ready package。
+
+## 2026-05-27 Top Journal Mechanism v6 Freshness Guard Closed Loop
+
+状态：`[negative-result]` `[audit]` `[optimization-diagnosis]`
+
+路径：
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_freshness_guard_20260527_v1/`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_freshness_guard_20260527_v1/gate_report.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_freshness_guard_20260527_v1/gate_summary.csv`
+- `artifacts/analysis/top_journal_mechanism_v6_freshness_guard_actionmix_diagnosis_20260527/`
+
+用途：记录 freshness-aware cache-warm guard 加入后的一次 3-seed formal closed-loop 结果，并作为后续 confidence/alignment prefetch admission guard 的诊断依据。该 run 不是 final-submission package，也不是当前 canonical。
+
+确认结果：
+- `formal_contract.ready=true`，但 `passed=false`、`paper_claim_ready=false`。
+- `mixed_informative`：SA `98.091111`，`popularity_cache_heuristic` `98.146667`，SA 差值 `-0.055556`。
+- `full_stratified`：SA `90.153148`，`popularity_cache_heuristic` `90.171667`，SA 差值 `-0.018519`。
+- blockers 为 `sa_total_reward_not_above_popularity` 与 `benchmark_minimum_success_not_reached`；SA 仍超过所有 learned baselines，但未超过 supplementary heuristic。
+- action-mix 诊断定位到 `window_off246_len24_t293_316` / `j_8` / seed `13` 的 prefetch realization gap：低置信度且 next-RSU 未对齐时过早 prefetch 导致 `expired_miss`。
+
+结论边界：
+- 该 artifact 证明 freshness countdown guard 单独不足以通过 gate。
+- 后续新增 `predictive_prefetch_admission_guard_*` 只完成 quick/debug chain 验证，不能把 quick 结果写成 formal improvement。
+
+## 2026-05-27 Top Journal Mechanism v6 Masked Fulltrain Closed Loop
+
+状态：`[negative-result]` `[audit]` `[repair-validation]`
+
+路径：
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/gate_report.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/gate_summary.csv`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_masked_fulltrain_20260527_v1/seed_checkpoint_manifest.json`
+
+用途：记录 SA v6 invalid action / action projection 修复后，使用 full-stratified training windows 与 v6 budget 的最新 closed-loop 结果。该 run 不是 final-submission package，也不是当前 canonical。
+
+确认结果：
+- `formal_contract.ready=true`，正式 seed、预算、benchmark modes 与 `primary_vehicle_selection=handoff_pressure` 合同满足。
+- `baseline_protocol_audit.passed=true`，MAPPO v3 checkpoint protocol 记录为 `aggregation_reason_weighted_controller_ppo_v3`。
+- gate 未通过：`passed=false`、`paper_claim_ready=false`。
+- `mixed_informative`：SA `98.091111`，`popularity_cache_heuristic` `98.146667`，SA 差值 `-0.055556`；strongest learned baseline 为 `mappo=82.555000`，SA 差值 `+15.536111`。
+- `full_stratified`：SA `90.153148`，`popularity_cache_heuristic` `90.171667`，SA 差值 `-0.018519`；strongest learned baseline 为 `mappo=86.142222`，SA 差值 `+4.010926`。
+- formal benchmark aggregate 中 `action_projection_count=0.0`、`invalid_action_attempt_count=0.0`；修复前 v6 run 的 gate total 为 mixed `85/85`、full `432/432`。
+- mechanism success gate 未达标：mixed `18/125=0.144000`，full `33/188=0.175532`。
+
+结论边界：
+- 该结果确认 SA v6 的 invalid action / projection 问题已修复，且 SA 重新超过所有 learned baselines。
+- 当前 blocker 已收窄为 supplementary `popularity_cache_heuristic` 的极小 reward gap 和 mechanism success gate；在两者通过前，不替换 `final_submission_full_current_baselines_20260511_v1`，也不运行 v6 final-submission promotion。
+
+## 2026-05-27 Top Journal Mechanism v6 Strong-Competition Closed Loop
+
+状态：`[negative-result]` `[audit]`
+
+路径：
+
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/gate_report.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/gate_summary.csv`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v6_strong_competition_20260527_v1/seed_checkpoint_manifest.json`
+
+用途：记录 SA v6 与 MAPPO v3 强对照 profile 的最新 closed-loop 结果。该 run 不是 final-submission package，也不是当前 canonical。
+
+确认结果：
+
+- `formal_contract.ready=true`，正式 seed、预算、benchmark modes 和 `primary_vehicle_selection=handoff_pressure` 合同满足。
+- `baseline_protocol_audit.passed=true`，MAPPO v3 checkpoint protocol 记录为 `aggregation_reason_weighted_controller_ppo_v3`。
+- gate 未通过：`passed=false`、`paper_claim_ready=false`。
+- `mixed_informative`：SA `96.874444`，`popularity_cache_heuristic` `98.146667`，`cache_offload_drl` `92.024444`；blockers 为 `sa_total_reward_not_above_popularity` 和 `benchmark_minimum_success_not_reached`。
+- `full_stratified`：SA `89.692037`，`popularity_cache_heuristic` `90.171667`，`cache_offload_drl` `90.168889`；blockers 为 `sa_total_reward_not_above_cache_offload_drl`、`sa_total_reward_not_above_popularity` 和 `benchmark_minimum_success_not_reached`。
+- MAPPO v3 本轮 closed-loop 中 mixed reward `83.435`、full reward `84.999259`；协议可运行，但不能支撑 paper-ready MAPPO 性能 claim。
+
+结论边界：
+
+- 该结果只能作为 negative candidate / optimization diagnosis，不替换 `final_submission_full_current_baselines_20260511_v1`。
+- 后续若要把 MAPPO v3 和 SA v6 写进主论文结果，需要先生成新的 final-submission package，并要求 final gate `paper_claim_ready=true`、comparison package `paper_ready_package_ready=true`。
+- 当前已知 blocker 是 SA v6 在 full split 下落后 `cache_offload_drl`，并且在 mixed/full 下均没有超过 supplementary `popularity_cache_heuristic`。
+
 ## 2026-05-11 Full Current-Baseline Final Submission
 
 状态：`[canonical]` `[paper-grade]`
@@ -13,8 +148,8 @@
 
 关键事实：
 - `final_submission_gate_report.json` 中 `paper_claim_ready=true`、`target_reached=true`、`blockers=[]`。
-- comparison report 中 `review_ready=true`、`paper_ready_package_ready=true`；自审 `blocker_count=0`、`limitation_count=4`、`pass_count=13`。
-- MAPPO 为当前 controller-level CTDE + aggregation-reason controller head-credit protocol，`baseline_protocol_versions.mappo` 记录 `head_credit_enabled=True`、`event_policy_credit_floor=0.05`、`event_entropy_credit_floor=0.05`、`event_advantage_blend=1.0`。
+- comparison report 中 `review_ready=true`、`paper_ready_package_ready=true`；自审 `blocker_count=0`、`limitation_count=5`、`pass_count=13`。
+- 该 artifact 中 MAPPO 为 controller-level CTDE + 当时的 aggregation-reason controller head-credit protocol，`baseline_protocol_versions.mappo` 记录 `head_credit_enabled=True`、`event_policy_credit_floor=0.05`、`event_entropy_credit_floor=0.05`、`event_advantage_blend=1.0`。2026-05-27 之后新的 MAPPO claim 必须使用 v3 protocol 重新跑 final-submission gate。
 - Formal / holdout 主表中 SA-GHMAPPO 均超过最强 learned baseline；最强 learned baseline 均为 `ppo`，reward margin 范围为 `+3.703148` 到 `+10.097777`。
 - Cluster-bootstrap paired total reward 对全部 9 个 learned baselines 均为 positive CI；formal 最弱 vs `ppo` mean delta `+4.745278`，95% CI `[2.3372, 7.028835]`；holdout 最弱 vs `ppo` mean delta `+6.975`，95% CI `[4.155505, 9.63982]`。
 - Prediction / robustness / scalability support suites 对全部 9 个 learned baselines 均为 positive CI；最弱项分别为 vs `ppo`：`+2.794583`、`+6.879236`、`+2.159306`。

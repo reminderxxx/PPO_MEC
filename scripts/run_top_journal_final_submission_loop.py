@@ -84,6 +84,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_selector", type=str, default="max_handoff_candidate")
     parser.add_argument("--window_mode_for_training", type=str, default="mixed_informative")
     parser.add_argument("--baseline_profile", type=str, default="baseline_safe")
+    parser.add_argument("--mappo_baseline_profile", type=str, default="mappo_strong_audit")
     parser.add_argument("--baseline_episodes", type=int, default=96)
     parser.add_argument("--baseline_update_every", type=int, default=6)
     parser.add_argument("--baseline_batch_size", type=int, default=32)
@@ -240,6 +241,8 @@ def run_learned_suite(
         *(str(seed) for seed in args.seeds),
         "--baseline_profile",
         args.baseline_profile,
+        "--mappo_baseline_profile",
+        args.mappo_baseline_profile,
         "--baseline_episodes",
         str(settings["baseline_episodes"]),
         "--baseline_update_every",
@@ -493,6 +496,8 @@ def build_final_gate_report(
         "base_manifest_path": args.base_manifest_path,
         "learned_baseline_agents": args.learned_baseline_agents,
         "heuristic_reference_agents": args.heuristic_reference_agents,
+        "baseline_profile": args.baseline_profile,
+        "mappo_baseline_profile": args.mappo_baseline_profile,
         "heuristic_policy": "supplementary_reference_only",
         "support_agents": args.support_agents,
         "formal_training_provenance": formal_training_provenance,
@@ -507,7 +512,7 @@ def build_final_gate_report(
                 "Top conference RL papers usually equalize interaction/sample budgets inside a benchmark family. "
                 "This final loop follows that standard for VEC: all learned baselines share the same real-data "
                 "windows, workflow source, seeds, episode count, and support-suite gates; algorithm-specific "
-                "optimization internals are preserved. MAPPO uses the current controller head-credit protocol "
+                "optimization internals are preserved. MAPPO uses the current controller head-credit v3 protocol "
                 "under the multi-controller action contract. Domain baselines for DAG offloading, model cache/offloading, "
                 "and digital-twin handoff receive no SA-GHMAPPO graph/surrogate/guard-only mechanisms."
             ),
@@ -525,7 +530,7 @@ def build_final_gate_report(
             "Final claims require formal and holdout learned gates plus cluster-bootstrap positive reward CI.",
             "Prediction, robustness, and scalability support are checked against learned support agents.",
             "Formal learned checkpoints must be trained in the final suite or resumed from the same run.",
-            "MAPPO claims require the current controller head-credit checkpoint protocol; pre-head-credit MAPPO results are archived only.",
+            "MAPPO claims require the current controller head-credit v3 checkpoint protocol; pre-v3/pre-head-credit MAPPO results are archived only.",
             "Prediction setting-level dominance is required only for claim-relevant learned/noisy predictor settings; no-prediction and oracle settings remain diagnostic.",
         ],
         "command_log": command_log,

@@ -310,17 +310,24 @@ def _build_action_preconditions(state: dict[str, Any]) -> dict[str, Any]:
     required_adapter = current_node.get("required_adapter")
     predictions = state.get("predictions") or {}
     next_rsu_sequence = list(predictions.get("next_rsu_sequence", {}).get(vehicle_id, []))
-    predicted_next_rsu_id = next_rsu_sequence[0] if next_rsu_sequence else None
+    predicted_next_rsu_id = predictions.get("predicted_next_rsu_by_vehicle", {}).get(vehicle_id)
+    if predicted_next_rsu_id is None and next_rsu_sequence:
+        predicted_next_rsu_id = next_rsu_sequence[0]
+    if predicted_next_rsu_id is None or str(predicted_next_rsu_id) == str(current_rsu_id):
+        for candidate_rsu_id in next_rsu_sequence:
+            if candidate_rsu_id is not None and str(candidate_rsu_id) != str(current_rsu_id):
+                predicted_next_rsu_id = candidate_rsu_id
+                break
     predicted_handoff_target_rsu_id = (
         predictions.get("predicted_first_handoff_rsu_by_vehicle", {}).get(vehicle_id)
         or predictions.get("predicted_handoff_target_rsu_id_by_vehicle", {}).get(vehicle_id)
     )
     distinct_predicted_next_rsu = bool(
-        predicted_next_rsu_id is not None and predicted_next_rsu_id != current_rsu_id
+        predicted_next_rsu_id is not None and str(predicted_next_rsu_id) != str(current_rsu_id)
     )
     distinct_handoff_target = bool(
         predicted_handoff_target_rsu_id is not None
-        and predicted_handoff_target_rsu_id != current_rsu_id
+        and str(predicted_handoff_target_rsu_id) != str(current_rsu_id)
     )
     target_adapter_ready = _rsu_has_adapter(
         state=state,

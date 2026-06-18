@@ -2,7 +2,7 @@
 
 ## MAPPO 对照协议
 
-当前 `mappo` paper-grade 对照必须使用 controller-level CTDE + aggregation-reason controller head-credit。正式 final-submission loop 会审计 `baseline_protocol_versions.mappo`，要求 checkpoint 配置包含 `head_credit_enabled=True`、`event_policy_credit_floor=0.05`、`event_entropy_credit_floor=0.05`、`event_advantage_blend=1.0`。旧 pre-head-credit MAPPO 结果只作归档，不再进入新版论文主表。
+当前 `mappo` paper-grade 对照必须使用 controller-level CTDE + `aggregation_reason_weighted_controller_ppo_v3`。正式 final-submission loop 会审计 `baseline_protocol_versions.mappo`，要求 checkpoint 配置包含 `head_credit_enabled=True`、`head_credit_protocol=aggregation_reason_weighted_controller_ppo_v3`、`slow_policy_credit_floor=0.25`、`fast_policy_credit_floor=0.10`、`event_policy_credit_floor=0.12`、`slow_entropy_credit_floor=0.20`、`fast_entropy_credit_floor=0.08`、`event_entropy_credit_floor=0.12`、`event_advantage_blend=0.85`。旧 pre-v3/pre-head-credit MAPPO 结果只作归档，不再进入新版论文主表。
 
 所有命令默认从仓库根目录执行。
 
@@ -68,6 +68,12 @@ python scripts/train_algo_pool_real_sample.py --agent_name controller_mat --prof
 python scripts/train_algo_pool_real_sample.py --agent_name dag_offload_drl --profile smoke
 python scripts/train_algo_pool_real_sample.py --agent_name cache_offload_drl --profile smoke
 python scripts/train_algo_pool_real_sample.py --agent_name dt_handoff_drl --profile smoke
+```
+
+MAPPO 正式强对照训练默认使用：
+
+```bash
+python scripts/train_algo_pool_real_sample.py --agent_name mappo --profile mappo_strong_audit
 ```
 
 评估：
@@ -385,7 +391,7 @@ Notes:
 当前 final-submission 复跑入口：
 
 ```bash
-python scripts/run_top_journal_final_submission_loop.py --run_id <new_run_id> --base_manifest_path artifacts/experiments/top_journal_closed_loop/top_journal_closed_loop_formal_20260505_v2/seed_checkpoint_manifest.json --force_retrain_learned --resume_training --resume_benchmark --resume_support --command_retries 2 --baseline_episodes 96 --baseline_update_every 6 --baseline_batch_size 32 --minimum_reward_delta 0.5 --holdout_offsets 3
+python scripts/run_top_journal_final_submission_loop.py --run_id <new_run_id> --base_manifest_path artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/seed_checkpoint_manifest.json --force_retrain_learned --resume_training --resume_benchmark --resume_support --command_retries 2 --baseline_episodes 96 --baseline_update_every 6 --baseline_batch_size 32 --minimum_reward_delta 0.5 --holdout_offsets 3 --seeds 7 13 29 --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified
 ```
 
 旧 repaired-baseline run 使用旧 final run 中已等预算训练的 checkpoint 作为 base manifest，只重跑修复后的 benchmark/gate/support，已被 clean retrain run 取代：
@@ -397,12 +403,12 @@ python scripts/run_top_journal_final_submission_loop.py --run_id final_submissio
 当前 canonical clean retrain run：
 
 ```bash
-python scripts/run_top_journal_final_submission_loop.py --run_id final_submission_domain_baselines_20260510_v1 --base_manifest_path artifacts/experiments/top_journal_closed_loop/top_journal_closed_loop_formal_20260505_v2/seed_checkpoint_manifest.json --force_retrain_learned --resume_training --resume_benchmark --resume_support --command_retries 1 --minimum_reward_delta 0.5 --holdout_offsets 3
+python scripts/run_top_journal_final_submission_loop.py --run_id final_submission_v7_latency_fallback_20260528_v1 --base_manifest_path artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260528_v1/seed_checkpoint_manifest.json --force_retrain_learned --resume_training --resume_benchmark --resume_support --command_retries 2 --baseline_episodes 96 --baseline_update_every 6 --baseline_batch_size 32 --minimum_reward_delta 0.5 --holdout_offsets 3 --seeds 7 13 29 --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified
 ```
 
 Comparison report package:
 ```bash
-python scripts/build_top_journal_comparison_report.py --final_run_root artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1
+python scripts/build_top_journal_comparison_report.py --final_run_root artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1
 ```
 
 断点续跑：
@@ -414,15 +420,15 @@ python scripts/build_top_journal_comparison_report.py --final_run_root artifacts
 
 当前正式产物：
 
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/final_submission_gate_report.json`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/comparison_report/top_journal_comparison_report.json`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/comparison_report/top_journal_comparison_report.md`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/comparison_report/paper_ready/paper_ready_main_comparison.tex`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/comparison_report/paper_ready/paper_ready_paired_reward_statistics.tex`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/comparison_report/paper_ready/paper_ready_support_reward_statistics.tex`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/comparison_report/paper_ready/paper_ready_report.md`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/learned_suites/final_submission_controller_mappo_qmix_20260509_v1_iter1_formal/learned_baseline_gate_report.json`
-- `artifacts/experiments/top_journal_final_submission/final_submission_controller_mappo_qmix_20260509_v1/learned_suites/final_submission_controller_mappo_qmix_20260509_v1_iter1_holdout_offset3/learned_baseline_gate_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/final_submission_gate_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/top_journal_comparison_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/top_journal_comparison_report.md`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_main_comparison.tex`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_paired_reward_statistics.tex`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_support_reward_statistics.tex`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/comparison_report/paper_ready/paper_ready_report.md`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/learned_suites/final_submission_v7_latency_fallback_20260528_v1_iter1_formal/learned_baseline_gate_report.json`
+- `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/learned_suites/final_submission_v7_latency_fallback_20260528_v1_iter1_holdout_offset3/learned_baseline_gate_report.json`
 
 当前 gate 结论：
 
@@ -431,8 +437,8 @@ python scripts/build_top_journal_comparison_report.py --final_run_root artifacts
 - comparison report `review_ready=true`
 - paper-ready package `paper_ready_package_ready=true`
 - formal 与 offset=3 holdout learned gate 均通过。
-- 当前新 run 的 learned baseline set 为 `ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl`；`final_submission_controller_mappo_qmix_20260509_v1` 尚未包含 `controller_mat` 以及 DAG/cache/DT 领域对照，含这些新增 baseline 的主表需重跑后确认 `baseline_contract.passed=true` 和 `baseline_independence.passed=true`。
-- `formal_training_provenance.passed=true`，`record_count=15`，说明 formal learned checkpoint 来自本次 final suite clean retrain。
+- 当前 canonical learned baseline set 为 `ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl`。
+- `formal_training_provenance.passed=true`，`record_count=27`，说明 formal learned checkpoint 来自本次 final suite clean retrain。
 - total_reward 的 cluster bootstrap 使用 `seed window_id workflow_id`。
 - prediction support 的 setting-level dominance 只要求 `learned_prediction` 和 `noisy_prediction`；`no_prediction` 与 `oracle_prediction` 保留为诊断设置，不能写成全面预测条件优势。
 - 旧 `final_submission_clean_equal_budget_20260506_v1` 已作废；不要引用其 IPPO/PPO/MAPPO 或 DDQN duplicate trace 结果作为 paper-grade 证据。
