@@ -5,7 +5,7 @@
 - `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`
 - `artifact_run_id`: `final_submission_v7_latency_fallback_20260618_rebuild_v1`
 - `policy_version`: `tmc_review_policy_v2_20260618`
-- `git_commit_at_review`: `pending_this_change`
+- `git_commit_at_review`: `6b8960b` (implementation snapshot; audit metadata finalized in its immediate documentation amend)
 - `evidence_level`: `E3_REPRODUCED`
 - `verdict`: `Not TMC-ready`
 
