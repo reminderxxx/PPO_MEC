@@ -1,0 +1,19 @@
+# Development, smoke-test, and local reproduction dependencies for PPO_MEC.
+#
+# Install from the repository root:
+#   python -m pip install -r requirements-dev.txt
+#
+# Notes:
+# - PyTorch wheels depend on Python version, OS, CUDA, and CPU/GPU target.
+#   If the default torch install does not match the target machine, install
+#   the proper torch build first from https://pytorch.org/get-started/locally/
+#   and then re-run this file for the remaining packages.
+# - Real NGSIM / Alibaba / LuST data files are not included in Git; see
+#   docs/project/RUNBOOK.md for data-readiness checks.
+
+numpy
+pandas
+torch
+PyYAML
+gymnasium
+pytest
