@@ -19,6 +19,7 @@
 - `src/`：核心实现
 - `tests/`：自动化测试
 - `artifacts/`：当前保留的训练 checkpoint、benchmark 报告和论文表格产物
+- `outputs/`：面向用户的可编辑汇报导出物；不作为训练、benchmark 或 canonical artifact 根目录
 
 ## 数据目录
 
@@ -44,6 +45,7 @@
 
 ## 产物目录
 
+- `outputs/ppo_mec_advisor_report_20260621.pptx`：基于 E3 复现证据整理的导师汇报 deck；数据来源与结论边界见 `docs/project/advisor_report_briefing_20260621.md`
 - `artifacts/training/`：被保留 benchmark 引用的训练 run、checkpoint 和训练审计
 - `artifacts/training/algo_pool/`：方向匹配对照算法训练产物
 - `artifacts/training/algo_pool_formal_round1/`：round1 三 seed formal flat baseline 训练产物
@@ -62,5 +64,4 @@
 - `artifacts/paper/`：历史 paper export；legacy v7 表格只能在明确标注 overlap limitation 时使用，strict reviewer 结论以最新审计为准
 
 新产物应写入明确的 run 目录，不应散落到仓库根目录。
-
 

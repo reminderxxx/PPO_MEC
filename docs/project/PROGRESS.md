@@ -2,6 +2,16 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-06-21: 导师汇报材料固化
+
+已完成：
+
+- 新增 `docs/project/advisor_report_briefing_20260621.md`，整理研究问题、四项创新点、系统框架、精确 model architecture、参数量、动作/奖励设计、数据协议、严格结果、消融、LuST 外部迁移、三分钟讲稿和答辩问答。
+- 新增 `outputs/ppo_mec_advisor_report_20260621.pptx`，共 14 页，使用可编辑原生图表和形状，逐页附 speaker notes。
+- 所有实验数字均回溯至 `final_submission_v7_latency_fallback_20260618_rebuild_v1` 及最新严格审计；本轮没有生成新训练或 benchmark 结果。
+
+结论边界：材料把 legacy gate、strict non-overlap 结果和当前 reviewer verdict 分开陈述。mixed formal/holdout 对 `dt_handoff_drl` 的 reward CI 为正；full formal/holdout CI 跨 0，项目仍为 `Not TMC-ready`。
+
 ## 2026-06-18: v7 独立重建、严格 holdout 与外部迁移补证
 
 已完成：

@@ -1,5 +1,12 @@
 # PPO_MEC
 
+## 2026-06-21 导师汇报材料
+
+- 可编辑汇报 PPT：`outputs/ppo_mec_advisor_report_20260621.pptx`
+- 中文讲稿、创新点、模型架构与结果边界：`docs/project/advisor_report_briefing_20260621.md`
+
+该材料基于 2026-06-18 E3 独立复现证据。可展示结论是：严格非重叠 mixed formal/holdout 对最强 learned baseline 的 reward 置信区间为正；full formal/holdout 仅点估计领先、95% CI 跨 0。材料不得被解释为项目已经达到 `TMC-ready`。
+
 ## 完整克隆（含真实数据）
 
 仓库中的 `data/` 通过 Git LFS 版本化。首次克隆或切换到包含数据的分支前，需先安装 Git LFS，然后执行：

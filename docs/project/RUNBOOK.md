@@ -18,6 +18,13 @@ python scripts/check_data_ready.py
 
 所有命令默认从仓库根目录执行。
 
+## 导师汇报材料
+
+- 讲稿与证据索引：`docs/project/advisor_report_briefing_20260621.md`
+- 可编辑 PPT：`outputs/ppo_mec_advisor_report_20260621.pptx`
+
+汇报材料不是新实验入口。更新图表前必须先核对 `docs/project/top_journal_readiness_audit_20260618.md` 和对应 raw statistics；不得用 legacy `paper_claim_ready=true` 覆盖 strict non-overlap 结论。
+
 ## 最小验证
 
 ```bash
