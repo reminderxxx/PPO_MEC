@@ -35,6 +35,10 @@
 
 ## 当前风险
 
+- 2026-06-21 最近邻审查确认：TMC 2026 已有 DAG timing/data dependency + MADDPG，以及 mobility-aware parallel-task cross-RSU collaborative offloading；IoT Journal 2025 已有 dependency-aware hierarchical VEC offloading。论文不能把 `DAG + mobility + MARL`、`DAG + hierarchy` 或 graph-assisted VEC offloading 单独写成 novelty。
+- `Dual Dependency-Aware Collaborative Service Caching and Task Offloading in VEC` 已覆盖 DAG/task dependency、service dependency、hierarchical cache 和 PPO；若 PPO_MEC 缺少 adapter size/load/warm/migration latency 或 serving-profile 证据，adapter cache 容易被审稿人视为 service cache 重命名。
+- 当前可守 novelty 是完整联合 contract，而非单组件：跨 RSU continuous workflow state、adapter warm-state lifecycle、predictive handoff preparation/state migration 和 cache/execution/event 三时间尺度控制。任一元素拆开都已有强近邻，相关绝对首次表述会形成 novelty blocker。
+
 - 2026-06-18 rebuild 已达到 `E3_REPRODUCED`，但旧 `window_rank_offset=3` formal/holdout 时间区间重叠；历史 offset holdout 只能作为 near-window sensitivity，不能作为 independent holdout。
 - 严格非重叠协议下，SA 对 `dt_handoff_drl` 的 formal-full 与 holdout-full total-reward 95% CI 均跨 0；这是当前 TMC-ready scientific blocker，不得用 legacy gate 的正 CI 覆盖。
 - mixed/full 会复用部分窗口，必须按 mode 分开报告，不能把 mode 当独立 cluster 合并扩大样本量。

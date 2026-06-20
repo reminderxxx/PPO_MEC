@@ -12,6 +12,7 @@
 - `current_results_audit_20260527.md`：当前 canonical / v5 / MAPPO v3 / SA v6 结果状态、缺口和阻塞审计表
 - `top_journal_review_policy.md`：以 IEEE TMC 为主目标的长期 AI reviewer 证据等级、blocker、评分和固定输出规范
 - `top_journal_readiness_audit_20260618.md`：v7 独立重建、严格非重叠 holdout、机制消融与 LuST 外部迁移的最新审查；当前 verdict 为 `Not TMC-ready`
+- `novelty_review_20260621.md`：面向 TMC 的最新一手文献检索、最近邻矩阵和四项创新点新颖性审查；结论为 `Conditionally defensible, but crowded`
 - `advisor_report_briefing_20260621.md`：面向导师汇报的创新点、整体框架、模型结构、实验结果、结论边界和问答讲稿
 - `../../outputs/ppo_mec_advisor_report_20260621.pptx`：与讲稿配套的 14 页可编辑导师汇报 PPT，含逐页 speaker notes
 - `CLEANUP_LOG.md`：旧文档和旧产物清理记录

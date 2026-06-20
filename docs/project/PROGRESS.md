@@ -2,6 +2,16 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-06-21: TMC 最近邻增量检索与创新性复核
+
+已完成：
+
+- 使用 IEEE Xplore、ACM DL 和正式 DOI 页面检索 2022–2026 的 VEC DAG/dependent-task offloading、service/adapter caching、mobility/handoff migration、multi-timescale control 和 MARL/PPO 近邻。
+- 新增 `docs/project/novelty_review_20260621.md`，建立最近邻矩阵并逐项审查当前四项创新；novelty verdict 为 `Conditionally defensible, but crowded`，内部 novelty 得分维持 `14/20`。
+- 文献表新增三篇 TMC、一篇 IEEE IoT Journal 和一篇 IEEE NGDN 近邻，并修正 service-migration 年份与 dual-dependency 标题。
+
+结论边界：截至本轮定向检索，尚未发现正式大刊同时覆盖“跨 RSU 连续 DAG workflow + adapter warm-state cache + predictive handoff prepare/state migration + 三时间尺度联合控制”的完整交集；但 `DAG + mobility + MARL`、`DAG + cache`、`DAG + hierarchy` 等子组合均已有工作，不能单独作为首次创新。整体 readiness 仍因 strict full CI blocker 为 `Not TMC-ready`。
+
 ## 2026-06-21: 导师汇报材料固化
 
 已完成：
