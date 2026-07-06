@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-06: predictor 升级为薄 supervised handoff anticipation 层
+
+决策：新增 `supervised_handoff_predictor_v1`，把 prediction/DT 口径限定为短时 next-RSU、handoff target 和 ETA anticipation。该层通过显式 checkpoint 接入 `PredictorManager`，服务于 SA-GHMAPPO 的 cache / prefetch / migration prepare 控制；不改变 `semantic_discrete_5` action contract，不把 predictor 提升为主算法贡献。
+
+原因：仅靠 baseline/calibrated predictor 难以支撑 TMC 级 predictive / DT claim；但完整 digital twin 子系统会稀释主问题并扩大实现风险。薄 supervised predictor 能提供可训练、可审计、可冻结的预测证据，同时保持主线问题聚焦在 reliability-gated continuous workflow control。
+
+影响：正式论文只能写 `supervised short-horizon handoff predictor` 和 `lightweight DT-style predictive state snapshot`；不得写完整 digital twin、轨迹预测 SOTA 或 predictor 单独解决连续 cache。v9 结果必须使用冻结 predictor checkpoint 重训并在 formal/future-validation 上重新验证。
+
 ## 2026-05-28: v7 final-submission package 升级为当前 canonical
 
 决策：`final_submission_v7_latency_fallback_20260528_v1` 升级为当前 paper-ready canonical final-submission package。旧 `final_submission_full_current_baselines_20260511_v1` 和 `final_submission_controller_mappo_qmix_20260509_v1` 降为历史 package；后续论文主表优先引用 v7 final-submission 的 `comparison_report/paper_ready/`。

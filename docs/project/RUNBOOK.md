@@ -31,6 +31,26 @@ python scripts/check_data_ready.py
 python scripts/smoke_test.py
 python -m pytest tests/test_env_contract.py
 ```
+## Supervised Handoff Predictor
+
+训练薄 supervised predictor：
+
+```bash
+.venv/bin/python scripts/train_supervised_handoff_predictor.py --train_window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/train_window_plan.json --dev_window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/dev_window_plan.json --horizon 3 --epochs 8 --random_seed 7
+```
+
+该脚本只使用 mobility future labels 生成 `next_rsu`、`first_handoff_target`、`handoff_within_horizon` 和 `handoff_eta_steps`，不读取 reward、action、checkpoint outcome 或 hidden 结果。输出包括 `supervised_handoff_predictor.pt`、`predictor_metrics_manifest.json` 和 `predictor_quality_rows.csv`。
+
+使用冻结 predictor 训练 / benchmark：
+
+```bash
+.venv/bin/python scripts/train_sa_ghmappo_real_sample.py --agent_name sa_ghmappo --profile top_journal_mechanism_v8_strict_full --predictor_kind supervised --predictor_checkpoint_path <supervised_handoff_predictor.pt> --window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/train_window_plan.json --primary_vehicle_selection handoff_pressure
+.venv/bin/python scripts/benchmark_main_results.py --agents sa_ghmappo dt_handoff_drl ppo --predictor_kind supervised --predictor_checkpoint_path <supervised_handoff_predictor.pt> --window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/formal_window_plan.json --window_mode full_stratified --primary_vehicle_selection handoff_pressure
+.venv/bin/python scripts/benchmark_prediction_robustness.py --agents sa_ghmappo ppo --predictor_kind supervised --predictor_checkpoint_path <supervised_handoff_predictor.pt> --primary_vehicle_selection handoff_pressure
+```
+
+论文表述边界：该层是 short-horizon handoff anticipation / lightweight DT-style predictive state snapshot，不是完整 digital twin 系统；正式主张必须来自冻结 predictor checkpoint、quality report、重训后的 SA-GHMAPPO checkpoint 和 formal/future-validation 原始结果。
+
 
 ## 数据准备检查
 

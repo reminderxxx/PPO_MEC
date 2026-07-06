@@ -415,7 +415,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prediction_confidence_scale", type=float, default=1.0)
     parser.add_argument("--prediction_delay_steps", type=int, default=0)
     parser.add_argument("--drop_handoff_prediction_prob", type=float, default=0.0)
-    parser.add_argument("--predictor_kind", type=str, default="baseline", choices=["baseline", "oracle", "learned_or_calibrated"])
+    parser.add_argument("--predictor_kind", type=str, default="baseline", choices=["baseline", "oracle", "learned_or_calibrated", "supervised"])
+    parser.add_argument("--predictor_checkpoint_path", type=str, default="")
     parser.add_argument("--continuity_guard_enabled", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--handoff_target_alignment_guard_enabled", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--continuity_guard_logit_penalty", type=float, default=None)
@@ -1761,6 +1762,7 @@ def build_agent_kwargs(args: argparse.Namespace) -> dict[str, Any]:
 
 def build_predictor_runtime_kwargs(args: argparse.Namespace, *, random_seed: int) -> dict[str, Any]:
     return {
+        "predictor_checkpoint_path": str(args.predictor_checkpoint_path),
         "predictor_kind": str(args.predictor_kind),
         "prediction_noise_std": float(args.prediction_noise_std),
         "prediction_confidence_scale": float(args.prediction_confidence_scale),

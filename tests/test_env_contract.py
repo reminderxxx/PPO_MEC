@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import math
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+
+import torch
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -16,6 +19,11 @@ from src.envs.core.predictor_manager import PredictorManager
 from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv, make_toy_vec_env
 from src.envs.specs import ControlAction, RSUState
 from src.envs.wrappers.gym_vec_env import GymVecEnv
+from src.predictors import (
+    CHECKPOINT_SCHEMA_VERSION,
+    FEATURE_SCHEMA_VERSION,
+    SupervisedHandoffPredictorNetwork,
+)
 
 
 def 构造控制动作(state: dict) -> ControlAction:
@@ -103,6 +111,89 @@ class EnvContractTestCase(unittest.TestCase):
         self.assertFalse(predictions["oracle_available"])
         self.assertTrue(predictions["oracle_fallback_to_baseline"])
         self.assertEqual(predictions["predictor_kind"], "baseline")
+
+    def test_supervised_predictor_checkpoint_fills_prediction_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            checkpoint_path = Path(tmpdir) / "predictor.pt"
+            rsu_ids = ["rsu_a", "rsu_b", "rsu_c"]
+            input_dim = 10 + 7 * len(rsu_ids)
+            network = SupervisedHandoffPredictorNetwork(
+                input_dim=input_dim,
+                rsu_class_count=len(rsu_ids) + 1,
+                hidden_dim=8,
+            )
+            torch.save(
+                {
+                    "checkpoint_schema_version": CHECKPOINT_SCHEMA_VERSION,
+                    "horizon": 3,
+                    "input_dim": input_dim,
+                    "hidden_dim": 8,
+                    "feature_schema": {
+                        "schema_version": FEATURE_SCHEMA_VERSION,
+                        "feature_names": [f"feature_{index}" for index in range(input_dim)],
+                    },
+                    "rsu_label_map": {"rsu_ids": rsu_ids, "none_index": len(rsu_ids)},
+                    "model_state_dict": network.state_dict(),
+                    "metrics": {},
+                },
+                checkpoint_path,
+            )
+            env = VecWorkflowCoreEnv(
+                predictor_manager=PredictorManager(
+                    predictor_kind="supervised",
+                    predictor_checkpoint_path=str(checkpoint_path),
+                )
+            )
+
+            state, _ = env.reset()
+
+        predictions = state["predictions"]
+        self.assertEqual(predictions["predictor_kind"], "supervised")
+        self.assertEqual(predictions["predictor_name"], "supervised_handoff_predictor_v1")
+        self.assertTrue(predictions["learned_predictor_attached"])
+        self.assertIn("next_rsu_sequence", predictions)
+        self.assertIn("predicted_handoff_eta_steps_by_vehicle", predictions)
+        self.assertIn("supervised_predictor_checkpoint", predictions)
+
+    def test_supervised_predictor_requires_checkpoint(self) -> None:
+        with self.assertRaises(ValueError):
+            PredictorManager(predictor_kind="supervised")
+
+    def test_supervised_predictor_rejects_rsu_map_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            checkpoint_path = Path(tmpdir) / "predictor.pt"
+            rsu_ids = ["rsu_a"]
+            input_dim = 10 + 7 * len(rsu_ids)
+            network = SupervisedHandoffPredictorNetwork(
+                input_dim=input_dim,
+                rsu_class_count=len(rsu_ids) + 1,
+                hidden_dim=8,
+            )
+            torch.save(
+                {
+                    "checkpoint_schema_version": CHECKPOINT_SCHEMA_VERSION,
+                    "horizon": 3,
+                    "input_dim": input_dim,
+                    "hidden_dim": 8,
+                    "feature_schema": {
+                        "schema_version": FEATURE_SCHEMA_VERSION,
+                        "feature_names": [f"feature_{index}" for index in range(input_dim)],
+                    },
+                    "rsu_label_map": {"rsu_ids": rsu_ids, "none_index": len(rsu_ids)},
+                    "model_state_dict": network.state_dict(),
+                    "metrics": {},
+                },
+                checkpoint_path,
+            )
+            env = VecWorkflowCoreEnv(
+                predictor_manager=PredictorManager(
+                    predictor_kind="supervised",
+                    predictor_checkpoint_path=str(checkpoint_path),
+                )
+            )
+
+            with self.assertRaises(ValueError):
+                env.reset()
 
     def test_predictor_manager_trims_prediction_history(self) -> None:
         predictor_manager = PredictorManager(prediction_delay_steps=2)

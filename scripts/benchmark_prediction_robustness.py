@@ -36,31 +36,6 @@ from src.evaluators.main_results_support import (
 
 BENCHMARK_AGENT_CHOICES = list_evaluable_agents()
 
-CORE_SETTINGS = {
-    "oracle_prediction": {
-        "predictor_kwargs": {"oracle_prediction_enabled": True},
-        "setting_note": "???? mobility frame ?? oracle next-rsu / handoff target????????",
-    },
-    "learned_prediction": {
-        "predictor_kwargs": {},
-        "setting_note": "?? baseline learned/surrogate-like predictor?",
-    },
-    "noisy_prediction": {
-        "predictor_kwargs": {
-            "prediction_noise_std": 0.2,
-            "prediction_confidence_scale": 0.7,
-            "prediction_delay_steps": 1,
-            "drop_handoff_prediction_prob": 0.2,
-        },
-        "setting_note": "? baseline predictor ????????????? delay?",
-    },
-    "no_prediction": {
-        "predictor_kwargs": {"disable_prediction_output": True},
-        "setting_note": "?? predictor ????? prediction lower bound?",
-    },
-}
-
-
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="?? frozen paper protocol ?? predictor robustness benchmark")
     parser.add_argument("--agents", nargs="+", default=["sa_ghmappo"], choices=BENCHMARK_AGENT_CHOICES)
@@ -91,6 +66,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_scan_stride", type=int, default=2)
     parser.add_argument("--min_tasks", type=int, default=5)
     parser.add_argument("--max_tasks", type=int, default=20)
+    parser.add_argument("--predictor_kind", type=str, default="baseline", choices=["baseline", "supervised"])
+    parser.add_argument("--predictor_checkpoint_path", type=str, default="")
     parser.add_argument("--include_noise_sweep", action="store_true")
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "artifacts" / "benchmarks" / "prediction_robustness"))
     return parser.parse_args()
@@ -108,15 +85,81 @@ def build_checkpoint_map(args: argparse.Namespace) -> dict[str, str]:
     }
 
 
-def build_settings(include_noise_sweep: bool) -> list[dict[str, Any]]:
-    settings = []
-    for setting_id, payload in CORE_SETTINGS.items():
-        settings.append({"setting_id": setting_id, **payload})
+def build_settings(include_noise_sweep: bool, predictor_kind: str, predictor_checkpoint_path: str) -> list[dict[str, Any]]:
+    settings = [
+        {
+            "setting_id": "baseline_prediction",
+            "predictor_kwargs": {"predictor_kind": "baseline"},
+            "setting_note": "baseline short-horizon predictor",
+        },
+        {
+            "setting_id": "no_prediction",
+            "predictor_kwargs": {"disable_prediction_output": True},
+            "setting_note": "prediction output disabled diagnostic lower bound",
+        },
+        {
+            "setting_id": "oracle_prediction",
+            "predictor_kwargs": {"oracle_prediction_enabled": True},
+            "setting_note": "oracle next-rsu / handoff-target diagnostic upper-bound setting",
+        },
+    ]
+    if predictor_kind == "supervised":
+        if not predictor_checkpoint_path:
+            raise ValueError("--predictor_checkpoint_path is required for --predictor_kind supervised")
+        supervised_kwargs = {
+            "predictor_kind": "supervised",
+            "predictor_checkpoint_path": predictor_checkpoint_path,
+        }
+        settings.insert(
+            1,
+            {
+                "setting_id": "supervised_prediction",
+                "predictor_kwargs": dict(supervised_kwargs),
+                "setting_note": "frozen supervised short-horizon handoff predictor",
+            },
+        )
+        settings.insert(
+            2,
+            {
+                "setting_id": "noisy_supervised_prediction",
+                "predictor_kwargs": {
+                    **supervised_kwargs,
+                    "prediction_noise_std": 0.2,
+                    "prediction_confidence_scale": 0.7,
+                    "prediction_delay_steps": 1,
+                    "drop_handoff_prediction_prob": 0.2,
+                },
+                "setting_note": "frozen supervised predictor under delay/drop/noise stress",
+            },
+        )
+    else:
+        settings.insert(
+            1,
+            {
+                "setting_id": "noisy_prediction",
+                "predictor_kwargs": {
+                    "predictor_kind": "baseline",
+                    "prediction_noise_std": 0.2,
+                    "prediction_confidence_scale": 0.7,
+                    "prediction_delay_steps": 1,
+                    "drop_handoff_prediction_prob": 0.2,
+                },
+                "setting_note": "baseline predictor under delay/drop/noise stress",
+            },
+        )
     if include_noise_sweep:
         for level in [0.0, 0.1, 0.2, 0.3]:
+            sweep_kwargs: dict[str, Any] = {"prediction_noise_std": level}
+            if predictor_kind == "supervised":
+                sweep_kwargs.update(
+                    {
+                        "predictor_kind": "supervised",
+                        "predictor_checkpoint_path": predictor_checkpoint_path,
+                    }
+                )
             settings.append({
                 "setting_id": f"noise_sweep_{level:.1f}",
-                "predictor_kwargs": {"prediction_noise_std": level},
+                "predictor_kwargs": sweep_kwargs,
                 "setting_note": f"???? sweep?noise_std={level:.1f}",
             })
     return settings
@@ -168,7 +211,11 @@ def main() -> None:
         window_mode=args.window_mode,
     )
     selected_windows = list(window_payload["selected_windows"])
-    settings = build_settings(include_noise_sweep=args.include_noise_sweep)
+    settings = build_settings(
+        include_noise_sweep=args.include_noise_sweep,
+        predictor_kind=args.predictor_kind,
+        predictor_checkpoint_path=args.predictor_checkpoint_path,
+    )
     run_id = datetime.now().strftime(f"prediction_robustness_%Y%m%d_%H%M%S_%f")
     output_root = Path(args.output_root) / run_id
     rows: list[dict[str, Any]] = []
@@ -239,16 +286,21 @@ def main() -> None:
 
     claim_summary = {}
     for agent_name in [agent for agent in args.agents if agent == "sa_ghmappo"]:
-        learned = aggregate_by_setting_and_agent.get(f"learned_prediction|{agent_name}", {"metrics": {}})
+        supervised = aggregate_by_setting_and_agent.get(f"supervised_prediction|{agent_name}", {"metrics": {}})
+        baseline = aggregate_by_setting_and_agent.get(f"baseline_prediction|{agent_name}", {"metrics": {}})
         oracle = aggregate_by_setting_and_agent.get(f"oracle_prediction|{agent_name}", {"metrics": {}})
-        noisy = aggregate_by_setting_and_agent.get(f"noisy_prediction|{agent_name}", {"metrics": {}})
+        noisy = aggregate_by_setting_and_agent.get(f"noisy_supervised_prediction|{agent_name}", {"metrics": {}})
+        if not noisy.get("metrics"):
+            noisy = aggregate_by_setting_and_agent.get(f"noisy_prediction|{agent_name}", {"metrics": {}})
         none = aggregate_by_setting_and_agent.get(f"no_prediction|{agent_name}", {"metrics": {}})
-        if not learned.get("metrics"):
+        reference = supervised if supervised.get("metrics") else baseline
+        if not reference.get("metrics"):
             continue
         claim_summary[agent_name] = {
-            "oracle_minus_learned_total_reward": round(float(oracle.get("metrics", {}).get("total_reward", {}).get("mean", 0.0)) - float(learned.get("metrics", {}).get("total_reward", {}).get("mean", 0.0)), 6),
-            "learned_minus_noisy_total_reward": round(float(learned.get("metrics", {}).get("total_reward", {}).get("mean", 0.0)) - float(noisy.get("metrics", {}).get("total_reward", {}).get("mean", 0.0)), 6),
-            "learned_minus_no_prediction_total_reward": round(float(learned.get("metrics", {}).get("total_reward", {}).get("mean", 0.0)) - float(none.get("metrics", {}).get("total_reward", {}).get("mean", 0.0)), 6),
+            "reference_prediction_setting": "supervised_prediction" if supervised.get("metrics") else "baseline_prediction",
+            "oracle_minus_reference_total_reward": round(float(oracle.get("metrics", {}).get("total_reward", {}).get("mean", 0.0)) - float(reference.get("metrics", {}).get("total_reward", {}).get("mean", 0.0)), 6),
+            "reference_minus_noisy_total_reward": round(float(reference.get("metrics", {}).get("total_reward", {}).get("mean", 0.0)) - float(noisy.get("metrics", {}).get("total_reward", {}).get("mean", 0.0)), 6),
+            "reference_minus_no_prediction_total_reward": round(float(reference.get("metrics", {}).get("total_reward", {}).get("mean", 0.0)) - float(none.get("metrics", {}).get("total_reward", {}).get("mean", 0.0)), 6),
         }
 
     aggregate_summary = {
@@ -261,6 +313,8 @@ def main() -> None:
         "mobility_source": args.mobility_source,
         "mobility_source_path": mobility_source_path,
         "primary_vehicle_selection": args.primary_vehicle_selection,
+        "predictor_kind": args.predictor_kind,
+        "predictor_checkpoint_path": args.predictor_checkpoint_path,
         "window_mode": args.window_mode,
         "selected_window_plan": selected_windows,
         "selected_window_plan_by_strata": window_payload.get("selected_window_plan_by_strata", {}),

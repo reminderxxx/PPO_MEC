@@ -4,7 +4,8 @@
 
 ## 当前限制
 
-- 当前 `sa_ghmappo` 预测层默认仍是 `baseline_predictor_v2`。`predictor_kind=learned_or_calibrated` 只接入 calibrated baseline surrogate interface 和质量审计字段，尚未加载 learned predictor checkpoint；论文中不能写成 learned surrogate predictor。
+- 当前 `sa_ghmappo` 预测层默认仍是 `baseline_predictor_v2`。代码已新增 `predictor_kind=supervised` 和 `supervised_handoff_predictor_v1` checkpoint runtime，但在正式冻结 checkpoint、quality report、SA-GHMAPPO v9 重训和 formal/future-validation benchmark 前，不能把当前主结果写成已经使用 learned predictor。`predictor_kind=learned_or_calibrated` 仍只表示 calibrated baseline surrogate interface。
+- `supervised_handoff_predictor_v1` 的安全定位是短时 next-RSU / handoff-target / ETA anticipation；不得写成完整 digital twin、轨迹预测 SOTA 或独立解决连续 cache 的核心算法。
 - 当前 action contract 仍是 `semantic_discrete_5`，DAG graph encoder 与 DAG pressure diagnostics 已接入，但环境动作不选择 DAG frontier / target node；不能声明 DAG-level parameterized decision，除非后续冻结 `action_type + target_node + target_rsu/adapter` contract。
 - `mechanism_exploration_bonus` 已标记为 shaping/diagnostic，但历史 reward 字段仍存在；正式机制收益必须优先用 validated prefetch hit、realized prepare、handoff ready、continuity 和 mechanism success gate，避免把 prepare/prefetch 尝试次数解释为机制兑现。
 - `action_mask_info`、`ControlAction.metadata.invalid_reason`、action projection 和 guard delta 已进入新链路；历史 artifacts 没有这些字段，跨版本比较时必须显式标注 protocol version 或缺失字段。

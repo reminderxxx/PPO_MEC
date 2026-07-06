@@ -1,6 +1,13 @@
 ﻿# Progress
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
+## 2026-07-06: supervised handoff predictor v1 代码路径接入
+
+- 新增 `src/predictors/supervised_handoff_predictor.py` 和 `scripts/train_supervised_handoff_predictor.py`，支持从冻结 train/dev window plan 构建 mobility future-label 样本，训练短时 next-RSU / handoff-target / ETA predictor，并输出 checkpoint、metrics manifest 与 quality rows。
+- `PredictorManager` 新增 `predictor_kind=supervised` 和 `predictor_checkpoint_path`；supervised 模式会填充现有 prediction contract，并设置 `learned_predictor_attached=true`。缺失 checkpoint 或 RSU map 不匹配会直接失败，不静默回退 baseline。
+- SA 训练、主结果 benchmark 和 prediction robustness 已接入 supervised predictor 参数；prediction robustness 支持 baseline、supervised、noisy supervised、no prediction 和 oracle diagnostic 设置。
+- 文档口径更新为：该层是 short-horizon handoff anticipation / lightweight DT-style predictive state snapshot，不是完整 digital twin 或轨迹预测 SOTA。当前仅代表代码链路接入；paper-ready claim 仍需冻结 predictor checkpoint、quality report、SA-GHMAPPO v9 重训和 formal/future-validation benchmark。
+
 
 ## 2026-06-21: TMC 最近邻增量检索与创新性复核
 

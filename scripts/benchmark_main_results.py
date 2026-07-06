@@ -79,6 +79,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_mode", type=str, default="mixed_informative", choices=["activating_only", "mixed", "full", "mixed_informative", "full_stratified"])
     parser.add_argument("--window_rank_offset", type=int, default=0)
     parser.add_argument("--exclude_window_plan_path", action="append", default=[])
+    parser.add_argument("--predictor_kind", type=str, default="baseline", choices=["baseline", "oracle", "learned_or_calibrated", "supervised"])
+    parser.add_argument("--predictor_checkpoint_path", type=str, default="")
+    parser.add_argument("--prediction_noise_std", type=float, default=0.0)
+    parser.add_argument("--prediction_confidence_scale", type=float, default=1.0)
+    parser.add_argument("--prediction_delay_steps", type=int, default=0)
+    parser.add_argument("--drop_handoff_prediction_prob", type=float, default=0.0)
     parser.add_argument("--holdout_min_gap_frames", type=int, default=0)
     parser.add_argument("--enforce_non_overlapping_selection", action="store_true")
     parser.add_argument("--activating_handoff_threshold", type=int, default=2)
@@ -459,6 +465,14 @@ def main() -> None:
                             "window_mode": args.window_mode,
                             "window_rank_offset": args.window_rank_offset,
                         },
+                        predictor_kwargs={
+                            "predictor_kind": args.predictor_kind,
+                            "predictor_checkpoint_path": args.predictor_checkpoint_path,
+                            "prediction_noise_std": args.prediction_noise_std,
+                            "prediction_confidence_scale": args.prediction_confidence_scale,
+                            "prediction_delay_steps": args.prediction_delay_steps,
+                            "drop_handoff_prediction_prob": args.drop_handoff_prediction_prob,
+                        },
                     )
                     summary_path = episode_root / str(mobility_bundle.rsu_metadata.get("window_id")) / workflow_state.workflow_id / agent_name / f"seed_{seed}.summary.json"
                     summary_path.parent.mkdir(parents=True, exist_ok=True)
@@ -509,6 +523,14 @@ def main() -> None:
         "excluded_window_ids": window_payload.get("excluded_window_ids", []),
         "primary_vehicle_selection": args.primary_vehicle_selection,
         "mainline": mainline_label,
+        "predictor_runtime_config": {
+            "predictor_kind": args.predictor_kind,
+            "predictor_checkpoint_path": args.predictor_checkpoint_path,
+            "prediction_noise_std": args.prediction_noise_std,
+            "prediction_confidence_scale": args.prediction_confidence_scale,
+            "prediction_delay_steps": args.prediction_delay_steps,
+            "drop_handoff_prediction_prob": args.drop_handoff_prediction_prob,
+        },
         "agents": args.agents,
         "seeds": args.seeds,
         "workflow_selector": args.workflow_selector,

@@ -51,6 +51,10 @@ PPO_MEC 是面向 AI-driven VEC 的研究原型，主线围绕跨 RSU 连续 DAG
 
 数据源声明统一维护在 `docs/project/DATASET_SOURCES.md` 和 `configs/data/dataset_sources.json`。当前已审计并 metadata-only 接入 Hugging Face model-cache 候选全集，用于 catalog/report 审计和后续 file-size profile 设计；不会自动下载模型文件，也不会替换正式 benchmark 默认 cache 行为。接入边界见 `configs/data/hf_model_cache_integration_plan.json` 和 `docs/agent/hf_model_cache_dataset_audit_round14_report.md`。
 
+## Supervised Handoff Predictor v1
+
+当前代码已接入薄 supervised handoff predictor 路径：`scripts/train_supervised_handoff_predictor.py` 可从冻结 train/dev window plan 训练短时 next-RSU / handoff-target / ETA predictor；`PredictorManager` 支持 `predictor_kind=supervised` 与显式 `predictor_checkpoint_path`。该层用于 handoff anticipation 和 lightweight DT-style predictive state snapshot，不是完整数字孪生系统，也不代表 predictor 本身已经形成 paper-ready 主结论；正式 claim 仍需要冻结 checkpoint、quality report、SA-GHMAPPO v9 重训和 formal/future-validation benchmark。
+
 ## 当前模型层
 
 主方法：

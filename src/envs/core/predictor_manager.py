@@ -10,6 +10,7 @@ from typing import Any
 from src.data.mobility.rsu_mapper import RSUMapper
 from src.data.model_catalog.adapter_catalog import AdapterCatalog
 from src.envs.specs import RSUState, VehicleState, WorkflowGraphState
+from src.predictors import SupervisedHandoffPredictorRuntime
 
 
 class PredictorManager:
@@ -33,6 +34,7 @@ class PredictorManager:
         oracle_rsu_states: list[RSUState] | None = None,
         random_seed: int = 7,
         predictor_kind: str = "baseline",
+        predictor_checkpoint_path: str = "",
     ) -> None:
         self._horizon = max(int(horizon), 1)
         self._history_window = max(int(history_window), 1)
@@ -51,6 +53,13 @@ class PredictorManager:
         ]
         self._oracle_rsu_states = list(oracle_rsu_states or [])
         self._requested_predictor_kind = self._normalize_predictor_kind(predictor_kind)
+        if self._requested_predictor_kind == "supervised" and not predictor_checkpoint_path:
+            raise ValueError("predictor_checkpoint_path is required when predictor_kind=supervised")
+        self._supervised_predictor = (
+            SupervisedHandoffPredictorRuntime(predictor_checkpoint_path)
+            if self._requested_predictor_kind == "supervised"
+            else None
+        )
         self._oracle_time_to_index = {
             int(frame.get("time_index", 0)): index
             for index, frame in enumerate(self._oracle_future_frames)
@@ -211,6 +220,19 @@ class PredictorManager:
     ) -> dict[str, Any]:
         """构造环境状态中的统一 predictions 字段。"""
         next_rsu_sequence = self.predict_next_rsu_sequence(vehicles, rsu_states)
+        supervised_payload: dict[str, Any] = {}
+        if self._supervised_predictor is not None:
+            supervised_payload = self._supervised_predictor.predict(
+                vehicles=vehicles,
+                rsu_states=rsu_states,
+                workflow_state=workflow_state,
+                current_associations=current_associations,
+                last_vehicle_positions=self._last_vehicle_positions,
+            )
+            next_rsu_sequence = {
+                vehicle_id: list(sequence)
+                for vehicle_id, sequence in supervised_payload["next_rsu_sequence"].items()
+            }
         predicted_next_rsu_by_vehicle = {
             vehicle_id: sequence[0] if sequence else current_associations.get(vehicle_id)
             for vehicle_id, sequence in next_rsu_sequence.items()
@@ -246,6 +268,14 @@ class PredictorManager:
             next_rsu_sequence=next_rsu_sequence,
             dwell_time=dwell_time,
         )
+        if supervised_payload:
+            predicted_next_rsu_by_vehicle = dict(supervised_payload["predicted_next_rsu_by_vehicle"])
+            predicted_first_handoff_rsu_by_vehicle = dict(
+                supervised_payload["predicted_first_handoff_rsu_by_vehicle"]
+            )
+            predicted_handoff_vehicle_ids = list(supervised_payload["predicted_handoff_vehicle_ids"])
+            confidence_by_vehicle = dict(supervised_payload["prediction_confidence_by_vehicle"])
+            uncertainty_by_vehicle = dict(supervised_payload["prediction_uncertainty_by_vehicle"])
         surrogate_delay_by_vehicle = {
             vehicle.vehicle_id: round(
                 0.8 + 0.2 * len(next_rsu_sequence.get(vehicle.vehicle_id, [])),
@@ -270,6 +300,27 @@ class PredictorManager:
             "predicted_handoff_target_rsu_id_by_vehicle": predicted_first_handoff_rsu_by_vehicle,
             "_current_associations": dict(current_associations),
         }
+        if supervised_payload:
+            predictions.update(
+                {
+                    "predictor_name": "supervised_handoff_predictor_v1",
+                    "predictor_note": (
+                        "supervised short-horizon handoff predictor; lightweight DT-style "
+                        "state snapshot, not a full digital-twin system"
+                    ),
+                    "predicted_handoff_eta_steps_by_vehicle": dict(
+                        supervised_payload.get("predicted_handoff_eta_steps_by_vehicle", {})
+                    ),
+                    "supervised_predictor_scores_by_vehicle": dict(
+                        supervised_payload.get("supervised_predictor_scores_by_vehicle", {})
+                    ),
+                    "supervised_predictor_checkpoint": dict(
+                        self._supervised_predictor.payload_metadata
+                        if self._supervised_predictor is not None
+                        else {}
+                    ),
+                }
+            )
         if self._oracle_prediction_enabled:
             predictions = self._apply_oracle_predictions(
                 predictions=predictions,
@@ -294,7 +345,7 @@ class PredictorManager:
         normalized = str(predictor_kind or "baseline").strip().lower()
         if normalized in {"learned", "calibrated", "learned_calibrated", "learned-or-calibrated"}:
             return "learned_or_calibrated"
-        if normalized in {"baseline", "oracle", "learned_or_calibrated", "no_prediction"}:
+        if normalized in {"baseline", "oracle", "learned_or_calibrated", "supervised", "no_prediction"}:
             return normalized
         return "baseline"
 
@@ -324,6 +375,7 @@ class PredictorManager:
             "baseline": "prediction_aware_surrogate_feature_assisted",
             "oracle": "oracle_diagnostic_not_learned_policy_claim",
             "learned_or_calibrated": "calibrated_surrogate_candidate_not_learned_model",
+            "supervised": "supervised_short_horizon_handoff_predictor_not_full_digital_twin",
             "no_prediction": "no_prediction_diagnostic",
         }
         if predictor_kind == "learned_or_calibrated":
@@ -336,6 +388,11 @@ class PredictorManager:
             predictions["predictor_note"] = (
                 "baseline short-horizon predictor; use prediction-aware/surrogate-feature-assisted wording"
             )
+        elif predictor_kind == "supervised":
+            predictions["predictor_name"] = "supervised_handoff_predictor_v1"
+            predictions["predictor_note"] = (
+                "supervised short-horizon handoff predictor; supports handoff anticipation only"
+            )
         predictions["requested_predictor_kind"] = self._requested_predictor_kind
         predictions["oracle_requested"] = oracle_requested
         predictions["oracle_available"] = oracle_available
@@ -347,8 +404,9 @@ class PredictorManager:
             "baseline",
             "oracle",
             "learned_or_calibrated",
+            "supervised",
         ]
-        predictions["learned_predictor_attached"] = False
+        predictions["learned_predictor_attached"] = bool(predictor_kind == "supervised")
         predictions["surrogate_claim_boundary"] = claim_boundary_by_kind.get(
             predictor_kind,
             "prediction_aware_surrogate_feature_assisted",

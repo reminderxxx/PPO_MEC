@@ -1,5 +1,12 @@
 # Code Module Map
 
+## 2026-07-06 supervised handoff predictor v1
+
+- `src/predictors/supervised_handoff_predictor.py`：定义薄 MLP predictor、冻结 feature schema、checkpoint schema 和 runtime loader；只输出短时 next-RSU / handoff-target / ETA / confidence prediction。
+- `scripts/train_supervised_handoff_predictor.py`：从冻结 train/dev window plan 构建 mobility future-label 样本，训练 predictor checkpoint 并写出 metrics manifest / quality rows；不读取 reward、action 或 checkpoint outcome。
+- `src/envs/core/predictor_manager.py`：新增 `predictor_kind=supervised` 和 `predictor_checkpoint_path`，将 supervised predictor 输出映射回现有 `predictions` contract；缺失 checkpoint、schema 或 RSU map 不匹配时 fail fast。
+- `scripts/train_sa_ghmappo_real_sample.py`、`scripts/benchmark_main_results.py`、`scripts/benchmark_prediction_robustness.py`：接收 supervised predictor checkpoint，支撑 SA-GHMAPPO v9 重训、主结果 benchmark 和 prediction robustness 五组设置。
+
 ## 2026-05-28 SA v7 latency fallback clean-retrain profile
 
 - `scripts/train_sa_ghmappo_real_sample.py`：新增 `top_journal_mechanism_v7_latency_fallback` profile；继承 v6 guards，并启用 `latency_fallback_bias_*` / `latency_fallback_slow_suppression_strength`，用于 clean retrain 而非旧 eval-bias 复用。
@@ -24,7 +31,7 @@
 
 - `src/envs/specs/action_schema.py`：维护 `semantic_discrete_5` action schema、precondition mask、invalid reason 和 `ActionAdapter` 到 `ControlAction` 的转换；`build_mask_info()` 是 wrapper/policy/report 消费 action legality 的来源。
 - `src/envs/specs/semantic_objects.py`：`ControlAction.metadata` 承载 action id/name、invalid action 和 invalid reason，不改变 cache/offload/migration 三个语义动作主体。
-- `src/envs/core/predictor_manager.py`：统一输出 `baseline`、`oracle`、`learned_or_calibrated`、`no_prediction` 的 predictor kind 和 runtime proxy audit；当前默认不是 learned predictor。
+- `src/envs/core/predictor_manager.py`：统一输出 `baseline`、`oracle`、`learned_or_calibrated`、`supervised`、`no_prediction` 的 predictor kind 和 runtime audit；当前默认仍不是 learned predictor，只有显式 supervised checkpoint 才设置 `learned_predictor_attached=true`。
 - `src/envs/core/vec_workflow_core_env.py`：在 `metrics_protocol` 汇总 predictor audit proxy、DAG frontier/critical-path pressure、mechanism success gate 和 action invalid 字段。
 - `src/agents/sa_ghmappo_core.py`：主算法 action info 同时记录 raw head action、mask projection 后 action、guard 后 final action 和 guard delta。
 - `src/trainers/marl_on_policy_trainer.py`、`scripts/train_sa_ghmappo_real_sample.py`、`src/evaluators/main_results_support.py`、`scripts/benchmark_main_results.py`、`scripts/build_top_journal_comparison_report.py`：消费并汇总 action projection、invalid attempt、DAG diagnostics 和 mechanism validated success gate。

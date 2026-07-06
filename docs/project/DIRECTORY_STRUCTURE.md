@@ -16,6 +16,7 @@
 - `scripts/build_top_journal_comparison_report.py`：最终交稿 comparison package 生成入口，汇总 baseline protocol matrix、reward margins、mechanism paired statistics、support statistics、paper-ready LaTeX 表格和作者自审报告
 - `scripts/audit_artifact_integrity.py`：run-root SHA-256、JSON path reference、external dependency 和 parse error 审计
 - `scripts/audit_window_independence.py`：formal/holdout selected window plan 的 split 内与 split 间 frame interval 独立性审计
+- `scripts/train_supervised_handoff_predictor.py`：从冻结 train/dev window plan 训练短时 supervised handoff predictor，并输出 checkpoint、metrics manifest 和 quality rows
 - `src/`：核心实现
 - `tests/`：自动化测试
 - `artifacts/`：当前保留的训练 checkpoint、benchmark 报告和论文表格产物
@@ -38,6 +39,7 @@
 - `src/encoders/`：DAG、RSU 状态和融合编码器
 - `src/envs/`：核心环境、预测层和 Gym/vector wrapper
 - `src/envs/specs/action_schema.py`：语义动作 schema、mask 和 action adapter
+- `src/predictors/`：监督 handoff predictor 的 feature schema、MLP checkpoint loader 和 runtime 推理封装
 - `src/evaluators/`：真实 sample、主结果和 checkpoint 评估辅助
 - `src/metrics/`：episode recorder、指标 reducer 和论文指标
 - `src/trainers/`：PPO/MARL 训练驱动和 buffer
@@ -48,6 +50,7 @@
 - `outputs/ppo_mec_advisor_report_20260621.pptx`：基于 E3 复现证据整理的导师汇报 deck；数据来源与结论边界见 `docs/project/advisor_report_briefing_20260621.md`
 - `artifacts/training/`：被保留 benchmark 引用的训练 run、checkpoint 和训练审计
 - `artifacts/training/algo_pool/`：方向匹配对照算法训练产物
+- `artifacts/training/supervised_predictors/`：supervised handoff predictor 的 checkpoint、quality report 和 metrics manifest
 - `artifacts/training/algo_pool_formal_round1/`：round1 三 seed formal flat baseline 训练产物
 - `artifacts/eval/algo_pool/`：方向匹配对照算法评估产物
 - `artifacts/experiments/baseline/`：config-driven baseline 闭环产物、per-seed manifest、comparison summary 和 by-window-class summary

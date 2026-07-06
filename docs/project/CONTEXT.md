@@ -17,6 +17,7 @@
 - 当前顶刊审查规范：`docs/project/top_journal_review_policy.md`；最新审查为 `docs/project/top_journal_readiness_audit_20260618.md`。
 - 2026-06-18 已独立重建 v7 closed-loop/final-submission 并完成 hash/provenance/comparison 复现，证据等级为 `E3_REPRODUCED`。严格 interval 审查证明旧 offset-3 与 formal 重叠；最新 reviewer verdict 为 `Not TMC-ready`。
 - 当前 live 模型层：主方法 `sa_ghmappo` + 方向匹配型对照算法池；`mappo` 对照采用 controller-level CTDE + `aggregation_reason_weighted_controller_ppo_v3`。
+- 当前 predictor 层：默认仍可使用 `baseline_predictor_v2`；代码已新增 `supervised_handoff_predictor_v1` 训练与 runtime 接口，需显式传入冻结 checkpoint。该层定位为短时 handoff anticipation / lightweight DT-style predictive state snapshot，不是完整数字孪生系统；在生成正式 checkpoint、quality report 和 v9 benchmark 前，不自动替代 v8 主结论。
 - 当前新增后 live paper-grade learned 对照算法池：`ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl`
 - 当前 optional learned 变体：`ddqn`、`dueling_ddqn`；只有 duplicate trace audit 证明独立后才能作为补充对照。
 - 当前 diagnostic / contract-blocked 对照：`ippo`；当前 single-wrapper contract 不支撑独立 IPPO。`mappo` / `qmix` / `controller_mat` 已实现为 controller-level CTDE / value-decomposition / transformer baselines，不是 vehicle-agent / RSU-agent full MARL wrapper。
@@ -36,6 +37,7 @@
 - 对照算法评估：`python scripts/eval_algo_pool_real_sample.py`
 - 消融：`python scripts/benchmark_ablation.py`
 - 鲁棒性：`python scripts/benchmark_robustness.py` / `python scripts/benchmark_prediction_robustness.py`
+- Supervised predictor：`python scripts/train_supervised_handoff_predictor.py`
 - 可扩展性：`python scripts/benchmark_scalability.py`
 
 ## 当前可引用结论边界
