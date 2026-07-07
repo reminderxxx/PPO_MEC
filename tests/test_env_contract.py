@@ -133,6 +133,11 @@ class EnvContractTestCase(unittest.TestCase):
                         "feature_names": [f"feature_{index}" for index in range(input_dim)],
                     },
                     "rsu_label_map": {"rsu_ids": rsu_ids, "none_index": len(rsu_ids)},
+                    "calibration": {
+                        "handoff_decision_threshold": 0.25,
+                        "threshold_selection_split": "dev",
+                        "threshold_selection_metric": "handoff_f1",
+                    },
                     "model_state_dict": network.state_dict(),
                     "metrics": {},
                 },
@@ -154,6 +159,10 @@ class EnvContractTestCase(unittest.TestCase):
         self.assertIn("next_rsu_sequence", predictions)
         self.assertIn("predicted_handoff_eta_steps_by_vehicle", predictions)
         self.assertIn("supervised_predictor_checkpoint", predictions)
+        self.assertEqual(
+            predictions["supervised_predictor_checkpoint"]["calibration"]["handoff_decision_threshold"],
+            0.25,
+        )
 
     def test_supervised_predictor_requires_checkpoint(self) -> None:
         with self.assertRaises(ValueError):

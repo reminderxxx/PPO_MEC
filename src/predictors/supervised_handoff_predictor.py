@@ -183,12 +183,19 @@ class SupervisedHandoffPredictorRuntime:
             "feature_schema_version": FEATURE_SCHEMA_VERSION,
             "horizon": int(payload.get("horizon", 3)),
             "run_id": str(payload.get("run_id", "unknown")),
+            "calibration": dict(payload.get("calibration", {})),
             "metrics": dict(payload.get("metrics", {})),
         }
         self._network = network
         self._rsu_ids = rsu_ids
         self._none_index = none_index
         self._horizon = max(int(payload.get("horizon", 3)), 1)
+        calibration = dict(payload.get("calibration", {}))
+        self._handoff_threshold = _clamp(
+            float(calibration.get("handoff_decision_threshold", 0.5)),
+            0.0,
+            1.0,
+        )
 
     @property
     def rsu_ids(self) -> list[str]:
@@ -248,7 +255,7 @@ class SupervisedHandoffPredictorRuntime:
             next_rsu_id = self._index_to_rsu(next_index)
             target_rsu_id = self._index_to_rsu(target_index)
             handoff_confidence = _clamp(float(handoff_prob.item()), 0.0, 1.0)
-            if target_rsu_id is None or handoff_confidence < 0.5:
+            if target_rsu_id is None or handoff_confidence < self._handoff_threshold:
                 target_rsu_id = None
             current_rsu_id = current_associations.get(vehicle.vehicle_id)
             sequence = self._build_sequence(
@@ -267,6 +274,7 @@ class SupervisedHandoffPredictorRuntime:
                 "next_rsu_probability": round(float(next_probs[next_index].item()), 6),
                 "target_rsu_probability": round(float(target_probs[target_index].item()), 6),
                 "handoff_probability": round(handoff_confidence, 6),
+                "handoff_decision_threshold": round(self._handoff_threshold, 6),
                 "eta_steps": round(eta_steps, 6),
             }
         return {

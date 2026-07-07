@@ -255,6 +255,7 @@ def evaluate_model(
     model: SupervisedHandoffPredictorNetwork,
     rows: list[dict[str, Any]],
     rsu_ids: list[str],
+    handoff_threshold: float = 0.5,
 ) -> tuple[dict[str, float], list[dict[str, Any]]]:
     if not rows:
         return {}, []
@@ -267,7 +268,8 @@ def evaluate_model(
         eta_pred = output["eta_steps"]
     next_pred = torch.argmax(next_probs, dim=-1)
     target_pred = torch.argmax(target_probs, dim=-1)
-    handoff_pred = (handoff_probs >= 0.5).float()
+    calibrated_threshold = max(0.0, min(float(handoff_threshold), 1.0))
+    handoff_pred = (handoff_probs >= calibrated_threshold).float()
     next_accuracy = float((next_pred == next_labels).float().mean().item())
     target_accuracy = float((target_pred == target_labels).float().mean().item())
     true_positive = float(((handoff_pred == 1.0) & (handoff_labels == 1.0)).float().sum().item())
@@ -287,6 +289,7 @@ def evaluate_model(
     eta_mae = sum(positive_eta_errors) / max(len(positive_eta_errors), 1)
     metrics = {
         "sample_count": float(len(rows)),
+        "handoff_threshold": round(calibrated_threshold, 6),
         "next_rsu_accuracy": round(next_accuracy, 6),
         "handoff_target_accuracy": round(target_accuracy, 6),
         "handoff_precision": round(precision, 6),
@@ -320,6 +323,7 @@ def evaluate_model(
                 "next_rsu_pred_index": int(next_pred[index].item()),
                 "handoff_target_pred_index": int(target_pred[index].item()),
                 "handoff_probability": round(float(handoff_probs[index].item()), 6),
+                "handoff_predicted": int(handoff_pred[index].item()),
                 "eta_pred_steps": round(float(eta_pred[index].item()), 6),
                 "eta_label_steps": round(float(eta_labels[index].item()), 6),
             }
@@ -327,17 +331,63 @@ def evaluate_model(
     return metrics, quality_rows
 
 
+def select_handoff_threshold(
+    *,
+    model: SupervisedHandoffPredictorNetwork,
+    rows: list[dict[str, Any]],
+    rsu_ids: list[str],
+) -> dict[str, float]:
+    """Select the dev-set threshold that maximizes handoff F1."""
+    if not rows:
+        return {"threshold": 0.5, "handoff_f1": 0.0, "handoff_precision": 0.0, "handoff_recall": 0.0}
+    features, _, _, handoff_labels, _ = tensors_from_rows(rows, rsu_ids)
+    with torch.no_grad():
+        scores = torch.sigmoid(model(features)["handoff_logit"]).tolist()
+    candidates = sorted({0.0, 0.5, 1.0, *[float(score) for score in scores]})
+    best = {
+        "threshold": 0.5,
+        "handoff_f1": -1.0,
+        "handoff_precision": 0.0,
+        "handoff_recall": 0.0,
+    }
+    labels = [float(label) for label in handoff_labels.tolist()]
+    for threshold in candidates:
+        predictions = [1.0 if float(score) >= float(threshold) else 0.0 for score in scores]
+        true_positive = sum(1.0 for pred, label in zip(predictions, labels) if pred == 1.0 and label == 1.0)
+        false_positive = sum(1.0 for pred, label in zip(predictions, labels) if pred == 1.0 and label == 0.0)
+        false_negative = sum(1.0 for pred, label in zip(predictions, labels) if pred == 0.0 and label == 1.0)
+        precision = true_positive / max(true_positive + false_positive, 1.0)
+        recall = true_positive / max(true_positive + false_negative, 1.0)
+        f1 = (2.0 * precision * recall) / max(precision + recall, 1e-9)
+        if f1 > float(best["handoff_f1"]) or (
+            math.isclose(f1, float(best["handoff_f1"])) and abs(float(threshold) - 0.5) < abs(float(best["threshold"]) - 0.5)
+        ):
+            best = {
+                "threshold": float(threshold),
+                "handoff_f1": float(f1),
+                "handoff_precision": float(precision),
+                "handoff_recall": float(recall),
+            }
+    return {key: round(value, 6) for key, value in best.items()}
+
+
 def grouped_metrics(
     *,
     model: SupervisedHandoffPredictorNetwork,
     rows: list[dict[str, Any]],
     rsu_ids: list[str],
+    handoff_threshold: float = 0.5,
 ) -> dict[str, dict[str, float]]:
     groups: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
         groups.setdefault(str(row.get("window_class", "unknown")), []).append(row)
     return {
-        group_name: evaluate_model(model=model, rows=group_rows, rsu_ids=rsu_ids)[0]
+        group_name: evaluate_model(
+            model=model,
+            rows=group_rows,
+            rsu_ids=rsu_ids,
+            handoff_threshold=handoff_threshold,
+        )[0]
         for group_name, group_rows in sorted(groups.items())
     }
 
@@ -431,8 +481,21 @@ def main() -> None:
             }
         )
     model.eval()
-    train_metrics, train_quality_rows = evaluate_model(model=model, rows=train_rows, rsu_ids=rsu_ids)
-    dev_metrics, dev_quality_rows = evaluate_model(model=model, rows=dev_rows, rsu_ids=rsu_ids)
+    threshold_selection = select_handoff_threshold(model=model, rows=dev_rows, rsu_ids=rsu_ids)
+    handoff_threshold = float(threshold_selection["threshold"])
+    train_metrics, train_quality_rows = evaluate_model(
+        model=model,
+        rows=train_rows,
+        rsu_ids=rsu_ids,
+        handoff_threshold=handoff_threshold,
+    )
+    dev_metrics, dev_quality_rows = evaluate_model(
+        model=model,
+        rows=dev_rows,
+        rsu_ids=rsu_ids,
+        handoff_threshold=handoff_threshold,
+    )
+    dev_uncalibrated_metrics, _ = evaluate_model(model=model, rows=dev_rows, rsu_ids=rsu_ids)
     run_id = datetime.now().strftime("supervised_handoff_predictor_%Y%m%d_%H%M%S_%f")
     output_root = Path(args.output_root) / run_id
     output_root.mkdir(parents=True, exist_ok=True)
@@ -455,11 +518,24 @@ def main() -> None:
             "rsu_ids": list(rsu_ids),
             "none_index": len(rsu_ids),
         },
+        "calibration": {
+            "handoff_decision_threshold": handoff_threshold,
+            "threshold_selection_split": "dev",
+            "threshold_selection_metric": "handoff_f1",
+            "threshold_selection": threshold_selection,
+            "uncalibrated_threshold": 0.5,
+        },
         "model_state_dict": model.state_dict(),
         "metrics": {
             "train": train_metrics,
             "dev": dev_metrics,
-            "dev_by_window_class": grouped_metrics(model=model, rows=dev_rows, rsu_ids=rsu_ids),
+            "dev_uncalibrated": dev_uncalibrated_metrics,
+            "dev_by_window_class": grouped_metrics(
+                model=model,
+                rows=dev_rows,
+                rsu_ids=rsu_ids,
+                handoff_threshold=handoff_threshold,
+            ),
         },
     }
     torch.save(checkpoint_payload, checkpoint_path)
@@ -481,6 +557,7 @@ def main() -> None:
         "dev_window_plan_sha256": sha256_file(Path(args.dev_window_plan_path)),
         "dev_window_plan_split": str(dev_metadata.get("split", "unknown")),
         "horizon": int(args.horizon),
+        "calibration": checkpoint_payload["calibration"],
         "rsu_label_map": checkpoint_payload["rsu_label_map"],
         "sample_counts": {
             "train": len(train_rows),
