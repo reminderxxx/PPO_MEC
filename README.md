@@ -1,5 +1,13 @@
 # PPO_MEC
 
+## 2026-06-21 strict-full v8 审查状态
+
+v8 已按冻结的 train/dev/formal/hidden 协议完成 5-seed formal 与一次性 hidden holdout。对全部 learned baselines 的 total reward hierarchical BCa 95% CI 在 formal/hidden 均为正，对 DT handoff DRL 的 workflow continuity 也为正；v7 的 strict-full statistical blocker 已修复。
+
+当前 reviewer verdict 为 `Major revision (78/100)`，不是 `TMC-ready candidate`：hidden 相对 PPO 的 handoff failure 更差，formal/hidden 的 backhaul cost 更高，对 popularity heuristic 未形成显著 reward 优势；v8-current robustness/scalability/ablation 与更大外部验证仍待补齐。详见 `docs/project/top_journal_readiness_audit_20260621.md` 和 `docs/project/strict_full_v8_execution_record_20260621.md`。
+
+2026-07-13 已接入 v8-current support suite 入口和 v9 Pareto-safe 候选路径：`scripts/run_strict_full_v8_support_suite.py` 负责补齐 prediction/system/scalability/guard attribution，`top_journal_mechanism_v9_pareto_safe` 负责在 dev / future-validation 上把 handoff failure 与 backhaul 纳入 checkpoint ranking。当前这些是代码与协议入口，不是新的论文结果；hidden holdout 已 consumed，不能再用于筛选。
+
 ## 2026-06-21 导师汇报材料
 
 - 可编辑汇报 PPT：`outputs/ppo_mec_advisor_report_20260621.pptx`
@@ -23,7 +31,7 @@ python scripts/check_data_ready.py
 
 当前主机已用 `top_journal_mechanism_v7_latency_fallback_20260618_rebuild_v1` 和 `final_submission_v7_latency_fallback_20260618_rebuild_v1` 独立 clean retrain，复现 2026-05-28 legacy formal/final gate，并完成 SHA-256、manifest、checkpoint provenance、机制消融和 LuST external mobility 检查。
 
-严格审查发现旧 `offset=3 holdout` 与 formal 滑动窗口重叠，不能称独立 holdout。改用 split 内及 split 间时间不重叠窗口后，mixed formal/holdout 对 `dt_handoff_drl` 的 paired CI 为正，但 full formal/holdout CI 跨 0。因此项目当前 reviewer verdict 为 `Not TMC-ready`；legacy `paper_claim_ready=true` 只说明旧项目 gate 可复现，不再代表顶刊 readiness。详见 `docs/project/top_journal_readiness_audit_20260618.md`。
+严格审查发现旧 `offset=3 holdout` 与 formal 滑动窗口重叠，不能称独立 holdout。改用 split 内及 split 间时间不重叠窗口后，mixed formal/holdout 对 `dt_handoff_drl` 的 paired CI 为正，但 full formal/holdout CI 跨 0。因此 v7 的 verdict 为 `Not TMC-ready`；legacy `paper_claim_ready=true` 只说明旧项目 gate 可复现。该 blocker 已由上文 v8 协议修复，v7 历史审查见 `docs/project/top_journal_readiness_audit_20260618.md`。
 
 ## 2026-05-28 SA v7 legacy final-submission package
 

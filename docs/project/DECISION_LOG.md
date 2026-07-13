@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-13: v9 采用 Pareto-safe checkpoint ranking，不改 reward/action contract
+
+决策：新增 `top_journal_mechanism_v9_pareto_safe` profile，把 handoff failure 与 backhaul trade-off 纳入 checkpoint selection / gate 的约束目标；实现上只调整 policy-side guard 参数、prefetch admission、steady RSU bias 和 checkpoint ranking，不修改 `semantic_discrete_5` action contract、环境 reward 或 baseline observation contract。
+
+原因：v8 已修复 strict-full reward/continuity blocker，但 formal/hidden 对 PPO 的 handoff failure 和 backhaul trade-off 仍是顶刊 blocker。直接改 reward 或动作空间会破坏 v8/v9 可比性，也会重开 baseline 公平性和 checkpoint provenance 风险；因此先把 v9 限定为 dev/future-validation 上的 Pareto-safe candidate。
+
+影响：v9 只有在 dev 与新 future-validation 上同时满足 reward、DT continuity、handoff failure 和 backhaul non-inferiority 后，才能进入重新审查；若 reward 明显下降，则归档为 safety trade-off candidate，不替换 v8。当前 hidden 已 consumed，不得用于 v9 筛选。
+
 ## 2026-07-06: predictor 升级为薄 supervised handoff anticipation 层
 
 决策：新增 `supervised_handoff_predictor_v1`，把 prediction/DT 口径限定为短时 next-RSU、handoff target 和 ETA anticipation。该层通过显式 checkpoint 接入 `PredictorManager`，服务于 SA-GHMAPPO 的 cache / prefetch / migration prepare 控制；不改变 `semantic_discrete_5` action contract，不把 predictor 提升为主算法贡献。
@@ -7,6 +15,22 @@
 原因：仅靠 baseline/calibrated predictor 难以支撑 TMC 级 predictive / DT claim；但完整 digital twin 子系统会稀释主问题并扩大实现风险。薄 supervised predictor 能提供可训练、可审计、可冻结的预测证据，同时保持主线问题聚焦在 reliability-gated continuous workflow control。
 
 影响：正式论文只能写 `supervised short-horizon handoff predictor` 和 `lightweight DT-style predictive state snapshot`；不得写完整 digital twin、轨迹预测 SOTA 或 predictor 单独解决连续 cache。v9 结果必须使用冻结 predictor checkpoint 重训并在 formal/future-validation 上重新验证。
+
+## 2026-06-21: strict-full v8 采用冻结 split、一次性 hidden 与层级统计
+
+决策：顶刊主结果默认使用 outcome-blind 固定 window plan；时间窗口是外层独立抽样单元，seed/workflow 只在窗口内重采样。候选最多进行两轮 dev 筛选，冻结后运行 formal；formal 通过后 hidden 只开启一次，之后永久作为 consumed holdout。
+
+原因：v7 的 rank-offset holdout 与 formal 重叠，且把 seed/workflow 行当独立 cluster 会高估有效样本量。固定 20-window/split、minimum gap 24 frames 与 hierarchical BCa/Holm 能把 selection、temporal overlap 和 pseudo-replication 风险拆开。
+
+影响：`window_rank_offset` 只保留为 sensitivity 工具；正式 independent split 必须传 `--window_plan_path`。hidden 开启事件写入独立 execution record，不回写冻结 manifest。当前 hidden 已 consumed，任何后续算法修复必须使用 dev 或新冻结 future validation split。
+
+## 2026-06-21: v8 用 steady-RSU soft bias 替换 v7 latency fallback
+
+决策：v8 关闭会在 idle/no-handoff 状态偏向 vehicle fallback 的 latency fallback，改为仅在 current adapter warm 且没有 distinct handoff target 时对 current-RSU execution 施加 soft bias。该机制不修改 reward、action contract、环境或 baseline 输入。
+
+原因：v7 failure diagnosis 显示 service wait/miss 与 continuity/failure 高度相关，而 latency fallback 在 steady window 中增加 vehicle execution，造成 strict-full continuity 退化。v8 需要保留跨 RSU mechanism 行为，同时避免在无 handoff 状态破坏已 warm 的本地服务。
+
+影响：v8 修复了相对 DT 的 strict-full reward/continuity blocker，但引入相对 PPO 的 handoff failure 和 backhaul trade-off。该 trade-off 必须作为后续约束优化目标，不能通过再次查看现有 hidden 调参。
 
 ## 2026-05-28: v7 final-submission package 升级为当前 canonical
 

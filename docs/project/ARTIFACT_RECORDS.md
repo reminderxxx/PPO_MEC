@@ -1,5 +1,24 @@
 # Artifact Records
 
+## 2026-06-21 strict-full v8 frozen candidate, formal and hidden
+
+状态：`[E2-artifact-audited]` `[strict-full-blocker-resolved]` `[major-revision]`
+
+路径：
+
+- `artifacts/experiments/top_journal_closed_loop/strict_full_v8_dev_screen_20260621_v2/`
+- `artifacts/experiments/strict_full_v8_formal_all_baselines_20260621_v1/main_results_full_stratified_20260621_025440_591857/`
+- `artifacts/experiments/strict_full_v8_hidden_holdout_20260621_v1/main_results_full_stratified_20260621_201353_886213/`
+- `artifacts/experiments/strict_full_v8_external_lust_grid_20260621_v2/main_results_full_stratified_20260621_202424_612488/`
+- `artifacts/analysis/strict_full_v8_formal_all_baselines_statistics_20260621_v1/`
+- `artifacts/analysis/strict_full_v8_hidden_all_baselines_statistics_20260621_v1/`
+- `artifacts/analysis/strict_full_v8_external_lust_grid_statistics_20260621_v2/`
+- `artifacts/audits/strict_full_v8_integrity_20260621/`
+
+确认结果：v8 使用冻结的 20-window/split、5-seed 协议；formal 与一次性 hidden 对全部 learned baselines 的 reward BCa CI 为正，对 DT continuity 的 CI 也为正。原 v7 strict-full blocker已解除。完整性审计 11457 个文件通过，missing reference 与 JSON error 为 0。
+
+结论边界：hidden 相对 PPO 的 handoff failure 显著更差，formal/hidden backhaul cost 更高，对 popularity heuristic 的 reward CI 跨 0；LuST 只有 4 个 outer windows。最新 verdict 为 `Major revision (78/100)`，数值和禁止表述见 `top_journal_readiness_audit_20260621.md`。
+
 ## 2026-06-18 v7 independent rebuild and strict review
 
 状态：`[E3-reproduced]` `[legacy-gate-pass]` `[strict-review-not-ready]`

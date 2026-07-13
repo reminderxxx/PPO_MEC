@@ -26,6 +26,7 @@ from src.data.mobility.replay_provider import ReplayProvider
 from src.data.mobility.rsu_mapper import RSUMapper
 from src.data.model_catalog.adapter_catalog import AdapterCatalog
 from src.evaluators.main_results_support import (
+    apply_frozen_window_plan,
     classify_experiment_scale,
     build_selected_workflow_states,
     clone_frames,
@@ -349,6 +350,30 @@ PROFILE_DEFAULTS = {
         "max_steps": 16,
         "train_window_count": 6,
     },
+    "top_journal_mechanism_v8_strict_full": {
+        "episodes": 96,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 4.5e-5,
+        "clip_ratio": 0.075,
+        "entropy_coef": 0.0012,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.32,
+        "max_steps": 16,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v9_pareto_safe": {
+        "episodes": 96,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 4.0e-5,
+        "clip_ratio": 0.07,
+        "entropy_coef": 0.0010,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.30,
+        "max_steps": 16,
+        "train_window_count": 20,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -371,6 +396,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--train_window_mode", type=str, default="rotate", choices=["fixed", "rotate", "sampled"])
     parser.add_argument("--train_window_count", type=int, default=None)
     parser.add_argument("--window_mode", type=str, default="activating_only", choices=["activating_only", "mixed", "full", "mixed_informative", "full_stratified"])
+    parser.add_argument("--window_plan_path", type=str, default="")
     parser.add_argument("--mobility_source", type=str, default="ngsim", choices=["ngsim", "lust"])
     parser.add_argument("--primary_vehicle_selection", type=str, default="stable_first", choices=["stable_first", "handoff_pressure"])
     parser.add_argument("--mobility_csv_path", type=str, default="")
@@ -411,6 +437,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--disable_dag_dependency_aware", action="store_true")
     parser.add_argument("--disable_uncertainty_signal", action="store_true")
     parser.add_argument("--latency_fallback_bias_enabled", action=argparse.BooleanOptionalAction, default=None)
+    parser.add_argument("--steady_rsu_bias_enabled", action=argparse.BooleanOptionalAction, default=None)
+    parser.add_argument("--steady_rsu_bias_strength", type=float, default=None)
+    parser.add_argument("--steady_rsu_confidence_floor", type=float, default=None)
     parser.add_argument("--prediction_noise_std", type=float, default=0.0)
     parser.add_argument("--prediction_confidence_scale", type=float, default=1.0)
     parser.add_argument("--prediction_delay_steps", type=int, default=0)
@@ -1345,6 +1374,43 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
             }
         )
         return kwargs
+    if profile == "top_journal_mechanism_v8_strict_full":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v6_strong_competition")
+        kwargs.update(
+            {
+                "latency_fallback_bias_enabled": False,
+                "latency_fallback_bias_strength": 0.0,
+                "latency_fallback_confidence_floor": 0.0,
+                "latency_fallback_slow_suppression_strength": 0.0,
+                "steady_rsu_bias_enabled": True,
+                "steady_rsu_bias_strength": 1.20,
+                "steady_rsu_confidence_floor": 0.62,
+                "continuity_guard_logit_penalty": 0.80,
+                "continuity_guard_prepare_boost": 1.00,
+                "continuity_guard_confidence_threshold": 0.65,
+                "continuity_guard_prepare_score_threshold": 0.35,
+                "predictive_prefetch_admission_min_confidence": 0.62,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v9_pareto_safe":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v8_strict_full")
+        kwargs.update(
+            {
+                "steady_rsu_bias_strength": 1.35,
+                "steady_rsu_confidence_floor": 0.66,
+                "continuity_guard_logit_penalty": 0.70,
+                "continuity_guard_prepare_boost": 0.90,
+                "continuity_guard_confidence_threshold": 0.68,
+                "continuity_guard_prepare_score_threshold": 0.38,
+                "predictive_prefetch_admission_min_confidence": 0.68,
+                "predictive_prefetch_admission_require_distinct_next": True,
+                "backhaul_guard_enabled": True,
+                "backhaul_guard_max_reactive_fills_per_adapter": 1,
+                "cache_warm_start_guard_max_prefetch_countdown": 5.0,
+            }
+        )
+        return kwargs
     if profile == "top_journal_mechanism_v5_perf_robust":
         kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v1")
         kwargs.update(
@@ -1746,6 +1812,9 @@ def build_agent_kwargs(args: argparse.Namespace) -> dict[str, Any]:
         "latency_fallback_bias_strength",
         "latency_fallback_confidence_floor",
         "latency_fallback_slow_suppression_strength",
+        "steady_rsu_bias_enabled",
+        "steady_rsu_bias_strength",
+        "steady_rsu_confidence_floor",
         "cache_warm_start_guard_max_prefetch_countdown",
         "predictive_prefetch_admission_guard_enabled",
         "predictive_prefetch_admission_min_confidence",
@@ -1762,8 +1831,8 @@ def build_agent_kwargs(args: argparse.Namespace) -> dict[str, Any]:
 
 def build_predictor_runtime_kwargs(args: argparse.Namespace, *, random_seed: int) -> dict[str, Any]:
     return {
-        "predictor_checkpoint_path": str(args.predictor_checkpoint_path),
         "predictor_kind": str(args.predictor_kind),
+        "predictor_checkpoint_path": str(args.predictor_checkpoint_path),
         "prediction_noise_std": float(args.prediction_noise_std),
         "prediction_confidence_scale": float(args.prediction_confidence_scale),
         "prediction_delay_steps": int(args.prediction_delay_steps),
@@ -3415,6 +3484,111 @@ def reward_tiebreak_score_priority_tuple(
     )
 
 
+def compute_pareto_safe_checkpoint_score(
+    metrics: dict[str, Any],
+    *,
+    reference_metrics: dict[str, Any] | None = None,
+    reference_agent: str = "ppo",
+    rows: list[dict[str, Any]] | None = None,
+    current_agent_name: str = "sa_ghmappo",
+) -> dict[str, Any]:
+    reference_metrics = reference_metrics or {}
+    missing_metrics: list[str] = []
+    reference_missing_metrics: list[str] = []
+    reference_available = bool(reference_metrics)
+    reward = _float_metric(metrics, "total_reward", missing_metrics)
+    continuity = _float_metric(metrics, "workflow_continuity_rate", missing_metrics)
+    handoff_failure = _float_metric(metrics, "handoff_failure_rate", missing_metrics)
+    backhaul_cost = _float_metric(metrics, "backhaul_traffic_cost", missing_metrics)
+    handoff_ready = _float_metric(metrics, "handoff_ready_ratio", missing_metrics)
+    mechanism = _float_metric(metrics, "mechanism_realization_rate", missing_metrics)
+    migration_overhead = _float_metric(metrics, "adapter_state_migration_overhead", missing_metrics)
+    if reference_available:
+        reward_gap = reward - _float_metric(reference_metrics, "total_reward", reference_missing_metrics)
+        continuity_gap = continuity - _float_metric(reference_metrics, "workflow_continuity_rate", reference_missing_metrics)
+        failure_reduction = _float_metric(reference_metrics, "handoff_failure_rate", reference_missing_metrics) - handoff_failure
+        backhaul_advantage = _float_metric(reference_metrics, "backhaul_traffic_cost", reference_missing_metrics) - backhaul_cost
+    else:
+        reward_gap = reward
+        continuity_gap = continuity
+        failure_reduction = -handoff_failure
+        backhaul_advantage = -backhaul_cost
+    stability_summary = build_mechanism_advantage_stability_summary(
+        metrics=metrics,
+        rows=rows,
+        current_agent_name=current_agent_name,
+    )
+    stability_penalty = float(stability_summary.get("stability_penalty", 0.0) or 0.0)
+    noninferiority_penalty = (
+        180.0 * max(0.0, -failure_reduction)
+        + 1.20 * max(0.0, -backhaul_advantage)
+        + 120.0 * max(0.0, -continuity_gap)
+    )
+    score = (
+        4.0 * reward_gap
+        + 70.0 * continuity_gap
+        + 140.0 * failure_reduction
+        + 0.35 * backhaul_advantage
+        + 15.0 * handoff_ready
+        + 12.0 * mechanism
+        - 0.15 * migration_overhead
+        - stability_penalty
+        - noninferiority_penalty
+    )
+    return {
+        "score": round(score, 6),
+        "score_mode": "pareto_safe_against_reference" if reference_available else "pareto_safe_self_metrics_fallback",
+        "reference_available": reference_available,
+        "reference_agent": reference_agent if reference_available else "",
+        "reward_gap": round(reward_gap, 6),
+        "continuity_gap": round(continuity_gap, 6),
+        "handoff_failure_reduction": round(failure_reduction, 6),
+        "backhaul_advantage": round(backhaul_advantage, 6),
+        "handoff_ready_ratio": round(handoff_ready, 6),
+        "mechanism_realization_rate": round(mechanism, 6),
+        "adapter_state_migration_overhead": round(migration_overhead, 6),
+        "stability_summary": stability_summary,
+        "noninferiority_penalty": round(noninferiority_penalty, 6),
+        "missing_metrics": sorted(set(missing_metrics)),
+        "reference_missing_metrics": sorted(set(reference_missing_metrics)),
+        "formula": (
+            "4*reward_gap + 70*continuity_gap + 140*handoff_failure_reduction "
+            "+ 0.35*backhaul_advantage + 15*handoff_ready + 12*mechanism "
+            "- 0.15*migration_overhead - stability_penalty - noninferiority_penalty"
+        ),
+        "noninferiority_rule": (
+            "Prefer checkpoints that do not regress handoff failure or backhaul against the "
+            "available reference. This is checkpoint ranking only and does not alter env reward."
+        ),
+    }
+
+
+def pareto_safe_score_priority_tuple(
+    metrics: dict[str, Any],
+    *,
+    reference_metrics: dict[str, Any] | None = None,
+    reference_agent: str = "ppo",
+    rows: list[dict[str, Any]] | None = None,
+    current_agent_name: str = "sa_ghmappo",
+) -> tuple[float, float, float, float, float, float, float]:
+    score_payload = compute_pareto_safe_checkpoint_score(
+        metrics,
+        reference_metrics=reference_metrics,
+        reference_agent=reference_agent,
+        rows=rows,
+        current_agent_name=current_agent_name,
+    )
+    return (
+        float(score_payload["score"]),
+        float(score_payload["handoff_failure_reduction"]),
+        float(score_payload["backhaul_advantage"]),
+        float(score_payload["continuity_gap"]),
+        float(score_payload["reward_gap"]),
+        float(metrics.get("handoff_ready_ratio", 0.0)),
+        float(metrics.get("mechanism_realization_rate", 0.0)),
+    )
+
+
 def build_reward_tiebreak_selection_reason(
     *,
     candidate_metrics: dict[str, Any],
@@ -4010,6 +4184,58 @@ def maybe_update_best_checkpoint(
                 current_agent_name=current_agent_name,
             ),
         }
+    pareto_reference_agent = "ppo" if "ppo" in update_eval.get("aggregate_by_agent", {}) else "popularity_cache_heuristic"
+    pareto_reference_metrics = dict(update_eval.get("aggregate_by_agent", {}).get(pareto_reference_agent, {}))
+    pareto_safe_candidate = pareto_safe_score_priority_tuple(
+        current_metrics,
+        reference_metrics=pareto_reference_metrics,
+        reference_agent=pareto_reference_agent,
+        rows=list(update_eval.get("rows", [])),
+        current_agent_name=current_agent_name,
+    )
+    pareto_safe_best = tuple(
+        best_record.get("best_by_pareto_safe_score", {}).get(
+            "priority_tuple",
+            (float("-inf"), float("-inf"), float("-inf"), float("-inf"), float("-inf"), -1.0, -1.0),
+        )
+    )
+    current_pareto_safe_best_update = int(
+        best_record.get("best_by_pareto_safe_score", {}).get("update_index", 0) or 0
+    )
+    if pareto_safe_candidate > pareto_safe_best or (
+        pareto_safe_candidate == pareto_safe_best and update_index > current_pareto_safe_best_update
+    ):
+        target_path = checkpoint_root / "best_by_pareto_safe_score.pt"
+        shutil.copy2(checkpoint_path, target_path)
+        score_breakdown = compute_pareto_safe_checkpoint_score(
+            current_metrics,
+            reference_metrics=pareto_reference_metrics,
+            reference_agent=pareto_reference_agent,
+            rows=list(update_eval.get("rows", [])),
+            current_agent_name=current_agent_name,
+        )
+        best_record["best_by_pareto_safe_score"] = {
+            "path": str(target_path),
+            "source_checkpoint_path": str(checkpoint_path),
+            "priority_tuple": list(pareto_safe_candidate),
+            "score_breakdown": score_breakdown,
+            "update_index": update_index,
+            "episode_index": episode_index,
+            "metrics": current_metrics,
+            "reference_agent": pareto_reference_agent if pareto_reference_metrics else "",
+            "reference_metrics": pareto_reference_metrics,
+            "policy_diagnostics": policy_diagnostics,
+            "selection_protocol": selection_protocol,
+            "selection_reason": {
+                "selected": True,
+                "selection_rule": "best_by_pareto_safe_score",
+                "selection_intent": (
+                    "v9 Pareto-safe checkpoint ranking; keeps total reward competitive while "
+                    "penalizing handoff-failure and backhaul regressions against the available reference"
+                ),
+                "score_breakdown": score_breakdown,
+            },
+        }
     best_record["latest_checkpoint_path"] = str(checkpoint_root / "latest.pt")
     best_record["selection_protocol"] = selection_protocol
     return best_record
@@ -4045,6 +4271,8 @@ def main() -> None:
         random_seed=args.random_seed,
         window_mode=args.window_mode,
     )
+    if args.window_plan_path:
+        window_payload = apply_frozen_window_plan(window_payload, args.window_plan_path)
     train_window_plan = build_training_window_plan(window_payload, args)
     eval_window_plan = [dict(item) for item in window_payload["selected_windows"]]
     training_window_sampling_config = {
@@ -4055,6 +4283,9 @@ def main() -> None:
         "selected_window_count": len(window_payload["selected_windows"]),
         "expanded_train_window_count": len(train_window_plan),
         "eval_window_count": len(eval_window_plan),
+        "frozen_window_plan_path": window_payload.get("frozen_window_plan_path", ""),
+        "frozen_window_plan_protocol_version": window_payload.get("frozen_window_plan_protocol_version", ""),
+        "frozen_window_plan_split": window_payload.get("frozen_window_plan_split", ""),
     }
 
     run_id = datetime.now().strftime(f"{args.agent_name}_train_%Y%m%d_%H%M%S_%f") + f'_seed{args.random_seed}'
@@ -4081,6 +4312,7 @@ def main() -> None:
         "best_by_round2_mechanism_score": {},
         "best_by_retained_mechanism_score": {},
         "best_by_reward_tiebreak_score": {},
+        "best_by_pareto_safe_score": {},
     }
     checkpoint_paths: list[str] = []
     stability_control_history: list[dict[str, Any]] = []
@@ -4532,11 +4764,13 @@ def main() -> None:
         "best_by_round2_mechanism_score_path": best_checkpoint_record.get("best_by_round2_mechanism_score", {}).get("path", ""),
         "best_by_retained_mechanism_score_path": best_checkpoint_record.get("best_by_retained_mechanism_score", {}).get("path", ""),
         "best_by_reward_tiebreak_score_path": best_checkpoint_record.get("best_by_reward_tiebreak_score", {}).get("path", ""),
+        "best_by_pareto_safe_score_path": best_checkpoint_record.get("best_by_pareto_safe_score", {}).get("path", ""),
         "best_by_advantage_score_selection_reason": best_checkpoint_record.get("best_by_advantage_score", {}).get("selection_reason", {}),
         "best_by_mechanism_advantage_score_selection_reason": best_checkpoint_record.get("best_by_mechanism_advantage_score", {}).get("selection_reason", {}),
         "best_by_round2_mechanism_score_selection_reason": best_checkpoint_record.get("best_by_round2_mechanism_score", {}).get("selection_reason", {}),
         "best_by_retained_mechanism_score_selection_reason": best_checkpoint_record.get("best_by_retained_mechanism_score", {}).get("selection_reason", {}),
         "best_by_reward_tiebreak_score_selection_reason": best_checkpoint_record.get("best_by_reward_tiebreak_score", {}).get("selection_reason", {}),
+        "best_by_pareto_safe_score_selection_reason": best_checkpoint_record.get("best_by_pareto_safe_score", {}).get("selection_reason", {}),
         "checkpoint_paths": checkpoint_paths,
         "checkpoint_consistency_audit_path": str(output_root / "checkpoint_consistency_audit.json"),
         "mechanism_collapse_audit_path": str(output_root / "mechanism_collapse_audit.json"),
@@ -4577,6 +4811,7 @@ def main() -> None:
     print(f"best_by_round2_mechanism_score_path: {best_checkpoint_record.get('best_by_round2_mechanism_score', {}).get('path', '')}")
     print(f"best_by_retained_mechanism_score_path: {best_checkpoint_record.get('best_by_retained_mechanism_score', {}).get('path', '')}")
     print(f"best_by_reward_tiebreak_score_path: {best_checkpoint_record.get('best_by_reward_tiebreak_score', {}).get('path', '')}")
+    print(f"best_by_pareto_safe_score_path: {best_checkpoint_record.get('best_by_pareto_safe_score', {}).get('path', '')}")
     print(f"best_record_repaired: {best_record_repaired}")
     print(f"collapse_detected: {bool(mechanism_collapse_audit.get('collapse_detected', False))}")
     print(f"collapse_start_update: {int(mechanism_collapse_audit.get('collapse_start_update', 0) or 0)}")

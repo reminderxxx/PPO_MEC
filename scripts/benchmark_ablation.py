@@ -19,6 +19,7 @@ from src.evaluators.main_results_support import (
     PAPER_PROTOCOL_FROZEN,
     PAPER_PROTOCOL_VERSION,
     aggregate_rows,
+    apply_frozen_window_plan,
     build_mechanism_diagnosis,
     build_pairwise_comparison,
     build_selected_workflow_states,
@@ -63,6 +64,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_count", type=int, default=3)
     parser.add_argument("--window_scan_stride", type=int, default=2)
     parser.add_argument("--window_rank_offset", type=int, default=0)
+    parser.add_argument("--window_plan_path", type=str, default="")
     parser.add_argument("--min_tasks", type=int, default=5)
     parser.add_argument("--max_tasks", type=int, default=20)
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "artifacts" / "benchmarks" / "ablation"))
@@ -138,6 +140,9 @@ def main() -> None:
     selected_windows = list(window_payload["selected_windows"])
     if not selected_windows:
         raise RuntimeError("frozen protocol ????????")
+    if args.window_plan_path:
+        window_payload = apply_frozen_window_plan(window_payload, args.window_plan_path)
+        selected_windows = list(window_payload["selected_windows"])
 
     run_id = datetime.now().strftime(f"ablation_{args.window_mode}_%Y%m%d_%H%M%S_%f")
     output_root = Path(args.output_root) / run_id
@@ -193,6 +198,7 @@ def main() -> None:
                         mobility_source=args.mobility_source,
                         primary_vehicle_selection=args.primary_vehicle_selection,
                         predictor_kwargs=dict(payload.get("predictor_kwargs", {}) or {}),
+                        agent_config_overrides=dict(payload.get("agent_config_overrides", {}) or {}),
                         run_metadata={
                             "script": "scripts/benchmark_ablation.py",
                             "ablation_label": label,
@@ -202,6 +208,9 @@ def main() -> None:
                             "window_class": window_candidate.get("window_class", "unknown"),
                             "protocol_version": PAPER_PROTOCOL_VERSION,
                             "paper_protocol_frozen": PAPER_PROTOCOL_FROZEN,
+                            "agent_config_override_keys": sorted(
+                                dict(payload.get("agent_config_overrides", {}) or {}).keys()
+                            ),
                         },
                     )
                     row = summary_to_row(summary)

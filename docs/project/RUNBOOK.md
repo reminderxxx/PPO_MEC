@@ -23,14 +23,56 @@ python scripts/check_data_ready.py
 - 讲稿与证据索引：`docs/project/advisor_report_briefing_20260621.md`
 - 可编辑 PPT：`outputs/ppo_mec_advisor_report_20260621.pptx`
 
-汇报材料不是新实验入口。更新图表前必须先核对 `docs/project/top_journal_readiness_audit_20260618.md` 和对应 raw statistics；不得用 legacy `paper_claim_ready=true` 覆盖 strict non-overlap 结论。
+汇报材料不是新实验入口。更新图表前必须先核对 `docs/project/top_journal_readiness_audit_20260621.md` 和对应 raw statistics；不得用 legacy `paper_claim_ready=true` 覆盖 strict-full 结论。
 
-## 最小验证
+## Strict-full v8 冻结协议
+
+冻结 outcome-blind、跨 split 间隔至少 24 frames 的窗口计划：
 
 ```bash
-python scripts/smoke_test.py
-python -m pytest tests/test_env_contract.py
+.venv/bin/python scripts/freeze_strict_split_protocol.py --output_dir configs/experiment/top_journal_v8_strict_split_20260621 --max_mobility_rows 10000 --window_length 24 --window_scan_stride 2 --minimum_gap_frames 24 --windows_per_split 20 --mechanism_windows_per_split 6 --active_non_mechanism_windows_per_split 2 --random_seed 7
 ```
+
+正式 benchmark 必须用显式计划，不再通过 rank offset 模拟独立 holdout：
+
+```bash
+.venv/bin/python scripts/benchmark_main_results.py --seed_checkpoint_manifest_path artifacts/experiments/top_journal_closed_loop/strict_full_v8_dev_screen_20260621_v2/seed_checkpoint_manifest.json --seeds 7 13 29 41 53 --window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/formal_window_plan.json --window_mode full_stratified --primary_vehicle_selection handoff_pressure
+```
+
+strict statistics：
+
+```bash
+.venv/bin/python scripts/analyze_top_journal_statistics.py --rows_path <benchmark_rows.csv> --candidate_agent sa_ghmappo --outer_cluster_keys window_id --inner_cluster_keys seed workflow_id --ci_method bca --bootstrap_samples 5000 --random_seed 7 --output_root <output_dir>
+```
+
+hidden 只能在候选和 formal 冻结后开启一次。不要修改 `split_manifest.json` 的冻结内容；开启事件写入独立 execution record。当前 hidden 已 consumed，后续开发不得再次用它筛选候选。完整记录见 `strict_full_v8_execution_record_20260621.md`。
+
+### Strict-full v8 support suite
+
+先 dry-run 检查命令、manifest 和 hidden 禁用规则：
+
+```bash
+.venv/bin/python scripts/run_strict_full_v8_support_suite.py --dry_run --run_id strict_full_v8_support_<date>_v1
+```
+
+正式补齐 v8-current support suite：
+
+```bash
+.venv/bin/python scripts/run_strict_full_v8_support_suite.py --run_id strict_full_v8_support_<date>_v1 --seed_checkpoint_manifest_path artifacts/experiments/top_journal_closed_loop/strict_full_v8_dev_screen_20260621_v2/seed_checkpoint_manifest.json --window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/formal_window_plan.json --guard_manifest_path configs/ablation_checkpoint_manifest_v8_guard_attribution.json
+```
+
+输出默认写入 `artifacts/experiments/top_journal_support_suite/strict_full_v8_support_<date>_v1/`，包括 `support_gate_report.json`、各 support benchmark 原始 rows/aggregate、paired statistics 和命令 manifest。该 suite 使用 formal/support 证据补齐 v8-current，不允许指向 hidden window plan。
+
+### v9 Pareto-safe 候选
+
+v9 只允许在 train/dev 或新冻结 future-validation split 上开发；当前 hidden 已 consumed，不得用于 checkpoint ranking 或筛选：
+
+```bash
+.venv/bin/python scripts/run_top_journal_closed_loop.py --run_id top_journal_mechanism_v9_pareto_safe_dev_<date> --seeds 7 13 29 41 53 --sa_profile top_journal_mechanism_v9_pareto_safe --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified --train_window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/train_window_plan.json --eval_window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/dev_window_plan.json
+```
+
+promotion 前必须检查 `best_by_pareto_safe_score.pt` 对 learned baselines 的 reward / continuity 正向性，以及 handoff failure / backhaul 的预注册 non-inferiority；若 reward 明显下降，v9 只能归档为 safety trade-off candidate。
+
 ## Supervised Handoff Predictor
 
 训练薄 supervised predictor：
@@ -51,6 +93,20 @@ python -m pytest tests/test_env_contract.py
 
 论文表述边界：该层是 short-horizon handoff anticipation / lightweight DT-style predictive state snapshot，不是完整 digital twin 系统；正式主张必须来自冻结 predictor checkpoint、quality report、重训后的 SA-GHMAPPO checkpoint 和 formal/future-validation 原始结果。
 
+## 文献表自动审计
+
+```bash
+.venv/bin/python scripts/audit_literature_reference_table.py --table_path docs/project/literature_reference_table.md --output_dir artifacts/analysis/literature_table_audit_20260621
+```
+
+默认将标题、DOI、URL 重复或非绝对 HTTP(S) 链接视为失败；显式 `待核验` 项会列入报告但不自动失败。投稿前需要清空待核验项时追加 `--fail_on_unverified`。该脚本只检查 URL 结构，不声称探测出版社页面实时可达性。
+
+## 最小验证
+
+```bash
+python scripts/smoke_test.py
+python -m pytest tests/test_env_contract.py
+```
 
 ## 数据准备检查
 
@@ -392,7 +448,7 @@ python scripts/export_paper_artifacts.py --mixed_summary_path artifacts/experime
 重建 paired statistics：
 
 ```bash
-python scripts/analyze_top_journal_statistics.py --rows_path <benchmark_rows.csv> --candidate_agent sa_ghmappo --baseline_agents popularity_cache_heuristic ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl reactive_greedy --output_root <statistics_output_root>
+python scripts/analyze_top_journal_statistics.py --rows_path <benchmark_rows.csv> --candidate_agent sa_ghmappo --baseline_agents popularity_cache_heuristic ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl reactive_greedy --outer_cluster_keys window_id --inner_cluster_keys seed workflow_id --ci_method bca --output_root <statistics_output_root>
 ```
 
 训练 current-contract ablation manifest：
@@ -498,6 +554,6 @@ Legacy gate 结论：
 - formal 与 offset=3 sensitivity gate 均通过；offset=3 不得再称 independent holdout。
 - 当前 canonical learned baseline set 为 `ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl`。
 - `formal_training_provenance.passed=true`，`record_count=27`，说明 formal learned checkpoint 来自本次 final suite clean retrain。
-- total_reward 的 cluster bootstrap 使用 `seed window_id workflow_id`。
+- 正式 paired statistics 使用 hierarchical bootstrap：`window_id` 是 outer cluster，`seed workflow_id` 是 inner cluster；同时报告 percentile/BCa CI、窗口层效应量、sign test 和 Holm 校正。旧 `--cluster_keys seed window_id workflow_id` 只保留兼容，不再作为 paper-ready 主口径。
 - prediction support 的 setting-level dominance 只要求 `learned_prediction` 和 `noisy_prediction`；`no_prediction` 与 `oracle_prediction` 保留为诊断设置，不能写成全面预测条件优势。
 - 旧 `final_submission_clean_equal_budget_20260506_v1` 已作废；不要引用其 IPPO/PPO/MAPPO 或 DDQN duplicate trace 结果作为 paper-grade 证据。

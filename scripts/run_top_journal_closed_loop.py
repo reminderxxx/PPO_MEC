@@ -68,6 +68,24 @@ SA_PROFILE_SETTING_OVERRIDES = {
         "sa_episodes": 128,
         "train_window_count": 6,
     },
+    "top_journal_mechanism_v8_strict_full": {
+        "sa_episodes": 96,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 10000,
+        "window_count": 20,
+    },
+    "top_journal_mechanism_v9_pareto_safe": {
+        "sa_episodes": 96,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 10000,
+        "window_count": 20,
+    },
 }
 CURRENT_BASELINE_PROTOCOLS = {
     "mappo": {
@@ -121,6 +139,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--rsu_layout", type=str, default="auto_dominant_tight")
     parser.add_argument("--window_selector", type=str, default="max_handoff_candidate")
     parser.add_argument("--window_mode_for_training", type=str, default="mixed_informative")
+    parser.add_argument("--train_window_plan_path", type=str, default="")
+    parser.add_argument("--eval_window_plan_path", type=str, default="")
     parser.add_argument("--sa_profile", type=str, default="top_journal_mechanism_v1")
     parser.add_argument("--mappo_baseline_profile", type=str, default="mappo_strong_audit")
     parser.add_argument("--sa_episodes", type=int, default=None)
@@ -411,6 +431,8 @@ def train_sa_for_seed(
         str(training_root),
         *common_real_args(args, settings),
     ]
+    if args.train_window_plan_path:
+        cmd.extend(["--window_plan_path", args.train_window_plan_path])
     run_command(label=f"train_sa_seed_{seed}", cmd=cmd, cwd=ROOT_DIR, command_log=command_log)
     summary_path = latest_file(training_root / "sa_ghmappo", "train_summary.json")
     train_summary = read_json(summary_path)
@@ -460,6 +482,8 @@ def train_baseline_for_seed(
         str(training_root),
         *common_real_args(args, settings),
     ]
+    if args.train_window_plan_path:
+        cmd.extend(["--window_plan_path", args.train_window_plan_path])
     run_command(label=f"train_{agent_name}_seed_{seed}", cmd=cmd, cwd=ROOT_DIR, command_log=command_log)
     summary_path = latest_file(training_root / agent_name, "train_summary.json")
     train_summary = read_json(summary_path)
@@ -512,6 +536,8 @@ def run_benchmark_mode(
         str(output_root),
         *common_real_args(args, settings),
     ]
+    if args.eval_window_plan_path:
+        cmd.extend(["--window_plan_path", args.eval_window_plan_path])
     run_command(label=f"benchmark_{mode}", cmd=cmd, cwd=ROOT_DIR, command_log=command_log)
     return latest_file(output_root, "aggregate_summary.json")
 

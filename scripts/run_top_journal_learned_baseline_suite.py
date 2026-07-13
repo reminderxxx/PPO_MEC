@@ -144,7 +144,19 @@ def parse_args() -> argparse.Namespace:
         "--statistics_cluster_keys",
         nargs="*",
         default=[],
-        help="Optional cluster bootstrap keys passed to analyze_top_journal_statistics.py.",
+        help="Legacy one-level cluster bootstrap keys passed to analyze_top_journal_statistics.py.",
+    )
+    parser.add_argument(
+        "--statistics_outer_cluster_keys",
+        nargs="*",
+        default=["window_id"],
+        help="Outer hierarchical bootstrap keys; strict mobility claims default to window_id.",
+    )
+    parser.add_argument(
+        "--statistics_inner_cluster_keys",
+        nargs="*",
+        default=["seed", "workflow_id"],
+        help="Inner hierarchical bootstrap keys nested within each outer mobility window.",
     )
     parser.add_argument(
         "--allow_contract_blocked_baselines",
@@ -461,6 +473,10 @@ def run_statistics(
     ]
     if args.statistics_cluster_keys:
         cmd.extend(["--cluster_keys", *args.statistics_cluster_keys])
+    elif args.statistics_outer_cluster_keys:
+        cmd.extend(["--outer_cluster_keys", *args.statistics_outer_cluster_keys])
+        if args.statistics_inner_cluster_keys:
+            cmd.extend(["--inner_cluster_keys", *args.statistics_inner_cluster_keys])
     run_command(label="learned_paired_statistics", cmd=cmd, command_log=command_log, retries=args.command_retries)
     return output_root / "paired_statistics.csv"
 
@@ -694,6 +710,8 @@ def build_gate_report(
             ],
         },
         "statistics_cluster_keys": args.statistics_cluster_keys,
+        "statistics_outer_cluster_keys": args.statistics_outer_cluster_keys,
+        "statistics_inner_cluster_keys": args.statistics_inner_cluster_keys,
         "seed_checkpoint_manifest_path": str(manifest_path),
         "training_records": training_records,
         "mode_reports": mode_reports,

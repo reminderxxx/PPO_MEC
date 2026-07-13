@@ -9,6 +9,10 @@
 - `configs/algo/`：方向匹配对照算法配置
 - `configs/experiment/baseline/`：baseline 训练、评估和 benchmark 闭环配置
 - `configs/experiment/top_journal_mechanism_v1.yaml`：顶刊路线机制训练 profile 与 benchmark 计划
+- `configs/experiment/top_journal_mechanism_v8_strict_full.yaml`：strict-full v8 冻结候选参数、统计协议和 claim gate
+- `configs/experiment/top_journal_mechanism_v9_pareto_safe.yaml`：v9 dev/future-validation 安全候选参数、non-inferiority 目标和 hidden 禁用边界
+- `configs/ablation_checkpoint_manifest_v8_guard_attribution.json`：v8 同 checkpoint 机制归因消融 manifest
+- `configs/experiment/top_journal_v8_strict_split_20260621/`：outcome-blind train/dev/formal/hidden 固定窗口计划与 SHA-256 manifest
 - `data/`：原始数据与处理后数据；通过 Git LFS 版本化，完整克隆后需执行 `git lfs pull`
 - `docs/`：长期维护文档，`docs/project/` 为事实来源，`docs/project/DATASET_SOURCES.md` 记录数据源声明，`docs/project/literature_reference_table.md` 记录顶刊/顶会 related-work 参考表，`docs/benchmark_plan_or_baseline_plan.md`、`docs/baseline_formalization_round1.md`、`docs/experiment_status_round1.md`、`docs/mechanism_activation_check_round1.md` 和 `docs/experiment_runbook_round1.md` 记录 baseline 计划、round1 状态、机制诊断与复跑命令
 - `scripts/`：数据检查、dry-run、训练、评估和 benchmark 入口
@@ -16,7 +20,11 @@
 - `scripts/build_top_journal_comparison_report.py`：最终交稿 comparison package 生成入口，汇总 baseline protocol matrix、reward margins、mechanism paired statistics、support statistics、paper-ready LaTeX 表格和作者自审报告
 - `scripts/audit_artifact_integrity.py`：run-root SHA-256、JSON path reference、external dependency 和 parse error 审计
 - `scripts/audit_window_independence.py`：formal/holdout selected window plan 的 split 内与 split 间 frame interval 独立性审计
+- `scripts/freeze_strict_split_protocol.py`：生成跨 split 互斥、带 minimum frame gap 的固定窗口计划
+- `scripts/run_strict_full_v8_support_suite.py`：编排 v8-current support suite、guard attribution、BCa/Holm statistics 和 support gate report；拒绝 hidden window plan
 - `scripts/train_supervised_handoff_predictor.py`：从冻结 train/dev window plan 训练短时 supervised handoff predictor，并输出 checkpoint、metrics manifest 和 quality rows
+- `scripts/analyze_strict_full_failure_modes.py`：在非 hidden split 上分解 strict-full reward、continuity、failure 和 action-mix 失败模式
+- `scripts/audit_literature_reference_table.py`：检查文献表标题/DOI/URL 重复、链接结构和显式待核验项
 - `src/`：核心实现
 - `tests/`：自动化测试
 - `artifacts/`：当前保留的训练 checkpoint、benchmark 报告和论文表格产物
@@ -55,16 +63,18 @@
 - `artifacts/eval/algo_pool/`：方向匹配对照算法评估产物
 - `artifacts/experiments/baseline/`：config-driven baseline 闭环产物、per-seed manifest、comparison summary 和 by-window-class summary
 - `artifacts/experiments/top_journal_closed_loop/`：顶刊路线闭环产物，包括训练记录、seed checkpoint manifest、benchmark aggregate 和 gate report
+- `artifacts/experiments/top_journal_support_suite/`：v8-current support suite、机制归因、paired statistics 和 support gate report 输出根目录；dry-run 不能作为论文证据
+- `artifacts/experiments/strict_full_v8_*`：v8 formal、一次性 hidden 与 LuST external benchmark；正式结论只引用 `top_journal_readiness_audit_20260621.md` 列出的 run ID
+- `artifacts/audits/strict_full_v8_integrity_20260621/`：v8 11457-file SHA-256 inventory 与引用完整性报告；保持 Git ignored
 - `artifacts/experiments/top_journal_learned_baseline_suite/`：learned-baseline strict gate 产物；当前新 run 的 paper-grade 默认 learned set 为 PPO/MAPPO/DQN/Dueling-DQN/QMIX/Controller-MAT/DAG-Offload-DRL/Cache-Offload-DRL/DT-Handoff-DRL，IPPO 旧产物只作 diagnostic/历史审计
 - `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v3_eval_bias_guarded_prefetch_plus_dueling_*`：补充 Dueling-DQN / Dueling-DDQN 后的 learned-baseline 扩展 gate 和 holdout 产物
 - `artifacts/experiments/top_journal_sa_iteration/`：主方法优势迭代和候选验证产物，包括 v2/v3 retrain、eval-bias manifest、screen benchmark 和 learned gate；负向迭代不作为 paper-grade 主表
 - `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v3_eval_bias_guarded_prefetch_*`：当前 v3 eval-bias formal/holdout gate refresh。
 - `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v3_eval_bias_support/`：v3 eval-bias latency fallback 消融、prediction robustness、robustness 和 scalability 支撑产物。
 - `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v4_prepare_eval_bias*`：v4 prepare override 负向筛选产物，不作为主结果。
-- `artifacts/experiments/top_journal_final_submission/`：最终交稿闭环产物；`final_submission_v7_latency_fallback_20260528_v1` 是 legacy paper-ready package，`final_submission_v7_latency_fallback_20260618_rebuild_v1` 为 E3 independent rebuild。旧 offset=3 与 formal 重叠，不能作为 strict canonical holdout；最新 readiness 以 `top_journal_readiness_audit_20260618.md` 为准。
+- `artifacts/experiments/top_journal_final_submission/`：最终交稿闭环产物；`final_submission_v7_latency_fallback_20260528_v1` 是 legacy paper-ready package，`final_submission_v7_latency_fallback_20260618_rebuild_v1` 为 E3 historical rebuild。旧 offset=3 与 formal 重叠；最新 readiness 以 `top_journal_readiness_audit_20260621.md` 为准。
 - `artifacts/benchmarks/`：当前可引用的主结果、预测鲁棒性、消融、robustness 和可扩展性 benchmark
 - `artifacts/analysis/hf_model_cache_dataset_audit_round14/`：HF model-cache 候选适配性审计产物
 - `artifacts/paper/`：历史 paper export；legacy v7 表格只能在明确标注 overlap limitation 时使用，strict reviewer 结论以最新审计为准
 
 新产物应写入明确的 run 目录，不应散落到仓库根目录。
-

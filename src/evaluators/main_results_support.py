@@ -995,6 +995,53 @@ def resolve_window_candidates(
     }
 
 
+def apply_frozen_window_plan(
+    window_payload: dict[str, Any],
+    plan_path: str | Path,
+) -> dict[str, Any]:
+    """Replace outcome-derived selection with an explicitly frozen plan."""
+    resolved_path = Path(plan_path)
+    payload = json.loads(resolved_path.read_text(encoding="utf-8-sig"))
+    metadata = payload if isinstance(payload, dict) else {}
+    plan = metadata.get("selected_window_plan") if metadata else payload
+    if not isinstance(plan, list) or not plan:
+        raise ValueError(f"selected_window_plan missing or empty: {resolved_path}")
+    required_fields = {"window_id", "frame_offset", "window_length", "window_class"}
+    normalized: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
+    for index, item in enumerate(plan):
+        if not isinstance(item, dict):
+            raise ValueError(f"window plan item {index} is not an object: {resolved_path}")
+        missing = required_fields.difference(item)
+        if missing:
+            raise ValueError(f"window plan item {index} missing {sorted(missing)}: {resolved_path}")
+        window_id = str(item["window_id"])
+        if window_id in seen_ids:
+            raise ValueError(f"duplicate window_id {window_id}: {resolved_path}")
+        seen_ids.add(window_id)
+        normalized.append(dict(item))
+    by_strata = {
+        label: [item for item in normalized if str(item.get("window_class")) == label]
+        for label in ("mechanism_activating", "active_non_mechanism", "idle_or_sparse")
+    }
+    updated = dict(window_payload)
+    updated.update(
+        {
+            "selected_windows": normalized,
+            "selected_window_plan_by_strata": by_strata,
+            "mechanism_activating_windows": by_strata["mechanism_activating"],
+            "active_non_mechanism_windows": by_strata["active_non_mechanism"],
+            "idle_or_sparse_windows": by_strata["idle_or_sparse"],
+            "non_mechanism_windows": by_strata["active_non_mechanism"],
+            "frozen_window_plan_path": str(resolved_path.resolve()),
+            "frozen_window_plan_protocol_version": str(metadata.get("protocol_version", "unknown")),
+            "frozen_window_plan_split": str(metadata.get("split", "unknown")),
+            "outcome_blind_selection": bool(metadata.get("outcome_blind_selection", False)),
+        }
+    )
+    return updated
+
+
 def resolve_agent_checkpoint(agent_name: str, checkpoint_map: dict[str, str]) -> str:
     checkpoint_path = checkpoint_map.get(agent_name, "")
     if agent_name in CHECKPOINT_REQUIRED_AGENTS:
@@ -1146,6 +1193,7 @@ def run_real_episode(
     primary_vehicle_selection: str = "stable_first",
     run_metadata: dict[str, Any],
     predictor_kwargs: dict[str, Any] | None = None,
+    agent_config_overrides: dict[str, Any] | None = None,
     adapter_catalog_override: AdapterCatalog | None = None,
     workflow_state_override: WorkflowGraphState | None = None,
     rsu_states_override: list[RSUState] | None = None,
@@ -1188,6 +1236,7 @@ def run_real_episode(
         random_seed=seed,
         checkpoint_path=checkpoint_path,
         deterministic_action=True,
+        agent_config_overrides=agent_config_overrides,
     )
     trainer = MARLOnPolicyTrainer(env=env, agent=agent, recorder=recorder, max_steps=max_steps)
     summary = trainer.run_episode(

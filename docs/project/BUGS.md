@@ -2,8 +2,24 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-06-21: strict-full statistical blocker（RESOLVED）
+
+- v7 的负向结论保持有效，但 v8 已按修复条件完成：四个 split 各 20 个互斥 outer windows、minimum gap 24 frames、5 seeds、window-outer hierarchical BCa/Holm、候选冻结后 formal 与一次性 hidden。
+- v8 对 DT 的 full reward 与 continuity 在 formal/hidden 的 BCa 95% CI 均为正；原 strict-full blocker 标记 resolved，不再用 v7 legacy gate 充当修复证据。
+- 修复不等于全面 TMC-ready。最新判定仍为 `Major revision`，详见 `top_journal_readiness_audit_20260621.md`。
+
+## 2026-06-21: v8 system-tradeoff 与泛化缺口（OPEN）
+
+- hidden 相对 PPO 的 handoff failure 显著更差；formal/hidden 相对 PPO 的 backhaul cost 显著更高。任何“failure-safe”或“降低回传开销”主张当前都会成为 blocker。
+- formal/hidden 相对 popularity heuristic 的 reward CI 均跨 0；不能声称显著优于 strong heuristic。
+- v8-current prediction robustness、system robustness、scalability 和逐机制消融已有统一入口，但尚未完成 full run 与 raw-row/statistics 审计；旧 v7 support suite 不能替代。
+- LuST 修正 grid 只有 4 个独立 outer windows，低于 12-window 门槛；只能作为低功效辅助证据。
+- hidden 已开启一次并永久 consumed。后续优化只能使用 dev 或新冻结 future validation split，不得再次读取现有 hidden 做候选选择。
+
 ## 当前限制
 
+- `top_journal_mechanism_v9_pareto_safe` 目前只是 dev/future-validation 安全候选 profile 和 checkpoint-ranking 入口；在完成 5-seed train/dev、learned-baseline 同窗口比较、future-validation split 互斥审计和新 readiness audit 前，不能替换 v8 canonical，也不能声称已解决 handoff failure / backhaul blocker。
+- v9 的 `best_by_pareto_safe_score.pt` 是 checkpoint selection heuristic，不是新 reward function 或环境约束；论文必须把 reward、DT continuity、handoff failure 和 backhaul non-inferiority 分开报告，不能把 safety guard 收益写成纯 learned policy 收益。
 - 当前 `sa_ghmappo` 预测层默认仍是 `baseline_predictor_v2`。代码已新增 `predictor_kind=supervised` 和 `supervised_handoff_predictor_v1` checkpoint runtime，但在正式冻结 checkpoint、quality report、SA-GHMAPPO v9 重训和 formal/future-validation benchmark 前，不能把当前主结果写成已经使用 learned predictor。`predictor_kind=learned_or_calibrated` 仍只表示 calibrated baseline surrogate interface。
 - `supervised_handoff_predictor_v1` 的安全定位是短时 next-RSU / handoff-target / ETA anticipation；不得写成完整 digital twin、轨迹预测 SOTA 或独立解决连续 cache 的核心算法。
 - 当前 action contract 仍是 `semantic_discrete_5`，DAG graph encoder 与 DAG pressure diagnostics 已接入，但环境动作不选择 DAG frontier / target node；不能声明 DAG-level parameterized decision，除非后续冻结 `action_type + target_node + target_rsu/adapter` contract。
@@ -41,7 +57,7 @@
 - 当前可守 novelty 是完整联合 contract，而非单组件：跨 RSU continuous workflow state、adapter warm-state lifecycle、predictive handoff preparation/state migration 和 cache/execution/event 三时间尺度控制。任一元素拆开都已有强近邻，相关绝对首次表述会形成 novelty blocker。
 
 - 2026-06-18 rebuild 已达到 `E3_REPRODUCED`，但旧 `window_rank_offset=3` formal/holdout 时间区间重叠；历史 offset holdout 只能作为 near-window sensitivity，不能作为 independent holdout。
-- 严格非重叠协议下，SA 对 `dt_handoff_drl` 的 formal-full 与 holdout-full total-reward 95% CI 均跨 0；这是当前 TMC-ready scientific blocker，不得用 legacy gate 的正 CI 覆盖。
+- v7 严格非重叠协议下，SA 对 `dt_handoff_drl` 的 formal-full 与 holdout-full total-reward 95% CI 均跨 0；该历史 blocker 已由 v8 冻结 formal/hidden 修复，但不得反向把 legacy v7 gate 写成有效 strict evidence。
 - mixed/full 会复用部分窗口，必须按 mode 分开报告，不能把 mode 当独立 cluster 合并扩大样本量。
 - `no_prediction` 与 `no_adapter_prefetch` 消融高度耦合，不能解释为正交因果贡献或将 delta 相加。
 - LuST grid 外部迁移的 reward 对 learned baselines 为正，但 backhaul 高于 popularity heuristic；不得声称全面改善系统指标。

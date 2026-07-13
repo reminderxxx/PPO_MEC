@@ -19,6 +19,7 @@ from src.evaluators.main_results_support import (
     PAPER_PROTOCOL_FROZEN,
     PAPER_PROTOCOL_VERSION,
     aggregate_rows,
+    apply_frozen_window_plan,
     build_mechanism_diagnosis,
     build_selected_workflow_states,
     checkpoint_map_for_seed,
@@ -64,6 +65,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_mode", type=str, default="mixed_informative", choices=["activating_only", "mixed", "full", "mixed_informative", "full_stratified"])
     parser.add_argument("--window_count", type=int, default=3)
     parser.add_argument("--window_scan_stride", type=int, default=2)
+    parser.add_argument("--window_plan_path", type=str, default="")
     parser.add_argument("--min_tasks", type=int, default=5)
     parser.add_argument("--max_tasks", type=int, default=20)
     parser.add_argument("--predictor_kind", type=str, default="baseline", choices=["baseline", "supervised"])
@@ -211,6 +213,9 @@ def main() -> None:
         window_mode=args.window_mode,
     )
     selected_windows = list(window_payload["selected_windows"])
+    if args.window_plan_path:
+        window_payload = apply_frozen_window_plan(window_payload, args.window_plan_path)
+        selected_windows = list(window_payload["selected_windows"])
     settings = build_settings(
         include_noise_sweep=args.include_noise_sweep,
         predictor_kind=args.predictor_kind,

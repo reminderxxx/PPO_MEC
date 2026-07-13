@@ -15,6 +15,7 @@ if str(ROOT_DIR) not in sys.path:
 
 from src.agents.registry import list_evaluable_agents
 from src.evaluators.main_results_support import (
+    apply_frozen_window_plan,
     aggregate_rows,
     audit_checkpoint_map,
     build_pairwise_comparison,
@@ -78,6 +79,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_selector", type=str, default="max_handoff_candidate", choices=["ordered", "random", "max_handoff_candidate", "max_axis_crossing"])
     parser.add_argument("--window_mode", type=str, default="mixed_informative", choices=["activating_only", "mixed", "full", "mixed_informative", "full_stratified"])
     parser.add_argument("--window_rank_offset", type=int, default=0)
+    parser.add_argument("--window_plan_path", type=str, default="")
     parser.add_argument("--exclude_window_plan_path", action="append", default=[])
     parser.add_argument("--predictor_kind", type=str, default="baseline", choices=["baseline", "oracle", "learned_or_calibrated", "supervised"])
     parser.add_argument("--predictor_checkpoint_path", type=str, default="")
@@ -402,6 +404,8 @@ def main() -> None:
         idle_or_sparse_vehicle_max=args.idle_or_sparse_vehicle_max,
         idle_or_sparse_association_change_max=args.idle_or_sparse_association_change_max,
     )
+    if args.window_plan_path:
+        window_payload = apply_frozen_window_plan(window_payload, args.window_plan_path)
     checkpoint_audit_bundle = audit_checkpoint_map(checkpoint_map=audit_checkpoint_source_map, agents=args.agents)
     checkpoint_audit = checkpoint_audit_bundle["checkpoint_audit"]
     smoke_warnings = checkpoint_audit_bundle["warnings"]
@@ -515,6 +519,10 @@ def main() -> None:
         "config_profile": infer_benchmark_config_profile(checkpoint_audit, args.agents),
         "window_mode": args.window_mode,
         "window_rank_offset": args.window_rank_offset,
+        "frozen_window_plan_path": window_payload.get("frozen_window_plan_path", ""),
+        "frozen_window_plan_protocol_version": window_payload.get("frozen_window_plan_protocol_version", ""),
+        "frozen_window_plan_split": window_payload.get("frozen_window_plan_split", ""),
+        "outcome_blind_window_selection": window_payload.get("outcome_blind_selection", False),
         "exclude_window_plan_paths": list(args.exclude_window_plan_path),
         "excluded_window_intervals": [list(interval) for interval in excluded_window_intervals],
         "holdout_min_gap_frames": args.holdout_min_gap_frames,
@@ -522,7 +530,6 @@ def main() -> None:
         "excluded_window_count": window_payload.get("excluded_window_count", 0),
         "excluded_window_ids": window_payload.get("excluded_window_ids", []),
         "primary_vehicle_selection": args.primary_vehicle_selection,
-        "mainline": mainline_label,
         "predictor_runtime_config": {
             "predictor_kind": args.predictor_kind,
             "predictor_checkpoint_path": args.predictor_checkpoint_path,
@@ -531,6 +538,7 @@ def main() -> None:
             "prediction_delay_steps": args.prediction_delay_steps,
             "drop_handoff_prediction_prob": args.drop_handoff_prediction_prob,
         },
+        "mainline": mainline_label,
         "agents": args.agents,
         "seeds": args.seeds,
         "workflow_selector": args.workflow_selector,

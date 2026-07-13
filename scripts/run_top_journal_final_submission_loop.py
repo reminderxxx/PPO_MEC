@@ -74,7 +74,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prediction_required_settings", nargs="*", default=["learned_prediction", "noisy_prediction"])
     parser.add_argument("--benchmark_modes", nargs="+", default=["mixed_informative", "full_stratified"])
     parser.add_argument("--minimum_reward_delta", type=float, default=0.5)
-    parser.add_argument("--cluster_keys", nargs="*", default=["seed", "window_id", "workflow_id"])
+    parser.add_argument("--cluster_keys", nargs="*", default=[], help="Legacy one-level bootstrap keys.")
+    parser.add_argument("--outer_cluster_keys", nargs="*", default=["window_id"])
+    parser.add_argument("--inner_cluster_keys", nargs="*", default=["seed", "workflow_id"])
     parser.add_argument("--workflow_csv_path", type=str, default=str(DEFAULT_WORKFLOW_CSV))
     parser.add_argument("--mobility_source", choices=["ngsim", "lust"], default="ngsim")
     parser.add_argument("--primary_vehicle_selection", choices=["stable_first", "handoff_pressure"], default="handoff_pressure")
@@ -261,6 +263,10 @@ def run_learned_suite(
         str(args.minimum_reward_delta),
         "--statistics_cluster_keys",
         *args.cluster_keys,
+        "--statistics_outer_cluster_keys",
+        *args.outer_cluster_keys,
+        "--statistics_inner_cluster_keys",
+        *args.inner_cluster_keys,
         "--command_retries",
         str(args.command_retries),
         *common_real_args(args, settings),
@@ -507,7 +513,9 @@ def build_final_gate_report(
             "baseline_episodes": settings["baseline_episodes"],
             "max_steps": settings["max_steps"],
             "seeds": args.seeds,
-            "cluster_keys": args.cluster_keys,
+            "legacy_cluster_keys": args.cluster_keys,
+            "outer_cluster_keys": args.outer_cluster_keys,
+            "inner_cluster_keys": args.inner_cluster_keys,
             "rationale": (
                 "Top conference RL papers usually equalize interaction/sample budgets inside a benchmark family. "
                 "This final loop follows that standard for VEC: all learned baselines share the same real-data "
@@ -518,7 +526,9 @@ def build_final_gate_report(
             ),
         },
         "prediction_required_settings": args.prediction_required_settings,
-        "cluster_keys": args.cluster_keys,
+        "legacy_cluster_keys": args.cluster_keys,
+        "outer_cluster_keys": args.outer_cluster_keys,
+        "inner_cluster_keys": args.inner_cluster_keys,
         "minimum_reward_delta": args.minimum_reward_delta,
         "formal_report_path": formal_report.get("report_path", ""),
         "holdout_report_paths": [report.get("report_path", "") for report in holdout_reports],

@@ -273,6 +273,38 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(kwargs["latency_fallback_confidence_floor"], 0.62)
         self.assertEqual(kwargs["latency_fallback_slow_suppression_strength"], 1.20)
 
+    def test_sa_v8_profile_replaces_vehicle_fallback_with_steady_rsu_bias(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v8_strict_full"]
+        self.assertEqual(defaults["episodes"], 96)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v8_strict_full")
+        self.assertFalse(kwargs["latency_fallback_bias_enabled"])
+        self.assertTrue(kwargs["steady_rsu_bias_enabled"])
+        self.assertEqual(kwargs["steady_rsu_bias_strength"], 1.20)
+        self.assertEqual(kwargs["steady_rsu_confidence_floor"], 0.62)
+        self.assertEqual(kwargs["continuity_guard_confidence_threshold"], 0.65)
+        self.assertEqual(kwargs["continuity_guard_prepare_score_threshold"], 0.35)
+        self.assertEqual(kwargs["predictive_prefetch_admission_min_confidence"], 0.62)
+
+    def test_sa_v9_profile_adds_pareto_safe_guardrails(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v9_pareto_safe"]
+        self.assertEqual(defaults["episodes"], 96)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v9_pareto_safe")
+        self.assertFalse(kwargs["latency_fallback_bias_enabled"])
+        self.assertTrue(kwargs["steady_rsu_bias_enabled"])
+        self.assertGreater(kwargs["steady_rsu_bias_strength"], 1.20)
+        self.assertTrue(kwargs["backhaul_guard_enabled"])
+        self.assertEqual(kwargs["backhaul_guard_max_reactive_fills_per_adapter"], 1)
+        self.assertEqual(kwargs["predictive_prefetch_admission_min_confidence"], 0.68)
+        self.assertEqual(kwargs["cache_warm_start_guard_max_prefetch_countdown"], 5.0)
+
     def test_qmix_uses_controller_level_value_decomposition_contract(self) -> None:
         state = _minimal_semantic_state()
         agent = build_agent("qmix", random_seed=1, deterministic_action=True)
@@ -468,6 +500,33 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertLess(float(adjusted["slow_logits"][1]), float(policy_output["slow_logits"][1]))
         self.assertGreater(float(adjusted["fast_logits"][1]), float(policy_output["fast_logits"][1]))
         self.assertTrue(adjusted["mechanism_bias_info"]["latency_fallback_candidate"])
+
+    def test_steady_rsu_bias_targets_current_rsu_without_hard_override(self) -> None:
+        state = _minimal_semantic_state()
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["predictions"]["predicted_next_rsu_by_vehicle"]["veh_1"] = None
+        state["predictions"]["predicted_first_handoff_rsu_by_vehicle"]["veh_1"] = None
+        state["predictions"]["next_rsu_sequence"]["veh_1"] = ["rsu_a", "rsu_a"]
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=1,
+            mechanism_logit_bias_strength=1.0,
+            steady_rsu_bias_enabled=True,
+            steady_rsu_bias_strength=1.2,
+            steady_rsu_confidence_floor=0.62,
+        )
+        policy_output = {
+            "slow_logits": torch.tensor([0.0, 1.0, 3.0]),
+            "fast_logits": torch.tensor([0.0, 0.0]),
+            "event_logits": torch.tensor([0.0, 1.0]),
+        }
+
+        adjusted = agent._apply_policy_adjustments(policy_output, state)
+
+        self.assertGreater(float(adjusted["fast_logits"][0]), float(policy_output["fast_logits"][0]))
+        self.assertEqual(float(adjusted["fast_logits"][1]), float(policy_output["fast_logits"][1]))
+        self.assertEqual(float(adjusted["slow_logits"][2]), float(policy_output["slow_logits"][2]))
+        self.assertTrue(adjusted["mechanism_bias_info"]["steady_rsu_candidate"])
 
     def test_continuity_guard_keeps_prefetch_available_until_target_cache_ready(self) -> None:
         state = _minimal_semantic_state()

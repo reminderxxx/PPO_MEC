@@ -31,6 +31,7 @@
 - `primary_target`: `IEEE TMC`
 - 检索主题：VEC/MEC DAG workflow offloading、service/model/adapter caching、handoff/migration、mobility prediction、multi-timescale control、MARL baseline、edge AI/LoRA/KV-cache serving。
 - 核验来源优先级：IEEE Xplore / ACM DL / 期刊或出版社 DOI 页面；DBLP、arXiv 和聚合页面不能单独确认正式 venue。
+- 自动审计：`artifacts/analysis/literature_table_audit_20260621/literature_table_audit.json`；54 篇，标题/DOI/URL 重复 0、无效链接结构 0、显式待核验 4。
 
 质量等级只表示 venue 证据和与本项目主 claim 的关系，不代表对单篇论文方法质量的最终评分：
 

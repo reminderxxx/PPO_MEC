@@ -11,7 +11,10 @@
 - `ARTIFACT_RECORDS.md`：从 `artifacts/` 整理出的规范化实验记录
 - `current_results_audit_20260527.md`：当前 canonical / v5 / MAPPO v3 / SA v6 结果状态、缺口和阻塞审计表
 - `top_journal_review_policy.md`：以 IEEE TMC 为主目标的长期 AI reviewer 证据等级、blocker、评分和固定输出规范
-- `top_journal_readiness_audit_20260618.md`：v7 独立重建、严格非重叠 holdout、机制消融与 LuST 外部迁移的最新审查；当前 verdict 为 `Not TMC-ready`
+- `top_journal_readiness_audit_20260621.md`：strict-full v8 formal、一次性 hidden 与 LuST supporting evidence 的最新审查；当前 verdict 为 `Major revision`
+- `strict_full_v8_execution_record_20260621.md`：v8 候选冻结、hidden 开启、运行语义、统计与完整性审计记录
+- `RUNBOOK.md`：包含 v8-current support suite 与 v9 Pareto-safe 候选的运行入口；这些入口不等于新 paper-grade 结果
+- `top_journal_readiness_audit_20260618.md`：v7 strict non-overlap 历史审查；verdict 为 `Not TMC-ready`
 - `novelty_review_20260621.md`：面向 TMC 的最新一手文献检索、最近邻矩阵和四项创新点新颖性审查；结论为 `Conditionally defensible, but crowded`
 - `advisor_report_briefing_20260621.md`：面向导师汇报的创新点、整体框架、模型结构、实验结果、结论边界和问答讲稿
 - `../../outputs/ppo_mec_advisor_report_20260621.pptx`：与讲稿配套的 14 页可编辑导师汇报 PPT，含逐页 speaker notes

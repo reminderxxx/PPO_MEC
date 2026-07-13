@@ -1,6 +1,15 @@
 ﻿# Progress
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
+
+## 2026-07-13: v8 support suite 与 v9 Pareto-safe 路径接入
+
+- 新增 `scripts/run_strict_full_v8_support_suite.py`，统一编排 v8-current prediction robustness、system robustness、scalability 和 guard attribution，并默认使用 `strict_full_v8_dev_screen_20260621_v2/seed_checkpoint_manifest.json` 与冻结 formal window plan；脚本会拒绝路径或 split metadata 中含 hidden 的窗口计划，避免把已 consumed hidden 重新用于筛选。
+- `benchmark_prediction_robustness.py`、`benchmark_robustness.py`、`benchmark_scalability.py` 和 `benchmark_ablation.py` 均支持 `--window_plan_path`，support suite 可复用 strict split 的显式窗口，不再通过 rank/offset 隐式选窗。
+- 新增 `configs/ablation_checkpoint_manifest_v8_guard_attribution.json`，在同一 checkpoint / 同一窗口下定义 `learned_core_only`、`no_guard`、`cache_warm_guard_only`、`prefetch_admission_guard_only`、`backhaul_guard_only` 和 `all_guards` 六组机制归因标签；`run_real_episode()` / `build_inference_agent()` 支持 `agent_config_overrides`，用于只在评估端开关 guard，不修改 checkpoint 或环境 contract。
+- 新增 `top_journal_mechanism_v9_pareto_safe` profile 与 `configs/experiment/top_journal_mechanism_v9_pareto_safe.yaml`。v9 保持 `semantic_discrete_5` reward/action/env contract 不变，把 handoff failure 和 backhaul trade-off 纳入 checkpoint ranking：训练输出新增 `best_by_pareto_safe_score.pt`，作为 dev-only / future-validation 候选选择的安全优先 checkpoint。
+- 当前仅完成代码入口、配置、dry-run 和单元测试验证；尚未运行 v8 full support suite、v9 5-seed 训练、future-validation split 或新的 readiness audit。不得把本条记录写成新的 paper-grade 结果。
+
 ## 2026-07-06: supervised handoff predictor v1 代码路径接入
 
 - 新增 `src/predictors/supervised_handoff_predictor.py` 和 `scripts/train_supervised_handoff_predictor.py`，支持从冻结 train/dev window plan 构建 mobility future-label 样本，训练短时 next-RSU / handoff-target / ETA predictor，并输出 checkpoint、metrics manifest 与 quality rows。
@@ -8,6 +17,29 @@
 - SA 训练、主结果 benchmark 和 prediction robustness 已接入 supervised predictor 参数；prediction robustness 支持 baseline、supervised、noisy supervised、no prediction 和 oracle diagnostic 设置。
 - 文档口径更新为：该层是 short-horizon handoff anticipation / lightweight DT-style predictive state snapshot，不是完整 digital twin 或轨迹预测 SOTA。当前仅代表代码链路接入；paper-ready claim 仍需冻结 predictor checkpoint、quality report、SA-GHMAPPO v9 重训和 formal/future-validation benchmark。
 
+## 2026-06-21: strict-full v8 formal/hidden 修复完成
+
+- 冻结 `strict_split_v1_20260621`：train/dev/formal/hidden 各 20 个 outer windows，80 个窗口全局互斥且 minimum gap 为 24 frames；选择只使用 mobility covariate，不读取 reward 或 checkpoint outcome。
+- v8 候选只在 dev 进行两轮筛选后冻结；随后 formal 和 hidden 使用同一 5-seed checkpoint manifest。hidden 在 formal reward gate 通过后只开启一次，开启后没有改 profile、checkpoint、split 或统计脚本。
+- formal 对 PPO / DT 的 reward BCa 95% CI 分别为 `+6.656750 [4.013080, 10.782299]` / `+17.893100 [12.429725, 24.247976]`；hidden 分别为 `+3.884200 [1.612143, 7.830383]` / `+16.323300 [10.347505, 21.426419]`。
+- 对 DT 的 continuity 在 formal / hidden 分别为 `+0.280658 [0.184057, 0.364369]` / `+0.266788 [0.154254, 0.356273]`，因此 v7 的 strict-full reward/continuity blocker 已修复。
+- 负向结果必须保留：hidden 相对 PPO 的 handoff-failure benefit 为 `-0.074167 [-0.198877, -0.002500]`；formal/hidden 相对 PPO 的 backhaul benefit 分别为 `-24.16 [-40.72, -11.84]` / `-14.24 [-25.12, -6.32]`。相对 popularity heuristic 的 reward CI 均跨 0。
+- LuST grid 方向一致，但只有 4 个独立 outer windows，只作为 supporting evidence。v8-current robustness/scalability/ablation 尚未补齐。
+- 完整性审计覆盖 11457 个文件，`missing_reference_count=0`、`json_error_count=0`。最新审查为 `docs/project/top_journal_readiness_audit_20260621.md`，verdict `Major revision (78/100)`，证据等级 `E2_ARTIFACT_AUDITED`。
+- 新增文献表自动审计：当前 54 篇记录中标题/DOI/URL 重复均为 0、结构化无效链接为 0；4 项显式 `待核验` 被保留并列入报告，不伪装为已核验正式出版物。
+
+验证入口：`docs/project/strict_full_v8_execution_record_20260621.md`、`artifacts/audits/strict_full_v8_integrity_20260621/`。
+
+本轮最终验证：全量 `.venv/bin/python -m pytest` 共 80 项通过；`smoke_test.py`、NGSIM sample、Alibaba sample 和 NGSIM+Alibaba real dry-run 均通过；在 `/tmp` 重建的四个 split plan 与冻结文件逐字一致。`check_data_ready.py` 为 4/5：NGSIM、Alibaba、LuST 与 model-cache metadata 就绪，非主线 highD 仍缺失。
+
+## 2026-06-21: strict-full 统计 blocker 修复启动
+
+- `scripts/analyze_top_journal_statistics.py` 升级为 window-outer hierarchical bootstrap：外层 `window_id` 等权重抽样，内层重采样 `seed + workflow_id`；同时输出 percentile/BCa 95% CI、row/window 层效应量、paired sign test 与全 baseline/metric Holm 校正。修复了旧自定义 LCG 在 2 的幂次 cluster 数上可能产生周期性抽样的问题。
+- learned-suite 与 final-submission 默认统计口径同步改为 outer `window_id`、inner `seed workflow_id`；旧 `--cluster_keys` 仅兼容历史命令。
+- 对 canonical v7 strict non-overlap formal/holdout 重审：formal full 的 SA-DT reward delta `+2.964167`，BCa 95% CI `[-1.785395, 15.207530]`；continuity delta `-0.088194`，BCa 95% CI `[-0.175347, -0.013194]`。holdout full reward delta `+1.263333`，BCa 95% CI `[-2.943056, 9.315519]`；continuity delta `-0.083112`，BCa 95% CI `[-0.158460, -0.029861]`。因此 strict-full blocker 被确认是方法/证据问题，不是旧统计实现可消除的问题。
+- 当前仍只有 6 个 outer windows/split，统计功效不足；v7 继续判为 `Not TMC-ready`。下一阶段必须冻结更大的 train/dev/formal/hidden-holdout split，并先在非 hidden 数据上诊断 continuity/handoff failure 后再实现 v8。
+
+验证：`git diff --check`、`PYTHONPYCACHEPREFIX=/tmp/ppo_mec_pycache .venv/bin/python -m py_compile ...`、`.venv/bin/python -m pytest tests/test_top_journal_statistics.py tests/test_top_journal_closed_loop.py tests/test_algo_pool_contract.py`，共 46 项通过。
 
 ## 2026-06-21: TMC 最近邻增量检索与创新性复核
 
@@ -17,7 +49,7 @@
 - 新增 `docs/project/novelty_review_20260621.md`，建立最近邻矩阵并逐项审查当前四项创新；novelty verdict 为 `Conditionally defensible, but crowded`，内部 novelty 得分维持 `14/20`。
 - 文献表新增三篇 TMC、一篇 IEEE IoT Journal 和一篇 IEEE NGDN 近邻，并修正 service-migration 年份与 dual-dependency 标题。
 
-结论边界：截至本轮定向检索，尚未发现正式大刊同时覆盖“跨 RSU 连续 DAG workflow + adapter warm-state cache + predictive handoff prepare/state migration + 三时间尺度联合控制”的完整交集；但 `DAG + mobility + MARL`、`DAG + cache`、`DAG + hierarchy` 等子组合均已有工作，不能单独作为首次创新。整体 readiness 仍因 strict full CI blocker 为 `Not TMC-ready`。
+结论边界：截至本轮定向检索，尚未发现正式大刊同时覆盖“跨 RSU 连续 DAG workflow + adapter warm-state cache + predictive handoff prepare/state migration + 三时间尺度联合控制”的完整交集；但 `DAG + mobility + MARL`、`DAG + cache`、`DAG + hierarchy` 等子组合均已有工作，不能单独作为首次创新。该段记录的是检索当时状态；strict-full blocker 后续已由 v8 修复，最新 verdict 见本文首节。
 
 ## 2026-06-21: 导师汇报材料固化
 
@@ -27,7 +59,7 @@
 - 新增 `outputs/ppo_mec_advisor_report_20260621.pptx`，共 14 页，使用可编辑原生图表和形状，逐页附 speaker notes。
 - 所有实验数字均回溯至 `final_submission_v7_latency_fallback_20260618_rebuild_v1` 及最新严格审计；本轮没有生成新训练或 benchmark 结果。
 
-结论边界：材料把 legacy gate、strict non-overlap 结果和当前 reviewer verdict 分开陈述。mixed formal/holdout 对 `dt_handoff_drl` 的 reward CI 为正；full formal/holdout CI 跨 0，项目仍为 `Not TMC-ready`。
+结论边界：该 deck 固化的是 v7 阶段证据。v8 已修复其中的 full blocker；复用 deck 前必须更新结果页和 verdict，不能把 v7 数字与 v8 结论混写。
 
 ## 2026-06-18: v7 独立重建、严格 holdout 与外部迁移补证
 
@@ -38,7 +70,7 @@
 - `benchmark_main_results.py` 新增 formal plan exclusion、minimum gap 和 split 内非重叠选择。旧 `offset=3 holdout` 与 formal 重叠，已降级为 near-window sensitivity。
 - 严格非重叠结果中，mixed formal/holdout 对 DT 的 CI 为正；full formal `+2.964167 [-0.202500, 6.453132]`，full holdout `+1.263333 [-0.816132, 3.512965]`，均跨 0。
 - 补齐五项 current-contract 机制消融；新增 LuST 二维 `auto_grid_tight` 外部 mobility benchmark，并记录其 backhaul trade-off。
-- reviewer policy 升级到 `tmc_review_policy_v2_20260618`；最新 verdict 为 `Not TMC-ready (74/100 + scientific blocker)`。
+- reviewer policy 当时升级到 `tmc_review_policy_v2_20260618`；该轮 verdict 为 `Not TMC-ready (74/100 + scientific blocker)`。
 
 结论边界：legacy `paper_claim_ready=true` 只证明旧 gate 可复现；不得把 offset-3 写成 independent holdout，也不得声称所有 strict split 显著优于 strongest learned baseline。
 

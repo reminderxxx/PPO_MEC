@@ -1,6 +1,6 @@
 ﻿# Context
 
-更新日期：2026-06-18
+更新日期：2026-06-21
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
@@ -14,8 +14,8 @@
 - 当前外部 model-cache metadata source：Hugging Face `model-cache` 候选全集已审计并 metadata-only 接入；当前只支持数据源声明和真实 file-size/cache-volume profile 设计，不替换 benchmark 默认 cache 行为
 - 当前论文协议：`paper_protocol_v1_20260409`
 - 当前正式结果入口：`docs/project/ARTIFACT_RECORDS.md`
-- 当前顶刊审查规范：`docs/project/top_journal_review_policy.md`；最新审查为 `docs/project/top_journal_readiness_audit_20260618.md`。
-- 2026-06-18 已独立重建 v7 closed-loop/final-submission 并完成 hash/provenance/comparison 复现，证据等级为 `E3_REPRODUCED`。严格 interval 审查证明旧 offset-3 与 formal 重叠；最新 reviewer verdict 为 `Not TMC-ready`。
+- 当前顶刊审查规范：`docs/project/top_journal_review_policy.md`；最新审查为 `docs/project/top_journal_readiness_audit_20260621.md`。
+- v7 的 strict-full blocker 已由 v8 修复：冻结 20-window/split 协议下，formal/一次性 hidden 对全部 learned baselines 的 reward CI 为正，对 DT continuity 的 CI 也为正。当前 reviewer verdict 为 `Major revision (78/100)`，证据等级为 `E2_ARTIFACT_AUDITED`；PPO handoff failure/backhaul trade-off、v8-current support suite 与外部样本量仍未达 TMC-ready。
 - 当前 live 模型层：主方法 `sa_ghmappo` + 方向匹配型对照算法池；`mappo` 对照采用 controller-level CTDE + `aggregation_reason_weighted_controller_ppo_v3`。
 - 当前 predictor 层：默认仍可使用 `baseline_predictor_v2`；代码已新增 `supervised_handoff_predictor_v1` 训练与 runtime 接口，需显式传入冻结 checkpoint。该层定位为短时 handoff anticipation / lightweight DT-style predictive state snapshot，不是完整数字孪生系统；在生成正式 checkpoint、quality report 和 v9 benchmark 前，不自动替代 v8 主结论。
 - 当前新增后 live paper-grade learned 对照算法池：`ppo`、`mappo`、`dqn`、`dueling_dqn`、`qmix`、`controller_mat`、`dag_offload_drl`、`cache_offload_drl`、`dt_handoff_drl`
@@ -43,7 +43,7 @@
 ## 当前可引用结论边界
 
 - 文档化结果：`final_submission_v7_latency_fallback_20260528_v1` 是 legacy paper-ready package；`final_submission_v7_latency_fallback_20260618_rebuild_v1` 已复现旧协议数值，但 strict non-overlap 结果取代 offset-3 作为 readiness 判断依据。
-- 当前主结果 claim 边界：只能安全表述 strict mixed 模式对 DT 的 CI 为正；strict full formal/holdout CI 跨 0。`mappo` / `qmix` / `controller_mat` 是 controller-level baselines，不是 vehicle-agent / RSU-agent full MARL wrappers。
+- 当前主结果 claim 边界：可安全表述 v8 strict-full formal/一次性 hidden 对全部 learned baselines 的 reward CI 为正，且对 DT continuity CI 为正；必须同时报告相对 PPO 的 handoff-failure/backhaul trade-off及未超过 popularity heuristic。`mappo` / `qmix` / `controller_mat` 是 controller-level baselines，不是 vehicle-agent / RSU-agent full MARL wrappers。
 - 注意：历史记录可包含旧对比算法；这些只代表归档结果，不代表当前方向匹配算法池的 live 结果。
 - 可引用但需说明限制：早期 robustness 最新保留记录，协议早于 frozen main table，不应单独支撑最终主张。
 - 不再引用：toy benchmark、tmp quickcheck、LuST micro 激活窗口试验、早期 dry-run、阶段性 reward shaping / recalibration / uncertainty tuning。

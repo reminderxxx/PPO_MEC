@@ -1,0 +1,48 @@
+experiment_name: top_journal_mechanism_v8_strict_full
+output_root: artifacts/training/top_journal_mechanism_v8_strict_full
+seeds: [7, 13, 29, 41, 53]
+
+scope:
+  objective: repair_strict_full_continuity_without_reward_definition_change
+  diagnosis_protocol: strict_full_failure_diagnosis_v1_20260621
+  statistics_protocol: hierarchical_window_bootstrap_v1_20260621
+  split_protocol: strict_split_v1_20260621
+  claim_boundary: formal_and_single_open_hidden_evaluated_major_revision
+  frozen_components:
+    - VecWorkflowCoreEnv reward definition
+    - semantic_discrete_5 action contract
+    - controller-level baseline contracts
+    - train/dev/formal/hidden window plans and source hashes
+
+training:
+  script: scripts/train_sa_ghmappo_real_sample.py
+  profile: top_journal_mechanism_v8_strict_full
+  episodes: 96
+  update_every: 8
+  batch_size: 32
+  max_steps: 16
+  max_mobility_rows: 10000
+  train_window_plan_path: configs/experiment/top_journal_v8_strict_split_20260621/train_window_plan.json
+  dev_window_plan_path: configs/experiment/top_journal_v8_strict_split_20260621/dev_window_plan.json
+  policy_repair:
+    latency_fallback_bias_enabled: false
+    steady_rsu_bias_enabled: true
+    steady_rsu_bias_strength: 1.20
+    steady_rsu_confidence_floor: 0.62
+    continuity_guard_logit_penalty: 0.80
+    continuity_guard_prepare_boost: 1.00
+    continuity_guard_confidence_threshold: 0.65
+    continuity_guard_prepare_score_threshold: 0.35
+    predictive_prefetch_admission_min_confidence: 0.62
+    rationale: keep warm current-RSU execution in non-handoff states; no reward change or hard override
+
+evaluation:
+  formal_window_plan_path: configs/experiment/top_journal_v8_strict_split_20260621/formal_window_plan.json
+  hidden_holdout_window_plan_path: configs/experiment/top_journal_v8_strict_split_20260621/hidden_holdout_window_plan.json
+  hidden_open_condition: frozen_candidate_and_formal_gate_passed
+  hidden_maximum_open_count: 1
+  hidden_status: consumed_once_20260621
+  outer_cluster_keys: [window_id]
+  inner_cluster_keys: [seed, workflow_id]
+  ci_method: bca
+  multiplicity_adjustment: holm

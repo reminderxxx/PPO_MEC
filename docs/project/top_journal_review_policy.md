@@ -1,7 +1,7 @@
 # Top Journal Review Policy
 
-- `policy_version`: `tmc_review_policy_v2_20260618`
-- `updated_at`: `2026-06-18`
+- `policy_version`: `tmc_review_policy_v3_20260621`
+- `updated_at`: `2026-06-21`
 - `primary_target`: `IEEE Transactions on Mobile Computing (TMC)`
 - `secondary_fit_targets`: `IEEE TITS / IEEE TVT`
 
@@ -45,6 +45,7 @@ Artifact 审查必须覆盖：
 - seed、训练预算、数据窗口、checkpoint provenance、protocol version 和命令记录；
 - manifest 中所有外部路径的存在性；
 - formal、holdout、prediction robustness、system robustness、scalability、ablation 和 comparison package；
+- hidden holdout 的独立开启记录，以及其与冻结候选/checkpoint manifest 的绑定关系；
 - 生产端 JSON/CSV 与论文表格、README、CONTEXT、BUGS、ARTIFACT_RECORDS 的一致性。
 
 缺失正式 checkpoint、manifest、command log、formal/holdout/support 任一关键证据时，不得用文档摘要补位。
@@ -54,7 +55,12 @@ Artifact 审查必须覆盖：
 - formal/holdout 的独立性按原始时间区间判断，不能只按 `window_id`、rank 或 `window_rank_offset` 判断。
 - 同一 split 中作为独立 cluster 使用的窗口不得重叠；holdout 窗口还必须与全部 formal 窗口不重叠，并记录最小 frame gap。
 - mixed/full 若复用同一时间窗口，不得把两种 mode 当作独立样本合并扩大样本量；应分别报告 CI，或使用显式建模 mode 依赖的层级统计。
+- 多个 seed / workflow 在同一时间窗口上重复评估时，时间窗口是外层独立抽样单元；seed 与 workflow 只能作为窗口内层级重采样单元。不得把 `(seed, window_id, workflow_id)` 的每一行冒充独立 cluster。
+- 正式统计默认报告 window-outer hierarchical bootstrap 的 percentile 与 BCa 95% CI、窗口层效应量、paired sign test 及全指标/全 baseline 的 Holm 校正；外层窗口少于 12 个时必须显式标注低统计功效，不能仅凭未校正 `p < 0.05` 晋级。
 - 任何窗口扫描、checkpoint selection、hyperparameter tuning 或 promotion gate 都不能读取 strict holdout 结果；规则必须先冻结再评估。
+- hidden holdout 必须在候选配置、checkpoint manifest、主 claim 和统计脚本全部冻结后才能开启；一次开启后即永久降级为 consumed holdout，不得因结果不理想重新调参、换 checkpoint 或重新筛窗口。
+- 冻结 split manifest 不因开启 hidden 而改写；开启时间、触发条件、候选 hash、命令和输出 run ID 写入独立 append-only execution record。
+- 候选允许在 dev 上进行有限轮次选择，但必须预先记录轮次数上限、每轮差异和最终冻结理由；未记录的反复筛选按 selection-bias major concern 处理。
 - `scripts/audit_window_independence.py` 的通过是窗口独立性的最低自动检查，不替代对数据源、workflow 和选择过程的人工审计。
 
 ## 硬性 Blocker

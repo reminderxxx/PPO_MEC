@@ -218,6 +218,9 @@ def _filter_checkpoint_config(agent_name: str, checkpoint_config: dict[str, Any]
         "latency_fallback_bias_strength",
         "latency_fallback_confidence_floor",
         "latency_fallback_slow_suppression_strength",
+        "steady_rsu_bias_enabled",
+        "steady_rsu_bias_strength",
+        "steady_rsu_confidence_floor",
         "backhaul_guard_enabled",
         "backhaul_guard_max_reactive_fills_per_adapter",
         "cache_warm_start_guard_enabled",
@@ -246,6 +249,7 @@ def build_inference_agent(
     random_seed: int,
     checkpoint_path: str = "",
     deterministic_action: bool = True,
+    agent_config_overrides: dict[str, Any] | None = None,
 ) -> BaseAgent:
     ensure_agent_checkpoint_path(agent_name, checkpoint_path)
     if agent_name in CHECKPOINT_REQUIRED_AGENTS:
@@ -261,6 +265,7 @@ def build_inference_agent(
     if agent_name == "sa_ghmappo" and deterministic_action:
         for key, value in SA_GHMAPPO_DETERMINISTIC_EVAL_DEFAULTS.items():
             checkpoint_config.setdefault(key, value)
+    checkpoint_config.update(dict(agent_config_overrides or {}))
     agent = build_agent(agent_name, **checkpoint_config)
     if checkpoint_path:
         agent.load(str(Path(checkpoint_path)))

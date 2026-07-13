@@ -337,6 +337,9 @@ class 分层PPO基类(BaseAgent):
         latency_fallback_bias_strength: float = 0.0,
         latency_fallback_confidence_floor: float = 0.0,
         latency_fallback_slow_suppression_strength: float = 0.0,
+        steady_rsu_bias_enabled: bool = False,
+        steady_rsu_bias_strength: float = 0.0,
+        steady_rsu_confidence_floor: float = 0.0,
         backhaul_guard_enabled: bool = False,
         backhaul_guard_max_reactive_fills_per_adapter: int = 1,
         cache_warm_start_guard_enabled: bool = False,
@@ -492,6 +495,12 @@ class 分层PPO基类(BaseAgent):
         self._latency_fallback_slow_suppression_strength = max(
             float(latency_fallback_slow_suppression_strength),
             0.0,
+        )
+        self._steady_rsu_bias_enabled = bool(steady_rsu_bias_enabled)
+        self._steady_rsu_bias_strength = max(float(steady_rsu_bias_strength), 0.0)
+        self._steady_rsu_confidence_floor = max(
+            0.0,
+            min(float(steady_rsu_confidence_floor), 1.0),
         )
         self._backhaul_guard_enabled = bool(backhaul_guard_enabled)
         self._backhaul_guard_max_reactive_fills_per_adapter = max(
@@ -3148,6 +3157,9 @@ class 分层PPO基类(BaseAgent):
             "latency_fallback_bias_strength": self._latency_fallback_bias_strength,
             "latency_fallback_confidence_floor": self._latency_fallback_confidence_floor,
             "latency_fallback_slow_suppression_strength": self._latency_fallback_slow_suppression_strength,
+            "steady_rsu_bias_enabled": self._steady_rsu_bias_enabled,
+            "steady_rsu_bias_strength": self._steady_rsu_bias_strength,
+            "steady_rsu_confidence_floor": self._steady_rsu_confidence_floor,
             "backhaul_guard_enabled": self._backhaul_guard_enabled,
             "backhaul_guard_max_reactive_fills_per_adapter": self._backhaul_guard_max_reactive_fills_per_adapter,
             "cache_warm_start_guard_enabled": self._cache_warm_start_guard_enabled,
@@ -3248,6 +3260,15 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
                 latency_fallback_candidate = bool(
                     float(pseudo_targets.get("latency_fallback_candidate", 0.0) or 0.0) > 0.0
                 )
+                steady_rsu_candidate = bool(
+                    float(pseudo_targets.get("steady_rsu_candidate", 0.0) or 0.0) > 0.0
+                )
+                if (
+                    self._steady_rsu_bias_enabled
+                    and steady_rsu_candidate
+                    and self._steady_rsu_bias_strength > 0.0
+                ):
+                    fast_logits[0] = fast_logits[0] + self._steady_rsu_bias_strength * confidence
                 if (
                     self._latency_fallback_bias_enabled
                     and latency_fallback_candidate
@@ -3270,6 +3291,7 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
                     "event_soft_target": round(event_soft_target, 6),
                     "confidence": round(float(confidence), 6),
                     "latency_fallback_candidate": latency_fallback_candidate,
+                    "steady_rsu_candidate": steady_rsu_candidate,
                 }
         adjusted = self._apply_continuity_guard(adjusted, semantic_state)
         return self._apply_event_logit_sharpening(adjusted, semantic_state)
@@ -3326,6 +3348,14 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
             and not predicted_target_differs
             and not sequence_contains_other_rsu
         )
+        steady_rsu_candidate = bool(
+            self._steady_rsu_bias_enabled
+            and current_rsu_id is not None
+            and current_adapter_ready
+            and not predicted_next_differs
+            and not predicted_target_differs
+            and not sequence_contains_other_rsu
+        )
         if latency_fallback_candidate:
             fast_target = 1
         event_target = 0
@@ -3343,6 +3373,8 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
             confidence_weight = max(confidence_weight, confidence_floor)
         if latency_fallback_candidate:
             confidence_weight = max(confidence_weight, self._latency_fallback_confidence_floor)
+        if steady_rsu_candidate:
+            confidence_weight = max(confidence_weight, self._steady_rsu_confidence_floor)
 
         return {
             "slow_target": slow_target,
@@ -3351,6 +3383,7 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
             "confidence_weight": confidence_weight,
             "event_soft_target": event_soft_target,
             "latency_fallback_candidate": float(latency_fallback_candidate),
+            "steady_rsu_candidate": float(steady_rsu_candidate),
             "temporal_urgency": float(timing_features["temporal_urgency"]),
             "prepare_window_score": float(timing_features["prepare_window_score"]),
             "handoff_countdown_steps": float(timing_features["countdown_steps"]),

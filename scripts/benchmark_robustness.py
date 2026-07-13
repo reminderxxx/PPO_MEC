@@ -17,6 +17,7 @@ from src.agents.registry import list_evaluable_agents
 from src.data.model_catalog.adapter_catalog import AdapterCatalog
 from src.evaluators.main_results_support import (
     aggregate_rows,
+    apply_frozen_window_plan,
     apply_adapter_capacity_scale,
     apply_dependency_simplification,
     audit_checkpoint_map,
@@ -66,6 +67,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_mode", type=str, default="activating_only", choices=["activating_only", "mixed", "full", "mixed_informative", "full_stratified"])
     parser.add_argument("--window_count", type=int, default=1)
     parser.add_argument("--window_scan_stride", type=int, default=2)
+    parser.add_argument("--window_plan_path", type=str, default="")
     parser.add_argument("--prediction_noise_std_list", nargs="+", type=float, default=[0.0, 0.2])
     parser.add_argument("--prediction_confidence_scale_list", nargs="+", type=float, default=[1.0, 0.7])
     parser.add_argument("--prediction_delay_steps_list", nargs="+", type=int, default=[0, 2])
@@ -165,6 +167,9 @@ def main() -> None:
         window_mode=args.window_mode,
     )
     selected_windows = [dict(window_candidate) for window_candidate in window_payload["selected_windows"]]
+    if args.window_plan_path:
+        window_payload = apply_frozen_window_plan(window_payload, args.window_plan_path)
+        selected_windows = [dict(window_candidate) for window_candidate in window_payload["selected_windows"]]
     adapter_catalog = AdapterCatalog.from_json(ROOT_DIR / "src" / "data" / "model_catalog" / "sample_model_catalog.json")
     run_id = datetime.now().strftime("robustness_%Y%m%d_%H%M%S")
     output_root = Path(args.output_root) / run_id

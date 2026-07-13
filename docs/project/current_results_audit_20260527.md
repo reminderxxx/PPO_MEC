@@ -7,7 +7,7 @@
 - `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v7_latency_fallback_20260618_rebuild_v1/`
 - `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260618_rebuild_v1/`
 
-rebuild 复现了下方 legacy v7 数值，SHA-256、checkpoint provenance、manifest references 和 comparison rebuild 均通过，证据升级为 `E3_REPRODUCED`。但 interval audit 发现 legacy offset-3 与 formal 滑动窗口重叠。严格 non-overlap 下 mixed formal/holdout 对 DT 的 CI 为正，而 full formal/holdout CI 跨 0；本轮 verdict 因 scientific blocker 为 `Not TMC-ready`。最新证据和安全表述见 `top_journal_readiness_audit_20260618.md`。
+rebuild 复现了下方 legacy v7 数值，SHA-256、checkpoint provenance、manifest references 和 comparison rebuild 均通过，证据升级为 `E3_REPRODUCED`。但 interval audit 发现 legacy offset-3 与 formal 滑动窗口重叠。严格 non-overlap 下 mixed formal/holdout 对 DT 的 CI 为正，而 full formal/holdout CI 跨 0；本历史轮 verdict 因 scientific blocker 为 `Not TMC-ready`。v8 已修复该 blocker，最新证据和安全表述见 `top_journal_readiness_audit_20260621.md`。
 
 ## 2026-05-28 v7 legacy final-submission package
 

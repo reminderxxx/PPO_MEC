@@ -1,0 +1,81 @@
+{
+  "learned_core_only": {
+    "agent_name": "sa_ghmappo",
+    "removed_module": "all deterministic guards, safety guards, and inference logit shaping",
+    "paper_contribution": "isolates the loaded learned policy network without policy-side guard or shaping layers",
+    "agent_config_overrides": {
+      "mechanism_logit_bias_strength": 0.0,
+      "latency_fallback_bias_enabled": false,
+      "steady_rsu_bias_enabled": false,
+      "event_logit_sharpening_final_scale": 1.0,
+      "event_logit_sharpening_timing_gain": 0.0,
+      "event_prepare_margin_boost": 0.0,
+      "deterministic_temporal_smoothing_enabled": false,
+      "deterministic_high_prepare_override_enabled": false,
+      "continuity_guard_enabled": false,
+      "handoff_target_alignment_guard_enabled": false,
+      "cache_warm_start_guard_enabled": false,
+      "predictive_prefetch_admission_guard_enabled": false,
+      "backhaul_guard_enabled": false
+    }
+  },
+  "no_guard": {
+    "agent_name": "sa_ghmappo",
+    "removed_module": "policy-side safety guards",
+    "paper_contribution": "keeps learned policy and inference bias but removes continuity/cache/prefetch/backhaul guard interventions",
+    "agent_config_overrides": {
+      "deterministic_high_prepare_override_enabled": false,
+      "continuity_guard_enabled": false,
+      "handoff_target_alignment_guard_enabled": false,
+      "cache_warm_start_guard_enabled": false,
+      "predictive_prefetch_admission_guard_enabled": false,
+      "backhaul_guard_enabled": false
+    }
+  },
+  "cache_warm_guard_only": {
+    "agent_name": "sa_ghmappo",
+    "removed_module": "all safety guards except cache warm-start guard",
+    "paper_contribution": "tests whether the cache warm-start guard alone explains safety or reward changes",
+    "agent_config_overrides": {
+      "deterministic_high_prepare_override_enabled": false,
+      "continuity_guard_enabled": false,
+      "handoff_target_alignment_guard_enabled": false,
+      "cache_warm_start_guard_enabled": true,
+      "predictive_prefetch_admission_guard_enabled": false,
+      "backhaul_guard_enabled": false
+    }
+  },
+  "prefetch_admission_guard_only": {
+    "agent_name": "sa_ghmappo",
+    "removed_module": "all safety guards except predictive prefetch admission guard",
+    "paper_contribution": "tests whether low-confidence prefetch deferral alone explains safety or reward changes",
+    "agent_config_overrides": {
+      "deterministic_high_prepare_override_enabled": false,
+      "continuity_guard_enabled": false,
+      "handoff_target_alignment_guard_enabled": false,
+      "cache_warm_start_guard_enabled": false,
+      "predictive_prefetch_admission_guard_enabled": true,
+      "backhaul_guard_enabled": false
+    }
+  },
+  "backhaul_guard_only": {
+    "agent_name": "sa_ghmappo",
+    "removed_module": "all safety guards except backhaul guard",
+    "paper_contribution": "tests whether the backhaul guard alone explains traffic-cost changes",
+    "agent_config_overrides": {
+      "deterministic_high_prepare_override_enabled": false,
+      "continuity_guard_enabled": false,
+      "handoff_target_alignment_guard_enabled": false,
+      "cache_warm_start_guard_enabled": false,
+      "predictive_prefetch_admission_guard_enabled": false,
+      "backhaul_guard_enabled": true,
+      "backhaul_guard_max_reactive_fills_per_adapter": 1
+    }
+  },
+  "all_guards": {
+    "agent_name": "sa_ghmappo",
+    "removed_module": "none",
+    "paper_contribution": "full loaded v8/v9 inference stack with learned policy, calibrated surrogate features, deterministic smoothing, and safety guards",
+    "agent_config_overrides": {}
+  }
+}

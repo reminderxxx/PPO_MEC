@@ -24,6 +24,7 @@ from src.envs.core.predictor_manager import PredictorManager
 from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv
 from src.envs.wrappers.gym_vec_env import GymVecEnv
 from src.evaluators.main_results_support import (
+    apply_frozen_window_plan,
     build_selected_workflow_states,
     clone_frames,
     clone_rsu_state,
@@ -96,6 +97,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_count", type=int, default=1)
     parser.add_argument("--window_scan_stride", type=int, default=2)
     parser.add_argument("--window_mode", type=str, default="activating_only", choices=["activating_only", "mixed", "full", "mixed_informative", "full_stratified"])
+    parser.add_argument("--window_plan_path", type=str, default="")
     parser.add_argument("--max_steps", type=int, default=None)
     parser.add_argument("--min_tasks", type=int, default=5)
     parser.add_argument("--max_tasks", type=int, default=20)
@@ -230,6 +232,8 @@ def main() -> None:
         random_seed=args.random_seed,
         window_mode=args.window_mode,
     )
+    if args.window_plan_path:
+        window_payload = apply_frozen_window_plan(window_payload, args.window_plan_path)
     selected_window_plan = list(window_payload.get("selected_windows", []))
     if not selected_window_plan:
         selected_window_plan = [
@@ -367,6 +371,10 @@ def main() -> None:
         "summary_json_path": str(summary_path),
         "workflow_ids": [workflow_state.workflow_id for workflow_state in workflow_states],
         "selected_window_plan": selected_window_plan,
+        "frozen_window_plan_path": window_payload.get("frozen_window_plan_path", ""),
+        "frozen_window_plan_protocol_version": window_payload.get("frozen_window_plan_protocol_version", ""),
+        "frozen_window_plan_split": window_payload.get("frozen_window_plan_split", ""),
+        "outcome_blind_window_selection": window_payload.get("outcome_blind_selection", False),
         "window_mode": args.window_mode,
         "primary_vehicle_selection": args.primary_vehicle_selection,
         "window_selector": args.window_selector,

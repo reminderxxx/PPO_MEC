@@ -1,11 +1,32 @@
 # Code Module Map
 
+## 2026-07-13 v8 support suite and v9 Pareto-safe candidate
+
+- `scripts/run_strict_full_v8_support_suite.py`：统一运行 v8-current prediction robustness、system robustness、scalability 和 guard attribution，并生成 `support_gate_report.json`；脚本只接受非 hidden window plan。
+- `scripts/benchmark_prediction_robustness.py`、`scripts/benchmark_robustness.py`、`scripts/benchmark_scalability.py`、`scripts/benchmark_ablation.py`：支持 `--window_plan_path`，让 support benchmark 消费冻结 strict split。
+- `src/evaluators/real_eval_support.py`、`src/evaluators/main_results_support.py`：新增 `agent_config_overrides` 评估端覆盖，用于同一 checkpoint 下的 guard attribution，不改变 checkpoint 文件、reward 或 action schema。
+- `scripts/train_sa_ghmappo_real_sample.py`：新增 `top_journal_mechanism_v9_pareto_safe` profile，并在 checkpoint selection 中输出 `best_by_pareto_safe_score.pt`；该 ranking 显式惩罚 handoff failure、backhaul 和 continuity regression。
+- `scripts/run_top_journal_closed_loop.py`：新增 v9 budget override，保持 strict-full 训练预算与 v8 可比。
+- `configs/experiment/top_journal_mechanism_v9_pareto_safe.yaml`、`configs/ablation_checkpoint_manifest_v8_guard_attribution.json`：分别记录 v9 候选边界和 v8 guard attribution manifest。
+
 ## 2026-07-06 supervised handoff predictor v1
 
 - `src/predictors/supervised_handoff_predictor.py`：定义薄 MLP predictor、冻结 feature schema、checkpoint schema 和 runtime loader；只输出短时 next-RSU / handoff-target / ETA / confidence prediction。
 - `scripts/train_supervised_handoff_predictor.py`：从冻结 train/dev window plan 构建 mobility future-label 样本，训练 predictor checkpoint 并写出 metrics manifest / quality rows；不读取 reward、action 或 checkpoint outcome。
 - `src/envs/core/predictor_manager.py`：新增 `predictor_kind=supervised` 和 `predictor_checkpoint_path`，将 supervised predictor 输出映射回现有 `predictions` contract；缺失 checkpoint、schema 或 RSU map 不匹配时 fail fast。
 - `scripts/train_sa_ghmappo_real_sample.py`、`scripts/benchmark_main_results.py`、`scripts/benchmark_prediction_robustness.py`：接收 supervised predictor checkpoint，支撑 SA-GHMAPPO v9 重训、主结果 benchmark 和 prediction robustness 五组设置。
+
+## 2026-06-21 strict-full v8 protocol and analysis
+
+- `scripts/freeze_strict_split_protocol.py`：只按 mobility covariate 分层，冻结 train/dev/formal/hidden 计划、源数据 hash 与 interval independence audit。
+- `src/evaluators/main_results_support.py`、`scripts/benchmark_main_results.py`：读取显式 `--window_plan_path`，保证 benchmark 消费冻结窗口而非重新扫描选择。
+- `scripts/run_top_journal_closed_loop.py`、`scripts/train_sa_ghmappo_real_sample.py`、`scripts/train_algo_pool_real_sample.py`：把 train/eval window plan 传入主方法和 baseline 训练链。
+- `scripts/analyze_top_journal_statistics.py`：window outer、seed/workflow inner hierarchical bootstrap，输出 percentile/BCa CI、effect size、sign test 与 Holm correction。
+- `scripts/analyze_strict_full_failure_modes.py`：只允许非 hidden 标签，按窗口/action/reward component 诊断 failure mode。
+- `src/agents/sa_ghmappo_core.py`、`src/evaluators/real_eval_support.py`：实现并恢复 v8 steady-RSU soft bias；只在 current adapter warm 且无 distinct handoff 时生效，不修改 reward/action schema。
+- `configs/experiment/top_journal_mechanism_v8_strict_full.yaml`：冻结 v8 profile、两轮 dev 上限、split/统计协议与 promotion boundary。
+- `tests/test_top_journal_statistics.py`、`tests/test_strict_split_protocol.py`、`tests/test_strict_full_failure_modes.py`、`tests/test_algo_pool_contract.py`：覆盖统计层级、split hash/间隔、hidden 标签禁用和 v8 checkpoint contract。
+- `scripts/audit_literature_reference_table.py`、`tests/test_literature_reference_audit.py`：解析六列文献表，归一化标题/DOI/URL，报告重复、无效链接结构与待核验条目。
 
 ## 2026-05-28 SA v7 latency fallback clean-retrain profile
 
