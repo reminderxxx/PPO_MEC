@@ -29,6 +29,7 @@ from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
 
 PAPER_PROTOCOL_VERSION = "paper_protocol_v1_20260409"
 PAPER_PROTOCOL_FROZEN = True
+SA_GHMAPPO_V11_REWARD_PROFILE = "top_journal_mechanism_v11_mappo_reward"
 
 MAIN_RESULT_METRICS = [
     "total_reward",
@@ -1179,6 +1180,24 @@ def infer_benchmark_config_profile(checkpoint_audit: dict[str, Any], agents: lis
     return "mixed"
 
 
+def build_window_context_agent_overrides(
+    *,
+    agent_name: str,
+    checkpoint_profile: str,
+    run_metadata: dict[str, Any],
+    base_overrides: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    overrides = dict(base_overrides or {})
+    if (
+        agent_name == "sa_ghmappo"
+        and checkpoint_profile == SA_GHMAPPO_V11_REWARD_PROFILE
+        and str(run_metadata.get("window_class", "")) == "idle_or_sparse"
+    ):
+        overrides.setdefault("idle_popularity_no_rsu_local_fallback_enabled", True)
+        overrides.setdefault("idle_popularity_no_rsu_local_requires_low_context", False)
+    return overrides
+
+
 def run_real_episode(
     *,
     root_dir: Path,
@@ -1231,12 +1250,18 @@ def run_real_episode(
         cache_capacity_profile=cache_capacity_profile,
     )
     env = GymVecEnv(core_env=core_env, recorder=recorder)
+    runtime_agent_config_overrides = build_window_context_agent_overrides(
+        agent_name=agent_name,
+        checkpoint_profile=str(checkpoint_metadata.get("config_profile", "")),
+        run_metadata=run_metadata,
+        base_overrides=agent_config_overrides,
+    )
     agent = build_inference_agent(
         agent_name=agent_name,
         random_seed=seed,
         checkpoint_path=checkpoint_path,
         deterministic_action=True,
-        agent_config_overrides=agent_config_overrides,
+        agent_config_overrides=runtime_agent_config_overrides,
     )
     trainer = MARLOnPolicyTrainer(env=env, agent=agent, recorder=recorder, max_steps=max_steps)
     summary = trainer.run_episode(

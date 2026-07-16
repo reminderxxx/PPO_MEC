@@ -331,6 +331,94 @@ class AlgoPoolContractTestCase(unittest.TestCase):
             {"slow": 0.3, "fast": 0.1, "event": 1.0},
         )
 
+    def test_sa_v11_profile_is_reward_first_mappo_rl(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v11_mappo_reward"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        self.assertEqual(defaults["entropy_coef"], PROFILE_DEFAULTS["top_journal_mechanism_v10_mappo_rl"]["entropy_coef"])
+        self.assertEqual(defaults["auxiliary_coef"], PROFILE_DEFAULTS["top_journal_mechanism_v8_strict_full"]["auxiliary_coef"])
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v11_mappo_reward")
+        self.assertTrue(kwargs["head_credit_enabled"])
+        self.assertEqual(kwargs["head_credit_protocol"], "aggregation_reason_weighted_controller_ppo_v3")
+        self.assertLess(kwargs["heuristic_imitation_coef"], 0.10)
+        self.assertLess(kwargs["mechanism_aux_coef"], 0.09)
+        self.assertLess(kwargs["prepare_action_prior_weight"], 0.60)
+        self.assertTrue(kwargs["mechanism_aux_current_cache_fill_enabled"])
+        self.assertGreaterEqual(kwargs["fast_policy_credit_floor"], 0.12)
+        self.assertGreater(kwargs["event_logit_sharpening_final_scale"], 1.55)
+        self.assertTrue(kwargs["idle_popularity_fallback_enabled"])
+        self.assertTrue(kwargs["idle_popularity_fallback_only_vehicle_fallback"])
+        self.assertEqual(kwargs["idle_popularity_prefetch_threshold"], 2)
+        self.assertFalse(kwargs["idle_popularity_no_rsu_local_fallback_enabled"])
+        self.assertTrue(kwargs["idle_popularity_no_rsu_local_requires_low_context"])
+
+    def test_sa_v11_idle_popularity_fallback_replaces_vehicle_fallback_only(self) -> None:
+        state = _minimal_semantic_state()
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=3,
+            deterministic_action=True,
+            idle_popularity_fallback_enabled=True,
+            idle_popularity_fallback_only_vehicle_fallback=True,
+            idle_popularity_prefetch_threshold=2,
+        )
+
+        fallback_info = agent._maybe_apply_idle_popularity_fallback(
+            semantic_state=state,
+            action_mask=[True, True, True, True, True],
+            original_env_action=2,
+            deterministic=True,
+        )
+
+        self.assertTrue(fallback_info["applied"])
+        self.assertEqual(fallback_info["fallback_action"], 0)
+        self.assertEqual(fallback_info["candidate_reason"], "popular_adapter_reactive_cache_fill")
+
+        non_fallback_info = agent._maybe_apply_idle_popularity_fallback(
+            semantic_state=state,
+            action_mask=[True, True, True, True, True],
+            original_env_action=3,
+            deterministic=True,
+        )
+
+        self.assertFalse(non_fallback_info["applied"])
+        self.assertEqual(non_fallback_info["reason"], "original_action_not_vehicle_fallback")
+
+    def test_sa_v11_idle_popularity_fallback_replaces_no_rsu_current_offload(self) -> None:
+        state = _minimal_semantic_state()
+        state["vehicles"][0]["associated_rsu_id"] = None
+        state["predictions"] = {
+            "predicted_handoff_vehicle_ids": [],
+            "predicted_next_rsu_by_vehicle": {},
+            "predicted_first_handoff_rsu_by_vehicle": {},
+            "next_rsu_sequence": {},
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=5,
+            deterministic_action=True,
+            idle_popularity_fallback_enabled=True,
+            idle_popularity_fallback_only_vehicle_fallback=True,
+            idle_popularity_prefetch_threshold=2,
+            idle_popularity_no_rsu_local_fallback_enabled=True,
+        )
+
+        fallback_info = agent._maybe_apply_idle_popularity_fallback(
+            semantic_state=state,
+            action_mask=[True, True, True, True, True],
+            original_env_action=3,
+            deterministic=True,
+        )
+
+        self.assertTrue(fallback_info["applied"])
+        self.assertEqual(fallback_info["fallback_action"], 2)
+        self.assertEqual(fallback_info["candidate_reason"], "no_associated_rsu_vehicle_fallback")
+        self.assertEqual(fallback_info["reason"], "no_rsu_current_offload_replaced_by_local")
+        self.assertTrue(fallback_info["low_mechanism_no_rsu_context"])
+
     def test_qmix_uses_controller_level_value_decomposition_contract(self) -> None:
         state = _minimal_semantic_state()
         agent = build_agent("qmix", random_seed=1, deterministic_action=True)

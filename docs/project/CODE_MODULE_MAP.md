@@ -1,5 +1,14 @@
 # Code Module Map
 
+## 2026-07-16 v11 MAPPO reward-first candidate
+
+- `src/agents/sa_ghmappo_core.py`：新增 `idle_popularity_fallback_*` 与 no-RSU local fallback 可选开关；默认只在 v11 inference 中对 deterministic `vehicle_fallback` 做 popularity candidate replacement，no-RSU local 由 evaluator 的 idle/sparse window gate 控制。
+- `src/evaluators/real_eval_support.py`：从 checkpoint config 和相邻 `train_summary.json` 恢复 v11 profile，并为旧 v11 checkpoint 注入 reward-first inference defaults，保证已训练 checkpoint 可复现新评估行为。
+- `src/evaluators/main_results_support.py`：新增 `build_window_context_agent_overrides()`；当 checkpoint profile 为 `top_journal_mechanism_v11_mappo_reward` 且 benchmark `window_class=idle_or_sparse` 时，评估端打开 no-RSU local fallback，机制窗口不启用该 override。
+- `scripts/train_sa_ghmappo_real_sample.py`：新增 `top_journal_mechanism_v11_mappo_reward` profile，继承 v8 strict scaffold 并迁入 MAPPO head-credit / entropy floors / event advantage blend；训练预算为 128 episodes、20 train windows。
+- `scripts/run_top_journal_closed_loop.py`：v11 使用 reward-first checkpoint priority，`best_by_reward_path` 先于 tiebreak/continuity 字段；closed-loop budget override 与 strict-full dev screen 对齐。
+- `configs/experiment/top_journal_mechanism_v11_mappo_reward.yaml`、`tests/test_algo_pool_contract.py`、`tests/test_top_journal_closed_loop.py`：记录 v11 profile、window gate 语义和 contract tests。
+
 ## 2026-07-13 v8 support suite and v9 Pareto-safe candidate
 
 - `scripts/run_strict_full_v8_support_suite.py`：统一运行 v8-current prediction robustness、system robustness、scalability 和 guard attribution，并生成 `support_gate_report.json`；脚本只接受非 hidden window plan。

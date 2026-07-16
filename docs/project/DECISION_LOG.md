@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-16: v11 采用 MAPPO-core reward-first + idle/sparse window-context option gate
+
+决策：新增 `top_journal_mechanism_v11_mappo_reward`，以 v8 strict-full scaffold 保留机制稳定性，同时迁入 MAPPO controller-level head-credit、entropy floors/scales 和 event advantage blend；checkpoint selection 使用 reward-first priority。推理期不全局替换 MAPPO 决策，只在 v11 checkpoint 且 `window_class=idle_or_sparse` 时打开 no-RSU local fallback，并在机制窗口保持 MAPPO 主策略和 vehicle-only fallback。
+
+原因：first-order diagnosis 显示初始 v11 在机制窗口已经优于 popularity，但 idle/sparse 的 `vehicle_fallback` / no-RSU offload 行为拉低总 reward。全局 no-RSU local fallback 虽能改善 idle/sparse，却会压低机制窗口 reward 和 mechanism realization；因此需要把规则先验限定为 outcome-blind mobility regime 下的推理期 option gate，而不是替换 MAPPO 学习策略。
+
+影响：v11 不修改 `VecWorkflowCoreEnv` reward、不修改 `semantic_discrete_5` action contract、不改变 baseline contract。full-dev 证据显示 SA total reward `79.4944` 高于全部对照，`sa_advantage_diagnosis.blockers=[]`；但这是 dev evidence，不能替代 v8 canonical 或现有 hidden/future-validation 审查。若要晋级，需要新冻结 future-validation split，并明确报告 idle/sparse 仍略低于 popularity 的边界。
+
 ## 2026-07-16: v10 用 MAPPO controller credit 强化 SA-GHMAPPO 的学习更新
 
 决策：新增 `top_journal_mechanism_v10_mappo_rl` profile，在 v9 Pareto-safe 边界上显式迁入 MAPPO 强对照的 `aggregation_reason_weighted_controller_ppo_v3`、slow/fast/event policy credit floors、entropy floors/scales 和 `event_advantage_blend=0.85`。同时降低 `heuristic_imitation_coef`、`mechanism_aux_coef`、`mechanism_window_weight` 和 `prepare_action_prior_weight`，并关闭 `mechanism_aux_current_cache_fill_enabled`，让 idle/sparse 行为更多由 PPO/CTDE credit 学习，而不是由手写 imitation 或辅助目标拉动。

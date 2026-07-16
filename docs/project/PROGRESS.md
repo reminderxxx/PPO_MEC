@@ -2,6 +2,15 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-07-16: v11 MAPPO reward-first dev full benchmark 超过 popularity heuristic
+
+- 新增 `top_journal_mechanism_v11_mappo_reward` profile 与 `configs/experiment/top_journal_mechanism_v11_mappo_reward.yaml`。v11 以 v8 strict-full scaffold 为底座，迁入 MAPPO 的 `aggregation_reason_weighted_controller_ppo_v3`、slow/fast/event policy credit floors、entropy floors/scales 与 `event_advantage_blend=0.88`，并把 checkpoint priority 改为 `best_by_reward_path` 优先。
+- first-order diagnosis：v11 初始 full-dev 结果低于 popularity 的原因集中在 `idle_or_sparse`，不是机制窗口。未启用窗口 gate 时，SA total reward `78.934`；vehicle-only fallback 后升至 `79.4379`，但仍低于 popularity `79.46875`；全局 no-RSU local fallback 会让机制窗口从 `82.788` 降到 `82.287`，因此被否决。
+- 最终改进为 MAPPO-core + reward-aware window-context gate：`sa_ghmappo` checkpoint profile 为 v11 且 benchmark `window_class=idle_or_sparse` 时，评估端打开 no-RSU local fallback；机制窗口保持 MAPPO 主策略和 vehicle-only fallback。该 gate 使用 outcome-blind frozen window class，不读取 reward 或 hidden。
+- full-dev 5-seed / 20-window / 2-workflow / full_stratified benchmark 已完成：`artifacts/experiments/top_journal_mappo_reward_full_dev_v11_20260716/main_results_full_stratified_window_gate_full/main_results_full_stratified_20260716_181112_383674/aggregate_summary.json`。主方法 total reward `79.4944`，高于 `popularity_cache_heuristic=79.46875`、`ppo=77.18775`、`reactive_greedy=75.845` 及其余 learned baselines；`sa_advantage_diagnosis.blockers=[]`。
+- 分层事实：机制窗口 SA `82.788` vs popularity `82.3425`；active non-mechanism 二者 `83.275` 持平；idle/sparse SA `77.2175` vs popularity `77.3975` 仍略低。总体胜出来自机制窗口优势和 idle/sparse cost gate 的组合，不得写成每个 window class 都全面优于 popularity。
+- 结论边界：这是 frozen dev evidence，hidden holdout 已 consumed 且没有用于本轮筛选或调参。v11 不能替换 v8 canonical，也不能称 paper-ready；promotion 需要新冻结 future-validation split、统计审查和 readiness audit。
+
 ## 2026-07-16: v10 MAPPO-core RL 候选入口接入
 
 - 新增 `top_journal_mechanism_v10_mappo_rl` profile 与 `configs/experiment/top_journal_mechanism_v10_mappo_rl.yaml`。v10 继承 v9 的 hidden 禁用和 Pareto-safe boundary，但把 MAPPO 强对照中的 `aggregation_reason_weighted_controller_ppo_v3`、slow/fast/event policy credit floors、entropy floors/scales 与 `event_advantage_blend=0.85` 显式迁入 SA-GHMAPPO 主方法候选。

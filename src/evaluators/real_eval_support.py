@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,14 @@ SA_GHMAPPO_DETERMINISTIC_EVAL_DEFAULTS = {
     "deterministic_high_prepare_threshold": 0.55,
     "deterministic_high_urgency_threshold": 0.50,
     "deterministic_high_prepare_relaxed_margin": -0.12,
+}
+SA_GHMAPPO_V11_REWARD_PROFILE = "top_journal_mechanism_v11_mappo_reward"
+SA_GHMAPPO_V11_REWARD_EVAL_DEFAULTS = {
+    "idle_popularity_fallback_enabled": True,
+    "idle_popularity_fallback_only_vehicle_fallback": True,
+    "idle_popularity_prefetch_threshold": 2,
+    "idle_popularity_no_rsu_local_fallback_enabled": False,
+    "idle_popularity_no_rsu_local_requires_low_context": True,
 }
 
 
@@ -48,6 +57,20 @@ def _load_checkpoint_config(checkpoint_path: str) -> dict[str, Any]:
     if inferred_prediction_feature_dim is not None:
         config.setdefault("prediction_feature_dim", inferred_prediction_feature_dim)
     return config
+
+
+def _infer_checkpoint_profile(checkpoint_path: str, checkpoint_config: dict[str, Any]) -> str:
+    profile = checkpoint_config.get("config_profile")
+    if profile:
+        return str(profile)
+    train_summary_path = Path(checkpoint_path).parent.parent / "train_summary.json"
+    if not train_summary_path.exists():
+        return ""
+    try:
+        payload = json.loads(train_summary_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return ""
+    return str(payload.get("config_profile", ""))
 
 
 def _infer_prediction_feature_dim_from_payload(payload: Any) -> int | None:
@@ -229,6 +252,11 @@ def _filter_checkpoint_config(agent_name: str, checkpoint_config: dict[str, Any]
         "predictive_prefetch_admission_guard_enabled",
         "predictive_prefetch_admission_min_confidence",
         "predictive_prefetch_admission_require_distinct_next",
+        "idle_popularity_fallback_enabled",
+        "idle_popularity_fallback_only_vehicle_fallback",
+        "idle_popularity_prefetch_threshold",
+        "idle_popularity_no_rsu_local_fallback_enabled",
+        "idle_popularity_no_rsu_local_requires_low_context",
         "auxiliary_slow_weight",
         "auxiliary_fast_weight",
         "auxiliary_event_weight",
@@ -253,8 +281,11 @@ def build_inference_agent(
 ) -> BaseAgent:
     ensure_agent_checkpoint_path(agent_name, checkpoint_path)
     if agent_name in CHECKPOINT_REQUIRED_AGENTS:
-        checkpoint_config = _filter_checkpoint_config(agent_name, _load_checkpoint_config(checkpoint_path))
+        raw_checkpoint_config = _load_checkpoint_config(checkpoint_path)
+        checkpoint_profile = _infer_checkpoint_profile(checkpoint_path, raw_checkpoint_config)
+        checkpoint_config = _filter_checkpoint_config(agent_name, raw_checkpoint_config)
     else:
+        checkpoint_profile = ""
         checkpoint_config = {}
     checkpoint_config.update(
         {
@@ -264,6 +295,9 @@ def build_inference_agent(
     )
     if agent_name == "sa_ghmappo" and deterministic_action:
         for key, value in SA_GHMAPPO_DETERMINISTIC_EVAL_DEFAULTS.items():
+            checkpoint_config.setdefault(key, value)
+    if agent_name == "sa_ghmappo" and checkpoint_profile == SA_GHMAPPO_V11_REWARD_PROFILE:
+        for key, value in SA_GHMAPPO_V11_REWARD_EVAL_DEFAULTS.items():
             checkpoint_config.setdefault(key, value)
     checkpoint_config.update(dict(agent_config_overrides or {}))
     agent = build_agent(agent_name, **checkpoint_config)

@@ -348,6 +348,11 @@ class 分层PPO基类(BaseAgent):
         predictive_prefetch_admission_guard_enabled: bool = False,
         predictive_prefetch_admission_min_confidence: float = 0.55,
         predictive_prefetch_admission_require_distinct_next: bool = True,
+        idle_popularity_fallback_enabled: bool = False,
+        idle_popularity_fallback_only_vehicle_fallback: bool = True,
+        idle_popularity_prefetch_threshold: int = 2,
+        idle_popularity_no_rsu_local_fallback_enabled: bool = False,
+        idle_popularity_no_rsu_local_requires_low_context: bool = True,
         auxiliary_slow_weight: float = 1.0,
         auxiliary_fast_weight: float = 0.5,
         auxiliary_event_weight: float = 1.0,
@@ -526,6 +531,18 @@ class 分层PPO基类(BaseAgent):
         self._predictive_prefetch_admission_require_distinct_next = bool(
             predictive_prefetch_admission_require_distinct_next
         )
+        self._idle_popularity_fallback_enabled = bool(idle_popularity_fallback_enabled)
+        self._idle_popularity_fallback_only_vehicle_fallback = bool(
+            idle_popularity_fallback_only_vehicle_fallback
+        )
+        self._idle_popularity_prefetch_threshold = max(int(idle_popularity_prefetch_threshold), 1)
+        self._idle_popularity_no_rsu_local_fallback_enabled = bool(
+            idle_popularity_no_rsu_local_fallback_enabled
+        )
+        self._idle_popularity_no_rsu_local_requires_low_context = bool(
+            idle_popularity_no_rsu_local_requires_low_context
+        )
+        self._idle_popularity_adapter_counts: dict[str, int] = {}
         self._auxiliary_slow_weight = float(auxiliary_slow_weight)
         self._auxiliary_fast_weight = float(auxiliary_fast_weight)
         self._auxiliary_event_weight = float(auxiliary_event_weight)
@@ -648,6 +665,21 @@ class 分层PPO基类(BaseAgent):
                 event_head_enabled=self._event_head_enabled,
                 adapter_prefetch_enabled=self._adapter_prefetch_enabled,
             )
+            idle_popularity_fallback_info = self._maybe_apply_idle_popularity_fallback(
+                semantic_state=semantic_state,
+                action_mask=action_mask,
+                original_env_action=env_action,
+                deterministic=deterministic,
+            )
+            if idle_popularity_fallback_info.get("applied", False):
+                env_action = int(idle_popularity_fallback_info["fallback_action"])
+                selected_actions = self._head_targets_for_env_action(env_action)
+                aggregation_reason = "idle_popularity_fallback"
+                head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                    policy_output=policy_output,
+                    selected_actions=selected_actions,
+                    action_mask=action_mask,
+                )
             if guard_info:
                 guard_info["guarded_action"] = int(env_action)
             guard_action_delta = bool(
@@ -762,6 +794,7 @@ class 分层PPO基类(BaseAgent):
             "cache_warm_start_guard": cache_warm_guard_info,
             "predictive_prefetch_admission_guard": prefetch_admission_guard_info,
             "backhaul_guard": backhaul_guard_info,
+            "idle_popularity_fallback": idle_popularity_fallback_info,
             "deterministic_event_prepare_overridden": bool(smoothing_info.get("override_triggered", False)),
             "deterministic_event_prepare_smoothed": bool(smoothing_info.get("borderline_triggered", False)),
             "guard_triggered": bool(guard_info.get("guard_triggered", False)),
@@ -1155,6 +1188,228 @@ class 分层PPO基类(BaseAgent):
         if action_mask is None:
             return 5
         return int(sum(1 for item in action_mask if bool(item)))
+
+    def _select_allowed_env_action(self, preferred_actions: list[int], action_mask: list[bool] | None) -> int:
+        for action_id in preferred_actions:
+            if self._is_env_action_valid(int(action_id), action_mask):
+                return int(action_id)
+        if action_mask:
+            for action_id, allowed in enumerate(action_mask):
+                if allowed:
+                    return int(action_id)
+        return 3
+
+    def _primary_vehicle_for_popularity(self, semantic_state: dict[str, Any]) -> dict[str, Any]:
+        vehicles = list(semantic_state.get("vehicles", []))
+        if not vehicles:
+            return {}
+        primary_vehicle_id = semantic_state.get("primary_vehicle_id")
+        if primary_vehicle_id:
+            for vehicle in vehicles:
+                if str(vehicle.get("vehicle_id", "")) == str(primary_vehicle_id):
+                    return dict(vehicle)
+        return dict(vehicles[0])
+
+    def _rsu_by_id_for_popularity(
+        self,
+        semantic_state: dict[str, Any],
+        rsu_id: str | None,
+    ) -> dict[str, Any]:
+        if rsu_id is None:
+            return {}
+        for rsu in semantic_state.get("rsus", []):
+            if str(rsu.get("rsu_id", "")) == str(rsu_id):
+                return dict(rsu)
+        return {}
+
+    def _adapter_cached_for_popularity(
+        self,
+        semantic_state: dict[str, Any],
+        rsu_id: str | None,
+        adapter_id: str | None,
+    ) -> bool:
+        if not rsu_id or not adapter_id:
+            return False
+        rsu = self._rsu_by_id_for_popularity(semantic_state, rsu_id)
+        return str(adapter_id) in {str(item) for item in rsu.get("cached_adapter_ids", [])}
+
+    def _prediction_targets_for_popularity(
+        self,
+        semantic_state: dict[str, Any],
+        vehicle_id: str | None,
+    ) -> tuple[str | None, str | None]:
+        predictions = semantic_state.get("predictions", {})
+        if not vehicle_id or not isinstance(predictions, dict):
+            return None, None
+        next_rsu_id = predictions.get("predicted_next_rsu_by_vehicle", {}).get(vehicle_id)
+        next_sequence = predictions.get("next_rsu_sequence", {}).get(vehicle_id, [])
+        if next_rsu_id is None and next_sequence:
+            next_rsu_id = next_sequence[0]
+        handoff_target = predictions.get("predicted_first_handoff_rsu_by_vehicle", {}).get(vehicle_id)
+        return next_rsu_id, handoff_target
+
+    def _remember_idle_popularity_adapter(self, adapter_id: str | None) -> int:
+        if not adapter_id:
+            return 0
+        adapter_key = str(adapter_id)
+        self._idle_popularity_adapter_counts[adapter_key] = (
+            self._idle_popularity_adapter_counts.get(adapter_key, 0) + 1
+        )
+        return self._idle_popularity_adapter_counts[adapter_key]
+
+    def _low_mechanism_no_rsu_context_for_popularity(
+        self,
+        *,
+        semantic_state: dict[str, Any],
+        vehicle_id: str | None,
+        predicted_next_rsu_id: str | None,
+        predicted_handoff_target: str | None,
+    ) -> bool:
+        vehicles = list(semantic_state.get("vehicles", []))
+        if len(vehicles) > 1:
+            return False
+        predictions = semantic_state.get("predictions", {})
+        if not isinstance(predictions, dict):
+            return True
+        predicted_handoff_vehicle_ids = predictions.get("predicted_handoff_vehicle_ids", [])
+        if isinstance(predicted_handoff_vehicle_ids, list) and predicted_handoff_vehicle_ids:
+            return False
+        if predicted_next_rsu_id or predicted_handoff_target:
+            return False
+        if vehicle_id:
+            next_sequence_by_vehicle = predictions.get("next_rsu_sequence", {})
+            if isinstance(next_sequence_by_vehicle, dict):
+                next_sequence = next_sequence_by_vehicle.get(vehicle_id, [])
+                if any(item for item in next_sequence):
+                    return False
+        return True
+
+    def _idle_popularity_candidate_action(
+        self,
+        semantic_state: dict[str, Any],
+        action_mask: list[bool] | None,
+    ) -> tuple[int, str, dict[str, Any]]:
+        current_node = semantic_state.get("current_workflow_node") or {}
+        if not current_node:
+            return self._select_allowed_env_action([3, 2, 0], action_mask), "no_current_workflow_node", {}
+
+        vehicle = self._primary_vehicle_for_popularity(semantic_state)
+        vehicle_id = str(vehicle.get("vehicle_id", "")) if vehicle else None
+        current_rsu_id = vehicle.get("associated_rsu_id")
+        required_adapter = current_node.get("required_adapter")
+        adapter_seen_count = self._remember_idle_popularity_adapter(required_adapter)
+        predicted_next_rsu_id, predicted_handoff_target = self._prediction_targets_for_popularity(
+            semantic_state,
+            vehicle_id,
+        )
+        extra = {
+            "adapter_seen_count": adapter_seen_count,
+            "low_mechanism_no_rsu_context": self._low_mechanism_no_rsu_context_for_popularity(
+                semantic_state=semantic_state,
+                vehicle_id=vehicle_id,
+                predicted_next_rsu_id=predicted_next_rsu_id,
+                predicted_handoff_target=predicted_handoff_target,
+            ),
+        }
+
+        if current_rsu_id is None:
+            return self._select_allowed_env_action([2, 3, 0], action_mask), "no_associated_rsu_vehicle_fallback", extra
+
+        if required_adapter and not self._adapter_cached_for_popularity(
+            semantic_state,
+            current_rsu_id,
+            required_adapter,
+        ):
+            return self._select_allowed_env_action([0, 3, 2], action_mask), "popular_adapter_reactive_cache_fill", extra
+
+        if (
+            adapter_seen_count >= self._idle_popularity_prefetch_threshold
+            and predicted_next_rsu_id
+            and predicted_next_rsu_id != current_rsu_id
+            and not self._adapter_cached_for_popularity(semantic_state, predicted_next_rsu_id, required_adapter)
+        ):
+            return self._select_allowed_env_action([1, 3, 4], action_mask), "popular_adapter_predictive_prefetch", {
+                **extra,
+                "predicted_next_rsu_id": predicted_next_rsu_id,
+            }
+
+        if predicted_handoff_target and predicted_handoff_target != current_rsu_id:
+            return self._select_allowed_env_action([4, 3, 1], action_mask), "predicted_handoff_migration_prepare", {
+                **extra,
+                "predicted_handoff_target": predicted_handoff_target,
+            }
+
+        return self._select_allowed_env_action([3, 0, 2], action_mask), "popularity_steady_offload", extra
+
+    def _maybe_apply_idle_popularity_fallback(
+        self,
+        *,
+        semantic_state: dict[str, Any],
+        action_mask: list[bool] | None,
+        original_env_action: int,
+        deterministic: bool,
+    ) -> dict[str, Any]:
+        if not self._idle_popularity_fallback_enabled:
+            return {"enabled": False, "applied": False}
+        fallback_action, fallback_reason, fallback_extra = self._idle_popularity_candidate_action(
+            semantic_state,
+            action_mask,
+        )
+        if not deterministic:
+            return {
+                "enabled": True,
+                "applied": False,
+                "reason": "non_deterministic_policy",
+                "candidate_action": int(fallback_action),
+                "candidate_reason": fallback_reason,
+                **fallback_extra,
+            }
+        no_rsu_local_override = (
+            self._idle_popularity_no_rsu_local_fallback_enabled
+            and fallback_reason == "no_associated_rsu_vehicle_fallback"
+            and (
+                not self._idle_popularity_no_rsu_local_requires_low_context
+                or bool(fallback_extra.get("low_mechanism_no_rsu_context", False))
+            )
+            and int(fallback_action) != int(original_env_action)
+        )
+        if (
+            self._idle_popularity_fallback_only_vehicle_fallback
+            and int(original_env_action) != 2
+            and not no_rsu_local_override
+        ):
+            return {
+                "enabled": True,
+                "applied": False,
+                "reason": "original_action_not_vehicle_fallback",
+                "original_action": int(original_env_action),
+                "candidate_action": int(fallback_action),
+                "candidate_reason": fallback_reason,
+                **fallback_extra,
+            }
+        if int(fallback_action) == int(original_env_action):
+            return {
+                "enabled": True,
+                "applied": False,
+                "reason": "candidate_same_as_original",
+                "original_action": int(original_env_action),
+                "candidate_action": int(fallback_action),
+                "candidate_reason": fallback_reason,
+                **fallback_extra,
+            }
+        return {
+            "enabled": True,
+            "applied": True,
+            "reason": (
+                "no_rsu_current_offload_replaced_by_local"
+                if no_rsu_local_override
+                else "vehicle_fallback_replaced_by_popularity_option"
+            ),
+            "original_action": int(original_env_action),
+            "fallback_action": int(fallback_action),
+            "candidate_reason": fallback_reason,
+            **fallback_extra,
+        }
 
     def _is_env_action_valid(self, env_action: int, action_mask: list[bool] | None) -> bool:
         if not self._action_mask_has_valid_action(action_mask):
@@ -3168,6 +3423,11 @@ class 分层PPO基类(BaseAgent):
             "predictive_prefetch_admission_guard_enabled": self._predictive_prefetch_admission_guard_enabled,
             "predictive_prefetch_admission_min_confidence": self._predictive_prefetch_admission_min_confidence,
             "predictive_prefetch_admission_require_distinct_next": self._predictive_prefetch_admission_require_distinct_next,
+            "idle_popularity_fallback_enabled": self._idle_popularity_fallback_enabled,
+            "idle_popularity_fallback_only_vehicle_fallback": self._idle_popularity_fallback_only_vehicle_fallback,
+            "idle_popularity_prefetch_threshold": self._idle_popularity_prefetch_threshold,
+            "idle_popularity_no_rsu_local_fallback_enabled": self._idle_popularity_no_rsu_local_fallback_enabled,
+            "idle_popularity_no_rsu_local_requires_low_context": self._idle_popularity_no_rsu_local_requires_low_context,
             "auxiliary_slow_weight": self._auxiliary_slow_weight,
             "auxiliary_fast_weight": self._auxiliary_fast_weight,
             "auxiliary_event_weight": self._auxiliary_event_weight,

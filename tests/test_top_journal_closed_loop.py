@@ -12,6 +12,7 @@ from scripts.run_top_journal_closed_loop import (
     latest_training_summary_for_seed,
     select_sa_checkpoint,
 )
+from src.evaluators.main_results_support import build_window_context_agent_overrides
 
 
 TEST_ROOT = ROOT_DIR / "artifacts" / "tmp_validation" / "top_journal_closed_loop_tests"
@@ -293,6 +294,72 @@ def test_effective_settings_honor_v10_mappo_rl_budget() -> None:
     assert settings["sa_update_every"] == 8
     assert settings["baseline_update_every"] == 8
     assert settings["train_window_count"] == 20
+
+
+def test_effective_settings_honor_v11_mappo_reward_budget() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v11_mappo_reward"
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["sa_update_every"] == 8
+    assert settings["baseline_update_every"] == 8
+    assert settings["train_window_count"] == 20
+
+
+def test_v11_selects_best_reward_checkpoint_before_tiebreak() -> None:
+    reward_path = _test_path("reward_first_checkpoint", "best_by_reward.pt")
+    tiebreak_path = _test_path("reward_first_checkpoint", "best_by_reward_tiebreak_score.pt")
+    reward_path.write_text("reward", encoding="utf-8")
+    tiebreak_path.write_text("tiebreak", encoding="utf-8")
+
+    checkpoint_path, selection_field = select_sa_checkpoint(
+        {
+            "config_profile": "top_journal_mechanism_v11_mappo_reward",
+            "best_by_reward_path": str(reward_path),
+            "best_by_reward_tiebreak_score_path": str(tiebreak_path),
+        }
+    )
+
+    assert checkpoint_path == reward_path
+    assert selection_field == "best_by_reward_path"
+
+
+def test_v11_idle_window_enables_no_rsu_local_fallback_override() -> None:
+    idle_overrides = build_window_context_agent_overrides(
+        agent_name="sa_ghmappo",
+        checkpoint_profile="top_journal_mechanism_v11_mappo_reward",
+        run_metadata={"window_class": "idle_or_sparse"},
+    )
+
+    assert idle_overrides["idle_popularity_no_rsu_local_fallback_enabled"] is True
+    assert idle_overrides["idle_popularity_no_rsu_local_requires_low_context"] is False
+
+    mechanism_overrides = build_window_context_agent_overrides(
+        agent_name="sa_ghmappo",
+        checkpoint_profile="top_journal_mechanism_v11_mappo_reward",
+        run_metadata={"window_class": "mechanism_activating"},
+    )
+
+    assert "idle_popularity_no_rsu_local_fallback_enabled" not in mechanism_overrides
 
 
 def test_latest_training_summary_for_seed_filters_seed_suffix() -> None:

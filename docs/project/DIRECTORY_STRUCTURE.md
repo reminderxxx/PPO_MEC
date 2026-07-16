@@ -12,6 +12,7 @@
 - `configs/experiment/top_journal_mechanism_v8_strict_full.yaml`：strict-full v8 冻结候选参数、统计协议和 claim gate
 - `configs/experiment/top_journal_mechanism_v9_pareto_safe.yaml`：v9 dev/future-validation 安全候选参数、non-inferiority 目标和 hidden 禁用边界
 - `configs/experiment/top_journal_mechanism_v10_mappo_rl.yaml`：v10 MAPPO-core RL 候选参数，迁入 controller-level head-credit / entropy floors，并降低 imitation / auxiliary 牵引
+- `configs/experiment/top_journal_mechanism_v11_mappo_reward.yaml`：v11 MAPPO reward-first dev 候选参数，记录 reward-first checkpoint priority 与 idle/sparse window-context fallback gate
 - `configs/ablation_checkpoint_manifest_v8_guard_attribution.json`：v8 同 checkpoint 机制归因消融 manifest
 - `configs/experiment/top_journal_v8_strict_split_20260621/`：outcome-blind train/dev/formal/hidden 固定窗口计划与 SHA-256 manifest
 - `data/`：原始数据与处理后数据；通过 Git LFS 版本化，完整克隆后需执行 `git lfs pull`
@@ -64,6 +65,7 @@
 - `artifacts/eval/algo_pool/`：方向匹配对照算法评估产物
 - `artifacts/experiments/baseline/`：config-driven baseline 闭环产物、per-seed manifest、comparison summary 和 by-window-class summary
 - `artifacts/experiments/top_journal_closed_loop/`：顶刊路线闭环产物，包括训练记录、seed checkpoint manifest、benchmark aggregate 和 gate report
+- `artifacts/experiments/top_journal_mappo_reward_full_dev_v11_20260716/`：v11 full-dev 训练 manifest、checkpoint-selection probes 和最终 window-gate full benchmark；当前成功主表为 `main_results_full_stratified_window_gate_full/main_results_full_stratified_20260716_181112_383674/aggregate_summary.json`
 - `artifacts/experiments/top_journal_support_suite/`：v8-current support suite、机制归因、paired statistics 和 support gate report 输出根目录；dry-run 不能作为论文证据
 - `artifacts/experiments/strict_full_v8_*`：v8 formal、一次性 hidden 与 LuST external benchmark；正式结论只引用 `top_journal_readiness_audit_20260621.md` 列出的 run ID
 - `artifacts/audits/strict_full_v8_integrity_20260621/`：v8 11457-file SHA-256 inventory 与引用完整性报告；保持 Git ignored

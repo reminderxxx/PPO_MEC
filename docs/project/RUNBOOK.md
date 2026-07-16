@@ -83,6 +83,16 @@ v10 继承 v9 的 safety boundary，但把 MAPPO 强对照中的 controller-leve
 
 promotion 前必须按 window class 单独审计：机制窗口收益不能坍缩，idle/sparse 对 `popularity_cache_heuristic` 的 reward gap 应显著收窄，同时 `best_by_pareto_safe_score.pt` 必须满足 PPO failure/backhaul non-inferiority。当前 hidden 仍不得用于筛选或调参。
 
+### v11 MAPPO reward-first dev 候选
+
+v11 以 v8 strict-full mechanism scaffold 为稳定底座，迁入 MAPPO controller-level head-credit、entropy floors/scales 和 event advantage blend，并把 checkpoint selection 改为 reward-first。推理期只在 v11 checkpoint 且 `window_class=idle_or_sparse` 时启用 no-RSU local fallback；机制窗口保持 MAPPO 主策略和 vehicle-only fallback，避免 v2-style 全局 no-RSU fallback 吃掉机制窗口收益。
+
+```bash
+.venv/bin/python scripts/run_top_journal_closed_loop.py --run_id top_journal_mechanism_v11_mappo_reward_dev_<date> --seeds 7 13 29 41 53 --sa_profile top_journal_mechanism_v11_mappo_reward --mappo_baseline_profile mappo_strong_audit --baseline_agents ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --primary_vehicle_selection handoff_pressure --window_mode_for_training full_stratified --train_window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/train_window_plan.json --eval_window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/dev_window_plan.json
+```
+
+当前 full-dev evidence：`artifacts/experiments/top_journal_mappo_reward_full_dev_v11_20260716/main_results_full_stratified_window_gate_full/main_results_full_stratified_20260716_181112_383674/aggregate_summary.json`。主方法 total reward `79.4944`，高于 `popularity_cache_heuristic=79.46875` 和所有 learned baselines；`sa_advantage_diagnosis.blockers=[]`。该结果只能作为 dev-stage evidence，promotion 仍需要新冻结 future-validation 或重新审查，不能使用已 consumed hidden。
+
 ## Supervised Handoff Predictor
 
 训练薄 supervised predictor：
