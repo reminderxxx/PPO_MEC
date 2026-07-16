@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-16: v10 用 MAPPO controller credit 强化 SA-GHMAPPO 的学习更新
+
+决策：新增 `top_journal_mechanism_v10_mappo_rl` profile，在 v9 Pareto-safe 边界上显式迁入 MAPPO 强对照的 `aggregation_reason_weighted_controller_ppo_v3`、slow/fast/event policy credit floors、entropy floors/scales 和 `event_advantage_blend=0.85`。同时降低 `heuristic_imitation_coef`、`mechanism_aux_coef`、`mechanism_window_weight` 和 `prepare_action_prior_weight`，并关闭 `mechanism_aux_current_cache_fill_enabled`，让 idle/sparse 行为更多由 PPO/CTDE credit 学习，而不是由手写 imitation 或辅助目标拉动。
+
+原因：v8/v9 的核心缺口不是 learned-baseline reward，而是相对 strong heuristic 的 idle/sparse 小亏，以及相对 PPO 的 failure/backhaul trade-off。继续只加 hard guard 容易把贡献写成规则系统；MAPPO 的 controller-level credit assignment 正好能解决三控制头共享错误 credit 和 action-mix collapse 风险，使 cache、execution 和 event head 从它们实际控制的动作中学习。
+
+影响：v10 不修改 `VecWorkflowCoreEnv` reward、不修改 `semantic_discrete_5` action contract、不改变 baseline contract，也不替换 v8 canonical。v10 只能在 dev 或新冻结 future-validation split 上筛选；当前 hidden 已 consumed，仍不得用于候选选择或调参。晋级前必须按 window class 报告机制窗口收益、idle/sparse gap、PPO failure/backhaul non-inferiority 和 learned-baseline reward/continuity。
+
 ## 2026-07-13: v9 采用 Pareto-safe checkpoint ranking，不改 reward/action contract
 
 决策：新增 `top_journal_mechanism_v9_pareto_safe` profile，把 handoff failure 与 backhaul trade-off 纳入 checkpoint selection / gate 的约束目标；实现上只调整 policy-side guard 参数、prefetch admission、steady RSU bias 和 checkpoint ranking，不修改 `semantic_discrete_5` action contract、环境 reward 或 baseline observation contract。

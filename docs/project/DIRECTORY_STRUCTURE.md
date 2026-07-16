@@ -11,6 +11,7 @@
 - `configs/experiment/top_journal_mechanism_v1.yaml`：顶刊路线机制训练 profile 与 benchmark 计划
 - `configs/experiment/top_journal_mechanism_v8_strict_full.yaml`：strict-full v8 冻结候选参数、统计协议和 claim gate
 - `configs/experiment/top_journal_mechanism_v9_pareto_safe.yaml`：v9 dev/future-validation 安全候选参数、non-inferiority 目标和 hidden 禁用边界
+- `configs/experiment/top_journal_mechanism_v10_mappo_rl.yaml`：v10 MAPPO-core RL 候选参数，迁入 controller-level head-credit / entropy floors，并降低 imitation / auxiliary 牵引
 - `configs/ablation_checkpoint_manifest_v8_guard_attribution.json`：v8 同 checkpoint 机制归因消融 manifest
 - `configs/experiment/top_journal_v8_strict_split_20260621/`：outcome-blind train/dev/formal/hidden 固定窗口计划与 SHA-256 manifest
 - `data/`：原始数据与处理后数据；通过 Git LFS 版本化，完整克隆后需执行 `git lfs pull`

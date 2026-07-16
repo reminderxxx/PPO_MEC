@@ -305,6 +305,32 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(kwargs["predictive_prefetch_admission_min_confidence"], 0.68)
         self.assertEqual(kwargs["cache_warm_start_guard_max_prefetch_countdown"], 5.0)
 
+    def test_sa_v10_profile_transfers_mappo_controller_credit(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v10_mappo_rl"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v10_mappo_rl")
+        self.assertTrue(kwargs["head_credit_enabled"])
+        self.assertEqual(kwargs["head_credit_protocol"], "aggregation_reason_weighted_controller_ppo_v3")
+        self.assertEqual(kwargs["slow_policy_credit_floor"], 0.25)
+        self.assertEqual(kwargs["fast_policy_credit_floor"], 0.10)
+        self.assertEqual(kwargs["event_policy_credit_floor"], 0.12)
+        self.assertEqual(kwargs["slow_entropy_credit_floor"], 0.20)
+        self.assertEqual(kwargs["fast_entropy_credit_floor"], 0.08)
+        self.assertEqual(kwargs["event_entropy_credit_floor"], 0.12)
+        self.assertEqual(kwargs["event_advantage_blend"], 0.85)
+        self.assertLess(kwargs["heuristic_imitation_coef"], 0.10)
+        self.assertLess(kwargs["mechanism_aux_coef"], 0.09)
+        self.assertFalse(kwargs["mechanism_aux_current_cache_fill_enabled"])
+        agent = build_agent("sa_ghmappo", random_seed=1, deterministic_action=True, **kwargs)
+        self.assertEqual(
+            agent._build_head_credit_weights("event_head_prepare"),
+            {"slow": 0.3, "fast": 0.1, "event": 1.0},
+        )
+
     def test_qmix_uses_controller_level_value_decomposition_contract(self) -> None:
         state = _minimal_semantic_state()
         agent = build_agent("qmix", random_seed=1, deterministic_action=True)

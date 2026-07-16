@@ -374,6 +374,18 @@ PROFILE_DEFAULTS = {
         "max_steps": 16,
         "train_window_count": 20,
     },
+    "top_journal_mechanism_v10_mappo_rl": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 4.0e-5,
+        "clip_ratio": 0.07,
+        "entropy_coef": 0.0012,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.28,
+        "max_steps": 16,
+        "train_window_count": 20,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -1408,6 +1420,44 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "backhaul_guard_enabled": True,
                 "backhaul_guard_max_reactive_fills_per_adapter": 1,
                 "cache_warm_start_guard_max_prefetch_countdown": 5.0,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v10_mappo_rl":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v9_pareto_safe")
+        kwargs.update(
+            {
+                "head_credit_enabled": True,
+                "head_credit_protocol": "aggregation_reason_weighted_controller_ppo_v3",
+                "slow_policy_credit_floor": 0.25,
+                "fast_policy_credit_floor": 0.10,
+                "event_policy_credit_floor": 0.12,
+                "slow_entropy_coef_scale": 1.25,
+                "fast_entropy_coef_scale": 1.0,
+                "event_entropy_coef_scale": 1.35,
+                "slow_entropy_credit_floor": 0.20,
+                "fast_entropy_credit_floor": 0.08,
+                "event_entropy_credit_floor": 0.12,
+                "event_advantage_blend": 0.85,
+                "event_actor_loss_extra_gain": 1.05,
+                "event_logit_temperature": 1.20,
+                "event_logit_temperature_final": 0.90,
+                "event_logit_sharpening_final_scale": 1.55,
+                "event_logit_sharpening_timing_gain": 0.55,
+                "heuristic_imitation_coef": 0.04,
+                "heuristic_imitation_warmup_updates": 4,
+                "heuristic_imitation_decay": 0.70,
+                "mechanism_aux_coef": 0.035,
+                "mechanism_window_weight": 1.20,
+                "prepare_action_prior_weight": 0.20,
+                "mechanism_entropy_coef": 0.0004,
+                "mechanism_aux_coef_floor_after_update": 0.035,
+                "mechanism_window_weight_floor_after_update": 1.20,
+                "mechanism_entropy_floor_after_update": 0.0004,
+                "mechanism_aux_current_cache_fill_enabled": False,
+                "train_epochs": 8,
+                "target_kl": 0.012,
+                "kl_early_stop_enabled": True,
             }
         )
         return kwargs

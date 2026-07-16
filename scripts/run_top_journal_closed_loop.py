@@ -86,6 +86,15 @@ SA_PROFILE_SETTING_OVERRIDES = {
         "max_mobility_rows": 10000,
         "window_count": 20,
     },
+    "top_journal_mechanism_v10_mappo_rl": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 10000,
+        "window_count": 20,
+    },
 }
 CURRENT_BASELINE_PROTOCOLS = {
     "mappo": {

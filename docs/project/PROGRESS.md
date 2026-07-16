@@ -2,6 +2,13 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-07-16: v10 MAPPO-core RL 候选入口接入
+
+- 新增 `top_journal_mechanism_v10_mappo_rl` profile 与 `configs/experiment/top_journal_mechanism_v10_mappo_rl.yaml`。v10 继承 v9 的 hidden 禁用和 Pareto-safe boundary，但把 MAPPO 强对照中的 `aggregation_reason_weighted_controller_ppo_v3`、slow/fast/event policy credit floors、entropy floors/scales 与 `event_advantage_blend=0.85` 显式迁入 SA-GHMAPPO 主方法候选。
+- v10 不改 `semantic_discrete_5` action contract、环境 reward 或 baseline contract；它保留 SA 的 graph/surrogate/critic，同时降低 `heuristic_imitation_coef`、`mechanism_aux_coef`、`mechanism_window_weight` 和 `prepare_action_prior_weight`，并关闭 `mechanism_aux_current_cache_fill_enabled`，用于减少 idle/sparse 行为对手写规则牵引的依赖。
+- `run_top_journal_closed_loop.py` 已加入 v10 formal-budget override：SA 128 episodes、20 train windows、10000 mobility rows，与 v8/v9 strict split 形状一致；contract tests 覆盖 profile 参数和 closed-loop effective settings。
+- 当前仅完成代码入口、配置和单元验证；尚未运行 v10 5-seed dev screen、同窗口 learned-baseline 比较、future-validation split 或 readiness audit。不得把 v10 写成已经改善 popularity gap、handoff failure 或 backhaul blocker 的结果。
+
 ## 2026-07-13: v8 support suite 与 v9 Pareto-safe 路径接入
 
 - 新增 `scripts/run_strict_full_v8_support_suite.py`，统一编排 v8-current prediction robustness、system robustness、scalability 和 guard attribution，并默认使用 `strict_full_v8_dev_screen_20260621_v2/seed_checkpoint_manifest.json` 与冻结 formal window plan；脚本会拒绝路径或 split metadata 中含 hidden 的窗口计划，避免把已 consumed hidden 重新用于筛选。
