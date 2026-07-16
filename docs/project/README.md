@@ -13,6 +13,7 @@
 - `top_journal_review_policy.md`：以 IEEE TMC 为主目标的长期 AI reviewer 证据等级、blocker、评分和固定输出规范
 - `top_journal_readiness_audit_20260621.md`：strict-full v8 formal、一次性 hidden 与 LuST supporting evidence 的最新审查；当前 verdict 为 `Major revision`
 - `strict_full_v8_execution_record_20260621.md`：v8 候选冻结、hidden 开启、运行语义、统计与完整性审计记录
+- `sa_ghmappo_paper_method_report_20260716.md`：面向论文 Problem Formulation / Method / Algorithm Design 的主算法详细报告，固化研究问题、状态/动作合同、encoder、三控制头、PPO objective、guard 和写作边界
 - `RUNBOOK.md`：包含 v8-current support suite 与 v9 Pareto-safe 候选的运行入口；这些入口不等于新 paper-grade 结果
 - `top_journal_readiness_audit_20260618.md`：v7 strict non-overlap 历史审查；verdict 为 `Not TMC-ready`
 - `novelty_review_20260621.md`：面向 TMC 的最新一手文献检索、最近邻矩阵和四项创新点新颖性审查；结论为 `Conditionally defensible, but crowded`
