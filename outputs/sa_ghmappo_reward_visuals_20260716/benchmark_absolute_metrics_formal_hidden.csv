@@ -1,0 +1,25 @@
+split,agent_name,agent_label,total_reward,workflow_continuity_rate,handoff_failure_rate,adapter_warm_hit_ratio,backhaul_traffic_cost
+formal,sa_ghmappo,SA-GHMAPPO,88.0168,0.896602,0.097917,0.896602,143.44
+formal,ppo,PPO,81.36005,0.899331,0.05375,0.899331,119.28
+formal,mappo,MAPPO,77.46295,0.632483,0.258333,0.632483,98.96
+formal,dqn,DQN,57.7635,0.37325,0.24,0.37325,45.44
+formal,dueling_dqn,Dueling DQN,50.68925,0.186625,0.32,0.186625,22.72
+formal,qmix,QMIX,65.15775,0.559875,0.16,0.559875,68.16
+formal,controller_mat,Controller-MAT,77.47155,0.646501,0.269167,0.646501,99.04
+formal,dag_offload_drl,DAG-Offload DRL,72.9587,0.629233,0.201667,0.629233,91.92
+formal,cache_offload_drl,Cache-Offload DRL,76.93755,0.661743,0.14875,0.661743,112.88
+formal,dt_handoff_drl,DT-Handoff DRL,70.1237,0.615944,0.162917,0.615944,103.2
+formal,popularity_cache_heuristic,Popularity,88.4225,0.889779,0.085417,0.889779,144.0
+formal,reactive_greedy,Reactive Greedy,78.57375,0.856498,0.29375,0.856498,116.8
+hidden,sa_ghmappo,SA-GHMAPPO,83.02555,0.860907,0.139167,0.860907,126.56
+hidden,ppo,PPO,79.14135,0.869392,0.065,0.869392,112.32
+hidden,mappo,MAPPO,73.90205,0.638216,0.265,0.638216,90.08
+hidden,dqn,DQN,56.983,0.357432,0.21,0.357432,43.52
+hidden,dueling_dqn,Dueling DQN,50.2215,0.178716,0.28,0.178716,21.76
+hidden,qmix,QMIX,64.0645,0.536148,0.14,0.536148,65.28
+hidden,controller_mat,Controller-MAT,74.2838,0.655625,0.26,0.655625,92.8
+hidden,dag_offload_drl,DAG-Offload DRL,70.11015,0.62443,0.134167,0.62443,86.08
+hidden,cache_offload_drl,Cache-Offload DRL,73.5511,0.642682,0.1075,0.642682,100.24
+hidden,dt_handoff_drl,DT-Handoff DRL,66.70225,0.594119,0.14,0.594119,96.64
+hidden,popularity_cache_heuristic,Popularity,83.475,0.859963,0.129167,0.859963,128.8
+hidden,reactive_greedy,Reactive Greedy,77.38375,0.839821,0.304167,0.839821,108.8
