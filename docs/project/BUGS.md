@@ -18,6 +18,9 @@
 
 ## 当前限制
 
+- `top_journal_mechanism_v20_idle_execution_prd` 是当前最强算法候选：在 frozen dev 上 SA-GHMAPPO reward `79.7195` > popularity `79.46875`，在 time-audited v20 future-validation 上 reward `67.561867` > popularity `65.754`、PPO `65.866133`、MAPPO `64.0888` 和全部其他对照；相对 popularity 的 future reward delta `+1.807867`，BCa 95% CI `[0.373706, 3.793892]`，Holm sign-test p=`0.047208`。但它仍不能写成 TMC-ready / paper-ready：future split 只有 15 个 outer windows 且 `minimum_gap_frames=0`，还缺新 formal/hidden/support suite，训练 summary 仍有 collapse flags，future 上 `mechanism_realization_rate` 低于 popularity、adapter migration overhead 略高。
+- v20 的收益来自 learning-side idle-execution partial-reward-decoupled MAPPO credit：改动 PPO/MAPPO actor advantage 与 option-gate advantage，让低风险 idle/current-RSU delay 与 local fallback 的 credit 分离。不得写成环境 reward shaping、evaluation wrapper、baseline 削弱或 window 筛选收益；也不得声称每个机制指标都全面优于 heuristic。
+- `top_journal_mechanism_v19_handoff_risk_prd` 是 v17 之后的 handoff-risk PRD 中间候选，frozen dev reward `79.69925` 高于 popularity 但低于 v17 `79.70825` 和 v20 `79.7195`，当前不作为主候选。它的 handoff-risk credit / dual-cost 逻辑只作为 v20 的组成和后续风险约束依据。
 - `top_journal_mechanism_v18_counterfactual_option` 是一次算法性 counterfactual option-credit MAPPO 尝试，但 frozen dev 结果低于 v17，且出现 continuity / handoff failure / mechanism readiness blocker；当前不得把 v18 写成主算法改进成功，只能作为负向探索和后续 credit-assignment 依据。
 - `top_journal_mechanism_v17_dag_aware_option` 在 time-audited future-validation 上均值仍为第一，但相对 `popularity_cache_heuristic` 的 reward margin 只有 `+0.04815`，BCa 95% CI `[-0.396869, 0.636962]` 且 Holm sign-test p=`1.0`；不能声称显著优于 strong heuristic，不能据此判为 TMC-ready candidate。
 - future-validation split 必须使用 `future_validation_split_v2_time_audited_20260717` 或后续更严格版本；只按 `frame_offset` 审计的 split 可能漏掉 `time_index_start/end` 重叠。任何旧 `top_journal_v17_future_validation_20260717` 结果不得作为 independent holdout / future evidence。

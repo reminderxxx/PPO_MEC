@@ -61,6 +61,8 @@ SA_LATEST_FIRST_PROFILES = {
     "top_journal_mechanism_v16_conservative_terminal_option",
     "top_journal_mechanism_v17_dag_aware_option",
     "top_journal_mechanism_v18_counterfactual_option",
+    "top_journal_mechanism_v19_handoff_risk_prd",
+    "top_journal_mechanism_v20_idle_execution_prd",
 }
 LOWER_IS_BETTER = {
     "backhaul_traffic_cost",
@@ -189,6 +191,24 @@ SA_PROFILE_SETTING_OVERRIDES = {
         "window_count": 20,
     },
     "top_journal_mechanism_v18_counterfactual_option": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 10000,
+        "window_count": 20,
+    },
+    "top_journal_mechanism_v19_handoff_risk_prd": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 10000,
+        "window_count": 20,
+    },
+    "top_journal_mechanism_v20_idle_execution_prd": {
         "sa_episodes": 128,
         "baseline_episodes": 96,
         "sa_update_every": 8,

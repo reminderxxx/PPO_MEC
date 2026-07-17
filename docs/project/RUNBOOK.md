@@ -159,6 +159,37 @@ paired statistics：
 
 当前结论：v18 counterfactual option-credit dev 结果不晋级；v17 time-audited future-validation 均值第一，但相对 popularity 的 reward CI 跨 0，不能写成 TMC-ready。
 
+### v19/v20 PRD-MAPPO 候选
+
+v19/v20 是 v17 后续算法候选，只允许使用 dev 或新冻结 future-validation；当前 hidden 仍不得用于筛选或调参。v19 加入 handoff-risk PRD 和 dual cost，v20 再加入 idle-execution PRD。二者均不改 reward/action/env/baseline contract。
+
+v20 单 seed warm-start 训练模板：
+
+```bash
+.venv/bin/python scripts/train_sa_ghmappo_real_sample.py --agent_name sa_ghmappo --profile top_journal_mechanism_v20_idle_execution_prd --random_seed <seed> --warm_start_checkpoint_path <v19_seed_latest.pt> --max_mobility_rows 10000 --max_workflows 2 --workflow_selector ordered --rsu_layout auto_dominant_tight --window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/train_window_plan.json --window_mode full_stratified --train_window_count 20 --primary_vehicle_selection handoff_pressure --min_tasks 5 --max_tasks 20 --output_root artifacts/training/top_journal_mechanism_v20_idle_execution_prd_full
+```
+
+v20 frozen dev benchmark：
+
+```bash
+.venv/bin/python scripts/benchmark_main_results.py --agents sa_ghmappo reactive_greedy popularity_cache_heuristic ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --seed_checkpoint_manifest_path artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/seed_checkpoint_manifest_idle_execution_prd_full.json --seeds 7 13 29 41 53 --max_mobility_rows 10000 --max_workflows 2 --max_steps 16 --workflow_selector ordered --rsu_layout auto_dominant_tight --window_count 20 --window_mode full_stratified --window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/dev_window_plan.json --primary_vehicle_selection handoff_pressure --min_tasks 5 --max_tasks 20 --output_root artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/main_results_full_stratified_latest
+```
+
+v20 time-audited future-validation split 因排除历史 100 个窗口后 idle pool 不足，当前冻结为 15 windows：
+
+```bash
+.venv/bin/python scripts/freeze_future_validation_split.py --output_dir configs/experiment/top_journal_v20_future_validation_time_audited_20260717 --max_mobility_rows 200000 --window_length 24 --window_scan_stride 2 --window_count 15 --mechanism_windows 7 --active_non_mechanism_windows 5 --minimum_gap_frames 0 --random_seed 20 --exclude_plan_path configs/experiment/top_journal_v17_future_validation_time_audited_20260717/future_validation_window_plan.json
+```
+
+v20 future-validation benchmark 与统计：
+
+```bash
+.venv/bin/python scripts/benchmark_main_results.py --agents sa_ghmappo reactive_greedy popularity_cache_heuristic ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --seed_checkpoint_manifest_path artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/seed_checkpoint_manifest_idle_execution_prd_full.json --seeds 7 13 29 41 53 --max_mobility_rows 200000 --max_workflows 2 --max_steps 16 --workflow_selector ordered --rsu_layout auto_dominant_tight --window_count 15 --window_mode full_stratified --window_plan_path configs/experiment/top_journal_v20_future_validation_time_audited_20260717/future_validation_window_plan.json --primary_vehicle_selection handoff_pressure --min_tasks 5 --max_tasks 20 --output_root artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/future_validation_time_audited_full_stratified
+.venv/bin/python scripts/analyze_top_journal_statistics.py --rows_path artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/future_validation_time_audited_full_stratified/main_results_full_stratified_20260717_172653_169861/benchmark_rows.csv --candidate_agent sa_ghmappo --baseline_agents popularity_cache_heuristic ppo mappo reactive_greedy --outer_cluster_keys window_id --inner_cluster_keys seed workflow_id --bootstrap_samples 5000 --output_root artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/future_validation_statistics
+```
+
+当前结论：v20 是 current best algorithmic candidate；future-validation 上 reward 超过全部对照，并相对 popularity 给出 Holm 校正后的正向证据。但它不是 final paper package，promotion 前必须补齐 formal/hidden/support、collapse 解释和机制指标 trade-off 审查。
+
 ## Supervised Handoff Predictor
 
 训练薄 supervised predictor：

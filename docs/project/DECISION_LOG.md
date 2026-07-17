@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-17: v20 采用 idle-execution PRD-MAPPO 作为当前 final-candidate 前置候选
+
+决策：在 v19 handoff-risk PRD 后新增 `top_journal_mechanism_v20_idle_execution_prd`，作为当前最强算法候选。v19 把 high-risk handoff readiness、prepare realization 和 failure/unprepared cost 引入 event-head / option-head partial credit；v20 进一步把低风险 idle / active-non-mechanism 场景中的 execution credit 解耦，让 PPO/MAPPO actor advantage 与 option-gate advantage 学会区分 local fallback 的低延迟收益和 current-RSU/cache-fill 在 idle 窗口的 delay side effect。
+
+原因：v17 已通过 DAG-aware option termination 清除了 dev backhaul blocker，但在 time-audited future split 上相对 strongest heuristic 的 reward margin 只有 `+0.04815` 且 CI 跨 0。v19 说明单独强化 handoff-risk readiness 不足以扩大 dev margin；逐行诊断显示剩余损失主要来自低风险 idle/稀疏窗口中 current-RSU/offload/cache-fill 与 local fallback 的 credit 纠缠。v20 直接在 MAPPO 学习目标中处理该 credit assignment 问题，符合“算法改进而非包装”的约束。
+
+影响：v20 不修改 `VecWorkflowCoreEnv` reward、不修改 `semantic_discrete_5` action contract、不改变 baseline contract、不使用 deterministic evaluator wrapper、不读取 hidden。dev reward 提升到 `79.7195`，time-audited future-validation reward 提升到 `67.561867`，并在 future split 上相对 popularity 取得 `+1.807867`、BCa 95% CI `[0.373706, 3.793892]`、Holm p=`0.047208`。但 v20 仍只是 final-candidate 前置候选：future split 只有 15 个 outer windows，formal/hidden/support 尚未重跑，training collapse flags 与 mechanism-realization trade-off 仍是投稿前风险。
+
 ## 2026-07-17: v18 counterfactual option-credit 不晋级，v17 future 验证改用 time-audited split
 
 决策：新增 `top_journal_mechanism_v18_counterfactual_option` 作为 v17 的前沿算法尝试，引入 COMA-style counterfactual option credit：option gate 的 advantage 由全局 PPO advantage、PRD partial credit 和 selected-vs-expected legal-option utility 共同构成。但 v18 frozen dev 结果低于 v17 且存在 blocker，因此不晋级为主候选。当前主候选仍为 v17，并且 future-validation 必须使用 `future_validation_split_v2_time_audited_20260717`。

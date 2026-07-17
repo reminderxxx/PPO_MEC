@@ -1,0 +1,32 @@
+profile: top_journal_mechanism_v20_idle_execution_prd
+purpose: >
+  Extend v19 with counterfactual idle-execution partial reward decoupling. The
+  MAPPO actor and option gate receive learning-only credit that separates
+  low-risk idle local execution from current-RSU delay side effects, while
+  preserving handoff-risk prepare credit in mechanism windows.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v19_handoff_risk_prd
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  idle_execution_prd_enabled: true
+  idle_execution_policy_coef: 0.30
+  idle_execution_option_coef: 0.42
+  idle_execution_current_rsu_delay_coef: 0.42
+  idle_execution_timing_threshold: 0.30
+  handoff_risk_prd_enabled: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+evaluation:
+  split_policy: dev_then_new_time_audited_future_validation
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile targets the v19 dev diagnosis where reward losses mostly came
+    from low-risk idle windows selecting current-RSU execution instead of local
+    fallback.
+  - The new signal changes PPO/MAPPO advantage learning only; it does not alter
+    environment rewards, baseline behavior, or benchmark consumption.

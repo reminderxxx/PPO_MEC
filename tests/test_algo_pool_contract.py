@@ -734,6 +734,135 @@ class AlgoPoolContractTestCase(unittest.TestCase):
 
         self.assertGreater(float(advantage.item()), 0.0)
 
+    def test_sa_v19_profile_enables_handoff_risk_prd(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v19_handoff_risk_prd"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v19_handoff_risk_prd")
+        self.assertTrue(kwargs["option_gate_enabled"])
+        self.assertTrue(kwargs["dag_aware_option_termination_enabled"])
+        self.assertTrue(kwargs["handoff_risk_prd_enabled"])
+        self.assertGreater(kwargs["handoff_risk_event_coef"], 0.0)
+        self.assertGreater(kwargs["handoff_risk_option_coef"], 0.0)
+        self.assertTrue(kwargs["handoff_risk_cost_dual_enabled"])
+
+    def test_sa_v19_handoff_risk_credit_rewards_ready_over_failure(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            handoff_risk_prd_enabled=True,
+            handoff_risk_event_coef=1.0,
+            handoff_risk_option_coef=1.0,
+            handoff_risk_failure_penalty=1.0,
+            handoff_risk_ready_bonus=0.8,
+            handoff_risk_prepare_bonus=0.3,
+            handoff_risk_unprepared_penalty=0.4,
+        )
+        base_row = {
+            "action": 4,
+            "action_info": {
+                "prepare_window_score": 0.8,
+                "temporal_urgency": 0.7,
+                "prediction_confidence": 0.8,
+                "final_env_action": 4,
+                "head_actions": {"event": 1},
+            },
+            "env_info": {
+                "metrics_protocol": {
+                    "predicted_handoff_signal": True,
+                    "handoff_event_count": 1,
+                }
+            },
+        }
+        ready_row = deepcopy(base_row)
+        ready_row["env_info"]["metrics_protocol"].update(
+            {
+                "handoff_ready": True,
+                "handoff_failed": False,
+                "migration_prepare_realized": True,
+            }
+        )
+        failed_row = deepcopy(base_row)
+        failed_row["action"] = 0
+        failed_row["action_info"]["final_env_action"] = 0
+        failed_row["action_info"]["head_actions"] = {"event": 0}
+        failed_row["env_info"]["metrics_protocol"].update(
+            {
+                "handoff_ready": False,
+                "handoff_failed": True,
+                "migration_prepare_realized": False,
+            }
+        )
+
+        self.assertGreater(
+            agent._handoff_risk_prd_credit(ready_row),
+            agent._handoff_risk_prd_credit(failed_row),
+        )
+
+    def test_sa_v20_profile_enables_idle_execution_prd(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v20_idle_execution_prd"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v20_idle_execution_prd")
+        self.assertTrue(kwargs["handoff_risk_prd_enabled"])
+        self.assertTrue(kwargs["idle_execution_prd_enabled"])
+        self.assertGreater(kwargs["idle_execution_policy_coef"], 0.0)
+        self.assertGreater(kwargs["idle_execution_option_coef"], 0.0)
+        self.assertGreater(kwargs["idle_execution_current_rsu_delay_coef"], 0.0)
+
+    def test_sa_v20_idle_execution_credit_prefers_low_risk_local(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            idle_execution_prd_enabled=True,
+            idle_execution_policy_coef=1.0,
+            idle_execution_option_coef=1.0,
+            idle_execution_current_rsu_delay_coef=0.5,
+            idle_execution_local_bonus=0.3,
+        )
+        base_row = {
+            "action_info": {
+                "prepare_window_score": 0.05,
+                "temporal_urgency": 0.04,
+                "prediction_confidence": 0.2,
+                "option_gate": {"window_class": "idle_or_sparse"},
+            },
+            "decision_info": {"run_metadata": {"window_class": "idle_or_sparse"}},
+            "env_info": {
+                "metrics_protocol": {
+                    "service_delay_sum": 4.0,
+                    "handoff_failure_rate": 0.0,
+                    "mechanism_success_rate": 0.0,
+                }
+            },
+        }
+        current_row = deepcopy(base_row)
+        current_row["action"] = 3
+        current_row["action_info"]["final_env_action"] = 3
+        local_row = deepcopy(base_row)
+        local_row["action"] = 2
+        local_row["action_info"]["final_env_action"] = 2
+
+        self.assertGreater(
+            agent._idle_execution_prd_credit(local_row),
+            agent._idle_execution_prd_credit(current_row),
+        )
+        self.assertLess(
+            float(
+                agent._option_gate_advantage(
+                    row=current_row,
+                    base_advantage=torch.tensor(0.0),
+                ).item()
+            ),
+            0.0,
+        )
+
     def test_sa_v14_net_utility_option_terminates_idle_no_rsu_prefetch(self) -> None:
         agent = build_agent(
             "sa_ghmappo",

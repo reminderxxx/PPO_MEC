@@ -1,5 +1,32 @@
 # Artifact Records
 
+## 2026-07-17 v20 idle-execution PRD-MAPPO dev and time-audited future-validation
+
+状态：`[current-algorithm-candidate]` `[time-audited-future-positive]` `[not-tmc-ready]`
+
+路径：
+
+- `configs/experiment/top_journal_mechanism_v19_handoff_risk_prd.yaml`
+- `configs/experiment/top_journal_mechanism_v20_idle_execution_prd.yaml`
+- `configs/experiment/top_journal_v20_future_validation_time_audited_20260717/future_validation_manifest.json`
+- `artifacts/audits/top_journal_v20_future_validation_time_audited_20260717/`
+- `artifacts/experiments/top_journal_handoff_risk_prd_v19_20260717/seed_checkpoint_manifest_handoff_risk_prd_full.json`
+- `artifacts/experiments/top_journal_handoff_risk_prd_v19_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_165737_892648/aggregate_summary.json`
+- `artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/seed_checkpoint_manifest_idle_execution_prd_full.json`
+- `artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/v20_training_checkpoint_summary.json`
+- `artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_171916_717335/aggregate_summary.json`
+- `artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_171916_717335/comparison_against_popularity.json`
+- `artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/dev_statistics/paired_statistics.csv`
+- `artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/future_validation_time_audited_full_stratified/main_results_full_stratified_20260717_172653_169861/aggregate_summary.json`
+- `artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/future_validation_time_audited_full_stratified/main_results_full_stratified_20260717_172653_169861/comparison_against_popularity.json`
+- `artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/future_validation_statistics/paired_statistics.csv`
+
+确认结果：v19 handoff-risk PRD frozen dev reward 为 SA-GHMAPPO `79.69925` vs popularity `79.46875`，高于 PPO/MAPPO 但低于 v17 dev，因此不晋级。v20 idle-execution PRD frozen dev reward 为 `79.7195`，高于 popularity `79.46875`、PPO `77.18775`、MAPPO `72.6328` 和全部其他对照；dev reward delta vs popularity `+0.25075`，BCa 95% CI `[0.017, 0.666438]`，Holm sign-test p=`0.1806`。
+
+time-audited future-validation：v20 future split 使用 15 个新窗口，strata 为 7 mechanism / 5 active non-mechanism / 3 idle；manifest 和 audit artifacts 确认其与 train/dev/formal/hidden/v17 future 在 `frame_offset` 与 `time_index` 上无重叠。v20 future benchmark 中 SA-GHMAPPO total reward `67.561867`，高于 popularity `65.754`、PPO `65.866133`、MAPPO `64.0888` 和全部其他对照。相对 popularity 的 reward delta `+1.807867`，BCa 95% CI `[0.373706, 3.793892]`，Holm sign-test p=`0.047208`；相对 PPO reward delta `+1.695733`，CI `[0.401923, 3.130144]`；相对 MAPPO reward delta `+3.473067`，CI `[0.807246, 6.68558]`。
+
+结论边界：v20 是当前最强算法候选，正向证据来自 MAPPO-core learning credit，而不是 reward/env/baseline/evaluator 改动。该 artifact 足以支持“进入 final-candidate formal/support 重跑”的判断，但不足以直接称为 TMC-ready：15-window future split 统计功效低于 strict 20-window split，尚未补齐 new formal/hidden/support suite，训练 collapse flags 仍需解释，future 上 mechanism realization 没有超过 popularity。
+
 ## 2026-07-17 v18 counterfactual option dev and v17 time-audited future-validation
 
 状态：`[negative-v18]` `[time-audited-future]` `[not-tmc-ready]`

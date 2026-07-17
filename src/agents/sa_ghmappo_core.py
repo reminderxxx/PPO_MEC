@@ -394,6 +394,29 @@ class 分层PPO基类(BaseAgent):
         option_gate_counterfactual_prd_enabled: bool = False,
         option_gate_counterfactual_coef: float = 0.0,
         option_gate_counterfactual_clip: float = 1.5,
+        handoff_risk_prd_enabled: bool = False,
+        handoff_risk_event_coef: float = 0.0,
+        handoff_risk_option_coef: float = 0.0,
+        handoff_risk_clip: float = 1.5,
+        handoff_risk_failure_penalty: float = 1.0,
+        handoff_risk_ready_bonus: float = 0.75,
+        handoff_risk_prepare_bonus: float = 0.25,
+        handoff_risk_unprepared_penalty: float = 0.35,
+        handoff_risk_confidence_threshold: float = 0.55,
+        handoff_risk_cost_dual_enabled: bool = False,
+        handoff_risk_cost_dual_lr: float = 0.0,
+        handoff_risk_cost_target: float = 0.0,
+        handoff_risk_cost_dual_max: float = 1.5,
+        handoff_risk_cost_dual_initial: float = 0.0,
+        idle_execution_prd_enabled: bool = False,
+        idle_execution_policy_coef: float = 0.0,
+        idle_execution_option_coef: float = 0.0,
+        idle_execution_clip: float = 1.5,
+        idle_execution_current_rsu_delay_coef: float = 0.35,
+        idle_execution_local_bonus: float = 0.25,
+        idle_execution_mechanism_penalty: float = 0.30,
+        idle_execution_timing_threshold: float = 0.28,
+        idle_execution_mechanism_preserve_bonus: float = 0.18,
         net_utility_prd_enabled: bool = False,
         net_utility_backhaul_coef: float = 0.0,
         net_utility_migration_coef: float = 0.0,
@@ -626,6 +649,44 @@ class 分层PPO基类(BaseAgent):
         self._option_gate_counterfactual_prd_enabled = bool(option_gate_counterfactual_prd_enabled)
         self._option_gate_counterfactual_coef = max(float(option_gate_counterfactual_coef), 0.0)
         self._option_gate_counterfactual_clip = max(float(option_gate_counterfactual_clip), 0.0)
+        self._handoff_risk_prd_enabled = bool(handoff_risk_prd_enabled)
+        self._handoff_risk_event_coef = max(float(handoff_risk_event_coef), 0.0)
+        self._handoff_risk_option_coef = max(float(handoff_risk_option_coef), 0.0)
+        self._handoff_risk_clip = max(float(handoff_risk_clip), 0.0)
+        self._handoff_risk_failure_penalty = max(float(handoff_risk_failure_penalty), 0.0)
+        self._handoff_risk_ready_bonus = max(float(handoff_risk_ready_bonus), 0.0)
+        self._handoff_risk_prepare_bonus = max(float(handoff_risk_prepare_bonus), 0.0)
+        self._handoff_risk_unprepared_penalty = max(float(handoff_risk_unprepared_penalty), 0.0)
+        self._handoff_risk_confidence_threshold = max(
+            min(float(handoff_risk_confidence_threshold), 1.0),
+            0.0,
+        )
+        self._handoff_risk_cost_dual_enabled = bool(handoff_risk_cost_dual_enabled)
+        self._handoff_risk_cost_dual_lr = max(float(handoff_risk_cost_dual_lr), 0.0)
+        self._handoff_risk_cost_target = max(float(handoff_risk_cost_target), 0.0)
+        self._handoff_risk_cost_dual_max = max(float(handoff_risk_cost_dual_max), 0.0)
+        self._handoff_risk_cost_dual = min(
+            max(float(handoff_risk_cost_dual_initial), 0.0),
+            self._handoff_risk_cost_dual_max,
+        )
+        self._idle_execution_prd_enabled = bool(idle_execution_prd_enabled)
+        self._idle_execution_policy_coef = max(float(idle_execution_policy_coef), 0.0)
+        self._idle_execution_option_coef = max(float(idle_execution_option_coef), 0.0)
+        self._idle_execution_clip = max(float(idle_execution_clip), 0.0)
+        self._idle_execution_current_rsu_delay_coef = max(
+            float(idle_execution_current_rsu_delay_coef),
+            0.0,
+        )
+        self._idle_execution_local_bonus = max(float(idle_execution_local_bonus), 0.0)
+        self._idle_execution_mechanism_penalty = max(float(idle_execution_mechanism_penalty), 0.0)
+        self._idle_execution_timing_threshold = max(
+            0.0,
+            min(float(idle_execution_timing_threshold), 1.0),
+        )
+        self._idle_execution_mechanism_preserve_bonus = max(
+            float(idle_execution_mechanism_preserve_bonus),
+            0.0,
+        )
         self._net_utility_prd_enabled = bool(net_utility_prd_enabled)
         self._net_utility_backhaul_coef = max(float(net_utility_backhaul_coef), 0.0)
         self._net_utility_migration_coef = max(float(net_utility_migration_coef), 0.0)
@@ -1038,6 +1099,45 @@ class 分层PPO基类(BaseAgent):
                 normalized_event_advantages
                 + self._event_prd_advantage_coef * event_prd_credit_values
             )
+        handoff_risk_cost_values = np.asarray(
+            [self._handoff_risk_cost_signal(row) for row in rollout],
+            dtype=np.float32,
+        )
+        handoff_risk_dual_before = float(self._handoff_risk_cost_dual)
+        self._update_handoff_risk_cost_dual(handoff_risk_cost_values)
+        handoff_risk_dual_after = float(self._handoff_risk_cost_dual)
+        handoff_risk_credit_values = np.zeros(len(rollout), dtype=np.float32)
+        if self._handoff_risk_prd_enabled and self._handoff_risk_event_coef > 0.0:
+            handoff_risk_credit_values = np.asarray(
+                [self._handoff_risk_prd_credit(row) for row in rollout],
+                dtype=np.float32,
+            )
+            if self._handoff_risk_clip > 0.0:
+                handoff_risk_credit_values = np.clip(
+                    handoff_risk_credit_values,
+                    -self._handoff_risk_clip,
+                    self._handoff_risk_clip,
+                )
+            normalized_event_advantages = (
+                normalized_event_advantages
+                + self._handoff_risk_event_coef * handoff_risk_credit_values
+            )
+        idle_execution_credit_values = np.zeros(len(rollout), dtype=np.float32)
+        if self._idle_execution_prd_enabled and self._idle_execution_policy_coef > 0.0:
+            idle_execution_credit_values = np.asarray(
+                [self._idle_execution_prd_credit(row) for row in rollout],
+                dtype=np.float32,
+            )
+            if self._idle_execution_clip > 0.0:
+                idle_execution_credit_values = np.clip(
+                    idle_execution_credit_values,
+                    -self._idle_execution_clip,
+                    self._idle_execution_clip,
+                )
+            normalized_advantages = (
+                normalized_advantages
+                + self._idle_execution_policy_coef * idle_execution_credit_values
+            )
         normalized_event_advantages = normalized_event_advantages * mechanism_transition_weights
         return_tensor = torch.as_tensor(returns, dtype=torch.float32, device=self._device)
         advantage_tensor = torch.as_tensor(normalized_advantages, dtype=torch.float32, device=self._device)
@@ -1296,6 +1396,30 @@ class 分层PPO基类(BaseAgent):
             else 0.0,
             "event_prd_credit_std": round(float(event_prd_credit_values.std()), 6)
             if len(event_prd_credit_values) > 0
+            else 0.0,
+            "handoff_risk_prd_enabled": self._handoff_risk_prd_enabled,
+            "handoff_risk_event_coef": round(self._handoff_risk_event_coef, 6),
+            "handoff_risk_option_coef": round(self._handoff_risk_option_coef, 6),
+            "handoff_risk_credit_mean": round(float(handoff_risk_credit_values.mean()), 6)
+            if len(handoff_risk_credit_values) > 0
+            else 0.0,
+            "handoff_risk_credit_std": round(float(handoff_risk_credit_values.std()), 6)
+            if len(handoff_risk_credit_values) > 0
+            else 0.0,
+            "handoff_risk_cost_dual_enabled": self._handoff_risk_cost_dual_enabled,
+            "handoff_risk_cost_dual_before": round(handoff_risk_dual_before, 6),
+            "handoff_risk_cost_dual_after": round(handoff_risk_dual_after, 6),
+            "handoff_risk_cost_signal_mean": round(float(handoff_risk_cost_values.mean()), 6)
+            if len(handoff_risk_cost_values) > 0
+            else 0.0,
+            "idle_execution_prd_enabled": self._idle_execution_prd_enabled,
+            "idle_execution_policy_coef": round(self._idle_execution_policy_coef, 6),
+            "idle_execution_option_coef": round(self._idle_execution_option_coef, 6),
+            "idle_execution_credit_mean": round(float(idle_execution_credit_values.mean()), 6)
+            if len(idle_execution_credit_values) > 0
+            else 0.0,
+            "idle_execution_credit_std": round(float(idle_execution_credit_values.std()), 6)
+            if len(idle_execution_credit_values) > 0
             else 0.0,
             "net_utility_prd_enabled": self._net_utility_prd_enabled,
             "net_utility_backhaul_coef": round(self._net_utility_backhaul_coef, 6),
@@ -3063,6 +3187,152 @@ class 分层PPO基类(BaseAgent):
             or float(metrics.get("mechanism_success_rate", 0.0) or 0.0) > 0.0
         )
 
+    def _metric_bool(self, metrics: dict[str, Any], field_name: str) -> bool:
+        value = metrics.get(field_name, False)
+        if isinstance(value, str):
+            return value.strip().lower() in {"1", "true", "yes", "y"}
+        return bool(value)
+
+    def _metric_float(self, metrics: dict[str, Any], field_name: str, default: float = 0.0) -> float:
+        try:
+            return float(metrics.get(field_name, default) or default)
+        except (TypeError, ValueError):
+            return float(default)
+
+    def _handoff_risk_context(self, row: dict[str, Any], metrics: dict[str, Any]) -> bool:
+        action_info = dict(row.get("action_info", {}))
+        prepare_score = max(float(action_info.get("prepare_window_score", 0.0) or 0.0), 0.0)
+        urgency = max(float(action_info.get("temporal_urgency", 0.0) or 0.0), 0.0)
+        confidence = max(float(action_info.get("prediction_confidence", 0.0) or 0.0), 0.0)
+        handoff_event_count = float(metrics.get("handoff_event_count", 0.0) or 0.0)
+        return bool(
+            handoff_event_count > 0.0
+            or self._metric_bool(metrics, "predicted_handoff_signal")
+            or self._metric_bool(metrics, "has_predicted_handoff_target")
+            or (
+                confidence >= self._handoff_risk_confidence_threshold
+                and (prepare_score >= 0.35 or urgency >= 0.45)
+            )
+        )
+
+    def _handoff_risk_cost_signal(self, row: dict[str, Any]) -> float:
+        if not self._handoff_risk_prd_enabled:
+            return 0.0
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        high_risk = self._handoff_risk_context(row, metrics)
+        handoff_failed = self._metric_bool(metrics, "handoff_failed") or float(
+            metrics.get("handoff_failure_rate", 0.0) or 0.0
+        ) > 0.0
+        handoff_ready = self._metric_bool(metrics, "handoff_ready") or float(
+            metrics.get("handoff_ready_ratio", metrics.get("handoff_ready_rate", 0.0)) or 0.0
+        ) > 0.0
+        action_info = dict(row.get("action_info", {}))
+        final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
+        unprepared_high_risk = high_risk and not handoff_ready and final_action not in {1, 4}
+        return float(handoff_failed) + 0.35 * float(unprepared_high_risk)
+
+    def _update_handoff_risk_cost_dual(self, cost_values: np.ndarray) -> None:
+        if (
+            not self._handoff_risk_prd_enabled
+            or not self._handoff_risk_cost_dual_enabled
+            or self._handoff_risk_cost_dual_lr <= 0.0
+            or self._handoff_risk_cost_dual_max <= 0.0
+            or len(cost_values) <= 0
+        ):
+            return
+        observed_cost = float(cost_values.mean())
+        self._handoff_risk_cost_dual = min(
+            self._handoff_risk_cost_dual_max,
+            max(
+                0.0,
+                self._handoff_risk_cost_dual
+                + self._handoff_risk_cost_dual_lr
+                * (observed_cost - self._handoff_risk_cost_target),
+            ),
+        )
+
+    def _handoff_risk_prd_credit(self, row: dict[str, Any]) -> float:
+        if not self._handoff_risk_prd_enabled:
+            return 0.0
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        high_risk = self._handoff_risk_context(row, metrics)
+        if not high_risk:
+            return 0.0
+        action_info = dict(row.get("action_info", {}))
+        final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
+        event_action = int(action_info.get("head_actions", {}).get("event", 0) or 0)
+        handoff_failed = self._metric_bool(metrics, "handoff_failed") or float(
+            metrics.get("handoff_failure_rate", 0.0) or 0.0
+        ) > 0.0
+        handoff_ready = self._metric_bool(metrics, "handoff_ready") or float(
+            metrics.get("handoff_ready_ratio", metrics.get("handoff_ready_rate", 0.0)) or 0.0
+        ) > 0.0
+        prepare_realized = self._metric_bool(metrics, "migration_prepare_realized") or self._metric_bool(
+            metrics,
+            "migration_prepare_requested",
+        )
+        mechanism_success = self._row_mechanism_success(metrics)
+        dual_scale = 1.0 + float(self._handoff_risk_cost_dual)
+        bonus = (
+            self._handoff_risk_ready_bonus * float(handoff_ready)
+            + self._handoff_risk_prepare_bonus * float(prepare_realized)
+            + 0.25 * float(mechanism_success)
+        )
+        if final_action in {1, 4} or event_action == 1:
+            bonus += 0.12
+        unprepared_penalty = self._handoff_risk_unprepared_penalty * float(
+            not handoff_ready and final_action not in {1, 4}
+        )
+        failure_penalty = self._handoff_risk_failure_penalty * float(handoff_failed)
+        return float(bonus - dual_scale * (failure_penalty + unprepared_penalty))
+
+    def _idle_execution_prd_credit(self, row: dict[str, Any]) -> float:
+        if not self._idle_execution_prd_enabled:
+            return 0.0
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        action_info = dict(row.get("action_info", {}))
+        window_class = self._row_window_class(row)
+        final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
+        prepare_score = max(float(action_info.get("prepare_window_score", 0.0) or 0.0), 0.0)
+        urgency = max(float(action_info.get("temporal_urgency", 0.0) or 0.0), 0.0)
+        timing_support = max(prepare_score, urgency)
+        high_risk = self._handoff_risk_context(row, metrics)
+        mechanism_success = self._row_mechanism_success(metrics)
+        service_delay_sum = max(
+            self._metric_float(metrics, "service_delay_sum"),
+            self._metric_float(metrics, "end_to_end_workflow_delay"),
+            0.0,
+        )
+        cache_miss_penalty = max(self._metric_float(metrics, "cache_miss_penalty_sum"), 0.0)
+        delay_pressure = min(service_delay_sum / 4.0, 1.0)
+        cache_pressure = min(cache_miss_penalty / 2.4, 1.0)
+        low_timing_context = bool(timing_support <= self._idle_execution_timing_threshold and not high_risk)
+
+        credit = 0.0
+        if window_class in {"idle_or_sparse", "active_non_mechanism"}:
+            if low_timing_context and final_action == 2:
+                credit += self._idle_execution_local_bonus * (1.0 + 0.35 * (1.0 - delay_pressure))
+            if low_timing_context and final_action in {0, 3} and not mechanism_success:
+                credit -= self._idle_execution_current_rsu_delay_coef * (0.50 + delay_pressure)
+                if final_action == 0 and cache_pressure <= 1e-6:
+                    credit -= 0.12
+            if final_action in {1, 4} and not mechanism_success:
+                stale_mechanism_scale = 1.0 + max(
+                    self._idle_execution_timing_threshold - timing_support,
+                    0.0,
+                ) / max(self._idle_execution_timing_threshold, 1e-6)
+                credit -= self._idle_execution_mechanism_penalty * stale_mechanism_scale
+            if mechanism_success:
+                credit += self._idle_execution_mechanism_preserve_bonus * (0.35 + cache_pressure)
+            return float(credit)
+
+        if window_class == "mechanism_activating":
+            if high_risk and final_action in {1, 4}:
+                credit += self._idle_execution_mechanism_preserve_bonus
+            if high_risk and final_action == 2:
+                credit -= 0.5 * self._idle_execution_local_bonus
+        return float(credit)
+
     def _net_utility_prd_adjustment(self, row: dict[str, Any]) -> float:
         if not self._net_utility_prd_enabled:
             return 0.0
@@ -3141,6 +3411,8 @@ class 分层PPO基类(BaseAgent):
                 self._option_gate_counterfactual_prd_enabled
                 and self._option_gate_counterfactual_coef > 0.0
             )
+            or (self._handoff_risk_prd_enabled and self._handoff_risk_option_coef > 0.0)
+            or (self._idle_execution_prd_enabled and self._idle_execution_option_coef > 0.0)
         ):
             return base_advantage
         partial_credit = 0.0
@@ -3164,6 +3436,16 @@ class 分层PPO基类(BaseAgent):
                     min(self._option_gate_counterfactual_clip, counterfactual_credit),
                 )
             partial_credit += counterfactual_credit * self._option_gate_counterfactual_coef
+        if self._handoff_risk_prd_enabled and self._handoff_risk_option_coef > 0.0:
+            risk_credit = self._handoff_risk_prd_credit(row)
+            if self._handoff_risk_clip > 0.0:
+                risk_credit = max(-self._handoff_risk_clip, min(self._handoff_risk_clip, risk_credit))
+            partial_credit += risk_credit * self._handoff_risk_option_coef
+        if self._idle_execution_prd_enabled and self._idle_execution_option_coef > 0.0:
+            idle_credit = self._idle_execution_prd_credit(row)
+            if self._idle_execution_clip > 0.0:
+                idle_credit = max(-self._idle_execution_clip, min(self._idle_execution_clip, idle_credit))
+            partial_credit += idle_credit * self._idle_execution_option_coef
         credit_tensor = torch.tensor(
             partial_credit,
             dtype=torch.float32,
@@ -4503,6 +4785,29 @@ class 分层PPO基类(BaseAgent):
             "option_gate_counterfactual_prd_enabled": self._option_gate_counterfactual_prd_enabled,
             "option_gate_counterfactual_coef": self._option_gate_counterfactual_coef,
             "option_gate_counterfactual_clip": self._option_gate_counterfactual_clip,
+            "handoff_risk_prd_enabled": self._handoff_risk_prd_enabled,
+            "handoff_risk_event_coef": self._handoff_risk_event_coef,
+            "handoff_risk_option_coef": self._handoff_risk_option_coef,
+            "handoff_risk_clip": self._handoff_risk_clip,
+            "handoff_risk_failure_penalty": self._handoff_risk_failure_penalty,
+            "handoff_risk_ready_bonus": self._handoff_risk_ready_bonus,
+            "handoff_risk_prepare_bonus": self._handoff_risk_prepare_bonus,
+            "handoff_risk_unprepared_penalty": self._handoff_risk_unprepared_penalty,
+            "handoff_risk_confidence_threshold": self._handoff_risk_confidence_threshold,
+            "handoff_risk_cost_dual_enabled": self._handoff_risk_cost_dual_enabled,
+            "handoff_risk_cost_dual_lr": self._handoff_risk_cost_dual_lr,
+            "handoff_risk_cost_target": self._handoff_risk_cost_target,
+            "handoff_risk_cost_dual_max": self._handoff_risk_cost_dual_max,
+            "handoff_risk_cost_dual_initial": self._handoff_risk_cost_dual,
+            "idle_execution_prd_enabled": self._idle_execution_prd_enabled,
+            "idle_execution_policy_coef": self._idle_execution_policy_coef,
+            "idle_execution_option_coef": self._idle_execution_option_coef,
+            "idle_execution_clip": self._idle_execution_clip,
+            "idle_execution_current_rsu_delay_coef": self._idle_execution_current_rsu_delay_coef,
+            "idle_execution_local_bonus": self._idle_execution_local_bonus,
+            "idle_execution_mechanism_penalty": self._idle_execution_mechanism_penalty,
+            "idle_execution_timing_threshold": self._idle_execution_timing_threshold,
+            "idle_execution_mechanism_preserve_bonus": self._idle_execution_mechanism_preserve_bonus,
             "net_utility_prd_enabled": self._net_utility_prd_enabled,
             "net_utility_backhaul_coef": self._net_utility_backhaul_coef,
             "net_utility_migration_coef": self._net_utility_migration_coef,

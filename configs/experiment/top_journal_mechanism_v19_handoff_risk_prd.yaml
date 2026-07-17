@@ -1,0 +1,30 @@
+profile: top_journal_mechanism_v19_handoff_risk_prd
+purpose: >
+  Extend v17 with constrained handoff-risk partial reward decoupling. The event
+  head and option gate receive policy-side credit for handoff readiness and
+  realized prepare actions, while a Lagrangian-style dual penalizes handoff
+  failures and unprepared high-risk handoff contexts.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v17_dag_aware_option
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  handoff_risk_prd_enabled: true
+  handoff_risk_event_coef: 0.38
+  handoff_risk_option_coef: 0.44
+  handoff_risk_cost_dual_enabled: true
+  handoff_risk_cost_target: 0.05
+  dag_aware_option_termination_enabled: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+evaluation:
+  split_policy: dev_then_new_time_audited_future_validation
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile targets the v17 time-audited blocker where handoff failure
+    remained slightly above the strong popularity heuristic.
+  - It does not reuse v18 counterfactual option credit, because v18 failed the
+    dev blocker audit.

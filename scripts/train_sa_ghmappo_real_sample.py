@@ -482,6 +482,30 @@ PROFILE_DEFAULTS = {
         "max_steps": 16,
         "train_window_count": 20,
     },
+    "top_journal_mechanism_v19_handoff_risk_prd": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.45e-5,
+        "clip_ratio": 0.07,
+        "entropy_coef": 0.0011,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.32,
+        "max_steps": 16,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v20_idle_execution_prd": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.45e-5,
+        "clip_ratio": 0.07,
+        "entropy_coef": 0.0011,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.32,
+        "max_steps": 16,
+        "train_window_count": 20,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -1752,6 +1776,72 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "option_gate_counterfactual_clip": 1.25,
                 "event_prd_advantage_coef": 0.44,
                 "event_prd_advantage_clip": 1.55,
+                "train_epochs": 7,
+                "target_kl": 0.011,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v19_handoff_risk_prd":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v17_dag_aware_option")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.038,
+                "heuristic_imitation_warmup_updates": 2,
+                "heuristic_imitation_decay": 0.66,
+                "mechanism_aux_coef": 0.068,
+                "mechanism_window_weight": 1.52,
+                "prepare_action_prior_weight": 0.60,
+                "mechanism_aux_coef_floor_after_update": 0.068,
+                "mechanism_window_weight_floor_after_update": 1.52,
+                "option_gate_loss_coef": 0.34,
+                "option_gate_prior_coef": 0.024,
+                "option_gate_prior_warmup_updates": 3,
+                "option_gate_prior_decay": 0.66,
+                "option_gate_prior_logit_bias": 0.34,
+                "option_gate_log_prob_weight": 0.50,
+                "option_gate_deterministic_prior_margin": 0.05,
+                "event_prd_advantage_coef": 0.42,
+                "event_prd_advantage_clip": 1.55,
+                "handoff_risk_prd_enabled": True,
+                "handoff_risk_event_coef": 0.38,
+                "handoff_risk_option_coef": 0.44,
+                "handoff_risk_clip": 1.35,
+                "handoff_risk_failure_penalty": 1.15,
+                "handoff_risk_ready_bonus": 0.85,
+                "handoff_risk_prepare_bonus": 0.34,
+                "handoff_risk_unprepared_penalty": 0.44,
+                "handoff_risk_confidence_threshold": 0.56,
+                "handoff_risk_cost_dual_enabled": True,
+                "handoff_risk_cost_dual_lr": 0.10,
+                "handoff_risk_cost_target": 0.05,
+                "handoff_risk_cost_dual_max": 1.40,
+                "handoff_risk_cost_dual_initial": 0.0,
+                "train_epochs": 7,
+                "target_kl": 0.011,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v20_idle_execution_prd":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v19_handoff_risk_prd")
+        kwargs.update(
+            {
+                "idle_execution_prd_enabled": True,
+                "idle_execution_policy_coef": 0.30,
+                "idle_execution_option_coef": 0.42,
+                "idle_execution_clip": 1.25,
+                "idle_execution_current_rsu_delay_coef": 0.42,
+                "idle_execution_local_bonus": 0.30,
+                "idle_execution_mechanism_penalty": 0.34,
+                "idle_execution_timing_threshold": 0.30,
+                "idle_execution_mechanism_preserve_bonus": 0.20,
+                "option_gate_loss_coef": 0.36,
+                "option_gate_prior_coef": 0.028,
+                "option_gate_prior_decay": 0.68,
+                "option_gate_log_prob_weight": 0.54,
+                "option_gate_deterministic_prior_margin": 0.06,
+                "event_prd_advantage_coef": 0.40,
+                "handoff_risk_event_coef": 0.34,
+                "handoff_risk_option_coef": 0.40,
                 "train_epochs": 7,
                 "target_kl": 0.011,
             }
@@ -4107,6 +4197,8 @@ def maybe_apply_anti_collapse_controls(
         "top_journal_mechanism_v16_conservative_terminal_option",
         "top_journal_mechanism_v17_dag_aware_option",
         "top_journal_mechanism_v18_counterfactual_option",
+        "top_journal_mechanism_v19_handoff_risk_prd",
+        "top_journal_mechanism_v20_idle_execution_prd",
     }
     if args.agent_name != "sa_ghmappo" or args.profile not in stability_profiles:
         return updated_best, None
