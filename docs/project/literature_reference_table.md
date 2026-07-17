@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-07-16
+更新日期：2026-07-17
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -44,6 +44,13 @@
 | `Unverified` | venue、DOI、卷期或正式录用状态尚未由一手页面确认 | `Digital Twin-Enabled Mobility-Aware Cooperative Caching`、`H2O` DOI、`POLAR`、`LRAgent` 继续保留待核验标签 |
 
 2026-06-21 增量检索新增五篇近邻工作：TMC 2026 的 DAG timing/data dependency + MADDPG、TMC 2026 的 mobility-aware parallel-task collaborative offloading、TMC 2025 的 graph-based federated meta-RL offloading、IoT Journal 2025 的 dependency-aware hierarchical offloading，以及 NGDN 2025 的 DAG + cache-assisted offloading。最新边界更严格：`DAG + mobility + MARL`、`DAG + hierarchy`、`DAG + cache` 均不能单独作为创新。当前检索未发现一篇正式大刊同时覆盖“跨 RSU 连续 DAG workflow + adapter warm-state cache + predictive handoff prepare/state migration + 三时间尺度联合控制”，但这只是截至检索日的一手页面检索结论，不构成穷尽性不存在证明。
+
+## MARL / Credit Assignment Foundations
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---:|---|---|---|
+| MAPPO strong baseline | [The Surprising Effectiveness of PPO in Cooperative, Multi-Agent Games](https://arxiv.org/abs/2103.01955) | NeurIPS 2022 Datasets and Benchmarks | 证明 PPO/MAPPO 在 cooperative multi-agent benchmark 中可成为强基线，并强调实现细节、超参数和 sample efficiency 对最终表现的重要性。 | PPO_MEC 不能把“使用 MAPPO/CTDE”本身写成创新；v10-v13 的创新边界应写为 controller-level credit 如何服务于 cache/execution/handoff-event 三头，以及如何结合 VEC DAG/adapter/handoff 机制。 | Baseline rationale；解释为什么需要强化 MAPPO 对照和为什么 PPO/MAPPO gap 不应被简单视为 baseline 弱。 |
+| MAPPO credit assignment | [Assigning Credit with Partial Reward Decoupling in Multi-Agent Proximal Policy Optimization](https://arxiv.org/abs/2408.04295) | Reinforcement Learning Journal / Reinforcement Learning Conference, 2024 | 指出 MAPPO 仍受 multi-agent credit assignment 限制，并用 partial reward decoupling 将大团队信用分配分解为更小相关子群，提高 data efficiency 和 asymptotic performance。 | PPO_MEC v13 借鉴 PRD 思想，但当前实现不是 teammate attention 或 full multi-agent subgroup decomposition；而是在 controller-level event/option heads 中注入部分信用，面向 VEC handoff readiness 和 mechanism success。论文中必须说明这是 domain-specific PRD adaptation，不可声称复现完整 PRD-MAPPO。 | Method motivation / Ablation discussion；支撑 v13 PRD event/option credit 的算法依据和 claim 边界。 |
 
 ## VEC/MEC Offloading, Caching, Migration
 

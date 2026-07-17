@@ -1,5 +1,20 @@
 # Artifact Records
 
+## 2026-07-17 v13 partial-reward-decoupled MAPPO latest full-dev
+
+状态：`[dev-full-success]` `[candidate]` `[not-hidden]`
+
+路径：
+
+- `artifacts/experiments/top_journal_prd_option_v13_20260717/seed_checkpoint_manifest_prd_event_latest.json`
+- `artifacts/experiments/top_journal_prd_option_v13_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_124815_375515/aggregate_summary.json`
+- `artifacts/experiments/top_journal_prd_option_v13_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_124815_375515/sa_advantage_diagnosis.json`
+- `artifacts/experiments/top_journal_prd_option_v13_20260717/main_results_full_stratified_best_reward/main_results_full_stratified_20260717_124435_673243/aggregate_summary.json`
+
+确认结果：v13 latest 使用 5 seeds、20 frozen dev windows、2 workflows/window、12 agents、`full_stratified`、`primary_vehicle_selection=handoff_pressure`。SA-GHMAPPO total reward `79.64465`，高于 `popularity_cache_heuristic=79.46875`、`ppo=77.18775`、`mappo=72.6328` 和全部其他对照；相对 strongest other 的 margin 为 `+0.17590`，高于 v12 的 `+0.12465`。机制 realization 为 `0.245`，高于 v12/best-by-reward `0.195` 和 popularity `0.175`；continuity 为 `0.811677`，高于 v12 `0.807893`。同一 v13 profile 的 `best_by_reward` full-dev 结果与 v12 完全一致，因为 checkpoint audit 显示 selected checkpoint source update 为 0 warm-start。
+
+结论边界：这是 frozen dev evidence，不是 formal/hidden/future-validation 或 paper-ready 证据。hidden holdout 已 consumed 且未用于 v13 筛选。v13 不能替换 v8 canonical；promotion 需要新冻结 future-validation split、统计审查、baseline fairness 审查和 readiness audit。`latest_after_prd_training` 是为了评估 PRD 学习后的策略，不能对外包装成 hidden-validated checkpoint selection。
+
 ## 2026-07-17 v12 learned MAPPO option gate full-dev
 
 状态：`[dev-full-success]` `[candidate]` `[not-hidden]`

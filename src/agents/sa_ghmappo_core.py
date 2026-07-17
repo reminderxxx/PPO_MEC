@@ -352,6 +352,9 @@ class 分层PPO基类(BaseAgent):
         mechanism_window_weight_floor_after_update: float = 1.0,
         mechanism_entropy_floor_after_update: float = 0.0,
         mechanism_aux_current_cache_fill_enabled: bool = True,
+        event_prd_advantage_enabled: bool = False,
+        event_prd_advantage_coef: float = 0.0,
+        event_prd_advantage_clip: float = 2.0,
         latency_fallback_bias_enabled: bool = False,
         latency_fallback_bias_strength: float = 0.0,
         latency_fallback_confidence_floor: float = 0.0,
@@ -384,6 +387,10 @@ class 分层PPO基类(BaseAgent):
         option_gate_context_prior_enabled: bool = False,
         option_gate_deterministic_prior_margin: float = 0.0,
         option_gate_idle_prior_enabled: bool = False,
+        option_gate_mechanism_preserve_enabled: bool = True,
+        option_gate_prd_enabled: bool = False,
+        option_gate_prd_coef: float = 0.0,
+        option_gate_prd_clip: float = 2.0,
         auxiliary_slow_weight: float = 1.0,
         auxiliary_fast_weight: float = 0.5,
         auxiliary_event_weight: float = 1.0,
@@ -522,6 +529,9 @@ class 分层PPO基类(BaseAgent):
         )
         self._mechanism_entropy_floor_after_update = max(float(mechanism_entropy_floor_after_update), 0.0)
         self._mechanism_aux_current_cache_fill_enabled = bool(mechanism_aux_current_cache_fill_enabled)
+        self._event_prd_advantage_enabled = bool(event_prd_advantage_enabled)
+        self._event_prd_advantage_coef = max(float(event_prd_advantage_coef), 0.0)
+        self._event_prd_advantage_clip = max(float(event_prd_advantage_clip), 0.0)
         self._latency_fallback_bias_enabled = bool(latency_fallback_bias_enabled)
         self._latency_fallback_bias_strength = max(float(latency_fallback_bias_strength), 0.0)
         self._latency_fallback_confidence_floor = max(
@@ -586,6 +596,10 @@ class 分层PPO基类(BaseAgent):
         self._option_gate_context_prior_enabled = bool(option_gate_context_prior_enabled)
         self._option_gate_deterministic_prior_margin = max(float(option_gate_deterministic_prior_margin), 0.0)
         self._option_gate_idle_prior_enabled = bool(option_gate_idle_prior_enabled)
+        self._option_gate_mechanism_preserve_enabled = bool(option_gate_mechanism_preserve_enabled)
+        self._option_gate_prd_enabled = bool(option_gate_prd_enabled)
+        self._option_gate_prd_coef = max(float(option_gate_prd_coef), 0.0)
+        self._option_gate_prd_clip = max(float(option_gate_prd_clip), 0.0)
         self._auxiliary_slow_weight = float(auxiliary_slow_weight)
         self._auxiliary_fast_weight = float(auxiliary_fast_weight)
         self._auxiliary_event_weight = float(auxiliary_event_weight)
@@ -938,6 +952,22 @@ class 分层PPO基类(BaseAgent):
             )
         else:
             normalized_event_advantages = (event_advantages_raw - event_advantage_mean) / (event_advantage_std + 1e-8)
+        event_prd_credit_values = np.zeros(len(rollout), dtype=np.float32)
+        if self._event_prd_advantage_enabled and self._event_prd_advantage_coef > 0.0:
+            event_prd_credit_values = np.asarray(
+                [self._event_partial_reward_credit(row) for row in rollout],
+                dtype=np.float32,
+            )
+            if self._event_prd_advantage_clip > 0.0:
+                event_prd_credit_values = np.clip(
+                    event_prd_credit_values,
+                    -self._event_prd_advantage_clip,
+                    self._event_prd_advantage_clip,
+                )
+            normalized_event_advantages = (
+                normalized_event_advantages
+                + self._event_prd_advantage_coef * event_prd_credit_values
+            )
         normalized_event_advantages = normalized_event_advantages * mechanism_transition_weights
         return_tensor = torch.as_tensor(returns, dtype=torch.float32, device=self._device)
         advantage_tensor = torch.as_tensor(normalized_advantages, dtype=torch.float32, device=self._device)
@@ -1189,6 +1219,14 @@ class 分层PPO基类(BaseAgent):
             "advantage_std_raw": round(advantage_std, 6),
             "event_advantage_mean_raw": round(event_advantage_mean, 6),
             "event_advantage_std_raw": round(event_advantage_std, 6),
+            "event_prd_advantage_enabled": self._event_prd_advantage_enabled,
+            "event_prd_advantage_coef": round(self._event_prd_advantage_coef, 6),
+            "event_prd_credit_mean": round(float(event_prd_credit_values.mean()), 6)
+            if len(event_prd_credit_values) > 0
+            else 0.0,
+            "event_prd_credit_std": round(float(event_prd_credit_values.std()), 6)
+            if len(event_prd_credit_values) > 0
+            else 0.0,
             "value_mean": round(float(old_value_tensor.mean().item()), 6),
             "return_mean": round(float(return_tensor.mean().item()), 6),
             "explained_variance": round(explained_variance, 6),
@@ -1684,7 +1722,11 @@ class 分层PPO基类(BaseAgent):
         if not self._option_gate_enabled or "option_logits" not in policy_output:
             return {"enabled": False, "applied": False}
         window_class = str((run_metadata or {}).get("window_class", "unknown"))
-        if self._option_gate_context_prior_enabled and window_class == "mechanism_activating":
+        if (
+            self._option_gate_context_prior_enabled
+            and self._option_gate_mechanism_preserve_enabled
+            and window_class == "mechanism_activating"
+        ):
             return {
                 "enabled": False,
                 "applied": False,
@@ -2661,7 +2703,10 @@ class 分层PPO基类(BaseAgent):
             )
             new_log_prob = distribution.log_prob(action_tensor)
             ratio = torch.exp(new_log_prob - old_log_prob)
-            option_advantage = batch_advantage[row_index]
+            option_advantage = self._option_gate_advantage(
+                row=row,
+                base_advantage=batch_advantage[row_index],
+            )
             surrogate_1 = ratio * option_advantage
             surrogate_2 = torch.clamp(
                 ratio,
@@ -2678,6 +2723,104 @@ class 分层PPO基类(BaseAgent):
         entropy = torch.stack(entropy_terms).mean() if entropy_terms else zero
         prior_loss = torch.stack(prior_terms).mean() if prior_terms else zero
         return ppo_loss, entropy, prior_loss
+
+    def _event_partial_reward_credit(self, row: dict[str, Any]) -> float:
+        action_info = dict(row.get("action_info", {}))
+        window_class = str(row.get("decision_info", {}).get("run_metadata", {}).get("window_class", "unknown"))
+        event_action = int(action_info.get("head_actions", {}).get("event", 0) or 0)
+        final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
+        prepare_score = max(float(action_info.get("prepare_window_score", 0.0) or 0.0), 0.0)
+        urgency = max(float(action_info.get("temporal_urgency", 0.0) or 0.0), 0.0)
+        confidence = max(float(action_info.get("prediction_confidence", 0.0) or 0.0), 0.0)
+        gate_pass = bool(action_info.get("gate_pass", False))
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        mechanism_success = float(metrics.get("mechanism_success_rate", 0.0) or 0.0)
+        ready_rate = float(metrics.get("handoff_ready_rate", metrics.get("handoff_ready_ratio", 0.0)) or 0.0)
+        failure_rate = float(metrics.get("handoff_failure_rate", 0.0) or 0.0)
+        context_strength = 0.45 * prepare_score + 0.30 * urgency + 0.20 * confidence
+        if gate_pass:
+            context_strength += 0.25
+        outcome_strength = 0.55 * mechanism_success + 0.25 * ready_rate - 0.35 * failure_rate
+
+        if window_class == "mechanism_activating":
+            if event_action == 1:
+                credit = context_strength + outcome_strength
+                if final_action in {1, 4}:
+                    credit += 0.18
+            else:
+                credit = outcome_strength - 0.35 * context_strength
+            return float(credit)
+        if window_class == "idle_or_sparse":
+            if event_action == 1:
+                return float(0.15 * context_strength - 0.35 * (1.0 - float(gate_pass)))
+            return 0.10
+        if window_class == "active_non_mechanism":
+            return -0.20 if event_action == 1 else 0.08
+        return 0.0
+
+    def _option_gate_advantage(self, *, row: dict[str, Any], base_advantage: torch.Tensor) -> torch.Tensor:
+        if not self._option_gate_prd_enabled or self._option_gate_prd_coef <= 0.0:
+            return base_advantage
+        partial_credit = self._option_gate_partial_reward_credit(row)
+        if self._option_gate_prd_clip > 0.0:
+            partial_credit = max(-self._option_gate_prd_clip, min(self._option_gate_prd_clip, partial_credit))
+        credit_tensor = torch.tensor(
+            partial_credit * self._option_gate_prd_coef,
+            dtype=torch.float32,
+            device=self._device,
+        )
+        return base_advantage + credit_tensor
+
+    def _option_gate_partial_reward_credit(self, row: dict[str, Any]) -> float:
+        action_info = dict(row.get("action_info", {}))
+        option_info = dict(action_info.get("option_gate", {}))
+        option_label = str(option_info.get("option_label", "accept_mappo"))
+        window_class = str(
+            option_info.get(
+                "window_class",
+                row.get("decision_info", {}).get("run_metadata", {}).get("window_class", "unknown"),
+            )
+        )
+        final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
+        prepare_score = max(float(action_info.get("prepare_window_score", 0.0) or 0.0), 0.0)
+        urgency = max(float(action_info.get("temporal_urgency", 0.0) or 0.0), 0.0)
+        confidence = max(float(action_info.get("prediction_confidence", 0.0) or 0.0), 0.0)
+        gate_pass = bool(action_info.get("gate_pass", False))
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        mechanism_success = float(metrics.get("mechanism_success_rate", 0.0) or 0.0)
+        ready_rate = float(metrics.get("handoff_ready_rate", metrics.get("handoff_ready_ratio", 0.0)) or 0.0)
+        failure_rate = float(metrics.get("handoff_failure_rate", 0.0) or 0.0)
+        reward_sign = 1.0 if float(row.get("reward", 0.0) or 0.0) >= 0.0 else -1.0
+
+        credit = 0.0
+        if window_class == "mechanism_activating":
+            context_strength = 0.45 * prepare_score + 0.30 * urgency + 0.20 * confidence
+            if gate_pass:
+                context_strength += 0.25
+            outcome_strength = 0.55 * mechanism_success + 0.25 * ready_rate - 0.35 * failure_rate
+            if option_label == "mechanism_prepare":
+                credit += context_strength + outcome_strength
+                if final_action in {1, 4}:
+                    credit += 0.20
+            elif option_label == "accept_mappo":
+                credit += 0.35 * context_strength + outcome_strength
+                if final_action in {1, 4}:
+                    credit += 0.10
+            elif option_label in {"popularity_safe", "no_rsu_local"}:
+                credit -= 0.35 * context_strength
+        elif window_class == "idle_or_sparse":
+            if option_label == "popularity_safe":
+                credit += 0.45 + 0.10 * reward_sign
+            elif option_label == "mechanism_prepare":
+                credit -= 0.45
+            elif option_label == "accept_mappo":
+                credit += 0.10 * reward_sign
+        elif window_class == "active_non_mechanism":
+            if option_label == "accept_mappo":
+                credit += 0.15 * reward_sign
+            elif bool(option_info.get("applied", False)):
+                credit -= 0.25
+        return float(credit)
 
     def _combine_head_statistics(
         self,
@@ -3820,6 +3963,9 @@ class 分层PPO基类(BaseAgent):
             "mechanism_window_weight_floor_after_update": self._mechanism_window_weight_floor_after_update,
             "mechanism_entropy_floor_after_update": self._mechanism_entropy_floor_after_update,
             "mechanism_aux_current_cache_fill_enabled": self._mechanism_aux_current_cache_fill_enabled,
+            "event_prd_advantage_enabled": self._event_prd_advantage_enabled,
+            "event_prd_advantage_coef": self._event_prd_advantage_coef,
+            "event_prd_advantage_clip": self._event_prd_advantage_clip,
             "latency_fallback_bias_enabled": self._latency_fallback_bias_enabled,
             "latency_fallback_bias_strength": self._latency_fallback_bias_strength,
             "latency_fallback_confidence_floor": self._latency_fallback_confidence_floor,
@@ -3852,6 +3998,10 @@ class 分层PPO基类(BaseAgent):
             "option_gate_context_prior_enabled": self._option_gate_context_prior_enabled,
             "option_gate_deterministic_prior_margin": self._option_gate_deterministic_prior_margin,
             "option_gate_idle_prior_enabled": self._option_gate_idle_prior_enabled,
+            "option_gate_mechanism_preserve_enabled": self._option_gate_mechanism_preserve_enabled,
+            "option_gate_prd_enabled": self._option_gate_prd_enabled,
+            "option_gate_prd_coef": self._option_gate_prd_coef,
+            "option_gate_prd_clip": self._option_gate_prd_clip,
             "auxiliary_slow_weight": self._auxiliary_slow_weight,
             "auxiliary_fast_weight": self._auxiliary_fast_weight,
             "auxiliary_event_weight": self._auxiliary_event_weight,

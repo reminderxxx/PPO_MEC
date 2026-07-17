@@ -45,6 +45,18 @@ SA_REWARD_FIRST_PROFILES = {
     "top_journal_mechanism_v11_mappo_reward",
     "top_journal_mechanism_v12_learned_option",
 }
+SA_LATEST_FIRST_CHECKPOINT_PRIORITY = [
+    "latest_checkpoint_path",
+    "best_by_reward_path",
+    "best_by_reward_tiebreak_score_path",
+    "best_by_continuity_path",
+    "best_by_retained_mechanism_score_path",
+    "best_by_mechanism_advantage_score_path",
+    "best_by_mechanism_balanced_path",
+]
+SA_LATEST_FIRST_PROFILES = {
+    "top_journal_mechanism_v13_prd_option",
+}
 LOWER_IS_BETTER = {
     "backhaul_traffic_cost",
     "handoff_failure_rate",
@@ -118,6 +130,15 @@ SA_PROFILE_SETTING_OVERRIDES = {
         "window_count": 20,
     },
     "top_journal_mechanism_v12_learned_option": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 10000,
+        "window_count": 20,
+    },
+    "top_journal_mechanism_v13_prd_option": {
         "sa_episodes": 128,
         "baseline_episodes": 96,
         "sa_update_every": 8,
@@ -338,11 +359,12 @@ def audit_baseline_checkpoint_protocols(training_records: list[dict[str, Any]]) 
 
 def select_sa_checkpoint(train_summary: dict[str, Any]) -> tuple[Path, str]:
     config_profile = str(train_summary.get("config_profile", ""))
-    priority = (
-        SA_REWARD_FIRST_CHECKPOINT_PRIORITY
-        if config_profile in SA_REWARD_FIRST_PROFILES
-        else SA_CHECKPOINT_PRIORITY
-    )
+    if config_profile in SA_LATEST_FIRST_PROFILES:
+        priority = SA_LATEST_FIRST_CHECKPOINT_PRIORITY
+    elif config_profile in SA_REWARD_FIRST_PROFILES:
+        priority = SA_REWARD_FIRST_CHECKPOINT_PRIORITY
+    else:
+        priority = SA_CHECKPOINT_PRIORITY
     for field_name in priority:
         candidate = existing_path(str(train_summary.get(field_name, "")))
         if candidate is not None:

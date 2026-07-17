@@ -1,5 +1,13 @@
 # Code Module Map
 
+## 2026-07-17 v13 partial-reward-decoupled MAPPO credit
+
+- `src/agents/sa_ghmappo_core.py`：新增 event-head partial reward decoupling、option-gate partial credit、机制窗口 preserve-MAPPO 下的 option credit 计算，以及 checkpoint config 中的 `event_prd_advantage_*` / `option_gate_prd_*` 字段。
+- `src/evaluators/real_eval_support.py`：恢复 v13 PRD credit config 字段，保证训练 checkpoint 与 benchmark inference contract 一致。
+- `scripts/train_sa_ghmappo_real_sample.py`：新增 `top_journal_mechanism_v13_prd_option` profile，继承 v12 learned option 并启用 PRD event / option credit。
+- `scripts/run_top_journal_closed_loop.py`：v13 使用 latest-first checkpoint priority，避免 `best_by_reward` 固定在 warm-start update 0；budget override 与 v12 strict-full dev screen 对齐。
+- `configs/experiment/top_journal_mechanism_v13_prd_option.yaml`、`tests/test_algo_pool_contract.py`、`tests/test_top_journal_closed_loop.py`：记录 v13 PRD 参数、latest checkpoint selection、fallback selection 和 contract tests。
+
 ## 2026-07-17 v12 learned MAPPO option gate
 
 - `src/agents/sa_ghmappo_core.py`：新增 policy-side `option_actor`、四类 option label、PPO-style option loss、entropy bonus、decayed contextual prior、idle/sparse popularity-safe prior、mechanism-window preserve-MAPPO 分支，以及 v11 checkpoint 缺少 option head 时的 partial warm-start load。

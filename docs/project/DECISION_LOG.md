@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-17: v13 用 partial-reward-decoupled MAPPO credit，并以 latest 评估学习后策略
+
+决策：新增 `top_journal_mechanism_v13_prd_option`，在 v12 learned option gate 基础上加入 event-head 与 option-head 的 partial-reward-decoupled credit。`event_prd_advantage_*` 把机制准备、handoff readiness、prediction confidence 和机制窗口 context 转成 event advantage 补充项；`option_gate_prd_*` 让 option loss 学习机制动作和安全动作的部分信用。closed-loop 中 v13 使用 `latest_checkpoint_path` 优先，因为 full-dev 审计显示 `best_by_reward_path` 停留在 update 0 warm-start，无法代表 PRD 训练后的策略。
+
+原因：v12 的 reward margin 已主要受机制窗口净收益限制，普通/idle 窗口多与 popularity 持平。继续扩大 hard rule 会被审稿人视为规则包装，也可能牺牲机制窗口；PRD-MAPPO 风格的部分信用分配更符合 MAPPO 的 CTDE 学习核心，目标是让 event/option head 从机制成功和净收益中学习，而不是只靠手写 fallback。
+
+影响：v13 不修改 `VecWorkflowCoreEnv` reward、不修改 `semantic_discrete_5` action contract、不改变 baseline contract、不读取 hidden。full-dev latest 证据显示 SA total reward `79.64465`，高于 v12/best-by-reward `79.5934`、`popularity_cache_heuristic=79.46875`、`ppo=77.18775`、`mappo=72.6328` 和全部其他对照；strongest-other margin 从 `+0.12465` 扩大到 `+0.17590`。该结果仍是 dev evidence，不能替代 v8 canonical 或 future-validation 审查。
+
 ## 2026-07-17: v12 采用 learned contextual MAPPO option gate，而不是继续扩大 hard rule
 
 决策：新增 `top_journal_mechanism_v12_learned_option`，在 v11 MAPPO-core reward-first checkpoint 上 warm-start，并在 SA-GHMAPPO policy 内加入四类 option head：`accept_mappo`、`popularity_safe`、`no_rsu_local`、`mechanism_prepare`。训练使用 PPO-style option loss、entropy 和随 update 衰减的 contextual prior；推理时机制窗口 preserve MAPPO 主策略，idle/sparse 才允许 learned popularity-safe option 接管。

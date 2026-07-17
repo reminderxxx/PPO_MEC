@@ -549,6 +549,61 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(option_info["reason"], "mechanism_window_preserve_mappo")
         self.assertEqual(option_info["base_env_action"], 4)
 
+    def test_sa_v13_profile_enables_prd_option_credit(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v13_prd_option"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v13_prd_option")
+        self.assertTrue(kwargs["option_gate_enabled"])
+        self.assertTrue(kwargs["option_gate_prd_enabled"])
+        self.assertGreater(kwargs["option_gate_prd_coef"], 0.0)
+        self.assertGreater(kwargs["option_gate_prd_clip"], 0.0)
+        self.assertTrue(kwargs["option_gate_mechanism_preserve_enabled"])
+        self.assertTrue(kwargs["event_prd_advantage_enabled"])
+        self.assertGreater(kwargs["event_prd_advantage_coef"], 0.0)
+        self.assertEqual(kwargs["head_credit_protocol"], "aggregation_reason_weighted_controller_ppo_v3")
+
+    def test_sa_v13_event_prd_rewards_mechanism_prepare_credit(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            event_prd_advantage_enabled=True,
+            event_prd_advantage_coef=0.4,
+        )
+        positive_row = {
+            "action": 4,
+            "action_info": {
+                "head_actions": {"event": 1},
+                "final_env_action": 4,
+                "prepare_window_score": 0.8,
+                "temporal_urgency": 0.7,
+                "prediction_confidence": 0.75,
+                "gate_pass": True,
+            },
+            "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+            "env_info": {"metrics_protocol": {"mechanism_success_rate": 0.5, "handoff_ready_rate": 0.5}},
+        }
+        negative_row = {
+            "action": 3,
+            "action_info": {
+                "head_actions": {"event": 0},
+                "final_env_action": 3,
+                "prepare_window_score": 0.8,
+                "temporal_urgency": 0.7,
+                "prediction_confidence": 0.75,
+                "gate_pass": True,
+            },
+            "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+            "env_info": {"metrics_protocol": {"mechanism_success_rate": 0.0, "handoff_ready_rate": 0.0}},
+        }
+
+        self.assertGreater(agent._event_partial_reward_credit(positive_row), 0.0)
+        self.assertLess(agent._event_partial_reward_credit(negative_row), 0.0)
+
     def test_qmix_uses_controller_level_value_decomposition_contract(self) -> None:
         state = _minimal_semantic_state()
         agent = build_agent("qmix", random_seed=1, deterministic_action=True)

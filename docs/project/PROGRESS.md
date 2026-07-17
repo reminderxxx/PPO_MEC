@@ -2,6 +2,15 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-07-17: v13 PRD-MAPPO latest 全量 dev 拉开奖励 margin
+
+- 新增 `top_journal_mechanism_v13_prd_option` profile 与 `configs/experiment/top_journal_mechanism_v13_prd_option.yaml`。v13 在 v12 learned option 基础上加入 partial-reward-decoupled event / option credit：`event_prd_advantage_*` 把机制准备成功、handoff readiness、gate pass 和高压窗口 context 注入 event-head advantage，`option_gate_prd_*` 把 option loss 从纯 PPO advantage 扩展为机制/安全动作的部分信用。
+- first-order diagnosis：v12 已在大多数非机制窗口与 popularity 持平，只在少数机制窗口取得净收益，因此主 reward gap 的提升空间主要来自机制窗口净收益，而不是继续扩大 hard rule。v13 的 `best_by_reward` checkpoint 在全量审计中停留在 update 0 warm-start，结果与 v12 完全一致；说明当前 reward-first checkpoint rule 不能代表 PRD 后续学习。
+- 最终可复现实验采用 `latest_after_prd_training`：`scripts/run_top_journal_closed_loop.py` 对 v13 profile 优先选择 `latest_checkpoint_path`，因为它直接评估 PRD 训练后的策略，不回退到 warm-start `best_by_reward`。
+- full-dev 5-seed / 20-window / 2-workflow / 12-agent benchmark 已完成：`artifacts/experiments/top_journal_prd_option_v13_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_124815_375515/aggregate_summary.json`。SA-GHMAPPO total reward `79.64465`，高于 v12/best-by-reward `79.5934`、`popularity_cache_heuristic=79.46875`、`ppo=77.18775`、`mappo=72.6328` 和全部其他对照；对 strongest other 的 margin 从 v12 `+0.12465` 扩大到 `+0.17590`。
+- 机制事实：v13 latest 的 `mechanism_realization_rate=0.245`，高于 v12/best-by-reward `0.195` 和 popularity `0.175`；continuity `0.811677` 也高于 v12 `0.807893`。这说明 reward 提升来自 PRD 后续学习带来的机制动作/continuity 增益，而不是改 reward、action contract、baseline contract 或 window plan。
+- 结论边界：这是 frozen dev evidence；hidden holdout 已 consumed 且未用于 v13 筛选或调参。v13 不能替换 v8 canonical，也不能称 paper-ready；promotion 需要新冻结 future-validation split、统计审查和 readiness audit。PPO 在 handoff failure/backhaul trade-off 上仍需单独报告。
+
 ## 2026-07-17: v12 learned MAPPO option gate full-dev 全量超过全部对照
 
 - 新增 `top_journal_mechanism_v12_learned_option` profile 与 `configs/experiment/top_journal_mechanism_v12_learned_option.yaml`。v12 以 v11 MAPPO-core reward-first checkpoint 为 warm-start，新增四类可学习 option：`accept_mappo`、`popularity_safe`、`no_rsu_local`、`mechanism_prepare`，并把 `window_class` 作为 outcome-blind contextual prior 传入 policy，而不是在 evaluator 里继续使用 v11 hard override。

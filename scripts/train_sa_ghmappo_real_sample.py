@@ -410,6 +410,18 @@ PROFILE_DEFAULTS = {
         "max_steps": 16,
         "train_window_count": 20,
     },
+    "top_journal_mechanism_v13_prd_option": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.5e-5,
+        "clip_ratio": 0.07,
+        "entropy_coef": 0.0011,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.32,
+        "max_steps": 16,
+        "train_window_count": 20,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -1542,6 +1554,37 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "idle_popularity_fallback_only_vehicle_fallback": True,
                 "idle_popularity_no_rsu_local_fallback_enabled": False,
                 "idle_popularity_no_rsu_local_requires_low_context": True,
+                "train_epochs": 7,
+                "target_kl": 0.012,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v13_prd_option":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v12_learned_option")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.045,
+                "heuristic_imitation_warmup_updates": 3,
+                "heuristic_imitation_decay": 0.70,
+                "mechanism_aux_coef": 0.07,
+                "mechanism_window_weight": 1.55,
+                "prepare_action_prior_weight": 0.62,
+                "mechanism_aux_coef_floor_after_update": 0.07,
+                "mechanism_window_weight_floor_after_update": 1.55,
+                "option_gate_loss_coef": 0.32,
+                "option_gate_prior_coef": 0.035,
+                "option_gate_prior_warmup_updates": 4,
+                "option_gate_prior_decay": 0.72,
+                "option_gate_prior_logit_bias": 0.45,
+                "option_gate_log_prob_weight": 0.42,
+                "option_gate_deterministic_prior_margin": 0.08,
+                "option_gate_mechanism_preserve_enabled": True,
+                "option_gate_prd_enabled": True,
+                "option_gate_prd_coef": 0.24,
+                "option_gate_prd_clip": 1.6,
+                "event_prd_advantage_enabled": True,
+                "event_prd_advantage_coef": 0.38,
+                "event_prd_advantage_clip": 1.8,
                 "train_epochs": 7,
                 "target_kl": 0.012,
             }
@@ -3891,6 +3934,7 @@ def maybe_apply_anti_collapse_controls(
         "formal_main_stable",
         "top_journal_mechanism_v11_mappo_reward",
         "top_journal_mechanism_v12_learned_option",
+        "top_journal_mechanism_v13_prd_option",
     }
     if args.agent_name != "sa_ghmappo" or args.profile not in stability_profiles:
         return updated_best, None
