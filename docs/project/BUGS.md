@@ -18,6 +18,9 @@
 
 ## 当前限制
 
+- `top_journal_mechanism_v12_learned_option` 已在 frozen dev full_stratified 上完成 5-seed / 20-window / 2-workflow 全量 benchmark，并超过 `popularity_cache_heuristic` 和全部 learned baselines；这仍不是 hidden/future-validation 证据。当前 hidden 已 consumed，v12 不得用现有 hidden 做进一步筛选；promotion 必须新冻结 future-validation split 并按 top-journal review policy 重新审查。
+- v12 的 full-dev 胜出来自 regime-aware 组合：mechanism window SA `82.758` > popularity `82.3425`，active non-mechanism 与 popularity/PPO 持平，idle/sparse 与 popularity 持平。不能声称每个 window class 或每个系统指标都全面优于规则；PPO 在 handoff failure `0.02` 和 backhaul `100.64` 上仍优于 v12 的 `0.075` / `110.72`。
+- v12 的 learned option gate 是 policy-side MAPPO option head + contextual prior，不是环境 reward 改动、action contract 改动或 baseline contract 改动。若论文要作为算法创新表述，必须说明 `window_class` 的 outcome-blind 来源、mechanism window preserve-MAPPO 规则、option loss/prior 的训练角色，以及和 v11 evaluator-side hard gate 的区别。
 - `top_journal_mechanism_v11_mappo_reward` 已在 frozen dev full_stratified 上超过 `popularity_cache_heuristic` 和全部 learned baselines，但这不是 hidden/future-validation 证据。当前 hidden 已 consumed，v11 不得用现有 hidden 做进一步筛选；promotion 必须新冻结 future-validation split 并按 top-journal review policy 重新审查。
 - v11 的 full-dev 胜出不是所有 window class 全面胜出：机制窗口 SA `82.788` > popularity `82.3425`，active non-mechanism 持平，但 idle/sparse 仍为 SA `77.2175` < popularity `77.3975`。论文或汇报只能说总体 full-dev reward 过线，不能声称 idle/sparse 已彻底优于规则。
 - v11 的 window-context no-RSU local fallback 由 outcome-blind `window_class=idle_or_sparse` gate 触发；它是推理期 regime-aware safety option，不是环境 reward 改动，也不是 learned predictor。若论文要将其作为算法创新，需要把 window class 的可观测来源、非 reward 选择边界和对 baselines 的公平性说明清楚。

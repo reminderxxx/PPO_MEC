@@ -69,6 +69,14 @@ MAIN_RESULT_METRICS = [
     "cache_warm_start_guard_rate",
     "predictive_prefetch_admission_guard_count",
     "predictive_prefetch_admission_guard_rate",
+    "option_gate_enabled_count",
+    "option_gate_enabled_rate",
+    "option_gate_applied_count",
+    "option_gate_applied_rate",
+    "option_gate_popularity_safe_count",
+    "option_gate_mechanism_prepare_count",
+    "option_gate_no_rsu_local_count",
+    "option_gate_context_prior_count",
 ]
 ACTIONMIX_DIAGNOSTIC_METRICS = [
     "service_success_count",
@@ -1564,6 +1572,18 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         "predictive_prefetch_admission_guard_rate": float(
             agent_action_diagnostics.get("predictive_prefetch_admission_guard_rate", 0.0) or 0.0
         ),
+        "option_gate_enabled_count": int(agent_action_diagnostics.get("option_gate_enabled_count", 0) or 0),
+        "option_gate_enabled_rate": float(agent_action_diagnostics.get("option_gate_enabled_rate", 0.0) or 0.0),
+        "option_gate_applied_count": int(agent_action_diagnostics.get("option_gate_applied_count", 0) or 0),
+        "option_gate_applied_rate": float(agent_action_diagnostics.get("option_gate_applied_rate", 0.0) or 0.0),
+        "option_gate_popularity_safe_count": int(
+            agent_action_diagnostics.get("option_gate_popularity_safe_count", 0) or 0
+        ),
+        "option_gate_mechanism_prepare_count": int(
+            agent_action_diagnostics.get("option_gate_mechanism_prepare_count", 0) or 0
+        ),
+        "option_gate_no_rsu_local_count": int(agent_action_diagnostics.get("option_gate_no_rsu_local_count", 0) or 0),
+        "option_gate_context_prior_count": int(agent_action_diagnostics.get("option_gate_context_prior_count", 0) or 0),
         "total_reward": summary["reward_breakdown"]["total"]["sum"],
         "end_to_end_workflow_delay": metrics["end_to_end_workflow_delay"],
         "workflow_continuity_rate": metrics["workflow_continuity_rate"],

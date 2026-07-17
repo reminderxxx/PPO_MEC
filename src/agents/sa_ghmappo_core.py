@@ -35,6 +35,13 @@ from src.encoders.fusion_encoder import (
     "event": {0: "keep", 1: "handoff_prepare"},
 }
 
+OPTION_GATE_LABELS = {
+    0: "accept_mappo",
+    1: "popularity_safe",
+    2: "no_rsu_local",
+    3: "mechanism_prepare",
+}
+
 
 def _resolve_primary_vehicle_from_semantic_state(
     semantic_state: dict[str, Any],
@@ -115,6 +122,8 @@ class 分层策略网络(nn.Module):
         graph_continuity_critic_enabled: bool = False,
         uncertainty_aware_critic_enabled: bool = False,
         event_logit_temperature: float = 1.0,
+        option_gate_enabled: bool = False,
+        option_gate_count: int = 4,
         hidden_dims: tuple[int, int] = (64, 64),
     ) -> None:
         super().__init__()
@@ -124,6 +133,8 @@ class 分层策略网络(nn.Module):
         self.centralized_critic = bool(centralized_critic)
         self.encoder_kind = str(encoder_kind)
         self.event_logit_temperature = max(float(event_logit_temperature), 0.25)
+        self.option_gate_enabled = bool(option_gate_enabled)
+        self.option_gate_count = max(int(option_gate_count), 1)
 
         if self.encoder_kind == "flat":
             self.encoder = FlatSemanticEncoder(hidden_dim=self.hidden_dim)
@@ -156,6 +167,8 @@ class 分层策略网络(nn.Module):
         else:
             self.flat_actor = _多层感知机(self.hidden_dim, 5, hidden_dims=hidden_dims)
             self.flat_critic = _多层感知机(self.hidden_dim, 1, hidden_dims=hidden_dims)
+        if self.option_gate_enabled:
+            self.option_actor = _多层感知机(self.hidden_dim, self.option_gate_count, hidden_dims=hidden_dims)
 
     def forward_single(
         self,
@@ -172,7 +185,7 @@ class 分层策略网络(nn.Module):
             critic_context_key = "centralized_critic_context" if self.centralized_critic else "critic_context"
             critic_context = encoded.get(critic_context_key, encoded["critic_context"])
             value = self.flat_critic(critic_context.unsqueeze(0)).squeeze(0).squeeze(-1)
-            return {
+            output = {
                 "encoded": encoded,
                 "flat_logits": flat_logits,
                 "value": value,
@@ -180,6 +193,9 @@ class 分层策略网络(nn.Module):
                 "critic_context_key": critic_context_key,
                 "head_values": {},
             }
+            if self.option_gate_enabled:
+                output["option_logits"] = self.option_actor(encoded["shared_embedding"].unsqueeze(0)).squeeze(0)
+            return output
 
         slow_logits = self.slow_actor(encoded["slow_context"].unsqueeze(0)).squeeze(0)
         slow_probs = torch.softmax(slow_logits, dim=-1)
@@ -215,7 +231,7 @@ class 分层策略网络(nn.Module):
             }
             value = torch.stack(list(head_values.values())).mean()
 
-        return {
+        output = {
             "encoded": encoded,
             "slow_logits": slow_logits,
             "fast_logits": fast_logits,
@@ -226,6 +242,9 @@ class 分层策略网络(nn.Module):
             "critic_mode": "centralized" if self.centralized_critic else "independent",
             "critic_context_key": critic_context_key,
         }
+        if self.option_gate_enabled:
+            output["option_logits"] = self.option_actor(encoded["shared_embedding"].unsqueeze(0)).squeeze(0)
+        return output
 
 
 def 聚合层级动作(
@@ -353,6 +372,18 @@ class 分层PPO基类(BaseAgent):
         idle_popularity_prefetch_threshold: int = 2,
         idle_popularity_no_rsu_local_fallback_enabled: bool = False,
         idle_popularity_no_rsu_local_requires_low_context: bool = True,
+        option_gate_enabled: bool = False,
+        option_gate_count: int = 4,
+        option_gate_loss_coef: float = 0.35,
+        option_gate_entropy_coef: float = 0.001,
+        option_gate_prior_coef: float = 0.0,
+        option_gate_prior_warmup_updates: int = 0,
+        option_gate_prior_decay: float = 0.85,
+        option_gate_prior_logit_bias: float = 0.0,
+        option_gate_log_prob_weight: float = 1.0,
+        option_gate_context_prior_enabled: bool = False,
+        option_gate_deterministic_prior_margin: float = 0.0,
+        option_gate_idle_prior_enabled: bool = False,
         auxiliary_slow_weight: float = 1.0,
         auxiliary_fast_weight: float = 0.5,
         auxiliary_event_weight: float = 1.0,
@@ -543,6 +574,18 @@ class 分层PPO基类(BaseAgent):
             idle_popularity_no_rsu_local_requires_low_context
         )
         self._idle_popularity_adapter_counts: dict[str, int] = {}
+        self._option_gate_enabled = bool(option_gate_enabled)
+        self._option_gate_count = max(int(option_gate_count), 1)
+        self._option_gate_loss_coef = max(float(option_gate_loss_coef), 0.0)
+        self._option_gate_entropy_coef = max(float(option_gate_entropy_coef), 0.0)
+        self._option_gate_prior_coef = max(float(option_gate_prior_coef), 0.0)
+        self._option_gate_prior_warmup_updates = max(int(option_gate_prior_warmup_updates), 0)
+        self._option_gate_prior_decay = max(float(option_gate_prior_decay), 0.0)
+        self._option_gate_prior_logit_bias = max(float(option_gate_prior_logit_bias), 0.0)
+        self._option_gate_log_prob_weight = max(float(option_gate_log_prob_weight), 0.0)
+        self._option_gate_context_prior_enabled = bool(option_gate_context_prior_enabled)
+        self._option_gate_deterministic_prior_margin = max(float(option_gate_deterministic_prior_margin), 0.0)
+        self._option_gate_idle_prior_enabled = bool(option_gate_idle_prior_enabled)
         self._auxiliary_slow_weight = float(auxiliary_slow_weight)
         self._auxiliary_fast_weight = float(auxiliary_fast_weight)
         self._auxiliary_event_weight = float(auxiliary_event_weight)
@@ -579,6 +622,8 @@ class 分层PPO基类(BaseAgent):
             graph_continuity_critic_enabled=self._graph_continuity_critic_enabled,
             uncertainty_aware_critic_enabled=self._uncertainty_aware_critic_enabled,
             event_logit_temperature=self._event_logit_temperature,
+            option_gate_enabled=self._option_gate_enabled,
+            option_gate_count=self._option_gate_count,
             hidden_dims=self._hidden_dims,
         ).to(self._device)
         self._optimizer = torch.optim.Adam(self._network.parameters(), lr=self._learning_rate)
@@ -587,6 +632,7 @@ class 分层PPO基类(BaseAgent):
         del observation
         semantic_state = self._extract_semantic_state(info)
         action_mask = self._extract_action_mask(info)
+        run_metadata = dict((info or {}).get("run_metadata", {}) or {})
         deterministic = bool(self._deterministic_action or (info or {}).get("deterministic_policy", False))
         with torch.no_grad():
             policy_output = self._forward_policy(semantic_state)
@@ -680,6 +726,25 @@ class 分层PPO基类(BaseAgent):
                     selected_actions=selected_actions,
                     action_mask=action_mask,
                 )
+            option_gate_info = self._maybe_apply_option_gate(
+                semantic_state=semantic_state,
+                action_mask=action_mask,
+                policy_output=policy_output,
+                base_env_action=env_action,
+                deterministic=deterministic,
+                run_metadata=run_metadata,
+            )
+            option_gate_info.pop("_option_log_prob_tensor", None)
+            option_entropy_tensor = option_gate_info.pop("_option_entropy_tensor", None)
+            if option_gate_info.get("applied", False):
+                env_action = int(option_gate_info["option_env_action"])
+                selected_actions = self._head_targets_for_env_action(env_action)
+                aggregation_reason = f"option_gate_{option_gate_info.get('option_label', 'unknown')}"
+                head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                    policy_output=policy_output,
+                    selected_actions=selected_actions,
+                    action_mask=action_mask,
+                )
             if guard_info:
                 guard_info["guarded_action"] = int(env_action)
             guard_action_delta = bool(
@@ -692,6 +757,8 @@ class 分层PPO基类(BaseAgent):
                 head_entropies=head_entropies,
                 head_credit_weights=head_credit_weights,
             )
+            if option_entropy_tensor is not None:
+                entropy = 0.5 * (entropy + option_entropy_tensor)
             value = float(policy_output["value"].item())
             prediction_gate = float(policy_output["encoded"].get("prediction_gate", torch.tensor([1.0], device=self._device)).flatten()[0].item())
             temporal_urgency = float(policy_output["encoded"].get("temporal_urgency", torch.tensor([0.0], device=self._device)).flatten()[0].item())
@@ -795,6 +862,7 @@ class 分层PPO基类(BaseAgent):
             "predictive_prefetch_admission_guard": prefetch_admission_guard_info,
             "backhaul_guard": backhaul_guard_info,
             "idle_popularity_fallback": idle_popularity_fallback_info,
+            "option_gate": option_gate_info,
             "deterministic_event_prepare_overridden": bool(smoothing_info.get("override_triggered", False)),
             "deterministic_event_prepare_smoothed": bool(smoothing_info.get("borderline_triggered", False)),
             "guard_triggered": bool(guard_info.get("guard_triggered", False)),
@@ -922,7 +990,11 @@ class 分层PPO基类(BaseAgent):
         heuristic_imitation_loss_total = 0.0
         mechanism_aux_loss_total = 0.0
         mechanism_entropy_bonus_total = 0.0
+        option_gate_loss_total = 0.0
+        option_gate_entropy_total = 0.0
+        option_gate_prior_loss_total = 0.0
         effective_imitation_coef = self._effective_heuristic_imitation_coef()
+        effective_option_prior_coef = self._effective_option_gate_prior_coef()
         mechanism_guidance_rollout_stats = self._summarize_mechanism_guidance_annotations(
             mechanism_guidance_annotations,
             rollout,
@@ -1003,6 +1075,11 @@ class 分层PPO基类(BaseAgent):
                     batch_outputs=batch_outputs,
                     batch_annotations=batch_annotations,
                 )
+                option_gate_loss, option_gate_entropy, option_gate_prior_loss = self._compute_option_gate_loss(
+                    batch_outputs=batch_outputs,
+                    batch_rows=batch_rows,
+                    batch_advantage=advantage_tensor[batch_indices],
+                )
                 total_loss = (
                     actor_loss
                     + self._value_coef * value_loss
@@ -1011,6 +1088,9 @@ class 分层PPO基类(BaseAgent):
                     + effective_imitation_coef * heuristic_imitation_loss
                     + effective_mechanism_aux_coef * mechanism_aux_loss
                     - effective_mechanism_entropy_coef * mechanism_entropy_bonus
+                    + self._option_gate_loss_coef * self._option_gate_log_prob_weight * option_gate_loss
+                    + effective_option_prior_coef * option_gate_prior_loss
+                    - self._option_gate_entropy_coef * option_gate_entropy
                 )
 
                 self._optimizer.zero_grad()
@@ -1031,6 +1111,9 @@ class 分层PPO基类(BaseAgent):
                 heuristic_imitation_loss_total += float(heuristic_imitation_loss.item())
                 mechanism_aux_loss_total += float(mechanism_aux_loss.item())
                 mechanism_entropy_bonus_total += float(mechanism_entropy_bonus.item())
+                option_gate_loss_total += float(option_gate_loss.item())
+                option_gate_entropy_total += float(option_gate_entropy.item())
+                option_gate_prior_loss_total += float(option_gate_prior_loss.item())
                 update_steps += 1
                 epoch_kl_values.append(float(approx_kl.item()))
             executed_epochs += 1
@@ -1077,6 +1160,14 @@ class 分层PPO基类(BaseAgent):
             "mechanism_entropy_coef": round(self._mechanism_entropy_coef, 6),
             "effective_mechanism_entropy_coef": round(effective_mechanism_entropy_coef, 6),
             "mechanism_head_entropy": round(mechanism_entropy_bonus_total / denominator, 6),
+            "option_gate_enabled": self._option_gate_enabled,
+            "option_gate_loss_coef": round(self._option_gate_loss_coef, 6),
+            "option_gate_loss": round(option_gate_loss_total / denominator, 6),
+            "option_gate_entropy_coef": round(self._option_gate_entropy_coef, 6),
+            "option_gate_entropy": round(option_gate_entropy_total / denominator, 6),
+            "option_gate_prior_coef": round(self._option_gate_prior_coef, 6),
+            "effective_option_gate_prior_coef": round(effective_option_prior_coef, 6),
+            "option_gate_prior_loss": round(option_gate_prior_loss_total / denominator, 6),
             "mechanism_retention_active": bool(retention_active),
             "mechanism_retention_start_update": int(self._mechanism_retention_start_update),
             "mechanism_aux_coef_floor_after_update": round(self._mechanism_aux_coef_floor_after_update, 6),
@@ -1159,8 +1250,25 @@ class 分层PPO基类(BaseAgent):
 
     def load(self, path: str) -> None:
         checkpoint = torch.load(Path(path), map_location=self._device)
-        self._network.load_state_dict(checkpoint["network_state_dict"])
-        if checkpoint.get("optimizer_state_dict") is not None:
+        network_state = checkpoint["network_state_dict"]
+        current_state = self._network.state_dict()
+        missing_keys = set(current_state) - set(network_state)
+        unexpected_keys = set(network_state) - set(current_state)
+        option_head_warm_start = bool(
+            self._option_gate_enabled
+            and missing_keys
+            and not unexpected_keys
+            and all(str(key).startswith("option_actor.") for key in missing_keys)
+        )
+        if option_head_warm_start:
+            merged_state = dict(current_state)
+            for key, value in network_state.items():
+                if key in merged_state and tuple(merged_state[key].shape) == tuple(value.shape):
+                    merged_state[key] = value
+            self._network.load_state_dict(merged_state, strict=True)
+        else:
+            self._network.load_state_dict(network_state)
+        if checkpoint.get("optimizer_state_dict") is not None and not option_head_warm_start:
             self._optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         self._update_count = int(checkpoint.get("update_count", 0))
 
@@ -1409,6 +1517,246 @@ class 分层PPO基类(BaseAgent):
             "fallback_action": int(fallback_action),
             "candidate_reason": fallback_reason,
             **fallback_extra,
+        }
+
+    def _mechanism_prepare_candidate_action(
+        self,
+        semantic_state: dict[str, Any],
+        action_mask: list[bool] | None,
+        base_env_action: int,
+    ) -> tuple[int, str, bool]:
+        vehicle = self._primary_vehicle_for_popularity(semantic_state)
+        vehicle_id = str(vehicle.get("vehicle_id", "")) if vehicle else None
+        current_rsu_id = vehicle.get("associated_rsu_id")
+        predicted_next_rsu_id, predicted_handoff_target = self._prediction_targets_for_popularity(
+            semantic_state,
+            vehicle_id,
+        )
+        current_node = semantic_state.get("current_workflow_node") or {}
+        required_adapter = current_node.get("required_adapter")
+        if predicted_handoff_target and predicted_handoff_target != current_rsu_id:
+            return self._select_allowed_env_action([4, 1, 3], action_mask), "handoff_target_prepare", True
+        if (
+            predicted_next_rsu_id
+            and predicted_next_rsu_id != current_rsu_id
+            and required_adapter
+            and not self._adapter_cached_for_popularity(semantic_state, predicted_next_rsu_id, required_adapter)
+        ):
+            return self._select_allowed_env_action([1, 4, 3], action_mask), "next_rsu_prefetch_prepare", True
+        return int(base_env_action), "no_mechanism_candidate", False
+
+    def _build_option_gate_candidates(
+        self,
+        *,
+        semantic_state: dict[str, Any],
+        action_mask: list[bool] | None,
+        base_env_action: int,
+        run_metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        base_action = self._select_allowed_env_action([int(base_env_action), 3, 2, 0], action_mask)
+        popularity_action, popularity_reason, popularity_extra = self._idle_popularity_candidate_action(
+            semantic_state,
+            action_mask,
+        )
+        vehicle = self._primary_vehicle_for_popularity(semantic_state)
+        current_rsu_id = vehicle.get("associated_rsu_id") if vehicle else None
+        no_rsu_available = bool(current_rsu_id is None and self._is_env_action_valid(2, action_mask))
+        no_rsu_action = 2 if no_rsu_available else base_action
+        mechanism_action, mechanism_reason, mechanism_available = self._mechanism_prepare_candidate_action(
+            semantic_state,
+            action_mask,
+            base_action,
+        )
+        window_class = str((run_metadata or {}).get("window_class", "unknown"))
+        if self._option_gate_context_prior_enabled and window_class in {"idle_or_sparse", "active_non_mechanism"}:
+            mechanism_action = int(base_action)
+            mechanism_reason = f"context_suppressed_for_{window_class}"
+            mechanism_available = False
+        option_actions = {
+            0: int(base_action),
+            1: int(popularity_action),
+            2: int(no_rsu_action),
+            3: int(mechanism_action),
+        }
+        option_mask = [True, True, bool(no_rsu_available), bool(mechanism_available)]
+        if not self._is_env_action_valid(popularity_action, action_mask):
+            option_mask[1] = False
+        if not self._is_env_action_valid(mechanism_action, action_mask):
+            option_mask[3] = False
+        if len(option_mask) < self._option_gate_count:
+            option_mask.extend(False for _ in range(self._option_gate_count - len(option_mask)))
+        option_mask = option_mask[: self._option_gate_count]
+        if not any(option_mask):
+            option_mask[0] = True
+        prior_target = self._option_gate_prior_target(
+            option_actions=option_actions,
+            option_mask=option_mask,
+            popularity_reason=popularity_reason,
+            popularity_extra=popularity_extra,
+            no_rsu_available=no_rsu_available,
+            mechanism_available=mechanism_available,
+            run_metadata=run_metadata,
+        )
+        return {
+            "option_actions": option_actions,
+            "option_mask": option_mask,
+            "prior_target": int(prior_target),
+            "popularity_reason": popularity_reason,
+            "mechanism_reason": mechanism_reason,
+            "popularity_extra": popularity_extra,
+            "no_rsu_available": bool(no_rsu_available),
+            "mechanism_available": bool(mechanism_available),
+            "window_class": window_class,
+        }
+
+    def _option_gate_prior_target(
+        self,
+        *,
+        option_actions: dict[int, int],
+        option_mask: list[bool],
+        popularity_reason: str,
+        popularity_extra: dict[str, Any],
+        no_rsu_available: bool,
+        mechanism_available: bool,
+        run_metadata: dict[str, Any] | None = None,
+    ) -> int:
+        window_class = str((run_metadata or {}).get("window_class", "unknown"))
+        if (
+            self._option_gate_idle_prior_enabled
+            and window_class == "idle_or_sparse"
+            and len(option_mask) > 1
+            and option_mask[1]
+            and int(option_actions.get(1, option_actions.get(0, 3))) != int(option_actions.get(0, 3))
+        ):
+            return 1
+        if mechanism_available and len(option_mask) > 3 and option_mask[3]:
+            return 3
+        if (
+            no_rsu_available
+            and len(option_mask) > 2
+            and option_mask[2]
+            and bool(popularity_extra.get("low_mechanism_no_rsu_context", False))
+        ):
+            return 2
+        if (
+            len(option_mask) > 1
+            and option_mask[1]
+            and int(option_actions.get(1, option_actions.get(0, 3))) != int(option_actions.get(0, 3))
+            and popularity_reason
+            in {
+                "popular_adapter_reactive_cache_fill",
+                "popular_adapter_predictive_prefetch",
+                "predicted_handoff_migration_prepare",
+                "popularity_steady_offload",
+            }
+        ):
+            return 1
+        return 0
+
+    def _masked_option_logits(
+        self,
+        logits: torch.Tensor,
+        option_mask: list[bool] | None,
+        prior_target: int | None = None,
+    ) -> torch.Tensor:
+        adjusted = logits
+        if self._option_gate_prior_logit_bias > 0.0 and prior_target is not None:
+            adjusted = adjusted.clone()
+            if 0 <= int(prior_target) < adjusted.shape[-1]:
+                adjusted[int(prior_target)] = adjusted[int(prior_target)] + self._option_gate_prior_logit_bias
+        if option_mask is None:
+            return adjusted
+        mask_tensor = torch.as_tensor(list(option_mask), dtype=torch.bool, device=adjusted.device)
+        if mask_tensor.numel() != adjusted.shape[-1] or not bool(mask_tensor.any().item()):
+            return adjusted
+        return adjusted.masked_fill(~mask_tensor, -1.0e9)
+
+    def _maybe_apply_option_gate(
+        self,
+        *,
+        semantic_state: dict[str, Any],
+        action_mask: list[bool] | None,
+        policy_output: dict[str, Any],
+        base_env_action: int,
+        deterministic: bool,
+        run_metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        if not self._option_gate_enabled or "option_logits" not in policy_output:
+            return {"enabled": False, "applied": False}
+        window_class = str((run_metadata or {}).get("window_class", "unknown"))
+        if self._option_gate_context_prior_enabled and window_class == "mechanism_activating":
+            return {
+                "enabled": False,
+                "applied": False,
+                "reason": "mechanism_window_preserve_mappo",
+                "base_env_action": int(base_env_action),
+                "window_class": window_class,
+            }
+        candidate_info = self._build_option_gate_candidates(
+            semantic_state=semantic_state,
+            action_mask=action_mask,
+            base_env_action=base_env_action,
+            run_metadata=run_metadata,
+        )
+        prior_target = int(candidate_info["prior_target"])
+        option_logits = self._masked_option_logits(
+            policy_output["option_logits"],
+            list(candidate_info["option_mask"]),
+            prior_target=prior_target,
+        )
+        distribution = Categorical(logits=option_logits)
+        option_probs = torch.softmax(option_logits, dim=-1)
+        top_tensor = torch.argmax(option_logits, dim=-1)
+        top_action = int(top_tensor.item())
+        selection_reason = "policy_argmax" if deterministic else "policy_sample"
+        if deterministic:
+            option_tensor = top_tensor
+            if (
+                self._option_gate_context_prior_enabled
+                and 0 <= prior_target < int(option_logits.shape[-1])
+                and prior_target < len(candidate_info["option_mask"])
+                and bool(candidate_info["option_mask"][prior_target])
+            ):
+                top_prob = float(option_probs[top_action].item())
+                prior_prob = float(option_probs[prior_target].item())
+                if top_action != prior_target and top_prob - prior_prob < self._option_gate_deterministic_prior_margin:
+                    option_tensor = torch.tensor(prior_target, dtype=torch.long, device=option_logits.device)
+                    selection_reason = "context_prior_margin"
+        else:
+            option_tensor = distribution.sample()
+        option_action = int(option_tensor.item())
+        option_env_action = int(candidate_info["option_actions"].get(option_action, int(base_env_action)))
+        option_label = OPTION_GATE_LABELS.get(option_action, f"option_{option_action}")
+        return {
+            "enabled": True,
+            "applied": bool(option_env_action != int(base_env_action)),
+            "option_action": int(option_action),
+            "option_label": option_label,
+            "option_env_action": option_env_action,
+            "base_env_action": int(base_env_action),
+            "option_mask": list(candidate_info["option_mask"]),
+            "option_actions": {str(key): int(value) for key, value in candidate_info["option_actions"].items()},
+            "prior_target": prior_target,
+            "prior_label": OPTION_GATE_LABELS.get(prior_target, f"option_{prior_target}"),
+            "selection_reason": selection_reason,
+            "top_option_action": top_action,
+            "top_option_label": OPTION_GATE_LABELS.get(top_action, f"option_{top_action}"),
+            "popularity_reason": str(candidate_info["popularity_reason"]),
+            "mechanism_reason": str(candidate_info["mechanism_reason"]),
+            "no_rsu_available": bool(candidate_info["no_rsu_available"]),
+            "mechanism_available": bool(candidate_info["mechanism_available"]),
+            "window_class": str(candidate_info.get("window_class", "unknown")),
+            "option_probs": [round(float(item), 6) for item in option_probs.tolist()],
+            "top_option_prob": round(float(option_probs[top_action].item()), 6),
+            "prior_option_prob": round(
+                float(option_probs[prior_target].item()) if 0 <= prior_target < int(option_probs.shape[-1]) else 0.0,
+                6,
+            ),
+            "base_option_prob": round(float(option_probs[0].item()) if int(option_probs.shape[-1]) > 0 else 0.0, 6),
+            "option_log_prob": round(float(distribution.log_prob(option_tensor).item()), 6),
+            "option_entropy": round(float(distribution.entropy().item()), 6),
+            "_option_log_prob_tensor": distribution.log_prob(option_tensor),
+            "_option_entropy_tensor": distribution.entropy(),
         }
 
     def _is_env_action_valid(self, env_action: int, action_mask: list[bool] | None) -> bool:
@@ -2266,6 +2614,70 @@ class 分层PPO基类(BaseAgent):
         assert surrogate_sum is not None
         assert weight_sum is not None
         return -(surrogate_sum / torch.clamp(weight_sum, min=1e-6)).mean()
+
+    def _effective_option_gate_prior_coef(self) -> float:
+        if self._option_gate_prior_coef <= 0.0:
+            return 0.0
+        if self._update_count < self._option_gate_prior_warmup_updates:
+            return self._option_gate_prior_coef
+        decay_steps = self._update_count - self._option_gate_prior_warmup_updates + 1
+        return float(self._option_gate_prior_coef * (self._option_gate_prior_decay ** decay_steps))
+
+    def _compute_option_gate_loss(
+        self,
+        *,
+        batch_outputs: list[dict[str, Any]],
+        batch_rows: list[dict[str, Any]],
+        batch_advantage: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        zero = torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        if not self._option_gate_enabled:
+            return zero, zero, zero
+        ppo_terms: list[torch.Tensor] = []
+        entropy_terms: list[torch.Tensor] = []
+        prior_terms: list[torch.Tensor] = []
+        for row_index, (policy_output, row) in enumerate(zip(batch_outputs, batch_rows)):
+            if "option_logits" not in policy_output:
+                continue
+            option_info = dict(row.get("action_info", {}).get("option_gate", {}))
+            if not bool(option_info.get("enabled", False)):
+                continue
+            option_action = int(option_info.get("option_action", 0) or 0)
+            if option_action < 0 or option_action >= int(policy_output["option_logits"].shape[-1]):
+                continue
+            option_mask = list(option_info.get("option_mask", []))
+            prior_target = int(option_info.get("prior_target", 0) or 0)
+            logits = self._masked_option_logits(
+                policy_output["option_logits"],
+                option_mask if option_mask else None,
+                prior_target=prior_target,
+            )
+            distribution = Categorical(logits=logits)
+            action_tensor = torch.tensor(option_action, dtype=torch.long, device=self._device)
+            old_log_prob = torch.tensor(
+                float(option_info.get("option_log_prob", 0.0) or 0.0),
+                dtype=torch.float32,
+                device=self._device,
+            )
+            new_log_prob = distribution.log_prob(action_tensor)
+            ratio = torch.exp(new_log_prob - old_log_prob)
+            option_advantage = batch_advantage[row_index]
+            surrogate_1 = ratio * option_advantage
+            surrogate_2 = torch.clamp(
+                ratio,
+                1.0 - self._clip_ratio,
+                1.0 + self._clip_ratio,
+            ) * option_advantage
+            ppo_terms.append(-torch.min(surrogate_1, surrogate_2))
+            entropy_terms.append(distribution.entropy())
+            if 0 <= prior_target < int(logits.shape[-1]):
+                if not option_mask or bool(option_mask[prior_target]):
+                    target_tensor = torch.tensor([prior_target], dtype=torch.long, device=self._device)
+                    prior_terms.append(nn.functional.cross_entropy(logits.unsqueeze(0), target_tensor))
+        ppo_loss = torch.stack(ppo_terms).mean() if ppo_terms else zero
+        entropy = torch.stack(entropy_terms).mean() if entropy_terms else zero
+        prior_loss = torch.stack(prior_terms).mean() if prior_terms else zero
+        return ppo_loss, entropy, prior_loss
 
     def _combine_head_statistics(
         self,
@@ -3428,6 +3840,18 @@ class 分层PPO基类(BaseAgent):
             "idle_popularity_prefetch_threshold": self._idle_popularity_prefetch_threshold,
             "idle_popularity_no_rsu_local_fallback_enabled": self._idle_popularity_no_rsu_local_fallback_enabled,
             "idle_popularity_no_rsu_local_requires_low_context": self._idle_popularity_no_rsu_local_requires_low_context,
+            "option_gate_enabled": self._option_gate_enabled,
+            "option_gate_count": self._option_gate_count,
+            "option_gate_loss_coef": self._option_gate_loss_coef,
+            "option_gate_entropy_coef": self._option_gate_entropy_coef,
+            "option_gate_prior_coef": self._option_gate_prior_coef,
+            "option_gate_prior_warmup_updates": self._option_gate_prior_warmup_updates,
+            "option_gate_prior_decay": self._option_gate_prior_decay,
+            "option_gate_prior_logit_bias": self._option_gate_prior_logit_bias,
+            "option_gate_log_prob_weight": self._option_gate_log_prob_weight,
+            "option_gate_context_prior_enabled": self._option_gate_context_prior_enabled,
+            "option_gate_deterministic_prior_margin": self._option_gate_deterministic_prior_margin,
+            "option_gate_idle_prior_enabled": self._option_gate_idle_prior_enabled,
             "auxiliary_slow_weight": self._auxiliary_slow_weight,
             "auxiliary_fast_weight": self._auxiliary_fast_weight,
             "auxiliary_event_weight": self._auxiliary_event_weight,

@@ -398,6 +398,18 @@ PROFILE_DEFAULTS = {
         "max_steps": 16,
         "train_window_count": 20,
     },
+    "top_journal_mechanism_v12_learned_option": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 4.0e-5,
+        "clip_ratio": 0.075,
+        "entropy_coef": 0.0012,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.32,
+        "max_steps": 16,
+        "train_window_count": 20,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -1504,6 +1516,34 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "idle_popularity_prefetch_threshold": 2,
                 "idle_popularity_no_rsu_local_fallback_enabled": False,
                 "idle_popularity_no_rsu_local_requires_low_context": True,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v12_learned_option":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v11_mappo_reward")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.06,
+                "heuristic_imitation_warmup_updates": 4,
+                "heuristic_imitation_decay": 0.76,
+                "option_gate_enabled": True,
+                "option_gate_count": 4,
+                "option_gate_loss_coef": 0.28,
+                "option_gate_entropy_coef": 0.0012,
+                "option_gate_prior_coef": 0.045,
+                "option_gate_prior_warmup_updates": 5,
+                "option_gate_prior_decay": 0.78,
+                "option_gate_prior_logit_bias": 0.6,
+                "option_gate_log_prob_weight": 0.35,
+                "option_gate_context_prior_enabled": True,
+                "option_gate_deterministic_prior_margin": 0.18,
+                "option_gate_idle_prior_enabled": True,
+                "idle_popularity_fallback_enabled": True,
+                "idle_popularity_fallback_only_vehicle_fallback": True,
+                "idle_popularity_no_rsu_local_fallback_enabled": False,
+                "idle_popularity_no_rsu_local_requires_low_context": True,
+                "train_epochs": 7,
+                "target_kl": 0.012,
             }
         )
         return kwargs
@@ -3847,7 +3887,11 @@ def maybe_apply_anti_collapse_controls(
 ) -> tuple[float, dict[str, Any] | None]:
     current_score = compute_mechanism_score(current_eval_metrics)
     updated_best = max(float(best_mechanism_score_so_far), current_score)
-    stability_profiles = {"formal_main_stable", "top_journal_mechanism_v11_mappo_reward"}
+    stability_profiles = {
+        "formal_main_stable",
+        "top_journal_mechanism_v11_mappo_reward",
+        "top_journal_mechanism_v12_learned_option",
+    }
     if args.agent_name != "sa_ghmappo" or args.profile not in stability_profiles:
         return updated_best, None
     if not hasattr(agent, "apply_stability_controls"):

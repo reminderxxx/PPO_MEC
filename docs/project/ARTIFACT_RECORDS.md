@@ -1,5 +1,19 @@
 # Artifact Records
 
+## 2026-07-17 v12 learned MAPPO option gate full-dev
+
+状态：`[dev-full-success]` `[candidate]` `[not-hidden]`
+
+路径：
+
+- `artifacts/experiments/top_journal_mappo_reward_v12_learned_option_20260717/seed_checkpoint_manifest.json`
+- `artifacts/experiments/top_journal_mappo_reward_v12_learned_option_20260717/main_results_full_stratified_mech_preserve/main_results_full_stratified_20260717_115754_212344/aggregate_summary.json`
+- `artifacts/experiments/top_journal_mappo_reward_v12_learned_option_20260717/main_results_full_stratified_mech_preserve/main_results_full_stratified_20260717_115754_212344/sa_advantage_diagnosis.json`
+
+确认结果：v12 使用 5 seeds、20 frozen dev windows、2 workflows/window、`full_stratified`、`primary_vehicle_selection=handoff_pressure`。SA-GHMAPPO total reward `79.5934`，高于 `popularity_cache_heuristic=79.46875`、`ppo=77.18775`、`mappo=72.6328` 和全部其他对照；`sa_advantage_diagnosis.blockers=[]`、`minimum_success_reached=true`。分层结果为 mechanism window SA `82.758` > popularity `82.3425`，active non-mechanism 三者 `83.275` 持平，idle/sparse SA 与 popularity 均为 `77.3975`。
+
+结论边界：这是 frozen dev evidence，不是 formal/hidden/future-validation 或 paper-ready 证据。hidden holdout 已 consumed 且未用于 v12 筛选。v12 不能替换 v8 canonical；promotion 需要新冻结 future-validation split、统计审查、baseline fairness 审查和 readiness audit。PPO 在 handoff failure/backhaul 上仍更优，不能据此声明 v12 已全面解决系统 trade-off。
+
 ## 2026-06-21 strict-full v8 frozen candidate, formal and hidden
 
 状态：`[E2-artifact-audited]` `[strict-full-blocker-resolved]` `[major-revision]`

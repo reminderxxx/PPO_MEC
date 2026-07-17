@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-17: v12 采用 learned contextual MAPPO option gate，而不是继续扩大 hard rule
+
+决策：新增 `top_journal_mechanism_v12_learned_option`，在 v11 MAPPO-core reward-first checkpoint 上 warm-start，并在 SA-GHMAPPO policy 内加入四类 option head：`accept_mappo`、`popularity_safe`、`no_rsu_local`、`mechanism_prepare`。训练使用 PPO-style option loss、entropy 和随 update 衰减的 contextual prior；推理时机制窗口 preserve MAPPO 主策略，idle/sparse 才允许 learned popularity-safe option 接管。
+
+原因：v11 full-dev 虽已超过 popularity，但 margin 只有 `+0.02565`，弱点集中在 idle/sparse；直接扩大规则 fallback 会牺牲机制窗口，而纯 learned option probe 会在低机制窗口和机制窗口之间误分配 credit。v12 把 MAPPO 的 controller-level credit assignment 留在主策略中，再让 option head 学习什么时候接受 MAPPO、什么时候借用规则安全动作，从而解决“MAPPO 与 PPO 拉不开、主算法偶尔低于规则”的一阶原因。
+
+影响：v12 不修改 `VecWorkflowCoreEnv` reward、不修改 `semantic_discrete_5` action contract、不改变 baseline contract，也不读取 hidden。full-dev 证据显示 SA total reward `79.5934` 高于 `popularity_cache_heuristic=79.46875`、`ppo=77.18775`、`mappo=72.6328` 和全部其他对照；但这是 dev evidence，不能替代 v8 canonical 或现有 hidden/future-validation 审查。若要晋级，需要新冻结 future-validation split，并继续报告 PPO 在 failure/backhaul 上仍更优的 trade-off。
+
 ## 2026-07-16: v11 采用 MAPPO-core reward-first + idle/sparse window-context option gate
 
 决策：新增 `top_journal_mechanism_v11_mappo_reward`，以 v8 strict-full scaffold 保留机制稳定性，同时迁入 MAPPO controller-level head-credit、entropy floors/scales 和 event advantage blend；checkpoint selection 使用 reward-first priority。推理期不全局替换 MAPPO 决策，只在 v11 checkpoint 且 `window_class=idle_or_sparse` 时打开 no-RSU local fallback，并在机制窗口保持 MAPPO 主策略和 vehicle-only fallback。

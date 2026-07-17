@@ -2,6 +2,15 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-07-17: v12 learned MAPPO option gate full-dev 全量超过全部对照
+
+- 新增 `top_journal_mechanism_v12_learned_option` profile 与 `configs/experiment/top_journal_mechanism_v12_learned_option.yaml`。v12 以 v11 MAPPO-core reward-first checkpoint 为 warm-start，新增四类可学习 option：`accept_mappo`、`popularity_safe`、`no_rsu_local`、`mechanism_prepare`，并把 `window_class` 作为 outcome-blind contextual prior 传入 policy，而不是在 evaluator 里继续使用 v11 hard override。
+- first-order diagnosis：v11 已在机制窗口胜出，但 idle/sparse 仍略低于 popularity，导致 overall margin 只有 `+0.02565`；纯 learned option 与未保护机制窗口的 v12 probe 会把机制/本地 fallback 用到不合适 regime，seed7 dev 分别停在 `77.880` 或 `79.348`，仍低于 popularity。MAPPO 与 PPO 差距不大主要来自 controller credit 已改善但缺少 regime-aware option selection；PPO 在低机制窗口能保持 continuity，MAPPO-core 的机制收益没有被稳定保留到总 reward。
+- 最终改进：在 `sa_ghmappo_core.py` 中加入 option actor、PPO-style option loss、entropy、decayed contextual prior 与 v11->v12 partial checkpoint load；机制窗口直接 preserve MAPPO 主策略，idle/sparse 只允许 learned `popularity_safe` option 接管低收益 vehicle/local 行为。`marl_on_policy_trainer.py` 与 `main_results_support.py` 同步输出 option gate 诊断字段。
+- full-dev 5-seed / 20-window / 2-workflow / full_stratified benchmark 已完成：`artifacts/experiments/top_journal_mappo_reward_v12_learned_option_20260717/main_results_full_stratified_mech_preserve/main_results_full_stratified_20260717_115754_212344/aggregate_summary.json`。主方法 total reward `79.5934`，高于 `popularity_cache_heuristic=79.46875`、`ppo=77.18775`、`mappo=72.6328` 及全部其他对照；对 popularity 的 reward margin 为 `+0.12465`，对 PPO 为 `+2.40565`，对 MAPPO 为 `+6.9606`；`sa_advantage_diagnosis.blockers=[]`、`minimum_success_reached=true`。
+- 分层事实：mechanism window SA `82.758` > popularity `82.3425`；active non-mechanism SA/popularity/PPO 均为 `83.275`；idle/sparse SA 与 popularity 均为 `77.3975`，高于 PPO `74.384333` 与 MAPPO `69.984`。v12 的总收益来自“机制窗口保留 MAPPO 优势 + idle/sparse 不再亏给规则”，不是每个系统指标都优于 PPO 或 heuristic。
+- 结论边界：这是 frozen dev evidence；hidden holdout 已 consumed 且未用于本轮筛选或调参。v12 不能替换 v8 canonical，也不能称 paper-ready；promotion 需要新冻结 future-validation split、统计审查和 readiness audit。PPO 仍在 handoff failure/backhaul 上更优，不能声称 v12 已解决所有 system trade-off。
+
 ## 2026-07-16: v11 MAPPO reward-first dev full benchmark 超过 popularity heuristic
 
 - 新增 `top_journal_mechanism_v11_mappo_reward` profile 与 `configs/experiment/top_journal_mechanism_v11_mappo_reward.yaml`。v11 以 v8 strict-full scaffold 为底座，迁入 MAPPO 的 `aggregation_reason_weighted_controller_ppo_v3`、slow/fast/event policy credit floors、entropy floors/scales 与 `event_advantage_blend=0.88`，并把 checkpoint priority 改为 `best_by_reward_path` 优先。

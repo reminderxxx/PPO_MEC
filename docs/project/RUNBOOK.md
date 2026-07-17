@@ -93,6 +93,24 @@ v11 以 v8 strict-full mechanism scaffold 为稳定底座，迁入 MAPPO control
 
 当前 full-dev evidence：`artifacts/experiments/top_journal_mappo_reward_full_dev_v11_20260716/main_results_full_stratified_window_gate_full/main_results_full_stratified_20260716_181112_383674/aggregate_summary.json`。主方法 total reward `79.4944`，高于 `popularity_cache_heuristic=79.46875` 和所有 learned baselines；`sa_advantage_diagnosis.blockers=[]`。该结果只能作为 dev-stage evidence，promotion 仍需要新冻结 future-validation 或重新审查，不能使用已 consumed hidden。
 
+### v12 learned MAPPO option gate dev 候选
+
+v12 在 v11 MAPPO-core reward-first checkpoint 上 warm-start，新增 policy-side option head，在 `accept_mappo`、`popularity_safe`、`no_rsu_local`、`mechanism_prepare` 间学习选择。机制窗口 preserve MAPPO 主策略，idle/sparse 允许 learned `popularity_safe` option 接管；该路径不再依赖 v11 evaluator-side window override。
+
+单 seed warm-start 训练模板：
+
+```bash
+.venv/bin/python scripts/train_sa_ghmappo_real_sample.py --agent_name sa_ghmappo --profile top_journal_mechanism_v12_learned_option --random_seed <seed> --warm_start_checkpoint_path <v11_seed_best_by_reward.pt> --max_mobility_rows 10000 --max_workflows 2 --workflow_selector ordered --rsu_layout auto_dominant_tight --window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/train_window_plan.json --window_mode full_stratified --train_window_count 20 --primary_vehicle_selection handoff_pressure --min_tasks 5 --max_tasks 20 --output_root artifacts/training/top_journal_mechanism_v12_learned_option
+```
+
+全量 dev benchmark 模板：
+
+```bash
+.venv/bin/python scripts/benchmark_main_results.py --agents sa_ghmappo reactive_greedy popularity_cache_heuristic ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl --seed_checkpoint_manifest_path artifacts/experiments/top_journal_mappo_reward_v12_learned_option_20260717/seed_checkpoint_manifest.json --seeds 7 13 29 41 53 --max_mobility_rows 10000 --max_workflows 2 --max_steps 16 --workflow_selector ordered --rsu_layout auto_dominant_tight --window_count 20 --window_mode full_stratified --window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/dev_window_plan.json --primary_vehicle_selection handoff_pressure --min_tasks 5 --max_tasks 20 --output_root artifacts/experiments/top_journal_mappo_reward_v12_learned_option_20260717/main_results_full_stratified_mech_preserve
+```
+
+当前 full-dev evidence：`artifacts/experiments/top_journal_mappo_reward_v12_learned_option_20260717/main_results_full_stratified_mech_preserve/main_results_full_stratified_20260717_115754_212344/aggregate_summary.json`。主方法 total reward `79.5934`，高于 `popularity_cache_heuristic=79.46875`、`ppo=77.18775`、`mappo=72.6328` 和所有其他对照；`sa_advantage_diagnosis.blockers=[]`。该结果只能作为 dev-stage evidence，promotion 仍需要新冻结 future-validation 或重新审查，不能使用已 consumed hidden。
+
 ## Supervised Handoff Predictor
 
 训练薄 supervised predictor：

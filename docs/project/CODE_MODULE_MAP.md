@@ -1,5 +1,15 @@
 # Code Module Map
 
+## 2026-07-17 v12 learned MAPPO option gate
+
+- `src/agents/sa_ghmappo_core.py`：新增 policy-side `option_actor`、四类 option label、PPO-style option loss、entropy bonus、decayed contextual prior、idle/sparse popularity-safe prior、mechanism-window preserve-MAPPO 分支，以及 v11 checkpoint 缺少 option head 时的 partial warm-start load。
+- `src/trainers/marl_on_policy_trainer.py`：把 `run_metadata.window_class` 传给 `agent.act()` / value evaluation，并在 rollout summary 中统计 option gate enabled/applied、label 和 selection reason。
+- `src/evaluators/main_results_support.py`：把 option gate 诊断字段纳入主结果 metrics/rows；v12 checkpoint 不触发 v11 evaluator-side idle/sparse hard override。
+- `src/evaluators/real_eval_support.py`：恢复 v12 option gate config 字段，保证训练 checkpoint 与 benchmark inference contract 一致。
+- `scripts/train_sa_ghmappo_real_sample.py`：新增 `top_journal_mechanism_v12_learned_option` profile，继承 v11 MAPPO-core reward-first 设置，降低 imitation 牵引并启用 learned contextual option gate。
+- `scripts/run_top_journal_closed_loop.py`：把 v12 纳入 reward-first profile set 和 strict-full dev budget override。
+- `configs/experiment/top_journal_mechanism_v12_learned_option.yaml`、`tests/test_algo_pool_contract.py`、`tests/test_top_journal_closed_loop.py`：记录 v12 config、warm-start contract、mechanism-window preserve 行为、reward checkpoint selection 和 contract tests。
+
 ## 2026-07-16 v11 MAPPO reward-first candidate
 
 - `src/agents/sa_ghmappo_core.py`：新增 `idle_popularity_fallback_*` 与 no-RSU local fallback 可选开关；默认只在 v11 inference 中对 deterministic `vehicle_fallback` 做 popularity candidate replacement，no-RSU local 由 evaluator 的 idle/sparse window gate 控制。

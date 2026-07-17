@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from typing import Any
 
 from src.agents.base_agent import BaseAgent
@@ -41,11 +42,12 @@ class MARLOnPolicyTrainer(BaseTrainer):
         step_count = 0
 
         while not terminated and not truncated and step_count < self._max_steps:
-            decision_info = dict(info)
-            decision_info["run_metadata"] = dict(run_metadata or {})
-            action, action_info = self._agent.act(observation, info)
+            policy_info = dict(info)
+            policy_info["run_metadata"] = dict(run_metadata or {})
+            decision_info = dict(policy_info)
+            action, action_info = self._agent.act(observation, policy_info)
             next_observation, reward, terminated, truncated, next_info = self._env.step(int(action))
-            estimated_value = float(action_info.get("value", self._estimate_value(observation, info)))
+            estimated_value = float(action_info.get("value", self._estimate_value(observation, policy_info)))
             buffer.add_step(
                 observation=observation,
                 action=int(action),
@@ -63,7 +65,9 @@ class MARLOnPolicyTrainer(BaseTrainer):
             info = next_info
             step_count += 1
 
-        last_value = 0.0 if terminated else self._estimate_value(observation, info)
+        bootstrap_info = dict(info)
+        bootstrap_info["run_metadata"] = dict(run_metadata or {})
+        last_value = 0.0 if terminated else self._estimate_value(observation, bootstrap_info)
         buffer.finalize(last_value=last_value, gamma=self._gamma, gae_lambda=self._gae_lambda)
         rollout = buffer.to_training_rows()
         summary = self._recorder.build_summary()
@@ -163,6 +167,24 @@ class MARLOnPolicyTrainer(BaseTrainer):
             int(row.get("action_info", {}).get("invalid_action_attempt_count", 0) or 0)
             for row in rollout
         )
+        option_gate_rows = [
+            row
+            for row in rollout
+            if bool(row.get("action_info", {}).get("option_gate", {}).get("enabled", False))
+        ]
+        option_gate_applied_rows = [
+            row
+            for row in option_gate_rows
+            if bool(row.get("action_info", {}).get("option_gate", {}).get("applied", False))
+        ]
+        option_label_counts = Counter(
+            str(row.get("action_info", {}).get("option_gate", {}).get("option_label", "unknown"))
+            for row in option_gate_rows
+        )
+        option_selection_reason_counts = Counter(
+            str(row.get("action_info", {}).get("option_gate", {}).get("selection_reason", "unknown"))
+            for row in option_gate_rows
+        )
 
         def metric_mean(field_name: str) -> float:
             values = [
@@ -193,6 +215,16 @@ class MARLOnPolicyTrainer(BaseTrainer):
                 float(len(prefetch_admission_guard_rows)) / float(total_steps),
                 6,
             ),
+            "option_gate_enabled_count": len(option_gate_rows),
+            "option_gate_enabled_rate": round(float(len(option_gate_rows)) / float(total_steps), 6),
+            "option_gate_applied_count": len(option_gate_applied_rows),
+            "option_gate_applied_rate": round(float(len(option_gate_applied_rows)) / float(total_steps), 6),
+            "option_gate_popularity_safe_count": int(option_label_counts.get("popularity_safe", 0)),
+            "option_gate_mechanism_prepare_count": int(option_label_counts.get("mechanism_prepare", 0)),
+            "option_gate_no_rsu_local_count": int(option_label_counts.get("no_rsu_local", 0)),
+            "option_gate_context_prior_count": int(option_selection_reason_counts.get("context_prior_margin", 0)),
+            "option_gate_label_counts": dict(option_label_counts),
+            "option_gate_selection_reason_counts": dict(option_selection_reason_counts),
             "dag_frontier_size_mean": metric_mean("dag_frontier_size"),
             "dag_critical_path_pressure_mean": metric_mean("dag_critical_path_pressure"),
             "dag_current_node_dependency_pressure_mean": metric_mean("dag_current_node_dependency_pressure"),

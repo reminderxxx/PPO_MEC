@@ -41,7 +41,10 @@ SA_REWARD_FIRST_CHECKPOINT_PRIORITY = [
     "best_by_mechanism_balanced_path",
     "latest_checkpoint_path",
 ]
-SA_REWARD_FIRST_PROFILES = {"top_journal_mechanism_v11_mappo_reward"}
+SA_REWARD_FIRST_PROFILES = {
+    "top_journal_mechanism_v11_mappo_reward",
+    "top_journal_mechanism_v12_learned_option",
+}
 LOWER_IS_BETTER = {
     "backhaul_traffic_cost",
     "handoff_failure_rate",
@@ -106,6 +109,15 @@ SA_PROFILE_SETTING_OVERRIDES = {
         "window_count": 20,
     },
     "top_journal_mechanism_v11_mappo_reward": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 10000,
+        "window_count": 20,
+    },
+    "top_journal_mechanism_v12_learned_option": {
         "sa_episodes": 128,
         "baseline_episodes": 96,
         "sa_update_every": 8,

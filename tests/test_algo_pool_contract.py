@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from copy import deepcopy
 from pathlib import Path
@@ -418,6 +419,135 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(fallback_info["candidate_reason"], "no_associated_rsu_vehicle_fallback")
         self.assertEqual(fallback_info["reason"], "no_rsu_current_offload_replaced_by_local")
         self.assertTrue(fallback_info["low_mechanism_no_rsu_context"])
+
+    def test_sa_v12_profile_enables_learned_option_gate(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v12_learned_option"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v12_learned_option")
+        self.assertTrue(kwargs["head_credit_enabled"])
+        self.assertEqual(kwargs["head_credit_protocol"], "aggregation_reason_weighted_controller_ppo_v3")
+        self.assertTrue(kwargs["option_gate_enabled"])
+        self.assertEqual(kwargs["option_gate_count"], 4)
+        self.assertGreater(kwargs["option_gate_loss_coef"], 0.0)
+        self.assertGreater(kwargs["option_gate_prior_coef"], 0.0)
+        self.assertTrue(kwargs["option_gate_context_prior_enabled"])
+        self.assertGreater(kwargs["option_gate_deterministic_prior_margin"], 0.0)
+        self.assertTrue(kwargs["option_gate_idle_prior_enabled"])
+        self.assertFalse(kwargs["idle_popularity_no_rsu_local_fallback_enabled"])
+
+    def test_sa_v12_option_gate_records_policy_choice(self) -> None:
+        state = _minimal_semantic_state()
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            option_gate_enabled=True,
+            option_gate_count=4,
+            option_gate_prior_logit_bias=0.5,
+            idle_popularity_fallback_enabled=False,
+        )
+        action, action_info = agent.act(
+            None,
+            {
+                "semantic_state": state,
+                "action_mask": [True, True, True, True, True],
+            },
+        )
+
+        self.assertIn(action, {0, 1, 2, 3, 4})
+        option_info = action_info["option_gate"]
+        self.assertTrue(option_info["enabled"])
+        self.assertIn(option_info["option_action"], {0, 1, 2, 3})
+        self.assertIn("option_log_prob", option_info)
+        self.assertEqual(len(option_info["option_mask"]), 4)
+
+    def test_sa_v12_contextual_prior_prefers_popularity_on_idle_sparse(self) -> None:
+        state = _minimal_semantic_state()
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            option_gate_enabled=True,
+            option_gate_count=4,
+            option_gate_context_prior_enabled=True,
+            option_gate_deterministic_prior_margin=0.2,
+            option_gate_idle_prior_enabled=True,
+            option_gate_prior_logit_bias=0.0,
+            idle_popularity_fallback_enabled=False,
+        )
+        option_info = agent._maybe_apply_option_gate(
+            semantic_state=state,
+            action_mask=[True, True, True, True, True],
+            policy_output={"option_logits": torch.tensor([0.1, 0.0, -1.0, -1.0])},
+            base_env_action=3,
+            deterministic=True,
+            run_metadata={"window_class": "idle_or_sparse"},
+        )
+
+        self.assertTrue(option_info["enabled"])
+        self.assertTrue(option_info["applied"])
+        self.assertEqual(option_info["option_label"], "popularity_safe")
+        self.assertEqual(option_info["option_env_action"], 0)
+        self.assertFalse(option_info["option_mask"][3])
+        self.assertEqual(option_info["prior_label"], "popularity_safe")
+        self.assertEqual(option_info["selection_reason"], "context_prior_margin")
+
+    def test_sa_v12_can_warm_start_from_v11_without_option_head(self) -> None:
+        source_agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            option_gate_enabled=False,
+        )
+        target_agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            option_gate_enabled=True,
+            option_gate_count=4,
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            checkpoint_path = Path(tmpdir) / "v11_like.pt"
+            source_agent.save(str(checkpoint_path))
+            target_agent.load(str(checkpoint_path))
+
+        action, action_info = target_agent.act(
+            None,
+            {
+                "semantic_state": _minimal_semantic_state(),
+                "action_mask": [True, True, True, True, True],
+            },
+        )
+        self.assertIn(action, {0, 1, 2, 3, 4})
+        self.assertTrue(action_info["option_gate"]["enabled"])
+
+    def test_sa_v12_contextual_option_preserves_mappo_on_mechanism_window(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            option_gate_enabled=True,
+            option_gate_count=4,
+            option_gate_context_prior_enabled=True,
+            option_gate_idle_prior_enabled=True,
+        )
+        option_info = agent._maybe_apply_option_gate(
+            semantic_state=_minimal_semantic_state(),
+            action_mask=[True, True, True, True, True],
+            policy_output={"option_logits": torch.tensor([-1.0, -1.0, -1.0, 3.0])},
+            base_env_action=4,
+            deterministic=True,
+            run_metadata={"window_class": "mechanism_activating"},
+        )
+
+        self.assertFalse(option_info["enabled"])
+        self.assertFalse(option_info["applied"])
+        self.assertEqual(option_info["reason"], "mechanism_window_preserve_mappo")
+        self.assertEqual(option_info["base_env_action"], 4)
 
     def test_qmix_uses_controller_level_value_decomposition_contract(self) -> None:
         state = _minimal_semantic_state()
