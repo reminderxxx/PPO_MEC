@@ -470,6 +470,18 @@ PROFILE_DEFAULTS = {
         "max_steps": 16,
         "train_window_count": 20,
     },
+    "top_journal_mechanism_v18_counterfactual_option": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.4e-5,
+        "clip_ratio": 0.07,
+        "entropy_coef": 0.0011,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.32,
+        "max_steps": 16,
+        "train_window_count": 20,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -1710,6 +1722,38 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "dag_aware_option_short_workflow_max_nodes": 12,
                 "dag_aware_option_branching_successors": 3,
                 "dag_aware_idle_prefetch_confidence_floor": 0.65,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v18_counterfactual_option":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v17_dag_aware_option")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.035,
+                "heuristic_imitation_warmup_updates": 2,
+                "heuristic_imitation_decay": 0.64,
+                "mechanism_aux_coef": 0.062,
+                "mechanism_window_weight": 1.48,
+                "prepare_action_prior_weight": 0.56,
+                "mechanism_aux_coef_floor_after_update": 0.062,
+                "mechanism_window_weight_floor_after_update": 1.48,
+                "option_gate_mechanism_preserve_enabled": False,
+                "option_gate_loss_coef": 0.36,
+                "option_gate_prior_coef": 0.020,
+                "option_gate_prior_warmup_updates": 3,
+                "option_gate_prior_decay": 0.64,
+                "option_gate_prior_logit_bias": 0.32,
+                "option_gate_log_prob_weight": 0.54,
+                "option_gate_deterministic_prior_margin": 0.06,
+                "option_gate_prd_coef": 0.30,
+                "option_gate_prd_clip": 1.45,
+                "option_gate_counterfactual_prd_enabled": True,
+                "option_gate_counterfactual_coef": 0.38,
+                "option_gate_counterfactual_clip": 1.25,
+                "event_prd_advantage_coef": 0.44,
+                "event_prd_advantage_clip": 1.55,
+                "train_epochs": 7,
+                "target_kl": 0.011,
             }
         )
         return kwargs
@@ -4062,6 +4106,7 @@ def maybe_apply_anti_collapse_controls(
         "top_journal_mechanism_v15_terminal_option",
         "top_journal_mechanism_v16_conservative_terminal_option",
         "top_journal_mechanism_v17_dag_aware_option",
+        "top_journal_mechanism_v18_counterfactual_option",
     }
     if args.agent_name != "sa_ghmappo" or args.profile not in stability_profiles:
         return updated_best, None

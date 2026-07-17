@@ -2,6 +2,15 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-07-17: v18 counterfactual option 负结果与 v17 time-audited future-validation
+
+- 新增 `top_journal_mechanism_v18_counterfactual_option` profile 与 `configs/experiment/top_journal_mechanism_v18_counterfactual_option.yaml`。v18 在 v17 DAG-aware option termination 基础上加入 COMA-style counterfactual option credit：对 option gate 使用 selected option partial utility 减去同状态合法 option 的 policy-probability-weighted expected utility，目标是强化 MAPPO 的 option-level credit assignment。该改动不修改 reward、environment/action contract、baseline contract 或 window plan。
+- v18 5-seed / 20-window / 2-workflow / 12-agent frozen dev benchmark 已完成：`artifacts/experiments/top_journal_counterfactual_option_v18_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_162210_019633/aggregate_summary.json`。SA-GHMAPPO total reward `79.4897`，只高于 popularity `79.46875` `+0.02095`，低于 v17 `79.70825`；诊断 blocker 为 `continuity_below_popularity`、`handoff_failure_above_popularity`、`mechanism_realization_and_ready_below_popularity`。结论：v18 是算法性前沿 credit-assignment 尝试，但当前配置不晋级为主候选。
+- 修复 future-validation 独立性审计：`scripts/audit_window_independence.py` 和 `scripts/freeze_future_validation_split.py` 均改为同时检查 `frame_offset` 与 `time_index_start/end`。先前 `max_mobility_rows=20000` 的 future split 在 time interval 上与 consumed hidden window 存在重叠风险，因此已废弃，不作为独立验证证据。
+- 新冻结 `future_validation_split_v2_time_audited_20260717`：`configs/experiment/top_journal_v17_future_validation_time_audited_20260717/future_validation_manifest.json`。该 split 使用 `max_mobility_rows=50000`，20 windows，strata 为 6 mechanism / 2 active non-mechanism / 12 idle-sparse；train/dev/formal/hidden 全部按 frame 和 time 双区间保持至少 24 frames gap。独立审计输出在 `artifacts/audits/top_journal_v17_future_validation_time_audited_20260717/`。
+- v17 time-audited future-validation 全量 benchmark 已完成：`artifacts/experiments/top_journal_dag_aware_option_v17_20260717/future_validation_time_audited_full_stratified/main_results_full_stratified_20260717_163104_648303/aggregate_summary.json`。SA-GHMAPPO total reward `77.56665`，高于 popularity `77.5185`、PPO `76.53095`、MAPPO `70.5285` 和全部其他对照；mechanism realization `0.240` > popularity `0.225`，continuity `0.762375` > `0.757926`，backhaul `125.28` < `126.0`。
+- 严格统计结果：`artifacts/analysis/top_journal_v17_future_validation_time_audited_statistics_20260717/paired_statistics.csv`。对 popularity 的 total reward delta 仅 `+0.04815`，BCa 95% CI `[-0.396869, 0.636962]`，Holm sign-test p=`1.0`；对 PPO 的 reward delta `+1.0357` 但 CI `[-1.050462, 3.058438]` 跨 0；对 MAPPO 的 reward delta `+7.03815`，CI `[3.849155, 10.471469]` 为正。结论：当前证据足以说明 SA-GHMAPPO 显著优于 MAPPO，但不足以支撑显著优于 popularity heuristic 或 TMC-ready 主张。
+
 ## 2026-07-17: v17 DAG-aware MAPPO option gate 扩大 dev reward margin 并清除 blocker
 
 - 新增 `top_journal_mechanism_v17_dag_aware_option` profile 与 `configs/experiment/top_journal_mechanism_v17_dag_aware_option.yaml`。v17 继承 v16 conservative terminal option，并在 SA-GHMAPPO option 层加入 DAG-aware termination：使用已有 graph-continuity critic 特征，在低置信 idle no-RSU prefetch 与短 DAG / 低 critical-path 机制窗口中终止低机会 prefetch。

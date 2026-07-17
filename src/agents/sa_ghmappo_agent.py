@@ -209,6 +209,9 @@ class SAGHMAPPOAgent(SAGHMAPPOBaseAgent):
             "dag_aware_option_short_workflow_max_nodes",
             "dag_aware_option_branching_successors",
             "dag_aware_idle_prefetch_confidence_floor",
+            "option_gate_counterfactual_prd_enabled",
+            "option_gate_counterfactual_coef",
+            "option_gate_counterfactual_clip",
         ):
             if field_name in kwargs:
                 self.ablation_config[field_name] = kwargs[field_name]

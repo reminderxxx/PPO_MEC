@@ -1,0 +1,28 @@
+profile: top_journal_mechanism_v18_counterfactual_option
+purpose: >
+  Extend v17 with counterfactual option-credit MAPPO. The learned option gate
+  receives a COMA-style baseline: selected option partial utility minus the
+  policy-probability-weighted utility of other legal options in the same state.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v17_dag_aware_option
+  reward_function_changed: false
+  environment_contract_changed: false
+  option_gate_counterfactual_prd_enabled: true
+  option_gate_counterfactual_coef: 0.38
+  option_gate_counterfactual_clip: 1.25
+  option_gate_mechanism_preserve_enabled: false
+  option_gate_prd_coef: 0.30
+  event_prd_advantage_coef: 0.44
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+evaluation:
+  split_policy: dev_then_outcome_blind_future_validation
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile keeps the v17 DAG-aware option termination and adds an
+    option-level counterfactual advantage term to improve credit assignment.
+  - It does not alter benchmark baselines, reward function, environment
+    contract, or action space.

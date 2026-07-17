@@ -18,6 +18,9 @@
 
 ## 当前限制
 
+- `top_journal_mechanism_v18_counterfactual_option` 是一次算法性 counterfactual option-credit MAPPO 尝试，但 frozen dev 结果低于 v17，且出现 continuity / handoff failure / mechanism readiness blocker；当前不得把 v18 写成主算法改进成功，只能作为负向探索和后续 credit-assignment 依据。
+- `top_journal_mechanism_v17_dag_aware_option` 在 time-audited future-validation 上均值仍为第一，但相对 `popularity_cache_heuristic` 的 reward margin 只有 `+0.04815`，BCa 95% CI `[-0.396869, 0.636962]` 且 Holm sign-test p=`1.0`；不能声称显著优于 strong heuristic，不能据此判为 TMC-ready candidate。
+- future-validation split 必须使用 `future_validation_split_v2_time_audited_20260717` 或后续更严格版本；只按 `frame_offset` 审计的 split 可能漏掉 `time_index_start/end` 重叠。任何旧 `top_journal_v17_future_validation_20260717` 结果不得作为 independent holdout / future evidence。
 - `top_journal_mechanism_v17_dag_aware_option` 已在 frozen dev full_stratified 上完成 5-seed / 20-window / 2-workflow / 12-agent 全量 benchmark，并把 strongest-other reward margin 提升到 `+0.2395`，同时清除 v13/v16 的 `backhaul_cost_above_popularity` blocker；这仍不是 hidden/future-validation 证据。当前 hidden 已 consumed，v17 不得用现有 hidden 做进一步筛选；promotion 必须新冻结 future-validation split 并按 top-journal review policy 重新审查。
 - v17 改进来自 policy-side DAG-aware MAPPO option termination，不是环境 reward、action contract、baseline contract、window plan 或评估包装改动。论文或汇报中可以说 v17 是当前 dev 主候选，但不能声称已 TMC-ready、全面优于 PPO 的所有系统指标，或已经通过独立 holdout。
 - v17 的 mechanism realization `0.195` 低于 v16 `0.265`，说明 DAG-aware gate 用更保守的机制动作换取 reward / backhaul trade-off；不能把它写成“机制触发越多越好”，必须同时报告 validated success、continuity、backhaul 和 total reward。

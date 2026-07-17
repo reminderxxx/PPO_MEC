@@ -15,15 +15,18 @@
 - `configs/experiment/top_journal_mechanism_v11_mappo_reward.yaml`：v11 MAPPO reward-first dev 候选参数，记录 reward-first checkpoint priority 与 idle/sparse window-context fallback gate
 - `configs/experiment/top_journal_mechanism_v12_learned_option.yaml`：v12 learned MAPPO option gate dev 候选参数，记录 option labels、contextual prior、warm-start 和 hidden 禁用边界
 - `configs/experiment/top_journal_mechanism_v13_prd_option.yaml`：v13 partial-reward-decoupled MAPPO dev 候选参数，记录 event/option PRD credit、latest-after-training checkpoint policy 和 hidden 禁用边界
+- `configs/experiment/top_journal_mechanism_v18_counterfactual_option.yaml`：v18 counterfactual option-credit MAPPO 候选参数，记录 selected-vs-expected legal-option utility credit 和负向晋级边界
 - `configs/ablation_checkpoint_manifest_v8_guard_attribution.json`：v8 同 checkpoint 机制归因消融 manifest
 - `configs/experiment/top_journal_v8_strict_split_20260621/`：outcome-blind train/dev/formal/hidden 固定窗口计划与 SHA-256 manifest
+- `configs/experiment/top_journal_v17_future_validation_time_audited_20260717/`：v17 time-audited future-validation 固定窗口计划；按 `frame_offset` 和 `time_index_start/end` 同时排除历史 split
 - `data/`：原始数据与处理后数据；通过 Git LFS 版本化，完整克隆后需执行 `git lfs pull`
 - `docs/`：长期维护文档，`docs/project/` 为事实来源，`docs/project/DATASET_SOURCES.md` 记录数据源声明，`docs/project/literature_reference_table.md` 记录顶刊/顶会 related-work 参考表，`docs/benchmark_plan_or_baseline_plan.md`、`docs/baseline_formalization_round1.md`、`docs/experiment_status_round1.md`、`docs/mechanism_activation_check_round1.md` 和 `docs/experiment_runbook_round1.md` 记录 baseline 计划、round1 状态、机制诊断与复跑命令
 - `scripts/`：数据检查、dry-run、训练、评估和 benchmark 入口
 - `scripts/run_top_journal_final_submission_loop.py`：最终交稿 learned-primary 自循环入口，编排 learned baseline 重训、formal/holdout gate、cluster bootstrap statistics 和 support suites
 - `scripts/build_top_journal_comparison_report.py`：最终交稿 comparison package 生成入口，汇总 baseline protocol matrix、reward margins、mechanism paired statistics、support statistics、paper-ready LaTeX 表格和作者自审报告
 - `scripts/audit_artifact_integrity.py`：run-root SHA-256、JSON path reference、external dependency 和 parse error 审计
-- `scripts/audit_window_independence.py`：formal/holdout selected window plan 的 split 内与 split 间 frame interval 独立性审计
+- `scripts/audit_window_independence.py`：formal/holdout selected window plan 的 split 内与 split 间 frame/time interval 独立性审计
+- `scripts/freeze_future_validation_split.py`：从 outcome-blind mobility covariates 生成 future-validation window plan，并排除已 consumed train/dev/formal/hidden frame/time intervals
 - `scripts/freeze_strict_split_protocol.py`：生成跨 split 互斥、带 minimum frame gap 的固定窗口计划
 - `scripts/run_strict_full_v8_support_suite.py`：编排 v8-current support suite、guard attribution、BCa/Holm statistics 和 support gate report；拒绝 hidden window plan
 - `scripts/train_supervised_handoff_predictor.py`：从冻结 train/dev window plan 训练短时 supervised handoff predictor，并输出 checkpoint、metrics manifest 和 quality rows
@@ -70,6 +73,10 @@
 - `artifacts/experiments/top_journal_mappo_reward_full_dev_v11_20260716/`：v11 full-dev 训练 manifest、checkpoint-selection probes 和最终 window-gate full benchmark；当前成功主表为 `main_results_full_stratified_window_gate_full/main_results_full_stratified_20260716_181112_383674/aggregate_summary.json`
 - `artifacts/experiments/top_journal_mappo_reward_v12_learned_option_20260717/`：v12 learned option full-dev probes、seed checkpoint manifest 和最终 mechanism-preserve full benchmark；当前成功主表为 `main_results_full_stratified_mech_preserve/main_results_full_stratified_20260717_115754_212344/aggregate_summary.json`
 - `artifacts/experiments/top_journal_prd_option_v13_20260717/`：v13 PRD option probes、latest/best-reward seed manifest 和全量 dev benchmark；当前 latest 成功主表为 `main_results_full_stratified_latest/main_results_full_stratified_20260717_124815_375515/aggregate_summary.json`
+- `artifacts/experiments/top_journal_counterfactual_option_v18_20260717/`：v18 counterfactual option-credit 训练 manifest 和全量 dev benchmark；当前结果为负向探索，不作为主候选
+- `artifacts/experiments/top_journal_dag_aware_option_v17_20260717/future_validation_time_audited_full_stratified/`：v17 time-audited future-validation 全量 benchmark；均值第一但对 popularity reward CI 跨 0
+- `artifacts/analysis/top_journal_v17_future_validation_time_audited_statistics_20260717/`：time-audited future-validation window-outer hierarchical statistics
+- `artifacts/audits/top_journal_v17_future_validation_time_audited_20260717/`：future split 与 train/dev/formal/hidden 的 frame/time 双区间独立性审计
 - `artifacts/experiments/top_journal_support_suite/`：v8-current support suite、机制归因、paired statistics 和 support gate report 输出根目录；dry-run 不能作为论文证据
 - `artifacts/experiments/strict_full_v8_*`：v8 formal、一次性 hidden 与 LuST external benchmark；正式结论只引用 `top_journal_readiness_audit_20260621.md` 列出的 run ID
 - `artifacts/audits/strict_full_v8_integrity_20260621/`：v8 11457-file SHA-256 inventory 与引用完整性报告；保持 Git ignored

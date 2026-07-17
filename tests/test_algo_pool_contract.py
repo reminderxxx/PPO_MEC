@@ -668,6 +668,72 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(kwargs["dag_aware_option_min_critical_path"], 6)
         self.assertEqual(kwargs["dag_aware_option_short_workflow_max_nodes"], 12)
 
+    def test_sa_v18_profile_enables_counterfactual_option_credit(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v18_counterfactual_option"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v18_counterfactual_option")
+        self.assertTrue(kwargs["option_gate_enabled"])
+        self.assertTrue(kwargs["dag_aware_option_termination_enabled"])
+        self.assertTrue(kwargs["option_gate_prd_enabled"])
+        self.assertTrue(kwargs["option_gate_counterfactual_prd_enabled"])
+        self.assertGreater(kwargs["option_gate_counterfactual_coef"], 0.0)
+        self.assertFalse(kwargs["option_gate_mechanism_preserve_enabled"])
+
+    def test_sa_v18_counterfactual_credit_rewards_better_option_than_policy_baseline(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            option_gate_enabled=True,
+            option_gate_count=4,
+            option_gate_prd_enabled=False,
+            option_gate_counterfactual_prd_enabled=True,
+            option_gate_counterfactual_coef=1.0,
+            option_gate_counterfactual_clip=2.0,
+        )
+        row = {
+            "reward": 1.0,
+            "action": 4,
+            "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+            "action_info": {
+                "prepare_window_score": 0.8,
+                "temporal_urgency": 0.7,
+                "prediction_confidence": 0.8,
+                "gate_pass": True,
+                "final_env_action": 4,
+                "option_gate": {
+                    "enabled": True,
+                    "applied": True,
+                    "option_action": 3,
+                    "option_label": "mechanism_prepare",
+                    "option_env_action": 4,
+                    "base_env_action": 0,
+                    "option_actions": {"0": 0, "1": 2, "2": 2, "3": 4},
+                    "option_mask": [True, True, False, True],
+                    "window_class": "mechanism_activating",
+                },
+            },
+            "env_info": {
+                "metrics_protocol": {
+                    "mechanism_success_rate": 1.0,
+                    "handoff_ready_rate": 1.0,
+                    "handoff_failure_rate": 0.0,
+                }
+            },
+        }
+
+        advantage = agent._option_gate_advantage(
+            row=row,
+            base_advantage=torch.tensor(0.0),
+            option_probs=torch.tensor([0.75, 0.20, 0.0, 0.05]),
+            option_mask=[True, True, False, True],
+        )
+
+        self.assertGreater(float(advantage.item()), 0.0)
+
     def test_sa_v14_net_utility_option_terminates_idle_no_rsu_prefetch(self) -> None:
         agent = build_agent(
             "sa_ghmappo",

@@ -391,6 +391,9 @@ class 分层PPO基类(BaseAgent):
         option_gate_prd_enabled: bool = False,
         option_gate_prd_coef: float = 0.0,
         option_gate_prd_clip: float = 2.0,
+        option_gate_counterfactual_prd_enabled: bool = False,
+        option_gate_counterfactual_coef: float = 0.0,
+        option_gate_counterfactual_clip: float = 1.5,
         net_utility_prd_enabled: bool = False,
         net_utility_backhaul_coef: float = 0.0,
         net_utility_migration_coef: float = 0.0,
@@ -620,6 +623,9 @@ class 分层PPO基类(BaseAgent):
         self._option_gate_prd_enabled = bool(option_gate_prd_enabled)
         self._option_gate_prd_coef = max(float(option_gate_prd_coef), 0.0)
         self._option_gate_prd_clip = max(float(option_gate_prd_clip), 0.0)
+        self._option_gate_counterfactual_prd_enabled = bool(option_gate_counterfactual_prd_enabled)
+        self._option_gate_counterfactual_coef = max(float(option_gate_counterfactual_coef), 0.0)
+        self._option_gate_counterfactual_clip = max(float(option_gate_counterfactual_clip), 0.0)
         self._net_utility_prd_enabled = bool(net_utility_prd_enabled)
         self._net_utility_backhaul_coef = max(float(net_utility_backhaul_coef), 0.0)
         self._net_utility_migration_coef = max(float(net_utility_migration_coef), 0.0)
@@ -2979,6 +2985,8 @@ class 分层PPO基类(BaseAgent):
             option_advantage = self._option_gate_advantage(
                 row=row,
                 base_advantage=batch_advantage[row_index],
+                option_probs=distribution.probs.detach(),
+                option_mask=option_mask if option_mask else None,
             )
             surrogate_1 = ratio * option_advantage
             surrogate_2 = torch.clamp(
@@ -3119,14 +3127,45 @@ class 分层PPO基类(BaseAgent):
             return float(credit + self._net_utility_prd_adjustment(row))
         return float(self._net_utility_prd_adjustment(row))
 
-    def _option_gate_advantage(self, *, row: dict[str, Any], base_advantage: torch.Tensor) -> torch.Tensor:
-        if not self._option_gate_prd_enabled or self._option_gate_prd_coef <= 0.0:
+    def _option_gate_advantage(
+        self,
+        *,
+        row: dict[str, Any],
+        base_advantage: torch.Tensor,
+        option_probs: torch.Tensor | None = None,
+        option_mask: list[bool] | None = None,
+    ) -> torch.Tensor:
+        if not (
+            (self._option_gate_prd_enabled and self._option_gate_prd_coef > 0.0)
+            or (
+                self._option_gate_counterfactual_prd_enabled
+                and self._option_gate_counterfactual_coef > 0.0
+            )
+        ):
             return base_advantage
-        partial_credit = self._option_gate_partial_reward_credit(row)
-        if self._option_gate_prd_clip > 0.0:
-            partial_credit = max(-self._option_gate_prd_clip, min(self._option_gate_prd_clip, partial_credit))
+        partial_credit = 0.0
+        if self._option_gate_prd_enabled and self._option_gate_prd_coef > 0.0:
+            selected_credit = self._option_gate_partial_reward_credit(row)
+            if self._option_gate_prd_clip > 0.0:
+                selected_credit = max(-self._option_gate_prd_clip, min(self._option_gate_prd_clip, selected_credit))
+            partial_credit += selected_credit * self._option_gate_prd_coef
+        if (
+            self._option_gate_counterfactual_prd_enabled
+            and self._option_gate_counterfactual_coef > 0.0
+        ):
+            counterfactual_credit = self._option_gate_counterfactual_partial_credit(
+                row,
+                option_probs=option_probs,
+                option_mask=option_mask,
+            )
+            if self._option_gate_counterfactual_clip > 0.0:
+                counterfactual_credit = max(
+                    -self._option_gate_counterfactual_clip,
+                    min(self._option_gate_counterfactual_clip, counterfactual_credit),
+                )
+            partial_credit += counterfactual_credit * self._option_gate_counterfactual_coef
         credit_tensor = torch.tensor(
-            partial_credit * self._option_gate_prd_coef,
+            partial_credit,
             dtype=torch.float32,
             device=self._device,
         )
@@ -3136,13 +3175,108 @@ class 分层PPO基类(BaseAgent):
         action_info = dict(row.get("action_info", {}))
         option_info = dict(action_info.get("option_gate", {}))
         option_label = str(option_info.get("option_label", "accept_mappo"))
+        option_env_action = int(
+            option_info.get(
+                "option_env_action",
+                action_info.get("final_env_action", row.get("action", 0)),
+            )
+            or 0
+        )
+        option_applied = bool(option_info.get("applied", False))
+        return self._option_gate_partial_reward_credit_for_label(
+            row,
+            option_label=option_label,
+            option_env_action=option_env_action,
+            option_applied=option_applied,
+        )
+
+    def _option_gate_counterfactual_partial_credit(
+        self,
+        row: dict[str, Any],
+        *,
+        option_probs: torch.Tensor | None,
+        option_mask: list[bool] | None,
+    ) -> float:
+        action_info = dict(row.get("action_info", {}))
+        option_info = dict(action_info.get("option_gate", {}))
+        option_action = int(option_info.get("option_action", 0) or 0)
+        base_env_action = int(
+            option_info.get(
+                "base_env_action",
+                action_info.get("projected_env_action", action_info.get("final_env_action", row.get("action", 0))),
+            )
+            or 0
+        )
+        option_actions_raw = option_info.get("option_actions", {})
+        option_actions: dict[int, int] = {}
+        if isinstance(option_actions_raw, dict):
+            for raw_key, raw_value in option_actions_raw.items():
+                try:
+                    option_actions[int(raw_key)] = int(raw_value)
+                except (TypeError, ValueError):
+                    continue
+        valid_count = min(self._option_gate_count, len(option_mask or [])) if option_mask else self._option_gate_count
+        utilities: list[float] = []
+        probabilities: list[float] = []
+        probs = option_probs.detach().cpu().tolist() if option_probs is not None else []
+        for option_index in range(self._option_gate_count):
+            is_valid = True
+            if option_mask is not None and option_index < len(option_mask):
+                is_valid = bool(option_mask[option_index])
+            elif option_mask is not None:
+                is_valid = False
+            if option_index >= valid_count:
+                is_valid = False
+            option_env_action = int(option_actions.get(option_index, base_env_action))
+            option_label = OPTION_GATE_LABELS.get(option_index, f"option_{option_index}")
+            option_applied = bool(option_env_action != base_env_action)
+            utilities.append(
+                self._option_gate_partial_reward_credit_for_label(
+                    row,
+                    option_label=option_label,
+                    option_env_action=option_env_action,
+                    option_applied=option_applied,
+                )
+                if is_valid
+                else 0.0
+            )
+            probabilities.append(float(probs[option_index]) if option_index < len(probs) and is_valid else 0.0)
+        probability_sum = float(sum(probabilities))
+        if probability_sum <= 1e-8:
+            valid_indices = [
+                index
+                for index in range(self._option_gate_count)
+                if option_mask is None or (index < len(option_mask) and bool(option_mask[index]))
+            ]
+            if not valid_indices:
+                return 0.0
+            uniform_prob = 1.0 / float(len(valid_indices))
+            probabilities = [uniform_prob if index in valid_indices else 0.0 for index in range(self._option_gate_count)]
+        else:
+            probabilities = [probability / probability_sum for probability in probabilities]
+        expected_credit = float(sum(probability * utility for probability, utility in zip(probabilities, utilities)))
+        if option_action < 0 or option_action >= len(utilities):
+            selected_credit = self._option_gate_partial_reward_credit(row)
+        else:
+            selected_credit = float(utilities[option_action])
+        return float(selected_credit - expected_credit)
+
+    def _option_gate_partial_reward_credit_for_label(
+        self,
+        row: dict[str, Any],
+        *,
+        option_label: str,
+        option_env_action: int,
+        option_applied: bool,
+    ) -> float:
+        action_info = dict(row.get("action_info", {}))
+        option_info = dict(action_info.get("option_gate", {}))
         window_class = str(
             option_info.get(
                 "window_class",
                 row.get("decision_info", {}).get("run_metadata", {}).get("window_class", "unknown"),
             )
         )
-        final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
         prepare_score = max(float(action_info.get("prepare_window_score", 0.0) or 0.0), 0.0)
         urgency = max(float(action_info.get("temporal_urgency", 0.0) or 0.0), 0.0)
         confidence = max(float(action_info.get("prediction_confidence", 0.0) or 0.0), 0.0)
@@ -3161,17 +3295,20 @@ class 分层PPO基类(BaseAgent):
             outcome_strength = 0.55 * mechanism_success + 0.25 * ready_rate - 0.35 * failure_rate
             if option_label == "mechanism_prepare":
                 credit += context_strength + outcome_strength
-                if final_action in {1, 4}:
+                if int(option_env_action) in {1, 4}:
                     credit += 0.20
             elif option_label == "accept_mappo":
                 credit += 0.35 * context_strength + outcome_strength
-                if final_action in {1, 4}:
+                if int(option_env_action) in {1, 4}:
                     credit += 0.10
             elif option_label in {"popularity_safe", "no_rsu_local"}:
                 credit -= 0.35 * context_strength
         elif window_class == "idle_or_sparse":
             if option_label == "popularity_safe":
                 credit += 0.45 + 0.10 * reward_sign
+            elif option_label == "no_rsu_local":
+                low_no_rsu_context = bool(option_info.get("no_rsu_available", False))
+                credit += (0.28 if low_no_rsu_context else 0.04) + 0.08 * reward_sign
             elif option_label == "mechanism_prepare":
                 credit -= 0.45
             elif option_label == "accept_mappo":
@@ -3179,7 +3316,7 @@ class 分层PPO基类(BaseAgent):
         elif window_class == "active_non_mechanism":
             if option_label == "accept_mappo":
                 credit += 0.15 * reward_sign
-            elif bool(option_info.get("applied", False)):
+            elif bool(option_applied):
                 credit -= 0.25
         return float(credit + self._net_utility_prd_adjustment(row))
 
@@ -4363,6 +4500,9 @@ class 分层PPO基类(BaseAgent):
             "option_gate_prd_enabled": self._option_gate_prd_enabled,
             "option_gate_prd_coef": self._option_gate_prd_coef,
             "option_gate_prd_clip": self._option_gate_prd_clip,
+            "option_gate_counterfactual_prd_enabled": self._option_gate_counterfactual_prd_enabled,
+            "option_gate_counterfactual_coef": self._option_gate_counterfactual_coef,
+            "option_gate_counterfactual_clip": self._option_gate_counterfactual_clip,
             "net_utility_prd_enabled": self._net_utility_prd_enabled,
             "net_utility_backhaul_coef": self._net_utility_backhaul_coef,
             "net_utility_migration_coef": self._net_utility_migration_coef,

@@ -1,5 +1,15 @@
 # Code Module Map
 
+## 2026-07-17 v18 counterfactual option credit and time-audited future split
+
+- `src/agents/sa_ghmappo_core.py`：新增 option-gate counterfactual partial credit，计算 selected option partial utility 与同状态合法 option policy-weighted expected utility 的差值；保留 v17 DAG-aware option termination，不修改 action/reward/environment contract。
+- `src/agents/sa_ghmappo_agent.py`、`src/evaluators/real_eval_support.py`：新增并恢复 `option_gate_counterfactual_prd_*` checkpoint/config 字段，保证 v18 训练和 benchmark inference contract 一致。
+- `scripts/train_sa_ghmappo_real_sample.py`：新增 `top_journal_mechanism_v18_counterfactual_option` profile，继承 v17 并启用 counterfactual option credit。
+- `scripts/run_top_journal_closed_loop.py`：把 v18 纳入 latest-first SA profile 和 strict-full dev budget override。
+- `scripts/freeze_future_validation_split.py`：新增 outcome-blind future-validation split 生成器，v2 同时按 `frame_offset` 与 `time_index_start/end` 排除 train/dev/formal/hidden 历史窗口。
+- `scripts/audit_window_independence.py`：窗口独立性审计从 frame-only 升级为 frame/time 双区间检查。
+- `configs/experiment/top_journal_mechanism_v18_counterfactual_option.yaml`、`configs/experiment/top_journal_v17_future_validation_time_audited_20260717/`、`tests/test_algo_pool_contract.py`、`tests/test_top_journal_closed_loop.py`：记录 v18 profile、time-audited future split 和 contract tests。
+
 ## 2026-07-17 v13 partial-reward-decoupled MAPPO credit
 
 - `src/agents/sa_ghmappo_core.py`：新增 event-head partial reward decoupling、option-gate partial credit、机制窗口 preserve-MAPPO 下的 option credit 计算，以及 checkpoint config 中的 `event_prd_advantage_*` / `option_gate_prd_*` 字段。

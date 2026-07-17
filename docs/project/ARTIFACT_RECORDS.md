@@ -1,5 +1,24 @@
 # Artifact Records
 
+## 2026-07-17 v18 counterfactual option dev and v17 time-audited future-validation
+
+状态：`[negative-v18]` `[time-audited-future]` `[not-tmc-ready]`
+
+路径：
+
+- `artifacts/experiments/top_journal_counterfactual_option_v18_20260717/seed_checkpoint_manifest_counterfactual_option_full.json`
+- `artifacts/experiments/top_journal_counterfactual_option_v18_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_162210_019633/aggregate_summary.json`
+- `artifacts/experiments/top_journal_counterfactual_option_v18_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_162210_019633/sa_advantage_diagnosis.json`
+- `configs/experiment/top_journal_v17_future_validation_time_audited_20260717/future_validation_manifest.json`
+- `artifacts/audits/top_journal_v17_future_validation_time_audited_20260717/`
+- `artifacts/experiments/top_journal_dag_aware_option_v17_20260717/future_validation_time_audited_full_stratified/main_results_full_stratified_20260717_163104_648303/aggregate_summary.json`
+- `artifacts/experiments/top_journal_dag_aware_option_v17_20260717/future_validation_time_audited_full_stratified/main_results_full_stratified_20260717_163104_648303/sa_advantage_diagnosis.json`
+- `artifacts/analysis/top_journal_v17_future_validation_time_audited_statistics_20260717/paired_statistics.csv`
+
+确认结果：v18 的 counterfactual option-credit MAPPO dev benchmark 为 SA-GHMAPPO `79.4897` vs popularity `79.46875`，低于 v17 dev `79.70825`，且存在 continuity、handoff failure、mechanism readiness blocker，因此不晋级。v17 time-audited future-validation 使用 20 个新冻结窗口、5 seeds、2 workflows/window、12 agents；SA-GHMAPPO total reward `77.56665`，高于 popularity `77.5185`、PPO `76.53095`、MAPPO `70.5285` 和全部其他对照；但相对 popularity 的 reward delta `+0.04815`，BCa 95% CI `[-0.396869, 0.636962]`，Holm sign-test p=`1.0`。相对 MAPPO 的 reward delta `+7.03815`，CI `[3.849155, 10.471469]`。
+
+结论边界：该 artifact 证明 v17 在严格 time-audited future split 上均值仍第一，并显著优于 MAPPO；但不足以声称显著优于 strongest heuristic，也不足以升级为 TMC-ready candidate。旧的非 time-audited future split 仅用于发现审计漏洞，不作为独立验证证据。
+
 ## 2026-07-17 v17 DAG-aware MAPPO option full-dev
 
 状态：`[dev-full-success]` `[current-dev-candidate]` `[not-hidden]`

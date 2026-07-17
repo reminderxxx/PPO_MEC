@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-17: v18 counterfactual option-credit 不晋级，v17 future 验证改用 time-audited split
+
+决策：新增 `top_journal_mechanism_v18_counterfactual_option` 作为 v17 的前沿算法尝试，引入 COMA-style counterfactual option credit：option gate 的 advantage 由全局 PPO advantage、PRD partial credit 和 selected-vs-expected legal-option utility 共同构成。但 v18 frozen dev 结果低于 v17 且存在 blocker，因此不晋级为主候选。当前主候选仍为 v17，并且 future-validation 必须使用 `future_validation_split_v2_time_audited_20260717`。
+
+原因：用户目标是“算法创新且 reward 更高”，不能用 evaluator 包装或规则筛结果。COMA-style counterfactual baseline 与 Option-Critic 风格 option gate 能直接作用于 MAPPO credit assignment，符合算法改进方向；但实验表明当前 v18 系数使 continuity、handoff failure 和 mechanism readiness 退化，说明 credit shaping 没有转化为更强策略。另一个关键发现是旧 future split 只按 `frame_offset` 排除，可能漏掉 `time_index_start/end` 重叠；顶刊审查要求按原始 frame/time interval 验证互斥，因此 split 生成器和审计脚本必须同时检查二者。
+
+影响：v18 保留为负向算法探索和后续 credit-assignment 参考，不作为论文主表候选。v17 在 time-audited future-validation 中 reward 均值仍第一，但对 popularity heuristic 的 reward CI 跨 0，不能声称显著优于 strong heuristic 或 TMC-ready。后续若继续追求更大提升，应在不改 reward/env/baseline 的前提下，优先解决 handoff failure non-inferiority 与 strong heuristic reward CI，而不是扩大规则 fallback。
+
 ## 2026-07-17: v17 用 DAG-aware option termination 约束 MAPPO 机制动作时机
 
 决策：新增 `top_journal_mechanism_v17_dag_aware_option`，在 v16 conservative terminal option 基础上加入 DAG-aware option termination。该 gate 使用已有 graph-continuity critic 特征和 DAG topology：低置信 idle no-RSU predictive prefetch 被终止；机制窗口中，若 workflow 是短 DAG、critical path 低于阈值且当前节点分叉较多，则终止低机会 prefetch，改由 option 层选择 `popularity_safe`。

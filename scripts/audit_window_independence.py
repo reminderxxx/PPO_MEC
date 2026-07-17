@@ -17,14 +17,25 @@ def load_plan(path: Path) -> list[dict[str, Any]]:
     return plan
 
 
-def interval(window: dict[str, Any]) -> tuple[int, int]:
+def frame_interval(window: dict[str, Any]) -> tuple[int, int]:
     start = int(window["frame_offset"])
     return start, start + int(window["window_length"]) - 1
 
 
-def overlaps(left: dict[str, Any], right: dict[str, Any], gap: int = 0) -> bool:
-    left_start, left_end = interval(left)
-    right_start, right_end = interval(right)
+def available_intervals(window: dict[str, Any]) -> dict[str, tuple[int, int]]:
+    intervals = {"frame_offset": frame_interval(window)}
+    if "time_index_start" in window and "time_index_end" in window:
+        intervals["time_index"] = (int(window["time_index_start"]), int(window["time_index_end"]))
+    return intervals
+
+
+def intervals_overlap(
+    left_interval: tuple[int, int],
+    right_interval: tuple[int, int],
+    gap: int = 0,
+) -> bool:
+    left_start, left_end = left_interval
+    right_start, right_end = right_interval
     return left_start <= right_end + gap and right_start <= left_end + gap
 
 
@@ -39,15 +50,19 @@ def overlap_rows(
     for left_index, left_window in enumerate(left):
         start = left_index + 1 if same_plan else 0
         for right_window in right[start:]:
-            if overlaps(left_window, right_window, gap):
-                rows.append(
-                    {
-                        "left_window_id": left_window.get("window_id"),
-                        "left_interval": list(interval(left_window)),
-                        "right_window_id": right_window.get("window_id"),
-                        "right_interval": list(interval(right_window)),
-                    }
-                )
+            left_intervals = available_intervals(left_window)
+            right_intervals = available_intervals(right_window)
+            for interval_kind in sorted(set(left_intervals) & set(right_intervals)):
+                if intervals_overlap(left_intervals[interval_kind], right_intervals[interval_kind], gap):
+                    rows.append(
+                        {
+                            "interval_kind": interval_kind,
+                            "left_window_id": left_window.get("window_id"),
+                            "left_interval": list(left_intervals[interval_kind]),
+                            "right_window_id": right_window.get("window_id"),
+                            "right_interval": list(right_intervals[interval_kind]),
+                        }
+                    )
     return rows
 
 
@@ -60,6 +75,7 @@ def build_report(formal_path: Path, holdout_path: Path, gap: int = 0) -> dict[st
     return {
         "passed": not formal_overlaps and not holdout_overlaps and not cross_overlaps,
         "minimum_gap_frames": gap,
+        "checked_interval_kinds": ["frame_offset", "time_index"],
         "formal_summary_path": str(formal_path.resolve()),
         "holdout_summary_path": str(holdout_path.resolve()),
         "formal_window_ids": [item.get("window_id") for item in formal],

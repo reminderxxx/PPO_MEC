@@ -129,6 +129,36 @@ v13 在 v12 learned option 基础上加入 event-head 与 option-head 的 partia
 
 当前 full-dev evidence：`artifacts/experiments/top_journal_prd_option_v13_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_124815_375515/aggregate_summary.json`。主方法 total reward `79.64465`，高于 v12/best-by-reward `79.5934`、`popularity_cache_heuristic=79.46875`、`ppo=77.18775`、`mappo=72.6328` 和所有其他对照；strongest-other margin 为 `+0.17590`。该结果只能作为 dev-stage evidence，promotion 仍需要新冻结 future-validation 或重新审查，不能使用已 consumed hidden。
 
+### v17/v18 time-audited future-validation
+
+future-validation split 必须同时排除 `frame_offset` 与 `time_index_start/end` 重叠；只按 frame offset 审计的旧 future split 不得作为 independent evidence。
+
+冻结 time-audited future split：
+
+```bash
+.venv/bin/python scripts/freeze_future_validation_split.py --max_mobility_rows 50000 --window_count 20 --mechanism_windows 6 --active_non_mechanism_windows 2 --minimum_gap_frames 24
+```
+
+复核与历史 train/dev/formal/hidden 的独立性：
+
+```bash
+.venv/bin/python scripts/audit_window_independence.py --formal_summary configs/experiment/top_journal_v8_strict_split_20260621/hidden_holdout_window_plan.json --holdout_summary configs/experiment/top_journal_v17_future_validation_time_audited_20260717/future_validation_window_plan.json --minimum_gap_frames 24 --output artifacts/audits/top_journal_v17_future_validation_time_audited_20260717/hidden_vs_future_independence.json
+```
+
+v17 time-audited future-validation benchmark：
+
+```bash
+.venv/bin/python scripts/benchmark_main_results.py --agents sa_ghmappo popularity_cache_heuristic ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl reactive_greedy --seed_checkpoint_manifest_path artifacts/experiments/top_journal_dag_aware_option_v17_20260717/seed_checkpoint_manifest_dag_aware_option_full.json --seeds 7 13 29 41 53 --mobility_source ngsim --primary_vehicle_selection handoff_pressure --workflow_csv_path data/raw/workflow/alibaba2018/batch_task.csv --max_mobility_rows 50000 --max_workflows 2 --workflow_selector ordered --rsu_layout auto_dominant_tight --window_selector max_handoff_candidate --window_mode full_stratified --window_plan_path configs/experiment/top_journal_v17_future_validation_time_audited_20260717/future_validation_window_plan.json --window_length 24 --window_scan_stride 2 --window_count 20 --max_steps 16 --min_tasks 5 --max_tasks 20 --output_root artifacts/experiments/top_journal_dag_aware_option_v17_20260717/future_validation_time_audited_full_stratified
+```
+
+paired statistics：
+
+```bash
+.venv/bin/python scripts/analyze_top_journal_statistics.py --rows_path <benchmark_rows.csv> --candidate_agent sa_ghmappo --baseline_agents popularity_cache_heuristic ppo mappo dqn dueling_dqn qmix controller_mat dag_offload_drl cache_offload_drl dt_handoff_drl reactive_greedy --outer_cluster_keys window_id --inner_cluster_keys seed workflow_id --bootstrap_samples 5000 --output_root artifacts/analysis/top_journal_v17_future_validation_time_audited_statistics_20260717
+```
+
+当前结论：v18 counterfactual option-credit dev 结果不晋级；v17 time-audited future-validation 均值第一，但相对 popularity 的 reward CI 跨 0，不能写成 TMC-ready。
+
 ## Supervised Handoff Predictor
 
 训练薄 supervised predictor：
