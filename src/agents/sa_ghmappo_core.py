@@ -422,6 +422,8 @@ class 分层PPO基类(BaseAgent):
         net_utility_migration_coef: float = 0.0,
         net_utility_expired_prefetch_coef: float = 0.0,
         net_utility_idle_prefetch_penalty: float = 0.0,
+        net_utility_failed_mechanism_penalty: float = 0.0,
+        net_utility_failed_mechanism_backhaul_coef: float = 0.0,
         net_utility_success_bonus: float = 0.0,
         net_utility_backhaul_normalizer: float = 64.0,
         net_utility_cost_dual_enabled: bool = False,
@@ -692,6 +694,11 @@ class 分层PPO基类(BaseAgent):
         self._net_utility_migration_coef = max(float(net_utility_migration_coef), 0.0)
         self._net_utility_expired_prefetch_coef = max(float(net_utility_expired_prefetch_coef), 0.0)
         self._net_utility_idle_prefetch_penalty = max(float(net_utility_idle_prefetch_penalty), 0.0)
+        self._net_utility_failed_mechanism_penalty = max(float(net_utility_failed_mechanism_penalty), 0.0)
+        self._net_utility_failed_mechanism_backhaul_coef = max(
+            float(net_utility_failed_mechanism_backhaul_coef),
+            0.0,
+        )
         self._net_utility_success_bonus = max(float(net_utility_success_bonus), 0.0)
         self._net_utility_backhaul_normalizer = max(float(net_utility_backhaul_normalizer), 1.0)
         self._net_utility_cost_dual_enabled = bool(net_utility_cost_dual_enabled)
@@ -1426,6 +1433,11 @@ class 分层PPO基类(BaseAgent):
             "net_utility_migration_coef": round(self._net_utility_migration_coef, 6),
             "net_utility_expired_prefetch_coef": round(self._net_utility_expired_prefetch_coef, 6),
             "net_utility_idle_prefetch_penalty": round(self._net_utility_idle_prefetch_penalty, 6),
+            "net_utility_failed_mechanism_penalty": round(self._net_utility_failed_mechanism_penalty, 6),
+            "net_utility_failed_mechanism_backhaul_coef": round(
+                self._net_utility_failed_mechanism_backhaul_coef,
+                6,
+            ),
             "net_utility_cost_dual_enabled": self._net_utility_cost_dual_enabled,
             "net_utility_cost_dual_before": round(net_utility_dual_before, 6),
             "net_utility_cost_dual_after": round(net_utility_dual_after, 6),
@@ -3147,7 +3159,14 @@ class 分层PPO基类(BaseAgent):
             and bool(metrics.get("predictive_prefetch_requested", False))
             and not self._row_mechanism_success(metrics)
         )
-        return float(backhaul_units + migration_cost + expired_prefetch + idle_prefetch)
+        failed_mechanism = float(self._row_failed_mechanism_attempt(row, metrics))
+        return float(
+            backhaul_units
+            + migration_cost
+            + expired_prefetch
+            + idle_prefetch
+            + failed_mechanism
+        )
 
     def _update_net_utility_cost_dual(self, cost_values: np.ndarray) -> None:
         if (
@@ -3186,6 +3205,19 @@ class 分层PPO基类(BaseAgent):
             or metrics.get("prefetch_validated_hit", False)
             or float(metrics.get("mechanism_success_rate", 0.0) or 0.0) > 0.0
         )
+
+    def _row_failed_mechanism_attempt(self, row: dict[str, Any], metrics: dict[str, Any]) -> bool:
+        action_info = dict(row.get("action_info", {}))
+        final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
+        event_action = int(action_info.get("head_actions", {}).get("event", 0) or 0)
+        attempted = bool(
+            metrics.get("mechanism_attempt_selected", False)
+            or metrics.get("predictive_prefetch_requested", False)
+            or metrics.get("migration_prepare_requested", False)
+            or final_action in {1, 4}
+            or event_action == 1
+        )
+        return bool(attempted and not self._row_mechanism_success(metrics))
 
     def _metric_bool(self, metrics: dict[str, Any], field_name: str) -> bool:
         value = metrics.get(field_name, False)
@@ -3357,6 +3389,11 @@ class 分层PPO基类(BaseAgent):
         )
         if window_class == "idle_or_sparse" and pending_prefetch and not mechanism_success:
             penalty += penalty_scale * self._net_utility_idle_prefetch_penalty
+        if self._row_failed_mechanism_attempt(row, metrics):
+            penalty += penalty_scale * (
+                self._net_utility_failed_mechanism_penalty
+                + self._net_utility_failed_mechanism_backhaul_coef * backhaul_units
+            )
         bonus = self._net_utility_success_bonus * float(mechanism_success)
         return float(bonus - penalty)
 
@@ -4813,6 +4850,8 @@ class 分层PPO基类(BaseAgent):
             "net_utility_migration_coef": self._net_utility_migration_coef,
             "net_utility_expired_prefetch_coef": self._net_utility_expired_prefetch_coef,
             "net_utility_idle_prefetch_penalty": self._net_utility_idle_prefetch_penalty,
+            "net_utility_failed_mechanism_penalty": self._net_utility_failed_mechanism_penalty,
+            "net_utility_failed_mechanism_backhaul_coef": self._net_utility_failed_mechanism_backhaul_coef,
             "net_utility_success_bonus": self._net_utility_success_bonus,
             "net_utility_backhaul_normalizer": self._net_utility_backhaul_normalizer,
             "net_utility_cost_dual_enabled": self._net_utility_cost_dual_enabled,

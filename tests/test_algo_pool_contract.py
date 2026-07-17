@@ -863,6 +863,39 @@ class AlgoPoolContractTestCase(unittest.TestCase):
             0.0,
         )
 
+    def test_sa_v21_profile_reactivates_net_utility_efficiency_prd(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v21_efficiency_prd"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v21_efficiency_prd")
+        self.assertTrue(kwargs["idle_execution_prd_enabled"])
+        self.assertTrue(kwargs["handoff_risk_prd_enabled"])
+        self.assertTrue(kwargs["net_utility_prd_enabled"])
+        self.assertTrue(kwargs["net_utility_cost_dual_enabled"])
+        self.assertGreater(kwargs["idle_execution_policy_coef"], 0.30)
+        self.assertGreater(kwargs["idle_execution_option_coef"], 0.42)
+        self.assertGreater(kwargs["net_utility_backhaul_coef"], 0.0)
+        self.assertLess(kwargs["mechanism_window_weight"], 1.52)
+
+    def test_sa_v22_profile_enables_validated_utility_prd(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v22_validated_utility_prd"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v22_validated_utility_prd")
+        self.assertTrue(kwargs["idle_execution_prd_enabled"])
+        self.assertTrue(kwargs["net_utility_prd_enabled"])
+        self.assertTrue(kwargs["net_utility_cost_dual_enabled"])
+        self.assertGreater(kwargs["net_utility_failed_mechanism_penalty"], 0.0)
+        self.assertGreater(kwargs["net_utility_failed_mechanism_backhaul_coef"], 0.0)
+        self.assertGreater(kwargs["idle_execution_policy_coef"], 0.46)
+        self.assertLess(kwargs["prepare_action_prior_weight"], 0.50)
+
     def test_sa_v14_net_utility_option_terminates_idle_no_rsu_prefetch(self) -> None:
         agent = build_agent(
             "sa_ghmappo",
@@ -1161,6 +1194,63 @@ class AlgoPoolContractTestCase(unittest.TestCase):
 
         self.assertLess(agent._event_partial_reward_credit(expired_idle_row), -1.0)
         self.assertLess(agent._option_gate_partial_reward_credit(expired_idle_row), -1.0)
+        self.assertGreater(agent._event_partial_reward_credit(success_row), 0.0)
+        self.assertGreater(agent._option_gate_partial_reward_credit(success_row), 0.0)
+
+    def test_sa_v22_net_utility_penalizes_unvalidated_mechanism_attempt(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            event_prd_advantage_enabled=True,
+            option_gate_prd_enabled=True,
+            net_utility_prd_enabled=True,
+            net_utility_backhaul_coef=0.22,
+            net_utility_migration_coef=0.24,
+            net_utility_failed_mechanism_penalty=0.84,
+            net_utility_failed_mechanism_backhaul_coef=0.36,
+            net_utility_success_bonus=0.28,
+            net_utility_backhaul_normalizer=64.0,
+        )
+        failed_row = {
+            "action": 4,
+            "reward": 1.0,
+            "action_info": {
+                "head_actions": {"event": 1},
+                "final_env_action": 4,
+                "prepare_window_score": 0.8,
+                "temporal_urgency": 0.7,
+                "prediction_confidence": 0.75,
+                "gate_pass": True,
+                "option_gate": {
+                    "enabled": True,
+                    "option_label": "accept_mappo",
+                    "window_class": "mechanism_activating",
+                },
+            },
+            "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+            "env_info": {
+                "metrics_protocol": {
+                    "backhaul_traffic_cost": 64.0,
+                    "adapter_state_migration_overhead": 0.0,
+                    "mechanism_attempt_selected": True,
+                    "migration_prepare_requested": True,
+                    "mechanism_success_strict": False,
+                    "handoff_ready": False,
+                }
+            },
+        }
+        success_row = deepcopy(failed_row)
+        success_row["env_info"]["metrics_protocol"].update(
+            {
+                "backhaul_traffic_cost": 0.0,
+                "mechanism_success_strict": True,
+                "handoff_ready": True,
+            }
+        )
+
+        self.assertLess(agent._event_partial_reward_credit(failed_row), 0.0)
+        self.assertLess(agent._option_gate_partial_reward_credit(failed_row), 0.0)
         self.assertGreater(agent._event_partial_reward_credit(success_row), 0.0)
         self.assertGreater(agent._option_gate_partial_reward_credit(success_row), 0.0)
 

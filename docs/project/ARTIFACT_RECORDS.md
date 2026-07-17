@@ -1,5 +1,36 @@
 # Artifact Records
 
+## 2026-07-17 v21/v22 efficiency and validated-utility PRD diagnostics
+
+状态：`[algorithmic-prd-followup]` `[formal-not-passed]` `[hidden-not-opened]`
+
+路径：
+
+- `configs/experiment/top_journal_mechanism_v21_efficiency_prd.yaml`
+- `configs/experiment/top_journal_mechanism_v22_validated_utility_prd.yaml`
+- `configs/experiment/top_journal_v20_formal_time_audited_20260717/future_validation_manifest.json`
+- `configs/experiment/top_journal_v20_hidden_time_audited_20260717/future_validation_manifest.json`
+- `artifacts/audits/top_journal_v20_submission_time_audited_20260717/`
+- `artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/formal_time_audited_full_stratified/main_results_full_stratified_20260717_174845_643488/aggregate_summary.json`
+- `artifacts/experiments/top_journal_idle_execution_prd_v20_20260717/formal_statistics/paired_statistics.csv`
+- `artifacts/experiments/top_journal_efficiency_prd_v21_20260717/seed_checkpoint_manifest_efficiency_prd_full.json`
+- `artifacts/experiments/top_journal_efficiency_prd_v21_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_180815_061047/aggregate_summary.json`
+- `artifacts/experiments/top_journal_efficiency_prd_v21_20260717/dev_statistics/paired_statistics.csv`
+- `artifacts/experiments/top_journal_efficiency_prd_v21_20260717/formal_time_audited_full_stratified/main_results_full_stratified_20260717_181224_815690/aggregate_summary.json`
+- `artifacts/experiments/top_journal_efficiency_prd_v21_20260717/formal_statistics/paired_statistics.csv`
+- `artifacts/experiments/top_journal_validated_utility_prd_v22_20260717/seed_checkpoint_manifest_validated_utility_prd_full.json`
+- `artifacts/experiments/top_journal_validated_utility_prd_v22_20260717/v22_training_checkpoint_summary.json`
+- `artifacts/experiments/top_journal_validated_utility_prd_v22_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_183502_979928/aggregate_summary.json`
+- `artifacts/experiments/top_journal_validated_utility_prd_v22_20260717/dev_statistics/paired_statistics.csv`
+- `artifacts/experiments/top_journal_validated_utility_prd_v22_20260717/formal_time_audited_full_stratified/main_results_full_stratified_20260717_183840_399252/aggregate_summary.json`
+- `artifacts/experiments/top_journal_validated_utility_prd_v22_20260717/formal_statistics/paired_statistics.csv`
+
+确认结果：v21 在 v20 上加入 efficiency-aware net-utility PRD，dev reward 为 SA-GHMAPPO `79.760` vs popularity `79.46875`，delta `+0.29125`，BCa CI `[0.01425, 0.811673]`，但 Holm p=`0.0789`；formal reward 为 `80.1965` vs popularity `80.02375`，delta `+0.17275`，BCa CI `[-0.406, 1.234163]`，Holm p=`1.0`，并保留 backhaul / unvalidated mechanism-attempt blocker。
+
+v22 在 v21 上加入 validated-utility failed-mechanism penalty，dev 上 mechanism realization delta 相对 popularity 为 `+0.05` 且 Holm p=`0.046872`，但 reward delta 为 `+0.268`、Holm p=`1.0`。v22 formal reward 为 `80.124` vs popularity `80.02375`，delta `+0.10025`，BCa CI `[-0.490537, 1.045619]`，Holm p=`1.0`，仍有 `backhaul_cost_above_popularity` 与 `mechanism_attempts_without_validated_success` blockers。
+
+结论边界：v21/v22 均是 policy-side MAPPO credit-assignment 改进，不是 reward/env/baseline/evaluator 包装；但它们没有产生论文级 stronger-heuristic 优势，不应晋级主表或开启 hidden。v22 可作为机制兑现改进的正向消融，v21 可作为 efficiency PRD 中间候选，二者都必须报告 formal 失败。
+
 ## 2026-07-17 v20 idle-execution PRD-MAPPO dev and time-audited future-validation
 
 状态：`[current-algorithm-candidate]` `[time-audited-future-positive]` `[not-tmc-ready]`

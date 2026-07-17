@@ -1,0 +1,266 @@
+{
+  "protocol_version": "future_validation_split_v2_time_audited_20260717",
+  "created_at": "2026-07-17T09:47:46.674788+00:00",
+  "selection_policy": "mobility-covariate-only; excludes prior train/dev/formal/hidden frame and time intervals; does not inspect reward, checkpoint, or outcome rows",
+  "parameters": {
+    "mobility_source": "ngsim",
+    "max_mobility_rows": 200000,
+    "window_length": 24,
+    "window_scan_stride": 2,
+    "minimum_gap_frames": 0,
+    "window_count": 20,
+    "targets": {
+      "mechanism_activating": 10,
+      "active_non_mechanism": 10,
+      "idle_or_sparse": 0
+    },
+    "random_seed": 37
+  },
+  "source_records": {
+    "mobility": {
+      "path": "data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+      "sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+      "size_bytes": 2118175938
+    },
+    "workflow": {
+      "path": "data/raw/workflow/alibaba2018/batch_task.csv",
+      "sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc",
+      "size_bytes": 802261444
+    }
+  },
+  "exclude_plan_records": [
+    {
+      "path": "configs/experiment/top_journal_v8_strict_split_20260621/train_window_plan.json",
+      "sha256": "2850bc3db6cce76d48f404a7e32ac2841f640c3f8c85a5ce4762f51b447ef6b5",
+      "window_count": 20,
+      "window_ids": [
+        "window_off154_len24_t199_222",
+        "window_off456_len24_t501_524",
+        "window_off1254_len24_t1472_1495",
+        "window_off1398_len24_t1739_2034",
+        "window_off1542_len24_t2155_2178",
+        "window_off1668_len24_t2429_2478",
+        "window_off1926_len24_t2932_3073",
+        "window_off2150_len24_t3274_3297",
+        "window_off2292_len24_t3416_3439",
+        "window_off2516_len24_t4059_4082",
+        "window_off2566_len24_t4109_4132",
+        "window_off2672_len24_t4215_4238",
+        "window_off2994_len24_t4625_4667",
+        "window_off3672_len24_t5352_5378",
+        "window_off3810_len24_t5540_5563",
+        "window_off3946_len24_t5676_5699",
+        "window_off4136_len24_t5866_5889",
+        "window_off4554_len24_t6284_6307",
+        "window_off5248_len24_t7070_7093",
+        "window_off5666_len24_t8277_8365"
+      ]
+    },
+    {
+      "path": "configs/experiment/top_journal_v8_strict_split_20260621/dev_window_plan.json",
+      "sha256": "19517ebcc468cc0232163d52a92886a35273b1cb76975c7e4cb52de8de7137e3",
+      "window_count": 20,
+      "window_ids": [
+        "window_off100_len24_t145_168",
+        "window_off288_len24_t333_356",
+        "window_off336_len24_t381_404",
+        "window_off1110_len24_t1328_1351",
+        "window_off1350_len24_t1568_1626",
+        "window_off1716_len24_t2546_2631",
+        "window_off1988_len24_t3112_3135",
+        "window_off2344_len24_t3473_3511",
+        "window_off2464_len24_t3750_3958",
+        "window_off2618_len24_t4161_4184",
+        "window_off3624_len24_t5304_5327",
+        "window_off3870_len24_t5600_5623",
+        "window_off4306_len24_t6036_6059",
+        "window_off4506_len24_t6236_6259",
+        "window_off4698_len24_t6478_6530",
+        "window_off5358_len24_t7180_7203",
+        "window_off5414_len24_t7240_7268",
+        "window_off5552_len24_t8120_8143",
+        "window_off5604_len24_t8172_8195",
+        "window_off5730_len24_t8565_8715"
+      ]
+    },
+    {
+      "path": "configs/experiment/top_journal_v8_strict_split_20260621/formal_window_plan.json",
+      "sha256": "f2c64ad0ee91d8cdd0144f1ba7445ce15b2e41e1b8ec28c15bf0c9aa0da421ca",
+      "window_count": 20,
+      "window_ids": [
+        "window_off42_len24_t87_110",
+        "window_off232_len24_t277_300",
+        "window_off584_len24_t646_744",
+        "window_off720_len24_t938_961",
+        "window_off830_len24_t1048_1071",
+        "window_off878_len24_t1096_1119",
+        "window_off1608_len24_t2221_2283",
+        "window_off1824_len24_t2830_2853",
+        "window_off1874_len24_t2880_2903",
+        "window_off2232_len24_t3356_3379",
+        "window_off2720_len24_t4263_4286",
+        "window_off2860_len24_t4403_4430",
+        "window_off2908_len24_t4455_4485",
+        "window_off3062_len24_t4742_4765",
+        "window_off3110_len24_t4790_4813",
+        "window_off3292_len24_t4972_4995",
+        "window_off4088_len24_t5818_5841",
+        "window_off4648_len24_t6428_6451",
+        "window_off4824_len24_t6638_6669",
+        "window_off5464_len24_t7331_7412"
+      ]
+    },
+    {
+      "path": "configs/experiment/top_journal_v8_strict_split_20260621/hidden_holdout_window_plan.json",
+      "sha256": "06a43975124e2fbd0203061daeb7a62435d8b23cc156ef17fd41d94deeeee368",
+      "window_count": 20,
+      "window_ids": [
+        "window_off534_len24_t579_602",
+        "window_off646_len24_t853_876",
+        "window_off994_len24_t1212_1235",
+        "window_off1062_len24_t1280_1303",
+        "window_off1198_len24_t1416_1439",
+        "window_off1302_len24_t1520_1543",
+        "window_off1460_len24_t2073_2096",
+        "window_off1776_len24_t2700_2787",
+        "window_off2054_len24_t3178_3201",
+        "window_off2416_len24_t3591_3683",
+        "window_off2812_len24_t4355_4378",
+        "window_off3160_len24_t4840_4863",
+        "window_off3376_len24_t5056_5079",
+        "window_off3508_len24_t5188_5211",
+        "window_off3566_len24_t5246_5269",
+        "window_off3744_len24_t5432_5476",
+        "window_off4010_len24_t5740_5763",
+        "window_off4370_len24_t6100_6123",
+        "window_off4746_len24_t6560_6583",
+        "window_off5778_len24_t8740_8824"
+      ]
+    },
+    {
+      "path": "configs/experiment/top_journal_v17_future_validation_time_audited_20260717/future_validation_window_plan.json",
+      "sha256": "9ed53bf3a3ad9f0d7cf72777e9b86ba4272216b68868cf74e20227d923cb6ab1",
+      "window_count": 20,
+      "window_ids": [
+        "window_off390_len24_t430_453",
+        "window_off4454_len24_t4522_4545",
+        "window_off5904_len24_t5976_5999",
+        "window_off6260_len24_t6332_6355",
+        "window_off6308_len24_t6380_6403",
+        "window_off7046_len24_t7119_7142",
+        "window_off7392_len24_t7533_7556",
+        "window_off7446_len24_t7587_7610",
+        "window_off7500_len24_t7641_7664",
+        "window_off7560_len24_t7701_7724",
+        "window_off8084_len24_t8225_8248",
+        "window_off8248_len24_t8390_8421",
+        "window_off8314_len24_t8468_8491",
+        "window_off8362_len24_t8516_8539",
+        "window_off8698_len24_t8852_8875",
+        "window_off8908_len24_t9062_9085",
+        "window_off8976_len24_t9130_9153",
+        "window_off9030_len24_t9184_9253",
+        "window_off9088_len24_t9299_9335",
+        "window_off9162_len24_t9557_10257"
+      ]
+    },
+    {
+      "path": "configs/experiment/top_journal_v20_future_validation_time_audited_20260717/future_validation_window_plan.json",
+      "sha256": "7ac28f56a5a35332c166741ed2e1f373a0c47f88a2723319b48fd05e890c6b3d",
+      "window_count": 15,
+      "window_ids": [
+        "window_off2490_len24_t2492_2515",
+        "window_off4866_len24_t4868_4891",
+        "window_off4918_len24_t4920_4943",
+        "window_off5272_len24_t5274_5297",
+        "window_off5504_len24_t5506_5529",
+        "window_off6534_len24_t6536_6559",
+        "window_off6764_len24_t6766_6789",
+        "window_off7268_len24_t7270_7293",
+        "window_off7298_len24_t7300_7323",
+        "window_off7738_len24_t7740_7763",
+        "window_off7856_len24_t7858_7881",
+        "window_off8196_len24_t8198_8221",
+        "window_off8874_len24_t8876_8899",
+        "window_off9462_len24_t9464_9487",
+        "window_off10302_len24_t10304_10327"
+      ]
+    },
+    {
+      "path": "configs/experiment/top_journal_v20_formal_time_audited_20260717/future_validation_window_plan.json",
+      "sha256": "f835e0f2bce3b32cf98e1302b75bacd22c0d0eb05694066f71bdf7a447d38ae5",
+      "window_count": 20,
+      "window_ids": [
+        "window_off1634_len24_t1636_1659",
+        "window_off3246_len24_t3248_3271",
+        "window_off3438_len24_t3440_3463",
+        "window_off3534_len24_t3536_3559",
+        "window_off5326_len24_t5328_5351",
+        "window_off5388_len24_t5390_5413",
+        "window_off6058_len24_t6060_6083",
+        "window_off6354_len24_t6356_6379",
+        "window_off6402_len24_t6404_6427",
+        "window_off6452_len24_t6454_6477",
+        "window_off6734_len24_t6736_6759",
+        "window_off6836_len24_t6838_6861",
+        "window_off6870_len24_t6872_6895",
+        "window_off6898_len24_t6900_6923",
+        "window_off6956_len24_t6958_6981",
+        "window_off7214_len24_t7216_7239",
+        "window_off7832_len24_t7834_7857",
+        "window_off7886_len24_t7888_7911",
+        "window_off8042_len24_t8044_8067",
+        "window_off8826_len24_t8828_8851"
+      ]
+    }
+  ],
+  "candidate_pool_counts": {
+    "active_non_mechanism": 1999,
+    "mechanism_activating": 2921,
+    "idle_or_sparse": 233
+  },
+  "future_validation_plan": {
+    "path": "configs/experiment/top_journal_v20_hidden_time_audited_20260717/future_validation_window_plan.json",
+    "sha256": "79c69feca483e145cc99205aa3556ab41585ed9893c8632fa0a87a62cdee1009",
+    "window_count": 20,
+    "window_ids": [
+      "window_off800_len24_t802_825",
+      "window_off1138_len24_t1140_1163",
+      "window_off1494_len24_t1496_1519",
+      "window_off1692_len24_t1694_1717",
+      "window_off2110_len24_t2112_2135",
+      "window_off2318_len24_t2320_2343",
+      "window_off2642_len24_t2644_2667",
+      "window_off3218_len24_t3220_3243",
+      "window_off4580_len24_t4582_4605",
+      "window_off5010_len24_t5012_5035",
+      "window_off5080_len24_t5082_5105",
+      "window_off5946_len24_t5948_5971",
+      "window_off6788_len24_t6790_6813",
+      "window_off6812_len24_t6814_6837",
+      "window_off7422_len24_t7424_7447",
+      "window_off7674_len24_t7676_7699",
+      "window_off7768_len24_t7770_7793",
+      "window_off7960_len24_t7962_7985",
+      "window_off9272_len24_t9274_9297",
+      "window_off9512_len24_t9514_9537"
+    ],
+    "stratum_counts": {
+      "mechanism_activating": 10,
+      "active_non_mechanism": 10,
+      "idle_or_sparse": 0
+    }
+  },
+  "independence_audit": {
+    "passed": true,
+    "minimum_gap_frames": 0,
+    "checked_interval_kinds": [
+      "frame_offset",
+      "time_index"
+    ],
+    "future_window_count": 20,
+    "excluded_window_count": 135,
+    "conflicts": []
+  },
+  "manifest_content_sha256": "0b43db212df3ca4a5cec87d593e000275c2e4d2b7298d88d2429a15ddc724c97"
+}

@@ -1,0 +1,33 @@
+profile: top_journal_mechanism_v21_efficiency_prd
+purpose: >
+  Extend v20 with efficiency-aware partial reward decoupling for the formal
+  mechanism/active-heavy split. The MAPPO actor and option gate receive stronger
+  active-window execution credit plus net-utility cost credit so unrealized
+  mechanism attempts and backhaul side effects are not over-credited.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v20_idle_execution_prd
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  idle_execution_prd_enabled: true
+  idle_execution_policy_coef: 0.46
+  idle_execution_option_coef: 0.64
+  net_utility_prd_enabled: true
+  net_utility_backhaul_coef: 0.12
+  net_utility_cost_dual_enabled: true
+  mechanism_window_weight: 1.42
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+evaluation:
+  split_policy: dev_then_time_audited_formal_then_hidden
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile targets the v20 formal blocker where active non-mechanism
+    windows lost delay reward and mechanism windows had backhaul regression with
+    low validated mechanism success.
+  - The signal changes PPO/MAPPO learning credit only; it does not alter
+    environment rewards, baseline behavior, or benchmark consumption.

@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-17: v21/v22 不晋级，hidden 保持关闭
+
+决策：新增 `top_journal_mechanism_v21_efficiency_prd` 与 `top_journal_mechanism_v22_validated_utility_prd` 后，不将二者晋级为主论文候选，也不打开 hidden holdout。v21 通过 net-utility PRD 重新惩罚 backhaul/migration/expired prefetch；v22 进一步把 failed mechanism attempt without validated success 纳入 event/option partial credit 的负项，并降低 prepare prior。两者都保留为算法性 MAPPO credit-assignment 尝试和消融/负结果。
+
+原因：v21 dev 对 popularity 的 reward margin 提升到 `+0.29125`，但 Holm p=`0.0789`，formal 只有 `+0.17275` 且 CI 跨 0；v22 提高 dev mechanism realization（delta `+0.05`，Holm p=`0.046872`），但 reward margin 降为 `+0.268`，formal 只有 `+0.10025` 且仍有 backhaul 与 unvalidated mechanism-attempt blocker。结果说明“更保守、更机制真实”的 credit 目前没有转化为 stronger heuristic reward superiority。
+
+影响：不能写“主算法已显著高于最强规则”或“足以发 TMC 主 claim”。`configs/experiment/top_journal_v20_formal_time_audited_20260717/future_validation_window_plan.json` 已被用于 v21/v22 诊断和算法设计，后续不能再作为未消费 final holdout；若继续冲击论文级结果，必须重新冻结未消费 formal/hidden，或在候选完全冻结后只开启一次未读取 hidden。当前最强正向证据仍是 v20 的 15-window time-audited future-validation，但它也不是 paper-ready package。
+
 ## 2026-07-17: v20 采用 idle-execution PRD-MAPPO 作为当前 final-candidate 前置候选
 
 决策：在 v19 handoff-risk PRD 后新增 `top_journal_mechanism_v20_idle_execution_prd`，作为当前最强算法候选。v19 把 high-risk handoff readiness、prepare realization 和 failure/unprepared cost 引入 event-head / option-head partial credit；v20 进一步把低风险 idle / active-non-mechanism 场景中的 execution credit 解耦，让 PPO/MAPPO actor advantage 与 option-gate advantage 学会区分 local fallback 的低延迟收益和 current-RSU/cache-fill 在 idle 窗口的 delay side effect。

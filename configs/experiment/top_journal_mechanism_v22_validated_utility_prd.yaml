@@ -1,0 +1,37 @@
+profile: top_journal_mechanism_v22_validated_utility_prd
+purpose: >
+  Extend v21 with conservative validated-utility partial reward decoupling. The
+  MAPPO event head and option gate keep mechanism credit only when prepare
+  attempts are supported by validated handoff/cache outcomes, while failed
+  prepare attempts receive an explicit net-utility penalty.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v21_efficiency_prd
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  idle_execution_prd_enabled: true
+  idle_execution_policy_coef: 0.62
+  idle_execution_option_coef: 0.82
+  idle_execution_current_rsu_delay_coef: 0.78
+  idle_execution_local_bonus: 0.64
+  net_utility_prd_enabled: true
+  net_utility_backhaul_coef: 0.22
+  net_utility_failed_mechanism_penalty: 0.84
+  net_utility_failed_mechanism_backhaul_coef: 0.36
+  net_utility_cost_dual_enabled: true
+  prepare_action_prior_weight: 0.34
+  mechanism_window_weight: 1.18
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+evaluation:
+  split_policy: dev_then_time_audited_formal_then_hidden
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile targets the v21 formal blockers: backhaul above popularity and
+    mechanism attempts without validated success.
+  - The signal changes PPO/MAPPO learning credit only; it does not alter
+    environment rewards, baseline behavior, or benchmark consumption.
