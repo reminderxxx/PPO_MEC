@@ -391,6 +391,26 @@ class 分层PPO基类(BaseAgent):
         option_gate_prd_enabled: bool = False,
         option_gate_prd_coef: float = 0.0,
         option_gate_prd_clip: float = 2.0,
+        net_utility_prd_enabled: bool = False,
+        net_utility_backhaul_coef: float = 0.0,
+        net_utility_migration_coef: float = 0.0,
+        net_utility_expired_prefetch_coef: float = 0.0,
+        net_utility_idle_prefetch_penalty: float = 0.0,
+        net_utility_success_bonus: float = 0.0,
+        net_utility_backhaul_normalizer: float = 64.0,
+        net_utility_cost_dual_enabled: bool = False,
+        net_utility_cost_dual_lr: float = 0.0,
+        net_utility_cost_target: float = 0.0,
+        net_utility_cost_dual_max: float = 2.0,
+        net_utility_cost_dual_initial: float = 0.0,
+        net_utility_option_termination_enabled: bool = False,
+        net_utility_option_termination_conservative_enabled: bool = False,
+        net_utility_option_termination_max_timing_support: float = 0.20,
+        dag_aware_option_termination_enabled: bool = False,
+        dag_aware_option_min_critical_path: int = 6,
+        dag_aware_option_short_workflow_max_nodes: int = 12,
+        dag_aware_option_branching_successors: int = 3,
+        dag_aware_idle_prefetch_confidence_floor: float = 0.65,
         auxiliary_slow_weight: float = 1.0,
         auxiliary_fast_weight: float = 0.5,
         auxiliary_event_weight: float = 1.0,
@@ -600,6 +620,37 @@ class 分层PPO基类(BaseAgent):
         self._option_gate_prd_enabled = bool(option_gate_prd_enabled)
         self._option_gate_prd_coef = max(float(option_gate_prd_coef), 0.0)
         self._option_gate_prd_clip = max(float(option_gate_prd_clip), 0.0)
+        self._net_utility_prd_enabled = bool(net_utility_prd_enabled)
+        self._net_utility_backhaul_coef = max(float(net_utility_backhaul_coef), 0.0)
+        self._net_utility_migration_coef = max(float(net_utility_migration_coef), 0.0)
+        self._net_utility_expired_prefetch_coef = max(float(net_utility_expired_prefetch_coef), 0.0)
+        self._net_utility_idle_prefetch_penalty = max(float(net_utility_idle_prefetch_penalty), 0.0)
+        self._net_utility_success_bonus = max(float(net_utility_success_bonus), 0.0)
+        self._net_utility_backhaul_normalizer = max(float(net_utility_backhaul_normalizer), 1.0)
+        self._net_utility_cost_dual_enabled = bool(net_utility_cost_dual_enabled)
+        self._net_utility_cost_dual_lr = max(float(net_utility_cost_dual_lr), 0.0)
+        self._net_utility_cost_target = max(float(net_utility_cost_target), 0.0)
+        self._net_utility_cost_dual_max = max(float(net_utility_cost_dual_max), 0.0)
+        self._net_utility_cost_dual = min(
+            max(float(net_utility_cost_dual_initial), 0.0),
+            self._net_utility_cost_dual_max,
+        )
+        self._net_utility_option_termination_enabled = bool(net_utility_option_termination_enabled)
+        self._net_utility_option_termination_conservative_enabled = bool(
+            net_utility_option_termination_conservative_enabled
+        )
+        self._net_utility_option_termination_max_timing_support = max(
+            min(float(net_utility_option_termination_max_timing_support), 1.0),
+            0.0,
+        )
+        self._dag_aware_option_termination_enabled = bool(dag_aware_option_termination_enabled)
+        self._dag_aware_option_min_critical_path = max(int(dag_aware_option_min_critical_path), 1)
+        self._dag_aware_option_short_workflow_max_nodes = max(int(dag_aware_option_short_workflow_max_nodes), 1)
+        self._dag_aware_option_branching_successors = max(int(dag_aware_option_branching_successors), 0)
+        self._dag_aware_idle_prefetch_confidence_floor = max(
+            min(float(dag_aware_idle_prefetch_confidence_floor), 1.0),
+            0.0,
+        )
         self._auxiliary_slow_weight = float(auxiliary_slow_weight)
         self._auxiliary_fast_weight = float(auxiliary_fast_weight)
         self._auxiliary_event_weight = float(auxiliary_event_weight)
@@ -952,6 +1003,19 @@ class 分层PPO基类(BaseAgent):
             )
         else:
             normalized_event_advantages = (event_advantages_raw - event_advantage_mean) / (event_advantage_std + 1e-8)
+        net_utility_cost_values = np.asarray(
+            [self._net_utility_cost_signal(row) for row in rollout],
+            dtype=np.float32,
+        )
+        net_utility_dual_before = float(self._net_utility_cost_dual)
+        self._update_net_utility_cost_dual(net_utility_cost_values)
+        net_utility_dual_after = float(self._net_utility_cost_dual)
+        net_utility_adjustment_values = np.zeros(len(rollout), dtype=np.float32)
+        if self._net_utility_prd_enabled:
+            net_utility_adjustment_values = np.asarray(
+                [self._net_utility_prd_adjustment(row) for row in rollout],
+                dtype=np.float32,
+            )
         event_prd_credit_values = np.zeros(len(rollout), dtype=np.float32)
         if self._event_prd_advantage_enabled and self._event_prd_advantage_coef > 0.0:
             event_prd_credit_values = np.asarray(
@@ -1226,6 +1290,39 @@ class 分层PPO基类(BaseAgent):
             else 0.0,
             "event_prd_credit_std": round(float(event_prd_credit_values.std()), 6)
             if len(event_prd_credit_values) > 0
+            else 0.0,
+            "net_utility_prd_enabled": self._net_utility_prd_enabled,
+            "net_utility_backhaul_coef": round(self._net_utility_backhaul_coef, 6),
+            "net_utility_migration_coef": round(self._net_utility_migration_coef, 6),
+            "net_utility_expired_prefetch_coef": round(self._net_utility_expired_prefetch_coef, 6),
+            "net_utility_idle_prefetch_penalty": round(self._net_utility_idle_prefetch_penalty, 6),
+            "net_utility_cost_dual_enabled": self._net_utility_cost_dual_enabled,
+            "net_utility_cost_dual_before": round(net_utility_dual_before, 6),
+            "net_utility_cost_dual_after": round(net_utility_dual_after, 6),
+            "net_utility_cost_signal_mean": round(float(net_utility_cost_values.mean()), 6)
+            if len(net_utility_cost_values) > 0
+            else 0.0,
+            "net_utility_option_termination_enabled": self._net_utility_option_termination_enabled,
+            "net_utility_option_termination_conservative_enabled": (
+                self._net_utility_option_termination_conservative_enabled
+            ),
+            "net_utility_option_termination_max_timing_support": round(
+                self._net_utility_option_termination_max_timing_support,
+                6,
+            ),
+            "dag_aware_option_termination_enabled": self._dag_aware_option_termination_enabled,
+            "dag_aware_option_min_critical_path": self._dag_aware_option_min_critical_path,
+            "dag_aware_option_short_workflow_max_nodes": self._dag_aware_option_short_workflow_max_nodes,
+            "dag_aware_option_branching_successors": self._dag_aware_option_branching_successors,
+            "dag_aware_idle_prefetch_confidence_floor": round(
+                self._dag_aware_idle_prefetch_confidence_floor,
+                6,
+            ),
+            "net_utility_prd_adjustment_mean": round(float(net_utility_adjustment_values.mean()), 6)
+            if len(net_utility_adjustment_values) > 0
+            else 0.0,
+            "net_utility_prd_adjustment_std": round(float(net_utility_adjustment_values.std()), 6)
+            if len(net_utility_adjustment_values) > 0
             else 0.0,
             "value_mean": round(float(old_value_tensor.mean().item()), 6),
             "return_mean": round(float(return_tensor.mean().item()), 6),
@@ -1647,6 +1744,140 @@ class 分层PPO基类(BaseAgent):
             "window_class": window_class,
         }
 
+    def _build_dag_opportunity_summary(self, semantic_state: dict[str, Any]) -> dict[str, float | int]:
+        workflow = semantic_state.get("workflow", {})
+        current_node = semantic_state.get("current_workflow_node") or {}
+        nodes = list(workflow.get("nodes", []))
+        node_map = {str(node.get("node_id")): node for node in nodes if node.get("node_id") is not None}
+        completed_node_ids = {str(node_id) for node_id in workflow.get("completed_node_ids", [])}
+        remaining_node_ids = [node_id for node_id in node_map if node_id not in completed_node_ids]
+        frontier_node_ids = [
+            node_id
+            for node_id in remaining_node_ids
+            if {str(item) for item in node_map[node_id].get("predecessors", [])}.issubset(completed_node_ids)
+        ]
+
+        longest_remaining_path_cache: dict[str, int] = {}
+
+        def remaining_path_length(node_id: str | None) -> int:
+            if not node_id or node_id not in node_map or node_id in completed_node_ids:
+                return 0
+            if node_id in longest_remaining_path_cache:
+                return longest_remaining_path_cache[node_id]
+            successors = [
+                str(successor_id)
+                for successor_id in node_map[node_id].get("successors", [])
+                if str(successor_id) in node_map and str(successor_id) not in completed_node_ids
+            ]
+            best_successor_length = max((remaining_path_length(successor_id) for successor_id in successors), default=0)
+            longest_remaining_path_cache[node_id] = 1 + best_successor_length
+            return longest_remaining_path_cache[node_id]
+
+        current_node_id = str(workflow.get("current_node_id") or current_node.get("node_id") or "")
+        current_path_length = remaining_path_length(current_node_id)
+        critical_path_length = max(
+            (remaining_path_length(node_id) for node_id in frontier_node_ids),
+            default=current_path_length,
+        )
+        current_node_record = node_map.get(current_node_id, current_node if isinstance(current_node, dict) else {})
+        current_successor_count = len(list(current_node_record.get("successors", [])))
+        node_count = len(node_map)
+        continuity_features = build_graph_continuity_critic_features(
+            semantic_state,
+            prediction_gate_min_leak=self._prediction_gate_min_leak,
+        )
+        return {
+            "node_count": int(node_count),
+            "remaining_node_count": int(len(remaining_node_ids)),
+            "frontier_width": int(len(frontier_node_ids)),
+            "current_path_length": int(current_path_length),
+            "critical_path_length": int(critical_path_length),
+            "current_successor_count": int(current_successor_count),
+            "remaining_nodes_ratio": float(continuity_features.get("remaining_nodes_ratio", 0.0)),
+            "critical_path_length_norm": float(continuity_features.get("critical_path_length_norm", 0.0)),
+            "predicted_path_switch_ratio": float(continuity_features.get("predicted_path_switch_ratio", 0.0)),
+            "prediction_confidence": float(continuity_features.get("prediction_confidence", 0.0)),
+            "prediction_reliability": float(continuity_features.get("prediction_reliability", 0.0)),
+            "reliability_timing_alignment": float(
+                continuity_features.get("reliability_timing_alignment", 0.0)
+            ),
+        }
+
+    def _dag_aware_option_termination_reason(
+        self,
+        *,
+        semantic_state: dict[str, Any],
+        candidate_info: dict[str, Any],
+        base_env_action: int,
+        window_class: str,
+    ) -> str | None:
+        if not (
+            self._dag_aware_option_termination_enabled
+            and int(base_env_action) == 1
+            and len(candidate_info["option_mask"]) > 1
+            and bool(candidate_info["option_mask"][1])
+            and int(candidate_info["option_actions"].get(1, int(base_env_action))) != int(base_env_action)
+        ):
+            return None
+
+        dag_summary = self._build_dag_opportunity_summary(semantic_state)
+        if (
+            window_class == "idle_or_sparse"
+            and str(candidate_info.get("popularity_reason", "")) == "no_associated_rsu_vehicle_fallback"
+            and float(dag_summary.get("prediction_confidence", 0.0))
+            <= self._dag_aware_idle_prefetch_confidence_floor
+        ):
+            return "dag_aware_idle_low_confidence_prefetch_termination"
+
+        if window_class != "mechanism_activating":
+            return None
+        if int(dag_summary.get("node_count", 0)) > self._dag_aware_option_short_workflow_max_nodes:
+            return None
+        if int(dag_summary.get("critical_path_length", 0)) >= self._dag_aware_option_min_critical_path:
+            return None
+        if int(dag_summary.get("current_successor_count", 0)) < self._dag_aware_option_branching_successors:
+            return None
+        return "dag_aware_short_dag_prefetch_termination"
+
+    def _should_apply_net_utility_option_termination(
+        self,
+        *,
+        semantic_state: dict[str, Any],
+        candidate_info: dict[str, Any],
+        base_env_action: int,
+        window_class: str,
+    ) -> bool:
+        if not (
+            self._net_utility_option_termination_enabled
+            and window_class == "idle_or_sparse"
+            and int(base_env_action) == 1
+            and str(candidate_info.get("popularity_reason", ""))
+            == "no_associated_rsu_vehicle_fallback"
+            and len(candidate_info["option_mask"]) > 1
+            and bool(candidate_info["option_mask"][1])
+            and int(candidate_info["option_actions"].get(1, int(base_env_action))) != int(base_env_action)
+        ):
+            return False
+        if not self._net_utility_option_termination_conservative_enabled:
+            return True
+        popularity_extra = candidate_info.get("popularity_extra", {})
+        if not bool(popularity_extra.get("low_mechanism_no_rsu_context", False)):
+            return False
+        if self._semantic_state_has_raw_handoff_candidate(semantic_state):
+            return False
+        if self._semantic_state_has_valid_predicted_handoff_target(semantic_state):
+            return False
+        timing_features = compute_temporal_prepare_window_score(
+            semantic_state,
+            preferred_lead_steps=self._temporal_prepare_lead_steps,
+            sigma=self._temporal_prepare_sigma,
+        )
+        timing_support = max(
+            float(timing_features.get("prepare_window_score", 0.0)),
+            float(timing_features.get("temporal_urgency", 0.0)),
+        )
+        return bool(timing_support <= self._net_utility_option_termination_max_timing_support)
+
     def _option_gate_prior_target(
         self,
         *,
@@ -1722,24 +1953,40 @@ class 分层PPO基类(BaseAgent):
         if not self._option_gate_enabled or "option_logits" not in policy_output:
             return {"enabled": False, "applied": False}
         window_class = str((run_metadata or {}).get("window_class", "unknown"))
+        candidate_info: dict[str, Any] | None = None
+        forced_selection_reason: str | None = None
         if (
             self._option_gate_context_prior_enabled
             and self._option_gate_mechanism_preserve_enabled
             and window_class == "mechanism_activating"
         ):
-            return {
-                "enabled": False,
-                "applied": False,
-                "reason": "mechanism_window_preserve_mappo",
-                "base_env_action": int(base_env_action),
-                "window_class": window_class,
-            }
-        candidate_info = self._build_option_gate_candidates(
-            semantic_state=semantic_state,
-            action_mask=action_mask,
-            base_env_action=base_env_action,
-            run_metadata=run_metadata,
-        )
+            candidate_info = self._build_option_gate_candidates(
+                semantic_state=semantic_state,
+                action_mask=action_mask,
+                base_env_action=base_env_action,
+                run_metadata=run_metadata,
+            )
+            forced_selection_reason = self._dag_aware_option_termination_reason(
+                semantic_state=semantic_state,
+                candidate_info=candidate_info,
+                base_env_action=base_env_action,
+                window_class=window_class,
+            )
+            if forced_selection_reason is None:
+                return {
+                    "enabled": False,
+                    "applied": False,
+                    "reason": "mechanism_window_preserve_mappo",
+                    "base_env_action": int(base_env_action),
+                    "window_class": window_class,
+                }
+        if candidate_info is None:
+            candidate_info = self._build_option_gate_candidates(
+                semantic_state=semantic_state,
+                action_mask=action_mask,
+                base_env_action=base_env_action,
+                run_metadata=run_metadata,
+            )
         prior_target = int(candidate_info["prior_target"])
         option_logits = self._masked_option_logits(
             policy_output["option_logits"],
@@ -1753,11 +2000,37 @@ class 分层PPO基类(BaseAgent):
         selection_reason = "policy_argmax" if deterministic else "policy_sample"
         if deterministic:
             option_tensor = top_tensor
+            if forced_selection_reason is not None:
+                option_tensor = torch.tensor(1, dtype=torch.long, device=option_logits.device)
+                selection_reason = forced_selection_reason
+            elif self._should_apply_net_utility_option_termination(
+                semantic_state=semantic_state,
+                candidate_info=candidate_info,
+                base_env_action=base_env_action,
+                window_class=window_class,
+            ):
+                option_tensor = torch.tensor(1, dtype=torch.long, device=option_logits.device)
+                selection_reason = (
+                    "net_utility_conservative_idle_prefetch_termination"
+                    if self._net_utility_option_termination_conservative_enabled
+                    else "net_utility_idle_prefetch_termination"
+                )
+            else:
+                dag_selection_reason = self._dag_aware_option_termination_reason(
+                    semantic_state=semantic_state,
+                    candidate_info=candidate_info,
+                    base_env_action=base_env_action,
+                    window_class=window_class,
+                )
+                if dag_selection_reason is not None:
+                    option_tensor = torch.tensor(1, dtype=torch.long, device=option_logits.device)
+                    selection_reason = dag_selection_reason
             if (
                 self._option_gate_context_prior_enabled
                 and 0 <= prior_target < int(option_logits.shape[-1])
                 and prior_target < len(candidate_info["option_mask"])
                 and bool(candidate_info["option_mask"][prior_target])
+                and selection_reason == "policy_argmax"
             ):
                 top_prob = float(option_probs[top_action].item())
                 prior_prob = float(option_probs[prior_target].item())
@@ -2724,9 +2997,94 @@ class 分层PPO基类(BaseAgent):
         prior_loss = torch.stack(prior_terms).mean() if prior_terms else zero
         return ppo_loss, entropy, prior_loss
 
+    def _net_utility_cost_signal(self, row: dict[str, Any]) -> float:
+        if not self._net_utility_prd_enabled:
+            return 0.0
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        backhaul_units = max(
+            float(metrics.get("backhaul_traffic_cost", 0.0) or 0.0),
+            0.0,
+        ) / self._net_utility_backhaul_normalizer
+        migration_cost = max(
+            float(metrics.get("adapter_state_migration_overhead", 0.0) or 0.0),
+            0.0,
+        )
+        expired_prefetch = float(bool(metrics.get("prefetch_expired_miss", False)))
+        idle_prefetch = float(
+            self._row_window_class(row) == "idle_or_sparse"
+            and bool(metrics.get("predictive_prefetch_requested", False))
+            and not self._row_mechanism_success(metrics)
+        )
+        return float(backhaul_units + migration_cost + expired_prefetch + idle_prefetch)
+
+    def _update_net_utility_cost_dual(self, cost_values: np.ndarray) -> None:
+        if (
+            not self._net_utility_prd_enabled
+            or not self._net_utility_cost_dual_enabled
+            or self._net_utility_cost_dual_lr <= 0.0
+            or self._net_utility_cost_dual_max <= 0.0
+            or len(cost_values) <= 0
+        ):
+            return
+        observed_cost = float(cost_values.mean())
+        self._net_utility_cost_dual = min(
+            self._net_utility_cost_dual_max,
+            max(
+                0.0,
+                self._net_utility_cost_dual
+                + self._net_utility_cost_dual_lr
+                * (observed_cost - self._net_utility_cost_target),
+            ),
+        )
+
+    def _row_window_class(self, row: dict[str, Any]) -> str:
+        action_info = dict(row.get("action_info", {}))
+        option_info = dict(action_info.get("option_gate", {}))
+        return str(
+            option_info.get(
+                "window_class",
+                row.get("decision_info", {}).get("run_metadata", {}).get("window_class", "unknown"),
+            )
+        )
+
+    def _row_mechanism_success(self, metrics: dict[str, Any]) -> bool:
+        return bool(
+            metrics.get("mechanism_success_strict", False)
+            or metrics.get("handoff_ready", False)
+            or metrics.get("prefetch_validated_hit", False)
+            or float(metrics.get("mechanism_success_rate", 0.0) or 0.0) > 0.0
+        )
+
+    def _net_utility_prd_adjustment(self, row: dict[str, Any]) -> float:
+        if not self._net_utility_prd_enabled:
+            return 0.0
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        window_class = self._row_window_class(row)
+        backhaul_units = max(
+            float(metrics.get("backhaul_traffic_cost", 0.0) or 0.0),
+            0.0,
+        ) / self._net_utility_backhaul_normalizer
+        migration_cost = max(
+            float(metrics.get("adapter_state_migration_overhead", 0.0) or 0.0),
+            0.0,
+        )
+        expired_prefetch = bool(metrics.get("prefetch_expired_miss", False))
+        pending_prefetch = bool(metrics.get("predictive_prefetch_requested", False))
+        mechanism_success = self._row_mechanism_success(metrics)
+        penalty_scale = 1.0 + float(self._net_utility_cost_dual)
+        penalty = penalty_scale * (
+            self._net_utility_backhaul_coef * backhaul_units
+            + self._net_utility_migration_coef * migration_cost
+            + self._net_utility_expired_prefetch_coef * float(expired_prefetch)
+        )
+        if window_class == "idle_or_sparse" and pending_prefetch and not mechanism_success:
+            penalty += penalty_scale * self._net_utility_idle_prefetch_penalty
+        bonus = self._net_utility_success_bonus * float(mechanism_success)
+        return float(bonus - penalty)
+
     def _event_partial_reward_credit(self, row: dict[str, Any]) -> float:
         action_info = dict(row.get("action_info", {}))
-        window_class = str(row.get("decision_info", {}).get("run_metadata", {}).get("window_class", "unknown"))
+        window_class = self._row_window_class(row)
         event_action = int(action_info.get("head_actions", {}).get("event", 0) or 0)
         final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
         prepare_score = max(float(action_info.get("prepare_window_score", 0.0) or 0.0), 0.0)
@@ -2749,14 +3107,17 @@ class 分层PPO基类(BaseAgent):
                     credit += 0.18
             else:
                 credit = outcome_strength - 0.35 * context_strength
-            return float(credit)
+            return float(credit + self._net_utility_prd_adjustment(row))
         if window_class == "idle_or_sparse":
             if event_action == 1:
-                return float(0.15 * context_strength - 0.35 * (1.0 - float(gate_pass)))
-            return 0.10
+                credit = 0.15 * context_strength - 0.35 * (1.0 - float(gate_pass))
+            else:
+                credit = 0.10
+            return float(credit + self._net_utility_prd_adjustment(row))
         if window_class == "active_non_mechanism":
-            return -0.20 if event_action == 1 else 0.08
-        return 0.0
+            credit = -0.20 if event_action == 1 else 0.08
+            return float(credit + self._net_utility_prd_adjustment(row))
+        return float(self._net_utility_prd_adjustment(row))
 
     def _option_gate_advantage(self, *, row: dict[str, Any], base_advantage: torch.Tensor) -> torch.Tensor:
         if not self._option_gate_prd_enabled or self._option_gate_prd_coef <= 0.0:
@@ -2820,7 +3181,7 @@ class 分层PPO基类(BaseAgent):
                 credit += 0.15 * reward_sign
             elif bool(option_info.get("applied", False)):
                 credit -= 0.25
-        return float(credit)
+        return float(credit + self._net_utility_prd_adjustment(row))
 
     def _combine_head_statistics(
         self,
@@ -4002,6 +4363,30 @@ class 分层PPO基类(BaseAgent):
             "option_gate_prd_enabled": self._option_gate_prd_enabled,
             "option_gate_prd_coef": self._option_gate_prd_coef,
             "option_gate_prd_clip": self._option_gate_prd_clip,
+            "net_utility_prd_enabled": self._net_utility_prd_enabled,
+            "net_utility_backhaul_coef": self._net_utility_backhaul_coef,
+            "net_utility_migration_coef": self._net_utility_migration_coef,
+            "net_utility_expired_prefetch_coef": self._net_utility_expired_prefetch_coef,
+            "net_utility_idle_prefetch_penalty": self._net_utility_idle_prefetch_penalty,
+            "net_utility_success_bonus": self._net_utility_success_bonus,
+            "net_utility_backhaul_normalizer": self._net_utility_backhaul_normalizer,
+            "net_utility_cost_dual_enabled": self._net_utility_cost_dual_enabled,
+            "net_utility_cost_dual_lr": self._net_utility_cost_dual_lr,
+            "net_utility_cost_target": self._net_utility_cost_target,
+            "net_utility_cost_dual_max": self._net_utility_cost_dual_max,
+            "net_utility_cost_dual_initial": self._net_utility_cost_dual,
+            "net_utility_option_termination_enabled": self._net_utility_option_termination_enabled,
+            "net_utility_option_termination_conservative_enabled": (
+                self._net_utility_option_termination_conservative_enabled
+            ),
+            "net_utility_option_termination_max_timing_support": (
+                self._net_utility_option_termination_max_timing_support
+            ),
+            "dag_aware_option_termination_enabled": self._dag_aware_option_termination_enabled,
+            "dag_aware_option_min_critical_path": self._dag_aware_option_min_critical_path,
+            "dag_aware_option_short_workflow_max_nodes": self._dag_aware_option_short_workflow_max_nodes,
+            "dag_aware_option_branching_successors": self._dag_aware_option_branching_successors,
+            "dag_aware_idle_prefetch_confidence_floor": self._dag_aware_idle_prefetch_confidence_floor,
             "auxiliary_slow_weight": self._auxiliary_slow_weight,
             "auxiliary_fast_weight": self._auxiliary_fast_weight,
             "auxiliary_event_weight": self._auxiliary_event_weight,

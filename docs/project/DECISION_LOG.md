@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-17: v17 用 DAG-aware option termination 约束 MAPPO 机制动作时机
+
+决策：新增 `top_journal_mechanism_v17_dag_aware_option`，在 v16 conservative terminal option 基础上加入 DAG-aware option termination。该 gate 使用已有 graph-continuity critic 特征和 DAG topology：低置信 idle no-RSU predictive prefetch 被终止；机制窗口中，若 workflow 是短 DAG、critical path 低于阈值且当前节点分叉较多，则终止低机会 prefetch，改由 option 层选择 `popularity_safe`。
+
+原因：v13 的 PRD-MAPPO 学习能提高机制收益，但少数 idle prefetch 会造成 backhaul blocker；v15/v16 在 reward 与 backhaul 之间来回摆动。逐行诊断显示 `window_off336.../j_3` 这类短 DAG 场景中“机制动作成功”不等于“总 reward 净收益”，而长 DAG 的 `j_8` 场景同类动作有明显正收益。因此需要把 MAPPO option 从 handoff/prediction evidence 升级为 DAG opportunity-aware termination，而不是继续扩大 hard rule 或改 reward。
+
+影响：v17 不修改 `VecWorkflowCoreEnv` reward、不修改 `semantic_discrete_5` action contract、不改变 baseline contract、不读取 hidden。full-dev 证据显示 SA total reward `79.70825`，高于 v13 `79.64465`、v16 `79.627`、`popularity_cache_heuristic=79.46875`、`ppo=77.18775`、`mappo=72.6328` 和全部其他对照；`sa_advantage_diagnosis.blockers=[]`，backhaul 与 popularity 持平。该结果仍是 dev evidence，不能替代 future-validation / readiness audit。
+
 ## 2026-07-17: v13 用 partial-reward-decoupled MAPPO credit，并以 latest 评估学习后策略
 
 决策：新增 `top_journal_mechanism_v13_prd_option`，在 v12 learned option gate 基础上加入 event-head 与 option-head 的 partial-reward-decoupled credit。`event_prd_advantage_*` 把机制准备、handoff readiness、prediction confidence 和机制窗口 context 转成 event advantage 补充项；`option_gate_prd_*` 让 option loss 学习机制动作和安全动作的部分信用。closed-loop 中 v13 使用 `latest_checkpoint_path` 优先，因为 full-dev 审计显示 `best_by_reward_path` 停留在 update 0 warm-start，无法代表 PRD 训练后的策略。

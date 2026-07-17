@@ -18,6 +18,9 @@
 
 ## 当前限制
 
+- `top_journal_mechanism_v17_dag_aware_option` 已在 frozen dev full_stratified 上完成 5-seed / 20-window / 2-workflow / 12-agent 全量 benchmark，并把 strongest-other reward margin 提升到 `+0.2395`，同时清除 v13/v16 的 `backhaul_cost_above_popularity` blocker；这仍不是 hidden/future-validation 证据。当前 hidden 已 consumed，v17 不得用现有 hidden 做进一步筛选；promotion 必须新冻结 future-validation split 并按 top-journal review policy 重新审查。
+- v17 改进来自 policy-side DAG-aware MAPPO option termination，不是环境 reward、action contract、baseline contract、window plan 或评估包装改动。论文或汇报中可以说 v17 是当前 dev 主候选，但不能声称已 TMC-ready、全面优于 PPO 的所有系统指标，或已经通过独立 holdout。
+- v17 的 mechanism realization `0.195` 低于 v16 `0.265`，说明 DAG-aware gate 用更保守的机制动作换取 reward / backhaul trade-off；不能把它写成“机制触发越多越好”，必须同时报告 validated success、continuity、backhaul 和 total reward。
 - `top_journal_mechanism_v13_prd_option` latest 已在 frozen dev full_stratified 上完成 5-seed / 20-window / 2-workflow / 12-agent 全量 benchmark，并把 strongest-other reward margin 从 v12 `+0.12465` 扩大到 `+0.17590`；这仍不是 hidden/future-validation 证据。当前 hidden 已 consumed，v13 不得用现有 hidden 做进一步筛选；promotion 必须新冻结 future-validation split 并按 top-journal review policy 重新审查。
 - v13 的 `best_by_reward` checkpoint 会停留在 warm-start update 0，不能代表 PRD 学习后的策略；本轮正向结果来自 `latest_checkpoint_path`，必须在论文或汇报中如实说明 checkpoint policy。不得把 latest-after-training 包装成 hidden-validated 或 reward-oracle selection。
 - v13 改进来自 policy-side partial-reward-decoupled MAPPO event/option credit，不是环境 reward、action contract、baseline contract 或 window plan 改动。PPO 在 handoff failure/backhaul trade-off 上仍需单独报告，不能因为 reward margin 扩大而声称系统指标全面优于 PPO 或 heuristic。

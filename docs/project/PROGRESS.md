@@ -2,6 +2,14 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-07-17: v17 DAG-aware MAPPO option gate 扩大 dev reward margin 并清除 blocker
+
+- 新增 `top_journal_mechanism_v17_dag_aware_option` profile 与 `configs/experiment/top_journal_mechanism_v17_dag_aware_option.yaml`。v17 继承 v16 conservative terminal option，并在 SA-GHMAPPO option 层加入 DAG-aware termination：使用已有 graph-continuity critic 特征，在低置信 idle no-RSU prefetch 与短 DAG / 低 critical-path 机制窗口中终止低机会 prefetch。
+- first-order diagnosis：v13 / v16 的主要 blocker 来自少数 idle prefetch 造成 backhaul 高于 popularity；v15 虽清除 blocker 但 reward margin 变薄。v16 进一步暴露 `window_off336.../j_3` 的短 DAG 机制动作负收益：机制兑现率赢了，但总 reward 输给规则；同窗口 `j_8` 长 DAG 则明显受益。因此 v17 把 option gate 从“是否有 handoff/prediction evidence”推进到“DAG 时机是否足以摊销机制动作成本”。
+- full-dev 5-seed / 20-window / 2-workflow / 12-agent benchmark 已完成：`artifacts/experiments/top_journal_dag_aware_option_v17_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_154951_203519/aggregate_summary.json`。SA-GHMAPPO total reward `79.70825`，高于 `popularity_cache_heuristic=79.46875`、`ppo=77.18775`、`mappo=72.6328` 和全部其他对照；对 popularity margin `+0.2395`，高于 v13 `+0.17590`。
+- 诊断结果：`sa_advantage_diagnosis.blockers=[]`、`minimum_success_reached=true`；backhaul 与 popularity 持平 `110.8` vs `110.8`，continuity `0.807302` > `0.801043`，mechanism realization `0.195` > `0.175`。v17 相比 v16 牺牲部分 mechanism realization，但换取更高 reward 和无 backhaul blocker。
+- 结论边界：v17 是当前 dev 主候选，不是 TMC-ready / paper-ready 结论。hidden holdout 已 consumed，未用于 v17 筛选；promotion 需要新冻结 future-validation split、window-outer hierarchical bootstrap / Holm 校正、ablation / robustness / scalability 支撑和独立 readiness audit。
+
 ## 2026-07-17: v13 PRD-MAPPO latest 全量 dev 拉开奖励 margin
 
 - 新增 `top_journal_mechanism_v13_prd_option` profile 与 `configs/experiment/top_journal_mechanism_v13_prd_option.yaml`。v13 在 v12 learned option 基础上加入 partial-reward-decoupled event / option credit：`event_prd_advantage_*` 把机制准备成功、handoff readiness、gate pass 和高压窗口 context 注入 event-head advantage，`option_gate_prd_*` 把 option loss 从纯 PPO advantage 扩展为机制/安全动作的部分信用。

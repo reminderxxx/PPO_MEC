@@ -1,0 +1,26 @@
+profile: top_journal_mechanism_v15_terminal_option
+purpose: >
+  Preserve the v13 PRD/option learning signal while adding the v14
+  hierarchy-level terminal option for idle or sparse windows with no associated
+  RSU. This tests whether the learned policy can keep the higher reward profile
+  and remove the expired-prefetch backhaul blocker without reward-contract or
+  baseline changes.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v13_prd_option
+  event_prd_advantage_enabled: true
+  option_gate_prd_enabled: true
+  net_utility_prd_enabled: false
+  net_utility_cost_dual_enabled: false
+  net_utility_option_termination_enabled: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+evaluation:
+  split_policy: dev_only_until_formal_future_holdout_is_run
+  hidden_holdout_for_selection: prohibited
+notes:
+  - The terminal option is part of SA-GHMAPPO's hierarchical policy path.
+  - This profile must be judged by full-stratified multi-seed benchmark output,
+    not smoke runs.

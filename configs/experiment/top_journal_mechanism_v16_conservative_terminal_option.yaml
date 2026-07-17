@@ -1,0 +1,28 @@
+profile: top_journal_mechanism_v16_conservative_terminal_option
+purpose: >
+  Refine v15 terminal option by terminating idle no-RSU predictive prefetch only
+  when mechanism opportunity evidence is low. This is intended to keep the v15
+  backhaul protection while preserving v13-style mechanism wins in windows that
+  still contain handoff or timing evidence.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v15_terminal_option
+  net_utility_prd_enabled: false
+  net_utility_option_termination_enabled: true
+  net_utility_option_termination_conservative_enabled: true
+  net_utility_option_termination_max_timing_support: 1.0
+  conservative_evidence:
+    require_low_mechanism_no_rsu_context: true
+    require_no_raw_handoff_candidate: true
+    require_no_valid_predicted_handoff_target: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+evaluation:
+  split_policy: dev_only_until_formal_future_holdout_is_run
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile changes the hierarchical option termination condition only.
+  - Reward function, environment contract, baselines, and benchmark window plan
+    stay unchanged.

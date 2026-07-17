@@ -188,3 +188,27 @@ class SAGHMAPPOAgent(SAGHMAPPOBaseAgent):
                 predictive_prefetch_admission_require_distinct_next
             ),
         }
+        for field_name in (
+            "net_utility_prd_enabled",
+            "net_utility_backhaul_coef",
+            "net_utility_migration_coef",
+            "net_utility_expired_prefetch_coef",
+            "net_utility_idle_prefetch_penalty",
+            "net_utility_success_bonus",
+            "net_utility_backhaul_normalizer",
+            "net_utility_cost_dual_enabled",
+            "net_utility_cost_dual_lr",
+            "net_utility_cost_target",
+            "net_utility_cost_dual_max",
+            "net_utility_cost_dual_initial",
+            "net_utility_option_termination_enabled",
+            "net_utility_option_termination_conservative_enabled",
+            "net_utility_option_termination_max_timing_support",
+            "dag_aware_option_termination_enabled",
+            "dag_aware_option_min_critical_path",
+            "dag_aware_option_short_workflow_max_nodes",
+            "dag_aware_option_branching_successors",
+            "dag_aware_idle_prefetch_confidence_floor",
+        ):
+            if field_name in kwargs:
+                self.ablation_config[field_name] = kwargs[field_name]

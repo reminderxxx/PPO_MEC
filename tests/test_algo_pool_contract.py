@@ -604,6 +604,371 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertGreater(agent._event_partial_reward_credit(positive_row), 0.0)
         self.assertLess(agent._event_partial_reward_credit(negative_row), 0.0)
 
+    def test_sa_v14_profile_enables_net_utility_prd_credit(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v14_net_utility_prd"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v14_net_utility_prd")
+        self.assertTrue(kwargs["option_gate_enabled"])
+        self.assertTrue(kwargs["option_gate_prd_enabled"])
+        self.assertTrue(kwargs["event_prd_advantage_enabled"])
+        self.assertTrue(kwargs["net_utility_prd_enabled"])
+        self.assertTrue(kwargs["net_utility_cost_dual_enabled"])
+        self.assertTrue(kwargs["net_utility_option_termination_enabled"])
+        self.assertGreater(kwargs["net_utility_backhaul_coef"], 0.0)
+        self.assertGreater(kwargs["net_utility_expired_prefetch_coef"], 0.0)
+        self.assertEqual(kwargs["head_credit_protocol"], "aggregation_reason_weighted_controller_ppo_v3")
+
+    def test_sa_v15_profile_keeps_prd_option_and_terminal_fallback(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v15_terminal_option"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v15_terminal_option")
+        self.assertTrue(kwargs["option_gate_enabled"])
+        self.assertTrue(kwargs["option_gate_prd_enabled"])
+        self.assertTrue(kwargs["event_prd_advantage_enabled"])
+        self.assertFalse(kwargs["net_utility_prd_enabled"])
+        self.assertFalse(kwargs["net_utility_cost_dual_enabled"])
+        self.assertTrue(kwargs["net_utility_option_termination_enabled"])
+        self.assertEqual(kwargs["head_credit_protocol"], "aggregation_reason_weighted_controller_ppo_v3")
+
+    def test_sa_v16_profile_enables_conservative_terminal_option(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v16_conservative_terminal_option"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v16_conservative_terminal_option")
+        self.assertTrue(kwargs["option_gate_enabled"])
+        self.assertTrue(kwargs["option_gate_prd_enabled"])
+        self.assertFalse(kwargs["net_utility_prd_enabled"])
+        self.assertTrue(kwargs["net_utility_option_termination_enabled"])
+        self.assertTrue(kwargs["net_utility_option_termination_conservative_enabled"])
+        self.assertGreater(kwargs["net_utility_option_termination_max_timing_support"], 0.0)
+
+    def test_sa_v17_profile_enables_dag_aware_option(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v17_dag_aware_option"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v17_dag_aware_option")
+        self.assertTrue(kwargs["option_gate_enabled"])
+        self.assertTrue(kwargs["net_utility_option_termination_enabled"])
+        self.assertTrue(kwargs["net_utility_option_termination_conservative_enabled"])
+        self.assertTrue(kwargs["dag_aware_option_termination_enabled"])
+        self.assertEqual(kwargs["dag_aware_option_min_critical_path"], 6)
+        self.assertEqual(kwargs["dag_aware_option_short_workflow_max_nodes"], 12)
+
+    def test_sa_v14_net_utility_option_terminates_idle_no_rsu_prefetch(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            option_gate_enabled=True,
+            option_gate_count=4,
+            option_gate_context_prior_enabled=True,
+            option_gate_idle_prior_enabled=True,
+            net_utility_option_termination_enabled=True,
+        )
+        semantic_state = deepcopy(_minimal_semantic_state())
+        semantic_state["vehicles"][0]["associated_rsu_id"] = None
+
+        option_info = agent._maybe_apply_option_gate(
+            semantic_state=semantic_state,
+            action_mask=[True, True, True, True, True],
+            policy_output={"option_logits": torch.tensor([5.0, -2.0, -2.0, -2.0])},
+            base_env_action=1,
+            deterministic=True,
+            run_metadata={"window_class": "idle_or_sparse"},
+        )
+
+        self.assertTrue(option_info["enabled"])
+        self.assertTrue(option_info["applied"])
+        self.assertEqual(option_info["selection_reason"], "net_utility_idle_prefetch_termination")
+        self.assertEqual(option_info["option_label"], "popularity_safe")
+        self.assertEqual(option_info["option_env_action"], 2)
+
+    def test_sa_v16_conservative_option_preserves_handoff_candidate(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            option_gate_enabled=True,
+            option_gate_count=4,
+            option_gate_context_prior_enabled=True,
+            option_gate_idle_prior_enabled=True,
+            net_utility_option_termination_enabled=True,
+            net_utility_option_termination_conservative_enabled=True,
+            net_utility_option_termination_max_timing_support=1.0,
+        )
+        semantic_state = deepcopy(_minimal_semantic_state())
+        semantic_state["vehicles"][0]["associated_rsu_id"] = None
+
+        option_info = agent._maybe_apply_option_gate(
+            semantic_state=semantic_state,
+            action_mask=[True, True, True, True, True],
+            policy_output={"option_logits": torch.tensor([5.0, -2.0, -2.0, -2.0])},
+            base_env_action=1,
+            deterministic=True,
+            run_metadata={"window_class": "idle_or_sparse"},
+        )
+
+        self.assertTrue(option_info["enabled"])
+        self.assertFalse(option_info["applied"])
+        self.assertEqual(option_info["selection_reason"], "policy_argmax")
+        self.assertEqual(option_info["option_label"], "accept_mappo")
+
+    def test_sa_v16_conservative_option_terminates_low_context_idle_prefetch(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            option_gate_enabled=True,
+            option_gate_count=4,
+            option_gate_context_prior_enabled=True,
+            option_gate_idle_prior_enabled=True,
+            net_utility_option_termination_enabled=True,
+            net_utility_option_termination_conservative_enabled=True,
+            net_utility_option_termination_max_timing_support=1.0,
+        )
+        semantic_state = deepcopy(_minimal_semantic_state())
+        semantic_state["vehicles"][0]["associated_rsu_id"] = None
+        semantic_state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 2.0},
+            "predicted_handoff_vehicle_ids": [],
+            "predicted_next_rsu_by_vehicle": {},
+            "predicted_first_handoff_rsu_by_vehicle": {},
+            "prediction_confidence_by_vehicle": {},
+            "prediction_uncertainty_by_vehicle": {},
+            "dwell_time": {},
+            "next_rsu_sequence": {"veh_1": []},
+        }
+
+        option_info = agent._maybe_apply_option_gate(
+            semantic_state=semantic_state,
+            action_mask=[True, True, True, True, True],
+            policy_output={"option_logits": torch.tensor([5.0, -2.0, -2.0, -2.0])},
+            base_env_action=1,
+            deterministic=True,
+            run_metadata={"window_class": "idle_or_sparse"},
+        )
+
+        self.assertTrue(option_info["enabled"])
+        self.assertTrue(option_info["applied"])
+        self.assertEqual(
+            option_info["selection_reason"],
+            "net_utility_conservative_idle_prefetch_termination",
+        )
+        self.assertEqual(option_info["option_label"], "popularity_safe")
+        self.assertEqual(option_info["option_env_action"], 2)
+
+    def test_sa_v17_dag_aware_option_terminates_short_dag_prefetch(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            option_gate_enabled=True,
+            option_gate_count=4,
+            option_gate_context_prior_enabled=True,
+            option_gate_idle_prior_enabled=True,
+            dag_aware_option_termination_enabled=True,
+            dag_aware_option_min_critical_path=6,
+            dag_aware_option_short_workflow_max_nodes=12,
+            dag_aware_option_branching_successors=3,
+        )
+        semantic_state = deepcopy(_minimal_semantic_state())
+        nodes = [
+            {"node_id": f"task_{idx}", "predecessors": [], "successors": []}
+            for idx in range(1, 10)
+        ]
+        nodes[2]["successors"] = ["task_4", "task_5", "task_6", "task_7"]
+        for successor_idx in range(4, 8):
+            nodes[successor_idx - 1]["predecessors"] = ["task_3"]
+        semantic_state["workflow"] = {
+            "nodes": nodes,
+            "completed_node_ids": ["task_1", "task_2"],
+            "execution_order": [node["node_id"] for node in nodes],
+            "current_node_id": "task_3",
+        }
+        semantic_state["current_workflow_node"] = {
+            "node_id": "task_3",
+            "required_adapter": "adapter_tracking",
+            "predecessors": ["task_1", "task_2"],
+            "successors": ["task_4", "task_5", "task_6", "task_7"],
+        }
+
+        option_info = agent._maybe_apply_option_gate(
+            semantic_state=semantic_state,
+            action_mask=[True, True, True, True, True],
+            policy_output={"option_logits": torch.tensor([5.0, -2.0, -2.0, -2.0])},
+            base_env_action=1,
+            deterministic=True,
+            run_metadata={"window_class": "mechanism_activating"},
+        )
+
+        self.assertTrue(option_info["enabled"])
+        self.assertTrue(option_info["applied"])
+        self.assertEqual(option_info["selection_reason"], "dag_aware_short_dag_prefetch_termination")
+        self.assertEqual(option_info["option_label"], "popularity_safe")
+
+    def test_sa_v17_dag_aware_option_preserves_long_dag_prefetch(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            option_gate_enabled=True,
+            option_gate_count=4,
+            option_gate_context_prior_enabled=True,
+            option_gate_idle_prior_enabled=True,
+            dag_aware_option_termination_enabled=True,
+            dag_aware_option_min_critical_path=6,
+            dag_aware_option_short_workflow_max_nodes=12,
+            dag_aware_option_branching_successors=3,
+        )
+        semantic_state = deepcopy(_minimal_semantic_state())
+        nodes = []
+        for idx in range(1, 18):
+            successors = [f"task_{idx + 1}"] if idx < 17 else []
+            predecessors = [f"task_{idx - 1}"] if idx > 1 else []
+            nodes.append({"node_id": f"task_{idx}", "predecessors": predecessors, "successors": successors})
+        semantic_state["workflow"] = {
+            "nodes": nodes,
+            "completed_node_ids": [],
+            "execution_order": [node["node_id"] for node in nodes],
+            "current_node_id": "task_1",
+        }
+        semantic_state["current_workflow_node"] = {
+            "node_id": "task_1",
+            "required_adapter": "adapter_tracking",
+            "predecessors": [],
+            "successors": ["task_2"],
+        }
+
+        option_info = agent._maybe_apply_option_gate(
+            semantic_state=semantic_state,
+            action_mask=[True, True, True, True, True],
+            policy_output={"option_logits": torch.tensor([5.0, -2.0, -2.0, -2.0])},
+            base_env_action=1,
+            deterministic=True,
+            run_metadata={"window_class": "mechanism_activating"},
+        )
+
+        self.assertFalse(option_info["enabled"])
+        self.assertFalse(option_info["applied"])
+        self.assertEqual(option_info["reason"], "mechanism_window_preserve_mappo")
+
+    def test_sa_v17_dag_aware_option_terminates_idle_low_confidence_prefetch(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            option_gate_enabled=True,
+            option_gate_count=4,
+            option_gate_context_prior_enabled=True,
+            option_gate_idle_prior_enabled=True,
+            net_utility_option_termination_enabled=True,
+            net_utility_option_termination_conservative_enabled=True,
+            net_utility_option_termination_max_timing_support=1.0,
+            dag_aware_option_termination_enabled=True,
+            dag_aware_idle_prefetch_confidence_floor=0.65,
+        )
+        semantic_state = deepcopy(_minimal_semantic_state())
+        semantic_state["vehicles"][0]["associated_rsu_id"] = None
+        semantic_state["predictions"]["prediction_confidence_by_vehicle"] = {"veh_1": 0.6}
+
+        option_info = agent._maybe_apply_option_gate(
+            semantic_state=semantic_state,
+            action_mask=[True, True, True, True, True],
+            policy_output={"option_logits": torch.tensor([5.0, -2.0, -2.0, -2.0])},
+            base_env_action=1,
+            deterministic=True,
+            run_metadata={"window_class": "idle_or_sparse"},
+        )
+
+        self.assertTrue(option_info["enabled"])
+        self.assertTrue(option_info["applied"])
+        self.assertEqual(option_info["selection_reason"], "dag_aware_idle_low_confidence_prefetch_termination")
+        self.assertEqual(option_info["option_label"], "popularity_safe")
+
+    def test_sa_v14_net_utility_prd_penalizes_idle_expired_prefetch(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            event_prd_advantage_enabled=True,
+            option_gate_prd_enabled=True,
+            net_utility_prd_enabled=True,
+            net_utility_backhaul_coef=0.16,
+            net_utility_migration_coef=0.22,
+            net_utility_expired_prefetch_coef=0.55,
+            net_utility_idle_prefetch_penalty=0.65,
+            net_utility_success_bonus=0.16,
+            net_utility_backhaul_normalizer=64.0,
+        )
+        expired_idle_row = {
+            "action": 1,
+            "reward": -0.2,
+            "action_info": {
+                "head_actions": {"event": 1},
+                "final_env_action": 1,
+                "option_gate": {
+                    "enabled": True,
+                    "option_label": "accept_mappo",
+                    "window_class": "idle_or_sparse",
+                },
+            },
+            "decision_info": {"run_metadata": {"window_class": "idle_or_sparse"}},
+            "env_info": {
+                "metrics_protocol": {
+                    "backhaul_traffic_cost": 64.0,
+                    "adapter_state_migration_overhead": 0.0,
+                    "predictive_prefetch_requested": True,
+                    "prefetch_expired_miss": True,
+                    "mechanism_success_strict": False,
+                }
+            },
+        }
+        success_row = {
+            "action": 4,
+            "reward": 1.0,
+            "action_info": {
+                "head_actions": {"event": 1},
+                "final_env_action": 4,
+                "prepare_window_score": 0.8,
+                "temporal_urgency": 0.7,
+                "prediction_confidence": 0.75,
+                "gate_pass": True,
+                "option_gate": {
+                    "enabled": True,
+                    "option_label": "accept_mappo",
+                    "window_class": "mechanism_activating",
+                },
+            },
+            "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+            "env_info": {
+                "metrics_protocol": {
+                    "backhaul_traffic_cost": 0.0,
+                    "adapter_state_migration_overhead": 0.0,
+                    "mechanism_success_strict": True,
+                    "handoff_ready": True,
+                }
+            },
+        }
+
+        self.assertLess(agent._event_partial_reward_credit(expired_idle_row), -1.0)
+        self.assertLess(agent._option_gate_partial_reward_credit(expired_idle_row), -1.0)
+        self.assertGreater(agent._event_partial_reward_credit(success_row), 0.0)
+        self.assertGreater(agent._option_gate_partial_reward_credit(success_row), 0.0)
+
     def test_qmix_uses_controller_level_value_decomposition_contract(self) -> None:
         state = _minimal_semantic_state()
         agent = build_agent("qmix", random_seed=1, deterministic_action=True)

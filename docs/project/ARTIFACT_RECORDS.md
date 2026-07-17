@@ -1,5 +1,20 @@
 # Artifact Records
 
+## 2026-07-17 v17 DAG-aware MAPPO option full-dev
+
+状态：`[dev-full-success]` `[current-dev-candidate]` `[not-hidden]`
+
+路径：
+
+- `artifacts/experiments/top_journal_dag_aware_option_v17_20260717/seed_checkpoint_manifest_dag_aware_option_full.json`
+- `artifacts/experiments/top_journal_dag_aware_option_v17_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_154951_203519/aggregate_summary.json`
+- `artifacts/experiments/top_journal_dag_aware_option_v17_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_154951_203519/comparison_against_popularity.json`
+- `artifacts/experiments/top_journal_dag_aware_option_v17_20260717/main_results_full_stratified_latest/main_results_full_stratified_20260717_154951_203519/sa_advantage_diagnosis.json`
+
+确认结果：v17 latest 使用 5 seeds、20 frozen dev windows、2 workflows/window、12 agents、`full_stratified`、`primary_vehicle_selection=handoff_pressure`。SA-GHMAPPO total reward `79.70825`，高于 `popularity_cache_heuristic=79.46875`、`ppo=77.18775`、`mappo=72.6328` 和全部其他对照；相对 strongest other 的 margin 为 `+0.2395`，高于 v13 的 `+0.17590`。`sa_advantage_diagnosis.blockers=[]`、`minimum_success_reached=true`；backhaul 与 popularity 持平 `110.8`，continuity 为 `0.807302`，mechanism realization 为 `0.195`。
+
+结论边界：这是 frozen dev evidence，不是 formal/hidden/future-validation 或 paper-ready 证据。hidden holdout 已 consumed 且未用于 v17 筛选。v17 可作为当前 dev 主候选，但 promotion 需要新冻结 future-validation split、window-outer hierarchical bootstrap / Holm 校正、support suite 和 readiness audit。v17 通过 DAG-aware option termination 降低低机会机制动作；不能把它写成机制触发次数全面增加。
+
 ## 2026-07-17 v13 partial-reward-decoupled MAPPO latest full-dev
 
 状态：`[dev-full-success]` `[candidate]` `[not-hidden]`

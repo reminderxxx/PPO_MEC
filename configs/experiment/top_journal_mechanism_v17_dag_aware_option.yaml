@@ -1,0 +1,29 @@
+profile: top_journal_mechanism_v17_dag_aware_option
+purpose: >
+  Extend v16 with a DAG-aware option termination gate. The gate uses existing
+  graph-continuity critic features to suppress predictive prefetch when the
+  learned MAPPO option fires in low-opportunity states: low-confidence idle
+  no-RSU contexts, or short-DAG mechanism windows whose critical path is too
+  small to amortize a prefetch step.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v16_conservative_terminal_option
+  reward_function_changed: false
+  environment_contract_changed: false
+  dag_aware_option_termination_enabled: true
+  dag_aware_option_min_critical_path: 6
+  dag_aware_option_short_workflow_max_nodes: 12
+  dag_aware_option_branching_successors: 3
+  dag_aware_idle_prefetch_confidence_floor: 0.65
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+evaluation:
+  split_policy: dev_only_until_formal_future_holdout_is_run
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile keeps the v16 conservative terminal option and adds a
+    DAG-aware option-critic termination condition.
+  - Baselines, reward function, environment contract, and benchmark window plan
+    stay unchanged.

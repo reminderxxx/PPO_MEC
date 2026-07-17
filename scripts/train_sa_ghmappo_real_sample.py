@@ -422,6 +422,54 @@ PROFILE_DEFAULTS = {
         "max_steps": 16,
         "train_window_count": 20,
     },
+    "top_journal_mechanism_v14_net_utility_prd": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.2e-5,
+        "clip_ratio": 0.065,
+        "entropy_coef": 0.0010,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.32,
+        "max_steps": 16,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v15_terminal_option": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.5e-5,
+        "clip_ratio": 0.07,
+        "entropy_coef": 0.0011,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.32,
+        "max_steps": 16,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v16_conservative_terminal_option": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.5e-5,
+        "clip_ratio": 0.07,
+        "entropy_coef": 0.0011,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.32,
+        "max_steps": 16,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v17_dag_aware_option": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.5e-5,
+        "clip_ratio": 0.07,
+        "entropy_coef": 0.0011,
+        "value_coef": 0.85,
+        "auxiliary_coef": 0.32,
+        "max_steps": 16,
+        "train_window_count": 20,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -1587,6 +1635,81 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "event_prd_advantage_clip": 1.8,
                 "train_epochs": 7,
                 "target_kl": 0.012,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v14_net_utility_prd":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v13_prd_option")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.035,
+                "heuristic_imitation_warmup_updates": 2,
+                "heuristic_imitation_decay": 0.62,
+                "mechanism_aux_coef": 0.065,
+                "mechanism_window_weight": 1.50,
+                "prepare_action_prior_weight": 0.58,
+                "mechanism_aux_coef_floor_after_update": 0.065,
+                "mechanism_window_weight_floor_after_update": 1.50,
+                "option_gate_loss_coef": 0.34,
+                "option_gate_prior_coef": 0.026,
+                "option_gate_prior_warmup_updates": 3,
+                "option_gate_prior_decay": 0.68,
+                "option_gate_prior_logit_bias": 0.35,
+                "option_gate_log_prob_weight": 0.48,
+                "option_gate_deterministic_prior_margin": 0.05,
+                "event_prd_advantage_coef": 0.42,
+                "event_prd_advantage_clip": 1.6,
+                "option_gate_prd_coef": 0.28,
+                "option_gate_prd_clip": 1.5,
+                "net_utility_prd_enabled": True,
+                "net_utility_backhaul_coef": 0.16,
+                "net_utility_migration_coef": 0.22,
+                "net_utility_expired_prefetch_coef": 0.55,
+                "net_utility_idle_prefetch_penalty": 0.65,
+                "net_utility_success_bonus": 0.16,
+                "net_utility_backhaul_normalizer": 64.0,
+                "net_utility_cost_dual_enabled": True,
+                "net_utility_cost_dual_lr": 0.08,
+                "net_utility_cost_target": 0.20,
+                "net_utility_cost_dual_max": 1.25,
+                "net_utility_cost_dual_initial": 0.0,
+                "net_utility_option_termination_enabled": True,
+                "train_epochs": 7,
+                "target_kl": 0.010,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v15_terminal_option":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v13_prd_option")
+        kwargs.update(
+            {
+                "net_utility_prd_enabled": False,
+                "net_utility_cost_dual_enabled": False,
+                "net_utility_cost_dual_initial": 0.0,
+                "net_utility_option_termination_enabled": True,
+                "train_epochs": 7,
+                "target_kl": 0.012,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v16_conservative_terminal_option":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v15_terminal_option")
+        kwargs.update(
+            {
+                "net_utility_option_termination_conservative_enabled": True,
+                "net_utility_option_termination_max_timing_support": 1.0,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v17_dag_aware_option":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v16_conservative_terminal_option")
+        kwargs.update(
+            {
+                "dag_aware_option_termination_enabled": True,
+                "dag_aware_option_min_critical_path": 6,
+                "dag_aware_option_short_workflow_max_nodes": 12,
+                "dag_aware_option_branching_successors": 3,
+                "dag_aware_idle_prefetch_confidence_floor": 0.65,
             }
         )
         return kwargs
@@ -3935,6 +4058,10 @@ def maybe_apply_anti_collapse_controls(
         "top_journal_mechanism_v11_mappo_reward",
         "top_journal_mechanism_v12_learned_option",
         "top_journal_mechanism_v13_prd_option",
+        "top_journal_mechanism_v14_net_utility_prd",
+        "top_journal_mechanism_v15_terminal_option",
+        "top_journal_mechanism_v16_conservative_terminal_option",
+        "top_journal_mechanism_v17_dag_aware_option",
     }
     if args.agent_name != "sa_ghmappo" or args.profile not in stability_profiles:
         return updated_best, None
