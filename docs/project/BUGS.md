@@ -18,6 +18,9 @@
 
 ## 当前限制
 
+- 2026-07-19 v23-v26 reward-gap 扩大实验没有形成比 v22 更强的主结果。v23 counterfactual constrained PRD 在 dev 上低于 popularity；v24 tail-risk PRD 只取得 dev `+0.195`、formal `+0.05625` 的 popularity reward delta 且 CI 跨 0；v25 opportunity PRD 退化到 dev `+0.100`；v26 safe-counterfactual PRD 为 dev `+0.16425`，仍低于 v22 `+0.268`。这些 profile 只能作为负向探索和机制诊断，不能写成 canonical 晋级或 paper-ready 改进。
+- 当前 strict/full dev 和 time-audited formal 中，`popularity_cache_heuristic` 是非常强的 supplementary rule reference；formal split 上 SA、popularity、PPO、MAPPO 的 `mechanism_realization_rate` 均为 `0.0`，因此很难从 handoff/cache mechanism 上拉开大 reward gap。若继续要求显著高于 popularity，需要新冻结更能覆盖 validated mechanism opportunities 且未消费的 formal/hidden split，不能在已查看 formal 上继续筛 profile。
+- v23-v26 的失败说明“增加机制尝试”不是单调有效：v23 会产生 failed mechanism tail loss，v25/v26 降低 validated mechanism realization 或压低 v22 的正窗口收益。后续算法设计必须先提供可检验的一阶机制假设，例如可学习 counterfactual evaluator、offline safe policy improvement 或更强 predictor，而不是单纯调大 PRD/auxiliary 系数。
 - `top_journal_mechanism_v21_efficiency_prd` 与 `top_journal_mechanism_v22_validated_utility_prd` 未能形成 paper-ready stronger-heuristic 优势。v21 dev 对 popularity reward delta 为 `+0.29125`，BCa CI `[0.01425, 0.811673]`，但 Holm p=`0.0789`；formal delta 只有 `+0.17275`，CI 跨 0，且仍有 backhaul 和 mechanism-attempt-without-validated-success blocker。v22 dev 提升了 mechanism realization（delta `+0.05`，Holm p=`0.046872`），但 reward delta 降至 `+0.268` 且 Holm p=`1.0`；formal reward delta 降至 `+0.10025`，blocker 未消除。hidden holdout 未开启，不能把 v21/v22 写成论文主 claim。
 - v20/v21/v22 formal 诊断已经使用 `configs/experiment/top_journal_v20_formal_time_audited_20260717/future_validation_window_plan.json` 反馈算法设计，因此该 formal split 不能再作为未调参消费的最终 holdout。若后续候选看起来达标，必须重新冻结未消费的 formal/hidden 或只在预先冻结、未读取的 hidden 上做一次最终验证，并清楚记录开启条件。
 - v20 formal/hidden 诊断 split 在排除历史窗口后没有可用 idle/sparse 窗口，只包含 10 mechanism / 10 active non-mechanism。它适合暴露 mechanism/active-heavy blocker，但不能替代 balanced strict split，也不能证明 idle/sparse 泛化。

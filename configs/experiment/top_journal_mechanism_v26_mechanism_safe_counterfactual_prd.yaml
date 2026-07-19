@@ -1,0 +1,41 @@
+profile: top_journal_mechanism_v26_mechanism_safe_counterfactual_prd
+purpose: >
+  Add a mechanism-window safe counterfactual PRD profile on top of v22. The MAPPO
+  update receives bounded teacher advantage for low-cost prepare behavior inside
+  mechanism-activating windows, while idle/local safety and net-utility costs
+  suppress redundant mechanism attempts.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v22_validated_utility_prd
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  counterfactual_teacher_prd_enabled: true
+  counterfactual_teacher_event_coef: 0.32
+  counterfactual_teacher_option_coef: 0.40
+  counterfactual_teacher_clip: 1.30
+  option_gate_counterfactual_prd_enabled: true
+  option_gate_counterfactual_coef: 0.28
+  option_gate_counterfactual_clip: 1.20
+  option_gate_mechanism_preserve_enabled: true
+  mechanism_aux_coef: 0.048
+  mechanism_window_weight: 1.26
+  prepare_action_prior_weight: 0.40
+  idle_execution_mechanism_penalty: 0.80
+  net_utility_failed_mechanism_penalty: 0.90
+  tail_risk_prd_enabled: false
+  opportunity_prd_enabled: false
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+evaluation:
+  split_policy: dev_then_time_audited_formal_then_hidden
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile targets the v22/v24 loss mode where SA-GHMAPPO under-prepared
+    in mechanism-activating windows relative to popularity, losing mechanism
+    shaping reward despite similar service/cache costs.
+  - It intentionally avoids v25's broad opportunity PRD because the dev run
+    showed lower mechanism realization and lower reward margin.

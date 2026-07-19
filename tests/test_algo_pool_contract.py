@@ -896,6 +896,75 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertGreater(kwargs["idle_execution_policy_coef"], 0.46)
         self.assertLess(kwargs["prepare_action_prior_weight"], 0.50)
 
+    def test_sa_v23_profile_enables_counterfactual_constrained_prd(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v23_counterfactual_constrained_prd"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v23_counterfactual_constrained_prd")
+        self.assertTrue(kwargs["counterfactual_teacher_prd_enabled"])
+        self.assertTrue(kwargs["option_gate_counterfactual_prd_enabled"])
+        self.assertFalse(kwargs["option_gate_mechanism_preserve_enabled"])
+        self.assertGreater(kwargs["counterfactual_teacher_event_coef"], 0.0)
+        self.assertGreater(kwargs["counterfactual_teacher_option_coef"], 0.0)
+        self.assertGreater(kwargs["mechanism_window_weight"], 1.18)
+        self.assertLess(kwargs["net_utility_mechanism_window_failed_penalty_scale"], 1.0)
+
+    def test_sa_v24_profile_enables_tail_risk_constrained_prd(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v24_tail_risk_constrained_prd"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v24_tail_risk_constrained_prd")
+        self.assertTrue(kwargs["tail_risk_prd_enabled"])
+        self.assertTrue(kwargs["counterfactual_teacher_prd_enabled"])
+        self.assertTrue(kwargs["option_gate_counterfactual_prd_enabled"])
+        self.assertTrue(kwargs["option_gate_mechanism_preserve_enabled"])
+        self.assertGreater(kwargs["tail_risk_policy_coef"], 0.0)
+        self.assertGreater(kwargs["tail_risk_event_coef"], 0.0)
+        self.assertGreater(kwargs["tail_risk_option_coef"], 0.0)
+        self.assertGreater(kwargs["net_utility_mechanism_window_failed_penalty_scale"], 0.5)
+
+    def test_sa_v25_profile_enables_opportunity_risk_prd(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v25_opportunity_risk_prd"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v25_opportunity_risk_prd")
+        self.assertTrue(kwargs["tail_risk_prd_enabled"])
+        self.assertTrue(kwargs["opportunity_prd_enabled"])
+        self.assertTrue(kwargs["counterfactual_teacher_prd_enabled"])
+        self.assertTrue(kwargs["option_gate_mechanism_preserve_enabled"])
+        self.assertGreater(kwargs["opportunity_policy_coef"], 0.0)
+        self.assertGreater(kwargs["opportunity_event_coef"], 0.0)
+        self.assertGreater(kwargs["opportunity_option_coef"], 0.0)
+        self.assertGreater(kwargs["opportunity_reward_surplus_coef"], 0.0)
+        self.assertLess(kwargs["tail_risk_policy_coef"], 0.52)
+
+    def test_sa_v26_profile_enables_safe_counterfactual_prd(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v26_mechanism_safe_counterfactual_prd"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v26_mechanism_safe_counterfactual_prd")
+        self.assertTrue(kwargs["counterfactual_teacher_prd_enabled"])
+        self.assertTrue(kwargs["option_gate_counterfactual_prd_enabled"])
+        self.assertTrue(kwargs["option_gate_mechanism_preserve_enabled"])
+        self.assertFalse(kwargs["tail_risk_prd_enabled"])
+        self.assertFalse(kwargs["opportunity_prd_enabled"])
+        self.assertGreater(kwargs["counterfactual_teacher_mechanism_bonus"], 0.0)
+        self.assertGreater(kwargs["counterfactual_teacher_invalid_mechanism_penalty"], 0.0)
+        self.assertGreater(kwargs["idle_execution_mechanism_penalty"], 0.72)
+        self.assertLess(kwargs["counterfactual_teacher_option_coef"], 0.72)
+
     def test_sa_v14_net_utility_option_terminates_idle_no_rsu_prefetch(self) -> None:
         agent = build_agent(
             "sa_ghmappo",
@@ -1253,6 +1322,242 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertLess(agent._option_gate_partial_reward_credit(failed_row), 0.0)
         self.assertGreater(agent._event_partial_reward_credit(success_row), 0.0)
         self.assertGreater(agent._option_gate_partial_reward_credit(success_row), 0.0)
+
+    def test_sa_v23_counterfactual_teacher_rewards_mechanism_and_penalizes_invalid_prepare(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            event_prd_advantage_enabled=True,
+            option_gate_enabled=True,
+            option_gate_count=4,
+            option_gate_prd_enabled=True,
+            option_gate_counterfactual_prd_enabled=True,
+            option_gate_counterfactual_coef=0.46,
+            net_utility_prd_enabled=True,
+            counterfactual_teacher_prd_enabled=True,
+            counterfactual_teacher_event_coef=0.58,
+            counterfactual_teacher_option_coef=0.72,
+            counterfactual_teacher_mechanism_bonus=0.92,
+            counterfactual_teacher_missed_prepare_penalty=0.78,
+            counterfactual_teacher_local_bonus=0.42,
+            counterfactual_teacher_current_rsu_penalty=0.16,
+            counterfactual_teacher_invalid_mechanism_penalty=0.82,
+        )
+        mechanism_row = {
+            "action": 4,
+            "reward": 1.0,
+            "action_info": {
+                "head_actions": {"event": 1},
+                "final_env_action": 4,
+                "prepare_window_score": 0.8,
+                "temporal_urgency": 0.7,
+                "prediction_confidence": 0.75,
+                "gate_pass": True,
+                "option_gate": {
+                    "enabled": True,
+                    "option_action": 3,
+                    "option_label": "mechanism_prepare",
+                    "option_actions": {"0": 3, "1": 3, "2": 2, "3": 4},
+                    "option_mask": [True, True, True, True],
+                    "window_class": "mechanism_activating",
+                },
+            },
+            "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+            "env_info": {"metrics_protocol": {"mechanism_success_strict": False}},
+        }
+        missed_prepare_row = deepcopy(mechanism_row)
+        missed_prepare_row["action"] = 3
+        missed_prepare_row["action_info"]["head_actions"] = {"event": 0}
+        missed_prepare_row["action_info"]["final_env_action"] = 3
+
+        invalid_prepare_row = deepcopy(mechanism_row)
+        invalid_prepare_row["decision_info"]["run_metadata"]["window_class"] = "active_non_mechanism"
+        invalid_prepare_row["action_info"]["option_gate"]["window_class"] = "active_non_mechanism"
+
+        local_row = deepcopy(invalid_prepare_row)
+        local_row["action"] = 2
+        local_row["action_info"]["head_actions"] = {"event": 0}
+        local_row["action_info"]["final_env_action"] = 2
+
+        mechanism_credit = agent._event_partial_reward_credit(mechanism_row)
+        missed_credit = agent._event_partial_reward_credit(missed_prepare_row)
+        invalid_credit = agent._event_partial_reward_credit(invalid_prepare_row)
+        local_credit = agent._event_partial_reward_credit(local_row)
+        self.assertGreater(mechanism_credit, missed_credit)
+        self.assertGreater(local_credit, invalid_credit)
+
+        option_advantage = agent._option_gate_advantage(
+            row=mechanism_row,
+            base_advantage=torch.tensor(0.0),
+            option_probs=torch.tensor([0.25, 0.25, 0.25, 0.25]),
+            option_mask=[True, True, True, True],
+        )
+        invalid_option_advantage = agent._option_gate_advantage(
+            row=invalid_prepare_row,
+            base_advantage=torch.tensor(0.0),
+            option_probs=torch.tensor([0.25, 0.25, 0.25, 0.25]),
+            option_mask=[True, True, True, True],
+        )
+        self.assertGreater(float(option_advantage.item()), 0.0)
+        self.assertLess(float(invalid_option_advantage.item()), 0.0)
+
+    def test_sa_v24_tail_risk_credit_penalizes_failed_redundant_mechanism(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            option_gate_enabled=True,
+            option_gate_count=4,
+            tail_risk_prd_enabled=True,
+            tail_risk_policy_coef=0.52,
+            tail_risk_event_coef=0.36,
+            tail_risk_option_coef=0.46,
+            tail_risk_reward_shortfall_coef=0.72,
+            tail_risk_service_coef=0.80,
+            tail_risk_continuity_coef=1.10,
+            tail_risk_handoff_failure_coef=1.35,
+            tail_risk_failed_mechanism_coef=0.82,
+            tail_risk_redundant_mechanism_coef=0.70,
+            tail_risk_success_credit=0.18,
+        )
+        failed_row = {
+            "action": 4,
+            "reward": -1.2,
+            "action_info": {
+                "head_actions": {"event": 1},
+                "final_env_action": 4,
+                "option_gate": {
+                    "enabled": True,
+                    "option_action": 3,
+                    "option_label": "mechanism_prepare",
+                    "option_actions": {"0": 3, "1": 3, "2": 2, "3": 4},
+                    "option_mask": [True, True, True, True],
+                    "window_class": "mechanism_activating",
+                },
+            },
+            "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+            "env_info": {
+                "metrics_protocol": {
+                    "handoff_failed": True,
+                    "handoff_failure_rate": 1.0,
+                    "workflow_continuity_rate": 0.25,
+                    "service_delay_sum": 4.0,
+                    "cache_miss_penalty_sum": 2.4,
+                    "migration_prepare_requested": True,
+                    "mechanism_success_strict": False,
+                }
+            },
+        }
+        success_row = deepcopy(failed_row)
+        success_row["reward"] = 1.0
+        success_row["env_info"]["metrics_protocol"].update(
+            {
+                "handoff_failed": False,
+                "handoff_failure_rate": 0.0,
+                "workflow_continuity_rate": 1.0,
+                "service_delay_sum": 0.0,
+                "cache_miss_penalty_sum": 0.0,
+                "mechanism_success_strict": True,
+                "handoff_ready": True,
+            }
+        )
+
+        failed_credit = agent._tail_risk_prd_credit(failed_row, reward_floor=0.0)
+        success_credit = agent._tail_risk_prd_credit(success_row, reward_floor=0.0)
+        self.assertLess(failed_credit, -1.0)
+        self.assertGreater(success_credit, failed_credit)
+
+        option_advantage = agent._option_gate_advantage(
+            row=failed_row,
+            base_advantage=torch.tensor(0.0),
+            option_probs=torch.tensor([0.25, 0.25, 0.25, 0.25]),
+            option_mask=[True, True, True, True],
+        )
+        self.assertLess(float(option_advantage.item()), 0.0)
+
+    def test_sa_v25_opportunity_credit_rewards_efficient_service_and_penalizes_waste(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            option_gate_enabled=True,
+            option_gate_count=4,
+            opportunity_prd_enabled=True,
+            opportunity_policy_coef=0.42,
+            opportunity_event_coef=0.24,
+            opportunity_option_coef=0.36,
+            opportunity_reward_surplus_coef=0.72,
+            opportunity_service_success_coef=0.54,
+            opportunity_cache_hit_coef=0.36,
+            opportunity_continuity_coef=0.42,
+            opportunity_current_rsu_efficiency_coef=0.36,
+            opportunity_local_fallback_coef=0.30,
+            opportunity_backhaul_penalty_coef=0.34,
+            opportunity_delay_penalty_coef=0.24,
+            opportunity_failed_service_penalty_coef=0.44,
+            opportunity_mechanism_success_bonus=0.32,
+        )
+        efficient_row = {
+            "action": 0,
+            "reward": 2.4,
+            "action_info": {"final_env_action": 0, "head_actions": {"event": 0}},
+            "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+            "env_info": {
+                "metrics_protocol": {
+                    "service_success_count": 8,
+                    "workflow_completed_count": 1,
+                    "workflow_unfinished_count": 0,
+                    "service_delay_sum": 3.2,
+                    "service_wait_sum": 0,
+                    "adapter_hit_count": 8,
+                    "adapter_miss_count": 0,
+                    "adapter_warm_hit_count": 8,
+                    "workflow_continuity_rate": 1.0,
+                    "current_rsu_exec_count": 8,
+                    "local_exec_count": 0,
+                    "backhaul_traffic_cost": 64.0,
+                    "cache_admission_count": 1,
+                    "mechanism_success_strict": True,
+                    "handoff_failed": False,
+                }
+            },
+        }
+        waste_row = deepcopy(efficient_row)
+        waste_row["action"] = 4
+        waste_row["reward"] = -1.6
+        waste_row["action_info"] = {"final_env_action": 4, "head_actions": {"event": 1}}
+        waste_row["env_info"]["metrics_protocol"].update(
+            {
+                "service_success_count": 2,
+                "workflow_completed_count": 0,
+                "workflow_unfinished_count": 1,
+                "service_delay_sum": 10.0,
+                "service_wait_sum": 4,
+                "adapter_hit_count": 2,
+                "adapter_miss_count": 6,
+                "adapter_warm_hit_count": 2,
+                "workflow_continuity_rate": 0.375,
+                "current_rsu_exec_count": 8,
+                "backhaul_traffic_cost": 192.0,
+                "cache_admission_count": 3,
+                "migration_prepare_requested": True,
+                "mechanism_success_strict": False,
+            }
+        )
+
+        efficient_credit = agent._opportunity_prd_credit(efficient_row, reward_floor=0.0)
+        waste_credit = agent._opportunity_prd_credit(waste_row, reward_floor=0.0)
+        self.assertGreater(efficient_credit, 0.5)
+        self.assertLess(waste_credit, 0.0)
+
+        option_advantage = agent._option_gate_advantage(
+            row=efficient_row,
+            base_advantage=torch.tensor(0.0),
+            option_probs=torch.tensor([0.25, 0.25, 0.25, 0.25]),
+            option_mask=[True, True, True, True],
+        )
+        self.assertGreater(float(option_advantage.item()), 0.0)
 
     def test_qmix_uses_controller_level_value_decomposition_contract(self) -> None:
         state = _minimal_semantic_state()

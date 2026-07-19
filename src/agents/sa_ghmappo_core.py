@@ -394,6 +394,44 @@ class 分层PPO基类(BaseAgent):
         option_gate_counterfactual_prd_enabled: bool = False,
         option_gate_counterfactual_coef: float = 0.0,
         option_gate_counterfactual_clip: float = 1.5,
+        counterfactual_teacher_prd_enabled: bool = False,
+        counterfactual_teacher_event_coef: float = 0.0,
+        counterfactual_teacher_option_coef: float = 0.0,
+        counterfactual_teacher_clip: float = 2.0,
+        counterfactual_teacher_mechanism_bonus: float = 0.0,
+        counterfactual_teacher_missed_prepare_penalty: float = 0.0,
+        counterfactual_teacher_local_bonus: float = 0.0,
+        counterfactual_teacher_current_rsu_penalty: float = 0.0,
+        counterfactual_teacher_invalid_mechanism_penalty: float = 0.0,
+        tail_risk_prd_enabled: bool = False,
+        tail_risk_policy_coef: float = 0.0,
+        tail_risk_event_coef: float = 0.0,
+        tail_risk_option_coef: float = 0.0,
+        tail_risk_clip: float = 2.0,
+        tail_risk_quantile: float = 0.20,
+        tail_risk_reward_shortfall_coef: float = 0.0,
+        tail_risk_service_coef: float = 0.0,
+        tail_risk_continuity_coef: float = 0.0,
+        tail_risk_handoff_failure_coef: float = 0.0,
+        tail_risk_failed_mechanism_coef: float = 0.0,
+        tail_risk_redundant_mechanism_coef: float = 0.0,
+        tail_risk_success_credit: float = 0.0,
+        opportunity_prd_enabled: bool = False,
+        opportunity_policy_coef: float = 0.0,
+        opportunity_event_coef: float = 0.0,
+        opportunity_option_coef: float = 0.0,
+        opportunity_clip: float = 1.6,
+        opportunity_reward_quantile: float = 0.60,
+        opportunity_reward_surplus_coef: float = 0.0,
+        opportunity_service_success_coef: float = 0.0,
+        opportunity_cache_hit_coef: float = 0.0,
+        opportunity_continuity_coef: float = 0.0,
+        opportunity_current_rsu_efficiency_coef: float = 0.0,
+        opportunity_local_fallback_coef: float = 0.0,
+        opportunity_backhaul_penalty_coef: float = 0.0,
+        opportunity_delay_penalty_coef: float = 0.0,
+        opportunity_failed_service_penalty_coef: float = 0.0,
+        opportunity_mechanism_success_bonus: float = 0.0,
         handoff_risk_prd_enabled: bool = False,
         handoff_risk_event_coef: float = 0.0,
         handoff_risk_option_coef: float = 0.0,
@@ -424,6 +462,7 @@ class 分层PPO基类(BaseAgent):
         net_utility_idle_prefetch_penalty: float = 0.0,
         net_utility_failed_mechanism_penalty: float = 0.0,
         net_utility_failed_mechanism_backhaul_coef: float = 0.0,
+        net_utility_mechanism_window_failed_penalty_scale: float = 1.0,
         net_utility_success_bonus: float = 0.0,
         net_utility_backhaul_normalizer: float = 64.0,
         net_utility_cost_dual_enabled: bool = False,
@@ -651,6 +690,59 @@ class 分层PPO基类(BaseAgent):
         self._option_gate_counterfactual_prd_enabled = bool(option_gate_counterfactual_prd_enabled)
         self._option_gate_counterfactual_coef = max(float(option_gate_counterfactual_coef), 0.0)
         self._option_gate_counterfactual_clip = max(float(option_gate_counterfactual_clip), 0.0)
+        self._counterfactual_teacher_prd_enabled = bool(counterfactual_teacher_prd_enabled)
+        self._counterfactual_teacher_event_coef = max(float(counterfactual_teacher_event_coef), 0.0)
+        self._counterfactual_teacher_option_coef = max(float(counterfactual_teacher_option_coef), 0.0)
+        self._counterfactual_teacher_clip = max(float(counterfactual_teacher_clip), 0.0)
+        self._counterfactual_teacher_mechanism_bonus = max(float(counterfactual_teacher_mechanism_bonus), 0.0)
+        self._counterfactual_teacher_missed_prepare_penalty = max(
+            float(counterfactual_teacher_missed_prepare_penalty),
+            0.0,
+        )
+        self._counterfactual_teacher_local_bonus = max(float(counterfactual_teacher_local_bonus), 0.0)
+        self._counterfactual_teacher_current_rsu_penalty = max(
+            float(counterfactual_teacher_current_rsu_penalty),
+            0.0,
+        )
+        self._counterfactual_teacher_invalid_mechanism_penalty = max(
+            float(counterfactual_teacher_invalid_mechanism_penalty),
+            0.0,
+        )
+        self._tail_risk_prd_enabled = bool(tail_risk_prd_enabled)
+        self._tail_risk_policy_coef = max(float(tail_risk_policy_coef), 0.0)
+        self._tail_risk_event_coef = max(float(tail_risk_event_coef), 0.0)
+        self._tail_risk_option_coef = max(float(tail_risk_option_coef), 0.0)
+        self._tail_risk_clip = max(float(tail_risk_clip), 0.0)
+        self._tail_risk_quantile = max(0.0, min(float(tail_risk_quantile), 1.0))
+        self._tail_risk_reward_shortfall_coef = max(float(tail_risk_reward_shortfall_coef), 0.0)
+        self._tail_risk_service_coef = max(float(tail_risk_service_coef), 0.0)
+        self._tail_risk_continuity_coef = max(float(tail_risk_continuity_coef), 0.0)
+        self._tail_risk_handoff_failure_coef = max(float(tail_risk_handoff_failure_coef), 0.0)
+        self._tail_risk_failed_mechanism_coef = max(float(tail_risk_failed_mechanism_coef), 0.0)
+        self._tail_risk_redundant_mechanism_coef = max(float(tail_risk_redundant_mechanism_coef), 0.0)
+        self._tail_risk_success_credit = max(float(tail_risk_success_credit), 0.0)
+        self._opportunity_prd_enabled = bool(opportunity_prd_enabled)
+        self._opportunity_policy_coef = max(float(opportunity_policy_coef), 0.0)
+        self._opportunity_event_coef = max(float(opportunity_event_coef), 0.0)
+        self._opportunity_option_coef = max(float(opportunity_option_coef), 0.0)
+        self._opportunity_clip = max(float(opportunity_clip), 0.0)
+        self._opportunity_reward_quantile = max(0.0, min(float(opportunity_reward_quantile), 1.0))
+        self._opportunity_reward_surplus_coef = max(float(opportunity_reward_surplus_coef), 0.0)
+        self._opportunity_service_success_coef = max(float(opportunity_service_success_coef), 0.0)
+        self._opportunity_cache_hit_coef = max(float(opportunity_cache_hit_coef), 0.0)
+        self._opportunity_continuity_coef = max(float(opportunity_continuity_coef), 0.0)
+        self._opportunity_current_rsu_efficiency_coef = max(
+            float(opportunity_current_rsu_efficiency_coef),
+            0.0,
+        )
+        self._opportunity_local_fallback_coef = max(float(opportunity_local_fallback_coef), 0.0)
+        self._opportunity_backhaul_penalty_coef = max(float(opportunity_backhaul_penalty_coef), 0.0)
+        self._opportunity_delay_penalty_coef = max(float(opportunity_delay_penalty_coef), 0.0)
+        self._opportunity_failed_service_penalty_coef = max(
+            float(opportunity_failed_service_penalty_coef),
+            0.0,
+        )
+        self._opportunity_mechanism_success_bonus = max(float(opportunity_mechanism_success_bonus), 0.0)
         self._handoff_risk_prd_enabled = bool(handoff_risk_prd_enabled)
         self._handoff_risk_event_coef = max(float(handoff_risk_event_coef), 0.0)
         self._handoff_risk_option_coef = max(float(handoff_risk_option_coef), 0.0)
@@ -697,6 +789,10 @@ class 分层PPO基类(BaseAgent):
         self._net_utility_failed_mechanism_penalty = max(float(net_utility_failed_mechanism_penalty), 0.0)
         self._net_utility_failed_mechanism_backhaul_coef = max(
             float(net_utility_failed_mechanism_backhaul_coef),
+            0.0,
+        )
+        self._net_utility_mechanism_window_failed_penalty_scale = max(
+            float(net_utility_mechanism_window_failed_penalty_scale),
             0.0,
         )
         self._net_utility_success_bonus = max(float(net_utility_success_bonus), 0.0)
@@ -1129,6 +1225,70 @@ class 分层PPO基类(BaseAgent):
                 normalized_event_advantages
                 + self._handoff_risk_event_coef * handoff_risk_credit_values
             )
+        tail_risk_reward_floor = 0.0
+        if self._tail_risk_prd_enabled and len(rollout) > 0:
+            reward_values = np.asarray(
+                [float(row.get("reward", 0.0) or 0.0) for row in rollout],
+                dtype=np.float32,
+            )
+            tail_risk_reward_floor = float(np.quantile(reward_values, self._tail_risk_quantile))
+        tail_risk_credit_values = np.zeros(len(rollout), dtype=np.float32)
+        if self._tail_risk_prd_enabled:
+            tail_risk_credit_values = np.asarray(
+                [
+                    self._tail_risk_prd_credit(row, reward_floor=tail_risk_reward_floor)
+                    for row in rollout
+                ],
+                dtype=np.float32,
+            )
+            if self._tail_risk_clip > 0.0:
+                tail_risk_credit_values = np.clip(
+                    tail_risk_credit_values,
+                    -self._tail_risk_clip,
+                    self._tail_risk_clip,
+                )
+            if self._tail_risk_policy_coef > 0.0:
+                normalized_advantages = (
+                    normalized_advantages
+                    + self._tail_risk_policy_coef * tail_risk_credit_values
+                )
+            if self._tail_risk_event_coef > 0.0:
+                normalized_event_advantages = (
+                    normalized_event_advantages
+                    + self._tail_risk_event_coef * tail_risk_credit_values
+                )
+        opportunity_reward_floor = 0.0
+        if self._opportunity_prd_enabled and len(rollout) > 0:
+            reward_values = np.asarray(
+                [float(row.get("reward", 0.0) or 0.0) for row in rollout],
+                dtype=np.float32,
+            )
+            opportunity_reward_floor = float(np.quantile(reward_values, self._opportunity_reward_quantile))
+        opportunity_credit_values = np.zeros(len(rollout), dtype=np.float32)
+        if self._opportunity_prd_enabled:
+            opportunity_credit_values = np.asarray(
+                [
+                    self._opportunity_prd_credit(row, reward_floor=opportunity_reward_floor)
+                    for row in rollout
+                ],
+                dtype=np.float32,
+            )
+            if self._opportunity_clip > 0.0:
+                opportunity_credit_values = np.clip(
+                    opportunity_credit_values,
+                    -self._opportunity_clip,
+                    self._opportunity_clip,
+                )
+            if self._opportunity_policy_coef > 0.0:
+                normalized_advantages = (
+                    normalized_advantages
+                    + self._opportunity_policy_coef * opportunity_credit_values
+                )
+            if self._opportunity_event_coef > 0.0:
+                normalized_event_advantages = (
+                    normalized_event_advantages
+                    + self._opportunity_event_coef * opportunity_credit_values
+                )
         idle_execution_credit_values = np.zeros(len(rollout), dtype=np.float32)
         if self._idle_execution_prd_enabled and self._idle_execution_policy_coef > 0.0:
             idle_execution_credit_values = np.asarray(
@@ -1418,6 +1578,28 @@ class 分层PPO基类(BaseAgent):
             "handoff_risk_cost_dual_after": round(handoff_risk_dual_after, 6),
             "handoff_risk_cost_signal_mean": round(float(handoff_risk_cost_values.mean()), 6)
             if len(handoff_risk_cost_values) > 0
+            else 0.0,
+            "tail_risk_prd_enabled": self._tail_risk_prd_enabled,
+            "tail_risk_policy_coef": round(self._tail_risk_policy_coef, 6),
+            "tail_risk_event_coef": round(self._tail_risk_event_coef, 6),
+            "tail_risk_option_coef": round(self._tail_risk_option_coef, 6),
+            "tail_risk_reward_floor": round(float(tail_risk_reward_floor), 6),
+            "tail_risk_credit_mean": round(float(tail_risk_credit_values.mean()), 6)
+            if len(tail_risk_credit_values) > 0
+            else 0.0,
+            "tail_risk_credit_std": round(float(tail_risk_credit_values.std()), 6)
+            if len(tail_risk_credit_values) > 0
+            else 0.0,
+            "opportunity_prd_enabled": self._opportunity_prd_enabled,
+            "opportunity_policy_coef": round(self._opportunity_policy_coef, 6),
+            "opportunity_event_coef": round(self._opportunity_event_coef, 6),
+            "opportunity_option_coef": round(self._opportunity_option_coef, 6),
+            "opportunity_reward_floor": round(float(opportunity_reward_floor), 6),
+            "opportunity_credit_mean": round(float(opportunity_credit_values.mean()), 6)
+            if len(opportunity_credit_values) > 0
+            else 0.0,
+            "opportunity_credit_std": round(float(opportunity_credit_values.std()), 6)
+            if len(opportunity_credit_values) > 0
             else 0.0,
             "idle_execution_prd_enabled": self._idle_execution_prd_enabled,
             "idle_execution_policy_coef": round(self._idle_execution_policy_coef, 6),
@@ -3219,6 +3401,96 @@ class 分层PPO基类(BaseAgent):
         )
         return bool(attempted and not self._row_mechanism_success(metrics))
 
+    def _counterfactual_teacher_action_credit(self, row: dict[str, Any], env_action: int) -> float:
+        if not self._counterfactual_teacher_prd_enabled:
+            return 0.0
+        action_info = dict(row.get("action_info", {}))
+        window_class = self._row_window_class(row)
+        prepare_score = max(float(action_info.get("prepare_window_score", 0.0) or 0.0), 0.0)
+        urgency = max(float(action_info.get("temporal_urgency", 0.0) or 0.0), 0.0)
+        confidence = max(float(action_info.get("prediction_confidence", 0.0) or 0.0), 0.0)
+        timing_support = max(prepare_score, urgency)
+        context_strength = 0.45 * prepare_score + 0.35 * urgency + 0.20 * confidence
+        if bool(action_info.get("gate_pass", False)):
+            context_strength += 0.20
+        context_strength = max(context_strength, 0.15 if window_class == "mechanism_activating" else 0.0)
+
+        env_action = int(env_action)
+        if window_class == "mechanism_activating":
+            if env_action in {1, 4}:
+                return self._counterfactual_teacher_mechanism_bonus * (0.75 + 0.35 * context_strength)
+            if env_action == 2:
+                return -0.50 * self._counterfactual_teacher_missed_prepare_penalty * (0.5 + timing_support)
+            return -self._counterfactual_teacher_missed_prepare_penalty * (0.45 + context_strength)
+
+        if window_class in {"idle_or_sparse", "active_non_mechanism"}:
+            if env_action == 2:
+                return self._counterfactual_teacher_local_bonus * (1.0 + 0.25 * (1.0 - timing_support))
+            if env_action in {1, 4}:
+                return -self._counterfactual_teacher_invalid_mechanism_penalty * (1.0 + 0.25 * (1.0 - timing_support))
+            if env_action in {0, 3}:
+                return -self._counterfactual_teacher_current_rsu_penalty * max(0.35, 1.0 - timing_support)
+        return 0.0
+
+    def _counterfactual_teacher_option_advantage(
+        self,
+        row: dict[str, Any],
+        *,
+        option_probs: torch.Tensor | None,
+        option_mask: list[bool] | None,
+    ) -> float:
+        if not self._counterfactual_teacher_prd_enabled:
+            return 0.0
+        action_info = dict(row.get("action_info", {}))
+        option_info = dict(action_info.get("option_gate", {}))
+        option_action = int(option_info.get("option_action", 0) or 0)
+        base_env_action = int(
+            option_info.get(
+                "base_env_action",
+                action_info.get("projected_env_action", action_info.get("final_env_action", row.get("action", 0))),
+            )
+            or 0
+        )
+        option_actions_raw = option_info.get("option_actions", {})
+        option_actions: dict[int, int] = {}
+        if isinstance(option_actions_raw, dict):
+            for raw_key, raw_value in option_actions_raw.items():
+                try:
+                    option_actions[int(raw_key)] = int(raw_value)
+                except (TypeError, ValueError):
+                    continue
+        valid_count = min(self._option_gate_count, len(option_mask or [])) if option_mask else self._option_gate_count
+        utilities: list[float] = []
+        probabilities: list[float] = []
+        probs = option_probs.detach().cpu().tolist() if option_probs is not None else []
+        for option_index in range(self._option_gate_count):
+            is_valid = True
+            if option_mask is not None and option_index < len(option_mask):
+                is_valid = bool(option_mask[option_index])
+            elif option_mask is not None:
+                is_valid = False
+            if option_index >= valid_count:
+                is_valid = False
+            option_env_action = int(option_actions.get(option_index, base_env_action))
+            utilities.append(self._counterfactual_teacher_action_credit(row, option_env_action) if is_valid else 0.0)
+            probabilities.append(float(probs[option_index]) if option_index < len(probs) and is_valid else 0.0)
+        probability_sum = float(sum(probabilities))
+        if probability_sum <= 1e-8:
+            valid_indices = [
+                index
+                for index in range(self._option_gate_count)
+                if option_mask is None or (index < len(option_mask) and bool(option_mask[index]))
+            ]
+            if not valid_indices:
+                return 0.0
+            uniform_prob = 1.0 / float(len(valid_indices))
+            probabilities = [uniform_prob if index in valid_indices else 0.0 for index in range(self._option_gate_count)]
+        else:
+            probabilities = [probability / probability_sum for probability in probabilities]
+        expected_credit = float(sum(probability * utility for probability, utility in zip(probabilities, utilities)))
+        selected_credit = float(utilities[option_action]) if 0 <= option_action < len(utilities) else 0.0
+        return float(selected_credit - expected_credit)
+
     def _metric_bool(self, metrics: dict[str, Any], field_name: str) -> bool:
         value = metrics.get(field_name, False)
         if isinstance(value, str):
@@ -3318,6 +3590,175 @@ class 分层PPO基类(BaseAgent):
         failure_penalty = self._handoff_risk_failure_penalty * float(handoff_failed)
         return float(bonus - dual_scale * (failure_penalty + unprepared_penalty))
 
+    def _tail_risk_prd_credit(self, row: dict[str, Any], *, reward_floor: float | None = None) -> float:
+        if not self._tail_risk_prd_enabled:
+            return 0.0
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        action_info = dict(row.get("action_info", {}))
+        final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
+        event_action = int(action_info.get("head_actions", {}).get("event", 0) or 0)
+        window_class = self._row_window_class(row)
+
+        reward = float(row.get("reward", 0.0) or 0.0)
+        floor = 0.0 if reward_floor is None else float(reward_floor)
+        reward_scale = max(abs(floor), abs(reward), 1.0)
+        reward_shortfall = max(floor - reward, 0.0) / reward_scale
+
+        service_delay_sum = max(
+            self._metric_float(metrics, "service_delay_sum"),
+            self._metric_float(metrics, "end_to_end_workflow_delay"),
+            0.0,
+        )
+        service_pressure = min(service_delay_sum / 4.0, 1.5)
+        cache_miss_penalty = max(self._metric_float(metrics, "cache_miss_penalty_sum"), 0.0)
+        cache_pressure = min(cache_miss_penalty / 2.4, 1.5)
+        continuity_rate = self._metric_float(metrics, "workflow_continuity_rate", 1.0)
+        continuity_loss = min(max(1.0 - continuity_rate, 0.0), 1.5)
+        handoff_failed = self._metric_bool(metrics, "handoff_failed") or self._metric_float(
+            metrics,
+            "handoff_failure_rate",
+        ) > 0.0
+        handoff_ready = self._metric_bool(metrics, "handoff_ready") or self._metric_float(
+            metrics,
+            "handoff_ready_ratio",
+            self._metric_float(metrics, "handoff_ready_rate", 0.0),
+        ) > 0.0
+        mechanism_attempt = bool(
+            self._metric_bool(metrics, "mechanism_attempt_selected")
+            or self._metric_bool(metrics, "predictive_prefetch_requested")
+            or self._metric_bool(metrics, "migration_prepare_requested")
+            or final_action in {1, 4}
+            or event_action == 1
+        )
+        strict_mechanism_success = bool(
+            self._metric_bool(metrics, "mechanism_success_strict")
+            or self._metric_bool(metrics, "prefetch_validated_hit")
+            or handoff_ready
+        )
+        failed_mechanism = self._row_failed_mechanism_attempt(row, metrics)
+        high_risk = self._handoff_risk_context(row, metrics)
+
+        risk = (
+            self._tail_risk_reward_shortfall_coef * reward_shortfall
+            + self._tail_risk_service_coef * service_pressure
+            + 0.45 * self._tail_risk_service_coef * cache_pressure
+            + self._tail_risk_continuity_coef * continuity_loss
+            + self._tail_risk_handoff_failure_coef * float(handoff_failed)
+            + self._tail_risk_failed_mechanism_coef * float(failed_mechanism)
+        )
+        redundant_mechanism = bool(mechanism_attempt and not strict_mechanism_success)
+        if redundant_mechanism:
+            tail_context = service_pressure + cache_pressure + continuity_loss + float(handoff_failed)
+            context_scale = 0.70 + min(tail_context, 2.0)
+            if window_class != "mechanism_activating" and not high_risk:
+                context_scale += 0.35
+            risk += self._tail_risk_redundant_mechanism_coef * context_scale
+
+        success_credit = 0.0
+        if mechanism_attempt and strict_mechanism_success and not handoff_failed:
+            low_tail_pressure = max(0.0, 1.0 - min(service_pressure + continuity_loss, 1.0))
+            success_credit = self._tail_risk_success_credit * (0.35 + 0.65 * low_tail_pressure)
+        return float(success_credit - risk)
+
+    def _opportunity_prd_credit(self, row: dict[str, Any], *, reward_floor: float | None = None) -> float:
+        if not self._opportunity_prd_enabled:
+            return 0.0
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        action_info = dict(row.get("action_info", {}))
+        window_class = self._row_window_class(row)
+        final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
+        event_action = int(action_info.get("head_actions", {}).get("event", 0) or 0)
+
+        reward = float(row.get("reward", 0.0) or 0.0)
+        floor = 0.0 if reward_floor is None else float(reward_floor)
+        reward_scale = max(abs(floor), abs(reward), 1.0)
+        reward_surplus = max(reward - floor, 0.0) / reward_scale
+
+        service_success = max(
+            self._metric_float(metrics, "service_success_count"),
+            self._metric_float(metrics, "workflow_completed_count"),
+            0.0,
+        )
+        service_wait = max(self._metric_float(metrics, "service_wait_sum"), 0.0)
+        workflow_unfinished = max(self._metric_float(metrics, "workflow_unfinished_count"), 0.0)
+        adapter_hit = max(self._metric_float(metrics, "adapter_hit_count"), 0.0)
+        adapter_miss = max(self._metric_float(metrics, "adapter_miss_count"), 0.0)
+        warm_hit = max(self._metric_float(metrics, "adapter_warm_hit_count"), 0.0)
+        cache_admission = max(self._metric_float(metrics, "cache_admission_count"), 0.0)
+        exec_counts = {
+            "local": max(self._metric_float(metrics, "local_exec_count"), 0.0),
+            "current": max(self._metric_float(metrics, "current_rsu_exec_count"), 0.0),
+            "next": max(self._metric_float(metrics, "next_rsu_exec_count"), 0.0),
+            "neighbor": max(self._metric_float(metrics, "neighbor_rsu_exec_count"), 0.0),
+            "cloud": max(self._metric_float(metrics, "cloud_exec_count"), 0.0),
+        }
+        exec_total = max(sum(exec_counts.values()), 1.0)
+        observed_units = max(
+            service_success + workflow_unfinished,
+            service_success + adapter_miss,
+            service_success + service_wait,
+            exec_total,
+            1.0,
+        )
+        success_rate = min(service_success / observed_units, 1.0)
+        warm_rate = min(warm_hit / max(adapter_hit + adapter_miss, 1.0), 1.0)
+        continuity_rate = max(min(self._metric_float(metrics, "workflow_continuity_rate", 1.0), 1.0), 0.0)
+        service_quality = 0.45 * success_rate + 0.30 * warm_rate + 0.25 * continuity_rate
+
+        service_delay_sum = max(
+            self._metric_float(metrics, "service_delay_sum"),
+            self._metric_float(metrics, "end_to_end_workflow_delay"),
+            0.0,
+        )
+        delay_pressure = min(service_delay_sum / max(4.0 * observed_units, 1.0), 1.5)
+        failed_service_pressure = min((service_wait + adapter_miss + workflow_unfinished) / observed_units, 1.5)
+        backhaul_units = max(self._metric_float(metrics, "backhaul_traffic_cost"), 0.0) / 64.0
+        mechanism_attempt = bool(
+            self._metric_bool(metrics, "mechanism_attempt_selected")
+            or self._metric_bool(metrics, "predictive_prefetch_requested")
+            or self._metric_bool(metrics, "migration_prepare_requested")
+            or final_action in {1, 4}
+            or event_action == 1
+        )
+        mechanism_success = self._row_mechanism_success(metrics)
+        handoff_failed = self._metric_bool(metrics, "handoff_failed") or self._metric_float(
+            metrics,
+            "handoff_failure_rate",
+        ) > 0.0
+        high_risk = self._handoff_risk_context(row, metrics)
+
+        credit = (
+            self._opportunity_reward_surplus_coef * reward_surplus
+            + self._opportunity_service_success_coef * service_quality
+            + self._opportunity_cache_hit_coef * warm_rate
+            + self._opportunity_continuity_coef * continuity_rate
+        )
+        credit -= self._opportunity_delay_penalty_coef * delay_pressure
+        credit -= self._opportunity_failed_service_penalty_coef * failed_service_pressure
+
+        current_share = (exec_counts["current"] + exec_counts["next"] + exec_counts["neighbor"]) / exec_total
+        local_share = exec_counts["local"] / exec_total
+        if final_action in {0, 3} or current_share >= 0.65:
+            credit += self._opportunity_current_rsu_efficiency_coef * (
+                0.45 * current_share + 0.35 * warm_rate + 0.20 * continuity_rate - 0.35 * delay_pressure
+            )
+        if final_action == 2 or local_share >= 0.25:
+            local_context = failed_service_pressure + 0.35 * float(not high_risk)
+            credit += self._opportunity_local_fallback_coef * (
+                0.45 * local_context + 0.25 * success_rate - 0.35 * delay_pressure
+            )
+            if window_class == "mechanism_activating" and high_risk and not mechanism_success:
+                credit -= 0.35 * self._opportunity_local_fallback_coef * max(local_share, 0.25)
+
+        if mechanism_success and not handoff_failed:
+            credit += self._opportunity_mechanism_success_bonus * (0.50 + 0.50 * service_quality)
+        if mechanism_attempt and not mechanism_success:
+            redundant_backhaul = max(backhaul_units + 0.25 * cache_admission - 1.0, 0.0)
+            credit -= self._opportunity_backhaul_penalty_coef * (0.40 + redundant_backhaul)
+        elif not mechanism_success:
+            credit -= self._opportunity_backhaul_penalty_coef * max(backhaul_units - 1.0, 0.0)
+        return float(credit)
+
     def _idle_execution_prd_credit(self, row: dict[str, Any]) -> float:
         if not self._idle_execution_prd_enabled:
             return 0.0
@@ -3390,9 +3831,15 @@ class 分层PPO基类(BaseAgent):
         if window_class == "idle_or_sparse" and pending_prefetch and not mechanism_success:
             penalty += penalty_scale * self._net_utility_idle_prefetch_penalty
         if self._row_failed_mechanism_attempt(row, metrics):
+            failed_penalty_scale = 1.0
+            if window_class == "mechanism_activating":
+                failed_penalty_scale = self._net_utility_mechanism_window_failed_penalty_scale
             penalty += penalty_scale * (
-                self._net_utility_failed_mechanism_penalty
-                + self._net_utility_failed_mechanism_backhaul_coef * backhaul_units
+                failed_penalty_scale
+                * (
+                    self._net_utility_failed_mechanism_penalty
+                    + self._net_utility_failed_mechanism_backhaul_coef * backhaul_units
+                )
             )
         bonus = self._net_utility_success_bonus * float(mechanism_success)
         return float(bonus - penalty)
@@ -3414,6 +3861,13 @@ class 分层PPO基类(BaseAgent):
         if gate_pass:
             context_strength += 0.25
         outcome_strength = 0.55 * mechanism_success + 0.25 * ready_rate - 0.35 * failure_rate
+        teacher_credit = self._counterfactual_teacher_action_credit(row, final_action)
+        if self._counterfactual_teacher_clip > 0.0:
+            teacher_credit = max(
+                -self._counterfactual_teacher_clip,
+                min(self._counterfactual_teacher_clip, teacher_credit),
+            )
+        teacher_adjustment = self._counterfactual_teacher_event_coef * teacher_credit
 
         if window_class == "mechanism_activating":
             if event_action == 1:
@@ -3422,17 +3876,17 @@ class 分层PPO基类(BaseAgent):
                     credit += 0.18
             else:
                 credit = outcome_strength - 0.35 * context_strength
-            return float(credit + self._net_utility_prd_adjustment(row))
+            return float(credit + teacher_adjustment + self._net_utility_prd_adjustment(row))
         if window_class == "idle_or_sparse":
             if event_action == 1:
                 credit = 0.15 * context_strength - 0.35 * (1.0 - float(gate_pass))
             else:
                 credit = 0.10
-            return float(credit + self._net_utility_prd_adjustment(row))
+            return float(credit + teacher_adjustment + self._net_utility_prd_adjustment(row))
         if window_class == "active_non_mechanism":
             credit = -0.20 if event_action == 1 else 0.08
-            return float(credit + self._net_utility_prd_adjustment(row))
-        return float(self._net_utility_prd_adjustment(row))
+            return float(credit + teacher_adjustment + self._net_utility_prd_adjustment(row))
+        return float(teacher_adjustment + self._net_utility_prd_adjustment(row))
 
     def _option_gate_advantage(
         self,
@@ -3450,6 +3904,12 @@ class 分层PPO基类(BaseAgent):
             )
             or (self._handoff_risk_prd_enabled and self._handoff_risk_option_coef > 0.0)
             or (self._idle_execution_prd_enabled and self._idle_execution_option_coef > 0.0)
+            or (self._tail_risk_prd_enabled and self._tail_risk_option_coef > 0.0)
+            or (self._opportunity_prd_enabled and self._opportunity_option_coef > 0.0)
+            or (
+                self._counterfactual_teacher_prd_enabled
+                and self._counterfactual_teacher_option_coef > 0.0
+            )
         ):
             return base_advantage
         partial_credit = 0.0
@@ -3483,6 +3943,34 @@ class 分层PPO基类(BaseAgent):
             if self._idle_execution_clip > 0.0:
                 idle_credit = max(-self._idle_execution_clip, min(self._idle_execution_clip, idle_credit))
             partial_credit += idle_credit * self._idle_execution_option_coef
+        if self._tail_risk_prd_enabled and self._tail_risk_option_coef > 0.0:
+            tail_credit = self._tail_risk_prd_credit(row)
+            if self._tail_risk_clip > 0.0:
+                tail_credit = max(-self._tail_risk_clip, min(self._tail_risk_clip, tail_credit))
+            partial_credit += tail_credit * self._tail_risk_option_coef
+        if self._opportunity_prd_enabled and self._opportunity_option_coef > 0.0:
+            opportunity_credit = self._opportunity_prd_credit(row)
+            if self._opportunity_clip > 0.0:
+                opportunity_credit = max(
+                    -self._opportunity_clip,
+                    min(self._opportunity_clip, opportunity_credit),
+                )
+            partial_credit += opportunity_credit * self._opportunity_option_coef
+        if (
+            self._counterfactual_teacher_prd_enabled
+            and self._counterfactual_teacher_option_coef > 0.0
+        ):
+            teacher_credit = self._counterfactual_teacher_option_advantage(
+                row,
+                option_probs=option_probs,
+                option_mask=option_mask,
+            )
+            if self._counterfactual_teacher_clip > 0.0:
+                teacher_credit = max(
+                    -self._counterfactual_teacher_clip,
+                    min(self._counterfactual_teacher_clip, teacher_credit),
+                )
+            partial_credit += teacher_credit * self._counterfactual_teacher_option_coef
         credit_tensor = torch.tensor(
             partial_credit,
             dtype=torch.float32,
@@ -4822,6 +5310,46 @@ class 分层PPO基类(BaseAgent):
             "option_gate_counterfactual_prd_enabled": self._option_gate_counterfactual_prd_enabled,
             "option_gate_counterfactual_coef": self._option_gate_counterfactual_coef,
             "option_gate_counterfactual_clip": self._option_gate_counterfactual_clip,
+            "counterfactual_teacher_prd_enabled": self._counterfactual_teacher_prd_enabled,
+            "counterfactual_teacher_event_coef": self._counterfactual_teacher_event_coef,
+            "counterfactual_teacher_option_coef": self._counterfactual_teacher_option_coef,
+            "counterfactual_teacher_clip": self._counterfactual_teacher_clip,
+            "counterfactual_teacher_mechanism_bonus": self._counterfactual_teacher_mechanism_bonus,
+            "counterfactual_teacher_missed_prepare_penalty": self._counterfactual_teacher_missed_prepare_penalty,
+            "counterfactual_teacher_local_bonus": self._counterfactual_teacher_local_bonus,
+            "counterfactual_teacher_current_rsu_penalty": self._counterfactual_teacher_current_rsu_penalty,
+            "counterfactual_teacher_invalid_mechanism_penalty": (
+                self._counterfactual_teacher_invalid_mechanism_penalty
+            ),
+            "tail_risk_prd_enabled": self._tail_risk_prd_enabled,
+            "tail_risk_policy_coef": self._tail_risk_policy_coef,
+            "tail_risk_event_coef": self._tail_risk_event_coef,
+            "tail_risk_option_coef": self._tail_risk_option_coef,
+            "tail_risk_clip": self._tail_risk_clip,
+            "tail_risk_quantile": self._tail_risk_quantile,
+            "tail_risk_reward_shortfall_coef": self._tail_risk_reward_shortfall_coef,
+            "tail_risk_service_coef": self._tail_risk_service_coef,
+            "tail_risk_continuity_coef": self._tail_risk_continuity_coef,
+            "tail_risk_handoff_failure_coef": self._tail_risk_handoff_failure_coef,
+            "tail_risk_failed_mechanism_coef": self._tail_risk_failed_mechanism_coef,
+            "tail_risk_redundant_mechanism_coef": self._tail_risk_redundant_mechanism_coef,
+            "tail_risk_success_credit": self._tail_risk_success_credit,
+            "opportunity_prd_enabled": self._opportunity_prd_enabled,
+            "opportunity_policy_coef": self._opportunity_policy_coef,
+            "opportunity_event_coef": self._opportunity_event_coef,
+            "opportunity_option_coef": self._opportunity_option_coef,
+            "opportunity_clip": self._opportunity_clip,
+            "opportunity_reward_quantile": self._opportunity_reward_quantile,
+            "opportunity_reward_surplus_coef": self._opportunity_reward_surplus_coef,
+            "opportunity_service_success_coef": self._opportunity_service_success_coef,
+            "opportunity_cache_hit_coef": self._opportunity_cache_hit_coef,
+            "opportunity_continuity_coef": self._opportunity_continuity_coef,
+            "opportunity_current_rsu_efficiency_coef": self._opportunity_current_rsu_efficiency_coef,
+            "opportunity_local_fallback_coef": self._opportunity_local_fallback_coef,
+            "opportunity_backhaul_penalty_coef": self._opportunity_backhaul_penalty_coef,
+            "opportunity_delay_penalty_coef": self._opportunity_delay_penalty_coef,
+            "opportunity_failed_service_penalty_coef": self._opportunity_failed_service_penalty_coef,
+            "opportunity_mechanism_success_bonus": self._opportunity_mechanism_success_bonus,
             "handoff_risk_prd_enabled": self._handoff_risk_prd_enabled,
             "handoff_risk_event_coef": self._handoff_risk_event_coef,
             "handoff_risk_option_coef": self._handoff_risk_option_coef,
@@ -4852,6 +5380,9 @@ class 分层PPO基类(BaseAgent):
             "net_utility_idle_prefetch_penalty": self._net_utility_idle_prefetch_penalty,
             "net_utility_failed_mechanism_penalty": self._net_utility_failed_mechanism_penalty,
             "net_utility_failed_mechanism_backhaul_coef": self._net_utility_failed_mechanism_backhaul_coef,
+            "net_utility_mechanism_window_failed_penalty_scale": (
+                self._net_utility_mechanism_window_failed_penalty_scale
+            ),
             "net_utility_success_bonus": self._net_utility_success_bonus,
             "net_utility_backhaul_normalizer": self._net_utility_backhaul_normalizer,
             "net_utility_cost_dual_enabled": self._net_utility_cost_dual_enabled,

@@ -1102,3 +1102,32 @@ quick run 结果边界：
 - `python -m pytest tests`
 
 验证结论：新版 MAPPO smoke checkpoint 通过协议审计；旧 `final_submission_controller_mappo_qmix_20260509_v1` 生成的新 comparison audit 为 `paper_ready_package_ready=false`，确认旧 pre-head-credit MAPPO 不再作为当前 paper-ready package。
+
+## 2026-07-19: v23-v26 MAPPO/PRD reward-gap 扩大实验
+
+本轮目标：在不修改 environment reward、baseline contract、window plan 或 evaluation wrapper 的前提下，继续基于 MAPPO/CTDE 与 partial-reward-decoupled credit assignment 改进 SA-GHMAPPO，使主算法 reward 稳定高于规则与 learned baselines。
+
+已完成：
+
+- 新增并验证 `top_journal_mechanism_v23_counterfactual_constrained_prd`、`top_journal_mechanism_v24_tail_risk_constrained_prd`、`top_journal_mechanism_v25_opportunity_risk_prd`、`top_journal_mechanism_v26_mechanism_safe_counterfactual_prd` 四个候选 profile。
+- v23/v24/v25/v26 均使用 5 seed、20 dev windows、2 workflows、12 agents 的 full-stratified benchmark；v24 额外跑了 time-audited future-validation formal benchmark。
+- 目标测试已覆盖 profile contract、checkpoint latest-first 选择和新增 PRD credit 行为。
+
+关键结果：
+
+- 当前 reward 最强仍是 v22：dev SA `79.73675` vs popularity `79.46875`，delta `+0.268`，BCa CI `[0.00076, 0.823611]`；formal SA `80.124` vs popularity `80.02375`，delta `+0.10025`，CI `[-0.490537, 1.045619]`。
+- v24 tail-risk PRD 在 dev 上为 SA `79.66375`，delta vs popularity `+0.195`，CI `[-0.098269, 0.703363]`；formal 为 SA `80.080`，delta `+0.05625`，CI `[-0.566491, 0.991443]`。
+- v25 opportunity PRD 退化：dev SA `79.56875`，delta vs popularity `+0.100`，CI `[-0.16225, 0.456904]`，mechanism realization 从 v22 `0.225` 降到 `0.185`。
+- v26 safe-counterfactual PRD 仍未超过 v22：dev SA `79.633`，delta vs popularity `+0.16425`，CI `[-0.062, 0.534445]`，mechanism realization `0.190`。
+- 相对 learned baselines，v22/v24/v25/v26 均稳定高于 PPO/MAPPO；例如 v26 dev vs PPO delta `+2.44525`，CI `[1.107208, 5.76918]`，vs MAPPO delta `+7.0002`，CI `[4.384952, 11.389729]`。
+
+洞察：
+
+- 主算法低于或接近 popularity 的一阶原因不是 MAPPO 学习能力不足，而是当前 strict dev/formal 协议中 popularity 已在大量无机制机会窗口接近可达上限；formal split 上 SA、popularity、PPO、MAPPO 的 mechanism realization 均为 `0.0`，机制优势没有足够可兑现空间。
+- 简单放大机制/机会 credit 会伤害 reward：v23 产生 failed mechanism tail loss，v25 降低 validated mechanism realization，v26 虽减少部分 loss 但仍压低 v22 已有正窗口收益。
+- 当前可守结论是“SA-GHMAPPO 在 learned baselines 上有稳定 reward 优势，并在 dev 上略高于 popularity”；不能写成“显著、大幅优于 strong heuristic”。
+
+结论边界：
+
+- v23-v26 均不晋级 canonical；当前 reward-first 候选仍保持 v22。
+- 已查看过的 v20/v22/v24 formal/future-validation 不能再作为未消费 hidden evidence。若后续要重新做 paper-ready 判断，必须先冻结新的未消费 formal/hidden split，再绑定最终 profile 和 checkpoint manifest 一次性评估。

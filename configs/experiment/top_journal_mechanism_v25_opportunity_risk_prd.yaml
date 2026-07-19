@@ -1,0 +1,51 @@
+profile: top_journal_mechanism_v25_opportunity_risk_prd
+purpose: >
+  Add opportunity-aware PRD on top of v24 tail-risk constrained PRD. The MAPPO
+  update receives positive local credit for high-reward, service-efficient,
+  cache-warm, continuity-preserving execution outcomes and negative credit for
+  delay, failed service, and redundant backhaul/cache admission without
+  validated mechanism success.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v24_tail_risk_constrained_prd
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  tail_risk_prd_enabled: true
+  tail_risk_policy_coef: 0.40
+  tail_risk_event_coef: 0.28
+  tail_risk_option_coef: 0.34
+  opportunity_prd_enabled: true
+  opportunity_policy_coef: 0.42
+  opportunity_event_coef: 0.24
+  opportunity_option_coef: 0.36
+  opportunity_clip: 1.65
+  opportunity_reward_quantile: 0.60
+  opportunity_reward_surplus_coef: 0.72
+  opportunity_service_success_coef: 0.54
+  opportunity_cache_hit_coef: 0.36
+  opportunity_continuity_coef: 0.42
+  opportunity_current_rsu_efficiency_coef: 0.36
+  opportunity_local_fallback_coef: 0.30
+  opportunity_backhaul_penalty_coef: 0.34
+  opportunity_delay_penalty_coef: 0.24
+  opportunity_failed_service_penalty_coef: 0.44
+  opportunity_mechanism_success_bonus: 0.32
+  net_utility_backhaul_coef: 0.28
+  net_utility_failed_mechanism_backhaul_coef: 0.42
+  counterfactual_teacher_prd_enabled: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+evaluation:
+  split_policy: dev_then_time_audited_formal_then_hidden
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile targets the v24 formal failure mode where total reward stayed
+    close to popularity because risk control suppressed profitable execution
+    opportunities and still allowed some redundant cache admission/backhaul.
+  - Opportunity PRD is injected into MAPPO policy/event advantage and learned
+    option-gate advantage only. It does not alter environment reward, heuristic
+    baselines, action masks, or benchmark metrics.

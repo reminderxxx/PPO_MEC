@@ -912,3 +912,33 @@ Run root：
 - `mappo` 和 `qmix` 是 controller-level baselines，不是 vehicle-agent / RSU-agent full MARL wrappers；新增 DAG/cache/DT 领域 baseline 尚未进入该 artifact。
 - `popularity_cache_heuristic` 与 SA-GHMAPPO 非常接近，仍需作为 supplementary reference 报告，不应宣称大幅领先手写规则。
 - prediction robustness 只能声明 `learned_prediction` / `noisy_prediction` 条件下优于 PPO；`no_prediction` / `oracle_prediction` 是诊断边界。
+
+## Top Journal Reward-Gap PRD Iterations v23-v26
+
+状态：`[not-promoted]`
+
+用途：2026-07-19 reward-gap 扩大实验记录。四个候选均保持环境 reward、baseline contract、window plan 和 evaluation wrapper 不变，只改 SA-GHMAPPO learning-side MAPPO/PRD credit 或 profile 参数。v23/v25/v26 未进入 formal；v24 跑了 dev 与 time-audited formal，但未超过 v22。
+
+核心产物：
+
+- v23 dev run：`artifacts/experiments/top_journal_counterfactual_constrained_prd_v23_20260718/main_results_full_stratified_latest/main_results_full_stratified_20260719_130629_878953`
+- v24 training manifest：`artifacts/experiments/top_journal_tail_risk_constrained_prd_v24_20260719/seed_checkpoint_manifest_tail_risk_constrained_prd_full.json`
+- v24 dev run：`artifacts/experiments/top_journal_tail_risk_constrained_prd_v24_20260719/main_results_full_stratified_latest/main_results_full_stratified_20260719_133007_558405`
+- v24 formal run：`artifacts/experiments/top_journal_tail_risk_constrained_prd_v24_20260719/formal_time_audited_full_stratified/main_results_full_stratified_20260719_133353_824313`
+- v25 training manifest：`artifacts/experiments/top_journal_opportunity_risk_prd_v25_20260719/seed_checkpoint_manifest_opportunity_risk_prd_full.json`
+- v25 dev run：`artifacts/experiments/top_journal_opportunity_risk_prd_v25_20260719/main_results_full_stratified_latest/main_results_full_stratified_20260719_135756_658943`
+- v26 training manifest：`artifacts/experiments/top_journal_mechanism_safe_counterfactual_prd_v26_20260719/seed_checkpoint_manifest_mechanism_safe_counterfactual_prd_full.json`
+- v26 dev run：`artifacts/experiments/top_journal_mechanism_safe_counterfactual_prd_v26_20260719/main_results_full_stratified_latest/main_results_full_stratified_20260719_141726_288470`
+
+确认结果：
+
+- v23 dev：SA `79.351` vs popularity `79.46875`，delta `-0.1181`，淘汰。
+- v24 dev：SA `79.66375` vs popularity `79.46875`，delta `+0.195`，BCa CI `[-0.098269, 0.703363]`；formal：SA `80.080` vs popularity `80.02375`，delta `+0.05625`，CI `[-0.566491, 0.991443]`。
+- v25 dev：SA `79.56875` vs popularity `79.46875`，delta `+0.100`，CI `[-0.16225, 0.456904]`；mechanism realization `0.185`，低于 v22 `0.225`。
+- v26 dev：SA `79.633` vs popularity `79.46875`，delta `+0.16425`，CI `[-0.062, 0.534445]`；vs PPO delta `+2.44525`，CI `[1.107208, 5.76918]`；vs MAPPO delta `+7.0002`，CI `[4.384952, 11.389729]`。
+
+结论边界：
+
+- 当前 reward-first canonical 仍是 v22，不是 v23-v26。
+- v23-v26 可用于讨论 negative result 与 credit-assignment 失败边界；不能作为“reward gap 已显著拉大”或“足以发论文”的证据。
+- 若继续推进 paper-ready claim，必须新冻结未消费 split，并补齐 support suite、artifact integrity、command logs、checkpoint provenance 与 top-journal review audit。

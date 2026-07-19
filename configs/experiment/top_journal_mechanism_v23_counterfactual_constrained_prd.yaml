@@ -1,0 +1,42 @@
+profile: top_journal_mechanism_v23_counterfactual_constrained_prd
+purpose: >
+  Add constrained counterfactual teacher PRD on top of v22. The MAPPO event
+  head and learned option gate receive selected-vs-counterfactual credit against
+  the strong rule action: follow mechanism preparation in mechanism windows, but
+  prefer local execution and suppress invalid mechanism actions in non-mechanism
+  windows.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v22_validated_utility_prd
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  counterfactual_teacher_prd_enabled: true
+  counterfactual_teacher_event_coef: 0.58
+  counterfactual_teacher_option_coef: 0.72
+  counterfactual_teacher_mechanism_bonus: 0.92
+  counterfactual_teacher_missed_prepare_penalty: 0.78
+  counterfactual_teacher_local_bonus: 0.42
+  counterfactual_teacher_invalid_mechanism_penalty: 0.82
+  option_gate_counterfactual_prd_enabled: true
+  option_gate_counterfactual_coef: 0.46
+  option_gate_mechanism_preserve_enabled: false
+  mechanism_aux_coef: 0.07
+  mechanism_window_weight: 1.58
+  prepare_action_prior_weight: 0.62
+  net_utility_mechanism_window_failed_penalty_scale: 0.10
+  net_utility_failed_mechanism_penalty: 0.42
+  net_utility_failed_mechanism_backhaul_coef: 0.16
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+evaluation:
+  split_policy: dev_then_time_audited_formal_then_hidden
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile targets the v22 formal loss pattern: missed migration prepare
+    reward in mechanism windows and delayed non-mechanism local execution.
+  - The teacher signal is policy-gradient credit only. It does not change
+    environment reward, baseline behavior, action masks, or benchmark metrics.

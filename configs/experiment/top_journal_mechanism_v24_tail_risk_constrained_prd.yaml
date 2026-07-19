@@ -1,0 +1,50 @@
+profile: top_journal_mechanism_v24_tail_risk_constrained_prd
+purpose: >
+  Add lower-tail risk constrained PRD on top of v23. The MAPPO update receives
+  a CVaR-style negative credit for low-quantile reward shortfall, handoff
+  failure, continuity loss, service/cache pressure, and redundant mechanism
+  attempts without strict validated success.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v23_counterfactual_constrained_prd
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  option_gate_mechanism_preserve_enabled: true
+  tail_risk_prd_enabled: true
+  tail_risk_policy_coef: 0.52
+  tail_risk_event_coef: 0.36
+  tail_risk_option_coef: 0.46
+  tail_risk_clip: 1.80
+  tail_risk_quantile: 0.25
+  tail_risk_reward_shortfall_coef: 0.72
+  tail_risk_service_coef: 0.80
+  tail_risk_continuity_coef: 1.10
+  tail_risk_handoff_failure_coef: 1.35
+  tail_risk_failed_mechanism_coef: 0.82
+  tail_risk_redundant_mechanism_coef: 0.70
+  tail_risk_success_credit: 0.18
+  counterfactual_teacher_prd_enabled: true
+  counterfactual_teacher_event_coef: 0.38
+  counterfactual_teacher_option_coef: 0.46
+  counterfactual_teacher_mechanism_bonus: 0.64
+  counterfactual_teacher_missed_prepare_penalty: 0.72
+  counterfactual_teacher_invalid_mechanism_penalty: 0.88
+  net_utility_mechanism_window_failed_penalty_scale: 0.72
+  net_utility_failed_mechanism_penalty: 0.78
+  net_utility_failed_mechanism_backhaul_coef: 0.30
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+evaluation:
+  split_policy: dev_then_time_audited_formal_then_hidden
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile targets the v23 dev failure mode where a few mechanism windows
+    gained extra mechanism actions but lost service, cache, and continuity
+    reward.
+  - The tail-risk signal is injected into MAPPO advantage and option-gate
+    advantage only. It does not change environment reward, baseline behavior,
+    action masks, or benchmark metrics.

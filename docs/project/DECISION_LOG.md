@@ -607,3 +607,25 @@
 - `cache_offload_drl` 使用 cache occupancy、adapter readiness、cache demand 和 future load 等标量，不使用 SA-GHMAPPO 的 surrogate/guard 机制。
 - `dt_handoff_drl` 使用 raw Digital Twin prediction snapshot，不使用 SA-GHMAPPO 的 calibrated surrogate gate、uncertainty-aware event scaling、temporal smoothing 或 handoff guards。
 - 这些新增 baseline 的 smoke train/eval 只能证明 contract 和链路可用；正式数值结论必须来自后续多 seed formal/holdout final-submission artifact。
+
+## 2026-07-19: v23-v26 reward-gap 候选不晋级
+
+决策：`top_journal_mechanism_v23_counterfactual_constrained_prd`、`top_journal_mechanism_v24_tail_risk_constrained_prd`、`top_journal_mechanism_v25_opportunity_risk_prd` 和 `top_journal_mechanism_v26_mechanism_safe_counterfactual_prd` 均不晋级 canonical。当前 reward-first SA-GHMAPPO 候选仍保持 `top_journal_mechanism_v22_validated_utility_prd`。
+
+原因：
+
+- v23-v26 均只修改 SA-GHMAPPO 的 MAPPO/CTDE learning-side credit assignment、partial-reward-decoupled advantage 或 profile 参数，没有修改 environment reward、baseline contract、window plan 或 evaluation wrapper；因此结果可以用于算法诊断。
+- v23 dev 低于 `popularity_cache_heuristic`；v24 dev/formal 均高于 popularity 但 CI 跨 0，且低于 v22；v25/v26 在 dev 上仍未超过 v22，并降低 validated mechanism realization。
+- 当前 strict dev 和 time-audited formal 中，popularity 在大量无机制机会窗口接近上限；formal 上 SA、popularity、PPO、MAPPO 的 `mechanism_realization_rate` 均为 `0.0`。这意味着 handoff/cache mechanism 的可兑现 reward 空间不足，不能通过继续放大 PRD/auxiliary 系数可靠拉开奖励差距。
+- v23-v26 的负结果表明“更多机制尝试”不是单调有效：failed mechanism tail loss、无效 opportunity credit 和过强 counterfactual teacher 都可能压低 reward。
+
+影响：
+
+- v23-v26 作为 negative-result profiles 和诊断 artifact 保留，但不得写成 paper-ready 改进或 canonical reward-gap 结果。
+- 后续若继续追求显著高于 strong heuristic 的主张，必须先冻结新的未消费 formal/hidden split，并补齐 support suite、checkpoint provenance、command logs、artifact integrity 与 top-journal review audit。
+- 算法上应优先转向可检验的一阶机制：learned counterfactual evaluator、safe policy improvement / constrained policy optimization、calibrated predictor 或明确冻结后的动作 contract 扩展；不再把已消费 dev/formal 上的 PRD 系数筛选作为论文证据。
+
+边界：
+
+- 当前可守结论是 SA-GHMAPPO 相比 learned baselines 有稳定 reward 优势，并在部分 dev/formal aggregate 上略高于 popularity；不能宣称“大幅、显著优于强规则 baseline”。
+- 已查看过的 v20/v22/v24 formal/future-validation 不能再作为未调参 hidden evidence 使用。
