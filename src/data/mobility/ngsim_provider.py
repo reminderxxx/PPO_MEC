@@ -95,15 +95,31 @@ class NGSIMProvider(MobilityProvider):
             )
 
     def _load_sample_frames(self, max_rows: int) -> list[dict[str, Any]]:
-        grouped_rows: dict[int, list[VehicleState]] = defaultdict(list)
+        grouped_rows: dict[tuple[str, int], dict[str, Any]] = {}
         loaded_rows = 0
         with self._csv_path.open("r", encoding="utf-8-sig", newline="") as file:
             reader = csv.DictReader(file)
             for row in reader:
                 frame_id = int(self._to_float(row["Frame_ID"]))
-                grouped_rows[frame_id].append(
+                location = str(row.get("Location") or "unknown").strip() or "unknown"
+                global_time_raw = row.get("Global_Time")
+                global_time = int(self._to_float(global_time_raw)) if global_time_raw not in {None, ""} else frame_id
+                segment_id = self._segment_id(location)
+                frame_key = (segment_id, global_time)
+                frame_record = grouped_rows.setdefault(
+                    frame_key,
+                    {
+                        "time_index": global_time,
+                        "ngsim_frame_id": frame_id,
+                        "global_time": global_time,
+                        "source_location": location,
+                        "source_segment_id": segment_id,
+                        "vehicles": [],
+                    },
+                )
+                frame_record["vehicles"].append(
                     VehicleState(
-                        vehicle_id=str(row["Vehicle_ID"]),
+                        vehicle_id=f"{segment_id}:{row['Vehicle_ID']}",
                         position_x=float(self._to_float(row["Local_X"])),
                         position_y=float(self._to_float(row["Local_Y"])),
                         speed=abs(float(self._to_float(row["v_Vel"]))),
@@ -115,11 +131,16 @@ class NGSIMProvider(MobilityProvider):
                     break
         if not grouped_rows:
             raise RuntimeError("NGSIM CSV 已找到，但 sample 读取结果为空。")
-        ordered_frames = sorted(grouped_rows.keys())
-        return [
-            {"time_index": frame_id, "vehicles": grouped_rows[frame_id]}
-            for frame_id in ordered_frames
-        ]
+        ordered_keys = sorted(grouped_rows.keys(), key=lambda item: (item[0], item[1]))
+        segment_indices: dict[str, int] = defaultdict(int)
+        frames: list[dict[str, Any]] = []
+        for key in ordered_keys:
+            frame = grouped_rows[key]
+            segment_id = str(frame["source_segment_id"])
+            frame["segment_frame_index"] = segment_indices[segment_id]
+            segment_indices[segment_id] += 1
+            frames.append(frame)
+        return frames
 
     def _ensure_frames_loaded(self) -> None:
         if not self._trajectory_frames:
@@ -149,3 +170,10 @@ class NGSIMProvider(MobilityProvider):
 
     def _to_float(self, raw_value: Any) -> float:
         return float(str(raw_value).replace(",", ""))
+
+    def _segment_id(self, location: str) -> str:
+        normalized = "".join(
+            char.lower() if char.isalnum() else "_"
+            for char in str(location or "unknown")
+        ).strip("_")
+        return normalized or "unknown"

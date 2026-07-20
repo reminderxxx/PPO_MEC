@@ -24,9 +24,19 @@ def frame_interval(window: dict[str, Any]) -> tuple[int, int]:
 
 def available_intervals(window: dict[str, Any]) -> dict[str, tuple[int, int]]:
     intervals = {"frame_offset": frame_interval(window)}
-    if "time_index_start" in window and "time_index_end" in window:
+    if window.get("time_index_start") is not None and window.get("time_index_end") is not None:
         intervals["time_index"] = (int(window["time_index_start"]), int(window["time_index_end"]))
+    if window.get("segment_frame_start") is not None and window.get("segment_frame_end") is not None:
+        intervals["segment_frame"] = (int(window["segment_frame_start"]), int(window["segment_frame_end"]))
     return intervals
+
+
+def same_known_segment(left: dict[str, Any], right: dict[str, Any]) -> bool | None:
+    left_segment = str(left.get("source_segment_id") or "").strip()
+    right_segment = str(right.get("source_segment_id") or "").strip()
+    if not left_segment or not right_segment:
+        return None
+    return left_segment == right_segment
 
 
 def intervals_overlap(
@@ -50,6 +60,8 @@ def overlap_rows(
     for left_index, left_window in enumerate(left):
         start = left_index + 1 if same_plan else 0
         for right_window in right[start:]:
+            if same_known_segment(left_window, right_window) is False:
+                continue
             left_intervals = available_intervals(left_window)
             right_intervals = available_intervals(right_window)
             for interval_kind in sorted(set(left_intervals) & set(right_intervals)):
@@ -58,8 +70,10 @@ def overlap_rows(
                         {
                             "interval_kind": interval_kind,
                             "left_window_id": left_window.get("window_id"),
+                            "left_source_segment_id": left_window.get("source_segment_id", ""),
                             "left_interval": list(left_intervals[interval_kind]),
                             "right_window_id": right_window.get("window_id"),
+                            "right_source_segment_id": right_window.get("source_segment_id", ""),
                             "right_interval": list(right_intervals[interval_kind]),
                         }
                     )
@@ -75,7 +89,7 @@ def build_report(formal_path: Path, holdout_path: Path, gap: int = 0) -> dict[st
     return {
         "passed": not formal_overlaps and not holdout_overlaps and not cross_overlaps,
         "minimum_gap_frames": gap,
-        "checked_interval_kinds": ["frame_offset", "time_index"],
+        "checked_interval_kinds": ["frame_offset", "time_index", "segment_frame"],
         "formal_summary_path": str(formal_path.resolve()),
         "holdout_summary_path": str(holdout_path.resolve()),
         "formal_window_ids": [item.get("window_id") for item in formal],

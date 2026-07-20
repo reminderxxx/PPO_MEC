@@ -1,0 +1,44 @@
+profile: top_journal_mechanism_v32_dt_continuation_mappo
+purpose: >
+  Extend v31 with a digital-twin continuation-value prior over the
+  hierarchical environment-action scores. The goal is to let SA-GHMAPPO learn
+  when high-risk handoff windows should keep migration preparation or waiting
+  actions active instead of terminating short DAGs too early.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v31_handoff_pacing_mappo
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  evaluation_wrapper_changed: false
+  digital_twin_policy_prior_enabled: true
+  digital_twin_policy_prior_pacing_enabled: true
+  digital_twin_policy_prior_env_action_bias_enabled: true
+  digital_twin_policy_prior_env_action_logit_bias: 4.80
+  digital_twin_policy_prior_continuation_threshold: 0.32
+  digital_twin_policy_prior_continuation_prepare_scale: 1.35
+  digital_twin_policy_prior_continuation_wait_scale: 0.95
+  digital_twin_policy_prior_continuation_steady_suppression: 0.42
+  digital_twin_policy_prior_distill_coef: 0.120
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+segmented_strict_protocol:
+  required_window_plan_root: configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719
+  protocol_version: strict_split_v3_segmented_executable_handoff_20260719
+  max_mobility_rows: 5000000
+  window_scan_stride: 8
+evaluation:
+  split_policy: train_dev_formal_then_one_time_hidden_after_candidate_freeze
+  hidden_holdout_for_selection: prohibited
+notes:
+  - The continuation prior is part of the actor score path and PPO auxiliary
+    distillation loss. It does not alter rewards, masks, transitions, or
+    benchmark aggregation.
+  - The intended mechanism follows recent MAPPO-style credit shaping and
+    model-based policy regularization: use digital-twin handoff features to
+    bias continuation actions only when the learned policy sees handoff
+    opportunity and short-DAG termination pressure together.

@@ -1,0 +1,43 @@
+profile: top_journal_mechanism_v37_advantage_gated_counterfactual_mappo
+purpose: >
+  Repair v36's over-aggressive COMA-style final-action margin by gating the
+  counterfactual auxiliary loss with MAPPO advantages. The auxiliary signal only
+  distills a better counterfactual semantic action when the sampled transition
+  has positive centralized-critic advantage and a sufficient teacher-credit gap.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v35_guard_relaxed_action_mappo
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  evaluation_wrapper_changed: false
+  env_action_counterfactual_margin_enabled: true
+  env_action_counterfactual_margin_coef: 0.055
+  env_action_counterfactual_margin_min_gap: 0.10
+  env_action_counterfactual_margin_max_weight: 1.35
+  env_action_counterfactual_margin_advantage_gate: 0.12
+  env_action_counterfactual_margin_advantage_blend: 0.70
+  env_action_ppo_enabled: true
+  env_action_ppo_ratio_barrier_coef: 0.075
+  env_action_ppo_ratio_barrier_margin: 0.30
+  counterfactual_teacher_prd_enabled: true
+  hard_guards_enabled: false
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+segmented_strict_protocol:
+  required_window_plan_root: configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719
+  protocol_version: strict_split_v3_segmented_executable_handoff_20260719
+  max_mobility_rows: 5000000
+  window_scan_stride: 8
+evaluation:
+  split_policy: train_dev_formal_then_one_time_hidden_after_candidate_freeze
+  hidden_holdout_for_selection: prohibited
+notes:
+  - The v37 objective keeps the MAPPO centralized critic as the arbiter of
+    policy improvement and uses counterfactual credit as a weak auxiliary term.
+  - No reward offset, action mask, baseline, manifest, or benchmark aggregation
+    is changed by this profile.

@@ -1,0 +1,179 @@
+{
+  "protocol_version": "strict_split_v2_segmented_ngsim_20260719",
+  "created_at": "2026-07-19T07:03:11.267470+00:00",
+  "selection_policy": "mobility-covariate-only; no reward, checkpoint, or outcome inspected",
+  "hidden_holdout_policy": {
+    "sealed": true,
+    "opened_at": null,
+    "open_condition": "candidate frozen and formal strict-full gate passed",
+    "maximum_open_count": 1
+  },
+  "parameters": {
+    "mobility_source": "ngsim",
+    "max_mobility_rows": 5000000,
+    "window_length": 24,
+    "window_scan_stride": 8,
+    "minimum_gap_frames": 24,
+    "windows_per_split": 20,
+    "targets_per_split": {
+      "mechanism_activating": 14,
+      "active_non_mechanism": 4,
+      "idle_or_sparse": 2
+    },
+    "random_seed": 27
+  },
+  "source_records": {
+    "mobility": {
+      "path": "data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+      "sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+      "size_bytes": 2118175938
+    },
+    "workflow": {
+      "path": "data/raw/workflow/alibaba2018/batch_task.csv",
+      "sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc",
+      "size_bytes": 802261444
+    }
+  },
+  "candidate_pool_counts": {
+    "active_non_mechanism": 1675,
+    "mechanism_activating": 5450,
+    "idle_or_sparse": 115
+  },
+  "plans": {
+    "train": {
+      "path": "configs/experiment/top_journal_v27_segmented_strict_split_20260719/train_window_plan.json",
+      "sha256": "adbe8acac7fc4fd834ae1d979af57a891c23ba4f4d79d981a0ee9fca8c9d999d",
+      "window_count": 20,
+      "window_ids": [
+        "window_lankershim_off536_len24_t1118935733800_1118935736100",
+        "window_lankershim_off1856_len24_t1118935870800_1118935873100",
+        "window_us_101_off30728_len24_t1118847026600_1118847028900",
+        "window_us_101_off30896_len24_t1118847043400_1118847045700",
+        "window_us_101_off30944_len24_t1118847048200_1118847050500",
+        "window_us_101_off31280_len24_t1118847081800_1118847084100",
+        "window_us_101_off32128_len24_t1118847166600_1118847168900",
+        "window_us_101_off32224_len24_t1118847176200_1118847178500",
+        "window_us_101_off32336_len24_t1118847187400_1118847189700",
+        "window_us_101_off32472_len24_t1118847201000_1118847203300",
+        "window_us_101_off37408_len24_t1118847694600_1118847696900",
+        "window_us_101_off38272_len24_t1118847781000_1118847783300",
+        "window_us_101_off43592_len24_t1118848313000_1118848315300",
+        "window_us_101_off44080_len24_t1118848361800_1118848364100",
+        "window_us_101_off44208_len24_t1118848374600_1118848376900",
+        "window_us_101_off44336_len24_t1118848387400_1118848389700",
+        "window_us_101_off47416_len24_t1118848695400_1118848697700",
+        "window_us_101_off49536_len24_t1118848907400_1118848909700",
+        "window_us_101_off53720_len24_t1118849325800_1118849328100",
+        "window_us_101_off53936_len24_t1118849347400_1118849349700"
+      ],
+      "stratum_counts": {
+        "mechanism_activating": 14,
+        "active_non_mechanism": 4,
+        "idle_or_sparse": 2
+      }
+    },
+    "dev": {
+      "path": "configs/experiment/top_journal_v27_segmented_strict_split_20260719/dev_window_plan.json",
+      "sha256": "62f7574384f35c0ac4be9011969d56a115cd909fb18e92a09c716a2ecb347b0d",
+      "window_count": 20,
+      "window_ids": [
+        "window_peachtree_off19936_len24_t1163021100_1163023400",
+        "window_us_101_off30832_len24_t1118847037000_1118847039300",
+        "window_us_101_off31872_len24_t1118847141000_1118847143300",
+        "window_us_101_off31928_len24_t1118847146600_1118847148900",
+        "window_us_101_off32176_len24_t1118847171400_1118847173700",
+        "window_us_101_off32288_len24_t1118847182600_1118847184900",
+        "window_us_101_off33288_len24_t1118847282600_1118847284900",
+        "window_us_101_off35392_len24_t1118847493000_1118847495300",
+        "window_us_101_off36768_len24_t1118847630600_1118847632900",
+        "window_us_101_off37288_len24_t1118847682600_1118847684900",
+        "window_us_101_off38600_len24_t1118847813800_1118847816100",
+        "window_us_101_off39384_len24_t1118847892200_1118847894500",
+        "window_us_101_off40032_len24_t1118847957000_1118847959300",
+        "window_us_101_off40120_len24_t1118847965800_1118847968100",
+        "window_us_101_off40216_len24_t1118847975400_1118847977700",
+        "window_us_101_off40592_len24_t1118848013000_1118848015300",
+        "window_us_101_off41680_len24_t1118848121800_1118848124100",
+        "window_us_101_off49672_len24_t1118848921000_1118848923300",
+        "window_us_101_off49944_len24_t1118848948200_1118848950500",
+        "window_us_101_off57952_len24_t1118849749000_1118849751300"
+      ],
+      "stratum_counts": {
+        "mechanism_activating": 14,
+        "active_non_mechanism": 4,
+        "idle_or_sparse": 2
+      }
+    },
+    "formal": {
+      "path": "configs/experiment/top_journal_v27_segmented_strict_split_20260719/formal_window_plan.json",
+      "sha256": "771da0a5c6e896cc96c79af3588b375fbd7e5676257ecd4ef93a07fcd897ea32",
+      "window_count": 20,
+      "window_ids": [
+        "window_lankershim_off19880_len24_t1118937673200_1118937675500",
+        "window_peachtree_off29624_len24_t1163989900_1163992200",
+        "window_us_101_off32400_len24_t1118847193800_1118847196100",
+        "window_us_101_off33392_len24_t1118847293000_1118847295300",
+        "window_us_101_off33936_len24_t1118847347400_1118847349700",
+        "window_us_101_off36584_len24_t1118847612200_1118847614500",
+        "window_us_101_off37200_len24_t1118847673800_1118847676100",
+        "window_us_101_off39280_len24_t1118847881800_1118847884100",
+        "window_us_101_off39552_len24_t1118847909000_1118847911300",
+        "window_us_101_off39672_len24_t1118847921000_1118847923300",
+        "window_us_101_off40288_len24_t1118847982600_1118847984900",
+        "window_us_101_off40448_len24_t1118847998600_1118848000900",
+        "window_us_101_off43744_len24_t1118848328200_1118848330500",
+        "window_us_101_off44496_len24_t1118848403400_1118848405700",
+        "window_us_101_off44752_len24_t1118848429000_1118848431300",
+        "window_us_101_off45800_len24_t1118848533800_1118848536100",
+        "window_us_101_off46216_len24_t1118848575400_1118848577700",
+        "window_us_101_off49400_len24_t1118848893800_1118848896100",
+        "window_us_101_off52512_len24_t1118849205000_1118849207300",
+        "window_us_101_off53352_len24_t1118849289000_1118849291300"
+      ],
+      "stratum_counts": {
+        "mechanism_activating": 14,
+        "active_non_mechanism": 4,
+        "idle_or_sparse": 2
+      }
+    },
+    "hidden_holdout": {
+      "path": "configs/experiment/top_journal_v27_segmented_strict_split_20260719/hidden_holdout_window_plan.json",
+      "sha256": "a86ab921460a41b30b007c2d5bf0b36e447cbaf071d260c206d04a9f9dd96de0",
+      "window_count": 20,
+      "window_ids": [
+        "window_lankershim_off432_len24_t1118935723400_1118935725700",
+        "window_lankershim_off8216_len24_t1118936506800_1118936509100",
+        "window_us_101_off31688_len24_t1118847122600_1118847124900",
+        "window_us_101_off32080_len24_t1118847161800_1118847164100",
+        "window_us_101_off32648_len24_t1118847218600_1118847220900",
+        "window_us_101_off35832_len24_t1118847537000_1118847539300",
+        "window_us_101_off36512_len24_t1118847605000_1118847607300",
+        "window_us_101_off40168_len24_t1118847970600_1118847972900",
+        "window_us_101_off40400_len24_t1118847993800_1118847996100",
+        "window_us_101_off40512_len24_t1118848005000_1118848007300",
+        "window_us_101_off40672_len24_t1118848021000_1118848023300",
+        "window_us_101_off44032_len24_t1118848357000_1118848359300",
+        "window_us_101_off46264_len24_t1118848580200_1118848582500",
+        "window_us_101_off46464_len24_t1118848600200_1118848602500",
+        "window_us_101_off48376_len24_t1118848791400_1118848793700",
+        "window_us_101_off48560_len24_t1118848809800_1118848812100",
+        "window_us_101_off48808_len24_t1118848834600_1118848836900",
+        "window_us_101_off50104_len24_t1118848964200_1118848966500",
+        "window_us_101_off52672_len24_t1118849221000_1118849223300",
+        "window_us_101_off54864_len24_t1118849440200_1118849442500"
+      ],
+      "stratum_counts": {
+        "mechanism_activating": 14,
+        "active_non_mechanism": 4,
+        "idle_or_sparse": 2
+      }
+    }
+  },
+  "independence_audit": {
+    "passed": true,
+    "minimum_gap_frames": 24,
+    "window_count": 80,
+    "conflicts": []
+  },
+  "manifest_content_sha256": "141d491423ab5a75c5e91c486575872a88081136c191ad8206d19f1b900e54b3"
+}

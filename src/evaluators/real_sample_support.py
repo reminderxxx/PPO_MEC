@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from statistics import fmean
 from typing import Any
@@ -68,6 +69,24 @@ def load_real_source_frames(
     lust_scenario_root: str,
     max_mobility_rows: int,
 ) -> tuple[list[dict[str, Any]], str]:
+    return _load_real_source_frames_cached(
+        str(root_dir.resolve()),
+        str(mobility_source),
+        str(mobility_csv_path or ""),
+        str(lust_scenario_root or ""),
+        int(max_mobility_rows),
+    )
+
+
+@lru_cache(maxsize=4)
+def _load_real_source_frames_cached(
+    root_dir_raw: str,
+    mobility_source: str,
+    mobility_csv_path: str,
+    lust_scenario_root: str,
+    max_mobility_rows: int,
+) -> tuple[list[dict[str, Any]], str]:
+    root_dir = Path(root_dir_raw)
     if mobility_source == "ngsim":
         csv_path = discover_ngsim_csv(root_dir=root_dir, explicit_path=mobility_csv_path)
         provider = NGSIMProvider(csv_path=csv_path, max_rows=max_mobility_rows)
@@ -179,6 +198,11 @@ def select_mobility_window(
     selected_frames = frames[start_index : start_index + normalized_length]
     if not selected_frames:
         raise RuntimeError("真实 mobility 窗口选择结果为空。")
+    if not _window_within_single_segment(selected_frames):
+        raise RuntimeError(
+            "真实 mobility 窗口跨越了不同 source_segment_id；"
+            "请使用 max_handoff_candidate/random 扫描或调整 frame_offset。"
+        )
     window_evaluation = evaluate_window_with_layout(
         window_frames=selected_frames,
         rsu_layout=requested_rsu_layout,
@@ -192,6 +216,10 @@ def select_mobility_window(
         "window_selector": selector,
         "time_index_start": int(selected_frames[0]["time_index"]),
         "time_index_end": int(selected_frames[-1]["time_index"]),
+        "source_segment_id": selected_frames[0].get("source_segment_id", ""),
+        "source_location": selected_frames[0].get("source_location", ""),
+        "segment_frame_start": selected_frames[0].get("segment_frame_index"),
+        "segment_frame_end": selected_frames[-1].get("segment_frame_index"),
         "effective_rsu_layout": window_evaluation["effective_rsu_layout"],
         "requested_rsu_layout": requested_rsu_layout,
         "dominant_axis": window_evaluation["dominant_axis"],
@@ -229,6 +257,8 @@ def scan_mobility_windows(
     max_start = len(frames) - normalized_length
     for start_index in range(frame_offset, max_start + 1, stride):
         window_frames = frames[start_index : start_index + normalized_length]
+        if not _window_within_single_segment(window_frames):
+            continue
         layout_evaluations = [
             evaluate_window_with_layout(window_frames=window_frames, rsu_layout=layout)
             for layout in layout_candidates
@@ -249,6 +279,10 @@ def scan_mobility_windows(
                 "window_length": len(window_frames),
                 "time_index_start": int(window_frames[0]["time_index"]),
                 "time_index_end": int(window_frames[-1]["time_index"]),
+                "source_segment_id": window_frames[0].get("source_segment_id", ""),
+                "source_location": window_frames[0].get("source_location", ""),
+                "segment_frame_start": window_frames[0].get("segment_frame_index"),
+                "segment_frame_end": window_frames[-1].get("segment_frame_index"),
                 "dominant_axis": recommended["dominant_axis"],
                 "recommended_rsu_layout": recommended["effective_rsu_layout"],
                 "chosen_rsu_axis": recommended["chosen_rsu_axis"],
@@ -709,4 +743,15 @@ def _sample_random_window_start(
 def _build_window_id(selected_frames: list[dict[str, Any]], frame_offset: int) -> str:
     time_start = int(selected_frames[0]["time_index"])
     time_end = int(selected_frames[-1]["time_index"])
-    return f"window_off{frame_offset}_len{len(selected_frames)}_t{time_start}_{time_end}"
+    segment_id = str(selected_frames[0].get("source_segment_id") or "").strip()
+    segment_prefix = f"{segment_id}_" if segment_id else ""
+    return f"window_{segment_prefix}off{frame_offset}_len{len(selected_frames)}_t{time_start}_{time_end}"
+
+
+def _window_within_single_segment(frames: list[dict[str, Any]]) -> bool:
+    if not frames:
+        return False
+    segment_ids = [frame.get("source_segment_id") for frame in frames if frame.get("source_segment_id")]
+    if not segment_ids:
+        return True
+    return len(set(segment_ids)) == 1 and len(segment_ids) == len(frames)

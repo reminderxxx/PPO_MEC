@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+import torch
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
@@ -115,6 +118,102 @@ class WindowSelectionContractTestCase(unittest.TestCase):
             [item["window_id"] for item in payload["selected_window_plan_by_strata"]["active_non_mechanism"]],
             ["a1"],
         )
+
+    def test_high_prediction_without_real_handoff_is_not_mechanism_window(self) -> None:
+        busy_no_handoff = _window_payload("busy_no_handoff", 0, "active_non_mechanism")
+        busy_no_handoff["estimated_association_change_count"] = 10
+        busy_no_handoff["active_vehicle_count_mean"] = 8.0
+        mechanism = _window_payload("real_handoff", 1, "mechanism_activating")
+        with (
+            patch.object(main_results_support, "load_real_source_frames", return_value=([{}] * 8, "fake.csv")),
+            patch.object(main_results_support, "scan_mobility_windows", return_value=[busy_no_handoff, mechanism]),
+            patch.object(main_results_support, "_build_window_rsus", return_value=([], {})),
+            patch.object(
+                main_results_support,
+                "_estimate_prediction_activity",
+                return_value={
+                    "predicted_next_rsu_non_null_ratio": 0.9,
+                    "predicted_handoff_target_non_null_ratio": 0.9,
+                },
+            ),
+        ):
+            _, payload = main_results_support.resolve_window_candidates(
+                root_dir=ROOT_DIR,
+                mobility_csv_path="",
+                max_mobility_rows=8,
+                rsu_layout="auto_dominant_tight",
+                frame_offset=0,
+                window_length=2,
+                window_selector="max_handoff_candidate",
+                window_count=1,
+                window_scan_stride=1,
+                random_seed=7,
+                window_mode="full_stratified",
+            )
+
+        mechanism_ids = [item["window_id"] for item in payload["mechanism_activating_windows"]]
+        self.assertEqual(mechanism_ids, ["real_handoff"])
+        self.assertNotIn("busy_no_handoff", mechanism_ids)
+
+    def test_layout_candidates_are_forwarded_to_window_scan(self) -> None:
+        mechanism = _window_payload("real_handoff", 0, "mechanism_activating")
+        with (
+            patch.object(main_results_support, "load_real_source_frames", return_value=([{}] * 4, "fake.csv")),
+            patch.object(main_results_support, "scan_mobility_windows", return_value=[mechanism]) as scan_mock,
+            patch.object(main_results_support, "_build_window_rsus", return_value=([], {})),
+            patch.object(
+                main_results_support,
+                "_estimate_prediction_activity",
+                return_value={
+                    "predicted_next_rsu_non_null_ratio": 0.9,
+                    "predicted_handoff_target_non_null_ratio": 0.9,
+                },
+            ),
+        ):
+            main_results_support.resolve_window_candidates(
+                root_dir=ROOT_DIR,
+                mobility_csv_path="",
+                max_mobility_rows=4,
+                rsu_layout="auto_dominant_tight",
+                layout_candidates=["lust_micro", "tight_y"],
+                frame_offset=0,
+                window_length=2,
+                window_selector="max_handoff_candidate",
+                window_count=1,
+                window_scan_stride=1,
+                random_seed=7,
+                window_mode="activating_only",
+            )
+
+        self.assertEqual(scan_mock.call_args.kwargs["layout_candidates"], ["lust_micro", "tight_y"])
+
+    def test_load_checkpoint_metadata_uses_checkpoint_update_count_without_summary(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            checkpoint_path = Path(temp_dir) / "run" / "checkpoints" / "latest.pt"
+            checkpoint_path.parent.mkdir(parents=True)
+            torch.save(
+                {
+                    "update_count": 4,
+                    "training_metadata": {
+                        "run_id": "r1",
+                        "config_profile": "top_journal_mechanism_v28_credit_focal_mappo",
+                        "train_window_mode": "rotate",
+                        "episodes": 32,
+                        "update_count": 4,
+                        "is_smoke_checkpoint": False,
+                    },
+                    "config": {"mechanism_credit_prd_enabled": True},
+                },
+                checkpoint_path,
+            )
+
+            metadata = main_results_support.load_checkpoint_metadata(str(checkpoint_path))
+
+        self.assertEqual(metadata["metadata_source"], "checkpoint_metadata")
+        self.assertEqual(metadata["run_update_count"], 4)
+        self.assertEqual(metadata["update_count"], 4)
+        self.assertEqual(metadata["checkpoint_source_update_index"], 4)
+        self.assertEqual(metadata["experiment_run_type"], "baseline")
 
 
 if __name__ == "__main__":

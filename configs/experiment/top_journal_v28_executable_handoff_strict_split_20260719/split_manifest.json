@@ -1,0 +1,186 @@
+{
+  "protocol_version": "strict_split_v3_segmented_executable_handoff_20260719",
+  "created_at": "2026-07-19T07:55:37.510090+00:00",
+  "selection_policy": "mobility-covariate-only; no reward, checkpoint, or outcome inspected",
+  "hidden_holdout_policy": {
+    "sealed": true,
+    "opened_at": null,
+    "open_condition": "candidate frozen and formal strict-full gate passed",
+    "maximum_open_count": 1
+  },
+  "parameters": {
+    "mobility_source": "ngsim",
+    "max_mobility_rows": 5000000,
+    "layout_candidates": [
+      "auto_dominant_tight",
+      "lust_micro",
+      "tight_y",
+      "tight_x",
+      "auto_grid_tight"
+    ],
+    "window_length": 24,
+    "window_scan_stride": 8,
+    "minimum_gap_frames": 24,
+    "windows_per_split": 20,
+    "targets_per_split": {
+      "mechanism_activating": 14,
+      "active_non_mechanism": 4,
+      "idle_or_sparse": 2
+    },
+    "random_seed": 28
+  },
+  "source_records": {
+    "mobility": {
+      "path": "data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+      "sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+      "size_bytes": 2118175938
+    },
+    "workflow": {
+      "path": "data/raw/workflow/alibaba2018/batch_task.csv",
+      "sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc",
+      "size_bytes": 802261444
+    }
+  },
+  "candidate_pool_counts": {
+    "active_non_mechanism": 752,
+    "mechanism_activating": 5907,
+    "idle_or_sparse": 581
+  },
+  "plans": {
+    "train": {
+      "path": "configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719/train_window_plan.json",
+      "sha256": "1bc37e452f41f3b8233daf5f88c56e0d15869977c2beea02f25e6cd29a11090a",
+      "window_count": 20,
+      "window_ids": [
+        "window_lankershim_off4064_len24_t1118936091600_1118936093900",
+        "window_lankershim_off17072_len24_t1118937392400_1118937394700",
+        "window_peachtree_off26744_len24_t1163701900_1163704200",
+        "window_us_101_off30408_len24_t1118846994600_1118846996900",
+        "window_us_101_off30624_len24_t1118847016200_1118847018500",
+        "window_us_101_off32184_len24_t1118847172200_1118847174500",
+        "window_us_101_off32304_len24_t1118847184200_1118847186500",
+        "window_us_101_off34760_len24_t1118847429800_1118847432100",
+        "window_us_101_off34808_len24_t1118847434600_1118847436900",
+        "window_us_101_off37200_len24_t1118847673800_1118847676100",
+        "window_us_101_off37736_len24_t1118847727400_1118847729700",
+        "window_us_101_off40576_len24_t1118848011400_1118848013700",
+        "window_us_101_off40704_len24_t1118848024200_1118848026500",
+        "window_us_101_off44080_len24_t1118848361800_1118848364100",
+        "window_us_101_off44336_len24_t1118848387400_1118848389700",
+        "window_us_101_off45488_len24_t1118848502600_1118848504900",
+        "window_us_101_off45656_len24_t1118848519400_1118848521700",
+        "window_us_101_off47360_len24_t1118848689800_1118848692100",
+        "window_us_101_off47456_len24_t1118848699400_1118848701700",
+        "window_us_101_off48712_len24_t1118848825000_1118848827300"
+      ],
+      "stratum_counts": {
+        "mechanism_activating": 14,
+        "active_non_mechanism": 4,
+        "idle_or_sparse": 2
+      }
+    },
+    "dev": {
+      "path": "configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719/dev_window_plan.json",
+      "sha256": "5efcb9068bbbd712e0f7bf9a1af2c4f910f0cad145f90b5ed6f77daa62aabcfa",
+      "window_count": 20,
+      "window_ids": [
+        "window_lankershim_off4000_len24_t1118936085200_1118936087500",
+        "window_lankershim_off7904_len24_t1118936475600_1118936477900",
+        "window_lankershim_off14008_len24_t1118937086000_1118937088300",
+        "window_lankershim_off17976_len24_t1118937482800_1118937485100",
+        "window_peachtree_off22888_len24_t1163316300_1163318600",
+        "window_us_101_off30672_len24_t1118847021000_1118847023300",
+        "window_us_101_off31096_len24_t1118847063400_1118847065700",
+        "window_us_101_off32096_len24_t1118847163400_1118847165700",
+        "window_us_101_off35256_len24_t1118847479400_1118847481700",
+        "window_us_101_off35416_len24_t1118847495400_1118847497700",
+        "window_us_101_off35648_len24_t1118847518600_1118847520900",
+        "window_us_101_off37040_len24_t1118847657800_1118847660100",
+        "window_us_101_off40376_len24_t1118847991400_1118847993700",
+        "window_us_101_off40488_len24_t1118848002600_1118848004900",
+        "window_us_101_off40640_len24_t1118848017800_1118848020100",
+        "window_us_101_off43456_len24_t1118848299400_1118848301700",
+        "window_us_101_off44288_len24_t1118848382600_1118848384900",
+        "window_us_101_off45408_len24_t1118848494600_1118848496900",
+        "window_us_101_off51136_len24_t1118849067400_1118849069700",
+        "window_us_101_off52632_len24_t1118849217000_1118849219300"
+      ],
+      "stratum_counts": {
+        "mechanism_activating": 14,
+        "active_non_mechanism": 4,
+        "idle_or_sparse": 2
+      }
+    },
+    "formal": {
+      "path": "configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719/formal_window_plan.json",
+      "sha256": "33c5da2c745aa96f46ee3c97d2f79d13f52c043bffd8d54c5884da68e7fdb81d",
+      "window_count": 20,
+      "window_ids": [
+        "window_lankershim_off8912_len24_t1118936576400_1118936578700",
+        "window_lankershim_off13048_len24_t1118936990000_1118936992300",
+        "window_lankershim_off15912_len24_t1118937276400_1118937278700",
+        "window_lankershim_off18072_len24_t1118937492400_1118937494700",
+        "window_peachtree_off23840_len24_t1163411500_1163413800",
+        "window_us_101_off32248_len24_t1118847178600_1118847180900",
+        "window_us_101_off32432_len24_t1118847197000_1118847199300",
+        "window_us_101_off32488_len24_t1118847202600_1118847204900",
+        "window_us_101_off33312_len24_t1118847285000_1118847287300",
+        "window_us_101_off35368_len24_t1118847490600_1118847492900",
+        "window_us_101_off37104_len24_t1118847664200_1118847666500",
+        "window_us_101_off37248_len24_t1118847678600_1118847680900",
+        "window_us_101_off40160_len24_t1118847969800_1118847972100",
+        "window_us_101_off43544_len24_t1118848308200_1118848310500",
+        "window_us_101_off45592_len24_t1118848513000_1118848515300",
+        "window_us_101_off47408_len24_t1118848694600_1118848696900",
+        "window_us_101_off48536_len24_t1118848807400_1118848809700",
+        "window_us_101_off49008_len24_t1118848854600_1118848856900",
+        "window_us_101_off51208_len24_t1118849074600_1118849076900",
+        "window_us_101_off52680_len24_t1118849221800_1118849224100"
+      ],
+      "stratum_counts": {
+        "mechanism_activating": 14,
+        "active_non_mechanism": 4,
+        "idle_or_sparse": 2
+      }
+    },
+    "hidden_holdout": {
+      "path": "configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719/hidden_holdout_window_plan.json",
+      "sha256": "4d99079b6e4cd798eef6f1ad20f59c17aaeaf2947c386ef67d987fdf4003f52a",
+      "window_count": 20,
+      "window_ids": [
+        "window_lankershim_off2968_len24_t1118935982000_1118935984300",
+        "window_lankershim_off3920_len24_t1118936077200_1118936079500",
+        "window_lankershim_off6048_len24_t1118936290000_1118936292300",
+        "window_lankershim_off15968_len24_t1118937282000_1118937284300",
+        "window_peachtree_off22952_len24_t1163322700_1163325000",
+        "window_us_101_off30552_len24_t1118847009000_1118847011300",
+        "window_us_101_off30776_len24_t1118847031400_1118847033700",
+        "window_us_101_off32040_len24_t1118847157800_1118847160100",
+        "window_us_101_off32384_len24_t1118847192200_1118847194500",
+        "window_us_101_off32536_len24_t1118847207400_1118847209700",
+        "window_us_101_off39360_len24_t1118847889800_1118847892100",
+        "window_us_101_off39496_len24_t1118847903400_1118847905700",
+        "window_us_101_off40432_len24_t1118847997000_1118847999300",
+        "window_us_101_off44144_len24_t1118848368200_1118848370500",
+        "window_us_101_off44200_len24_t1118848373800_1118848376100",
+        "window_us_101_off44864_len24_t1118848440200_1118848442500",
+        "window_us_101_off45544_len24_t1118848508200_1118848510500",
+        "window_us_101_off51280_len24_t1118849081800_1118849084100",
+        "window_us_101_off52536_len24_t1118849207400_1118849209700",
+        "window_us_101_off52752_len24_t1118849229000_1118849231300"
+      ],
+      "stratum_counts": {
+        "mechanism_activating": 14,
+        "active_non_mechanism": 4,
+        "idle_or_sparse": 2
+      }
+    }
+  },
+  "independence_audit": {
+    "passed": true,
+    "minimum_gap_frames": 24,
+    "window_count": 80,
+    "conflicts": []
+  },
+  "manifest_content_sha256": "a66af99cd918773e73ee4db8bac02855ffd80477440c126952cc7776307670d2"
+}

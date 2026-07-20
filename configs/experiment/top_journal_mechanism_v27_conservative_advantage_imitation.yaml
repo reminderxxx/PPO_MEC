@@ -1,0 +1,49 @@
+profile: top_journal_mechanism_v27_conservative_advantage_imitation
+purpose: >
+  Add advantage-weighted conservative imitation on top of v20 idle-execution
+  PRD. The MAPPO update regularizes toward the strong popularity policy only
+  for low-reward, failed-mechanism, or teacher-mismatch rollout samples, while
+  high-reward validated samples are down-weighted so the learned policy can
+  keep improvements over the rule.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v20_idle_execution_prd
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  evaluation_wrapper_changed: false
+  conservative_imitation_enabled: true
+  conservative_imitation_reward_quantile: 0.38
+  conservative_imitation_min_weight: 0.08
+  conservative_imitation_max_weight: 1.45
+  conservative_imitation_shortfall_coef: 0.70
+  conservative_imitation_failure_coef: 0.85
+  conservative_imitation_mismatch_coef: 0.22
+  conservative_imitation_success_decay: 0.20
+  tail_risk_prd_enabled: false
+  opportunity_prd_enabled: false
+  counterfactual_teacher_prd_enabled: false
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+segmented_strict_protocol:
+  required_window_plan_root: configs/experiment/top_journal_v27_segmented_strict_split_20260719
+  max_mobility_rows: 5000000
+  window_scan_stride: 8
+  window_count_per_split: 20
+  targets_per_split:
+    mechanism_activating: 14
+    active_non_mechanism: 4
+    idle_or_sparse: 2
+evaluation:
+  split_policy: train_dev_formal_then_one_time_hidden_after_candidate_freeze
+  hidden_holdout_for_selection: prohibited
+notes:
+  - The conservative imitation signal is a loss weighting inside the PPO update.
+    It does not alter the environment reward, heuristic baselines, action masks,
+    deterministic inference wrapper, or benchmark metrics.
+  - This profile intentionally avoids the v23-v26 fixed counterfactual,
+    tail-risk, and opportunity PRD additions because they failed to improve the
+    v22/v20 reward-first result on consumed dev/formal evidence.

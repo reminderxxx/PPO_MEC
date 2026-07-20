@@ -18,7 +18,7 @@ if str(ROOT_DIR) not in sys.path:
 from src.evaluators.main_results_support import resolve_window_candidates
 
 
-PROTOCOL_VERSION = "strict_split_v1_20260621"
+PROTOCOL_VERSION = "strict_split_v3_segmented_executable_handoff_20260719"
 SPLIT_NAMES = ("train", "dev", "formal", "hidden_holdout")
 STRATUM_KEYS = (
     "active_non_mechanism_windows",
@@ -46,6 +46,11 @@ def parse_args() -> argparse.Namespace:
         default=str(ROOT_DIR / "data" / "raw" / "workflow" / "alibaba2018" / "batch_task.csv"),
     )
     parser.add_argument("--max_mobility_rows", type=int, default=10000)
+    parser.add_argument(
+        "--layout_candidates",
+        default="auto_dominant_tight,lust_micro,tight_y,tight_x,auto_grid_tight",
+        help="Comma-separated outcome-blind RSU layout candidates used during window scanning.",
+    )
     parser.add_argument("--window_length", type=int, default=24)
     parser.add_argument("--window_scan_stride", type=int, default=2)
     parser.add_argument("--minimum_gap_frames", type=int, default=24)
@@ -72,9 +77,45 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def parse_layout_candidates(raw_value: str) -> list[str]:
+    return [
+        item.strip()
+        for item in str(raw_value or "").split(",")
+        if item.strip()
+    ]
+
+
 def interval(window: dict[str, Any]) -> tuple[int, int]:
     start = int(window["frame_offset"])
     return start, start + int(window["window_length"]) - 1
+
+
+def available_intervals(window: dict[str, Any]) -> dict[str, tuple[int, int]]:
+    intervals = {"frame_offset": interval(window)}
+    if window.get("time_index_start") is not None and window.get("time_index_end") is not None:
+        intervals["time_index"] = (int(window["time_index_start"]), int(window["time_index_end"]))
+    if window.get("segment_frame_start") is not None and window.get("segment_frame_end") is not None:
+        intervals["segment_frame"] = (int(window["segment_frame_start"]), int(window["segment_frame_end"]))
+    return intervals
+
+
+def intervals_have_gap(
+    left_interval: tuple[int, int],
+    right_interval: tuple[int, int],
+    minimum_gap_frames: int,
+) -> bool:
+    left_start, left_end = left_interval
+    right_start, right_end = right_interval
+    gap = max(0, int(minimum_gap_frames))
+    return left_end + gap < right_start or right_end + gap < left_start
+
+
+def same_known_segment(left: dict[str, Any], right: dict[str, Any]) -> bool | None:
+    left_segment = str(left.get("source_segment_id") or "").strip()
+    right_segment = str(right.get("source_segment_id") or "").strip()
+    if not left_segment or not right_segment:
+        return None
+    return left_segment == right_segment
 
 
 def intervals_separated(
@@ -82,10 +123,18 @@ def intervals_separated(
     right: dict[str, Any],
     minimum_gap_frames: int,
 ) -> bool:
-    left_start, left_end = interval(left)
-    right_start, right_end = interval(right)
-    gap = max(0, int(minimum_gap_frames))
-    return left_end + gap < right_start or right_end + gap < left_start
+    if same_known_segment(left, right) is False:
+        return True
+    left_intervals = available_intervals(left)
+    right_intervals = available_intervals(right)
+    for interval_kind in set(left_intervals) & set(right_intervals):
+        if not intervals_have_gap(
+            left_intervals[interval_kind],
+            right_intervals[interval_kind],
+            minimum_gap_frames,
+        ):
+            return False
+    return True
 
 
 def select_stratified_windows(
@@ -141,9 +190,11 @@ def audit_split_plans(
                     {
                         "left_split": left_split,
                         "left_window_id": left_window.get("window_id"),
+                        "left_source_segment_id": left_window.get("source_segment_id", ""),
                         "left_interval": list(interval(left_window)),
                         "right_split": right_split,
                         "right_window_id": right_window.get("window_id"),
+                        "right_source_segment_id": right_window.get("source_segment_id", ""),
                         "right_interval": list(interval(right_window)),
                     }
                 )
@@ -187,6 +238,7 @@ def main() -> int:
         window_scan_stride=args.window_scan_stride,
         random_seed=args.random_seed,
         window_mode="full_stratified",
+        layout_candidates=parse_layout_candidates(args.layout_candidates),
     )
     targets = {
         "mechanism_activating": int(args.mechanism_windows_per_split),
@@ -260,6 +312,7 @@ def main() -> int:
         "parameters": {
             "mobility_source": args.mobility_source,
             "max_mobility_rows": args.max_mobility_rows,
+            "layout_candidates": parse_layout_candidates(args.layout_candidates),
             "window_length": args.window_length,
             "window_scan_stride": args.window_scan_stride,
             "minimum_gap_frames": args.minimum_gap_frames,

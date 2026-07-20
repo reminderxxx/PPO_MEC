@@ -1,0 +1,50 @@
+profile: top_journal_mechanism_v35_guard_relaxed_action_mappo
+purpose: >
+  Let SA-GHMAPPO rely on MAPPO-style centralized training and final semantic
+  action PPO credit instead of hard post-policy guards. The target is to remove
+  the v34 action-distribution bottleneck that kept SA close to MAPPO/popularity
+  while preserving a conservative ratio barrier on the learned five-way action.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v34_adaptive_wait_mappo
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  evaluation_wrapper_changed: false
+  continuity_guard_enabled: false
+  handoff_target_alignment_guard_enabled: false
+  backhaul_guard_enabled: false
+  cache_warm_start_guard_enabled: false
+  predictive_prefetch_admission_guard_enabled: false
+  env_action_ppo_enabled: true
+  env_action_ppo_coef: 0.98
+  env_action_ppo_teacher_coef: 0.66
+  env_action_ppo_mechanism_focus: 1.05
+  env_action_ppo_ratio_barrier_coef: 0.060
+  env_action_ppo_ratio_barrier_margin: 0.30
+  digital_twin_policy_prior_adaptive_wait_enabled: true
+  digital_twin_policy_prior_wait_ready_threshold: 0.30
+  digital_twin_policy_prior_wait_timing_ceiling: 0.92
+  digital_twin_policy_prior_continuation_wait_scale: 1.80
+  counterfactual_teacher_prd_enabled: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+segmented_strict_protocol:
+  required_window_plan_root: configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719
+  protocol_version: strict_split_v3_segmented_executable_handoff_20260719
+  max_mobility_rows: 5000000
+  window_scan_stride: 8
+evaluation:
+  split_policy: train_dev_formal_then_one_time_hidden_after_candidate_freeze
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile intentionally disables SA hard action guards because v34
+    diagnostics showed the guards were rewriting the learned action mix into a
+    MAPPO/popularity-like policy.
+  - The safety signal remains in training through centralized critic credit,
+    counterfactual teacher credit, and the action-level PPO ratio barrier; no
+    evaluator override or reward wrapper is introduced.

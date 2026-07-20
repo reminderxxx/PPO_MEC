@@ -1,5 +1,11 @@
 # PPO_MEC
 
+## 2026-07-21 MAPPO 行为正则 dev-probe 状态
+
+v40/v41 已按用户要求做算法侧 MAPPO 改进并完成 frozen dev full-pool 复核，但没有证明“主算法高于全部算法”。当前本轮最高 SA 结果来自 v39 update_0005 full-pool：SA-GHMAPPO total reward `106.041`，高于 MAPPO `105.5875`、popularity `105.25` 和 PPO `94.77375`，但低于 `cache_offload_drl=119.14875` 与 `dt_handoff_drl=119.22625`，artifact 为 `artifacts/experiments/top_journal_closed_loop/top_journal_v39_delayed_credit_dev_probe/benchmarks/update_0005_full_pool/main_results_full_stratified_20260721_011956_616135/aggregate_summary.json`。
+
+关键诊断是当前 `reward_positive_offset=5.0` 按 step 累加，DT/cache 的高 reward 与较低 completion/continuity 同时出现：DT/cache `successful_episode_rate=0.65`、`workflow_continuity_rate=0.583014`，SA 为 `1.0` / `0.970369`。因此 v39-v41 仍是 dev-probe，不是 paper-ready 或 all-baseline-winner 结论；若要继续冲击论文级结果，必须先冻结 completion-constrained / time-normalized objective 或重新设计 reward 后让全部 baseline 同协议重训重评。详见 `docs/project/PROGRESS.md`、`docs/project/BUGS.md` 和 `docs/project/ARTIFACT_RECORDS.md`。
+
 ## 2026-06-21 strict-full v8 审查状态
 
 v8 已按冻结的 train/dev/formal/hidden 协议完成 5-seed formal 与一次性 hidden holdout。对全部 learned baselines 的 total reward hierarchical BCa 95% CI 在 formal/hidden 均为正，对 DT handoff DRL 的 workflow continuity 也为正；v7 的 strict-full statistical blocker 已修复。

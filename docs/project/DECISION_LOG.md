@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-21: v40/v41 不晋级，下一轮先处理 reward-objective 不一致
+
+决策：新增 `top_journal_mechanism_v40_advantage_weighted_behavior_mappo` 与 `top_journal_mechanism_v41_conservative_recovery_mappo` 后，不将二者晋级为主论文候选，也不继续用当前 single-seed dev-probe 作为 paper-ready 依据。v40/v41 保留为 MAPPO learning-objective 消融：v40 对 positive/negative deviation 都做 advantage-weighted behavior regularization，v41 改为 negative-only conservative recovery。
+
+原因：v40 在 train-window 上出现高 reward，但 frozen dev targeted reward 只有 `85.433` 到 `89.6965`，属于明显过拟合。v41 恢复 dev 稳定，但 full-pool reward `105.686` 只略高于 MAPPO/popularity，低于 `cache_offload_drl=119.14875` 和 `dt_handoff_drl=119.22625`。v39 update_0005 full-pool 是本轮最高 SA 复核，reward `106.041`，同样低于 DT/cache。DT/cache reward 更高的同时 completion/continuity 更差，说明当前 `reward_positive_offset=5.0` 的 step-wise 累加正在影响 reward ranking。
+
+影响：后续如果继续追求“主算法 reward 高于所有 baseline”，必须先冻结并报告 completion-constrained 或 time-normalized objective，或重新设计 reward/gate 后让所有 baselines 同协议重训/重评；不能把利用 positive-offset 拖长 episode 的行为写成算法创新。若继续做算法改进，优先级应是修复目标一致性、机制 validated success 和 generalization，而不是继续扩大 AWR/AWAC-style cloning 系数。现有 v39/v41 可以安全表述为 dev-probe 中略高于 MAPPO/PPO/popularity，但不构成 all-baseline winner 或 TMC-ready candidate。
+
 ## 2026-07-17: v21/v22 不晋级，hidden 保持关闭
 
 决策：新增 `top_journal_mechanism_v21_efficiency_prd` 与 `top_journal_mechanism_v22_validated_utility_prd` 后，不将二者晋级为主论文候选，也不打开 hidden holdout。v21 通过 net-utility PRD 重新惩罚 backhaul/migration/expired prefetch；v22 进一步把 failed mechanism attempt without validated success 纳入 event/option partial credit 的负项，并降低 prepare prior。两者都保留为算法性 MAPPO credit-assignment 尝试和消融/负结果。

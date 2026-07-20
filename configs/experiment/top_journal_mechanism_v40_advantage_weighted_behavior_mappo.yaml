@@ -1,0 +1,50 @@
+profile: top_journal_mechanism_v40_advantage_weighted_behavior_mappo
+purpose: >
+  Add advantage-weighted behavior regularization to the MAPPO update so
+  beneficial deviations from the strong popularity heuristic are reinforced,
+  while negative-advantage deviations are pulled back to the safe heuristic
+  action.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v39_delayed_credit_mappo
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  evaluation_wrapper_changed: false
+  advantage_weighted_behavior_regularization_enabled: true
+  advantage_weighted_behavior_coef: 0.24
+  advantage_weighted_behavior_positive_coef: 1.08
+  advantage_weighted_behavior_negative_coef: 0.92
+  advantage_weighted_behavior_temperature: 0.62
+  advantage_weighted_behavior_max_weight: 2.20
+  advantage_weighted_behavior_positive_gate: 0.08
+  advantage_weighted_behavior_negative_gate: 0.04
+  advantage_weighted_behavior_mechanism_scale: 1.35
+  env_action_ppo_enabled: true
+  env_action_ppo_coef: 1.00
+  delayed_mechanism_credit_enabled: true
+  delayed_mechanism_credit_policy_coef: 0.38
+  delayed_mechanism_credit_event_coef: 0.92
+  hard_guards_enabled: false
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+segmented_strict_protocol:
+  required_window_plan_root: configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719
+  protocol_version: strict_split_v3_segmented_executable_handoff_20260719
+  max_mobility_rows: 5000000
+  window_scan_stride: 8
+evaluation:
+  split_policy: train_dev_formal_then_one_time_hidden_after_candidate_freeze
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile changes only the policy optimization objective. It does not
+    alter benchmark rewards, action masks, baselines, window plans, or
+    deterministic evaluation wrappers.
+  - The intended mechanism is MAPPO-compatible advantage-weighted policy
+    improvement: positive-advantage deviations from the heuristic are
+    preserved, and negative-advantage deviations are regularized back toward
+    the heuristic.

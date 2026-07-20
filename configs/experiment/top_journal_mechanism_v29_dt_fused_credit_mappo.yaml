@@ -1,0 +1,44 @@
+profile: top_journal_mechanism_v29_dt_fused_credit_mappo
+purpose: >
+  Close the dev-set gap against the digital-twin handoff baseline by fusing raw
+  handoff sequence, boundary urgency, service-pressure, and load-delta features
+  into the SA-GHMAPPO actor and centralized critic, while keeping the v28
+  mechanism-credit and focal auxiliary MAPPO updates.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v28_credit_focal_mappo
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  evaluation_wrapper_changed: false
+  digital_twin_handoff_fusion_enabled: true
+  digital_twin_handoff_slow_scale: 0.38
+  digital_twin_handoff_fast_scale: 0.48
+  digital_twin_handoff_event_scale: 0.95
+  digital_twin_handoff_critic_scale: 0.78
+  mechanism_credit_prd_enabled: true
+  mechanism_focal_aux_enabled: true
+  mechanism_credit_policy_coef: 0.36
+  mechanism_credit_event_coef: 0.98
+  mechanism_credit_option_coef: 0.50
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+segmented_strict_protocol:
+  required_window_plan_root: configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719
+  protocol_version: strict_split_v3_segmented_executable_handoff_20260719
+  max_mobility_rows: 5000000
+  window_scan_stride: 8
+evaluation:
+  split_policy: train_dev_formal_then_one_time_hidden_after_candidate_freeze
+  hidden_holdout_for_selection: prohibited
+notes:
+  - The v29 fusion uses the same raw digital-twin feature family that makes
+    dt_handoff_drl strong, but keeps SA-GHMAPPO's graph/surrogate encoder,
+    centralized critic, mechanism credit assignment, and continuity guards.
+  - This is an algorithm-side actor/critic representation change. It does not
+    change action masks, deterministic inference wrappers, reward computation,
+    or benchmark metrics.

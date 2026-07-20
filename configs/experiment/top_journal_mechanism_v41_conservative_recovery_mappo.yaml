@@ -1,0 +1,23 @@
+profile: top_journal_mechanism_v41_conservative_recovery_mappo
+base_profile: top_journal_mechanism_v39_delayed_credit_mappo
+purpose: >
+  Conservative recovery MAPPO probe after v40 showed train-window advantage-weighted
+  positive deviations did not generalize to the frozen dev split.
+algorithm_delta:
+  - Keeps the v39 delayed mechanism-credit MAPPO backbone.
+  - Enables advantage-weighted behavior regularization only for negative-advantage
+    deviations from the popularity-safe teacher.
+  - Disables positive-deviation cloning so train-window-specific high reward actions
+    are not amplified into held-out windows.
+  - Keeps env-action PPO and counterfactual teacher credit active with tighter
+    trust-region ratio barriers.
+unchanged_protocol:
+  reward_function: unchanged
+  environment: unchanged
+  evaluator: unchanged
+  baseline_checkpoints: unchanged
+  wrapper_or_action_override: none
+paper_claim_boundary: >
+  Dev-probe only. Any improvement must be validated by frozen benchmark artifacts
+  and remains non-paper-ready until formal multi-seed, holdout, support, provenance,
+  and statistical audits pass the top-journal review policy.

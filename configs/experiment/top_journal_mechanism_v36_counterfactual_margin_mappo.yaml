@@ -1,0 +1,42 @@
+profile: top_journal_mechanism_v36_counterfactual_margin_mappo
+purpose: >
+  Add COMA-style counterfactual final-action margin learning on top of v35.
+  The actor compares the available five-way semantic actions under the same
+  state, follows the highest counterfactual teacher credit with a conservative
+  PPO ratio barrier, and keeps the centralized MAPPO critic unchanged.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v35_guard_relaxed_action_mappo
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  evaluation_wrapper_changed: false
+  env_action_counterfactual_margin_enabled: true
+  env_action_counterfactual_margin_coef: 0.22
+  env_action_counterfactual_margin_min_gap: 0.04
+  env_action_counterfactual_margin_max_weight: 2.40
+  env_action_ppo_enabled: true
+  env_action_ppo_ratio_barrier_coef: 0.070
+  env_action_ppo_ratio_barrier_margin: 0.28
+  counterfactual_teacher_prd_enabled: true
+  hard_guards_enabled: false
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+segmented_strict_protocol:
+  required_window_plan_root: configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719
+  protocol_version: strict_split_v3_segmented_executable_handoff_20260719
+  max_mobility_rows: 5000000
+  window_scan_stride: 8
+evaluation:
+  split_policy: train_dev_formal_then_one_time_hidden_after_candidate_freeze
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This profile does not alter rewards, masks, transition dynamics, baseline
+    implementations, checkpoint manifests, or benchmark aggregation.
+  - The new margin term is a training-time policy-gradient auxiliary objective:
+    it gives final semantic actions direct counterfactual credit instead of
+    relying only on the sampled action's advantage.

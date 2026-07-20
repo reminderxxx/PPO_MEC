@@ -1,0 +1,46 @@
+profile: top_journal_mechanism_v38_undiscounted_dt_prior_mappo
+purpose: >
+  Align the MAPPO training objective with the benchmark's undiscounted episodic
+  total reward while preserving centralized-critic policy improvement. The
+  profile strengthens advantage-weighted digital-twin policy-prior distillation
+  for continuation/prepare decisions and keeps an action-level PPO ratio
+  barrier to prevent pure rule imitation.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v35_guard_relaxed_action_mappo
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  evaluation_wrapper_changed: false
+  gamma: 1.0
+  gae_lambda: 1.0
+  digital_twin_policy_prior_distill_coef: 0.145
+  digital_twin_policy_prior_advantage_weight: 0.78
+  digital_twin_policy_prior_max_weight: 3.20
+  digital_twin_policy_prior_env_action_logit_bias: 5.20
+  env_action_ppo_enabled: true
+  env_action_ppo_coef: 1.08
+  env_action_ppo_teacher_coef: 0.74
+  env_action_ppo_ratio_barrier_coef: 0.055
+  env_action_counterfactual_margin_enabled: false
+  hard_guards_enabled: false
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+segmented_strict_protocol:
+  required_window_plan_root: configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719
+  protocol_version: strict_split_v3_segmented_executable_handoff_20260719
+  max_mobility_rows: 5000000
+  window_scan_stride: 8
+evaluation:
+  split_policy: train_dev_formal_then_one_time_hidden_after_candidate_freeze
+  hidden_holdout_for_selection: prohibited
+notes:
+  - This is an algorithm/training-objective profile: rewards, action masks,
+    baselines, manifests, and benchmark aggregation remain unchanged.
+  - If it increases total reward by prolonging trajectories while degrading
+    delay/continuity, the result must be treated as reward-protocol evidence,
+    not paper-ready mechanism evidence.

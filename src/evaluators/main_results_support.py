@@ -773,6 +773,7 @@ def resolve_window_candidates(
     excluded_window_intervals: list[tuple[int, int]] | None = None,
     holdout_min_gap_frames: int = 0,
     enforce_non_overlapping_selection: bool = False,
+    layout_candidates: list[str] | None = None,
 ) -> tuple[str, dict[str, Any]]:
     raw_frames, source_path = load_real_source_frames(
         root_dir=root_dir,
@@ -782,9 +783,23 @@ def resolve_window_candidates(
         max_mobility_rows=max_mobility_rows,
     )
     ranking_mode = "max_handoff_candidate" if window_selector in {"ordered", "random"} else window_selector
+    scan_layout_candidates = [
+        str(item).strip()
+        for item in (layout_candidates or [])
+        if str(item).strip()
+    ]
+    if not scan_layout_candidates:
+        scan_layout_candidates = [
+            item.strip()
+            for item in str(rsu_layout or "").split(",")
+            if item.strip()
+        ]
+    if not scan_layout_candidates:
+        scan_layout_candidates = ["auto_dominant_tight"]
+
     scan_results = scan_mobility_windows(
         frames=raw_frames,
-        layout_candidates=[rsu_layout],
+        layout_candidates=scan_layout_candidates,
         frame_offset=frame_offset,
         window_length=window_length,
         stride=max(1, window_scan_stride),
@@ -843,8 +858,9 @@ def resolve_window_candidates(
         elif (
             active_vehicle_count_mean > float(idle_or_sparse_vehicle_max)
             and estimated_association_change_count > int(idle_or_sparse_association_change_max)
+            and estimated_handoff_count <= int(active_non_mechanism_handoff_max)
         ):
-            window_class = "mechanism_activating"
+            window_class = "active_non_mechanism"
         else:
             window_class = "idle_or_sparse"
 
@@ -863,6 +879,10 @@ def resolve_window_candidates(
                 "window_length": item["window_length"],
                 "time_index_start": item["time_index_start"],
                 "time_index_end": item["time_index_end"],
+                "source_segment_id": item.get("source_segment_id", ""),
+                "source_location": item.get("source_location", ""),
+                "segment_frame_start": item.get("segment_frame_start"),
+                "segment_frame_end": item.get("segment_frame_end"),
                 "dominant_axis": item["dominant_axis"],
                 "recommended_rsu_layout": item["recommended_rsu_layout"],
                 "chosen_rsu_axis": item["chosen_rsu_axis"],
@@ -1130,6 +1150,11 @@ def load_checkpoint_metadata(checkpoint_path: str) -> dict[str, Any]:
             episodes = int(training_metadata.get("episodes", metadata.get("episodes", 0)) or 0)
             config_profile = str(training_metadata.get("config_profile", metadata.get("config_profile", "unknown")))
             checkpoint_source_update_index = int(training_metadata.get("update_count", metadata.get("checkpoint_source_update_index", 0)) or 0)
+            run_update_count = max(
+                int(training_metadata.get("run_update_count", 0) or 0),
+                int(metadata.get("run_update_count", 0) or 0),
+                checkpoint_source_update_index,
+            )
             is_smoke = bool(training_metadata.get("is_smoke_checkpoint", config_profile == "smoke" or episodes <= 4))
             metadata.update(
                 {
@@ -1138,6 +1163,7 @@ def load_checkpoint_metadata(checkpoint_path: str) -> dict[str, Any]:
                     "config_profile": config_profile,
                     "train_window_mode": str(training_metadata.get("train_window_mode", metadata.get("train_window_mode", "unknown"))),
                     "episodes": episodes,
+                    "run_update_count": run_update_count,
                     "checkpoint_source_update_index": checkpoint_source_update_index,
                     "is_smoke_checkpoint": is_smoke,
                     "smoke_warning": is_smoke,

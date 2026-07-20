@@ -578,6 +578,188 @@ PROFILE_DEFAULTS = {
         "max_steps": 16,
         "train_window_count": 20,
     },
+    "top_journal_mechanism_v27_conservative_advantage_imitation": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.40e-5,
+        "clip_ratio": 0.065,
+        "entropy_coef": 0.0010,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.32,
+        "max_steps": 16,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v28_credit_focal_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.35e-5,
+        "clip_ratio": 0.065,
+        "entropy_coef": 0.0012,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.34,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v29_dt_fused_credit_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.30e-5,
+        "clip_ratio": 0.065,
+        "entropy_coef": 0.0012,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.34,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v30_dt_prior_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.25e-5,
+        "clip_ratio": 0.060,
+        "entropy_coef": 0.0011,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.34,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v31_handoff_pacing_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.20e-5,
+        "clip_ratio": 0.058,
+        "entropy_coef": 0.0010,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.34,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v32_dt_continuation_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.15e-5,
+        "clip_ratio": 0.056,
+        "entropy_coef": 0.0010,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.34,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v33_env_action_ppo_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.10e-5,
+        "clip_ratio": 0.055,
+        "entropy_coef": 0.0011,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.34,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v34_adaptive_wait_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.08e-5,
+        "clip_ratio": 0.055,
+        "entropy_coef": 0.00115,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.34,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v35_guard_relaxed_action_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.05e-5,
+        "clip_ratio": 0.055,
+        "entropy_coef": 0.00125,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.30,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v36_counterfactual_margin_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.00e-5,
+        "clip_ratio": 0.052,
+        "entropy_coef": 0.00135,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.28,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v37_advantage_gated_counterfactual_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.04e-5,
+        "clip_ratio": 0.055,
+        "entropy_coef": 0.00125,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.30,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v38_undiscounted_dt_prior_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.08e-5,
+        "clip_ratio": 0.055,
+        "entropy_coef": 0.00135,
+        "value_coef": 0.88,
+        "auxiliary_coef": 0.30,
+        "gamma": 1.0,
+        "gae_lambda": 1.0,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v39_delayed_credit_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.04e-5,
+        "clip_ratio": 0.055,
+        "entropy_coef": 0.00130,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.30,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v40_advantage_weighted_behavior_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.02e-5,
+        "clip_ratio": 0.055,
+        "entropy_coef": 0.00135,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.30,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
+    "top_journal_mechanism_v41_conservative_recovery_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 3.03e-5,
+        "clip_ratio": 0.055,
+        "entropy_coef": 0.00130,
+        "value_coef": 0.86,
+        "auxiliary_coef": 0.30,
+        "max_steps": 22,
+        "train_window_count": 20,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -686,6 +868,10 @@ def parse_args() -> argparse.Namespace:
     for field_name in ["episodes", "update_every", "batch_size", "learning_rate", "clip_ratio", "entropy_coef", "value_coef", "auxiliary_coef", "max_steps", "train_window_count"]:
         if getattr(args, field_name) is None:
             setattr(args, field_name, profile_defaults[field_name])
+    if "gamma" in profile_defaults and float(args.gamma) == 0.99:
+        args.gamma = float(profile_defaults["gamma"])
+    if "gae_lambda" in profile_defaults and float(args.gae_lambda) == 0.95:
+        args.gae_lambda = float(profile_defaults["gae_lambda"])
     if args.profile in {
         "top_journal_mechanism_v1",
         "top_journal_mechanism_v2",
@@ -2284,6 +2470,611 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
             }
         )
         return kwargs
+    if profile == "top_journal_mechanism_v27_conservative_advantage_imitation":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v20_idle_execution_prd")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.045,
+                "heuristic_imitation_warmup_updates": 6,
+                "heuristic_imitation_decay": 0.82,
+                "conservative_imitation_enabled": True,
+                "conservative_imitation_reward_quantile": 0.38,
+                "conservative_imitation_min_weight": 0.08,
+                "conservative_imitation_max_weight": 1.45,
+                "conservative_imitation_shortfall_coef": 0.70,
+                "conservative_imitation_failure_coef": 0.85,
+                "conservative_imitation_mismatch_coef": 0.22,
+                "conservative_imitation_success_decay": 0.20,
+                "mechanism_aux_coef": 0.052,
+                "mechanism_window_weight": 1.32,
+                "prepare_action_prior_weight": 0.46,
+                "mechanism_aux_coef_floor_after_update": 0.040,
+                "mechanism_window_weight_floor_after_update": 1.18,
+                "option_gate_loss_coef": 0.34,
+                "option_gate_prior_coef": 0.022,
+                "option_gate_prior_decay": 0.64,
+                "option_gate_log_prob_weight": 0.52,
+                "option_gate_deterministic_prior_margin": 0.05,
+                "event_prd_advantage_coef": 0.36,
+                "handoff_risk_event_coef": 0.32,
+                "handoff_risk_option_coef": 0.38,
+                "idle_execution_policy_coef": 0.28,
+                "idle_execution_option_coef": 0.40,
+                "idle_execution_clip": 1.20,
+                "idle_execution_current_rsu_delay_coef": 0.40,
+                "idle_execution_local_bonus": 0.30,
+                "idle_execution_mechanism_penalty": 0.36,
+                "idle_execution_timing_threshold": 0.32,
+                "idle_execution_mechanism_preserve_bonus": 0.18,
+                "tail_risk_prd_enabled": False,
+                "opportunity_prd_enabled": False,
+                "counterfactual_teacher_prd_enabled": False,
+                "train_epochs": 7,
+                "target_kl": 0.010,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v28_credit_focal_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v20_idle_execution_prd")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.035,
+                "heuristic_imitation_warmup_updates": 4,
+                "heuristic_imitation_decay": 0.78,
+                "conservative_imitation_enabled": True,
+                "conservative_imitation_reward_quantile": 0.36,
+                "conservative_imitation_min_weight": 0.06,
+                "conservative_imitation_max_weight": 1.35,
+                "conservative_imitation_shortfall_coef": 0.55,
+                "conservative_imitation_failure_coef": 0.68,
+                "conservative_imitation_mismatch_coef": 0.18,
+                "conservative_imitation_success_decay": 0.18,
+                "mechanism_aux_coef": 0.075,
+                "mechanism_window_weight": 1.65,
+                "prepare_action_prior_weight": 0.62,
+                "mechanism_entropy_coef": 0.0009,
+                "mechanism_retention_start_update": 4,
+                "mechanism_aux_coef_floor_after_update": 0.070,
+                "mechanism_window_weight_floor_after_update": 1.45,
+                "mechanism_entropy_floor_after_update": 0.0010,
+                "mechanism_aux_current_cache_fill_enabled": False,
+                "mechanism_credit_prd_enabled": True,
+                "mechanism_credit_policy_coef": 0.30,
+                "mechanism_credit_event_coef": 0.85,
+                "mechanism_credit_option_coef": 0.42,
+                "mechanism_credit_clip": 1.80,
+                "mechanism_credit_success_bonus": 1.00,
+                "mechanism_credit_prepare_bonus": 0.55,
+                "mechanism_credit_ready_bonus": 0.85,
+                "mechanism_credit_prefetch_hit_bonus": 0.65,
+                "mechanism_credit_miss_penalty": 0.55,
+                "mechanism_credit_false_positive_penalty": 0.38,
+                "mechanism_credit_min_context": 0.15,
+                "mechanism_focal_aux_enabled": True,
+                "mechanism_focal_gamma": 1.40,
+                "event_prd_advantage_coef": 0.48,
+                "handoff_risk_event_coef": 0.52,
+                "handoff_risk_option_coef": 0.46,
+                "handoff_risk_ready_bonus": 0.92,
+                "handoff_risk_prepare_bonus": 0.32,
+                "handoff_risk_unprepared_penalty": 0.46,
+                "idle_execution_policy_coef": 0.22,
+                "idle_execution_option_coef": 0.28,
+                "idle_execution_clip": 1.20,
+                "idle_execution_current_rsu_delay_coef": 0.38,
+                "idle_execution_local_bonus": 0.28,
+                "idle_execution_mechanism_penalty": 0.34,
+                "idle_execution_timing_threshold": 0.32,
+                "idle_execution_mechanism_preserve_bonus": 0.22,
+                "option_gate_loss_coef": 0.36,
+                "option_gate_prior_coef": 0.025,
+                "option_gate_prior_decay": 0.66,
+                "option_gate_log_prob_weight": 0.58,
+                "option_gate_deterministic_prior_margin": 0.06,
+                "tail_risk_prd_enabled": False,
+                "opportunity_prd_enabled": False,
+                "counterfactual_teacher_prd_enabled": False,
+                "train_epochs": 7,
+                "target_kl": 0.011,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v29_dt_fused_credit_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v28_credit_focal_mappo")
+        kwargs.update(
+            {
+                "digital_twin_handoff_fusion_enabled": True,
+                "digital_twin_handoff_slow_scale": 0.38,
+                "digital_twin_handoff_fast_scale": 0.48,
+                "digital_twin_handoff_event_scale": 0.95,
+                "digital_twin_handoff_critic_scale": 0.78,
+                "mechanism_credit_policy_coef": 0.36,
+                "mechanism_credit_event_coef": 0.98,
+                "mechanism_credit_option_coef": 0.50,
+                "mechanism_credit_success_bonus": 1.10,
+                "mechanism_credit_prepare_bonus": 0.62,
+                "mechanism_credit_ready_bonus": 0.95,
+                "mechanism_credit_prefetch_hit_bonus": 0.70,
+                "mechanism_credit_miss_penalty": 0.50,
+                "mechanism_credit_false_positive_penalty": 0.34,
+                "mechanism_aux_coef": 0.082,
+                "mechanism_window_weight": 1.72,
+                "prepare_action_prior_weight": 0.66,
+                "mechanism_aux_coef_floor_after_update": 0.076,
+                "mechanism_window_weight_floor_after_update": 1.52,
+                "handoff_risk_event_coef": 0.56,
+                "handoff_risk_option_coef": 0.50,
+                "handoff_risk_ready_bonus": 1.00,
+                "handoff_risk_prepare_bonus": 0.36,
+                "idle_execution_mechanism_preserve_bonus": 0.26,
+                "option_gate_loss_coef": 0.38,
+                "option_gate_log_prob_weight": 0.62,
+                "target_kl": 0.010,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v30_dt_prior_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v29_dt_fused_credit_mappo")
+        kwargs.update(
+            {
+                "digital_twin_policy_prior_enabled": True,
+                "digital_twin_policy_prior_logit_bias": 3.20,
+                "digital_twin_policy_prior_event_scale": 1.22,
+                "digital_twin_policy_prior_slow_scale": 0.82,
+                "digital_twin_policy_prior_fast_scale": 0.20,
+                "digital_twin_policy_prior_prepare_threshold": 0.16,
+                "digital_twin_policy_prior_prefetch_threshold": 0.20,
+                "digital_twin_policy_prior_confidence_floor": 0.18,
+                "digital_twin_policy_prior_distill_coef": 0.095,
+                "digital_twin_policy_prior_distill_warmup_updates": 3,
+                "digital_twin_policy_prior_distill_decay": 0.82,
+                "digital_twin_policy_prior_advantage_weight": 0.45,
+                "digital_twin_policy_prior_max_weight": 2.20,
+                "mechanism_credit_policy_coef": 0.40,
+                "mechanism_credit_event_coef": 1.05,
+                "mechanism_credit_option_coef": 0.52,
+                "mechanism_aux_coef": 0.086,
+                "mechanism_window_weight": 1.78,
+                "prepare_action_prior_weight": 0.70,
+                "mechanism_aux_coef_floor_after_update": 0.080,
+                "mechanism_window_weight_floor_after_update": 1.58,
+                "event_logit_sharpening_timing_gain": 0.38,
+                "event_prepare_margin_boost": 0.42,
+                "handoff_risk_event_coef": 0.60,
+                "handoff_risk_option_coef": 0.52,
+                "handoff_risk_ready_bonus": 1.08,
+                "handoff_risk_prepare_bonus": 0.40,
+                "target_kl": 0.0095,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v31_handoff_pacing_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v30_dt_prior_mappo")
+        kwargs.update(
+            {
+                "digital_twin_policy_prior_pacing_enabled": True,
+                "digital_twin_policy_prior_pacing_threshold": 0.30,
+                "digital_twin_policy_prior_pacing_fast_scale": 1.35,
+                "digital_twin_policy_prior_pacing_event_suppression": 0.72,
+                "digital_twin_policy_prior_pacing_slow_suppression": 0.68,
+                "digital_twin_policy_prior_pacing_short_dag_threshold": 10,
+                "digital_twin_policy_prior_logit_bias": 3.60,
+                "digital_twin_policy_prior_distill_coef": 0.105,
+                "digital_twin_policy_prior_advantage_weight": 0.52,
+                "digital_twin_policy_prior_max_weight": 2.40,
+                "mechanism_credit_policy_coef": 0.42,
+                "mechanism_credit_event_coef": 1.08,
+                "handoff_risk_event_coef": 0.62,
+                "handoff_risk_option_coef": 0.54,
+                "target_kl": 0.009,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v32_dt_continuation_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v31_handoff_pacing_mappo")
+        kwargs.update(
+            {
+                "digital_twin_policy_prior_env_action_bias_enabled": True,
+                "digital_twin_policy_prior_env_action_logit_bias": 4.80,
+                "digital_twin_policy_prior_continuation_threshold": 0.32,
+                "digital_twin_policy_prior_continuation_prepare_scale": 1.35,
+                "digital_twin_policy_prior_continuation_wait_scale": 0.95,
+                "digital_twin_policy_prior_continuation_steady_suppression": 0.42,
+                "digital_twin_policy_prior_logit_bias": 4.15,
+                "digital_twin_policy_prior_pacing_threshold": 0.26,
+                "digital_twin_policy_prior_pacing_event_suppression": 0.48,
+                "digital_twin_policy_prior_pacing_slow_suppression": 0.56,
+                "digital_twin_policy_prior_distill_coef": 0.120,
+                "digital_twin_policy_prior_advantage_weight": 0.58,
+                "digital_twin_policy_prior_max_weight": 2.60,
+                "mechanism_credit_policy_coef": 0.46,
+                "mechanism_credit_event_coef": 1.18,
+                "mechanism_credit_option_coef": 0.58,
+                "handoff_risk_event_coef": 0.68,
+                "handoff_risk_option_coef": 0.60,
+                "target_kl": 0.0085,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v33_env_action_ppo_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v32_dt_continuation_mappo")
+        kwargs.update(
+            {
+                "env_action_ppo_enabled": True,
+                "env_action_ppo_coef": 0.72,
+                "env_action_ppo_advantage_blend": 0.54,
+                "env_action_ppo_teacher_coef": 0.34,
+                "env_action_ppo_mechanism_focus": 0.65,
+                "env_action_ppo_max_weight": 2.25,
+                "counterfactual_teacher_prd_enabled": True,
+                "counterfactual_teacher_event_coef": 0.34,
+                "counterfactual_teacher_option_coef": 0.42,
+                "counterfactual_teacher_clip": 1.60,
+                "counterfactual_teacher_mechanism_bonus": 0.64,
+                "counterfactual_teacher_missed_prepare_penalty": 0.50,
+                "counterfactual_teacher_local_bonus": 0.32,
+                "counterfactual_teacher_current_rsu_penalty": 0.10,
+                "counterfactual_teacher_invalid_mechanism_penalty": 0.86,
+                "digital_twin_policy_prior_env_action_logit_bias": 3.20,
+                "digital_twin_policy_prior_continuation_threshold": 0.38,
+                "digital_twin_policy_prior_continuation_prepare_scale": 1.05,
+                "digital_twin_policy_prior_continuation_wait_scale": 1.10,
+                "digital_twin_policy_prior_continuation_steady_suppression": 0.30,
+                "digital_twin_policy_prior_logit_bias": 3.55,
+                "digital_twin_policy_prior_distill_coef": 0.090,
+                "digital_twin_policy_prior_advantage_weight": 0.46,
+                "digital_twin_policy_prior_max_weight": 2.20,
+                "mechanism_credit_policy_coef": 0.48,
+                "mechanism_credit_event_coef": 1.10,
+                "mechanism_credit_option_coef": 0.54,
+                "handoff_risk_event_coef": 0.66,
+                "handoff_risk_option_coef": 0.58,
+                "target_kl": 0.0085,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v34_adaptive_wait_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v33_env_action_ppo_mappo")
+        kwargs.update(
+            {
+                "digital_twin_policy_prior_adaptive_wait_enabled": True,
+                "digital_twin_policy_prior_wait_ready_threshold": 0.50,
+                "digital_twin_policy_prior_wait_timing_ceiling": 0.58,
+                "digital_twin_policy_prior_wait_cache_ready_scale": 1.42,
+                "digital_twin_policy_prior_prepare_not_ready_scale": 0.92,
+                "digital_twin_policy_prior_env_action_logit_bias": 3.70,
+                "digital_twin_policy_prior_continuation_threshold": 0.34,
+                "digital_twin_policy_prior_continuation_prepare_scale": 0.88,
+                "digital_twin_policy_prior_continuation_wait_scale": 1.48,
+                "digital_twin_policy_prior_continuation_steady_suppression": 0.36,
+                "digital_twin_policy_prior_logit_bias": 3.70,
+                "digital_twin_policy_prior_distill_coef": 0.082,
+                "digital_twin_policy_prior_advantage_weight": 0.42,
+                "digital_twin_policy_prior_max_weight": 2.10,
+                "env_action_ppo_coef": 0.82,
+                "env_action_ppo_advantage_blend": 0.50,
+                "env_action_ppo_teacher_coef": 0.48,
+                "env_action_ppo_mechanism_focus": 0.82,
+                "env_action_ppo_max_weight": 2.30,
+                "env_action_ppo_ratio_barrier_coef": 0.045,
+                "env_action_ppo_ratio_barrier_margin": 0.32,
+                "counterfactual_teacher_mechanism_bonus": 0.58,
+                "counterfactual_teacher_missed_prepare_penalty": 0.34,
+                "counterfactual_teacher_local_bonus": 0.54,
+                "counterfactual_teacher_current_rsu_penalty": 0.08,
+                "counterfactual_teacher_invalid_mechanism_penalty": 0.72,
+                "mechanism_credit_policy_coef": 0.46,
+                "mechanism_credit_event_coef": 1.02,
+                "mechanism_credit_option_coef": 0.52,
+                "handoff_risk_event_coef": 0.62,
+                "handoff_risk_option_coef": 0.56,
+                "target_kl": 0.008,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v35_guard_relaxed_action_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v34_adaptive_wait_mappo")
+        kwargs.update(
+            {
+                "continuity_guard_enabled": False,
+                "handoff_target_alignment_guard_enabled": False,
+                "backhaul_guard_enabled": False,
+                "cache_warm_start_guard_enabled": False,
+                "predictive_prefetch_admission_guard_enabled": False,
+                "heuristic_imitation_coef": 0.018,
+                "heuristic_imitation_warmup_updates": 2,
+                "heuristic_imitation_decay": 0.55,
+                "mechanism_aux_coef": 0.040,
+                "mechanism_window_weight": 1.18,
+                "prepare_action_prior_weight": 0.30,
+                "mechanism_entropy_coef": 0.0012,
+                "mechanism_aux_coef_floor_after_update": 0.028,
+                "mechanism_window_weight_floor_after_update": 1.08,
+                "mechanism_entropy_floor_after_update": 0.0010,
+                "digital_twin_policy_prior_wait_ready_threshold": 0.30,
+                "digital_twin_policy_prior_wait_timing_ceiling": 0.92,
+                "digital_twin_policy_prior_wait_cache_ready_scale": 1.72,
+                "digital_twin_policy_prior_prepare_not_ready_scale": 0.74,
+                "digital_twin_policy_prior_env_action_logit_bias": 4.10,
+                "digital_twin_policy_prior_continuation_threshold": 0.26,
+                "digital_twin_policy_prior_continuation_prepare_scale": 0.72,
+                "digital_twin_policy_prior_continuation_wait_scale": 1.80,
+                "digital_twin_policy_prior_continuation_steady_suppression": 0.18,
+                "digital_twin_policy_prior_logit_bias": 3.90,
+                "digital_twin_policy_prior_distill_coef": 0.074,
+                "digital_twin_policy_prior_advantage_weight": 0.48,
+                "digital_twin_policy_prior_max_weight": 2.30,
+                "env_action_ppo_coef": 0.98,
+                "env_action_ppo_advantage_blend": 0.46,
+                "env_action_ppo_teacher_coef": 0.66,
+                "env_action_ppo_mechanism_focus": 1.05,
+                "env_action_ppo_max_weight": 2.65,
+                "env_action_ppo_ratio_barrier_coef": 0.060,
+                "env_action_ppo_ratio_barrier_margin": 0.30,
+                "counterfactual_teacher_mechanism_bonus": 0.74,
+                "counterfactual_teacher_missed_prepare_penalty": 0.24,
+                "counterfactual_teacher_local_bonus": 0.68,
+                "counterfactual_teacher_current_rsu_penalty": 0.04,
+                "counterfactual_teacher_invalid_mechanism_penalty": 0.58,
+                "mechanism_credit_policy_coef": 0.54,
+                "mechanism_credit_event_coef": 1.16,
+                "mechanism_credit_option_coef": 0.62,
+                "handoff_risk_event_coef": 0.72,
+                "handoff_risk_option_coef": 0.64,
+                "idle_execution_policy_coef": 0.54,
+                "idle_execution_option_coef": 0.72,
+                "idle_execution_local_bonus": 0.58,
+                "idle_execution_mechanism_penalty": 0.22,
+                "target_kl": 0.0075,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v36_counterfactual_margin_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v35_guard_relaxed_action_mappo")
+        kwargs.update(
+            {
+                "env_action_counterfactual_margin_enabled": True,
+                "env_action_counterfactual_margin_coef": 0.22,
+                "env_action_counterfactual_margin_min_gap": 0.04,
+                "env_action_counterfactual_margin_max_weight": 2.40,
+                "env_action_ppo_coef": 0.88,
+                "env_action_ppo_teacher_coef": 0.56,
+                "env_action_ppo_mechanism_focus": 0.92,
+                "env_action_ppo_max_weight": 2.45,
+                "env_action_ppo_ratio_barrier_coef": 0.070,
+                "env_action_ppo_ratio_barrier_margin": 0.28,
+                "digital_twin_policy_prior_wait_ready_threshold": 0.18,
+                "digital_twin_policy_prior_wait_timing_ceiling": 1.00,
+                "digital_twin_policy_prior_wait_cache_ready_scale": 1.90,
+                "digital_twin_policy_prior_prepare_not_ready_scale": 0.68,
+                "digital_twin_policy_prior_continuation_threshold": 0.20,
+                "digital_twin_policy_prior_continuation_wait_scale": 2.05,
+                "digital_twin_policy_prior_continuation_prepare_scale": 0.64,
+                "counterfactual_teacher_local_bonus": 0.92,
+                "counterfactual_teacher_mechanism_bonus": 0.78,
+                "counterfactual_teacher_current_rsu_penalty": 0.03,
+                "counterfactual_teacher_invalid_mechanism_penalty": 0.66,
+                "idle_execution_policy_coef": 0.62,
+                "idle_execution_option_coef": 0.80,
+                "idle_execution_local_bonus": 0.72,
+                "mechanism_aux_coef": 0.034,
+                "mechanism_window_weight": 1.12,
+                "prepare_action_prior_weight": 0.22,
+                "mechanism_entropy_coef": 0.0014,
+                "target_kl": 0.007,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v37_advantage_gated_counterfactual_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v35_guard_relaxed_action_mappo")
+        kwargs.update(
+            {
+                "env_action_counterfactual_margin_enabled": True,
+                "env_action_counterfactual_margin_coef": 0.055,
+                "env_action_counterfactual_margin_min_gap": 0.10,
+                "env_action_counterfactual_margin_max_weight": 1.35,
+                "env_action_counterfactual_margin_advantage_gate": 0.12,
+                "env_action_counterfactual_margin_advantage_blend": 0.70,
+                "env_action_ppo_coef": 1.00,
+                "env_action_ppo_teacher_coef": 0.60,
+                "env_action_ppo_mechanism_focus": 0.95,
+                "env_action_ppo_max_weight": 2.55,
+                "env_action_ppo_ratio_barrier_coef": 0.075,
+                "env_action_ppo_ratio_barrier_margin": 0.30,
+                "digital_twin_policy_prior_wait_ready_threshold": 0.30,
+                "digital_twin_policy_prior_wait_timing_ceiling": 0.92,
+                "digital_twin_policy_prior_continuation_wait_scale": 1.78,
+                "digital_twin_policy_prior_continuation_prepare_scale": 0.72,
+                "counterfactual_teacher_local_bonus": 0.70,
+                "counterfactual_teacher_mechanism_bonus": 0.72,
+                "counterfactual_teacher_missed_prepare_penalty": 0.22,
+                "counterfactual_teacher_current_rsu_penalty": 0.04,
+                "counterfactual_teacher_invalid_mechanism_penalty": 0.56,
+                "mechanism_aux_coef": 0.038,
+                "mechanism_window_weight": 1.16,
+                "prepare_action_prior_weight": 0.28,
+                "mechanism_entropy_coef": 0.0011,
+                "target_kl": 0.0075,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v38_undiscounted_dt_prior_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v35_guard_relaxed_action_mappo")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.010,
+                "mechanism_aux_coef": 0.036,
+                "mechanism_window_weight": 1.14,
+                "prepare_action_prior_weight": 0.24,
+                "mechanism_entropy_coef": 0.0016,
+                "digital_twin_policy_prior_logit_bias": 4.60,
+                "digital_twin_policy_prior_env_action_logit_bias": 5.20,
+                "digital_twin_policy_prior_distill_coef": 0.145,
+                "digital_twin_policy_prior_distill_warmup_updates": 1,
+                "digital_twin_policy_prior_distill_decay": 0.94,
+                "digital_twin_policy_prior_advantage_weight": 0.78,
+                "digital_twin_policy_prior_max_weight": 3.20,
+                "digital_twin_policy_prior_continuation_threshold": 0.18,
+                "digital_twin_policy_prior_continuation_prepare_scale": 1.10,
+                "digital_twin_policy_prior_continuation_wait_scale": 1.35,
+                "digital_twin_policy_prior_continuation_steady_suppression": 0.12,
+                "digital_twin_policy_prior_wait_ready_threshold": 0.24,
+                "digital_twin_policy_prior_wait_timing_ceiling": 0.96,
+                "digital_twin_policy_prior_wait_cache_ready_scale": 1.84,
+                "digital_twin_policy_prior_prepare_not_ready_scale": 0.82,
+                "env_action_ppo_coef": 1.08,
+                "env_action_ppo_advantage_blend": 0.58,
+                "env_action_ppo_teacher_coef": 0.74,
+                "env_action_ppo_mechanism_focus": 1.18,
+                "env_action_ppo_max_weight": 3.10,
+                "env_action_ppo_ratio_barrier_coef": 0.055,
+                "env_action_ppo_ratio_barrier_margin": 0.34,
+                "env_action_counterfactual_margin_enabled": False,
+                "counterfactual_teacher_mechanism_bonus": 0.82,
+                "counterfactual_teacher_missed_prepare_penalty": 0.20,
+                "counterfactual_teacher_local_bonus": 0.70,
+                "counterfactual_teacher_current_rsu_penalty": 0.035,
+                "counterfactual_teacher_invalid_mechanism_penalty": 0.52,
+                "mechanism_credit_policy_coef": 0.60,
+                "mechanism_credit_event_coef": 1.24,
+                "mechanism_credit_option_coef": 0.66,
+                "target_kl": 0.008,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v39_delayed_credit_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v35_guard_relaxed_action_mappo")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.012,
+                "heuristic_imitation_warmup_updates": 1,
+                "heuristic_imitation_decay": 0.50,
+                "mechanism_aux_coef": 0.036,
+                "mechanism_window_weight": 1.16,
+                "prepare_action_prior_weight": 0.26,
+                "mechanism_entropy_coef": 0.0014,
+                "digital_twin_policy_prior_logit_bias": 3.70,
+                "digital_twin_policy_prior_env_action_logit_bias": 3.95,
+                "digital_twin_policy_prior_distill_coef": 0.052,
+                "digital_twin_policy_prior_advantage_weight": 0.40,
+                "digital_twin_policy_prior_max_weight": 2.20,
+                "digital_twin_policy_prior_wait_ready_threshold": 0.30,
+                "digital_twin_policy_prior_wait_timing_ceiling": 0.92,
+                "digital_twin_policy_prior_wait_cache_ready_scale": 1.72,
+                "digital_twin_policy_prior_prepare_not_ready_scale": 0.74,
+                "digital_twin_policy_prior_continuation_threshold": 0.26,
+                "digital_twin_policy_prior_continuation_prepare_scale": 0.72,
+                "digital_twin_policy_prior_continuation_wait_scale": 1.80,
+                "env_action_ppo_coef": 1.06,
+                "env_action_ppo_advantage_blend": 0.44,
+                "env_action_ppo_teacher_coef": 0.46,
+                "env_action_ppo_mechanism_focus": 1.24,
+                "env_action_ppo_max_weight": 2.80,
+                "env_action_ppo_ratio_barrier_coef": 0.065,
+                "env_action_ppo_ratio_barrier_margin": 0.30,
+                "env_action_counterfactual_margin_enabled": False,
+                "delayed_mechanism_credit_enabled": True,
+                "delayed_mechanism_credit_policy_coef": 0.46,
+                "delayed_mechanism_credit_event_coef": 1.05,
+                "delayed_mechanism_credit_horizon": 5,
+                "delayed_mechanism_credit_decay": 0.72,
+                "delayed_mechanism_credit_clip": 1.80,
+                "delayed_mechanism_credit_ready_bonus": 1.35,
+                "delayed_mechanism_credit_success_bonus": 0.88,
+                "delayed_mechanism_credit_failure_penalty": 1.02,
+                "delayed_mechanism_credit_missed_prepare_scale": 0.62,
+                "delayed_mechanism_credit_stale_penalty": 0.42,
+                "delayed_mechanism_credit_context_gate": 0.24,
+                "counterfactual_teacher_mechanism_bonus": 0.66,
+                "counterfactual_teacher_missed_prepare_penalty": 0.22,
+                "counterfactual_teacher_local_bonus": 0.66,
+                "counterfactual_teacher_current_rsu_penalty": 0.04,
+                "counterfactual_teacher_invalid_mechanism_penalty": 0.54,
+                "mechanism_credit_policy_coef": 0.50,
+                "mechanism_credit_event_coef": 1.10,
+                "mechanism_credit_option_coef": 0.60,
+                "handoff_risk_event_coef": 0.74,
+                "handoff_risk_option_coef": 0.64,
+                "target_kl": 0.0075,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v40_advantage_weighted_behavior_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v39_delayed_credit_mappo")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.008,
+                "heuristic_imitation_warmup_updates": 1,
+                "heuristic_imitation_decay": 0.42,
+                "env_action_ppo_coef": 1.00,
+                "env_action_ppo_advantage_blend": 0.48,
+                "env_action_ppo_teacher_coef": 0.34,
+                "env_action_ppo_mechanism_focus": 1.10,
+                "env_action_ppo_max_weight": 2.55,
+                "env_action_ppo_ratio_barrier_coef": 0.075,
+                "env_action_ppo_ratio_barrier_margin": 0.30,
+                "advantage_weighted_behavior_regularization_enabled": True,
+                "advantage_weighted_behavior_coef": 0.24,
+                "advantage_weighted_behavior_positive_coef": 1.08,
+                "advantage_weighted_behavior_negative_coef": 0.92,
+                "advantage_weighted_behavior_temperature": 0.62,
+                "advantage_weighted_behavior_max_weight": 2.20,
+                "advantage_weighted_behavior_positive_gate": 0.08,
+                "advantage_weighted_behavior_negative_gate": 0.04,
+                "advantage_weighted_behavior_mechanism_scale": 1.35,
+                "delayed_mechanism_credit_policy_coef": 0.38,
+                "delayed_mechanism_credit_event_coef": 0.92,
+                "delayed_mechanism_credit_clip": 1.65,
+                "counterfactual_teacher_mechanism_bonus": 0.60,
+                "counterfactual_teacher_missed_prepare_penalty": 0.26,
+                "counterfactual_teacher_local_bonus": 0.62,
+                "counterfactual_teacher_invalid_mechanism_penalty": 0.58,
+                "mechanism_aux_coef": 0.034,
+                "mechanism_window_weight": 1.12,
+                "prepare_action_prior_weight": 0.24,
+                "mechanism_entropy_coef": 0.0015,
+                "target_kl": 0.0075,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v41_conservative_recovery_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v39_delayed_credit_mappo")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.010,
+                "heuristic_imitation_warmup_updates": 1,
+                "heuristic_imitation_decay": 0.48,
+                "env_action_ppo_coef": 1.04,
+                "env_action_ppo_advantage_blend": 0.44,
+                "env_action_ppo_teacher_coef": 0.42,
+                "env_action_ppo_mechanism_focus": 1.18,
+                "env_action_ppo_max_weight": 2.70,
+                "env_action_ppo_ratio_barrier_coef": 0.070,
+                "env_action_ppo_ratio_barrier_margin": 0.28,
+                "advantage_weighted_behavior_regularization_enabled": True,
+                "advantage_weighted_behavior_coef": 0.115,
+                "advantage_weighted_behavior_positive_coef": 0.0,
+                "advantage_weighted_behavior_negative_coef": 1.18,
+                "advantage_weighted_behavior_temperature": 0.70,
+                "advantage_weighted_behavior_max_weight": 1.80,
+                "advantage_weighted_behavior_positive_gate": 0.20,
+                "advantage_weighted_behavior_negative_gate": 0.025,
+                "advantage_weighted_behavior_mechanism_scale": 0.95,
+                "delayed_mechanism_credit_policy_coef": 0.44,
+                "delayed_mechanism_credit_event_coef": 1.02,
+                "delayed_mechanism_credit_clip": 1.75,
+                "counterfactual_teacher_mechanism_bonus": 0.64,
+                "counterfactual_teacher_missed_prepare_penalty": 0.24,
+                "counterfactual_teacher_local_bonus": 0.64,
+                "counterfactual_teacher_invalid_mechanism_penalty": 0.56,
+                "mechanism_aux_coef": 0.035,
+                "mechanism_window_weight": 1.14,
+                "prepare_action_prior_weight": 0.25,
+                "mechanism_entropy_coef": 0.0014,
+                "target_kl": 0.0075,
+            }
+        )
+        return kwargs
     if profile == "top_journal_mechanism_v5_perf_robust":
         kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v1")
         kwargs.update(
@@ -3326,6 +4117,24 @@ def run_checkpoint_consistency_audit(
     checkpoint_entries.extend([("warm_start", checkpoint_root / "warm_start.pt")])
     if bool(getattr(args, "audit_update_checkpoints", False)):
         checkpoint_entries.extend((path.stem, path) for path in sorted(checkpoint_root.glob("update_*.pt")))
+    best_labels = [
+        "best_by_reward",
+        "best_by_continuity",
+        "best_by_mechanism_balanced",
+        "best_by_advantage_score",
+        "best_by_mechanism_advantage_score",
+        "best_by_round2_mechanism_score",
+        "best_by_retained_mechanism_score",
+        "best_by_reward_tiebreak_score",
+    ]
+    for best_label in best_labels:
+        source_path_text = str(
+            best_record.get(best_label, {}).get("source_checkpoint_path", "")
+            or best_record.get(best_label, {}).get("path", "")
+            or ""
+        )
+        if source_path_text:
+            checkpoint_entries.append((f"source_{best_label}", Path(source_path_text)))
     checkpoint_entries.extend(
         [
             ("best_by_reward", checkpoint_root / "best_by_reward.pt"),
@@ -3338,6 +4147,15 @@ def run_checkpoint_consistency_audit(
             ("best_by_reward_tiebreak_score", checkpoint_root / "best_by_reward_tiebreak_score.pt"),
         ]
     )
+    deduped_entries: list[tuple[str, Path]] = []
+    seen_checkpoint_paths: set[str] = set()
+    for checkpoint_label, checkpoint_path in checkpoint_entries:
+        key = str(checkpoint_path)
+        if key in seen_checkpoint_paths:
+            continue
+        seen_checkpoint_paths.add(key)
+        deduped_entries.append((checkpoint_label, checkpoint_path))
+    checkpoint_entries = deduped_entries
     audited: list[dict[str, Any]] = []
     for checkpoint_label, checkpoint_path in checkpoint_entries:
         if not checkpoint_path.exists():
@@ -3476,7 +4294,12 @@ def run_checkpoint_consistency_audit(
     source_candidates = [
         item
         for item in audited
-        if item.get("exists") and (item.get("checkpoint_label", "").startswith("update_") or item.get("checkpoint_label") == "warm_start")
+        if item.get("exists")
+        and (
+            item.get("checkpoint_label", "").startswith("update_")
+            or item.get("checkpoint_label", "").startswith("source_")
+            or item.get("checkpoint_label") == "warm_start"
+        )
     ]
     if not source_candidates:
         source_candidates = [item for item in audited if item.get("exists") and item.get("checkpoint_label") == "latest"]
@@ -4642,6 +5465,12 @@ def maybe_apply_anti_collapse_controls(
         "top_journal_mechanism_v24_tail_risk_constrained_prd",
         "top_journal_mechanism_v25_opportunity_risk_prd",
         "top_journal_mechanism_v26_mechanism_safe_counterfactual_prd",
+        "top_journal_mechanism_v27_conservative_advantage_imitation",
+        "top_journal_mechanism_v28_credit_focal_mappo",
+        "top_journal_mechanism_v29_dt_fused_credit_mappo",
+        "top_journal_mechanism_v30_dt_prior_mappo",
+        "top_journal_mechanism_v31_handoff_pacing_mappo",
+        "top_journal_mechanism_v32_dt_continuation_mappo",
     }
     if args.agent_name != "sa_ghmappo" or args.profile not in stability_profiles:
         return updated_best, None
@@ -5609,6 +6438,39 @@ def main() -> None:
             ),
             "mechanism_aux_current_cache_fill_enabled": bool(
                 getattr(agent, "_mechanism_aux_current_cache_fill_enabled", True)
+            ),
+            "mechanism_credit_prd_enabled": bool(getattr(agent, "_mechanism_credit_prd_enabled", False)),
+            "mechanism_credit_policy_coef": float(getattr(agent, "_mechanism_credit_policy_coef", 0.0)),
+            "mechanism_credit_event_coef": float(getattr(agent, "_mechanism_credit_event_coef", 0.0)),
+            "mechanism_credit_option_coef": float(getattr(agent, "_mechanism_credit_option_coef", 0.0)),
+            "mechanism_credit_clip": float(getattr(agent, "_mechanism_credit_clip", 0.0)),
+            "mechanism_credit_success_bonus": float(getattr(agent, "_mechanism_credit_success_bonus", 0.0)),
+            "mechanism_credit_prepare_bonus": float(getattr(agent, "_mechanism_credit_prepare_bonus", 0.0)),
+            "mechanism_credit_ready_bonus": float(getattr(agent, "_mechanism_credit_ready_bonus", 0.0)),
+            "mechanism_credit_prefetch_hit_bonus": float(
+                getattr(agent, "_mechanism_credit_prefetch_hit_bonus", 0.0)
+            ),
+            "mechanism_credit_miss_penalty": float(getattr(agent, "_mechanism_credit_miss_penalty", 0.0)),
+            "mechanism_credit_false_positive_penalty": float(
+                getattr(agent, "_mechanism_credit_false_positive_penalty", 0.0)
+            ),
+            "mechanism_credit_min_context": float(getattr(agent, "_mechanism_credit_min_context", 0.0)),
+            "mechanism_focal_aux_enabled": bool(getattr(agent, "_mechanism_focal_aux_enabled", False)),
+            "mechanism_focal_gamma": float(getattr(agent, "_mechanism_focal_gamma", 0.0)),
+            "digital_twin_handoff_fusion_enabled": bool(
+                getattr(agent, "_digital_twin_handoff_fusion_enabled", False)
+            ),
+            "digital_twin_handoff_slow_scale": float(
+                getattr(agent, "_digital_twin_handoff_slow_scale", 0.0)
+            ),
+            "digital_twin_handoff_fast_scale": float(
+                getattr(agent, "_digital_twin_handoff_fast_scale", 0.0)
+            ),
+            "digital_twin_handoff_event_scale": float(
+                getattr(agent, "_digital_twin_handoff_event_scale", 0.0)
+            ),
+            "digital_twin_handoff_critic_scale": float(
+                getattr(agent, "_digital_twin_handoff_critic_scale", 0.0)
             ),
             "backhaul_guard_enabled": bool(getattr(agent, "_backhaul_guard_enabled", False)),
             "backhaul_guard_max_reactive_fills_per_adapter": int(

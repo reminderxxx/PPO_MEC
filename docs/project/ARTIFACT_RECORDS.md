@@ -1,5 +1,29 @@
 # Artifact Records
 
+## 2026-07-21 v39/v40/v41 MAPPO behavior-regularization dev probes
+
+状态：`[dev-probe]` `[negative-v40]` `[v41-stability-restored]` `[not-all-baseline-winner]` `[not-tmc-ready]`
+
+路径：
+
+- `configs/experiment/top_journal_mechanism_v39_delayed_credit_mappo.yaml`
+- `configs/experiment/top_journal_mechanism_v40_advantage_weighted_behavior_mappo.yaml`
+- `configs/experiment/top_journal_mechanism_v41_conservative_recovery_mappo.yaml`
+- `artifacts/training/top_journal_v40_advantage_weighted_behavior_dev_probe/sa_ghmappo/sa_ghmappo_train_20260720_235829_740995_seed7/`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_v40_advantage_weighted_behavior_dev_probe/`
+- `artifacts/training/top_journal_v41_conservative_recovery_dev_probe/sa_ghmappo/sa_ghmappo_train_20260721_004212_881111_seed7/`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_v41_conservative_recovery_dev_probe/benchmarks/latest_targeted/main_results_full_stratified_20260721_005120_253186/aggregate_summary.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_v41_conservative_recovery_dev_probe/benchmarks/latest_full_pool/main_results_full_stratified_20260721_011039_423874/aggregate_summary.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_v39_delayed_credit_dev_probe/benchmarks/update_0005_full_pool/main_results_full_stratified_20260721_011956_616135/aggregate_summary.json`
+
+确认结果：v40 将 advantage-weighted behavior regularization 接入 SA-GHMAPPO/MAPPO 学习目标，但 positive-deviation cloning 在 train-window 上形成高 reward、在 frozen dev 上严重退化；targeted dev 中 `latest=85.433`、`update_0005=85.788`、`update_0006=85.788`、`update_0012=89.6965`，均低于 PPO/MAPPO/popularity/DT。
+
+v41 改为 conservative recovery，只对负 advantage 偏离回归 popularity-safe teacher。它在 frozen dev targeted latest 上恢复到 SA-GHMAPPO `105.686`，略高于 MAPPO `105.588`、popularity `105.250` 和 PPO `94.774`，但低于 DT `119.226`。v41 full-pool 结果同样为 SA `105.686`，低于 `cache_offload_drl=119.14875` 与 `dt_handoff_drl=119.22625`。
+
+v39 update_0005 full-pool 复核是当前本轮最高 SA dev-probe：SA-GHMAPPO `106.041`，高于 MAPPO `105.5875`、popularity `105.25` 和 PPO `94.77375`，但仍低于 `cache_offload_drl=119.14875` 与 `dt_handoff_drl=119.22625`。关键系统指标显示 SA 的 `successful_episode_rate=1.0`、`workflow_continuity_rate=0.970369`、`handoff_failure_rate=0.0`，而 DT/cache 为 `0.65`、`0.583014`、`0.208333`。
+
+结论边界：本组 artifact 只能支持 dev-probe diagnosis。它们没有 formal/holdout/support package、没有多 seed statistical claim，也没有超过全部 baseline。当前 total reward ranking 受 `reward_positive_offset=5.0` 的 step-wise 累加影响，存在“拖长 episode 获得更高 reward”的目标不一致风险；任何 paper-ready 判断必须先修正或并列报告 completion-constrained / time-normalized 指标，并重新冻结正式 protocol。
+
 ## 2026-07-17 v21/v22 efficiency and validated-utility PRD diagnostics
 
 状态：`[algorithmic-prd-followup]` `[formal-not-passed]` `[hidden-not-opened]`

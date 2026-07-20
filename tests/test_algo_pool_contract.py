@@ -965,6 +965,811 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertGreater(kwargs["idle_execution_mechanism_penalty"], 0.72)
         self.assertLess(kwargs["counterfactual_teacher_option_coef"], 0.72)
 
+    def test_sa_v27_profile_enables_conservative_advantage_imitation(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v27_conservative_advantage_imitation"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v27_conservative_advantage_imitation")
+        self.assertTrue(kwargs["idle_execution_prd_enabled"])
+        self.assertTrue(kwargs["handoff_risk_prd_enabled"])
+        self.assertTrue(kwargs["conservative_imitation_enabled"])
+        self.assertFalse(kwargs["tail_risk_prd_enabled"])
+        self.assertFalse(kwargs["opportunity_prd_enabled"])
+        self.assertFalse(kwargs["counterfactual_teacher_prd_enabled"])
+        self.assertGreater(kwargs["heuristic_imitation_coef"], 0.0)
+        self.assertGreater(kwargs["conservative_imitation_failure_coef"], 0.0)
+        self.assertLess(kwargs["conservative_imitation_success_decay"], 1.0)
+
+    def test_sa_v27_conservative_imitation_weight_targets_low_reward_failures(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            conservative_imitation_enabled=True,
+            conservative_imitation_min_weight=0.08,
+            conservative_imitation_max_weight=1.45,
+            conservative_imitation_shortfall_coef=0.70,
+            conservative_imitation_failure_coef=0.85,
+            conservative_imitation_mismatch_coef=0.22,
+            conservative_imitation_success_decay=0.20,
+        )
+        failed_row = {
+            "reward": -0.8,
+            "action": 4,
+            "action_info": {"final_env_action": 4, "head_actions": {"event": 1}},
+            "env_info": {
+                "metrics_protocol": {
+                    "migration_prepare_requested": True,
+                    "mechanism_success_strict": False,
+                }
+            },
+        }
+        success_row = {
+            "reward": 1.2,
+            "action": 3,
+            "action_info": {"final_env_action": 3, "head_actions": {"event": 0}},
+            "env_info": {
+                "metrics_protocol": {
+                    "handoff_ready": True,
+                    "mechanism_success_strict": True,
+                }
+            },
+        }
+
+        failed_weight = agent._conservative_imitation_weight(
+            failed_row,
+            reward_floor=0.0,
+            student_action=4,
+            teacher_action=3,
+        )
+        success_weight = agent._conservative_imitation_weight(
+            success_row,
+            reward_floor=0.0,
+            student_action=3,
+            teacher_action=3,
+        )
+
+        self.assertGreater(failed_weight, success_weight)
+        self.assertLessEqual(failed_weight, 1.45)
+        self.assertGreaterEqual(success_weight, 0.08)
+
+    def test_sa_v28_profile_enables_mechanism_credit_and_focal_aux(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v28_credit_focal_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["update_every"], 8)
+        self.assertEqual(defaults["train_window_count"], 20)
+        self.assertEqual(defaults["max_steps"], 22)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v28_credit_focal_mappo")
+        self.assertTrue(kwargs["idle_execution_prd_enabled"])
+        self.assertTrue(kwargs["handoff_risk_prd_enabled"])
+        self.assertTrue(kwargs["mechanism_credit_prd_enabled"])
+        self.assertTrue(kwargs["mechanism_focal_aux_enabled"])
+        self.assertGreater(kwargs["mechanism_credit_event_coef"], kwargs["mechanism_credit_policy_coef"])
+        self.assertGreater(kwargs["mechanism_credit_option_coef"], 0.0)
+        self.assertFalse(kwargs["tail_risk_prd_enabled"])
+        self.assertFalse(kwargs["opportunity_prd_enabled"])
+        self.assertFalse(kwargs["counterfactual_teacher_prd_enabled"])
+
+    def test_sa_v28_mechanism_credit_rewards_success_and_penalizes_misses(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            mechanism_credit_prd_enabled=True,
+            mechanism_credit_policy_coef=0.30,
+            mechanism_credit_event_coef=0.85,
+            mechanism_credit_option_coef=0.42,
+            mechanism_credit_clip=1.80,
+            mechanism_credit_success_bonus=1.0,
+            mechanism_credit_prepare_bonus=0.55,
+            mechanism_credit_ready_bonus=0.85,
+            mechanism_credit_prefetch_hit_bonus=0.65,
+            mechanism_credit_miss_penalty=0.55,
+            mechanism_credit_false_positive_penalty=0.38,
+        )
+        base_action_info = {
+            "prepare_window_score": 0.8,
+            "temporal_urgency": 0.7,
+            "prediction_confidence": 0.9,
+            "gate_pass": True,
+            "raw_handoff_candidate": True,
+            "predicted_handoff_target_valid": True,
+        }
+        success_row = {
+            "action": 4,
+            "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+            "action_info": {
+                **base_action_info,
+                "final_env_action": 4,
+                "head_actions": {"event": 1},
+            },
+            "env_info": {
+                "metrics_protocol": {
+                    "handoff_event_count": 1,
+                    "predicted_handoff_signal": True,
+                    "has_predicted_handoff_target": True,
+                    "migration_prepare_realized": True,
+                    "handoff_ready": True,
+                    "prefetch_validated_hit": True,
+                    "mechanism_success_strict": True,
+                }
+            },
+        }
+        missed_row = {
+            "action": 2,
+            "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+            "action_info": {
+                **base_action_info,
+                "final_env_action": 2,
+                "head_actions": {"event": 0},
+            },
+            "env_info": {
+                "metrics_protocol": {
+                    "handoff_event_count": 1,
+                    "predicted_handoff_signal": True,
+                    "has_predicted_handoff_target": True,
+                    "handoff_failed": True,
+                    "mechanism_success_strict": False,
+                }
+            },
+        }
+        false_positive_row = {
+            "action": 4,
+            "decision_info": {"run_metadata": {"window_class": "idle_or_sparse"}},
+            "action_info": {
+                "prepare_window_score": 0.0,
+                "temporal_urgency": 0.0,
+                "prediction_confidence": 0.0,
+                "gate_pass": False,
+                "final_env_action": 4,
+                "head_actions": {"event": 1},
+            },
+            "env_info": {"metrics_protocol": {"mechanism_success_strict": False}},
+        }
+
+        success_credit = agent._mechanism_credit_prd_credit(success_row)
+        missed_credit = agent._mechanism_credit_prd_credit(missed_row)
+        false_positive_credit = agent._mechanism_credit_prd_credit(false_positive_row)
+
+        self.assertGreater(success_credit, 0.0)
+        self.assertLess(missed_credit, 0.0)
+        self.assertLess(false_positive_credit, 0.0)
+        self.assertGreater(success_credit, abs(missed_credit))
+
+    def test_sa_v29_profile_enables_digital_twin_handoff_fusion(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v29_dt_fused_credit_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v29_dt_fused_credit_mappo")
+        self.assertTrue(kwargs["digital_twin_handoff_fusion_enabled"])
+        self.assertTrue(kwargs["mechanism_credit_prd_enabled"])
+        self.assertTrue(kwargs["mechanism_focal_aux_enabled"])
+        self.assertGreater(kwargs["digital_twin_handoff_event_scale"], kwargs["digital_twin_handoff_slow_scale"])
+        self.assertGreater(kwargs["mechanism_credit_event_coef"], kwargs["mechanism_credit_policy_coef"])
+
+    def test_sa_v29_digital_twin_handoff_features_reach_network_output(self) -> None:
+        state = _minimal_semantic_state()
+        state["vehicles"][0]["position_x"] = 9.5
+        state["vehicles"][0]["position_y"] = 0.0
+        state["rsus"][0]["position_x"] = 0.0
+        state["rsus"][0]["position_y"] = 0.0
+        state["rsus"][0]["coverage_radius"] = 10.0
+        state["current_node_service_steps_remaining"] = 3.0
+        state["predictions"]["next_rsu_sequence"]["veh_1"] = ["rsu_a", "rsu_b", "rsu_b"]
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            digital_twin_handoff_fusion_enabled=True,
+            digital_twin_handoff_event_scale=0.95,
+        )
+
+        output = agent._forward_policy(state)
+        encoded = output["encoded"]
+
+        self.assertIn("digital_twin_handoff_fusion_enabled", encoded)
+        self.assertAlmostEqual(float(encoded["digital_twin_handoff_fusion_enabled"].item()), 1.0)
+        self.assertGreater(float(encoded["digital_twin_handoff_target_differs"].item()), 0.0)
+        self.assertGreater(float(encoded["digital_twin_handoff_boundary_urgency"].item()), 0.9)
+        self.assertGreater(float(encoded["digital_twin_handoff_service_pressure"].item()), 0.0)
+
+    def test_sa_v30_profile_enables_dt_policy_prior(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v30_dt_prior_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v30_dt_prior_mappo")
+        self.assertTrue(kwargs["digital_twin_handoff_fusion_enabled"])
+        self.assertTrue(kwargs["digital_twin_policy_prior_enabled"])
+        self.assertGreater(kwargs["digital_twin_policy_prior_logit_bias"], 0.0)
+        self.assertGreater(kwargs["digital_twin_policy_prior_distill_coef"], 0.0)
+        self.assertGreater(kwargs["mechanism_credit_event_coef"], kwargs["mechanism_credit_policy_coef"])
+
+    def test_sa_v30_dt_policy_prior_boosts_event_prepare_margin(self) -> None:
+        state = _minimal_semantic_state()
+        state["vehicles"][0]["position_x"] = 9.5
+        state["vehicles"][0]["position_y"] = 0.0
+        state["rsus"][0]["position_x"] = 0.0
+        state["rsus"][0]["position_y"] = 0.0
+        state["rsus"][0]["coverage_radius"] = 10.0
+        base_agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            digital_twin_handoff_fusion_enabled=True,
+            digital_twin_policy_prior_enabled=False,
+        )
+        prior_agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            digital_twin_handoff_fusion_enabled=True,
+            digital_twin_policy_prior_enabled=True,
+            digital_twin_policy_prior_logit_bias=3.0,
+            digital_twin_policy_prior_prepare_threshold=0.0,
+            digital_twin_policy_prior_confidence_floor=0.1,
+        )
+
+        base_output = base_agent._forward_policy(state)
+        prior_output = prior_agent._forward_policy(state)
+        annotation = prior_agent._build_digital_twin_policy_prior_annotation(state)
+        base_margin = float((base_output["event_logits"][1] - base_output["event_logits"][0]).item())
+        prior_margin = float((prior_output["event_logits"][1] - prior_output["event_logits"][0]).item())
+
+        self.assertTrue(annotation["apply"])
+        self.assertEqual(annotation["event_target"], 1)
+        self.assertIn("digital_twin_policy_prior_info", prior_output)
+        self.assertGreater(prior_margin, base_margin)
+
+    def test_sa_v31_profile_enables_handoff_pacing_prior(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v31_handoff_pacing_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v31_handoff_pacing_mappo")
+        self.assertTrue(kwargs["digital_twin_policy_prior_enabled"])
+        self.assertTrue(kwargs["digital_twin_policy_prior_pacing_enabled"])
+        self.assertGreater(kwargs["digital_twin_policy_prior_pacing_fast_scale"], 1.0)
+        self.assertGreater(kwargs["digital_twin_policy_prior_pacing_event_suppression"], 0.0)
+
+    def test_sa_v31_handoff_pacing_prior_boosts_fast_fallback(self) -> None:
+        state = _minimal_semantic_state()
+        state["vehicles"][0]["position_x"] = 9.5
+        state["vehicles"][0]["position_y"] = 0.0
+        state["rsus"][0]["position_x"] = 0.0
+        state["rsus"][0]["position_y"] = 0.0
+        state["rsus"][0]["coverage_radius"] = 10.0
+        base_agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            digital_twin_handoff_fusion_enabled=True,
+            digital_twin_policy_prior_enabled=False,
+        )
+        pacing_agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            digital_twin_handoff_fusion_enabled=True,
+            digital_twin_policy_prior_enabled=True,
+            digital_twin_policy_prior_logit_bias=3.5,
+            digital_twin_policy_prior_pacing_enabled=True,
+            digital_twin_policy_prior_pacing_threshold=0.0,
+            digital_twin_policy_prior_pacing_fast_scale=1.4,
+            digital_twin_policy_prior_pacing_event_suppression=0.8,
+            digital_twin_policy_prior_pacing_slow_suppression=0.7,
+        )
+
+        base_output = base_agent._forward_policy(state)
+        pacing_output = pacing_agent._forward_policy(state)
+        annotation = pacing_agent._build_digital_twin_policy_prior_annotation(state)
+        base_fast_margin = float((base_output["fast_logits"][1] - base_output["fast_logits"][0]).item())
+        pacing_fast_margin = float((pacing_output["fast_logits"][1] - pacing_output["fast_logits"][0]).item())
+        base_event_margin = float((base_output["event_logits"][1] - base_output["event_logits"][0]).item())
+        pacing_event_margin = float((pacing_output["event_logits"][1] - pacing_output["event_logits"][0]).item())
+
+        self.assertTrue(annotation["apply"])
+        self.assertTrue(annotation["pacing_target"])
+        self.assertEqual(annotation["fast_target"], 1)
+        self.assertGreater(pacing_fast_margin, base_fast_margin)
+        self.assertLess(pacing_event_margin, base_event_margin)
+
+    def test_sa_v32_profile_enables_dt_continuation_prior(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v32_dt_continuation_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v32_dt_continuation_mappo")
+        self.assertTrue(kwargs["digital_twin_policy_prior_enabled"])
+        self.assertTrue(kwargs["digital_twin_policy_prior_pacing_enabled"])
+        self.assertTrue(kwargs["digital_twin_policy_prior_env_action_bias_enabled"])
+        self.assertGreater(kwargs["digital_twin_policy_prior_env_action_logit_bias"], 0.0)
+        self.assertGreater(kwargs["digital_twin_policy_prior_continuation_prepare_scale"], 1.0)
+
+    def test_sa_v32_dt_continuation_prior_biases_env_prepare_score(self) -> None:
+        state = _minimal_semantic_state()
+        state["vehicles"][0]["position_x"] = 9.5
+        state["vehicles"][0]["position_y"] = 0.0
+        state["rsus"][0]["position_x"] = 0.0
+        state["rsus"][0]["position_y"] = 0.0
+        state["rsus"][0]["coverage_radius"] = 10.0
+        base_agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            digital_twin_handoff_fusion_enabled=True,
+            digital_twin_policy_prior_enabled=False,
+        )
+        continuation_agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            digital_twin_handoff_fusion_enabled=True,
+            digital_twin_policy_prior_enabled=True,
+            digital_twin_policy_prior_logit_bias=4.0,
+            digital_twin_policy_prior_pacing_enabled=True,
+            digital_twin_policy_prior_pacing_threshold=0.0,
+            digital_twin_policy_prior_env_action_bias_enabled=True,
+            digital_twin_policy_prior_env_action_logit_bias=5.0,
+            digital_twin_policy_prior_continuation_threshold=0.0,
+            digital_twin_policy_prior_continuation_prepare_scale=1.3,
+        )
+        run_metadata = {"window_class": "mechanism_activating"}
+
+        base_output = base_agent._forward_policy(state, run_metadata=run_metadata)
+        continuation_output = continuation_agent._forward_policy(state, run_metadata=run_metadata)
+        annotation = continuation_agent._build_digital_twin_policy_prior_annotation(
+            state,
+            run_metadata=run_metadata,
+        )
+        base_scores = base_agent._hierarchical_env_action_scores(base_output)
+        continuation_scores = continuation_agent._hierarchical_env_action_scores(continuation_output)
+
+        self.assertTrue(annotation["apply"])
+        self.assertTrue(annotation["continuation_target"])
+        self.assertEqual(annotation["env_target"], 4)
+        self.assertIn("env_action_logits_bias", continuation_output)
+        self.assertGreater(float(continuation_output["env_action_logits_bias"][4].item()), 0.0)
+        self.assertGreater(float(continuation_scores[4].item()), float(base_scores[4].item()))
+        self.assertGreater(float(continuation_scores[4].item()), float(continuation_scores[3].item()))
+
+    def test_sa_v33_profile_enables_env_action_ppo(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v33_env_action_ppo_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v33_env_action_ppo_mappo")
+        self.assertTrue(kwargs["env_action_ppo_enabled"])
+        self.assertGreater(kwargs["env_action_ppo_coef"], 0.0)
+        self.assertGreater(kwargs["env_action_ppo_teacher_coef"], 0.0)
+        self.assertTrue(kwargs["counterfactual_teacher_prd_enabled"])
+        self.assertLess(kwargs["digital_twin_policy_prior_env_action_logit_bias"], 4.80)
+
+    def test_sa_v33_env_action_ppo_optimizes_executed_action(self) -> None:
+        state = _minimal_semantic_state()
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            env_action_ppo_enabled=True,
+            env_action_ppo_coef=1.0,
+            env_action_ppo_advantage_blend=0.5,
+            env_action_ppo_teacher_coef=0.0,
+            env_action_ppo_mechanism_focus=0.0,
+        )
+        action_mask = [True, True, True, True, True]
+        policy_output = agent._forward_policy(state)
+        old_log_prob, _, _ = agent._env_action_distribution_statistics(
+            policy_output=policy_output,
+            env_action=4,
+            action_mask=action_mask,
+        )
+
+        loss = agent._compute_env_action_ppo_loss(
+            batch_outputs=[policy_output],
+            batch_action_masks=[action_mask],
+            batch_actions=torch.tensor([4], dtype=torch.long),
+            old_env_action_log_probs=old_log_prob.detach().reshape(1),
+            base_advantage=torch.tensor([1.0], dtype=torch.float32),
+            event_advantage=torch.tensor([1.0], dtype=torch.float32),
+            batch_rows=[{"action": 4, "action_info": {"final_env_action": 4}}],
+        )
+
+        self.assertLess(float(loss.item()), 0.0)
+
+    def test_sa_v34_profile_enables_adaptive_wait_mappo(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v34_adaptive_wait_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v34_adaptive_wait_mappo")
+        self.assertTrue(kwargs["env_action_ppo_enabled"])
+        self.assertTrue(kwargs["digital_twin_policy_prior_adaptive_wait_enabled"])
+        self.assertGreater(kwargs["digital_twin_policy_prior_continuation_wait_scale"], 1.0)
+        self.assertLess(kwargs["digital_twin_policy_prior_continuation_prepare_scale"], 1.0)
+        self.assertGreater(kwargs["env_action_ppo_ratio_barrier_coef"], 0.0)
+
+    def test_sa_v35_profile_relaxes_hard_guards_and_keeps_action_mappo(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v35_guard_relaxed_action_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v35_guard_relaxed_action_mappo")
+
+        self.assertFalse(kwargs["continuity_guard_enabled"])
+        self.assertFalse(kwargs["handoff_target_alignment_guard_enabled"])
+        self.assertFalse(kwargs["backhaul_guard_enabled"])
+        self.assertFalse(kwargs["cache_warm_start_guard_enabled"])
+        self.assertFalse(kwargs["predictive_prefetch_admission_guard_enabled"])
+        self.assertTrue(kwargs["env_action_ppo_enabled"])
+        self.assertTrue(kwargs["digital_twin_policy_prior_adaptive_wait_enabled"])
+        self.assertGreater(kwargs["env_action_ppo_teacher_coef"], 0.60)
+        self.assertGreater(kwargs["env_action_ppo_ratio_barrier_coef"], 0.0)
+        self.assertGreater(kwargs["digital_twin_policy_prior_continuation_wait_scale"], 1.0)
+        self.assertLess(kwargs["digital_twin_policy_prior_continuation_prepare_scale"], 1.0)
+
+    def test_sa_v36_profile_enables_counterfactual_margin_mappo(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v36_counterfactual_margin_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v36_counterfactual_margin_mappo")
+
+        self.assertFalse(kwargs["continuity_guard_enabled"])
+        self.assertTrue(kwargs["env_action_ppo_enabled"])
+        self.assertTrue(kwargs["env_action_counterfactual_margin_enabled"])
+        self.assertGreater(kwargs["env_action_counterfactual_margin_coef"], 0.0)
+        self.assertGreater(kwargs["env_action_ppo_ratio_barrier_coef"], 0.0)
+
+    def test_sa_v37_profile_gates_counterfactual_margin_with_advantage(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v37_advantage_gated_counterfactual_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v37_advantage_gated_counterfactual_mappo")
+
+        self.assertFalse(kwargs["continuity_guard_enabled"])
+        self.assertTrue(kwargs["env_action_ppo_enabled"])
+        self.assertTrue(kwargs["env_action_counterfactual_margin_enabled"])
+        self.assertLess(kwargs["env_action_counterfactual_margin_coef"], 0.10)
+        self.assertGreater(kwargs["env_action_counterfactual_margin_advantage_gate"], 0.0)
+        self.assertGreater(kwargs["env_action_ppo_ratio_barrier_coef"], 0.0)
+
+    def test_sa_v38_profile_uses_undiscounted_dt_prior_mappo(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v38_undiscounted_dt_prior_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        self.assertEqual(defaults["gamma"], 1.0)
+        self.assertEqual(defaults["gae_lambda"], 1.0)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v38_undiscounted_dt_prior_mappo")
+
+        self.assertFalse(kwargs["continuity_guard_enabled"])
+        self.assertTrue(kwargs["env_action_ppo_enabled"])
+        self.assertFalse(kwargs["env_action_counterfactual_margin_enabled"])
+        self.assertGreater(kwargs["digital_twin_policy_prior_distill_coef"], 0.10)
+        self.assertGreater(kwargs["digital_twin_policy_prior_advantage_weight"], 0.70)
+        self.assertGreater(kwargs["env_action_ppo_teacher_coef"], 0.70)
+        self.assertGreater(kwargs["env_action_ppo_ratio_barrier_coef"], 0.0)
+
+    def test_sa_v39_profile_uses_delayed_mechanism_credit_mappo(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v39_delayed_credit_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v39_delayed_credit_mappo")
+
+        self.assertTrue(kwargs["delayed_mechanism_credit_enabled"])
+        self.assertGreater(kwargs["delayed_mechanism_credit_policy_coef"], 0.0)
+        self.assertGreater(kwargs["delayed_mechanism_credit_event_coef"], kwargs["delayed_mechanism_credit_policy_coef"])
+        self.assertEqual(kwargs["delayed_mechanism_credit_horizon"], 5)
+        self.assertLess(kwargs["env_action_ppo_teacher_coef"], 0.60)
+        self.assertFalse(kwargs["env_action_counterfactual_margin_enabled"])
+
+    def test_sa_v40_profile_uses_advantage_weighted_behavior_mappo(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v40_advantage_weighted_behavior_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v40_advantage_weighted_behavior_mappo")
+
+        self.assertTrue(kwargs["advantage_weighted_behavior_regularization_enabled"])
+        self.assertGreater(kwargs["advantage_weighted_behavior_coef"], 0.0)
+        self.assertTrue(kwargs["delayed_mechanism_credit_enabled"])
+        self.assertLess(kwargs["env_action_ppo_teacher_coef"], 0.46)
+        self.assertGreater(kwargs["advantage_weighted_behavior_positive_coef"], 1.0)
+
+    def test_sa_v41_profile_uses_conservative_recovery_mappo(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v41_conservative_recovery_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v41_conservative_recovery_mappo")
+
+        self.assertTrue(kwargs["advantage_weighted_behavior_regularization_enabled"])
+        self.assertGreater(kwargs["advantage_weighted_behavior_coef"], 0.0)
+        self.assertEqual(kwargs["advantage_weighted_behavior_positive_coef"], 0.0)
+        self.assertGreater(kwargs["advantage_weighted_behavior_negative_coef"], 1.0)
+        self.assertTrue(kwargs["delayed_mechanism_credit_enabled"])
+        self.assertLess(kwargs["env_action_ppo_ratio_barrier_margin"], 0.30)
+
+    def test_sa_v36_counterfactual_margin_loss_prefers_local_on_idle_window(self) -> None:
+        state = _minimal_semantic_state()
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            counterfactual_teacher_prd_enabled=True,
+            env_action_counterfactual_margin_enabled=True,
+            env_action_counterfactual_margin_coef=0.22,
+            counterfactual_teacher_local_bonus=0.9,
+            counterfactual_teacher_current_rsu_penalty=0.03,
+            counterfactual_teacher_invalid_mechanism_penalty=0.66,
+        )
+        row = {
+            "action": 3,
+            "decision_info": {
+                "semantic_state": state,
+                "run_metadata": {"window_class": "idle_or_sparse"},
+            },
+            "action_info": {
+                "final_env_action": 3,
+                "prepare_window_score": 0.05,
+                "temporal_urgency": 0.05,
+                "prediction_confidence": 0.2,
+            },
+        }
+        policy_output = agent._forward_policy(state, run_metadata={"window_class": "idle_or_sparse"})
+        action_mask = [True, True, True, True, True]
+
+        loss = agent._compute_env_action_counterfactual_margin_loss(
+            batch_outputs=[policy_output],
+            batch_action_masks=[action_mask],
+            batch_rows=[row],
+        )
+
+        self.assertGreater(float(loss.item()), 0.0)
+        self.assertGreater(
+            agent._counterfactual_teacher_action_credit(row, 2),
+            agent._counterfactual_teacher_action_credit(row, 3),
+        )
+
+    def test_sa_v37_counterfactual_margin_loss_skips_negative_advantage(self) -> None:
+        state = _minimal_semantic_state()
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            counterfactual_teacher_prd_enabled=True,
+            env_action_counterfactual_margin_enabled=True,
+            env_action_counterfactual_margin_coef=0.055,
+            env_action_counterfactual_margin_advantage_gate=0.12,
+            env_action_counterfactual_margin_advantage_blend=0.70,
+            counterfactual_teacher_local_bonus=0.9,
+            counterfactual_teacher_current_rsu_penalty=0.03,
+            counterfactual_teacher_invalid_mechanism_penalty=0.66,
+        )
+        row = {
+            "action": 3,
+            "decision_info": {
+                "semantic_state": state,
+                "run_metadata": {"window_class": "idle_or_sparse"},
+            },
+            "action_info": {
+                "final_env_action": 3,
+                "prepare_window_score": 0.05,
+                "temporal_urgency": 0.05,
+                "prediction_confidence": 0.2,
+            },
+        }
+        policy_output = agent._forward_policy(state, run_metadata={"window_class": "idle_or_sparse"})
+        action_mask = [True, True, True, True, True]
+
+        loss = agent._compute_env_action_counterfactual_margin_loss(
+            batch_outputs=[policy_output],
+            batch_action_masks=[action_mask],
+            batch_rows=[row],
+            base_advantage=torch.tensor([-0.5]),
+            event_advantage=torch.tensor([-0.2]),
+        )
+
+        self.assertEqual(float(loss.item()), 0.0)
+
+    def test_sa_v39_delayed_credit_propagates_future_ready_to_prepare(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            delayed_mechanism_credit_enabled=True,
+            delayed_mechanism_credit_horizon=3,
+            delayed_mechanism_credit_decay=0.7,
+            delayed_mechanism_credit_ready_bonus=1.2,
+            delayed_mechanism_credit_success_bonus=0.8,
+            delayed_mechanism_credit_failure_penalty=0.9,
+            delayed_mechanism_credit_stale_penalty=0.0,
+        )
+        rollout = [
+            {
+                "action": 4,
+                "terminated": False,
+                "truncated": False,
+                "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+                "action_info": {
+                    "final_env_action": 4,
+                    "head_actions": {"event": 1, "slow": 0, "fast": 0},
+                    "prepare_window_score": 0.8,
+                    "temporal_urgency": 0.7,
+                    "prediction_confidence": 0.8,
+                    "gate_pass": True,
+                },
+                "env_info": {"metrics_protocol": {"predicted_handoff_signal": True}},
+            },
+            {
+                "action": 3,
+                "terminated": False,
+                "truncated": False,
+                "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+                "action_info": {
+                    "final_env_action": 3,
+                    "head_actions": {"event": 0, "slow": 0, "fast": 1},
+                    "prepare_window_score": 0.4,
+                    "temporal_urgency": 0.6,
+                    "prediction_confidence": 0.8,
+                },
+                "env_info": {"metrics_protocol": {"predicted_handoff_signal": True}},
+            },
+            {
+                "action": 3,
+                "terminated": True,
+                "truncated": False,
+                "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+                "action_info": {
+                    "final_env_action": 3,
+                    "head_actions": {"event": 0, "slow": 0, "fast": 1},
+                },
+                "env_info": {
+                    "metrics_protocol": {
+                        "handoff_ready": True,
+                        "mechanism_success_strict": True,
+                        "handoff_event_count": 1,
+                    }
+                },
+            },
+        ]
+
+        credits = agent._delayed_mechanism_credit_values(rollout)
+
+        self.assertGreater(float(credits[0]), 0.0)
+        self.assertGreater(float(credits[0]), float(credits[1]))
+
+    def test_sa_v40_advantage_weighted_behavior_keeps_positive_deviation(self) -> None:
+        state = _minimal_semantic_state()
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            advantage_weighted_behavior_regularization_enabled=True,
+            advantage_weighted_behavior_coef=0.24,
+            advantage_weighted_behavior_positive_gate=0.08,
+            advantage_weighted_behavior_negative_gate=0.04,
+        )
+        row = {
+            "action": 4,
+            "decision_info": {
+                "semantic_state": state,
+                "action_mask": [True, True, True, True, True],
+                "run_metadata": {"window_class": "mechanism_activating"},
+            },
+            "action_info": {"final_env_action": 4},
+            "env_info": {"metrics_protocol": {"predicted_handoff_signal": True}},
+        }
+
+        stats = agent._annotate_advantage_weighted_behavior_targets(
+            [row],
+            advantage_values=torch.tensor([0.6]).numpy(),
+        )
+        policy_output = agent._forward_policy(state, run_metadata={"window_class": "mechanism_activating"})
+        loss = agent._compute_advantage_weighted_behavior_loss(
+            batch_outputs=[policy_output],
+            batch_action_masks=[[True, True, True, True, True]],
+            batch_rows=[row],
+        )
+
+        self.assertEqual(stats["positive_count"], 1)
+        self.assertEqual(row["advantage_weighted_behavior_mode"], "positive_deviation")
+        self.assertEqual(row["advantage_weighted_behavior_target_action"], 4)
+        self.assertGreater(float(loss.item()), 0.0)
+
+    def test_sa_v40_advantage_weighted_behavior_recovers_negative_deviation(self) -> None:
+        state = _minimal_semantic_state()
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            advantage_weighted_behavior_regularization_enabled=True,
+            advantage_weighted_behavior_coef=0.24,
+            advantage_weighted_behavior_positive_gate=0.08,
+            advantage_weighted_behavior_negative_gate=0.04,
+        )
+        row = {
+            "action": 4,
+            "decision_info": {
+                "semantic_state": state,
+                "action_mask": [True, True, True, True, True],
+                "run_metadata": {"window_class": "mechanism_activating"},
+            },
+            "action_info": {"final_env_action": 4},
+            "env_info": {"metrics_protocol": {"predicted_handoff_signal": True}},
+        }
+
+        stats = agent._annotate_advantage_weighted_behavior_targets(
+            [row],
+            advantage_values=torch.tensor([-0.6]).numpy(),
+        )
+
+        self.assertEqual(stats["negative_count"], 1)
+        self.assertEqual(row["advantage_weighted_behavior_mode"], "negative_recovery")
+        self.assertEqual(row["advantage_weighted_behavior_target_action"], 0)
+
+    def test_sa_v34_adaptive_wait_prior_prefers_local_when_target_ready(self) -> None:
+        state = _minimal_semantic_state()
+        state["rsus"][1]["cached_adapter_ids"] = ["adapter_tracking"]
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            digital_twin_policy_prior_enabled=True,
+            digital_twin_policy_prior_logit_bias=5.0,
+            digital_twin_policy_prior_env_action_bias_enabled=True,
+            digital_twin_policy_prior_env_action_logit_bias=5.0,
+            digital_twin_policy_prior_continuation_threshold=0.0,
+            digital_twin_policy_prior_continuation_prepare_scale=0.8,
+            digital_twin_policy_prior_continuation_wait_scale=1.5,
+            digital_twin_policy_prior_adaptive_wait_enabled=True,
+            digital_twin_policy_prior_wait_ready_threshold=0.5,
+            digital_twin_policy_prior_wait_timing_ceiling=1.0,
+            digital_twin_policy_prior_wait_cache_ready_scale=1.4,
+            counterfactual_teacher_prd_enabled=True,
+            counterfactual_teacher_local_bonus=0.6,
+            counterfactual_teacher_invalid_mechanism_penalty=0.7,
+        )
+        run_metadata = {"window_class": "mechanism_activating"}
+
+        annotation = agent._build_digital_twin_policy_prior_annotation(
+            state,
+            run_metadata=run_metadata,
+        )
+        policy_output = agent._forward_policy(state, run_metadata=run_metadata)
+        scores = agent._hierarchical_env_action_scores(policy_output)
+        wait_bias = policy_output["env_action_logits_bias"]
+        row = {
+            "decision_info": {
+                "semantic_state": state,
+                "run_metadata": run_metadata,
+            },
+            "action_info": {
+                "prepare_window_score": 0.05,
+                "temporal_urgency": 0.05,
+                "prediction_confidence": 0.8,
+                "gate_pass": True,
+                "predicted_handoff_target_valid": True,
+            },
+        }
+        local_credit = agent._counterfactual_teacher_action_credit(row, 2)
+        prepare_credit = agent._counterfactual_teacher_action_credit(row, 4)
+
+        self.assertTrue(annotation["apply"])
+        self.assertTrue(annotation["adaptive_wait_preferred"])
+        self.assertTrue(annotation["continuation_wait_target"])
+        self.assertEqual(annotation["env_target"], 2)
+        self.assertGreater(float(wait_bias[2].item()), float(wait_bias[4].item()))
+        self.assertGreater(float(scores[2].item()), float(scores[4].item()))
+        self.assertGreater(local_credit, 0.0)
+        self.assertGreater(local_credit, prepare_credit)
+
     def test_sa_v14_net_utility_option_terminates_idle_no_rsu_prefetch(self) -> None:
         agent = build_agent(
             "sa_ghmappo",
@@ -1706,6 +2511,38 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         targets = agent._build_mechanism_targets(state)
 
         self.assertEqual(targets["slow_target"], 2)
+
+    def test_top_journal_mechanism_aux_guides_cached_handoff_migration_prepare(self) -> None:
+        state = _minimal_semantic_state()
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["rsus"][1]["cached_adapter_ids"] = ["adapter_tracking"]
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=1,
+            mechanism_aux_coef=0.1,
+            mechanism_aux_current_cache_fill_enabled=False,
+        )
+
+        annotation = agent._build_mechanism_guidance_annotation(
+            state,
+            {
+                "action_info": {
+                    "prediction_state_available": True,
+                    "raw_handoff_candidate": True,
+                    "predicted_handoff_target_valid": True,
+                    "next_rsu_non_null_count": 1,
+                    "gate_pass": True,
+                    "prepare_window_score": 0.8,
+                    "temporal_urgency": 0.7,
+                    "prediction_confidence": 0.9,
+                }
+            },
+        )
+
+        self.assertTrue(annotation["apply"])
+        self.assertTrue(annotation["event_guidance"])
+        self.assertFalse(annotation["prefetch_guidance"])
+        self.assertTrue(annotation["cache_ready"])
 
     def test_latency_fallback_bias_targets_fast_head_only_when_low_risk_and_warm(self) -> None:
         state = _minimal_semantic_state()

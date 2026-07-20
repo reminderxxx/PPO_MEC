@@ -1,0 +1,45 @@
+profile: top_journal_mechanism_v34_adaptive_wait_mappo
+purpose: >
+  Extend v33 with state-aware adaptive wait/local action credit. The goal is to
+  let SA-GHMAPPO learn when a handoff/cache mechanism window should prepare
+  migration and when the target or current service state is already ready enough
+  to prefer the fast local/wait semantic action.
+algorithmic_delta:
+  base_profile: top_journal_mechanism_v33_env_action_ppo_mappo
+  reward_function_changed: false
+  environment_contract_changed: false
+  baseline_contract_changed: false
+  deterministic_action_wrapper_changed: false
+  evaluation_wrapper_changed: false
+  digital_twin_policy_prior_adaptive_wait_enabled: true
+  digital_twin_policy_prior_wait_ready_threshold: 0.50
+  digital_twin_policy_prior_wait_timing_ceiling: 0.58
+  digital_twin_policy_prior_wait_cache_ready_scale: 1.42
+  digital_twin_policy_prior_prepare_not_ready_scale: 0.92
+  env_action_ppo_enabled: true
+  env_action_ppo_coef: 0.82
+  env_action_ppo_teacher_coef: 0.48
+  env_action_ppo_ratio_barrier_coef: 0.045
+  env_action_ppo_ratio_barrier_margin: 0.32
+  counterfactual_teacher_prd_enabled: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+segmented_strict_protocol:
+  required_window_plan_root: configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719
+  protocol_version: strict_split_v3_segmented_executable_handoff_20260719
+  max_mobility_rows: 5000000
+  window_scan_stride: 8
+evaluation:
+  split_policy: train_dev_formal_then_one_time_hidden_after_candidate_freeze
+  hidden_holdout_for_selection: prohibited
+notes:
+  - Adaptive wait is policy-side credit assignment, not an evaluator override.
+    It uses only semantic state, prediction/cache readiness, and timing features
+    available to the agent at decision time.
+  - The action-level ratio barrier is a conservative PPO stabilizer for the
+    final five-way semantic action; it does not change rewards, masks,
+    transition dynamics, or baseline implementations.

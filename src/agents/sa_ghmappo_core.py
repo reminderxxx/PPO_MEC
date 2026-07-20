@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import random
 from pathlib import Path
 from statistics import fmean
@@ -87,6 +88,87 @@ def _clamp01(value: float) -> float:
     return max(0.0, min(float(value), 1.0))
 
 
+def _rsu_by_id_from_semantic_state(semantic_state: dict[str, Any], rsu_id: Any) -> dict[str, Any]:
+    for rsu in semantic_state.get("rsus", []) or []:
+        if str(rsu.get("rsu_id")) == str(rsu_id):
+            return dict(rsu)
+    return {}
+
+
+def _build_digital_twin_handoff_feature_tensor(semantic_state: dict[str, Any]) -> torch.Tensor:
+    primary_vehicle, _ = _resolve_primary_vehicle_from_semantic_state(semantic_state)
+    vehicle_id = str(primary_vehicle.get("vehicle_id", ""))
+    current_rsu_id = primary_vehicle.get("associated_rsu_id")
+    predictions = semantic_state.get("predictions", {}) or {}
+    next_sequence = list(predictions.get("next_rsu_sequence", {}).get(vehicle_id, []) or [])
+    predicted_next_rsu_id = predictions.get("predicted_next_rsu_by_vehicle", {}).get(vehicle_id)
+    if predicted_next_rsu_id is None and next_sequence:
+        predicted_next_rsu_id = next_sequence[0]
+    predicted_target_rsu_id = predictions.get("predicted_first_handoff_rsu_by_vehicle", {}).get(vehicle_id)
+    confidence = _clamp01(float(predictions.get("prediction_confidence_by_vehicle", {}).get(vehicle_id, 0.0) or 0.0))
+    uncertainty = _clamp01(float(predictions.get("prediction_uncertainty_by_vehicle", {}).get(vehicle_id, 1.0) or 1.0))
+    dwell_time = float(predictions.get("dwell_time", {}).get(vehicle_id, 0.0) or 0.0)
+
+    horizon = max(len(next_sequence), 1)
+    non_current_eta = horizon + 1
+    non_current_count = 0
+    unique_future_rsus: set[str] = set()
+    switch_count = 0
+    previous_rsu_id = current_rsu_id
+    for index, rsu_id in enumerate(next_sequence, start=1):
+        if rsu_id is None:
+            continue
+        unique_future_rsus.add(str(rsu_id))
+        if str(rsu_id) != str(current_rsu_id):
+            non_current_count += 1
+            non_current_eta = min(non_current_eta, index)
+        if previous_rsu_id is not None and str(rsu_id) != str(previous_rsu_id):
+            switch_count += 1
+        previous_rsu_id = rsu_id
+
+    current_rsu = _rsu_by_id_from_semantic_state(semantic_state, current_rsu_id)
+    coverage_radius = max(float(current_rsu.get("coverage_radius", 0.0) or 0.0), 1.0)
+    dx = float(primary_vehicle.get("position_x", 0.0) or 0.0) - float(
+        current_rsu.get("position_x", primary_vehicle.get("position_x", 0.0)) or 0.0
+    )
+    dy = float(primary_vehicle.get("position_y", 0.0) or 0.0) - float(
+        current_rsu.get("position_y", primary_vehicle.get("position_y", 0.0)) or 0.0
+    )
+    distance = math.sqrt(dx * dx + dy * dy) if current_rsu else 0.0
+    boundary_urgency = 1.0 - _clamp01(max(coverage_radius - distance, 0.0) / coverage_radius) if current_rsu else 0.0
+
+    current_node = semantic_state.get("current_workflow_node") or {}
+    service_steps_remaining = float(semantic_state.get("current_node_service_steps_remaining", 0.0) or 0.0)
+    service_pressure = _clamp01(service_steps_remaining / float(max(non_current_eta, 1)))
+    future_load = predictions.get("future_load", {}) if isinstance(predictions, dict) else {}
+    current_load = float(future_load.get(current_rsu_id, 0.0) or 0.0)
+    target_load = float(future_load.get(predicted_target_rsu_id, 0.0) or 0.0)
+    predicted_load = float(future_load.get(predicted_next_rsu_id, 0.0) or 0.0)
+    load_pressure = _clamp01(max(target_load, predicted_load, current_load) / 10.0)
+    load_gap_pressure = _clamp01(max(target_load - current_load, predicted_load - current_load, 0.0) / 10.0)
+
+    has_prediction = bool(predicted_next_rsu_id or predicted_target_rsu_id or next_sequence)
+    target_differs = bool(predicted_target_rsu_id and str(predicted_target_rsu_id) != str(current_rsu_id))
+    next_differs = bool(predicted_next_rsu_id and str(predicted_next_rsu_id) != str(current_rsu_id))
+    features = [
+        1.0 if has_prediction else 0.0,
+        1.0 if next_differs else 0.0,
+        1.0 if target_differs else 0.0,
+        confidence,
+        uncertainty,
+        _clamp01(dwell_time / 20.0),
+        _clamp01(float(horizon) / 10.0),
+        _clamp01(float(switch_count) / float(horizon)),
+        _clamp01(float(len(unique_future_rsus)) / max(float(len(semantic_state.get("rsus", []) or [])), 1.0)),
+        _clamp01(float(non_current_count) / float(horizon)),
+        _clamp01(float(non_current_eta) / float(horizon + 1)),
+        boundary_urgency,
+        service_pressure,
+        load_gap_pressure if current_node else load_pressure,
+    ]
+    return torch.tensor([_clamp01(item) for item in features], dtype=torch.float32)
+
+
 class _多层感知机(nn.Module):
     """轻量 MLP。"""
 
@@ -124,6 +206,11 @@ class 分层策略网络(nn.Module):
         event_logit_temperature: float = 1.0,
         option_gate_enabled: bool = False,
         option_gate_count: int = 4,
+        digital_twin_handoff_fusion_enabled: bool = False,
+        digital_twin_handoff_slow_scale: float = 0.35,
+        digital_twin_handoff_fast_scale: float = 0.45,
+        digital_twin_handoff_event_scale: float = 0.85,
+        digital_twin_handoff_critic_scale: float = 0.70,
         hidden_dims: tuple[int, int] = (64, 64),
     ) -> None:
         super().__init__()
@@ -135,6 +222,11 @@ class 分层策略网络(nn.Module):
         self.event_logit_temperature = max(float(event_logit_temperature), 0.25)
         self.option_gate_enabled = bool(option_gate_enabled)
         self.option_gate_count = max(int(option_gate_count), 1)
+        self.digital_twin_handoff_fusion_enabled = bool(digital_twin_handoff_fusion_enabled)
+        self.digital_twin_handoff_slow_scale = max(float(digital_twin_handoff_slow_scale), 0.0)
+        self.digital_twin_handoff_fast_scale = max(float(digital_twin_handoff_fast_scale), 0.0)
+        self.digital_twin_handoff_event_scale = max(float(digital_twin_handoff_event_scale), 0.0)
+        self.digital_twin_handoff_critic_scale = max(float(digital_twin_handoff_critic_scale), 0.0)
 
         if self.encoder_kind == "flat":
             self.encoder = FlatSemanticEncoder(hidden_dim=self.hidden_dim)
@@ -169,6 +261,17 @@ class 分层策略网络(nn.Module):
             self.flat_critic = _多层感知机(self.hidden_dim, 1, hidden_dims=hidden_dims)
         if self.option_gate_enabled:
             self.option_actor = _多层感知机(self.hidden_dim, self.option_gate_count, hidden_dims=hidden_dims)
+        if self.digital_twin_handoff_fusion_enabled:
+            self.dt_handoff_projection = nn.Sequential(
+                nn.Linear(14, self.hidden_dim),
+                nn.Tanh(),
+                nn.Linear(self.hidden_dim, self.hidden_dim),
+                nn.Tanh(),
+            )
+            self.dt_slow_norm = nn.LayerNorm(self.hidden_dim)
+            self.dt_fast_norm = nn.LayerNorm(self.hidden_dim)
+            self.dt_event_norm = nn.LayerNorm(self.hidden_dim)
+            self.dt_critic_norm = nn.LayerNorm(self.hidden_dim)
 
     def forward_single(
         self,
@@ -180,6 +283,31 @@ class 分层策略网络(nn.Module):
             float(self.event_logit_temperature if event_logit_temperature is None else event_logit_temperature),
             0.25,
         )
+        if self.digital_twin_handoff_fusion_enabled:
+            dt_features = _build_digital_twin_handoff_feature_tensor(semantic_state).to(
+                device=encoded["shared_embedding"].device,
+                dtype=encoded["shared_embedding"].dtype,
+            )
+            dt_embedding = self.dt_handoff_projection(dt_features.unsqueeze(0)).squeeze(0)
+            encoded = dict(encoded)
+            encoded["slow_context"] = self.dt_slow_norm(
+                encoded["slow_context"] + self.digital_twin_handoff_slow_scale * dt_embedding
+            )
+            encoded["fast_context"] = self.dt_fast_norm(
+                encoded["fast_context"] + self.digital_twin_handoff_fast_scale * dt_embedding
+            )
+            encoded["event_context"] = self.dt_event_norm(
+                encoded["event_context"] + self.digital_twin_handoff_event_scale * dt_embedding
+            )
+            for critic_key in ["critic_context", "centralized_critic_context"]:
+                if critic_key in encoded:
+                    encoded[critic_key] = self.dt_critic_norm(
+                        encoded[critic_key] + self.digital_twin_handoff_critic_scale * dt_embedding
+                    )
+            encoded["digital_twin_handoff_fusion_enabled"] = torch.tensor([1.0], dtype=dt_features.dtype, device=dt_features.device)
+            encoded["digital_twin_handoff_target_differs"] = dt_features[2:3]
+            encoded["digital_twin_handoff_boundary_urgency"] = dt_features[11:12]
+            encoded["digital_twin_handoff_service_pressure"] = dt_features[12:13]
         if not self.use_hierarchy:
             flat_logits = self.flat_actor(encoded["shared_embedding"].unsqueeze(0)).squeeze(0)
             critic_context_key = "centralized_critic_context" if self.centralized_critic else "critic_context"
@@ -343,6 +471,14 @@ class 分层PPO基类(BaseAgent):
         heuristic_imitation_coef: float = 0.0,
         heuristic_imitation_warmup_updates: int = 2,
         heuristic_imitation_decay: float = 0.5,
+        conservative_imitation_enabled: bool = False,
+        conservative_imitation_reward_quantile: float = 0.35,
+        conservative_imitation_min_weight: float = 0.10,
+        conservative_imitation_max_weight: float = 1.60,
+        conservative_imitation_shortfall_coef: float = 0.90,
+        conservative_imitation_failure_coef: float = 0.65,
+        conservative_imitation_mismatch_coef: float = 0.25,
+        conservative_imitation_success_decay: float = 0.30,
         mechanism_aux_coef: float = 0.0,
         mechanism_window_weight: float = 1.0,
         prepare_action_prior_weight: float = 0.5,
@@ -352,9 +488,93 @@ class 分层PPO基类(BaseAgent):
         mechanism_window_weight_floor_after_update: float = 1.0,
         mechanism_entropy_floor_after_update: float = 0.0,
         mechanism_aux_current_cache_fill_enabled: bool = True,
+        mechanism_credit_prd_enabled: bool = False,
+        mechanism_credit_policy_coef: float = 0.0,
+        mechanism_credit_event_coef: float = 0.0,
+        mechanism_credit_option_coef: float = 0.0,
+        mechanism_credit_clip: float = 2.0,
+        mechanism_credit_success_bonus: float = 1.0,
+        mechanism_credit_prepare_bonus: float = 0.45,
+        mechanism_credit_ready_bonus: float = 0.75,
+        mechanism_credit_prefetch_hit_bonus: float = 0.55,
+        mechanism_credit_miss_penalty: float = 0.55,
+        mechanism_credit_false_positive_penalty: float = 0.35,
+        mechanism_credit_min_context: float = 0.15,
+        mechanism_focal_aux_enabled: bool = False,
+        mechanism_focal_gamma: float = 1.5,
+        digital_twin_handoff_fusion_enabled: bool = False,
+        digital_twin_handoff_slow_scale: float = 0.35,
+        digital_twin_handoff_fast_scale: float = 0.45,
+        digital_twin_handoff_event_scale: float = 0.85,
+        digital_twin_handoff_critic_scale: float = 0.70,
+        digital_twin_policy_prior_enabled: bool = False,
+        digital_twin_policy_prior_logit_bias: float = 0.0,
+        digital_twin_policy_prior_event_scale: float = 1.0,
+        digital_twin_policy_prior_slow_scale: float = 0.75,
+        digital_twin_policy_prior_fast_scale: float = 0.25,
+        digital_twin_policy_prior_prepare_threshold: float = 0.20,
+        digital_twin_policy_prior_prefetch_threshold: float = 0.22,
+        digital_twin_policy_prior_confidence_floor: float = 0.12,
+        digital_twin_policy_prior_distill_coef: float = 0.0,
+        digital_twin_policy_prior_distill_warmup_updates: int = 0,
+        digital_twin_policy_prior_distill_decay: float = 0.90,
+        digital_twin_policy_prior_advantage_weight: float = 0.35,
+        digital_twin_policy_prior_max_weight: float = 2.0,
+        digital_twin_policy_prior_pacing_enabled: bool = False,
+        digital_twin_policy_prior_pacing_threshold: float = 0.55,
+        digital_twin_policy_prior_pacing_fast_scale: float = 1.0,
+        digital_twin_policy_prior_pacing_event_suppression: float = 0.45,
+        digital_twin_policy_prior_pacing_slow_suppression: float = 0.35,
+        digital_twin_policy_prior_pacing_short_dag_threshold: int = 9,
+        digital_twin_policy_prior_env_action_bias_enabled: bool = False,
+        digital_twin_policy_prior_env_action_logit_bias: float = 0.0,
+        digital_twin_policy_prior_continuation_threshold: float = 0.55,
+        digital_twin_policy_prior_continuation_prepare_scale: float = 1.0,
+        digital_twin_policy_prior_continuation_wait_scale: float = 0.75,
+        digital_twin_policy_prior_continuation_steady_suppression: float = 0.30,
+        digital_twin_policy_prior_adaptive_wait_enabled: bool = False,
+        digital_twin_policy_prior_wait_ready_threshold: float = 0.55,
+        digital_twin_policy_prior_wait_timing_ceiling: float = 0.38,
+        digital_twin_policy_prior_wait_cache_ready_scale: float = 1.15,
+        digital_twin_policy_prior_prepare_not_ready_scale: float = 1.0,
+        env_action_ppo_enabled: bool = False,
+        env_action_ppo_coef: float = 0.0,
+        env_action_ppo_advantage_blend: float = 0.65,
+        env_action_ppo_teacher_coef: float = 0.0,
+        env_action_ppo_mechanism_focus: float = 0.0,
+        env_action_ppo_max_weight: float = 2.50,
+        env_action_ppo_ratio_barrier_coef: float = 0.0,
+        env_action_ppo_ratio_barrier_margin: float = 0.35,
+        env_action_counterfactual_margin_enabled: bool = False,
+        env_action_counterfactual_margin_coef: float = 0.0,
+        env_action_counterfactual_margin_min_gap: float = 0.05,
+        env_action_counterfactual_margin_max_weight: float = 2.0,
+        env_action_counterfactual_margin_advantage_gate: float = 0.0,
+        env_action_counterfactual_margin_advantage_blend: float = 0.5,
         event_prd_advantage_enabled: bool = False,
         event_prd_advantage_coef: float = 0.0,
         event_prd_advantage_clip: float = 2.0,
+        delayed_mechanism_credit_enabled: bool = False,
+        delayed_mechanism_credit_policy_coef: float = 0.0,
+        delayed_mechanism_credit_event_coef: float = 0.0,
+        delayed_mechanism_credit_horizon: int = 4,
+        delayed_mechanism_credit_decay: float = 0.70,
+        delayed_mechanism_credit_clip: float = 2.0,
+        delayed_mechanism_credit_ready_bonus: float = 1.20,
+        delayed_mechanism_credit_success_bonus: float = 0.80,
+        delayed_mechanism_credit_failure_penalty: float = 0.90,
+        delayed_mechanism_credit_missed_prepare_scale: float = 0.55,
+        delayed_mechanism_credit_stale_penalty: float = 0.35,
+        delayed_mechanism_credit_context_gate: float = 0.25,
+        advantage_weighted_behavior_regularization_enabled: bool = False,
+        advantage_weighted_behavior_coef: float = 0.0,
+        advantage_weighted_behavior_positive_coef: float = 1.0,
+        advantage_weighted_behavior_negative_coef: float = 0.85,
+        advantage_weighted_behavior_temperature: float = 0.75,
+        advantage_weighted_behavior_max_weight: float = 2.0,
+        advantage_weighted_behavior_positive_gate: float = 0.10,
+        advantage_weighted_behavior_negative_gate: float = 0.05,
+        advantage_weighted_behavior_mechanism_scale: float = 1.25,
         latency_fallback_bias_enabled: bool = False,
         latency_fallback_bias_strength: float = 0.0,
         latency_fallback_confidence_floor: float = 0.0,
@@ -604,6 +824,26 @@ class 分层PPO基类(BaseAgent):
         self._heuristic_imitation_coef = max(float(heuristic_imitation_coef), 0.0)
         self._heuristic_imitation_warmup_updates = max(int(heuristic_imitation_warmup_updates), 0)
         self._heuristic_imitation_decay = max(float(heuristic_imitation_decay), 0.0)
+        self._conservative_imitation_enabled = bool(conservative_imitation_enabled)
+        self._conservative_imitation_reward_quantile = max(
+            0.0,
+            min(float(conservative_imitation_reward_quantile), 1.0),
+        )
+        self._conservative_imitation_min_weight = max(float(conservative_imitation_min_weight), 0.0)
+        self._conservative_imitation_max_weight = max(
+            float(conservative_imitation_max_weight),
+            self._conservative_imitation_min_weight,
+        )
+        self._conservative_imitation_shortfall_coef = max(
+            float(conservative_imitation_shortfall_coef),
+            0.0,
+        )
+        self._conservative_imitation_failure_coef = max(float(conservative_imitation_failure_coef), 0.0)
+        self._conservative_imitation_mismatch_coef = max(float(conservative_imitation_mismatch_coef), 0.0)
+        self._conservative_imitation_success_decay = max(
+            0.0,
+            min(float(conservative_imitation_success_decay), 1.0),
+        )
         self._mechanism_aux_coef = max(float(mechanism_aux_coef), 0.0)
         self._mechanism_window_weight = max(float(mechanism_window_weight), 1.0)
         self._prepare_action_prior_weight = max(float(prepare_action_prior_weight), 0.0)
@@ -616,9 +856,207 @@ class 分层PPO基类(BaseAgent):
         )
         self._mechanism_entropy_floor_after_update = max(float(mechanism_entropy_floor_after_update), 0.0)
         self._mechanism_aux_current_cache_fill_enabled = bool(mechanism_aux_current_cache_fill_enabled)
+        self._mechanism_credit_prd_enabled = bool(mechanism_credit_prd_enabled)
+        self._mechanism_credit_policy_coef = max(float(mechanism_credit_policy_coef), 0.0)
+        self._mechanism_credit_event_coef = max(float(mechanism_credit_event_coef), 0.0)
+        self._mechanism_credit_option_coef = max(float(mechanism_credit_option_coef), 0.0)
+        self._mechanism_credit_clip = max(float(mechanism_credit_clip), 0.0)
+        self._mechanism_credit_success_bonus = max(float(mechanism_credit_success_bonus), 0.0)
+        self._mechanism_credit_prepare_bonus = max(float(mechanism_credit_prepare_bonus), 0.0)
+        self._mechanism_credit_ready_bonus = max(float(mechanism_credit_ready_bonus), 0.0)
+        self._mechanism_credit_prefetch_hit_bonus = max(float(mechanism_credit_prefetch_hit_bonus), 0.0)
+        self._mechanism_credit_miss_penalty = max(float(mechanism_credit_miss_penalty), 0.0)
+        self._mechanism_credit_false_positive_penalty = max(float(mechanism_credit_false_positive_penalty), 0.0)
+        self._mechanism_credit_min_context = max(
+            0.0,
+            min(float(mechanism_credit_min_context), 1.0),
+        )
+        self._mechanism_focal_aux_enabled = bool(mechanism_focal_aux_enabled)
+        self._mechanism_focal_gamma = max(float(mechanism_focal_gamma), 0.0)
+        self._digital_twin_handoff_fusion_enabled = bool(digital_twin_handoff_fusion_enabled)
+        self._digital_twin_handoff_slow_scale = max(float(digital_twin_handoff_slow_scale), 0.0)
+        self._digital_twin_handoff_fast_scale = max(float(digital_twin_handoff_fast_scale), 0.0)
+        self._digital_twin_handoff_event_scale = max(float(digital_twin_handoff_event_scale), 0.0)
+        self._digital_twin_handoff_critic_scale = max(float(digital_twin_handoff_critic_scale), 0.0)
+        self._digital_twin_policy_prior_enabled = bool(digital_twin_policy_prior_enabled)
+        self._digital_twin_policy_prior_logit_bias = max(float(digital_twin_policy_prior_logit_bias), 0.0)
+        self._digital_twin_policy_prior_event_scale = max(float(digital_twin_policy_prior_event_scale), 0.0)
+        self._digital_twin_policy_prior_slow_scale = max(float(digital_twin_policy_prior_slow_scale), 0.0)
+        self._digital_twin_policy_prior_fast_scale = max(float(digital_twin_policy_prior_fast_scale), 0.0)
+        self._digital_twin_policy_prior_prepare_threshold = max(
+            0.0,
+            min(float(digital_twin_policy_prior_prepare_threshold), 1.0),
+        )
+        self._digital_twin_policy_prior_prefetch_threshold = max(
+            0.0,
+            min(float(digital_twin_policy_prior_prefetch_threshold), 1.0),
+        )
+        self._digital_twin_policy_prior_confidence_floor = max(
+            0.0,
+            min(float(digital_twin_policy_prior_confidence_floor), 1.0),
+        )
+        self._digital_twin_policy_prior_distill_coef = max(
+            float(digital_twin_policy_prior_distill_coef),
+            0.0,
+        )
+        self._digital_twin_policy_prior_distill_warmup_updates = max(
+            int(digital_twin_policy_prior_distill_warmup_updates),
+            0,
+        )
+        self._digital_twin_policy_prior_distill_decay = max(
+            float(digital_twin_policy_prior_distill_decay),
+            0.0,
+        )
+        self._digital_twin_policy_prior_advantage_weight = max(
+            float(digital_twin_policy_prior_advantage_weight),
+            0.0,
+        )
+        self._digital_twin_policy_prior_max_weight = max(
+            float(digital_twin_policy_prior_max_weight),
+            0.0,
+        )
+        self._digital_twin_policy_prior_pacing_enabled = bool(digital_twin_policy_prior_pacing_enabled)
+        self._digital_twin_policy_prior_pacing_threshold = max(
+            0.0,
+            min(float(digital_twin_policy_prior_pacing_threshold), 1.0),
+        )
+        self._digital_twin_policy_prior_pacing_fast_scale = max(
+            float(digital_twin_policy_prior_pacing_fast_scale),
+            0.0,
+        )
+        self._digital_twin_policy_prior_pacing_event_suppression = max(
+            float(digital_twin_policy_prior_pacing_event_suppression),
+            0.0,
+        )
+        self._digital_twin_policy_prior_pacing_slow_suppression = max(
+            float(digital_twin_policy_prior_pacing_slow_suppression),
+            0.0,
+        )
+        self._digital_twin_policy_prior_pacing_short_dag_threshold = max(
+            int(digital_twin_policy_prior_pacing_short_dag_threshold),
+            1,
+        )
+        self._digital_twin_policy_prior_env_action_bias_enabled = bool(
+            digital_twin_policy_prior_env_action_bias_enabled
+        )
+        self._digital_twin_policy_prior_env_action_logit_bias = max(
+            float(digital_twin_policy_prior_env_action_logit_bias),
+            0.0,
+        )
+        self._digital_twin_policy_prior_continuation_threshold = max(
+            0.0,
+            min(float(digital_twin_policy_prior_continuation_threshold), 1.0),
+        )
+        self._digital_twin_policy_prior_continuation_prepare_scale = max(
+            float(digital_twin_policy_prior_continuation_prepare_scale),
+            0.0,
+        )
+        self._digital_twin_policy_prior_continuation_wait_scale = max(
+            float(digital_twin_policy_prior_continuation_wait_scale),
+            0.0,
+        )
+        self._digital_twin_policy_prior_continuation_steady_suppression = max(
+            float(digital_twin_policy_prior_continuation_steady_suppression),
+            0.0,
+        )
+        self._digital_twin_policy_prior_adaptive_wait_enabled = bool(
+            digital_twin_policy_prior_adaptive_wait_enabled
+        )
+        self._digital_twin_policy_prior_wait_ready_threshold = max(
+            0.0,
+            min(float(digital_twin_policy_prior_wait_ready_threshold), 1.0),
+        )
+        self._digital_twin_policy_prior_wait_timing_ceiling = max(
+            0.0,
+            min(float(digital_twin_policy_prior_wait_timing_ceiling), 1.0),
+        )
+        self._digital_twin_policy_prior_wait_cache_ready_scale = max(
+            float(digital_twin_policy_prior_wait_cache_ready_scale),
+            0.0,
+        )
+        self._digital_twin_policy_prior_prepare_not_ready_scale = max(
+            float(digital_twin_policy_prior_prepare_not_ready_scale),
+            0.0,
+        )
+        self._env_action_ppo_enabled = bool(env_action_ppo_enabled)
+        self._env_action_ppo_coef = max(float(env_action_ppo_coef), 0.0)
+        self._env_action_ppo_advantage_blend = max(
+            0.0,
+            min(float(env_action_ppo_advantage_blend), 1.0),
+        )
+        self._env_action_ppo_teacher_coef = max(float(env_action_ppo_teacher_coef), 0.0)
+        self._env_action_ppo_mechanism_focus = max(float(env_action_ppo_mechanism_focus), 0.0)
+        self._env_action_ppo_max_weight = max(float(env_action_ppo_max_weight), 0.0)
+        self._env_action_ppo_ratio_barrier_coef = max(float(env_action_ppo_ratio_barrier_coef), 0.0)
+        self._env_action_ppo_ratio_barrier_margin = max(
+            0.0,
+            min(float(env_action_ppo_ratio_barrier_margin), 0.95),
+        )
+        self._env_action_counterfactual_margin_enabled = bool(env_action_counterfactual_margin_enabled)
+        self._env_action_counterfactual_margin_coef = max(float(env_action_counterfactual_margin_coef), 0.0)
+        self._env_action_counterfactual_margin_min_gap = max(float(env_action_counterfactual_margin_min_gap), 0.0)
+        self._env_action_counterfactual_margin_max_weight = max(float(env_action_counterfactual_margin_max_weight), 0.0)
+        self._env_action_counterfactual_margin_advantage_gate = max(
+            float(env_action_counterfactual_margin_advantage_gate),
+            0.0,
+        )
+        self._env_action_counterfactual_margin_advantage_blend = max(
+            0.0,
+            min(float(env_action_counterfactual_margin_advantage_blend), 1.0),
+        )
         self._event_prd_advantage_enabled = bool(event_prd_advantage_enabled)
         self._event_prd_advantage_coef = max(float(event_prd_advantage_coef), 0.0)
         self._event_prd_advantage_clip = max(float(event_prd_advantage_clip), 0.0)
+        self._delayed_mechanism_credit_enabled = bool(delayed_mechanism_credit_enabled)
+        self._delayed_mechanism_credit_policy_coef = max(float(delayed_mechanism_credit_policy_coef), 0.0)
+        self._delayed_mechanism_credit_event_coef = max(float(delayed_mechanism_credit_event_coef), 0.0)
+        self._delayed_mechanism_credit_horizon = max(int(delayed_mechanism_credit_horizon), 1)
+        self._delayed_mechanism_credit_decay = max(0.0, min(float(delayed_mechanism_credit_decay), 1.0))
+        self._delayed_mechanism_credit_clip = max(float(delayed_mechanism_credit_clip), 0.0)
+        self._delayed_mechanism_credit_ready_bonus = max(float(delayed_mechanism_credit_ready_bonus), 0.0)
+        self._delayed_mechanism_credit_success_bonus = max(float(delayed_mechanism_credit_success_bonus), 0.0)
+        self._delayed_mechanism_credit_failure_penalty = max(float(delayed_mechanism_credit_failure_penalty), 0.0)
+        self._delayed_mechanism_credit_missed_prepare_scale = max(
+            float(delayed_mechanism_credit_missed_prepare_scale),
+            0.0,
+        )
+        self._delayed_mechanism_credit_stale_penalty = max(float(delayed_mechanism_credit_stale_penalty), 0.0)
+        self._delayed_mechanism_credit_context_gate = max(
+            0.0,
+            min(float(delayed_mechanism_credit_context_gate), 1.0),
+        )
+        self._advantage_weighted_behavior_regularization_enabled = bool(
+            advantage_weighted_behavior_regularization_enabled
+        )
+        self._advantage_weighted_behavior_coef = max(float(advantage_weighted_behavior_coef), 0.0)
+        self._advantage_weighted_behavior_positive_coef = max(
+            float(advantage_weighted_behavior_positive_coef),
+            0.0,
+        )
+        self._advantage_weighted_behavior_negative_coef = max(
+            float(advantage_weighted_behavior_negative_coef),
+            0.0,
+        )
+        self._advantage_weighted_behavior_temperature = max(
+            float(advantage_weighted_behavior_temperature),
+            1e-6,
+        )
+        self._advantage_weighted_behavior_max_weight = max(
+            float(advantage_weighted_behavior_max_weight),
+            0.0,
+        )
+        self._advantage_weighted_behavior_positive_gate = max(
+            float(advantage_weighted_behavior_positive_gate),
+            0.0,
+        )
+        self._advantage_weighted_behavior_negative_gate = max(
+            float(advantage_weighted_behavior_negative_gate),
+            0.0,
+        )
+        self._advantage_weighted_behavior_mechanism_scale = max(
+            float(advantage_weighted_behavior_mechanism_scale),
+            0.0,
+        )
         self._latency_fallback_bias_enabled = bool(latency_fallback_bias_enabled)
         self._latency_fallback_bias_strength = max(float(latency_fallback_bias_strength), 0.0)
         self._latency_fallback_confidence_floor = max(
@@ -859,6 +1297,11 @@ class 分层PPO基类(BaseAgent):
             event_logit_temperature=self._event_logit_temperature,
             option_gate_enabled=self._option_gate_enabled,
             option_gate_count=self._option_gate_count,
+            digital_twin_handoff_fusion_enabled=self._digital_twin_handoff_fusion_enabled,
+            digital_twin_handoff_slow_scale=self._digital_twin_handoff_slow_scale,
+            digital_twin_handoff_fast_scale=self._digital_twin_handoff_fast_scale,
+            digital_twin_handoff_event_scale=self._digital_twin_handoff_event_scale,
+            digital_twin_handoff_critic_scale=self._digital_twin_handoff_critic_scale,
             hidden_dims=self._hidden_dims,
         ).to(self._device)
         self._optimizer = torch.optim.Adam(self._network.parameters(), lr=self._learning_rate)
@@ -870,7 +1313,7 @@ class 分层PPO基类(BaseAgent):
         run_metadata = dict((info or {}).get("run_metadata", {}) or {})
         deterministic = bool(self._deterministic_action or (info or {}).get("deterministic_policy", False))
         with torch.no_grad():
-            policy_output = self._forward_policy(semantic_state)
+            policy_output = self._forward_policy(semantic_state, run_metadata=run_metadata)
             (
                 selected_actions,
                 head_log_probs,
@@ -986,6 +1429,11 @@ class 分层PPO基类(BaseAgent):
                 int(projected_env_action) != int(env_action)
                 or dict(projected_head_actions) != dict(selected_actions)
             )
+            env_action_log_prob, env_action_entropy, env_action_probs = self._env_action_distribution_statistics(
+                policy_output=policy_output,
+                env_action=env_action,
+                action_mask=action_mask,
+            )
             head_credit_weights = self._build_head_credit_weights(aggregation_reason=aggregation_reason)
             log_prob, entropy = self._combine_head_statistics(
                 head_log_probs=head_log_probs,
@@ -1035,6 +1483,9 @@ class 分层PPO基类(BaseAgent):
             "projected_aggregation_reason": projected_aggregation_reason,
             "aggregation_reason": aggregation_reason,
             "log_prob": round(float(log_prob.item()), 6),
+            "env_action_log_prob": round(float(env_action_log_prob.item()), 6),
+            "env_action_entropy": round(float(env_action_entropy.item()), 6),
+            "env_action_probs": env_action_probs,
             "value": round(value, 6),
             "entropy": round(float(entropy.item()), 6),
             "head_log_probs": {
@@ -1048,6 +1499,7 @@ class 分层PPO基类(BaseAgent):
             "handoff_countdown_steps": round(handoff_countdown_steps, 6),
             "event_logit_temperature": round(active_event_logit_temperature, 6),
             "event_sharpening_info": dict(policy_output.get("event_sharpening_info", {})),
+            "digital_twin_policy_prior": dict(policy_output.get("digital_twin_policy_prior_info", {})),
             "event_prepare_prob": round(event_prepare_prob, 6),
             "event_margin": round(event_margin, 6),
             "predicted_handoff_target_valid": bool(predicted_handoff_target_valid),
@@ -1112,8 +1564,9 @@ class 分层PPO基类(BaseAgent):
     def evaluate_value(self, observation: Any, info: dict[str, Any] | None = None) -> float:
         del observation
         semantic_state = self._extract_semantic_state(info)
+        run_metadata = dict((info or {}).get("run_metadata", {}) or {})
         with torch.no_grad():
-            policy_output = self._forward_policy(semantic_state)
+            policy_output = self._forward_policy(semantic_state, run_metadata=run_metadata)
         return float(policy_output["value"].item())
 
     def learn(self, rollout: list[dict[str, Any]]) -> dict[str, Any]:
@@ -1128,18 +1581,45 @@ class 分层PPO基类(BaseAgent):
 
         imitation_rollout_stats = self._annotate_heuristic_imitation_targets(rollout)
         semantic_states = [self._extract_semantic_state(row.get("decision_info")) for row in rollout]
+        run_metadata_by_row = [
+            dict(row.get("decision_info", {}).get("run_metadata", {}) or {})
+            for row in rollout
+        ]
         action_masks = [self._extract_action_mask(row.get("decision_info")) for row in rollout]
         actions = [int(row["action"]) for row in rollout]
         returns = np.asarray([float(row.get("return", row.get("reward", 0.0))) for row in rollout], dtype=np.float32)
         advantages = np.asarray([float(row.get("advantage", 0.0)) for row in rollout], dtype=np.float32)
         values = np.asarray([float(row.get("value", 0.0)) for row in rollout], dtype=np.float32)
         old_log_probs = np.asarray([float(row.get("log_prob", 0.0)) for row in rollout], dtype=np.float32)
+        old_env_action_log_prob_values: list[float] = []
+        old_env_action_log_prob_missing_count = 0
+        for row in rollout:
+            action_info = dict(row.get("action_info", {}))
+            action_projection = dict(action_info.get("action_projection", {}))
+            if "env_action_log_prob" in action_info:
+                old_env_action_log_prob_values.append(float(action_info.get("env_action_log_prob", 0.0) or 0.0))
+            elif "masked_env_action_log_prob" in action_projection:
+                old_env_action_log_prob_values.append(
+                    float(action_projection.get("masked_env_action_log_prob", 0.0) or 0.0)
+                )
+                old_env_action_log_prob_missing_count += 1
+            else:
+                old_env_action_log_prob_values.append(float(row.get("log_prob", 0.0) or 0.0))
+                old_env_action_log_prob_missing_count += 1
+        old_env_action_log_probs = np.asarray(old_env_action_log_prob_values, dtype=np.float32)
         retention_active = self._mechanism_retention_active_for_update()
         effective_mechanism_aux_coef = self._effective_mechanism_aux_coef()
         effective_mechanism_entropy_coef = self._effective_mechanism_entropy_coef()
         mechanism_guidance_annotations = [
             self._build_mechanism_guidance_annotation(semantic_state, row)
             for semantic_state, row in zip(semantic_states, rollout)
+        ]
+        digital_twin_policy_prior_annotations = [
+            self._build_digital_twin_policy_prior_annotation(
+                semantic_state,
+                run_metadata=run_metadata,
+            )
+            for semantic_state, run_metadata in zip(semantic_states, run_metadata_by_row)
         ]
         mechanism_transition_weights = np.asarray(
             [
@@ -1225,6 +1705,34 @@ class 分层PPO基类(BaseAgent):
                 normalized_event_advantages
                 + self._handoff_risk_event_coef * handoff_risk_credit_values
             )
+        mechanism_credit_values = np.zeros(len(rollout), dtype=np.float32)
+        if (
+            self._mechanism_credit_prd_enabled
+            and (
+                self._mechanism_credit_policy_coef > 0.0
+                or self._mechanism_credit_event_coef > 0.0
+            )
+        ):
+            mechanism_credit_values = np.asarray(
+                [self._mechanism_credit_prd_credit(row) for row in rollout],
+                dtype=np.float32,
+            )
+            if self._mechanism_credit_clip > 0.0:
+                mechanism_credit_values = np.clip(
+                    mechanism_credit_values,
+                    -self._mechanism_credit_clip,
+                    self._mechanism_credit_clip,
+                )
+            if self._mechanism_credit_policy_coef > 0.0:
+                normalized_advantages = (
+                    normalized_advantages
+                    + self._mechanism_credit_policy_coef * mechanism_credit_values
+                )
+            if self._mechanism_credit_event_coef > 0.0:
+                normalized_event_advantages = (
+                    normalized_event_advantages
+                    + self._mechanism_credit_event_coef * mechanism_credit_values
+                )
         tail_risk_reward_floor = 0.0
         if self._tail_risk_prd_enabled and len(rollout) > 0:
             reward_values = np.asarray(
@@ -1305,11 +1813,45 @@ class 分层PPO基类(BaseAgent):
                 normalized_advantages
                 + self._idle_execution_policy_coef * idle_execution_credit_values
             )
+        delayed_mechanism_credit_values = np.zeros(len(rollout), dtype=np.float32)
+        if (
+            self._delayed_mechanism_credit_enabled
+            and (
+                self._delayed_mechanism_credit_policy_coef > 0.0
+                or self._delayed_mechanism_credit_event_coef > 0.0
+            )
+        ):
+            delayed_mechanism_credit_values = self._delayed_mechanism_credit_values(rollout)
+            if self._delayed_mechanism_credit_clip > 0.0:
+                delayed_mechanism_credit_values = np.clip(
+                    delayed_mechanism_credit_values,
+                    -self._delayed_mechanism_credit_clip,
+                    self._delayed_mechanism_credit_clip,
+                )
+            if self._delayed_mechanism_credit_policy_coef > 0.0:
+                normalized_advantages = (
+                    normalized_advantages
+                    + self._delayed_mechanism_credit_policy_coef * delayed_mechanism_credit_values
+                )
+            if self._delayed_mechanism_credit_event_coef > 0.0:
+                normalized_event_advantages = (
+                    normalized_event_advantages
+                    + self._delayed_mechanism_credit_event_coef * delayed_mechanism_credit_values
+                )
+        advantage_weighted_behavior_stats = self._annotate_advantage_weighted_behavior_targets(
+            rollout,
+            advantage_values=normalized_advantages,
+        )
         normalized_event_advantages = normalized_event_advantages * mechanism_transition_weights
         return_tensor = torch.as_tensor(returns, dtype=torch.float32, device=self._device)
         advantage_tensor = torch.as_tensor(normalized_advantages, dtype=torch.float32, device=self._device)
         event_advantage_tensor = torch.as_tensor(normalized_event_advantages, dtype=torch.float32, device=self._device)
         old_log_prob_tensor = torch.as_tensor(old_log_probs, dtype=torch.float32, device=self._device)
+        old_env_action_log_prob_tensor = torch.as_tensor(
+            old_env_action_log_probs,
+            dtype=torch.float32,
+            device=self._device,
+        )
         old_value_tensor = torch.as_tensor(values, dtype=torch.float32, device=self._device)
         action_tensor = torch.as_tensor(actions, dtype=torch.long, device=self._device)
 
@@ -1360,11 +1902,44 @@ class 分层PPO基类(BaseAgent):
         option_gate_loss_total = 0.0
         option_gate_entropy_total = 0.0
         option_gate_prior_loss_total = 0.0
+        env_action_ppo_loss_total = 0.0
+        env_action_counterfactual_margin_loss_total = 0.0
+        advantage_weighted_behavior_loss_total = 0.0
         effective_imitation_coef = self._effective_heuristic_imitation_coef()
         effective_option_prior_coef = self._effective_option_gate_prior_coef()
+        digital_twin_policy_prior_loss_total = 0.0
+        effective_digital_twin_policy_prior_distill_coef = (
+            self._effective_digital_twin_policy_prior_distill_coef()
+        )
         mechanism_guidance_rollout_stats = self._summarize_mechanism_guidance_annotations(
             mechanism_guidance_annotations,
             rollout,
+        )
+        digital_twin_policy_prior_applied = [
+            item for item in digital_twin_policy_prior_annotations if bool(item.get("apply", False))
+        ]
+        digital_twin_policy_prior_strength_mean = (
+            float(fmean(float(item.get("strength", 0.0) or 0.0) for item in digital_twin_policy_prior_applied))
+            if digital_twin_policy_prior_applied
+            else 0.0
+        )
+        digital_twin_policy_prior_event_count = sum(
+            1 for item in digital_twin_policy_prior_applied if int(item.get("event_target", 0)) == 1
+        )
+        digital_twin_policy_prior_prefetch_count = sum(
+            1 for item in digital_twin_policy_prior_applied if int(item.get("slow_target", 0)) == 2
+        )
+        digital_twin_policy_prior_pacing_count = sum(
+            1 for item in digital_twin_policy_prior_applied if bool(item.get("pacing_target", False))
+        )
+        digital_twin_policy_prior_continuation_count = sum(
+            1 for item in digital_twin_policy_prior_applied if bool(item.get("continuation_target", False))
+        )
+        digital_twin_policy_prior_env_prepare_count = sum(
+            1 for item in digital_twin_policy_prior_applied if int(item.get("env_target", -1)) == 4
+        )
+        digital_twin_policy_prior_env_wait_count = sum(
+            1 for item in digital_twin_policy_prior_applied if int(item.get("env_target", -1)) == 2
         )
         update_steps = 0
         executed_epochs = 0
@@ -1377,8 +1952,13 @@ class 分层PPO基类(BaseAgent):
                 batch_indices = permutation[start_index : start_index + batch_size]
                 batch_index_list = batch_indices.detach().cpu().tolist()
                 batch_states = [semantic_states[int(index)] for index in batch_index_list]
+                batch_run_metadata = [run_metadata_by_row[int(index)] for index in batch_index_list]
                 batch_rows = [rollout[int(index)] for index in batch_index_list]
-                batch_outputs = [self._forward_policy(state) for state in batch_states]
+                batch_action_masks = [action_masks[int(index)] for index in batch_index_list]
+                batch_outputs = [
+                    self._forward_policy(state, run_metadata=run_metadata)
+                    for state, run_metadata in zip(batch_states, batch_run_metadata)
+                ]
                 if self._use_hierarchy:
                     batch_head_actions = {
                         head_name: tensor[batch_indices] for head_name, tensor in head_action_tensors.items()
@@ -1408,8 +1988,28 @@ class 分层PPO基类(BaseAgent):
                         base_advantage=advantage_tensor[batch_indices],
                         event_advantage=event_advantage_tensor[batch_indices],
                     )
+                    env_action_ppo_loss = self._compute_env_action_ppo_loss(
+                        batch_outputs=batch_outputs,
+                        batch_action_masks=batch_action_masks,
+                        batch_actions=action_tensor[batch_indices],
+                        old_env_action_log_probs=old_env_action_log_prob_tensor[batch_indices],
+                        base_advantage=advantage_tensor[batch_indices],
+                        event_advantage=event_advantage_tensor[batch_indices],
+                        batch_rows=batch_rows,
+                    )
+                    env_action_counterfactual_margin_loss = self._compute_env_action_counterfactual_margin_loss(
+                        batch_outputs=batch_outputs,
+                        batch_action_masks=batch_action_masks,
+                        batch_rows=batch_rows,
+                        base_advantage=advantage_tensor[batch_indices],
+                        event_advantage=event_advantage_tensor[batch_indices],
+                    )
+                    advantage_weighted_behavior_loss = self._compute_advantage_weighted_behavior_loss(
+                        batch_outputs=batch_outputs,
+                        batch_action_masks=batch_action_masks,
+                        batch_rows=batch_rows,
+                    )
                 else:
-                    batch_action_masks = [action_masks[int(index)] for index in batch_index_list]
                     logits = torch.stack(
                         [
                             self._masked_flat_logits(output["flat_logits"], mask)
@@ -1428,6 +2028,17 @@ class 分层PPO基类(BaseAgent):
                         1.0 + self._clip_ratio,
                     ) * advantage_tensor[batch_indices]
                     actor_loss = -torch.min(surrogate_1, surrogate_2).mean()
+                    env_action_ppo_loss = torch.tensor(0.0, dtype=torch.float32, device=self._device)
+                    env_action_counterfactual_margin_loss = torch.tensor(
+                        0.0,
+                        dtype=torch.float32,
+                        device=self._device,
+                    )
+                    advantage_weighted_behavior_loss = self._compute_advantage_weighted_behavior_loss(
+                        batch_outputs=batch_outputs,
+                        batch_action_masks=batch_action_masks,
+                        batch_rows=batch_rows,
+                    )
 
                 value_prediction = torch.stack([output["value"] for output in batch_outputs], dim=0)
                 ratio = torch.exp(new_log_prob - old_log_prob_tensor[batch_indices])
@@ -1438,9 +2049,18 @@ class 分层PPO基类(BaseAgent):
                     batch_rows=batch_rows,
                 )
                 batch_annotations = [mechanism_guidance_annotations[int(index)] for index in batch_index_list]
+                batch_dt_policy_prior_annotations = [
+                    digital_twin_policy_prior_annotations[int(index)]
+                    for index in batch_index_list
+                ]
                 mechanism_aux_loss, mechanism_entropy_bonus = self._compute_mechanism_auxiliary_loss(
                     batch_outputs=batch_outputs,
                     batch_annotations=batch_annotations,
+                )
+                digital_twin_policy_prior_loss = self._compute_digital_twin_policy_prior_loss(
+                    batch_outputs=batch_outputs,
+                    batch_annotations=batch_dt_policy_prior_annotations,
+                    batch_advantage=advantage_tensor[batch_indices],
                 )
                 option_gate_loss, option_gate_entropy, option_gate_prior_loss = self._compute_option_gate_loss(
                     batch_outputs=batch_outputs,
@@ -1455,6 +2075,10 @@ class 分层PPO基类(BaseAgent):
                     + effective_imitation_coef * heuristic_imitation_loss
                     + effective_mechanism_aux_coef * mechanism_aux_loss
                     - effective_mechanism_entropy_coef * mechanism_entropy_bonus
+                    + effective_digital_twin_policy_prior_distill_coef * digital_twin_policy_prior_loss
+                    + self._env_action_ppo_coef * env_action_ppo_loss
+                    + self._env_action_counterfactual_margin_coef * env_action_counterfactual_margin_loss
+                    + self._advantage_weighted_behavior_coef * advantage_weighted_behavior_loss
                     + self._option_gate_loss_coef * self._option_gate_log_prob_weight * option_gate_loss
                     + effective_option_prior_coef * option_gate_prior_loss
                     - self._option_gate_entropy_coef * option_gate_entropy
@@ -1478,6 +2102,12 @@ class 分层PPO基类(BaseAgent):
                 heuristic_imitation_loss_total += float(heuristic_imitation_loss.item())
                 mechanism_aux_loss_total += float(mechanism_aux_loss.item())
                 mechanism_entropy_bonus_total += float(mechanism_entropy_bonus.item())
+                digital_twin_policy_prior_loss_total += float(digital_twin_policy_prior_loss.item())
+                env_action_ppo_loss_total += float(env_action_ppo_loss.item())
+                env_action_counterfactual_margin_loss_total += float(
+                    env_action_counterfactual_margin_loss.item()
+                )
+                advantage_weighted_behavior_loss_total += float(advantage_weighted_behavior_loss.item())
                 option_gate_loss_total += float(option_gate_loss.item())
                 option_gate_entropy_total += float(option_gate_entropy.item())
                 option_gate_prior_loss_total += float(option_gate_prior_loss.item())
@@ -1521,6 +2151,19 @@ class 分层PPO基类(BaseAgent):
             "heuristic_imitation_applied_count": int(imitation_rollout_stats["applied_count"]),
             "heuristic_imitation_match_count": int(imitation_rollout_stats["match_count"]),
             "heuristic_imitation_match_rate": round(float(imitation_rollout_stats["match_rate"]), 6),
+            "conservative_imitation_enabled": self._conservative_imitation_enabled,
+            "conservative_imitation_reward_floor": round(
+                float(imitation_rollout_stats.get("reward_floor", 0.0)),
+                6,
+            ),
+            "conservative_imitation_weight_mean": round(
+                float(imitation_rollout_stats.get("weight_mean", 0.0)),
+                6,
+            ),
+            "conservative_imitation_weight_max": round(
+                float(imitation_rollout_stats.get("weight_max", 0.0)),
+                6,
+            ),
             "mechanism_aux_coef": round(self._mechanism_aux_coef, 6),
             "effective_mechanism_aux_coef": round(effective_mechanism_aux_coef, 6),
             "mechanism_aux_loss_mean": round(mechanism_aux_loss_total / denominator, 6),
@@ -1556,6 +2199,62 @@ class 分层PPO基类(BaseAgent):
             "advantage_std_raw": round(advantage_std, 6),
             "event_advantage_mean_raw": round(event_advantage_mean, 6),
             "event_advantage_std_raw": round(event_advantage_std, 6),
+            "env_action_ppo_enabled": self._env_action_ppo_enabled,
+            "env_action_ppo_coef": round(self._env_action_ppo_coef, 6),
+            "env_action_ppo_advantage_blend": round(self._env_action_ppo_advantage_blend, 6),
+            "env_action_ppo_teacher_coef": round(self._env_action_ppo_teacher_coef, 6),
+            "env_action_ppo_mechanism_focus": round(self._env_action_ppo_mechanism_focus, 6),
+            "env_action_ppo_max_weight": round(self._env_action_ppo_max_weight, 6),
+            "env_action_ppo_ratio_barrier_coef": round(self._env_action_ppo_ratio_barrier_coef, 6),
+            "env_action_ppo_ratio_barrier_margin": round(self._env_action_ppo_ratio_barrier_margin, 6),
+            "env_action_ppo_loss": round(env_action_ppo_loss_total / denominator, 6),
+            "env_action_counterfactual_margin_enabled": self._env_action_counterfactual_margin_enabled,
+            "env_action_counterfactual_margin_coef": round(
+                self._env_action_counterfactual_margin_coef,
+                6,
+            ),
+            "env_action_counterfactual_margin_loss": round(
+                env_action_counterfactual_margin_loss_total / denominator,
+                6,
+            ),
+            "env_action_counterfactual_margin_advantage_gate": round(
+                self._env_action_counterfactual_margin_advantage_gate,
+                6,
+            ),
+            "env_action_counterfactual_margin_advantage_blend": round(
+                self._env_action_counterfactual_margin_advantage_blend,
+                6,
+            ),
+            "advantage_weighted_behavior_regularization_enabled": (
+                self._advantage_weighted_behavior_regularization_enabled
+            ),
+            "advantage_weighted_behavior_coef": round(self._advantage_weighted_behavior_coef, 6),
+            "advantage_weighted_behavior_loss": round(
+                advantage_weighted_behavior_loss_total / denominator,
+                6,
+            ),
+            "advantage_weighted_behavior_applied_count": int(
+                advantage_weighted_behavior_stats["applied_count"]
+            ),
+            "advantage_weighted_behavior_positive_count": int(
+                advantage_weighted_behavior_stats["positive_count"]
+            ),
+            "advantage_weighted_behavior_negative_count": int(
+                advantage_weighted_behavior_stats["negative_count"]
+            ),
+            "advantage_weighted_behavior_teacher_match_rate": round(
+                float(advantage_weighted_behavior_stats["teacher_match_rate"]),
+                6,
+            ),
+            "advantage_weighted_behavior_weight_mean": round(
+                float(advantage_weighted_behavior_stats["weight_mean"]),
+                6,
+            ),
+            "advantage_weighted_behavior_weight_max": round(
+                float(advantage_weighted_behavior_stats["weight_max"]),
+                6,
+            ),
+            "env_action_log_prob_missing_count": int(old_env_action_log_prob_missing_count),
             "event_prd_advantage_enabled": self._event_prd_advantage_enabled,
             "event_prd_advantage_coef": round(self._event_prd_advantage_coef, 6),
             "event_prd_credit_mean": round(float(event_prd_credit_values.mean()), 6)
@@ -1564,6 +2263,30 @@ class 分层PPO基类(BaseAgent):
             "event_prd_credit_std": round(float(event_prd_credit_values.std()), 6)
             if len(event_prd_credit_values) > 0
             else 0.0,
+            "delayed_mechanism_credit_enabled": self._delayed_mechanism_credit_enabled,
+            "delayed_mechanism_credit_policy_coef": round(self._delayed_mechanism_credit_policy_coef, 6),
+            "delayed_mechanism_credit_event_coef": round(self._delayed_mechanism_credit_event_coef, 6),
+            "delayed_mechanism_credit_horizon": int(self._delayed_mechanism_credit_horizon),
+            "delayed_mechanism_credit_decay": round(self._delayed_mechanism_credit_decay, 6),
+            "delayed_mechanism_credit_clip": round(self._delayed_mechanism_credit_clip, 6),
+            "delayed_mechanism_credit_mean": round(float(delayed_mechanism_credit_values.mean()), 6)
+            if len(delayed_mechanism_credit_values) > 0
+            else 0.0,
+            "delayed_mechanism_credit_std": round(float(delayed_mechanism_credit_values.std()), 6)
+            if len(delayed_mechanism_credit_values) > 0
+            else 0.0,
+            "delayed_mechanism_credit_min": round(float(delayed_mechanism_credit_values.min()), 6)
+            if len(delayed_mechanism_credit_values) > 0
+            else 0.0,
+            "delayed_mechanism_credit_max": round(float(delayed_mechanism_credit_values.max()), 6)
+            if len(delayed_mechanism_credit_values) > 0
+            else 0.0,
+            "delayed_mechanism_credit_positive_count": int(np.sum(delayed_mechanism_credit_values > 1e-8))
+            if len(delayed_mechanism_credit_values) > 0
+            else 0,
+            "delayed_mechanism_credit_negative_count": int(np.sum(delayed_mechanism_credit_values < -1e-8))
+            if len(delayed_mechanism_credit_values) > 0
+            else 0,
             "handoff_risk_prd_enabled": self._handoff_risk_prd_enabled,
             "handoff_risk_event_coef": round(self._handoff_risk_event_coef, 6),
             "handoff_risk_option_coef": round(self._handoff_risk_option_coef, 6),
@@ -1579,6 +2302,74 @@ class 分层PPO基类(BaseAgent):
             "handoff_risk_cost_signal_mean": round(float(handoff_risk_cost_values.mean()), 6)
             if len(handoff_risk_cost_values) > 0
             else 0.0,
+            "mechanism_credit_prd_enabled": self._mechanism_credit_prd_enabled,
+            "mechanism_credit_policy_coef": round(self._mechanism_credit_policy_coef, 6),
+            "mechanism_credit_event_coef": round(self._mechanism_credit_event_coef, 6),
+            "mechanism_credit_option_coef": round(self._mechanism_credit_option_coef, 6),
+            "mechanism_credit_mean": round(float(mechanism_credit_values.mean()), 6)
+            if len(mechanism_credit_values) > 0
+            else 0.0,
+            "mechanism_credit_std": round(float(mechanism_credit_values.std()), 6)
+            if len(mechanism_credit_values) > 0
+            else 0.0,
+            "mechanism_credit_min": round(float(mechanism_credit_values.min()), 6)
+            if len(mechanism_credit_values) > 0
+            else 0.0,
+            "mechanism_credit_max": round(float(mechanism_credit_values.max()), 6)
+            if len(mechanism_credit_values) > 0
+            else 0.0,
+            "mechanism_focal_aux_enabled": self._mechanism_focal_aux_enabled,
+            "mechanism_focal_gamma": round(self._mechanism_focal_gamma, 6),
+            "digital_twin_handoff_fusion_enabled": self._digital_twin_handoff_fusion_enabled,
+            "digital_twin_handoff_slow_scale": round(self._digital_twin_handoff_slow_scale, 6),
+            "digital_twin_handoff_fast_scale": round(self._digital_twin_handoff_fast_scale, 6),
+            "digital_twin_handoff_event_scale": round(self._digital_twin_handoff_event_scale, 6),
+            "digital_twin_handoff_critic_scale": round(self._digital_twin_handoff_critic_scale, 6),
+            "digital_twin_policy_prior_enabled": self._digital_twin_policy_prior_enabled,
+            "digital_twin_policy_prior_logit_bias": round(
+                self._digital_twin_policy_prior_logit_bias,
+                6,
+            ),
+            "digital_twin_policy_prior_distill_coef": round(
+                self._digital_twin_policy_prior_distill_coef,
+                6,
+            ),
+            "effective_digital_twin_policy_prior_distill_coef": round(
+                effective_digital_twin_policy_prior_distill_coef,
+                6,
+            ),
+            "digital_twin_policy_prior_loss": round(
+                digital_twin_policy_prior_loss_total / denominator,
+                6,
+            ),
+            "digital_twin_policy_prior_applied_count": int(len(digital_twin_policy_prior_applied)),
+            "digital_twin_policy_prior_event_count": int(digital_twin_policy_prior_event_count),
+            "digital_twin_policy_prior_prefetch_count": int(digital_twin_policy_prior_prefetch_count),
+            "digital_twin_policy_prior_pacing_count": int(digital_twin_policy_prior_pacing_count),
+            "digital_twin_policy_prior_continuation_count": int(
+                digital_twin_policy_prior_continuation_count
+            ),
+            "digital_twin_policy_prior_env_prepare_count": int(
+                digital_twin_policy_prior_env_prepare_count
+            ),
+            "digital_twin_policy_prior_env_wait_count": int(
+                digital_twin_policy_prior_env_wait_count
+            ),
+            "digital_twin_policy_prior_adaptive_wait_enabled": (
+                self._digital_twin_policy_prior_adaptive_wait_enabled
+            ),
+            "digital_twin_policy_prior_wait_ready_threshold": round(
+                self._digital_twin_policy_prior_wait_ready_threshold,
+                6,
+            ),
+            "digital_twin_policy_prior_wait_timing_ceiling": round(
+                self._digital_twin_policy_prior_wait_timing_ceiling,
+                6,
+            ),
+            "digital_twin_policy_prior_strength_mean": round(
+                digital_twin_policy_prior_strength_mean,
+                6,
+            ),
             "tail_risk_prd_enabled": self._tail_risk_prd_enabled,
             "tail_risk_policy_coef": round(self._tail_risk_policy_coef, 6),
             "tail_risk_event_coef": round(self._tail_risk_event_coef, 6),
@@ -2440,7 +3231,7 @@ class 分层PPO基类(BaseAgent):
         event_log_probs = torch.log_softmax(policy_output["event_logits"], dim=-1)
         slow_log_probs = torch.log_softmax(policy_output["slow_logits"], dim=-1)
         fast_log_probs = torch.log_softmax(policy_output["fast_logits"], dim=-1)
-        return torch.stack(
+        scores = torch.stack(
             [
                 event_log_probs[0] + slow_log_probs[1],
                 event_log_probs[0] + slow_log_probs[2],
@@ -2450,6 +3241,10 @@ class 分层PPO基类(BaseAgent):
             ],
             dim=0,
         )
+        env_action_bias = policy_output.get("env_action_logits_bias")
+        if isinstance(env_action_bias, torch.Tensor) and env_action_bias.numel() == scores.numel():
+            scores = scores + env_action_bias.to(device=scores.device, dtype=scores.dtype)
+        return scores
 
     def _project_head_actions_to_valid_env_action(
         self,
@@ -2468,12 +3263,42 @@ class 分层PPO基类(BaseAgent):
         valid_env_action = self._best_valid_env_action_from_policy(policy_output, action_mask)
         return self._head_targets_for_env_action(valid_env_action)
 
-    def _forward_policy(self, semantic_state: dict[str, Any]) -> dict[str, Any]:
+    def _forward_policy(
+        self,
+        semantic_state: dict[str, Any],
+        run_metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         policy_output = self._network.forward_single(
             semantic_state,
             event_logit_temperature=self._current_event_logit_temperature(),
         )
-        return self._apply_policy_adjustments(policy_output, semantic_state)
+        return self._apply_policy_adjustments(
+            policy_output,
+            semantic_state,
+            run_metadata=run_metadata,
+        )
+
+    def _env_action_distribution_statistics(
+        self,
+        *,
+        policy_output: dict[str, Any],
+        env_action: int,
+        action_mask: list[bool] | None,
+    ) -> tuple[torch.Tensor, torch.Tensor, list[float]]:
+        action_tensor = torch.tensor(int(env_action), dtype=torch.long, device=self._device)
+        if not self._use_hierarchy:
+            logits = self._masked_flat_logits(policy_output["flat_logits"], action_mask)
+        else:
+            logits = self._masked_flat_logits(
+                self._hierarchical_env_action_scores(policy_output),
+                action_mask,
+            )
+        distribution = Categorical(logits=logits)
+        return (
+            distribution.log_prob(action_tensor),
+            distribution.entropy(),
+            [round(float(item), 6) for item in torch.softmax(logits, dim=-1).tolist()],
+        )
 
     def _selected_action_statistics(
         self,
@@ -3254,6 +4079,172 @@ class 分层PPO基类(BaseAgent):
         assert weight_sum is not None
         return -(surrogate_sum / torch.clamp(weight_sum, min=1e-6)).mean()
 
+    def _compute_env_action_ppo_loss(
+        self,
+        *,
+        batch_outputs: list[dict[str, Any]],
+        batch_action_masks: list[list[bool] | None],
+        batch_actions: torch.Tensor,
+        old_env_action_log_probs: torch.Tensor,
+        base_advantage: torch.Tensor,
+        event_advantage: torch.Tensor,
+        batch_rows: list[dict[str, Any]],
+    ) -> torch.Tensor:
+        if (
+            not self._env_action_ppo_enabled
+            or self._env_action_ppo_coef <= 0.0
+            or not self._use_hierarchy
+            or not batch_outputs
+        ):
+            return torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        env_scores = torch.stack(
+            [
+                self._masked_flat_logits(
+                    self._hierarchical_env_action_scores(output),
+                    action_mask,
+                )
+                for output, action_mask in zip(batch_outputs, batch_action_masks)
+            ],
+            dim=0,
+        )
+        distribution = Categorical(logits=env_scores)
+        new_log_probs = distribution.log_prob(batch_actions)
+        blend = self._env_action_ppo_advantage_blend
+        action_advantage = blend * base_advantage + (1.0 - blend) * event_advantage
+        if self._counterfactual_teacher_prd_enabled and self._env_action_ppo_teacher_coef > 0.0:
+            teacher_values: list[float] = []
+            for row, action in zip(batch_rows, batch_actions.detach().cpu().tolist()):
+                teacher_credit = self._counterfactual_teacher_action_credit(row, int(action))
+                if self._counterfactual_teacher_clip > 0.0:
+                    teacher_credit = max(
+                        -self._counterfactual_teacher_clip,
+                        min(self._counterfactual_teacher_clip, teacher_credit),
+                    )
+                teacher_values.append(float(teacher_credit))
+            teacher_tensor = torch.as_tensor(teacher_values, dtype=torch.float32, device=self._device)
+            action_advantage = action_advantage + self._env_action_ppo_teacher_coef * teacher_tensor
+        sample_weights = torch.ones_like(action_advantage)
+        if self._env_action_ppo_mechanism_focus > 0.0:
+            focus_values: list[float] = []
+            for row in batch_rows:
+                metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+                high_risk = self._handoff_risk_context(row, metrics)
+                mechanism_window = self._row_window_class(row) == "mechanism_activating"
+                focus_values.append(float(high_risk or mechanism_window))
+            focus_tensor = torch.as_tensor(focus_values, dtype=torch.float32, device=self._device)
+            sample_weights = sample_weights + self._env_action_ppo_mechanism_focus * focus_tensor
+        if self._env_action_ppo_max_weight > 0.0:
+            sample_weights = torch.clamp(sample_weights, max=self._env_action_ppo_max_weight)
+        ratio = torch.exp(new_log_probs - old_env_action_log_probs)
+        surrogate_1 = ratio * action_advantage
+        surrogate_2 = torch.clamp(
+            ratio,
+            1.0 - self._clip_ratio,
+            1.0 + self._clip_ratio,
+        ) * action_advantage
+        weighted_surrogate = torch.min(surrogate_1, surrogate_2) * sample_weights
+        loss = -(weighted_surrogate.sum() / torch.clamp(sample_weights.sum(), min=1e-6))
+        if self._env_action_ppo_ratio_barrier_coef > 0.0:
+            lower = max(1e-6, 1.0 - self._env_action_ppo_ratio_barrier_margin)
+            upper = 1.0 + self._env_action_ppo_ratio_barrier_margin
+            positive_advantage = torch.relu(action_advantage.detach())
+            negative_advantage = torch.relu(-action_advantage.detach())
+            under_update_gap = torch.relu(lower - ratio) * positive_advantage
+            over_update_gap = torch.relu(ratio - upper) * negative_advantage
+            barrier = (under_update_gap.square() + over_update_gap.square()) * sample_weights
+            loss = loss + self._env_action_ppo_ratio_barrier_coef * (
+                barrier.sum() / torch.clamp(sample_weights.sum(), min=1e-6)
+            )
+        return loss
+
+    def _compute_env_action_counterfactual_margin_loss(
+        self,
+        *,
+        batch_outputs: list[dict[str, Any]],
+        batch_action_masks: list[list[bool] | None],
+        batch_rows: list[dict[str, Any]],
+        base_advantage: torch.Tensor | None = None,
+        event_advantage: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        if (
+            not self._env_action_counterfactual_margin_enabled
+            or self._env_action_counterfactual_margin_coef <= 0.0
+            or not self._counterfactual_teacher_prd_enabled
+            or not self._use_hierarchy
+            or not batch_outputs
+        ):
+            return torch.tensor(0.0, dtype=torch.float32, device=self._device)
+
+        advantage_gate_values: torch.Tensor | None = None
+        if base_advantage is not None:
+            advantage_gate_values = base_advantage.detach()
+            if event_advantage is not None:
+                blend = self._env_action_counterfactual_margin_advantage_blend
+                advantage_gate_values = (
+                    blend * base_advantage.detach()
+                    + (1.0 - blend) * event_advantage.detach()
+                )
+
+        loss_terms: list[torch.Tensor] = []
+        for row_index, (policy_output, action_mask, row) in enumerate(
+            zip(batch_outputs, batch_action_masks, batch_rows)
+        ):
+            if (
+                advantage_gate_values is not None
+                and self._env_action_counterfactual_margin_advantage_gate > 0.0
+            ):
+                advantage_value = float(advantage_gate_values[row_index].item())
+                if advantage_value <= self._env_action_counterfactual_margin_advantage_gate:
+                    continue
+
+            valid_actions = [
+                action_id
+                for action_id in range(5)
+                if self._is_env_action_valid(action_id, action_mask)
+            ]
+            if not valid_actions:
+                continue
+            credits = [
+                self._counterfactual_teacher_action_credit(row, action_id)
+                for action_id in valid_actions
+            ]
+            best_index = max(range(len(valid_actions)), key=lambda index: credits[index])
+            best_action = int(valid_actions[best_index])
+            best_credit = float(credits[best_index])
+            if self._counterfactual_teacher_clip > 0.0:
+                best_credit = max(
+                    -self._counterfactual_teacher_clip,
+                    min(self._counterfactual_teacher_clip, best_credit),
+                )
+            if best_credit <= 0.0:
+                continue
+
+            action_info = dict(row.get("action_info", {}))
+            current_action = int(action_info.get("final_env_action", row.get("action", best_action)) or best_action)
+            current_credit = self._counterfactual_teacher_action_credit(row, current_action)
+            credit_gap = max(best_credit - float(current_credit), 0.0)
+            weight = max(best_credit, credit_gap + self._env_action_counterfactual_margin_min_gap)
+            if advantage_gate_values is not None:
+                advantage_value = max(float(advantage_gate_values[row_index].item()), 0.0)
+                weight *= 1.0 + min(advantage_value, 1.0)
+            if self._env_action_counterfactual_margin_max_weight > 0.0:
+                weight = min(weight, self._env_action_counterfactual_margin_max_weight)
+            if weight <= 1e-8:
+                continue
+
+            env_scores = self._masked_flat_logits(
+                self._hierarchical_env_action_scores(policy_output),
+                action_mask,
+            )
+            target = torch.tensor([best_action], dtype=torch.long, device=self._device)
+            loss_terms.append(
+                nn.functional.cross_entropy(env_scores.unsqueeze(0), target) * float(weight)
+            )
+
+        if not loss_terms:
+            return torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        return torch.stack(loss_terms).mean()
+
     def _effective_option_gate_prior_coef(self) -> float:
         if self._option_gate_prior_coef <= 0.0:
             return 0.0
@@ -3414,9 +4405,40 @@ class 分层PPO基类(BaseAgent):
         if bool(action_info.get("gate_pass", False)):
             context_strength += 0.20
         context_strength = max(context_strength, 0.15 if window_class == "mechanism_activating" else 0.0)
+        decision_info = dict(row.get("decision_info", {}))
+        semantic_state = decision_info.get("semantic_state") if isinstance(decision_info, dict) else None
+        wait_context: dict[str, Any] = {}
+        if isinstance(semantic_state, dict):
+            wait_context = self._digital_twin_wait_readiness_context(
+                semantic_state,
+                timing_support=timing_support,
+                boundary_urgency=urgency,
+                handoff_context=bool(
+                    window_class == "mechanism_activating"
+                    or action_info.get("predicted_handoff_target_valid", False)
+                    or action_info.get("raw_handoff_candidate", False)
+                ),
+            )
+        adaptive_wait_preferred = bool(
+            self._digital_twin_policy_prior_adaptive_wait_enabled
+            and wait_context.get("wait_preferred", False)
+        )
+        ready_score = float(wait_context.get("ready_score", 0.0) or 0.0)
 
         env_action = int(env_action)
         if window_class == "mechanism_activating":
+            if adaptive_wait_preferred:
+                if env_action == 2:
+                    return self._counterfactual_teacher_local_bonus * (
+                        0.90 + 0.40 * ready_score + 0.20 * (1.0 - timing_support)
+                    )
+                if env_action in {1, 4}:
+                    return -0.35 * self._counterfactual_teacher_invalid_mechanism_penalty * (
+                        0.50 + ready_score
+                    )
+                return -0.35 * self._counterfactual_teacher_current_rsu_penalty * (
+                    0.50 + ready_score
+                )
             if env_action in {1, 4}:
                 return self._counterfactual_teacher_mechanism_bonus * (0.75 + 0.35 * context_strength)
             if env_action == 2:
@@ -3589,6 +4611,312 @@ class 分层PPO基类(BaseAgent):
         )
         failure_penalty = self._handoff_risk_failure_penalty * float(handoff_failed)
         return float(bonus - dual_scale * (failure_penalty + unprepared_penalty))
+
+    def _mechanism_credit_prd_credit(self, row: dict[str, Any]) -> float:
+        if not self._mechanism_credit_prd_enabled:
+            return 0.0
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        action_info = dict(row.get("action_info", {}))
+        head_actions = action_info.get("head_actions", {})
+        if not isinstance(head_actions, dict):
+            head_actions = {}
+        final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
+        event_action = int(head_actions.get("event", 0) or 0)
+        window_class = self._row_window_class(row)
+
+        prepare_score = max(float(action_info.get("prepare_window_score", 0.0) or 0.0), 0.0)
+        urgency = max(float(action_info.get("temporal_urgency", 0.0) or 0.0), 0.0)
+        confidence = max(float(action_info.get("prediction_confidence", 0.0) or 0.0), 0.0)
+        gate_pass = bool(action_info.get("gate_pass", False))
+        context_strength = _clamp01(
+            0.42 * prepare_score
+            + 0.30 * urgency
+            + 0.22 * confidence
+            + 0.06 * float(gate_pass)
+        )
+
+        predicted_signal = bool(
+            self._metric_bool(metrics, "predicted_handoff_signal")
+            or self._metric_bool(metrics, "has_predicted_handoff_target")
+            or bool(action_info.get("raw_handoff_candidate", False))
+            or bool(action_info.get("predicted_handoff_target_valid", False))
+        )
+        handoff_event_count = max(
+            self._metric_float(metrics, "handoff_event_count"),
+            self._metric_float(metrics, "handoff_count"),
+            0.0,
+        )
+        opportunity = bool(
+            window_class == "mechanism_activating"
+            or handoff_event_count > 0.0
+            or predicted_signal
+        )
+        if opportunity:
+            context_strength = max(context_strength, self._mechanism_credit_min_context)
+
+        selected_prepare = bool(
+            self._metric_bool(metrics, "mechanism_attempt_selected")
+            or self._metric_bool(metrics, "predictive_prefetch_requested")
+            or self._metric_bool(metrics, "migration_prepare_requested")
+            or final_action in {1, 4}
+            or event_action == 1
+        )
+        prepare_realized = bool(
+            self._metric_bool(metrics, "migration_prepare_realized")
+            or self._metric_bool(metrics, "migration_prepare_requested")
+        )
+        handoff_ready = bool(
+            self._metric_bool(metrics, "handoff_ready")
+            or self._metric_float(
+                metrics,
+                "handoff_ready_ratio",
+                self._metric_float(metrics, "handoff_ready_rate", 0.0),
+            )
+            > 0.0
+        )
+        prefetch_hit = bool(
+            self._metric_bool(metrics, "prefetch_validated_hit")
+            or self._metric_float(metrics, "prefetch_validated_hit_rate") > 0.0
+        )
+        mechanism_success = self._row_mechanism_success(metrics)
+        handoff_failed = bool(
+            self._metric_bool(metrics, "handoff_failed")
+            or self._metric_float(metrics, "handoff_failure_rate") > 0.0
+        )
+
+        credit = 0.0
+        if opportunity:
+            if selected_prepare:
+                credit += 0.08 + 0.20 * context_strength
+                credit += self._mechanism_credit_success_bonus * float(mechanism_success)
+                credit += self._mechanism_credit_prepare_bonus * float(prepare_realized)
+                credit += self._mechanism_credit_ready_bonus * float(handoff_ready)
+                credit += self._mechanism_credit_prefetch_hit_bonus * float(prefetch_hit)
+                if handoff_failed and not mechanism_success:
+                    credit -= self._mechanism_credit_miss_penalty * (0.80 + context_strength)
+                if not prepare_realized and not mechanism_success:
+                    credit -= 0.25 * self._mechanism_credit_miss_penalty * (
+                        1.0 - min(context_strength, 1.0)
+                    )
+            else:
+                credit -= self._mechanism_credit_miss_penalty * (0.65 + context_strength)
+                if handoff_failed:
+                    credit -= 0.50 * self._mechanism_credit_miss_penalty
+        elif selected_prepare and not mechanism_success:
+            timing_support = max(prepare_score, urgency)
+            stale_scale = 1.0 + max(self._mechanism_credit_min_context - timing_support, 0.0) / max(
+                self._mechanism_credit_min_context,
+                1e-6,
+            )
+            credit -= self._mechanism_credit_false_positive_penalty * stale_scale
+
+        if self._mechanism_credit_clip > 0.0:
+            credit = max(
+                -self._mechanism_credit_clip,
+                min(self._mechanism_credit_clip, credit),
+            )
+        return float(credit)
+
+    def _delayed_mechanism_credit_values(self, rollout: list[dict[str, Any]]) -> np.ndarray:
+        values = np.zeros(len(rollout), dtype=np.float32)
+        if not rollout or not self._delayed_mechanism_credit_enabled:
+            return values
+
+        segment_start = 0
+        for row_index, row in enumerate(rollout):
+            if bool(row.get("terminated", False)) or bool(row.get("truncated", False)):
+                self._accumulate_delayed_mechanism_credit_segment(
+                    rollout,
+                    values,
+                    segment_start=segment_start,
+                    segment_end=row_index + 1,
+                )
+                segment_start = row_index + 1
+        if segment_start < len(rollout):
+            self._accumulate_delayed_mechanism_credit_segment(
+                rollout,
+                values,
+                segment_start=segment_start,
+                segment_end=len(rollout),
+            )
+
+        if self._delayed_mechanism_credit_clip > 0.0:
+            values = np.clip(
+                values,
+                -self._delayed_mechanism_credit_clip,
+                self._delayed_mechanism_credit_clip,
+            ).astype(np.float32)
+        return values
+
+    def _accumulate_delayed_mechanism_credit_segment(
+        self,
+        rollout: list[dict[str, Any]],
+        values: np.ndarray,
+        *,
+        segment_start: int,
+        segment_end: int,
+    ) -> None:
+        if segment_end <= segment_start:
+            return
+        horizon = max(int(self._delayed_mechanism_credit_horizon), 1)
+        decay = max(0.0, min(float(self._delayed_mechanism_credit_decay), 1.0))
+        outcome_signals = [
+            self._delayed_mechanism_outcome_signal(rollout[index])
+            for index in range(segment_start, segment_end)
+        ]
+        positive_outcome_indices = {
+            segment_start + local_index
+            for local_index, signal in enumerate(outcome_signals)
+            if signal > 1e-8
+        }
+
+        for local_outcome_index, outcome_signal in enumerate(outcome_signals):
+            if abs(outcome_signal) <= 1e-8:
+                continue
+            outcome_index = segment_start + local_outcome_index
+            first_source_index = max(segment_start, outcome_index - horizon)
+            for source_index in range(first_source_index, outcome_index + 1):
+                source_row = rollout[source_index]
+                selected_mechanism = self._row_selected_mechanism_action(source_row)
+                opportunity = self._row_mechanism_credit_opportunity(source_row)
+                if not selected_mechanism and not opportunity:
+                    continue
+                context_strength = self._row_mechanism_credit_context(source_row)
+                lag = outcome_index - source_index
+                temporal_weight = decay ** lag
+                context_weight = 0.35 + 0.65 * context_strength
+                if selected_mechanism:
+                    values[source_index] += float(outcome_signal * temporal_weight * context_weight)
+                elif outcome_signal < 0.0:
+                    values[source_index] += float(
+                        outcome_signal
+                        * temporal_weight
+                        * context_weight
+                        * self._delayed_mechanism_credit_missed_prepare_scale
+                    )
+
+        if self._delayed_mechanism_credit_stale_penalty <= 0.0:
+            return
+        for source_index in range(segment_start, segment_end):
+            source_row = rollout[source_index]
+            if not self._row_selected_mechanism_action(source_row):
+                continue
+            context_strength = self._row_mechanism_credit_context(source_row)
+            has_positive_outcome = any(
+                positive_index >= source_index
+                and positive_index <= min(segment_end - 1, source_index + horizon)
+                for positive_index in positive_outcome_indices
+            )
+            if has_positive_outcome:
+                continue
+            opportunity = self._row_mechanism_credit_opportunity(source_row)
+            if opportunity and context_strength >= self._delayed_mechanism_credit_context_gate:
+                continue
+            stale_gap = max(self._delayed_mechanism_credit_context_gate - context_strength, 0.0)
+            values[source_index] -= float(
+                self._delayed_mechanism_credit_stale_penalty
+                * (0.75 + stale_gap)
+            )
+
+    def _delayed_mechanism_outcome_signal(self, row: dict[str, Any]) -> float:
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        handoff_ready = bool(
+            self._metric_bool(metrics, "handoff_ready")
+            or self._metric_float(
+                metrics,
+                "handoff_ready_ratio",
+                self._metric_float(metrics, "handoff_ready_rate", 0.0),
+            )
+            > 0.0
+        )
+        mechanism_success = self._row_mechanism_success(metrics)
+        handoff_failed = bool(
+            self._metric_bool(metrics, "handoff_failed")
+            or self._metric_float(metrics, "handoff_failure_rate") > 0.0
+        )
+        handoff_event_count = max(
+            self._metric_float(metrics, "handoff_event_count"),
+            self._metric_float(metrics, "handoff_count"),
+            0.0,
+        )
+        prefetch_hit = bool(
+            self._metric_bool(metrics, "prefetch_validated_hit")
+            or self._metric_float(metrics, "prefetch_validated_hit_rate") > 0.0
+        )
+        prepare_realized = bool(
+            self._metric_bool(metrics, "migration_prepare_realized")
+            or self._metric_bool(metrics, "migration_prepare_requested")
+        )
+
+        signal = 0.0
+        signal += self._delayed_mechanism_credit_ready_bonus * float(handoff_ready)
+        signal += self._delayed_mechanism_credit_success_bonus * float(mechanism_success)
+        signal += 0.35 * self._delayed_mechanism_credit_success_bonus * float(prefetch_hit)
+        signal += 0.20 * self._delayed_mechanism_credit_success_bonus * float(prepare_realized)
+        signal -= self._delayed_mechanism_credit_failure_penalty * float(handoff_failed)
+        if handoff_event_count > 0.0 and not handoff_ready:
+            signal -= 0.35 * self._delayed_mechanism_credit_failure_penalty
+        return float(signal)
+
+    def _row_selected_mechanism_action(self, row: dict[str, Any]) -> bool:
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        action_info = dict(row.get("action_info", {}))
+        head_actions = action_info.get("head_actions", {})
+        if not isinstance(head_actions, dict):
+            head_actions = {}
+        final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
+        return bool(
+            final_action in {1, 4}
+            or int(head_actions.get("event", 0) or 0) == 1
+            or int(head_actions.get("slow", 0) or 0) == 2
+            or self._metric_bool(metrics, "predictive_prefetch_requested")
+            or self._metric_bool(metrics, "migration_prepare_requested")
+        )
+
+    def _row_mechanism_credit_context(self, row: dict[str, Any]) -> float:
+        action_info = dict(row.get("action_info", {}))
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        prepare_score = max(float(action_info.get("prepare_window_score", 0.0) or 0.0), 0.0)
+        urgency = max(float(action_info.get("temporal_urgency", 0.0) or 0.0), 0.0)
+        confidence = max(float(action_info.get("prediction_confidence", 0.0) or 0.0), 0.0)
+        gate_pass = bool(action_info.get("gate_pass", False))
+        predicted_signal = bool(
+            self._metric_bool(metrics, "predicted_handoff_signal")
+            or self._metric_bool(metrics, "has_predicted_handoff_target")
+            or bool(action_info.get("raw_handoff_candidate", False))
+            or bool(action_info.get("predicted_handoff_target_valid", False))
+        )
+        context = (
+            0.38 * prepare_score
+            + 0.26 * urgency
+            + 0.22 * confidence
+            + 0.08 * float(gate_pass)
+            + 0.06 * float(predicted_signal)
+        )
+        if self._row_window_class(row) == "mechanism_activating":
+            context = max(context, self._delayed_mechanism_credit_context_gate)
+        return float(_clamp01(context))
+
+    def _row_mechanism_credit_opportunity(self, row: dict[str, Any]) -> bool:
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        action_info = dict(row.get("action_info", {}))
+        handoff_event_count = max(
+            self._metric_float(metrics, "handoff_event_count"),
+            self._metric_float(metrics, "handoff_count"),
+            0.0,
+        )
+        predicted_signal = bool(
+            self._metric_bool(metrics, "predicted_handoff_signal")
+            or self._metric_bool(metrics, "has_predicted_handoff_target")
+            or bool(action_info.get("raw_handoff_candidate", False))
+            or bool(action_info.get("predicted_handoff_target_valid", False))
+        )
+        return bool(
+            self._row_window_class(row) == "mechanism_activating"
+            or handoff_event_count > 0.0
+            or predicted_signal
+            or self._row_mechanism_credit_context(row) >= self._delayed_mechanism_credit_context_gate
+        )
 
     def _tail_risk_prd_credit(self, row: dict[str, Any], *, reward_floor: float | None = None) -> float:
         if not self._tail_risk_prd_enabled:
@@ -3903,6 +5231,7 @@ class 分层PPO基类(BaseAgent):
                 and self._option_gate_counterfactual_coef > 0.0
             )
             or (self._handoff_risk_prd_enabled and self._handoff_risk_option_coef > 0.0)
+            or (self._mechanism_credit_prd_enabled and self._mechanism_credit_option_coef > 0.0)
             or (self._idle_execution_prd_enabled and self._idle_execution_option_coef > 0.0)
             or (self._tail_risk_prd_enabled and self._tail_risk_option_coef > 0.0)
             or (self._opportunity_prd_enabled and self._opportunity_option_coef > 0.0)
@@ -3938,6 +5267,14 @@ class 分层PPO基类(BaseAgent):
             if self._handoff_risk_clip > 0.0:
                 risk_credit = max(-self._handoff_risk_clip, min(self._handoff_risk_clip, risk_credit))
             partial_credit += risk_credit * self._handoff_risk_option_coef
+        if self._mechanism_credit_prd_enabled and self._mechanism_credit_option_coef > 0.0:
+            mechanism_credit = self._mechanism_credit_prd_credit(row)
+            if self._mechanism_credit_clip > 0.0:
+                mechanism_credit = max(
+                    -self._mechanism_credit_clip,
+                    min(self._mechanism_credit_clip, mechanism_credit),
+                )
+            partial_credit += mechanism_credit * self._mechanism_credit_option_coef
         if self._idle_execution_prd_enabled and self._idle_execution_option_coef > 0.0:
             idle_credit = self._idle_execution_prd_credit(row)
             if self._idle_execution_clip > 0.0:
@@ -4265,7 +5602,7 @@ class 分层PPO基类(BaseAgent):
             and prepare_action_legal
             and timing_active
             and prediction_usable
-            and (not cache_ready or target_mismatch or not gate_pass)
+            and (valid_handoff_target or not cache_ready or target_mismatch or not gate_pass)
         )
         needs_prefetch_guidance = bool(
             self._mechanism_aux_coef > 0.0
@@ -4416,12 +5753,24 @@ class 分层PPO基类(BaseAgent):
             event_logits = policy_output["event_logits"]
             event_target = torch.tensor([int(annotation.get("event_target", 1))], dtype=torch.long, device=self._device)
             event_loss = nn.functional.cross_entropy(event_logits.unsqueeze(0), event_target)
+            if self._mechanism_focal_aux_enabled and self._mechanism_focal_gamma > 0.0:
+                event_probs = torch.softmax(event_logits, dim=-1)
+                event_target_index = int(event_target.item())
+                if 0 <= event_target_index < int(event_probs.shape[-1]):
+                    target_prob = torch.clamp(event_probs[event_target_index], min=1e-6, max=1.0)
+                    event_loss = torch.pow(1.0 - target_prob, self._mechanism_focal_gamma) * event_loss
             event_distribution = Categorical(logits=event_logits)
             weighted_loss = float(annotation.get("event_weight", 1.0)) * event_loss
             slow_weight = float(annotation.get("slow_weight", 0.0) or 0.0)
             if slow_weight > 1e-8:
                 slow_target = torch.tensor([int(annotation.get("slow_target", 0))], dtype=torch.long, device=self._device)
                 slow_loss = nn.functional.cross_entropy(policy_output["slow_logits"].unsqueeze(0), slow_target)
+                if self._mechanism_focal_aux_enabled and self._mechanism_focal_gamma > 0.0:
+                    slow_probs = torch.softmax(policy_output["slow_logits"], dim=-1)
+                    slow_target_index = int(slow_target.item())
+                    if 0 <= slow_target_index < int(slow_probs.shape[-1]):
+                        slow_target_prob = torch.clamp(slow_probs[slow_target_index], min=1e-6, max=1.0)
+                        slow_loss = torch.pow(1.0 - slow_target_prob, self._mechanism_focal_gamma) * slow_loss
                 weighted_loss = weighted_loss + slow_weight * slow_loss
             loss_terms.append(weighted_loss)
             entropy_terms.append(event_distribution.entropy())
@@ -4434,8 +5783,14 @@ class 分层PPO基类(BaseAgent):
         self,
         policy_output: dict[str, Any],
         semantic_state: dict[str, Any],
+        run_metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        adjusted = self._apply_continuity_guard(policy_output, semantic_state)
+        adjusted = self._apply_digital_twin_policy_prior(
+            policy_output,
+            semantic_state,
+            run_metadata=run_metadata,
+        )
+        adjusted = self._apply_continuity_guard(adjusted, semantic_state)
         return self._apply_event_logit_sharpening(adjusted, semantic_state)
 
     def _apply_continuity_guard(
@@ -5008,6 +6363,526 @@ class 分层PPO基类(BaseAgent):
         del batch_outputs
         return torch.tensor(0.0, dtype=torch.float32, device=self._device)
 
+    def _effective_digital_twin_policy_prior_distill_coef(self) -> float:
+        if (
+            not self._digital_twin_policy_prior_enabled
+            or self._digital_twin_policy_prior_distill_coef <= 0.0
+        ):
+            return 0.0
+        if self._update_count < self._digital_twin_policy_prior_distill_warmup_updates:
+            return self._digital_twin_policy_prior_distill_coef
+        decay_steps = self._update_count - self._digital_twin_policy_prior_distill_warmup_updates + 1
+        return float(self._digital_twin_policy_prior_distill_coef * (self._digital_twin_policy_prior_distill_decay ** decay_steps))
+
+    def _digital_twin_wait_readiness_context(
+        self,
+        semantic_state: dict[str, Any],
+        *,
+        timing_support: float,
+        boundary_urgency: float = 0.0,
+        handoff_context: bool = False,
+    ) -> dict[str, Any]:
+        current_node = semantic_state.get("current_workflow_node") or {}
+        required_adapter = current_node.get("required_adapter")
+        predictions = semantic_state.get("predictions", {})
+        if not isinstance(predictions, dict):
+            predictions = {}
+        primary_vehicle, _ = _resolve_primary_vehicle_from_semantic_state(semantic_state)
+        vehicle_id = str(primary_vehicle.get("vehicle_id", ""))
+        current_rsu_id = primary_vehicle.get("associated_rsu_id")
+        predicted_next_rsu_id = predictions.get("predicted_next_rsu_by_vehicle", {}).get(vehicle_id)
+        next_sequence = list(predictions.get("next_rsu_sequence", {}).get(vehicle_id, []) or [])
+        if predicted_next_rsu_id is None and next_sequence:
+            predicted_next_rsu_id = next_sequence[0]
+        predicted_handoff_target_rsu_id = predictions.get("predicted_first_handoff_rsu_by_vehicle", {}).get(vehicle_id)
+        current_rsu = _rsu_by_id_from_semantic_state(semantic_state, current_rsu_id)
+        predicted_next_rsu = _rsu_by_id_from_semantic_state(semantic_state, predicted_next_rsu_id)
+        handoff_target_rsu = _rsu_by_id_from_semantic_state(semantic_state, predicted_handoff_target_rsu_id)
+        adapter_id = str(required_adapter) if required_adapter else ""
+        current_cache_ready = bool(
+            adapter_id
+            and adapter_id in {str(item) for item in current_rsu.get("cached_adapter_ids", [])}
+        )
+        predicted_next_cache_ready = bool(
+            adapter_id
+            and adapter_id in {str(item) for item in predicted_next_rsu.get("cached_adapter_ids", [])}
+        )
+        handoff_target_cache_ready = bool(
+            adapter_id
+            and adapter_id in {str(item) for item in handoff_target_rsu.get("cached_adapter_ids", [])}
+        )
+        target_differs = bool(
+            predicted_handoff_target_rsu_id is not None
+            and current_rsu_id is not None
+            and str(predicted_handoff_target_rsu_id) != str(current_rsu_id)
+        )
+        next_differs = bool(
+            predicted_next_rsu_id is not None
+            and current_rsu_id is not None
+            and str(predicted_next_rsu_id) != str(current_rsu_id)
+        )
+        ready_score = max(
+            1.0 if handoff_target_cache_ready else 0.0,
+            0.78 if predicted_next_cache_ready else 0.0,
+            0.56 if current_cache_ready else 0.0,
+        )
+        wait_preferred = bool(
+            self._digital_twin_policy_prior_adaptive_wait_enabled
+            and ready_score >= self._digital_twin_policy_prior_wait_ready_threshold
+            and float(timing_support) <= self._digital_twin_policy_prior_wait_timing_ceiling
+            and (handoff_context or target_differs or next_differs)
+            and float(boundary_urgency) < 0.82
+        )
+        return {
+            "wait_preferred": wait_preferred,
+            "ready_score": round(float(_clamp01(ready_score)), 6),
+            "current_cache_ready": current_cache_ready,
+            "predicted_next_cache_ready": predicted_next_cache_ready,
+            "handoff_target_cache_ready": handoff_target_cache_ready,
+            "predicted_next_rsu_id": predicted_next_rsu_id,
+            "predicted_handoff_target_rsu_id": predicted_handoff_target_rsu_id,
+            "current_rsu_id": current_rsu_id,
+            "target_differs": target_differs,
+            "next_differs": next_differs,
+        }
+
+    def _build_digital_twin_policy_prior_annotation(
+        self,
+        semantic_state: dict[str, Any],
+        run_metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        if not self._digital_twin_policy_prior_enabled or not self._use_hierarchy:
+            return {"apply": False, "reason": "disabled"}
+
+        window_class = str((run_metadata or {}).get("window_class") or semantic_state.get("window_class", "unknown"))
+        dt_features = _build_digital_twin_handoff_feature_tensor(semantic_state)
+        feature_values = [float(item) for item in dt_features.detach().cpu().tolist()]
+        (
+            has_prediction,
+            next_differs,
+            target_differs,
+            confidence,
+            uncertainty,
+            _dwell_norm,
+            _horizon_norm,
+            switch_ratio,
+            _unique_future_ratio,
+            non_current_ratio,
+            eta_norm,
+            boundary_urgency,
+            service_pressure,
+            load_pressure,
+        ) = feature_values
+        timing_features = compute_temporal_prepare_window_score(
+            semantic_state,
+            preferred_lead_steps=self._temporal_prepare_lead_steps,
+            sigma=self._temporal_prepare_sigma,
+        )
+        timing_support = max(
+            float(timing_features.get("prepare_window_score", 0.0) or 0.0),
+            float(timing_features.get("temporal_urgency", 0.0) or 0.0),
+        )
+        confidence_support = max(
+            self._digital_twin_policy_prior_confidence_floor if has_prediction > 0.0 else 0.0,
+            _clamp01(confidence * (1.0 - 0.45 * uncertainty)),
+        )
+
+        current_node = semantic_state.get("current_workflow_node") or {}
+        required_adapter = current_node.get("required_adapter")
+        predictions = semantic_state.get("predictions", {}) if isinstance(semantic_state.get("predictions", {}), dict) else {}
+        primary_vehicle, _ = _resolve_primary_vehicle_from_semantic_state(semantic_state)
+        vehicle_id = str(primary_vehicle.get("vehicle_id", ""))
+        current_rsu_id = primary_vehicle.get("associated_rsu_id")
+        predicted_next_rsu_id = predictions.get("predicted_next_rsu_by_vehicle", {}).get(vehicle_id)
+        next_sequence = list(predictions.get("next_rsu_sequence", {}).get(vehicle_id, []) or [])
+        if predicted_next_rsu_id is None and next_sequence:
+            predicted_next_rsu_id = next_sequence[0]
+        predicted_handoff_target_rsu_id = predictions.get("predicted_first_handoff_rsu_by_vehicle", {}).get(vehicle_id)
+        current_rsu = _rsu_by_id_from_semantic_state(semantic_state, current_rsu_id)
+        predicted_next_rsu = _rsu_by_id_from_semantic_state(semantic_state, predicted_next_rsu_id)
+        handoff_target_rsu = _rsu_by_id_from_semantic_state(semantic_state, predicted_handoff_target_rsu_id)
+        current_cache_ready = bool(
+            required_adapter
+            and required_adapter in {str(item) for item in current_rsu.get("cached_adapter_ids", [])}
+        )
+        predicted_next_cache_ready = bool(
+            required_adapter
+            and required_adapter in {str(item) for item in predicted_next_rsu.get("cached_adapter_ids", [])}
+        )
+        handoff_target_cache_ready = bool(
+            required_adapter
+            and required_adapter in {str(item) for item in handoff_target_rsu.get("cached_adapter_ids", [])}
+        )
+        workflow = semantic_state.get("workflow", {}) if isinstance(semantic_state.get("workflow", {}), dict) else {}
+        nodes = list(workflow.get("nodes", []) or [])
+        completed_node_ids = {str(item) for item in workflow.get("completed_node_ids", []) or []}
+        remaining_node_count = len(
+            [
+                node
+                for node in nodes
+                if str(node.get("node_id", "")) not in completed_node_ids
+            ]
+        )
+        handoff_pressure = _clamp01(
+            0.26 * target_differs
+            + 0.20 * next_differs
+            + 0.18 * non_current_ratio
+            + 0.13 * switch_ratio
+            + 0.10 * boundary_urgency
+            + 0.08 * service_pressure
+            + 0.05 * (1.0 - eta_norm)
+        )
+        event_strength = _clamp01(
+            (0.42 * handoff_pressure + 0.34 * timing_support + 0.16 * confidence_support + 0.08 * load_pressure)
+            * (0.35 + 0.65 * has_prediction)
+        )
+        prefetch_useful = bool(
+            self._adapter_prefetch_enabled
+            and predicted_next_rsu_id
+            and str(predicted_next_rsu_id) != str(current_rsu_id)
+            and required_adapter
+            and not predicted_next_cache_ready
+        )
+        prefetch_strength = _clamp01(
+            (0.42 * next_differs + 0.28 * target_differs + 0.20 * non_current_ratio + 0.10 * confidence_support)
+            * (1.0 if prefetch_useful else 0.35)
+        )
+        short_dag_pressure = 1.0 if (
+            remaining_node_count > 0
+            and remaining_node_count <= self._digital_twin_policy_prior_pacing_short_dag_threshold
+        ) else 0.0
+        current_cache_gap = 0.0 if current_cache_ready else 1.0
+        pacing_strength = _clamp01(
+            0.34 * handoff_pressure
+            + 0.24 * boundary_urgency
+            + 0.18 * short_dag_pressure
+            + 0.14 * current_cache_gap
+            + 0.10 * (1.0 - eta_norm)
+        )
+        continuation_strength = _clamp01(
+            0.30 * handoff_pressure
+            + 0.22 * timing_support
+            + 0.18 * boundary_urgency
+            + 0.14 * short_dag_pressure
+            + 0.10 * confidence_support
+            + 0.06 * (1.0 - eta_norm)
+        )
+        mechanism_context = window_class == "mechanism_activating"
+        handoff_context = bool(target_differs > 0.0 or next_differs > 0.0 or non_current_ratio >= 0.25)
+        wait_context = self._digital_twin_wait_readiness_context(
+            semantic_state,
+            timing_support=timing_support,
+            boundary_urgency=boundary_urgency,
+            handoff_context=handoff_context,
+        )
+        pacing_target = bool(
+            self._digital_twin_policy_prior_pacing_enabled
+            and pacing_strength >= self._digital_twin_policy_prior_pacing_threshold
+            and handoff_context
+            and (not current_cache_ready or short_dag_pressure > 0.0 or boundary_urgency >= 0.55)
+        )
+        continuation_target = bool(
+            self._digital_twin_policy_prior_env_action_bias_enabled
+            and continuation_strength >= self._digital_twin_policy_prior_continuation_threshold
+            and remaining_node_count > 0
+            and (mechanism_context or handoff_context)
+        )
+        event_target = int(
+            self._event_head_enabled
+            and event_strength >= self._digital_twin_policy_prior_prepare_threshold
+            and handoff_context
+        )
+        slow_target = 2 if prefetch_strength >= self._digital_twin_policy_prior_prefetch_threshold and prefetch_useful else 0
+        fast_target = 1 if pacing_target else 0
+        env_target = -1
+        env_target_reason = "none"
+        if self._digital_twin_policy_prior_adaptive_wait_enabled:
+            continuation_wait_target = bool(continuation_target and wait_context.get("wait_preferred", False))
+            continuation_prepare_target = bool(
+                continuation_target
+                and not continuation_wait_target
+                and (
+                    not handoff_target_cache_ready
+                    or timing_support >= 0.22
+                    or boundary_urgency >= 0.38
+                    or (
+                        mechanism_context
+                        and float(wait_context.get("ready_score", 0.0) or 0.0)
+                        < self._digital_twin_policy_prior_wait_ready_threshold
+                    )
+                )
+            )
+        else:
+            continuation_prepare_target = bool(
+                continuation_target
+                and (
+                    mechanism_context
+                    or timing_support >= 0.20
+                    or boundary_urgency >= 0.35
+                    or not handoff_target_cache_ready
+                )
+            )
+            continuation_wait_target = bool(continuation_target and not continuation_prepare_target)
+        if continuation_prepare_target:
+            env_target = 4
+            env_target_reason = "continuation_prepare"
+            event_target = 1
+            slow_target = 0
+            fast_target = 0
+            strength = continuation_strength
+            if (
+                self._digital_twin_policy_prior_adaptive_wait_enabled
+                and not handoff_target_cache_ready
+            ):
+                strength *= self._digital_twin_policy_prior_prepare_not_ready_scale
+        elif continuation_wait_target or pacing_target:
+            env_target = 2
+            env_target_reason = "continuation_wait" if continuation_wait_target else "handoff_pacing_wait"
+            event_target = 0
+            slow_target = 0
+            fast_target = 1
+            continuation_wait_strength = (
+                continuation_strength * self._digital_twin_policy_prior_wait_cache_ready_scale
+                if continuation_wait_target
+                else 0.0
+            )
+            strength = max(
+                continuation_wait_strength,
+                pacing_strength if pacing_target else 0.0,
+            )
+        else:
+            strength = max(
+                event_strength if event_target == 1 else 0.0,
+                prefetch_strength if slow_target == 2 else 0.0,
+            )
+        if strength <= 1e-8:
+            return {
+                "apply": False,
+                "reason": "below_threshold",
+                "event_strength": round(float(event_strength), 6),
+                "prefetch_strength": round(float(prefetch_strength), 6),
+                "pacing_strength": round(float(pacing_strength), 6),
+                "continuation_strength": round(float(continuation_strength), 6),
+            }
+        return {
+            "apply": True,
+            "reason": (
+                "dt_handoff_continuation_prepare_prior"
+                if env_target == 4
+                else "dt_handoff_continuation_wait_prior"
+                if env_target == 2
+                else "dt_handoff_pacing_prior"
+                if pacing_target
+                else "dt_handoff_policy_prior"
+            ),
+            "strength": round(float(strength), 6),
+            "event_strength": round(float(event_strength), 6),
+            "prefetch_strength": round(float(prefetch_strength), 6),
+            "pacing_strength": round(float(pacing_strength), 6),
+            "continuation_strength": round(float(continuation_strength), 6),
+            "handoff_pressure": round(float(handoff_pressure), 6),
+            "timing_support": round(float(timing_support), 6),
+            "confidence_support": round(float(confidence_support), 6),
+            "event_target": int(event_target),
+            "slow_target": int(slow_target),
+            "fast_target": int(fast_target),
+            "pacing_target": bool(pacing_target),
+            "continuation_target": bool(continuation_target),
+            "continuation_prepare_target": bool(continuation_prepare_target),
+            "continuation_wait_target": bool(continuation_wait_target),
+            "env_target": int(env_target),
+            "env_target_reason": env_target_reason,
+            "adaptive_wait_enabled": bool(self._digital_twin_policy_prior_adaptive_wait_enabled),
+            "adaptive_wait_preferred": bool(wait_context.get("wait_preferred", False)),
+            "adaptive_wait_ready_score": float(wait_context.get("ready_score", 0.0) or 0.0),
+            "window_class": window_class,
+            "remaining_node_count": int(remaining_node_count),
+            "short_dag_pressure": round(float(short_dag_pressure), 6),
+            "current_cache_ready": bool(current_cache_ready),
+            "predicted_next_cache_ready": bool(predicted_next_cache_ready),
+            "handoff_target_cache_ready": bool(handoff_target_cache_ready),
+            "predicted_next_rsu_id": predicted_next_rsu_id,
+            "predicted_handoff_target_rsu_id": predicted_handoff_target_rsu_id,
+            "current_rsu_id": current_rsu_id,
+        }
+
+    def _apply_digital_twin_policy_prior(
+        self,
+        policy_output: dict[str, Any],
+        semantic_state: dict[str, Any],
+        run_metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        if (
+            not self._digital_twin_policy_prior_enabled
+            or self._digital_twin_policy_prior_logit_bias <= 0.0
+            or not self._use_hierarchy
+        ):
+            return policy_output
+        annotation = self._build_digital_twin_policy_prior_annotation(
+            semantic_state,
+            run_metadata=run_metadata,
+        )
+        if not bool(annotation.get("apply", False)):
+            return policy_output
+        adjusted = dict(policy_output)
+        slow_logits = adjusted["slow_logits"].clone()
+        fast_logits = adjusted["fast_logits"].clone()
+        event_logits = adjusted["event_logits"].clone()
+        bias = self._digital_twin_policy_prior_logit_bias * float(annotation.get("strength", 0.0) or 0.0)
+        env_action_bias = adjusted.get("env_action_logits_bias")
+        if isinstance(env_action_bias, torch.Tensor) and env_action_bias.numel() == 5:
+            env_action_logits_bias = env_action_bias.clone()
+        else:
+            env_action_logits_bias = torch.zeros(5, dtype=event_logits.dtype, device=event_logits.device)
+        if int(annotation.get("event_target", 0)) == 1:
+            event_bias = self._digital_twin_policy_prior_event_scale * bias
+            event_logits[1] = event_logits[1] + event_bias
+            event_logits[0] = event_logits[0] - 0.20 * event_bias
+        if int(annotation.get("slow_target", 0)) == 2:
+            slow_bias = self._digital_twin_policy_prior_slow_scale * bias
+            slow_logits[2] = slow_logits[2] + slow_bias
+            slow_logits[0] = slow_logits[0] - 0.10 * slow_bias
+        if bool(annotation.get("pacing_target", False)):
+            pacing_fast_bias = self._digital_twin_policy_prior_pacing_fast_scale * bias
+            fast_logits[1] = fast_logits[1] + pacing_fast_bias
+            if self._digital_twin_policy_prior_pacing_event_suppression > 0.0:
+                event_suppression = self._digital_twin_policy_prior_pacing_event_suppression * bias
+                event_logits[1] = event_logits[1] - event_suppression
+                event_logits[0] = event_logits[0] + 0.20 * event_suppression
+            if self._digital_twin_policy_prior_pacing_slow_suppression > 0.0:
+                slow_suppression = self._digital_twin_policy_prior_pacing_slow_suppression * bias
+                slow_logits[1] = slow_logits[1] - slow_suppression
+                slow_logits[2] = slow_logits[2] - 0.50 * slow_suppression
+        if self._digital_twin_policy_prior_fast_scale > 0.0:
+            fast_bias = self._digital_twin_policy_prior_fast_scale * bias
+            fast_logits[0] = fast_logits[0] + fast_bias
+        env_target = int(annotation.get("env_target", -1))
+        if (
+            self._digital_twin_policy_prior_env_action_bias_enabled
+            and self._digital_twin_policy_prior_env_action_logit_bias > 0.0
+            and 0 <= env_target < 5
+        ):
+            env_bias = self._digital_twin_policy_prior_env_action_logit_bias * float(
+                annotation.get("strength", 0.0) or 0.0
+            )
+            if env_target == 4:
+                env_bias *= self._digital_twin_policy_prior_continuation_prepare_scale
+                event_logits[1] = event_logits[1] + 0.35 * env_bias
+                event_logits[0] = event_logits[0] - 0.12 * env_bias
+            elif env_target == 2:
+                env_bias *= self._digital_twin_policy_prior_continuation_wait_scale
+                fast_logits[1] = fast_logits[1] + 0.45 * env_bias
+                event_logits[1] = event_logits[1] - 0.25 * env_bias
+                event_logits[0] = event_logits[0] + 0.08 * env_bias
+            env_action_logits_bias[env_target] = env_action_logits_bias[env_target] + env_bias
+            steady_suppression = self._digital_twin_policy_prior_continuation_steady_suppression * env_bias
+            if steady_suppression > 0.0:
+                env_action_logits_bias[3] = env_action_logits_bias[3] - steady_suppression
+                if env_target == 4:
+                    env_action_logits_bias[0] = env_action_logits_bias[0] - 0.35 * steady_suppression
+                    env_action_logits_bias[1] = env_action_logits_bias[1] - 0.25 * steady_suppression
+                elif env_target == 2:
+                    env_action_logits_bias[4] = env_action_logits_bias[4] - 0.20 * steady_suppression
+        adjusted["slow_logits"] = slow_logits
+        adjusted["fast_logits"] = fast_logits
+        adjusted["event_logits"] = event_logits
+        adjusted["env_action_logits_bias"] = env_action_logits_bias
+        adjusted["digital_twin_policy_prior_info"] = {
+            **annotation,
+            "logit_bias": round(float(bias), 6),
+            "env_action_logit_bias": [
+                round(float(item), 6)
+                for item in env_action_logits_bias.detach().cpu().tolist()
+            ],
+        }
+        return adjusted
+
+    def _compute_digital_twin_policy_prior_loss(
+        self,
+        *,
+        batch_outputs: list[dict[str, Any]],
+        batch_annotations: list[dict[str, Any]],
+        batch_advantage: torch.Tensor,
+    ) -> torch.Tensor:
+        if (
+            not self._digital_twin_policy_prior_enabled
+            or self._digital_twin_policy_prior_distill_coef <= 0.0
+            or not self._use_hierarchy
+        ):
+            return torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        loss_terms: list[torch.Tensor] = []
+        for row_index, (policy_output, annotation) in enumerate(zip(batch_outputs, batch_annotations)):
+            if not bool(annotation.get("apply", False)):
+                continue
+            weight = float(annotation.get("strength", 0.0) or 0.0)
+            if batch_advantage.numel() > row_index:
+                positive_advantage = max(float(batch_advantage[row_index].detach().item()), 0.0)
+                weight *= 1.0 + self._digital_twin_policy_prior_advantage_weight * positive_advantage
+            if self._digital_twin_policy_prior_max_weight > 0.0:
+                weight = min(weight, self._digital_twin_policy_prior_max_weight)
+            if weight <= 1e-8:
+                continue
+            term = torch.tensor(0.0, dtype=torch.float32, device=self._device)
+            if int(annotation.get("event_target", 0)) == 1:
+                event_target = torch.tensor([1], dtype=torch.long, device=self._device)
+                term = term + self._digital_twin_policy_prior_event_scale * nn.functional.cross_entropy(
+                    policy_output["event_logits"].unsqueeze(0),
+                    event_target,
+                )
+            elif bool(annotation.get("pacing_target", False)):
+                event_target = torch.tensor([0], dtype=torch.long, device=self._device)
+                term = term + self._digital_twin_policy_prior_pacing_event_suppression * nn.functional.cross_entropy(
+                    policy_output["event_logits"].unsqueeze(0),
+                    event_target,
+                )
+            slow_target_value = int(annotation.get("slow_target", 0))
+            if slow_target_value == 2:
+                slow_target = torch.tensor([slow_target_value], dtype=torch.long, device=self._device)
+                term = term + self._digital_twin_policy_prior_slow_scale * nn.functional.cross_entropy(
+                    policy_output["slow_logits"].unsqueeze(0),
+                    slow_target,
+                )
+            fast_target_value = int(annotation.get("fast_target", 0))
+            if bool(annotation.get("pacing_target", False)):
+                fast_target = torch.tensor([fast_target_value], dtype=torch.long, device=self._device)
+                term = term + self._digital_twin_policy_prior_pacing_fast_scale * nn.functional.cross_entropy(
+                    policy_output["fast_logits"].unsqueeze(0),
+                    fast_target,
+                )
+                slow_target = torch.tensor([0], dtype=torch.long, device=self._device)
+                term = term + self._digital_twin_policy_prior_pacing_slow_suppression * nn.functional.cross_entropy(
+                    policy_output["slow_logits"].unsqueeze(0),
+                    slow_target,
+                )
+            elif self._digital_twin_policy_prior_fast_scale > 0.0:
+                fast_target = torch.tensor([fast_target_value], dtype=torch.long, device=self._device)
+                term = term + 0.25 * self._digital_twin_policy_prior_fast_scale * nn.functional.cross_entropy(
+                    policy_output["fast_logits"].unsqueeze(0),
+                    fast_target,
+                )
+            env_target_value = int(annotation.get("env_target", -1))
+            if (
+                self._digital_twin_policy_prior_env_action_bias_enabled
+                and 0 <= env_target_value < 5
+            ):
+                env_target = torch.tensor([env_target_value], dtype=torch.long, device=self._device)
+                env_scores = self._hierarchical_env_action_scores(policy_output)
+                env_scale = (
+                    self._digital_twin_policy_prior_continuation_prepare_scale
+                    if env_target_value == 4
+                    else self._digital_twin_policy_prior_continuation_wait_scale
+                    if env_target_value == 2
+                    else 1.0
+                )
+                term = term + env_scale * nn.functional.cross_entropy(
+                    env_scores.unsqueeze(0),
+                    env_target,
+                )
+            loss_terms.append(term * weight)
+        if not loss_terms:
+            return torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        return torch.stack(loss_terms).mean()
+
     def _effective_heuristic_imitation_coef(self) -> float:
         if self._heuristic_imitation_coef <= 0.0:
             return 0.0
@@ -5020,10 +6895,28 @@ class 分层PPO基类(BaseAgent):
         applied_count = 0
         match_count = 0
         if self._heuristic_imitation_coef <= 0.0 or not rollout:
-            return {"applied_count": 0, "match_count": 0, "match_rate": 0.0}
+            return {
+                "applied_count": 0,
+                "match_count": 0,
+                "match_rate": 0.0,
+                "reward_floor": 0.0,
+                "weight_mean": 0.0,
+                "weight_max": 0.0,
+            }
+        reward_floor = 0.0
+        if self._conservative_imitation_enabled:
+            reward_values = np.asarray(
+                [float(row.get("reward", 0.0) or 0.0) for row in rollout],
+                dtype=np.float32,
+            )
+            reward_floor = float(
+                np.quantile(reward_values, self._conservative_imitation_reward_quantile)
+            )
         teacher = PopularityCacheHeuristicAgent()
+        weights: list[float] = []
         for row in rollout:
             row["imitation_applied"] = False
+            row["imitation_weight"] = 0.0
             decision_info = dict(row.get("decision_info", {}))
             semantic_state = self._extract_semantic_state(decision_info)
             run_metadata = dict(decision_info.get("run_metadata", {}))
@@ -5042,11 +6935,59 @@ class 分层PPO基类(BaseAgent):
             row["teacher_reason"] = str(teacher_info.get("heuristic_reason", "unknown"))
             row["imitation_applied"] = True
             row["imitation_head_targets"] = self._head_targets_for_env_action(int(teacher_action))
+            imitation_weight = self._conservative_imitation_weight(
+                row,
+                reward_floor=reward_floor,
+                student_action=student_action,
+                teacher_action=int(teacher_action),
+            )
+            row["imitation_weight"] = float(imitation_weight)
+            weights.append(float(imitation_weight))
             applied_count += 1
             if student_action == int(teacher_action):
                 match_count += 1
         match_rate = float(match_count) / float(applied_count) if applied_count else 0.0
-        return {"applied_count": applied_count, "match_count": match_count, "match_rate": match_rate}
+        weight_mean = float(sum(weights) / len(weights)) if weights else 0.0
+        weight_max = float(max(weights)) if weights else 0.0
+        return {
+            "applied_count": applied_count,
+            "match_count": match_count,
+            "match_rate": match_rate,
+            "reward_floor": reward_floor,
+            "weight_mean": weight_mean,
+            "weight_max": weight_max,
+        }
+
+    def _conservative_imitation_weight(
+        self,
+        row: dict[str, Any],
+        *,
+        reward_floor: float,
+        student_action: int,
+        teacher_action: int,
+    ) -> float:
+        if not self._conservative_imitation_enabled:
+            return 1.0
+        reward = float(row.get("reward", 0.0) or 0.0)
+        shortfall = max(float(reward_floor) - reward, 0.0)
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        failed_mechanism = self._row_failed_mechanism_attempt(row, metrics)
+        mechanism_success = self._row_mechanism_success(metrics)
+        mismatch = int(student_action) != int(teacher_action)
+        weight = (
+            self._conservative_imitation_min_weight
+            + self._conservative_imitation_shortfall_coef * min(shortfall, 1.0)
+            + self._conservative_imitation_failure_coef * float(failed_mechanism)
+            + self._conservative_imitation_mismatch_coef * float(mismatch)
+        )
+        if mechanism_success and shortfall <= 1e-8:
+            weight *= self._conservative_imitation_success_decay
+        return float(
+            max(
+                self._conservative_imitation_min_weight,
+                min(self._conservative_imitation_max_weight, weight),
+            )
+        )
 
     def _should_apply_heuristic_imitation(
         self,
@@ -5101,30 +7042,220 @@ class 分层PPO基类(BaseAgent):
         for policy_output, row in zip(batch_outputs, batch_rows):
             if not bool(row.get("imitation_applied", False)):
                 continue
+            imitation_weight = torch.tensor(
+                float(row.get("imitation_weight", 1.0) or 1.0),
+                dtype=torch.float32,
+                device=self._device,
+            )
             teacher_action = int(row.get("teacher_action", 3))
             if not self._use_hierarchy:
                 target = torch.tensor([teacher_action], dtype=torch.long, device=self._device)
-                loss_terms.append(nn.functional.cross_entropy(policy_output["flat_logits"].unsqueeze(0), target))
+                loss_terms.append(
+                    imitation_weight
+                    * nn.functional.cross_entropy(policy_output["flat_logits"].unsqueeze(0), target)
+                )
                 continue
             head_targets = dict(row.get("imitation_head_targets", self._head_targets_for_env_action(teacher_action)))
             if teacher_action == 4:
                 target = torch.tensor([int(head_targets.get("event", 1))], dtype=torch.long, device=self._device)
-                loss_terms.append(nn.functional.cross_entropy(policy_output["event_logits"].unsqueeze(0), target))
+                loss_terms.append(
+                    imitation_weight
+                    * nn.functional.cross_entropy(policy_output["event_logits"].unsqueeze(0), target)
+                )
             elif teacher_action in {0, 1}:
                 target = torch.tensor([int(head_targets.get("slow", 0))], dtype=torch.long, device=self._device)
-                loss_terms.append(nn.functional.cross_entropy(policy_output["slow_logits"].unsqueeze(0), target))
+                loss_terms.append(
+                    imitation_weight
+                    * nn.functional.cross_entropy(policy_output["slow_logits"].unsqueeze(0), target)
+                )
             elif teacher_action == 2:
                 target = torch.tensor([int(head_targets.get("fast", 1))], dtype=torch.long, device=self._device)
-                loss_terms.append(nn.functional.cross_entropy(policy_output["fast_logits"].unsqueeze(0), target))
+                loss_terms.append(
+                    imitation_weight
+                    * nn.functional.cross_entropy(policy_output["fast_logits"].unsqueeze(0), target)
+                )
             else:
                 event_target = torch.tensor([0], dtype=torch.long, device=self._device)
                 slow_target = torch.tensor([0], dtype=torch.long, device=self._device)
                 fast_target = torch.tensor([0], dtype=torch.long, device=self._device)
                 loss_terms.append(
-                    0.5 * nn.functional.cross_entropy(policy_output["event_logits"].unsqueeze(0), event_target)
-                    + 0.25 * nn.functional.cross_entropy(policy_output["slow_logits"].unsqueeze(0), slow_target)
-                    + 0.25 * nn.functional.cross_entropy(policy_output["fast_logits"].unsqueeze(0), fast_target)
+                    imitation_weight
+                    * (
+                        0.5 * nn.functional.cross_entropy(policy_output["event_logits"].unsqueeze(0), event_target)
+                        + 0.25 * nn.functional.cross_entropy(policy_output["slow_logits"].unsqueeze(0), slow_target)
+                        + 0.25 * nn.functional.cross_entropy(policy_output["fast_logits"].unsqueeze(0), fast_target)
+                    )
                 )
+        if not loss_terms:
+            return torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        return torch.stack(loss_terms).mean()
+
+    def _annotate_advantage_weighted_behavior_targets(
+        self,
+        rollout: list[dict[str, Any]],
+        *,
+        advantage_values: np.ndarray,
+    ) -> dict[str, float | int]:
+        for row in rollout:
+            row["advantage_weighted_behavior_applied"] = False
+            row["advantage_weighted_behavior_weight"] = 0.0
+            row["advantage_weighted_behavior_mode"] = "none"
+            row["advantage_weighted_behavior_target_action"] = int(row.get("action", 3) or 3)
+
+        if (
+            not self._advantage_weighted_behavior_regularization_enabled
+            or self._advantage_weighted_behavior_coef <= 0.0
+            or not rollout
+        ):
+            return {
+                "applied_count": 0,
+                "positive_count": 0,
+                "negative_count": 0,
+                "teacher_match_count": 0,
+                "teacher_match_rate": 0.0,
+                "weight_mean": 0.0,
+                "weight_max": 0.0,
+            }
+
+        teacher = PopularityCacheHeuristicAgent()
+        applied_count = 0
+        positive_count = 0
+        negative_count = 0
+        teacher_match_count = 0
+        teacher_seen_count = 0
+        weights: list[float] = []
+        for row_index, row in enumerate(rollout):
+            decision_info = dict(row.get("decision_info", {}))
+            try:
+                semantic_state = self._extract_semantic_state(decision_info)
+            except ValueError:
+                continue
+            action_mask = self._extract_action_mask(decision_info)
+            teacher_action, teacher_info = teacher.act(
+                None,
+                {
+                    "semantic_state": semantic_state,
+                    "action_mask": action_mask,
+                },
+            )
+            action_info = dict(row.get("action_info", {}))
+            student_action = int(action_info.get("final_env_action", row.get("action", 3)) or 3)
+            teacher_action = int(teacher_action)
+            if not self._is_env_action_valid(teacher_action, action_mask):
+                continue
+            teacher_seen_count += 1
+            if student_action == teacher_action:
+                teacher_match_count += 1
+                continue
+            advantage_value = float(advantage_values[row_index]) if row_index < len(advantage_values) else 0.0
+            target_action: int | None = None
+            mode = "none"
+            coefficient = 0.0
+            magnitude = 0.0
+            if (
+                advantage_value > self._advantage_weighted_behavior_positive_gate
+                and self._advantage_weighted_behavior_positive_coef > 0.0
+            ):
+                target_action = student_action
+                mode = "positive_deviation"
+                coefficient = self._advantage_weighted_behavior_positive_coef
+                magnitude = advantage_value - self._advantage_weighted_behavior_positive_gate
+            elif (
+                advantage_value < -self._advantage_weighted_behavior_negative_gate
+                and self._advantage_weighted_behavior_negative_coef > 0.0
+            ):
+                target_action = teacher_action
+                mode = "negative_recovery"
+                coefficient = self._advantage_weighted_behavior_negative_coef
+                magnitude = -advantage_value - self._advantage_weighted_behavior_negative_gate
+            if target_action is None or not self._is_env_action_valid(target_action, action_mask):
+                continue
+
+            weight = coefficient * math.exp(
+                min(
+                    magnitude / self._advantage_weighted_behavior_temperature,
+                    math.log(max(self._advantage_weighted_behavior_max_weight, 1.0)),
+                )
+            )
+            if self._advantage_weighted_behavior_max_weight > 0.0:
+                weight = min(weight, self._advantage_weighted_behavior_max_weight)
+            metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+            mechanism_context = bool(
+                self._row_window_class(row) == "mechanism_activating"
+                or student_action in {1, 4}
+                or teacher_action in {1, 4}
+                or self._handoff_risk_context(row, metrics)
+            )
+            if mechanism_context:
+                weight *= self._advantage_weighted_behavior_mechanism_scale
+            if weight <= 1e-8:
+                continue
+
+            row["advantage_weighted_behavior_applied"] = True
+            row["advantage_weighted_behavior_weight"] = float(weight)
+            row["advantage_weighted_behavior_mode"] = mode
+            row["advantage_weighted_behavior_target_action"] = int(target_action)
+            row["advantage_weighted_behavior_teacher_action"] = teacher_action
+            row["advantage_weighted_behavior_student_action"] = int(student_action)
+            row["advantage_weighted_behavior_advantage"] = float(advantage_value)
+            row["advantage_weighted_behavior_teacher_reason"] = str(
+                teacher_info.get("heuristic_reason", "unknown")
+            )
+            weights.append(float(weight))
+            applied_count += 1
+            if mode == "positive_deviation":
+                positive_count += 1
+            elif mode == "negative_recovery":
+                negative_count += 1
+
+        return {
+            "applied_count": applied_count,
+            "positive_count": positive_count,
+            "negative_count": negative_count,
+            "teacher_match_count": teacher_match_count,
+            "teacher_match_rate": (
+                float(teacher_match_count) / float(teacher_seen_count)
+                if teacher_seen_count
+                else 0.0
+            ),
+            "weight_mean": float(sum(weights) / len(weights)) if weights else 0.0,
+            "weight_max": float(max(weights)) if weights else 0.0,
+        }
+
+    def _compute_advantage_weighted_behavior_loss(
+        self,
+        *,
+        batch_outputs: list[dict[str, Any]],
+        batch_action_masks: list[list[bool] | None],
+        batch_rows: list[dict[str, Any]],
+    ) -> torch.Tensor:
+        if (
+            not self._advantage_weighted_behavior_regularization_enabled
+            or self._advantage_weighted_behavior_coef <= 0.0
+            or not batch_outputs
+        ):
+            return torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        loss_terms: list[torch.Tensor] = []
+        for policy_output, action_mask, row in zip(batch_outputs, batch_action_masks, batch_rows):
+            if not bool(row.get("advantage_weighted_behavior_applied", False)):
+                continue
+            target_action = int(row.get("advantage_weighted_behavior_target_action", row.get("action", 3)) or 3)
+            if not self._is_env_action_valid(target_action, action_mask):
+                continue
+            weight = float(row.get("advantage_weighted_behavior_weight", 0.0) or 0.0)
+            if weight <= 1e-8:
+                continue
+            if not self._use_hierarchy:
+                logits = self._masked_flat_logits(policy_output["flat_logits"], action_mask)
+            else:
+                logits = self._masked_flat_logits(
+                    self._hierarchical_env_action_scores(policy_output),
+                    action_mask,
+                )
+            target = torch.tensor([target_action], dtype=torch.long, device=self._device)
+            loss_terms.append(
+                nn.functional.cross_entropy(logits.unsqueeze(0), target) * float(weight)
+            )
         if not loss_terms:
             return torch.tensor(0.0, dtype=torch.float32, device=self._device)
         return torch.stack(loss_terms).mean()
@@ -5259,6 +7390,14 @@ class 分层PPO基类(BaseAgent):
             "heuristic_imitation_coef": self._heuristic_imitation_coef,
             "heuristic_imitation_warmup_updates": self._heuristic_imitation_warmup_updates,
             "heuristic_imitation_decay": self._heuristic_imitation_decay,
+            "conservative_imitation_enabled": self._conservative_imitation_enabled,
+            "conservative_imitation_reward_quantile": self._conservative_imitation_reward_quantile,
+            "conservative_imitation_min_weight": self._conservative_imitation_min_weight,
+            "conservative_imitation_max_weight": self._conservative_imitation_max_weight,
+            "conservative_imitation_shortfall_coef": self._conservative_imitation_shortfall_coef,
+            "conservative_imitation_failure_coef": self._conservative_imitation_failure_coef,
+            "conservative_imitation_mismatch_coef": self._conservative_imitation_mismatch_coef,
+            "conservative_imitation_success_decay": self._conservative_imitation_success_decay,
             "mechanism_aux_coef": self._mechanism_aux_coef,
             "mechanism_window_weight": self._mechanism_window_weight,
             "prepare_action_prior_weight": self._prepare_action_prior_weight,
@@ -5268,9 +7407,131 @@ class 分层PPO基类(BaseAgent):
             "mechanism_window_weight_floor_after_update": self._mechanism_window_weight_floor_after_update,
             "mechanism_entropy_floor_after_update": self._mechanism_entropy_floor_after_update,
             "mechanism_aux_current_cache_fill_enabled": self._mechanism_aux_current_cache_fill_enabled,
+            "mechanism_credit_prd_enabled": self._mechanism_credit_prd_enabled,
+            "mechanism_credit_policy_coef": self._mechanism_credit_policy_coef,
+            "mechanism_credit_event_coef": self._mechanism_credit_event_coef,
+            "mechanism_credit_option_coef": self._mechanism_credit_option_coef,
+            "mechanism_credit_clip": self._mechanism_credit_clip,
+            "mechanism_credit_success_bonus": self._mechanism_credit_success_bonus,
+            "mechanism_credit_prepare_bonus": self._mechanism_credit_prepare_bonus,
+            "mechanism_credit_ready_bonus": self._mechanism_credit_ready_bonus,
+            "mechanism_credit_prefetch_hit_bonus": self._mechanism_credit_prefetch_hit_bonus,
+            "mechanism_credit_miss_penalty": self._mechanism_credit_miss_penalty,
+            "mechanism_credit_false_positive_penalty": self._mechanism_credit_false_positive_penalty,
+            "mechanism_credit_min_context": self._mechanism_credit_min_context,
+            "mechanism_focal_aux_enabled": self._mechanism_focal_aux_enabled,
+            "mechanism_focal_gamma": self._mechanism_focal_gamma,
+            "digital_twin_handoff_fusion_enabled": self._digital_twin_handoff_fusion_enabled,
+            "digital_twin_handoff_slow_scale": self._digital_twin_handoff_slow_scale,
+            "digital_twin_handoff_fast_scale": self._digital_twin_handoff_fast_scale,
+            "digital_twin_handoff_event_scale": self._digital_twin_handoff_event_scale,
+            "digital_twin_handoff_critic_scale": self._digital_twin_handoff_critic_scale,
+            "digital_twin_policy_prior_enabled": self._digital_twin_policy_prior_enabled,
+            "digital_twin_policy_prior_logit_bias": self._digital_twin_policy_prior_logit_bias,
+            "digital_twin_policy_prior_event_scale": self._digital_twin_policy_prior_event_scale,
+            "digital_twin_policy_prior_slow_scale": self._digital_twin_policy_prior_slow_scale,
+            "digital_twin_policy_prior_fast_scale": self._digital_twin_policy_prior_fast_scale,
+            "digital_twin_policy_prior_prepare_threshold": self._digital_twin_policy_prior_prepare_threshold,
+            "digital_twin_policy_prior_prefetch_threshold": self._digital_twin_policy_prior_prefetch_threshold,
+            "digital_twin_policy_prior_confidence_floor": self._digital_twin_policy_prior_confidence_floor,
+            "digital_twin_policy_prior_distill_coef": self._digital_twin_policy_prior_distill_coef,
+            "digital_twin_policy_prior_distill_warmup_updates": (
+                self._digital_twin_policy_prior_distill_warmup_updates
+            ),
+            "digital_twin_policy_prior_distill_decay": self._digital_twin_policy_prior_distill_decay,
+            "digital_twin_policy_prior_advantage_weight": self._digital_twin_policy_prior_advantage_weight,
+            "digital_twin_policy_prior_max_weight": self._digital_twin_policy_prior_max_weight,
+            "digital_twin_policy_prior_pacing_enabled": self._digital_twin_policy_prior_pacing_enabled,
+            "digital_twin_policy_prior_pacing_threshold": self._digital_twin_policy_prior_pacing_threshold,
+            "digital_twin_policy_prior_pacing_fast_scale": self._digital_twin_policy_prior_pacing_fast_scale,
+            "digital_twin_policy_prior_pacing_event_suppression": (
+                self._digital_twin_policy_prior_pacing_event_suppression
+            ),
+            "digital_twin_policy_prior_pacing_slow_suppression": (
+                self._digital_twin_policy_prior_pacing_slow_suppression
+            ),
+            "digital_twin_policy_prior_pacing_short_dag_threshold": (
+                self._digital_twin_policy_prior_pacing_short_dag_threshold
+            ),
+            "digital_twin_policy_prior_env_action_bias_enabled": (
+                self._digital_twin_policy_prior_env_action_bias_enabled
+            ),
+            "digital_twin_policy_prior_env_action_logit_bias": (
+                self._digital_twin_policy_prior_env_action_logit_bias
+            ),
+            "digital_twin_policy_prior_continuation_threshold": (
+                self._digital_twin_policy_prior_continuation_threshold
+            ),
+            "digital_twin_policy_prior_continuation_prepare_scale": (
+                self._digital_twin_policy_prior_continuation_prepare_scale
+            ),
+            "digital_twin_policy_prior_continuation_wait_scale": (
+                self._digital_twin_policy_prior_continuation_wait_scale
+            ),
+            "digital_twin_policy_prior_continuation_steady_suppression": (
+                self._digital_twin_policy_prior_continuation_steady_suppression
+            ),
+            "digital_twin_policy_prior_adaptive_wait_enabled": (
+                self._digital_twin_policy_prior_adaptive_wait_enabled
+            ),
+            "digital_twin_policy_prior_wait_ready_threshold": (
+                self._digital_twin_policy_prior_wait_ready_threshold
+            ),
+            "digital_twin_policy_prior_wait_timing_ceiling": (
+                self._digital_twin_policy_prior_wait_timing_ceiling
+            ),
+            "digital_twin_policy_prior_wait_cache_ready_scale": (
+                self._digital_twin_policy_prior_wait_cache_ready_scale
+            ),
+            "digital_twin_policy_prior_prepare_not_ready_scale": (
+                self._digital_twin_policy_prior_prepare_not_ready_scale
+            ),
+            "env_action_ppo_enabled": self._env_action_ppo_enabled,
+            "env_action_ppo_coef": self._env_action_ppo_coef,
+            "env_action_ppo_advantage_blend": self._env_action_ppo_advantage_blend,
+            "env_action_ppo_teacher_coef": self._env_action_ppo_teacher_coef,
+            "env_action_ppo_mechanism_focus": self._env_action_ppo_mechanism_focus,
+            "env_action_ppo_max_weight": self._env_action_ppo_max_weight,
+            "env_action_ppo_ratio_barrier_coef": self._env_action_ppo_ratio_barrier_coef,
+            "env_action_ppo_ratio_barrier_margin": self._env_action_ppo_ratio_barrier_margin,
+            "env_action_counterfactual_margin_enabled": self._env_action_counterfactual_margin_enabled,
+            "env_action_counterfactual_margin_coef": self._env_action_counterfactual_margin_coef,
+            "env_action_counterfactual_margin_min_gap": self._env_action_counterfactual_margin_min_gap,
+            "env_action_counterfactual_margin_max_weight": self._env_action_counterfactual_margin_max_weight,
+            "env_action_counterfactual_margin_advantage_gate": (
+                self._env_action_counterfactual_margin_advantage_gate
+            ),
+            "env_action_counterfactual_margin_advantage_blend": (
+                self._env_action_counterfactual_margin_advantage_blend
+            ),
             "event_prd_advantage_enabled": self._event_prd_advantage_enabled,
             "event_prd_advantage_coef": self._event_prd_advantage_coef,
             "event_prd_advantage_clip": self._event_prd_advantage_clip,
+            "delayed_mechanism_credit_enabled": self._delayed_mechanism_credit_enabled,
+            "delayed_mechanism_credit_policy_coef": self._delayed_mechanism_credit_policy_coef,
+            "delayed_mechanism_credit_event_coef": self._delayed_mechanism_credit_event_coef,
+            "delayed_mechanism_credit_horizon": self._delayed_mechanism_credit_horizon,
+            "delayed_mechanism_credit_decay": self._delayed_mechanism_credit_decay,
+            "delayed_mechanism_credit_clip": self._delayed_mechanism_credit_clip,
+            "delayed_mechanism_credit_ready_bonus": self._delayed_mechanism_credit_ready_bonus,
+            "delayed_mechanism_credit_success_bonus": self._delayed_mechanism_credit_success_bonus,
+            "delayed_mechanism_credit_failure_penalty": self._delayed_mechanism_credit_failure_penalty,
+            "delayed_mechanism_credit_missed_prepare_scale": (
+                self._delayed_mechanism_credit_missed_prepare_scale
+            ),
+            "delayed_mechanism_credit_stale_penalty": self._delayed_mechanism_credit_stale_penalty,
+            "delayed_mechanism_credit_context_gate": self._delayed_mechanism_credit_context_gate,
+            "advantage_weighted_behavior_regularization_enabled": (
+                self._advantage_weighted_behavior_regularization_enabled
+            ),
+            "advantage_weighted_behavior_coef": self._advantage_weighted_behavior_coef,
+            "advantage_weighted_behavior_positive_coef": self._advantage_weighted_behavior_positive_coef,
+            "advantage_weighted_behavior_negative_coef": self._advantage_weighted_behavior_negative_coef,
+            "advantage_weighted_behavior_temperature": self._advantage_weighted_behavior_temperature,
+            "advantage_weighted_behavior_max_weight": self._advantage_weighted_behavior_max_weight,
+            "advantage_weighted_behavior_positive_gate": self._advantage_weighted_behavior_positive_gate,
+            "advantage_weighted_behavior_negative_gate": self._advantage_weighted_behavior_negative_gate,
+            "advantage_weighted_behavior_mechanism_scale": self._advantage_weighted_behavior_mechanism_scale,
             "latency_fallback_bias_enabled": self._latency_fallback_bias_enabled,
             "latency_fallback_bias_strength": self._latency_fallback_bias_strength,
             "latency_fallback_confidence_floor": self._latency_fallback_confidence_floor,
@@ -5469,6 +7730,7 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
         self,
         policy_output: dict[str, Any],
         semantic_state: dict[str, Any],
+        run_metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         adjusted = dict(policy_output)
         if self._use_hierarchy and self._mechanism_logit_bias_strength > 0.0:
@@ -5527,6 +7789,11 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
                     "latency_fallback_candidate": latency_fallback_candidate,
                     "steady_rsu_candidate": steady_rsu_candidate,
                 }
+        adjusted = self._apply_digital_twin_policy_prior(
+            adjusted,
+            semantic_state,
+            run_metadata=run_metadata,
+        )
         adjusted = self._apply_continuity_guard(adjusted, semantic_state)
         return self._apply_event_logit_sharpening(adjusted, semantic_state)
 
