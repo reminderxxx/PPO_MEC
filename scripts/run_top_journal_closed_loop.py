@@ -84,6 +84,18 @@ SA_LATEST_FIRST_PROFILES = {
     "top_journal_mechanism_v39_delayed_credit_mappo",
     "top_journal_mechanism_v40_advantage_weighted_behavior_mappo",
     "top_journal_mechanism_v41_conservative_recovery_mappo",
+    "top_journal_mechanism_v42_completion_aligned_mappo",
+    "top_journal_mechanism_v43_strict_opportunity_mappo",
+    "top_journal_mechanism_v44_opportunity_constrained_mappo",
+    "top_journal_mechanism_v45_balanced_refresh_mappo",
+    "top_journal_mechanism_v46_net_utility_constrained_mappo",
+}
+OFFSET_FREE_REWARD_PROFILES = {
+    "top_journal_mechanism_v42_completion_aligned_mappo",
+    "top_journal_mechanism_v43_strict_opportunity_mappo",
+    "top_journal_mechanism_v44_opportunity_constrained_mappo",
+    "top_journal_mechanism_v45_balanced_refresh_mappo",
+    "top_journal_mechanism_v46_net_utility_constrained_mappo",
 }
 LOWER_IS_BETTER = {
     "backhaul_traffic_cost",
@@ -441,6 +453,56 @@ SA_PROFILE_SETTING_OVERRIDES = {
         "window_count": 20,
         "max_steps": 22,
     },
+    "top_journal_mechanism_v42_completion_aligned_mappo": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 5000000,
+        "window_count": 20,
+        "max_steps": 22,
+    },
+    "top_journal_mechanism_v43_strict_opportunity_mappo": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 5000000,
+        "window_count": 20,
+        "max_steps": 22,
+    },
+    "top_journal_mechanism_v44_opportunity_constrained_mappo": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 5000000,
+        "window_count": 20,
+        "max_steps": 22,
+    },
+    "top_journal_mechanism_v45_balanced_refresh_mappo": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 5000000,
+        "window_count": 20,
+        "max_steps": 22,
+    },
+    "top_journal_mechanism_v46_net_utility_constrained_mappo": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 5000000,
+        "window_count": 20,
+        "max_steps": 22,
+    },
 }
 CURRENT_BASELINE_PROTOCOLS = {
     "mappo": {
@@ -506,6 +568,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--baseline_batch_size", type=int, default=None)
     parser.add_argument("--max_mobility_rows", type=int, default=None)
     parser.add_argument("--max_workflows", type=int, default=None)
+    parser.add_argument("--reward_positive_offset", type=float, default=None)
     parser.add_argument("--window_length", type=int, default=None)
     parser.add_argument("--window_count", type=int, default=None)
     parser.add_argument("--train_window_count", type=int, default=None)
@@ -566,6 +629,14 @@ def effective_settings(args: argparse.Namespace) -> dict[str, int]:
         key: int(getattr(args, key)) if getattr(args, key) is not None else value
         for key, value in defaults.items()
     }
+
+
+def effective_reward_positive_offset(args: argparse.Namespace) -> float:
+    if args.reward_positive_offset is not None:
+        return max(float(args.reward_positive_offset), 0.0)
+    if str(args.sa_profile) in OFFSET_FREE_REWARD_PROFILES:
+        return 0.0
+    return 5.0
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -739,6 +810,8 @@ def common_real_args(args: argparse.Namespace, settings: dict[str, int]) -> list
         str(settings["max_mobility_rows"]),
         "--max_workflows",
         str(settings["max_workflows"]),
+        "--reward_positive_offset",
+        str(effective_reward_positive_offset(args)),
         "--workflow_selector",
         args.workflow_selector,
         "--rsu_layout",
@@ -1141,6 +1214,11 @@ def build_gate_report(
         "passed": passed,
         "settings": settings,
         "primary_vehicle_selection": args.primary_vehicle_selection,
+        "reward_protocol": {
+            "reward_positive_offset": effective_reward_positive_offset(args),
+            "offset_free": abs(effective_reward_positive_offset(args)) <= 1e-12,
+            "offset_adjusted_total_reward_reported": True,
+        },
         "seeds": args.seeds,
         "baseline_agents": args.baseline_agents,
         "mappo_baseline_profile": args.mappo_baseline_profile,
@@ -1192,6 +1270,11 @@ def main() -> None:
             "quick": bool(args.quick),
             "args": vars(args),
             "settings": settings,
+            "reward_protocol": {
+                "reward_positive_offset": effective_reward_positive_offset(args),
+                "offset_free": abs(effective_reward_positive_offset(args)) <= 1e-12,
+                "offset_adjusted_total_reward_reported": True,
+            },
         },
     )
 

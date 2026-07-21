@@ -1,0 +1,36 @@
+profile: top_journal_mechanism_v46_net_utility_constrained_mappo
+base_profile: top_journal_mechanism_v44_opportunity_constrained_mappo
+purpose: >
+  Offset-free MAPPO candidate that combines v44 opportunity-constrained actor
+  logits with constrained net-utility partial-reward decoupling, targeting the
+  remaining backhaul-cost blocker against popularity_cache_heuristic.
+algorithm_delta:
+  - Enables policy-side net-utility PRD with a Lagrangian-style dual cost signal
+    for backhaul, migration, expired prefetch, idle prefetch, and failed
+    mechanism attempts.
+  - Keeps v44 opportunity gating in the actor logits so prepare/prefetch remains
+    available only under trusted handoff context.
+  - Does not modify environment reward, baseline contracts, evaluator fields,
+    window selection, or result filtering.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+net_utility_prd:
+  net_utility_prd_enabled: true
+  net_utility_backhaul_coef: 0.24
+  net_utility_migration_coef: 0.22
+  net_utility_failed_mechanism_penalty: 0.82
+  net_utility_failed_mechanism_backhaul_coef: 0.36
+  net_utility_cost_dual_enabled: true
+  net_utility_cost_target: 0.08
+  net_utility_cost_dual_max: 1.65
+paper_claim_boundary: >
+  Candidate only. Must beat all baselines by a meaningful margin across formal,
+  holdout, support, provenance, and statistical audits before paper claims.

@@ -7,12 +7,13 @@ from scripts.run_top_journal_closed_loop import (
     FORMAL_MIN_SETTINGS,
     ROOT_DIR,
     audit_formal_contract,
+    effective_reward_positive_offset,
     effective_settings,
     evaluate_mode_gate,
     latest_training_summary_for_seed,
     select_sa_checkpoint,
 )
-from src.evaluators.main_results_support import build_window_context_agent_overrides
+from src.evaluators.main_results_support import build_window_context_agent_overrides, summary_to_row
 
 
 TEST_ROOT = ROOT_DIR / "artifacts" / "tmp_validation" / "top_journal_closed_loop_tests"
@@ -103,6 +104,56 @@ def test_gate_blocks_reward_regression_against_popularity() -> None:
     assert report["passed"] is False
     assert "sa_total_reward_not_above_popularity" in report["blockers"]
     assert "benchmark_minimum_success_not_reached" in report["blockers"]
+
+
+def test_summary_row_reports_offset_adjusted_reward() -> None:
+    summary = {
+        "run_info": {
+            "agent_name": "sa_ghmappo",
+            "seed": 7,
+            "window_id": "w0",
+            "workflow_id": "wf0",
+            "primary_vehicle_selection": "handoff_pressure",
+            "reward_positive_offset": 5.0,
+            "checkpoint_metadata": {},
+        },
+        "episode_success": True,
+        "reward_breakdown": {"total": {"sum": 12.0}},
+        "system_metrics": {
+            "end_to_end_workflow_delay": 1.0,
+            "workflow_continuity_rate": 1.0,
+            "handoff_failure_rate": 0.0,
+            "handoff_ready_ratio": 1.0,
+            "adapter_warm_hit_ratio": 1.0,
+            "cross_rsu_cold_start_frequency": 0.0,
+            "backhaul_traffic_cost": 0.0,
+            "adapter_state_migration_overhead": 0.0,
+            "predictive_prefetch_precision": 1.0,
+        },
+        "handoff_summary": {
+            "handoff_ready_count": 1,
+            "migration_during_handoff_count": 0,
+            "handoff_total_count": 1,
+            "migration_prepare_count": 1,
+        },
+        "prefetch_summary": {"true_predictive_prefetch_count": 1},
+        "prefetch_validation_summary": {
+            "validated_predictive_prefetch_count": 1,
+            "prefetch_validated_hit_count": 1,
+            "prefetch_expired_miss_count": 0,
+        },
+        "agent_action_diagnostics": {},
+        "step_trace": [
+            {"reward_dict": {"positive_offset": 5.0}},
+            {"reward_dict": {"positive_offset": 5.0}},
+        ],
+    }
+
+    row = summary_to_row(summary)
+
+    assert row["episode_step_count"] == 2
+    assert row["reward_positive_offset_component"] == 10.0
+    assert row["offset_adjusted_total_reward"] == 2.0
 
 
 def test_select_sa_checkpoint_prefers_reward_tiebreak_guardrail_policy() -> None:
@@ -1261,6 +1312,163 @@ def test_effective_settings_honor_v41_conservative_recovery_budget() -> None:
     assert settings["max_steps"] == 22
 
 
+def test_effective_settings_honor_v42_completion_aligned_budget_and_offset() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v42_completion_aligned_mappo"
+        reward_positive_offset = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["sa_update_every"] == 8
+    assert settings["baseline_update_every"] == 8
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v43_strict_opportunity_budget_and_offset() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v43_strict_opportunity_mappo"
+        reward_positive_offset = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v44_opportunity_constrained_budget_and_offset() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v44_opportunity_constrained_mappo"
+        reward_positive_offset = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v45_balanced_refresh_budget_and_offset() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v45_balanced_refresh_mappo"
+        reward_positive_offset = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v46_net_utility_constrained_budget_and_offset() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v46_net_utility_constrained_mappo"
+        reward_positive_offset = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
 def test_v12_selects_reward_checkpoint_and_skips_v11_window_override() -> None:
     reward_path = _test_path("v12_reward_first_checkpoint", "best_by_reward.pt")
     continuity_path = _test_path("v12_reward_first_checkpoint", "best_by_continuity.pt")
@@ -2053,6 +2261,136 @@ def test_v41_selects_latest_checkpoint_and_skips_window_override() -> None:
     overrides = build_window_context_agent_overrides(
         agent_name="sa_ghmappo",
         checkpoint_profile="top_journal_mechanism_v41_conservative_recovery_mappo",
+        run_metadata={"window_class": "idle_or_sparse"},
+    )
+
+    assert overrides == {}
+
+
+def test_v42_selects_latest_checkpoint_and_skips_window_override() -> None:
+    latest_path = _test_path("v42_latest_first_checkpoint", "latest.pt")
+    reward_path = _test_path("v42_reward_first_checkpoint", "best_by_reward.pt")
+    latest_path.write_text("latest", encoding="utf-8")
+    reward_path.write_text("reward", encoding="utf-8")
+
+    checkpoint_path, selection_field = select_sa_checkpoint(
+        {
+            "config_profile": "top_journal_mechanism_v42_completion_aligned_mappo",
+            "latest_checkpoint_path": str(latest_path),
+            "best_by_reward_path": str(reward_path),
+        }
+    )
+
+    assert checkpoint_path == latest_path
+    assert selection_field == "latest_checkpoint_path"
+
+    overrides = build_window_context_agent_overrides(
+        agent_name="sa_ghmappo",
+        checkpoint_profile="top_journal_mechanism_v42_completion_aligned_mappo",
+        run_metadata={"window_class": "idle_or_sparse"},
+    )
+
+    assert overrides == {}
+
+
+def test_v43_selects_latest_checkpoint_and_skips_window_override() -> None:
+    latest_path = _test_path("v43_latest_first_checkpoint", "latest.pt")
+    reward_path = _test_path("v43_reward_first_checkpoint", "best_by_reward.pt")
+    latest_path.write_text("latest", encoding="utf-8")
+    reward_path.write_text("reward", encoding="utf-8")
+
+    checkpoint_path, selection_field = select_sa_checkpoint(
+        {
+            "config_profile": "top_journal_mechanism_v43_strict_opportunity_mappo",
+            "latest_checkpoint_path": str(latest_path),
+            "best_by_reward_path": str(reward_path),
+        }
+    )
+
+    assert checkpoint_path == latest_path
+    assert selection_field == "latest_checkpoint_path"
+
+    overrides = build_window_context_agent_overrides(
+        agent_name="sa_ghmappo",
+        checkpoint_profile="top_journal_mechanism_v43_strict_opportunity_mappo",
+        run_metadata={"window_class": "idle_or_sparse"},
+    )
+
+    assert overrides == {}
+
+
+def test_v44_selects_latest_checkpoint_and_skips_window_override() -> None:
+    latest_path = _test_path("v44_latest_first_checkpoint", "latest.pt")
+    reward_path = _test_path("v44_reward_first_checkpoint", "best_by_reward.pt")
+    latest_path.write_text("latest", encoding="utf-8")
+    reward_path.write_text("reward", encoding="utf-8")
+
+    checkpoint_path, selection_field = select_sa_checkpoint(
+        {
+            "config_profile": "top_journal_mechanism_v44_opportunity_constrained_mappo",
+            "latest_checkpoint_path": str(latest_path),
+            "best_by_reward_path": str(reward_path),
+        }
+    )
+
+    assert checkpoint_path == latest_path
+    assert selection_field == "latest_checkpoint_path"
+
+    overrides = build_window_context_agent_overrides(
+        agent_name="sa_ghmappo",
+        checkpoint_profile="top_journal_mechanism_v44_opportunity_constrained_mappo",
+        run_metadata={"window_class": "idle_or_sparse"},
+    )
+
+    assert overrides == {}
+
+
+def test_v45_selects_latest_checkpoint_and_skips_window_override() -> None:
+    latest_path = _test_path("v45_latest_first_checkpoint", "latest.pt")
+    reward_path = _test_path("v45_reward_first_checkpoint", "best_by_reward.pt")
+    latest_path.write_text("latest", encoding="utf-8")
+    reward_path.write_text("reward", encoding="utf-8")
+
+    checkpoint_path, selection_field = select_sa_checkpoint(
+        {
+            "config_profile": "top_journal_mechanism_v45_balanced_refresh_mappo",
+            "latest_checkpoint_path": str(latest_path),
+            "best_by_reward_path": str(reward_path),
+        }
+    )
+
+    assert checkpoint_path == latest_path
+    assert selection_field == "latest_checkpoint_path"
+
+    overrides = build_window_context_agent_overrides(
+        agent_name="sa_ghmappo",
+        checkpoint_profile="top_journal_mechanism_v45_balanced_refresh_mappo",
+        run_metadata={"window_class": "idle_or_sparse"},
+    )
+
+    assert overrides == {}
+
+
+def test_v46_selects_latest_checkpoint_and_skips_window_override() -> None:
+    latest_path = _test_path("v46_latest_first_checkpoint", "latest.pt")
+    reward_path = _test_path("v46_reward_first_checkpoint", "best_by_reward.pt")
+    latest_path.write_text("latest", encoding="utf-8")
+    reward_path.write_text("reward", encoding="utf-8")
+
+    checkpoint_path, selection_field = select_sa_checkpoint(
+        {
+            "config_profile": "top_journal_mechanism_v46_net_utility_constrained_mappo",
+            "latest_checkpoint_path": str(latest_path),
+            "best_by_reward_path": str(reward_path),
+        }
+    )
+
+    assert checkpoint_path == latest_path
+    assert selection_field == "latest_checkpoint_path"
+
+    overrides = build_window_context_agent_overrides(
+        agent_name="sa_ghmappo",
+        checkpoint_profile="top_journal_mechanism_v46_net_utility_constrained_mappo",
         run_metadata={"window_class": "idle_or_sparse"},
     )
 

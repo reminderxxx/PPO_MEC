@@ -157,6 +157,7 @@ class RewardBreakdown:
     """奖励拆解。"""
 
     total: float
+    positive_offset: float
     service_reward: float
     delay_penalty: float
     cache_miss_penalty: float

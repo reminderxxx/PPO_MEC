@@ -1,5 +1,15 @@
 # Code Module Map
 
+## 2026-07-22 v42-v46 offset-free MAPPO opportunity / net-utility profiles
+
+- `src/envs/specs/semantic_objects.py`、`src/envs/core/vec_workflow_core_env.py`：`RewardBreakdown` 和环境 info 新增 `positive_offset` / `reward_positive_offset_component`，支撑 offset-free 与 legacy reward protocol 同时审计。
+- `src/evaluators/main_results_support.py`、`scripts/benchmark_main_results.py`：主结果 rows/aggregate 新增 `reward_positive_offset`、`reward_positive_offset_component`、`offset_adjusted_total_reward`、`episode_step_count` 和 `reward_protocol`，benchmark 支持 `--reward_positive_offset 0.0`。
+- `scripts/train_sa_ghmappo_real_sample.py`、`scripts/train_algo_pool_real_sample.py`：训练入口新增 `--reward_positive_offset` 并在 v42+ profile 默认置 0；新增 v42-v46 profile defaults 和 SA-GHMAPPO profile kwargs。
+- `src/agents/sa_ghmappo_core.py`：v43 新增 strict opportunity delayed-credit 判定；v44 新增 opportunity-constrained actor logits，将 trusted handoff context、prediction reliability、prepare timing 和 cache readiness 写入 event/slow/fast/env-action logits；v46 复用已有 net-utility PRD / dual-cost credit 作为 MAPPO policy-side learning signal。
+- `scripts/run_top_journal_closed_loop.py`：把 v42-v46 纳入 latest-first checkpoint selection、offset-free reward profile 和 strict full-budget override，避免 reward-first checkpoint 或正 offset 回退。
+- `configs/experiment/top_journal_mechanism_v42_completion_aligned_mappo.yaml` 至 `configs/experiment/top_journal_mechanism_v46_net_utility_constrained_mappo.yaml`：记录各候选 profile、算法差异、训练预算和 paper-claim boundary。
+- `tests/test_algo_pool_contract.py`、`tests/test_top_journal_closed_loop.py`：覆盖 v42-v46 profile 参数、offset-free effective setting、latest checkpoint selection 和 opportunity/net-utility contract。
+
 ## 2026-07-17 v18 counterfactual option credit and time-audited future split
 
 - `src/agents/sa_ghmappo_core.py`：新增 option-gate counterfactual partial credit，计算 selected option partial utility 与同状态合法 option policy-weighted expected utility 的差值；保留 v17 DAG-aware option termination，不修改 action/reward/environment contract。

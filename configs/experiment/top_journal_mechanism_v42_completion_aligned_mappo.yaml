@@ -1,0 +1,48 @@
+profile: top_journal_mechanism_v42_completion_aligned_mappo
+base_profile: top_journal_mechanism_v41_conservative_recovery_mappo
+purpose: >
+  Completion-aligned MAPPO profile that removes the per-step positive reward
+  offset from both training and benchmark environments so centralized value
+  learning optimizes workflow progress, continuity, and handoff readiness rather
+  than episode length.
+algorithm_delta:
+  - Keeps the v39/v41 delayed mechanism-credit MAPPO backbone.
+  - Uses undiscounted GAE targets under the offset-free reward protocol so future
+    workflow completion and handoff-ready outcomes remain first-order credit.
+  - Keeps conservative negative-advantage behavior recovery but weakens teacher
+    imitation to let the MAPPO learner improve beyond popularity-safe actions.
+  - Requires matched retraining of PPO, MAPPO, and trainable learned baselines
+    under the same reward_positive_offset=0.0 protocol.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+  reason: >
+    Earlier v39-v41 dev probes showed total_reward could be inflated by longer
+    episodes because reward_positive_offset=5.0 was accumulated every step.
+    v42 freezes the offset-free objective before claiming reward superiority.
+unchanged_contract:
+  action_schema: semantic_discrete_5
+  deterministic_evaluation_wrapper: unchanged
+  baseline_action_contract: unchanged
+  window_plan_contract: unchanged
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+  gamma: 1.0
+  gae_lambda: 1.0
+segmented_strict_protocol:
+  required_window_plan_root: configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719
+  protocol_version: strict_split_v3_segmented_executable_handoff_20260719
+  max_mobility_rows: 5000000
+  window_scan_stride: 8
+evaluation:
+  split_policy: train_dev_formal_then_one_time_hidden_after_candidate_freeze
+  learned_baselines: retrain_all_under_same_offset_free_protocol
+paper_claim_boundary: >
+  This is a candidate protocol and remains non-paper-ready until formal,
+  holdout, support, provenance, statistics, and checkpoint audits pass the
+  top-journal review policy.

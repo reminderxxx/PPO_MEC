@@ -1,0 +1,32 @@
+profile: top_journal_mechanism_v45_balanced_refresh_mappo
+base_profile: top_journal_mechanism_v44_opportunity_constrained_mappo
+purpose: >
+  Offset-free MAPPO candidate that keeps opportunity-constrained safety while
+  relaxing low-risk proactive refresh so active non-mechanism windows do not
+  collapse to popularity/local fallback behavior.
+algorithm_delta:
+  - Lowers the opportunity reliability floor and prepare/prefetch penalties from
+    v44, while increasing current-RSU refresh bias.
+  - Keeps stale/failed mechanism penalties high enough to avoid the v42/v43
+    over-prepare collapse.
+  - Uses centralized MAPPO env-action PPO and advantage-weighted behavior
+    regularization; no reward wrapper or post-hoc result filtering is added.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+balanced_refresh:
+  opportunity_constrained_reliability_floor: 0.22
+  opportunity_constrained_prepare_penalty: 5.75
+  opportunity_constrained_prefetch_penalty: 3.10
+  opportunity_constrained_current_bias: 2.75
+  opportunity_constrained_local_bias: 0.10
+paper_claim_boundary: >
+  Candidate only. Must beat all baselines by a meaningful margin across formal,
+  holdout, support, provenance, and statistical audits before paper claims.

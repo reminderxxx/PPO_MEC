@@ -33,6 +33,9 @@ SA_GHMAPPO_V11_REWARD_PROFILE = "top_journal_mechanism_v11_mappo_reward"
 
 MAIN_RESULT_METRICS = [
     "total_reward",
+    "offset_adjusted_total_reward",
+    "reward_positive_offset_component",
+    "episode_step_count",
     "end_to_end_workflow_delay",
     "workflow_continuity_rate",
     "handoff_failure_rate",
@@ -1244,6 +1247,7 @@ def run_real_episode(
     max_steps: int,
     mobility_source: str = "ngsim",
     primary_vehicle_selection: str = "stable_first",
+    reward_positive_offset: float = 5.0,
     run_metadata: dict[str, Any],
     predictor_kwargs: dict[str, Any] | None = None,
     agent_config_overrides: dict[str, Any] | None = None,
@@ -1281,6 +1285,7 @@ def run_real_episode(
         max_steps=max(max_steps + 2, 8),
         mobility_source=mobility_source,
         primary_vehicle_selection=primary_vehicle_selection,
+        reward_positive_offset=reward_positive_offset,
         cache_capacity_profile=cache_capacity_profile,
     )
     env = GymVecEnv(core_env=core_env, recorder=recorder)
@@ -1308,6 +1313,7 @@ def run_real_episode(
             "window_id": mobility_bundle.rsu_metadata.get("window_id"),
             "rsu_layout": mobility_bundle.rsu_metadata.get("effective_rsu_layout"),
             "primary_vehicle_selection": primary_vehicle_selection,
+            "reward_positive_offset": float(reward_positive_offset),
             "checkpoint_run_id": checkpoint_metadata.get("run_id"),
             "checkpoint_profile": checkpoint_metadata.get("config_profile"),
             "checkpoint_is_smoke": checkpoint_metadata.get("is_smoke_checkpoint", False),
@@ -1434,6 +1440,7 @@ def _build_actionmix_diagnostics(summary: dict[str, Any]) -> dict[str, float]:
     continuity_bonus = _reward_sum(step_trace, "continuity_bonus")
     mechanism_bonus = _reward_sum(step_trace, "mechanism_exploration_bonus")
     constraint_penalty = _reward_sum(step_trace, "constraint_penalty")
+    positive_offset = _reward_sum(step_trace, "positive_offset")
     migration_failed_count = max(float(len(migration_attempts) - len(migration_successes)), 0.0)
     capacity_enabled_steps = [step for step in step_trace if _bool_value(step.get("cache_capacity_enabled", False))]
     cache_used_values = [_float_value(step.get("cache_used_size"), 0.0) for step in capacity_enabled_steps if step.get("cache_used_size") is not None]
@@ -1534,6 +1541,8 @@ def _build_actionmix_diagnostics(summary: dict[str, Any]) -> dict[str, float]:
         "continuity_reward_component": continuity_bonus,
         "service_reward_component": service_reward,
         "mechanism_exploration_reward_component": mechanism_bonus,
+        "reward_positive_offset_component": positive_offset,
+        "episode_step_count": float(len(step_trace)),
         "constraint_penalty_sum": constraint_penalty,
         "migration_cost_sum": migration_cost,
         "cache_miss_penalty_sum": cache_miss_penalty,
@@ -1552,6 +1561,12 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
     run_info = summary["run_info"]
     checkpoint_metadata = run_info.get("checkpoint_metadata", {})
     agent_action_diagnostics = summary.get("agent_action_diagnostics", {})
+    step_trace = [step for step in summary.get("step_trace", []) if isinstance(step, dict)]
+    reward_positive_offset = _float_value(run_info.get("reward_positive_offset"), 5.0)
+    reward_positive_offset_component = _reward_sum(step_trace, "positive_offset")
+    if reward_positive_offset_component <= 0.0 and reward_positive_offset > 0.0:
+        reward_positive_offset_component = reward_positive_offset * float(len(step_trace))
+    total_reward = float(summary["reward_breakdown"]["total"]["sum"])
     mechanism_realized = int(
         validation_summary.get("validated_predictive_prefetch_count", 0) > 0
         or handoff_summary.get("handoff_ready_count", 0) > 0
@@ -1570,6 +1585,10 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         "policy_name": run_info.get("agent_name"),
         "seed": run_info.get("seed"),
         "primary_vehicle_selection": run_info.get("primary_vehicle_selection", "stable_first"),
+        "reward_positive_offset": reward_positive_offset,
+        "reward_positive_offset_component": round(float(reward_positive_offset_component), 6),
+        "offset_adjusted_total_reward": round(float(total_reward - reward_positive_offset_component), 6),
+        "episode_step_count": len(step_trace),
         "episode_success": summary.get("episode_success", False),
         "successful_episode_rate": 1.0 if summary.get("episode_success", False) else 0.0,
         "mechanism_realization_rate": float(mechanism_realized),
@@ -1610,7 +1629,7 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         ),
         "option_gate_no_rsu_local_count": int(agent_action_diagnostics.get("option_gate_no_rsu_local_count", 0) or 0),
         "option_gate_context_prior_count": int(agent_action_diagnostics.get("option_gate_context_prior_count", 0) or 0),
-        "total_reward": summary["reward_breakdown"]["total"]["sum"],
+        "total_reward": total_reward,
         "end_to_end_workflow_delay": metrics["end_to_end_workflow_delay"],
         "workflow_continuity_rate": metrics["workflow_continuity_rate"],
         "handoff_failure_rate": metrics["handoff_failure_rate"],

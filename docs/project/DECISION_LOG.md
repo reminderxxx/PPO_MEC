@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-22: v46 晋级为 offset-free dev 候选，但不触发 paper-ready claim
+
+决策：新增 `top_journal_mechanism_v42_completion_aligned_mappo`、`v43_strict_opportunity_mappo`、`v44_opportunity_constrained_mappo`、`v45_balanced_refresh_mappo` 和 `v46_net_utility_constrained_mappo` 后，将 v46 作为当前 offset-free dev full-pool 最强候选；不打开 hidden holdout，不将 v46 写成 TMC-ready / paper-ready。v42 起统一使用 `reward_positive_offset=0.0`，并在训练、benchmark、rows 和 aggregate 中报告 offset-free reward protocol。
+
+原因：v42/v43 证明正 offset 移除后，原主方法会暴露过度 prepare/migration 问题；v44 通过 opportunity-constrained actor logits 恢复并超过 PPO/popularity，但对 PPO gap 仅 `+0.0985`；v45 没有扩大 gap。v46 在 v44 上加入 constrained net-utility PRD 和 Lagrangian-style dual cost signal，把 backhaul、migration、expired/idle prefetch 和 failed mechanism attempt 纳入 MAPPO policy-side credit。v46 full-pool reward 为 `38.791`，高于 PPO `38.3375`、popularity `38.0` 和全部其他对照，gap vs PPO 扩到 `+0.4535`，vs popularity 扩到 `+0.791`。
+
+影响：v46 可以作为下一轮 formal/support package 的候选，但必须先冻结候选 checkpoint manifest、重新运行多 seed formal/holdout/support 和 artifact audit。当前证据仍是 seed7 dev split；相对 PPO 的 reward CI 跨 0，`sa_advantage_diagnosis` 仍有 `backhaul_cost_above_popularity`。论文中可安全表述为“offset-free dev full-pool candidate improves reward margin through MAPPO credit-side opportunity and net-utility constraints”，不能表述为“显著优于 PPO/规则”“足以投 TMC”或“已经解决 backhaul/failure trade-off”。
+
 ## 2026-07-21: v40/v41 不晋级，下一轮先处理 reward-objective 不一致
 
 决策：新增 `top_journal_mechanism_v40_advantage_weighted_behavior_mappo` 与 `top_journal_mechanism_v41_conservative_recovery_mappo` 后，不将二者晋级为主论文候选，也不继续用当前 single-seed dev-probe 作为 paper-ready 依据。v40/v41 保留为 MAPPO learning-objective 消融：v40 对 positive/negative deviation 都做 advantage-weighted behavior regularization，v41 改为 negative-only conservative recovery。

@@ -70,6 +70,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max_mobility_rows", type=int, default=2500)
     parser.add_argument("--max_workflows", type=int, default=2)
     parser.add_argument("--max_steps", type=int, default=12)
+    parser.add_argument("--reward_positive_offset", type=float, default=5.0)
     parser.add_argument("--workflow_selector", type=str, default="ordered")
     parser.add_argument("--rsu_layout", type=str, default="auto_dominant_tight")
     parser.add_argument("--frame_offset", type=int, default=0)
@@ -459,10 +460,12 @@ def main() -> None:
                         max_steps=args.max_steps,
                         mobility_source=args.mobility_source,
                         primary_vehicle_selection=args.primary_vehicle_selection,
+                        reward_positive_offset=args.reward_positive_offset,
                         run_metadata={
                             "script": "scripts/benchmark_main_results.py",
                             "benchmark_run_id": benchmark_run_id,
                             "mainline": mainline_label,
+                            "reward_positive_offset": args.reward_positive_offset,
                             "mobility_source_path": mobility_source_path,
                             "window_rank": window_candidate["window_rank"],
                             "window_class": window_candidate["window_class"],
@@ -530,6 +533,11 @@ def main() -> None:
         "excluded_window_count": window_payload.get("excluded_window_count", 0),
         "excluded_window_ids": window_payload.get("excluded_window_ids", []),
         "primary_vehicle_selection": args.primary_vehicle_selection,
+        "reward_protocol": {
+            "reward_positive_offset": float(args.reward_positive_offset),
+            "offset_free": abs(float(args.reward_positive_offset)) <= 1e-12,
+            "offset_adjusted_total_reward_reported": True,
+        },
         "predictor_runtime_config": {
             "predictor_kind": args.predictor_kind,
             "predictor_checkpoint_path": args.predictor_checkpoint_path,

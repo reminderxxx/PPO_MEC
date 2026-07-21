@@ -1,5 +1,35 @@
 # Artifact Records
 
+## 2026-07-22 v42-v46 offset-free MAPPO opportunity / net-utility dev probes
+
+状态：`[offset-free]` `[dev-full-pool-winner-v46]` `[single-seed]` `[not-tmc-ready]`
+
+路径：
+
+- `configs/experiment/top_journal_mechanism_v42_completion_aligned_mappo.yaml`
+- `configs/experiment/top_journal_mechanism_v43_strict_opportunity_mappo.yaml`
+- `configs/experiment/top_journal_mechanism_v44_opportunity_constrained_mappo.yaml`
+- `configs/experiment/top_journal_mechanism_v45_balanced_refresh_mappo.yaml`
+- `configs/experiment/top_journal_mechanism_v46_net_utility_constrained_mappo.yaml`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_v42_completion_aligned_dev_full_pool_seed7/`
+- `artifacts/training/top_journal_v43_strict_opportunity_dev_probe/sa_ghmappo/sa_ghmappo_train_20260721_023742_753308_seed7/`
+- `artifacts/training/top_journal_v44b_opportunity_constrained_dev_probe/sa_ghmappo/sa_ghmappo_train_20260721_232538_723529_seed7/`
+- `artifacts/experiments/top_journal_v44b_opportunity_constrained_dev_probe/benchmarks/latest_reuse_v42_baselines_full_pool/main_results_full_stratified_20260721_233645_655700/aggregate_summary.json`
+- `artifacts/training/top_journal_v45_balanced_refresh_dev_probe/sa_ghmappo/sa_ghmappo_train_20260721_234404_042037_seed7/`
+- `artifacts/experiments/top_journal_v45_balanced_refresh_dev_probe/benchmarks/latest_reuse_v42_baselines_full_pool/main_results_full_stratified_20260721_235334_630545/aggregate_summary.json`
+- `artifacts/training/top_journal_v46_net_utility_constrained_dev_probe/sa_ghmappo/sa_ghmappo_train_20260722_000200_631694_seed7/`
+- `artifacts/experiments/top_journal_v46_net_utility_constrained_dev_probe/benchmarks/latest_reuse_v42_baselines_full_pool/main_results_full_stratified_20260722_001210_003005/aggregate_summary.json`
+- `artifacts/experiments/top_journal_v46_net_utility_constrained_dev_probe/benchmarks/latest_reuse_v42_baselines_full_pool/main_results_full_stratified_20260722_001210_003005/sa_advantage_diagnosis.json`
+- `artifacts/experiments/top_journal_v46_net_utility_constrained_dev_probe/statistics/latest_reuse_v42_baselines_full_pool/paired_statistics.csv`
+
+确认结果：v42 在 offset-free reward protocol 下暴露 completion-aligned MAPPO 退化，full-pool seed7 中 SA-GHMAPPO `-11.326`，低于 PPO `38.3375` 与 popularity `38.0`；v43 strict opportunity 训练 update eval 仍停在 `5.67425` 级别，不晋级。
+
+v44b 用 opportunity-constrained actor logits 恢复主方法：full-pool seed7 中 SA-GHMAPPO `38.436`，高于 PPO `38.3375`、popularity `38.0` 和全部其他对照；但对 PPO margin 只有 `+0.0985`。v45 balanced-refresh 训练均值略变，但 full-pool benchmark 与 v44b 排名和数值一致，没有扩大 gap。
+
+v46 在 v44 上加入 constrained net-utility PRD：full-pool seed7 中 SA-GHMAPPO `38.791`，高于 PPO `38.3375`、popularity `38.0`、DQN/Dueling/QMIX `21.059`、reactive `18.032` 和 MAPPO/Controller-MAT/DAG/cache/DT `5.674`。相对 popularity 的 paired total reward mean delta `+0.791`，BCa 95% CI `[0.18, 2.239]`，sign-test p=`0.007812`，Holm p=`0.210924`；相对 PPO mean delta `+0.4535`，BCa 95% CI `[-0.09125, 2.330993]`，Holm p=`1.0`。
+
+结论边界：v46 是当前 offset-free dev full-pool 最强候选，提升来自 MAPPO policy-side opportunity constraint 和 net-utility PRD credit，不是环境 reward、baseline、window plan 或 result-filtering 改动。但它仍是单 seed dev evidence，缺 formal/holdout/support package；`sa_advantage_diagnosis.blockers=["backhaul_cost_above_popularity"]`，且对 PPO 的 reward CI 跨 0。不能写成 paper-ready 或显著优于 PPO/strong heuristic 的最终结论。
+
 ## 2026-07-21 v39/v40/v41 MAPPO behavior-regularization dev probes
 
 状态：`[dev-probe]` `[negative-v40]` `[v41-stability-restored]` `[not-all-baseline-winner]` `[not-tmc-ready]`

@@ -1,0 +1,33 @@
+profile: top_journal_mechanism_v43_strict_opportunity_mappo
+base_profile: top_journal_mechanism_v41_conservative_recovery_mappo
+purpose: >
+  Offset-free constrained MAPPO profile after v42 showed that delayed mechanism
+  credit over-activated prepare/migrate actions under the completion-aligned
+  reward protocol.
+algorithm_delta:
+  - Adds strict delayed-mechanism opportunity gating: a mechanism window alone no
+    longer grants delayed positive credit unless a real or predicted handoff
+    opportunity, valid target context, or sufficient timing context is present.
+  - Keeps centralized MAPPO value learning and event-head credit, but increases
+    negative-advantage recovery toward the popularity-safe teacher.
+  - Lowers prepare priors, mechanism auxiliary weight, and delayed mechanism
+    positive credit while increasing stale/failure penalties.
+  - Trains and evaluates with reward_positive_offset=0.0, matching all baselines.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+strict_opportunity_gate:
+  delayed_mechanism_credit_strict_opportunity_enabled: true
+  delayed_mechanism_credit_context_gate: 0.46
+  delayed_mechanism_credit_stale_penalty: 0.92
+  delayed_mechanism_credit_failure_penalty: 1.75
+paper_claim_boundary: >
+  Candidate only. The profile must beat all baselines in frozen full-pool dev,
+  then pass formal/holdout/support audits before any paper-ready claim.

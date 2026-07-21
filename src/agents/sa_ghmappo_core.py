@@ -566,6 +566,19 @@ class 分层PPO基类(BaseAgent):
         delayed_mechanism_credit_missed_prepare_scale: float = 0.55,
         delayed_mechanism_credit_stale_penalty: float = 0.35,
         delayed_mechanism_credit_context_gate: float = 0.25,
+        delayed_mechanism_credit_strict_opportunity_enabled: bool = False,
+        opportunity_constrained_policy_enabled: bool = False,
+        opportunity_constrained_min_context: float = 0.52,
+        opportunity_constrained_low_context: float = 0.28,
+        opportunity_constrained_prepare_penalty: float = 0.0,
+        opportunity_constrained_prefetch_penalty: float = 0.0,
+        opportunity_constrained_prepare_bias: float = 0.0,
+        opportunity_constrained_prefetch_bias: float = 0.0,
+        opportunity_constrained_current_bias: float = 0.0,
+        opportunity_constrained_local_bias: float = 0.0,
+        opportunity_constrained_confidence_floor: float = 0.18,
+        opportunity_constrained_uncertainty_ceiling: float = 0.78,
+        opportunity_constrained_reliability_floor: float = 0.28,
         advantage_weighted_behavior_regularization_enabled: bool = False,
         advantage_weighted_behavior_coef: float = 0.0,
         advantage_weighted_behavior_positive_coef: float = 1.0,
@@ -1024,6 +1037,42 @@ class 分层PPO基类(BaseAgent):
         self._delayed_mechanism_credit_context_gate = max(
             0.0,
             min(float(delayed_mechanism_credit_context_gate), 1.0),
+        )
+        self._delayed_mechanism_credit_strict_opportunity_enabled = bool(
+            delayed_mechanism_credit_strict_opportunity_enabled
+        )
+        self._opportunity_constrained_policy_enabled = bool(opportunity_constrained_policy_enabled)
+        self._opportunity_constrained_min_context = max(
+            0.0,
+            min(float(opportunity_constrained_min_context), 1.0),
+        )
+        self._opportunity_constrained_low_context = max(
+            0.0,
+            min(float(opportunity_constrained_low_context), self._opportunity_constrained_min_context),
+        )
+        self._opportunity_constrained_prepare_penalty = max(
+            float(opportunity_constrained_prepare_penalty),
+            0.0,
+        )
+        self._opportunity_constrained_prefetch_penalty = max(
+            float(opportunity_constrained_prefetch_penalty),
+            0.0,
+        )
+        self._opportunity_constrained_prepare_bias = max(float(opportunity_constrained_prepare_bias), 0.0)
+        self._opportunity_constrained_prefetch_bias = max(float(opportunity_constrained_prefetch_bias), 0.0)
+        self._opportunity_constrained_current_bias = max(float(opportunity_constrained_current_bias), 0.0)
+        self._opportunity_constrained_local_bias = max(float(opportunity_constrained_local_bias), 0.0)
+        self._opportunity_constrained_confidence_floor = max(
+            0.0,
+            min(float(opportunity_constrained_confidence_floor), 1.0),
+        )
+        self._opportunity_constrained_uncertainty_ceiling = max(
+            0.0,
+            min(float(opportunity_constrained_uncertainty_ceiling), 1.0),
+        )
+        self._opportunity_constrained_reliability_floor = max(
+            0.0,
+            min(float(opportunity_constrained_reliability_floor), 1.0),
         )
         self._advantage_weighted_behavior_regularization_enabled = bool(
             advantage_weighted_behavior_regularization_enabled
@@ -1500,6 +1549,7 @@ class 分层PPO基类(BaseAgent):
             "event_logit_temperature": round(active_event_logit_temperature, 6),
             "event_sharpening_info": dict(policy_output.get("event_sharpening_info", {})),
             "digital_twin_policy_prior": dict(policy_output.get("digital_twin_policy_prior_info", {})),
+            "opportunity_constrained_policy": dict(policy_output.get("opportunity_constrained_policy_info", {})),
             "event_prepare_prob": round(event_prepare_prob, 6),
             "event_margin": round(event_margin, 6),
             "predicted_handoff_target_valid": bool(predicted_handoff_target_valid),
@@ -2269,6 +2319,9 @@ class 分层PPO基类(BaseAgent):
             "delayed_mechanism_credit_horizon": int(self._delayed_mechanism_credit_horizon),
             "delayed_mechanism_credit_decay": round(self._delayed_mechanism_credit_decay, 6),
             "delayed_mechanism_credit_clip": round(self._delayed_mechanism_credit_clip, 6),
+            "delayed_mechanism_credit_strict_opportunity_enabled": (
+                self._delayed_mechanism_credit_strict_opportunity_enabled
+            ),
             "delayed_mechanism_credit_mean": round(float(delayed_mechanism_credit_values.mean()), 6)
             if len(delayed_mechanism_credit_values) > 0
             else 0.0,
@@ -4893,7 +4946,10 @@ class 分层PPO基类(BaseAgent):
             + 0.08 * float(gate_pass)
             + 0.06 * float(predicted_signal)
         )
-        if self._row_window_class(row) == "mechanism_activating":
+        if (
+            self._row_window_class(row) == "mechanism_activating"
+            and not self._delayed_mechanism_credit_strict_opportunity_enabled
+        ):
             context = max(context, self._delayed_mechanism_credit_context_gate)
         return float(_clamp01(context))
 
@@ -4911,8 +4967,12 @@ class 分层PPO基类(BaseAgent):
             or bool(action_info.get("raw_handoff_candidate", False))
             or bool(action_info.get("predicted_handoff_target_valid", False))
         )
-        return bool(
+        window_class_opportunity = (
             self._row_window_class(row) == "mechanism_activating"
+            and not self._delayed_mechanism_credit_strict_opportunity_enabled
+        )
+        return bool(
+            window_class_opportunity
             or handoff_event_count > 0.0
             or predicted_signal
             or self._row_mechanism_credit_context(row) >= self._delayed_mechanism_credit_context_gate
@@ -5779,6 +5839,185 @@ class 分层PPO基类(BaseAgent):
             return zero, zero
         return torch.stack(loss_terms).mean(), torch.stack(entropy_terms).mean()
 
+    def _apply_opportunity_constrained_policy(
+        self,
+        policy_output: dict[str, Any],
+        semantic_state: dict[str, Any],
+    ) -> dict[str, Any]:
+        if not self._use_hierarchy or not self._opportunity_constrained_policy_enabled:
+            return policy_output
+
+        timing_features = compute_temporal_prepare_window_score(
+            semantic_state,
+            preferred_lead_steps=self._temporal_prepare_lead_steps,
+            sigma=self._temporal_prepare_sigma,
+        )
+        prepare_score = _clamp01(float(timing_features.get("prepare_window_score", 0.0) or 0.0))
+        temporal_urgency = _clamp01(float(timing_features.get("temporal_urgency", 0.0) or 0.0))
+        predicted_target_valid = self._semantic_state_has_valid_predicted_handoff_target(semantic_state)
+        diagnostics = self._build_prediction_target_diagnostics(
+            semantic_state=semantic_state,
+            temporal_urgency=temporal_urgency,
+            predicted_handoff_target_valid=predicted_target_valid,
+        )
+        confidence = _clamp01(float(diagnostics.get("prediction_confidence", 0.0) or 0.0))
+        uncertainty = _clamp01(float(diagnostics.get("prediction_uncertainty", 1.0) or 1.0))
+        reliability = _clamp01(confidence * (1.0 - uncertainty))
+        raw_candidate = bool(diagnostics.get("raw_handoff_candidate", False))
+        gate_pass = bool(diagnostics.get("gate_pass", False))
+        first_eta = int(diagnostics.get("predicted_first_non_current_eta", 0) or 0)
+        reliable_candidate = bool(
+            raw_candidate
+            and confidence >= self._opportunity_constrained_confidence_floor
+            and uncertainty <= self._opportunity_constrained_uncertainty_ceiling
+        )
+        trusted_candidate = bool(reliable_candidate and (gate_pass or reliability >= self._opportunity_constrained_reliability_floor))
+        opportunity_context = _clamp01(
+            0.34 * prepare_score
+            + 0.22 * temporal_urgency
+            + 0.26 * reliability
+            + 0.08 * float(gate_pass)
+            + 0.06 * float(raw_candidate)
+            + 0.04 * float(predicted_target_valid)
+        )
+        strong_opportunity = bool(
+            trusted_candidate
+            and predicted_target_valid
+            and opportunity_context >= self._opportunity_constrained_min_context
+        )
+        weak_opportunity = bool(
+            trusted_candidate
+            and opportunity_context >= self._opportunity_constrained_low_context
+        )
+
+        current_node = semantic_state.get("current_workflow_node") or {}
+        required_adapter = current_node.get("required_adapter")
+        required_adapter_key = str(required_adapter) if required_adapter else None
+        primary_vehicle, _ = _resolve_primary_vehicle_from_semantic_state(semantic_state)
+        current_rsu_id = primary_vehicle.get("associated_rsu_id")
+        predictions = semantic_state.get("predictions", {}) if isinstance(semantic_state.get("predictions", {}), dict) else {}
+        vehicle_id = str(primary_vehicle.get("vehicle_id", ""))
+        predicted_next_rsu_id = predictions.get("predicted_next_rsu_by_vehicle", {}).get(vehicle_id)
+        if predicted_next_rsu_id is None:
+            next_sequence = list(predictions.get("next_rsu_sequence", {}).get(vehicle_id, []) or [])
+            predicted_next_rsu_id = next_sequence[0] if next_sequence else None
+        predicted_handoff_target_rsu_id = predictions.get("predicted_first_handoff_rsu_by_vehicle", {}).get(vehicle_id)
+        current_rsu = _rsu_by_id_from_semantic_state(semantic_state, current_rsu_id)
+        predicted_next_rsu = _rsu_by_id_from_semantic_state(semantic_state, predicted_next_rsu_id)
+        handoff_target_rsu = _rsu_by_id_from_semantic_state(semantic_state, predicted_handoff_target_rsu_id)
+
+        def has_adapter(rsu: dict[str, Any]) -> bool:
+            return bool(
+                required_adapter_key
+                and required_adapter_key in {str(item) for item in rsu.get("cached_adapter_ids", [])}
+            )
+
+        current_cache_ready = has_adapter(current_rsu)
+        predicted_next_cache_ready = has_adapter(predicted_next_rsu)
+        handoff_target_cache_ready = has_adapter(handoff_target_rsu)
+        next_differs = bool(predicted_next_rsu_id is not None and str(predicted_next_rsu_id) != str(current_rsu_id))
+        target_differs = bool(
+            predicted_handoff_target_rsu_id is not None
+            and str(predicted_handoff_target_rsu_id) != str(current_rsu_id)
+        )
+
+        adjusted = dict(policy_output)
+        slow_logits = adjusted["slow_logits"].clone()
+        fast_logits = adjusted["fast_logits"].clone()
+        event_logits = adjusted["event_logits"].clone()
+        env_action_bias = adjusted.get("env_action_logits_bias")
+        if isinstance(env_action_bias, torch.Tensor) and env_action_bias.numel() == 5:
+            env_action_logits_bias = env_action_bias.clone()
+        else:
+            env_action_logits_bias = torch.zeros(5, dtype=event_logits.dtype, device=event_logits.device)
+
+        low_context_span = max(self._opportunity_constrained_min_context - self._opportunity_constrained_low_context, 1e-6)
+        weak_scale = _clamp01((opportunity_context - self._opportunity_constrained_low_context) / low_context_span)
+        suppress_scale = 1.0 - weak_scale if not strong_opportunity else 0.0
+        if not weak_opportunity:
+            suppress_scale = 1.0
+
+        prepare_penalty = self._opportunity_constrained_prepare_penalty * suppress_scale
+        prefetch_penalty = self._opportunity_constrained_prefetch_penalty * suppress_scale
+        if prepare_penalty > 1e-8:
+            event_logits[1] = event_logits[1] - prepare_penalty
+            event_logits[0] = event_logits[0] + 0.20 * prepare_penalty
+            env_action_logits_bias[4] = env_action_logits_bias[4] - prepare_penalty
+        if prefetch_penalty > 1e-8:
+            slow_logits[2] = slow_logits[2] - prefetch_penalty
+            slow_logits[0] = slow_logits[0] + 0.12 * prefetch_penalty
+            env_action_logits_bias[1] = env_action_logits_bias[1] - prefetch_penalty
+
+        prepare_bias = 0.0
+        prefetch_bias = 0.0
+        if strong_opportunity:
+            imminent = bool(first_eta <= 3 or prepare_score >= self._opportunity_constrained_min_context)
+            if imminent and (handoff_target_cache_ready or current_cache_ready or prepare_score >= 0.72):
+                prepare_bias = self._opportunity_constrained_prepare_bias * opportunity_context
+                event_logits[1] = event_logits[1] + prepare_bias
+                event_logits[0] = event_logits[0] - 0.16 * prepare_bias
+                env_action_logits_bias[4] = env_action_logits_bias[4] + prepare_bias
+            if next_differs and not predicted_next_cache_ready and (not imminent or not handoff_target_cache_ready):
+                prefetch_bias = self._opportunity_constrained_prefetch_bias * opportunity_context
+                slow_logits[2] = slow_logits[2] + prefetch_bias
+                slow_logits[0] = slow_logits[0] - 0.10 * prefetch_bias
+                env_action_logits_bias[1] = env_action_logits_bias[1] + prefetch_bias
+
+        current_bias = 0.0
+        local_bias = 0.0
+        if suppress_scale > 1e-8:
+            if current_rsu_id is not None:
+                current_action = 3 if current_cache_ready else 0
+                current_bias = self._opportunity_constrained_current_bias * suppress_scale
+                env_action_logits_bias[current_action] = env_action_logits_bias[current_action] + current_bias
+                if current_action == 0:
+                    slow_logits[1] = slow_logits[1] + 0.40 * current_bias
+                else:
+                    fast_logits[0] = fast_logits[0] + 0.28 * current_bias
+            else:
+                local_bias = self._opportunity_constrained_local_bias * suppress_scale
+                env_action_logits_bias[2] = env_action_logits_bias[2] + local_bias
+                fast_logits[1] = fast_logits[1] + 0.35 * local_bias
+
+        adjusted["slow_logits"] = slow_logits
+        adjusted["fast_logits"] = fast_logits
+        adjusted["event_logits"] = event_logits
+        adjusted["env_action_logits_bias"] = env_action_logits_bias
+        adjusted["opportunity_constrained_policy_info"] = {
+            "enabled": True,
+            "opportunity_context": round(float(opportunity_context), 6),
+            "weak_opportunity": bool(weak_opportunity),
+            "strong_opportunity": bool(strong_opportunity),
+            "trusted_candidate": bool(trusted_candidate),
+            "reliability": round(float(reliability), 6),
+            "suppress_scale": round(float(suppress_scale), 6),
+            "prepare_penalty": round(float(prepare_penalty), 6),
+            "prefetch_penalty": round(float(prefetch_penalty), 6),
+            "prepare_bias": round(float(prepare_bias), 6),
+            "prefetch_bias": round(float(prefetch_bias), 6),
+            "current_bias": round(float(current_bias), 6),
+            "local_bias": round(float(local_bias), 6),
+            "raw_handoff_candidate": bool(raw_candidate),
+            "predicted_handoff_target_valid": bool(predicted_target_valid),
+            "gate_pass": bool(gate_pass),
+            "prediction_confidence": round(float(confidence), 6),
+            "prediction_uncertainty": round(float(uncertainty), 6),
+            "reliability_floor": round(float(self._opportunity_constrained_reliability_floor), 6),
+            "prepare_window_score": round(float(prepare_score), 6),
+            "temporal_urgency": round(float(temporal_urgency), 6),
+            "predicted_first_non_current_eta": int(first_eta),
+            "current_cache_ready": bool(current_cache_ready),
+            "predicted_next_cache_ready": bool(predicted_next_cache_ready),
+            "handoff_target_cache_ready": bool(handoff_target_cache_ready),
+            "next_differs": bool(next_differs),
+            "target_differs": bool(target_differs),
+            "env_action_logit_bias": [
+                round(float(item), 6)
+                for item in env_action_logits_bias.detach().cpu().tolist()
+            ],
+        }
+        return adjusted
+
     def _apply_policy_adjustments(
         self,
         policy_output: dict[str, Any],
@@ -5790,6 +6029,7 @@ class 分层PPO基类(BaseAgent):
             semantic_state,
             run_metadata=run_metadata,
         )
+        adjusted = self._apply_opportunity_constrained_policy(adjusted, semantic_state)
         adjusted = self._apply_continuity_guard(adjusted, semantic_state)
         return self._apply_event_logit_sharpening(adjusted, semantic_state)
 
@@ -7521,6 +7761,21 @@ class 分层PPO基类(BaseAgent):
             ),
             "delayed_mechanism_credit_stale_penalty": self._delayed_mechanism_credit_stale_penalty,
             "delayed_mechanism_credit_context_gate": self._delayed_mechanism_credit_context_gate,
+            "delayed_mechanism_credit_strict_opportunity_enabled": (
+                self._delayed_mechanism_credit_strict_opportunity_enabled
+            ),
+            "opportunity_constrained_policy_enabled": self._opportunity_constrained_policy_enabled,
+            "opportunity_constrained_min_context": self._opportunity_constrained_min_context,
+            "opportunity_constrained_low_context": self._opportunity_constrained_low_context,
+            "opportunity_constrained_prepare_penalty": self._opportunity_constrained_prepare_penalty,
+            "opportunity_constrained_prefetch_penalty": self._opportunity_constrained_prefetch_penalty,
+            "opportunity_constrained_prepare_bias": self._opportunity_constrained_prepare_bias,
+            "opportunity_constrained_prefetch_bias": self._opportunity_constrained_prefetch_bias,
+            "opportunity_constrained_current_bias": self._opportunity_constrained_current_bias,
+            "opportunity_constrained_local_bias": self._opportunity_constrained_local_bias,
+            "opportunity_constrained_confidence_floor": self._opportunity_constrained_confidence_floor,
+            "opportunity_constrained_uncertainty_ceiling": self._opportunity_constrained_uncertainty_ceiling,
+            "opportunity_constrained_reliability_floor": self._opportunity_constrained_reliability_floor,
             "advantage_weighted_behavior_regularization_enabled": (
                 self._advantage_weighted_behavior_regularization_enabled
             ),
@@ -7794,6 +8049,7 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
             semantic_state,
             run_metadata=run_metadata,
         )
+        adjusted = self._apply_opportunity_constrained_policy(adjusted, semantic_state)
         adjusted = self._apply_continuity_guard(adjusted, semantic_state)
         return self._apply_event_logit_sharpening(adjusted, semantic_state)
 

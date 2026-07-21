@@ -1502,6 +1502,191 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertTrue(kwargs["delayed_mechanism_credit_enabled"])
         self.assertLess(kwargs["env_action_ppo_ratio_barrier_margin"], 0.30)
 
+    def test_sa_v42_profile_uses_completion_aligned_offset_free_mappo(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v42_completion_aligned_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["max_steps"], 22)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertEqual(defaults["gamma"], 1.0)
+        self.assertEqual(defaults["gae_lambda"], 1.0)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v42_completion_aligned_mappo")
+
+        self.assertTrue(kwargs["delayed_mechanism_credit_enabled"])
+        self.assertTrue(kwargs["advantage_weighted_behavior_regularization_enabled"])
+        self.assertEqual(kwargs["advantage_weighted_behavior_positive_coef"], 0.0)
+        self.assertGreater(kwargs["advantage_weighted_behavior_negative_coef"], 1.0)
+        self.assertLess(kwargs["env_action_ppo_teacher_coef"], 0.42)
+        self.assertGreater(kwargs["delayed_mechanism_credit_failure_penalty"], 1.02)
+
+    def test_sa_v43_profile_uses_strict_opportunity_offset_free_mappo(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v43_strict_opportunity_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v43_strict_opportunity_mappo")
+
+        self.assertTrue(kwargs["delayed_mechanism_credit_enabled"])
+        self.assertTrue(kwargs["delayed_mechanism_credit_strict_opportunity_enabled"])
+        self.assertGreater(kwargs["delayed_mechanism_credit_context_gate"], 0.40)
+        self.assertGreater(kwargs["delayed_mechanism_credit_failure_penalty"], 1.5)
+        self.assertLess(kwargs["prepare_action_prior_weight"], 0.10)
+        self.assertGreater(kwargs["advantage_weighted_behavior_negative_coef"], 1.4)
+
+    def test_sa_v44_profile_uses_opportunity_constrained_policy(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v44_opportunity_constrained_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v44_opportunity_constrained_mappo")
+
+        self.assertTrue(kwargs["delayed_mechanism_credit_strict_opportunity_enabled"])
+        self.assertTrue(kwargs["opportunity_constrained_policy_enabled"])
+        self.assertGreater(kwargs["opportunity_constrained_prepare_penalty"], 6.0)
+        self.assertGreater(kwargs["opportunity_constrained_prefetch_penalty"], 3.0)
+        self.assertGreaterEqual(kwargs["opportunity_constrained_reliability_floor"], 0.28)
+        self.assertLess(kwargs["mechanism_aux_coef"], 0.01)
+        self.assertGreater(kwargs["counterfactual_teacher_invalid_mechanism_penalty"], 1.0)
+
+    def test_sa_v45_profile_balances_refresh_after_opportunity_constraint(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v45_balanced_refresh_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v45_balanced_refresh_mappo")
+
+        self.assertTrue(kwargs["opportunity_constrained_policy_enabled"])
+        self.assertLess(kwargs["opportunity_constrained_reliability_floor"], 0.28)
+        self.assertLess(kwargs["opportunity_constrained_prepare_penalty"], 6.0)
+        self.assertGreater(kwargs["opportunity_constrained_current_bias"], 2.5)
+        self.assertLess(kwargs["opportunity_constrained_local_bias"], 0.2)
+        self.assertLess(kwargs["mechanism_aux_coef"], 0.01)
+
+    def test_sa_v46_profile_enables_constrained_net_utility_prd(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v46_net_utility_constrained_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertLess(defaults["clip_ratio"], 0.05)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v46_net_utility_constrained_mappo")
+
+        self.assertTrue(kwargs["opportunity_constrained_policy_enabled"])
+        self.assertTrue(kwargs["net_utility_prd_enabled"])
+        self.assertTrue(kwargs["net_utility_cost_dual_enabled"])
+        self.assertFalse(kwargs["net_utility_option_termination_enabled"])
+        self.assertGreater(kwargs["net_utility_backhaul_coef"], 0.20)
+        self.assertGreater(kwargs["net_utility_failed_mechanism_backhaul_coef"], 0.30)
+        self.assertGreater(kwargs["opportunity_constrained_prepare_penalty"], 7.0)
+        self.assertGreater(kwargs["advantage_weighted_behavior_negative_coef"], 1.30)
+
+    def test_sa_v44_opportunity_constraint_suppresses_prepare_without_candidate(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": [],
+            "predicted_next_rsu_by_vehicle": {"veh_1": "rsu_a"},
+            "predicted_first_handoff_rsu_by_vehicle": {},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.05},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.95},
+            "dwell_time": {"veh_1": 12.0},
+            "next_rsu_sequence": {"veh_1": ["rsu_a", "rsu_a", "rsu_a"]},
+            "predictor_name": "unit_test",
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            opportunity_constrained_policy_enabled=True,
+            opportunity_constrained_prepare_penalty=12.0,
+            opportunity_constrained_prefetch_penalty=10.0,
+            opportunity_constrained_current_bias=4.0,
+            opportunity_constrained_min_context=0.54,
+            opportunity_constrained_low_context=0.32,
+        )
+
+        action, action_info = agent.act(
+            None,
+            {
+                "semantic_state": state,
+                "action_mask": [True, True, True, True, True],
+                "deterministic_policy": True,
+                "run_metadata": {"window_class": "active_non_mechanism"},
+            },
+        )
+
+        self.assertNotIn(action, {1, 4})
+        constraint_info = action_info["opportunity_constrained_policy"]
+        self.assertTrue(constraint_info["enabled"])
+        self.assertFalse(constraint_info["weak_opportunity"])
+        self.assertGreater(constraint_info["prepare_penalty"], 0.0)
+        self.assertGreater(constraint_info["prefetch_penalty"], 0.0)
+
+    def test_sa_v44_opportunity_constraint_requires_trusted_candidate(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["predictions"]["prediction_confidence_by_vehicle"] = {"veh_1": 0.10}
+        state["predictions"]["prediction_uncertainty_by_vehicle"] = {"veh_1": 0.90}
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            deterministic_action=True,
+            opportunity_constrained_policy_enabled=True,
+            opportunity_constrained_prepare_penalty=12.0,
+            opportunity_constrained_prefetch_penalty=10.0,
+            opportunity_constrained_current_bias=4.0,
+            opportunity_constrained_min_context=0.54,
+            opportunity_constrained_low_context=0.32,
+            opportunity_constrained_reliability_floor=0.40,
+        )
+
+        action, action_info = agent.act(
+            None,
+            {
+                "semantic_state": state,
+                "action_mask": [True, True, True, True, True],
+                "deterministic_policy": True,
+                "run_metadata": {"window_class": "mechanism_activating"},
+            },
+        )
+
+        self.assertNotIn(action, {1, 4})
+        constraint_info = action_info["opportunity_constrained_policy"]
+        self.assertFalse(constraint_info["trusted_candidate"])
+        self.assertFalse(constraint_info["weak_opportunity"])
+        self.assertGreater(constraint_info["prepare_penalty"], 0.0)
+
+    def test_sa_v43_strict_opportunity_does_not_treat_window_class_as_credit(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            delayed_mechanism_credit_enabled=True,
+            delayed_mechanism_credit_context_gate=0.46,
+            delayed_mechanism_credit_strict_opportunity_enabled=True,
+        )
+        row = {
+            "decision_info": {"run_metadata": {"window_class": "mechanism_activating"}},
+            "env_info": {
+                "metrics_protocol": {
+                    "handoff_event_count": 0,
+                    "predicted_handoff_signal": False,
+                    "has_predicted_handoff_target": False,
+                }
+            },
+            "action_info": {
+                "prepare_window_score": 0.0,
+                "temporal_urgency": 0.0,
+                "prediction_confidence": 0.0,
+                "gate_pass": False,
+                "raw_handoff_candidate": False,
+                "predicted_handoff_target_valid": False,
+            },
+        }
+
+        self.assertFalse(agent._row_mechanism_credit_opportunity(row))
+
     def test_sa_v36_counterfactual_margin_loss_prefers_local_on_idle_window(self) -> None:
         state = _minimal_semantic_state()
         agent = build_agent(

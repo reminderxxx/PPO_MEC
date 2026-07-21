@@ -1,0 +1,36 @@
+profile: top_journal_mechanism_v44_opportunity_constrained_mappo
+base_profile: top_journal_mechanism_v43_strict_opportunity_mappo
+purpose: >
+  Offset-free MAPPO candidate that moves the handoff-opportunity constraint into
+  the actor probability model instead of relying only on delayed reward credit.
+algorithm_delta:
+  - Adds opportunity-constrained policy logits: weak or unreliable handoff
+    contexts suppress prefetch/prepare env-action scores before sampling,
+    deterministic argmax, and env-action PPO ratio computation.
+  - Keeps centralized MAPPO and delayed mechanism credit, but lowers mechanism
+    auxiliary pressure so the actor can recover from stale prepare/migrate
+    collapse.
+  - Uses conservative positive prepare/prefetch bias only when predicted handoff
+    opportunity is reliable enough and timing/cache context supports it.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+opportunity_constraint:
+  opportunity_constrained_policy_enabled: true
+  opportunity_constrained_min_context: 0.54
+  opportunity_constrained_low_context: 0.32
+  opportunity_constrained_prepare_penalty: 7.5
+  opportunity_constrained_prefetch_penalty: 4.25
+  opportunity_constrained_prepare_bias: 1.05
+  opportunity_constrained_prefetch_bias: 0.65
+  opportunity_constrained_reliability_floor: 0.28
+paper_claim_boundary: >
+  Candidate only. A full-pool dev win is insufficient for publication claims
+  until formal, holdout, support, provenance, and statistical audits pass.

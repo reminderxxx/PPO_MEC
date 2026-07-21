@@ -70,6 +70,11 @@ class VecWorkflowCoreEnv:
         self._node_service_steps: dict[str, int] = {}
         self._node_remaining_service_steps: dict[str, int] = {}
 
+    @property
+    def reward_positive_offset(self) -> float:
+        """Return the per-step positive reward offset used by this env."""
+        return self._reward_positive_offset
+
     def reset(self) -> tuple[dict[str, Any], dict[str, Any]]:
         """重置环境并返回语义状态字典。"""
         self._episode_steps = 0
@@ -110,6 +115,7 @@ class VecWorkflowCoreEnv:
             stall_occurred=False,
             reward=RewardBreakdown(
                 total=0.0,
+                positive_offset=0.0,
                 service_reward=0.0,
                 delay_penalty=0.0,
                 cache_miss_penalty=0.0,
@@ -203,6 +209,7 @@ class VecWorkflowCoreEnv:
         if current_node is None:
             reward = RewardBreakdown(
                 total=0.0,
+                positive_offset=0.0,
                 service_reward=0.0,
                 delay_penalty=0.0,
                 cache_miss_penalty=0.0,
@@ -323,6 +330,7 @@ class VecWorkflowCoreEnv:
         )
         reward = RewardBreakdown(
             total=total_reward,
+            positive_offset=self._reward_positive_offset,
             service_reward=service_reward,
             delay_penalty=delay_penalty,
             cache_miss_penalty=cache_miss_penalty,

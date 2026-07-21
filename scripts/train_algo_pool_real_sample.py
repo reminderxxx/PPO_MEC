@@ -45,6 +45,9 @@ PROFILE_DEFAULTS = {
 }
 SUMMARY_METRICS = [
     "total_reward",
+    "offset_adjusted_total_reward",
+    "reward_positive_offset_component",
+    "episode_step_count",
     "end_to_end_workflow_delay",
     "workflow_continuity_rate",
     "handoff_failure_rate",
@@ -89,6 +92,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--workflow_csv_path", type=str, default=str(ROOT_DIR / "data" / "raw" / "workflow" / "alibaba2018" / "batch_task.csv"))
     parser.add_argument("--max_mobility_rows", type=int, default=1500)
     parser.add_argument("--max_workflows", type=int, default=2)
+    parser.add_argument("--reward_positive_offset", type=float, default=5.0)
     parser.add_argument("--workflow_selector", type=str, default="ordered")
     parser.add_argument("--rsu_layout", type=str, default="auto_dominant_tight")
     parser.add_argument("--frame_offset", type=int, default=0)
@@ -147,15 +151,28 @@ def build_summary_row(summary: dict[str, Any], *, episode_index: int, updated: b
         or handoff.get("handoff_ready_count", 0) > 0
         or handoff.get("migration_during_handoff_count", 0) > 0
     )
+    step_trace = [step for step in summary.get("step_trace", []) if isinstance(step, dict)]
+    reward_positive_offset = float(summary["run_info"].get("reward_positive_offset", 5.0) or 0.0)
+    reward_positive_offset_component = sum(
+        float(step.get("reward_dict", {}).get("positive_offset", 0.0) or 0.0)
+        for step in step_trace
+    )
+    if reward_positive_offset_component <= 0.0 and reward_positive_offset > 0.0:
+        reward_positive_offset_component = reward_positive_offset * float(len(step_trace))
+    total_reward = float(summary["reward_breakdown"]["total"]["sum"])
     return {
         "episode_index": episode_index,
         "agent_name": summary["run_info"].get("agent_name"),
         "workflow_id": summary["run_info"].get("workflow_id"),
         "window_id": summary["run_info"].get("window_id"),
         "primary_vehicle_selection": summary["run_info"].get("primary_vehicle_selection", "stable_first"),
+        "reward_positive_offset": reward_positive_offset,
         "updated": bool(updated),
         "episode_success": bool(summary.get("episode_success", False)),
-        "total_reward": float(summary["reward_breakdown"]["total"]["sum"]),
+        "total_reward": total_reward,
+        "offset_adjusted_total_reward": round(float(total_reward - reward_positive_offset_component), 6),
+        "reward_positive_offset_component": round(float(reward_positive_offset_component), 6),
+        "episode_step_count": len(step_trace),
         "end_to_end_workflow_delay": metrics["end_to_end_workflow_delay"],
         "workflow_continuity_rate": metrics["workflow_continuity_rate"],
         "handoff_failure_rate": metrics["handoff_failure_rate"],
@@ -292,6 +309,7 @@ def main() -> None:
             max_steps=max(args.max_steps + 2, 8),
             mobility_source=args.mobility_source,
             primary_vehicle_selection=args.primary_vehicle_selection,
+            reward_positive_offset=args.reward_positive_offset,
         )
         env = GymVecEnv(core_env=core_env, recorder=recorder)
         trainer = MARLOnPolicyTrainer(
@@ -313,6 +331,7 @@ def main() -> None:
                 "window_mode": args.window_mode,
                 "window_class": mobility_bundle.rsu_metadata.get("window_class"),
                 "primary_vehicle_selection": args.primary_vehicle_selection,
+                "reward_positive_offset": args.reward_positive_offset,
             }
         )
         summary["episode_success"] = bool(summary.get("episode_status", {}).get("completed", False))
@@ -332,6 +351,7 @@ def main() -> None:
                 "agent_name": args.agent_name,
                 "config_profile": args.profile,
                 "primary_vehicle_selection": args.primary_vehicle_selection,
+                "reward_positive_offset": args.reward_positive_offset,
                 "episodes": args.episodes,
                 "update_count": update_index,
                 "is_smoke_checkpoint": args.profile == "smoke",
@@ -377,6 +397,11 @@ def main() -> None:
         "outcome_blind_window_selection": window_payload.get("outcome_blind_selection", False),
         "window_mode": args.window_mode,
         "primary_vehicle_selection": args.primary_vehicle_selection,
+        "reward_protocol": {
+            "reward_positive_offset": float(args.reward_positive_offset),
+            "offset_free": abs(float(args.reward_positive_offset)) <= 1e-12,
+            "offset_adjusted_total_reward_reported": True,
+        },
         "window_selector": args.window_selector,
         "window_count": args.window_count,
         "window_scan_stride": args.window_scan_stride,
