@@ -1,5 +1,24 @@
 # Artifact Records
 
+## 2026-07-27 v55 coverage-recovery MAPPO full-dev summary rerun
+
+状态：`[offset-free]` `[multi-seed-dev]` `[summary-generated]` `[compact-audit-only]` `[not-tmc-ready]`
+
+路径：
+
+- `configs/experiment/top_journal_mechanism_v55_coverage_recovery_mappo.yaml`
+- `artifacts/training/top_journal_v55_coverage_recovery_full_dev_summary/sa_ghmappo/sa_ghmappo_train_20260727_162901_590569_seed7/train_summary.json`
+- `artifacts/training/top_journal_v55_coverage_recovery_full_dev_summary/sa_ghmappo/sa_ghmappo_train_20260727_162901_590508_seed13/train_summary.json`
+- `artifacts/training/top_journal_v55_coverage_recovery_full_dev_summary/sa_ghmappo/sa_ghmappo_train_20260727_162901_589840_seed29/train_summary.json`
+- `artifacts/experiments/top_journal_closed_loop_v51_physical_transfer/top_journal_mechanism_v51_physical_transfer_seed3_stride20/training/algo_pool/ppo/`
+- `artifacts/experiments/top_journal_closed_loop_v51_physical_transfer/top_journal_mechanism_v51_physical_transfer_seed3_stride20/training/algo_pool/mappo/`
+
+确认结果：v55 在 128 episodes / 20 train windows / max_steps 22 / `prediction_horizon=16` / `reward_positive_offset=0.0` 下完成 seed7/13/29 full-dev summary rerun。三 seed mean reward 为 `9.102656`；seed7/13/29 分别为 `9.104609` / `9.104609` / `9.098750`，median 均为 `11.67`。no-current-RSU 动作分布均为 `{4:1064}`，对比 v51 SA-GHMAPPO seed7/13/29 的 no-current action 主要为 action2 fallback（约 `966`--`972` 次），说明当前提升来自 coverage-recovery MAPPO credit 改变了关键状态下的策略动作。
+
+同窗口 learned baseline 对照来自 v51 physical-transfer run：PPO seed7/13 mean reward 为 `3.862500` / `2.850938`，MAPPO seed7/13 为 `5.766563` / `7.168437`。v55 三 seed 相对 MAPPO seed7/13 平均 gap 为 `+2.635156`（`+40.74%`），相对 PPO seed7/13 平均 gap 为 `+5.745937`（`+171.18%`）。
+
+结论边界：这是 dev full training evidence，且 post-training audit 为 compact scope（`full_protocol=false`、1 window x 1 workflow），只能作为 liveness/provenance probe。它不是 paper-ready package；缺 formal/holdout/support suite、window-outer statistics、完整 manifest/command log 和 paper-grade full checkpoint consistency audit。不得声称 TMC-ready、paper-ready 或显著优于全部算法。
+
 ## 2026-07-22 v42-v46 offset-free MAPPO opportunity / net-utility dev probes
 
 状态：`[offset-free]` `[dev-full-pool-winner-v46]` `[single-seed]` `[not-tmc-ready]`
