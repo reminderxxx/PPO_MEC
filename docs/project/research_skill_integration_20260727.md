@@ -25,14 +25,14 @@ hypothesis/config -> train summary/checkpoint -> frozen benchmark rows -> hierar
 
 For each candidate, record a hypothesis, changed policy mechanism, unchanged contracts, train/dev windows, seed, checkpoint-selection rule, raw artifact paths, negative results, and the exact safe/prohibited wording. docs/project/top_journal_review_policy.md remains the promotion authority.
 
-## Policy-Learning Gate (required before v47+ promotion)
+## Policy-Learning Gate (implemented; required before v47+ promotion)
 
-The v47--v51 audit identified deterministic action invariance and policy overrides. A subsequent implementation task must add the following gate before any new candidate is benchmarked beyond dev:
+The v47--v51 audit identified deterministic action invariance and policy overrides. The gate is implemented in `scripts/train_sa_ghmappo_real_sample.py` and `src/agents/sa_ghmappo_core.py`; it is required before any new candidate is benchmarked beyond dev:
 
 1. **Separate feasibility from preference.** The environment action mask may reject infeasible actions. Predictor labels, pseudo-targets, temporal priors, option defaults, and continuity/backhaul rules may contribute differentiable training losses or logged features, but must not deterministically select a valid action at evaluation.
-2. **Evaluate two policies.** Record both raw_policy (learned logits plus action mask only) and safety_projected_policy (any optional runtime guard). A paper claim about MAPPO requires the raw policy to improve; a safety-projection gain must be reported as a hybrid-system ablation.
-3. **Make learning observable.** At every saved update, evaluate a fixed dev probe set and save an action signature (per-state action, action probabilities, entropy, event margin and value). Mark a run policy_invariant if the deterministic signature and all reported objective metrics remain unchanged from the first checkpoint.
-4. **Block invalid selection.** A policy_invariant run cannot supply latest, best_by_reward, Pareto, or paper candidate checkpoints. It is a negative result even if its scalar reward is high.
+2. **Evaluate two policies.** Record both `raw_policy` (learned logits plus action mask only) and `safety_projected` (optional runtime guard). A paper claim about MAPPO requires the raw policy to improve; a safety-projection gain must be reported as a hybrid-system ablation.
+3. **Make learning observable.** At every saved update, evaluate the fixed dev protocol and save a deterministic raw-policy action signature (action, raw/projected action, event choice and margin) with a stable digest.
+4. **Block invalid selection.** The first checkpoint is not eligible until a second raw evaluation exists. A run with invariant raw action signatures and raw aggregate metrics cannot supply best/Pareto/paper candidate checkpoints. All automatic best-checkpoint scores and the consistency audit use `raw_policy`, never safety-projected metrics.
 5. **Use retrospective labels correctly.** Future trajectory labels are allowed only for offline auxiliary loss or split/window auditing. Online state, action mask, benchmark policy and baseline inputs must not consume them.
 6. **Pre-register the next candidate.** Freeze one ablation grid on dev, then freeze a new mutually time-disjoint formal/hidden protocol before observing final results. The existing consumed hidden split remains unavailable.
 
@@ -46,7 +46,7 @@ The proposed experimental implementation is a constrained, policy-side MAPPO var
 
 ## Execution order
 
-1. Implement and unit-test the Policy-Learning Gate without changing environment reward or baselines.
+1. Completed: implement and unit-test the Policy-Learning Gate without changing environment reward or baselines.
 2. Run the fixed dev ablation with multi-seed checkpoint/action-signature reports.
 3. Audit the winner and its negative controls; only then freeze an unused formal/hidden protocol.
 4. Run formal, support suite, robustness, scalability, statistics and claim ledger.

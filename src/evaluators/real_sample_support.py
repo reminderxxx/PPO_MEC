@@ -266,10 +266,10 @@ def scan_mobility_windows(
         recommended = max(
             layout_evaluations,
             key=lambda item: (
-                item["estimated_association_change_count"],
-                item["estimated_handoff_count"],
                 item["axis_crossing_score"],
                 item["active_vehicle_count_mean"],
+                item["estimated_handoff_count"],
+                item["estimated_association_change_count"],
             ),
         )
         results.append(
@@ -310,10 +310,10 @@ def scan_mobility_windows(
     else:
         results.sort(
             key=lambda item: (
-                item["estimated_association_change_count"],
-                item["estimated_handoff_count"],
                 item["axis_crossing_score"],
                 item["active_vehicle_count_mean"],
+                item["estimated_handoff_count"],
+                item["estimated_association_change_count"],
             ),
             reverse=True,
         )

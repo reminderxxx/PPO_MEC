@@ -1,0 +1,60 @@
+profile: top_journal_mechanism_v51_physical_transfer_mappo
+base_profile: top_journal_mechanism_v50_long_horizon_handoff_mappo
+purpose: >
+  Offset-free MAPPO candidate that replaces raw RSU-ID jump windows with
+  physically continuous transfer windows and uses a trajectory-boundary
+  predictor to expose executable handoff opportunities before RSU coverage
+  changes.
+algorithm_delta:
+  - Keeps CTDE/MAPPO, PRD credit, net-utility shaping, and retrospective
+    handoff auxiliary learning from v50.
+  - Uses a shared trajectory-boundary predictor that combines observed motion
+    history, RSU ordering, current coverage exit, and next-RSU gap bridging.
+  - Classifies mechanism windows by physical transfer opportunity count when
+    real trajectory evidence is available, preventing non-physical ID jumps
+    from becoming auxiliary labels.
+  - Strengthens event/preparation auxiliary weights modestly because v51
+    should receive denser and physically learnable handoff signals.
+negative_controls:
+  - v49 and v50 showed that longer horizon alone is insufficient when raw
+    handoff labels are dominated by non-physical jumps.
+  - v51 does not use oracle future labels in online observations or evaluation;
+    future trajectory is used only for offline window auditing and training-only
+    retrospective auxiliary labels.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+training_window_protocol:
+  window_mode: mixed_informative
+  mechanism_window_oversample_ratio: 2.25
+  handoff_imminent_oversample_ratio: 1.50
+  target_mismatch_sample_weight: 1.50
+  min_mechanism_activating_windows: 4
+prediction_protocol:
+  predictor_kind: baseline
+  predictor_name: baseline_predictor_v3
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+physical_transfer_protocol:
+  physical_transfer_activity_available: required_for_real_windows
+  transition_definition: same_vehicle_continuous_motion_to_adjacent_future_rsu
+  gap_between_rsus_allowed: true
+  non_physical_jump_windows_excluded_from_mechanism_class: true
+retrospective_handoff_auxiliary:
+  retrospective_handoff_aux_enabled: true
+  retrospective_handoff_aux_max_eta: 16.0
+  retrospective_handoff_aux_min_score: 0.035
+  retrospective_handoff_aux_prepare_weight: 0.90
+  retrospective_handoff_aux_transition_weight: 2.05
+paper_claim_boundary: >
+  Candidate only. It may advance to paper-ready only if full-pool dev,
+  formal, holdout, support-suite, multi-seed, and statistical audits prove it
+  beats PPO, MAPPO, and rule baselines without reward offset or result
+  filtering.

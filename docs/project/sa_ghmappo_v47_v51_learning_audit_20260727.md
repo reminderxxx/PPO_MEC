@@ -55,6 +55,13 @@ All dimensions: N/S because the candidates lack the required E2 evidence and lea
 
 Implement the Policy-Learning Gate in research_skill_integration_20260727.md; then run pre-registered multi-seed dev ablations and only promote a raw-policy winner to a new frozen formal/holdout protocol.
 
+## Post-audit implementation follow-up (2026-07-27)
+
+- The independent implementation task added the required gate. `raw_policy` bypasses policy logit adjustments and runtime guards while retaining the environment action mask; `safety_projected` remains a separately logged hybrid-system mode.
+- Saved-update evaluation now records a stable raw action-signature digest. The first checkpoint is not selection-eligible; a run whose raw signatures and raw aggregate metrics remain invariant is blocked from automatic best/Pareto selection.
+- Automatic checkpoint selection and checkpoint-consistency re-evaluation now use `raw_policy` metrics, so a safety-projected value cannot overwrite the recorded learned-policy result.
+- A minimal real-data smoke verified this implementation path only. It does not change this audit's `E1_DOCUMENTED / Unverifiable` verdict, and it does not evaluate or promote the historical v47--v51 artifacts.
+
 ## TITS/TVT fit note
 
 The current evidence is insufficient for a paper-level fit judgement at either venue. A TITS/TVT submission cannot be used to relax the same attribution, fairness, or independent-evidence requirements.

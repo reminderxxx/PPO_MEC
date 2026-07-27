@@ -6,6 +6,7 @@ import csv
 import json
 import random
 from copy import deepcopy
+from math import dist
 from pathlib import Path
 from statistics import fmean, pstdev
 from typing import Any
@@ -68,6 +69,11 @@ MAIN_RESULT_METRICS = [
     "dag_remaining_nodes_mean",
     "backhaul_guard_count",
     "backhaul_guard_rate",
+    "backhaul_aware_policy_adjust_count",
+    "backhaul_aware_policy_adjust_rate",
+    "backhaul_aware_service_fill_bias_mean",
+    "backhaul_aware_redundant_fill_penalty_mean",
+    "backhaul_aware_no_signal_penalty_mean",
     "cache_warm_start_guard_count",
     "cache_warm_start_guard_rate",
     "predictive_prefetch_admission_guard_count",
@@ -700,13 +706,16 @@ def subsample_mobility_bundle_by_vehicle_count(
     }
 
 
+WINDOW_PREDICTION_AUDIT_HORIZON = 16
+
+
 def _estimate_prediction_activity(window_frames: list[dict[str, Any]], rsu_states: list[RSUState]) -> dict[str, float]:
     if not window_frames:
         return {
             "predicted_next_rsu_non_null_ratio": 0.0,
             "predicted_handoff_target_non_null_ratio": 0.0,
         }
-    predictor = PredictorManager()
+    predictor = PredictorManager(horizon=WINDOW_PREDICTION_AUDIT_HORIZON)
     predictor.reset()
     mapper = RSUMapper(rsu_states)
     total_vehicle_observations = 0
@@ -739,6 +748,125 @@ def _estimate_prediction_activity(window_frames: list[dict[str, Any]], rsu_state
     }
 
 
+def _estimate_physical_transfer_activity(
+    window_frames: list[dict[str, Any]],
+    rsu_states: list[RSUState],
+    *,
+    horizon: int = WINDOW_PREDICTION_AUDIT_HORIZON,
+) -> dict[str, Any]:
+    if len(window_frames) < 2 or not rsu_states:
+        return {
+            "physical_transfer_activity_available": False,
+            "physical_transfer_opportunity_count": 0,
+            "physical_transfer_opportunity_rate": 0.0,
+            "physical_transfer_event_count": 0,
+            "physical_transfer_vehicle_count": 0,
+            "physical_transfer_eta_mean": 0.0,
+        }
+
+    mapper = RSUMapper(rsu_states)
+    vehicle_maps: list[dict[str, VehicleState]] = [
+        {vehicle.vehicle_id: vehicle for vehicle in frame.get("vehicles", [])}
+        for frame in window_frames
+    ]
+    if not any(vehicle_map for vehicle_map in vehicle_maps):
+        return {
+            "physical_transfer_activity_available": False,
+            "physical_transfer_opportunity_count": 0,
+            "physical_transfer_opportunity_rate": 0.0,
+            "physical_transfer_event_count": 0,
+            "physical_transfer_vehicle_count": 0,
+            "physical_transfer_eta_mean": 0.0,
+        }
+    association_maps = [
+        mapper.associate(list(vehicle_map.values()))
+        for vehicle_map in vehicle_maps
+    ]
+    rsu_axis = _dominant_rsu_axis(rsu_states)
+    ordered_rsus = sorted(
+        rsu_states,
+        key=lambda rsu: (float(rsu.position_y), float(rsu.position_x))
+        if rsu_axis == "y"
+        else (float(rsu.position_x), float(rsu.position_y)),
+    )
+    rsu_order_index = {rsu.rsu_id: index for index, rsu in enumerate(ordered_rsus)}
+    total_vehicle_observations = 0
+    opportunity_count = 0
+    transfer_events: set[tuple[str, int, str, str]] = set()
+    transfer_vehicle_ids: set[str] = set()
+    eta_values: list[float] = []
+    max_horizon = max(1, int(horizon))
+
+    for frame_index, vehicle_map in enumerate(vehicle_maps[:-1]):
+        current_associations = association_maps[frame_index]
+        for vehicle_id, vehicle in vehicle_map.items():
+            total_vehicle_observations += 1
+            current_rsu_id = current_associations.get(vehicle_id)
+            if current_rsu_id is None:
+                continue
+            last_vehicle = vehicle
+            path_continuous = True
+            for future_index in range(frame_index + 1, min(len(window_frames), frame_index + max_horizon + 1)):
+                future_vehicle = vehicle_maps[future_index].get(vehicle_id)
+                if future_vehicle is None:
+                    path_continuous = False
+                    break
+                if not _vehicle_step_is_physical(last_vehicle, future_vehicle):
+                    path_continuous = False
+                    break
+                future_rsu_id = association_maps[future_index].get(vehicle_id)
+                if future_rsu_id is not None and future_rsu_id != current_rsu_id:
+                    if path_continuous and _rsu_transition_is_adjacent(
+                        current_rsu_id=current_rsu_id,
+                        future_rsu_id=future_rsu_id,
+                        rsu_order_index=rsu_order_index,
+                    ):
+                        opportunity_count += 1
+                        transfer_vehicle_ids.add(vehicle_id)
+                        transfer_events.add((vehicle_id, future_index, current_rsu_id, future_rsu_id))
+                        eta_values.append(float(future_index - frame_index))
+                    break
+                last_vehicle = future_vehicle
+
+    denominator = max(total_vehicle_observations, 1)
+    return {
+        "physical_transfer_activity_available": True,
+        "physical_transfer_opportunity_count": int(opportunity_count),
+        "physical_transfer_opportunity_rate": round(float(opportunity_count) / float(denominator), 6),
+        "physical_transfer_event_count": int(len(transfer_events)),
+        "physical_transfer_vehicle_count": int(len(transfer_vehicle_ids)),
+        "physical_transfer_eta_mean": round(fmean(eta_values), 6) if eta_values else 0.0,
+    }
+
+
+def _dominant_rsu_axis(rsu_states: list[RSUState]) -> str:
+    if len(rsu_states) < 2:
+        return "x"
+    x_values = [float(rsu.position_x) for rsu in rsu_states]
+    y_values = [float(rsu.position_y) for rsu in rsu_states]
+    return "y" if (max(y_values) - min(y_values)) > (max(x_values) - min(x_values)) else "x"
+
+
+def _vehicle_step_is_physical(previous_vehicle: VehicleState, current_vehicle: VehicleState) -> bool:
+    displacement = dist(
+        (float(previous_vehicle.position_x), float(previous_vehicle.position_y)),
+        (float(current_vehicle.position_x), float(current_vehicle.position_y)),
+    )
+    max_speed = max(float(previous_vehicle.speed or 0.0), float(current_vehicle.speed or 0.0))
+    return bool(displacement <= max(25.0, 0.5 * max_speed))
+
+
+def _rsu_transition_is_adjacent(
+    *,
+    current_rsu_id: str,
+    future_rsu_id: str,
+    rsu_order_index: dict[str, int],
+) -> bool:
+    if current_rsu_id not in rsu_order_index or future_rsu_id not in rsu_order_index:
+        return False
+    return abs(int(rsu_order_index[current_rsu_id]) - int(rsu_order_index[future_rsu_id])) <= 1
+
+
 def _build_window_rsus(window_frames: list[dict[str, Any]], recommended_layout: str) -> tuple[list[RSUState], dict[str, Any]]:
     from src.evaluators.real_sample_support import build_sample_rsus
 
@@ -762,7 +890,7 @@ def resolve_window_candidates(
     activating_handoff_threshold: int = 2,
     activating_vehicle_threshold: float = 2.0,
     activating_predicted_next_ratio_threshold: float = 0.3,
-    activating_handoff_prediction_ratio_threshold: float = 0.15,
+    activating_handoff_prediction_ratio_threshold: float = 0.0,
     non_mechanism_handoff_max: int = 0,
     non_mechanism_prediction_ratio_max: float = 0.05,
     active_non_mechanism_vehicle_threshold: float = 2.0,
@@ -825,14 +953,21 @@ def resolve_window_candidates(
         window_frames = raw_frames[int(item["frame_offset"]): int(item["frame_offset"]) + int(item["window_length"])]
         rsu_states, _ = _build_window_rsus(window_frames=window_frames, recommended_layout=str(item["recommended_rsu_layout"]))
         prediction_activity = _estimate_prediction_activity(window_frames=window_frames, rsu_states=rsu_states)
+        physical_transfer_activity = _estimate_physical_transfer_activity(window_frames=window_frames, rsu_states=rsu_states)
         estimated_handoff_count = int(item["estimated_handoff_count"])
         estimated_association_change_count = int(item["estimated_association_change_count"])
         active_vehicle_count_mean = float(item["active_vehicle_count_mean"])
         predicted_next_ratio = float(prediction_activity["predicted_next_rsu_non_null_ratio"])
         predicted_handoff_ratio = float(prediction_activity["predicted_handoff_target_non_null_ratio"])
+        physical_transfer_available = bool(physical_transfer_activity["physical_transfer_activity_available"])
+        physical_transfer_opportunity_count = int(physical_transfer_activity["physical_transfer_opportunity_count"])
+        physical_transfer_event_count = int(physical_transfer_activity["physical_transfer_event_count"])
+        mechanism_signal_count = (
+            physical_transfer_opportunity_count if physical_transfer_available else estimated_handoff_count
+        )
 
         is_activating = (
-            estimated_handoff_count >= effective_activating_handoff_threshold
+            mechanism_signal_count >= effective_activating_handoff_threshold
             and active_vehicle_count_mean >= effective_activating_vehicle_threshold
             and predicted_next_ratio >= effective_activating_predicted_next_ratio_threshold
             and predicted_handoff_ratio >= effective_activating_handoff_prediction_ratio_threshold
@@ -841,14 +976,14 @@ def resolve_window_candidates(
             not is_activating
             and active_vehicle_count_mean >= float(active_non_mechanism_vehicle_threshold)
             and estimated_association_change_count >= int(active_non_mechanism_association_change_min)
-            and estimated_handoff_count <= int(active_non_mechanism_handoff_max)
+            and mechanism_signal_count <= int(active_non_mechanism_handoff_max)
             and predicted_handoff_ratio <= float(active_non_mechanism_handoff_prediction_ratio_max)
         )
         is_idle_or_sparse = (
             active_vehicle_count_mean <= float(idle_or_sparse_vehicle_max)
             or (
                 estimated_association_change_count <= int(idle_or_sparse_association_change_max)
-                and estimated_handoff_count <= int(non_mechanism_handoff_max)
+                and mechanism_signal_count <= int(non_mechanism_handoff_max)
                 and predicted_handoff_ratio <= float(non_mechanism_prediction_ratio_max)
             )
         )
@@ -861,14 +996,15 @@ def resolve_window_candidates(
         elif (
             active_vehicle_count_mean > float(idle_or_sparse_vehicle_max)
             and estimated_association_change_count > int(idle_or_sparse_association_change_max)
-            and estimated_handoff_count <= int(active_non_mechanism_handoff_max)
+            and mechanism_signal_count <= int(active_non_mechanism_handoff_max)
         ):
             window_class = "active_non_mechanism"
         else:
             window_class = "idle_or_sparse"
 
         mechanism_score = round(
-            2.0 * estimated_handoff_count
+            0.08 * mechanism_signal_count
+            + 2.0 * physical_transfer_event_count
             + 0.5 * active_vehicle_count_mean
             + 8.0 * predicted_handoff_ratio
             + 4.0 * predicted_next_ratio,
@@ -893,6 +1029,14 @@ def resolve_window_candidates(
                 "spacing": item["spacing"],
                 "estimated_association_change_count": estimated_association_change_count,
                 "estimated_handoff_count": estimated_handoff_count,
+                "axis_crossing_score": item.get("axis_crossing_score", 0.0),
+                "physical_transfer_activity_available": physical_transfer_available,
+                "physical_transfer_opportunity_count": physical_transfer_opportunity_count,
+                "physical_transfer_opportunity_rate": physical_transfer_activity["physical_transfer_opportunity_rate"],
+                "physical_transfer_event_count": physical_transfer_event_count,
+                "physical_transfer_vehicle_count": physical_transfer_activity["physical_transfer_vehicle_count"],
+                "physical_transfer_eta_mean": physical_transfer_activity["physical_transfer_eta_mean"],
+                "mechanism_signal_count": mechanism_signal_count,
                 "active_vehicle_count_mean": active_vehicle_count_mean,
                 "active_vehicle_count_max": item["active_vehicle_count_max"],
                 "unique_vehicle_count": item["unique_vehicle_count"],
@@ -1609,6 +1753,21 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         "dag_remaining_nodes_mean": float(agent_action_diagnostics.get("dag_remaining_nodes_mean", 0.0) or 0.0),
         "backhaul_guard_count": int(agent_action_diagnostics.get("backhaul_guard_count", 0) or 0),
         "backhaul_guard_rate": float(agent_action_diagnostics.get("backhaul_guard_rate", 0.0) or 0.0),
+        "backhaul_aware_policy_adjust_count": int(
+            agent_action_diagnostics.get("backhaul_aware_policy_adjust_count", 0) or 0
+        ),
+        "backhaul_aware_policy_adjust_rate": float(
+            agent_action_diagnostics.get("backhaul_aware_policy_adjust_rate", 0.0) or 0.0
+        ),
+        "backhaul_aware_service_fill_bias_mean": float(
+            agent_action_diagnostics.get("backhaul_aware_service_fill_bias_mean", 0.0) or 0.0
+        ),
+        "backhaul_aware_redundant_fill_penalty_mean": float(
+            agent_action_diagnostics.get("backhaul_aware_redundant_fill_penalty_mean", 0.0) or 0.0
+        ),
+        "backhaul_aware_no_signal_penalty_mean": float(
+            agent_action_diagnostics.get("backhaul_aware_no_signal_penalty_mean", 0.0) or 0.0
+        ),
         "cache_warm_start_guard_count": int(agent_action_diagnostics.get("cache_warm_start_guard_count", 0) or 0),
         "cache_warm_start_guard_rate": float(agent_action_diagnostics.get("cache_warm_start_guard_rate", 0.0) or 0.0),
         "predictive_prefetch_admission_guard_count": int(

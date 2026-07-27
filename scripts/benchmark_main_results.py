@@ -84,6 +84,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--exclude_window_plan_path", action="append", default=[])
     parser.add_argument("--predictor_kind", type=str, default="baseline", choices=["baseline", "oracle", "learned_or_calibrated", "supervised"])
     parser.add_argument("--predictor_checkpoint_path", type=str, default="")
+    parser.add_argument("--prediction_horizon", type=int, default=3)
     parser.add_argument("--prediction_noise_std", type=float, default=0.0)
     parser.add_argument("--prediction_confidence_scale", type=float, default=1.0)
     parser.add_argument("--prediction_delay_steps", type=int, default=0)
@@ -473,6 +474,7 @@ def main() -> None:
                             "window_rank_offset": args.window_rank_offset,
                         },
                         predictor_kwargs={
+                            "horizon": args.prediction_horizon,
                             "predictor_kind": args.predictor_kind,
                             "predictor_checkpoint_path": args.predictor_checkpoint_path,
                             "prediction_noise_std": args.prediction_noise_std,

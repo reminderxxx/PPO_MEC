@@ -89,6 +89,11 @@ SA_LATEST_FIRST_PROFILES = {
     "top_journal_mechanism_v44_opportunity_constrained_mappo",
     "top_journal_mechanism_v45_balanced_refresh_mappo",
     "top_journal_mechanism_v46_net_utility_constrained_mappo",
+    "top_journal_mechanism_v47_service_backhaul_mappo",
+    "top_journal_mechanism_v48_service_fill_mappo",
+    "top_journal_mechanism_v49_retrospective_handoff_mappo",
+    "top_journal_mechanism_v50_long_horizon_handoff_mappo",
+    "top_journal_mechanism_v51_physical_transfer_mappo",
 }
 OFFSET_FREE_REWARD_PROFILES = {
     "top_journal_mechanism_v42_completion_aligned_mappo",
@@ -96,6 +101,11 @@ OFFSET_FREE_REWARD_PROFILES = {
     "top_journal_mechanism_v44_opportunity_constrained_mappo",
     "top_journal_mechanism_v45_balanced_refresh_mappo",
     "top_journal_mechanism_v46_net_utility_constrained_mappo",
+    "top_journal_mechanism_v47_service_backhaul_mappo",
+    "top_journal_mechanism_v48_service_fill_mappo",
+    "top_journal_mechanism_v49_retrospective_handoff_mappo",
+    "top_journal_mechanism_v50_long_horizon_handoff_mappo",
+    "top_journal_mechanism_v51_physical_transfer_mappo",
 }
 LOWER_IS_BETTER = {
     "backhaul_traffic_cost",
@@ -503,6 +513,59 @@ SA_PROFILE_SETTING_OVERRIDES = {
         "window_count": 20,
         "max_steps": 22,
     },
+    "top_journal_mechanism_v47_service_backhaul_mappo": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 5000000,
+        "window_count": 20,
+        "max_steps": 22,
+    },
+    "top_journal_mechanism_v48_service_fill_mappo": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 5000000,
+        "window_count": 20,
+        "max_steps": 22,
+    },
+    "top_journal_mechanism_v49_retrospective_handoff_mappo": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 5000000,
+        "window_count": 20,
+        "max_steps": 22,
+        "prediction_horizon": 8,
+    },
+    "top_journal_mechanism_v50_long_horizon_handoff_mappo": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 5000000,
+        "window_count": 20,
+        "max_steps": 22,
+        "prediction_horizon": 16,
+    },
+    "top_journal_mechanism_v51_physical_transfer_mappo": {
+        "sa_episodes": 128,
+        "baseline_episodes": 96,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "train_window_count": 20,
+        "max_mobility_rows": 5000000,
+        "window_count": 20,
+        "max_steps": 22,
+        "prediction_horizon": 16,
+    },
 }
 CURRENT_BASELINE_PROTOCOLS = {
     "mappo": {
@@ -574,6 +637,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--train_window_count", type=int, default=None)
     parser.add_argument("--window_scan_stride", type=int, default=None)
     parser.add_argument("--max_steps", type=int, default=None)
+    parser.add_argument("--prediction_horizon", type=int, default=None)
     parser.add_argument("--min_tasks", type=int, default=None)
     parser.add_argument("--max_tasks", type=int, default=None)
     parser.add_argument("--continuity_tolerance", type=float, default=0.02)
@@ -600,6 +664,7 @@ def effective_settings(args: argparse.Namespace) -> dict[str, int]:
             "train_window_count": 1,
             "window_scan_stride": 4,
             "max_steps": 2,
+            "prediction_horizon": 3,
             "min_tasks": 5,
             "max_tasks": 10,
         }
@@ -618,6 +683,7 @@ def effective_settings(args: argparse.Namespace) -> dict[str, int]:
             "train_window_count": 5,
             "window_scan_stride": 2,
             "max_steps": 16,
+            "prediction_horizon": 3,
             "min_tasks": 5,
             "max_tasks": 20,
         }
@@ -626,7 +692,7 @@ def effective_settings(args: argparse.Namespace) -> dict[str, int]:
             if getattr(args, key, None) is None:
                 defaults[key] = int(value)
     return {
-        key: int(getattr(args, key)) if getattr(args, key) is not None else value
+        key: int(getattr(args, key, None)) if getattr(args, key, None) is not None else value
         for key, value in defaults.items()
     }
 
@@ -822,6 +888,8 @@ def common_real_args(args: argparse.Namespace, settings: dict[str, int]) -> list
         str(settings["window_length"]),
         "--window_scan_stride",
         str(settings["window_scan_stride"]),
+        "--prediction_horizon",
+        str(settings["prediction_horizon"]),
         "--min_tasks",
         str(settings["min_tasks"]),
         "--max_tasks",

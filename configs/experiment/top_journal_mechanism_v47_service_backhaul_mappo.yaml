@@ -1,0 +1,37 @@
+profile: top_journal_mechanism_v47_service_backhaul_mappo
+base_profile: top_journal_mechanism_v46_net_utility_constrained_mappo
+purpose: >
+  Offset-free MAPPO candidate that adds service-pressure-aware cache-fill logits
+  and opportunity-gated backhaul suppression on top of v46 constrained
+  net-utility PRD.
+algorithm_delta:
+  - Adds actor-level backhaul-aware policy logits: current-RSU cache fill is
+    boosted when the current service lacks its adapter, while redundant fill,
+    prefetch, and prepare are suppressed when no trusted handoff/cache
+    opportunity exists.
+  - Enables the existing in-policy backhaul guard only for repeated no-signal
+    reactive fills, preserving cache-warm and predicted-handoff opportunities.
+  - Keeps constrained net-utility PRD as a MAPPO learning signal and does not
+    modify environment reward, baseline contracts, evaluator filtering, or
+    window selection.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+backhaul_aware_policy:
+  backhaul_aware_policy_enabled: true
+  backhaul_aware_service_fill_bias: 2.40
+  backhaul_aware_redundant_fill_penalty: 2.20
+  backhaul_aware_no_signal_prefetch_penalty: 1.20
+  backhaul_aware_no_signal_prepare_penalty: 1.65
+  backhaul_aware_steady_bias: 1.15
+  backhaul_aware_service_pressure_floor: 0.34
+paper_claim_boundary: >
+  Candidate only. A paper-ready claim requires formal/holdout/support raw
+  outputs, window independence audit, statistics, and provenance at E2 or above.

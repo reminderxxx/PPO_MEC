@@ -1,0 +1,52 @@
+profile: top_journal_mechanism_v50_long_horizon_handoff_mappo
+base_profile: top_journal_mechanism_v49_retrospective_handoff_mappo
+purpose: >
+  Offset-free MAPPO candidate that fixes the v49 executable-target bottleneck:
+  mechanism windows contain true handoff events, but an 8-step online horizon
+  leaves most handoffs outside the actionable prediction sequence.
+algorithm_delta:
+  - Extends the shared online prediction horizon from 8 to 16 steps so
+    CTDE/MAPPO can assign prepare/prefetch decisions to executable future RSUs.
+  - Aligns retrospective handoff auxiliary labels to the same 16-step ETA
+    window, preserving training-only labels without adding future information
+    to online policy observations.
+  - Slightly strengthens prepare prior and mechanism-window weighting while
+    retaining v49 net-utility PRD, backhaul-aware service-fill, and offset-free
+    reward protocol.
+  - Keeps benchmark predictor protocol shared by SA-GHMAPPO and all baselines;
+    no environment reward, result filtering, or baseline wrapper change.
+negative_controls:
+  - v47 collapsed because no-signal penalties suppressed prepare/prefetch.
+  - v48 kept service-fill behavior but provided no guided handoff transitions.
+  - v49 restored retrospective auxiliary gradients but still had too few online
+    executable handoff candidates under horizon 8.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+training_window_protocol:
+  window_mode: mixed_informative
+  mechanism_window_oversample_ratio: 2.25
+  handoff_imminent_oversample_ratio: 1.50
+  target_mismatch_sample_weight: 1.50
+  min_mechanism_activating_windows: 4
+prediction_protocol:
+  predictor_kind: baseline
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+retrospective_handoff_auxiliary:
+  retrospective_handoff_aux_enabled: true
+  retrospective_handoff_aux_max_eta: 16.0
+  retrospective_handoff_aux_min_score: 0.04
+  retrospective_handoff_aux_prepare_weight: 0.82
+  retrospective_handoff_aux_transition_weight: 1.85
+paper_claim_boundary: >
+  Candidate only. It may advance to formal/holdout only if full-pool dev
+  benchmark beats PPO, MAPPO, and rule baselines without reward offset and with
+  complete provenance/statistical audits.

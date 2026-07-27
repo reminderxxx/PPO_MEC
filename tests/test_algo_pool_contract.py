@@ -1224,6 +1224,35 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertIn("digital_twin_policy_prior_info", prior_output)
         self.assertGreater(prior_margin, base_margin)
 
+    def test_sa_raw_policy_mode_bypasses_policy_adjustments(self) -> None:
+        state = _minimal_semantic_state()
+        state["vehicles"][0]["position_x"] = 9.5
+        state["vehicles"][0]["position_y"] = 0.0
+        state["rsus"][0]["position_x"] = 0.0
+        state["rsus"][0]["position_y"] = 0.0
+        state["rsus"][0]["coverage_radius"] = 10.0
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            digital_twin_handoff_fusion_enabled=True,
+            digital_twin_policy_prior_enabled=True,
+            digital_twin_policy_prior_logit_bias=3.0,
+            digital_twin_policy_prior_prepare_threshold=0.0,
+            digital_twin_policy_prior_confidence_floor=0.1,
+        )
+
+        safety_output = agent._forward_policy(state)
+        raw_output = agent._forward_policy(
+            state,
+            run_metadata={"policy_evaluation_mode": "raw_policy"},
+        )
+
+        self.assertIn("digital_twin_policy_prior_info", safety_output)
+        self.assertNotIn("digital_twin_policy_prior_info", raw_output)
+        safety_margin = float((safety_output["event_logits"][1] - safety_output["event_logits"][0]).item())
+        raw_margin = float((raw_output["event_logits"][1] - raw_output["event_logits"][0]).item())
+        self.assertGreater(safety_margin, raw_margin)
+
     def test_sa_v31_profile_enables_handoff_pacing_prior(self) -> None:
         from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
 
@@ -1583,6 +1612,306 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertGreater(kwargs["net_utility_failed_mechanism_backhaul_coef"], 0.30)
         self.assertGreater(kwargs["opportunity_constrained_prepare_penalty"], 7.0)
         self.assertGreater(kwargs["advantage_weighted_behavior_negative_coef"], 1.30)
+
+    def test_sa_v47_profile_enables_service_backhaul_aware_mappo(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v47_service_backhaul_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertLess(defaults["learning_rate"], 2.6e-5)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v47_service_backhaul_mappo")
+
+        self.assertTrue(kwargs["opportunity_constrained_policy_enabled"])
+        self.assertTrue(kwargs["net_utility_prd_enabled"])
+        self.assertTrue(kwargs["backhaul_guard_enabled"])
+        self.assertTrue(kwargs["backhaul_aware_policy_enabled"])
+        self.assertGreater(kwargs["backhaul_aware_service_fill_bias"], 2.0)
+        self.assertGreater(kwargs["backhaul_aware_redundant_fill_penalty"], 2.0)
+        self.assertGreater(kwargs["backhaul_aware_no_signal_prepare_penalty"], 1.5)
+        self.assertGreater(kwargs["net_utility_failed_mechanism_backhaul_coef"], 0.40)
+
+    def test_sa_v48_profile_enables_service_fill_without_no_signal_suppression(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import PROFILE_DEFAULTS, build_sa_ghmappo_profile_kwargs
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v48_service_fill_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertLess(defaults["clip_ratio"], 0.05)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v48_service_fill_mappo")
+
+        self.assertTrue(kwargs["opportunity_constrained_policy_enabled"])
+        self.assertTrue(kwargs["net_utility_prd_enabled"])
+        self.assertFalse(kwargs["backhaul_guard_enabled"])
+        self.assertTrue(kwargs["backhaul_aware_policy_enabled"])
+        self.assertGreater(kwargs["backhaul_aware_service_fill_bias"], 1.0)
+        self.assertLess(kwargs["backhaul_aware_redundant_fill_penalty"], 1.0)
+        self.assertEqual(kwargs["backhaul_aware_no_signal_prefetch_penalty"], 0.0)
+        self.assertEqual(kwargs["backhaul_aware_no_signal_prepare_penalty"], 0.0)
+        self.assertGreater(kwargs["net_utility_failed_mechanism_backhaul_coef"], 0.35)
+
+    def test_sa_v49_profile_enables_retrospective_handoff_auxiliary(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        defaults = PROFILE_DEFAULTS["top_journal_mechanism_v49_retrospective_handoff_mappo"]
+        self.assertEqual(defaults["episodes"], 128)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertEqual(defaults["prediction_horizon"], 8)
+        self.assertIn("top_journal_mechanism_v49_retrospective_handoff_mappo", MECHANISM_COVERAGE_PROFILES)
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v49_retrospective_handoff_mappo")
+
+        self.assertTrue(kwargs["opportunity_constrained_policy_enabled"])
+        self.assertTrue(kwargs["net_utility_prd_enabled"])
+        self.assertTrue(kwargs["retrospective_handoff_aux_enabled"])
+        self.assertGreater(kwargs["retrospective_handoff_aux_transition_weight"], 1.0)
+        self.assertGreater(kwargs["mechanism_aux_coef"], 0.01)
+        self.assertFalse(kwargs["backhaul_guard_enabled"])
+
+    def test_sa_v49_training_window_plan_requires_mechanism_coverage(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import build_training_window_plan
+
+        class Args:
+            window_mode = "mixed_informative"
+            mechanism_window_oversample_ratio = 2.25
+            handoff_imminent_oversample_ratio = 1.50
+            target_mismatch_sample_weight = 1.50
+            min_mechanism_activating_windows = 4
+
+        active_window = {"window_id": "active_0", "window_class": "active_non_mechanism"}
+        mechanism_window = {"window_id": "mechanism_0", "window_class": "mechanism_activating"}
+
+        plan = build_training_window_plan(
+            {
+                "selected_windows": [active_window],
+                "mechanism_activating_windows": [mechanism_window],
+            },
+            Args(),
+        )
+
+        self.assertIn("mechanism_activating", [item["window_class"] for item in plan])
+
+        with self.assertRaises(RuntimeError):
+            build_training_window_plan(
+                {
+                    "selected_windows": [active_window],
+                    "mechanism_activating_windows": [],
+                },
+                Args(),
+            )
+
+    def test_mechanism_window_classification_is_not_predictor_ratio_gated(self) -> None:
+        from inspect import signature
+
+        from src.evaluators.main_results_support import resolve_window_candidates
+
+        default_threshold = signature(resolve_window_candidates).parameters[
+            "activating_handoff_prediction_ratio_threshold"
+        ].default
+
+        self.assertEqual(default_threshold, 0.0)
+
+    def test_sa_v50_profile_extends_handoff_horizon_and_auxiliary_eta(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v50_long_horizon_handoff_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["retrospective_handoff_aux_enabled"])
+        self.assertEqual(kwargs["retrospective_handoff_aux_max_eta"], 16.0)
+        self.assertGreater(kwargs["retrospective_handoff_aux_transition_weight"], 1.6)
+        self.assertGreater(kwargs["prepare_action_prior_weight"], 0.06)
+
+    def test_sa_v51_profile_uses_physical_transfer_horizon_and_stronger_auxiliary(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v51_physical_transfer_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["retrospective_handoff_aux_enabled"])
+        self.assertEqual(kwargs["retrospective_handoff_aux_max_eta"], 16.0)
+        self.assertGreater(kwargs["retrospective_handoff_aux_transition_weight"], 2.0)
+        self.assertGreater(kwargs["prepare_action_prior_weight"], 0.08)
+
+    def test_sa_v47_backhaul_aware_policy_boosts_service_fill_without_signal(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": [],
+            "predicted_next_rsu_by_vehicle": {"veh_1": "rsu_a"},
+            "predicted_first_handoff_rsu_by_vehicle": {},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.05},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.95},
+            "dwell_time": {"veh_1": 12.0},
+            "next_rsu_sequence": {"veh_1": ["rsu_a", "rsu_a"]},
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            backhaul_aware_policy_enabled=True,
+            backhaul_aware_service_fill_bias=3.0,
+            backhaul_aware_no_signal_prefetch_penalty=1.2,
+            backhaul_aware_no_signal_prepare_penalty=1.6,
+            backhaul_aware_service_pressure_floor=0.20,
+        )
+        policy_output = {
+            "slow_logits": torch.zeros(3),
+            "fast_logits": torch.zeros(2),
+            "event_logits": torch.zeros(2),
+        }
+
+        adjusted = agent._apply_backhaul_aware_policy(policy_output, state)
+
+        info = adjusted["backhaul_aware_policy_info"]
+        self.assertTrue(info["enabled"])
+        self.assertTrue(info["missing_current_adapter"])
+        self.assertTrue(info["no_trusted_signal"])
+        self.assertGreater(info["service_fill_bias"], 0.0)
+        self.assertGreater(adjusted["slow_logits"][1].item(), policy_output["slow_logits"][1].item())
+        self.assertLess(adjusted["slow_logits"][2].item(), policy_output["slow_logits"][2].item())
+        self.assertLess(adjusted["event_logits"][1].item(), policy_output["event_logits"][1].item())
+
+    def test_sa_v47_backhaul_aware_policy_suppresses_redundant_fill_when_ready(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": [],
+            "predicted_next_rsu_by_vehicle": {"veh_1": "rsu_a"},
+            "predicted_first_handoff_rsu_by_vehicle": {},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.05},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.95},
+            "dwell_time": {"veh_1": 12.0},
+            "next_rsu_sequence": {"veh_1": ["rsu_a", "rsu_a"]},
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            backhaul_aware_policy_enabled=True,
+            backhaul_aware_redundant_fill_penalty=2.5,
+            backhaul_aware_steady_bias=1.0,
+        )
+        policy_output = {
+            "slow_logits": torch.zeros(3),
+            "fast_logits": torch.zeros(2),
+            "event_logits": torch.zeros(2),
+        }
+
+        adjusted = agent._apply_backhaul_aware_policy(policy_output, state)
+
+        info = adjusted["backhaul_aware_policy_info"]
+        self.assertTrue(info["current_cache_ready"])
+        self.assertGreater(info["redundant_fill_penalty"], 0.0)
+        self.assertGreater(info["steady_bias"], 0.0)
+        self.assertLess(adjusted["slow_logits"][1].item(), policy_output["slow_logits"][1].item())
+
+    def test_sa_v48_backhaul_aware_policy_preserves_prepare_logits_without_signal_penalty(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": [],
+            "predicted_next_rsu_by_vehicle": {"veh_1": "rsu_a"},
+            "predicted_first_handoff_rsu_by_vehicle": {},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.05},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.95},
+            "dwell_time": {"veh_1": 12.0},
+            "next_rsu_sequence": {"veh_1": ["rsu_a", "rsu_a"]},
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            backhaul_aware_policy_enabled=True,
+            backhaul_aware_service_fill_bias=1.35,
+            backhaul_aware_no_signal_prefetch_penalty=0.0,
+            backhaul_aware_no_signal_prepare_penalty=0.0,
+            backhaul_aware_service_pressure_floor=0.20,
+        )
+        policy_output = {
+            "slow_logits": torch.zeros(3),
+            "fast_logits": torch.zeros(2),
+            "event_logits": torch.zeros(2),
+        }
+
+        adjusted = agent._apply_backhaul_aware_policy(policy_output, state)
+
+        info = adjusted["backhaul_aware_policy_info"]
+        self.assertTrue(info["enabled"])
+        self.assertTrue(info["missing_current_adapter"])
+        self.assertTrue(info["no_trusted_signal"])
+        self.assertGreater(info["service_fill_bias"], 0.0)
+        self.assertEqual(info["prepare_penalty"], 0.0)
+        self.assertEqual(info["prefetch_penalty"], 0.0)
+        self.assertGreater(adjusted["slow_logits"][1].item(), policy_output["slow_logits"][1].item())
+        self.assertEqual(adjusted["slow_logits"][2].item(), policy_output["slow_logits"][2].item())
+        self.assertEqual(adjusted["event_logits"][1].item(), policy_output["event_logits"][1].item())
+
+    def test_sa_v49_retrospective_aux_guides_event_when_predictor_misses_handoff(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["predictions"]["predicted_handoff_vehicle_ids"] = []
+        state["predictions"]["predicted_next_rsu_by_vehicle"]["veh_1"] = "rsu_a"
+        state["predictions"]["predicted_first_handoff_rsu_by_vehicle"]["veh_1"] = None
+        state["predictions"]["next_rsu_sequence"]["veh_1"] = ["rsu_a", "rsu_a", "rsu_a"]
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            mechanism_aux_coef=0.1,
+            mechanism_aux_current_cache_fill_enabled=False,
+            retrospective_handoff_aux_enabled=True,
+            retrospective_handoff_aux_max_eta=6.0,
+            retrospective_handoff_aux_min_score=0.05,
+            retrospective_handoff_aux_prepare_weight=0.72,
+            retrospective_handoff_aux_transition_weight=1.6,
+        )
+
+        annotation = agent._build_mechanism_guidance_annotation(
+            state,
+            {
+                "decision_info": {
+                    "retrospective_handoff_label": {
+                        "gt_handoff_opportunity": 1.0,
+                        "gt_first_handoff_steps": 2.5,
+                        "gt_first_next_rsu": "rsu_b",
+                        "current_rsu_id": "rsu_a",
+                    }
+                },
+                "action_info": {
+                    "prediction_state_available": True,
+                    "raw_handoff_candidate": False,
+                    "predicted_handoff_target_valid": False,
+                    "next_rsu_non_null_count": 0,
+                    "gate_pass": False,
+                    "prepare_window_score": 0.0,
+                    "temporal_urgency": 0.0,
+                    "prediction_confidence": 0.1,
+                },
+            },
+        )
+
+        self.assertTrue(annotation["apply"])
+        self.assertTrue(annotation["event_guidance"])
+        self.assertFalse(annotation["predicted_event_guidance"])
+        self.assertTrue(annotation["retrospective_event_guidance"])
+        self.assertFalse(annotation["valid_handoff_target"])
+        self.assertTrue(annotation["prepare_aux_legal"])
+        self.assertGreater(annotation["event_weight"], 0.0)
+        self.assertGreater(annotation["transition_weight"], 1.0)
 
     def test_sa_v44_opportunity_constraint_suppresses_prepare_without_candidate(self) -> None:
         state = deepcopy(_minimal_semantic_state())
@@ -3146,6 +3475,24 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         control = ActionAdapter().decode(1, state)
         self.assertEqual(control.cache_action["strategy"], "predictive_prefetch")
         self.assertEqual(control.cache_action["rsu_id"], "rsu_b")
+        self.assertFalse(control.metadata["invalid_action"])
+
+    def test_action_adapter_decodes_handoff_prepare_as_target_prefetch(self) -> None:
+        state = {
+            "current_workflow_node": {"required_adapter": "adapter_tracking"},
+            "vehicles": [{"vehicle_id": "veh_1", "associated_rsu_id": "rsu_a"}],
+            "predictions": {
+                "predicted_first_handoff_rsu_by_vehicle": {"veh_1": "rsu_b"},
+                "predicted_handoff_target_rsu_id_by_vehicle": {"veh_1": "rsu_b"},
+            },
+        }
+
+        control = ActionAdapter().decode(4, state)
+
+        self.assertEqual(control.cache_action["strategy"], "handoff_prepare_prefetch")
+        self.assertEqual(control.cache_action["rsu_id"], "rsu_b")
+        self.assertEqual(control.migration_action["mode"], "prepare")
+        self.assertEqual(control.migration_action["expected_target_rsu_id"], "rsu_b")
         self.assertFalse(control.metadata["invalid_action"])
 
     def test_action_adapter_marks_invalid_predictive_action_without_current_rsu_fallback(self) -> None:

@@ -51,7 +51,7 @@ class ActionSchema:
                 DiscreteActionSpec(
                     4,
                     "handoff_migration_prepare",
-                    "Prepare adapter-state migration for the predicted handoff target.",
+                    "Prepare adapter-state migration and prefetch the required adapter at the predicted handoff target.",
                 ),
             ]
         )
@@ -247,7 +247,14 @@ class ActionAdapter:
                     migration_strategy="invalid_handoff_prepare",
                 )
             return ControlAction(
-                cache_action={},
+                cache_action={
+                    "operation": "cache",
+                    "rsu_id": predicted_handoff_target_rsu_id,
+                    "adapter_id": required_adapter,
+                    "strategy": "handoff_prepare_prefetch",
+                    "prediction_driven": True,
+                    "prediction_source": "predicted_first_handoff_rsu",
+                },
                 offload_action={"mode": "rsu", "strategy": "current_rsu_steady_offload"},
                 migration_action={
                     "mode": "prepare",

@@ -127,6 +127,8 @@ class VecWorkflowCoreEnv:
             control=ControlAction(),
             cache_result=self._default_cache_result(),
             handoff_count=0,
+            raw_handoff_count=0,
+            gap_transfer_count=0,
             pre_action_associated_rsu_id=None,
             pre_action_prediction_snapshot={},
             realized_prepare=self._default_prepare_realization(),
@@ -189,11 +191,20 @@ class VecWorkflowCoreEnv:
             required_adapter=current_required_adapter,
             prediction_snapshot=pre_action_prediction_snapshot,
         )
+        gap_transfer_count = int(
+            self._is_gap_transfer_entry(
+                pre_action_associated_rsu_id=pre_action_associated_rsu_id,
+                post_action_associated_rsu_id=primary_vehicle.associated_rsu_id if primary_vehicle else None,
+                prediction_snapshot=pre_action_prediction_snapshot,
+                prepare_action_context=prepare_action_context,
+            )
+        )
+        mobility_transfer_count = max(handoff_count, gap_transfer_count)
         realized_prepare = self._consume_realized_prepare(
             vehicle_id=tracked_vehicle_id,
             actual_target_rsu_id=primary_vehicle.associated_rsu_id if primary_vehicle else None,
             required_adapter=current_required_adapter,
-            handoff_count=handoff_count,
+            handoff_count=mobility_transfer_count,
             current_prepare_action=prepare_action_context,
         )
 
@@ -238,6 +249,8 @@ class VecWorkflowCoreEnv:
                 control=control,
                 cache_result=cache_result,
                 handoff_count=0,
+                raw_handoff_count=0,
+                gap_transfer_count=0,
                 pre_action_associated_rsu_id=pre_action_associated_rsu_id,
                 pre_action_prediction_snapshot=pre_action_prediction_snapshot,
                 realized_prepare=realized_prepare,
@@ -287,16 +300,16 @@ class VecWorkflowCoreEnv:
         mechanism_exploration_action = self._is_mechanism_exploration_action(control)
         if predicted_handoff_signal and mechanism_exploration_action:
             mechanism_exploration_bonus = 1.0
-        if handoff_count > 0:
-            delay_penalty += 0.25 * handoff_count
+        if mobility_transfer_count > 0:
+            delay_penalty += 0.25 * mobility_transfer_count
             if migration_mode == "migrate":
-                migration_cost = 0.35 * handoff_count
+                migration_cost = 0.35 * mobility_transfer_count
                 continuity_bonus = 1.45 if warm_ready else 0.25
             elif migration_mode == "prepare" or prepared_handoff_realized:
-                migration_cost = 0.18 * handoff_count
+                migration_cost = 0.18 * mobility_transfer_count
                 continuity_bonus = 8.0 if warm_ready else 0.35
             else:
-                migration_cost = 1.0 * handoff_count
+                migration_cost = 1.0 * mobility_transfer_count
                 continuity_bonus = 0.1 if cache_hit else 0.0
         else:
             continuity_bonus = 0.35 if cache_hit else 0.05
@@ -313,7 +326,7 @@ class VecWorkflowCoreEnv:
 
         if cache_result["added_new_adapter"] and cache_hit:
             continuity_bonus += 0.15
-        if handoff_count > 0 and warm_ready:
+        if mobility_transfer_count > 0 and warm_ready:
             service_reward += 2.0
         if prepared_handoff_realized and warm_ready:
             service_reward += 2.0
@@ -362,7 +375,9 @@ class VecWorkflowCoreEnv:
             reward=reward,
             control=control,
             cache_result=cache_result,
-            handoff_count=handoff_count,
+            handoff_count=mobility_transfer_count,
+            raw_handoff_count=handoff_count,
+            gap_transfer_count=gap_transfer_count,
             pre_action_associated_rsu_id=pre_action_associated_rsu_id,
             pre_action_prediction_snapshot=pre_action_prediction_snapshot,
             realized_prepare=realized_prepare,
@@ -746,6 +761,26 @@ class VecWorkflowCoreEnv:
             and predicted_next_rsu_id != current_rsu_id
         )
 
+    def _is_gap_transfer_entry(
+        self,
+        *,
+        pre_action_associated_rsu_id: str | None,
+        post_action_associated_rsu_id: str | None,
+        prediction_snapshot: dict[str, Any],
+        prepare_action_context: dict[str, Any] | None,
+    ) -> bool:
+        if pre_action_associated_rsu_id is not None or post_action_associated_rsu_id is None:
+            return False
+        candidate_targets = {
+            prediction_snapshot.get("predicted_handoff_target_rsu_id"),
+            prediction_snapshot.get("predicted_next_rsu_id"),
+        }
+        if prepare_action_context is not None:
+            candidate_targets.add(prepare_action_context.get("target_rsu_id"))
+        for prepare_entry in self._prepare_history:
+            candidate_targets.add(prepare_entry.get("target_rsu_id"))
+        return post_action_associated_rsu_id in candidate_targets
+
     def _is_mechanism_exploration_action(self, control: ControlAction) -> bool:
         return bool(
             control.migration_action.get("mode") == "prepare"
@@ -830,8 +865,6 @@ class VecWorkflowCoreEnv:
         for index, entry in enumerate(self._prepare_history):
             if entry["vehicle_id"] != vehicle_id:
                 continue
-            if entry["required_adapter"] != required_adapter:
-                continue
             if entry["target_rsu_id"] != actual_target_rsu_id:
                 continue
             prepare_age = self._episode_steps - int(entry["prepared_at_step"])
@@ -851,6 +884,8 @@ class VecWorkflowCoreEnv:
             "vehicle_id": vehicle_id,
             "target_rsu_id": actual_target_rsu_id,
             "required_adapter": required_adapter,
+            "prepared_required_adapter": matched_entry.get("required_adapter"),
+            "required_adapter_match": bool(matched_entry.get("required_adapter") == required_adapter),
             "prepared_at_step": matched_entry["prepared_at_step"],
             "prepare_age": self._episode_steps - int(matched_entry["prepared_at_step"]),
         }
@@ -869,6 +904,8 @@ class VecWorkflowCoreEnv:
             "vehicle_id": None,
             "target_rsu_id": None,
             "required_adapter": None,
+            "prepared_required_adapter": None,
+            "required_adapter_match": False,
             "prepared_at_step": None,
             "prepare_age": None,
         }
@@ -956,6 +993,8 @@ class VecWorkflowCoreEnv:
         pre_action_prediction_snapshot: dict[str, Any],
         realized_prepare: dict[str, Any],
         pre_execution_cache_hit: bool = False,
+        raw_handoff_count: int = 0,
+        gap_transfer_count: int = 0,
     ) -> dict[str, Any]:
         post_action_associated_rsu_id = primary_vehicle.associated_rsu_id if primary_vehicle else None
         control_metadata = dict(getattr(control, "metadata", {}) or {})
@@ -999,7 +1038,7 @@ class VecWorkflowCoreEnv:
         )
         predictive_prefetch_requested = bool(
             cache_result.get("requested", False)
-            and cache_result.get("strategy") == "predictive_prefetch"
+            and cache_result.get("strategy") in {"predictive_prefetch", "handoff_prepare_prefetch"}
             and cache_result.get("prediction_driven", False)
             and cache_result.get("target_rsu_id") is not None
             and cache_result.get("target_rsu_id") != pre_action_associated_rsu_id
@@ -1081,6 +1120,8 @@ class VecWorkflowCoreEnv:
             "has_predicted_handoff_target": has_predicted_handoff_target,
             "predicted_handoff_signal": predicted_handoff_signal,
             "handoff_event_count": int(handoff_count),
+            "raw_handoff_event_count": int(raw_handoff_count),
+            "gap_transfer_event_count": int(gap_transfer_count),
             "handoff_ready": handoff_ready,
             "handoff_ready_from_prepare": bool(handoff_ready and migration_prepare_realized),
             "handoff_failed": handoff_failed,
@@ -1095,6 +1136,8 @@ class VecWorkflowCoreEnv:
             "migration_prepare_realized_source": realized_prepare.get("source"),
             "migration_prepare_source_step": realized_prepare.get("prepared_at_step"),
             "migration_prepare_age": realized_prepare.get("prepare_age"),
+            "migration_prepare_required_adapter_match": bool(realized_prepare.get("required_adapter_match", False)),
+            "migration_prepare_prepared_required_adapter": realized_prepare.get("prepared_required_adapter"),
             "migration_prepare_window": self._handoff_prepare_window,
             "migration_during_handoff": migration_during_handoff,
             "mechanism_exploration_action_selected": mechanism_exploration_action,
@@ -1204,8 +1247,17 @@ class VecWorkflowCoreEnv:
         trajectory_frames = getattr(self._mobility_provider, "_trajectory_frames", [])
         if len(trajectory_frames) < 2:
             return None
-        previous_associations = self._mapper.associate(self._frame_to_vehicle_states(trajectory_frames[0]))
         candidate_ids = {str(vehicle_id) for vehicle_id in candidate_vehicle_ids} if candidate_vehicle_ids else None
+        physical_transfer_scores = self._score_physical_transfer_pressure(
+            trajectory_frames=trajectory_frames,
+            candidate_ids=candidate_ids,
+        )
+        if physical_transfer_scores:
+            best_vehicle_id, best_score = max(sorted(physical_transfer_scores.items()), key=lambda item: item[1])
+            if best_score > 0:
+                return best_vehicle_id
+
+        previous_associations = self._mapper.associate(self._frame_to_vehicle_states(trajectory_frames[0]))
         if candidate_ids is not None:
             previous_associations = {
                 vehicle_id: rsu_id
@@ -1242,6 +1294,82 @@ class VecWorkflowCoreEnv:
         if best_count <= 0:
             return None
         return best_vehicle_id
+
+    def _score_physical_transfer_pressure(
+        self,
+        *,
+        trajectory_frames: list[dict[str, Any]],
+        candidate_ids: set[str] | None,
+        horizon: int = 16,
+    ) -> dict[str, int]:
+        vehicle_maps = [
+            {vehicle.vehicle_id: vehicle for vehicle in self._frame_to_vehicle_states(frame)}
+            for frame in trajectory_frames
+        ]
+        association_maps = [
+            self._mapper.associate(list(vehicle_map.values()))
+            for vehicle_map in vehicle_maps
+        ]
+        rsu_order_index = self._rsu_order_index()
+        scores: dict[str, int] = {}
+        max_horizon = max(1, int(horizon))
+        for frame_index, vehicle_map in enumerate(vehicle_maps[:-1]):
+            for vehicle_id, vehicle in vehicle_map.items():
+                if candidate_ids is not None and vehicle_id not in candidate_ids:
+                    continue
+                current_rsu_id = association_maps[frame_index].get(vehicle_id)
+                if current_rsu_id is None:
+                    continue
+                last_vehicle = vehicle
+                for future_index in range(frame_index + 1, min(len(vehicle_maps), frame_index + max_horizon + 1)):
+                    future_vehicle = vehicle_maps[future_index].get(vehicle_id)
+                    if future_vehicle is None:
+                        break
+                    if not self._vehicle_step_is_physical(last_vehicle, future_vehicle):
+                        break
+                    future_rsu_id = association_maps[future_index].get(vehicle_id)
+                    if future_rsu_id is not None and future_rsu_id != current_rsu_id:
+                        if self._rsu_transition_is_adjacent(current_rsu_id, future_rsu_id, rsu_order_index):
+                            scores[vehicle_id] = scores.get(vehicle_id, 0) + 1
+                        break
+                    last_vehicle = future_vehicle
+        return scores
+
+    def _rsu_order_index(self) -> dict[str, int]:
+        if not self.rsu_states:
+            return {}
+        x_values = [float(rsu.position_x) for rsu in self.rsu_states]
+        y_values = [float(rsu.position_y) for rsu in self.rsu_states]
+        axis = "y" if (max(y_values) - min(y_values)) > (max(x_values) - min(x_values)) else "x"
+        ordered_rsus = sorted(
+            self.rsu_states,
+            key=lambda rsu: (float(rsu.position_y), float(rsu.position_x))
+            if axis == "y"
+            else (float(rsu.position_x), float(rsu.position_y)),
+        )
+        return {rsu.rsu_id: index for index, rsu in enumerate(ordered_rsus)}
+
+    def _rsu_transition_is_adjacent(
+        self,
+        current_rsu_id: str,
+        future_rsu_id: str,
+        rsu_order_index: dict[str, int],
+    ) -> bool:
+        if current_rsu_id not in rsu_order_index or future_rsu_id not in rsu_order_index:
+            return False
+        return abs(int(rsu_order_index[current_rsu_id]) - int(rsu_order_index[future_rsu_id])) <= 1
+
+    def _vehicle_step_is_physical(
+        self,
+        previous_vehicle: VehicleState,
+        current_vehicle: VehicleState,
+    ) -> bool:
+        displacement = math.dist(
+            (float(previous_vehicle.position_x), float(previous_vehicle.position_y)),
+            (float(current_vehicle.position_x), float(current_vehicle.position_y)),
+        )
+        max_speed = max(float(previous_vehicle.speed or 0.0), float(current_vehicle.speed or 0.0))
+        return bool(displacement <= max(25.0, 0.5 * max_speed))
 
     def _frame_to_vehicle_states(self, frame: dict[str, Any]) -> list[VehicleState]:
         vehicles: list[VehicleState] = []

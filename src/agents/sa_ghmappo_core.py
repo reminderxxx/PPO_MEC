@@ -488,6 +488,11 @@ class 分层PPO基类(BaseAgent):
         mechanism_window_weight_floor_after_update: float = 1.0,
         mechanism_entropy_floor_after_update: float = 0.0,
         mechanism_aux_current_cache_fill_enabled: bool = True,
+        retrospective_handoff_aux_enabled: bool = False,
+        retrospective_handoff_aux_max_eta: float = 6.0,
+        retrospective_handoff_aux_min_score: float = 0.08,
+        retrospective_handoff_aux_prepare_weight: float = 0.70,
+        retrospective_handoff_aux_transition_weight: float = 1.45,
         mechanism_credit_prd_enabled: bool = False,
         mechanism_credit_policy_coef: float = 0.0,
         mechanism_credit_event_coef: float = 0.0,
@@ -579,6 +584,13 @@ class 分层PPO基类(BaseAgent):
         opportunity_constrained_confidence_floor: float = 0.18,
         opportunity_constrained_uncertainty_ceiling: float = 0.78,
         opportunity_constrained_reliability_floor: float = 0.28,
+        backhaul_aware_policy_enabled: bool = False,
+        backhaul_aware_service_fill_bias: float = 0.0,
+        backhaul_aware_redundant_fill_penalty: float = 0.0,
+        backhaul_aware_no_signal_prefetch_penalty: float = 0.0,
+        backhaul_aware_no_signal_prepare_penalty: float = 0.0,
+        backhaul_aware_steady_bias: float = 0.0,
+        backhaul_aware_service_pressure_floor: float = 0.35,
         advantage_weighted_behavior_regularization_enabled: bool = False,
         advantage_weighted_behavior_coef: float = 0.0,
         advantage_weighted_behavior_positive_coef: float = 1.0,
@@ -869,6 +881,20 @@ class 分层PPO基类(BaseAgent):
         )
         self._mechanism_entropy_floor_after_update = max(float(mechanism_entropy_floor_after_update), 0.0)
         self._mechanism_aux_current_cache_fill_enabled = bool(mechanism_aux_current_cache_fill_enabled)
+        self._retrospective_handoff_aux_enabled = bool(retrospective_handoff_aux_enabled)
+        self._retrospective_handoff_aux_max_eta = max(float(retrospective_handoff_aux_max_eta), 1.0)
+        self._retrospective_handoff_aux_min_score = max(
+            0.0,
+            min(float(retrospective_handoff_aux_min_score), 1.0),
+        )
+        self._retrospective_handoff_aux_prepare_weight = max(
+            float(retrospective_handoff_aux_prepare_weight),
+            0.0,
+        )
+        self._retrospective_handoff_aux_transition_weight = max(
+            float(retrospective_handoff_aux_transition_weight),
+            1.0,
+        )
         self._mechanism_credit_prd_enabled = bool(mechanism_credit_prd_enabled)
         self._mechanism_credit_policy_coef = max(float(mechanism_credit_policy_coef), 0.0)
         self._mechanism_credit_event_coef = max(float(mechanism_credit_event_coef), 0.0)
@@ -1073,6 +1099,25 @@ class 分层PPO基类(BaseAgent):
         self._opportunity_constrained_reliability_floor = max(
             0.0,
             min(float(opportunity_constrained_reliability_floor), 1.0),
+        )
+        self._backhaul_aware_policy_enabled = bool(backhaul_aware_policy_enabled)
+        self._backhaul_aware_service_fill_bias = max(float(backhaul_aware_service_fill_bias), 0.0)
+        self._backhaul_aware_redundant_fill_penalty = max(
+            float(backhaul_aware_redundant_fill_penalty),
+            0.0,
+        )
+        self._backhaul_aware_no_signal_prefetch_penalty = max(
+            float(backhaul_aware_no_signal_prefetch_penalty),
+            0.0,
+        )
+        self._backhaul_aware_no_signal_prepare_penalty = max(
+            float(backhaul_aware_no_signal_prepare_penalty),
+            0.0,
+        )
+        self._backhaul_aware_steady_bias = max(float(backhaul_aware_steady_bias), 0.0)
+        self._backhaul_aware_service_pressure_floor = max(
+            0.0,
+            min(float(backhaul_aware_service_pressure_floor), 1.0),
         )
         self._advantage_weighted_behavior_regularization_enabled = bool(
             advantage_weighted_behavior_regularization_enabled
@@ -1360,6 +1405,13 @@ class 分层PPO基类(BaseAgent):
         semantic_state = self._extract_semantic_state(info)
         action_mask = self._extract_action_mask(info)
         run_metadata = dict((info or {}).get("run_metadata", {}) or {})
+        policy_evaluation_mode = str(
+            run_metadata.get("policy_evaluation_mode", "safety_projected")
+        ).strip().lower()
+        if policy_evaluation_mode not in {"raw_policy", "safety_projected"}:
+            policy_evaluation_mode = "safety_projected"
+        run_metadata["policy_evaluation_mode"] = policy_evaluation_mode
+        raw_policy_evaluation = policy_evaluation_mode == "raw_policy"
         deterministic = bool(self._deterministic_action or (info or {}).get("deterministic_policy", False))
         with torch.no_grad():
             policy_output = self._forward_policy(semantic_state, run_metadata=run_metadata)
@@ -1382,7 +1434,7 @@ class 分层PPO基类(BaseAgent):
                 adapter_prefetch_enabled=self._adapter_prefetch_enabled,
             )
             guard_info = dict(policy_output.get("continuity_guard_info", {}))
-            if self._should_hard_apply_continuity_guard(
+            if (not raw_policy_evaluation) and self._should_hard_apply_continuity_guard(
                 selected_actions=selected_actions,
                 guard_info=guard_info,
             ):
@@ -1395,15 +1447,23 @@ class 分层PPO基类(BaseAgent):
                     action_mask=action_mask,
                 )
                 guard_info["hard_override_applied"] = True
-            smoothing_info = self._apply_deterministic_temporal_smoothing(
-                semantic_state=semantic_state,
-                policy_output=policy_output,
-                selected_actions=selected_actions,
-                deterministic=deterministic,
+            smoothing_info = (
+                self._apply_deterministic_temporal_smoothing(
+                    semantic_state=semantic_state,
+                    policy_output=policy_output,
+                    selected_actions=selected_actions,
+                    deterministic=deterministic,
+                )
+                if not raw_policy_evaluation
+                else {"enabled": False, "reason": "raw_policy_evaluation"}
             )
-            cache_warm_guard_info = self._apply_cache_warm_start_guard_to_actions(
-                semantic_state=semantic_state,
-                selected_actions=selected_actions,
+            cache_warm_guard_info = (
+                self._apply_cache_warm_start_guard_to_actions(
+                    semantic_state=semantic_state,
+                    selected_actions=selected_actions,
+                )
+                if not raw_policy_evaluation
+                else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
             )
             if cache_warm_guard_info.get("guarded", False):
                 head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
@@ -1411,9 +1471,13 @@ class 分层PPO基类(BaseAgent):
                     selected_actions=selected_actions,
                     action_mask=action_mask,
                 )
-            prefetch_admission_guard_info = self._apply_predictive_prefetch_admission_guard_to_actions(
-                semantic_state=semantic_state,
-                selected_actions=selected_actions,
+            prefetch_admission_guard_info = (
+                self._apply_predictive_prefetch_admission_guard_to_actions(
+                    semantic_state=semantic_state,
+                    selected_actions=selected_actions,
+                )
+                if not raw_policy_evaluation
+                else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
             )
             if prefetch_admission_guard_info.get("guarded", False):
                 head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
@@ -1421,10 +1485,14 @@ class 分层PPO基类(BaseAgent):
                     selected_actions=selected_actions,
                     action_mask=action_mask,
                 )
-            backhaul_guard_info = self._apply_backhaul_guard_to_actions(
-                semantic_state=semantic_state,
-                selected_actions=selected_actions,
-                cache_warm_guard_info=cache_warm_guard_info,
+            backhaul_guard_info = (
+                self._apply_backhaul_guard_to_actions(
+                    semantic_state=semantic_state,
+                    selected_actions=selected_actions,
+                    cache_warm_guard_info=cache_warm_guard_info,
+                )
+                if not raw_policy_evaluation
+                else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
             )
             if backhaul_guard_info.get("guarded", False):
                 head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
@@ -1438,11 +1506,15 @@ class 分层PPO基类(BaseAgent):
                 event_head_enabled=self._event_head_enabled,
                 adapter_prefetch_enabled=self._adapter_prefetch_enabled,
             )
-            idle_popularity_fallback_info = self._maybe_apply_idle_popularity_fallback(
-                semantic_state=semantic_state,
-                action_mask=action_mask,
-                original_env_action=env_action,
-                deterministic=deterministic,
+            idle_popularity_fallback_info = (
+                self._maybe_apply_idle_popularity_fallback(
+                    semantic_state=semantic_state,
+                    action_mask=action_mask,
+                    original_env_action=env_action,
+                    deterministic=deterministic,
+                )
+                if not raw_policy_evaluation
+                else {"enabled": False, "applied": False, "reason": "raw_policy_evaluation"}
             )
             if idle_popularity_fallback_info.get("applied", False):
                 env_action = int(idle_popularity_fallback_info["fallback_action"])
@@ -1453,13 +1525,17 @@ class 分层PPO基类(BaseAgent):
                     selected_actions=selected_actions,
                     action_mask=action_mask,
                 )
-            option_gate_info = self._maybe_apply_option_gate(
-                semantic_state=semantic_state,
-                action_mask=action_mask,
-                policy_output=policy_output,
-                base_env_action=env_action,
-                deterministic=deterministic,
-                run_metadata=run_metadata,
+            option_gate_info = (
+                self._maybe_apply_option_gate(
+                    semantic_state=semantic_state,
+                    action_mask=action_mask,
+                    policy_output=policy_output,
+                    base_env_action=env_action,
+                    deterministic=deterministic,
+                    run_metadata=run_metadata,
+                )
+                if not raw_policy_evaluation
+                else {"enabled": False, "applied": False, "reason": "raw_policy_evaluation"}
             )
             option_gate_info.pop("_option_log_prob_tensor", None)
             option_entropy_tensor = option_gate_info.pop("_option_entropy_tensor", None)
@@ -1511,6 +1587,8 @@ class 分层PPO基类(BaseAgent):
 
         return env_action, {
             "policy_mode": "deterministic" if deterministic else "sample",
+            "policy_evaluation_mode": policy_evaluation_mode,
+            "raw_policy_evaluation": raw_policy_evaluation,
             "policy_type": self.policy_type,
             "encoder_mode": policy_output["encoded"].get("encoder_mode"),
             "critic_mode": policy_output.get("critic_mode", "centralized" if self._centralized_critic else "independent"),
@@ -1550,6 +1628,7 @@ class 分层PPO基类(BaseAgent):
             "event_sharpening_info": dict(policy_output.get("event_sharpening_info", {})),
             "digital_twin_policy_prior": dict(policy_output.get("digital_twin_policy_prior_info", {})),
             "opportunity_constrained_policy": dict(policy_output.get("opportunity_constrained_policy_info", {})),
+            "backhaul_aware_policy": dict(policy_output.get("backhaul_aware_policy_info", {})),
             "event_prepare_prob": round(event_prepare_prob, 6),
             "event_margin": round(event_margin, 6),
             "predicted_handoff_target_valid": bool(predicted_handoff_target_valid),
@@ -3325,11 +3404,19 @@ class 分层PPO基类(BaseAgent):
             semantic_state,
             event_logit_temperature=self._current_event_logit_temperature(),
         )
+        if self._is_raw_policy_evaluation(run_metadata):
+            return dict(policy_output)
         return self._apply_policy_adjustments(
             policy_output,
             semantic_state,
             run_metadata=run_metadata,
         )
+
+    @staticmethod
+    def _is_raw_policy_evaluation(run_metadata: dict[str, Any] | None) -> bool:
+        return str(
+            (run_metadata or {}).get("policy_evaluation_mode", "safety_projected")
+        ).strip().lower() == "raw_policy"
 
     def _env_action_distribution_statistics(
         self,
@@ -5624,6 +5711,42 @@ class 分层PPO基类(BaseAgent):
         valid_handoff_target = bool(action_info.get("predicted_handoff_target_valid", self._semantic_state_has_valid_predicted_handoff_target(semantic_state)))
         next_rsu_non_null_count = int(action_info.get("next_rsu_non_null_count", 0) or 0)
         gate_pass = bool(action_info.get("gate_pass", False))
+        retrospective_label = {}
+        decision_info = row.get("decision_info", {})
+        if isinstance(decision_info, dict):
+            retrospective_label = dict(decision_info.get("retrospective_handoff_label", {}) or {})
+        if not retrospective_label and isinstance(row.get("retrospective_handoff_label", {}), dict):
+            retrospective_label = dict(row.get("retrospective_handoff_label", {}) or {})
+        retrospective_opportunity = bool(
+            self._retrospective_handoff_aux_enabled
+            and retrospective_label
+            and float(retrospective_label.get("gt_handoff_opportunity", 0.0) or 0.0) > 0.5
+        )
+        retrospective_eta = max(
+            float(retrospective_label.get("gt_first_handoff_steps", 0.0) or 0.0),
+            0.0,
+        )
+        retrospective_target_rsu_id = retrospective_label.get("gt_first_next_rsu")
+        retrospective_current_rsu_id = retrospective_label.get("current_rsu_id")
+        retrospective_target_distinct = bool(
+            retrospective_target_rsu_id is not None
+            and (
+                retrospective_current_rsu_id is None
+                or str(retrospective_target_rsu_id) != str(retrospective_current_rsu_id)
+            )
+        )
+        retrospective_window_score = 0.0
+        if retrospective_eta > 0.0:
+            normalized_eta_gap = (
+                retrospective_eta - float(self._temporal_prepare_lead_steps)
+            ) / max(float(self._temporal_prepare_sigma), 0.25)
+            retrospective_window_score = float(math.exp(-0.5 * normalized_eta_gap * normalized_eta_gap))
+        retrospective_guidance = bool(
+            retrospective_opportunity
+            and retrospective_target_distinct
+            and 0.0 < retrospective_eta <= self._retrospective_handoff_aux_max_eta
+            and retrospective_window_score >= self._retrospective_handoff_aux_min_score
+        )
         rsus = list(semantic_state.get("rsus", []))
         current_node = semantic_state.get("current_workflow_node") or {}
         required_adapter = current_node.get("required_adapter")
@@ -5647,6 +5770,7 @@ class 分层PPO基类(BaseAgent):
             and predicted_next_rsu_id != current_rsu_id
         )
         prepare_action_legal = bool(mechanism_action_legal and valid_handoff_target)
+        prepare_aux_legal = bool(mechanism_action_legal and (valid_handoff_target or retrospective_guidance))
         target_mismatch = bool(
             predicted_next_rsu_id
             and predicted_handoff_target_rsu_id
@@ -5657,13 +5781,19 @@ class 分层PPO基类(BaseAgent):
             prediction_state_available
             and (raw_handoff_candidate or next_rsu_non_null_count > 0 or prefetch_action_legal)
         )
-        needs_event_guidance = bool(
+        predicted_event_guidance = bool(
             self._mechanism_aux_coef > 0.0
             and prepare_action_legal
             and timing_active
             and prediction_usable
             and (valid_handoff_target or not cache_ready or target_mismatch or not gate_pass)
         )
+        retrospective_event_guidance = bool(
+            self._mechanism_aux_coef > 0.0
+            and prepare_aux_legal
+            and retrospective_guidance
+        )
+        needs_event_guidance = bool(predicted_event_guidance or retrospective_event_guidance)
         needs_prefetch_guidance = bool(
             self._mechanism_aux_coef > 0.0
             and prefetch_action_legal
@@ -5687,12 +5817,28 @@ class 分层PPO基类(BaseAgent):
             + 0.20 * float(action_info.get("prediction_confidence", 0.0) or 0.0)
             + 0.10 * float(gate_pass)
         )
+        if retrospective_event_guidance:
+            retrospective_strength = _clamp01(
+                self._retrospective_handoff_aux_prepare_weight
+                * (0.55 + 0.45 * retrospective_window_score)
+            )
+            guidance_strength = max(guidance_strength, retrospective_strength)
         guidance_strength = max(guidance_strength, 0.25 if needs_guidance else 0.0)
         transition_weight = self._effective_mechanism_window_weight() if needs_guidance else 1.0
+        if retrospective_event_guidance:
+            transition_weight = max(transition_weight, self._retrospective_handoff_aux_transition_weight)
         return {
             "apply": needs_guidance,
             "event_guidance": needs_event_guidance,
             "prefetch_guidance": needs_prefetch_guidance,
+            "predicted_event_guidance": predicted_event_guidance,
+            "retrospective_event_guidance": retrospective_event_guidance,
+            "retrospective_handoff_aux_enabled": self._retrospective_handoff_aux_enabled,
+            "retrospective_handoff_opportunity": retrospective_opportunity,
+            "retrospective_target_distinct": retrospective_target_distinct,
+            "retrospective_handoff_eta": round(float(retrospective_eta), 6),
+            "retrospective_handoff_score": round(float(retrospective_window_score), 6),
+            "retrospective_target_rsu_id": retrospective_target_rsu_id,
             "raw_handoff_candidate": raw_handoff_candidate,
             "valid_handoff_target": valid_handoff_target,
             "timing_active": timing_active,
@@ -5704,6 +5850,8 @@ class 分层PPO基类(BaseAgent):
             "predicted_next_cache_ready": predicted_next_cache_ready,
             "handoff_target_cache_ready": handoff_target_cache_ready,
             "mechanism_action_legal": mechanism_action_legal,
+            "prepare_action_legal": prepare_action_legal,
+            "prepare_aux_legal": prepare_aux_legal,
             "prefetch_action_legal": prefetch_action_legal,
             "target_mismatch": target_mismatch,
             "event_target": 1,
@@ -5760,6 +5908,31 @@ class 分层PPO基类(BaseAgent):
             ),
             "mechanism_event_guidance_count": int(
                 sum(1 for item in annotations if bool(item.get("event_guidance", False)))
+            ),
+            "mechanism_predicted_event_guidance_count": int(
+                sum(1 for item in annotations if bool(item.get("predicted_event_guidance", False)))
+            ),
+            "mechanism_retrospective_event_guidance_count": int(
+                sum(1 for item in annotations if bool(item.get("retrospective_event_guidance", False)))
+            ),
+            "mechanism_retrospective_handoff_aux_enabled": self._retrospective_handoff_aux_enabled,
+            "mechanism_retrospective_handoff_opportunity_count": int(
+                sum(1 for item in annotations if bool(item.get("retrospective_handoff_opportunity", False)))
+            ),
+            "mechanism_retrospective_target_distinct_count": int(
+                sum(1 for item in annotations if bool(item.get("retrospective_target_distinct", False)))
+            ),
+            "mechanism_retrospective_handoff_score_mean": round(
+                float(
+                    fmean(
+                        float(item.get("retrospective_handoff_score", 0.0) or 0.0)
+                        for item in annotations
+                        if bool(item.get("retrospective_event_guidance", False))
+                    )
+                )
+                if any(bool(item.get("retrospective_event_guidance", False)) for item in annotations)
+                else 0.0,
+                6,
             ),
             "mechanism_prefetch_guidance_count": int(
                 sum(1 for item in annotations if bool(item.get("prefetch_guidance", False)))
@@ -6018,6 +6191,152 @@ class 分层PPO基类(BaseAgent):
         }
         return adjusted
 
+    def _apply_backhaul_aware_policy(
+        self,
+        policy_output: dict[str, Any],
+        semantic_state: dict[str, Any],
+    ) -> dict[str, Any]:
+        if not self._use_hierarchy or not self._backhaul_aware_policy_enabled:
+            return policy_output
+
+        current_node = semantic_state.get("current_workflow_node") or {}
+        required_adapter = current_node.get("required_adapter")
+        required_adapter_key = str(required_adapter) if required_adapter else None
+        primary_vehicle, _ = _resolve_primary_vehicle_from_semantic_state(semantic_state)
+        current_rsu_id = primary_vehicle.get("associated_rsu_id")
+        current_rsu = _rsu_by_id_from_semantic_state(semantic_state, current_rsu_id)
+        current_cache_ready = bool(
+            required_adapter_key
+            and required_adapter_key in {str(item) for item in current_rsu.get("cached_adapter_ids", [])}
+        )
+
+        timing_features = compute_temporal_prepare_window_score(
+            semantic_state,
+            preferred_lead_steps=self._temporal_prepare_lead_steps,
+            sigma=self._temporal_prepare_sigma,
+        )
+        temporal_urgency = _clamp01(float(timing_features.get("temporal_urgency", 0.0) or 0.0))
+        predicted_target_valid = self._semantic_state_has_valid_predicted_handoff_target(semantic_state)
+        diagnostics = self._build_prediction_target_diagnostics(
+            semantic_state=semantic_state,
+            temporal_urgency=temporal_urgency,
+            predicted_handoff_target_valid=predicted_target_valid,
+        )
+        confidence = _clamp01(float(diagnostics.get("prediction_confidence", 0.0) or 0.0))
+        uncertainty = _clamp01(float(diagnostics.get("prediction_uncertainty", 1.0) or 1.0))
+        reliability = _clamp01(confidence * (1.0 - uncertainty))
+        raw_candidate = bool(diagnostics.get("raw_handoff_candidate", False))
+        gate_pass = bool(diagnostics.get("gate_pass", False))
+        trusted_candidate = bool(
+            raw_candidate
+            and confidence >= self._opportunity_constrained_confidence_floor
+            and uncertainty <= self._opportunity_constrained_uncertainty_ceiling
+            and (gate_pass or reliability >= self._opportunity_constrained_reliability_floor)
+        )
+        no_trusted_signal = bool(not trusted_candidate and not predicted_target_valid and not raw_candidate)
+
+        workflow = semantic_state.get("workflow") if isinstance(semantic_state.get("workflow"), dict) else {}
+        nodes = workflow.get("nodes", []) if isinstance(workflow, dict) else []
+        completed_nodes = set(str(item) for item in workflow.get("completed_node_ids", []) or [])
+        remaining_nodes = 0
+        if isinstance(nodes, list) and nodes:
+            for node in nodes:
+                node_id = str((node or {}).get("node_id", ""))
+                if node_id and node_id not in completed_nodes:
+                    remaining_nodes += 1
+        else:
+            remaining_nodes = 1 if current_node else 0
+        successors = current_node.get("successors", []) if isinstance(current_node, dict) else []
+        try:
+            input_size = max(float(current_node.get("input_size", 0.0) or 0.0), 0.0)
+        except (TypeError, ValueError):
+            input_size = 0.0
+        service_pressure = 0.0
+        if current_node:
+            service_pressure = _clamp01(
+                0.22
+                + 0.22 * float(bool(required_adapter_key and not current_cache_ready))
+                + 0.16 * float(current_rsu_id is not None)
+                + min(float(remaining_nodes) / 8.0, 0.22)
+                + 0.08 * float(bool(successors))
+                + min(input_size / 256.0, 0.10)
+            )
+
+        adjusted = dict(policy_output)
+        slow_logits = adjusted["slow_logits"].clone()
+        fast_logits = adjusted["fast_logits"].clone()
+        event_logits = adjusted["event_logits"].clone()
+        env_action_bias = adjusted.get("env_action_logits_bias")
+        if isinstance(env_action_bias, torch.Tensor) and env_action_bias.numel() == 5:
+            env_action_logits_bias = env_action_bias.clone()
+        else:
+            env_action_logits_bias = torch.zeros(5, dtype=event_logits.dtype, device=event_logits.device)
+
+        service_fill_bias = 0.0
+        if (
+            required_adapter_key
+            and current_rsu_id is not None
+            and not current_cache_ready
+            and service_pressure >= self._backhaul_aware_service_pressure_floor
+        ):
+            candidate_relief = 0.55 if trusted_candidate else 1.0
+            service_fill_bias = self._backhaul_aware_service_fill_bias * service_pressure * candidate_relief
+            if service_fill_bias > 1e-8:
+                slow_logits[1] = slow_logits[1] + service_fill_bias
+                slow_logits[0] = slow_logits[0] - 0.08 * service_fill_bias
+                env_action_logits_bias[0] = env_action_logits_bias[0] + service_fill_bias
+                env_action_logits_bias[3] = env_action_logits_bias[3] - 0.18 * service_fill_bias
+
+        redundant_fill_penalty = 0.0
+        steady_bias = 0.0
+        if current_cache_ready and self._backhaul_aware_redundant_fill_penalty > 0.0:
+            redundant_fill_penalty = self._backhaul_aware_redundant_fill_penalty * (1.0 if no_trusted_signal else 0.55)
+            slow_logits[1] = slow_logits[1] - redundant_fill_penalty
+            env_action_logits_bias[0] = env_action_logits_bias[0] - redundant_fill_penalty
+            steady_bias = self._backhaul_aware_steady_bias * (0.70 + 0.30 * service_pressure)
+            if steady_bias > 1e-8:
+                fast_logits[0] = fast_logits[0] + 0.30 * steady_bias
+                env_action_logits_bias[3] = env_action_logits_bias[3] + steady_bias
+
+        prefetch_penalty = 0.0
+        prepare_penalty = 0.0
+        if no_trusted_signal:
+            low_service_relief = max(0.35, 1.0 - service_pressure)
+            prefetch_penalty = self._backhaul_aware_no_signal_prefetch_penalty * low_service_relief
+            prepare_penalty = self._backhaul_aware_no_signal_prepare_penalty * low_service_relief
+            if prefetch_penalty > 1e-8:
+                slow_logits[2] = slow_logits[2] - prefetch_penalty
+                env_action_logits_bias[1] = env_action_logits_bias[1] - prefetch_penalty
+            if prepare_penalty > 1e-8:
+                event_logits[1] = event_logits[1] - prepare_penalty
+                event_logits[0] = event_logits[0] + 0.12 * prepare_penalty
+                env_action_logits_bias[4] = env_action_logits_bias[4] - prepare_penalty
+
+        adjusted["slow_logits"] = slow_logits
+        adjusted["fast_logits"] = fast_logits
+        adjusted["event_logits"] = event_logits
+        adjusted["env_action_logits_bias"] = env_action_logits_bias
+        adjusted["backhaul_aware_policy_info"] = {
+            "enabled": True,
+            "service_pressure": round(float(service_pressure), 6),
+            "service_fill_bias": round(float(service_fill_bias), 6),
+            "redundant_fill_penalty": round(float(redundant_fill_penalty), 6),
+            "prefetch_penalty": round(float(prefetch_penalty), 6),
+            "prepare_penalty": round(float(prepare_penalty), 6),
+            "steady_bias": round(float(steady_bias), 6),
+            "current_cache_ready": bool(current_cache_ready),
+            "missing_current_adapter": bool(required_adapter_key and not current_cache_ready),
+            "trusted_candidate": bool(trusted_candidate),
+            "no_trusted_signal": bool(no_trusted_signal),
+            "remaining_nodes": int(remaining_nodes),
+            "service_pressure_floor": round(float(self._backhaul_aware_service_pressure_floor), 6),
+            "env_action_logit_bias": [
+                round(float(item), 6)
+                for item in env_action_logits_bias.detach().cpu().tolist()
+            ],
+        }
+        return adjusted
+
     def _apply_policy_adjustments(
         self,
         policy_output: dict[str, Any],
@@ -6030,6 +6349,7 @@ class 分层PPO基类(BaseAgent):
             run_metadata=run_metadata,
         )
         adjusted = self._apply_opportunity_constrained_policy(adjusted, semantic_state)
+        adjusted = self._apply_backhaul_aware_policy(adjusted, semantic_state)
         adjusted = self._apply_continuity_guard(adjusted, semantic_state)
         return self._apply_event_logit_sharpening(adjusted, semantic_state)
 
@@ -7776,6 +8096,18 @@ class 分层PPO基类(BaseAgent):
             "opportunity_constrained_confidence_floor": self._opportunity_constrained_confidence_floor,
             "opportunity_constrained_uncertainty_ceiling": self._opportunity_constrained_uncertainty_ceiling,
             "opportunity_constrained_reliability_floor": self._opportunity_constrained_reliability_floor,
+            "retrospective_handoff_aux_enabled": self._retrospective_handoff_aux_enabled,
+            "retrospective_handoff_aux_max_eta": self._retrospective_handoff_aux_max_eta,
+            "retrospective_handoff_aux_min_score": self._retrospective_handoff_aux_min_score,
+            "retrospective_handoff_aux_prepare_weight": self._retrospective_handoff_aux_prepare_weight,
+            "retrospective_handoff_aux_transition_weight": self._retrospective_handoff_aux_transition_weight,
+            "backhaul_aware_policy_enabled": self._backhaul_aware_policy_enabled,
+            "backhaul_aware_service_fill_bias": self._backhaul_aware_service_fill_bias,
+            "backhaul_aware_redundant_fill_penalty": self._backhaul_aware_redundant_fill_penalty,
+            "backhaul_aware_no_signal_prefetch_penalty": self._backhaul_aware_no_signal_prefetch_penalty,
+            "backhaul_aware_no_signal_prepare_penalty": self._backhaul_aware_no_signal_prepare_penalty,
+            "backhaul_aware_steady_bias": self._backhaul_aware_steady_bias,
+            "backhaul_aware_service_pressure_floor": self._backhaul_aware_service_pressure_floor,
             "advantage_weighted_behavior_regularization_enabled": (
                 self._advantage_weighted_behavior_regularization_enabled
             ),
@@ -8050,6 +8382,7 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
             run_metadata=run_metadata,
         )
         adjusted = self._apply_opportunity_constrained_policy(adjusted, semantic_state)
+        adjusted = self._apply_backhaul_aware_policy(adjusted, semantic_state)
         adjusted = self._apply_continuity_guard(adjusted, semantic_state)
         return self._apply_event_logit_sharpening(adjusted, semantic_state)
 

@@ -1,0 +1,44 @@
+profile: top_journal_mechanism_v48_service_fill_mappo
+base_profile: top_journal_mechanism_v46_net_utility_constrained_mappo
+purpose: >
+  Offset-free MAPPO candidate that narrows the failed v47 backhaul-aware logits
+  into service-pressure-aware current-RSU adapter fill only, preserving v46
+  constrained net-utility PRD and handoff preparation learning.
+algorithm_delta:
+  - Boosts current-RSU cache-fill logits only when the active workflow node
+    requires an adapter that is missing from the serving RSU and the service
+    pressure floor is met.
+  - Penalizes only redundant current-RSU fill after the required adapter is
+    already cached; no-signal prefetch and prepare penalties are disabled so
+    MAPPO can still learn rare handoff preparation from advantage feedback.
+  - Disables the repeated-fill backhaul guard used by v47 after the v47 probe
+    showed mechanism collapse; keeps v46 net-utility dual cost learning.
+  - Does not modify environment reward, baseline contracts, evaluator
+    filtering, window selection, or result filtering.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+backhaul_aware_policy:
+  backhaul_aware_policy_enabled: true
+  backhaul_aware_service_fill_bias: 1.35
+  backhaul_aware_redundant_fill_penalty: 0.85
+  backhaul_aware_no_signal_prefetch_penalty: 0.0
+  backhaul_aware_no_signal_prepare_penalty: 0.0
+  backhaul_aware_steady_bias: 0.45
+  backhaul_aware_service_pressure_floor: 0.42
+negative_control:
+  previous_profile: top_journal_mechanism_v47_service_backhaul_mappo
+  reason: >
+    v47 suppressed prepare/prefetch under weak predictor signals and collapsed
+    handoff-ready/mechanism realization to zero on the seed7 dev probe.
+paper_claim_boundary: >
+  Candidate only. A paper-ready claim requires formal/holdout/support raw
+  outputs, mutually audited window independence, statistics, command logs,
+  manifest provenance, and evidence level E2 or above.

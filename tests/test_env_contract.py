@@ -17,7 +17,7 @@ if str(ROOT_DIR) not in sys.path:
 from src.data.mobility.replay_provider import ReplayProvider
 from src.envs.core.predictor_manager import PredictorManager
 from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv, make_toy_vec_env
-from src.envs.specs import ControlAction, RSUState
+from src.envs.specs import ControlAction, RSUState, VehicleState
 from src.envs.wrappers.gym_vec_env import GymVecEnv
 from src.predictors import (
     CHECKPOINT_SCHEMA_VERSION,
@@ -216,6 +216,68 @@ class EnvContractTestCase(unittest.TestCase):
 
         self.assertLessEqual(len(predictor_manager._prediction_history), 3)
 
+    def test_predictor_manager_uses_observed_frame_delta_for_handoff_forecast(self) -> None:
+        predictor_manager = PredictorManager(horizon=2)
+        rsus = [
+            RSUState(rsu_id="rsu_a", position_x=0.0, position_y=0.0, coverage_radius=12.0),
+            RSUState(rsu_id="rsu_b", position_x=22.0, position_y=0.0, coverage_radius=12.0),
+        ]
+        predictor_manager._update_last_positions(
+            [
+                VehicleState(
+                    vehicle_id="veh_a",
+                    position_x=0.0,
+                    position_y=0.0,
+                    speed=1.0,
+                    base_model_id="veh_base_v1",
+                    associated_rsu_id="rsu_a",
+                )
+            ]
+        )
+        current_vehicle = VehicleState(
+            vehicle_id="veh_a",
+            position_x=8.0,
+            position_y=0.0,
+            speed=1.0,
+            base_model_id="veh_base_v1",
+            associated_rsu_id="rsu_a",
+        )
+
+        sequence = predictor_manager.predict_next_rsu_sequence([current_vehicle], rsus)["veh_a"]
+
+        self.assertEqual(sequence[0], "rsu_b")
+
+    def test_predictor_manager_bridges_coverage_gap_to_adjacent_rsu(self) -> None:
+        predictor_manager = PredictorManager(horizon=4)
+        rsus = [
+            RSUState(rsu_id="rsu_a", position_x=0.0, position_y=0.0, coverage_radius=10.0),
+            RSUState(rsu_id="rsu_b", position_x=40.0, position_y=0.0, coverage_radius=10.0),
+        ]
+        predictor_manager._update_last_positions(
+            [
+                VehicleState(
+                    vehicle_id="veh_gap",
+                    position_x=0.0,
+                    position_y=0.0,
+                    speed=5.0,
+                    base_model_id="veh_base_v1",
+                    associated_rsu_id="rsu_a",
+                )
+            ]
+        )
+        current_vehicle = VehicleState(
+            vehicle_id="veh_gap",
+            position_x=8.0,
+            position_y=0.0,
+            speed=5.0,
+            base_model_id="veh_base_v1",
+            associated_rsu_id="rsu_a",
+        )
+
+        sequence = predictor_manager.predict_next_rsu_sequence([current_vehicle], rsus)["veh_gap"]
+
+        self.assertIn("rsu_b", sequence)
+
     def test_gym_observation_uses_primary_vehicle_cache_context(self) -> None:
         env = GymVecEnv(core_env=make_toy_vec_env())
         state = {
@@ -303,6 +365,92 @@ class EnvContractTestCase(unittest.TestCase):
         self.assertEqual(state["vehicles"][0]["vehicle_id"], "veh_b")
         self.assertEqual(state["primary_vehicle_selection"], "handoff_pressure")
         self.assertTrue(state["primary_vehicle_handoff_pressure_enabled"])
+
+    def test_handoff_pressure_primary_vehicle_selection_uses_physical_gap_transfer(self) -> None:
+        frames = [
+            {
+                "time_index": index,
+                "vehicles": [
+                    {
+                        "vehicle_id": "veh_a",
+                        "position_x": 0.0,
+                        "position_y": 0.0,
+                        "speed": 1.0,
+                        "base_model_id": "veh_base_v1",
+                    },
+                    {
+                        "vehicle_id": "veh_b",
+                        "position_x": float(position_x),
+                        "position_y": 0.0,
+                        "speed": 8.0,
+                        "base_model_id": "veh_base_v1",
+                    },
+                ],
+            }
+            for index, position_x in enumerate([0.0, 8.0, 16.0, 22.0])
+        ]
+        rsus = [
+            RSUState(rsu_id="rsu_a", position_x=0.0, position_y=0.0, coverage_radius=12.0),
+            RSUState(rsu_id="rsu_b", position_x=30.0, position_y=0.0, coverage_radius=12.0),
+        ]
+        env = VecWorkflowCoreEnv(
+            mobility_provider=ReplayProvider(trajectory_frames=frames),
+            rsu_states=rsus,
+            primary_vehicle_selection="handoff_pressure",
+        )
+
+        state, _ = env.reset()
+
+        self.assertEqual(state["primary_vehicle_id"], "veh_b")
+        self.assertEqual(state["vehicles"][0]["vehicle_id"], "veh_b")
+
+    def test_gap_transfer_entry_can_realize_prepared_handoff(self) -> None:
+        frames = [
+            {
+                "time_index": index,
+                "vehicles": [
+                    {
+                        "vehicle_id": "veh_b",
+                        "position_x": float(position_x),
+                        "position_y": 0.0,
+                        "speed": 8.0,
+                        "base_model_id": "veh_base_v1",
+                    }
+                ],
+            }
+            for index, position_x in enumerate([0.0, 8.0, 16.0, 22.0])
+        ]
+        rsus = [
+            RSUState(rsu_id="rsu_a", position_x=0.0, position_y=0.0, coverage_radius=12.0),
+            RSUState(rsu_id="rsu_b", position_x=30.0, position_y=0.0, coverage_radius=12.0),
+        ]
+        env = VecWorkflowCoreEnv(
+            mobility_provider=ReplayProvider(trajectory_frames=frames),
+            rsu_states=rsus,
+            primary_vehicle_selection="handoff_pressure",
+            predictor_manager=PredictorManager(horizon=4),
+        )
+        state, _ = env.reset()
+        required_adapter = state["current_workflow_node"]["required_adapter"]
+        env.rsu_states[1].cached_adapter_ids.append(required_adapter)
+        prepare_control = ControlAction(
+            offload_action={"mode": "rsu"},
+            migration_action={"mode": "prepare", "expected_target_rsu_id": "rsu_b"},
+        )
+        keep_control = ControlAction(offload_action={"mode": "rsu"}, migration_action={"mode": "keep"})
+
+        state, _, _, _, _ = env.step(prepare_control)
+        next_required_adapter = state["current_workflow_node"]["required_adapter"]
+        if next_required_adapter not in env.rsu_states[1].cached_adapter_ids:
+            env.rsu_states[1].cached_adapter_ids.append(next_required_adapter)
+        state, _, _, _, _ = env.step(keep_control)
+        _, _, _, _, info = env.step(keep_control)
+
+        metrics = info["metrics_protocol"]
+        self.assertEqual(metrics["gap_transfer_event_count"], 1)
+        self.assertEqual(metrics["raw_handoff_event_count"], 0)
+        self.assertTrue(metrics["migration_prepare_realized"])
+        self.assertTrue(metrics["handoff_ready"])
 
 
 if __name__ == "__main__":

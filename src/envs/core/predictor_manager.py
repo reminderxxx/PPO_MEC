@@ -68,6 +68,7 @@ class PredictorManager:
         self._load_history: list[dict[str, int]] = []
         self._adapter_heat: Counter[str] = Counter()
         self._last_vehicle_positions: dict[str, tuple[float, float]] = {}
+        self._vehicle_position_history: dict[str, list[tuple[float, float]]] = {}
         self._prediction_history: list[dict[str, Any]] = []
 
     def reset(self) -> None:
@@ -75,6 +76,7 @@ class PredictorManager:
         self._load_history = []
         self._adapter_heat = Counter()
         self._last_vehicle_positions = {}
+        self._vehicle_position_history = {}
         self._prediction_history = []
 
     def predict_next_rsu_sequence(
@@ -284,7 +286,7 @@ class PredictorManager:
             for vehicle in vehicles
         }
         predictions = {
-            "predictor_name": "baseline_predictor_v2",
+            "predictor_name": "baseline_predictor_v3",
             "predictor_note": "?? baseline predictor??????? DT / surrogate / seq2seq / learned predictor?",
             "prediction_time": time_index,
             "next_rsu_sequence": next_rsu_sequence,
@@ -384,9 +386,9 @@ class PredictorManager:
                 "calibrated baseline surrogate interface; no learned predictor checkpoint attached"
             )
         elif predictor_kind == "baseline":
-            predictions["predictor_name"] = "baseline_predictor_v2"
+            predictions["predictor_name"] = "baseline_predictor_v3"
             predictions["predictor_note"] = (
-                "baseline short-horizon predictor; use prediction-aware/surrogate-feature-assisted wording"
+                "trajectory-boundary short-horizon predictor; use prediction-aware/surrogate-feature-assisted wording"
             )
         elif predictor_kind == "supervised":
             predictions["predictor_name"] = "supervised_handoff_predictor_v1"
@@ -683,12 +685,29 @@ class PredictorManager:
         vehicle: VehicleState,
         rsu_states: list[RSUState],
     ) -> list[str | None]:
-        direction_x, direction_y = self._estimate_motion_direction(vehicle)
+        delta_x, delta_y = self._estimate_motion_delta(vehicle)
+        transition_hint = self._build_boundary_transition_hint(
+            vehicle=vehicle,
+            rsu_states=rsu_states,
+            delta_x=delta_x,
+            delta_y=delta_y,
+        )
         sequence: list[str | None] = []
         for step_index in range(1, self._horizon + 1):
-            predicted_x = vehicle.position_x + direction_x * vehicle.speed * float(step_index)
-            predicted_y = vehicle.position_y + direction_y * vehicle.speed * float(step_index)
-            sequence.append(self._find_best_rsu(predicted_x, predicted_y, rsu_states))
+            predicted_x = vehicle.position_x + delta_x * float(step_index)
+            predicted_y = vehicle.position_y + delta_y * float(step_index)
+            best_rsu_id = self._find_best_rsu(predicted_x, predicted_y, rsu_states)
+            if (
+                best_rsu_id is None
+                and transition_hint is not None
+                and self._boundary_hint_applies(
+                    transition_hint=transition_hint,
+                    predicted_x=predicted_x,
+                    predicted_y=predicted_y,
+                )
+            ):
+                best_rsu_id = transition_hint["target_rsu_id"]
+            sequence.append(best_rsu_id)
         return sequence
 
     def _find_best_rsu(
@@ -732,8 +751,108 @@ class PredictorManager:
             return 1.0, 0.0
         return delta_x / norm, delta_y / norm
 
+    def _estimate_motion_delta(self, vehicle: VehicleState) -> tuple[float, float]:
+        history = list(self._vehicle_position_history.get(vehicle.vehicle_id, []))
+        points = [*history[-max(self._history_window - 1, 1):], (float(vehicle.position_x), float(vehicle.position_y))]
+        deltas: list[tuple[float, float]] = []
+        for previous_point, current_point in zip(points, points[1:]):
+            delta_x = float(current_point[0]) - float(previous_point[0])
+            delta_y = float(current_point[1]) - float(previous_point[1])
+            if sqrt(delta_x * delta_x + delta_y * delta_y) > 1e-6:
+                deltas.append((delta_x, delta_y))
+        if deltas:
+            return (
+                sum(delta[0] for delta in deltas) / float(len(deltas)),
+                sum(delta[1] for delta in deltas) / float(len(deltas)),
+            )
+        previous_position = self._last_vehicle_positions.get(vehicle.vehicle_id)
+        if previous_position is None:
+            direction_x, direction_y = self._estimate_motion_direction(vehicle)
+            return direction_x * float(vehicle.speed), direction_y * float(vehicle.speed)
+        delta_x = float(vehicle.position_x) - float(previous_position[0])
+        delta_y = float(vehicle.position_y) - float(previous_position[1])
+        if sqrt(delta_x * delta_x + delta_y * delta_y) <= 1e-6:
+            direction_x, direction_y = self._estimate_motion_direction(vehicle)
+            return direction_x * float(vehicle.speed), direction_y * float(vehicle.speed)
+        return delta_x, delta_y
+
+    def _build_boundary_transition_hint(
+        self,
+        *,
+        vehicle: VehicleState,
+        rsu_states: list[RSUState],
+        delta_x: float,
+        delta_y: float,
+    ) -> dict[str, Any] | None:
+        current_rsu_id = vehicle.associated_rsu_id
+        if current_rsu_id is None or not rsu_states:
+            return None
+        current_rsu = next((rsu for rsu in rsu_states if rsu.rsu_id == current_rsu_id), None)
+        if current_rsu is None:
+            return None
+        axis = self._dominant_rsu_axis(rsu_states)
+        delta_axis = delta_y if axis == "y" else delta_x
+        if abs(delta_axis) <= 1e-6:
+            return None
+        ordered_rsus = sorted(rsu_states, key=lambda rsu: (rsu.position_y, rsu.position_x) if axis == "y" else (rsu.position_x, rsu.position_y))
+        current_index = next((index for index, rsu in enumerate(ordered_rsus) if rsu.rsu_id == current_rsu_id), None)
+        if current_index is None:
+            return None
+        direction = 1 if delta_axis > 0.0 else -1
+        target_index = current_index + direction
+        if target_index < 0 or target_index >= len(ordered_rsus):
+            return None
+        target_rsu = ordered_rsus[target_index]
+        current_axis_value = float(vehicle.position_y if axis == "y" else vehicle.position_x)
+        current_center_axis = float(current_rsu.position_y if axis == "y" else current_rsu.position_x)
+        target_center_axis = float(target_rsu.position_y if axis == "y" else target_rsu.position_x)
+        if direction * (target_center_axis - current_center_axis) <= 0.0:
+            return None
+        exit_axis_value = current_center_axis + direction * float(current_rsu.coverage_radius)
+        enter_axis_value = target_center_axis - direction * float(target_rsu.coverage_radius)
+        horizon_axis_value = current_axis_value + delta_axis * float(self._horizon)
+        if direction * (horizon_axis_value - min(exit_axis_value, enter_axis_value, key=lambda value: direction * value)) < 0.0:
+            return None
+        return {
+            "axis": axis,
+            "direction": direction,
+            "exit_axis_value": exit_axis_value,
+            "enter_axis_value": enter_axis_value,
+            "target_rsu_id": target_rsu.rsu_id,
+        }
+
+    def _boundary_hint_applies(
+        self,
+        *,
+        transition_hint: dict[str, Any],
+        predicted_x: float,
+        predicted_y: float,
+    ) -> bool:
+        axis = str(transition_hint["axis"])
+        direction = int(transition_hint["direction"])
+        predicted_axis_value = float(predicted_y if axis == "y" else predicted_x)
+        exit_axis_value = float(transition_hint["exit_axis_value"])
+        enter_axis_value = float(transition_hint["enter_axis_value"])
+        earliest_gap_axis_value = min(exit_axis_value, enter_axis_value, key=lambda value: direction * value)
+        return bool(direction * (predicted_axis_value - earliest_gap_axis_value) >= -1e-6)
+
+    def _dominant_rsu_axis(self, rsu_states: list[RSUState]) -> str:
+        if len(rsu_states) < 2:
+            return "x"
+        x_values = [float(rsu.position_x) for rsu in rsu_states]
+        y_values = [float(rsu.position_y) for rsu in rsu_states]
+        return "y" if (max(y_values) - min(y_values)) > (max(x_values) - min(x_values)) else "x"
+
     def _update_last_positions(self, vehicles: list[VehicleState]) -> None:
         self._last_vehicle_positions = {
             vehicle.vehicle_id: (float(vehicle.position_x), float(vehicle.position_y))
             for vehicle in vehicles
         }
+        current_vehicle_ids = {vehicle.vehicle_id for vehicle in vehicles}
+        for vehicle in vehicles:
+            history = list(self._vehicle_position_history.get(vehicle.vehicle_id, []))
+            history.append((float(vehicle.position_x), float(vehicle.position_y)))
+            self._vehicle_position_history[vehicle.vehicle_id] = history[-self._history_window :]
+        for vehicle_id in list(self._vehicle_position_history):
+            if vehicle_id not in current_vehicle_ids:
+                self._vehicle_position_history.pop(vehicle_id, None)

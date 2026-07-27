@@ -102,6 +102,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_scan_stride", type=int, default=2)
     parser.add_argument("--window_mode", type=str, default="activating_only", choices=["activating_only", "mixed", "full", "mixed_informative", "full_stratified"])
     parser.add_argument("--window_plan_path", type=str, default="")
+    parser.add_argument("--prediction_horizon", type=int, default=3)
     parser.add_argument("--max_steps", type=int, default=None)
     parser.add_argument("--min_tasks", type=int, default=5)
     parser.add_argument("--max_tasks", type=int, default=20)
@@ -305,7 +306,10 @@ def main() -> None:
             workflow_state=clone_workflow_state(workflow_state),
             adapter_catalog=adapter_catalog,
             rsu_states=[clone_rsu_state(rsu_state) for rsu_state in mobility_bundle.rsu_states],
-            predictor_manager=PredictorManager(random_seed=args.random_seed + episode_index),
+            predictor_manager=PredictorManager(
+                random_seed=args.random_seed + episode_index,
+                horizon=args.prediction_horizon,
+            ),
             max_steps=max(args.max_steps + 2, 8),
             mobility_source=args.mobility_source,
             primary_vehicle_selection=args.primary_vehicle_selection,
@@ -332,6 +336,7 @@ def main() -> None:
                 "window_class": mobility_bundle.rsu_metadata.get("window_class"),
                 "primary_vehicle_selection": args.primary_vehicle_selection,
                 "reward_positive_offset": args.reward_positive_offset,
+                "prediction_horizon": args.prediction_horizon,
             }
         )
         summary["episode_success"] = bool(summary.get("episode_status", {}).get("completed", False))
@@ -352,6 +357,7 @@ def main() -> None:
                 "config_profile": args.profile,
                 "primary_vehicle_selection": args.primary_vehicle_selection,
                 "reward_positive_offset": args.reward_positive_offset,
+                "prediction_horizon": args.prediction_horizon,
                 "episodes": args.episodes,
                 "update_count": update_index,
                 "is_smoke_checkpoint": args.profile == "smoke",
@@ -405,6 +411,7 @@ def main() -> None:
         "window_selector": args.window_selector,
         "window_count": args.window_count,
         "window_scan_stride": args.window_scan_stride,
+        "prediction_horizon": args.prediction_horizon,
         "agent_protocol": getattr(agent, "baseline_config", {}),
         "mean_metrics": metric_means(rows),
         "rows": rows,

@@ -15,6 +15,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from src.evaluators import main_results_support
+from src.envs.specs import RSUState, VehicleState
 
 
 def _window_payload(window_id: str, frame_offset: int, window_class: str) -> dict:
@@ -154,6 +155,57 @@ class WindowSelectionContractTestCase(unittest.TestCase):
         mechanism_ids = [item["window_id"] for item in payload["mechanism_activating_windows"]]
         self.assertEqual(mechanism_ids, ["real_handoff"])
         self.assertNotIn("busy_no_handoff", mechanism_ids)
+
+    def test_physical_transfer_window_is_mechanism_without_raw_handoff(self) -> None:
+        transfer_window = _window_payload("physical_transfer", 0, "active_non_mechanism")
+        transfer_window["window_length"] = 4
+        transfer_window["estimated_handoff_count"] = 0
+        transfer_window["estimated_association_change_count"] = 1
+        transfer_window["active_vehicle_count_mean"] = 3.0
+        frames = [
+            {
+                "time_index": index,
+                "vehicles": [
+                    VehicleState(
+                        vehicle_id="veh_transfer",
+                        position_x=float(position_x),
+                        position_y=0.0,
+                        speed=8.0,
+                        base_model_id="veh_base_v1",
+                    )
+                ],
+            }
+            for index, position_x in enumerate([0.0, 8.0, 16.0, 22.0])
+        ]
+        rsus = [
+            RSUState(rsu_id="rsu_a", position_x=0.0, position_y=0.0, coverage_radius=12.0),
+            RSUState(rsu_id="rsu_b", position_x=30.0, position_y=0.0, coverage_radius=12.0),
+        ]
+        with (
+            patch.object(main_results_support, "load_real_source_frames", return_value=(frames, "fake.csv")),
+            patch.object(main_results_support, "scan_mobility_windows", return_value=[transfer_window]),
+            patch.object(main_results_support, "_build_window_rsus", return_value=(rsus, {})),
+        ):
+            _, payload = main_results_support.resolve_window_candidates(
+                root_dir=ROOT_DIR,
+                mobility_csv_path="",
+                max_mobility_rows=4,
+                rsu_layout="auto_dominant_tight",
+                frame_offset=0,
+                window_length=4,
+                window_selector="max_handoff_candidate",
+                window_count=1,
+                window_scan_stride=1,
+                random_seed=7,
+                window_mode="activating_only",
+                activating_handoff_threshold=2,
+                activating_predicted_next_ratio_threshold=0.0,
+                activating_handoff_prediction_ratio_threshold=0.0,
+            )
+
+        mechanism_ids = [item["window_id"] for item in payload["mechanism_activating_windows"]]
+        self.assertEqual(mechanism_ids, ["physical_transfer"])
+        self.assertGreaterEqual(payload["mechanism_activating_windows"][0]["physical_transfer_opportunity_count"], 2)
 
     def test_layout_candidates_are_forwarded_to_window_scan(self) -> None:
         mechanism = _window_payload("real_handoff", 0, "mechanism_activating")

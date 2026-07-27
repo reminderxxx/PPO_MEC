@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import random
@@ -184,6 +185,11 @@ POLICY_DIAGNOSTIC_FIELDS = [
     "guard_action_delta_rate",
     "backhaul_guard_count",
     "backhaul_guard_rate",
+    "backhaul_aware_policy_adjust_count",
+    "backhaul_aware_policy_adjust_rate",
+    "backhaul_aware_service_fill_bias_mean",
+    "backhaul_aware_redundant_fill_penalty_mean",
+    "backhaul_aware_no_signal_penalty_mean",
     "cache_warm_start_guard_count",
     "cache_warm_start_guard_rate",
     "predictive_prefetch_admission_guard_count",
@@ -827,6 +833,74 @@ PROFILE_DEFAULTS = {
         "train_window_count": 20,
         "reward_positive_offset": 0.0,
     },
+    "top_journal_mechanism_v47_service_backhaul_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.45e-5,
+        "clip_ratio": 0.046,
+        "entropy_coef": 0.00102,
+        "value_coef": 0.90,
+        "auxiliary_coef": 0.23,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "reward_positive_offset": 0.0,
+    },
+    "top_journal_mechanism_v48_service_fill_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.50e-5,
+        "clip_ratio": 0.048,
+        "entropy_coef": 0.00104,
+        "value_coef": 0.90,
+        "auxiliary_coef": 0.24,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "reward_positive_offset": 0.0,
+    },
+    "top_journal_mechanism_v49_retrospective_handoff_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.55e-5,
+        "clip_ratio": 0.048,
+        "entropy_coef": 0.00106,
+        "value_coef": 0.90,
+        "auxiliary_coef": 0.24,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 8,
+    },
+    "top_journal_mechanism_v50_long_horizon_handoff_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.55e-5,
+        "clip_ratio": 0.048,
+        "entropy_coef": 0.00106,
+        "value_coef": 0.90,
+        "auxiliary_coef": 0.24,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+    },
+    "top_journal_mechanism_v51_physical_transfer_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.55e-5,
+        "clip_ratio": 0.048,
+        "entropy_coef": 0.00106,
+        "value_coef": 0.90,
+        "auxiliary_coef": 0.24,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -839,6 +913,53 @@ PROFILE_DEFAULTS = {
         "max_steps": 14,
         "train_window_count": 4,
     },
+}
+
+MECHANISM_COVERAGE_PROFILES = {
+    "top_journal_mechanism_v8_strict_full",
+    "top_journal_mechanism_v9_pareto_safe",
+    "top_journal_mechanism_v10_mappo_rl",
+    "top_journal_mechanism_v11_mappo_reward",
+    "top_journal_mechanism_v12_learned_option",
+    "top_journal_mechanism_v13_stratified_full_pool",
+    "top_journal_mechanism_v14_reward_gate",
+    "top_journal_mechanism_v15_mappo_credit",
+    "top_journal_mechanism_v16_timing_credit",
+    "top_journal_mechanism_v17_predictor_aligned",
+    "top_journal_mechanism_v18_oracle_boundary",
+    "top_journal_mechanism_v19_reward_credit",
+    "top_journal_mechanism_v20_mechanism_retention",
+    "top_journal_mechanism_v21_event_credit",
+    "top_journal_mechanism_v22_pretrain_event",
+    "top_journal_mechanism_v23_predictor_calibrated",
+    "top_journal_mechanism_v24_target_alignment",
+    "top_journal_mechanism_v25_mappo_advantage",
+    "top_journal_mechanism_v26_stability_repair",
+    "top_journal_mechanism_v27_replay_stabilized",
+    "top_journal_mechanism_v28_credit_shaping",
+    "top_journal_mechanism_v29_predictor_policy_fusion",
+    "top_journal_mechanism_v30_counterfactual_credit",
+    "top_journal_mechanism_v31_mechanism_distillation",
+    "top_journal_mechanism_v32_actor_regularized",
+    "top_journal_mechanism_v33_prediction_trust_region",
+    "top_journal_mechanism_v34_handoff_timing",
+    "top_journal_mechanism_v35_transition_credit",
+    "top_journal_mechanism_v36_advantage_safe",
+    "top_journal_mechanism_v37_mechanism_locked",
+    "top_journal_mechanism_v38_mechanism_oracle_gap",
+    "top_journal_mechanism_v39_mappo_timing_bridge",
+    "top_journal_mechanism_v40_timing_reward",
+    "top_journal_mechanism_v41_credit_stable",
+    "top_journal_mechanism_v42_mechanism_ready",
+    "top_journal_mechanism_v43_adaptive_option",
+    "top_journal_mechanism_v44_backhaul_margin",
+    "top_journal_mechanism_v45_balanced_margin",
+    "top_journal_mechanism_v46_net_utility_constrained_mappo",
+    "top_journal_mechanism_v47_service_backhaul_mappo",
+    "top_journal_mechanism_v48_service_fill_mappo",
+    "top_journal_mechanism_v49_retrospective_handoff_mappo",
+    "top_journal_mechanism_v50_long_horizon_handoff_mappo",
+    "top_journal_mechanism_v51_physical_transfer_mappo",
 }
 
 
@@ -894,6 +1015,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--steady_rsu_bias_enabled", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--steady_rsu_bias_strength", type=float, default=None)
     parser.add_argument("--steady_rsu_confidence_floor", type=float, default=None)
+    parser.add_argument("--prediction_horizon", type=int, default=None)
     parser.add_argument("--prediction_noise_std", type=float, default=0.0)
     parser.add_argument("--prediction_confidence_scale", type=float, default=1.0)
     parser.add_argument("--prediction_delay_steps", type=int, default=0)
@@ -938,6 +1060,8 @@ def parse_args() -> argparse.Namespace:
             setattr(args, field_name, profile_defaults[field_name])
     if args.reward_positive_offset is None:
         args.reward_positive_offset = float(profile_defaults.get("reward_positive_offset", 5.0))
+    if args.prediction_horizon is None:
+        args.prediction_horizon = int(profile_defaults.get("prediction_horizon", 3))
     if "gamma" in profile_defaults and float(args.gamma) == 0.99:
         args.gamma = float(profile_defaults["gamma"])
     if "gae_lambda" in profile_defaults and float(args.gae_lambda) == 0.95:
@@ -982,6 +1106,15 @@ def parse_args() -> argparse.Namespace:
             args.min_mechanism_activating_windows = (
                 3 if args.profile in strong_competition_profiles else 2
             )
+    if args.profile in MECHANISM_COVERAGE_PROFILES:
+        if float(args.mechanism_window_oversample_ratio) == 1.0:
+            args.mechanism_window_oversample_ratio = 2.25
+        if float(args.handoff_imminent_oversample_ratio) == 1.0:
+            args.handoff_imminent_oversample_ratio = 1.50
+        if float(args.target_mismatch_sample_weight) == 1.0:
+            args.target_mismatch_sample_weight = 1.50
+        if int(args.min_mechanism_activating_windows) == 0:
+            args.min_mechanism_activating_windows = 4
     return args
 
 
@@ -1252,6 +1385,68 @@ def build_gt_handoff_probe(gt_context: dict[str, Any], semantic_state: dict[str,
     }
 
 
+def annotate_retrospective_handoff_auxiliary_targets(
+    *,
+    rollout: list[dict[str, Any]],
+    env: Any,
+    agent: Any,
+) -> dict[str, Any]:
+    if not bool(getattr(agent, "_retrospective_handoff_aux_enabled", False)) or not rollout:
+        return {
+            "enabled": False,
+            "annotated_count": 0,
+            "opportunity_count": 0,
+            "target_distinct_count": 0,
+        }
+    gt_context = build_gt_handoff_context(env)
+    max_eta = float(getattr(agent, "_retrospective_handoff_aux_max_eta", 6.0))
+    opportunity_count = 0
+    target_distinct_count = 0
+    eta_values: list[float] = []
+    for row in rollout:
+        decision_info = dict(row.get("decision_info", {}) or {})
+        semantic_state = dict(decision_info.get("semantic_state", {}) or {})
+        gt_probe = build_gt_handoff_probe(gt_context, semantic_state)
+        gt_opportunity = float(gt_probe.get("gt_handoff_opportunity", 0.0) or 0.0)
+        gt_eta = float(gt_probe.get("gt_first_handoff_steps", 0.0) or 0.0)
+        gt_target = gt_probe.get("gt_first_next_rsu")
+        current_rsu_id = gt_probe.get("current_rsu_id")
+        target_distinct = bool(
+            gt_target is not None
+            and (current_rsu_id is None or str(gt_target) != str(current_rsu_id))
+        )
+        effective = bool(gt_opportunity > 0.5 and target_distinct and 0.0 < gt_eta <= max_eta)
+        if gt_opportunity > 0.5:
+            opportunity_count += 1
+        if target_distinct:
+            target_distinct_count += 1
+        if effective:
+            eta_values.append(gt_eta)
+        decision_info["retrospective_handoff_label"] = {
+            "enabled": True,
+            "gt_handoff_opportunity": gt_opportunity,
+            "gt_first_handoff_steps": gt_eta,
+            "gt_first_next_rsu": gt_target,
+            "current_rsu_id": current_rsu_id,
+            "target_distinct": target_distinct,
+            "effective_aux_candidate": effective,
+            "max_eta": max_eta,
+            "source": "training_retrospective_gt_handoff_probe",
+        }
+        row["decision_info"] = decision_info
+    return {
+        "enabled": True,
+        "annotated_count": len(rollout),
+        "opportunity_count": int(opportunity_count),
+        "target_distinct_count": int(target_distinct_count),
+        "effective_aux_candidate_count": len(eta_values),
+        "effective_aux_candidate_rate": round(float(len(eta_values)) / float(max(len(rollout), 1)), 6),
+        "eta_mean": safe_mean(eta_values),
+        "eta_p25": safe_percentile(eta_values, 25.0),
+        "eta_p75": safe_percentile(eta_values, 75.0),
+    }
+
+
 def build_policy_alignment_sample(step_row: dict[str, Any]) -> dict[str, Any]:
     return {
         "step_index": int(step_row.get("debug_step_index", 0) or 0),
@@ -1268,7 +1463,12 @@ def build_policy_alignment_sample(step_row: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def build_stochastic_event_probe(agent: Any, semantic_state: dict[str, Any]) -> dict[str, float]:
+def build_stochastic_event_probe(
+    agent: Any,
+    semantic_state: dict[str, Any],
+    *,
+    policy_evaluation_mode: str = "safety_projected",
+) -> dict[str, float]:
     default_probe = {
         "stochastic_event_prepare": 0.0,
         "event_prepare_prob": 0.0,
@@ -1278,7 +1478,10 @@ def build_stochastic_event_probe(agent: Any, semantic_state: dict[str, Any]) -> 
     if not callable(forward_policy):
         return default_probe
     with torch.no_grad():
-        policy_output = forward_policy(semantic_state)
+        policy_output = forward_policy(
+            semantic_state,
+            run_metadata={"policy_evaluation_mode": policy_evaluation_mode},
+        )
     if bool(getattr(agent, "_use_hierarchy", False)) and "event_logits" in policy_output:
         event_logits = policy_output["event_logits"]
         event_probs = torch.softmax(event_logits, dim=-1)
@@ -1408,6 +1611,7 @@ def build_policy_step_diagnostic(
     cache_warm_guard_info = dict(action_info.get("cache_warm_start_guard", {}))
     prefetch_admission_guard_info = dict(action_info.get("predictive_prefetch_admission_guard", {}))
     backhaul_guard_info = dict(action_info.get("backhaul_guard", {}))
+    backhaul_aware_info = dict(action_info.get("backhaul_aware_policy", {}))
     action_projection_applied = bool(action_info.get("action_projection_applied", False))
     invalid_action_attempt_count = int(action_info.get("invalid_action_attempt_count", 0) or 0)
     guard_action_delta = bool(action_info.get("guard_action_delta", False))
@@ -1509,6 +1713,21 @@ def build_policy_step_diagnostic(
         "cache_warm_start_guarded": 1.0 if bool(cache_warm_guard_info.get("guarded", False)) else 0.0,
         "predictive_prefetch_admission_guarded": 1.0 if bool(prefetch_admission_guard_info.get("guarded", False)) else 0.0,
         "backhaul_guarded": 1.0 if bool(backhaul_guard_info.get("guarded", False)) else 0.0,
+        "backhaul_aware_policy_adjusted": 1.0
+        if bool(backhaul_aware_info.get("enabled", False))
+        and (
+            abs(float(backhaul_aware_info.get("service_fill_bias", 0.0) or 0.0)) > 1e-8
+            or abs(float(backhaul_aware_info.get("redundant_fill_penalty", 0.0) or 0.0)) > 1e-8
+            or abs(float(backhaul_aware_info.get("prefetch_penalty", 0.0) or 0.0)) > 1e-8
+            or abs(float(backhaul_aware_info.get("prepare_penalty", 0.0) or 0.0)) > 1e-8
+        )
+        else 0.0,
+        "backhaul_aware_service_fill_bias": float(backhaul_aware_info.get("service_fill_bias", 0.0) or 0.0),
+        "backhaul_aware_redundant_fill_penalty": float(
+            backhaul_aware_info.get("redundant_fill_penalty", 0.0) or 0.0
+        ),
+        "backhaul_aware_no_signal_penalty": float(backhaul_aware_info.get("prefetch_penalty", 0.0) or 0.0)
+        + float(backhaul_aware_info.get("prepare_penalty", 0.0) or 0.0),
         "dag_frontier_size": float(metrics_protocol.get("dag_frontier_size", 0.0) or 0.0),
         "dag_critical_path_pressure": float(metrics_protocol.get("dag_critical_path_pressure", 0.0) or 0.0),
         "dag_current_node_dependency_pressure": float(
@@ -1531,6 +1750,59 @@ def build_policy_step_diagnostic(
         "debug_predicted_sequence_preview": predicted_sequence_preview,
         "debug_predicted_first_non_current_rsu": predicted_first_non_current_rsu,
         "debug_predicted_first_non_current_eta": predicted_first_non_current_eta,
+    }
+
+
+def build_policy_action_signature(step_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """Fingerprint deterministic policy actions on the fixed development protocol.
+
+    The signature deliberately records policy-derived choices only.  It is used to
+    reject a checkpoint-selection run when the raw, masked policy never changes
+    across checkpoints, even if safety rules make the projected evaluation look
+    stable or favourable.
+    """
+    action_counts: dict[str, int] = {}
+    payload_rows: list[dict[str, Any]] = []
+    for row in step_rows:
+        final_action = int(row.get("debug_final_env_action", 0) or 0)
+        action_counts[str(final_action)] = action_counts.get(str(final_action), 0) + 1
+        payload_rows.append(
+            {
+                "step": int(row.get("debug_step_index", 0) or 0),
+                "action": final_action,
+                "raw_action": int(row.get("debug_raw_env_action", final_action) or final_action),
+                "projected_action": int(row.get("debug_projected_env_action", final_action) or final_action),
+                "event_prepare": round(float(row.get("deterministic_event_prepare", 0.0) or 0.0), 8),
+                "event_margin": round(float(row.get("event_margin", 0.0) or 0.0), 8),
+            }
+        )
+    payload = json.dumps(payload_rows, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
+    return {
+        "step_count": len(payload_rows),
+        "action_counts": action_counts,
+        "digest": hashlib.sha256(payload.encode("utf-8")).hexdigest(),
+    }
+
+
+def aggregate_policy_action_signatures(signature_rows: list[dict[str, Any]]) -> dict[str, Any]:
+    canonical_rows = [
+        {
+            "workflow_id": str(row.get("workflow_id", "")),
+            "window_id": str(row.get("window_id", "")),
+            "step_count": int(row.get("step_count", 0) or 0),
+            "digest": str(row.get("digest", "")),
+            "action_counts": {
+                str(key): int(value)
+                for key, value in sorted(dict(row.get("action_counts", {})).items(), key=lambda item: str(item[0]))
+            },
+        }
+        for row in signature_rows
+    ]
+    payload = json.dumps(canonical_rows, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
+    return {
+        "episode_count": len(canonical_rows),
+        "digest": hashlib.sha256(payload.encode("utf-8")).hexdigest(),
+        "episodes": canonical_rows,
     }
 
 
@@ -1601,6 +1873,21 @@ def aggregate_policy_diagnostics(step_rows: list[dict[str, Any]]) -> dict[str, f
     cache_warm_start_guard_count = int(round(sum(float(row.get("cache_warm_start_guarded", 0.0)) for row in step_rows)))
     predictive_prefetch_admission_guard_count = int(round(sum(float(row.get("predictive_prefetch_admission_guarded", 0.0)) for row in step_rows)))
     backhaul_guard_count = int(round(sum(float(row.get("backhaul_guarded", 0.0)) for row in step_rows)))
+    backhaul_aware_policy_adjust_count = int(
+        round(sum(float(row.get("backhaul_aware_policy_adjusted", 0.0)) for row in step_rows))
+    )
+    backhaul_aware_service_fill_biases = [
+        float(row.get("backhaul_aware_service_fill_bias", 0.0) or 0.0)
+        for row in step_rows
+    ]
+    backhaul_aware_redundant_fill_penalties = [
+        float(row.get("backhaul_aware_redundant_fill_penalty", 0.0) or 0.0)
+        for row in step_rows
+    ]
+    backhaul_aware_no_signal_penalties = [
+        float(row.get("backhaul_aware_no_signal_penalty", 0.0) or 0.0)
+        for row in step_rows
+    ]
     dag_frontier_sizes = [float(row.get("dag_frontier_size", 0.0)) for row in step_rows]
     dag_critical_path_pressures = [float(row.get("dag_critical_path_pressure", 0.0)) for row in step_rows]
     dag_dependency_pressures = [float(row.get("dag_current_node_dependency_pressure", 0.0)) for row in step_rows]
@@ -1716,6 +2003,14 @@ def aggregate_policy_diagnostics(step_rows: list[dict[str, Any]]) -> dict[str, f
         ),
         "backhaul_guard_count": backhaul_guard_count,
         "backhaul_guard_rate": round(float(backhaul_guard_count) / float(total_steps), 6),
+        "backhaul_aware_policy_adjust_count": backhaul_aware_policy_adjust_count,
+        "backhaul_aware_policy_adjust_rate": round(
+            float(backhaul_aware_policy_adjust_count) / float(total_steps),
+            6,
+        ),
+        "backhaul_aware_service_fill_bias_mean": safe_mean(backhaul_aware_service_fill_biases),
+        "backhaul_aware_redundant_fill_penalty_mean": safe_mean(backhaul_aware_redundant_fill_penalties),
+        "backhaul_aware_no_signal_penalty_mean": safe_mean(backhaul_aware_no_signal_penalties),
         "dag_frontier_size_mean": safe_mean(dag_frontier_sizes),
         "dag_critical_path_pressure_mean": safe_mean(dag_critical_path_pressures),
         "dag_current_node_dependency_pressure_mean": safe_mean(dag_dependency_pressures),
@@ -3357,6 +3652,156 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
             }
         )
         return kwargs
+    if profile == "top_journal_mechanism_v47_service_backhaul_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v46_net_utility_constrained_mappo")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.012,
+                "env_action_ppo_coef": 1.04,
+                "env_action_ppo_advantage_blend": 0.66,
+                "env_action_ppo_teacher_coef": 0.34,
+                "advantage_weighted_behavior_coef": 0.13,
+                "advantage_weighted_behavior_negative_coef": 1.22,
+                "opportunity_constrained_current_bias": 2.35,
+                "opportunity_constrained_local_bias": 0.56,
+                "net_utility_backhaul_coef": 0.20,
+                "net_utility_migration_coef": 0.24,
+                "net_utility_failed_mechanism_penalty": 0.90,
+                "net_utility_failed_mechanism_backhaul_coef": 0.42,
+                "net_utility_cost_target": 0.10,
+                "net_utility_cost_dual_max": 1.50,
+                "backhaul_guard_enabled": True,
+                "backhaul_guard_max_reactive_fills_per_adapter": 1,
+                "backhaul_aware_policy_enabled": True,
+                "backhaul_aware_service_fill_bias": 2.40,
+                "backhaul_aware_redundant_fill_penalty": 2.20,
+                "backhaul_aware_no_signal_prefetch_penalty": 1.20,
+                "backhaul_aware_no_signal_prepare_penalty": 1.65,
+                "backhaul_aware_steady_bias": 1.15,
+                "backhaul_aware_service_pressure_floor": 0.34,
+                "target_kl": 0.0052,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v48_service_fill_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v46_net_utility_constrained_mappo")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.014,
+                "env_action_ppo_coef": 1.02,
+                "env_action_ppo_advantage_blend": 0.66,
+                "env_action_ppo_teacher_coef": 0.36,
+                "advantage_weighted_behavior_coef": 0.14,
+                "advantage_weighted_behavior_negative_coef": 1.28,
+                "opportunity_constrained_current_bias": 2.30,
+                "opportunity_constrained_local_bias": 0.72,
+                "net_utility_backhaul_coef": 0.22,
+                "net_utility_migration_coef": 0.23,
+                "net_utility_failed_mechanism_penalty": 0.86,
+                "net_utility_failed_mechanism_backhaul_coef": 0.38,
+                "net_utility_cost_target": 0.09,
+                "net_utility_cost_dual_max": 1.55,
+                "backhaul_guard_enabled": False,
+                "backhaul_aware_policy_enabled": True,
+                "backhaul_aware_service_fill_bias": 1.35,
+                "backhaul_aware_redundant_fill_penalty": 0.85,
+                "backhaul_aware_no_signal_prefetch_penalty": 0.0,
+                "backhaul_aware_no_signal_prepare_penalty": 0.0,
+                "backhaul_aware_steady_bias": 0.45,
+                "backhaul_aware_service_pressure_floor": 0.42,
+                "target_kl": 0.0055,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v49_retrospective_handoff_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v46_net_utility_constrained_mappo")
+        kwargs.update(
+            {
+                "heuristic_imitation_coef": 0.014,
+                "env_action_ppo_coef": 1.02,
+                "env_action_ppo_advantage_blend": 0.67,
+                "env_action_ppo_teacher_coef": 0.36,
+                "advantage_weighted_behavior_coef": 0.14,
+                "advantage_weighted_behavior_negative_coef": 1.28,
+                "mechanism_aux_coef": 0.018,
+                "mechanism_aux_coef_floor_after_update": 0.018,
+                "mechanism_window_weight": 1.20,
+                "mechanism_window_weight_floor_after_update": 1.20,
+                "prepare_action_prior_weight": 0.060,
+                "opportunity_constrained_prepare_penalty": 6.40,
+                "opportunity_constrained_prefetch_penalty": 4.10,
+                "opportunity_constrained_prepare_bias": 1.18,
+                "opportunity_constrained_prefetch_bias": 0.68,
+                "opportunity_constrained_current_bias": 2.25,
+                "opportunity_constrained_local_bias": 0.70,
+                "net_utility_backhaul_coef": 0.22,
+                "net_utility_migration_coef": 0.23,
+                "net_utility_failed_mechanism_penalty": 0.86,
+                "net_utility_failed_mechanism_backhaul_coef": 0.38,
+                "net_utility_cost_target": 0.09,
+                "net_utility_cost_dual_max": 1.55,
+                "retrospective_handoff_aux_enabled": True,
+                "retrospective_handoff_aux_max_eta": 6.0,
+                "retrospective_handoff_aux_min_score": 0.08,
+                "retrospective_handoff_aux_prepare_weight": 0.72,
+                "retrospective_handoff_aux_transition_weight": 1.60,
+                "backhaul_guard_enabled": False,
+                "backhaul_aware_policy_enabled": True,
+                "backhaul_aware_service_fill_bias": 1.20,
+                "backhaul_aware_redundant_fill_penalty": 0.75,
+                "backhaul_aware_no_signal_prefetch_penalty": 0.0,
+                "backhaul_aware_no_signal_prepare_penalty": 0.0,
+                "backhaul_aware_steady_bias": 0.40,
+                "backhaul_aware_service_pressure_floor": 0.42,
+                "target_kl": 0.0055,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v50_long_horizon_handoff_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v49_retrospective_handoff_mappo")
+        kwargs.update(
+            {
+                "mechanism_aux_coef": 0.020,
+                "mechanism_aux_coef_floor_after_update": 0.020,
+                "mechanism_window_weight": 1.28,
+                "mechanism_window_weight_floor_after_update": 1.24,
+                "prepare_action_prior_weight": 0.072,
+                "opportunity_constrained_prepare_bias": 1.28,
+                "opportunity_constrained_prefetch_bias": 0.74,
+                "opportunity_constrained_prepare_penalty": 5.80,
+                "opportunity_constrained_prefetch_penalty": 3.80,
+                "retrospective_handoff_aux_max_eta": 16.0,
+                "retrospective_handoff_aux_min_score": 0.04,
+                "retrospective_handoff_aux_prepare_weight": 0.82,
+                "retrospective_handoff_aux_transition_weight": 1.85,
+                "backhaul_aware_service_fill_bias": 1.15,
+                "backhaul_aware_redundant_fill_penalty": 0.70,
+                "target_kl": 0.0055,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v51_physical_transfer_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v50_long_horizon_handoff_mappo")
+        kwargs.update(
+            {
+                "mechanism_aux_coef": 0.024,
+                "mechanism_aux_coef_floor_after_update": 0.022,
+                "mechanism_window_weight": 1.36,
+                "mechanism_window_weight_floor_after_update": 1.30,
+                "prepare_action_prior_weight": 0.084,
+                "opportunity_constrained_prepare_bias": 1.38,
+                "opportunity_constrained_prefetch_bias": 0.80,
+                "opportunity_constrained_prepare_penalty": 5.20,
+                "opportunity_constrained_prefetch_penalty": 3.40,
+                "retrospective_handoff_aux_min_score": 0.035,
+                "retrospective_handoff_aux_prepare_weight": 0.90,
+                "retrospective_handoff_aux_transition_weight": 2.05,
+                "backhaul_aware_service_fill_bias": 1.10,
+                "backhaul_aware_redundant_fill_penalty": 0.66,
+                "target_kl": 0.0052,
+            }
+        )
+        return kwargs
     if profile == "top_journal_mechanism_v5_perf_robust":
         kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v1")
         kwargs.update(
@@ -3777,6 +4222,7 @@ def build_agent_kwargs(args: argparse.Namespace) -> dict[str, Any]:
 
 def build_predictor_runtime_kwargs(args: argparse.Namespace, *, random_seed: int) -> dict[str, Any]:
     return {
+        "horizon": int(args.prediction_horizon),
         "predictor_kind": str(args.predictor_kind),
         "predictor_checkpoint_path": str(args.predictor_checkpoint_path),
         "prediction_noise_std": float(args.prediction_noise_std),
@@ -4059,6 +4505,14 @@ def build_training_window_plan(
             selected_windows.append(dict(candidate))
             selected_ids.add(str(candidate.get("window_id")))
             current_mechanism_count += 1
+    mechanism_count = len(
+        [item for item in selected_windows if str(item.get("window_class", "")) == "mechanism_activating"]
+    )
+    if str(getattr(args, "window_mode", "")) in {"activating_only", "mixed_informative", "full_stratified"} and mechanism_count <= 0:
+        raise RuntimeError(
+            "mechanism-aware training window plan contains no mechanism_activating windows; "
+            "increase max_mobility_rows/window_count or relax the handoff-window selection protocol"
+        )
     expanded_plan: list[dict[str, Any]] = []
     for window_candidate in selected_windows:
         duplicate_count = max(1, int(round(training_window_weight(dict(window_candidate), args))))
@@ -4134,7 +4588,11 @@ def run_real_episode_with_policy_diagnostics(
     reward_positive_offset: float,
     predictor_runtime_kwargs: dict[str, Any],
     run_metadata: dict[str, Any],
+    policy_evaluation_mode: str = "safety_projected",
 ) -> dict[str, Any]:
+    policy_evaluation_mode = str(policy_evaluation_mode).strip().lower()
+    if policy_evaluation_mode not in {"raw_policy", "safety_projected"}:
+        raise ValueError(f"unsupported policy_evaluation_mode: {policy_evaluation_mode}")
     recorder = EpisodeRecorder(prefetch_validation_window=6)
     adapter_catalog = AdapterCatalog.from_json(ROOT_DIR / "src" / "data" / "model_catalog" / "sample_model_catalog.json")
     rsu_states = [clone_rsu_state(rsu_state) for rsu_state in mobility_bundle.rsu_states]
@@ -4192,8 +4650,18 @@ def run_real_episode_with_policy_diagnostics(
     gt_context = build_gt_handoff_context(env)
     while not terminated and not truncated and step_count < max_steps:
         semantic_state = dict(info.get("semantic_state", {}))
-        action, action_info = agent.act(observation, info)
-        stochastic_probe = build_stochastic_event_probe(agent, semantic_state)
+        policy_info = dict(info)
+        policy_info["run_metadata"] = {
+            **dict(info.get("run_metadata", {}) or {}),
+            **dict(run_metadata),
+            "policy_evaluation_mode": policy_evaluation_mode,
+        }
+        action, action_info = agent.act(observation, policy_info)
+        stochastic_probe = build_stochastic_event_probe(
+            agent,
+            semantic_state,
+            policy_evaluation_mode=policy_evaluation_mode,
+        )
         gt_probe = build_gt_handoff_probe(gt_context, semantic_state)
         next_observation, _, terminated, truncated, next_info = env.step(int(action))
         step_diagnostic = build_policy_step_diagnostic(
@@ -4206,6 +4674,9 @@ def run_real_episode_with_policy_diagnostics(
             env_info=next_info,
         )
         step_diagnostic["debug_step_index"] = int(step_count)
+        step_diagnostic["policy_evaluation_mode"] = str(
+            action_info.get("policy_evaluation_mode", policy_evaluation_mode)
+        )
         policy_step_trace.append(step_diagnostic)
         observation = next_observation
         info = next_info
@@ -4231,6 +4702,8 @@ def run_real_episode_with_policy_diagnostics(
     summary["policy_diagnostics_trace"] = list(policy_step_trace)
     summary["policy_diagnostics_summary"] = aggregate_policy_diagnostics(policy_step_trace)
     summary["policy_alignment_samples"] = summarize_policy_alignment_samples(policy_step_trace, limit=5)
+    summary["policy_evaluation_mode"] = policy_evaluation_mode
+    summary["policy_action_signature"] = build_policy_action_signature(policy_step_trace)
     return summary
 
 
@@ -4246,7 +4719,11 @@ def evaluate_checkpoint_protocol(
     max_workflows: int | None = None,
     max_windows: int | None = None,
     protocol_name: str = "checkpoint_eval",
+    policy_evaluation_mode: str = "safety_projected",
 ) -> dict[str, Any]:
+    policy_evaluation_mode = str(policy_evaluation_mode).strip().lower()
+    if policy_evaluation_mode not in {"raw_policy", "safety_projected"}:
+        raise ValueError(f"unsupported policy_evaluation_mode: {policy_evaluation_mode}")
     compare_agents, checkpoint_map = _compare_agents_for_checkpoint(current_agent_name=current_agent_name, checkpoint_path=checkpoint_path, args=args)
     if not include_reference_agents:
         compare_agents = [current_agent_name]
@@ -4256,6 +4733,7 @@ def evaluate_checkpoint_protocol(
     rows: list[dict[str, Any]] = []
     policy_step_diagnostics_by_agent: dict[str, list[dict[str, Any]]] = {agent_name: [] for agent_name in compare_agents}
     policy_alignment_samples_by_agent: dict[str, list[dict[str, Any]]] = {agent_name: [] for agent_name in compare_agents}
+    policy_action_signature_rows_by_agent: dict[str, list[dict[str, Any]]] = {agent_name: [] for agent_name in compare_agents}
     for eval_window in selected_windows:
         mobility_bundle = load_window_bundle(
             root_dir=ROOT_DIR,
@@ -4291,14 +4769,23 @@ def evaluate_checkpoint_protocol(
                         "config_profile": args.profile,
                         "primary_vehicle_selection": args.primary_vehicle_selection,
                         "reward_positive_offset": args.reward_positive_offset,
+                        "policy_evaluation_mode": policy_evaluation_mode,
                         "experiment_run_type": build_run_scale_info(args.profile, args.episodes, max(1, len(selected_windows))).get("experiment_run_type"),
                     },
+                    policy_evaluation_mode=policy_evaluation_mode,
                 )
                 metrics = summary["system_metrics"]
                 validation_summary = summary["prefetch_validation_summary"]
                 handoff_summary = summary["handoff_summary"]
                 policy_summary = dict(summary.get("policy_diagnostics_summary", default_policy_diagnostics()))
                 policy_step_diagnostics_by_agent.setdefault(agent_name, []).extend(list(summary.get("policy_diagnostics_trace", [])))
+                policy_action_signature_rows_by_agent.setdefault(agent_name, []).append(
+                    {
+                        "workflow_id": workflow_state.workflow_id,
+                        "window_id": eval_window.get("window_id"),
+                        **dict(summary.get("policy_action_signature", {})),
+                    }
+                )
                 for sample in list(summary.get("policy_alignment_samples", [])):
                     agent_samples = policy_alignment_samples_by_agent.setdefault(agent_name, [])
                     if len(agent_samples) >= 5:
@@ -4314,6 +4801,7 @@ def evaluate_checkpoint_protocol(
                 rows.append(
                     {
                         "agent_name": agent_name,
+                        "policy_evaluation_mode": policy_evaluation_mode,
                         "workflow_id": workflow_state.workflow_id,
                         "window_id": eval_window.get("window_id"),
                         "window_class": eval_window.get("window_class", "unknown"),
@@ -4336,6 +4824,7 @@ def evaluate_checkpoint_protocol(
     reward_breakdown_by_agent: dict[str, dict[str, float]] = {}
     mechanism_diagnostics_by_agent: dict[str, dict[str, float]] = {}
     policy_diagnostics_by_agent: dict[str, dict[str, float]] = {}
+    policy_action_signatures_by_agent: dict[str, dict[str, Any]] = {}
     for agent_name in compare_agents:
         agent_rows = [row for row in rows if row["agent_name"] == agent_name]
         aggregate_by_agent[agent_name] = aggregate_metrics(agent_rows)
@@ -4345,14 +4834,19 @@ def evaluate_checkpoint_protocol(
             for field_name in MECHANISM_DIAGNOSTIC_FIELDS
         }
         policy_diagnostics_by_agent[agent_name] = aggregate_policy_diagnostics(policy_step_diagnostics_by_agent.get(agent_name, []))
+        policy_action_signatures_by_agent[agent_name] = aggregate_policy_action_signatures(
+            policy_action_signature_rows_by_agent.get(agent_name, [])
+        )
     return {
         "protocol_name": protocol_name,
         "deterministic_eval": True,
+        "policy_evaluation_mode": policy_evaluation_mode,
         "rows": rows,
         "aggregate_by_agent": aggregate_by_agent,
         "aggregate_reward_breakdown_by_agent": reward_breakdown_by_agent,
         "aggregate_mechanism_diagnostics_by_agent": mechanism_diagnostics_by_agent,
         "aggregate_policy_diagnostics_by_agent": policy_diagnostics_by_agent,
+        "policy_action_signatures_by_agent": policy_action_signatures_by_agent,
         "policy_alignment_samples_by_agent": policy_alignment_samples_by_agent,
         "eval_windows": selected_windows,
         "eval_window_ids": [item.get("window_id") for item in selected_windows],
@@ -4370,7 +4864,7 @@ def run_update_eval(
     eval_windows: list[dict[str, Any]],
     args: argparse.Namespace,
 ) -> dict[str, Any]:
-    return evaluate_checkpoint_protocol(
+    safety_projected_eval = evaluate_checkpoint_protocol(
         current_agent_name=current_agent_name,
         checkpoint_path=checkpoint_path,
         workflow_states=workflow_states,
@@ -4378,7 +4872,19 @@ def run_update_eval(
         args=args,
         include_reference_agents=True,
         protocol_name="update_eval",
+        policy_evaluation_mode="safety_projected",
     )
+    safety_projected_eval["raw_policy_eval"] = evaluate_checkpoint_protocol(
+        current_agent_name=current_agent_name,
+        checkpoint_path=checkpoint_path,
+        workflow_states=workflow_states,
+        eval_windows=eval_windows,
+        args=args,
+        include_reference_agents=False,
+        protocol_name="update_eval_raw_policy",
+        policy_evaluation_mode="raw_policy",
+    )
+    return safety_projected_eval
 
 
 
@@ -4388,6 +4894,83 @@ def metrics_match(expected: dict[str, float], actual: dict[str, float], toleranc
         if abs(float(expected.get(key, 0.0)) - float(actual.get(key, 0.0))) > tolerance:
             return False
     return True
+
+
+def build_policy_learning_gate(
+    update_eval_history: list[dict[str, Any]],
+    current_agent_name: str,
+) -> dict[str, Any]:
+    """Decide whether a checkpoint can be selected as a learned-policy result.
+
+    A safety-projected score is not sufficient evidence that MAPPO learned a
+    decision rule.  We require two or more checkpoints and inspect the fixed
+    development protocol under the raw (masked but otherwise unprojected)
+    policy.  If both actions and raw metrics are invariant, no checkpoint from
+    the run can be promoted by the automatic selector.
+    """
+    raw_records: list[dict[str, Any]] = []
+    for item in update_eval_history:
+        raw_eval = dict(item.get("raw_policy_eval", {}) or {})
+        signature = dict(raw_eval.get("policy_action_signatures_by_agent", {}).get(current_agent_name, {}) or {})
+        digest = str(signature.get("digest", "") or "")
+        if not digest:
+            continue
+        raw_records.append(
+            {
+                "update_index": int(item.get("update_index", 0) or 0),
+                "digest": digest,
+                "metrics": dict(raw_eval.get("aggregate_by_agent", {}).get(current_agent_name, {}) or {}),
+            }
+        )
+    observed_count = len(raw_records)
+    base_payload: dict[str, Any] = {
+        "gate_name": "raw_policy_invariance_gate",
+        "policy_evaluation_mode": "raw_policy",
+        "required_checkpoint_count": 2,
+        "observed_checkpoint_count": observed_count,
+        "evaluated_update_indices": [item["update_index"] for item in raw_records],
+        "selection_eligible": False,
+        "policy_invariant": False,
+    }
+    if observed_count < 2:
+        return {
+            **base_payload,
+            "status": "pending_insufficient_checkpoints",
+            "reason": "requires_two_raw_policy_evaluations_before_checkpoint_selection",
+            "first_signature_digest": raw_records[0]["digest"] if raw_records else "",
+            "current_signature_digest": raw_records[-1]["digest"] if raw_records else "",
+        }
+    first_record = raw_records[0]
+    current_record = raw_records[-1]
+    signature_invariant = all(item["digest"] == first_record["digest"] for item in raw_records[1:])
+    metrics_invariant = all(
+        metrics_match(first_record["metrics"], item["metrics"])
+        for item in raw_records[1:]
+    )
+    policy_invariant = bool(signature_invariant and metrics_invariant)
+    if policy_invariant:
+        return {
+            **base_payload,
+            "status": "blocked_policy_invariant",
+            "reason": "raw_policy_actions_and_metrics_are_invariant_across_evaluated_checkpoints",
+            "selection_eligible": False,
+            "policy_invariant": True,
+            "signature_invariant": True,
+            "metrics_invariant": True,
+            "first_signature_digest": first_record["digest"],
+            "current_signature_digest": current_record["digest"],
+        }
+    return {
+        **base_payload,
+        "status": "passed_policy_changed",
+        "reason": "raw_policy_signature_or_metrics_changed_across_evaluated_checkpoints",
+        "selection_eligible": True,
+        "policy_invariant": False,
+        "signature_invariant": signature_invariant,
+        "metrics_invariant": metrics_invariant,
+        "first_signature_digest": first_record["digest"],
+        "current_signature_digest": current_record["digest"],
+    }
 
 
 
@@ -4400,6 +4983,11 @@ def run_checkpoint_consistency_audit(
     args: argparse.Namespace,
     best_record: dict[str, Any],
 ) -> dict[str, Any]:
+    selection_evaluation_mode = str(
+        best_record.get("selection_protocol", {}).get("policy_evaluation_mode", "safety_projected")
+    ).strip().lower()
+    if selection_evaluation_mode not in {"raw_policy", "safety_projected"}:
+        selection_evaluation_mode = "safety_projected"
     checkpoint_entries = [("latest", checkpoint_root / "latest.pt")]
     checkpoint_entries.extend([("warm_start", checkpoint_root / "warm_start.pt")])
     if bool(getattr(args, "audit_update_checkpoints", False)):
@@ -4475,6 +5063,7 @@ def run_checkpoint_consistency_audit(
                 args=args,
                 include_reference_agents=False,
                 protocol_name="checkpoint_consistency_protocol_eval",
+                policy_evaluation_mode=selection_evaluation_mode,
             )
             probe_eval = evaluate_checkpoint_protocol(
                 current_agent_name=current_agent_name,
@@ -4486,6 +5075,7 @@ def run_checkpoint_consistency_audit(
                 max_workflows=1,
                 max_windows=1,
                 protocol_name="checkpoint_consistency_probe_eval",
+                policy_evaluation_mode=selection_evaluation_mode,
             )
             loaded_metadata = load_checkpoint_metadata(str(checkpoint_path))
         except Exception as exc:  # Defensive audit path for partially written checkpoints.
@@ -4669,6 +5259,7 @@ def run_checkpoint_consistency_audit(
         "run_scale": build_run_scale_info(args.profile, args.episodes, max(1, len(source_candidates))),
         "selection_protocol": {
             "protocol_name": "all_selected_windows_x_all_selected_workflows_deterministic",
+            "policy_evaluation_mode": selection_evaluation_mode,
             "eval_window_ids": [item.get("window_id") for item in eval_windows],
             "workflow_ids": [workflow_state.workflow_id for workflow_state in workflow_states],
         },
@@ -4836,6 +5427,10 @@ def build_training_audit(update_logs: list[dict[str, Any]], update_eval_history:
     ]
     return {
         "update_count": len(update_logs),
+        "policy_learning_gate": build_policy_learning_gate(
+            update_eval_history=update_eval_history,
+            current_agent_name=current_agent_name,
+        ),
         "policy_entropy_trend": [round(item, 6) for item in policy_entropy],
         "approx_kl_trend": [round(item, 6) for item in approx_kl],
         "clip_fraction_trend": [round(item, 6) for item in clip_fraction],
@@ -5936,13 +6531,29 @@ def maybe_update_best_checkpoint(
     best_record: dict[str, Any],
     retention_start_update: int = 8,
 ) -> dict[str, Any]:
-    current_metrics = dict(update_eval["aggregate_by_agent"].get(current_agent_name, {}))
+    policy_learning_gate = dict(update_eval.get("policy_learning_gate", {}) or {})
+    selection_eval = dict(update_eval.get("raw_policy_eval", {}) or update_eval)
     selection_protocol = {
-        "protocol_name": update_eval.get("protocol_name", "update_eval"),
-        "deterministic_eval": bool(update_eval.get("deterministic_eval", True)),
-        "eval_window_ids": list(update_eval.get("eval_window_ids", [])),
-        "workflow_ids": list(update_eval.get("workflow_ids", [])),
+        "protocol_name": selection_eval.get("protocol_name", "update_eval_raw_policy"),
+        "deterministic_eval": bool(selection_eval.get("deterministic_eval", True)),
+        "policy_evaluation_mode": selection_eval.get("policy_evaluation_mode", "raw_policy"),
+        "eval_window_ids": list(selection_eval.get("eval_window_ids", [])),
+        "workflow_ids": list(selection_eval.get("workflow_ids", [])),
+        "policy_learning_gate": policy_learning_gate,
     }
+    best_record["latest_checkpoint_path"] = str(checkpoint_root / "latest.pt")
+    best_record["selection_protocol"] = selection_protocol
+    best_record["policy_learning_gate"] = policy_learning_gate
+    if not bool(policy_learning_gate.get("selection_eligible", False)):
+        best_record["selection_blocked"] = {
+            "update_index": int(update_index),
+            "episode_index": int(episode_index),
+            "checkpoint_path": str(checkpoint_path),
+            "reason": str(policy_learning_gate.get("reason", "raw_policy_evidence_required")),
+            "gate_status": str(policy_learning_gate.get("status", "missing_policy_learning_gate")),
+        }
+        return best_record
+    current_metrics = dict(selection_eval["aggregate_by_agent"].get(current_agent_name, {}))
     reward_candidate = float(current_metrics.get("total_reward", 0.0))
     reward_best = float(best_record.get("best_by_reward", {}).get("score", float("-inf")))
     if reward_candidate > reward_best:
@@ -6009,7 +6620,7 @@ def maybe_update_best_checkpoint(
     ):
         target_path = checkpoint_root / "best_by_advantage_score.pt"
         shutil.copy2(checkpoint_path, target_path)
-        popularity_metrics = dict(update_eval.get("aggregate_by_agent", {}).get("popularity_cache_heuristic", {}))
+        popularity_metrics = dict(selection_eval.get("aggregate_by_agent", {}).get("popularity_cache_heuristic", {}))
         best_record["best_by_advantage_score"] = {
             "path": str(target_path),
             "source_checkpoint_path": str(checkpoint_path),
@@ -6027,7 +6638,7 @@ def maybe_update_best_checkpoint(
         }
     mechanism_advantage_candidate = mechanism_advantage_score_priority_tuple(
         current_metrics,
-        rows=list(update_eval.get("rows", [])),
+        rows=list(selection_eval.get("rows", [])),
         current_agent_name=current_agent_name,
     )
     mechanism_advantage_best = tuple(
@@ -6044,7 +6655,7 @@ def maybe_update_best_checkpoint(
     ):
         target_path = checkpoint_root / "best_by_mechanism_advantage_score.pt"
         shutil.copy2(checkpoint_path, target_path)
-        popularity_metrics = dict(update_eval.get("aggregate_by_agent", {}).get("popularity_cache_heuristic", {}))
+        popularity_metrics = dict(selection_eval.get("aggregate_by_agent", {}).get("popularity_cache_heuristic", {}))
         best_record["best_by_mechanism_advantage_score"] = {
             "path": str(target_path),
             "source_checkpoint_path": str(checkpoint_path),
@@ -6052,7 +6663,7 @@ def maybe_update_best_checkpoint(
             "score_breakdown": compute_mechanism_advantage_checkpoint_score(
                 current_metrics,
                 reference_metrics=popularity_metrics,
-                rows=list(update_eval.get("rows", [])),
+                rows=list(selection_eval.get("rows", [])),
                 current_agent_name=current_agent_name,
             ),
             "update_index": update_index,
@@ -6062,12 +6673,12 @@ def maybe_update_best_checkpoint(
             "selection_reason": build_mechanism_advantage_selection_reason(
                 candidate_metrics=current_metrics,
                 popularity_metrics=popularity_metrics,
-                rows=list(update_eval.get("rows", [])),
+                rows=list(selection_eval.get("rows", [])),
                 selected=True,
                 current_agent_name=current_agent_name,
             ),
         }
-    policy_diagnostics = dict(update_eval.get("aggregate_policy_diagnostics_by_agent", {}).get(current_agent_name, {}))
+    policy_diagnostics = dict(selection_eval.get("aggregate_policy_diagnostics_by_agent", {}).get(current_agent_name, {}))
     round2_candidate = round2_mechanism_score_priority_tuple(current_metrics, policy_diagnostics)
     round2_best = tuple(
         best_record.get("best_by_round2_mechanism_score", {}).get(
@@ -6147,11 +6758,11 @@ def maybe_update_best_checkpoint(
                 "score_breakdown": score_breakdown,
             },
         }
-    popularity_metrics = dict(update_eval.get("aggregate_by_agent", {}).get("popularity_cache_heuristic", {}))
+    popularity_metrics = dict(selection_eval.get("aggregate_by_agent", {}).get("popularity_cache_heuristic", {}))
     reward_tiebreak_candidate = reward_tiebreak_score_priority_tuple(
         current_metrics,
         reference_metrics=popularity_metrics,
-        rows=list(update_eval.get("rows", [])),
+        rows=list(selection_eval.get("rows", [])),
         current_agent_name=current_agent_name,
     )
     reward_tiebreak_best = tuple(
@@ -6171,7 +6782,7 @@ def maybe_update_best_checkpoint(
         score_breakdown = compute_reward_tiebreak_checkpoint_score(
             current_metrics,
             reference_metrics=popularity_metrics,
-            rows=list(update_eval.get("rows", [])),
+            rows=list(selection_eval.get("rows", [])),
             current_agent_name=current_agent_name,
         )
         best_record["best_by_reward_tiebreak_score"] = {
@@ -6187,18 +6798,18 @@ def maybe_update_best_checkpoint(
             "selection_reason": build_reward_tiebreak_selection_reason(
                 candidate_metrics=current_metrics,
                 popularity_metrics=popularity_metrics,
-                rows=list(update_eval.get("rows", [])),
+                rows=list(selection_eval.get("rows", [])),
                 selected=True,
                 current_agent_name=current_agent_name,
             ),
         }
-    pareto_reference_agent = "ppo" if "ppo" in update_eval.get("aggregate_by_agent", {}) else "popularity_cache_heuristic"
-    pareto_reference_metrics = dict(update_eval.get("aggregate_by_agent", {}).get(pareto_reference_agent, {}))
+    pareto_reference_agent = "ppo" if "ppo" in selection_eval.get("aggregate_by_agent", {}) else "popularity_cache_heuristic"
+    pareto_reference_metrics = dict(selection_eval.get("aggregate_by_agent", {}).get(pareto_reference_agent, {}))
     pareto_safe_candidate = pareto_safe_score_priority_tuple(
         current_metrics,
         reference_metrics=pareto_reference_metrics,
         reference_agent=pareto_reference_agent,
-        rows=list(update_eval.get("rows", [])),
+        rows=list(selection_eval.get("rows", [])),
         current_agent_name=current_agent_name,
     )
     pareto_safe_best = tuple(
@@ -6219,7 +6830,7 @@ def maybe_update_best_checkpoint(
             current_metrics,
             reference_metrics=pareto_reference_metrics,
             reference_agent=pareto_reference_agent,
-            rows=list(update_eval.get("rows", [])),
+            rows=list(selection_eval.get("rows", [])),
             current_agent_name=current_agent_name,
         )
         best_record["best_by_pareto_safe_score"] = {
@@ -6244,8 +6855,6 @@ def maybe_update_best_checkpoint(
                 "score_breakdown": score_breakdown,
             },
         }
-    best_record["latest_checkpoint_path"] = str(checkpoint_root / "latest.pt")
-    best_record["selection_protocol"] = selection_protocol
     return best_record
 
 
@@ -6312,6 +6921,7 @@ def main() -> None:
     update_eval_history: list[dict[str, Any]] = []
     best_checkpoint_record: dict[str, Any] = {
         "latest_checkpoint_path": "",
+        "policy_learning_gate": {},
         "best_by_reward": {},
         "best_by_continuity": {},
         "best_by_mechanism_balanced": {},
@@ -6368,6 +6978,10 @@ def main() -> None:
             warm_start_eval.get("aggregate_policy_diagnostics_by_agent", {}).get(args.agent_name, default_policy_diagnostics())
         )
         update_eval_history.append(warm_start_eval)
+        warm_start_eval["policy_learning_gate"] = build_policy_learning_gate(
+            update_eval_history=update_eval_history,
+            current_agent_name=args.agent_name,
+        )
         best_checkpoint_record = maybe_update_best_checkpoint(
             current_agent_name=args.agent_name,
             checkpoint_path=warm_start_target,
@@ -6436,6 +7050,11 @@ def main() -> None:
             }
         )
         summary["episode_success"] = bool(summary.get("episode_status", {}).get("completed", False))
+        summary["retrospective_handoff_auxiliary"] = annotate_retrospective_handoff_auxiliary_targets(
+            rollout=rollout,
+            env=env,
+            agent=agent,
+        )
         summary["reward_shaping"] = apply_temporal_reward_shaping_to_rollout(
             rollout=rollout,
             agent=agent,
@@ -6481,6 +7100,10 @@ def main() -> None:
                 update_eval.get("aggregate_policy_diagnostics_by_agent", {}).get(args.agent_name, default_policy_diagnostics())
             )
             update_eval_history.append(update_eval)
+            update_eval["policy_learning_gate"] = build_policy_learning_gate(
+                update_eval_history=update_eval_history,
+                current_agent_name=args.agent_name,
+            )
             best_checkpoint_record = maybe_update_best_checkpoint(
                 current_agent_name=args.agent_name,
                 checkpoint_path=checkpoint_path,
@@ -6799,6 +7422,9 @@ def main() -> None:
         "evaluation_protocol": {
             "protocol_name": "all_selected_windows_x_all_selected_workflows_deterministic",
             "deterministic_eval": True,
+            "selection_eval_mode": "safety_projected",
+            "policy_learning_gate_eval_mode": "raw_policy",
+            "raw_policy_definition": "learned_logits_plus_action_mask_without_policy_adjustments_or_safety_rules",
             "eval_window_ids": [item.get("window_id") for item in eval_window_plan],
             "workflow_ids": [workflow_state.workflow_id for workflow_state in workflow_states],
         },
@@ -6835,6 +7461,10 @@ def main() -> None:
         "update_logs": update_logs,
         "stability_control_history": stability_control_history,
         "training_effectiveness_audit": training_audit,
+        "policy_learning_gate": build_policy_learning_gate(
+            update_eval_history=update_eval_history,
+            current_agent_name=args.agent_name,
+        ),
         "mechanism_collapse_audit": mechanism_collapse_audit,
     }
     (output_root / "train_summary.json").write_text(json.dumps(train_summary, ensure_ascii=False, indent=2), encoding="utf-8")

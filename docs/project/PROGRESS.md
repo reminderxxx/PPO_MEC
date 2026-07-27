@@ -6,7 +6,8 @@
 
 - 新增 `docs/project/research_skill_integration_20260727.md`：采用 Claude Scholar 的实验/claim ledger 工作流、scientific-agent-skills 的统计/预测/多目标分析边界、academic-research-skills-codex 的证据链审查；AI-Research-SKILLs MLOps 与 figure workflow 暂不作为训练运行时依赖。所有外部 workflow 保持本地 artifact 为事实来源，禁止上传未公开数据、checkpoint 或稿件。
 - 新增独立审计 `docs/project/sa_ghmappo_v47_v51_learning_audit_20260727.md`。v47--v51 的 dev update eval 出现完全不变的 deterministic 指标；v51 虽有 physical-transfer candidate，但 update 1--16 均为 reward `15.358`、continuity `0.706148`、ready `0.45`、mechanism realization `0.525`，并有 `guard_action_delta_rate=0.684751`。结论为 `E1_DOCUMENTED / Unverifiable`，不得晋级或写成 MAPPO 学习收益。
-- 后续实现先通过 Policy-Learning Gate：区分 raw learned policy 与 safety-projected policy、保存 checkpoint action signature、阻止 action-invariant checkpoint 参与选择；不改变环境 reward、baseline contract、窗口或结果过滤。
+- 已完成 Policy-Learning Gate 的独立实现：`raw_policy` 只保留 learned logits 与环境 action mask；`safety_projected` 保留现有 runtime guard 供混合系统诊断。每个保存 update 同时写入 raw action-signature digest；首个 checkpoint 不可选，raw signature 与 raw metrics 均不变的 run 会阻止所有 best/Pareto checkpoint 选择，且 best-record consistency audit 也按 raw-policy 重算。该实现不改变环境 reward、baseline contract、窗口或结果过滤。
+- 最小真实 smoke（`artifacts/tmp_validation/sa_policy_gate_smoke_v3/`）验证双轨评估和 raw checkpoint selection 链路：两个 update 的 raw signature 不同，因此门禁通过；checkpoint audit 未回写为 safety-projected 指标。该 artifact 为 debug 验证，不构成性能、创新性或论文证据。
 
 ## 2026-07-22: v46 offset-free MAPPO net-utility constraint 扩大 dev full-pool reward gap
 
