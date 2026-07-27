@@ -2,6 +2,12 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-07-27: v47--v51 训练归因审计与科研 Skill 选择性接入
+
+- 新增 `docs/project/research_skill_integration_20260727.md`：采用 Claude Scholar 的实验/claim ledger 工作流、scientific-agent-skills 的统计/预测/多目标分析边界、academic-research-skills-codex 的证据链审查；AI-Research-SKILLs MLOps 与 figure workflow 暂不作为训练运行时依赖。所有外部 workflow 保持本地 artifact 为事实来源，禁止上传未公开数据、checkpoint 或稿件。
+- 新增独立审计 `docs/project/sa_ghmappo_v47_v51_learning_audit_20260727.md`。v47--v51 的 dev update eval 出现完全不变的 deterministic 指标；v51 虽有 physical-transfer candidate，但 update 1--16 均为 reward `15.358`、continuity `0.706148`、ready `0.45`、mechanism realization `0.525`，并有 `guard_action_delta_rate=0.684751`。结论为 `E1_DOCUMENTED / Unverifiable`，不得晋级或写成 MAPPO 学习收益。
+- 后续实现先通过 Policy-Learning Gate：区分 raw learned policy 与 safety-projected policy、保存 checkpoint action signature、阻止 action-invariant checkpoint 参与选择；不改变环境 reward、baseline contract、窗口或结果过滤。
+
 ## 2026-07-22: v46 offset-free MAPPO net-utility constraint 扩大 dev full-pool reward gap
 
 - 背景诊断：v39/v41 的高 reward 受 `reward_positive_offset=5.0` step-wise 累加影响，DT/cache 专项 baseline 可能通过更长、未完成 episode 获得更高 total reward。因此本轮从 v42 起把主线 candidate 切到 offset-free 协议：训练、benchmark、aggregate 和 rows 均记录 `reward_positive_offset=0.0`、`reward_positive_offset_component`、`offset_adjusted_total_reward` 和 `reward_protocol`，避免继续优化正 offset artifact。

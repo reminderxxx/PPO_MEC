@@ -2,6 +2,12 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-07-27: v47--v51 policy-attribution blocker（OPEN）
+
+- `top_journal_mechanism_v47`--`v51` 目前只有 dev-stage single-seed training evidence，且各 update 的 deterministic evaluation 指标不变。v51 update 1--16 的 reward `15.358`、continuity `0.706148`、handoff-ready `0.45`、mechanism realization `0.525` 相同；`best_by_reward` 位于 update 1。不能把 checkpoint selection、physical-transfer feature 或 reward 数值解释为 MAPPO 学习改进。
+- v51 diagnostics 的 `deterministic_event_prepare_rate_on_valid_target=1.0`、`event_margin_mean=5.998730`、`guard_action_delta_rate=0.684751` 表明当前推理路径混合了 learned logits 和 runtime policy interventions。任何主 claim 必须先比较 raw-policy 与 safety-projected-policy；环境 action mask 可以保留，heuristic logit bias/guard/option replacement 的贡献必须作为独立机制消融报告。
+- 在完成 `docs/project/research_skill_integration_20260727.md` 定义的 Policy-Learning Gate、multi-seed dev ablation 和新的 frozen formal/holdout 协议前，v47--v51 均为 `Unverifiable`，不得晋级 canonical、paper-ready 或 TMC-ready。
+
 ## 2026-06-21: strict-full statistical blocker（RESOLVED）
 
 - v7 的负向结论保持有效，但 v8 已按修复条件完成：四个 split 各 20 个互斥 outer windows、minimum gap 24 frames、5 seeds、window-outer hierarchical BCa/Holm、候选冻结后 formal 与一次性 hidden。

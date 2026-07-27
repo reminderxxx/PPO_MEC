@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-07-21
+更新日期：2026-07-27
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -49,6 +49,7 @@
 
 | 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
 |---|---|---:|---|---|---|
+| cooperative edge caching + CTDE MADRL | [Cooperative Edge Caching for Profit Maximization Based on Multi-agent Deep Reinforcement Learning](https://doi.org/10.1109/TMC.2026.3710512) | IEEE TMC, 2026 early access | 联合 cache configuration、pricing 和 request scheduling；使用 CTDE MADRL 处理 edge-node cooperation/competition，并报告 edge testbed 结果。 | 该文不是 VEC、DAG workflow 或 adapter warm-state migration；它进一步压缩“cooperative caching + CTDE MARL”作为创新的空间。PPO_MEC 的可守差异必须是跨 RSU 连续 workflow、adapter/service state、causal handoff prediction 与机制兑现，而不是仅声称 cooperative cache MARL。 | Related Work / novelty-risk matrix；审稿回复中明确区分一般 edge cache profit game 与 mobility-driven VEC workflow control。 |
 | multi-agent counterfactual credit | [Counterfactual Multi-Agent Policy Gradients](https://arxiv.org/abs/1705.08926) | AAAI, 2018 | 提出 COMA counterfactual baseline，用 centralized critic 估计个体动作相对其他可行动作的边际贡献，缓解 cooperative MARL credit assignment。 | PPO_MEC v18 只把 selected-vs-expected legal option utility 作为 controller-level option gate 的部分 credit；不是完整 COMA critic，也不是 vehicle/RSU-agent full MARL。v18 full-dev 未晋级，论文中只能作为失败探索或 future work，不可当作主结果依据。 | Method motivation / Negative-result discussion；解释为何尝试 counterfactual option credit，以及为何当前不作为主 claim。 |
 | temporal abstraction / options | [The Option-Critic Architecture](https://arxiv.org/abs/1609.05140) | AAAI, 2017 | 提供端到端学习 intra-option policies 与 termination functions 的 option framework，支撑把高层 option selection/termination 作为 RL 学习对象。 | PPO_MEC v12-v18 的 option gate 是面向 VEC cache/execution/handoff-event 的 domain-specific option layer；当前仍在 `semantic_discrete_5` contract 内学习 option selection/termination，不声称复现完整 Option-Critic 架构。 | Method motivation；支撑 learned option gate / DAG-aware termination 的算法背景和 claim 边界。 |
 | MAPPO strong baseline | [The Surprising Effectiveness of PPO in Cooperative, Multi-Agent Games](https://arxiv.org/abs/2103.01955) | NeurIPS 2022 Datasets and Benchmarks | 证明 PPO/MAPPO 在 cooperative multi-agent benchmark 中可成为强基线，并强调实现细节、超参数和 sample efficiency 对最终表现的重要性。 | PPO_MEC 不能把“使用 MAPPO/CTDE”本身写成创新；v10-v13 的创新边界应写为 controller-level credit 如何服务于 cache/execution/handoff-event 三头，以及如何结合 VEC DAG/adapter/handoff 机制。 | Baseline rationale；解释为什么需要强化 MAPPO 对照和为什么 PPO/MAPPO gap 不应被简单视为 baseline 弱。 |

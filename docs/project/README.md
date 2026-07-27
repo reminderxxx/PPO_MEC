@@ -9,6 +9,8 @@
 - `PROGRESS.md`：已确认阶段事实和整理动作
 - `BUGS.md`：当前有效问题、风险和禁止误读项
 - `ARTIFACT_RECORDS.md`：从 `artifacts/` 整理出的规范化实验记录
+- `research_skill_integration_20260727.md`：外部科研 Skill 的选择性采用边界、项目原生证据链和 Policy-Learning Gate
+- `sa_ghmappo_v47_v51_learning_audit_20260727.md`：v47--v51 dev 阶段训练/动作归因审计；当前不可晋级
 - `current_results_audit_20260527.md`：当前 canonical / v5 / MAPPO v3 / SA v6 结果状态、缺口和阻塞审计表
 - `top_journal_review_policy.md`：以 IEEE TMC 为主目标的长期 AI reviewer 证据等级、blocker、评分和固定输出规范
 - `top_journal_readiness_audit_20260621.md`：strict-full v8 formal、一次性 hidden 与 LuST supporting evidence 的最新审查；当前 verdict 为 `Major revision`
