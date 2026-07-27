@@ -1,0 +1,59 @@
+profile: top_journal_mechanism_v54_service_completion_mappo
+base_profile: top_journal_mechanism_v53_service_net_advantage_mappo
+purpose: >
+  Offset-free MAPPO candidate that repairs the v52/v53 net-advantage gate
+  routing and adds service-completion-aware credit assignment. It targets the
+  observed failure mode where the main algorithm overuses vehicle fallback in
+  coverage-gap and short-DAG states while PPO/MAPPO gain reward by keeping
+  current-RSU cache fill and steady offload active.
+algorithm_delta:
+  - Connects the net-advantage prepare gate to the SA-GHMAPPO subclass policy
+    path so its logit and advantage signals affect the actual main algorithm.
+  - Adds a service-completion gate inside the MAPPO policy path. When a current
+    RSU is still available and only a small number of DAG nodes remain, it
+    softly raises current-RSU cache fill or steady offload and suppresses
+    handoff prepare, predictive prefetch, and vehicle fallback.
+  - Adds service-completion partial reward credit to MAPPO learning. Rewarded
+    current-RSU service actions receive positive policy advantage, while
+    fallback or unmaterialized mechanism actions in short-DAG service windows
+    receive negative credit.
+  - Preserves reward calculation, action schema, predictor sharing, and
+    benchmark consumers.
+negative_controls:
+  - v53 seed7 full training stayed below v51 and MAPPO because the new
+    net-advantage gate was not on the subclass path and fallback remained the
+    dominant learned action.
+  - v54 is a policy-learning and credit-assignment change, not reward offset,
+    result filtering, evaluation wrapping, or post-hoc action replacement.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+training_window_protocol:
+  window_mode: mixed_informative
+  mechanism_window_oversample_ratio: 2.25
+  handoff_imminent_oversample_ratio: 1.50
+  target_mismatch_sample_weight: 1.50
+  min_mechanism_activating_windows: 4
+prediction_protocol:
+  predictor_kind: baseline
+  predictor_name: baseline_predictor_v3
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+service_completion_gate:
+  enabled: true
+  remaining_nodes_threshold: 2
+  online_logit_gate: true
+  mappo_policy_advantage_credit: true
+  mappo_event_advantage_credit: true
+paper_claim_boundary: >
+  Candidate only. It may advance to paper-ready only if full-pool dev,
+  formal, holdout, support-suite, multi-seed, and statistical audits prove it
+  beats PPO, MAPPO, and rule baselines without reward offset, wrapping,
+  result filtering, or test-set tuning.

@@ -2,6 +2,13 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-07-27: v55 coverage-recovery dev evidence 与后处理审计风险（OPEN）
+
+- v52/v53 已确认存在策略路径接入问题：net-advantage prepare gate 没有进入 `SAGHMAPPOBaseAgent` 覆盖后的 `_apply_policy_adjustments`。本轮已在真实 policy path 中修复，并用单元测试覆盖；历史 v52/v53 结果不得解释为 gate 已实际改善主策略。
+- v54 虽修复 gate 路径并加入 service-completion gate，但 no-current-RSU 覆盖缺口仍大量选择 action2 vehicle fallback，导致主算法低于 MAPPO。v55 的 coverage-recovery MAPPO credit/option candidate/guard 在三组 full dev 训练中把 no-current action 稳定转为 `{4:1064}`，这是当前 reward 提升的主要机制证据。
+- v55 仍不是 paper-ready：三 seed full dev mean reward 约 `9.102656`，高于同协议 PPO/MAPPO dev 对照，但缺 formal/holdout/support suite、窗口外层统计、完整 manifest/command log 和最终 checkpoint consistency summary。禁止写成“足以发论文”“TMC-ready”或“显著高于全部算法”。
+- 新发现训练脚本后处理风险：`scripts/train_sa_ghmappo_real_sample.py` 在 128/128 episode 完成后进入 checkpoint consistency audit 时会长时间卡住，seed7/13/29 均需手动中断审计段，导致 `train_summary.json` 缺失。当前 v55 数值只能从 episode 原始 JSON 聚合；正式重跑前必须修复或跳过该审计卡点，并生成完整 summary、manifest 和 command log。
+
 ## 2026-07-27: v47--v51 policy-attribution blocker（OPEN；门禁已实现）
 
 - `top_journal_mechanism_v47`--`v51` 目前只有 dev-stage single-seed training evidence，且各 update 的 deterministic evaluation 指标不变。v51 update 1--16 的 reward `15.358`、continuity `0.706148`、handoff-ready `0.45`、mechanism realization `0.525` 相同；`best_by_reward` 位于 update 1。不能把 checkpoint selection、physical-transfer feature 或 reward 数值解释为 MAPPO 学习改进。

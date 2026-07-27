@@ -1,0 +1,50 @@
+profile: top_journal_mechanism_v53_service_net_advantage_mappo
+base_profile: top_journal_mechanism_v52_net_advantage_mappo
+purpose: >
+  Offset-free MAPPO candidate that extends the v52 net-advantage handoff gate
+  with service-cache utility learning. It targets the v52 failure mode where
+  handoff readiness improves but total reward remains low because the policy
+  overuses local fallback and underuses current-RSU cache fill.
+algorithm_delta:
+  - Keeps v52's online net-advantage handoff prepare gate and MAPPO advantage
+    credit.
+  - Adds service-cache fill scoring to the same gate: when the current RSU is
+    available, the active workflow node needs an uncached adapter, and DAG or
+    service pressure is high, the policy softly raises current-RSU cache fill
+    and lowers unnecessary local fallback.
+  - Feeds service-cache fill and local-fallback outcomes back into policy
+    advantage credit, giving positive credit to reward-aligned cache fill and
+    negative credit to high-delay local fallback under service pressure.
+  - Keeps reward calculation, action schema, predictor sharing, and benchmark
+    consumers unchanged.
+negative_controls:
+  - v52 probe showed that handoff-only net advantage can still leave reward
+    below baselines when service/cache execution is inefficient.
+  - v53 is not a wrapper or post-processing rule; the new signal enters logits
+    and MAPPO advantage learning.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+prediction_protocol:
+  predictor_kind: baseline
+  predictor_name: baseline_predictor_v3
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+net_advantage_gate:
+  handoff_prepare_enabled: true
+  service_cache_fill_enabled: true
+  local_fallback_penalty_enabled: true
+  mappo_policy_advantage_credit: true
+  mappo_event_advantage_credit: true
+paper_claim_boundary: >
+  Candidate only. It may advance to paper-ready only if full-pool dev,
+  formal, holdout, support-suite, multi-seed, and statistical audits prove it
+  beats PPO, MAPPO, and rule baselines without reward offset, wrapping,
+  result filtering, or test-set tuning.

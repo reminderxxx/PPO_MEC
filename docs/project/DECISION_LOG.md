@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-27: v55 采用 coverage-recovery counterfactual MAPPO gate 拉开奖励差距
+
+决策：新增 `top_journal_mechanism_v55_coverage_recovery_mappo`，把 no-current-RSU 覆盖缺口从 vehicle fallback 学习目标改为 predictive coverage recovery 目标。实现上在 SA-GHMAPPO/MAPPO 主策略内部加入 coverage-recovery logits bias、fallback/current suppression、partial-credit positive/negative terms、no-RSU option candidate 和可审计 guard；不修改环境 reward、action contract、baseline contract、window plan 或 evaluator result filtering。
+
+原因：v54 已证明 net-advantage gate 和 service-completion gate 能进入真实策略路径，但主算法仍低于 MAPPO，主要因为无当前 RSU 且有 predicted target 时仍大量执行 action2 fallback。该状态下 fallback 会牺牲跨 RSU workflow continuity 与 warm-state migration，属于 MAPPO credit assignment 的一阶错误；因此应在 CTDE/MAPPO policy 与 advantage 内让 action4 prepare/transfer 获得上下文信用，同时惩罚错误 fallback，而不是继续增加规则包装或 reward offset。
+
+影响：v55 dev full 三 seed mean reward 为 `9.102656`，seed7/13 相对同协议 MAPPO 平均 gap 为 `+2.637109`，相对 PPO 平均 gap 为 `+5.747890`；三 seed no-current action 均为 `{4:1064}`，说明收益来自策略动作机制改变。该候选可以进入下一轮 formal/holdout/support 候选冻结，但当前仍不是 paper-ready：三次训练的 checkpoint consistency audit 在 128 episode 后卡住并被中断，`train_summary.json` 缺失，且尚未完成 window-outer statistics、formal/holdout/support 和 artifact 完整性审计。
+
 ## 2026-07-22: v46 晋级为 offset-free dev 候选，但不触发 paper-ready claim
 
 决策：新增 `top_journal_mechanism_v42_completion_aligned_mappo`、`v43_strict_opportunity_mappo`、`v44_opportunity_constrained_mappo`、`v45_balanced_refresh_mappo` 和 `v46_net_utility_constrained_mappo` 后，将 v46 作为当前 offset-free dev full-pool 最强候选；不打开 hidden holdout，不将 v46 写成 TMC-ready / paper-ready。v42 起统一使用 `reward_positive_offset=0.0`，并在训练、benchmark、rows 和 aggregate 中报告 offset-free reward protocol。

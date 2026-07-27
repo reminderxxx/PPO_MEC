@@ -1631,6 +1631,138 @@ def test_effective_settings_honor_v51_physical_transfer_budget_offset_and_horizo
     assert effective_reward_positive_offset(Args()) == 0.0
 
 
+def test_effective_settings_honor_v52_net_advantage_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v52_net_advantage_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v53_service_net_advantage_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v53_service_net_advantage_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v54_service_completion_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v54_service_completion_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v55_coverage_recovery_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v55_coverage_recovery_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
 def test_v12_selects_reward_checkpoint_and_skips_v11_window_override() -> None:
     reward_path = _test_path("v12_reward_first_checkpoint", "best_by_reward.pt")
     continuity_path = _test_path("v12_reward_first_checkpoint", "best_by_continuity.pt")

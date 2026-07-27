@@ -1750,6 +1750,456 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertGreater(kwargs["retrospective_handoff_aux_transition_weight"], 2.0)
         self.assertGreater(kwargs["prepare_action_prior_weight"], 0.08)
 
+    def test_sa_v52_profile_enables_net_advantage_gate(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v52_net_advantage_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["net_advantage_prepare_gate_enabled"])
+        self.assertGreater(kwargs["net_advantage_prepare_gate_policy_coef"], 0.0)
+        self.assertGreater(kwargs["net_advantage_prepare_gate_event_coef"], 0.0)
+        self.assertLess(kwargs["mechanism_aux_coef"], 0.020)
+        self.assertLess(kwargs["prepare_action_prior_weight"], 0.060)
+        self.assertGreater(kwargs["net_utility_failed_mechanism_backhaul_coef"], 0.40)
+
+    def test_sa_v53_profile_enables_service_cache_net_advantage_gate(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v53_service_net_advantage_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["net_advantage_prepare_gate_enabled"])
+        self.assertGreater(kwargs["net_advantage_prepare_gate_service_fill_scale"], 0.80)
+        self.assertGreater(kwargs["net_advantage_prepare_gate_local_penalty_scale"], 0.60)
+        self.assertGreater(kwargs["idle_execution_current_rsu_delay_coef"], 0.45)
+        self.assertLess(kwargs["idle_execution_local_bonus"], 0.50)
+        self.assertGreater(kwargs["opportunity_current_rsu_efficiency_coef"], 0.30)
+
+    def test_sa_v54_profile_enables_service_completion_gate(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v54_service_completion_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["net_advantage_prepare_gate_enabled"])
+        self.assertTrue(kwargs["service_completion_gate_enabled"])
+        self.assertGreater(kwargs["service_completion_gate_bias"], 3.0)
+        self.assertGreater(kwargs["service_completion_gate_policy_coef"], 0.30)
+        self.assertGreater(kwargs["service_completion_gate_fallback_suppression_scale"], 1.0)
+
+    def test_sa_v55_profile_enables_coverage_recovery_credit(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v55_coverage_recovery_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["net_advantage_prepare_gate_enabled"])
+        self.assertTrue(kwargs["service_completion_gate_enabled"])
+        self.assertGreater(kwargs["coverage_recovery_gate_bias_scale"], 1.50)
+        self.assertGreater(kwargs["coverage_recovery_gate_min_scale"], 0.55)
+        self.assertGreater(kwargs["coverage_recovery_gate_fallback_suppression_scale"], 2.0)
+        self.assertGreater(kwargs["coverage_recovery_gate_prepare_credit"], 1.0)
+        self.assertGreater(kwargs["coverage_recovery_gate_fallback_penalty"], 1.4)
+        self.assertTrue(kwargs["coverage_recovery_guard_enabled"])
+
+    def test_sa_v54_policy_path_applies_net_and_service_completion_gates(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["workflow"]["nodes"] = [
+            {"node_id": "n1", "predecessors": [], "successors": []}
+        ]
+        state["workflow"]["completed_node_ids"] = []
+        state["current_workflow_node"]["successors"] = []
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": [],
+            "predicted_next_rsu_by_vehicle": {"veh_1": "rsu_a"},
+            "predicted_first_handoff_rsu_by_vehicle": {},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.2},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.8},
+            "dwell_time": {"veh_1": 12.0},
+            "next_rsu_sequence": {"veh_1": ["rsu_a", "rsu_a"]},
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            mechanism_logit_bias_strength=0.0,
+            digital_twin_policy_prior_enabled=False,
+            opportunity_constrained_policy_enabled=False,
+            backhaul_aware_policy_enabled=False,
+            continuity_guard_enabled=False,
+            event_logit_sharpening_final_scale=1.0,
+            net_advantage_prepare_gate_enabled=True,
+            net_advantage_prepare_gate_bias=2.0,
+            net_advantage_prepare_gate_min_score=0.42,
+            net_advantage_prepare_gate_margin=0.10,
+            service_completion_gate_enabled=True,
+            service_completion_gate_bias=3.2,
+            service_completion_gate_remaining_nodes_threshold=2,
+            service_completion_gate_fallback_suppression_scale=1.1,
+        )
+
+        with torch.no_grad():
+            raw = agent._network.forward_single(state)
+            adjusted = agent._forward_policy(state)
+
+        self.assertIn("net_advantage_prepare_gate_info", adjusted)
+        self.assertIn("service_completion_gate_info", adjusted)
+        service_info = adjusted["service_completion_gate_info"]
+        self.assertTrue(service_info["active"])
+        self.assertEqual(service_info["target_action"], 3)
+        self.assertGreater(float(adjusted["env_action_logits_bias"][3].item()), 0.0)
+        self.assertLess(float(adjusted["env_action_logits_bias"][2].item()), 0.0)
+        self.assertGreater(float(adjusted["fast_logits"][0].item()), float(raw["fast_logits"][0].item()))
+        self.assertLess(float(adjusted["fast_logits"][1].item()), float(raw["fast_logits"][1].item()))
+
+    def test_sa_v54_net_gate_boosts_coverage_gap_recovery_prepare(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["vehicles"][0]["associated_rsu_id"] = None
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": ["veh_1"],
+            "predicted_next_rsu_by_vehicle": {"veh_1": None},
+            "predicted_first_handoff_rsu_by_vehicle": {"veh_1": "rsu_b"},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.55},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.35},
+            "dwell_time": {"veh_1": 1.0},
+            "next_rsu_sequence": {"veh_1": [None, None, "rsu_b"]},
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            net_advantage_prepare_gate_enabled=True,
+            net_advantage_prepare_gate_bias=2.4,
+            net_advantage_prepare_gate_min_score=0.50,
+            net_advantage_prepare_gate_margin=0.12,
+            net_advantage_prepare_gate_current_scale=1.0,
+        )
+
+        with torch.no_grad():
+            raw = agent._network.forward_single(state)
+            adjusted = agent._apply_net_advantage_prepare_gate(raw, state)
+
+        gate_info = adjusted["net_advantage_prepare_gate_info"]
+        raw_margin = float((raw["event_logits"][1] - raw["event_logits"][0]).item())
+        adjusted_margin = float((adjusted["event_logits"][1] - adjusted["event_logits"][0]).item())
+
+        self.assertTrue(gate_info["target_differs"])
+        self.assertIsNone(gate_info["current_rsu_id"])
+        self.assertGreater(adjusted_margin, raw_margin)
+        self.assertGreater(float(adjusted["env_action_logits_bias"][4].item()), 0.0)
+        self.assertLess(float(adjusted["env_action_logits_bias"][2].item()), 0.0)
+        self.assertLess(float(adjusted["fast_logits"][1].item()), float(raw["fast_logits"][1].item()))
+
+    def test_sa_v55_policy_path_strongly_suppresses_gap_fallback(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["vehicles"][0]["associated_rsu_id"] = None
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": ["veh_1"],
+            "predicted_next_rsu_by_vehicle": {"veh_1": None},
+            "predicted_first_handoff_rsu_by_vehicle": {"veh_1": "rsu_b"},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.48},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.40},
+            "dwell_time": {"veh_1": 1.0},
+            "next_rsu_sequence": {"veh_1": [None, None, "rsu_b"]},
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            mechanism_logit_bias_strength=0.0,
+            digital_twin_policy_prior_enabled=False,
+            opportunity_constrained_policy_enabled=False,
+            backhaul_aware_policy_enabled=False,
+            continuity_guard_enabled=False,
+            event_logit_sharpening_final_scale=1.0,
+            net_advantage_prepare_gate_enabled=True,
+            net_advantage_prepare_gate_bias=2.65,
+            net_advantage_prepare_gate_min_score=0.50,
+            net_advantage_prepare_gate_margin=0.12,
+            coverage_recovery_gate_bias_scale=1.65,
+            coverage_recovery_gate_min_scale=0.62,
+            coverage_recovery_gate_fallback_suppression_scale=2.35,
+            coverage_recovery_gate_fast_suppression_scale=1.50,
+            coverage_recovery_gate_current_suppression_scale=0.36,
+            service_completion_gate_enabled=True,
+            service_completion_gate_bias=3.35,
+        )
+
+        with torch.no_grad():
+            raw = agent._network.forward_single(state)
+            adjusted = agent._forward_policy(state)
+
+        gate_info = adjusted["net_advantage_prepare_gate_info"]
+        raw_margin = float((raw["event_logits"][1] - raw["event_logits"][0]).item())
+        adjusted_margin = float((adjusted["event_logits"][1] - adjusted["event_logits"][0]).item())
+
+        self.assertTrue(gate_info["target_differs"])
+        self.assertIsNone(gate_info["current_rsu_id"])
+        self.assertGreater(gate_info["coverage_recovery_scale"], 0.60)
+        self.assertGreater(gate_info["coverage_recovery_bias"], 0.0)
+        self.assertGreater(gate_info["coverage_recovery_fallback_suppression"], 3.0)
+        self.assertGreater(adjusted_margin, raw_margin)
+        self.assertGreater(float(adjusted["env_action_logits_bias"][4].item()), 0.0)
+        self.assertLess(float(adjusted["env_action_logits_bias"][2].item()), -3.0)
+        self.assertLess(float(adjusted["fast_logits"][1].item()), float(raw["fast_logits"][1].item()))
+
+    def test_sa_v55_no_rsu_option_candidate_uses_coverage_recovery_prepare(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["vehicles"][0]["associated_rsu_id"] = None
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": ["veh_1"],
+            "predicted_next_rsu_by_vehicle": {"veh_1": None},
+            "predicted_first_handoff_rsu_by_vehicle": {"veh_1": "rsu_b"},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.60},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.30},
+            "dwell_time": {"veh_1": 1.0},
+            "next_rsu_sequence": {"veh_1": [None, "rsu_b"]},
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            net_advantage_prepare_gate_enabled=True,
+            coverage_recovery_gate_min_scale=0.62,
+        )
+
+        candidate_info = agent._build_option_gate_candidates(
+            semantic_state=state,
+            action_mask=[True, True, True, True, True],
+            base_env_action=2,
+            run_metadata={"window_class": "mechanism_activating"},
+        )
+
+        self.assertTrue(candidate_info["no_rsu_available"])
+        self.assertTrue(candidate_info["coverage_recovery_no_rsu"])
+        self.assertEqual(candidate_info["option_actions"][2], 4)
+        self.assertEqual(candidate_info["option_actions"][3], 4)
+        self.assertEqual(candidate_info["prior_target"], 3)
+
+    def test_sa_v55_coverage_recovery_guard_converts_gap_fallback_to_prepare(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["vehicles"][0]["associated_rsu_id"] = None
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": ["veh_1"],
+            "predicted_next_rsu_by_vehicle": {"veh_1": None},
+            "predicted_first_handoff_rsu_by_vehicle": {"veh_1": "rsu_b"},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.60},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.30},
+            "dwell_time": {"veh_1": 1.0},
+            "next_rsu_sequence": {"veh_1": [None, "rsu_b"]},
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            net_advantage_prepare_gate_enabled=True,
+            net_advantage_prepare_gate_bias=2.65,
+            coverage_recovery_gate_bias_scale=1.65,
+            coverage_recovery_gate_min_scale=0.62,
+            coverage_recovery_guard_enabled=True,
+        )
+
+        with torch.no_grad():
+            policy_output = agent._forward_policy(state)
+        guard_info = agent._apply_coverage_recovery_guard_to_actions(
+            semantic_state=state,
+            policy_output=policy_output,
+            selected_actions={"slow": 0, "fast": 1, "event": 0},
+            action_mask=[True, True, True, True, True],
+        )
+
+        self.assertTrue(guard_info["guarded"])
+        self.assertEqual(guard_info["original_action"], 2)
+        self.assertEqual(guard_info["guarded_action"], 4)
+        self.assertGreaterEqual(guard_info["coverage_recovery_scale"], 0.62)
+
+    def test_sa_v52_net_advantage_gate_boosts_prepare_when_net_positive(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["rsus"][1]["cached_adapter_ids"] = ["adapter_tracking"]
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            net_advantage_prepare_gate_enabled=True,
+            net_advantage_prepare_gate_bias=2.0,
+            net_advantage_prepare_gate_min_score=0.42,
+            net_advantage_prepare_gate_margin=0.10,
+            net_advantage_prepare_gate_policy_coef=0.2,
+            net_advantage_prepare_gate_event_coef=0.4,
+        )
+
+        with torch.no_grad():
+            raw = agent._network.forward_single(state)
+            adjusted = agent._apply_net_advantage_prepare_gate(raw, state)
+
+        raw_margin = float((raw["event_logits"][1] - raw["event_logits"][0]).item())
+        adjusted_margin = float((adjusted["event_logits"][1] - adjusted["event_logits"][0]).item())
+        gate_info = adjusted["net_advantage_prepare_gate_info"]
+
+        self.assertGreater(gate_info["net_advantage_score"], gate_info["min_score"])
+        self.assertGreater(gate_info["positive_scale"], 0.0)
+        self.assertGreater(adjusted_margin, raw_margin)
+        self.assertGreater(float(adjusted["env_action_logits_bias"][4].item()), 0.0)
+
+    def test_sa_v52_net_advantage_gate_suppresses_prepare_without_target(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": [],
+            "predicted_next_rsu_by_vehicle": {"veh_1": "rsu_a"},
+            "predicted_first_handoff_rsu_by_vehicle": {},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.05},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.95},
+            "dwell_time": {"veh_1": 12.0},
+            "next_rsu_sequence": {"veh_1": ["rsu_a", "rsu_a", "rsu_a"]},
+            "predictor_name": "unit_test",
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            net_advantage_prepare_gate_enabled=True,
+            net_advantage_prepare_gate_bias=2.0,
+            net_advantage_prepare_gate_min_score=0.50,
+            net_advantage_prepare_gate_margin=0.12,
+        )
+
+        with torch.no_grad():
+            raw = agent._network.forward_single(state)
+            adjusted = agent._apply_net_advantage_prepare_gate(raw, state)
+
+        raw_margin = float((raw["event_logits"][1] - raw["event_logits"][0]).item())
+        adjusted_margin = float((adjusted["event_logits"][1] - adjusted["event_logits"][0]).item())
+        gate_info = adjusted["net_advantage_prepare_gate_info"]
+
+        self.assertFalse(gate_info["target_differs"])
+        self.assertGreater(gate_info["negative_scale"], 0.0)
+        self.assertLess(adjusted_margin, raw_margin)
+        self.assertLess(float(adjusted["env_action_logits_bias"][4].item()), 0.0)
+
+    def test_sa_v53_net_advantage_gate_boosts_service_fill_under_cache_pressure(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["workflow"]["nodes"].append(
+            {"node_id": "n2", "predecessors": ["n1"], "successors": ["n3"]}
+        )
+        state["workflow"]["nodes"].append(
+            {"node_id": "n3", "predecessors": ["n2"], "successors": []}
+        )
+        state["current_workflow_node"]["successors"] = ["n2", "n3"]
+        state["current_workflow_node"]["input_size"] = 128.0
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": [],
+            "predicted_next_rsu_by_vehicle": {"veh_1": "rsu_a"},
+            "predicted_first_handoff_rsu_by_vehicle": {},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.05},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.95},
+            "dwell_time": {"veh_1": 12.0},
+            "next_rsu_sequence": {"veh_1": ["rsu_a", "rsu_a"]},
+            "predictor_name": "unit_test",
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            net_advantage_prepare_gate_enabled=True,
+            net_advantage_prepare_gate_bias=2.0,
+            net_advantage_prepare_gate_service_fill_scale=1.0,
+            net_advantage_prepare_gate_local_penalty_scale=0.8,
+            net_advantage_prepare_gate_min_score=0.50,
+            net_advantage_prepare_gate_margin=0.12,
+        )
+
+        with torch.no_grad():
+            raw = agent._network.forward_single(state)
+            adjusted = agent._apply_net_advantage_prepare_gate(raw, state)
+
+        gate_info = adjusted["net_advantage_prepare_gate_info"]
+
+        self.assertTrue(gate_info["missing_current_adapter"])
+        self.assertGreater(gate_info["service_fill_bias"], 0.0)
+        self.assertGreater(float(adjusted["env_action_logits_bias"][0].item()), 0.0)
+        self.assertLess(float(adjusted["env_action_logits_bias"][2].item()), 0.0)
+        self.assertGreater(float(adjusted["slow_logits"][1].item()), float(raw["slow_logits"][1].item()))
+
+    def test_sa_v53_net_advantage_gate_boosts_current_execution_after_cache_warm(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["workflow"]["nodes"].append(
+            {"node_id": "n2", "predecessors": ["n1"], "successors": ["n3"]}
+        )
+        state["workflow"]["nodes"].append(
+            {"node_id": "n3", "predecessors": ["n2"], "successors": []}
+        )
+        state["current_workflow_node"]["successors"] = ["n2", "n3"]
+        state["current_workflow_node"]["input_size"] = 128.0
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": [],
+            "predicted_next_rsu_by_vehicle": {"veh_1": "rsu_a"},
+            "predicted_first_handoff_rsu_by_vehicle": {},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.05},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.95},
+            "dwell_time": {"veh_1": 12.0},
+            "next_rsu_sequence": {"veh_1": ["rsu_a", "rsu_a"]},
+            "predictor_name": "unit_test",
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            net_advantage_prepare_gate_enabled=True,
+            net_advantage_prepare_gate_bias=2.0,
+            net_advantage_prepare_gate_service_fill_scale=1.0,
+            net_advantage_prepare_gate_local_penalty_scale=0.8,
+            net_advantage_prepare_gate_min_score=0.50,
+            net_advantage_prepare_gate_margin=0.12,
+        )
+
+        with torch.no_grad():
+            raw = agent._network.forward_single(state)
+            adjusted = agent._apply_net_advantage_prepare_gate(raw, state)
+
+        gate_info = adjusted["net_advantage_prepare_gate_info"]
+
+        self.assertTrue(gate_info["current_cache_ready"])
+        self.assertGreater(gate_info["service_fill_bias"], 0.0)
+        self.assertGreater(float(adjusted["env_action_logits_bias"][3].item()), 0.0)
+        self.assertLess(float(adjusted["env_action_logits_bias"][2].item()), 0.0)
+        self.assertGreater(float(adjusted["fast_logits"][0].item()), float(raw["fast_logits"][0].item()))
+
     def test_sa_v47_backhaul_aware_policy_boosts_service_fill_without_signal(self) -> None:
         state = deepcopy(_minimal_semantic_state())
         state["predictions"] = {

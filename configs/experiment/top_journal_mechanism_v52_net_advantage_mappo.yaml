@@ -1,0 +1,61 @@
+profile: top_journal_mechanism_v52_net_advantage_mappo
+base_profile: top_journal_mechanism_v51_physical_transfer_mappo
+purpose: >
+  Offset-free MAPPO candidate that converts physically valid handoff-transfer
+  signals into reward-aligned preparation decisions through a learned
+  net-advantage gate. The goal is to preserve v51's executable handoff
+  opportunities while avoiding reward-negative over-preparation and redundant
+  prefetch.
+algorithm_delta:
+  - Keeps CTDE/MAPPO, graph-hierarchical actor heads, trajectory-boundary
+    prediction, physical-transfer window selection, and cache-aided action 4
+    from v51.
+  - Adds Net-Advantage Prepare Gate inside the policy network path. The gate
+    produces soft logits for event handoff_prepare, predictive prefetch, and
+    current-RSU execution based on prediction reliability, temporal readiness,
+    target cache state, DAG/service pressure, and expected cost pressure.
+  - Feeds the same gate into MAPPO learning as policy/event advantage credit,
+    rewarding low-cost realized preparation and penalizing failed or stale
+    preparation attempts.
+  - Reduces fixed mechanism auxiliary strength so the main policy learns
+    whether a handoff opportunity has positive net reward rather than blindly
+    following mechanism labels.
+negative_controls:
+  - v51 showed high handoff readiness and validated prefetch hits but did not
+    convert those mechanism wins into higher total reward.
+  - v52 does not modify reward calculation, action schema, benchmark consumers,
+    or evaluation filtering.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+training_window_protocol:
+  window_mode: mixed_informative
+  mechanism_window_oversample_ratio: 2.25
+  handoff_imminent_oversample_ratio: 1.50
+  target_mismatch_sample_weight: 1.50
+  min_mechanism_activating_windows: 4
+prediction_protocol:
+  predictor_kind: baseline
+  predictor_name: baseline_predictor_v3
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+net_advantage_prepare_gate:
+  enabled: true
+  online_logit_gate: true
+  mappo_advantage_credit: true
+  min_score: 0.50
+  margin: 0.16
+  policy_coef: 0.18
+  event_coef: 0.42
+paper_claim_boundary: >
+  Candidate only. It may advance to paper-ready only if full-pool dev,
+  formal, holdout, support-suite, multi-seed, and statistical audits prove it
+  beats PPO, MAPPO, and rule baselines without reward offset, wrapping,
+  result filtering, or test-set tuning.

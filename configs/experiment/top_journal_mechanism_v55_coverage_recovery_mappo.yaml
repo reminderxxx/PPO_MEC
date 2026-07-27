@@ -1,0 +1,62 @@
+profile: top_journal_mechanism_v55_coverage_recovery_mappo
+base_profile: top_journal_mechanism_v54_service_completion_mappo
+purpose: >
+  Offset-free MAPPO candidate that adds coverage-recovery counterfactual
+  advantage learning on top of v54. It targets the remaining failure mode where
+  SA-GHMAPPO still overuses vehicle fallback when the primary vehicle has no
+  current RSU but a predicted handoff target is available.
+algorithm_delta:
+  - Adds a coverage-recovery gate inside the SA-GHMAPPO policy path. In
+    no-current-RSU states with a valid predicted target, it softly raises the
+    handoff prepare / transfer action and suppresses vehicle fallback.
+  - Adds counterfactual coverage-recovery credit to MAPPO advantage learning.
+    Prepare / transfer receives positive partial credit in recoverable coverage
+    gaps, while fallback and invalid current-RSU execution receive negative
+    partial credit.
+  - Keeps v54 service-completion credit so short DAG tails still prefer
+    current-RSU service when immediate transfer pressure is absent.
+  - Preserves reward calculation, action schema, predictor sharing, benchmark
+    consumers, and evaluation aggregation.
+negative_controls:
+  - v54 seed7 full training improved over v51/v53 but stayed below PPO/MAPPO
+    because no-current fallback remained too frequent.
+  - v55 is a policy-learning and credit-assignment change, not reward offset,
+    result filtering, evaluation wrapping, or post-hoc action replacement.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+training_window_protocol:
+  window_mode: mixed_informative
+  mechanism_window_oversample_ratio: 2.25
+  handoff_imminent_oversample_ratio: 1.50
+  target_mismatch_sample_weight: 1.50
+  min_mechanism_activating_windows: 4
+prediction_protocol:
+  predictor_kind: baseline
+  predictor_name: baseline_predictor_v3
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+coverage_recovery_gate:
+  enabled: true
+  online_logit_gate: true
+  policy_internal_guard: true
+  mappo_policy_advantage_credit: true
+  mappo_event_advantage_credit: true
+service_completion_gate:
+  enabled: true
+  remaining_nodes_threshold: 2
+  online_logit_gate: true
+  mappo_policy_advantage_credit: true
+  mappo_event_advantage_credit: true
+paper_claim_boundary: >
+  Candidate only. It may advance to paper-ready only if full-pool dev,
+  formal, holdout, support-suite, multi-seed, and statistical audits prove it
+  beats PPO, MAPPO, and rule baselines without reward offset, wrapping,
+  result filtering, or test-set tuning.

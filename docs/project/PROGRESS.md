@@ -2,6 +2,18 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-07-27: v55 coverage-recovery MAPPO credit 扩大 offset-free dev reward gap
+
+- 一阶诊断：v52/v53 的 net-advantage prepare gate 只接入了 base `_apply_policy_adjustments`，但真实 `SAGHMAPPOBaseAgent` 覆盖了该方法，导致 gate 没有进入主策略路径；v54 修复路径后仍低于 MAPPO，主要损失来自 no-current-RSU 覆盖缺口阶段继续选择 action2 vehicle fallback。v54 seed7 full 诊断中 no-current 动作为 `{2:812, 4:240, 3:4, 0:8}`，其中 action2 平均 reward 为负，解释了主算法低于 MAPPO/PPO 的主要来源。
+- 新增 `top_journal_mechanism_v55_coverage_recovery_mappo`。v55 在 SA-GHMAPPO/MAPPO 策略内部加入 coverage-recovery counterfactual gate：当当前 RSU 缺失但 predictor 给出 distinct next/target RSU 时，提高 action4 handoff migration prepare / transfer 的 logits 与 partial credit，压低 action2 fallback、fast fallback 和无效 current-RSU execution；同时 option candidate 在 no-RSU recovery context 下选择机制 prepare。该改动不修改环境 reward、baseline contract、window plan、action schema 或 evaluator 结果过滤，`reward_positive_offset=0.0`。
+- v55 配套实现：`scripts/train_sa_ghmappo_real_sample.py` 新增 v55 profile 与 frozen `--window_plan_path` 快速路径；`scripts/run_top_journal_closed_loop.py` 接入 v55 formal-budget override；配置文件为 `configs/experiment/top_journal_mechanism_v55_coverage_recovery_mappo.yaml`。单元测试覆盖 profile 参数、真实 policy path、no-current fallback suppression、option candidate 和 coverage recovery guard。
+- v55 full dev 训练已完成 3 个 seed，每个 seed 均为 128 episodes / 20 train windows / max_steps 22 / prediction_horizon 16 / offset-free。由于最终 checkpoint consistency audit 在训练完成后长时间卡住，三次均在 128 episode 已落盘后中断审计段，未生成 `train_summary.json`；以下结果直接从 `episodes/episode_*.summary.json` 的原始 `reward_breakdown.total.sum` 聚合：
+  - seed7：`artifacts/training/top_journal_v55_coverage_recovery_full_dev_c/sa_ghmappo/sa_ghmappo_train_20260727_151531_512333_seed7`，mean reward `9.104609`，median `11.67`，no-current action `{4:1064}`。
+  - seed13：`artifacts/training/top_journal_v55_coverage_recovery_full_dev_c/sa_ghmappo/sa_ghmappo_train_20260727_153616_536690_seed13`，mean reward `9.104609`，median `11.67`，no-current action `{4:1064}`。
+  - seed29：`artifacts/training/top_journal_v55_coverage_recovery_full_dev_c/sa_ghmappo/sa_ghmappo_train_20260727_155346_075755_seed29`，mean reward `9.098750`，median `11.67`，no-current action `{4:1064}`。
+- 同窗口 seed7/seed13 learned baseline 对照来自 v51 physical-transfer run 的 `train_summary.json`：PPO seed7/13 mean reward `3.862500` / `2.850938`，MAPPO seed7/13 mean reward `5.766563` / `7.168437`。v55 seed7/13 平均 reward `9.104609`，相对 MAPPO 两 seed 平均 gap `+2.637109`，相对 PPO 两 seed 平均 gap `+5.747890`。v55 三 seed 平均 reward 为 `9.102656`。
+- 证据边界：这是 dev full training evidence，不是 paper-ready package。`reviewed_at=2026-07-27`，`target_venue=IEEE TMC`，`policy_version=tmc_review_policy_v3_20260621`，`artifact_run_id=top_journal_v55_coverage_recovery_full_dev_c`，evidence level 低于 `E2_ARTIFACT_AUDITED`；缺 formal/holdout/support suite、window-outer statistics、manifest/command-log package 和最终 checkpoint summary，因此不得声称 TMC-ready、paper-ready 或显著优于全部算法。
+
 ## 2026-07-27: v47--v51 训练归因审计与科研 Skill 选择性接入
 
 - 新增 `docs/project/research_skill_integration_20260727.md`：采用 Claude Scholar 的实验/claim ledger 工作流、scientific-agent-skills 的统计/预测/多目标分析边界、academic-research-skills-codex 的证据链审查；AI-Research-SKILLs MLOps 与 figure workflow 暂不作为训练运行时依赖。所有外部 workflow 保持本地 artifact 为事实来源，禁止上传未公开数据、checkpoint 或稿件。

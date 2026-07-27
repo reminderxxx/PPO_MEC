@@ -584,6 +584,35 @@ class 分层PPO基类(BaseAgent):
         opportunity_constrained_confidence_floor: float = 0.18,
         opportunity_constrained_uncertainty_ceiling: float = 0.78,
         opportunity_constrained_reliability_floor: float = 0.28,
+        net_advantage_prepare_gate_enabled: bool = False,
+        net_advantage_prepare_gate_bias: float = 0.0,
+        net_advantage_prepare_gate_min_score: float = 0.48,
+        net_advantage_prepare_gate_margin: float = 0.14,
+        net_advantage_prepare_gate_prefetch_scale: float = 0.35,
+        net_advantage_prepare_gate_current_scale: float = 0.55,
+        net_advantage_prepare_gate_service_fill_scale: float = 0.0,
+        net_advantage_prepare_gate_local_penalty_scale: float = 0.0,
+        net_advantage_prepare_gate_cost_scale: float = 0.45,
+        net_advantage_prepare_gate_policy_coef: float = 0.0,
+        net_advantage_prepare_gate_event_coef: float = 0.0,
+        net_advantage_prepare_gate_clip: float = 1.5,
+        coverage_recovery_gate_bias_scale: float = 0.70,
+        coverage_recovery_gate_min_scale: float = 0.0,
+        coverage_recovery_gate_fallback_suppression_scale: float = 1.10,
+        coverage_recovery_gate_fast_suppression_scale: float = 0.68,
+        coverage_recovery_gate_current_suppression_scale: float = 0.20,
+        coverage_recovery_gate_prepare_credit: float = 0.52,
+        coverage_recovery_gate_fallback_penalty: float = 0.76,
+        coverage_recovery_guard_enabled: bool = False,
+        service_completion_gate_enabled: bool = False,
+        service_completion_gate_bias: float = 0.0,
+        service_completion_gate_remaining_nodes_threshold: int = 2,
+        service_completion_gate_event_suppression_scale: float = 0.65,
+        service_completion_gate_prefetch_suppression_scale: float = 0.45,
+        service_completion_gate_fallback_suppression_scale: float = 0.85,
+        service_completion_gate_policy_coef: float = 0.0,
+        service_completion_gate_event_coef: float = 0.0,
+        service_completion_gate_clip: float = 1.5,
         backhaul_aware_policy_enabled: bool = False,
         backhaul_aware_service_fill_bias: float = 0.0,
         backhaul_aware_redundant_fill_penalty: float = 0.0,
@@ -1100,6 +1129,98 @@ class 分层PPO基类(BaseAgent):
             0.0,
             min(float(opportunity_constrained_reliability_floor), 1.0),
         )
+        self._net_advantage_prepare_gate_enabled = bool(net_advantage_prepare_gate_enabled)
+        self._net_advantage_prepare_gate_bias = max(float(net_advantage_prepare_gate_bias), 0.0)
+        self._net_advantage_prepare_gate_min_score = max(
+            0.0,
+            min(float(net_advantage_prepare_gate_min_score), 1.0),
+        )
+        self._net_advantage_prepare_gate_margin = max(float(net_advantage_prepare_gate_margin), 0.0)
+        self._net_advantage_prepare_gate_prefetch_scale = max(
+            float(net_advantage_prepare_gate_prefetch_scale),
+            0.0,
+        )
+        self._net_advantage_prepare_gate_current_scale = max(
+            float(net_advantage_prepare_gate_current_scale),
+            0.0,
+        )
+        self._net_advantage_prepare_gate_service_fill_scale = max(
+            float(net_advantage_prepare_gate_service_fill_scale),
+            0.0,
+        )
+        self._net_advantage_prepare_gate_local_penalty_scale = max(
+            float(net_advantage_prepare_gate_local_penalty_scale),
+            0.0,
+        )
+        self._net_advantage_prepare_gate_cost_scale = max(
+            float(net_advantage_prepare_gate_cost_scale),
+            0.0,
+        )
+        self._net_advantage_prepare_gate_policy_coef = max(
+            float(net_advantage_prepare_gate_policy_coef),
+            0.0,
+        )
+        self._net_advantage_prepare_gate_event_coef = max(
+            float(net_advantage_prepare_gate_event_coef),
+            0.0,
+        )
+        self._net_advantage_prepare_gate_clip = max(float(net_advantage_prepare_gate_clip), 0.0)
+        self._coverage_recovery_gate_bias_scale = max(
+            float(coverage_recovery_gate_bias_scale),
+            0.0,
+        )
+        self._coverage_recovery_gate_min_scale = max(
+            0.0,
+            min(float(coverage_recovery_gate_min_scale), 1.0),
+        )
+        self._coverage_recovery_gate_fallback_suppression_scale = max(
+            float(coverage_recovery_gate_fallback_suppression_scale),
+            0.0,
+        )
+        self._coverage_recovery_gate_fast_suppression_scale = max(
+            float(coverage_recovery_gate_fast_suppression_scale),
+            0.0,
+        )
+        self._coverage_recovery_gate_current_suppression_scale = max(
+            float(coverage_recovery_gate_current_suppression_scale),
+            0.0,
+        )
+        self._coverage_recovery_gate_prepare_credit = max(
+            float(coverage_recovery_gate_prepare_credit),
+            0.0,
+        )
+        self._coverage_recovery_gate_fallback_penalty = max(
+            float(coverage_recovery_gate_fallback_penalty),
+            0.0,
+        )
+        self._coverage_recovery_guard_enabled = bool(coverage_recovery_guard_enabled)
+        self._service_completion_gate_enabled = bool(service_completion_gate_enabled)
+        self._service_completion_gate_bias = max(float(service_completion_gate_bias), 0.0)
+        self._service_completion_gate_remaining_nodes_threshold = max(
+            int(service_completion_gate_remaining_nodes_threshold),
+            1,
+        )
+        self._service_completion_gate_event_suppression_scale = max(
+            float(service_completion_gate_event_suppression_scale),
+            0.0,
+        )
+        self._service_completion_gate_prefetch_suppression_scale = max(
+            float(service_completion_gate_prefetch_suppression_scale),
+            0.0,
+        )
+        self._service_completion_gate_fallback_suppression_scale = max(
+            float(service_completion_gate_fallback_suppression_scale),
+            0.0,
+        )
+        self._service_completion_gate_policy_coef = max(
+            float(service_completion_gate_policy_coef),
+            0.0,
+        )
+        self._service_completion_gate_event_coef = max(
+            float(service_completion_gate_event_coef),
+            0.0,
+        )
+        self._service_completion_gate_clip = max(float(service_completion_gate_clip), 0.0)
         self._backhaul_aware_policy_enabled = bool(backhaul_aware_policy_enabled)
         self._backhaul_aware_service_fill_bias = max(float(backhaul_aware_service_fill_bias), 0.0)
         self._backhaul_aware_redundant_fill_penalty = max(
@@ -1500,6 +1621,25 @@ class 分层PPO基类(BaseAgent):
                     selected_actions=selected_actions,
                     action_mask=action_mask,
                 )
+            coverage_recovery_guard_info = (
+                self._apply_coverage_recovery_guard_to_actions(
+                    semantic_state=semantic_state,
+                    policy_output=policy_output,
+                    selected_actions=selected_actions,
+                    action_mask=action_mask,
+                )
+                if not raw_policy_evaluation
+                else {"enabled": False, "guarded": False, "reason": "raw_policy_evaluation"}
+            )
+            if coverage_recovery_guard_info.get("guarded", False):
+                selected_actions = self._head_targets_for_env_action(
+                    int(coverage_recovery_guard_info["guarded_action"])
+                )
+                head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                    policy_output=policy_output,
+                    selected_actions=selected_actions,
+                    action_mask=action_mask,
+                )
             env_action, aggregation_reason = 聚合层级动作(
                 head_actions=selected_actions,
                 use_hierarchy=self._use_hierarchy,
@@ -1629,6 +1769,9 @@ class 分层PPO基类(BaseAgent):
             "digital_twin_policy_prior": dict(policy_output.get("digital_twin_policy_prior_info", {})),
             "opportunity_constrained_policy": dict(policy_output.get("opportunity_constrained_policy_info", {})),
             "backhaul_aware_policy": dict(policy_output.get("backhaul_aware_policy_info", {})),
+            "net_advantage_prepare_gate": dict(policy_output.get("net_advantage_prepare_gate_info", {})),
+            "service_completion_gate": dict(policy_output.get("service_completion_gate_info", {})),
+            "coverage_recovery_guard": dict(coverage_recovery_guard_info),
             "event_prepare_prob": round(event_prepare_prob, 6),
             "event_margin": round(event_margin, 6),
             "predicted_handoff_target_valid": bool(predicted_handoff_target_valid),
@@ -1966,6 +2109,66 @@ class 分层PPO基类(BaseAgent):
                 normalized_event_advantages = (
                     normalized_event_advantages
                     + self._delayed_mechanism_credit_event_coef * delayed_mechanism_credit_values
+                )
+        net_advantage_prepare_gate_credit_values = np.zeros(len(rollout), dtype=np.float32)
+        if (
+            self._net_advantage_prepare_gate_enabled
+            and (
+                self._net_advantage_prepare_gate_policy_coef > 0.0
+                or self._net_advantage_prepare_gate_event_coef > 0.0
+            )
+        ):
+            net_advantage_prepare_gate_credit_values = np.asarray(
+                [self._net_advantage_prepare_gate_credit(row) for row in rollout],
+                dtype=np.float32,
+            )
+            if self._net_advantage_prepare_gate_clip > 0.0:
+                net_advantage_prepare_gate_credit_values = np.clip(
+                    net_advantage_prepare_gate_credit_values,
+                    -self._net_advantage_prepare_gate_clip,
+                    self._net_advantage_prepare_gate_clip,
+                )
+            if self._net_advantage_prepare_gate_policy_coef > 0.0:
+                normalized_advantages = (
+                    normalized_advantages
+                    + self._net_advantage_prepare_gate_policy_coef
+                    * net_advantage_prepare_gate_credit_values
+                )
+            if self._net_advantage_prepare_gate_event_coef > 0.0:
+                normalized_event_advantages = (
+                    normalized_event_advantages
+                    + self._net_advantage_prepare_gate_event_coef
+                    * net_advantage_prepare_gate_credit_values
+                )
+        service_completion_gate_credit_values = np.zeros(len(rollout), dtype=np.float32)
+        if (
+            self._service_completion_gate_enabled
+            and (
+                self._service_completion_gate_policy_coef > 0.0
+                or self._service_completion_gate_event_coef > 0.0
+            )
+        ):
+            service_completion_gate_credit_values = np.asarray(
+                [self._service_completion_gate_credit(row) for row in rollout],
+                dtype=np.float32,
+            )
+            if self._service_completion_gate_clip > 0.0:
+                service_completion_gate_credit_values = np.clip(
+                    service_completion_gate_credit_values,
+                    -self._service_completion_gate_clip,
+                    self._service_completion_gate_clip,
+                )
+            if self._service_completion_gate_policy_coef > 0.0:
+                normalized_advantages = (
+                    normalized_advantages
+                    + self._service_completion_gate_policy_coef
+                    * service_completion_gate_credit_values
+                )
+            if self._service_completion_gate_event_coef > 0.0:
+                normalized_event_advantages = (
+                    normalized_event_advantages
+                    + self._service_completion_gate_event_coef
+                    * service_completion_gate_credit_values
                 )
         advantage_weighted_behavior_stats = self._annotate_advantage_weighted_behavior_targets(
             rollout,
@@ -2571,6 +2774,68 @@ class 分层PPO基类(BaseAgent):
             "net_utility_prd_adjustment_std": round(float(net_utility_adjustment_values.std()), 6)
             if len(net_utility_adjustment_values) > 0
             else 0.0,
+            "net_advantage_prepare_gate_enabled": self._net_advantage_prepare_gate_enabled,
+            "net_advantage_prepare_gate_policy_coef": round(
+                self._net_advantage_prepare_gate_policy_coef,
+                6,
+            ),
+            "net_advantage_prepare_gate_event_coef": round(
+                self._net_advantage_prepare_gate_event_coef,
+                6,
+            ),
+            "net_advantage_prepare_gate_credit_mean": round(
+                float(net_advantage_prepare_gate_credit_values.mean()),
+                6,
+            )
+            if len(net_advantage_prepare_gate_credit_values) > 0
+            else 0.0,
+            "net_advantage_prepare_gate_credit_std": round(
+                float(net_advantage_prepare_gate_credit_values.std()),
+                6,
+            )
+            if len(net_advantage_prepare_gate_credit_values) > 0
+            else 0.0,
+            "net_advantage_prepare_gate_credit_positive_count": int(
+                np.sum(net_advantage_prepare_gate_credit_values > 1e-8)
+            )
+            if len(net_advantage_prepare_gate_credit_values) > 0
+            else 0,
+            "net_advantage_prepare_gate_credit_negative_count": int(
+                np.sum(net_advantage_prepare_gate_credit_values < -1e-8)
+            )
+            if len(net_advantage_prepare_gate_credit_values) > 0
+            else 0,
+            "service_completion_gate_enabled": self._service_completion_gate_enabled,
+            "service_completion_gate_policy_coef": round(
+                self._service_completion_gate_policy_coef,
+                6,
+            ),
+            "service_completion_gate_event_coef": round(
+                self._service_completion_gate_event_coef,
+                6,
+            ),
+            "service_completion_gate_credit_mean": round(
+                float(service_completion_gate_credit_values.mean()),
+                6,
+            )
+            if len(service_completion_gate_credit_values) > 0
+            else 0.0,
+            "service_completion_gate_credit_std": round(
+                float(service_completion_gate_credit_values.std()),
+                6,
+            )
+            if len(service_completion_gate_credit_values) > 0
+            else 0.0,
+            "service_completion_gate_credit_positive_count": int(
+                np.sum(service_completion_gate_credit_values > 1e-8)
+            )
+            if len(service_completion_gate_credit_values) > 0
+            else 0,
+            "service_completion_gate_credit_negative_count": int(
+                np.sum(service_completion_gate_credit_values < -1e-8)
+            )
+            if len(service_completion_gate_credit_values) > 0
+            else 0,
             "value_mean": round(float(old_value_tensor.mean().item()), 6),
             "return_mean": round(float(return_tensor.mean().item()), 6),
             "explained_variance": round(explained_variance, 6),
@@ -2803,6 +3068,17 @@ class 分层PPO基类(BaseAgent):
         }
 
         if current_rsu_id is None:
+            if self._net_advantage_prepare_gate_enabled and (
+                predicted_handoff_target or predicted_next_rsu_id
+            ):
+                return self._select_allowed_env_action(
+                    [4, 1, 2],
+                    action_mask,
+                ), "no_associated_rsu_coverage_recovery_prepare", {
+                    **extra,
+                    "predicted_next_rsu_id": predicted_next_rsu_id,
+                    "predicted_handoff_target": predicted_handoff_target,
+                }
             return self._select_allowed_env_action([2, 3, 0], action_mask), "no_associated_rsu_vehicle_fallback", extra
 
         if required_adapter and not self._adapter_cached_for_popularity(
@@ -2943,12 +3219,18 @@ class 分层PPO基类(BaseAgent):
         vehicle = self._primary_vehicle_for_popularity(semantic_state)
         current_rsu_id = vehicle.get("associated_rsu_id") if vehicle else None
         no_rsu_available = bool(current_rsu_id is None and self._is_env_action_valid(2, action_mask))
-        no_rsu_action = 2 if no_rsu_available else base_action
         mechanism_action, mechanism_reason, mechanism_available = self._mechanism_prepare_candidate_action(
             semantic_state,
             action_mask,
             base_action,
         )
+        coverage_recovery_no_rsu = bool(
+            no_rsu_available
+            and mechanism_available
+            and self._net_advantage_prepare_gate_enabled
+            and int(mechanism_action) in {1, 4}
+        )
+        no_rsu_action = int(mechanism_action) if coverage_recovery_no_rsu else 2 if no_rsu_available else base_action
         window_class = str((run_metadata or {}).get("window_class", "unknown"))
         if self._option_gate_context_prior_enabled and window_class in {"idle_or_sparse", "active_non_mechanism"}:
             mechanism_action = int(base_action)
@@ -2987,6 +3269,7 @@ class 分层PPO基类(BaseAgent):
             "mechanism_reason": mechanism_reason,
             "popularity_extra": popularity_extra,
             "no_rsu_available": bool(no_rsu_available),
+            "coverage_recovery_no_rsu": bool(coverage_recovery_no_rsu),
             "mechanism_available": bool(mechanism_available),
             "window_class": window_class,
         }
@@ -3467,6 +3750,78 @@ class 分层PPO基类(BaseAgent):
             head_entropies[head_name] = distribution.entropy()
             action_prob_payload[head_name] = [round(float(item), 6) for item in torch.softmax(logits, dim=-1).tolist()]
         return head_log_probs, head_entropies, action_prob_payload
+
+    def _apply_coverage_recovery_guard_to_actions(
+        self,
+        *,
+        semantic_state: dict[str, Any],
+        policy_output: dict[str, Any],
+        selected_actions: dict[str, int],
+        action_mask: list[bool] | None,
+    ) -> dict[str, Any]:
+        if not (self._coverage_recovery_guard_enabled and self._use_hierarchy):
+            return {"enabled": False, "guarded": False, "reason": "disabled"}
+        gate_info = dict(policy_output.get("net_advantage_prepare_gate_info", {}))
+        if not gate_info:
+            return {"enabled": True, "guarded": False, "reason": "missing_net_advantage_gate"}
+        recovery_context = bool(
+            gate_info.get("current_rsu_id") is None
+            and (
+                gate_info.get("predicted_target_valid", False)
+                or gate_info.get("target_differs", False)
+            )
+        )
+        recovery_scale = _clamp01(float(gate_info.get("coverage_recovery_scale", 0.0) or 0.0))
+        if not recovery_context:
+            return {
+                "enabled": True,
+                "guarded": False,
+                "reason": "not_coverage_recovery_context",
+                "coverage_recovery_scale": round(float(recovery_scale), 6),
+            }
+        min_scale = max(self._coverage_recovery_gate_min_scale, 0.20)
+        if recovery_scale + 1e-8 < min_scale:
+            return {
+                "enabled": True,
+                "guarded": False,
+                "reason": "coverage_recovery_scale_below_min",
+                "coverage_recovery_scale": round(float(recovery_scale), 6),
+                "min_scale": round(float(min_scale), 6),
+            }
+        target_action = 4
+        if not self._is_env_action_valid(target_action, action_mask):
+            return {
+                "enabled": True,
+                "guarded": False,
+                "reason": "target_action_invalid",
+                "target_action": int(target_action),
+                "coverage_recovery_scale": round(float(recovery_scale), 6),
+            }
+        original_action, original_reason = 聚合层级动作(
+            head_actions=selected_actions,
+            use_hierarchy=self._use_hierarchy,
+            event_head_enabled=self._event_head_enabled,
+            adapter_prefetch_enabled=self._adapter_prefetch_enabled,
+        )
+        if int(original_action) == target_action:
+            return {
+                "enabled": True,
+                "guarded": False,
+                "reason": "already_prepare",
+                "original_action": int(original_action),
+                "coverage_recovery_scale": round(float(recovery_scale), 6),
+            }
+        return {
+            "enabled": True,
+            "guarded": True,
+            "reason": "coverage_recovery_prefers_prepare",
+            "original_action": int(original_action),
+            "original_aggregation_reason": original_reason,
+            "guarded_action": int(target_action),
+            "coverage_recovery_scale": round(float(recovery_scale), 6),
+            "predicted_handoff_target_rsu_id": gate_info.get("predicted_handoff_target_rsu_id"),
+            "predicted_next_rsu_id": gate_info.get("predicted_next_rsu_id"),
+        }
 
     def _should_hard_apply_continuity_guard(
         self,
@@ -5281,6 +5636,219 @@ class 分层PPO基类(BaseAgent):
                 credit -= 0.5 * self._idle_execution_local_bonus
         return float(credit)
 
+    def _net_advantage_prepare_gate_credit(self, row: dict[str, Any]) -> float:
+        if not self._net_advantage_prepare_gate_enabled:
+            return 0.0
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        action_info = dict(row.get("action_info", {}))
+        gate_info = dict(action_info.get("net_advantage_prepare_gate", {}))
+        if not gate_info:
+            return 0.0
+
+        head_actions = action_info.get("head_actions", {})
+        if not isinstance(head_actions, dict):
+            head_actions = {}
+        final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
+        event_action = int(head_actions.get("event", 0) or 0)
+        slow_action = int(head_actions.get("slow", 0) or 0)
+        selected_prepare = bool(
+            final_action in {1, 4}
+            or event_action == 1
+            or self._metric_bool(metrics, "migration_prepare_requested")
+            or self._metric_bool(metrics, "mechanism_attempt_selected")
+        )
+        selected_prefetch = bool(
+            final_action == 1
+            or slow_action == 2
+            or self._metric_bool(metrics, "predictive_prefetch_requested")
+        )
+        selected_service_fill = bool(final_action == 0 or slow_action == 1)
+        selected_current_execution = bool(final_action in {0, 3})
+        selected_local_fallback = bool(final_action == 2 or int(head_actions.get("fast", 0) or 0) == 1)
+
+        score = _clamp01(float(gate_info.get("net_advantage_score", 0.0) or 0.0))
+        score_surplus = score - self._net_advantage_prepare_gate_min_score
+        service_pressure = _clamp01(float(gate_info.get("service_pressure", 0.0) or 0.0))
+        missing_current_adapter = bool(gate_info.get("missing_current_adapter", False))
+        current_rsu_available = gate_info.get("current_rsu_id") is not None
+        continuity = _clamp01(self._metric_float(metrics, "workflow_continuity_rate", 1.0))
+        handoff_ready = bool(
+            self._metric_bool(metrics, "handoff_ready")
+            or self._metric_float(
+                metrics,
+                "handoff_ready_ratio",
+                self._metric_float(metrics, "handoff_ready_rate", 0.0),
+            )
+            > 0.0
+        )
+        prefetch_hit = bool(
+            self._metric_bool(metrics, "prefetch_validated_hit")
+            or self._metric_float(metrics, "prefetch_validated_hit_rate") > 0.0
+            or self._metric_float(metrics, "prefetch_validated_hit_count") > 0.0
+        )
+        mechanism_success = self._row_mechanism_success(metrics)
+        handoff_failed = bool(
+            self._metric_bool(metrics, "handoff_failed")
+            or self._metric_float(metrics, "handoff_failure_rate") > 0.0
+        )
+        service_success = max(
+            self._metric_float(metrics, "service_success_count"),
+            self._metric_float(metrics, "workflow_completed_count"),
+            0.0,
+        )
+        service_wait = max(self._metric_float(metrics, "service_wait_sum"), 0.0)
+        workflow_unfinished = max(self._metric_float(metrics, "workflow_unfinished_count"), 0.0)
+        adapter_miss = max(self._metric_float(metrics, "adapter_miss_count"), 0.0)
+        observed_units = max(service_success + workflow_unfinished + adapter_miss + service_wait, 1.0)
+        service_quality = _clamp01(
+            0.45 * min(service_success / observed_units, 1.0)
+            + 0.35 * continuity
+            + 0.20 * float(prefetch_hit or handoff_ready)
+        )
+        backhaul_units = max(self._metric_float(metrics, "backhaul_traffic_cost"), 0.0) / 64.0
+        migration_cost = max(self._metric_float(metrics, "adapter_state_migration_overhead"), 0.0)
+        expired_prefetch = self._metric_bool(metrics, "prefetch_expired_miss")
+        failed_mechanism = self._row_failed_mechanism_attempt(row, metrics)
+        cost_pressure = min(
+            backhaul_units
+            + 0.75 * migration_cost
+            + 0.80 * float(expired_prefetch)
+            + 0.90 * float(failed_mechanism),
+            3.0,
+        ) / 3.0
+        high_net_window = bool(score >= self._net_advantage_prepare_gate_min_score)
+        coverage_recovery_context = bool(
+            not current_rsu_available
+            and (
+                gate_info.get("predicted_target_valid", False)
+                or gate_info.get("target_differs", False)
+            )
+        )
+        coverage_recovery_scale = _clamp01(
+            max(
+                float(gate_info.get("coverage_recovery_scale", 0.0) or 0.0),
+                score,
+            )
+        )
+
+        credit = 0.0
+        if selected_prepare or selected_prefetch:
+            credit += 0.70 * score_surplus
+            credit += 0.42 * service_quality
+            credit += 0.36 * float(mechanism_success)
+            credit += 0.22 * float(handoff_ready)
+            credit += 0.18 * float(prefetch_hit)
+            credit -= self._net_advantage_prepare_gate_cost_scale * (0.85 * cost_pressure)
+            if not high_net_window:
+                credit -= 0.65 * abs(score_surplus) * (1.0 + cost_pressure)
+            if handoff_failed and not mechanism_success:
+                credit -= 0.55
+        else:
+            if high_net_window and (handoff_failed or not handoff_ready):
+                credit -= 0.45 + 0.55 * score_surplus
+            elif not high_net_window:
+                credit += 0.12 * abs(score_surplus) * (1.0 - min(cost_pressure, 1.0))
+        if current_rsu_available and service_pressure > 1e-8:
+            if selected_service_fill:
+                credit += (
+                    0.28 * self._net_advantage_prepare_gate_service_fill_scale * service_pressure
+                    + 0.18 * service_quality
+                    - 0.08 * cost_pressure
+                )
+            elif selected_current_execution:
+                credit += (
+                    0.18 * self._net_advantage_prepare_gate_service_fill_scale * service_pressure
+                    + 0.14 * continuity
+                    - 0.06 * cost_pressure
+                )
+            elif selected_local_fallback:
+                credit -= (
+                    0.32
+                    * self._net_advantage_prepare_gate_local_penalty_scale
+                    * service_pressure
+                    * (1.15 if not missing_current_adapter else 1.0)
+                    + 0.14 * min(adapter_miss / observed_units, 1.0)
+                )
+        if coverage_recovery_context:
+            if selected_prepare:
+                credit += self._coverage_recovery_gate_prepare_credit * (
+                    0.55 + 0.45 * coverage_recovery_scale
+                )
+                credit += 0.24 * score + 0.16 * float(handoff_ready or mechanism_success)
+                if final_action == 4:
+                    credit += 0.18 * coverage_recovery_scale
+                if failed_mechanism and not handoff_ready:
+                    credit -= 0.10 * min(cost_pressure, 1.0)
+            if selected_local_fallback:
+                credit -= self._coverage_recovery_gate_fallback_penalty * (
+                    0.70 + 0.30 * coverage_recovery_scale
+                )
+                credit -= 0.30 * min(adapter_miss / observed_units, 1.0) + 0.22 * cost_pressure
+            elif selected_current_execution and not selected_prepare:
+                credit -= 0.24 * self._coverage_recovery_gate_fallback_penalty * (
+                    0.60 + 0.40 * coverage_recovery_scale
+                )
+        return float(credit)
+
+    def _service_completion_gate_credit(self, row: dict[str, Any]) -> float:
+        if not self._service_completion_gate_enabled:
+            return 0.0
+        action_info = dict(row.get("action_info", {}))
+        gate_info = dict(action_info.get("service_completion_gate", {}))
+        if not bool(gate_info.get("active", False)):
+            return 0.0
+
+        metrics = dict(row.get("env_info", {}).get("metrics_protocol", {}))
+        head_actions = action_info.get("head_actions", {})
+        if not isinstance(head_actions, dict):
+            head_actions = {}
+        final_action = int(action_info.get("final_env_action", row.get("action", 0)) or 0)
+        event_action = int(head_actions.get("event", 0) or 0)
+        slow_action = int(head_actions.get("slow", 0) or 0)
+        fast_action = int(head_actions.get("fast", 0) or 0)
+        target_action = int(gate_info.get("target_action", 3) or 3)
+        score = _clamp01(float(gate_info.get("service_completion_score", 0.0) or 0.0))
+        service_pressure = _clamp01(float(gate_info.get("service_pressure", 0.0) or 0.0))
+        terminal_pressure = _clamp01(float(gate_info.get("terminal_pressure", 0.0) or 0.0))
+
+        service_reward = max(self._metric_float(metrics, "service_reward_sum"), 0.0)
+        if service_reward <= 0.0:
+            service_reward = max(self._metric_float(metrics, "service_success_count"), 0.0)
+        delay_pressure = min(
+            max(
+                self._metric_float(metrics, "service_delay_sum"),
+                self._metric_float(metrics, "end_to_end_workflow_delay"),
+                0.0,
+            )
+            / 64.0,
+            1.5,
+        )
+        cache_miss_pressure = min(max(self._metric_float(metrics, "cache_miss_penalty_sum"), 0.0) / 4.8, 1.5)
+        continuity = _clamp01(self._metric_float(metrics, "workflow_continuity_rate", 1.0))
+        stall = float(self._metric_bool(metrics, "stall_occurred"))
+        mechanism_success = self._row_mechanism_success(metrics)
+        selected_target = bool(final_action == target_action)
+        selected_current_service = bool(final_action in {0, 3} or slow_action == 1 or fast_action == 0)
+        selected_local_fallback = bool(final_action == 2 or fast_action == 1)
+        selected_mechanism = bool(final_action in {1, 4} or event_action == 1 or slow_action == 2)
+
+        credit = 0.0
+        if selected_target or selected_current_service:
+            credit += 0.62 * score + 0.28 * service_pressure + 0.18 * continuity
+            credit -= 0.12 * delay_pressure + 0.10 * cache_miss_pressure
+        if selected_local_fallback:
+            credit -= (
+                0.74 * score
+                + 0.34 * terminal_pressure
+                + 0.24 * cache_miss_pressure
+                + 0.18 * stall
+            )
+        if selected_mechanism and not mechanism_success:
+            credit -= 0.52 * score + 0.24 * terminal_pressure + 0.16 * delay_pressure
+        elif selected_mechanism and mechanism_success:
+            credit += 0.20 * score
+        return float(credit)
+
     def _net_utility_prd_adjustment(self, row: dict[str, Any]) -> float:
         if not self._net_utility_prd_enabled:
             return 0.0
@@ -6337,6 +6905,594 @@ class 分层PPO基类(BaseAgent):
         }
         return adjusted
 
+    def _net_advantage_prepare_context(self, semantic_state: dict[str, Any]) -> dict[str, Any]:
+        if not self._net_advantage_prepare_gate_enabled:
+            return {"enabled": False, "reason": "disabled", "net_advantage_score": 0.0}
+
+        timing_features = compute_temporal_prepare_window_score(
+            semantic_state,
+            preferred_lead_steps=self._temporal_prepare_lead_steps,
+            sigma=self._temporal_prepare_sigma,
+        )
+        prepare_score = _clamp01(float(timing_features.get("prepare_window_score", 0.0) or 0.0))
+        temporal_urgency = _clamp01(float(timing_features.get("temporal_urgency", 0.0) or 0.0))
+        timing_support = max(prepare_score, temporal_urgency)
+
+        primary_vehicle, _ = _resolve_primary_vehicle_from_semantic_state(semantic_state)
+        current_rsu_id = primary_vehicle.get("associated_rsu_id")
+        vehicle_id = str(primary_vehicle.get("vehicle_id", ""))
+        predictions = semantic_state.get("predictions", {})
+        if not isinstance(predictions, dict):
+            predictions = {}
+        next_sequence = list(predictions.get("next_rsu_sequence", {}).get(vehicle_id, []) or [])
+        predicted_next_rsu_id = predictions.get("predicted_next_rsu_by_vehicle", {}).get(vehicle_id)
+        if predicted_next_rsu_id is None and next_sequence:
+            predicted_next_rsu_id = next_sequence[0]
+        predicted_handoff_target_rsu_id = predictions.get("predicted_first_handoff_rsu_by_vehicle", {}).get(vehicle_id)
+        if predicted_handoff_target_rsu_id is None:
+            for rsu_id in next_sequence:
+                if rsu_id is not None and str(rsu_id) != str(current_rsu_id):
+                    predicted_handoff_target_rsu_id = rsu_id
+                    break
+
+        current_node = semantic_state.get("current_workflow_node") or {}
+        required_adapter = current_node.get("required_adapter")
+        required_adapter_key = str(required_adapter) if required_adapter else None
+        current_rsu = _rsu_by_id_from_semantic_state(semantic_state, current_rsu_id)
+        predicted_next_rsu = _rsu_by_id_from_semantic_state(semantic_state, predicted_next_rsu_id)
+        handoff_target_rsu = _rsu_by_id_from_semantic_state(semantic_state, predicted_handoff_target_rsu_id)
+
+        def has_adapter(rsu: dict[str, Any]) -> bool:
+            return bool(
+                required_adapter_key
+                and required_adapter_key in {str(item) for item in rsu.get("cached_adapter_ids", [])}
+            )
+
+        current_cache_ready = has_adapter(current_rsu)
+        predicted_next_cache_ready = has_adapter(predicted_next_rsu)
+        handoff_target_cache_ready = has_adapter(handoff_target_rsu)
+        next_differs = bool(
+            predicted_next_rsu_id is not None and str(predicted_next_rsu_id) != str(current_rsu_id)
+        )
+        target_differs = bool(
+            predicted_handoff_target_rsu_id is not None
+            and str(predicted_handoff_target_rsu_id) != str(current_rsu_id)
+        )
+        predicted_target_valid = bool(target_differs and bool(handoff_target_rsu))
+        diagnostics = self._build_prediction_target_diagnostics(
+            semantic_state=semantic_state,
+            temporal_urgency=temporal_urgency,
+            predicted_handoff_target_valid=predicted_target_valid,
+        )
+        confidence = _clamp01(float(diagnostics.get("prediction_confidence", 0.0) or 0.0))
+        uncertainty = _clamp01(float(diagnostics.get("prediction_uncertainty", 1.0) or 1.0))
+        reliability = _clamp01(confidence * (1.0 - uncertainty))
+        raw_candidate = bool(diagnostics.get("raw_handoff_candidate", False))
+        gate_pass = bool(diagnostics.get("gate_pass", False))
+
+        workflow = semantic_state.get("workflow") if isinstance(semantic_state.get("workflow"), dict) else {}
+        nodes = workflow.get("nodes", []) if isinstance(workflow, dict) else []
+        completed_nodes = set(str(item) for item in workflow.get("completed_node_ids", []) or [])
+        remaining_nodes = 0
+        if isinstance(nodes, list) and nodes:
+            for node in nodes:
+                node_id = str((node or {}).get("node_id", ""))
+                if node_id and node_id not in completed_nodes:
+                    remaining_nodes += 1
+        else:
+            remaining_nodes = 1 if current_node else 0
+        successors = current_node.get("successors", []) if isinstance(current_node, dict) else []
+        try:
+            input_size = max(float(current_node.get("input_size", 0.0) or 0.0), 0.0)
+        except (TypeError, ValueError):
+            input_size = 0.0
+        try:
+            continuity_features = build_graph_continuity_critic_features(
+                semantic_state,
+                prediction_gate_min_leak=self._prediction_gate_min_leak,
+            )
+        except Exception:
+            continuity_features = {}
+        path_pressure = _clamp01(
+            0.55 * float(continuity_features.get("critical_path_length_norm", 0.0) or 0.0)
+            + 0.25 * float(continuity_features.get("frontier_width_ratio", 0.0) or 0.0)
+            + min(float(remaining_nodes) / 10.0, 0.20)
+        )
+        service_pressure = _clamp01(
+            0.16
+            + 0.18 * float(bool(successors))
+            + 0.18 * float(remaining_nodes >= 3)
+            + 0.16 * float(required_adapter_key is not None)
+            + min(input_size / 256.0, 0.12)
+            + 0.20 * path_pressure
+        )
+
+        prediction_support = _clamp01(
+            0.30 * prepare_score
+            + 0.22 * temporal_urgency
+            + 0.22 * reliability
+            + 0.10 * float(gate_pass)
+            + 0.08 * float(raw_candidate)
+            + 0.08 * float(predicted_target_valid)
+        )
+        execution_support = _clamp01(
+            0.24 * float(current_cache_ready)
+            + 0.18 * float(handoff_target_cache_ready)
+            + 0.18 * float(target_differs)
+            + 0.16 * service_pressure
+            + 0.14 * path_pressure
+            + 0.10 * float(predicted_next_cache_ready)
+        )
+        target_requires_prefetch = bool(required_adapter_key and target_differs and not handoff_target_cache_ready)
+        missing_current_adapter = bool(required_adapter_key and current_rsu_id is not None and not current_cache_ready)
+        no_target_penalty = float(not target_differs)
+        stale_prefetch_risk = float(target_requires_prefetch) * (1.0 - timing_support)
+        uncertainty_risk = 0.55 * uncertainty + 0.45 * (1.0 - confidence)
+        cost_pressure = _clamp01(
+            0.32 * float(missing_current_adapter)
+            + 0.24 * stale_prefetch_risk
+            + 0.18 * no_target_penalty
+            + 0.16 * uncertainty_risk
+            + 0.10 * float(target_requires_prefetch and not gate_pass)
+        )
+        net_advantage_score = _clamp01(
+            prediction_support
+            + 0.42 * execution_support
+            - self._net_advantage_prepare_gate_cost_scale * cost_pressure
+        )
+        return {
+            "enabled": True,
+            "net_advantage_score": round(float(net_advantage_score), 6),
+            "prediction_support": round(float(prediction_support), 6),
+            "execution_support": round(float(execution_support), 6),
+            "cost_pressure": round(float(cost_pressure), 6),
+            "service_pressure": round(float(service_pressure), 6),
+            "path_pressure": round(float(path_pressure), 6),
+            "prepare_window_score": round(float(prepare_score), 6),
+            "temporal_urgency": round(float(temporal_urgency), 6),
+            "timing_support": round(float(timing_support), 6),
+            "prediction_confidence": round(float(confidence), 6),
+            "prediction_uncertainty": round(float(uncertainty), 6),
+            "prediction_reliability": round(float(reliability), 6),
+            "raw_handoff_candidate": bool(raw_candidate),
+            "gate_pass": bool(gate_pass),
+            "predicted_target_valid": bool(predicted_target_valid),
+            "current_cache_ready": bool(current_cache_ready),
+            "predicted_next_cache_ready": bool(predicted_next_cache_ready),
+            "handoff_target_cache_ready": bool(handoff_target_cache_ready),
+            "target_requires_prefetch": bool(target_requires_prefetch),
+            "missing_current_adapter": bool(missing_current_adapter),
+            "next_differs": bool(next_differs),
+            "target_differs": bool(target_differs),
+            "current_rsu_id": current_rsu_id,
+            "predicted_next_rsu_id": predicted_next_rsu_id,
+            "predicted_handoff_target_rsu_id": predicted_handoff_target_rsu_id,
+        }
+
+    def _apply_net_advantage_prepare_gate(
+        self,
+        policy_output: dict[str, Any],
+        semantic_state: dict[str, Any],
+    ) -> dict[str, Any]:
+        if not self._use_hierarchy or not self._net_advantage_prepare_gate_enabled:
+            return policy_output
+
+        gate_info = self._net_advantage_prepare_context(semantic_state)
+        score = float(gate_info.get("net_advantage_score", 0.0) or 0.0)
+        positive_span = max(1.0 - self._net_advantage_prepare_gate_min_score, 1e-6)
+        positive_scale = _clamp01((score - self._net_advantage_prepare_gate_min_score) / positive_span)
+        negative_threshold = min(
+            self._net_advantage_prepare_gate_min_score + self._net_advantage_prepare_gate_margin,
+            1.0,
+        )
+        negative_scale = _clamp01((negative_threshold - score) / max(negative_threshold, 1e-6))
+
+        adjusted = dict(policy_output)
+        slow_logits = adjusted["slow_logits"].clone()
+        fast_logits = adjusted["fast_logits"].clone()
+        event_logits = adjusted["event_logits"].clone()
+        env_action_bias = adjusted.get("env_action_logits_bias")
+        if isinstance(env_action_bias, torch.Tensor) and env_action_bias.numel() == 5:
+            env_action_logits_bias = env_action_bias.clone()
+        else:
+            env_action_logits_bias = torch.zeros(5, dtype=event_logits.dtype, device=event_logits.device)
+
+        prepare_bias = self._net_advantage_prepare_gate_bias * positive_scale
+        prepare_penalty = self._net_advantage_prepare_gate_bias * negative_scale
+        coverage_recovery_context = bool(
+            gate_info.get("current_rsu_id") is None
+            and (
+                gate_info.get("predicted_target_valid", False)
+                or gate_info.get("target_differs", False)
+            )
+        )
+        coverage_recovery_scale = 0.0
+        if coverage_recovery_context:
+            coverage_context_score = _clamp01(
+                0.24
+                + 0.30 * float(gate_info.get("timing_support", 0.0) or 0.0)
+                + 0.20 * float(gate_info.get("prediction_support", 0.0) or 0.0)
+                + 0.16 * float(gate_info.get("execution_support", 0.0) or 0.0)
+                + 0.10 * float(gate_info.get("net_advantage_score", 0.0) or 0.0)
+            )
+            coverage_recovery_scale = _clamp01(
+                max(
+                    positive_scale,
+                    self._coverage_recovery_gate_min_scale,
+                    coverage_context_score,
+                )
+            )
+        coverage_recovery_bias = 0.0
+        if prepare_bias > 1e-8:
+            event_logits[1] = event_logits[1] + prepare_bias
+            event_logits[0] = event_logits[0] - 0.12 * prepare_bias
+            env_action_logits_bias[4] = env_action_logits_bias[4] + prepare_bias
+        if prepare_penalty > 1e-8:
+            effective_prepare_penalty = prepare_penalty
+            if coverage_recovery_context:
+                effective_prepare_penalty *= 1.0 - 0.85 * coverage_recovery_scale
+            event_logits[1] = event_logits[1] - effective_prepare_penalty
+            event_logits[0] = event_logits[0] + 0.14 * effective_prepare_penalty
+            env_action_logits_bias[4] = env_action_logits_bias[4] - effective_prepare_penalty
+
+        prefetch_bias = 0.0
+        prefetch_penalty = 0.0
+        if gate_info.get("target_requires_prefetch", False):
+            prefetch_bias = (
+                self._net_advantage_prepare_gate_bias
+                * self._net_advantage_prepare_gate_prefetch_scale
+                * positive_scale
+                * max(float(gate_info.get("timing_support", 0.0) or 0.0), 0.35)
+            )
+            if prefetch_bias > 1e-8:
+                slow_logits[2] = slow_logits[2] + prefetch_bias
+                slow_logits[0] = slow_logits[0] - 0.08 * prefetch_bias
+                env_action_logits_bias[1] = env_action_logits_bias[1] + prefetch_bias
+        if negative_scale > 1e-8:
+            prefetch_penalty = (
+                self._net_advantage_prepare_gate_bias
+                * self._net_advantage_prepare_gate_prefetch_scale
+                * negative_scale
+                * (1.15 if not gate_info.get("target_differs", False) else 1.0)
+            )
+            slow_logits[2] = slow_logits[2] - prefetch_penalty
+            env_action_logits_bias[1] = env_action_logits_bias[1] - prefetch_penalty
+
+        current_bias = 0.0
+        local_bias = 0.0
+        if negative_scale > 1e-8:
+            relief = self._net_advantage_prepare_gate_current_scale * prepare_penalty
+            if gate_info.get("current_rsu_id") is not None:
+                current_action = 3 if gate_info.get("current_cache_ready", False) else 0
+                current_bias = relief
+                env_action_logits_bias[current_action] = env_action_logits_bias[current_action] + current_bias
+                if current_action == 0:
+                    slow_logits[1] = slow_logits[1] + 0.36 * current_bias
+                else:
+                    fast_logits[0] = fast_logits[0] + 0.30 * current_bias
+            elif gate_info.get("predicted_target_valid", False) or gate_info.get("target_differs", False):
+                current_bias = 0.85 * relief
+                event_logits[1] = event_logits[1] + current_bias
+                event_logits[0] = event_logits[0] - 0.10 * current_bias
+                env_action_logits_bias[4] = env_action_logits_bias[4] + current_bias
+                env_action_logits_bias[2] = env_action_logits_bias[2] - 1.00 * relief
+                fast_logits[1] = fast_logits[1] - 0.62 * relief
+            else:
+                local_bias = relief
+                env_action_logits_bias[2] = env_action_logits_bias[2] + local_bias
+                fast_logits[1] = fast_logits[1] + 0.32 * local_bias
+
+        coverage_recovery_fallback_suppression = 0.0
+        coverage_recovery_fast_suppression = 0.0
+        coverage_recovery_current_suppression = 0.0
+        if coverage_recovery_context and coverage_recovery_scale > 1e-8:
+            coverage_recovery_bias = (
+                self._net_advantage_prepare_gate_bias
+                * self._coverage_recovery_gate_bias_scale
+                * coverage_recovery_scale
+            )
+            coverage_recovery_fallback_suppression = (
+                self._net_advantage_prepare_gate_bias
+                * self._coverage_recovery_gate_fallback_suppression_scale
+                * coverage_recovery_scale
+            )
+            coverage_recovery_fast_suppression = (
+                self._net_advantage_prepare_gate_bias
+                * self._coverage_recovery_gate_fast_suppression_scale
+                * coverage_recovery_scale
+            )
+            coverage_recovery_current_suppression = (
+                self._net_advantage_prepare_gate_bias
+                * self._coverage_recovery_gate_current_suppression_scale
+                * coverage_recovery_scale
+            )
+            event_logits[1] = event_logits[1] + coverage_recovery_bias
+            event_logits[0] = event_logits[0] - 0.12 * coverage_recovery_bias
+            env_action_logits_bias[4] = env_action_logits_bias[4] + coverage_recovery_bias
+            env_action_logits_bias[2] = (
+                env_action_logits_bias[2] - coverage_recovery_fallback_suppression
+            )
+            fast_logits[1] = fast_logits[1] - coverage_recovery_fast_suppression
+            if coverage_recovery_current_suppression > 1e-8:
+                env_action_logits_bias[0] = (
+                    env_action_logits_bias[0] - coverage_recovery_current_suppression
+                )
+                env_action_logits_bias[3] = (
+                    env_action_logits_bias[3] - coverage_recovery_current_suppression
+                )
+
+        service_fill_bias = 0.0
+        local_penalty = 0.0
+        service_pressure = _clamp01(float(gate_info.get("service_pressure", 0.0) or 0.0))
+        if (
+            gate_info.get("current_rsu_id") is not None
+            and self._net_advantage_prepare_gate_service_fill_scale > 0.0
+            and service_pressure > 1e-8
+        ):
+            mechanism_relief = 1.0 - 0.35 * positive_scale
+            current_cache_ready = bool(gate_info.get("current_cache_ready", False))
+            service_current_action = 3 if current_cache_ready else 0
+            current_cache_scale = 0.62 if current_cache_ready else 1.0
+            service_fill_bias = (
+                self._net_advantage_prepare_gate_bias
+                * self._net_advantage_prepare_gate_service_fill_scale
+                * service_pressure
+                * current_cache_scale
+                * max(mechanism_relief, 0.45)
+            )
+            env_action_logits_bias[service_current_action] = (
+                env_action_logits_bias[service_current_action] + service_fill_bias
+            )
+            if service_current_action == 0:
+                slow_logits[1] = slow_logits[1] + service_fill_bias
+                slow_logits[2] = slow_logits[2] - 0.08 * service_fill_bias
+            else:
+                fast_logits[0] = fast_logits[0] + 0.42 * service_fill_bias
+            fast_logits[1] = fast_logits[1] - 0.18 * service_fill_bias
+        if (
+            self._net_advantage_prepare_gate_local_penalty_scale > 0.0
+            and gate_info.get("current_rsu_id") is not None
+            and service_pressure > 1e-8
+        ):
+            local_penalty_context = bool(
+                not gate_info.get("target_differs", False)
+                or gate_info.get("current_cache_ready", False)
+                or score < negative_threshold
+            )
+        else:
+            local_penalty_context = False
+        if local_penalty_context:
+            local_penalty = (
+                self._net_advantage_prepare_gate_bias
+                * self._net_advantage_prepare_gate_local_penalty_scale
+                * service_pressure
+                * (0.60 + 0.40 * negative_scale)
+            )
+            fast_logits[1] = fast_logits[1] - local_penalty
+            env_action_logits_bias[2] = env_action_logits_bias[2] - local_penalty
+
+        adjusted["slow_logits"] = slow_logits
+        adjusted["fast_logits"] = fast_logits
+        adjusted["event_logits"] = event_logits
+        adjusted["env_action_logits_bias"] = env_action_logits_bias
+        gate_info.update(
+            {
+                "min_score": round(float(self._net_advantage_prepare_gate_min_score), 6),
+                "margin": round(float(self._net_advantage_prepare_gate_margin), 6),
+                "positive_scale": round(float(positive_scale), 6),
+                "negative_scale": round(float(negative_scale), 6),
+                "prepare_bias": round(float(prepare_bias), 6),
+                "prepare_penalty": round(float(prepare_penalty), 6),
+                "coverage_recovery_scale": round(float(coverage_recovery_scale), 6),
+                "coverage_recovery_bias": round(float(coverage_recovery_bias), 6),
+                "coverage_recovery_fallback_suppression": round(
+                    float(coverage_recovery_fallback_suppression),
+                    6,
+                ),
+                "coverage_recovery_fast_suppression": round(
+                    float(coverage_recovery_fast_suppression),
+                    6,
+                ),
+                "coverage_recovery_current_suppression": round(
+                    float(coverage_recovery_current_suppression),
+                    6,
+                ),
+                "prefetch_bias": round(float(prefetch_bias), 6),
+                "prefetch_penalty": round(float(prefetch_penalty), 6),
+                "current_bias": round(float(current_bias), 6),
+                "local_bias": round(float(local_bias), 6),
+                "service_fill_bias": round(float(service_fill_bias), 6),
+                "local_penalty": round(float(local_penalty), 6),
+                "env_action_logit_bias": [
+                    round(float(item), 6)
+                    for item in env_action_logits_bias.detach().cpu().tolist()
+                ],
+            }
+        )
+        adjusted["net_advantage_prepare_gate_info"] = gate_info
+        return adjusted
+
+    def _service_completion_context(self, semantic_state: dict[str, Any]) -> dict[str, Any]:
+        if not self._service_completion_gate_enabled:
+            return {"enabled": False, "reason": "disabled", "service_completion_score": 0.0}
+
+        primary_vehicle, _ = _resolve_primary_vehicle_from_semantic_state(semantic_state)
+        current_rsu_id = primary_vehicle.get("associated_rsu_id")
+        current_node = semantic_state.get("current_workflow_node") or {}
+        required_adapter = current_node.get("required_adapter")
+        required_adapter_key = str(required_adapter) if required_adapter else None
+        workflow = semantic_state.get("workflow") if isinstance(semantic_state.get("workflow"), dict) else {}
+        nodes = workflow.get("nodes", []) if isinstance(workflow, dict) else []
+        completed_nodes = set(str(item) for item in workflow.get("completed_node_ids", []) or [])
+        remaining_nodes = 0
+        if isinstance(nodes, list) and nodes:
+            for node in nodes:
+                node_id = str((node or {}).get("node_id", ""))
+                if node_id and node_id not in completed_nodes:
+                    remaining_nodes += 1
+        else:
+            remaining_nodes = 1 if current_node else 0
+        if current_rsu_id is None or remaining_nodes <= 0:
+            return {
+                "enabled": True,
+                "active": False,
+                "reason": "no_current_rsu_or_no_remaining_node",
+                "service_completion_score": 0.0,
+                "current_rsu_id": current_rsu_id,
+                "remaining_nodes": int(remaining_nodes),
+            }
+
+        current_rsu = _rsu_by_id_from_semantic_state(semantic_state, current_rsu_id)
+        current_cache_ready = bool(
+            required_adapter_key
+            and required_adapter_key in {str(item) for item in current_rsu.get("cached_adapter_ids", [])}
+        )
+        vehicle_id = str(primary_vehicle.get("vehicle_id", ""))
+        predictions = semantic_state.get("predictions", {})
+        if not isinstance(predictions, dict):
+            predictions = {}
+        predicted_next_rsu_id = predictions.get("predicted_next_rsu_by_vehicle", {}).get(vehicle_id)
+        predicted_handoff_target_rsu_id = predictions.get("predicted_first_handoff_rsu_by_vehicle", {}).get(vehicle_id)
+        next_differs = bool(predicted_next_rsu_id is not None and str(predicted_next_rsu_id) != str(current_rsu_id))
+        target_differs = bool(
+            predicted_handoff_target_rsu_id is not None
+            and str(predicted_handoff_target_rsu_id) != str(current_rsu_id)
+        )
+        try:
+            continuity_features = build_graph_continuity_critic_features(
+                semantic_state,
+                prediction_gate_min_leak=self._prediction_gate_min_leak,
+            )
+        except Exception:
+            continuity_features = {}
+        path_pressure = _clamp01(
+            0.60 * float(continuity_features.get("critical_path_length_norm", 0.0) or 0.0)
+            + 0.28 * float(continuity_features.get("frontier_width_ratio", 0.0) or 0.0)
+            + min(float(remaining_nodes) / 10.0, 0.12)
+        )
+        threshold = max(float(self._service_completion_gate_remaining_nodes_threshold), 1.0)
+        terminal_pressure = _clamp01((threshold - float(remaining_nodes) + 1.0) / threshold)
+        service_pressure = _clamp01(
+            0.24
+            + 0.28 * terminal_pressure
+            + 0.18 * path_pressure
+            + 0.16 * float(required_adapter_key is not None)
+            + 0.14 * float(current_cache_ready)
+        )
+
+        timing_features = compute_temporal_prepare_window_score(
+            semantic_state,
+            preferred_lead_steps=self._temporal_prepare_lead_steps,
+            sigma=self._temporal_prepare_sigma,
+        )
+        prepare_score = _clamp01(float(timing_features.get("prepare_window_score", 0.0) or 0.0))
+        temporal_urgency = _clamp01(float(timing_features.get("temporal_urgency", 0.0) or 0.0))
+        handoff_pressure = _clamp01(0.55 * prepare_score + 0.45 * temporal_urgency)
+        completion_score = _clamp01(
+            0.40 * terminal_pressure
+            + 0.30 * service_pressure
+            + 0.20 * float(current_cache_ready)
+            + 0.10 * (1.0 - 0.5 * handoff_pressure)
+        )
+        immediate_transfer_context = bool(next_differs and target_differs and handoff_pressure >= 0.20)
+        active = bool(
+            remaining_nodes <= self._service_completion_gate_remaining_nodes_threshold
+            and not immediate_transfer_context
+        )
+        target_action = 3 if current_cache_ready else 0
+        return {
+            "enabled": True,
+            "active": bool(active),
+            "reason": (
+                "service_completion_window"
+                if active
+                else "immediate_transfer_context"
+                if immediate_transfer_context
+                else "outside_completion_window"
+            ),
+            "service_completion_score": round(float(completion_score), 6),
+            "service_pressure": round(float(service_pressure), 6),
+            "terminal_pressure": round(float(terminal_pressure), 6),
+            "path_pressure": round(float(path_pressure), 6),
+            "handoff_pressure": round(float(handoff_pressure), 6),
+            "prepare_window_score": round(float(prepare_score), 6),
+            "temporal_urgency": round(float(temporal_urgency), 6),
+            "target_action": int(target_action),
+            "current_cache_ready": bool(current_cache_ready),
+            "current_rsu_id": current_rsu_id,
+            "predicted_next_rsu_id": predicted_next_rsu_id,
+            "predicted_handoff_target_rsu_id": predicted_handoff_target_rsu_id,
+            "next_differs": bool(next_differs),
+            "target_differs": bool(target_differs),
+            "remaining_nodes": int(remaining_nodes),
+            "required_adapter": required_adapter_key,
+        }
+
+    def _apply_service_completion_gate(
+        self,
+        policy_output: dict[str, Any],
+        semantic_state: dict[str, Any],
+    ) -> dict[str, Any]:
+        if not self._use_hierarchy or not self._service_completion_gate_enabled:
+            return policy_output
+
+        gate_info = self._service_completion_context(semantic_state)
+        if not bool(gate_info.get("active", False)):
+            adjusted = dict(policy_output)
+            adjusted["service_completion_gate_info"] = gate_info
+            return adjusted
+
+        adjusted = dict(policy_output)
+        slow_logits = adjusted["slow_logits"].clone()
+        fast_logits = adjusted["fast_logits"].clone()
+        event_logits = adjusted["event_logits"].clone()
+        env_action_bias = adjusted.get("env_action_logits_bias")
+        if isinstance(env_action_bias, torch.Tensor) and env_action_bias.numel() == 5:
+            env_action_logits_bias = env_action_bias.clone()
+        else:
+            env_action_logits_bias = torch.zeros(5, dtype=event_logits.dtype, device=event_logits.device)
+
+        score = _clamp01(float(gate_info.get("service_completion_score", 0.0) or 0.0))
+        bias = self._service_completion_gate_bias * score
+        target_action = int(gate_info.get("target_action", 3))
+        event_suppression = self._service_completion_gate_event_suppression_scale * bias
+        prefetch_suppression = self._service_completion_gate_prefetch_suppression_scale * bias
+        fallback_suppression = self._service_completion_gate_fallback_suppression_scale * bias
+        env_action_logits_bias[target_action] = env_action_logits_bias[target_action] + bias
+        env_action_logits_bias[1] = env_action_logits_bias[1] - prefetch_suppression
+        env_action_logits_bias[2] = env_action_logits_bias[2] - fallback_suppression
+        env_action_logits_bias[4] = env_action_logits_bias[4] - event_suppression
+        event_logits[1] = event_logits[1] - event_suppression
+        event_logits[0] = event_logits[0] + 0.18 * event_suppression
+        slow_logits[2] = slow_logits[2] - prefetch_suppression
+        fast_logits[1] = fast_logits[1] - fallback_suppression
+        if target_action == 0:
+            slow_logits[1] = slow_logits[1] + bias
+            slow_logits[0] = slow_logits[0] - 0.10 * bias
+            fast_logits[0] = fast_logits[0] + 0.18 * bias
+        else:
+            slow_logits[0] = slow_logits[0] + 0.24 * bias
+            fast_logits[0] = fast_logits[0] + bias
+
+        adjusted["slow_logits"] = slow_logits
+        adjusted["fast_logits"] = fast_logits
+        adjusted["event_logits"] = event_logits
+        adjusted["env_action_logits_bias"] = env_action_logits_bias
+        gate_info.update(
+            {
+                "bias": round(float(bias), 6),
+                "event_suppression": round(float(event_suppression), 6),
+                "prefetch_suppression": round(float(prefetch_suppression), 6),
+                "fallback_suppression": round(float(fallback_suppression), 6),
+                "env_action_logit_bias": [
+                    round(float(item), 6)
+                    for item in env_action_logits_bias.detach().cpu().tolist()
+                ],
+            }
+        )
+        adjusted["service_completion_gate_info"] = gate_info
+        return adjusted
+
     def _apply_policy_adjustments(
         self,
         policy_output: dict[str, Any],
@@ -6350,7 +7506,9 @@ class 分层PPO基类(BaseAgent):
         )
         adjusted = self._apply_opportunity_constrained_policy(adjusted, semantic_state)
         adjusted = self._apply_backhaul_aware_policy(adjusted, semantic_state)
+        adjusted = self._apply_net_advantage_prepare_gate(adjusted, semantic_state)
         adjusted = self._apply_continuity_guard(adjusted, semantic_state)
+        adjusted = self._apply_service_completion_gate(adjusted, semantic_state)
         return self._apply_event_logit_sharpening(adjusted, semantic_state)
 
     def _apply_continuity_guard(
@@ -8096,6 +9254,53 @@ class 分层PPO基类(BaseAgent):
             "opportunity_constrained_confidence_floor": self._opportunity_constrained_confidence_floor,
             "opportunity_constrained_uncertainty_ceiling": self._opportunity_constrained_uncertainty_ceiling,
             "opportunity_constrained_reliability_floor": self._opportunity_constrained_reliability_floor,
+            "net_advantage_prepare_gate_enabled": self._net_advantage_prepare_gate_enabled,
+            "net_advantage_prepare_gate_bias": self._net_advantage_prepare_gate_bias,
+            "net_advantage_prepare_gate_min_score": self._net_advantage_prepare_gate_min_score,
+            "net_advantage_prepare_gate_margin": self._net_advantage_prepare_gate_margin,
+            "net_advantage_prepare_gate_prefetch_scale": self._net_advantage_prepare_gate_prefetch_scale,
+            "net_advantage_prepare_gate_current_scale": self._net_advantage_prepare_gate_current_scale,
+            "net_advantage_prepare_gate_service_fill_scale": (
+                self._net_advantage_prepare_gate_service_fill_scale
+            ),
+            "net_advantage_prepare_gate_local_penalty_scale": (
+                self._net_advantage_prepare_gate_local_penalty_scale
+            ),
+            "net_advantage_prepare_gate_cost_scale": self._net_advantage_prepare_gate_cost_scale,
+            "net_advantage_prepare_gate_policy_coef": self._net_advantage_prepare_gate_policy_coef,
+            "net_advantage_prepare_gate_event_coef": self._net_advantage_prepare_gate_event_coef,
+            "net_advantage_prepare_gate_clip": self._net_advantage_prepare_gate_clip,
+            "coverage_recovery_gate_bias_scale": self._coverage_recovery_gate_bias_scale,
+            "coverage_recovery_gate_min_scale": self._coverage_recovery_gate_min_scale,
+            "coverage_recovery_gate_fallback_suppression_scale": (
+                self._coverage_recovery_gate_fallback_suppression_scale
+            ),
+            "coverage_recovery_gate_fast_suppression_scale": (
+                self._coverage_recovery_gate_fast_suppression_scale
+            ),
+            "coverage_recovery_gate_current_suppression_scale": (
+                self._coverage_recovery_gate_current_suppression_scale
+            ),
+            "coverage_recovery_gate_prepare_credit": self._coverage_recovery_gate_prepare_credit,
+            "coverage_recovery_gate_fallback_penalty": self._coverage_recovery_gate_fallback_penalty,
+            "coverage_recovery_guard_enabled": self._coverage_recovery_guard_enabled,
+            "service_completion_gate_enabled": self._service_completion_gate_enabled,
+            "service_completion_gate_bias": self._service_completion_gate_bias,
+            "service_completion_gate_remaining_nodes_threshold": (
+                self._service_completion_gate_remaining_nodes_threshold
+            ),
+            "service_completion_gate_event_suppression_scale": (
+                self._service_completion_gate_event_suppression_scale
+            ),
+            "service_completion_gate_prefetch_suppression_scale": (
+                self._service_completion_gate_prefetch_suppression_scale
+            ),
+            "service_completion_gate_fallback_suppression_scale": (
+                self._service_completion_gate_fallback_suppression_scale
+            ),
+            "service_completion_gate_policy_coef": self._service_completion_gate_policy_coef,
+            "service_completion_gate_event_coef": self._service_completion_gate_event_coef,
+            "service_completion_gate_clip": self._service_completion_gate_clip,
             "retrospective_handoff_aux_enabled": self._retrospective_handoff_aux_enabled,
             "retrospective_handoff_aux_max_eta": self._retrospective_handoff_aux_max_eta,
             "retrospective_handoff_aux_min_score": self._retrospective_handoff_aux_min_score,
@@ -8383,7 +9588,9 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
         )
         adjusted = self._apply_opportunity_constrained_policy(adjusted, semantic_state)
         adjusted = self._apply_backhaul_aware_policy(adjusted, semantic_state)
+        adjusted = self._apply_net_advantage_prepare_gate(adjusted, semantic_state)
         adjusted = self._apply_continuity_guard(adjusted, semantic_state)
+        adjusted = self._apply_service_completion_gate(adjusted, semantic_state)
         return self._apply_event_logit_sharpening(adjusted, semantic_state)
 
     def _build_mechanism_targets(self, semantic_state: dict[str, Any]) -> dict[str, float | int]:

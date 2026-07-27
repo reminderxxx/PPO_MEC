@@ -901,6 +901,62 @@ PROFILE_DEFAULTS = {
         "reward_positive_offset": 0.0,
         "prediction_horizon": 16,
     },
+    "top_journal_mechanism_v52_net_advantage_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.50e-5,
+        "clip_ratio": 0.046,
+        "entropy_coef": 0.00108,
+        "value_coef": 0.90,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+    },
+    "top_journal_mechanism_v53_service_net_advantage_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.45e-5,
+        "clip_ratio": 0.046,
+        "entropy_coef": 0.00110,
+        "value_coef": 0.90,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+    },
+    "top_journal_mechanism_v54_service_completion_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.45e-5,
+        "clip_ratio": 0.046,
+        "entropy_coef": 0.00110,
+        "value_coef": 0.90,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+    },
+    "top_journal_mechanism_v55_coverage_recovery_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.45e-5,
+        "clip_ratio": 0.046,
+        "entropy_coef": 0.00110,
+        "value_coef": 0.90,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -960,6 +1016,10 @@ MECHANISM_COVERAGE_PROFILES = {
     "top_journal_mechanism_v49_retrospective_handoff_mappo",
     "top_journal_mechanism_v50_long_horizon_handoff_mappo",
     "top_journal_mechanism_v51_physical_transfer_mappo",
+    "top_journal_mechanism_v52_net_advantage_mappo",
+    "top_journal_mechanism_v53_service_net_advantage_mappo",
+    "top_journal_mechanism_v54_service_completion_mappo",
+    "top_journal_mechanism_v55_coverage_recovery_mappo",
 }
 
 
@@ -3799,6 +3859,115 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "backhaul_aware_service_fill_bias": 1.10,
                 "backhaul_aware_redundant_fill_penalty": 0.66,
                 "target_kl": 0.0052,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v52_net_advantage_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v51_physical_transfer_mappo")
+        kwargs.update(
+            {
+                "mechanism_aux_coef": 0.014,
+                "mechanism_aux_coef_floor_after_update": 0.010,
+                "mechanism_window_weight": 1.18,
+                "mechanism_window_weight_floor_after_update": 1.12,
+                "prepare_action_prior_weight": 0.052,
+                "opportunity_constrained_prepare_bias": 0.92,
+                "opportunity_constrained_prefetch_bias": 0.52,
+                "opportunity_constrained_prepare_penalty": 6.10,
+                "opportunity_constrained_prefetch_penalty": 4.15,
+                "retrospective_handoff_aux_prepare_weight": 0.58,
+                "retrospective_handoff_aux_transition_weight": 1.35,
+                "backhaul_aware_service_fill_bias": 1.22,
+                "backhaul_aware_redundant_fill_penalty": 0.78,
+                "net_utility_backhaul_coef": 0.28,
+                "net_utility_migration_coef": 0.28,
+                "net_utility_failed_mechanism_penalty": 1.04,
+                "net_utility_failed_mechanism_backhaul_coef": 0.48,
+                "net_utility_cost_target": 0.075,
+                "net_utility_cost_dual_max": 1.85,
+                "net_advantage_prepare_gate_enabled": True,
+                "net_advantage_prepare_gate_bias": 1.85,
+                "net_advantage_prepare_gate_min_score": 0.50,
+                "net_advantage_prepare_gate_margin": 0.16,
+                "net_advantage_prepare_gate_prefetch_scale": 0.42,
+                "net_advantage_prepare_gate_current_scale": 0.70,
+                "net_advantage_prepare_gate_cost_scale": 0.58,
+                "net_advantage_prepare_gate_policy_coef": 0.18,
+                "net_advantage_prepare_gate_event_coef": 0.42,
+                "net_advantage_prepare_gate_clip": 1.35,
+                "target_kl": 0.0048,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v53_service_net_advantage_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v52_net_advantage_mappo")
+        kwargs.update(
+            {
+                "backhaul_aware_service_fill_bias": 1.55,
+                "backhaul_aware_redundant_fill_penalty": 0.70,
+                "idle_execution_local_bonus": 0.42,
+                "idle_execution_current_rsu_delay_coef": 0.50,
+                "opportunity_current_rsu_efficiency_coef": 0.42,
+                "opportunity_local_fallback_coef": 0.18,
+                "opportunity_backhaul_penalty_coef": 0.34,
+                "net_advantage_prepare_gate_bias": 2.10,
+                "net_advantage_prepare_gate_min_score": 0.52,
+                "net_advantage_prepare_gate_margin": 0.14,
+                "net_advantage_prepare_gate_prefetch_scale": 0.48,
+                "net_advantage_prepare_gate_current_scale": 0.86,
+                "net_advantage_prepare_gate_service_fill_scale": 0.92,
+                "net_advantage_prepare_gate_local_penalty_scale": 0.72,
+                "net_advantage_prepare_gate_cost_scale": 0.62,
+                "net_advantage_prepare_gate_policy_coef": 0.24,
+                "net_advantage_prepare_gate_event_coef": 0.44,
+                "net_advantage_prepare_gate_clip": 1.45,
+                "target_kl": 0.0046,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v54_service_completion_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v53_service_net_advantage_mappo")
+        kwargs.update(
+            {
+                "service_completion_gate_enabled": True,
+                "service_completion_gate_bias": 3.20,
+                "service_completion_gate_remaining_nodes_threshold": 2,
+                "service_completion_gate_event_suppression_scale": 0.82,
+                "service_completion_gate_prefetch_suppression_scale": 0.52,
+                "service_completion_gate_fallback_suppression_scale": 1.10,
+                "service_completion_gate_policy_coef": 0.36,
+                "service_completion_gate_event_coef": 0.24,
+                "service_completion_gate_clip": 1.60,
+                "net_advantage_prepare_gate_bias": 2.35,
+                "net_advantage_prepare_gate_current_scale": 0.94,
+                "net_advantage_prepare_gate_service_fill_scale": 1.02,
+                "net_advantage_prepare_gate_local_penalty_scale": 0.88,
+                "net_advantage_prepare_gate_policy_coef": 0.30,
+                "net_advantage_prepare_gate_event_coef": 0.48,
+                "target_kl": 0.0046,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v55_coverage_recovery_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v54_service_completion_mappo")
+        kwargs.update(
+            {
+                "coverage_recovery_gate_bias_scale": 1.65,
+                "coverage_recovery_gate_min_scale": 0.62,
+                "coverage_recovery_gate_fallback_suppression_scale": 2.35,
+                "coverage_recovery_gate_fast_suppression_scale": 1.50,
+                "coverage_recovery_gate_current_suppression_scale": 0.36,
+                "coverage_recovery_gate_prepare_credit": 1.15,
+                "coverage_recovery_gate_fallback_penalty": 1.55,
+                "coverage_recovery_guard_enabled": True,
+                "net_advantage_prepare_gate_bias": 2.65,
+                "net_advantage_prepare_gate_policy_coef": 0.42,
+                "net_advantage_prepare_gate_event_coef": 0.60,
+                "net_advantage_prepare_gate_clip": 2.10,
+                "service_completion_gate_bias": 3.35,
+                "service_completion_gate_policy_coef": 0.38,
+                "service_completion_gate_event_coef": 0.24,
+                "target_kl": 0.0044,
             }
         )
         return kwargs
@@ -6873,23 +7042,24 @@ def main() -> None:
     if not workflow_states:
         raise RuntimeError("???????? workflow states?")
 
-    _, window_payload = resolve_window_candidates(
-        root_dir=ROOT_DIR,
-        mobility_source=args.mobility_source,
-        mobility_csv_path=args.mobility_csv_path,
-        lust_scenario_root=args.lust_scenario_root,
-        max_mobility_rows=args.max_mobility_rows,
-        rsu_layout=args.rsu_layout,
-        frame_offset=args.frame_offset,
-        window_length=args.window_length,
-        window_selector=args.window_selector,
-        window_count=args.train_window_count,
-        window_scan_stride=args.window_scan_stride,
-        random_seed=args.random_seed,
-        window_mode=args.window_mode,
-    )
     if args.window_plan_path:
-        window_payload = apply_frozen_window_plan(window_payload, args.window_plan_path)
+        window_payload = apply_frozen_window_plan({}, args.window_plan_path)
+    else:
+        _, window_payload = resolve_window_candidates(
+            root_dir=ROOT_DIR,
+            mobility_source=args.mobility_source,
+            mobility_csv_path=args.mobility_csv_path,
+            lust_scenario_root=args.lust_scenario_root,
+            max_mobility_rows=args.max_mobility_rows,
+            rsu_layout=args.rsu_layout,
+            frame_offset=args.frame_offset,
+            window_length=args.window_length,
+            window_selector=args.window_selector,
+            window_count=args.train_window_count,
+            window_scan_stride=args.window_scan_stride,
+            random_seed=args.random_seed,
+            window_mode=args.window_mode,
+        )
     train_window_plan = build_training_window_plan(window_payload, args)
     eval_window_plan = [dict(item) for item in window_payload["selected_windows"]]
     training_window_sampling_config = {
