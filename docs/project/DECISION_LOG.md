@@ -6,7 +6,7 @@
 
 原因：v54 已证明 net-advantage gate 和 service-completion gate 能进入真实策略路径，但主算法仍低于 MAPPO，主要因为无当前 RSU 且有 predicted target 时仍大量执行 action2 fallback。该状态下 fallback 会牺牲跨 RSU workflow continuity 与 warm-state migration，属于 MAPPO credit assignment 的一阶错误；因此应在 CTDE/MAPPO policy 与 advantage 内让 action4 prepare/transfer 获得上下文信用，同时惩罚错误 fallback，而不是继续增加规则包装或 reward offset。
 
-影响：v55 dev full 三 seed mean reward 为 `9.102656`，seed7/13 相对同协议 MAPPO 平均 gap 为 `+2.637109`，相对 PPO 平均 gap 为 `+5.747890`；三 seed no-current action 均为 `{4:1064}`，说明收益来自策略动作机制改变。该候选可以进入下一轮 formal/holdout/support 候选冻结，但当前仍不是 paper-ready：三次训练的 checkpoint consistency audit 在 128 episode 后卡住并被中断，`train_summary.json` 缺失，且尚未完成 window-outer statistics、formal/holdout/support 和 artifact 完整性审计。
+影响：v55 dev full 三 seed mean reward 为 `9.102656`，seed7/13 相对同协议 MAPPO 平均 gap 为 `+2.637109`，相对 PPO 平均 gap 为 `+5.747890`；三 seed no-current action 均为 `{4:1064}`，说明收益来自策略动作机制改变。该候选可以进入下一轮 formal/holdout/support 候选冻结。为避免训练后 full checkpoint audit 阻断 summary 落盘，v55 默认采用 compact post-training audit；compact 只作为 liveness/provenance probe，不能修复 best record，也不能替代 paper-grade full consistency audit。当前仍不是 paper-ready，尚未完成 window-outer statistics、formal/holdout/support 和 artifact 完整性审计。
 
 ## 2026-07-22: v46 晋级为 offset-free dev 候选，但不触发 paper-ready claim
 

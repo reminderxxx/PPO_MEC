@@ -956,6 +956,7 @@ PROFILE_DEFAULTS = {
         "train_window_count": 20,
         "reward_positive_offset": 0.0,
         "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
     },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
@@ -1110,6 +1111,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min_mechanism_activating_windows", type=int, default=0)
     parser.add_argument("--warm_start_checkpoint_path", type=str, default="")
     parser.add_argument("--audit_update_checkpoints", action="store_true")
+    parser.add_argument("--post_training_audit_mode", choices=["full", "compact"], default=None)
+    parser.add_argument("--post_training_audit_max_windows", type=int, default=None)
+    parser.add_argument("--post_training_audit_max_workflows", type=int, default=None)
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "artifacts" / "training" / "main_agents"))
     args = parser.parse_args()
     if args.smoke_run:
@@ -1122,6 +1126,8 @@ def parse_args() -> argparse.Namespace:
         args.reward_positive_offset = float(profile_defaults.get("reward_positive_offset", 5.0))
     if args.prediction_horizon is None:
         args.prediction_horizon = int(profile_defaults.get("prediction_horizon", 3))
+    if args.post_training_audit_mode is None:
+        args.post_training_audit_mode = str(profile_defaults.get("post_training_audit_mode", "full"))
     if "gamma" in profile_defaults and float(args.gamma) == 0.99:
         args.gamma = float(profile_defaults["gamma"])
     if "gae_lambda" in profile_defaults and float(args.gae_lambda) == 0.95:
@@ -5142,6 +5148,25 @@ def build_policy_learning_gate(
     }
 
 
+def resolve_post_training_audit_scope(args: argparse.Namespace) -> dict[str, Any]:
+    mode = str(getattr(args, "post_training_audit_mode", "full") or "full").strip().lower()
+    if mode not in {"full", "compact"}:
+        mode = "full"
+    explicit_windows = getattr(args, "post_training_audit_max_windows", None)
+    explicit_workflows = getattr(args, "post_training_audit_max_workflows", None)
+    max_windows = int(explicit_windows) if explicit_windows is not None and int(explicit_windows) > 0 else None
+    max_workflows = int(explicit_workflows) if explicit_workflows is not None and int(explicit_workflows) > 0 else None
+    if mode == "compact":
+        max_windows = max_windows or 1
+        max_workflows = max_workflows or 1
+    return {
+        "mode": mode,
+        "max_windows": max_windows,
+        "max_workflows": max_workflows,
+        "full_protocol": bool(mode == "full" and max_windows is None and max_workflows is None),
+    }
+
+
 
 def run_checkpoint_consistency_audit(
     *,
@@ -5152,6 +5177,7 @@ def run_checkpoint_consistency_audit(
     args: argparse.Namespace,
     best_record: dict[str, Any],
 ) -> dict[str, Any]:
+    audit_scope = resolve_post_training_audit_scope(args)
     selection_evaluation_mode = str(
         best_record.get("selection_protocol", {}).get("policy_evaluation_mode", "safety_projected")
     ).strip().lower()
@@ -5231,6 +5257,8 @@ def run_checkpoint_consistency_audit(
                 eval_windows=eval_windows,
                 args=args,
                 include_reference_agents=False,
+                max_workflows=audit_scope["max_workflows"],
+                max_windows=audit_scope["max_windows"],
                 protocol_name="checkpoint_consistency_protocol_eval",
                 policy_evaluation_mode=selection_evaluation_mode,
             )
@@ -5425,12 +5453,31 @@ def run_checkpoint_consistency_audit(
     return {
         "agent_name": current_agent_name,
         "config_profile": args.profile,
+        "audit_scope": {
+            "mode": audit_scope["mode"],
+            "full_protocol": audit_scope["full_protocol"],
+            "repair_best_record_eligible": bool(audit_scope["full_protocol"]),
+            "max_windows": audit_scope["max_windows"],
+            "max_workflows": audit_scope["max_workflows"],
+            "scope_note": (
+                "compact audit is a post-training liveness/provenance probe only; "
+                "it must not be used as paper-grade checkpoint consistency evidence"
+                if audit_scope["mode"] == "compact"
+                else "full selected-window checkpoint consistency audit"
+            ),
+        },
         "run_scale": build_run_scale_info(args.profile, args.episodes, max(1, len(source_candidates))),
         "selection_protocol": {
             "protocol_name": "all_selected_windows_x_all_selected_workflows_deterministic",
             "policy_evaluation_mode": selection_evaluation_mode,
-            "eval_window_ids": [item.get("window_id") for item in eval_windows],
-            "workflow_ids": [workflow_state.workflow_id for workflow_state in workflow_states],
+            "eval_window_ids": [
+                item.get("window_id")
+                for item in list(eval_windows[: audit_scope["max_windows"] or len(eval_windows)])
+            ],
+            "workflow_ids": [
+                workflow_state.workflow_id
+                for workflow_state in list(workflow_states[: audit_scope["max_workflows"] or len(workflow_states)])
+            ],
         },
         "audited_checkpoints": audited,
         "recorded_best_paths": {
@@ -6629,6 +6676,7 @@ def build_checkpoint_family_eval(
     eval_windows: list[dict[str, Any]],
     args: argparse.Namespace,
 ) -> dict[str, Any]:
+    audit_scope = resolve_post_training_audit_scope(args)
     family_results: dict[str, Any] = {}
     for label in [
         "best_by_reward",
@@ -6655,6 +6703,8 @@ def build_checkpoint_family_eval(
                 eval_windows=eval_windows,
                 args=args,
                 include_reference_agents=True,
+                max_workflows=audit_scope["max_workflows"],
+                max_windows=audit_scope["max_windows"],
                 protocol_name=f"{label}_family_eval",
             )
             checkpoint_metadata = load_checkpoint_metadata(str(checkpoint_path))
@@ -6685,6 +6735,12 @@ def build_checkpoint_family_eval(
     return {
         "agent_name": current_agent_name,
         "config_profile": args.profile,
+        "audit_scope": {
+            "mode": audit_scope["mode"],
+            "full_protocol": audit_scope["full_protocol"],
+            "max_windows": audit_scope["max_windows"],
+            "max_workflows": audit_scope["max_workflows"],
+        },
         "family_results": family_results,
     }
 
@@ -7457,20 +7513,29 @@ def main() -> None:
         args=args,
         best_record=best_checkpoint_record,
     )
-    best_checkpoint_record, best_record_repaired = repair_best_checkpoint_record_from_audit(
-        checkpoint_root=checkpoint_root,
-        best_record=best_checkpoint_record,
-        audit_payload=checkpoint_consistency_audit,
-    )
-    if best_record_repaired:
-        checkpoint_consistency_audit = run_checkpoint_consistency_audit(
-            current_agent_name=args.agent_name,
+    audit_scope = dict(checkpoint_consistency_audit.get("audit_scope", {}) or {})
+    if bool(audit_scope.get("repair_best_record_eligible", False)):
+        best_checkpoint_record, best_record_repaired = repair_best_checkpoint_record_from_audit(
             checkpoint_root=checkpoint_root,
-            workflow_states=workflow_states,
-            eval_windows=eval_window_plan,
-            args=args,
             best_record=best_checkpoint_record,
+            audit_payload=checkpoint_consistency_audit,
         )
+        if best_record_repaired:
+            checkpoint_consistency_audit = run_checkpoint_consistency_audit(
+                current_agent_name=args.agent_name,
+                checkpoint_root=checkpoint_root,
+                workflow_states=workflow_states,
+                eval_windows=eval_window_plan,
+                args=args,
+                best_record=best_checkpoint_record,
+            )
+    else:
+        best_record_repaired = False
+        checkpoint_consistency_audit["best_record_repair_skipped"] = {
+            "skipped": True,
+            "reason": "post_training_audit_mode_is_not_full_protocol",
+            "audit_mode": str(audit_scope.get("mode", "unknown")),
+        }
     mechanism_collapse_audit = build_mechanism_collapse_audit(update_eval_history=update_eval_history, current_agent_name=args.agent_name)
     checkpoint_family_eval = build_checkpoint_family_eval(
         current_agent_name=args.agent_name,
@@ -7597,6 +7662,12 @@ def main() -> None:
             "raw_policy_definition": "learned_logits_plus_action_mask_without_policy_adjustments_or_safety_rules",
             "eval_window_ids": [item.get("window_id") for item in eval_window_plan],
             "workflow_ids": [workflow_state.workflow_id for workflow_state in workflow_states],
+        },
+        "post_training_audit_config": {
+            "mode": str(getattr(args, "post_training_audit_mode", "full")),
+            "max_windows": getattr(args, "post_training_audit_max_windows", None),
+            "max_workflows": getattr(args, "post_training_audit_max_workflows", None),
+            "checkpoint_consistency_audit_scope": checkpoint_consistency_audit.get("audit_scope", {}),
         },
         "output_dir": str(output_root),
         "latest_checkpoint_path": best_checkpoint_record.get("latest_checkpoint_path", ""),

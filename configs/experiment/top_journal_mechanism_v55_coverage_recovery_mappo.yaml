@@ -38,6 +38,11 @@ training_window_protocol:
   handoff_imminent_oversample_ratio: 1.50
   target_mismatch_sample_weight: 1.50
   min_mechanism_activating_windows: 4
+post_training_audit_protocol:
+  default_mode: compact
+  compact_scope: 1_window_x_1_workflow
+  full_protocol_required_for_paper_ready: true
+  repair_best_record_from_compact_audit: false
 prediction_protocol:
   predictor_kind: baseline
   predictor_name: baseline_predictor_v3

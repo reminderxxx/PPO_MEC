@@ -1825,6 +1825,7 @@ class AlgoPoolContractTestCase(unittest.TestCase):
 
         self.assertEqual(defaults["prediction_horizon"], 16)
         self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertEqual(defaults["post_training_audit_mode"], "compact")
         self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
         self.assertTrue(kwargs["net_advantage_prepare_gate_enabled"])
         self.assertTrue(kwargs["service_completion_gate_enabled"])

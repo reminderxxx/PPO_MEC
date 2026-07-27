@@ -190,6 +190,22 @@ v20 future-validation benchmark 与统计：
 
 当前结论：v20 是 current best algorithmic candidate；future-validation 上 reward 超过全部对照，并相对 popularity 给出 Holm 校正后的正向证据。但它不是 final paper package，promotion 前必须补齐 formal/hidden/support、collapse 解释和机制指标 trade-off 审查。
 
+### v55 coverage-recovery MAPPO 候选
+
+v55 解决 v54 之后的一阶失败模式：no-current-RSU 但 predictor 给出 distinct target 时，主策略不应继续学习 vehicle fallback，而应通过 MAPPO policy / event advantage 的 coverage-recovery credit 学习 handoff prepare / transfer。该候选不改 reward、action contract、baseline contract 或 evaluator wrapping。
+
+开发训练默认使用 compact post-training audit，保证 `train_summary.json` 先落盘，同时在 summary 中标明 `full_protocol=false`。compact audit 只用于 liveness/provenance probe，不得作为 paper-grade checkpoint consistency evidence：
+
+```bash
+.venv/bin/python scripts/train_sa_ghmappo_real_sample.py --agent_name sa_ghmappo --profile top_journal_mechanism_v55_coverage_recovery_mappo --random_seed <seed> --max_mobility_rows 5000000 --max_workflows 2 --workflow_selector ordered --rsu_layout auto_dominant_tight --window_selector max_handoff_candidate --window_length 24 --window_scan_stride 20 --window_mode mixed_informative --train_window_count 20 --primary_vehicle_selection handoff_pressure --min_tasks 5 --max_tasks 20 --reward_positive_offset 0.0 --prediction_horizon 16 --output_root artifacts/training/top_journal_v55_coverage_recovery_full_dev
+```
+
+正式候选冻结或 paper-ready 审查前，必须补跑 full checkpoint consistency audit / final package；训练入口可显式开启完整后处理审计，但应预留较长运行时间：
+
+```bash
+.venv/bin/python scripts/train_sa_ghmappo_real_sample.py --agent_name sa_ghmappo --profile top_journal_mechanism_v55_coverage_recovery_mappo --random_seed <seed> --post_training_audit_mode full --max_mobility_rows 5000000 --max_workflows 2 --workflow_selector ordered --rsu_layout auto_dominant_tight --window_selector max_handoff_candidate --window_length 24 --window_scan_stride 20 --window_mode mixed_informative --train_window_count 20 --primary_vehicle_selection handoff_pressure --min_tasks 5 --max_tasks 20 --reward_positive_offset 0.0 --prediction_horizon 16 --output_root artifacts/training/top_journal_v55_coverage_recovery_full_audited
+```
+
 ## Supervised Handoff Predictor
 
 训练薄 supervised predictor：
