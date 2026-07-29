@@ -1,0 +1,71 @@
+profile: top_journal_mechanism_v65_argmax_margin_mappo
+base_profile: top_journal_mechanism_v64_handoff_alignment_barrier_mappo
+purpose: >
+  Offset-free MAPPO candidate that targets the v64 failure mode: stochastic
+  training trajectories avoid excessive prepare, but deterministic benchmark
+  argmax collapses toward action4 in mechanism-activating windows, causing high
+  adapter misses and low workflow continuity.
+algorithm_delta:
+  - Adds an argmax-margin regularizer to the hierarchical MAPPO env-action
+    policy. Tail-risk samples compare counterfactual service-continuity credit
+    for valid env actions and require the best current-service action to exceed
+    prepare/prefetch scores by a minimum margin.
+  - Keeps the centralized critic, hierarchical actor heads, action mask, reward
+    protocol, action schema, baselines, and evaluator unchanged. This is a
+    policy-gradient learning term, not post-policy action replacement.
+  - Reduces over-strong prepare priors from v64 so deterministic action choice
+    is determined more by reward-grounded counterfactual margin.
+negative_controls:
+  - v63 and v64 lose to PPO, popularity, and DT because high mechanism
+    realization does not translate into service continuity.
+  - v65 must be accepted only if full mixed_informative and full_stratified
+    artifacts show higher offset-free total_reward than every benchmark agent.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+training_window_protocol:
+  window_mode: full_stratified
+  train_window_mode: rotate
+post_training_audit_protocol:
+  default_mode: compact
+  compact_scope: 1_window_x_1_workflow
+  full_protocol_required_for_paper_ready: true
+  repair_best_record_from_compact_audit: false
+prediction_protocol:
+  predictor_kind: baseline
+  predictor_name: baseline_predictor_v3
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+argmax_margin_regularization:
+  argmax_margin_regularization_enabled: true
+  argmax_margin_coef: 0.76
+  argmax_margin_min_gap: 0.42
+  argmax_margin_max_weight: 4.80
+  argmax_margin_tail_risk_threshold: 0.04
+  argmax_margin_mechanism_penalty_scale: 1.65
+prepare_prior_rebalance:
+  event_logit_sharpening_final_scale: 1.55
+  event_prepare_margin_boost: 0.12
+  digital_twin_policy_prior_logit_bias: 2.05
+  digital_twin_policy_prior_distill_coef: 0.026
+  net_advantage_prepare_gate_bias: 2.18
+current_service_counterfactual:
+  cache_feasibility_cache_fill_bias: 9.20
+  cache_feasibility_current_miss_prepare_penalty: 14.60
+  cache_feasibility_current_miss_prefetch_penalty: 9.40
+  service_continuity_current_bonus: 2.18
+  service_continuity_prepare_bonus: 0.18
+  env_action_adapter_miss_counterfactual_coef: 4.80
+  env_action_risk_adjusted_recovery_coef: 3.45
+  env_action_counterfactual_margin_coef: 0.58
+paper_claim_boundary: >
+  Candidate only. It is not paper-ready unless independent formal, holdout, and
+  support-suite artifacts with complete provenance show robust superiority and
+  satisfy docs/project/top_journal_review_policy.md.

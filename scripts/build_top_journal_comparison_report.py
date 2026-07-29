@@ -93,6 +93,7 @@ ACTION_MIX_METRICS = [
     "env_invalid_action_count",
     "action_projection_count",
     "guard_action_delta_count",
+    "coverage_recovery_final_guard_count",
     "dag_frontier_size_mean",
     "dag_critical_path_pressure_mean",
     "dag_current_node_dependency_pressure_mean",

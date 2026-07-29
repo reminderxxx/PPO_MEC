@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-07-29: v70 采用 sparse-tail option-policy prior 修复 formal full 短板
+
+决策：新增 `top_journal_mechanism_v70_sparse_tail_option_mappo`，把 v67/v69 的 idle/sparse 失败点从 reward-side credit 转到 MAPPO option-policy boundary 上解决。实现上在 SA-GHMAPPO policy 内，当 frozen mobility context、handoff prediction、adapter requirement 和 target-RSU evidence 表明处于 sparse handoff-tail risk 时，直接提高 `mechanism_prepare` option logits，压低 `popularity_safe` 与 local fallback option logits，同时保留 event/action head 的 sparse handoff recovery prior。不修改环境 reward、action contract、baseline contract、window plan 或 evaluator result filtering。
+
+原因：v67 在 mixed 上超过 DT，但 full_stratified 低于 DT 的 gap 全部来自 `idle_or_sparse`。v69 增加 success-conditioned realization credit 后，checkpoint config 已保存新字段，但 frozen benchmark 行为与 v67 完全一致，说明问题不是 credit 数值本身，而是 option gate 在稀疏尾部仍选择 popularity/local 安全分支，导致机制准备无法兑现。要发挥 MAPPO 的学习能力，需要让 option head 在关键上下文接收到可学习的先验边界，而不是继续改 reward 或加评估包装。
+
+影响：v70 3-seed formal-min 全量 benchmark 已完成。mixed 中 SA `33.763250`，高于 DT `32.922750`、popularity `31.756250`、PPO `29.017167`、MAPPO `18.310000`；full_stratified 中 SA `32.385729`，高于 DT `31.426667`、popularity `29.969271`、PPO `27.301597`、MAPPO `16.261458`。full-only hierarchical statistics 中 SA vs DT total reward delta `+0.959063`，95% CI `[0.554171, 1.691468]`。分层上 mechanism/active 不变，`idle_or_sparse` 从 `27.1015` 提升到 `30.7365`，证明增益来自修复 sparse-tail option selection。v70 可作为新的 formal-min all-baseline reward winner 候选进入下一轮独立 holdout/support/ablation 审查，但当前仍不是 TMC-ready 或 paper-ready。
+
 ## 2026-07-27: v55 采用 coverage-recovery counterfactual MAPPO gate 拉开奖励差距
 
 决策：新增 `top_journal_mechanism_v55_coverage_recovery_mappo`，把 no-current-RSU 覆盖缺口从 vehicle fallback 学习目标改为 predictive coverage recovery 目标。实现上在 SA-GHMAPPO/MAPPO 主策略内部加入 coverage-recovery logits bias、fallback/current suppression、partial-credit positive/negative terms、no-RSU option candidate 和可审计 guard；不修改环境 reward、action contract、baseline contract、window plan 或 evaluator result filtering。

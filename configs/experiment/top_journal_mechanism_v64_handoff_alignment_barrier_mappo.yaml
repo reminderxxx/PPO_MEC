@@ -1,0 +1,75 @@
+profile: top_journal_mechanism_v64_handoff_alignment_barrier_mappo
+base_profile: top_journal_mechanism_v63_current_ready_two_stage_mappo
+purpose: >
+  Offset-free MAPPO candidate that targets the v63 first-order failure:
+  handoff prepare/prefetch actions can cache a predicted target that is not the
+  first post-step service RSU, creating adapter misses and lower workflow
+  continuity despite high mechanism realization.
+algorithm_delta:
+  - Adds a handoff-alignment barrier inside the centralized hierarchical MAPPO
+    policy. When the current service adapter is missing, the first non-current
+    RSU is not ready, the handoff target mismatches the first predicted hop, or
+    ETA is beyond the useful prepare window, action4 prepare and action1
+    prefetch receive negative actor logits.
+  - Adds matching counterfactual credit so adapter-miss samples no longer give
+    positive prepare/prefetch credit unless the prepare was actually safe:
+    successful mechanism, high ready rate, high continuity, and low adapter
+    miss.
+  - Keeps all reward accounting, action schema, benchmark baselines, and
+    evaluation protocol unchanged. This is not an evaluator wrapper or
+    post-policy action replacement.
+negative_controls:
+  - Corrected v63 still loses to PPO, popularity, and DT because mechanism
+    activating windows overuse prepare/prefetch and suffer high adapter miss
+    counts.
+  - v64 must be judged by corrected mixed_informative and full_stratified
+    benchmark artifacts, not by training reward alone.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+training_window_protocol:
+  window_mode: full_stratified
+  train_window_mode: rotate
+post_training_audit_protocol:
+  default_mode: compact
+  compact_scope: 1_window_x_1_workflow
+  full_protocol_required_for_paper_ready: true
+  repair_best_record_from_compact_audit: false
+prediction_protocol:
+  predictor_kind: baseline
+  predictor_name: baseline_predictor_v3
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+handoff_alignment_barrier:
+  handoff_alignment_barrier_enabled: true
+  handoff_alignment_barrier_prepare_penalty: 12.50
+  handoff_alignment_barrier_prefetch_penalty: 7.20
+  handoff_alignment_barrier_current_fill_bias: 8.80
+  handoff_alignment_barrier_target_mismatch_penalty: 5.60
+  handoff_alignment_barrier_late_eta_penalty: 3.20
+  handoff_alignment_barrier_min_context: 0.0
+current_ready_two_stage_prior:
+  cache_feasibility_prior_enabled: true
+  cache_feasibility_cache_fill_bias: 8.40
+  cache_feasibility_steady_penalty: 6.20
+  cache_feasibility_current_miss_prepare_penalty: 12.80
+  cache_feasibility_current_miss_prefetch_penalty: 7.80
+  cache_feasibility_prepare_penalty: 1.45
+  cache_feasibility_prefetch_penalty: 1.65
+adapter_miss_counterfactual_learning:
+  env_action_adapter_miss_counterfactual_coef: 4.20
+  env_action_risk_adjusted_recovery_coef: 3.10
+  env_action_sparse_recovery_focus: 0.34
+  env_action_counterfactual_margin_enabled: true
+  counterfactual_teacher_prd_enabled: true
+paper_claim_boundary: >
+  Candidate only. It can support a paper claim only after independent formal,
+  holdout, and support-suite artifacts with complete provenance show robust
+  superiority without hidden tuning or overlap leakage.

@@ -1,0 +1,64 @@
+profile: top_journal_mechanism_v57_service_continuity_counterfactual_mappo
+base_profile: top_journal_mechanism_v56_partial_observation_handoff_memory_mappo
+purpose: >
+  Offset-free MAPPO candidate that targets the v56 benchmark gap: the main
+  policy still fell back to local vehicle execution in no-current-RSU / weak
+  context states, while PPO and DT kept RSU service continuity and obtained
+  higher reward. v57 turns that finding into policy-internal counterfactual
+  learning rather than an evaluator wrapper.
+algorithm_delta:
+  - Adds a service-continuity counterfactual teacher for MAPPO updates. The
+    teacher gives positive credit to current-RSU service continuation and
+    context-supported prepare actions, and negative credit to local fallback.
+  - Adds the same service-continuity credit to the option-gate partial reward,
+    so option selection learns to avoid no_rsu_local when RSU service is valid.
+  - Adds a no-current-RSU service prior inside the opportunity-constrained
+    policy logits, biasing action3 and suppressing action2 before sampling /
+    deterministic argmax.
+  - Changes the no-current-RSU popularity candidate used by the option gate to
+    prefer service continuity when enabled.
+  - Keeps the reward function, action schema, environment transition, baseline
+    contracts, benchmark consumers, and window selection unchanged.
+negative_controls:
+  - v56 full benchmark showed coverage_recovery_final_guard_count=0 and a large
+    idle_or_sparse loss caused by local_exec_count, so merely strengthening
+    handoff-target memory is insufficient.
+  - This is not reward offset, evaluator wrapping, result filtering, heuristic
+    baseline weakening, or test-window selection.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+training_window_protocol:
+  window_mode: mixed_informative
+  mechanism_window_oversample_ratio: 2.25
+  handoff_imminent_oversample_ratio: 1.50
+  target_mismatch_sample_weight: 1.50
+  min_mechanism_activating_windows: 4
+post_training_audit_protocol:
+  default_mode: compact
+  compact_scope: 1_window_x_1_workflow
+  full_protocol_required_for_paper_ready: true
+  repair_best_record_from_compact_audit: false
+prediction_protocol:
+  predictor_kind: baseline
+  predictor_name: baseline_predictor_v3
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+service_continuity_counterfactual:
+  enabled: true
+  no_current_rsu_service_prior: true
+  local_fallback_penalty: true
+  option_gate_credit: true
+  env_action_ppo_teacher: true
+paper_claim_boundary: >
+  Candidate only. It may advance to paper-ready only if independent formal /
+  holdout / support-suite evidence, multi-seed statistics, provenance, and
+  top-journal audit show robust superiority without reward offset, wrapping,
+  result filtering, or hidden/test-set tuning.

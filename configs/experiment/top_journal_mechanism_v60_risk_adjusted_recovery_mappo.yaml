@@ -1,0 +1,54 @@
+profile: top_journal_mechanism_v60_risk_adjusted_recovery_mappo
+base_profile: top_journal_mechanism_v59_sparse_recovery_curriculum_mappo
+purpose: >
+  Offset-free MAPPO candidate that repairs the v59 failure mode: sparse recovery
+  improved idle_or_sparse reward, but over-weighted prepare/prefetch actions
+  reduced continuity and total reward on mechanism_activating windows.
+algorithm_delta:
+  - Adds risk-adjusted recovery credit inside env-action PPO. The centralized
+    MAPPO advantage is penalized when a prepare action is followed by failed
+    migration, cache miss pressure, handoff failure, or unfinished workflow.
+  - Applies the same risk signal to counterfactual env-action margin learning,
+    discounting teacher-driven prepare targets after failed mechanism outcomes.
+  - Keeps full_stratified curriculum from v59, but lowers sparse-recovery and
+    teacher weights so rare-context learning does not dominate active windows.
+  - Preserves reward protocol, environment transition rules, action schema, and
+    benchmark baselines. This is not an evaluator wrapper or result filter.
+negative_controls:
+  - Corrected v59 improves idle_or_sparse reward versus PPO/MAPPO but fails
+    total-reward and continuity gates against popularity and DT on mixed/full.
+  - v60 must be judged by corrected mixed_informative and full_stratified
+    benchmark artifacts, not by training reward alone.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+training_window_protocol:
+  window_mode: full_stratified
+  train_window_mode: rotate
+post_training_audit_protocol:
+  default_mode: compact
+  compact_scope: 1_window_x_1_workflow
+  full_protocol_required_for_paper_ready: true
+  repair_best_record_from_compact_audit: false
+prediction_protocol:
+  predictor_kind: baseline
+  predictor_name: baseline_predictor_v3
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+risk_adjusted_learning:
+  env_action_sparse_recovery_focus: 0.54
+  env_action_risk_adjusted_recovery_coef: 2.20
+  env_action_risk_adjusted_recovery_floor: 0.16
+  env_action_counterfactual_margin_enabled: true
+  counterfactual_teacher_prd_enabled: true
+paper_claim_boundary: >
+  Candidate only. It can support a paper claim only after independent formal,
+  holdout, and support-suite artifacts with complete provenance show robust
+  superiority without hidden tuning or overlap leakage.

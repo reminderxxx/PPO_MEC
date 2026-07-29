@@ -1836,6 +1836,1007 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertGreater(kwargs["coverage_recovery_gate_fallback_penalty"], 1.4)
         self.assertTrue(kwargs["coverage_recovery_guard_enabled"])
 
+    def test_sa_v56_profile_enables_partial_observation_handoff_memory(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v56_partial_observation_handoff_memory_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertEqual(defaults["post_training_audit_mode"], "compact")
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["coverage_recovery_guard_enabled"])
+        self.assertTrue(kwargs["coverage_recovery_final_guard_enabled"])
+        self.assertLess(kwargs["coverage_recovery_gate_min_scale"], 0.50)
+        self.assertLessEqual(kwargs["coverage_recovery_final_guard_min_scale"], 0.20)
+        self.assertGreater(kwargs["coverage_recovery_target_memory_option_credit"], 0.60)
+        self.assertGreater(kwargs["coverage_recovery_target_memory_option_penalty"], 1.0)
+        self.assertGreater(kwargs["net_advantage_prepare_gate_policy_coef"], 0.45)
+        self.assertGreater(kwargs["net_advantage_prepare_gate_event_coef"], 0.60)
+
+    def test_sa_v57_profile_enables_service_continuity_counterfactual(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v57_service_continuity_counterfactual_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["service_continuity_teacher_enabled"])
+        self.assertTrue(kwargs["idle_popularity_no_rsu_service_continuity_enabled"])
+        self.assertTrue(kwargs["option_gate_counterfactual_prd_enabled"])
+        self.assertGreater(kwargs["service_continuity_local_penalty"], 1.0)
+        self.assertGreater(kwargs["service_continuity_current_bonus"], 0.9)
+        self.assertGreater(kwargs["opportunity_constrained_no_rsu_service_bias"], 3.0)
+        self.assertGreater(kwargs["opportunity_constrained_no_rsu_local_penalty"], 3.0)
+
+    def test_sa_v58_profile_enables_ready_aware_counterfactual_margin(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v58_ready_aware_counterfactual_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["counterfactual_teacher_prd_enabled"])
+        self.assertTrue(kwargs["env_action_counterfactual_margin_enabled"])
+        self.assertTrue(kwargs["idle_popularity_no_rsu_any_action_override_enabled"])
+        self.assertTrue(kwargs["option_gate_idle_recovery_mechanism_prior_enabled"])
+        self.assertGreater(kwargs["opportunity_constrained_no_rsu_prepare_bias"], 2.0)
+        self.assertGreater(kwargs["service_continuity_prepare_bonus"], 1.0)
+        self.assertGreater(kwargs["service_continuity_local_penalty"], 1.5)
+
+    def test_sa_v59_profile_enables_sparse_recovery_curriculum(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v59_sparse_recovery_curriculum_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["window_mode"], "full_stratified")
+        self.assertEqual(defaults["train_window_mode"], "rotate")
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["counterfactual_teacher_prd_enabled"])
+        self.assertTrue(kwargs["env_action_counterfactual_margin_enabled"])
+        self.assertGreater(kwargs["env_action_sparse_recovery_focus"], 1.0)
+        self.assertGreater(kwargs["env_action_ppo_teacher_coef"], 1.0)
+        self.assertGreater(kwargs["service_continuity_local_penalty"], 2.0)
+
+        original_argv = sys.argv
+        try:
+            sys.argv = ["train_sa_ghmappo_real_sample.py", "--profile", profile]
+            args = parse_args()
+        finally:
+            sys.argv = original_argv
+        self.assertEqual(args.window_mode, "full_stratified")
+        self.assertEqual(args.train_window_mode, "rotate")
+
+    def test_sa_v60_profile_enables_risk_adjusted_recovery(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v60_risk_adjusted_recovery_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["window_mode"], "full_stratified")
+        self.assertEqual(defaults["train_window_mode"], "rotate")
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["counterfactual_teacher_prd_enabled"])
+        self.assertTrue(kwargs["env_action_counterfactual_margin_enabled"])
+        self.assertGreater(kwargs["env_action_risk_adjusted_recovery_coef"], 1.0)
+        self.assertGreater(
+            kwargs["env_action_risk_adjusted_recovery_coef"],
+            kwargs["env_action_sparse_recovery_focus"],
+        )
+        self.assertLess(kwargs["env_action_sparse_recovery_focus"], 1.0)
+        self.assertGreaterEqual(kwargs["env_action_risk_adjusted_recovery_floor"], 0.0)
+        self.assertLessEqual(kwargs["env_action_risk_adjusted_recovery_floor"], 1.0)
+
+        original_argv = sys.argv
+        try:
+            sys.argv = ["train_sa_ghmappo_real_sample.py", "--profile", profile]
+            args = parse_args()
+        finally:
+            sys.argv = original_argv
+        self.assertEqual(args.window_mode, "full_stratified")
+        self.assertEqual(args.train_window_mode, "rotate")
+
+    def test_sa_v61_profile_enables_adapter_miss_counterfactual(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v61_adapter_miss_counterfactual_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["window_mode"], "full_stratified")
+        self.assertEqual(defaults["train_window_mode"], "rotate")
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["counterfactual_teacher_prd_enabled"])
+        self.assertTrue(kwargs["env_action_counterfactual_margin_enabled"])
+        self.assertGreater(kwargs["env_action_adapter_miss_counterfactual_coef"], 2.0)
+        self.assertGreater(
+            kwargs["env_action_adapter_miss_counterfactual_coef"],
+            kwargs["env_action_risk_adjusted_recovery_coef"],
+        )
+        self.assertLess(kwargs["env_action_sparse_recovery_focus"], 0.5)
+        self.assertGreater(kwargs["env_action_counterfactual_margin_coef"], 0.3)
+
+        original_argv = sys.argv
+        try:
+            sys.argv = ["train_sa_ghmappo_real_sample.py", "--profile", profile]
+            args = parse_args()
+        finally:
+            sys.argv = original_argv
+        self.assertEqual(args.window_mode, "full_stratified")
+        self.assertEqual(args.train_window_mode, "rotate")
+
+    def test_sa_v62_profile_enables_cache_feasibility_prior(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v62_cache_feasibility_prior_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["window_mode"], "full_stratified")
+        self.assertEqual(defaults["train_window_mode"], "rotate")
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["cache_feasibility_prior_enabled"])
+        self.assertGreater(kwargs["cache_feasibility_cache_fill_bias"], 5.0)
+        self.assertGreater(kwargs["cache_feasibility_steady_penalty"], 7.0)
+        self.assertGreater(
+            kwargs["env_action_adapter_miss_counterfactual_coef"],
+            build_sa_ghmappo_profile_kwargs(
+                "top_journal_mechanism_v61_adapter_miss_counterfactual_mappo"
+            )["env_action_adapter_miss_counterfactual_coef"],
+        )
+        self.assertLess(kwargs["target_kl"], 0.0035)
+
+        original_argv = sys.argv
+        try:
+            sys.argv = ["train_sa_ghmappo_real_sample.py", "--profile", profile]
+            args = parse_args()
+        finally:
+            sys.argv = original_argv
+        self.assertEqual(args.window_mode, "full_stratified")
+        self.assertEqual(args.train_window_mode, "rotate")
+
+    def test_sa_v63_profile_enables_current_ready_two_stage_prior(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v63_current_ready_two_stage_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+        v62_kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v62_cache_feasibility_prior_mappo"
+        )
+
+        self.assertEqual(defaults["window_mode"], "full_stratified")
+        self.assertEqual(defaults["train_window_mode"], "rotate")
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["cache_feasibility_prior_enabled"])
+        self.assertGreater(kwargs["cache_feasibility_cache_fill_bias"], v62_kwargs["cache_feasibility_cache_fill_bias"])
+        self.assertGreater(kwargs["cache_feasibility_current_miss_prepare_penalty"], 8.0)
+        self.assertGreater(kwargs["cache_feasibility_current_miss_prefetch_penalty"], 5.0)
+        self.assertGreater(
+            kwargs["cache_feasibility_current_miss_prepare_penalty"],
+            kwargs["cache_feasibility_prepare_penalty"],
+        )
+        self.assertLess(kwargs["target_kl"], v62_kwargs["target_kl"])
+
+        original_argv = sys.argv
+        try:
+            sys.argv = ["train_sa_ghmappo_real_sample.py", "--profile", profile]
+            args = parse_args()
+        finally:
+            sys.argv = original_argv
+        self.assertEqual(args.window_mode, "full_stratified")
+        self.assertEqual(args.train_window_mode, "rotate")
+
+    def test_sa_v64_profile_enables_handoff_alignment_barrier(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v64_handoff_alignment_barrier_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+        v63_kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v63_current_ready_two_stage_mappo"
+        )
+
+        self.assertEqual(defaults["window_mode"], "full_stratified")
+        self.assertEqual(defaults["train_window_mode"], "rotate")
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["handoff_alignment_barrier_enabled"])
+        self.assertGreater(kwargs["handoff_alignment_barrier_prepare_penalty"], 12.0)
+        self.assertGreater(kwargs["handoff_alignment_barrier_prefetch_penalty"], 7.0)
+        self.assertGreater(
+            kwargs["cache_feasibility_current_miss_prepare_penalty"],
+            v63_kwargs["cache_feasibility_current_miss_prepare_penalty"],
+        )
+        self.assertLess(kwargs["service_continuity_prepare_bonus"], v63_kwargs["service_continuity_prepare_bonus"])
+        self.assertLess(kwargs["target_kl"], v63_kwargs["target_kl"])
+
+        original_argv = sys.argv
+        try:
+            sys.argv = ["train_sa_ghmappo_real_sample.py", "--profile", profile]
+            args = parse_args()
+        finally:
+            sys.argv = original_argv
+        self.assertEqual(args.window_mode, "full_stratified")
+        self.assertEqual(args.train_window_mode, "rotate")
+
+    def test_sa_v65_profile_enables_argmax_margin_mappo(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v65_argmax_margin_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+        v64_kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v64_handoff_alignment_barrier_mappo"
+        )
+
+        self.assertEqual(defaults["window_mode"], "full_stratified")
+        self.assertEqual(defaults["train_window_mode"], "rotate")
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["argmax_margin_regularization_enabled"])
+        self.assertGreater(kwargs["argmax_margin_coef"], 0.70)
+        self.assertLess(kwargs["event_logit_sharpening_final_scale"], v64_kwargs["event_logit_sharpening_final_scale"])
+        self.assertLess(kwargs["digital_twin_policy_prior_logit_bias"], v64_kwargs["digital_twin_policy_prior_logit_bias"])
+        self.assertGreater(kwargs["service_continuity_current_bonus"], v64_kwargs["service_continuity_current_bonus"])
+        self.assertLess(kwargs["service_continuity_prepare_bonus"], v64_kwargs["service_continuity_prepare_bonus"])
+        self.assertLess(kwargs["target_kl"], v64_kwargs["target_kl"])
+
+        original_argv = sys.argv
+        try:
+            sys.argv = ["train_sa_ghmappo_real_sample.py", "--profile", profile]
+            args = parse_args()
+        finally:
+            sys.argv = original_argv
+        self.assertEqual(args.window_mode, "full_stratified")
+        self.assertEqual(args.train_window_mode, "rotate")
+
+    def test_sa_v66_profile_restores_sparse_recovery_with_safe_cpi(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v66_sparse_safe_cpi_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+        v65_kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v65_argmax_margin_mappo"
+        )
+
+        self.assertEqual(defaults["window_mode"], "full_stratified")
+        self.assertEqual(defaults["train_window_mode"], "rotate")
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["argmax_margin_regularization_enabled"])
+        self.assertGreater(kwargs["env_action_sparse_recovery_focus"], v65_kwargs["env_action_sparse_recovery_focus"])
+        self.assertGreater(kwargs["digital_twin_policy_prior_distill_coef"], v65_kwargs["digital_twin_policy_prior_distill_coef"])
+        self.assertGreater(kwargs["service_continuity_prepare_bonus"], v65_kwargs["service_continuity_prepare_bonus"])
+        self.assertGreater(kwargs["env_action_ppo_ratio_barrier_coef"], v65_kwargs["env_action_ppo_ratio_barrier_coef"])
+        self.assertLess(kwargs["argmax_margin_coef"], v65_kwargs["argmax_margin_coef"])
+        self.assertLess(kwargs["target_kl"], v65_kwargs["target_kl"])
+
+        original_argv = sys.argv
+        try:
+            sys.argv = ["train_sa_ghmappo_real_sample.py", "--profile", profile]
+            args = parse_args()
+        finally:
+            sys.argv = original_argv
+        self.assertEqual(args.window_mode, "full_stratified")
+        self.assertEqual(args.train_window_mode, "rotate")
+
+    def test_sa_v67_profile_adds_sparse_handoff_recovery_prior(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v67_sparse_handoff_recovery_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+        v66_kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v66_sparse_safe_cpi_mappo"
+        )
+
+        self.assertEqual(defaults["window_mode"], "full_stratified")
+        self.assertEqual(defaults["train_window_mode"], "rotate")
+        self.assertEqual(defaults["prediction_horizon"], 16)
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["sparse_handoff_recovery_prior_enabled"])
+        self.assertGreater(kwargs["sparse_handoff_recovery_prefetch_bias"], 0.0)
+        self.assertGreater(kwargs["sparse_handoff_recovery_prepare_bias"], 0.0)
+        self.assertGreater(kwargs["sparse_handoff_recovery_local_penalty"], 0.0)
+        self.assertGreater(kwargs["env_action_sparse_recovery_focus"], v66_kwargs["env_action_sparse_recovery_focus"])
+        self.assertGreater(kwargs["digital_twin_policy_prior_distill_coef"], v66_kwargs["digital_twin_policy_prior_distill_coef"])
+        self.assertLess(kwargs["target_kl"], v66_kwargs["target_kl"])
+
+        original_argv = sys.argv
+        try:
+            sys.argv = ["train_sa_ghmappo_real_sample.py", "--profile", profile]
+            args = parse_args()
+        finally:
+            sys.argv = original_argv
+        self.assertEqual(args.window_mode, "full_stratified")
+        self.assertEqual(args.train_window_mode, "rotate")
+
+    def test_sa_v67_sparse_recovery_prior_boosts_prefetch_and_suppresses_local(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["window_class"] = "idle_or_sparse"
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["rsus"][1]["cached_adapter_ids"] = []
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            mechanism_logit_bias_strength=0.0,
+            digital_twin_policy_prior_enabled=False,
+            backhaul_aware_policy_enabled=False,
+            continuity_guard_enabled=False,
+            event_logit_sharpening_final_scale=1.0,
+            sparse_handoff_recovery_prior_enabled=True,
+            sparse_handoff_recovery_prefetch_bias=6.0,
+            sparse_handoff_recovery_prepare_bias=4.0,
+            sparse_handoff_recovery_current_fill_bias=1.0,
+            sparse_handoff_recovery_steady_bias=1.0,
+            sparse_handoff_recovery_local_penalty=5.0,
+            sparse_handoff_recovery_min_context=0.05,
+            sparse_handoff_recovery_max_eta=16,
+        )
+        policy_output = {
+            "slow_logits": torch.zeros(3),
+            "fast_logits": torch.zeros(2),
+            "event_logits": torch.zeros(2),
+        }
+
+        adjusted = agent._apply_sparse_handoff_recovery_prior(
+            policy_output,
+            state,
+            run_metadata={"window_class": "idle_or_sparse"},
+        )
+        info = adjusted["sparse_handoff_recovery_prior_info"]
+        env_bias = adjusted["env_action_logits_bias"]
+
+        self.assertTrue(info["active"])
+        self.assertGreater(info["prefetch_bias"], 0.0)
+        self.assertGreater(float(adjusted["slow_logits"][2]), float(policy_output["slow_logits"][2]))
+        self.assertGreater(float(env_bias[1]), 0.0)
+        self.assertLess(float(env_bias[2]), 0.0)
+
+    def test_sa_v68_profile_disables_idle_popularity_fallback_for_actor_native_recovery(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v68_actor_native_sparse_recovery_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+        v67_kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v67_sparse_handoff_recovery_mappo"
+        )
+
+        self.assertEqual(defaults["window_mode"], "full_stratified")
+        self.assertEqual(defaults["train_window_mode"], "rotate")
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(v67_kwargs["idle_popularity_fallback_enabled"])
+        self.assertFalse(kwargs["idle_popularity_fallback_enabled"])
+        self.assertFalse(kwargs["idle_popularity_no_rsu_service_continuity_enabled"])
+        self.assertFalse(kwargs["idle_popularity_no_rsu_any_action_override_enabled"])
+        self.assertTrue(kwargs["sparse_handoff_recovery_prior_enabled"])
+        self.assertGreater(
+            kwargs["sparse_handoff_recovery_prepare_bias"],
+            v67_kwargs["sparse_handoff_recovery_prepare_bias"],
+        )
+        self.assertGreater(
+            kwargs["sparse_handoff_recovery_local_penalty"],
+            v67_kwargs["sparse_handoff_recovery_local_penalty"],
+        )
+        self.assertGreater(
+            kwargs["sparse_handoff_recovery_max_eta"],
+            v67_kwargs["sparse_handoff_recovery_max_eta"],
+        )
+
+        original_argv = sys.argv
+        try:
+            sys.argv = ["train_sa_ghmappo_real_sample.py", "--profile", profile]
+            args = parse_args()
+        finally:
+            sys.argv = original_argv
+        self.assertEqual(args.window_mode, "full_stratified")
+        self.assertEqual(args.train_window_mode, "rotate")
+
+    def test_sa_v69_profile_adds_success_conditioned_sparse_realization_credit(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v69_realization_credit_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+        v67_kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v67_sparse_handoff_recovery_mappo"
+        )
+        v68_kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v68_actor_native_sparse_recovery_mappo"
+        )
+
+        self.assertEqual(defaults["window_mode"], "full_stratified")
+        self.assertEqual(defaults["train_window_mode"], "rotate")
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["sparse_handoff_realization_credit_enabled"])
+        self.assertGreater(kwargs["sparse_handoff_realization_success_bonus"], 0.0)
+        self.assertGreater(kwargs["sparse_handoff_realization_failed_prepare_penalty"], 0.0)
+        self.assertTrue(kwargs["idle_popularity_fallback_enabled"])
+        self.assertTrue(v67_kwargs["idle_popularity_fallback_enabled"])
+        self.assertFalse(v68_kwargs["idle_popularity_fallback_enabled"])
+        self.assertTrue(kwargs["sparse_handoff_recovery_prior_enabled"])
+        self.assertLess(
+            kwargs["sparse_handoff_recovery_prefetch_bias"],
+            v68_kwargs["sparse_handoff_recovery_prefetch_bias"],
+        )
+
+        original_argv = sys.argv
+        try:
+            sys.argv = ["train_sa_ghmappo_real_sample.py", "--profile", profile]
+            args = parse_args()
+        finally:
+            sys.argv = original_argv
+        self.assertEqual(args.window_mode, "full_stratified")
+        self.assertEqual(args.train_window_mode, "rotate")
+
+    def test_sa_v70_profile_adds_sparse_tail_option_prior(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v70_sparse_tail_option_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+        v69_kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v69_realization_credit_mappo"
+        )
+
+        self.assertEqual(defaults["window_mode"], "full_stratified")
+        self.assertEqual(defaults["train_window_mode"], "rotate")
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["sparse_handoff_option_prior_enabled"])
+        self.assertGreater(kwargs["sparse_handoff_option_prepare_bias"], 0.0)
+        self.assertGreater(kwargs["sparse_handoff_option_popularity_penalty"], 0.0)
+        self.assertGreater(kwargs["sparse_handoff_option_local_penalty"], 0.0)
+        self.assertTrue(kwargs["sparse_handoff_realization_credit_enabled"])
+        self.assertTrue(kwargs["idle_popularity_fallback_enabled"])
+        self.assertGreater(
+            kwargs["handoff_risk_option_coef"],
+            v69_kwargs["handoff_risk_option_coef"],
+        )
+
+        original_argv = sys.argv
+        try:
+            sys.argv = ["train_sa_ghmappo_real_sample.py", "--profile", profile]
+            args = parse_args()
+        finally:
+            sys.argv = original_argv
+        self.assertEqual(args.window_mode, "full_stratified")
+        self.assertEqual(args.train_window_mode, "rotate")
+
+    def test_sa_v70_sparse_tail_option_prior_boosts_mechanism_option(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["window_class"] = "idle_or_sparse"
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["rsus"][1]["cached_adapter_ids"] = []
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            mechanism_logit_bias_strength=0.0,
+            digital_twin_policy_prior_enabled=False,
+            backhaul_aware_policy_enabled=False,
+            continuity_guard_enabled=False,
+            event_logit_sharpening_final_scale=1.0,
+            option_gate_enabled=True,
+            option_gate_context_prior_enabled=True,
+            option_gate_idle_recovery_mechanism_prior_enabled=True,
+            sparse_handoff_recovery_prior_enabled=True,
+            sparse_handoff_recovery_prefetch_bias=1.0,
+            sparse_handoff_recovery_prepare_bias=1.0,
+            sparse_handoff_recovery_current_fill_bias=0.0,
+            sparse_handoff_recovery_steady_bias=0.0,
+            sparse_handoff_recovery_local_penalty=1.0,
+            sparse_handoff_recovery_min_context=0.0,
+            sparse_handoff_recovery_max_eta=16,
+            sparse_handoff_option_prior_enabled=True,
+            sparse_handoff_option_prepare_bias=6.0,
+            sparse_handoff_option_popularity_penalty=3.0,
+            sparse_handoff_option_local_penalty=4.0,
+            sparse_handoff_option_min_context=0.0,
+            sparse_handoff_option_max_eta=16,
+        )
+        policy_output = {
+            "slow_logits": torch.zeros(3),
+            "fast_logits": torch.zeros(2),
+            "event_logits": torch.zeros(2),
+            "option_logits": torch.zeros(4),
+        }
+
+        adjusted = agent._apply_sparse_handoff_recovery_prior(
+            policy_output,
+            state,
+            run_metadata={"window_class": "idle_or_sparse"},
+        )
+        candidate_info = agent._build_option_gate_candidates(
+            semantic_state=state,
+            action_mask=[True, True, True, True, True],
+            base_env_action=3,
+            run_metadata={"window_class": "idle_or_sparse"},
+        )
+
+        info = adjusted["sparse_handoff_recovery_prior_info"]
+        self.assertTrue(info["active"])
+        self.assertGreater(info["option_prepare_bias"], 0.0)
+        self.assertGreater(float(adjusted["option_logits"][3]), 0.0)
+        self.assertLess(float(adjusted["option_logits"][1]), 0.0)
+        self.assertLess(float(adjusted["option_logits"][2]), 0.0)
+        self.assertTrue(candidate_info["idle_recovery_context"])
+        self.assertEqual(candidate_info["prior_target"], 3)
+        self.assertTrue(candidate_info["sparse_tail_risk_option_context"]["active"])
+
+    def test_sa_v69_sparse_realization_credit_rewards_success_and_penalizes_failure(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            sparse_handoff_realization_credit_enabled=True,
+            sparse_handoff_realization_success_bonus=1.5,
+            sparse_handoff_realization_ready_bonus=1.2,
+            sparse_handoff_realization_prefetch_bonus=1.0,
+            sparse_handoff_realization_failed_prepare_penalty=2.4,
+            sparse_handoff_realization_local_penalty=1.4,
+            sparse_handoff_realization_min_context=0.0,
+        )
+        base_row = {
+            "action": 4,
+            "decision_info": {
+                "semantic_state": deepcopy(_minimal_semantic_state()),
+                "run_metadata": {"window_class": "idle_or_sparse"},
+            },
+            "action_info": {
+                "final_env_action": 4,
+                "prepare_window_score": 0.42,
+                "temporal_urgency": 0.34,
+                "prediction_confidence": 0.70,
+                "raw_handoff_candidate": True,
+                "option_gate": {
+                    "window_class": "idle_or_sparse",
+                    "idle_recovery_context": True,
+                },
+            },
+            "reward": 1.0,
+        }
+        success_row = deepcopy(base_row)
+        success_row["env_info"] = {
+            "metrics_protocol": {
+                "predicted_handoff_signal": True,
+                "mechanism_success_rate": 0.75,
+                "handoff_ready_rate": 1.0,
+                "prefetch_validated_hit_count": 4.0,
+                "prefetch_validated_hit_rate": 1.0,
+                "migration_success_count": 1.0,
+            }
+        }
+        failed_row = deepcopy(base_row)
+        failed_row["env_info"] = {
+            "metrics_protocol": {
+                "predicted_handoff_signal": True,
+                "mechanism_success_rate": 0.0,
+                "handoff_ready_rate": 0.0,
+                "prefetch_validated_hit_count": 0.0,
+                "migration_failed_count": 4.0,
+                "migration_prepare_requested": True,
+            }
+        }
+
+        self.assertGreater(
+            agent._sparse_handoff_realization_credit(success_row, env_action=4),
+            0.0,
+        )
+        self.assertLess(
+            agent._sparse_handoff_realization_credit(failed_row, env_action=4),
+            0.0,
+        )
+        self.assertLess(
+            agent._sparse_handoff_realization_credit(success_row, env_action=2),
+            agent._sparse_handoff_realization_credit(success_row, env_action=3),
+        )
+
+    def test_sa_v62_policy_prior_boosts_cache_fill_when_current_adapter_missing(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["window_class"] = "mechanism_activating"
+        state["rsus"][0]["cached_adapter_ids"] = []
+        state["rsus"][1]["cached_adapter_ids"] = []
+        state["current_workflow_node"]["required_adapter"] = "adapter_tracking"
+        state["vehicles"][0]["associated_rsu_id"] = "rsu_a"
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": [],
+            "predicted_next_rsu_by_vehicle": {"veh_1": "rsu_a"},
+            "predicted_first_handoff_rsu_by_vehicle": {},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.20},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.80},
+            "dwell_time": {"veh_1": 12.0},
+            "next_rsu_sequence": {"veh_1": ["rsu_a", "rsu_a"]},
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            mechanism_logit_bias_strength=0.0,
+            digital_twin_policy_prior_enabled=False,
+            backhaul_aware_policy_enabled=False,
+            continuity_guard_enabled=False,
+            event_logit_sharpening_final_scale=1.0,
+            opportunity_constrained_policy_enabled=True,
+            opportunity_constrained_min_context=0.45,
+            opportunity_constrained_low_context=0.20,
+            opportunity_constrained_current_bias=0.0,
+            opportunity_constrained_prepare_penalty=0.0,
+            opportunity_constrained_prefetch_penalty=0.0,
+            cache_feasibility_prior_enabled=True,
+            cache_feasibility_cache_fill_bias=5.70,
+            cache_feasibility_steady_penalty=7.40,
+            cache_feasibility_prepare_penalty=1.10,
+            cache_feasibility_prefetch_penalty=1.35,
+            cache_feasibility_min_context=0.0,
+        )
+
+        with torch.no_grad():
+            raw = agent._network.forward_single(state)
+            adjusted = agent._apply_opportunity_constrained_policy(raw, state)
+
+        info = adjusted["opportunity_constrained_policy_info"]
+        self.assertTrue(info["cache_feasibility_prior_active"])
+        self.assertFalse(info["current_cache_ready"])
+        self.assertGreater(float(adjusted["env_action_logits_bias"][0].item()), 5.0)
+        self.assertLess(float(adjusted["env_action_logits_bias"][3].item()), -7.0)
+        self.assertLess(float(adjusted["env_action_logits_bias"][4].item()), 0.0)
+        self.assertLess(float(adjusted["env_action_logits_bias"][1].item()), 0.0)
+        self.assertGreater(float(adjusted["slow_logits"][1].item()), float(raw["slow_logits"][1].item()))
+        self.assertLess(float(adjusted["fast_logits"][0].item()), float(raw["fast_logits"][0].item()))
+
+    def test_sa_v63_current_ready_prior_suppresses_prepare_under_strong_signal_until_current_cache_ready(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["window_class"] = "mechanism_activating"
+        state["rsus"][0]["cached_adapter_ids"] = []
+        state["rsus"][1]["cached_adapter_ids"] = []
+        state["current_workflow_node"]["required_adapter"] = "adapter_tracking"
+        state["vehicles"][0]["associated_rsu_id"] = "rsu_a"
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0},
+            "predicted_handoff_vehicle_ids": ["veh_1"],
+            "predicted_next_rsu_by_vehicle": {"veh_1": "rsu_b"},
+            "predicted_first_handoff_rsu_by_vehicle": {"veh_1": "rsu_b"},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.92},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.04},
+            "dwell_time": {"veh_1": 3.0},
+            "next_rsu_sequence": {"veh_1": ["rsu_a", "rsu_b", "rsu_b", "rsu_b"]},
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            mechanism_logit_bias_strength=0.0,
+            digital_twin_policy_prior_enabled=False,
+            backhaul_aware_policy_enabled=False,
+            continuity_guard_enabled=False,
+            event_logit_sharpening_final_scale=1.0,
+            opportunity_constrained_policy_enabled=True,
+            opportunity_constrained_min_context=0.45,
+            opportunity_constrained_low_context=0.20,
+            opportunity_constrained_prepare_bias=3.0,
+            opportunity_constrained_prefetch_bias=2.0,
+            opportunity_constrained_current_bias=0.0,
+            opportunity_constrained_prepare_penalty=0.0,
+            opportunity_constrained_prefetch_penalty=0.0,
+            cache_feasibility_prior_enabled=True,
+            cache_feasibility_cache_fill_bias=7.20,
+            cache_feasibility_steady_penalty=6.20,
+            cache_feasibility_current_miss_prepare_penalty=8.80,
+            cache_feasibility_current_miss_prefetch_penalty=5.60,
+            cache_feasibility_min_context=0.0,
+        )
+
+        with torch.no_grad():
+            raw = agent._network.forward_single(state)
+            adjusted = agent._apply_opportunity_constrained_policy(raw, state)
+
+        info = adjusted["opportunity_constrained_policy_info"]
+        self.assertTrue(info["strong_opportunity"])
+        self.assertTrue(info["cache_feasibility_prior_active"])
+        self.assertFalse(info["current_cache_ready"])
+        self.assertGreater(info["cache_feasibility_current_miss_prepare_penalty"], 8.0)
+        self.assertGreater(info["cache_feasibility_current_miss_prefetch_penalty"], 5.0)
+        self.assertGreater(float(adjusted["env_action_logits_bias"][0].item()), 6.0)
+        self.assertLess(float(adjusted["env_action_logits_bias"][4].item()), 0.0)
+        self.assertLess(float(adjusted["env_action_logits_bias"][1].item()), 0.0)
+        self.assertLess(float(adjusted["event_logits"][1].item()), float(raw["event_logits"][1].item()))
+        self.assertLess(float(adjusted["slow_logits"][2].item()), float(raw["slow_logits"][2].item()))
+
+    def test_sa_v64_handoff_alignment_barrier_suppresses_mismatched_prepare(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["window_class"] = "mechanism_activating"
+        state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["rsus"][1]["cached_adapter_ids"] = ["adapter_tracking"]
+        state["rsus"].append(
+            {
+                "rsu_id": "rsu_c",
+                "cached_adapter_ids": [],
+                "cache_capacity": 4,
+            }
+        )
+        state["current_workflow_node"]["required_adapter"] = "adapter_tracking"
+        state["vehicles"][0]["associated_rsu_id"] = "rsu_a"
+        state["predictions"] = {
+            "future_load": {"rsu_a": 1.0, "rsu_b": 1.0, "rsu_c": 1.0},
+            "predicted_handoff_vehicle_ids": ["veh_1"],
+            "predicted_next_rsu_by_vehicle": {"veh_1": "rsu_c"},
+            "predicted_first_handoff_rsu_by_vehicle": {"veh_1": "rsu_b"},
+            "prediction_confidence_by_vehicle": {"veh_1": 0.94},
+            "prediction_uncertainty_by_vehicle": {"veh_1": 0.03},
+            "dwell_time": {"veh_1": 2.0},
+            "next_rsu_sequence": {"veh_1": ["rsu_c", "rsu_b", "rsu_b"]},
+        }
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            mechanism_logit_bias_strength=0.0,
+            digital_twin_policy_prior_enabled=False,
+            backhaul_aware_policy_enabled=False,
+            continuity_guard_enabled=False,
+            event_logit_sharpening_final_scale=1.0,
+            opportunity_constrained_policy_enabled=True,
+            opportunity_constrained_min_context=0.45,
+            opportunity_constrained_low_context=0.20,
+            opportunity_constrained_prepare_bias=3.0,
+            opportunity_constrained_prefetch_bias=2.0,
+            opportunity_constrained_current_bias=0.0,
+            opportunity_constrained_prepare_penalty=0.0,
+            opportunity_constrained_prefetch_penalty=0.0,
+            cache_feasibility_prior_enabled=True,
+            cache_feasibility_cache_fill_bias=8.40,
+            cache_feasibility_steady_penalty=6.20,
+            cache_feasibility_current_miss_prepare_penalty=12.80,
+            cache_feasibility_current_miss_prefetch_penalty=7.80,
+            cache_feasibility_min_context=0.0,
+            handoff_alignment_barrier_enabled=True,
+            handoff_alignment_barrier_prepare_penalty=12.50,
+            handoff_alignment_barrier_prefetch_penalty=7.20,
+            handoff_alignment_barrier_current_fill_bias=8.80,
+            handoff_alignment_barrier_target_mismatch_penalty=5.60,
+            handoff_alignment_barrier_late_eta_penalty=3.20,
+            handoff_alignment_barrier_min_context=0.0,
+        )
+
+        with torch.no_grad():
+            raw = agent._network.forward_single(state)
+            adjusted = agent._apply_opportunity_constrained_policy(raw, state)
+
+        info = adjusted["opportunity_constrained_policy_info"]
+        self.assertTrue(info["strong_opportunity"])
+        self.assertFalse(info["cache_feasibility_prior_active"])
+        self.assertTrue(info["current_cache_ready"])
+        self.assertTrue(info["handoff_alignment_barrier_active"])
+        self.assertTrue(info["handoff_alignment_target_mismatch"])
+        self.assertEqual(info["predicted_first_non_current_rsu_id"], "rsu_c")
+        self.assertGreater(info["handoff_alignment_prepare_penalty"], 12.0)
+        self.assertLess(float(adjusted["env_action_logits_bias"][4].item()), -10.0)
+        self.assertLess(float(adjusted["event_logits"][1].item()), float(raw["event_logits"][1].item()))
+
+    def test_sa_v64_service_credit_penalizes_prepare_after_adapter_miss(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            counterfactual_teacher_prd_enabled=True,
+            service_continuity_teacher_enabled=True,
+            service_continuity_prepare_bonus=0.34,
+            service_continuity_current_bonus=1.78,
+            env_action_adapter_miss_counterfactual_coef=4.20,
+            handoff_alignment_barrier_enabled=True,
+            handoff_alignment_barrier_prepare_penalty=12.50,
+            handoff_alignment_barrier_prefetch_penalty=7.20,
+        )
+        row = {
+            "action": 4,
+            "decision_info": {
+                "semantic_state": deepcopy(_minimal_semantic_state()),
+                "run_metadata": {"window_class": "mechanism_activating"},
+            },
+            "action_info": {
+                "final_env_action": 4,
+                "prepare_window_score": 0.80,
+                "temporal_urgency": 0.70,
+                "prediction_confidence": 0.90,
+                "predicted_handoff_target_valid": True,
+                "raw_handoff_candidate": True,
+            },
+            "env_info": {
+                "metrics_protocol": {
+                    "predicted_handoff_signal": True,
+                    "has_predicted_handoff_target": True,
+                    "mechanism_success_rate": 0.0,
+                    "handoff_ready_rate": 0.40,
+                    "workflow_continuity_rate": 0.58,
+                    "adapter_miss_count": 3.0,
+                    "cache_miss_penalty_sum": 1.2,
+                    "migration_failed_count": 4.0,
+                    "stall_occurred": True,
+                }
+            },
+            "reward": -1.0,
+        }
+
+        self.assertLess(
+            agent._service_continuity_counterfactual_credit(
+                row,
+                env_action=4,
+                window_class="mechanism_activating",
+                context_strength=0.90,
+                timing_support=0.80,
+                ready_score=0.0,
+            ),
+            0.0,
+        )
+
+    def test_sa_v65_argmax_margin_penalizes_prepare_over_current_service(self) -> None:
+        state = deepcopy(_minimal_semantic_state())
+        state["window_class"] = "mechanism_activating"
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            counterfactual_teacher_prd_enabled=True,
+            service_continuity_teacher_enabled=True,
+            service_continuity_prepare_bonus=0.18,
+            service_continuity_current_bonus=2.18,
+            env_action_adapter_miss_counterfactual_coef=4.80,
+            handoff_alignment_barrier_enabled=True,
+            handoff_alignment_barrier_prepare_penalty=12.50,
+            handoff_alignment_barrier_prefetch_penalty=7.20,
+            argmax_margin_regularization_enabled=True,
+            argmax_margin_coef=0.76,
+            argmax_margin_min_gap=0.42,
+            argmax_margin_tail_risk_threshold=0.04,
+        )
+        row = {
+            "action": 4,
+            "decision_info": {
+                "semantic_state": deepcopy(state),
+                "run_metadata": {"window_class": "mechanism_activating"},
+            },
+            "action_info": {
+                "final_env_action": 4,
+                "prepare_window_score": 0.80,
+                "temporal_urgency": 0.70,
+                "prediction_confidence": 0.90,
+                "predicted_handoff_target_valid": True,
+                "raw_handoff_candidate": True,
+            },
+            "env_info": {
+                "metrics_protocol": {
+                    "predicted_handoff_signal": True,
+                    "has_predicted_handoff_target": True,
+                    "mechanism_success_rate": 0.0,
+                    "handoff_ready_rate": 0.40,
+                    "workflow_continuity_rate": 0.58,
+                    "adapter_miss_count": 3.0,
+                    "cache_miss_penalty_sum": 1.2,
+                    "delay_penalty_sum": 8.0,
+                    "migration_failed_count": 4.0,
+                    "stall_occurred": True,
+                }
+            },
+            "reward": -1.0,
+        }
+        with torch.no_grad():
+            policy_output = agent._forward_policy(
+                state,
+                run_metadata={"window_class": "mechanism_activating"},
+            )
+            policy_output = dict(policy_output)
+            policy_output["env_action_logits_bias"] = torch.tensor(
+                [0.0, 0.0, 0.0, 0.0, 3.0],
+                dtype=policy_output["event_logits"].dtype,
+                device=policy_output["event_logits"].device,
+            )
+
+        loss = agent._compute_argmax_margin_regularization_loss(
+            batch_outputs=[policy_output],
+            batch_action_masks=[[True, True, True, True, True]],
+            batch_rows=[row],
+        )
+
+        self.assertGreater(float(loss.item()), 0.0)
+        self.assertGreater(
+            agent._counterfactual_teacher_action_credit(row, 0),
+            agent._counterfactual_teacher_action_credit(row, 4),
+        )
+
     def test_sa_v54_policy_path_applies_net_and_service_completion_gates(self) -> None:
         state = deepcopy(_minimal_semantic_state())
         state["rsus"][0]["cached_adapter_ids"] = ["adapter_tracking"]
@@ -2047,6 +3048,293 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(guard_info["original_action"], 2)
         self.assertEqual(guard_info["guarded_action"], 4)
         self.assertGreaterEqual(guard_info["coverage_recovery_scale"], 0.62)
+
+    def test_sa_v56_final_guard_recovers_prepare_after_option_fallback(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            net_advantage_prepare_gate_enabled=True,
+            coverage_recovery_final_guard_enabled=True,
+            coverage_recovery_final_guard_min_scale=0.18,
+            coverage_recovery_final_guard_min_confidence=0.35,
+        )
+        policy_output = {
+            "net_advantage_prepare_gate_info": {
+                "current_rsu_id": None,
+                "predicted_target_valid": True,
+                "target_differs": True,
+                "coverage_recovery_scale": 0.05,
+                "net_advantage_score": 0.05,
+                "prediction_confidence": 0.60,
+                "predicted_handoff_target_rsu_id": "rsu_b",
+                "predicted_next_rsu_id": None,
+            }
+        }
+
+        guard_info = agent._apply_coverage_recovery_final_guard_to_env_action(
+            semantic_state=deepcopy(_minimal_semantic_state()),
+            policy_output=policy_output,
+            env_action=2,
+            action_mask=[True, True, True, True, True],
+            option_gate_info={"option_label": "no_rsu_local", "option_env_action": 2},
+        )
+
+        self.assertTrue(guard_info["guarded"])
+        self.assertEqual(guard_info["original_action"], 2)
+        self.assertEqual(guard_info["guarded_action"], 4)
+        self.assertEqual(
+            guard_info["reason"],
+            "partial_observation_handoff_target_memory_prefers_prepare",
+        )
+
+    def test_sa_v56_final_guard_respects_low_memory_confidence(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            net_advantage_prepare_gate_enabled=True,
+            coverage_recovery_final_guard_enabled=True,
+            coverage_recovery_final_guard_min_scale=0.18,
+            coverage_recovery_final_guard_min_confidence=0.35,
+        )
+        policy_output = {
+            "net_advantage_prepare_gate_info": {
+                "current_rsu_id": None,
+                "predicted_target_valid": True,
+                "target_differs": True,
+                "coverage_recovery_scale": 0.04,
+                "net_advantage_score": 0.04,
+                "prediction_confidence": 0.20,
+                "predicted_handoff_target_rsu_id": "rsu_b",
+                "predicted_next_rsu_id": None,
+            }
+        }
+
+        guard_info = agent._apply_coverage_recovery_final_guard_to_env_action(
+            semantic_state=deepcopy(_minimal_semantic_state()),
+            policy_output=policy_output,
+            env_action=2,
+            action_mask=[True, True, True, True, True],
+            option_gate_info={"option_label": "no_rsu_local", "option_env_action": 2},
+        )
+
+        self.assertFalse(guard_info["guarded"])
+        self.assertEqual(guard_info["reason"], "coverage_recovery_memory_below_min")
+
+    def test_sa_v57_no_rsu_candidate_prefers_service_continuity(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            idle_popularity_no_rsu_service_continuity_enabled=True,
+        )
+        state = deepcopy(_minimal_semantic_state())
+        state["vehicles"][0]["associated_rsu_id"] = None
+        state["predictions"]["predicted_handoff_vehicle_ids"] = []
+        state["predictions"]["predicted_next_rsu_by_vehicle"] = {}
+        state["predictions"]["predicted_first_handoff_rsu_by_vehicle"] = {}
+        state["predictions"]["next_rsu_sequence"] = {"veh_1": []}
+
+        action, reason, _extra = agent._idle_popularity_candidate_action(
+            state,
+            [True, True, True, True, True],
+        )
+
+        self.assertEqual(action, 3)
+        self.assertEqual(reason, "no_associated_rsu_service_continuity")
+
+    def test_sa_v58_no_rsu_service_continuity_can_override_nonlocal_action(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            idle_popularity_fallback_enabled=True,
+            idle_popularity_fallback_only_vehicle_fallback=True,
+            idle_popularity_no_rsu_service_continuity_enabled=True,
+            idle_popularity_no_rsu_any_action_override_enabled=True,
+        )
+        state = deepcopy(_minimal_semantic_state())
+        state["vehicles"][0]["associated_rsu_id"] = None
+        state["predictions"]["predicted_handoff_vehicle_ids"] = []
+        state["predictions"]["predicted_next_rsu_by_vehicle"] = {}
+        state["predictions"]["predicted_first_handoff_rsu_by_vehicle"] = {}
+        state["predictions"]["next_rsu_sequence"] = {"veh_1": []}
+
+        info = agent._maybe_apply_idle_popularity_fallback(
+            semantic_state=state,
+            action_mask=[True, True, True, True, True],
+            original_env_action=4,
+            deterministic=True,
+        )
+
+        self.assertTrue(info["applied"])
+        self.assertEqual(info["fallback_action"], 3)
+        self.assertEqual(info["reason"], "no_rsu_service_continuity_replaced_by_popularity_option")
+
+    def test_sa_v58_idle_recovery_keeps_mechanism_option_prior(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            option_gate_context_prior_enabled=True,
+            option_gate_idle_recovery_mechanism_prior_enabled=True,
+            option_gate_idle_recovery_min_context=0.0,
+            idle_popularity_no_rsu_service_continuity_enabled=True,
+            net_advantage_prepare_gate_enabled=True,
+        )
+        state = deepcopy(_minimal_semantic_state())
+        state["vehicles"][0]["associated_rsu_id"] = None
+        state["predictions"]["predicted_handoff_vehicle_ids"] = ["veh_1"]
+        state["predictions"]["predicted_first_handoff_rsu_by_vehicle"] = {"veh_1": "rsu_b"}
+        state["predictions"]["predicted_next_rsu_by_vehicle"] = {"veh_1": "rsu_b"}
+        state["predictions"]["prediction_confidence_by_vehicle"] = {"veh_1": 0.80}
+        state["predictions"]["prediction_uncertainty_by_vehicle"] = {"veh_1": 0.20}
+        state["predictions"]["next_rsu_sequence"] = {"veh_1": ["rsu_b", "rsu_b"]}
+
+        info = agent._build_option_gate_candidates(
+            semantic_state=state,
+            action_mask=[True, True, True, True, True],
+            base_env_action=2,
+            run_metadata={"window_class": "idle_or_sparse"},
+        )
+
+        self.assertTrue(info["mechanism_available"])
+        self.assertTrue(info["idle_recovery_context"])
+        self.assertEqual(info["prior_target"], 3)
+        self.assertEqual(info["option_actions"][3], 4)
+
+    def test_sa_v57_service_continuity_teacher_penalizes_local_fallback(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            counterfactual_teacher_prd_enabled=True,
+            service_continuity_teacher_enabled=True,
+            service_continuity_current_bonus=1.05,
+            service_continuity_prepare_bonus=0.78,
+            service_continuity_local_penalty=1.45,
+            service_continuity_min_prepare_context=0.16,
+        )
+        row = {
+            "action": 2,
+            "decision_info": {
+                "semantic_state": deepcopy(_minimal_semantic_state()),
+                "run_metadata": {"window_class": "idle_or_sparse"},
+            },
+            "action_info": {
+                "final_env_action": 2,
+                "prepare_window_score": 0.04,
+                "temporal_urgency": 0.05,
+                "prediction_confidence": 0.20,
+            },
+            "env_info": {"metrics_protocol": {"mechanism_success_rate": 0.0}},
+            "reward": -1.0,
+        }
+
+        self.assertLess(agent._counterfactual_teacher_action_credit(row, 2), 0.0)
+        self.assertGreater(
+            agent._counterfactual_teacher_action_credit(row, 3),
+            agent._counterfactual_teacher_action_credit(row, 2),
+        )
+
+    def test_sa_v58_service_teacher_prefers_prepare_over_local_in_idle_recovery(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            counterfactual_teacher_prd_enabled=True,
+            service_continuity_teacher_enabled=True,
+            service_continuity_current_bonus=1.28,
+            service_continuity_prepare_bonus=1.16,
+            service_continuity_local_penalty=1.95,
+            service_continuity_min_prepare_context=0.06,
+        )
+        row = {
+            "action": 2,
+            "decision_info": {
+                "semantic_state": deepcopy(_minimal_semantic_state()),
+                "run_metadata": {"window_class": "idle_or_sparse"},
+            },
+            "action_info": {
+                "final_env_action": 2,
+                "prepare_window_score": 0.08,
+                "temporal_urgency": 0.12,
+                "prediction_confidence": 0.55,
+                "predicted_handoff_target_valid": True,
+                "option_gate": {
+                    "window_class": "idle_or_sparse",
+                    "idle_recovery_context": True,
+                },
+            },
+            "env_info": {
+                "metrics_protocol": {
+                    "mechanism_success_rate": 0.0,
+                    "local_exec_count": 6.0,
+                    "current_rsu_exec_count": 1.0,
+                }
+            },
+            "reward": -1.0,
+        }
+
+        self.assertLess(agent._counterfactual_teacher_action_credit(row, 2), 0.0)
+        self.assertGreater(
+            agent._counterfactual_teacher_action_credit(row, 4),
+            agent._counterfactual_teacher_action_credit(row, 2),
+        )
+
+    def test_sa_v57_no_rsu_policy_prior_biases_service_and_suppresses_local(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            opportunity_constrained_policy_enabled=True,
+            opportunity_constrained_prepare_penalty=1.0,
+            opportunity_constrained_prefetch_penalty=1.0,
+            opportunity_constrained_no_rsu_service_bias=4.2,
+            opportunity_constrained_no_rsu_local_penalty=4.8,
+        )
+        state = deepcopy(_minimal_semantic_state())
+        state["vehicles"][0]["associated_rsu_id"] = None
+        state["predictions"]["predicted_handoff_vehicle_ids"] = []
+        state["predictions"]["predicted_next_rsu_by_vehicle"] = {}
+        state["predictions"]["predicted_first_handoff_rsu_by_vehicle"] = {}
+        state["predictions"]["next_rsu_sequence"] = {"veh_1": []}
+        policy_output = {
+            "slow_logits": torch.zeros(3),
+            "fast_logits": torch.zeros(2),
+            "event_logits": torch.zeros(2),
+        }
+
+        adjusted = agent._apply_opportunity_constrained_policy(policy_output, state)
+        env_bias = adjusted["env_action_logits_bias"]
+
+        self.assertGreater(float(env_bias[3]), 0.0)
+        self.assertLess(float(env_bias[2]), 0.0)
+
+    def test_sa_v58_no_rsu_policy_prior_biases_prepare_when_target_exists(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            opportunity_constrained_policy_enabled=True,
+            opportunity_constrained_prepare_penalty=1.0,
+            opportunity_constrained_prefetch_penalty=1.0,
+            opportunity_constrained_no_rsu_service_bias=5.0,
+            opportunity_constrained_no_rsu_local_penalty=5.7,
+            opportunity_constrained_no_rsu_prepare_bias=3.1,
+            opportunity_constrained_no_rsu_prepare_min_context=0.0,
+        )
+        state = deepcopy(_minimal_semantic_state())
+        state["vehicles"][0]["associated_rsu_id"] = None
+        state["predictions"]["predicted_handoff_vehicle_ids"] = ["veh_1"]
+        state["predictions"]["predicted_next_rsu_by_vehicle"] = {"veh_1": "rsu_b"}
+        state["predictions"]["predicted_first_handoff_rsu_by_vehicle"] = {"veh_1": "rsu_b"}
+        state["predictions"]["prediction_confidence_by_vehicle"] = {"veh_1": 0.75}
+        state["predictions"]["prediction_uncertainty_by_vehicle"] = {"veh_1": 0.25}
+        state["predictions"]["next_rsu_sequence"] = {"veh_1": ["rsu_b", "rsu_b"]}
+        policy_output = {
+            "slow_logits": torch.zeros(3),
+            "fast_logits": torch.zeros(2),
+            "event_logits": torch.zeros(2),
+        }
+
+        adjusted = agent._apply_opportunity_constrained_policy(policy_output, state)
+        env_bias = adjusted["env_action_logits_bias"]
+
+        self.assertGreater(float(env_bias[4]), 0.0)
+        self.assertLess(float(env_bias[2]), 0.0)
 
     def test_sa_v52_net_advantage_gate_boosts_prepare_when_net_positive(self) -> None:
         state = deepcopy(_minimal_semantic_state())

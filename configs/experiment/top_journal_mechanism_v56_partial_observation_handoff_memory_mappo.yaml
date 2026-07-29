@@ -1,0 +1,63 @@
+profile: top_journal_mechanism_v56_partial_observation_handoff_memory_mappo
+base_profile: top_journal_mechanism_v55_coverage_recovery_mappo
+purpose: >
+  Offset-free MAPPO candidate that fixes the v55 execution gap under partial
+  observability: when the primary vehicle temporarily has no current RSU but
+  the predictor still carries a valid handoff target, the policy should keep
+  handoff migration preparation instead of reverting to vehicle fallback.
+algorithm_delta:
+  - Adds a final policy-internal coverage-recovery projection after the option
+    gate, so no-current target-memory states keep action4 prepare/transfer even
+    when the option head would otherwise choose fallback.
+  - Adds target-memory option credit to the MAPPO option advantage. The
+    mechanism_prepare option receives positive credit in recoverable coverage
+    gaps, while no_rsu_local/fallback receives negative credit.
+  - Lowers the online coverage-recovery scale threshold because v55 failed when
+    predicted_handoff_target remained valid but predicted_next_rsu was null.
+  - Keeps the reward function, action schema, environment transition, baseline
+    contracts, benchmark consumers, and window selection unchanged.
+negative_controls:
+  - v55 full closed-loop showed training reward improvement but benchmark loss
+    to DT/PPO because the final action could be changed after the early coverage
+    guard. v56 targets that internal policy-ordering mismatch.
+  - This is not reward offset, evaluator wrapping, result filtering, heuristic
+    baseline weakening, or test-window selection.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+training_window_protocol:
+  window_mode: mixed_informative
+  mechanism_window_oversample_ratio: 2.25
+  handoff_imminent_oversample_ratio: 1.50
+  target_mismatch_sample_weight: 1.50
+  min_mechanism_activating_windows: 4
+post_training_audit_protocol:
+  default_mode: compact
+  compact_scope: 1_window_x_1_workflow
+  full_protocol_required_for_paper_ready: true
+  repair_best_record_from_compact_audit: false
+prediction_protocol:
+  predictor_kind: baseline
+  predictor_name: baseline_predictor_v3
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+coverage_recovery_target_memory:
+  enabled: true
+  final_guard_after_option_gate: true
+  min_scale: 0.18
+  min_confidence: 0.35
+  mappo_policy_advantage_credit: true
+  mappo_event_advantage_credit: true
+  mappo_option_target_memory_credit: true
+paper_claim_boundary: >
+  Candidate only. It may advance to paper-ready only if independent formal /
+  holdout / support-suite evidence, multi-seed statistics, provenance, and
+  top-journal audit show robust superiority without reward offset, wrapping,
+  result filtering, or hidden/test-set tuning.

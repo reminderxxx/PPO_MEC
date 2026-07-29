@@ -1,0 +1,42 @@
+profile: top_journal_mechanism_v68_actor_native_sparse_recovery_mappo
+base_profile: top_journal_mechanism_v67_sparse_handoff_recovery_mappo
+purpose: >
+  Remove idle popularity fallback so idle_or_sparse recovery is decided by the
+  hierarchical MAPPO actor and the sparse handoff recovery prior instead of a
+  popularity-style safety override.
+
+algorithm_delta:
+  - Disables idle_popularity_fallback in the main profile.
+  - Keeps sparse_handoff_recovery_prior inside actor/env-action logits.
+  - Strengthens sparse-window prefetch and prepare biases.
+  - Suppresses local fallback harder in predicted sparse handoff contexts.
+  - Extends sparse recovery ETA coverage from 16 to 24 steps.
+  - Keeps v66/v67 conservative PPO/KL and reward-first checkpoint selection.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  prediction_horizon: 16
+
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  learning_rate: 1.84e-5
+  clip_ratio: 0.030
+  target_kl: 0.0014
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+
+checkpoint_protocol:
+  closed_loop_priority: reward_first
+  selection_source: training_update_eval
+  disallowed_claim: benchmark_selected_checkpoint
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    This profile is designed to test whether actor-native sparse recovery can
+    beat the DT baseline on full_stratified, especially idle_or_sparse windows.

@@ -194,6 +194,8 @@ POLICY_DIAGNOSTIC_FIELDS = [
     "cache_warm_start_guard_rate",
     "predictive_prefetch_admission_guard_count",
     "predictive_prefetch_admission_guard_rate",
+    "coverage_recovery_final_guard_count",
+    "coverage_recovery_final_guard_rate",
     "dag_frontier_size_mean",
     "dag_critical_path_pressure_mean",
     "dag_current_node_dependency_pressure_mean",
@@ -958,6 +960,255 @@ PROFILE_DEFAULTS = {
         "prediction_horizon": 16,
         "post_training_audit_mode": "compact",
     },
+    "top_journal_mechanism_v56_partial_observation_handoff_memory_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.45e-5,
+        "clip_ratio": 0.046,
+        "entropy_coef": 0.00110,
+        "value_coef": 0.90,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v57_service_continuity_counterfactual_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.45e-5,
+        "clip_ratio": 0.046,
+        "entropy_coef": 0.00110,
+        "value_coef": 0.90,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v58_ready_aware_counterfactual_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.45e-5,
+        "clip_ratio": 0.046,
+        "entropy_coef": 0.00110,
+        "value_coef": 0.90,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v59_sparse_recovery_curriculum_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.45e-5,
+        "clip_ratio": 0.046,
+        "entropy_coef": 0.00110,
+        "value_coef": 0.90,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v60_risk_adjusted_recovery_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.42e-5,
+        "clip_ratio": 0.044,
+        "entropy_coef": 0.00105,
+        "value_coef": 0.92,
+        "auxiliary_coef": 0.21,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v61_adapter_miss_counterfactual_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.40e-5,
+        "clip_ratio": 0.042,
+        "entropy_coef": 0.00100,
+        "value_coef": 0.94,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v62_cache_feasibility_prior_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.22e-5,
+        "clip_ratio": 0.040,
+        "entropy_coef": 0.00095,
+        "value_coef": 0.94,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v63_current_ready_two_stage_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.18e-5,
+        "clip_ratio": 0.040,
+        "entropy_coef": 0.00090,
+        "value_coef": 0.94,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v64_handoff_alignment_barrier_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.12e-5,
+        "clip_ratio": 0.038,
+        "entropy_coef": 0.00086,
+        "value_coef": 0.94,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v65_argmax_margin_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 2.08e-5,
+        "clip_ratio": 0.036,
+        "entropy_coef": 0.00105,
+        "value_coef": 0.94,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v66_sparse_safe_cpi_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 1.88e-5,
+        "clip_ratio": 0.030,
+        "entropy_coef": 0.00092,
+        "value_coef": 0.94,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v67_sparse_handoff_recovery_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 1.86e-5,
+        "clip_ratio": 0.030,
+        "entropy_coef": 0.00094,
+        "value_coef": 0.94,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v68_actor_native_sparse_recovery_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 1.84e-5,
+        "clip_ratio": 0.030,
+        "entropy_coef": 0.00096,
+        "value_coef": 0.94,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v69_realization_credit_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 1.84e-5,
+        "clip_ratio": 0.030,
+        "entropy_coef": 0.00098,
+        "value_coef": 0.94,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
+    "top_journal_mechanism_v70_sparse_tail_option_mappo": {
+        "episodes": 128,
+        "update_every": 8,
+        "batch_size": 32,
+        "learning_rate": 1.84e-5,
+        "clip_ratio": 0.030,
+        "entropy_coef": 0.00102,
+        "value_coef": 0.94,
+        "auxiliary_coef": 0.22,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -1021,6 +1272,21 @@ MECHANISM_COVERAGE_PROFILES = {
     "top_journal_mechanism_v53_service_net_advantage_mappo",
     "top_journal_mechanism_v54_service_completion_mappo",
     "top_journal_mechanism_v55_coverage_recovery_mappo",
+    "top_journal_mechanism_v56_partial_observation_handoff_memory_mappo",
+    "top_journal_mechanism_v57_service_continuity_counterfactual_mappo",
+    "top_journal_mechanism_v58_ready_aware_counterfactual_mappo",
+    "top_journal_mechanism_v59_sparse_recovery_curriculum_mappo",
+    "top_journal_mechanism_v60_risk_adjusted_recovery_mappo",
+    "top_journal_mechanism_v61_adapter_miss_counterfactual_mappo",
+    "top_journal_mechanism_v62_cache_feasibility_prior_mappo",
+    "top_journal_mechanism_v63_current_ready_two_stage_mappo",
+    "top_journal_mechanism_v64_handoff_alignment_barrier_mappo",
+    "top_journal_mechanism_v65_argmax_margin_mappo",
+    "top_journal_mechanism_v66_sparse_safe_cpi_mappo",
+    "top_journal_mechanism_v67_sparse_handoff_recovery_mappo",
+    "top_journal_mechanism_v68_actor_native_sparse_recovery_mappo",
+    "top_journal_mechanism_v69_realization_credit_mappo",
+    "top_journal_mechanism_v70_sparse_tail_option_mappo",
 }
 
 
@@ -1122,6 +1388,10 @@ def parse_args() -> argparse.Namespace:
     for field_name in ["episodes", "update_every", "batch_size", "learning_rate", "clip_ratio", "entropy_coef", "value_coef", "auxiliary_coef", "max_steps", "train_window_count"]:
         if getattr(args, field_name) is None:
             setattr(args, field_name, profile_defaults[field_name])
+    for field_name in ["window_mode", "train_window_mode"]:
+        default_value = profile_defaults.get(field_name)
+        if default_value is not None and getattr(args, field_name) == parser.get_default(field_name):
+            setattr(args, field_name, default_value)
     if args.reward_positive_offset is None:
         args.reward_positive_offset = float(profile_defaults.get("reward_positive_offset", 5.0))
     if args.prediction_horizon is None:
@@ -1676,6 +1946,7 @@ def build_policy_step_diagnostic(
     guard_triggered = bool(action_info.get("guard_triggered", False))
     cache_warm_guard_info = dict(action_info.get("cache_warm_start_guard", {}))
     prefetch_admission_guard_info = dict(action_info.get("predictive_prefetch_admission_guard", {}))
+    coverage_recovery_final_guard_info = dict(action_info.get("coverage_recovery_final_guard", {}))
     backhaul_guard_info = dict(action_info.get("backhaul_guard", {}))
     backhaul_aware_info = dict(action_info.get("backhaul_aware_policy", {}))
     action_projection_applied = bool(action_info.get("action_projection_applied", False))
@@ -1778,6 +2049,9 @@ def build_policy_step_diagnostic(
         "guard_action_delta": 1.0 if guard_action_delta else 0.0,
         "cache_warm_start_guarded": 1.0 if bool(cache_warm_guard_info.get("guarded", False)) else 0.0,
         "predictive_prefetch_admission_guarded": 1.0 if bool(prefetch_admission_guard_info.get("guarded", False)) else 0.0,
+        "coverage_recovery_final_guarded": (
+            1.0 if bool(coverage_recovery_final_guard_info.get("guarded", False)) else 0.0
+        ),
         "backhaul_guarded": 1.0 if bool(backhaul_guard_info.get("guarded", False)) else 0.0,
         "backhaul_aware_policy_adjusted": 1.0
         if bool(backhaul_aware_info.get("enabled", False))
@@ -1938,6 +2212,9 @@ def aggregate_policy_diagnostics(step_rows: list[dict[str, Any]]) -> dict[str, f
     guard_action_delta_count = int(round(sum(float(row.get("guard_action_delta", 0.0)) for row in step_rows)))
     cache_warm_start_guard_count = int(round(sum(float(row.get("cache_warm_start_guarded", 0.0)) for row in step_rows)))
     predictive_prefetch_admission_guard_count = int(round(sum(float(row.get("predictive_prefetch_admission_guarded", 0.0)) for row in step_rows)))
+    coverage_recovery_final_guard_count = int(
+        round(sum(float(row.get("coverage_recovery_final_guarded", 0.0)) for row in step_rows))
+    )
     backhaul_guard_count = int(round(sum(float(row.get("backhaul_guarded", 0.0)) for row in step_rows)))
     backhaul_aware_policy_adjust_count = int(
         round(sum(float(row.get("backhaul_aware_policy_adjusted", 0.0)) for row in step_rows))
@@ -2065,6 +2342,11 @@ def aggregate_policy_diagnostics(step_rows: list[dict[str, Any]]) -> dict[str, f
         "predictive_prefetch_admission_guard_count": predictive_prefetch_admission_guard_count,
         "predictive_prefetch_admission_guard_rate": round(
             float(predictive_prefetch_admission_guard_count) / float(total_steps),
+            6,
+        ),
+        "coverage_recovery_final_guard_count": coverage_recovery_final_guard_count,
+        "coverage_recovery_final_guard_rate": round(
+            float(coverage_recovery_final_guard_count) / float(total_steps),
             6,
         ),
         "backhaul_guard_count": backhaul_guard_count,
@@ -3974,6 +4256,537 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "service_completion_gate_policy_coef": 0.38,
                 "service_completion_gate_event_coef": 0.24,
                 "target_kl": 0.0044,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v56_partial_observation_handoff_memory_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v55_coverage_recovery_mappo")
+        kwargs.update(
+            {
+                "coverage_recovery_gate_bias_scale": 1.82,
+                "coverage_recovery_gate_min_scale": 0.35,
+                "coverage_recovery_gate_fallback_suppression_scale": 2.80,
+                "coverage_recovery_gate_fast_suppression_scale": 1.72,
+                "coverage_recovery_gate_current_suppression_scale": 0.46,
+                "coverage_recovery_gate_prepare_credit": 1.35,
+                "coverage_recovery_gate_fallback_penalty": 1.85,
+                "coverage_recovery_final_guard_enabled": True,
+                "coverage_recovery_final_guard_min_scale": 0.18,
+                "coverage_recovery_final_guard_min_confidence": 0.35,
+                "coverage_recovery_target_memory_option_credit": 0.72,
+                "coverage_recovery_target_memory_option_penalty": 1.25,
+                "net_advantage_prepare_gate_bias": 2.95,
+                "net_advantage_prepare_gate_policy_coef": 0.48,
+                "net_advantage_prepare_gate_event_coef": 0.66,
+                "net_advantage_prepare_gate_clip": 2.25,
+                "option_gate_prd_coef": 0.36,
+                "option_gate_counterfactual_coef": 0.44,
+                "handoff_risk_option_coef": 0.46,
+                "service_completion_gate_bias": 3.20,
+                "service_completion_gate_policy_coef": 0.34,
+                "service_completion_gate_event_coef": 0.22,
+                "target_kl": 0.0042,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v57_service_continuity_counterfactual_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v56_partial_observation_handoff_memory_mappo"
+        )
+        kwargs.update(
+            {
+                "idle_popularity_no_rsu_service_continuity_enabled": True,
+                "opportunity_constrained_no_rsu_service_bias": 4.20,
+                "opportunity_constrained_no_rsu_local_penalty": 4.80,
+                "service_continuity_teacher_enabled": True,
+                "service_continuity_current_bonus": 1.05,
+                "service_continuity_prepare_bonus": 0.78,
+                "service_continuity_local_penalty": 1.45,
+                "service_continuity_min_prepare_context": 0.16,
+                "option_gate_counterfactual_prd_enabled": True,
+                "option_gate_prd_coef": 0.46,
+                "option_gate_counterfactual_coef": 0.62,
+                "option_gate_counterfactual_clip": 1.80,
+                "option_gate_log_prob_weight": 0.74,
+                "env_action_ppo_coef": 1.08,
+                "env_action_ppo_teacher_coef": 0.76,
+                "env_action_ppo_mechanism_focus": 1.18,
+                "env_action_ppo_max_weight": 2.85,
+                "env_action_ppo_ratio_barrier_coef": 0.072,
+                "env_action_ppo_ratio_barrier_margin": 0.30,
+                "counterfactual_teacher_local_bonus": 0.0,
+                "counterfactual_teacher_current_rsu_penalty": 0.0,
+                "counterfactual_teacher_invalid_mechanism_penalty": 0.64,
+                "net_utility_idle_prefetch_penalty": 0.62,
+                "net_utility_failed_mechanism_penalty": 0.72,
+                "net_utility_mechanism_window_failed_penalty_scale": 0.36,
+                "coverage_recovery_gate_min_scale": 0.28,
+                "coverage_recovery_final_guard_min_scale": 0.12,
+                "target_kl": 0.0042,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v58_ready_aware_counterfactual_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v57_service_continuity_counterfactual_mappo"
+        )
+        kwargs.update(
+            {
+                "counterfactual_teacher_prd_enabled": True,
+                "counterfactual_teacher_event_coef": 0.24,
+                "counterfactual_teacher_option_coef": 0.66,
+                "counterfactual_teacher_clip": 2.10,
+                "env_action_counterfactual_margin_enabled": True,
+                "env_action_counterfactual_margin_coef": 0.18,
+                "env_action_counterfactual_margin_min_gap": 0.06,
+                "env_action_counterfactual_margin_max_weight": 2.65,
+                "env_action_counterfactual_margin_advantage_gate": 0.0,
+                "env_action_counterfactual_margin_advantage_blend": 0.58,
+                "idle_popularity_no_rsu_any_action_override_enabled": True,
+                "option_gate_idle_recovery_mechanism_prior_enabled": True,
+                "option_gate_idle_recovery_min_context": 0.0,
+                "option_gate_deterministic_prior_margin": 0.96,
+                "option_gate_prior_logit_bias": 1.95,
+                "option_gate_prior_coef": 0.052,
+                "option_gate_prior_warmup_updates": 6,
+                "option_gate_prior_decay": 0.82,
+                "option_gate_loss_coef": 0.40,
+                "option_gate_log_prob_weight": 0.86,
+                "opportunity_constrained_no_rsu_prepare_bias": 3.10,
+                "opportunity_constrained_no_rsu_prepare_min_context": 0.0,
+                "opportunity_constrained_no_rsu_service_bias": 5.00,
+                "opportunity_constrained_no_rsu_local_penalty": 5.70,
+                "service_continuity_current_bonus": 1.28,
+                "service_continuity_prepare_bonus": 1.16,
+                "service_continuity_local_penalty": 1.95,
+                "service_continuity_min_prepare_context": 0.06,
+                "net_utility_idle_prefetch_penalty": 0.38,
+                "net_utility_failed_mechanism_penalty": 0.54,
+                "net_utility_mechanism_window_failed_penalty_scale": 0.24,
+                "env_action_ppo_teacher_coef": 0.96,
+                "env_action_ppo_mechanism_focus": 1.45,
+                "env_action_ppo_max_weight": 3.10,
+                "coverage_recovery_gate_min_scale": 0.18,
+                "coverage_recovery_final_guard_min_scale": 0.06,
+                "target_kl": 0.0042,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v59_sparse_recovery_curriculum_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v58_ready_aware_counterfactual_mappo"
+        )
+        kwargs.update(
+            {
+                "counterfactual_teacher_event_coef": 0.30,
+                "counterfactual_teacher_option_coef": 0.82,
+                "counterfactual_teacher_clip": 2.25,
+                "env_action_counterfactual_margin_coef": 0.26,
+                "env_action_counterfactual_margin_max_weight": 3.10,
+                "env_action_counterfactual_margin_advantage_blend": 0.62,
+                "env_action_sparse_recovery_focus": 1.18,
+                "option_gate_deterministic_prior_margin": 1.00,
+                "option_gate_prior_logit_bias": 2.35,
+                "option_gate_prior_coef": 0.060,
+                "option_gate_prior_decay": 0.86,
+                "option_gate_loss_coef": 0.46,
+                "option_gate_log_prob_weight": 0.92,
+                "opportunity_constrained_no_rsu_prepare_bias": 3.60,
+                "opportunity_constrained_no_rsu_service_bias": 5.45,
+                "opportunity_constrained_no_rsu_local_penalty": 6.30,
+                "service_continuity_current_bonus": 1.55,
+                "service_continuity_prepare_bonus": 1.42,
+                "service_continuity_local_penalty": 2.65,
+                "service_continuity_min_prepare_context": 0.02,
+                "net_utility_idle_prefetch_penalty": 0.22,
+                "net_utility_failed_mechanism_penalty": 0.42,
+                "net_utility_mechanism_window_failed_penalty_scale": 0.18,
+                "env_action_ppo_teacher_coef": 1.20,
+                "env_action_ppo_mechanism_focus": 1.75,
+                "env_action_ppo_max_weight": 3.80,
+                "coverage_recovery_gate_min_scale": 0.12,
+                "coverage_recovery_final_guard_min_scale": 0.04,
+                "target_kl": 0.0040,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v60_risk_adjusted_recovery_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v59_sparse_recovery_curriculum_mappo"
+        )
+        kwargs.update(
+            {
+                "counterfactual_teacher_event_coef": 0.22,
+                "counterfactual_teacher_option_coef": 0.58,
+                "counterfactual_teacher_clip": 1.85,
+                "env_action_counterfactual_margin_coef": 0.16,
+                "env_action_counterfactual_margin_max_weight": 2.35,
+                "env_action_counterfactual_margin_advantage_blend": 0.70,
+                "env_action_sparse_recovery_focus": 0.54,
+                "env_action_risk_adjusted_recovery_coef": 2.20,
+                "env_action_risk_adjusted_recovery_floor": 0.16,
+                "option_gate_deterministic_prior_margin": 0.72,
+                "option_gate_prior_logit_bias": 1.60,
+                "option_gate_prior_coef": 0.044,
+                "option_gate_prior_decay": 0.78,
+                "option_gate_loss_coef": 0.38,
+                "option_gate_log_prob_weight": 0.76,
+                "opportunity_constrained_no_rsu_prepare_bias": 2.75,
+                "opportunity_constrained_no_rsu_service_bias": 5.10,
+                "opportunity_constrained_no_rsu_local_penalty": 6.10,
+                "service_continuity_current_bonus": 1.75,
+                "service_continuity_prepare_bonus": 0.88,
+                "service_continuity_local_penalty": 2.95,
+                "service_continuity_min_prepare_context": 0.10,
+                "net_utility_idle_prefetch_penalty": 0.38,
+                "net_utility_failed_mechanism_penalty": 1.05,
+                "net_utility_mechanism_window_failed_penalty_scale": 0.70,
+                "env_action_ppo_teacher_coef": 0.72,
+                "env_action_ppo_mechanism_focus": 1.10,
+                "env_action_ppo_max_weight": 2.75,
+                "env_action_ppo_ratio_barrier_coef": 0.11,
+                "env_action_ppo_ratio_barrier_margin": 0.24,
+                "advantage_weighted_behavior_coef": 0.20,
+                "advantage_weighted_behavior_negative_coef": 1.62,
+                "advantage_weighted_behavior_positive_coef": 0.72,
+                "advantage_weighted_behavior_mechanism_scale": 1.32,
+                "coverage_recovery_gate_min_scale": 0.08,
+                "coverage_recovery_final_guard_min_scale": 0.04,
+                "target_kl": 0.0036,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v61_adapter_miss_counterfactual_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v60_risk_adjusted_recovery_mappo"
+        )
+        kwargs.update(
+            {
+                "counterfactual_teacher_event_coef": 0.24,
+                "counterfactual_teacher_option_coef": 0.72,
+                "counterfactual_teacher_clip": 3.10,
+                "env_action_counterfactual_margin_coef": 0.34,
+                "env_action_counterfactual_margin_max_weight": 3.40,
+                "env_action_counterfactual_margin_advantage_blend": 0.76,
+                "env_action_sparse_recovery_focus": 0.34,
+                "env_action_risk_adjusted_recovery_coef": 2.40,
+                "env_action_risk_adjusted_recovery_floor": 0.12,
+                "env_action_adapter_miss_counterfactual_coef": 2.85,
+                "option_gate_deterministic_prior_margin": 0.58,
+                "option_gate_prior_logit_bias": 1.25,
+                "option_gate_prior_coef": 0.036,
+                "option_gate_prior_decay": 0.74,
+                "option_gate_loss_coef": 0.34,
+                "option_gate_log_prob_weight": 0.68,
+                "opportunity_constrained_no_rsu_prepare_bias": 2.35,
+                "opportunity_constrained_no_rsu_service_bias": 4.55,
+                "opportunity_constrained_no_rsu_local_penalty": 6.30,
+                "service_continuity_current_bonus": 1.05,
+                "service_continuity_prepare_bonus": 0.78,
+                "service_continuity_local_penalty": 3.15,
+                "service_continuity_min_prepare_context": 0.14,
+                "net_utility_idle_prefetch_penalty": 0.42,
+                "net_utility_failed_mechanism_penalty": 1.18,
+                "net_utility_mechanism_window_failed_penalty_scale": 0.78,
+                "env_action_ppo_teacher_coef": 1.02,
+                "env_action_ppo_mechanism_focus": 1.25,
+                "env_action_ppo_max_weight": 3.20,
+                "env_action_ppo_ratio_barrier_coef": 0.14,
+                "env_action_ppo_ratio_barrier_margin": 0.22,
+                "advantage_weighted_behavior_coef": 0.24,
+                "advantage_weighted_behavior_negative_coef": 1.82,
+                "advantage_weighted_behavior_positive_coef": 0.70,
+                "advantage_weighted_behavior_mechanism_scale": 1.40,
+                "coverage_recovery_gate_min_scale": 0.08,
+                "coverage_recovery_final_guard_min_scale": 0.04,
+                "target_kl": 0.0034,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v62_cache_feasibility_prior_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v61_adapter_miss_counterfactual_mappo"
+        )
+        kwargs.update(
+            {
+                "cache_feasibility_prior_enabled": True,
+                "cache_feasibility_cache_fill_bias": 5.70,
+                "cache_feasibility_steady_penalty": 7.40,
+                "cache_feasibility_prepare_penalty": 1.10,
+                "cache_feasibility_prefetch_penalty": 1.35,
+                "cache_feasibility_min_context": 0.0,
+                "env_action_adapter_miss_counterfactual_coef": 3.15,
+                "env_action_risk_adjusted_recovery_coef": 2.55,
+                "env_action_risk_adjusted_recovery_floor": 0.10,
+                "env_action_counterfactual_margin_coef": 0.38,
+                "env_action_counterfactual_margin_max_weight": 3.70,
+                "env_action_ppo_teacher_coef": 1.10,
+                "env_action_ppo_mechanism_focus": 1.35,
+                "env_action_ppo_max_weight": 3.35,
+                "option_gate_deterministic_prior_margin": 0.52,
+                "option_gate_prior_logit_bias": 1.18,
+                "option_gate_prior_coef": 0.034,
+                "opportunity_constrained_current_bias": 3.35,
+                "opportunity_constrained_no_rsu_prepare_bias": 2.15,
+                "opportunity_constrained_no_rsu_service_bias": 4.80,
+                "opportunity_constrained_no_rsu_local_penalty": 6.45,
+                "service_continuity_current_bonus": 1.18,
+                "service_continuity_prepare_bonus": 0.70,
+                "service_continuity_local_penalty": 3.25,
+                "service_continuity_min_prepare_context": 0.16,
+                "net_utility_failed_mechanism_penalty": 1.24,
+                "net_utility_mechanism_window_failed_penalty_scale": 0.82,
+                "advantage_weighted_behavior_negative_coef": 1.92,
+                "target_kl": 0.0030,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v63_current_ready_two_stage_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v62_cache_feasibility_prior_mappo"
+        )
+        kwargs.update(
+            {
+                "cache_feasibility_cache_fill_bias": 7.20,
+                "cache_feasibility_steady_penalty": 6.20,
+                "cache_feasibility_current_miss_prepare_penalty": 8.80,
+                "cache_feasibility_current_miss_prefetch_penalty": 5.60,
+                "cache_feasibility_prepare_penalty": 1.45,
+                "cache_feasibility_prefetch_penalty": 1.65,
+                "env_action_adapter_miss_counterfactual_coef": 3.45,
+                "env_action_risk_adjusted_recovery_coef": 2.70,
+                "env_action_counterfactual_margin_coef": 0.42,
+                "env_action_counterfactual_margin_max_weight": 3.95,
+                "env_action_ppo_teacher_coef": 1.18,
+                "env_action_ppo_mechanism_focus": 1.45,
+                "env_action_ppo_max_weight": 3.55,
+                "service_continuity_current_bonus": 1.45,
+                "service_continuity_prepare_bonus": 0.58,
+                "service_continuity_local_penalty": 3.35,
+                "net_utility_failed_mechanism_penalty": 1.32,
+                "net_utility_mechanism_window_failed_penalty_scale": 0.90,
+                "advantage_weighted_behavior_negative_coef": 2.05,
+                "target_kl": 0.0028,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v64_handoff_alignment_barrier_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v63_current_ready_two_stage_mappo"
+        )
+        kwargs.update(
+            {
+                "handoff_alignment_barrier_enabled": True,
+                "handoff_alignment_barrier_prepare_penalty": 12.50,
+                "handoff_alignment_barrier_prefetch_penalty": 7.20,
+                "handoff_alignment_barrier_current_fill_bias": 8.80,
+                "handoff_alignment_barrier_target_mismatch_penalty": 5.60,
+                "handoff_alignment_barrier_late_eta_penalty": 3.20,
+                "handoff_alignment_barrier_min_context": 0.0,
+                "cache_feasibility_cache_fill_bias": 8.40,
+                "cache_feasibility_current_miss_prepare_penalty": 12.80,
+                "cache_feasibility_current_miss_prefetch_penalty": 7.80,
+                "service_continuity_current_bonus": 1.78,
+                "service_continuity_prepare_bonus": 0.34,
+                "env_action_adapter_miss_counterfactual_coef": 4.20,
+                "env_action_risk_adjusted_recovery_coef": 3.10,
+                "env_action_ppo_teacher_coef": 0.92,
+                "env_action_ppo_mechanism_focus": 1.10,
+                "advantage_weighted_behavior_negative_coef": 2.45,
+                "target_kl": 0.0026,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v65_argmax_margin_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v64_handoff_alignment_barrier_mappo"
+        )
+        kwargs.update(
+            {
+                "argmax_margin_regularization_enabled": True,
+                "argmax_margin_coef": 0.76,
+                "argmax_margin_min_gap": 0.42,
+                "argmax_margin_max_weight": 4.80,
+                "argmax_margin_tail_risk_threshold": 0.04,
+                "argmax_margin_mechanism_penalty_scale": 1.65,
+                "event_logit_sharpening_final_scale": 1.55,
+                "event_prepare_margin_boost": 0.12,
+                "digital_twin_policy_prior_logit_bias": 2.05,
+                "digital_twin_policy_prior_distill_coef": 0.026,
+                "net_advantage_prepare_gate_bias": 2.18,
+                "opportunity_constrained_prepare_bias": 0.58,
+                "opportunity_constrained_prefetch_bias": 0.34,
+                "coverage_recovery_gate_prepare_credit": 0.92,
+                "cache_feasibility_cache_fill_bias": 9.20,
+                "cache_feasibility_current_miss_prepare_penalty": 14.60,
+                "cache_feasibility_current_miss_prefetch_penalty": 9.40,
+                "service_continuity_current_bonus": 2.18,
+                "service_continuity_prepare_bonus": 0.18,
+                "env_action_adapter_miss_counterfactual_coef": 4.80,
+                "env_action_risk_adjusted_recovery_coef": 3.45,
+                "env_action_counterfactual_margin_coef": 0.58,
+                "env_action_counterfactual_margin_min_gap": 0.10,
+                "env_action_counterfactual_margin_max_weight": 4.60,
+                "env_action_ppo_teacher_coef": 0.98,
+                "env_action_ppo_mechanism_focus": 1.20,
+                "advantage_weighted_behavior_negative_coef": 2.75,
+                "target_kl": 0.0024,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v66_sparse_safe_cpi_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v65_argmax_margin_mappo"
+        )
+        kwargs.update(
+            {
+                "argmax_margin_coef": 0.62,
+                "argmax_margin_min_gap": 0.34,
+                "argmax_margin_max_weight": 4.20,
+                "argmax_margin_tail_risk_threshold": 0.06,
+                "argmax_margin_mechanism_penalty_scale": 1.38,
+                "digital_twin_policy_prior_logit_bias": 2.85,
+                "digital_twin_policy_prior_env_action_logit_bias": 4.35,
+                "digital_twin_policy_prior_distill_coef": 0.058,
+                "digital_twin_policy_prior_advantage_weight": 0.60,
+                "digital_twin_policy_prior_max_weight": 2.85,
+                "env_action_sparse_recovery_focus": 1.08,
+                "env_action_risk_adjusted_recovery_coef": 3.70,
+                "env_action_adapter_miss_counterfactual_coef": 4.55,
+                "env_action_counterfactual_margin_coef": 0.50,
+                "env_action_counterfactual_margin_max_weight": 4.20,
+                "env_action_ppo_teacher_coef": 1.20,
+                "env_action_ppo_mechanism_focus": 1.55,
+                "env_action_ppo_max_weight": 3.90,
+                "env_action_ppo_ratio_barrier_coef": 0.24,
+                "env_action_ppo_ratio_barrier_margin": 0.18,
+                "opportunity_constrained_prepare_bias": 0.82,
+                "opportunity_constrained_prefetch_bias": 0.52,
+                "net_advantage_prepare_gate_bias": 2.36,
+                "net_advantage_prepare_gate_service_fill_scale": 0.18,
+                "service_continuity_current_bonus": 2.05,
+                "service_continuity_prepare_bonus": 0.48,
+                "service_continuity_min_prepare_context": 0.08,
+                "advantage_weighted_behavior_negative_coef": 3.10,
+                "advantage_weighted_behavior_positive_coef": 0.78,
+                "target_kl": 0.0016,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v67_sparse_handoff_recovery_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v66_sparse_safe_cpi_mappo"
+        )
+        kwargs.update(
+            {
+                "sparse_handoff_recovery_prior_enabled": True,
+                "sparse_handoff_recovery_prefetch_bias": 6.80,
+                "sparse_handoff_recovery_prepare_bias": 5.40,
+                "sparse_handoff_recovery_current_fill_bias": 2.40,
+                "sparse_handoff_recovery_steady_bias": 1.45,
+                "sparse_handoff_recovery_local_penalty": 6.20,
+                "sparse_handoff_recovery_min_context": 0.16,
+                "sparse_handoff_recovery_max_eta": 16,
+                "digital_twin_policy_prior_distill_coef": 0.064,
+                "digital_twin_policy_prior_env_action_logit_bias": 4.55,
+                "env_action_sparse_recovery_focus": 1.22,
+                "env_action_risk_adjusted_recovery_coef": 3.85,
+                "env_action_adapter_miss_counterfactual_coef": 4.80,
+                "env_action_ppo_teacher_coef": 1.28,
+                "env_action_ppo_ratio_barrier_coef": 0.26,
+                "service_continuity_prepare_bonus": 0.56,
+                "advantage_weighted_behavior_negative_coef": 3.25,
+                "target_kl": 0.0015,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v68_actor_native_sparse_recovery_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v67_sparse_handoff_recovery_mappo"
+        )
+        kwargs.update(
+            {
+                "idle_popularity_fallback_enabled": False,
+                "idle_popularity_no_rsu_service_continuity_enabled": False,
+                "idle_popularity_no_rsu_any_action_override_enabled": False,
+                "sparse_handoff_recovery_prefetch_bias": 8.80,
+                "sparse_handoff_recovery_prepare_bias": 8.20,
+                "sparse_handoff_recovery_current_fill_bias": 3.60,
+                "sparse_handoff_recovery_steady_bias": 0.60,
+                "sparse_handoff_recovery_local_penalty": 8.50,
+                "sparse_handoff_recovery_min_context": 0.0,
+                "sparse_handoff_recovery_max_eta": 24,
+                "digital_twin_policy_prior_env_action_logit_bias": 4.85,
+                "digital_twin_policy_prior_distill_coef": 0.070,
+                "env_action_sparse_recovery_focus": 1.36,
+                "env_action_risk_adjusted_recovery_coef": 4.05,
+                "env_action_adapter_miss_counterfactual_coef": 5.10,
+                "env_action_ppo_teacher_coef": 1.36,
+                "env_action_ppo_ratio_barrier_coef": 0.28,
+                "service_continuity_prepare_bonus": 0.64,
+                "advantage_weighted_behavior_negative_coef": 3.40,
+                "target_kl": 0.0014,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v69_realization_credit_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v67_sparse_handoff_recovery_mappo"
+        )
+        kwargs.update(
+            {
+                "sparse_handoff_realization_credit_enabled": True,
+                "sparse_handoff_realization_success_bonus": 1.55,
+                "sparse_handoff_realization_ready_bonus": 1.25,
+                "sparse_handoff_realization_prefetch_bonus": 1.05,
+                "sparse_handoff_realization_failed_prepare_penalty": 2.55,
+                "sparse_handoff_realization_local_penalty": 1.65,
+                "sparse_handoff_realization_min_context": 0.08,
+                "sparse_handoff_recovery_prefetch_bias": 5.95,
+                "sparse_handoff_recovery_prepare_bias": 5.10,
+                "sparse_handoff_recovery_current_fill_bias": 2.65,
+                "sparse_handoff_recovery_steady_bias": 1.20,
+                "sparse_handoff_recovery_local_penalty": 6.05,
+                "sparse_handoff_recovery_min_context": 0.12,
+                "net_utility_failed_mechanism_penalty": 1.50,
+                "net_utility_idle_prefetch_penalty": 0.50,
+                "coverage_recovery_target_memory_option_credit": 0.62,
+                "coverage_recovery_target_memory_option_penalty": 1.42,
+                "env_action_sparse_recovery_focus": 1.30,
+                "env_action_risk_adjusted_recovery_coef": 4.05,
+                "env_action_adapter_miss_counterfactual_coef": 4.95,
+                "env_action_ppo_teacher_coef": 1.32,
+                "env_action_ppo_ratio_barrier_coef": 0.27,
+                "target_kl": 0.0014,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v70_sparse_tail_option_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v69_realization_credit_mappo"
+        )
+        kwargs.update(
+            {
+                "sparse_handoff_option_prior_enabled": True,
+                "sparse_handoff_option_prepare_bias": 7.40,
+                "sparse_handoff_option_popularity_penalty": 4.35,
+                "sparse_handoff_option_local_penalty": 5.85,
+                "sparse_handoff_option_min_context": 0.08,
+                "sparse_handoff_option_max_eta": 22,
+                "sparse_handoff_recovery_prefetch_bias": 6.35,
+                "sparse_handoff_recovery_prepare_bias": 5.85,
+                "sparse_handoff_recovery_local_penalty": 6.45,
+                "sparse_handoff_recovery_min_context": 0.10,
+                "option_gate_idle_recovery_mechanism_prior_enabled": True,
+                "option_gate_idle_recovery_min_context": 0.06,
+                "option_gate_deterministic_prior_margin": 0.22,
+                "handoff_risk_option_coef": 0.58,
+                "handoff_risk_event_coef": 0.82,
+                "handoff_risk_unprepared_penalty": 0.58,
+                "handoff_risk_ready_bonus": 1.18,
+                "handoff_risk_prepare_bonus": 0.48,
+                "idle_execution_mechanism_penalty": 0.72,
+                "target_kl": 0.0014,
             }
         )
         return kwargs

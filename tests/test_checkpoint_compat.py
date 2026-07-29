@@ -72,6 +72,12 @@ class CheckpointCompatTestCase(unittest.TestCase):
                 "env_action_counterfactual_margin_max_weight": 2.2,
                 "env_action_counterfactual_margin_advantage_gate": 0.12,
                 "env_action_counterfactual_margin_advantage_blend": 0.7,
+                "argmax_margin_regularization_enabled": True,
+                "argmax_margin_coef": 0.76,
+                "argmax_margin_min_gap": 0.42,
+                "argmax_margin_max_weight": 4.8,
+                "argmax_margin_tail_risk_threshold": 0.04,
+                "argmax_margin_mechanism_penalty_scale": 1.65,
                 "delayed_mechanism_credit_enabled": True,
                 "delayed_mechanism_credit_policy_coef": 0.46,
                 "delayed_mechanism_credit_event_coef": 1.05,
@@ -133,6 +139,12 @@ class CheckpointCompatTestCase(unittest.TestCase):
         self.assertEqual(filtered["env_action_counterfactual_margin_max_weight"], 2.2)
         self.assertEqual(filtered["env_action_counterfactual_margin_advantage_gate"], 0.12)
         self.assertEqual(filtered["env_action_counterfactual_margin_advantage_blend"], 0.7)
+        self.assertTrue(filtered["argmax_margin_regularization_enabled"])
+        self.assertEqual(filtered["argmax_margin_coef"], 0.76)
+        self.assertEqual(filtered["argmax_margin_min_gap"], 0.42)
+        self.assertEqual(filtered["argmax_margin_max_weight"], 4.8)
+        self.assertEqual(filtered["argmax_margin_tail_risk_threshold"], 0.04)
+        self.assertEqual(filtered["argmax_margin_mechanism_penalty_scale"], 1.65)
         self.assertTrue(filtered["delayed_mechanism_credit_enabled"])
         self.assertEqual(filtered["delayed_mechanism_credit_policy_coef"], 0.46)
         self.assertEqual(filtered["delayed_mechanism_credit_event_coef"], 1.05)
@@ -156,6 +168,118 @@ class CheckpointCompatTestCase(unittest.TestCase):
         self.assertEqual(filtered["advantage_weighted_behavior_mechanism_scale"], 1.35)
         self.assertEqual(filtered["mechanism_credit_event_coef"], 0.98)
         self.assertTrue(filtered["mechanism_focal_aux_enabled"])
+
+    def test_sa_v64_checkpoint_config_preserves_alignment_barrier_fields(self) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_sparse_recovery_focus": 0.34,
+                "env_action_risk_adjusted_recovery_coef": 2.70,
+                "env_action_risk_adjusted_recovery_floor": 0.10,
+                "env_action_adapter_miss_counterfactual_coef": 3.45,
+                "cache_feasibility_prior_enabled": True,
+                "cache_feasibility_cache_fill_bias": 7.20,
+                "cache_feasibility_steady_penalty": 6.20,
+                "cache_feasibility_prepare_penalty": 1.45,
+                "cache_feasibility_prefetch_penalty": 1.65,
+                "cache_feasibility_current_miss_prepare_penalty": 8.80,
+                "cache_feasibility_current_miss_prefetch_penalty": 5.60,
+                "cache_feasibility_min_context": 0.0,
+                "handoff_alignment_barrier_enabled": True,
+                "handoff_alignment_barrier_prepare_penalty": 12.50,
+                "handoff_alignment_barrier_prefetch_penalty": 7.20,
+                "handoff_alignment_barrier_current_fill_bias": 8.80,
+                "handoff_alignment_barrier_target_mismatch_penalty": 5.60,
+                "handoff_alignment_barrier_late_eta_penalty": 3.20,
+                "handoff_alignment_barrier_min_context": 0.0,
+            },
+        )
+
+        self.assertEqual(filtered["env_action_sparse_recovery_focus"], 0.34)
+        self.assertEqual(filtered["env_action_risk_adjusted_recovery_coef"], 2.70)
+        self.assertEqual(filtered["env_action_risk_adjusted_recovery_floor"], 0.10)
+        self.assertEqual(filtered["env_action_adapter_miss_counterfactual_coef"], 3.45)
+        self.assertTrue(filtered["cache_feasibility_prior_enabled"])
+        self.assertEqual(filtered["cache_feasibility_cache_fill_bias"], 7.20)
+        self.assertEqual(filtered["cache_feasibility_steady_penalty"], 6.20)
+        self.assertEqual(filtered["cache_feasibility_prepare_penalty"], 1.45)
+        self.assertEqual(filtered["cache_feasibility_prefetch_penalty"], 1.65)
+        self.assertEqual(filtered["cache_feasibility_current_miss_prepare_penalty"], 8.80)
+        self.assertEqual(filtered["cache_feasibility_current_miss_prefetch_penalty"], 5.60)
+        self.assertEqual(filtered["cache_feasibility_min_context"], 0.0)
+        self.assertTrue(filtered["handoff_alignment_barrier_enabled"])
+        self.assertEqual(filtered["handoff_alignment_barrier_prepare_penalty"], 12.50)
+        self.assertEqual(filtered["handoff_alignment_barrier_prefetch_penalty"], 7.20)
+        self.assertEqual(filtered["handoff_alignment_barrier_current_fill_bias"], 8.80)
+        self.assertEqual(filtered["handoff_alignment_barrier_target_mismatch_penalty"], 5.60)
+        self.assertEqual(filtered["handoff_alignment_barrier_late_eta_penalty"], 3.20)
+        self.assertEqual(filtered["handoff_alignment_barrier_min_context"], 0.0)
+
+    def test_sa_v67_checkpoint_config_preserves_sparse_recovery_prior_fields(self) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "sparse_handoff_recovery_prior_enabled": True,
+                "sparse_handoff_recovery_prefetch_bias": 6.80,
+                "sparse_handoff_recovery_prepare_bias": 5.40,
+                "sparse_handoff_recovery_current_fill_bias": 2.40,
+                "sparse_handoff_recovery_steady_bias": 1.45,
+                "sparse_handoff_recovery_local_penalty": 6.20,
+                "sparse_handoff_recovery_min_context": 0.16,
+                "sparse_handoff_recovery_max_eta": 16,
+            },
+        )
+
+        self.assertTrue(filtered["sparse_handoff_recovery_prior_enabled"])
+        self.assertEqual(filtered["sparse_handoff_recovery_prefetch_bias"], 6.80)
+        self.assertEqual(filtered["sparse_handoff_recovery_prepare_bias"], 5.40)
+        self.assertEqual(filtered["sparse_handoff_recovery_current_fill_bias"], 2.40)
+        self.assertEqual(filtered["sparse_handoff_recovery_steady_bias"], 1.45)
+        self.assertEqual(filtered["sparse_handoff_recovery_local_penalty"], 6.20)
+        self.assertEqual(filtered["sparse_handoff_recovery_min_context"], 0.16)
+        self.assertEqual(filtered["sparse_handoff_recovery_max_eta"], 16)
+
+    def test_sa_v69_checkpoint_config_preserves_sparse_realization_credit_fields(self) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "sparse_handoff_realization_credit_enabled": True,
+                "sparse_handoff_realization_success_bonus": 1.55,
+                "sparse_handoff_realization_ready_bonus": 1.25,
+                "sparse_handoff_realization_prefetch_bonus": 1.05,
+                "sparse_handoff_realization_failed_prepare_penalty": 2.55,
+                "sparse_handoff_realization_local_penalty": 1.65,
+                "sparse_handoff_realization_min_context": 0.08,
+            },
+        )
+
+        self.assertTrue(filtered["sparse_handoff_realization_credit_enabled"])
+        self.assertEqual(filtered["sparse_handoff_realization_success_bonus"], 1.55)
+        self.assertEqual(filtered["sparse_handoff_realization_ready_bonus"], 1.25)
+        self.assertEqual(filtered["sparse_handoff_realization_prefetch_bonus"], 1.05)
+        self.assertEqual(filtered["sparse_handoff_realization_failed_prepare_penalty"], 2.55)
+        self.assertEqual(filtered["sparse_handoff_realization_local_penalty"], 1.65)
+        self.assertEqual(filtered["sparse_handoff_realization_min_context"], 0.08)
+
+    def test_sa_v70_checkpoint_config_preserves_sparse_tail_option_fields(self) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "sparse_handoff_option_prior_enabled": True,
+                "sparse_handoff_option_prepare_bias": 7.40,
+                "sparse_handoff_option_popularity_penalty": 4.35,
+                "sparse_handoff_option_local_penalty": 5.85,
+                "sparse_handoff_option_min_context": 0.08,
+                "sparse_handoff_option_max_eta": 22,
+            },
+        )
+
+        self.assertTrue(filtered["sparse_handoff_option_prior_enabled"])
+        self.assertEqual(filtered["sparse_handoff_option_prepare_bias"], 7.40)
+        self.assertEqual(filtered["sparse_handoff_option_popularity_penalty"], 4.35)
+        self.assertEqual(filtered["sparse_handoff_option_local_penalty"], 5.85)
+        self.assertEqual(filtered["sparse_handoff_option_min_context"], 0.08)
+        self.assertEqual(filtered["sparse_handoff_option_max_eta"], 22)
 
 
 if __name__ == "__main__":

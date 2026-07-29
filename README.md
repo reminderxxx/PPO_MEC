@@ -1,5 +1,17 @@
 # PPO_MEC
 
+## 2026-07-29 v70 sparse-tail option MAPPO 正式结果
+
+v70 `top_journal_mechanism_v70_sparse_tail_option_mappo` 已按 3 seed、12-agent、frozen mixed/full 窗口完成全量 benchmark，并首次在当前 offset-free formal-min full_stratified 协议下让 SA-GHMAPPO 同时高于 DT 规则/专项对照、popularity heuristic、PPO 和 MAPPO。关键 artifact：
+
+- mixed: `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730/benchmarks/mixed_informative_config_loaded/main_results_mixed_informative_20260730_010306_535310/aggregate_summary.json`
+- full: `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730/benchmarks/full_stratified_config_loaded/main_results_full_stratified_20260730_010523_184238/aggregate_summary.json`
+- full hierarchical statistics: `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730/statistics/full_stratified_hierarchical/paired_statistics.json`
+
+结果：mixed 中 SA `33.763250` > DT `32.922750` > popularity `31.756250` > PPO `29.017167` > MAPPO `18.310000`；full 中 SA `32.385729` > DT `31.426667` > popularity `29.969271` > PPO `27.301597` > MAPPO `16.261458`。full-only window-outer hierarchical bootstrap 显示 SA 相对 DT 的 total reward delta 为 `+0.959063`，95% CI `[0.554171, 1.691468]`；相对 PPO 为 `+5.084132`，相对 MAPPO 为 `+16.124271`。收益来自 v70 sparse-tail option-prior 把原本 v67/v69 的 `idle_or_sparse` 短板从 `27.1015` 提升到 `30.7365`，并反超 DT `29.29275`。
+
+结论边界：这是本轮“主算法 reward 高于其他算法”的正式 artifact 证据，但仍不是 `TMC-ready` 或 paper-ready package。当前还缺独立 hidden/future holdout、support suite、完整 artifact integrity/command-log package、消融与 robustness/scalability 复核；并且相对 DT 的 continuity 微弱为负、backhaul cost 略高，不能写成所有系统指标全面优于规则。
+
 ## 2026-07-21 MAPPO 行为正则 dev-probe 状态
 
 v40/v41 已按用户要求做算法侧 MAPPO 改进并完成 frozen dev full-pool 复核，但没有证明“主算法高于全部算法”。当前本轮最高 SA 结果来自 v39 update_0005 full-pool：SA-GHMAPPO total reward `106.041`，高于 MAPPO `105.5875`、popularity `105.25` 和 PPO `94.77375`，但低于 `cache_offload_drl=119.14875` 与 `dt_handoff_drl=119.22625`，artifact 为 `artifacts/experiments/top_journal_closed_loop/top_journal_v39_delayed_credit_dev_probe/benchmarks/update_0005_full_pool/main_results_full_stratified_20260721_011956_616135/aggregate_summary.json`。

@@ -39,6 +39,8 @@ python scripts/check_data_ready.py
 .venv/bin/python scripts/benchmark_main_results.py --seed_checkpoint_manifest_path artifacts/experiments/top_journal_closed_loop/strict_full_v8_dev_screen_20260621_v2/seed_checkpoint_manifest.json --seeds 7 13 29 41 53 --window_plan_path configs/experiment/top_journal_v8_strict_split_20260621/formal_window_plan.json --window_mode full_stratified --primary_vehicle_selection handoff_pressure
 ```
 
+当传入 `--window_plan_path` 时，`benchmark_main_results.py` 会直接读取 frozen plan 中的 `selected_window_plan`，不再先重扫原始 mobility 候选窗口。该快路径只改变执行效率，不改变窗口集合、reward、baseline 或 evaluator 口径。
+
 strict statistics：
 
 ```bash

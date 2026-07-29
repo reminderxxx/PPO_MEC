@@ -1,0 +1,47 @@
+profile: top_journal_mechanism_v70_sparse_tail_option_mappo
+base_profile: top_journal_mechanism_v69_realization_credit_mappo
+purpose: >
+  Inject sparse-tail handoff risk into the hierarchical MAPPO option gate so
+  idle_or_sparse windows with a predicted handoff opportunity can choose the
+  mechanism_prepare option before popularity/local fallback dominates.
+
+algorithm_delta:
+  - Keeps v69 success-conditioned sparse handoff realization credit.
+  - Adds a sparse_handoff_option_prior inside the learned option policy logits.
+  - Boosts mechanism_prepare only when idle_or_sparse context, target-different
+    prediction, bounded ETA, and reliability/urgency context are present.
+  - Suppresses popularity_safe and no_rsu_local options only in that sparse-tail
+    context.
+  - Leaves reward, action schema, baseline checkpoints, and benchmark filtering
+    unchanged.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  prediction_horizon: 16
+
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  learning_rate: 1.84e-5
+  clip_ratio: 0.030
+  target_kl: 0.0014
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+
+checkpoint_protocol:
+  closed_loop_priority: reward_first
+  selection_source: training_update_eval
+  disallowed_claim: benchmark_selected_checkpoint
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    This is a sparse-tail option-policy candidate. It is promotable only if
+    mixed_informative and full_stratified multi-seed benchmarks beat PPO, MAPPO,
+    popularity_cache_heuristic, DT handoff, cache/DAG learned baselines, and
+    show stronger idle_or_sparse handoff readiness without reward/action or
+    evaluator changes.

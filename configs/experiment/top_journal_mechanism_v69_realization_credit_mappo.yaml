@@ -1,0 +1,48 @@
+profile: top_journal_mechanism_v69_realization_credit_mappo
+base_profile: top_journal_mechanism_v67_sparse_handoff_recovery_mappo
+purpose: >
+  Add success-conditioned sparse handoff realization credit to the hierarchical
+  MAPPO actor/option advantage so sparse-window prepare and prefetch actions are
+  reinforced only when they produce validated prefetch hits, handoff readiness,
+  or migration success.
+
+algorithm_delta:
+  - Keeps v67 sparse_handoff_recovery_prior inside actor/env-action logits.
+  - Adds sparse_handoff_realization_credit to event and option-gate MAPPO credit.
+  - Rewards validated prefetch, handoff-ready state, and realized migration in
+    idle_or_sparse recovery contexts.
+  - Penalizes failed prepare/prefetch attempts and local fallback under sparse
+    handoff recovery context.
+  - Keeps idle popularity fallback enabled; this profile does not use the v68
+    actor-native fallback removal.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  prediction_horizon: 16
+
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  learning_rate: 1.84e-5
+  clip_ratio: 0.030
+  target_kl: 0.0014
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+
+checkpoint_protocol:
+  closed_loop_priority: reward_first
+  selection_source: training_update_eval
+  disallowed_claim: benchmark_selected_checkpoint
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    This is a MAPPO credit-assignment candidate. It may only be promoted if
+    full mixed_informative and full_stratified multi-seed benchmarks show reward
+    above PPO, MAPPO, popularity_cache_heuristic, and DT/cache/DAG learned
+    baselines without changing reward, action contract, baseline contract, or
+    benchmark result filtering.

@@ -1,5 +1,26 @@
 # Artifact Records
 
+## 2026-07-29 v70 sparse-tail option MAPPO formal-min all-baseline winner
+
+状态：`[offset-free]` `[formal-min]` `[multi-seed]` `[all-baseline-reward-winner]` `[not-tmc-ready]`
+
+路径：
+
+- `configs/experiment/top_journal_mechanism_v70_sparse_tail_option_mappo.yaml`
+- `artifacts/training/top_journal_v70_sparse_tail_option_formal_min_dev/sa_ghmappo/sa_ghmappo_train_20260730_002620_391783_seed7/train_summary.json`
+- `artifacts/training/top_journal_v70_sparse_tail_option_formal_min_dev/sa_ghmappo/sa_ghmappo_train_20260730_002620_474927_seed13/train_summary.json`
+- `artifacts/training/top_journal_v70_sparse_tail_option_formal_min_dev/sa_ghmappo/sa_ghmappo_train_20260730_002620_477551_seed29/train_summary.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730/seed_checkpoint_manifest.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730/benchmarks/mixed_informative_config_loaded/main_results_mixed_informative_20260730_010306_535310/aggregate_summary.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730/benchmarks/full_stratified_config_loaded/main_results_full_stratified_20260730_010523_184238/aggregate_summary.json`
+- `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730/statistics/full_stratified_hierarchical/paired_statistics.json`
+
+确认结果：v70 在 3 seeds `[7,13,29]`、12 agents、`reward_positive_offset=0.0`、`prediction_horizon=16`、frozen mixed/full formal-min windows 上完成全量 benchmark。mixed 中 SA-GHMAPPO total reward `33.763250`，高于 `dt_handoff_drl=32.922750`、`popularity_cache_heuristic=31.756250`、`ppo=29.017167`、`mappo=18.310000`。full_stratified 中 SA-GHMAPPO `32.385729`，高于 `dt_handoff_drl=31.426667`、`popularity_cache_heuristic=29.969271`、`ppo=27.301597`、`mappo=16.261458`。
+
+分层结果说明提升来自 v70 的 sparse-tail option-policy prior：mechanism 与 active non-mechanism 窗口数值相对 v67/v69 不变；`idle_or_sparse` 从 SA `27.1015` 提高到 `30.7365`，相对 DT 从 `-2.19125` 转为 `+1.44375`。full-only window-outer hierarchical statistics 给出 SA vs DT total reward delta `+0.959063`，95% CI `[0.554171, 1.691468]`；SA vs popularity/PPO/MAPPO 的 total reward CI 也均为正。
+
+结论边界：v70 是当前 formal-min all-baseline reward winner，改动属于 policy-side MAPPO option boundary，不是 reward/env/action/baseline/evaluator 包装。但它仍不是 paper-ready package：缺独立 hidden/future holdout、support suite、artifact integrity/command-log package、ablation、robustness/scalability 和 readiness audit；相对 DT/popularity 的 backhaul trade-off 仍需报告。
+
 ## 2026-07-27 v55 coverage-recovery MAPPO full-dev summary rerun
 
 状态：`[offset-free]` `[multi-seed-dev]` `[summary-generated]` `[compact-audit-only]` `[not-tmc-ready]`

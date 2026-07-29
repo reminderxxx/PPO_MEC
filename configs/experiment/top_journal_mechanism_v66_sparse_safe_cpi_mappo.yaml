@@ -1,0 +1,41 @@
+profile: top_journal_mechanism_v66_sparse_safe_cpi_mappo
+base_profile: top_journal_mechanism_v65_argmax_margin_mappo
+purpose: >
+  Restore sparse-handoff recovery learning while preventing late PPO drift with
+  a conservative-policy-improvement style validation checkpoint protocol.
+
+algorithm_delta:
+  - Reweights sparse recovery in the hierarchical MAPPO env-action PPO loss.
+  - Strengthens digital-twin prior distillation for sparse/idle handoff timing.
+  - Keeps v65 risk-adaptive argmax-margin regularization but relaxes it so valid
+    sparse recovery actions are not suppressed.
+  - Uses lower PPO target KL and ratio barrier to limit destructive late updates.
+  - Selects the training validation best-by-reward checkpoint in closed-loop runs.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  prediction_horizon: 16
+
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  learning_rate: 1.88e-5
+  clip_ratio: 0.030
+  target_kl: 0.0016
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+
+checkpoint_protocol:
+  closed_loop_priority: reward_first
+  selection_source: training_update_eval
+  disallowed_claim: benchmark_selected_checkpoint
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    This profile must be validated by full mixed_informative and full_stratified
+    multi-seed benchmarks before any superiority claim is made.

@@ -2,6 +2,14 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-07-29: v70 formal-min all-baseline reward winner 仍非 paper-ready（OPEN）
+
+- v70 `top_journal_mechanism_v70_sparse_tail_option_mappo` 已在当前 formal-min mixed/full 全量 benchmark 中让 SA-GHMAPPO total reward 排名第一。full_stratified artifact 为 `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730/benchmarks/full_stratified_config_loaded/main_results_full_stratified_20260730_010523_184238/aggregate_summary.json`：SA `32.385729` > DT `31.426667` > popularity `29.969271` > PPO `27.301597` > MAPPO `16.261458`。
+- 当前最关键正向证据是 full-only window-outer hierarchical statistics：`artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730/statistics/full_stratified_hierarchical/paired_statistics.json`。SA vs DT total reward delta 为 `+0.959063`，95% CI `[0.554171, 1.691468]`；SA vs popularity/PPO/MAPPO 的 reward CI 也均为正。
+- 不得把 v70 写成 paper-ready / TMC-ready：本轮是 formal-min benchmark + statistics，缺独立 hidden/future holdout、support suite、artifact integrity/command-log package、ablation、prediction/system robustness、scalability 和完整 readiness audit，证据等级低于 `E2_ARTIFACT_AUDITED`。
+- 不得声称所有系统指标全面优于规则。v70 相对 DT 的 reward 与 mechanism readiness/realization 为正，但 workflow continuity delta 微弱为负且 CI 触及 0；backhaul cost 相对 DT 略高，SA vs DT backhaul signed benefit 为 `-0.444444`，95% CI `[-1.515039, 0.0]`，Holm p=`0.07812`。相对 popularity 的 reward/continuity/readiness/realization 为正，但 backhaul cost 仍更高：raw delta `+1.5`。
+- v70 的安全表述边界：提升来自 policy-side sparse-tail option prior 修复 `idle_or_sparse` option boundary，使该 strata reward 从 v67/v69 的 `27.1015` 提到 `30.7365` 并反超 DT `29.29275`；不是 reward shaping、environment/action schema、baseline contract 或 evaluator filtering。后续若冲击投稿，需要冻结未消费 holdout 并补 support/ablation，不得继续在已查看 formal-min 结果上反复调参后再把它当独立验证。
+
 ## 2026-07-27: v55 coverage-recovery dev evidence 与后处理审计风险（OPEN）
 
 - v52/v53 已确认存在策略路径接入问题：net-advantage prepare gate 没有进入 `SAGHMAPPOBaseAgent` 覆盖后的 `_apply_policy_adjustments`。本轮已在真实 policy path 中修复，并用单元测试覆盖；历史 v52/v53 结果不得解释为 gate 已实际改善主策略。

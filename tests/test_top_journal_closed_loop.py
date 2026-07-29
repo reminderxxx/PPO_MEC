@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from scripts.run_top_journal_closed_loop import (
     FORMAL_MIN_SETTINGS,
     ROOT_DIR,
@@ -13,7 +15,11 @@ from scripts.run_top_journal_closed_loop import (
     latest_training_summary_for_seed,
     select_sa_checkpoint,
 )
-from src.evaluators.main_results_support import build_window_context_agent_overrides, summary_to_row
+from src.evaluators.main_results_support import (
+    build_window_context_agent_overrides,
+    load_seed_checkpoint_manifest,
+    summary_to_row,
+)
 
 
 TEST_ROOT = ROOT_DIR / "artifacts" / "tmp_validation" / "top_journal_closed_loop_tests"
@@ -1761,6 +1767,547 @@ def test_effective_settings_honor_v55_coverage_recovery_budget_offset_and_horizo
     assert settings["max_steps"] == 22
     assert settings["prediction_horizon"] == 16
     assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v56_partial_observation_memory_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v56_partial_observation_handoff_memory_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v57_service_continuity_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v57_service_continuity_counterfactual_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v58_ready_aware_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v58_ready_aware_counterfactual_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v59_sparse_recovery_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v59_sparse_recovery_curriculum_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v60_risk_adjusted_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v60_risk_adjusted_recovery_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v61_adapter_miss_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v61_adapter_miss_counterfactual_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v62_cache_feasibility_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v62_cache_feasibility_prior_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v63_current_ready_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v63_current_ready_two_stage_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v64_handoff_alignment_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v64_handoff_alignment_barrier_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v65_argmax_margin_budget_offset_and_horizon() -> None:
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v65_argmax_margin_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+
+
+def test_effective_settings_honor_v66_sparse_safe_cpi_budget_and_checkpoint_policy() -> None:
+    from scripts.run_top_journal_closed_loop import (
+        SA_LATEST_FIRST_PROFILES,
+        SA_REWARD_FIRST_PROFILES,
+    )
+
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v66_sparse_safe_cpi_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+    assert Args.sa_profile in SA_REWARD_FIRST_PROFILES
+    assert Args.sa_profile not in SA_LATEST_FIRST_PROFILES
+
+
+def test_effective_settings_honor_v67_sparse_recovery_budget_and_checkpoint_policy() -> None:
+    from scripts.run_top_journal_closed_loop import (
+        SA_LATEST_FIRST_PROFILES,
+        SA_REWARD_FIRST_PROFILES,
+    )
+
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v67_sparse_handoff_recovery_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+    assert Args.sa_profile in SA_REWARD_FIRST_PROFILES
+    assert Args.sa_profile not in SA_LATEST_FIRST_PROFILES
+
+
+def test_effective_settings_honor_v68_actor_native_sparse_recovery_budget_and_checkpoint_policy() -> None:
+    from scripts.run_top_journal_closed_loop import (
+        SA_LATEST_FIRST_PROFILES,
+        SA_REWARD_FIRST_PROFILES,
+    )
+
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v68_actor_native_sparse_recovery_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+    assert Args.sa_profile in SA_REWARD_FIRST_PROFILES
+    assert Args.sa_profile not in SA_LATEST_FIRST_PROFILES
+
+
+def test_effective_settings_honor_v69_realization_credit_budget_and_checkpoint_policy() -> None:
+    from scripts.run_top_journal_closed_loop import (
+        SA_LATEST_FIRST_PROFILES,
+        SA_REWARD_FIRST_PROFILES,
+    )
+
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v69_realization_credit_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+    assert Args.sa_profile in SA_REWARD_FIRST_PROFILES
+    assert Args.sa_profile not in SA_LATEST_FIRST_PROFILES
+
+
+def test_effective_settings_honor_v70_sparse_tail_option_budget_and_checkpoint_policy() -> None:
+    from scripts.run_top_journal_closed_loop import (
+        SA_LATEST_FIRST_PROFILES,
+        SA_REWARD_FIRST_PROFILES,
+    )
+
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v70_sparse_tail_option_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 128
+    assert settings["baseline_episodes"] == 96
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["max_steps"] == 22
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+    assert Args.sa_profile in SA_REWARD_FIRST_PROFILES
+    assert Args.sa_profile not in SA_LATEST_FIRST_PROFILES
+
+
+def test_seed_checkpoint_manifest_rejects_seed_keyed_payload() -> None:
+    manifest_path = _test_path("seed_keyed_manifest_rejected", "seed_checkpoint_manifest.json")
+    manifest_path.write_text(
+        json.dumps({"7": {"sa_ghmappo": "wrong-layout.pt"}}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="keyed by agent name"):
+        load_seed_checkpoint_manifest(manifest_path)
 
 
 def test_v12_selects_reward_checkpoint_and_skips_v11_window_override() -> None:

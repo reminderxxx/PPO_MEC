@@ -78,6 +78,8 @@ MAIN_RESULT_METRICS = [
     "cache_warm_start_guard_rate",
     "predictive_prefetch_admission_guard_count",
     "predictive_prefetch_admission_guard_rate",
+    "coverage_recovery_final_guard_count",
+    "coverage_recovery_final_guard_rate",
     "option_gate_enabled_count",
     "option_gate_enabled_rate",
     "option_gate_applied_count",
@@ -283,9 +285,17 @@ def load_seed_checkpoint_manifest(path: str | Path) -> dict[str, dict[str, str]]
         raise ValueError(f"seed checkpoint manifest must be a mapping: {manifest_path}")
     normalized: dict[str, dict[str, str]] = {}
     for agent_name, seed_map in payload.items():
+        agent_key = str(agent_name)
+        if agent_key.startswith("_"):
+            continue
+        if agent_key.isdigit():
+            raise ValueError(
+                "seed checkpoint manifest must be keyed by agent name, not seed; "
+                f"found top-level seed key {agent_key!r} in {manifest_path}"
+            )
         if not isinstance(seed_map, dict):
             continue
-        normalized[str(agent_name)] = {
+        normalized[agent_key] = {
             str(seed): str(checkpoint_path)
             for seed, checkpoint_path in seed_map.items()
             if str(checkpoint_path)
@@ -1775,6 +1785,12 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         ),
         "predictive_prefetch_admission_guard_rate": float(
             agent_action_diagnostics.get("predictive_prefetch_admission_guard_rate", 0.0) or 0.0
+        ),
+        "coverage_recovery_final_guard_count": int(
+            agent_action_diagnostics.get("coverage_recovery_final_guard_count", 0) or 0
+        ),
+        "coverage_recovery_final_guard_rate": float(
+            agent_action_diagnostics.get("coverage_recovery_final_guard_rate", 0.0) or 0.0
         ),
         "option_gate_enabled_count": int(agent_action_diagnostics.get("option_gate_enabled_count", 0) or 0),
         "option_gate_enabled_rate": float(agent_action_diagnostics.get("option_gate_enabled_rate", 0.0) or 0.0),

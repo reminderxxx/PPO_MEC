@@ -153,6 +153,15 @@ class MARLOnPolicyTrainer(BaseTrainer):
                 .get("guarded", False)
             )
         ]
+        coverage_recovery_final_guard_rows = [
+            row
+            for row in rollout
+            if bool(
+                row.get("action_info", {})
+                .get("coverage_recovery_final_guard", {})
+                .get("guarded", False)
+            )
+        ]
         action_projection_rows = [
             row
             for row in rollout
@@ -213,6 +222,11 @@ class MARLOnPolicyTrainer(BaseTrainer):
             "predictive_prefetch_admission_guard_count": len(prefetch_admission_guard_rows),
             "predictive_prefetch_admission_guard_rate": round(
                 float(len(prefetch_admission_guard_rows)) / float(total_steps),
+                6,
+            ),
+            "coverage_recovery_final_guard_count": len(coverage_recovery_final_guard_rows),
+            "coverage_recovery_final_guard_rate": round(
+                float(len(coverage_recovery_final_guard_rows)) / float(total_steps),
                 6,
             ),
             "option_gate_enabled_count": len(option_gate_rows),

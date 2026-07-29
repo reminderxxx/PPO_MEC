@@ -126,6 +126,15 @@ def load_excluded_window_intervals(paths: list[str]) -> list[tuple[int, int]]:
     return sorted(intervals)
 
 
+def load_frozen_benchmark_window_payload(plan_path: str | Path) -> tuple[str, dict[str, Any]]:
+    """Load an explicit frozen window plan without rescanning raw mobility windows."""
+    resolved_path = Path(plan_path)
+    payload = json.loads(resolved_path.read_text(encoding="utf-8-sig"))
+    metadata = payload if isinstance(payload, dict) else {}
+    window_payload = apply_frozen_window_plan({"selected_windows": []}, resolved_path)
+    return str(metadata.get("mobility_source_path", "")), window_payload
+
+
 def build_checkpoint_map(args: argparse.Namespace) -> dict[str, str]:
     return {
         "sa_ghmappo": args.sa_ghmappo_checkpoint_path,
@@ -162,8 +171,16 @@ def load_seed_checkpoint_manifest(path: str) -> dict[str, dict[str, str]]:
         raise ValueError(f"seed checkpoint manifest must be a mapping: {manifest_path}")
     normalized: dict[str, dict[str, str]] = {}
     for agent_name, seed_map in payload.items():
+        agent_key = str(agent_name)
+        if agent_key.startswith("_"):
+            continue
+        if agent_key.isdigit():
+            raise ValueError(
+                "seed checkpoint manifest must be keyed by agent name, not seed; "
+                f"found top-level seed key {agent_key!r} in {manifest_path}"
+            )
         if isinstance(seed_map, dict):
-            normalized[str(agent_name)] = {
+            normalized[agent_key] = {
                 str(seed): str(checkpoint_path)
                 for seed, checkpoint_path in seed_map.items()
                 if str(checkpoint_path)
@@ -273,6 +290,11 @@ def build_comparison_against_popularity(
         for row in rows
         if row.get("agent_name") == "sa_ghmappo"
     )
+    coverage_recovery_final_guard_count = sum(
+        int(row.get("coverage_recovery_final_guard_count", 0) or 0)
+        for row in rows
+        if row.get("agent_name") == "sa_ghmappo"
+    )
     mechanism_attempt_count = sum(
         float(row.get("mechanism_attempt_count", 0.0) or 0.0)
         for row in rows
@@ -295,6 +317,7 @@ def build_comparison_against_popularity(
             "action_projection_count": action_projection_count,
             "invalid_action_attempt_count": invalid_action_attempt_count,
             "guard_action_delta_count": guard_action_delta_count,
+            "coverage_recovery_final_guard_count": coverage_recovery_final_guard_count,
             "mechanism_attempt_count": round(mechanism_attempt_count, 6),
             "mechanism_validated_success_count": round(mechanism_validated_success_count, 6),
             "mechanism_success_rate": round(
@@ -374,40 +397,41 @@ def main() -> None:
         seed_checkpoint_manifest=seed_checkpoint_manifest,
         seeds=args.seeds,
     )
-    mobility_source_path, window_payload = resolve_window_candidates(
-        root_dir=ROOT_DIR,
-        mobility_source=args.mobility_source,
-        mobility_csv_path=args.mobility_csv_path,
-        lust_scenario_root=args.lust_scenario_root,
-        max_mobility_rows=args.max_mobility_rows,
-        rsu_layout=args.rsu_layout,
-        frame_offset=args.frame_offset,
-        window_length=args.window_length,
-        window_selector=args.window_selector,
-        window_count=args.window_count,
-        window_scan_stride=args.window_scan_stride,
-        random_seed=args.seeds[0] if args.seeds else 7,
-        window_mode=args.window_mode,
-        window_rank_offset=args.window_rank_offset,
-        excluded_window_intervals=excluded_window_intervals,
-        holdout_min_gap_frames=args.holdout_min_gap_frames,
-        enforce_non_overlapping_selection=args.enforce_non_overlapping_selection,
-        activating_handoff_threshold=args.activating_handoff_threshold,
-        activating_vehicle_threshold=args.activating_vehicle_threshold,
-        activating_predicted_next_ratio_threshold=args.activating_predicted_next_ratio_threshold,
-        activating_handoff_prediction_ratio_threshold=args.activating_handoff_prediction_ratio_threshold,
-        non_mechanism_handoff_max=args.non_mechanism_handoff_max,
-        non_mechanism_prediction_ratio_max=args.non_mechanism_prediction_ratio_max,
-        active_non_mechanism_vehicle_threshold=args.active_non_mechanism_vehicle_threshold,
-        active_non_mechanism_association_change_min=args.active_non_mechanism_association_change_min,
-        active_non_mechanism_handoff_max=args.active_non_mechanism_handoff_max,
-        active_non_mechanism_predicted_next_ratio_max=args.active_non_mechanism_predicted_next_ratio_max,
-        active_non_mechanism_handoff_prediction_ratio_max=args.active_non_mechanism_handoff_prediction_ratio_max,
-        idle_or_sparse_vehicle_max=args.idle_or_sparse_vehicle_max,
-        idle_or_sparse_association_change_max=args.idle_or_sparse_association_change_max,
-    )
     if args.window_plan_path:
-        window_payload = apply_frozen_window_plan(window_payload, args.window_plan_path)
+        mobility_source_path, window_payload = load_frozen_benchmark_window_payload(args.window_plan_path)
+    else:
+        mobility_source_path, window_payload = resolve_window_candidates(
+            root_dir=ROOT_DIR,
+            mobility_source=args.mobility_source,
+            mobility_csv_path=args.mobility_csv_path,
+            lust_scenario_root=args.lust_scenario_root,
+            max_mobility_rows=args.max_mobility_rows,
+            rsu_layout=args.rsu_layout,
+            frame_offset=args.frame_offset,
+            window_length=args.window_length,
+            window_selector=args.window_selector,
+            window_count=args.window_count,
+            window_scan_stride=args.window_scan_stride,
+            random_seed=args.seeds[0] if args.seeds else 7,
+            window_mode=args.window_mode,
+            window_rank_offset=args.window_rank_offset,
+            excluded_window_intervals=excluded_window_intervals,
+            holdout_min_gap_frames=args.holdout_min_gap_frames,
+            enforce_non_overlapping_selection=args.enforce_non_overlapping_selection,
+            activating_handoff_threshold=args.activating_handoff_threshold,
+            activating_vehicle_threshold=args.activating_vehicle_threshold,
+            activating_predicted_next_ratio_threshold=args.activating_predicted_next_ratio_threshold,
+            activating_handoff_prediction_ratio_threshold=args.activating_handoff_prediction_ratio_threshold,
+            non_mechanism_handoff_max=args.non_mechanism_handoff_max,
+            non_mechanism_prediction_ratio_max=args.non_mechanism_prediction_ratio_max,
+            active_non_mechanism_vehicle_threshold=args.active_non_mechanism_vehicle_threshold,
+            active_non_mechanism_association_change_min=args.active_non_mechanism_association_change_min,
+            active_non_mechanism_handoff_max=args.active_non_mechanism_handoff_max,
+            active_non_mechanism_predicted_next_ratio_max=args.active_non_mechanism_predicted_next_ratio_max,
+            active_non_mechanism_handoff_prediction_ratio_max=args.active_non_mechanism_handoff_prediction_ratio_max,
+            idle_or_sparse_vehicle_max=args.idle_or_sparse_vehicle_max,
+            idle_or_sparse_association_change_max=args.idle_or_sparse_association_change_max,
+        )
     checkpoint_audit_bundle = audit_checkpoint_map(checkpoint_map=audit_checkpoint_source_map, agents=args.agents)
     checkpoint_audit = checkpoint_audit_bundle["checkpoint_audit"]
     smoke_warnings = checkpoint_audit_bundle["warnings"]

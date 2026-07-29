@@ -1,0 +1,45 @@
+profile: top_journal_mechanism_v67_sparse_handoff_recovery_mappo
+base_profile: top_journal_mechanism_v66_sparse_safe_cpi_mappo
+purpose: >
+  Add a sparse-window handoff recovery prior inside the hierarchical MAPPO actor
+  so reward-first checkpoints can learn adapter prefetch/prepare timing in
+  idle_or_sparse windows instead of losing reward to DT-style lookahead.
+
+algorithm_delta:
+  - Adds sparse_handoff_recovery_prior to actor/env-action logits, not as an
+    evaluation wrapper.
+  - Activates only on idle_or_sparse windows with a predicted non-current RSU
+    target, valid adapter demand, and bounded ETA.
+  - Biases predictive prefetch when the target adapter is missing.
+  - Biases handoff_prepare when ETA is close or the target adapter is ready.
+  - Penalizes local fallback under sparse handoff recovery context.
+  - Keeps v66 conservative PPO/KL and reward-first checkpoint selection.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  prediction_horizon: 16
+
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  learning_rate: 1.86e-5
+  clip_ratio: 0.030
+  target_kl: 0.0015
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+
+checkpoint_protocol:
+  closed_loop_priority: reward_first
+  selection_source: training_update_eval
+  disallowed_claim: benchmark_selected_checkpoint
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    This profile must beat PPO/MAPPO and the strongest heuristic/DT baselines
+    on full mixed_informative and full_stratified multi-seed benchmarks before
+    any superiority or paper-ready claim is made.

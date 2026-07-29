@@ -1,0 +1,56 @@
+profile: top_journal_mechanism_v61_adapter_miss_counterfactual_mappo
+base_profile: top_journal_mechanism_v60_risk_adjusted_recovery_mappo
+purpose: >
+  Offset-free MAPPO candidate that targets the v60 root cause: mechanism
+  realization improved, but steady offload without adapter/cache support caused
+  adapter misses, stalls, continuity loss, and lower total reward.
+algorithm_delta:
+  - Adds an adapter-miss counterfactual teacher inside centralized MAPPO
+    env-action learning. When a training transition shows cache miss or stall
+    pressure, cache-fill receives positive counterfactual credit while steady
+    offload receives negative credit.
+  - Routes the new credit through env-action PPO and counterfactual margin
+    learning, so the policy changes through learned advantage ranking instead
+    of evaluator-time action overrides.
+  - Retains v60 risk-adjusted recovery for prepare/prefetch actions but lowers
+    sparse recovery and option prior weights to reduce over-preparation.
+  - Preserves reward protocol, environment transition rules, action schema, and
+    benchmark baselines. This is not an evaluator wrapper or result filter.
+negative_controls:
+  - Corrected v60 still loses total reward against PPO, popularity, and DT on
+    mixed_informative and full_stratified despite higher mechanism realization.
+  - v61 must be judged by corrected mixed_informative and full_stratified
+    benchmark artifacts, not by training reward alone.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+training_window_protocol:
+  window_mode: full_stratified
+  train_window_mode: rotate
+post_training_audit_protocol:
+  default_mode: compact
+  compact_scope: 1_window_x_1_workflow
+  full_protocol_required_for_paper_ready: true
+  repair_best_record_from_compact_audit: false
+prediction_protocol:
+  predictor_kind: baseline
+  predictor_name: baseline_predictor_v3
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+adapter_miss_counterfactual_learning:
+  env_action_adapter_miss_counterfactual_coef: 2.85
+  env_action_risk_adjusted_recovery_coef: 2.40
+  env_action_sparse_recovery_focus: 0.34
+  env_action_counterfactual_margin_enabled: true
+  counterfactual_teacher_prd_enabled: true
+paper_claim_boundary: >
+  Candidate only. It can support a paper claim only after independent formal,
+  holdout, and support-suite artifacts with complete provenance show robust
+  superiority without hidden tuning or overlap leakage.

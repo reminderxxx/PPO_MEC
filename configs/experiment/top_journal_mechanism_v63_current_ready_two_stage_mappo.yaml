@@ -1,0 +1,65 @@
+profile: top_journal_mechanism_v63_current_ready_two_stage_mappo
+base_profile: top_journal_mechanism_v62_cache_feasibility_prior_mappo
+purpose: >
+  Offset-free MAPPO candidate that targets the v62 root cause: mechanism
+  windows achieved high handoff readiness but still suffered low continuity and
+  high adapter misses because prepare/prefetch actions could be selected before
+  the current RSU had the required adapter for same-step service.
+algorithm_delta:
+  - Adds a current-ready two-stage feasibility prior inside the centralized
+    hierarchical MAPPO policy. If the current RSU lacks the required adapter,
+    the actor first receives stronger cache-fill preference and strong
+    prepare/prefetch suppression, even under a strong handoff signal.
+  - Once the current adapter is ready, the existing handoff prepare/prefetch
+    logic can activate normally. This keeps predictive learning but aligns it
+    with same-step service continuity.
+  - Keeps all reward accounting, action schema, benchmark baselines, and
+    evaluation protocol unchanged. This is not an evaluator wrapper or
+    post-policy action replacement.
+negative_controls:
+  - Corrected v62 beats MAPPO on full_stratified but loses to PPO, popularity,
+    and DT because mechanism_activating continuity is only 0.575 and adapter
+    miss count remains high.
+  - v63 must be judged by corrected mixed_informative and full_stratified
+    benchmark artifacts, not by training reward alone.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+training_window_protocol:
+  window_mode: full_stratified
+  train_window_mode: rotate
+post_training_audit_protocol:
+  default_mode: compact
+  compact_scope: 1_window_x_1_workflow
+  full_protocol_required_for_paper_ready: true
+  repair_best_record_from_compact_audit: false
+prediction_protocol:
+  predictor_kind: baseline
+  predictor_name: baseline_predictor_v3
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+current_ready_two_stage_prior:
+  cache_feasibility_prior_enabled: true
+  cache_feasibility_cache_fill_bias: 7.20
+  cache_feasibility_steady_penalty: 6.20
+  cache_feasibility_current_miss_prepare_penalty: 8.80
+  cache_feasibility_current_miss_prefetch_penalty: 5.60
+  cache_feasibility_prepare_penalty: 1.45
+  cache_feasibility_prefetch_penalty: 1.65
+adapter_miss_counterfactual_learning:
+  env_action_adapter_miss_counterfactual_coef: 3.45
+  env_action_risk_adjusted_recovery_coef: 2.70
+  env_action_sparse_recovery_focus: 0.34
+  env_action_counterfactual_margin_enabled: true
+  counterfactual_teacher_prd_enabled: true
+paper_claim_boundary: >
+  Candidate only. It can support a paper claim only after independent formal,
+  holdout, and support-suite artifacts with complete provenance show robust
+  superiority without hidden tuning or overlap leakage.

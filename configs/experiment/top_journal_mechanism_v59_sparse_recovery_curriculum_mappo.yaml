@@ -1,0 +1,63 @@
+profile: top_journal_mechanism_v59_sparse_recovery_curriculum_mappo
+base_profile: top_journal_mechanism_v58_ready_aware_counterfactual_mappo
+purpose: >
+  Offset-free MAPPO candidate that fixes the validated v58 bottleneck:
+  idle_or_sparse windows were almost identical to popularity, because the
+  learner did not receive enough centralized recovery samples.
+algorithm_delta:
+  - Uses a centralized rare-context curriculum: full_stratified training rotates
+    through mechanism_activating, active_non_mechanism, and idle_or_sparse
+    windows under the same MAPPO actor-critic update.
+  - Adds sparse-recovery sample focus to env-action PPO and the counterfactual
+    margin loss, so idle_or_sparse rows with local-service collapse, predicted
+    handoff signal, or option-gate recovery candidates receive stronger
+    policy-gradient pressure.
+  - Strengthens service-continuity counterfactual credit and option-gate priors
+    for current-RSU service and prepare actions while preserving reward
+    function, action schema, environment transitions, and baseline protocols.
+  - Keeps the method learnable inside SA-GHMAPPO; no evaluator-side wrapper,
+    reward offset, result filtering, or baseline weakening is introduced.
+negative_controls:
+  - Corrected v58 exceeds PPO/MAPPO/popularity on mixed_informative but remains
+    below cache/DT; corrected full_stratified exceeds MAPPO/popularity/cache but
+    remains below PPO/DT.
+  - Corrected v58 full_stratified idle_or_sparse reward equals popularity
+    (8.042), exposing a training-distribution failure rather than a benchmark
+    reporting issue.
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  offset_adjusted_total_reward_reported: true
+training_budget:
+  episodes: 128
+  update_every: 8
+  batch_size: 32
+  train_window_count: 20
+  max_steps: 22
+training_window_protocol:
+  window_mode: full_stratified
+  train_window_mode: rotate
+  mechanism_window_oversample_ratio: 2.25
+  handoff_imminent_oversample_ratio: 1.50
+  target_mismatch_sample_weight: 1.50
+  min_mechanism_activating_windows: 4
+post_training_audit_protocol:
+  default_mode: compact
+  compact_scope: 1_window_x_1_workflow
+  full_protocol_required_for_paper_ready: true
+  repair_best_record_from_compact_audit: false
+prediction_protocol:
+  predictor_kind: baseline
+  predictor_name: baseline_predictor_v3
+  prediction_horizon: 16
+  shared_by_all_benchmark_agents: true
+sparse_recovery_learning:
+  env_action_sparse_recovery_focus: 1.18
+  counterfactual_teacher_prd_enabled: true
+  env_action_counterfactual_margin_enabled: true
+  idle_recovery_mechanism_prior_enabled: true
+  no_current_rsu_prepare_bias: true
+paper_claim_boundary: >
+  Candidate only. It can support a paper claim only after independent formal,
+  holdout, and support-suite artifacts with multi-seed statistics and complete
+  provenance show robust superiority without hidden tuning or overlap leakage.
