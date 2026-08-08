@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-07-30
+更新日期：2026-08-08
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -68,6 +68,14 @@
 | advantage-weighted policy improvement | [Advantage-Weighted Regression: Simple and Scalable Off-Policy Reinforcement Learning](https://arxiv.org/abs/1910.00177) | arXiv, 2019；正式 venue 待核验 | 使用 advantage-weighted supervised regression 更新 actor，使高 advantage 动作更容易被策略保留，是 AWR/AWBC 类方法的基础思路。 | PPO_MEC v40/v41 只借鉴 advantage-weighted behavior regularization，将其放入 controller-level MAPPO 更新；不是完整 off-policy AWR，也不能用作 VEC 场景 novelty 证明。 | Method motivation / negative-result discussion；解释 v40/v41 的行为正则来源和边界。 |
 | offline-to-online actor regularization | [AWAC: Accelerating Online Reinforcement Learning with Offline Datasets](https://arxiv.org/abs/2006.09359) | arXiv, 2020；正式 venue 待核验 | 用 advantage-weighted actor update 从离线数据或已有经验中提取可迁移行为，同时继续在线 RL 改进。 | PPO_MEC v40/v41 没有使用外部 offline dataset；只是把 rollout 内 teacher/student 行为差异和 advantage 门控结合，作为 MAPPO actor 的保守正则。 | Method motivation / reviewer response；说明这是学习目标设计，不是 evaluation wrapper 或 reward 改写。 |
 | conservative offline RL | [Conservative Q-Learning for Offline Reinforcement Learning](https://proceedings.neurips.cc/paper/2020/hash/0d2b2061826a5df3221116a5085a6052-Abstract.html) | NeurIPS, 2020 | 通过 conservative value estimation 抑制离线 RL 对数据外动作的过估计，强调保守 policy improvement 和 distributional safety。 | PPO_MEC v41 的 negative-only recovery 只借鉴 conservative improvement 思想，用于将负 advantage 的偏离拉回安全 teacher；不是 CQL，也没有 Q-function conservative penalty。 | Method motivation / risk discussion；支撑为什么 v41 不再鼓励所有 positive deviation。 |
+
+## Uncertainty-Aware Model-Based Policy Improvement
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---:|---|---|---|
+| short model rollouts for policy optimization | [When to Trust Your Model: Model-Based Policy Optimization](https://proceedings.neurips.cc/paper/2019/hash/5faf461eff3099671ad63c6f3f094f7f-Abstract.html) | NeurIPS, 2019 | 分析模型生成数据的偏差与策略改进关系，并用从真实数据分支出的短模型 rollout 提高 sample efficiency，避免长 horizon model bias。 | UCC-MAPPO 不采用长 imagination rollout；它在真实 VEC transition 上训练 action-conditioned reward/next-state/TD-target ensemble，只对合法原生动作做一步 conservative comparison，再由 MAPPO actor 学习。差异点是跨 RSU DAG/cache/handoff 的 controller-level action contract，而不是通用连续控制 world model。 | Method foundation / complexity analysis；说明为何采用 one-step model-assisted improvement。 |
+| uncertainty-penalized model-based improvement | [MOPO: Model-based Offline Policy Optimization](https://proceedings.neurips.cc/paper_files/paper/2020/hash/a322852ce0df73e204b7e67cbbef0d0a-Abstract.html) | NeurIPS, 2020 | 用 model ensemble disagreement 估计模型风险，并将不确定性作为 reward penalty，构造偏保守的 model-based policy improvement 目标以抑制分布外动作过估计。 | UCC-MAPPO 借鉴 ensemble disagreement 与 lower-confidence action target，但使用 online/on-policy real rollouts、critic-bootstrap TD target 和 MAPPO policy-prior trust region；不声称复现 MOPO 的 offline penalized-MDP 理论保证。 | Method foundation / risk-aware planner；必须报告 calibration、uncertainty ablation 和 model-query cost。 |
+| conservative model-based policy evaluation | [COMBO: Conservative Offline Model-Based Policy Optimization](https://openreview.net/forum?id=dUEpGV2mhf) | NeurIPS, 2021 | 指出显式 uncertainty 在复杂模型上可能不可靠，并通过 model rollout 与 out-of-support value regularization 构造 conservative value estimate，给出 offline policy improvement 分析。 | UCC-MAPPO 当前采用 calibrated bootstrap ensemble，保留显式 uncertainty；其新增问题是 VEC handoff/cache action support 与 controller-level policy prior。应通过 no-uncertainty、no-policy-prior 和 model-only ablation 检验性能是否来自真实机制，而非单一风险系数。 | Related Work / ablation rationale；明确 UCC-MAPPO 是 domain adaptation，不是 COMBO 的复现。 |
 
 ## VEC/MEC Offloading, Caching, Migration
 
