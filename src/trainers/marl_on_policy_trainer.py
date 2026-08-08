@@ -53,6 +53,39 @@ class MARLOnPolicyTrainer(BaseTrainer):
             policy_info["algorithm_memory"] = deepcopy(algorithm_memory)
             decision_info = dict(policy_info)
             action, action_info = self._agent.act(observation, policy_info)
+            learned_transition_model_rollout = None
+            if bool(
+                getattr(
+                    self._agent,
+                    "_learned_transition_model_planner_enabled",
+                    False,
+                )
+            ):
+                learned_transition_model_rollout = (
+                    self._agent.predict_learned_transition_targets(
+                        observation=observation,
+                        action_info=action_info,
+                    )
+                )
+            if learned_transition_model_rollout:
+                planned_action, planner_stats = (
+                    self._agent.select_env_action_from_model_targets(
+                        action_info=action_info,
+                        rollout_info=learned_transition_model_rollout,
+                    )
+                )
+                if int(planned_action) != int(action):
+                    action_info = self._agent.relabel_action_info_for_env_action(
+                        action_info=action_info,
+                        decision_info=decision_info,
+                        env_action=int(planned_action),
+                        planner_stats=planner_stats,
+                    )
+                else:
+                    action_info = dict(action_info)
+                    action_info["online_counterfactual_planner"] = planner_stats
+                action_info["env_action_model_rollout"] = learned_transition_model_rollout
+                action_info["learned_transition_model_planner"] = planner_stats
             env_action_model_rollout = None
             if collect_model_targets or online_planner_enabled:
                 env_action_model_rollout = (
@@ -101,6 +134,11 @@ class MARLOnPolicyTrainer(BaseTrainer):
                 action_info["option_gate"] = option_gate_info
             next_observation, reward, terminated, truncated, next_info = self._env.step(int(action))
             estimated_value = float(action_info.get("value", self._estimate_value(observation, policy_info)))
+            next_estimated_value = (
+                0.0
+                if terminated
+                else self._estimate_value(next_observation, next_info)
+            )
             buffer.add_step(
                 observation=observation,
                 action=int(action),
@@ -110,6 +148,7 @@ class MARLOnPolicyTrainer(BaseTrainer):
                 log_prob=float(action_info.get("log_prob", 0.0)),
                 value=estimated_value,
                 next_observation=next_observation,
+                next_value=next_estimated_value,
                 action_info=action_info,
                 decision_info=decision_info,
                 env_info=next_info,

@@ -19,6 +19,7 @@ class PPORolloutStep:
     truncated: bool
     log_prob: float
     value: float
+    next_value: float
     next_observation: list[float]
     action_info: dict[str, Any]
     decision_info: dict[str, Any]
@@ -46,6 +47,7 @@ class PPORolloutBuffer:
         action_info: dict[str, Any],
         decision_info: dict[str, Any],
         env_info: dict[str, Any],
+        next_value: float | None = None,
     ) -> None:
         self._steps.append(
             PPORolloutStep(
@@ -56,6 +58,7 @@ class PPORolloutBuffer:
                 truncated=bool(truncated),
                 log_prob=float(log_prob),
                 value=float(value),
+                next_value=float(value if next_value is None else next_value),
                 next_observation=np.asarray(next_observation, dtype=np.float32).reshape(-1).tolist(),
                 action_info=dict(action_info),
                 decision_info=dict(decision_info),
@@ -95,6 +98,7 @@ class PPORolloutBuffer:
                 "truncated": step.truncated,
                 "log_prob": step.log_prob,
                 "value": step.value,
+                "next_value": step.next_value,
                 "advantage": step.advantage,
                 "return": step.return_value,
                 "next_observation": step.next_observation,

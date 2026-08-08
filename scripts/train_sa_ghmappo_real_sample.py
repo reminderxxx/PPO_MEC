@@ -1692,6 +1692,27 @@ PROFILE_DEFAULTS = {
         "update_eval_max_windows": 4,
         "update_eval_max_workflows": 1,
     },
+    "top_journal_mechanism_v94_ucc_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -1793,6 +1814,7 @@ MECHANISM_COVERAGE_PROFILES = {
     "top_journal_mechanism_v91_balanced_recovery_distillation_mappo",
     "top_journal_mechanism_v92_online_counterfactual_mappo",
     "top_journal_mechanism_v93_mechanism_aware_online_mappo",
+    "top_journal_mechanism_v94_ucc_mappo",
 }
 
 
@@ -5629,6 +5651,45 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
         kwargs.update(
             {
                 "env_action_model_online_planner_mechanism_coef": 2.0,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v94_ucc_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v71_tail_counterfactual_option_mappo"
+        )
+        kwargs.update(
+            {
+                "option_gate_enabled": False,
+                "option_counterfactual_critic_enabled": False,
+                "option_counterfactual_policy_improvement_enabled": False,
+                "option_counterfactual_model_rollout_enabled": False,
+                "env_action_model_critic_enabled": False,
+                "env_action_model_rollout_enabled": False,
+                "env_action_model_policy_improvement_enabled": True,
+                "env_action_model_policy_improvement_coef": 0.22,
+                "env_action_model_policy_improvement_temperature": 2.0,
+                "env_action_model_policy_improvement_robust_horizons_enabled": False,
+                "env_action_model_online_planner_enabled": False,
+                "env_action_ppo_enabled": True,
+                "env_action_ppo_coef": 0.35,
+                "learned_transition_model_enabled": True,
+                "learned_transition_model_planner_enabled": True,
+                "learned_transition_model_ensemble_size": 5,
+                "learned_transition_model_hidden_dim": 64,
+                "learned_transition_model_learning_rate": 3e-3,
+                "learned_transition_model_fit_epochs": 4,
+                "learned_transition_model_max_samples": 4096,
+                "learned_transition_model_min_samples": 64,
+                "learned_transition_model_discount": 0.99,
+                "learned_transition_model_risk_coef": 0.65,
+                "learned_transition_model_policy_coef": 1.0,
+                "learned_transition_model_policy_prior_coef": 0.15,
+                "learned_transition_model_min_margin": 0.02,
+                "learned_transition_model_warmup_updates": 1,
+                "train_epochs": 8,
+                "target_kl": 0.015,
+                "kl_early_stop_enabled": True,
             }
         )
         return kwargs

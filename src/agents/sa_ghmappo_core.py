@@ -23,6 +23,9 @@ from src.encoders.fusion_encoder import (
     build_prediction_reliability_summary,
     compute_temporal_prepare_window_score,
 )
+from src.models.uncertainty_transition_ensemble import (
+    UncertaintyTransitionEnsemble,
+)
 
 
 控制头动作空间 = {
@@ -1076,6 +1079,20 @@ class 分层PPO基类(BaseAgent):
         env_action_model_policy_improvement_tail_target_balance_enabled: bool = False,
         env_action_model_policy_improvement_tail_target_balance_power: float = 0.5,
         env_action_model_policy_improvement_tail_target_balance_max_weight: float = 4.0,
+        learned_transition_model_enabled: bool = False,
+        learned_transition_model_planner_enabled: bool = False,
+        learned_transition_model_ensemble_size: int = 5,
+        learned_transition_model_hidden_dim: int = 64,
+        learned_transition_model_learning_rate: float = 3e-3,
+        learned_transition_model_fit_epochs: int = 4,
+        learned_transition_model_max_samples: int = 4096,
+        learned_transition_model_min_samples: int = 64,
+        learned_transition_model_discount: float = 0.99,
+        learned_transition_model_risk_coef: float = 0.8,
+        learned_transition_model_policy_coef: float = 1.0,
+        learned_transition_model_policy_prior_coef: float = 0.15,
+        learned_transition_model_min_margin: float = 0.02,
+        learned_transition_model_warmup_updates: int = 1,
         env_action_model_online_planner_enabled: bool = False,
         env_action_model_online_planner_coef: float = 1.0,
         env_action_model_online_planner_mechanism_coef: float = 0.0,
@@ -2281,6 +2298,28 @@ class 分层PPO基类(BaseAgent):
             ),
             1.0,
         )
+        self._learned_transition_model_enabled = bool(learned_transition_model_enabled)
+        self._learned_transition_model_planner_enabled = bool(
+            learned_transition_model_planner_enabled
+        )
+        self._learned_transition_model_discount = float(
+            np.clip(float(learned_transition_model_discount), 0.0, 1.0)
+        )
+        self._learned_transition_model_risk_coef = max(
+            float(learned_transition_model_risk_coef), 0.0
+        )
+        self._learned_transition_model_policy_coef = max(
+            float(learned_transition_model_policy_coef), 0.0
+        )
+        self._learned_transition_model_policy_prior_coef = max(
+            float(learned_transition_model_policy_prior_coef), 0.0
+        )
+        self._learned_transition_model_min_margin = max(
+            float(learned_transition_model_min_margin), 0.0
+        )
+        self._learned_transition_model_warmup_updates = max(
+            int(learned_transition_model_warmup_updates), 0
+        )
         self._env_action_model_online_planner_enabled = bool(
             env_action_model_online_planner_enabled
         )
@@ -2488,6 +2527,24 @@ class 分层PPO基类(BaseAgent):
         random.seed(random_seed)
         np.random.seed(random_seed)
         torch.manual_seed(random_seed)
+
+        self._learned_transition_model = (
+            UncertaintyTransitionEnsemble(
+                observation_dim=9,
+                action_count=5,
+                ensemble_size=learned_transition_model_ensemble_size,
+                hidden_dim=learned_transition_model_hidden_dim,
+                learning_rate=learned_transition_model_learning_rate,
+                fit_epochs=learned_transition_model_fit_epochs,
+                max_samples=learned_transition_model_max_samples,
+                min_samples=learned_transition_model_min_samples,
+                discount=self._learned_transition_model_discount,
+                random_seed=random_seed + 7919,
+                device=device,
+            )
+            if self._learned_transition_model_enabled
+            else None
+        )
 
         self._network = 分层策略网络(
             hidden_dim=self._hidden_dim,
@@ -3066,6 +3123,82 @@ class 分层PPO基类(BaseAgent):
             policy_output = self._forward_policy(semantic_state, run_metadata=run_metadata)
         return float(policy_output["value"].item())
 
+    def _fit_learned_transition_model(
+        self,
+        rollout: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        if self._learned_transition_model is None:
+            return {"enabled": False, "ready": False, "skipped": True}
+        return self._learned_transition_model.fit(rollout)
+
+    def predict_learned_transition_targets(
+        self,
+        *,
+        observation: Any,
+        action_info: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Build action-conditioned conservative targets from the learned model.
+
+        Only a frozen model learned from prior environment rollout rows is used
+        during action selection.  The uncertainty penalty is a lower confidence
+        bound, so poorly supported actions cannot win merely through optimistic
+        extrapolation.
+        """
+        model = self._learned_transition_model
+        if (
+            model is None
+            or not self._learned_transition_model_planner_enabled
+            or self._update_count < self._learned_transition_model_warmup_updates
+            or not model.ready
+        ):
+            return {}
+        action_mask = self._extract_action_mask(action_info)
+        valid_actions = [
+            action_id
+            for action_id in range(5)
+            if self._is_env_action_valid(action_id, action_mask)
+        ]
+        if len(valid_actions) < 2:
+            return {}
+        prediction = model.predict(observation, valid_actions)
+        if not bool(prediction.get("ready", False)):
+            return {}
+        robust_targets = {
+            str(action_id): float(mean - self._learned_transition_model_risk_coef * std)
+            for action_id, mean, std in zip(
+                valid_actions,
+                prediction.get("td_target_mean", []),
+                prediction.get("td_target_std", []),
+            )
+        }
+        return {
+            "source": "learned_transition_ensemble",
+            "protocol": "ucc_mappo_lcb_policy_improvement_v1",
+            "action_td_targets": robust_targets,
+            "action_td_targets_by_horizon": {"1": robust_targets},
+            "model_query_count": len(valid_actions),
+            "model_transition_count": len(valid_actions),
+            "model_sample_count": int(model.sample_count),
+            "model_update_count": int(model.update_count),
+            "uncertainty_scale": float(model.uncertainty_scale),
+            "action_td_target_mean": {
+                str(action_id): round(float(value), 6)
+                for action_id, value in zip(valid_actions, prediction.get("td_target_mean", []))
+            },
+            "action_td_target_std": {
+                str(action_id): round(float(value), 6)
+                for action_id, value in zip(valid_actions, prediction.get("td_target_std", []))
+            },
+            "action_reward_mean": {
+                str(action_id): round(float(value), 6)
+                for action_id, value in zip(valid_actions, prediction.get("reward_mean", []))
+            },
+            "action_reward_std": {
+                str(action_id): round(float(value), 6)
+                for action_id, value in zip(valid_actions, prediction.get("reward_std", []))
+            },
+        }
+
     def learn(self, rollout: list[dict[str, Any]]) -> dict[str, Any]:
         if not rollout:
             return {
@@ -3076,6 +3209,7 @@ class 分层PPO基类(BaseAgent):
                 "update_count": self._update_count,
             }
 
+        learned_transition_model_stats = self._fit_learned_transition_model(rollout)
         imitation_rollout_stats = self._annotate_heuristic_imitation_targets(rollout)
         semantic_states = [self._extract_semantic_state(row.get("decision_info")) for row in rollout]
         run_metadata_by_row = [
@@ -4668,6 +4802,18 @@ class 分层PPO基类(BaseAgent):
             "predictive_prepare_hard_override_enabled": self._predictive_prepare_hard_override_enabled,
             "predictive_prepare_hard_override_score_threshold": self._predictive_prepare_hard_override_score_threshold,
             "predictive_prepare_hard_override_confidence_threshold": self._predictive_prepare_hard_override_confidence_threshold,
+            "learned_transition_model_enabled": self._learned_transition_model_enabled,
+            "learned_transition_model_planner_enabled": self._learned_transition_model_planner_enabled,
+            "learned_transition_model_fit": dict(learned_transition_model_stats),
+            "learned_transition_model_sample_count": int(
+                self._learned_transition_model.sample_count
+                if self._learned_transition_model is not None
+                else 0
+            ),
+            "learned_transition_model_ready": bool(
+                self._learned_transition_model is not None
+                and self._learned_transition_model.ready
+            ),
         }
 
     def save(self, path: str) -> None:
@@ -4680,6 +4826,11 @@ class 分层PPO基类(BaseAgent):
             "config": self._checkpoint_config(),
             "network_state_dict": self._network.state_dict(),
             "optimizer_state_dict": self._optimizer.state_dict(),
+            "learned_transition_model_state": (
+                self._learned_transition_model.state_dict()
+                if self._learned_transition_model is not None
+                else None
+            ),
         }
         torch.save(checkpoint, output_path)
 
@@ -4714,6 +4865,9 @@ class 分层PPO基类(BaseAgent):
             self._network.load_state_dict(network_state)
         if checkpoint.get("optimizer_state_dict") is not None and not additive_head_warm_start:
             self._optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        learned_model_state = checkpoint.get("learned_transition_model_state")
+        if self._learned_transition_model is not None and isinstance(learned_model_state, dict):
+            self._learned_transition_model.load_state_dict(learned_model_state)
         self._update_count = int(checkpoint.get("update_count", 0))
 
     def _extract_semantic_state(self, info: dict[str, Any] | None) -> dict[str, Any]:
@@ -7446,21 +7600,46 @@ class 分层PPO基类(BaseAgent):
         inside the agent contract instead of adding an evaluator-side rule.
         """
         current_action = int(action_info.get("final_env_action", 3))
+        learned_model_source = str(rollout_info.get("source", "")) == (
+            "learned_transition_ensemble"
+        )
+        planner_enabled = bool(
+            self._env_action_model_online_planner_enabled or learned_model_source
+        )
+        model_coef = (
+            self._learned_transition_model_policy_coef
+            if learned_model_source
+            else self._env_action_model_online_planner_coef
+        )
+        policy_prior_coef = (
+            self._learned_transition_model_policy_prior_coef
+            if learned_model_source
+            else self._env_action_model_online_planner_policy_prior_coef
+        )
+        min_margin = (
+            self._learned_transition_model_min_margin
+            if learned_model_source
+            else self._env_action_model_online_planner_min_margin
+        )
         planner_stats: dict[str, Any] = {
-            "enabled": self._env_action_model_online_planner_enabled,
+            "enabled": planner_enabled,
             "applied": False,
-            "protocol": "mappo_counterfactual_policy_improvement_v1",
+            "protocol": (
+                "ucc_mappo_lcb_policy_improvement_v1"
+                if learned_model_source
+                else "mappo_counterfactual_policy_improvement_v1"
+            ),
             "candidate_count": 0,
             "target_maps": 0,
             "mechanism_target_success_count": 0,
             "current_action": current_action,
             "selected_action": current_action,
-            "model_coef": self._env_action_model_online_planner_coef,
+            "model_coef": model_coef,
             "mechanism_coef": self._env_action_model_online_planner_mechanism_coef,
-            "policy_prior_coef": self._env_action_model_online_planner_policy_prior_coef,
-            "min_margin": self._env_action_model_online_planner_min_margin,
+            "policy_prior_coef": policy_prior_coef,
+            "min_margin": min_margin,
         }
-        if not self._env_action_model_online_planner_enabled:
+        if not planner_enabled:
             return current_action, planner_stats
 
         target_maps = self._extract_env_action_model_target_maps(rollout_info)
@@ -7545,10 +7724,10 @@ class 分层PPO基类(BaseAgent):
             ).clamp_min(1e-6)
             mechanism_advantage = mechanism_centered / mechanism_scale
         scores = (
-            self._env_action_model_online_planner_coef * model_advantage
+            model_coef * model_advantage
             + self._env_action_model_online_planner_mechanism_coef
             * mechanism_advantage
-            + self._env_action_model_online_planner_policy_prior_coef
+            + policy_prior_coef
             * torch.log(prior.clamp_min(1e-8))
         )
         ranked_positions = torch.argsort(scores, descending=True).detach().cpu().tolist()
@@ -7559,7 +7738,7 @@ class 分层PPO基类(BaseAgent):
         )
         selected_action = int(valid_indices[best_position])
         if (
-            score_margin < self._env_action_model_online_planner_min_margin
+            score_margin < min_margin
             and current_action in valid_indices
         ):
             selected_action = current_action
@@ -14385,6 +14564,14 @@ class 分层PPO基类(BaseAgent):
             "env_action_model_policy_improvement_tail_target_balance_max_weight": (
                 self._env_action_model_policy_improvement_tail_target_balance_max_weight
             ),
+            "learned_transition_model_enabled": self._learned_transition_model_enabled,
+            "learned_transition_model_planner_enabled": self._learned_transition_model_planner_enabled,
+            "learned_transition_model_risk_coef": self._learned_transition_model_risk_coef,
+            "learned_transition_model_policy_coef": self._learned_transition_model_policy_coef,
+            "learned_transition_model_policy_prior_coef": self._learned_transition_model_policy_prior_coef,
+            "learned_transition_model_min_margin": self._learned_transition_model_min_margin,
+            "learned_transition_model_discount": self._learned_transition_model_discount,
+            "learned_transition_model_warmup_updates": self._learned_transition_model_warmup_updates,
             "env_action_model_online_planner_enabled": (
                 self._env_action_model_online_planner_enabled
             ),

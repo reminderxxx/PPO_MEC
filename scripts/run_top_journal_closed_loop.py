@@ -125,6 +125,7 @@ SA_LATEST_FIRST_PROFILES = {
     "top_journal_mechanism_v80_imagination_replay_model_policy_mappo",
     "top_journal_mechanism_v81_trust_region_imagination_mappo",
     "top_journal_mechanism_v82_recovery_imagination_mappo",
+    "top_journal_mechanism_v94_ucc_mappo",
 }
 OFFSET_FREE_REWARD_PROFILES = {
     "top_journal_mechanism_v42_completion_aligned_mappo",
@@ -168,6 +169,7 @@ OFFSET_FREE_REWARD_PROFILES = {
     "top_journal_mechanism_v80_imagination_replay_model_policy_mappo",
     "top_journal_mechanism_v81_trust_region_imagination_mappo",
     "top_journal_mechanism_v82_recovery_imagination_mappo",
+    "top_journal_mechanism_v94_ucc_mappo",
 }
 LOWER_IS_BETTER = {
     "backhaul_traffic_cost",
@@ -981,6 +983,19 @@ SA_PROFILE_SETTING_OVERRIDES = {
         "prediction_horizon": 16,
     },
     "top_journal_mechanism_v82_recovery_imagination_mappo": {
+        "sa_episodes": 256,
+        "baseline_episodes": 256,
+        "sa_update_every": 8,
+        "baseline_update_every": 8,
+        "sa_batch_size": 64,
+        "baseline_batch_size": 64,
+        "train_window_count": 20,
+        "max_mobility_rows": 5000000,
+        "window_count": 20,
+        "max_steps": 22,
+        "prediction_horizon": 16,
+    },
+    "top_journal_mechanism_v94_ucc_mappo": {
         "sa_episodes": 256,
         "baseline_episodes": 256,
         "sa_update_every": 8,
