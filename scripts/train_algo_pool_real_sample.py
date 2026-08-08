@@ -235,23 +235,25 @@ def main() -> None:
         max_tasks=args.max_tasks,
         random_seed=args.random_seed,
     )
-    _, window_payload = resolve_window_candidates(
-        root_dir=ROOT_DIR,
-        mobility_source=args.mobility_source,
-        mobility_csv_path=args.mobility_csv_path,
-        lust_scenario_root=args.lust_scenario_root,
-        max_mobility_rows=args.max_mobility_rows,
-        rsu_layout=args.rsu_layout,
-        frame_offset=args.frame_offset,
-        window_length=args.window_length,
-        window_selector=args.window_selector,
-        window_count=args.window_count,
-        window_scan_stride=args.window_scan_stride,
-        random_seed=args.random_seed,
-        window_mode=args.window_mode,
-    )
     if args.window_plan_path:
-        window_payload = apply_frozen_window_plan(window_payload, args.window_plan_path)
+        # A frozen protocol plan is already outcome-blind; avoid rescanning the raw trace.
+        window_payload = apply_frozen_window_plan({}, args.window_plan_path)
+    else:
+        _, window_payload = resolve_window_candidates(
+            root_dir=ROOT_DIR,
+            mobility_source=args.mobility_source,
+            mobility_csv_path=args.mobility_csv_path,
+            lust_scenario_root=args.lust_scenario_root,
+            max_mobility_rows=args.max_mobility_rows,
+            rsu_layout=args.rsu_layout,
+            frame_offset=args.frame_offset,
+            window_length=args.window_length,
+            window_selector=args.window_selector,
+            window_count=args.window_count,
+            window_scan_stride=args.window_scan_stride,
+            random_seed=args.random_seed,
+            window_mode=args.window_mode,
+        )
     selected_window_plan = list(window_payload.get("selected_windows", []))
     if not selected_window_plan:
         selected_window_plan = [

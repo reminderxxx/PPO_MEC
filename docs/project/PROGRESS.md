@@ -11,6 +11,7 @@
 - 已验证：UCC 模型单测、checkpoint 序列化、PPO/MAPPO/environment contract 共 `252 passed`；`scripts/smoke_test.py` 通过；真实 NGSIM+Alibaba 小跑中 model planner 在 warm-up 后启用，模型 policy-improvement loss 非零。该小跑不是论文证据。
 - 正式闭环 `top_journal_v94_ucc_mappo_strict_full_20260808` 已启动，协议为 NGSIM+Alibaba、严格冻结 train/dev/formal split、3 seeds、SA 与 learned baseline 各 256 episodes、20 windows、zero reward offset；截至本记录，首个 SA seed 已完成，PPO seed 正在运行，formal aggregate 尚未生成，不能提前下结论。
 - 长实验数据加载瓶颈已定位并修复：`NGSIMProvider` 增加可选 chunked pandas C-parser，保留原 csv fallback；5,000,000-row 真实文件读取基准为 `24.69s`，segment contract 与 `run_ngsim_sample --max_rows 1500` 均通过。此前未产出首个 baseline episode 的长跑已停止并按原协议重启，不能作为实验结果使用。
+- 进一步定位到 baseline 入口仍会在已有 `train_window_plan.json` 时先扫描全量 mobility 再覆盖冻结计划；已改为与 SA 入口一致，冻结计划存在时直接读取并应用，不再做无效扫描。该优化只改变启动路径，不改变窗口、数据、奖励、动作或训练预算。
 
 ## 2026-08-08: v93 机制感知在线反事实 MAPPO 完成零偏移开发集验证
 
