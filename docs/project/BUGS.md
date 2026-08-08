@@ -10,6 +10,7 @@
 - `OPEN / protocol`: hidden holdout 仍 sealed；formal candidate、checkpoint manifest、statistics 和主 claim 冻结前不得开启 hidden，也不得用 formal 结果继续调参。
 - `RESOLVED / data-loading`: baseline 长跑曾由纯 Python `csv.DictReader` 解析 5M-row NGSIM 造成首个 episode 长时间无输出；`NGSIMProvider` 现用 bounded-chunk pandas C-parser 并保留 fallback，已用 segment contract、真实 1500-row sample 和 5M-row read benchmark 验证。
 - `RESOLVED / frozen-plan startup`: `train_algo_pool_real_sample.py` 在冻结训练计划存在时曾重复执行全量窗口扫描；现直接消费冻结 plan，与 SA 入口保持一致。低行数 smoke 若覆盖不到冻结 plan 的 frame offset 会明确报错，不能用缩短数据集伪造正式协议。
+- `RESOLVED / evaluation checkpoint contract`: 首轮 v94 benchmark 的 SA evaluator 白名单漏掉 UCC ensemble/planner 配置，导致恢复时 planner 默认关闭；已补齐字段、补充 checkpoint compatibility regression test，并用真实 checkpoint 验证 model state/replay 恢复。首轮 aggregate 降级为 diagnostic，需用同一 frozen manifest 重跑 benchmark。
 
 ## 2026-08-08: v93 开发集已领先但仍有训练预算与顶刊证据 blocker（OPEN）
 

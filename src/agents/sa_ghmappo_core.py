@@ -2302,6 +2302,24 @@ class 分层PPO基类(BaseAgent):
         self._learned_transition_model_planner_enabled = bool(
             learned_transition_model_planner_enabled
         )
+        self._learned_transition_model_ensemble_size = max(
+            int(learned_transition_model_ensemble_size), 2
+        )
+        self._learned_transition_model_hidden_dim = max(
+            int(learned_transition_model_hidden_dim), 8
+        )
+        self._learned_transition_model_learning_rate = max(
+            float(learned_transition_model_learning_rate), 1e-8
+        )
+        self._learned_transition_model_fit_epochs = max(
+            int(learned_transition_model_fit_epochs), 1
+        )
+        self._learned_transition_model_max_samples = max(
+            int(learned_transition_model_max_samples), 1
+        )
+        self._learned_transition_model_min_samples = max(
+            int(learned_transition_model_min_samples), 2
+        )
         self._learned_transition_model_discount = float(
             np.clip(float(learned_transition_model_discount), 0.0, 1.0)
         )
@@ -2532,12 +2550,12 @@ class 分层PPO基类(BaseAgent):
             UncertaintyTransitionEnsemble(
                 observation_dim=9,
                 action_count=5,
-                ensemble_size=learned_transition_model_ensemble_size,
-                hidden_dim=learned_transition_model_hidden_dim,
-                learning_rate=learned_transition_model_learning_rate,
-                fit_epochs=learned_transition_model_fit_epochs,
-                max_samples=learned_transition_model_max_samples,
-                min_samples=learned_transition_model_min_samples,
+                ensemble_size=self._learned_transition_model_ensemble_size,
+                hidden_dim=self._learned_transition_model_hidden_dim,
+                learning_rate=self._learned_transition_model_learning_rate,
+                fit_epochs=self._learned_transition_model_fit_epochs,
+                max_samples=self._learned_transition_model_max_samples,
+                min_samples=self._learned_transition_model_min_samples,
                 discount=self._learned_transition_model_discount,
                 random_seed=random_seed + 7919,
                 device=device,
@@ -14566,6 +14584,12 @@ class 分层PPO基类(BaseAgent):
             ),
             "learned_transition_model_enabled": self._learned_transition_model_enabled,
             "learned_transition_model_planner_enabled": self._learned_transition_model_planner_enabled,
+            "learned_transition_model_ensemble_size": self._learned_transition_model_ensemble_size,
+            "learned_transition_model_hidden_dim": self._learned_transition_model_hidden_dim,
+            "learned_transition_model_learning_rate": self._learned_transition_model_learning_rate,
+            "learned_transition_model_fit_epochs": self._learned_transition_model_fit_epochs,
+            "learned_transition_model_max_samples": self._learned_transition_model_max_samples,
+            "learned_transition_model_min_samples": self._learned_transition_model_min_samples,
             "learned_transition_model_risk_coef": self._learned_transition_model_risk_coef,
             "learned_transition_model_policy_coef": self._learned_transition_model_policy_coef,
             "learned_transition_model_policy_prior_coef": self._learned_transition_model_policy_prior_coef,

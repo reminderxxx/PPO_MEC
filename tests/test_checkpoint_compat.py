@@ -33,6 +33,35 @@ class CheckpointCompatTestCase(unittest.TestCase):
     def test_missing_prediction_projection_returns_none(self) -> None:
         self.assertIsNone(_infer_prediction_feature_dim_from_payload({"network_state_dict": {}}))
 
+    def test_sa_ucc_checkpoint_config_preserves_model_planner_fields(self) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "learned_transition_model_enabled": True,
+                "learned_transition_model_planner_enabled": True,
+                "learned_transition_model_ensemble_size": 7,
+                "learned_transition_model_hidden_dim": 96,
+                "learned_transition_model_learning_rate": 0.002,
+                "learned_transition_model_fit_epochs": 5,
+                "learned_transition_model_max_samples": 8192,
+                "learned_transition_model_min_samples": 128,
+                "learned_transition_model_discount": 0.985,
+                "learned_transition_model_risk_coef": 0.7,
+                "learned_transition_model_policy_coef": 1.1,
+                "learned_transition_model_policy_prior_coef": 0.2,
+                "learned_transition_model_min_margin": 0.03,
+                "learned_transition_model_warmup_updates": 2,
+            },
+        )
+
+        self.assertTrue(filtered["learned_transition_model_enabled"])
+        self.assertTrue(filtered["learned_transition_model_planner_enabled"])
+        self.assertEqual(filtered["learned_transition_model_ensemble_size"], 7)
+        self.assertEqual(filtered["learned_transition_model_hidden_dim"], 96)
+        self.assertEqual(filtered["learned_transition_model_max_samples"], 8192)
+        self.assertEqual(filtered["learned_transition_model_min_samples"], 128)
+        self.assertEqual(filtered["learned_transition_model_warmup_updates"], 2)
+
     def test_sa_v29_checkpoint_config_preserves_dt_fusion_fields(self) -> None:
         filtered = _filter_checkpoint_config(
             "sa_ghmappo",
