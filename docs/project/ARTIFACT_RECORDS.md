@@ -1,5 +1,16 @@
 # Artifact Records
 
+## 2026-08-09: CAMA-MAPPO follow-up probes
+
+状态：`[development-only]` `[not-promoted]`
+
+- Implementation: `src/agents/sa_ghmappo_core.py` and `scripts/train_sa_ghmappo_real_sample.py`; CAMA adds exact head-wise counterfactual advantages and detached utility-weighted head targets to the hierarchical PPO/MAPPO update.
+- v102 full native-policy run: `artifacts/experiments/top_journal_v102_cama_policy_control_full_20260808/`; dev benchmark reward SA `18.4101` vs Popularity `21.1033`.
+- v103 full native-policy run: `artifacts/experiments/top_journal_v103_cama_head_policy_full_20260808/`; dev benchmark reward SA `18.4093` vs Popularity `21.1033`.
+- v104/v105 probes: `artifacts/experiments/top_journal_v104_urgency_gated_cama_probe64/` and `artifacts/experiments/top_journal_v105_resource_gated_cama_probe64/`; neither improved the dev candidate.
+- Negative stress artifacts: `artifacts/experiments/top_journal_v106_cama_planner_fusion_probe64/`, `artifacts/experiments/top_journal_v107_cvar_runtime_probe/` and `artifacts/experiments/top_journal_v108_strong_cama_native_probe32/`. v106/v107 did not change reward; v108 mean reward was `-15.038` and continuity `0.256`.
+- These follow-ups lack a new untouched hidden package and are not paper-ready evidence. The retained reward-winner record is the v100 package below, with formal SA `26.430` vs Popularity `26.082`, delta `+0.3475`, BCa `[0.1550, 0.6008]`.
+
 ## 2026-08-08: top_journal_v100_urgency_safe_resource_full_20260808
 
 - Candidate: `top_journal_mechanism_v100_urgency_safe_resource_mappo`; code freeze commit `9d9bc3f`, freeze record commit `ac7491b`.

@@ -1,5 +1,15 @@
 ﻿# Decision Log
 
+## 2026-08-09: CAMA-MAPPO retained as experimental capability, not promoted
+
+决策：保留 CAMA-MAPPO 的温和实现作为后续研究能力，但不把 v101-v105 晋级为 canonical reward winner；撤销未带来收益的 v106-v108 profiles。当前可靠主方法证据仍是 v100 agent-side urgency-safe resource MAPPO planner。
+
+依据：CAMA 的实现确实进入 hierarchical MAPPO actor update，使用 exact legal head alternatives、policy-marginal counterfactual advantage 和 detached utility-weighted target distribution；它没有修改 environment reward、baseline contract 或 evaluator。可是 v102/v103 native policy full dev reward 分别为 `18.4101`/`18.4093`，低于 Popularity `21.1033`；v104/v105 无改善；v106/v107 无 reward change；v108 strong distillation 退化到 mean reward `-15.038`、continuity `0.256`。
+
+解释：v100 的可验证正向差异来自 agent-side online counterfactual planner 在 active/non-mechanism 窗口减少 current-RSU delay，而非 CAMA head distillation 已经把该行为稳定内化。机制窗口中 SA 与 Popularity 经常完全相同，因此当前 protocol 的 aggregate reward gap 存在可达上限。
+
+边界：v100 formal reward `26.430` 高于 Popularity `26.082`，BCa `[0.1550, 0.6008]`，但 v100 没有 untouched hidden、机制指标未形成独立优势、完整 ablations/support/compute audit 仍缺失；不得写成“大幅优于强规则”或 TMC-ready。后续必须先冻结新的非重叠 formal/hidden split，再进行一次完整候选评估。
+
 ## 2026-08-08: freeze v100 as a formal reward-winner candidate, not paper-ready
 
 决策：将 `top_journal_mechanism_v100_urgency_safe_resource_mappo` 作为当前 formal reward-winner candidate 记录，不晋级为 TMC-ready 或 paper-ready。保留 v98 consumed hidden 结论，不重新打开 hidden；v100 的新增证据只包括 frozen formal replication、mixed replication、compact prediction support 和 artifact integrity audit。

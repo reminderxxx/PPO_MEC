@@ -2,6 +2,15 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-08-09: CAMA-MAPPO follow-up and candidate freeze boundary
+
+- Implemented and runtime-verified CAMA-MAPPO in `src/agents/sa_ghmappo_core.py`: exact legal alternatives for slow/fast/event heads, policy-marginal counterfactual advantages, and detached utility-weighted head policy targets. The mechanism is training-side MAPPO logic; it does not change environment reward, action schema, evaluator filters or baseline contracts.
+- Native policy-control full runs v102/v103 did not beat Popularity on the dev protocol: v102 `18.4101`, v103 `18.4093`, versus Popularity `21.1033`. Urgency/resource variants v104/v105 also did not improve the dev candidate.
+- The v100 agent-side planner remains the strongest verified candidate: formal SA `26.430` versus Popularity `26.082`, delta `+0.3475`, BCa `[0.1550, 0.6008]`, paired `54/66/0`. Its active-window gain comes from lower delay through more vehicle fallback; mechanism windows are frequently tied.
+- Additional v106/v107 planner fusion probes produced no reward change. Strong CAMA distillation v108 was negative (`mean reward=-15.038`, continuity `0.256`) and was not retained as a profile. Full details: `docs/project/top_journal_cama_followup_results_20260809.md`.
+
+证据边界：CAMA is a real MAPPO-core improvement and is retained as an experimental capability, but it has not produced a new reward winner. v100 remains `Not TMC-ready; strong formal reward candidate, major revision` because v100 has no untouched hidden holdout, tied mechanism metrics, incomplete ablations/support and no unified compute audit.
+
 ## 2026-08-08: v100 urgency-safe resource MAPPO formal package completed
 
 - v100 implemented an urgency-safe resource-constrained MAPPO policy-improvement path: exact legal-action branch replay at horizons `1,3,6`, branch-derived mechanism/resource targets, and the same adaptive horizon mixture in MAPPO KL improvement and execution-time counterfactual planning. Environment reward, action schema, baseline contract and evaluator filtering were unchanged.

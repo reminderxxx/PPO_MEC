@@ -1839,6 +1839,111 @@ PROFILE_DEFAULTS = {
         "update_eval_max_windows": 4,
         "update_eval_max_workflows": 1,
     },
+    "top_journal_mechanism_v101_cama_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v102_cama_policy_control": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v103_cama_head_policy": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v104_urgency_gated_cama": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v105_resource_gated_cama": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -1947,6 +2052,11 @@ MECHANISM_COVERAGE_PROFILES = {
     "top_journal_mechanism_v98_ucc_counterfactual_policy_improvement_mappo",
     "top_journal_mechanism_v99_adaptive_resource_mappo",
     "top_journal_mechanism_v100_urgency_safe_resource_mappo",
+    "top_journal_mechanism_v101_cama_mappo",
+    "top_journal_mechanism_v102_cama_policy_control",
+    "top_journal_mechanism_v103_cama_head_policy",
+    "top_journal_mechanism_v104_urgency_gated_cama",
+    "top_journal_mechanism_v105_resource_gated_cama",
 }
 
 
@@ -5927,6 +6037,74 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 # MAPPO policy improvement and execution-time planning.
                 "env_action_model_online_planner_mechanism_coef": 0.80,
                 "env_action_model_resource_cost_coef": 0.22,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v101_cama_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v100_urgency_safe_resource_mappo"
+        )
+        kwargs.update(
+            {
+                # CAMA-MAPPO replaces shared global credit with exact
+                # action-marginalized advantages for slow/fast/event heads.
+                "counterfactual_head_advantage_enabled": True,
+                "counterfactual_head_advantage_coef": 0.70,
+                "counterfactual_head_advantage_clip": 2.0,
+                "counterfactual_head_advantage_warmup_updates": 2,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v102_cama_policy_control":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v101_cama_mappo"
+        )
+        kwargs.update(
+            {
+                # The model supplies a training counterfactual, while the
+                # deployed action must remain the native MAPPO action.
+                "env_action_model_online_planner_enabled": False,
+                "learned_transition_model_planner_enabled": False,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v103_cama_head_policy":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v102_cama_policy_control"
+        )
+        kwargs.update(
+            {
+                # Utility-weighted head targets close the exploration gap left
+                # by sampled-action counterfactual advantages.
+                "counterfactual_head_policy_improvement_coef": 0.25,
+                "counterfactual_head_policy_improvement_temperature": 0.75,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v104_urgency_gated_cama":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v103_cama_head_policy"
+        )
+        kwargs.update(
+            {
+                # Apply counterfactual mechanism credit mainly when a handoff
+                # is temporally actionable; otherwise PPO reward credit wins.
+                "counterfactual_head_advantage_coef": 0.55,
+                "counterfactual_head_policy_improvement_coef": 0.15,
+                "counterfactual_head_temporal_gate_enabled": True,
+                "counterfactual_head_temporal_gate_floor": 0.25,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v105_resource_gated_cama":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v104_urgency_gated_cama"
+        )
+        kwargs.update(
+            {
+                # Penalize redundant cache/migration branches in the
+                # counterfactual utility while keeping urgent handoff credit.
+                "env_action_model_resource_cost_coef": 0.45,
             }
         )
         return kwargs

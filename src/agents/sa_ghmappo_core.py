@@ -1099,6 +1099,14 @@ class 分层PPO基类(BaseAgent):
         env_action_model_online_planner_mechanism_coef: float = 0.0,
         env_action_model_online_planner_policy_prior_coef: float = 0.15,
         env_action_model_online_planner_min_margin: float = 0.0,
+        counterfactual_head_advantage_enabled: bool = False,
+        counterfactual_head_advantage_coef: float = 0.0,
+        counterfactual_head_advantage_clip: float = 2.0,
+        counterfactual_head_advantage_warmup_updates: int = 1,
+        counterfactual_head_policy_improvement_coef: float = 0.0,
+        counterfactual_head_policy_improvement_temperature: float = 1.0,
+        counterfactual_head_temporal_gate_enabled: bool = False,
+        counterfactual_head_temporal_gate_floor: float = 0.25,
         env_action_model_online_planner_prefer_beam_targets: bool = False,
         env_action_model_resource_constraint_enabled: bool = False,
         env_action_model_resource_cost_coef: float = 0.0,
@@ -2366,6 +2374,36 @@ class 分层PPO基类(BaseAgent):
             float(env_action_model_online_planner_min_margin),
             0.0,
         )
+        self._counterfactual_head_advantage_enabled = bool(
+            counterfactual_head_advantage_enabled
+        )
+        self._counterfactual_head_advantage_coef = max(
+            0.0,
+            min(float(counterfactual_head_advantage_coef), 1.0),
+        )
+        self._counterfactual_head_advantage_clip = max(
+            float(counterfactual_head_advantage_clip),
+            0.0,
+        )
+        self._counterfactual_head_advantage_warmup_updates = max(
+            int(counterfactual_head_advantage_warmup_updates),
+            0,
+        )
+        self._counterfactual_head_policy_improvement_coef = max(
+            float(counterfactual_head_policy_improvement_coef),
+            0.0,
+        )
+        self._counterfactual_head_policy_improvement_temperature = max(
+            float(counterfactual_head_policy_improvement_temperature),
+            1e-3,
+        )
+        self._counterfactual_head_temporal_gate_enabled = bool(
+            counterfactual_head_temporal_gate_enabled
+        )
+        self._counterfactual_head_temporal_gate_floor = min(
+            max(float(counterfactual_head_temporal_gate_floor), 0.0),
+            1.0,
+        )
         self._env_action_model_online_planner_prefer_beam_targets = bool(
             env_action_model_online_planner_prefer_beam_targets
         )
@@ -3015,6 +3053,30 @@ class 分层PPO基类(BaseAgent):
             ),
             "env_action_model_online_planner_min_margin": (
                 self._env_action_model_online_planner_min_margin
+            ),
+            "counterfactual_head_advantage_enabled": (
+                self._counterfactual_head_advantage_enabled
+            ),
+            "counterfactual_head_advantage_coef": (
+                self._counterfactual_head_advantage_coef
+            ),
+            "counterfactual_head_advantage_clip": (
+                self._counterfactual_head_advantage_clip
+            ),
+            "counterfactual_head_advantage_warmup_updates": (
+                self._counterfactual_head_advantage_warmup_updates
+            ),
+            "counterfactual_head_policy_improvement_coef": (
+                self._counterfactual_head_policy_improvement_coef
+            ),
+            "counterfactual_head_policy_improvement_temperature": (
+                self._counterfactual_head_policy_improvement_temperature
+            ),
+            "counterfactual_head_temporal_gate_enabled": (
+                self._counterfactual_head_temporal_gate_enabled
+            ),
+            "counterfactual_head_temporal_gate_floor": (
+                self._counterfactual_head_temporal_gate_floor
             ),
             "env_action_model_resource_constraint_enabled": (
                 self._env_action_model_resource_constraint_enabled
@@ -3701,6 +3763,13 @@ class 分层PPO基类(BaseAgent):
         env_action_model_critic_advantage_abs_total = 0.0
         env_action_model_policy_improvement_loss_total = 0.0
         env_action_model_policy_improvement_target_kl_total = 0.0
+        counterfactual_head_advantage_abs_total = {
+            "slow": 0.0,
+            "fast": 0.0,
+            "event": 0.0,
+        }
+        counterfactual_head_advantage_applied_batches = 0
+        counterfactual_head_policy_improvement_loss_total = 0.0
         env_action_ppo_loss_total = 0.0
         env_action_counterfactual_margin_loss_total = 0.0
         argmax_margin_loss_total = 0.0
@@ -3777,6 +3846,21 @@ class 分层PPO基类(BaseAgent):
                         head_log_probs=head_log_prob_outputs,
                         head_entropies=head_entropy_outputs,
                     )
+                    counterfactual_head_advantage_result = (
+                        self._compute_counterfactual_head_advantages(
+                            batch_outputs=batch_outputs,
+                            batch_rows=batch_rows,
+                            batch_action_masks=batch_action_masks,
+                        )
+                    )
+                    if counterfactual_head_advantage_result is None:
+                        counterfactual_head_advantages = None
+                        counterfactual_head_policy_targets = None
+                    else:
+                        (
+                            counterfactual_head_advantages,
+                            counterfactual_head_policy_targets,
+                        ) = counterfactual_head_advantage_result
                     actor_loss = self._compute_hierarchical_actor_loss(
                         batch_states=batch_states,
                         head_log_probs=head_log_prob_outputs,
@@ -3787,6 +3871,21 @@ class 分层PPO基类(BaseAgent):
                         head_credit_tensors=batch_head_credits,
                         base_advantage=advantage_tensor[batch_indices],
                         event_advantage=event_advantage_tensor[batch_indices],
+                        counterfactual_head_advantages=counterfactual_head_advantages,
+                    )
+                    if counterfactual_head_advantages is not None:
+                        counterfactual_head_advantage_applied_batches += 1
+                        for head_name, tensor in counterfactual_head_advantages.items():
+                            counterfactual_head_advantage_abs_total[head_name] += float(
+                                torch.mean(torch.abs(tensor.detach())).item()
+                            )
+                    counterfactual_head_policy_improvement_loss = (
+                        self._compute_counterfactual_head_policy_improvement_loss(
+                            batch_outputs=batch_outputs,
+                            counterfactual_head_policy_targets=(
+                                counterfactual_head_policy_targets
+                            ),
+                        )
                     )
                     env_action_ppo_loss = self._compute_env_action_ppo_loss(
                         batch_outputs=batch_outputs,
@@ -3844,6 +3943,11 @@ class 分层PPO基类(BaseAgent):
                         batch_outputs=batch_outputs,
                         batch_action_masks=batch_action_masks,
                         batch_rows=batch_rows,
+                    )
+                    counterfactual_head_policy_improvement_loss = torch.tensor(
+                        0.0,
+                        dtype=torch.float32,
+                        device=self._device,
                     )
 
                 value_prediction = torch.stack([output["value"] for output in batch_outputs], dim=0)
@@ -3918,6 +4022,8 @@ class 分层PPO基类(BaseAgent):
                     * env_action_model_critic_loss
                     + self._env_action_model_policy_improvement_coef
                     * env_action_model_policy_improvement_loss
+                    + self._counterfactual_head_policy_improvement_coef
+                    * counterfactual_head_policy_improvement_loss
                 )
 
                 self._optimizer.zero_grad()
@@ -3965,6 +4071,9 @@ class 分层PPO基类(BaseAgent):
                 )
                 env_action_model_policy_improvement_target_kl_total += float(
                     env_action_model_policy_improvement_target_kl.item()
+                )
+                counterfactual_head_policy_improvement_loss_total += float(
+                    counterfactual_head_policy_improvement_loss.item()
                 )
                 update_steps += 1
                 epoch_kl_values.append(float(approx_kl.item()))
@@ -4312,6 +4421,45 @@ class 分层PPO基类(BaseAgent):
             ),
             "env_action_model_policy_improvement_target_kl": round(
                 env_action_model_policy_improvement_target_kl_total / denominator,
+                6,
+            ),
+            "counterfactual_head_advantage_enabled": (
+                self._counterfactual_head_advantage_enabled
+            ),
+            "counterfactual_head_advantage_coef": round(
+                self._counterfactual_head_advantage_coef,
+                6,
+            ),
+            "counterfactual_head_advantage_warmup_updates": (
+                self._counterfactual_head_advantage_warmup_updates
+            ),
+            "counterfactual_head_advantage_applied_batches": int(
+                counterfactual_head_advantage_applied_batches
+            ),
+            "counterfactual_head_advantage_abs_mean": {
+                head_name: round(
+                    value / max(counterfactual_head_advantage_applied_batches, 1),
+                    6,
+                )
+                for head_name, value in counterfactual_head_advantage_abs_total.items()
+            },
+            "counterfactual_head_policy_improvement_coef": round(
+                self._counterfactual_head_policy_improvement_coef,
+                6,
+            ),
+            "counterfactual_head_policy_improvement_temperature": round(
+                self._counterfactual_head_policy_improvement_temperature,
+                6,
+            ),
+            "counterfactual_head_temporal_gate_enabled": (
+                self._counterfactual_head_temporal_gate_enabled
+            ),
+            "counterfactual_head_temporal_gate_floor": round(
+                self._counterfactual_head_temporal_gate_floor,
+                6,
+            ),
+            "counterfactual_head_policy_improvement_loss": round(
+                counterfactual_head_policy_improvement_loss_total / denominator,
                 6,
             ),
             "env_action_model_tail_distillation_candidate_count": int(
@@ -6950,6 +7098,195 @@ class 分层PPO基类(BaseAgent):
         entropy = (weighted_entropy_sum / torch.clamp(weight_sum, min=1e-6)).mean()
         return joint_log_prob, entropy
 
+    def _compute_counterfactual_head_advantages(
+        self,
+        *,
+        batch_outputs: list[dict[str, Any]],
+        batch_rows: list[dict[str, Any]],
+        batch_action_masks: list[list[bool] | None],
+    ) -> tuple[dict[str, torch.Tensor], dict[str, torch.Tensor]] | None:
+        """Decompose exact action utility into marginal advantages per control head.
+
+        The shared rollout advantage cannot tell whether a reward change came from
+        the slow cache head, fast execution head, or event handoff head. For each
+        head, hold the other sampled heads fixed and marginalize the head's legal
+        alternatives under its current policy. This is the MAPPO/COMA-style
+        counterfactual baseline used by CAMA-MAPPO.
+        """
+        if (
+            not self._counterfactual_head_advantage_enabled
+            or self._counterfactual_head_advantage_coef <= 0.0
+            or self._update_count < self._counterfactual_head_advantage_warmup_updates
+            or not self._use_hierarchy
+            or not batch_outputs
+        ):
+            return None
+
+        head_sizes = {"slow": 3, "fast": 2, "event": 2}
+        values_by_head: dict[str, list[torch.Tensor]] = {
+            head_name: [] for head_name in head_sizes
+        }
+        target_probs_by_head: dict[str, list[torch.Tensor]] = {
+            head_name: [] for head_name in head_sizes
+        }
+        for output, row, action_mask in zip(
+            batch_outputs,
+            batch_rows,
+            batch_action_masks,
+        ):
+            context = self._build_env_action_model_policy_improvement_context(
+                output=output,
+                row=row,
+                action_mask=action_mask,
+            )
+            if context is None:
+                for head_name in head_sizes:
+                    values_by_head[head_name].append(
+                        torch.tensor(0.0, dtype=torch.float32, device=self._device)
+                    )
+                    target_probs_by_head[head_name].append(
+                        torch.softmax(
+                            output[f"{head_name}_logits"].detach(),
+                            dim=-1,
+                        )
+                    )
+                continue
+
+            utility_by_action = {
+                int(action_id): context["normalized_advantage"][index]
+                for index, action_id in enumerate(context["valid_indices"])
+            }
+            temporal_gate = 1.0
+            if self._counterfactual_head_temporal_gate_enabled:
+                temporal_signal = self._env_action_model_temporal_signal(
+                    dict(row.get("action_info", {}))
+                )
+                temporal_gate = self._counterfactual_head_temporal_gate_floor + (
+                    1.0 - self._counterfactual_head_temporal_gate_floor
+                ) * temporal_signal
+            sampled_heads = {
+                head_name: int(
+                    row.get("action_info", {})
+                    .get("head_actions", {})
+                    .get(head_name, 0)
+                )
+                for head_name in head_sizes
+            }
+            for head_name, head_size in head_sizes.items():
+                head_probs = torch.softmax(
+                    output[f"{head_name}_logits"].detach(),
+                    dim=-1,
+                )
+                candidate_values: list[torch.Tensor] = []
+                candidate_valid: list[bool] = []
+                for candidate in range(head_size):
+                    candidate_heads = dict(sampled_heads)
+                    candidate_heads[head_name] = candidate
+                    env_action, _ = 聚合层级动作(
+                        head_actions=candidate_heads,
+                        use_hierarchy=True,
+                        event_head_enabled=self._event_head_enabled,
+                        adapter_prefetch_enabled=self._adapter_prefetch_enabled,
+                    )
+                    is_valid = bool(
+                        self._is_env_action_valid(env_action, action_mask)
+                        and env_action in utility_by_action
+                    )
+                    candidate_valid.append(is_valid)
+                    candidate_values.append(
+                        utility_by_action.get(
+                            env_action,
+                            torch.tensor(0.0, dtype=torch.float32, device=self._device),
+                        )
+                    )
+                valid_mask = torch.as_tensor(
+                    candidate_valid,
+                    dtype=torch.bool,
+                    device=self._device,
+                )
+                if not bool(valid_mask.any().item()):
+                    values_by_head[head_name].append(
+                        torch.tensor(0.0, dtype=torch.float32, device=self._device)
+                    )
+                    target_probs_by_head[head_name].append(head_probs.detach())
+                    continue
+                values = torch.stack(candidate_values) * temporal_gate
+                probs = head_probs[:head_size].masked_fill(~valid_mask, 0.0)
+                probs = probs / probs.sum().clamp_min(1e-8)
+                baseline = torch.sum(probs * values)
+                selected_action = sampled_heads[head_name]
+                selected_value = values[min(max(selected_action, 0), head_size - 1)]
+                counterfactual_advantage = selected_value - baseline
+                if self._counterfactual_head_advantage_clip > 0.0:
+                    counterfactual_advantage = torch.clamp(
+                        counterfactual_advantage,
+                        -self._counterfactual_head_advantage_clip,
+                        self._counterfactual_head_advantage_clip,
+                    )
+                values_by_head[head_name].append(counterfactual_advantage)
+                target_logits = (
+                    torch.log(head_probs[:head_size].clamp_min(1e-8))
+                    + values.detach()
+                    / self._counterfactual_head_policy_improvement_temperature
+                )
+                target_logits = target_logits.masked_fill(
+                    ~valid_mask,
+                    torch.finfo(target_logits.dtype).min,
+                )
+                target_probs_by_head[head_name].append(
+                    torch.softmax(target_logits, dim=-1).detach()
+                )
+
+        return (
+            {
+                head_name: torch.stack(values)
+                for head_name, values in values_by_head.items()
+            },
+            {
+                head_name: torch.stack(values)
+                for head_name, values in target_probs_by_head.items()
+            },
+        )
+
+    def _compute_counterfactual_head_policy_improvement_loss(
+        self,
+        *,
+        batch_outputs: list[dict[str, Any]],
+        counterfactual_head_policy_targets: dict[str, torch.Tensor] | None,
+    ) -> torch.Tensor:
+        """Distill counterfactual utility into each MAPPO control head.
+
+        The sampled-action policy gradient only updates the action that happened
+        to be drawn. A detached utility-weighted target distribution gives every
+        legal head alternative a learning signal while preserving PPO as the
+        on-policy objective and keeping execution free of a planner override.
+        """
+        zero = torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        if (
+            self._counterfactual_head_policy_improvement_coef <= 0.0
+            or not counterfactual_head_policy_targets
+            or not batch_outputs
+        ):
+            return zero
+        losses: list[torch.Tensor] = []
+        for head_name in ["slow", "fast", "event"]:
+            target = counterfactual_head_policy_targets.get(head_name)
+            if not isinstance(target, torch.Tensor):
+                continue
+            logits = torch.stack(
+                [output[f"{head_name}_logits"] for output in batch_outputs],
+                dim=0,
+            )
+            if tuple(logits.shape) != tuple(target.shape):
+                continue
+            losses.append(
+                -torch.sum(
+                    target.detach() * torch.log_softmax(logits, dim=-1),
+                    dim=-1,
+                ).mean()
+            )
+        return torch.stack(losses).mean() if losses else zero
+
     def _compute_hierarchical_actor_loss(
         self,
         *,
@@ -6959,6 +7296,7 @@ class 分层PPO基类(BaseAgent):
         head_credit_tensors: dict[str, torch.Tensor],
         base_advantage: torch.Tensor,
         event_advantage: torch.Tensor,
+        counterfactual_head_advantages: dict[str, torch.Tensor] | None = None,
     ) -> torch.Tensor:
         surrogate_sum: torch.Tensor | None = None
         weight_sum: torch.Tensor | None = None
@@ -6980,6 +7318,14 @@ class 分层PPO基类(BaseAgent):
                     self._event_advantage_blend * event_advantage
                     + (1.0 - self._event_advantage_blend) * base_advantage
                 )
+            if counterfactual_head_advantages is not None:
+                counterfactual_advantage = counterfactual_head_advantages.get(head_name)
+                if counterfactual_advantage is not None:
+                    blend = self._counterfactual_head_advantage_coef
+                    head_advantage = (
+                        (1.0 - blend) * head_advantage
+                        + blend * counterfactual_advantage
+                    )
             ratio = torch.exp(head_log_probs[head_name] - old_head_log_probs[head_name])
             surrogate_1 = ratio * head_advantage
             surrogate_2 = torch.clamp(
@@ -7836,13 +8182,21 @@ class 分层PPO基类(BaseAgent):
             if learned_model_source
             else self._env_action_model_online_planner_min_margin
         )
+        legacy_planner_contract = not (
+            self._env_action_model_resource_constraint_enabled
+            or self._env_action_model_adaptive_horizon_enabled
+        )
         planner_stats: dict[str, Any] = {
             "enabled": planner_enabled,
             "applied": False,
             "protocol": (
                 "ucc_mappo_lcb_policy_improvement_v2_adaptive_resource_mechanism"
                 if learned_model_source
-                else "mappo_counterfactual_policy_improvement_v2_adaptive_resource_mechanism"
+                else (
+                    "mappo_counterfactual_policy_improvement_v1"
+                    if legacy_planner_contract
+                    else "mappo_counterfactual_policy_improvement_v2_adaptive_resource_mechanism"
+                )
             ),
             "candidate_count": 0,
             "target_maps": 0,
@@ -8272,6 +8626,8 @@ class 分层PPO基类(BaseAgent):
                 mechanism_advantage = mechanism_stacked.mean(dim=0)
             effective_mechanism_coef = float(mechanism_coef) * (
                 0.25 + 0.75 * float(np.clip(temporal_signal, 0.0, 1.0))
+                if self._env_action_model_resource_constraint_enabled
+                else 1.0
             )
             robust_advantage = (
                 robust_advantage
@@ -8503,6 +8859,7 @@ class 分层PPO基类(BaseAgent):
         return {
             "actor_scores": actor_scores,
             "valid_indices": valid_indices,
+            "normalized_advantage": normalized_advantage.detach(),
             "old_probs": old_probs,
             "improved_target": improved_target,
             "target_action_id": valid_indices[
@@ -14997,6 +15354,30 @@ class 分层PPO基类(BaseAgent):
             ),
             "env_action_model_online_planner_min_margin": (
                 self._env_action_model_online_planner_min_margin
+            ),
+            "counterfactual_head_advantage_enabled": (
+                self._counterfactual_head_advantage_enabled
+            ),
+            "counterfactual_head_advantage_coef": (
+                self._counterfactual_head_advantage_coef
+            ),
+            "counterfactual_head_advantage_clip": (
+                self._counterfactual_head_advantage_clip
+            ),
+            "counterfactual_head_advantage_warmup_updates": (
+                self._counterfactual_head_advantage_warmup_updates
+            ),
+            "counterfactual_head_policy_improvement_coef": (
+                self._counterfactual_head_policy_improvement_coef
+            ),
+            "counterfactual_head_policy_improvement_temperature": (
+                self._counterfactual_head_policy_improvement_temperature
+            ),
+            "counterfactual_head_temporal_gate_enabled": (
+                self._counterfactual_head_temporal_gate_enabled
+            ),
+            "counterfactual_head_temporal_gate_floor": (
+                self._counterfactual_head_temporal_gate_floor
             ),
             "env_action_model_resource_constraint_enabled": (
                 self._env_action_model_resource_constraint_enabled

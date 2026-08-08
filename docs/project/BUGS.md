@@ -2,6 +2,13 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-09: CAMA follow-up did not widen the reward gap
+
+- `OPEN / candidate performance`: native CAMA v102/v103 remains below Popularity on the dev protocol (`18.4101`/`18.4093` vs `21.1033`). Do not claim that counterfactual head credit has already improved end-to-end reward.
+- `OPEN / planner dependence`: v100's positive margin is produced by the agent-side online counterfactual planner; CAMA head distillation did not reproduce that margin when planner execution was disabled. Any future claim must report planner-enabled and native-policy ablations separately.
+- `RESOLVED / negative stress test`: strong CAMA target distillation was tested and rejected after mean reward `-15.038` and continuity `0.256`. A non-triggered `collapse_detected=false` flag is not evidence of safe learning; the raw probe remains a negative boundary condition.
+- `OPEN / paper evidence`: v101-v105 have no untouched independent hidden result, complete component ablation package or unified compute audit. They remain development evidence, not paper-ready proof.
+
 ## 2026-08-08: v100 paper-readiness risks remain
 
 - `BLOCKER`: v100 has no untouched hidden holdout. The historical v71 hidden split was consumed by v98 and must not be reused for v100 tuning or claimed as v100 evidence.
