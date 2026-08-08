@@ -1797,6 +1797,27 @@ PROFILE_DEFAULTS = {
         "update_eval_max_windows": 4,
         "update_eval_max_workflows": 1,
     },
+    "top_journal_mechanism_v99_adaptive_resource_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -1903,6 +1924,7 @@ MECHANISM_COVERAGE_PROFILES = {
     "top_journal_mechanism_v96_ucc_ucb_exploration_mappo",
     "top_journal_mechanism_v97_ucc_counterfactual_calibration_mappo",
     "top_journal_mechanism_v98_ucc_counterfactual_policy_improvement_mappo",
+    "top_journal_mechanism_v99_adaptive_resource_mappo",
 }
 
 
@@ -5834,6 +5856,42 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "env_action_model_online_planner_policy_prior_coef": 0.15,
                 "env_action_model_online_planner_min_margin": 0.0,
                 "env_action_model_online_planner_mechanism_coef": 0.0,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v99_adaptive_resource_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v98_ucc_counterfactual_policy_improvement_mappo"
+        )
+        kwargs.update(
+            {
+                # Native-action MAPPO is improved with exact multi-horizon branch
+                # targets; resource cost is an auxiliary constrained objective.
+                "env_action_model_rollout_enabled": True,
+                "env_action_model_rollout_horizon": 6,
+                "env_action_model_rollout_horizons": [1, 3, 6],
+                "env_action_model_policy_improvement_enabled": True,
+                "env_action_model_policy_improvement_coef": 0.30,
+                "env_action_model_policy_improvement_robust_horizons_enabled": True,
+                "env_action_model_policy_improvement_horizon_aggregation_mode": (
+                    "lambda_downside"
+                ),
+                "env_action_model_policy_improvement_horizon_lambda": 0.85,
+                "env_action_model_policy_improvement_horizon_risk_coef": 0.45,
+                "env_action_model_policy_improvement_adaptive_kl_enabled": True,
+                "env_action_model_policy_improvement_target_kl": 0.025,
+                "env_action_model_adaptive_horizon_enabled": True,
+                "env_action_model_adaptive_horizon_temperature": 1.0,
+                "env_action_model_resource_constraint_enabled": True,
+                "env_action_model_resource_cost_coef": 0.22,
+                "env_action_model_resource_cost_scale": 64.0,
+                "env_action_model_online_planner_coef": 1.0,
+                "env_action_model_online_planner_policy_prior_coef": 0.10,
+                "env_action_model_online_planner_min_margin": 0.01,
+                "env_action_ppo_coef": 0.30,
+                "train_epochs": 6,
+                "target_kl": 0.012,
+                "kl_early_stop_enabled": True,
             }
         )
         return kwargs

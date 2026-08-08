@@ -332,6 +332,10 @@ class MARLOnPolicyTrainer(BaseTrainer):
             horizon: {}
             for horizon in rollout_horizons
         }
+        action_resource_costs_by_horizon: dict[int, dict[int, float]] = {
+            horizon: {}
+            for horizon in rollout_horizons
+        }
         imagination_replay_enabled = bool(
             action_info.get(
                 "env_action_model_imagination_replay_enabled",
@@ -421,6 +425,7 @@ class MARLOnPolicyTrainer(BaseTrainer):
             first_reward = 0.0
             first_next_observation: Any = None
             mechanism_score = 0.0
+            resource_cost = 0.0
             pending_prefetches: list[dict[str, int | str | None]] = []
             for branch_step in range(rollout_horizon):
                 (
@@ -469,6 +474,32 @@ class MARLOnPolicyTrainer(BaseTrainer):
                     )
                 ):
                     mechanism_score = 1.0
+                resource_cost += discount * (
+                    max(
+                        float(branch_metrics.get("backhaul_traffic_cost", 0.0) or 0.0),
+                        0.0,
+                    )
+                    + max(
+                        float(
+                            branch_metrics.get(
+                                "adapter_state_migration_overhead",
+                                0.0,
+                            )
+                            or 0.0
+                        ),
+                        0.0,
+                    )
+                    * max(
+                        float(
+                            action_info.get(
+                                "env_action_model_resource_cost_scale",
+                                64.0,
+                            )
+                            or 64.0
+                        ),
+                        1e-6,
+                    )
+                )
                 if (
                     branch_metrics.get("predictive_prefetch_requested", False)
                     and branch_metrics.get("cache_target_rsu_id") is not None
@@ -511,6 +542,9 @@ class MARLOnPolicyTrainer(BaseTrainer):
                     action_mechanism_targets_by_horizon[reached_horizon][
                         initial_action
                     ] = mechanism_score
+                    action_resource_costs_by_horizon[reached_horizon][
+                        initial_action
+                    ] = float(resource_cost)
                 if terminated or truncated:
                     for horizon in rollout_horizons:
                         if horizon > reached_horizon:
@@ -520,6 +554,9 @@ class MARLOnPolicyTrainer(BaseTrainer):
                             action_mechanism_targets_by_horizon[horizon][
                                 initial_action
                             ] = mechanism_score
+                            action_resource_costs_by_horizon[horizon][
+                                initial_action
+                            ] = float(resource_cost)
                     break
                 if branch_step + 1 < rollout_horizon:
                     branch_policy_info = dict(next_info)
@@ -624,6 +661,23 @@ class MARLOnPolicyTrainer(BaseTrainer):
                     for action_id, target in targets.items()
                 }
                 for horizon, targets in action_mechanism_targets_by_horizon.items()
+            },
+            "action_resource_costs": {
+                str(action_id): round(
+                    action_resource_costs_by_horizon[rollout_horizon].get(
+                        action_id,
+                        0.0,
+                    ),
+                    6,
+                )
+                for action_id in valid_actions
+            },
+            "action_resource_costs_by_horizon": {
+                str(horizon): {
+                    str(action_id): round(cost, 6)
+                    for action_id, cost in costs.items()
+                }
+                for horizon, costs in action_resource_costs_by_horizon.items()
             },
             "action_immediate_rewards": {
                 str(action_id): round(reward, 6)

@@ -1100,6 +1100,11 @@ class 分层PPO基类(BaseAgent):
         env_action_model_online_planner_policy_prior_coef: float = 0.15,
         env_action_model_online_planner_min_margin: float = 0.0,
         env_action_model_online_planner_prefer_beam_targets: bool = False,
+        env_action_model_resource_constraint_enabled: bool = False,
+        env_action_model_resource_cost_coef: float = 0.0,
+        env_action_model_resource_cost_scale: float = 64.0,
+        env_action_model_adaptive_horizon_enabled: bool = False,
+        env_action_model_adaptive_horizon_temperature: float = 1.0,
         env_action_model_beam_search_enabled: bool = False,
         env_action_model_beam_search_horizon: int = 4,
         env_action_model_beam_search_width: int = 2,
@@ -2364,6 +2369,24 @@ class 分层PPO基类(BaseAgent):
         self._env_action_model_online_planner_prefer_beam_targets = bool(
             env_action_model_online_planner_prefer_beam_targets
         )
+        self._env_action_model_resource_constraint_enabled = bool(
+            env_action_model_resource_constraint_enabled
+        )
+        self._env_action_model_resource_cost_coef = max(
+            float(env_action_model_resource_cost_coef),
+            0.0,
+        )
+        self._env_action_model_resource_cost_scale = max(
+            float(env_action_model_resource_cost_scale),
+            1e-6,
+        )
+        self._env_action_model_adaptive_horizon_enabled = bool(
+            env_action_model_adaptive_horizon_enabled
+        )
+        self._env_action_model_adaptive_horizon_temperature = max(
+            float(env_action_model_adaptive_horizon_temperature),
+            0.05,
+        )
         self._env_action_model_beam_search_enabled = bool(
             env_action_model_beam_search_enabled
         )
@@ -2992,6 +3015,21 @@ class 分层PPO基类(BaseAgent):
             ),
             "env_action_model_online_planner_min_margin": (
                 self._env_action_model_online_planner_min_margin
+            ),
+            "env_action_model_resource_constraint_enabled": (
+                self._env_action_model_resource_constraint_enabled
+            ),
+            "env_action_model_resource_cost_coef": (
+                self._env_action_model_resource_cost_coef
+            ),
+            "env_action_model_resource_cost_scale": (
+                self._env_action_model_resource_cost_scale
+            ),
+            "env_action_model_adaptive_horizon_enabled": (
+                self._env_action_model_adaptive_horizon_enabled
+            ),
+            "env_action_model_adaptive_horizon_temperature": (
+                self._env_action_model_adaptive_horizon_temperature
             ),
             "env_action_model_beam_search_enabled": (
                 self._env_action_model_beam_search_enabled
@@ -4227,6 +4265,24 @@ class 分层PPO基类(BaseAgent):
             ),
             "env_action_model_online_planner_min_margin": round(
                 self._env_action_model_online_planner_min_margin,
+                6,
+            ),
+            "env_action_model_resource_constraint_enabled": (
+                self._env_action_model_resource_constraint_enabled
+            ),
+            "env_action_model_resource_cost_coef": round(
+                self._env_action_model_resource_cost_coef,
+                6,
+            ),
+            "env_action_model_resource_cost_scale": round(
+                self._env_action_model_resource_cost_scale,
+                6,
+            ),
+            "env_action_model_adaptive_horizon_enabled": (
+                self._env_action_model_adaptive_horizon_enabled
+            ),
+            "env_action_model_adaptive_horizon_temperature": round(
+                self._env_action_model_adaptive_horizon_temperature,
                 6,
             ),
             "env_action_model_online_planner_prefer_beam_targets": (
@@ -7639,6 +7695,86 @@ class 分层PPO基类(BaseAgent):
         )
         return [targets] if targets else []
 
+    def _extract_env_action_model_resource_cost_maps(
+        self,
+        rollout_info: dict[str, Any],
+    ) -> list[dict[int, float]]:
+        if not self._env_action_model_resource_constraint_enabled:
+            return []
+        by_horizon_raw = rollout_info.get(
+            "action_resource_costs_by_horizon",
+            {},
+        )
+        if isinstance(by_horizon_raw, dict):
+            ordered_maps: list[tuple[int, dict[int, float]]] = []
+            for raw_horizon, costs_raw in by_horizon_raw.items():
+                try:
+                    horizon = int(raw_horizon)
+                except (TypeError, ValueError):
+                    continue
+                costs = self._parse_env_action_target_map(costs_raw)
+                if costs:
+                    ordered_maps.append((horizon, costs))
+            if ordered_maps:
+                return [costs for _, costs in sorted(ordered_maps)]
+        costs = self._parse_env_action_target_map(
+            rollout_info.get("action_resource_costs", {})
+        )
+        return [costs] if costs else []
+
+    def _build_adaptive_horizon_weights(
+        self,
+        *,
+        rollout_info: dict[str, Any],
+        action_info: dict[str, Any],
+        target_maps: list[dict[int, float]],
+    ) -> torch.Tensor | None:
+        if (
+            not self._env_action_model_adaptive_horizon_enabled
+            or len(target_maps) < 2
+        ):
+            return None
+        raw_horizons = rollout_info.get("rollout_horizons", [])
+        horizons: list[int] = []
+        if isinstance(raw_horizons, (list, tuple)):
+            for raw_horizon in raw_horizons:
+                try:
+                    horizons.append(max(int(raw_horizon), 1))
+                except (TypeError, ValueError):
+                    continue
+        if len(horizons) != len(target_maps):
+            horizons = list(range(1, len(target_maps) + 1))
+        horizons = sorted(horizons)
+        urgency = max(
+            float(action_info.get("temporal_urgency", 0.0) or 0.0),
+            float(action_info.get("prepare_window_score", 0.0) or 0.0),
+        )
+        confidence = float(action_info.get("prediction_confidence", 0.0) or 0.0)
+        countdown = float(action_info.get("handoff_countdown_steps", 0.0) or 0.0)
+        countdown_signal = 0.0
+        if countdown > 0.0:
+            countdown_signal = 1.0 / (1.0 + countdown)
+        signal = float(
+            np.clip(
+                0.55 * urgency + 0.25 * countdown_signal + 0.20 * confidence,
+                0.0,
+                1.0,
+            )
+        )
+        minimum_horizon = float(min(horizons))
+        maximum_horizon = float(max(horizons))
+        effective_horizon = minimum_horizon + signal * (
+            maximum_horizon - minimum_horizon
+        )
+        temperature = self._env_action_model_adaptive_horizon_temperature
+        distance = torch.as_tensor(
+            [abs(float(horizon) - effective_horizon) for horizon in horizons],
+            dtype=torch.float32,
+            device=self._device,
+        )
+        weights = torch.softmax(-distance / temperature, dim=0)
+        return weights / weights.sum().clamp_min(1e-8)
+
     def select_env_action_from_model_targets(
         self,
         *,
@@ -7690,6 +7826,10 @@ class 分层PPO基类(BaseAgent):
             "mechanism_coef": self._env_action_model_online_planner_mechanism_coef,
             "policy_prior_coef": policy_prior_coef,
             "min_margin": min_margin,
+            "resource_constraint_enabled": bool(
+                self._env_action_model_resource_constraint_enabled
+            ),
+            "resource_cost_coef": self._env_action_model_resource_cost_coef,
         }
         if not planner_enabled:
             return current_action, planner_stats
@@ -7744,6 +7884,19 @@ class 分层PPO基类(BaseAgent):
         model_advantage = self._build_env_action_model_robust_advantage(
             target_maps=target_maps,
             valid_indices=valid_indices,
+            horizon_weights=self._build_adaptive_horizon_weights(
+                rollout_info=rollout_info,
+                action_info=action_info,
+                target_maps=target_maps,
+            ),
+            resource_cost_maps=self._extract_env_action_model_resource_cost_maps(
+                rollout_info
+            ),
+            resource_cost_coef=(
+                self._env_action_model_resource_cost_coef
+                if self._env_action_model_resource_constraint_enabled
+                else 0.0
+            ),
         ).detach()
         mechanism_target_raw = rollout_info.get(
             "action_mechanism_targets",
@@ -7810,6 +7963,31 @@ class 分层PPO基类(BaseAgent):
                         model_advantage.detach().cpu().tolist(),
                     )
                 },
+                "resource_cost_advantage": {
+                    str(action_id): round(float(value), 6)
+                    for action_id, value in zip(
+                        valid_indices,
+                        self._build_env_action_model_resource_cost_advantage(
+                            resource_cost_maps=self._extract_env_action_model_resource_cost_maps(
+                                rollout_info
+                            ),
+                            valid_indices=valid_indices,
+                        ).detach().cpu().tolist(),
+                    )
+                },
+                "adaptive_horizon_weights": (
+                    self._build_adaptive_horizon_weights(
+                        rollout_info=rollout_info,
+                        action_info=action_info,
+                        target_maps=target_maps,
+                    ).detach().cpu().tolist()
+                    if self._build_adaptive_horizon_weights(
+                        rollout_info=rollout_info,
+                        action_info=action_info,
+                        target_maps=target_maps,
+                    ) is not None
+                    else []
+                ),
                 "mechanism_advantage": {
                     str(action_id): round(float(value), 6)
                     for action_id, value in zip(
@@ -7916,6 +8094,9 @@ class 分层PPO基类(BaseAgent):
         *,
         target_maps: list[dict[int, float]],
         valid_indices: list[int],
+        horizon_weights: torch.Tensor | None = None,
+        resource_cost_maps: list[dict[int, float]] | None = None,
+        resource_cost_coef: float = 0.0,
     ) -> torch.Tensor:
         normalized_by_horizon: list[torch.Tensor] = []
         for targets in target_maps:
@@ -7950,6 +8131,11 @@ class 分层PPO基类(BaseAgent):
                 device=self._device,
             )
             weight_tensor = weight_tensor / weight_tensor.sum().clamp_min(1e-6)
+            if horizon_weights is not None and len(horizon_weights) == len(
+                normalized_by_horizon
+            ):
+                weight_tensor = horizon_weights.detach()
+                weight_tensor = weight_tensor / weight_tensor.sum().clamp_min(1e-6)
             robust_advantage = torch.sum(
                 weight_tensor.unsqueeze(-1) * stacked,
                 dim=0,
@@ -7974,13 +8160,32 @@ class 分层PPO基类(BaseAgent):
                 * temporal_downside
             )
         else:
-            robust_advantage = stacked.mean(dim=0)
+            if horizon_weights is not None and len(horizon_weights) == len(
+                normalized_by_horizon
+            ):
+                weight_tensor = horizon_weights.detach()
+                weight_tensor = weight_tensor / weight_tensor.sum().clamp_min(1e-6)
+                robust_advantage = torch.sum(
+                    weight_tensor.unsqueeze(-1) * stacked,
+                    dim=0,
+                )
+            else:
+                robust_advantage = stacked.mean(dim=0)
             if len(normalized_by_horizon) > 1:
                 robust_advantage = (
                     robust_advantage
                     - self._env_action_model_policy_improvement_horizon_risk_coef
                     * stacked.std(dim=0, unbiased=False)
                 )
+        if resource_cost_maps and resource_cost_coef > 0.0:
+            resource_cost_advantage = self._build_env_action_model_resource_cost_advantage(
+                resource_cost_maps=resource_cost_maps,
+                valid_indices=valid_indices,
+                horizon_weights=horizon_weights,
+            )
+            robust_advantage = robust_advantage - float(
+                resource_cost_coef
+            ) * resource_cost_advantage
         robust_advantage = robust_advantage - robust_advantage.mean()
         if self._env_action_model_critic_advantage_clip > 0.0:
             robust_advantage = torch.clamp(
@@ -7989,6 +8194,42 @@ class 分层PPO基类(BaseAgent):
                 self._env_action_model_critic_advantage_clip,
             )
         return robust_advantage
+
+    def _build_env_action_model_resource_cost_advantage(
+        self,
+        *,
+        resource_cost_maps: list[dict[int, float]],
+        valid_indices: list[int],
+        horizon_weights: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        if not resource_cost_maps:
+            return torch.zeros(
+                len(valid_indices),
+                dtype=torch.float32,
+                device=self._device,
+            )
+        normalized_by_horizon: list[torch.Tensor] = []
+        for costs in resource_cost_maps:
+            values = torch.as_tensor(
+                [
+                    float(costs.get(action_id, 0.0))
+                    / self._env_action_model_resource_cost_scale
+                    for action_id in valid_indices
+                ],
+                dtype=torch.float32,
+                device=self._device,
+            )
+            centered = values - values.mean()
+            scale = torch.sqrt(torch.mean(centered.square())).clamp_min(1e-6)
+            normalized_by_horizon.append(centered / scale)
+        stacked = torch.stack(normalized_by_horizon)
+        if horizon_weights is not None and len(horizon_weights) == len(
+            normalized_by_horizon
+        ):
+            weights = horizon_weights.detach()
+            weights = weights / weights.sum().clamp_min(1e-8)
+            return torch.sum(weights.unsqueeze(-1) * stacked, dim=0)
+        return stacked.mean(dim=0)
 
     def _build_env_action_model_improved_target(
         self,
@@ -8095,6 +8336,19 @@ class 分层PPO基类(BaseAgent):
         normalized_advantage = self._build_env_action_model_robust_advantage(
             target_maps=target_maps,
             valid_indices=valid_indices,
+            horizon_weights=self._build_adaptive_horizon_weights(
+                rollout_info=rollout_info,
+                action_info=dict(row.get("action_info", {})),
+                target_maps=target_maps,
+            ),
+            resource_cost_maps=self._extract_env_action_model_resource_cost_maps(
+                rollout_info
+            ),
+            resource_cost_coef=(
+                self._env_action_model_resource_cost_coef
+                if self._env_action_model_resource_constraint_enabled
+                else 0.0
+            ),
         )
         projection_info = dict(
             row.get("action_info", {}).get("action_projection", {})
@@ -14645,6 +14899,21 @@ class 分层PPO基类(BaseAgent):
             ),
             "env_action_model_online_planner_min_margin": (
                 self._env_action_model_online_planner_min_margin
+            ),
+            "env_action_model_resource_constraint_enabled": (
+                self._env_action_model_resource_constraint_enabled
+            ),
+            "env_action_model_resource_cost_coef": (
+                self._env_action_model_resource_cost_coef
+            ),
+            "env_action_model_resource_cost_scale": (
+                self._env_action_model_resource_cost_scale
+            ),
+            "env_action_model_adaptive_horizon_enabled": (
+                self._env_action_model_adaptive_horizon_enabled
+            ),
+            "env_action_model_adaptive_horizon_temperature": (
+                self._env_action_model_adaptive_horizon_temperature
             ),
             "env_action_model_online_planner_prefer_beam_targets": (
                 self._env_action_model_online_planner_prefer_beam_targets
