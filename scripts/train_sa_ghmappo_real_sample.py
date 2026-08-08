@@ -1818,6 +1818,27 @@ PROFILE_DEFAULTS = {
         "update_eval_max_windows": 4,
         "update_eval_max_workflows": 1,
     },
+    "top_journal_mechanism_v100_urgency_safe_resource_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -1925,6 +1946,7 @@ MECHANISM_COVERAGE_PROFILES = {
     "top_journal_mechanism_v97_ucc_counterfactual_calibration_mappo",
     "top_journal_mechanism_v98_ucc_counterfactual_policy_improvement_mappo",
     "top_journal_mechanism_v99_adaptive_resource_mappo",
+    "top_journal_mechanism_v100_urgency_safe_resource_mappo",
 }
 
 
@@ -5892,6 +5914,19 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "train_epochs": 6,
                 "target_kl": 0.012,
                 "kl_early_stop_enabled": True,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v100_urgency_safe_resource_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v99_adaptive_resource_mappo"
+        )
+        kwargs.update(
+            {
+                # The same branch-derived mechanism targets constrain both
+                # MAPPO policy improvement and execution-time planning.
+                "env_action_model_online_planner_mechanism_coef": 0.80,
+                "env_action_model_resource_cost_coef": 0.22,
             }
         )
         return kwargs

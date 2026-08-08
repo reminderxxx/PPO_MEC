@@ -7722,6 +7722,48 @@ class 分层PPO基类(BaseAgent):
         )
         return [costs] if costs else []
 
+    def _extract_env_action_model_mechanism_maps(
+        self,
+        rollout_info: dict[str, Any],
+    ) -> list[dict[int, float]]:
+        by_horizon_raw = rollout_info.get(
+            "action_mechanism_targets_by_horizon",
+            {},
+        )
+        if isinstance(by_horizon_raw, dict):
+            ordered_maps: list[tuple[int, dict[int, float]]] = []
+            for raw_horizon, targets_raw in by_horizon_raw.items():
+                try:
+                    horizon = int(raw_horizon)
+                except (TypeError, ValueError):
+                    continue
+                targets = self._parse_env_action_target_map(targets_raw)
+                if targets:
+                    ordered_maps.append((horizon, targets))
+            if ordered_maps:
+                return [targets for _, targets in sorted(ordered_maps)]
+        targets = self._parse_env_action_target_map(
+            rollout_info.get("action_mechanism_targets", {})
+        )
+        return [targets] if targets else []
+
+    @staticmethod
+    def _env_action_model_temporal_signal(action_info: dict[str, Any]) -> float:
+        urgency = max(
+            float(action_info.get("temporal_urgency", 0.0) or 0.0),
+            float(action_info.get("prepare_window_score", 0.0) or 0.0),
+        )
+        confidence = float(action_info.get("prediction_confidence", 0.0) or 0.0)
+        countdown = float(action_info.get("handoff_countdown_steps", 0.0) or 0.0)
+        countdown_signal = 1.0 / (1.0 + countdown) if countdown > 0.0 else 0.0
+        return float(
+            np.clip(
+                0.55 * urgency + 0.25 * countdown_signal + 0.20 * confidence,
+                0.0,
+                1.0,
+            )
+        )
+
     def _build_adaptive_horizon_weights(
         self,
         *,
@@ -7745,22 +7787,7 @@ class 分层PPO基类(BaseAgent):
         if len(horizons) != len(target_maps):
             horizons = list(range(1, len(target_maps) + 1))
         horizons = sorted(horizons)
-        urgency = max(
-            float(action_info.get("temporal_urgency", 0.0) or 0.0),
-            float(action_info.get("prepare_window_score", 0.0) or 0.0),
-        )
-        confidence = float(action_info.get("prediction_confidence", 0.0) or 0.0)
-        countdown = float(action_info.get("handoff_countdown_steps", 0.0) or 0.0)
-        countdown_signal = 0.0
-        if countdown > 0.0:
-            countdown_signal = 1.0 / (1.0 + countdown)
-        signal = float(
-            np.clip(
-                0.55 * urgency + 0.25 * countdown_signal + 0.20 * confidence,
-                0.0,
-                1.0,
-            )
-        )
+        signal = self._env_action_model_temporal_signal(action_info)
         minimum_horizon = float(min(horizons))
         maximum_horizon = float(max(horizons))
         effective_horizon = minimum_horizon + signal * (
@@ -7813,9 +7840,9 @@ class 分层PPO基类(BaseAgent):
             "enabled": planner_enabled,
             "applied": False,
             "protocol": (
-                "ucc_mappo_lcb_policy_improvement_v1"
+                "ucc_mappo_lcb_policy_improvement_v2_adaptive_resource_mechanism"
                 if learned_model_source
-                else "mappo_counterfactual_policy_improvement_v1"
+                else "mappo_counterfactual_policy_improvement_v2_adaptive_resource_mechanism"
             ),
             "candidate_count": 0,
             "target_maps": 0,
@@ -7897,6 +7924,11 @@ class 分层PPO基类(BaseAgent):
                 if self._env_action_model_resource_constraint_enabled
                 else 0.0
             ),
+            mechanism_target_maps=self._extract_env_action_model_mechanism_maps(
+                rollout_info
+            ),
+            mechanism_coef=self._env_action_model_online_planner_mechanism_coef,
+            temporal_signal=self._env_action_model_temporal_signal(action_info),
         ).detach()
         mechanism_target_raw = rollout_info.get(
             "action_mechanism_targets",
@@ -7928,12 +7960,8 @@ class 分层PPO基类(BaseAgent):
                 torch.mean(mechanism_centered.square())
             ).clamp_min(1e-6)
             mechanism_advantage = mechanism_centered / mechanism_scale
-        scores = (
-            model_coef * model_advantage
-            + self._env_action_model_online_planner_mechanism_coef
-            * mechanism_advantage
-            + policy_prior_coef
-            * torch.log(prior.clamp_min(1e-8))
+        scores = model_coef * model_advantage + policy_prior_coef * torch.log(
+            prior.clamp_min(1e-8)
         )
         ranked_positions = torch.argsort(scores, descending=True).detach().cpu().tolist()
         best_position = int(ranked_positions[0])
@@ -7975,6 +8003,29 @@ class 分层PPO基类(BaseAgent):
                         ).detach().cpu().tolist(),
                     )
                 },
+                "temporal_signal": round(
+                    self._env_action_model_temporal_signal(action_info),
+                    6,
+                ),
+                "effective_resource_cost_coef": round(
+                    self._env_action_model_resource_cost_coef
+                    * (
+                        1.0
+                        - 0.70
+                        * self._env_action_model_temporal_signal(action_info)
+                    ),
+                    6,
+                ),
+                "effective_mechanism_coef": round(
+                    model_coef
+                    * self._env_action_model_online_planner_mechanism_coef
+                    * (
+                        0.25
+                        + 0.75
+                        * self._env_action_model_temporal_signal(action_info)
+                    ),
+                    6,
+                ),
                 "adaptive_horizon_weights": (
                     self._build_adaptive_horizon_weights(
                         rollout_info=rollout_info,
@@ -8097,6 +8148,9 @@ class 分层PPO基类(BaseAgent):
         horizon_weights: torch.Tensor | None = None,
         resource_cost_maps: list[dict[int, float]] | None = None,
         resource_cost_coef: float = 0.0,
+        mechanism_target_maps: list[dict[int, float]] | None = None,
+        mechanism_coef: float = 0.0,
+        temporal_signal: float = 0.0,
     ) -> torch.Tensor:
         normalized_by_horizon: list[torch.Tensor] = []
         for targets in target_maps:
@@ -8183,9 +8237,46 @@ class 分层PPO基类(BaseAgent):
                 valid_indices=valid_indices,
                 horizon_weights=horizon_weights,
             )
-            robust_advantage = robust_advantage - float(
-                resource_cost_coef
-            ) * resource_cost_advantage
+            effective_resource_cost_coef = float(resource_cost_coef) * (
+                1.0 - 0.70 * float(np.clip(temporal_signal, 0.0, 1.0))
+            )
+            robust_advantage = (
+                robust_advantage
+                - effective_resource_cost_coef * resource_cost_advantage
+            )
+        if mechanism_target_maps and mechanism_coef > 0.0:
+            mechanism_values_by_horizon: list[torch.Tensor] = []
+            for targets in mechanism_target_maps:
+                values = torch.as_tensor(
+                    [
+                        float(targets.get(action_id, 0.0))
+                        for action_id in valid_indices
+                    ],
+                    dtype=torch.float32,
+                    device=self._device,
+                )
+                centered = values - values.mean()
+                scale = torch.sqrt(torch.mean(centered.square())).clamp_min(1e-6)
+                mechanism_values_by_horizon.append(centered / scale)
+            mechanism_stacked = torch.stack(mechanism_values_by_horizon)
+            if horizon_weights is not None and len(horizon_weights) == len(
+                mechanism_values_by_horizon
+            ):
+                mechanism_weights = horizon_weights.detach()
+                mechanism_weights = mechanism_weights / mechanism_weights.sum().clamp_min(1e-8)
+                mechanism_advantage = torch.sum(
+                    mechanism_weights.unsqueeze(-1) * mechanism_stacked,
+                    dim=0,
+                )
+            else:
+                mechanism_advantage = mechanism_stacked.mean(dim=0)
+            effective_mechanism_coef = float(mechanism_coef) * (
+                0.25 + 0.75 * float(np.clip(temporal_signal, 0.0, 1.0))
+            )
+            robust_advantage = (
+                robust_advantage
+                + effective_mechanism_coef * mechanism_advantage
+            )
         robust_advantage = robust_advantage - robust_advantage.mean()
         if self._env_action_model_critic_advantage_clip > 0.0:
             robust_advantage = torch.clamp(
@@ -8348,6 +8439,13 @@ class 分层PPO基类(BaseAgent):
                 self._env_action_model_resource_cost_coef
                 if self._env_action_model_resource_constraint_enabled
                 else 0.0
+            ),
+            mechanism_target_maps=self._extract_env_action_model_mechanism_maps(
+                rollout_info
+            ),
+            mechanism_coef=self._env_action_model_online_planner_mechanism_coef,
+            temporal_signal=self._env_action_model_temporal_signal(
+                dict(row.get("action_info", {}))
             ),
         )
         projection_info = dict(
