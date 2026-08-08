@@ -2,6 +2,12 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-09: learned predictor integration remains blocked
+
+- `BLOCKED / predictor-policy mismatch`: the supervised predictor has strong next-RSU classification but low handoff probability under the current class imbalance. Feeding its low-confidence targets into the v100 planner caused `mean_total_reward=16.366` and mechanism collapse on the dev probe. Do not enable `predictor_kind=supervised` in the canonical v100 run until a separately frozen calibration and policy-gating protocol is designed.
+- `FIXED / variable RSU slots`: v71 windows expose different RSU slot counts. The predictor now accepts a runtime RSU subset of the checkpoint slot map and pads newly observed slots during train-sample construction. This is an input-contract fix, not evidence of algorithmic gain.
+- `FIXED / threshold-selection complexity`: supervised predictor threshold selection previously rebuilt predictions for every candidate score, creating quadratic behavior on full mobility plans. It now uses one sorted cumulative scan.
+
 ## 2026-08-09: CAMA follow-up did not widen the reward gap
 
 - `OPEN / candidate performance`: native CAMA v102/v103 remains below Popularity on the dev protocol (`18.4101`/`18.4093` vs `21.1033`). Do not claim that counterfactual head credit has already improved end-to-end reward.

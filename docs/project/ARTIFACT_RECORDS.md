@@ -1,5 +1,13 @@
 # Artifact Records
 
+## 2026-08-09: v109-v112 development negative probes
+
+- v109 artifact: `artifacts/experiments/top_journal_v109_option_cama_probe_20260809/`; historical sparse-tail option on the current v71 dev plan collapsed (`mean_total_reward=-46.095`).
+- v110 artifact: `artifacts/experiments/top_journal_v110_option_cama_probe_20260809/`; exact option counterfactual credit produced dev SA `21.40075` versus Popularity `21.10325`, but tied all mechanism/continuity metrics and reproduced the v100 planner margin.
+- v111 artifact: `artifacts/experiments/top_journal_v111_native_option_cama_probe_20260809/`; execution-time planners disabled and SA tied Popularity at `21.10325`.
+- v112 predictor artifact: `artifacts/experiments/top_journal_v112_predictor_training_20260809/supervised_handoff_predictor_20260809_033406_140764/`; train-only mobility labels, `41,059/33,260` train/dev samples, dev AUC `0.872972` and next-RSU accuracy `0.956705`.
+- v112 integration artifact: `artifacts/experiments/top_journal_v112_soft_predictor_mappo_probe_20260809/`; learned predictor integration collapsed with `mean_total_reward=16.366`, `collapse_detected=true`, and mechanism realization `0.000`. These artifacts are negative development evidence and are not formal/hidden claims.
+
 ## 2026-08-09: CAMA-MAPPO follow-up probes
 
 状态：`[development-only]` `[not-promoted]`

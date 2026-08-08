@@ -67,6 +67,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--epochs", type=int, default=8)
     parser.add_argument("--batch_size", type=int, default=128)
     parser.add_argument("--learning_rate", type=float, default=1e-3)
+    parser.add_argument(
+        "--target_selection_mode",
+        type=str,
+        default="hard",
+        choices=["hard", "soft"],
+        help="retain the top handoff target and expose confidence, or hard-gate it",
+    )
     parser.add_argument("--random_seed", type=int, default=7)
     parser.add_argument("--sample_limit", type=int, default=0)
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "artifacts" / "training" / "supervised_predictors"))
@@ -149,11 +156,17 @@ def build_samples_for_plan(
         )
         window_rsu_ids = [str(rsu.rsu_id) for rsu in bundle.rsu_states]
         if not resolved_rsu_ids:
-            resolved_rsu_ids = window_rsu_ids
-        if window_rsu_ids != resolved_rsu_ids:
-            raise ValueError(
-                f"RSU layout mismatch in {window.get('window_id')}: {window_rsu_ids} != {resolved_rsu_ids}"
-            )
+            resolved_rsu_ids = list(window_rsu_ids)
+        new_rsu_ids = [rsu_id for rsu_id in window_rsu_ids if rsu_id not in resolved_rsu_ids]
+        if new_rsu_ids:
+            # RSU ids are stable alphabetical slots in the synthetic layout;
+            # append newly observed slots and pad earlier rows below.
+            if any(rsu_id < resolved_rsu_ids[-1] for rsu_id in new_rsu_ids):
+                raise ValueError(
+                    f"RSU slot order changed in {window.get('window_id')}: "
+                    f"new={new_rsu_ids}, existing={resolved_rsu_ids}"
+                )
+            resolved_rsu_ids.extend(new_rsu_ids)
         mapper = RSUMapper([clone_rsu_state(rsu_state) for rsu_state in bundle.rsu_states])
         last_positions: dict[str, tuple[float, float]] = {}
         frames = list(bundle.frames)
@@ -202,6 +215,12 @@ def build_samples_for_plan(
                 last_positions[vehicle.vehicle_id] = (float(vehicle.position_x), float(vehicle.position_y))
             if args.sample_limit and len(rows) >= int(args.sample_limit):
                 return rows[: int(args.sample_limit)], resolved_rsu_ids
+    final_feature_dim = 10 + 7 * len(resolved_rsu_ids)
+    for row in rows:
+        feature_vector = list(row.get("features", []))
+        if len(feature_vector) < final_feature_dim:
+            feature_vector.extend([0.0] * (final_feature_dim - len(feature_vector)))
+        row["features"] = feature_vector[:final_feature_dim]
     return rows, resolved_rsu_ids
 
 
@@ -343,7 +362,6 @@ def select_handoff_threshold(
     features, _, _, handoff_labels, _ = tensors_from_rows(rows, rsu_ids)
     with torch.no_grad():
         scores = torch.sigmoid(model(features)["handoff_logit"]).tolist()
-    candidates = sorted({0.0, 0.5, 1.0, *[float(score) for score in scores]})
     best = {
         "threshold": 0.5,
         "handoff_f1": -1.0,
@@ -351,11 +369,12 @@ def select_handoff_threshold(
         "handoff_recall": 0.0,
     }
     labels = [float(label) for label in handoff_labels.tolist()]
-    for threshold in candidates:
-        predictions = [1.0 if float(score) >= float(threshold) else 0.0 for score in scores]
-        true_positive = sum(1.0 for pred, label in zip(predictions, labels) if pred == 1.0 and label == 1.0)
-        false_positive = sum(1.0 for pred, label in zip(predictions, labels) if pred == 1.0 and label == 0.0)
-        false_negative = sum(1.0 for pred, label in zip(predictions, labels) if pred == 0.0 and label == 1.0)
+    positive_count = sum(1.0 for label in labels if label > 0.5)
+
+    def consider(threshold: float, true_positive: float, predicted_positive: float) -> None:
+        nonlocal best
+        false_positive = predicted_positive - true_positive
+        false_negative = positive_count - true_positive
         precision = true_positive / max(true_positive + false_positive, 1.0)
         recall = true_positive / max(true_positive + false_negative, 1.0)
         f1 = (2.0 * precision * recall) / max(precision + recall, 1e-9)
@@ -368,6 +387,18 @@ def select_handoff_threshold(
                 "handoff_precision": float(precision),
                 "handoff_recall": float(recall),
             }
+
+    # Evaluate every unique score once. The previous implementation rebuilt
+    # predictions for every score, which was quadratic on full mobility plans.
+    consider(0.0, positive_count, float(len(labels)))
+    scored = sorted(zip((float(score) for score in scores), labels), reverse=True)
+    true_positive = 0.0
+    for index, (score, label) in enumerate(scored):
+        true_positive += 1.0 if label > 0.5 else 0.0
+        next_score = scored[index + 1][0] if index + 1 < len(scored) else None
+        if next_score is None or not math.isclose(score, next_score):
+            consider(score, true_positive, float(index + 1))
+    consider(1.0, 0.0, 0.0)
     return {key: round(value, 6) for key, value in best.items()}
 
 
@@ -520,6 +551,7 @@ def main() -> None:
         },
         "calibration": {
             "handoff_decision_threshold": handoff_threshold,
+            "target_selection_mode": str(args.target_selection_mode),
             "threshold_selection_split": "dev",
             "threshold_selection_metric": "handoff_f1",
             "threshold_selection": threshold_selection,

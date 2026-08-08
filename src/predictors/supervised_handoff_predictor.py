@@ -191,6 +191,14 @@ class SupervisedHandoffPredictorRuntime:
         self._none_index = none_index
         self._horizon = max(int(payload.get("horizon", 3)), 1)
         calibration = dict(payload.get("calibration", {}))
+        self._target_selection_mode = str(
+            calibration.get("target_selection_mode", "hard")
+        ).strip().lower()
+        if self._target_selection_mode not in {"hard", "soft"}:
+            raise ValueError(
+                "unsupported supervised predictor target_selection_mode "
+                f"{self._target_selection_mode!r}; expected 'hard' or 'soft'"
+            )
         self._handoff_threshold = _clamp(
             float(calibration.get("handoff_decision_threshold", 0.5)),
             0.0,
@@ -222,10 +230,15 @@ class SupervisedHandoffPredictorRuntime:
         last_vehicle_positions: dict[str, tuple[float, float]] | None = None,
     ) -> dict[str, Any]:
         runtime_rsu_ids = [str(rsu.rsu_id) for rsu in rsu_states]
-        if runtime_rsu_ids != self._rsu_ids:
+        checkpoint_rsu_ids = set(self._rsu_ids)
+        runtime_rsu_id_set = set(runtime_rsu_ids)
+        if (
+            len(runtime_rsu_ids) != len(runtime_rsu_id_set)
+            or not runtime_rsu_id_set.issubset(checkpoint_rsu_ids)
+        ):
             raise ValueError(
-                f"runtime RSU map {runtime_rsu_ids} does not match supervised predictor checkpoint "
-                f"RSU map {self._rsu_ids}"
+                f"runtime RSU map {runtime_rsu_ids} is not compatible with supervised predictor "
+                f"checkpoint slot map {self._rsu_ids}"
             )
         sequences: dict[str, list[str | None]] = {}
         predicted_next: dict[str, str | None] = {}
@@ -254,10 +267,22 @@ class SupervisedHandoffPredictorRuntime:
             target_index = int(torch.argmax(target_probs).item())
             next_rsu_id = self._index_to_rsu(next_index)
             target_rsu_id = self._index_to_rsu(target_index)
-            handoff_confidence = _clamp(float(handoff_prob.item()), 0.0, 1.0)
-            if target_rsu_id is None or handoff_confidence < self._handoff_threshold:
+            if next_rsu_id is not None and str(next_rsu_id) not in runtime_rsu_id_set:
+                next_rsu_id = None
+            if target_rsu_id is not None and str(target_rsu_id) not in runtime_rsu_id_set:
                 target_rsu_id = None
             current_rsu_id = current_associations.get(vehicle.vehicle_id)
+            if target_rsu_id is not None and str(target_rsu_id) == str(current_rsu_id):
+                # A handoff target is defined as the first RSU different from
+                # the current association; retaining the current RSU here
+                # would mask a valid next-RSU prediction in the sequence head.
+                target_rsu_id = None
+            handoff_confidence = _clamp(float(handoff_prob.item()), 0.0, 1.0)
+            if (
+                self._target_selection_mode == "hard"
+                and (target_rsu_id is None or handoff_confidence < self._handoff_threshold)
+            ):
+                target_rsu_id = None
             sequence = self._build_sequence(
                 current_rsu_id=current_rsu_id,
                 next_rsu_id=next_rsu_id,
@@ -275,6 +300,7 @@ class SupervisedHandoffPredictorRuntime:
                 "target_rsu_probability": round(float(target_probs[target_index].item()), 6),
                 "handoff_probability": round(handoff_confidence, 6),
                 "handoff_decision_threshold": round(self._handoff_threshold, 6),
+                "target_selection_mode": self._target_selection_mode,
                 "eta_steps": round(eta_steps, 6),
             }
         return {

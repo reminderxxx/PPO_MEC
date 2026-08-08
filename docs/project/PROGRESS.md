@@ -2,6 +2,15 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-08-09: v109-v112 counterfactual option and learned predictor probes rejected
+
+- v109 re-ran the historical sparse-tail option on the current v71 dev split and collapsed: `mean_total_reward=-46.095`, continuity `0.217`, mechanism realization `0.000`.
+- v110 exact option counterfactual credit preserved the v100 planner behavior but did not create a new policy gain: dev SA `21.401` versus Popularity `21.103`, with mechanism and continuity tied. v111 disabled execution-time planners and tied Popularity at `21.103`.
+- The existing supervised handoff predictor was trained using train-window future mobility labels only: `41,059` train samples, `33,260` dev samples, dev next-RSU accuracy `0.9567`, handoff-target accuracy `0.9505`, AUC `0.8730`, Brier `0.0415`. Variable RSU-slot support and quadratic threshold selection were fixed in the predictor pipeline.
+- v112 MAPPO integration with the learned predictor collapsed under hard and soft target selection: `mean_total_reward=16.366`, `collapse_detected=true`, mechanism realization `0.000`. The learned predictor is not promoted into the main algorithm; its contract fixes remain reusable infrastructure.
+
+证据边界：这些均为 development probes，不是 formal 或 hidden evidence。v100 remains the strongest verified candidate；no new reward winner was established.
+
 ## 2026-08-09: CAMA-MAPPO follow-up and candidate freeze boundary
 
 - Implemented and runtime-verified CAMA-MAPPO in `src/agents/sa_ghmappo_core.py`: exact legal alternatives for slow/fast/event heads, policy-marginal counterfactual advantages, and detached utility-weighted head policy targets. The mechanism is training-side MAPPO logic; it does not change environment reward, action schema, evaluator filters or baseline contracts.

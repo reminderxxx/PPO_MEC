@@ -115,7 +115,9 @@ class EnvContractTestCase(unittest.TestCase):
     def test_supervised_predictor_checkpoint_fills_prediction_contract(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             checkpoint_path = Path(tmpdir) / "predictor.pt"
-            rsu_ids = ["rsu_a", "rsu_b", "rsu_c"]
+            # The runtime environment exposes a strict subset of checkpoint
+            # slots; this is the supported variable-layout contract.
+            rsu_ids = ["rsu_a", "rsu_b", "rsu_c", "rsu_d"]
             input_dim = 10 + 7 * len(rsu_ids)
             network = SupervisedHandoffPredictorNetwork(
                 input_dim=input_dim,

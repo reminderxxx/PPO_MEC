@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-08-09: reject option-only and learned-predictor promotion
+
+决策：不将 v110/v111 option-CAMA profiles 或 v112 supervised-predictor integration 晋级为 canonical 主算法。移除 v110/v111 live profile entries；保留 CAMA core implementation 和 predictor input-contract fixes 作为后续研究基础。
+
+依据：v110 `21.40075` vs Popularity `21.10325` 只是复现 v100 planner margin；v111 native policy `21.10325` 与 Popularity 完全持平。v112 learned predictor 在同一 dev protocol 下 collapse，`mean_total_reward=16.366`，机制实现率为 `0.000`。没有任何新候选完成 formal/hidden 晋级条件。
+
+边界：不能把 predictor 的 `0.9567` next-RSU accuracy 或 v110 的局部 reward margin 写成主算法提升；当前唯一正式 reward-winner candidate 仍是 v100，且仍受无 untouched hidden、机制指标持平、跨场景和 compute audit 缺口约束。
+
 ## 2026-08-09: CAMA-MAPPO retained as experimental capability, not promoted
 
 决策：保留 CAMA-MAPPO 的温和实现作为后续研究能力，但不把 v101-v105 晋级为 canonical reward winner；撤销未带来收益的 v106-v108 profiles。当前可靠主方法证据仍是 v100 agent-side urgency-safe resource MAPPO planner。
