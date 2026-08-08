@@ -13,6 +13,7 @@
 - 长实验数据加载瓶颈已定位并修复：`NGSIMProvider` 增加可选 chunked pandas C-parser，保留原 csv fallback；5,000,000-row 真实文件读取基准为 `24.69s`，segment contract 与 `run_ngsim_sample --max_rows 1500` 均通过。此前未产出首个 baseline episode 的长跑已停止并按原协议重启，不能作为实验结果使用。
 - 进一步定位到 baseline 入口仍会在已有 `train_window_plan.json` 时先扫描全量 mobility 再覆盖冻结计划；已改为与 SA 入口一致，冻结计划存在时直接读取并应用，不再做无效扫描。该优化只改变启动路径，不改变窗口、数据、奖励、动作或训练预算。
 - 首轮 full benchmark 暴露评估端 contract 漏项：`real_eval_support.py` 的 SA checkpoint config 白名单未携带 UCC model/planner 字段，导致 benchmark 恢复 agent 时使用默认关闭的 learned planner；训练 checkpoint 本身已保存 model state。现已补齐 producer/consumer 字段并用真实 seed7 checkpoint 验证 `planner_enabled=True`、`model_ready=True`、`sample_count=3645`、`update_count=32`。首轮 aggregate 只能视为未执行完整 v94 推理的诊断结果，不能作为最终 v94 结论。
+- repaired evaluator 又暴露 trainer action propagation 漏项：learned planner 统计显示 applied，但 learned-planner 分支没有把 `planned_action` 写回环境 step；现已补齐并增加 fake-env regression test，确保 model-selected action 真正进入环境。
 
 ## 2026-08-08: v93 机制感知在线反事实 MAPPO 完成零偏移开发集验证
 

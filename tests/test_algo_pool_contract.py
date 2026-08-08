@@ -3827,6 +3827,75 @@ class AlgoPoolContractTestCase(unittest.TestCase):
             summary["agent_info"]["learn_info"]["policy_update_skipped"]
         )
 
+    def test_marl_learned_planner_action_reaches_environment(self) -> None:
+        from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
+
+        class FakeEnv:
+            def __init__(self) -> None:
+                self.actions = []
+
+            def reset(self):
+                return [0], {"semantic_state": {}, "action_mask": [True] * 5}
+
+            def step(self, action: int):
+                self.actions.append(int(action))
+                return (
+                    [1],
+                    1.0,
+                    True,
+                    False,
+                    {"semantic_state": {}, "action_mask": [True] * 5},
+                )
+
+        class FakeRecorder:
+            def start_episode(self, run_metadata=None) -> None:
+                del run_metadata
+
+            def build_summary(self):
+                return {"episode_status": {}}
+
+        class FakeAgent:
+            agent_name = "fake"
+            _learned_transition_model_planner_enabled = True
+
+            def act(self, observation, info):
+                del observation, info
+                return 0, {
+                    "final_env_action": 0,
+                    "action_mask": [True] * 5,
+                    "value": 0.0,
+                    "log_prob": 0.0,
+                }
+
+            def predict_learned_transition_targets(self, observation, action_info):
+                del observation, action_info
+                return {"source": "learned_transition_ensemble", "action_td_targets": {}}
+
+            def select_env_action_from_model_targets(self, action_info, rollout_info):
+                del action_info, rollout_info
+                return 2, {"enabled": True, "applied": True, "selected_action": 2}
+
+            def relabel_action_info_for_env_action(
+                self, action_info, decision_info, env_action, planner_stats
+            ):
+                del decision_info
+                updated = dict(action_info)
+                updated["final_env_action"] = int(env_action)
+                updated["online_counterfactual_planner"] = dict(planner_stats)
+                return updated
+
+        env = FakeEnv()
+        trainer = MARLOnPolicyTrainer(
+            env=env,
+            agent=FakeAgent(),
+            recorder=FakeRecorder(),
+            max_steps=1,
+        )
+        _, rollout = trainer.collect_episode(collect_model_targets=False)
+
+        self.assertEqual(env.actions, [2])
+        self.assertEqual(rollout[0]["action"], 2)
+
     def test_sa_v70_sparse_tail_option_prior_boosts_mechanism_option(self) -> None:
         state = deepcopy(_minimal_semantic_state())
         state["window_class"] = "idle_or_sparse"

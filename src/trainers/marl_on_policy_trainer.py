@@ -81,6 +81,7 @@ class MARLOnPolicyTrainer(BaseTrainer):
                         env_action=int(planned_action),
                         planner_stats=planner_stats,
                     )
+                    action = int(planned_action)
                 else:
                     action_info = dict(action_info)
                     action_info["online_counterfactual_planner"] = planner_stats
