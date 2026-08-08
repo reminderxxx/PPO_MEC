@@ -5,7 +5,7 @@ literature_cutoff: `2026-08-09` (project reference table; no new external litera
 target_venue: `IEEE TMC`
 artifact_run_id: `top_journal_v101_cama_full_20260808` through `top_journal_v108_strong_cama_native_probe32`
 policy_version: `tmc_review_policy_v3_20260621`
-git_commit: `3ae7f5d` (pre-commit source baseline; follow-up implementation was audited in the working tree)
+git_commit: `182e369`
 evidence_level: `E2_PARTIAL / development-only for v101-v108`
 
 ## Objective
