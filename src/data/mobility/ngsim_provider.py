@@ -7,6 +7,11 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+try:  # Optional acceleration; the csv path remains the dependency-free fallback.
+    import pandas as pd
+except ImportError:  # pragma: no cover - depends on the local runtime image.
+    pd = None
+
 from src.data.mobility.base_provider import MobilityProvider
 from src.envs.specs import VehicleState
 
@@ -95,6 +100,62 @@ class NGSIMProvider(MobilityProvider):
             )
 
     def _load_sample_frames(self, max_rows: int) -> list[dict[str, Any]]:
+        if pd is not None:
+            return self._load_sample_frames_pandas(max_rows=max_rows)
+        return self._load_sample_frames_csv(max_rows=max_rows)
+
+    def _load_sample_frames_pandas(self, max_rows: int) -> list[dict[str, Any]]:
+        """Parse large NGSIM files with pandas' C parser in bounded chunks."""
+        grouped_rows: dict[tuple[str, int], dict[str, Any]] = {}
+        loaded_rows = 0
+        columns = ["Vehicle_ID", "Frame_ID", "Local_X", "Local_Y", "v_Vel", "Location"]
+        columns_with_time = [*columns, "Global_Time"]
+        for chunk in pd.read_csv(
+            self._csv_path,
+            usecols=columns_with_time,
+            dtype=str,
+            keep_default_na=False,
+            nrows=max_rows,
+            chunksize=250_000,
+        ):
+            for row in chunk.itertuples(index=False, name=None):
+                values = dict(zip(chunk.columns, row))
+                frame_id = int(self._to_float(values["Frame_ID"]))
+                location = str(values.get("Location") or "unknown").strip() or "unknown"
+                global_time_raw = values.get("Global_Time")
+                global_time = (
+                    int(self._to_float(global_time_raw))
+                    if global_time_raw not in {None, ""}
+                    else frame_id
+                )
+                segment_id = self._segment_id(location)
+                frame_key = (segment_id, global_time)
+                frame_record = grouped_rows.setdefault(
+                    frame_key,
+                    {
+                        "time_index": global_time,
+                        "ngsim_frame_id": frame_id,
+                        "global_time": global_time,
+                        "source_location": location,
+                        "source_segment_id": segment_id,
+                        "vehicles": [],
+                    },
+                )
+                frame_record["vehicles"].append(
+                    VehicleState(
+                        vehicle_id=f"{segment_id}:{values['Vehicle_ID']}",
+                        position_x=float(self._to_float(values["Local_X"])),
+                        position_y=float(self._to_float(values["Local_Y"])),
+                        speed=abs(float(self._to_float(values["v_Vel"]))),
+                        base_model_id=self._default_base_model_id,
+                    )
+                )
+                loaded_rows += 1
+            if loaded_rows >= max_rows:
+                break
+        return self._finalize_grouped_frames(grouped_rows)
+
+    def _load_sample_frames_csv(self, max_rows: int) -> list[dict[str, Any]]:
         grouped_rows: dict[tuple[str, int], dict[str, Any]] = {}
         loaded_rows = 0
         with self._csv_path.open("r", encoding="utf-8-sig", newline="") as file:
@@ -129,6 +190,12 @@ class NGSIMProvider(MobilityProvider):
                 loaded_rows += 1
                 if loaded_rows >= max_rows:
                     break
+        return self._finalize_grouped_frames(grouped_rows)
+
+    def _finalize_grouped_frames(
+        self,
+        grouped_rows: dict[tuple[str, int], dict[str, Any]],
+    ) -> list[dict[str, Any]]:
         if not grouped_rows:
             raise RuntimeError("NGSIM CSV 已找到，但 sample 读取结果为空。")
         ordered_keys = sorted(grouped_rows.keys(), key=lambda item: (item[0], item[1]))

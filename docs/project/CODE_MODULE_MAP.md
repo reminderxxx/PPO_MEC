@@ -7,6 +7,7 @@
 - `src/agents/sa_ghmappo_core.py`：将 UCC target 与 MAPPO policy prior、margin 和 PPO actor loss 连接；保存/恢复 ensemble、replay 和 protocol config。
 - `scripts/train_sa_ghmappo_real_sample.py`、`scripts/run_top_journal_closed_loop.py`：维护 v94 profile、等预算 256-episode closed-loop、冻结 train/dev/formal plan 和 latest-first checkpoint selection。
 - `tests/test_uncertainty_transition_ensemble.py`：覆盖 TD target、replay accumulation、uncertainty output 和 torch checkpoint serialization。
+- `src/data/mobility/ngsim_provider.py`：提供 bounded-chunk pandas C-parser fast path 和原 csv fallback；两者输出同一 NGSIM segment/frame/VehicleState contract。
 
 ## 2026-08-08 v93 mechanism-aware online counterfactual MAPPO
 

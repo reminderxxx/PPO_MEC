@@ -8,6 +8,7 @@
 - `OPEN / calibration`: ensemble uncertainty 在当前真实小跑中出现较高 validation error 和 clipped calibration scale；正式结果必须报告 calibration、no-uncertainty、no-policy-prior、no-model ablation，不能只报告 reward。
 - `OPEN / contract scope`: 该 model 是 controller-level action-conditioned TD surrogate，不是 vehicle-level / RSU-level multi-agent world model；论文中不能扩大 MARL 或 digital-twin claim。
 - `OPEN / protocol`: hidden holdout 仍 sealed；formal candidate、checkpoint manifest、statistics 和主 claim 冻结前不得开启 hidden，也不得用 formal 结果继续调参。
+- `RESOLVED / data-loading`: baseline 长跑曾由纯 Python `csv.DictReader` 解析 5M-row NGSIM 造成首个 episode 长时间无输出；`NGSIMProvider` 现用 bounded-chunk pandas C-parser 并保留 fallback，已用 segment contract、真实 1500-row sample 和 5M-row read benchmark 验证。
 
 ## 2026-08-08: v93 开发集已领先但仍有训练预算与顶刊证据 blocker（OPEN）
 
