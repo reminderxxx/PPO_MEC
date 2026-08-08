@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-08-08: UCC-MAPPO 采用 critic-bootstrap TD model 而非行为 return 伪反事实
+
+决策：v94 使用 replay-backed bootstrap transition ensemble 预测 `reward`、`next_observation` 和 one-step `r + gamma V(next_state)` TD target；planner 对合法动作计算 uncertainty lower confidence bound，并通过 MAPPO policy prior / margin 约束接入 actor 更新。
+
+原因：行为轨迹的整段 return 是当前行为后续动作的结果，不能直接作为未执行候选 action 的反事实 value。新增 `next_value` 使模型目标与 MAPPO centralized critic 对齐，同时保留 ensemble disagreement 作为分布外风险信号。
+
+边界：该实现借鉴 MBPO/MOPO/COMBO 的模型辅助与保守策略改进思想，但不是通用 world model、offline RL 或已有理论保证的复现；主张必须由 formal/holdout、uncertainty/policy-prior/model ablation 和模型计算成本共同支撑。正式闭环结果生成前，v94 只属于候选实现，不属于 canonical paper claim。
+
 ## 2026-08-08: v93 采用机制感知 delayed-credit counterfactual MAPPO，暂不晋级 paper-ready
 
 决策：将 `top_journal_mechanism_v93_mechanism_aware_online_mappo` 作为当前 zero-offset dev 候选，保留 v92 作为机制感知消融；不打开 hidden holdout，不更新 canonical paper claim。

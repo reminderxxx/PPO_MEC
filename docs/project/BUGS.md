@@ -2,6 +2,13 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-08 v94 UCC-MAPPO 开放风险
+
+- `OPEN / evidence pending`: UCC-MAPPO 的正式多 seed benchmark 尚未完成；当前不能把首个 seed、真实 smoke 或历史 v93 开发结果写成全量优胜结论。
+- `OPEN / calibration`: ensemble uncertainty 在当前真实小跑中出现较高 validation error 和 clipped calibration scale；正式结果必须报告 calibration、no-uncertainty、no-policy-prior、no-model ablation，不能只报告 reward。
+- `OPEN / contract scope`: 该 model 是 controller-level action-conditioned TD surrogate，不是 vehicle-level / RSU-level multi-agent world model；论文中不能扩大 MARL 或 digital-twin claim。
+- `OPEN / protocol`: hidden holdout 仍 sealed；formal candidate、checkpoint manifest、statistics 和主 claim 冻结前不得开启 hidden，也不得用 formal 结果继续调参。
+
 ## 2026-08-08: v93 开发集已领先但仍有训练预算与顶刊证据 blocker（OPEN）
 
 - v93 在两个独立 seed 的同窗口 zero-offset full-stratified dev benchmark 中均高于 PPO、controller-level MAPPO 和 Popularity；seed13 为 `17.901250` vs `16.947000`，seed7 为 `18.068000` vs `16.947000`。这只能作为开发集事实，不能替代 formal/holdout 统计。

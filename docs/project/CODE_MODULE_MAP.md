@@ -1,5 +1,13 @@
 # Code Module Map
 
+## 2026-08-08 v94 uncertainty-calibrated model-assisted MAPPO
+
+- `src/models/uncertainty_transition_ensemble.py`：负责 UCC-MAPPO 的 replay-backed bootstrap transition/TD-target ensemble、validation calibration、LCB prediction 和 checkpoint state；它只消费 rollout rows，不反向依赖 evaluator 或 benchmark。
+- `src/trainers/ppo_buffer.py`、`src/trainers/marl_on_policy_trainer.py`：记录 `next_value`，为 model-assisted action improvement 提供 critic-bootstrap TD target，并维持原 PPO/SA rollout contract 的向后兼容默认值。
+- `src/agents/sa_ghmappo_core.py`：将 UCC target 与 MAPPO policy prior、margin 和 PPO actor loss 连接；保存/恢复 ensemble、replay 和 protocol config。
+- `scripts/train_sa_ghmappo_real_sample.py`、`scripts/run_top_journal_closed_loop.py`：维护 v94 profile、等预算 256-episode closed-loop、冻结 train/dev/formal plan 和 latest-first checkpoint selection。
+- `tests/test_uncertainty_transition_ensemble.py`：覆盖 TD target、replay accumulation、uncertainty output 和 torch checkpoint serialization。
+
 ## 2026-08-08 v93 mechanism-aware online counterfactual MAPPO
 
 - `src/trainers/marl_on_policy_trainer.py`：在线反事实 branch replay 新增 delayed predictive-prefetch validation queue 和当前步 handoff-aligned prepare target，确保机制 credit 与 `EpisodeRecorder` 的兑现协议一致。

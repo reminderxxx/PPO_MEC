@@ -2,6 +2,15 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-08-08: v94 UCC-MAPPO 算法实现与正式闭环启动
+
+- v93 的在线 exact counterfactual 分支存在 `deepcopy(env)` 计算瓶颈；v94 新增 uncertainty-calibrated action-conditioned model-assisted MAPPO，不再依赖训练时逐动作复制环境。
+- `src/models/uncertainty_transition_ensemble.py` 使用 bootstrap ensemble 学习真实 rollout 的即时 reward、normalized next observation 和 `r_t + gamma * V(s_{t+1})` critic-bootstrap TD target，并以 replay-backed sample pool、ensemble disagreement 和 validation calibration 形成 action-level lower-confidence target。
+- planner 仅查询合法 `semantic_discrete_5` 原生动作，将 UCC lower-confidence target 与当前 MAPPO policy prior / minimum margin 结合，再通过既有 PPO actor policy-improvement loss 学习；环境 reward、action schema、evaluator 过滤和 baseline contract 未修改。
+- `PPORolloutBuffer` / `MARLOnPolicyTrainer` 新增 `next_value` rollout contract，checkpoint 同时保存 model optimizer、calibration、ensemble weights 和 replay 状态，避免把行为轨迹 return 直接冒充反事实 Q 值。
+- 已验证：UCC 模型单测、checkpoint 序列化、PPO/MAPPO/environment contract 共 `252 passed`；`scripts/smoke_test.py` 通过；真实 NGSIM+Alibaba 小跑中 model planner 在 warm-up 后启用，模型 policy-improvement loss 非零。该小跑不是论文证据。
+- 正式闭环 `top_journal_v94_ucc_mappo_strict_full_20260808` 已启动，协议为 NGSIM+Alibaba、严格冻结 train/dev/formal split、3 seeds、SA 与 learned baseline 各 256 episodes、20 windows、zero reward offset；截至本记录，首个 SA seed 已完成，PPO seed 正在运行，formal aggregate 尚未生成，不能提前下结论。
+
 ## 2026-08-08: v93 机制感知在线反事实 MAPPO 完成零偏移开发集验证
 
 - 一阶根因已确认：旧在线反事实分支只看 `next_info`，没有复现 `EpisodeRecorder` 的 delayed predictive-prefetch validation，因此训练目标把“请求”误当成“兑现”；同时 handoff prepare 目标缺少当前步因果约束，容易获得未来事件 credit。
