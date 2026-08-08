@@ -14,6 +14,8 @@
 
 证据边界：v98 已是 frozen formal + independent hidden 的 reward winner，但不是“所有机制指标都优于 Popularity”：formal/hidden 的 continuity、handoff-ready、mechanism realization 与 Popularity 持平。当前可安全表述为“在本项目 NGSIM + Alibaba strict protocol 上，v98 SA-GHMAPPO 的 total reward 高于全部已纳入对照，并在独立 hidden 上保持正向”；不能扩大为所有 MARL、所有数据集或 full vehicle/RSU-level 部署结论。
 
+顶刊自审：`docs/project/top_journal_v98_readiness_review_20260808.md` 给出 `E2_ARTIFACT_AUDITED`、`71/100`、`Not TMC-ready; strong reward candidate, major revision`。主要扣分来自强规则差距小、单一 mobility/workflow 组合、完整 system/scalability/compute package 未完成；不是 formal/hidden reward 统计失败。
+
 ## 2026-08-08: v98 UCC-MAPPO counterfactual policy improvement probe
 
 - v95 的 risk-only 调整和 v96 的全动作 UCB 探索均被拒绝：两者分别在 update 5/6 后出现 mechanism collapse；v96 独立 dev benchmark 为 SA `8.629`、Popularity `21.103`。这些结果保留为 negative probe，不进入主结论。
