@@ -2,6 +2,14 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-08: v100 paper-readiness risks remain
+
+- `BLOCKER`: v100 has no untouched hidden holdout. The historical v71 hidden split was consumed by v98 and must not be reused for v100 tuning or claimed as v100 evidence.
+- `BLOCKER`: only the NGSIM + Alibaba controller-level combination is covered. Cross-mobility, cross-workflow and larger system-scale validation are absent.
+- `MAJOR`: formal mechanism realization, continuity, handoff-ready ratio and backhaul/migration outcomes tie Popularity; the reward margin is mainly delay-based and small (`+0.3475`).
+- `MAJOR`: v100 and v98 formal reward rows are identical, so the v100 formal package is a replication/winner confirmation rather than proof of a new formal uplift.
+- `MAJOR`: full noise sweep, complete component ablations and unified wall-clock/compute accounting are not yet available. Compact prediction support is support-only and must not replace these packages.
+
 ## 2026-08-08 v98 hidden 已消费后的剩余风险
 
 - `RESOLVED / formal-hidden independence`: `scripts/audit_window_independence.py` 对 v71 formal 与 hidden 计划通过，20+20 windows 的 frame/time/segment intervals 均无重叠；hidden 已一次性消费，不能再用于调参或换 checkpoint。

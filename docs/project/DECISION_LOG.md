@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-08-08: freeze v100 as a formal reward-winner candidate, not paper-ready
+
+决策：将 `top_journal_mechanism_v100_urgency_safe_resource_mappo` 作为当前 formal reward-winner candidate 记录，不晋级为 TMC-ready 或 paper-ready。保留 v98 consumed hidden 结论，不重新打开 hidden；v100 的新增证据只包括 frozen formal replication、mixed replication、compact prediction support 和 artifact integrity audit。
+
+原因：v100 将 exact multi-horizon legal-action branch targets、urgency-conditioned mechanism advantage 和 resource-cost pressure 纳入 MAPPO 的 policy-improvement target 与在线 counterfactual planner，开发集从 v99 的 `18.211` 提升到 `18.760`。在 3-seed full formal 中 SA `26.430` 高于 Popularity `26.082` 及其余 9 个对照，且 BCa 区间和配对统计支持正向差异。
+
+限制：v100 与 v98 formal reward rows 完全一致；机制 realization、continuity、handoff-ready 与 backhaul/migration 与 Popularity 持平；没有 v100 independent hidden、第二数据组合、完整消融、完整噪声扫描和统一 compute audit。顶刊审查给出 `71/100`、`Not TMC-ready; strong formal reward candidate, major revision`。后续必须先补独立 hidden、跨场景、消融和成本证据，不能继续通过重复读取已消费 hidden 或只调 reward/评估包装扩大 gap。
+
 ## 2026-08-08: v98 frozen hidden 结果确认晋级为当前 reward candidate
 
 决策：将 `top_journal_mechanism_v98_ucc_counterfactual_policy_improvement_mappo` 记录为当前 reward-first candidate；不把它写成已经 TMC-ready，也不继续读取 hidden 进行调参。

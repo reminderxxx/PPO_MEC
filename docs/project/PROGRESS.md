@@ -2,6 +2,16 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-08-08: v100 urgency-safe resource MAPPO formal package completed
+
+- v100 implemented an urgency-safe resource-constrained MAPPO policy-improvement path: exact legal-action branch replay at horizons `1,3,6`, branch-derived mechanism/resource targets, and the same adaptive horizon mixture in MAPPO KL improvement and execution-time counterfactual planning. Environment reward, action schema, baseline contract and evaluator filtering were unchanged.
+- Three full-budget seeds `[7,13,29]` completed with 256 episodes and 32 updates; all `collapse_detected=false`. Formal full used 20 frozen windows, 2 Alibaba workflows and 11 agents, producing 1320 raw summaries.
+- Formal full reward: SA-GHMAPPO `26.430`, Popularity `26.082`, DQN `21.602`, Dueling-DQN `17.341`, DT `11.180`, DAG `9.320`, PPO `9.283`, QMIX `9.184`, Cache `1.333`, MAPPO `1.126`, Controller-MAT `0.844`. SA is the reward winner; SA vs Popularity delta `+0.3475`, BCa 95% CI `[0.1550, 0.6008]`, paired `54/66/0`, Holm-adjusted sign-test p=`0.0`.
+- The same frozen protocol was rerun as mixed-informative and reported separately. Compact prediction support completed on 5 outcome-blind windows, 3 seeds and 4 settings; SA remained above Popularity in baseline/noisy/no-prediction/oracle settings. Full noise sweep produced no artifact and is not claimed.
+- v100 artifact audit passed: `3574` root files, `3665` referenced files, `0` missing references and `0` JSON errors. Evidence record: `docs/project/top_journal_v100_results_20260808.md`.
+
+证据边界：v100 formal rows are identical to v98 under this frozen protocol; v100 only has a pre-frozen dev uplift over v99 (`18.760` vs `18.211`). The v71 hidden holdout was consumed by v98 and was not reopened, so v100 has no independent hidden claim. The current top-journal review is `71/100`, `Not TMC-ready; strong formal reward candidate, major revision`.
+
 ## 2026-08-08: v98 UCC-MAPPO full formal/hidden 闭环完成
 
 - v98 使用 3 seeds `[7,13,29]`、256 episodes、update every 8、batch size 64，在 NGSIM + Alibaba、zero reward offset、同一 baseline manifest 下完成 SA-GHMAPPO 与 10 个对照的 full-stratified formal benchmark；mixed-informative 作为同窗口不同 mode 单独报告，未合并扩大样本量。

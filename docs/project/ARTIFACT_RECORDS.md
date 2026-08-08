@@ -1,5 +1,16 @@
 # Artifact Records
 
+## 2026-08-08: top_journal_v100_urgency_safe_resource_full_20260808
+
+- Candidate: `top_journal_mechanism_v100_urgency_safe_resource_mappo`; code freeze commit `9d9bc3f`, freeze record commit `ac7491b`.
+- Formal full raw run: `artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/benchmarks/formal_full_stratified/main_results_full_stratified_20260808_183339_526215/`; 1320 summaries, 11 agents, 20 windows, 2 workflows and 3 seeds.
+- Formal statistics: `artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/statistics/formal_full_stratified/paired_statistics.json`; SA vs Popularity total-reward delta `+0.3475`, BCa `[0.1550, 0.6008]`, `54/66/0`, Holm p=`0.0`.
+- Mixed replication: `artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/benchmarks/formal_mixed_informative/main_results_mixed_informative_20260808_184603_237845/`; not pooled with formal full.
+- Compact prediction support: `artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/support/prediction_robustness_compact/prediction_robustness_20260808_214349_192721/`; 240 raw summaries over 5 windows, 3 seeds, 2 agents and 4 settings.
+- Checkpoint manifest SHA-256: `418657c69731b45cfca1df0b45ecc1757adcd555cbde5b27106bc4ef6f7b9d09`.
+- Integrity report: `artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/audit_artifact_integrity/artifact_integrity_report.json`, `passed=true`, root files `3574`, referenced files `3665`, missing references `0`, JSON errors `0`.
+- Boundaries: no v100 hidden holdout; v100 formal rows equal v98 rows; full noise sweep and complete ablations remain unavailable.
+
 ## 2026-08-08 v98 UCC-MAPPO formal/hidden full package
 
 状态：`[frozen-formal]` `[independent-hidden-consumed]` `[reward-winner]` `[not-tmc-ready-complete-support]`
