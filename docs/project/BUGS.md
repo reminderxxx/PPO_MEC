@@ -2,6 +2,15 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-08 v98 hidden 已消费后的剩余风险
+
+- `RESOLVED / formal-hidden independence`: `scripts/audit_window_independence.py` 对 v71 formal 与 hidden 计划通过，20+20 windows 的 frame/time/segment intervals 均无重叠；hidden 已一次性消费，不能再用于调参或换 checkpoint。
+- `RESOLVED / reward main claim`: v98 full formal 与 hidden 均相对 Popularity 为正，且 window-outer BCa CI 完全高于 0；结果不能解释为所有机制指标全面领先，因为 continuity、handoff-ready、mechanism realization 与 Popularity 持平。
+- `RESOLVED / policy-improvement attribution`: v97 calibration-only 三 seed full formal 未超过 Popularity；v98 第二层 exact one-step policy improvement 后超过，v97 collapse seed29 未被筛除。
+- `OPEN / support scope`: prediction robustness 已完成 5-window frozen support subset；未完成 full 20-window noise sweep、system robustness 和 scalability 的当前 v98 package，不能宣称完整 support suite 已闭环。
+- `OPEN / compute audit`: 训练/评估包含 exact branch samples、UCC ensemble 和 online planner；当前 artifact 有训练 summary 与 update count，但尚未形成统一 wall-clock/peak-memory/branch-cost table。
+- `OPEN / metric tradeoff`: v98 的 reward 胜出主要来自 total_reward；与 Popularity 的机制 realization、ready、continuity 持平，backhaul/migration 等指标必须随主表一起报告，不能只给 reward。
+
 ## 2026-08-08 v98 candidate risks
 
 - `OPEN / multi-seed evidence`: v98 目前只有 seed7、48 episode 的 formal probe，不能与 v94/v70 的 multi-seed full result 等量齐观；必须完成 seeds `[7,13,29]`、256 episodes、formal aggregate 和 paired statistics。

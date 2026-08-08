@@ -197,25 +197,28 @@ def main() -> None:
         seeds=args.seeds,
     )
     checkpoint_audit = build_checkpoint_audit(audit_checkpoint_source_map, args.agents)
-    mobility_source_path, window_payload = resolve_window_candidates(
-        root_dir=ROOT_DIR,
-        mobility_source=args.mobility_source,
-        mobility_csv_path=args.mobility_csv_path,
-        lust_scenario_root=args.lust_scenario_root,
-        max_mobility_rows=args.max_mobility_rows,
-        rsu_layout=args.rsu_layout,
-        frame_offset=args.frame_offset,
-        window_length=args.window_length,
-        window_selector=args.window_selector,
-        window_count=args.window_count,
-        window_scan_stride=args.window_scan_stride,
-        random_seed=args.seeds[0] if args.seeds else 7,
-        window_mode=args.window_mode,
-    )
-    selected_windows = list(window_payload["selected_windows"])
     if args.window_plan_path:
-        window_payload = apply_frozen_window_plan(window_payload, args.window_plan_path)
-        selected_windows = list(window_payload["selected_windows"])
+        # A frozen plan is already the selection result; scanning all NGSIM rows
+        # first defeats the protocol and makes support runs unnecessarily costly.
+        mobility_source_path = str(args.mobility_csv_path or args.lust_scenario_root)
+        window_payload = apply_frozen_window_plan({}, args.window_plan_path)
+    else:
+        mobility_source_path, window_payload = resolve_window_candidates(
+            root_dir=ROOT_DIR,
+            mobility_source=args.mobility_source,
+            mobility_csv_path=args.mobility_csv_path,
+            lust_scenario_root=args.lust_scenario_root,
+            max_mobility_rows=args.max_mobility_rows,
+            rsu_layout=args.rsu_layout,
+            frame_offset=args.frame_offset,
+            window_length=args.window_length,
+            window_selector=args.window_selector,
+            window_count=args.window_count,
+            window_scan_stride=args.window_scan_stride,
+            random_seed=args.seeds[0] if args.seeds else 7,
+            window_mode=args.window_mode,
+        )
+    selected_windows = list(window_payload["selected_windows"])
     settings = build_settings(
         include_noise_sweep=args.include_noise_sweep,
         predictor_kind=args.predictor_kind,

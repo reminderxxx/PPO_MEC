@@ -2,6 +2,18 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-08-08: v98 UCC-MAPPO full formal/hidden 闭环完成
+
+- v98 使用 3 seeds `[7,13,29]`、256 episodes、update every 8、batch size 64，在 NGSIM + Alibaba、zero reward offset、同一 baseline manifest 下完成 SA-GHMAPPO 与 10 个对照的 full-stratified formal benchmark；mixed-informative 作为同窗口不同 mode 单独报告，未合并扩大样本量。
+- formal full：SA-GHMAPPO `26.430`，Popularity `26.082`，reward delta `+0.3475`；window-outer hierarchical BCa 95% CI `[0.1625, 0.6000]`，paired `54/66/0`，Holm sign-test p=`0.0`。相对 PPO/MAPPO/DQN 的 delta 分别为 `+17.146917/+25.304083/+4.828333`，BCa CI 均完全高于 0。
+- frozen hidden holdout：SA-GHMAPPO `17.049`，Popularity `16.814`，reward delta `+0.2350`；BCa 95% CI `[0.078333, 0.483290]`，paired `36/84/0`，Holm sign-test p=`0.0`。相对 PPO/MAPPO/DQN 的 delta 为 `+14.764/+19.192333/+4.732167`，BCa CI 均完全高于 0。
+- 机制归因：v97 calibration-only 三 seed full formal 为 `25.960`，低于 Popularity `26.082`，delta `-0.1225`，BCa CI `[-0.611667, 0.180000]`；v98 在此基础上增加 exact one-step model policy improvement 后 formal 提升 `+0.470`，支持第二层 policy-improvement view 是本轮增益来源。v97 seed29 的 collapse 负结果原样保留，没有剔除。
+- v98 的 MAPPO/UCC 机制包括 bootstrap transition ensemble、exact branch transition calibration、LCB evaluation、MAPPO policy prior 和 exact TD-target policy improvement；不修改 environment reward、action schema、window plan、baseline contract 或 evaluator filtering。
+- prediction support 子集已完成：5 个 frozen formal windows、3 seeds、baseline/noisy/no-prediction/oracle 四设置；SA baseline reward `89.312` vs Popularity `88.152`，noisy reward `89.117` vs `87.937`，`reference - no_prediction = +1.457`。该 suite 是 support subset，不替代 full formal/hidden。
+- formal/hidden window audit 通过：20/20 windows，split 内及 split 间 frame/time/segment intervals 无重叠。candidate freeze 与一次性 hidden execution 分别记录于 `top_journal_v98_freeze_20260808.md` 和 `top_journal_v98_hidden_execution_20260808.md`。
+
+证据边界：v98 已是 frozen formal + independent hidden 的 reward winner，但不是“所有机制指标都优于 Popularity”：formal/hidden 的 continuity、handoff-ready、mechanism realization 与 Popularity 持平。当前可安全表述为“在本项目 NGSIM + Alibaba strict protocol 上，v98 SA-GHMAPPO 的 total reward 高于全部已纳入对照，并在独立 hidden 上保持正向”；不能扩大为所有 MARL、所有数据集或 full vehicle/RSU-level 部署结论。
+
 ## 2026-08-08: v98 UCC-MAPPO counterfactual policy improvement probe
 
 - v95 的 risk-only 调整和 v96 的全动作 UCB 探索均被拒绝：两者分别在 update 5/6 后出现 mechanism collapse；v96 独立 dev benchmark 为 SA `8.629`、Popularity `21.103`。这些结果保留为 negative probe，不进入主结论。

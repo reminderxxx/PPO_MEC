@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-08-08: v98 frozen hidden 结果确认晋级为当前 reward candidate
+
+决策：将 `top_journal_mechanism_v98_ucc_counterfactual_policy_improvement_mappo` 记录为当前 reward-first candidate；不把它写成已经 TMC-ready，也不继续读取 hidden 进行调参。
+
+依据：v98 full formal 相对 Popularity 的 total-reward delta 为 `+0.3475`，BCa 95% CI `[0.1625, 0.6000]`；独立 hidden delta 为 `+0.2350`，BCa `[0.078333, 0.483290]`。v97 calibration-only full formal delta 为 `-0.1225`，说明 v98 的第二层 exact one-step policy improvement 是可检验的增益来源，而不是评估包装。
+
+边界：formal/hidden 中 continuity、handoff-ready、mechanism realization 与 Popularity 持平；v98 只支持项目内 NGSIM + Alibaba strict protocol 的 reward winner claim。完整顶刊审查仍受 support subset、system/scalability、compute audit 和更完整组件消融限制。
+
 ## 2026-08-08: v97/v98 用 counterfactual calibration 修复 UCC 的动作覆盖缺口
 
 决策：拒绝 v95 的直接降风险和 v96 的全动作 UCB；v97 将 exact one-step branch replay 作为 UCC ensemble 的校准数据源，v98 再将 exact one-step TD targets 作为第二层 MAPPO policy-improvement view。两层都经过 action mask 和 MAPPO policy prior 约束，训练/评估仍保持 UCC 的 model-assisted MAPPO contract。

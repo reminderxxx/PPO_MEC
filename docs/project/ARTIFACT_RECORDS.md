@@ -1,5 +1,25 @@
 # Artifact Records
 
+## 2026-08-08 v98 UCC-MAPPO formal/hidden full package
+
+状态：`[frozen-formal]` `[independent-hidden-consumed]` `[reward-winner]` `[not-tmc-ready-complete-support]`
+
+核心路径：
+
+- manifest：`artifacts/experiments/top_journal_v98_ucc_full_20260808/seed_checkpoint_manifest.json`
+- formal rows/aggregate：`artifacts/experiments/top_journal_v98_ucc_full_20260808/benchmarks/formal_full_stratified/main_results_full_stratified_20260808_152756_948018/`
+- mixed rows/aggregate：`artifacts/experiments/top_journal_v98_ucc_full_20260808/benchmarks/formal_mixed_informative/main_results_mixed_informative_20260808_153526_884824/`
+- hidden rows/aggregate：`artifacts/experiments/top_journal_v98_ucc_full_20260808/benchmarks/hidden_holdout_full_stratified/main_results_full_stratified_20260808_160805_690263/`
+- formal statistics：`artifacts/experiments/top_journal_v98_ucc_full_20260808/statistics/formal_full_stratified/paired_statistics.json`
+- hidden statistics：`artifacts/experiments/top_journal_v98_ucc_full_20260808/statistics/hidden_holdout_full_stratified/paired_statistics.json`
+- v97 mechanism ablation：`artifacts/experiments/top_journal_v97_ucc_full_20260808/`
+- prediction support：`artifacts/experiments/top_journal_v98_ucc_full_20260808/support/prediction_robustness_5window/prediction_robustness_20260808_170131_736798/`
+- freeze/execution records：`docs/project/top_journal_v98_freeze_20260808.md`、`docs/project/top_journal_v98_hidden_execution_20260808.md`
+
+确认结果：formal reward `26.430` vs Popularity `26.082`，delta `+0.3475`，BCa `[0.1625, 0.6000]`；hidden reward `17.049` vs `16.814`，delta `+0.2350`，BCa `[0.078333, 0.483290]`。两种 mode 分开统计，外层均为 20 windows，内层为 120 seed-workflow rows。
+
+边界：这是当前 candidate 的强 reward evidence，不等于 complete TMC-ready package。机制指标没有超过 Popularity，support 只完成 5-window prediction subset，wall-clock/compute table、system robustness、scalability 和完整组件消融仍需补齐后才能升级审稿 verdict。
+
 ## 2026-08-08 v95-v98 UCC-MAPPO candidate probes
 
 状态：`[candidate-validation]` `[not-paper-ready]`
