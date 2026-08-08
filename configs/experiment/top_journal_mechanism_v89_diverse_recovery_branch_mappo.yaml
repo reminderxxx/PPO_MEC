@@ -1,0 +1,60 @@
+profile: top_journal_mechanism_v89_diverse_recovery_branch_mappo
+base_profile: top_journal_mechanism_v88_contextual_recovery_expert_mappo
+purpose: >
+  Prevent recovery-imagination mode collapse by replaying the highest-support
+  legal action branches before beam-based MAPPO policy improvement.
+
+algorithm_delta:
+  - Retains clipped MAPPO, centralized value learning, contextual recovery residuals, beam search, mirror target projection, and transactional KL rollback.
+  - Expands recovery imagination from only the dominant policy branch to the top two legal branches ranked by the current policy distribution.
+  - Runs the same beam search from each imagined branch state so delayed recovery modes can enter the learned residual policy.
+  - Selects branches without development-window labels or hand-picked action identities.
+  - Uses no action override, reward shaping, heuristic policy, evaluator bias, or development labels.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v88_contextual_recovery_expert_mappo
+  observed_failure: >
+    All 58 imagined recovery targets in the diagnostic run selected action 2,
+    while exact digital-twin search in the hard development trajectory selected
+    action 0 after the first failed preparation. Dominant-branch imagination
+    therefore omitted a distinct cache-refill recovery mode.
+  correction: >
+    Branch-diverse Dyna replay explores the two highest-support legal policy
+    branches and lets return-ranked beam targets, rather than action identity,
+    determine the recovery update.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  temporal_reward_shaping_enabled: false
+  reward_shaping_added: false
+
+training_budget:
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  prediction_horizon: 16
+
+algorithm:
+  outcome_context_residual_enabled: true
+  env_action_model_imagination_beam_search_enabled: true
+  env_action_model_imagination_replay_branch_mode: top_k
+  env_action_model_imagination_replay_branch_top_k: 2
+  env_action_model_policy_improvement_tail_logit_projection_enabled: true
+  env_action_model_policy_improvement_tail_residual_optimizer_enabled: true
+  env_action_model_policy_improvement_tail_max_policy_kl: 0.35
+
+compute_accounting:
+  branch_selection: top two legal actions by current policy support
+  paper_requirement: report branch actions, parameter count, model transitions, selected observed/imagined states, accepted KL, rejected epochs, wall time, and memory
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Development-only until targeted mechanism verification, fresh multi-seed
+    training, complete baselines, strict formal/hidden evaluation, statistics,
+    and mechanism ablations pass.

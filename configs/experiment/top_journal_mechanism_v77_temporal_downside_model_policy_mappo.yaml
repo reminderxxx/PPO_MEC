@@ -1,0 +1,86 @@
+profile: top_journal_mechanism_v77_temporal_downside_model_policy_mappo
+base_profile: top_journal_mechanism_v76_recurrent_robust_model_policy_mappo
+purpose: >
+  Preserve delayed preparation benefits while suppressing actions whose
+  short-horizon digital-twin advantage deteriorates at longer planning depths.
+
+algorithm_delta:
+  - Retains observable trajectory-outcome memory in the actor and critic.
+  - Evaluates every valid native action at horizons 1, 2, 4, and 8.
+  - Replaces symmetric cross-horizon dispersion with a sparse-horizon lambda return.
+  - Applies a one-sided temporal-downside penalty only when advantage deteriorates at longer horizons.
+  - Preserves delayed gains from cache fill, prefetch, and migration preparation without action-specific rules.
+  - Uses a per-state MPO-style KL constraint for conservative policy projection.
+  - Retains clipped MAPPO and adds no reward shaping, teacher, fixed action prior, guard, or evaluator override.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v76_recurrent_robust_model_policy_mappo
+  observed_failure: >
+    Symmetric cross-horizon standard deviation treated delayed preparation
+    gains as uncertainty, reduced preparation attempts, and did not improve
+    continuity or unfinished-workflow rate on development windows.
+  correction: >
+    The temporal-downside objective distinguishes delayed opportunity from
+    short-term action-value spikes: rising long-horizon value is preserved,
+    while falling long-horizon value is penalized.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  prediction_horizon: 16
+  reward_shaping_added: false
+
+training_budget:
+  primary_vehicle_selection: handoff_pressure
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  clip_ratio: 0.12
+  target_kl: 0.015
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  temporal_reward_shaping_enabled: false
+  update_eval_max_windows: 4
+  update_eval_max_workflows: 1
+  post_training_audit_mode: compact
+
+algorithm:
+  outcome_memory_fusion_enabled: true
+  outcome_memory_actor_scale: 0.7
+  outcome_memory_critic_scale: 0.85
+  env_action_model_critic_enabled: true
+  env_action_model_critic_value_coef: 0.5
+  env_action_model_critic_advantage_coef: 0.0
+  env_action_model_critic_policy_improvement_coef: 0.0
+  env_action_model_policy_improvement_enabled: true
+  env_action_model_policy_improvement_coef: 0.35
+  env_action_model_policy_improvement_robust_horizons_enabled: true
+  env_action_model_policy_improvement_horizon_aggregation_mode: lambda_downside
+  env_action_model_policy_improvement_horizon_lambda: 0.9
+  env_action_model_policy_improvement_horizon_risk_coef: 0.75
+  env_action_model_policy_improvement_adaptive_kl_enabled: true
+  env_action_model_policy_improvement_target_kl: 0.03
+  env_action_model_rollout_enabled: true
+  env_action_model_rollout_horizons: [1, 2, 4, 8]
+  env_action_ppo_enabled: true
+  env_action_ppo_coef: 0.35
+
+compute_accounting:
+  model_query_unit: valid_native_action_per_training_state
+  model_transition_unit: simulated_branch_step
+  paper_requirement: report real transitions, model queries, model transitions, wall time, and memory
+
+checkpoint_protocol:
+  closed_loop_priority: latest_after_fixed_budget
+  selection_source: no_benchmark_selection
+  disallowed_claim: benchmark_selected_checkpoint
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Promotion requires all-baseline development evidence, independent formal
+    and hidden confirmation, equal-budget baselines, ablations, and support
+    experiments under the frozen protocol.

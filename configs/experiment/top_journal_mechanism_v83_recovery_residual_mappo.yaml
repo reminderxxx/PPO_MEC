@@ -1,0 +1,57 @@
+profile: top_journal_mechanism_v83_recovery_residual_mappo
+base_profile: top_journal_mechanism_v82_recovery_imagination_mappo
+purpose: >
+  Prevent recovery learning from overwriting the ordinary MAPPO policy by
+  isolating counterfactual recovery updates in an outcome-gated residual head.
+
+algorithm_delta:
+  - Retains clipped MAPPO, exact training-only digital-twin counterfactuals, and recovery-conditioned imagination.
+  - Adds a zero-initialized residual action head gated by observed stall, no-progress, failed-prepare, or failed-handoff memory.
+  - Restricts recovery-tail distillation to recovery states and updates only the residual head.
+  - Preserves the pretrained ordinary-state policy exactly when the recovery gate is inactive.
+  - Uses no action labels, reward shaping, heuristic policy, evaluator override, or development data.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v82_recovery_imagination_mappo
+  observed_failure: >
+    Recovery imagination repaired the hard off27624 workflow but globally
+    shifted the actor toward current-RSU cache fill, removing useful
+    preparation actions from ordinary states and reducing development reward.
+  correction: >
+    State-conditioned residual policy optimization separates rare recovery
+    adaptation from the stable base policy and prevents catastrophic
+    interference outside observed recovery states.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  temporal_reward_shaping_enabled: false
+  reward_shaping_added: false
+
+training_budget:
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  prediction_horizon: 16
+
+algorithm:
+  outcome_recovery_residual_enabled: true
+  outcome_recovery_residual_scale: 1.0
+  env_action_model_policy_improvement_tail_recovery_only: true
+  env_action_model_policy_improvement_tail_adapter_only: true
+
+compute_accounting:
+  recovery_state_unit: state with observable failed-prepare, no-progress, failed-handoff, or stall memory
+  residual_update_unit: recovery-state actor gradient applied only to the residual head
+  paper_requirement: report real transitions, model transitions, recovery states, residual updates, wall time, and memory
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    This profile remains development-only until fresh multi-seed training,
+    complete baselines, strict formal/hidden evaluation, statistics, and
+    mechanism ablations are complete.

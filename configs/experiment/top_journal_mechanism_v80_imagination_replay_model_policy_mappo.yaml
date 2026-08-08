@@ -1,0 +1,86 @@
+profile: top_journal_mechanism_v80_imagination_replay_model_policy_mappo
+base_profile: top_journal_mechanism_v79_tail_distilled_model_policy_mappo
+purpose: >
+  Generate recovery-state coverage from training-only digital-twin branches
+  and use those states in regret-prioritized generalized policy iteration.
+
+algorithm_delta:
+  - Retains clipped MAPPO as the real-transition policy objective.
+  - Follows the actor's dominant action branch only inside frozen training windows.
+  - Samples actual simulated branch states at depths 2, 4, and 8.
+  - Evaluates every legal native action at each imagined state with one-step TD targets.
+  - Adds imagined states to the high-regret tail distillation pool.
+  - Reduces tail distillation from 8 to 4 epochs and coefficient from 1.0 to 0.75.
+  - Uses no development data, heuristic action labels, reward shaping, guards, or evaluator overrides.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v79_tail_distilled_model_policy_mappo
+  observed_failure: >
+    Tail distillation improved development reward by 0.278 but could not alter
+    the repeated-action recovery failure because comparable post-failure
+    observations were absent from real training rollouts.
+  correction: >
+    Training-only branched imagination exposes the policy to its own likely
+    future failure states, while exact native-action counterfactual TD targets
+    provide recovery credit without hand-authored actions.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  prediction_horizon: 16
+  reward_shaping_added: false
+
+training_budget:
+  primary_vehicle_selection: handoff_pressure
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  clip_ratio: 0.12
+  target_kl: 0.015
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  temporal_reward_shaping_enabled: false
+  update_eval_max_windows: 4
+  update_eval_max_workflows: 1
+  post_training_audit_mode: compact
+
+algorithm:
+  env_action_model_rollout_enabled: true
+  env_action_model_rollout_horizons: [1, 2, 4, 8, 16]
+  env_action_model_imagination_replay_enabled: true
+  env_action_model_imagination_replay_depths: [2, 4, 8]
+  env_action_model_policy_improvement_enabled: true
+  env_action_model_policy_improvement_horizon_aggregation_mode: lambda_downside
+  env_action_model_policy_improvement_horizon_lambda: 0.9
+  env_action_model_policy_improvement_horizon_risk_coef: 0.75
+  env_action_model_policy_improvement_adaptive_kl_enabled: true
+  env_action_model_policy_improvement_target_kl: 0.03
+  env_action_model_policy_improvement_regret_adaptive_kl_enabled: true
+  env_action_model_policy_improvement_max_target_kl: 0.35
+  env_action_model_policy_improvement_regret_priority_coef: 2.0
+  env_action_model_policy_improvement_tail_distillation_enabled: true
+  env_action_model_policy_improvement_tail_quantile: 0.75
+  env_action_model_policy_improvement_tail_min_regret: 0.5
+  env_action_model_policy_improvement_tail_epochs: 4
+  env_action_model_policy_improvement_tail_coef: 0.75
+
+compute_accounting:
+  model_query_unit: valid_native_action_per_real_or_imagined_training_state
+  model_transition_unit: simulated_branch_step
+  imagination_state_unit: dominant-policy branch state at a configured depth
+  paper_requirement: report real transitions, imagined states, model queries, model transitions, tail updates, wall time, and memory
+
+checkpoint_protocol:
+  closed_loop_priority: latest_after_fixed_budget
+  selection_source: no_benchmark_selection
+  disallowed_claim: benchmark_selected_checkpoint
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Promotion requires all-baseline development evidence, independent formal
+    and hidden confirmation, equal-budget baselines, ablations, and support
+    experiments under the frozen protocol.

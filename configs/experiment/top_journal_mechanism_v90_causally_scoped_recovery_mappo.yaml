@@ -1,0 +1,62 @@
+profile: top_journal_mechanism_v90_causally_scoped_recovery_mappo
+base_profile: top_journal_mechanism_v89_diverse_recovery_branch_mappo
+purpose: >
+  Prevent recovery-target gradients from changing the nominal planning policy
+  by limiting branch-replay tail updates to failure-gated residual experts.
+
+algorithm_delta:
+  - Retains clipped MAPPO, centralized value learning, top-k recovery imagination, beam return targets, mirror projection, and transactional KL rollback.
+  - Optimizes only the outcome-recovery and outcome-context residual adapters on high-regret tail states.
+  - Freezes the global digital-twin planning residual during recovery replay so action preferences learned after failure cannot leak into nominal pre-failure states.
+  - Preserves zero recovery influence when failure, stall, and no-progress gates are inactive.
+  - Uses no action override, reward shaping, heuristic policy, evaluator bias, or development labels.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v89_diverse_recovery_branch_mappo
+  observed_failure: >
+    Diverse replay introduced action 0 targets and doubled the hard-window mean
+    reward, but j_3 selected action 0 at step 1 and returned to repeated action 4
+    after the first failure. Recovery gradients had updated the globally active
+    planning residual together with the gated recovery experts.
+  correction: >
+    Causal optimizer scoping confines recovery improvement to modules whose
+    forward contribution is activated by observed failure or stall state.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  temporal_reward_shaping_enabled: false
+  reward_shaping_added: false
+
+training_budget:
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  prediction_horizon: 16
+
+algorithm:
+  outcome_context_residual_enabled: true
+  env_action_model_imagination_beam_search_enabled: true
+  env_action_model_imagination_replay_branch_mode: top_k
+  env_action_model_imagination_replay_branch_top_k: 2
+  env_action_model_policy_improvement_tail_adapter_only: true
+  env_action_model_policy_improvement_tail_planning_adapter_only: false
+  env_action_model_policy_improvement_tail_logit_projection_enabled: true
+  env_action_model_policy_improvement_tail_residual_optimizer_enabled: true
+  env_action_model_policy_improvement_tail_max_policy_kl: 0.35
+
+compute_accounting:
+  trainable_tail_modules: outcome recovery residual and contextual recovery residual
+  frozen_tail_modules: digital-twin planning residual and base MAPPO actor
+  paper_requirement: report trainable parameter count, model transitions, selected observed/imagined states, accepted KL, rejected epochs, wall time, and memory
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Development-only until targeted mechanism verification, fresh multi-seed
+    training, complete baselines, strict formal/hidden evaluation, statistics,
+    and mechanism ablations pass.

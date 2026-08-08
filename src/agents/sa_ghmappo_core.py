@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import math
 import random
+from copy import deepcopy
 from pathlib import Path
 from statistics import fmean
 from typing import Any
@@ -169,6 +170,37 @@ def _build_digital_twin_handoff_feature_tensor(semantic_state: dict[str, Any]) -
     return torch.tensor([_clamp01(item) for item in features], dtype=torch.float32)
 
 
+def _build_outcome_memory_feature_tensor(
+    semantic_state: dict[str, Any],
+) -> torch.Tensor:
+    memory = semantic_state.get("algorithm_memory", {})
+    if not isinstance(memory, dict):
+        memory = {}
+    raw_last_action_id = memory.get("last_action_id", -1)
+    last_action_id = int(
+        -1 if raw_last_action_id is None else raw_last_action_id
+    )
+    last_action_one_hot = [
+        1.0 if last_action_id == action_id else 0.0
+        for action_id in range(5)
+    ]
+    features = [
+        1.0 if int(memory.get("step_index", 0) or 0) > 0 else 0.0,
+        *last_action_one_hot,
+        _clamp01(float(memory.get("same_action_streak", 0) or 0) / 8.0),
+        _clamp01(float(memory.get("prepare_action_streak", 0) or 0) / 8.0),
+        _clamp01(float(memory.get("failed_prepare_streak", 0) or 0) / 8.0),
+        _clamp01(float(memory.get("no_progress_streak", 0) or 0) / 8.0),
+        math.tanh(float(memory.get("last_reward", 0.0) or 0.0) / 4.0),
+        1.0 if bool(memory.get("last_handoff_failed", False)) else 0.0,
+        1.0 if bool(memory.get("last_stall", False)) else 0.0,
+        1.0 if bool(memory.get("last_mechanism_success", False)) else 0.0,
+        1.0 if bool(memory.get("last_prefetch_expired", False)) else 0.0,
+        1.0 if bool(memory.get("last_cache_hit", False)) else 0.0,
+    ]
+    return torch.tensor(features, dtype=torch.float32)
+
+
 class _多层感知机(nn.Module):
     """轻量 MLP。"""
 
@@ -206,11 +238,21 @@ class 分层策略网络(nn.Module):
         event_logit_temperature: float = 1.0,
         option_gate_enabled: bool = False,
         option_gate_count: int = 4,
+        option_counterfactual_critic_enabled: bool = False,
+        env_action_model_critic_enabled: bool = False,
         digital_twin_handoff_fusion_enabled: bool = False,
         digital_twin_handoff_slow_scale: float = 0.35,
         digital_twin_handoff_fast_scale: float = 0.45,
         digital_twin_handoff_event_scale: float = 0.85,
         digital_twin_handoff_critic_scale: float = 0.70,
+        digital_twin_planning_residual_enabled: bool = False,
+        digital_twin_planning_residual_scale: float = 1.0,
+        outcome_memory_fusion_enabled: bool = False,
+        outcome_memory_actor_scale: float = 0.80,
+        outcome_memory_critic_scale: float = 0.70,
+        outcome_recovery_residual_enabled: bool = False,
+        outcome_recovery_residual_scale: float = 1.0,
+        outcome_context_residual_enabled: bool = False,
         hidden_dims: tuple[int, int] = (64, 64),
     ) -> None:
         super().__init__()
@@ -222,11 +264,37 @@ class 分层策略网络(nn.Module):
         self.event_logit_temperature = max(float(event_logit_temperature), 0.25)
         self.option_gate_enabled = bool(option_gate_enabled)
         self.option_gate_count = max(int(option_gate_count), 1)
+        self.option_counterfactual_critic_enabled = bool(
+            option_counterfactual_critic_enabled
+        )
+        self.env_action_model_critic_enabled = bool(
+            env_action_model_critic_enabled
+        )
         self.digital_twin_handoff_fusion_enabled = bool(digital_twin_handoff_fusion_enabled)
         self.digital_twin_handoff_slow_scale = max(float(digital_twin_handoff_slow_scale), 0.0)
         self.digital_twin_handoff_fast_scale = max(float(digital_twin_handoff_fast_scale), 0.0)
         self.digital_twin_handoff_event_scale = max(float(digital_twin_handoff_event_scale), 0.0)
         self.digital_twin_handoff_critic_scale = max(float(digital_twin_handoff_critic_scale), 0.0)
+        self.digital_twin_planning_residual_enabled = bool(
+            digital_twin_planning_residual_enabled
+        )
+        self.digital_twin_planning_residual_scale = max(
+            float(digital_twin_planning_residual_scale),
+            0.0,
+        )
+        self.outcome_memory_fusion_enabled = bool(outcome_memory_fusion_enabled)
+        self.outcome_memory_actor_scale = max(float(outcome_memory_actor_scale), 0.0)
+        self.outcome_memory_critic_scale = max(float(outcome_memory_critic_scale), 0.0)
+        self.outcome_recovery_residual_enabled = bool(
+            outcome_recovery_residual_enabled
+        )
+        self.outcome_recovery_residual_scale = max(
+            float(outcome_recovery_residual_scale),
+            0.0,
+        )
+        self.outcome_context_residual_enabled = bool(
+            outcome_context_residual_enabled
+        )
 
         if self.encoder_kind == "flat":
             self.encoder = FlatSemanticEncoder(hidden_dim=self.hidden_dim)
@@ -261,6 +329,18 @@ class 分层策略网络(nn.Module):
             self.flat_critic = _多层感知机(self.hidden_dim, 1, hidden_dims=hidden_dims)
         if self.option_gate_enabled:
             self.option_actor = _多层感知机(self.hidden_dim, self.option_gate_count, hidden_dims=hidden_dims)
+            if self.option_counterfactual_critic_enabled:
+                self.option_critic = _多层感知机(
+                    self.hidden_dim,
+                    self.option_gate_count,
+                    hidden_dims=hidden_dims,
+                )
+        if self.env_action_model_critic_enabled:
+            self.env_action_critic = _多层感知机(
+                self.hidden_dim,
+                5,
+                hidden_dims=hidden_dims,
+            )
         if self.digital_twin_handoff_fusion_enabled:
             self.dt_handoff_projection = nn.Sequential(
                 nn.Linear(14, self.hidden_dim),
@@ -272,6 +352,45 @@ class 分层策略网络(nn.Module):
             self.dt_fast_norm = nn.LayerNorm(self.hidden_dim)
             self.dt_event_norm = nn.LayerNorm(self.hidden_dim)
             self.dt_critic_norm = nn.LayerNorm(self.hidden_dim)
+        if self.digital_twin_planning_residual_enabled:
+            planning_hidden_dim = max(int(hidden_dims[0]), 16)
+            self.digital_twin_planning_adapter = nn.Sequential(
+                nn.Linear(self.hidden_dim, planning_hidden_dim),
+                nn.Tanh(),
+                nn.Linear(planning_hidden_dim, 5),
+            )
+            nn.init.zeros_(self.digital_twin_planning_adapter[-1].weight)
+            nn.init.zeros_(self.digital_twin_planning_adapter[-1].bias)
+        if self.outcome_memory_fusion_enabled:
+            self.outcome_memory_projection = nn.Sequential(
+                nn.Linear(16, self.hidden_dim),
+                nn.Tanh(),
+                nn.Linear(self.hidden_dim, self.hidden_dim),
+                nn.Tanh(),
+            )
+            self.outcome_memory_shared_norm = nn.LayerNorm(self.hidden_dim)
+            self.outcome_memory_slow_norm = nn.LayerNorm(self.hidden_dim)
+            self.outcome_memory_fast_norm = nn.LayerNorm(self.hidden_dim)
+            self.outcome_memory_event_norm = nn.LayerNorm(self.hidden_dim)
+            self.outcome_memory_critic_norm = nn.LayerNorm(self.hidden_dim)
+        if self.outcome_recovery_residual_enabled:
+            residual_hidden_dim = max(int(hidden_dims[0]), 16)
+            self.outcome_recovery_adapter = nn.Sequential(
+                nn.Linear(self.hidden_dim, residual_hidden_dim),
+                nn.Tanh(),
+                nn.Linear(residual_hidden_dim, 5),
+            )
+            nn.init.zeros_(self.outcome_recovery_adapter[-1].weight)
+            nn.init.zeros_(self.outcome_recovery_adapter[-1].bias)
+        if self.outcome_context_residual_enabled:
+            context_hidden_dim = max(int(hidden_dims[0]), 16)
+            self.outcome_context_residual_adapter = nn.Sequential(
+                nn.Linear(self.hidden_dim + 16 + 14, context_hidden_dim),
+                nn.Tanh(),
+                nn.Linear(context_hidden_dim, 5),
+            )
+            nn.init.zeros_(self.outcome_context_residual_adapter[-1].weight)
+            nn.init.zeros_(self.outcome_context_residual_adapter[-1].bias)
 
     def forward_single(
         self,
@@ -283,11 +402,18 @@ class 分层策略网络(nn.Module):
             float(self.event_logit_temperature if event_logit_temperature is None else event_logit_temperature),
             0.25,
         )
-        if self.digital_twin_handoff_fusion_enabled:
+        dt_features: torch.Tensor | None = None
+        if (
+            self.digital_twin_handoff_fusion_enabled
+            or self.digital_twin_planning_residual_enabled
+            or self.outcome_context_residual_enabled
+        ):
             dt_features = _build_digital_twin_handoff_feature_tensor(semantic_state).to(
                 device=encoded["shared_embedding"].device,
                 dtype=encoded["shared_embedding"].dtype,
             )
+        if self.digital_twin_handoff_fusion_enabled:
+            assert dt_features is not None
             dt_embedding = self.dt_handoff_projection(dt_features.unsqueeze(0)).squeeze(0)
             encoded = dict(encoded)
             encoded["slow_context"] = self.dt_slow_norm(
@@ -308,8 +434,132 @@ class 分层策略网络(nn.Module):
             encoded["digital_twin_handoff_target_differs"] = dt_features[2:3]
             encoded["digital_twin_handoff_boundary_urgency"] = dt_features[11:12]
             encoded["digital_twin_handoff_service_pressure"] = dt_features[12:13]
+        memory_features: torch.Tensor | None = None
+        if (
+            self.outcome_memory_fusion_enabled
+            or self.outcome_recovery_residual_enabled
+            or self.outcome_context_residual_enabled
+        ):
+            memory_features = _build_outcome_memory_feature_tensor(
+                semantic_state
+            ).to(
+                device=encoded["shared_embedding"].device,
+                dtype=encoded["shared_embedding"].dtype,
+            )
+        if self.outcome_memory_fusion_enabled:
+            assert memory_features is not None
+            memory_embedding = self.outcome_memory_projection(
+                memory_features.unsqueeze(0)
+            ).squeeze(0)
+            encoded = dict(encoded)
+            encoded["shared_embedding"] = self.outcome_memory_shared_norm(
+                encoded["shared_embedding"]
+                + self.outcome_memory_actor_scale * memory_embedding
+            )
+            encoded["slow_context"] = self.outcome_memory_slow_norm(
+                encoded["slow_context"]
+                + self.outcome_memory_actor_scale * memory_embedding
+            )
+            encoded["fast_context"] = self.outcome_memory_fast_norm(
+                encoded["fast_context"]
+                + self.outcome_memory_actor_scale * memory_embedding
+            )
+            encoded["event_context"] = self.outcome_memory_event_norm(
+                encoded["event_context"]
+                + self.outcome_memory_actor_scale * memory_embedding
+            )
+            for critic_key in ("critic_context", "centralized_critic_context"):
+                if critic_key in encoded:
+                    encoded[critic_key] = self.outcome_memory_critic_norm(
+                        encoded[critic_key]
+                        + self.outcome_memory_critic_scale * memory_embedding
+                    )
+            encoded["outcome_memory_fusion_enabled"] = torch.tensor(
+                [1.0],
+                dtype=memory_features.dtype,
+                device=memory_features.device,
+            )
+            encoded["outcome_memory_same_action_streak"] = memory_features[6:7]
+            encoded["outcome_memory_failed_prepare_streak"] = memory_features[8:9]
+            encoded["outcome_memory_no_progress_streak"] = memory_features[9:10]
+        recovery_residual_bias: torch.Tensor | None = None
+        recovery_gate = torch.tensor(
+            0.0,
+            dtype=encoded["shared_embedding"].dtype,
+            device=encoded["shared_embedding"].device,
+        )
+        if (
+            self.outcome_recovery_residual_enabled
+            or self.outcome_context_residual_enabled
+        ):
+            assert memory_features is not None
+            recovery_gate = torch.stack(
+                [
+                    memory_features[8],
+                    memory_features[9],
+                    memory_features[11],
+                    memory_features[12],
+                ]
+            ).max()
+        if self.outcome_recovery_residual_enabled:
+            recovery_residual_bias = (
+                self.outcome_recovery_residual_scale
+                * recovery_gate
+                * self.outcome_recovery_adapter(
+                    encoded["shared_embedding"].unsqueeze(0)
+                ).squeeze(0)
+            )
+        context_residual_bias: torch.Tensor | None = None
+        if self.outcome_context_residual_enabled:
+            assert memory_features is not None
+            assert dt_features is not None
+            context_residual_bias = (
+                self.outcome_recovery_residual_scale
+                * recovery_gate
+                * self.outcome_context_residual_adapter(
+                    torch.cat(
+                        [
+                            encoded["shared_embedding"],
+                            memory_features,
+                            dt_features,
+                        ],
+                        dim=0,
+                    ).unsqueeze(0)
+                ).squeeze(0)
+            )
+        planning_residual_bias: torch.Tensor | None = None
+        planning_gate = torch.tensor(
+            0.0,
+            dtype=encoded["shared_embedding"].dtype,
+            device=encoded["shared_embedding"].device,
+        )
+        if self.digital_twin_planning_residual_enabled:
+            assert dt_features is not None
+            planning_gate = torch.maximum(dt_features[1], dt_features[2])
+            planning_residual_bias = (
+                self.digital_twin_planning_residual_scale
+                * planning_gate
+                * self.digital_twin_planning_adapter(
+                    encoded["shared_embedding"].unsqueeze(0)
+                ).squeeze(0)
+            )
+        combined_residual_bias: torch.Tensor | None = None
+        for residual_bias in (
+            recovery_residual_bias,
+            context_residual_bias,
+            planning_residual_bias,
+        ):
+            if residual_bias is None:
+                continue
+            combined_residual_bias = (
+                residual_bias
+                if combined_residual_bias is None
+                else combined_residual_bias + residual_bias
+            )
         if not self.use_hierarchy:
             flat_logits = self.flat_actor(encoded["shared_embedding"].unsqueeze(0)).squeeze(0)
+            if combined_residual_bias is not None:
+                flat_logits = flat_logits + combined_residual_bias
             critic_context_key = "centralized_critic_context" if self.centralized_critic else "critic_context"
             critic_context = encoded.get(critic_context_key, encoded["critic_context"])
             value = self.flat_critic(critic_context.unsqueeze(0)).squeeze(0).squeeze(-1)
@@ -320,9 +570,22 @@ class 分层策略网络(nn.Module):
                 "critic_mode": "centralized" if self.centralized_critic else "independent",
                 "critic_context_key": critic_context_key,
                 "head_values": {},
+                "outcome_recovery_residual_gate": recovery_gate,
+                "digital_twin_planning_residual_gate": planning_gate,
+                "outcome_recovery_residual_bias": recovery_residual_bias,
+                "outcome_context_residual_bias": context_residual_bias,
+                "digital_twin_planning_residual_bias": planning_residual_bias,
             }
             if self.option_gate_enabled:
                 output["option_logits"] = self.option_actor(encoded["shared_embedding"].unsqueeze(0)).squeeze(0)
+                if self.option_counterfactual_critic_enabled:
+                    output["option_q_values"] = self.option_critic(
+                        encoded["shared_embedding"].unsqueeze(0)
+                    ).squeeze(0)
+            if self.env_action_model_critic_enabled:
+                output["env_action_q_values"] = self.env_action_critic(
+                    encoded["shared_embedding"].unsqueeze(0)
+                ).squeeze(0)
             return output
 
         slow_logits = self.slow_actor(encoded["slow_context"].unsqueeze(0)).squeeze(0)
@@ -369,9 +632,24 @@ class 分层策略网络(nn.Module):
             "event_logit_temperature": effective_event_temperature,
             "critic_mode": "centralized" if self.centralized_critic else "independent",
             "critic_context_key": critic_context_key,
+            "outcome_recovery_residual_gate": recovery_gate,
+            "digital_twin_planning_residual_gate": planning_gate,
+            "outcome_recovery_residual_bias": recovery_residual_bias,
+            "outcome_context_residual_bias": context_residual_bias,
+            "digital_twin_planning_residual_bias": planning_residual_bias,
         }
+        if combined_residual_bias is not None:
+            output["env_action_logits_bias"] = combined_residual_bias
         if self.option_gate_enabled:
             output["option_logits"] = self.option_actor(encoded["shared_embedding"].unsqueeze(0)).squeeze(0)
+            if self.option_counterfactual_critic_enabled:
+                output["option_q_values"] = self.option_critic(
+                    encoded["shared_embedding"].unsqueeze(0)
+                ).squeeze(0)
+        if self.env_action_model_critic_enabled:
+            output["env_action_q_values"] = self.env_action_critic(
+                encoded["shared_embedding"].unsqueeze(0)
+            ).squeeze(0)
         return output
 
 
@@ -512,6 +790,14 @@ class 分层PPO基类(BaseAgent):
         digital_twin_handoff_fast_scale: float = 0.45,
         digital_twin_handoff_event_scale: float = 0.85,
         digital_twin_handoff_critic_scale: float = 0.70,
+        digital_twin_planning_residual_enabled: bool = False,
+        digital_twin_planning_residual_scale: float = 1.0,
+        outcome_memory_fusion_enabled: bool = False,
+        outcome_memory_actor_scale: float = 0.80,
+        outcome_memory_critic_scale: float = 0.70,
+        outcome_recovery_residual_enabled: bool = False,
+        outcome_recovery_residual_scale: float = 1.0,
+        outcome_context_residual_enabled: bool = False,
         digital_twin_policy_prior_enabled: bool = False,
         digital_twin_policy_prior_logit_bias: float = 0.0,
         digital_twin_policy_prior_event_scale: float = 1.0,
@@ -727,6 +1013,82 @@ class 分层PPO基类(BaseAgent):
         option_gate_counterfactual_prd_enabled: bool = False,
         option_gate_counterfactual_coef: float = 0.0,
         option_gate_counterfactual_clip: float = 1.5,
+        option_counterfactual_critic_enabled: bool = False,
+        option_counterfactual_value_coef: float = 0.5,
+        option_counterfactual_advantage_coef: float = 1.0,
+        option_counterfactual_advantage_clip: float = 2.0,
+        option_counterfactual_warmup_updates: int = 2,
+        option_counterfactual_tail_weight: float = 0.0,
+        option_counterfactual_policy_improvement_enabled: bool | None = None,
+        option_counterfactual_policy_improvement_coef: float = 1.0,
+        option_counterfactual_policy_improvement_clip: float = 2.0,
+        option_counterfactual_policy_improvement_deterministic_only: bool = True,
+        option_counterfactual_model_rollout_enabled: bool = False,
+        option_counterfactual_model_rollout_horizon: int = 1,
+        env_action_model_critic_enabled: bool = False,
+        env_action_model_critic_value_coef: float = 0.5,
+        env_action_model_critic_advantage_coef: float = 1.0,
+        env_action_model_critic_policy_improvement_coef: float = 2.0,
+        env_action_model_critic_advantage_clip: float = 2.0,
+        env_action_model_critic_warmup_updates: int = 2,
+        env_action_model_rollout_enabled: bool = False,
+        env_action_model_rollout_horizon: int = 4,
+        env_action_model_rollout_horizons: tuple[int, ...] | list[int] | None = None,
+        env_action_model_imagination_replay_enabled: bool = False,
+        env_action_model_imagination_replay_depths: (
+            tuple[int, ...] | list[int] | None
+        ) = None,
+        env_action_model_imagination_replay_horizons: (
+            tuple[int, ...] | list[int] | None
+        ) = None,
+        env_action_model_imagination_replay_recovery_only: bool = False,
+        env_action_model_imagination_beam_search_enabled: bool = False,
+        env_action_model_imagination_replay_branch_mode: str = "dominant",
+        env_action_model_imagination_replay_branch_top_k: int = 1,
+        env_action_model_policy_improvement_enabled: bool = False,
+        env_action_model_policy_improvement_coef: float = 0.5,
+        env_action_model_policy_improvement_temperature: float = 2.0,
+        env_action_model_policy_improvement_robust_horizons_enabled: bool = False,
+        env_action_model_policy_improvement_horizon_risk_coef: float = 0.75,
+        env_action_model_policy_improvement_horizon_aggregation_mode: str = "mean_std",
+        env_action_model_policy_improvement_horizon_lambda: float = 0.90,
+        env_action_model_policy_improvement_adaptive_kl_enabled: bool = False,
+        env_action_model_policy_improvement_target_kl: float = 0.03,
+        env_action_model_policy_improvement_regret_adaptive_kl_enabled: bool = False,
+        env_action_model_policy_improvement_max_target_kl: float = 0.35,
+        env_action_model_policy_improvement_regret_priority_coef: float = 0.0,
+        env_action_model_policy_improvement_tail_distillation_enabled: bool = False,
+        env_action_model_policy_improvement_tail_quantile: float = 0.75,
+        env_action_model_policy_improvement_tail_min_regret: float = 0.50,
+        env_action_model_policy_improvement_tail_epochs: int = 0,
+        env_action_model_policy_improvement_tail_coef: float = 1.0,
+        env_action_model_policy_improvement_tail_max_policy_kl: float = 0.0,
+        env_action_model_policy_improvement_tail_recovery_only: bool = False,
+        env_action_model_policy_improvement_tail_adapter_only: bool = False,
+        env_action_model_policy_improvement_tail_beam_only: bool = False,
+        env_action_model_policy_improvement_tail_planning_adapter_only: bool = False,
+        env_action_model_policy_improvement_tail_residual_optimizer_enabled: bool = False,
+        env_action_model_policy_improvement_tail_residual_learning_rate: float = 0.01,
+        env_action_model_policy_improvement_tail_residual_backtrack_factor: float = 0.5,
+        env_action_model_policy_improvement_tail_residual_min_learning_rate: float = 1e-5,
+        env_action_model_policy_improvement_tail_residual_max_backtracks: int = 4,
+        env_action_model_policy_improvement_tail_logit_projection_enabled: bool = False,
+        env_action_model_policy_improvement_tail_target_balance_enabled: bool = False,
+        env_action_model_policy_improvement_tail_target_balance_power: float = 0.5,
+        env_action_model_policy_improvement_tail_target_balance_max_weight: float = 4.0,
+        env_action_model_online_planner_enabled: bool = False,
+        env_action_model_online_planner_coef: float = 1.0,
+        env_action_model_online_planner_mechanism_coef: float = 0.0,
+        env_action_model_online_planner_policy_prior_coef: float = 0.15,
+        env_action_model_online_planner_min_margin: float = 0.0,
+        env_action_model_online_planner_prefer_beam_targets: bool = False,
+        env_action_model_beam_search_enabled: bool = False,
+        env_action_model_beam_search_horizon: int = 4,
+        env_action_model_beam_search_width: int = 2,
+        env_action_model_beam_search_context_only: bool = True,
+        env_action_model_beam_search_min_eta: int = 0,
+        env_action_model_beam_search_max_eta: int = 999,
+        env_action_model_policy_improvement_prefer_beam_targets: bool = False,
         counterfactual_teacher_prd_enabled: bool = False,
         counterfactual_teacher_event_coef: float = 0.0,
         counterfactual_teacher_option_coef: float = 0.0,
@@ -1010,6 +1372,34 @@ class 分层PPO基类(BaseAgent):
         self._digital_twin_handoff_fast_scale = max(float(digital_twin_handoff_fast_scale), 0.0)
         self._digital_twin_handoff_event_scale = max(float(digital_twin_handoff_event_scale), 0.0)
         self._digital_twin_handoff_critic_scale = max(float(digital_twin_handoff_critic_scale), 0.0)
+        self._digital_twin_planning_residual_enabled = bool(
+            digital_twin_planning_residual_enabled
+        )
+        self._digital_twin_planning_residual_scale = max(
+            float(digital_twin_planning_residual_scale),
+            0.0,
+        )
+        self._outcome_memory_fusion_enabled = bool(
+            outcome_memory_fusion_enabled
+        )
+        self._outcome_memory_actor_scale = max(
+            float(outcome_memory_actor_scale),
+            0.0,
+        )
+        self._outcome_memory_critic_scale = max(
+            float(outcome_memory_critic_scale),
+            0.0,
+        )
+        self._outcome_recovery_residual_enabled = bool(
+            outcome_recovery_residual_enabled
+        )
+        self._outcome_recovery_residual_scale = max(
+            float(outcome_recovery_residual_scale),
+            0.0,
+        )
+        self._outcome_context_residual_enabled = bool(
+            outcome_context_residual_enabled
+        )
         self._digital_twin_policy_prior_enabled = bool(digital_twin_policy_prior_enabled)
         self._digital_twin_policy_prior_logit_bias = max(float(digital_twin_policy_prior_logit_bias), 0.0)
         self._digital_twin_policy_prior_event_scale = max(float(digital_twin_policy_prior_event_scale), 0.0)
@@ -1601,6 +1991,343 @@ class 分层PPO基类(BaseAgent):
         self._option_gate_counterfactual_prd_enabled = bool(option_gate_counterfactual_prd_enabled)
         self._option_gate_counterfactual_coef = max(float(option_gate_counterfactual_coef), 0.0)
         self._option_gate_counterfactual_clip = max(float(option_gate_counterfactual_clip), 0.0)
+        self._option_counterfactual_critic_enabled = bool(
+            option_counterfactual_critic_enabled
+        )
+        self._option_counterfactual_value_coef = max(
+            float(option_counterfactual_value_coef),
+            0.0,
+        )
+        self._option_counterfactual_advantage_coef = max(
+            float(option_counterfactual_advantage_coef),
+            0.0,
+        )
+        self._option_counterfactual_advantage_clip = max(
+            float(option_counterfactual_advantage_clip),
+            0.0,
+        )
+        self._option_counterfactual_warmup_updates = max(
+            int(option_counterfactual_warmup_updates),
+            0,
+        )
+        self._option_counterfactual_tail_weight = max(
+            float(option_counterfactual_tail_weight),
+            0.0,
+        )
+        self._option_counterfactual_policy_improvement_enabled = bool(
+            self._option_counterfactual_critic_enabled
+            if option_counterfactual_policy_improvement_enabled is None
+            else option_counterfactual_policy_improvement_enabled
+        )
+        self._option_counterfactual_policy_improvement_coef = max(
+            float(option_counterfactual_policy_improvement_coef),
+            0.0,
+        )
+        self._option_counterfactual_policy_improvement_clip = max(
+            float(option_counterfactual_policy_improvement_clip),
+            0.0,
+        )
+        self._option_counterfactual_policy_improvement_deterministic_only = bool(
+            option_counterfactual_policy_improvement_deterministic_only
+        )
+        self._option_counterfactual_model_rollout_enabled = bool(
+            option_counterfactual_model_rollout_enabled
+        )
+        self._option_counterfactual_model_rollout_horizon = max(
+            int(option_counterfactual_model_rollout_horizon),
+            1,
+        )
+        self._env_action_model_critic_enabled = bool(
+            env_action_model_critic_enabled
+        )
+        self._env_action_model_critic_value_coef = max(
+            float(env_action_model_critic_value_coef),
+            0.0,
+        )
+        self._env_action_model_critic_advantage_coef = max(
+            float(env_action_model_critic_advantage_coef),
+            0.0,
+        )
+        self._env_action_model_critic_policy_improvement_coef = max(
+            float(env_action_model_critic_policy_improvement_coef),
+            0.0,
+        )
+        self._env_action_model_critic_advantage_clip = max(
+            float(env_action_model_critic_advantage_clip),
+            0.0,
+        )
+        self._env_action_model_critic_warmup_updates = max(
+            int(env_action_model_critic_warmup_updates),
+            0,
+        )
+        self._env_action_model_rollout_enabled = bool(
+            env_action_model_rollout_enabled
+        )
+        self._env_action_model_rollout_horizon = max(
+            int(env_action_model_rollout_horizon),
+            1,
+        )
+        raw_rollout_horizons = (
+            list(env_action_model_rollout_horizons)
+            if env_action_model_rollout_horizons is not None
+            else [self._env_action_model_rollout_horizon]
+        )
+        self._env_action_model_rollout_horizons = tuple(
+            sorted(
+                {
+                    max(int(horizon), 1)
+                    for horizon in raw_rollout_horizons
+                }
+            )
+        )
+        self._env_action_model_rollout_horizon = max(
+            self._env_action_model_rollout_horizons
+        )
+        self._env_action_model_imagination_replay_enabled = bool(
+            env_action_model_imagination_replay_enabled
+        )
+        raw_imagination_depths = (
+            list(env_action_model_imagination_replay_depths)
+            if env_action_model_imagination_replay_depths is not None
+            else [2, 4, 8]
+        )
+        self._env_action_model_imagination_replay_depths = tuple(
+            sorted(
+                {
+                    max(int(depth), 1)
+                    for depth in raw_imagination_depths
+                    if int(depth) < self._env_action_model_rollout_horizon
+                }
+            )
+        )
+        raw_imagination_horizons = (
+            list(env_action_model_imagination_replay_horizons)
+            if env_action_model_imagination_replay_horizons is not None
+            else [1]
+        )
+        self._env_action_model_imagination_replay_horizons = tuple(
+            sorted(
+                {
+                    max(int(horizon), 1)
+                    for horizon in raw_imagination_horizons
+                }
+            )
+        )
+        self._env_action_model_imagination_replay_recovery_only = bool(
+            env_action_model_imagination_replay_recovery_only
+        )
+        self._env_action_model_imagination_beam_search_enabled = bool(
+            env_action_model_imagination_beam_search_enabled
+        )
+        imagination_branch_mode = str(
+            env_action_model_imagination_replay_branch_mode
+        ).strip().lower()
+        if imagination_branch_mode not in {"dominant", "top_k"}:
+            raise ValueError(
+                "env_action_model_imagination_replay_branch_mode must be "
+                "one of {'dominant', 'top_k'}"
+            )
+        self._env_action_model_imagination_replay_branch_mode = (
+            imagination_branch_mode
+        )
+        self._env_action_model_imagination_replay_branch_top_k = max(
+            int(env_action_model_imagination_replay_branch_top_k),
+            1,
+        )
+        self._env_action_model_policy_improvement_enabled = bool(
+            env_action_model_policy_improvement_enabled
+        )
+        self._env_action_model_policy_improvement_coef = max(
+            float(env_action_model_policy_improvement_coef),
+            0.0,
+        )
+        self._env_action_model_policy_improvement_temperature = max(
+            float(env_action_model_policy_improvement_temperature),
+            0.05,
+        )
+        self._env_action_model_policy_improvement_robust_horizons_enabled = bool(
+            env_action_model_policy_improvement_robust_horizons_enabled
+        )
+        self._env_action_model_policy_improvement_horizon_risk_coef = max(
+            float(env_action_model_policy_improvement_horizon_risk_coef),
+            0.0,
+        )
+        horizon_aggregation_mode = str(
+            env_action_model_policy_improvement_horizon_aggregation_mode
+        ).strip().lower()
+        if horizon_aggregation_mode not in {"mean_std", "lambda_downside"}:
+            raise ValueError(
+                "env_action_model_policy_improvement_horizon_aggregation_mode "
+                "must be one of {'mean_std', 'lambda_downside'}"
+            )
+        self._env_action_model_policy_improvement_horizon_aggregation_mode = (
+            horizon_aggregation_mode
+        )
+        self._env_action_model_policy_improvement_horizon_lambda = min(
+            max(
+                float(env_action_model_policy_improvement_horizon_lambda),
+                0.0,
+            ),
+            0.999,
+        )
+        self._env_action_model_policy_improvement_adaptive_kl_enabled = bool(
+            env_action_model_policy_improvement_adaptive_kl_enabled
+        )
+        self._env_action_model_policy_improvement_target_kl = max(
+            float(env_action_model_policy_improvement_target_kl),
+            1e-5,
+        )
+        self._env_action_model_policy_improvement_regret_adaptive_kl_enabled = bool(
+            env_action_model_policy_improvement_regret_adaptive_kl_enabled
+        )
+        self._env_action_model_policy_improvement_max_target_kl = max(
+            float(env_action_model_policy_improvement_max_target_kl),
+            self._env_action_model_policy_improvement_target_kl,
+        )
+        self._env_action_model_policy_improvement_regret_priority_coef = max(
+            float(env_action_model_policy_improvement_regret_priority_coef),
+            0.0,
+        )
+        self._env_action_model_policy_improvement_tail_distillation_enabled = bool(
+            env_action_model_policy_improvement_tail_distillation_enabled
+        )
+        self._env_action_model_policy_improvement_tail_quantile = min(
+            max(
+                float(env_action_model_policy_improvement_tail_quantile),
+                0.0,
+            ),
+            1.0,
+        )
+        self._env_action_model_policy_improvement_tail_min_regret = min(
+            max(
+                float(env_action_model_policy_improvement_tail_min_regret),
+                0.0,
+            ),
+            1.0,
+        )
+        self._env_action_model_policy_improvement_tail_epochs = max(
+            int(env_action_model_policy_improvement_tail_epochs),
+            0,
+        )
+        self._env_action_model_policy_improvement_tail_coef = max(
+            float(env_action_model_policy_improvement_tail_coef),
+            0.0,
+        )
+        self._env_action_model_policy_improvement_tail_max_policy_kl = max(
+            float(
+                env_action_model_policy_improvement_tail_max_policy_kl
+            ),
+            0.0,
+        )
+        self._env_action_model_policy_improvement_tail_recovery_only = bool(
+            env_action_model_policy_improvement_tail_recovery_only
+        )
+        self._env_action_model_policy_improvement_tail_adapter_only = bool(
+            env_action_model_policy_improvement_tail_adapter_only
+        )
+        self._env_action_model_policy_improvement_tail_beam_only = bool(
+            env_action_model_policy_improvement_tail_beam_only
+        )
+        self._env_action_model_policy_improvement_tail_planning_adapter_only = bool(
+            env_action_model_policy_improvement_tail_planning_adapter_only
+        )
+        self._env_action_model_policy_improvement_tail_residual_optimizer_enabled = bool(
+            env_action_model_policy_improvement_tail_residual_optimizer_enabled
+        )
+        self._env_action_model_policy_improvement_tail_residual_learning_rate = max(
+            float(env_action_model_policy_improvement_tail_residual_learning_rate),
+            1e-6,
+        )
+        self._env_action_model_policy_improvement_tail_residual_backtrack_factor = min(
+            max(
+                float(
+                    env_action_model_policy_improvement_tail_residual_backtrack_factor
+                ),
+                0.05,
+            ),
+            0.95,
+        )
+        self._env_action_model_policy_improvement_tail_residual_min_learning_rate = min(
+            max(
+                float(
+                    env_action_model_policy_improvement_tail_residual_min_learning_rate
+                ),
+                1e-7,
+            ),
+            self._env_action_model_policy_improvement_tail_residual_learning_rate,
+        )
+        self._env_action_model_policy_improvement_tail_residual_max_backtracks = max(
+            int(env_action_model_policy_improvement_tail_residual_max_backtracks),
+            0,
+        )
+        self._env_action_model_policy_improvement_tail_logit_projection_enabled = bool(
+            env_action_model_policy_improvement_tail_logit_projection_enabled
+        )
+        self._env_action_model_policy_improvement_tail_target_balance_enabled = bool(
+            env_action_model_policy_improvement_tail_target_balance_enabled
+        )
+        self._env_action_model_policy_improvement_tail_target_balance_power = min(
+            max(
+                float(
+                    env_action_model_policy_improvement_tail_target_balance_power
+                ),
+                0.0,
+            ),
+            1.0,
+        )
+        self._env_action_model_policy_improvement_tail_target_balance_max_weight = max(
+            float(
+                env_action_model_policy_improvement_tail_target_balance_max_weight
+            ),
+            1.0,
+        )
+        self._env_action_model_online_planner_enabled = bool(
+            env_action_model_online_planner_enabled
+        )
+        self._env_action_model_online_planner_coef = max(
+            float(env_action_model_online_planner_coef),
+            0.0,
+        )
+        self._env_action_model_online_planner_mechanism_coef = max(
+            float(env_action_model_online_planner_mechanism_coef),
+            0.0,
+        )
+        self._env_action_model_online_planner_policy_prior_coef = max(
+            float(env_action_model_online_planner_policy_prior_coef),
+            0.0,
+        )
+        self._env_action_model_online_planner_min_margin = max(
+            float(env_action_model_online_planner_min_margin),
+            0.0,
+        )
+        self._env_action_model_online_planner_prefer_beam_targets = bool(
+            env_action_model_online_planner_prefer_beam_targets
+        )
+        self._env_action_model_beam_search_enabled = bool(
+            env_action_model_beam_search_enabled
+        )
+        self._env_action_model_beam_search_horizon = max(
+            int(env_action_model_beam_search_horizon),
+            1,
+        )
+        self._env_action_model_beam_search_width = max(
+            int(env_action_model_beam_search_width),
+            1,
+        )
+        self._env_action_model_beam_search_context_only = bool(
+            env_action_model_beam_search_context_only
+        )
+        self._env_action_model_beam_search_min_eta = max(
+            int(env_action_model_beam_search_min_eta),
+            0,
+        )
+        self._env_action_model_beam_search_max_eta = max(
+            int(env_action_model_beam_search_max_eta),
+            self._env_action_model_beam_search_min_eta,
+        )
+        self._env_action_model_policy_improvement_prefer_beam_targets = bool(
+            env_action_model_policy_improvement_prefer_beam_targets
+        )
         self._counterfactual_teacher_prd_enabled = bool(counterfactual_teacher_prd_enabled)
         self._counterfactual_teacher_event_coef = max(float(counterfactual_teacher_event_coef), 0.0)
         self._counterfactual_teacher_option_coef = max(float(counterfactual_teacher_option_coef), 0.0)
@@ -1778,14 +2505,99 @@ class 分层PPO基类(BaseAgent):
             event_logit_temperature=self._event_logit_temperature,
             option_gate_enabled=self._option_gate_enabled,
             option_gate_count=self._option_gate_count,
+            option_counterfactual_critic_enabled=self._option_counterfactual_critic_enabled,
+            env_action_model_critic_enabled=self._env_action_model_critic_enabled,
             digital_twin_handoff_fusion_enabled=self._digital_twin_handoff_fusion_enabled,
             digital_twin_handoff_slow_scale=self._digital_twin_handoff_slow_scale,
             digital_twin_handoff_fast_scale=self._digital_twin_handoff_fast_scale,
             digital_twin_handoff_event_scale=self._digital_twin_handoff_event_scale,
             digital_twin_handoff_critic_scale=self._digital_twin_handoff_critic_scale,
+            digital_twin_planning_residual_enabled=(
+                self._digital_twin_planning_residual_enabled
+            ),
+            digital_twin_planning_residual_scale=(
+                self._digital_twin_planning_residual_scale
+            ),
+            outcome_memory_fusion_enabled=self._outcome_memory_fusion_enabled,
+            outcome_memory_actor_scale=self._outcome_memory_actor_scale,
+            outcome_memory_critic_scale=self._outcome_memory_critic_scale,
+            outcome_recovery_residual_enabled=(
+                self._outcome_recovery_residual_enabled
+            ),
+            outcome_recovery_residual_scale=(
+                self._outcome_recovery_residual_scale
+            ),
+            outcome_context_residual_enabled=(
+                self._outcome_context_residual_enabled
+            ),
             hidden_dims=self._hidden_dims,
         ).to(self._device)
         self._optimizer = torch.optim.Adam(self._network.parameters(), lr=self._learning_rate)
+
+    def _apply_env_action_model_critic_improvement(
+        self,
+        *,
+        policy_output: dict[str, Any],
+        action_mask: list[bool] | None,
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        if (
+            not self._env_action_model_critic_enabled
+            or self._env_action_model_critic_policy_improvement_coef <= 0.0
+            or self._update_count < self._env_action_model_critic_warmup_updates
+            or "env_action_q_values" not in policy_output
+        ):
+            return policy_output, {"enabled": False, "applied": False}
+
+        q_values = policy_output["env_action_q_values"].detach()
+        if self._use_hierarchy:
+            actor_scores = self._hierarchical_env_action_scores(policy_output)
+        else:
+            actor_scores = policy_output["flat_logits"]
+        valid_mask = torch.ones_like(q_values, dtype=torch.bool)
+        if action_mask and len(action_mask) == int(q_values.shape[-1]):
+            valid_mask = torch.as_tensor(
+                action_mask,
+                dtype=torch.bool,
+                device=self._device,
+            )
+        if not bool(valid_mask.any().item()):
+            return policy_output, {"enabled": True, "applied": False}
+
+        masked_scores = actor_scores.masked_fill(~valid_mask, -1.0e9)
+        actor_probs = torch.softmax(masked_scores, dim=-1)
+        q_baseline = torch.sum(actor_probs * q_values)
+        q_advantage = (q_values - q_baseline).masked_fill(~valid_mask, 0.0)
+        valid_advantage = q_advantage[valid_mask]
+        q_scale = torch.sqrt(torch.mean(valid_advantage.square())).clamp_min(1e-6)
+        normalized_advantage = (q_advantage / q_scale).masked_fill(~valid_mask, 0.0)
+        if self._env_action_model_critic_advantage_clip > 0.0:
+            normalized_advantage = torch.clamp(
+                normalized_advantage,
+                -self._env_action_model_critic_advantage_clip,
+                self._env_action_model_critic_advantage_clip,
+            )
+
+        adjusted_output = dict(policy_output)
+        critic_bias = (
+            self._env_action_model_critic_policy_improvement_coef
+            * normalized_advantage
+        )
+        existing_bias = policy_output.get("env_action_logits_bias")
+        if isinstance(existing_bias, torch.Tensor) and existing_bias.shape == critic_bias.shape:
+            critic_bias = critic_bias + existing_bias
+        adjusted_output["env_action_logits_bias"] = critic_bias
+        return adjusted_output, {
+            "enabled": True,
+            "applied": bool(torch.any(torch.abs(normalized_advantage) > 1e-8).item()),
+            "normalized_advantage": [
+                round(float(item), 6)
+                for item in normalized_advantage.tolist()
+            ],
+            "policy_improvement_coef": round(
+                self._env_action_model_critic_policy_improvement_coef,
+                6,
+            ),
+        }
 
     def act(self, observation: Any, info: dict[str, Any] | None = None) -> tuple[int, dict[str, Any]]:
         del observation
@@ -1802,6 +2614,18 @@ class 分层PPO基类(BaseAgent):
         deterministic = bool(self._deterministic_action or (info or {}).get("deterministic_policy", False))
         with torch.no_grad():
             policy_output = self._forward_policy(semantic_state, run_metadata=run_metadata)
+            env_action_model_critic_info: dict[str, Any] = {
+                "enabled": False,
+                "applied": False,
+            }
+            if deterministic:
+                (
+                    policy_output,
+                    env_action_model_critic_info,
+                ) = self._apply_env_action_model_critic_improvement(
+                    policy_output=policy_output,
+                    action_mask=action_mask,
+                )
             (
                 selected_actions,
                 head_log_probs,
@@ -2044,6 +2868,70 @@ class 分层PPO基类(BaseAgent):
             "env_action_log_prob": round(float(env_action_log_prob.item()), 6),
             "env_action_entropy": round(float(env_action_entropy.item()), 6),
             "env_action_probs": env_action_probs,
+            "env_action_model_critic": env_action_model_critic_info,
+            "env_action_model_rollout_enabled": bool(
+                self._env_action_model_rollout_enabled
+            ),
+            "env_action_model_rollout_horizon": int(
+                self._env_action_model_rollout_horizon
+            ),
+            "env_action_model_rollout_horizons": list(
+                self._env_action_model_rollout_horizons
+            ),
+            "env_action_model_imagination_replay_enabled": bool(
+                self._env_action_model_imagination_replay_enabled
+            ),
+            "env_action_model_imagination_replay_depths": list(
+                self._env_action_model_imagination_replay_depths
+            ),
+            "env_action_model_imagination_replay_horizons": list(
+                self._env_action_model_imagination_replay_horizons
+            ),
+            "env_action_model_imagination_replay_recovery_only": (
+                self._env_action_model_imagination_replay_recovery_only
+            ),
+            "env_action_model_imagination_beam_search_enabled": (
+                self._env_action_model_imagination_beam_search_enabled
+            ),
+            "env_action_model_imagination_replay_branch_mode": (
+                self._env_action_model_imagination_replay_branch_mode
+            ),
+            "env_action_model_imagination_replay_branch_top_k": (
+                self._env_action_model_imagination_replay_branch_top_k
+            ),
+            "env_action_model_online_planner_enabled": (
+                self._env_action_model_online_planner_enabled
+            ),
+            "env_action_model_online_planner_coef": (
+                self._env_action_model_online_planner_coef
+            ),
+            "env_action_model_online_planner_mechanism_coef": (
+                self._env_action_model_online_planner_mechanism_coef
+            ),
+            "env_action_model_online_planner_policy_prior_coef": (
+                self._env_action_model_online_planner_policy_prior_coef
+            ),
+            "env_action_model_online_planner_min_margin": (
+                self._env_action_model_online_planner_min_margin
+            ),
+            "env_action_model_beam_search_enabled": (
+                self._env_action_model_beam_search_enabled
+            ),
+            "env_action_model_beam_search_horizon": (
+                self._env_action_model_beam_search_horizon
+            ),
+            "env_action_model_beam_search_width": (
+                self._env_action_model_beam_search_width
+            ),
+            "env_action_model_beam_search_context_only": (
+                self._env_action_model_beam_search_context_only
+            ),
+            "env_action_model_beam_search_min_eta": (
+                self._env_action_model_beam_search_min_eta
+            ),
+            "env_action_model_beam_search_max_eta": (
+                self._env_action_model_beam_search_max_eta
+            ),
             "value": round(value, 6),
             "entropy": round(float(entropy.item()), 6),
             "head_log_probs": {
@@ -2055,6 +2943,51 @@ class 分层PPO基类(BaseAgent):
             "temporal_urgency": round(temporal_urgency, 6),
             "prepare_window_score": round(prepare_window_score, 6),
             "handoff_countdown_steps": round(handoff_countdown_steps, 6),
+            "outcome_recovery_residual_gate": round(
+                float(
+                    policy_output.get(
+                        "outcome_recovery_residual_gate",
+                        torch.tensor(0.0, device=self._device),
+                    ).item()
+                ),
+                6,
+            ),
+            "digital_twin_planning_residual_gate": round(
+                float(
+                    policy_output.get(
+                        "digital_twin_planning_residual_gate",
+                        torch.tensor(0.0, device=self._device),
+                    ).item()
+                ),
+                6,
+            ),
+            "outcome_recovery_residual_bias": [
+                round(float(item), 6)
+                for item in (
+                    policy_output.get("outcome_recovery_residual_bias")
+                    if policy_output.get("outcome_recovery_residual_bias")
+                    is not None
+                    else torch.zeros(5, device=self._device)
+                ).detach().tolist()
+            ],
+            "outcome_context_residual_bias": [
+                round(float(item), 6)
+                for item in (
+                    policy_output.get("outcome_context_residual_bias")
+                    if policy_output.get("outcome_context_residual_bias")
+                    is not None
+                    else torch.zeros(5, device=self._device)
+                ).detach().tolist()
+            ],
+            "digital_twin_planning_residual_bias": [
+                round(float(item), 6)
+                for item in (
+                    policy_output.get("digital_twin_planning_residual_bias")
+                    if policy_output.get("digital_twin_planning_residual_bias")
+                    is not None
+                    else torch.zeros(5, device=self._device)
+                ).detach().tolist()
+            ],
             "event_logit_temperature": round(active_event_logit_temperature, 6),
             "event_sharpening_info": dict(policy_output.get("event_sharpening_info", {})),
             "digital_twin_policy_prior": dict(policy_output.get("digital_twin_policy_prior_info", {})),
@@ -2467,7 +3400,19 @@ class 分层PPO基类(BaseAgent):
             advantage_values=normalized_advantages,
         )
         normalized_event_advantages = normalized_event_advantages * mechanism_transition_weights
+        option_return_mean = float(returns.mean()) if len(returns) > 0 else 0.0
+        option_return_std = float(returns.std()) if len(returns) > 0 else 0.0
+        normalized_option_returns = (
+            (returns - option_return_mean) / (option_return_std + 1e-8)
+            if len(returns) > 0
+            else returns
+        )
         return_tensor = torch.as_tensor(returns, dtype=torch.float32, device=self._device)
+        option_return_tensor = torch.as_tensor(
+            normalized_option_returns,
+            dtype=torch.float32,
+            device=self._device,
+        )
         advantage_tensor = torch.as_tensor(normalized_advantages, dtype=torch.float32, device=self._device)
         event_advantage_tensor = torch.as_tensor(normalized_event_advantages, dtype=torch.float32, device=self._device)
         old_log_prob_tensor = torch.as_tensor(old_log_probs, dtype=torch.float32, device=self._device)
@@ -2526,6 +3471,12 @@ class 分层PPO基类(BaseAgent):
         option_gate_loss_total = 0.0
         option_gate_entropy_total = 0.0
         option_gate_prior_loss_total = 0.0
+        option_counterfactual_value_loss_total = 0.0
+        option_counterfactual_advantage_abs_total = 0.0
+        env_action_model_critic_loss_total = 0.0
+        env_action_model_critic_advantage_abs_total = 0.0
+        env_action_model_policy_improvement_loss_total = 0.0
+        env_action_model_policy_improvement_target_kl_total = 0.0
         env_action_ppo_loss_total = 0.0
         env_action_counterfactual_margin_loss_total = 0.0
         argmax_margin_loss_total = 0.0
@@ -2693,10 +3644,33 @@ class 分层PPO基类(BaseAgent):
                     batch_annotations=batch_dt_policy_prior_annotations,
                     batch_advantage=advantage_tensor[batch_indices],
                 )
-                option_gate_loss, option_gate_entropy, option_gate_prior_loss = self._compute_option_gate_loss(
+                (
+                    option_gate_loss,
+                    option_gate_entropy,
+                    option_gate_prior_loss,
+                    option_counterfactual_value_loss,
+                    option_counterfactual_advantage_abs,
+                ) = self._compute_option_gate_loss(
                     batch_outputs=batch_outputs,
                     batch_rows=batch_rows,
                     batch_advantage=advantage_tensor[batch_indices],
+                    batch_option_returns=option_return_tensor[batch_indices],
+                )
+                (
+                    env_action_model_critic_loss,
+                    env_action_model_critic_advantage_abs,
+                ) = self._compute_env_action_model_critic_loss(
+                    batch_outputs=batch_outputs,
+                    batch_rows=batch_rows,
+                    batch_action_masks=batch_action_masks,
+                )
+                (
+                    env_action_model_policy_improvement_loss,
+                    env_action_model_policy_improvement_target_kl,
+                ) = self._compute_env_action_model_policy_improvement_loss(
+                    batch_outputs=batch_outputs,
+                    batch_rows=batch_rows,
+                    batch_action_masks=batch_action_masks,
                 )
                 total_loss = (
                     actor_loss
@@ -2714,6 +3688,12 @@ class 分层PPO基类(BaseAgent):
                     + self._option_gate_loss_coef * self._option_gate_log_prob_weight * option_gate_loss
                     + effective_option_prior_coef * option_gate_prior_loss
                     - self._option_gate_entropy_coef * option_gate_entropy
+                    + self._option_counterfactual_value_coef
+                    * option_counterfactual_value_loss
+                    + self._env_action_model_critic_value_coef
+                    * env_action_model_critic_loss
+                    + self._env_action_model_policy_improvement_coef
+                    * env_action_model_policy_improvement_loss
                 )
 
                 self._optimizer.zero_grad()
@@ -2744,6 +3724,24 @@ class 分层PPO基类(BaseAgent):
                 option_gate_loss_total += float(option_gate_loss.item())
                 option_gate_entropy_total += float(option_gate_entropy.item())
                 option_gate_prior_loss_total += float(option_gate_prior_loss.item())
+                option_counterfactual_value_loss_total += float(
+                    option_counterfactual_value_loss.item()
+                )
+                option_counterfactual_advantage_abs_total += float(
+                    option_counterfactual_advantage_abs.item()
+                )
+                env_action_model_critic_loss_total += float(
+                    env_action_model_critic_loss.item()
+                )
+                env_action_model_critic_advantage_abs_total += float(
+                    env_action_model_critic_advantage_abs.item()
+                )
+                env_action_model_policy_improvement_loss_total += float(
+                    env_action_model_policy_improvement_loss.item()
+                )
+                env_action_model_policy_improvement_target_kl_total += float(
+                    env_action_model_policy_improvement_target_kl.item()
+                )
                 update_steps += 1
                 epoch_kl_values.append(float(approx_kl.item()))
             executed_epochs += 1
@@ -2753,6 +3751,47 @@ class 分层PPO基类(BaseAgent):
                     early_stop_triggered = True
                     break
 
+        tail_semantic_states = list(semantic_states)
+        tail_run_metadata_by_row = list(run_metadata_by_row)
+        tail_rollout = list(rollout)
+        tail_action_masks = list(action_masks)
+        imagined_recovery_state_count = 0
+        if self._env_action_model_imagination_replay_enabled:
+            for row in rollout:
+                imagined_samples = (
+                    row.get("action_info", {})
+                    .get("env_action_model_rollout", {})
+                    .get("imagined_recovery_samples", [])
+                )
+                if not isinstance(imagined_samples, list):
+                    continue
+                for sample in imagined_samples:
+                    if not isinstance(sample, dict):
+                        continue
+                    decision_info = dict(sample.get("decision_info", {}))
+                    tail_semantic_states.append(
+                        self._extract_semantic_state(decision_info)
+                    )
+                    tail_run_metadata_by_row.append(
+                        dict(decision_info.get("run_metadata", {}) or {})
+                    )
+                    tail_rollout.append(sample)
+                    tail_action_masks.append(
+                        self._extract_action_mask(decision_info)
+                    )
+                    imagined_recovery_state_count += 1
+
+        env_action_model_tail_distillation_stats = (
+            self._run_env_action_model_tail_distillation(
+                semantic_states=tail_semantic_states,
+                run_metadata_by_row=tail_run_metadata_by_row,
+                rollout=tail_rollout,
+                action_masks=tail_action_masks,
+            )
+        )
+        env_action_model_tail_distillation_stats[
+            "imagined_recovery_state_count"
+        ] = imagined_recovery_state_count
         self._update_count += 1
         denominator = max(update_steps, 1)
         explained_variance = 0.0
@@ -2811,6 +3850,388 @@ class 分层PPO基类(BaseAgent):
             "option_gate_prior_coef": round(self._option_gate_prior_coef, 6),
             "effective_option_gate_prior_coef": round(effective_option_prior_coef, 6),
             "option_gate_prior_loss": round(option_gate_prior_loss_total / denominator, 6),
+            "option_counterfactual_critic_enabled": self._option_counterfactual_critic_enabled,
+            "option_counterfactual_value_coef": round(
+                self._option_counterfactual_value_coef,
+                6,
+            ),
+            "option_counterfactual_value_loss": round(
+                option_counterfactual_value_loss_total / denominator,
+                6,
+            ),
+            "option_counterfactual_advantage_coef": round(
+                self._option_counterfactual_advantage_coef,
+                6,
+            ),
+            "option_counterfactual_advantage_abs_mean": round(
+                option_counterfactual_advantage_abs_total / denominator,
+                6,
+            ),
+            "option_counterfactual_warmup_active": bool(
+                self._update_count <= self._option_counterfactual_warmup_updates
+            ),
+            "option_counterfactual_tail_weight": round(
+                self._option_counterfactual_tail_weight,
+                6,
+            ),
+            "option_counterfactual_policy_improvement_enabled": (
+                self._option_counterfactual_policy_improvement_enabled
+            ),
+            "option_counterfactual_policy_improvement_coef": round(
+                self._option_counterfactual_policy_improvement_coef,
+                6,
+            ),
+            "option_counterfactual_policy_improvement_clip": round(
+                self._option_counterfactual_policy_improvement_clip,
+                6,
+            ),
+            "option_counterfactual_policy_improvement_deterministic_only": (
+                self._option_counterfactual_policy_improvement_deterministic_only
+            ),
+            "option_counterfactual_model_rollout_enabled": (
+                self._option_counterfactual_model_rollout_enabled
+            ),
+            "option_counterfactual_model_rollout_horizon": (
+                self._option_counterfactual_model_rollout_horizon
+            ),
+            "env_action_model_critic_enabled": self._env_action_model_critic_enabled,
+            "env_action_model_critic_value_coef": round(
+                self._env_action_model_critic_value_coef,
+                6,
+            ),
+            "env_action_model_critic_value_loss": round(
+                env_action_model_critic_loss_total / denominator,
+                6,
+            ),
+            "env_action_model_critic_advantage_coef": round(
+                self._env_action_model_critic_advantage_coef,
+                6,
+            ),
+            "env_action_model_critic_advantage_abs_mean": round(
+                env_action_model_critic_advantage_abs_total / denominator,
+                6,
+            ),
+            "env_action_model_critic_policy_improvement_coef": round(
+                self._env_action_model_critic_policy_improvement_coef,
+                6,
+            ),
+            "env_action_model_critic_advantage_clip": round(
+                self._env_action_model_critic_advantage_clip,
+                6,
+            ),
+            "env_action_model_critic_warmup_active": bool(
+                self._update_count <= self._env_action_model_critic_warmup_updates
+            ),
+            "env_action_model_rollout_enabled": self._env_action_model_rollout_enabled,
+            "env_action_model_rollout_horizon": self._env_action_model_rollout_horizon,
+            "env_action_model_rollout_horizons": list(
+                self._env_action_model_rollout_horizons
+            ),
+            "env_action_model_imagination_replay_enabled": (
+                self._env_action_model_imagination_replay_enabled
+            ),
+            "env_action_model_imagination_replay_depths": list(
+                self._env_action_model_imagination_replay_depths
+            ),
+            "env_action_model_imagination_replay_horizons": list(
+                self._env_action_model_imagination_replay_horizons
+            ),
+            "env_action_model_imagination_replay_recovery_only": (
+                self._env_action_model_imagination_replay_recovery_only
+            ),
+            "env_action_model_imagination_beam_search_enabled": (
+                self._env_action_model_imagination_beam_search_enabled
+            ),
+            "env_action_model_imagination_replay_branch_mode": (
+                self._env_action_model_imagination_replay_branch_mode
+            ),
+            "env_action_model_imagination_replay_branch_top_k": (
+                self._env_action_model_imagination_replay_branch_top_k
+            ),
+            "env_action_model_policy_improvement_enabled": (
+                self._env_action_model_policy_improvement_enabled
+            ),
+            "env_action_model_policy_improvement_coef": round(
+                self._env_action_model_policy_improvement_coef,
+                6,
+            ),
+            "env_action_model_policy_improvement_temperature": round(
+                self._env_action_model_policy_improvement_temperature,
+                6,
+            ),
+            "env_action_model_policy_improvement_robust_horizons_enabled": (
+                self._env_action_model_policy_improvement_robust_horizons_enabled
+            ),
+            "env_action_model_policy_improvement_horizon_risk_coef": round(
+                self._env_action_model_policy_improvement_horizon_risk_coef,
+                6,
+            ),
+            "env_action_model_policy_improvement_horizon_aggregation_mode": (
+                self._env_action_model_policy_improvement_horizon_aggregation_mode
+            ),
+            "env_action_model_policy_improvement_horizon_lambda": round(
+                self._env_action_model_policy_improvement_horizon_lambda,
+                6,
+            ),
+            "env_action_model_policy_improvement_adaptive_kl_enabled": (
+                self._env_action_model_policy_improvement_adaptive_kl_enabled
+            ),
+            "env_action_model_policy_improvement_kl_constraint": round(
+                self._env_action_model_policy_improvement_target_kl,
+                6,
+            ),
+            "env_action_model_policy_improvement_regret_adaptive_kl_enabled": (
+                self._env_action_model_policy_improvement_regret_adaptive_kl_enabled
+            ),
+            "env_action_model_policy_improvement_max_target_kl": round(
+                self._env_action_model_policy_improvement_max_target_kl,
+                6,
+            ),
+            "env_action_model_policy_improvement_regret_priority_coef": round(
+                self._env_action_model_policy_improvement_regret_priority_coef,
+                6,
+            ),
+            "env_action_model_policy_improvement_tail_distillation_enabled": (
+                self._env_action_model_policy_improvement_tail_distillation_enabled
+            ),
+            "env_action_model_policy_improvement_tail_quantile": round(
+                self._env_action_model_policy_improvement_tail_quantile,
+                6,
+            ),
+            "env_action_model_policy_improvement_tail_min_regret": round(
+                self._env_action_model_policy_improvement_tail_min_regret,
+                6,
+            ),
+            "env_action_model_policy_improvement_tail_epochs": (
+                self._env_action_model_policy_improvement_tail_epochs
+            ),
+            "env_action_model_policy_improvement_tail_coef": round(
+                self._env_action_model_policy_improvement_tail_coef,
+                6,
+            ),
+            "env_action_model_policy_improvement_tail_max_policy_kl": round(
+                self._env_action_model_policy_improvement_tail_max_policy_kl,
+                6,
+            ),
+            "env_action_model_policy_improvement_tail_target_balance_enabled": (
+                self._env_action_model_policy_improvement_tail_target_balance_enabled
+            ),
+            "env_action_model_policy_improvement_tail_target_balance_power": round(
+                self._env_action_model_policy_improvement_tail_target_balance_power,
+                6,
+            ),
+            "env_action_model_policy_improvement_tail_target_balance_max_weight": round(
+                self._env_action_model_policy_improvement_tail_target_balance_max_weight,
+                6,
+            ),
+            "env_action_model_online_planner_enabled": (
+                self._env_action_model_online_planner_enabled
+            ),
+            "env_action_model_online_planner_coef": round(
+                self._env_action_model_online_planner_coef,
+                6,
+            ),
+            "env_action_model_online_planner_mechanism_coef": round(
+                self._env_action_model_online_planner_mechanism_coef,
+                6,
+            ),
+            "env_action_model_online_planner_policy_prior_coef": round(
+                self._env_action_model_online_planner_policy_prior_coef,
+                6,
+            ),
+            "env_action_model_online_planner_min_margin": round(
+                self._env_action_model_online_planner_min_margin,
+                6,
+            ),
+            "env_action_model_online_planner_prefer_beam_targets": (
+                self._env_action_model_online_planner_prefer_beam_targets
+            ),
+            "env_action_model_policy_improvement_tail_residual_optimizer_enabled": (
+                self._env_action_model_policy_improvement_tail_residual_optimizer_enabled
+            ),
+            "env_action_model_policy_improvement_tail_residual_learning_rate": round(
+                self._env_action_model_policy_improvement_tail_residual_learning_rate,
+                8,
+            ),
+            "env_action_model_policy_improvement_tail_residual_backtrack_factor": round(
+                self._env_action_model_policy_improvement_tail_residual_backtrack_factor,
+                6,
+            ),
+            "env_action_model_policy_improvement_tail_residual_min_learning_rate": round(
+                self._env_action_model_policy_improvement_tail_residual_min_learning_rate,
+                8,
+            ),
+            "env_action_model_policy_improvement_tail_residual_max_backtracks": (
+                self._env_action_model_policy_improvement_tail_residual_max_backtracks
+            ),
+            "env_action_model_policy_improvement_loss": round(
+                env_action_model_policy_improvement_loss_total / denominator,
+                6,
+            ),
+            "env_action_model_policy_improvement_target_kl": round(
+                env_action_model_policy_improvement_target_kl_total / denominator,
+                6,
+            ),
+            "env_action_model_tail_distillation_candidate_count": int(
+                env_action_model_tail_distillation_stats["candidate_count"]
+            ),
+            "env_action_model_tail_distillation_imagined_state_count": int(
+                env_action_model_tail_distillation_stats[
+                    "imagined_recovery_state_count"
+                ]
+            ),
+            "env_action_model_tail_distillation_selected_count": int(
+                env_action_model_tail_distillation_stats["selected_count"]
+            ),
+            "env_action_model_tail_distillation_selected_imagined_count": int(
+                env_action_model_tail_distillation_stats[
+                    "selected_imagined_count"
+                ]
+            ),
+            "env_action_model_tail_distillation_selected_fraction": round(
+                float(
+                    env_action_model_tail_distillation_stats[
+                        "selected_fraction"
+                    ]
+                ),
+                6,
+            ),
+            "env_action_model_tail_distillation_regret_mean": round(
+                float(env_action_model_tail_distillation_stats["regret_mean"]),
+                6,
+            ),
+            "env_action_model_tail_distillation_regret_threshold": round(
+                float(
+                    env_action_model_tail_distillation_stats[
+                        "regret_threshold"
+                    ]
+                ),
+                6,
+            ),
+            "env_action_model_tail_distillation_selected_regret_mean": round(
+                float(
+                    env_action_model_tail_distillation_stats[
+                        "selected_regret_mean"
+                    ]
+                ),
+                6,
+            ),
+            "env_action_model_tail_distillation_loss": round(
+                float(env_action_model_tail_distillation_stats["loss"]),
+                6,
+            ),
+            "env_action_model_tail_distillation_update_steps": int(
+                env_action_model_tail_distillation_stats["update_steps"]
+            ),
+            "env_action_model_tail_distillation_executed_epochs": int(
+                env_action_model_tail_distillation_stats["executed_epochs"]
+            ),
+            "env_action_model_tail_distillation_early_stop_triggered": bool(
+                env_action_model_tail_distillation_stats[
+                    "early_stop_triggered"
+                ]
+            ),
+            "env_action_model_tail_distillation_residual_optimizer_used": bool(
+                env_action_model_tail_distillation_stats[
+                    "residual_optimizer_used"
+                ]
+            ),
+            "env_action_model_tail_distillation_residual_learning_rate_initial": round(
+                float(
+                    env_action_model_tail_distillation_stats[
+                        "residual_learning_rate_initial"
+                    ]
+                ),
+                8,
+            ),
+            "env_action_model_tail_distillation_residual_learning_rate_final": round(
+                float(
+                    env_action_model_tail_distillation_stats[
+                        "residual_learning_rate_final"
+                    ]
+                ),
+                8,
+            ),
+            "env_action_model_tail_distillation_backtrack_count": int(
+                env_action_model_tail_distillation_stats[
+                    "backtrack_count"
+                ]
+            ),
+            "env_action_model_tail_distillation_rejected_epoch_count": int(
+                env_action_model_tail_distillation_stats[
+                    "rejected_epoch_count"
+                ]
+            ),
+            "env_action_model_tail_distillation_target_action_counts": dict(
+                env_action_model_tail_distillation_stats[
+                    "target_action_counts"
+                ]
+            ),
+            "env_action_model_tail_distillation_imagined_target_action_counts": dict(
+                env_action_model_tail_distillation_stats[
+                    "imagined_target_action_counts"
+                ]
+            ),
+            "env_action_model_tail_distillation_selected_target_action_counts": dict(
+                env_action_model_tail_distillation_stats[
+                    "selected_target_action_counts"
+                ]
+            ),
+            "env_action_model_tail_distillation_selected_imagined_target_action_counts": dict(
+                env_action_model_tail_distillation_stats[
+                    "selected_imagined_target_action_counts"
+                ]
+            ),
+            "env_action_model_tail_distillation_target_balance_enabled": bool(
+                env_action_model_tail_distillation_stats[
+                    "target_balance_enabled"
+                ]
+            ),
+            "env_action_model_tail_distillation_target_balance_weights": dict(
+                env_action_model_tail_distillation_stats[
+                    "target_balance_weights"
+                ]
+            ),
+            "env_action_model_tail_distillation_target_balance_weight_min": round(
+                float(
+                    env_action_model_tail_distillation_stats[
+                        "target_balance_weight_min"
+                    ]
+                ),
+                6,
+            ),
+            "env_action_model_tail_distillation_target_balance_weight_mean": round(
+                float(
+                    env_action_model_tail_distillation_stats[
+                        "target_balance_weight_mean"
+                    ]
+                ),
+                6,
+            ),
+            "env_action_model_tail_distillation_target_balance_weight_max": round(
+                float(
+                    env_action_model_tail_distillation_stats[
+                        "target_balance_weight_max"
+                    ]
+                ),
+                6,
+            ),
+            "env_action_model_tail_distillation_policy_kl_before": round(
+                float(
+                    env_action_model_tail_distillation_stats[
+                        "policy_kl_before"
+                    ]
+                ),
+                6,
+            ),
+            "env_action_model_tail_distillation_policy_kl_after": round(
+                float(
+                    env_action_model_tail_distillation_stats["policy_kl_after"]
+                ),
+                6,
+            ),
+            "option_return_target_mean": round(option_return_mean, 6),
+            "option_return_target_std": round(option_return_std, 6),
             "mechanism_retention_active": bool(retention_active),
             "mechanism_retention_start_update": int(self._mechanism_retention_start_update),
             "mechanism_aux_coef_floor_after_update": round(self._mechanism_aux_coef_floor_after_update, 6),
@@ -3018,6 +4439,15 @@ class 分层PPO基类(BaseAgent):
             "digital_twin_handoff_fast_scale": round(self._digital_twin_handoff_fast_scale, 6),
             "digital_twin_handoff_event_scale": round(self._digital_twin_handoff_event_scale, 6),
             "digital_twin_handoff_critic_scale": round(self._digital_twin_handoff_critic_scale, 6),
+            "outcome_memory_fusion_enabled": self._outcome_memory_fusion_enabled,
+            "outcome_memory_actor_scale": round(
+                self._outcome_memory_actor_scale,
+                6,
+            ),
+            "outcome_memory_critic_scale": round(
+                self._outcome_memory_critic_scale,
+                6,
+            ),
             "digital_twin_policy_prior_enabled": self._digital_twin_policy_prior_enabled,
             "digital_twin_policy_prior_logit_bias": round(
                 self._digital_twin_policy_prior_logit_bias,
@@ -3259,13 +4689,22 @@ class 分层PPO基类(BaseAgent):
         current_state = self._network.state_dict()
         missing_keys = set(current_state) - set(network_state)
         unexpected_keys = set(network_state) - set(current_state)
-        option_head_warm_start = bool(
-            self._option_gate_enabled
-            and missing_keys
+        additive_head_warm_start = bool(
+            missing_keys
             and not unexpected_keys
-            and all(str(key).startswith("option_actor.") for key in missing_keys)
+            and all(
+                str(key).startswith(
+                    (
+                        "option_actor.",
+                        "outcome_recovery_adapter.",
+                        "outcome_context_residual_adapter.",
+                        "digital_twin_planning_adapter.",
+                    )
+                )
+                for key in missing_keys
+            )
         )
-        if option_head_warm_start:
+        if additive_head_warm_start:
             merged_state = dict(current_state)
             for key, value in network_state.items():
                 if key in merged_state and tuple(merged_state[key].shape) == tuple(value.shape):
@@ -3273,7 +4712,7 @@ class 分层PPO基类(BaseAgent):
             self._network.load_state_dict(merged_state, strict=True)
         else:
             self._network.load_state_dict(network_state)
-        if checkpoint.get("optimizer_state_dict") is not None and not option_head_warm_start:
+        if checkpoint.get("optimizer_state_dict") is not None and not additive_head_warm_start:
             self._optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         self._update_count = int(checkpoint.get("update_count", 0))
 
@@ -3281,7 +4720,12 @@ class 分层PPO基类(BaseAgent):
         semantic_state = (info or {}).get("semantic_state")
         if semantic_state is None:
             raise ValueError(f"{self.agent_name} 需要 info['semantic_state'] 才能做图结构编码。")
-        return semantic_state
+        algorithm_memory = (info or {}).get("algorithm_memory")
+        if not isinstance(algorithm_memory, dict):
+            return semantic_state
+        augmented_state = dict(semantic_state)
+        augmented_state["algorithm_memory"] = dict(algorithm_memory)
+        return augmented_state
 
     def _extract_action_mask(self, info: dict[str, Any] | None) -> list[bool] | None:
         raw_mask = (info or {}).get("action_mask")
@@ -3587,8 +5031,12 @@ class 分层PPO基类(BaseAgent):
         semantic_state: dict[str, Any],
         run_metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        if not (self._use_hierarchy and self._sparse_handoff_option_prior_enabled):
-            return {"enabled": bool(self._sparse_handoff_option_prior_enabled), "active": False}
+        context_enabled = bool(
+            self._sparse_handoff_option_prior_enabled
+            or self._option_counterfactual_critic_enabled
+        )
+        if not (self._use_hierarchy and context_enabled):
+            return {"enabled": context_enabled, "active": False}
 
         run_metadata = dict(run_metadata or {})
         window_class = str(
@@ -4015,6 +5463,55 @@ class 分层PPO基类(BaseAgent):
             return adjusted
         return adjusted.masked_fill(~mask_tensor, -1.0e9)
 
+    def _critic_improved_option_logits(
+        self,
+        *,
+        option_logits: torch.Tensor,
+        option_q_values: torch.Tensor | None,
+        option_mask: list[bool] | None,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        zero_advantage = torch.zeros_like(option_logits)
+        if (
+            not self._option_counterfactual_policy_improvement_enabled
+            or self._option_counterfactual_policy_improvement_coef <= 0.0
+            or self._update_count < self._option_counterfactual_warmup_updates
+            or option_q_values is None
+            or option_q_values.shape != option_logits.shape
+        ):
+            return option_logits, zero_advantage
+
+        valid_mask = torch.ones_like(option_logits, dtype=torch.bool)
+        if option_mask and len(option_mask) == int(option_logits.shape[-1]):
+            valid_mask = torch.as_tensor(
+                option_mask,
+                dtype=torch.bool,
+                device=option_logits.device,
+            )
+        if not bool(valid_mask.any().item()):
+            return option_logits, zero_advantage
+
+        detached_q = option_q_values.detach()
+        actor_probs = torch.softmax(option_logits, dim=-1).detach()
+        actor_probs = actor_probs.masked_fill(~valid_mask, 0.0)
+        actor_probs = actor_probs / actor_probs.sum().clamp_min(1e-8)
+        q_baseline = torch.sum(actor_probs * detached_q)
+        q_advantage = (detached_q - q_baseline).masked_fill(~valid_mask, 0.0)
+        valid_advantages = q_advantage[valid_mask]
+        q_scale = torch.sqrt(torch.mean(valid_advantages.square())).clamp_min(1e-6)
+        normalized_advantage = (q_advantage / q_scale).masked_fill(~valid_mask, 0.0)
+        if self._option_counterfactual_policy_improvement_clip > 0.0:
+            normalized_advantage = torch.clamp(
+                normalized_advantage,
+                -self._option_counterfactual_policy_improvement_clip,
+                self._option_counterfactual_policy_improvement_clip,
+            )
+        improved_logits = (
+            option_logits
+            + self._option_counterfactual_policy_improvement_coef
+            * normalized_advantage
+        )
+        return improved_logits, normalized_advantage
+
     def _maybe_apply_option_gate(
         self,
         *,
@@ -4063,11 +5560,20 @@ class 分层PPO基类(BaseAgent):
                 run_metadata=run_metadata,
             )
         prior_target = int(candidate_info["prior_target"])
-        option_logits = self._masked_option_logits(
+        actor_option_logits = self._masked_option_logits(
             policy_output["option_logits"],
             list(candidate_info["option_mask"]),
             prior_target=prior_target,
         )
+        if deterministic or not self._option_counterfactual_policy_improvement_deterministic_only:
+            option_logits, critic_option_advantage = self._critic_improved_option_logits(
+                option_logits=actor_option_logits,
+                option_q_values=policy_output.get("option_q_values"),
+                option_mask=list(candidate_info["option_mask"]),
+            )
+        else:
+            option_logits = actor_option_logits
+            critic_option_advantage = torch.zeros_like(actor_option_logits)
         distribution = Categorical(logits=option_logits)
         option_probs = torch.softmax(option_logits, dim=-1)
         top_tensor = torch.argmax(option_logits, dim=-1)
@@ -4149,6 +5655,22 @@ class 分层PPO基类(BaseAgent):
             "base_option_prob": round(float(option_probs[0].item()) if int(option_probs.shape[-1]) > 0 else 0.0, 6),
             "option_log_prob": round(float(distribution.log_prob(option_tensor).item()), 6),
             "option_entropy": round(float(distribution.entropy().item()), 6),
+            "critic_policy_improvement_enabled": bool(
+                self._option_counterfactual_policy_improvement_enabled
+            ),
+            "critic_policy_improvement_deterministic_only": bool(
+                self._option_counterfactual_policy_improvement_deterministic_only
+            ),
+            "counterfactual_model_rollout_enabled": bool(
+                self._option_counterfactual_model_rollout_enabled
+            ),
+            "counterfactual_model_rollout_horizon": int(
+                self._option_counterfactual_model_rollout_horizon
+            ),
+            "critic_option_advantages": [
+                round(float(item), 6)
+                for item in critic_option_advantage.tolist()
+            ],
             "_option_log_prob_tensor": distribution.log_prob(option_tensor),
             "_option_entropy_tensor": distribution.entropy(),
         }
@@ -5242,6 +6764,52 @@ class 分层PPO基类(BaseAgent):
         new_log_probs = distribution.log_prob(batch_actions)
         blend = self._env_action_ppo_advantage_blend
         action_advantage = blend * base_advantage + (1.0 - blend) * event_advantage
+        if (
+            self._env_action_model_critic_enabled
+            and self._env_action_model_critic_advantage_coef > 0.0
+            and self._update_count >= self._env_action_model_critic_warmup_updates
+        ):
+            model_advantages: list[torch.Tensor] = []
+            for row_index, (output, action_mask) in enumerate(
+                zip(batch_outputs, batch_action_masks)
+            ):
+                q_values = output.get("env_action_q_values")
+                if not isinstance(q_values, torch.Tensor):
+                    model_advantages.append(
+                        torch.tensor(0.0, dtype=torch.float32, device=self._device)
+                    )
+                    continue
+                valid_mask = torch.ones_like(q_values, dtype=torch.bool)
+                if action_mask and len(action_mask) == int(q_values.shape[-1]):
+                    valid_mask = torch.as_tensor(
+                        action_mask,
+                        dtype=torch.bool,
+                        device=self._device,
+                    )
+                detached_q = q_values.detach().masked_fill(~valid_mask, 0.0)
+                detached_probs = distribution.probs[row_index].detach().masked_fill(
+                    ~valid_mask,
+                    0.0,
+                )
+                detached_probs = (
+                    detached_probs / detached_probs.sum().clamp_min(1e-8)
+                )
+                baseline_q = torch.sum(detached_probs * detached_q)
+                selected_advantage = (
+                    detached_q[int(batch_actions[row_index].item())] - baseline_q
+                )
+                if self._env_action_model_critic_advantage_clip > 0.0:
+                    selected_advantage = torch.clamp(
+                        selected_advantage,
+                        -self._env_action_model_critic_advantage_clip,
+                        self._env_action_model_critic_advantage_clip,
+                    )
+                model_advantages.append(selected_advantage)
+            action_advantage = (
+                action_advantage
+                + self._env_action_model_critic_advantage_coef
+                * torch.stack(model_advantages)
+            )
         if self._counterfactual_teacher_prd_enabled and self._env_action_ppo_teacher_coef > 0.0:
             teacher_values: list[float] = []
             for row, action in zip(batch_rows, batch_actions.detach().cpu().tolist()):
@@ -5572,13 +7140,21 @@ class 分层PPO基类(BaseAgent):
         batch_outputs: list[dict[str, Any]],
         batch_rows: list[dict[str, Any]],
         batch_advantage: torch.Tensor,
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        batch_option_returns: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         zero = torch.tensor(0.0, dtype=torch.float32, device=self._device)
         if not self._option_gate_enabled:
-            return zero, zero, zero
+            return zero, zero, zero, zero, zero
         ppo_terms: list[torch.Tensor] = []
         entropy_terms: list[torch.Tensor] = []
         prior_terms: list[torch.Tensor] = []
+        counterfactual_value_terms: list[torch.Tensor] = []
+        counterfactual_advantage_terms: list[torch.Tensor] = []
+        counterfactual_actor_active = bool(
+            self._option_counterfactual_critic_enabled
+            and self._update_count >= self._option_counterfactual_warmup_updates
+            and self._option_counterfactual_advantage_coef > 0.0
+        )
         for row_index, (policy_output, row) in enumerate(zip(batch_outputs, batch_rows)):
             if "option_logits" not in policy_output:
                 continue
@@ -5590,11 +7166,19 @@ class 分层PPO基类(BaseAgent):
                 continue
             option_mask = list(option_info.get("option_mask", []))
             prior_target = int(option_info.get("prior_target", 0) or 0)
-            logits = self._masked_option_logits(
+            actor_logits = self._masked_option_logits(
                 policy_output["option_logits"],
                 option_mask if option_mask else None,
                 prior_target=prior_target,
             )
+            if self._option_counterfactual_policy_improvement_deterministic_only:
+                logits = actor_logits
+            else:
+                logits, _ = self._critic_improved_option_logits(
+                    option_logits=actor_logits,
+                    option_q_values=policy_output.get("option_q_values"),
+                    option_mask=option_mask if option_mask else None,
+                )
             distribution = Categorical(logits=logits)
             action_tensor = torch.tensor(option_action, dtype=torch.long, device=self._device)
             old_log_prob = torch.tensor(
@@ -5610,6 +7194,104 @@ class 分层PPO基类(BaseAgent):
                 option_probs=distribution.probs.detach(),
                 option_mask=option_mask if option_mask else None,
             )
+            if (
+                self._option_counterfactual_critic_enabled
+                and "option_q_values" in policy_output
+            ):
+                option_q_values = policy_output["option_q_values"]
+                valid_mask = torch.ones_like(option_q_values, dtype=torch.bool)
+                if option_mask and len(option_mask) == int(option_q_values.shape[-1]):
+                    valid_mask = torch.as_tensor(
+                        option_mask,
+                        dtype=torch.bool,
+                        device=self._device,
+                    )
+                selected_q = option_q_values[option_action]
+                tail_context = dict(
+                    option_info.get("sparse_tail_risk_option_context", {})
+                )
+                tail_scale = 1.0
+                if bool(tail_context.get("active", False)):
+                    tail_scale += self._option_counterfactual_tail_weight * _clamp01(
+                        float(tail_context.get("context", 0.0) or 0.0)
+                    )
+                model_rollout_info = dict(
+                    option_info.get("counterfactual_model_rollout", {})
+                )
+                model_targets_raw = model_rollout_info.get("option_td_targets", {})
+                model_targets: dict[int, float] = {}
+                if isinstance(model_targets_raw, dict):
+                    for raw_key, raw_value in model_targets_raw.items():
+                        try:
+                            model_targets[int(raw_key)] = float(raw_value)
+                        except (TypeError, ValueError):
+                            continue
+                valid_target_indices = [
+                    option_index
+                    for option_index in range(int(option_q_values.shape[-1]))
+                    if bool(valid_mask[option_index].item())
+                    and option_index in model_targets
+                ]
+                if valid_target_indices:
+                    target_values = torch.as_tensor(
+                        [model_targets[index] for index in valid_target_indices],
+                        dtype=torch.float32,
+                        device=self._device,
+                    )
+                    centered_targets = target_values - target_values.mean()
+                    target_scale = torch.sqrt(
+                        torch.mean(centered_targets.square())
+                    ).clamp_min(1e-6)
+                    normalized_targets = centered_targets / target_scale
+                    if self._option_counterfactual_advantage_clip > 0.0:
+                        normalized_targets = torch.clamp(
+                            normalized_targets,
+                            -self._option_counterfactual_advantage_clip,
+                            self._option_counterfactual_advantage_clip,
+                        )
+                    predicted_targets = option_q_values[valid_target_indices]
+                    centered_predictions = (
+                        predicted_targets - predicted_targets.mean()
+                    )
+                    counterfactual_value_terms.append(
+                        tail_scale
+                        * nn.functional.smooth_l1_loss(
+                            centered_predictions,
+                            normalized_targets.detach(),
+                        )
+                    )
+                else:
+                    counterfactual_value_terms.append(
+                        tail_scale
+                        * nn.functional.smooth_l1_loss(
+                            selected_q,
+                            batch_option_returns[row_index].detach(),
+                        )
+                    )
+                detached_q = option_q_values.detach().masked_fill(~valid_mask, 0.0)
+                detached_probs = distribution.probs.detach().masked_fill(~valid_mask, 0.0)
+                probability_mass = detached_probs.sum().clamp_min(1e-8)
+                detached_probs = detached_probs / probability_mass
+                counterfactual_baseline = torch.sum(detached_probs * detached_q)
+                counterfactual_advantage = (
+                    detached_q[option_action] - counterfactual_baseline
+                )
+                if self._option_counterfactual_advantage_clip > 0.0:
+                    counterfactual_advantage = torch.clamp(
+                        counterfactual_advantage,
+                        -self._option_counterfactual_advantage_clip,
+                        self._option_counterfactual_advantage_clip,
+                    )
+                counterfactual_advantage_terms.append(
+                    torch.abs(counterfactual_advantage)
+                )
+                if counterfactual_actor_active:
+                    option_advantage = (
+                        option_advantage
+                        + self._option_counterfactual_advantage_coef
+                        * tail_scale
+                        * counterfactual_advantage
+                    )
             surrogate_1 = ratio * option_advantage
             surrogate_2 = torch.clamp(
                 ratio,
@@ -5625,7 +7307,1238 @@ class 分层PPO基类(BaseAgent):
         ppo_loss = torch.stack(ppo_terms).mean() if ppo_terms else zero
         entropy = torch.stack(entropy_terms).mean() if entropy_terms else zero
         prior_loss = torch.stack(prior_terms).mean() if prior_terms else zero
-        return ppo_loss, entropy, prior_loss
+        counterfactual_value_loss = (
+            torch.stack(counterfactual_value_terms).mean()
+            if counterfactual_value_terms
+            else zero
+        )
+        counterfactual_advantage_abs = (
+            torch.stack(counterfactual_advantage_terms).mean()
+            if counterfactual_advantage_terms
+            else zero
+        )
+        return (
+            ppo_loss,
+            entropy,
+            prior_loss,
+            counterfactual_value_loss,
+            counterfactual_advantage_abs,
+        )
+
+    def _compute_env_action_model_critic_loss(
+        self,
+        *,
+        batch_outputs: list[dict[str, Any]],
+        batch_rows: list[dict[str, Any]],
+        batch_action_masks: list[list[bool] | None],
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        zero = torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        if not self._env_action_model_critic_enabled:
+            return zero, zero
+        value_terms: list[torch.Tensor] = []
+        advantage_terms: list[torch.Tensor] = []
+        for output, row, action_mask in zip(
+            batch_outputs,
+            batch_rows,
+            batch_action_masks,
+        ):
+            q_values = output.get("env_action_q_values")
+            if not isinstance(q_values, torch.Tensor):
+                continue
+            rollout_info = dict(
+                row.get("action_info", {}).get("env_action_model_rollout", {})
+            )
+            target_maps = self._extract_env_action_model_target_maps(
+                rollout_info
+            )
+            valid_indices = [
+                action_id
+                for action_id in range(int(q_values.shape[-1]))
+                if target_maps
+                and all(action_id in targets for targets in target_maps)
+                and (
+                    not action_mask
+                    or (
+                        action_id < len(action_mask)
+                        and bool(action_mask[action_id])
+                    )
+                )
+            ]
+            if len(valid_indices) < 2:
+                continue
+            normalized_targets = self._build_env_action_model_robust_advantage(
+                target_maps=target_maps,
+                valid_indices=valid_indices,
+            )
+            predicted_values = q_values[valid_indices]
+            centered_predictions = predicted_values - predicted_values.mean()
+            value_terms.append(
+                nn.functional.smooth_l1_loss(
+                    centered_predictions,
+                    normalized_targets.detach(),
+                )
+            )
+            advantage_terms.append(torch.mean(torch.abs(centered_predictions)))
+        return (
+            torch.stack(value_terms).mean() if value_terms else zero,
+            torch.stack(advantage_terms).mean() if advantage_terms else zero,
+        )
+
+    @staticmethod
+    def _parse_env_action_target_map(
+        targets_raw: Any,
+    ) -> dict[int, float]:
+        targets: dict[int, float] = {}
+        if not isinstance(targets_raw, dict):
+            return targets
+        for raw_key, raw_value in targets_raw.items():
+            try:
+                targets[int(raw_key)] = float(raw_value)
+            except (TypeError, ValueError):
+                continue
+        return targets
+
+    def _extract_env_action_model_target_maps(
+        self,
+        rollout_info: dict[str, Any],
+    ) -> list[dict[int, float]]:
+        if self._env_action_model_policy_improvement_prefer_beam_targets:
+            beam_targets = self._parse_env_action_target_map(
+                rollout_info.get("beam_action_td_targets", {})
+            )
+            if beam_targets:
+                return [beam_targets]
+        if self._env_action_model_policy_improvement_robust_horizons_enabled:
+            by_horizon_raw = rollout_info.get(
+                "action_td_targets_by_horizon",
+                {},
+            )
+            if isinstance(by_horizon_raw, dict):
+                ordered_maps: list[tuple[int, dict[int, float]]] = []
+                for raw_horizon, targets_raw in by_horizon_raw.items():
+                    try:
+                        horizon = int(raw_horizon)
+                    except (TypeError, ValueError):
+                        continue
+                    targets = self._parse_env_action_target_map(targets_raw)
+                    if targets:
+                        ordered_maps.append((horizon, targets))
+                if len(ordered_maps) >= 2:
+                    return [
+                        targets
+                        for _, targets in sorted(ordered_maps)
+                    ]
+        targets = self._parse_env_action_target_map(
+            rollout_info.get("action_td_targets", {})
+        )
+        return [targets] if targets else []
+
+    def select_env_action_from_model_targets(
+        self,
+        *,
+        action_info: dict[str, Any],
+        rollout_info: dict[str, Any],
+    ) -> tuple[int, dict[str, Any]]:
+        """Perform a policy-prior-constrained counterfactual action improvement.
+
+        The digital twin supplies action returns; the MAPPO policy remains a
+        prior through the KL-like log-probability term. This keeps planning
+        inside the agent contract instead of adding an evaluator-side rule.
+        """
+        current_action = int(action_info.get("final_env_action", 3))
+        planner_stats: dict[str, Any] = {
+            "enabled": self._env_action_model_online_planner_enabled,
+            "applied": False,
+            "protocol": "mappo_counterfactual_policy_improvement_v1",
+            "candidate_count": 0,
+            "target_maps": 0,
+            "mechanism_target_success_count": 0,
+            "current_action": current_action,
+            "selected_action": current_action,
+            "model_coef": self._env_action_model_online_planner_coef,
+            "mechanism_coef": self._env_action_model_online_planner_mechanism_coef,
+            "policy_prior_coef": self._env_action_model_online_planner_policy_prior_coef,
+            "min_margin": self._env_action_model_online_planner_min_margin,
+        }
+        if not self._env_action_model_online_planner_enabled:
+            return current_action, planner_stats
+
+        target_maps = self._extract_env_action_model_target_maps(rollout_info)
+        if self._env_action_model_online_planner_prefer_beam_targets:
+            beam_targets = self._parse_env_action_target_map(
+                rollout_info.get("beam_action_td_targets", {})
+            )
+            if beam_targets:
+                target_maps = [beam_targets]
+        action_mask = action_info.get("action_mask")
+        valid_indices = [
+            action_id
+            for action_id in range(5)
+            if not action_mask
+            or (
+                action_id < len(action_mask)
+                and bool(action_mask[action_id])
+            )
+        ]
+        valid_indices = [
+            action_id
+            for action_id in valid_indices
+            if target_maps and all(action_id in targets for targets in target_maps)
+        ]
+        planner_stats["target_maps"] = len(target_maps)
+        planner_stats["candidate_count"] = len(valid_indices)
+        if len(valid_indices) < 2:
+            planner_stats["reason"] = "insufficient_counterfactual_support"
+            return current_action, planner_stats
+
+        action_projection = dict(action_info.get("action_projection", {}))
+        prior_raw = action_projection.get(
+            "masked_env_action_probs",
+            action_info.get("env_action_probs", []),
+        )
+        if isinstance(prior_raw, list) and len(prior_raw) >= 5:
+            prior = torch.as_tensor(
+                [max(float(prior_raw[action_id]), 1e-8) for action_id in valid_indices],
+                dtype=torch.float32,
+                device=self._device,
+            )
+            prior = prior / prior.sum().clamp_min(1e-8)
+        else:
+            prior = torch.full(
+                (len(valid_indices),),
+                1.0 / len(valid_indices),
+                dtype=torch.float32,
+                device=self._device,
+            )
+        model_advantage = self._build_env_action_model_robust_advantage(
+            target_maps=target_maps,
+            valid_indices=valid_indices,
+        ).detach()
+        mechanism_target_raw = rollout_info.get(
+            "action_mechanism_targets",
+            {},
+        )
+        mechanism_targets = self._parse_env_action_target_map(
+            mechanism_target_raw
+        )
+        mechanism_target_success_count = sum(
+            1
+            for action_id in valid_indices
+            if float(mechanism_targets.get(action_id, 0.0)) > 0.0
+        )
+        planner_stats["mechanism_target_success_count"] = (
+            mechanism_target_success_count
+        )
+        mechanism_valid = all(
+            action_id in mechanism_targets for action_id in valid_indices
+        )
+        mechanism_advantage = torch.zeros_like(model_advantage)
+        if mechanism_valid and len(valid_indices) >= 2:
+            mechanism_values = torch.as_tensor(
+                [mechanism_targets[action_id] for action_id in valid_indices],
+                dtype=torch.float32,
+                device=self._device,
+            )
+            mechanism_centered = mechanism_values - mechanism_values.mean()
+            mechanism_scale = torch.sqrt(
+                torch.mean(mechanism_centered.square())
+            ).clamp_min(1e-6)
+            mechanism_advantage = mechanism_centered / mechanism_scale
+        scores = (
+            self._env_action_model_online_planner_coef * model_advantage
+            + self._env_action_model_online_planner_mechanism_coef
+            * mechanism_advantage
+            + self._env_action_model_online_planner_policy_prior_coef
+            * torch.log(prior.clamp_min(1e-8))
+        )
+        ranked_positions = torch.argsort(scores, descending=True).detach().cpu().tolist()
+        best_position = int(ranked_positions[0])
+        second_position = int(ranked_positions[1])
+        score_margin = float(
+            (scores[best_position] - scores[second_position]).item()
+        )
+        selected_action = int(valid_indices[best_position])
+        if (
+            score_margin < self._env_action_model_online_planner_min_margin
+            and current_action in valid_indices
+        ):
+            selected_action = current_action
+            planner_stats["reason"] = "below_min_margin"
+        else:
+            planner_stats["reason"] = "counterfactual_policy_improvement"
+        planner_stats.update(
+            {
+                "applied": selected_action != current_action,
+                "selected_action": selected_action,
+                "score_margin": round(score_margin, 6),
+                "candidate_actions": valid_indices,
+                "model_advantage": {
+                    str(action_id): round(float(value), 6)
+                    for action_id, value in zip(
+                        valid_indices,
+                        model_advantage.detach().cpu().tolist(),
+                    )
+                },
+                "mechanism_advantage": {
+                    str(action_id): round(float(value), 6)
+                    for action_id, value in zip(
+                        valid_indices,
+                        mechanism_advantage.detach().cpu().tolist(),
+                    )
+                },
+                "mechanism_targets": {
+                    str(action_id): round(
+                        float(mechanism_targets.get(action_id, 0.0)),
+                        6,
+                    )
+                    for action_id in valid_indices
+                },
+                "planner_scores": {
+                    str(action_id): round(float(value), 6)
+                    for action_id, value in zip(
+                        valid_indices,
+                        scores.detach().cpu().tolist(),
+                    )
+                },
+            }
+        )
+        return selected_action, planner_stats
+
+    def relabel_action_info_for_env_action(
+        self,
+        *,
+        action_info: dict[str, Any],
+        decision_info: dict[str, Any],
+        env_action: int,
+        planner_stats: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Keep on-policy statistics aligned after model-based action improvement."""
+        semantic_state = self._extract_semantic_state(decision_info)
+        action_mask = self._extract_action_mask(decision_info)
+        run_metadata = dict(decision_info.get("run_metadata", {}) or {})
+        with torch.no_grad():
+            policy_output = self._forward_policy(
+                semantic_state,
+                run_metadata=run_metadata,
+            )
+            selected_actions = self._head_targets_for_env_action(int(env_action))
+            head_log_probs, head_entropies, action_prob_payload = (
+                self._selected_action_statistics(
+                    policy_output=policy_output,
+                    selected_actions=selected_actions,
+                    action_mask=action_mask,
+                )
+            )
+            env_action_log_prob, env_action_entropy, env_action_probs = (
+                self._env_action_distribution_statistics(
+                    policy_output=policy_output,
+                    env_action=int(env_action),
+                    action_mask=action_mask,
+                )
+            )
+            log_prob, entropy = self._combine_head_statistics(
+                head_log_probs=head_log_probs,
+                head_entropies=head_entropies,
+                head_credit_weights=self._build_head_credit_weights(
+                    aggregation_reason="online_counterfactual_planner"
+                ),
+            )
+        updated = dict(action_info)
+        updated["head_actions"] = selected_actions
+        updated["head_action_labels"] = self._head_action_labels(selected_actions)
+        updated["raw_env_action"] = int(env_action)
+        updated["projected_env_action"] = int(env_action)
+        updated["final_env_action"] = int(env_action)
+        updated["aggregation_reason"] = "online_counterfactual_planner"
+        updated["log_prob"] = round(float(log_prob.item()), 6)
+        updated["env_action_log_prob"] = round(float(env_action_log_prob.item()), 6)
+        updated["env_action_entropy"] = round(float(env_action_entropy.item()), 6)
+        updated["env_action_probs"] = env_action_probs
+        updated["action_probs"] = action_prob_payload
+        updated["head_log_probs"] = {
+            head_name: round(float(value.item()), 6)
+            for head_name, value in head_log_probs.items()
+        }
+        updated["value"] = round(float(policy_output["value"].item()), 6)
+        updated["entropy"] = round(float(entropy.item()), 6)
+        projection = dict(updated.get("action_projection", {}))
+        projection.update(
+            {
+                "raw_env_action": int(env_action),
+                "projected_env_action": int(env_action),
+                "masked_env_action_log_prob": round(
+                    float(env_action_log_prob.item()),
+                    6,
+                ),
+                "online_planner_relabelled": True,
+            }
+        )
+        updated["action_projection"] = projection
+        updated["online_counterfactual_planner"] = dict(planner_stats)
+        updated["planner_original_action"] = int(
+            planner_stats.get("current_action", action_info.get("final_env_action", 3))
+        )
+        return updated
+
+    def _build_env_action_model_robust_advantage(
+        self,
+        *,
+        target_maps: list[dict[int, float]],
+        valid_indices: list[int],
+    ) -> torch.Tensor:
+        normalized_by_horizon: list[torch.Tensor] = []
+        for targets in target_maps:
+            target_values = torch.as_tensor(
+                [targets[action_id] for action_id in valid_indices],
+                dtype=torch.float32,
+                device=self._device,
+            )
+            centered_targets = target_values - target_values.mean()
+            target_scale = torch.sqrt(
+                torch.mean(centered_targets.square())
+            ).clamp_min(1e-6)
+            normalized_by_horizon.append(centered_targets / target_scale)
+        stacked = torch.stack(normalized_by_horizon)
+        if (
+            len(normalized_by_horizon) > 1
+            and self._env_action_model_policy_improvement_horizon_aggregation_mode
+            == "lambda_downside"
+        ):
+            horizon_count = len(normalized_by_horizon)
+            horizon_lambda = (
+                self._env_action_model_policy_improvement_horizon_lambda
+            )
+            lambda_weights = [
+                (1.0 - horizon_lambda) * (horizon_lambda**index)
+                for index in range(horizon_count - 1)
+            ]
+            lambda_weights.append(horizon_lambda ** (horizon_count - 1))
+            weight_tensor = torch.as_tensor(
+                lambda_weights,
+                dtype=torch.float32,
+                device=self._device,
+            )
+            weight_tensor = weight_tensor / weight_tensor.sum().clamp_min(1e-6)
+            robust_advantage = torch.sum(
+                weight_tensor.unsqueeze(-1) * stacked,
+                dim=0,
+            )
+
+            # Penalize only value deterioration at longer planning depths.
+            # Delayed gains from prepare/cache actions remain opportunity-preserving.
+            temporal_decline = torch.relu(stacked[:-1] - stacked[1:])
+            decline_weights = weight_tensor[1:]
+            decline_weights = decline_weights / decline_weights.sum().clamp_min(
+                1e-6
+            )
+            temporal_downside = torch.sqrt(
+                torch.sum(
+                    decline_weights.unsqueeze(-1) * temporal_decline.square(),
+                    dim=0,
+                ).clamp_min(0.0)
+            )
+            robust_advantage = (
+                robust_advantage
+                - self._env_action_model_policy_improvement_horizon_risk_coef
+                * temporal_downside
+            )
+        else:
+            robust_advantage = stacked.mean(dim=0)
+            if len(normalized_by_horizon) > 1:
+                robust_advantage = (
+                    robust_advantage
+                    - self._env_action_model_policy_improvement_horizon_risk_coef
+                    * stacked.std(dim=0, unbiased=False)
+                )
+        robust_advantage = robust_advantage - robust_advantage.mean()
+        if self._env_action_model_critic_advantage_clip > 0.0:
+            robust_advantage = torch.clamp(
+                robust_advantage,
+                -self._env_action_model_critic_advantage_clip,
+                self._env_action_model_critic_advantage_clip,
+            )
+        return robust_advantage
+
+    def _build_env_action_model_improved_target(
+        self,
+        *,
+        old_probs: torch.Tensor,
+        normalized_advantage: torch.Tensor,
+        target_kl: float | None = None,
+    ) -> torch.Tensor:
+        if not self._env_action_model_policy_improvement_adaptive_kl_enabled:
+            target_logits = (
+                torch.log(old_probs.clamp_min(1e-8))
+                + normalized_advantage
+                / self._env_action_model_policy_improvement_temperature
+            )
+            return torch.softmax(target_logits, dim=-1).detach()
+
+        old_probs_detached = old_probs.detach()
+        advantage_detached = normalized_advantage.detach()
+        effective_target_kl = max(
+            float(
+                self._env_action_model_policy_improvement_target_kl
+                if target_kl is None
+                else target_kl
+            ),
+            1e-5,
+        )
+
+        def target_and_kl(temperature: float) -> tuple[torch.Tensor, float]:
+            target = torch.softmax(
+                torch.log(old_probs_detached.clamp_min(1e-8))
+                + advantage_detached / max(float(temperature), 1e-4),
+                dim=-1,
+            )
+            kl_value = torch.sum(
+                target
+                * (
+                    torch.log(target.clamp_min(1e-8))
+                    - torch.log(old_probs_detached.clamp_min(1e-8))
+                )
+            )
+            return target, float(kl_value.item())
+
+        lower = 1e-3
+        upper = 100.0
+        target, lower_kl = target_and_kl(lower)
+        if lower_kl <= effective_target_kl:
+            return target.detach()
+        for _ in range(32):
+            midpoint = 0.5 * (lower + upper)
+            candidate, candidate_kl = target_and_kl(midpoint)
+            if candidate_kl > effective_target_kl:
+                lower = midpoint
+            else:
+                upper = midpoint
+                target = candidate
+        return target.detach()
+
+    @staticmethod
+    def _normalized_env_action_counterfactual_regret(
+        *,
+        old_probs: torch.Tensor,
+        normalized_advantage: torch.Tensor,
+    ) -> torch.Tensor:
+        advantage_range = (
+            normalized_advantage.max() - normalized_advantage.min()
+        ).clamp_min(1e-6)
+        policy_value = torch.sum(
+            old_probs.detach() * normalized_advantage.detach()
+        )
+        regret = normalized_advantage.detach().max() - policy_value
+        return torch.clamp(regret / advantage_range, 0.0, 1.0)
+
+    def _build_env_action_model_policy_improvement_context(
+        self,
+        *,
+        output: dict[str, Any],
+        row: dict[str, Any],
+        action_mask: list[bool] | None,
+    ) -> dict[str, Any] | None:
+        rollout_info = dict(
+            row.get("action_info", {}).get("env_action_model_rollout", {})
+        )
+        target_maps = self._extract_env_action_model_target_maps(rollout_info)
+        if self._use_hierarchy:
+            actor_scores = self._hierarchical_env_action_scores(output)
+        else:
+            actor_scores = output["flat_logits"]
+        valid_indices = [
+            action_id
+            for action_id in range(int(actor_scores.shape[-1]))
+            if target_maps
+            and all(action_id in targets for targets in target_maps)
+            and (
+                not action_mask
+                or (
+                    action_id < len(action_mask)
+                    and bool(action_mask[action_id])
+                )
+            )
+        ]
+        if len(valid_indices) < 2:
+            return None
+
+        normalized_advantage = self._build_env_action_model_robust_advantage(
+            target_maps=target_maps,
+            valid_indices=valid_indices,
+        )
+        projection_info = dict(
+            row.get("action_info", {}).get("action_projection", {})
+        )
+        old_probs_raw = projection_info.get("masked_env_action_probs", [])
+        if (
+            isinstance(old_probs_raw, list)
+            and len(old_probs_raw) == int(actor_scores.shape[-1])
+        ):
+            old_probs = torch.as_tensor(
+                [
+                    float(old_probs_raw[action_id])
+                    for action_id in valid_indices
+                ],
+                dtype=torch.float32,
+                device=self._device,
+            )
+            old_probs = old_probs / old_probs.sum().clamp_min(1e-8)
+        else:
+            old_probs = torch.softmax(
+                actor_scores.detach()[valid_indices],
+                dim=-1,
+            )
+        normalized_regret = self._normalized_env_action_counterfactual_regret(
+            old_probs=old_probs,
+            normalized_advantage=normalized_advantage,
+        )
+        effective_target_kl = (
+            self._env_action_model_policy_improvement_target_kl
+        )
+        if (
+            self._env_action_model_policy_improvement_regret_adaptive_kl_enabled
+        ):
+            effective_target_kl = (
+                self._env_action_model_policy_improvement_target_kl
+                + (
+                    self._env_action_model_policy_improvement_max_target_kl
+                    - self._env_action_model_policy_improvement_target_kl
+                )
+                * float(normalized_regret.item())
+            )
+        improved_target = self._build_env_action_model_improved_target(
+            old_probs=old_probs,
+            normalized_advantage=normalized_advantage,
+            target_kl=effective_target_kl,
+        )
+        target_kl = torch.sum(
+            improved_target
+            * (
+                torch.log(improved_target.clamp_min(1e-8))
+                - torch.log(old_probs.clamp_min(1e-8))
+            )
+        )
+        return {
+            "actor_scores": actor_scores,
+            "valid_indices": valid_indices,
+            "old_probs": old_probs,
+            "improved_target": improved_target,
+            "target_action_id": valid_indices[
+                int(torch.argmax(improved_target).item())
+            ],
+            "normalized_regret": normalized_regret,
+            "target_kl": target_kl,
+        }
+
+    def _compute_env_action_model_policy_improvement_loss(
+        self,
+        *,
+        batch_outputs: list[dict[str, Any]],
+        batch_rows: list[dict[str, Any]],
+        batch_action_masks: list[list[bool] | None],
+        logit_projection_enabled: bool = False,
+        sample_weights: list[float] | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        zero = torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        if not self._env_action_model_policy_improvement_enabled:
+            return zero, zero
+        effective_sample_weights = (
+            [1.0] * len(batch_outputs)
+            if sample_weights is None
+            else [max(float(weight), 0.0) for weight in sample_weights]
+        )
+        if len(effective_sample_weights) != len(batch_outputs):
+            raise ValueError("sample_weights must align with batch_outputs")
+
+        loss_terms: list[torch.Tensor] = []
+        loss_weights: list[torch.Tensor] = []
+        target_kl_terms: list[torch.Tensor] = []
+        for output, row, action_mask, sample_weight in zip(
+            batch_outputs,
+            batch_rows,
+            batch_action_masks,
+            effective_sample_weights,
+        ):
+            context = self._build_env_action_model_policy_improvement_context(
+                output=output,
+                row=row,
+                action_mask=action_mask,
+            )
+            if context is None:
+                continue
+            actor_scores = context["actor_scores"]
+            valid_indices = context["valid_indices"]
+            improved_target = context["improved_target"]
+            normalized_regret = context["normalized_regret"]
+            loss_weight = (
+                1.0
+                + self._env_action_model_policy_improvement_regret_priority_coef
+                * normalized_regret
+            )
+            loss_weight = loss_weight * sample_weight
+            if logit_projection_enabled:
+                current_logits = actor_scores[valid_indices]
+                current_logits = current_logits - current_logits.mean()
+                target_logits = torch.log(improved_target.clamp_min(1e-8))
+                target_logits = target_logits - target_logits.mean()
+                projection_loss = nn.functional.smooth_l1_loss(
+                    current_logits,
+                    target_logits.detach(),
+                )
+                loss_terms.append(loss_weight * projection_loss)
+            else:
+                current_log_probs = torch.log_softmax(
+                    actor_scores[valid_indices],
+                    dim=-1,
+                )
+                loss_terms.append(
+                    -loss_weight
+                    * torch.sum(improved_target * current_log_probs)
+                )
+            loss_weights.append(loss_weight)
+            target_kl_terms.append(context["target_kl"])
+
+        return (
+            (
+                torch.stack(loss_terms).sum()
+                / torch.stack(loss_weights).sum().clamp_min(1e-6)
+                if loss_terms
+                else zero
+            ),
+            torch.stack(target_kl_terms).mean() if target_kl_terms else zero,
+        )
+
+    @staticmethod
+    def _build_tail_target_balance_weights(
+        selected: list[tuple[int, float, int, bool]],
+        *,
+        power: float,
+        max_weight: float,
+    ) -> tuple[dict[int, float], dict[str, float]]:
+        if not selected:
+            return {}, {}
+        target_counts: dict[int, int] = {}
+        for _, _, target_action, _ in selected:
+            target_counts[target_action] = target_counts.get(target_action, 0) + 1
+        largest_count = max(target_counts.values())
+        clipped_power = min(max(float(power), 0.0), 1.0)
+        clipped_max_weight = max(float(max_weight), 1.0)
+        raw_by_target = {
+            target_action: min(
+                (largest_count / max(count, 1)) ** clipped_power,
+                clipped_max_weight,
+            )
+            for target_action, count in target_counts.items()
+        }
+        sample_mean = sum(
+            target_counts[target_action] * raw_weight
+            for target_action, raw_weight in raw_by_target.items()
+        ) / len(selected)
+        normalized_by_target = {
+            target_action: raw_weight / max(sample_mean, 1e-8)
+            for target_action, raw_weight in raw_by_target.items()
+        }
+        return (
+            {
+                index: normalized_by_target[target_action]
+                for index, _, target_action, _ in selected
+            },
+            {
+                str(target_action): normalized_by_target[target_action]
+                for target_action in sorted(normalized_by_target)
+            },
+        )
+
+    def _mean_env_action_model_policy_kl(
+        self,
+        *,
+        semantic_states: list[dict[str, Any]],
+        run_metadata_by_row: list[dict[str, Any]],
+        rollout: list[dict[str, Any]],
+        action_masks: list[list[bool] | None],
+        selected_indices: list[int],
+    ) -> float:
+        kl_values: list[float] = []
+        with torch.no_grad():
+            for index in selected_indices:
+                output = self._forward_policy(
+                    semantic_states[index],
+                    run_metadata=run_metadata_by_row[index],
+                )
+                context = (
+                    self._build_env_action_model_policy_improvement_context(
+                        output=output,
+                        row=rollout[index],
+                        action_mask=action_masks[index],
+                    )
+                )
+                if context is None:
+                    continue
+                current_probs = torch.softmax(
+                    context["actor_scores"][context["valid_indices"]],
+                    dim=-1,
+                )
+                old_probs = context["old_probs"]
+                policy_kl = torch.sum(
+                    old_probs
+                    * (
+                        torch.log(old_probs.clamp_min(1e-8))
+                        - torch.log(current_probs.clamp_min(1e-8))
+                    )
+                )
+                kl_values.append(float(policy_kl.item()))
+        return float(fmean(kl_values)) if kl_values else 0.0
+
+    def _run_env_action_model_tail_distillation(
+        self,
+        *,
+        semantic_states: list[dict[str, Any]],
+        run_metadata_by_row: list[dict[str, Any]],
+        rollout: list[dict[str, Any]],
+        action_masks: list[list[bool] | None],
+    ) -> dict[str, Any]:
+        stats = {
+            "enabled": (
+                self._env_action_model_policy_improvement_tail_distillation_enabled
+            ),
+            "candidate_count": 0,
+            "selected_count": 0,
+            "selected_fraction": 0.0,
+            "regret_mean": 0.0,
+            "regret_threshold": 0.0,
+            "selected_regret_mean": 0.0,
+            "loss": 0.0,
+            "update_steps": 0,
+            "executed_epochs": 0,
+            "policy_kl_before": 0.0,
+            "policy_kl_after": 0.0,
+            "early_stop_triggered": False,
+            "residual_optimizer_used": False,
+            "residual_learning_rate_initial": 0.0,
+            "residual_learning_rate_final": 0.0,
+            "backtrack_count": 0,
+            "rejected_epoch_count": 0,
+            "logit_projection_enabled": bool(
+                self._env_action_model_policy_improvement_tail_logit_projection_enabled
+            ),
+            "target_balance_enabled": bool(
+                self._env_action_model_policy_improvement_tail_target_balance_enabled
+            ),
+            "target_balance_power": float(
+                self._env_action_model_policy_improvement_tail_target_balance_power
+            ),
+            "target_balance_max_weight": float(
+                self._env_action_model_policy_improvement_tail_target_balance_max_weight
+            ),
+            "target_balance_weights": {},
+            "target_balance_weight_min": 1.0,
+            "target_balance_weight_mean": 1.0,
+            "target_balance_weight_max": 1.0,
+            "target_action_counts": {},
+            "imagined_target_action_counts": {},
+            "selected_target_action_counts": {},
+            "selected_imagined_target_action_counts": {},
+            "selected_imagined_count": 0,
+            "recovery_candidate_count": 0,
+        }
+        if (
+            not self._env_action_model_policy_improvement_enabled
+            or not self._env_action_model_policy_improvement_tail_distillation_enabled
+            or self._env_action_model_policy_improvement_tail_epochs <= 0
+            or self._env_action_model_policy_improvement_tail_coef <= 0.0
+        ):
+            return stats
+
+        regret_by_index: list[tuple[int, float, int, bool]] = []
+        with torch.no_grad():
+            for index, (state, run_metadata, row, action_mask) in enumerate(
+                zip(
+                    semantic_states,
+                    run_metadata_by_row,
+                    rollout,
+                    action_masks,
+                )
+            ):
+                output = self._forward_policy(
+                    state,
+                    run_metadata=run_metadata,
+                )
+                context = (
+                    self._build_env_action_model_policy_improvement_context(
+                        output=output,
+                        row=row,
+                        action_mask=action_mask,
+                    )
+                )
+                if context is not None:
+                    rollout_info = dict(
+                        row.get("action_info", {}).get(
+                            "env_action_model_rollout",
+                            {},
+                        )
+                    )
+                    if (
+                        self._env_action_model_policy_improvement_tail_beam_only
+                        and not rollout_info.get("beam_action_td_targets")
+                    ):
+                        continue
+                    recovery_signal = self._semantic_state_recovery_signal(
+                        state
+                    )
+                    if (
+                        self._env_action_model_policy_improvement_tail_recovery_only
+                        and recovery_signal <= 0.0
+                    ):
+                        continue
+                    regret_by_index.append(
+                        (
+                            index,
+                            float(context["normalized_regret"].item()),
+                            int(context["target_action_id"]),
+                            bool(row.get("imagination_depth")),
+                        )
+                    )
+        if not regret_by_index:
+            return stats
+
+        regret_values = np.asarray(
+            [regret for _, regret, _, _ in regret_by_index],
+            dtype=np.float32,
+        )
+        regret_threshold = max(
+            self._env_action_model_policy_improvement_tail_min_regret,
+            float(
+                np.quantile(
+                    regret_values,
+                    self._env_action_model_policy_improvement_tail_quantile,
+                )
+            ),
+        )
+        selected = [
+            (index, regret, target_action, imagined)
+            for index, regret, target_action, imagined in regret_by_index
+            if regret + 1e-8 >= regret_threshold
+        ]
+        target_action_counts: dict[str, int] = {}
+        for _, _, target_action, _ in regret_by_index:
+            key = str(target_action)
+            target_action_counts[key] = target_action_counts.get(key, 0) + 1
+        selected_target_action_counts: dict[str, int] = {}
+        for _, _, target_action, _ in selected:
+            key = str(target_action)
+            selected_target_action_counts[key] = (
+                selected_target_action_counts.get(key, 0) + 1
+            )
+        imagined_target_action_counts: dict[str, int] = {}
+        for _, _, target_action, imagined in regret_by_index:
+            if imagined:
+                key = str(target_action)
+                imagined_target_action_counts[key] = (
+                    imagined_target_action_counts.get(key, 0) + 1
+                )
+        selected_imagined_target_action_counts: dict[str, int] = {}
+        for _, _, target_action, imagined in selected:
+            if imagined:
+                key = str(target_action)
+                selected_imagined_target_action_counts[key] = (
+                    selected_imagined_target_action_counts.get(key, 0) + 1
+                )
+        stats.update(
+            {
+                "candidate_count": len(regret_by_index),
+                "selected_count": len(selected),
+                "selected_fraction": (
+                    len(selected) / max(len(regret_by_index), 1)
+                ),
+                "regret_mean": float(regret_values.mean()),
+                "regret_threshold": regret_threshold,
+                "selected_regret_mean": (
+                    float(
+                        fmean(
+                            regret
+                            for _, regret, _, _ in selected
+                        )
+                    )
+                    if selected
+                    else 0.0
+                ),
+                "target_action_counts": target_action_counts,
+                "imagined_target_action_counts": (
+                    imagined_target_action_counts
+                ),
+                "selected_target_action_counts": (
+                    selected_target_action_counts
+                ),
+                "selected_imagined_target_action_counts": (
+                    selected_imagined_target_action_counts
+                ),
+                "selected_imagined_count": sum(
+                    1 for _, _, _, imagined in selected if imagined
+                ),
+                "recovery_candidate_count": len(regret_by_index),
+            }
+        )
+        if not selected:
+            return stats
+
+        selected_indices = [index for index, _, _, _ in selected]
+        target_balance_weight_by_index: dict[int, float] = {
+            index: 1.0 for index in selected_indices
+        }
+        target_balance_weights: dict[str, float] = {}
+        if self._env_action_model_policy_improvement_tail_target_balance_enabled:
+            (
+                target_balance_weight_by_index,
+                target_balance_weights,
+            ) = self._build_tail_target_balance_weights(
+                selected,
+                power=(
+                    self._env_action_model_policy_improvement_tail_target_balance_power
+                ),
+                max_weight=(
+                    self._env_action_model_policy_improvement_tail_target_balance_max_weight
+                ),
+            )
+        selected_balance_weights = [
+            target_balance_weight_by_index[index]
+            for index in selected_indices
+        ]
+        stats.update(
+            {
+                "target_balance_weights": target_balance_weights,
+                "target_balance_weight_min": min(selected_balance_weights),
+                "target_balance_weight_mean": float(
+                    fmean(selected_balance_weights)
+                ),
+                "target_balance_weight_max": max(selected_balance_weights),
+            }
+        )
+        stats["policy_kl_before"] = self._mean_env_action_model_policy_kl(
+            semantic_states=semantic_states,
+            run_metadata_by_row=run_metadata_by_row,
+            rollout=rollout,
+            action_masks=action_masks,
+            selected_indices=selected_indices,
+        )
+        batch_size = max(1, min(self._batch_size, len(selected_indices)))
+        loss_total = 0.0
+        update_steps = 0
+        executed_epochs = 0
+        early_stop_triggered = False
+        backtrack_count = 0
+        rejected_epoch_count = 0
+        trainable_adapter_prefixes = (
+            (
+                "digital_twin_planning_adapter.",
+                "outcome_recovery_adapter.",
+                "outcome_context_residual_adapter.",
+            )
+            if self._env_action_model_policy_improvement_tail_planning_adapter_only
+            else (
+                "outcome_recovery_adapter.",
+                "outcome_context_residual_adapter.",
+            )
+        )
+        residual_parameters = [
+            parameter
+            for parameter_name, parameter in self._network.named_parameters()
+            if parameter_name.startswith(trainable_adapter_prefixes)
+        ]
+        residual_optimizer: torch.optim.Optimizer | None = None
+        if (
+            self._env_action_model_policy_improvement_tail_residual_optimizer_enabled
+            and residual_parameters
+            and (
+                self._env_action_model_policy_improvement_tail_adapter_only
+                or self._env_action_model_policy_improvement_tail_planning_adapter_only
+            )
+        ):
+            residual_optimizer = torch.optim.Adam(
+                residual_parameters,
+                lr=(
+                    self._env_action_model_policy_improvement_tail_residual_learning_rate
+                ),
+            )
+        active_optimizer = (
+            residual_optimizer
+            if residual_optimizer is not None
+            else self._optimizer
+        )
+        epoch_index = 0
+        while (
+            epoch_index
+            < self._env_action_model_policy_improvement_tail_epochs
+        ):
+            epoch_network_state = None
+            epoch_optimizer_state = None
+            epoch_loss_total_before = loss_total
+            epoch_update_steps_before = update_steps
+            if (
+                self._env_action_model_policy_improvement_tail_max_policy_kl
+                > 0.0
+            ):
+                epoch_network_state = deepcopy(
+                    self._network.state_dict()
+                )
+                epoch_optimizer_state = deepcopy(
+                    active_optimizer.state_dict()
+                )
+            permutation = torch.randperm(
+                len(selected_indices),
+                device=self._device,
+            )
+            for start_index in range(0, len(selected_indices), batch_size):
+                batch_positions = permutation[
+                    start_index : start_index + batch_size
+                ].detach().cpu().tolist()
+                batch_indices = [
+                    selected_indices[int(position)]
+                    for position in batch_positions
+                ]
+                batch_outputs = [
+                    self._forward_policy(
+                        semantic_states[index],
+                        run_metadata=run_metadata_by_row[index],
+                    )
+                    for index in batch_indices
+                ]
+                tail_loss, _ = (
+                    self._compute_env_action_model_policy_improvement_loss(
+                        batch_outputs=batch_outputs,
+                        batch_rows=[rollout[index] for index in batch_indices],
+                    batch_action_masks=[
+                        action_masks[index] for index in batch_indices
+                    ],
+                    logit_projection_enabled=(
+                        self._env_action_model_policy_improvement_tail_logit_projection_enabled
+                    ),
+                    sample_weights=[
+                        target_balance_weight_by_index[index]
+                        for index in batch_indices
+                    ],
+                )
+                )
+                weighted_tail_loss = (
+                    self._env_action_model_policy_improvement_tail_coef
+                    * tail_loss
+                )
+                active_optimizer.zero_grad()
+                weighted_tail_loss.backward()
+                if (
+                    self._env_action_model_policy_improvement_tail_adapter_only
+                    or self._env_action_model_policy_improvement_tail_planning_adapter_only
+                ):
+                    for parameter_name, parameter in self._network.named_parameters():
+                        if not parameter_name.startswith(
+                            trainable_adapter_prefixes
+                        ):
+                            parameter.grad = None
+                nn.utils.clip_grad_norm_(
+                    (
+                        residual_parameters
+                        if residual_optimizer is not None
+                        else self._network.parameters()
+                    ),
+                    max_norm=self._max_grad_norm,
+                )
+                active_optimizer.step()
+                loss_total += float(tail_loss.item())
+                update_steps += 1
+            if (
+                self._env_action_model_policy_improvement_tail_max_policy_kl
+                > 0.0
+            ):
+                current_policy_kl = (
+                    self._mean_env_action_model_policy_kl(
+                        semantic_states=semantic_states,
+                        run_metadata_by_row=run_metadata_by_row,
+                        rollout=rollout,
+                        action_masks=action_masks,
+                        selected_indices=selected_indices,
+                    )
+                )
+                if (
+                    current_policy_kl
+                    >= self._env_action_model_policy_improvement_tail_max_policy_kl
+                ):
+                    if epoch_network_state is not None:
+                        self._network.load_state_dict(epoch_network_state)
+                    if epoch_optimizer_state is not None:
+                        active_optimizer.load_state_dict(epoch_optimizer_state)
+                    loss_total = epoch_loss_total_before
+                    update_steps = epoch_update_steps_before
+                    rejected_epoch_count += 1
+                    if (
+                        residual_optimizer is not None
+                        and backtrack_count
+                        < self._env_action_model_policy_improvement_tail_residual_max_backtracks
+                    ):
+                        current_learning_rate = float(
+                            active_optimizer.param_groups[0]["lr"]
+                        )
+                        next_learning_rate = max(
+                            current_learning_rate
+                            * self._env_action_model_policy_improvement_tail_residual_backtrack_factor,
+                            self._env_action_model_policy_improvement_tail_residual_min_learning_rate,
+                        )
+                        if next_learning_rate < current_learning_rate - 1e-12:
+                            for parameter_group in active_optimizer.param_groups:
+                                parameter_group["lr"] = next_learning_rate
+                            backtrack_count += 1
+                            continue
+                    early_stop_triggered = True
+                    break
+            executed_epochs += 1
+            epoch_index += 1
+        residual_learning_rate_final = (
+            float(residual_optimizer.param_groups[0]["lr"])
+            if residual_optimizer is not None
+            else 0.0
+        )
+        stats.update(
+            {
+                "loss": loss_total / max(update_steps, 1),
+                "update_steps": update_steps,
+                "executed_epochs": executed_epochs,
+                "early_stop_triggered": early_stop_triggered,
+                "residual_optimizer_used": residual_optimizer is not None,
+                "residual_learning_rate_initial": (
+                    self._env_action_model_policy_improvement_tail_residual_learning_rate
+                    if residual_optimizer is not None
+                    else 0.0
+                ),
+                "residual_learning_rate_final": residual_learning_rate_final,
+                "backtrack_count": backtrack_count,
+                "rejected_epoch_count": rejected_epoch_count,
+                "policy_kl_after": (
+                    self._mean_env_action_model_policy_kl(
+                        semantic_states=semantic_states,
+                        run_metadata_by_row=run_metadata_by_row,
+                        rollout=rollout,
+                        action_masks=action_masks,
+                        selected_indices=selected_indices,
+                    )
+                ),
+            }
+        )
+        return stats
+
+    @staticmethod
+    def _semantic_state_recovery_signal(
+        semantic_state: dict[str, Any],
+    ) -> float:
+        memory = semantic_state.get("algorithm_memory", {})
+        if not isinstance(memory, dict):
+            return 0.0
+        return max(
+            _clamp01(
+                float(memory.get("failed_prepare_streak", 0) or 0) / 8.0
+            ),
+            _clamp01(
+                float(memory.get("no_progress_streak", 0) or 0) / 8.0
+            ),
+            float(bool(memory.get("last_handoff_failed", False))),
+            float(bool(memory.get("last_stall", False))),
+        )
 
     def _net_utility_cost_signal(self, row: dict[str, Any]) -> float:
         if not self._net_utility_prd_enabled:
@@ -10967,6 +13880,24 @@ class 分层PPO基类(BaseAgent):
             "digital_twin_handoff_fast_scale": self._digital_twin_handoff_fast_scale,
             "digital_twin_handoff_event_scale": self._digital_twin_handoff_event_scale,
             "digital_twin_handoff_critic_scale": self._digital_twin_handoff_critic_scale,
+            "digital_twin_planning_residual_enabled": (
+                self._digital_twin_planning_residual_enabled
+            ),
+            "digital_twin_planning_residual_scale": (
+                self._digital_twin_planning_residual_scale
+            ),
+            "outcome_memory_fusion_enabled": self._outcome_memory_fusion_enabled,
+            "outcome_memory_actor_scale": self._outcome_memory_actor_scale,
+            "outcome_memory_critic_scale": self._outcome_memory_critic_scale,
+            "outcome_recovery_residual_enabled": (
+                self._outcome_recovery_residual_enabled
+            ),
+            "outcome_recovery_residual_scale": (
+                self._outcome_recovery_residual_scale
+            ),
+            "outcome_context_residual_enabled": (
+                self._outcome_context_residual_enabled
+            ),
             "digital_twin_policy_prior_enabled": self._digital_twin_policy_prior_enabled,
             "digital_twin_policy_prior_logit_bias": self._digital_twin_policy_prior_logit_bias,
             "digital_twin_policy_prior_event_scale": self._digital_twin_policy_prior_event_scale,
@@ -11303,6 +14234,196 @@ class 分层PPO基类(BaseAgent):
             "option_gate_counterfactual_prd_enabled": self._option_gate_counterfactual_prd_enabled,
             "option_gate_counterfactual_coef": self._option_gate_counterfactual_coef,
             "option_gate_counterfactual_clip": self._option_gate_counterfactual_clip,
+            "option_counterfactual_critic_enabled": self._option_counterfactual_critic_enabled,
+            "option_counterfactual_value_coef": self._option_counterfactual_value_coef,
+            "option_counterfactual_advantage_coef": self._option_counterfactual_advantage_coef,
+            "option_counterfactual_advantage_clip": self._option_counterfactual_advantage_clip,
+            "option_counterfactual_warmup_updates": self._option_counterfactual_warmup_updates,
+            "option_counterfactual_tail_weight": self._option_counterfactual_tail_weight,
+            "option_counterfactual_policy_improvement_enabled": (
+                self._option_counterfactual_policy_improvement_enabled
+            ),
+            "option_counterfactual_policy_improvement_coef": (
+                self._option_counterfactual_policy_improvement_coef
+            ),
+            "option_counterfactual_policy_improvement_clip": (
+                self._option_counterfactual_policy_improvement_clip
+            ),
+            "option_counterfactual_policy_improvement_deterministic_only": (
+                self._option_counterfactual_policy_improvement_deterministic_only
+            ),
+            "option_counterfactual_model_rollout_enabled": (
+                self._option_counterfactual_model_rollout_enabled
+            ),
+            "option_counterfactual_model_rollout_horizon": (
+                self._option_counterfactual_model_rollout_horizon
+            ),
+            "env_action_model_critic_enabled": self._env_action_model_critic_enabled,
+            "env_action_model_critic_value_coef": self._env_action_model_critic_value_coef,
+            "env_action_model_critic_advantage_coef": (
+                self._env_action_model_critic_advantage_coef
+            ),
+            "env_action_model_critic_policy_improvement_coef": (
+                self._env_action_model_critic_policy_improvement_coef
+            ),
+            "env_action_model_critic_advantage_clip": (
+                self._env_action_model_critic_advantage_clip
+            ),
+            "env_action_model_critic_warmup_updates": (
+                self._env_action_model_critic_warmup_updates
+            ),
+            "env_action_model_rollout_enabled": self._env_action_model_rollout_enabled,
+            "env_action_model_rollout_horizon": self._env_action_model_rollout_horizon,
+            "env_action_model_rollout_horizons": list(
+                self._env_action_model_rollout_horizons
+            ),
+            "env_action_model_imagination_replay_enabled": (
+                self._env_action_model_imagination_replay_enabled
+            ),
+            "env_action_model_imagination_replay_depths": list(
+                self._env_action_model_imagination_replay_depths
+            ),
+            "env_action_model_imagination_replay_horizons": list(
+                self._env_action_model_imagination_replay_horizons
+            ),
+            "env_action_model_imagination_replay_recovery_only": (
+                self._env_action_model_imagination_replay_recovery_only
+            ),
+            "env_action_model_imagination_beam_search_enabled": (
+                self._env_action_model_imagination_beam_search_enabled
+            ),
+            "env_action_model_policy_improvement_enabled": (
+                self._env_action_model_policy_improvement_enabled
+            ),
+            "env_action_model_policy_improvement_coef": (
+                self._env_action_model_policy_improvement_coef
+            ),
+            "env_action_model_policy_improvement_temperature": (
+                self._env_action_model_policy_improvement_temperature
+            ),
+            "env_action_model_policy_improvement_robust_horizons_enabled": (
+                self._env_action_model_policy_improvement_robust_horizons_enabled
+            ),
+            "env_action_model_policy_improvement_horizon_risk_coef": (
+                self._env_action_model_policy_improvement_horizon_risk_coef
+            ),
+            "env_action_model_policy_improvement_horizon_aggregation_mode": (
+                self._env_action_model_policy_improvement_horizon_aggregation_mode
+            ),
+            "env_action_model_policy_improvement_horizon_lambda": (
+                self._env_action_model_policy_improvement_horizon_lambda
+            ),
+            "env_action_model_policy_improvement_adaptive_kl_enabled": (
+                self._env_action_model_policy_improvement_adaptive_kl_enabled
+            ),
+            "env_action_model_policy_improvement_target_kl": (
+                self._env_action_model_policy_improvement_target_kl
+            ),
+            "env_action_model_policy_improvement_regret_adaptive_kl_enabled": (
+                self._env_action_model_policy_improvement_regret_adaptive_kl_enabled
+            ),
+            "env_action_model_policy_improvement_max_target_kl": (
+                self._env_action_model_policy_improvement_max_target_kl
+            ),
+            "env_action_model_policy_improvement_regret_priority_coef": (
+                self._env_action_model_policy_improvement_regret_priority_coef
+            ),
+            "env_action_model_policy_improvement_tail_distillation_enabled": (
+                self._env_action_model_policy_improvement_tail_distillation_enabled
+            ),
+            "env_action_model_policy_improvement_tail_quantile": (
+                self._env_action_model_policy_improvement_tail_quantile
+            ),
+            "env_action_model_policy_improvement_tail_min_regret": (
+                self._env_action_model_policy_improvement_tail_min_regret
+            ),
+            "env_action_model_policy_improvement_tail_epochs": (
+                self._env_action_model_policy_improvement_tail_epochs
+            ),
+            "env_action_model_policy_improvement_tail_coef": (
+                self._env_action_model_policy_improvement_tail_coef
+            ),
+            "env_action_model_policy_improvement_tail_max_policy_kl": (
+                self._env_action_model_policy_improvement_tail_max_policy_kl
+            ),
+            "env_action_model_policy_improvement_tail_recovery_only": (
+                self._env_action_model_policy_improvement_tail_recovery_only
+            ),
+            "env_action_model_policy_improvement_tail_adapter_only": (
+                self._env_action_model_policy_improvement_tail_adapter_only
+            ),
+            "env_action_model_policy_improvement_tail_beam_only": (
+                self._env_action_model_policy_improvement_tail_beam_only
+            ),
+            "env_action_model_policy_improvement_tail_planning_adapter_only": (
+                self._env_action_model_policy_improvement_tail_planning_adapter_only
+            ),
+            "env_action_model_policy_improvement_tail_residual_optimizer_enabled": (
+                self._env_action_model_policy_improvement_tail_residual_optimizer_enabled
+            ),
+            "env_action_model_policy_improvement_tail_residual_learning_rate": (
+                self._env_action_model_policy_improvement_tail_residual_learning_rate
+            ),
+            "env_action_model_policy_improvement_tail_residual_backtrack_factor": (
+                self._env_action_model_policy_improvement_tail_residual_backtrack_factor
+            ),
+            "env_action_model_policy_improvement_tail_residual_min_learning_rate": (
+                self._env_action_model_policy_improvement_tail_residual_min_learning_rate
+            ),
+            "env_action_model_policy_improvement_tail_residual_max_backtracks": (
+                self._env_action_model_policy_improvement_tail_residual_max_backtracks
+            ),
+            "env_action_model_policy_improvement_tail_logit_projection_enabled": (
+                self._env_action_model_policy_improvement_tail_logit_projection_enabled
+            ),
+            "env_action_model_policy_improvement_tail_target_balance_enabled": (
+                self._env_action_model_policy_improvement_tail_target_balance_enabled
+            ),
+            "env_action_model_policy_improvement_tail_target_balance_power": (
+                self._env_action_model_policy_improvement_tail_target_balance_power
+            ),
+            "env_action_model_policy_improvement_tail_target_balance_max_weight": (
+                self._env_action_model_policy_improvement_tail_target_balance_max_weight
+            ),
+            "env_action_model_online_planner_enabled": (
+                self._env_action_model_online_planner_enabled
+            ),
+            "env_action_model_online_planner_coef": (
+                self._env_action_model_online_planner_coef
+            ),
+            "env_action_model_online_planner_mechanism_coef": (
+                self._env_action_model_online_planner_mechanism_coef
+            ),
+            "env_action_model_online_planner_policy_prior_coef": (
+                self._env_action_model_online_planner_policy_prior_coef
+            ),
+            "env_action_model_online_planner_min_margin": (
+                self._env_action_model_online_planner_min_margin
+            ),
+            "env_action_model_online_planner_prefer_beam_targets": (
+                self._env_action_model_online_planner_prefer_beam_targets
+            ),
+            "env_action_model_beam_search_enabled": (
+                self._env_action_model_beam_search_enabled
+            ),
+            "env_action_model_beam_search_horizon": (
+                self._env_action_model_beam_search_horizon
+            ),
+            "env_action_model_beam_search_width": (
+                self._env_action_model_beam_search_width
+            ),
+            "env_action_model_beam_search_context_only": (
+                self._env_action_model_beam_search_context_only
+            ),
+            "env_action_model_beam_search_min_eta": (
+                self._env_action_model_beam_search_min_eta
+            ),
+            "env_action_model_beam_search_max_eta": (
+                self._env_action_model_beam_search_max_eta
+            ),
+            "env_action_model_policy_improvement_prefer_beam_targets": (
+                self._env_action_model_policy_improvement_prefer_beam_targets
+            ),
             "counterfactual_teacher_prd_enabled": self._counterfactual_teacher_prd_enabled,
             "counterfactual_teacher_event_coef": self._counterfactual_teacher_event_coef,
             "counterfactual_teacher_option_coef": self._counterfactual_teacher_option_coef,

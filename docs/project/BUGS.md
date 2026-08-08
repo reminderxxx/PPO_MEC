@@ -2,6 +2,14 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-08: v93 开发集已领先但仍有训练预算与顶刊证据 blocker（OPEN）
+
+- v93 在两个独立 seed 的同窗口 zero-offset full-stratified dev benchmark 中均高于 PPO、controller-level MAPPO 和 Popularity；seed13 为 `17.901250` vs `16.947000`，seed7 为 `18.068000` vs `16.947000`。这只能作为开发集事实，不能替代 formal/holdout 统计。
+- 当前最大 blocker 是训练预算不对称：v93 seed13 checkpoint 仅 16 episodes，seed7 的独立训练在 episode19 / update2 后因 branch `deepcopy` 反事实计算过慢中止；PPO/MAPPO checkpoint 为 96 episodes。后续 paper comparison 必须统一 episode/update budget，或给出预注册的 compute-matched protocol。
+- v93 仍未完成未消费 formal/hidden、window-outer hierarchical CI、paired sign test/Holm、prediction/system robustness、scalability、完整 ablation package、command log 和 artifact integrity manifest。按 `tmc_review_policy_v3_20260621` 当前 verdict 仍为 `Not TMC-ready` / evidence below `E2_ARTIFACT_AUDITED`。
+- v93 机制目标已修复 delayed prefetch validation 和当前步 handoff alignment，但机制指标仍不是所有 strata 全面领先；完整结果必须同时报告 validated hit、handoff ready、continuity、backhaul 和失败率，不能只报告 total reward。
+- v93 在线 planner 需要每个候选动作做 digital-twin branch replay，训练计算成本高。后续应先做不改变 objective 的 branch reuse / state snapshot 优化，并记录 wall-clock、branch count 和 peak memory；不能通过减少候选或缩短 rollout 后把结果称为等预算。
+
 ## 2026-07-29: v70 formal-min all-baseline reward winner 仍非 paper-ready（OPEN）
 
 - v70 `top_journal_mechanism_v70_sparse_tail_option_mappo` 已在当前 formal-min mixed/full 全量 benchmark 中让 SA-GHMAPPO total reward 排名第一。full_stratified artifact 为 `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730/benchmarks/full_stratified_config_loaded/main_results_full_stratified_20260730_010523_184238/aggregate_summary.json`：SA `32.385729` > DT `31.426667` > popularity `29.969271` > PPO `27.301597` > MAPPO `16.261458`。

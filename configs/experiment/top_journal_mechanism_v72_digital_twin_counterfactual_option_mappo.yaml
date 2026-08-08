@@ -1,0 +1,60 @@
+profile: top_journal_mechanism_v72_digital_twin_counterfactual_option_mappo
+base_profile: top_journal_mechanism_v71_tail_counterfactual_option_mappo
+purpose: >
+  Learn option values for rare cross-RSU workflow decisions from explicit
+  one-step digital-twin branches. The behavior policy remains on-policy;
+  learned critic advantages improve the deterministic deployment policy.
+
+algorithm_delta:
+  - Branches every distinct valid option action once in the training-only digital twin.
+  - Builds environment TD targets for selected and unselected options.
+  - Fits centered option values to centered counterfactual TD targets.
+  - Uses critic-guided deterministic policy improvement after critic warm-up.
+  - Adds no reward shaping, heuristic labels, action override, or evaluator bias.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  prediction_horizon: 16
+  reward_shaping_added: false
+
+training_budget:
+  primary_vehicle_selection: handoff_pressure
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  clip_ratio: 0.12
+  target_kl: 0.015
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  temporal_reward_shaping_enabled: false
+  update_eval_max_windows: 4
+  update_eval_max_workflows: 1
+  post_training_audit_mode: compact
+
+algorithm:
+  option_counterfactual_critic_enabled: true
+  option_counterfactual_model_rollout_enabled: true
+  option_counterfactual_policy_improvement_enabled: true
+  option_counterfactual_policy_improvement_coef: 1.0
+  option_counterfactual_policy_improvement_clip: 2.0
+  option_counterfactual_policy_improvement_deterministic_only: true
+
+compute_accounting:
+  model_query_unit: distinct_valid_option_action_per_training_state
+  paper_requirement: report real transitions, model queries, wall time, and memory
+
+checkpoint_protocol:
+  closed_loop_priority: latest_after_fixed_budget
+  selection_source: no_benchmark_selection
+  disallowed_claim: benchmark_selected_checkpoint
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Promotion requires five-seed equal-real-transition baselines, explicit
+    digital-twin query accounting, non-overlapping formal/hidden windows,
+    ablations, and one-time hidden confirmation.

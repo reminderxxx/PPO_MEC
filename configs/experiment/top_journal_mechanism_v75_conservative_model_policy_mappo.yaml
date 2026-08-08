@@ -1,0 +1,75 @@
+profile: top_journal_mechanism_v75_conservative_model_policy_mappo
+base_profile: top_journal_mechanism_v74_model_based_env_action_mappo
+purpose: >
+  Convert digital-twin action returns into conservative mirror-descent policy
+  targets instead of overriding deployment actions with the learned critic.
+
+algorithm_delta:
+  - Retains four-step counterfactual rollouts for every valid native action.
+  - Forms a conservative target policy proportional to old policy times exponentiated model advantage.
+  - Distills the target into the native-action actor under the existing clipped MAPPO objective.
+  - Keeps the action critic as an auxiliary value learner but removes critic advantage from actor PPO.
+  - Disables critic-based inference logit bias so deployment decisions come from learned actor parameters.
+  - Adds no reward shaping, rule teacher, fixed prior, action guard, or evaluator override.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v74_model_based_env_action_mappo
+  observed_failure: >
+    Direct critic policy improvement over-triggered mechanism actions, reduced
+    workflow continuity, and produced collapse flags in two of three seeds.
+  correction: >
+    Multiplicative old-policy anchoring and temperature-controlled model
+    advantages limit each policy-improvement step without encoding domain rules.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  prediction_horizon: 16
+  reward_shaping_added: false
+
+training_budget:
+  primary_vehicle_selection: handoff_pressure
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  clip_ratio: 0.12
+  target_kl: 0.015
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  temporal_reward_shaping_enabled: false
+  update_eval_max_windows: 4
+  update_eval_max_workflows: 1
+  post_training_audit_mode: compact
+
+algorithm:
+  env_action_model_critic_enabled: true
+  env_action_model_critic_value_coef: 0.5
+  env_action_model_critic_advantage_coef: 0.0
+  env_action_model_critic_policy_improvement_coef: 0.0
+  env_action_model_policy_improvement_enabled: true
+  env_action_model_policy_improvement_coef: 0.35
+  env_action_model_policy_improvement_temperature: 2.5
+  env_action_model_rollout_enabled: true
+  env_action_model_rollout_horizon: 4
+  env_action_ppo_enabled: true
+  env_action_ppo_coef: 0.35
+
+compute_accounting:
+  model_query_unit: valid_native_action_per_training_state
+  model_transition_unit: simulated_branch_step
+  paper_requirement: report real transitions, model queries, model transitions, wall time, and memory
+
+checkpoint_protocol:
+  closed_loop_priority: latest_after_fixed_budget
+  selection_source: no_benchmark_selection
+  disallowed_claim: benchmark_selected_checkpoint
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    This is the final recorded structural correction on the current development
+    split. Promotion still requires independent formal evidence, equal-budget
+    baselines, ablations, support experiments, and one-time hidden confirmation.

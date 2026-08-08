@@ -70,7 +70,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max_mobility_rows", type=int, default=2500)
     parser.add_argument("--max_workflows", type=int, default=2)
     parser.add_argument("--max_steps", type=int, default=12)
-    parser.add_argument("--reward_positive_offset", type=float, default=5.0)
+    parser.add_argument("--reward_positive_offset", type=float, default=0.0)
     parser.add_argument("--workflow_selector", type=str, default="ordered")
     parser.add_argument("--rsu_layout", type=str, default="auto_dominant_tight")
     parser.add_argument("--frame_offset", type=int, default=0)

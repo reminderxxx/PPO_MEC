@@ -2299,6 +2299,47 @@ def test_effective_settings_honor_v70_sparse_tail_option_budget_and_checkpoint_p
     assert Args.sa_profile not in SA_LATEST_FIRST_PROFILES
 
 
+def test_effective_settings_honor_v71_equal_budget_and_latest_checkpoint_policy() -> None:
+    from scripts.run_top_journal_closed_loop import (
+        SA_LATEST_FIRST_PROFILES,
+        SA_REWARD_FIRST_PROFILES,
+    )
+
+    class Args:
+        quick = False
+        sa_profile = "top_journal_mechanism_v71_tail_counterfactual_option_mappo"
+        reward_positive_offset = None
+        prediction_horizon = None
+        sa_episodes = None
+        baseline_episodes = None
+        sa_update_every = None
+        baseline_update_every = None
+        sa_batch_size = None
+        baseline_batch_size = None
+        max_mobility_rows = None
+        max_workflows = None
+        window_length = None
+        window_count = None
+        train_window_count = None
+        window_scan_stride = None
+        max_steps = None
+        min_tasks = None
+        max_tasks = None
+
+    settings = effective_settings(Args())
+
+    assert settings["sa_episodes"] == 256
+    assert settings["baseline_episodes"] == 256
+    assert settings["sa_batch_size"] == 64
+    assert settings["baseline_batch_size"] == 64
+    assert settings["train_window_count"] == 20
+    assert settings["max_mobility_rows"] == 5000000
+    assert settings["prediction_horizon"] == 16
+    assert effective_reward_positive_offset(Args()) == 0.0
+    assert Args.sa_profile not in SA_REWARD_FIRST_PROFILES
+    assert Args.sa_profile in SA_LATEST_FIRST_PROFILES
+
+
 def test_seed_checkpoint_manifest_rejects_seed_keyed_payload() -> None:
     manifest_path = _test_path("seed_keyed_manifest_rejected", "seed_checkpoint_manifest.json")
     manifest_path.write_text(

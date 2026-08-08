@@ -281,6 +281,477 @@ class CheckpointCompatTestCase(unittest.TestCase):
         self.assertEqual(filtered["sparse_handoff_option_min_context"], 0.08)
         self.assertEqual(filtered["sparse_handoff_option_max_eta"], 22)
 
+    def test_sa_v71_checkpoint_config_preserves_counterfactual_option_critic_fields(self) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "option_counterfactual_critic_enabled": True,
+                "option_counterfactual_value_coef": 0.65,
+                "option_counterfactual_advantage_coef": 1.20,
+                "option_counterfactual_advantage_clip": 2.0,
+                "option_counterfactual_warmup_updates": 2,
+                "option_counterfactual_tail_weight": 2.25,
+                "option_counterfactual_policy_improvement_enabled": True,
+                "option_counterfactual_policy_improvement_coef": 1.0,
+                "option_counterfactual_policy_improvement_clip": 2.0,
+                "option_counterfactual_policy_improvement_deterministic_only": True,
+                "option_counterfactual_model_rollout_enabled": True,
+                "option_counterfactual_model_rollout_horizon": 4,
+            },
+        )
+
+        self.assertTrue(filtered["option_counterfactual_critic_enabled"])
+        self.assertEqual(filtered["option_counterfactual_value_coef"], 0.65)
+        self.assertEqual(filtered["option_counterfactual_advantage_coef"], 1.20)
+        self.assertEqual(filtered["option_counterfactual_advantage_clip"], 2.0)
+        self.assertEqual(filtered["option_counterfactual_warmup_updates"], 2)
+        self.assertEqual(filtered["option_counterfactual_tail_weight"], 2.25)
+        self.assertTrue(filtered["option_counterfactual_policy_improvement_enabled"])
+        self.assertEqual(filtered["option_counterfactual_policy_improvement_coef"], 1.0)
+        self.assertEqual(filtered["option_counterfactual_policy_improvement_clip"], 2.0)
+        self.assertTrue(
+            filtered["option_counterfactual_policy_improvement_deterministic_only"]
+        )
+        self.assertTrue(filtered["option_counterfactual_model_rollout_enabled"])
+        self.assertEqual(filtered["option_counterfactual_model_rollout_horizon"], 4)
+
+    def test_sa_v74_checkpoint_config_preserves_action_model_critic_fields(self) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_model_critic_enabled": True,
+                "env_action_model_critic_value_coef": 0.8,
+                "env_action_model_critic_advantage_coef": 1.25,
+                "env_action_model_critic_policy_improvement_coef": 2.0,
+                "env_action_model_critic_advantage_clip": 2.0,
+                "env_action_model_critic_warmup_updates": 2,
+                "env_action_model_rollout_enabled": True,
+                "env_action_model_rollout_horizon": 4,
+                "env_action_model_policy_improvement_enabled": True,
+                "env_action_model_policy_improvement_coef": 0.35,
+                "env_action_model_policy_improvement_temperature": 2.5,
+            },
+        )
+
+        self.assertTrue(filtered["env_action_model_critic_enabled"])
+        self.assertEqual(filtered["env_action_model_critic_value_coef"], 0.8)
+        self.assertEqual(filtered["env_action_model_critic_advantage_coef"], 1.25)
+        self.assertEqual(
+            filtered["env_action_model_critic_policy_improvement_coef"],
+            2.0,
+        )
+        self.assertEqual(filtered["env_action_model_critic_advantage_clip"], 2.0)
+        self.assertEqual(filtered["env_action_model_critic_warmup_updates"], 2)
+        self.assertTrue(filtered["env_action_model_rollout_enabled"])
+        self.assertEqual(filtered["env_action_model_rollout_horizon"], 4)
+        self.assertTrue(filtered["env_action_model_policy_improvement_enabled"])
+        self.assertEqual(
+            filtered["env_action_model_policy_improvement_coef"],
+            0.35,
+        )
+        self.assertEqual(
+            filtered["env_action_model_policy_improvement_temperature"],
+            2.5,
+        )
+
+    def test_sa_v76_checkpoint_config_preserves_memory_and_robust_model_fields(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "outcome_memory_fusion_enabled": True,
+                "outcome_memory_actor_scale": 0.70,
+                "outcome_memory_critic_scale": 0.85,
+                "env_action_model_rollout_horizons": [1, 2, 4, 8],
+                "env_action_model_policy_improvement_robust_horizons_enabled": True,
+                "env_action_model_policy_improvement_horizon_risk_coef": 0.75,
+                "env_action_model_policy_improvement_adaptive_kl_enabled": True,
+                "env_action_model_policy_improvement_target_kl": 0.03,
+            },
+        )
+
+        self.assertTrue(filtered["outcome_memory_fusion_enabled"])
+        self.assertEqual(filtered["outcome_memory_actor_scale"], 0.70)
+        self.assertEqual(filtered["outcome_memory_critic_scale"], 0.85)
+        self.assertEqual(
+            filtered["env_action_model_rollout_horizons"],
+            [1, 2, 4, 8],
+        )
+        self.assertTrue(
+            filtered[
+                "env_action_model_policy_improvement_robust_horizons_enabled"
+            ]
+        )
+        self.assertEqual(
+            filtered[
+                "env_action_model_policy_improvement_horizon_risk_coef"
+            ],
+            0.75,
+        )
+        self.assertTrue(
+            filtered[
+                "env_action_model_policy_improvement_adaptive_kl_enabled"
+            ]
+        )
+        self.assertEqual(
+            filtered["env_action_model_policy_improvement_target_kl"],
+            0.03,
+        )
+
+    def test_sa_v77_checkpoint_config_preserves_temporal_downside_fields(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_model_policy_improvement_horizon_aggregation_mode": (
+                    "lambda_downside"
+                ),
+                "env_action_model_policy_improvement_horizon_lambda": 0.90,
+            },
+        )
+
+        self.assertEqual(
+            filtered[
+                "env_action_model_policy_improvement_horizon_aggregation_mode"
+            ],
+            "lambda_downside",
+        )
+        self.assertEqual(
+            filtered["env_action_model_policy_improvement_horizon_lambda"],
+            0.90,
+        )
+
+    def test_sa_v78_checkpoint_config_preserves_regret_adaptive_fields(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_model_policy_improvement_regret_adaptive_kl_enabled": (
+                    True
+                ),
+                "env_action_model_policy_improvement_max_target_kl": 0.35,
+                "env_action_model_policy_improvement_regret_priority_coef": 2.0,
+            },
+        )
+
+        self.assertTrue(
+            filtered[
+                "env_action_model_policy_improvement_regret_adaptive_kl_enabled"
+            ]
+        )
+        self.assertEqual(
+            filtered["env_action_model_policy_improvement_max_target_kl"],
+            0.35,
+        )
+        self.assertEqual(
+            filtered[
+                "env_action_model_policy_improvement_regret_priority_coef"
+            ],
+            2.0,
+        )
+
+    def test_sa_v79_checkpoint_config_preserves_tail_distillation_fields(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_model_policy_improvement_tail_distillation_enabled": (
+                    True
+                ),
+                "env_action_model_policy_improvement_tail_quantile": 0.75,
+                "env_action_model_policy_improvement_tail_min_regret": 0.50,
+                "env_action_model_policy_improvement_tail_epochs": 8,
+                "env_action_model_policy_improvement_tail_coef": 1.0,
+            },
+        )
+
+        self.assertTrue(
+            filtered[
+                "env_action_model_policy_improvement_tail_distillation_enabled"
+            ]
+        )
+        self.assertEqual(
+            filtered["env_action_model_policy_improvement_tail_quantile"],
+            0.75,
+        )
+        self.assertEqual(
+            filtered["env_action_model_policy_improvement_tail_min_regret"],
+            0.50,
+        )
+        self.assertEqual(
+            filtered["env_action_model_policy_improvement_tail_epochs"],
+            8,
+        )
+        self.assertEqual(
+            filtered["env_action_model_policy_improvement_tail_coef"],
+            1.0,
+        )
+
+    def test_sa_v80_checkpoint_config_preserves_imagination_replay_fields(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_model_imagination_replay_enabled": True,
+                "env_action_model_imagination_replay_depths": [2, 4, 8],
+            },
+        )
+
+        self.assertTrue(
+            filtered["env_action_model_imagination_replay_enabled"]
+        )
+        self.assertEqual(
+            filtered["env_action_model_imagination_replay_depths"],
+            [2, 4, 8],
+        )
+
+    def test_sa_v81_checkpoint_config_preserves_imagination_trust_fields(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_model_imagination_replay_horizons": [1, 2, 4],
+                "env_action_model_policy_improvement_tail_max_policy_kl": 0.05,
+            },
+        )
+
+        self.assertEqual(
+            filtered["env_action_model_imagination_replay_horizons"],
+            [1, 2, 4],
+        )
+        self.assertEqual(
+            filtered[
+                "env_action_model_policy_improvement_tail_max_policy_kl"
+            ],
+            0.05,
+        )
+
+    def test_sa_v82_checkpoint_config_preserves_recovery_only_field(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_model_imagination_replay_recovery_only": True,
+            },
+        )
+
+        self.assertTrue(
+            filtered[
+                "env_action_model_imagination_replay_recovery_only"
+            ]
+        )
+
+    def test_sa_v83_checkpoint_config_preserves_recovery_residual_fields(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "outcome_recovery_residual_enabled": True,
+                "outcome_recovery_residual_scale": 1.0,
+                "env_action_model_policy_improvement_tail_recovery_only": True,
+                "env_action_model_policy_improvement_tail_adapter_only": True,
+            },
+        )
+
+        self.assertTrue(filtered["outcome_recovery_residual_enabled"])
+        self.assertEqual(filtered["outcome_recovery_residual_scale"], 1.0)
+        self.assertTrue(
+            filtered[
+                "env_action_model_policy_improvement_tail_recovery_only"
+            ]
+        )
+        self.assertTrue(
+            filtered[
+                "env_action_model_policy_improvement_tail_adapter_only"
+            ]
+        )
+
+    def test_sa_v85_checkpoint_config_preserves_residual_optimizer_fields(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_model_policy_improvement_tail_residual_optimizer_enabled": (
+                    True
+                ),
+                "env_action_model_policy_improvement_tail_residual_learning_rate": (
+                    0.02
+                ),
+                "env_action_model_policy_improvement_tail_residual_backtrack_factor": (
+                    0.5
+                ),
+                "env_action_model_policy_improvement_tail_residual_min_learning_rate": (
+                    0.00015625
+                ),
+                "env_action_model_policy_improvement_tail_residual_max_backtracks": (
+                    7
+                ),
+            },
+        )
+
+        self.assertTrue(
+            filtered[
+                "env_action_model_policy_improvement_tail_residual_optimizer_enabled"
+            ]
+        )
+        self.assertEqual(
+            filtered[
+                "env_action_model_policy_improvement_tail_residual_learning_rate"
+            ],
+            0.02,
+        )
+        self.assertEqual(
+            filtered[
+                "env_action_model_policy_improvement_tail_residual_backtrack_factor"
+            ],
+            0.5,
+        )
+        self.assertEqual(
+            filtered[
+                "env_action_model_policy_improvement_tail_residual_min_learning_rate"
+            ],
+            0.00015625,
+        )
+        self.assertEqual(
+            filtered[
+                "env_action_model_policy_improvement_tail_residual_max_backtracks"
+            ],
+            7,
+        )
+
+    def test_sa_v86_checkpoint_config_preserves_imagined_beam_field(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_model_imagination_beam_search_enabled": True,
+            },
+        )
+
+        self.assertTrue(
+            filtered["env_action_model_imagination_beam_search_enabled"]
+        )
+
+    def test_sa_v87_checkpoint_config_preserves_logit_projection_field(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_model_policy_improvement_tail_logit_projection_enabled": (
+                    True
+                ),
+            },
+        )
+
+        self.assertTrue(
+            filtered[
+                "env_action_model_policy_improvement_tail_logit_projection_enabled"
+            ]
+        )
+
+    def test_sa_v88_checkpoint_config_preserves_contextual_expert_field(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {"outcome_context_residual_enabled": True},
+        )
+
+        self.assertTrue(filtered["outcome_context_residual_enabled"])
+
+    def test_sa_v89_checkpoint_config_preserves_branch_replay_fields(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_model_imagination_replay_branch_mode": "top_k",
+                "env_action_model_imagination_replay_branch_top_k": 2,
+            },
+        )
+
+        self.assertEqual(
+            filtered["env_action_model_imagination_replay_branch_mode"],
+            "top_k",
+        )
+        self.assertEqual(
+            filtered["env_action_model_imagination_replay_branch_top_k"],
+            2,
+        )
+
+    def test_sa_v91_checkpoint_config_preserves_target_balance_fields(
+        self,
+    ) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_model_policy_improvement_tail_target_balance_enabled": (
+                    True
+                ),
+                "env_action_model_policy_improvement_tail_target_balance_power": (
+                    0.5
+                ),
+                "env_action_model_policy_improvement_tail_target_balance_max_weight": (
+                    4.0
+                ),
+            },
+        )
+
+        self.assertTrue(
+            filtered[
+                "env_action_model_policy_improvement_tail_target_balance_enabled"
+            ]
+        )
+        self.assertEqual(
+            filtered[
+                "env_action_model_policy_improvement_tail_target_balance_power"
+            ],
+            0.5,
+        )
+        self.assertEqual(
+            filtered[
+                "env_action_model_policy_improvement_tail_target_balance_max_weight"
+            ],
+            4.0,
+        )
+
+    def test_sa_v92_checkpoint_config_preserves_online_planner_fields(self) -> None:
+        filtered = _filter_checkpoint_config(
+            "sa_ghmappo",
+            {
+                "env_action_model_online_planner_enabled": True,
+                "env_action_model_online_planner_coef": 1.0,
+                "env_action_model_online_planner_mechanism_coef": 2.0,
+                "env_action_model_online_planner_policy_prior_coef": 0.15,
+                "env_action_model_online_planner_min_margin": 0.08,
+                "env_action_model_online_planner_prefer_beam_targets": True,
+            },
+        )
+
+        self.assertTrue(filtered["env_action_model_online_planner_enabled"])
+        self.assertEqual(filtered["env_action_model_online_planner_coef"], 1.0)
+        self.assertEqual(
+            filtered["env_action_model_online_planner_mechanism_coef"],
+            2.0,
+        )
+        self.assertEqual(
+            filtered["env_action_model_online_planner_policy_prior_coef"],
+            0.15,
+        )
+        self.assertEqual(filtered["env_action_model_online_planner_min_margin"], 0.08)
+        self.assertTrue(filtered["env_action_model_online_planner_prefer_beam_targets"])
+
 
 if __name__ == "__main__":
     unittest.main()

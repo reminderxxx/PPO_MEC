@@ -1,0 +1,60 @@
+profile: top_journal_mechanism_v82_recovery_imagination_mappo
+base_profile: top_journal_mechanism_v81_trust_region_imagination_mappo
+purpose: >
+  Restrict branched imagination replay to training states with observed
+  recovery demand instead of treating ordinary low-risk states as failures.
+
+algorithm_delta:
+  - Retains clipped MAPPO, H1/H2/H4 imagined returns, and joint-KL early stopping.
+  - Admits an imagined state only after stall, no progress, failed preparation, or failed handoff.
+  - Uses outcome memory produced by actual simulator transitions, not an action label or hand-coded recovery action.
+  - Separately reports imagined-state target actions and selected imagined-state target actions.
+  - Uses no development data, reward shaping, heuristic policy, action guard, or evaluator override.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v81_trust_region_imagination_mappo
+  observed_failure: >
+    Unconditional imagination replay was dominated by low-risk warm-cache
+    states where vehicle fallback is genuinely efficient. All selected smoke
+    targets became action2, causing fallback to generalize into no-coverage
+    states and collapsing workflow execution.
+  correction: >
+    Outcome-conditioned admission focuses model capacity on the rare recovery
+    distribution that the algorithm is intended to improve.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  prediction_horizon: 16
+  reward_shaping_added: false
+
+training_budget:
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+
+algorithm:
+  env_action_model_imagination_replay_enabled: true
+  env_action_model_imagination_replay_depths: [2, 4, 8]
+  env_action_model_imagination_replay_horizons: [1, 2, 4]
+  env_action_model_imagination_replay_recovery_only: true
+  env_action_model_policy_improvement_tail_max_policy_kl: 0.05
+  env_action_model_policy_improvement_tail_epochs: 4
+  env_action_model_policy_improvement_tail_coef: 0.75
+
+compute_accounting:
+  model_query_unit: valid_native_action_per_real_or_recovery-imagined_training_state
+  model_transition_unit: simulated_branch_step
+  recovery_state_unit: branch state with observed stall, no-progress, failed-prepare, or failed-handoff memory
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Promotion requires all-baseline development evidence, independent formal
+    and hidden confirmation, equal-budget baselines, ablations, and support
+    experiments under the frozen protocol.

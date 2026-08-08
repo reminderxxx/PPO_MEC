@@ -1,0 +1,58 @@
+profile: top_journal_mechanism_v88_contextual_recovery_expert_mappo
+base_profile: top_journal_mechanism_v87_mirror_residual_projection_mappo
+purpose: >
+  Generalize beam-discovered recovery actions across mobility windows by giving
+  a trainable recovery expert explicit outcome-memory and digital-twin context.
+
+algorithm_delta:
+  - Retains clipped MAPPO, recovery-conditioned beam replay, mirror target projection, and transactional KL rollback.
+  - Adds a zero-initialized residual expert conditioned on the shared graph embedding, 16-dimensional outcome memory, and 14-dimensional digital-twin handoff state.
+  - Trains the contextual expert only on high-regret beam-supported tail states together with the existing residual heads.
+  - Preserves the base MAPPO policy when no failure or stall signal is present through the existing outcome gate.
+  - Uses no action override, reward shaping, heuristic policy, evaluator bias, or development labels.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v87_mirror_residual_projection_mappo
+  observed_failure: >
+    Mirror projection converged on selected training states, but the hard unseen
+    window retained the repeated-prepare trajectory. The recovery adapter saw
+    only a LayerNorm-mixed shared embedding, so failure streak and handoff-state
+    variables were not directly available to its function approximator.
+  correction: >
+    A contextual residual expert exposes the causal recovery variables directly
+    while still learning its action preferences exclusively from digital-twin
+    returns under the same trust region.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  temporal_reward_shaping_enabled: false
+  reward_shaping_added: false
+
+training_budget:
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  prediction_horizon: 16
+
+algorithm:
+  outcome_context_residual_enabled: true
+  env_action_model_imagination_beam_search_enabled: true
+  env_action_model_policy_improvement_tail_logit_projection_enabled: true
+  env_action_model_policy_improvement_tail_residual_optimizer_enabled: true
+  env_action_model_policy_improvement_tail_max_policy_kl: 0.35
+
+compute_accounting:
+  contextual_expert_input: shared graph embedding plus outcome memory plus digital-twin handoff features
+  paper_requirement: report parameter count, model transitions, selected observed/imagined states, accepted KL, rejected epochs, wall time, and memory
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Development-only until targeted mechanism verification, fresh multi-seed
+    training, complete baselines, strict formal/hidden evaluation, statistics,
+    and mechanism ablations pass.

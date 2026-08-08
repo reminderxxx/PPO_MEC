@@ -1,0 +1,62 @@
+profile: top_journal_mechanism_v92_online_counterfactual_mappo
+base_profile: top_journal_mechanism_v91_balanced_recovery_distillation_mappo
+purpose: >
+  Close the train-deploy gap by using the same digital-twin counterfactual
+  returns used by MAPPO training for an online trust-region action improvement.
+
+algorithm_delta:
+  - Retains clipped MAPPO, centralized value learning, robust multi-horizon targets, top-k recovery imagination, causal recovery residuals, and target-balanced tail distillation.
+  - Scores legal actions with model-based robust advantage plus a policy log-probability prior, so planning can improve actions without discarding the learned MAPPO policy.
+  - Relabels the selected action's PPO log-probability and head credit before the transition is stored, preserving the on-policy contract.
+  - Uses no reward offset, evaluator override, heuristic fallback, or development label.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v91_balanced_recovery_distillation_mappo
+  observed_failure: >
+    v91 learned counterfactual targets during training but deployed the base
+    policy unchanged; the hard j_3 window repeatedly selected fallback actions
+    and missed workflow completion.
+  correction: >
+    The online counterfactual MAPPO planner applies the learned policy prior and
+    robust digital-twin return at each legal decision, with exact PPO statistics
+    relabelled for the selected action.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  temporal_reward_shaping_enabled: false
+  reward_shaping_added: false
+
+training_budget:
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  prediction_horizon: 16
+
+algorithm:
+  env_action_model_online_planner_enabled: true
+  env_action_model_online_planner_coef: 1.0
+  env_action_model_online_planner_policy_prior_coef: 0.15
+  env_action_model_online_planner_min_margin: 0.0
+  env_action_model_online_planner_prefer_beam_targets: false
+  env_action_model_imagination_beam_search_enabled: false
+  env_action_model_policy_improvement_tail_target_balance_enabled: true
+  env_action_model_policy_improvement_tail_target_balance_power: 0.5
+  env_action_model_policy_improvement_tail_target_balance_max_weight: 4.0
+  env_action_model_policy_improvement_tail_adapter_only: true
+  env_action_model_policy_improvement_tail_max_policy_kl: 0.35
+
+compute_accounting:
+  online_planning_protocol: robust_multi_horizon_counterfactual_return_plus_policy_prior_v1
+  paper_requirement: report model transitions, target margins, planner action changes, PPO relabelling, compute overhead, and planner ablation
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Development-only until fresh multi-seed training, equal-budget learned and
+    model-based baselines, strict formal/hidden evaluation, statistics,
+    ablations, and novelty review pass.

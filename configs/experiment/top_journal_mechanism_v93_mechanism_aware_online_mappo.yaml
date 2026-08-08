@@ -1,0 +1,61 @@
+profile: top_journal_mechanism_v93_mechanism_aware_online_mappo
+base_profile: top_journal_mechanism_v92_online_counterfactual_mappo
+purpose: >
+  Select actions using both long-horizon return and whether the digital-twin
+  branch actually realizes the handoff/cache mechanism.
+
+algorithm_delta:
+  - Retains clipped MAPPO, centralized value learning, robust multi-horizon counterfactual returns, causal recovery residuals, target-balanced tail distillation, and policy-prior constrained online planning.
+  - Adds a binary mechanism target from each legal simulated branch: strict realization, validated prefetch, or a handoff-aligned prepare transition.
+  - Replays the same delayed prefetch validation window used by the evaluator inside the digital twin.
+  - Adds the normalized mechanism advantage to the model-return advantage before the MAPPO policy-prior term.
+  - Keeps the target outside the reward function and reports strict realization and handoff alignment separately.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v92_online_counterfactual_mappo
+  observed_failure: >
+    v92 improved continuity and reduced handoff failures, but hard-window
+    prefetch/migration attempts had zero validated success.
+  correction: >
+    v93 optimizes for mechanism realization in the counterfactual action value,
+    preventing a low-delay but non-realized preparation action from dominating.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  temporal_reward_shaping_enabled: false
+  reward_shaping_added: false
+
+training_budget:
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  prediction_horizon: 16
+
+algorithm:
+  env_action_model_online_planner_enabled: true
+  env_action_model_online_planner_coef: 1.0
+  env_action_model_online_planner_mechanism_coef: 2.0
+  env_action_model_online_planner_policy_prior_coef: 0.15
+  env_action_model_online_planner_min_margin: 0.0
+  env_action_model_online_planner_prefer_beam_targets: false
+  env_action_model_imagination_beam_search_enabled: false
+  env_action_model_policy_improvement_tail_target_balance_enabled: true
+  env_action_model_policy_improvement_tail_target_balance_power: 0.5
+  env_action_model_policy_improvement_tail_target_balance_max_weight: 4.0
+  env_action_model_policy_improvement_tail_adapter_only: true
+  env_action_model_policy_improvement_tail_max_policy_kl: 0.35
+
+compute_accounting:
+  mechanism_target_protocol: branch_replay_prefetch_validation_and_handoff_alignment_v2
+  paper_requirement: report return advantage, mechanism advantage, action changes, validated success, compute overhead, and planner ablation
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Development-only until fresh multi-seed training, equal-budget baselines,
+    strict formal/hidden evaluation, statistics, ablations, and novelty review pass.

@@ -1,0 +1,71 @@
+profile: top_journal_mechanism_v84_search_distilled_residual_mappo
+base_profile: top_journal_mechanism_v83_recovery_residual_mappo
+purpose: >
+  Remove actor-continuation bias from model-based policy improvement by
+  distilling short-horizon digital-twin beam search into an isolated planning
+  residual head.
+
+algorithm_delta:
+  - Retains clipped MAPPO, outcome-gated recovery residuals, and exact training-only digital-twin transitions.
+  - Runs discrete beam search only in predicted-handoff or observed-recovery states.
+  - Compares each first action under its best searched continuation instead of the current actor continuation.
+  - Distills high-regret beam targets only into a zero-initialized planning residual head.
+  - Uses a context-local trust region, preserving the base policy outside planning states.
+  - Uses no action labels, reward shaping, heuristic policy, evaluator override, or development data.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v83_recovery_residual_mappo
+  observed_failure: >
+    The policy matched the strongest rule on most windows but repeated action4
+    in two hard workflows. One-action counterfactual evaluation could not
+    represent the successful prefetch-then-prepare continuation.
+  correction: >
+    Search-backed policy improvement exposes coordinated action sequences and
+    transfers only their first-action distribution into MAPPO.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  temporal_reward_shaping_enabled: false
+  reward_shaping_added: false
+
+training_budget:
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  prediction_horizon: 16
+
+algorithm:
+  digital_twin_planning_residual_enabled: true
+  digital_twin_planning_residual_scale: 1.0
+  env_action_model_beam_search_enabled: true
+  env_action_model_beam_search_horizon: 6
+  env_action_model_beam_search_width: 2
+  env_action_model_beam_search_context_only: true
+  env_action_model_beam_search_min_eta: 2
+  env_action_model_beam_search_max_eta: 8
+  env_action_model_policy_improvement_prefer_beam_targets: true
+  env_action_model_policy_improvement_tail_recovery_only: false
+  env_action_model_policy_improvement_tail_adapter_only: false
+  env_action_model_policy_improvement_tail_beam_only: true
+  env_action_model_policy_improvement_tail_planning_adapter_only: true
+  env_action_model_policy_improvement_tail_epochs: 8
+  env_action_model_policy_improvement_tail_coef: 1.0
+  env_action_model_policy_improvement_tail_max_policy_kl: 0.20
+  env_action_model_policy_improvement_tail_min_regret: 0.35
+
+compute_accounting:
+  beam_query_unit: one digital-twin action transition expanded by beam search
+  beam_width: 2
+  beam_horizon: 6
+  paper_requirement: report real transitions, actor rollouts, beam transitions, residual updates, wall time, and memory
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Development-only until fresh multi-seed training, complete baselines,
+    strict formal/hidden evaluation, statistics, and mechanism ablations pass.

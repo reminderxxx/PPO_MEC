@@ -1,0 +1,65 @@
+profile: top_journal_mechanism_v86_recovery_beam_replay_mappo
+base_profile: top_journal_mechanism_v85_trust_region_residual_search_mappo
+purpose: >
+  Learn recovery actions before an on-policy failure is encountered by applying
+  the same digital-twin beam search to counterfactually imagined recovery states.
+
+algorithm_delta:
+  - Retains clipped MAPPO, recurrent outcome memory, dual residual heads, and KL-constrained residual optimization.
+  - Rolls the current MAPPO policy forward only in the training digital twin to expose latent stall and failed-handoff states.
+  - Starts a discrete beam search from each imagined recovery-state snapshot rather than from the real rollout root.
+  - Distils only high-regret beam targets, so imagined states now satisfy the same search-evidence gate as observed states.
+  - Records imagined beam transitions separately through the existing model-query and transition accounting.
+  - Uses no action override, reward shaping, heuristic policy, evaluator bias, or development labels.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v85_trust_region_residual_search_mappo
+  observed_failure: >
+    The residual optimizer produced large, KL-valid updates and learned action-2
+    targets on observed training states, yet all 58 imagined recovery states in
+    one diagnostic update were excluded by beam-only distillation because they
+    had no beam targets. The hard development trajectory therefore remained an
+    out-of-distribution repeated-prepare loop.
+  correction: >
+    Recovery-conditioned beam replay supplies multi-step sequence supervision
+    at the latent failure states that on-policy MAPPO rarely reaches, while the
+    residual trust region preserves the base policy outside selected tail states.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  temporal_reward_shaping_enabled: false
+  reward_shaping_added: false
+
+training_budget:
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  prediction_horizon: 16
+
+algorithm:
+  env_action_model_imagination_replay_enabled: true
+  env_action_model_imagination_replay_recovery_only: true
+  env_action_model_imagination_beam_search_enabled: true
+  env_action_model_beam_search_enabled: true
+  env_action_model_beam_search_horizon: 6
+  env_action_model_beam_search_width: 2
+  env_action_model_policy_improvement_prefer_beam_targets: true
+  env_action_model_policy_improvement_tail_beam_only: true
+  env_action_model_policy_improvement_tail_residual_optimizer_enabled: true
+  env_action_model_policy_improvement_tail_max_policy_kl: 0.35
+
+compute_accounting:
+  imagined_beam_query_unit: one action transition expanded from an imagined recovery-state snapshot
+  paper_requirement: report real transitions, observed-state beam transitions, imagined-state beam transitions, accepted residual updates, rejected epochs, wall time, and memory
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Development-only until targeted mechanism verification, fresh multi-seed
+    training, complete baselines, strict formal/hidden evaluation, statistics,
+    and mechanism ablations pass.

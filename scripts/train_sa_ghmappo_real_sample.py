@@ -1209,6 +1209,489 @@ PROFILE_DEFAULTS = {
         "prediction_horizon": 16,
         "post_training_audit_mode": "compact",
     },
+    "top_journal_mechanism_v71_tail_counterfactual_option_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v72_digital_twin_counterfactual_option_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v73_multistep_counterfactual_option_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v74_model_based_env_action_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v75_conservative_model_policy_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v76_recurrent_robust_model_policy_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v77_temporal_downside_model_policy_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v78_regret_adaptive_model_policy_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v79_tail_distilled_model_policy_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v80_imagination_replay_model_policy_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v81_trust_region_imagination_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v82_recovery_imagination_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v83_recovery_residual_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v84_search_distilled_residual_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v85_trust_region_residual_search_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v86_recovery_beam_replay_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v87_mirror_residual_projection_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v88_contextual_recovery_expert_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v89_diverse_recovery_branch_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v90_causally_scoped_recovery_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v91_balanced_recovery_distillation_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v92_online_counterfactual_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v93_mechanism_aware_online_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -1287,6 +1770,29 @@ MECHANISM_COVERAGE_PROFILES = {
     "top_journal_mechanism_v68_actor_native_sparse_recovery_mappo",
     "top_journal_mechanism_v69_realization_credit_mappo",
     "top_journal_mechanism_v70_sparse_tail_option_mappo",
+    "top_journal_mechanism_v71_tail_counterfactual_option_mappo",
+    "top_journal_mechanism_v72_digital_twin_counterfactual_option_mappo",
+    "top_journal_mechanism_v73_multistep_counterfactual_option_mappo",
+    "top_journal_mechanism_v74_model_based_env_action_mappo",
+    "top_journal_mechanism_v75_conservative_model_policy_mappo",
+    "top_journal_mechanism_v76_recurrent_robust_model_policy_mappo",
+    "top_journal_mechanism_v77_temporal_downside_model_policy_mappo",
+    "top_journal_mechanism_v78_regret_adaptive_model_policy_mappo",
+    "top_journal_mechanism_v79_tail_distilled_model_policy_mappo",
+    "top_journal_mechanism_v80_imagination_replay_model_policy_mappo",
+    "top_journal_mechanism_v81_trust_region_imagination_mappo",
+    "top_journal_mechanism_v82_recovery_imagination_mappo",
+    "top_journal_mechanism_v83_recovery_residual_mappo",
+    "top_journal_mechanism_v84_search_distilled_residual_mappo",
+    "top_journal_mechanism_v85_trust_region_residual_search_mappo",
+    "top_journal_mechanism_v86_recovery_beam_replay_mappo",
+    "top_journal_mechanism_v87_mirror_residual_projection_mappo",
+    "top_journal_mechanism_v88_contextual_recovery_expert_mappo",
+    "top_journal_mechanism_v89_diverse_recovery_branch_mappo",
+    "top_journal_mechanism_v90_causally_scoped_recovery_mappo",
+    "top_journal_mechanism_v91_balanced_recovery_distillation_mappo",
+    "top_journal_mechanism_v92_online_counterfactual_mappo",
+    "top_journal_mechanism_v93_mechanism_aware_online_mappo",
 }
 
 
@@ -1298,8 +1804,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--train_window_count", type=int, default=None)
     parser.add_argument("--window_mode", type=str, default="activating_only", choices=["activating_only", "mixed", "full", "mixed_informative", "full_stratified"])
     parser.add_argument("--window_plan_path", type=str, default="")
+    parser.add_argument("--eval_window_plan_path", type=str, default="")
     parser.add_argument("--mobility_source", type=str, default="ngsim", choices=["ngsim", "lust"])
-    parser.add_argument("--primary_vehicle_selection", type=str, default="stable_first", choices=["stable_first", "handoff_pressure"])
+    parser.add_argument(
+        "--primary_vehicle_selection",
+        type=str,
+        default=None,
+        choices=["stable_first", "handoff_pressure"],
+    )
     parser.add_argument("--mobility_csv_path", type=str, default="")
     parser.add_argument(
         "--lust_scenario_root",
@@ -1347,6 +1859,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prediction_confidence_scale", type=float, default=1.0)
     parser.add_argument("--prediction_delay_steps", type=int, default=0)
     parser.add_argument("--drop_handoff_prediction_prob", type=float, default=0.0)
+    parser.add_argument(
+        "--temporal_reward_shaping_enabled",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+    )
     parser.add_argument("--predictor_kind", type=str, default="baseline", choices=["baseline", "oracle", "learned_or_calibrated", "supervised"])
     parser.add_argument("--predictor_checkpoint_path", type=str, default="")
     parser.add_argument("--continuity_guard_enabled", action=argparse.BooleanOptionalAction, default=None)
@@ -1380,6 +1897,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--post_training_audit_mode", choices=["full", "compact"], default=None)
     parser.add_argument("--post_training_audit_max_windows", type=int, default=None)
     parser.add_argument("--post_training_audit_max_workflows", type=int, default=None)
+    parser.add_argument("--update_eval_max_windows", type=int, default=None)
+    parser.add_argument("--update_eval_max_workflows", type=int, default=None)
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "artifacts" / "training" / "main_agents"))
     args = parser.parse_args()
     if args.smoke_run:
@@ -1392,12 +1911,23 @@ def parse_args() -> argparse.Namespace:
         default_value = profile_defaults.get(field_name)
         if default_value is not None and getattr(args, field_name) == parser.get_default(field_name):
             setattr(args, field_name, default_value)
+    if args.primary_vehicle_selection is None:
+        args.primary_vehicle_selection = str(
+            profile_defaults.get("primary_vehicle_selection", "stable_first")
+        )
     if args.reward_positive_offset is None:
         args.reward_positive_offset = float(profile_defaults.get("reward_positive_offset", 5.0))
     if args.prediction_horizon is None:
         args.prediction_horizon = int(profile_defaults.get("prediction_horizon", 3))
     if args.post_training_audit_mode is None:
         args.post_training_audit_mode = str(profile_defaults.get("post_training_audit_mode", "full"))
+    if args.temporal_reward_shaping_enabled is None:
+        args.temporal_reward_shaping_enabled = bool(
+            profile_defaults.get("temporal_reward_shaping_enabled", True)
+        )
+    for field_name in ["update_eval_max_windows", "update_eval_max_workflows"]:
+        if getattr(args, field_name) is None and profile_defaults.get(field_name) is not None:
+            setattr(args, field_name, int(profile_defaults[field_name]))
     if "gamma" in profile_defaults and float(args.gamma) == 0.99:
         args.gamma = float(profile_defaults["gamma"])
     if "gae_lambda" in profile_defaults and float(args.gae_lambda) == 0.95:
@@ -4790,6 +5320,437 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
             }
         )
         return kwargs
+    if profile == "top_journal_mechanism_v73_multistep_counterfactual_option_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v72_digital_twin_counterfactual_option_mappo"
+        )
+        kwargs.update(
+            {
+                "option_counterfactual_model_rollout_horizon": 4,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v74_model_based_env_action_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v71_tail_counterfactual_option_mappo"
+        )
+        kwargs.update(
+            {
+                "option_gate_enabled": False,
+                "option_counterfactual_critic_enabled": False,
+                "option_counterfactual_policy_improvement_enabled": False,
+                "option_counterfactual_model_rollout_enabled": False,
+                "env_action_model_critic_enabled": True,
+                "env_action_model_critic_value_coef": 0.80,
+                "env_action_model_critic_advantage_coef": 1.25,
+                "env_action_model_critic_policy_improvement_coef": 2.0,
+                "env_action_model_critic_advantage_clip": 2.0,
+                "env_action_model_critic_warmup_updates": 2,
+                "env_action_model_rollout_enabled": True,
+                "env_action_model_rollout_horizon": 4,
+                "env_action_ppo_coef": 1.0,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v75_conservative_model_policy_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v74_model_based_env_action_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_critic_value_coef": 0.50,
+                "env_action_model_critic_advantage_coef": 0.0,
+                "env_action_model_critic_policy_improvement_coef": 0.0,
+                "env_action_model_policy_improvement_enabled": True,
+                "env_action_model_policy_improvement_coef": 0.35,
+                "env_action_model_policy_improvement_temperature": 2.5,
+                "env_action_ppo_coef": 0.35,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v76_recurrent_robust_model_policy_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v75_conservative_model_policy_mappo"
+        )
+        kwargs.update(
+            {
+                "outcome_memory_fusion_enabled": True,
+                "outcome_memory_actor_scale": 0.70,
+                "outcome_memory_critic_scale": 0.85,
+                "env_action_model_rollout_horizon": 8,
+                "env_action_model_rollout_horizons": (1, 2, 4, 8),
+                "env_action_model_policy_improvement_robust_horizons_enabled": True,
+                "env_action_model_policy_improvement_horizon_risk_coef": 0.75,
+                "env_action_model_policy_improvement_adaptive_kl_enabled": True,
+                "env_action_model_policy_improvement_target_kl": 0.03,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v77_temporal_downside_model_policy_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v76_recurrent_robust_model_policy_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_policy_improvement_horizon_aggregation_mode": (
+                    "lambda_downside"
+                ),
+                "env_action_model_policy_improvement_horizon_lambda": 0.90,
+                "env_action_model_policy_improvement_horizon_risk_coef": 0.75,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v78_regret_adaptive_model_policy_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v77_temporal_downside_model_policy_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_rollout_horizon": 16,
+                "env_action_model_rollout_horizons": (1, 2, 4, 8, 16),
+                "env_action_model_policy_improvement_regret_adaptive_kl_enabled": (
+                    True
+                ),
+                "env_action_model_policy_improvement_max_target_kl": 0.35,
+                "env_action_model_policy_improvement_regret_priority_coef": 2.0,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v79_tail_distilled_model_policy_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v78_regret_adaptive_model_policy_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_policy_improvement_tail_distillation_enabled": (
+                    True
+                ),
+                "env_action_model_policy_improvement_tail_quantile": 0.75,
+                "env_action_model_policy_improvement_tail_min_regret": 0.50,
+                "env_action_model_policy_improvement_tail_epochs": 8,
+                "env_action_model_policy_improvement_tail_coef": 1.0,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v80_imagination_replay_model_policy_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v79_tail_distilled_model_policy_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_imagination_replay_enabled": True,
+                "env_action_model_imagination_replay_depths": (2, 4, 8),
+                "env_action_model_policy_improvement_tail_epochs": 4,
+                "env_action_model_policy_improvement_tail_coef": 0.75,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v81_trust_region_imagination_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v80_imagination_replay_model_policy_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_imagination_replay_horizons": (1, 2, 4),
+                "env_action_model_policy_improvement_tail_max_policy_kl": 0.05,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v82_recovery_imagination_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v81_trust_region_imagination_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_imagination_replay_recovery_only": True,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v83_recovery_residual_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v82_recovery_imagination_mappo"
+        )
+        kwargs.update(
+            {
+                "outcome_recovery_residual_enabled": True,
+                "outcome_recovery_residual_scale": 1.0,
+                "env_action_model_policy_improvement_tail_recovery_only": True,
+                "env_action_model_policy_improvement_tail_adapter_only": True,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v84_search_distilled_residual_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v83_recovery_residual_mappo"
+        )
+        kwargs.update(
+            {
+                "digital_twin_planning_residual_enabled": True,
+                "digital_twin_planning_residual_scale": 1.0,
+                "env_action_model_beam_search_enabled": True,
+                "env_action_model_beam_search_horizon": 6,
+                "env_action_model_beam_search_width": 2,
+                "env_action_model_beam_search_context_only": True,
+                "env_action_model_beam_search_min_eta": 2,
+                "env_action_model_beam_search_max_eta": 8,
+                "env_action_model_policy_improvement_prefer_beam_targets": True,
+                "env_action_model_policy_improvement_tail_recovery_only": False,
+                "env_action_model_policy_improvement_tail_adapter_only": False,
+                "env_action_model_policy_improvement_tail_beam_only": True,
+                "env_action_model_policy_improvement_tail_planning_adapter_only": (
+                    True
+                ),
+                "env_action_model_policy_improvement_tail_epochs": 8,
+                "env_action_model_policy_improvement_tail_coef": 1.0,
+                "env_action_model_policy_improvement_tail_max_policy_kl": 0.20,
+                "env_action_model_policy_improvement_tail_min_regret": 0.35,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v85_trust_region_residual_search_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v84_search_distilled_residual_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_policy_improvement_tail_epochs": 24,
+                "env_action_model_policy_improvement_tail_max_policy_kl": 0.35,
+                "env_action_model_policy_improvement_tail_residual_optimizer_enabled": (
+                    True
+                ),
+                "env_action_model_policy_improvement_tail_residual_learning_rate": (
+                    0.02
+                ),
+                "env_action_model_policy_improvement_tail_residual_backtrack_factor": (
+                    0.5
+                ),
+                "env_action_model_policy_improvement_tail_residual_min_learning_rate": (
+                    0.00015625
+                ),
+                "env_action_model_policy_improvement_tail_residual_max_backtracks": (
+                    7
+                ),
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v86_recovery_beam_replay_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v85_trust_region_residual_search_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_imagination_beam_search_enabled": True,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v87_mirror_residual_projection_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v86_recovery_beam_replay_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_policy_improvement_tail_logit_projection_enabled": (
+                    True
+                ),
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v88_contextual_recovery_expert_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v87_mirror_residual_projection_mappo"
+        )
+        kwargs.update(
+            {
+                "outcome_context_residual_enabled": True,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v89_diverse_recovery_branch_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v88_contextual_recovery_expert_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_imagination_replay_branch_mode": "top_k",
+                "env_action_model_imagination_replay_branch_top_k": 2,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v90_causally_scoped_recovery_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v89_diverse_recovery_branch_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_policy_improvement_tail_adapter_only": True,
+                "env_action_model_policy_improvement_tail_planning_adapter_only": (
+                    False
+                ),
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v91_balanced_recovery_distillation_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v90_causally_scoped_recovery_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_policy_improvement_tail_target_balance_enabled": (
+                    True
+                ),
+                "env_action_model_policy_improvement_tail_target_balance_power": (
+                    0.5
+                ),
+                "env_action_model_policy_improvement_tail_target_balance_max_weight": (
+                    4.0
+                ),
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v92_online_counterfactual_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v91_balanced_recovery_distillation_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_online_planner_enabled": True,
+                "env_action_model_online_planner_coef": 1.0,
+                "env_action_model_online_planner_policy_prior_coef": 0.15,
+                "env_action_model_online_planner_min_margin": 0.0,
+                "env_action_model_online_planner_prefer_beam_targets": False,
+                "env_action_model_imagination_beam_search_enabled": False,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v93_mechanism_aware_online_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v92_online_counterfactual_mappo"
+        )
+        kwargs.update(
+            {
+                "env_action_model_online_planner_mechanism_coef": 2.0,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v72_digital_twin_counterfactual_option_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v71_tail_counterfactual_option_mappo"
+        )
+        kwargs.update(
+            {
+                "option_counterfactual_policy_improvement_deterministic_only": True,
+                "option_counterfactual_model_rollout_enabled": True,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v71_tail_counterfactual_option_mappo":
+        return {
+            "graph_continuity_critic_enabled": True,
+            "uncertainty_aware_event_scaling_enabled": True,
+            "uncertainty_aware_critic_enabled": True,
+            "digital_twin_handoff_fusion_enabled": True,
+            "digital_twin_handoff_slow_scale": 0.30,
+            "digital_twin_handoff_fast_scale": 0.35,
+            "digital_twin_handoff_event_scale": 0.70,
+            "digital_twin_handoff_critic_scale": 0.85,
+            "head_credit_enabled": True,
+            "head_credit_protocol": "aggregation_reason_weighted_controller_ppo_v3",
+            "slow_policy_credit_floor": 0.18,
+            "fast_policy_credit_floor": 0.12,
+            "event_policy_credit_floor": 0.16,
+            "slow_entropy_coef_scale": 1.05,
+            "fast_entropy_coef_scale": 1.00,
+            "event_entropy_coef_scale": 1.15,
+            "slow_entropy_credit_floor": 0.10,
+            "fast_entropy_credit_floor": 0.08,
+            "event_entropy_credit_floor": 0.10,
+            "event_advantage_blend": 0.82,
+            "event_logit_temperature": 1.0,
+            "event_logit_temperature_final": 1.0,
+            "event_logit_sharpening_final_scale": 1.0,
+            "event_logit_sharpening_timing_gain": 0.0,
+            "event_prepare_margin_boost": 0.0,
+            "temporal_consistency_coef": 0.0,
+            "mechanism_logit_bias_strength": 0.0,
+            "continuity_guard_enabled": False,
+            "handoff_target_alignment_guard_enabled": False,
+            "heuristic_imitation_coef": 0.0,
+            "mechanism_aux_coef": 0.0,
+            "mechanism_entropy_coef": 0.0,
+            "backhaul_guard_enabled": False,
+            "cache_warm_start_guard_enabled": False,
+            "predictive_prefetch_admission_guard_enabled": False,
+            "idle_popularity_fallback_enabled": False,
+            "idle_popularity_no_rsu_local_fallback_enabled": False,
+            "idle_popularity_no_rsu_service_continuity_enabled": False,
+            "idle_popularity_no_rsu_any_action_override_enabled": False,
+            "option_gate_enabled": True,
+            "option_gate_count": 4,
+            "option_gate_loss_coef": 1.0,
+            "option_gate_entropy_coef": 0.004,
+            "option_gate_prior_coef": 0.0,
+            "option_gate_prior_logit_bias": 0.0,
+            "option_gate_log_prob_weight": 1.0,
+            "option_gate_context_prior_enabled": False,
+            "option_gate_deterministic_prior_margin": 0.0,
+            "option_gate_idle_prior_enabled": False,
+            "option_gate_idle_recovery_mechanism_prior_enabled": False,
+            "option_gate_mechanism_preserve_enabled": False,
+            "option_gate_prd_enabled": False,
+            "option_gate_counterfactual_prd_enabled": False,
+            "option_counterfactual_critic_enabled": True,
+            "option_counterfactual_value_coef": 0.65,
+            "option_counterfactual_advantage_coef": 1.20,
+            "option_counterfactual_advantage_clip": 2.0,
+            "option_counterfactual_warmup_updates": 2,
+            "option_counterfactual_tail_weight": 2.25,
+            "option_counterfactual_policy_improvement_enabled": True,
+            "option_counterfactual_policy_improvement_coef": 1.0,
+            "option_counterfactual_policy_improvement_clip": 2.0,
+            "sparse_handoff_option_prior_enabled": False,
+            "sparse_handoff_option_prepare_bias": 0.0,
+            "sparse_handoff_option_popularity_penalty": 0.0,
+            "sparse_handoff_option_local_penalty": 0.0,
+            "sparse_handoff_option_min_context": 0.08,
+            "sparse_handoff_option_max_eta": 22,
+            "sparse_handoff_recovery_prior_enabled": False,
+            "sparse_handoff_realization_credit_enabled": False,
+            "digital_twin_policy_prior_enabled": False,
+            "digital_twin_policy_prior_logit_bias": 0.0,
+            "digital_twin_policy_prior_env_action_bias_enabled": False,
+            "digital_twin_policy_prior_env_action_logit_bias": 0.0,
+            "digital_twin_policy_prior_distill_coef": 0.0,
+            "cache_feasibility_prior_enabled": False,
+            "handoff_alignment_barrier_enabled": False,
+            "opportunity_constrained_policy_enabled": False,
+            "net_advantage_prepare_gate_enabled": False,
+            "coverage_recovery_guard_enabled": False,
+            "coverage_recovery_final_guard_enabled": False,
+            "service_completion_gate_enabled": False,
+            "backhaul_aware_policy_enabled": False,
+            "advantage_weighted_behavior_regularization_enabled": False,
+            "counterfactual_teacher_prd_enabled": False,
+            "service_continuity_teacher_enabled": False,
+            "tail_risk_prd_enabled": False,
+            "opportunity_prd_enabled": False,
+            "handoff_risk_prd_enabled": False,
+            "idle_execution_prd_enabled": False,
+            "net_utility_prd_enabled": False,
+            "delayed_mechanism_credit_enabled": False,
+            "env_action_ppo_enabled": True,
+            "env_action_ppo_coef": 0.35,
+            "env_action_ppo_advantage_blend": 0.65,
+            "env_action_ppo_teacher_coef": 0.0,
+            "env_action_ppo_mechanism_focus": 0.0,
+            "env_action_sparse_recovery_focus": 0.0,
+            "env_action_risk_adjusted_recovery_coef": 0.0,
+            "env_action_adapter_miss_counterfactual_coef": 0.0,
+            "env_action_counterfactual_margin_enabled": False,
+            "argmax_margin_regularization_enabled": False,
+            "train_epochs": 8,
+            "target_kl": 0.015,
+            "kl_early_stop_enabled": True,
+        }
     if profile == "top_journal_mechanism_v5_perf_robust":
         kwargs = build_sa_ghmappo_profile_kwargs("top_journal_mechanism_v1")
         kwargs.update(
@@ -5228,7 +6189,10 @@ def gaussian_window_score(value: float, center: float, sigma: float) -> float:
 
 
 def build_temporal_reward_shaping_config(agent: Any, args: argparse.Namespace) -> dict[str, float | bool]:
-    if args.agent_name != "sa_ghmappo":
+    if (
+        args.agent_name != "sa_ghmappo"
+        or not bool(getattr(args, "temporal_reward_shaping_enabled", True))
+    ):
         return {"enabled": False}
     preferred_lead_steps = float(getattr(agent, "_temporal_prepare_lead_steps", 2.5))
     sigma = float(getattr(agent, "_temporal_prepare_sigma", 1.25))
@@ -5859,6 +6823,8 @@ def run_update_eval(
         eval_windows=eval_windows,
         args=args,
         include_reference_agents=True,
+        max_workflows=args.update_eval_max_workflows,
+        max_windows=args.update_eval_max_windows,
         protocol_name="update_eval",
         policy_evaluation_mode="safety_projected",
     )
@@ -5869,6 +6835,8 @@ def run_update_eval(
         eval_windows=eval_windows,
         args=args,
         include_reference_agents=False,
+        max_workflows=args.update_eval_max_workflows,
+        max_windows=args.update_eval_max_windows,
         protocol_name="update_eval_raw_policy",
         policy_evaluation_mode="raw_policy",
     )
@@ -7930,7 +8898,13 @@ def main() -> None:
             window_mode=args.window_mode,
         )
     train_window_plan = build_training_window_plan(window_payload, args)
-    eval_window_plan = [dict(item) for item in window_payload["selected_windows"]]
+    if args.eval_window_plan_path:
+        eval_window_payload = apply_frozen_window_plan({}, args.eval_window_plan_path)
+    else:
+        eval_window_payload = window_payload
+    eval_window_plan = [
+        dict(item) for item in eval_window_payload["selected_windows"]
+    ]
     training_window_sampling_config = {
         "mechanism_window_oversample_ratio": float(args.mechanism_window_oversample_ratio),
         "handoff_imminent_oversample_ratio": float(args.handoff_imminent_oversample_ratio),
@@ -7942,6 +8916,17 @@ def main() -> None:
         "frozen_window_plan_path": window_payload.get("frozen_window_plan_path", ""),
         "frozen_window_plan_protocol_version": window_payload.get("frozen_window_plan_protocol_version", ""),
         "frozen_window_plan_split": window_payload.get("frozen_window_plan_split", ""),
+        "frozen_eval_window_plan_path": eval_window_payload.get("frozen_window_plan_path", ""),
+        "frozen_eval_window_plan_protocol_version": eval_window_payload.get(
+            "frozen_window_plan_protocol_version",
+            "",
+        ),
+        "frozen_eval_window_plan_split": eval_window_payload.get(
+            "frozen_window_plan_split",
+            "",
+        ),
+        "update_eval_max_windows": args.update_eval_max_windows,
+        "update_eval_max_workflows": args.update_eval_max_workflows,
     }
 
     run_id = datetime.now().strftime(f"{args.agent_name}_train_%Y%m%d_%H%M%S_%f") + f'_seed{args.random_seed}'
@@ -7975,6 +8960,8 @@ def main() -> None:
     stability_control_history: list[dict[str, Any]] = []
     best_mechanism_score_so_far = 0.0
     update_index = 0
+    counterfactual_model_query_count_total = 0
+    counterfactual_model_transition_count_total = 0
     warm_start_record: dict[str, Any] = {
         "enabled": bool(args.warm_start_checkpoint_path),
         "source_checkpoint_path": args.warm_start_checkpoint_path,
@@ -8183,6 +9170,20 @@ def main() -> None:
             }
 
         summary["agent_info"] = {"agent_name": agent.agent_name, "learn_info": learn_info}
+        counterfactual_model_query_count_total += int(
+            summary.get("trainer_info", {}).get(
+                "counterfactual_model_query_count",
+                0,
+            )
+            or 0
+        )
+        counterfactual_model_transition_count_total += int(
+            summary.get("trainer_info", {}).get(
+                "counterfactual_model_transition_count",
+                0,
+            )
+            or 0
+        )
         (episode_root / f"episode_{episode_index:04d}.summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
         episode_metric = build_episode_metric(summary=summary, episode_index=episode_index, updated=should_update)
         episode_metrics.append(episode_metric)
@@ -8386,6 +9387,216 @@ def main() -> None:
         "entropy_coef": args.entropy_coef,
         "value_coef": args.value_coef,
         "auxiliary_coef": args.auxiliary_coef,
+        "counterfactual_model_rollout": {
+            "enabled": bool(
+                getattr(agent, "_env_action_model_rollout_enabled", False)
+                or getattr(
+                    agent,
+                    "_option_counterfactual_model_rollout_enabled",
+                    False,
+                )
+            ),
+            "protocol": (
+                "digital_twin_multihorizon_env_action_td_v2"
+                if getattr(agent, "_env_action_model_rollout_enabled", False)
+                else "digital_twin_multistep_option_td_v2"
+            ),
+            "horizon": int(
+                getattr(agent, "_env_action_model_rollout_horizon", 1)
+                if getattr(agent, "_env_action_model_rollout_enabled", False)
+                else getattr(
+                    agent,
+                    "_option_counterfactual_model_rollout_horizon",
+                    1,
+                )
+            ),
+            "horizons": list(
+                getattr(
+                    agent,
+                    "_env_action_model_rollout_horizons",
+                    (
+                        getattr(
+                            agent,
+                            "_env_action_model_rollout_horizon",
+                            1,
+                        ),
+                    ),
+                )
+            ),
+            "imagination_replay_enabled": bool(
+                getattr(
+                    agent,
+                    "_env_action_model_imagination_replay_enabled",
+                    False,
+                )
+            ),
+            "imagination_replay_depths": list(
+                getattr(
+                    agent,
+                    "_env_action_model_imagination_replay_depths",
+                    (),
+                )
+            ),
+            "imagination_replay_horizons": list(
+                getattr(
+                    agent,
+                    "_env_action_model_imagination_replay_horizons",
+                    (),
+                )
+            ),
+            "imagination_replay_recovery_only": bool(
+                getattr(
+                    agent,
+                    "_env_action_model_imagination_replay_recovery_only",
+                    False,
+                )
+            ),
+            "outcome_memory_fusion_enabled": bool(
+                getattr(agent, "_outcome_memory_fusion_enabled", False)
+            ),
+            "robust_horizon_policy_improvement_enabled": bool(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_robust_horizons_enabled",
+                    False,
+                )
+            ),
+            "horizon_risk_coef": float(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_horizon_risk_coef",
+                    0.0,
+                )
+            ),
+            "horizon_aggregation_mode": str(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_horizon_aggregation_mode",
+                    "mean_std",
+                )
+            ),
+            "horizon_lambda": float(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_horizon_lambda",
+                    0.0,
+                )
+            ),
+            "adaptive_kl_enabled": bool(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_adaptive_kl_enabled",
+                    False,
+                )
+            ),
+            "policy_improvement_target_kl": float(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_target_kl",
+                    0.0,
+                )
+            ),
+            "regret_adaptive_kl_enabled": bool(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_regret_adaptive_kl_enabled",
+                    False,
+                )
+            ),
+            "max_policy_improvement_target_kl": float(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_max_target_kl",
+                    0.0,
+                )
+            ),
+            "counterfactual_regret_priority_coef": float(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_regret_priority_coef",
+                    0.0,
+                )
+            ),
+            "tail_distillation_enabled": bool(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_tail_distillation_enabled",
+                    False,
+                )
+            ),
+            "tail_distillation_quantile": float(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_tail_quantile",
+                    0.0,
+                )
+            ),
+            "tail_distillation_min_regret": float(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_tail_min_regret",
+                    0.0,
+                )
+            ),
+            "tail_distillation_epochs": int(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_tail_epochs",
+                    0,
+                )
+            ),
+            "tail_distillation_coef": float(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_tail_coef",
+                    0.0,
+                )
+            ),
+            "tail_distillation_max_policy_kl": float(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_tail_max_policy_kl",
+                    0.0,
+                )
+            ),
+            "tail_residual_optimizer_enabled": bool(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_tail_residual_optimizer_enabled",
+                    False,
+                )
+            ),
+            "tail_residual_learning_rate": float(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_tail_residual_learning_rate",
+                    0.0,
+                )
+            ),
+            "tail_residual_backtrack_factor": float(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_tail_residual_backtrack_factor",
+                    0.0,
+                )
+            ),
+            "tail_residual_min_learning_rate": float(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_tail_residual_min_learning_rate",
+                    0.0,
+                )
+            ),
+            "tail_residual_max_backtracks": int(
+                getattr(
+                    agent,
+                    "_env_action_model_policy_improvement_tail_residual_max_backtracks",
+                    0,
+                )
+            ),
+            "model_query_count": counterfactual_model_query_count_total,
+            "model_transition_count": counterfactual_model_transition_count_total,
+        },
         "warm_start": warm_start_record,
         "mechanism_aux_config": {
             "mechanism_aux_coef": float(getattr(agent, "_mechanism_aux_coef", 0.0)),
@@ -8472,7 +9683,10 @@ def main() -> None:
             "deterministic_eval": True,
             "selection_eval_mode": "safety_projected",
             "policy_learning_gate_eval_mode": "raw_policy",
-            "raw_policy_definition": "learned_logits_plus_action_mask_without_policy_adjustments_or_safety_rules",
+            "raw_policy_definition": (
+                "learned_actor_and_model_critic_policy_improvement_plus_action_mask_"
+                "without_fixed_policy_adjustments_or_safety_rules"
+            ),
             "eval_window_ids": [item.get("window_id") for item in eval_window_plan],
             "workflow_ids": [workflow_state.workflow_id for workflow_state in workflow_states],
         },

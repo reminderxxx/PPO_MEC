@@ -2,6 +2,17 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-08-08: v93 机制感知在线反事实 MAPPO 完成零偏移开发集验证
+
+- 一阶根因已确认：旧在线反事实分支只看 `next_info`，没有复现 `EpisodeRecorder` 的 delayed predictive-prefetch validation，因此训练目标把“请求”误当成“兑现”；同时 handoff prepare 目标缺少当前步因果约束，容易获得未来事件 credit。
+- v93 修复为 branch-local prefetch pending queue，按 evaluator 相同的 6-step validation window 回放 validated hit，并只在当前 branch step 发生 handoff-aligned prepare 时给机制目标。该逻辑位于 MAPPO learning-side counterfactual target，不修改 environment reward、action contract、baseline contract 或 benchmark 过滤。
+- v93 在 `src/agents/sa_ghmappo_core.py` / `src/trainers/marl_on_policy_trainer.py` 中组合 robust return advantage、mechanism advantage 和 policy-prior constrained online planning；配置为 `configs/experiment/top_journal_mechanism_v93_mechanism_aware_online_mappo.yaml`。
+- seed13 零偏移 full-stratified 开发集：40 episodes、20 windows、2 workflows，SA `17.901250`，PPO `14.158000`，MAPPO `8.628750`，Popularity `16.947000`；SA 相对 Popularity `+0.954250`（`+5.63%`）。SA mechanism realization `0.475`，handoff-ready `0.3875`。
+- seed7 独立零偏移 full-stratified 开发集：40 episodes、20 windows、2 workflows，SA `18.068000`，PPO `14.158000`，MAPPO `8.628750`，Popularity `16.947000`；SA 相对 Popularity `+1.121000`（`+6.61%`）。SA mechanism realization `0.500`，handoff-ready `0.4125`。
+- v92 同窗口消融为 SA `17.321000`；v93 配对 40 个 window-workflow 单元平均提升 `+0.580250`，v93 胜/平/负为 `3/36/1`，mechanism realization 从 `0.400` 提升到 `0.475`。这支持新增机制感知 counterfactual target 的算法归因，但不是独立 formal 统计结论。
+- 原始 artifact：`artifacts/experiments/top_journal_v93_full20_dev_algo_pool_zero_offset_20260808/main_results_full_stratified_20260808_103827_523749/`、`artifacts/experiments/top_journal_v93_full20_dev_algo_pool_seed7_zero_offset_20260808/main_results_full_stratified_20260808_110200_372655/`、`artifacts/experiments/top_journal_v92_full20_dev_ablation_zero_offset_20260808/main_results_full_stratified_20260808_110925_596025/`。
+- 当前证据边界：这是 zero-offset dev evidence，不是 paper-ready。v93 主 checkpoint 为 16 episodes（seed13）和独立 seed7 的 update 2；PPO/MAPPO 对照为 96 episodes。等预算 v93 256-episode 训练因反事实 deepcopy 计算成本在 seed7 episode19 中止，但 update 2 checkpoint 已完整落盘；不得把它写成完成的 256-episode 多 seed 训练。
+
 ## 2026-07-29: v70 sparse-tail option MAPPO 在 formal-min mixed/full 全量 benchmark 中排名第一
 
 - 一阶诊断：v67/v69 在 mixed 上已经超过 DT，但 full_stratified 仍低于 `dt_handoff_drl`，根因集中在 `idle_or_sparse` 窗口。v67/v69 full 中 `idle_or_sparse` 为 SA `27.1015`、DT `29.29275`、popularity `27.1015`，导致 overall full SA `30.871146` 低于 DT `31.426667`。v69 success-conditioned realization credit 已进入 checkpoint config，但 selected benchmark rows 与 v67 在关键字段上完全一致，说明单纯 reward/credit 变化未穿透 option-gate 决策边界。

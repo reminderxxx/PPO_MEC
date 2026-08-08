@@ -1,0 +1,61 @@
+profile: top_journal_mechanism_v87_mirror_residual_projection_mappo
+base_profile: top_journal_mechanism_v86_recovery_beam_replay_mappo
+purpose: >
+  Close the residual M-step convergence gap by fitting the KL-constrained
+  mirror-policy target in centered logit space on observed and imagined tail states.
+
+algorithm_delta:
+  - Retains clipped MAPPO, recovery-conditioned beam replay, and the residual trust region.
+  - Uses beam returns to construct a regret-adaptive KL-constrained mirror-descent target distribution.
+  - Regresses centered policy logits onto centered target log-probabilities, removing the softmax saturation that suppressed rare recovery actions.
+  - Keeps transactional KL rollback and residual learning-rate backtracking as the acceptance rule.
+  - Updates only planning and recovery residual heads during the tail M-step.
+  - Uses no action override, reward shaping, heuristic policy, evaluator bias, or development labels.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v86_recovery_beam_replay_mappo
+  observed_failure: >
+    Recovery beam replay supplied 58 imagined recovery states and selected 22
+    high-regret samples, but the cross-entropy M-step raised the hard-state
+    recovery action probability only to about 0.04-0.05 while repeated prepare
+    remained above 0.83. Mean accepted KL was 0.237 under a 0.35 limit, showing
+    target discovery succeeded but residual projection remained under-converged.
+  correction: >
+    Centered logit projection directly matches relative action preferences of
+    the constrained mirror target, while KL rollback still bounds the resulting
+    policy update.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  temporal_reward_shaping_enabled: false
+  reward_shaping_added: false
+
+training_budget:
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  prediction_horizon: 16
+
+algorithm:
+  env_action_model_imagination_beam_search_enabled: true
+  env_action_model_policy_improvement_tail_logit_projection_enabled: true
+  env_action_model_policy_improvement_tail_residual_optimizer_enabled: true
+  env_action_model_policy_improvement_tail_max_policy_kl: 0.35
+  env_action_model_policy_improvement_tail_beam_only: true
+
+compute_accounting:
+  mirror_target_unit: one selected state with a beam-return target and a solved KL projection
+  residual_update_unit: one accepted centered-logit M-step minibatch
+  paper_requirement: report selected observed/imagined states, target KL, accepted policy KL, rejected epochs, backtracks, model transitions, wall time, and memory
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Development-only until targeted mechanism verification, fresh multi-seed
+    training, complete baselines, strict formal/hidden evaluation, statistics,
+    and mechanism ablations pass.

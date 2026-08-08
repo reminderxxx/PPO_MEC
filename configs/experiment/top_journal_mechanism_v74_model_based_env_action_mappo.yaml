@@ -1,0 +1,68 @@
+profile: top_journal_mechanism_v74_model_based_env_action_mappo
+base_profile: top_journal_mechanism_v71_tail_counterfactual_option_mappo
+purpose: >
+  Learn native environment-action values from short-horizon digital-twin
+  branches so MAPPO can improve beyond the limited option candidate set.
+
+algorithm_delta:
+  - Executes every valid native environment action in a cloned training state.
+  - Continues each branch for three steps with the current deterministic MAPPO policy.
+  - Uses four-step discounted environment return plus critic bootstrap as the action target.
+  - Trains selected and unselected action values after per-state centering.
+  - Adds detached model advantages to the clipped native-action PPO objective.
+  - Uses the learned action critic for deterministic policy improvement after warmup.
+  - Disables option gating, reward shaping, heuristic targets, fixed priors, and evaluator overrides.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  prediction_horizon: 16
+  reward_shaping_added: false
+
+training_budget:
+  primary_vehicle_selection: handoff_pressure
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  clip_ratio: 0.12
+  target_kl: 0.015
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  temporal_reward_shaping_enabled: false
+  update_eval_max_windows: 4
+  update_eval_max_workflows: 1
+  post_training_audit_mode: compact
+
+algorithm:
+  option_gate_enabled: false
+  option_counterfactual_critic_enabled: false
+  env_action_model_critic_enabled: true
+  env_action_model_critic_value_coef: 0.8
+  env_action_model_critic_advantage_coef: 1.25
+  env_action_model_critic_policy_improvement_coef: 2.0
+  env_action_model_critic_advantage_clip: 2.0
+  env_action_model_critic_warmup_updates: 2
+  env_action_model_rollout_enabled: true
+  env_action_model_rollout_horizon: 4
+  env_action_ppo_enabled: true
+  env_action_ppo_coef: 1.0
+
+compute_accounting:
+  model_query_unit: valid_native_action_per_training_state
+  model_transition_unit: simulated_branch_step
+  paper_requirement: report real transitions, model queries, model transitions, wall time, and memory
+
+checkpoint_protocol:
+  closed_loop_priority: latest_after_fixed_budget
+  selection_source: no_benchmark_selection
+  disallowed_claim: benchmark_selected_checkpoint
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Promotion requires five-seed equal-real-transition baselines, explicit
+    model-query accounting, non-overlapping formal and hidden windows,
+    ablations, and one-time hidden confirmation.

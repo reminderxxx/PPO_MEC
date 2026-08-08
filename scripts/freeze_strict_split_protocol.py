@@ -57,6 +57,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--windows_per_split", type=int, default=20)
     parser.add_argument("--mechanism_windows_per_split", type=int, default=6)
     parser.add_argument("--active_non_mechanism_windows_per_split", type=int, default=2)
+    parser.add_argument(
+        "--exclude_window_plan_path",
+        action="append",
+        default=[],
+        help="Previously consumed plan/aggregate whose intervals cannot enter the new split.",
+    )
     parser.add_argument("--random_seed", type=int, default=7)
     return parser.parse_args()
 
@@ -143,9 +149,10 @@ def select_stratified_windows(
     split_names: tuple[str, ...],
     targets_per_split: dict[str, int],
     minimum_gap_frames: int,
+    excluded_windows: list[dict[str, Any]] | None = None,
 ) -> dict[str, list[dict[str, Any]]]:
     plans = {split_name: [] for split_name in split_names}
-    occupied: list[dict[str, Any]] = []
+    occupied = [dict(window) for window in (excluded_windows or [])]
 
     for stratum_key in STRATUM_KEYS:
         per_split = int(targets_per_split[STRATUM_LABELS[stratum_key]])
@@ -171,6 +178,66 @@ def select_stratified_windows(
     for split_name in split_names:
         plans[split_name].sort(key=lambda item: int(item["frame_offset"]))
     return plans
+
+
+def load_excluded_window_plans(
+    paths: list[str],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    windows: list[dict[str, Any]] = []
+    records: list[dict[str, Any]] = []
+    for raw_path in paths:
+        path = Path(raw_path)
+        if not path.is_absolute():
+            path = ROOT_DIR / path
+        path = path.resolve()
+        payload = json.loads(path.read_text(encoding="utf-8-sig"))
+        if isinstance(payload, dict):
+            selected = payload.get(
+                "selected_window_plan",
+                payload.get("selected_windows", []),
+            )
+        else:
+            selected = payload if isinstance(payload, list) else []
+        if not isinstance(selected, list) or not selected:
+            raise ValueError(f"excluded window plan is empty: {path}")
+        selected_windows = [dict(item) for item in selected if isinstance(item, dict)]
+        windows.extend(selected_windows)
+        records.append(
+            {
+                "path": relative_or_absolute(path),
+                "sha256": sha256_file(path),
+                "window_count": len(selected_windows),
+            }
+        )
+    return windows, records
+
+
+def audit_against_excluded_windows(
+    plans: dict[str, list[dict[str, Any]]],
+    excluded_windows: list[dict[str, Any]],
+    minimum_gap_frames: int,
+) -> dict[str, Any]:
+    conflicts: list[dict[str, Any]] = []
+    for split_name, windows in plans.items():
+        for window in windows:
+            for excluded in excluded_windows:
+                if intervals_separated(window, excluded, minimum_gap_frames):
+                    continue
+                conflicts.append(
+                    {
+                        "split": split_name,
+                        "window_id": window.get("window_id"),
+                        "window_interval": list(interval(window)),
+                        "excluded_window_id": excluded.get("window_id"),
+                        "excluded_interval": list(interval(excluded)),
+                    }
+                )
+    return {
+        "passed": not conflicts,
+        "minimum_gap_frames": int(minimum_gap_frames),
+        "excluded_window_count": len(excluded_windows),
+        "conflicts": conflicts,
+    }
 
 
 def audit_split_plans(
@@ -246,15 +313,28 @@ def main() -> int:
         "idle_or_sparse": idle_per_split,
     }
     pools = {key: list(window_payload.get(key, [])) for key in STRATUM_KEYS}
+    excluded_windows, exclusion_records = load_excluded_window_plans(
+        list(args.exclude_window_plan_path)
+    )
     plans = select_stratified_windows(
         pools,
         split_names=SPLIT_NAMES,
         targets_per_split=targets,
         minimum_gap_frames=args.minimum_gap_frames,
+        excluded_windows=excluded_windows,
     )
     audit = audit_split_plans(plans, args.minimum_gap_frames)
     if not audit["passed"]:
         raise RuntimeError(f"split independence audit failed: {audit['conflicts']}")
+    exclusion_audit = audit_against_excluded_windows(
+        plans,
+        excluded_windows,
+        args.minimum_gap_frames,
+    )
+    if not exclusion_audit["passed"]:
+        raise RuntimeError(
+            f"external exclusion audit failed: {exclusion_audit['conflicts']}"
+        )
 
     mobility_path = Path(source_path)
     workflow_path = Path(args.workflow_csv_path)
@@ -324,6 +404,8 @@ def main() -> int:
         "candidate_pool_counts": {
             STRATUM_LABELS[key]: len(pools[key]) for key in STRATUM_KEYS
         },
+        "excluded_plan_records": exclusion_records,
+        "external_exclusion_audit": exclusion_audit,
         "plans": plan_records,
         "independence_audit": audit,
     }

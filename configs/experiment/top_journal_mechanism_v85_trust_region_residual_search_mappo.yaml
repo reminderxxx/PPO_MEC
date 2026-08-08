@@ -1,0 +1,77 @@
+profile: top_journal_mechanism_v85_trust_region_residual_search_mappo
+base_profile: top_journal_mechanism_v84_search_distilled_residual_mappo
+purpose: >
+  Close the optimization gap between search-discovered action sequences and
+  the executed MAPPO policy through a separately optimized, KL-constrained
+  residual policy-improvement step.
+
+algorithm_delta:
+  - Retains clipped MAPPO, outcome-gated recovery residuals, and training-only digital-twin beam search.
+  - Freezes the shared MAPPO policy during tail-state search distillation.
+  - Fits only the planning and recovery residual heads with an independent fast inner-loop optimizer.
+  - Transactionally rejects KL-violating epochs and backtracks the residual learning rate before retrying.
+  - Records accepted KL, rejected epochs, backtracks, and effective residual learning rate.
+  - Uses no action override, reward shaping, heuristic policy, evaluator bias, or development labels.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v84_search_distilled_residual_mappo
+  observed_failure: >
+    Beam search exposed alternative first actions on high-regret states, but
+    the shared 1e-4 optimizer moved residual output weights by only about
+    0.005 after 24 episodes. The executed policy therefore retained the same
+    deterministic action sequence on the hard development workflow.
+  correction: >
+    A parameter-efficient inner policy-improvement loop is allowed to fit the
+    model-derived distribution up to the same regret-adaptive KL radius that
+    generated the target, while preserving MAPPO outside gated states.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  temporal_reward_shaping_enabled: false
+  reward_shaping_added: false
+
+training_budget:
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  prediction_horizon: 16
+
+algorithm:
+  digital_twin_planning_residual_enabled: true
+  outcome_recovery_residual_enabled: true
+  env_action_model_beam_search_enabled: true
+  env_action_model_beam_search_horizon: 6
+  env_action_model_beam_search_width: 2
+  env_action_model_beam_search_context_only: true
+  env_action_model_beam_search_min_eta: 2
+  env_action_model_beam_search_max_eta: 8
+  env_action_model_policy_improvement_prefer_beam_targets: true
+  env_action_model_policy_improvement_tail_beam_only: true
+  env_action_model_policy_improvement_tail_planning_adapter_only: true
+  env_action_model_policy_improvement_tail_epochs: 24
+  env_action_model_policy_improvement_tail_coef: 1.0
+  env_action_model_policy_improvement_tail_max_policy_kl: 0.35
+  env_action_model_policy_improvement_tail_min_regret: 0.35
+  env_action_model_policy_improvement_tail_residual_optimizer_enabled: true
+  env_action_model_policy_improvement_tail_residual_learning_rate: 0.02
+  env_action_model_policy_improvement_tail_residual_backtrack_factor: 0.5
+  env_action_model_policy_improvement_tail_residual_min_learning_rate: 0.00015625
+  env_action_model_policy_improvement_tail_residual_max_backtracks: 7
+
+compute_accounting:
+  beam_query_unit: one digital-twin action transition expanded by beam search
+  residual_update_unit: one accepted inner-loop optimizer minibatch
+  rejected_epoch_rule: excluded from accepted update count and reported separately
+  paper_requirement: report real transitions, beam transitions, accepted residual updates, rejected epochs, backtracks, wall time, and memory
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Development-only until targeted mechanism verification, fresh multi-seed
+    training, complete baselines, strict formal/hidden evaluation, statistics,
+    and mechanism ablations pass.

@@ -61,6 +61,45 @@ def test_audit_rejects_cross_split_overlap() -> None:
     assert audit["conflicts"][0]["left_split"] == "formal"
 
 
+def test_select_stratified_windows_respects_consumed_external_intervals() -> None:
+    pools = {
+        "active_non_mechanism_windows": [
+            window(0, "active_non_mechanism"),
+            window(40, "active_non_mechanism"),
+        ],
+        "mechanism_activating_windows": [
+            window(100, "mechanism_activating"),
+            window(140, "mechanism_activating"),
+        ],
+        "idle_or_sparse_windows": [
+            window(200, "idle_or_sparse"),
+            window(240, "idle_or_sparse"),
+        ],
+    }
+    excluded = [
+        window(0, "consumed"),
+        window(100, "consumed"),
+        window(200, "consumed"),
+    ]
+    plans = MODULE.select_stratified_windows(
+        pools,
+        split_names=("formal",),
+        targets_per_split={
+            "active_non_mechanism": 1,
+            "mechanism_activating": 1,
+            "idle_or_sparse": 1,
+        },
+        minimum_gap_frames=5,
+        excluded_windows=excluded,
+    )
+    assert [item["frame_offset"] for item in plans["formal"]] == [40, 140, 240]
+    assert MODULE.audit_against_excluded_windows(
+        plans,
+        excluded,
+        minimum_gap_frames=5,
+    )["passed"] is True
+
+
 def test_apply_frozen_window_plan_records_provenance(tmp_path: Path) -> None:
     plan_path = tmp_path / "dev.json"
     plan_path.write_text(

@@ -7,6 +7,7 @@ import tempfile
 import unittest
 from copy import deepcopy
 from pathlib import Path
+from unittest.mock import patch
 
 import torch
 
@@ -1655,6 +1656,7 @@ class AlgoPoolContractTestCase(unittest.TestCase):
             MECHANISM_COVERAGE_PROFILES,
             PROFILE_DEFAULTS,
             build_sa_ghmappo_profile_kwargs,
+            parse_args,
         )
 
         defaults = PROFILE_DEFAULTS["top_journal_mechanism_v49_retrospective_handoff_mappo"]
@@ -1719,6 +1721,7 @@ class AlgoPoolContractTestCase(unittest.TestCase):
             MECHANISM_COVERAGE_PROFILES,
             PROFILE_DEFAULTS,
             build_sa_ghmappo_profile_kwargs,
+            parse_args,
         )
 
         profile = "top_journal_mechanism_v50_long_horizon_handoff_mappo"
@@ -2401,6 +2404,1428 @@ class AlgoPoolContractTestCase(unittest.TestCase):
             sys.argv = original_argv
         self.assertEqual(args.window_mode, "full_stratified")
         self.assertEqual(args.train_window_mode, "rotate")
+
+    def test_sa_v71_profile_uses_learned_counterfactual_option_credit_only(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v71_tail_counterfactual_option_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertEqual(defaults["window_mode"], "full_stratified")
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["option_gate_enabled"])
+        self.assertTrue(kwargs["option_counterfactual_critic_enabled"])
+        self.assertGreater(kwargs["option_counterfactual_value_coef"], 0.0)
+        self.assertGreater(kwargs["option_counterfactual_advantage_coef"], 0.0)
+        self.assertGreater(kwargs["option_counterfactual_tail_weight"], 0.0)
+        self.assertTrue(kwargs["option_counterfactual_policy_improvement_enabled"])
+        self.assertGreater(kwargs["option_counterfactual_policy_improvement_coef"], 0.0)
+        self.assertFalse(kwargs["sparse_handoff_option_prior_enabled"])
+        self.assertFalse(kwargs["sparse_handoff_recovery_prior_enabled"])
+        self.assertFalse(kwargs["sparse_handoff_realization_credit_enabled"])
+        self.assertFalse(kwargs["continuity_guard_enabled"])
+        self.assertFalse(kwargs["idle_popularity_fallback_enabled"])
+        self.assertEqual(kwargs["heuristic_imitation_coef"], 0.0)
+        self.assertEqual(kwargs["option_gate_prior_logit_bias"], 0.0)
+        self.assertFalse(defaults["temporal_reward_shaping_enabled"])
+        original_argv = sys.argv
+        try:
+            sys.argv = ["train_sa_ghmappo_real_sample.py", "--profile", profile]
+            args = parse_args()
+        finally:
+            sys.argv = original_argv
+        self.assertFalse(args.temporal_reward_shaping_enabled)
+        self.assertEqual(args.update_eval_max_windows, 4)
+        self.assertEqual(args.update_eval_max_workflows, 1)
+        self.assertEqual(args.post_training_audit_mode, "compact")
+
+    def test_sa_v71_counterfactual_option_critic_uses_return_targets(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            option_gate_enabled=True,
+            option_counterfactual_critic_enabled=True,
+            option_counterfactual_value_coef=0.5,
+            option_counterfactual_advantage_coef=1.0,
+            option_counterfactual_advantage_clip=2.0,
+            option_counterfactual_warmup_updates=0,
+            option_counterfactual_tail_weight=2.0,
+        )
+        option_q_values = torch.tensor(
+            [0.0, 1.0, 0.0, 0.0],
+            dtype=torch.float32,
+            requires_grad=True,
+        )
+        losses = agent._compute_option_gate_loss(
+            batch_outputs=[
+                {
+                    "option_logits": torch.zeros(4, requires_grad=True),
+                    "option_q_values": option_q_values,
+                }
+            ],
+            batch_rows=[
+                {
+                    "action_info": {
+                        "option_gate": {
+                            "enabled": True,
+                            "option_action": 1,
+                            "option_log_prob": -1.386294,
+                            "option_mask": [True, True, True, True],
+                            "prior_target": 0,
+                            "sparse_tail_risk_option_context": {
+                                "active": True,
+                                "context": 1.0,
+                            },
+                        }
+                    }
+                }
+            ],
+            batch_advantage=torch.tensor([0.0]),
+            batch_option_returns=torch.tensor([2.0]),
+        )
+
+        self.assertEqual(len(losses), 5)
+        self.assertGreater(float(losses[3].detach()), 0.0)
+        self.assertGreater(float(losses[4].detach()), 0.0)
+        losses[3].backward()
+        self.assertIsNotNone(option_q_values.grad)
+
+    def test_sa_v71_counterfactual_critic_improves_option_logits(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            option_gate_enabled=True,
+            option_counterfactual_critic_enabled=True,
+            option_counterfactual_policy_improvement_enabled=True,
+            option_counterfactual_policy_improvement_coef=1.0,
+            option_counterfactual_policy_improvement_clip=2.0,
+            option_counterfactual_warmup_updates=0,
+        )
+        improved_logits, normalized_advantage = agent._critic_improved_option_logits(
+            option_logits=torch.zeros(4),
+            option_q_values=torch.tensor([0.0, 2.0, -1.0, 1.0]),
+            option_mask=[True, True, False, True],
+        )
+
+        self.assertEqual(int(torch.argmax(improved_logits).item()), 1)
+        self.assertGreater(float(normalized_advantage[1]), 0.0)
+        self.assertEqual(float(normalized_advantage[2]), 0.0)
+
+    def test_sa_v72_profile_uses_digital_twin_counterfactual_targets(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = (
+            "top_journal_mechanism_v72_digital_twin_counterfactual_option_mappo"
+        )
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertEqual(
+            defaults["primary_vehicle_selection"],
+            "handoff_pressure",
+        )
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["option_counterfactual_critic_enabled"])
+        self.assertTrue(kwargs["option_counterfactual_model_rollout_enabled"])
+        self.assertTrue(
+            kwargs[
+                "option_counterfactual_policy_improvement_deterministic_only"
+            ]
+        )
+        self.assertFalse(kwargs["sparse_handoff_option_prior_enabled"])
+        self.assertFalse(kwargs["sparse_handoff_realization_credit_enabled"])
+
+    def test_sa_v72_counterfactual_targets_train_unselected_options(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            option_gate_enabled=True,
+            option_counterfactual_critic_enabled=True,
+            option_counterfactual_model_rollout_enabled=True,
+            option_counterfactual_warmup_updates=0,
+        )
+        option_q_values = torch.zeros(4, requires_grad=True)
+        losses = agent._compute_option_gate_loss(
+            batch_outputs=[
+                {
+                    "option_logits": torch.zeros(4, requires_grad=True),
+                    "option_q_values": option_q_values,
+                }
+            ],
+            batch_rows=[
+                {
+                    "action_info": {
+                        "option_gate": {
+                            "enabled": True,
+                            "option_action": 0,
+                            "option_log_prob": -1.386294,
+                            "option_mask": [True, True, True, True],
+                            "prior_target": 0,
+                            "counterfactual_model_rollout": {
+                                "option_td_targets": {
+                                    "0": 1.0,
+                                    "1": 4.0,
+                                    "2": -2.0,
+                                    "3": 2.0,
+                                }
+                            },
+                        }
+                    }
+                }
+            ],
+            batch_advantage=torch.tensor([0.0]),
+            batch_option_returns=torch.tensor([0.0]),
+        )
+
+        losses[3].backward()
+        self.assertIsNotNone(option_q_values.grad)
+        self.assertGreater(float(torch.abs(option_q_values.grad[1])), 0.0)
+        self.assertGreater(float(torch.abs(option_q_values.grad[2])), 0.0)
+
+    def test_sa_v73_profile_uses_four_step_counterfactual_rollout(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v73_multistep_counterfactual_option_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["option_counterfactual_model_rollout_enabled"])
+        self.assertEqual(kwargs["option_counterfactual_model_rollout_horizon"], 4)
+        self.assertTrue(
+            kwargs[
+                "option_counterfactual_policy_improvement_deterministic_only"
+            ]
+        )
+
+    def test_sa_v74_profile_uses_native_action_model_critic(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v74_model_based_env_action_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertFalse(kwargs["option_gate_enabled"])
+        self.assertFalse(kwargs["option_counterfactual_critic_enabled"])
+        self.assertTrue(kwargs["env_action_model_critic_enabled"])
+        self.assertTrue(kwargs["env_action_model_rollout_enabled"])
+        self.assertEqual(kwargs["env_action_model_rollout_horizon"], 4)
+        self.assertGreater(kwargs["env_action_model_critic_value_coef"], 0.0)
+        self.assertGreater(kwargs["env_action_model_critic_advantage_coef"], 0.0)
+        self.assertGreater(
+            kwargs["env_action_model_critic_policy_improvement_coef"],
+            0.0,
+        )
+        self.assertTrue(kwargs["env_action_ppo_enabled"])
+        self.assertFalse(defaults["temporal_reward_shaping_enabled"])
+
+    def test_sa_v74_action_model_critic_trains_unselected_actions(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            env_action_model_critic_enabled=True,
+            env_action_model_rollout_enabled=True,
+            env_action_model_critic_warmup_updates=0,
+        )
+        action_q_values = torch.zeros(5, requires_grad=True)
+        value_loss, _ = agent._compute_env_action_model_critic_loss(
+            batch_outputs=[{"env_action_q_values": action_q_values}],
+            batch_rows=[
+                {
+                    "action_info": {
+                        "env_action_model_rollout": {
+                            "action_td_targets": {
+                                "0": 1.0,
+                                "1": 4.0,
+                                "2": -2.0,
+                                "3": 2.0,
+                                "4": 6.0,
+                            }
+                        }
+                    }
+                }
+            ],
+            batch_action_masks=[[True, True, True, True, True]],
+        )
+
+        value_loss.backward()
+        self.assertIsNotNone(action_q_values.grad)
+        self.assertGreater(float(torch.abs(action_q_values.grad[1])), 0.0)
+        self.assertGreater(float(torch.abs(action_q_values.grad[2])), 0.0)
+        self.assertGreater(float(torch.abs(action_q_values.grad[4])), 0.0)
+
+    def test_sa_v74_action_critic_improves_native_action_scores(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            env_action_model_critic_enabled=True,
+            env_action_model_critic_policy_improvement_coef=2.0,
+            env_action_model_critic_warmup_updates=0,
+        )
+        policy_output = {
+            "slow_logits": torch.zeros(3),
+            "fast_logits": torch.zeros(2),
+            "event_logits": torch.zeros(2),
+            "env_action_q_values": torch.tensor([0.0, 1.0, -2.0, 0.5, 4.0]),
+        }
+        adjusted, diagnostics = agent._apply_env_action_model_critic_improvement(
+            policy_output=policy_output,
+            action_mask=[True, True, True, True, True],
+        )
+        improved_scores = agent._hierarchical_env_action_scores(adjusted)
+
+        self.assertTrue(diagnostics["applied"])
+        self.assertEqual(int(torch.argmax(improved_scores).item()), 4)
+
+    def test_sa_v75_profile_uses_conservative_model_policy_improvement(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+            parse_args,
+        )
+
+        profile = "top_journal_mechanism_v75_conservative_model_policy_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["env_action_model_policy_improvement_enabled"])
+        self.assertGreater(
+            kwargs["env_action_model_policy_improvement_coef"],
+            0.0,
+        )
+        self.assertGreater(
+            kwargs["env_action_model_policy_improvement_temperature"],
+            1.0,
+        )
+        self.assertEqual(kwargs["env_action_model_critic_advantage_coef"], 0.0)
+        self.assertEqual(
+            kwargs["env_action_model_critic_policy_improvement_coef"],
+            0.0,
+        )
+        with patch.object(
+            sys,
+            "argv",
+            ["train_sa_ghmappo_real_sample.py", "--profile", profile],
+        ):
+            self.assertEqual(
+                parse_args().primary_vehicle_selection,
+                "handoff_pressure",
+            )
+        with patch.object(
+            sys,
+            "argv",
+            [
+                "train_sa_ghmappo_real_sample.py",
+                "--profile",
+                profile,
+                "--primary_vehicle_selection",
+                "stable_first",
+            ],
+        ):
+            self.assertEqual(
+                parse_args().primary_vehicle_selection,
+                "stable_first",
+            )
+
+    def test_sa_v75_model_policy_loss_updates_actor_logits(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            env_action_model_critic_enabled=True,
+            env_action_model_policy_improvement_enabled=True,
+            env_action_model_policy_improvement_coef=0.35,
+            env_action_model_policy_improvement_temperature=2.5,
+        )
+        slow_logits = torch.zeros(3, requires_grad=True)
+        fast_logits = torch.zeros(2, requires_grad=True)
+        event_logits = torch.zeros(2, requires_grad=True)
+        loss, target_kl = agent._compute_env_action_model_policy_improvement_loss(
+            batch_outputs=[
+                {
+                    "slow_logits": slow_logits,
+                    "fast_logits": fast_logits,
+                    "event_logits": event_logits,
+                }
+            ],
+            batch_rows=[
+                {
+                    "action_info": {
+                        "action_projection": {
+                            "masked_env_action_probs": [0.2] * 5,
+                        },
+                        "env_action_model_rollout": {
+                            "action_td_targets": {
+                                "0": 1.0,
+                                "1": 2.0,
+                                "2": 0.0,
+                                "3": -1.0,
+                                "4": 4.0,
+                            }
+                        },
+                    }
+                }
+            ],
+            batch_action_masks=[[True, True, True, True, True]],
+        )
+
+        loss.backward()
+        self.assertGreater(float(target_kl), 0.0)
+        self.assertIsNotNone(slow_logits.grad)
+        self.assertIsNotNone(fast_logits.grad)
+        self.assertIsNotNone(event_logits.grad)
+        self.assertGreater(float(torch.abs(event_logits.grad).sum()), 0.0)
+
+    def test_sa_v76_profile_enables_memory_robust_horizons_and_kl(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = (
+            "top_journal_mechanism_v76_recurrent_robust_model_policy_mappo"
+        )
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertEqual(
+            defaults["primary_vehicle_selection"],
+            "handoff_pressure",
+        )
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["outcome_memory_fusion_enabled"])
+        self.assertEqual(
+            tuple(kwargs["env_action_model_rollout_horizons"]),
+            (1, 2, 4, 8),
+        )
+        self.assertTrue(
+            kwargs[
+                "env_action_model_policy_improvement_robust_horizons_enabled"
+            ]
+        )
+        self.assertTrue(
+            kwargs[
+                "env_action_model_policy_improvement_adaptive_kl_enabled"
+            ]
+        )
+        self.assertAlmostEqual(
+            kwargs["env_action_model_policy_improvement_target_kl"],
+            0.03,
+        )
+
+    def test_sa_v76_memory_features_reach_actor_encoder(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            outcome_memory_fusion_enabled=True,
+        )
+        info = {
+            "semantic_state": _minimal_semantic_state(),
+            "algorithm_memory": {
+                "step_index": 4,
+                "last_action_id": 4,
+                "same_action_streak": 3,
+                "prepare_action_streak": 3,
+                "failed_prepare_streak": 2,
+                "no_progress_streak": 2,
+                "last_reward": -1.25,
+                "last_handoff_failed": True,
+                "last_stall": True,
+            },
+        }
+
+        output = agent._forward_policy(agent._extract_semantic_state(info))
+        encoded = output["encoded"]
+
+        self.assertIn("outcome_memory_fusion_enabled", encoded)
+        self.assertAlmostEqual(
+            float(encoded["outcome_memory_same_action_streak"].item()),
+            3.0 / 8.0,
+        )
+        self.assertAlmostEqual(
+            float(encoded["outcome_memory_failed_prepare_streak"].item()),
+            2.0 / 8.0,
+        )
+        self.assertAlmostEqual(
+            float(encoded["outcome_memory_no_progress_streak"].item()),
+            2.0 / 8.0,
+        )
+
+    def test_sa_v76_trainer_memory_tracks_repeated_failed_prepare(self) -> None:
+        from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
+
+        memory = MARLOnPolicyTrainer._initial_algorithm_memory()
+        decision_info = {
+            "semantic_state": {
+                "workflow": {
+                    "execution_order": ["n1", "n2"],
+                    "completed_node_ids": [],
+                }
+            }
+        }
+        next_info = {
+            "semantic_state": deepcopy(decision_info["semantic_state"]),
+            "metrics_protocol": {
+                "stall_occurred": True,
+                "handoff_failed": True,
+                "mechanism_success_strict": False,
+                "cache_hit": False,
+            },
+        }
+
+        memory = MARLOnPolicyTrainer._advance_algorithm_memory(
+            memory,
+            action=4,
+            reward=-1.25,
+            decision_info=decision_info,
+            next_info=next_info,
+        )
+        memory = MARLOnPolicyTrainer._advance_algorithm_memory(
+            memory,
+            action=4,
+            reward=-1.25,
+            decision_info=decision_info,
+            next_info=next_info,
+        )
+
+        self.assertEqual(memory["same_action_streak"], 2)
+        self.assertEqual(memory["prepare_action_streak"], 2)
+        self.assertEqual(memory["failed_prepare_streak"], 2)
+        self.assertEqual(memory["no_progress_streak"], 2)
+        self.assertTrue(memory["last_handoff_failed"])
+
+    def test_sa_v76_robust_horizon_target_rejects_short_term_prepare_spike(
+        self,
+    ) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            env_action_model_critic_enabled=True,
+            env_action_model_policy_improvement_enabled=True,
+            env_action_model_policy_improvement_robust_horizons_enabled=True,
+            env_action_model_policy_improvement_horizon_risk_coef=0.75,
+            env_action_model_policy_improvement_adaptive_kl_enabled=True,
+            env_action_model_policy_improvement_target_kl=0.03,
+        )
+        target_maps = [
+            {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 10.0},
+            {0: 2.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 5.0},
+            {0: 5.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: -5.0},
+            {0: 8.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: -10.0},
+        ]
+        robust_advantage = agent._build_env_action_model_robust_advantage(
+            target_maps=target_maps,
+            valid_indices=[0, 1, 2, 3, 4],
+        )
+        old_probs = torch.full((5,), 0.2)
+        improved_target = agent._build_env_action_model_improved_target(
+            old_probs=old_probs,
+            normalized_advantage=robust_advantage,
+        )
+        target_kl = torch.sum(
+            improved_target
+            * (
+                torch.log(improved_target)
+                - torch.log(old_probs)
+            )
+        )
+
+        self.assertEqual(int(torch.argmax(improved_target).item()), 0)
+        self.assertLessEqual(float(target_kl), 0.03001)
+        self.assertLess(
+            float(improved_target[4]),
+            float(improved_target[0]),
+        )
+
+    def test_sa_v77_profile_enables_temporal_downside_lambda_target(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = (
+            "top_journal_mechanism_v77_temporal_downside_model_policy_mappo"
+        )
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertEqual(
+            kwargs[
+                "env_action_model_policy_improvement_horizon_aggregation_mode"
+            ],
+            "lambda_downside",
+        )
+        self.assertAlmostEqual(
+            kwargs["env_action_model_policy_improvement_horizon_lambda"],
+            0.90,
+        )
+        self.assertTrue(
+            kwargs[
+                "env_action_model_policy_improvement_adaptive_kl_enabled"
+            ]
+        )
+
+    def test_sa_v77_temporal_downside_preserves_delayed_gain(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            env_action_model_critic_enabled=True,
+            env_action_model_policy_improvement_enabled=True,
+            env_action_model_policy_improvement_robust_horizons_enabled=True,
+            env_action_model_policy_improvement_horizon_risk_coef=0.75,
+            env_action_model_policy_improvement_horizon_aggregation_mode=(
+                "lambda_downside"
+            ),
+            env_action_model_policy_improvement_horizon_lambda=0.90,
+            env_action_model_policy_improvement_adaptive_kl_enabled=True,
+            env_action_model_policy_improvement_target_kl=0.03,
+        )
+        target_maps = [
+            {0: -10.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 10.0},
+            {0: -5.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 5.0},
+            {0: 5.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: -5.0},
+            {0: 10.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: -10.0},
+        ]
+
+        temporal_advantage = agent._build_env_action_model_robust_advantage(
+            target_maps=target_maps,
+            valid_indices=[0, 1, 2, 3, 4],
+        )
+        old_probs = torch.full((5,), 0.2)
+        improved_target = agent._build_env_action_model_improved_target(
+            old_probs=old_probs,
+            normalized_advantage=temporal_advantage,
+        )
+        target_kl = torch.sum(
+            improved_target
+            * (
+                torch.log(improved_target)
+                - torch.log(old_probs)
+            )
+        )
+
+        self.assertEqual(int(torch.argmax(improved_target).item()), 0)
+        self.assertGreater(
+            float(improved_target[0]),
+            float(improved_target[4]),
+        )
+        self.assertLessEqual(float(target_kl), 0.03001)
+
+    def test_sa_v78_profile_enables_regret_adaptive_long_horizon_target(
+        self,
+    ) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v78_regret_adaptive_model_policy_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertEqual(
+            tuple(kwargs["env_action_model_rollout_horizons"]),
+            (1, 2, 4, 8, 16),
+        )
+        self.assertTrue(
+            kwargs[
+                "env_action_model_policy_improvement_regret_adaptive_kl_enabled"
+            ]
+        )
+        self.assertAlmostEqual(
+            kwargs["env_action_model_policy_improvement_max_target_kl"],
+            0.35,
+        )
+        self.assertAlmostEqual(
+            kwargs["env_action_model_policy_improvement_regret_priority_coef"],
+            2.0,
+        )
+
+    def test_sa_v78_counterfactual_regret_can_reverse_bad_policy_mode(
+        self,
+    ) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            env_action_model_critic_enabled=True,
+            env_action_model_policy_improvement_enabled=True,
+            env_action_model_policy_improvement_robust_horizons_enabled=True,
+            env_action_model_policy_improvement_horizon_risk_coef=0.75,
+            env_action_model_policy_improvement_horizon_aggregation_mode=(
+                "lambda_downside"
+            ),
+            env_action_model_policy_improvement_horizon_lambda=0.90,
+            env_action_model_policy_improvement_adaptive_kl_enabled=True,
+            env_action_model_policy_improvement_target_kl=0.03,
+            env_action_model_policy_improvement_regret_adaptive_kl_enabled=True,
+            env_action_model_policy_improvement_max_target_kl=0.35,
+            env_action_model_policy_improvement_regret_priority_coef=2.0,
+        )
+        target_maps = [
+            {0: 4.15, 2: 0.20, 3: 0.10, 4: 1.10},
+            {0: 6.74, 2: -1.06, 3: -1.16, 4: -0.16},
+            {0: 9.59, 2: -3.54, 3: -3.64, 4: -2.64},
+            {0: 9.59, 2: -8.36, 3: -8.46, 4: -7.46},
+            {0: 29.26, 2: -9.27, 3: -9.37, 4: -8.37},
+        ]
+        normalized_advantage = (
+            agent._build_env_action_model_robust_advantage(
+                target_maps=target_maps,
+                valid_indices=[0, 2, 3, 4],
+            )
+        )
+        old_probs = torch.tensor([0.168305, 0.056089, 0.068270, 0.707335])
+        old_probs = old_probs / old_probs.sum()
+        normalized_regret = (
+            agent._normalized_env_action_counterfactual_regret(
+                old_probs=old_probs,
+                normalized_advantage=normalized_advantage,
+            )
+        )
+        effective_target_kl = 0.03 + (0.35 - 0.03) * float(
+            normalized_regret
+        )
+        improved_target = agent._build_env_action_model_improved_target(
+            old_probs=old_probs,
+            normalized_advantage=normalized_advantage,
+            target_kl=effective_target_kl,
+        )
+        target_kl = torch.sum(
+            improved_target
+            * (
+                torch.log(improved_target)
+                - torch.log(old_probs)
+            )
+        )
+
+        self.assertGreater(float(normalized_regret), 0.70)
+        self.assertEqual(int(torch.argmax(improved_target).item()), 0)
+        self.assertLessEqual(float(target_kl), effective_target_kl + 1e-5)
+        self.assertLessEqual(effective_target_kl, 0.35)
+
+    def test_sa_v79_profile_enables_high_regret_tail_distillation(
+        self,
+    ) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v79_tail_distilled_model_policy_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(
+            kwargs[
+                "env_action_model_policy_improvement_tail_distillation_enabled"
+            ]
+        )
+        self.assertAlmostEqual(
+            kwargs["env_action_model_policy_improvement_tail_quantile"],
+            0.75,
+        )
+        self.assertAlmostEqual(
+            kwargs["env_action_model_policy_improvement_tail_min_regret"],
+            0.50,
+        )
+        self.assertEqual(
+            kwargs["env_action_model_policy_improvement_tail_epochs"],
+            8,
+        )
+        self.assertAlmostEqual(
+            kwargs["env_action_model_policy_improvement_tail_coef"],
+            1.0,
+        )
+
+    def test_sa_v80_profile_enables_training_only_imagination_replay(
+        self,
+    ) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = (
+            "top_journal_mechanism_v80_imagination_replay_model_policy_mappo"
+        )
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(
+            kwargs["env_action_model_imagination_replay_enabled"]
+        )
+        self.assertEqual(
+            tuple(kwargs["env_action_model_imagination_replay_depths"]),
+            (2, 4, 8),
+        )
+        self.assertEqual(
+            kwargs["env_action_model_policy_improvement_tail_epochs"],
+            4,
+        )
+        self.assertAlmostEqual(
+            kwargs["env_action_model_policy_improvement_tail_coef"],
+            0.75,
+        )
+
+    def test_sa_v81_profile_enables_multihorizon_joint_trust_region(
+        self,
+    ) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v81_trust_region_imagination_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertEqual(
+            tuple(kwargs["env_action_model_imagination_replay_horizons"]),
+            (1, 2, 4),
+        )
+        self.assertAlmostEqual(
+            kwargs[
+                "env_action_model_policy_improvement_tail_max_policy_kl"
+            ],
+            0.05,
+        )
+
+    def test_sa_v82_profile_enables_outcome_conditioned_recovery_imagination(
+        self,
+    ) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+        from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
+
+        profile = "top_journal_mechanism_v82_recovery_imagination_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(
+            kwargs["env_action_model_imagination_replay_recovery_only"]
+        )
+        self.assertFalse(
+            MARLOnPolicyTrainer._algorithm_memory_has_recovery_signal(
+                MARLOnPolicyTrainer._initial_algorithm_memory()
+            )
+        )
+        self.assertTrue(
+            MARLOnPolicyTrainer._algorithm_memory_has_recovery_signal(
+                {"no_progress_streak": 2}
+            )
+        )
+
+    def test_sa_v83_profile_isolates_recovery_residual_updates(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v83_recovery_residual_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["outcome_recovery_residual_enabled"])
+        self.assertTrue(
+            kwargs[
+                "env_action_model_policy_improvement_tail_recovery_only"
+            ]
+        )
+        self.assertTrue(
+            kwargs[
+                "env_action_model_policy_improvement_tail_adapter_only"
+            ]
+        )
+
+    def test_sa_v84_profile_enables_search_distilled_dual_residuals(
+        self,
+    ) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = (
+            "top_journal_mechanism_v84_search_distilled_residual_mappo"
+        )
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["digital_twin_planning_residual_enabled"])
+        self.assertTrue(kwargs["env_action_model_beam_search_enabled"])
+        self.assertEqual(kwargs["env_action_model_beam_search_horizon"], 6)
+        self.assertEqual(kwargs["env_action_model_beam_search_width"], 2)
+        self.assertTrue(
+            kwargs[
+                "env_action_model_policy_improvement_tail_planning_adapter_only"
+            ]
+        )
+
+    def test_sa_v85_profile_enables_backtracked_residual_optimizer(
+        self,
+    ) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = (
+            "top_journal_mechanism_v85_trust_region_residual_search_mappo"
+        )
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(
+            kwargs[
+                "env_action_model_policy_improvement_tail_residual_optimizer_enabled"
+            ]
+        )
+        self.assertEqual(
+            kwargs["env_action_model_policy_improvement_tail_epochs"],
+            24,
+        )
+        self.assertAlmostEqual(
+            kwargs[
+                "env_action_model_policy_improvement_tail_residual_learning_rate"
+            ],
+            0.02,
+        )
+        self.assertAlmostEqual(
+            kwargs[
+                "env_action_model_policy_improvement_tail_residual_backtrack_factor"
+            ],
+            0.5,
+        )
+        self.assertEqual(
+            kwargs[
+                "env_action_model_policy_improvement_tail_residual_max_backtracks"
+            ],
+            7,
+        )
+        self.assertAlmostEqual(
+            kwargs[
+                "env_action_model_policy_improvement_tail_max_policy_kl"
+            ],
+            kwargs["env_action_model_policy_improvement_max_target_kl"],
+        )
+
+    def test_sa_v86_profile_searches_imagined_recovery_states(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v86_recovery_beam_replay_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["env_action_model_imagination_replay_enabled"])
+        self.assertTrue(
+            kwargs["env_action_model_imagination_replay_recovery_only"]
+        )
+        self.assertTrue(
+            kwargs["env_action_model_imagination_beam_search_enabled"]
+        )
+        self.assertTrue(
+            kwargs["env_action_model_policy_improvement_tail_beam_only"]
+        )
+
+    def test_sa_v86_imagined_recovery_sample_carries_beam_targets(self) -> None:
+        from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
+
+        class FakeEnv:
+            def __init__(self, state: int = 0) -> None:
+                self.state = state
+                self._recorder = None
+
+            def step(self, action: int):
+                self.state += 1
+                reward = float(self.state * 10 + int(action))
+                return (
+                    [self.state],
+                    reward,
+                    self.state >= 7,
+                    False,
+                    {
+                        "semantic_state": {},
+                        "metrics_protocol": {"stall_occurred": False},
+                    },
+                )
+
+        class FakeAgent:
+            def act(self, observation, info):
+                del observation, info
+                return 0, {"action_mask": [True] * 5}
+
+            def evaluate_value(self, observation, info=None):
+                del observation, info
+                return 0.0
+
+        trainer = MARLOnPolicyTrainer(
+            env=FakeEnv(state=0),
+            agent=FakeAgent(),
+            recorder=None,
+            gamma=0.99,
+        )
+        sample, transition_count = (
+            trainer._collect_imagined_env_action_sample(
+                branch_env=FakeEnv(state=4),
+                observation=[4],
+                decision_info={"semantic_state": {}},
+                algorithm_memory={"no_progress_streak": 1},
+                action_info={
+                    "action_mask": [True] * 5,
+                    "env_action_model_imagination_beam_search_enabled": True,
+                    "env_action_model_beam_search_horizon": 2,
+                    "env_action_model_beam_search_width": 2,
+                },
+                run_metadata=None,
+                imagination_depth=2,
+                imagination_horizons=[1],
+            )
+        )
+        rollout = sample["action_info"]["env_action_model_rollout"]
+
+        self.assertEqual(
+            rollout["protocol"],
+            "digital_twin_imagined_recovery_beam_td_v3",
+        )
+        self.assertEqual(
+            rollout["beam_search_protocol"],
+            "digital_twin_discrete_beam_search_v1",
+        )
+        self.assertEqual(set(rollout["beam_action_td_targets"]), set("01234"))
+        self.assertGreater(
+            min(rollout["beam_action_td_targets"].values()),
+            50.0,
+        )
+        self.assertEqual(transition_count, rollout["model_transition_count"])
+
+    def test_sa_v87_profile_enables_mirror_logit_projection(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v87_mirror_residual_projection_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(
+            kwargs["env_action_model_imagination_beam_search_enabled"]
+        )
+        self.assertTrue(
+            kwargs[
+                "env_action_model_policy_improvement_tail_logit_projection_enabled"
+            ]
+        )
+
+    def test_sa_v87_logit_projection_pushes_toward_beam_action(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            use_hierarchy=False,
+            env_action_model_policy_improvement_enabled=True,
+            env_action_model_policy_improvement_adaptive_kl_enabled=True,
+            env_action_model_policy_improvement_regret_adaptive_kl_enabled=True,
+            env_action_model_policy_improvement_target_kl=0.03,
+            env_action_model_policy_improvement_max_target_kl=0.35,
+            env_action_model_policy_improvement_prefer_beam_targets=True,
+        )
+        logits = torch.tensor(
+            [-0.5, -1.0, -2.5, -3.0, 2.5],
+            dtype=torch.float32,
+            requires_grad=True,
+        )
+        old_probs = torch.softmax(logits.detach(), dim=-1).tolist()
+        loss, _ = agent._compute_env_action_model_policy_improvement_loss(
+            batch_outputs=[{"flat_logits": logits}],
+            batch_rows=[
+                {
+                    "action_info": {
+                        "action_projection": {
+                            "masked_env_action_probs": old_probs,
+                        },
+                        "env_action_model_rollout": {
+                            "beam_action_td_targets": {
+                                "0": 0.0,
+                                "1": -1.0,
+                                "2": 10.0,
+                                "3": -2.0,
+                                "4": -5.0,
+                            },
+                        },
+                    },
+                }
+            ],
+            batch_action_masks=[[True] * 5],
+            logit_projection_enabled=True,
+        )
+
+        loss.backward()
+
+        self.assertLess(float(logits.grad[2]), 0.0)
+        self.assertGreater(float(logits.grad[4]), 0.0)
+
+    def test_sa_v88_profile_enables_contextual_recovery_expert(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v88_contextual_recovery_expert_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["outcome_context_residual_enabled"])
+        self.assertTrue(
+            kwargs[
+                "env_action_model_policy_improvement_tail_logit_projection_enabled"
+            ]
+        )
+
+    def test_sa_v88_contextual_expert_receives_explicit_state(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            outcome_memory_fusion_enabled=True,
+            outcome_recovery_residual_enabled=True,
+            digital_twin_planning_residual_enabled=True,
+            outcome_context_residual_enabled=True,
+        )
+        state = deepcopy(_minimal_semantic_state())
+        state["algorithm_memory"] = {
+            "step_index": 6,
+            "last_action_id": 4,
+            "failed_prepare_streak": 1,
+            "no_progress_streak": 1,
+            "last_stall": True,
+        }
+        output = agent._forward_policy(state)
+
+        self.assertIn("outcome_context_residual_bias", output)
+        self.assertIsNotNone(output["outcome_context_residual_bias"])
+        self.assertEqual(tuple(output["outcome_context_residual_bias"].shape), (5,))
+        self.assertAlmostEqual(
+            float(output["outcome_recovery_residual_gate"].item()),
+            1.0,
+        )
+
+    def test_sa_v89_profile_enables_diverse_recovery_branches(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v89_diverse_recovery_branch_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["outcome_context_residual_enabled"])
+        self.assertEqual(
+            kwargs["env_action_model_imagination_replay_branch_mode"],
+            "top_k",
+        )
+        self.assertEqual(
+            kwargs["env_action_model_imagination_replay_branch_top_k"],
+            2,
+        )
+
+    def test_sa_v89_top_k_imagination_branches_follow_policy_support(
+        self,
+    ) -> None:
+        from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
+
+        top_k = MARLOnPolicyTrainer._select_imagination_branch_actions(
+            valid_actions=[0, 2, 4],
+            root_probs=[0.3, 0.0, 0.1, 0.0, 0.6],
+            dominant_action=4,
+            branch_mode="top_k",
+            branch_top_k=2,
+        )
+        dominant = MARLOnPolicyTrainer._select_imagination_branch_actions(
+            valid_actions=[0, 2, 4],
+            root_probs=[0.3, 0.0, 0.1, 0.0, 0.6],
+            dominant_action=4,
+            branch_mode="dominant",
+            branch_top_k=2,
+        )
+
+        self.assertEqual(top_k, {0, 4})
+        self.assertEqual(dominant, {4})
+
+    def test_sa_v90_profile_scopes_tail_updates_to_recovery_adapters(
+        self,
+    ) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v90_causally_scoped_recovery_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["episodes"], 256)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertEqual(
+            kwargs["env_action_model_imagination_replay_branch_mode"],
+            "top_k",
+        )
+        self.assertTrue(
+            kwargs["env_action_model_policy_improvement_tail_adapter_only"]
+        )
+        self.assertFalse(
+            kwargs[
+                "env_action_model_policy_improvement_tail_planning_adapter_only"
+            ]
+        )
+
+    def test_sa_v91_profile_balances_high_regret_recovery_targets(
+        self,
+    ) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v91_balanced_recovery_distillation_mappo"
+        defaults = PROFILE_DEFAULTS[profile]
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+
+        self.assertEqual(defaults["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(
+            kwargs[
+                "env_action_model_policy_improvement_tail_target_balance_enabled"
+            ]
+        )
+        self.assertEqual(
+            kwargs[
+                "env_action_model_policy_improvement_tail_target_balance_power"
+            ],
+            0.5,
+        )
+        self.assertTrue(
+            kwargs["env_action_model_policy_improvement_tail_adapter_only"]
+        )
+
+    def test_sa_v91_target_balance_preserves_scale_and_upweights_minority(
+        self,
+    ) -> None:
+        agent = build_agent("sa_ghmappo", random_seed=7)
+        selected = [
+            (index, 0.9, 2, True) for index in range(12)
+        ] + [
+            (12, 0.95, 0, True),
+            (13, 0.94, 0, False),
+        ]
+
+        by_index, by_target = agent._build_tail_target_balance_weights(
+            selected,
+            power=0.5,
+            max_weight=4.0,
+        )
+
+        self.assertGreater(by_target["0"], by_target["2"])
+        self.assertLessEqual(max(by_index.values()), 4.0)
+        self.assertAlmostEqual(
+            sum(by_index.values()) / len(by_index),
+            1.0,
+            places=6,
+        )
+
+    def test_sa_v92_online_planner_uses_counterfactual_return_with_policy_contract(
+        self,
+    ) -> None:
+        from scripts.train_sa_ghmappo_real_sample import build_sa_ghmappo_profile_kwargs
+
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v92_online_counterfactual_mappo"
+        )
+        kwargs["env_action_model_online_planner_policy_prior_coef"] = 0.0
+        agent = build_agent("sa_ghmappo", random_seed=7, **kwargs)
+        selected_action, planner_stats = agent.select_env_action_from_model_targets(
+            action_info={
+                "final_env_action": 0,
+                "action_mask": [True, True, True, True, True],
+                "action_projection": {
+                    "masked_env_action_probs": [0.70, 0.05, 0.10, 0.10, 0.05]
+                },
+            },
+            rollout_info={
+                "action_td_targets_by_horizon": {
+                    "1": {"0": 0.0, "1": 0.0, "2": 2.0, "3": 0.0, "4": 0.0},
+                    "4": {"0": 0.0, "1": 0.0, "2": 4.0, "3": 0.0, "4": 0.0},
+                }
+            },
+        )
+
+        self.assertEqual(selected_action, 2)
+        self.assertTrue(planner_stats["enabled"])
+        self.assertTrue(planner_stats["applied"])
+        self.assertEqual(planner_stats["candidate_count"], 5)
+        self.assertEqual(
+            planner_stats["protocol"],
+            "mappo_counterfactual_policy_improvement_v1",
+        )
+
+    def test_sa_v92_profile_enables_online_counterfactual_planner(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            PROFILE_DEFAULTS,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v92_online_counterfactual_mappo"
+        self.assertEqual(PROFILE_DEFAULTS[profile]["reward_positive_offset"], 0.0)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+        self.assertTrue(kwargs["env_action_model_online_planner_enabled"])
+        self.assertEqual(kwargs["env_action_model_online_planner_coef"], 1.0)
+
+    def test_sa_v93_planner_prefers_realized_mechanism_over_return_only_action(
+        self,
+    ) -> None:
+        from scripts.train_sa_ghmappo_real_sample import build_sa_ghmappo_profile_kwargs
+
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            **build_sa_ghmappo_profile_kwargs(
+                "top_journal_mechanism_v93_mechanism_aware_online_mappo"
+            ),
+        )
+        selected_action, planner_stats = agent.select_env_action_from_model_targets(
+            action_info={
+                "final_env_action": 0,
+                "action_mask": [True, True, True, True, True],
+                "action_projection": {
+                    "masked_env_action_probs": [0.20, 0.20, 0.20, 0.20, 0.20]
+                },
+            },
+            rollout_info={
+                "action_td_targets": {
+                    "0": 0.0,
+                    "1": 0.0,
+                    "2": 4.0,
+                    "3": 0.0,
+                    "4": 0.0,
+                },
+                "action_mechanism_targets": {
+                    "0": 0.0,
+                    "1": 0.0,
+                    "2": 0.0,
+                    "3": 0.0,
+                    "4": 1.0,
+                },
+            },
+        )
+
+        self.assertEqual(selected_action, 4)
+        self.assertEqual(planner_stats["mechanism_coef"], 2.0)
+        self.assertGreater(planner_stats["mechanism_advantage"]["4"], 0.0)
+
+    def test_marl_evaluation_skips_training_only_model_targets(self) -> None:
+        from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
+
+        class FakeAgent:
+            agent_name = "fake"
+
+            def learn(self, rollout):
+                return {"collected_steps": len(rollout)}
+
+        class StubTrainer(MARLOnPolicyTrainer):
+            def __init__(self) -> None:
+                self._agent = FakeAgent()
+                self.collect_model_targets = None
+
+            def collect_episode(
+                self,
+                run_metadata=None,
+                collect_model_targets=True,
+            ):
+                del run_metadata
+                self.collect_model_targets = collect_model_targets
+                return {"episode_status": {}}, [{"reward": 1.0}]
+
+        trainer = StubTrainer()
+        summary = trainer.run_episode(learn=False)
+
+        self.assertFalse(trainer.collect_model_targets)
+        self.assertTrue(
+            summary["agent_info"]["learn_info"]["policy_update_skipped"]
+        )
 
     def test_sa_v70_sparse_tail_option_prior_boosts_mechanism_option(self) -> None:
         state = deepcopy(_minimal_semantic_state())

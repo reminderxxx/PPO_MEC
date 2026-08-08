@@ -1,0 +1,81 @@
+profile: top_journal_mechanism_v81_trust_region_imagination_mappo
+base_profile: top_journal_mechanism_v80_imagination_replay_model_policy_mappo
+purpose: >
+  Make training-only recovery imagination reliable through multihorizon branch
+  returns and an empirical trust region over the joint tail update.
+
+algorithm_delta:
+  - Retains clipped MAPPO and v80 dominant-policy branch state generation.
+  - Replaces imagined-state one-step critic targets with H1/H2/H4 simulated returns.
+  - Applies the same lambda-downside aggregation used by real rollout states.
+  - Measures behavior-policy KL over the complete selected tail after each distillation epoch.
+  - Stops tail distillation when empirical joint KL reaches 0.05.
+  - Records real versus imagined selection counts and target native-action distributions.
+  - Uses no development data, reward shaping, heuristic labels, guards, or evaluator overrides.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v80_imagination_replay_model_policy_mappo
+  observed_failure: >
+    One-step imagined targets depended on an immature critic with near-zero
+    explained variance, while shared-network tail updates reached KL 0.277
+    despite individually bounded targets, collapsing development reward.
+  correction: >
+    Short multistep simulator returns reduce OOD bootstrap bias and empirical
+    joint-KL early stopping constrains representation-induced policy drift.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  prediction_horizon: 16
+  reward_shaping_added: false
+
+training_budget:
+  primary_vehicle_selection: handoff_pressure
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  clip_ratio: 0.12
+  target_kl: 0.015
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  temporal_reward_shaping_enabled: false
+  update_eval_max_windows: 4
+  update_eval_max_workflows: 1
+  post_training_audit_mode: compact
+
+algorithm:
+  env_action_model_rollout_horizons: [1, 2, 4, 8, 16]
+  env_action_model_imagination_replay_enabled: true
+  env_action_model_imagination_replay_depths: [2, 4, 8]
+  env_action_model_imagination_replay_horizons: [1, 2, 4]
+  env_action_model_policy_improvement_horizon_aggregation_mode: lambda_downside
+  env_action_model_policy_improvement_horizon_lambda: 0.9
+  env_action_model_policy_improvement_regret_adaptive_kl_enabled: true
+  env_action_model_policy_improvement_max_target_kl: 0.35
+  env_action_model_policy_improvement_tail_distillation_enabled: true
+  env_action_model_policy_improvement_tail_quantile: 0.75
+  env_action_model_policy_improvement_tail_min_regret: 0.5
+  env_action_model_policy_improvement_tail_epochs: 4
+  env_action_model_policy_improvement_tail_coef: 0.75
+  env_action_model_policy_improvement_tail_max_policy_kl: 0.05
+
+compute_accounting:
+  model_query_unit: valid_native_action_per_real_or_imagined_training_state
+  model_transition_unit: simulated_branch_step
+  imagination_state_unit: dominant-policy branch state at a configured depth
+  paper_requirement: report real transitions, imagined states, model queries, model transitions, tail updates, wall time, and memory
+
+checkpoint_protocol:
+  closed_loop_priority: latest_after_fixed_budget
+  selection_source: no_benchmark_selection
+  disallowed_claim: benchmark_selected_checkpoint
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Promotion requires all-baseline development evidence, independent formal
+    and hidden confirmation, equal-budget baselines, ablations, and support
+    experiments under the frozen protocol.

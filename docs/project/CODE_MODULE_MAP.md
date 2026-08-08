@@ -1,5 +1,13 @@
 # Code Module Map
 
+## 2026-08-08 v93 mechanism-aware online counterfactual MAPPO
+
+- `src/trainers/marl_on_policy_trainer.py`：在线反事实 branch replay 新增 delayed predictive-prefetch validation queue 和当前步 handoff-aligned prepare target，确保机制 credit 与 `EpisodeRecorder` 的兑现协议一致。
+- `src/agents/sa_ghmappo_core.py`、`src/agents/sa_ghmappo_agent.py`：v93 保留 MAPPO centralized critic / controller credit，融合 robust counterfactual return advantage、mechanism advantage 和 policy-prior constrained online planner；不改变 reward/action contract。
+- `src/evaluators/main_results_support.py`、`src/evaluators/real_eval_support.py`、`scripts/benchmark_main_results.py`：记录 planner、validated mechanism、offset-free reward 和 checkpoint provenance，支持同窗口 PPO/MAPPO/heuristic 比较。
+- `scripts/train_sa_ghmappo_real_sample.py`、`scripts/run_top_journal_closed_loop.py`、`configs/experiment/top_journal_mechanism_v93_mechanism_aware_online_mappo.yaml`：维护 v71-v93 profile chain、训练预算与 paper-claim boundary；v93 当前仅为 dev candidate。
+- `tests/test_algo_pool_contract.py`、`tests/test_checkpoint_compat.py`、`tests/test_strict_split_protocol.py`、`tests/test_top_journal_closed_loop.py`：覆盖 v93 contract、checkpoint compatibility、冻结窗口和 closed-loop 入口。
+
 ## 2026-07-22 v42-v46 offset-free MAPPO opportunity / net-utility profiles
 
 - `src/envs/specs/semantic_objects.py`、`src/envs/core/vec_workflow_core_env.py`：`RewardBreakdown` 和环境 info 新增 `positive_offset` / `reward_positive_offset_component`，支撑 offset-free 与 legacy reward protocol 同时审计。

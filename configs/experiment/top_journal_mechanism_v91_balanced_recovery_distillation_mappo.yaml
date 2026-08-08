@@ -1,0 +1,57 @@
+profile: top_journal_mechanism_v91_balanced_recovery_distillation_mappo
+base_profile: top_journal_mechanism_v90_causally_scoped_recovery_mappo
+purpose: >
+  Prevent rare but necessary recovery actions from being erased by the majority
+  target in high-regret model-imagination replay.
+
+algorithm_delta:
+  - Retains clipped MAPPO, centralized value learning, top-k recovery imagination, beam return targets, causal residual scoping, mirror projection, and transactional KL rollback.
+  - Applies normalized square-root inverse-frequency weights to target actions within the selected high-regret recovery tail.
+  - Trains only failure-gated recovery residual experts; the base actor and globally active planning residual remain frozen during tail distillation.
+  - Preserves the original mean loss scale and caps target weights at 4.0 before normalization.
+  - Uses no action override, reward shaping, heuristic policy, evaluator bias, or development labels.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v90_causally_scoped_recovery_mappo
+  observed_failure: >
+    On development seed 13, the selected recovery targets were dominated by
+    action 2 over action 0 by 47 to 3. The resulting policy failed both
+    workflows in the hard off27624 window despite improving average training
+    reward and respecting the KL constraint.
+  correction: >
+    Target-balanced distillation preserves minority recovery gradients while
+    the residual gate confines their effect to observed failure or stall states.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  temporal_reward_shaping_enabled: false
+  reward_shaping_added: false
+
+training_budget:
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  prediction_horizon: 16
+
+algorithm:
+  env_action_model_policy_improvement_tail_target_balance_enabled: true
+  env_action_model_policy_improvement_tail_target_balance_power: 0.5
+  env_action_model_policy_improvement_tail_target_balance_max_weight: 4.0
+  env_action_model_policy_improvement_tail_adapter_only: true
+  env_action_model_policy_improvement_tail_planning_adapter_only: false
+  env_action_model_policy_improvement_tail_max_policy_kl: 0.35
+
+compute_accounting:
+  added_trainable_parameters: 0
+  paper_requirement: report selected target counts, normalized target weights, accepted KL, rejected epochs, wall time, and memory
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Development-only until fresh multi-seed training, complete equal-budget
+    baselines, strict formal/hidden evaluation, statistics, and ablations pass.

@@ -1,0 +1,95 @@
+profile: top_journal_mechanism_v79_tail_distilled_model_policy_mappo
+base_profile: top_journal_mechanism_v78_regret_adaptive_model_policy_mappo
+purpose: >
+  Preserve rare high-regret recovery states across the MAPPO update by
+  performing additional KL-anchored policy distillation on the
+  counterfactual-regret tail of each real training rollout.
+
+algorithm_delta:
+  - Retains clipped MAPPO, observable outcome memory, and exact training-only digital-twin counterfactual evaluation.
+  - Retains horizons 1, 2, 4, 8, and 16 with sparse-horizon lambda returns and one-sided temporal downside.
+  - Ranks real on-policy states by normalized counterfactual regret.
+  - Replays only the upper regret tail for additional actor distillation epochs.
+  - Anchors every improved target to the stored behavior policy with regret-adaptive KL.
+  - Uses no heuristic action labels, reward shaping, action guard, fixed prior, evaluator override, or development data.
+
+failure_addressed:
+  source_profile: top_journal_mechanism_v78_regret_adaptive_model_policy_mappo
+  observed_failure: >
+    Regret-adaptive targets were valid and produced model-policy losses, but
+    rare no-progress states appeared only once in ordinary on-policy
+    minibatches and did not cross the deterministic actor decision boundary.
+  correction: >
+    Tail-prioritized generalized policy iteration gives high-regret states
+    repeated optimization while retaining a per-state behavior-policy trust
+    region, preventing common low-regret states from diluting recovery credit.
+
+reward_protocol:
+  reward_positive_offset: 0.0
+  offset_free: true
+  prediction_horizon: 16
+  reward_shaping_added: false
+
+training_budget:
+  primary_vehicle_selection: handoff_pressure
+  episodes: 256
+  update_every: 8
+  batch_size: 64
+  learning_rate: 0.0001
+  clip_ratio: 0.12
+  target_kl: 0.015
+  train_window_count: 20
+  train_window_mode: rotate
+  window_mode: full_stratified
+  max_steps: 22
+  temporal_reward_shaping_enabled: false
+  update_eval_max_windows: 4
+  update_eval_max_workflows: 1
+  post_training_audit_mode: compact
+
+algorithm:
+  outcome_memory_fusion_enabled: true
+  outcome_memory_actor_scale: 0.7
+  outcome_memory_critic_scale: 0.85
+  env_action_model_critic_enabled: true
+  env_action_model_critic_value_coef: 0.5
+  env_action_model_critic_advantage_coef: 0.0
+  env_action_model_critic_policy_improvement_coef: 0.0
+  env_action_model_policy_improvement_enabled: true
+  env_action_model_policy_improvement_coef: 0.35
+  env_action_model_policy_improvement_robust_horizons_enabled: true
+  env_action_model_policy_improvement_horizon_aggregation_mode: lambda_downside
+  env_action_model_policy_improvement_horizon_lambda: 0.9
+  env_action_model_policy_improvement_horizon_risk_coef: 0.75
+  env_action_model_policy_improvement_adaptive_kl_enabled: true
+  env_action_model_policy_improvement_target_kl: 0.03
+  env_action_model_policy_improvement_regret_adaptive_kl_enabled: true
+  env_action_model_policy_improvement_max_target_kl: 0.35
+  env_action_model_policy_improvement_regret_priority_coef: 2.0
+  env_action_model_policy_improvement_tail_distillation_enabled: true
+  env_action_model_policy_improvement_tail_quantile: 0.75
+  env_action_model_policy_improvement_tail_min_regret: 0.5
+  env_action_model_policy_improvement_tail_epochs: 8
+  env_action_model_policy_improvement_tail_coef: 1.0
+  env_action_model_rollout_enabled: true
+  env_action_model_rollout_horizons: [1, 2, 4, 8, 16]
+  env_action_ppo_enabled: true
+  env_action_ppo_coef: 0.35
+
+compute_accounting:
+  model_query_unit: valid_native_action_per_training_state
+  model_transition_unit: simulated_branch_step
+  tail_update_unit: selected_high_regret_state_actor_gradient_step
+  paper_requirement: report real transitions, model queries, model transitions, tail updates, wall time, and memory
+
+checkpoint_protocol:
+  closed_loop_priority: latest_after_fixed_budget
+  selection_source: no_benchmark_selection
+  disallowed_claim: benchmark_selected_checkpoint
+
+claim_boundary:
+  paper_claim_ready: false
+  note: >
+    Promotion requires all-baseline development evidence, independent formal
+    and hidden confirmation, equal-budget baselines, ablations, and support
+    experiments under the frozen protocol.

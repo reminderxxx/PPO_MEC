@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-08-08: v93 采用机制感知 delayed-credit counterfactual MAPPO，暂不晋级 paper-ready
+
+决策：将 `top_journal_mechanism_v93_mechanism_aware_online_mappo` 作为当前 zero-offset dev 候选，保留 v92 作为机制感知消融；不打开 hidden holdout，不更新 canonical paper claim。
+
+原因：v92 的 online counterfactual planner 已改善部分 continuity，但没有把 predictive prefetch request 与 evaluator 的 delayed validated hit 对齐。v93 在 branch replay 中复现 6-step prefetch validation，并对 handoff prepare 施加当前 branch step 因果约束，再将机制 advantage 与 robust return advantage、MAPPO policy prior 合并。v93 同一 dev 协议下为 `17.901250`，v92 为 `17.321000`，Popularity 为 `16.947000`；paired 40 个 window-workflow 单元 v93 相对 v92 平均 `+0.580250`，机制实现率 `0.400 -> 0.475`。
+
+影响：seed13 与 seed7 的 full-stratified zero-offset dev reward 分别为 `17.901250` 与 `18.068000`，均高于 PPO `14.158000`、MAPPO `8.628750` 和 Popularity `16.947000`。该结果支持算法方向有效，但主 checkpoint 训练预算仍不对称，且缺正式多 seed 统计、未消费 formal/hidden、support suite、artifact integrity 和 command log，因此不得写成 TMC-ready、paper-ready 或“已证明泛化”。
+
 ## 2026-07-29: v70 采用 sparse-tail option-policy prior 修复 formal full 短板
 
 决策：新增 `top_journal_mechanism_v70_sparse_tail_option_mappo`，把 v67/v69 的 idle/sparse 失败点从 reward-side credit 转到 MAPPO option-policy boundary 上解决。实现上在 SA-GHMAPPO policy 内，当 frozen mobility context、handoff prediction、adapter requirement 和 target-RSU evidence 表明处于 sparse handoff-tail risk 时，直接提高 `mechanism_prepare` option logits，压低 `popularity_safe` 与 local fallback option logits，同时保留 event/action head 的 sparse handoff recovery prior。不修改环境 reward、action contract、baseline contract、window plan 或 evaluator result filtering。

@@ -88,6 +88,14 @@ MAIN_RESULT_METRICS = [
     "option_gate_mechanism_prepare_count",
     "option_gate_no_rsu_local_count",
     "option_gate_context_prior_count",
+    "online_planner_enabled_count",
+    "online_planner_enabled_rate",
+    "online_planner_applied_count",
+    "online_planner_applied_rate",
+    "online_planner_candidate_count_mean",
+    "online_planner_score_margin_mean",
+    "online_planner_mechanism_target_success_count",
+    "online_planner_mechanism_target_success_rate",
 ]
 ACTIONMIX_DIAGNOSTIC_METRICS = [
     "service_success_count",
@@ -1804,6 +1812,40 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         ),
         "option_gate_no_rsu_local_count": int(agent_action_diagnostics.get("option_gate_no_rsu_local_count", 0) or 0),
         "option_gate_context_prior_count": int(agent_action_diagnostics.get("option_gate_context_prior_count", 0) or 0),
+        "online_planner_enabled_count": int(
+            agent_action_diagnostics.get("online_planner_enabled_count", 0) or 0
+        ),
+        "online_planner_enabled_rate": float(
+            agent_action_diagnostics.get("online_planner_enabled_rate", 0.0) or 0.0
+        ),
+        "online_planner_applied_count": int(
+            agent_action_diagnostics.get("online_planner_applied_count", 0) or 0
+        ),
+        "online_planner_applied_rate": float(
+            agent_action_diagnostics.get("online_planner_applied_rate", 0.0) or 0.0
+        ),
+        "online_planner_candidate_count_mean": float(
+            agent_action_diagnostics.get("online_planner_candidate_count_mean", 0.0)
+            or 0.0
+        ),
+        "online_planner_score_margin_mean": float(
+            agent_action_diagnostics.get("online_planner_score_margin_mean", 0.0)
+            or 0.0
+        ),
+        "online_planner_mechanism_target_success_count": int(
+            agent_action_diagnostics.get(
+                "online_planner_mechanism_target_success_count",
+                0,
+            )
+            or 0
+        ),
+        "online_planner_mechanism_target_success_rate": float(
+            agent_action_diagnostics.get(
+                "online_planner_mechanism_target_success_rate",
+                0.0,
+            )
+            or 0.0
+        ),
         "total_reward": total_reward,
         "end_to_end_workflow_delay": metrics["end_to_end_workflow_delay"],
         "workflow_continuity_rate": metrics["workflow_continuity_rate"],
