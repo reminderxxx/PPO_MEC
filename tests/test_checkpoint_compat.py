@@ -47,6 +47,7 @@ class CheckpointCompatTestCase(unittest.TestCase):
                 "learned_transition_model_min_samples": 128,
                 "learned_transition_model_discount": 0.985,
                 "learned_transition_model_risk_coef": 0.7,
+                "learned_transition_model_exploration_coef": 0.4,
                 "learned_transition_model_policy_coef": 1.1,
                 "learned_transition_model_policy_prior_coef": 0.2,
                 "learned_transition_model_min_margin": 0.03,
@@ -60,6 +61,7 @@ class CheckpointCompatTestCase(unittest.TestCase):
         self.assertEqual(filtered["learned_transition_model_hidden_dim"], 96)
         self.assertEqual(filtered["learned_transition_model_max_samples"], 8192)
         self.assertEqual(filtered["learned_transition_model_min_samples"], 128)
+        self.assertEqual(filtered["learned_transition_model_exploration_coef"], 0.4)
         self.assertEqual(filtered["learned_transition_model_warmup_updates"], 2)
 
     def test_sa_v29_checkpoint_config_preserves_dt_fusion_fields(self) -> None:

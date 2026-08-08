@@ -2,6 +2,13 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-08-08: v98 UCC-MAPPO counterfactual policy improvement probe
+
+- v95 的 risk-only 调整和 v96 的全动作 UCB 探索均被拒绝：两者分别在 update 5/6 后出现 mechanism collapse；v96 独立 dev benchmark 为 SA `8.629`、Popularity `21.103`。这些结果保留为 negative probe，不进入主结论。
+- v97 新增 exact one-step counterfactual transition calibration：branch 只生成真实 `observation/action/reward/next_observation/next_value` 样本，和 on-policy rollout 一起训练 UCC ensemble；actor 仍使用 UCC-LCB + MAPPO policy prior。v97 seed7 256-episode training 无 collapse，formal single-seed reward `25.793`，Popularity `26.082`，仍低 `0.289`。
+- v98 在 v97 上增加第二层 exact one-step model policy improvement，仍由 MAPPO policy prior / action mask / margin 约束，不改 environment reward、action schema、window plan 或 baseline contract。48-episode seed7 formal probe 为 SA `26.430`、Popularity `26.082`，暂视为 promising probe，不是等预算结论。
+- 当前下一步为 v98 的 3-seed、256-episode 等预算训练与 formal/holdout/statistics；在该闭环完成前，不得把 v98 probe 写成 multi-seed winner 或 paper-ready。
+
 ## 2026-08-08: v94 UCC-MAPPO 算法实现与正式闭环启动
 
 - v93 的在线 exact counterfactual 分支存在 `deepcopy(env)` 计算瓶颈；v94 新增 uncertainty-calibrated action-conditioned model-assisted MAPPO，不再依赖训练时逐动作复制环境。

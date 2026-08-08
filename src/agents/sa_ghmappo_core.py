@@ -1089,6 +1089,7 @@ class 分层PPO基类(BaseAgent):
         learned_transition_model_min_samples: int = 64,
         learned_transition_model_discount: float = 0.99,
         learned_transition_model_risk_coef: float = 0.8,
+        learned_transition_model_exploration_coef: float = 0.0,
         learned_transition_model_policy_coef: float = 1.0,
         learned_transition_model_policy_prior_coef: float = 0.15,
         learned_transition_model_min_margin: float = 0.02,
@@ -2326,6 +2327,9 @@ class 分层PPO基类(BaseAgent):
         self._learned_transition_model_risk_coef = max(
             float(learned_transition_model_risk_coef), 0.0
         )
+        self._learned_transition_model_exploration_coef = max(
+            float(learned_transition_model_exploration_coef), 0.0
+        )
         self._learned_transition_model_policy_coef = max(
             float(learned_transition_model_policy_coef), 0.0
         )
@@ -3155,12 +3159,12 @@ class 分层PPO基类(BaseAgent):
         observation: Any,
         action_info: dict[str, Any],
     ) -> dict[str, Any]:
-        """Build action-conditioned conservative targets from the learned model.
+        """Build action-conditioned UCB-train/LCB-eval targets from the model.
 
         Only a frozen model learned from prior environment rollout rows is used
-        during action selection.  The uncertainty penalty is a lower confidence
-        bound, so poorly supported actions cannot win merely through optimistic
-        extrapolation.
+        during action selection. Training adds calibrated disagreement to
+        acquire coverage for uncertain actions; deterministic evaluation keeps
+        the lower-confidence bound so extrapolation remains conservative.
         """
         model = self._learned_transition_model
         if (
@@ -3181,8 +3185,17 @@ class 分层PPO基类(BaseAgent):
         prediction = model.predict(observation, valid_actions)
         if not bool(prediction.get("ready", False)):
             return {}
+        exploration_coef = (
+            self._learned_transition_model_exploration_coef
+            if not self._deterministic_action
+            else 0.0
+        )
         robust_targets = {
-            str(action_id): float(mean - self._learned_transition_model_risk_coef * std)
+            str(action_id): float(
+                mean
+                - self._learned_transition_model_risk_coef * std
+                + exploration_coef * std
+            )
             for action_id, mean, std in zip(
                 valid_actions,
                 prediction.get("td_target_mean", []),
@@ -3191,7 +3204,7 @@ class 分层PPO基类(BaseAgent):
         }
         return {
             "source": "learned_transition_ensemble",
-            "protocol": "ucc_mappo_lcb_policy_improvement_v1",
+            "protocol": "ucc_mappo_ucb_train_lcb_eval_v1",
             "action_td_targets": robust_targets,
             "action_td_targets_by_horizon": {"1": robust_targets},
             "model_query_count": len(valid_actions),
@@ -3199,6 +3212,9 @@ class 分层PPO基类(BaseAgent):
             "model_sample_count": int(model.sample_count),
             "model_update_count": int(model.update_count),
             "uncertainty_scale": float(model.uncertainty_scale),
+            "risk_coef": float(self._learned_transition_model_risk_coef),
+            "exploration_coef": float(exploration_coef),
+            "exploration_mode": "lcb_eval" if self._deterministic_action else "ucb_train",
             "action_td_target_mean": {
                 str(action_id): round(float(value), 6)
                 for action_id, value in zip(valid_actions, prediction.get("td_target_mean", []))
@@ -3227,7 +3243,25 @@ class 分层PPO基类(BaseAgent):
                 "update_count": self._update_count,
             }
 
-        learned_transition_model_stats = self._fit_learned_transition_model(rollout)
+        model_training_rollout = list(rollout)
+        counterfactual_sample_count = 0
+        for row in rollout:
+            rollout_info = dict(
+                row.get("action_info", {}).get("env_action_model_rollout", {})
+                or {}
+            )
+            counterfactual_samples = rollout_info.get(
+                "counterfactual_transition_samples", []
+            )
+            if isinstance(counterfactual_samples, list):
+                model_training_rollout.extend(counterfactual_samples)
+                counterfactual_sample_count += len(counterfactual_samples)
+        learned_transition_model_stats = self._fit_learned_transition_model(
+            model_training_rollout
+        )
+        learned_transition_model_stats["counterfactual_sample_count"] = (
+            counterfactual_sample_count
+        )
         imitation_rollout_stats = self._annotate_heuristic_imitation_targets(rollout)
         semantic_states = [self._extract_semantic_state(row.get("decision_info")) for row in rollout]
         run_metadata_by_row = [
@@ -14591,6 +14625,7 @@ class 分层PPO基类(BaseAgent):
             "learned_transition_model_max_samples": self._learned_transition_model_max_samples,
             "learned_transition_model_min_samples": self._learned_transition_model_min_samples,
             "learned_transition_model_risk_coef": self._learned_transition_model_risk_coef,
+            "learned_transition_model_exploration_coef": self._learned_transition_model_exploration_coef,
             "learned_transition_model_policy_coef": self._learned_transition_model_policy_coef,
             "learned_transition_model_policy_prior_coef": self._learned_transition_model_policy_prior_coef,
             "learned_transition_model_min_margin": self._learned_transition_model_min_margin,

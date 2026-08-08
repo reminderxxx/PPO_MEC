@@ -486,6 +486,7 @@ def _filter_checkpoint_config(agent_name: str, checkpoint_config: dict[str, Any]
         "learned_transition_model_min_samples",
         "learned_transition_model_discount",
         "learned_transition_model_risk_coef",
+        "learned_transition_model_exploration_coef",
         "learned_transition_model_policy_coef",
         "learned_transition_model_policy_prior_coef",
         "learned_transition_model_min_margin",

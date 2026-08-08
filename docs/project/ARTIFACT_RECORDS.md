@@ -1,5 +1,21 @@
 # Artifact Records
 
+## 2026-08-08 v95-v98 UCC-MAPPO candidate probes
+
+状态：`[candidate-validation]` `[not-paper-ready]`
+
+路径：
+
+- `artifacts/training/top_journal_v95_ucc_risk_probe/sa_ghmappo/sa_ghmappo_train_20260808_143001_671066_seed7/train_summary.json`
+- `artifacts/training/top_journal_v96_ucc_ucb_probe/sa_ghmappo/sa_ghmappo_train_20260808_143629_213190_seed7/train_summary.json`
+- `artifacts/experiments/top_journal_v96_ucc_ucb_probe_dev_eval/main_results_full_stratified_20260808_143840_220283/aggregate_summary.json`
+- `artifacts/training/top_journal_v97_ucc_counterfactual_full_seed7/sa_ghmappo/sa_ghmappo_train_20260808_144619_509795_seed7/train_summary.json`
+- `artifacts/experiments/top_journal_v97_ucc_counterfactual_full_seed7_formal_eval/main_results_full_stratified_20260808_145931_471153/aggregate_summary.json`
+- `artifacts/training/top_journal_v98_ucc_counterfactual_policy_probe/sa_ghmappo/sa_ghmappo_train_20260808_150228_023472_seed7/train_summary.json`
+- `artifacts/experiments/top_journal_v98_ucc_counterfactual_policy_probe_formal_eval/main_results_full_stratified_20260808_150458_694983/aggregate_summary.json`
+
+确认结果：v95/v96 分别出现 mechanism collapse，v96 dev reward `8.629` 低于 Popularity `21.103`，均为 negative probe。v97 256-episode seed7 formal reward `25.793` 低于 Popularity `26.082`；v98 48-episode seed7 formal probe reward `26.430` 高于 Popularity `26.082`，但训练预算不等、尚无多 seed，因此只能作为 promising candidate，不能写成主算法已全面领先或 paper-ready。
+
 ## 2026-07-29 v70 sparse-tail option MAPPO formal-min all-baseline winner
 
 状态：`[offset-free]` `[formal-min]` `[multi-seed]` `[all-baseline-reward-winner]` `[not-tmc-ready]`

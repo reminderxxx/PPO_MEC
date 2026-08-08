@@ -91,6 +91,7 @@ class MARLOnPolicyTrainer(BaseTrainer):
             if collect_model_targets or online_planner_enabled:
                 env_action_model_rollout = (
                     self._collect_env_action_counterfactual_targets(
+                        observation=observation,
                         action_info=action_info,
                         algorithm_memory=algorithm_memory,
                         decision_info=decision_info,
@@ -222,6 +223,7 @@ class MARLOnPolicyTrainer(BaseTrainer):
     def _collect_env_action_counterfactual_targets(
         self,
         *,
+        observation: Any,
         action_info: dict[str, Any],
         algorithm_memory: dict[str, Any],
         decision_info: dict[str, Any],
@@ -320,6 +322,7 @@ class MARLOnPolicyTrainer(BaseTrainer):
         rollout_horizon = max(rollout_horizons)
         action_targets: dict[int, float] = {}
         action_rewards: dict[int, float] = {}
+        action_transition_samples: list[dict[str, Any]] = []
         action_mechanism_targets: dict[int, float] = {}
         action_targets_by_horizon: dict[int, dict[int, float]] = {
             horizon: {}
@@ -416,6 +419,7 @@ class MARLOnPolicyTrainer(BaseTrainer):
             terminated = False
             truncated = False
             first_reward = 0.0
+            first_next_observation: Any = None
             mechanism_score = 0.0
             pending_prefetches: list[dict[str, int | str | None]] = []
             for branch_step in range(rollout_horizon):
@@ -429,6 +433,7 @@ class MARLOnPolicyTrainer(BaseTrainer):
                 model_transition_count += 1
                 if branch_step == 0:
                     first_reward = float(reward)
+                    first_next_observation = deepcopy(next_observation)
                 branch_metrics = next_info.get("metrics_protocol", {})
                 if not isinstance(branch_metrics, dict):
                     branch_metrics = {}
@@ -574,6 +579,17 @@ class MARLOnPolicyTrainer(BaseTrainer):
                     bootstrap_info,
                 )
             action_rewards[initial_action] = first_reward
+            if first_next_observation is not None:
+                action_transition_samples.append(
+                    {
+                        "observation": deepcopy(observation),
+                        "action": int(initial_action),
+                        "reward": float(first_reward),
+                        "next_observation": deepcopy(first_next_observation),
+                        "next_value": float(bootstrap_value),
+                        "terminated": bool(terminated),
+                    }
+                )
             action_targets[initial_action] = float(
                 discounted_return + discount * bootstrap_value
             )
@@ -613,6 +629,7 @@ class MARLOnPolicyTrainer(BaseTrainer):
                 str(action_id): round(reward, 6)
                 for action_id, reward in action_rewards.items()
             },
+            "counterfactual_transition_samples": action_transition_samples,
             "imagined_recovery_samples": imagined_recovery_samples,
             "imagined_recovery_sample_count": len(
                 imagined_recovery_samples

@@ -2,6 +2,13 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-08 v98 candidate risks
+
+- `OPEN / multi-seed evidence`: v98 目前只有 seed7、48 episode 的 formal probe，不能与 v94/v70 的 multi-seed full result 等量齐观；必须完成 seeds `[7,13,29]`、256 episodes、formal aggregate 和 paired statistics。
+- `OPEN / holdout freeze`: hidden holdout 尚未消费。v98 formal candidate、checkpoint manifest、stats protocol 和 claim 必须先冻结，再做一次性 holdout；不得根据 holdout 结果继续调参。
+- `OPEN / compute cost`: v97/v98 每个训练 step 使用 five-action one-step branch calibration，训练 wall-clock 高于 v94；最终必须记录 branch transition count、runtime 和 checkpoint provenance，并做 compute-aware comparison。
+- `OPEN / ablation`: v98 的增益尚未拆分为 UCC calibration、exact policy improvement、policy prior 和 no-model/no-calibration ablations；在补齐前不能声称每个组件独立显著贡献。
+
 ## 2026-08-08 v94 UCC-MAPPO 开放风险
 
 - `OPEN / evidence pending`: UCC-MAPPO 的正式多 seed benchmark 尚未完成；当前不能把首个 seed、真实 smoke 或历史 v93 开发结果写成全量优胜结论。

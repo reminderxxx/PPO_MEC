@@ -3896,6 +3896,103 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(env.actions, [2])
         self.assertEqual(rollout[0]["action"], 2)
 
+    def test_ucc_uses_ucb_during_training_and_lcb_during_evaluation(self) -> None:
+        class FakeModel:
+            ready = True
+            sample_count = 128
+            update_count = 3
+            uncertainty_scale = 1.0
+
+            def predict(self, observation, action_ids):
+                del observation
+                return {
+                    "ready": True,
+                    "td_target_mean": [10.0 for _ in action_ids],
+                    "td_target_std": [2.0 for _ in action_ids],
+                    "reward_mean": [0.0 for _ in action_ids],
+                    "reward_std": [0.0 for _ in action_ids],
+                }
+
+        training_agent = build_agent(
+            "sa_ghmappo",
+            random_seed=1,
+            learned_transition_model_enabled=True,
+            learned_transition_model_planner_enabled=True,
+            learned_transition_model_risk_coef=0.65,
+            learned_transition_model_exploration_coef=0.80,
+        )
+        training_agent._learned_transition_model = FakeModel()
+        training_agent._update_count = 1
+        train_targets = training_agent.predict_learned_transition_targets(
+            observation=[0.0] * 9,
+            action_info={"action_mask": [True] * 5},
+        )
+
+        evaluation_agent = build_agent(
+            "sa_ghmappo",
+            random_seed=1,
+            deterministic_action=True,
+            learned_transition_model_enabled=True,
+            learned_transition_model_planner_enabled=True,
+            learned_transition_model_risk_coef=0.65,
+            learned_transition_model_exploration_coef=0.80,
+        )
+        evaluation_agent._learned_transition_model = FakeModel()
+        evaluation_agent._update_count = 1
+        eval_targets = evaluation_agent.predict_learned_transition_targets(
+            observation=[0.0] * 9,
+            action_info={"action_mask": [True] * 5},
+        )
+
+        self.assertEqual(train_targets["exploration_mode"], "ucb_train")
+        self.assertEqual(eval_targets["exploration_mode"], "lcb_eval")
+        self.assertAlmostEqual(train_targets["action_td_targets"]["0"], 10.3)
+        self.assertAlmostEqual(eval_targets["action_td_targets"]["0"], 8.7)
+
+    def test_counterfactual_calibration_samples_are_emitted(self) -> None:
+        from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
+
+        class BranchEnv:
+            def __deepcopy__(self, memo):
+                del memo
+                return self
+
+            def step(self, action: int):
+                del action
+                return [1.0] * 9, 2.0, True, False, {}
+
+        class FakeRecorder:
+            def start_episode(self, run_metadata=None) -> None:
+                del run_metadata
+
+            def build_summary(self):
+                return {"episode_status": {}}
+
+        trainer = MARLOnPolicyTrainer(
+            env=BranchEnv(),
+            agent=object(),
+            recorder=FakeRecorder(),
+            max_steps=1,
+        )
+        payload = trainer._collect_env_action_counterfactual_targets(
+            observation=[0.0] * 9,
+            action_info={
+                "action_mask": [True] * 5,
+                "env_action_model_rollout_enabled": True,
+                "env_action_model_rollout_horizon": 1,
+                "env_action_model_rollout_horizons": [1],
+            },
+            algorithm_memory={},
+            decision_info={},
+            run_metadata={},
+        )
+
+        self.assertEqual(len(payload["counterfactual_transition_samples"]), 5)
+        self.assertEqual(
+            {sample["action"] for sample in payload["counterfactual_transition_samples"]},
+            {0, 1, 2, 3, 4},
+        )
+
     def test_sa_v70_sparse_tail_option_prior_boosts_mechanism_option(self) -> None:
         state = deepcopy(_minimal_semantic_state())
         state["window_class"] = "idle_or_sparse"

@@ -1713,6 +1713,90 @@ PROFILE_DEFAULTS = {
         "update_eval_max_windows": 4,
         "update_eval_max_workflows": 1,
     },
+    "top_journal_mechanism_v95_ucc_risk_calibrated_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v96_ucc_ucb_exploration_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v97_ucc_counterfactual_calibration_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v98_ucc_counterfactual_policy_improvement_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -1815,6 +1899,10 @@ MECHANISM_COVERAGE_PROFILES = {
     "top_journal_mechanism_v92_online_counterfactual_mappo",
     "top_journal_mechanism_v93_mechanism_aware_online_mappo",
     "top_journal_mechanism_v94_ucc_mappo",
+    "top_journal_mechanism_v95_ucc_risk_calibrated_mappo",
+    "top_journal_mechanism_v96_ucc_ucb_exploration_mappo",
+    "top_journal_mechanism_v97_ucc_counterfactual_calibration_mappo",
+    "top_journal_mechanism_v98_ucc_counterfactual_policy_improvement_mappo",
 }
 
 
@@ -5690,6 +5778,62 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "train_epochs": 8,
                 "target_kl": 0.015,
                 "kl_early_stop_enabled": True,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v95_ucc_risk_calibrated_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v94_ucc_mappo"
+        )
+        kwargs.update(
+            {
+                # Reduce pessimism for under-covered but semantically valid steady actions.
+                "learned_transition_model_risk_coef": 0.25,
+                "learned_transition_model_policy_prior_coef": 0.05,
+                "learned_transition_model_min_margin": 0.01,
+                "learned_transition_model_policy_coef": 1.10,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v96_ucc_ucb_exploration_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v94_ucc_mappo"
+        )
+        kwargs.update(
+            {
+                # Train with calibrated UCB exploration, then switch to LCB at evaluation.
+                "learned_transition_model_exploration_coef": 0.80,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v97_ucc_counterfactual_calibration_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v94_ucc_mappo"
+        )
+        kwargs.update(
+            {
+                # Exact one-step branches calibrate UCC replay; action selection remains UCC-LCB.
+                "env_action_model_rollout_enabled": True,
+                "env_action_model_rollout_horizon": 1,
+                "env_action_model_rollout_horizons": [1],
+                "env_action_model_policy_improvement_enabled": False,
+                "env_action_model_online_planner_enabled": False,
+                "learned_transition_model_exploration_coef": 0.0,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v98_ucc_counterfactual_policy_improvement_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v97_ucc_counterfactual_calibration_mappo"
+        )
+        kwargs.update(
+            {
+                # UCC supplies calibrated model support; exact one-step targets provide a second policy-improvement view.
+                "env_action_model_online_planner_enabled": True,
+                "env_action_model_online_planner_coef": 1.0,
+                "env_action_model_online_planner_policy_prior_coef": 0.15,
+                "env_action_model_online_planner_min_margin": 0.0,
+                "env_action_model_online_planner_mechanism_coef": 0.0,
             }
         )
         return kwargs

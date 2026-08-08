@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-08-08: v97/v98 用 counterfactual calibration 修复 UCC 的动作覆盖缺口
+
+决策：拒绝 v95 的直接降风险和 v96 的全动作 UCB；v97 将 exact one-step branch replay 作为 UCC ensemble 的校准数据源，v98 再将 exact one-step TD targets 作为第二层 MAPPO policy-improvement view。两层都经过 action mask 和 MAPPO policy prior 约束，训练/评估仍保持 UCC 的 model-assisted MAPPO contract。
+
+原因：v94 true-eval 的剩余差距集中在 `active_non_mechanism` / `idle_or_sparse` 的 steady action 3。仅靠 LCB 会惩罚低支持动作；全动作 UCB 又把不确定性扩散到机制动作，导致 collapse。精确一阶 branch 样本同时补齐 action-conditioned model 的真实支持和 next-state/critic-bootstrap 标签，exact target 作为第二视角可避免单一 learned ensemble 在 low-support action 上误判。
+
+证据边界：v97 seed7 256-episode formal single-seed 为 `25.793` vs Popularity `26.082`；v98 seed7 48-episode formal probe 为 `26.430` vs `26.082`。后者不是等预算、多 seed 或 paper-ready 证据；必须完成冻结协议下的 v98 3-seed full run、formal/holdout、统计、消融和计算成本审计。
+
 ## 2026-08-08: UCC-MAPPO 采用 critic-bootstrap TD model 而非行为 return 伪反事实
 
 决策：v94 使用 replay-backed bootstrap transition ensemble 预测 `reward`、`next_observation` 和 one-step `r + gamma V(next_state)` TD target；planner 对合法动作计算 uncertainty lower confidence bound，并通过 MAPPO policy prior / margin 约束接入 actor 更新。

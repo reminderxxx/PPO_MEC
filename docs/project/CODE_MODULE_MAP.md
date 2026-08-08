@@ -1,5 +1,12 @@
 # Code Module Map
 
+## 2026-08-08 v97/v98 UCC counterfactual calibration and policy improvement
+
+- `src/trainers/marl_on_policy_trainer.py`：在保持原 PPO rollout contract 的前提下，把 exact one-step branch 的真实 transition samples（含当前 MAPPO critic bootstrap）交给 UCC replay；v98 同时保留 exact action TD targets 供第二层 model policy improvement 使用。
+- `src/agents/sa_ghmappo_core.py`：训练阶段可按 UCB、确定性评估按 LCB；v97/v98 通过 UCC calibration、MAPPO policy prior、action mask 和 margin 约束模型辅助动作，不修改 environment reward 或 evaluator filtering。
+- `scripts/train_sa_ghmappo_real_sample.py`：维护 v95/v96 negative profiles 与 v97/v98 candidate profiles；v97/v98 的 formal winner status 仍待 multi-seed evidence。
+- `tests/test_algo_pool_contract.py`：覆盖 UCB-train/LCB-eval、planned action propagation 和 counterfactual calibration sample contract。
+
 ## 2026-08-08 v94 uncertainty-calibrated model-assisted MAPPO
 
 - `src/models/uncertainty_transition_ensemble.py`：负责 UCC-MAPPO 的 replay-backed bootstrap transition/TD-target ensemble、validation calibration、LCB prediction 和 checkpoint state；它只消费 rollout rows，不反向依赖 evaluator 或 benchmark。
