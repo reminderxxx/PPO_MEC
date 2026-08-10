@@ -51,8 +51,9 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=ROOT_DIR / "configs" / "experiment" / "top_journal_v17_future_validation_time_audited_20260717",
     )
-    parser.add_argument("--mobility_source", choices=["ngsim"], default="ngsim")
+    parser.add_argument("--mobility_source", choices=["ngsim", "lust"], default="ngsim")
     parser.add_argument("--mobility_csv_path", default="")
+    parser.add_argument("--lust_scenario_root", default="")
     parser.add_argument(
         "--workflow_csv_path",
         default=str(ROOT_DIR / "data" / "raw" / "workflow" / "alibaba2018" / "batch_task.csv"),
@@ -73,7 +74,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--exclude_plan_path",
         action="append",
-        default=[str(path) for path in DEFAULT_EXCLUDE_PLANS],
+        default=[],
         help="Existing plan to exclude from future validation; repeatable.",
     )
     return parser.parse_args()
@@ -93,6 +94,17 @@ def sha256_file(path: Path) -> str:
         while chunk := handle.read(1024 * 1024):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def resolve_source_file(source_path: str, mobility_source: str) -> Path:
+    """Resolve the hashed trace file from an NGSIM path or LuST descriptor."""
+    if mobility_source == "lust":
+        for item in str(source_path).split(";"):
+            key, separator, value = item.strip().partition("=")
+            if separator and key == "trace_csv" and value:
+                return Path(value)
+        raise ValueError(f"LuST source descriptor has no trace_csv path: {source_path}")
+    return Path(source_path)
 
 
 def parse_layout_candidates(raw_value: str) -> list[str]:
@@ -296,13 +308,16 @@ def main() -> int:
         "active_non_mechanism": int(args.active_non_mechanism_windows),
         "idle_or_sparse": idle_count,
     }
-    excluded_windows, exclude_plan_records = load_excluded_windows(list(args.exclude_plan_path))
+    exclude_plan_paths = list(args.exclude_plan_path)
+    if not exclude_plan_paths and args.mobility_source == "ngsim":
+        exclude_plan_paths = [str(path) for path in DEFAULT_EXCLUDE_PLANS]
+    excluded_windows, exclude_plan_records = load_excluded_windows(exclude_plan_paths)
 
     source_path, window_payload = resolve_window_candidates(
         root_dir=ROOT_DIR,
         mobility_source=args.mobility_source,
         mobility_csv_path=args.mobility_csv_path,
-        lust_scenario_root="",
+        lust_scenario_root=args.lust_scenario_root,
         max_mobility_rows=args.max_mobility_rows,
         rsu_layout="auto_dominant_tight",
         frame_offset=0,
@@ -325,7 +340,7 @@ def main() -> int:
     if not audit["passed"]:
         raise RuntimeError(f"future-validation independence audit failed: {audit['conflicts']}")
 
-    mobility_path = Path(source_path)
+    mobility_path = resolve_source_file(source_path, args.mobility_source)
     workflow_path = Path(args.workflow_csv_path)
     if not mobility_path.is_absolute():
         mobility_path = ROOT_DIR / mobility_path
@@ -336,6 +351,7 @@ def main() -> int:
             "path": relative_or_absolute(mobility_path),
             "sha256": sha256_file(mobility_path),
             "size_bytes": mobility_path.stat().st_size,
+            "source_descriptor": source_path,
         },
         "workflow": {
             "path": relative_or_absolute(workflow_path),
@@ -351,6 +367,8 @@ def main() -> int:
         "sealed": True,
         "outcome_blind_selection": True,
         "excluded_consumed_hidden_outcomes": True,
+        "mobility_source_path": source_path,
+        "workflow_source_path": str(workflow_path.resolve()),
         "selected_window_plan": selected_windows,
     }
     plan_path = args.output_dir / "future_validation_window_plan.json"
@@ -366,6 +384,8 @@ def main() -> int:
         ),
         "parameters": {
             "mobility_source": args.mobility_source,
+            "mobility_csv_path": args.mobility_csv_path,
+            "lust_scenario_root": args.lust_scenario_root,
             "max_mobility_rows": args.max_mobility_rows,
             "layout_candidates": parse_layout_candidates(args.layout_candidates),
             "window_length": args.window_length,

@@ -161,6 +161,16 @@ paired statistics：
 
 当前结论：v18 counterfactual option-credit dev 结果不晋级；v17 time-audited future-validation 均值第一，但相对 popularity 的 reward CI 跨 0，不能写成 TMC-ready。
 
+### v100 LuST outcome-blind future validation
+
+LuST 的 future split 不能复用历史 4-window support 结果。先用 source hash、历史窗口排除和 frame/time/segment gap 审计冻结新计划，再对所有 baseline 一次性评估；LuST 结果与 NGSIM 不合并为独立样本。
+
+```bash
+.venv/bin/python scripts/freeze_future_validation_split.py --mobility_source lust --mobility_csv_path data/processed/mobility/lust/lust_fcd.csv --output_dir configs/experiment/top_journal_v100_lust_future_validation_20260810 --max_mobility_rows 200000 --layout_candidates auto_grid_tight,lust_micro,auto_dominant_tight --window_length 24 --window_scan_stride 2 --minimum_gap_frames 24 --window_count 12 --mechanism_windows 5 --active_non_mechanism_windows 4 --random_seed 100 --exclude_plan_path artifacts/experiments/strict_full_v8_external_lust_grid_20260621_v2/main_results_full_stratified_20260621_202424_612488/aggregate_summary.json
+```
+
+当前 v100 LuST package：12 windows、3 seeds、2 workflows、792 raw summaries；SA total reward `-25.638`，Popularity `-32.961`，MAPPO `-35.535`。SA-Popularity outer-window BCa 95% CI `[+2.324,+15.186]`。由于 active/idle strata 全体困难且整体为负，LuST 证据必须表述为 cross-mobility reward support，不能写成 all-regime/all-metric superiority。
+
 ### v19/v20 PRD-MAPPO 候选
 
 v19/v20 是 v17 后续算法候选，只允许使用 dev 或新冻结 future-validation；当前 hidden 仍不得用于筛选或调参。v19 加入 handoff-risk PRD 和 dual cost，v20 再加入 idle-execution PRD。二者均不改 reward/action/env/baseline contract。

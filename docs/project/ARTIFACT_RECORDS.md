@@ -8,6 +8,18 @@
 - v20 future windows have no frame interval overlap with v71 train/dev/formal/hidden plans. Integrity audit passed with `missing_reference_count=0` and `json_error_count=0`.
 - Evidence boundary: this confirms frozen-checkpoint cross-split reward performance; it does not remove the remaining cross-dataset, complete-ablation, compute-audit or mechanism-tradeoff blockers.
 
+## 2026-08-10: v100 LuST external support benchmark
+
+- Artifact root: `artifacts/experiments/top_journal_v100_lust_external_support_20260810/`; raw run: `main_results_full_stratified_20260810_183709_845522/`.
+- SA-GHMAPPO reward `34.200` versus Popularity `27.215` and MAPPO `28.946`; SA versus Popularity delta `+6.985`, BCa `[+0.900,+18.780]`, paired `24/0/0`.
+- The package uses 4 historical LuST support windows and reports 264 raw summaries. The plan metadata is not outcome-blind and the outer-window count is below the primary generalization threshold, so this is support only.
+
+## 2026-08-11: v100 outcome-blind LuST future-validation benchmark
+
+- Plan: `configs/experiment/top_journal_v100_lust_future_validation_20260810/`; artifact root: `artifacts/experiments/top_journal_v100_lust_future_validation_20260810/`; raw run: `main_results_full_stratified_20260811_011340_308565/`.
+- 11 agents, 3 seeds, 12 sealed outcome-blind windows, 2 workflows, 22 steps, 792 raw summaries. SA-GHMAPPO `-25.638` versus Popularity `-32.961` and MAPPO `-35.535`; SA-Popularity delta `+7.3225`, BCa `[+2.324167,+15.186198]`, paired `24/48/0`.
+- The plan audit excludes the historical LuST support windows with minimum gap 24 and reports zero conflicts. The result is not pooled with NGSIM and is not interpreted as all-regime or all-metric dominance.
+
 ## 2026-08-09: v113-v117 MAPPO policy-internalization negative probes
 
 - v113: `artifacts/experiments/top_journal_v113_factorized_cama_probe_20260809/`; factorized joint-target marginalization was active, but mean reward was `11.383`.

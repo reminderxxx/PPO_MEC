@@ -8,6 +8,18 @@
 - `OPEN / metric trade-off`: SA's mechanism realization (`0.600`) is above Popularity (`0.567`) on this split but not uniformly above all learned baselines; backhaul and migration costs remain trade-offs. Do not compress the result into “all metrics improved.”
 - `OPEN / paper readiness`: one mobility/workflow combination, complete component ablations and unified compute accounting remain absent. The independent future split strengthens evidence but does not make the package TMC-ready.
 
+## 2026-08-10: LuST support is positive but not an independent generalization claim
+
+- `RESOLVED / external direction`: v100 wins on the available LuST support package (`34.200` vs Popularity `27.215`, MAPPO `28.946`).
+- `OPEN / support power`: only 4 outer windows are available and the historical plan metadata is `outcome_blind_selection=false`; do not use this as primary cross-city evidence or pool it with the NGSIM future rows.
+- `OPEN / workflow scope`: LuST support still uses Alibaba workflows; a second workflow source remains unavailable in the current data root.
+
+## 2026-08-11: LuST independent split confirms reward lead but exposes regime trade-off
+
+- `RESOLVED / cross-mobility reward`: the new outcome-blind 12-window LuST split gives SA `-25.638` versus Popularity `-32.961`, with BCa reward CI `[+2.324,+15.186]` and paired `24/48/0`.
+- `OPEN / regime coverage`: all methods are negative in the aggregate; SA's lead concentrates in mechanism-activating windows (`31.218` vs Popularity `13.644`), while active/idle strata remain negative. The algorithm must not be described as uniformly robust across regimes.
+- `OPEN / paper readiness`: component ablations and unified compute accounting remain incomplete even after cross-mobility evidence was added.
+
 ## 2026-08-09: v113-v117 native-policy internalization boundary
 
 - `REJECTED / factorized target`: v113's joint-to-head marginal target is a valid MAPPO training loss but destabilized the event head and reduced reward; it is not enabled by the canonical v100 profile.

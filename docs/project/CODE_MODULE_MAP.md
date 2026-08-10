@@ -1,5 +1,11 @@
 # Code Module Map
 
+## 2026-08-11 v100 LuST outcome-blind future validation
+
+- `scripts/freeze_future_validation_split.py`：在保持 NGSIM 默认排除逻辑不变的前提下，支持 LuST trace 的 outcome-blind window freezing、历史 LuST plan 排除、source hash 记录和 frame/time/segment gap audit。
+- `configs/experiment/top_journal_v100_lust_future_validation_20260810/`：保存 12-window sealed LuST plan 与 source manifest；它只定义验证窗口，不改变算法、reward 或 benchmark evaluator。
+- `scripts/benchmark_main_results.py`、`scripts/analyze_top_journal_statistics.py`：执行冻结 v100 manifest 的 11-agent LuST full benchmark 和 outer-window hierarchical statistics。
+
 ## 2026-08-09 v113-v117 MAPPO policy-iteration experiments
 
 - `src/agents/sa_ghmappo_core.py`：保留 factorized counterfactual head loss、selective teacher-only label、training-only planner 和 conservative model-advantage gate；这些能力默认关闭，且未晋级 canonical v100。

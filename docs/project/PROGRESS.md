@@ -11,6 +11,22 @@
 
 Evidence record: `docs/project/top_journal_v100_future_validation_execution_20260809.md`.
 
+## 2026-08-10: v100 LuST external support confirms direction, remains low-power evidence
+
+- The frozen v100 checkpoint was evaluated on the available LuST SUMO FCD support plan with all 11 agents, seeds `7,13,29`, 4 outer windows, 2 workflows and 22 steps.
+- SA-GHMAPPO reward was `34.200`, versus Popularity `27.215` and MAPPO `28.946`; SA versus Popularity delta `+6.985`, BCa `[+0.900,+18.780]`, paired `24/0/0`. SA continuity, handoff-ready and mechanism realization were all `1.000` on this support package.
+- This is directionally consistent with the NGSIM future result, but the historical plan metadata is `outcome_blind_selection=false` and only 4 outer windows are available. It is external support, not independent formal/hidden evidence; at least 12 newly frozen outcome-blind LuST windows are required for a primary cross-city claim.
+
+Evidence record: `docs/project/top_journal_v100_lust_external_support_execution_20260810.md`.
+
+## 2026-08-11: v100 outcome-blind LuST future split completed
+
+- A new LuST future-validation plan was frozen without reward/checkpoint inspection: 12 windows (`5 mechanism / 4 active / 3 idle`), minimum gap 24, excluding the historical 4-window LuST support package; plan audit passed with zero conflicts.
+- Full evaluation used the frozen v100 manifest, 11 agents, 3 seeds, 2 workflows and 22 steps, producing exactly 792 raw summaries. SA-GHMAPPO reward `-25.638` exceeded Popularity `-32.961` and MAPPO `-35.535`; SA versus Popularity delta `+7.3225`, BCa `[+2.3242,+15.1862]`, paired `24/48/0`, Holm p=`0.0`.
+- The result is valid cross-mobility evidence, but not a universal claim: all methods are negative in aggregate, SA's mechanism-window mean is `31.218` versus Popularity `13.644`, while active/idle strata remain hard and negative. NGSIM and LuST are not pooled as independent rows.
+
+Evidence record: `docs/project/top_journal_v100_lust_future_validation_execution_20260811.md`.
+
 ## 2026-08-09: v113-v117 MAPPO policy-internalization probes rejected
 
 - v113 factorized counterfactual head marginalization was applied in the hierarchical MAPPO update, but the strict dev probe ended at `mean_total_reward=11.383`, continuity `0.734` and mechanism realization `0.312`; event-head usage collapsed toward `keep` after update 2.

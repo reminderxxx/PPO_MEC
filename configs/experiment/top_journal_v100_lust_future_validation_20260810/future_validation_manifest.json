@@ -1,0 +1,94 @@
+{
+  "protocol_version": "future_validation_split_v4_segmented_executable_handoff_20260719",
+  "created_at": "2026-08-10T11:06:13.941575+00:00",
+  "selection_policy": "mobility-covariate-only; excludes prior train/dev/formal/hidden frame and time intervals; does not inspect reward, checkpoint, or outcome rows",
+  "parameters": {
+    "mobility_source": "lust",
+    "mobility_csv_path": "data/processed/mobility/lust/lust_fcd.csv",
+    "lust_scenario_root": "",
+    "max_mobility_rows": 200000,
+    "layout_candidates": [
+      "auto_grid_tight",
+      "lust_micro",
+      "auto_dominant_tight"
+    ],
+    "window_length": 24,
+    "window_scan_stride": 2,
+    "minimum_gap_frames": 24,
+    "window_count": 12,
+    "targets": {
+      "mechanism_activating": 5,
+      "active_non_mechanism": 4,
+      "idle_or_sparse": 3
+    },
+    "random_seed": 100
+  },
+  "source_records": {
+    "mobility": {
+      "path": "data/processed/mobility/lust/lust_fcd.csv",
+      "sha256": "13286951c378a02832b73229799ee278eed487a589076055225aca81423fd4e1",
+      "size_bytes": 9562361,
+      "source_descriptor": "scenario=/Users/howen/Projects/PPO_MEC/data/raw/mobility/LuSTScenario/LuSTScenario-master/scenario; trace_csv=data/processed/mobility/lust/lust_fcd.csv"
+    },
+    "workflow": {
+      "path": "data/raw/workflow/alibaba2018/batch_task.csv",
+      "sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc",
+      "size_bytes": 802261444
+    }
+  },
+  "exclude_plan_records": [
+    {
+      "path": "artifacts/experiments/strict_full_v8_external_lust_grid_20260621_v2/main_results_full_stratified_20260621_202424_612488/aggregate_summary.json",
+      "sha256": "54d2caea13ae93b17a2d9b51f7df0533a117727ae57932dbde3b323be02ead21",
+      "window_count": 4,
+      "window_ids": [
+        "window_off226_len24_t226_249",
+        "window_off174_len24_t174_197",
+        "window_off36_len24_t36_59",
+        "window_off108_len24_t108_131"
+      ]
+    }
+  ],
+  "candidate_pool_counts": {
+    "active_non_mechanism": 39,
+    "mechanism_activating": 152,
+    "idle_or_sparse": 698
+  },
+  "future_validation_plan": {
+    "path": "configs/experiment/top_journal_v100_lust_future_validation_20260810/future_validation_window_plan.json",
+    "sha256": "65183ac6e72909af10f2f09b4af9c9c7842006a0cefb3f379f1b27c0caea453f",
+    "window_count": 12,
+    "window_ids": [
+      "window_off572_len24_t572_595",
+      "window_off620_len24_t620_643",
+      "window_off800_len24_t800_823",
+      "window_off1038_len24_t1038_1061",
+      "window_off1126_len24_t1126_1149",
+      "window_off1202_len24_t1202_1225",
+      "window_off1282_len24_t1282_1305",
+      "window_off1360_len24_t1360_1383",
+      "window_off1448_len24_t1448_1471",
+      "window_off1524_len24_t1524_1547",
+      "window_off1594_len24_t1594_1617",
+      "window_off1750_len24_t1750_1773"
+    ],
+    "stratum_counts": {
+      "mechanism_activating": 5,
+      "active_non_mechanism": 4,
+      "idle_or_sparse": 3
+    }
+  },
+  "independence_audit": {
+    "passed": true,
+    "minimum_gap_frames": 24,
+    "checked_interval_kinds": [
+      "frame_offset",
+      "time_index",
+      "segment_frame"
+    ],
+    "future_window_count": 12,
+    "excluded_window_count": 4,
+    "conflicts": []
+  },
+  "manifest_content_sha256": "a73347ffdca0db5b39be6049b770b126381bd9dbc8ba4959ee20ea742c524d39"
+}
