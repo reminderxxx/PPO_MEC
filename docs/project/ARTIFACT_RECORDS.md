@@ -20,6 +20,12 @@
 - 11 agents, 3 seeds, 12 sealed outcome-blind windows, 2 workflows, 22 steps, 792 raw summaries. SA-GHMAPPO `-25.638` versus Popularity `-32.961` and MAPPO `-35.535`; SA-Popularity delta `+7.3225`, BCa `[+2.324167,+15.186198]`, paired `24/48/0`.
 - The plan audit excludes the historical LuST support windows with minimum gap 24 and reports zero conflicts. The result is not pooled with NGSIM and is not interpreted as all-regime or all-metric dominance.
 
+## 2026-08-11: v100 LuST inference ablation
+
+- Corrected artifact: `artifacts/experiments/top_journal_v100_inference_ablation_lust_zero_offset_20260811/ablation_full_stratified_20260811_014709_410809/`.
+- Full v100 minus no-online-planner delta `+2.084722`, BCa `[+1.733256,+2.467439]`, paired `72/0/0` across 12 LuST windows, 3 seeds and 2 workflows.
+- The prior positive-offset diagnostic is invalid and excluded; this record is inference-side attribution, not matched retraining ablation evidence.
+
 ## 2026-08-09: v113-v117 MAPPO policy-internalization negative probes
 
 - v113: `artifacts/experiments/top_journal_v113_factorized_cama_probe_20260809/`; factorized joint-target marginalization was active, but mean reward was `11.383`.

@@ -27,6 +27,14 @@ Evidence record: `docs/project/top_journal_v100_lust_external_support_execution_
 
 Evidence record: `docs/project/top_journal_v100_lust_future_validation_execution_20260811.md`.
 
+## 2026-08-11: v100 inference ablation attributes reward gain to online counterfactual planner
+
+- On the identical 12-window LuST future plan, full v100 was paired against a frozen-checkpoint inference variant with `env_action_model_online_planner_enabled=false` and `learned_transition_model_planner_enabled=false`; no retraining or reward modification was used.
+- Full v100 minus no-online-planner mean reward delta was `+2.084722`, hierarchical outer-window BCa 95% CI `[+1.733256,+2.467439]`, paired `72/0/0`, sign-test p=`0.0`, consistent across all 12 windows.
+- A legacy ablation diagnostic accidentally used its old default positive offset `5.0`; it is explicitly invalid and excluded. The ablation runner now exposes zero-offset protocol and frozen-plan fast path, and the corrected run is the only cited result.
+
+Evidence record: `docs/project/top_journal_v100_inference_ablation_execution_20260811.md`.
+
 ## 2026-08-09: v113-v117 MAPPO policy-internalization probes rejected
 
 - v113 factorized counterfactual head marginalization was applied in the hierarchical MAPPO update, but the strict dev probe ended at `mean_total_reward=11.383`, continuity `0.734` and mechanism realization `0.312`; event-head usage collapsed toward `keep` after update 2.

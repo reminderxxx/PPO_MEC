@@ -1,0 +1,60 @@
+{
+  "sa_ghmappo_full": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_by_seed": {
+      "7": "artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/training_seed_7/sa_ghmappo/sa_ghmappo_train_20260808_180202_920353_seed7/checkpoints/latest.pt",
+      "13": "artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/training_seed_13/sa_ghmappo/sa_ghmappo_train_20260808_180202_920344_seed13/checkpoints/latest.pt",
+      "29": "artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/training_seed_29/sa_ghmappo/sa_ghmappo_train_20260808_180202_920334_seed29/checkpoints/latest.pt"
+    },
+    "run_id": "top_journal_mechanism_v100_urgency_safe_resource_mappo",
+    "config_profile": "top_journal_mechanism_v100_urgency_safe_resource_mappo",
+    "removed_module": "none",
+    "paper_contribution": "full frozen v100 MAPPO policy with multi-horizon planner, urgency mechanism credit and resource constraint"
+  },
+  "w/o_online_counterfactual_planner": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_by_seed": {
+      "7": "artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/training_seed_7/sa_ghmappo/sa_ghmappo_train_20260808_180202_920353_seed7/checkpoints/latest.pt",
+      "13": "artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/training_seed_13/sa_ghmappo/sa_ghmappo_train_20260808_180202_920344_seed13/checkpoints/latest.pt",
+      "29": "artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/training_seed_29/sa_ghmappo/sa_ghmappo_train_20260808_180202_920334_seed29/checkpoints/latest.pt"
+    },
+    "run_id": "top_journal_mechanism_v100_urgency_safe_resource_mappo",
+    "config_profile": "v100_inference_ablation",
+    "agent_config_overrides": {
+      "env_action_model_online_planner_enabled": false,
+      "learned_transition_model_planner_enabled": false
+    },
+    "removed_module": "execution-time online counterfactual planner",
+    "paper_contribution": "native frozen policy without execution-time model action replacement"
+  },
+  "w/o_mechanism_planner_credit": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_by_seed": {
+      "7": "artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/training_seed_7/sa_ghmappo/sa_ghmappo_train_20260808_180202_920353_seed7/checkpoints/latest.pt",
+      "13": "artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/training_seed_13/sa_ghmappo/sa_ghmappo_train_20260808_180202_920344_seed13/checkpoints/latest.pt",
+      "29": "artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/training_seed_29/sa_ghmappo/sa_ghmappo_train_20260808_180202_920334_seed29/checkpoints/latest.pt"
+    },
+    "run_id": "top_journal_mechanism_v100_urgency_safe_resource_mappo",
+    "config_profile": "v100_inference_ablation",
+    "agent_config_overrides": {
+      "env_action_model_online_planner_mechanism_coef": 0.0
+    },
+    "removed_module": "urgency-conditioned mechanism credit in online planner",
+    "paper_contribution": "frozen planner with mechanism-specific counterfactual bonus removed"
+  },
+  "w/o_resource_constraint": {
+    "agent_name": "sa_ghmappo",
+    "checkpoint_by_seed": {
+      "7": "artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/training_seed_7/sa_ghmappo/sa_ghmappo_train_20260808_180202_920353_seed7/checkpoints/latest.pt",
+      "13": "artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/training_seed_13/sa_ghmappo/sa_ghmappo_train_20260808_180202_920344_seed13/checkpoints/latest.pt",
+      "29": "artifacts/experiments/top_journal_v100_urgency_safe_resource_full_20260808/training_seed_29/sa_ghmappo/sa_ghmappo_train_20260808_180202_920334_seed29/checkpoints/latest.pt"
+    },
+    "run_id": "top_journal_mechanism_v100_urgency_safe_resource_mappo",
+    "config_profile": "v100_inference_ablation",
+    "agent_config_overrides": {
+      "env_action_model_resource_constraint_enabled": false
+    },
+    "removed_module": "resource-constrained planner utility",
+    "paper_contribution": "frozen planner without resource constraint term"
+  }
+}

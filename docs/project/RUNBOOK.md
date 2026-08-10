@@ -171,6 +171,14 @@ LuST 的 future split 不能复用历史 4-window support 结果。先用 source
 
 当前 v100 LuST package：12 windows、3 seeds、2 workflows、792 raw summaries；SA total reward `-25.638`，Popularity `-32.961`，MAPPO `-35.535`。SA-Popularity outer-window BCa 95% CI `[+2.324,+15.186]`。由于 active/idle strata 全体困难且整体为负，LuST 证据必须表述为 cross-mobility reward support，不能写成 all-regime/all-metric superiority。
 
+v100 LuST inference-side planner attribution（必须 zero offset；不替代 matched retraining ablation）：
+
+```bash
+.venv/bin/python scripts/benchmark_ablation.py --ablation_labels w/o_online_counterfactual_planner --manifest_path configs/ablation_checkpoint_manifest_v100_inference_components_20260811.json --mobility_source lust --mobility_csv_path data/processed/mobility/lust/lust_fcd.csv --primary_vehicle_selection handoff_pressure --workflow_csv_path data/raw/workflow/alibaba2018/batch_task.csv --seeds 7 13 29 --max_mobility_rows 200000 --max_workflows 2 --max_steps 22 --reward_positive_offset 0.0 --workflow_selector ordered --rsu_layout auto_grid_tight --window_mode full_stratified --window_plan_path configs/experiment/top_journal_v100_lust_future_validation_20260810/future_validation_window_plan.json --window_length 24 --window_scan_stride 2 --min_tasks 5 --max_tasks 20 --output_root artifacts/experiments/top_journal_v100_inference_ablation_lust_zero_offset_20260811
+```
+
+full v100 minus no-online-planner：`+2.084722`，outer-window hierarchical BCa 95% CI `[+1.733256,+2.467439]`，`72/0/0`。旧的 positive-offset diagnostic 不得引用。
+
 ### v19/v20 PRD-MAPPO 候选
 
 v19/v20 是 v17 后续算法候选，只允许使用 dev 或新冻结 future-validation；当前 hidden 仍不得用于筛选或调参。v19 加入 handoff-risk PRD 和 dual cost，v20 再加入 idle-execution PRD。二者均不改 reward/action/env/baseline contract。

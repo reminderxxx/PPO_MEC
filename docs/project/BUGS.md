@@ -20,6 +20,12 @@
 - `OPEN / regime coverage`: all methods are negative in the aggregate; SA's lead concentrates in mechanism-activating windows (`31.218` vs Popularity `13.644`), while active/idle strata remain negative. The algorithm must not be described as uniformly robust across regimes.
 - `OPEN / paper readiness`: component ablations and unified compute accounting remain incomplete even after cross-mobility evidence was added.
 
+## 2026-08-11: inference ablation contract fixed and planner attribution recorded
+
+- `FIXED / ablation reward protocol`: `scripts/benchmark_ablation.py` previously inherited a `+5.0` reward offset by omission; the invalid diagnostic is excluded, and the corrected runner defaults to explicit zero offset.
+- `RESOLVED / planner attribution`: full v100 beats the no-online-planner inference variant by `+2.084722` with a positive BCa interval on all 12 LuST windows.
+- `OPEN / training ablation`: this is an inference-side component ablation. Matched retraining ablations for every loss/constraint component are still required for a full causal training claim.
+
 ## 2026-08-09: v113-v117 native-policy internalization boundary
 
 - `REJECTED / factorized target`: v113's joint-to-head marginal target is a valid MAPPO training loss but destabilized the event head and reduced reward; it is not enabled by the canonical v100 profile.

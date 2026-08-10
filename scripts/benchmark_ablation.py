@@ -55,6 +55,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max_mobility_rows", type=int, default=1500)
     parser.add_argument("--max_workflows", type=int, default=2)
     parser.add_argument("--max_steps", type=int, default=14)
+    parser.add_argument("--reward_positive_offset", type=float, default=0.0)
     parser.add_argument("--workflow_selector", type=str, default="ordered")
     parser.add_argument("--rsu_layout", type=str, default="auto_dominant_tight")
     parser.add_argument("--frame_offset", type=int, default=0)
@@ -121,28 +122,29 @@ def main() -> None:
     if not selected_manifest:
         raise RuntimeError("ablation_labels ??? manifest ??????")
 
-    source_path, window_payload = resolve_window_candidates(
-        root_dir=ROOT_DIR,
-        mobility_source=args.mobility_source,
-        mobility_csv_path=args.mobility_csv_path,
-        lust_scenario_root=args.lust_scenario_root,
-        max_mobility_rows=args.max_mobility_rows,
-        rsu_layout=args.rsu_layout,
-        frame_offset=args.frame_offset,
-        window_length=args.window_length,
-        window_selector=args.window_selector,
-        window_count=args.window_count,
-        window_scan_stride=args.window_scan_stride,
-        random_seed=args.seeds[0] if args.seeds else 7,
-        window_mode=args.window_mode,
-        window_rank_offset=args.window_rank_offset,
-    )
+    if args.window_plan_path:
+        window_payload = apply_frozen_window_plan({"selected_windows": []}, args.window_plan_path)
+        source_path = str(window_payload.get("mobility_source_path", ""))
+    else:
+        source_path, window_payload = resolve_window_candidates(
+            root_dir=ROOT_DIR,
+            mobility_source=args.mobility_source,
+            mobility_csv_path=args.mobility_csv_path,
+            lust_scenario_root=args.lust_scenario_root,
+            max_mobility_rows=args.max_mobility_rows,
+            rsu_layout=args.rsu_layout,
+            frame_offset=args.frame_offset,
+            window_length=args.window_length,
+            window_selector=args.window_selector,
+            window_count=args.window_count,
+            window_scan_stride=args.window_scan_stride,
+            random_seed=args.seeds[0] if args.seeds else 7,
+            window_mode=args.window_mode,
+            window_rank_offset=args.window_rank_offset,
+        )
     selected_windows = list(window_payload["selected_windows"])
     if not selected_windows:
         raise RuntimeError("frozen protocol ????????")
-    if args.window_plan_path:
-        window_payload = apply_frozen_window_plan(window_payload, args.window_plan_path)
-        selected_windows = list(window_payload["selected_windows"])
 
     run_id = datetime.now().strftime(f"ablation_{args.window_mode}_%Y%m%d_%H%M%S_%f")
     output_root = Path(args.output_root) / run_id
@@ -197,6 +199,7 @@ def main() -> None:
                         max_steps=args.max_steps,
                         mobility_source=args.mobility_source,
                         primary_vehicle_selection=args.primary_vehicle_selection,
+                        reward_positive_offset=args.reward_positive_offset,
                         predictor_kwargs=dict(payload.get("predictor_kwargs", {}) or {}),
                         agent_config_overrides=dict(payload.get("agent_config_overrides", {}) or {}),
                         run_metadata={
@@ -205,6 +208,7 @@ def main() -> None:
                             "mainline": mainline_label,
                             "window_mode": args.window_mode,
                             "window_rank_offset": args.window_rank_offset,
+                            "reward_positive_offset": args.reward_positive_offset,
                             "window_class": window_candidate.get("window_class", "unknown"),
                             "protocol_version": PAPER_PROTOCOL_VERSION,
                             "paper_protocol_frozen": PAPER_PROTOCOL_FROZEN,
@@ -238,6 +242,10 @@ def main() -> None:
         "mobility_source": args.mobility_source,
         "mobility_source_path": source_path,
         "primary_vehicle_selection": args.primary_vehicle_selection,
+        "reward_protocol": {
+            "reward_positive_offset": float(args.reward_positive_offset),
+            "offset_free": abs(float(args.reward_positive_offset)) <= 1e-12,
+        },
         "window_mode": args.window_mode,
         "window_rank_offset": args.window_rank_offset,
         "selected_window_plan": selected_windows,
