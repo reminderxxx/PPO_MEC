@@ -96,6 +96,9 @@ MAIN_RESULT_METRICS = [
     "online_planner_score_margin_mean",
     "online_planner_mechanism_target_success_count",
     "online_planner_mechanism_target_success_rate",
+    "inference_wall_clock_sec",
+    "inference_wall_clock_sec_per_step",
+    "python_peak_increment_bytes",
 ]
 ACTIONMIX_DIAGNOSTIC_METRICS = [
     "service_success_count",
@@ -1735,6 +1738,7 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         or handoff_summary.get("migration_during_handoff_count", 0) > 0
     )
     actionmix_diagnostics = _build_actionmix_diagnostics(summary)
+    compute_audit = summary.get("compute_audit", {})
     return {
         "window_id": run_info.get("window_id"),
         "scenario_id": run_info.get("scenario_id", run_info.get("window_id")),
@@ -1751,6 +1755,13 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         "reward_positive_offset_component": round(float(reward_positive_offset_component), 6),
         "offset_adjusted_total_reward": round(float(total_reward - reward_positive_offset_component), 6),
         "episode_step_count": len(step_trace),
+        "inference_wall_clock_sec": float(compute_audit.get("wall_clock_sec", 0.0) or 0.0),
+        "inference_wall_clock_sec_per_step": float(
+            compute_audit.get("wall_clock_sec_per_step", 0.0) or 0.0
+        ),
+        "python_peak_increment_bytes": float(
+            compute_audit.get("python_peak_increment_bytes", 0.0) or 0.0
+        ),
         "episode_success": summary.get("episode_success", False),
         "successful_episode_rate": 1.0 if summary.get("episode_success", False) else 0.0,
         "mechanism_realization_rate": float(mechanism_realized),

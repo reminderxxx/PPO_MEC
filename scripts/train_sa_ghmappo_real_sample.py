@@ -2224,6 +2224,26 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--disable_adapter_prefetch", action="store_true")
     parser.add_argument("--disable_dag_dependency_aware", action="store_true")
     parser.add_argument("--disable_uncertainty_signal", action="store_true")
+    parser.add_argument(
+        "--env_action_model_online_planner_enabled",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+    )
+    parser.add_argument(
+        "--env_action_model_policy_improvement_enabled",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+    )
+    parser.add_argument(
+        "--env_action_model_resource_constraint_enabled",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+    )
+    parser.add_argument(
+        "--learned_transition_model_enabled",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+    )
     parser.add_argument("--latency_fallback_bias_enabled", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--steady_rsu_bias_enabled", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--steady_rsu_bias_strength", type=float, default=None)
@@ -6833,6 +6853,10 @@ def build_agent_kwargs(args: argparse.Namespace) -> dict[str, Any]:
         "predictive_prefetch_admission_guard_enabled",
         "predictive_prefetch_admission_min_confidence",
         "predictive_prefetch_admission_require_distinct_next",
+        "env_action_model_online_planner_enabled",
+        "env_action_model_policy_improvement_enabled",
+        "env_action_model_resource_constraint_enabled",
+        "learned_transition_model_enabled",
     ]
     for field_name in optional_agent_fields:
         value = getattr(args, field_name, None)

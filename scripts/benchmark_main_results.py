@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
+import tracemalloc
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -107,6 +109,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min_tasks", type=int, default=5)
     parser.add_argument("--max_tasks", type=int, default=20)
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "artifacts" / "benchmarks" / "main_results"))
+    parser.add_argument(
+        "--audit_runtime",
+        action="store_true",
+        help="Record episode wall-clock and Python traced peak allocation for compute auditing.",
+    )
     return parser.parse_args()
 
 
@@ -442,6 +449,8 @@ def main() -> None:
     rows: list[dict[str, Any]] = []
     selected_workflow_ids_by_seed: dict[str, list[str]] = {}
     selected_window_plan = list(window_payload["selected_windows"])
+    if args.audit_runtime:
+        tracemalloc.start()
 
     for seed in args.seeds:
         workflow_states = build_selected_workflow_states(
@@ -474,6 +483,10 @@ def main() -> None:
             mobility_bundle.rsu_metadata["window_class"] = window_candidate["window_class"]
             for workflow_state in workflow_states:
                 for agent_name in args.agents:
+                    if args.audit_runtime:
+                        tracemalloc.reset_peak()
+                        allocation_before, _ = tracemalloc.get_traced_memory()
+                        runtime_started = time.perf_counter()
                     summary = run_real_episode(
                         root_dir=ROOT_DIR,
                         agent_name=agent_name,
@@ -507,6 +520,20 @@ def main() -> None:
                             "drop_handoff_prediction_prob": args.drop_handoff_prediction_prob,
                         },
                     )
+                    if args.audit_runtime:
+                        runtime_sec = time.perf_counter() - runtime_started
+                        allocation_after, allocation_peak = tracemalloc.get_traced_memory()
+                        summary["compute_audit"] = {
+                            "wall_clock_sec": round(runtime_sec, 9),
+                            "wall_clock_sec_per_step": round(
+                                runtime_sec / max(int(summary.get("run_info", {}).get("total_steps", 0)), 1),
+                                9,
+                            ),
+                            "python_allocation_before_bytes": int(allocation_before),
+                            "python_allocation_after_bytes": int(allocation_after),
+                            "python_peak_increment_bytes": int(max(allocation_peak - allocation_before, 0)),
+                            "memory_scope": "tracemalloc_python_allocations_only",
+                        }
                     summary_path = episode_root / str(mobility_bundle.rsu_metadata.get("window_id")) / workflow_state.workflow_id / agent_name / f"seed_{seed}.summary.json"
                     summary_path.parent.mkdir(parents=True, exist_ok=True)
                     summary["run_info"]["summary_path"] = str(summary_path)
@@ -589,6 +616,7 @@ def main() -> None:
         "checkpoint_audit": checkpoint_audit,
         "smoke_checkpoint_warnings": smoke_warnings,
         "episode_count": len(rows),
+        "runtime_audit_enabled": bool(args.audit_runtime),
         "mobility_source_path": mobility_source_path,
         "workflow_source_path": args.workflow_csv_path,
         "window_strata_summary": {

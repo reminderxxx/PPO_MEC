@@ -15,6 +15,30 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 
 
 VARIANTS: dict[str, dict[str, Any]] = {
+    "no_online_counterfactual_planner": {
+        "disable_flags": ["--no-env_action_model_online_planner_enabled"],
+        "removed_module": "online counterfactual action planner",
+        "paper_contribution": "removes execution-time model-based action improvement while retaining learned MAPPO training",
+    },
+    "no_model_policy_improvement": {
+        "disable_flags": ["--no-env_action_model_policy_improvement_enabled"],
+        "removed_module": "multi-horizon model-based policy improvement",
+        "paper_contribution": "removes robust multi-horizon policy targets while retaining the online planner",
+    },
+    "no_resource_constraint": {
+        "disable_flags": ["--no-env_action_model_resource_constraint_enabled"],
+        "removed_module": "resource-constrained counterfactual objective",
+        "paper_contribution": "removes branch resource-cost regularization from model-based MAPPO",
+    },
+    "no_learned_dynamics": {
+        "disable_flags": [
+            "--no-learned_transition_model_enabled",
+            "--no-env_action_model_online_planner_enabled",
+            "--no-env_action_model_policy_improvement_enabled",
+        ],
+        "removed_module": "learned dynamics and model-based policy improvement",
+        "paper_contribution": "reduces the method to its model-free hierarchical MAPPO core",
+    },
     "no_latency_fallback": {
         "disable_flags": ["--no-latency_fallback_bias_enabled"],
         "removed_module": "inference-calibrated latency fallback",
@@ -81,9 +105,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_length", type=int, default=24)
     parser.add_argument("--window_scan_stride", type=int, default=2)
     parser.add_argument("--window_mode", type=str, default="mixed_informative")
+    parser.add_argument("--window_plan_path", type=str, default="")
+    parser.add_argument("--eval_window_plan_path", type=str, default="")
+    parser.add_argument("--reward_positive_offset", type=float, default=0.0)
+    parser.add_argument("--prediction_horizon", type=int, default=16)
+    parser.add_argument("--post_training_audit_mode", choices=["full", "compact"], default="compact")
     parser.add_argument("--min_tasks", type=int, default=5)
     parser.add_argument("--max_tasks", type=int, default=20)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument(
+        "--retrain_full",
+        action="store_true",
+        help="Retrain the full method under the same protocol instead of reusing its checkpoint manifest.",
+    )
     return parser.parse_args()
 
 
@@ -113,7 +147,7 @@ def selected_checkpoint_from_summary(summary_path: Path) -> str:
     raise RuntimeError(f"no usable checkpoint found in {summary_path}")
 
 
-def build_train_command(args: argparse.Namespace, variant: str, seed: int, variant_root: Path) -> list[str]:
+def build_train_command(args: argparse.Namespace, variant: str | None, seed: int, variant_root: Path) -> list[str]:
     command = [
         sys.executable,
         "scripts/train_sa_ghmappo_real_sample.py",
@@ -147,6 +181,8 @@ def build_train_command(args: argparse.Namespace, variant: str, seed: int, varia
         str(args.max_mobility_rows),
         "--max_workflows",
         str(args.max_workflows),
+        "--reward_positive_offset",
+        str(args.reward_positive_offset),
         "--workflow_selector",
         args.workflow_selector,
         "--rsu_layout",
@@ -157,12 +193,21 @@ def build_train_command(args: argparse.Namespace, variant: str, seed: int, varia
         str(args.window_length),
         "--window_scan_stride",
         str(args.window_scan_stride),
+        "--prediction_horizon",
+        str(args.prediction_horizon),
+        "--post_training_audit_mode",
+        args.post_training_audit_mode,
         "--min_tasks",
         str(args.min_tasks),
         "--max_tasks",
         str(args.max_tasks),
     ]
-    command.extend(VARIANTS[variant]["disable_flags"])
+    if args.window_plan_path:
+        command.extend(["--window_plan_path", args.window_plan_path])
+    if args.eval_window_plan_path:
+        command.extend(["--eval_window_plan_path", args.eval_window_plan_path])
+    if variant is not None:
+        command.extend(VARIANTS[variant]["disable_flags"])
     return command
 
 
@@ -185,12 +230,59 @@ def main() -> None:
         "removed_module": "none",
         "paper_contribution": "full current-contract SA-GHMAPPO",
         "profile": args.profile,
+        "training_protocol": {
+            "episodes": args.episodes,
+            "update_every": args.update_every,
+            "batch_size": args.batch_size,
+            "max_steps": args.max_steps,
+            "train_window_count": args.train_window_count,
+            "window_mode": args.window_mode,
+            "window_plan_path": args.window_plan_path,
+            "eval_window_plan_path": args.eval_window_plan_path,
+            "reward_positive_offset": args.reward_positive_offset,
+            "prediction_horizon": args.prediction_horizon,
+        },
     }
     command_log: list[dict[str, Any]] = []
     if command_log_path.exists():
         existing_log = load_json(command_log_path)
         if isinstance(existing_log, list):
             command_log.extend(existing_log)
+
+    if args.retrain_full:
+        full_root = run_root / "training" / "sa_ghmappo_full"
+        full_manifest = dict(manifest["sa_ghmappo_full"])
+        full_manifest["checkpoint_by_seed"] = {}
+        full_manifest["retrained_as_matched_control"] = True
+        for seed in args.seeds:
+            existing_summary = find_latest_summary(full_root, seed) if args.resume else None
+            if existing_summary is not None:
+                checkpoint_path = selected_checkpoint_from_summary(existing_summary)
+                full_manifest["checkpoint_by_seed"][str(seed)] = checkpoint_path
+                continue
+            command = build_train_command(args, None, seed, full_root)
+            started = time.time()
+            result = subprocess.run(command, cwd=ROOT_DIR, text=True, capture_output=True)
+            elapsed_sec = round(time.time() - started, 3)
+            summary_path = find_latest_summary(full_root, seed)
+            checkpoint_path = selected_checkpoint_from_summary(summary_path) if summary_path else ""
+            command_log.append(
+                {
+                    "label": f"train_sa_ghmappo_full_seed_{seed}",
+                    "command": command,
+                    "returncode": result.returncode,
+                    "elapsed_sec": elapsed_sec,
+                    "summary_path": str(summary_path) if summary_path else "",
+                    "selected_checkpoint_path": checkpoint_path,
+                    "stdout_tail": result.stdout[-4000:],
+                    "stderr_tail": result.stderr[-4000:],
+                }
+            )
+            if result.returncode != 0:
+                command_log_path.write_text(json.dumps(command_log, ensure_ascii=False, indent=2), encoding="utf-8")
+                raise RuntimeError(f"training failed for matched full control seed={seed}; see {command_log_path}")
+            full_manifest["checkpoint_by_seed"][str(seed)] = checkpoint_path
+        manifest["sa_ghmappo_full"] = full_manifest
 
     for variant in args.variants:
         variant_root = run_root / "training" / variant
@@ -201,6 +293,18 @@ def main() -> None:
             "paper_contribution": VARIANTS[variant]["paper_contribution"],
             "predictor_kwargs": dict(VARIANTS[variant].get("predictor_kwargs", {})),
             "profile": args.profile,
+            "training_protocol": {
+                "episodes": args.episodes,
+                "update_every": args.update_every,
+                "batch_size": args.batch_size,
+                "max_steps": args.max_steps,
+                "train_window_count": args.train_window_count,
+                "window_mode": args.window_mode,
+                "window_plan_path": args.window_plan_path,
+                "eval_window_plan_path": args.eval_window_plan_path,
+                "reward_positive_offset": args.reward_positive_offset,
+                "prediction_horizon": args.prediction_horizon,
+            },
         }
         for seed in args.seeds:
             existing_summary = find_latest_summary(variant_root, seed) if args.resume else None

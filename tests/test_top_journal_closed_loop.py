@@ -149,6 +149,11 @@ def test_summary_row_reports_offset_adjusted_reward() -> None:
             "prefetch_expired_miss_count": 0,
         },
         "agent_action_diagnostics": {},
+        "compute_audit": {
+            "wall_clock_sec": 0.2,
+            "wall_clock_sec_per_step": 0.1,
+            "python_peak_increment_bytes": 4096,
+        },
         "step_trace": [
             {"reward_dict": {"positive_offset": 5.0}},
             {"reward_dict": {"positive_offset": 5.0}},
@@ -160,6 +165,9 @@ def test_summary_row_reports_offset_adjusted_reward() -> None:
     assert row["episode_step_count"] == 2
     assert row["reward_positive_offset_component"] == 10.0
     assert row["offset_adjusted_total_reward"] == 2.0
+    assert row["inference_wall_clock_sec"] == 0.2
+    assert row["inference_wall_clock_sec_per_step"] == 0.1
+    assert row["python_peak_increment_bytes"] == 4096.0
 
 
 def test_select_sa_checkpoint_prefers_reward_tiebreak_guardrail_policy() -> None:
