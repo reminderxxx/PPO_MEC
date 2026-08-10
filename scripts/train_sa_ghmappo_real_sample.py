@@ -1944,6 +1944,111 @@ PROFILE_DEFAULTS = {
         "update_eval_max_windows": 4,
         "update_eval_max_workflows": 1,
     },
+    "top_journal_mechanism_v113_factorized_cama_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v114_selective_teacher_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v115_training_policy_iteration_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v116_risk_sensitive_planner_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v117_conservative_policy_iteration_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -2057,6 +2162,11 @@ MECHANISM_COVERAGE_PROFILES = {
     "top_journal_mechanism_v103_cama_head_policy",
     "top_journal_mechanism_v104_urgency_gated_cama",
     "top_journal_mechanism_v105_resource_gated_cama",
+    "top_journal_mechanism_v113_factorized_cama_mappo",
+    "top_journal_mechanism_v114_selective_teacher_mappo",
+    "top_journal_mechanism_v115_training_policy_iteration_mappo",
+    "top_journal_mechanism_v116_risk_sensitive_planner_mappo",
+    "top_journal_mechanism_v117_conservative_policy_iteration_mappo",
 }
 
 
@@ -6105,6 +6215,94 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 # Penalize redundant cache/migration branches in the
                 # counterfactual utility while keeping urgent handoff credit.
                 "env_action_model_resource_cost_coef": 0.45,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v113_factorized_cama_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v100_urgency_safe_resource_mappo"
+        )
+        kwargs.update(
+            {
+                # Native execution uses a factorized policy-iteration target:
+                # the exact branch-improved joint target is marginalized into
+                # slow/fast/event heads during training only.
+                "env_action_model_online_planner_enabled": False,
+                "learned_transition_model_planner_enabled": False,
+                "counterfactual_factorized_policy_improvement_enabled": True,
+                "counterfactual_factorized_policy_improvement_coef": 0.80,
+                "counterfactual_factorized_policy_improvement_temperature": 0.80,
+                "counterfactual_head_advantage_enabled": False,
+                "counterfactual_head_policy_improvement_coef": 0.0,
+                "env_action_model_policy_improvement_coef": 0.50,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v114_selective_teacher_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v100_urgency_safe_resource_mappo"
+        )
+        kwargs.update(
+            {
+                # The digital twin supplies selective positive-margin labels
+                # during training; deployment remains native MAPPO.
+                "env_action_model_online_planner_enabled": False,
+                "learned_transition_model_planner_enabled": False,
+                "env_action_model_teacher_distillation_enabled": True,
+                "env_action_model_teacher_distillation_coef": 0.80,
+                "env_action_model_teacher_distillation_temperature": 1.0,
+                "counterfactual_factorized_policy_improvement_enabled": False,
+                "counterfactual_factorized_policy_improvement_coef": 0.0,
+                "counterfactual_head_advantage_enabled": False,
+                "counterfactual_head_policy_improvement_coef": 0.0,
+                "env_action_model_policy_improvement_coef": 0.30,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v115_training_policy_iteration_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v100_urgency_safe_resource_mappo"
+        )
+        kwargs.update(
+            {
+                # Execute counterfactual policy-improved actions only while
+                # collecting training rollouts; evaluation remains native.
+                "env_action_model_online_planner_enabled": False,
+                "env_action_model_training_planner_enabled": True,
+                "learned_transition_model_planner_enabled": False,
+                "env_action_model_teacher_distillation_enabled": False,
+                "env_action_model_teacher_distillation_coef": 0.0,
+                "counterfactual_factorized_policy_improvement_enabled": False,
+                "counterfactual_factorized_policy_improvement_coef": 0.0,
+                "counterfactual_head_advantage_enabled": False,
+                "counterfactual_head_policy_improvement_coef": 0.0,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v116_risk_sensitive_planner_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v100_urgency_safe_resource_mappo"
+        )
+        kwargs.update(
+            {
+                # Let the calibrated downside return choose among legal
+                # actions, while retaining the explicit resource constraint.
+                "env_action_model_online_planner_policy_prior_coef": 0.0,
+                "env_action_model_online_planner_mechanism_coef": 1.20,
+                "env_action_model_resource_cost_coef": 0.10,
+                "env_action_model_online_planner_min_margin": 0.0,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v117_conservative_policy_iteration_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v100_urgency_safe_resource_mappo"
+        )
+        kwargs.update(
+            {
+                # Conservative policy iteration: accept a model action only
+                # when its robust advantage over the native action is clear.
+                "env_action_model_online_planner_min_advantage": 0.15,
             }
         )
         return kwargs

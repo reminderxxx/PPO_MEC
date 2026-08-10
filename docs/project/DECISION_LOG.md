@@ -1,5 +1,21 @@
 ﻿# Decision Log
 
+## 2026-08-09: freeze v100 after one-time independent future validation
+
+决策：将 v100 的 v20 future-validation 结果作为冻结 checkpoint 的独立 cross-split reward evidence，停止基于该结果调参；不把 v113-v117 的失败 profile 重新接入 canonical。下一轮如需提升机制指标或扩大泛化，必须另立新 split 和预注册 protocol。
+
+依据：11 个算法、3 seeds、15 个 outcome-blind future windows、2 workflows 的全量 benchmark 中，SA-GHMAPPO `33.342` 高于 Popularity `29.350`；配对 reward delta `+3.992`，BCa `[+2.077111,+8.290975]`，胜平负 `75/15/0`，且对全部十个 baseline 的 reward BCa 下界均为正。v20 与 v71 train/dev/formal/hidden 无 frame interval overlap，artifact integrity 通过。
+
+边界：该结果证明冻结 v100 在本项目 future split 上的 reward lead，但不证明所有 mechanism/cost metrics 全面领先。跨 mobility/workflow、完整组件消融、统一 compute audit 和 TMC-ready 审查仍未完成。
+
+## 2026-08-09: reject v113-v117 as canonical promotion candidates
+
+决策：不晋级 v113 factorized CAMA、v114 selective teacher distillation、v115 training-only policy iteration、v116 risk-sensitive planner 或 v117 conservative policy-iteration gate。保留它们作为已审计的实验 profile/contract，canonical reward candidate 仍为 v100。
+
+依据：v113-v117 在同一严格 dev probe 中分别得到 `11.383`、`11.537`、`14.913`、`14.913`、`14.913` 的 mean reward，均未超过 Popularity 或 v100 formal candidate；v114 的 teacher loss 有真实梯度和非零 support，但仍然失败，排除了“代码未接入”解释。
+
+边界：v100 formal `26.430` vs Popularity `26.0825` 的 `+0.3475` uplift 仍是可复核结果，但它不能被改写为“大幅领先”或 TMC-ready。下一轮候选必须先冻结新的独立 split，再做完整 multi-seed formal/hidden/support protocol。
+
 ## 2026-08-09: reject option-only and learned-predictor promotion
 
 决策：不将 v110/v111 option-CAMA profiles 或 v112 supervised-predictor integration 晋级为 canonical 主算法。移除 v110/v111 live profile entries；保留 CAMA core implementation 和 predictor input-contract fixes 作为后续研究基础。

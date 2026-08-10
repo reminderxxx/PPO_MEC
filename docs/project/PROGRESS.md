@@ -2,6 +2,24 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-08-09: v100 frozen future-validation full benchmark confirms cross-split reward lead
+
+- Without changing the frozen v100 checkpoint or tuning after outcome access, the candidate was evaluated once on the outcome-blind v20 `future_validation` plan: 11 agents, 3 seeds (`7,13,29`), 15 non-overlapping windows, 2 workflows and 22 steps, producing 990 raw episode summaries.
+- SA-GHMAPPO total reward was `33.342`, ahead of Popularity `29.350`, DQN `24.236`, Dueling-DQN `19.159`, DT-Handoff `10.027`, PPO `9.169`, QMIX `8.924`, DAG-Offload `8.600`, Cache-Offload `3.125`, MAPPO `-1.066` and Controller-MAT `-1.271`.
+- SA versus Popularity had reward delta `+3.992`, hierarchical window-bootstrap BCa 95% CI `[+2.077111, +8.290975]`, paired `75/15/0`, Holm-adjusted sign-test p=`0.0`; the reward BCa lower bound was positive against every baseline. Artifact integrity passed with zero missing references and zero JSON errors.
+- v20 future windows have no frame-interval overlap with v71 train/dev/formal/hidden plans. This is the first independent cross-split reward confirmation for the frozen v100 checkpoint, not evidence that all mechanism/cost metrics dominate or that the work is TMC-ready.
+
+Evidence record: `docs/project/top_journal_v100_future_validation_execution_20260809.md`.
+
+## 2026-08-09: v113-v117 MAPPO policy-internalization probes rejected
+
+- v113 factorized counterfactual head marginalization was applied in the hierarchical MAPPO update, but the strict dev probe ended at `mean_total_reward=11.383`, continuity `0.734` and mechanism realization `0.312`; event-head usage collapsed toward `keep` after update 2.
+- v114 selective counterfactual teacher distillation used exact positive-margin model-improved actions without replacing environment actions. Teacher support was nonzero (`174/348/190/195` per update), but the probe ended at `mean_total_reward=11.537`, continuity `0.721` and mechanism realization `0.312`.
+- v115 training-only counterfactual policy iteration executed model-improved actions only during training and disabled the planner for native evaluation; it improved the probe over v114 but ended at `mean_total_reward=14.913`, below the current Popularity dev reference. v116 risk-sensitive planner and v117 conservative model-advantage gate did not change that outcome.
+- These probes establish a real algorithmic boundary: hard or behavior-shifted distillation does not internalize v100's execution-time planner gain under the current protocol. The new teacher/training-only/conservative controls remain non-canonical research capabilities; no v113-v117 result is formal or hidden evidence.
+
+证据边界：v100 remains the only verified formal reward winner, and the new v20 future package now provides an independent frozen-checkpoint reward confirmation (`33.342` vs `29.350`). This larger cross-split gap must not be conflated with universal metric dominance; further tuning requires a new non-overlapping frozen split rather than repeated selection on consumed holdouts.
+
 ## 2026-08-09: v109-v112 counterfactual option and learned predictor probes rejected
 
 - v109 re-ran the historical sparse-tail option on the current v71 dev split and collapsed: `mean_total_reward=-46.095`, continuity `0.217`, mechanism realization `0.000`.

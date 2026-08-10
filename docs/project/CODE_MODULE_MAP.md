@@ -1,5 +1,12 @@
 # Code Module Map
 
+## 2026-08-09 v113-v117 MAPPO policy-iteration experiments
+
+- `src/agents/sa_ghmappo_core.py`：保留 factorized counterfactual head loss、selective teacher-only label、training-only planner 和 conservative model-advantage gate；这些能力默认关闭，且未晋级 canonical v100。
+- `src/trainers/marl_on_policy_trainer.py`：区分 online planner、training-only planner 和 teacher-only label，保证训练期辅助信号不会被误报为 native evaluation 行为。
+- `src/evaluators/real_eval_support.py`：恢复新增 checkpoint config 字段，确保实验 profile 的 producer/consumer contract 对齐。
+- `scripts/train_sa_ghmappo_real_sample.py`、`tests/test_algo_pool_contract.py`：维护 v113-v117 negative profiles 与 MAPPO action/loss contract regression tests。
+
 ## 2026-08-08 v97/v98 UCC counterfactual calibration and policy improvement
 
 - `src/trainers/marl_on_policy_trainer.py`：在保持原 PPO rollout contract 的前提下，把 exact one-step branch 的真实 transition samples（含当前 MAPPO critic bootstrap）交给 UCC replay；v98 同时保留 exact action TD targets 供第二层 model policy improvement 使用。

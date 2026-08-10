@@ -1099,12 +1099,20 @@ class 分层PPO基类(BaseAgent):
         env_action_model_online_planner_mechanism_coef: float = 0.0,
         env_action_model_online_planner_policy_prior_coef: float = 0.15,
         env_action_model_online_planner_min_margin: float = 0.0,
+        env_action_model_online_planner_min_advantage: float = 0.0,
+        env_action_model_teacher_distillation_enabled: bool = False,
+        env_action_model_teacher_distillation_coef: float = 0.0,
+        env_action_model_teacher_distillation_temperature: float = 1.0,
+        env_action_model_training_planner_enabled: bool = False,
         counterfactual_head_advantage_enabled: bool = False,
         counterfactual_head_advantage_coef: float = 0.0,
         counterfactual_head_advantage_clip: float = 2.0,
         counterfactual_head_advantage_warmup_updates: int = 1,
         counterfactual_head_policy_improvement_coef: float = 0.0,
         counterfactual_head_policy_improvement_temperature: float = 1.0,
+        counterfactual_factorized_policy_improvement_enabled: bool = False,
+        counterfactual_factorized_policy_improvement_coef: float = 0.0,
+        counterfactual_factorized_policy_improvement_temperature: float = 1.0,
         counterfactual_head_temporal_gate_enabled: bool = False,
         counterfactual_head_temporal_gate_floor: float = 0.25,
         env_action_model_online_planner_prefer_beam_targets: bool = False,
@@ -2374,6 +2382,24 @@ class 分层PPO基类(BaseAgent):
             float(env_action_model_online_planner_min_margin),
             0.0,
         )
+        self._env_action_model_online_planner_min_advantage = max(
+            float(env_action_model_online_planner_min_advantage),
+            0.0,
+        )
+        self._env_action_model_teacher_distillation_enabled = bool(
+            env_action_model_teacher_distillation_enabled
+        )
+        self._env_action_model_teacher_distillation_coef = max(
+            float(env_action_model_teacher_distillation_coef),
+            0.0,
+        )
+        self._env_action_model_teacher_distillation_temperature = max(
+            float(env_action_model_teacher_distillation_temperature),
+            1e-3,
+        )
+        self._env_action_model_training_planner_enabled = bool(
+            env_action_model_training_planner_enabled
+        )
         self._counterfactual_head_advantage_enabled = bool(
             counterfactual_head_advantage_enabled
         )
@@ -2395,6 +2421,17 @@ class 分层PPO基类(BaseAgent):
         )
         self._counterfactual_head_policy_improvement_temperature = max(
             float(counterfactual_head_policy_improvement_temperature),
+            1e-3,
+        )
+        self._counterfactual_factorized_policy_improvement_enabled = bool(
+            counterfactual_factorized_policy_improvement_enabled
+        )
+        self._counterfactual_factorized_policy_improvement_coef = max(
+            float(counterfactual_factorized_policy_improvement_coef),
+            0.0,
+        )
+        self._counterfactual_factorized_policy_improvement_temperature = max(
+            float(counterfactual_factorized_policy_improvement_temperature),
             1e-3,
         )
         self._counterfactual_head_temporal_gate_enabled = bool(
@@ -3054,6 +3091,21 @@ class 分层PPO基类(BaseAgent):
             "env_action_model_online_planner_min_margin": (
                 self._env_action_model_online_planner_min_margin
             ),
+            "env_action_model_online_planner_min_advantage": (
+                self._env_action_model_online_planner_min_advantage
+            ),
+            "env_action_model_teacher_distillation_enabled": (
+                self._env_action_model_teacher_distillation_enabled
+            ),
+            "env_action_model_teacher_distillation_coef": (
+                self._env_action_model_teacher_distillation_coef
+            ),
+            "env_action_model_teacher_distillation_temperature": (
+                self._env_action_model_teacher_distillation_temperature
+            ),
+            "env_action_model_training_planner_enabled": (
+                self._env_action_model_training_planner_enabled
+            ),
             "counterfactual_head_advantage_enabled": (
                 self._counterfactual_head_advantage_enabled
             ),
@@ -3071,6 +3123,15 @@ class 分层PPO基类(BaseAgent):
             ),
             "counterfactual_head_policy_improvement_temperature": (
                 self._counterfactual_head_policy_improvement_temperature
+            ),
+            "counterfactual_factorized_policy_improvement_enabled": (
+                self._counterfactual_factorized_policy_improvement_enabled
+            ),
+            "counterfactual_factorized_policy_improvement_coef": (
+                self._counterfactual_factorized_policy_improvement_coef
+            ),
+            "counterfactual_factorized_policy_improvement_temperature": (
+                self._counterfactual_factorized_policy_improvement_temperature
             ),
             "counterfactual_head_temporal_gate_enabled": (
                 self._counterfactual_head_temporal_gate_enabled
@@ -3770,6 +3831,10 @@ class 分层PPO基类(BaseAgent):
         }
         counterfactual_head_advantage_applied_batches = 0
         counterfactual_head_policy_improvement_loss_total = 0.0
+        counterfactual_factorized_policy_improvement_loss_total = 0.0
+        counterfactual_factorized_policy_improvement_applied_batches = 0
+        env_action_model_teacher_distillation_loss_total = 0.0
+        env_action_model_teacher_distillation_support = 0
         env_action_ppo_loss_total = 0.0
         env_action_counterfactual_margin_loss_total = 0.0
         argmax_margin_loss_total = 0.0
@@ -3887,6 +3952,22 @@ class 分层PPO基类(BaseAgent):
                             ),
                         )
                     )
+                    (
+                        counterfactual_factorized_policy_improvement_loss,
+                        counterfactual_factorized_policy_improvement_support,
+                    ) = self._compute_counterfactual_factorized_policy_improvement_loss(
+                        batch_outputs=batch_outputs,
+                        batch_rows=batch_rows,
+                        batch_action_masks=batch_action_masks,
+                    )
+                    (
+                        env_action_model_teacher_distillation_loss,
+                        env_action_model_teacher_distillation_batch_support,
+                    ) = self._compute_env_action_model_teacher_distillation_loss(
+                        batch_outputs=batch_outputs,
+                        batch_rows=batch_rows,
+                        batch_action_masks=batch_action_masks,
+                    )
                     env_action_ppo_loss = self._compute_env_action_ppo_loss(
                         batch_outputs=batch_outputs,
                         batch_action_masks=batch_action_masks,
@@ -3949,6 +4030,18 @@ class 分层PPO基类(BaseAgent):
                         dtype=torch.float32,
                         device=self._device,
                     )
+                    counterfactual_factorized_policy_improvement_loss = torch.tensor(
+                        0.0,
+                        dtype=torch.float32,
+                        device=self._device,
+                    )
+                    counterfactual_factorized_policy_improvement_support = 0
+                    env_action_model_teacher_distillation_loss = torch.tensor(
+                        0.0,
+                        dtype=torch.float32,
+                        device=self._device,
+                    )
+                    env_action_model_teacher_distillation_batch_support = 0
 
                 value_prediction = torch.stack([output["value"] for output in batch_outputs], dim=0)
                 ratio = torch.exp(new_log_prob - old_log_prob_tensor[batch_indices])
@@ -4024,6 +4117,10 @@ class 分层PPO基类(BaseAgent):
                     * env_action_model_policy_improvement_loss
                     + self._counterfactual_head_policy_improvement_coef
                     * counterfactual_head_policy_improvement_loss
+                    + self._counterfactual_factorized_policy_improvement_coef
+                    * counterfactual_factorized_policy_improvement_loss
+                    + self._env_action_model_teacher_distillation_coef
+                    * env_action_model_teacher_distillation_loss
                 )
 
                 self._optimizer.zero_grad()
@@ -4074,6 +4171,18 @@ class 分层PPO基类(BaseAgent):
                 )
                 counterfactual_head_policy_improvement_loss_total += float(
                     counterfactual_head_policy_improvement_loss.item()
+                )
+                counterfactual_factorized_policy_improvement_loss_total += float(
+                    counterfactual_factorized_policy_improvement_loss.item()
+                )
+                counterfactual_factorized_policy_improvement_applied_batches += int(
+                    counterfactual_factorized_policy_improvement_support > 0
+                )
+                env_action_model_teacher_distillation_loss_total += float(
+                    env_action_model_teacher_distillation_loss.item()
+                )
+                env_action_model_teacher_distillation_support += int(
+                    env_action_model_teacher_distillation_batch_support
                 )
                 update_steps += 1
                 epoch_kl_values.append(float(approx_kl.item()))
@@ -4376,6 +4485,10 @@ class 分层PPO基类(BaseAgent):
                 self._env_action_model_online_planner_min_margin,
                 6,
             ),
+            "env_action_model_online_planner_min_advantage": round(
+                self._env_action_model_online_planner_min_advantage,
+                6,
+            ),
             "env_action_model_resource_constraint_enabled": (
                 self._env_action_model_resource_constraint_enabled
             ),
@@ -4461,6 +4574,42 @@ class 分层PPO基类(BaseAgent):
             "counterfactual_head_policy_improvement_loss": round(
                 counterfactual_head_policy_improvement_loss_total / denominator,
                 6,
+            ),
+            "counterfactual_factorized_policy_improvement_enabled": (
+                self._counterfactual_factorized_policy_improvement_enabled
+            ),
+            "counterfactual_factorized_policy_improvement_coef": round(
+                self._counterfactual_factorized_policy_improvement_coef,
+                6,
+            ),
+            "counterfactual_factorized_policy_improvement_temperature": round(
+                self._counterfactual_factorized_policy_improvement_temperature,
+                6,
+            ),
+            "counterfactual_factorized_policy_improvement_loss": round(
+                counterfactual_factorized_policy_improvement_loss_total / denominator,
+                6,
+            ),
+            "counterfactual_factorized_policy_improvement_applied_batches": int(
+                counterfactual_factorized_policy_improvement_applied_batches
+            ),
+            "env_action_model_teacher_distillation_enabled": (
+                self._env_action_model_teacher_distillation_enabled
+            ),
+            "env_action_model_teacher_distillation_coef": round(
+                self._env_action_model_teacher_distillation_coef,
+                6,
+            ),
+            "env_action_model_teacher_distillation_temperature": round(
+                self._env_action_model_teacher_distillation_temperature,
+                6,
+            ),
+            "env_action_model_teacher_distillation_loss": round(
+                env_action_model_teacher_distillation_loss_total / denominator,
+                6,
+            ),
+            "env_action_model_teacher_distillation_support": int(
+                env_action_model_teacher_distillation_support
             ),
             "env_action_model_tail_distillation_candidate_count": int(
                 env_action_model_tail_distillation_stats["candidate_count"]
@@ -7287,6 +7436,175 @@ class 分层PPO基类(BaseAgent):
             )
         return torch.stack(losses).mean() if losses else zero
 
+    def _compute_counterfactual_factorized_policy_improvement_loss(
+        self,
+        *,
+        batch_outputs: list[dict[str, Any]],
+        batch_rows: list[dict[str, Any]],
+        batch_action_masks: list[list[bool] | None],
+    ) -> tuple[torch.Tensor, int]:
+        """Project the joint counterfactual target onto all MAPPO heads.
+
+        The environment action distribution is a deterministic composition of
+        the slow, fast, and event heads. Optimizing only the joint action loss
+        leaves credit poorly identified when several head combinations share
+        the same rollout. We therefore marginalize the detached trust-region
+        target over the exact action-to-head map and train each head against its
+        corresponding target. This is a factorized policy-iteration step, not
+        an execution-time rule: deployment still samples the native policy.
+        """
+        zero = torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        if (
+            not self._counterfactual_factorized_policy_improvement_enabled
+            or self._counterfactual_factorized_policy_improvement_coef <= 0.0
+            or not self._use_hierarchy
+            or not batch_outputs
+        ):
+            return zero, 0
+
+        head_sizes = {"slow": 3, "fast": 2, "event": 2}
+        losses: list[torch.Tensor] = []
+        applied_count = 0
+        for output, row, action_mask in zip(
+            batch_outputs,
+            batch_rows,
+            batch_action_masks,
+        ):
+            context = self._build_env_action_model_policy_improvement_context(
+                output=output,
+                row=row,
+                action_mask=action_mask,
+            )
+            if context is None:
+                continue
+
+            target_by_action = torch.zeros(
+                5,
+                dtype=torch.float32,
+                device=self._device,
+            )
+            for action_id, target_probability in zip(
+                context["valid_indices"],
+                context["improved_target"],
+            ):
+                target_by_action[int(action_id)] = target_probability
+
+            row_losses: list[torch.Tensor] = []
+            for head_name, head_size in head_sizes.items():
+                marginal_target = torch.zeros(
+                    head_size,
+                    dtype=torch.float32,
+                    device=self._device,
+                )
+                for action_id in context["valid_indices"]:
+                    head_action = self._head_targets_for_env_action(int(action_id))[head_name]
+                    marginal_target[head_action] += target_by_action[int(action_id)]
+                if float(marginal_target.sum().item()) <= 1e-8:
+                    continue
+                marginal_target = marginal_target / marginal_target.sum().clamp_min(1e-8)
+                if self._counterfactual_factorized_policy_improvement_temperature != 1.0:
+                    marginal_target = torch.pow(
+                        marginal_target.clamp_min(1e-8),
+                        1.0 / self._counterfactual_factorized_policy_improvement_temperature,
+                    )
+                    marginal_target = marginal_target / marginal_target.sum().clamp_min(1e-8)
+                logits = output[f"{head_name}_logits"][:head_size]
+                row_losses.append(
+                    -torch.sum(
+                        marginal_target.detach() * torch.log_softmax(logits, dim=-1)
+                    )
+                )
+            if row_losses:
+                losses.append(torch.stack(row_losses).mean())
+                applied_count += 1
+
+        return (torch.stack(losses).mean() if losses else zero), applied_count
+
+    def _compute_env_action_model_teacher_distillation_loss(
+        self,
+        *,
+        batch_outputs: list[dict[str, Any]],
+        batch_rows: list[dict[str, Any]],
+        batch_action_masks: list[list[bool] | None],
+    ) -> tuple[torch.Tensor, int]:
+        """Distill only model-improved actions while keeping native execution.
+
+        A label is present only when the counterfactual planner found a
+        positive-margin action different from the sampled native action. The
+        margin weights the cross-entropy, so low-confidence model decisions do
+        not overwrite PPO credit on ordinary states.
+        """
+        zero = torch.tensor(0.0, dtype=torch.float32, device=self._device)
+        if (
+            not self._env_action_model_teacher_distillation_enabled
+            or self._env_action_model_teacher_distillation_coef <= 0.0
+            or not batch_outputs
+        ):
+            return zero, 0
+
+        losses: list[torch.Tensor] = []
+        weights: list[torch.Tensor] = []
+        temperature = self._env_action_model_teacher_distillation_temperature
+        support = 0
+        for output, row, action_mask in zip(
+            batch_outputs,
+            batch_rows,
+            batch_action_masks,
+        ):
+            teacher_stats = row.get("action_info", {}).get(
+                "counterfactual_teacher_planner",
+                {},
+            )
+            if not isinstance(teacher_stats, dict) or not bool(
+                teacher_stats.get("applied", False)
+            ):
+                continue
+            try:
+                teacher_action = int(teacher_stats["selected_action"])
+            except (KeyError, TypeError, ValueError):
+                continue
+            if self._use_hierarchy:
+                scores = self._hierarchical_env_action_scores(output)
+            else:
+                scores = output["flat_logits"]
+            valid_indices = [
+                action_id
+                for action_id in range(int(scores.shape[-1]))
+                if not action_mask
+                or (
+                    action_id < len(action_mask)
+                    and bool(action_mask[action_id])
+                )
+            ]
+            if teacher_action not in valid_indices or len(valid_indices) < 2:
+                continue
+            score_margin = max(
+                float(teacher_stats.get("score_margin", 0.0) or 0.0),
+                0.0,
+            )
+            loss = nn.functional.cross_entropy(
+                (scores[valid_indices] / temperature).unsqueeze(0),
+                torch.as_tensor(
+                    [valid_indices.index(teacher_action)],
+                    dtype=torch.long,
+                    device=self._device,
+                ),
+            )
+            losses.append(loss)
+            weights.append(
+                torch.as_tensor(
+                    1.0 + min(score_margin, 1.0),
+                    dtype=torch.float32,
+                    device=self._device,
+                )
+            )
+            support += 1
+        if not losses:
+            return zero, 0
+        loss_tensor = torch.stack(losses)
+        weight_tensor = torch.stack(weights)
+        return torch.sum(loss_tensor * weight_tensor) / weight_tensor.sum().clamp_min(1e-8), support
+
     def _compute_hierarchical_actor_loss(
         self,
         *,
@@ -8153,19 +8471,27 @@ class 分层PPO基类(BaseAgent):
         *,
         action_info: dict[str, Any],
         rollout_info: dict[str, Any],
+        teacher_only: bool = False,
+        training_only: bool = False,
     ) -> tuple[int, dict[str, Any]]:
         """Perform a policy-prior-constrained counterfactual action improvement.
 
         The digital twin supplies action returns; the MAPPO policy remains a
         prior through the KL-like log-probability term. This keeps planning
         inside the agent contract instead of adding an evaluator-side rule.
+        ``teacher_only`` computes the same improvement label for training but
+        never enables execution-time action replacement. ``training_only``
+        permits action replacement only for training rollouts.
         """
         current_action = int(action_info.get("final_env_action", 3))
         learned_model_source = str(rollout_info.get("source", "")) == (
             "learned_transition_ensemble"
         )
         planner_enabled = bool(
-            self._env_action_model_online_planner_enabled or learned_model_source
+            teacher_only
+            or training_only
+            or self._env_action_model_online_planner_enabled
+            or learned_model_source
         )
         model_coef = (
             self._learned_transition_model_policy_coef
@@ -8188,6 +8514,8 @@ class 分层PPO基类(BaseAgent):
         )
         planner_stats: dict[str, Any] = {
             "enabled": planner_enabled,
+            "teacher_only": bool(teacher_only),
+            "training_only": bool(training_only),
             "applied": False,
             "protocol": (
                 "ucc_mappo_lcb_policy_improvement_v2_adaptive_resource_mechanism"
@@ -8207,6 +8535,7 @@ class 分层PPO基类(BaseAgent):
             "mechanism_coef": self._env_action_model_online_planner_mechanism_coef,
             "policy_prior_coef": policy_prior_coef,
             "min_margin": min_margin,
+            "min_advantage": self._env_action_model_online_planner_min_advantage,
             "resource_constraint_enabled": bool(
                 self._env_action_model_resource_constraint_enabled
             ),
@@ -8324,12 +8653,28 @@ class 分层PPO基类(BaseAgent):
             (scores[best_position] - scores[second_position]).item()
         )
         selected_action = int(valid_indices[best_position])
+        model_advantage_gain = 0.0
+        if current_action in valid_indices:
+            current_position = valid_indices.index(current_action)
+            model_advantage_gain = float(
+                (
+                    model_advantage[best_position]
+                    - model_advantage[current_position]
+                ).item()
+            )
         if (
             score_margin < min_margin
             and current_action in valid_indices
         ):
             selected_action = current_action
             planner_stats["reason"] = "below_min_margin"
+        elif (
+            selected_action != current_action
+            and model_advantage_gain < self._env_action_model_online_planner_min_advantage
+            and current_action in valid_indices
+        ):
+            selected_action = current_action
+            planner_stats["reason"] = "below_min_model_advantage"
         else:
             planner_stats["reason"] = "counterfactual_policy_improvement"
         planner_stats.update(
@@ -8337,6 +8682,7 @@ class 分层PPO基类(BaseAgent):
                 "applied": selected_action != current_action,
                 "selected_action": selected_action,
                 "score_margin": round(score_margin, 6),
+                "model_advantage_gain": round(model_advantage_gain, 6),
                 "candidate_actions": valid_indices,
                 "model_advantage": {
                     str(action_id): round(float(value), 6)
@@ -15354,6 +15700,9 @@ class 分层PPO基类(BaseAgent):
             ),
             "env_action_model_online_planner_min_margin": (
                 self._env_action_model_online_planner_min_margin
+            ),
+            "env_action_model_online_planner_min_advantage": (
+                self._env_action_model_online_planner_min_advantage
             ),
             "counterfactual_head_advantage_enabled": (
                 self._counterfactual_head_advantage_enabled

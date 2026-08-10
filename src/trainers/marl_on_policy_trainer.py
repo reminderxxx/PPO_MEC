@@ -46,6 +46,22 @@ class MARLOnPolicyTrainer(BaseTrainer):
         online_planner_enabled = bool(
             getattr(self._agent, "_env_action_model_online_planner_enabled", False)
         )
+        teacher_distillation_enabled = bool(
+            getattr(
+                self._agent,
+                "_env_action_model_teacher_distillation_enabled",
+                False,
+            )
+            and collect_model_targets
+        )
+        training_planner_enabled = bool(
+            getattr(
+                self._agent,
+                "_env_action_model_training_planner_enabled",
+                False,
+            )
+            and collect_model_targets
+        )
 
         while not terminated and not truncated and step_count < self._max_steps:
             policy_info = dict(info)
@@ -88,7 +104,12 @@ class MARLOnPolicyTrainer(BaseTrainer):
                 action_info["env_action_model_rollout"] = learned_transition_model_rollout
                 action_info["learned_transition_model_planner"] = planner_stats
             env_action_model_rollout = None
-            if collect_model_targets or online_planner_enabled:
+            if (
+                collect_model_targets
+                or online_planner_enabled
+                or teacher_distillation_enabled
+                or training_planner_enabled
+            ):
                 env_action_model_rollout = (
                     self._collect_env_action_counterfactual_targets(
                         observation=observation,
@@ -98,11 +119,16 @@ class MARLOnPolicyTrainer(BaseTrainer):
                         run_metadata=run_metadata,
                     )
                 )
-            if env_action_model_rollout and online_planner_enabled:
+            if env_action_model_rollout and (
+                online_planner_enabled or training_planner_enabled
+            ):
                 planned_action, planner_stats = (
                     self._agent.select_env_action_from_model_targets(
                         action_info=action_info,
                         rollout_info=env_action_model_rollout,
+                        training_only=(
+                            training_planner_enabled and not online_planner_enabled
+                        ),
                     )
                 )
                 if int(planned_action) != int(action):
@@ -116,6 +142,22 @@ class MARLOnPolicyTrainer(BaseTrainer):
                     action_info = dict(action_info)
                     action_info["online_counterfactual_planner"] = planner_stats
                 action = int(planned_action)
+            if (
+                env_action_model_rollout
+                and teacher_distillation_enabled
+                and not online_planner_enabled
+            ):
+                _, teacher_planner_stats = (
+                    self._agent.select_env_action_from_model_targets(
+                        action_info=action_info,
+                        rollout_info=env_action_model_rollout,
+                        teacher_only=True,
+                    )
+                )
+                action_info = dict(action_info)
+                action_info["counterfactual_teacher_planner"] = (
+                    teacher_planner_stats
+                )
             if env_action_model_rollout:
                 action_info = dict(action_info)
                 action_info["env_action_model_rollout"] = env_action_model_rollout

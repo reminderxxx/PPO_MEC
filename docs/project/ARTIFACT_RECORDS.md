@@ -1,5 +1,21 @@
 # Artifact Records
 
+## 2026-08-09: v100 independent future-validation full benchmark
+
+- Artifact root: `artifacts/experiments/top_journal_v100_future_validation_v20_20260809/`; raw benchmark run: `main_results_full_stratified_20260809_041440_446507/`.
+- Protocol: NGSIM + Alibaba, 11 agents, 3 seeds, 15 frozen outcome-blind future windows, 2 workflows, 22 steps, zero reward offset; 990 raw summaries plus aggregate, comparison and statistics outputs.
+- SA-GHMAPPO reward `33.342` versus Popularity `29.350`; delta `+3.992`, BCa `[+2.077111,+8.290975]`, paired `75/15/0`, Holm p=`0.0`. SA ranks first in total reward against all ten baselines.
+- v20 future windows have no frame interval overlap with v71 train/dev/formal/hidden plans. Integrity audit passed with `missing_reference_count=0` and `json_error_count=0`.
+- Evidence boundary: this confirms frozen-checkpoint cross-split reward performance; it does not remove the remaining cross-dataset, complete-ablation, compute-audit or mechanism-tradeoff blockers.
+
+## 2026-08-09: v113-v117 MAPPO policy-internalization negative probes
+
+- v113: `artifacts/experiments/top_journal_v113_factorized_cama_probe_20260809/`; factorized joint-target marginalization was active, but mean reward was `11.383`.
+- v114: `artifacts/experiments/top_journal_v114_selective_teacher_probe_20260809/`; teacher support was recorded in `train_summary.json`, but mean reward was `11.537` and mechanism realization was `0.312`.
+- v115: `artifacts/experiments/top_journal_v115_training_policy_iteration_probe_20260809/`; training-only planner probe mean reward was `14.913` and native evaluation did not internalize the planner gain.
+- v116/v117: `artifacts/experiments/top_journal_v116_risk_sensitive_planner_probe_20260809/` and `artifacts/experiments/top_journal_v117_conservative_policy_iteration_probe_20260809/`; risk-prior and model-advantage threshold variants did not improve the v115 result.
+- These are development-only negative artifacts. They are not formal/hidden evidence and cannot replace the v100 package.
+
 ## 2026-08-09: v109-v112 development negative probes
 
 - v109 artifact: `artifacts/experiments/top_journal_v109_option_cama_probe_20260809/`; historical sparse-tail option on the current v71 dev plan collapsed (`mean_total_reward=-46.095`).

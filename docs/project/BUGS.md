@@ -2,6 +2,19 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-09: v100 reward lead confirmed on independent future split, mechanism dominance unresolved
+
+- `RESOLVED / cross-split reward`: frozen v100 SA-GHMAPPO reached `33.342` versus Popularity `29.350` on the one-time v20 future-validation package; reward BCa CI was fully positive and SA won `75/15/0` paired comparisons.
+- `OPEN / metric trade-off`: SA's mechanism realization (`0.600`) is above Popularity (`0.567`) on this split but not uniformly above all learned baselines; backhaul and migration costs remain trade-offs. Do not compress the result into “all metrics improved.”
+- `OPEN / paper readiness`: one mobility/workflow combination, complete component ablations and unified compute accounting remain absent. The independent future split strengthens evidence but does not make the package TMC-ready.
+
+## 2026-08-09: v113-v117 native-policy internalization boundary
+
+- `REJECTED / factorized target`: v113's joint-to-head marginal target is a valid MAPPO training loss but destabilized the event head and reduced reward; it is not enabled by the canonical v100 profile.
+- `REJECTED / hard teacher distillation`: v114 generated exact model-improved labels with positive support, but its rollout behavior and native PPO returns were misaligned. Nonzero teacher support must not be interpreted as policy improvement.
+- `REJECTED / training-only planner`: v115-v117 kept planner execution out of evaluation, but the native policy did not internalize the online planner advantage within the tested budget. Any future result must report training behavior and native evaluation separately.
+- `OPEN / metric interpretation`: v100 formal uplift was `+0.3475`, while the one-time independent v20 future split produced `+3.992`; the larger cross-split reward gap is now established for the frozen checkpoint, but mechanism/cost metrics are not uniformly dominant. No reward-only selection or runtime wrapper may be used to manufacture an advantage.
+
 ## 2026-08-09: learned predictor integration remains blocked
 
 - `BLOCKED / predictor-policy mismatch`: the supervised predictor has strong next-RSU classification but low handoff probability under the current class imbalance. Feeding its low-confidence targets into the v100 planner caused `mean_total_reward=16.366` and mechanism collapse on the dev probe. Do not enable `predictor_kind=supervised` in the canonical v100 run until a separately frozen calibration and policy-gating protocol is designed.
