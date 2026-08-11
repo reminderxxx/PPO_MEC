@@ -2070,6 +2070,69 @@ PROFILE_DEFAULTS = {
         "update_eval_max_windows": 4,
         "update_eval_max_workflows": 1,
     },
+    "top_journal_mechanism_v119_doubly_validated_planner_distillation_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v120_doubly_validated_strong_distillation_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
+    "top_journal_mechanism_v121_realized_advantage_margin_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -2189,6 +2252,9 @@ MECHANISM_COVERAGE_PROFILES = {
     "top_journal_mechanism_v116_risk_sensitive_planner_mappo",
     "top_journal_mechanism_v117_conservative_policy_iteration_mappo",
     "top_journal_mechanism_v118_conservative_planner_distillation_mappo",
+    "top_journal_mechanism_v119_doubly_validated_planner_distillation_mappo",
+    "top_journal_mechanism_v120_doubly_validated_strong_distillation_mappo",
+    "top_journal_mechanism_v121_realized_advantage_margin_mappo",
 }
 
 
@@ -6366,6 +6432,55 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 "env_action_model_policy_improvement_regret_adaptive_kl_enabled": True,
                 "env_action_model_policy_improvement_max_target_kl": 0.12,
                 "env_action_model_policy_improvement_regret_priority_coef": 0.75,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v119_doubly_validated_planner_distillation_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v100_urgency_safe_resource_mappo"
+        )
+        kwargs.update(
+            {
+                # A planner label is trusted only when the robust model
+                # advantage agrees with the realized on-policy GAE signal.
+                "env_action_model_teacher_distillation_enabled": True,
+                "env_action_model_teacher_distillation_coef": 0.20,
+                "env_action_model_teacher_distillation_temperature": 1.0,
+                "env_action_model_teacher_distillation_online_planner_enabled": True,
+                "env_action_model_teacher_distillation_min_advantage": 0.10,
+                "env_action_model_teacher_distillation_realized_advantage_gate_enabled": True,
+                "env_action_model_teacher_distillation_min_realized_advantage": 0.10,
+                "env_action_model_teacher_distillation_max_weight": 2.0,
+                "env_action_model_teacher_distillation_behavior_kl_coef": 0.30,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v120_doubly_validated_strong_distillation_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v119_doubly_validated_planner_distillation_mappo"
+        )
+        kwargs.update(
+            {
+                # Keep the model/GAE agreement gate while restoring enough
+                # projection strength to alter the deterministic policy.
+                "env_action_model_teacher_distillation_coef": 0.45,
+                "env_action_model_teacher_distillation_max_weight": 3.0,
+                "env_action_model_teacher_distillation_behavior_kl_coef": 0.20,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v121_realized_advantage_margin_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v119_doubly_validated_planner_distillation_mappo"
+        )
+        kwargs.update(
+            {
+                # The ranking margin targets deterministic action boundaries;
+                # the model/GAE gate and behavior KL keep it conservative.
+                "env_action_model_teacher_distillation_coef": 0.30,
+                "env_action_model_teacher_distillation_logit_margin": 0.25,
+                "env_action_model_teacher_distillation_max_weight": 2.0,
+                "env_action_model_teacher_distillation_behavior_kl_coef": 0.25,
             }
         )
         return kwargs

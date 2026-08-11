@@ -1,5 +1,13 @@
 # Code Module Map
 
+## 2026-08-11 v118-v121 planner-internalization boundary
+
+- `src/agents/sa_ghmappo_core.py`：用 forked PyTorch RNG 初始化 optional transition ensemble，避免改变 policy 初始权重；实验性 teacher loss 支持 realized-GAE agreement gate 和 logit-margin projection，均默认关闭。
+- `src/agents/sa_ghmappo_agent.py`：维护新增 checkpoint/config 字段白名单，确保训练与 evaluator restore contract 一致。
+- `scripts/train_sa_ghmappo_real_sample.py`：维护 v118-v121 development profiles；这些 profile 已被 dual-domain matched evidence 拒绝，不属于 canonical v100。
+- `tests/test_algo_pool_contract.py`：覆盖 learned-dynamics on/off 初始 policy 相等、model/realized advantage 双门控、低优势拒绝与 logit-margin 梯度路径。
+- `docs/project/top_journal_v118_v121_negative_execution_20260811.md`：记录完整训练、双域 raw/planner 结果、统计边界与下一阶段 multi-entity MAPPO contract 要求。
+
 ## 2026-08-11 v100 LuST outcome-blind future validation
 
 - `scripts/freeze_future_validation_split.py`：在保持 NGSIM 默认排除逻辑不变的前提下，支持 LuST trace 的 outcome-blind window freezing、历史 LuST plan 排除、source hash 记录和 frame/time/segment gap audit。

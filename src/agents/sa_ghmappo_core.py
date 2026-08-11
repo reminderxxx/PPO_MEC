@@ -1105,6 +1105,9 @@ class 分层PPO基类(BaseAgent):
         env_action_model_teacher_distillation_temperature: float = 1.0,
         env_action_model_teacher_distillation_online_planner_enabled: bool = False,
         env_action_model_teacher_distillation_min_advantage: float = 0.0,
+        env_action_model_teacher_distillation_realized_advantage_gate_enabled: bool = False,
+        env_action_model_teacher_distillation_min_realized_advantage: float = 0.0,
+        env_action_model_teacher_distillation_logit_margin: float = 0.0,
         env_action_model_teacher_distillation_max_weight: float = 3.0,
         env_action_model_teacher_distillation_behavior_kl_coef: float = 0.0,
         env_action_model_training_planner_enabled: bool = False,
@@ -2408,6 +2411,16 @@ class 分层PPO基类(BaseAgent):
             float(env_action_model_teacher_distillation_min_advantage),
             0.0,
         )
+        self._env_action_model_teacher_distillation_realized_advantage_gate_enabled = bool(
+            env_action_model_teacher_distillation_realized_advantage_gate_enabled
+        )
+        self._env_action_model_teacher_distillation_min_realized_advantage = float(
+            env_action_model_teacher_distillation_min_realized_advantage
+        )
+        self._env_action_model_teacher_distillation_logit_margin = max(
+            float(env_action_model_teacher_distillation_logit_margin),
+            0.0,
+        )
         self._env_action_model_teacher_distillation_max_weight = max(
             float(env_action_model_teacher_distillation_max_weight),
             1.0,
@@ -3131,6 +3144,15 @@ class 分层PPO基类(BaseAgent):
             ),
             "env_action_model_teacher_distillation_min_advantage": (
                 self._env_action_model_teacher_distillation_min_advantage
+            ),
+            "env_action_model_teacher_distillation_realized_advantage_gate_enabled": (
+                self._env_action_model_teacher_distillation_realized_advantage_gate_enabled
+            ),
+            "env_action_model_teacher_distillation_min_realized_advantage": (
+                self._env_action_model_teacher_distillation_min_realized_advantage
+            ),
+            "env_action_model_teacher_distillation_logit_margin": (
+                self._env_action_model_teacher_distillation_logit_margin
             ),
             "env_action_model_teacher_distillation_max_weight": (
                 self._env_action_model_teacher_distillation_max_weight
@@ -4002,6 +4024,7 @@ class 分层PPO基类(BaseAgent):
                         batch_outputs=batch_outputs,
                         batch_rows=batch_rows,
                         batch_action_masks=batch_action_masks,
+                        batch_realized_advantage=advantage_tensor[batch_indices],
                     )
                     env_action_ppo_loss = self._compute_env_action_ppo_loss(
                         batch_outputs=batch_outputs,
@@ -4644,6 +4667,17 @@ class 分层PPO基类(BaseAgent):
             ),
             "env_action_model_teacher_distillation_min_advantage": round(
                 self._env_action_model_teacher_distillation_min_advantage,
+                6,
+            ),
+            "env_action_model_teacher_distillation_realized_advantage_gate_enabled": (
+                self._env_action_model_teacher_distillation_realized_advantage_gate_enabled
+            ),
+            "env_action_model_teacher_distillation_min_realized_advantage": round(
+                self._env_action_model_teacher_distillation_min_realized_advantage,
+                6,
+            ),
+            "env_action_model_teacher_distillation_logit_margin": round(
+                self._env_action_model_teacher_distillation_logit_margin,
                 6,
             ),
             "env_action_model_teacher_distillation_max_weight": round(
@@ -7576,6 +7610,7 @@ class 分层PPO基类(BaseAgent):
         batch_outputs: list[dict[str, Any]],
         batch_rows: list[dict[str, Any]],
         batch_action_masks: list[list[bool] | None],
+        batch_realized_advantage: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, int]:
         """Distill only model-improved actions while keeping native execution.
 
@@ -7596,10 +7631,15 @@ class 分层PPO基类(BaseAgent):
         weights: list[torch.Tensor] = []
         temperature = self._env_action_model_teacher_distillation_temperature
         support = 0
-        for output, row, action_mask in zip(
+        if batch_realized_advantage is None:
+            realized_advantages = [None] * len(batch_outputs)
+        else:
+            realized_advantages = batch_realized_advantage.detach().cpu().tolist()
+        for output, row, action_mask, realized_advantage in zip(
             batch_outputs,
             batch_rows,
             batch_action_masks,
+            realized_advantages,
         ):
             action_info = row.get("action_info", {})
             teacher_stats = action_info.get("counterfactual_teacher_planner", {})
@@ -7647,15 +7687,38 @@ class 分层PPO基类(BaseAgent):
                 < self._env_action_model_teacher_distillation_min_advantage
             ):
                 continue
+            if self._env_action_model_teacher_distillation_realized_advantage_gate_enabled:
+                if realized_advantage is None or float(realized_advantage) <= (
+                    self._env_action_model_teacher_distillation_min_realized_advantage
+                ):
+                    continue
             current_logits = scores[valid_indices] / temperature
+            teacher_position = valid_indices.index(teacher_action)
             loss = nn.functional.cross_entropy(
                 current_logits.unsqueeze(0),
                 torch.as_tensor(
-                    [valid_indices.index(teacher_action)],
+                    [teacher_position],
                     dtype=torch.long,
                     device=self._device,
                 ),
             )
+            if self._env_action_model_teacher_distillation_logit_margin > 0.0:
+                competing_logits = torch.cat(
+                    [
+                        current_logits[:teacher_position],
+                        current_logits[teacher_position + 1 :],
+                    ]
+                )
+                if competing_logits.numel() > 0:
+                    loss = loss + torch.relu(
+                        torch.as_tensor(
+                            self._env_action_model_teacher_distillation_logit_margin,
+                            dtype=torch.float32,
+                            device=self._device,
+                        )
+                        + torch.max(competing_logits)
+                        - current_logits[teacher_position]
+                    )
             old_probs_raw = action_info.get("action_projection", {}).get(
                 "masked_env_action_probs",
                 [],
@@ -15812,6 +15875,15 @@ class 分层PPO基类(BaseAgent):
             ),
             "env_action_model_teacher_distillation_min_advantage": (
                 self._env_action_model_teacher_distillation_min_advantage
+            ),
+            "env_action_model_teacher_distillation_realized_advantage_gate_enabled": (
+                self._env_action_model_teacher_distillation_realized_advantage_gate_enabled
+            ),
+            "env_action_model_teacher_distillation_min_realized_advantage": (
+                self._env_action_model_teacher_distillation_min_realized_advantage
+            ),
+            "env_action_model_teacher_distillation_logit_margin": (
+                self._env_action_model_teacher_distillation_logit_margin
             ),
             "env_action_model_teacher_distillation_max_weight": (
                 self._env_action_model_teacher_distillation_max_weight

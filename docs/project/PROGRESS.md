@@ -2,6 +2,16 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-08-11: v118-v121 planner internalization line rejected after matched dual-domain evaluation
+
+- Fixed a causal-ablation defect: optional transition-ensemble construction consumed the global PyTorch RNG before policy initialization. Model initialization now uses a forked RNG stream, and enabled/disabled learned-dynamics variants must start from identical policy parameters.
+- RNG-aligned v100 and v118 completed seeds `[7,13,29]`, 256 episodes and 32 updates with frozen v71 train/dev plans, zero reward offset and fixed `latest.pt` selection. v118 raw policy regressed against v100 on LuST (`-37.4842` vs `-35.2392`, delta `-2.2450`) and NGSIM formal (`16.4178` vs `18.8258`, delta `-2.4081`). The NGSIM BCa interval was fully negative `[-6.0801,-0.2678]`.
+- Planner-enabled v118 also failed to improve v100: LuST delta `-0.1000`, NGSIM delta `-0.0450`. The planner hid most native-policy degradation but did not create a new winner.
+- v119-v121 added realized-GAE agreement, stronger gated projection and a logit-margin boundary loss. Three-seed 64-episode matched probes were effectively invariant: all 72 LuST pairs tied; NGSIM delta was only `+0.0096` with `1/119/0` wins/ties/losses. None is promoted to full training or canonical status.
+- The fixed update-8 v118 audit was seed- and domain-unstable: LuST `+0.3667` came only from seed 7, while NGSIM was `-8.8065`. Direct planner-action internalization is therefore rejected under the current controller-level contract.
+
+Evidence record: `docs/project/top_journal_v118_v121_negative_execution_20260811.md`.
+
 ## 2026-08-09: v100 frozen future-validation full benchmark confirms cross-split reward lead
 
 - Without changing the frozen v100 checkpoint or tuning after outcome access, the candidate was evaluated once on the outcome-blind v20 `future_validation` plan: 11 agents, 3 seeds (`7,13,29`), 15 non-overlapping windows, 2 workflows and 22 steps, producing 990 raw episode summaries.

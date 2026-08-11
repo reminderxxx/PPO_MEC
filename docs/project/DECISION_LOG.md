@@ -1,5 +1,15 @@
 ﻿# Decision Log
 
+## 2026-08-11: reject v118-v121 and stop planner-label internalization tuning
+
+决策：不将 v118 conservative planner distillation、v119 realized-GAE gate、v120 stronger projection 或 v121 logit-margin projection 晋级为 canonical。停止在已消费的 NGSIM formal / LuST future split 上继续调整蒸馏系数、margin 或 checkpoint；canonical reward record 仍为冻结 v100。
+
+依据：在 RNG 对齐、三 seed、256 episodes、固定 update32、zero-offset 的完整评估中，v118 native policy 相对 v100 在 LuST/NGSIM 分别退化 `-2.2450/-2.4081`；NGSIM BCa 区间完全为负。planner-on 也未改善。v119-v121 的三 seed matched pilots 则几乎完全 action-invariant，无法形成实质 reward 增益。update8 的局部 uplift 仅来自 seed7，并在 NGSIM 发生大幅反转。
+
+方法边界：直接 planner label distillation 在当前 factorized controller-level MAPPO contract 下要么放大模型偏差，要么无法跨越 deterministic action boundary。下一轮不再靠 reward shaping、evaluation wrapper、增大 CE/margin 或 checkpoint 筛选；如继续追求 MAPPO 与 PPO 的结构性差距，必须先冻结 vehicle/RSU-level decentralized actor + centralized graph critic 的 observation/action contract，并使用新 untouched split。
+
+审查边界：v118-v121 使用过的 formal/LuST 结果属于开发证据，不得重新包装成独立验证或论文主表。
+
 ## 2026-08-09: freeze v100 after one-time independent future validation
 
 决策：将 v100 的 v20 future-validation 结果作为冻结 checkpoint 的独立 cross-split reward evidence，停止基于该结果调参；不把 v113-v117 的失败 profile 重新接入 canonical。下一轮如需提升机制指标或扩大泛化，必须另立新 split 和预注册 protocol。

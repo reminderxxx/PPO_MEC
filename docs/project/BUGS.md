@@ -2,6 +2,15 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-11: planner distillation is not a stable native-policy improvement
+
+- `FIXED / RNG fairness`: transition-ensemble initialization previously shifted the global PyTorch RNG before policy construction. Historical `no_learned_dynamics` retraining results are confounded and must not be cited causally. New enabled/disabled runs share identical initial policy parameters.
+- `REJECTED / v118 full`: conservative planner distillation regressed RNG-aligned v100 raw reward on LuST by `-2.2450` and NGSIM by `-2.4081`; NGSIM BCa `[-6.0801,-0.2678]`. Planner execution masked most of the loss but did not improve v100.
+- `REJECTED / early checkpoint`: v118 update8 improved only seed7 on LuST and catastrophically reversed on NGSIM. Fixed shorter training or checkpoint selection is not a valid recovery route.
+- `REJECTED / v119-v121`: realized-GAE gating removed the negative tail but produced no material deterministic policy change. Stronger coefficients and logit-margin projection remained effectively tied to v100 in three-seed dual-domain probes.
+- `BLOCKER / contract`: PPO and MAPPO currently share one global semantic observation and one environment action; MAPPO only factorizes the controller heads and centralizes the critic. A large generic MAPPO-over-PPO claim is structurally unsupported until a vehicle/RSU-level decentralized observation/action contract is frozen and benchmarked.
+- `OPEN / selection bias`: NGSIM formal and LuST future outcomes were consumed repeatedly during v118-v121 development. These profiles cannot be promoted on the same splits; any new architecture requires an untouched frozen holdout.
+
 ## 2026-08-09: v100 reward lead confirmed on independent future split, mechanism dominance unresolved
 
 - `RESOLVED / cross-split reward`: frozen v100 SA-GHMAPPO reached `33.342` versus Popularity `29.350` on the one-time v20 future-validation package; reward BCa CI was fully positive and SA won `75/15/0` paired comparisons.

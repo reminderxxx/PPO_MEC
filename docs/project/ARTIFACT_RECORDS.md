@@ -1,5 +1,15 @@
 # Artifact Records
 
+## 2026-08-11: v118-v121 matched planner-internalization negative package
+
+- Full training roots: `artifacts/experiments/top_journal_v100_rng_fixed_full_seed{7,13,29}_20260811/` and `artifacts/experiments/top_journal_v118_full_seed{7,13,29}_20260811/`; every `latest.pt` records 256 episodes, 32 updates, zero offset and non-smoke provenance.
+- Full comparison root: `artifacts/experiments/top_journal_v118_full_evaluation_20260811/`; LuST has 288 rows and NGSIM has 480 rows with no duplicate `(agent,seed,window,workflow)` keys.
+- Integrity audit: `artifacts/experiments/top_journal_v118_full_evaluation_20260811/audit_artifact_integrity/artifact_integrity_report.json`, `passed=true`, 18 root files, 37 referenced files, zero missing references and zero JSON errors.
+- v118 raw minus RNG-aligned v100 raw: LuST `-2.2450`, BCa `[-9.5791,1.1937]`; NGSIM `-2.4081`, BCa `[-6.0801,-0.2678]`. Planner-on deltas were `-0.1000` and `-0.0450`, respectively.
+- Matched pilot roots: `artifacts/experiments/top_journal_v119_pilot_evaluation_20260811/`, `top_journal_v120_pilot_evaluation_20260811/` and `top_journal_v121_pilot_evaluation_20260811/`. Each used three seeds and fixed update8; LuST was all ties and NGSIM changed only one of 120 pairs.
+- Training-stage audit: `artifacts/experiments/top_journal_v118_update8_evaluation_20260811/`; LuST delta `+0.3667` was seed7-only, while NGSIM delta was `-8.8065`.
+- Evidence boundary: these are complete development raw artifacts and negative results, not a frozen canonical or untouched-holdout package. Execution interpretation is recorded in `docs/project/top_journal_v118_v121_negative_execution_20260811.md`.
+
 ## 2026-08-09: v100 independent future-validation full benchmark
 
 - Artifact root: `artifacts/experiments/top_journal_v100_future_validation_v20_20260809/`; raw benchmark run: `main_results_full_stratified_20260809_041440_446507/`.

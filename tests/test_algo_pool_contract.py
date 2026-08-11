@@ -3930,6 +3930,135 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertEqual(support, 0)
         self.assertEqual(float(loss.item()), 0.0)
 
+    def test_sa_v119_requires_model_and_realized_advantage_agreement(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v119_doubly_validated_planner_distillation_mappo"
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(
+            kwargs[
+                "env_action_model_teacher_distillation_realized_advantage_gate_enabled"
+            ]
+        )
+        agent = build_agent("sa_ghmappo", random_seed=7, **kwargs)
+        outputs = [
+            {
+                "slow_logits": torch.zeros(3, requires_grad=True),
+                "fast_logits": torch.zeros(2, requires_grad=True),
+                "event_logits": torch.zeros(2, requires_grad=True),
+            }
+        ]
+        rows = [
+            {
+                "action_info": {
+                    "action_projection": {
+                        "masked_env_action_probs": [0.2] * 5,
+                    },
+                    "online_counterfactual_planner": {
+                        "applied": True,
+                        "selected_action": 2,
+                        "score_margin": 0.6,
+                        "model_advantage_gain": 0.8,
+                    },
+                }
+            }
+        ]
+        rejected_loss, rejected_support = (
+            agent._compute_env_action_model_teacher_distillation_loss(
+                batch_outputs=outputs,
+                batch_rows=rows,
+                batch_action_masks=[[True] * 5],
+                batch_realized_advantage=torch.tensor([-0.5]),
+            )
+        )
+        accepted_loss, accepted_support = (
+            agent._compute_env_action_model_teacher_distillation_loss(
+                batch_outputs=outputs,
+                batch_rows=rows,
+                batch_action_masks=[[True] * 5],
+                batch_realized_advantage=torch.tensor([0.5]),
+            )
+        )
+        self.assertEqual(rejected_support, 0)
+        self.assertEqual(float(rejected_loss.item()), 0.0)
+        self.assertEqual(accepted_support, 1)
+        self.assertGreater(float(accepted_loss.item()), 0.0)
+
+    def test_sa_v120_retains_realized_advantage_gate_with_stronger_projection(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v120_doubly_validated_strong_distillation_mappo"
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(
+            kwargs[
+                "env_action_model_teacher_distillation_realized_advantage_gate_enabled"
+            ]
+        )
+        self.assertEqual(kwargs["env_action_model_teacher_distillation_coef"], 0.45)
+        self.assertEqual(kwargs["env_action_model_teacher_distillation_max_weight"], 3.0)
+        self.assertEqual(
+            kwargs["env_action_model_teacher_distillation_behavior_kl_coef"],
+            0.20,
+        )
+
+    def test_sa_v121_adds_realized_advantage_gated_logit_margin(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v121_realized_advantage_margin_mappo"
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(
+            kwargs[
+                "env_action_model_teacher_distillation_realized_advantage_gate_enabled"
+            ]
+        )
+        self.assertEqual(
+            kwargs["env_action_model_teacher_distillation_logit_margin"],
+            0.25,
+        )
+        agent = build_agent("sa_ghmappo", random_seed=7, **kwargs)
+        event_logits = torch.zeros(2, requires_grad=True)
+        loss, support = agent._compute_env_action_model_teacher_distillation_loss(
+            batch_outputs=[
+                {
+                    "slow_logits": torch.zeros(3, requires_grad=True),
+                    "fast_logits": torch.zeros(2, requires_grad=True),
+                    "event_logits": event_logits,
+                }
+            ],
+            batch_rows=[
+                {
+                    "action_info": {
+                        "action_projection": {
+                            "masked_env_action_probs": [0.2] * 5,
+                        },
+                        "online_counterfactual_planner": {
+                            "applied": True,
+                            "selected_action": 2,
+                            "score_margin": 0.6,
+                            "model_advantage_gain": 0.8,
+                        },
+                    }
+                }
+            ],
+            batch_action_masks=[[True] * 5],
+            batch_realized_advantage=torch.tensor([0.5]),
+        )
+        loss.backward()
+        self.assertEqual(support, 1)
+        self.assertGreater(float(event_logits.grad.abs().sum()), 0.0)
+
     def test_sa_v115_profile_uses_training_only_policy_iteration(self) -> None:
         from scripts.train_sa_ghmappo_real_sample import (
             MECHANISM_COVERAGE_PROFILES,
