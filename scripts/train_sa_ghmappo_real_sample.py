@@ -2049,6 +2049,27 @@ PROFILE_DEFAULTS = {
         "update_eval_max_windows": 4,
         "update_eval_max_workflows": 1,
     },
+    "top_journal_mechanism_v118_conservative_planner_distillation_mappo": {
+        "episodes": 256,
+        "update_every": 8,
+        "batch_size": 64,
+        "learning_rate": 1.0e-4,
+        "clip_ratio": 0.12,
+        "entropy_coef": 0.004,
+        "value_coef": 0.70,
+        "auxiliary_coef": 0.06,
+        "max_steps": 22,
+        "train_window_count": 20,
+        "window_mode": "full_stratified",
+        "train_window_mode": "rotate",
+        "primary_vehicle_selection": "handoff_pressure",
+        "reward_positive_offset": 0.0,
+        "prediction_horizon": 16,
+        "post_training_audit_mode": "compact",
+        "temporal_reward_shaping_enabled": False,
+        "update_eval_max_windows": 4,
+        "update_eval_max_workflows": 1,
+    },
     "sa_reward_tiebreak_round4": {
         "episodes": 16,
         "update_every": 4,
@@ -2167,6 +2188,7 @@ MECHANISM_COVERAGE_PROFILES = {
     "top_journal_mechanism_v115_training_policy_iteration_mappo",
     "top_journal_mechanism_v116_risk_sensitive_planner_mappo",
     "top_journal_mechanism_v117_conservative_policy_iteration_mappo",
+    "top_journal_mechanism_v118_conservative_planner_distillation_mappo",
 }
 
 
@@ -6323,6 +6345,27 @@ def build_sa_ghmappo_profile_kwargs(profile: str) -> dict[str, Any]:
                 # Conservative policy iteration: accept a model action only
                 # when its robust advantage over the native action is clear.
                 "env_action_model_online_planner_min_advantage": 0.15,
+            }
+        )
+        return kwargs
+    if profile == "top_journal_mechanism_v118_conservative_planner_distillation_mappo":
+        kwargs = build_sa_ghmappo_profile_kwargs(
+            "top_journal_mechanism_v100_urgency_safe_resource_mappo"
+        )
+        kwargs.update(
+            {
+                # Advantage-weighted dataset aggregation transfers only
+                # positive planner improvements into the native MAPPO policy.
+                "env_action_model_teacher_distillation_enabled": True,
+                "env_action_model_teacher_distillation_coef": 0.45,
+                "env_action_model_teacher_distillation_temperature": 1.0,
+                "env_action_model_teacher_distillation_online_planner_enabled": True,
+                "env_action_model_teacher_distillation_min_advantage": 0.05,
+                "env_action_model_teacher_distillation_max_weight": 3.0,
+                "env_action_model_teacher_distillation_behavior_kl_coef": 0.15,
+                "env_action_model_policy_improvement_regret_adaptive_kl_enabled": True,
+                "env_action_model_policy_improvement_max_target_kl": 0.12,
+                "env_action_model_policy_improvement_regret_priority_coef": 0.75,
             }
         )
         return kwargs

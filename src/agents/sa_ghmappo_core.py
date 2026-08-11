@@ -1103,6 +1103,10 @@ class 分层PPO基类(BaseAgent):
         env_action_model_teacher_distillation_enabled: bool = False,
         env_action_model_teacher_distillation_coef: float = 0.0,
         env_action_model_teacher_distillation_temperature: float = 1.0,
+        env_action_model_teacher_distillation_online_planner_enabled: bool = False,
+        env_action_model_teacher_distillation_min_advantage: float = 0.0,
+        env_action_model_teacher_distillation_max_weight: float = 3.0,
+        env_action_model_teacher_distillation_behavior_kl_coef: float = 0.0,
         env_action_model_training_planner_enabled: bool = False,
         counterfactual_head_advantage_enabled: bool = False,
         counterfactual_head_advantage_coef: float = 0.0,
@@ -2397,6 +2401,21 @@ class 分层PPO基类(BaseAgent):
             float(env_action_model_teacher_distillation_temperature),
             1e-3,
         )
+        self._env_action_model_teacher_distillation_online_planner_enabled = bool(
+            env_action_model_teacher_distillation_online_planner_enabled
+        )
+        self._env_action_model_teacher_distillation_min_advantage = max(
+            float(env_action_model_teacher_distillation_min_advantage),
+            0.0,
+        )
+        self._env_action_model_teacher_distillation_max_weight = max(
+            float(env_action_model_teacher_distillation_max_weight),
+            1.0,
+        )
+        self._env_action_model_teacher_distillation_behavior_kl_coef = max(
+            float(env_action_model_teacher_distillation_behavior_kl_coef),
+            0.0,
+        )
         self._env_action_model_training_planner_enabled = bool(
             env_action_model_training_planner_enabled
         )
@@ -2648,23 +2667,27 @@ class 分层PPO基类(BaseAgent):
         np.random.seed(random_seed)
         torch.manual_seed(random_seed)
 
-        self._learned_transition_model = (
-            UncertaintyTransitionEnsemble(
-                observation_dim=9,
-                action_count=5,
-                ensemble_size=self._learned_transition_model_ensemble_size,
-                hidden_dim=self._learned_transition_model_hidden_dim,
-                learning_rate=self._learned_transition_model_learning_rate,
-                fit_epochs=self._learned_transition_model_fit_epochs,
-                max_samples=self._learned_transition_model_max_samples,
-                min_samples=self._learned_transition_model_min_samples,
-                discount=self._learned_transition_model_discount,
-                random_seed=random_seed + 7919,
-                device=device,
+        # Optional model capacity must not perturb the MAPPO initialization or
+        # its subsequent policy-sampling RNG stream in matched ablations.
+        with torch.random.fork_rng(devices=[]):
+            torch.random.default_generator.manual_seed(random_seed + 7919)
+            self._learned_transition_model = (
+                UncertaintyTransitionEnsemble(
+                    observation_dim=9,
+                    action_count=5,
+                    ensemble_size=self._learned_transition_model_ensemble_size,
+                    hidden_dim=self._learned_transition_model_hidden_dim,
+                    learning_rate=self._learned_transition_model_learning_rate,
+                    fit_epochs=self._learned_transition_model_fit_epochs,
+                    max_samples=self._learned_transition_model_max_samples,
+                    min_samples=self._learned_transition_model_min_samples,
+                    discount=self._learned_transition_model_discount,
+                    random_seed=random_seed + 7919,
+                    device=device,
+                )
+                if self._learned_transition_model_enabled
+                else None
             )
-            if self._learned_transition_model_enabled
-            else None
-        )
 
         self._network = 分层策略网络(
             hidden_dim=self._hidden_dim,
@@ -3102,6 +3125,18 @@ class 分层PPO基类(BaseAgent):
             ),
             "env_action_model_teacher_distillation_temperature": (
                 self._env_action_model_teacher_distillation_temperature
+            ),
+            "env_action_model_teacher_distillation_online_planner_enabled": (
+                self._env_action_model_teacher_distillation_online_planner_enabled
+            ),
+            "env_action_model_teacher_distillation_min_advantage": (
+                self._env_action_model_teacher_distillation_min_advantage
+            ),
+            "env_action_model_teacher_distillation_max_weight": (
+                self._env_action_model_teacher_distillation_max_weight
+            ),
+            "env_action_model_teacher_distillation_behavior_kl_coef": (
+                self._env_action_model_teacher_distillation_behavior_kl_coef
             ),
             "env_action_model_training_planner_enabled": (
                 self._env_action_model_training_planner_enabled
@@ -4602,6 +4637,21 @@ class 分层PPO基类(BaseAgent):
             ),
             "env_action_model_teacher_distillation_temperature": round(
                 self._env_action_model_teacher_distillation_temperature,
+                6,
+            ),
+            "env_action_model_teacher_distillation_online_planner_enabled": (
+                self._env_action_model_teacher_distillation_online_planner_enabled
+            ),
+            "env_action_model_teacher_distillation_min_advantage": round(
+                self._env_action_model_teacher_distillation_min_advantage,
+                6,
+            ),
+            "env_action_model_teacher_distillation_max_weight": round(
+                self._env_action_model_teacher_distillation_max_weight,
+                6,
+            ),
+            "env_action_model_teacher_distillation_behavior_kl_coef": round(
+                self._env_action_model_teacher_distillation_behavior_kl_coef,
                 6,
             ),
             "env_action_model_teacher_distillation_loss": round(
@@ -7551,10 +7601,16 @@ class 分层PPO基类(BaseAgent):
             batch_rows,
             batch_action_masks,
         ):
-            teacher_stats = row.get("action_info", {}).get(
-                "counterfactual_teacher_planner",
-                {},
-            )
+            action_info = row.get("action_info", {})
+            teacher_stats = action_info.get("counterfactual_teacher_planner", {})
+            if (
+                self._env_action_model_teacher_distillation_online_planner_enabled
+                and not bool(teacher_stats.get("applied", False))
+            ):
+                teacher_stats = action_info.get(
+                    "online_counterfactual_planner",
+                    {},
+                )
             if not isinstance(teacher_stats, dict) or not bool(
                 teacher_stats.get("applied", False)
             ):
@@ -7582,18 +7638,56 @@ class 分层PPO基类(BaseAgent):
                 float(teacher_stats.get("score_margin", 0.0) or 0.0),
                 0.0,
             )
+            model_advantage_gain = max(
+                float(teacher_stats.get("model_advantage_gain", 0.0) or 0.0),
+                0.0,
+            )
+            if (
+                model_advantage_gain
+                < self._env_action_model_teacher_distillation_min_advantage
+            ):
+                continue
+            current_logits = scores[valid_indices] / temperature
             loss = nn.functional.cross_entropy(
-                (scores[valid_indices] / temperature).unsqueeze(0),
+                current_logits.unsqueeze(0),
                 torch.as_tensor(
                     [valid_indices.index(teacher_action)],
                     dtype=torch.long,
                     device=self._device,
                 ),
             )
+            old_probs_raw = action_info.get("action_projection", {}).get(
+                "masked_env_action_probs",
+                [],
+            )
+            if (
+                self._env_action_model_teacher_distillation_behavior_kl_coef > 0.0
+                and isinstance(old_probs_raw, list)
+                and len(old_probs_raw) == int(scores.shape[-1])
+            ):
+                old_probs = torch.as_tensor(
+                    [max(float(old_probs_raw[index]), 1e-8) for index in valid_indices],
+                    dtype=torch.float32,
+                    device=self._device,
+                )
+                old_probs = old_probs / old_probs.sum().clamp_min(1e-8)
+                current_log_probs = torch.log_softmax(current_logits, dim=-1)
+                behavior_kl = torch.sum(
+                    old_probs
+                    * (torch.log(old_probs.clamp_min(1e-8)) - current_log_probs)
+                )
+                loss = (
+                    loss
+                    + self._env_action_model_teacher_distillation_behavior_kl_coef
+                    * behavior_kl
+                )
             losses.append(loss)
             weights.append(
                 torch.as_tensor(
-                    1.0 + min(score_margin, 1.0),
+                    min(
+                        1.0 + min(score_margin, 1.0) + model_advantage_gain,
+                        self._env_action_model_teacher_distillation_max_weight,
+                    ),
                     dtype=torch.float32,
                     device=self._device,
                 )
@@ -15703,6 +15797,27 @@ class 分层PPO基类(BaseAgent):
             ),
             "env_action_model_online_planner_min_advantage": (
                 self._env_action_model_online_planner_min_advantage
+            ),
+            "env_action_model_teacher_distillation_enabled": (
+                self._env_action_model_teacher_distillation_enabled
+            ),
+            "env_action_model_teacher_distillation_coef": (
+                self._env_action_model_teacher_distillation_coef
+            ),
+            "env_action_model_teacher_distillation_temperature": (
+                self._env_action_model_teacher_distillation_temperature
+            ),
+            "env_action_model_teacher_distillation_online_planner_enabled": (
+                self._env_action_model_teacher_distillation_online_planner_enabled
+            ),
+            "env_action_model_teacher_distillation_min_advantage": (
+                self._env_action_model_teacher_distillation_min_advantage
+            ),
+            "env_action_model_teacher_distillation_max_weight": (
+                self._env_action_model_teacher_distillation_max_weight
+            ),
+            "env_action_model_teacher_distillation_behavior_kl_coef": (
+                self._env_action_model_teacher_distillation_behavior_kl_coef
             ),
             "counterfactual_head_advantage_enabled": (
                 self._counterfactual_head_advantage_enabled

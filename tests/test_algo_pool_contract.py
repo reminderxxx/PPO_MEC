@@ -526,6 +526,29 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         self.assertIn(action, {0, 1, 2, 3, 4})
         self.assertTrue(action_info["option_gate"]["enabled"])
 
+    def test_optional_transition_model_preserves_policy_initialization(self) -> None:
+        without_model = build_agent(
+            "sa_ghmappo",
+            random_seed=17,
+            deterministic_action=True,
+            learned_transition_model_enabled=False,
+        )
+        with_model = build_agent(
+            "sa_ghmappo",
+            random_seed=17,
+            deterministic_action=True,
+            learned_transition_model_enabled=True,
+        )
+
+        without_state = without_model._network.state_dict()
+        with_state = with_model._network.state_dict()
+        self.assertEqual(set(without_state), set(with_state))
+        for parameter_name in without_state:
+            self.assertTrue(
+                torch.equal(without_state[parameter_name], with_state[parameter_name]),
+                parameter_name,
+            )
+
     def test_sa_v12_contextual_option_preserves_mappo_on_mechanism_window(self) -> None:
         agent = build_agent(
             "sa_ghmappo",
@@ -3820,6 +3843,92 @@ class AlgoPoolContractTestCase(unittest.TestCase):
         loss.backward()
         self.assertEqual(support, 1)
         self.assertGreater(float(event_logits.grad.abs().sum()), 0.0)
+
+    def test_sa_v118_distills_positive_online_planner_advantage(self) -> None:
+        from scripts.train_sa_ghmappo_real_sample import (
+            MECHANISM_COVERAGE_PROFILES,
+            build_sa_ghmappo_profile_kwargs,
+        )
+
+        profile = "top_journal_mechanism_v118_conservative_planner_distillation_mappo"
+        kwargs = build_sa_ghmappo_profile_kwargs(profile)
+        self.assertIn(profile, MECHANISM_COVERAGE_PROFILES)
+        self.assertTrue(kwargs["env_action_model_online_planner_enabled"])
+        self.assertTrue(kwargs["env_action_model_teacher_distillation_enabled"])
+        self.assertTrue(
+            kwargs["env_action_model_teacher_distillation_online_planner_enabled"]
+        )
+
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            **kwargs,
+        )
+        slow_logits = torch.zeros(3, requires_grad=True)
+        fast_logits = torch.zeros(2, requires_grad=True)
+        event_logits = torch.zeros(2, requires_grad=True)
+        loss, support = agent._compute_env_action_model_teacher_distillation_loss(
+            batch_outputs=[
+                {
+                    "slow_logits": slow_logits,
+                    "fast_logits": fast_logits,
+                    "event_logits": event_logits,
+                }
+            ],
+            batch_rows=[
+                {
+                    "action_info": {
+                        "action_projection": {
+                            "masked_env_action_probs": [0.2] * 5,
+                        },
+                        "online_counterfactual_planner": {
+                            "applied": True,
+                            "selected_action": 2,
+                            "score_margin": 0.6,
+                            "model_advantage_gain": 0.8,
+                        },
+                    }
+                }
+            ],
+            batch_action_masks=[[True] * 5],
+        )
+        loss.backward()
+        self.assertEqual(support, 1)
+        self.assertGreater(float(event_logits.grad.abs().sum()), 0.0)
+
+    def test_sa_v118_rejects_low_advantage_online_planner_label(self) -> None:
+        agent = build_agent(
+            "sa_ghmappo",
+            random_seed=7,
+            env_action_model_teacher_distillation_enabled=True,
+            env_action_model_teacher_distillation_coef=0.45,
+            env_action_model_teacher_distillation_online_planner_enabled=True,
+            env_action_model_teacher_distillation_min_advantage=0.1,
+        )
+        loss, support = agent._compute_env_action_model_teacher_distillation_loss(
+            batch_outputs=[
+                {
+                    "slow_logits": torch.zeros(3, requires_grad=True),
+                    "fast_logits": torch.zeros(2, requires_grad=True),
+                    "event_logits": torch.zeros(2, requires_grad=True),
+                }
+            ],
+            batch_rows=[
+                {
+                    "action_info": {
+                        "online_counterfactual_planner": {
+                            "applied": True,
+                            "selected_action": 2,
+                            "score_margin": 0.6,
+                            "model_advantage_gain": 0.05,
+                        }
+                    }
+                }
+            ],
+            batch_action_masks=[[True] * 5],
+        )
+        self.assertEqual(support, 0)
+        self.assertEqual(float(loss.item()), 0.0)
 
     def test_sa_v115_profile_uses_training_only_policy_iteration(self) -> None:
         from scripts.train_sa_ghmappo_real_sample import (
