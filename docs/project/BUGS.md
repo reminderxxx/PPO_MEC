@@ -226,3 +226,11 @@
 - 通用模板目录不再作为 live 文档入口。
 - 旧阶段文档不再作为事实来源。
 - toy / tmp / quickcheck / 单次 dry-run 产物不再参与当前结论。
+
+# 2026-08-14: cache observability / baseline / oracle blockers
+
+- `BLOCKER / baseline identity`: live registry 没有独立 LRU、LFU、FIFO、Random cache agents；环境中的 LRU 仅是 capacity-enabled admission 时的 eviction primitive，不能当成已评估 baseline。
+- `BLOCKER / capacity protocol`: v100 formal/future 主 rows 的 cache capacity 未启用，aggregate occupancy/eviction 为 0；这些 artifacts 不支持 cache pollution、turnover、eviction regret、byte efficiency 或容量受限 placement claim。
+- `BLOCKER / request observability`: 当前 raw rows 没有 request-level object bytes、hit source（local/neighbor/cloud）、delay decomposition、future reuse 与 counterfactual cloud latency，无法计算 byte hit、P95/P99、useful-cache ratio 或 latency-saved-per-MB。
+- `OPEN / cache oracle`: `oracle_prediction` 不是 future-request capacity oracle；尚未建立固定 horizon、相同容量/transfer cost 下的 offline optimal placement/eviction upper bound。
+- 完整审计与 P0--P3 路线见 `docs/project/full_system_cache_algorithm_audit_20260814.md`。

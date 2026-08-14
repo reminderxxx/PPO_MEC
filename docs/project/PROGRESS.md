@@ -1312,3 +1312,11 @@ quick run 结果边界：
 
 - v23-v26 均不晋级 canonical；当前 reward-first 候选仍保持 v22。
 - 已查看过的 v20/v22/v24 formal/future-validation 不能再作为未消费 hidden evidence。若后续要重新做 paper-ready 判断，必须先冻结新的未消费 formal/hidden split，再绑定最终 profile 和 checkpoint manifest 一次性评估。
+
+# 2026-08-14 全系统 Cache / Algorithm / Novelty 审计
+
+- 新增 `docs/project/full_system_cache_algorithm_audit_20260814.md`，按 Part A--K 审计系统、数据、算法身份、cache efficiency、failure/oracle、DT 双时间尺度和 novelty collision。
+- 核心事实：live registry 没有独立 LRU/LFU/FIFO/Random；环境只有 capacity-enabled 时的 LRU eviction primitive。v100 future 主结果 capacity disabled，因此 occupancy/eviction 为 0，不能据此评价 byte hit、pollution、eviction regret 或 LRU/LFU 性能。
+- PPO clipped on-policy update 可由源码确认；MAPPO 是 cache/execution/handoff-event controller-level CTDE，不是 vehicle/RSU-agent full MARL。v100 的主要正向归因仍依赖 online counterfactual planner。
+- 文献 collision 结论：DAPR 已覆盖 DT + mobility-aware async FL + prediction + DRL VEC caching，TMC 2026 EC-MADRL 已覆盖 cooperative caching + CTDE MADRL。建议 novelty 收缩到 continuous DAG + typed base/adapter state + handoff migration + causal/cost-aware evidence。
+- 审查 verdict 为 `Not TMC-ready`。P0 是统一 request/cache event schema、容量匹配 LRU/LFU/FIFO/Random 和 future-horizon cache oracle；本轮只做只读审查，没有修改算法或筛选 checkpoint。
