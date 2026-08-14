@@ -1,5 +1,7 @@
 ﻿# Directory Structure
 
+`scripts/audit_cache_event_telemetry.py` 是单 episode CacheEvent 对账入口；输出应写入 `artifacts/audits/<audit_id>/`，不得覆盖历史 run summary。
+
 ## 根目录
 
 - `README.md`：项目定位、当前阶段、主线命令和实验入口总览

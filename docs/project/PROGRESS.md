@@ -1,5 +1,13 @@
 ﻿# Progress
 
+## 2026-08-14: CacheEvent independent reduction and telemetry reconciliation
+
+- 新增 pure reducer `src/metrics/cache_event_metrics.py`，仅消费 raw `cache_event_trace` 与 schema version，可独立重算 request/hit source/admission/eviction/transfer/migration/service/execution；缺 trace 明确为 unavailable，空 trace 保持 available-empty。
+- 新增结构化 legacy audit 和 `scripts/audit_cache_event_telemetry.py`。mapping 分为 `exact`、`compatible_but_different_scope`、`not_equivalent`、`unavailable`，不强迫 warm readiness、continuity 或 backhaul 与 request event 指标相等。
+- 当前 commit 下 NGSIM + Alibaba dry-run 为 `artifacts/runs/real_sample_dryrun_20260814_132117/summary.json`；审计为 `artifacts/audits/cache_event_telemetry_20260814_132117/summary.cache_event_telemetry_audit.json`。event-derived：10 requests，9 hits/1 miss，current/target/neighbor/unserved=`5/2/2/1`，admission requested/added=`10/3`，eviction=`0`，adapter/state transfer=`192/112 MB`，migration requested/realized=`7/2`，service success/failure=`9/1`。
+- legacy exact matches：hit/miss、admission request/add、eviction、migration attempt/success。总 event transfer `304 MB` 与 legacy backhaul `224 MB` 不等价：前者记录 migration request/realization bundle size，后者只在 handoff 时计 migration cost。未发现 producer/consumer bug；G01 schema 无 amendment。
+- 本轮不实现 byte hit 正式指标、pollution、eviction regret、latency saved、byte capacity、LRU/LFU/FIFO/Random 或 cache oracle。
+
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
 ## 2026-08-14: request-level Cache Event Schema v1 implemented

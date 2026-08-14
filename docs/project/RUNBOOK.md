@@ -1,5 +1,17 @@
 # Runbook
 
+## CacheEvent telemetry 独立对账
+
+先生成或选择一个包含 `cache_event_trace` 的 episode summary，再将审计输出写到新目录：
+
+```bash
+.venv/bin/python scripts/audit_cache_event_telemetry.py \
+  --summary_path artifacts/runs/<run_id>/summary.json \
+  --output_dir artifacts/audits/<audit_id>
+```
+
+脚本拒绝覆盖同名结果。历史 summary 缺 trace 时输出 `availability=unavailable`，不伪造零命中；不同 scope 字段只作 informational 对照。该入口只验证 contract telemetry，不产出论文级 cache efficiency 指标。
+
 ## Git LFS 数据恢复
 
 `data/` 由 Git LFS 管理。新主机首次检出后执行：

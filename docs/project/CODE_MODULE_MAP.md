@@ -1,5 +1,11 @@
 # Code Module Map
 
+## 2026-08-14 cache event independent reducer
+
+- `src/metrics/cache_event_metrics.py`：纯 `CacheEvent` reducer、历史 summary 的 unavailable/empty 区分、schema/invariant validation 和 legacy telemetry structured comparison；reducer 不依赖 step/system/evaluator aggregate。
+- `scripts/audit_cache_event_telemetry.py`：读取单个 episode `summary.json`，将 event-derived/legacy value、差值、mapping class 和解释写入独立 audit JSON，拒绝覆盖已有审计。
+- `tests/test_cache_event_metrics.py`：覆盖人工精确值、denominator、来源/执行、admission/eviction/transfer/migration、非法 schema/event、历史兼容和 mapping mismatch。
+
 ## 2026-08-14 request-level cache event contract
 
 - `src/envs/specs/semantic_objects.py`：冻结 `CacheEvent` v1 dataclass、required fields 与 event/object/hit-source 枚举，并执行 hit、admission、eviction 和 capacity-null 不变量。

@@ -1,5 +1,7 @@
 # PPO_MEC
 
+CacheEvent `1.x` episode telemetry 可通过 `scripts/audit_cache_event_telemetry.py` 从 raw `cache_event_trace` 独立重算并与 legacy step/episode 字段分类对账；使用方法和口径见 `docs/project/RUNBOOK.md` 与 `docs/project/cache_event_contract.md`。该能力用于 contract 验证，不是新增论文指标。
+
 ## 2026-07-29 v70 sparse-tail option MAPPO 正式结果
 
 v70 `top_journal_mechanism_v70_sparse_tail_option_mappo` 已按 3 seed、12-agent、frozen mixed/full 窗口完成全量 benchmark，并首次在当前 offset-free formal-min full_stratified 协议下让 SA-GHMAPPO 同时高于 DT 规则/专项对照、popularity heuristic、PPO 和 MAPPO。关键 artifact：
