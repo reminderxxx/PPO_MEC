@@ -1,5 +1,13 @@
 # Code Module Map
 
+## 2026-08-14 request-level cache event contract
+
+- `src/envs/specs/semantic_objects.py`：冻结 `CacheEvent` v1 dataclass、required fields 与 event/object/hit-source 枚举，并执行 hit、admission、eviction 和 capacity-null 不变量。
+- `src/envs/core/vec_workflow_core_env.py`：在真实 request/cache/handoff/execution 结果汇合处生产单 lifecycle event；cache action 同时保留 admission 前后 capacity 快照。
+- `src/metrics/recorder.py`：检查 episode 内 `event_id` 唯一性，将 raw events 导出为 `cache_event_trace`；既有 `step_trace` 和 summary 字段保持不变。
+- `docs/project/cache_event_contract.md`：记录 version、lifecycle、null/compatibility 边界和后续 byte capacity / LRU/LFU / oracle 消费方式。
+- `tests/test_cache_event_contract.py`：覆盖 contract、场景、序列化和 request-denominator/invariant regression。
+
 ## 2026-08-11 v118-v121 planner-internalization boundary
 
 - `src/agents/sa_ghmappo_core.py`：用 forked PyTorch RNG 初始化 optional transition ensemble，避免改变 policy 初始权重；实验性 teacher loss 支持 realized-GAE agreement gate 和 logit-margin projection，均默认关闭。

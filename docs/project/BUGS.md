@@ -2,6 +2,12 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-14: cache observability contract resolved; metric/baseline work remains open
+
+- `RESOLVED / event observability`: request-level `CacheEvent` v1 now records lookup, mutually exclusive hit source, admission, eviction victim, transfer/migration, capacity before/after and execution result in raw episode summaries.
+- `OPEN / derived metrics`: byte hit, pollution, eviction regret and latency-saved metrics are not implemented in this task; v1 events only provide their future raw input contract.
+- `OPEN / algorithm comparison`: byte capacity, capacity-matched LRU/LFU/FIFO/Random and future-horizon oracle remain absent. Capacity-disabled historical artifacts still cannot support cache-efficiency claims.
+
 ## 2026-08-11: planner distillation is not a stable native-policy improvement
 
 - `FIXED / RNG fairness`: transition-ensemble initialization previously shifted the global PyTorch RNG before policy construction. Historical `no_learned_dynamics` retraining results are confounded and must not be cited causally. New enabled/disabled runs share identical initial policy parameters.

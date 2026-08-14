@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-08-14: Cache Event 采用单 request lifecycle
+
+决策：`CacheEvent` v1 使用一个 workflow-node request 对应一个完整事件，lookup、最终 hit source、admission、eviction、transfer/migration 与 execution result 作为同一事件字段；无当前节点输出 `not_applicable` 事件。
+
+原因：核心环境已经在单 step 内汇合真实 cache 和 service 结果。单 lifecycle 能保证 event/request 一一对应，避免 admission/eviction 子事件重复扩大 denominator，同时仍能按字段独立审计 victim、bytes 与 capacity snapshot。多事件方案需要额外 request/parent ID 和跨事件 completion 逻辑，当前没有带来更强的真实语义。
+
+影响：episode summary 新增 `cache_event_schema_version` 与 `cache_event_trace`；既有 summary/benchmark contract 保持向后兼容。未来 byte capacity、LRU/LFU 和 horizon oracle 消费 v1 trace，但不得把 capacity-disabled `null` 解释为零占用。
+
 ## 2026-08-11: reject v118-v121 and stop planner-label internalization tuning
 
 决策：不将 v118 conservative planner distillation、v119 realized-GAE gate、v120 stronger projection 或 v121 logit-margin projection 晋级为 canonical。停止在已消费的 NGSIM formal / LuST future split 上继续调整蒸馏系数、margin 或 checkpoint；canonical reward record 仍为冻结 v100。

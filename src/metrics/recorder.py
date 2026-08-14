@@ -7,6 +7,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+from src.envs.specs import CACHE_EVENT_SCHEMA_VERSION
 from src.metrics.paper_metrics import PaperMetricSet
 from src.metrics.reducers import 聚合奖励拆解, 求和
 
@@ -21,6 +22,7 @@ class EpisodeRecorder:
         self._run_metadata: dict[str, Any] = {}
         self._initial_state: dict[str, Any] | None = None
         self._step_records: list[dict[str, Any]] = []
+        self._cache_events: list[dict[str, Any]] = []
         self._pending_prefetches: list[dict[str, Any]] = []
         self._episode_status: dict[str, Any] = {}
 
@@ -29,6 +31,7 @@ class EpisodeRecorder:
         self._run_metadata = deepcopy(run_metadata or {})
         self._initial_state = None
         self._step_records = []
+        self._cache_events = []
         self._pending_prefetches = []
         self._episode_status = {
             "completed": False,
@@ -57,6 +60,15 @@ class EpisodeRecorder:
         metrics_info["action_id"] = info.get("action_id")
         metrics_info["action_name"] = info.get("action_name")
         metrics_info["control_action"] = deepcopy(info.get("control_action", {}))
+        cache_event = deepcopy(info.get("cache_event") or metrics_info.get("cache_event"))
+        if cache_event:
+            cache_event["action_id"] = info.get("action_id", cache_event.get("action_id"))
+            cache_event["action_name"] = info.get("action_name", cache_event.get("action_name"))
+            metrics_info["cache_event"] = deepcopy(cache_event)
+            event_id = cache_event.get("event_id")
+            if event_id in {event.get("event_id") for event in self._cache_events}:
+                raise ValueError(f"duplicate cache event_id in episode: {event_id}")
+            self._cache_events.append(cache_event)
         metrics_info.setdefault("predictive_prefetch_correct", False)
         metrics_info.setdefault("predictive_prefetch_validated", False)
         metrics_info.setdefault("predictive_prefetch_pending", False)
@@ -109,6 +121,8 @@ class EpisodeRecorder:
             "validated_predictive_prefetch_count": prefetch_validation_summary["validated_predictive_prefetch_count"],
             "prefetch_validation_summary": prefetch_validation_summary,
             "step_trace": deepcopy(self._step_records),
+            "cache_event_schema_version": CACHE_EVENT_SCHEMA_VERSION,
+            "cache_event_trace": deepcopy(self._cache_events),
         }
 
     def export_summary(self, output_path: str | Path) -> dict[str, Any]:

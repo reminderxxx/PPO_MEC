@@ -2,6 +2,13 @@
 
 用途：记录已确认的阶段事实和整理动作。未验证内容不写成事实。
 
+## 2026-08-14: request-level Cache Event Schema v1 implemented
+
+- 新增稳定 `CacheEvent` schema `1.0.0`，采用每个 workflow-node request 一个完整 lifecycle event；admission/eviction 不生成重复子事件，无当前节点使用 `not_applicable`。
+- 核心环境在真实 cache/action/handoff/service 结果位置生产 event，覆盖 hit/miss、reactive/predictive admission、capacity disabled、LRU eviction primitive、vehicle fallback 和 migration prepare/realization。
+- `EpisodeRecorder` 将 raw event 写入 `cache_event_trace`，检查 episode 内 event ID 唯一；既有 `step_trace`、system/prefetch/handoff summary 与 benchmark row/aggregate contract 不变。
+- Contract 与目标场景测试、环境合同、toy smoke 和 capacity eviction validation 已通过。本任务只建设 observability；未实现 byte capacity、LRU/LFU/FIFO/Random agent、新 cache metrics 或 oracle。
+
 ## 2026-08-11: v118-v121 planner internalization line rejected after matched dual-domain evaluation
 
 - Fixed a causal-ablation defect: optional transition-ensemble construction consumed the global PyTorch RNG before policy initialization. Model initialization now uses a forked RNG stream, and enabled/disabled learned-dynamics variants must start from identical policy parameters.

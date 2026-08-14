@@ -13,7 +13,15 @@ from src.data.mobility.rsu_mapper import RSUMapper
 from src.data.model_catalog.adapter_catalog import AdapterCatalog
 from src.data.workflow.toy_workflow_generator import ToyWorkflowGenerator
 from src.envs.core.predictor_manager import PredictorManager
-from src.envs.specs import ControlAction, RSUState, RewardBreakdown, VehicleState, WorkflowGraphState
+from src.envs.specs import (
+    CACHE_EVENT_SCHEMA_VERSION,
+    CacheEvent,
+    ControlAction,
+    RSUState,
+    RewardBreakdown,
+    VehicleState,
+    WorkflowGraphState,
+)
 
 
 PRIMARY_VEHICLE_SELECTION_CHOICES = {"stable_first", "handoff_pressure"}
@@ -662,6 +670,7 @@ class VecWorkflowCoreEnv:
             }
 
         was_cached_before = adapter_id in rsu.cached_adapter_ids
+        capacity_before = self._cache_capacity_snapshot(execution_target_rsu_id)
         added_new_adapter = False
         evicted_adapter_id = None
         eviction_count = 0
@@ -690,6 +699,7 @@ class VecWorkflowCoreEnv:
             "strategy": strategy,
             "prediction_driven": prediction_driven,
             "cache_target_corrected_by_handoff": cache_target_corrected_by_handoff,
+            "capacity_before": capacity_before,
             **self._cache_capacity_snapshot(execution_target_rsu_id),
         }
 
@@ -1082,6 +1092,21 @@ class VecWorkflowCoreEnv:
             predictive_prefetch_requested and not mechanism_success_strict
         )
         dag_evidence_metrics = self._build_dag_evidence_metrics(current_node)
+        cache_event = self._build_cache_event(
+            current_node=current_node,
+            primary_vehicle=primary_vehicle,
+            request_rsu_id=pre_action_associated_rsu_id,
+            selected_target_rsu_id=offload_target_rsu_id,
+            predicted_next_rsu_id=predicted_next_rsu_id,
+            predicted_handoff_target_rsu_id=predicted_handoff_target_rsu_id,
+            cache_hit=cache_hit,
+            stall_occurred=stall_occurred,
+            control=control,
+            cache_result=cache_result,
+            handoff_count=handoff_count,
+            migration_prepare_requested=migration_prepare_requested,
+            migration_prepare_realized=migration_prepare_realized,
+        )
 
         metrics_protocol = {
             "time_index": self._mobility_provider.get_time(),
@@ -1176,6 +1201,7 @@ class VecWorkflowCoreEnv:
             "evicted_adapter_count": int(cache_result.get("evicted_adapter_count", 0) or 0),
             "evicted_adapter_id": cache_result.get("evicted_adapter_id"),
             "offload_target_rsu_id": offload_target_rsu_id,
+            "cache_event": cache_event.to_dict(),
             **dag_evidence_metrics,
         }
         return {
@@ -1192,7 +1218,130 @@ class VecWorkflowCoreEnv:
             "reward_dict": reward.to_dict(),
             "cache_applied": bool(cache_result.get("requested", False)),
             "metrics_protocol": metrics_protocol,
+            "cache_event": cache_event.to_dict(),
         }
+
+    def _build_cache_event(
+        self,
+        *,
+        current_node: Any,
+        primary_vehicle: VehicleState | None,
+        request_rsu_id: str | None,
+        selected_target_rsu_id: str | None,
+        predicted_next_rsu_id: str | None,
+        predicted_handoff_target_rsu_id: str | None,
+        cache_hit: bool,
+        stall_occurred: bool,
+        control: ControlAction,
+        cache_result: dict[str, Any],
+        handoff_count: int,
+        migration_prepare_requested: bool,
+        migration_prepare_realized: bool,
+    ) -> CacheEvent:
+        adapter_id = current_node.required_adapter if current_node else None
+        cache_object = next(
+            (item for item in self.adapter_catalog.cache_objects if item.adapter_id == adapter_id),
+            None,
+        )
+        object_id = cache_object.object_id if cache_object else (f"adapter:{adapter_id}" if adapter_id else None)
+        size_mb = float(cache_object.size_mb) if cache_object else (
+            float(self.adapter_catalog.estimate_adapter_transfer_size_mb(adapter_id)) if adapter_id else None
+        )
+        offload_mode = str(control.offload_action.get("mode", "rsu"))
+        if current_node is None:
+            hit_source = "not_applicable"
+        elif offload_mode == "vehicle":
+            hit_source = "vehicle_local"
+        elif offload_mode == "cloud":
+            hit_source = "cloud"
+        elif not cache_hit:
+            hit_source = "unserved"
+        elif selected_target_rsu_id == request_rsu_id:
+            hit_source = "current_rsu"
+        elif selected_target_rsu_id in {predicted_next_rsu_id, predicted_handoff_target_rsu_id}:
+            hit_source = "target_rsu"
+        else:
+            hit_source = "neighbor_rsu"
+
+        admission_requested = bool(cache_result.get("requested", False))
+        admission_added = bool(cache_result.get("added_new_adapter", False))
+        if not admission_requested:
+            admission_reason = "not_requested"
+        elif not cache_result.get("target_rsu_id"):
+            admission_reason = "missing_target_rsu"
+        elif cache_result.get("was_cached_before", False):
+            admission_reason = "already_cached"
+        elif admission_added:
+            admission_reason = str(cache_result.get("strategy") or "manual_cache")
+        else:
+            admission_reason = "not_added"
+
+        eviction_occurred = bool(cache_result.get("cache_eviction", False))
+        evicted_adapter_id = cache_result.get("evicted_adapter_id")
+        evicted_object = next(
+            (item for item in self.adapter_catalog.cache_objects if item.adapter_id == evicted_adapter_id),
+            None,
+        )
+        capacity_before = dict(cache_result.get("capacity_before") or {})
+        capacity_enabled = bool(cache_result.get("cache_capacity_enabled", False))
+        adapter_transfer_size = size_mb if admission_added and size_mb is not None else 0.0
+        migration_transfer_size = (
+            float(self.adapter_catalog.estimate_bundle_transfer_size_mb(adapter_id))
+            if adapter_id and (migration_prepare_requested or migration_prepare_realized)
+            else 0.0
+        )
+        return CacheEvent(
+            event_id=f"cache-event-{self._episode_steps:06d}",
+            event_schema_version=CACHE_EVENT_SCHEMA_VERSION,
+            event_type="request" if current_node else "not_applicable",
+            time_index=int(self._mobility_provider.get_time()),
+            episode_step_index=int(self._episode_steps),
+            vehicle_id=primary_vehicle.vehicle_id if primary_vehicle else self._primary_vehicle_id,
+            workflow_id=self.workflow_state.workflow_id,
+            node_id=current_node.node_id if current_node else None,
+            object_id=object_id,
+            adapter_id=adapter_id,
+            object_type="adapter" if adapter_id else "not_applicable",
+            size_mb=size_mb,
+            request_rsu_id=request_rsu_id,
+            selected_target_rsu_id=selected_target_rsu_id,
+            served_rsu_id=(selected_target_rsu_id if current_node and offload_mode == "rsu" and not stall_occurred else None),
+            predicted_next_rsu_id=predicted_next_rsu_id,
+            predicted_handoff_target_rsu_id=predicted_handoff_target_rsu_id,
+            hit_source=hit_source,
+            cache_lookup_performed=bool(current_node and offload_mode == "rsu" and selected_target_rsu_id),
+            cache_hit=bool(cache_hit),
+            was_cached_before=bool(cache_result.get("was_cached_before", False)),
+            admission_requested=admission_requested,
+            admission_added=admission_added,
+            admission_reason=admission_reason,
+            cache_target_rsu_id=cache_result.get("target_rsu_id"),
+            eviction_occurred=eviction_occurred,
+            eviction_policy=(str(self._cache_capacity_profile.get("eviction_policy", "lru")) if capacity_enabled else "not_applicable"),
+            evicted_object_id=(evicted_object.object_id if evicted_object else (f"adapter:{evicted_adapter_id}" if evicted_adapter_id else None)),
+            evicted_adapter_id=evicted_adapter_id,
+            eviction_reason="capacity_limit" if eviction_occurred else "not_occurred",
+            adapter_transfer_size_mb=float(adapter_transfer_size),
+            state_migration_size_mb=float(migration_transfer_size),
+            transfer_source=("catalog_cache_object" if cache_object else "catalog_fallback" if adapter_id else "not_applicable"),
+            migration_requested=bool(migration_prepare_requested or control.migration_action.get("mode") == "migrate"),
+            migration_realized=bool(migration_prepare_realized or (handoff_count > 0 and control.migration_action.get("mode") == "migrate")),
+            cache_capacity_enabled=capacity_enabled,
+            cache_capacity_unit=str(cache_result.get("cache_capacity_unit", "adapter_slots")),
+            cache_capacity_before=capacity_before.get("cache_capacity") if capacity_enabled else None,
+            cache_used_before=capacity_before.get("cache_used_size") if capacity_enabled else None,
+            cache_remaining_before=capacity_before.get("cache_remaining_size") if capacity_enabled else None,
+            cache_capacity_after=cache_result.get("cache_capacity") if capacity_enabled else None,
+            cache_used_after=cache_result.get("cache_used_size") if capacity_enabled else None,
+            cache_remaining_after=cache_result.get("cache_remaining_size") if capacity_enabled else None,
+            action_id=control.metadata.get("action_id"),
+            action_name=control.metadata.get("action_name"),
+            cache_strategy=str(cache_result.get("strategy", "none")),
+            offload_mode=offload_mode,
+            service_success=bool(current_node and not stall_occurred),
+            stall_occurred=bool(stall_occurred),
+            handoff_event_count=int(handoff_count),
+        )
 
     def _estimate_backhaul_traffic_cost(
         self,

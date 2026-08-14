@@ -2,8 +2,24 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
-from typing import Any
+from dataclasses import asdict, dataclass, field, fields
+from typing import Any, ClassVar
+
+
+CACHE_EVENT_SCHEMA_VERSION = "1.0.0"
+CACHE_EVENT_TYPES = frozenset({"request", "not_applicable"})
+CACHE_OBJECT_TYPES = frozenset({"adapter", "not_applicable"})
+CACHE_HIT_SOURCES = frozenset(
+    {
+        "vehicle_local",
+        "current_rsu",
+        "target_rsu",
+        "neighbor_rsu",
+        "cloud",
+        "unserved",
+        "not_applicable",
+    }
+)
 
 
 @dataclass
@@ -121,6 +137,109 @@ class CacheObject:
     def to_dict(self) -> dict[str, Any]:
         """转成普通字典。"""
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class CacheEvent:
+    """Request-level cache lifecycle event schema v1."""
+
+    REQUIRED_FIELDS: ClassVar[tuple[str, ...]]
+
+    event_id: str
+    event_schema_version: str
+    event_type: str
+    time_index: int
+    episode_step_index: int
+    vehicle_id: str | None
+    workflow_id: str | None
+    node_id: str | None
+    object_id: str | None
+    adapter_id: str | None
+    object_type: str
+    size_mb: float | None
+    request_rsu_id: str | None
+    selected_target_rsu_id: str | None
+    served_rsu_id: str | None
+    predicted_next_rsu_id: str | None
+    predicted_handoff_target_rsu_id: str | None
+    hit_source: str
+    cache_lookup_performed: bool
+    cache_hit: bool
+    was_cached_before: bool
+    admission_requested: bool
+    admission_added: bool
+    admission_reason: str
+    cache_target_rsu_id: str | None
+    eviction_occurred: bool
+    eviction_policy: str
+    evicted_object_id: str | None
+    evicted_adapter_id: str | None
+    eviction_reason: str
+    adapter_transfer_size_mb: float
+    state_migration_size_mb: float
+    transfer_source: str
+    migration_requested: bool
+    migration_realized: bool
+    cache_capacity_enabled: bool
+    cache_capacity_unit: str
+    cache_capacity_before: float | None
+    cache_used_before: float | None
+    cache_remaining_before: float | None
+    cache_capacity_after: float | None
+    cache_used_after: float | None
+    cache_remaining_after: float | None
+    action_id: int | None
+    action_name: str | None
+    cache_strategy: str
+    offload_mode: str
+    service_success: bool
+    stall_occurred: bool
+    handoff_event_count: int
+
+    def __post_init__(self) -> None:
+        if self.event_schema_version != CACHE_EVENT_SCHEMA_VERSION:
+            raise ValueError("unsupported cache event schema version")
+        if self.event_type not in CACHE_EVENT_TYPES:
+            raise ValueError(f"invalid cache event type: {self.event_type}")
+        if self.object_type not in CACHE_OBJECT_TYPES:
+            raise ValueError(f"invalid cache object type: {self.object_type}")
+        if self.hit_source not in CACHE_HIT_SOURCES:
+            raise ValueError(f"invalid cache hit source: {self.hit_source}")
+        if self.cache_hit and self.hit_source not in {
+            "vehicle_local", "current_rsu", "target_rsu", "neighbor_rsu", "cloud"
+        }:
+            raise ValueError("cache_hit requires a concrete hit_source")
+        if not self.cache_hit and self.hit_source in {"current_rsu", "target_rsu", "neighbor_rsu"}:
+            raise ValueError("RSU hit_source requires cache_hit=true")
+        if self.admission_added and (not self.cache_target_rsu_id or not self.object_id):
+            raise ValueError("admission_added requires cache target and object")
+        if self.eviction_occurred and not self.evicted_object_id:
+            raise ValueError("eviction requires a victim object")
+        if not self.cache_capacity_enabled and any(
+            value is not None
+            for value in (
+                self.cache_capacity_before,
+                self.cache_used_before,
+                self.cache_remaining_before,
+                self.cache_capacity_after,
+                self.cache_used_after,
+                self.cache_remaining_after,
+            )
+        ):
+            raise ValueError("capacity-disabled snapshots must be null")
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, payload: dict[str, Any]) -> "CacheEvent":
+        missing = [field_name for field_name in cls.REQUIRED_FIELDS if field_name not in payload]
+        if missing:
+            raise ValueError(f"missing cache event fields: {', '.join(missing)}")
+        return cls(**{field_name: payload[field_name] for field_name in cls.REQUIRED_FIELDS})
+
+
+CacheEvent.REQUIRED_FIELDS = tuple(item.name for item in fields(CacheEvent))
 
 
 @dataclass
