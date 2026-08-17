@@ -88,6 +88,29 @@ def test_consumer_safe_1_x_optional_field_is_accepted() -> None:
     assert result.request_event_count == 1
 
 
+def test_1_1_multi_victim_counts_victims_and_preserves_legacy_first() -> None:
+    payload = event(
+        "multi",
+        event_schema_version="1.1.0",
+        admission_requested=True,
+        admission_added=True,
+        was_cached_before=False,
+        admission_reason="capacity_fill",
+        cache_target_rsu_id="r1",
+        eviction_occurred=True,
+        eviction_policy="lru",
+        evicted_object_id="obj:old-a",
+        evicted_adapter_id="old-a",
+        eviction_reason="capacity_limit",
+        eviction_count=2,
+        evicted_object_ids=["obj:old-a", "obj:old-b"],
+        evicted_adapter_ids=["old-a", "old-b"],
+        evicted_size_mb_sum=5.0,
+    )
+    result = reduce_cache_events([payload], schema_version="1.1.0")
+    assert result.eviction_count == result.evicted_object_count == 2
+
+
 def test_hand_calculated_mixed_trace() -> None:
     result = reduce_cache_events(mixed_trace()).to_dict()
     assert (result["request_event_count"], result["not_applicable_event_count"], result["total_event_count"]) == (11, 1, 12)

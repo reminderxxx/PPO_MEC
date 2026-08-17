@@ -282,3 +282,8 @@
 - `src/agents/ippo_agent.py` 当前仅保留 diagnostic/contract-blocked agent；不能作为 paper-grade learned baseline，除非后续先实现真实 independent per-agent wrapper/action contract。`src/agents/mappo_agent.py`、`src/agents/qmix_agent.py` 与 `src/agents/mat_agent.py` 已接入为 controller-level paper-grade learned baselines，但不支持 full vehicle-agent / RSU-agent MAPPO/QMIX/MAT 声明。`src/agents/dag_offload_agent.py`、`src/agents/cache_offload_agent.py`、`src/agents/dt_handoff_agent.py` 已接入为主线领域专项 learned baselines，需通过 final-submission loop 后才能引用正式数值。
 - `scripts/analyze_top_journal_statistics.py` 支持 `--cluster_keys`，当前 final loop 使用 `seed window_id workflow_id` 作为 total_reward cluster bootstrap unit。
 - `src/data/mobility/ngsim_provider.py` 返回 loaded frames 时使用显式 `VehicleState` 字段复制，避免长实验中通用 `deepcopy` 在 Python 3.14 下偶发崩溃。
+# 2026-08-17 Cache capacity dependency update
+
+- `src/data/model_catalog/adapter_catalog.py` 提供唯一 resident adapter MB resolver，区分 explicit CacheObject 与 64 MB legacy fallback。
+- `src/envs/core/vec_workflow_core_env.py` 负责 slot/MB normalization、initial enforcement、原子 LRU victim planning/admission 和 snapshots。
+- `src/envs/specs/semantic_objects.py`、`src/metrics/cache_event_metrics.py` 负责 CacheEvent 1.1 multi-victim 生产、1.0/1.x 兼容消费与 legacy 对账。

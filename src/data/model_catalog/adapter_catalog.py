@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
@@ -47,6 +48,16 @@ class ModelCacheDatasetProfile:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+@dataclass(frozen=True)
+class AdapterSizeResolution:
+    """Auditable resident-cache size resolution for one adapter."""
+
+    adapter_id: str
+    size_mb: float
+    source: str
+    object_id: str | None
 
 
 @dataclass
@@ -131,6 +142,34 @@ class AdapterCatalog:
             if cache_object.adapter_id == adapter_id:
                 return float(cache_object.size_mb)
         return 64.0
+
+    def resolve_adapter_resident_size_mb(self, adapter_id: str | None) -> AdapterSizeResolution:
+        """Resolve and validate the resident size used by cache capacity arithmetic.
+
+        The legacy 64 MB transfer fallback remains the resident-size fallback until
+        the catalog provides an explicit CacheObject. It is never interpreted as 0.
+        """
+        normalized_id = str(adapter_id or "").strip()
+        if not normalized_id:
+            raise ValueError("adapter_id is required for resident size resolution")
+        cache_object = next(
+            (item for item in self.cache_objects if item.adapter_id == normalized_id),
+            None,
+        )
+        size_mb = float(cache_object.size_mb) if cache_object else float(
+            self.estimate_adapter_transfer_size_mb(normalized_id)
+        )
+        if not math.isfinite(size_mb) or size_mb <= 0.0:
+            source = "catalog_cache_object" if cache_object else "catalog_fallback"
+            raise ValueError(
+                f"invalid resident size_mb for adapter {normalized_id!r} from {source}: {size_mb!r}"
+            )
+        return AdapterSizeResolution(
+            adapter_id=normalized_id,
+            size_mb=size_mb,
+            source="catalog_cache_object" if cache_object else "catalog_fallback",
+            object_id=cache_object.object_id if cache_object else None,
+        )
 
     def estimate_bundle_transfer_size_mb(self, adapter_id: str | None) -> float:
         """估计 adapter-state bundle 的迁移开销。"""

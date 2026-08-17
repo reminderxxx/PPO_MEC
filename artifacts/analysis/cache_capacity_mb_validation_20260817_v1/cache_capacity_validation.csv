@@ -1,0 +1,4 @@
+case_name,cache_capacity_enabled,rsu_adapter_slots,step_count,eviction_count,max_cache_used_size,cache_occupancy_rate_max,old_append_only_behavior_preserved,capacity_limit_respected,admission_added_new_adapter_count
+capacity_disabled,False,2,5,0,0.0,missing,True,True,5
+capacity_enabled_slots_2,True,2,5,3,2.0,1.0,False,True,5
+capacity_enabled_mb_120,True,missing,8,3,120.0,1.0,False,True,4

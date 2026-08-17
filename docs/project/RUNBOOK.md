@@ -722,3 +722,11 @@ Legacy gate 结论：
 - 正式 paired statistics 使用 hierarchical bootstrap：`window_id` 是 outer cluster，`seed workflow_id` 是 inner cluster；同时报告 percentile/BCa CI、窗口层效应量、sign test 和 Holm 校正。旧 `--cluster_keys seed window_id workflow_id` 只保留兼容，不再作为 paper-ready 主口径。
 - prediction support 的 setting-level dominance 只要求 `learned_prediction` 和 `noisy_prediction`；`no_prediction` 与 `oracle_prediction` 保留为诊断设置，不能写成全面预测条件优势。
 - 旧 `final_submission_clean_equal_budget_20260506_v1` 已作废；不要引用其 IPPO/PPO/MAPPO 或 DDQN duplicate trace 结果作为 paper-grade 证据。
+## MB cache capacity contract validation
+
+```bash
+.venv/bin/python -m pytest tests/test_cache_capacity_mb.py -q
+.venv/bin/python scripts/validate_cache_capacity_eviction.py
+```
+
+输出写入 `artifacts/analysis/cache_capacity_mb_validation_20260817_v1/`，包含 summary、scenario/event snapshots 与 invariants。该 smoke artifact 不用于论文结论。

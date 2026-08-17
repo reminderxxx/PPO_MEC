@@ -1335,3 +1335,8 @@ quick run 结果边界：
 - PPO clipped on-policy update 可由源码确认；MAPPO 是 cache/execution/handoff-event controller-level CTDE，不是 vehicle/RSU-agent full MARL。v100 的主要正向归因仍依赖 online counterfactual planner。
 - 文献 collision 结论：DAPR 已覆盖 DT + mobility-aware async FL + prediction + DRL VEC caching，TMC 2026 EC-MADRL 已覆盖 cooperative caching + CTDE MADRL。建议 novelty 收缩到 continuous DAG + typed base/adapter state + handoff migration + causal/cost-aware evidence。
 - 审查 verdict 为 `Not TMC-ready`。P0 是统一 request/cache event schema、容量匹配 LRU/LFU/FIFO/Random 和 future-horizon cache oracle；本轮只做只读审查，没有修改算法或筛选 checkpoint。
+# 2026-08-17 MB-based Cache Capacity
+
+- 新增 `capacity_unit={adapter_slots,mb}`；disabled 与 slot 历史语义保留，MB 按集中 resident-size resolver 严格约束每个 RSU。
+- runtime admission 支持原子 multi-victim 最小 LRU 前缀；oversized 对象零 eviction 拒绝；initial cache 使用同一 resolver 确定性修剪。
+- CacheEvent 升级为 consumer-safe `1.1.0`，reducer 继续消费 1.0.0。validation artifact 位于 `artifacts/analysis/cache_capacity_mb_validation_20260817_v1/`，不作为论文结论。

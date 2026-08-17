@@ -240,3 +240,6 @@
 - `BLOCKER / request observability`: 当前 raw rows 没有 request-level object bytes、hit source（local/neighbor/cloud）、delay decomposition、future reuse 与 counterfactual cloud latency，无法计算 byte hit、P95/P99、useful-cache ratio 或 latency-saved-per-MB。
 - `OPEN / cache oracle`: `oracle_prediction` 不是 future-request capacity oracle；尚未建立固定 horizon、相同容量/transfer cost 下的 offline optimal placement/eviction upper bound。
 - 完整审计与 P0--P3 路线见 `docs/project/full_system_cache_algorithm_audit_20260814.md`。
+# 2026-08-17 MB capacity implementation status
+
+- `RESOLVED / live capacity semantics`: 环境已支持 slot/MB、initial enforcement、原子 multi-victim 与 oversized 拒绝。这不追溯改变 v100 capacity-disabled artifacts，也未解决独立 cache baseline、正式 byte metrics 或 oracle blocker。

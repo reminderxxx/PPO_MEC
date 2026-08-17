@@ -753,3 +753,6 @@
 
 - 当前可守结论是 SA-GHMAPPO 相比 learned baselines 有稳定 reward 优势，并在部分 dev/formal aggregate 上略高于 popularity；不能宣称“大幅、显著优于强规则 baseline”。
 - 已查看过的 v20/v22/v24 formal/future-validation 不能再作为未调参 hidden evidence 使用。
+## 2026-08-17: 冻结 MB cache capacity contract
+
+保留 disabled 与 `adapter_slots`，新增显式 `unit=mb, capacity_mb>0`。resident size 统一由 AdapterCatalog 解析；runtime 先规划最小 LRU victim 前缀再原子应用，oversized 不清空现有 cache。CacheEvent 以可选字段升级到 1.1，旧 singular victim 固定表示首个 LRU victim。不扩展 reward/action，也不实现 EvictionPolicy、LFU/FIFO/Random、独立 LRU baseline、正式 byte metrics 或 oracle。

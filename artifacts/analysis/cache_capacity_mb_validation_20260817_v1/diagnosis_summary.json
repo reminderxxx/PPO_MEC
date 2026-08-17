@@ -1,0 +1,59 @@
+{
+  "task_name": "cache_capacity_mb_validation_20260817_v1",
+  "training_run": false,
+  "reward_modified": false,
+  "policy_modified": false,
+  "baseline_modified": false,
+  "capacity_disabled_preserves_old_behavior": true,
+  "capacity_enabled_eviction_observed": true,
+  "capacity_enabled_limit_respected": true,
+  "cache_occupancy_rate_observed": true,
+  "mb_multi_victim_observed": true,
+  "mb_oversized_rejection_observed": true,
+  "mb_never_exceeds_capacity": true,
+  "summaries": [
+    {
+      "case_name": "capacity_disabled",
+      "cache_capacity_enabled": false,
+      "rsu_adapter_slots": 2,
+      "step_count": 5,
+      "eviction_count": 0,
+      "max_cache_used_size": 0.0,
+      "cache_occupancy_rate_max": "missing",
+      "old_append_only_behavior_preserved": true,
+      "capacity_limit_respected": true,
+      "admission_added_new_adapter_count": 5
+    },
+    {
+      "case_name": "capacity_enabled_slots_2",
+      "cache_capacity_enabled": true,
+      "rsu_adapter_slots": 2,
+      "step_count": 5,
+      "eviction_count": 3,
+      "max_cache_used_size": 2.0,
+      "cache_occupancy_rate_max": 1.0,
+      "old_append_only_behavior_preserved": false,
+      "capacity_limit_respected": true,
+      "admission_added_new_adapter_count": 5
+    },
+    {
+      "case_name": "capacity_enabled_mb_120",
+      "cache_capacity_enabled": true,
+      "rsu_adapter_slots": "missing",
+      "step_count": 8,
+      "eviction_count": 3,
+      "max_cache_used_size": 120.0,
+      "cache_occupancy_rate_max": 1.0,
+      "old_append_only_behavior_preserved": false,
+      "capacity_limit_respected": true,
+      "admission_added_new_adapter_count": 4
+    }
+  ],
+  "generated_artifacts": {
+    "cache_capacity_validation": "artifacts/analysis/cache_capacity_mb_validation_20260817_v1/cache_capacity_validation.csv",
+    "eviction_event_validation": "artifacts/analysis/cache_capacity_mb_validation_20260817_v1/eviction_event_validation.csv",
+    "telemetry_field_coverage": "artifacts/analysis/cache_capacity_mb_validation_20260817_v1/telemetry_field_coverage.csv",
+    "diagnosis_summary": "artifacts/analysis/cache_capacity_mb_validation_20260817_v1/diagnosis_summary.json",
+    "mb_episode_summary": "artifacts/analysis/cache_capacity_mb_validation_20260817_v1/mb_episode_summary.json"
+  }
+}

@@ -1651,10 +1651,10 @@ def _build_actionmix_diagnostics(summary: dict[str, Any]) -> dict[str, float]:
         ),
         "cache_capacity_enabled": 1.0 if capacity_enabled_steps else 0.0,
         "rsu_adapter_slots": max(rsu_slot_values) if rsu_slot_values else 0.0,
-        "cache_capacity": max(cache_capacity_values) if cache_capacity_values else 0.0,
-        "cache_used_size": round(fmean(cache_used_values), 6) if cache_used_values else 0.0,
-        "cache_remaining_size": round(fmean(cache_remaining_values), 6) if cache_remaining_values else 0.0,
-        "cache_occupancy_rate": round(fmean(cache_occupancy_values), 6) if cache_occupancy_values else 0.0,
+        "cache_capacity": max(cache_capacity_values) if cache_capacity_values else None,
+        "cache_used_size": round(fmean(cache_used_values), 6) if cache_used_values else None,
+        "cache_remaining_size": round(fmean(cache_remaining_values), 6) if cache_remaining_values else None,
+        "cache_occupancy_rate": round(fmean(cache_occupancy_values), 6) if cache_occupancy_values else None,
         "eviction_count": float(sum(_float_value(step.get("eviction_count"), 0.0) for step in step_trace)),
         "evicted_adapter_count": float(sum(_float_value(step.get("evicted_adapter_count"), 0.0) for step in step_trace)),
         "cache_noop_count": float(
@@ -1713,7 +1713,10 @@ def _build_actionmix_diagnostics(summary: dict[str, Any]) -> dict[str, float]:
         "cache_miss_penalty_sum": cache_miss_penalty,
         "delay_penalty_sum": delay_penalty,
     }
-    rounded = {key: round(float(value), 6) for key, value in diagnostics.items()}
+    rounded = {
+        key: (round(float(value), 6) if value is not None else None)
+        for key, value in diagnostics.items()
+    }
     rounded["cache_capacity_unit"] = cache_capacity_unit
     return rounded
 

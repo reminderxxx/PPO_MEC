@@ -25,6 +25,8 @@ from src.envs.specs import (
 
 
 PRIMARY_VEHICLE_SELECTION_CHOICES = {"stable_first", "handoff_pressure"}
+CACHE_CAPACITY_UNITS = {"adapter_slots", "mb"}
+CACHE_CAPACITY_EPSILON = 1.0e-9
 
 
 class VecWorkflowCoreEnv:
@@ -530,6 +532,7 @@ class VecWorkflowCoreEnv:
             "enabled": False,
             "unit": "adapter_slots",
             "rsu_adapter_slots": 0,
+            "capacity_mb": None,
             "count_base_model_separately": False,
             "eviction_policy": "lru",
             "telemetry_enabled": True,
@@ -537,19 +540,47 @@ class VecWorkflowCoreEnv:
         if profile:
             merged.update(dict(profile))
         merged["enabled"] = bool(merged.get("enabled", False))
-        merged["unit"] = str(merged.get("unit") or "adapter_slots")
-        merged["rsu_adapter_slots"] = max(0, int(merged.get("rsu_adapter_slots", 0) or 0))
+        merged["unit"] = str(merged.get("unit") or "adapter_slots").strip().lower()
+        if merged["unit"] not in CACHE_CAPACITY_UNITS:
+            raise ValueError(f"unsupported cache capacity unit: {merged['unit']}")
+        raw_slots = merged.get("rsu_adapter_slots", 0)
+        merged["rsu_adapter_slots"] = int(raw_slots or 0)
+        if merged["rsu_adapter_slots"] < 0:
+            raise ValueError("rsu_adapter_slots must be non-negative")
+        if merged["enabled"] and merged["unit"] == "mb":
+            if merged.get("capacity_mb") is None:
+                raise ValueError("capacity_mb is required when cache capacity unit=mb")
+            capacity_mb = float(merged["capacity_mb"])
+            if not math.isfinite(capacity_mb) or capacity_mb <= 0.0:
+                raise ValueError("capacity_mb must be a finite positive number")
+            merged["capacity_mb"] = capacity_mb
         merged["count_base_model_separately"] = bool(merged.get("count_base_model_separately", False))
         merged["eviction_policy"] = str(merged.get("eviction_policy") or "lru").lower()
         merged["telemetry_enabled"] = bool(merged.get("telemetry_enabled", True))
         return merged
 
     def _cache_capacity_enabled(self) -> bool:
-        return bool(
-            self._cache_capacity_profile.get("enabled", False)
-            and self._cache_capacity_profile.get("unit") == "adapter_slots"
-            and int(self._cache_capacity_profile.get("rsu_adapter_slots", 0) or 0) > 0
-        )
+        if not self._cache_capacity_profile.get("enabled", False):
+            return False
+        if self._cache_capacity_profile.get("unit") == "mb":
+            return True
+        return int(self._cache_capacity_profile.get("rsu_adapter_slots", 0) or 0) > 0
+
+    def _cache_capacity_value(self) -> float | int | None:
+        if not self._cache_capacity_enabled():
+            return None
+        if self._cache_capacity_profile["unit"] == "mb":
+            return float(self._cache_capacity_profile["capacity_mb"])
+        return int(self._cache_capacity_profile["rsu_adapter_slots"])
+
+    def _adapter_resident_size_mb(self, adapter_id: str) -> float:
+        return self.adapter_catalog.resolve_adapter_resident_size_mb(adapter_id).size_mb
+
+    def _cache_used_value(self, rsu: RSUState) -> float | int:
+        unique_adapters = list(dict.fromkeys(rsu.cached_adapter_ids))
+        if self._cache_capacity_profile["unit"] == "mb":
+            return float(sum(self._adapter_resident_size_mb(item) for item in unique_adapters))
+        return len(unique_adapters)
 
     def _initialize_cache_capacity_metadata(self) -> None:
         self._cache_last_used_step = {}
@@ -561,9 +592,13 @@ class VecWorkflowCoreEnv:
                 self._enforce_initial_cache_capacity(rsu)
 
     def _enforce_initial_cache_capacity(self, rsu: RSUState) -> None:
-        capacity = int(self._cache_capacity_profile.get("rsu_adapter_slots", 0) or 0)
-        while capacity > 0 and len(rsu.cached_adapter_ids) > capacity:
-            evicted_adapter_id = rsu.cached_adapter_ids.pop(0)
+        capacity = self._cache_capacity_value()
+        while capacity is not None and self._cache_used_value(rsu) > float(capacity) + CACHE_CAPACITY_EPSILON:
+            evicted_adapter_id = min(
+                list(dict.fromkeys(rsu.cached_adapter_ids)),
+                key=lambda item: (self._cache_last_used_step[rsu.rsu_id].get(item, -10**9), item),
+            )
+            rsu.cached_adapter_ids.remove(evicted_adapter_id)
             self._cache_last_used_step.get(rsu.rsu_id, {}).pop(evicted_adapter_id, None)
             self._remove_catalog_cached_adapter(rsu.rsu_id, evicted_adapter_id)
 
@@ -593,15 +628,15 @@ class VecWorkflowCoreEnv:
 
     def _cache_capacity_snapshot(self, rsu_id: str | None) -> dict[str, Any]:
         capacity_enabled = self._cache_capacity_enabled()
-        capacity = int(self._cache_capacity_profile.get("rsu_adapter_slots", 0) or 0) if capacity_enabled else None
+        capacity = self._cache_capacity_value()
         used_size = None
         remaining_size = None
         occupancy_rate = None
         if rsu_id is not None:
             rsu = self._get_rsu_map().get(rsu_id)
-            if rsu is not None and capacity_enabled and capacity:
-                used_size = len(rsu.cached_adapter_ids)
-                remaining_size = max(capacity - used_size, 0)
+            if rsu is not None and capacity_enabled and capacity is not None:
+                used_size = self._cache_used_value(rsu)
+                remaining_size = max(float(capacity) - float(used_size), 0.0)
                 occupancy_rate = round(float(used_size) / float(capacity), 6)
         return {
             "cache_capacity_enabled": capacity_enabled,
@@ -670,20 +705,41 @@ class VecWorkflowCoreEnv:
             }
 
         was_cached_before = adapter_id in rsu.cached_adapter_ids
+        size_resolution = self.adapter_catalog.resolve_adapter_resident_size_mb(adapter_id)
         capacity_before = self._cache_capacity_snapshot(execution_target_rsu_id)
         added_new_adapter = False
-        evicted_adapter_id = None
-        eviction_count = 0
+        evicted_adapter_ids: list[str] = []
+        rejection_reason = None
         if adapter_id not in rsu.cached_adapter_ids:
             if self._cache_capacity_enabled():
-                capacity = int(self._cache_capacity_profile.get("rsu_adapter_slots", 0) or 0)
-                if capacity > 0 and len(rsu.cached_adapter_ids) >= capacity:
-                    evicted_adapter_id = self._evict_lru_adapter(rsu)
-                    eviction_count = 1 if evicted_adapter_id is not None else 0
-            rsu.cached_adapter_ids.append(adapter_id)
-            self.adapter_catalog.ensure_cached_adapter(execution_target_rsu_id, adapter_id)
-            added_new_adapter = True
+                capacity = float(self._cache_capacity_value() or 0.0)
+                object_size = size_resolution.size_mb if self._cache_capacity_profile["unit"] == "mb" else 1.0
+                if object_size > capacity + CACHE_CAPACITY_EPSILON:
+                    rejection_reason = "object_exceeds_total_capacity"
+                else:
+                    used = float(self._cache_used_value(rsu))
+                    last_used = self._cache_last_used_step.setdefault(rsu.rsu_id, {})
+                    for victim in sorted(
+                        list(dict.fromkeys(rsu.cached_adapter_ids)),
+                        key=lambda item: (last_used.get(item, -10**9), item),
+                    ):
+                        if used + object_size <= capacity + CACHE_CAPACITY_EPSILON:
+                            break
+                        evicted_adapter_ids.append(victim)
+                        used -= self._adapter_resident_size_mb(victim) if self._cache_capacity_profile["unit"] == "mb" else 1.0
+                    if used + object_size > capacity + CACHE_CAPACITY_EPSILON:
+                        rejection_reason = "insufficient_evictable_capacity"
+                        evicted_adapter_ids = []
+            if rejection_reason is None:
+                for victim in evicted_adapter_ids:
+                    rsu.cached_adapter_ids.remove(victim)
+                    self._cache_last_used_step[rsu.rsu_id].pop(victim, None)
+                    self._remove_catalog_cached_adapter(rsu.rsu_id, victim)
+                rsu.cached_adapter_ids.append(adapter_id)
+                self.adapter_catalog.ensure_cached_adapter(execution_target_rsu_id, adapter_id)
+                added_new_adapter = True
         self._touch_cached_adapter(execution_target_rsu_id, adapter_id)
+        evicted_size_mb_sum = sum(self._adapter_resident_size_mb(item) for item in evicted_adapter_ids)
         return {
             "requested": True,
             "decision_target_rsu_id": decision_target_rsu_id,
@@ -692,10 +748,15 @@ class VecWorkflowCoreEnv:
             "was_cached_before": was_cached_before,
             "added_new_adapter": added_new_adapter,
             "cache_admission_added_new_adapter": added_new_adapter,
-            "cache_eviction": bool(eviction_count > 0),
-            "eviction_count": eviction_count,
-            "evicted_adapter_count": eviction_count,
-            "evicted_adapter_id": evicted_adapter_id,
+            "cache_eviction": bool(evicted_adapter_ids),
+            "eviction_count": len(evicted_adapter_ids),
+            "evicted_adapter_count": len(evicted_adapter_ids),
+            "evicted_adapter_id": evicted_adapter_ids[0] if evicted_adapter_ids else None,
+            "evicted_adapter_ids": evicted_adapter_ids,
+            "evicted_size_mb_sum": evicted_size_mb_sum,
+            "requested_object_size_mb": size_resolution.size_mb,
+            "resident_size_source": size_resolution.source,
+            "capacity_rejection_reason": rejection_reason,
             "strategy": strategy,
             "prediction_driven": prediction_driven,
             "cache_target_corrected_by_handoff": cache_target_corrected_by_handoff,
@@ -1239,14 +1300,15 @@ class VecWorkflowCoreEnv:
         migration_prepare_realized: bool,
     ) -> CacheEvent:
         adapter_id = current_node.required_adapter if current_node else None
-        cache_object = next(
-            (item for item in self.adapter_catalog.cache_objects if item.adapter_id == adapter_id),
-            None,
+        size_resolution = (
+            self.adapter_catalog.resolve_adapter_resident_size_mb(adapter_id)
+            if adapter_id else None
         )
-        object_id = cache_object.object_id if cache_object else (f"adapter:{adapter_id}" if adapter_id else None)
-        size_mb = float(cache_object.size_mb) if cache_object else (
-            float(self.adapter_catalog.estimate_adapter_transfer_size_mb(adapter_id)) if adapter_id else None
+        object_id = (
+            size_resolution.object_id or f"adapter:{adapter_id}"
+            if size_resolution else None
         )
+        size_mb = size_resolution.size_mb if size_resolution else None
         offload_mode = str(control.offload_action.get("mode", "rsu"))
         if current_node is None:
             hit_source = "not_applicable"
@@ -1271,6 +1333,8 @@ class VecWorkflowCoreEnv:
             admission_reason = "missing_target_rsu"
         elif cache_result.get("was_cached_before", False):
             admission_reason = "already_cached"
+        elif cache_result.get("capacity_rejection_reason"):
+            admission_reason = str(cache_result["capacity_rejection_reason"])
         elif admission_added:
             admission_reason = str(cache_result.get("strategy") or "manual_cache")
         else:
@@ -1278,6 +1342,14 @@ class VecWorkflowCoreEnv:
 
         eviction_occurred = bool(cache_result.get("cache_eviction", False))
         evicted_adapter_id = cache_result.get("evicted_adapter_id")
+        evicted_adapter_ids = list(cache_result.get("evicted_adapter_ids") or [])
+        evicted_object_ids = []
+        for victim_id in evicted_adapter_ids:
+            victim_object = next(
+                (item for item in self.adapter_catalog.cache_objects if item.adapter_id == victim_id),
+                None,
+            )
+            evicted_object_ids.append(victim_object.object_id if victim_object else f"adapter:{victim_id}")
         evicted_object = next(
             (item for item in self.adapter_catalog.cache_objects if item.adapter_id == evicted_adapter_id),
             None,
@@ -1323,7 +1395,7 @@ class VecWorkflowCoreEnv:
             eviction_reason="capacity_limit" if eviction_occurred else "not_occurred",
             adapter_transfer_size_mb=float(adapter_transfer_size),
             state_migration_size_mb=float(migration_transfer_size),
-            transfer_source=("catalog_cache_object" if cache_object else "catalog_fallback" if adapter_id else "not_applicable"),
+            transfer_source=(size_resolution.source if size_resolution else "not_applicable"),
             migration_requested=bool(migration_prepare_requested or control.migration_action.get("mode") == "migrate"),
             migration_realized=bool(migration_prepare_realized or (handoff_count > 0 and control.migration_action.get("mode") == "migrate")),
             cache_capacity_enabled=capacity_enabled,
@@ -1341,6 +1413,12 @@ class VecWorkflowCoreEnv:
             service_success=bool(current_node and not stall_occurred),
             stall_occurred=bool(stall_occurred),
             handoff_event_count=int(handoff_count),
+            eviction_count=len(evicted_adapter_ids),
+            evicted_object_ids=evicted_object_ids,
+            evicted_adapter_ids=evicted_adapter_ids,
+            evicted_size_mb_sum=float(cache_result.get("evicted_size_mb_sum", 0.0) or 0.0),
+            requested_object_size_mb=cache_result.get("requested_object_size_mb", size_mb),
+            capacity_rejection_reason=cache_result.get("capacity_rejection_reason"),
         )
 
     def _estimate_backhaul_traffic_cost(

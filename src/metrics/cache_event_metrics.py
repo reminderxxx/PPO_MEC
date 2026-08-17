@@ -140,8 +140,8 @@ def reduce_cache_events(
             admission_reasons[event.admission_reason] += 1
             counters["admission_noop"] += int(not event.admission_added)
         if event.eviction_occurred:
-            counters["eviction"] += 1
-            counters["evicted_object"] += 1
+            counters["eviction"] += event.eviction_count
+            counters["evicted_object"] += event.eviction_count
             eviction_policies[event.eviction_policy] += 1
         counters["migration_request"] += int(event.migration_requested)
         counters["migration_realized"] += int(event.migration_realized)
@@ -268,8 +268,8 @@ def audit_cache_event_telemetry(summary: Mapping[str, Any]) -> dict[str, Any]:
         "cache_miss_count__adapter_miss_count": _comparison(event["cache_miss_count"], legacy["adapter_miss_count"], "exact", "both count executable request cache_hit=false under G01"),
         "admission_request_count__cache_admission_count": _comparison(event["admission_request_count"], legacy["cache_admission_count"], "exact", "request lifecycle admission flag"),
         "admission_added_count__cache_admission_added_new_adapter_count": _comparison(event["admission_added_count"], legacy["cache_admission_added_new_adapter_count"], "exact", "new adapter admission"),
-        "eviction_count__cache_eviction_count": _comparison(event["eviction_count"], legacy["cache_eviction_count"], "exact", "one G01 victim per eviction event"),
-        "eviction_count__eviction_count": _comparison(event["eviction_count"], legacy["eviction_count"], "exact", "one G01 victim per eviction event"),
+        "eviction_count__cache_eviction_count": _comparison(event["eviction_count"], legacy["cache_eviction_count"], "compatible_but_different_scope", "legacy cache_eviction_count counts request events; CacheEvent 1.1 eviction_count counts victims"),
+        "eviction_count__eviction_count": _comparison(event["eviction_count"], legacy["eviction_count"], "exact", "both count victims; CacheEvent 1.0 implies one victim"),
         "migration_request_count__migration_attempt_count": _comparison(event["migration_request_count"], legacy["migration_attempt_count"], "exact", "prepare or migrate request"),
         "migration_request_count__migration_prepare_count": _comparison(event["migration_request_count"], legacy["migration_prepare_count"], "compatible_but_different_scope", "handoff summary counts prepare mode only"),
         "migration_realized_count__migration_success_count": _comparison(event["migration_realized_count"], legacy["migration_success_count"], "exact", "realized prepare or migration during handoff"),

@@ -6,7 +6,7 @@ from dataclasses import asdict, dataclass, field, fields
 from typing import Any, ClassVar
 
 
-CACHE_EVENT_SCHEMA_VERSION = "1.0.0"
+CACHE_EVENT_SCHEMA_VERSION = "1.1.0"
 CACHE_EVENT_TYPES = frozenset({"request", "not_applicable"})
 CACHE_OBJECT_TYPES = frozenset({"adapter", "not_applicable"})
 CACHE_HIT_SOURCES = frozenset(
@@ -144,6 +144,7 @@ class CacheEvent:
     """Request-level cache lifecycle event schema v1."""
 
     REQUIRED_FIELDS: ClassVar[tuple[str, ...]]
+    OPTIONAL_FIELDS: ClassVar[tuple[str, ...]]
 
     event_id: str
     event_schema_version: str
@@ -195,6 +196,12 @@ class CacheEvent:
     service_success: bool
     stall_occurred: bool
     handoff_event_count: int
+    eviction_count: int = 0
+    evicted_object_ids: list[str] = field(default_factory=list)
+    evicted_adapter_ids: list[str] = field(default_factory=list)
+    evicted_size_mb_sum: float = 0.0
+    requested_object_size_mb: float | None = None
+    capacity_rejection_reason: str | None = None
 
     def __post_init__(self) -> None:
         if self.event_schema_version != CACHE_EVENT_SCHEMA_VERSION:
@@ -215,6 +222,17 @@ class CacheEvent:
             raise ValueError("admission_added requires cache target and object")
         if self.eviction_occurred and not self.evicted_object_id:
             raise ValueError("eviction requires a victim object")
+        if self.eviction_count != len(self.evicted_adapter_ids):
+            raise ValueError("eviction_count must match evicted_adapter_ids")
+        if self.eviction_count != len(self.evicted_object_ids):
+            raise ValueError("eviction_count must match evicted_object_ids")
+        if self.eviction_occurred != (self.eviction_count > 0):
+            raise ValueError("eviction_occurred must match eviction_count")
+        if self.eviction_count and (
+            self.evicted_adapter_id != self.evicted_adapter_ids[0]
+            or self.evicted_object_id != self.evicted_object_ids[0]
+        ):
+            raise ValueError("legacy victim fields must identify the first LRU victim")
         if not self.cache_capacity_enabled and any(
             value is not None
             for value in (
@@ -236,10 +254,30 @@ class CacheEvent:
         missing = [field_name for field_name in cls.REQUIRED_FIELDS if field_name not in payload]
         if missing:
             raise ValueError(f"missing cache event fields: {', '.join(missing)}")
-        return cls(**{field_name: payload[field_name] for field_name in cls.REQUIRED_FIELDS})
+        values = {field_name: payload[field_name] for field_name in cls.REQUIRED_FIELDS}
+        for field_name in cls.OPTIONAL_FIELDS:
+            if field_name in payload:
+                values[field_name] = payload[field_name]
+        if payload.get("eviction_occurred") and "eviction_count" not in values:
+            values.update(
+                eviction_count=1,
+                evicted_object_ids=[payload["evicted_object_id"]],
+                evicted_adapter_ids=[payload["evicted_adapter_id"]],
+            )
+        return cls(**values)
 
 
-CacheEvent.REQUIRED_FIELDS = tuple(item.name for item in fields(CacheEvent))
+CacheEvent.OPTIONAL_FIELDS = (
+    "eviction_count",
+    "evicted_object_ids",
+    "evicted_adapter_ids",
+    "evicted_size_mb_sum",
+    "requested_object_size_mb",
+    "capacity_rejection_reason",
+)
+CacheEvent.REQUIRED_FIELDS = tuple(
+    item.name for item in fields(CacheEvent) if item.name not in CacheEvent.OPTIONAL_FIELDS
+)
 
 
 @dataclass

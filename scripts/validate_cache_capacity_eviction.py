@@ -16,9 +16,10 @@ from src.data.mobility.replay_provider import ReplayProvider
 from src.data.model_catalog.adapter_catalog import AdapterCatalog
 from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv
 from src.envs.specs import ControlAction, RSUState, WorkflowGraphState, WorkflowNode
+from src.envs.specs import CACHE_EVENT_SCHEMA_VERSION
 
 
-OUTPUT_DIR = Path("artifacts/analysis/cache_capacity_eviction_telemetry_round9")
+OUTPUT_DIR = Path("artifacts/analysis/cache_capacity_mb_validation_20260817_v1")
 REQUIRED_TELEMETRY_FIELDS = [
     "cache_capacity_enabled",
     "cache_capacity_unit",
@@ -66,13 +67,7 @@ def _safe(value: Any) -> Any:
 
 
 def _build_workflow() -> WorkflowGraphState:
-    adapters = [
-        "adapter_perception",
-        "adapter_tracking",
-        "adapter_fusion",
-        "adapter_intent",
-        "adapter_control",
-    ]
+    adapters = ["adapter_perception", "adapter_tracking", "adapter_fusion", "adapter_intent", "adapter_control"]
     nodes = [
         WorkflowNode(
             node_id=f"node_{index + 1}",
@@ -104,6 +99,7 @@ def _build_catalog() -> AdapterCatalog:
         "adapter_intent",
         "adapter_control",
     ]
+    sizes = [40.0, 30.0, 50.0, 90.0, 200.0]
     return AdapterCatalog.from_dict(
         {
             "vehicle_base_models": [
@@ -119,10 +115,10 @@ def _build_catalog() -> AdapterCatalog:
                 {
                     "object_id": f"cache_obj_{adapter_id}",
                     "adapter_id": adapter_id,
-                    "size_mb": 64.0,
+                    "size_mb": size_mb,
                     "source": "validation_catalog",
                 }
-                for adapter_id in adapters
+                for adapter_id, size_mb in zip(adapters, sizes)
             ],
         }
     )
@@ -197,17 +193,11 @@ def _run_case(case_name: str, cache_capacity_profile: dict[str, Any]) -> tuple[d
                 "rsu_cache_after_step": ";".join(rsu_cache) if rsu_cache else "empty",
                 **{field: _safe(metrics.get(field)) for field in REQUIRED_TELEMETRY_FIELDS},
                 "evicted_adapter_id": _safe(metrics.get("evicted_adapter_id")),
+                "cache_event": json.dumps(info.get("cache_event", {}), ensure_ascii=False, sort_keys=True),
             }
         )
     eviction_count = sum(int(row["eviction_count"]) if str(row["eviction_count"]).isdigit() else 0 for row in event_rows)
-    max_cache_used = max(
-        [
-            int(row["cache_used_size"])
-            for row in event_rows
-            if str(row["cache_used_size"]).isdigit()
-        ]
-        or [0]
-    )
+    max_cache_used = max([float(row["cache_used_size"]) for row in event_rows if row["cache_used_size"] != "missing"] or [0.0])
     occupancy_values = [
         float(row["cache_occupancy_rate"])
         for row in event_rows
@@ -224,7 +214,11 @@ def _run_case(case_name: str, cache_capacity_profile: dict[str, Any]) -> tuple[d
         "old_append_only_behavior_preserved": bool(case_name == "capacity_disabled" and eviction_count == 0),
         "capacity_limit_respected": bool(
             case_name == "capacity_disabled"
-            or (max_cache_used <= int(cache_capacity_profile.get("rsu_adapter_slots", 0) or 0))
+            or max_cache_used <= float(
+                cache_capacity_profile.get("capacity_mb")
+                if cache_capacity_profile.get("unit") == "mb"
+                else cache_capacity_profile.get("rsu_adapter_slots", 0) or 0
+            ) + 1.0e-9
         ),
         "admission_added_new_adapter_count": sum(
             1 for row in event_rows if str(row["cache_admission_added_new_adapter"]).lower() == "true"
@@ -254,7 +248,11 @@ def main() -> None:
             "telemetry_enabled": True,
         },
     )
-    all_events = disabled_events + enabled_events
+    mb_summary, mb_events = _run_case(
+        "capacity_enabled_mb_120",
+        {"enabled": True, "unit": "mb", "capacity_mb": 120.0, "eviction_policy": "lru", "telemetry_enabled": True},
+    )
+    all_events = disabled_events + enabled_events + mb_events
     coverage_rows = []
     for field in REQUIRED_TELEMETRY_FIELDS + ["evicted_adapter_id"]:
         present_count = sum(1 for row in all_events if row.get(field) not in (None, "", "missing"))
@@ -268,7 +266,7 @@ def main() -> None:
             }
         )
     diagnosis = {
-        "task_name": "cache_capacity_eviction_telemetry_round9",
+        "task_name": "cache_capacity_mb_validation_20260817_v1",
         "training_run": False,
         "reward_modified": False,
         "policy_modified": False,
@@ -277,19 +275,43 @@ def main() -> None:
         "capacity_enabled_eviction_observed": bool(enabled_summary["eviction_count"] > 0),
         "capacity_enabled_limit_respected": bool(enabled_summary["capacity_limit_respected"]),
         "cache_occupancy_rate_observed": bool(enabled_summary["cache_occupancy_rate_max"] != "missing"),
-        "summaries": [disabled_summary, enabled_summary],
+        "mb_multi_victim_observed": any(float(row.get("eviction_count", 0) or 0) > 1 for row in mb_events),
+        "mb_oversized_rejection_observed": any("object_exceeds_total_capacity" in row.get("cache_event", "") for row in mb_events),
+        "mb_never_exceeds_capacity": bool(mb_summary["capacity_limit_respected"]),
+        "summaries": [disabled_summary, enabled_summary, mb_summary],
         "generated_artifacts": {
             "cache_capacity_validation": str(OUTPUT_DIR / "cache_capacity_validation.csv"),
             "eviction_event_validation": str(OUTPUT_DIR / "eviction_event_validation.csv"),
             "telemetry_field_coverage": str(OUTPUT_DIR / "telemetry_field_coverage.csv"),
             "diagnosis_summary": str(OUTPUT_DIR / "diagnosis_summary.json"),
+            "mb_episode_summary": str(OUTPUT_DIR / "mb_episode_summary.json"),
         },
     }
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    _write_csv(OUTPUT_DIR / "cache_capacity_validation.csv", [disabled_summary, enabled_summary])
+    _write_csv(OUTPUT_DIR / "cache_capacity_validation.csv", [disabled_summary, enabled_summary, mb_summary])
     _write_csv(OUTPUT_DIR / "eviction_event_validation.csv", all_events)
     _write_csv(OUTPUT_DIR / "telemetry_field_coverage.csv", coverage_rows)
     (OUTPUT_DIR / "diagnosis_summary.json").write_text(json.dumps(diagnosis, ensure_ascii=False, indent=2), encoding="utf-8")
+    mb_episode_summary = {
+        "cache_event_schema_version": CACHE_EVENT_SCHEMA_VERSION,
+        "cache_event_trace": [json.loads(row["cache_event"]) for row in mb_events],
+        "step_trace": [
+            {
+                "current_node_id": row["required_adapter"],
+                "cache_hit": row["cache_hit"],
+                "cache_applied": True,
+                "cache_admission_added_new_adapter": row["cache_admission_added_new_adapter"],
+                "cache_eviction": int(row["eviction_count"] or 0) > 0,
+                "eviction_count": int(row["eviction_count"] or 0),
+                "migration_prepare_requested": False,
+                "migration_prepare_realized": False,
+            }
+            for row in mb_events
+        ],
+        "system_metrics": {},
+        "handoff_summary": {},
+    }
+    (OUTPUT_DIR / "mb_episode_summary.json").write_text(json.dumps(mb_episode_summary, ensure_ascii=False, indent=2), encoding="utf-8")
     print("cache capacity eviction validation complete")
     print(f"capacity_disabled_preserves_old_behavior: {diagnosis['capacity_disabled_preserves_old_behavior']}")
     print(f"capacity_enabled_eviction_observed: {diagnosis['capacity_enabled_eviction_observed']}")

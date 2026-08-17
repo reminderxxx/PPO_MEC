@@ -1,0 +1,213 @@
+{
+  "availability": "available",
+  "event_metrics": {
+    "availability": "available",
+    "cache_event_schema_version": "1.1.0",
+    "request_event_count": 8,
+    "not_applicable_event_count": 0,
+    "total_event_count": 8,
+    "cache_hit_count": 4,
+    "cache_miss_count": 4,
+    "cache_hit_rate": 0.5,
+    "vehicle_local_hit_count": 0,
+    "current_rsu_hit_count": 4,
+    "target_rsu_hit_count": 0,
+    "neighbor_rsu_hit_count": 0,
+    "cloud_served_count": 0,
+    "unserved_count": 4,
+    "not_applicable_hit_source_count": 0,
+    "admission_request_count": 8,
+    "admission_added_count": 4,
+    "admission_noop_or_existing_count": 4,
+    "admission_reason_counts": {
+      "object_exceeds_total_capacity": 4,
+      "validation_cache_fill": 4
+    },
+    "eviction_count": 3,
+    "evicted_object_count": 3,
+    "eviction_policy_counts": {
+      "lru": 1
+    },
+    "adapter_transfer_size_mb_sum": 210.0,
+    "state_migration_size_mb_sum": 0.0,
+    "migration_request_count": 0,
+    "migration_realized_count": 0,
+    "migration_realization_rate": null,
+    "transfer_source_counts": {
+      "catalog_cache_object": 8
+    },
+    "transfer_source_size_mb_sums": {
+      "catalog_cache_object": 210.0
+    },
+    "service_success_count": 4,
+    "service_failure_count": 4,
+    "stall_count": 4,
+    "vehicle_execution_count": 0,
+    "current_rsu_execution_count": 4,
+    "target_rsu_execution_count": 0,
+    "neighbor_rsu_execution_count": 0,
+    "cloud_execution_count": 0,
+    "unserved_execution_count": 4
+  },
+  "legacy_values": {
+    "episode_step_count": 8,
+    "adapter_hit_count": 4,
+    "adapter_miss_count": 4,
+    "cache_admission_count": 8,
+    "cache_admission_added_new_adapter_count": 4,
+    "cache_eviction_count": 1,
+    "eviction_count": 3,
+    "migration_attempt_count": 0,
+    "migration_success_count": 0,
+    "migration_prepare_count": null,
+    "migration_during_handoff_count": null,
+    "backhaul_traffic_cost": null,
+    "workflow_continuity_rate": null,
+    "adapter_warm_hit_ratio": null
+  },
+  "comparisons": {
+    "request_event_count__episode_step_count": {
+      "event_derived_value": 8,
+      "legacy_value": 8,
+      "absolute_difference": 0.0,
+      "relative_difference": 0.0,
+      "mapping_class": "compatible_but_different_scope",
+      "match_status": "informational",
+      "note": "steps may include not_applicable events"
+    },
+    "cache_hit_count__adapter_hit_count": {
+      "event_derived_value": 4,
+      "legacy_value": 4,
+      "absolute_difference": 0.0,
+      "relative_difference": 0.0,
+      "mapping_class": "exact",
+      "match_status": "match",
+      "note": "both count executable request cache_hit=true under G01"
+    },
+    "cache_miss_count__adapter_miss_count": {
+      "event_derived_value": 4,
+      "legacy_value": 4,
+      "absolute_difference": 0.0,
+      "relative_difference": 0.0,
+      "mapping_class": "exact",
+      "match_status": "match",
+      "note": "both count executable request cache_hit=false under G01"
+    },
+    "admission_request_count__cache_admission_count": {
+      "event_derived_value": 8,
+      "legacy_value": 8,
+      "absolute_difference": 0.0,
+      "relative_difference": 0.0,
+      "mapping_class": "exact",
+      "match_status": "match",
+      "note": "request lifecycle admission flag"
+    },
+    "admission_added_count__cache_admission_added_new_adapter_count": {
+      "event_derived_value": 4,
+      "legacy_value": 4,
+      "absolute_difference": 0.0,
+      "relative_difference": 0.0,
+      "mapping_class": "exact",
+      "match_status": "match",
+      "note": "new adapter admission"
+    },
+    "eviction_count__cache_eviction_count": {
+      "event_derived_value": 3,
+      "legacy_value": 1,
+      "absolute_difference": 2.0,
+      "relative_difference": 2.0,
+      "mapping_class": "compatible_but_different_scope",
+      "match_status": "informational",
+      "note": "legacy cache_eviction_count counts request events; CacheEvent 1.1 eviction_count counts victims"
+    },
+    "eviction_count__eviction_count": {
+      "event_derived_value": 3,
+      "legacy_value": 3,
+      "absolute_difference": 0.0,
+      "relative_difference": 0.0,
+      "mapping_class": "exact",
+      "match_status": "match",
+      "note": "both count victims; CacheEvent 1.0 implies one victim"
+    },
+    "migration_request_count__migration_attempt_count": {
+      "event_derived_value": 0,
+      "legacy_value": 0,
+      "absolute_difference": 0.0,
+      "relative_difference": 0.0,
+      "mapping_class": "exact",
+      "match_status": "match",
+      "note": "prepare or migrate request"
+    },
+    "migration_request_count__migration_prepare_count": {
+      "event_derived_value": 0,
+      "legacy_value": null,
+      "absolute_difference": null,
+      "relative_difference": null,
+      "mapping_class": "compatible_but_different_scope",
+      "match_status": "unavailable",
+      "note": "handoff summary counts prepare mode only"
+    },
+    "migration_realized_count__migration_success_count": {
+      "event_derived_value": 0,
+      "legacy_value": 0,
+      "absolute_difference": 0.0,
+      "relative_difference": 0.0,
+      "mapping_class": "exact",
+      "match_status": "match",
+      "note": "realized prepare or migration during handoff"
+    },
+    "migration_realized_count__migration_during_handoff_count": {
+      "event_derived_value": 0,
+      "legacy_value": null,
+      "absolute_difference": null,
+      "relative_difference": null,
+      "mapping_class": "compatible_but_different_scope",
+      "match_status": "unavailable",
+      "note": "handoff-only subset may differ from realized prepare"
+    },
+    "total_transfer_size_mb__backhaul_traffic_cost": {
+      "event_derived_value": 210.0,
+      "legacy_value": null,
+      "absolute_difference": null,
+      "relative_difference": null,
+      "mapping_class": "compatible_but_different_scope",
+      "match_status": "unavailable",
+      "note": "legacy backhaul books migration at handoff; events book requested/realized migration bundle semantics"
+    },
+    "cache_hit_rate__adapter_warm_hit_ratio": {
+      "event_derived_value": 0.5,
+      "legacy_value": null,
+      "absolute_difference": null,
+      "relative_difference": null,
+      "mapping_class": "not_equivalent",
+      "match_status": "unavailable",
+      "note": "warm readiness is step-level, not request cache hit rate"
+    },
+    "stall_count__workflow_continuity_rate": {
+      "event_derived_value": 4,
+      "legacy_value": null,
+      "absolute_difference": null,
+      "relative_difference": null,
+      "mapping_class": "not_equivalent",
+      "match_status": "unavailable",
+      "note": "count and episode step-level rate have different units"
+    },
+    "hit_source_distribution__legacy": {
+      "event_derived_value": {
+        "vehicle_local_hit_count": 0,
+        "current_rsu_hit_count": 4,
+        "target_rsu_hit_count": 0,
+        "neighbor_rsu_hit_count": 0,
+        "cloud_served_count": 0,
+        "unserved_count": 4
+      },
+      "legacy_value": null,
+      "absolute_difference": null,
+      "relative_difference": null,
+      "mapping_class": "unavailable",
+      "match_status": "unavailable",
+      "note": "legacy summary has no complete request hit-source distribution"
+    }
+  },
+  "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/cache_capacity_mb_validation_20260817_v1/mb_episode_summary.json"
+}

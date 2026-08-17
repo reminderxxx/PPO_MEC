@@ -94,3 +94,4 @@
 - `artifacts/paper/`：历史 paper export；legacy v7 表格只能在明确标注 overlap limitation 时使用，strict reviewer 结论以最新审计为准
 
 新产物应写入明确的 run 目录，不应散落到仓库根目录。
+`artifacts/analysis/cache_capacity_mb_validation_<run_id>/` 保存 MB capacity contract validation 的 summary、scenario/event snapshots 与 invariant 结果，不覆盖历史 validation。

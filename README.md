@@ -1,5 +1,7 @@
 # PPO_MEC
 
+Cache capacity supports backward-compatible `adapter_slots` and resident-size `mb` modes. See `docs/project/cache_capacity_contract.md` for configuration, oversized rejection, atomic multi-victim LRU and CacheEvent 1.1 compatibility.
+
 CacheEvent `1.x` episode telemetry 可通过 `scripts/audit_cache_event_telemetry.py` 从 raw `cache_event_trace` 独立重算并与 legacy step/episode 字段分类对账；使用方法和口径见 `docs/project/RUNBOOK.md` 与 `docs/project/cache_event_contract.md`。该能力用于 contract 验证，不是新增论文指标。
 
 ## 2026-07-29 v70 sparse-tail option MAPPO 正式结果

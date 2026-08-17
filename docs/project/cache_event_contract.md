@@ -1,6 +1,6 @@
 # Cache Event Contract
 
-Version: `1.0.0`
+Version: `1.1.0`
 
 ## Lifecycle
 
@@ -22,9 +22,9 @@ Version: `1.0.0`
 - Workload: `vehicle_id`, `workflow_id`, `node_id`, `object_id`, `adapter_id`, `object_type`, `size_mb`
 - Service path: `request_rsu_id`, `selected_target_rsu_id`, `served_rsu_id`, `predicted_next_rsu_id`, `predicted_handoff_target_rsu_id`, `hit_source`
 - Lookup/admission: `cache_lookup_performed`, `cache_hit`, `was_cached_before`, `admission_requested`, `admission_added`, `admission_reason`, `cache_target_rsu_id`
-- Eviction: `eviction_occurred`, `eviction_policy`, `evicted_object_id`, `evicted_adapter_id`, `eviction_reason`
+- Eviction: frozen singular fields plus optional 1.1 `eviction_count`, ordered `evicted_object_ids`, ordered `evicted_adapter_ids`, `evicted_size_mb_sum`; singular fields identify the first LRU victim
 - Transfer/migration: `adapter_transfer_size_mb`, `state_migration_size_mb`, `transfer_source`, `migration_requested`, `migration_realized`
-- Capacity: `cache_capacity_enabled`, `cache_capacity_unit`, `cache_capacity_before`, `cache_used_before`, `cache_remaining_before`, `cache_capacity_after`, `cache_used_after`, `cache_remaining_after`
+- Capacity: existing before/after fields plus optional `requested_object_size_mb`, `capacity_rejection_reason`
 - Control/result: `action_id`, `action_name`, `cache_strategy`, `offload_mode`, `service_success`, `stall_occurred`, `handoff_event_count`
 
 ## Null and not-applicable rules

@@ -27,7 +27,7 @@ def test_cache_event_required_fields_and_json_round_trip() -> None:
         ControlAction(offload_action={"mode": "rsu"}),
     )
 
-    assert set(CacheEvent.REQUIRED_FIELDS) == set(event)
+    assert set(CacheEvent.REQUIRED_FIELDS) | set(CacheEvent.OPTIONAL_FIELDS) == set(event)
     assert event["event_schema_version"] == CACHE_EVENT_SCHEMA_VERSION
     restored = CacheEvent.from_dict(json.loads(json.dumps(event)))
     assert restored.to_dict() == event
