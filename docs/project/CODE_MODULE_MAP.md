@@ -285,5 +285,6 @@
 # 2026-08-17 Cache capacity dependency update
 
 - `src/data/model_catalog/adapter_catalog.py` 提供唯一 resident adapter MB resolver，区分 explicit CacheObject 与 64 MB legacy fallback。
-- `src/envs/core/vec_workflow_core_env.py` 负责 slot/MB normalization、initial enforcement、原子 LRU victim planning/admission 和 snapshots。
+- `src/envs/core/cache_eviction.py` 负责通用 eviction lifecycle、只读 `EvictionPlan`、LRU 1.0 状态/排序和仅注册 `lru` 的 fail-fast factory；不写 cache/catalog，也不承载 RL agent。
+- `src/envs/core/vec_workflow_core_env.py` 负责 slot/MB normalization、size/oversized/required-free、plan 验证、initial/runtime 原子 mutation 和 snapshots；通过 factory 依赖 policy，不再直接维护 LRU 排序状态。
 - `src/envs/specs/semantic_objects.py`、`src/metrics/cache_event_metrics.py` 负责 CacheEvent 1.1 multi-victim 生产、1.0/1.x 兼容消费与 legacy 对账。

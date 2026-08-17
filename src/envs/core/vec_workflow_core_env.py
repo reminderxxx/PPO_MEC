@@ -12,6 +12,7 @@ from src.data.mobility.replay_provider import ReplayProvider
 from src.data.mobility.rsu_mapper import RSUMapper
 from src.data.model_catalog.adapter_catalog import AdapterCatalog
 from src.data.workflow.toy_workflow_generator import ToyWorkflowGenerator
+from src.envs.core.cache_eviction import EvictionPlan, build_eviction_policy
 from src.envs.core.predictor_manager import PredictorManager
 from src.envs.specs import (
     CACHE_EVENT_SCHEMA_VERSION,
@@ -64,6 +65,9 @@ class VecWorkflowCoreEnv:
         self._handoff_prepare_window = max(1, int(handoff_prepare_window))
         self._reward_positive_offset = max(float(reward_positive_offset), 0.0)
         self._cache_capacity_profile = self._normalize_cache_capacity_profile(cache_capacity_profile)
+        self._eviction_policy = build_eviction_policy(
+            self._cache_capacity_profile["eviction_policy"]
+        )
 
         self._handoff_builder = HandoffBuilder()
         self._mapper = RSUMapper(deepcopy(self._rsu_template))
@@ -75,7 +79,7 @@ class VecWorkflowCoreEnv:
         self._episode_steps = 0
         self._last_state: dict[str, Any] = {}
         self._prepare_history: list[dict[str, Any]] = []
-        self._cache_last_used_step: dict[str, dict[str, int]] = {}
+        self._last_eviction_plan: dict[str, Any] | None = None
         self._primary_vehicle_id: str | None = None
         self._node_service_steps: dict[str, int] = {}
         self._node_remaining_service_steps: dict[str, int] = {}
@@ -85,6 +89,14 @@ class VecWorkflowCoreEnv:
         """Return the per-step positive reward offset used by this env."""
         return self._reward_positive_offset
 
+    def export_cache_eviction_policy_state(self) -> dict[str, Any]:
+        """Return a detached policy snapshot for debugging and artifact audit."""
+        return self._eviction_policy.export_state()
+
+    def export_last_eviction_plan(self) -> dict[str, Any] | None:
+        """Return the last planned victim selection without exposing live state."""
+        return deepcopy(self._last_eviction_plan)
+
     def reset(self) -> tuple[dict[str, Any], dict[str, Any]]:
         """重置环境并返回语义状态字典。"""
         self._episode_steps = 0
@@ -93,7 +105,7 @@ class VecWorkflowCoreEnv:
         self.rsu_states = deepcopy(self._rsu_template)
         self._predictor_manager.reset()
         self._prepare_history = []
-        self._cache_last_used_step = {}
+        self._last_eviction_plan = None
         self._primary_vehicle_id = None
         self._node_service_steps = self._build_node_service_step_plan(self.workflow_state)
         self._node_remaining_service_steps = dict(self._node_service_steps)
@@ -583,48 +595,112 @@ class VecWorkflowCoreEnv:
         return len(unique_adapters)
 
     def _initialize_cache_capacity_metadata(self) -> None:
-        self._cache_last_used_step = {}
+        self._eviction_policy.reset()
         for rsu in self.rsu_states:
-            self._cache_last_used_step[rsu.rsu_id] = {}
-            for index, adapter_id in enumerate(list(rsu.cached_adapter_ids)):
-                self._cache_last_used_step[rsu.rsu_id][adapter_id] = -len(rsu.cached_adapter_ids) + index
+            self._eviction_policy.reset(
+                rsu_id=rsu.rsu_id,
+                initial_resident_ids=list(rsu.cached_adapter_ids),
+                current_step=self._episode_steps,
+            )
             if self._cache_capacity_enabled():
                 self._enforce_initial_cache_capacity(rsu)
 
     def _enforce_initial_cache_capacity(self, rsu: RSUState) -> None:
         capacity = self._cache_capacity_value()
-        while capacity is not None and self._cache_used_value(rsu) > float(capacity) + CACHE_CAPACITY_EPSILON:
-            evicted_adapter_id = min(
-                list(dict.fromkeys(rsu.cached_adapter_ids)),
-                key=lambda item: (self._cache_last_used_step[rsu.rsu_id].get(item, -10**9), item),
-            )
+        if capacity is None:
+            return
+        used = float(self._cache_used_value(rsu))
+        required = max(used - float(capacity), 0.0)
+        if required <= CACHE_CAPACITY_EPSILON:
+            return
+        plan = self._eviction_policy.plan_victims(
+            rsu_id=rsu.rsu_id,
+            resident_ids=list(rsu.cached_adapter_ids),
+            resident_sizes=self._resident_sizes_for_policy(rsu),
+            required_free_capacity=required,
+            protected_object_id=None,
+            capacity_unit=self._cache_capacity_profile["unit"],
+            current_step=self._episode_steps,
+        )
+        self._validate_eviction_plan(
+            plan=plan,
+            rsu=rsu,
+            required_free_capacity=required,
+            protected_object_id=None,
+        )
+        if not plan.sufficient:
+            raise RuntimeError("initial cache cannot be trimmed to configured capacity")
+        self._last_eviction_plan = plan.to_dict()
+        for evicted_adapter_id in plan.ordered_victim_ids:
+            if evicted_adapter_id not in rsu.cached_adapter_ids:
+                raise RuntimeError("eviction policy selected a non-resident initial-cache victim")
             rsu.cached_adapter_ids.remove(evicted_adapter_id)
-            self._cache_last_used_step.get(rsu.rsu_id, {}).pop(evicted_adapter_id, None)
+            self._eviction_policy.on_eviction(
+                rsu_id=rsu.rsu_id,
+                object_id=evicted_adapter_id,
+                current_step=self._episode_steps,
+            )
             self._remove_catalog_cached_adapter(rsu.rsu_id, evicted_adapter_id)
 
     def _touch_cached_adapter(self, rsu_id: str | None, adapter_id: str | None) -> None:
-        if not self._cache_capacity_enabled() or not rsu_id or not adapter_id:
+        if not rsu_id or not adapter_id:
             return
-        self._cache_last_used_step.setdefault(rsu_id, {})[adapter_id] = int(self._episode_steps)
+        self._eviction_policy.on_hit(
+            rsu_id=rsu_id,
+            object_id=adapter_id,
+            current_step=self._episode_steps,
+        )
+
+    def _resident_sizes_for_policy(self, rsu: RSUState) -> dict[str, float]:
+        if self._cache_capacity_profile["unit"] == "mb":
+            return {
+                adapter_id: self._adapter_resident_size_mb(adapter_id)
+                for adapter_id in dict.fromkeys(rsu.cached_adapter_ids)
+            }
+        return {adapter_id: 1.0 for adapter_id in dict.fromkeys(rsu.cached_adapter_ids)}
+
+    def _validate_eviction_plan(
+        self,
+        *,
+        plan: EvictionPlan,
+        rsu: RSUState,
+        required_free_capacity: float,
+        protected_object_id: str | None,
+    ) -> None:
+        residents = list(dict.fromkeys(rsu.cached_adapter_ids))
+        victims = list(plan.ordered_victim_ids)
+        if plan.rsu_id != rsu.rsu_id:
+            raise RuntimeError("eviction plan RSU does not match admission target")
+        if (
+            plan.policy_name != self._eviction_policy.policy_name
+            or plan.policy_version != self._eviction_policy.policy_version
+        ):
+            raise RuntimeError("eviction plan identity does not match configured policy")
+        if plan.capacity_unit != self._cache_capacity_profile["unit"]:
+            raise RuntimeError("eviction plan capacity unit does not match environment")
+        if (
+            abs(float(plan.required_free_capacity) - float(required_free_capacity))
+            > CACHE_CAPACITY_EPSILON
+        ):
+            raise RuntimeError("eviction plan required capacity does not match environment")
+        if len(victims) != len(set(victims)):
+            raise RuntimeError("eviction policy selected duplicate victims")
+        if any(victim not in residents for victim in victims):
+            raise RuntimeError("eviction policy selected a non-resident victim")
+        if protected_object_id is not None and protected_object_id in victims:
+            raise RuntimeError("eviction policy selected the protected incoming object")
+        sizes = self._resident_sizes_for_policy(rsu)
+        actual_freed = sum(sizes[victim] for victim in victims)
+        if abs(actual_freed - float(plan.cumulative_freed_capacity)) > CACHE_CAPACITY_EPSILON:
+            raise RuntimeError("eviction plan freed capacity does not match resident sizes")
+        if bool(actual_freed + CACHE_CAPACITY_EPSILON >= required_free_capacity) != plan.sufficient:
+            raise RuntimeError("eviction plan sufficient flag is inconsistent")
 
     def _remove_catalog_cached_adapter(self, rsu_id: str, adapter_id: str) -> None:
         for profile in self.adapter_catalog.rsu_adapter_caches:
             if profile.rsu_id == rsu_id and adapter_id in profile.cached_adapter_ids:
                 profile.cached_adapter_ids.remove(adapter_id)
                 return
-
-    def _evict_lru_adapter(self, rsu: RSUState) -> str | None:
-        if not rsu.cached_adapter_ids:
-            return None
-        last_used = self._cache_last_used_step.setdefault(rsu.rsu_id, {})
-        evicted_adapter_id = min(
-            list(rsu.cached_adapter_ids),
-            key=lambda adapter_id: (last_used.get(adapter_id, -10**9), adapter_id),
-        )
-        rsu.cached_adapter_ids.remove(evicted_adapter_id)
-        last_used.pop(evicted_adapter_id, None)
-        self._remove_catalog_cached_adapter(rsu.rsu_id, evicted_adapter_id)
-        return evicted_adapter_id
 
     def _cache_capacity_snapshot(self, rsu_id: str | None) -> dict[str, Any]:
         capacity_enabled = self._cache_capacity_enabled()
@@ -709,6 +785,7 @@ class VecWorkflowCoreEnv:
         capacity_before = self._cache_capacity_snapshot(execution_target_rsu_id)
         added_new_adapter = False
         evicted_adapter_ids: list[str] = []
+        eviction_plan: EvictionPlan | None = None
         rejection_reason = None
         if adapter_id not in rsu.cached_adapter_ids:
             if self._cache_capacity_enabled():
@@ -718,27 +795,49 @@ class VecWorkflowCoreEnv:
                     rejection_reason = "object_exceeds_total_capacity"
                 else:
                     used = float(self._cache_used_value(rsu))
-                    last_used = self._cache_last_used_step.setdefault(rsu.rsu_id, {})
-                    for victim in sorted(
-                        list(dict.fromkeys(rsu.cached_adapter_ids)),
-                        key=lambda item: (last_used.get(item, -10**9), item),
-                    ):
-                        if used + object_size <= capacity + CACHE_CAPACITY_EPSILON:
-                            break
-                        evicted_adapter_ids.append(victim)
-                        used -= self._adapter_resident_size_mb(victim) if self._cache_capacity_profile["unit"] == "mb" else 1.0
-                    if used + object_size > capacity + CACHE_CAPACITY_EPSILON:
+                    required = max(used + object_size - capacity, 0.0)
+                    if required > CACHE_CAPACITY_EPSILON:
+                        eviction_plan = self._eviction_policy.plan_victims(
+                            rsu_id=rsu.rsu_id,
+                            resident_ids=list(rsu.cached_adapter_ids),
+                            resident_sizes=self._resident_sizes_for_policy(rsu),
+                            required_free_capacity=required,
+                            protected_object_id=adapter_id,
+                            capacity_unit=self._cache_capacity_profile["unit"],
+                            current_step=self._episode_steps,
+                        )
+                        self._validate_eviction_plan(
+                            plan=eviction_plan,
+                            rsu=rsu,
+                            required_free_capacity=required,
+                            protected_object_id=adapter_id,
+                        )
+                        self._last_eviction_plan = eviction_plan.to_dict()
+                        evicted_adapter_ids = list(eviction_plan.ordered_victim_ids)
+                    if eviction_plan is not None and not eviction_plan.sufficient:
                         rejection_reason = "insufficient_evictable_capacity"
                         evicted_adapter_ids = []
             if rejection_reason is None:
+                if any(victim not in rsu.cached_adapter_ids for victim in evicted_adapter_ids):
+                    raise RuntimeError("eviction policy selected a non-resident victim")
                 for victim in evicted_adapter_ids:
                     rsu.cached_adapter_ids.remove(victim)
-                    self._cache_last_used_step[rsu.rsu_id].pop(victim, None)
+                    self._eviction_policy.on_eviction(
+                        rsu_id=rsu.rsu_id,
+                        object_id=victim,
+                        current_step=self._episode_steps,
+                    )
                     self._remove_catalog_cached_adapter(rsu.rsu_id, victim)
                 rsu.cached_adapter_ids.append(adapter_id)
                 self.adapter_catalog.ensure_cached_adapter(execution_target_rsu_id, adapter_id)
+                self._eviction_policy.on_admission(
+                    rsu_id=execution_target_rsu_id,
+                    object_id=adapter_id,
+                    current_step=self._episode_steps,
+                )
                 added_new_adapter = True
-        self._touch_cached_adapter(execution_target_rsu_id, adapter_id)
+        if was_cached_before:
+            self._touch_cached_adapter(execution_target_rsu_id, adapter_id)
         evicted_size_mb_sum = sum(self._adapter_resident_size_mb(item) for item in evicted_adapter_ids)
         return {
             "requested": True,
@@ -757,6 +856,7 @@ class VecWorkflowCoreEnv:
             "requested_object_size_mb": size_resolution.size_mb,
             "resident_size_source": size_resolution.source,
             "capacity_rejection_reason": rejection_reason,
+            "eviction_plan": eviction_plan.to_dict() if eviction_plan is not None else None,
             "strategy": strategy,
             "prediction_driven": prediction_driven,
             "cache_target_corrected_by_handoff": cache_target_corrected_by_handoff,

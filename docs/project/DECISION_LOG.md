@@ -756,3 +756,11 @@
 ## 2026-08-17: 冻结 MB cache capacity contract
 
 保留 disabled 与 `adapter_slots`，新增显式 `unit=mb, capacity_mb>0`。resident size 统一由 AdapterCatalog 解析；runtime 先规划最小 LRU victim 前缀再原子应用，oversized 不清空现有 cache。CacheEvent 以可选字段升级到 1.1，旧 singular victim 固定表示首个 LRU victim。不扩展 reward/action，也不实现 EvictionPolicy、LFU/FIFO/Random、独立 LRU baseline、正式 byte metrics 或 oracle。
+
+## 2026-08-17: Eviction policy 与环境 mutation 分离，LRU 作为首个 contract implementation
+
+- 决策：在 `src/envs/core/cache_eviction.py` 建立 policy identity、lifecycle、只读 victim plan、state export 和最小 factory；当前只注册 LRU。
+- 原因：G03 已冻结 slot/MB、oversized、multi-victim 与原子 admission 语义，后续公平比较需要让 victim 算法可替换且可解释，同时避免 policy 接管环境容量和 telemetry 职责。
+- 冻结语义：LRU 使用 episode step；初始顺序为 `-N..-1`；tie-break 为 `(last_used_step, adapter_id)`；multi-victim 是最小充分前缀。环境先拒绝 oversized，只在完整 plan sufficient 后原子 mutation。
+- 兼容边界：CacheEvent 保持 1.1.0，无新增 schema 字段；legacy singular victim 仍指向第一个 victim。LRU 仍非 benchmark agent，FIFO/LFU/Aging-LFU/Random 未实现。
+- 证据：`tests/test_cache_eviction_policy.py` 与 `artifacts/analysis/cache_eviction_policy_lru_validation_20260817_v1/`。

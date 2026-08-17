@@ -1,0 +1,40 @@
+{
+  "policy_name": "lru",
+  "policy_version": "1.0.0",
+  "deterministic": true,
+  "requires_seed": false,
+  "capacity_units_supported": [
+    "adapter_slots",
+    "mb"
+  ],
+  "selection_key": [
+    "last_used_step",
+    "object_id"
+  ],
+  "clock": "episode_step",
+  "seed_consumed": false,
+  "rsus": {
+    "rsu_a": {
+      "lru_order_oldest_first": [
+        "b",
+        "c"
+      ],
+      "resident_metadata": {
+        "b": {
+          "last_used_step": -2,
+          "admitted_step": 0,
+          "initial_admission_order": 1,
+          "last_event": "reset_initial_admission",
+          "last_event_sequence": 2
+        },
+        "c": {
+          "last_used_step": -1,
+          "admitted_step": 0,
+          "initial_admission_order": 2,
+          "last_event": "reset_initial_admission",
+          "last_event_sequence": 3
+        }
+      }
+    }
+  }
+}

@@ -12,6 +12,17 @@
 
 脚本拒绝覆盖同名结果。历史 summary 缺 trace 时输出 `availability=unavailable`，不伪造零命中；不同 scope 字段只作 informational 对照。该入口只验证 contract telemetry，不产出论文级 cache efficiency 指标。
 
+## LRU eviction policy contract validation
+
+以下验证只证明 G03 行为等价和 policy 可审计，不是性能 benchmark：
+
+```bash
+.venv/bin/python -m pytest tests/test_cache_eviction_policy.py -q
+.venv/bin/python scripts/validate_cache_eviction_policy.py
+```
+
+输出目录为 `artifacts/analysis/cache_eviction_policy_lru_validation_20260817_v1/`，包含 `diagnosis_summary.json`、`victim_plan_rows.json` 和 `exported_policy_state.json`。既有容量回归仍运行 `scripts/validate_cache_capacity_eviction.py`。LRU 未加入正式算法池；FIFO/LFU/Random 不可作为配置值。
+
 ## Git LFS 数据恢复
 
 `data/` 由 Git LFS 管理。新主机首次检出后执行：

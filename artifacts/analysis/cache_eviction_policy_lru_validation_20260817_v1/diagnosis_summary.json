@@ -1,0 +1,146 @@
+{
+  "run_id": "cache_eviction_policy_lru_validation_20260817_v1",
+  "purpose": "G03 structural parity; not a performance experiment",
+  "policy_identity": {
+    "policy_name": "lru",
+    "policy_version": "1.0.0",
+    "deterministic": true,
+    "requires_seed": false,
+    "capacity_units_supported": [
+      "adapter_slots",
+      "mb"
+    ],
+    "selection_key": [
+      "last_used_step",
+      "object_id"
+    ],
+    "clock": "episode_step",
+    "seed_consumed": false,
+    "rsus": {
+      "rsu_a": {
+        "lru_order_oldest_first": [
+          "a",
+          "z"
+        ],
+        "resident_metadata": {
+          "a": {
+            "last_used_step": 2,
+            "admitted_step": 2,
+            "initial_admission_order": null,
+            "last_event": "admission",
+            "last_event_sequence": 2
+          },
+          "z": {
+            "last_used_step": 2,
+            "admitted_step": 2,
+            "initial_admission_order": null,
+            "last_event": "admission",
+            "last_event_sequence": 1
+          }
+        }
+      }
+    }
+  },
+  "all_victim_cases_match_g03": true,
+  "multi_victim_order_matches_g03": true,
+  "hit_recency_victim": [
+    "b"
+  ],
+  "hit_recency_expected": [
+    "b"
+  ],
+  "tie_break_victim": [
+    "a"
+  ],
+  "tie_break_expected": [
+    "a"
+  ],
+  "initial_trim_final_cache": [
+    "b",
+    "c"
+  ],
+  "reset_isolation": true,
+  "disabled_victim_planning_absent": true,
+  "disabled_admission_behavior_preserved": true,
+  "event_parity": {
+    "reward_total": 2.749999999999999,
+    "reward_matches_g03": true,
+    "final_cache": [
+      "adapter_lane"
+    ],
+    "final_cache_matches_g03": true,
+    "cache_event": {
+      "event_id": "cache-event-000001",
+      "event_schema_version": "1.1.0",
+      "event_type": "request",
+      "time_index": 1,
+      "episode_step_index": 1,
+      "vehicle_id": "veh_1",
+      "workflow_id": "wf_toy_1",
+      "node_id": "n1",
+      "object_id": "adapter:adapter_perception",
+      "adapter_id": "adapter_perception",
+      "object_type": "adapter",
+      "size_mb": 64.0,
+      "request_rsu_id": "rsu_a",
+      "selected_target_rsu_id": "rsu_a",
+      "served_rsu_id": null,
+      "predicted_next_rsu_id": "rsu_a",
+      "predicted_handoff_target_rsu_id": "rsu_b",
+      "hit_source": "unserved",
+      "cache_lookup_performed": true,
+      "cache_hit": false,
+      "was_cached_before": false,
+      "admission_requested": true,
+      "admission_added": true,
+      "admission_reason": "reactive_cache_fill",
+      "cache_target_rsu_id": "rsu_a",
+      "eviction_occurred": true,
+      "eviction_policy": "lru",
+      "evicted_object_id": "adapter:adapter_perception",
+      "evicted_adapter_id": "adapter_perception",
+      "eviction_reason": "capacity_limit",
+      "adapter_transfer_size_mb": 64.0,
+      "state_migration_size_mb": 0.0,
+      "transfer_source": "catalog_fallback",
+      "migration_requested": false,
+      "migration_realized": false,
+      "cache_capacity_enabled": true,
+      "cache_capacity_unit": "adapter_slots",
+      "cache_capacity_before": 1,
+      "cache_used_before": 1,
+      "cache_remaining_before": 0.0,
+      "cache_capacity_after": 1,
+      "cache_used_after": 1,
+      "cache_remaining_after": 0.0,
+      "action_id": null,
+      "action_name": null,
+      "cache_strategy": "reactive_cache_fill",
+      "offload_mode": "rsu",
+      "service_success": false,
+      "stall_occurred": true,
+      "handoff_event_count": 0,
+      "eviction_count": 1,
+      "evicted_object_ids": [
+        "adapter:adapter_perception"
+      ],
+      "evicted_adapter_ids": [
+        "adapter_perception"
+      ],
+      "evicted_size_mb_sum": 64.0,
+      "requested_object_size_mb": 64.0,
+      "capacity_rejection_reason": null
+    },
+    "cache_event_matches_g03": true,
+    "legacy_telemetry": {
+      "cache_eviction": true,
+      "eviction_count": 1,
+      "evicted_adapter_id": "adapter_perception",
+      "cache_admission_added_new_adapter": true,
+      "cache_hit": false,
+      "cache_used_size": 1,
+      "cache_remaining_size": 0.0
+    },
+    "legacy_telemetry_matches_g03": true
+  }
+}

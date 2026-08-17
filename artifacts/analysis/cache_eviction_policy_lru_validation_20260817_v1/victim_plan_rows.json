@@ -1,0 +1,224 @@
+[
+  {
+    "case": "slot_single",
+    "before": [
+      "a",
+      "b"
+    ],
+    "incoming": "c",
+    "expected_g03_victims": [
+      "a"
+    ],
+    "actual_victims": [
+      "a"
+    ],
+    "victim_parity": true,
+    "final_cache": [
+      "b",
+      "c"
+    ],
+    "admission_added": true,
+    "capacity_used": 2,
+    "capacity_remaining": 0.0,
+    "eviction_plan": {
+      "rsu_id": "rsu_a",
+      "ordered_victim_ids": [
+        "a"
+      ],
+      "victim_sizes": [
+        1.0
+      ],
+      "cumulative_freed_capacity": 1.0,
+      "required_free_capacity": 1.0,
+      "capacity_unit": "adapter_slots",
+      "policy_name": "lru",
+      "policy_version": "1.0.0",
+      "ordered_candidates": [
+        "a",
+        "b"
+      ],
+      "candidate_recency": [
+        {
+          "rank": 0,
+          "object_id": "a",
+          "last_used_step": -2,
+          "admitted_step": 0,
+          "initial_admission_order": 0,
+          "last_event": "reset_initial_admission",
+          "selection_key": [
+            -2,
+            "a"
+          ]
+        },
+        {
+          "rank": 1,
+          "object_id": "b",
+          "last_used_step": -1,
+          "admitted_step": 0,
+          "initial_admission_order": 1,
+          "last_event": "reset_initial_admission",
+          "selection_key": [
+            -1,
+            "b"
+          ]
+        }
+      ],
+      "sufficient": true,
+      "selection_reason": "lru_minimum_prefix_sufficient"
+    }
+  },
+  {
+    "case": "mb_single",
+    "before": [
+      "a",
+      "b"
+    ],
+    "incoming": "c",
+    "expected_g03_victims": [
+      "a"
+    ],
+    "actual_victims": [
+      "a"
+    ],
+    "victim_parity": true,
+    "final_cache": [
+      "b",
+      "c"
+    ],
+    "admission_added": true,
+    "capacity_used": 6.0,
+    "capacity_remaining": 1.0,
+    "eviction_plan": {
+      "rsu_id": "rsu_a",
+      "ordered_victim_ids": [
+        "a"
+      ],
+      "victim_sizes": [
+        3.0
+      ],
+      "cumulative_freed_capacity": 3.0,
+      "required_free_capacity": 2.0,
+      "capacity_unit": "mb",
+      "policy_name": "lru",
+      "policy_version": "1.0.0",
+      "ordered_candidates": [
+        "a",
+        "b"
+      ],
+      "candidate_recency": [
+        {
+          "rank": 0,
+          "object_id": "a",
+          "last_used_step": -2,
+          "admitted_step": 0,
+          "initial_admission_order": 0,
+          "last_event": "reset_initial_admission",
+          "selection_key": [
+            -2,
+            "a"
+          ]
+        },
+        {
+          "rank": 1,
+          "object_id": "b",
+          "last_used_step": -1,
+          "admitted_step": 0,
+          "initial_admission_order": 1,
+          "last_event": "reset_initial_admission",
+          "selection_key": [
+            -1,
+            "b"
+          ]
+        }
+      ],
+      "sufficient": true,
+      "selection_reason": "lru_minimum_prefix_sufficient"
+    }
+  },
+  {
+    "case": "mb_multi",
+    "before": [
+      "a",
+      "b",
+      "c"
+    ],
+    "incoming": "d",
+    "expected_g03_victims": [
+      "a",
+      "b"
+    ],
+    "actual_victims": [
+      "a",
+      "b"
+    ],
+    "victim_parity": true,
+    "final_cache": [
+      "c",
+      "d"
+    ],
+    "admission_added": true,
+    "capacity_used": 10.0,
+    "capacity_remaining": 0.0,
+    "eviction_plan": {
+      "rsu_id": "rsu_a",
+      "ordered_victim_ids": [
+        "a",
+        "b"
+      ],
+      "victim_sizes": [
+        3.0,
+        3.0
+      ],
+      "cumulative_freed_capacity": 6.0,
+      "required_free_capacity": 6.0,
+      "capacity_unit": "mb",
+      "policy_name": "lru",
+      "policy_version": "1.0.0",
+      "ordered_candidates": [
+        "a",
+        "b",
+        "c"
+      ],
+      "candidate_recency": [
+        {
+          "rank": 0,
+          "object_id": "a",
+          "last_used_step": -3,
+          "admitted_step": 0,
+          "initial_admission_order": 0,
+          "last_event": "reset_initial_admission",
+          "selection_key": [
+            -3,
+            "a"
+          ]
+        },
+        {
+          "rank": 1,
+          "object_id": "b",
+          "last_used_step": -2,
+          "admitted_step": 0,
+          "initial_admission_order": 1,
+          "last_event": "reset_initial_admission",
+          "selection_key": [
+            -2,
+            "b"
+          ]
+        },
+        {
+          "rank": 2,
+          "object_id": "c",
+          "last_used_step": -1,
+          "admitted_step": 0,
+          "initial_admission_order": 2,
+          "last_event": "reset_initial_admission",
+          "selection_key": [
+            -1,
+            "c"
+          ]
+        }
+      ],
+      "sufficient": true,
+      "selection_reason": "lru_minimum_prefix_sufficient"
+    }
+  }
+]

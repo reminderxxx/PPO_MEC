@@ -84,13 +84,17 @@ def test_mb_direct_exact_single_and_multi_victim_admission() -> None:
 def test_oversized_and_already_cached_are_atomic_noops() -> None:
     env = _env(cached=["a", "b"], capacity=5.0, sizes={"a": 2.0, "b": 3.0, "huge": 6.0})
     before = list(env.rsu_states[0].cached_adapter_ids)
+    policy_before = env.export_cache_eviction_policy_state()
     oversized = _admit(env, "huge")
     assert oversized["capacity_rejection_reason"] == "object_exceeds_total_capacity"
     assert oversized["eviction_count"] == 0
     assert env.rsu_states[0].cached_adapter_ids == before
+    assert env.export_cache_eviction_policy_state() == policy_before
     repeated = _admit(env, "a")
     assert repeated["added_new_adapter"] is False
     assert repeated["cache_used_size"] == 5.0
+    metadata = env.export_cache_eviction_policy_state()["rsus"]["rsu_a"]["resident_metadata"]
+    assert metadata["a"]["last_event"] == "hit"
 
 
 def test_initial_cache_enforcement_uses_sizes_and_lru_order() -> None:
@@ -99,6 +103,8 @@ def test_initial_cache_enforcement_uses_sizes_and_lru_order() -> None:
     snapshot = env._cache_capacity_snapshot("rsu_a")
     assert snapshot["cache_used_size"] == 7.0
     assert snapshot["cache_remaining_size"] == 0.0
+    state = env.export_cache_eviction_policy_state()["rsus"]["rsu_a"]
+    assert state["lru_order_oldest_first"] == ["b", "c"]
 
 
 def test_disabled_and_slot_legacy_snapshots() -> None:

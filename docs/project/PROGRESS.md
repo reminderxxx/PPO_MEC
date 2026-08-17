@@ -1,5 +1,13 @@
 ﻿# Progress
 
+## 2026-08-17: Eviction Policy Contract and G03-compatible LRU migration
+
+- 新增 `src/envs/core/cache_eviction.py`：稳定 lifecycle（`reset/on_admission/on_hit/on_eviction/plan_victims/export_state`）、可序列化 `EvictionPlan`、确定性 `LRUEvictionPolicy` 和 fail-fast factory。当前仅注册 `lru`，不包含 FIFO/LFU/Random。
+- `VecWorkflowCoreEnv` 不再保存 `_cache_last_used_step` 或直接排序 victim；环境继续负责 capacity/size/oversized/required-free 计算、plan 验证、catalog/cache 原子写入及 CacheEvent/legacy telemetry。disabled 不规划 victim，oversized 在规划前拒绝。
+- LRU 保持 G03 语义：初始目录顺序映射为 `-N..-1`，运行时使用 episode step，排序键为 `(last_used_step, adapter_id)`，multi-victim 为满足所需释放量的最小有序前缀。initial trimming 与 runtime admission 共用同一 policy 状态和 plan 接口。
+- 独立 contract 测试和 `scripts/validate_cache_eviction_policy.py` 覆盖 identity/factory、RSU/reset 隔离、hit/admission、slot/MB single/multi victim、tie-break、protected/insufficient、read-only plan、cleanup、disabled 与 initial trim。parity artifact：`artifacts/analysis/cache_eviction_policy_lru_validation_20260817_v1/`。
+- 本轮是结构与算法身份重构，不是性能优化；LRU 未进入正式 benchmark，reward/action/PPO/MAPPO/SA-GHMAPPO、数据集与 CacheEvent schema 均未修改。
+
 ## 2026-08-14: CacheEvent independent reduction and telemetry reconciliation
 
 - 新增 pure reducer `src/metrics/cache_event_metrics.py`，仅消费 raw `cache_event_trace` 与 schema version，可独立重算 request/hit source/admission/eviction/transfer/migration/service/execution；缺 trace 明确为 unavailable，空 trace 保持 available-empty。
