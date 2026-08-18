@@ -1,6 +1,6 @@
 # PPO_MEC
 
-Cache capacity supports backward-compatible `adapter_slots` and resident-size `mb` modes. Eviction now uses the auditable policy contract in `src/envs/core/cache_eviction.py`; only deterministic LRU is registered, and it remains an environment primitive rather than a benchmark baseline. See `docs/project/cache_capacity_contract.md` and `docs/project/cache_eviction_policy_contract.md`.
+Cache capacity supports backward-compatible `adapter_slots` and resident-size `mb` modes. The auditable eviction factory registers LRU, FIFO, LFU, Aging-LFU and seeded Random. Five matched `reactive_*` classical baselines share one reactive admission/control contract and differ only in eviction; see `docs/project/classical_cache_baseline_contract.md` and validate with `python scripts/validate_classical_cache_baselines.py`. These are benchmark-ready mechanism baselines, not paper-grade results or full cooperative caching algorithms.
 
 CacheEvent `1.x` episode telemetry 可通过 `scripts/audit_cache_event_telemetry.py` 从 raw `cache_event_trace` 独立重算并与 legacy step/episode 字段分类对账；使用方法和口径见 `docs/project/RUNBOOK.md` 与 `docs/project/cache_event_contract.md`。该能力用于 contract 验证，不是新增论文指标。
 

@@ -34,3 +34,7 @@ Initialization trimming and runtime admission use the same policy state and plan
 An `EvictionPlan` contains `policy_name`, `policy_version`, `ordered_candidates`, `candidate_recency`, `ordered_victim_ids`, `victim_sizes`, `required_free_capacity`, `cumulative_freed_capacity`, `capacity_unit`, `sufficient` and `selection_reason`. `VecWorkflowCoreEnv.export_cache_eviction_policy_state()` and `export_last_eviction_plan()` expose detached debug snapshots; existing CacheEvent 1.1 fields and legacy first-victim compatibility are unchanged.
 
 G03 parity evidence is produced by `scripts/validate_cache_eviction_policy.py` under `artifacts/analysis/cache_eviction_policy_lru_validation_20260817_v1/`. It covers disabled admission, slot and MB victims, MB multi-victim order, hit refresh, same-step tie-break, RSU/reset isolation, initial trim, final cache and exported state. This artifact is contract validation only and cannot support claims of LRU performance superiority.
+
+# 1.1 classical policy extension (2026-08-18)
+
+Factory 精确注册 `lru/fifo/lfu/aging_lfu/random`。冻结排序、aging 与 seed 语义见 `classical_cache_baseline_contract.md`。`EvictionPlan.candidate_recency` 保持 1.x 兼容字段名并承载各 policy evidence；未升级 CacheEvent schema。

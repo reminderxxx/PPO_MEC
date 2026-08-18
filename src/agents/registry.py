@@ -6,6 +6,15 @@ from typing import Any
 
 from src.agents.base_agent import BaseAgent
 from src.agents.cache_offload_agent import CacheOffloadDRLAgent
+from src.agents.classical_cache_agent import (
+    BASELINE_SCOPE,
+    CONTROL_POLICY,
+    ReactiveAgingLFUAgent,
+    ReactiveFIFOAgent,
+    ReactiveLFUAgent,
+    ReactiveLRUAgent,
+    ReactiveRandomAgent,
+)
 from src.agents.dag_offload_agent import DAGOffloadDRLAgent
 from src.agents.dqn_agent import DDQNAgent, DQNAgent, DuelingDDQNAgent, DuelingDQNAgent
 from src.agents.dt_handoff_agent import DTHandoffDRLAgent
@@ -184,6 +193,54 @@ ALGO_REGISTRY: dict[str, dict[str, Any]] = {
         "notes": "Popularity-aware cache and simple prediction-aware offload heuristic baseline.",
     },
 }
+
+for _agent_name, _agent_class, _policy_name, _requires_seed in (
+    ("reactive_lru", ReactiveLRUAgent, "lru", False),
+    ("reactive_fifo", ReactiveFIFOAgent, "fifo", False),
+    ("reactive_lfu", ReactiveLFUAgent, "lfu", False),
+    ("reactive_aging_lfu", ReactiveAgingLFUAgent, "aging_lfu", False),
+    ("reactive_random", ReactiveRandomAgent, "random", True),
+):
+    ALGO_REGISTRY[_agent_name] = {
+        "class": _agent_class,
+        "support_level": "heuristic",
+        "priority_tier": "classical",
+        "checkpoint_required": False,
+        "family": "classical_cache",
+        "control_policy": CONTROL_POLICY,
+        "required_eviction_policy": _policy_name,
+        "eviction_policy": _policy_name,
+        "eviction_policy_version": "1.0.0",
+        "capacity_contract": "cache_capacity_contract_v1",
+        "observation_contract": ReactiveGreedyAgent.observation_contract,
+        "action_contract": ReactiveGreedyAgent.action_contract,
+        "uses_prediction": False,
+        "uses_learning": False,
+        "requires_seed": _requires_seed,
+        "baseline_scope": BASELINE_SCOPE,
+        "notes": f"{BASELINE_SCOPE}; not full cooperative caching.",
+    }
+
+
+def validate_agent_eviction_binding(agent_name: str, cache_capacity_profile: dict[str, Any] | None, *, run_seed: int | None = None) -> dict[str, Any] | None:
+    """Bind classical identity to the environment policy and fail on mismatch."""
+    spec = ALGO_REGISTRY.get(agent_name)
+    required = None if spec is None else spec.get("required_eviction_policy")
+    if required is None:
+        return cache_capacity_profile
+    profile = dict(cache_capacity_profile or {})
+    actual = str(profile.get("eviction_policy") or "").strip().lower()
+    if actual != required:
+        raise ValueError(f"agent {agent_name} requires eviction_policy={required}, got {actual or '<missing>'}")
+    if required == "random":
+        supplied = profile.get("eviction_policy_seed")
+        if supplied is None:
+            if run_seed is None:
+                raise ValueError("reactive_random requires eviction_policy_seed or run_seed")
+            profile["eviction_policy_seed"] = int(run_seed)
+        elif run_seed is not None and int(supplied) != int(run_seed):
+            raise ValueError("reactive_random policy seed must equal benchmark run seed")
+    return profile
 
 
 def build_agent(agent_name: str, **kwargs: Any) -> BaseAgent:

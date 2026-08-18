@@ -741,3 +741,11 @@ Legacy gate 结论：
 ```
 
 输出写入 `artifacts/analysis/cache_capacity_mb_validation_20260817_v1/`，包含 summary、scenario/event snapshots 与 invariants。该 smoke artifact 不用于论文结论。
+
+# Classical cache baseline validation
+
+```bash
+.venv/bin/python scripts/validate_classical_cache_baselines.py
+```
+
+该命令运行相同 request stream、initial cache、slot capacity、reactive control 和 system seed 的 controlled 五算法验证。Random policy seed 等于 run seed。产物位于 `artifacts/analysis/classical_cache_baseline_validation_<run_id>/`，不是 formal/hidden 或性能排名。

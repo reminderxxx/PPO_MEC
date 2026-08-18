@@ -13,7 +13,7 @@ from typing import Any
 
 import torch
 
-from src.agents.registry import checkpoint_required_agents
+from src.agents.registry import checkpoint_required_agents, validate_agent_eviction_binding
 from src.data.mobility.replay_provider import ReplayProvider
 from src.data.mobility.rsu_mapper import RSUMapper
 from src.data.model_catalog.adapter_catalog import AdapterCatalog
@@ -1422,6 +1422,9 @@ def run_real_episode(
     mobility_frames_override: list[dict[str, Any]] | None = None,
     cache_capacity_profile: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    cache_capacity_profile = validate_agent_eviction_binding(
+        agent_name, cache_capacity_profile, run_seed=seed
+    )
     recorder = EpisodeRecorder(prefetch_validation_window=6)
     adapter_catalog = adapter_catalog_override or AdapterCatalog.from_json(root_dir / "src" / "data" / "model_catalog" / "sample_model_catalog.json")
     rsu_states = [clone_rsu_state(rsu_state) for rsu_state in (rsu_states_override or mobility_bundle.rsu_states)]
@@ -1474,6 +1477,16 @@ def run_real_episode(
             "workflow_id": workflow_state_runtime.workflow_id,
             "workflow_source_path": workflow_source_path,
             "agent_name": agent_name,
+            "eviction_policy": (
+                cache_capacity_profile.get("eviction_policy", "not_applicable")
+                if cache_capacity_profile
+                else "not_applicable"
+            ),
+            "eviction_policy_seed": (
+                cache_capacity_profile.get("eviction_policy_seed")
+                if cache_capacity_profile
+                else None
+            ),
             "seed": seed,
             "window_id": mobility_bundle.rsu_metadata.get("window_id"),
             "rsu_layout": mobility_bundle.rsu_metadata.get("effective_rsu_layout"),
@@ -1752,6 +1765,8 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         "workflow_id": run_info.get("workflow_id"),
         "agent_name": run_info.get("agent_name"),
         "policy_name": run_info.get("agent_name"),
+        "eviction_policy": run_info.get("eviction_policy", "not_applicable"),
+        "eviction_policy_seed": run_info.get("eviction_policy_seed"),
         "seed": run_info.get("seed"),
         "primary_vehicle_selection": run_info.get("primary_vehicle_selection", "stable_first"),
         "reward_positive_offset": reward_positive_offset,
@@ -1912,7 +1927,9 @@ def aggregate_rows(rows: list[dict[str, Any]], group_keys: list[str], metrics: l
             "group": {group_key: group_rows[0][group_key] for group_key in group_keys},
             "episode_count": len(group_rows),
             "metrics": {
-                metric_name: metric_stats([float(item[metric_name]) for item in group_rows])
+                metric_name: metric_stats(
+                    [_float_value(item.get(metric_name), 0.0) for item in group_rows]
+                )
                 for metric_name in metrics
             },
         }

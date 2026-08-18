@@ -15,7 +15,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from src.agents.registry import list_evaluable_agents
+from src.agents.registry import get_algo_spec, list_evaluable_agents
 from src.evaluators.main_results_support import (
     apply_frozen_window_plan,
     aggregate_rows,
@@ -72,6 +72,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max_mobility_rows", type=int, default=2500)
     parser.add_argument("--max_workflows", type=int, default=2)
     parser.add_argument("--max_steps", type=int, default=12)
+    parser.add_argument("--classical_cache_slots", type=int, default=3)
     parser.add_argument("--reward_positive_offset", type=float, default=0.0)
     parser.add_argument("--workflow_selector", type=str, default="ordered")
     parser.add_argument("--rsu_layout", type=str, default="auto_dominant_tight")
@@ -483,6 +484,22 @@ def main() -> None:
             mobility_bundle.rsu_metadata["window_class"] = window_candidate["window_class"]
             for workflow_state in workflow_states:
                 for agent_name in args.agents:
+                    algo_spec = get_algo_spec(agent_name)
+                    cache_capacity_profile = None
+                    if algo_spec.get("required_eviction_policy"):
+                        if args.classical_cache_slots <= 0:
+                            raise ValueError("classical_cache_slots must be positive")
+                        cache_capacity_profile = {
+                            "enabled": True,
+                            "unit": "adapter_slots",
+                            "rsu_adapter_slots": args.classical_cache_slots,
+                            "eviction_policy": algo_spec["required_eviction_policy"],
+                            "eviction_policy_config": (
+                                {"aging_interval": 8, "aging_factor": 0.5}
+                                if agent_name == "reactive_aging_lfu"
+                                else {}
+                            ),
+                        }
                     if args.audit_runtime:
                         tracemalloc.reset_peak()
                         allocation_before, _ = tracemalloc.get_traced_memory()
@@ -499,6 +516,7 @@ def main() -> None:
                         mobility_source=args.mobility_source,
                         primary_vehicle_selection=args.primary_vehicle_selection,
                         reward_positive_offset=args.reward_positive_offset,
+                        cache_capacity_profile=cache_capacity_profile,
                         run_metadata={
                             "script": "scripts/benchmark_main_results.py",
                             "benchmark_run_id": benchmark_run_id,
@@ -601,6 +619,8 @@ def main() -> None:
         },
         "mainline": mainline_label,
         "agents": args.agents,
+        "classical_cache_slots": args.classical_cache_slots,
+        "algorithm_specs": {agent: get_algo_spec(agent) for agent in args.agents},
         "seeds": args.seeds,
         "workflow_selector": args.workflow_selector,
         "selected_workflow_ids_by_seed": selected_workflow_ids_by_seed,

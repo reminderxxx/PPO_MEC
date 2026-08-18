@@ -288,3 +288,10 @@
 - `src/envs/core/cache_eviction.py` 负责通用 eviction lifecycle、只读 `EvictionPlan`、LRU 1.0 状态/排序和仅注册 `lru` 的 fail-fast factory；不写 cache/catalog，也不承载 RL agent。
 - `src/envs/core/vec_workflow_core_env.py` 负责 slot/MB normalization、size/oversized/required-free、plan 验证、initial/runtime 原子 mutation 和 snapshots；通过 factory 依赖 policy，不再直接维护 LRU 排序状态。
 - `src/envs/specs/semantic_objects.py`、`src/metrics/cache_event_metrics.py` 负责 CacheEvent 1.1 multi-victim 生产、1.0/1.x 兼容消费与 legacy 对账。
+
+# 2026-08-18 classical cache baseline modules
+
+- `src/envs/core/cache_eviction.py`：五种 eviction policy、统一 plan/state factory。
+- `src/agents/classical_cache_agent.py`：共享 reactive control 的身份薄层；不拥有 eviction state。
+- `src/agents/registry.py`：完整 baseline spec 与 identity-policy binding validator。
+- `scripts/validate_classical_cache_baselines.py`：matched controlled benchmark 与诊断 artifact。

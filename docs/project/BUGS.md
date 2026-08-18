@@ -243,3 +243,8 @@
 # 2026-08-17 MB capacity implementation status
 
 - `RESOLVED / live capacity semantics`: 环境已支持 slot/MB、initial enforcement、原子 multi-victim 与 oversized 拒绝。这不追溯改变 v100 capacity-disabled artifacts，也未解决独立 cache baseline、正式 byte metrics 或 oracle blocker。
+
+# 2026-08-18 Classical baseline boundary
+
+- `RESOLVED`: FIFO/LFU/Aging-LFU/Random、明确 baseline identity 与 agent-policy mismatch 检查已实现。
+- `OPEN`: 正式 byte-hit/pollution/regret/latency-saved、capacity oracle 与 paper fairness manifest 不属于本 Goal；controlled validation 不能替代 formal evidence。

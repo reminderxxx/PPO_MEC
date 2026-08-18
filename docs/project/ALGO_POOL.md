@@ -221,3 +221,7 @@ baseline 闭环额外写出：
 - `mappo` 和 `qmix` 均按主方法的 cache / execution-offload / handoff-event controller 粒度实现，可在当前 `semantic_discrete_5` contract 下训练、评估和 benchmark。
 - `ippo` 仍为 diagnostic；`td3`、`sac`、`maddpg` 仍需新的连续或 multi-agent action/observation contract 后才能接入。
 - 既有 `final_submission_clean_retrain_repaired_baselines_20260507_v1` 是 pre-MAPPO/QMIX-controller-level 结果；当前主表若包含 `mappo` / `qmix`，必须重跑 final-submission loop。
+
+# Classical cache additions (2026-08-18)
+
+`reactive_lru`、`reactive_fifo`、`reactive_lfu`、`reactive_aging_lfu`、`reactive_random` 为 live、checkpoint-free、explicit-only classical baselines。五者 observation/action 与 reactive admission 相同，仅 `required_eviction_policy` 不同；不自动加入历史 final-submission suite。

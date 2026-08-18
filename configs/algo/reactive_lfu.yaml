@@ -1,0 +1,11 @@
+algorithm: reactive_lfu
+family: classical_cache
+control_policy: reactive_current_rsu_admission_v1
+eviction_policy: lfu
+eviction_policy_version: 1.0.0
+capacity_contract: cache_capacity_contract_v1
+prediction: false
+learning: false
+checkpoint_required: false
+requires_seed: false
+baseline_scope: reactive placement/admission + selected eviction policy

@@ -66,7 +66,9 @@ class VecWorkflowCoreEnv:
         self._reward_positive_offset = max(float(reward_positive_offset), 0.0)
         self._cache_capacity_profile = self._normalize_cache_capacity_profile(cache_capacity_profile)
         self._eviction_policy = build_eviction_policy(
-            self._cache_capacity_profile["eviction_policy"]
+            self._cache_capacity_profile["eviction_policy"],
+            seed=self._cache_capacity_profile.get("eviction_policy_seed"),
+            **dict(self._cache_capacity_profile.get("eviction_policy_config", {})),
         )
 
         self._handoff_builder = HandoffBuilder()
@@ -547,6 +549,8 @@ class VecWorkflowCoreEnv:
             "capacity_mb": None,
             "count_base_model_separately": False,
             "eviction_policy": "lru",
+            "eviction_policy_seed": None,
+            "eviction_policy_config": {},
             "telemetry_enabled": True,
         }
         if profile:
@@ -568,6 +572,11 @@ class VecWorkflowCoreEnv:
             merged["capacity_mb"] = capacity_mb
         merged["count_base_model_separately"] = bool(merged.get("count_base_model_separately", False))
         merged["eviction_policy"] = str(merged.get("eviction_policy") or "lru").lower()
+        if merged.get("eviction_policy_seed") is not None:
+            merged["eviction_policy_seed"] = int(merged["eviction_policy_seed"])
+        if not isinstance(merged.get("eviction_policy_config"), dict):
+            raise ValueError("eviction_policy_config must be a mapping")
+        merged["eviction_policy_config"] = dict(merged["eviction_policy_config"])
         merged["telemetry_enabled"] = bool(merged.get("telemetry_enabled", True))
         return merged
 
@@ -717,6 +726,9 @@ class VecWorkflowCoreEnv:
         return {
             "cache_capacity_enabled": capacity_enabled,
             "cache_capacity_unit": self._cache_capacity_profile.get("unit", "adapter_slots"),
+            "eviction_policy": self._eviction_policy.policy_name,
+            "eviction_policy_version": self._eviction_policy.policy_version,
+            "eviction_policy_seed": self._cache_capacity_profile.get("eviction_policy_seed"),
             "rsu_adapter_slots": int(self._cache_capacity_profile.get("rsu_adapter_slots", 0) or 0),
             "cache_capacity": capacity,
             "cache_used_size": used_size,

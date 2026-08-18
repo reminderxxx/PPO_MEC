@@ -764,3 +764,10 @@
 - 冻结语义：LRU 使用 episode step；初始顺序为 `-N..-1`；tie-break 为 `(last_used_step, adapter_id)`；multi-victim 是最小充分前缀。环境先拒绝 oversized，只在完整 plan sufficient 后原子 mutation。
 - 兼容边界：CacheEvent 保持 1.1.0，无新增 schema 字段；legacy singular victim 仍指向第一个 victim。LRU 仍非 benchmark agent，FIFO/LFU/Aging-LFU/Random 未实现。
 - 证据：`tests/test_cache_eviction_policy.py` 与 `artifacts/analysis/cache_eviction_policy_lru_validation_20260817_v1/`。
+
+# 2026-08-18 — Classical cache composition and seeded Random
+
+- 传统 baseline 由共享 `reactive_current_rsu_admission_v1` 与环境 eviction policy 组合，不复制 action code。
+- LFU admission frequency 为 0，tie-break 为 `(frequency,last_used_step,object_id)`；Aging-LFU 使用每 RSU callback clock、更新前每 8 events 乘 0.5 后向下取整。
+- Random 私有 RNG 的 seed 等于 benchmark run seed；identity-policy 与 Random seed mismatch 均 fail-fast。
+- 这些 baseline 不代表 neighbor cooperative placement，也不进入历史 final-submission 默认 loop。

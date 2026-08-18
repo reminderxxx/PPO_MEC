@@ -42,8 +42,8 @@ def test_identity_factory_and_unknown_policy() -> None:
     assert policy.requires_seed is False
     assert policy.capacity_units_supported == frozenset({"adapter_slots", "mb"})
     assert policy.export_state()["seed_consumed"] is False
-    with pytest.raises(ValueError, match="registered policies: lru"):
-        build_eviction_policy("fifo")
+    with pytest.raises(ValueError, match="registered policies"):
+        build_eviction_policy("clock")
 
 
 def test_reset_initial_order_rsu_isolation_and_episode_isolation() -> None:

@@ -1348,3 +1348,9 @@ quick run 结果边界：
 - 新增 `capacity_unit={adapter_slots,mb}`；disabled 与 slot 历史语义保留，MB 按集中 resident-size resolver 严格约束每个 RSU。
 - runtime admission 支持原子 multi-victim 最小 LRU 前缀；oversized 对象零 eviction 拒绝；initial cache 使用同一 resolver 确定性修剪。
 - CacheEvent 升级为 consumer-safe `1.1.0`，reducer 继续消费 1.0.0。validation artifact 位于 `artifacts/analysis/cache_capacity_mb_validation_20260817_v1/`，不作为论文结论。
+
+## 2026-08-18: Matched reactive classical cache baseline suite
+
+- 新增 FIFO、LFU、周期整数衰减 Aging-LFU 和私有 seeded RNG Random；factory 严格注册 `lru/fifo/lfu/aging_lfu/random`。
+- 新增 checkpoint-free `reactive_lru/reactive_fifo/reactive_lfu/reactive_aging_lfu/reactive_random`；共享 ReactiveGreedy control，仅 eviction 不同。
+- real evaluation 对 identity-policy binding fail-fast；Random 固定 `policy_seed=run seed`。controlled validation 不训练、不改 reward/RL、不运行 formal/hidden，也不产生性能优劣结论。

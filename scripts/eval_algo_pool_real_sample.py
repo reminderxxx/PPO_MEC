@@ -70,6 +70,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min_tasks", type=int, default=5)
     parser.add_argument("--max_tasks", type=int, default=20)
     parser.add_argument("--random_seed", type=int, default=7)
+    parser.add_argument("--classical_cache_slots", type=int, default=3)
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "artifacts" / "eval" / "algo_pool"))
     args = parser.parse_args()
     if args.agent_name in CHECKPOINT_REQUIRED and not args.checkpoint_path:
@@ -89,6 +90,7 @@ def build_eval_row(summary: dict[str, Any]) -> dict[str, Any]:
     )
     return {
         "agent_name": summary["run_info"].get("agent_name"),
+        "eviction_policy": summary["run_info"].get("eviction_policy", "not_applicable"),
         "workflow_id": summary["run_info"].get("workflow_id"),
         "window_id": summary["run_info"].get("window_id"),
         "seed": summary["run_info"].get("seed"),
@@ -157,6 +159,22 @@ def main() -> None:
         random_seed=args.random_seed,
     )
     checkpoint_map = {args.agent_name: args.checkpoint_path}
+    algo_spec = get_algo_spec(args.agent_name)
+    cache_capacity_profile = None
+    if algo_spec.get("required_eviction_policy"):
+        if args.classical_cache_slots <= 0:
+            raise ValueError("classical_cache_slots must be positive")
+        cache_capacity_profile = {
+            "enabled": True,
+            "unit": "adapter_slots",
+            "rsu_adapter_slots": args.classical_cache_slots,
+            "eviction_policy": algo_spec["required_eviction_policy"],
+            "eviction_policy_config": (
+                {"aging_interval": 8, "aging_factor": 0.5}
+                if args.agent_name == "reactive_aging_lfu"
+                else {}
+            ),
+        }
     rows: list[dict[str, Any]] = []
     episode_summaries: list[dict[str, Any]] = []
     for workflow_state in workflow_states:
@@ -171,6 +189,7 @@ def main() -> None:
             max_steps=args.max_steps,
             mobility_source=args.mobility_source,
             primary_vehicle_selection=args.primary_vehicle_selection,
+            cache_capacity_profile=cache_capacity_profile,
             run_metadata={
                 "script": "scripts/eval_algo_pool_real_sample.py",
                 "run_id": run_id,
@@ -187,7 +206,8 @@ def main() -> None:
     summary_payload = {
         "run_id": run_id,
         "agent_name": args.agent_name,
-        "algo_spec": get_algo_spec(args.agent_name),
+        "algo_spec": algo_spec,
+        "cache_capacity_profile": cache_capacity_profile,
         "checkpoint_path": args.checkpoint_path,
         "primary_vehicle_selection": args.primary_vehicle_selection,
         "checkpoint_metadata": (

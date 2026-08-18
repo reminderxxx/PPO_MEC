@@ -26,6 +26,13 @@ def main() -> None:
     if output_path.exists():
         raise FileExistsError(f"refusing to overwrite existing audit: {output_path}")
     payload = json.loads(summary_path.read_text(encoding="utf-8"))
+    episode_summaries = payload.get("episode_summaries")
+    if isinstance(episode_summaries, list):
+        if len(episode_summaries) != 1:
+            raise ValueError(
+                "aggregate summary audit requires exactly one episode_summary"
+            )
+        payload = episode_summaries[0]
     audit = audit_cache_event_telemetry(payload)
     audit["summary_path"] = str(summary_path)
     output_path.write_text(json.dumps(audit, ensure_ascii=False, indent=2), encoding="utf-8")
