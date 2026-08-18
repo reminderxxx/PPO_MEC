@@ -2,6 +2,12 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-18: G05 unavailable/null aggregation regression resolved
+
+- `FIXED / nullable aggregate`: benchmark aggregate 曾把 `None`/missing 通过通用 default-zero 聚合成 `0.0`，违反 G03 Cache Capacity Contract；现全 unavailable group 保持 JSON `null`，mixed group 只统计 available finite numeric values并记录 available/unavailable counts。
+- `FIXED / consumer compatibility`: pairwise、win/tie/loss、robustness、checkpoint sweep 与 transaction summary 已能读取 nullable mean；不可用值不参与 delta 或 best-value 排名。
+- `BOUNDARY`: 该修复不追溯改写历史 artifact，也不新增 G06 byte-hit/pollution/regret/latency-saved 指标；历史 capacity-disabled artifact 仍不能支持 cache-efficiency claim。
+
 ## 2026-08-14: cache observability contract resolved; metric/baseline work remains open
 
 - `RESOLVED / event observability`: request-level `CacheEvent` v1 now records lookup, mutually exclusive hit source, admission, eviction victim, transfer/migration, capacity before/after and execution result in raw episode summaries.

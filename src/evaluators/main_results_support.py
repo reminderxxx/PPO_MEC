@@ -6,7 +6,7 @@ import csv
 import json
 import random
 from copy import deepcopy
-from math import dist
+from math import dist, isfinite
 from pathlib import Path
 from statistics import fmean, pstdev
 from typing import Any
@@ -1904,14 +1904,36 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
 
 
 
-def metric_stats(values: list[float]) -> dict[str, float]:
-    if not values:
-        return {"mean": 0.0, "std": 0.0, "min": 0.0, "max": 0.0}
+def _optional_float(value: Any) -> float | None:
+    if value is None:
+        return None
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
+    return numeric if isfinite(numeric) else None
+
+
+def metric_stats(values: list[Any]) -> dict[str, float | int | None]:
+    numeric_values = [numeric for value in values if (numeric := _optional_float(value)) is not None]
+    available_count = len(numeric_values)
+    unavailable_count = len(values) - available_count
+    if not numeric_values:
+        return {
+            "mean": None,
+            "std": None,
+            "min": None,
+            "max": None,
+            "available_count": 0,
+            "unavailable_count": unavailable_count,
+        }
     return {
-        "mean": round(fmean(values), 6),
-        "std": round(pstdev(values), 6),
-        "min": round(min(values), 6),
-        "max": round(max(values), 6),
+        "mean": round(fmean(numeric_values), 6),
+        "std": round(pstdev(numeric_values), 6),
+        "min": round(min(numeric_values), 6),
+        "max": round(max(numeric_values), 6),
+        "available_count": available_count,
+        "unavailable_count": unavailable_count,
     }
 
 
@@ -1927,9 +1949,7 @@ def aggregate_rows(rows: list[dict[str, Any]], group_keys: list[str], metrics: l
             "group": {group_key: group_rows[0][group_key] for group_key in group_keys},
             "episode_count": len(group_rows),
             "metrics": {
-                metric_name: metric_stats(
-                    [_float_value(item.get(metric_name), 0.0) for item in group_rows]
-                )
+                metric_name: metric_stats([item.get(metric_name) for item in group_rows])
                 for metric_name in metrics
             },
         }
@@ -1948,11 +1968,17 @@ def build_pairwise_comparison(
     for agent_name, payload in aggregate_by_agent.items():
         if agent_name == baseline_agent:
             continue
-        delta: dict[str, float] = {}
+        delta: dict[str, float | None] = {}
         result: dict[str, str] = {}
         for metric_name in metrics:
+            candidate_mean = payload["metrics"][metric_name]["mean"]
+            baseline_mean = baseline_metrics[metric_name]["mean"]
+            if candidate_mean is None or baseline_mean is None:
+                delta[metric_name] = None
+                result[metric_name] = "unavailable"
+                continue
             delta_value = round(
-                float(payload["metrics"][metric_name]["mean"]) - float(baseline_metrics[metric_name]["mean"]),
+                float(candidate_mean) - float(baseline_mean),
                 6,
             )
             delta[metric_name] = delta_value
@@ -1991,10 +2017,18 @@ def _collect_group_scores(
         for agent_name, agent_metrics in agent_payloads.items():
             if agent_name == baseline_agent:
                 continue
-            counts.setdefault(agent_name, {metric_name: {"win": 0, "tie": 0, "loss": 0} for metric_name in metrics})
-            group_outcome = "tie"
+            counts.setdefault(
+                agent_name,
+                {metric_name: {"win": 0, "tie": 0, "loss": 0, "unavailable": 0} for metric_name in metrics},
+            )
+            group_outcome: str | None = None
             for metric_name in metrics:
-                delta_value = float(agent_metrics[metric_name]["mean"]) - float(baseline_metrics[metric_name]["mean"])
+                agent_mean = agent_metrics[metric_name]["mean"]
+                baseline_mean = baseline_metrics[metric_name]["mean"]
+                if agent_mean is None or baseline_mean is None:
+                    counts[agent_name][metric_name]["unavailable"] += 1
+                    continue
+                delta_value = float(agent_mean) - float(baseline_mean)
                 effective_delta = -delta_value if metric_name in LOWER_IS_BETTER_METRICS else delta_value
                 if effective_delta > 1e-6:
                     outcome = "win"
@@ -2007,8 +2041,10 @@ def _collect_group_scores(
                     group_outcome = "loss"
                 elif outcome == "win" and group_outcome != "loss":
                     group_outcome = "win"
-            overall_counts.setdefault(agent_name, {"win": 0, "tie": 0, "loss": 0})
-            overall_counts[agent_name][group_outcome] += 1
+                elif group_outcome is None:
+                    group_outcome = "tie"
+            overall_counts.setdefault(agent_name, {"win": 0, "tie": 0, "loss": 0, "unavailable": 0})
+            overall_counts[agent_name][group_outcome or "unavailable"] += 1
     return {
         "baseline_agent": baseline_agent,
         "group_dimension": group_dimension,

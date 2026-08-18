@@ -712,7 +712,7 @@ def build_transaction_comparison(aggregate_by_agent: dict[str, Any]) -> dict[str
 
     best_by_metric: dict[str, Any] = {}
     for metric in TRANSACTION_ALIGNED_METRICS:
-        candidate_rows = [row for row in rows if metric in row]
+        candidate_rows = [row for row in rows if row.get(metric) is not None]
         if not candidate_rows:
             continue
         reverse = metric not in LOWER_IS_BETTER
@@ -729,7 +729,11 @@ def build_transaction_comparison(aggregate_by_agent: dict[str, Any]) -> dict[str
         wins: list[str] = []
         losses: list[str] = []
         ties: list[str] = []
+        unavailable: list[str] = []
         for metric, best in best_by_metric.items():
+            if sa_row.get(metric) is None:
+                unavailable.append(metric)
+                continue
             best_value = float_value(best["best_value"])
             sa_value = float_value(sa_row.get(metric))
             if abs(sa_value - best_value) <= 1e-6:
@@ -743,6 +747,7 @@ def build_transaction_comparison(aggregate_by_agent: dict[str, Any]) -> dict[str
                 "best_metric_count": len(ties),
                 "metric_ties_for_best": ties,
                 "metric_losses_to_best": losses,
+                "unavailable_metrics": unavailable,
                 "metric_wins_over_best_reference": wins,
                 "advantage_claim_supported_in_this_round": len(ties) >= max(4, len(TRANSACTION_ALIGNED_METRICS) // 3)
                 and "total_reward" in ties,

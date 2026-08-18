@@ -15,3 +15,5 @@
 - Random：只使用私有 `random.Random`；`policy_seed = benchmark run seed`，相同 seed 与事件序列可复现。候选先按 object id 稳定排序，再无放回采样。
 
 所有 policy 支持 `adapter_slots` 和 `mb`，返回统一 `EvictionPlan`，并导出 JSON-safe detached state。validation 入口为 `scripts/validate_classical_cache_baselines.py`，产物写入 `artifacts/analysis/classical_cache_baseline_validation_<run_id>/`。当前状态仅为 benchmark-ready 的 controlled mechanism validation，不是 paper-grade 性能结果；正式 cache metrics、oracle 与 paper fairness manifest 仍未实现。
+
+Benchmark aggregate 继承 Cache Capacity Contract 的 nullable 语义：capacity disabled 时，`cache_capacity/cache_used_size/cache_remaining_size/cache_occupancy_rate` 的统计值保持 JSON `null`，不得写成零；`cache_capacity_enabled=0.0` 仍是观测到的 disabled 状态。mixed group 仅聚合 available finite numeric values，`available_count/unavailable_count` 记录分母与不可用样本数。五个 baseline 的 identity、reactive admission/control、eviction policy 与 seed contract 不因该聚合规则改变。

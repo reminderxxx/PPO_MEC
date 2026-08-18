@@ -1,5 +1,12 @@
 ﻿# Progress
 
+## 2026-08-18: G05 nullable benchmark aggregation regression fixed
+
+- 根因是 `aggregate_rows()` 对每个 metric 使用 `_float_value(..., 0.0)`，把 G03 capacity-disabled 的 `None` 和缺失字段静默转换成观测零。
+- aggregate 现仅统计 available finite numeric values；全 unavailable group 的 `mean/std/min/max` 为 JSON `null`，mixed group 不把 unavailable 纳入分母，并以 `available_count/unavailable_count` 保留审计数量。真实 `0.0` 仍为零，完整 numeric metric 的统计结果保持兼容。
+- pairwise、window/workflow win-tie-loss、robustness degradation、checkpoint sweep 与 HF transaction summary 已适配 nullable mean，不再因 `float(None)` 崩溃或把 unavailable 排名为零。
+- 回归覆盖 missing/all-null、real-zero、mixed、普通 metric、五个 classical baseline、JSON round-trip 与 summary consumer。本轮未修改五个 baseline、eviction、reactive control、reward/RL/CacheEvent，也未实现 G06 metrics 或运行 formal/hidden benchmark。
+
 ## 2026-08-17: Eviction Policy Contract and G03-compatible LRU migration
 
 - 新增 `src/envs/core/cache_eviction.py`：稳定 lifecycle（`reset/on_admission/on_hit/on_eviction/plan_victims/export_state`）、可序列化 `EvictionPlan`、确定性 `LRUEvictionPolicy` 和 fail-fast factory。当前仅注册 `lru`，不包含 FIFO/LFU/Random。

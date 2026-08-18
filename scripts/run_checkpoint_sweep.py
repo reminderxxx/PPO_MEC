@@ -121,9 +121,9 @@ def write_candidate_rows_csv(output_path: Path, candidates: list[dict[str, Any]]
             )
 
 
-def extract_mean_metrics(aggregate_entry: dict[str, Any]) -> dict[str, float]:
+def extract_mean_metrics(aggregate_entry: dict[str, Any]) -> dict[str, float | None]:
     return {
-        metric_name: float(metric_payload["mean"])
+        metric_name: (float(metric_payload["mean"]) if metric_payload["mean"] is not None else None)
         for metric_name, metric_payload in dict(aggregate_entry.get("metrics", {})).items()
     }
 

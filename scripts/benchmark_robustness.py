@@ -273,10 +273,15 @@ def main() -> None:
             clean_key = f"clean|{agent_name}"
             if clean_key not in aggregate_by_setting_and_agent:
                 continue
-            degradation_summary[key] = {
-                metric: round(float(payload["metrics"][metric]["mean"]) - float(aggregate_by_setting_and_agent[clean_key]["metrics"][metric]["mean"]), 6)
-                for metric in MAIN_RESULT_METRICS
-            }
+            degradation_summary[key] = {}
+            for metric in MAIN_RESULT_METRICS:
+                setting_mean = payload["metrics"][metric]["mean"]
+                clean_mean = aggregate_by_setting_and_agent[clean_key]["metrics"][metric]["mean"]
+                degradation_summary[key][metric] = (
+                    round(float(setting_mean) - float(clean_mean), 6)
+                    if setting_mean is not None and clean_mean is not None
+                    else None
+                )
     aggregate_summary = {
         "run_id": run_id,
         "config_profile": infer_benchmark_config_profile(audit_bundle["checkpoint_audit"], args.agents),

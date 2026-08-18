@@ -19,6 +19,19 @@ CacheEvent `1.1.0` adds optional `eviction_count`, ordered `evicted_object_ids`,
 
 Legacy telemetry remains; `cache_capacity_unit` declares the unit. Disabled aggregate capacity/used/remaining remain `null`. In MB mode `rsu_adapter_slots` is compatibility metadata only, not capacity. Policy lifecycle, audit plan and exact LRU ordering are frozen in `cache_eviction_policy_contract.md`. LRU remains an environment primitive, not an evaluated baseline. LFU/FIFO/Random, formal byte metrics and a future-request oracle are not implemented.
 
+## Nullable benchmark aggregation
+
+`cache_capacity`、`cache_used_size`、`cache_remaining_size` 与 `cache_occupancy_rate` 是 nullable capacity snapshots。`null`/字段缺失表示 unavailable 或 not applicable，数值 `0` 表示真实观测零；聚合层不得互换二者。`cache_capacity_enabled` 是实际 0/1 状态指标，不属于 nullable capacity value。
+
+每个 metric 的 aggregate 只对 available finite numeric values 计算 `mean/std/min/max`，并输出 `available_count` 与 `unavailable_count`：
+
+- group 全部 unavailable 时，四个统计值均为 JSON `null`；
+- mixed group 忽略 unavailable 样本，仅以 available 数值作为统计分母，同时由两个 count 保留审计范围；
+- 真实零参与统计并保持数值 `0.0`；
+- pairwise、win/tie/loss、robustness 与报告消费者不得把 unavailable 转为零；无法比较时结果为/保持 `unavailable` 或 `null`。
+
+该规则适用于 benchmark 通用聚合，因而普通完整 numeric metrics 的既有统计值不变；缺失、`null`、非数值或非有限值不再由通用 default-zero 伪造成观测零。
+
 # 2026-08-18 policy compatibility
 
 五种 registered policy 均支持 `adapter_slots` 与 `mb`。`eviction_policy_seed` 与 `eviction_policy_config` 是向后兼容 profile 字段；Random 要求 seed，Aging-LFU 验证 interval/factor。环境继续计算 required free、验证 plan 并原子提交。
