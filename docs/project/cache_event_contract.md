@@ -1,6 +1,6 @@
 # Cache Event Contract
 
-Version: `1.1.0`
+Version: `1.2.0`
 
 ## Lifecycle
 
@@ -23,6 +23,7 @@ Version: `1.1.0`
 - Service path: `request_rsu_id`, `selected_target_rsu_id`, `served_rsu_id`, `predicted_next_rsu_id`, `predicted_handoff_target_rsu_id`, `hit_source`
 - Lookup/admission: `cache_lookup_performed`, `cache_hit`, `was_cached_before`, `admission_requested`, `admission_added`, `admission_reason`, `cache_target_rsu_id`
 - Eviction: frozen singular fields plus optional 1.1 `eviction_count`, ordered `evicted_object_ids`, ordered `evicted_adapter_ids`, `evicted_size_mb_sum`; singular fields identify the first LRU victim
+- Efficiency extension: optional 1.2 `admitted_object_id`, `admitted_adapter_id`, `admitted_size_mb`, ordered `evicted_sizes_mb`; episode summary carries separate `cache_trace_context 1.0.0` initial/final per-RSU snapshots
 - Transfer/migration: `adapter_transfer_size_mb`, `state_migration_size_mb`, `transfer_source`, `migration_requested`, `migration_realized`
 - Capacity: existing before/after fields plus optional `requested_object_size_mb`, `capacity_rejection_reason`
 - Control/result: `action_id`, `action_name`, `cache_strategy`, `offload_mode`, `service_success`, `stall_occurred`, `handoff_event_count`
@@ -44,7 +45,7 @@ Schema `1.x` may add optional consumer-safe fields but cannot delete or redefine
 
 ## Current boundary and future consumers
 
-The contract enables request hit/source audit, byte denominators from `size_mb`, admission/eviction counts, transfer volumes and future reuse joins. It does not yet implement byte-hit metrics, cache pollution, eviction regret, latency saved, LRU/LFU/FIFO/Random baselines, byte capacity or an oracle.
+The contract enables request hit/source audit, byte denominators from `size_mb`, admission/eviction counts, transfer volumes, residency reconstruction and future reuse joins. G06 implements the identifiable derived metrics; causal eviction regret, latency saved and the G08 oracle remain unavailable. Five G05 classical baselines and slot/MB capacity are separate frozen contracts.
 
 Future byte-capacity and LRU/LFU implementations should consume ordered `request` events and before/after capacity snapshots. A future-horizon oracle should join by episode/time/object and compare placement/victim decisions under the same capacity and request stream. Those are separate tasks and must not reinterpret capacity-disabled artifacts.
 
@@ -54,7 +55,7 @@ Future byte-capacity and LRU/LFU implementations should consume ordered `request
 
 Only `event_type=request` enters the request denominator. `not_applicable` is counted separately; admission and eviction remain attributes of one request. `cache_hit=true` defines a hit. `vehicle_local` is a hit under the frozen environment semantics; `cloud` and `unserved` are misses; `not_applicable` is excluded. A zero-request hit or migration rate is `null`, not a fabricated zero.
 
-Execution source is derived without guessing: successful vehicle/cloud requests require matching `offload_mode`; successful RSU requests require `offload_mode=rsu` and non-null `served_rsu_id`; a failed request must be stalled and `unserved`. Contradictions fail fast. G01 remains one-victim-per-event.
+Execution source is derived without guessing: successful vehicle/cloud requests require matching `offload_mode`; successful RSU requests require `offload_mode=rsu` and non-null `served_rsu_id`; a failed request must be stalled and `unserved`. Contradictions fail fast. Since 1.1, one request may carry an ordered multi-victim eviction.
 
 Current `1.x` events are accepted, including consumer-safe optional fields. Unknown major versions, malformed events, duplicate IDs, hit/source contradictions, invalid admission/eviction/migration lifecycles and invalid capacity-disabled snapshots fail fast.
 
@@ -76,4 +77,4 @@ Current `1.x` events are accepted, including consumer-safe optional fields. Unkn
 | `stall_count` | `workflow_continuity_rate` | `not_equivalent` | count vs step rate |
 | hit-source distribution | complete legacy field | `unavailable` | old summary has no full distribution |
 
-This reducer is contract/telemetry verification, not a new paper metric. Byte-hit reporting, pollution, eviction regret, latency saved, byte capacity, standalone LRU/LFU/FIFO/Random baselines and a cache oracle remain unimplemented.
+G06 derived metrics are frozen separately in `cache_efficiency_metrics_contract.md`. Future reuse remains a non-causal proxy; latency saved remains unavailable; G08 cache oracle remains unimplemented. Controlled metrics are not paper performance evidence.

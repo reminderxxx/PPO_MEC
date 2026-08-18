@@ -6,7 +6,7 @@ from dataclasses import asdict, dataclass, field, fields
 from typing import Any, ClassVar
 
 
-CACHE_EVENT_SCHEMA_VERSION = "1.1.0"
+CACHE_EVENT_SCHEMA_VERSION = "1.2.0"
 CACHE_EVENT_TYPES = frozenset({"request", "not_applicable"})
 CACHE_OBJECT_TYPES = frozenset({"adapter", "not_applicable"})
 CACHE_HIT_SOURCES = frozenset(
@@ -202,6 +202,10 @@ class CacheEvent:
     evicted_size_mb_sum: float = 0.0
     requested_object_size_mb: float | None = None
     capacity_rejection_reason: str | None = None
+    admitted_object_id: str | None = None
+    admitted_adapter_id: str | None = None
+    admitted_size_mb: float | None = None
+    evicted_sizes_mb: list[float] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         if self.event_schema_version != CACHE_EVENT_SCHEMA_VERSION:
@@ -213,9 +217,13 @@ class CacheEvent:
         if self.hit_source not in CACHE_HIT_SOURCES:
             raise ValueError(f"invalid cache hit source: {self.hit_source}")
         if self.cache_hit and self.hit_source not in {
-            "vehicle_local", "current_rsu", "target_rsu", "neighbor_rsu", "cloud"
+            "vehicle_local", "current_rsu", "target_rsu", "neighbor_rsu"
         }:
             raise ValueError("cache_hit requires a concrete hit_source")
+        if self.hit_source in {"cloud", "unserved"} and self.cache_hit:
+            raise ValueError("cloud and unserved are cache misses")
+        if self.hit_source == "vehicle_local" and not self.cache_hit:
+            raise ValueError("vehicle_local is a cache hit")
         if not self.cache_hit and self.hit_source in {"current_rsu", "target_rsu", "neighbor_rsu"}:
             raise ValueError("RSU hit_source requires cache_hit=true")
         if self.admission_added and (not self.cache_target_rsu_id or not self.object_id):
@@ -226,6 +234,8 @@ class CacheEvent:
             raise ValueError("eviction_count must match evicted_adapter_ids")
         if self.eviction_count != len(self.evicted_object_ids):
             raise ValueError("eviction_count must match evicted_object_ids")
+        if self.evicted_sizes_mb and self.eviction_count != len(self.evicted_sizes_mb):
+            raise ValueError("eviction_count must match evicted_sizes_mb when present")
         if self.eviction_occurred != (self.eviction_count > 0):
             raise ValueError("eviction_occurred must match eviction_count")
         if self.eviction_count and (
@@ -274,6 +284,10 @@ CacheEvent.OPTIONAL_FIELDS = (
     "evicted_size_mb_sum",
     "requested_object_size_mb",
     "capacity_rejection_reason",
+    "admitted_object_id",
+    "admitted_adapter_id",
+    "admitted_size_mb",
+    "evicted_sizes_mb",
 )
 CacheEvent.REQUIRED_FIELDS = tuple(
     item.name for item in fields(CacheEvent) if item.name not in CacheEvent.OPTIONAL_FIELDS

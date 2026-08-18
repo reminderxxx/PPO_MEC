@@ -254,3 +254,9 @@
 
 - `RESOLVED`: FIFO/LFU/Aging-LFU/Random、明确 baseline identity 与 agent-policy mismatch 检查已实现。
 - `OPEN`: 正式 byte-hit/pollution/regret/latency-saved、capacity oracle 与 paper fairness manifest 不属于本 Goal；controlled validation 不能替代 formal evidence。
+## 2026-08-18: G06 cache-efficiency contract frozen; causal latency/oracle remain unavailable
+
+- `RESOLVED / derived metrics`: request/byte efficiency、lifecycle/churn/transfer、slot/MB capacity、operational pollution + right censoring 与 fixed-horizon future-reuse proxy 可从 raw CacheEvent 1.2 + trace context 独立重算。
+- `RESOLVED / multi-victim and initial state`: optional per-victim MB、admission identity/MB 与 initial/final per-RSU snapshots 消除 multi-victim/pollution reconstruction ambiguity；旧 trace 缺证据时明确 partial/unavailable。
+- `OPEN / latency saved`: 缺 request-aligned observed/cold-counterfactual/transfer/stall latency，正式值保持 null；reward 和 workflow delay 不得代替。
+- `OPEN / causal regret and fairness`: future reuse 仅为 proxy；G08 oracle regret 与 G07 fairness manifest 未实现。历史 capacity-disabled artifact 仍不能支持 capacity/pollution claim。

@@ -129,6 +129,7 @@ class GymVecEnv(gym.Env):
         action_mask_info = self._action_mask_builder.build_mask_info(semantic_state)
         info = {
             **info,
+            "cache_trace_snapshot": self._core_env.export_cache_trace_snapshot(),
             "semantic_state": semantic_state,
             "action_schema": self._action_schema.to_dict(),
             "action_mask": action_mask_info["mask"],
@@ -151,6 +152,7 @@ class GymVecEnv(gym.Env):
         action_metadata = dict(control.metadata)
         info = {
             **info,
+            "cache_trace_snapshot": self._core_env.export_cache_trace_snapshot(),
             "semantic_state": semantic_state,
             "action_schema": self._action_schema.to_dict(),
             "action_mask": action_mask_info["mask"],

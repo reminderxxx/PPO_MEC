@@ -23,6 +23,8 @@ class EpisodeRecorder:
         self._initial_state: dict[str, Any] | None = None
         self._step_records: list[dict[str, Any]] = []
         self._cache_events: list[dict[str, Any]] = []
+        self._cache_trace_initial_snapshot: dict[str, Any] | None = None
+        self._cache_trace_final_snapshot: dict[str, Any] | None = None
         self._pending_prefetches: list[dict[str, Any]] = []
         self._episode_status: dict[str, Any] = {}
 
@@ -32,6 +34,8 @@ class EpisodeRecorder:
         self._initial_state = None
         self._step_records = []
         self._cache_events = []
+        self._cache_trace_initial_snapshot = None
+        self._cache_trace_final_snapshot = None
         self._pending_prefetches = []
         self._episode_status = {
             "completed": False,
@@ -41,8 +45,9 @@ class EpisodeRecorder:
         }
 
     def record_reset(self, state: dict[str, Any], info: dict[str, Any]) -> None:
-        del info
         self._initial_state = deepcopy(state)
+        self._cache_trace_initial_snapshot = deepcopy(info.get("cache_trace_snapshot"))
+        self._cache_trace_final_snapshot = deepcopy(info.get("cache_trace_snapshot"))
 
     def record_step(
         self,
@@ -53,6 +58,8 @@ class EpisodeRecorder:
         truncated: bool,
     ) -> None:
         metrics_info = deepcopy(info.get("metrics_protocol", {}))
+        if info.get("cache_trace_snapshot") is not None:
+            self._cache_trace_final_snapshot = deepcopy(info["cache_trace_snapshot"])
         metrics_info["time_index"] = int(state.get("time_index", 0))
         metrics_info["reward_dict"] = deepcopy(reward_dict)
         metrics_info["terminated"] = bool(terminated)
@@ -123,6 +130,12 @@ class EpisodeRecorder:
             "step_trace": deepcopy(self._step_records),
             "cache_event_schema_version": CACHE_EVENT_SCHEMA_VERSION,
             "cache_event_trace": deepcopy(self._cache_events),
+            "cache_trace_context": {
+                "context_schema_version": "1.0.0",
+                "initial_snapshot": deepcopy(self._cache_trace_initial_snapshot),
+                "final_snapshot": deepcopy(self._cache_trace_final_snapshot),
+                "episode_end_step_index": len(self._step_records),
+            },
         }
 
     def export_summary(self, output_path: str | Path) -> dict[str, Any]:

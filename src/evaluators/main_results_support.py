@@ -24,6 +24,7 @@ from src.envs.specs import RSUState, VehicleState, WorkflowGraphState, WorkflowN
 from src.envs.wrappers.gym_vec_env import GymVecEnv
 from src.evaluators.real_eval_support import build_inference_agent, ensure_agent_checkpoint_path
 from src.evaluators.real_sample_support import RealMobilityBundle, load_real_mobility_bundle, load_real_source_frames, scan_mobility_windows
+from src.metrics.cache_efficiency_metrics import cache_efficiency_row_fields
 from src.metrics.recorder import EpisodeRecorder
 from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
 
@@ -100,6 +101,15 @@ MAIN_RESULT_METRICS = [
     "inference_wall_clock_sec_per_step",
     "python_peak_increment_bytes",
 ]
+MAIN_RESULT_METRICS.extend([
+    "cache_object_hit_rate",
+    "cache_byte_hit_rate",
+    "cache_churn_mb",
+    "cache_pollution_ratio",
+    "cache_transfer_amplification_ratio",
+    "cache_capacity_mean_occupancy",
+    "cache_latency_saved_sum_ms",
+])
 ACTIONMIX_DIAGNOSTIC_METRICS = [
     "service_success_count",
     "service_delay_sum",
@@ -1754,6 +1764,7 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         or handoff_summary.get("migration_during_handoff_count", 0) > 0
     )
     actionmix_diagnostics = _build_actionmix_diagnostics(summary)
+    cache_efficiency_fields = cache_efficiency_row_fields(summary)
     compute_audit = summary.get("compute_audit", {})
     return {
         "window_id": run_info.get("window_id"),
@@ -1900,6 +1911,7 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         "checkpoint_episode_count": checkpoint_metadata.get("episodes", 0),
         "checkpoint_is_smoke": checkpoint_metadata.get("is_smoke_checkpoint", False),
         **actionmix_diagnostics,
+        **cache_efficiency_fields,
     }
 
 

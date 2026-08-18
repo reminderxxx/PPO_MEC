@@ -4,6 +4,8 @@ Cache capacity supports backward-compatible `adapter_slots` and resident-size `m
 
 CacheEvent `1.x` episode telemetry 可通过 `scripts/audit_cache_event_telemetry.py` 从 raw `cache_event_trace` 独立重算并与 legacy step/episode 字段分类对账；使用方法和口径见 `docs/project/RUNBOOK.md` 与 `docs/project/cache_event_contract.md`。该能力用于 contract 验证，不是新增论文指标。
 
+G06 cache-efficiency contract 通过 `scripts/audit_cache_efficiency_metrics.py` 从 raw CacheEvent + trace context 独立重算 request/byte、churn、capacity、pollution 和 future-reuse proxy；latency saved 在缺少逐请求 counterfactual latency 时保持 unavailable。精确定义见 `docs/project/cache_efficiency_metrics_contract.md`；controlled/smoke 输出不是性能结论。
+
 ## 2026-07-29 v70 sparse-tail option MAPPO 正式结果
 
 v70 `top_journal_mechanism_v70_sparse_tail_option_mappo` 已按 3 seed、12-agent、frozen mixed/full 窗口完成全量 benchmark，并首次在当前 offset-free formal-min full_stratified 协议下让 SA-GHMAPPO 同时高于 DT 规则/专项对照、popularity heuristic、PPO 和 MAPPO。关键 artifact：

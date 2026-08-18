@@ -99,6 +99,33 @@ class VecWorkflowCoreEnv:
         """Return the last planned victim selection without exposing live state."""
         return deepcopy(self._last_eviction_plan)
 
+    def export_cache_trace_snapshot(self) -> dict[str, Any]:
+        """Return a detached, JSON-safe per-RSU residency snapshot for metrics."""
+        capacity_enabled = self._cache_capacity_enabled()
+        capacity = self._cache_capacity_value()
+        rsus = []
+        for rsu in sorted(self.rsu_states, key=lambda item: item.rsu_id):
+            residents = []
+            for adapter_id in rsu.cached_adapter_ids:
+                resolution = self.adapter_catalog.resolve_adapter_resident_size_mb(adapter_id)
+                cache_object = next(
+                    (item for item in self.adapter_catalog.cache_objects if item.adapter_id == adapter_id),
+                    None,
+                )
+                residents.append({
+                    "object_id": cache_object.object_id if cache_object else f"adapter:{adapter_id}",
+                    "adapter_id": adapter_id,
+                    "size_mb": float(resolution.size_mb),
+                })
+            rsus.append({
+                "rsu_id": rsu.rsu_id,
+                "residents": residents,
+                "capacity_enabled": capacity_enabled,
+                "capacity_unit": self._cache_capacity_profile.get("unit", "adapter_slots"),
+                "capacity": capacity,
+            })
+        return {"snapshot_step_index": int(self._episode_steps), "rsus": rsus}
+
     def reset(self) -> tuple[dict[str, Any], dict[str, Any]]:
         """重置环境并返回语义状态字典。"""
         self._episode_steps = 0
@@ -1531,6 +1558,25 @@ class VecWorkflowCoreEnv:
             evicted_size_mb_sum=float(cache_result.get("evicted_size_mb_sum", 0.0) or 0.0),
             requested_object_size_mb=cache_result.get("requested_object_size_mb", size_mb),
             capacity_rejection_reason=cache_result.get("capacity_rejection_reason"),
+            admitted_object_id=(
+                next(
+                    (
+                        item.object_id
+                        for item in self.adapter_catalog.cache_objects
+                        if item.adapter_id == cache_result.get("adapter_id")
+                    ),
+                    f"adapter:{cache_result.get('adapter_id')}",
+                )
+                if admission_added and cache_result.get("adapter_id")
+                else None
+            ),
+            admitted_adapter_id=(cache_result.get("adapter_id") if admission_added else None),
+            admitted_size_mb=(
+                float(cache_result.get("requested_object_size_mb"))
+                if admission_added and cache_result.get("requested_object_size_mb") is not None
+                else None
+            ),
+            evicted_sizes_mb=[float(self._adapter_resident_size_mb(item)) for item in evicted_adapter_ids],
         )
 
     def _estimate_backhaul_traffic_cost(

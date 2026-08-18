@@ -295,3 +295,11 @@
 - `src/agents/classical_cache_agent.py`：共享 reactive control 的身份薄层；不拥有 eviction state。
 - `src/agents/registry.py`：完整 baseline spec 与 identity-policy binding validator。
 - `scripts/validate_classical_cache_baselines.py`：matched controlled benchmark 与诊断 artifact。
+## 2026-08-18 G06 cache efficiency metrics
+
+- `src/metrics/cache_efficiency_metrics.py`：pure CacheEvent/trace-context reducer，冻结 request/byte、lifecycle/churn、capacity、pollution、future-reuse proxy 和 latency-unavailable contract。
+- `src/envs/specs/semantic_objects.py`：CacheEvent 1.2 optional admission identity/size 与逐 victim sizes；1.0/1.1 consumer compatibility 保留。
+- `src/envs/core/vec_workflow_core_env.py`、`src/envs/wrappers/gym_vec_env.py`、`src/metrics/recorder.py`：生产版本化 initial/final per-RSU cache snapshot，不将环境对象泄露到 metrics 层。
+- `src/evaluators/main_results_support.py`：仅接入 G06 nullable scalar；大型 raw trace 仍由 episode summary 承载。
+- `scripts/audit_cache_efficiency_metrics.py`：读取真实 summary 并输出 JSON-safe 独立重算结果。
+- `tests/test_cache_efficiency_metrics.py`：覆盖 byte denominator、multi-victim、pollution/censoring、reuse horizon、invalid/missing/null 与 aggregate semantics。

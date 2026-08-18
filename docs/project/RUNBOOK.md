@@ -749,3 +749,15 @@ Legacy gate 结论：
 ```
 
 该命令运行相同 request stream、initial cache、slot capacity、reactive control 和 system seed 的 controlled 五算法验证。Random policy seed 等于 run seed。产物位于 `artifacts/analysis/classical_cache_baseline_validation_<run_id>/`，不是 formal/hidden 或性能排名。
+
+## G06 cache efficiency 独立审计
+
+选择包含 `cache_event_trace` 的 episode summary；新生成的 CacheEvent 1.2 summary 同时包含 pollution 重建所需的 `cache_trace_context`：
+
+```bash
+.venv/bin/python scripts/audit_cache_efficiency_metrics.py \
+  --summary_path <episode.summary.json> \
+  --output_path artifacts/audits/<run_id>/cache_efficiency_metrics.json
+```
+
+旧 1.0/1.1 summary 可审计 request/byte 等已有证据，但缺 trace context 时 pollution 为 unavailable。CLI 拒绝覆盖已有输出；结果只作机制/contract 验证，不能作为算法优劣或 paper-ready 证据。

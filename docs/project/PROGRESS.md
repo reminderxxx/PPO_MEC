@@ -1361,3 +1361,9 @@ quick run 结果边界：
 - 新增 FIFO、LFU、周期整数衰减 Aging-LFU 和私有 seeded RNG Random；factory 严格注册 `lru/fifo/lfu/aging_lfu/random`。
 - 新增 checkpoint-free `reactive_lru/reactive_fifo/reactive_lfu/reactive_aging_lfu/reactive_random`；共享 ReactiveGreedy control，仅 eviction 不同。
 - real evaluation 对 identity-policy binding fail-fast；Random 固定 `policy_seed=run seed`。controlled validation 不训练、不改 reward/RL、不运行 formal/hidden，也不产生性能优劣结论。
+## 2026-08-18: G06 Cache Efficiency Metrics Contract frozen
+
+- 新增 pure reducer `src/metrics/cache_efficiency_metrics.py` 与 contract `docs/project/cache_efficiency_metrics_contract.md`：从 raw request CacheEvent + versioned trace context 独立重算 request/byte、admission/eviction/churn/transfer、slot/MB capacity、pollution/censoring 和 H={1,3,6,12} future-reuse proxy。
+- CacheEvent consumer-safe 升级到 `1.2.0`，只新增 optional admission identity/size 与逐 victim size；recorder 增加 initial/final per-RSU cache snapshot。旧 1.0/1.1 trace 继续读取，缺 context/field 的 group 为 partial/unavailable，不补零。
+- latency saved 审计结论为 unavailable：当前缺逐 request observed 与 cold/cloud counterfactual latency，未使用 reward/delay surrogate。Benchmark row/aggregate 仅接入 nullable scalar。
+- 新增 `scripts/audit_cache_efficiency_metrics.py`。本轮仅做 synthetic、controlled baseline、smoke 与最小 real dry-run contract 验证，不实现 G07 fairness manifest、G08 oracle，不运行 formal/hidden，不形成算法优劣结论。
