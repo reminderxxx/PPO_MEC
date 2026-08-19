@@ -10,7 +10,12 @@ from typing import Any
 from src.data.mobility.handoff_builder import HandoffBuilder
 from src.data.mobility.replay_provider import ReplayProvider
 from src.data.mobility.rsu_mapper import RSUMapper
-from src.data.model_catalog.adapter_catalog import AdapterCatalog
+from src.data.model_catalog.adapter_catalog import (
+    AdapterCatalog,
+    LEGACY_MODEL_CACHE_PROFILE_ID,
+    TYPED_MODEL_CACHE_CONTRACT_VERSION,
+    TYPED_MODEL_CACHE_PROFILE_ID,
+)
 from src.data.workflow.toy_workflow_generator import ToyWorkflowGenerator
 from src.envs.core.cache_eviction import EvictionPlan, build_eviction_policy
 from src.envs.core.predictor_manager import PredictorManager
@@ -28,6 +33,7 @@ from src.envs.specs import (
 PRIMARY_VEHICLE_SELECTION_CHOICES = {"stable_first", "handoff_pressure"}
 CACHE_CAPACITY_UNITS = {"adapter_slots", "mb"}
 CACHE_CAPACITY_EPSILON = 1.0e-9
+TYPED_MAX_DEPENDENCY_BUNDLE_OBJECTS = 2
 
 
 class VecWorkflowCoreEnv:
@@ -85,6 +91,8 @@ class VecWorkflowCoreEnv:
         self._primary_vehicle_id: str | None = None
         self._node_service_steps: dict[str, int] = {}
         self._node_remaining_service_steps: dict[str, int] = {}
+        self._typed_resident_object_ids: dict[str, list[str]] = {}
+        self._typed_workflow_state_ready: dict[str, set[str]] = {}
 
     @property
     def reward_positive_offset(self) -> float:
@@ -106,23 +114,44 @@ class VecWorkflowCoreEnv:
         rsus = []
         for rsu in sorted(self.rsu_states, key=lambda item: item.rsu_id):
             residents = []
-            for adapter_id in rsu.cached_adapter_ids:
-                resolution = self.adapter_catalog.resolve_adapter_resident_size_mb(adapter_id)
-                cache_object = next(
-                    (item for item in self.adapter_catalog.cache_objects if item.adapter_id == adapter_id),
-                    None,
-                )
-                residents.append({
-                    "object_id": cache_object.object_id if cache_object else f"adapter:{adapter_id}",
-                    "adapter_id": adapter_id,
-                    "size_mb": float(resolution.size_mb),
-                })
+            if self._typed_mode_enabled():
+                for object_id in self._typed_resident_object_ids.get(rsu.rsu_id, []):
+                    item = self.adapter_catalog.get_typed_object(object_id)
+                    residents.append({
+                        "object_id": item.object_id,
+                        "object_type": item.object_type,
+                        "adapter_id": item.adapter_id,
+                        "base_model_id": item.base_model_id,
+                        "required_base_model_id": item.required_base_model_id,
+                        "size_mb": float(item.resident_size_mb),
+                        "evictability": item.evictability,
+                    })
+            else:
+                for adapter_id in rsu.cached_adapter_ids:
+                    resolution = self.adapter_catalog.resolve_adapter_resident_size_mb(adapter_id)
+                    cache_object = next(
+                        (item for item in self.adapter_catalog.cache_objects if item.adapter_id == adapter_id),
+                        None,
+                    )
+                    residents.append({
+                        "object_id": cache_object.object_id if cache_object else f"adapter:{adapter_id}",
+                        "adapter_id": adapter_id,
+                        "size_mb": float(resolution.size_mb),
+                    })
             rsus.append({
                 "rsu_id": rsu.rsu_id,
                 "residents": residents,
                 "capacity_enabled": capacity_enabled,
                 "capacity_unit": self._cache_capacity_profile.get("unit", "adapter_slots"),
                 "capacity": capacity,
+                **(
+                    {
+                        "model_cache_profile_id": self.adapter_catalog.model_cache_profile_id,
+                        "typed_model_cache_contract_version": TYPED_MODEL_CACHE_CONTRACT_VERSION,
+                    }
+                    if self._typed_mode_enabled()
+                    else {}
+                ),
             })
         return {"snapshot_step_index": int(self._episode_steps), "rsus": rsus}
 
@@ -141,6 +170,13 @@ class VecWorkflowCoreEnv:
         for rsu in self.rsu_states:
             rsu.cached_adapter_ids = self.adapter_catalog.get_initial_cached_adapters(rsu.rsu_id)
             rsu.active_vehicle_ids = []
+        self._typed_resident_object_ids = {
+            rsu.rsu_id: self.adapter_catalog.get_initial_typed_residents(rsu.rsu_id)
+            for rsu in self.rsu_states
+        }
+        self._typed_workflow_state_ready = {rsu.rsu_id: set() for rsu in self.rsu_states}
+        if self._typed_mode_enabled():
+            self._sync_legacy_adapter_views_from_typed()
         self._initialize_cache_capacity_metadata()
 
         self._mapper.update_rsus(self.rsu_states)
@@ -220,10 +256,20 @@ class VecWorkflowCoreEnv:
         current_required_adapter = current_node.required_adapter if current_node else None
         tracked_vehicle_id = primary_vehicle.vehicle_id if primary_vehicle else pre_action_vehicle_id
         offload_target_rsu_id = self._resolve_target_rsu_id(primary_vehicle, control)
-        pre_execution_cache_hit = self._check_rsu_has_required_adapter(
-            rsu_id=offload_target_rsu_id,
-            required_adapter=current_required_adapter,
-        )
+        if self._typed_mode_enabled() and current_node is not None:
+            pre_execution_cache_hit = self._typed_service_readiness(
+                current_node=current_node,
+                primary_vehicle=primary_vehicle,
+                offload_mode=str(control.offload_action.get("mode", "rsu")),
+                service_rsu_id=offload_target_rsu_id,
+                state_required=False,
+                state_ready=True,
+            )["joint_base_adapter_hit"]
+        else:
+            pre_execution_cache_hit = self._check_rsu_has_required_adapter(
+                rsu_id=offload_target_rsu_id,
+                required_adapter=current_required_adapter,
+            )
         cache_result = self._apply_cache_action(
             control=control,
             primary_vehicle=primary_vehicle,
@@ -258,6 +304,33 @@ class VecWorkflowCoreEnv:
             handoff_count=mobility_transfer_count,
             current_prepare_action=prepare_action_context,
         )
+        offload_mode = str(control.offload_action.get("mode", "rsu"))
+        typed_readiness: dict[str, Any] | None = None
+        if self._typed_mode_enabled() and current_node is not None:
+            continuity_identity = f"{tracked_vehicle_id}/{self.workflow_state.workflow_id}"
+            state_required = mobility_transfer_count > 0
+            migration_realized_now = bool(
+                realized_prepare.get("realized", False)
+                or (mobility_transfer_count > 0 and migration_mode == "migrate")
+            )
+            if migration_realized_now and offload_target_rsu_id:
+                self._typed_workflow_state_ready.setdefault(
+                    offload_target_rsu_id, set()
+                ).add(continuity_identity)
+            state_ready = bool(
+                not state_required
+                or continuity_identity
+                in self._typed_workflow_state_ready.get(str(offload_target_rsu_id), set())
+            )
+            typed_readiness = self._typed_service_readiness(
+                current_node=current_node,
+                primary_vehicle=primary_vehicle,
+                offload_mode=offload_mode,
+                service_rsu_id=offload_target_rsu_id,
+                state_required=state_required,
+                state_ready=state_ready,
+            )
+            cache_result["service_readiness"] = typed_readiness
 
         cache_hit = False
         base_model_ok = False
@@ -310,6 +383,13 @@ class VecWorkflowCoreEnv:
 
         if primary_vehicle is None:
             constraint_penalty += 1.0
+        elif typed_readiness is not None:
+            service_reward += 0.15
+            base_model_ok = bool(typed_readiness["base_ready"])
+            if not base_model_ok:
+                constraint_penalty += 1.0
+            else:
+                service_reward += 0.2
         else:
             service_reward += 0.15
             base_model_ok = primary_vehicle.base_model_id == current_node.required_base_model
@@ -318,8 +398,15 @@ class VecWorkflowCoreEnv:
             else:
                 service_reward += 0.2
 
-        if offload_target_rsu_id is None:
+        if offload_target_rsu_id is None and (
+            typed_readiness is None or offload_mode == "rsu"
+        ):
             constraint_penalty += 0.7
+        elif typed_readiness is not None:
+            service_reward += 0.1
+            cache_hit = bool(typed_readiness["full_service_ready"])
+            if cache_hit:
+                service_reward += 0.45
         else:
             service_reward += 0.1
             target_rsu = self._get_rsu_map().get(offload_target_rsu_id)
@@ -330,7 +417,6 @@ class VecWorkflowCoreEnv:
             if cache_hit:
                 service_reward += 0.45
 
-        offload_mode = control.offload_action.get("mode", "rsu")
         if offload_mode == "vehicle":
             delay_penalty += 0.65
         elif offload_mode == "rsu":
@@ -570,6 +656,7 @@ class VecWorkflowCoreEnv:
 
     def _normalize_cache_capacity_profile(self, profile: dict[str, Any] | None) -> dict[str, Any]:
         merged = {
+            "model_cache_profile_id": LEGACY_MODEL_CACHE_PROFILE_ID,
             "enabled": False,
             "unit": "adapter_slots",
             "rsu_adapter_slots": 0,
@@ -583,6 +670,16 @@ class VecWorkflowCoreEnv:
         if profile:
             merged.update(dict(profile))
         merged["enabled"] = bool(merged.get("enabled", False))
+        merged["model_cache_profile_id"] = str(
+            merged.get("model_cache_profile_id") or LEGACY_MODEL_CACHE_PROFILE_ID
+        )
+        catalog_profile = str(
+            getattr(self._catalog_template, "model_cache_profile_id", LEGACY_MODEL_CACHE_PROFILE_ID)
+        )
+        if merged["model_cache_profile_id"] != catalog_profile:
+            raise ValueError(
+                "cache capacity model_cache_profile_id must match catalog profile"
+            )
         merged["unit"] = str(merged.get("unit") or "adapter_slots").strip().lower()
         if merged["unit"] not in CACHE_CAPACITY_UNITS:
             raise ValueError(f"unsupported cache capacity unit: {merged['unit']}")
@@ -605,7 +702,19 @@ class VecWorkflowCoreEnv:
             raise ValueError("eviction_policy_config must be a mapping")
         merged["eviction_policy_config"] = dict(merged["eviction_policy_config"])
         merged["telemetry_enabled"] = bool(merged.get("telemetry_enabled", True))
+        if merged["model_cache_profile_id"] == TYPED_MODEL_CACHE_PROFILE_ID:
+            if not merged["enabled"] or merged["unit"] != "mb":
+                raise ValueError("typed model cache requires enabled MB capacity")
+            if merged.get("count_base_model_separately") is False:
+                merged["count_base_model_separately"] = True
         return merged
+
+    def _typed_mode_enabled(self) -> bool:
+        return (
+            self.adapter_catalog.model_cache_profile_id == TYPED_MODEL_CACHE_PROFILE_ID
+            and self._cache_capacity_profile.get("model_cache_profile_id")
+            == TYPED_MODEL_CACHE_PROFILE_ID
+        )
 
     def _cache_capacity_enabled(self) -> bool:
         if not self._cache_capacity_profile.get("enabled", False):
@@ -625,6 +734,14 @@ class VecWorkflowCoreEnv:
         return self.adapter_catalog.resolve_adapter_resident_size_mb(adapter_id).size_mb
 
     def _cache_used_value(self, rsu: RSUState) -> float | int:
+        if self._typed_mode_enabled():
+            return float(
+                sum(
+                    self.adapter_catalog.get_typed_object(object_id).resident_size_mb
+                    for object_id in self._typed_resident_object_ids.get(rsu.rsu_id, [])
+                    if self.adapter_catalog.get_typed_object(object_id).counts_toward_capacity
+                )
+            )
         unique_adapters = list(dict.fromkeys(rsu.cached_adapter_ids))
         if self._cache_capacity_profile["unit"] == "mb":
             return float(sum(self._adapter_resident_size_mb(item) for item in unique_adapters))
@@ -633,13 +750,55 @@ class VecWorkflowCoreEnv:
     def _initialize_cache_capacity_metadata(self) -> None:
         self._eviction_policy.reset()
         for rsu in self.rsu_states:
+            initial_residents = (
+                list(self._typed_resident_object_ids.get(rsu.rsu_id, []))
+                if self._typed_mode_enabled()
+                else list(rsu.cached_adapter_ids)
+            )
             self._eviction_policy.reset(
                 rsu_id=rsu.rsu_id,
-                initial_resident_ids=list(rsu.cached_adapter_ids),
+                initial_resident_ids=initial_residents,
                 current_step=self._episode_steps,
             )
             if self._cache_capacity_enabled():
-                self._enforce_initial_cache_capacity(rsu)
+                if self._typed_mode_enabled():
+                    self._validate_typed_resident_invariants(rsu.rsu_id)
+                    if float(self._cache_used_value(rsu)) > float(self._cache_capacity_value() or 0):
+                        raise ValueError(
+                            "typed initial cache must fit capacity without policy-specific trimming"
+                        )
+                else:
+                    self._enforce_initial_cache_capacity(rsu)
+
+    def _sync_legacy_adapter_views_from_typed(self) -> None:
+        for rsu in self.rsu_states:
+            adapter_ids = []
+            for object_id in self._typed_resident_object_ids.get(rsu.rsu_id, []):
+                item = self.adapter_catalog.get_typed_object(object_id)
+                if item.object_type == "adapter" and item.adapter_id:
+                    adapter_ids.append(item.adapter_id)
+            rsu.cached_adapter_ids = adapter_ids
+
+    def _validate_typed_resident_invariants(self, rsu_id: str) -> None:
+        residents = self._typed_resident_object_ids.get(rsu_id, [])
+        if len(residents) != len(set(residents)):
+            raise RuntimeError(f"duplicate typed resident at {rsu_id}")
+        resident_set = set(residents)
+        for object_id in residents:
+            item = self.adapter_catalog.get_typed_object(object_id)
+            if not item.counts_toward_capacity or item.object_type == "kv_prefix":
+                raise RuntimeError(f"invalid typed resident at {rsu_id}: {object_id}")
+            if not set(item.dependency_ids).issubset(resident_set):
+                raise RuntimeError(f"orphan typed resident at {rsu_id}: {object_id}")
+
+    def _typed_used_mb_by_type(self, rsu_id: str) -> dict[str, float]:
+        totals: dict[str, float] = {}
+        for object_id in self._typed_resident_object_ids.get(rsu_id, []):
+            item = self.adapter_catalog.get_typed_object(object_id)
+            totals[item.object_type] = totals.get(item.object_type, 0.0) + float(
+                item.resident_size_mb
+            )
+        return {key: round(value, 6) for key, value in sorted(totals.items())}
 
     def _enforce_initial_cache_capacity(self, rsu: RSUState) -> None:
         capacity = self._cache_capacity_value()
@@ -688,6 +847,13 @@ class VecWorkflowCoreEnv:
         )
 
     def _resident_sizes_for_policy(self, rsu: RSUState) -> dict[str, float]:
+        if self._typed_mode_enabled():
+            return {
+                object_id: float(
+                    self.adapter_catalog.get_typed_object(object_id).resident_size_mb
+                )
+                for object_id in self._typed_resident_object_ids.get(rsu.rsu_id, [])
+            }
         if self._cache_capacity_profile["unit"] == "mb":
             return {
                 adapter_id: self._adapter_resident_size_mb(adapter_id)
@@ -703,7 +869,13 @@ class VecWorkflowCoreEnv:
         required_free_capacity: float,
         protected_object_id: str | None,
     ) -> None:
-        residents = list(dict.fromkeys(rsu.cached_adapter_ids))
+        residents = list(
+            dict.fromkeys(
+                self._typed_resident_object_ids.get(rsu.rsu_id, [])
+                if self._typed_mode_enabled()
+                else rsu.cached_adapter_ids
+            )
+        )
         victims = list(plan.ordered_victim_ids)
         if plan.rsu_id != rsu.rsu_id:
             raise RuntimeError("eviction plan RSU does not match admission target")
@@ -751,6 +923,9 @@ class VecWorkflowCoreEnv:
                 remaining_size = max(float(capacity) - float(used_size), 0.0)
                 occupancy_rate = round(float(used_size) / float(capacity), 6)
         return {
+            "model_cache_profile_id": self._cache_capacity_profile.get(
+                "model_cache_profile_id", LEGACY_MODEL_CACHE_PROFILE_ID
+            ),
             "cache_capacity_enabled": capacity_enabled,
             "cache_capacity_unit": self._cache_capacity_profile.get("unit", "adapter_slots"),
             "eviction_policy": self._eviction_policy.policy_name,
@@ -761,6 +936,11 @@ class VecWorkflowCoreEnv:
             "cache_used_size": used_size,
             "cache_remaining_size": remaining_size,
             "cache_occupancy_rate": occupancy_rate,
+            "cache_used_mb_by_object_type": (
+                self._typed_used_mb_by_type(rsu_id)
+                if rsu_id is not None and self._typed_mode_enabled()
+                else None
+            ),
         }
 
     def _apply_cache_action(
@@ -770,6 +950,13 @@ class VecWorkflowCoreEnv:
         current_node_id: str | None,
         required_adapter: str | None,
     ) -> dict[str, Any]:
+        if self._typed_mode_enabled():
+            return self._apply_typed_cache_action(
+                control=control,
+                primary_vehicle=primary_vehicle,
+                current_node_id=current_node_id,
+                required_adapter=required_adapter,
+            )
         if current_node_id is None or required_adapter is None:
             return self._default_cache_result()
         if not control.cache_action:
@@ -903,6 +1090,204 @@ class VecWorkflowCoreEnv:
             **self._cache_capacity_snapshot(execution_target_rsu_id),
         }
 
+    def _typed_evictable_residents(self, rsu_id: str) -> list[str]:
+        residents = list(self._typed_resident_object_ids.get(rsu_id, []))
+        resident_set = set(residents)
+        result = []
+        for object_id in residents:
+            item = self.adapter_catalog.get_typed_object(object_id)
+            if item.evictability != "evictable":
+                continue
+            if item.object_type == "base_model" and any(
+                object_id in self.adapter_catalog.get_typed_object(candidate).dependency_ids
+                for candidate in resident_set
+                if candidate != object_id
+            ):
+                continue
+            result.append(object_id)
+        return result
+
+    @staticmethod
+    def _typed_rows_by_type(rows: list[dict[str, Any]]) -> dict[str, float]:
+        totals: dict[str, float] = {}
+        for row in rows:
+            object_type = str(row["object_type"])
+            totals[object_type] = totals.get(object_type, 0.0) + float(row["resident_size_mb"])
+        return {key: round(value, 6) for key, value in sorted(totals.items())}
+
+    def _typed_object_row(self, object_id: str) -> dict[str, Any]:
+        item = self.adapter_catalog.get_typed_object(object_id)
+        return {
+            "object_id": item.object_id,
+            "object_type": item.object_type,
+            "version": item.version,
+            "resident_size_mb": float(item.resident_size_mb),
+            "transfer_size_mb": float(item.transfer_size_mb),
+            "adapter_id": item.adapter_id,
+            "base_model_id": item.base_model_id,
+            "required_base_model_id": item.required_base_model_id,
+            "dependency_ids": list(item.dependency_ids),
+            "evictability": item.evictability,
+        }
+
+    def _apply_typed_cache_action(
+        self,
+        *,
+        control: ControlAction,
+        primary_vehicle: VehicleState | None,
+        current_node_id: str | None,
+        required_adapter: str | None,
+    ) -> dict[str, Any]:
+        if current_node_id is None or required_adapter is None or not control.cache_action:
+            return self._default_cache_result()
+        if control.cache_action.get("operation", "cache") == "noop":
+            return self._default_cache_result()
+        strategy = str(control.cache_action.get("strategy", "manual_cache"))
+        prediction_driven = bool(control.cache_action.get("prediction_driven", False))
+        decision_target_rsu_id = control.cache_action.get("rsu_id")
+        current_rsu_id = primary_vehicle.associated_rsu_id if primary_vehicle else None
+        target_rsu_id = decision_target_rsu_id or current_rsu_id
+        corrected = False
+        if strategy == "reactive_cache_fill" and current_rsu_id is not None and target_rsu_id != current_rsu_id:
+            target_rsu_id = current_rsu_id
+            corrected = True
+        base_result = {
+            **self._default_cache_result(),
+            "requested": True,
+            "decision_target_rsu_id": decision_target_rsu_id,
+            "target_rsu_id": target_rsu_id,
+            "adapter_id": required_adapter,
+            "strategy": strategy,
+            "prediction_driven": prediction_driven,
+            "cache_target_corrected_by_handoff": corrected,
+        }
+        rsu = self._get_rsu_map().get(target_rsu_id) if target_rsu_id else None
+        if rsu is None:
+            return {**base_result, "atomic_transaction_status": "rejected_missing_target_rsu"}
+        residents = list(self._typed_resident_object_ids.get(rsu.rsu_id, []))
+        placement = self.adapter_catalog.resolve_typed_placement_plan(
+            adapter_id=required_adapter,
+            resident_object_ids=residents,
+        )
+        if len(placement.ordered_object_ids) > TYPED_MAX_DEPENDENCY_BUNDLE_OBJECTS:
+            raise RuntimeError("typed dependency bundle exceeds frozen object limit")
+        requested_rows = [self._typed_object_row(item) for item in placement.ordered_object_ids]
+        missing_rows = [self._typed_object_row(item) for item in placement.missing_object_ids]
+        capacity_before = self._cache_capacity_snapshot(rsu.rsu_id)
+        adapter = self.adapter_catalog.get_typed_adapter(required_adapter)
+        adapter_was_resident = adapter.object_id in residents
+        for object_id in placement.already_resident_object_ids:
+            self._eviction_policy.on_hit(
+                rsu_id=rsu.rsu_id, object_id=object_id, current_step=self._episode_steps
+            )
+        if not placement.missing_object_ids:
+            return {
+                **base_result,
+                "was_cached_before": True,
+                "dependency_bundle": placement.to_dict(),
+                "requested_typed_objects": requested_rows,
+                "atomic_transaction_status": "noop_all_resident",
+                "orphan_count": 0,
+                "capacity_before": capacity_before,
+                **self._cache_capacity_snapshot(rsu.rsu_id),
+            }
+        capacity = float(self._cache_capacity_value() or 0.0)
+        requested_mb = float(placement.requested_bundle_mb)
+        rejection_reason: str | None = None
+        if any(float(row["resident_size_mb"]) > capacity + CACHE_CAPACITY_EPSILON for row in missing_rows):
+            rejection_reason = "object_exceeds_total_capacity"
+        elif requested_mb > capacity + CACHE_CAPACITY_EPSILON:
+            rejection_reason = "dependency_bundle_exceeds_total_capacity"
+        used = float(self._cache_used_value(rsu))
+        required_free = max(used + requested_mb - capacity, 0.0)
+        eviction_plan: EvictionPlan | None = None
+        victim_ids: list[str] = []
+        if rejection_reason is None and required_free > CACHE_CAPACITY_EPSILON:
+            eligible = self._typed_evictable_residents(rsu.rsu_id)
+            eviction_plan = self._eviction_policy.plan_victims(
+                rsu_id=rsu.rsu_id,
+                resident_ids=eligible,
+                resident_sizes=self._resident_sizes_for_policy(rsu),
+                required_free_capacity=required_free,
+                protected_object_id=None,
+                capacity_unit="mb",
+                current_step=self._episode_steps,
+            )
+            self._validate_eviction_plan(
+                plan=eviction_plan,
+                rsu=rsu,
+                required_free_capacity=required_free,
+                protected_object_id=None,
+            )
+            self._last_eviction_plan = eviction_plan.to_dict()
+            if not eviction_plan.sufficient:
+                rejection_reason = "insufficient_dependency_safe_evictable_capacity"
+            else:
+                victim_ids = list(eviction_plan.ordered_victim_ids)
+        if rejection_reason is not None:
+            return {
+                **base_result,
+                "was_cached_before": adapter_was_resident,
+                "dependency_bundle": placement.to_dict(),
+                "requested_typed_objects": requested_rows,
+                "requested_object_size_mb": requested_mb,
+                "capacity_rejection_reason": rejection_reason,
+                "atomic_transaction_status": "rolled_back_no_mutation",
+                "orphan_count": 0,
+                "eviction_plan": eviction_plan.to_dict() if eviction_plan else None,
+                "capacity_before": capacity_before,
+                **self._cache_capacity_snapshot(rsu.rsu_id),
+            }
+        evicted_rows = [self._typed_object_row(item) for item in victim_ids]
+        admitted_rows = [self._typed_object_row(item) for item in placement.missing_object_ids]
+        next_residents = [item for item in residents if item not in set(victim_ids)]
+        next_residents.extend(placement.missing_object_ids)
+        # All checks precede this commit point; callbacks and resident mutation now form one transaction.
+        for victim_id in victim_ids:
+            self._eviction_policy.on_eviction(
+                rsu_id=rsu.rsu_id, object_id=victim_id, current_step=self._episode_steps
+            )
+        for object_id in placement.missing_object_ids:
+            self._eviction_policy.on_admission(
+                rsu_id=rsu.rsu_id, object_id=object_id, current_step=self._episode_steps
+            )
+        self._typed_resident_object_ids[rsu.rsu_id] = next_residents
+        self._validate_typed_resident_invariants(rsu.rsu_id)
+        if float(self._cache_used_value(rsu)) > capacity + CACHE_CAPACITY_EPSILON:
+            raise RuntimeError("typed transaction violated MB capacity")
+        self._sync_legacy_adapter_views_from_typed()
+        adapter_admitted = adapter.object_id in placement.missing_object_ids
+        evicted_adapter_ids = [
+            str(row["adapter_id"]) for row in evicted_rows if row.get("adapter_id")
+        ]
+        return {
+            **base_result,
+            "was_cached_before": adapter_was_resident,
+            "added_new_adapter": adapter_admitted,
+            "cache_admission_added_new_adapter": adapter_admitted,
+            "cache_eviction": bool(victim_ids),
+            "eviction_count": len(victim_ids),
+            "evicted_adapter_count": len(evicted_adapter_ids),
+            "evicted_adapter_id": evicted_adapter_ids[0] if evicted_adapter_ids else None,
+            "evicted_adapter_ids": evicted_adapter_ids,
+            "evicted_object_ids": victim_ids,
+            "evicted_size_mb_sum": sum(float(row["resident_size_mb"]) for row in evicted_rows),
+            "requested_object_size_mb": requested_mb,
+            "resident_size_source": "typed_catalog_dependency_bundle",
+            "dependency_bundle": placement.to_dict(),
+            "requested_typed_objects": requested_rows,
+            "admitted_typed_objects": admitted_rows,
+            "evicted_typed_objects": evicted_rows,
+            "admitted_mb_by_type": self._typed_rows_by_type(admitted_rows),
+            "evicted_mb_by_type": self._typed_rows_by_type(evicted_rows),
+            "transfer_mb_by_type": dict(placement.transfer_mb_by_type),
+            "atomic_transaction_status": "committed",
+            "orphan_count": 0,
+            "eviction_plan": eviction_plan.to_dict() if eviction_plan else None,
+            "capacity_before": capacity_before,
+            **self._cache_capacity_snapshot(rsu.rsu_id),
+        }
+
     def _check_rsu_has_required_adapter(
         self,
         rsu_id: str | None,
@@ -917,6 +1302,95 @@ class VecWorkflowCoreEnv:
         if cache_hit:
             self._touch_cached_adapter(rsu_id, required_adapter)
         return cache_hit
+
+    def _typed_service_readiness(
+        self,
+        *,
+        current_node: Any,
+        primary_vehicle: VehicleState | None,
+        offload_mode: str,
+        service_rsu_id: str | None,
+        state_required: bool,
+        state_ready: bool,
+    ) -> dict[str, Any]:
+        if current_node is None:
+            return {
+                "base_ready": False,
+                "adapter_ready": False,
+                "joint_base_adapter_hit": False,
+                "state_required": False,
+                "state_ready": False,
+                "full_service_ready": False,
+                "missing_object_types": [],
+                "incompatibility_reason": "not_applicable",
+                "service_scope": "not_applicable",
+                "per_object_lookup_results": [],
+            }
+        adapter = self.adapter_catalog.get_typed_adapter(current_node.required_adapter)
+        base = self.adapter_catalog.get_typed_base(current_node.required_base_model)
+        compatible = (
+            adapter.required_base_model_id == current_node.required_base_model
+            and adapter.base_model_family == base.base_model_family
+            and current_node.required_adapter
+            in self.adapter_catalog.compatibility_map.get(current_node.required_base_model, [])
+        )
+        lookup_rows: list[dict[str, Any]] = []
+        if offload_mode == "vehicle":
+            base_ready = bool(
+                primary_vehicle
+                and primary_vehicle.base_model_id == current_node.required_base_model
+            )
+            adapter_ready = False
+            service_scope = "vehicle_local"
+            lookup_rows = [
+                {"object_id": base.object_id, "object_type": "base_model", "resident": base_ready, "evidence": "vehicle_capability"},
+                {"object_id": adapter.object_id, "object_type": "adapter", "resident": False, "evidence": "vehicle_adapter_residency_disabled"},
+            ]
+        else:
+            residents = set(self._typed_resident_object_ids.get(str(service_rsu_id), []))
+            base_ready = base.object_id in residents
+            adapter_ready = adapter.object_id in residents
+            service_scope = "rsu"
+            lookup_rows = [
+                {"object_id": base.object_id, "object_type": "base_model", "resident": base_ready, "evidence": "rsu_resident_state"},
+                {"object_id": adapter.object_id, "object_type": "adapter", "resident": adapter_ready, "evidence": "rsu_resident_state"},
+            ]
+        effective_state_ready = bool(not state_required or state_ready)
+        missing = []
+        if not base_ready:
+            missing.append("base_model")
+        if not adapter_ready:
+            missing.append("adapter")
+        if state_required and not effective_state_ready:
+            missing.append("workflow_state")
+        if not compatible:
+            reason = "base_adapter_family_or_version_incompatible"
+        elif service_rsu_id is None and offload_mode == "rsu":
+            reason = "illegal_or_missing_service_target"
+        elif missing:
+            reason = "missing:" + ",".join(missing)
+        else:
+            reason = None
+        full_ready = bool(
+            compatible
+            and base_ready
+            and adapter_ready
+            and effective_state_ready
+            and (offload_mode != "rsu" or service_rsu_id in self._get_rsu_map())
+        )
+        return {
+            "base_ready": base_ready,
+            "adapter_ready": adapter_ready,
+            "joint_base_adapter_hit": bool(base_ready and adapter_ready and compatible),
+            "state_required": bool(state_required),
+            "state_ready": effective_state_ready,
+            "full_service_ready": full_ready,
+            "missing_object_types": missing,
+            "incompatibility_reason": reason,
+            "compatibility_result": "compatible" if compatible else "incompatible",
+            "service_scope": service_scope,
+            "per_object_lookup_results": lookup_rows,
+        }
 
     def _get_rsu_map(self) -> dict[str, RSUState]:
         return {rsu.rsu_id: rsu for rsu in self.rsu_states}
@@ -1421,6 +1895,25 @@ class VecWorkflowCoreEnv:
             "action_precondition_valid": not bool(control_metadata.get("invalid_action", False)),
             "stall_occurred": bool(stall_occurred),
             "cache_hit": bool(cache_hit),
+            "model_cache_profile_id": self.adapter_catalog.model_cache_profile_id,
+            "typed_model_cache_contract_version": (
+                TYPED_MODEL_CACHE_CONTRACT_VERSION if self._typed_mode_enabled() else None
+            ),
+            "base_model_hit": (
+                cache_event.base_model_hit if self._typed_mode_enabled() else None
+            ),
+            "adapter_hit": (
+                cache_event.adapter_hit if self._typed_mode_enabled() else None
+            ),
+            "joint_model_hit": (
+                cache_event.joint_model_hit if self._typed_mode_enabled() else None
+            ),
+            "workflow_state_ready": (
+                cache_event.workflow_state_ready if self._typed_mode_enabled() else None
+            ),
+            "full_service_ready": (
+                cache_event.full_service_ready if self._typed_mode_enabled() else None
+            ),
             "cache_applied": bool(cache_result.get("requested", False)),
             "cache_admission_count": int(bool(cache_result.get("requested", False))),
             "cache_admission_added_new_adapter": bool(cache_result.get("cache_admission_added_new_adapter", False)),
@@ -1474,15 +1967,24 @@ class VecWorkflowCoreEnv:
         migration_prepare_realized: bool,
     ) -> CacheEvent:
         adapter_id = current_node.required_adapter if current_node else None
-        size_resolution = (
-            self.adapter_catalog.resolve_adapter_resident_size_mb(adapter_id)
-            if adapter_id else None
-        )
-        object_id = (
-            size_resolution.object_id or f"adapter:{adapter_id}"
-            if size_resolution else None
-        )
-        size_mb = size_resolution.size_mb if size_resolution else None
+        typed_mode = self._typed_mode_enabled()
+        if typed_mode and adapter_id:
+            typed_adapter = self.adapter_catalog.get_typed_adapter(adapter_id)
+            object_id = typed_adapter.object_id
+            size_mb = float(typed_adapter.resident_size_mb)
+            transfer_source = "typed_catalog_dependency_bundle"
+            size_resolution = None
+        else:
+            size_resolution = (
+                self.adapter_catalog.resolve_adapter_resident_size_mb(adapter_id)
+                if adapter_id else None
+            )
+            object_id = (
+                size_resolution.object_id or f"adapter:{adapter_id}"
+                if size_resolution else None
+            )
+            size_mb = size_resolution.size_mb if size_resolution else None
+            transfer_source = size_resolution.source if size_resolution else "not_applicable"
         offload_mode = str(control.offload_action.get("mode", "rsu"))
         if current_node is None:
             hit_source = "not_applicable"
@@ -1517,25 +2019,55 @@ class VecWorkflowCoreEnv:
         eviction_occurred = bool(cache_result.get("cache_eviction", False))
         evicted_adapter_id = cache_result.get("evicted_adapter_id")
         evicted_adapter_ids = list(cache_result.get("evicted_adapter_ids") or [])
-        evicted_object_ids = []
-        for victim_id in evicted_adapter_ids:
-            victim_object = next(
-                (item for item in self.adapter_catalog.cache_objects if item.adapter_id == victim_id),
+        if typed_mode:
+            evicted_object_ids = list(cache_result.get("evicted_object_ids") or [])
+            evicted_object_id = evicted_object_ids[0] if evicted_object_ids else None
+        else:
+            evicted_object_ids = []
+            for victim_id in evicted_adapter_ids:
+                victim_object = next(
+                    (item for item in self.adapter_catalog.cache_objects if item.adapter_id == victim_id),
+                    None,
+                )
+                evicted_object_ids.append(victim_object.object_id if victim_object else f"adapter:{victim_id}")
+            evicted_object = next(
+                (item for item in self.adapter_catalog.cache_objects if item.adapter_id == evicted_adapter_id),
                 None,
             )
-            evicted_object_ids.append(victim_object.object_id if victim_object else f"adapter:{victim_id}")
-        evicted_object = next(
-            (item for item in self.adapter_catalog.cache_objects if item.adapter_id == evicted_adapter_id),
-            None,
-        )
+            evicted_object_id = (
+                evicted_object.object_id
+                if evicted_object
+                else (f"adapter:{evicted_adapter_id}" if evicted_adapter_id else None)
+            )
         capacity_before = dict(cache_result.get("capacity_before") or {})
         capacity_enabled = bool(cache_result.get("cache_capacity_enabled", False))
-        adapter_transfer_size = size_mb if admission_added and size_mb is not None else 0.0
-        migration_transfer_size = (
-            float(self.adapter_catalog.estimate_bundle_transfer_size_mb(adapter_id))
-            if adapter_id and (migration_prepare_requested or migration_prepare_realized)
-            else 0.0
+        adapter_transfer_size = (
+            float(cache_result.get("transfer_mb_by_type", {}).get("adapter", 0.0))
+            if typed_mode
+            else size_mb if admission_added and size_mb is not None else 0.0
         )
+        migration_requested_flag = bool(
+            migration_prepare_requested
+            or migration_prepare_realized
+            or control.migration_action.get("mode") == "migrate"
+        )
+        if typed_mode:
+            state_object = self.adapter_catalog.resolve_workflow_state_object()
+            migration_transfer_size = (
+                float(state_object.transfer_size_mb)
+                if state_object and migration_requested_flag
+                else 0.0
+            )
+        else:
+            migration_transfer_size = (
+                float(self.adapter_catalog.estimate_bundle_transfer_size_mb(adapter_id))
+                if adapter_id and migration_requested_flag
+                else 0.0
+            )
+        readiness = dict(cache_result.get("service_readiness") or {})
+        typed_transfer_by_type = dict(cache_result.get("transfer_mb_by_type") or {})
+        if typed_mode and migration_transfer_size > 0:
+            typed_transfer_by_type["workflow_state"] = round(migration_transfer_size, 6)
         return CacheEvent(
             event_id=f"cache-event-{self._episode_steps:06d}",
             event_schema_version=CACHE_EVENT_SCHEMA_VERSION,
@@ -1564,13 +2096,13 @@ class VecWorkflowCoreEnv:
             cache_target_rsu_id=cache_result.get("target_rsu_id"),
             eviction_occurred=eviction_occurred,
             eviction_policy=(str(self._cache_capacity_profile.get("eviction_policy", "lru")) if capacity_enabled else "not_applicable"),
-            evicted_object_id=(evicted_object.object_id if evicted_object else (f"adapter:{evicted_adapter_id}" if evicted_adapter_id else None)),
+            evicted_object_id=evicted_object_id,
             evicted_adapter_id=evicted_adapter_id,
             eviction_reason="capacity_limit" if eviction_occurred else "not_occurred",
             adapter_transfer_size_mb=float(adapter_transfer_size),
             state_migration_size_mb=float(migration_transfer_size),
-            transfer_source=(size_resolution.source if size_resolution else "not_applicable"),
-            migration_requested=bool(migration_prepare_requested or control.migration_action.get("mode") == "migrate"),
+            transfer_source=transfer_source,
+            migration_requested=migration_requested_flag,
             migration_realized=bool(migration_prepare_realized or (handoff_count > 0 and control.migration_action.get("mode") == "migrate")),
             cache_capacity_enabled=capacity_enabled,
             cache_capacity_unit=str(cache_result.get("cache_capacity_unit", "adapter_slots")),
@@ -1591,27 +2123,80 @@ class VecWorkflowCoreEnv:
             evicted_object_ids=evicted_object_ids,
             evicted_adapter_ids=evicted_adapter_ids,
             evicted_size_mb_sum=float(cache_result.get("evicted_size_mb_sum", 0.0) or 0.0),
-            requested_object_size_mb=cache_result.get("requested_object_size_mb", size_mb),
+            requested_object_size_mb=(size_mb if typed_mode else cache_result.get("requested_object_size_mb", size_mb)),
             capacity_rejection_reason=cache_result.get("capacity_rejection_reason"),
             admitted_object_id=(
-                next(
-                    (
-                        item.object_id
-                        for item in self.adapter_catalog.cache_objects
-                        if item.adapter_id == cache_result.get("adapter_id")
-                    ),
-                    f"adapter:{cache_result.get('adapter_id')}",
+                (
+                    self.adapter_catalog.get_typed_adapter(
+                        str(cache_result.get("adapter_id"))
+                    ).object_id
+                    if typed_mode
+                    else next(
+                        (
+                            item.object_id
+                            for item in self.adapter_catalog.cache_objects
+                            if item.adapter_id == cache_result.get("adapter_id")
+                        ),
+                        f"adapter:{cache_result.get('adapter_id')}",
+                    )
                 )
                 if admission_added and cache_result.get("adapter_id")
                 else None
             ),
             admitted_adapter_id=(cache_result.get("adapter_id") if admission_added else None),
             admitted_size_mb=(
-                float(cache_result.get("requested_object_size_mb"))
-                if admission_added and cache_result.get("requested_object_size_mb") is not None
+                float(size_mb)
+                if admission_added and size_mb is not None
                 else None
             ),
-            evicted_sizes_mb=[float(self._adapter_resident_size_mb(item)) for item in evicted_adapter_ids],
+            evicted_sizes_mb=(
+                [
+                    float(self.adapter_catalog.get_typed_object(item).resident_size_mb)
+                    for item in evicted_object_ids
+                ]
+                if typed_mode
+                else [float(self._adapter_resident_size_mb(item)) for item in evicted_adapter_ids]
+            ),
+            typed_model_cache_contract_version=(
+                TYPED_MODEL_CACHE_CONTRACT_VERSION if typed_mode else None
+            ),
+            model_cache_profile_id=self.adapter_catalog.model_cache_profile_id,
+            requested_typed_objects=list(cache_result.get("requested_typed_objects") or []),
+            dependency_bundle=cache_result.get("dependency_bundle"),
+            per_object_lookup_results=list(readiness.get("per_object_lookup_results") or []),
+            base_model_hit=(bool(readiness.get("base_ready")) if typed_mode else None),
+            adapter_hit=(bool(readiness.get("adapter_ready")) if typed_mode else None),
+            joint_model_hit=(bool(readiness.get("joint_base_adapter_hit")) if typed_mode else None),
+            workflow_state_ready=(bool(readiness.get("state_ready")) if typed_mode else None),
+            full_service_ready=(bool(readiness.get("full_service_ready")) if typed_mode else None),
+            missing_object_types=list(readiness.get("missing_object_types") or []),
+            incompatibility_reason=readiness.get("incompatibility_reason"),
+            compatibility_result=readiness.get("compatibility_result"),
+            admitted_typed_objects=list(cache_result.get("admitted_typed_objects") or []),
+            evicted_typed_objects=list(cache_result.get("evicted_typed_objects") or []),
+            admitted_mb_by_type=dict(cache_result.get("admitted_mb_by_type") or {}),
+            evicted_mb_by_type=dict(cache_result.get("evicted_mb_by_type") or {}),
+            transfer_mb_by_type=typed_transfer_by_type,
+            typed_capacity_snapshot=(
+                {
+                    "before": capacity_before,
+                    "after": {
+                        "capacity_mb": cache_result.get("cache_capacity"),
+                        "used_mb": cache_result.get("cache_used_size"),
+                        "remaining_mb": cache_result.get("cache_remaining_size"),
+                        "used_mb_by_type": cache_result.get("cache_used_mb_by_object_type"),
+                    },
+                    "requested_dependency_bundle_mb": (
+                        (cache_result.get("dependency_bundle") or {}).get("requested_bundle_mb")
+                    ),
+                }
+                if typed_mode
+                else None
+            ),
+            atomic_transaction_status=(
+                cache_result.get("atomic_transaction_status") if typed_mode else None
+            ),
+            orphan_count=(int(cache_result.get("orphan_count", 0)) if typed_mode else None),
         )
 
     def _estimate_backhaul_traffic_cost(
@@ -1623,13 +2208,25 @@ class VecWorkflowCoreEnv:
         realized_prepare: dict[str, Any],
     ) -> float:
         cache_cost = 0.0
-        if cache_result.get("added_new_adapter", False):
+        if self._typed_mode_enabled():
+            cache_cost = sum(
+                float(value)
+                for object_type, value in dict(
+                    cache_result.get("transfer_mb_by_type") or {}
+                ).items()
+                if object_type in {"base_model", "adapter"}
+            )
+        elif cache_result.get("added_new_adapter", False):
             cache_cost = self.adapter_catalog.estimate_adapter_transfer_size_mb(
                 cache_result.get("adapter_id") or adapter_id
             )
         migration_cost = 0.0
         if handoff_count > 0 and (migration_mode in {"prepare", "migrate"} or realized_prepare.get("realized", False)):
-            migration_cost = self.adapter_catalog.estimate_bundle_transfer_size_mb(adapter_id)
+            if self._typed_mode_enabled():
+                state_object = self.adapter_catalog.resolve_workflow_state_object()
+                migration_cost = float(state_object.transfer_size_mb) if state_object else 0.0
+            else:
+                migration_cost = self.adapter_catalog.estimate_bundle_transfer_size_mb(adapter_id)
         return cache_cost + migration_cost
 
     def _extract_primary_vehicle_from_state(self, state: dict[str, Any]) -> dict[str, Any]:
@@ -1657,6 +2254,17 @@ class VecWorkflowCoreEnv:
             "eviction_count": 0,
             "evicted_adapter_count": 0,
             "evicted_adapter_id": None,
+            "evicted_adapter_ids": [],
+            "evicted_object_ids": [],
+            "dependency_bundle": None,
+            "requested_typed_objects": [],
+            "admitted_typed_objects": [],
+            "evicted_typed_objects": [],
+            "admitted_mb_by_type": {},
+            "evicted_mb_by_type": {},
+            "transfer_mb_by_type": {},
+            "atomic_transaction_status": "not_requested",
+            "orphan_count": 0,
             **self._cache_capacity_snapshot(None),
         }
 

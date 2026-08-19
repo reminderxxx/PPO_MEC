@@ -53,3 +53,7 @@ Semantic hash 排除 `identity.manifest_id`、`identity.created_at`、`artifact_
 ## G08 reuse
 
 G08 必须直接消费同一 validated manifest与evaluation units，在相同 request plan、capacity/catalog/initial cache、seed和cost model上增加 oracle identity；不得重选窗口、重建请求流或另设容量。G08 输出的 oracle gap/causal regret属于新合同，不能反向写入或修改G07历史artifact。
+
+## G13 optional typed binding
+
+`cache_contract.typed_model_cache`是consumer-safe optional binding：profile/contract、catalog fingerprint、compatibility map、initial typed state fingerprint、resident object size/dependency/evictability、atomic transaction、type-aware metric 1.1与oracle compatibility。typed binding强制MB capacity并校验initial no-orphan/no-trim。五baseline仍共享同一logical action与typed dependency resolver，pairwise唯一主要差异是eviction policy。旧G07 manifest缺该字段仍按legacy 1.0验证。

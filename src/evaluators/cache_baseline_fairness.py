@@ -267,6 +267,119 @@ def _catalog_resident_sizes(catalog: AdapterCatalog, workflows: Iterable[Any]) -
     return rows
 
 
+def build_typed_cache_fairness_binding(catalog: AdapterCatalog) -> dict[str, Any]:
+    """Build the policy-invariant typed portion embedded by a G13 fairness manifest."""
+    if not catalog.typed_mode_enabled:
+        raise FairnessManifestError("typed fairness binding requires typed catalog profile")
+    catalog.validate_typed_catalog()
+    objects = [
+        {
+            "object_id": item.object_id,
+            "object_type": item.object_type,
+            "version": item.version,
+            "resident_size_mb": float(item.resident_size_mb),
+            "transfer_size_mb": float(item.transfer_size_mb),
+            "dependency_ids": list(item.dependency_ids),
+            "adapter_id": item.adapter_id,
+            "base_model_id": item.base_model_id,
+            "required_base_model_id": item.required_base_model_id,
+            "evictability": item.evictability,
+            "counts_toward_capacity": item.counts_toward_capacity,
+        }
+        for item in catalog.typed_cache_objects
+        if item.counts_toward_capacity
+    ]
+    initial = [
+        item.to_dict()
+        for item in sorted(catalog.rsu_typed_cache_profiles, key=lambda row: row.rsu_id)
+    ]
+    payload = {
+        "profile_id": catalog.model_cache_profile_id,
+        "contract_version": catalog.typed_model_cache_contract_version,
+        "catalog_fingerprint": catalog.canonical_fingerprint(),
+        "compatibility_map": {
+            key: list(values) for key, values in sorted(catalog.compatibility_map.items())
+        },
+        "resident_objects": objects,
+        "initial_typed_cache_contents": initial,
+        "initial_typed_state_fingerprint": sha256_value(initial),
+        "transaction_contract": {
+            "max_logical_cache_actions_per_step": 1,
+            "max_dependency_bundle_objects": 2,
+            "admission_order": ["base_model", "adapter"],
+            "partial_admission": False,
+            "atomic_rollback": True,
+            "dependency_safe_base_eviction": "prohibit_while_resident_adapter_depends",
+        },
+        "type_aware_metric_version": "1.1.0",
+        "oracle_compatibility": {
+            "status": "compatible_tiny_exact_and_state_limit_guarded",
+            "objective": "joint_base_adapter_hit",
+            "atomic_dependency_bundle": True,
+        },
+    }
+    report = validate_typed_cache_fairness_binding(payload)
+    if report["status"] != "pass":
+        raise FairnessManifestError("; ".join(report["errors"]))
+    return payload
+
+
+def validate_typed_cache_fairness_binding(
+    payload: dict[str, Any], *, capacity: dict[str, Any] | None = None
+) -> dict[str, Any]:
+    errors: list[str] = []
+    if payload.get("profile_id") != "typed_base_adapter_state_v1":
+        errors.append("typed fairness profile mismatch")
+    if payload.get("contract_version") != "1.0.0":
+        errors.append("typed fairness contract version mismatch")
+    objects = payload.get("resident_objects")
+    if not isinstance(objects, list) or not objects:
+        errors.append("typed fairness resident object table missing")
+        objects = []
+    object_map = {str(item.get("object_id")): item for item in objects if isinstance(item, dict)}
+    if len(object_map) != len(objects):
+        errors.append("typed fairness object IDs must be unique")
+    for object_id, item in object_map.items():
+        try:
+            size = float(item.get("resident_size_mb"))
+            transfer = float(item.get("transfer_size_mb"))
+            if not math.isfinite(size) or size <= 0 or not math.isfinite(transfer) or transfer <= 0:
+                raise ValueError
+        except (TypeError, ValueError):
+            errors.append(f"invalid typed size for {object_id}")
+        if any(str(dependency) not in object_map for dependency in item.get("dependency_ids") or []):
+            errors.append(f"missing typed dependency for {object_id}")
+    initial = payload.get("initial_typed_cache_contents")
+    if not isinstance(initial, list) or sha256_value(initial) != payload.get("initial_typed_state_fingerprint"):
+        errors.append("typed initial state fingerprint mismatch")
+        initial = []
+    if capacity is not None:
+        if capacity.get("unit") != "mb" or capacity.get("enabled") is not True:
+            errors.append("typed fairness requires enabled MB capacity")
+        cap = float(capacity.get("capacity_mb") or 0.0)
+    else:
+        cap = math.inf
+    for rsu in initial:
+        residents = set(map(str, rsu.get("resident_object_ids") or []))
+        if any(object_id not in object_map for object_id in residents):
+            errors.append(f"typed initial state references unknown object at {rsu.get('rsu_id')}")
+            continue
+        if any(not set(object_map[item].get("dependency_ids") or []).issubset(residents) for item in residents):
+            errors.append(f"typed initial state has orphan at {rsu.get('rsu_id')}")
+        if sum(float(object_map[item]["resident_size_mb"]) for item in residents) > cap + 1e-9:
+            errors.append(f"typed initial state exceeds capacity at {rsu.get('rsu_id')}")
+    transaction = payload.get("transaction_contract") or {}
+    if transaction.get("max_logical_cache_actions_per_step") != 1 or transaction.get("max_dependency_bundle_objects") != 2:
+        errors.append("typed transaction action/bundle budget mismatch")
+    if transaction.get("partial_admission") is not False or transaction.get("atomic_rollback") is not True:
+        errors.append("typed transaction must be atomic without partial admission")
+    if payload.get("type_aware_metric_version") != "1.1.0":
+        errors.append("typed metric version mismatch")
+    if payload.get("oracle_compatibility", {}).get("atomic_dependency_bundle") is not True:
+        errors.append("typed oracle compatibility missing")
+    return {"status": "pass" if not errors else "fail", "errors": errors}
+
+
 def _load_baseline_entry(root: Path, name: str) -> dict[str, Any]:
     path = root / "configs" / "algo" / f"{name}.yaml"
     payload = yaml.safe_load(path.read_text(encoding="utf-8-sig"))
@@ -559,9 +672,9 @@ def build_manifest(
             "adapter_transfer_size_source": "catalog resident size resolver",
             "state_migration_size_source": "AdapterCatalog.estimate_bundle_transfer_size_mb/v1",
             "capacity_contract_version": "cache_capacity_contract_v1",
-            "cache_event_schema_version": "1.2.0",
+            "cache_event_schema_version": "1.3.0",
             "cache_trace_context_version": "1.0.0",
-            "cache_efficiency_metrics_contract_version": "1.0.0",
+            "cache_efficiency_metrics_contract_version": "1.1.0",
             "oracle_companion_contract": {
                 "cache_request_replay_version": "1.0.0",
                 "oracle_contract_version": "future_horizon_cache_oracle_contract_v1.0.0",
@@ -775,7 +888,7 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
         errors.append("incompatible CacheEvent schema major version")
     if cache.get("cache_trace_context_version") != "1.0.0":
         errors.append("cache trace context version mismatch")
-    if cache.get("cache_efficiency_metrics_contract_version") != "1.0.0":
+    if cache.get("cache_efficiency_metrics_contract_version") not in {"1.0.0", "1.1.0"}:
         errors.append("cache efficiency metrics contract version mismatch")
     if cache.get("size_resolver") != "AdapterCatalog.resolve_adapter_resident_size_mb/v1" or not cache.get("catalog_fallback_rule"):
         errors.append("resident size/fallback contract mismatch")
@@ -787,6 +900,12 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
         for item in initial_cache:
             if sum(float(sizes.get(adapter_id, math.inf)) for adapter_id in item.get("cached_adapter_ids", [])) > float(capacity.get("capacity_mb", 0) or 0) + 1e-9:
                 errors.append("initial cache would require policy-specific MB trimming")
+    typed_cache = cache.get("typed_model_cache")
+    if typed_cache is not None:
+        typed_report = validate_typed_cache_fairness_binding(
+            typed_cache, capacity=capacity
+        )
+        errors.extend(typed_report["errors"])
     checked.append("capacity_catalog_initial_cache_and_cacheevent_contracts")
     matrix = manifest.get("baseline_matrix", [])
     names = [entry.get("agent_identity", {}).get("name") for entry in matrix]

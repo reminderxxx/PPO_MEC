@@ -1,0 +1,563 @@
+[
+  {
+    "case": "base_plus_adapter_atomic_admit",
+    "result": {
+      "requested": true,
+      "decision_target_rsu_id": "rsu_b",
+      "target_rsu_id": "rsu_b",
+      "adapter_id": "adapter_tracking",
+      "was_cached_before": false,
+      "added_new_adapter": true,
+      "strategy": "manual_cache",
+      "prediction_driven": false,
+      "cache_target_corrected_by_handoff": false,
+      "cache_admission_added_new_adapter": true,
+      "cache_eviction": false,
+      "eviction_count": 0,
+      "evicted_adapter_count": 0,
+      "evicted_adapter_id": null,
+      "evicted_adapter_ids": [],
+      "evicted_object_ids": [],
+      "dependency_bundle": {
+        "requested_adapter_id": "adapter_tracking",
+        "required_base_model_id": "veh_base_v1",
+        "ordered_object_ids": [
+          "base:veh_base_v1",
+          "adapter:tracking"
+        ],
+        "missing_object_ids": [
+          "base:veh_base_v1",
+          "adapter:tracking"
+        ],
+        "already_resident_object_ids": [],
+        "requested_bundle_mb": 236.0,
+        "transfer_mb_by_type": {
+          "adapter": 48.0,
+          "base_model": 160.0
+        }
+      },
+      "requested_typed_objects": [
+        {
+          "object_id": "base:veh_base_v1",
+          "object_type": "base_model",
+          "version": "v1",
+          "resident_size_mb": 180.0,
+          "transfer_size_mb": 160.0,
+          "adapter_id": null,
+          "base_model_id": "veh_base_v1",
+          "required_base_model_id": null,
+          "dependency_ids": [],
+          "evictability": "pinned"
+        },
+        {
+          "object_id": "adapter:tracking",
+          "object_type": "adapter",
+          "version": "v1",
+          "resident_size_mb": 56.0,
+          "transfer_size_mb": 48.0,
+          "adapter_id": "adapter_tracking",
+          "base_model_id": null,
+          "required_base_model_id": "veh_base_v1",
+          "dependency_ids": [
+            "base:veh_base_v1"
+          ],
+          "evictability": "evictable"
+        }
+      ],
+      "admitted_typed_objects": [
+        {
+          "object_id": "base:veh_base_v1",
+          "object_type": "base_model",
+          "version": "v1",
+          "resident_size_mb": 180.0,
+          "transfer_size_mb": 160.0,
+          "adapter_id": null,
+          "base_model_id": "veh_base_v1",
+          "required_base_model_id": null,
+          "dependency_ids": [],
+          "evictability": "pinned"
+        },
+        {
+          "object_id": "adapter:tracking",
+          "object_type": "adapter",
+          "version": "v1",
+          "resident_size_mb": 56.0,
+          "transfer_size_mb": 48.0,
+          "adapter_id": "adapter_tracking",
+          "base_model_id": null,
+          "required_base_model_id": "veh_base_v1",
+          "dependency_ids": [
+            "base:veh_base_v1"
+          ],
+          "evictability": "evictable"
+        }
+      ],
+      "evicted_typed_objects": [],
+      "admitted_mb_by_type": {
+        "adapter": 56.0,
+        "base_model": 180.0
+      },
+      "evicted_mb_by_type": {},
+      "transfer_mb_by_type": {
+        "adapter": 48.0,
+        "base_model": 160.0
+      },
+      "atomic_transaction_status": "committed",
+      "orphan_count": 0,
+      "model_cache_profile_id": "typed_base_adapter_state_v1",
+      "cache_capacity_enabled": true,
+      "cache_capacity_unit": "mb",
+      "eviction_policy": "lru",
+      "eviction_policy_version": "1.0.0",
+      "eviction_policy_seed": 7,
+      "rsu_adapter_slots": 0,
+      "cache_capacity": 320.0,
+      "cache_used_size": 236.0,
+      "cache_remaining_size": 84.0,
+      "cache_occupancy_rate": 0.7375,
+      "cache_used_mb_by_object_type": {
+        "adapter": 56.0,
+        "base_model": 180.0
+      },
+      "evicted_size_mb_sum": 0,
+      "requested_object_size_mb": 236.0,
+      "resident_size_source": "typed_catalog_dependency_bundle",
+      "eviction_plan": null,
+      "capacity_before": {
+        "model_cache_profile_id": "typed_base_adapter_state_v1",
+        "cache_capacity_enabled": true,
+        "cache_capacity_unit": "mb",
+        "eviction_policy": "lru",
+        "eviction_policy_version": "1.0.0",
+        "eviction_policy_seed": 7,
+        "rsu_adapter_slots": 0,
+        "cache_capacity": 320.0,
+        "cache_used_size": 0.0,
+        "cache_remaining_size": 320.0,
+        "cache_occupancy_rate": 0.0,
+        "cache_used_mb_by_object_type": {}
+      }
+    },
+    "final_residents": [
+      "base:veh_base_v1",
+      "adapter:tracking"
+    ]
+  },
+  {
+    "case": "dependency_safe_atomic_rollback",
+    "result": {
+      "requested": true,
+      "decision_target_rsu_id": "rsu_a",
+      "target_rsu_id": "rsu_a",
+      "adapter_id": "adapter_reasoning",
+      "was_cached_before": false,
+      "added_new_adapter": false,
+      "strategy": "manual_cache",
+      "prediction_driven": false,
+      "cache_target_corrected_by_handoff": false,
+      "cache_admission_added_new_adapter": false,
+      "cache_eviction": false,
+      "eviction_count": 0,
+      "evicted_adapter_count": 0,
+      "evicted_adapter_id": null,
+      "evicted_adapter_ids": [],
+      "evicted_object_ids": [],
+      "dependency_bundle": {
+        "requested_adapter_id": "adapter_reasoning",
+        "required_base_model_id": "veh_base_v2",
+        "ordered_object_ids": [
+          "base:veh_base_v2",
+          "adapter:reasoning"
+        ],
+        "missing_object_ids": [
+          "base:veh_base_v2",
+          "adapter:reasoning"
+        ],
+        "already_resident_object_ids": [],
+        "requested_bundle_mb": 228.0,
+        "transfer_mb_by_type": {
+          "adapter": 80.0,
+          "base_model": 132.0
+        }
+      },
+      "requested_typed_objects": [
+        {
+          "object_id": "base:veh_base_v2",
+          "object_type": "base_model",
+          "version": "v1",
+          "resident_size_mb": 140.0,
+          "transfer_size_mb": 132.0,
+          "adapter_id": null,
+          "base_model_id": "veh_base_v2",
+          "required_base_model_id": null,
+          "dependency_ids": [],
+          "evictability": "evictable"
+        },
+        {
+          "object_id": "adapter:reasoning",
+          "object_type": "adapter",
+          "version": "v1",
+          "resident_size_mb": 88.0,
+          "transfer_size_mb": 80.0,
+          "adapter_id": "adapter_reasoning",
+          "base_model_id": null,
+          "required_base_model_id": "veh_base_v2",
+          "dependency_ids": [
+            "base:veh_base_v2"
+          ],
+          "evictability": "evictable"
+        }
+      ],
+      "admitted_typed_objects": [],
+      "evicted_typed_objects": [],
+      "admitted_mb_by_type": {},
+      "evicted_mb_by_type": {},
+      "transfer_mb_by_type": {},
+      "atomic_transaction_status": "rolled_back_no_mutation",
+      "orphan_count": 0,
+      "model_cache_profile_id": "typed_base_adapter_state_v1",
+      "cache_capacity_enabled": true,
+      "cache_capacity_unit": "mb",
+      "eviction_policy": "lru",
+      "eviction_policy_version": "1.0.0",
+      "eviction_policy_seed": 7,
+      "rsu_adapter_slots": 0,
+      "cache_capacity": 320.0,
+      "cache_used_size": 276.0,
+      "cache_remaining_size": 44.0,
+      "cache_occupancy_rate": 0.8625,
+      "cache_used_mb_by_object_type": {
+        "adapter": 96.0,
+        "base_model": 180.0
+      },
+      "requested_object_size_mb": 228.0,
+      "capacity_rejection_reason": "insufficient_dependency_safe_evictable_capacity",
+      "eviction_plan": {
+        "rsu_id": "rsu_a",
+        "ordered_victim_ids": [
+          "adapter:perception",
+          "adapter:tracking"
+        ],
+        "victim_sizes": [
+          40.0,
+          56.0
+        ],
+        "cumulative_freed_capacity": 96.0,
+        "required_free_capacity": 184.0,
+        "capacity_unit": "mb",
+        "policy_name": "lru",
+        "policy_version": "1.0.0",
+        "ordered_candidates": [
+          "adapter:perception",
+          "adapter:tracking"
+        ],
+        "candidate_recency": [
+          {
+            "rank": 0,
+            "object_id": "adapter:perception",
+            "last_used_step": -2,
+            "admitted_step": 0,
+            "initial_admission_order": 1,
+            "last_event": "reset_initial_admission",
+            "selection_key": [
+              -2,
+              "adapter:perception"
+            ]
+          },
+          {
+            "rank": 1,
+            "object_id": "adapter:tracking",
+            "last_used_step": -1,
+            "admitted_step": 0,
+            "initial_admission_order": 2,
+            "last_event": "reset_initial_admission",
+            "selection_key": [
+              -1,
+              "adapter:tracking"
+            ]
+          }
+        ],
+        "sufficient": false,
+        "selection_reason": "insufficient_evictable_capacity"
+      },
+      "capacity_before": {
+        "model_cache_profile_id": "typed_base_adapter_state_v1",
+        "cache_capacity_enabled": true,
+        "cache_capacity_unit": "mb",
+        "eviction_policy": "lru",
+        "eviction_policy_version": "1.0.0",
+        "eviction_policy_seed": 7,
+        "rsu_adapter_slots": 0,
+        "cache_capacity": 320.0,
+        "cache_used_size": 276.0,
+        "cache_remaining_size": 44.0,
+        "cache_occupancy_rate": 0.8625,
+        "cache_used_mb_by_object_type": {
+          "adapter": 96.0,
+          "base_model": 180.0
+        }
+      }
+    },
+    "state_unchanged": true
+  },
+  {
+    "case": "heterogeneous_multi_victim",
+    "result": {
+      "requested": true,
+      "decision_target_rsu_id": "rsu_a",
+      "target_rsu_id": "rsu_a",
+      "adapter_id": "adapter_control",
+      "was_cached_before": false,
+      "added_new_adapter": true,
+      "strategy": "manual_cache",
+      "prediction_driven": false,
+      "cache_target_corrected_by_handoff": false,
+      "cache_admission_added_new_adapter": true,
+      "cache_eviction": true,
+      "eviction_count": 2,
+      "evicted_adapter_count": 2,
+      "evicted_adapter_id": "adapter_perception",
+      "evicted_adapter_ids": [
+        "adapter_perception",
+        "adapter_tracking"
+      ],
+      "evicted_object_ids": [
+        "adapter:perception",
+        "adapter:tracking"
+      ],
+      "dependency_bundle": {
+        "requested_adapter_id": "adapter_control",
+        "required_base_model_id": "veh_base_v1",
+        "ordered_object_ids": [
+          "base:veh_base_v1",
+          "adapter:control"
+        ],
+        "missing_object_ids": [
+          "adapter:control"
+        ],
+        "already_resident_object_ids": [
+          "base:veh_base_v1"
+        ],
+        "requested_bundle_mb": 100.0,
+        "transfer_mb_by_type": {
+          "adapter": 92.0
+        }
+      },
+      "requested_typed_objects": [
+        {
+          "object_id": "base:veh_base_v1",
+          "object_type": "base_model",
+          "version": "v1",
+          "resident_size_mb": 180.0,
+          "transfer_size_mb": 160.0,
+          "adapter_id": null,
+          "base_model_id": "veh_base_v1",
+          "required_base_model_id": null,
+          "dependency_ids": [],
+          "evictability": "pinned"
+        },
+        {
+          "object_id": "adapter:control",
+          "object_type": "adapter",
+          "version": "v1",
+          "resident_size_mb": 100.0,
+          "transfer_size_mb": 92.0,
+          "adapter_id": "adapter_control",
+          "base_model_id": null,
+          "required_base_model_id": "veh_base_v1",
+          "dependency_ids": [
+            "base:veh_base_v1"
+          ],
+          "evictability": "evictable"
+        }
+      ],
+      "admitted_typed_objects": [
+        {
+          "object_id": "adapter:control",
+          "object_type": "adapter",
+          "version": "v1",
+          "resident_size_mb": 100.0,
+          "transfer_size_mb": 92.0,
+          "adapter_id": "adapter_control",
+          "base_model_id": null,
+          "required_base_model_id": "veh_base_v1",
+          "dependency_ids": [
+            "base:veh_base_v1"
+          ],
+          "evictability": "evictable"
+        }
+      ],
+      "evicted_typed_objects": [
+        {
+          "object_id": "adapter:perception",
+          "object_type": "adapter",
+          "version": "v1",
+          "resident_size_mb": 40.0,
+          "transfer_size_mb": 36.0,
+          "adapter_id": "adapter_perception",
+          "base_model_id": null,
+          "required_base_model_id": "veh_base_v1",
+          "dependency_ids": [
+            "base:veh_base_v1"
+          ],
+          "evictability": "evictable"
+        },
+        {
+          "object_id": "adapter:tracking",
+          "object_type": "adapter",
+          "version": "v1",
+          "resident_size_mb": 56.0,
+          "transfer_size_mb": 48.0,
+          "adapter_id": "adapter_tracking",
+          "base_model_id": null,
+          "required_base_model_id": "veh_base_v1",
+          "dependency_ids": [
+            "base:veh_base_v1"
+          ],
+          "evictability": "evictable"
+        }
+      ],
+      "admitted_mb_by_type": {
+        "adapter": 100.0
+      },
+      "evicted_mb_by_type": {
+        "adapter": 96.0
+      },
+      "transfer_mb_by_type": {
+        "adapter": 92.0
+      },
+      "atomic_transaction_status": "committed",
+      "orphan_count": 0,
+      "model_cache_profile_id": "typed_base_adapter_state_v1",
+      "cache_capacity_enabled": true,
+      "cache_capacity_unit": "mb",
+      "eviction_policy": "lru",
+      "eviction_policy_version": "1.0.0",
+      "eviction_policy_seed": 7,
+      "rsu_adapter_slots": 0,
+      "cache_capacity": 300.0,
+      "cache_used_size": 280.0,
+      "cache_remaining_size": 20.0,
+      "cache_occupancy_rate": 0.933333,
+      "cache_used_mb_by_object_type": {
+        "adapter": 100.0,
+        "base_model": 180.0
+      },
+      "evicted_size_mb_sum": 96.0,
+      "requested_object_size_mb": 100.0,
+      "resident_size_source": "typed_catalog_dependency_bundle",
+      "eviction_plan": {
+        "rsu_id": "rsu_a",
+        "ordered_victim_ids": [
+          "adapter:perception",
+          "adapter:tracking"
+        ],
+        "victim_sizes": [
+          40.0,
+          56.0
+        ],
+        "cumulative_freed_capacity": 96.0,
+        "required_free_capacity": 76.0,
+        "capacity_unit": "mb",
+        "policy_name": "lru",
+        "policy_version": "1.0.0",
+        "ordered_candidates": [
+          "adapter:perception",
+          "adapter:tracking"
+        ],
+        "candidate_recency": [
+          {
+            "rank": 0,
+            "object_id": "adapter:perception",
+            "last_used_step": -2,
+            "admitted_step": 0,
+            "initial_admission_order": 1,
+            "last_event": "reset_initial_admission",
+            "selection_key": [
+              -2,
+              "adapter:perception"
+            ]
+          },
+          {
+            "rank": 1,
+            "object_id": "adapter:tracking",
+            "last_used_step": -1,
+            "admitted_step": 0,
+            "initial_admission_order": 2,
+            "last_event": "reset_initial_admission",
+            "selection_key": [
+              -1,
+              "adapter:tracking"
+            ]
+          }
+        ],
+        "sufficient": true,
+        "selection_reason": "lru_minimum_prefix_sufficient"
+      },
+      "capacity_before": {
+        "model_cache_profile_id": "typed_base_adapter_state_v1",
+        "cache_capacity_enabled": true,
+        "cache_capacity_unit": "mb",
+        "eviction_policy": "lru",
+        "eviction_policy_version": "1.0.0",
+        "eviction_policy_seed": 7,
+        "rsu_adapter_slots": 0,
+        "cache_capacity": 300.0,
+        "cache_used_size": 276.0,
+        "cache_remaining_size": 24.0,
+        "cache_occupancy_rate": 0.92,
+        "cache_used_mb_by_object_type": {
+          "adapter": 96.0,
+          "base_model": 180.0
+        }
+      }
+    },
+    "final_residents": [
+      "base:veh_base_v1",
+      "adapter:control"
+    ]
+  },
+  {
+    "case": "base_hit_adapter_miss_plan",
+    "plan": {
+      "requested_adapter_id": "adapter_control",
+      "required_base_model_id": "veh_base_v1",
+      "ordered_object_ids": [
+        "base:veh_base_v1",
+        "adapter:control"
+      ],
+      "missing_object_ids": [
+        "adapter:control"
+      ],
+      "already_resident_object_ids": [
+        "base:veh_base_v1"
+      ],
+      "requested_bundle_mb": 100.0,
+      "transfer_mb_by_type": {
+        "adapter": 92.0
+      }
+    }
+  },
+  {
+    "case": "oversized_dependency_bundle_at_200mb",
+    "plan": {
+      "requested_adapter_id": "adapter_reasoning",
+      "required_base_model_id": "veh_base_v2",
+      "ordered_object_ids": [
+        "base:veh_base_v2",
+        "adapter:reasoning"
+      ],
+      "missing_object_ids": [
+        "base:veh_base_v2",
+        "adapter:reasoning"
+      ],
+      "already_resident_object_ids": [],
+      "requested_bundle_mb": 228.0,
+      "transfer_mb_by_type": {
+        "adapter": 80.0,
+        "base_model": 132.0
+      }
+    },
+    "rejection_expected": true
+  }
+]

@@ -6,9 +6,11 @@ from dataclasses import asdict, dataclass, field, fields
 from typing import Any, ClassVar
 
 
-CACHE_EVENT_SCHEMA_VERSION = "1.2.0"
+CACHE_EVENT_SCHEMA_VERSION = "1.3.0"
 CACHE_EVENT_TYPES = frozenset({"request", "not_applicable"})
-CACHE_OBJECT_TYPES = frozenset({"adapter", "not_applicable"})
+CACHE_OBJECT_TYPES = frozenset(
+    {"base_model", "adapter", "workflow_state", "kv_prefix", "not_applicable"}
+)
 CACHE_HIT_SOURCES = frozenset(
     {
         "vehicle_local",
@@ -206,9 +208,30 @@ class CacheEvent:
     admitted_adapter_id: str | None = None
     admitted_size_mb: float | None = None
     evicted_sizes_mb: list[float] = field(default_factory=list)
+    typed_model_cache_contract_version: str | None = None
+    model_cache_profile_id: str | None = None
+    requested_typed_objects: list[dict[str, Any]] = field(default_factory=list)
+    dependency_bundle: dict[str, Any] | None = None
+    per_object_lookup_results: list[dict[str, Any]] = field(default_factory=list)
+    base_model_hit: bool | None = None
+    adapter_hit: bool | None = None
+    joint_model_hit: bool | None = None
+    workflow_state_ready: bool | None = None
+    full_service_ready: bool | None = None
+    missing_object_types: list[str] = field(default_factory=list)
+    incompatibility_reason: str | None = None
+    compatibility_result: str | None = None
+    admitted_typed_objects: list[dict[str, Any]] = field(default_factory=list)
+    evicted_typed_objects: list[dict[str, Any]] = field(default_factory=list)
+    admitted_mb_by_type: dict[str, float] = field(default_factory=dict)
+    evicted_mb_by_type: dict[str, float] = field(default_factory=dict)
+    transfer_mb_by_type: dict[str, float] = field(default_factory=dict)
+    typed_capacity_snapshot: dict[str, Any] | None = None
+    atomic_transaction_status: str | None = None
+    orphan_count: int | None = None
 
     def __post_init__(self) -> None:
-        if self.event_schema_version != CACHE_EVENT_SCHEMA_VERSION:
+        if str(self.event_schema_version).split(".", 1)[0] != "1":
             raise ValueError("unsupported cache event schema version")
         if self.event_type not in CACHE_EVENT_TYPES:
             raise ValueError(f"invalid cache event type: {self.event_type}")
@@ -230,7 +253,8 @@ class CacheEvent:
             raise ValueError("admission_added requires cache target and object")
         if self.eviction_occurred and not self.evicted_object_id:
             raise ValueError("eviction requires a victim object")
-        if self.eviction_count != len(self.evicted_adapter_ids):
+        typed_event = self.model_cache_profile_id == "typed_base_adapter_state_v1"
+        if not typed_event and self.eviction_count != len(self.evicted_adapter_ids):
             raise ValueError("eviction_count must match evicted_adapter_ids")
         if self.eviction_count != len(self.evicted_object_ids):
             raise ValueError("eviction_count must match evicted_object_ids")
@@ -238,11 +262,10 @@ class CacheEvent:
             raise ValueError("eviction_count must match evicted_sizes_mb when present")
         if self.eviction_occurred != (self.eviction_count > 0):
             raise ValueError("eviction_occurred must match eviction_count")
-        if self.eviction_count and (
-            self.evicted_adapter_id != self.evicted_adapter_ids[0]
-            or self.evicted_object_id != self.evicted_object_ids[0]
-        ):
-            raise ValueError("legacy victim fields must identify the first LRU victim")
+        if self.eviction_count and self.evicted_object_id != self.evicted_object_ids[0]:
+            raise ValueError("legacy object victim field must identify the first victim")
+        if self.evicted_adapter_ids and self.evicted_adapter_id != self.evicted_adapter_ids[0]:
+            raise ValueError("legacy adapter victim field must identify the first adapter victim")
         if not self.cache_capacity_enabled and any(
             value is not None
             for value in (
@@ -255,6 +278,21 @@ class CacheEvent:
             )
         ):
             raise ValueError("capacity-disabled snapshots must be null")
+        if typed_event:
+            if self.typed_model_cache_contract_version != "1.0.0":
+                raise ValueError("typed cache event requires contract version 1.0.0")
+            if self.object_type == "kv_prefix":
+                raise ValueError("kv_prefix is reserved and disabled in G13")
+            if self.base_model_hit is None or self.adapter_hit is None:
+                raise ValueError("typed cache event requires layered model hit fields")
+            if self.joint_model_hit != bool(self.base_model_hit and self.adapter_hit):
+                raise ValueError("joint_model_hit must equal base_model_hit && adapter_hit")
+            if self.full_service_ready and not (
+                self.joint_model_hit and self.workflow_state_ready
+            ):
+                raise ValueError("full_service_ready requires joint model and workflow state readiness")
+            if self.orphan_count != 0:
+                raise ValueError("typed resident dependency invariant requires orphan_count=0")
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -288,6 +326,27 @@ CacheEvent.OPTIONAL_FIELDS = (
     "admitted_adapter_id",
     "admitted_size_mb",
     "evicted_sizes_mb",
+    "typed_model_cache_contract_version",
+    "model_cache_profile_id",
+    "requested_typed_objects",
+    "dependency_bundle",
+    "per_object_lookup_results",
+    "base_model_hit",
+    "adapter_hit",
+    "joint_model_hit",
+    "workflow_state_ready",
+    "full_service_ready",
+    "missing_object_types",
+    "incompatibility_reason",
+    "compatibility_result",
+    "admitted_typed_objects",
+    "evicted_typed_objects",
+    "admitted_mb_by_type",
+    "evicted_mb_by_type",
+    "transfer_mb_by_type",
+    "typed_capacity_snapshot",
+    "atomic_transaction_status",
+    "orphan_count",
 )
 CacheEvent.REQUIRED_FIELDS = tuple(
     item.name for item in fields(CacheEvent) if item.name not in CacheEvent.OPTIONAL_FIELDS

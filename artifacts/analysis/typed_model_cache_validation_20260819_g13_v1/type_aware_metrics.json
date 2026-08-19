@@ -1,0 +1,312 @@
+{
+  "cache_event_metrics": {
+    "availability": "available",
+    "cache_event_schema_version": "1.3.0",
+    "request_event_count": 1,
+    "not_applicable_event_count": 0,
+    "total_event_count": 1,
+    "cache_hit_count": 1,
+    "cache_miss_count": 0,
+    "cache_hit_rate": 1.0,
+    "vehicle_local_hit_count": 0,
+    "current_rsu_hit_count": 1,
+    "target_rsu_hit_count": 0,
+    "neighbor_rsu_hit_count": 0,
+    "cloud_served_count": 0,
+    "unserved_count": 0,
+    "not_applicable_hit_source_count": 0,
+    "admission_request_count": 1,
+    "admission_added_count": 0,
+    "admission_noop_or_existing_count": 1,
+    "admission_reason_counts": {
+      "already_cached": 1
+    },
+    "eviction_count": 0,
+    "evicted_object_count": 0,
+    "eviction_policy_counts": {},
+    "adapter_transfer_size_mb_sum": 0.0,
+    "state_migration_size_mb_sum": 20.0,
+    "migration_request_count": 1,
+    "migration_realized_count": 0,
+    "migration_realization_rate": 0.0,
+    "transfer_source_counts": {
+      "typed_catalog_dependency_bundle": 1
+    },
+    "transfer_source_size_mb_sums": {
+      "typed_catalog_dependency_bundle": 20.0
+    },
+    "service_success_count": 1,
+    "service_failure_count": 0,
+    "stall_count": 0,
+    "vehicle_execution_count": 0,
+    "current_rsu_execution_count": 1,
+    "target_rsu_execution_count": 0,
+    "neighbor_rsu_execution_count": 0,
+    "cloud_execution_count": 0,
+    "unserved_execution_count": 0,
+    "typed_metrics_availability": "available",
+    "base_model_hit_count": 1,
+    "adapter_hit_count": 1,
+    "joint_model_hit_count": 1,
+    "workflow_state_ready_count": 1,
+    "full_service_ready_count": 1,
+    "compatibility_failure_count": 0,
+    "base_model_transfer_size_mb_sum": 0.0,
+    "typed_transfer_size_mb_by_type": {
+      "workflow_state": 20.0
+    }
+  },
+  "cache_efficiency_metrics": {
+    "availability": "available",
+    "cache_event_schema_version": "1.3.0",
+    "cache_efficiency_metrics_version": "1.1.0",
+    "request_metrics": {
+      "availability": "available",
+      "unavailable_reason": null,
+      "required_fields": [
+        "event_type",
+        "cache_hit",
+        "hit_source"
+      ],
+      "available_event_count": 1,
+      "unavailable_event_count": 0,
+      "request_count": 1,
+      "object_hit_count": 1,
+      "object_miss_count": 0,
+      "object_hit_rate": 1.0,
+      "hit_source_request_counts": {
+        "vehicle_local": 0,
+        "current_rsu": 1,
+        "target_rsu": 0,
+        "neighbor_rsu": 0,
+        "cloud": 0,
+        "unserved": 0
+      },
+      "hit_source_request_rates": {
+        "vehicle_local": 0.0,
+        "current_rsu": 1.0,
+        "target_rsu": 0.0,
+        "neighbor_rsu": 0.0,
+        "cloud": 0.0,
+        "unserved": 0.0
+      }
+    },
+    "byte_metrics": {
+      "availability": "available",
+      "unavailable_reason": null,
+      "required_fields": [
+        "size_mb"
+      ],
+      "available_event_count": 1,
+      "unavailable_event_count": 0,
+      "byte_denominator_coverage_count": 1,
+      "byte_denominator_request_count": 1,
+      "byte_denominator_coverage_rate": 1.0,
+      "requested_size_mb_sum": 40.0,
+      "hit_size_mb_sum": 40.0,
+      "miss_size_mb_sum": 0,
+      "byte_hit_rate": 1.0,
+      "hit_source_requested_size_mb_sums": {
+        "vehicle_local": 0,
+        "current_rsu": 40.0,
+        "target_rsu": 0,
+        "neighbor_rsu": 0,
+        "cloud": 0,
+        "unserved": 0
+      },
+      "hit_source_byte_rates": {
+        "vehicle_local": 0.0,
+        "current_rsu": 1.0,
+        "target_rsu": 0.0,
+        "neighbor_rsu": 0.0,
+        "cloud": 0.0,
+        "unserved": 0.0
+      }
+    },
+    "lifecycle_metrics": {
+      "availability": "available",
+      "unavailable_reason": null,
+      "required_fields": [
+        "admitted_size_mb",
+        "evicted_size_mb_sum"
+      ],
+      "available_event_count": 0,
+      "unavailable_event_count": 0,
+      "admission_requested_count": 1,
+      "admission_added_count": 0,
+      "admitted_size_mb_sum": 0,
+      "admission_rejection_count": 1,
+      "admission_rejection_reason_counts": {
+        "already_cached": 1
+      },
+      "oversized_rejection_count": 0,
+      "oversized_rejection_size_mb_sum": 0,
+      "eviction_event_count": 0,
+      "eviction_victim_count": 0,
+      "evicted_size_mb_sum": 0,
+      "adapter_transfer_size_mb_sum": 0.0,
+      "state_migration_size_mb_sum": 20.0,
+      "total_transfer_size_mb_sum": 20.0,
+      "cache_churn_mb": 0,
+      "transfer_per_hit_mb": 20.0,
+      "transfer_amplification_ratio": 0.5
+    },
+    "capacity_metrics": {
+      "availability": "available",
+      "unavailable_reason": null,
+      "required_fields": [
+        "cache_capacity_*",
+        "cache_used_*",
+        "cache_remaining_*"
+      ],
+      "available_event_count": 2,
+      "unavailable_event_count": 0,
+      "observed_capacity_unit": "mb",
+      "observed_capacity": 320.0,
+      "observation_count": 2,
+      "mean_occupancy": 0.8625,
+      "peak_occupancy": 0.8625,
+      "capacity_saturation_event_count": 0,
+      "capacity_saturation_event_rate": 0.0,
+      "rejected_due_to_capacity_count": 0
+    },
+    "pollution_metrics": {
+      "availability": "available",
+      "unavailable_reason": null,
+      "required_fields": [
+        "cache_trace_context.initial_snapshot",
+        "cache_trace_context.final_snapshot",
+        "admitted_object_id",
+        "admitted_size_mb",
+        "evicted_object_ids"
+      ],
+      "available_event_count": 1,
+      "unavailable_event_count": 0,
+      "unused_admitted_object_count": 0,
+      "unused_admitted_size_mb": 0.0,
+      "right_censored_unused_admitted_object_count": 0,
+      "right_censored_unused_admitted_size_mb": 0.0,
+      "polluted_resident_mb_steps": 0.0,
+      "total_resident_mb_steps": 1512.0,
+      "cache_pollution_ratio": 0.0,
+      "right_censored_unused_by_object_type": {},
+      "censoring_semantics": "episode-end un-reused admissions are right-censored and excluded from pollution numerator"
+    },
+    "future_reuse_proxy_metrics": {
+      "availability": "available",
+      "unavailable_reason": null,
+      "required_fields": [
+        "evicted_object_ids",
+        "episode_step_index",
+        "object_id"
+      ],
+      "available_event_count": 0,
+      "unavailable_event_count": 0,
+      "evicted_victim_count": 0,
+      "time_to_next_request_after_eviction_steps_mean": null,
+      "horizons": {
+        "1": {
+          "evicted_then_requested_within_h_count": 0,
+          "evicted_then_requested_within_h_mb": 0,
+          "eviction_future_reuse_rate_h": null,
+          "mb_availability": "available"
+        },
+        "3": {
+          "evicted_then_requested_within_h_count": 0,
+          "evicted_then_requested_within_h_mb": 0,
+          "eviction_future_reuse_rate_h": null,
+          "mb_availability": "available"
+        },
+        "6": {
+          "evicted_then_requested_within_h_count": 0,
+          "evicted_then_requested_within_h_mb": 0,
+          "eviction_future_reuse_rate_h": null,
+          "mb_availability": "available"
+        },
+        "12": {
+          "evicted_then_requested_within_h_count": 0,
+          "evicted_then_requested_within_h_mb": 0,
+          "eviction_future_reuse_rate_h": null,
+          "mb_availability": "available"
+        }
+      },
+      "claim_boundary": "future-request reuse proxy; not causal eviction regret or oracle gap"
+    },
+    "latency_saved_metrics": {
+      "availability": "unavailable",
+      "unavailable_reason": "missing_request_aligned_observed_and_cold_counterfactual_latency",
+      "required_fields": [
+        "observed_service_latency_ms",
+        "cold_counterfactual_service_latency_ms",
+        "transfer_latency_ms",
+        "stall_or_restart_latency_ms"
+      ],
+      "available_event_count": 0,
+      "unavailable_event_count": 1,
+      "latency_saved_sum_ms": null,
+      "latency_saved_per_request_ms": null,
+      "latency_saved_per_hit_ms": null,
+      "latency_saved_per_resident_mb_ms": null
+    },
+    "type_aware_metrics": {
+      "availability": "available",
+      "unavailable_reason": null,
+      "required_fields": [
+        "CacheEvent 1.3 typed fields"
+      ],
+      "available_event_count": 1,
+      "unavailable_event_count": 0,
+      "typed_model_cache_contract_version": "1.0.0",
+      "request_count": 1,
+      "base_hit_count": 1,
+      "base_hit_rate": 1.0,
+      "adapter_hit_count": 1,
+      "adapter_hit_rate": 1.0,
+      "joint_base_adapter_hit_count": 1,
+      "joint_base_adapter_hit_rate": 1.0,
+      "workflow_state_ready_count": 1,
+      "workflow_state_ready_rate": 1.0,
+      "full_service_ready_count": 1,
+      "full_service_ready_rate": 1.0,
+      "miss_count_by_missing_object_type": {},
+      "compatibility_failure_count": 0,
+      "requested_mb_by_type": {
+        "adapter": 40.0,
+        "base_model": 180.0
+      },
+      "hit_mb_by_type": {
+        "adapter": 40.0,
+        "base_model": 180.0
+      },
+      "resident_mb_by_type": {
+        "adapter": 256.0,
+        "base_model": 500.0
+      },
+      "admitted_mb_by_type": {},
+      "evicted_mb_by_type": {},
+      "transfer_mb_by_type": {
+        "workflow_state": 20.0
+      },
+      "base_occupancy_share": 0.661376,
+      "adapter_occupancy_share": 0.338624,
+      "pinned_or_unavailable_capacity_mb": 360.0,
+      "dependency_bundle_rejection_count": 0,
+      "adapters_per_resident_base": {
+        "rsu_a/base:veh_base_v1": 2,
+        "rsu_b/base:veh_base_v2": 1,
+        "rsu_c/base:veh_base_v1": 1
+      },
+      "base_reuse_count": 0,
+      "base_sharing_hit_count": 0,
+      "avoided_duplicate_base_transfer_mb": 0.0,
+      "orphan_count": 0,
+      "dependency_bundle_churn_mb": 0,
+      "total_transfer_mb": 20.0,
+      "transfer_amplification": 0.5,
+      "latency_saved": {
+        "availability": "unavailable",
+        "value": null
+      }
+    }
+  }
+}

@@ -52,3 +52,10 @@
 ## 模板来源
 
 通用模板内容已整理进本目录。当前事实来源只保留 `docs/project/` 和根目录 `AGENTS.md`。
+
+## G13 type-aware model cache
+
+- 合同：`typed_model_cache_contract.md`
+- 验证报告：`typed_model_cache_validation_report.md`
+- 机器证据：`../../artifacts/analysis/typed_model_cache_validation_20260819_g13_v1/`
+- 默认继续使用 legacy adapter-only profile；typed profile 必须显式启用。

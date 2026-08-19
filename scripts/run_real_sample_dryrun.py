@@ -72,6 +72,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max_tasks", type=int, default=20, help="Alibaba workflow 最大任务数")
     parser.add_argument("--random_seed", type=int, default=7, help="用于随机 workflow/window 选择")
     parser.add_argument("--agent_name", choices=["sa_ghmappo"], default="sa_ghmappo")
+    parser.add_argument(
+        "--model_cache_profile",
+        choices=["legacy_adapter_only_v1", "typed_base_adapter_state_v1"],
+        default="legacy_adapter_only_v1",
+    )
+    parser.add_argument("--typed_cache_capacity_mb", type=float, default=320.0)
+    parser.add_argument(
+        "--catalog_path",
+        type=str,
+        default="",
+        help="Optional explicit catalog; typed profile defaults to the repository controlled catalog.",
+    )
     return parser.parse_args()
 
 
@@ -91,6 +103,11 @@ def load_selected_workflow_state(args: argparse.Namespace) -> tuple[object, list
         min_tasks=args.min_tasks,
         max_tasks=args.max_tasks,
         random_seed=args.random_seed,
+        adapter_assignment_profile=(
+            "semantic_ai_service"
+            if args.model_cache_profile == "typed_base_adapter_state_v1"
+            else "legacy_batch_type"
+        ),
     )
     if not selected_workflow_states:
         raise RuntimeError(
@@ -117,7 +134,14 @@ def main() -> None:
     )
     workflow_state, workflow_candidate_ids, workflow_source_path = load_selected_workflow_state(args)
 
-    catalog_path = ROOT_DIR / "src" / "data" / "model_catalog" / "sample_model_catalog.json"
+    catalog_path = Path(args.catalog_path) if args.catalog_path else (
+        ROOT_DIR / "src" / "data" / "model_catalog" /
+        (
+            "typed_model_cache_controlled.json"
+            if args.model_cache_profile == "typed_base_adapter_state_v1"
+            else "sample_model_catalog.json"
+        )
+    )
     adapter_catalog = AdapterCatalog.from_json(catalog_path)
     predictor_manager = PredictorManager()
     recorder = EpisodeRecorder(prefetch_validation_window=args.prefetch_validation_window)
@@ -130,6 +154,18 @@ def main() -> None:
         max_steps=max(args.max_steps + 2, 8),
         mobility_source=args.mobility_source,
         primary_vehicle_selection=args.primary_vehicle_selection,
+        cache_capacity_profile=(
+            {
+                "model_cache_profile_id": "typed_base_adapter_state_v1",
+                "enabled": True,
+                "unit": "mb",
+                "capacity_mb": args.typed_cache_capacity_mb,
+                "eviction_policy": "lru",
+                "telemetry_enabled": True,
+            }
+            if args.model_cache_profile == "typed_base_adapter_state_v1"
+            else None
+        ),
     )
     env = GymVecEnv(core_env=core_env, recorder=recorder)
     agent = build_agent(args.agent_name, random_seed=args.random_seed, deterministic_action=True)
@@ -150,6 +186,8 @@ def main() -> None:
             "random_seed": args.random_seed,
             "window_id": mobility_bundle.rsu_metadata.get("window_id"),
             "prefetch_validation_window": args.prefetch_validation_window,
+            "model_cache_profile_id": args.model_cache_profile,
+            "catalog_path": str(catalog_path),
         }
     )
     observation, info = env.reset()
@@ -173,6 +211,8 @@ def main() -> None:
     print(f"spacing: {mobility_bundle.rsu_metadata.get('spacing')}")
     print(f"estimated_association_change_count: {mobility_bundle.rsu_metadata.get('estimated_association_change_count')}")
     print(f"prefetch_validation_window: {args.prefetch_validation_window}")
+    print(f"model_cache_profile_id: {args.model_cache_profile}")
+    print(f"catalog_path: {catalog_path}")
 
     terminated = False
     truncated = False
@@ -239,4 +279,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

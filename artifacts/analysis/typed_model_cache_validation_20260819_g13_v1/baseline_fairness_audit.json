@@ -1,0 +1,237 @@
+{
+  "status": "pass",
+  "binding": {
+    "profile_id": "typed_base_adapter_state_v1",
+    "contract_version": "1.0.0",
+    "catalog_fingerprint": "1c0b3d55e957619af8bd1d15cbf1ba61b756b540c2c67ab8e66b507734092d7e",
+    "compatibility_map": {
+      "veh_base_v1": [
+        "adapter_perception",
+        "adapter_tracking",
+        "adapter_fusion",
+        "adapter_intent",
+        "adapter_control"
+      ],
+      "veh_base_v2": [
+        "adapter_reasoning"
+      ]
+    },
+    "resident_objects": [
+      {
+        "object_id": "base:veh_base_v1",
+        "object_type": "base_model",
+        "version": "v1",
+        "resident_size_mb": 180.0,
+        "transfer_size_mb": 160.0,
+        "dependency_ids": [],
+        "adapter_id": null,
+        "base_model_id": "veh_base_v1",
+        "required_base_model_id": null,
+        "evictability": "pinned",
+        "counts_toward_capacity": true
+      },
+      {
+        "object_id": "base:veh_base_v2",
+        "object_type": "base_model",
+        "version": "v1",
+        "resident_size_mb": 140.0,
+        "transfer_size_mb": 132.0,
+        "dependency_ids": [],
+        "adapter_id": null,
+        "base_model_id": "veh_base_v2",
+        "required_base_model_id": null,
+        "evictability": "evictable",
+        "counts_toward_capacity": true
+      },
+      {
+        "object_id": "adapter:perception",
+        "object_type": "adapter",
+        "version": "v1",
+        "resident_size_mb": 40.0,
+        "transfer_size_mb": 36.0,
+        "dependency_ids": [
+          "base:veh_base_v1"
+        ],
+        "adapter_id": "adapter_perception",
+        "base_model_id": null,
+        "required_base_model_id": "veh_base_v1",
+        "evictability": "evictable",
+        "counts_toward_capacity": true
+      },
+      {
+        "object_id": "adapter:tracking",
+        "object_type": "adapter",
+        "version": "v1",
+        "resident_size_mb": 56.0,
+        "transfer_size_mb": 48.0,
+        "dependency_ids": [
+          "base:veh_base_v1"
+        ],
+        "adapter_id": "adapter_tracking",
+        "base_model_id": null,
+        "required_base_model_id": "veh_base_v1",
+        "evictability": "evictable",
+        "counts_toward_capacity": true
+      },
+      {
+        "object_id": "adapter:fusion",
+        "object_type": "adapter",
+        "version": "v1",
+        "resident_size_mb": 72.0,
+        "transfer_size_mb": 64.0,
+        "dependency_ids": [
+          "base:veh_base_v1"
+        ],
+        "adapter_id": "adapter_fusion",
+        "base_model_id": null,
+        "required_base_model_id": "veh_base_v1",
+        "evictability": "evictable",
+        "counts_toward_capacity": true
+      },
+      {
+        "object_id": "adapter:reasoning",
+        "object_type": "adapter",
+        "version": "v1",
+        "resident_size_mb": 88.0,
+        "transfer_size_mb": 80.0,
+        "dependency_ids": [
+          "base:veh_base_v2"
+        ],
+        "adapter_id": "adapter_reasoning",
+        "base_model_id": null,
+        "required_base_model_id": "veh_base_v2",
+        "evictability": "evictable",
+        "counts_toward_capacity": true
+      },
+      {
+        "object_id": "adapter:intent",
+        "object_type": "adapter",
+        "version": "v1",
+        "resident_size_mb": 64.0,
+        "transfer_size_mb": 58.0,
+        "dependency_ids": [
+          "base:veh_base_v1"
+        ],
+        "adapter_id": "adapter_intent",
+        "base_model_id": null,
+        "required_base_model_id": "veh_base_v1",
+        "evictability": "evictable",
+        "counts_toward_capacity": true
+      },
+      {
+        "object_id": "adapter:control",
+        "object_type": "adapter",
+        "version": "v1",
+        "resident_size_mb": 100.0,
+        "transfer_size_mb": 92.0,
+        "dependency_ids": [
+          "base:veh_base_v1"
+        ],
+        "adapter_id": "adapter_control",
+        "base_model_id": null,
+        "required_base_model_id": "veh_base_v1",
+        "evictability": "evictable",
+        "counts_toward_capacity": true
+      }
+    ],
+    "initial_typed_cache_contents": [
+      {
+        "rsu_id": "rsu_a",
+        "resident_object_ids": [
+          "base:veh_base_v1",
+          "adapter:perception",
+          "adapter:tracking"
+        ]
+      },
+      {
+        "rsu_id": "rsu_b",
+        "resident_object_ids": [
+          "base:veh_base_v2",
+          "adapter:reasoning"
+        ]
+      },
+      {
+        "rsu_id": "rsu_c",
+        "resident_object_ids": [
+          "base:veh_base_v1",
+          "adapter:fusion"
+        ]
+      }
+    ],
+    "initial_typed_state_fingerprint": "5ac98b39c11de50e154a60824b91e0d0ba58f69f587dbde11d3619759b14db7a",
+    "transaction_contract": {
+      "max_logical_cache_actions_per_step": 1,
+      "max_dependency_bundle_objects": 2,
+      "admission_order": [
+        "base_model",
+        "adapter"
+      ],
+      "partial_admission": false,
+      "atomic_rollback": true,
+      "dependency_safe_base_eviction": "prohibit_while_resident_adapter_depends"
+    },
+    "type_aware_metric_version": "1.1.0",
+    "oracle_compatibility": {
+      "status": "compatible_tiny_exact_and_state_limit_guarded",
+      "objective": "joint_base_adapter_hit",
+      "atomic_dependency_bundle": true
+    }
+  },
+  "binding_validation": {
+    "status": "pass",
+    "errors": []
+  },
+  "baseline_rows": [
+    {
+      "policy": "lru",
+      "transaction_status": "committed",
+      "orphan_count": 0,
+      "capacity_mb": 300.0,
+      "requested_bundle": [
+        "base:veh_base_v1",
+        "adapter:control"
+      ]
+    },
+    {
+      "policy": "fifo",
+      "transaction_status": "committed",
+      "orphan_count": 0,
+      "capacity_mb": 300.0,
+      "requested_bundle": [
+        "base:veh_base_v1",
+        "adapter:control"
+      ]
+    },
+    {
+      "policy": "lfu",
+      "transaction_status": "committed",
+      "orphan_count": 0,
+      "capacity_mb": 300.0,
+      "requested_bundle": [
+        "base:veh_base_v1",
+        "adapter:control"
+      ]
+    },
+    {
+      "policy": "aging_lfu",
+      "transaction_status": "committed",
+      "orphan_count": 0,
+      "capacity_mb": 300.0,
+      "requested_bundle": [
+        "base:veh_base_v1",
+        "adapter:control"
+      ]
+    },
+    {
+      "policy": "random",
+      "transaction_status": "committed",
+      "orphan_count": 0,
+      "capacity_mb": 300.0,
+      "requested_bundle": [
+        "base:veh_base_v1",
+        "adapter:control"
+      ]
+    }
+  ],
+  "only_primary_difference": "eviction_policy"
+}

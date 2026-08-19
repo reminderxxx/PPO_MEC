@@ -820,3 +820,20 @@
 影响：19个候选进入统一registry；HF qwen/cbow/bert只保留E类size metadata，ImageNet/LlamaGen与Examsathi退出live projection。BurstGPT、Qwen-Bailian、Mooncake、Azure与Acme只作为未来独立G12候选，不自动下载或启用正式benchmark。
 
 边界：G11不实现raw importer、predictor calibration或synthetic replay，不改变`NGSIM + Alibaba`主线。未知license不得formal-ready；任何未来cross-source alignment必须标记exogenous/synthetic并记录信息损失。
+
+## 2026-08-19: G13 冻结 type-aware base/adapter/workflow-state cache contract
+
+- 决策：保留 `legacy_adapter_only_v1` 为默认兼容 profile；新增显式
+  `typed_base_adapter_state_v1`。typed resident cache 只包含 `base_model` 与
+  `adapter`，`workflow_state` 是 migration-only readiness，`kv_prefix` 禁用。
+- 身份与依赖：对象身份为 `(object_type, version, object_id)`；adapter 必须且只依赖一个
+  compatibility map 允许的 base。一次 adapter admission 可形成严格 `base -> adapter`
+  两对象事务，不暴露半提交状态。
+- 容量与淘汰：MB 是 typed profile 唯一容量单位；base 与 adapter 共同计费；pinned、
+  non-evictable 和仍被 resident adapter 依赖的 base 不可淘汰。五种 policy 只负责排序，
+  环境负责 dependency-safe 过滤、完整性校验和原子 mutation。
+- readiness：分别记录 base、adapter、workflow state 与 full-service readiness；
+  `vehicle_local` 仅代表 vehicle base capability，不伪装成 RSU adapter residency 或完整 hit。
+- 证据边界：NGSIM + Alibaba 提供 mobility/workflow；typed catalog 是受控 metadata/profile。
+  Hugging Face 条目只作非正式 size/provenance diagnostic，unknown license 与 BERT provenance
+  anomaly 均禁止 formal claim。G13 不运行训练、formal/holdout/hidden，也不证明算法收益。

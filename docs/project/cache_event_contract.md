@@ -1,6 +1,6 @@
 # Cache Event Contract
 
-Version: `1.2.0`
+Version: `1.3.0`（G13 typed extension；1.0/1.1/1.2 继续兼容消费）
 
 ## Lifecycle
 
@@ -11,10 +11,12 @@ Version: `1.2.0`
 ## Frozen enums
 
 - `event_type`: `request`, `not_applicable`
-- `object_type`: `adapter`, `not_applicable`
+- `object_type`: `base_model`, `adapter`, `workflow_state`, `kv_prefix`, `not_applicable`
 - `hit_source`: `vehicle_local`, `current_rsu`, `target_rsu`, `neighbor_rsu`, `cloud`, `unserved`, `not_applicable`
 
-当前真实 cache object 只冻结 `adapter`。不把不存在的 content 或 inference-result cache 写入正式 schema。
+legacy profile 的真实 resident object 仍只有 `adapter`。typed profile 冻结
+`base_model`、`adapter` 与 migration-only `workflow_state`；`kv_prefix` 仅保留禁用枚举，
+不得伪造 KV request、residency 或 hit。
 
 ## Fields
 
@@ -78,3 +80,9 @@ Current `1.x` events are accepted, including consumer-safe optional fields. Unkn
 | hit-source distribution | complete legacy field | `unavailable` | old summary has no full distribution |
 
 G06 derived metrics are frozen separately in `cache_efficiency_metrics_contract.md`. Future reuse remains a non-causal proxy; latency saved remains unavailable; G08 cache oracle remains unimplemented. Controlled metrics are not paper performance evidence.
+
+## G13 typed extension (1.3.0)
+
+`CacheEvent 1.3.0` adds optional typed model-cache fields without deleting/redefining 1.0–1.2 fields. `object_type` enum now reserves `base_model/adapter/workflow_state/kv_prefix`；G13 request的legacy singular view仍指向requested adapter，完整base+adapter dependency保存在typed lists。只admit base时不得伪造`admission_added/admitted_adapter_id`；typed transaction status记录真实commit。一个dependency bundle仍只有一个request event。
+
+新增layered readiness、per-object lookup、typed admission/eviction、per-type MB、compatibility、capacity snapshot、atomic status和orphan invariant。旧trace缺typed字段时typed reducer返回unavailable；KV保持disabled且不进入denominator。详见`typed_model_cache_contract.md`。

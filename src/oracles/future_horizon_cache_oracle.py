@@ -276,6 +276,25 @@ def solve_future_horizon_cache_oracle(
         raise CacheOracleError(f"horizon must be one of {ALLOWED_HORIZONS}")
     if state_limit <= 0:
         raise CacheOracleError("state_limit must be positive")
+    if (
+        replay.get("request_semantics", {}).get("model_cache_profile_id")
+        == "typed_base_adapter_state_v1"
+    ):
+        replay_report = validate_request_replay(replay, source_manifest=manifest)
+        if replay_report["status"] != "pass":
+            raise CacheOracleError("; ".join(replay_report["errors"]))
+        from src.oracles.typed_model_cache_oracle import solve_typed_model_cache_oracle
+
+        return solve_typed_model_cache_oracle(
+            replay=replay,
+            manifest=manifest,
+            horizon=horizon,
+            state_limit=state_limit,
+            full_trace_diagnostic=full_trace_diagnostic,
+            contract_version=CACHE_ORACLE_CONTRACT_VERSION,
+            solver_identity=SOLVER_IDENTITY,
+            objective_identity=OBJECTIVE_IDENTITY,
+        )
     state, sizes, capacity = _problem_from_manifest(replay, manifest)
     unit = str(capacity["unit"])
     cap_value = _capacity_value(capacity)
@@ -498,7 +517,21 @@ def build_observed_baseline_outcome(
     *, replay: dict[str, Any], manifest: dict[str, Any], summary: dict[str, Any]
 ) -> dict[str, Any]:
     """Align a raw observed CacheEvent outcome to an already external replay."""
-    state, _, capacity = _problem_from_manifest(replay, manifest)
+    typed_mode = (
+        replay.get("request_semantics", {}).get("model_cache_profile_id")
+        == "typed_base_adapter_state_v1"
+    )
+    if typed_mode:
+        typed_contract = manifest["cache_contract"].get("typed_model_cache") or {}
+        if typed_contract.get("catalog_fingerprint") != replay["requests"][0].get("catalog_fingerprint"):
+            raise CacheOracleError("typed observed outcome catalog fingerprint mismatch")
+        state = {
+            str(item["rsu_id"]): set(map(str, item["resident_object_ids"]))
+            for item in typed_contract.get("initial_typed_cache_contents", [])
+        }
+        capacity = deepcopy(manifest["cache_contract"]["capacity"])
+    else:
+        state, _, capacity = _problem_from_manifest(replay, manifest)
     run_info = summary.get("run_info") or {}
     if run_info.get("fairness_manifest_id") != manifest["identity"]["manifest_id"]:
         raise CacheOracleError("observed summary G07 manifest ID mismatch")
@@ -551,17 +584,36 @@ def build_observed_baseline_outcome(
         "capacity_unit": capacity["unit"],
         "capacity_value": capacity_value,
         "initial_state_fingerprint": _state_fingerprint(state),
-        "object_hit_count": sum(bool(item.get("cache_hit")) for item in events),
-        "hit_mb": sum(float(item["size_mb"]) for item in events if item.get("cache_hit")),
+        "object_hit_count": sum(
+            bool(item.get("full_service_ready") if typed_mode else item.get("cache_hit"))
+            for item in events
+        ),
+        "hit_mb": sum(
+            float(item["size_mb"])
+            for item in events
+            if bool(item.get("full_service_ready") if typed_mode else item.get("cache_hit"))
+        ),
         "transfer_mb": sum(
-            float(item.get("adapter_transfer_size_mb") or 0.0)
-            + float(item.get("state_migration_size_mb") or 0.0)
+            (
+                sum(float(value) for value in (item.get("transfer_mb_by_type") or {}).values())
+                if typed_mode
+                else float(item.get("adapter_transfer_size_mb") or 0.0)
+                + float(item.get("state_migration_size_mb") or 0.0)
+            )
             for item in events
         ),
         "churn_mb": sum(
-            float(item.get("admitted_size_mb") or 0.0)
-            + float(item.get("evicted_size_mb_sum") or 0.0)
+            (
+                sum(float(value) for value in (item.get("admitted_mb_by_type") or {}).values())
+                + sum(float(value) for value in (item.get("evicted_mb_by_type") or {}).values())
+                if typed_mode
+                else float(item.get("admitted_size_mb") or 0.0)
+                + float(item.get("evicted_size_mb_sum") or 0.0)
+            )
             for item in events
+        ),
+        "model_cache_profile_id": (
+            "typed_base_adapter_state_v1" if typed_mode else "legacy_adapter_only_v1"
         ),
         "request_alignment_status": "matched_external_replay",
         "legacy_observed_request_stream_fingerprint": run_info.get("observed_request_stream_fingerprint"),
@@ -572,6 +624,9 @@ def build_observed_baseline_outcome(
                 "request_id": request["request_id"],
                 "event_id": event.get("event_id"),
                 "cache_hit": bool(event.get("cache_hit")),
+                "full_service_ready": (
+                    bool(event.get("full_service_ready")) if typed_mode else None
+                ),
                 "hit_source": event.get("hit_source"),
                 "cache_target_rsu_id": event.get("cache_target_rsu_id"),
                 "served_rsu_id": event.get("served_rsu_id"),
@@ -589,6 +644,15 @@ def build_observed_baseline_outcome(
                     float(event.get("state_migration_size_mb") or 0.0)
                     if "state_migration_size_mb" in event else None
                 ),
+                "transfer_mb_by_type": (
+                    dict(event.get("transfer_mb_by_type") or {}) if typed_mode else None
+                ),
+                "admitted_mb_by_type": (
+                    dict(event.get("admitted_mb_by_type") or {}) if typed_mode else None
+                ),
+                "evicted_mb_by_type": (
+                    dict(event.get("evicted_mb_by_type") or {}) if typed_mode else None
+                ),
                 "admitted_size_mb": (
                     float(event.get("admitted_size_mb") or 0.0)
                     if "admitted_size_mb" in event else None
@@ -602,6 +666,7 @@ def build_observed_baseline_outcome(
                         "event_id", "cache_hit", "admission_requested", "admission_added",
                         "eviction_occurred", "evicted_object_ids", "adapter_transfer_size_mb",
                         "state_migration_size_mb", "admitted_size_mb", "evicted_size_mb_sum",
+                        "transfer_mb_by_type", "admitted_mb_by_type", "evicted_mb_by_type",
                     ) if field not in event
                 ),
             }

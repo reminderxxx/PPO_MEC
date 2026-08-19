@@ -89,3 +89,7 @@ Concentration 固定 top-k `{1,3,5}`、positive object-gap Gini、zero-opportuni
 ```
 
 默认拒绝覆盖，输出 summary、request rows、by-baseline/H/reason/object/window/RSU、information labels、input validation、reconciliation、command log与 integrity manifest。G10 只可消费版本化 request rows、fixed strata、information labels和 coverage；不得把 G09 association 升格为 information sufficiency 或 MARL conclusion。
+
+## G13 typed consumer
+
+typed artifact使用full-service baseline hit、typed initial object set与oracle total/per-type transfer；不得只读legacy`adapter_transfer_mb`而漏掉base transfer。base hit/adapter miss作为partial readiness evidence，不进入captured full-service opportunity。旧adapter replay继续使用原字段。

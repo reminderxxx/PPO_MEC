@@ -345,8 +345,25 @@ def _demand_rows(replay: dict[str, Any], config: dict[str, Any]) -> tuple[list[d
 
 def _initial_objects(manifest: dict[str, Any]) -> set[str]:
     cache = manifest["cache_contract"]
+    if cache.get("typed_model_cache"):
+        return {
+            str(object_id)
+            for row in cache["typed_model_cache"].get("initial_typed_cache_contents", [])
+            for object_id in row.get("resident_object_ids", [])
+        }
     mapping = {str(row["adapter_id"]): str(row.get("object_id") or f"adapter:{row['adapter_id']}") for row in cache["resident_sizes"]}
     return {mapping.get(str(adapter), f"adapter:{adapter}") for row in cache["initial_per_rsu_cache_contents"] for adapter in row["cached_adapter_ids"]}
+
+
+def _oracle_transfer_mb(row: dict[str, Any]) -> float:
+    return float(row.get("transfer_mb", row.get("adapter_transfer_mb", 0.0)) or 0.0)
+
+
+def _baseline_transfer_mb(row: dict[str, Any]) -> float:
+    typed = row.get("transfer_mb_by_type")
+    if isinstance(typed, dict):
+        return sum(float(value) for value in typed.values())
+    return float(row.get("adapter_transfer_size_mb") or 0.0) + float(row.get("state_migration_size_mb") or 0.0)
 
 
 def _secondary_evidence(demand: dict[str, Any], oracle: dict[str, Any], baseline: dict[str, Any]) -> list[str]:
@@ -359,7 +376,7 @@ def _secondary_evidence(demand: dict[str, Any], oracle: dict[str, Any], baseline
         (demand["topology_ineligible_reuse"], "topology_ineligible_reuse"),
         (bool(oracle.get("evicted_object_ids")), "oracle_victim_replacement"),
         (len(oracle.get("evicted_object_ids") or []) > 1, "oracle_multi_victim"),
-        (float(oracle.get("adapter_transfer_mb") or 0) > 0, "oracle_transfer_required"),
+        (_oracle_transfer_mb(oracle) > 0, "oracle_transfer_required"),
         (bool(baseline.get("eviction_occurred")), "baseline_eviction_observed"),
         (bool(baseline.get("admission_requested")), "baseline_admission_requested"),
     ):
@@ -372,7 +389,11 @@ def _primary_reason(
     *, demand: dict[str, Any], oracle: dict[str, Any], baseline: dict[str, Any], initial_objects: set[str], horizon: int
 ) -> str:
     oracle_hit = bool(oracle["post_action_hit"])
-    baseline_hit = bool(baseline["cache_hit"])
+    baseline_hit = bool(
+        baseline.get("full_service_ready")
+        if baseline.get("full_service_ready") is not None
+        else baseline["cache_hit"]
+    )
     if oracle_hit and oracle.get("pre_action_hit") and demand["object_id"] in initial_objects and oracle.get("admitted_object_id") is None:
         return "initial_cache_hit"
     if oracle_hit and baseline_hit:
@@ -406,7 +427,7 @@ def _primary_reason(
             return "eviction_choice"
         if oracle_victims:
             return "insufficient_free_capacity"
-        if float(baseline.get("adapter_transfer_size_mb") or 0) > float(oracle.get("adapter_transfer_mb") or 0):
+        if _baseline_transfer_mb(baseline) > _oracle_transfer_mb(oracle):
             return "transfer_tradeoff"
         if not baseline.get("admission_requested") or not baseline.get("admission_added"):
             return "admission_not_selected"
@@ -429,7 +450,7 @@ def _information_labels(row: dict[str, Any]) -> list[dict[str, str]]:
         labels.append(("next_rsu_handoff_estimate", "predictor-required"))
     if row["demand"]["cross_rsu_reuse"]:
         labels.extend([("cross_rsu_cache_state", "currently absent/unknown"), ("multi_agent_coordination_information", "currently absent/unknown")])
-    if row["oracle"]["adapter_transfer_mb"] > 0:
+    if _oracle_transfer_mb(row["oracle"]) > 0:
         labels.append(("transfer_cost", "decision-time observable"))
     labels.append(("dag_workflow_future_demand", "oracle-only future information"))
     return [{"information": name, "availability_class": category} for name, category in sorted(set(labels))]
@@ -540,7 +561,7 @@ def analyze_cache_opportunities(
             "capacity_binding_opportunity_count": sum(bool(row.get("evicted_object_ids")) for row in trace),
             "oversized_infeasible_request_count": sum(oversized_flags),
             "oversized_infeasible_request_mb": sum(demand_rows[i]["object_size_mb"] for i, flag in enumerate(oversized_flags) if flag),
-            "transfer_required_opportunity_count": sum(float(row.get("adapter_transfer_mb") or 0) > 0 for row in trace),
+            "transfer_required_opportunity_count": sum(_oracle_transfer_mb(row) > 0 for row in trace),
             "multi_victim_required_opportunity_count": sum(len(row.get("evicted_object_ids") or []) > 1 for row in trace),
             "oracle_opportunity_density": _safe_rate(sum(row["post_action_hit"] for row in trace), len(trace)),
             "oracle_byte_opportunity_density": _safe_rate(sum(demand_rows[i]["object_size_mb"] for i, row in enumerate(trace) if row["post_action_hit"]), sum(row["object_size_mb"] for row in demand_rows)),
@@ -564,7 +585,12 @@ def analyze_cache_opportunities(
                 if reason not in PRIMARY_REASON_PRIORITY:
                     raise AssertionError(f"unfrozen primary reason: {reason}")
                 occupancy = [float(row["occupancy_rate"]) for row in oracle.get("capacity_occupancy", {}).values()]
-                oracle_hit, baseline_hit = bool(oracle["post_action_hit"]), bool(baseline["cache_hit"])
+                oracle_hit = bool(oracle["post_action_hit"])
+                baseline_hit = bool(
+                    baseline.get("full_service_ready")
+                    if baseline.get("full_service_ready") is not None
+                    else baseline["cache_hit"]
+                )
                 row = {
                     "request_id": demand["request_id"], "baseline_identity": baseline_name,
                     "horizon": horizon, "capacity_unit": result["identity"]["capacity_unit"],
@@ -587,12 +613,12 @@ def analyze_cache_opportunities(
                     "primary_opportunity_reason": reason,
                     "secondary_evidence": _secondary_evidence(demand, oracle, baseline),
                     "right_censored": demand["reuse_horizons"][str(horizon)]["right_censored"],
-                    "oracle_transfer_mb": float(oracle.get("adapter_transfer_mb") or 0),
+                    "oracle_transfer_mb": _oracle_transfer_mb(oracle),
                     "oracle_churn_mb": float(oracle.get("cache_churn_mb") or 0),
-                    "baseline_transfer_mb": float(baseline.get("adapter_transfer_size_mb") or 0) + float(baseline.get("state_migration_size_mb") or 0),
+                    "baseline_transfer_mb": _baseline_transfer_mb(baseline),
                     "baseline_churn_mb": float(baseline.get("admitted_size_mb") or 0) + float(baseline.get("evicted_size_mb_sum") or 0),
                     "demand": demand,
-                    "oracle": {name: deepcopy(oracle.get(name)) for name in ("pre_action_hit", "post_action_hit", "action", "cache_target_rsu_id", "admitted_object_id", "evicted_object_ids", "rejection_reason", "adapter_transfer_mb")},
+                    "oracle": {name: deepcopy(oracle.get(name)) for name in ("pre_action_hit", "post_action_hit", "action", "cache_target_rsu_id", "admitted_object_id", "admitted_object_ids", "evicted_object_ids", "rejection_reason", "adapter_transfer_mb", "transfer_mb", "transfer_mb_by_type")},
                     "baseline": deepcopy(baseline),
                     "availability": "available", "coverage": 1.0,
                 }

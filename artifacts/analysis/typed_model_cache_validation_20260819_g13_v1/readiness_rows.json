@@ -1,0 +1,116 @@
+[
+  {
+    "case": "full_base_adapter_hit",
+    "base_ready": true,
+    "adapter_ready": true,
+    "joint_base_adapter_hit": true,
+    "state_required": false,
+    "state_ready": true,
+    "full_service_ready": true,
+    "missing_object_types": [],
+    "incompatibility_reason": null,
+    "compatibility_result": "compatible",
+    "service_scope": "rsu",
+    "per_object_lookup_results": [
+      {
+        "object_id": "base:veh_base_v1",
+        "object_type": "base_model",
+        "resident": true,
+        "evidence": "rsu_resident_state"
+      },
+      {
+        "object_id": "adapter:perception",
+        "object_type": "adapter",
+        "resident": true,
+        "evidence": "rsu_resident_state"
+      }
+    ]
+  },
+  {
+    "case": "base_hit_adapter_miss",
+    "base_ready": true,
+    "adapter_ready": false,
+    "joint_base_adapter_hit": false,
+    "state_required": false,
+    "state_ready": true,
+    "full_service_ready": false,
+    "missing_object_types": [
+      "adapter"
+    ],
+    "incompatibility_reason": "missing:adapter",
+    "compatibility_result": "compatible",
+    "service_scope": "rsu",
+    "per_object_lookup_results": [
+      {
+        "object_id": "base:veh_base_v1",
+        "object_type": "base_model",
+        "resident": true,
+        "evidence": "rsu_resident_state"
+      },
+      {
+        "object_id": "adapter:perception",
+        "object_type": "adapter",
+        "resident": false,
+        "evidence": "rsu_resident_state"
+      }
+    ]
+  },
+  {
+    "case": "adapter_present_base_missing",
+    "base_ready": false,
+    "adapter_ready": true,
+    "joint_base_adapter_hit": false,
+    "state_required": false,
+    "state_ready": true,
+    "full_service_ready": false,
+    "missing_object_types": [
+      "base_model"
+    ],
+    "incompatibility_reason": "missing:base_model",
+    "compatibility_result": "compatible",
+    "service_scope": "rsu",
+    "per_object_lookup_results": [
+      {
+        "object_id": "base:veh_base_v1",
+        "object_type": "base_model",
+        "resident": false,
+        "evidence": "rsu_resident_state"
+      },
+      {
+        "object_id": "adapter:perception",
+        "object_type": "adapter",
+        "resident": true,
+        "evidence": "rsu_resident_state"
+      }
+    ]
+  },
+  {
+    "case": "workflow_state_missing",
+    "base_ready": true,
+    "adapter_ready": true,
+    "joint_base_adapter_hit": true,
+    "state_required": true,
+    "state_ready": false,
+    "full_service_ready": false,
+    "missing_object_types": [
+      "workflow_state"
+    ],
+    "incompatibility_reason": "missing:workflow_state",
+    "compatibility_result": "compatible",
+    "service_scope": "rsu",
+    "per_object_lookup_results": [
+      {
+        "object_id": "base:veh_base_v1",
+        "object_type": "base_model",
+        "resident": true,
+        "evidence": "rsu_resident_state"
+      },
+      {
+        "object_id": "adapter:perception",
+        "object_type": "adapter",
+        "resident": true,
+        "evidence": "rsu_resident_state"
+      }
+    ]
+  }
+]

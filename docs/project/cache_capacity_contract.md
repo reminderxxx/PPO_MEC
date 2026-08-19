@@ -35,3 +35,7 @@ Legacy telemetry remains; `cache_capacity_unit` declares the unit. Disabled aggr
 # 2026-08-18 policy compatibility
 
 五种 registered policy 均支持 `adapter_slots` 与 `mb`。`eviction_policy_seed` 与 `eviction_policy_config` 是向后兼容 profile 字段；Random 要求 seed，Aging-LFU 验证 interval/factor。环境继续计算 required free、验证 plan 并原子提交。
+
+## G13 typed profile
+
+`typed_base_adapter_state_v1`只允许enabled MB capacity；base+adapter共享同一per-RSU byte capacity。workflow state固定为handoff payload且不计入，KV disabled。initial typed state必须无需policy-specific trim即可装入。dependency bundle一次计算required-free、一次plan并原子commit；任一对象/整体bundle oversized或victim不足时rollback。snapshot增加used MB by type、bundle MB、admitted/evicted MB by type与orphan=0。legacy profile的disabled/slot/MB语义不变。

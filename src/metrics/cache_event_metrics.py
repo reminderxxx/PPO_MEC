@@ -50,6 +50,15 @@ class CacheEventMetricSummary:
     neighbor_rsu_execution_count: int = 0
     cloud_execution_count: int = 0
     unserved_execution_count: int = 0
+    typed_metrics_availability: str = "unavailable"
+    base_model_hit_count: int | None = None
+    adapter_hit_count: int | None = None
+    joint_model_hit_count: int | None = None
+    workflow_state_ready_count: int | None = None
+    full_service_ready_count: int | None = None
+    compatibility_failure_count: int | None = None
+    base_model_transfer_size_mb_sum: float | None = None
+    typed_transfer_size_mb_by_type: dict[str, float] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -98,6 +107,8 @@ def reduce_cache_events(
     transfer_sizes: defaultdict[str, float] = defaultdict(float)
     seen_ids: set[str] = set()
     adapter_transfer = state_transfer = 0.0
+    typed_transfer_sizes: defaultdict[str, float] = defaultdict(float)
+    typed_event_count = 0
 
     for index, raw in enumerate(raw_events):
         payload = _event_dict(raw, index)
@@ -114,7 +125,11 @@ def reduce_cache_events(
         seen_ids.add(event.event_id)
         if event.admission_added and not event.admission_requested:
             raise ValueError("admission_added requires admission_requested=true")
-        if event.eviction_occurred and not event.admission_added:
+        if (
+            event.eviction_occurred
+            and not event.admission_added
+            and not event.admitted_typed_objects
+        ):
             raise ValueError("eviction requires an added admission in G01 lifecycle")
         if event.migration_realized and not event.migration_requested:
             raise ValueError("migration_realized requires migration_requested=true")
@@ -124,6 +139,20 @@ def reduce_cache_events(
         state_transfer += m_size
         transfer_counts[event.transfer_source] += 1
         transfer_sizes[event.transfer_source] += a_size + m_size
+        if event.model_cache_profile_id == "typed_base_adapter_state_v1":
+            typed_event_count += int(event.event_type == "request")
+            for object_type, value in event.transfer_mb_by_type.items():
+                typed_transfer_sizes[str(object_type)] += _validate_number(
+                    value, f"transfer_mb_by_type.{object_type}"
+                )
+            counters["typed:base_hit"] += int(bool(event.base_model_hit))
+            counters["typed:adapter_hit"] += int(bool(event.adapter_hit))
+            counters["typed:joint_hit"] += int(bool(event.joint_model_hit))
+            counters["typed:state_ready"] += int(bool(event.workflow_state_ready))
+            counters["typed:full_ready"] += int(bool(event.full_service_ready))
+            counters["typed:compatibility_failure"] += int(
+                event.compatibility_result == "incompatible"
+            )
         counters["total"] += 1
 
         if event.event_type == "not_applicable":
@@ -207,6 +236,25 @@ def reduce_cache_events(
         neighbor_rsu_execution_count=counters["execution:neighbor_rsu"],
         cloud_execution_count=counters["execution:cloud"],
         unserved_execution_count=counters["execution:unserved"],
+        typed_metrics_availability=("available" if typed_event_count else "unavailable"),
+        base_model_hit_count=(counters["typed:base_hit"] if typed_event_count else None),
+        adapter_hit_count=(counters["typed:adapter_hit"] if typed_event_count else None),
+        joint_model_hit_count=(counters["typed:joint_hit"] if typed_event_count else None),
+        workflow_state_ready_count=(counters["typed:state_ready"] if typed_event_count else None),
+        full_service_ready_count=(counters["typed:full_ready"] if typed_event_count else None),
+        compatibility_failure_count=(
+            counters["typed:compatibility_failure"] if typed_event_count else None
+        ),
+        base_model_transfer_size_mb_sum=(
+            round(typed_transfer_sizes.get("base_model", 0.0), 6)
+            if typed_event_count
+            else None
+        ),
+        typed_transfer_size_mb_by_type=(
+            {key: round(value, 6) for key, value in sorted(typed_transfer_sizes.items())}
+            if typed_event_count
+            else None
+        ),
     )
 
 

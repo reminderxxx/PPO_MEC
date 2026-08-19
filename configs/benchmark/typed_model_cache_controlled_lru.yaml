@@ -1,0 +1,27 @@
+profile_id: typed_model_cache_controlled_lru
+claim_boundary: controlled synthetic typed-cache mechanism over NGSIM+Alibaba skeleton; non-formal
+catalog_path: src/data/model_catalog/typed_model_cache_controlled.json
+cache_capacity_profile:
+  model_cache_profile_id: typed_base_adapter_state_v1
+  enabled: true
+  unit: mb
+  capacity_mb: 320.0
+  count_base_model_separately: true
+  eviction_policy: lru
+  eviction_policy_seed: 7
+  telemetry_enabled: true
+transaction_contract:
+  max_logical_cache_actions_per_step: 1
+  max_dependency_bundle_objects: 2
+  admission_order: [base_model, adapter]
+  transfer_order: [base_model, adapter, workflow_state]
+  partial_admission: false
+  atomic_rollback: true
+  dependency_safe_base_eviction: prohibit_while_resident_adapter_depends
+kv_prefix:
+  enabled: false
+  capacity_denominator: excluded
+  cache_event_denominator: excluded
+baseline_matrix:
+  agents: [reactive_lru, reactive_fifo, reactive_lfu, reactive_aging_lfu, reactive_random]
+  only_primary_difference: eviction_policy

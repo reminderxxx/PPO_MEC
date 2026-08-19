@@ -1184,3 +1184,18 @@ Run root：
 - 当前 reward-first canonical 仍是 v22，不是 v23-v26。
 - v23-v26 可用于讨论 negative result 与 credit-assignment 失败边界；不能作为“reward gap 已显著拉大”或“足以发论文”的证据。
 - 若继续推进 paper-ready claim，必须新冻结未消费 split，并补齐 support suite、artifact integrity、command logs、checkpoint provenance 与 top-journal review audit。
+
+## G13 typed model cache validation 20260819 v1
+
+状态：`[contract-validation-only]`
+
+产物根目录：
+`artifacts/analysis/typed_model_cache_validation_20260819_g13_v1/`
+
+范围：冻结 type-aware base-model / adapter / workflow-state contract，并用确定性场景验证
+catalog、compatibility、base→adapter atomic admission、rollback、分层 readiness、MB 容量守恒、
+LRU/FIFO/LFU/Aging-LFU/Random 公平绑定、小规模 exact oracle，以及真实 NGSIM + Alibaba
+三步最小链路。完整性 manifest 对目录内其余 JSON 逐文件记录 SHA-256。
+
+边界：`formal=false`、`training=false`；没有 checkpoint、没有算法比较、没有 formal/holdout/hidden
+结果。该产物只能支持 G13 contract/plumbing 已实现和受控验证通过，不能支持性能或论文收益主张。

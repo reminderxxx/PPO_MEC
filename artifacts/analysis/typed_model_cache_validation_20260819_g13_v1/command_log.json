@@ -1,0 +1,18 @@
+{
+  "run_id": "typed_model_cache_validation_20260819_g13_v1",
+  "executed_at": "2026-08-19T09:30:03.702400+00:00",
+  "command": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "scripts/validate_typed_model_cache.py"
+  ],
+  "cwd": "/Users/howen/Projects/PPO_MEC",
+  "prohibited_work_not_executed": [
+    "G14",
+    "training",
+    "tuning",
+    "formal",
+    "holdout",
+    "hidden",
+    "HF payload download"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "model_cache_profile_id": "typed_base_adapter_state_v1",
+  "typed_model_cache_contract_version": "1.0.0",
+  "vehicle_base_models": [],
+  "rsu_adapter_caches": [],
+  "adapter_state_bundles": [],
+  "cache_objects": [],
+  "typed_cache_objects": [
+    {
+      "object_id": "hf-base:ClemSummer/qwen-model-cache", "object_type": "base_model", "version": "metadata-snapshot-20260819", "resident_size_mb": 2457.6, "transfer_size_mb": 2457.6,
+      "source": "huggingface_metadata_only_cross_source", "provenance": {"dataset_id": "ClemSummer/qwen-model-cache", "raw_payload_downloaded": false, "joint_request_trace": false},
+      "base_model_family": "hf_qwen_metadata", "base_model_id": "hf_qwen_metadata_base", "required_base_model_id": null, "adapter_id": null, "workflow_identity": null,
+      "shareability_scope": "diagnostic_only", "mutability": "immutable", "persistence": "metadata_profile_only", "evictability": "evictable", "migration_semantics": "not_runtime_activated",
+      "dependency_ids": [], "dataset_profile_source": "G11_hf_metadata", "license_status": "unknown", "formal_use_status": "non_formal_blocked_unknown_license",
+      "stable_fingerprint": "5d338d312c277664698916d97a230c4c5fdf54ad5fd76ba1caa92cd377020b5f", "availability": "metadata_only", "counts_toward_capacity": true
+    },
+    {
+      "object_id": "hf-base:ClemSummer/cbow-model-cache", "object_type": "base_model", "version": "metadata-snapshot-20260819", "resident_size_mb": 997.0, "transfer_size_mb": 997.0,
+      "source": "huggingface_metadata_only_cross_source", "provenance": {"dataset_id": "ClemSummer/cbow-model-cache", "raw_payload_downloaded": false, "joint_request_trace": false},
+      "base_model_family": "hf_cbow_metadata", "base_model_id": "hf_cbow_metadata_base", "required_base_model_id": null, "adapter_id": null, "workflow_identity": null,
+      "shareability_scope": "diagnostic_only", "mutability": "immutable", "persistence": "metadata_profile_only", "evictability": "evictable", "migration_semantics": "not_runtime_activated",
+      "dependency_ids": [], "dataset_profile_source": "G11_hf_metadata", "license_status": "unknown", "formal_use_status": "non_formal_blocked_unknown_license",
+      "stable_fingerprint": "eee95a6eb8399826f08c389b7593f727a0139fa08eee457c6a11515f55bb76c8", "availability": "metadata_only", "counts_toward_capacity": true
+    },
+    {
+      "object_id": "hf-base:Kuperberg/bert-model-cache", "object_type": "base_model", "version": "metadata-snapshot-20260819", "resident_size_mb": 5017.6, "transfer_size_mb": 5017.6,
+      "source": "huggingface_metadata_only_cross_source", "provenance": {"dataset_id": "Kuperberg/bert-model-cache", "raw_payload_downloaded": false, "joint_request_trace": false, "size_provenance_anomaly": true},
+      "base_model_family": "hf_bert_metadata", "base_model_id": "hf_bert_metadata_base", "required_base_model_id": null, "adapter_id": null, "workflow_identity": null,
+      "shareability_scope": "diagnostic_only", "mutability": "immutable", "persistence": "metadata_profile_only", "evictability": "evictable", "migration_semantics": "not_runtime_activated",
+      "dependency_ids": [], "dataset_profile_source": "G11_hf_metadata", "license_status": "unknown", "formal_use_status": "non_formal_blocked_license_and_provenance",
+      "stable_fingerprint": "d92aa8321fa492bd374f5e0dac4e279666b0cef08fe8365922391b4a40dc1600", "availability": "blocked_provenance_anomaly", "counts_toward_capacity": true
+    }
+  ],
+  "rsu_typed_cache_profiles": [],
+  "compatibility_map": {},
+  "kv_prefix_enabled": false,
+  "vehicle_adapter_residency_enabled": false,
+  "model_cache_datasets": []
+}

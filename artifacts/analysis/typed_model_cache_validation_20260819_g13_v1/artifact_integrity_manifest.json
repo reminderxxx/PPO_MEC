@@ -1,0 +1,72 @@
+{
+  "run_id": "typed_model_cache_validation_20260819_g13_v1",
+  "status": "pass",
+  "file_count_excluding_manifest": 13,
+  "files": [
+    {
+      "path": "baseline_fairness_audit.json",
+      "size_bytes": 6469,
+      "sha256": "4782a39b2647146725b1b75d87633644328aae2a610eef1cf436689be91faf8c"
+    },
+    {
+      "path": "capacity_invariant_audit.json",
+      "size_bytes": 171,
+      "sha256": "d158d43947fb7010bfc5d10cbf0a97b3918d91af5f4b69e1a18ecf3f4f706b59"
+    },
+    {
+      "path": "catalog_validation.json",
+      "size_bytes": 190,
+      "sha256": "5e9152b76e29fb8034d77f7cef0ce8709fdfdf145c50caf04725d55e018d2238"
+    },
+    {
+      "path": "command_log.json",
+      "size_bytes": 427,
+      "sha256": "f26bc7ca6814c2accfec6cb47aee478eec2afbec7a7d80cedc9597f50d5c4612"
+    },
+    {
+      "path": "compatibility_map.json",
+      "size_bytes": 191,
+      "sha256": "88a2d05491bd9df4f9a62e502672bdf3780b4633bcb814fffaeab07f0c41f0b0"
+    },
+    {
+      "path": "eviction_plan_rows.json",
+      "size_bytes": 2689,
+      "sha256": "c0eed5f892558f70333c2c4b2ee7c83879639393d123d03ce39f04cec03777d5"
+    },
+    {
+      "path": "legacy_parity.json",
+      "size_bytes": 175,
+      "sha256": "6536bb3f0f81cac6d75b49ee5d19c2c2ed17e7e454926b5dc16e13d8801aee38"
+    },
+    {
+      "path": "readiness_rows.json",
+      "size_bytes": 3022,
+      "sha256": "c56323b17439a9539fec3430e3de21756f4eb26db21897a64a7ecb7e645452ee"
+    },
+    {
+      "path": "real_minimal_run_summary.json",
+      "size_bytes": 669,
+      "sha256": "9cb83a02657fcab40d1ef2d8de9e34371e501b49cda66f9764c72d82462ac545"
+    },
+    {
+      "path": "transaction_rows.json",
+      "size_bytes": 16930,
+      "sha256": "870aa1e8d9af13d970c2c21848f8eb053bda6f1cae4b322a587dfaaca103188b"
+    },
+    {
+      "path": "type_aware_metrics.json",
+      "size_bytes": 9850,
+      "sha256": "bd15bb70534a886ec3e79634a07c47b403de29b3f7ab147a4628806e6aabcd12"
+    },
+    {
+      "path": "typed_catalog.json",
+      "size_bytes": 13352,
+      "sha256": "9740bff74d43fbd436801b5aa1be13ee3f822a5921935fe2449f42e97f23385f"
+    },
+    {
+      "path": "typed_oracle_validation.json",
+      "size_bytes": 11860,
+      "sha256": "a3f6cb6437be3209966efdaddbc997d3c2ffd5de0b2cf232969d15e6e6cb771e"
+    }
+  ]
+}

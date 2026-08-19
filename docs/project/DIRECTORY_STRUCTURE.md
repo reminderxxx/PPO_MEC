@@ -42,6 +42,7 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 - `scripts/analyze_strict_full_failure_modes.py`：在非 hidden split 上分解 strict-full reward、continuity、failure 和 action-mix 失败模式
 - `scripts/audit_literature_reference_table.py`：检查文献表标题/DOI/URL 重复、链接结构和显式待核验项
 - `scripts/validate_model_cache_dataset_registry.py`：校验 G11 taxonomy、字段、评分、hard gates与兼容投影，并确定性生成机器审计包
+- `scripts/validate_typed_model_cache.py`：生成 G13 typed base/adapter/state 受控验证包，覆盖原子事务、readiness、容量、五种 eviction、公平性、小规模 oracle 和真实数据最小链路
 - `src/`：核心实现
 - `tests/`：自动化测试
 - `artifacts/`：当前保留的训练 checkpoint、benchmark 报告和论文表格产物
@@ -61,6 +62,7 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 
 - `src/agents/`：agent 基类、注册表和按算法分文件的主方法 / 对比方法接入；不再保留 `baselines/` 或 `marl/` 分类目录
 - `src/data/`：mobility、workflow 和 model catalog 数据层；model-cache dataset qualification 与 `AdapterCatalog` runtime schema 保持职责分离
+- `src/data/model_catalog/typed_model_cache_controlled.json`：G13 runtime controlled catalog；`hf_metadata_diagnostic_model_profile.json` 仅是非正式 metadata diagnostic，不参与 runtime 初始 cache
 - `src/encoders/`：DAG、RSU 状态和融合编码器
 - `src/envs/`：核心环境、预测层和 Gym/vector wrapper
 - `src/envs/specs/action_schema.py`：语义动作 schema、mask 和 action adapter
@@ -86,6 +88,7 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 - `artifacts/experiments/top_journal_counterfactual_option_v18_20260717/`：v18 counterfactual option-credit 训练 manifest 和全量 dev benchmark；当前结果为负向探索，不作为主候选
 - `artifacts/experiments/top_journal_dag_aware_option_v17_20260717/future_validation_time_audited_full_stratified/`：v17 time-audited future-validation 全量 benchmark；均值第一但对 popularity reward CI 跨 0
 - `artifacts/analysis/top_journal_v17_future_validation_time_audited_statistics_20260717/`：time-audited future-validation window-outer hierarchical statistics
+- `artifacts/analysis/typed_model_cache_validation_20260819_g13_v1/`：G13 小规模 deterministic validation；`formal=false`、`training=false`，不得作为算法收益论文证据
 - `artifacts/audits/top_journal_v17_future_validation_time_audited_20260717/`：future split 与 train/dev/formal/hidden 的 frame/time 双区间独立性审计
 - `artifacts/experiments/top_journal_support_suite/`：v8-current support suite、机制归因、paired statistics 和 support gate report 输出根目录；dry-run 不能作为论文证据
 - `artifacts/experiments/strict_full_v8_*`：v8 formal、一次性 hidden 与 LuST external benchmark；正式结论只引用 `top_journal_readiness_audit_20260621.md` 列出的 run ID

@@ -1,0 +1,109 @@
+[
+  {
+    "case": "no_feasible_victim",
+    "plan": {
+      "rsu_id": "rsu_a",
+      "ordered_victim_ids": [
+        "adapter:perception",
+        "adapter:tracking"
+      ],
+      "victim_sizes": [
+        40.0,
+        56.0
+      ],
+      "cumulative_freed_capacity": 96.0,
+      "required_free_capacity": 184.0,
+      "capacity_unit": "mb",
+      "policy_name": "lru",
+      "policy_version": "1.0.0",
+      "ordered_candidates": [
+        "adapter:perception",
+        "adapter:tracking"
+      ],
+      "candidate_recency": [
+        {
+          "rank": 0,
+          "object_id": "adapter:perception",
+          "last_used_step": -2,
+          "admitted_step": 0,
+          "initial_admission_order": 1,
+          "last_event": "reset_initial_admission",
+          "selection_key": [
+            -2,
+            "adapter:perception"
+          ]
+        },
+        {
+          "rank": 1,
+          "object_id": "adapter:tracking",
+          "last_used_step": -1,
+          "admitted_step": 0,
+          "initial_admission_order": 2,
+          "last_event": "reset_initial_admission",
+          "selection_key": [
+            -1,
+            "adapter:tracking"
+          ]
+        }
+      ],
+      "sufficient": false,
+      "selection_reason": "insufficient_evictable_capacity"
+    },
+    "pinned_base": "base:veh_base_v1"
+  },
+  {
+    "case": "multi_victim",
+    "plan": {
+      "rsu_id": "rsu_a",
+      "ordered_victim_ids": [
+        "adapter:perception",
+        "adapter:tracking"
+      ],
+      "victim_sizes": [
+        40.0,
+        56.0
+      ],
+      "cumulative_freed_capacity": 96.0,
+      "required_free_capacity": 76.0,
+      "capacity_unit": "mb",
+      "policy_name": "lru",
+      "policy_version": "1.0.0",
+      "ordered_candidates": [
+        "adapter:perception",
+        "adapter:tracking"
+      ],
+      "candidate_recency": [
+        {
+          "rank": 0,
+          "object_id": "adapter:perception",
+          "last_used_step": -2,
+          "admitted_step": 0,
+          "initial_admission_order": 1,
+          "last_event": "reset_initial_admission",
+          "selection_key": [
+            -2,
+            "adapter:perception"
+          ]
+        },
+        {
+          "rank": 1,
+          "object_id": "adapter:tracking",
+          "last_used_step": -1,
+          "admitted_step": 0,
+          "initial_admission_order": 2,
+          "last_event": "reset_initial_admission",
+          "selection_key": [
+            -1,
+            "adapter:tracking"
+          ]
+        }
+      ],
+      "sufficient": true,
+      "selection_reason": "lru_minimum_prefix_sufficient"
+    },
+    "victims": [
+      "adapter:perception",
+      "adapter:tracking"
+    ]
+  }
+]

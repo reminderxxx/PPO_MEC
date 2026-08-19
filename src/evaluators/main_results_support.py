@@ -109,6 +109,11 @@ MAIN_RESULT_METRICS.extend([
     "cache_transfer_amplification_ratio",
     "cache_capacity_mean_occupancy",
     "cache_latency_saved_sum_ms",
+    "cache_base_model_hit_rate",
+    "cache_adapter_hit_rate",
+    "cache_joint_model_hit_rate",
+    "cache_full_service_ready_rate",
+    "cache_base_transfer_mb",
 ])
 ACTIONMIX_DIAGNOSTIC_METRICS = [
     "service_success_count",

@@ -1,0 +1,369 @@
+{
+  "request_replay": {
+    "cache_request_replay_version": "1.0.0",
+    "producer": {
+      "identity": "policy_neutral_dag_mobility_replay_v1",
+      "policy_neutral": true,
+      "executes_cache_policy": false,
+      "executes_service_policy": false
+    },
+    "source_manifest": {
+      "manifest_id": "g13-controlled",
+      "full_manifest_sha256": "controlled",
+      "semantic_protocol_sha256": "controlled",
+      "git_commit": "695f54fb5324c3ef7e1a6b9b28b660f4a5952bbf"
+    },
+    "evaluation_unit": {
+      "evaluation_unit_id": "g13/u1",
+      "benchmark_run_seed": 7,
+      "window_id": "controlled",
+      "workflow_id": "wf",
+      "workflow_dag_sha256": "controlled",
+      "expected_workload_fingerprint": "controlled",
+      "raw_frame_interval": {
+        "start": 0,
+        "end": 2
+      },
+      "raw_time_interval": {
+        "start": 0,
+        "end": 2
+      }
+    },
+    "request_semantics": {
+      "request_source": "policy_neutral_static_dag_execution_order_plus_mobility_topology",
+      "outcome_fields_forbidden": [
+        "actual_admission",
+        "actual_cache_hit",
+        "actual_execution_result",
+        "actual_policy_state",
+        "actual_victim",
+        "admission_added",
+        "baseline_cache_contents",
+        "cache_hit",
+        "evicted_object_ids",
+        "hit_source",
+        "reward",
+        "service_success",
+        "stall_occurred"
+      ],
+      "admission_timing": "action_before_service_lookup_same_step_admission_can_hit",
+      "action_budget": "at_most_one_current_object_admission_per_step",
+      "oracle_control_scope": "current_rsu_placement_admission_eviction_or_noop",
+      "model_cache_profile_id": "typed_base_adapter_state_v1",
+      "atomic_dependency_bundle": true,
+      "max_dependency_bundle_objects": 2
+    },
+    "requests": [
+      {
+        "evaluation_unit_id": "g13/u1",
+        "episode_id": "ep",
+        "vehicle_id": "v",
+        "workflow_id": "wf",
+        "required_base_model": "veh_base_v1",
+        "object_id": "adapter:tracking",
+        "adapter_id": "adapter_tracking",
+        "object_size_mb": 56.0,
+        "size_source": "typed_catalog",
+        "request_rsu_id": "rsu_x",
+        "current_service_rsu_id": "rsu_x",
+        "previous_rsu_id": null,
+        "actual_next_rsu_id": "rsu_x",
+        "predicted_next_rsu_id": null,
+        "actual_handoff_target_rsu_id": null,
+        "predicted_handoff_target_rsu_id": null,
+        "eligible_service_rsu_ids": [
+          "rsu_x"
+        ],
+        "eligible_cache_target_rsu_ids": [
+          "rsu_x"
+        ],
+        "dag_provenance": {
+          "policy_neutral": true
+        },
+        "model_cache_profile_id": "typed_base_adapter_state_v1",
+        "typed_model_cache_contract_version": "1.0.0",
+        "catalog_fingerprint": "1c0b3d55e957619af8bd1d15cbf1ba61b756b540c2c67ab8e66b507734092d7e",
+        "requested_typed_objects": [
+          {
+            "object_id": "base:veh_base_v1",
+            "object_type": "base_model",
+            "resident_size_mb": 180.0,
+            "transfer_size_mb": 160.0
+          },
+          {
+            "object_id": "adapter:tracking",
+            "object_type": "adapter",
+            "resident_size_mb": 56.0,
+            "transfer_size_mb": 48.0
+          }
+        ],
+        "dependency_bundle": {
+          "requested_adapter_id": "adapter_tracking",
+          "required_base_model_id": "veh_base_v1",
+          "ordered_object_ids": [
+            "base:veh_base_v1",
+            "adapter:tracking"
+          ],
+          "missing_object_ids": [
+            "base:veh_base_v1",
+            "adapter:tracking"
+          ],
+          "already_resident_object_ids": [],
+          "requested_bundle_mb": 236.0,
+          "transfer_mb_by_type": {
+            "adapter": 48.0,
+            "base_model": 160.0
+          }
+        },
+        "request_id": "r1",
+        "node_id": "n1",
+        "step_index": 1,
+        "time_index": 1,
+        "request_order": 0
+      },
+      {
+        "evaluation_unit_id": "g13/u1",
+        "episode_id": "ep",
+        "vehicle_id": "v",
+        "workflow_id": "wf",
+        "required_base_model": "veh_base_v1",
+        "object_id": "adapter:tracking",
+        "adapter_id": "adapter_tracking",
+        "object_size_mb": 56.0,
+        "size_source": "typed_catalog",
+        "request_rsu_id": "rsu_x",
+        "current_service_rsu_id": "rsu_x",
+        "previous_rsu_id": null,
+        "actual_next_rsu_id": "rsu_x",
+        "predicted_next_rsu_id": null,
+        "actual_handoff_target_rsu_id": null,
+        "predicted_handoff_target_rsu_id": null,
+        "eligible_service_rsu_ids": [
+          "rsu_x"
+        ],
+        "eligible_cache_target_rsu_ids": [
+          "rsu_x"
+        ],
+        "dag_provenance": {
+          "policy_neutral": true
+        },
+        "model_cache_profile_id": "typed_base_adapter_state_v1",
+        "typed_model_cache_contract_version": "1.0.0",
+        "catalog_fingerprint": "1c0b3d55e957619af8bd1d15cbf1ba61b756b540c2c67ab8e66b507734092d7e",
+        "requested_typed_objects": [
+          {
+            "object_id": "base:veh_base_v1",
+            "object_type": "base_model",
+            "resident_size_mb": 180.0,
+            "transfer_size_mb": 160.0
+          },
+          {
+            "object_id": "adapter:tracking",
+            "object_type": "adapter",
+            "resident_size_mb": 56.0,
+            "transfer_size_mb": 48.0
+          }
+        ],
+        "dependency_bundle": {
+          "requested_adapter_id": "adapter_tracking",
+          "required_base_model_id": "veh_base_v1",
+          "ordered_object_ids": [
+            "base:veh_base_v1",
+            "adapter:tracking"
+          ],
+          "missing_object_ids": [
+            "base:veh_base_v1",
+            "adapter:tracking"
+          ],
+          "already_resident_object_ids": [],
+          "requested_bundle_mb": 236.0,
+          "transfer_mb_by_type": {
+            "adapter": 48.0,
+            "base_model": 160.0
+          }
+        },
+        "request_id": "r2",
+        "node_id": "n2",
+        "step_index": 2,
+        "time_index": 2,
+        "request_order": 1
+      }
+    ],
+    "request_replay_fingerprint": "20d343e68acc3738c59572f4bdf600da7bcbe0b3af17f7bcab37b830da311617"
+  },
+  "oracle_result": {
+    "identity": {
+      "oracle_contract_version": "future_horizon_cache_oracle_contract_v1.0.0",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "solver_identity": "exact_rolling_enumeration_v1.0.0",
+      "objective_identity": "lex_hit_mb_hit_count_transfer_evicted_churn_v1.0.0",
+      "objective_lexicographic": [
+        "maximize_future_joint_model_hit_mb",
+        "maximize_future_full_model_hit_count",
+        "minimize_typed_transfer_mb",
+        "minimize_evicted_mb_and_cache_churn",
+        "canonical_tie_break"
+      ],
+      "horizon": 1,
+      "horizon_includes_current_request": true,
+      "rolling_horizon": true,
+      "admission_timing": "action_before_service_lookup_same_step_atomic_bundle_can_hit",
+      "optimality_status": "optimal",
+      "request_replay_fingerprint": "20d343e68acc3738c59572f4bdf600da7bcbe0b3af17f7bcab37b830da311617",
+      "g07_manifest_id": "g13-controlled",
+      "g07_manifest_full_sha256": "controlled",
+      "g07_manifest_semantic_sha256": "controlled",
+      "git_commit": "695f54fb5324c3ef7e1a6b9b28b660f4a5952bbf",
+      "capacity_unit": "mb",
+      "capacity_value": 260.0,
+      "initial_state_fingerprint": "476516414469418d5c59911bf992f78f6ba451d2e117ca703aae867296a4d045",
+      "state_limit": 10000,
+      "states_visited": 6,
+      "model_cache_profile_id": "typed_base_adapter_state_v1",
+      "typed_model_cache_contract_version": "1.0.0",
+      "catalog_fingerprint": "1c0b3d55e957619af8bd1d15cbf1ba61b756b540c2c67ab8e66b507734092d7e",
+      "atomic_dependency_bundle": true
+    },
+    "performance": {
+      "request_count": 2,
+      "total_replay_request_count": 2,
+      "object_hit_count": 2,
+      "object_hit_rate": 1.0,
+      "joint_model_hit_count": 2,
+      "full_service_ready_count": 2,
+      "requested_mb": 112.0,
+      "hit_mb": 112.0,
+      "byte_hit_rate": 1.0,
+      "admission_count": 1,
+      "admission_mb": 208.0,
+      "eviction_event_count": 0,
+      "eviction_victim_count": 0,
+      "evicted_mb": 0.0,
+      "transfer_mb": 208.0,
+      "transfer_mb_by_type": {
+        "adapter": 48.0,
+        "base_model": 160.0
+      },
+      "churn_mb": 208.0,
+      "latency_saved": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "counterfactual latency absent"
+      }
+    },
+    "action_trace": [
+      {
+        "request_id": "r1",
+        "step_index": 1,
+        "request_order": 0,
+        "visible_request_ids": [
+          "r1"
+        ],
+        "visible_start_index": 0,
+        "visible_end_index_exclusive": 1,
+        "pre_action_hit": false,
+        "post_action_hit": true,
+        "action": "admit_bundle",
+        "cache_target_rsu_id": "rsu_x",
+        "admitted_object_id": "adapter:tracking",
+        "admitted_object_ids": [
+          "base:veh_base_v1",
+          "adapter:tracking"
+        ],
+        "evicted_object_ids": [],
+        "rejection_reason": null,
+        "adapter_transfer_mb": 48.0,
+        "transfer_mb_by_type": {
+          "adapter": 48.0,
+          "base_model": 160.0
+        },
+        "evicted_mb_by_type": {},
+        "transfer_mb": 208.0,
+        "evicted_mb": 0.0,
+        "cache_churn_mb": 208.0,
+        "rolling_plan_objective": {
+          "hit_mb": 56.0,
+          "hit_count": 1,
+          "transfer_mb": 208.0,
+          "evicted_mb": 0.0
+        },
+        "post_state": {
+          "rsu_x": [
+            "adapter:tracking",
+            "base:veh_base_v1"
+          ]
+        },
+        "post_state_fingerprint": "b2c45b07a4a470379e93bcadef465cf8b151eada18eab6b1806f9a285be1f64d",
+        "capacity_occupancy": {
+          "rsu_x": {
+            "used": 236.0,
+            "capacity": 260.0,
+            "occupancy_rate": 0.9076923076923077
+          }
+        },
+        "atomic_dependency_bundle": true,
+        "orphan_count": 0
+      },
+      {
+        "request_id": "r2",
+        "step_index": 2,
+        "request_order": 1,
+        "visible_request_ids": [
+          "r2"
+        ],
+        "visible_start_index": 1,
+        "visible_end_index_exclusive": 2,
+        "pre_action_hit": true,
+        "post_action_hit": true,
+        "action": "noop",
+        "cache_target_rsu_id": null,
+        "admitted_object_id": null,
+        "admitted_object_ids": [],
+        "evicted_object_ids": [],
+        "rejection_reason": null,
+        "adapter_transfer_mb": 0.0,
+        "transfer_mb_by_type": {},
+        "evicted_mb_by_type": {},
+        "transfer_mb": 0.0,
+        "evicted_mb": 0.0,
+        "cache_churn_mb": 0.0,
+        "rolling_plan_objective": {
+          "hit_mb": 56.0,
+          "hit_count": 1,
+          "transfer_mb": 0.0,
+          "evicted_mb": 0.0
+        },
+        "post_state": {
+          "rsu_x": [
+            "adapter:tracking",
+            "base:veh_base_v1"
+          ]
+        },
+        "post_state_fingerprint": "b2c45b07a4a470379e93bcadef465cf8b151eada18eab6b1806f9a285be1f64d",
+        "capacity_occupancy": {
+          "rsu_x": {
+            "used": 236.0,
+            "capacity": 260.0,
+            "occupancy_rate": 0.9076923076923077
+          }
+        },
+        "atomic_dependency_bundle": true,
+        "orphan_count": 0
+      }
+    ],
+    "capacity_invariant_audit": {
+      "status": "pass",
+      "checked_step_count": 2,
+      "capacity_never_exceeded": true,
+      "dependency_orphan_count": 0,
+      "per_rsu_isolation": true
+    },
+    "horizon_information_audit": {
+      "status": "pass",
+      "full_trace_diagnostic": false,
+      "max_visible_request_count": 1,
+      "outside_horizon_read": false
+    }
+  },
+  "status": "pass"
+}

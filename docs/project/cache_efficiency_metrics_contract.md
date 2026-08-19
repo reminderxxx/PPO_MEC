@@ -1,6 +1,6 @@
 # Cache Efficiency Metrics Contract
 
-版本：`1.0.0`（G06，2026-08-18）
+版本：`1.1.0`（G13 typed extension，2026-08-19；G06 legacy 指标保持兼容）
 输入：raw `CacheEvent 1.x` trace + 可选 `cache_trace_context 1.0.0`。参考实现为 `src/metrics/cache_efficiency_metrics.py`。
 
 ## 总原则
@@ -77,3 +77,7 @@ Benchmark row 只接入 object/byte hit、churn、pollution、transfer amplifica
 ```
 
 这些结果是 contract/机制验证。Smoke、synthetic、controlled classical baseline 或最小 real dry-run 均不能支持 paper-ready、算法 superiority、causal regret 或 latency-saved claim。
+
+## G13 type-aware metrics 1.1.0
+
+CacheEvent 1.3 raw fields独立重算base/adapter/joint hit、state/full readiness、missing type、compatibility failure、per-type requested/hit/resident/admitted/evicted/transfer MB、base/adapter occupancy、pinned MB、bundle rejection/churn、adapters per base、base reuse/sharing、严格可识别的avoided base transfer与orphan。pollution重建支持multi-object typed admission/eviction，right-censoring不变。旧1.0–1.2 trace的type-aware group为unavailable而非0。latency saved仍unavailable。

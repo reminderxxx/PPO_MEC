@@ -1,0 +1,7 @@
+{
+  "status": "pass",
+  "profile_when_omitted": "legacy_adapter_only_v1",
+  "reward_equal": true,
+  "cache_event_equal": true,
+  "typed_metrics_availability": "unavailable"
+}

@@ -40,3 +40,7 @@ baseline comparison 必须匹配 replay fingerprint、capacity unit/value、init
 ```
 
 入口重验 G07 manifest/replay、拒绝覆盖、不读取 hidden、不运行 formal benchmark，并输出 replay/validation、resolved config、oracle result/action trace、baseline gap、capacity/horizon audits、command log和 integrity manifest。
+
+## G13 typed exact mode
+
+当replay/manifest显式绑定`typed_base_adapter_state_v1`时，exact solver把base+adapter作为atomic action，使用per-type resident/transfer MB并拒绝产生orphan的victim组合；pinned对象不可evict。hit objective是joint base+adapter service hit，不把base-only当hit。tiny validation支持H=1/3/6/12；达到state limit仍返回`unknown_state_limit`且不silent fallback。legacy single-adapter solver不变。

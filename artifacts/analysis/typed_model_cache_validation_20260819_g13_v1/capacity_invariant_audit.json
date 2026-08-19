@@ -1,0 +1,7 @@
+{
+  "status": "pass",
+  "capacity_never_exceeded": true,
+  "atomic_rollback_observed": true,
+  "orphan_count": 0,
+  "workflow_state_counts_toward_model_capacity": false
+}

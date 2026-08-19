@@ -1,0 +1,12 @@
+{
+  "veh_base_v1": [
+    "adapter_perception",
+    "adapter_tracking",
+    "adapter_fusion",
+    "adapter_intent",
+    "adapter_control"
+  ],
+  "veh_base_v2": [
+    "adapter_reasoning"
+  ]
+}

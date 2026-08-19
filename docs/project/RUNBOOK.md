@@ -877,3 +877,23 @@ G11 只验证版本化 registry、兼容声明与 deterministic artifact，不�
 输出目录固定为 `artifacts/analysis/model_cache_dataset_discovery_20260819_g11_v1/`。registry 在 `configs/data/model_cache_dataset_registry.json`；HF 历史兼容 manifest 在 `data/raw/model_cache/huggingface_model_cache_sources.json`。
 
 禁止把 validator 当作下载/importer：G12 必须另立任务并获得明确授权。任何 BurstGPT/Azure/KV/HF 与 NGSIM 的组合都必须标记 `cross_source_exogenous_or_synthetic`，记录独立来源、mapping、信息损失和随机种子；不得称为真实 joint VEC trace。KV/prefix replay 与 adapter cache replay 必须使用不同 artifact type。
+
+## G13 typed model cache 受控验证
+
+该验证只覆盖 contract、事务、指标、公平性和真实数据 plumbing；不会训练 agent，
+不会运行 formal、holdout 或 hidden benchmark，也不会自动下载模型数据。
+
+```bash
+.venv/bin/python scripts/validate_typed_model_cache.py
+.venv/bin/python -m pytest -q tests/test_typed_model_cache.py
+```
+
+固定输出目录为
+`artifacts/analysis/typed_model_cache_validation_20260819_g13_v1/`。脚本采用
+create-only 语义；目录已存在时会拒绝覆盖。重跑前应明确选择新的 run ID 或人工归档旧目录，
+不得静默覆盖证据。真实最小链路要求本地 NGSIM 与 Alibaba 数据已经按本 runbook 准备；
+缺失时验证会 fail-fast，而不会下载或生成替代数据。
+
+legacy 兼容 dry-run 默认仍为 `legacy_adapter_only_v1`。只有显式传入
+`--model_cache_profile typed_base_adapter_state_v1 --typed_cache_capacity_mb <MB>`
+并使用受控 catalog 时才启用 typed resident cache。

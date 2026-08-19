@@ -59,6 +59,13 @@ REQUIRED_REQUEST_FIELDS = {
     "eligible_cache_target_rsu_ids",
     "dag_provenance",
 }
+TYPED_REQUEST_FIELDS = {
+    "model_cache_profile_id",
+    "typed_model_cache_contract_version",
+    "catalog_fingerprint",
+    "requested_typed_objects",
+    "dependency_bundle",
+}
 
 
 class CacheRequestReplayError(ValueError):
@@ -100,6 +107,11 @@ def build_request_replay(
     producer: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     unit_id = str(evaluation_unit["evaluation_unit_id"])
+    request_rows = [deepcopy(item) for item in requests]
+    typed_mode = bool(request_rows) and all(
+        item.get("model_cache_profile_id") == "typed_base_adapter_state_v1"
+        for item in request_rows
+    )
     replay = {
         "cache_request_replay_version": CACHE_REQUEST_REPLAY_VERSION,
         "producer": producer
@@ -131,8 +143,13 @@ def build_request_replay(
             "admission_timing": "action_before_service_lookup_same_step_admission_can_hit",
             "action_budget": "at_most_one_current_object_admission_per_step",
             "oracle_control_scope": "current_rsu_placement_admission_eviction_or_noop",
+            "model_cache_profile_id": (
+                "typed_base_adapter_state_v1" if typed_mode else "legacy_adapter_only_v1"
+            ),
+            "atomic_dependency_bundle": typed_mode,
+            "max_dependency_bundle_objects": 2 if typed_mode else 1,
         },
-        "requests": [deepcopy(item) for item in requests],
+        "requests": request_rows,
     }
     _validate_finite(replay)
     replay["request_replay_fingerprint"] = request_replay_fingerprint(replay)
@@ -170,6 +187,35 @@ def validate_request_replay(
         if missing:
             errors.append(f"request[{index}] missing fields: {missing}")
             continue
+        if request.get("model_cache_profile_id") is not None:
+            typed_missing = sorted(TYPED_REQUEST_FIELDS - set(request))
+            if typed_missing:
+                errors.append(f"request[{index}] missing typed fields: {typed_missing}")
+            elif request.get("model_cache_profile_id") != "typed_base_adapter_state_v1":
+                errors.append(f"request[{index}] unsupported typed profile")
+            elif request.get("typed_model_cache_contract_version") != "1.0.0":
+                errors.append(f"request[{index}] typed contract version mismatch")
+            else:
+                bundle = request.get("dependency_bundle") or {}
+                rows = request.get("requested_typed_objects") or []
+                ordered_ids = list(bundle.get("ordered_object_ids") or [])
+                if not isinstance(rows, list) or not 1 <= len(rows) <= 2:
+                    errors.append(f"request[{index}] typed object bundle must contain 1-2 objects")
+                elif ordered_ids != [row.get("object_id") for row in rows]:
+                    errors.append(f"request[{index}] dependency bundle order mismatch")
+                elif rows[-1].get("object_type") != "adapter":
+                    errors.append(f"request[{index}] dependency bundle must end with adapter")
+                elif len(rows) == 2 and rows[0].get("object_type") != "base_model":
+                    errors.append(f"request[{index}] dependency bundle must admit base before adapter")
+                for row in rows:
+                    try:
+                        resident_size = float(row.get("resident_size_mb"))
+                        transfer_size = float(row.get("transfer_size_mb"))
+                        if not math.isfinite(resident_size) or resident_size <= 0 or not math.isfinite(transfer_size) or transfer_size <= 0:
+                            raise ValueError
+                    except (TypeError, ValueError):
+                        errors.append(f"request[{index}] invalid typed object size")
+                        break
         request_id = str(request["request_id"])
         if request_id in seen:
             errors.append(f"duplicate request_id: {request_id}")

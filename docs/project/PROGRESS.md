@@ -1,5 +1,14 @@
 ﻿# Progress
 
+## 2026-08-19: G13 typed base/model/adapter/workflow-state cache frozen
+
+- 冻结`typed_model_cache_contract_version=1.0.0`、`CacheEvent=1.3.0`和type-aware metrics `1.1.0`；缺profile继续使用`legacy_adapter_only_v1`。
+- typed catalog显式区分base model、adapter和migration-only workflow state；KV reserved/disabled。adapter唯一依赖base，catalog fingerprint/compatibility/license/provenance均fail-fast。
+- typed runtime只允许MB capacity；一个logical cache action解析为最多2对象的atomic base+adapter bundle。pinned/dependency-safe multi-victim、rollback/no-orphan、per-type transfer/readiness均已实现。
+- G07 optional typed fairness binding、G08 typed replay/tiny exact oracle、G09 typed transfer/full-service consumer已接入；legacy消费者/fixtures保持兼容。
+- validation artifact：`artifacts/analysis/typed_model_cache_validation_20260819_g13_v1/`。真实NGSIM+Alibaba最小typed run为3 requests/3 typed events；这是non-formal mechanism evidence，不是性能结论。
+- 本轮未执行G14、训练、调参、formal、holdout或hidden。
+
 ## 2026-08-19: G12 Causal Calibrated Predictor Snapshot Contract frozen
 
 - 冻结 snapshot `1.0.0`、calibration artifact `causal_predictor_calibration_artifact_v1.0.0` 和 decision trace `1.0.0`；新增 generated/as-of/consumed、validity/age、raw/calibrated probability、abstention/mask、oracle isolation 与 fail-fast validator。

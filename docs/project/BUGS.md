@@ -1,5 +1,16 @@
 ﻿# Bugs And Risks
 
+## 2026-08-19: G13 typed model-cache contract frozen; real workload/latency evidence remains open
+
+- `RESOLVED / semantics`：vehicle base capability、RSU base resident、adapter resident与workflow-state migration payload现已分层；partial hit不再算full service。
+- `RESOLVED / transaction`：base+adapter dependency bundle为single-plan atomic commit；oversized/no-victim rollback不改变resident/policy且orphan始终0。
+- `RESOLVED / compatibility`：legacy profile仍默认；CacheEvent 1.0–1.2继续读取，typed-only metrics对旧trace为unavailable。
+- `OPEN / real trace`：controlled catalog不是production model/adapter request trace；G11 joint VEC/adapter trace缺口未解决。
+- `OPEN / latency`：仍无request-aligned load/inference/transfer/counterfactual latency，latency saved不可用。
+- `OPEN / scale`：typed exact oracle只对小状态保证exact；state limit返回unknown，G14前需按冻结规模审计。
+- `BLOCKED / HF formal`：qwen/cbow/bert license未知，BERT size provenance异常；diagnostic profile不得用于formal。
+- `BOUNDARY`：workflow state是migration-only，不是长期共享cache；KV prefix仍disabled。G13不授权G14、训练或任何formal/holdout/hidden运行。
+
 用途：记录当前有效问题、风险和禁止误读项。
 
 ## 2026-08-19: G12 predictor causality/calibration contract frozen; policy use remains blocked

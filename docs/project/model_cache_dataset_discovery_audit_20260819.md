@@ -136,3 +136,7 @@ Microsoft 官方说明分别覆盖 [2023](https://github.com/Azure/AzurePublicDa
 ## Claim boundary 与剩余风险
 
 G11 只达到公开 metadata 的 E2 artifact-audited evidence。它不证明任何新源已适配环境、不证明 predictor calibration、不证明算法性能或 paper readiness。页面后续可能变更；HF 缺失 license、BERT 异常大小、Alibaba PAI license、公开 adapter trace 缺口与 joint VEC trace 缺口仍是 blocker。所有跨源组合必须保留 source provenance，并把独立性与信息损失写入未来 artifact。
+
+## G13 mapping freeze
+
+G13新增`hf_metadata_diagnostic_model_profile.json`，只把qwen/cbow/bert表示为`base_model` size metadata，不再映射成adapter request/object。profile显式标记metadata-only、cross-source、non-formal、no payload downloaded；未知license均blocked from formal，BERT另为`blocked_provenance_anomaly`。它不进入默认runtime或G14正式主表。BurstGPT仍未下载/未进入runtime；Qwen-Bailian/Mooncake继续KV-only且G13 disabled。

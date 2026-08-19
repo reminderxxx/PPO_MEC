@@ -12,7 +12,7 @@ from src.envs.specs import CACHE_EVENT_SCHEMA_VERSION, CacheEvent
 from src.metrics.cache_event_metrics import reduce_cache_events
 
 
-CACHE_EFFICIENCY_METRICS_VERSION = "1.0.0"
+CACHE_EFFICIENCY_METRICS_VERSION = "1.1.0"
 DEFAULT_REUSE_HORIZONS = (1, 3, 6, 12)
 HIT_SOURCES = (
     "vehicle_local", "current_rsu", "target_rsu", "neighbor_rsu", "cloud", "unserved"
@@ -59,6 +59,7 @@ class CacheEfficiencyMetricSummary:
     pollution_metrics: dict[str, Any] = field(default_factory=dict)
     future_reuse_proxy_metrics: dict[str, Any] = field(default_factory=dict)
     latency_saved_metrics: dict[str, Any] = field(default_factory=dict)
+    type_aware_metrics: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -91,13 +92,23 @@ def _snapshot_residents(snapshot: Mapping[str, Any], label: str) -> tuple[dict[t
             raise ValueError("capacity-disabled trace context must have null capacity")
         contracts.add((enabled, unit, capacity))
         for item in rsu["residents"]:
-            if not isinstance(item, Mapping) or not item.get("object_id") or not item.get("adapter_id"):
+            if not isinstance(item, Mapping) or not item.get("object_id"):
                 raise ValueError(f"malformed {label} resident")
             size = _number(item.get("size_mb"), f"{label}.resident.size_mb")
+            object_type = str(item.get("object_type") or "adapter")
+            adapter_id = item.get("adapter_id")
+            if object_type == "adapter" and not adapter_id:
+                raise ValueError(f"malformed {label} adapter resident")
             key = (str(rsu["rsu_id"]), str(item["object_id"]))
             if key in residents:
                 raise ValueError(f"duplicate resident in {label} snapshot: {key}")
-            residents[key] = {"adapter_id": str(item["adapter_id"]), "size_mb": size}
+            residents[key] = {
+                "adapter_id": str(adapter_id) if adapter_id else None,
+                "object_type": object_type,
+                "required_base_model_id": item.get("required_base_model_id"),
+                "evictability": item.get("evictability"),
+                "size_mb": size,
+            }
     return residents, contracts
 
 
@@ -147,7 +158,30 @@ def _pollution_metrics(events: list[dict[str, Any]], context: Mapping[str, Any] 
                     confirmed_count += 1
                     confirmed_mb += float(interval["size_mb"])
                     polluted_mb_steps += float(interval["size_mb"]) * duration
-        if event.get("admission_added"):
+        typed_admissions = list(event.get("admitted_typed_objects") or [])
+        if typed_admissions:
+            rsu_id = event.get("cache_target_rsu_id")
+            if not rsu_id:
+                return {**_group("unavailable", "admission_identity_or_size_missing", required, 0, len(events))}
+            for row in typed_admissions:
+                object_id = row.get("object_id")
+                size = _number(row.get("resident_size_mb"), "resident_size_mb", nullable=True)
+                if not object_id or size is None:
+                    return {**_group("unavailable", "admission_identity_or_size_missing", required, 0, len(events))}
+                key = (str(rsu_id), str(object_id))
+                if key in active:
+                    raise ValueError(f"duplicate admission of resident object: {key}")
+                active[key] = {
+                    "adapter_id": row.get("adapter_id"),
+                    "object_type": str(row.get("object_type")),
+                    "required_base_model_id": row.get("required_base_model_id"),
+                    "evictability": row.get("evictability"),
+                    "size_mb": size,
+                    "start": step,
+                    "origin": "admission",
+                    "hit": False,
+                }
+        elif event.get("admission_added"):
             rsu_id = event.get("cache_target_rsu_id")
             object_id = event.get("admitted_object_id")
             adapter_id = event.get("admitted_adapter_id")
@@ -157,12 +191,18 @@ def _pollution_metrics(events: list[dict[str, Any]], context: Mapping[str, Any] 
             key = (str(rsu_id), str(object_id))
             if key in active:
                 raise ValueError(f"duplicate admission of resident object: {key}")
-            active[key] = {"adapter_id": str(adapter_id), "size_mb": size, "start": step, "origin": "admission", "hit": False}
+            active[key] = {"adapter_id": str(adapter_id), "object_type": "adapter", "required_base_model_id": None, "evictability": None, "size_mb": size, "start": step, "origin": "admission", "hit": False}
         if event.get("cache_hit") and event.get("hit_source") in {"current_rsu", "target_rsu", "neighbor_rsu"}:
-            key = (str(event.get("served_rsu_id")), str(event.get("object_id")))
-            if key not in active:
-                raise ValueError(f"cache hit references non-resident object: {key}")
-            active[key]["hit"] = True
+            lookup_ids = [
+                row.get("object_id")
+                for row in event.get("per_object_lookup_results") or []
+                if row.get("resident")
+            ] or [event.get("object_id")]
+            for object_id in lookup_ids:
+                key = (str(event.get("served_rsu_id")), str(object_id))
+                if key not in active:
+                    raise ValueError(f"cache hit references non-resident object: {key}")
+                active[key]["hit"] = True
 
     closure_step = end_step + 1
     for interval in active.values():
@@ -171,7 +211,16 @@ def _pollution_metrics(events: list[dict[str, Any]], context: Mapping[str, Any] 
         if interval["origin"] == "admission" and not interval["hit"]:
             censored_count += 1
             censored_mb += float(interval["size_mb"])
-    reconstructed = {(rsu, obj): {"adapter_id": value["adapter_id"], "size_mb": value["size_mb"]} for (rsu, obj), value in active.items()}
+    reconstructed = {
+        (rsu, obj): {
+            "adapter_id": value.get("adapter_id"),
+            "object_type": value.get("object_type", "adapter"),
+            "required_base_model_id": value.get("required_base_model_id"),
+            "evictability": value.get("evictability"),
+            "size_mb": value["size_mb"],
+        }
+        for (rsu, obj), value in active.items()
+    }
     if reconstructed != final:
         raise ValueError("reconstructed final cache does not match final snapshot")
     return {
@@ -183,6 +232,11 @@ def _pollution_metrics(events: list[dict[str, Any]], context: Mapping[str, Any] 
         "polluted_resident_mb_steps": round(polluted_mb_steps, 6),
         "total_resident_mb_steps": round(total_mb_steps, 6),
         "cache_pollution_ratio": _rate(polluted_mb_steps, total_mb_steps),
+        "right_censored_unused_by_object_type": dict(sorted(Counter(
+            interval.get("object_type", "adapter")
+            for interval in active.values()
+            if interval["origin"] == "admission" and not interval["hit"]
+        ).items())),
         "censoring_semantics": "episode-end un-reused admissions are right-censored and excluded from pollution numerator",
     }
 
@@ -231,6 +285,199 @@ def _future_reuse(events: list[dict[str, Any]], horizons: tuple[int, ...]) -> di
             "mb_availability": "available" if size_available else "partial",
         }
     return result
+
+
+def _sum_type_maps(events: list[dict[str, Any]], field_name: str) -> dict[str, float]:
+    totals: dict[str, float] = {}
+    for event in events:
+        value = event.get(field_name) or {}
+        if not isinstance(value, Mapping):
+            raise ValueError(f"{field_name} must be a mapping")
+        for object_type, raw in value.items():
+            totals[str(object_type)] = totals.get(str(object_type), 0.0) + float(
+                _number(raw, f"{field_name}.{object_type}") or 0.0
+            )
+    return {key: round(value, 6) for key, value in sorted(totals.items())}
+
+
+def _type_aware_metrics(
+    requests: list[dict[str, Any]], context: Mapping[str, Any] | None
+) -> dict[str, Any]:
+    typed = [
+        item
+        for item in requests
+        if item.get("model_cache_profile_id") == "typed_base_adapter_state_v1"
+    ]
+    if not typed:
+        return {
+            **_group(
+                "unavailable",
+                "legacy_trace_has_no_typed_model_cache_evidence",
+                ["model_cache_profile_id", "base_model_hit", "adapter_hit"],
+                0,
+                len(requests),
+            ),
+            "request_count": len(requests),
+        }
+    if len(typed) != len(requests):
+        return {
+            **_group(
+                "partial",
+                "mixed_legacy_and_typed_trace_not_aggregated",
+                ["model_cache_profile_id"],
+                len(typed),
+                len(requests) - len(typed),
+            ),
+            "request_count": len(requests),
+        }
+    count = len(typed)
+    for item in typed:
+        if item.get("typed_model_cache_contract_version") != "1.0.0":
+            raise ValueError("typed event contract version mismatch")
+        if item.get("orphan_count") != 0:
+            raise ValueError("typed event reports an orphan resident")
+    base_hits = sum(bool(item.get("base_model_hit")) for item in typed)
+    adapter_hits = sum(bool(item.get("adapter_hit")) for item in typed)
+    joint_hits = sum(bool(item.get("joint_model_hit")) for item in typed)
+    state_ready = sum(bool(item.get("workflow_state_ready")) for item in typed)
+    full_ready = sum(bool(item.get("full_service_ready")) for item in typed)
+    missing_types = Counter(
+        object_type
+        for item in typed
+        for object_type in item.get("missing_object_types") or []
+    )
+    compatibility_failures = sum(
+        item.get("compatibility_result") == "incompatible" for item in typed
+    )
+    requested_mb: dict[str, float] = {}
+    hit_mb: dict[str, float] = {}
+    sharing_hits = 0
+    avoided_base_transfer_mb = 0.0
+    base_reuse_count = 0
+    seen_base_requests: Counter[str] = Counter()
+    base_to_adapters: dict[str, set[str]] = {}
+    for item in typed:
+        rows = list(item.get("requested_typed_objects") or [])
+        row_by_id = {str(row.get("object_id")): row for row in rows}
+        lookup = list(item.get("per_object_lookup_results") or [])
+        for row in rows:
+            object_type = str(row.get("object_type"))
+            requested_mb[object_type] = requested_mb.get(object_type, 0.0) + float(
+                _number(row.get("resident_size_mb"), "resident_size_mb") or 0.0
+            )
+        for row in lookup:
+            if not row.get("resident"):
+                continue
+            source = row_by_id.get(str(row.get("object_id")))
+            if source:
+                object_type = str(source.get("object_type"))
+                hit_mb[object_type] = hit_mb.get(object_type, 0.0) + float(
+                    _number(source.get("resident_size_mb"), "resident_size_mb") or 0.0
+                )
+        base_row = next((row for row in rows if row.get("object_type") == "base_model"), None)
+        adapter_row = next((row for row in rows if row.get("object_type") == "adapter"), None)
+        if base_row:
+            base_id = str(base_row.get("object_id"))
+            base_reuse_count += int(seen_base_requests[base_id] > 0 and bool(item.get("base_model_hit")))
+            seen_base_requests[base_id] += 1
+            if adapter_row:
+                previous_adapters = base_to_adapters.setdefault(base_id, set())
+                adapter_id = str(adapter_row.get("adapter_id"))
+                if bool(item.get("base_model_hit")) and adapter_id not in previous_adapters and previous_adapters:
+                    sharing_hits += 1
+                previous_adapters.add(adapter_id)
+            if bool(item.get("base_model_hit")) and not bool(item.get("adapter_hit")):
+                avoided_base_transfer_mb += float(
+                    _number(base_row.get("transfer_size_mb"), "transfer_size_mb") or 0.0
+                )
+    admitted_by_type = _sum_type_maps(typed, "admitted_mb_by_type")
+    evicted_by_type = _sum_type_maps(typed, "evicted_mb_by_type")
+    transfer_by_type = _sum_type_maps(typed, "transfer_mb_by_type")
+    resident_by_type: dict[str, float] | None = None
+    pinned_mb = None
+    adapters_per_base: dict[str, int] | None = None
+    if isinstance(context, Mapping) and isinstance(context.get("final_snapshot"), Mapping):
+        resident_by_type = {}
+        pinned_mb = 0.0
+        base_adapter_sets: dict[str, set[str]] = {}
+        for rsu in context["final_snapshot"].get("rsus", []):
+            residents = list(rsu.get("residents") or [])
+            base_objects = {
+                row.get("base_model_id"): row.get("object_id")
+                for row in residents
+                if row.get("object_type") == "base_model"
+            }
+            for row in residents:
+                object_type = str(row.get("object_type") or "adapter")
+                size = float(_number(row.get("size_mb"), "resident.size_mb") or 0.0)
+                resident_by_type[object_type] = resident_by_type.get(object_type, 0.0) + size
+                if row.get("evictability") != "evictable":
+                    pinned_mb += size
+                required = row.get("required_base_model_id")
+                if object_type == "adapter" and required in base_objects:
+                    key = f"{rsu.get('rsu_id')}/{base_objects[required]}"
+                    base_adapter_sets.setdefault(key, set()).add(str(row.get("adapter_id")))
+        resident_by_type = {
+            key: round(value, 6) for key, value in sorted(resident_by_type.items())
+        }
+        adapters_per_base = {
+            key: len(value) for key, value in sorted(base_adapter_sets.items())
+        }
+        pinned_mb = round(pinned_mb, 6)
+    full_ready_mb = sum(
+        float(item.get("size_mb") or 0.0)
+        for item in typed
+        if item.get("full_service_ready")
+    )
+    total_transfer = sum(transfer_by_type.values())
+    return {
+        **_group("available", None, ["CacheEvent 1.3 typed fields"], count, 0),
+        "typed_model_cache_contract_version": "1.0.0",
+        "request_count": count,
+        "base_hit_count": base_hits,
+        "base_hit_rate": _rate(base_hits, count),
+        "adapter_hit_count": adapter_hits,
+        "adapter_hit_rate": _rate(adapter_hits, count),
+        "joint_base_adapter_hit_count": joint_hits,
+        "joint_base_adapter_hit_rate": _rate(joint_hits, count),
+        "workflow_state_ready_count": state_ready,
+        "workflow_state_ready_rate": _rate(state_ready, count),
+        "full_service_ready_count": full_ready,
+        "full_service_ready_rate": _rate(full_ready, count),
+        "miss_count_by_missing_object_type": dict(sorted(missing_types.items())),
+        "compatibility_failure_count": compatibility_failures,
+        "requested_mb_by_type": {key: round(value, 6) for key, value in sorted(requested_mb.items())},
+        "hit_mb_by_type": {key: round(value, 6) for key, value in sorted(hit_mb.items())},
+        "resident_mb_by_type": resident_by_type,
+        "admitted_mb_by_type": admitted_by_type,
+        "evicted_mb_by_type": evicted_by_type,
+        "transfer_mb_by_type": transfer_by_type,
+        "base_occupancy_share": (
+            _rate(resident_by_type.get("base_model", 0.0), sum(resident_by_type.values()))
+            if resident_by_type
+            else None
+        ),
+        "adapter_occupancy_share": (
+            _rate(resident_by_type.get("adapter", 0.0), sum(resident_by_type.values()))
+            if resident_by_type
+            else None
+        ),
+        "pinned_or_unavailable_capacity_mb": pinned_mb,
+        "dependency_bundle_rejection_count": sum(
+            bool(item.get("capacity_rejection_reason")) for item in typed
+        ),
+        "adapters_per_resident_base": adapters_per_base,
+        "base_reuse_count": base_reuse_count,
+        "base_sharing_hit_count": sharing_hits,
+        "avoided_duplicate_base_transfer_mb": round(avoided_base_transfer_mb, 6),
+        "orphan_count": 0,
+        "dependency_bundle_churn_mb": round(
+            sum(admitted_by_type.values()) + sum(evicted_by_type.values()), 6
+        ),
+        "total_transfer_mb": round(total_transfer, 6),
+        "transfer_amplification": _rate(total_transfer, full_ready_mb),
+        "latency_saved": {"availability": "unavailable", "value": None},
+    }
 
 
 def reduce_cache_efficiency_events(
@@ -397,6 +644,7 @@ def reduce_cache_efficiency_events(
         request_metrics=request_metrics, byte_metrics=byte_metrics, lifecycle_metrics=lifecycle_metrics,
         capacity_metrics=capacity_metrics, pollution_metrics=_pollution_metrics(requests, trace_context),
         future_reuse_proxy_metrics=_future_reuse(requests, horizons), latency_saved_metrics=latency,
+        type_aware_metrics=_type_aware_metrics(requests, trace_context),
     )
 
 
@@ -408,6 +656,7 @@ def reduce_cache_efficiency_summary(summary: Mapping[str, Any], *, reuse_horizon
             request_metrics=dict(missing), byte_metrics=dict(missing), lifecycle_metrics=dict(missing),
             capacity_metrics=dict(missing), pollution_metrics=dict(missing),
             future_reuse_proxy_metrics=dict(missing), latency_saved_metrics=dict(missing),
+            type_aware_metrics=dict(missing),
         )
     trace = summary["cache_event_trace"]
     if not isinstance(trace, list):
@@ -432,4 +681,9 @@ def cache_efficiency_row_fields(summary: Mapping[str, Any]) -> dict[str, Any]:
         "cache_transfer_amplification_ratio": result.lifecycle_metrics.get("transfer_amplification_ratio"),
         "cache_capacity_mean_occupancy": result.capacity_metrics.get("mean_occupancy"),
         "cache_latency_saved_sum_ms": result.latency_saved_metrics.get("latency_saved_sum_ms"),
+        "cache_base_model_hit_rate": result.type_aware_metrics.get("base_hit_rate"),
+        "cache_adapter_hit_rate": result.type_aware_metrics.get("adapter_hit_rate"),
+        "cache_joint_model_hit_rate": result.type_aware_metrics.get("joint_base_adapter_hit_rate"),
+        "cache_full_service_ready_rate": result.type_aware_metrics.get("full_service_ready_rate"),
+        "cache_base_transfer_mb": result.type_aware_metrics.get("transfer_mb_by_type", {}).get("base_model") if isinstance(result.type_aware_metrics.get("transfer_mb_by_type"), dict) else None,
     }

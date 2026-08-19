@@ -24,3 +24,7 @@ G08 oracle 只消费 policy-neutral request replay，不从任一 baseline 的 h
 ```
 
 入口默认拒绝覆盖。G07 `1.0.0` 仍可读取；新 builder 在 `cache_contract.oracle_companion_contract` 写入可选 consumer-safe 派生信息，旧 manifest 缺该字段仍有效。
+
+## G13 typed request extension
+
+typed replay逐request附带`model_cache_profile_id/typed contract/catalog fingerprint/requested_typed_objects/dependency_bundle`。bundle canonical order最多2项且必须为base→adapter；resident/transfer size均需有限正数。request仍是一行，dependency不能扩张denominator。profile、顺序、catalog fingerprint或atomic contract不匹配时fail-fast；legacy replay字段与fingerprint规则保持兼容。

@@ -38,3 +38,7 @@ G03 parity evidence is produced by `scripts/validate_cache_eviction_policy.py` u
 # 1.1 classical policy extension (2026-08-18)
 
 Factory 精确注册 `lru/fifo/lfu/aging_lfu/random`。冻结排序、aging 与 seed 语义见 `classical_cache_baseline_contract.md`。`EvictionPlan.candidate_recency` 保持 1.x 兼容字段名并承载各 policy evidence；未升级 CacheEvent schema。
+
+## G13 typed object generalization
+
+policy boundary本来使用`object_id`，legacy环境实际传adapter ID；typed profile现在传stable typed object ID。五policy算法不变。typed victim candidate排除pinned/non-evictable对象，并冻结“base仍有resident adapter依赖时禁止evictbase”；一次bundle只调用一次read-only multi-victim plan。没有dependency-safe sufficient plan时环境不应用任何victim。legacy adapter victim排序/seed parity保持不变。

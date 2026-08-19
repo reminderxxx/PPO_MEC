@@ -349,3 +349,14 @@
 - `src/evaluators/main_results_support.py`：仅接入 G06 nullable scalar；大型 raw trace 仍由 episode summary 承载。
 - `scripts/audit_cache_efficiency_metrics.py`：读取真实 summary 并输出 JSON-safe 独立重算结果。
 - `tests/test_cache_efficiency_metrics.py`：覆盖 byte denominator、multi-victim、pollution/censoring、reuse horizon、invalid/missing/null 与 aggregate semantics。
+
+## 2026-08-19 G13 type-aware model cache
+
+- `src/data/model_catalog/adapter_catalog.py`：同时承载 legacy adapter-only projection 与冻结的 typed catalog 校验、fingerprint、依赖/兼容解析；不下载或加载模型权重。
+- `src/envs/core/vec_workflow_core_env.py`：拥有 RSU typed residency、分层 readiness、base→adapter 单动作原子事务、容量守恒和 dependency-safe mutation；workflow state 只记录迁移 readiness，不计 resident cache 容量。
+- `src/envs/core/cache_eviction.py`：继续只生成只读 victim plan；typed 环境负责过滤 pinned/non-evictable/dependency-blocked 对象并验证完整 plan 后一次提交。
+- `src/envs/specs/semantic_objects.py`：冻结 `CacheEvent 1.3.0` 的 typed 可选字段，同时兼容消费 1.0–1.2。
+- `src/metrics/cache_event_metrics.py`、`src/metrics/cache_efficiency_metrics.py`：从 raw event 独立重算 layered readiness、逐类型 transfer/residency/admission/eviction、base reuse、orphan/churn；legacy 缺失项保持 unavailable/null。
+- `src/oracles/cache_request_replay.py`、`src/oracles/typed_model_cache_oracle.py`、`src/oracles/future_horizon_cache_oracle.py`：冻结 typed replay 与小规模精确 atomic oracle；legacy oracle 路径不变。
+- `src/evaluators/cache_baseline_fairness.py`：校验 catalog/profile/初始状态/事务/指标/oracle 的 policy-invariant binding。
+- `scripts/validate_typed_model_cache.py`：只运行受控确定性验证与真实 NGSIM + Alibaba 最小链路，不训练、不运行 formal/holdout/hidden。
