@@ -13,7 +13,7 @@
 - 主线问题：跨 RSU 连续 DAG workflow 执行、车载 base model 与路侧 adapter cache 协同、handoff 状态迁移、多时间尺度控制
 - 当前正式数据主线：`NGSIM + Alibaba`
 - 当前数据源声明入口：`docs/project/DATASET_SOURCES.md`
-- 当前外部 model-cache metadata source：Hugging Face `model-cache` 候选全集已审计并 metadata-only 接入；当前只支持数据源声明和真实 file-size/cache-volume profile 设计，不替换 benchmark 默认 cache 行为
+- 当前外部 model-cache registry：G11 `1.0.0` 已核验19个候选；未发现joint VEC或真实adapter request trace。BurstGPT/Qwen-Bailian/Mooncake/Azure/Acme与三个HF size源仅metadata-only声明，不替换benchmark默认cache行为；HF live catalog只保留qwen/cbow/bert三项E类size metadata。
 - 当前论文协议：`paper_protocol_v1_20260409`
 - 当前正式结果入口：`docs/project/ARTIFACT_RECORDS.md`
 - 当前顶刊审查规范：`docs/project/top_journal_review_policy.md`；最新审查为 `docs/project/top_journal_readiness_audit_20260621.md`。

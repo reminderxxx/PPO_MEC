@@ -1,5 +1,13 @@
 ﻿# Progress
 
+## 2026-08-19: G11 Public Model-Cache Dataset Discovery and Metadata Integration frozen
+
+- 冻结 `model_cache_dataset_registry_version=1.0.0`、A–I taxonomy、19项字段覆盖、100分权重/hard gates及 metadata-only compatibility validator；19个候选均由官方页面、仓库或API metadata核验，raw payload download=false。
+- 未发现 A 类 joint VEC AI cache trace，也未发现 C 类真实 adapter/LoRA request trace。最佳 B 类为 BurstGPT v2.0；D 类为 Qwen-Bailian/Mooncake；Azure/Acme只能提供 arrival/token/resource；三个 HF 候选只能提供 size metadata。
+- 重新审计五个 HF 项：qwen/cbow/bert降级保留 E 类 live catalog metadata；ImageNet/LlamaGen 内容cache与空 Examsathi候选从 live projection移除，历史审计记录保留。
+- 新增 deterministic validator、24个专项/兼容测试和 `artifacts/analysis/model_cache_dataset_discovery_20260819_g11_v1/` 机器审计包；mapping plan明确跨源对齐的信息损失，不实现 G12 importer。
+- 未下载大型数据，未训练或执行 formal/holdout/hidden；`NGSIM + Alibaba` 正式主线不变。完整结论见 `docs/project/model_cache_dataset_discovery_audit_20260819.md`。
+
 ## 2026-08-19: G10 Observation Information Sufficiency and MARL Necessity Audit frozen
 
 - 新增 `information_sufficiency_audit_contract_version=1.0.0`、只读 core reducer 与稳定 CLI；严格绑定 G07 manifest、G08 replay/oracle action trace、G09 request rows，拒绝 hidden、reward、aggregate、oracle future、事后 service result、duplicate/NaN/identity drift。

@@ -1,0 +1,291 @@
+{
+  "scoring_contract": {
+    "version": "1.0.0",
+    "weights": {
+      "temporal_request_sequence": 20,
+      "stable_model_adapter_cache_object_identity": 20,
+      "bytes_size": 15,
+      "reuse_cache_semantics": 10,
+      "load_inference_transfer_latency": 10,
+      "client_tenant_identity": 5,
+      "mobility_location_rsu": 10,
+      "license_provenance_reproducibility": 10
+    },
+    "hard_gates": [
+      "no stable model/adapter identity means not a real model-cache request trace",
+      "no temporal order means not usable for an online caching policy",
+      "no mobility/location means not a real VEC trace",
+      "file size only means size-profile only",
+      "unknown license means not formal-ready",
+      "content named cache is not a cache trace"
+    ]
+  },
+  "rows": [
+    {
+      "source_key": "hf_qwen_model_cache",
+      "components": {
+        "temporal_request_sequence": 0,
+        "stable_model_adapter_cache_object_identity": 20,
+        "bytes_size": 15,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 3
+      },
+      "total": 38
+    },
+    {
+      "source_key": "hf_cbow_model_cache",
+      "components": {
+        "temporal_request_sequence": 0,
+        "stable_model_adapter_cache_object_identity": 20,
+        "bytes_size": 15,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 3
+      },
+      "total": 38
+    },
+    {
+      "source_key": "hf_imagenet_llamagen_cache",
+      "components": {
+        "temporal_request_sequence": 0,
+        "stable_model_adapter_cache_object_identity": 0,
+        "bytes_size": 15,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 3
+      },
+      "total": 18
+    },
+    {
+      "source_key": "hf_bert_model_cache",
+      "components": {
+        "temporal_request_sequence": 0,
+        "stable_model_adapter_cache_object_identity": 20,
+        "bytes_size": 15,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 3
+      },
+      "total": 38
+    },
+    {
+      "source_key": "hf_examsathi_model_cache",
+      "components": {
+        "temporal_request_sequence": 0,
+        "stable_model_adapter_cache_object_identity": 0,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 2
+      },
+      "total": 2
+    },
+    {
+      "source_key": "azure_llm_inference_2023",
+      "components": {
+        "temporal_request_sequence": 20,
+        "stable_model_adapter_cache_object_identity": 0,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 10
+      },
+      "total": 30
+    },
+    {
+      "source_key": "azure_llm_inference_2024",
+      "components": {
+        "temporal_request_sequence": 20,
+        "stable_model_adapter_cache_object_identity": 0,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 10
+      },
+      "total": 30
+    },
+    {
+      "source_key": "azure_lmm_inference_2025",
+      "components": {
+        "temporal_request_sequence": 20,
+        "stable_model_adapter_cache_object_identity": 0,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 10
+      },
+      "total": 30
+    },
+    {
+      "source_key": "burstgpt_v2",
+      "components": {
+        "temporal_request_sequence": 20,
+        "stable_model_adapter_cache_object_identity": 20,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 3,
+        "load_inference_transfer_latency": 10,
+        "client_tenant_identity": 5,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 10
+      },
+      "total": 68
+    },
+    {
+      "source_key": "mooncake_fast25_traces",
+      "components": {
+        "temporal_request_sequence": 20,
+        "stable_model_adapter_cache_object_identity": 20,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 10,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 10
+      },
+      "total": 60
+    },
+    {
+      "source_key": "qwen_bailian_kv_traces",
+      "components": {
+        "temporal_request_sequence": 20,
+        "stable_model_adapter_cache_object_identity": 20,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 10,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 5,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 10
+      },
+      "total": 65
+    },
+    {
+      "source_key": "acme_trace",
+      "components": {
+        "temporal_request_sequence": 20,
+        "stable_model_adapter_cache_object_identity": 0,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 10,
+        "client_tenant_identity": 5,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 10
+      },
+      "total": 45
+    },
+    {
+      "source_key": "alibaba_pai_gpu_trace_2020",
+      "components": {
+        "temporal_request_sequence": 20,
+        "stable_model_adapter_cache_object_identity": 0,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 10,
+        "client_tenant_identity": 5,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 5
+      },
+      "total": 40
+    },
+    {
+      "source_key": "azure_functions_invocation_2021",
+      "components": {
+        "temporal_request_sequence": 20,
+        "stable_model_adapter_cache_object_identity": 0,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 10,
+        "client_tenant_identity": 5,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 10
+      },
+      "total": 45
+    },
+    {
+      "source_key": "lmsys_chat_1m",
+      "components": {
+        "temporal_request_sequence": 0,
+        "stable_model_adapter_cache_object_identity": 20,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 5
+      },
+      "total": 25
+    },
+    {
+      "source_key": "slora_artifact",
+      "components": {
+        "temporal_request_sequence": 0,
+        "stable_model_adapter_cache_object_identity": 0,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 10
+      },
+      "total": 10
+    },
+    {
+      "source_key": "distserve_artifact",
+      "components": {
+        "temporal_request_sequence": 0,
+        "stable_model_adapter_cache_object_identity": 0,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 10
+      },
+      "total": 10
+    },
+    {
+      "source_key": "serverlessllm_artifact",
+      "components": {
+        "temporal_request_sequence": 0,
+        "stable_model_adapter_cache_object_identity": 0,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 10,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 10
+      },
+      "total": 20
+    },
+    {
+      "source_key": "trimcaching_paper",
+      "components": {
+        "temporal_request_sequence": 0,
+        "stable_model_adapter_cache_object_identity": 0,
+        "bytes_size": 0,
+        "reuse_cache_semantics": 0,
+        "load_inference_transfer_latency": 0,
+        "client_tenant_identity": 0,
+        "mobility_location_rsu": 0,
+        "license_provenance_reproducibility": 10
+      },
+      "total": 10
+    }
+  ]
+}

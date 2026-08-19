@@ -1,5 +1,7 @@
 # PPO_MEC
 
+G11 冻结 `model_cache_dataset_registry_version=1.0.0`：截至 `2026-08-19` 从官方页面/API 核验 19 个 public model-serving、KV/prefix、model-artifact 与 AI workload 候选，固定 A–I taxonomy、19 项 field coverage、100 分 qualification 和 hard gates。结论为 A 类 joint VEC trace=0、C 类真实 adapter/LoRA request trace=0；BurstGPT 是最佳 B 类 request trace，Qwen-Bailian/Mooncake 是 D 类 KV trace，三个 HF 项仅可作 E 类 size metadata。接入严格 metadata-only，不改变 `NGSIM + Alibaba` 主线或正式 benchmark。详见 `docs/project/model_cache_dataset_discovery_audit_20260819.md`。
+
 G10 冻结 `information_sufficiency_audit_contract_version=1.0.0`：`scripts/audit_cache_information_sufficiency.py` 基于源码真实 observation/action/actor contract 和严格匹配的 G07–G09 artifact，只读审计字段覆盖、recoverability、observation aliasing、固定 projection、entropy/NMI/CMI 与实体级 MARL 必要条件。当前真实 validation 只有 1 request/1 evaluation unit且无 decision-time observation trace，因此总 verdict 为 `UNVERIFIABLE`；MAPPO/SA-GHMAPPO 是 controller-level CTDE，不是 vehicle/RSU-level MARL。详见 `docs/project/cache_information_sufficiency_marl_audit_contract.md`。
 
 G09 冻结 `cache_opportunity_analyzer_contract_version=1.0.0`：`scripts/analyze_cache_opportunities.py` 在严格匹配的 G07 manifest、G08 external replay/exact action trace、initial cache/capacity 与五个 baseline raw CacheEvent outcome 上，独立输出 demand reuse、feasible oracle opportunity、baseline capture/loss、互斥 taxonomy、gap decomposition、concentration 与 information-requirement labels。latency saved 继续 unavailable；该分析不是 causal regret、MARL 必要性、formal/holdout/hidden 或算法优劣证据。详见 `docs/project/cache_opportunity_analyzer_contract.md`。

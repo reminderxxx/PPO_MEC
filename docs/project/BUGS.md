@@ -2,6 +2,14 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-19: G11 public model-cache registry frozen; joint-trace gap remains open
+
+- `RESOLVED / semantic classification`：HF模型文件、内容cache、KV/prefix trace、generic AI workload与真实model request trace已由固定taxonomy和hard gate分离；rejected来源不能进入live projection。
+- `OPEN / joint trace`：未发现公开来源同时观测vehicle/client、RSU/location、model/adapter/object、bytes、reuse/cache outcome、latency与mobility/handoff；任何NGSIM+外部request拼接只能称exogenous/synthetic alignment。
+- `OPEN / adapter trace`：未发现公开可验证的真实LoRA/adapter请求序列；S-LoRA、DistServe、ServerlessLLM等artifact不提供可消费production adapter trace。
+- `BLOCKER / license and provenance`：qwen/cbow/bert HF候选无明确license，BERT aggregate size另有provenance异常；Alibaba PAI data license未核验，均不得进入formal benchmark。
+- `BOUNDARY / G12`：G11只冻结metadata registry和mapping plan；未下载payload、实现raw importer、校准predictor或启用新正式数据源。
+
 ## 2026-08-19: G10 information audit frozen; entity-level MARL remains unverified
 
 - `RESOLVED / architecture naming`：源码级审计已冻结 PPO=single controller、MAPPO/SA-GHMAPPO=controller-level CTDE；多个controller head、参数共享或centralized critic不再视为vehicle/RSU-level actor证据。

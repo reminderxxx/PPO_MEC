@@ -1,35 +1,50 @@
 # Dataset Sources
 
-更新日期：2026-04-27
+更新日期：2026-08-19
 
-用途：统一记录当前项目使用、保留或接入为 metadata 的数据源。这里的“下载页”指可到达的官方或托管页；不会自动下载或覆盖原始数据。
+用途：统一记录项目使用、保留或 metadata-only 接入的数据源。数据源声明不会自动下载或覆盖原始数据。
 
-## 数据集声明
+## 正式与保留数据源
 
-| 数据源 | 当前角色 | 本地路径 | 下载页 |
-| --- | --- | --- | --- |
-| Next Generation Simulation (NGSIM) Vehicle Trajectories and Supporting Data | 正式 mobility trace 主线 | `data/raw/mobility/ngsim/` | https://catalog.data.gov/dataset/next-generation-simulation-ngsim-vehicle-trajectories-and-supporting-data |
-| Alibaba Cluster Trace Program - cluster-trace-v2018 | 正式 workflow DAG 主线，当前消费 `batch_task.csv` | `data/raw/workflow/alibaba2018/` | https://github.com/alibaba/clusterdata/tree/master/cluster-trace-v2018 |
-| Luxembourg SUMO Traffic (LuST) Scenario | 保留 mobility provider 和导出链路，不阻塞正式主线 | `data/raw/mobility/LuSTScenario/` | https://github.com/lcodeca/LuSTScenario |
-| The highD Dataset: A Drone Dataset of Naturalistic Vehicle Trajectories on German Highways | 保留 mobility provider 骨架，作为后补数据源 | `data/raw/mobility/highD/` | https://levelxdata.com/highd-dataset/ |
-| ClemSummer/qwen-model-cache | HF 真实 model-file cache 候选；metadata/file-size only | `data/raw/model_cache/huggingface_model_cache_sources.json` | https://huggingface.co/datasets/ClemSummer/qwen-model-cache |
-| ClemSummer/cbow-model-cache | HF 真实 embedding cache 候选；metadata/file-size only | `data/raw/model_cache/huggingface_model_cache_sources.json` | https://huggingface.co/datasets/ClemSummer/cbow-model-cache |
-| Efficient-Large-Model/imagenet-llamagen-cache | HF 大规模 cache-like WebDataset 体量参考；非 VEC model/adapter cache trace | `data/raw/model_cache/huggingface_model_cache_sources.json` | https://huggingface.co/datasets/Efficient-Large-Model/imagenet-llamagen-cache |
-| Kuperberg/bert-model-cache | HF 分块 model-file cache 候选；metadata/file-size only | `data/raw/model_cache/huggingface_model_cache_sources.json` | https://huggingface.co/datasets/Kuperberg/bert-model-cache |
-| amansapkota/examsathi-model-cache | HF 候选排除记录；审计时无可用模型/cache 文件 | `data/raw/model_cache/huggingface_model_cache_sources.json` | https://huggingface.co/datasets/amansapkota/examsathi-model-cache |
+| 数据源 | 当前角色 | 本地路径 | 官方页 |
+|---|---|---|---|
+| NGSIM Vehicle Trajectories | 正式 mobility trace 主线 | `data/raw/mobility/ngsim/` | https://catalog.data.gov/dataset/next-generation-simulation-ngsim-vehicle-trajectories-and-supporting-data |
+| Alibaba cluster-trace-v2018 | 正式 workflow DAG 主线 | `data/raw/workflow/alibaba2018/` | https://github.com/alibaba/clusterdata/tree/master/cluster-trace-v2018 |
+| LuST Scenario | 保留 mobility provider / support | `data/raw/mobility/LuSTScenario/` | https://github.com/lcodeca/LuSTScenario |
+| highD | 后补 mobility provider 骨架 | `data/raw/mobility/highD/` | https://levelxdata.com/highd-dataset/ |
 
-## 受控 Profile
+`NGSIM + Alibaba` 仍是唯一正式数据主线；G11 没有改变 benchmark 默认数据、split 或算法语义。
 
-这些不是外部真实数据集，不能在论文中写成新数据集。
+## G11 public model-cache dataset registry
+
+统一 registry：`configs/data/model_cache_dataset_registry.json`，版本 `1.0.0`。截至 `2026-08-19` 核验 19 个来源；完整证据、字段矩阵、分数与拒绝理由见 `docs/project/model_cache_dataset_discovery_audit_20260819.md`。
+
+已接入 `configs/data/dataset_sources.json` 的 metadata-only 来源：
+
+| 来源 | 分类 / recommendation | 可安全使用的真实字段 | 主要边界 |
+|---|---|---|---|
+| BurstGPT v2.0 | B / request trace candidate | time、session、model、tokens、elapsed time | 无 mobility/RSU/bytes/cache outcome |
+| Qwen-Bailian traces | D / KV reuse profile | time、chat/turn、token lengths、prefix hashes | KV不是adapter；无RSU/latency |
+| Mooncake FAST'25 traces | D / KV reuse profile | time、token lengths、prefix hashes | KV不是adapter；无model/client/mobility |
+| Azure LLM 2023/2024、LMM 2025 | F / arrival-token profile | time、input/output tokens、image count | 无稳定model identity |
+| AcmeTrace | F / coarse arrival-resource profile | job/user/type/times/resources | generic AI job，非serving request |
+| Alibaba PAI GPU trace | F / metadata reference | job/task/time/resource metadata | license和inference subset未解决 |
+| HF qwen/cbow/bert model-cache | E / model size profile | revision、file path/count/bytes | license未知；无request/cache event |
+
+五个 HF 历史候选仍完整保留在 `data/raw/model_cache/huggingface_model_cache_sources.json` 供审计追溯，但 `sample_model_catalog.json` 只投影 qwen/cbow/bert 三个 E 类 size metadata。ImageNet/LlamaGen 内容 cache 与空 Examsathi 候选已拒绝，不进入 live catalog。
+
+## 受控 profile
+
+这些不是外部真实数据集，不能在论文中写成新数据集：
 
 | Profile | 路径 | 边界 |
-| --- | --- | --- |
-| PPO_MEC sample_model_catalog AI-service adapter profile | `src/data/model_catalog/sample_model_catalog.json` | repo-local controlled catalog，定义 base model、adapter cache、state bundle 和 cache object 语义。 |
-| multi_adapter_hard_joint_proposal | `configs/benchmark/multi_adapter_hard_joint_proposal.yaml` | proposal-only controlled stress profile，叠加在真实 NGSIM mobility 和 Alibaba DAG structure 上。 |
+|---|---|---|
+| PPO_MEC sample model catalog | `src/data/model_catalog/sample_model_catalog.json` | repo-local base model、adapter/cache/state schema；其中外部 dataset rows 仅为 metadata |
+| multi-adapter hard-joint proposal | `configs/benchmark/multi_adapter_hard_joint_proposal.yaml` | 叠加在 NGSIM + Alibaba 上的 controlled stress profile |
 
-## 当前边界
+## Claim boundary
 
-- `NGSIM + Alibaba` 仍是正式数据主线。
-- HF model-cache 候选全集已写入统一数据源声明、`AdapterCatalog.model_cache_datasets` 和 `data/raw/model_cache/huggingface_model_cache_sources.json`。
-- 当前 HF 接入是 audit/metadata/file-size 层，不自动下载模型文件，也不直接驱动 benchmark cache event。
-- 审计结论：现有 HF 候选不提供真实 VEC cache hit/miss、RSU locality、handoff demand 或 adapter state migration trace；正式 benchmark 若使用 HF，只能先作为单独的 file-size/profile projection，并在报告里明确边界。
+- 未发现公开 A 类 joint VEC AI cache trace，也未发现 C 类真实 adapter/LoRA request trace。
+- 独立的 request/KV/size 来源可在后续单独批准的 G12 中与 NGSIM 做明确标注的 exogenous/synthetic alignment，但不能称 jointly observed trace。
+- G11 未下载原始 payload，未实现 importer，未启用任何新源进入 formal benchmark。
+- HF 模型文件不能称 request trace；KV/prefix cache 不能等同 adapter cache。

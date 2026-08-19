@@ -1,5 +1,14 @@
 # Code Module Map
 
+## G11 public model-cache dataset registry
+
+- `src/data/model_catalog/model_cache_dataset_registry.py`：纯 metadata validator/artifact projector；冻结 A–I taxonomy、19项 field availability、100分score、hard gates、compatibility检查、canonical JSON与SHA-256，不发起网络请求或下载。
+- `configs/data/model_cache_dataset_registry.json`：19个候选的唯一 qualification 事实源；包含identity/access/fields/evidence/fitness/score/recommendation/mapping与online verification metadata。
+- `scripts/validate_model_cache_dataset_registry.py`：加载 registry、`dataset_sources`、HF兼容manifest与legacy sample catalog，fail-fast后生成 deterministic G11 artifact。
+- `scripts/check_data_ready.py`、`scripts/validate_dataset_source_declarations.py`：只检查 metadata readiness 和引用一致性；不把外部候选变成 runtime dataset。
+- `src/data/model_catalog/adapter_catalog.py`：继续只承载环境所需 catalog schema；不负责外部来源qualification、license决策或下载。
+- `tests/test_model_cache_dataset_registry.py`：覆盖taxonomy/score/hard-gate/compatibility/NaN/URL/date/determinism/legacy catalog/raw-download boundary。
+
 ## G10 information sufficiency and MARL necessity audit
 
 - `src/analysis/information_sufficiency_audit.py`：纯只读 G10 reducer；冻结源码architecture facts、15项field map、trace leakage/alignment、recoverability、aliasing/projection、plug-in entropy/NMI/CMI和entity-level必要条件门禁。

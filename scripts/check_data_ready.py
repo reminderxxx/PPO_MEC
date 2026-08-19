@@ -11,6 +11,8 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+from src.data.model_catalog.model_cache_dataset_registry import validate_registry_payload
+
 
 def _check_lust() -> dict[str, Any]:
     scenario_root = ROOT_DIR / "data" / "raw" / "mobility" / "LuSTScenario" / "LuSTScenario-master" / "scenario"
@@ -117,8 +119,11 @@ def _check_huggingface_model_cache_sources() -> dict[str, Any]:
             if item.get("dataset_id")
         ]
         for item in sources:
-            if not item.get("dataset_name") or not item.get("download_page_url"):
-                missing_items.append("model-cache source dataset_name/download_page_url")
+            if not item.get("dataset_id") or not item.get("download_page_url"):
+                missing_items.append("model-cache source dataset_id/download_page_url")
+                break
+            if item.get("raw_download_performed") is not False:
+                missing_items.append("model-cache source violates metadata-only boundary")
                 break
 
     if not dataset_sources_manifest.exists():
@@ -135,6 +140,39 @@ def _check_huggingface_model_cache_sources() -> dict[str, Any]:
     }
 
 
+def _check_model_cache_dataset_registry() -> dict[str, Any]:
+    registry_path = ROOT_DIR / "configs" / "data" / "model_cache_dataset_registry.json"
+    missing_items: list[str] = []
+    validation: dict[str, Any] = {}
+    source_count = 0
+    qualified_count = 0
+    if not registry_path.exists():
+        missing_items.append("G11 model-cache dataset registry")
+    else:
+        payload = json.loads(registry_path.read_text(encoding="utf-8-sig"))
+        validation = validate_registry_payload(payload)
+        source_count = validation.get("source_count", 0)
+        qualified_count = sum(
+            1
+            for item in payload.get("sources", [])
+            if item.get("integration", {}).get("recommendation") != "rejected"
+        )
+        if not validation.get("valid"):
+            missing_items.append("G11 registry validation failed")
+        if any(item.get("access", {}).get("raw_download_performed") is not False for item in payload.get("sources", [])):
+            missing_items.append("G11 raw-download boundary violated")
+    return {
+        "dataset_name": "G11 public model-cache dataset registry metadata",
+        "ready": len(missing_items) == 0,
+        "registry": str(registry_path),
+        "source_count": source_count,
+        "qualified_or_reference_count": qualified_count,
+        "raw_download_performed": False,
+        "validation": validation,
+        "missing_items": missing_items,
+    }
+
+
 def main() -> None:
     results = [
         _check_lust(),
@@ -142,6 +180,7 @@ def main() -> None:
         _check_highd(),
         _check_alibaba_batch_task(),
         _check_huggingface_model_cache_sources(),
+        _check_model_cache_dataset_registry(),
     ]
     ready_count = sum(1 for item in results if item["ready"])
     print("数据就绪检查完成")

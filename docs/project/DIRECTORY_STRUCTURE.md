@@ -2,6 +2,8 @@
 
 `scripts/audit_cache_event_telemetry.py` 是单 episode CacheEvent 对账入口；输出应写入 `artifacts/audits/<audit_id>/`，不得覆盖历史 run summary。
 
+G11：`configs/data/model_cache_dataset_registry.json` 是 public model-cache dataset qualification 事实源；`src/data/model_catalog/model_cache_dataset_registry.py` 负责纯验证和 deterministic artifact projection；`scripts/validate_model_cache_dataset_registry.py` 是稳定入口；产物固定写入 `artifacts/analysis/model_cache_dataset_discovery_20260819_g11_v1/`。该目录只含 metadata/audit JSON，不存 raw trace 或模型文件。
+
 G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cache_request_replay.py`、`scripts/run_future_horizon_cache_oracle.py`、`scripts/audit_cache_oracle_gap.py` 为稳定入口；validation bundle写入 `artifacts/analysis/future_horizon_cache_oracle_validation_<run_id>/`，不得覆盖历史artifact。
 
 ## 根目录
@@ -9,7 +11,7 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 - `README.md`：项目定位、当前阶段、主线命令和实验入口总览
 - `AGENTS.md`：AI 协作和维护规则
 - `configs/`：正式实验、baseline 协议和消融相关 manifest
-- `configs/data/`：统一数据源声明 manifest 和 HF model-cache 接入方案
+- `configs/data/`：统一数据源声明、G11 model-cache dataset registry 和 HF compatibility integration plan
 - `configs/algo/`：方向匹配对照算法配置
 - `configs/experiment/baseline/`：baseline 训练、评估和 benchmark 闭环配置
 - `configs/experiment/top_journal_mechanism_v1.yaml`：顶刊路线机制训练 profile 与 benchmark 计划
@@ -36,6 +38,7 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 - `scripts/train_supervised_handoff_predictor.py`：从冻结 train/dev window plan 训练短时 supervised handoff predictor，并输出 checkpoint、metrics manifest 和 quality rows
 - `scripts/analyze_strict_full_failure_modes.py`：在非 hidden split 上分解 strict-full reward、continuity、failure 和 action-mix 失败模式
 - `scripts/audit_literature_reference_table.py`：检查文献表标题/DOI/URL 重复、链接结构和显式待核验项
+- `scripts/validate_model_cache_dataset_registry.py`：校验 G11 taxonomy、字段、评分、hard gates与兼容投影，并确定性生成机器审计包
 - `src/`：核心实现
 - `tests/`：自动化测试
 - `artifacts/`：当前保留的训练 checkpoint、benchmark 报告和论文表格产物
@@ -54,7 +57,7 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 ## 代码目录
 
 - `src/agents/`：agent 基类、注册表和按算法分文件的主方法 / 对比方法接入；不再保留 `baselines/` 或 `marl/` 分类目录
-- `src/data/`：mobility、workflow 和 model catalog 数据层
+- `src/data/`：mobility、workflow 和 model catalog 数据层；model-cache dataset qualification 与 `AdapterCatalog` runtime schema 保持职责分离
 - `src/encoders/`：DAG、RSU 状态和融合编码器
 - `src/envs/`：核心环境、预测层和 Gym/vector wrapper
 - `src/envs/specs/action_schema.py`：语义动作 schema、mask 和 action adapter
@@ -92,7 +95,8 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 - `artifacts/experiments/top_journal_sa_iteration/top_journal_mechanism_v4_prepare_eval_bias*`：v4 prepare override 负向筛选产物，不作为主结果。
 - `artifacts/experiments/top_journal_final_submission/`：最终交稿闭环产物；`final_submission_v7_latency_fallback_20260528_v1` 是 legacy paper-ready package，`final_submission_v7_latency_fallback_20260618_rebuild_v1` 为 E3 historical rebuild。旧 offset=3 与 formal 重叠；最新 readiness 以 `top_journal_readiness_audit_20260621.md` 为准。
 - `artifacts/benchmarks/`：当前可引用的主结果、预测鲁棒性、消融、robustness 和可扩展性 benchmark
-- `artifacts/analysis/hf_model_cache_dataset_audit_round14/`：HF model-cache 候选适配性审计产物
+- `artifacts/analysis/model_cache_dataset_discovery_20260819_g11_v1/`：G11 19候选 registry snapshot、字段矩阵、评分、HF复核、mapping、validation与integrity manifest
+- `artifacts/analysis/hf_model_cache_dataset_audit_round14/`：历史 HF model-cache 候选适配性审计路径；当前结论以 G11 artifact 为准
 - `artifacts/paper/`：历史 paper export；legacy v7 表格只能在明确标注 overlap limitation 时使用，strict reviewer 结论以最新审计为准
 
 新产物应写入明确的 run 目录，不应散落到仓库根目录。

@@ -1,7 +1,8 @@
 {
-  "schema_version": "dataset_sources_v1",
-  "updated_at": "2026-04-27",
-  "purpose": "Dataset/source declaration for PPO_MEC reports and data readiness checks.",
+  "schema_version": "dataset_sources_v2",
+  "updated_at": "2026-08-19",
+  "purpose": "Dataset/source declarations for PPO_MEC reports and readiness checks; registry-linked G11 entries are metadata-only and never trigger raw downloads.",
+  "model_cache_dataset_registry": "configs/data/model_cache_dataset_registry.json",
   "datasets": [
     {
       "dataset_key": "ngsim_vehicle_trajectories",
@@ -21,7 +22,7 @@
       "local_path": "data/raw/workflow/alibaba2018/batch_task.csv",
       "download_page_url": "https://github.com/alibaba/clusterdata/tree/master/cluster-trace-v2018",
       "current_status": "active_mainline",
-      "notes": "Formal workflow DAG source; the project currently consumes batch_task.csv."
+      "notes": "Formal workflow DAG source; the project consumes batch_task.csv."
     },
     {
       "dataset_key": "lust_scenario",
@@ -35,7 +36,7 @@
     },
     {
       "dataset_key": "highd_vehicle_trajectories",
-      "dataset_name": "The highD Dataset: A Drone Dataset of Naturalistic Vehicle Trajectories on German Highways",
+      "dataset_name": "The highD Dataset",
       "provider": "RWTH Aachen University / fka",
       "source_role": "retained_mobility_provider_skeleton",
       "local_path": "data/raw/mobility/highD",
@@ -47,51 +48,122 @@
       "dataset_key": "hf_qwen_model_cache",
       "dataset_name": "ClemSummer/qwen-model-cache",
       "provider": "Hugging Face Datasets",
-      "source_role": "external_real_model_cache_reference",
+      "source_role": "model_artifact_size_metadata",
       "local_path": "data/raw/model_cache/huggingface_model_cache_sources.json",
       "download_page_url": "https://huggingface.co/datasets/ClemSummer/qwen-model-cache",
-      "current_status": "audited_file_metadata_declared_only",
-      "notes": "Audited as Qwen model/tokenizer files. Safe for future cache-object size profiling only; no automatic download and no default benchmark behavior change."
+      "current_status": "metadata_only_size_candidate",
+      "model_cache_registry_source_key": "hf_qwen_model_cache",
+      "notes": "Live legacy catalog projection; no request or cache-event semantics and no automatic download."
     },
     {
       "dataset_key": "hf_cbow_model_cache",
       "dataset_name": "ClemSummer/cbow-model-cache",
       "provider": "Hugging Face Datasets",
-      "source_role": "external_real_model_cache_reference",
+      "source_role": "model_artifact_size_metadata",
       "local_path": "data/raw/model_cache/huggingface_model_cache_sources.json",
       "download_page_url": "https://huggingface.co/datasets/ClemSummer/cbow-model-cache",
-      "current_status": "audited_file_metadata_declared_only",
-      "notes": "Audited as CBOW embedding cache files. Safe for future cache-object size profiling only; not a VEC cache request trace."
-    },
-    {
-      "dataset_key": "hf_imagenet_llamagen_cache",
-      "dataset_name": "Efficient-Large-Model/imagenet-llamagen-cache",
-      "provider": "Hugging Face Datasets",
-      "source_role": "external_real_cache_like_volume_reference",
-      "local_path": "data/raw/model_cache/huggingface_model_cache_sources.json",
-      "download_page_url": "https://huggingface.co/datasets/Efficient-Large-Model/imagenet-llamagen-cache",
-      "current_status": "audited_large_webdataset_not_vec_cache_trace",
-      "notes": "Audited as a large WebDataset cache-like source with Dataset Viewer rows. It is not a model/adapter cache event trace."
+      "current_status": "metadata_only_size_candidate",
+      "model_cache_registry_source_key": "hf_cbow_model_cache",
+      "notes": "Live legacy catalog projection; no request or cache-event semantics and no automatic download."
     },
     {
       "dataset_key": "hf_bert_model_cache",
       "dataset_name": "Kuperberg/bert-model-cache",
       "provider": "Hugging Face Datasets",
-      "source_role": "external_real_chunked_model_cache_reference",
+      "source_role": "model_artifact_size_metadata",
       "local_path": "data/raw/model_cache/huggingface_model_cache_sources.json",
       "download_page_url": "https://huggingface.co/datasets/Kuperberg/bert-model-cache",
-      "current_status": "audited_file_metadata_declared_only",
-      "notes": "Audited as chunked BERT model files. Candidate for chunk-level cache-object size profiling after explicit importer/projection."
+      "current_status": "metadata_only_size_candidate_provenance_blocked",
+      "model_cache_registry_source_key": "hf_bert_model_cache",
+      "notes": "Live legacy catalog projection for metadata compatibility only; license and anomalous size provenance block formal use."
     },
     {
-      "dataset_key": "hf_examsathi_model_cache",
-      "dataset_name": "amansapkota/examsathi-model-cache",
-      "provider": "Hugging Face Datasets",
-      "source_role": "external_model_cache_candidate_rejected",
-      "local_path": "data/raw/model_cache/huggingface_model_cache_sources.json",
-      "download_page_url": "https://huggingface.co/datasets/amansapkota/examsathi-model-cache",
-      "current_status": "audited_not_benchmark_ready",
-      "notes": "Audited repo exposes no usable cache/model files beyond .gitattributes at audit time; retained only for traceability."
+      "dataset_key": "burstgpt_v2",
+      "dataset_name": "BurstGPT v2.0",
+      "provider": "HPMLL",
+      "source_role": "public_model_serving_request_trace_candidate",
+      "local_path": "configs/data/model_cache_dataset_registry.json",
+      "download_page_url": "https://github.com/HPMLL/BurstGPT",
+      "current_status": "qualified_metadata_only_not_downloaded",
+      "model_cache_registry_source_key": "burstgpt_v2",
+      "notes": "Best G11 request-trace candidate; no mobility, RSU, byte-transfer, or cache-event fields."
+    },
+    {
+      "dataset_key": "mooncake_fast25_traces",
+      "dataset_name": "Mooncake FAST'25 Trace Release",
+      "provider": "Mooncake / kvcache-ai",
+      "source_role": "public_kv_prefix_reuse_trace_candidate",
+      "local_path": "configs/data/model_cache_dataset_registry.json",
+      "download_page_url": "https://github.com/kvcache-ai/Mooncake/blob/main/FAST25-release/README.md",
+      "current_status": "qualified_metadata_only_not_downloaded",
+      "model_cache_registry_source_key": "mooncake_fast25_traces",
+      "notes": "KV/prefix trace semantics only; not an adapter cache or joint VEC trace."
+    },
+    {
+      "dataset_key": "qwen_bailian_kv_traces",
+      "dataset_name": "Qwen-Bailian Anonymous KVCache Traces",
+      "provider": "Alibaba Cloud / Alibaba Education",
+      "source_role": "public_kv_prefix_reuse_trace_candidate",
+      "local_path": "configs/data/model_cache_dataset_registry.json",
+      "download_page_url": "https://github.com/alibaba-edu/qwen-bailian-usagetraces-anon",
+      "current_status": "qualified_metadata_only_not_downloaded",
+      "model_cache_registry_source_key": "qwen_bailian_kv_traces",
+      "notes": "Production-derived token-prefix trace; no vehicle, RSU, latency, or exact serving model version."
+    },
+    {
+      "dataset_key": "azure_llm_inference_2023",
+      "dataset_name": "Azure LLM Inference Trace 2023",
+      "provider": "Microsoft Azure",
+      "source_role": "arrival_token_profile_candidate",
+      "local_path": "configs/data/model_cache_dataset_registry.json",
+      "download_page_url": "https://github.com/Azure/AzurePublicDataset/blob/master/AzureLLMInferenceDataset2023.md",
+      "current_status": "qualified_metadata_only_not_downloaded",
+      "model_cache_registry_source_key": "azure_llm_inference_2023",
+      "notes": "Timestamp and token counts only; stable model identity is absent."
+    },
+    {
+      "dataset_key": "azure_llm_inference_2024",
+      "dataset_name": "Azure LLM Inference Trace 2024",
+      "provider": "Microsoft Azure",
+      "source_role": "arrival_token_profile_candidate",
+      "local_path": "configs/data/model_cache_dataset_registry.json",
+      "download_page_url": "https://github.com/Azure/AzurePublicDataset/blob/master/AzureLLMInferenceDataset2024.md",
+      "current_status": "qualified_metadata_only_not_downloaded",
+      "model_cache_registry_source_key": "azure_llm_inference_2024",
+      "notes": "Timestamp and token counts only; stable model identity is absent."
+    },
+    {
+      "dataset_key": "azure_lmm_inference_2025",
+      "dataset_name": "Azure LMM Inference Trace 2025",
+      "provider": "Microsoft Azure",
+      "source_role": "arrival_token_profile_candidate",
+      "local_path": "configs/data/model_cache_dataset_registry.json",
+      "download_page_url": "https://github.com/Azure/AzurePublicDataset/blob/master/AzureLMMInferenceDataset2025.md",
+      "current_status": "qualified_metadata_only_not_downloaded",
+      "model_cache_registry_source_key": "azure_lmm_inference_2025",
+      "notes": "Adds image count but still lacks stable model identity, mobility, and cache semantics."
+    },
+    {
+      "dataset_key": "acme_trace",
+      "dataset_name": "AcmeTrace",
+      "provider": "InternLM / Shanghai AI Laboratory",
+      "source_role": "generic_ai_job_trace_candidate",
+      "local_path": "configs/data/model_cache_dataset_registry.json",
+      "download_page_url": "https://github.com/InternLM/AcmeTrace",
+      "current_status": "qualified_metadata_only_not_downloaded",
+      "model_cache_registry_source_key": "acme_trace",
+      "notes": "Generic AI job/resource trace, not a serving-model or adapter cache trace."
+    },
+    {
+      "dataset_key": "alibaba_pai_gpu_trace_2020",
+      "dataset_name": "Alibaba PAI GPU Cluster Trace 2020",
+      "provider": "Alibaba Group",
+      "source_role": "generic_ai_job_trace_metadata_reference",
+      "local_path": "configs/data/model_cache_dataset_registry.json",
+      "download_page_url": "https://github.com/alibaba/clusterdata/tree/master/cluster-trace-gpu-v2020",
+      "current_status": "metadata_only_license_unresolved",
+      "model_cache_registry_source_key": "alibaba_pai_gpu_trace_2020",
+      "notes": "Rich job/task/resource trace, but stable model identity and a verified data license are absent."
     }
   ],
   "controlled_profiles": [
@@ -109,7 +181,7 @@
       "local_path": "configs/benchmark/multi_adapter_hard_joint_proposal.yaml",
       "status": "proposal_only_controlled_stress_profile",
       "not_a_real_dataset": true,
-      "notes": "Controlled AI-service/cache-capacity stress profile over real NGSIM mobility and Alibaba DAG structure; not a new real dataset."
+      "notes": "Controlled stress profile over real NGSIM mobility and Alibaba DAG structure; not a new real dataset."
     }
   ]
 }

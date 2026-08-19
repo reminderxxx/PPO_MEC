@@ -1,0 +1,24 @@
+{
+  "validation_contract_version": "1.0.0",
+  "validated_at": "2026-08-19T18:00:00+08:00",
+  "registry": {
+    "registry_version": "1.0.0",
+    "source_count": 19,
+    "error_count": 0,
+    "warning_count": 0,
+    "valid": true,
+    "errors": [],
+    "warnings": []
+  },
+  "compatibility": {
+    "valid": true,
+    "error_count": 0,
+    "errors": [],
+    "dataset_source_reference_count": 11,
+    "hf_manifest_source_count": 5,
+    "catalog_projection_count": 3
+  },
+  "valid": true,
+  "raw_download_performed": false,
+  "registry_fingerprint": "35baf216cd007341f76e433a270d0dffe4d372facfa4a49cdc5054aaa2dccbed"
+}

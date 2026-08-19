@@ -40,7 +40,7 @@ class ModelCatalogSourcesTestCase(unittest.TestCase):
             catalog.get_model_cache_dataset_ids(),
         )
 
-    def test_all_hf_model_cache_sources_are_declared_in_catalog(self) -> None:
+    def test_only_qualified_hf_size_sources_are_declared_in_catalog(self) -> None:
         manifest = json.loads(
             (
                 ROOT_DIR
@@ -53,15 +53,19 @@ class ModelCatalogSourcesTestCase(unittest.TestCase):
         catalog = AdapterCatalog.from_json(
             ROOT_DIR / "src" / "data" / "model_catalog" / "sample_model_catalog.json"
         )
-        manifest_ids = {
+        live_manifest_ids = {
             str(item["dataset_id"])
             for item in manifest.get("sources", [])
-            if item.get("dataset_id")
+            if item.get("live_catalog_projection")
         }
-        self.assertLessEqual(
-            manifest_ids,
-            set(catalog.get_model_cache_dataset_ids()),
-        )
+        rejected_ids = {
+            str(item["dataset_id"])
+            for item in manifest.get("sources", [])
+            if item.get("recommendation") == "rejected"
+        }
+        catalog_ids = set(catalog.get_model_cache_dataset_ids())
+        self.assertEqual(live_manifest_ids, catalog_ids)
+        self.assertFalse(rejected_ids & catalog_ids)
 
     def test_dataset_sources_have_names_and_download_pages(self) -> None:
         payload = json.loads(

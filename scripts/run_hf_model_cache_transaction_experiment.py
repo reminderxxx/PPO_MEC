@@ -61,7 +61,7 @@ HF_TO_ADAPTER_PROJECTION = [
         "projection_role": "middle_tracking_adapter",
     },
     {
-        "dataset_id": "Efficient-Large-Model/imagenet-llamagen-cache",
+        "dataset_id": "ClemSummer/cbow-model-cache",
         "adapter_id": "adapter_fusion",
         "projection_role": "multi_parent_fusion_adapter",
     },
@@ -229,29 +229,31 @@ def build_hf_adapter_catalog(
         source = source_map.get(dataset_id)
         if source is None:
             raise KeyError(f"HF dataset missing from manifest: {dataset_id}")
-        size_mb = float_value(source.get("file_summary", {}).get("total_size_mb"), 0.0)
+        if source.get("recommendation") != "model_size_profile_candidate" or not source.get("live_catalog_projection"):
+            raise ValueError(f"HF dataset is not qualified for size projection: {dataset_id}")
+        size_mb = float_value(source.get("total_size_bytes"), 0.0) / (1024.0 * 1024.0)
         if size_mb <= 0:
-            raise ValueError(f"HF dataset has no usable total_size_mb: {dataset_id}")
+            raise ValueError(f"HF dataset has no usable total_size_bytes: {dataset_id}")
         adapter_id = projection["adapter_id"]
-        representative_files = source.get("file_summary", {}).get("representative_files", [])
+        representative_files = source.get("usable_evidence", [])
         cache_objects.append(
             {
                 "object_id": f"hf_{adapter_id}",
                 "adapter_id": adapter_id,
                 "size_mb": round(size_mb, 6),
-                "source": f"hf_dataset:{dataset_id}:file_summary.total_size_mb",
+                "source": f"hf_dataset:{dataset_id}:total_size_bytes:synthetic_adapter_projection",
             }
         )
         projection_rows.append(
             {
                 "adapter_id": adapter_id,
                 "dataset_id": dataset_id,
-                "dataset_name": source.get("dataset_name", ""),
+                "dataset_name": source.get("dataset_id", ""),
                 "projected_size_mb": round(size_mb, 6),
                 "projection_role": projection["projection_role"],
                 "representative_files": ";".join(str(item) for item in representative_files),
-                "safe_scope": source.get("fit_assessment", {}).get("safe_integration_scope", ""),
-                "claim_boundary": "file_size_profile_only_not_vec_cache_trace",
+                "safe_scope": "metadata_only_model_size_profile",
+                "claim_boundary": "synthetic_adapter_projection_from_real_file_size_metadata_not_a_real_request_or_cache_trace",
             }
         )
 
@@ -276,7 +278,7 @@ def build_hf_adapter_catalog(
         "model_cache_datasets": list(base_payload.get("model_cache_datasets", [])),
     }
     diagnosis = {
-        "profile_name": "hf_file_size_transaction_profile_v1",
+        "profile_name": "hf_file_size_transaction_profile_v2",
         "source_boundary": manifest.get("source_boundary", "audited_metadata_and_file_size_no_automatic_download"),
         "hf_manifest_path": str(hf_manifest_path),
         "adapter_projection_count": len(projection_rows),

@@ -1,0 +1,166 @@
+{
+  "normalized_target_fields": [
+    "request_time_order",
+    "requester_tenant",
+    "model_base_model_id",
+    "adapter_id",
+    "object_id",
+    "object_size_mb",
+    "input_output_tokens",
+    "load_inference_latency",
+    "reuse_prefix_key",
+    "source_provenance"
+  ],
+  "mappings": [
+    {
+      "mapping_id": "map_hf_artifact_size",
+      "source_fields": [
+        "Hub sibling rfilename",
+        "Hub sibling size",
+        "LFS sha256"
+      ],
+      "normalized_fields": [
+        "object_id",
+        "object_size_mb",
+        "source_provenance"
+      ],
+      "ppo_mec_target": "future explicit CacheObject size-profile artifact",
+      "transformation": "preserve path; bytes/1048576; require explicit adapter mapping",
+      "information_loss": "no request order, popularity, locality, latency, hit/miss, or mobility",
+      "validation_requirement": "license resolution, checksum pin, no rejected content source, no automatic adapter inference"
+    },
+    {
+      "mapping_id": "map_burstgpt_requests",
+      "source_fields": [
+        "Timestamp",
+        "Session ID",
+        "Model",
+        "Request tokens",
+        "Response tokens",
+        "Elapsed time",
+        "Log Type"
+      ],
+      "normalized_fields": [
+        "request_time_order",
+        "requester_tenant",
+        "model_base_model_id",
+        "input_output_tokens",
+        "load_inference_latency",
+        "source_provenance"
+      ],
+      "ppo_mec_target": "future external model-request replay artifact",
+      "transformation": "relative timestamp ordering; row index as request ID; Session ID retained as session, not user",
+      "information_loss": "no model bytes, adapter ID, RSU, mobility, cache outcome, or latency decomposition",
+      "validation_requirement": "small v2.0 sample, monotonic time check, enum/model coverage, session-null handling"
+    },
+    {
+      "mapping_id": "map_mooncake_prefix",
+      "source_fields": [
+        "timestamp",
+        "input_length",
+        "output_length",
+        "hash_ids"
+      ],
+      "normalized_fields": [
+        "request_time_order",
+        "object_id",
+        "input_output_tokens",
+        "reuse_prefix_key",
+        "source_provenance"
+      ],
+      "ppo_mec_target": "future KV-only replay artifact kept separate from adapter cache",
+      "transformation": "hash IDs remain opaque prefix-block keys; separate real and synthetic files",
+      "information_loss": "no model/client/bytes/latency/eviction/mobility; KV object is not adapter",
+      "validation_requirement": "prefix-overlap recomputation and file-role guard"
+    },
+    {
+      "mapping_id": "map_qwen_bailian_prefix",
+      "source_fields": [
+        "chat_id",
+        "parent_chat_id",
+        "timestamp",
+        "input_length",
+        "output_length",
+        "type",
+        "turn",
+        "hash_ids"
+      ],
+      "normalized_fields": [
+        "request_time_order",
+        "requester_tenant",
+        "object_id",
+        "input_output_tokens",
+        "reuse_prefix_key",
+        "source_provenance"
+      ],
+      "ppo_mec_target": "future session-aware KV-only replay artifact",
+      "transformation": "chat ID as session; hash IDs as opaque 16-token block keys",
+      "information_loss": "no user identity, exact model version, bytes, latency, eviction, RSU, or mobility",
+      "validation_requirement": "LFS sample authorization, parent/turn consistency, prefix overlap, privacy boundary"
+    },
+    {
+      "mapping_id": "map_azure_arrival_tokens",
+      "source_fields": [
+        "TIMESTAMP",
+        "ContextTokens",
+        "GeneratedTokens",
+        "NumImages when available"
+      ],
+      "normalized_fields": [
+        "request_time_order",
+        "input_output_tokens",
+        "source_provenance"
+      ],
+      "ppo_mec_target": "future arrival/token calibration artifact",
+      "transformation": "row index request ID; preserve service file separation",
+      "information_loss": "no stable model/client/cache identity, bytes, reuse, latency, or mobility",
+      "validation_requirement": "do not invent model IDs; timestamp and token-range checks"
+    },
+    {
+      "mapping_id": "map_acme_jobs",
+      "source_fields": [
+        "job_id",
+        "user",
+        "type",
+        "submit_time",
+        "start_time",
+        "end_time",
+        "duration",
+        "queue",
+        "gpu_num"
+      ],
+      "normalized_fields": [
+        "request_time_order",
+        "requester_tenant",
+        "load_inference_latency",
+        "source_provenance"
+      ],
+      "ppo_mec_target": "optional coarse AI job arrival/resource profile",
+      "transformation": "job-level only; type retained as workload_type, never model_id",
+      "information_loss": "not inference-request granularity; no tokens, cache object, or mobility",
+      "validation_requirement": "job-time reconciliation and workload-type boundary"
+    },
+    {
+      "mapping_id": "map_alibaba_pai_jobs",
+      "source_fields": [
+        "job_name",
+        "user",
+        "start_time",
+        "end_time",
+        "group",
+        "workload",
+        "gpu_type",
+        "plan_mem"
+      ],
+      "normalized_fields": [
+        "request_time_order",
+        "requester_tenant",
+        "source_provenance"
+      ],
+      "ppo_mec_target": "metadata reference only",
+      "transformation": "none until license and inference subset are resolved",
+      "information_loss": "hybrid training/inference jobs; no model ID or online request stream",
+      "validation_requirement": "license resolution and inference-subset audit"
+    }
+  ]
+}

@@ -802,3 +802,13 @@
 - LFU admission frequency 为 0，tie-break 为 `(frequency,last_used_step,object_id)`；Aging-LFU 使用每 RSU callback clock、更新前每 8 events 乘 0.5 后向下取整。
 - Random 私有 RNG 的 seed 等于 benchmark run seed；identity-policy 与 Random seed mismatch 均 fail-fast。
 - 这些 baseline 不代表 neighbor cooperative placement，也不进入历史 final-submission 默认 loop。
+
+## 2026-08-19: G11 public model-cache qualification 与 runtime catalog 分离
+
+决策：冻结 `model_cache_dataset_registry_version=1.0.0`、A–I 单一primary taxonomy、固定100分权重和hard gates。外部来源qualification、license/provenance、字段证据与recommendation由registry负责；`AdapterCatalog`只保留经过明确允许的metadata compatibility projection。
+
+原因：名称含`cache`不能证明request/cache-event语义；KV cache、adapter cache、模型文件与内容cache是不同对象。现有公开来源也不提供vehicle/RSU/model/cache/latency/handoff联合观测，跨源拼接不能补成真实joint trace。
+
+影响：19个候选进入统一registry；HF qwen/cbow/bert只保留E类size metadata，ImageNet/LlamaGen与Examsathi退出live projection。BurstGPT、Qwen-Bailian、Mooncake、Azure与Acme只作为未来独立G12候选，不自动下载或启用正式benchmark。
+
+边界：G11不实现raw importer、predictor calibration或synthetic replay，不改变`NGSIM + Alibaba`主线。未知license不得formal-ready；任何未来cross-source alignment必须标记exogenous/synthetic并记录信息损失。

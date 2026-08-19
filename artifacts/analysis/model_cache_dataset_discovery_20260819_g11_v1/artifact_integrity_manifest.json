@@ -1,0 +1,58 @@
+{
+  "artifact_name": "model_cache_dataset_discovery_20260819_g11_v1",
+  "generated_at": "2026-08-19T18:00:00+08:00",
+  "registry_version": "1.0.0",
+  "raw_download_performed": false,
+  "files": [
+    {
+      "path": "candidate_registry_snapshot.json",
+      "sha256": "3214cc49f49e17ce0b0c98fa9bdba53529085b520a5227fabf9e6a884251ddec",
+      "size_bytes": 94033
+    },
+    {
+      "path": "existing_hf_reaudit.json",
+      "sha256": "854105443274c495ea8f930eb66455f7ba1d80d3a4e86cd2ee87202f44f8414c",
+      "size_bytes": 3052
+    },
+    {
+      "path": "field_coverage_matrix.json",
+      "sha256": "b4710b51a6d0835314c57e7ab40986bebfd0a8da5d420ee1d956807d82bae318",
+      "size_bytes": 13894
+    },
+    {
+      "path": "integration_mapping_plan.json",
+      "sha256": "f80bdb6ca6c00bfadc238f9750c90fb1c0b99949ec032a6c1c3afb639801b2cb",
+      "size_bytes": 5575
+    },
+    {
+      "path": "qualification_scores.json",
+      "sha256": "aee485fbcc9bb84c4d7fe03f209ac8d305ad41792661ab962c90258a6a235590",
+      "size_bytes": 9030
+    },
+    {
+      "path": "recommended_sources.json",
+      "sha256": "74f2ab2fad02fe4b56a0b35ca6320f2a6d2d51311e3184f12818bd274fc00a3c",
+      "size_bytes": 57560
+    },
+    {
+      "path": "rejected_sources.json",
+      "sha256": "e41a0eeb0f84995b5eba4cce52ccee48ed75411886a4903836190d78b0cab9f4",
+      "size_bytes": 25448
+    },
+    {
+      "path": "search_query_log.json",
+      "sha256": "a714e8a67487ea8f60bcbc12e4fddda83339a2e09323fbf2b3cc5be588804498",
+      "size_bytes": 2928
+    },
+    {
+      "path": "source_verification_rows.json",
+      "sha256": "94a1a122ebd78213e6aa9be166cfb6362a7234ad53566dceda684157fc9260bb",
+      "size_bytes": 9489
+    },
+    {
+      "path": "validation_report.json",
+      "sha256": "dd5abf530e77a564bf2f9c30b980929d115e60f565965b0fe262555328dd3ab8",
+      "size_bytes": 614
+    }
+  ]
+}

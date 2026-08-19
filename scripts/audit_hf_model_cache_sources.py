@@ -37,26 +37,19 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
 def _audit_rows(manifest: dict[str, Any]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for source in manifest.get("sources", []):
-        viewer = source.get("viewer", {})
-        file_summary = source.get("file_summary", {})
-        fit = source.get("fit_assessment", {})
         rows.append(
             {
                 "dataset_id": source.get("dataset_id", ""),
-                "dataset_name": source.get("dataset_name", ""),
+                "dataset_name": source.get("dataset_id", ""),
                 "download_page_url": source.get("download_page_url", ""),
-                "observed_downloads": source.get("observed_downloads", ""),
                 "license": source.get("license"),
-                "viewer_enabled": viewer.get("viewer", False),
-                "viewer_rows": viewer.get("viewer_rows", ""),
-                "file_count": file_summary.get("file_count", 0),
-                "lfs_file_count": file_summary.get("lfs_file_count", 0),
-                "total_size_mb": file_summary.get("total_size_mb", 0),
-                "direct_benchmark_fit": fit.get("direct_benchmark_fit", "missing"),
-                "safe_integration_scope": fit.get("safe_integration_scope", "missing"),
-                "integration_status": source.get("integration_status", "missing"),
-                "usage_scope": source.get("usage_scope", "missing"),
-                "reason": fit.get("reason", ""),
+                "file_count": source.get("file_count", 0),
+                "total_size_mb": round(float(source.get("total_size_bytes", 0)) / (1024.0 * 1024.0), 6),
+                "primary_class": source.get("primary_class", "missing"),
+                "recommendation": source.get("recommendation", "missing"),
+                "live_catalog_projection": source.get("live_catalog_projection", False),
+                "raw_download_performed": source.get("raw_download_performed"),
+                "reason": source.get("rejection_reason", ""),
             }
         )
     return rows
@@ -66,20 +59,20 @@ def _build_diagnosis(rows: list[dict[str, Any]]) -> dict[str, Any]:
     direct_ready = [
         row["dataset_id"]
         for row in rows
-        if row["direct_benchmark_fit"] == "ready"
+        if row["primary_class"] == "model_serving_request_trace"
     ]
     file_size_candidates = [
         row["dataset_id"]
         for row in rows
-        if row["safe_integration_scope"] not in {"audit_record_only", "missing"}
+        if row["recommendation"] == "model_size_profile_candidate"
     ]
     rejected = [
         row["dataset_id"]
         for row in rows
-        if row["direct_benchmark_fit"] == "not_suitable"
+        if row["recommendation"] == "rejected"
     ]
     return {
-        "task_name": "hf_model_cache_dataset_audit_round14",
+        "task_name": "hf_model_cache_dataset_audit_round14_compatibility_refresh_for_g11",
         "manifest_path": str(MANIFEST_PATH.relative_to(ROOT_DIR)),
         "plan_path": str(PLAN_PATH.relative_to(ROOT_DIR)),
         "candidate_count": len(rows),
@@ -89,10 +82,7 @@ def _build_diagnosis(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "file_size_profile_candidate_dataset_ids": file_size_candidates,
         "rejected_dataset_ids": rejected,
         "benchmark_consumption_allowed_now": False,
-        "claim_boundary": (
-            "HF candidates can support real file-size/cache-volume references only; "
-            "they do not provide real VEC cache event traces."
-        ),
+        "claim_boundary": "Three HF candidates support file-size metadata only; two are rejected. None provides a VEC cache event trace.",
         "generated_artifacts": {
             "audit_csv": str(OUTPUT_DIR / "hf_model_cache_dataset_audit.csv"),
             "diagnosis_summary": str(OUTPUT_DIR / "diagnosis_summary.json"),
@@ -113,18 +103,17 @@ def _write_report(rows: list[dict[str, Any]], diagnosis: dict[str, Any]) -> None
         "",
         "## 候选审计",
         "",
-        "| Dataset | 可用文件/规模 | Viewer | 当前判定 | 下载页 |",
+        "| Dataset | 可用文件/规模 | 分类 | recommendation | 下载页 |",
         "|---|---:|---|---|---|",
     ]
     for row in rows:
-        viewer_text = "yes" if row["viewer_enabled"] else "no"
         lines.append(
-            "| {dataset} | {size} MB / {files} files | {viewer} | {fit} | {url} |".format(
+            "| {dataset} | {size} MB / {files} files | {primary_class} | {recommendation} | {url} |".format(
                 dataset=row["dataset_id"],
                 size=row["total_size_mb"],
                 files=row["file_count"],
-                viewer=viewer_text,
-                fit=row["direct_benchmark_fit"],
+                primary_class=row["primary_class"],
+                recommendation=row["recommendation"],
                 url=row["download_page_url"],
             )
         )

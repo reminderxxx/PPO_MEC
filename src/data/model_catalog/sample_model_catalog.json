@@ -78,15 +78,6 @@
       "notes": "可作为未来 cache-object size profile 的真实文件大小参考；不是 VEC cache request trace。"
     },
     {
-      "dataset_id": "Efficient-Large-Model/imagenet-llamagen-cache",
-      "dataset_name": "imagenet-llamagen-cache",
-      "provider": "Hugging Face Datasets",
-      "download_page_url": "https://huggingface.co/datasets/Efficient-Large-Model/imagenet-llamagen-cache",
-      "local_status": "audited_large_webdataset_not_vec_cache_trace",
-      "usage_scope": "large_cache_like_volume_reference_only",
-      "notes": "有 Dataset Viewer 和大规模 WebDataset 行，但语义是图像生成 cache，不是 model/adapter cache demand。"
-    },
-    {
       "dataset_id": "Kuperberg/bert-model-cache",
       "dataset_name": "bert-model-cache",
       "provider": "Hugging Face Datasets",
@@ -94,15 +85,6 @@
       "local_status": "audited_file_metadata_declared_only",
       "usage_scope": "chunked_model_file_size_reference_only",
       "notes": "可作为未来分块模型 cache-object size profile 的真实文件大小参考；需要显式 importer 和 adapter 映射。"
-    },
-    {
-      "dataset_id": "amansapkota/examsathi-model-cache",
-      "dataset_name": "examsathi-model-cache",
-      "provider": "Hugging Face Datasets",
-      "download_page_url": "https://huggingface.co/datasets/amansapkota/examsathi-model-cache",
-      "local_status": "audited_not_benchmark_ready",
-      "usage_scope": "audit_record_only",
-      "notes": "审计时没有可用模型/cache 文件，保留为候选排除记录，不进入 benchmark profile。"
     }
   ]
 }

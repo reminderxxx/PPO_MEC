@@ -1,0 +1,84 @@
+{
+  "sources": [
+    {
+      "page_exists": true,
+      "dataset_card_exists": false,
+      "license_explicit": false,
+      "files": [
+        "model.safetensors",
+        "tokenizer.json",
+        "config.json"
+      ],
+      "only_model_or_cache_files": true,
+      "request_timestamps": false,
+      "model_or_adapter_ids": "model identity derivable; no adapter identity",
+      "cache_hit_or_eviction": false,
+      "size_profile_usable": true,
+      "previous_classification_correct": "partially; size-only boundary was correct, but license risk was understated",
+      "decision": "retain metadata-only and block formal use"
+    },
+    {
+      "page_exists": true,
+      "dataset_card_exists": false,
+      "license_explicit": false,
+      "files": [
+        "cbow_model.kv",
+        "cbow_model.kv.vectors.npy"
+      ],
+      "only_model_or_cache_files": true,
+      "request_timestamps": false,
+      "model_or_adapter_ids": "CBOW object identity derivable; no adapter identity",
+      "cache_hit_or_eviction": false,
+      "size_profile_usable": true,
+      "previous_classification_correct": "mostly, but this is an embedding artifact rather than an AI serving trace",
+      "decision": "retain metadata-only and block formal use"
+    },
+    {
+      "page_exists": true,
+      "dataset_card_exists": false,
+      "license_explicit": false,
+      "files": [
+        "imagenet_llamagen_cache.tar"
+      ],
+      "only_model_or_cache_files": false,
+      "request_timestamps": false,
+      "model_or_adapter_ids": false,
+      "cache_hit_or_eviction": false,
+      "size_profile_usable": false,
+      "previous_classification_correct": "no; it is a content-cache dataset, not model artifact size metadata",
+      "decision": "remove from live catalog and reject for model-cache integration"
+    },
+    {
+      "page_exists": true,
+      "dataset_card_exists": false,
+      "license_explicit": false,
+      "files": [
+        "bert-base-uncased-pytorch-model-chunk-0000.bin",
+        "bert-base-uncased-pytorch-model-chunk-0023.bin",
+        "bert-config-metadata-cb98c64d.json"
+      ],
+      "only_model_or_cache_files": true,
+      "request_timestamps": false,
+      "model_or_adapter_ids": "BERT model identity present; no adapter identity",
+      "cache_hit_or_eviction": false,
+      "size_profile_usable": true,
+      "previous_classification_correct": "partially; chunk-size role is correct, but provenance/license remain unresolved",
+      "decision": "retain metadata-only and block formal use"
+    },
+    {
+      "page_exists": true,
+      "dataset_card_exists": false,
+      "license_explicit": false,
+      "files": [
+        ".gitattributes"
+      ],
+      "only_model_or_cache_files": false,
+      "request_timestamps": false,
+      "model_or_adapter_ids": false,
+      "cache_hit_or_eviction": false,
+      "size_profile_usable": false,
+      "previous_classification_correct": "yes as rejected, but it must not remain in live AdapterCatalog",
+      "decision": "remove from live catalog and retain rejection record"
+    }
+  ]
+}

@@ -833,3 +833,18 @@ Legacy gate 结论：
 ```
 
 旧 1.0/1.1 summary 可审计 request/byte 等已有证据，但缺 trace context 时 pollution 为 unavailable。CLI 拒绝覆盖已有输出；结果只作机制/contract 验证，不能作为算法优劣或 paper-ready 证据。
+
+## G11 public model-cache dataset metadata audit
+
+G11 只验证版本化 registry、兼容声明与 deterministic artifact，不下载外部 payload：
+
+```bash
+.venv/bin/python scripts/check_data_ready.py
+.venv/bin/python scripts/validate_dataset_source_declarations.py
+.venv/bin/python scripts/validate_model_cache_dataset_registry.py
+.venv/bin/python -m pytest tests/test_model_cache_dataset_registry.py -q
+```
+
+输出目录固定为 `artifacts/analysis/model_cache_dataset_discovery_20260819_g11_v1/`。registry 在 `configs/data/model_cache_dataset_registry.json`；HF 历史兼容 manifest 在 `data/raw/model_cache/huggingface_model_cache_sources.json`。
+
+禁止把 validator 当作下载/importer：G12 必须另立任务并获得明确授权。任何 BurstGPT/Azure/KV/HF 与 NGSIM 的组合都必须标记 `cross_source_exogenous_or_synthetic`，记录独立来源、mapping、信息损失和随机种子；不得称为真实 joint VEC trace。KV/prefix replay 与 adapter cache replay 必须使用不同 artifact type。

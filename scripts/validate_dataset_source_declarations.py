@@ -14,12 +14,14 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from src.data.model_catalog.adapter_catalog import AdapterCatalog
+from src.data.model_catalog.model_cache_dataset_registry import assert_valid, validate_all
 
 
 DATASET_SOURCES_PATH = ROOT_DIR / "configs" / "data" / "dataset_sources.json"
 MODEL_CACHE_SOURCES_PATH = ROOT_DIR / "data" / "raw" / "model_cache" / "huggingface_model_cache_sources.json"
 SAMPLE_CATALOG_PATH = ROOT_DIR / "src" / "data" / "model_catalog" / "sample_model_catalog.json"
-OUTPUT_DIR = ROOT_DIR / "artifacts" / "analysis" / "model_cache_dataset_integration_round13"
+REGISTRY_PATH = ROOT_DIR / "configs" / "data" / "model_cache_dataset_registry.json"
+OUTPUT_DIR = ROOT_DIR / "artifacts" / "analysis" / "model_cache_dataset_source_declarations_20260819_g11_v1"
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -80,12 +82,14 @@ def _model_cache_rows() -> list[dict[str, Any]]:
             {
                 "source_file": str(MODEL_CACHE_SOURCES_PATH.relative_to(ROOT_DIR)),
                 "dataset_id": item.get("dataset_id", "missing"),
-                "dataset_name": item.get("dataset_name", "missing"),
-                "provider": item.get("provider", "missing"),
+                "dataset_name": item.get("dataset_id", "missing"),
+                "provider": "Hugging Face Datasets",
                 "download_page_url": download_page_url or "missing",
                 "download_page_url_shape_valid": _is_reachable_page_shape(download_page_url),
-                "integration_status": item.get("integration_status", "missing"),
-                "usage_scope": item.get("usage_scope", "missing"),
+                "primary_class": item.get("primary_class", "missing"),
+                "recommendation": item.get("recommendation", "missing"),
+                "live_catalog_projection": item.get("live_catalog_projection", False),
+                "raw_download_performed": item.get("raw_download_performed"),
             }
         )
     return rows
@@ -114,6 +118,13 @@ def main() -> None:
     dataset_rows = _dataset_rows()
     model_cache_rows = _model_cache_rows()
     catalog_rows = _catalog_rows()
+    registry = _load_json(REGISTRY_PATH)
+    registry_validation = validate_all(
+        registry,
+        dataset_sources=_load_json(DATASET_SOURCES_PATH),
+        hf_manifest=_load_json(MODEL_CACHE_SOURCES_PATH),
+        sample_catalog=_load_json(SAMPLE_CATALOG_PATH),
+    )
     all_declaration_rows = dataset_rows + model_cache_rows + catalog_rows
 
     missing_required = [
@@ -133,8 +144,13 @@ def main() -> None:
         for row in catalog_rows
         if row.get("dataset_id") not in {None, "", "missing"}
     }
+    expected_catalog_ids = {
+        str(row.get("dataset_id"))
+        for row in model_cache_rows
+        if row.get("live_catalog_projection")
+    }
     diagnosis = {
-        "task_name": "model_cache_dataset_integration_round13",
+        "task_name": "model_cache_dataset_discovery_20260819_g11_v1",
         "dataset_sources_file": str(DATASET_SOURCES_PATH.relative_to(ROOT_DIR)),
         "model_cache_sources_file": str(MODEL_CACHE_SOURCES_PATH.relative_to(ROOT_DIR)),
         "sample_catalog_file": str(SAMPLE_CATALOG_PATH.relative_to(ROOT_DIR)),
@@ -143,8 +159,10 @@ def main() -> None:
         "catalog_model_cache_dataset_count": len(catalog_rows),
         "all_dataset_declarations_have_name_and_download_page": not missing_required,
         "model_cache_dataset_declared_in_catalog": bool(model_cache_dataset_ids & catalog_dataset_ids),
-        "all_model_cache_sources_declared_in_catalog": model_cache_dataset_ids <= catalog_dataset_ids,
-        "missing_model_cache_sources_in_catalog": sorted(model_cache_dataset_ids - catalog_dataset_ids),
+        "catalog_matches_live_projection": catalog_dataset_ids == expected_catalog_ids,
+        "non_live_model_cache_sources_excluded_from_catalog": not bool((model_cache_dataset_ids - expected_catalog_ids) & catalog_dataset_ids),
+        "missing_live_model_cache_sources_in_catalog": sorted(expected_catalog_ids - catalog_dataset_ids),
+        "registry_validation": registry_validation,
         "metadata_only_no_automatic_download": True,
         "missing_required_rows": missing_required,
         "generated_artifacts": {
@@ -162,8 +180,9 @@ def main() -> None:
         json.dumps(diagnosis, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
-    if missing_required or not diagnosis["all_model_cache_sources_declared_in_catalog"]:
+    if missing_required or not diagnosis["catalog_matches_live_projection"] or not registry_validation["valid"]:
         raise SystemExit(json.dumps(diagnosis, ensure_ascii=False, indent=2))
+    assert_valid(registry_validation)
     print("dataset source declaration validation complete")
     print(
         "all_dataset_declarations_have_name_and_download_page: "
@@ -174,8 +193,8 @@ def main() -> None:
         f"{diagnosis['model_cache_dataset_declared_in_catalog']}"
     )
     print(
-        "all_model_cache_sources_declared_in_catalog: "
-        f"{diagnosis['all_model_cache_sources_declared_in_catalog']}"
+        "catalog_matches_live_projection: "
+        f"{diagnosis['catalog_matches_live_projection']}"
     )
     for key, path in diagnosis["generated_artifacts"].items():
         print(f"{key}: {path}")

@@ -1,0 +1,85 @@
+{
+  "literature_cutoff": "2026-08-19",
+  "queries": [
+    {
+      "query": "\"model cache dataset\"",
+      "searched_at": "2026-08-19",
+      "outcome": "mostly ambiguous content caches; retained explicit rejection records"
+    },
+    {
+      "query": "\"model caching trace dataset\"",
+      "searched_at": "2026-08-19",
+      "outcome": "no public joint VEC trace found"
+    },
+    {
+      "query": "\"LLM serving trace dataset\"",
+      "searched_at": "2026-08-19",
+      "outcome": "BurstGPT, Azure traces, Mooncake, and Qwen-Bailian verified"
+    },
+    {
+      "query": "\"LLM inference workload trace\"",
+      "searched_at": "2026-08-19",
+      "outcome": "Azure 2023/2024 and BurstGPT verified"
+    },
+    {
+      "query": "\"model request trace model id timestamp\"",
+      "searched_at": "2026-08-19",
+      "outcome": "BurstGPT satisfies model plus time; Azure does not expose model identity"
+    },
+    {
+      "query": "\"LoRA adapter request trace\"",
+      "searched_at": "2026-08-19",
+      "outcome": "no public real adapter request trace found"
+    },
+    {
+      "query": "\"adapter serving workload dataset\"",
+      "searched_at": "2026-08-19",
+      "outcome": "S-LoRA workloads are synthetic; no C-class source qualified"
+    },
+    {
+      "query": "\"KV cache trace dataset\"",
+      "searched_at": "2026-08-19",
+      "outcome": "Mooncake and Qwen-Bailian qualified as D class"
+    },
+    {
+      "query": "\"prefix cache workload trace\"",
+      "searched_at": "2026-08-19",
+      "outcome": "production-derived prefix block hashes verified"
+    },
+    {
+      "query": "\"serverless model loading trace\"",
+      "searched_at": "2026-08-19",
+      "outcome": "ServerlessLLM code verified; no standalone real model-request trace"
+    },
+    {
+      "query": "\"edge AI service request dataset\"",
+      "searched_at": "2026-08-19",
+      "outcome": "no mobility-linked model request dataset found"
+    },
+    {
+      "query": "\"vehicular edge model caching dataset\"",
+      "searched_at": "2026-08-19",
+      "outcome": "papers and simulations found, no public A-class trace"
+    },
+    {
+      "query": "site:huggingface.co/datasets \"model-cache\"",
+      "searched_at": "2026-08-19",
+      "outcome": "five project candidates re-audited through official HF API"
+    },
+    {
+      "query": "site:github.com model serving trace dataset",
+      "searched_at": "2026-08-19",
+      "outcome": "official repositories opened and revisions recorded"
+    },
+    {
+      "query": "BurstGPT Mooncake DistServe ServerlessLLM public trace",
+      "searched_at": "2026-08-19",
+      "outcome": "real, synthetic, and unavailable trace boundaries separated"
+    },
+    {
+      "query": "Azure AWS Alibaba Google AI inference workload trace",
+      "searched_at": "2026-08-19",
+      "outcome": "Azure and Alibaba primary sources verified; no equivalent public AWS/Google model-ID trace qualified"
+    }
+  ]
+}
