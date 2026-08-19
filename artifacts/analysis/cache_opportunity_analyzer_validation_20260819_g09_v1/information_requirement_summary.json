@@ -1,0 +1,63 @@
+{
+  "provenance": {
+    "cache_opportunity_analyzer_contract_version": "1.0.0",
+    "analyzer_identity": "cache_opportunity_analyzer_v1.0.0",
+    "analysis_fingerprint": "e8f747034853c078b1c7cb274f1cbc2aaf8835bab28e1dd210b7e703ae5ff76c",
+    "request_replay_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+    "g07_manifest": {
+      "manifest_id": "cbfm-90c2dda3fb82e270",
+      "full_manifest_sha256": "fdd2448ab331f0033cd9617484ead78707bbc897c852090af80cf9c71299cb12",
+      "semantic_protocol_sha256": "90c2dda3fb82e270022e351de09c5170a2a70ac26942c94d60782ab545f3dcfd",
+      "git_commit": "5d76596aa08c6589e4cc028d78b3383d48b830e6"
+    },
+    "oracle_contract_version": "future_horizon_cache_oracle_contract_v1.0.0",
+    "oracle_objective_identity": "lex_hit_mb_hit_count_transfer_evicted_churn_v1.0.0",
+    "horizons": [
+      1,
+      3,
+      6,
+      12
+    ]
+  },
+  "report": {
+    "availability": "available",
+    "labels_are_not_information_sufficiency_conclusions": true,
+    "rows": [
+      {
+        "information": "current_cache_contents",
+        "availability_class": "decision-time observable",
+        "request_analysis_row_count": 20
+      },
+      {
+        "information": "current_object_identity_and_size",
+        "availability_class": "decision-time observable",
+        "request_analysis_row_count": 20
+      },
+      {
+        "information": "current_rsu",
+        "availability_class": "decision-time observable",
+        "request_analysis_row_count": 20
+      },
+      {
+        "information": "dag_workflow_future_demand",
+        "availability_class": "oracle-only future information",
+        "request_analysis_row_count": 20
+      },
+      {
+        "information": "next_rsu_handoff_estimate",
+        "availability_class": "predictor-required",
+        "request_analysis_row_count": 20
+      },
+      {
+        "information": "remaining_capacity",
+        "availability_class": "decision-time observable",
+        "request_analysis_row_count": 20
+      },
+      {
+        "information": "transfer_cost",
+        "availability_class": "decision-time observable",
+        "request_analysis_row_count": 20
+      }
+    ]
+  }
+}

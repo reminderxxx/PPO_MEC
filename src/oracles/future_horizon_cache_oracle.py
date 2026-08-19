@@ -502,6 +502,10 @@ def build_observed_baseline_outcome(
     run_info = summary.get("run_info") or {}
     if run_info.get("fairness_manifest_id") != manifest["identity"]["manifest_id"]:
         raise CacheOracleError("observed summary G07 manifest ID mismatch")
+    if run_info.get("fairness_manifest_hash") != manifest["hashes"]["full_manifest_sha256"]:
+        raise CacheOracleError("observed summary G07 manifest full hash mismatch")
+    if run_info.get("fairness_semantic_protocol_hash") != manifest["hashes"]["semantic_protocol_sha256"]:
+        raise CacheOracleError("observed summary G07 manifest semantic hash mismatch")
     if run_info.get("evaluation_unit_id") != replay["evaluation_unit"]["evaluation_unit_id"]:
         raise CacheOracleError("observed summary evaluation unit mismatch")
     events = [item for item in summary.get("cache_event_trace", []) if item.get("event_type") == "request"]
@@ -541,6 +545,9 @@ def build_observed_baseline_outcome(
         "baseline_identity": f"{run_info.get('agent_name')}/{run_info.get('eviction_policy')}",
         "metric_source": "observed_request_outcome_v1",
         "request_replay_fingerprint": replay["request_replay_fingerprint"],
+        "g07_manifest_id": manifest["identity"]["manifest_id"],
+        "g07_manifest_full_sha256": manifest["hashes"]["full_manifest_sha256"],
+        "g07_manifest_semantic_sha256": manifest["hashes"]["semantic_protocol_sha256"],
         "capacity_unit": capacity["unit"],
         "capacity_value": capacity_value,
         "initial_state_fingerprint": _state_fingerprint(state),
@@ -560,4 +567,44 @@ def build_observed_baseline_outcome(
         "legacy_observed_request_stream_fingerprint": run_info.get("observed_request_stream_fingerprint"),
         "reward_consumed": False,
         "aggregate_consumed": False,
+        "request_outcomes": [
+            {
+                "request_id": request["request_id"],
+                "event_id": event.get("event_id"),
+                "cache_hit": bool(event.get("cache_hit")),
+                "hit_source": event.get("hit_source"),
+                "cache_target_rsu_id": event.get("cache_target_rsu_id"),
+                "served_rsu_id": event.get("served_rsu_id"),
+                "admission_requested": bool(event.get("admission_requested")),
+                "admission_added": bool(event.get("admission_added")),
+                "admission_reason": event.get("admission_reason"),
+                "capacity_rejection_reason": event.get("capacity_rejection_reason"),
+                "eviction_occurred": bool(event.get("eviction_occurred")),
+                "evicted_object_ids": list(event.get("evicted_object_ids") or []),
+                "adapter_transfer_size_mb": (
+                    float(event.get("adapter_transfer_size_mb") or 0.0)
+                    if "adapter_transfer_size_mb" in event else None
+                ),
+                "state_migration_size_mb": (
+                    float(event.get("state_migration_size_mb") or 0.0)
+                    if "state_migration_size_mb" in event else None
+                ),
+                "admitted_size_mb": (
+                    float(event.get("admitted_size_mb") or 0.0)
+                    if "admitted_size_mb" in event else None
+                ),
+                "evicted_size_mb_sum": (
+                    float(event.get("evicted_size_mb_sum") or 0.0)
+                    if "evicted_size_mb_sum" in event else None
+                ),
+                "source_missing_fields": sorted(
+                    field for field in (
+                        "event_id", "cache_hit", "admission_requested", "admission_added",
+                        "eviction_occurred", "evicted_object_ids", "adapter_transfer_size_mb",
+                        "state_migration_size_mb", "admitted_size_mb", "evicted_size_mb_sum",
+                    ) if field not in event
+                ),
+            }
+            for request, event in zip(requests, events)
+        ],
     }

@@ -1,5 +1,15 @@
 # Artifact Records
 
+## 2026-08-19 G09 Cache Opportunity Analyzer validation
+
+- path: `artifacts/analysis/cache_opportunity_analyzer_validation_20260819_g09_v1/`
+- identity: `cache_opportunity_analyzer_contract_version=1.0.0`; analysis fingerprint `e8f747034853c078b1c7cb274f1cbc2aaf8835bab28e1dd210b7e703ae5ff76c`
+- inputs: G07 final manifest; G08 external replay/result/action trace; five matched controlled raw NGSIM+Alibaba episode summaries
+- result: 1 replay request × H={1,3,6,12} × 5 baseline = 20 request rows; input validation and taxonomy reconciliation pass; repeated run summary/request rows byte-identical
+- controlled finding: all five baseline and rolling oracle hit the single 64MB request under G08 same-step admission semantics, so object/byte gap is zero; there is no observable repeat reuse and concentration warns small sample
+- integrity: summary、request rows、by-baseline/H/reason/object/window/RSU、information、validation、reconciliation、command log均由`artifact_integrity_manifest.json`登记
+- boundary: contract validation only; not G10, training, tuning, formal, holdout, hidden, causal regret, latency gain, MARL necessity, or algorithm superiority evidence
+
 ## 2026-08-19 G08 Future-Horizon Cache Oracle validation
 
 - path: `artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/`

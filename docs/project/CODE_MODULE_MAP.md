@@ -1,5 +1,11 @@
 # Code Module Map
 
+## G09 cache opportunity analyzer
+
+- `src/analysis/cache_opportunity_analyzer.py`：纯 G09 reducer；严格校验 G07/G08/raw baseline identity，生成 demand/oracle/capture-loss request rows、taxonomy、fixed buckets、concentration、information labels和reconciliation。
+- `scripts/analyze_cache_opportunities.py`：默认拒绝覆盖的稳定入口；只读取显式 raw artifact，输出 command log 与 integrity manifest，不执行训练或 benchmark。
+- `tests/test_cache_opportunity_analyzer.py`：覆盖 demand、oracle、五 baseline、所有 primary reason、MB multi-victim、cross-RSU/handoff、identity/integrity、determinism与 JSON round-trip。
+
 ## G08 oracle
 
 - `src/oracles/cache_request_replay.py`：policy-neutral replay schema、canonical fingerprint、G07/provider/workflow reconstruction和validation。

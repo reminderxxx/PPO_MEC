@@ -1,0 +1,70 @@
+{
+  "artifact_integrity_manifest_version": "1.0.0",
+  "analyzer_contract_version": "1.0.0",
+  "manifest_validation_status": "pass",
+  "request_replay_validation_status": "pass",
+  "analyzer_input_validation_status": "pass",
+  "reconciliation_status": "pass",
+  "files": [
+    {
+      "path": "command_log.json",
+      "size_bytes": 6727,
+      "sha256": "a2fdae475bc77370cc9a0d9cb3b473ebb050579e451ccd49ea74716e4155baf0"
+    },
+    {
+      "path": "information_requirement_summary.json",
+      "size_bytes": 2192,
+      "sha256": "30c69dafb2a132ebc54c3a39556d3d9074c926afb1735976913809b4e68c183d"
+    },
+    {
+      "path": "input_validation_report.json",
+      "size_bytes": 1526,
+      "sha256": "be7d15646a1734d0783802d06e4bef4a3afd4e083327ee94389fd5774f491314"
+    },
+    {
+      "path": "opportunity_by_baseline.json",
+      "size_bytes": 20770,
+      "sha256": "d67ece9b0743da39b885fdb1e33c9c096a2b3467469c6995f406cfc291216502"
+    },
+    {
+      "path": "opportunity_by_horizon.json",
+      "size_bytes": 4714,
+      "sha256": "a0fa5766d46f787aaf5519ede5a39bf289085cd825c3b871442ac3987b7aaa20"
+    },
+    {
+      "path": "opportunity_by_object.json",
+      "size_bytes": 21790,
+      "sha256": "df24efc0ba5f992963fd74f8d1e023a3660fab5811be096fc375b0dfbe3fcd16"
+    },
+    {
+      "path": "opportunity_by_reason.json",
+      "size_bytes": 21730,
+      "sha256": "6f36b279630bda81a116923b558c173a1addd7e5d58cb4ff5985161ff01b0f13"
+    },
+    {
+      "path": "opportunity_by_rsu.json",
+      "size_bytes": 21270,
+      "sha256": "23973c1aac680c4200fbba8db5827d3b8fc0d43db319d13fea1edd3de23d9008"
+    },
+    {
+      "path": "opportunity_by_window.json",
+      "size_bytes": 22630,
+      "sha256": "b3e8bf98e33ed6afa0acedec0a60a679fecdebab17153b043e21241e0563cd61"
+    },
+    {
+      "path": "opportunity_summary.json",
+      "size_bytes": 32686,
+      "sha256": "065b7d61589f1e6b0d73f775cee7ad48a6cc83c0caf73897795f5acb600ac23a"
+    },
+    {
+      "path": "reconciliation_report.json",
+      "size_bytes": 1258,
+      "sha256": "e89565994c933ae2a2531995910f7991ce67e0cb5137c2a0aff8390a54e0d259"
+    },
+    {
+      "path": "request_opportunity_rows.json",
+      "size_bytes": 112830,
+      "sha256": "3b4a660f7636e8fed1c85e4d932c50b1ff61f2033828645697ded0da2ad9751a"
+    }
+  ]
+}

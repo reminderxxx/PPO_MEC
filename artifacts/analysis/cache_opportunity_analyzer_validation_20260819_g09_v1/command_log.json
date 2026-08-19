@@ -1,0 +1,50 @@
+{
+  "recorded_at": "2026-08-19T06:14:06.621229Z",
+  "argv": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "scripts/analyze_cache_opportunities.py",
+    "--fairness_manifest_path",
+    "artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/cache_baseline_fairness_manifest.json",
+    "--request_replay_path",
+    "artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/request_replay.json",
+    "--oracle_results_path",
+    "artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/oracle_results.json",
+    "--oracle_action_trace_path",
+    "artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/oracle_action_trace.json",
+    "--baseline_outcome_path",
+    "artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_aging_lfu/seed_7.summary.json",
+    "artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_fifo/seed_7.summary.json",
+    "artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lfu/seed_7.summary.json",
+    "artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lru/seed_7.summary.json",
+    "artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_random/seed_7.summary.json",
+    "--output_dir",
+    "artifacts/analysis/cache_opportunity_analyzer_validation_20260819_g09_v1",
+    "--horizons",
+    "1",
+    "3",
+    "6",
+    "12"
+  ],
+  "shell_command": "/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/analyze_cache_opportunities.py --fairness_manifest_path artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/cache_baseline_fairness_manifest.json --request_replay_path artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/request_replay.json --oracle_results_path artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/oracle_results.json --oracle_action_trace_path artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/oracle_action_trace.json --baseline_outcome_path artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_aging_lfu/seed_7.summary.json artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_fifo/seed_7.summary.json artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lfu/seed_7.summary.json artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lru/seed_7.summary.json artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_random/seed_7.summary.json --output_dir artifacts/analysis/cache_opportunity_analyzer_validation_20260819_g09_v1 --horizons 1 3 6 12",
+  "git_commit": "2e8e766434f5c09005f553d7f4a32ff488315fe8",
+  "cache_opportunity_analyzer_contract_version": "1.0.0",
+  "reward_read": false,
+  "legacy_aggregate_read": false,
+  "learned_policy_hidden_state_read": false,
+  "hidden_read": false,
+  "training_executed": false,
+  "formal_benchmark_executed": false,
+  "input_paths": {
+    "fairness_manifest": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/cache_baseline_fairness_manifest.json",
+    "request_replay": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/request_replay.json",
+    "oracle_results": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/oracle_results.json",
+    "oracle_action_trace": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/oracle_action_trace.json",
+    "baseline_outcomes": [
+      "/Users/howen/Projects/PPO_MEC/artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_aging_lfu/seed_7.summary.json",
+      "/Users/howen/Projects/PPO_MEC/artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_fifo/seed_7.summary.json",
+      "/Users/howen/Projects/PPO_MEC/artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lfu/seed_7.summary.json",
+      "/Users/howen/Projects/PPO_MEC/artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lru/seed_7.summary.json",
+      "/Users/howen/Projects/PPO_MEC/artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/controlled_benchmark/main_results_mixed_informative_20260819_091720_778691/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_random/seed_7.summary.json"
+    ]
+  }
+}

@@ -1,5 +1,13 @@
 ﻿# Progress
 
+## 2026-08-19: G09 Cache Opportunity Analyzer Contract frozen
+
+- 新增 `cache_opportunity_analyzer_contract_version=1.0.0`、pure analyzer与稳定 CLI；输入严格限定为 G07 identity、G08 external replay/exact result/action trace、initial capacity/cache和matched baseline raw request outcome。
+- 已实现 demand count/MB、first/repeat、reuse/next-use、H=1/3/6/12 censoring、local/cross-RSU/handoff/topology；oracle natural/same-step/eviction/multi-victim/oversized/transfer/capacity；五baseline四象限、capture/loss、object/byte/cost gap。
+- 冻结15项互斥 primary taxonomy、multi-label secondary evidence、fixed buckets、top-k/Gini/zero-window concentration、fixed density strata与 information-requirement availability classes；taxonomy denominator reconciliation fail-fast。
+- Validation artifact：`artifacts/analysis/cache_opportunity_analyzer_validation_20260819_g09_v1/`。现有 NGSIM+Alibaba controlled unit 为1 request × 4H × 5baseline = 20 rows；reconciliation pass，两次运行 fingerprint均为`e8f747034853c078b1c7cb274f1cbc2aaf8835bab28e1dd210b7e703ae5ff76c`。五baseline均capture同一可达hit，object/byte gap为0；这是合同验证与small-sample边界，不是性能结论。
+- 未执行G10、训练、调参、formal、holdout或hidden。Latency saved继续unavailable；不判断MARL必要性或因果regret。
+
 ## 2026-08-18: G07 paper-grade cache baseline fairness manifest frozen
 
 - 新增versioned manifest `1.0.0`，绑定NGSIM/Alibaba/catalog/window plan content hash、raw frame/time双区间、workflow DAG/request plan、seed derivation、capacity/catalog/initial cache、G01/G03/G06和artifact/claim边界。

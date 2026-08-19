@@ -1,5 +1,20 @@
 # Runbook
 
+## G09 cache opportunity analyzer
+
+```bash
+.venv/bin/python scripts/analyze_cache_opportunities.py \
+  --fairness_manifest_path <g07_manifest.json> \
+  --request_replay_path <g08_request_replay.json> \
+  --oracle_results_path <g08_oracle_results.json> \
+  --oracle_action_trace_path <g08_oracle_action_trace.json> \
+  --baseline_outcome_path <raw_episode_1.summary.json> <raw_episode_2.summary.json> \
+  --output_dir artifacts/analysis/cache_opportunity_analyzer_validation_<run_id> \
+  --horizons 1 3 6 12
+```
+
+Baseline 输入优先使用 raw episode summary；入口会在 frozen replay 已存在后逐 request 对齐并构造 outcome rows。旧的只含总 hit/MB 的 observed outcome 不能支持 G09 request attribution，会 fail-fast。输出目录必须不存在；不要传 formal/holdout/hidden artifact。检查 `input_validation_report.json` 与 `reconciliation_report.json` 均为 pass，再核对 `artifact_integrity_manifest.json`。controlled 单请求的 zero gap/zero reuse 与 small-sample warning 是合法结果，不得解释成接近通用 oracle 上界。
+
 ## G08 policy-neutral request replay 与 cache oracle
 
 ```bash

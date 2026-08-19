@@ -1,5 +1,12 @@
 ﻿# Decision Log
 
+## 2026-08-19: G09 机会分析只消费匹配 raw artifact，并冻结互斥 taxonomy
+
+- 决定：机会存在由 external replay 描述，feasible opportunity由 G08 exact action trace描述，capture/loss只由逐request raw baseline outcome比较；reward、aggregate、hidden state和文档摘要永不作为输入。
+- Primary reason按合同固定优先级且每行恰好一个；secondary evidence可多选。`eviction_choice`要求不同victim及H内后续request证据，但仍不称causal regret。
+- Object/byte、right-censoring、slot/MB、initial natural hit、same-step admission和rolling `baseline hit/oracle miss`分别报告。固定bucket/strata不按结果调节。
+- Information requirement只标注observable/history/predictor/oracle-only/absent，不做G10或MARL必要性判断。Latency counterfactual缺失时保持unavailable。
+
 ## 2026-08-19: G08 使用外生 replay、现有同step时序与 exact rolling identity
 
 - 不从baseline CacheEvent outcome构造request stream；使用G07 provider/workflow/mobility companion producer冻结policy-neutral replay。

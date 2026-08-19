@@ -2,6 +2,14 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-19: G09 analyzer contract frozen; evidence scope remains diagnostic
+
+- `RESOLVED / request attribution contract`：G09现从matched external replay、exact oracle action trace和baseline raw request outcome重算机会；fingerprint/capacity/initial/H/objective/ID mismatch及taxonomy不守恒均fail-fast。
+- `RESOLVED / censoring and taxonomy`：first request、right-censored tail、initial-cache natural hit、same-step admission、rolling baseline-hit/oracle-miss已分开；eviction-choice要求victim与后续request证据。
+- `OPEN / sample coverage`：当前真实controlled artifact只有1 request、1 window；zero gap、100% capture、Gini null与small-sample warning不能证明五baseline接近真实上界或机会不集中。
+- `OPEN / causality and latency`：reuse/frequency/topology/capacity分层和victim evidence均为diagnostic association；无逐request latency counterfactual，latency saved/gap继续unavailable。
+- `BOUNDARY / G10`：information labels不证明MARL必要性或信息充分性；本轮未执行G10、训练、formal、holdout或hidden。
+
 ## 2026-08-18: G07 fairness manifest closes classical-baseline protocol drift; runtime scope remains bounded
 
 - `RESOLVED / protocol identity`：五个reactive baseline现在由机器可验证manifest绑定相同dataset/window/request/seed/capacity/catalog/initial-cache/metrics合同，10组pairwise diff只允许eviction policy身份差异。
