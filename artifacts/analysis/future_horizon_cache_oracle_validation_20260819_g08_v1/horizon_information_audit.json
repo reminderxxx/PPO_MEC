@@ -1,0 +1,32 @@
+{
+  "h_1": {
+    "status": "pass",
+    "full_trace_diagnostic": false,
+    "max_visible_request_count": 1,
+    "outside_horizon_read": false
+  },
+  "h_3": {
+    "status": "pass",
+    "full_trace_diagnostic": false,
+    "max_visible_request_count": 1,
+    "outside_horizon_read": false
+  },
+  "h_6": {
+    "status": "pass",
+    "full_trace_diagnostic": false,
+    "max_visible_request_count": 1,
+    "outside_horizon_read": false
+  },
+  "h_12": {
+    "status": "pass",
+    "full_trace_diagnostic": false,
+    "max_visible_request_count": 1,
+    "outside_horizon_read": false
+  },
+  "full_trace_diagnostic": {
+    "status": "pass",
+    "full_trace_diagnostic": true,
+    "max_visible_request_count": 1,
+    "outside_horizon_read": false
+  }
+}

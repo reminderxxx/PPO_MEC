@@ -45,7 +45,7 @@ Schema `1.x` may add optional consumer-safe fields but cannot delete or redefine
 
 ## Current boundary and future consumers
 
-The contract enables request hit/source audit, byte denominators from `size_mb`, admission/eviction counts, transfer volumes, residency reconstruction and future reuse joins. G06 implements the identifiable derived metrics; causal eviction regret, latency saved and the G08 oracle remain unavailable. Five G05 classical baselines and slot/MB capacity are separate frozen contracts.
+The contract enables request hit/source audit, byte denominators from `size_mb`, admission/eviction counts, transfer volumes, residency reconstruction and future reuse joins. G06 implements the identifiable derived metrics. G08 now provides a separate policy-neutral replay and finite-horizon placement opportunity oracle; it does not reinterpret observed CacheEvent as oracle input. Causal eviction regret and latency saved remain unavailable. Five G05 classical baselines and slot/MB capacity are separate frozen contracts.
 
 Future byte-capacity and LRU/LFU implementations should consume ordered `request` events and before/after capacity snapshots. A future-horizon oracle should join by episode/time/object and compare placement/victim decisions under the same capacity and request stream. Those are separate tasks and must not reinterpret capacity-disabled artifacts.
 

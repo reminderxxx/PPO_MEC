@@ -2,6 +2,8 @@
 
 `scripts/audit_cache_event_telemetry.py` 是单 episode CacheEvent 对账入口；输出应写入 `artifacts/audits/<audit_id>/`，不得覆盖历史 run summary。
 
+G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cache_request_replay.py`、`scripts/run_future_horizon_cache_oracle.py`、`scripts/audit_cache_oracle_gap.py` 为稳定入口；validation bundle写入 `artifacts/analysis/future_horizon_cache_oracle_validation_<run_id>/`，不得覆盖历史artifact。
+
 ## 根目录
 
 - `README.md`：项目定位、当前阶段、主线命令和实验入口总览

@@ -562,6 +562,17 @@ def build_manifest(
             "cache_event_schema_version": "1.2.0",
             "cache_trace_context_version": "1.0.0",
             "cache_efficiency_metrics_contract_version": "1.0.0",
+            "oracle_companion_contract": {
+                "cache_request_replay_version": "1.0.0",
+                "oracle_contract_version": "future_horizon_cache_oracle_contract_v1.0.0",
+                "allowed_horizons": [1, 3, 6, 12],
+                "objective_identity": "lex_hit_mb_hit_count_transfer_evicted_churn_v1.0.0",
+                "initial_state_fingerprint_source": "G07 initial_per_rsu_cache_contents plus resident object identity",
+                "action_budget_contract": "at_most_one_current_object_admission_per_step",
+                "expected_replay_fingerprint": None,
+                "expected_replay_fingerprint_status": "derived_by_policy_neutral_G08_companion_after_manifest_validation",
+                "compatibility": "optional consumer-safe G07 1.x field; old manifests remain valid",
+            },
         },
         "baseline_matrix": [_load_baseline_entry(root, name) for name in BASELINE_NAMES],
         "metrics_aggregation": {

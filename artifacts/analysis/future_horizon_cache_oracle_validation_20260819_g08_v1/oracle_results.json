@@ -1,0 +1,272 @@
+{
+  "h_1": {
+    "identity": {
+      "oracle_contract_version": "future_horizon_cache_oracle_contract_v1.0.0",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "solver_identity": "exact_rolling_enumeration_v1.0.0",
+      "objective_identity": "lex_hit_mb_hit_count_transfer_evicted_churn_v1.0.0",
+      "objective_lexicographic": [
+        "maximize_future_cache_hit_mb",
+        "maximize_future_cache_hit_count",
+        "minimize_adapter_transfer_mb",
+        "minimize_evicted_mb_and_cache_churn",
+        "canonical_(rsu_id,object_id,action,victims)_tie_break"
+      ],
+      "horizon": 1,
+      "horizon_includes_current_request": true,
+      "rolling_horizon": true,
+      "admission_timing": "action_before_service_lookup_same_step_admission_can_hit",
+      "optimality_status": "optimal",
+      "request_replay_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "g07_manifest_id": "cbfm-90c2dda3fb82e270",
+      "g07_manifest_full_sha256": "fdd2448ab331f0033cd9617484ead78707bbc897c852090af80cf9c71299cb12",
+      "g07_manifest_semantic_sha256": "90c2dda3fb82e270022e351de09c5170a2a70ac26942c94d60782ab545f3dcfd",
+      "git_commit": "5d76596aa08c6589e4cc028d78b3383d48b830e6",
+      "capacity_unit": "adapter_slots",
+      "capacity_value": 3.0,
+      "initial_state_fingerprint": "05626c3f8678a07f559ef8fde77cde1ca3766a364d77632e1c120efd6e5a66b1",
+      "state_limit": 200000,
+      "states_visited": 3
+    },
+    "performance": {
+      "request_count": 1,
+      "total_replay_request_count": 1,
+      "object_hit_count": 1,
+      "object_hit_rate": 1.0,
+      "requested_mb": 64.0,
+      "hit_mb": 64.0,
+      "byte_hit_rate": 1.0,
+      "admission_count": 1,
+      "admission_mb": 64.0,
+      "eviction_event_count": 0,
+      "eviction_victim_count": 0,
+      "evicted_mb": 0.0,
+      "transfer_mb": 64.0,
+      "churn_mb": 64.0,
+      "mean_capacity_occupancy": 0.6666666666666666,
+      "peak_capacity_occupancy": 1.0,
+      "oversized_rejection_count": 0,
+      "latency_saved": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    }
+  },
+  "h_3": {
+    "identity": {
+      "oracle_contract_version": "future_horizon_cache_oracle_contract_v1.0.0",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "solver_identity": "exact_rolling_enumeration_v1.0.0",
+      "objective_identity": "lex_hit_mb_hit_count_transfer_evicted_churn_v1.0.0",
+      "objective_lexicographic": [
+        "maximize_future_cache_hit_mb",
+        "maximize_future_cache_hit_count",
+        "minimize_adapter_transfer_mb",
+        "minimize_evicted_mb_and_cache_churn",
+        "canonical_(rsu_id,object_id,action,victims)_tie_break"
+      ],
+      "horizon": 3,
+      "horizon_includes_current_request": true,
+      "rolling_horizon": true,
+      "admission_timing": "action_before_service_lookup_same_step_admission_can_hit",
+      "optimality_status": "optimal",
+      "request_replay_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "g07_manifest_id": "cbfm-90c2dda3fb82e270",
+      "g07_manifest_full_sha256": "fdd2448ab331f0033cd9617484ead78707bbc897c852090af80cf9c71299cb12",
+      "g07_manifest_semantic_sha256": "90c2dda3fb82e270022e351de09c5170a2a70ac26942c94d60782ab545f3dcfd",
+      "git_commit": "5d76596aa08c6589e4cc028d78b3383d48b830e6",
+      "capacity_unit": "adapter_slots",
+      "capacity_value": 3.0,
+      "initial_state_fingerprint": "05626c3f8678a07f559ef8fde77cde1ca3766a364d77632e1c120efd6e5a66b1",
+      "state_limit": 200000,
+      "states_visited": 3
+    },
+    "performance": {
+      "request_count": 1,
+      "total_replay_request_count": 1,
+      "object_hit_count": 1,
+      "object_hit_rate": 1.0,
+      "requested_mb": 64.0,
+      "hit_mb": 64.0,
+      "byte_hit_rate": 1.0,
+      "admission_count": 1,
+      "admission_mb": 64.0,
+      "eviction_event_count": 0,
+      "eviction_victim_count": 0,
+      "evicted_mb": 0.0,
+      "transfer_mb": 64.0,
+      "churn_mb": 64.0,
+      "mean_capacity_occupancy": 0.6666666666666666,
+      "peak_capacity_occupancy": 1.0,
+      "oversized_rejection_count": 0,
+      "latency_saved": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    }
+  },
+  "h_6": {
+    "identity": {
+      "oracle_contract_version": "future_horizon_cache_oracle_contract_v1.0.0",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "solver_identity": "exact_rolling_enumeration_v1.0.0",
+      "objective_identity": "lex_hit_mb_hit_count_transfer_evicted_churn_v1.0.0",
+      "objective_lexicographic": [
+        "maximize_future_cache_hit_mb",
+        "maximize_future_cache_hit_count",
+        "minimize_adapter_transfer_mb",
+        "minimize_evicted_mb_and_cache_churn",
+        "canonical_(rsu_id,object_id,action,victims)_tie_break"
+      ],
+      "horizon": 6,
+      "horizon_includes_current_request": true,
+      "rolling_horizon": true,
+      "admission_timing": "action_before_service_lookup_same_step_admission_can_hit",
+      "optimality_status": "optimal",
+      "request_replay_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "g07_manifest_id": "cbfm-90c2dda3fb82e270",
+      "g07_manifest_full_sha256": "fdd2448ab331f0033cd9617484ead78707bbc897c852090af80cf9c71299cb12",
+      "g07_manifest_semantic_sha256": "90c2dda3fb82e270022e351de09c5170a2a70ac26942c94d60782ab545f3dcfd",
+      "git_commit": "5d76596aa08c6589e4cc028d78b3383d48b830e6",
+      "capacity_unit": "adapter_slots",
+      "capacity_value": 3.0,
+      "initial_state_fingerprint": "05626c3f8678a07f559ef8fde77cde1ca3766a364d77632e1c120efd6e5a66b1",
+      "state_limit": 200000,
+      "states_visited": 3
+    },
+    "performance": {
+      "request_count": 1,
+      "total_replay_request_count": 1,
+      "object_hit_count": 1,
+      "object_hit_rate": 1.0,
+      "requested_mb": 64.0,
+      "hit_mb": 64.0,
+      "byte_hit_rate": 1.0,
+      "admission_count": 1,
+      "admission_mb": 64.0,
+      "eviction_event_count": 0,
+      "eviction_victim_count": 0,
+      "evicted_mb": 0.0,
+      "transfer_mb": 64.0,
+      "churn_mb": 64.0,
+      "mean_capacity_occupancy": 0.6666666666666666,
+      "peak_capacity_occupancy": 1.0,
+      "oversized_rejection_count": 0,
+      "latency_saved": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    }
+  },
+  "h_12": {
+    "identity": {
+      "oracle_contract_version": "future_horizon_cache_oracle_contract_v1.0.0",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "solver_identity": "exact_rolling_enumeration_v1.0.0",
+      "objective_identity": "lex_hit_mb_hit_count_transfer_evicted_churn_v1.0.0",
+      "objective_lexicographic": [
+        "maximize_future_cache_hit_mb",
+        "maximize_future_cache_hit_count",
+        "minimize_adapter_transfer_mb",
+        "minimize_evicted_mb_and_cache_churn",
+        "canonical_(rsu_id,object_id,action,victims)_tie_break"
+      ],
+      "horizon": 12,
+      "horizon_includes_current_request": true,
+      "rolling_horizon": true,
+      "admission_timing": "action_before_service_lookup_same_step_admission_can_hit",
+      "optimality_status": "optimal",
+      "request_replay_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "g07_manifest_id": "cbfm-90c2dda3fb82e270",
+      "g07_manifest_full_sha256": "fdd2448ab331f0033cd9617484ead78707bbc897c852090af80cf9c71299cb12",
+      "g07_manifest_semantic_sha256": "90c2dda3fb82e270022e351de09c5170a2a70ac26942c94d60782ab545f3dcfd",
+      "git_commit": "5d76596aa08c6589e4cc028d78b3383d48b830e6",
+      "capacity_unit": "adapter_slots",
+      "capacity_value": 3.0,
+      "initial_state_fingerprint": "05626c3f8678a07f559ef8fde77cde1ca3766a364d77632e1c120efd6e5a66b1",
+      "state_limit": 200000,
+      "states_visited": 3
+    },
+    "performance": {
+      "request_count": 1,
+      "total_replay_request_count": 1,
+      "object_hit_count": 1,
+      "object_hit_rate": 1.0,
+      "requested_mb": 64.0,
+      "hit_mb": 64.0,
+      "byte_hit_rate": 1.0,
+      "admission_count": 1,
+      "admission_mb": 64.0,
+      "eviction_event_count": 0,
+      "eviction_victim_count": 0,
+      "evicted_mb": 0.0,
+      "transfer_mb": 64.0,
+      "churn_mb": 64.0,
+      "mean_capacity_occupancy": 0.6666666666666666,
+      "peak_capacity_occupancy": 1.0,
+      "oversized_rejection_count": 0,
+      "latency_saved": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    }
+  },
+  "full_trace_diagnostic": {
+    "identity": {
+      "oracle_contract_version": "future_horizon_cache_oracle_contract_v1.0.0",
+      "oracle_identity": "full_trace_exact_diagnostic_v1.0.0",
+      "solver_identity": "exact_rolling_enumeration_v1.0.0",
+      "objective_identity": "lex_hit_mb_hit_count_transfer_evicted_churn_v1.0.0",
+      "objective_lexicographic": [
+        "maximize_future_cache_hit_mb",
+        "maximize_future_cache_hit_count",
+        "minimize_adapter_transfer_mb",
+        "minimize_evicted_mb_and_cache_churn",
+        "canonical_(rsu_id,object_id,action,victims)_tie_break"
+      ],
+      "horizon": "full_trace",
+      "horizon_includes_current_request": true,
+      "rolling_horizon": false,
+      "admission_timing": "action_before_service_lookup_same_step_admission_can_hit",
+      "optimality_status": "optimal",
+      "request_replay_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "g07_manifest_id": "cbfm-90c2dda3fb82e270",
+      "g07_manifest_full_sha256": "fdd2448ab331f0033cd9617484ead78707bbc897c852090af80cf9c71299cb12",
+      "g07_manifest_semantic_sha256": "90c2dda3fb82e270022e351de09c5170a2a70ac26942c94d60782ab545f3dcfd",
+      "git_commit": "5d76596aa08c6589e4cc028d78b3383d48b830e6",
+      "capacity_unit": "adapter_slots",
+      "capacity_value": 3.0,
+      "initial_state_fingerprint": "05626c3f8678a07f559ef8fde77cde1ca3766a364d77632e1c120efd6e5a66b1",
+      "state_limit": 200000,
+      "states_visited": 3
+    },
+    "performance": {
+      "request_count": 1,
+      "total_replay_request_count": 1,
+      "object_hit_count": 1,
+      "object_hit_rate": 1.0,
+      "requested_mb": 64.0,
+      "hit_mb": 64.0,
+      "byte_hit_rate": 1.0,
+      "admission_count": 1,
+      "admission_mb": 64.0,
+      "eviction_event_count": 0,
+      "eviction_victim_count": 0,
+      "evicted_mb": 0.0,
+      "transfer_mb": 64.0,
+      "churn_mb": 64.0,
+      "mean_capacity_occupancy": 0.6666666666666666,
+      "peak_capacity_occupancy": 1.0,
+      "oversized_rejection_count": 0,
+      "latency_saved": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    }
+  }
+}

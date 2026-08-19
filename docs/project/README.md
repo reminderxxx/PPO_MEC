@@ -4,6 +4,10 @@
 
 ## Live 文档
 
+- `cache_request_replay_contract.md`：G08 policy-neutral request replay schema、fingerprint和outcome隔离规则
+- `future_horizon_cache_oracle_contract.md`：G08 exact rolling finite-horizon oracle、可行域、objective、gap和artifact合同
+- `cache_oracle_identifiability_feasibility_audit.md`：G08修改前的request内生性、真实时序和可识别性源码审计
+
 - `../../AGENTS.md`：AI 协作硬约束和项目主线规则
 - `CONTEXT.md`：当前稳定上下文、正式入口和结论边界
 - `PROGRESS.md`：已确认阶段事实和整理动作

@@ -223,6 +223,11 @@
 
 ## 当前风险
 
+- G08 遵循当前环境“cache action 先于 service lookup”的同 step admission-hit语义；短 replay 可能让baseline与oracle都达到100% hit并出现零gap。这是合同事实，不代表算法已接近常见pre-request cache oracle上界。若未来改成lookup-before-admission，必须升级major contract并重跑比较。
+- `adapter_slots` 中每个incoming adapter只占1 slot，且valid initial state不超容量，因此一次admission最多需要1个victim；“slot multi-victim”在当前合同下结构性not applicable。multi-victim有效验证位于MB heterogeneous-size stratum。
+- G08 solver支持MB不代表 `benchmark_main_results.py` 已完成五baseline的MB runtime公平比较；G07 runner仍只消费slot stratum。
+- G08 validation只有controlled单request unit，不能支持oracle gap大小、算法接近上界、causal regret或latency gain结论。request-level observed/counterfactual latency仍缺失。
+
 - 2026-06-21 最近邻审查确认：TMC 2026 已有 DAG timing/data dependency + MADDPG，以及 mobility-aware parallel-task cross-RSU collaborative offloading；IoT Journal 2025 已有 dependency-aware hierarchical VEC offloading。论文不能把 `DAG + mobility + MARL`、`DAG + hierarchy` 或 graph-assisted VEC offloading 单独写成 novelty。
 - `Dual Dependency-Aware Collaborative Service Caching and Task Offloading in VEC` 已覆盖 DAG/task dependency、service dependency、hierarchical cache 和 PPO；若 PPO_MEC 缺少 adapter size/load/warm/migration latency 或 serving-profile 证据，adapter cache 容易被审稿人视为 service cache 重命名。
 - 当前可守 novelty 是完整联合 contract，而非单组件：跨 RSU continuous workflow state、adapter warm-state lifecycle、predictive handoff preparation/state migration 和 cache/execution/event 三时间尺度控制。任一元素拆开都已有强近邻，相关绝对首次表述会形成 novelty blocker。

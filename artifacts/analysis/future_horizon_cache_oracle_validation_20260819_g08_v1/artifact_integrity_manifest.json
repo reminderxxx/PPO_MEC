@@ -1,0 +1,57 @@
+{
+  "artifact_integrity_manifest_version": "1.0.0",
+  "manifest_validation_status": "pass",
+  "request_replay_validation_status": "pass",
+  "files": [
+    {
+      "path": "baseline_oracle_gap.json",
+      "size_bytes": 25602,
+      "sha256": "88804495e937ea2f7f99379a933256fa945c9d298ef768d67c85b231ef60536e"
+    },
+    {
+      "path": "capacity_invariant_audit.json",
+      "size_bytes": 692,
+      "sha256": "f42ea0284ff782aa1f259582fe6ce5258e07b8f3b759294518252fdb0310fd8b"
+    },
+    {
+      "path": "command_log.json",
+      "size_bytes": 3801,
+      "sha256": "73c131aaeaceec7481d11a5f56405fed921fcdcfcc87f757a3b5f346a5566d08"
+    },
+    {
+      "path": "horizon_information_audit.json",
+      "size_bytes": 741,
+      "sha256": "22ff1a121adc9d7a83748048fb974e4f09ff6b4b09c17a21d43221e32c3f795d"
+    },
+    {
+      "path": "observed_baseline_outcomes.json",
+      "size_bytes": 4093,
+      "sha256": "a2d2b368f03ccfeaa7040dedb77f6a5d34c73144f7aa15dfd7359cc18a6c9b83"
+    },
+    {
+      "path": "oracle_action_trace.json",
+      "size_bytes": 8512,
+      "sha256": "6d23d9583b10a2af9e6287779bfcdf4ea69e1d22aa953e363af32921665096e6"
+    },
+    {
+      "path": "oracle_config.json",
+      "size_bytes": 430,
+      "sha256": "2764ede7c163c07cd6dcd60331f0970efb1c4d26fe21a01a9d78ffe9c923f338"
+    },
+    {
+      "path": "oracle_results.json",
+      "size_bytes": 11174,
+      "sha256": "32e9abb886aa6c4fdb0e7bb6b2a96e843ce6bb87c545eaf1f5574d4618e69a84"
+    },
+    {
+      "path": "request_replay.json",
+      "size_bytes": 3631,
+      "sha256": "76d8317d7e210c2d8b2c090155216dfd88b836ca7cb10848e5b71c1e7401b174"
+    },
+    {
+      "path": "request_replay_validation.json",
+      "size_bytes": 195,
+      "sha256": "a3a8340f4a4f07bdeeaa1e137dcb200bf581a1629bf26114d71a1c612800ce6b"
+    }
+  ]
+}

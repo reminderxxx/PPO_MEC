@@ -1374,3 +1374,11 @@ quick run 结果边界：
 - CacheEvent consumer-safe 升级到 `1.2.0`，只新增 optional admission identity/size 与逐 victim size；recorder 增加 initial/final per-RSU cache snapshot。旧 1.0/1.1 trace 继续读取，缺 context/field 的 group 为 partial/unavailable，不补零。
 - latency saved 审计结论为 unavailable：当前缺逐 request observed 与 cold/cloud counterfactual latency，未使用 reward/delay surrogate。Benchmark row/aggregate 仅接入 nullable scalar。
 - 新增 `scripts/audit_cache_efficiency_metrics.py`。本轮仅做 synthetic、controlled baseline、smoke 与最小 real dry-run contract 验证，不实现 G07 fairness manifest、G08 oracle，不运行 formal/hidden，不形成算法优劣结论。
+
+## 2026-08-19: G08 Future-Horizon Cache Oracle Contract frozen
+
+- 新增 policy-neutral `cache_request_replay_version=1.0.0`：复用 G07 的 Alibaba workflow、NGSIM window、RSU mapper、catalog和evaluation unit，不执行 cache/service policy，不从 baseline hit/miss 反推请求。
+- 新增 exact rolling oracle，支持 H=1/3/6/12、slot/MB、heterogeneous size、per-RSU isolation、oversized、MB multi-victim、deterministic tie-break、state-limit unknown和 full-trace独立diagnostic identity。
+- 源码审计冻结真实时序：环境同 step 先 cache action 后 service hit lookup，故合法 admission 可命中当前 request；trace 分开记录 pre/post-action hit。
+- matched raw outcome comparison 对 fingerprint、capacity或initial-state不匹配fail-fast。G06 proxy、reward和legacy aggregate不能冒充oracle gap；latency gap继续unavailable。
+- controlled artifact为 `artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/`。四个H与full-trace均exact optimal；单request reactive LRU gap为0。该结果仅验证合同，不是formal/holdout/hidden或性能结论。

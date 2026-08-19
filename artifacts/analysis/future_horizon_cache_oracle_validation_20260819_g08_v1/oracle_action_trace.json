@@ -1,0 +1,302 @@
+{
+  "h_1": [
+    {
+      "request_id": "seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3/request_000001",
+      "step_index": 1,
+      "request_order": 0,
+      "visible_request_ids": [
+        "seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3/request_000001"
+      ],
+      "visible_start_index": 0,
+      "visible_end_index_exclusive": 1,
+      "pre_action_hit": false,
+      "post_action_hit": true,
+      "action": "admit",
+      "cache_target_rsu_id": "rsu_c",
+      "admitted_object_id": "adapter:adapter_batch_type_1",
+      "evicted_object_ids": [],
+      "rejection_reason": null,
+      "adapter_transfer_mb": 64.0,
+      "evicted_mb": 0.0,
+      "cache_churn_mb": 64.0,
+      "rolling_plan_objective": {
+        "hit_mb": 64.0,
+        "hit_count": 1,
+        "transfer_mb": 64.0,
+        "evicted_mb": 0.0
+      },
+      "post_state": {
+        "rsu_a": [
+          "adapter:adapter_perception"
+        ],
+        "rsu_b": [
+          "adapter:adapter_fusion",
+          "cache_obj_tracking"
+        ],
+        "rsu_c": [
+          "adapter:adapter_batch_type_1",
+          "adapter:adapter_intent",
+          "cache_obj_control"
+        ]
+      },
+      "post_state_fingerprint": "44c86f160d126a2867f99a4f1ae50bdf89d28e8a459b931cad7498f958d384c8",
+      "capacity_occupancy": {
+        "rsu_a": {
+          "used": 1.0,
+          "capacity": 3.0,
+          "occupancy_rate": 0.3333333333333333
+        },
+        "rsu_b": {
+          "used": 2.0,
+          "capacity": 3.0,
+          "occupancy_rate": 0.6666666666666666
+        },
+        "rsu_c": {
+          "used": 3.0,
+          "capacity": 3.0,
+          "occupancy_rate": 1.0
+        }
+      }
+    }
+  ],
+  "h_3": [
+    {
+      "request_id": "seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3/request_000001",
+      "step_index": 1,
+      "request_order": 0,
+      "visible_request_ids": [
+        "seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3/request_000001"
+      ],
+      "visible_start_index": 0,
+      "visible_end_index_exclusive": 1,
+      "pre_action_hit": false,
+      "post_action_hit": true,
+      "action": "admit",
+      "cache_target_rsu_id": "rsu_c",
+      "admitted_object_id": "adapter:adapter_batch_type_1",
+      "evicted_object_ids": [],
+      "rejection_reason": null,
+      "adapter_transfer_mb": 64.0,
+      "evicted_mb": 0.0,
+      "cache_churn_mb": 64.0,
+      "rolling_plan_objective": {
+        "hit_mb": 64.0,
+        "hit_count": 1,
+        "transfer_mb": 64.0,
+        "evicted_mb": 0.0
+      },
+      "post_state": {
+        "rsu_a": [
+          "adapter:adapter_perception"
+        ],
+        "rsu_b": [
+          "adapter:adapter_fusion",
+          "cache_obj_tracking"
+        ],
+        "rsu_c": [
+          "adapter:adapter_batch_type_1",
+          "adapter:adapter_intent",
+          "cache_obj_control"
+        ]
+      },
+      "post_state_fingerprint": "44c86f160d126a2867f99a4f1ae50bdf89d28e8a459b931cad7498f958d384c8",
+      "capacity_occupancy": {
+        "rsu_a": {
+          "used": 1.0,
+          "capacity": 3.0,
+          "occupancy_rate": 0.3333333333333333
+        },
+        "rsu_b": {
+          "used": 2.0,
+          "capacity": 3.0,
+          "occupancy_rate": 0.6666666666666666
+        },
+        "rsu_c": {
+          "used": 3.0,
+          "capacity": 3.0,
+          "occupancy_rate": 1.0
+        }
+      }
+    }
+  ],
+  "h_6": [
+    {
+      "request_id": "seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3/request_000001",
+      "step_index": 1,
+      "request_order": 0,
+      "visible_request_ids": [
+        "seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3/request_000001"
+      ],
+      "visible_start_index": 0,
+      "visible_end_index_exclusive": 1,
+      "pre_action_hit": false,
+      "post_action_hit": true,
+      "action": "admit",
+      "cache_target_rsu_id": "rsu_c",
+      "admitted_object_id": "adapter:adapter_batch_type_1",
+      "evicted_object_ids": [],
+      "rejection_reason": null,
+      "adapter_transfer_mb": 64.0,
+      "evicted_mb": 0.0,
+      "cache_churn_mb": 64.0,
+      "rolling_plan_objective": {
+        "hit_mb": 64.0,
+        "hit_count": 1,
+        "transfer_mb": 64.0,
+        "evicted_mb": 0.0
+      },
+      "post_state": {
+        "rsu_a": [
+          "adapter:adapter_perception"
+        ],
+        "rsu_b": [
+          "adapter:adapter_fusion",
+          "cache_obj_tracking"
+        ],
+        "rsu_c": [
+          "adapter:adapter_batch_type_1",
+          "adapter:adapter_intent",
+          "cache_obj_control"
+        ]
+      },
+      "post_state_fingerprint": "44c86f160d126a2867f99a4f1ae50bdf89d28e8a459b931cad7498f958d384c8",
+      "capacity_occupancy": {
+        "rsu_a": {
+          "used": 1.0,
+          "capacity": 3.0,
+          "occupancy_rate": 0.3333333333333333
+        },
+        "rsu_b": {
+          "used": 2.0,
+          "capacity": 3.0,
+          "occupancy_rate": 0.6666666666666666
+        },
+        "rsu_c": {
+          "used": 3.0,
+          "capacity": 3.0,
+          "occupancy_rate": 1.0
+        }
+      }
+    }
+  ],
+  "h_12": [
+    {
+      "request_id": "seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3/request_000001",
+      "step_index": 1,
+      "request_order": 0,
+      "visible_request_ids": [
+        "seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3/request_000001"
+      ],
+      "visible_start_index": 0,
+      "visible_end_index_exclusive": 1,
+      "pre_action_hit": false,
+      "post_action_hit": true,
+      "action": "admit",
+      "cache_target_rsu_id": "rsu_c",
+      "admitted_object_id": "adapter:adapter_batch_type_1",
+      "evicted_object_ids": [],
+      "rejection_reason": null,
+      "adapter_transfer_mb": 64.0,
+      "evicted_mb": 0.0,
+      "cache_churn_mb": 64.0,
+      "rolling_plan_objective": {
+        "hit_mb": 64.0,
+        "hit_count": 1,
+        "transfer_mb": 64.0,
+        "evicted_mb": 0.0
+      },
+      "post_state": {
+        "rsu_a": [
+          "adapter:adapter_perception"
+        ],
+        "rsu_b": [
+          "adapter:adapter_fusion",
+          "cache_obj_tracking"
+        ],
+        "rsu_c": [
+          "adapter:adapter_batch_type_1",
+          "adapter:adapter_intent",
+          "cache_obj_control"
+        ]
+      },
+      "post_state_fingerprint": "44c86f160d126a2867f99a4f1ae50bdf89d28e8a459b931cad7498f958d384c8",
+      "capacity_occupancy": {
+        "rsu_a": {
+          "used": 1.0,
+          "capacity": 3.0,
+          "occupancy_rate": 0.3333333333333333
+        },
+        "rsu_b": {
+          "used": 2.0,
+          "capacity": 3.0,
+          "occupancy_rate": 0.6666666666666666
+        },
+        "rsu_c": {
+          "used": 3.0,
+          "capacity": 3.0,
+          "occupancy_rate": 1.0
+        }
+      }
+    }
+  ],
+  "full_trace_diagnostic": [
+    {
+      "request_id": "seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3/request_000001",
+      "step_index": 1,
+      "request_order": 0,
+      "visible_request_ids": [
+        "seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3/request_000001"
+      ],
+      "visible_start_index": 0,
+      "visible_end_index_exclusive": 1,
+      "pre_action_hit": false,
+      "post_action_hit": true,
+      "action": "admit",
+      "cache_target_rsu_id": "rsu_c",
+      "admitted_object_id": "adapter:adapter_batch_type_1",
+      "evicted_object_ids": [],
+      "rejection_reason": null,
+      "adapter_transfer_mb": 64.0,
+      "evicted_mb": 0.0,
+      "cache_churn_mb": 64.0,
+      "rolling_plan_objective": {
+        "hit_mb": 64.0,
+        "hit_count": 1,
+        "transfer_mb": 64.0,
+        "evicted_mb": 0.0
+      },
+      "post_state": {
+        "rsu_a": [
+          "adapter:adapter_perception"
+        ],
+        "rsu_b": [
+          "adapter:adapter_fusion",
+          "cache_obj_tracking"
+        ],
+        "rsu_c": [
+          "adapter:adapter_batch_type_1",
+          "adapter:adapter_intent",
+          "cache_obj_control"
+        ]
+      },
+      "post_state_fingerprint": "44c86f160d126a2867f99a4f1ae50bdf89d28e8a459b931cad7498f958d384c8",
+      "capacity_occupancy": {
+        "rsu_a": {
+          "used": 1.0,
+          "capacity": 3.0,
+          "occupancy_rate": 0.3333333333333333
+        },
+        "rsu_b": {
+          "used": 2.0,
+          "capacity": 3.0,
+          "occupancy_rate": 0.6666666666666666
+        },
+        "rsu_c": {
+          "used": 3.0,
+          "capacity": 3.0,
+          "occupancy_rate": 1.0
+        }
+      }
+    }
+  ]
+}

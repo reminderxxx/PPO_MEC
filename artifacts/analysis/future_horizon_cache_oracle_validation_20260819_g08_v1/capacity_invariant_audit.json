@@ -1,0 +1,32 @@
+{
+  "h_1": {
+    "status": "pass",
+    "checked_step_count": 1,
+    "capacity_never_exceeded": true,
+    "per_rsu_isolation": true
+  },
+  "h_3": {
+    "status": "pass",
+    "checked_step_count": 1,
+    "capacity_never_exceeded": true,
+    "per_rsu_isolation": true
+  },
+  "h_6": {
+    "status": "pass",
+    "checked_step_count": 1,
+    "capacity_never_exceeded": true,
+    "per_rsu_isolation": true
+  },
+  "h_12": {
+    "status": "pass",
+    "checked_step_count": 1,
+    "capacity_never_exceeded": true,
+    "per_rsu_isolation": true
+  },
+  "full_trace_diagnostic": {
+    "status": "pass",
+    "checked_step_count": 1,
+    "capacity_never_exceeded": true,
+    "per_rsu_isolation": true
+  }
+}

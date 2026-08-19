@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-08-19: G08 使用外生 replay、现有同step时序与 exact rolling identity
+
+- 不从baseline CacheEvent outcome构造request stream；使用G07 provider/workflow/mobility companion producer冻结policy-neutral replay。
+- 按源码保留action-before-lookup语义，同step current-RSU admission可命中当前request；若改时序必须升级major contract。
+- v1 oracle只控制current-RSU placement/admission/victim/noop，排除prefetch、migration、vehicle/cloud和non-cache control。
+- 主objective依次优化hit MB、hit count、transfer、evicted/churn；finite H与full-trace diagnostic使用不同identity。state limit返回unknown，不静默greedy。
+- gap只称placement opportunity gap；latency saved与causal regret仍不可识别。G07 1.0保持兼容，新oracle字段是optional companion extension。
+
 ## 2026-08-18 — Cache comparison以validated fairness manifest作为唯一协议来源
 
 决定：五个classical reactive baseline及后续G08 oracle必须消费`cache_baseline_fairness_manifest_version=1.0.0`；不得再以CLI默认值、完整config hash、`window_rank_offset`或历史aggregate作为公平性协议来源。Manifest冻结dataset content、raw frame/time、DAG request plan、seed、capacity/catalog/initial cache、G01/G03/G06、aggregation与artifact provenance，pairwise只允许eviction policy identity相关字段变化。

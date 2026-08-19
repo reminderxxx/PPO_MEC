@@ -1,0 +1,99 @@
+{
+  "cache_request_replay_version": "1.0.0",
+  "producer": {
+    "identity": "policy_neutral_dag_mobility_replay_v1",
+    "policy_neutral": true,
+    "executes_cache_policy": false,
+    "executes_service_policy": false,
+    "workflow_provider": "WorkflowDatasetBuilder.build_selected_alibaba_workflow_states",
+    "mobility_provider": "load_window_bundle/NGSIMProvider/ReplayProvider",
+    "rsu_mapper": "RSUMapper"
+  },
+  "source_manifest": {
+    "manifest_id": "cbfm-90c2dda3fb82e270",
+    "full_manifest_sha256": "fdd2448ab331f0033cd9617484ead78707bbc897c852090af80cf9c71299cb12",
+    "semantic_protocol_sha256": "90c2dda3fb82e270022e351de09c5170a2a70ac26942c94d60782ab545f3dcfd",
+    "git_commit": "5d76596aa08c6589e4cc028d78b3383d48b830e6"
+  },
+  "evaluation_unit": {
+    "evaluation_unit_id": "seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3",
+    "benchmark_run_seed": 7,
+    "window_id": "window_peachtree_off0_len24_t1163034800_1163037800",
+    "workflow_id": "j_3",
+    "workflow_dag_sha256": "9cb7efae5d337b71bc63fb4d95436f5369f9c371ee70787d98e43a57a68cb148",
+    "expected_workload_fingerprint": "afb6b86646b31bb2ecba3b82b3f2315a3680d1ac76ceebba18c06ec74caeb406",
+    "raw_frame_interval": {
+      "start": 0,
+      "end": 23
+    },
+    "raw_time_interval": {
+      "start": 1163034800,
+      "end": 1163037800
+    }
+  },
+  "request_semantics": {
+    "request_source": "policy_neutral_static_dag_execution_order_plus_mobility_topology",
+    "outcome_fields_forbidden": [
+      "actual_admission",
+      "actual_cache_hit",
+      "actual_execution_result",
+      "actual_policy_state",
+      "actual_victim",
+      "admission_added",
+      "baseline_cache_contents",
+      "cache_hit",
+      "evicted_object_ids",
+      "hit_source",
+      "reward",
+      "service_success",
+      "stall_occurred"
+    ],
+    "admission_timing": "action_before_service_lookup_same_step_admission_can_hit",
+    "action_budget": "at_most_one_current_object_admission_per_step",
+    "oracle_control_scope": "current_rsu_placement_admission_eviction_or_noop"
+  },
+  "requests": [
+    {
+      "request_id": "seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3/request_000001",
+      "evaluation_unit_id": "seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3",
+      "episode_id": "policy-neutral/seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3",
+      "step_index": 1,
+      "time_index": 1163034900,
+      "request_order": 0,
+      "vehicle_id": "peachtree:15",
+      "workflow_id": "j_3",
+      "node_id": "task_3",
+      "required_base_model": "veh_base_v1",
+      "object_id": "adapter:adapter_batch_type_1",
+      "adapter_id": "adapter_batch_type_1",
+      "object_size_mb": 64.0,
+      "size_source": "catalog_fallback",
+      "request_rsu_id": "rsu_b",
+      "current_service_rsu_id": "rsu_c",
+      "previous_rsu_id": null,
+      "actual_next_rsu_id": "rsu_c",
+      "predicted_next_rsu_id": null,
+      "actual_handoff_target_rsu_id": "rsu_c",
+      "predicted_handoff_target_rsu_id": null,
+      "eligible_service_rsu_ids": [
+        "rsu_c"
+      ],
+      "eligible_cache_target_rsu_ids": [
+        "rsu_c"
+      ],
+      "dag_provenance": {
+        "workflow_dag_sha256": "9cb7efae5d337b71bc63fb4d95436f5369f9c371ee70787d98e43a57a68cb148",
+        "execution_order_index": 0,
+        "predecessors": [],
+        "successors": [
+          "task_1",
+          "task_4",
+          "task_6",
+          "task_8"
+        ],
+        "policy_neutral_progression": true
+      }
+    }
+  ],
+  "request_replay_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4"
+}

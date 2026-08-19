@@ -1,5 +1,14 @@
 # Artifact Records
 
+## 2026-08-19 G08 Future-Horizon Cache Oracle validation
+
+- path: `artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/`
+- source: G07 controlled non-hidden unit `seed_7/window_peachtree_off0_len24_t1163034800_1163037800/j_3`
+- replay: policy-neutral fingerprint `7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4`; five reactive baseline raw summaries align to the same fingerprint
+- solver: H=1/3/6/12 rolling exact and separately identified full-trace diagnostic are `optimal`; capacity/horizon audits pass
+- controlled result: one request, oracle hit count 1 / hit MB 64; all five matched baseline gaps are 0 for object hit, hit MB, transfer and churn
+- boundary: contract validation only; not formal/holdout/hidden, not algorithm ranking, causal regret, upper-bound performance claim or latency-gain evidence
+
 ## 2026-08-11: v118-v121 matched planner-internalization negative package
 
 - Full training roots: `artifacts/experiments/top_journal_v100_rng_fixed_full_seed{7,13,29}_20260811/` and `artifacts/experiments/top_journal_v118_full_seed{7,13,29}_20260811/`; every `latest.pt` records 256 episodes, 32 updates, zero offset and non-smoke provenance.

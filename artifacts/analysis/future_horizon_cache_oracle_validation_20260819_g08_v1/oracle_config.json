@@ -1,0 +1,14 @@
+{
+  "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/cache_baseline_fairness_manifest.json",
+  "request_replay_path": "/private/tmp/g08_request_replay_v2.json",
+  "horizons": [
+    1,
+    3,
+    6,
+    12
+  ],
+  "state_limit": 200000,
+  "full_trace_diagnostic": true,
+  "hidden_input_allowed": false,
+  "formal_benchmark_executed": false
+}

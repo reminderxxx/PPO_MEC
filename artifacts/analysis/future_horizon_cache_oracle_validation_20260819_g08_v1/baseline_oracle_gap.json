@@ -1,0 +1,587 @@
+{
+  "h_1": {
+    "reactive_aging_lfu/aging_lfu": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_aging_lfu/aging_lfu",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 1,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_fifo/fifo": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_fifo/fifo",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 1,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_lfu/lfu": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_lfu/lfu",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 1,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_lru/lru": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_lru/lru",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 1,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_random/random": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_random/random",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 1,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    }
+  },
+  "h_3": {
+    "reactive_aging_lfu/aging_lfu": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_aging_lfu/aging_lfu",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 3,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_fifo/fifo": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_fifo/fifo",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 3,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_lfu/lfu": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_lfu/lfu",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 3,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_lru/lru": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_lru/lru",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 3,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_random/random": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_random/random",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 3,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    }
+  },
+  "h_6": {
+    "reactive_aging_lfu/aging_lfu": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_aging_lfu/aging_lfu",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 6,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_fifo/fifo": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_fifo/fifo",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 6,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_lfu/lfu": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_lfu/lfu",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 6,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_lru/lru": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_lru/lru",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 6,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_random/random": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_random/random",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 6,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    }
+  },
+  "h_12": {
+    "reactive_aging_lfu/aging_lfu": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_aging_lfu/aging_lfu",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 12,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_fifo/fifo": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_fifo/fifo",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 12,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_lfu/lfu": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_lfu/lfu",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 12,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_lru/lru": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_lru/lru",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 12,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_random/random": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_random/random",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "rolling_finite_horizon_exact_v1.0.0",
+      "horizon": 12,
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    }
+  },
+  "full_trace_diagnostic": {
+    "reactive_aging_lfu/aging_lfu": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_aging_lfu/aging_lfu",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "full_trace_exact_diagnostic_v1.0.0",
+      "horizon": "full_trace",
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_fifo/fifo": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_fifo/fifo",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "full_trace_exact_diagnostic_v1.0.0",
+      "horizon": "full_trace",
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_lfu/lfu": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_lfu/lfu",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "full_trace_exact_diagnostic_v1.0.0",
+      "horizon": "full_trace",
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_lru/lru": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_lru/lru",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "full_trace_exact_diagnostic_v1.0.0",
+      "horizon": "full_trace",
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    },
+    "reactive_random/random": {
+      "comparable_status": "matched",
+      "incompatibility_reasons": [],
+      "observed_baseline_identity": "reactive_random/random",
+      "observed_request_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+      "oracle_identity": "full_trace_exact_diagnostic_v1.0.0",
+      "horizon": "full_trace",
+      "gaps": {
+        "object_hit_gap_oracle_minus_baseline": 0,
+        "hit_mb_gap_oracle_minus_baseline": 0.0,
+        "transfer_gap_baseline_minus_oracle_mb": 0.0,
+        "churn_gap_baseline_minus_oracle_mb": 0.0,
+        "normalized_object_hit_gap": 0.0,
+        "normalized_hit_mb_gap": 0.0
+      },
+      "interpretation": "matched placement opportunity gap; not causal regret or end-to-end latency gain",
+      "g06_future_reuse_proxy": "separate_not_used",
+      "latency_gap": {
+        "availability": "unavailable",
+        "value": null,
+        "reason": "request-aligned observed and counterfactual latency components are absent"
+      }
+    }
+  }
+}

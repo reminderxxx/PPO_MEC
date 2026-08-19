@@ -1,5 +1,11 @@
 # Code Module Map
 
+## G08 oracle
+
+- `src/oracles/cache_request_replay.py`：policy-neutral replay schema、canonical fingerprint、G07/provider/workflow reconstruction和validation。
+- `src/oracles/future_horizon_cache_oracle.py`：slot/MB exact rolling solver、capacity/action trace、optimality status、raw outcome alignment和matched gap；不依赖reward、agent或aggregate。
+- `scripts/build_cache_request_replay.py`、`scripts/run_future_horizon_cache_oracle.py`、`scripts/audit_cache_oracle_gap.py`：稳定构建、运行和审计入口。
+
 ## 2026-08-18 G07 cache baseline fairness manifest
 
 - `src/evaluators/cache_baseline_fairness.py`：canonical JSON/hash、schema builder/validator、dataset/window/workload/seed/cache/metric invariants、10组pairwise diff、runtime fingerprint/provenance enforcement。

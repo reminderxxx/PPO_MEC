@@ -2,6 +2,8 @@
 
 版本：`cache_baseline_fairness_manifest_version = 1.0.0`（G07，2026-08-18）
 
+2026-08-19 G08 以 companion contract 集成：新 builder 可在 `cache_contract.oracle_companion_contract` 写入 replay/oracle version、H、objective、initial-state fingerprint source、action budget和 expected replay fingerprint 派生状态。该字段是 optional consumer-safe 1.x extension；既有 G07 `1.0.0` manifest 不含它仍可校验和消费。实际 replay fingerprint 只能由 policy-neutral producer 生成，不能填入或复用 legacy observed fingerprint。
+
 ## 目的与边界
 
 本合同是五个 classical reactive cache baseline 以及后续 G08 oracle 的唯一比较协议来源。对同一 evaluation unit，唯一允许变化的主要实验因素是 eviction policy identity。manifest 校验通过不表示实验已运行；controlled/smoke 运行不构成 formal、holdout、hidden 或算法优劣证据。G07 不实现 G08 oracle、causal eviction regret 或 request-level latency saved。

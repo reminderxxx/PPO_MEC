@@ -1,10 +1,12 @@
 ﻿# Context
 
-更新日期：2026-07-21
+更新日期：2026-08-19
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
 ## 项目状态
+
+- G08 live contract：`cache_request_replay_version=1.0.0` + `future_horizon_cache_oracle_contract_v1.0.0`。输入必须是独立policy-neutral DAG/mobility replay；oracle只控制current-RSU placement/admission/eviction，并按当前环境同step admission可命中的真实时序运行exact rolling H=1/3/6/12。matched gap仅为placement opportunity gap，不是causal regret或latency gain；当前validation未运行formal/holdout/hidden。
 
 - 项目：`PPO_MEC`
 - 定位：面向 AI-driven VEC 的研究原型

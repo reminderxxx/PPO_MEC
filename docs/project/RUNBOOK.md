@@ -1,5 +1,14 @@
 # Runbook
 
+## G08 policy-neutral request replay 与 cache oracle
+
+```bash
+.venv/bin/python scripts/build_cache_request_replay.py --fairness_manifest_path <g07_manifest.json> --evaluation_unit_id <seed/window/workflow> --output_path <new_request_replay.json>
+.venv/bin/python scripts/run_future_horizon_cache_oracle.py --fairness_manifest_path <g07_manifest.json> --request_replay_path <request_replay.json> --observed_baseline_path <raw_episode.summary.json> --output_dir artifacts/analysis/future_horizon_cache_oracle_validation_<run_id> --horizons 1 3 6 12 --full_trace_diagnostic
+```
+
+两个入口都拒绝覆盖。第二个入口不运行benchmark，只读取显式G07 manifest、external replay和可选raw baseline summary；不要传hidden路径。未提供raw outcome时gap明确为unavailable。当前G07 runner仍只支持slot runtime。
+
 ## G07 cache baseline fairness manifest
 
 构建新的非hidden、受控NGSIM+Alibaba manifest（默认拒绝覆盖）：
