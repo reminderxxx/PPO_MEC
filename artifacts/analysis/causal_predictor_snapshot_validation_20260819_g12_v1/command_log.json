@@ -1,0 +1,13 @@
+{
+  "G13_executed": false,
+  "argv": [
+    "scripts/audit_predictor_calibration.py",
+    "--run_id",
+    "causal_predictor_snapshot_validation_20260819_g12_v1"
+  ],
+  "cwd": "/Users/howen/Projects/PPO_MEC",
+  "formal_holdout_hidden_executed": false,
+  "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+  "reviewed_at": "2026-08-19T08:37:54.335664+00:00",
+  "training_or_tuning_executed": false
+}

@@ -1,0 +1,394 @@
+{
+  "calibration": [
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9292861907938625,
+      "accepted_brier": 0.0565630580006667,
+      "accepted_count": 11992,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.0,
+      "selective_ece": 0.006816560966240931
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9292861907938625,
+      "accepted_brier": 0.0565630580006667,
+      "accepted_count": 11992,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.05,
+      "selective_ece": 0.006816560966240931
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9292861907938625,
+      "accepted_brier": 0.0565630580006667,
+      "accepted_count": 11992,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.1,
+      "selective_ece": 0.006816560966240931
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9292861907938625,
+      "accepted_brier": 0.0565630580006667,
+      "accepted_count": 11992,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.15,
+      "selective_ece": 0.006816560966240931
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9292861907938625,
+      "accepted_brier": 0.0565630580006667,
+      "accepted_count": 11992,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.2,
+      "selective_ece": 0.006816560966240931
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9292861907938625,
+      "accepted_brier": 0.0565630580006667,
+      "accepted_count": 11992,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.25,
+      "selective_ece": 0.006816560966240931
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9292861907938625,
+      "accepted_brier": 0.0565630580006667,
+      "accepted_count": 11992,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.3,
+      "selective_ece": 0.006816560966240931
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9292861907938625,
+      "accepted_brier": 0.0565630580006667,
+      "accepted_count": 11992,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.35,
+      "selective_ece": 0.006816560966240931
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9292861907938625,
+      "accepted_brier": 0.0565630580006667,
+      "accepted_count": 11992,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.4,
+      "selective_ece": 0.006816560966240931
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9292861907938625,
+      "accepted_brier": 0.0565630580006667,
+      "accepted_count": 11992,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.45,
+      "selective_ece": 0.006816560966240931
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9292861907938625,
+      "accepted_brier": 0.0565630580006667,
+      "accepted_count": 11992,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.5,
+      "selective_ece": 0.006816560966240931
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9292861907938625,
+      "accepted_brier": 0.0565630580006667,
+      "accepted_count": 11992,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.55,
+      "selective_ece": 0.006816560966240931
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9292861907938625,
+      "accepted_brier": 0.0565630580006667,
+      "accepted_count": 11992,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.6,
+      "selective_ece": 0.006816560966240931
+    },
+    {
+      "abstention_rate": 0.00066711140760507,
+      "accepted_accuracy": 0.9294893190921228,
+      "accepted_brier": 0.056450118623270124,
+      "accepted_count": 11984,
+      "accepted_coverage": 0.9993328885923949,
+      "confidence_threshold": 0.65,
+      "selective_ece": 0.006825091952835106
+    },
+    {
+      "abstention_rate": 0.004086057371581054,
+      "accepted_accuracy": 0.9310056099807419,
+      "accepted_brier": 0.055649398905933796,
+      "accepted_count": 11943,
+      "accepted_coverage": 0.9959139426284189,
+      "confidence_threshold": 0.7,
+      "selective_ece": 0.0061720337775527006
+    },
+    {
+      "abstention_rate": 0.01992995330220147,
+      "accepted_accuracy": 0.9338041351144388,
+      "accepted_brier": 0.053590588828735124,
+      "accepted_count": 11753,
+      "accepted_coverage": 0.9800700466977985,
+      "confidence_threshold": 0.75,
+      "selective_ece": 0.006753558919056579
+    },
+    {
+      "abstention_rate": 0.10031687791861241,
+      "accepted_accuracy": 0.9522661970525536,
+      "accepted_brier": 0.04057505596543846,
+      "accepted_count": 10789,
+      "accepted_coverage": 0.8996831220813876,
+      "confidence_threshold": 0.8,
+      "selective_ece": 0.002704134921927585
+    },
+    {
+      "abstention_rate": 0.21914609739826552,
+      "accepted_accuracy": 0.9714865442118753,
+      "accepted_brier": 0.02509754909337543,
+      "accepted_count": 9364,
+      "accepted_coverage": 0.7808539026017345,
+      "confidence_threshold": 0.85,
+      "selective_ece": 0.003412656849855632
+    },
+    {
+      "abstention_rate": 0.3286357571714476,
+      "accepted_accuracy": 0.990560178859769,
+      "accepted_brier": 0.00889917074558502,
+      "accepted_count": 8051,
+      "accepted_coverage": 0.6713642428285523,
+      "confidence_threshold": 0.9,
+      "selective_ece": 0.0018129045840750545
+    },
+    {
+      "abstention_rate": 0.3519846564376251,
+      "accepted_accuracy": 0.9947239737485523,
+      "accepted_brier": 0.0051959223752193655,
+      "accepted_count": 7771,
+      "accepted_coverage": 0.6480153435623749,
+      "confidence_threshold": 0.95,
+      "selective_ece": 0.0037651083334305883
+    },
+    {
+      "abstention_rate": 1.0,
+      "accepted_accuracy": null,
+      "accepted_brier": null,
+      "accepted_count": 0,
+      "accepted_coverage": 0.0,
+      "confidence_threshold": 1.0,
+      "selective_ece": null
+    }
+  ],
+  "evaluation": [
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9505111244738425,
+      "accepted_brier": 0.04123107503650479,
+      "accepted_count": 33260,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.0,
+      "selective_ece": 0.005647537110980571
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9505111244738425,
+      "accepted_brier": 0.04123107503650479,
+      "accepted_count": 33260,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.05,
+      "selective_ece": 0.005647537110980571
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9505111244738425,
+      "accepted_brier": 0.04123107503650479,
+      "accepted_count": 33260,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.1,
+      "selective_ece": 0.005647537110980571
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9505111244738425,
+      "accepted_brier": 0.04123107503650479,
+      "accepted_count": 33260,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.15,
+      "selective_ece": 0.005647537110980571
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9505111244738425,
+      "accepted_brier": 0.04123107503650479,
+      "accepted_count": 33260,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.2,
+      "selective_ece": 0.005647537110980571
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9505111244738425,
+      "accepted_brier": 0.04123107503650479,
+      "accepted_count": 33260,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.25,
+      "selective_ece": 0.005647537110980571
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9505111244738425,
+      "accepted_brier": 0.04123107503650479,
+      "accepted_count": 33260,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.3,
+      "selective_ece": 0.005647537110980571
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9505111244738425,
+      "accepted_brier": 0.04123107503650479,
+      "accepted_count": 33260,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.35,
+      "selective_ece": 0.005647537110980571
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9505111244738425,
+      "accepted_brier": 0.04123107503650479,
+      "accepted_count": 33260,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.4,
+      "selective_ece": 0.005647537110980571
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9505111244738425,
+      "accepted_brier": 0.04123107503650479,
+      "accepted_count": 33260,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.45,
+      "selective_ece": 0.005647537110980571
+    },
+    {
+      "abstention_rate": 0.0,
+      "accepted_accuracy": 0.9505111244738425,
+      "accepted_brier": 0.04123107503650479,
+      "accepted_count": 33260,
+      "accepted_coverage": 1.0,
+      "confidence_threshold": 0.5,
+      "selective_ece": 0.005647537110980571
+    },
+    {
+      "abstention_rate": 0.00024052916416115455,
+      "accepted_accuracy": 0.9505894382292794,
+      "accepted_brier": 0.04118246277139408,
+      "accepted_count": 33252,
+      "accepted_coverage": 0.9997594708358388,
+      "confidence_threshold": 0.55,
+      "selective_ece": 0.005670684324900721
+    },
+    {
+      "abstention_rate": 0.0003908598917618761,
+      "accepted_accuracy": 0.9506722411044606,
+      "accepted_brier": 0.04114885350903062,
+      "accepted_count": 33247,
+      "accepted_coverage": 0.9996091401082381,
+      "confidence_threshold": 0.6,
+      "selective_ece": 0.00564349673059441
+    },
+    {
+      "abstention_rate": 0.0008117859290438966,
+      "accepted_accuracy": 0.9508320043330425,
+      "accepted_brier": 0.041062231379325465,
+      "accepted_count": 33233,
+      "accepted_coverage": 0.9991882140709561,
+      "confidence_threshold": 0.65,
+      "selective_ece": 0.005670442177672787
+    },
+    {
+      "abstention_rate": 0.0028262176788935657,
+      "accepted_accuracy": 0.951215099801001,
+      "accepted_brier": 0.04077072702895652,
+      "accepted_count": 33166,
+      "accepted_coverage": 0.9971737823211064,
+      "confidence_threshold": 0.7,
+      "selective_ece": 0.005517513058449946
+    },
+    {
+      "abstention_rate": 0.01010222489476849,
+      "accepted_accuracy": 0.9527396428137529,
+      "accepted_brier": 0.03968196232153366,
+      "accepted_count": 32924,
+      "accepted_coverage": 0.9898977751052315,
+      "confidence_threshold": 0.75,
+      "selective_ece": 0.005646710479102428
+    },
+    {
+      "abstention_rate": 0.047083583884546004,
+      "accepted_accuracy": 0.9616962201047516,
+      "accepted_brier": 0.03334205890977888,
+      "accepted_count": 31694,
+      "accepted_coverage": 0.952916416115454,
+      "confidence_threshold": 0.8,
+      "selective_ece": 0.0036440838689089355
+    },
+    {
+      "abstention_rate": 0.12300060132291041,
+      "accepted_accuracy": 0.9740820734341252,
+      "accepted_brier": 0.023404713059906265,
+      "accepted_count": 29169,
+      "accepted_coverage": 0.8769993986770896,
+      "confidence_threshold": 0.85,
+      "selective_ece": 0.0032950522106862654
+    },
+    {
+      "abstention_rate": 0.1934155141310884,
+      "accepted_accuracy": 0.9846423379431171,
+      "accepted_brier": 0.014425110265977635,
+      "accepted_count": 26827,
+      "accepted_coverage": 0.8065844858689116,
+      "confidence_threshold": 0.9,
+      "selective_ece": 0.0017018949719168844
+    },
+    {
+      "abstention_rate": 0.25676488274203246,
+      "accepted_accuracy": 0.9924352750809061,
+      "accepted_brier": 0.007449892766882327,
+      "accepted_count": 24720,
+      "accepted_coverage": 0.7432351172579675,
+      "confidence_threshold": 0.95,
+      "selective_ece": 0.0009511591021393284
+    },
+    {
+      "abstention_rate": 1.0,
+      "accepted_accuracy": null,
+      "accepted_brier": null,
+      "accepted_count": 0,
+      "accepted_coverage": 0.0,
+      "confidence_threshold": 1.0,
+      "selective_ece": null
+    }
+  ],
+  "selected_evaluation_row": {
+    "abstention_rate": 0.25676488274203246,
+    "accepted_accuracy": 0.9924352750809061,
+    "accepted_brier": 0.007449892766882327,
+    "accepted_count": 24720,
+    "accepted_coverage": 0.7432351172579675,
+    "confidence_threshold": 0.95,
+    "selective_ece": 0.0009511591021393284
+  },
+  "selected_threshold": 0.95
+}

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from copy import deepcopy
 from pathlib import Path
 from typing import Any
@@ -10,6 +11,56 @@ from typing import Any
 from src.envs.specs import CACHE_EVENT_SCHEMA_VERSION
 from src.metrics.paper_metrics import PaperMetricSet
 from src.metrics.reducers import 聚合奖励拆解, 求和
+
+
+DECISION_OBSERVATION_TRACE_VERSION = "1.0.0"
+
+
+def validate_decision_observation_trace_record(record: dict[str, Any]) -> None:
+    """Fail fast on malformed or outcome-leaking pre-action trace records."""
+    if record.get("decision_observation_trace_version") != DECISION_OBSERVATION_TRACE_VERSION:
+        raise ValueError("unsupported decision observation trace version")
+    if record.get("captured_phase") != "pre_action":
+        raise ValueError("decision observation trace must be captured pre_action")
+    if record.get("future_or_outcome_fields_present") is not False:
+        raise ValueError("pre-action trace must declare future_or_outcome_fields_present=false")
+    flattened = record.get("flattened_observation")
+    index_map = record.get("feature_name_to_index")
+    feature_values = record.get("flattened_feature_values")
+    if not isinstance(flattened, list) or not isinstance(index_map, dict) or not isinstance(feature_values, dict):
+        raise ValueError("decision observation flat feature contract is incomplete")
+    if int(record.get("flattened_dimension", -1)) != len(flattened):
+        raise ValueError("decision observation flattened_dimension mismatch")
+    for name, raw_index in index_map.items():
+        index = int(raw_index)
+        if index < 0 or index >= len(flattened) or name not in feature_values:
+            raise ValueError("decision observation feature index is invalid")
+        if float(feature_values[name]) != float(flattened[index]):
+            raise ValueError("decision observation feature value/index mismatch")
+    forbidden = {"label", "future_label", "future_truth", "reward", "service_result", "oracle_action"}
+
+    def walk(value: Any, path: str) -> None:
+        if value is None or isinstance(value, (str, bool, int)):
+            return
+        if isinstance(value, float):
+            if not math.isfinite(value):
+                raise ValueError(f"{path} contains NaN or infinity")
+            return
+        if isinstance(value, dict):
+            for key, item in value.items():
+                if key in forbidden:
+                    raise ValueError(f"pre-action trace contains forbidden field: {path}.{key}")
+                if key == "selected_action" and path != "trace.post_decision_outcome":
+                    raise ValueError("selected action must be isolated in post_decision_outcome")
+                walk(item, f"{path}.{key}")
+            return
+        if isinstance(value, list):
+            for index, item in enumerate(value):
+                walk(item, f"{path}[{index}]")
+            return
+        raise ValueError(f"{path} contains a non-JSON-safe type")
+
+    walk(record, "trace")
 
 
 class EpisodeRecorder:
@@ -27,6 +78,7 @@ class EpisodeRecorder:
         self._cache_trace_final_snapshot: dict[str, Any] | None = None
         self._pending_prefetches: list[dict[str, Any]] = []
         self._episode_status: dict[str, Any] = {}
+        self._decision_observation_records: list[dict[str, Any]] = []
 
     def start_episode(self, run_metadata: dict[str, Any] | None = None) -> None:
         self._episode_index += 1
@@ -43,6 +95,13 @@ class EpisodeRecorder:
             "truncated": False,
             "total_steps": 0,
         }
+        self._decision_observation_records = []
+
+    def build_decision_request_id(self, step_index: int) -> str:
+        """Return the G08-compatible request ID when an evaluation unit is known."""
+        evaluation_unit_id = self._run_metadata.get("evaluation_unit_id")
+        prefix = str(evaluation_unit_id) if evaluation_unit_id else "local_episode"
+        return f"{prefix}/request_{int(step_index):06d}"
 
     def record_reset(self, state: dict[str, Any], info: dict[str, Any]) -> None:
         self._initial_state = deepcopy(state)
@@ -58,6 +117,13 @@ class EpisodeRecorder:
         truncated: bool,
     ) -> None:
         metrics_info = deepcopy(info.get("metrics_protocol", {}))
+        decision_record = deepcopy(info.get("decision_observation_trace_record"))
+        if decision_record is not None:
+            validate_decision_observation_trace_record(decision_record)
+            request_id = str(decision_record.get("request_id"))
+            if request_id in {str(row.get("request_id")) for row in self._decision_observation_records}:
+                raise ValueError(f"duplicate decision observation request_id: {request_id}")
+            self._decision_observation_records.append(decision_record)
         if info.get("cache_trace_snapshot") is not None:
             self._cache_trace_final_snapshot = deepcopy(info["cache_trace_snapshot"])
         metrics_info["time_index"] = int(state.get("time_index", 0))
@@ -109,6 +175,20 @@ class EpisodeRecorder:
             }
 
         prefetch_validation_summary = self._build_prefetch_validation_summary()
+        snapshot_ids = sorted(
+            {
+                str(record["causal_predictor_snapshot_id"])
+                for record in self._step_records
+                if record.get("causal_predictor_snapshot_id")
+            }
+        )
+        snapshot_contract_versions = sorted(
+            {
+                str(record["causal_predictor_snapshot_contract_version"])
+                for record in self._step_records
+                if record.get("causal_predictor_snapshot_contract_version")
+            }
+        )
         return {
             "run_info": {
                 "episode_index": self._episode_index,
@@ -128,6 +208,30 @@ class EpisodeRecorder:
             "validated_predictive_prefetch_count": prefetch_validation_summary["validated_predictive_prefetch_count"],
             "prefetch_validation_summary": prefetch_validation_summary,
             "step_trace": deepcopy(self._step_records),
+            "decision_observation_trace": {
+                "decision_observation_trace_version": DECISION_OBSERVATION_TRACE_VERSION,
+                "provenance": {
+                    "request_replay_fingerprint": self._run_metadata.get("request_replay_fingerprint"),
+                    "g07_manifest_id": self._run_metadata.get("fairness_manifest_id"),
+                    "g07_manifest_semantic_sha256": self._run_metadata.get("fairness_semantic_protocol_hash"),
+                    "g08_oracle_contract_version": self._run_metadata.get("g08_oracle_contract_version"),
+                    "g09_analysis_fingerprint": self._run_metadata.get("g09_analysis_fingerprint"),
+                    "evaluation_unit_id": self._run_metadata.get("evaluation_unit_id"),
+                    "availability": (
+                        "g08_alignable" if self._run_metadata.get("evaluation_unit_id") else "local_trace_only"
+                    ),
+                },
+                "records": deepcopy(self._decision_observation_records),
+            },
+            "predictor_snapshot_provenance": {
+                "snapshot_ids": snapshot_ids,
+                "snapshot_contract_versions": snapshot_contract_versions,
+                "accepted_step_count": sum(
+                    int(record.get("causal_predictor_snapshot_availability_mask", 0) or 0)
+                    for record in self._step_records
+                ),
+                "recorded_step_count": len(self._step_records),
+            },
             "cache_event_schema_version": CACHE_EVENT_SCHEMA_VERSION,
             "cache_event_trace": deepcopy(self._cache_events),
             "cache_trace_context": {

@@ -1,0 +1,14 @@
+{
+  "audit_version": "1.0.0",
+  "claim_boundary": "contract and nonformal predictor diagnostics only; no policy-benefit or digital-twin claim",
+  "delayed_snapshot_recomputed": false,
+  "history_reset_at_window_or_episode": true,
+  "label_horizon_steps": 3,
+  "oracle_identity_isolated": true,
+  "reviewed_at": "2026-08-19T08:37:54.335664+00:00",
+  "runtime_future_label_consumed": false,
+  "runtime_reward_or_action_consumed": false,
+  "snapshot_contract_version": "1.0.0",
+  "source_document": "docs/project/predictor_causality_calibration_audit_20260819.md",
+  "source_document_sha256": "e2ce71fa874abe0c1b67f340a819f34fdc721904afc96fe624d66fe24a44fa4f"
+}

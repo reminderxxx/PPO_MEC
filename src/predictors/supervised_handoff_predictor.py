@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import hashlib
 from pathlib import Path
 from typing import Any
 
@@ -14,6 +15,40 @@ from src.envs.specs import RSUState, VehicleState, WorkflowGraphState
 
 FEATURE_SCHEMA_VERSION = "supervised_handoff_feature_v1"
 CHECKPOINT_SCHEMA_VERSION = "supervised_handoff_predictor_checkpoint_v1"
+NORMALIZATION_VERSION = "supervised_handoff_fixed_clamp_v1"
+
+
+def feature_names_for_rsus(rsu_ids: list[str]) -> list[str]:
+    """Return the semantic feature order frozen by feature schema v1."""
+    names = [
+        "vehicle.position_x_scaled",
+        "vehicle.position_y_scaled",
+        "vehicle.speed_scaled",
+        "vehicle.delta_x_scaled",
+        "vehicle.delta_y_scaled",
+        "vehicle.current_rsu_available",
+        "workflow.current_node_available",
+        "workflow.progress",
+        "current_rsu.required_adapter_ready",
+        "workflow.remaining_nodes_scaled",
+    ]
+    for rsu_id in rsu_ids:
+        names.extend(
+            [
+                f"rsu.{rsu_id}.relative_x_scaled",
+                f"rsu.{rsu_id}.relative_y_scaled",
+                f"rsu.{rsu_id}.distance_scaled",
+                f"rsu.{rsu_id}.is_current",
+                f"rsu.{rsu_id}.active_vehicle_count_scaled",
+                f"rsu.{rsu_id}.coverage_radius_scaled",
+                f"rsu.{rsu_id}.required_adapter_ready",
+            ]
+        )
+    return names
+
+
+def feature_order_sha256(feature_names: list[str]) -> str:
+    return hashlib.sha256("\n".join(feature_names).encode("utf-8")).hexdigest()
 
 
 def _safe_float(value: Any, default: float = 0.0) -> float:
@@ -163,10 +198,27 @@ class SupervisedHandoffPredictorRuntime:
         rsu_label_map = dict(payload.get("rsu_label_map", {}))
         rsu_ids = [str(item) for item in rsu_label_map.get("rsu_ids", [])]
         none_index = int(rsu_label_map.get("none_index", len(rsu_ids)))
-        input_dim = int(payload.get("input_dim", len(feature_schema.get("feature_names", []))))
+        feature_names = list(feature_schema.get("feature_names", []))
+        input_dim = int(payload.get("input_dim", len(feature_names)))
         expected_dim = 10 + 7 * len(rsu_ids)
         if input_dim != expected_dim:
             raise ValueError(f"checkpoint input_dim={input_dim} does not match expected feature dim {expected_dim}")
+        if len(feature_names) != input_dim:
+            raise ValueError("checkpoint feature_names length does not match input_dim")
+        computed_feature_order_sha256 = feature_order_sha256(feature_names)
+        declared_feature_order_sha256 = feature_schema.get("feature_order_sha256")
+        if (
+            declared_feature_order_sha256 is not None
+            and str(declared_feature_order_sha256) != computed_feature_order_sha256
+        ):
+            raise ValueError("checkpoint feature_order_sha256 does not match feature_names")
+        normalization_version = str(
+            feature_schema.get("normalization_version", NORMALIZATION_VERSION)
+        )
+        if normalization_version != NORMALIZATION_VERSION:
+            raise ValueError(
+                f"unsupported predictor normalization version: {normalization_version}"
+            )
         hidden_dim = int(payload.get("hidden_dim", 64))
         rsu_class_count = len(rsu_ids) + 1
         network = SupervisedHandoffPredictorNetwork(
@@ -185,6 +237,10 @@ class SupervisedHandoffPredictorRuntime:
             "run_id": str(payload.get("run_id", "unknown")),
             "calibration": dict(payload.get("calibration", {})),
             "metrics": dict(payload.get("metrics", {})),
+            "feature_names": feature_names,
+            "feature_order_sha256": computed_feature_order_sha256,
+            "normalization_version": normalization_version,
+            "rsu_ids": list(rsu_ids),
         }
         self._network = network
         self._rsu_ids = rsu_ids
@@ -247,6 +303,8 @@ class SupervisedHandoffPredictorRuntime:
         uncertainty: dict[str, float] = {}
         eta_by_vehicle: dict[str, float] = {}
         raw_scores: dict[str, dict[str, Any]] = {}
+        prediction_details: dict[str, dict[str, Any]] = {}
+        class_ids: list[str | None] = [*self._rsu_ids, None]
         for vehicle in vehicles:
             feature_vector = build_feature_vector(
                 vehicle=vehicle,
@@ -303,6 +361,27 @@ class SupervisedHandoffPredictorRuntime:
                 "target_selection_mode": self._target_selection_mode,
                 "eta_steps": round(eta_steps, 6),
             }
+            prediction_details[vehicle.vehicle_id] = {
+                "class_ids": list(class_ids),
+                "next_rsu_logits": [float(value) for value in output["next_rsu_logits"].squeeze(0).tolist()],
+                "next_rsu_probabilities": [float(value) for value in next_probs.tolist()],
+                "handoff_target_logits": [
+                    float(value) for value in output["handoff_target_logits"].squeeze(0).tolist()
+                ],
+                "handoff_target_probabilities": [float(value) for value in target_probs.tolist()],
+                "handoff_logit": float(output["handoff_logit"].squeeze(0).item()),
+                "handoff_probability": handoff_confidence,
+                "eta_point_estimate_steps": eta_steps,
+                "eta_interval_steps": None,
+                "eta_uncertainty": None,
+                "feature_availability_mask": {
+                    "current_observation": True,
+                    "previous_vehicle_position": vehicle.vehicle_id in (last_vehicle_positions or {}),
+                    "workflow_state": workflow_state is not None,
+                    "current_rsu_association": current_rsu_id is not None,
+                },
+                "normalization_version": NORMALIZATION_VERSION,
+            }
         return {
             "next_rsu_sequence": sequences,
             "predicted_next_rsu_by_vehicle": predicted_next,
@@ -315,6 +394,7 @@ class SupervisedHandoffPredictorRuntime:
             "prediction_uncertainty_by_vehicle": uncertainty,
             "predicted_handoff_eta_steps_by_vehicle": eta_by_vehicle,
             "supervised_predictor_scores_by_vehicle": raw_scores,
+            "supervised_prediction_details_by_vehicle": prediction_details,
         }
 
     def _build_sequence(

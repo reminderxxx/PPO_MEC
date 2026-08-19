@@ -1,5 +1,34 @@
 # Runbook
 
+## G12 causal predictor calibration/snapshot audit
+
+稳定入口不训练 predictor、不运行 RL benchmark，也不读取 formal/holdout/hidden：
+
+```bash
+.venv/bin/python scripts/audit_predictor_calibration.py \
+  --quality_rows_path artifacts/experiments/top_journal_v112_predictor_training_20260809/supervised_handoff_predictor_20260809_033406_140764/predictor_quality_rows.csv \
+  --checkpoint_path artifacts/experiments/top_journal_v112_predictor_training_20260809/supervised_handoff_predictor_20260809_033406_140764/supervised_handoff_predictor.pt \
+  --train_window_plan_path configs/experiment/top_journal_v71_strict_split_20260730/train_window_plan.json \
+  --evaluation_window_plan_path configs/experiment/top_journal_v71_strict_split_20260730/dev_window_plan.json \
+  --run_id causal_predictor_snapshot_validation_20260819_g12_v1
+```
+
+入口固定用train-plan的`index % 4 == 3`作为calibration窗口，dev只评估；frame/time overlap、hidden/formal role、artifact calibration fit role不合法时fail-fast。`--skip_real_trace`只用于synthetic/CI，不可作为本轮NGSIM trace证据。输出应含16个JSON；用下列命令复算integrity：
+
+```bash
+.venv/bin/python - <<'PY'
+import hashlib, json
+from pathlib import Path
+p = Path('artifacts/analysis/causal_predictor_snapshot_validation_20260819_g12_v1')
+m = json.loads((p / 'artifact_integrity_manifest.json').read_text())
+for row in m['files']:
+    assert hashlib.sha256((p / row['path']).read_bytes()).hexdigest() == row['sha256']
+print(m['aggregate_sha256'])
+PY
+```
+
+runtime只在显式传入`predictor_kind=supervised`、checkpoint、`causal_calibrated_snapshot_enabled=true`和calibration artifact时启用；canonical config不得由runbook隐式修改。完整语义见`docs/project/causal_calibrated_predictor_snapshot_contract.md`。
+
 ## G10 cache information sufficiency只读审计
 
 ```bash

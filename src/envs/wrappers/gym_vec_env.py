@@ -44,6 +44,18 @@ except ImportError:
 
 
 默认动作规范 = ActionSchema.default_vec_workflow_schema()
+DECISION_OBSERVATION_TRACE_VERSION = "1.0.0"
+FLAT_OBSERVATION_FEATURE_NAMES = (
+    "relative_time",
+    "vehicle_count",
+    "rsu_count",
+    "workflow_progress",
+    "handoff_event_count",
+    "accepted_predicted_handoff_count",
+    "current_node_available",
+    "current_rsu_cache_size",
+    "mean_future_load",
+)
 动作语义表 = {
     action_id: 默认动作规范.action_name(action_id)
     for action_id in range(默认动作规范.discrete_action_count)
@@ -142,6 +154,7 @@ class GymVecEnv(gym.Env):
         return self._encode_observation(state), info
 
     def step(self, action: int) -> tuple[list[float], float, bool, bool, dict[str, Any]]:
+        pre_action_trace_record = self._build_decision_observation_trace_record(action)
         control = self._decode_action(action)
         action_name = 动作语义表.get(action, "unknown_action")
         state, reward, terminated, truncated, info = self._core_env.step(control)
@@ -165,6 +178,7 @@ class GymVecEnv(gym.Env):
             "action_invalid_reason": str(action_metadata.get("invalid_reason", "none")),
             "observation_normalized": True,
             "observation_encoder": "deterministic_scale_v1",
+            "decision_observation_trace_record": pre_action_trace_record,
         }
         if self._recorder is not None:
             self._recorder.record_step(
@@ -181,6 +195,15 @@ class GymVecEnv(gym.Env):
         return self._action_adapter.decode(action, semantic_state)
 
     def _encode_observation(self, state: dict[str, Any]) -> list[float]:
+        raw_observation = self._build_raw_observation(state)
+        return self._normalizer.normalize(
+            raw_observation=raw_observation,
+            state=state,
+            episode_step_index=self._episode_step_index,
+            max_steps=getattr(self._core_env, "_max_steps", 16),
+        )
+
+    def _build_raw_observation(self, state: dict[str, Any]) -> list[float]:
         workflow = state.get("workflow", {})
         completed_node_ids = workflow.get("completed_node_ids", [])
         execution_order = workflow.get("execution_order", [])
@@ -215,12 +238,107 @@ class GymVecEnv(gym.Env):
             current_rsu_cache_size,
             float(mean_future_load),
         ]
-        return self._normalizer.normalize(
-            raw_observation=raw_observation,
-            state=state,
-            episode_step_index=self._episode_step_index,
-            max_steps=getattr(self._core_env, "_max_steps", 16),
+        return raw_observation
+
+    def _build_decision_observation_trace_record(self, action: int) -> dict[str, Any]:
+        """Capture the wrapper observation before applying the selected action."""
+        state = deepcopy(self._last_state or {})
+        semantic_state = self._build_compatible_semantic_state(state)
+        raw_observation = self._build_raw_observation(state)
+        flattened = self._encode_observation(state)
+        feature_name_to_index = {
+            name: index for index, name in enumerate(FLAT_OBSERVATION_FEATURE_NAMES)
+        }
+        feature_values = {
+            name: float(flattened[index]) for name, index in feature_name_to_index.items()
+        }
+        raw_values = {
+            name: float(raw_observation[index]) for name, index in feature_name_to_index.items()
+        }
+        action_mask_info = self._action_mask_builder.build_mask_info(semantic_state)
+        action_mask = [bool(value) for value in action_mask_info["mask"]]
+        primary_vehicle = self._resolve_primary_vehicle_for_observation(state)
+        vehicle_id = str(primary_vehicle.get("vehicle_id")) if primary_vehicle.get("vehicle_id") is not None else None
+        predictions = dict(state.get("predictions", {}))
+        snapshot = dict(predictions.get("causal_predictor_snapshots_by_vehicle", {}).get(vehicle_id, {})) if vehicle_id else {}
+        snapshot_identity = dict(snapshot.get("identity", {}))
+        snapshot_time = dict(snapshot.get("causal_time", {}))
+        next_step = self._episode_step_index + 1
+        request_id = (
+            self._recorder.build_decision_request_id(next_step)
+            if self._recorder is not None and hasattr(self._recorder, "build_decision_request_id")
+            else f"local_episode/request_{next_step:06d}"
         )
+        current_rsu_id = primary_vehicle.get("associated_rsu_id")
+        predictor_projection = {
+            "snapshot_id": snapshot_identity.get("snapshot_id"),
+            "availability_mask": predictions.get("causal_snapshot_availability_by_vehicle", {}).get(vehicle_id, 0),
+            "predicted_next_rsu_id": predictions.get("predicted_next_rsu_by_vehicle", {}).get(vehicle_id),
+            "predicted_handoff_target_rsu_id": predictions.get("predicted_handoff_target_rsu_id_by_vehicle", {}).get(vehicle_id),
+        }
+        return {
+            "decision_observation_trace_version": DECISION_OBSERVATION_TRACE_VERSION,
+            "request_id": request_id,
+            "step_index": next_step,
+            "time_index": int(state.get("time_index", 0)),
+            "captured_phase": "pre_action",
+            "controller_identity": "single_environment_action_controller",
+            "observation_contract_version": "gym_vec_flat_semantic_v1",
+            "raw_semantic_fields": {
+                "primary_vehicle_id": vehicle_id,
+                "current_rsu_id": current_rsu_id,
+                "flat_raw_feature_values": raw_values,
+                "predictor": predictor_projection,
+            },
+            "semantic_feature_map": raw_values,
+            "flattened_observation": [float(value) for value in flattened],
+            "flattened_dimension": len(flattened),
+            "feature_name_to_index": feature_name_to_index,
+            "flattened_feature_values": feature_values,
+            "feature_availability": {
+                name: True for name in FLAT_OBSERVATION_FEATURE_NAMES
+            },
+            "normalization": {
+                "kind": "deterministic_scale_and_tanh",
+                "version": "deterministic_scale_v1",
+                "fitted_on_data": False,
+            },
+            "information_scopes": {
+                "current_local_information": ["current_rsu_id", "current_rsu_cache_size"],
+                "cross_rsu_global_information": ["rsu_count", "mean_future_load"],
+                "predictor_outputs": ["accepted_predicted_handoff_count", "predictor"],
+                "history_derived_information": ["relative_time"],
+                "actor_visibility": "flat_observation_plus_agent_semantic_encoder_if_configured",
+                "controller_visibility": "semantic_state_and_flat_observation",
+                "critic_visibility": "agent_dependent; wrapper_adds_no_future_or_label_fields",
+            },
+            "predictor_snapshot_provenance": {
+                "snapshot_id": snapshot_identity.get("snapshot_id"),
+                "contract_version": snapshot_identity.get("contract_version"),
+                "generated_at_step": snapshot_time.get("generated_at_step"),
+                "observation_as_of_step": snapshot_time.get("observation_as_of_step"),
+                "consumed_at_step": snapshot_time.get("consumed_at_step"),
+                "age_steps": snapshot_time.get("age_steps"),
+                "availability_mask": predictor_projection["availability_mask"],
+            },
+            "action_mask": action_mask,
+            "eligible_actions": [index for index, value in enumerate(action_mask) if value],
+            "post_decision_outcome": {"selected_action": int(action)},
+            "observation_projections": {
+                "actor_local": {
+                    "current_rsu_id": current_rsu_id,
+                    "current_rsu_cache_size": raw_values["current_rsu_cache_size"],
+                },
+                "controller_global": {
+                    "current_rsu_id": current_rsu_id,
+                    "rsu_count": raw_values["rsu_count"],
+                    "mean_future_load": raw_values["mean_future_load"],
+                },
+                "critic_only": {},
+                "predictor_augmented": predictor_projection,
+            },
+            "future_or_outcome_fields_present": False,
+        }
 
     def _resolve_primary_vehicle_for_observation(self, state: dict[str, Any]) -> dict[str, Any]:
         vehicles = list(state.get("vehicles", []))

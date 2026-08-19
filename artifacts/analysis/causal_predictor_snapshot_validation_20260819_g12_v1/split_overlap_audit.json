@@ -1,0 +1,107 @@
+{
+  "checked_interval_kinds": [
+    "frame_interval",
+    "time_interval",
+    "segment_frame_interval"
+  ],
+  "different_window_id_is_independence_evidence": false,
+  "interpretation": "vehicle IDs may recur, but raw frame/time intervals are disjoint; interval isolation is authoritative",
+  "overlap_conflicts": [],
+  "passed": true,
+  "split_manifest_sha256": "931a226b039d27501f84b10b33917cdb9bf55a54da17fa633b3bd217af1a7253",
+  "vehicle_group_overlap_audit": {
+    "group_key": "vehicle_id",
+    "pairwise": [
+      {
+        "left_split": "calibration",
+        "overlap_count": 179,
+        "overlap_examples": [
+          "lankershim:1569",
+          "lankershim:1570",
+          "peachtree:1498",
+          "peachtree:396",
+          "peachtree:399",
+          "peachtree:402",
+          "peachtree:404",
+          "peachtree:405",
+          "peachtree:407",
+          "peachtree:409",
+          "peachtree:413",
+          "peachtree:415",
+          "peachtree:419",
+          "peachtree:420",
+          "peachtree:426",
+          "peachtree:432",
+          "peachtree:440",
+          "peachtree:443",
+          "peachtree:449",
+          "peachtree:451"
+        ],
+        "right_split": "evaluation_dev",
+        "risk": "adjacent_trajectory_group_dependence"
+      },
+      {
+        "left_split": "calibration",
+        "overlap_count": 113,
+        "overlap_examples": [
+          "peachtree:396",
+          "peachtree:399",
+          "peachtree:402",
+          "peachtree:404",
+          "peachtree:405",
+          "peachtree:407",
+          "peachtree:409",
+          "peachtree:413",
+          "peachtree:415",
+          "peachtree:419",
+          "peachtree:420",
+          "peachtree:426",
+          "peachtree:432",
+          "peachtree:440",
+          "peachtree:443",
+          "peachtree:449",
+          "peachtree:451",
+          "peachtree:460",
+          "peachtree:461",
+          "peachtree:464"
+        ],
+        "right_split": "predictor_train",
+        "risk": "adjacent_trajectory_group_dependence"
+      },
+      {
+        "left_split": "evaluation_dev",
+        "overlap_count": 359,
+        "overlap_examples": [
+          "lankershim:1003",
+          "lankershim:1105",
+          "lankershim:1116",
+          "lankershim:1119",
+          "lankershim:1124",
+          "lankershim:1125",
+          "lankershim:1128",
+          "lankershim:1136",
+          "lankershim:1137",
+          "lankershim:1138",
+          "lankershim:1141",
+          "lankershim:1144",
+          "lankershim:1145",
+          "lankershim:1153",
+          "lankershim:1155",
+          "lankershim:1158",
+          "lankershim:1164",
+          "lankershim:1168",
+          "lankershim:1183",
+          "lankershim:1185"
+        ],
+        "right_split": "predictor_train",
+        "risk": "adjacent_trajectory_group_dependence"
+      }
+    ],
+    "requires_interval_isolation_even_when_vehicle_repeats": true
+  },
+  "window_count_by_split": {
+    "calibration": 5,
+    "evaluation_dev": 20,
+    "predictor_train": 15
+  }
+}

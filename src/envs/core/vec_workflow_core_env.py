@@ -938,9 +938,20 @@ class VecWorkflowCoreEnv:
                 "predictor_kind": predictions.get("predictor_kind"),
                 "surrogate_claim_boundary": predictions.get("surrogate_claim_boundary"),
                 "prediction_quality_audit": dict(predictions.get("prediction_quality_audit", {})),
+                "causal_snapshot_id": None,
+                "causal_snapshot_contract_version": predictions.get("causal_predictor_snapshot_contract_version"),
+                "causal_snapshot_availability_mask": 0,
+                "causal_snapshot_generated_at_step": None,
+                "causal_snapshot_observation_as_of_step": None,
+                "causal_snapshot_age_steps": None,
             }
         next_sequence = list(predictions.get("next_rsu_sequence", {}).get(vehicle_id, []))
         predicted_handoff_target_rsu_id = predictions.get("predicted_first_handoff_rsu_by_vehicle", {}).get(vehicle_id)
+        causal_snapshot = dict(
+            predictions.get("causal_predictor_snapshots_by_vehicle", {}).get(vehicle_id, {})
+        )
+        causal_identity = dict(causal_snapshot.get("identity", {}))
+        causal_time = dict(causal_snapshot.get("causal_time", {}))
         return {
             "predicted_next_rsu_id": predictions.get("predicted_next_rsu_by_vehicle", {}).get(vehicle_id),
             "predicted_handoff_target_rsu_id": predicted_handoff_target_rsu_id,
@@ -953,6 +964,14 @@ class VecWorkflowCoreEnv:
             "predictor_kind": predictions.get("predictor_kind"),
             "surrogate_claim_boundary": predictions.get("surrogate_claim_boundary"),
             "prediction_quality_audit": dict(predictions.get("prediction_quality_audit", {})),
+            "causal_snapshot_id": causal_identity.get("snapshot_id"),
+            "causal_snapshot_contract_version": causal_identity.get("contract_version"),
+            "causal_snapshot_availability_mask": predictions.get(
+                "causal_snapshot_availability_by_vehicle", {}
+            ).get(vehicle_id, 0),
+            "causal_snapshot_generated_at_step": causal_time.get("generated_at_step"),
+            "causal_snapshot_observation_as_of_step": causal_time.get("observation_as_of_step"),
+            "causal_snapshot_age_steps": causal_time.get("age_steps"),
         }
 
     def _has_predicted_handoff_signal(
@@ -1342,6 +1361,22 @@ class VecWorkflowCoreEnv:
             "predictor_prediction_delay_steps": prediction_quality_audit.get("prediction_delay_steps"),
             "predictor_drop_handoff_prediction_prob": prediction_quality_audit.get("drop_handoff_prediction_prob"),
             "prediction_confidence": round(prediction_confidence, 6),
+            "causal_predictor_snapshot_id": pre_action_prediction_snapshot.get("causal_snapshot_id"),
+            "causal_predictor_snapshot_contract_version": pre_action_prediction_snapshot.get(
+                "causal_snapshot_contract_version"
+            ),
+            "causal_predictor_snapshot_availability_mask": pre_action_prediction_snapshot.get(
+                "causal_snapshot_availability_mask", 0
+            ),
+            "causal_predictor_snapshot_generated_at_step": pre_action_prediction_snapshot.get(
+                "causal_snapshot_generated_at_step"
+            ),
+            "causal_predictor_snapshot_observation_as_of_step": pre_action_prediction_snapshot.get(
+                "causal_snapshot_observation_as_of_step"
+            ),
+            "causal_predictor_snapshot_age_steps": pre_action_prediction_snapshot.get(
+                "causal_snapshot_age_steps"
+            ),
             "has_predicted_handoff_target": has_predicted_handoff_target,
             "predicted_handoff_signal": predicted_handoff_signal,
             "handoff_event_count": int(handoff_count),

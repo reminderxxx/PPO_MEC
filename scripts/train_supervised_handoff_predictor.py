@@ -31,9 +31,12 @@ from src.evaluators.main_results_support import (
 from src.predictors import (
     CHECKPOINT_SCHEMA_VERSION,
     FEATURE_SCHEMA_VERSION,
+    NORMALIZATION_VERSION,
     SupervisedHandoffPredictorNetwork,
     build_feature_vector,
+    feature_names_for_rsus,
 )
+from src.predictors.supervised_handoff_predictor import feature_order_sha256
 
 
 def parse_args() -> argparse.Namespace:
@@ -530,7 +533,9 @@ def main() -> None:
     run_id = datetime.now().strftime("supervised_handoff_predictor_%Y%m%d_%H%M%S_%f")
     output_root = Path(args.output_root) / run_id
     output_root.mkdir(parents=True, exist_ok=True)
-    feature_names = [f"feature_{index}" for index in range(int(input_dim))]
+    feature_names = feature_names_for_rsus(rsu_ids)
+    if len(feature_names) != int(input_dim):
+        raise RuntimeError("semantic feature order does not match predictor input dimension")
     checkpoint_path = output_root / "supervised_handoff_predictor.pt"
     checkpoint_payload = {
         "checkpoint_schema_version": CHECKPOINT_SCHEMA_VERSION,
@@ -543,6 +548,8 @@ def main() -> None:
         "feature_schema": {
             "schema_version": FEATURE_SCHEMA_VERSION,
             "feature_names": feature_names,
+            "feature_order_sha256": feature_order_sha256(feature_names),
+            "normalization_version": NORMALIZATION_VERSION,
             "note": "mobility/RSU/workflow/cache state only; no reward/action/outcome features",
         },
         "rsu_label_map": {

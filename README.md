@@ -107,6 +107,15 @@ PPO_MEC 是面向 AI-driven VEC 的研究原型，主线围绕跨 RSU 连续 DAG
 
 当前代码已接入薄 supervised handoff predictor 路径：`scripts/train_supervised_handoff_predictor.py` 可从冻结 train/dev window plan 训练短时 next-RSU / handoff-target / ETA predictor；`PredictorManager` 支持 `predictor_kind=supervised` 与显式 `predictor_checkpoint_path`。该层用于 handoff anticipation 和 lightweight DT-style predictive state snapshot，不是完整数字孪生系统，也不代表 predictor 本身已经形成 paper-ready 主结论；正式 claim 仍需要冻结 checkpoint、quality report、SA-GHMAPPO v9 重训和 formal/future-validation benchmark。
 
+G12进一步冻结 `causal_predictor_snapshot_contract_version=1.0.0`：generated/as-of/consumed时间、calibrated probabilities、staleness、abstention/mask和oracle隔离。入口仍默认关闭，不进入canonical profile。非hidden calibration/validation审计可运行：
+
+```bash
+.venv/bin/python scripts/audit_predictor_calibration.py \
+  --run_id causal_predictor_snapshot_validation_20260819_g12_v1
+```
+
+该命令不训练、不调参、不运行formal/holdout/hidden或RL性能比较。合同和claim边界见`docs/project/causal_calibrated_predictor_snapshot_contract.md`。
+
 ## 当前模型层
 
 主方法：

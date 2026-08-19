@@ -1,5 +1,14 @@
 ﻿# Progress
 
+## 2026-08-19: G12 Causal Calibrated Predictor Snapshot Contract frozen
+
+- 冻结 snapshot `1.0.0`、calibration artifact `causal_predictor_calibration_artifact_v1.0.0` 和 decision trace `1.0.0`；新增 generated/as-of/consumed、validity/age、raw/calibrated probability、abstention/mask、oracle isolation 与 fail-fast validator。
+- v71 非 hidden 材料按预先固定规则形成 `29,067/11,992/33,260` predictor-train/calibration/evaluation rows；frame/time/segment-frame 跨 split 零冲突，manifest SHA-256=`931a226b039d27501f84b10b33917cdb9bf55a54da17fa633b3bd217af1a7253`。vehicle跨split重现保留依赖风险记录。
+- binary temperature `1.0815913534` 仅由 calibration fit；dev Brier/NLL/ECE 为 `0.041477/0.149638/0.011171 -> 0.041231/0.148008/0.005648`。threshold `0.95` 由 calibration-only minimum-Brier/minimum-coverage规则选择，未读RL reward。
+- `PredictorManager` 增加默认关闭的 K-step slow snapshot消费；delay复用历史生成对象，cold/stale/unseen/low-confidence明确mask且不切换oracle。snapshot provenance进入step/summary/row；wrapper补齐可与G08 request ID对齐的pre-action observation trace。
+- NGSIM+Alibaba最小非formal trace完成5步、6个snapshot；当前真实快照均因cold-start或confidence gate abstain，诚实记录为0 accepted，不作policy benefit。artifact：`artifacts/analysis/causal_predictor_snapshot_validation_20260819_g12_v1/`。
+- 本轮未执行G13、训练/调参、formal/holdout/hidden，未下载G11 payload，未修改RL loss/reward/action/policy，也未自动启用canonical predictor。合同见 `docs/project/causal_calibrated_predictor_snapshot_contract.md`。
+
 ## 2026-08-19: G11 Public Model-Cache Dataset Discovery and Metadata Integration frozen
 
 - 冻结 `model_cache_dataset_registry_version=1.0.0`、A–I taxonomy、19项字段覆盖、100分权重/hard gates及 metadata-only compatibility validator；19个候选均由官方页面、仓库或API metadata核验，raw payload download=false。

@@ -1,0 +1,67 @@
+{
+  "contract_version": "1.0.0",
+  "delayed_snapshot_is_recomputed_with_future_information": false,
+  "is_rl_performance_comparison": false,
+  "observed_age_max": 6,
+  "observed_age_min": 0,
+  "observed_snapshot_count": 7,
+  "prediction_delay_definition": "consumed_at_step_minus_historical_generated_at_step",
+  "update_interval_rows": [
+    {
+      "calibration_by_staleness_bucket": null,
+      "eta_error_by_staleness": null,
+      "handoff_error_by_staleness": null,
+      "maximum_age_steps": 0,
+      "mean_age_steps": 0.0,
+      "metric_availability_note": "requires realized future labels aligned to each historical snapshot",
+      "prediction_drift": null,
+      "refresh_count": 7,
+      "simulated_step_count": 7,
+      "snapshot_reuse_count": 0,
+      "target_error_by_staleness": null,
+      "update_interval_steps": 1
+    },
+    {
+      "calibration_by_staleness_bucket": null,
+      "eta_error_by_staleness": null,
+      "handoff_error_by_staleness": null,
+      "maximum_age_steps": 2,
+      "mean_age_steps": 0.8571428571428571,
+      "metric_availability_note": "requires realized future labels aligned to each historical snapshot",
+      "prediction_drift": null,
+      "refresh_count": 3,
+      "simulated_step_count": 7,
+      "snapshot_reuse_count": 4,
+      "target_error_by_staleness": null,
+      "update_interval_steps": 3
+    },
+    {
+      "calibration_by_staleness_bucket": null,
+      "eta_error_by_staleness": null,
+      "handoff_error_by_staleness": null,
+      "maximum_age_steps": 5,
+      "mean_age_steps": 2.5,
+      "metric_availability_note": "requires realized future labels aligned to each historical snapshot",
+      "prediction_drift": null,
+      "refresh_count": 2,
+      "simulated_step_count": 12,
+      "snapshot_reuse_count": 10,
+      "target_error_by_staleness": null,
+      "update_interval_steps": 6
+    },
+    {
+      "calibration_by_staleness_bucket": null,
+      "eta_error_by_staleness": null,
+      "handoff_error_by_staleness": null,
+      "maximum_age_steps": 11,
+      "mean_age_steps": 5.5,
+      "metric_availability_note": "requires realized future labels aligned to each historical snapshot",
+      "prediction_drift": null,
+      "refresh_count": 2,
+      "simulated_step_count": 24,
+      "snapshot_reuse_count": 22,
+      "target_error_by_staleness": null,
+      "update_interval_steps": 12
+    }
+  ]
+}

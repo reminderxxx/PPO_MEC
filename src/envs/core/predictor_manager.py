@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter
+from copy import deepcopy
 import random
 from math import dist, sqrt
 from typing import Any
@@ -11,6 +12,14 @@ from src.data.mobility.rsu_mapper import RSUMapper
 from src.data.model_catalog.adapter_catalog import AdapterCatalog
 from src.envs.specs import RSUState, VehicleState, WorkflowGraphState
 from src.predictors import SupervisedHandoffPredictorRuntime
+from src.predictors.causal_snapshot import (
+    CAUSAL_PREDICTOR_SNAPSHOT_CONTRACT_VERSION,
+    build_causal_predictor_snapshot,
+    consume_snapshot,
+    load_calibration_artifact,
+    sha256_file,
+)
+from src.predictors.calibration import canonical_sha256
 
 
 class PredictorManager:
@@ -35,6 +44,15 @@ class PredictorManager:
         random_seed: int = 7,
         predictor_kind: str = "baseline",
         predictor_checkpoint_path: str = "",
+        causal_calibrated_snapshot_enabled: bool = False,
+        causal_snapshot_calibration_artifact_path: str = "",
+        causal_snapshot_update_interval_steps: int = 3,
+        causal_snapshot_valid_for_steps: int = 3,
+        causal_snapshot_min_history_steps: int = 1,
+        causal_snapshot_fallback_behavior: str = "mask_only",
+        causal_snapshot_source_dataset_identity: dict[str, Any] | None = None,
+        causal_snapshot_source_window_plan_identity: dict[str, Any] | None = None,
+        causal_snapshot_git_commit: str = "unknown",
     ) -> None:
         self._horizon = max(int(horizon), 1)
         self._history_window = max(int(history_window), 1)
@@ -60,6 +78,56 @@ class PredictorManager:
             if self._requested_predictor_kind == "supervised"
             else None
         )
+        self._causal_calibrated_snapshot_enabled = bool(causal_calibrated_snapshot_enabled)
+        self._causal_snapshot_update_interval_steps = max(int(causal_snapshot_update_interval_steps), 1)
+        self._causal_snapshot_valid_for_steps = max(int(causal_snapshot_valid_for_steps), 0)
+        self._causal_snapshot_min_history_steps = max(int(causal_snapshot_min_history_steps), 0)
+        self._causal_snapshot_fallback_behavior = str(causal_snapshot_fallback_behavior or "mask_only")
+        if self._causal_snapshot_fallback_behavior not in {"mask_only", "no_prediction"}:
+            raise ValueError("causal snapshot fallback behavior must be mask_only or no_prediction")
+        if self._causal_calibrated_snapshot_enabled and self._requested_predictor_kind != "supervised":
+            raise ValueError("causal calibrated snapshot consumption currently requires predictor_kind=supervised")
+        if self._causal_calibrated_snapshot_enabled and self._oracle_prediction_enabled:
+            raise ValueError("causal supervised snapshots cannot be combined with oracle prediction")
+        if self._causal_calibrated_snapshot_enabled and self._disable_prediction_output:
+            raise ValueError("causal supervised snapshots cannot be combined with disable_prediction_output")
+        if self._causal_calibrated_snapshot_enabled and (
+            self._prediction_noise_std > 0.0
+            or self._drop_handoff_prediction_prob > 0.0
+            or self._prediction_confidence_scale != 1.0
+        ):
+            raise ValueError(
+                "legacy prediction perturbations are not defined for causal calibrated snapshots"
+            )
+        self._causal_snapshot_calibration_artifact = (
+            load_calibration_artifact(causal_snapshot_calibration_artifact_path)
+            if causal_snapshot_calibration_artifact_path
+            else None
+        )
+        self._causal_snapshot_source_dataset_identity = deepcopy(
+            causal_snapshot_source_dataset_identity
+            or {"dataset": "NGSIM", "role": "mobility_handoff_only", "cross_source": False}
+        )
+        self._causal_snapshot_source_window_plan_identity = deepcopy(
+            causal_snapshot_source_window_plan_identity
+        )
+        self._causal_snapshot_git_commit = str(causal_snapshot_git_commit or "unknown")
+        self._causal_snapshot_config_hash = canonical_sha256(
+            {
+                "enabled": self._causal_calibrated_snapshot_enabled,
+                "predictor_kind": self._requested_predictor_kind,
+                "checkpoint_path": str(predictor_checkpoint_path),
+                "calibration_artifact_hash": (
+                    self._causal_snapshot_calibration_artifact.get("_artifact_sha256")
+                    if self._causal_snapshot_calibration_artifact
+                    else None
+                ),
+                "update_interval_steps": self._causal_snapshot_update_interval_steps,
+                "valid_for_steps": self._causal_snapshot_valid_for_steps,
+                "minimum_history_steps": self._causal_snapshot_min_history_steps,
+                "fallback_behavior": self._causal_snapshot_fallback_behavior,
+            }
+        )
         self._oracle_time_to_index = {
             int(frame.get("time_index", 0)): index
             for index, frame in enumerate(self._oracle_future_frames)
@@ -70,6 +138,13 @@ class PredictorManager:
         self._last_vehicle_positions: dict[str, tuple[float, float]] = {}
         self._vehicle_position_history: dict[str, list[tuple[float, float]]] = {}
         self._prediction_history: list[dict[str, Any]] = []
+        self._causal_snapshot_call_index = 0
+        self._causal_snapshot_refresh_count = 0
+        self._causal_snapshot_history: list[dict[str, Any]] = []
+        self._latest_supervised_payload: dict[str, Any] | None = None
+        self._latest_supervised_generated_step: int | None = None
+        self._latest_supervised_generated_time: int | float | None = None
+        self._observed_time_history: list[int | float] = []
 
     def reset(self) -> None:
         """重置内部统计状态。"""
@@ -78,6 +153,13 @@ class PredictorManager:
         self._last_vehicle_positions = {}
         self._vehicle_position_history = {}
         self._prediction_history = []
+        self._causal_snapshot_call_index = 0
+        self._causal_snapshot_refresh_count = 0
+        self._causal_snapshot_history = []
+        self._latest_supervised_payload = None
+        self._latest_supervised_generated_step = None
+        self._latest_supervised_generated_time = None
+        self._observed_time_history = []
 
     def predict_next_rsu_sequence(
         self,
@@ -221,16 +303,28 @@ class PredictorManager:
         current_associations: dict[str, str | None],
     ) -> dict[str, Any]:
         """构造环境状态中的统一 predictions 字段。"""
+        snapshot_step = self._causal_snapshot_call_index
+        snapshot_refresh_due = bool(
+            not self._causal_calibrated_snapshot_enabled
+            or self._latest_supervised_payload is None
+            or snapshot_step % self._causal_snapshot_update_interval_steps == 0
+        )
         next_rsu_sequence = self.predict_next_rsu_sequence(vehicles, rsu_states)
         supervised_payload: dict[str, Any] = {}
         if self._supervised_predictor is not None:
-            supervised_payload = self._supervised_predictor.predict(
-                vehicles=vehicles,
-                rsu_states=rsu_states,
-                workflow_state=workflow_state,
-                current_associations=current_associations,
-                last_vehicle_positions=self._last_vehicle_positions,
-            )
+            if snapshot_refresh_due:
+                supervised_payload = self._supervised_predictor.predict(
+                    vehicles=vehicles,
+                    rsu_states=rsu_states,
+                    workflow_state=workflow_state,
+                    current_associations=current_associations,
+                    last_vehicle_positions=self._last_vehicle_positions,
+                )
+                self._latest_supervised_payload = deepcopy(supervised_payload)
+                self._latest_supervised_generated_step = snapshot_step
+                self._latest_supervised_generated_time = time_index
+            else:
+                supervised_payload = deepcopy(self._latest_supervised_payload or {})
             next_rsu_sequence = {
                 vehicle_id: list(sequence)
                 for vehicle_id, sequence in supervised_payload["next_rsu_sequence"].items()
@@ -316,6 +410,9 @@ class PredictorManager:
                     "supervised_predictor_scores_by_vehicle": dict(
                         supervised_payload.get("supervised_predictor_scores_by_vehicle", {})
                     ),
+                    "supervised_prediction_details_by_vehicle": deepcopy(
+                        supervised_payload.get("supervised_prediction_details_by_vehicle", {})
+                    ),
                     "supervised_predictor_checkpoint": dict(
                         self._supervised_predictor.payload_metadata
                         if self._supervised_predictor is not None
@@ -336,12 +433,29 @@ class PredictorManager:
                 vehicles=vehicles,
             )
         self._update_last_positions(vehicles)
-        perturbed_predictions = self._apply_prediction_perturbations(predictions)
-        return self._attach_prediction_contract_metadata(
+        perturbed_predictions = self._apply_prediction_perturbations(
+            predictions,
+            apply_delay=not self._causal_calibrated_snapshot_enabled,
+        )
+        contracted_predictions = self._attach_prediction_contract_metadata(
             predictions=perturbed_predictions,
             vehicles=vehicles,
             current_associations=current_associations,
         )
+        if self._causal_calibrated_snapshot_enabled:
+            contracted_predictions = self._attach_causal_calibrated_snapshots(
+                predictions=contracted_predictions,
+                vehicles=vehicles,
+                rsu_states=rsu_states,
+                current_associations=current_associations,
+                time_index=time_index,
+                snapshot_step=snapshot_step,
+                refresh_due=snapshot_refresh_due,
+            )
+        self._observed_time_history.append(time_index)
+        self._observed_time_history = self._observed_time_history[-self._history_window :]
+        self._causal_snapshot_call_index += 1
+        return contracted_predictions
 
     def _normalize_predictor_kind(self, predictor_kind: str) -> str:
         normalized = str(predictor_kind or "baseline").strip().lower()
@@ -496,6 +610,210 @@ class PredictorManager:
             ),
         }
 
+    def _attach_causal_calibrated_snapshots(
+        self,
+        *,
+        predictions: dict[str, Any],
+        vehicles: list[VehicleState],
+        rsu_states: list[RSUState],
+        current_associations: dict[str, str | None],
+        time_index: int,
+        snapshot_step: int,
+        refresh_due: bool,
+    ) -> dict[str, Any]:
+        """Attach historical, calibrated snapshots and expose only accepted values."""
+        details_by_vehicle = dict(predictions.get("supervised_prediction_details_by_vehicle", {}))
+        if refresh_due:
+            generated_step = int(
+                self._latest_supervised_generated_step
+                if self._latest_supervised_generated_step is not None
+                else snapshot_step
+            )
+            generated_time = (
+                self._latest_supervised_generated_time
+                if self._latest_supervised_generated_time is not None
+                else time_index
+            )
+            checkpoint_metadata = dict(predictions.get("supervised_predictor_checkpoint", {}))
+            checkpoint_path = checkpoint_metadata.get("checkpoint_path")
+            checkpoint_identity = {
+                "path": str(checkpoint_path) if checkpoint_path else None,
+                "sha256": sha256_file(checkpoint_path) if checkpoint_path else None,
+                "run_id": checkpoint_metadata.get("run_id"),
+                "checkpoint_schema_version": checkpoint_metadata.get("checkpoint_schema_version"),
+                "feature_schema_version": checkpoint_metadata.get("feature_schema_version"),
+                "feature_order_sha256": checkpoint_metadata.get("feature_order_sha256"),
+                "rsu_ids": checkpoint_metadata.get("rsu_ids"),
+                "horizon": checkpoint_metadata.get("horizon"),
+                "normalization_version": checkpoint_metadata.get("normalization_version"),
+            }
+            runtime_rsu_ids = [str(rsu.rsu_id) for rsu in rsu_states]
+            generated_snapshots: dict[str, dict[str, Any]] = {}
+            for vehicle in vehicles:
+                vehicle_id = str(vehicle.vehicle_id)
+                details = dict(details_by_vehicle.get(vehicle_id, {}))
+                feature_mask = dict(details.get("feature_availability_mask", {}))
+                previous_available = bool(feature_mask.get("previous_vehicle_position", False))
+                insufficient_history = bool(
+                    self._causal_snapshot_min_history_steps > 0 and not previous_available
+                )
+                history_count = len(self._vehicle_position_history.get(vehicle_id, []))
+                history_start_step = max(generated_step - max(history_count - 1, 0), 0) if history_count else None
+                generated_snapshots[vehicle_id] = build_causal_predictor_snapshot(
+                    vehicle_id=vehicle_id,
+                    predictor_kind="supervised",
+                    model_identity="supervised_handoff_predictor_v1",
+                    checkpoint_identity=checkpoint_identity,
+                    predictor_config_hash=self._causal_snapshot_config_hash,
+                    source_dataset_identity=self._causal_snapshot_source_dataset_identity,
+                    source_window_plan_identity=self._causal_snapshot_source_window_plan_identity,
+                    git_commit=self._causal_snapshot_git_commit,
+                    generated_at_step=generated_step,
+                    generated_at_time=generated_time,
+                    observation_as_of_step=generated_step,
+                    observation_as_of_time=generated_time,
+                    consumed_at_step=generated_step,
+                    consumed_at_time=generated_time,
+                    label_horizon=(self._supervised_predictor.horizon if self._supervised_predictor else self._horizon),
+                    valid_for_steps=self._causal_snapshot_valid_for_steps,
+                    update_interval_steps=self._causal_snapshot_update_interval_steps,
+                    current_rsu_id=current_associations.get(vehicle_id),
+                    class_ids=list(details.get("class_ids", [])),
+                    runtime_rsu_ids=runtime_rsu_ids,
+                    raw_next_rsu_logits=details.get("next_rsu_logits"),
+                    raw_handoff_logit=details.get("handoff_logit"),
+                    raw_handoff_target_logits=details.get("handoff_target_logits"),
+                    eta_point_estimate=details.get("eta_point_estimate_steps"),
+                    calibration_artifact=self._causal_snapshot_calibration_artifact,
+                    feature_availability_mask=feature_mask,
+                    normalization_version=str(details.get("normalization_version", "unknown")),
+                    history_start_step=history_start_step,
+                    history_end_step=generated_step,
+                    history_start_time=(self._observed_time_history[0] if self._observed_time_history else generated_time),
+                    history_end_time=generated_time,
+                    source_frame_interval=[generated_step, generated_step],
+                    source_time_interval=[generated_time, generated_time],
+                    causal_cutoff_step=generated_step,
+                    causal_cutoff_time=generated_time,
+                    insufficient_history=insufficient_history,
+                    predictor_available=bool(details),
+                    fallback_behavior=self._causal_snapshot_fallback_behavior,
+                    oracle=False,
+                    allow_oracle_consumer=False,
+                    demand_or_arrival_belief=None,
+                )
+            self._causal_snapshot_history.append(
+                {
+                    "generated_step": generated_step,
+                    "generated_time": generated_time,
+                    "snapshots": generated_snapshots,
+                }
+            )
+            history_limit = max(
+                self._prediction_delay_steps
+                + self._causal_snapshot_valid_for_steps
+                + self._causal_snapshot_update_interval_steps
+                + 2,
+                4,
+            )
+            self._causal_snapshot_history = self._causal_snapshot_history[-history_limit:]
+            self._causal_snapshot_refresh_count += 1
+
+        maximum_generated_step = snapshot_step - self._prediction_delay_steps
+        eligible_history = [
+            entry
+            for entry in self._causal_snapshot_history
+            if int(entry["generated_step"]) <= maximum_generated_step
+        ]
+        selected_entry = eligible_history[-1] if eligible_history else None
+        consumed_snapshots: dict[str, dict[str, Any]] = {}
+        if selected_entry is not None:
+            for vehicle in vehicles:
+                source_snapshot = selected_entry["snapshots"].get(str(vehicle.vehicle_id))
+                if source_snapshot is not None:
+                    consumed_snapshots[str(vehicle.vehicle_id)] = consume_snapshot(
+                        source_snapshot,
+                        consumed_at_step=snapshot_step,
+                        consumed_at_time=time_index,
+                    )
+
+        availability_by_vehicle = {
+            str(vehicle.vehicle_id): int(
+                consumed_snapshots.get(str(vehicle.vehicle_id), {}).get("predictions", {}).get("availability_mask", 0)
+            )
+            for vehicle in vehicles
+        }
+        snapshot_ids = {
+            str(vehicle.vehicle_id): consumed_snapshots.get(str(vehicle.vehicle_id), {}).get("identity", {}).get("snapshot_id")
+            for vehicle in vehicles
+        }
+        accepted_next: dict[str, str | None] = {}
+        accepted_target: dict[str, str | None] = {}
+        accepted_confidence: dict[str, float] = {}
+        accepted_uncertainty: dict[str, float] = {}
+        accepted_eta: dict[str, float | None] = {}
+        accepted_sequence: dict[str, list[str | None]] = {}
+        for vehicle in vehicles:
+            vehicle_id = str(vehicle.vehicle_id)
+            snapshot_predictions = consumed_snapshots.get(vehicle_id, {}).get("predictions", {})
+            if availability_by_vehicle[vehicle_id]:
+                next_rsu_id = snapshot_predictions.get("predicted_next_rsu_id")
+                target_rsu_id = snapshot_predictions.get("predicted_target_rsu_id")
+                eta_steps = snapshot_predictions.get("eta_point_estimate_steps")
+                accepted_next[vehicle_id] = next_rsu_id
+                accepted_target[vehicle_id] = target_rsu_id
+                accepted_confidence[vehicle_id] = float(snapshot_predictions.get("confidence") or 0.0)
+                accepted_uncertainty[vehicle_id] = float(snapshot_predictions.get("uncertainty") or 0.0)
+                accepted_eta[vehicle_id] = eta_steps
+                accepted_sequence[vehicle_id] = self._supervised_predictor._build_sequence(
+                    current_rsu_id=current_associations.get(vehicle_id),
+                    next_rsu_id=next_rsu_id,
+                    target_rsu_id=target_rsu_id,
+                    eta_steps=float(eta_steps or self._horizon),
+                ) if self._supervised_predictor is not None else [next_rsu_id] * self._horizon
+            else:
+                accepted_next[vehicle_id] = None
+                accepted_target[vehicle_id] = None
+                accepted_confidence[vehicle_id] = 0.0
+                accepted_uncertainty[vehicle_id] = 1.0
+                accepted_eta[vehicle_id] = None
+                accepted_sequence[vehicle_id] = [None] * self._horizon
+
+        predictions.update(
+            {
+                "causal_calibrated_snapshot_enabled": True,
+                "causal_predictor_snapshot_contract_version": CAUSAL_PREDICTOR_SNAPSHOT_CONTRACT_VERSION,
+                "causal_predictor_snapshots_by_vehicle": consumed_snapshots,
+                "causal_snapshot_id_by_vehicle": snapshot_ids,
+                "causal_snapshot_availability_by_vehicle": availability_by_vehicle,
+                "causal_snapshot_runtime_audit": {
+                    "update_interval_steps": self._causal_snapshot_update_interval_steps,
+                    "valid_for_steps": self._causal_snapshot_valid_for_steps,
+                    "prediction_delay_steps": self._prediction_delay_steps,
+                    "delay_definition": "consumed_at_step_minus_historical_generated_at_step",
+                    "refresh_due": refresh_due,
+                    "refresh_count": self._causal_snapshot_refresh_count,
+                    "reuse_count": max(snapshot_step + 1 - self._causal_snapshot_refresh_count, 0),
+                    "historical_snapshot_available": selected_entry is not None,
+                    "cold_start": selected_entry is None,
+                    "fallback_behavior": self._causal_snapshot_fallback_behavior,
+                    "calibration_available": self._causal_snapshot_calibration_artifact is not None,
+                    "oracle_fallback_allowed": False,
+                },
+                "next_rsu_sequence": accepted_sequence,
+                "predicted_next_rsu_by_vehicle": accepted_next,
+                "predicted_first_handoff_rsu_by_vehicle": accepted_target,
+                "predicted_handoff_target_rsu_id_by_vehicle": accepted_target,
+                "predicted_handoff_vehicle_ids": [
+                    vehicle_id for vehicle_id, target in accepted_target.items() if target is not None
+                ],
+                "prediction_confidence_by_vehicle": accepted_confidence,
+                "prediction_uncertainty_by_vehicle": accepted_uncertainty,
+                "predicted_handoff_eta_steps_by_vehicle": accepted_eta,
+            }
+        )
+        return predictions
+
     def _apply_oracle_predictions(
         self,
         predictions: dict[str, Any],
@@ -603,7 +921,12 @@ class PredictorManager:
             uncertainty_by_vehicle[vehicle_id] = round(1.0 - confidence, 3)
         return confidence_by_vehicle, uncertainty_by_vehicle
 
-    def _apply_prediction_perturbations(self, predictions: dict[str, Any]) -> dict[str, Any]:
+    def _apply_prediction_perturbations(
+        self,
+        predictions: dict[str, Any],
+        *,
+        apply_delay: bool = True,
+    ) -> dict[str, Any]:
         perturbed = {
             key: (value.copy() if isinstance(value, dict) else list(value) if isinstance(value, list) else value)
             for key, value in predictions.items()
@@ -653,6 +976,8 @@ class PredictorManager:
             "drop_handoff_prediction_prob": self._drop_handoff_prediction_prob,
         }
         perturbed.pop("_current_associations", None)
+        if not apply_delay:
+            return perturbed
         self._prediction_history.append(perturbed)
         history_limit = max(self._prediction_delay_steps + 1, 1)
         if len(self._prediction_history) > history_limit:

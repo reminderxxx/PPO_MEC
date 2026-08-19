@@ -2,6 +2,15 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-19: G12 predictor causality/calibration contract frozen; policy use remains blocked
+
+- `RESOLVED / causal runtime`：snapshot现验证generated/as-of/consumed、history/source cutoff、age/expiry；delay读取历史对象，episode/window reset清空状态，oracle/supervised identity分离。
+- `RESOLVED / calibration reuse`：原v112在dev选threshold并同split报告的问题不再用于G12；新binary temperature和abstention threshold仅fit/select于独立calibration段，不读取evaluation label或RL reward。
+- `OPEN / multiclass calibration evidence`：历史quality rows没有next-RSU/target全量logits；真实multiclass Brier/NLL/ECE仍unavailable。handoff-positive eligible target hard top-1仅`0.001823`，旧all-row `0.950481`主要受no-target多数类口径影响。
+- `OPEN / vehicle dependence`：frame/time跨split零冲突，但同一vehicle ID可在不同不相邻区间重现；当前明确记录相邻轨迹/group依赖风险，不把window ID当独立性证据。
+- `OPEN / real acceptance`：最小NGSIM trace在threshold `0.95`下0/6 accepted；它证明fail-safe链路，不证明可用coverage或policy收益。需要新独立标签对齐材料才能报告real staleness drift/error。
+- `BLOCKED / canonical policy`：v112 predictor-policy collapse仍有效；G12只提供默认关闭接口。未经G13独立协议、训练与新split验证，不得把supervised snapshot启用进canonical profile。
+
 ## 2026-08-19: G11 public model-cache registry frozen; joint-trace gap remains open
 
 - `RESOLVED / semantic classification`：HF模型文件、内容cache、KV/prefix trace、generic AI workload与真实model request trace已由固定taxonomy和hard gate分离；rejected来源不能进入live projection。

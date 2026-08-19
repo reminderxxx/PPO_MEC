@@ -1,0 +1,1614 @@
+{
+  "abstention_reason_counts": {
+    "confidence_below_threshold": 6,
+    "insufficient_history": 6
+  },
+  "accepted_snapshot_count": 0,
+  "action_semantics_changed": false,
+  "availability": "available",
+  "decision_observation_trace": {
+    "decision_observation_trace_version": "1.0.0",
+    "provenance": {
+      "availability": "g08_alignable",
+      "evaluation_unit_id": "g12_nonformal_ngsim_minimal",
+      "g07_manifest_id": null,
+      "g07_manifest_semantic_sha256": null,
+      "g08_oracle_contract_version": null,
+      "g09_analysis_fingerprint": null,
+      "request_replay_fingerprint": null
+    },
+    "records": [
+      {
+        "action_mask": [
+          true,
+          false,
+          true,
+          true,
+          false
+        ],
+        "captured_phase": "pre_action",
+        "controller_identity": "single_environment_action_controller",
+        "decision_observation_trace_version": "1.0.0",
+        "eligible_actions": [
+          0,
+          2,
+          3
+        ],
+        "feature_availability": {
+          "accepted_predicted_handoff_count": true,
+          "current_node_available": true,
+          "current_rsu_cache_size": true,
+          "handoff_event_count": true,
+          "mean_future_load": true,
+          "relative_time": true,
+          "rsu_count": true,
+          "vehicle_count": true,
+          "workflow_progress": true
+        },
+        "feature_name_to_index": {
+          "accepted_predicted_handoff_count": 5,
+          "current_node_available": 6,
+          "current_rsu_cache_size": 7,
+          "handoff_event_count": 4,
+          "mean_future_load": 8,
+          "relative_time": 0,
+          "rsu_count": 2,
+          "vehicle_count": 1,
+          "workflow_progress": 3
+        },
+        "flattened_dimension": 9,
+        "flattened_feature_values": {
+          "accepted_predicted_handoff_count": 0.0,
+          "current_node_available": 1.0,
+          "current_rsu_cache_size": 0.24491866240370913,
+          "handoff_event_count": 0.0,
+          "mean_future_load": 0.04164257074548595,
+          "relative_time": 0.0,
+          "rsu_count": 0.5,
+          "vehicle_count": 0.125,
+          "workflow_progress": 0.0
+        },
+        "flattened_observation": [
+          0.0,
+          0.125,
+          0.5,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.24491866240370913,
+          0.04164257074548595
+        ],
+        "future_or_outcome_fields_present": false,
+        "information_scopes": {
+          "actor_visibility": "flat_observation_plus_agent_semantic_encoder_if_configured",
+          "controller_visibility": "semantic_state_and_flat_observation",
+          "critic_visibility": "agent_dependent; wrapper_adds_no_future_or_label_fields",
+          "cross_rsu_global_information": [
+            "rsu_count",
+            "mean_future_load"
+          ],
+          "current_local_information": [
+            "current_rsu_id",
+            "current_rsu_cache_size"
+          ],
+          "history_derived_information": [
+            "relative_time"
+          ],
+          "predictor_outputs": [
+            "accepted_predicted_handoff_count",
+            "predictor"
+          ]
+        },
+        "normalization": {
+          "fitted_on_data": false,
+          "kind": "deterministic_scale_and_tanh",
+          "version": "deterministic_scale_v1"
+        },
+        "observation_contract_version": "gym_vec_flat_semantic_v1",
+        "observation_projections": {
+          "actor_local": {
+            "current_rsu_cache_size": 2.0,
+            "current_rsu_id": "rsu_b"
+          },
+          "controller_global": {
+            "current_rsu_id": "rsu_b",
+            "mean_future_load": 0.25,
+            "rsu_count": 4.0
+          },
+          "critic_only": {},
+          "predictor_augmented": {
+            "availability_mask": 0,
+            "predicted_handoff_target_rsu_id": null,
+            "predicted_next_rsu_id": null,
+            "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+          }
+        },
+        "post_decision_outcome": {
+          "selected_action": 0
+        },
+        "predictor_snapshot_provenance": {
+          "age_steps": 0,
+          "availability_mask": 0,
+          "consumed_at_step": 0,
+          "contract_version": "1.0.0",
+          "generated_at_step": 0,
+          "observation_as_of_step": 0,
+          "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+        },
+        "raw_semantic_fields": {
+          "current_rsu_id": "rsu_b",
+          "flat_raw_feature_values": {
+            "accepted_predicted_handoff_count": 0.0,
+            "current_node_available": 1.0,
+            "current_rsu_cache_size": 2.0,
+            "handoff_event_count": 0.0,
+            "mean_future_load": 0.25,
+            "relative_time": 1163565100.0,
+            "rsu_count": 4.0,
+            "vehicle_count": 1.0,
+            "workflow_progress": 0.0
+          },
+          "predictor": {
+            "availability_mask": 0,
+            "predicted_handoff_target_rsu_id": null,
+            "predicted_next_rsu_id": null,
+            "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+          },
+          "primary_vehicle_id": "peachtree:846"
+        },
+        "request_id": "g12_nonformal_ngsim_minimal/request_000001",
+        "semantic_feature_map": {
+          "accepted_predicted_handoff_count": 0.0,
+          "current_node_available": 1.0,
+          "current_rsu_cache_size": 2.0,
+          "handoff_event_count": 0.0,
+          "mean_future_load": 0.25,
+          "relative_time": 1163565100.0,
+          "rsu_count": 4.0,
+          "vehicle_count": 1.0,
+          "workflow_progress": 0.0
+        },
+        "step_index": 1,
+        "time_index": 1163565100
+      },
+      {
+        "action_mask": [
+          true,
+          false,
+          true,
+          true,
+          false
+        ],
+        "captured_phase": "pre_action",
+        "controller_identity": "single_environment_action_controller",
+        "decision_observation_trace_version": "1.0.0",
+        "eligible_actions": [
+          0,
+          2,
+          3
+        ],
+        "feature_availability": {
+          "accepted_predicted_handoff_count": true,
+          "current_node_available": true,
+          "current_rsu_cache_size": true,
+          "handoff_event_count": true,
+          "mean_future_load": true,
+          "relative_time": true,
+          "rsu_count": true,
+          "vehicle_count": true,
+          "workflow_progress": true
+        },
+        "feature_name_to_index": {
+          "accepted_predicted_handoff_count": 5,
+          "current_node_available": 6,
+          "current_rsu_cache_size": 7,
+          "handoff_event_count": 4,
+          "mean_future_load": 8,
+          "relative_time": 0,
+          "rsu_count": 2,
+          "vehicle_count": 1,
+          "workflow_progress": 3
+        },
+        "flattened_dimension": 9,
+        "flattened_feature_values": {
+          "accepted_predicted_handoff_count": 0.0,
+          "current_node_available": 1.0,
+          "current_rsu_cache_size": 0.35835739835078595,
+          "handoff_event_count": 0.24491866240370913,
+          "mean_future_load": 0.04164257074548595,
+          "relative_time": 0.9999925467214317,
+          "rsu_count": 0.5,
+          "vehicle_count": 0.125,
+          "workflow_progress": 0.1111111111111111
+        },
+        "flattened_observation": [
+          0.9999925467214317,
+          0.125,
+          0.5,
+          0.1111111111111111,
+          0.24491866240370913,
+          0.0,
+          1.0,
+          0.35835739835078595,
+          0.04164257074548595
+        ],
+        "future_or_outcome_fields_present": false,
+        "information_scopes": {
+          "actor_visibility": "flat_observation_plus_agent_semantic_encoder_if_configured",
+          "controller_visibility": "semantic_state_and_flat_observation",
+          "critic_visibility": "agent_dependent; wrapper_adds_no_future_or_label_fields",
+          "cross_rsu_global_information": [
+            "rsu_count",
+            "mean_future_load"
+          ],
+          "current_local_information": [
+            "current_rsu_id",
+            "current_rsu_cache_size"
+          ],
+          "history_derived_information": [
+            "relative_time"
+          ],
+          "predictor_outputs": [
+            "accepted_predicted_handoff_count",
+            "predictor"
+          ]
+        },
+        "normalization": {
+          "fitted_on_data": false,
+          "kind": "deterministic_scale_and_tanh",
+          "version": "deterministic_scale_v1"
+        },
+        "observation_contract_version": "gym_vec_flat_semantic_v1",
+        "observation_projections": {
+          "actor_local": {
+            "current_rsu_cache_size": 3.0,
+            "current_rsu_id": "rsu_c"
+          },
+          "controller_global": {
+            "current_rsu_id": "rsu_c",
+            "mean_future_load": 0.25,
+            "rsu_count": 4.0
+          },
+          "critic_only": {},
+          "predictor_augmented": {
+            "availability_mask": 0,
+            "predicted_handoff_target_rsu_id": null,
+            "predicted_next_rsu_id": null,
+            "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+          }
+        },
+        "post_decision_outcome": {
+          "selected_action": 0
+        },
+        "predictor_snapshot_provenance": {
+          "age_steps": 1,
+          "availability_mask": 0,
+          "consumed_at_step": 1,
+          "contract_version": "1.0.0",
+          "generated_at_step": 0,
+          "observation_as_of_step": 0,
+          "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+        },
+        "raw_semantic_fields": {
+          "current_rsu_id": "rsu_c",
+          "flat_raw_feature_values": {
+            "accepted_predicted_handoff_count": 0.0,
+            "current_node_available": 1.0,
+            "current_rsu_cache_size": 3.0,
+            "handoff_event_count": 1.0,
+            "mean_future_load": 0.25,
+            "relative_time": 1163565200.0,
+            "rsu_count": 4.0,
+            "vehicle_count": 1.0,
+            "workflow_progress": 0.1111111111111111
+          },
+          "predictor": {
+            "availability_mask": 0,
+            "predicted_handoff_target_rsu_id": null,
+            "predicted_next_rsu_id": null,
+            "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+          },
+          "primary_vehicle_id": "peachtree:846"
+        },
+        "request_id": "g12_nonformal_ngsim_minimal/request_000002",
+        "semantic_feature_map": {
+          "accepted_predicted_handoff_count": 0.0,
+          "current_node_available": 1.0,
+          "current_rsu_cache_size": 3.0,
+          "handoff_event_count": 1.0,
+          "mean_future_load": 0.25,
+          "relative_time": 1163565200.0,
+          "rsu_count": 4.0,
+          "vehicle_count": 1.0,
+          "workflow_progress": 0.1111111111111111
+        },
+        "step_index": 2,
+        "time_index": 1163565200
+      },
+      {
+        "action_mask": [
+          true,
+          false,
+          true,
+          true,
+          false
+        ],
+        "captured_phase": "pre_action",
+        "controller_identity": "single_environment_action_controller",
+        "decision_observation_trace_version": "1.0.0",
+        "eligible_actions": [
+          0,
+          2,
+          3
+        ],
+        "feature_availability": {
+          "accepted_predicted_handoff_count": true,
+          "current_node_available": true,
+          "current_rsu_cache_size": true,
+          "handoff_event_count": true,
+          "mean_future_load": true,
+          "relative_time": true,
+          "rsu_count": true,
+          "vehicle_count": true,
+          "workflow_progress": true
+        },
+        "feature_name_to_index": {
+          "accepted_predicted_handoff_count": 5,
+          "current_node_available": 6,
+          "current_rsu_cache_size": 7,
+          "handoff_event_count": 4,
+          "mean_future_load": 8,
+          "relative_time": 0,
+          "rsu_count": 2,
+          "vehicle_count": 1,
+          "workflow_progress": 3
+        },
+        "flattened_dimension": 9,
+        "flattened_feature_values": {
+          "accepted_predicted_handoff_count": 0.0,
+          "current_node_available": 1.0,
+          "current_rsu_cache_size": 0.35835739835078595,
+          "handoff_event_count": 0.0,
+          "mean_future_load": 0.04164257074548595,
+          "relative_time": 0.9999999999722241,
+          "rsu_count": 0.5,
+          "vehicle_count": 0.125,
+          "workflow_progress": 0.2222222222222222
+        },
+        "flattened_observation": [
+          0.9999999999722241,
+          0.125,
+          0.5,
+          0.2222222222222222,
+          0.0,
+          0.0,
+          1.0,
+          0.35835739835078595,
+          0.04164257074548595
+        ],
+        "future_or_outcome_fields_present": false,
+        "information_scopes": {
+          "actor_visibility": "flat_observation_plus_agent_semantic_encoder_if_configured",
+          "controller_visibility": "semantic_state_and_flat_observation",
+          "critic_visibility": "agent_dependent; wrapper_adds_no_future_or_label_fields",
+          "cross_rsu_global_information": [
+            "rsu_count",
+            "mean_future_load"
+          ],
+          "current_local_information": [
+            "current_rsu_id",
+            "current_rsu_cache_size"
+          ],
+          "history_derived_information": [
+            "relative_time"
+          ],
+          "predictor_outputs": [
+            "accepted_predicted_handoff_count",
+            "predictor"
+          ]
+        },
+        "normalization": {
+          "fitted_on_data": false,
+          "kind": "deterministic_scale_and_tanh",
+          "version": "deterministic_scale_v1"
+        },
+        "observation_contract_version": "gym_vec_flat_semantic_v1",
+        "observation_projections": {
+          "actor_local": {
+            "current_rsu_cache_size": 3.0,
+            "current_rsu_id": "rsu_c"
+          },
+          "controller_global": {
+            "current_rsu_id": "rsu_c",
+            "mean_future_load": 0.25,
+            "rsu_count": 4.0
+          },
+          "critic_only": {},
+          "predictor_augmented": {
+            "availability_mask": 0,
+            "predicted_handoff_target_rsu_id": null,
+            "predicted_next_rsu_id": null,
+            "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+          }
+        },
+        "post_decision_outcome": {
+          "selected_action": 0
+        },
+        "predictor_snapshot_provenance": {
+          "age_steps": 2,
+          "availability_mask": 0,
+          "consumed_at_step": 2,
+          "contract_version": "1.0.0",
+          "generated_at_step": 0,
+          "observation_as_of_step": 0,
+          "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+        },
+        "raw_semantic_fields": {
+          "current_rsu_id": "rsu_c",
+          "flat_raw_feature_values": {
+            "accepted_predicted_handoff_count": 0.0,
+            "current_node_available": 1.0,
+            "current_rsu_cache_size": 3.0,
+            "handoff_event_count": 0.0,
+            "mean_future_load": 0.25,
+            "relative_time": 1163565300.0,
+            "rsu_count": 4.0,
+            "vehicle_count": 1.0,
+            "workflow_progress": 0.2222222222222222
+          },
+          "predictor": {
+            "availability_mask": 0,
+            "predicted_handoff_target_rsu_id": null,
+            "predicted_next_rsu_id": null,
+            "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+          },
+          "primary_vehicle_id": "peachtree:846"
+        },
+        "request_id": "g12_nonformal_ngsim_minimal/request_000003",
+        "semantic_feature_map": {
+          "accepted_predicted_handoff_count": 0.0,
+          "current_node_available": 1.0,
+          "current_rsu_cache_size": 3.0,
+          "handoff_event_count": 0.0,
+          "mean_future_load": 0.25,
+          "relative_time": 1163565300.0,
+          "rsu_count": 4.0,
+          "vehicle_count": 1.0,
+          "workflow_progress": 0.2222222222222222
+        },
+        "step_index": 3,
+        "time_index": 1163565300
+      },
+      {
+        "action_mask": [
+          true,
+          false,
+          true,
+          true,
+          false
+        ],
+        "captured_phase": "pre_action",
+        "controller_identity": "single_environment_action_controller",
+        "decision_observation_trace_version": "1.0.0",
+        "eligible_actions": [
+          0,
+          2,
+          3
+        ],
+        "feature_availability": {
+          "accepted_predicted_handoff_count": true,
+          "current_node_available": true,
+          "current_rsu_cache_size": true,
+          "handoff_event_count": true,
+          "mean_future_load": true,
+          "relative_time": true,
+          "rsu_count": true,
+          "vehicle_count": true,
+          "workflow_progress": true
+        },
+        "feature_name_to_index": {
+          "accepted_predicted_handoff_count": 5,
+          "current_node_available": 6,
+          "current_rsu_cache_size": 7,
+          "handoff_event_count": 4,
+          "mean_future_load": 8,
+          "relative_time": 0,
+          "rsu_count": 2,
+          "vehicle_count": 1,
+          "workflow_progress": 3
+        },
+        "flattened_dimension": 9,
+        "flattened_feature_values": {
+          "accepted_predicted_handoff_count": 0.0,
+          "current_node_available": 1.0,
+          "current_rsu_cache_size": 0.35835739835078595,
+          "handoff_event_count": 0.46211715726000974,
+          "mean_future_load": 0.04164257074548595,
+          "relative_time": 1.0,
+          "rsu_count": 0.5,
+          "vehicle_count": 0.125,
+          "workflow_progress": 0.3333333333333333
+        },
+        "flattened_observation": [
+          1.0,
+          0.125,
+          0.5,
+          0.3333333333333333,
+          0.46211715726000974,
+          0.0,
+          1.0,
+          0.35835739835078595,
+          0.04164257074548595
+        ],
+        "future_or_outcome_fields_present": false,
+        "information_scopes": {
+          "actor_visibility": "flat_observation_plus_agent_semantic_encoder_if_configured",
+          "controller_visibility": "semantic_state_and_flat_observation",
+          "critic_visibility": "agent_dependent; wrapper_adds_no_future_or_label_fields",
+          "cross_rsu_global_information": [
+            "rsu_count",
+            "mean_future_load"
+          ],
+          "current_local_information": [
+            "current_rsu_id",
+            "current_rsu_cache_size"
+          ],
+          "history_derived_information": [
+            "relative_time"
+          ],
+          "predictor_outputs": [
+            "accepted_predicted_handoff_count",
+            "predictor"
+          ]
+        },
+        "normalization": {
+          "fitted_on_data": false,
+          "kind": "deterministic_scale_and_tanh",
+          "version": "deterministic_scale_v1"
+        },
+        "observation_contract_version": "gym_vec_flat_semantic_v1",
+        "observation_projections": {
+          "actor_local": {
+            "current_rsu_cache_size": 3.0,
+            "current_rsu_id": "rsu_b"
+          },
+          "controller_global": {
+            "current_rsu_id": "rsu_b",
+            "mean_future_load": 0.25,
+            "rsu_count": 4.0
+          },
+          "critic_only": {},
+          "predictor_augmented": {
+            "availability_mask": 0,
+            "predicted_handoff_target_rsu_id": null,
+            "predicted_next_rsu_id": null,
+            "snapshot_id": "causal-predictor-bcb4249be081e667ae24372f"
+          }
+        },
+        "post_decision_outcome": {
+          "selected_action": 0
+        },
+        "predictor_snapshot_provenance": {
+          "age_steps": 0,
+          "availability_mask": 0,
+          "consumed_at_step": 3,
+          "contract_version": "1.0.0",
+          "generated_at_step": 3,
+          "observation_as_of_step": 3,
+          "snapshot_id": "causal-predictor-bcb4249be081e667ae24372f"
+        },
+        "raw_semantic_fields": {
+          "current_rsu_id": "rsu_b",
+          "flat_raw_feature_values": {
+            "accepted_predicted_handoff_count": 0.0,
+            "current_node_available": 1.0,
+            "current_rsu_cache_size": 3.0,
+            "handoff_event_count": 2.0,
+            "mean_future_load": 0.25,
+            "relative_time": 1163566600.0,
+            "rsu_count": 4.0,
+            "vehicle_count": 1.0,
+            "workflow_progress": 0.3333333333333333
+          },
+          "predictor": {
+            "availability_mask": 0,
+            "predicted_handoff_target_rsu_id": null,
+            "predicted_next_rsu_id": null,
+            "snapshot_id": "causal-predictor-bcb4249be081e667ae24372f"
+          },
+          "primary_vehicle_id": "peachtree:847"
+        },
+        "request_id": "g12_nonformal_ngsim_minimal/request_000004",
+        "semantic_feature_map": {
+          "accepted_predicted_handoff_count": 0.0,
+          "current_node_available": 1.0,
+          "current_rsu_cache_size": 3.0,
+          "handoff_event_count": 2.0,
+          "mean_future_load": 0.25,
+          "relative_time": 1163566600.0,
+          "rsu_count": 4.0,
+          "vehicle_count": 1.0,
+          "workflow_progress": 0.3333333333333333
+        },
+        "step_index": 4,
+        "time_index": 1163566600
+      },
+      {
+        "action_mask": [
+          true,
+          false,
+          true,
+          true,
+          false
+        ],
+        "captured_phase": "pre_action",
+        "controller_identity": "single_environment_action_controller",
+        "decision_observation_trace_version": "1.0.0",
+        "eligible_actions": [
+          0,
+          2,
+          3
+        ],
+        "feature_availability": {
+          "accepted_predicted_handoff_count": true,
+          "current_node_available": true,
+          "current_rsu_cache_size": true,
+          "handoff_event_count": true,
+          "mean_future_load": true,
+          "relative_time": true,
+          "rsu_count": true,
+          "vehicle_count": true,
+          "workflow_progress": true
+        },
+        "feature_name_to_index": {
+          "accepted_predicted_handoff_count": 5,
+          "current_node_available": 6,
+          "current_rsu_cache_size": 7,
+          "handoff_event_count": 4,
+          "mean_future_load": 8,
+          "relative_time": 0,
+          "rsu_count": 2,
+          "vehicle_count": 1,
+          "workflow_progress": 3
+        },
+        "flattened_dimension": 9,
+        "flattened_feature_values": {
+          "accepted_predicted_handoff_count": 0.0,
+          "current_node_available": 1.0,
+          "current_rsu_cache_size": 0.35835739835078595,
+          "handoff_event_count": 0.0,
+          "mean_future_load": 0.04164257074548595,
+          "relative_time": 1.0,
+          "rsu_count": 0.5,
+          "vehicle_count": 0.125,
+          "workflow_progress": 0.4444444444444444
+        },
+        "flattened_observation": [
+          1.0,
+          0.125,
+          0.5,
+          0.4444444444444444,
+          0.0,
+          0.0,
+          1.0,
+          0.35835739835078595,
+          0.04164257074548595
+        ],
+        "future_or_outcome_fields_present": false,
+        "information_scopes": {
+          "actor_visibility": "flat_observation_plus_agent_semantic_encoder_if_configured",
+          "controller_visibility": "semantic_state_and_flat_observation",
+          "critic_visibility": "agent_dependent; wrapper_adds_no_future_or_label_fields",
+          "cross_rsu_global_information": [
+            "rsu_count",
+            "mean_future_load"
+          ],
+          "current_local_information": [
+            "current_rsu_id",
+            "current_rsu_cache_size"
+          ],
+          "history_derived_information": [
+            "relative_time"
+          ],
+          "predictor_outputs": [
+            "accepted_predicted_handoff_count",
+            "predictor"
+          ]
+        },
+        "normalization": {
+          "fitted_on_data": false,
+          "kind": "deterministic_scale_and_tanh",
+          "version": "deterministic_scale_v1"
+        },
+        "observation_contract_version": "gym_vec_flat_semantic_v1",
+        "observation_projections": {
+          "actor_local": {
+            "current_rsu_cache_size": 3.0,
+            "current_rsu_id": "rsu_b"
+          },
+          "controller_global": {
+            "current_rsu_id": "rsu_b",
+            "mean_future_load": 0.25,
+            "rsu_count": 4.0
+          },
+          "critic_only": {},
+          "predictor_augmented": {
+            "availability_mask": 0,
+            "predicted_handoff_target_rsu_id": null,
+            "predicted_next_rsu_id": null,
+            "snapshot_id": "causal-predictor-bcb4249be081e667ae24372f"
+          }
+        },
+        "post_decision_outcome": {
+          "selected_action": 0
+        },
+        "predictor_snapshot_provenance": {
+          "age_steps": 1,
+          "availability_mask": 0,
+          "consumed_at_step": 4,
+          "contract_version": "1.0.0",
+          "generated_at_step": 3,
+          "observation_as_of_step": 3,
+          "snapshot_id": "causal-predictor-bcb4249be081e667ae24372f"
+        },
+        "raw_semantic_fields": {
+          "current_rsu_id": "rsu_b",
+          "flat_raw_feature_values": {
+            "accepted_predicted_handoff_count": 0.0,
+            "current_node_available": 1.0,
+            "current_rsu_cache_size": 3.0,
+            "handoff_event_count": 0.0,
+            "mean_future_load": 0.25,
+            "relative_time": 1163566700.0,
+            "rsu_count": 4.0,
+            "vehicle_count": 1.0,
+            "workflow_progress": 0.4444444444444444
+          },
+          "predictor": {
+            "availability_mask": 0,
+            "predicted_handoff_target_rsu_id": null,
+            "predicted_next_rsu_id": null,
+            "snapshot_id": "causal-predictor-bcb4249be081e667ae24372f"
+          },
+          "primary_vehicle_id": "peachtree:847"
+        },
+        "request_id": "g12_nonformal_ngsim_minimal/request_000005",
+        "semantic_feature_map": {
+          "accepted_predicted_handoff_count": 0.0,
+          "current_node_available": 1.0,
+          "current_rsu_cache_size": 3.0,
+          "handoff_event_count": 0.0,
+          "mean_future_load": 0.25,
+          "relative_time": 1163566700.0,
+          "rsu_count": 4.0,
+          "vehicle_count": 1.0,
+          "workflow_progress": 0.4444444444444444
+        },
+        "step_index": 5,
+        "time_index": 1163566700
+      }
+    ]
+  },
+  "formal_or_hidden_used": false,
+  "predictor_snapshot_provenance": {
+    "accepted_step_count": 0,
+    "recorded_step_count": 5,
+    "snapshot_contract_versions": [
+      "1.0.0"
+    ],
+    "snapshot_ids": [
+      "causal-predictor-6f84abc7ddf7af15a9d7abfd",
+      "causal-predictor-bcb4249be081e667ae24372f"
+    ]
+  },
+  "reward_changed": false,
+  "scope": "NGSIM non-hidden non-formal minimal runtime contract validation",
+  "snapshot_count": 6,
+  "snapshot_examples": [
+    {
+      "audit": {
+        "fallback_behavior": "mask_only",
+        "feature_availability_mask": {
+          "current_observation": true,
+          "current_rsu_association": true,
+          "previous_vehicle_position": false,
+          "workflow_state": true
+        },
+        "leakage_audit": {
+          "future_label_in_runtime_snapshot": false,
+          "history_reset_required_per_window_or_episode": true,
+          "reward_or_service_outcome_in_runtime_snapshot": false,
+          "runtime_feature_cutoff_enforced": true
+        },
+        "normalization_version": "supervised_handoff_fixed_clamp_v1",
+        "oracle_flag": false,
+        "snapshot_validation_status": "pass",
+        "snapshot_validator_version": "causal_predictor_snapshot_validator_v1.0.0",
+        "unknown_values_are_json_null": true,
+        "unseen_rsu_or_slot_handling": "abstain_and_mask"
+      },
+      "causal_time": {
+        "age_steps": 0,
+        "causal_cutoff_step": 0,
+        "causal_cutoff_time": 1163565100.0,
+        "consumed_at_step": 0,
+        "consumed_at_time": 1163565100.0,
+        "generated_at_step": 0,
+        "generated_at_time": 1163565100.0,
+        "history_end_step": 0,
+        "history_end_time": 1163565100.0,
+        "history_start_step": 0,
+        "history_start_time": 1163565100.0,
+        "label_horizon_steps": 3,
+        "observation_as_of_step": 0,
+        "observation_as_of_time": 1163565100.0,
+        "source_frame_interval": [
+          0,
+          0
+        ],
+        "source_time_interval": [
+          1163565100,
+          1163565100
+        ],
+        "staleness_steps": 0,
+        "update_interval_steps": 3,
+        "valid_from_step": 0,
+        "valid_until_step": 3
+      },
+      "identity": {
+        "calibration_artifact_hash": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+        "calibration_method": {
+          "handoff": "binary_temperature_scaling",
+          "handoff_target": "identity",
+          "next_rsu": "identity"
+        },
+        "calibration_version": "deterministic_log_temperature_golden_v1.0.0",
+        "contract_version": "1.0.0",
+        "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+        "oracle": false,
+        "predictor_checkpoint_identity": {
+          "checkpoint_schema_version": "supervised_handoff_predictor_checkpoint_v1",
+          "feature_order_sha256": "daca936378525756b6dd68000e39f3f21bbf4eb275221d8bc1b01e4bf8c92f9b",
+          "feature_schema_version": "supervised_handoff_feature_v1",
+          "horizon": 3,
+          "normalization_version": "supervised_handoff_fixed_clamp_v1",
+          "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/top_journal_v112_predictor_training_20260809/supervised_handoff_predictor_20260809_033406_140764/supervised_handoff_predictor.pt",
+          "rsu_ids": [
+            "rsu_a",
+            "rsu_b",
+            "rsu_c",
+            "rsu_d",
+            "rsu_e",
+            "rsu_f",
+            "rsu_g",
+            "rsu_h",
+            "rsu_i",
+            "rsu_j",
+            "rsu_k",
+            "rsu_l",
+            "rsu_m",
+            "rsu_n",
+            "rsu_o",
+            "rsu_p"
+          ],
+          "run_id": "supervised_handoff_predictor_20260809_033406_140764",
+          "sha256": "ea96a11717ab9588446b03d3b2115166b4108387514a7f03feb2c00b3eecd59e"
+        },
+        "predictor_config_hash": "a76854b5057025b1da6cd3fe37d2938de725964af5250ec1df6f4ea7a114517f",
+        "predictor_kind": "supervised",
+        "predictor_model_identity": "supervised_handoff_predictor_v1",
+        "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd",
+        "source_dataset_identity": {
+          "cross_source": false,
+          "dataset": "NGSIM",
+          "role": "non_hidden_nonformal_minimal_runtime_trace",
+          "source_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv"
+        },
+        "source_window_plan_identity": {
+          "frame_interval": [
+            719,
+            742
+          ],
+          "time_interval": [
+            1163565100,
+            1163573700
+          ],
+          "window_id": "window_peachtree_off719_len24_t1163565100_1163573700"
+        },
+        "vehicle_id": "peachtree:846"
+      },
+      "predictions": {
+        "abstained": true,
+        "abstention_reasons": [
+          "confidence_below_threshold",
+          "insufficient_history"
+        ],
+        "availability": false,
+        "availability_mask": 0,
+        "calibrated_probabilities": {
+          "handoff": 0.12450956480390374,
+          "handoff_target": {
+            "__none__": 0.9136090413730649,
+            "rsu_a": 0.0037046575722165217,
+            "rsu_b": 0.000975107435386273,
+            "rsu_c": 0.07680439603342436,
+            "rsu_d": 0.0031964184547718035,
+            "rsu_e": 0.00019616711858865853,
+            "rsu_f": 0.0012217329601278766,
+            "rsu_g": 0.00021984671329819904,
+            "rsu_h": 2.075619137244856e-05,
+            "rsu_i": 3.990042870027236e-06,
+            "rsu_j": 1.5073004782379493e-07,
+            "rsu_k": 4.502953598209575e-08,
+            "rsu_l": 2.2312623200636024e-07,
+            "rsu_m": 4.2435545775651306e-05,
+            "rsu_n": 6.338374890822429e-09,
+            "rsu_o": 4.963273988514115e-06,
+            "rsu_p": 6.206092413166496e-08
+          },
+          "next_rsu": {
+            "__none__": 0.09831847533966359,
+            "rsu_a": 0.002701437435288914,
+            "rsu_b": 0.8266769304343838,
+            "rsu_c": 0.031856743538333204,
+            "rsu_d": 0.0036285239256943704,
+            "rsu_e": 0.013890498656417845,
+            "rsu_f": 0.0036362549648219764,
+            "rsu_g": 0.00674691563122113,
+            "rsu_h": 0.005855485247361475,
+            "rsu_i": 3.208011547087585e-06,
+            "rsu_j": 1.3248953120338633e-05,
+            "rsu_k": 0.0001282813121515911,
+            "rsu_l": 1.23544533883156e-05,
+            "rsu_m": 0.00039501557565898345,
+            "rsu_n": 0.005864442209028342,
+            "rsu_o": 0.00025844223566397174,
+            "rsu_p": 1.3742076255208806e-05
+          }
+        },
+        "confidence": 0.8754904351960963,
+        "confidence_definition": "max_calibrated_binary_handoff_class_probability",
+        "current_rsu_id": "rsu_b",
+        "demand_or_arrival_belief": null,
+        "eta_interval_steps": null,
+        "eta_point_estimate_steps": 1.8764933347702026,
+        "eta_uncertainty": null,
+        "handoff_predicted": false,
+        "handoff_probability": 0.12450956480390374,
+        "handoff_target_probability_distribution": {
+          "__none__": 0.9136090413730649,
+          "rsu_a": 0.0037046575722165217,
+          "rsu_b": 0.000975107435386273,
+          "rsu_c": 0.07680439603342436,
+          "rsu_d": 0.0031964184547718035,
+          "rsu_e": 0.00019616711858865853,
+          "rsu_f": 0.0012217329601278766,
+          "rsu_g": 0.00021984671329819904,
+          "rsu_h": 2.075619137244856e-05,
+          "rsu_i": 3.990042870027236e-06,
+          "rsu_j": 1.5073004782379493e-07,
+          "rsu_k": 4.502953598209575e-08,
+          "rsu_l": 2.2312623200636024e-07,
+          "rsu_m": 4.2435545775651306e-05,
+          "rsu_n": 6.338374890822429e-09,
+          "rsu_o": 4.963273988514115e-06,
+          "rsu_p": 6.206092413166496e-08
+        },
+        "next_rsu_probability_distribution": {
+          "__none__": 0.09831847533966359,
+          "rsu_a": 0.002701437435288914,
+          "rsu_b": 0.8266769304343838,
+          "rsu_c": 0.031856743538333204,
+          "rsu_d": 0.0036285239256943704,
+          "rsu_e": 0.013890498656417845,
+          "rsu_f": 0.0036362549648219764,
+          "rsu_g": 0.00674691563122113,
+          "rsu_h": 0.005855485247361475,
+          "rsu_i": 3.208011547087585e-06,
+          "rsu_j": 1.3248953120338633e-05,
+          "rsu_k": 0.0001282813121515911,
+          "rsu_l": 1.23544533883156e-05,
+          "rsu_m": 0.00039501557565898345,
+          "rsu_n": 0.005864442209028342,
+          "rsu_o": 0.00025844223566397174,
+          "rsu_p": 1.3742076255208806e-05
+        },
+        "predicted_next_rsu_id": "rsu_b",
+        "predicted_target_rsu_id": null,
+        "raw_scores": {
+          "eta_model_output": 1.8764933347702026,
+          "handoff_logit": -2.1095376014709473,
+          "handoff_target_logits": [
+            -1.7855602502822876,
+            -3.12035870552063,
+            1.2461107969284058,
+            -1.9331201314926147,
+            -4.723939418792725,
+            -2.894880771636963,
+            -4.609975814819336,
+            -6.970061779022217,
+            -8.619104385375977,
+            -11.895171165466309,
+            -13.10334300994873,
+            -11.502923965454102,
+            -6.25492000579834,
+            -15.06403923034668,
+            -8.400840759277344,
+            -12.78254508972168,
+            3.7222516536712646
+          ],
+          "next_rsu_logits": [
+            -2.1371798515319824,
+            3.5864500999450684,
+            0.3302852213382721,
+            -1.8421379327774048,
+            -0.4997588098049164,
+            -1.8400095701217651,
+            -1.2218784093856812,
+            -1.3635849952697754,
+            -8.873067855834961,
+            -7.454800605773926,
+            -5.184493541717529,
+            -7.524702548980713,
+            -4.059793949127197,
+            -1.3620564937591553,
+            -4.484046936035156,
+            -7.418256759643555,
+            1.4572480916976929
+          ]
+        },
+        "uncertainty": 0.12450956480390374,
+        "uncertainty_definition": "one_minus_confidence_not_ETA_uncertainty"
+      }
+    },
+    {
+      "audit": {
+        "fallback_behavior": "mask_only",
+        "feature_availability_mask": {
+          "current_observation": true,
+          "current_rsu_association": true,
+          "previous_vehicle_position": false,
+          "workflow_state": true
+        },
+        "leakage_audit": {
+          "future_label_in_runtime_snapshot": false,
+          "history_reset_required_per_window_or_episode": true,
+          "reward_or_service_outcome_in_runtime_snapshot": false,
+          "runtime_feature_cutoff_enforced": true
+        },
+        "normalization_version": "supervised_handoff_fixed_clamp_v1",
+        "oracle_flag": false,
+        "snapshot_validation_status": "pass",
+        "snapshot_validator_version": "causal_predictor_snapshot_validator_v1.0.0",
+        "unknown_values_are_json_null": true,
+        "unseen_rsu_or_slot_handling": "abstain_and_mask"
+      },
+      "causal_time": {
+        "age_steps": 1,
+        "causal_cutoff_step": 0,
+        "causal_cutoff_time": 1163565100.0,
+        "consumed_at_step": 1,
+        "consumed_at_time": 1163565200.0,
+        "generated_at_step": 0,
+        "generated_at_time": 1163565100.0,
+        "history_end_step": 0,
+        "history_end_time": 1163565100.0,
+        "history_start_step": 0,
+        "history_start_time": 1163565100.0,
+        "label_horizon_steps": 3,
+        "observation_as_of_step": 0,
+        "observation_as_of_time": 1163565100.0,
+        "source_frame_interval": [
+          0,
+          0
+        ],
+        "source_time_interval": [
+          1163565100,
+          1163565100
+        ],
+        "staleness_steps": 1,
+        "update_interval_steps": 3,
+        "valid_from_step": 0,
+        "valid_until_step": 3
+      },
+      "identity": {
+        "calibration_artifact_hash": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+        "calibration_method": {
+          "handoff": "binary_temperature_scaling",
+          "handoff_target": "identity",
+          "next_rsu": "identity"
+        },
+        "calibration_version": "deterministic_log_temperature_golden_v1.0.0",
+        "contract_version": "1.0.0",
+        "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+        "oracle": false,
+        "predictor_checkpoint_identity": {
+          "checkpoint_schema_version": "supervised_handoff_predictor_checkpoint_v1",
+          "feature_order_sha256": "daca936378525756b6dd68000e39f3f21bbf4eb275221d8bc1b01e4bf8c92f9b",
+          "feature_schema_version": "supervised_handoff_feature_v1",
+          "horizon": 3,
+          "normalization_version": "supervised_handoff_fixed_clamp_v1",
+          "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/top_journal_v112_predictor_training_20260809/supervised_handoff_predictor_20260809_033406_140764/supervised_handoff_predictor.pt",
+          "rsu_ids": [
+            "rsu_a",
+            "rsu_b",
+            "rsu_c",
+            "rsu_d",
+            "rsu_e",
+            "rsu_f",
+            "rsu_g",
+            "rsu_h",
+            "rsu_i",
+            "rsu_j",
+            "rsu_k",
+            "rsu_l",
+            "rsu_m",
+            "rsu_n",
+            "rsu_o",
+            "rsu_p"
+          ],
+          "run_id": "supervised_handoff_predictor_20260809_033406_140764",
+          "sha256": "ea96a11717ab9588446b03d3b2115166b4108387514a7f03feb2c00b3eecd59e"
+        },
+        "predictor_config_hash": "a76854b5057025b1da6cd3fe37d2938de725964af5250ec1df6f4ea7a114517f",
+        "predictor_kind": "supervised",
+        "predictor_model_identity": "supervised_handoff_predictor_v1",
+        "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd",
+        "source_dataset_identity": {
+          "cross_source": false,
+          "dataset": "NGSIM",
+          "role": "non_hidden_nonformal_minimal_runtime_trace",
+          "source_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv"
+        },
+        "source_window_plan_identity": {
+          "frame_interval": [
+            719,
+            742
+          ],
+          "time_interval": [
+            1163565100,
+            1163573700
+          ],
+          "window_id": "window_peachtree_off719_len24_t1163565100_1163573700"
+        },
+        "vehicle_id": "peachtree:846"
+      },
+      "predictions": {
+        "abstained": true,
+        "abstention_reasons": [
+          "confidence_below_threshold",
+          "insufficient_history"
+        ],
+        "availability": false,
+        "availability_mask": 0,
+        "calibrated_probabilities": {
+          "handoff": 0.12450956480390374,
+          "handoff_target": {
+            "__none__": 0.9136090413730649,
+            "rsu_a": 0.0037046575722165217,
+            "rsu_b": 0.000975107435386273,
+            "rsu_c": 0.07680439603342436,
+            "rsu_d": 0.0031964184547718035,
+            "rsu_e": 0.00019616711858865853,
+            "rsu_f": 0.0012217329601278766,
+            "rsu_g": 0.00021984671329819904,
+            "rsu_h": 2.075619137244856e-05,
+            "rsu_i": 3.990042870027236e-06,
+            "rsu_j": 1.5073004782379493e-07,
+            "rsu_k": 4.502953598209575e-08,
+            "rsu_l": 2.2312623200636024e-07,
+            "rsu_m": 4.2435545775651306e-05,
+            "rsu_n": 6.338374890822429e-09,
+            "rsu_o": 4.963273988514115e-06,
+            "rsu_p": 6.206092413166496e-08
+          },
+          "next_rsu": {
+            "__none__": 0.09831847533966359,
+            "rsu_a": 0.002701437435288914,
+            "rsu_b": 0.8266769304343838,
+            "rsu_c": 0.031856743538333204,
+            "rsu_d": 0.0036285239256943704,
+            "rsu_e": 0.013890498656417845,
+            "rsu_f": 0.0036362549648219764,
+            "rsu_g": 0.00674691563122113,
+            "rsu_h": 0.005855485247361475,
+            "rsu_i": 3.208011547087585e-06,
+            "rsu_j": 1.3248953120338633e-05,
+            "rsu_k": 0.0001282813121515911,
+            "rsu_l": 1.23544533883156e-05,
+            "rsu_m": 0.00039501557565898345,
+            "rsu_n": 0.005864442209028342,
+            "rsu_o": 0.00025844223566397174,
+            "rsu_p": 1.3742076255208806e-05
+          }
+        },
+        "confidence": 0.8754904351960963,
+        "confidence_definition": "max_calibrated_binary_handoff_class_probability",
+        "current_rsu_id": "rsu_b",
+        "demand_or_arrival_belief": null,
+        "eta_interval_steps": null,
+        "eta_point_estimate_steps": 1.8764933347702026,
+        "eta_uncertainty": null,
+        "handoff_predicted": false,
+        "handoff_probability": 0.12450956480390374,
+        "handoff_target_probability_distribution": {
+          "__none__": 0.9136090413730649,
+          "rsu_a": 0.0037046575722165217,
+          "rsu_b": 0.000975107435386273,
+          "rsu_c": 0.07680439603342436,
+          "rsu_d": 0.0031964184547718035,
+          "rsu_e": 0.00019616711858865853,
+          "rsu_f": 0.0012217329601278766,
+          "rsu_g": 0.00021984671329819904,
+          "rsu_h": 2.075619137244856e-05,
+          "rsu_i": 3.990042870027236e-06,
+          "rsu_j": 1.5073004782379493e-07,
+          "rsu_k": 4.502953598209575e-08,
+          "rsu_l": 2.2312623200636024e-07,
+          "rsu_m": 4.2435545775651306e-05,
+          "rsu_n": 6.338374890822429e-09,
+          "rsu_o": 4.963273988514115e-06,
+          "rsu_p": 6.206092413166496e-08
+        },
+        "next_rsu_probability_distribution": {
+          "__none__": 0.09831847533966359,
+          "rsu_a": 0.002701437435288914,
+          "rsu_b": 0.8266769304343838,
+          "rsu_c": 0.031856743538333204,
+          "rsu_d": 0.0036285239256943704,
+          "rsu_e": 0.013890498656417845,
+          "rsu_f": 0.0036362549648219764,
+          "rsu_g": 0.00674691563122113,
+          "rsu_h": 0.005855485247361475,
+          "rsu_i": 3.208011547087585e-06,
+          "rsu_j": 1.3248953120338633e-05,
+          "rsu_k": 0.0001282813121515911,
+          "rsu_l": 1.23544533883156e-05,
+          "rsu_m": 0.00039501557565898345,
+          "rsu_n": 0.005864442209028342,
+          "rsu_o": 0.00025844223566397174,
+          "rsu_p": 1.3742076255208806e-05
+        },
+        "predicted_next_rsu_id": "rsu_b",
+        "predicted_target_rsu_id": null,
+        "raw_scores": {
+          "eta_model_output": 1.8764933347702026,
+          "handoff_logit": -2.1095376014709473,
+          "handoff_target_logits": [
+            -1.7855602502822876,
+            -3.12035870552063,
+            1.2461107969284058,
+            -1.9331201314926147,
+            -4.723939418792725,
+            -2.894880771636963,
+            -4.609975814819336,
+            -6.970061779022217,
+            -8.619104385375977,
+            -11.895171165466309,
+            -13.10334300994873,
+            -11.502923965454102,
+            -6.25492000579834,
+            -15.06403923034668,
+            -8.400840759277344,
+            -12.78254508972168,
+            3.7222516536712646
+          ],
+          "next_rsu_logits": [
+            -2.1371798515319824,
+            3.5864500999450684,
+            0.3302852213382721,
+            -1.8421379327774048,
+            -0.4997588098049164,
+            -1.8400095701217651,
+            -1.2218784093856812,
+            -1.3635849952697754,
+            -8.873067855834961,
+            -7.454800605773926,
+            -5.184493541717529,
+            -7.524702548980713,
+            -4.059793949127197,
+            -1.3620564937591553,
+            -4.484046936035156,
+            -7.418256759643555,
+            1.4572480916976929
+          ]
+        },
+        "uncertainty": 0.12450956480390374,
+        "uncertainty_definition": "one_minus_confidence_not_ETA_uncertainty"
+      }
+    },
+    {
+      "audit": {
+        "fallback_behavior": "mask_only",
+        "feature_availability_mask": {
+          "current_observation": true,
+          "current_rsu_association": true,
+          "previous_vehicle_position": false,
+          "workflow_state": true
+        },
+        "leakage_audit": {
+          "future_label_in_runtime_snapshot": false,
+          "history_reset_required_per_window_or_episode": true,
+          "reward_or_service_outcome_in_runtime_snapshot": false,
+          "runtime_feature_cutoff_enforced": true
+        },
+        "normalization_version": "supervised_handoff_fixed_clamp_v1",
+        "oracle_flag": false,
+        "snapshot_validation_status": "pass",
+        "snapshot_validator_version": "causal_predictor_snapshot_validator_v1.0.0",
+        "unknown_values_are_json_null": true,
+        "unseen_rsu_or_slot_handling": "abstain_and_mask"
+      },
+      "causal_time": {
+        "age_steps": 2,
+        "causal_cutoff_step": 0,
+        "causal_cutoff_time": 1163565100.0,
+        "consumed_at_step": 2,
+        "consumed_at_time": 1163565300.0,
+        "generated_at_step": 0,
+        "generated_at_time": 1163565100.0,
+        "history_end_step": 0,
+        "history_end_time": 1163565100.0,
+        "history_start_step": 0,
+        "history_start_time": 1163565100.0,
+        "label_horizon_steps": 3,
+        "observation_as_of_step": 0,
+        "observation_as_of_time": 1163565100.0,
+        "source_frame_interval": [
+          0,
+          0
+        ],
+        "source_time_interval": [
+          1163565100,
+          1163565100
+        ],
+        "staleness_steps": 2,
+        "update_interval_steps": 3,
+        "valid_from_step": 0,
+        "valid_until_step": 3
+      },
+      "identity": {
+        "calibration_artifact_hash": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+        "calibration_method": {
+          "handoff": "binary_temperature_scaling",
+          "handoff_target": "identity",
+          "next_rsu": "identity"
+        },
+        "calibration_version": "deterministic_log_temperature_golden_v1.0.0",
+        "contract_version": "1.0.0",
+        "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+        "oracle": false,
+        "predictor_checkpoint_identity": {
+          "checkpoint_schema_version": "supervised_handoff_predictor_checkpoint_v1",
+          "feature_order_sha256": "daca936378525756b6dd68000e39f3f21bbf4eb275221d8bc1b01e4bf8c92f9b",
+          "feature_schema_version": "supervised_handoff_feature_v1",
+          "horizon": 3,
+          "normalization_version": "supervised_handoff_fixed_clamp_v1",
+          "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/top_journal_v112_predictor_training_20260809/supervised_handoff_predictor_20260809_033406_140764/supervised_handoff_predictor.pt",
+          "rsu_ids": [
+            "rsu_a",
+            "rsu_b",
+            "rsu_c",
+            "rsu_d",
+            "rsu_e",
+            "rsu_f",
+            "rsu_g",
+            "rsu_h",
+            "rsu_i",
+            "rsu_j",
+            "rsu_k",
+            "rsu_l",
+            "rsu_m",
+            "rsu_n",
+            "rsu_o",
+            "rsu_p"
+          ],
+          "run_id": "supervised_handoff_predictor_20260809_033406_140764",
+          "sha256": "ea96a11717ab9588446b03d3b2115166b4108387514a7f03feb2c00b3eecd59e"
+        },
+        "predictor_config_hash": "a76854b5057025b1da6cd3fe37d2938de725964af5250ec1df6f4ea7a114517f",
+        "predictor_kind": "supervised",
+        "predictor_model_identity": "supervised_handoff_predictor_v1",
+        "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd",
+        "source_dataset_identity": {
+          "cross_source": false,
+          "dataset": "NGSIM",
+          "role": "non_hidden_nonformal_minimal_runtime_trace",
+          "source_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv"
+        },
+        "source_window_plan_identity": {
+          "frame_interval": [
+            719,
+            742
+          ],
+          "time_interval": [
+            1163565100,
+            1163573700
+          ],
+          "window_id": "window_peachtree_off719_len24_t1163565100_1163573700"
+        },
+        "vehicle_id": "peachtree:846"
+      },
+      "predictions": {
+        "abstained": true,
+        "abstention_reasons": [
+          "confidence_below_threshold",
+          "insufficient_history"
+        ],
+        "availability": false,
+        "availability_mask": 0,
+        "calibrated_probabilities": {
+          "handoff": 0.12450956480390374,
+          "handoff_target": {
+            "__none__": 0.9136090413730649,
+            "rsu_a": 0.0037046575722165217,
+            "rsu_b": 0.000975107435386273,
+            "rsu_c": 0.07680439603342436,
+            "rsu_d": 0.0031964184547718035,
+            "rsu_e": 0.00019616711858865853,
+            "rsu_f": 0.0012217329601278766,
+            "rsu_g": 0.00021984671329819904,
+            "rsu_h": 2.075619137244856e-05,
+            "rsu_i": 3.990042870027236e-06,
+            "rsu_j": 1.5073004782379493e-07,
+            "rsu_k": 4.502953598209575e-08,
+            "rsu_l": 2.2312623200636024e-07,
+            "rsu_m": 4.2435545775651306e-05,
+            "rsu_n": 6.338374890822429e-09,
+            "rsu_o": 4.963273988514115e-06,
+            "rsu_p": 6.206092413166496e-08
+          },
+          "next_rsu": {
+            "__none__": 0.09831847533966359,
+            "rsu_a": 0.002701437435288914,
+            "rsu_b": 0.8266769304343838,
+            "rsu_c": 0.031856743538333204,
+            "rsu_d": 0.0036285239256943704,
+            "rsu_e": 0.013890498656417845,
+            "rsu_f": 0.0036362549648219764,
+            "rsu_g": 0.00674691563122113,
+            "rsu_h": 0.005855485247361475,
+            "rsu_i": 3.208011547087585e-06,
+            "rsu_j": 1.3248953120338633e-05,
+            "rsu_k": 0.0001282813121515911,
+            "rsu_l": 1.23544533883156e-05,
+            "rsu_m": 0.00039501557565898345,
+            "rsu_n": 0.005864442209028342,
+            "rsu_o": 0.00025844223566397174,
+            "rsu_p": 1.3742076255208806e-05
+          }
+        },
+        "confidence": 0.8754904351960963,
+        "confidence_definition": "max_calibrated_binary_handoff_class_probability",
+        "current_rsu_id": "rsu_b",
+        "demand_or_arrival_belief": null,
+        "eta_interval_steps": null,
+        "eta_point_estimate_steps": 1.8764933347702026,
+        "eta_uncertainty": null,
+        "handoff_predicted": false,
+        "handoff_probability": 0.12450956480390374,
+        "handoff_target_probability_distribution": {
+          "__none__": 0.9136090413730649,
+          "rsu_a": 0.0037046575722165217,
+          "rsu_b": 0.000975107435386273,
+          "rsu_c": 0.07680439603342436,
+          "rsu_d": 0.0031964184547718035,
+          "rsu_e": 0.00019616711858865853,
+          "rsu_f": 0.0012217329601278766,
+          "rsu_g": 0.00021984671329819904,
+          "rsu_h": 2.075619137244856e-05,
+          "rsu_i": 3.990042870027236e-06,
+          "rsu_j": 1.5073004782379493e-07,
+          "rsu_k": 4.502953598209575e-08,
+          "rsu_l": 2.2312623200636024e-07,
+          "rsu_m": 4.2435545775651306e-05,
+          "rsu_n": 6.338374890822429e-09,
+          "rsu_o": 4.963273988514115e-06,
+          "rsu_p": 6.206092413166496e-08
+        },
+        "next_rsu_probability_distribution": {
+          "__none__": 0.09831847533966359,
+          "rsu_a": 0.002701437435288914,
+          "rsu_b": 0.8266769304343838,
+          "rsu_c": 0.031856743538333204,
+          "rsu_d": 0.0036285239256943704,
+          "rsu_e": 0.013890498656417845,
+          "rsu_f": 0.0036362549648219764,
+          "rsu_g": 0.00674691563122113,
+          "rsu_h": 0.005855485247361475,
+          "rsu_i": 3.208011547087585e-06,
+          "rsu_j": 1.3248953120338633e-05,
+          "rsu_k": 0.0001282813121515911,
+          "rsu_l": 1.23544533883156e-05,
+          "rsu_m": 0.00039501557565898345,
+          "rsu_n": 0.005864442209028342,
+          "rsu_o": 0.00025844223566397174,
+          "rsu_p": 1.3742076255208806e-05
+        },
+        "predicted_next_rsu_id": "rsu_b",
+        "predicted_target_rsu_id": null,
+        "raw_scores": {
+          "eta_model_output": 1.8764933347702026,
+          "handoff_logit": -2.1095376014709473,
+          "handoff_target_logits": [
+            -1.7855602502822876,
+            -3.12035870552063,
+            1.2461107969284058,
+            -1.9331201314926147,
+            -4.723939418792725,
+            -2.894880771636963,
+            -4.609975814819336,
+            -6.970061779022217,
+            -8.619104385375977,
+            -11.895171165466309,
+            -13.10334300994873,
+            -11.502923965454102,
+            -6.25492000579834,
+            -15.06403923034668,
+            -8.400840759277344,
+            -12.78254508972168,
+            3.7222516536712646
+          ],
+          "next_rsu_logits": [
+            -2.1371798515319824,
+            3.5864500999450684,
+            0.3302852213382721,
+            -1.8421379327774048,
+            -0.4997588098049164,
+            -1.8400095701217651,
+            -1.2218784093856812,
+            -1.3635849952697754,
+            -8.873067855834961,
+            -7.454800605773926,
+            -5.184493541717529,
+            -7.524702548980713,
+            -4.059793949127197,
+            -1.3620564937591553,
+            -4.484046936035156,
+            -7.418256759643555,
+            1.4572480916976929
+          ]
+        },
+        "uncertainty": 0.12450956480390374,
+        "uncertainty_definition": "one_minus_confidence_not_ETA_uncertainty"
+      }
+    }
+  ],
+  "source_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+  "step_count": 5,
+  "window_metadata": {
+    "active_vehicle_count_max": 2,
+    "active_vehicle_count_mean": 1.291667,
+    "axis": "y",
+    "axis_crossing_score": 8.51075,
+    "chosen_rsu_axis": "y",
+    "coverage_radius": 8.0,
+    "dominant_axis": "y",
+    "effective_rsu_layout": "auto_dominant_tight",
+    "estimated_association_change_count": 18,
+    "estimated_handoff_count": 8,
+    "frame_count": 24,
+    "frame_offset": 719,
+    "requested_rsu_layout": "auto_dominant_tight",
+    "rsu_count": 4,
+    "segment_frame_end": 742,
+    "segment_frame_start": 719,
+    "selected_frame_count": 24,
+    "source_frame_count": 1151,
+    "source_location": "peachtree",
+    "source_segment_id": "peachtree",
+    "spacing": 8.0,
+    "time_index_end": 1163573700,
+    "time_index_start": 1163565100,
+    "total_abs_dx": 5.963,
+    "total_abs_dy": 68.086,
+    "unique_vehicle_count": 6,
+    "vehicle_record_count": 31,
+    "window_id": "window_peachtree_off719_len24_t1163565100_1163573700",
+    "window_length": 24,
+    "window_selector": "max_handoff_candidate",
+    "x_range": 13.78,
+    "y_range": 17.483
+  }
+}

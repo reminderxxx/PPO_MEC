@@ -2,6 +2,8 @@
 
 `scripts/audit_cache_event_telemetry.py` 是单 episode CacheEvent 对账入口；输出应写入 `artifacts/audits/<audit_id>/`，不得覆盖历史 run summary。
 
+G12：`src/predictors/calibration.py` 与 `src/predictors/causal_snapshot.py` 承载pure calibration reducer和snapshot validator；`scripts/audit_predictor_calibration.py` 是稳定入口；小型validation bundle位于 `artifacts/analysis/causal_predictor_snapshot_validation_<run_id>/`。该入口不训练、不调参、不读取formal/holdout/hidden或RL reward。
+
 G11：`configs/data/model_cache_dataset_registry.json` 是 public model-cache dataset qualification 事实源；`src/data/model_catalog/model_cache_dataset_registry.py` 负责纯验证和 deterministic artifact projection；`scripts/validate_model_cache_dataset_registry.py` 是稳定入口；产物固定写入 `artifacts/analysis/model_cache_dataset_discovery_20260819_g11_v1/`。该目录只含 metadata/audit JSON，不存 raw trace 或模型文件。
 
 G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cache_request_replay.py`、`scripts/run_future_horizon_cache_oracle.py`、`scripts/audit_cache_oracle_gap.py` 为稳定入口；validation bundle写入 `artifacts/analysis/future_horizon_cache_oracle_validation_<run_id>/`，不得覆盖历史artifact。
@@ -36,6 +38,7 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 - `scripts/freeze_strict_split_protocol.py`：生成跨 split 互斥、带 minimum frame gap 的固定窗口计划
 - `scripts/run_strict_full_v8_support_suite.py`：编排 v8-current support suite、guard attribution、BCa/Holm statistics 和 support gate report；拒绝 hidden window plan
 - `scripts/train_supervised_handoff_predictor.py`：从冻结 train/dev window plan 训练短时 supervised handoff predictor，并输出 checkpoint、metrics manifest 和 quality rows
+- `scripts/audit_predictor_calibration.py`：从非hidden三段split审计binary calibration、reliability/selective gate、causal snapshots、staleness和pre-action trace，不运行RL benchmark
 - `scripts/analyze_strict_full_failure_modes.py`：在非 hidden split 上分解 strict-full reward、continuity、failure 和 action-mix 失败模式
 - `scripts/audit_literature_reference_table.py`：检查文献表标题/DOI/URL 重复、链接结构和显式待核验项
 - `scripts/validate_model_cache_dataset_registry.py`：校验 G11 taxonomy、字段、评分、hard gates与兼容投影，并确定性生成机器审计包

@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-08-19: G12采用独立calibration段、temperature scaling和默认关闭的mask-only消费
+
+- 决定：v71 train plan按预先固定的顺序模4规则拆成predictor-train/calibration，原dev仅evaluation；不沿用v112在dev选F1 threshold并同split报告的口径。
+- 决定：只实现identity与deterministic temperature scaling，方法按NLL/Brier/identity词典序选择；abstention按calibration-only accepted Brier与minimum coverage选择，不使用RL reward。
+- 决定：慢predictor每K step生成不可变snapshot；`prediction_delay_steps`读取历史generation，stale/cold/unseen/low-confidence通过mask拒绝，不重算、不伪装no-handoff、不fallback oracle。
+- 决定：接口默认关闭，G12不修改action/reward/policy、不执行G13、不晋级canonical。原因是v112 policy collapse和eligible target证据仍是开放风险。
+- 决定：历史quality rows缺multiclass logits时保持Brier/NLL/ECE unavailable；不得由hard accuracy或one-hot伪概率补位。
+
 ## 2026-08-19: G10 将 centralized information value 与 entity-level MARL necessity 分离
 
 - 决定：architecture只按源码的actor binding、observation isolation、action ownership和execution aggregation分类，不按 PPO/MAPPO/SA-GHMAPPO 名称分类。当前 PPO=single controller；MAPPO/SA-GHMAPPO=controller-level CTDE，不是entity-level MARL。

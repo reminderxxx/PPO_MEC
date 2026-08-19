@@ -1,0 +1,83 @@
+{
+  "aggregate_sha256": "642547267d433bd2ac1455c3abe4f1670e063a03d644a259484361344fa1726d",
+  "artifact_integrity_contract_version": "g12_artifact_integrity_v1.0.0",
+  "file_count_excluding_manifest": 15,
+  "files": [
+    {
+      "path": "calibration_config.json",
+      "sha256": "20dce9f1bcfa61c24d01e5095b810f094b9a0e84634f5567222e5a5e423f0326",
+      "size_bytes": 449
+    },
+    {
+      "path": "calibration_parameters.json",
+      "sha256": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+      "size_bytes": 2982
+    },
+    {
+      "path": "command_log.json",
+      "sha256": "16497610e09e830329ea8e19f440f531d9ed9892b60414e8758b020c24b14a2e",
+      "size_bytes": 404
+    },
+    {
+      "path": "decision_observation_trace_sample.json",
+      "sha256": "645b7bcfc7fd1d3d4c2f027b373d901cb6bd2807f11fc0b2e730408bf4b0b76b",
+      "size_bytes": 57492
+    },
+    {
+      "path": "input_provenance.json",
+      "sha256": "80ed13089bf5687ff73ae855a740bbd1802a8e94de942c1eb4ccd6be562f4572",
+      "size_bytes": 1768
+    },
+    {
+      "path": "metrics_after_calibration.json",
+      "sha256": "534049c17fd41123848dcabc049236b2f6fc4e84813b2ff2adbf3c4d01e5fd45",
+      "size_bytes": 16139
+    },
+    {
+      "path": "metrics_before_calibration.json",
+      "sha256": "6e250c6fd96b05c258f1e94f90f46babf6035ad7f62bf39fb0930b7b16134287",
+      "size_bytes": 15806
+    },
+    {
+      "path": "predictor_causality_audit.json",
+      "sha256": "a411217f4c9be4aa4cee773627f972870930bd528d57ca9f4d7a04066a286c36",
+      "size_bytes": 659
+    },
+    {
+      "path": "reliability_diagram_rows.json",
+      "sha256": "e2d2d46393e4db2fc7b59d92f70723e34f0bf88a9873cb6dfe8bdfe2892a6fbe",
+      "size_bytes": 7221
+    },
+    {
+      "path": "risk_coverage_rows.json",
+      "sha256": "74d116e7e53e95febc4d40d04519dd9e48d91e362bb2532ffa56cd3712a38b84",
+      "size_bytes": 12454
+    },
+    {
+      "path": "snapshot_examples.json",
+      "sha256": "bfbcedf54020729518b54229c058a3b9d2ffc8206dcab2bc02e3daf47334dd92",
+      "size_bytes": 47974
+    },
+    {
+      "path": "snapshot_validation.json",
+      "sha256": "7368bd9f8f7b32c4aaca47fc5f1c353d2ea9d787ab3a14d6a5eda739b65e7399",
+      "size_bytes": 1519
+    },
+    {
+      "path": "split_manifest.json",
+      "sha256": "f8182787e7e2b5f2feaeab0eb46686bf6b0347cd22aec5e34694cd00a3fe9769",
+      "size_bytes": 56097
+    },
+    {
+      "path": "split_overlap_audit.json",
+      "sha256": "86a8543989d38275be7c3ada00f1604f347cc7f41e467e155913f74e2dbfb425",
+      "size_bytes": 3031
+    },
+    {
+      "path": "staleness_audit.json",
+      "sha256": "55f37fdd5920624e109509b3083cb44eb82740ea4028b4ddb6e6dd6a5243e8ee",
+      "size_bytes": 2373
+    }
+  ],
+  "run_id": "causal_predictor_snapshot_validation_20260819_g12_v1"
+}

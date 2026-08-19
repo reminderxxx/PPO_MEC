@@ -1,0 +1,1313 @@
+{
+  "real_NGSIM_minimal_examples": [
+    {
+      "audit": {
+        "fallback_behavior": "mask_only",
+        "feature_availability_mask": {
+          "current_observation": true,
+          "current_rsu_association": true,
+          "previous_vehicle_position": false,
+          "workflow_state": true
+        },
+        "leakage_audit": {
+          "future_label_in_runtime_snapshot": false,
+          "history_reset_required_per_window_or_episode": true,
+          "reward_or_service_outcome_in_runtime_snapshot": false,
+          "runtime_feature_cutoff_enforced": true
+        },
+        "normalization_version": "supervised_handoff_fixed_clamp_v1",
+        "oracle_flag": false,
+        "snapshot_validation_status": "pass",
+        "snapshot_validator_version": "causal_predictor_snapshot_validator_v1.0.0",
+        "unknown_values_are_json_null": true,
+        "unseen_rsu_or_slot_handling": "abstain_and_mask"
+      },
+      "causal_time": {
+        "age_steps": 0,
+        "causal_cutoff_step": 0,
+        "causal_cutoff_time": 1163565100.0,
+        "consumed_at_step": 0,
+        "consumed_at_time": 1163565100.0,
+        "generated_at_step": 0,
+        "generated_at_time": 1163565100.0,
+        "history_end_step": 0,
+        "history_end_time": 1163565100.0,
+        "history_start_step": 0,
+        "history_start_time": 1163565100.0,
+        "label_horizon_steps": 3,
+        "observation_as_of_step": 0,
+        "observation_as_of_time": 1163565100.0,
+        "source_frame_interval": [
+          0,
+          0
+        ],
+        "source_time_interval": [
+          1163565100,
+          1163565100
+        ],
+        "staleness_steps": 0,
+        "update_interval_steps": 3,
+        "valid_from_step": 0,
+        "valid_until_step": 3
+      },
+      "identity": {
+        "calibration_artifact_hash": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+        "calibration_method": {
+          "handoff": "binary_temperature_scaling",
+          "handoff_target": "identity",
+          "next_rsu": "identity"
+        },
+        "calibration_version": "deterministic_log_temperature_golden_v1.0.0",
+        "contract_version": "1.0.0",
+        "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+        "oracle": false,
+        "predictor_checkpoint_identity": {
+          "checkpoint_schema_version": "supervised_handoff_predictor_checkpoint_v1",
+          "feature_order_sha256": "daca936378525756b6dd68000e39f3f21bbf4eb275221d8bc1b01e4bf8c92f9b",
+          "feature_schema_version": "supervised_handoff_feature_v1",
+          "horizon": 3,
+          "normalization_version": "supervised_handoff_fixed_clamp_v1",
+          "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/top_journal_v112_predictor_training_20260809/supervised_handoff_predictor_20260809_033406_140764/supervised_handoff_predictor.pt",
+          "rsu_ids": [
+            "rsu_a",
+            "rsu_b",
+            "rsu_c",
+            "rsu_d",
+            "rsu_e",
+            "rsu_f",
+            "rsu_g",
+            "rsu_h",
+            "rsu_i",
+            "rsu_j",
+            "rsu_k",
+            "rsu_l",
+            "rsu_m",
+            "rsu_n",
+            "rsu_o",
+            "rsu_p"
+          ],
+          "run_id": "supervised_handoff_predictor_20260809_033406_140764",
+          "sha256": "ea96a11717ab9588446b03d3b2115166b4108387514a7f03feb2c00b3eecd59e"
+        },
+        "predictor_config_hash": "a76854b5057025b1da6cd3fe37d2938de725964af5250ec1df6f4ea7a114517f",
+        "predictor_kind": "supervised",
+        "predictor_model_identity": "supervised_handoff_predictor_v1",
+        "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd",
+        "source_dataset_identity": {
+          "cross_source": false,
+          "dataset": "NGSIM",
+          "role": "non_hidden_nonformal_minimal_runtime_trace",
+          "source_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv"
+        },
+        "source_window_plan_identity": {
+          "frame_interval": [
+            719,
+            742
+          ],
+          "time_interval": [
+            1163565100,
+            1163573700
+          ],
+          "window_id": "window_peachtree_off719_len24_t1163565100_1163573700"
+        },
+        "vehicle_id": "peachtree:846"
+      },
+      "predictions": {
+        "abstained": true,
+        "abstention_reasons": [
+          "confidence_below_threshold",
+          "insufficient_history"
+        ],
+        "availability": false,
+        "availability_mask": 0,
+        "calibrated_probabilities": {
+          "handoff": 0.12450956480390374,
+          "handoff_target": {
+            "__none__": 0.9136090413730649,
+            "rsu_a": 0.0037046575722165217,
+            "rsu_b": 0.000975107435386273,
+            "rsu_c": 0.07680439603342436,
+            "rsu_d": 0.0031964184547718035,
+            "rsu_e": 0.00019616711858865853,
+            "rsu_f": 0.0012217329601278766,
+            "rsu_g": 0.00021984671329819904,
+            "rsu_h": 2.075619137244856e-05,
+            "rsu_i": 3.990042870027236e-06,
+            "rsu_j": 1.5073004782379493e-07,
+            "rsu_k": 4.502953598209575e-08,
+            "rsu_l": 2.2312623200636024e-07,
+            "rsu_m": 4.2435545775651306e-05,
+            "rsu_n": 6.338374890822429e-09,
+            "rsu_o": 4.963273988514115e-06,
+            "rsu_p": 6.206092413166496e-08
+          },
+          "next_rsu": {
+            "__none__": 0.09831847533966359,
+            "rsu_a": 0.002701437435288914,
+            "rsu_b": 0.8266769304343838,
+            "rsu_c": 0.031856743538333204,
+            "rsu_d": 0.0036285239256943704,
+            "rsu_e": 0.013890498656417845,
+            "rsu_f": 0.0036362549648219764,
+            "rsu_g": 0.00674691563122113,
+            "rsu_h": 0.005855485247361475,
+            "rsu_i": 3.208011547087585e-06,
+            "rsu_j": 1.3248953120338633e-05,
+            "rsu_k": 0.0001282813121515911,
+            "rsu_l": 1.23544533883156e-05,
+            "rsu_m": 0.00039501557565898345,
+            "rsu_n": 0.005864442209028342,
+            "rsu_o": 0.00025844223566397174,
+            "rsu_p": 1.3742076255208806e-05
+          }
+        },
+        "confidence": 0.8754904351960963,
+        "confidence_definition": "max_calibrated_binary_handoff_class_probability",
+        "current_rsu_id": "rsu_b",
+        "demand_or_arrival_belief": null,
+        "eta_interval_steps": null,
+        "eta_point_estimate_steps": 1.8764933347702026,
+        "eta_uncertainty": null,
+        "handoff_predicted": false,
+        "handoff_probability": 0.12450956480390374,
+        "handoff_target_probability_distribution": {
+          "__none__": 0.9136090413730649,
+          "rsu_a": 0.0037046575722165217,
+          "rsu_b": 0.000975107435386273,
+          "rsu_c": 0.07680439603342436,
+          "rsu_d": 0.0031964184547718035,
+          "rsu_e": 0.00019616711858865853,
+          "rsu_f": 0.0012217329601278766,
+          "rsu_g": 0.00021984671329819904,
+          "rsu_h": 2.075619137244856e-05,
+          "rsu_i": 3.990042870027236e-06,
+          "rsu_j": 1.5073004782379493e-07,
+          "rsu_k": 4.502953598209575e-08,
+          "rsu_l": 2.2312623200636024e-07,
+          "rsu_m": 4.2435545775651306e-05,
+          "rsu_n": 6.338374890822429e-09,
+          "rsu_o": 4.963273988514115e-06,
+          "rsu_p": 6.206092413166496e-08
+        },
+        "next_rsu_probability_distribution": {
+          "__none__": 0.09831847533966359,
+          "rsu_a": 0.002701437435288914,
+          "rsu_b": 0.8266769304343838,
+          "rsu_c": 0.031856743538333204,
+          "rsu_d": 0.0036285239256943704,
+          "rsu_e": 0.013890498656417845,
+          "rsu_f": 0.0036362549648219764,
+          "rsu_g": 0.00674691563122113,
+          "rsu_h": 0.005855485247361475,
+          "rsu_i": 3.208011547087585e-06,
+          "rsu_j": 1.3248953120338633e-05,
+          "rsu_k": 0.0001282813121515911,
+          "rsu_l": 1.23544533883156e-05,
+          "rsu_m": 0.00039501557565898345,
+          "rsu_n": 0.005864442209028342,
+          "rsu_o": 0.00025844223566397174,
+          "rsu_p": 1.3742076255208806e-05
+        },
+        "predicted_next_rsu_id": "rsu_b",
+        "predicted_target_rsu_id": null,
+        "raw_scores": {
+          "eta_model_output": 1.8764933347702026,
+          "handoff_logit": -2.1095376014709473,
+          "handoff_target_logits": [
+            -1.7855602502822876,
+            -3.12035870552063,
+            1.2461107969284058,
+            -1.9331201314926147,
+            -4.723939418792725,
+            -2.894880771636963,
+            -4.609975814819336,
+            -6.970061779022217,
+            -8.619104385375977,
+            -11.895171165466309,
+            -13.10334300994873,
+            -11.502923965454102,
+            -6.25492000579834,
+            -15.06403923034668,
+            -8.400840759277344,
+            -12.78254508972168,
+            3.7222516536712646
+          ],
+          "next_rsu_logits": [
+            -2.1371798515319824,
+            3.5864500999450684,
+            0.3302852213382721,
+            -1.8421379327774048,
+            -0.4997588098049164,
+            -1.8400095701217651,
+            -1.2218784093856812,
+            -1.3635849952697754,
+            -8.873067855834961,
+            -7.454800605773926,
+            -5.184493541717529,
+            -7.524702548980713,
+            -4.059793949127197,
+            -1.3620564937591553,
+            -4.484046936035156,
+            -7.418256759643555,
+            1.4572480916976929
+          ]
+        },
+        "uncertainty": 0.12450956480390374,
+        "uncertainty_definition": "one_minus_confidence_not_ETA_uncertainty"
+      }
+    },
+    {
+      "audit": {
+        "fallback_behavior": "mask_only",
+        "feature_availability_mask": {
+          "current_observation": true,
+          "current_rsu_association": true,
+          "previous_vehicle_position": false,
+          "workflow_state": true
+        },
+        "leakage_audit": {
+          "future_label_in_runtime_snapshot": false,
+          "history_reset_required_per_window_or_episode": true,
+          "reward_or_service_outcome_in_runtime_snapshot": false,
+          "runtime_feature_cutoff_enforced": true
+        },
+        "normalization_version": "supervised_handoff_fixed_clamp_v1",
+        "oracle_flag": false,
+        "snapshot_validation_status": "pass",
+        "snapshot_validator_version": "causal_predictor_snapshot_validator_v1.0.0",
+        "unknown_values_are_json_null": true,
+        "unseen_rsu_or_slot_handling": "abstain_and_mask"
+      },
+      "causal_time": {
+        "age_steps": 1,
+        "causal_cutoff_step": 0,
+        "causal_cutoff_time": 1163565100.0,
+        "consumed_at_step": 1,
+        "consumed_at_time": 1163565200.0,
+        "generated_at_step": 0,
+        "generated_at_time": 1163565100.0,
+        "history_end_step": 0,
+        "history_end_time": 1163565100.0,
+        "history_start_step": 0,
+        "history_start_time": 1163565100.0,
+        "label_horizon_steps": 3,
+        "observation_as_of_step": 0,
+        "observation_as_of_time": 1163565100.0,
+        "source_frame_interval": [
+          0,
+          0
+        ],
+        "source_time_interval": [
+          1163565100,
+          1163565100
+        ],
+        "staleness_steps": 1,
+        "update_interval_steps": 3,
+        "valid_from_step": 0,
+        "valid_until_step": 3
+      },
+      "identity": {
+        "calibration_artifact_hash": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+        "calibration_method": {
+          "handoff": "binary_temperature_scaling",
+          "handoff_target": "identity",
+          "next_rsu": "identity"
+        },
+        "calibration_version": "deterministic_log_temperature_golden_v1.0.0",
+        "contract_version": "1.0.0",
+        "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+        "oracle": false,
+        "predictor_checkpoint_identity": {
+          "checkpoint_schema_version": "supervised_handoff_predictor_checkpoint_v1",
+          "feature_order_sha256": "daca936378525756b6dd68000e39f3f21bbf4eb275221d8bc1b01e4bf8c92f9b",
+          "feature_schema_version": "supervised_handoff_feature_v1",
+          "horizon": 3,
+          "normalization_version": "supervised_handoff_fixed_clamp_v1",
+          "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/top_journal_v112_predictor_training_20260809/supervised_handoff_predictor_20260809_033406_140764/supervised_handoff_predictor.pt",
+          "rsu_ids": [
+            "rsu_a",
+            "rsu_b",
+            "rsu_c",
+            "rsu_d",
+            "rsu_e",
+            "rsu_f",
+            "rsu_g",
+            "rsu_h",
+            "rsu_i",
+            "rsu_j",
+            "rsu_k",
+            "rsu_l",
+            "rsu_m",
+            "rsu_n",
+            "rsu_o",
+            "rsu_p"
+          ],
+          "run_id": "supervised_handoff_predictor_20260809_033406_140764",
+          "sha256": "ea96a11717ab9588446b03d3b2115166b4108387514a7f03feb2c00b3eecd59e"
+        },
+        "predictor_config_hash": "a76854b5057025b1da6cd3fe37d2938de725964af5250ec1df6f4ea7a114517f",
+        "predictor_kind": "supervised",
+        "predictor_model_identity": "supervised_handoff_predictor_v1",
+        "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd",
+        "source_dataset_identity": {
+          "cross_source": false,
+          "dataset": "NGSIM",
+          "role": "non_hidden_nonformal_minimal_runtime_trace",
+          "source_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv"
+        },
+        "source_window_plan_identity": {
+          "frame_interval": [
+            719,
+            742
+          ],
+          "time_interval": [
+            1163565100,
+            1163573700
+          ],
+          "window_id": "window_peachtree_off719_len24_t1163565100_1163573700"
+        },
+        "vehicle_id": "peachtree:846"
+      },
+      "predictions": {
+        "abstained": true,
+        "abstention_reasons": [
+          "confidence_below_threshold",
+          "insufficient_history"
+        ],
+        "availability": false,
+        "availability_mask": 0,
+        "calibrated_probabilities": {
+          "handoff": 0.12450956480390374,
+          "handoff_target": {
+            "__none__": 0.9136090413730649,
+            "rsu_a": 0.0037046575722165217,
+            "rsu_b": 0.000975107435386273,
+            "rsu_c": 0.07680439603342436,
+            "rsu_d": 0.0031964184547718035,
+            "rsu_e": 0.00019616711858865853,
+            "rsu_f": 0.0012217329601278766,
+            "rsu_g": 0.00021984671329819904,
+            "rsu_h": 2.075619137244856e-05,
+            "rsu_i": 3.990042870027236e-06,
+            "rsu_j": 1.5073004782379493e-07,
+            "rsu_k": 4.502953598209575e-08,
+            "rsu_l": 2.2312623200636024e-07,
+            "rsu_m": 4.2435545775651306e-05,
+            "rsu_n": 6.338374890822429e-09,
+            "rsu_o": 4.963273988514115e-06,
+            "rsu_p": 6.206092413166496e-08
+          },
+          "next_rsu": {
+            "__none__": 0.09831847533966359,
+            "rsu_a": 0.002701437435288914,
+            "rsu_b": 0.8266769304343838,
+            "rsu_c": 0.031856743538333204,
+            "rsu_d": 0.0036285239256943704,
+            "rsu_e": 0.013890498656417845,
+            "rsu_f": 0.0036362549648219764,
+            "rsu_g": 0.00674691563122113,
+            "rsu_h": 0.005855485247361475,
+            "rsu_i": 3.208011547087585e-06,
+            "rsu_j": 1.3248953120338633e-05,
+            "rsu_k": 0.0001282813121515911,
+            "rsu_l": 1.23544533883156e-05,
+            "rsu_m": 0.00039501557565898345,
+            "rsu_n": 0.005864442209028342,
+            "rsu_o": 0.00025844223566397174,
+            "rsu_p": 1.3742076255208806e-05
+          }
+        },
+        "confidence": 0.8754904351960963,
+        "confidence_definition": "max_calibrated_binary_handoff_class_probability",
+        "current_rsu_id": "rsu_b",
+        "demand_or_arrival_belief": null,
+        "eta_interval_steps": null,
+        "eta_point_estimate_steps": 1.8764933347702026,
+        "eta_uncertainty": null,
+        "handoff_predicted": false,
+        "handoff_probability": 0.12450956480390374,
+        "handoff_target_probability_distribution": {
+          "__none__": 0.9136090413730649,
+          "rsu_a": 0.0037046575722165217,
+          "rsu_b": 0.000975107435386273,
+          "rsu_c": 0.07680439603342436,
+          "rsu_d": 0.0031964184547718035,
+          "rsu_e": 0.00019616711858865853,
+          "rsu_f": 0.0012217329601278766,
+          "rsu_g": 0.00021984671329819904,
+          "rsu_h": 2.075619137244856e-05,
+          "rsu_i": 3.990042870027236e-06,
+          "rsu_j": 1.5073004782379493e-07,
+          "rsu_k": 4.502953598209575e-08,
+          "rsu_l": 2.2312623200636024e-07,
+          "rsu_m": 4.2435545775651306e-05,
+          "rsu_n": 6.338374890822429e-09,
+          "rsu_o": 4.963273988514115e-06,
+          "rsu_p": 6.206092413166496e-08
+        },
+        "next_rsu_probability_distribution": {
+          "__none__": 0.09831847533966359,
+          "rsu_a": 0.002701437435288914,
+          "rsu_b": 0.8266769304343838,
+          "rsu_c": 0.031856743538333204,
+          "rsu_d": 0.0036285239256943704,
+          "rsu_e": 0.013890498656417845,
+          "rsu_f": 0.0036362549648219764,
+          "rsu_g": 0.00674691563122113,
+          "rsu_h": 0.005855485247361475,
+          "rsu_i": 3.208011547087585e-06,
+          "rsu_j": 1.3248953120338633e-05,
+          "rsu_k": 0.0001282813121515911,
+          "rsu_l": 1.23544533883156e-05,
+          "rsu_m": 0.00039501557565898345,
+          "rsu_n": 0.005864442209028342,
+          "rsu_o": 0.00025844223566397174,
+          "rsu_p": 1.3742076255208806e-05
+        },
+        "predicted_next_rsu_id": "rsu_b",
+        "predicted_target_rsu_id": null,
+        "raw_scores": {
+          "eta_model_output": 1.8764933347702026,
+          "handoff_logit": -2.1095376014709473,
+          "handoff_target_logits": [
+            -1.7855602502822876,
+            -3.12035870552063,
+            1.2461107969284058,
+            -1.9331201314926147,
+            -4.723939418792725,
+            -2.894880771636963,
+            -4.609975814819336,
+            -6.970061779022217,
+            -8.619104385375977,
+            -11.895171165466309,
+            -13.10334300994873,
+            -11.502923965454102,
+            -6.25492000579834,
+            -15.06403923034668,
+            -8.400840759277344,
+            -12.78254508972168,
+            3.7222516536712646
+          ],
+          "next_rsu_logits": [
+            -2.1371798515319824,
+            3.5864500999450684,
+            0.3302852213382721,
+            -1.8421379327774048,
+            -0.4997588098049164,
+            -1.8400095701217651,
+            -1.2218784093856812,
+            -1.3635849952697754,
+            -8.873067855834961,
+            -7.454800605773926,
+            -5.184493541717529,
+            -7.524702548980713,
+            -4.059793949127197,
+            -1.3620564937591553,
+            -4.484046936035156,
+            -7.418256759643555,
+            1.4572480916976929
+          ]
+        },
+        "uncertainty": 0.12450956480390374,
+        "uncertainty_definition": "one_minus_confidence_not_ETA_uncertainty"
+      }
+    },
+    {
+      "audit": {
+        "fallback_behavior": "mask_only",
+        "feature_availability_mask": {
+          "current_observation": true,
+          "current_rsu_association": true,
+          "previous_vehicle_position": false,
+          "workflow_state": true
+        },
+        "leakage_audit": {
+          "future_label_in_runtime_snapshot": false,
+          "history_reset_required_per_window_or_episode": true,
+          "reward_or_service_outcome_in_runtime_snapshot": false,
+          "runtime_feature_cutoff_enforced": true
+        },
+        "normalization_version": "supervised_handoff_fixed_clamp_v1",
+        "oracle_flag": false,
+        "snapshot_validation_status": "pass",
+        "snapshot_validator_version": "causal_predictor_snapshot_validator_v1.0.0",
+        "unknown_values_are_json_null": true,
+        "unseen_rsu_or_slot_handling": "abstain_and_mask"
+      },
+      "causal_time": {
+        "age_steps": 2,
+        "causal_cutoff_step": 0,
+        "causal_cutoff_time": 1163565100.0,
+        "consumed_at_step": 2,
+        "consumed_at_time": 1163565300.0,
+        "generated_at_step": 0,
+        "generated_at_time": 1163565100.0,
+        "history_end_step": 0,
+        "history_end_time": 1163565100.0,
+        "history_start_step": 0,
+        "history_start_time": 1163565100.0,
+        "label_horizon_steps": 3,
+        "observation_as_of_step": 0,
+        "observation_as_of_time": 1163565100.0,
+        "source_frame_interval": [
+          0,
+          0
+        ],
+        "source_time_interval": [
+          1163565100,
+          1163565100
+        ],
+        "staleness_steps": 2,
+        "update_interval_steps": 3,
+        "valid_from_step": 0,
+        "valid_until_step": 3
+      },
+      "identity": {
+        "calibration_artifact_hash": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+        "calibration_method": {
+          "handoff": "binary_temperature_scaling",
+          "handoff_target": "identity",
+          "next_rsu": "identity"
+        },
+        "calibration_version": "deterministic_log_temperature_golden_v1.0.0",
+        "contract_version": "1.0.0",
+        "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+        "oracle": false,
+        "predictor_checkpoint_identity": {
+          "checkpoint_schema_version": "supervised_handoff_predictor_checkpoint_v1",
+          "feature_order_sha256": "daca936378525756b6dd68000e39f3f21bbf4eb275221d8bc1b01e4bf8c92f9b",
+          "feature_schema_version": "supervised_handoff_feature_v1",
+          "horizon": 3,
+          "normalization_version": "supervised_handoff_fixed_clamp_v1",
+          "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/top_journal_v112_predictor_training_20260809/supervised_handoff_predictor_20260809_033406_140764/supervised_handoff_predictor.pt",
+          "rsu_ids": [
+            "rsu_a",
+            "rsu_b",
+            "rsu_c",
+            "rsu_d",
+            "rsu_e",
+            "rsu_f",
+            "rsu_g",
+            "rsu_h",
+            "rsu_i",
+            "rsu_j",
+            "rsu_k",
+            "rsu_l",
+            "rsu_m",
+            "rsu_n",
+            "rsu_o",
+            "rsu_p"
+          ],
+          "run_id": "supervised_handoff_predictor_20260809_033406_140764",
+          "sha256": "ea96a11717ab9588446b03d3b2115166b4108387514a7f03feb2c00b3eecd59e"
+        },
+        "predictor_config_hash": "a76854b5057025b1da6cd3fe37d2938de725964af5250ec1df6f4ea7a114517f",
+        "predictor_kind": "supervised",
+        "predictor_model_identity": "supervised_handoff_predictor_v1",
+        "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd",
+        "source_dataset_identity": {
+          "cross_source": false,
+          "dataset": "NGSIM",
+          "role": "non_hidden_nonformal_minimal_runtime_trace",
+          "source_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv"
+        },
+        "source_window_plan_identity": {
+          "frame_interval": [
+            719,
+            742
+          ],
+          "time_interval": [
+            1163565100,
+            1163573700
+          ],
+          "window_id": "window_peachtree_off719_len24_t1163565100_1163573700"
+        },
+        "vehicle_id": "peachtree:846"
+      },
+      "predictions": {
+        "abstained": true,
+        "abstention_reasons": [
+          "confidence_below_threshold",
+          "insufficient_history"
+        ],
+        "availability": false,
+        "availability_mask": 0,
+        "calibrated_probabilities": {
+          "handoff": 0.12450956480390374,
+          "handoff_target": {
+            "__none__": 0.9136090413730649,
+            "rsu_a": 0.0037046575722165217,
+            "rsu_b": 0.000975107435386273,
+            "rsu_c": 0.07680439603342436,
+            "rsu_d": 0.0031964184547718035,
+            "rsu_e": 0.00019616711858865853,
+            "rsu_f": 0.0012217329601278766,
+            "rsu_g": 0.00021984671329819904,
+            "rsu_h": 2.075619137244856e-05,
+            "rsu_i": 3.990042870027236e-06,
+            "rsu_j": 1.5073004782379493e-07,
+            "rsu_k": 4.502953598209575e-08,
+            "rsu_l": 2.2312623200636024e-07,
+            "rsu_m": 4.2435545775651306e-05,
+            "rsu_n": 6.338374890822429e-09,
+            "rsu_o": 4.963273988514115e-06,
+            "rsu_p": 6.206092413166496e-08
+          },
+          "next_rsu": {
+            "__none__": 0.09831847533966359,
+            "rsu_a": 0.002701437435288914,
+            "rsu_b": 0.8266769304343838,
+            "rsu_c": 0.031856743538333204,
+            "rsu_d": 0.0036285239256943704,
+            "rsu_e": 0.013890498656417845,
+            "rsu_f": 0.0036362549648219764,
+            "rsu_g": 0.00674691563122113,
+            "rsu_h": 0.005855485247361475,
+            "rsu_i": 3.208011547087585e-06,
+            "rsu_j": 1.3248953120338633e-05,
+            "rsu_k": 0.0001282813121515911,
+            "rsu_l": 1.23544533883156e-05,
+            "rsu_m": 0.00039501557565898345,
+            "rsu_n": 0.005864442209028342,
+            "rsu_o": 0.00025844223566397174,
+            "rsu_p": 1.3742076255208806e-05
+          }
+        },
+        "confidence": 0.8754904351960963,
+        "confidence_definition": "max_calibrated_binary_handoff_class_probability",
+        "current_rsu_id": "rsu_b",
+        "demand_or_arrival_belief": null,
+        "eta_interval_steps": null,
+        "eta_point_estimate_steps": 1.8764933347702026,
+        "eta_uncertainty": null,
+        "handoff_predicted": false,
+        "handoff_probability": 0.12450956480390374,
+        "handoff_target_probability_distribution": {
+          "__none__": 0.9136090413730649,
+          "rsu_a": 0.0037046575722165217,
+          "rsu_b": 0.000975107435386273,
+          "rsu_c": 0.07680439603342436,
+          "rsu_d": 0.0031964184547718035,
+          "rsu_e": 0.00019616711858865853,
+          "rsu_f": 0.0012217329601278766,
+          "rsu_g": 0.00021984671329819904,
+          "rsu_h": 2.075619137244856e-05,
+          "rsu_i": 3.990042870027236e-06,
+          "rsu_j": 1.5073004782379493e-07,
+          "rsu_k": 4.502953598209575e-08,
+          "rsu_l": 2.2312623200636024e-07,
+          "rsu_m": 4.2435545775651306e-05,
+          "rsu_n": 6.338374890822429e-09,
+          "rsu_o": 4.963273988514115e-06,
+          "rsu_p": 6.206092413166496e-08
+        },
+        "next_rsu_probability_distribution": {
+          "__none__": 0.09831847533966359,
+          "rsu_a": 0.002701437435288914,
+          "rsu_b": 0.8266769304343838,
+          "rsu_c": 0.031856743538333204,
+          "rsu_d": 0.0036285239256943704,
+          "rsu_e": 0.013890498656417845,
+          "rsu_f": 0.0036362549648219764,
+          "rsu_g": 0.00674691563122113,
+          "rsu_h": 0.005855485247361475,
+          "rsu_i": 3.208011547087585e-06,
+          "rsu_j": 1.3248953120338633e-05,
+          "rsu_k": 0.0001282813121515911,
+          "rsu_l": 1.23544533883156e-05,
+          "rsu_m": 0.00039501557565898345,
+          "rsu_n": 0.005864442209028342,
+          "rsu_o": 0.00025844223566397174,
+          "rsu_p": 1.3742076255208806e-05
+        },
+        "predicted_next_rsu_id": "rsu_b",
+        "predicted_target_rsu_id": null,
+        "raw_scores": {
+          "eta_model_output": 1.8764933347702026,
+          "handoff_logit": -2.1095376014709473,
+          "handoff_target_logits": [
+            -1.7855602502822876,
+            -3.12035870552063,
+            1.2461107969284058,
+            -1.9331201314926147,
+            -4.723939418792725,
+            -2.894880771636963,
+            -4.609975814819336,
+            -6.970061779022217,
+            -8.619104385375977,
+            -11.895171165466309,
+            -13.10334300994873,
+            -11.502923965454102,
+            -6.25492000579834,
+            -15.06403923034668,
+            -8.400840759277344,
+            -12.78254508972168,
+            3.7222516536712646
+          ],
+          "next_rsu_logits": [
+            -2.1371798515319824,
+            3.5864500999450684,
+            0.3302852213382721,
+            -1.8421379327774048,
+            -0.4997588098049164,
+            -1.8400095701217651,
+            -1.2218784093856812,
+            -1.3635849952697754,
+            -8.873067855834961,
+            -7.454800605773926,
+            -5.184493541717529,
+            -7.524702548980713,
+            -4.059793949127197,
+            -1.3620564937591553,
+            -4.484046936035156,
+            -7.418256759643555,
+            1.4572480916976929
+          ]
+        },
+        "uncertainty": 0.12450956480390374,
+        "uncertainty_definition": "one_minus_confidence_not_ETA_uncertainty"
+      }
+    }
+  ],
+  "synthetic_contract_examples": [
+    {
+      "audit": {
+        "fallback_behavior": "mask_only",
+        "feature_availability_mask": {
+          "current_observation": true,
+          "previous_vehicle_position": true
+        },
+        "leakage_audit": {
+          "future_label_in_runtime_snapshot": false,
+          "history_reset_required_per_window_or_episode": true,
+          "reward_or_service_outcome_in_runtime_snapshot": false,
+          "runtime_feature_cutoff_enforced": true
+        },
+        "normalization_version": "supervised_handoff_fixed_clamp_v1",
+        "oracle_flag": false,
+        "snapshot_validation_status": "pass",
+        "snapshot_validator_version": "causal_predictor_snapshot_validator_v1.0.0",
+        "unknown_values_are_json_null": true,
+        "unseen_rsu_or_slot_handling": "abstain_and_mask"
+      },
+      "causal_time": {
+        "age_steps": 0,
+        "causal_cutoff_step": 2,
+        "causal_cutoff_time": 200.0,
+        "consumed_at_step": 2,
+        "consumed_at_time": 200.0,
+        "generated_at_step": 2,
+        "generated_at_time": 200.0,
+        "history_end_step": 2,
+        "history_end_time": 200.0,
+        "history_start_step": 1,
+        "history_start_time": 100.0,
+        "label_horizon_steps": 3,
+        "observation_as_of_step": 2,
+        "observation_as_of_time": 200.0,
+        "source_frame_interval": [
+          1,
+          2
+        ],
+        "source_time_interval": [
+          100,
+          200
+        ],
+        "staleness_steps": 0,
+        "update_interval_steps": 3,
+        "valid_from_step": 2,
+        "valid_until_step": 5
+      },
+      "identity": {
+        "calibration_artifact_hash": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+        "calibration_method": {
+          "handoff": "binary_temperature_scaling",
+          "handoff_target": "identity",
+          "next_rsu": "identity"
+        },
+        "calibration_version": "deterministic_log_temperature_golden_v1.0.0",
+        "contract_version": "1.0.0",
+        "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+        "oracle": false,
+        "predictor_checkpoint_identity": {
+          "horizon": 3,
+          "sha256": "synthetic"
+        },
+        "predictor_config_hash": "2ee70afd14b9e86e4212f479cdf4d2b678884d58be777b051c12ccab5ddb1f45",
+        "predictor_kind": "supervised",
+        "predictor_model_identity": "synthetic_contract_fixture_not_runtime_model",
+        "snapshot_id": "causal-predictor-fab547415b0f4f46cbb55e6b",
+        "source_dataset_identity": {
+          "cross_source": false,
+          "dataset": "synthetic_contract_fixture"
+        },
+        "source_window_plan_identity": {
+          "window_id": "synthetic_window"
+        },
+        "vehicle_id": "synthetic_vehicle"
+      },
+      "predictions": {
+        "abstained": false,
+        "abstention_reasons": [],
+        "availability": true,
+        "availability_mask": 1,
+        "calibrated_probabilities": {
+          "handoff": 0.9999999906815739,
+          "handoff_target": {
+            "__none__": 8.315261481426896e-07,
+            "rsu_a": 2.2603224183848172e-06,
+            "rsu_b": 0.9999969081514334
+          },
+          "next_rsu": {
+            "__none__": 8.315261481426896e-07,
+            "rsu_a": 2.2603224183848172e-06,
+            "rsu_b": 0.9999969081514334
+          }
+        },
+        "confidence": 0.9999999906815739,
+        "confidence_definition": "max_calibrated_binary_handoff_class_probability",
+        "current_rsu_id": "rsu_a",
+        "demand_or_arrival_belief": null,
+        "eta_interval_steps": null,
+        "eta_point_estimate_steps": 2.0,
+        "eta_uncertainty": null,
+        "handoff_predicted": true,
+        "handoff_probability": 0.9999999906815739,
+        "handoff_target_probability_distribution": {
+          "__none__": 8.315261481426896e-07,
+          "rsu_a": 2.2603224183848172e-06,
+          "rsu_b": 0.9999969081514334
+        },
+        "next_rsu_probability_distribution": {
+          "__none__": 8.315261481426896e-07,
+          "rsu_a": 2.2603224183848172e-06,
+          "rsu_b": 0.9999969081514334
+        },
+        "predicted_next_rsu_id": "rsu_b",
+        "predicted_target_rsu_id": "rsu_b",
+        "raw_scores": {
+          "eta_model_output": 2.0,
+          "handoff_logit": 20.0,
+          "handoff_target_logits": [
+            -5.0,
+            8.0,
+            -6.0
+          ],
+          "next_rsu_logits": [
+            -5.0,
+            8.0,
+            -6.0
+          ]
+        },
+        "uncertainty": 9.318426141824432e-09,
+        "uncertainty_definition": "one_minus_confidence_not_ETA_uncertainty"
+      }
+    },
+    {
+      "audit": {
+        "fallback_behavior": "mask_only",
+        "feature_availability_mask": {
+          "current_observation": true,
+          "previous_vehicle_position": true
+        },
+        "leakage_audit": {
+          "future_label_in_runtime_snapshot": false,
+          "history_reset_required_per_window_or_episode": true,
+          "reward_or_service_outcome_in_runtime_snapshot": false,
+          "runtime_feature_cutoff_enforced": true
+        },
+        "normalization_version": "supervised_handoff_fixed_clamp_v1",
+        "oracle_flag": false,
+        "snapshot_validation_status": "pass",
+        "snapshot_validator_version": "causal_predictor_snapshot_validator_v1.0.0",
+        "unknown_values_are_json_null": true,
+        "unseen_rsu_or_slot_handling": "abstain_and_mask"
+      },
+      "causal_time": {
+        "age_steps": 6,
+        "causal_cutoff_step": 2,
+        "causal_cutoff_time": 200.0,
+        "consumed_at_step": 8,
+        "consumed_at_time": 800.0,
+        "generated_at_step": 2,
+        "generated_at_time": 200.0,
+        "history_end_step": 2,
+        "history_end_time": 200.0,
+        "history_start_step": 1,
+        "history_start_time": 100.0,
+        "label_horizon_steps": 3,
+        "observation_as_of_step": 2,
+        "observation_as_of_time": 200.0,
+        "source_frame_interval": [
+          1,
+          2
+        ],
+        "source_time_interval": [
+          100,
+          200
+        ],
+        "staleness_steps": 6,
+        "update_interval_steps": 3,
+        "valid_from_step": 2,
+        "valid_until_step": 5
+      },
+      "identity": {
+        "calibration_artifact_hash": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+        "calibration_method": {
+          "handoff": "binary_temperature_scaling",
+          "handoff_target": "identity",
+          "next_rsu": "identity"
+        },
+        "calibration_version": "deterministic_log_temperature_golden_v1.0.0",
+        "contract_version": "1.0.0",
+        "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+        "oracle": false,
+        "predictor_checkpoint_identity": {
+          "horizon": 3,
+          "sha256": "synthetic"
+        },
+        "predictor_config_hash": "2ee70afd14b9e86e4212f479cdf4d2b678884d58be777b051c12ccab5ddb1f45",
+        "predictor_kind": "supervised",
+        "predictor_model_identity": "synthetic_contract_fixture_not_runtime_model",
+        "snapshot_id": "causal-predictor-fab547415b0f4f46cbb55e6b",
+        "source_dataset_identity": {
+          "cross_source": false,
+          "dataset": "synthetic_contract_fixture"
+        },
+        "source_window_plan_identity": {
+          "window_id": "synthetic_window"
+        },
+        "vehicle_id": "synthetic_vehicle"
+      },
+      "predictions": {
+        "abstained": true,
+        "abstention_reasons": [
+          "prediction_expired",
+          "snapshot_stale"
+        ],
+        "availability": false,
+        "availability_mask": 0,
+        "calibrated_probabilities": {
+          "handoff": 0.9999999906815739,
+          "handoff_target": {
+            "__none__": 8.315261481426896e-07,
+            "rsu_a": 2.2603224183848172e-06,
+            "rsu_b": 0.9999969081514334
+          },
+          "next_rsu": {
+            "__none__": 8.315261481426896e-07,
+            "rsu_a": 2.2603224183848172e-06,
+            "rsu_b": 0.9999969081514334
+          }
+        },
+        "confidence": 0.9999999906815739,
+        "confidence_definition": "max_calibrated_binary_handoff_class_probability",
+        "current_rsu_id": "rsu_a",
+        "demand_or_arrival_belief": null,
+        "eta_interval_steps": null,
+        "eta_point_estimate_steps": 2.0,
+        "eta_uncertainty": null,
+        "handoff_predicted": true,
+        "handoff_probability": 0.9999999906815739,
+        "handoff_target_probability_distribution": {
+          "__none__": 8.315261481426896e-07,
+          "rsu_a": 2.2603224183848172e-06,
+          "rsu_b": 0.9999969081514334
+        },
+        "next_rsu_probability_distribution": {
+          "__none__": 8.315261481426896e-07,
+          "rsu_a": 2.2603224183848172e-06,
+          "rsu_b": 0.9999969081514334
+        },
+        "predicted_next_rsu_id": "rsu_b",
+        "predicted_target_rsu_id": "rsu_b",
+        "raw_scores": {
+          "eta_model_output": 2.0,
+          "handoff_logit": 20.0,
+          "handoff_target_logits": [
+            -5.0,
+            8.0,
+            -6.0
+          ],
+          "next_rsu_logits": [
+            -5.0,
+            8.0,
+            -6.0
+          ]
+        },
+        "uncertainty": 9.318426141824432e-09,
+        "uncertainty_definition": "one_minus_confidence_not_ETA_uncertainty"
+      }
+    },
+    {
+      "audit": {
+        "fallback_behavior": "mask_only",
+        "feature_availability_mask": {
+          "current_observation": true,
+          "previous_vehicle_position": true
+        },
+        "leakage_audit": {
+          "future_label_in_runtime_snapshot": false,
+          "history_reset_required_per_window_or_episode": true,
+          "reward_or_service_outcome_in_runtime_snapshot": false,
+          "runtime_feature_cutoff_enforced": true
+        },
+        "normalization_version": "supervised_handoff_fixed_clamp_v1",
+        "oracle_flag": false,
+        "snapshot_validation_status": "pass",
+        "snapshot_validator_version": "causal_predictor_snapshot_validator_v1.0.0",
+        "unknown_values_are_json_null": true,
+        "unseen_rsu_or_slot_handling": "abstain_and_mask"
+      },
+      "causal_time": {
+        "age_steps": 0,
+        "causal_cutoff_step": 2,
+        "causal_cutoff_time": 200.0,
+        "consumed_at_step": 2,
+        "consumed_at_time": 200.0,
+        "generated_at_step": 2,
+        "generated_at_time": 200.0,
+        "history_end_step": 2,
+        "history_end_time": 200.0,
+        "history_start_step": null,
+        "history_start_time": null,
+        "label_horizon_steps": 3,
+        "observation_as_of_step": 2,
+        "observation_as_of_time": 200.0,
+        "source_frame_interval": [
+          1,
+          2
+        ],
+        "source_time_interval": [
+          100,
+          200
+        ],
+        "staleness_steps": 0,
+        "update_interval_steps": 3,
+        "valid_from_step": 2,
+        "valid_until_step": 5
+      },
+      "identity": {
+        "calibration_artifact_hash": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+        "calibration_method": {
+          "handoff": "binary_temperature_scaling",
+          "handoff_target": "identity",
+          "next_rsu": "identity"
+        },
+        "calibration_version": "deterministic_log_temperature_golden_v1.0.0",
+        "contract_version": "1.0.0",
+        "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+        "oracle": false,
+        "predictor_checkpoint_identity": {
+          "horizon": 3,
+          "sha256": "synthetic"
+        },
+        "predictor_config_hash": "2ee70afd14b9e86e4212f479cdf4d2b678884d58be777b051c12ccab5ddb1f45",
+        "predictor_kind": "supervised",
+        "predictor_model_identity": "synthetic_contract_fixture_not_runtime_model",
+        "snapshot_id": "causal-predictor-3c9407c17d1dc598b1d6cd97",
+        "source_dataset_identity": {
+          "cross_source": false,
+          "dataset": "synthetic_contract_fixture"
+        },
+        "source_window_plan_identity": {
+          "window_id": "synthetic_window"
+        },
+        "vehicle_id": "synthetic_vehicle"
+      },
+      "predictions": {
+        "abstained": true,
+        "abstention_reasons": [
+          "insufficient_history"
+        ],
+        "availability": false,
+        "availability_mask": 0,
+        "calibrated_probabilities": {
+          "handoff": 0.9999999906815739,
+          "handoff_target": {
+            "__none__": 8.315261481426896e-07,
+            "rsu_a": 2.2603224183848172e-06,
+            "rsu_b": 0.9999969081514334
+          },
+          "next_rsu": {
+            "__none__": 8.315261481426896e-07,
+            "rsu_a": 2.2603224183848172e-06,
+            "rsu_b": 0.9999969081514334
+          }
+        },
+        "confidence": 0.9999999906815739,
+        "confidence_definition": "max_calibrated_binary_handoff_class_probability",
+        "current_rsu_id": "rsu_a",
+        "demand_or_arrival_belief": null,
+        "eta_interval_steps": null,
+        "eta_point_estimate_steps": 2.0,
+        "eta_uncertainty": null,
+        "handoff_predicted": true,
+        "handoff_probability": 0.9999999906815739,
+        "handoff_target_probability_distribution": {
+          "__none__": 8.315261481426896e-07,
+          "rsu_a": 2.2603224183848172e-06,
+          "rsu_b": 0.9999969081514334
+        },
+        "next_rsu_probability_distribution": {
+          "__none__": 8.315261481426896e-07,
+          "rsu_a": 2.2603224183848172e-06,
+          "rsu_b": 0.9999969081514334
+        },
+        "predicted_next_rsu_id": "rsu_b",
+        "predicted_target_rsu_id": "rsu_b",
+        "raw_scores": {
+          "eta_model_output": 2.0,
+          "handoff_logit": 20.0,
+          "handoff_target_logits": [
+            -5.0,
+            8.0,
+            -6.0
+          ],
+          "next_rsu_logits": [
+            -5.0,
+            8.0,
+            -6.0
+          ]
+        },
+        "uncertainty": 9.318426141824432e-09,
+        "uncertainty_definition": "one_minus_confidence_not_ETA_uncertainty"
+      }
+    },
+    {
+      "audit": {
+        "fallback_behavior": "mask_only",
+        "feature_availability_mask": {
+          "current_observation": true,
+          "previous_vehicle_position": true
+        },
+        "leakage_audit": {
+          "future_label_in_runtime_snapshot": false,
+          "history_reset_required_per_window_or_episode": true,
+          "reward_or_service_outcome_in_runtime_snapshot": false,
+          "runtime_feature_cutoff_enforced": true
+        },
+        "normalization_version": "supervised_handoff_fixed_clamp_v1",
+        "oracle_flag": false,
+        "snapshot_validation_status": "pass",
+        "snapshot_validator_version": "causal_predictor_snapshot_validator_v1.0.0",
+        "unknown_values_are_json_null": true,
+        "unseen_rsu_or_slot_handling": "abstain_and_mask"
+      },
+      "causal_time": {
+        "age_steps": 0,
+        "causal_cutoff_step": 2,
+        "causal_cutoff_time": 200.0,
+        "consumed_at_step": 2,
+        "consumed_at_time": 200.0,
+        "generated_at_step": 2,
+        "generated_at_time": 200.0,
+        "history_end_step": 2,
+        "history_end_time": 200.0,
+        "history_start_step": 1,
+        "history_start_time": 100.0,
+        "label_horizon_steps": 3,
+        "observation_as_of_step": 2,
+        "observation_as_of_time": 200.0,
+        "source_frame_interval": [
+          1,
+          2
+        ],
+        "source_time_interval": [
+          100,
+          200
+        ],
+        "staleness_steps": 0,
+        "update_interval_steps": 3,
+        "valid_from_step": 2,
+        "valid_until_step": 5
+      },
+      "identity": {
+        "calibration_artifact_hash": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+        "calibration_method": {
+          "handoff": "binary_temperature_scaling",
+          "handoff_target": "identity",
+          "next_rsu": "identity"
+        },
+        "calibration_version": "deterministic_log_temperature_golden_v1.0.0",
+        "contract_version": "1.0.0",
+        "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+        "oracle": false,
+        "predictor_checkpoint_identity": {
+          "horizon": 3,
+          "sha256": "synthetic"
+        },
+        "predictor_config_hash": "2ee70afd14b9e86e4212f479cdf4d2b678884d58be777b051c12ccab5ddb1f45",
+        "predictor_kind": "supervised",
+        "predictor_model_identity": "synthetic_contract_fixture_not_runtime_model",
+        "snapshot_id": "causal-predictor-dbf66d54c6c1d3da62aa0638",
+        "source_dataset_identity": {
+          "cross_source": false,
+          "dataset": "synthetic_contract_fixture"
+        },
+        "source_window_plan_identity": {
+          "window_id": "synthetic_window"
+        },
+        "vehicle_id": "synthetic_vehicle"
+      },
+      "predictions": {
+        "abstained": true,
+        "abstention_reasons": [
+          "unseen_rsu_or_class"
+        ],
+        "availability": false,
+        "availability_mask": 0,
+        "calibrated_probabilities": {
+          "handoff": 0.9999999906815739,
+          "handoff_target": {
+            "__none__": 8.315261481426896e-07,
+            "rsu_a": 2.2603224183848172e-06,
+            "rsu_b": 0.9999969081514334
+          },
+          "next_rsu": {
+            "__none__": 8.315261481426896e-07,
+            "rsu_a": 2.2603224183848172e-06,
+            "rsu_b": 0.9999969081514334
+          }
+        },
+        "confidence": 0.9999999906815739,
+        "confidence_definition": "max_calibrated_binary_handoff_class_probability",
+        "current_rsu_id": "rsu_a",
+        "demand_or_arrival_belief": null,
+        "eta_interval_steps": null,
+        "eta_point_estimate_steps": 2.0,
+        "eta_uncertainty": null,
+        "handoff_predicted": true,
+        "handoff_probability": 0.9999999906815739,
+        "handoff_target_probability_distribution": {
+          "__none__": 8.315261481426896e-07,
+          "rsu_a": 2.2603224183848172e-06,
+          "rsu_b": 0.9999969081514334
+        },
+        "next_rsu_probability_distribution": {
+          "__none__": 8.315261481426896e-07,
+          "rsu_a": 2.2603224183848172e-06,
+          "rsu_b": 0.9999969081514334
+        },
+        "predicted_next_rsu_id": "rsu_b",
+        "predicted_target_rsu_id": "rsu_b",
+        "raw_scores": {
+          "eta_model_output": 2.0,
+          "handoff_logit": 20.0,
+          "handoff_target_logits": [
+            -5.0,
+            8.0,
+            -6.0
+          ],
+          "next_rsu_logits": [
+            -5.0,
+            8.0,
+            -6.0
+          ]
+        },
+        "uncertainty": 9.318426141824432e-09,
+        "uncertainty_definition": "one_minus_confidence_not_ETA_uncertainty"
+      }
+    }
+  ]
+}

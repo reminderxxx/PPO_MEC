@@ -1,5 +1,15 @@
 # Code Module Map
 
+## G12 causal calibrated predictor snapshots
+
+- `src/predictors/calibration.py`：pure binary/multiclass/ETA/reliability/selective reducers，deterministic temperature fit、三段split interval audit与canonical hash。
+- `src/predictors/causal_snapshot.py`：snapshot/calibration artifact版本、JSON-safe builder/consumer、causal/oracle/probability fail-fast validator和K=1/3/6/12 staleness诊断。
+- `src/predictors/supervised_handoff_predictor.py`：保留旧runtime值，同时暴露完整raw logits/probabilities、semantic feature order/hash、normalization和availability。
+- `src/envs/core/predictor_manager.py`：默认关闭的K-step慢快照、历史delay、expiry/abstention mask与显式fallback；不切换oracle。
+- `src/envs/wrappers/gym_vec_env.py`、`src/metrics/recorder.py`：pre-action decision observation trace及step/episode snapshot provenance；`src/evaluators/main_results_support.py`把provenance投影到benchmark row。
+- `scripts/audit_predictor_calibration.py`：稳定非训练入口；只用v71非hidden train/dev与v112 quality/checkpoint，生成G12完整audit bundle。
+- `tests/test_causal_predictor_snapshot.py`：causality/probability/metrics/calibration/split/abstention/runtime/trace合同与负例。
+
 ## G11 public model-cache dataset registry
 
 - `src/data/model_catalog/model_cache_dataset_registry.py`：纯 metadata validator/artifact projector；冻结 A–I taxonomy、19项 field availability、100分score、hard gates、compatibility检查、canonical JSON与SHA-256，不发起网络请求或下载。

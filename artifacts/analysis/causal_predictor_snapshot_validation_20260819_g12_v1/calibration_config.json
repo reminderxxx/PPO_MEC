@@ -1,0 +1,13 @@
+{
+  "evaluation_split": "evaluation_dev",
+  "fit_split": "calibration",
+  "method_candidates": [
+    "identity",
+    "binary_temperature_scaling"
+  ],
+  "method_selection_rule": "minimum_calibration_NLL_then_Brier_then_identity",
+  "minimum_coverage": 0.5,
+  "reliability_bin_contract_version": "equal_width_10_v1.0.0",
+  "threshold_selection_rule": "calibration_only_minimum_accepted_Brier_subject_to_minimum_coverage",
+  "uses_rl_reward": false
+}

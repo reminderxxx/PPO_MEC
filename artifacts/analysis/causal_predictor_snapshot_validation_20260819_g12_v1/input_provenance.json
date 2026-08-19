@@ -1,0 +1,28 @@
+{
+  "G11_cross_source_payload_downloaded": false,
+  "NGSIM_runtime_trace": {
+    "availability": "available",
+    "payload_sha256_not_computed_reason": "large raw source remains local and is not copied into artifact",
+    "source_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv"
+  },
+  "checkpoint": {
+    "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/top_journal_v112_predictor_training_20260809/supervised_handoff_predictor_20260809_033406_140764/supervised_handoff_predictor.pt",
+    "sha256": "ea96a11717ab9588446b03d3b2115166b4108387514a7f03feb2c00b3eecd59e"
+  },
+  "evaluation_window_plan": {
+    "path": "/Users/howen/Projects/PPO_MEC/configs/experiment/top_journal_v71_strict_split_20260730/dev_window_plan.json",
+    "sha256": "83a83350b33e968a2ae6ea8dae0c13d77717b6f335eea11d610c1431f5811df3"
+  },
+  "predictor_manifest": {
+    "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/top_journal_v112_predictor_training_20260809/supervised_handoff_predictor_20260809_033406_140764/predictor_metrics_manifest.json",
+    "sha256": "66e8846b224387a69a719d039c270026b07f65df96c2086d62d53354ac442268"
+  },
+  "quality_rows": {
+    "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/top_journal_v112_predictor_training_20260809/supervised_handoff_predictor_20260809_033406_140764/predictor_quality_rows.csv",
+    "sha256": "31c63709d93ddc2d359c6f3bdce7d7c826d525dd0a0f351b459f52804aa0521b"
+  },
+  "train_window_plan": {
+    "path": "/Users/howen/Projects/PPO_MEC/configs/experiment/top_journal_v71_strict_split_20260730/train_window_plan.json",
+    "sha256": "1fbca60aa781ee9b3e6fbc36fa0573891c23f772996aec7e140fe28603b0328c"
+  }
+}

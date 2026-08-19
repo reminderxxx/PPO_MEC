@@ -1766,6 +1766,7 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
     actionmix_diagnostics = _build_actionmix_diagnostics(summary)
     cache_efficiency_fields = cache_efficiency_row_fields(summary)
     compute_audit = summary.get("compute_audit", {})
+    predictor_snapshot_provenance = dict(summary.get("predictor_snapshot_provenance", {}))
     return {
         "window_id": run_info.get("window_id"),
         "scenario_id": run_info.get("scenario_id", run_info.get("window_id")),
@@ -1791,6 +1792,15 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         "reward_positive_offset_component": round(float(reward_positive_offset_component), 6),
         "offset_adjusted_total_reward": round(float(total_reward - reward_positive_offset_component), 6),
         "episode_step_count": len(step_trace),
+        "causal_predictor_snapshot_contract_versions": "|".join(
+            str(value) for value in predictor_snapshot_provenance.get("snapshot_contract_versions", [])
+        ),
+        "causal_predictor_snapshot_ids": "|".join(
+            str(value) for value in predictor_snapshot_provenance.get("snapshot_ids", [])
+        ),
+        "causal_predictor_snapshot_accepted_step_count": int(
+            predictor_snapshot_provenance.get("accepted_step_count", 0) or 0
+        ),
         "inference_wall_clock_sec": float(compute_audit.get("wall_clock_sec", 0.0) or 0.0),
         "inference_wall_clock_sec_per_step": float(
             compute_audit.get("wall_clock_sec_per_step", 0.0) or 0.0

@@ -1,0 +1,98 @@
+{
+  "abstention": {
+    "calibration_only_result": {
+      "abstention_rate": 0.3519846564376251,
+      "accepted_accuracy": 0.9947239737485523,
+      "accepted_brier": 0.0051959223752193655,
+      "accepted_count": 7771,
+      "accepted_coverage": 0.6480153435623749,
+      "confidence_threshold": 0.95,
+      "selective_ece": 0.0037651083334305883
+    },
+    "candidate_grid": [
+      0.0,
+      0.05,
+      0.1,
+      0.15,
+      0.2,
+      0.25,
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8,
+      0.85,
+      0.9,
+      0.95,
+      1.0
+    ],
+    "minimum_coverage": 0.5,
+    "selected_threshold": 0.95,
+    "selection_rule": "calibration_only_minimum_accepted_Brier_subject_to_minimum_coverage",
+    "selection_version": "calibration_only_risk_coverage_v1.0.0",
+    "small_sample_warning": false,
+    "uses_rl_reward": false
+  },
+  "calibration_artifact_contract_version": "causal_predictor_calibration_artifact_v1.0.0",
+  "calibration_method_version": "deterministic_log_temperature_golden_v1.0.0",
+  "evaluation_labels_used_for_fit": false,
+  "fit_split": "calibration",
+  "fit_split_manifest_sha256": "931a226b039d27501f84b10b33917cdb9bf55a54da17fa633b3bd217af1a7253",
+  "git_commit_at_generation": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+  "parameters": {
+    "handoff": {
+      "converged": true,
+      "fit_sample_count": 11992,
+      "fit_split": "calibration",
+      "method": "binary_temperature_scaling",
+      "method_version": "deterministic_log_temperature_golden_v1.0.0",
+      "metrics": {
+        "auroc": 0.8677847945082555,
+        "brier_score": 0.0565630580006667,
+        "ece": 0.006816560966240931,
+        "maximum_calibration_error": 0.16391019799692552,
+        "negative_log_likelihood": 0.18817763627115666
+      },
+      "objective": "negative_log_likelihood",
+      "objective_value": 0.18817763627115666,
+      "seed": 7,
+      "selection_rule": "minimum_calibration_NLL_then_Brier_then_identity",
+      "temperature": 1.0815913534284083
+    },
+    "handoff_target": {
+      "availability": "identity_only_historical_full_logits_unavailable",
+      "converged": true,
+      "fit_sample_count": 0,
+      "fit_split": "calibration",
+      "method": "identity",
+      "method_version": "1.0.0",
+      "objective": null,
+      "objective_value": null,
+      "seed": 0,
+      "task": "handoff_target",
+      "temperature": 1.0
+    },
+    "next_rsu": {
+      "availability": "identity_only_historical_full_logits_unavailable",
+      "converged": true,
+      "fit_sample_count": 0,
+      "fit_split": "calibration",
+      "method": "identity",
+      "method_version": "1.0.0",
+      "objective": null,
+      "objective_value": null,
+      "seed": 0,
+      "task": "next_rsu",
+      "temperature": 1.0
+    }
+  },
+  "predictor_checkpoint_sha256": "ea96a11717ab9588446b03d3b2115166b4108387514a7f03feb2c00b3eecd59e",
+  "rl_reward_used_for_selection": false,
+  "seed": 7
+}

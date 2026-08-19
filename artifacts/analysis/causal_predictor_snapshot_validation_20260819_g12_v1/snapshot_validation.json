@@ -1,0 +1,52 @@
+{
+  "abstention_reason_counts": {
+    "insufficient_history": 1,
+    "prediction_expired": 1,
+    "snapshot_stale": 1,
+    "unseen_rsu_or_class": 1
+  },
+  "example_validations": [
+    {
+      "errors": [],
+      "snapshot_id": "causal-predictor-fab547415b0f4f46cbb55e6b",
+      "status": "pass",
+      "validator_version": "causal_predictor_snapshot_validator_v1.0.0"
+    },
+    {
+      "errors": [],
+      "snapshot_id": "causal-predictor-fab547415b0f4f46cbb55e6b",
+      "status": "pass",
+      "validator_version": "causal_predictor_snapshot_validator_v1.0.0"
+    },
+    {
+      "errors": [],
+      "snapshot_id": "causal-predictor-3c9407c17d1dc598b1d6cd97",
+      "status": "pass",
+      "validator_version": "causal_predictor_snapshot_validator_v1.0.0"
+    },
+    {
+      "errors": [],
+      "snapshot_id": "causal-predictor-dbf66d54c6c1d3da62aa0638",
+      "status": "pass",
+      "validator_version": "causal_predictor_snapshot_validator_v1.0.0"
+    }
+  ],
+  "future_as_of_negative_case": {
+    "errors": [
+      "observation_as_of_step cannot be in the future of generation"
+    ],
+    "snapshot_id": "causal-predictor-fab547415b0f4f46cbb55e6b",
+    "status": "fail",
+    "validator_version": "causal_predictor_snapshot_validator_v1.0.0"
+  },
+  "future_as_of_rejected": true,
+  "real_NGSIM_minimal": {
+    "abstention_reason_counts": {
+      "confidence_below_threshold": 6,
+      "insufficient_history": 6
+    },
+    "accepted_snapshot_count": 0,
+    "availability": "available",
+    "snapshot_count": 6
+  }
+}
