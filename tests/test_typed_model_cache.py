@@ -75,6 +75,10 @@ def test_legacy_catalog_defaults_to_adapter_only_and_projects_explicitly() -> No
 
 def test_typed_catalog_round_trip_fingerprint_and_hf_nonformal_boundary() -> None:
     catalog = _catalog()
+    assert all(
+        len(adapter_ids) >= 2
+        for adapter_ids in catalog.compatibility_map.values()
+    )
     restored = AdapterCatalog.from_dict(json.loads(json.dumps(catalog.to_dict())))
     assert restored.canonical_fingerprint() == catalog.canonical_fingerprint()
     assert restored.validate_typed_catalog()["status"] == "pass"

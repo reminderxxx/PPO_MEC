@@ -16,7 +16,7 @@ G13 已冻结：`typed_model_cache_contract_version=1.0.0`、`CacheEvent=1.3.0`�
 
 ## 结果
 
-- catalog：9 typed objects，canonical fingerprint `1c0b3d55e957619af8bd1d15cbf1ba61b756b540c2c67ab8e66b507734092d7e`；duplicate/missing/cycle/family/size/license/provenance gates已覆盖。
+- catalog：10 typed objects，两个 base 均绑定多个 compatible adapters；canonical fingerprint 见 `catalog_validation.json`；duplicate/missing/cycle/family/size/license/provenance gates已覆盖。
 - readiness：full hit、base-only、adapter-only、state missing、vehicle-local边界均输出分层证据；partial hit不计full service。
 - transaction：base+adapter atomic admit、base present只admit adapter、rollback无mutation、heterogeneous two-victim、pinned/dependency-safe无可行victim、oversized bundle均通过；orphan始终0。
 - transfer：base、adapter与workflow state分别计费；workflow state不占长期model-cache capacity；CacheEvent仍是一请求一个denominator。

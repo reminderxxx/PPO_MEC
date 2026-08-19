@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "baseline_fairness_audit.json",
-      "size_bytes": 6469,
-      "sha256": "4782a39b2647146725b1b75d87633644328aae2a610eef1cf436689be91faf8c"
+      "size_bytes": 6948,
+      "sha256": "13e59a4a55ec288ec100bdebccbff82b95df57a6e40cd00825d0f6c175120916"
     },
     {
       "path": "capacity_invariant_audit.json",
@@ -15,18 +15,18 @@
     },
     {
       "path": "catalog_validation.json",
-      "size_bytes": 190,
-      "sha256": "5e9152b76e29fb8034d77f7cef0ce8709fdfdf145c50caf04725d55e018d2238"
+      "size_bytes": 191,
+      "sha256": "d2beee92ec840cafc1e3abdfb7946fd7eeff8960be2f4713f236b5782e3eade5"
     },
     {
       "path": "command_log.json",
       "size_bytes": 427,
-      "sha256": "f26bc7ca6814c2accfec6cb47aee478eec2afbec7a7d80cedc9597f50d5c4612"
+      "sha256": "75efcb7f90df94f69bf45c6f2cbd5cd53a7d76d69c277f9385a908bf18b7ce8a"
     },
     {
       "path": "compatibility_map.json",
-      "size_bytes": 191,
-      "sha256": "88a2d05491bd9df4f9a62e502672bdf3780b4633bcb814fffaeab07f0c41f0b0"
+      "size_bytes": 215,
+      "sha256": "9d1e0ef8354f696668c6613b8c1d7a70b5cf8c3f423e6046727da9e33c4ada34"
     },
     {
       "path": "eviction_plan_rows.json",
@@ -60,13 +60,13 @@
     },
     {
       "path": "typed_catalog.json",
-      "size_bytes": 13352,
-      "sha256": "9740bff74d43fbd436801b5aa1be13ee3f822a5921935fe2449f42e97f23385f"
+      "size_bytes": 14675,
+      "sha256": "90b6bf4dfec73ca672cc39a7b450bcdfa20205ddc1d68cf0fa7ecaa68a8f3b7d"
     },
     {
       "path": "typed_oracle_validation.json",
       "size_bytes": 11860,
-      "sha256": "a3f6cb6437be3209966efdaddbc997d3c2ffd5de0b2cf232969d15e6e6cb771e"
+      "sha256": "9696758339c8ec66bfb70b712ad128ec623f64f77e155d248e3ae789917edcd8"
     }
   ]
 }

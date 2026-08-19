@@ -11,7 +11,7 @@
       "manifest_id": "g13-controlled",
       "full_manifest_sha256": "controlled",
       "semantic_protocol_sha256": "controlled",
-      "git_commit": "695f54fb5324c3ef7e1a6b9b28b660f4a5952bbf"
+      "git_commit": "d3420e7b3784af00dcd8e0f0c05b850338fc76d9"
     },
     "evaluation_unit": {
       "evaluation_unit_id": "g13/u1",
@@ -82,7 +82,7 @@
         },
         "model_cache_profile_id": "typed_base_adapter_state_v1",
         "typed_model_cache_contract_version": "1.0.0",
-        "catalog_fingerprint": "1c0b3d55e957619af8bd1d15cbf1ba61b756b540c2c67ab8e66b507734092d7e",
+        "catalog_fingerprint": "9dc699b640cd375cd96ce61374825c1e0f854b72bc70ae173791707568617f5d",
         "requested_typed_objects": [
           {
             "object_id": "base:veh_base_v1",
@@ -149,7 +149,7 @@
         },
         "model_cache_profile_id": "typed_base_adapter_state_v1",
         "typed_model_cache_contract_version": "1.0.0",
-        "catalog_fingerprint": "1c0b3d55e957619af8bd1d15cbf1ba61b756b540c2c67ab8e66b507734092d7e",
+        "catalog_fingerprint": "9dc699b640cd375cd96ce61374825c1e0f854b72bc70ae173791707568617f5d",
         "requested_typed_objects": [
           {
             "object_id": "base:veh_base_v1",
@@ -189,7 +189,7 @@
         "request_order": 1
       }
     ],
-    "request_replay_fingerprint": "20d343e68acc3738c59572f4bdf600da7bcbe0b3af17f7bcab37b830da311617"
+    "request_replay_fingerprint": "9a43af20f80cd1bbcd08df6ecc5956353d3be041c1dd37b818180a1f96e1c918"
   },
   "oracle_result": {
     "identity": {
@@ -209,11 +209,11 @@
       "rolling_horizon": true,
       "admission_timing": "action_before_service_lookup_same_step_atomic_bundle_can_hit",
       "optimality_status": "optimal",
-      "request_replay_fingerprint": "20d343e68acc3738c59572f4bdf600da7bcbe0b3af17f7bcab37b830da311617",
+      "request_replay_fingerprint": "9a43af20f80cd1bbcd08df6ecc5956353d3be041c1dd37b818180a1f96e1c918",
       "g07_manifest_id": "g13-controlled",
       "g07_manifest_full_sha256": "controlled",
       "g07_manifest_semantic_sha256": "controlled",
-      "git_commit": "695f54fb5324c3ef7e1a6b9b28b660f4a5952bbf",
+      "git_commit": "d3420e7b3784af00dcd8e0f0c05b850338fc76d9",
       "capacity_unit": "mb",
       "capacity_value": 260.0,
       "initial_state_fingerprint": "476516414469418d5c59911bf992f78f6ba451d2e117ca703aae867296a4d045",
@@ -221,7 +221,7 @@
       "states_visited": 6,
       "model_cache_profile_id": "typed_base_adapter_state_v1",
       "typed_model_cache_contract_version": "1.0.0",
-      "catalog_fingerprint": "1c0b3d55e957619af8bd1d15cbf1ba61b756b540c2c67ab8e66b507734092d7e",
+      "catalog_fingerprint": "9dc699b640cd375cd96ce61374825c1e0f854b72bc70ae173791707568617f5d",
       "atomic_dependency_bundle": true
     },
     "performance": {

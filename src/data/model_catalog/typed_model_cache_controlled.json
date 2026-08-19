@@ -19,6 +19,7 @@
     {"object_id": "legacy_adapter_tracking", "adapter_id": "adapter_tracking", "size_mb": 56.0, "source": "controlled_legacy_view"},
     {"object_id": "legacy_adapter_fusion", "adapter_id": "adapter_fusion", "size_mb": 72.0, "source": "controlled_legacy_view"},
     {"object_id": "legacy_adapter_reasoning", "adapter_id": "adapter_reasoning", "size_mb": 88.0, "source": "controlled_legacy_view"},
+    {"object_id": "legacy_adapter_planning", "adapter_id": "adapter_planning", "size_mb": 52.0, "source": "controlled_legacy_view"},
     {"object_id": "legacy_adapter_intent", "adapter_id": "adapter_intent", "size_mb": 64.0, "source": "controlled_legacy_view"},
     {"object_id": "legacy_adapter_control", "adapter_id": "adapter_control", "size_mb": 100.0, "source": "controlled_legacy_view"}
   ],
@@ -72,6 +73,14 @@
       "license_status": "repository_native", "formal_use_status": "controlled_validation_only", "stable_fingerprint": "1806320d637a03bb71a648a6218ca41f3501a44def07f8b569e0de85204793fa", "availability": "available", "counts_toward_capacity": true
     },
     {
+      "object_id": "adapter:planning", "object_type": "adapter", "version": "v1", "resident_size_mb": 52.0, "transfer_size_mb": 45.0,
+      "source": "controlled_repository_native", "provenance": {"profile": "controlled", "raw_payload_downloaded": false},
+      "base_model_family": "controlled_reasoning", "base_model_id": null, "required_base_model_id": "veh_base_v2", "adapter_id": "adapter_planning", "workflow_identity": null,
+      "shareability_scope": "rsu_workflows", "mutability": "immutable", "persistence": "episode_resident", "evictability": "evictable",
+      "migration_semantics": "independent_adapter_transfer", "dependency_ids": ["base:veh_base_v2"], "dataset_profile_source": "repository_native_controlled",
+      "license_status": "repository_native", "formal_use_status": "controlled_validation_only", "stable_fingerprint": "a954ae09e2cbb3789df8db7db619fb5cb528511a3dc97afb1e717a4f213b9a8d", "availability": "available", "counts_toward_capacity": true
+    },
+    {
       "object_id": "adapter:intent", "object_type": "adapter", "version": "v1", "resident_size_mb": 64.0, "transfer_size_mb": 58.0,
       "source": "controlled_repository_native", "provenance": {"profile": "controlled", "raw_payload_downloaded": false},
       "base_model_family": "controlled_perception", "base_model_id": null, "required_base_model_id": "veh_base_v1", "adapter_id": "adapter_intent", "workflow_identity": null,
@@ -103,7 +112,7 @@
   ],
   "compatibility_map": {
     "veh_base_v1": ["adapter_perception", "adapter_tracking", "adapter_fusion", "adapter_intent", "adapter_control"],
-    "veh_base_v2": ["adapter_reasoning"]
+    "veh_base_v2": ["adapter_reasoning", "adapter_planning"]
   },
   "kv_prefix_enabled": false,
   "vehicle_adapter_residency_enabled": false,

@@ -73,7 +73,7 @@ G08 typed replay保存完整 `[base,adapter]` dependency bundle、catalog finger
 
 ## Profile 与数据边界
 
-- `typed_model_cache_controlled.json`：repository-native deterministic controlled profile；2 base、5 compatible perception-family adapters、1 reasoning adapter、1 migration-only workflow-state，heterogeneous size、pinned base、3 RSU。它是“controlled synthetic catalog over NGSIM+Alibaba skeleton”，不是真实联合trace。
+- `typed_model_cache_controlled.json`：repository-native deterministic controlled profile；2 base、5 compatible perception-family adapters、2 reasoning-family adapters、1 migration-only workflow-state，heterogeneous size、pinned base、3 RSU；每个 base 都可被多个 adapter 共享。它是“controlled synthetic catalog over NGSIM+Alibaba skeleton”，不是真实联合trace。
 - `hf_metadata_diagnostic_model_profile.json`：qwen/cbow/bert metadata-only、cross-source、non-formal、no payload downloaded；未知license，BERT anomaly blocked；不进入默认profile或G14正式主表。
 - BurstGPT不下载/不进入G13 runtime request stream；仅保留future replay mapping。
 
