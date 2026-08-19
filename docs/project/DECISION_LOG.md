@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-08-18 — Cache comparison以validated fairness manifest作为唯一协议来源
+
+决定：五个classical reactive baseline及后续G08 oracle必须消费`cache_baseline_fairness_manifest_version=1.0.0`；不得再以CLI默认值、完整config hash、`window_rank_offset`或历史aggregate作为公平性协议来源。Manifest冻结dataset content、raw frame/time、DAG request plan、seed、capacity/catalog/initial cache、G01/G03/G06、aggregation与artifact provenance，pairwise只允许eviction policy identity相关字段变化。
+
+理由：现有benchmark虽在同一循环共享多数CLI值并有agent-policy binding，但YAML未被runtime消费，capacity/Aging参数硬编码，且缺dataset/request/initial-cache/semantic hash证据，无法机器证明“唯一变量为eviction”。
+
+影响：manifest的semantic hash排除时间戳、输出目录和本机absolute path，但包含Git commit和全部实验关键字段；runtime先验证再执行并拒绝CLI覆盖。旧benchmark继续可运行但标记fairness unavailable。G08必须复用同一manifest，不得另选请求流或容量。
+
 ## 2026-08-14: Cache Event 采用单 request lifecycle
 
 决策：`CacheEvent` v1 使用一个 workflow-node request 对应一个完整事件，lookup、最终 hit source、admission、eviction、transfer/migration 与 execution result 作为同一事件字段；无当前节点输出 `not_applicable` 事件。

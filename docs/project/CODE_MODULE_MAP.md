@@ -1,5 +1,13 @@
 # Code Module Map
 
+## 2026-08-18 G07 cache baseline fairness manifest
+
+- `src/evaluators/cache_baseline_fairness.py`：canonical JSON/hash、schema builder/validator、dataset/window/workload/seed/cache/metric invariants、10组pairwise diff、runtime fingerprint/provenance enforcement。
+- `scripts/build_cache_baseline_fairness_manifest.py`、`scripts/validate_cache_baseline_fairness_manifest.py`：显式构建与结构化验证入口；不下载数据、不运行formal/hidden。
+- `scripts/benchmark_main_results.py`：显式消费已验证manifest，拒绝CLI覆盖冻结字段，核对observed request stream，并写resolved manifest、run/audit/integrity provenance。
+- `src/evaluators/main_results_support.py`：raw row新增manifest ID/full/semantic hash、evaluation unit、expected/observed fingerprint；未传manifest保持`unavailable`兼容。
+- `tests/test_cache_baseline_fairness_manifest.py`：覆盖schema、漂移、canonical hash、CLI/runtime、provenance、pairwise与legacy兼容。
+
 ## 2026-08-14 cache event independent reducer
 
 - `src/metrics/cache_event_metrics.py`：纯 `CacheEvent` reducer、历史 summary 的 unavailable/empty 区分、schema/invariant validation 和 legacy telemetry structured comparison；reducer 不依赖 step/system/evaluator aggregate。

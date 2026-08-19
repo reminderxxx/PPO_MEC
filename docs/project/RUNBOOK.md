@@ -1,5 +1,39 @@
 # Runbook
 
+## G07 cache baseline fairness manifest
+
+构建新的非hidden、受控NGSIM+Alibaba manifest（默认拒绝覆盖）：
+
+```bash
+.venv/bin/python scripts/build_cache_baseline_fairness_manifest.py \
+  --output_path artifacts/analysis/cache_baseline_fairness_manifest_validation_<run_id>/cache_baseline_fairness_manifest.json \
+  --window_plan_path configs/experiment/cache_baseline_fairness_g07_smoke_window_plan.json
+```
+
+独立校验并输出10组pairwise diff：
+
+```bash
+.venv/bin/python scripts/validate_cache_baseline_fairness_manifest.py \
+  --manifest_path <manifest.json> \
+  --report_path <validation_report.json> \
+  --pairwise_diff_path <pairwise_protocol_diff.json>
+```
+
+用manifest驱动最小正式生产链（受控机制验证，不是性能排名）：
+
+```bash
+.venv/bin/python scripts/benchmark_main_results.py \
+  --agents reactive_lru reactive_fifo reactive_lfu reactive_aging_lfu reactive_random \
+  --cache_baseline_fairness_manifest_path <manifest.json> \
+  --seeds 7 --max_mobility_rows 2500 --max_workflows 1 --max_steps 1 \
+  --classical_cache_slots 3 --workflow_selector ordered \
+  --window_plan_path configs/experiment/cache_baseline_fairness_g07_smoke_window_plan.json \
+  --primary_vehicle_selection stable_first --min_tasks 5 --max_tasks 20 \
+  --reward_positive_offset 0.0 --output_root <new_output_root>
+```
+
+Runtime会重验manifest、阻止冻结字段被CLI覆盖，并检查同unit五baseline observed request fingerprint一致。输出包含resolved manifest、`run_manifest.json`、`fairness_runtime_audit.json`、command log和integrity manifest。不要把该入口指向formal/holdout/hidden计划；G08 oracle不在此入口中。
+
 ## CacheEvent telemetry 独立对账
 
 先生成或选择一个包含 `cache_event_trace` 的 episode summary，再将审计输出写到新目录：

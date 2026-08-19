@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shlex
 import sys
 import time
 import tracemalloc
@@ -16,6 +17,17 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from src.agents.registry import get_algo_spec, list_evaluable_agents
+from src.evaluators.cache_baseline_fairness import (
+    BASELINE_NAMES,
+    FairnessManifestError,
+    enforce_benchmark_args,
+    expected_unit,
+    load_and_validate_manifest,
+    sha256_file,
+    stamp_summary_provenance,
+    validate_observed_fingerprint_matrix,
+    workload_fingerprint,
+)
 from src.evaluators.main_results_support import (
     apply_frozen_window_plan,
     aggregate_rows,
@@ -59,6 +71,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--flat_ppo_checkpoint_path", type=str, default="")
     parser.add_argument("--flat_mappo_checkpoint_path", type=str, default="")
     parser.add_argument("--seed_checkpoint_manifest_path", type=str, default="")
+    parser.add_argument("--cache_baseline_fairness_manifest_path", type=str, default="")
     parser.add_argument("--mobility_source", type=str, default="ngsim", choices=["ngsim", "lust"])
     parser.add_argument("--primary_vehicle_selection", type=str, default="stable_first", choices=["stable_first", "handoff_pressure"])
     parser.add_argument("--mobility_csv_path", type=str, default="")
@@ -396,6 +409,16 @@ def build_sa_advantage_diagnosis(
 
 def main() -> None:
     args = parse_args()
+    fairness_manifest: dict[str, Any] | None = None
+    fairness_validation_report: dict[str, Any] | None = None
+    if args.cache_baseline_fairness_manifest_path:
+        fairness_manifest, fairness_validation_report = load_and_validate_manifest(
+            args.cache_baseline_fairness_manifest_path,
+            root=ROOT_DIR,
+            check_files=True,
+        )
+        args._fairness_root = ROOT_DIR
+        enforce_benchmark_args(args, fairness_manifest)
     excluded_window_intervals = load_excluded_window_intervals(args.exclude_window_plan_path)
     mainline_label = "LuST(SUMO) + Alibaba" if args.mobility_source == "lust" else "NGSIM + Alibaba"
     base_checkpoint_map = expand_checkpoint_aliases(build_checkpoint_map(args))
@@ -450,6 +473,17 @@ def main() -> None:
     rows: list[dict[str, Any]] = []
     selected_workflow_ids_by_seed: dict[str, list[str]] = {}
     selected_window_plan = list(window_payload["selected_windows"])
+    if fairness_manifest is not None:
+        allowed_window_ids = {
+            unit["window_id"]
+            for unit in fairness_manifest["window_workload_plan"]["evaluation_units"]
+        }
+        selected_window_plan = [
+            window for window in selected_window_plan if window["window_id"] in allowed_window_ids
+        ]
+        if not selected_window_plan or {window["window_id"] for window in selected_window_plan} != allowed_window_ids:
+            raise FairnessManifestError("runtime window plan does not resolve every manifest window")
+    observed_request_fingerprints: dict[str, dict[str, str]] = {}
     if args.audit_runtime:
         tracemalloc.start()
 
@@ -484,6 +518,19 @@ def main() -> None:
             mobility_bundle.rsu_metadata["window_class"] = window_candidate["window_class"]
             for workflow_state in workflow_states:
                 for agent_name in args.agents:
+                    fairness_unit = None
+                    if fairness_manifest is not None:
+                        fairness_unit = expected_unit(
+                            fairness_manifest,
+                            seed=seed,
+                            window_id=str(window_candidate["window_id"]),
+                            workflow_id=workflow_state.workflow_id,
+                        )
+                        actual_workload_fingerprint = workload_fingerprint(workflow_state)
+                        if actual_workload_fingerprint != fairness_unit["expected_workload_fingerprint"]:
+                            raise FairnessManifestError(
+                                f"observed workload fingerprint mismatch for {fairness_unit['evaluation_unit_id']}"
+                            )
                     algo_spec = get_algo_spec(agent_name)
                     cache_capacity_profile = None
                     if algo_spec.get("required_eviction_policy"):
@@ -529,6 +576,7 @@ def main() -> None:
                             "window_rank_offset": args.window_rank_offset,
                         },
                         predictor_kwargs={
+                            **({"random_seed": seed} if fairness_manifest is not None else {}),
                             "horizon": args.prediction_horizon,
                             "predictor_kind": args.predictor_kind,
                             "predictor_checkpoint_path": args.predictor_checkpoint_path,
@@ -552,11 +600,18 @@ def main() -> None:
                             "python_peak_increment_bytes": int(max(allocation_peak - allocation_before, 0)),
                             "memory_scope": "tracemalloc_python_allocations_only",
                         }
+                    if fairness_manifest is not None and fairness_unit is not None:
+                        stamp_summary_provenance(summary, fairness_manifest, fairness_unit)
+                        unit_id = fairness_unit["evaluation_unit_id"]
+                        observed_request_fingerprints.setdefault(unit_id, {})[agent_name] = summary["run_info"]["observed_request_stream_fingerprint"]
                     summary_path = episode_root / str(mobility_bundle.rsu_metadata.get("window_id")) / workflow_state.workflow_id / agent_name / f"seed_{seed}.summary.json"
                     summary_path.parent.mkdir(parents=True, exist_ok=True)
                     summary["run_info"]["summary_path"] = str(summary_path)
                     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
                     rows.append(summary_to_row(summary))
+
+    if fairness_manifest is not None:
+        validate_observed_fingerprint_matrix(observed_request_fingerprints)
 
     aggregate_by_agent = aggregate_rows(rows, group_keys=["agent_name"], metrics=MAIN_RESULT_METRICS)
     aggregate_by_seed_and_agent = aggregate_rows(rows, group_keys=["seed", "agent_name"], metrics=MAIN_RESULT_METRICS)
@@ -569,6 +624,12 @@ def main() -> None:
     aggregate_mechanism_windows_by_agent = aggregate_rows(mechanism_window_rows, group_keys=["agent_name"], metrics=MAIN_RESULT_METRICS)
     aggregate_active_non_mechanism_windows_by_agent = aggregate_rows(active_non_mechanism_window_rows, group_keys=["agent_name"], metrics=MAIN_RESULT_METRICS)
     aggregate_idle_or_sparse_windows_by_agent = aggregate_rows(idle_or_sparse_window_rows, group_keys=["agent_name"], metrics=MAIN_RESULT_METRICS)
+    aggregate_by_fairness_stratum_and_agent = {}
+    if fairness_manifest is not None:
+        grouping_keys = fairness_manifest["metrics_aggregation"]["grouping_keys"]
+        aggregate_by_fairness_stratum_and_agent = aggregate_rows(
+            rows, group_keys=grouping_keys, metrics=MAIN_RESULT_METRICS
+        )
     comparison_against_popularity = build_comparison_against_popularity(aggregate_by_agent, rows)
     sa_advantage_diagnosis = build_sa_advantage_diagnosis(aggregate_by_agent, rows)
 
@@ -586,6 +647,10 @@ def main() -> None:
     )
     aggregate_summary = {
         "run_id": benchmark_run_id,
+        "fairness_manifest_status": "validated" if fairness_manifest is not None else "unavailable",
+        "fairness_manifest_id": fairness_manifest["identity"]["manifest_id"] if fairness_manifest else None,
+        "fairness_manifest_hash": fairness_manifest["hashes"]["full_manifest_sha256"] if fairness_manifest else None,
+        "fairness_semantic_protocol_hash": fairness_manifest["hashes"]["semantic_protocol_sha256"] if fairness_manifest else None,
         "protocol_version": PAPER_PROTOCOL_VERSION,
         "paper_protocol_frozen": PAPER_PROTOCOL_FROZEN,
         "canonical_paper_protocol": bool(args.window_mode in {"activating_only", "mixed_informative", "full_stratified"}),
@@ -655,6 +720,7 @@ def main() -> None:
         "aggregate_mechanism_windows_by_agent": aggregate_mechanism_windows_by_agent,
         "aggregate_active_non_mechanism_windows_by_agent": aggregate_active_non_mechanism_windows_by_agent,
         "aggregate_idle_or_sparse_windows_by_agent": aggregate_idle_or_sparse_windows_by_agent,
+        "aggregate_by_fairness_stratum_and_agent": aggregate_by_fairness_stratum_and_agent,
         "aggregate_non_mechanism_windows_by_agent": aggregate_active_non_mechanism_windows_by_agent,
         "pairwise_comparison": pairwise_comparison,
         "mechanism_diagnosis": build_mechanism_diagnosis(rows),
@@ -668,10 +734,53 @@ def main() -> None:
     rows_path = output_root / "benchmark_rows.csv"
     comparison_path = output_root / "comparison_against_popularity.json"
     diagnosis_path = output_root / "sa_advantage_diagnosis.json"
+    run_manifest_path = output_root / "run_manifest.json"
+    fairness_audit_path = output_root / "fairness_runtime_audit.json"
+    resolved_manifest_path = output_root / "cache_baseline_fairness_manifest.json"
+    command_log_path = output_root / "resolved_command.txt"
+    integrity_path = output_root / "artifact_integrity_manifest.json"
     aggregate_path.write_text(json.dumps(aggregate_summary, ensure_ascii=False, indent=2), encoding="utf-8")
     comparison_path.write_text(json.dumps(comparison_against_popularity, ensure_ascii=False, indent=2), encoding="utf-8")
     diagnosis_path.write_text(json.dumps(sa_advantage_diagnosis, ensure_ascii=False, indent=2), encoding="utf-8")
     write_rows_csv(rows_path, rows)
+    command_log_path.write_text(" ".join(shlex.quote(item) for item in sys.argv) + "\n", encoding="utf-8")
+    run_manifest = {
+        "run_id": benchmark_run_id,
+        "fairness_manifest_status": "validated" if fairness_manifest is not None else "unavailable",
+        "fairness_manifest_id": fairness_manifest["identity"]["manifest_id"] if fairness_manifest else None,
+        "fairness_manifest_hash": fairness_manifest["hashes"]["full_manifest_sha256"] if fairness_manifest else None,
+        "fairness_semantic_protocol_hash": fairness_manifest["hashes"]["semantic_protocol_sha256"] if fairness_manifest else None,
+        "agents": args.agents,
+        "seeds": args.seeds,
+        "output_paths": {
+            "aggregate": str(aggregate_path),
+            "rows": str(rows_path),
+            "episodes": str(episode_root),
+            "command_log": str(command_log_path),
+        },
+    }
+    run_manifest_path.write_text(json.dumps(run_manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if fairness_manifest is not None:
+        resolved_manifest_path.write_text(json.dumps(fairness_manifest, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+        fairness_audit = {
+            "status": "pass",
+            "validation_report": fairness_validation_report,
+            "observed_request_fingerprints": observed_request_fingerprints,
+            "all_five_baselines_per_unit": True,
+            "observed_request_streams_identical_per_unit": True,
+        }
+        fairness_audit_path.write_text(json.dumps(fairness_audit, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    integrity_files = [aggregate_path, rows_path, run_manifest_path, command_log_path]
+    if fairness_manifest is not None:
+        integrity_files.extend([resolved_manifest_path, fairness_audit_path])
+    integrity_payload = {
+        "integrity_manifest_version": "1.0.0",
+        "files": [
+            {"path": path.relative_to(output_root).as_posix(), "size_bytes": path.stat().st_size, "sha256": sha256_file(path)}
+            for path in integrity_files
+        ],
+    }
+    integrity_path.write_text(json.dumps(integrity_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     print("main results benchmark complete")
     print(f"run_id: {benchmark_run_id}")

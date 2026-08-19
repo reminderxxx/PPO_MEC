@@ -2,6 +2,14 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-18: G07 fairness manifest closes classical-baseline protocol drift; runtime scope remains bounded
+
+- `RESOLVED / protocol identity`：五个reactive baseline现在由机器可验证manifest绑定相同dataset/window/request/seed/capacity/catalog/initial-cache/metrics合同，10组pairwise diff只允许eviction policy身份差异。
+- `RESOLVED / silent override`：manifest runtime拒绝agents、seed、workflow/window、capacity、max-step、vehicle-selection和reward CLI漂移；未传manifest的legacy benchmark显式标记fairness unavailable。
+- `OPEN / MB runtime consumer`：schema/validator已冻结slot与MB独立stratum，但`benchmark_main_results.py`当前G07消费者只执行`adapter_slots`；MB manifest在该runner fail-fast，不能宣称已完成MB runtime benchmark。
+- `OPEN / exogenous long-horizon requests`：pre-run static DAG workload与同unit observed request stream均受审计；本轮controlled unit只有1 step。若长episode因cache outcome改变workflow推进，cross-baseline observed fingerprint会fail，必须先冻结外生request replay contract，不能绕过校验。
+- `BOUNDARY`：G07不是G08 oracle、causal regret、latency-saved、formal或paper-ready evidence；hidden未消费。
+
 ## 2026-08-18: G05 unavailable/null aggregation regression resolved
 
 - `FIXED / nullable aggregate`: benchmark aggregate 曾把 `None`/missing 通过通用 default-zero 聚合成 `0.0`，违反 G03 Cache Capacity Contract；现全 unavailable group 保持 JSON `null`，mixed group 只统计 available finite numeric values并记录 available/unavailable counts。

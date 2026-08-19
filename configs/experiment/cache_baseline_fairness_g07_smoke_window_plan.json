@@ -1,0 +1,29 @@
+{
+  "protocol_version": "cache_baseline_fairness_g07_controlled_v1",
+  "split": "controlled_non_hidden",
+  "sealed": false,
+  "outcome_blind_selection": true,
+  "mobility_source_path": "data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+  "selected_window_plan": [
+    {
+      "window_rank": 0,
+      "window_id": "window_peachtree_off0_len24_t1163034800_1163037800",
+      "frame_offset": 0,
+      "window_length": 24,
+      "time_index_start": 1163034800,
+      "time_index_end": 1163037800,
+      "source_segment_id": "peachtree",
+      "source_location": "peachtree",
+      "segment_frame_start": 0,
+      "segment_frame_end": 23,
+      "dominant_axis": "y",
+      "recommended_rsu_layout": "auto_dominant_tight",
+      "chosen_rsu_axis": "y",
+      "coverage_radius": 8.0,
+      "spacing": 9.736667,
+      "estimated_association_change_count": 5,
+      "estimated_handoff_count": 3,
+      "window_class": "controlled_g07"
+    }
+  ]
+}

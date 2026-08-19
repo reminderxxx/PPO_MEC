@@ -1,5 +1,12 @@
 ﻿# Progress
 
+## 2026-08-18: G07 paper-grade cache baseline fairness manifest frozen
+
+- 新增versioned manifest `1.0.0`，绑定NGSIM/Alibaba/catalog/window plan content hash、raw frame/time双区间、workflow DAG/request plan、seed derivation、capacity/catalog/initial cache、G01/G03/G06和artifact/claim边界。
+- 五个classical reactive baseline已做10组字段级pairwise diff；唯一主要变量为eviction policy identity，Random使用私有`random.Random(run_seed)`。Config drift、agent-policy mismatch、agent-specific override与CLI覆盖均fail-fast。
+- `benchmark_main_results.py`已实际消费manifest并把manifest/policy provenance写入episode summary、raw row、aggregate、run manifest、runtime audit与integrity manifest；旧入口未传manifest时标记`unavailable`。
+- G07 controlled单seed/单窗口/单workflow/单step验证仅证明协议链路可运行，不做性能排名。未执行G08、formal、holdout或hidden；latency saved继续unavailable。
+
 ## 2026-08-18: G05 nullable benchmark aggregation regression fixed
 
 - 根因是 `aggregate_rows()` 对每个 metric 使用 `_float_value(..., 0.0)`，把 G03 capacity-disabled 的 `None` 和缺失字段静默转换成观测零。
