@@ -1,0 +1,30 @@
+{
+  "status": "pass",
+  "benchmark_dirs": {
+    "320mb": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202",
+    "384mb": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626"
+  },
+  "episode_summary_count": 28,
+  "row_count": 28,
+  "agents": [
+    "reactive_lru",
+    "reactive_fifo",
+    "reactive_lfu",
+    "reactive_aging_lfu",
+    "reactive_random",
+    "ppo",
+    "mappo"
+  ],
+  "seeds": [
+    7,
+    13
+  ],
+  "capacities_mb": [
+    320.0,
+    384.0
+  ],
+  "raw_summary_retains_typed_events": true,
+  "row_and_aggregate_are_lightweight_scalars": true,
+  "same_step_action_before_lookup": true,
+  "base_adapter_atomic_transaction": true
+}

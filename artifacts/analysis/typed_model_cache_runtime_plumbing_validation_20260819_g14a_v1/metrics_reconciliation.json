@@ -1,0 +1,234 @@
+{
+  "status": "pass",
+  "cache_efficiency_metrics_contract_version": "1.1.0",
+  "summary_count": 28,
+  "missing_trace_semantics": {
+    "cache_efficiency_availability": "unavailable"
+  },
+  "rows": [
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/mappo/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/mappo/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/ppo/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/ppo/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_aging_lfu/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_aging_lfu/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_fifo/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_fifo/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lfu/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lfu/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lru/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lru/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_random/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "320mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_random/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/mappo/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/mappo/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/ppo/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/ppo/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_aging_lfu/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_aging_lfu/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_fifo/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_fifo/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lfu/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lfu/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lru/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lru/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_random/seed_13.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    },
+    {
+      "capacity_label": "384mb",
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_random/seed_7.summary.json",
+      "metrics_version": "1.1.0",
+      "availability": "available",
+      "scalar_reconciliation": "pass",
+      "nullable_latency_saved": null
+    }
+  ]
+}

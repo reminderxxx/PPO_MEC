@@ -897,3 +897,21 @@ create-only 语义；目录已存在时会拒绝覆盖。重跑前应明确选�
 legacy 兼容 dry-run 默认仍为 `legacy_adapter_only_v1`。只有显式传入
 `--model_cache_profile typed_base_adapter_state_v1 --typed_cache_capacity_mb <MB>`
 并使用受控 catalog 时才启用 typed resident cache。
+
+## G14A typed MB runtime plumbing（非正式验证）
+
+共享typed配置通过`--model_cache_runtime_config`接入训练、评估和benchmark。受控320 MB示例：
+
+```bash
+.venv/bin/python scripts/train_algo_pool_real_sample.py --agent_name ppo --profile smoke --episodes 1 --max_steps 1 --window_plan_path configs/experiment/cache_baseline_fairness_g07_smoke_window_plan.json --model_cache_runtime_config configs/benchmark/typed_model_cache_controlled_lru.yaml --reward_positive_offset 0
+```
+
+完整非正式rehearsal：
+
+```bash
+.venv/bin/python scripts/run_typed_model_cache_runtime_rehearsal.py
+```
+
+该入口固定label为`non_formal_typed_runtime_rehearsal`，只使用`controlled_non_hidden`计划，运行2 seed、320/384 MB、五reactive baseline与PPO/MAPPO tiny serialization/restore。输出位于`artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/`。不得把其中checkpoint复制到formal manifest。
+
+Typed benchmark必须同时给出validated fairness manifest；含learned agent时还必须给出`--checkpoint_provenance_manifest_path`。旧legacy benchmark可使用`legacy_adapter_slots_lru.yaml`或`legacy_adapter_mb_lru.yaml`，不提供fairness manifest时provenance明确为unavailable。G14B前不得运行formal/holdout/hidden。

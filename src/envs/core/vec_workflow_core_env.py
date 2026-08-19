@@ -276,6 +276,24 @@ class VecWorkflowCoreEnv:
             current_node_id=current_node.node_id if current_node else None,
             required_adapter=current_required_adapter,
         )
+        if (
+            self._typed_mode_enabled()
+            and current_required_adapter is not None
+            and cache_result.get("dependency_bundle") is None
+        ):
+            request_rsu_id = offload_target_rsu_id
+            request_residents = list(
+                self._typed_resident_object_ids.get(str(request_rsu_id), [])
+            )
+            request_placement = self.adapter_catalog.resolve_typed_placement_plan(
+                adapter_id=current_required_adapter,
+                resident_object_ids=request_residents,
+            )
+            cache_result["dependency_bundle"] = request_placement.to_dict()
+            cache_result["requested_typed_objects"] = [
+                self._typed_object_row(object_id)
+                for object_id in request_placement.ordered_object_ids
+            ]
         handoff_count = sum(
             1
             for event in handoff_events
@@ -1989,7 +2007,7 @@ class VecWorkflowCoreEnv:
         if current_node is None:
             hit_source = "not_applicable"
         elif offload_mode == "vehicle":
-            hit_source = "vehicle_local"
+            hit_source = "vehicle_local" if cache_hit else "unserved"
         elif offload_mode == "cloud":
             hit_source = "cloud"
         elif not cache_hit:
@@ -2119,7 +2137,7 @@ class VecWorkflowCoreEnv:
             service_success=bool(current_node and not stall_occurred),
             stall_occurred=bool(stall_occurred),
             handoff_event_count=int(handoff_count),
-            eviction_count=len(evicted_adapter_ids),
+            eviction_count=(len(evicted_object_ids) if typed_mode else len(evicted_adapter_ids)),
             evicted_object_ids=evicted_object_ids,
             evicted_adapter_ids=evicted_adapter_ids,
             evicted_size_mb_sum=float(cache_result.get("evicted_size_mb_sum", 0.0) or 0.0),

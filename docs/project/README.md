@@ -59,3 +59,10 @@
 - 验证报告：`typed_model_cache_validation_report.md`
 - 机器证据：`../../artifacts/analysis/typed_model_cache_validation_20260819_g13_v1/`
 - 默认继续使用 legacy adapter-only profile；typed profile 必须显式启用。
+
+## G14A typed MB runtime plumbing
+
+- 合同：`typed_model_cache_runtime_contract.md`
+- 验证报告：`typed_model_cache_runtime_validation_report.md`
+- 机器证据：`../../artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/`
+- 状态：plumbing/rehearsal通过，但G14 readiness仍blocked；split/protocol与正式checkpoint留给G14B。

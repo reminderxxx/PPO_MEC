@@ -315,3 +315,15 @@ python scripts/build_top_journal_comparison_report.py --final_run_root artifacts
 - `artifacts/experiments/top_journal_final_submission/final_submission_v7_latency_fallback_20260528_v1/learned_suites/final_submission_v7_latency_fallback_20260528_v1_iter1_holdout_offset3/learned_baseline_gate_report.json`
 
 `final_submission_v7_latency_fallback_20260528_v1` 是 legacy paper-ready package，2026-06-18 rebuild 证明它可复现；但严格非重叠 holdout 审查已否决其当前 TMC-ready 状态。`final_submission_controller_mappo_qmix_20260509_v1`、`final_submission_full_current_baselines_20260511_v1` 和更早 package 只用于历史追溯。`mappo`、`qmix` 和 `controller_mat` 是 controller-level learned baselines，不应写成 vehicle-agent / RSU-agent full MARL wrappers；`popularity_cache_heuristic` 是 close supplementary reference。
+
+## Typed MB Runtime Plumbing
+
+训练、评估、benchmark与cache fairness现在共享`typed_model_cache_runtime_contract_v1.0.0`。Typed入口示例配置为`configs/benchmark/typed_model_cache_controlled_lru.yaml`（320 MB）和`typed_model_cache_controlled_lru_384mb.yaml`；legacy slot/MB配置继续可用。共享训练入口`train_algo_pool_real_sample.py`支持SA-GHMAPPO、PPO、MAPPO和domain cache/offload agent的显式runtime binding。
+
+非正式端到端检查入口：
+
+```bash
+.venv/bin/python scripts/run_typed_model_cache_runtime_rehearsal.py
+```
+
+该入口只生成`non_formal_typed_runtime_rehearsal`，不冻结G14 split/protocol，不训练正式checkpoint，不运行formal、holdout、hidden或G15。合同与运行方法见`docs/project/typed_model_cache_runtime_contract.md`和`docs/project/typed_model_cache_runtime_validation_report.md`。

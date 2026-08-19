@@ -1199,3 +1199,13 @@ LRU/FIFO/LFU/Aging-LFU/Random 公平绑定、小规模 exact oracle，以及真�
 
 边界：`formal=false`、`training=false`；没有 checkpoint、没有算法比较、没有 formal/holdout/hidden
 结果。该产物只能支持 G13 contract/plumbing 已实现和受控验证通过，不能支持性能或论文收益主张。
+
+## G14A typed MB runtime plumbing validation 20260819 v1
+
+状态：`[contract-validation-only / non-formal]`
+
+产物根目录：`artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/`
+
+Run `g14a_rehearsal_20260819_230456_872949`使用`controlled_non_hidden`窗口、NGSIM + Alibaba最小骨架、seed 7/13、320/384 MB、五个reactive baseline与PPO/MAPPO。8个tiny checkpoint均通过typed provenance gate；28个typed episode的CacheEvent 1.3与metrics 1.1 reconciliation通过；legacy slot/MB各通过一次兼容运行。Top-level integrity manifest记录125个本地文件。
+
+证据边界：没有正式split/protocol、正式checkpoint、formal/holdout/hidden/support或G15；rehearsal checkpoint不进入Git或正式manifest。G14 readiness仍为blocked，下一步必须重新执行readiness gate。本记录不提供算法排名或paper-ready结论。

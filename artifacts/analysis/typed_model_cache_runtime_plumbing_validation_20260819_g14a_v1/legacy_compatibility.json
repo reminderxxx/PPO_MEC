@@ -1,0 +1,41 @@
+{
+  "status": "pass",
+  "legacy_modes": [
+    {
+      "mode": "adapter_slots",
+      "status": "pass",
+      "runtime_contract_sha256": "19d98f964e21e4d31c8f48308087efb6acf42c6965da46f8202845e4c35af6e8",
+      "capacity_profile": {
+        "model_cache_profile_id": "legacy_adapter_only_v1",
+        "enabled": true,
+        "unit": "adapter_slots",
+        "rsu_adapter_slots": 3,
+        "capacity_mb": null,
+        "count_base_model_separately": false,
+        "eviction_policy": "lru",
+        "eviction_policy_seed": 7,
+        "telemetry_enabled": true
+      },
+      "benchmark_dir": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/adapter_slots/main_results_mixed_informative_20260819_230516_320066",
+      "fairness_manifest_status": "unavailable"
+    },
+    {
+      "mode": "mb",
+      "status": "pass",
+      "runtime_contract_sha256": "5881e269428464e2004174ff28b838f26c8c9607b4e3c991322e417e2154a70f",
+      "capacity_profile": {
+        "model_cache_profile_id": "legacy_adapter_only_v1",
+        "enabled": true,
+        "unit": "mb",
+        "rsu_adapter_slots": null,
+        "capacity_mb": 256.0,
+        "count_base_model_separately": false,
+        "eviction_policy": "lru",
+        "eviction_policy_seed": 7,
+        "telemetry_enabled": true
+      },
+      "benchmark_dir": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/mb/main_results_mixed_informative_20260819_230517_052662",
+      "fairness_manifest_status": "unavailable"
+    }
+  ]
+}

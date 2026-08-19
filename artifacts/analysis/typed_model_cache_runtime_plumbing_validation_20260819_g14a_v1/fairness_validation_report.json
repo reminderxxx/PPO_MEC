@@ -1,0 +1,1375 @@
+{
+  "status": "pass",
+  "reports": {
+    "320mb": {
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "checked_invariants": [
+        "json_safe_finite_values",
+        "dataset_file_size_and_sha256",
+        "raw_frame_time_intervals_and_workload_fingerprints",
+        "seed_identity_and_private_random_rng",
+        "capacity_catalog_initial_cache_and_cacheevent_contracts",
+        "five_baselines_binding_and_10_pairwise_diffs",
+        "metrics_nullable_aggregation_and_latency_boundary",
+        "canonical_semantic_and_full_hashes"
+      ],
+      "manifest_id": "cbfm-ed3bb8656c94fff0",
+      "manifest_hash": "fc1643ae1f60623cfb72da63001263c12aaa1acd777f369c94c78044d105d159",
+      "semantic_protocol_hash": "ed3bb8656c94fff0cb62e64c2e8052392ec14091a01b8fddc897a1d181424eaa",
+      "pairwise_protocol_diff": {
+        "comparison_count": 10,
+        "status": "pass",
+        "comparisons": [
+          {
+            "left": "reactive_lru",
+            "right": "reactive_fifo",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveLruAgent",
+                "right": "ReactiveFifoAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_lru",
+                "right": "reactive_fifo"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lru.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_fifo.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_lru.yaml",
+                "right": "configs/algo/reactive_fifo.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "cd08bed1fd55b05bdb7648f9ded74c2f0ac78754ee56720997485a520f9db060",
+                "right": "f203414a190ba70a0e6f3ca2ce1559ec712fcf9eeee69db84ec81562ca7cc726"
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "lru",
+                "right": "fifo"
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_lru",
+                "right": "reactive_fifo"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "lru",
+                "right": "fifo"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_lru",
+            "right": "reactive_lfu",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveLruAgent",
+                "right": "ReactiveLfuAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_lru",
+                "right": "reactive_lfu"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lru.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lfu.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_lru.yaml",
+                "right": "configs/algo/reactive_lfu.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "cd08bed1fd55b05bdb7648f9ded74c2f0ac78754ee56720997485a520f9db060",
+                "right": "0090775cd0d298d8d48bae7212c454e8370860435c74ad34757c80ba3b0d31e2"
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "lru",
+                "right": "lfu"
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_lru",
+                "right": "reactive_lfu"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "lru",
+                "right": "lfu"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_lru",
+            "right": "reactive_aging_lfu",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveLruAgent",
+                "right": "ReactiveAgingLfuAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_lru",
+                "right": "reactive_aging_lfu"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lru.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_aging_lfu.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_lru.yaml",
+                "right": "configs/algo/reactive_aging_lfu.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "cd08bed1fd55b05bdb7648f9ded74c2f0ac78754ee56720997485a520f9db060",
+                "right": "14e8c7a1e3e966c755012600dc0648ce72d77a86ff37ebe176df9965d56caf6f"
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "lru",
+                "right": "aging_lfu"
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_factor",
+                "left": "<missing>",
+                "right": 0.5
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_interval",
+                "left": "<missing>",
+                "right": 8
+              },
+              {
+                "path": "semantic_config.aging_factor",
+                "left": "<missing>",
+                "right": 0.5
+              },
+              {
+                "path": "semantic_config.aging_interval",
+                "left": "<missing>",
+                "right": 8
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_lru",
+                "right": "reactive_aging_lfu"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "lru",
+                "right": "aging_lfu"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_lru",
+            "right": "reactive_random",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveLruAgent",
+                "right": "ReactiveRandomAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_lru",
+                "right": "reactive_random"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lru.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_lru.yaml",
+                "right": "configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "cd08bed1fd55b05bdb7648f9ded74c2f0ac78754ee56720997485a520f9db060",
+                "right": "54f1b3862769895066ac251cf73ecda05fda632814f83f4d26e38228a88c8316"
+              },
+              {
+                "path": "eviction_policy.deterministic",
+                "left": true,
+                "right": false
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "lru",
+                "right": "random"
+              },
+              {
+                "path": "eviction_policy.policy_seed_rule",
+                "left": "not_consumed",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              },
+              {
+                "path": "eviction_policy.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_lru",
+                "right": "reactive_random"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "lru",
+                "right": "random"
+              },
+              {
+                "path": "semantic_config.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.seed_derivation",
+                "left": "<missing>",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_fifo",
+            "right": "reactive_lfu",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveFifoAgent",
+                "right": "ReactiveLfuAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_fifo",
+                "right": "reactive_lfu"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_fifo.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lfu.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_fifo.yaml",
+                "right": "configs/algo/reactive_lfu.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "f203414a190ba70a0e6f3ca2ce1559ec712fcf9eeee69db84ec81562ca7cc726",
+                "right": "0090775cd0d298d8d48bae7212c454e8370860435c74ad34757c80ba3b0d31e2"
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "fifo",
+                "right": "lfu"
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_fifo",
+                "right": "reactive_lfu"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "fifo",
+                "right": "lfu"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_fifo",
+            "right": "reactive_aging_lfu",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveFifoAgent",
+                "right": "ReactiveAgingLfuAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_fifo",
+                "right": "reactive_aging_lfu"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_fifo.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_aging_lfu.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_fifo.yaml",
+                "right": "configs/algo/reactive_aging_lfu.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "f203414a190ba70a0e6f3ca2ce1559ec712fcf9eeee69db84ec81562ca7cc726",
+                "right": "14e8c7a1e3e966c755012600dc0648ce72d77a86ff37ebe176df9965d56caf6f"
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "fifo",
+                "right": "aging_lfu"
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_factor",
+                "left": "<missing>",
+                "right": 0.5
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_interval",
+                "left": "<missing>",
+                "right": 8
+              },
+              {
+                "path": "semantic_config.aging_factor",
+                "left": "<missing>",
+                "right": 0.5
+              },
+              {
+                "path": "semantic_config.aging_interval",
+                "left": "<missing>",
+                "right": 8
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_fifo",
+                "right": "reactive_aging_lfu"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "fifo",
+                "right": "aging_lfu"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_fifo",
+            "right": "reactive_random",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveFifoAgent",
+                "right": "ReactiveRandomAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_fifo",
+                "right": "reactive_random"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_fifo.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_fifo.yaml",
+                "right": "configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "f203414a190ba70a0e6f3ca2ce1559ec712fcf9eeee69db84ec81562ca7cc726",
+                "right": "54f1b3862769895066ac251cf73ecda05fda632814f83f4d26e38228a88c8316"
+              },
+              {
+                "path": "eviction_policy.deterministic",
+                "left": true,
+                "right": false
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "fifo",
+                "right": "random"
+              },
+              {
+                "path": "eviction_policy.policy_seed_rule",
+                "left": "not_consumed",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              },
+              {
+                "path": "eviction_policy.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_fifo",
+                "right": "reactive_random"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "fifo",
+                "right": "random"
+              },
+              {
+                "path": "semantic_config.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.seed_derivation",
+                "left": "<missing>",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_lfu",
+            "right": "reactive_aging_lfu",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveLfuAgent",
+                "right": "ReactiveAgingLfuAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_lfu",
+                "right": "reactive_aging_lfu"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lfu.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_aging_lfu.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_lfu.yaml",
+                "right": "configs/algo/reactive_aging_lfu.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "0090775cd0d298d8d48bae7212c454e8370860435c74ad34757c80ba3b0d31e2",
+                "right": "14e8c7a1e3e966c755012600dc0648ce72d77a86ff37ebe176df9965d56caf6f"
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "lfu",
+                "right": "aging_lfu"
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_factor",
+                "left": "<missing>",
+                "right": 0.5
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_interval",
+                "left": "<missing>",
+                "right": 8
+              },
+              {
+                "path": "semantic_config.aging_factor",
+                "left": "<missing>",
+                "right": 0.5
+              },
+              {
+                "path": "semantic_config.aging_interval",
+                "left": "<missing>",
+                "right": 8
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_lfu",
+                "right": "reactive_aging_lfu"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "lfu",
+                "right": "aging_lfu"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_lfu",
+            "right": "reactive_random",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveLfuAgent",
+                "right": "ReactiveRandomAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_lfu",
+                "right": "reactive_random"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lfu.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_lfu.yaml",
+                "right": "configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "0090775cd0d298d8d48bae7212c454e8370860435c74ad34757c80ba3b0d31e2",
+                "right": "54f1b3862769895066ac251cf73ecda05fda632814f83f4d26e38228a88c8316"
+              },
+              {
+                "path": "eviction_policy.deterministic",
+                "left": true,
+                "right": false
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "lfu",
+                "right": "random"
+              },
+              {
+                "path": "eviction_policy.policy_seed_rule",
+                "left": "not_consumed",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              },
+              {
+                "path": "eviction_policy.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_lfu",
+                "right": "reactive_random"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "lfu",
+                "right": "random"
+              },
+              {
+                "path": "semantic_config.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.seed_derivation",
+                "left": "<missing>",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_aging_lfu",
+            "right": "reactive_random",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveAgingLfuAgent",
+                "right": "ReactiveRandomAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_aging_lfu",
+                "right": "reactive_random"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_aging_lfu.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_aging_lfu.yaml",
+                "right": "configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "14e8c7a1e3e966c755012600dc0648ce72d77a86ff37ebe176df9965d56caf6f",
+                "right": "54f1b3862769895066ac251cf73ecda05fda632814f83f4d26e38228a88c8316"
+              },
+              {
+                "path": "eviction_policy.deterministic",
+                "left": true,
+                "right": false
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "aging_lfu",
+                "right": "random"
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_factor",
+                "left": 0.5,
+                "right": "<missing>"
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_interval",
+                "left": 8,
+                "right": "<missing>"
+              },
+              {
+                "path": "eviction_policy.policy_seed_rule",
+                "left": "not_consumed",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              },
+              {
+                "path": "eviction_policy.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.aging_factor",
+                "left": 0.5,
+                "right": "<missing>"
+              },
+              {
+                "path": "semantic_config.aging_interval",
+                "left": 8,
+                "right": "<missing>"
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_aging_lfu",
+                "right": "reactive_random"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "aging_lfu",
+                "right": "random"
+              },
+              {
+                "path": "semantic_config.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.seed_derivation",
+                "left": "<missing>",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          }
+        ]
+      },
+      "validated_at": "2026-08-19T15:04:58.934558Z"
+    },
+    "384mb": {
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "checked_invariants": [
+        "json_safe_finite_values",
+        "dataset_file_size_and_sha256",
+        "raw_frame_time_intervals_and_workload_fingerprints",
+        "seed_identity_and_private_random_rng",
+        "capacity_catalog_initial_cache_and_cacheevent_contracts",
+        "five_baselines_binding_and_10_pairwise_diffs",
+        "metrics_nullable_aggregation_and_latency_boundary",
+        "canonical_semantic_and_full_hashes"
+      ],
+      "manifest_id": "cbfm-9c147ac9687fadd2",
+      "manifest_hash": "043fe3516eec7fbf9bddf8c57d1f755a1475c9288bf11f3ef49604d0e89d9b2f",
+      "semantic_protocol_hash": "9c147ac9687fadd299b75f502f666387b081c62949cc6d818d041c59c4a5d0ec",
+      "pairwise_protocol_diff": {
+        "comparison_count": 10,
+        "status": "pass",
+        "comparisons": [
+          {
+            "left": "reactive_lru",
+            "right": "reactive_fifo",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveLruAgent",
+                "right": "ReactiveFifoAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_lru",
+                "right": "reactive_fifo"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lru.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_fifo.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_lru.yaml",
+                "right": "configs/algo/reactive_fifo.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "cd08bed1fd55b05bdb7648f9ded74c2f0ac78754ee56720997485a520f9db060",
+                "right": "f203414a190ba70a0e6f3ca2ce1559ec712fcf9eeee69db84ec81562ca7cc726"
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "lru",
+                "right": "fifo"
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_lru",
+                "right": "reactive_fifo"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "lru",
+                "right": "fifo"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_lru",
+            "right": "reactive_lfu",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveLruAgent",
+                "right": "ReactiveLfuAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_lru",
+                "right": "reactive_lfu"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lru.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lfu.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_lru.yaml",
+                "right": "configs/algo/reactive_lfu.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "cd08bed1fd55b05bdb7648f9ded74c2f0ac78754ee56720997485a520f9db060",
+                "right": "0090775cd0d298d8d48bae7212c454e8370860435c74ad34757c80ba3b0d31e2"
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "lru",
+                "right": "lfu"
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_lru",
+                "right": "reactive_lfu"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "lru",
+                "right": "lfu"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_lru",
+            "right": "reactive_aging_lfu",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveLruAgent",
+                "right": "ReactiveAgingLfuAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_lru",
+                "right": "reactive_aging_lfu"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lru.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_aging_lfu.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_lru.yaml",
+                "right": "configs/algo/reactive_aging_lfu.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "cd08bed1fd55b05bdb7648f9ded74c2f0ac78754ee56720997485a520f9db060",
+                "right": "14e8c7a1e3e966c755012600dc0648ce72d77a86ff37ebe176df9965d56caf6f"
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "lru",
+                "right": "aging_lfu"
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_factor",
+                "left": "<missing>",
+                "right": 0.5
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_interval",
+                "left": "<missing>",
+                "right": 8
+              },
+              {
+                "path": "semantic_config.aging_factor",
+                "left": "<missing>",
+                "right": 0.5
+              },
+              {
+                "path": "semantic_config.aging_interval",
+                "left": "<missing>",
+                "right": 8
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_lru",
+                "right": "reactive_aging_lfu"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "lru",
+                "right": "aging_lfu"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_lru",
+            "right": "reactive_random",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveLruAgent",
+                "right": "ReactiveRandomAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_lru",
+                "right": "reactive_random"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lru.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_lru.yaml",
+                "right": "configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "cd08bed1fd55b05bdb7648f9ded74c2f0ac78754ee56720997485a520f9db060",
+                "right": "54f1b3862769895066ac251cf73ecda05fda632814f83f4d26e38228a88c8316"
+              },
+              {
+                "path": "eviction_policy.deterministic",
+                "left": true,
+                "right": false
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "lru",
+                "right": "random"
+              },
+              {
+                "path": "eviction_policy.policy_seed_rule",
+                "left": "not_consumed",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              },
+              {
+                "path": "eviction_policy.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_lru",
+                "right": "reactive_random"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "lru",
+                "right": "random"
+              },
+              {
+                "path": "semantic_config.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.seed_derivation",
+                "left": "<missing>",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_fifo",
+            "right": "reactive_lfu",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveFifoAgent",
+                "right": "ReactiveLfuAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_fifo",
+                "right": "reactive_lfu"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_fifo.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lfu.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_fifo.yaml",
+                "right": "configs/algo/reactive_lfu.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "f203414a190ba70a0e6f3ca2ce1559ec712fcf9eeee69db84ec81562ca7cc726",
+                "right": "0090775cd0d298d8d48bae7212c454e8370860435c74ad34757c80ba3b0d31e2"
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "fifo",
+                "right": "lfu"
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_fifo",
+                "right": "reactive_lfu"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "fifo",
+                "right": "lfu"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_fifo",
+            "right": "reactive_aging_lfu",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveFifoAgent",
+                "right": "ReactiveAgingLfuAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_fifo",
+                "right": "reactive_aging_lfu"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_fifo.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_aging_lfu.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_fifo.yaml",
+                "right": "configs/algo/reactive_aging_lfu.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "f203414a190ba70a0e6f3ca2ce1559ec712fcf9eeee69db84ec81562ca7cc726",
+                "right": "14e8c7a1e3e966c755012600dc0648ce72d77a86ff37ebe176df9965d56caf6f"
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "fifo",
+                "right": "aging_lfu"
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_factor",
+                "left": "<missing>",
+                "right": 0.5
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_interval",
+                "left": "<missing>",
+                "right": 8
+              },
+              {
+                "path": "semantic_config.aging_factor",
+                "left": "<missing>",
+                "right": 0.5
+              },
+              {
+                "path": "semantic_config.aging_interval",
+                "left": "<missing>",
+                "right": 8
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_fifo",
+                "right": "reactive_aging_lfu"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "fifo",
+                "right": "aging_lfu"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_fifo",
+            "right": "reactive_random",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveFifoAgent",
+                "right": "ReactiveRandomAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_fifo",
+                "right": "reactive_random"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_fifo.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_fifo.yaml",
+                "right": "configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "f203414a190ba70a0e6f3ca2ce1559ec712fcf9eeee69db84ec81562ca7cc726",
+                "right": "54f1b3862769895066ac251cf73ecda05fda632814f83f4d26e38228a88c8316"
+              },
+              {
+                "path": "eviction_policy.deterministic",
+                "left": true,
+                "right": false
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "fifo",
+                "right": "random"
+              },
+              {
+                "path": "eviction_policy.policy_seed_rule",
+                "left": "not_consumed",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              },
+              {
+                "path": "eviction_policy.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_fifo",
+                "right": "reactive_random"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "fifo",
+                "right": "random"
+              },
+              {
+                "path": "semantic_config.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.seed_derivation",
+                "left": "<missing>",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_lfu",
+            "right": "reactive_aging_lfu",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveLfuAgent",
+                "right": "ReactiveAgingLfuAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_lfu",
+                "right": "reactive_aging_lfu"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lfu.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_aging_lfu.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_lfu.yaml",
+                "right": "configs/algo/reactive_aging_lfu.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "0090775cd0d298d8d48bae7212c454e8370860435c74ad34757c80ba3b0d31e2",
+                "right": "14e8c7a1e3e966c755012600dc0648ce72d77a86ff37ebe176df9965d56caf6f"
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "lfu",
+                "right": "aging_lfu"
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_factor",
+                "left": "<missing>",
+                "right": 0.5
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_interval",
+                "left": "<missing>",
+                "right": 8
+              },
+              {
+                "path": "semantic_config.aging_factor",
+                "left": "<missing>",
+                "right": 0.5
+              },
+              {
+                "path": "semantic_config.aging_interval",
+                "left": "<missing>",
+                "right": 8
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_lfu",
+                "right": "reactive_aging_lfu"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "lfu",
+                "right": "aging_lfu"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_lfu",
+            "right": "reactive_random",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveLfuAgent",
+                "right": "ReactiveRandomAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_lfu",
+                "right": "reactive_random"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lfu.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_lfu.yaml",
+                "right": "configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "0090775cd0d298d8d48bae7212c454e8370860435c74ad34757c80ba3b0d31e2",
+                "right": "54f1b3862769895066ac251cf73ecda05fda632814f83f4d26e38228a88c8316"
+              },
+              {
+                "path": "eviction_policy.deterministic",
+                "left": true,
+                "right": false
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "lfu",
+                "right": "random"
+              },
+              {
+                "path": "eviction_policy.policy_seed_rule",
+                "left": "not_consumed",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              },
+              {
+                "path": "eviction_policy.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_lfu",
+                "right": "reactive_random"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "lfu",
+                "right": "random"
+              },
+              {
+                "path": "semantic_config.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.seed_derivation",
+                "left": "<missing>",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          },
+          {
+            "left": "reactive_aging_lfu",
+            "right": "reactive_random",
+            "allowed_differences": [
+              {
+                "path": "agent_identity.class",
+                "left": "ReactiveAgingLfuAgent",
+                "right": "ReactiveRandomAgent"
+              },
+              {
+                "path": "agent_identity.name",
+                "left": "reactive_aging_lfu",
+                "right": "reactive_random"
+              },
+              {
+                "path": "config.normalized_absolute_path",
+                "left": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_aging_lfu.yaml",
+                "right": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.path",
+                "left": "configs/algo/reactive_aging_lfu.yaml",
+                "right": "configs/algo/reactive_random.yaml"
+              },
+              {
+                "path": "config.sha256",
+                "left": "14e8c7a1e3e966c755012600dc0648ce72d77a86ff37ebe176df9965d56caf6f",
+                "right": "54f1b3862769895066ac251cf73ecda05fda632814f83f4d26e38228a88c8316"
+              },
+              {
+                "path": "eviction_policy.deterministic",
+                "left": true,
+                "right": false
+              },
+              {
+                "path": "eviction_policy.name",
+                "left": "aging_lfu",
+                "right": "random"
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_factor",
+                "left": 0.5,
+                "right": "<missing>"
+              },
+              {
+                "path": "eviction_policy.policy_config.aging_interval",
+                "left": 8,
+                "right": "<missing>"
+              },
+              {
+                "path": "eviction_policy.policy_seed_rule",
+                "left": "not_consumed",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              },
+              {
+                "path": "eviction_policy.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.aging_factor",
+                "left": 0.5,
+                "right": "<missing>"
+              },
+              {
+                "path": "semantic_config.aging_interval",
+                "left": 8,
+                "right": "<missing>"
+              },
+              {
+                "path": "semantic_config.algorithm",
+                "left": "reactive_aging_lfu",
+                "right": "reactive_random"
+              },
+              {
+                "path": "semantic_config.eviction_policy",
+                "left": "aging_lfu",
+                "right": "random"
+              },
+              {
+                "path": "semantic_config.requires_seed",
+                "left": false,
+                "right": true
+              },
+              {
+                "path": "semantic_config.seed_derivation",
+                "left": "<missing>",
+                "right": "policy_seed_equals_benchmark_run_seed"
+              }
+            ],
+            "unexpected_differences": [],
+            "status": "pass"
+          }
+        ]
+      },
+      "validated_at": "2026-08-19T15:05:00.962520Z"
+    }
+  }
+}

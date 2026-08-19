@@ -1,0 +1,41 @@
+{
+  "rehearsal_manifest_version": "1.0.0",
+  "run_id": "g14a_rehearsal_20260819_230456_872949",
+  "artifact_run_id": "20260819_g14a_v1",
+  "label": "non_formal_typed_runtime_rehearsal",
+  "status": "pass",
+  "created_at": "2026-08-19T15:05:17.184258Z",
+  "execution_git_commit": "ba690b3a7b4883d1073901a39464f3e35da386ba",
+  "dataset_skeleton": "NGSIM+Alibaba",
+  "window_plan_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/cache_baseline_fairness_g07_smoke_window_plan.json",
+  "window_split": "controlled_non_hidden",
+  "hidden_consumed": false,
+  "formal_consumed": false,
+  "holdout_consumed": false,
+  "g15_executed": false,
+  "seeds": [
+    7,
+    13
+  ],
+  "capacities_mb": [
+    320.0,
+    384.0
+  ],
+  "reactive_agents": [
+    "reactive_lru",
+    "reactive_fifo",
+    "reactive_lfu",
+    "reactive_aging_lfu",
+    "reactive_random"
+  ],
+  "learned_agents": [
+    "ppo",
+    "mappo"
+  ],
+  "benchmark_dirs": {
+    "320mb": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202",
+    "384mb": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626"
+  },
+  "claim_boundary": "plumbing validation only; no ranking or paper claim",
+  "g14_readiness_status": "still_blocked_pending_g14b_split_protocol_and_formal_checkpoints"
+}

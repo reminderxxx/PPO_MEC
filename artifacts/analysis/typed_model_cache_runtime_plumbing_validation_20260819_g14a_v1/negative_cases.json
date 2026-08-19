@@ -1,0 +1,37 @@
+{
+  "status": "pass",
+  "case_count": 4,
+  "cases": [
+    {
+      "case_id": "typed_slot_rejected",
+      "status": "pass_rejected",
+      "error_type": "RuntimeContractError",
+      "message": "typed runtime requires MB capacity; adapter slots are forbidden"
+    },
+    {
+      "case_id": "catalog_fingerprint_mismatch",
+      "status": "pass_rejected",
+      "error_type": "RuntimeContractError",
+      "message": "typed catalog fingerprint mismatch: 0000000000000000000000000000000000000000000000000000000000000000 != 89c548980b63df733553d748e8db3ca622965b63abcd08ebd4c231790b40a9d6"
+    },
+    {
+      "case_id": "non_finite_mb",
+      "status": "pass_rejected",
+      "error_type": "RuntimeContractError",
+      "message": "typed runtime requires finite positive capacity_mb"
+    },
+    {
+      "case_id": "legacy_checkpoint_typed_status",
+      "status": "pass_rejected",
+      "gate_status": "unavailable_legacy_metadata",
+      "evidence": {
+        "status": "unavailable_legacy_metadata",
+        "checkpoint_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_checkpoint.pt",
+        "checkpoint_sha256": "6820623da944a29ef87953bf8ee5d907e0d1c65263d6d57bb3ea9028b4a8fcc4",
+        "errors": [
+          "typed_runtime_provenance missing"
+        ]
+      }
+    }
+  ]
+}

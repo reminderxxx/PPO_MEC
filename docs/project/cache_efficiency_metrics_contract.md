@@ -81,3 +81,5 @@ Benchmark row 只接入 object/byte hit、churn、pollution、transfer amplifica
 ## G13 type-aware metrics 1.1.0
 
 CacheEvent 1.3 raw fields独立重算base/adapter/joint hit、state/full readiness、missing type、compatibility failure、per-type requested/hit/resident/admitted/evicted/transfer MB、base/adapter occupancy、pinned MB、bundle rejection/churn、adapters per base、base reuse/sharing、严格可识别的avoided base transfer与orphan。pollution重建支持multi-object typed admission/eviction，right-censoring不变。旧1.0–1.2 trace的type-aware group为unavailable而非0。latency saved仍unavailable。
+
+G14A benchmark raw summary继续保留完整CacheEvent 1.3与trace context；`summary_to_row()`只输出nullable scalar和轻量runtime/fairness/checkpoint provenance，aggregate不复制raw event。`typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1`对28个typed episode从raw event独立重算metrics 1.1并与benchmark scalar一致；这只是reconciliation，不是性能比较。

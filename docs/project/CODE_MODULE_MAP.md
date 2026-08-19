@@ -360,3 +360,12 @@
 - `src/oracles/cache_request_replay.py`、`src/oracles/typed_model_cache_oracle.py`、`src/oracles/future_horizon_cache_oracle.py`：冻结 typed replay 与小规模精确 atomic oracle；legacy oracle 路径不变。
 - `src/evaluators/cache_baseline_fairness.py`：校验 catalog/profile/初始状态/事务/指标/oracle 的 policy-invariant binding。
 - `scripts/validate_typed_model_cache.py`：只运行受控确定性验证与真实 NGSIM + Alibaba 最小链路，不训练、不运行 formal/holdout/hidden。
+
+## 2026-08-19 G14A typed formal runtime plumbing
+
+- `src/runtime/typed_model_cache_runtime.py`：config/fairness/training/checkpoint/benchmark共享resolver、runtime hash、catalog consumer check与三态checkpoint provenance gate；不拥有环境cache mutation。
+- `scripts/train_algo_pool_real_sample.py`：统一learned training入口，显式消费runtime catalog/MB profile并写summary/checkpoint provenance；支持SA-GHMAPPO、PPO、MAPPO和domain cache/offload baseline。
+- `scripts/eval_algo_pool_real_sample.py`、`scripts/benchmark_main_results.py`：消费同一resolved runtime；typed learned evaluation执行checkpoint gate；benchmark支持legacy slot、legacy MB、typed MB并把raw event留在episode summary。
+- `src/evaluators/cache_baseline_fairness.py`：typed manifest 1.1 producer/validator及runtime CLI enforcement；五reactive pairwise matrix不被controller companion改变。
+- `scripts/run_typed_model_cache_runtime_rehearsal.py`：只生成non-formal tiny training/restore/benchmark/reconciliation与integrity证据。
+- `tests/test_typed_runtime_plumbing.py`：G14A配置、fairness、training、checkpoint、legacy、event、metrics、hash/JSON专项合同测试。

@@ -1433,3 +1433,11 @@ quick run 结果边界：
 - 源码审计冻结真实时序：环境同 step 先 cache action 后 service hit lookup，故合法 admission 可命中当前 request；trace 分开记录 pre/post-action hit。
 - matched raw outcome comparison 对 fingerprint、capacity或initial-state不匹配fail-fast。G06 proxy、reward和legacy aggregate不能冒充oracle gap；latency gap继续unavailable。
 - controlled artifact为 `artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/`。四个H与full-trace均exact optimal；单request reactive LRU gap为0。该结果仅验证合同，不是formal/holdout/hidden或性能结论。
+
+## 2026-08-19: G14A Typed MB Formal Runtime Plumbing
+
+- 新增共享`typed_model_cache_runtime_contract_v1.0.0`，typed config强制显式catalog fingerprint、enabled MB capacity、initial/dependency/compatibility/pinned fingerprints；legacy缺字段默认行为保持。
+- G07 fairness typed companion升级到consumer-safe 1.1；训练/评估/benchmark正式入口消费同一resolved runtime。Shared training入口覆盖SA-GHMAPPO、PPO、MAPPO和`cache_offload_drl`，checkpoint写typed provenance；typed learned benchmark强制external SHA/window/Git binding。
+- Controlled catalog补齐Alibaba `adapter_batch_type_1` repository-native映射；CacheEvent 1.3保证每typed request都有base+adapter dependency bundle，并修正typed vehicle-local miss为`unserved`。
+- `non_formal_typed_runtime_rehearsal`通过：2 seed × 2 MB capacity，8个PPO/MAPPO tiny checkpoint均compatible，五reactive + 两learned共28个typed episode；metrics 1.1独立重算一致；legacy slot/MB兼容通过。
+- G14 readiness仍未通过：split/final protocol未冻结、无正式checkpoint、未运行formal/holdout/hidden/G15。下一步必须重新执行readiness gate，不自动进入G14B。

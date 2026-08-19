@@ -33,6 +33,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--capacity_value", type=float, default=3.0)
     parser.add_argument("--artifact_output_root", default="artifacts/analysis/cache_baseline_fairness_runtime")
     parser.add_argument("--evaluation_unit_limit", type=int, default=1)
+    parser.add_argument("--controller_agents", nargs="*", default=[])
     parser.add_argument("--force", action="store_true")
     return parser.parse_args()
 
@@ -60,6 +61,7 @@ def main() -> None:
         capacity_value=args.capacity_value,
         output_root=args.artifact_output_root,
         evaluation_unit_limit=args.evaluation_unit_limit,
+        controller_agents=args.controller_agents,
     )
     report = validate_manifest(manifest, root=ROOT, check_files=True)
     if report["status"] != "pass":

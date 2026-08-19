@@ -16,7 +16,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from src.agents.registry import get_algo_spec, list_evaluable_agents
+from src.agents.registry import checkpoint_required_agents, get_algo_spec, list_evaluable_agents
 from src.evaluators.cache_baseline_fairness import (
     BASELINE_NAMES,
     FairnessManifestError,
@@ -46,6 +46,11 @@ from src.evaluators.main_results_support import (
     PAPER_PROTOCOL_VERSION,
     PAPER_PROTOCOL_FROZEN,
 )
+from src.runtime.typed_model_cache_runtime import (
+    load_runtime_catalog,
+    resolve_model_cache_runtime,
+    validate_checkpoint_provenance,
+)
 
 BENCHMARK_AGENT_CHOICES = list_evaluable_agents()
 SA_ADVANTAGE_FOCUS_METRICS = [
@@ -70,8 +75,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sa_ghmappo_checkpoint_path", type=str, default="")
     parser.add_argument("--flat_ppo_checkpoint_path", type=str, default="")
     parser.add_argument("--flat_mappo_checkpoint_path", type=str, default="")
+    parser.add_argument("--cache_offload_drl_checkpoint_path", type=str, default="")
     parser.add_argument("--seed_checkpoint_manifest_path", type=str, default="")
+    parser.add_argument("--checkpoint_provenance_manifest_path", type=str, default="")
     parser.add_argument("--cache_baseline_fairness_manifest_path", type=str, default="")
+    parser.add_argument(
+        "--model_cache_runtime_config",
+        type=str,
+        default="",
+        help="Shared legacy/typed runtime YAML; typed formal-capable runs require a fairness manifest.",
+    )
     parser.add_argument("--mobility_source", type=str, default="ngsim", choices=["ngsim", "lust"])
     parser.add_argument("--primary_vehicle_selection", type=str, default="stable_first", choices=["stable_first", "handoff_pressure"])
     parser.add_argument("--mobility_csv_path", type=str, default="")
@@ -163,9 +176,28 @@ def build_checkpoint_map(args: argparse.Namespace) -> dict[str, str]:
         "mappo": args.flat_mappo_checkpoint_path,
         "flat_ppo": args.flat_ppo_checkpoint_path,
         "flat_mappo": args.flat_mappo_checkpoint_path,
+        "cache_offload_drl": args.cache_offload_drl_checkpoint_path,
         "reactive_greedy": "",
         "popularity_cache_heuristic": "",
     }
+
+
+def load_checkpoint_provenance_manifest(path: str) -> dict[str, dict[str, dict[str, Any]]]:
+    if not path:
+        return {}
+    payload = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    if not isinstance(payload, dict):
+        raise ValueError("checkpoint provenance manifest must be a mapping")
+    normalized: dict[str, dict[str, dict[str, Any]]] = {}
+    for agent_name, seed_map in payload.items():
+        if not isinstance(seed_map, dict):
+            continue
+        normalized[str(agent_name)] = {
+            str(seed): dict(binding)
+            for seed, binding in seed_map.items()
+            if isinstance(binding, dict)
+        }
+    return normalized
 
 
 def expand_checkpoint_aliases(checkpoint_map: dict[str, str]) -> dict[str, str]:
@@ -409,6 +441,16 @@ def build_sa_advantage_diagnosis(
 
 def main() -> None:
     args = parse_args()
+    runtime_contract = resolve_model_cache_runtime(
+        args.model_cache_runtime_config or None,
+        root=ROOT_DIR,
+    )
+    runtime_catalog = load_runtime_catalog(runtime_contract, root=ROOT_DIR)
+    typed_runtime = runtime_contract["model_cache_profile"] == "typed_base_adapter_state_v1"
+    if typed_runtime and not args.cache_baseline_fairness_manifest_path:
+        raise FairnessManifestError(
+            "typed formal-capable benchmark requires --cache_baseline_fairness_manifest_path"
+        )
     fairness_manifest: dict[str, Any] | None = None
     fairness_validation_report: dict[str, Any] | None = None
     if args.cache_baseline_fairness_manifest_path:
@@ -418,11 +460,15 @@ def main() -> None:
             check_files=True,
         )
         args._fairness_root = ROOT_DIR
+        args._resolved_model_cache_runtime = runtime_contract
         enforce_benchmark_args(args, fairness_manifest)
     excluded_window_intervals = load_excluded_window_intervals(args.exclude_window_plan_path)
     mainline_label = "LuST(SUMO) + Alibaba" if args.mobility_source == "lust" else "NGSIM + Alibaba"
     base_checkpoint_map = expand_checkpoint_aliases(build_checkpoint_map(args))
     seed_checkpoint_manifest = load_seed_checkpoint_manifest(args.seed_checkpoint_manifest_path)
+    checkpoint_provenance_manifest = load_checkpoint_provenance_manifest(
+        args.checkpoint_provenance_manifest_path
+    )
     audit_checkpoint_source_map = representative_checkpoint_map(
         base_checkpoint_map=base_checkpoint_map,
         seed_checkpoint_manifest=seed_checkpoint_manifest,
@@ -484,6 +530,7 @@ def main() -> None:
         if not selected_window_plan or {window["window_id"] for window in selected_window_plan} != allowed_window_ids:
             raise FairnessManifestError("runtime window plan does not resolve every manifest window")
     observed_request_fingerprints: dict[str, dict[str, str]] = {}
+    checkpoint_provenance_validation: dict[str, dict[str, dict[str, Any]]] = {}
     if args.audit_runtime:
         tracemalloc.start()
 
@@ -532,21 +579,62 @@ def main() -> None:
                                 f"observed workload fingerprint mismatch for {fairness_unit['evaluation_unit_id']}"
                             )
                     algo_spec = get_algo_spec(agent_name)
-                    cache_capacity_profile = None
+                    cache_capacity_profile = dict(runtime_contract["cache_capacity_profile"])
+                    if not cache_capacity_profile.get("enabled"):
+                        cache_capacity_profile = None
                     if algo_spec.get("required_eviction_policy"):
-                        if args.classical_cache_slots <= 0:
-                            raise ValueError("classical_cache_slots must be positive")
-                        cache_capacity_profile = {
-                            "enabled": True,
-                            "unit": "adapter_slots",
-                            "rsu_adapter_slots": args.classical_cache_slots,
-                            "eviction_policy": algo_spec["required_eviction_policy"],
-                            "eviction_policy_config": (
-                                {"aging_interval": 8, "aging_factor": 0.5}
-                                if agent_name == "reactive_aging_lfu"
-                                else {}
-                            ),
-                        }
+                        if cache_capacity_profile is None:
+                            if args.classical_cache_slots <= 0:
+                                raise ValueError("classical_cache_slots must be positive")
+                            cache_capacity_profile = {
+                                "enabled": True,
+                                "unit": "adapter_slots",
+                                "rsu_adapter_slots": args.classical_cache_slots,
+                            }
+                        cache_capacity_profile["eviction_policy"] = algo_spec[
+                            "required_eviction_policy"
+                        ]
+                        cache_capacity_profile["eviction_policy_config"] = (
+                            {"aging_interval": 8, "aging_factor": 0.5}
+                            if agent_name == "reactive_aging_lfu"
+                            else {}
+                        )
+                        if agent_name == "reactive_random":
+                            cache_capacity_profile["eviction_policy_seed"] = seed
+                    checkpoint_gate = {
+                        "status": "not_applicable",
+                        "checkpoint_sha256": None,
+                    }
+                    if typed_runtime and agent_name in checkpoint_required_agents():
+                        checkpoint_path = seed_checkpoint_map.get(agent_name, "")
+                        binding = checkpoint_provenance_manifest.get(agent_name, {}).get(
+                            str(seed)
+                        )
+                        if not binding:
+                            raise ValueError(
+                                "typed learned benchmark requires an external checkpoint provenance "
+                                f"binding for agent={agent_name}, seed={seed}"
+                            )
+                        checkpoint_gate = validate_checkpoint_provenance(
+                            checkpoint_path,
+                            expected_agent_name=agent_name,
+                            expected_seed=seed,
+                            expected_runtime_contract=runtime_contract,
+                            expected_reward_positive_offset=args.reward_positive_offset,
+                            expected_window_plan_identity=binding.get(
+                                "train_window_plan_identity"
+                            )
+                            or {},
+                            expected_checkpoint_sha256=binding.get("checkpoint_sha256"),
+                            require_git_commit=binding.get("execution_git_commit"),
+                        )
+                        if checkpoint_gate["status"] != "compatible":
+                            raise ValueError(
+                                f"typed checkpoint provenance gate failed: {checkpoint_gate}"
+                            )
+                        checkpoint_provenance_validation.setdefault(agent_name, {})[
+                            str(seed)
+                        ] = checkpoint_gate
                     if args.audit_runtime:
                         tracemalloc.reset_peak()
                         allocation_before, _ = tracemalloc.get_traced_memory()
@@ -564,6 +652,8 @@ def main() -> None:
                         primary_vehicle_selection=args.primary_vehicle_selection,
                         reward_positive_offset=args.reward_positive_offset,
                         cache_capacity_profile=cache_capacity_profile,
+                        adapter_catalog_override=runtime_catalog,
+                        model_cache_runtime_contract=runtime_contract,
                         run_metadata={
                             "script": "scripts/benchmark_main_results.py",
                             "benchmark_run_id": benchmark_run_id,
@@ -574,6 +664,8 @@ def main() -> None:
                             "window_class": window_candidate["window_class"],
                             "window_mode": args.window_mode,
                             "window_rank_offset": args.window_rank_offset,
+                            "checkpoint_provenance_status": checkpoint_gate["status"],
+                            "checkpoint_sha256": checkpoint_gate.get("checkpoint_sha256"),
                         },
                         predictor_kwargs={
                             **({"random_seed": seed} if fairness_manifest is not None else {}),
@@ -611,7 +703,9 @@ def main() -> None:
                     rows.append(summary_to_row(summary))
 
     if fairness_manifest is not None:
-        validate_observed_fingerprint_matrix(observed_request_fingerprints)
+        validate_observed_fingerprint_matrix(
+            observed_request_fingerprints, expected_agents=args.agents
+        )
 
     aggregate_by_agent = aggregate_rows(rows, group_keys=["agent_name"], metrics=MAIN_RESULT_METRICS)
     aggregate_by_seed_and_agent = aggregate_rows(rows, group_keys=["seed", "agent_name"], metrics=MAIN_RESULT_METRICS)
@@ -651,6 +745,9 @@ def main() -> None:
         "fairness_manifest_id": fairness_manifest["identity"]["manifest_id"] if fairness_manifest else None,
         "fairness_manifest_hash": fairness_manifest["hashes"]["full_manifest_sha256"] if fairness_manifest else None,
         "fairness_semantic_protocol_hash": fairness_manifest["hashes"]["semantic_protocol_sha256"] if fairness_manifest else None,
+        "resolved_model_cache_runtime": runtime_contract,
+        "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
+        "checkpoint_provenance_validation": checkpoint_provenance_validation,
         "protocol_version": PAPER_PROTOCOL_VERSION,
         "paper_protocol_frozen": PAPER_PROTOCOL_FROZEN,
         "canonical_paper_protocol": bool(args.window_mode in {"activating_only", "mixed_informative", "full_stratified"}),
@@ -750,6 +847,10 @@ def main() -> None:
         "fairness_manifest_id": fairness_manifest["identity"]["manifest_id"] if fairness_manifest else None,
         "fairness_manifest_hash": fairness_manifest["hashes"]["full_manifest_sha256"] if fairness_manifest else None,
         "fairness_semantic_protocol_hash": fairness_manifest["hashes"]["semantic_protocol_sha256"] if fairness_manifest else None,
+        "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
+        "model_cache_profile": runtime_contract["model_cache_profile"],
+        "typed_catalog_fingerprint": runtime_contract["typed_catalog_fingerprint"],
+        "checkpoint_provenance_validation": checkpoint_provenance_validation,
         "agents": args.agents,
         "seeds": args.seeds,
         "output_paths": {
@@ -766,11 +867,14 @@ def main() -> None:
             "status": "pass",
             "validation_report": fairness_validation_report,
             "observed_request_fingerprints": observed_request_fingerprints,
-            "all_five_baselines_per_unit": True,
+            "all_manifest_agents_per_unit": True,
+            "five_reactive_baselines_only_policy_difference": True,
             "observed_request_streams_identical_per_unit": True,
+            "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
         }
         fairness_audit_path.write_text(json.dumps(fairness_audit, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     integrity_files = [aggregate_path, rows_path, run_manifest_path, command_log_path]
+    integrity_files.extend(sorted(episode_root.rglob("*.summary.json")))
     if fairness_manifest is not None:
         integrity_files.extend([resolved_manifest_path, fairness_audit_path])
     integrity_payload = {

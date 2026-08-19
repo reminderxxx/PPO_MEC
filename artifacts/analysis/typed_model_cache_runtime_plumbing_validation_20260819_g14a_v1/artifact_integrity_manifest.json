@@ -1,0 +1,633 @@
+{
+  "integrity_manifest_version": "1.0.0",
+  "artifact_run_id": "20260819_g14a_v1",
+  "generated_at": "2026-08-19T15:05:17.198920Z",
+  "file_count": 125,
+  "files": [
+    {
+      "path": "benchmark_runtime_audit.json",
+      "size_bytes": 1016,
+      "sha256": "85a12fcefeed6dca07de9c3789198a098203ccdb5894dfda7ace133bdc789799"
+    },
+    {
+      "path": "cache_event_reconciliation.json",
+      "size_bytes": 18013,
+      "sha256": "d3882b7f4068ae94d8dd5464c63ce64fa837b1dee402edccdf3d9764a7d2ee86"
+    },
+    {
+      "path": "checkpoint_provenance_validation.json",
+      "size_bytes": 8433,
+      "sha256": "786228f12276000537603588b7be77436c602046d3a9a130dc1873cff11f6540"
+    },
+    {
+      "path": "command_log.json",
+      "size_bytes": 34544,
+      "sha256": "fcdfea246bdf11753817c1921e6fe89fa9489954c650eba15d88157fa3f0293d"
+    },
+    {
+      "path": "fairness_validation_report.json",
+      "size_bytes": 49068,
+      "sha256": "71d93d0b6866ce3cdf98985437d53b1c6eb655173356b20a729705e0234180d1"
+    },
+    {
+      "path": "legacy_compatibility.json",
+      "size_bytes": 1736,
+      "sha256": "2c9f3794946bbc651ffe24832564013dc3f1c007770e4208b424a3574089716f"
+    },
+    {
+      "path": "metrics_reconciliation.json",
+      "size_bytes": 15567,
+      "sha256": "76958eae1a25aad242a64bd2ce8325230b229eb78bc6780b48283b614a16b835"
+    },
+    {
+      "path": "negative_cases.json",
+      "size_bytes": 1407,
+      "sha256": "e5c647289160290f11825de35accd5fdf13fa60b5faf624835335d2ee74e4b10"
+    },
+    {
+      "path": "producer_consumer_matrix.json",
+      "size_bytes": 10573,
+      "sha256": "fe336a7df3b5090b759a6d14d4d7dc3465e215237a9b8233ba25d3621eae85fc"
+    },
+    {
+      "path": "rehearsal_run_manifest.json",
+      "size_bytes": 1606,
+      "sha256": "4b8772f98493df419bce81cbd321765c5a56cb3280a22e4174b72a6ea69bc6f0"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmark_inputs/320mb/checkpoint_provenance_manifest.json",
+      "size_bytes": 2329,
+      "sha256": "7cc567c218b051b7b40c1cd0539fc79c39b76ec99d43c80fdba19fe193c08e47"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmark_inputs/320mb/seed_checkpoint_manifest.json",
+      "size_bytes": 1105,
+      "sha256": "ac69288b638a068257d4376cb0342243092f89210796a82d9c88eaa0ba9c2ca0"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmark_inputs/384mb/checkpoint_provenance_manifest.json",
+      "size_bytes": 2329,
+      "sha256": "53a767a0b6bf862b48a35fd174ef6fa54560959e2303c36464970c70b24d8cb6"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmark_inputs/384mb/seed_checkpoint_manifest.json",
+      "size_bytes": 1105,
+      "sha256": "aa77e8e95fbc6d5b293509b14a837165f311aff0528441561b224337f7c88640"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/aggregate_summary.json",
+      "size_bytes": 1693792,
+      "sha256": "af57a956d33d7ad3fbd152769696bd0167deba40638eaa6623e4d79354cb4a87"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/benchmark_rows.csv",
+      "size_bytes": 23374,
+      "sha256": "71a900f175d5164ff668110654ee638155e8f73280483418c92ce4ef9a3d278c"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/cache_baseline_fairness_manifest.json",
+      "size_bytes": 38073,
+      "sha256": "774339c81c70f3f89906e7f1344e1bb853661f5b54e17c983bbabab3565c6bbb"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/comparison_against_popularity.json",
+      "size_bytes": 88,
+      "sha256": "5e2822a12f548ce7a2a3a95672c92530c66e300adad0cf88219882cf8a8704a8"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/mappo/seed_13.summary.json",
+      "size_bytes": 55631,
+      "sha256": "4640b18fe30d0037d734314ac6d40f36131b66c017ae59620607ca536b02b5be"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/mappo/seed_7.summary.json",
+      "size_bytes": 55621,
+      "sha256": "92114c59dd17353cede06633b18fc30abc465f35ac0b123beefb84c3ac2eb697"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/ppo/seed_13.summary.json",
+      "size_bytes": 55572,
+      "sha256": "189f04049a88e452fc317c1779daf322f296722f471cd2d946561ee4d416e316"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/ppo/seed_7.summary.json",
+      "size_bytes": 52536,
+      "sha256": "6ef39a322862e88b3922f98209733255afe44267653250954bcde67c947ee334"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_aging_lfu/seed_13.summary.json",
+      "size_bytes": 52929,
+      "sha256": "91fb38f051c7f1329cff0755bed545e9c40b551688549472e83ae4cc6724c987"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_aging_lfu/seed_7.summary.json",
+      "size_bytes": 52926,
+      "sha256": "b0e56d8170dcba57773552651814986c7578264773027a77bef7a8c4dc46b061"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_fifo/seed_13.summary.json",
+      "size_bytes": 52874,
+      "sha256": "7f6b9cd0790dbb87503e0931d41d059da62f5b48e5e4ff6fa8a3764d658c4e0c"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_fifo/seed_7.summary.json",
+      "size_bytes": 52871,
+      "sha256": "bb665a6a4dc6e5c7ef331ca2b395bc4880bf16e29b07a05f438ab158847bc3e2"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lfu/seed_13.summary.json",
+      "size_bytes": 52863,
+      "sha256": "e5d23f192578f7418d222d496d3061de503252926103bd77ed073006807d80bd"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lfu/seed_7.summary.json",
+      "size_bytes": 52860,
+      "sha256": "4e9bd98cfe890f2736538331a89edc962ccc57366706880a19769a4a98e9047d"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lru/seed_13.summary.json",
+      "size_bytes": 52863,
+      "sha256": "e27677c50032e794218d6fa431089df5ea12d626ba0b6146fb64a07d68e48700"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lru/seed_7.summary.json",
+      "size_bytes": 52860,
+      "sha256": "1c33a13c9ee5b16dffa489ffc049f2addc6ce11e8877fc8603202fa331bf7aa1"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_random/seed_13.summary.json",
+      "size_bytes": 52899,
+      "sha256": "e5c63014219a9da7aef06b46c0b61673bf31531656809f4b3c5070e671d7d279"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_random/seed_7.summary.json",
+      "size_bytes": 52893,
+      "sha256": "181eb692a2e1e47d1cfafbdaea8fd6bd1775f4107392962e84584e6ea0a13590"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/fairness_runtime_audit.json",
+      "size_bytes": 24872,
+      "sha256": "525622890c4eb914ad47dc83e746866c280194f97a74fa2f28f7f664f73fb924"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/resolved_command.txt",
+      "size_bytes": 1508,
+      "sha256": "b73cbbbc15090849a92c0dbb64fed31ef3f0c71c7c20016897a88e2f41612298"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/run_manifest.json",
+      "size_bytes": 11325,
+      "sha256": "b8916e63cba3a66bc3a03489caecba7a40c517d321095b1d8a57ee0bed84ff9a"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/320mb/main_results_mixed_informative_20260819_230507_718202/sa_advantage_diagnosis.json",
+      "size_bytes": 88,
+      "sha256": "5e2822a12f548ce7a2a3a95672c92530c66e300adad0cf88219882cf8a8704a8"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/aggregate_summary.json",
+      "size_bytes": 1694673,
+      "sha256": "7c9a55b7c0f97b7fa9ef06c504f634c8de9c0ca6067b8773320a09df9f9ee160"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/benchmark_rows.csv",
+      "size_bytes": 23439,
+      "sha256": "6b9b7f8bd48b95283c4ecb5ccf655bdc84adbfd241d091bfbdb16bb6e01d5b3d"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/cache_baseline_fairness_manifest.json",
+      "size_bytes": 38073,
+      "sha256": "0fdb709e8c67ef4d9c179ccfd515e49a2eb376e82302abbce9a39eddce89694a"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/comparison_against_popularity.json",
+      "size_bytes": 88,
+      "sha256": "5e2822a12f548ce7a2a3a95672c92530c66e300adad0cf88219882cf8a8704a8"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/mappo/seed_13.summary.json",
+      "size_bytes": 55650,
+      "sha256": "49f7362aaf9264fc1901dffc8492363b3e3444beed9dd267f149a10df85c1be8"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/mappo/seed_7.summary.json",
+      "size_bytes": 55640,
+      "sha256": "95757f55a39b6645ab3fec88f8b2df3333ec20aaa7a547eec80f7eb8b6d43b7b"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/ppo/seed_13.summary.json",
+      "size_bytes": 55591,
+      "sha256": "c6cc0a4e604bb9726d7c09911c17eabaf0e4e0224f3bbb24ad6cd532df878e06"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/ppo/seed_7.summary.json",
+      "size_bytes": 52542,
+      "sha256": "a2c80114a1bc593f4102f8ac36d623025e5e2cd81b565830eef718badce90618"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_aging_lfu/seed_13.summary.json",
+      "size_bytes": 52948,
+      "sha256": "4034bea8a0f421033d43802f63fed96882429f8d5fae785fc9d596a0fd9f1aa9"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_aging_lfu/seed_7.summary.json",
+      "size_bytes": 52945,
+      "sha256": "78de0431540af9dd942788d78ed7254515d3d4f54d32550b826f0325baa38c91"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_fifo/seed_13.summary.json",
+      "size_bytes": 52893,
+      "sha256": "bb8f021bb38c90e6879ebf7455b44570c09e0dd784292722c947265bd579dfce"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_fifo/seed_7.summary.json",
+      "size_bytes": 52890,
+      "sha256": "20aa31d742d66156977e759b1696d00b5d4434fb31e9f4ca3572b5d9292c613b"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lfu/seed_13.summary.json",
+      "size_bytes": 52882,
+      "sha256": "6b175376a58639d3ded0ac4f41145fae380c7271cffbae82603f21d469cf6585"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lfu/seed_7.summary.json",
+      "size_bytes": 52879,
+      "sha256": "456db840898bb7583e35d473b074f3f5799cb2bb08e573d1ab6789e03d49ca84"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lru/seed_13.summary.json",
+      "size_bytes": 52882,
+      "sha256": "ec1edb112068e17d69464e95e3c3ef867656ccf1e386d1fc84842b0bbc156ff1"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_lru/seed_7.summary.json",
+      "size_bytes": 52879,
+      "sha256": "ca9267aceb3a8e2d2baacf0c847a2ae484309fdd6303c207d432cdc5edd9b6d2"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_random/seed_13.summary.json",
+      "size_bytes": 52918,
+      "sha256": "f09ac74379901e4ba2677814ad223458797064ebe57062f0e254f00892e5493a"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/episodes/window_peachtree_off0_len24_t1163034800_1163037300/j_3/reactive_random/seed_7.summary.json",
+      "size_bytes": 52912,
+      "sha256": "8eb3e22a426399bd3ca15a27e21f716b2f41663460f4aae29ff7f063206590df"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/fairness_runtime_audit.json",
+      "size_bytes": 24872,
+      "sha256": "4ae1be6407c47e42d2930aa90b162245c8409d0a8272c5fc0f2ced77f16782ca"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/resolved_command.txt",
+      "size_bytes": 1520,
+      "sha256": "1db7a6b0156242c67a9bb1e156e312408ce83ead331cb154ef3a0f8a01bcb29a"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/run_manifest.json",
+      "size_bytes": 11325,
+      "sha256": "c2dde7da181fd7f94a8a6e485ebfc5f4cd7440eb499f7d37a4ef3c3841035e6b"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/benchmarks/384mb/main_results_mixed_informative_20260819_230514_908626/sa_advantage_diagnosis.json",
+      "size_bytes": 88,
+      "sha256": "5e2822a12f548ce7a2a3a95672c92530c66e300adad0cf88219882cf8a8704a8"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/adapter_slots/main_results_mixed_informative_20260819_230516_320066/aggregate_summary.json",
+      "size_bytes": 154202,
+      "sha256": "242e596659d07075999e60c2f9cc02d2c5c6a57a3599824953eeec758ac96a50"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/adapter_slots/main_results_mixed_informative_20260819_230516_320066/benchmark_rows.csv",
+      "size_bytes": 5487,
+      "sha256": "dad50917d0808f4937a88300200d24721b32a59e545de337c48ad67abd968bde"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/adapter_slots/main_results_mixed_informative_20260819_230516_320066/comparison_against_popularity.json",
+      "size_bytes": 88,
+      "sha256": "5e2822a12f548ce7a2a3a95672c92530c66e300adad0cf88219882cf8a8704a8"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/adapter_slots/main_results_mixed_informative_20260819_230516_320066/episodes/window_peachtree_off0_len24_t1163034800_1163041300/j_3/reactive_lru/seed_7.summary.json",
+      "size_bytes": 32833,
+      "sha256": "8725fee8190f4b6889b8aaa4ff6e48882fc79a0e2ad67b27cb75dd9f0c190185"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/adapter_slots/main_results_mixed_informative_20260819_230516_320066/resolved_command.txt",
+      "size_bytes": 616,
+      "sha256": "3d5b41322ca184a188326cd0ae2679b3b7223cfb3a21df6f15c3bb839384847e"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/adapter_slots/main_results_mixed_informative_20260819_230516_320066/run_manifest.json",
+      "size_bytes": 1753,
+      "sha256": "ec9d1d387a4816d5e009893328b8b3b300faf1abc5bb3b90c0436c38ffc348ab"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/adapter_slots/main_results_mixed_informative_20260819_230516_320066/sa_advantage_diagnosis.json",
+      "size_bytes": 88,
+      "sha256": "5e2822a12f548ce7a2a3a95672c92530c66e300adad0cf88219882cf8a8704a8"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/mb/main_results_mixed_informative_20260819_230517_052662/aggregate_summary.json",
+      "size_bytes": 154197,
+      "sha256": "35151fdd52906ce71c538fc51e24d49ebbb5d84b12588db57499bdfeb5cc42fb"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/mb/main_results_mixed_informative_20260819_230517_052662/benchmark_rows.csv",
+      "size_bytes": 5477,
+      "sha256": "e43ab2cbaf61ca52832edf54bc6cb80766ebc023bfd8c200087d4b71e283a21a"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/mb/main_results_mixed_informative_20260819_230517_052662/comparison_against_popularity.json",
+      "size_bytes": 88,
+      "sha256": "5e2822a12f548ce7a2a3a95672c92530c66e300adad0cf88219882cf8a8704a8"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/mb/main_results_mixed_informative_20260819_230517_052662/episodes/window_peachtree_off0_len24_t1163034800_1163041300/j_3/reactive_lru/seed_7.summary.json",
+      "size_bytes": 32765,
+      "sha256": "c591905ada00894ec9c30e7045e6e9808fe505d93230c45eaf77b2191c00cafd"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/mb/main_results_mixed_informative_20260819_230517_052662/resolved_command.txt",
+      "size_bytes": 602,
+      "sha256": "cb9604b4d3c6f175950ac9c7351d00261020d6c9cff58d20c5621d673aa18433"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/mb/main_results_mixed_informative_20260819_230517_052662/run_manifest.json",
+      "size_bytes": 1709,
+      "sha256": "b3daf90958007d78e5f9e4a1280a059fe65e57761b2b66b59335af526820ea5e"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_benchmarks/mb/main_results_mixed_informative_20260819_230517_052662/sa_advantage_diagnosis.json",
+      "size_bytes": 88,
+      "sha256": "5e2822a12f548ce7a2a3a95672c92530c66e300adad0cf88219882cf8a8704a8"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/legacy_checkpoint.pt",
+      "size_bytes": 1385,
+      "sha256": "6820623da944a29ef87953bf8ee5d907e0d1c65263d6d57bb3ea9028b4a8fcc4"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/mappo/mappo_train_20260819_230505_265112_seed13/checkpoints/latest.pt",
+      "size_bytes": 531305,
+      "sha256": "37c643ad22e1fb03a3e30605bbf267ceea296795f4a7bb76e956fdcbfe8d1eea"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/mappo/mappo_train_20260819_230505_265112_seed13/checkpoints/update_0001.pt",
+      "size_bytes": 536055,
+      "sha256": "7436bf14670f54f3baeaaedf12a6a7c65059b9f589bb3707411e76e66917509c"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/mappo/mappo_train_20260819_230505_265112_seed13/episodes/episode_0001.summary.json",
+      "size_bytes": 56871,
+      "sha256": "164a9b1f5c8df114acbe9b3cb8faf9c1f7a624199a8beef94af7c84a02660d95"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/mappo/mappo_train_20260819_230505_265112_seed13/summary.json",
+      "size_bytes": 41121,
+      "sha256": "29140b0dfb1450712921528f88163d1d0086a29ec7e50a05855a1066bcbf506b"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/mappo/mappo_train_20260819_230505_265112_seed13/train.csv",
+      "size_bytes": 800,
+      "sha256": "69b3635d0dbf3a94a51c52b160b5e0ac069fb5391aacc35d9d013009b688ce22"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/mappo/mappo_train_20260819_230505_265112_seed13/train_summary.json",
+      "size_bytes": 41121,
+      "sha256": "29140b0dfb1450712921528f88163d1d0086a29ec7e50a05855a1066bcbf506b"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/ppo/ppo_train_20260819_230502_962299_seed13/checkpoints/latest.pt",
+      "size_bytes": 317149,
+      "sha256": "f5e31ec5207f6159c9096c522150aab44ebdc6fc71f1d018065c0b62b6f28bb5"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/ppo/ppo_train_20260819_230502_962299_seed13/checkpoints/update_0001.pt",
+      "size_bytes": 320187,
+      "sha256": "e92539251ca6245a491752d92ddfa1abf98ed121b46bcd7760504db0296ffe31"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/ppo/ppo_train_20260819_230502_962299_seed13/episodes/episode_0001.summary.json",
+      "size_bytes": 56638,
+      "sha256": "26fab4aaec3c7156aab1afbb1d4353eea3b5c51f46ec9e3924c8c36241b66caa"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/ppo/ppo_train_20260819_230502_962299_seed13/summary.json",
+      "size_bytes": 39101,
+      "sha256": "f628e198d11ec0005873544b34c257a4a97a585f49da5c9a3f5b948601e8e0b0"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/ppo/ppo_train_20260819_230502_962299_seed13/train.csv",
+      "size_bytes": 798,
+      "sha256": "bccc833e7f0273b6daac66535215edb9624a21c7510b6369695240a9b4ba5a0e"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/ppo/ppo_train_20260819_230502_962299_seed13/train_summary.json",
+      "size_bytes": 39101,
+      "sha256": "f628e198d11ec0005873544b34c257a4a97a585f49da5c9a3f5b948601e8e0b0"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/mappo/mappo_train_20260819_230504_102839_seed7/checkpoints/latest.pt",
+      "size_bytes": 531305,
+      "sha256": "d11b989dc05642403778222f6557355b566a69ebe3aaa45bb3b85d55a4dd9ac4"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/mappo/mappo_train_20260819_230504_102839_seed7/checkpoints/update_0001.pt",
+      "size_bytes": 536055,
+      "sha256": "909a793a3de745ad030b369b167d5b676ac62a99e3c6c8cedc175dede7d7e8ad"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/mappo/mappo_train_20260819_230504_102839_seed7/episodes/episode_0001.summary.json",
+      "size_bytes": 58747,
+      "sha256": "75caea0d8b12a60690aadd67b2a96c43570bfb81352b770b139bb7e619f1fad0"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/mappo/mappo_train_20260819_230504_102839_seed7/summary.json",
+      "size_bytes": 41112,
+      "sha256": "ca5469e523562a65d98e3a2e2270c9db37d1f3600eb8d86aa270515f5aa8e854"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/mappo/mappo_train_20260819_230504_102839_seed7/train.csv",
+      "size_bytes": 800,
+      "sha256": "1817755366a5b0c9515c55e5872a8624e65b834fdc664db744c19cfcc67cd80b"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/mappo/mappo_train_20260819_230504_102839_seed7/train_summary.json",
+      "size_bytes": 41112,
+      "sha256": "ca5469e523562a65d98e3a2e2270c9db37d1f3600eb8d86aa270515f5aa8e854"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/ppo/ppo_train_20260819_230501_711200_seed7/checkpoints/latest.pt",
+      "size_bytes": 317149,
+      "sha256": "b004d7ab88938ded4b15dd675944652873176979f7df2e7b9d32fc5ce42f8ea1"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/ppo/ppo_train_20260819_230501_711200_seed7/checkpoints/update_0001.pt",
+      "size_bytes": 320187,
+      "sha256": "73a2522cfbb7af5346b0cd5e5090e49f296d6efea5663d58de3a516bd5ccf6cd"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/ppo/ppo_train_20260819_230501_711200_seed7/episodes/episode_0001.summary.json",
+      "size_bytes": 56736,
+      "sha256": "20c79cd1dca544176f431b932cff4383289686ecfa7beaf29de433f86b06c7bd"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/ppo/ppo_train_20260819_230501_711200_seed7/summary.json",
+      "size_bytes": 39090,
+      "sha256": "0975908617b7d64bd3f916c5e17cf3f13b68b7a491fa021a1a374d4a489806fb"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/ppo/ppo_train_20260819_230501_711200_seed7/train.csv",
+      "size_bytes": 798,
+      "sha256": "f6b25a698d9d740abdface02a47fe01617f4a715421e9b8eb86e9eb10d8a19b6"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/ppo/ppo_train_20260819_230501_711200_seed7/train_summary.json",
+      "size_bytes": 39090,
+      "sha256": "0975908617b7d64bd3f916c5e17cf3f13b68b7a491fa021a1a374d4a489806fb"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/mappo/mappo_train_20260819_230512_476631_seed13/checkpoints/latest.pt",
+      "size_bytes": 531305,
+      "sha256": "be2aec6cd44015c5035d1ec9542919bfeb9613086988384c08061b20dc340b1a"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/mappo/mappo_train_20260819_230512_476631_seed13/checkpoints/update_0001.pt",
+      "size_bytes": 536055,
+      "sha256": "e4244b5e06a62e8fc034d3b21f43d0a56c2ec010b2eb785797af15534a8f87a3"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/mappo/mappo_train_20260819_230512_476631_seed13/episodes/episode_0001.summary.json",
+      "size_bytes": 56871,
+      "sha256": "52de1ad37cd6423519556bd790f84469666cfac1e91f95c6af22f62f35d0faeb"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/mappo/mappo_train_20260819_230512_476631_seed13/summary.json",
+      "size_bytes": 41127,
+      "sha256": "2f9da96a78d0a93fc102806c2486405857aef4fc51737534e9731d0bac1bf993"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/mappo/mappo_train_20260819_230512_476631_seed13/train.csv",
+      "size_bytes": 800,
+      "sha256": "69b3635d0dbf3a94a51c52b160b5e0ac069fb5391aacc35d9d013009b688ce22"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/mappo/mappo_train_20260819_230512_476631_seed13/train_summary.json",
+      "size_bytes": 41127,
+      "sha256": "2f9da96a78d0a93fc102806c2486405857aef4fc51737534e9731d0bac1bf993"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/ppo/ppo_train_20260819_230510_191792_seed13/checkpoints/latest.pt",
+      "size_bytes": 317149,
+      "sha256": "57d34420f980b01b620a1e68409198f4079d196b7004157cb66e139406d05cc3"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/ppo/ppo_train_20260819_230510_191792_seed13/checkpoints/update_0001.pt",
+      "size_bytes": 320187,
+      "sha256": "98c4bda39bfc9ecee76977ea8482d1b6cefc10a4371e2872b1bc33bced2c113c"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/ppo/ppo_train_20260819_230510_191792_seed13/episodes/episode_0001.summary.json",
+      "size_bytes": 56638,
+      "sha256": "57cde616b024f36f610385b5aa907c2509cebdd557c959873f0c750e85dd6dd1"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/ppo/ppo_train_20260819_230510_191792_seed13/summary.json",
+      "size_bytes": 39107,
+      "sha256": "cd608702929c297a74214b2eb4e4c50b5f7bb141f91bc70654cc0649cec34aab"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/ppo/ppo_train_20260819_230510_191792_seed13/train.csv",
+      "size_bytes": 798,
+      "sha256": "bccc833e7f0273b6daac66535215edb9624a21c7510b6369695240a9b4ba5a0e"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/ppo/ppo_train_20260819_230510_191792_seed13/train_summary.json",
+      "size_bytes": 39107,
+      "sha256": "cd608702929c297a74214b2eb4e4c50b5f7bb141f91bc70654cc0649cec34aab"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/mappo/mappo_train_20260819_230511_327683_seed7/checkpoints/latest.pt",
+      "size_bytes": 531305,
+      "sha256": "b80872419547a40cd33b5d7a90a7655d6e11d5b0846e3f11e4294896554a2e52"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/mappo/mappo_train_20260819_230511_327683_seed7/checkpoints/update_0001.pt",
+      "size_bytes": 536055,
+      "sha256": "25da5bef15d7a4d0e6111b4e1e4cc3e6d09ec47c8cb8b29aa718bf2f73102291"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/mappo/mappo_train_20260819_230511_327683_seed7/episodes/episode_0001.summary.json",
+      "size_bytes": 62028,
+      "sha256": "5b6aa01ee980e9331c0c7d11ca2e5e51eb9d262cff61896a9581ee5ce80a2ea0"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/mappo/mappo_train_20260819_230511_327683_seed7/summary.json",
+      "size_bytes": 41109,
+      "sha256": "71cb37dfd9ac97b20bbb370c11c2c5ded8257f7fe6fc2c88e08051ca611ac27f"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/mappo/mappo_train_20260819_230511_327683_seed7/train.csv",
+      "size_bytes": 798,
+      "sha256": "9533a8c4ea5f3f4083a69f908e8832977dfa80b1b49e6ac294ae3bb571dab2ab"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/mappo/mappo_train_20260819_230511_327683_seed7/train_summary.json",
+      "size_bytes": 41109,
+      "sha256": "71cb37dfd9ac97b20bbb370c11c2c5ded8257f7fe6fc2c88e08051ca611ac27f"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/ppo/ppo_train_20260819_230509_074953_seed7/checkpoints/latest.pt",
+      "size_bytes": 317149,
+      "sha256": "d732f2afd77dc4975854d7d9545a5d0e2c02cea81225041753535e8c80e8a11c"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/ppo/ppo_train_20260819_230509_074953_seed7/checkpoints/update_0001.pt",
+      "size_bytes": 320187,
+      "sha256": "08cf6a64e59a2fbb5976d10b913a099a63c4c2ff880b24b32ca752a243f7a580"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/ppo/ppo_train_20260819_230509_074953_seed7/episodes/episode_0001.summary.json",
+      "size_bytes": 56736,
+      "sha256": "7969f1f56ca5017cc5caf5b71d0acb105990fe4bbc80b7e0a1c3325cbb43f0a8"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/ppo/ppo_train_20260819_230509_074953_seed7/summary.json",
+      "size_bytes": 39096,
+      "sha256": "36b39afb4ea99d0c3a9b1145575da5fb7e37897aed8302e5ef38862dd9d66c1c"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/ppo/ppo_train_20260819_230509_074953_seed7/train.csv",
+      "size_bytes": 798,
+      "sha256": "f6b25a698d9d740abdface02a47fe01617f4a715421e9b8eb86e9eb10d8a19b6"
+    },
+    {
+      "path": "rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/ppo/ppo_train_20260819_230509_074953_seed7/train_summary.json",
+      "size_bytes": 39096,
+      "sha256": "36b39afb4ea99d0c3a9b1145575da5fb7e37897aed8302e5ef38862dd9d66c1c"
+    },
+    {
+      "path": "resolved_runtime_contract.json",
+      "size_bytes": 24589,
+      "sha256": "714788756cddd5a47547ad66c7d5d912c919b6dc2076497051d6da6ed641c345"
+    },
+    {
+      "path": "training_entrypoint_audit.json",
+      "size_bytes": 9092,
+      "sha256": "7e6d5dc7aefe9712d6fbed42d578ec95a7c7bb1bf94fbbf483b7da55e7ffd76b"
+    },
+    {
+      "path": "typed_fairness_manifest.json",
+      "size_bytes": 38073,
+      "sha256": "774339c81c70f3f89906e7f1344e1bb853661f5b54e17c983bbabab3565c6bbb"
+    },
+    {
+      "path": "typed_fairness_manifest_384mb.json",
+      "size_bytes": 38073,
+      "sha256": "0fdb709e8c67ef4d9c179ccfd515e49a2eb376e82302abbce9a39eddce89694a"
+    }
+  ]
+}

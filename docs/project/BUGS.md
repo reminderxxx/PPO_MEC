@@ -326,3 +326,10 @@
 - `RESOLVED / multi-victim and initial state`: optional per-victim MB、admission identity/MB 与 initial/final per-RSU snapshots 消除 multi-victim/pollution reconstruction ambiguity；旧 trace 缺证据时明确 partial/unavailable。
 - `OPEN / latency saved`: 缺 request-aligned observed/cold-counterfactual/transfer/stall latency，正式值保持 null；reward 和 workflow delay 不得代替。
 - `OPEN / causal regret and fairness`: future reuse 仅为 proxy；G08 oracle regret 与 G07 fairness manifest 未实现。历史 capacity-disabled artifact 仍不能支持 capacity/pollution claim。
+
+## 2026-08-19 G14A status
+
+- `RESOLVED / typed runtime plumbing`：typed catalog、MB capacity、initial/dependency/pinned contract、training/checkpoint provenance、fairness 1.1、benchmark、CacheEvent 1.3与metrics 1.1已端到端接通；legacy slot/MB未回归。
+- `RESOLVED / controlled Alibaba adapter mapping`：repository controlled catalog已显式声明`adapter_batch_type_1 -> base:veh_base_v1`，不再在NGSIM+Alibaba入口因未知typed adapter失败。
+- `OPEN BLOCKER / G14B`：正式split exclusion/final protocol尚未冻结；没有正式checkpoint、formal raw trace、holdout/support或重跑后的readiness审计。G14A artifact和tiny checkpoint不得进入论文主表。
+- `OPEN / latency saved`：metrics 1.1继续输出null；G14A没有新增request-aligned counterfactual latency，不能将reward/delay替代。

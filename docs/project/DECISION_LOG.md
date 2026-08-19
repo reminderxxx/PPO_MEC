@@ -837,3 +837,11 @@
 - 证据边界：NGSIM + Alibaba 提供 mobility/workflow；typed catalog 是受控 metadata/profile。
   Hugging Face 条目只作非正式 size/provenance diagnostic，unknown license 与 BERT provenance
   anomaly 均禁止 formal claim。G13 不运行训练、formal/holdout/hidden，也不证明算法收益。
+
+## 2026-08-19: G14A 采用共享resolved runtime与外部checkpoint hash binding
+
+- 决策：training、evaluation、benchmark与fairness不得复制typed解析；统一消费`src/runtime/typed_model_cache_runtime.py`。Typed必须显式MB/fingerprint，legacy保持默认adapter-only。
+- 决策：checkpoint文件内记录runtime provenance，文件SHA在序列化完成后由外部per-agent/per-seed manifest绑定；不使用不可能稳定的checkpoint self-hash。Typed learned benchmark只接受`compatible`。
+- 决策：typed fairness继续将五reactive baseline严格保留在pairwise matrix，learned controller只放optional companion agent list；因此only-policy-difference不被算法结构差异污染。
+- 决策：typed formal-capable benchmark强制fairness manifest；无manifest兼容仅限legacy并标记unavailable。G14A不冻结split/protocol，G14B必须在新readiness gate后另立任务。
+- 证据：`artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/`，evidence level为non-formal contract validation。

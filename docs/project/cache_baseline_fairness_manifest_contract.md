@@ -46,7 +46,7 @@ Semantic hash 排除 `identity.manifest_id`、`identity.created_at`、`artifact_
 
 `scripts/build_cache_baseline_fairness_manifest.py` 从显式输入构建 resolved JSON，默认拒绝覆盖并在写出前自动验证。`scripts/validate_cache_baseline_fairness_manifest.py` 输出结构化 report 与 pairwise diff。
 
-`scripts/benchmark_main_results.py --cache_baseline_fairness_manifest_path ...` 在加载数据前重验 manifest，拒绝 CLI 覆盖 agents、seeds、workflow selection、window plan、capacity、max steps、vehicle selection 或 reward offset。当前正式消费者先冻结 `adapter_slots`；MB schema已验证，但在该 runner 增加显式 MB runtime参数前 fail-fast。未传 manifest 的旧 benchmark 保持兼容，并在 row/aggregate/run manifest 中标记 `fairness_manifest_status=unavailable`。
+`scripts/benchmark_main_results.py --cache_baseline_fairness_manifest_path ...` 在加载数据前重验 manifest，拒绝 CLI 覆盖 agents、seeds、workflow selection、window plan、capacity、max steps、vehicle selection 或 reward offset。G14A 后消费者支持 legacy slot、legacy MB 与 typed MB；typed slot仍 fail-fast。Typed formal-capable路径必须同时提供共享runtime config和fairness manifest，learned agent另需external checkpoint provenance manifest。未传 manifest 的旧 legacy benchmark 保持兼容，并在 row/aggregate/run manifest 中标记 `fairness_manifest_status=unavailable`。
 
 运行后，summary、raw row、aggregate、run manifest、runtime audit、resolved manifest与integrity manifest均记录 manifest ID/full hash/semantic hash及真实 agent/policy identity；aggregate另按 manifest grouping keys生成 fairness stratum。
 
@@ -57,3 +57,9 @@ G08 必须直接消费同一 validated manifest与evaluation units，在相同 r
 ## G13 optional typed binding
 
 `cache_contract.typed_model_cache`是consumer-safe optional binding：profile/contract、catalog fingerprint、compatibility map、initial typed state fingerprint、resident object size/dependency/evictability、atomic transaction、type-aware metric 1.1与oracle compatibility。typed binding强制MB capacity并校验initial no-orphan/no-trim。五baseline仍共享同一logical action与typed dependency resolver，pairwise唯一主要差异是eviction policy。旧G07 manifest缺该字段仍按legacy 1.0验证。
+
+## G14A typed manifest 1.1 runtime binding
+
+Typed producer使用consumer-safe manifest `1.1.0`，并新增catalog logical path、object taxonomy、dependency/compatibility/pinned-evictability独立fingerprint、resident/transfer size、transaction contract version、action-before-lookup、CacheEvent 1.3、metrics 1.1、trace context 1.0和typed replay identity。Validator从冻结catalog文件重新构建binding；catalog、dependency、initial state、MB值或pinned metadata任一漂移即失败。
+
+`baseline_matrix`仍严格只含五个reactive baseline并执行10组only-policy-difference审计。可选`typed_model_cache.controller_agents`只冻结同一evaluation unit实际需要追加的learned controller身份，不进入reactive pairwise diff。Typed manifest不得由legacy runtime消费，legacy manifest也不得被typed runtime冒充。

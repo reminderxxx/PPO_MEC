@@ -73,10 +73,14 @@ G08 typed replay保存完整 `[base,adapter]` dependency bundle、catalog finger
 
 ## Profile 与数据边界
 
-- `typed_model_cache_controlled.json`：repository-native deterministic controlled profile；2 base、5 compatible perception-family adapters、2 reasoning-family adapters、1 migration-only workflow-state，heterogeneous size、pinned base、3 RSU；每个 base 都可被多个 adapter 共享。它是“controlled synthetic catalog over NGSIM+Alibaba skeleton”，不是真实联合trace。
+- `typed_model_cache_controlled.json`：repository-native deterministic controlled profile；2 base、6 compatible perception-family adapters（含Alibaba `legacy_batch_type`对应的`adapter_batch_type_1`）、2 reasoning-family adapters、1 migration-only workflow-state，heterogeneous size、pinned base、3 RSU；每个 base 都可被多个 adapter 共享。它是“controlled synthetic catalog over NGSIM+Alibaba skeleton”，不是真实联合trace。
 - `hf_metadata_diagnostic_model_profile.json`：qwen/cbow/bert metadata-only、cross-source、non-formal、no payload downloaded；未知license，BERT anomaly blocked；不进入默认profile或G14正式主表。
 - BurstGPT不下载/不进入G13 runtime request stream；仅保留future replay mapping。
 
 ## Claim boundary
 
 G13 artifact只证明合同、事务、兼容和最小真实链路可运行，不证明算法优势、latency saving、paper readiness或真实 joint VEC model-cache trace。本轮未执行G14、训练、调参、formal、holdout或hidden benchmark。
+
+## G14A runtime plumbing
+
+G14A新增`typed_model_cache_runtime_contract_v1.0.0`作为config/training/checkpoint/benchmark/fairness的唯一resolved入口。每个typed request即便没有cache admission动作，也必须记录确定性的`[base_model, adapter]` dependency bundle和per-object lookup；dependency对象不增加request denominator。详见`typed_model_cache_runtime_contract.md`。G14A的tiny training/benchmark只验证管线，不能覆盖本节G13 claim boundary或代替G14B正式protocol。

@@ -86,3 +86,5 @@ G06 derived metrics are frozen separately in `cache_efficiency_metrics_contract.
 `CacheEvent 1.3.0` adds optional typed model-cache fields without deleting/redefining 1.0–1.2 fields. `object_type` enum now reserves `base_model/adapter/workflow_state/kv_prefix`；G13 request的legacy singular view仍指向requested adapter，完整base+adapter dependency保存在typed lists。只admit base时不得伪造`admission_added/admitted_adapter_id`；typed transaction status记录真实commit。一个dependency bundle仍只有一个request event。
 
 新增layered readiness、per-object lookup、typed admission/eviction、per-type MB、compatibility、capacity snapshot、atomic status和orphan invariant。旧trace缺typed字段时typed reducer返回unavailable；KV保持disabled且不进入denominator。详见`typed_model_cache_contract.md`。
+
+G14A进一步要求正式入口对每个typed request都填充`requested_typed_objects`和`dependency_bundle`，不以“本step未请求admission”为由省略请求依赖。`vehicle_local`只有在真实hit时使用；typed local缺adapter导致的失败服务必须标为`unserved`，从而保持CacheEvent 1.3 hit/source一致性。`scripts/run_typed_model_cache_runtime_rehearsal.py`已对28个raw episode逐request重验一事件、schema、dependency、lookup、per-type transfer与workflow-state独立性。

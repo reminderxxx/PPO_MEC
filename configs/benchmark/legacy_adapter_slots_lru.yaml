@@ -1,0 +1,11 @@
+profile_id: legacy_adapter_slots_lru
+model_cache_profile: legacy_adapter_only_v1
+catalog_path: src/data/model_catalog/sample_model_catalog.json
+cache_capacity_profile:
+  enabled: true
+  unit: adapter_slots
+  rsu_adapter_slots: 3
+  count_base_model_separately: false
+  eviction_policy: lru
+  eviction_policy_seed: 7
+  telemetry_enabled: true

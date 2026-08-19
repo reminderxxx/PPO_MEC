@@ -1352,6 +1352,9 @@ def load_checkpoint_metadata(checkpoint_path: str) -> dict[str, Any]:
                     "smoke_warning": is_smoke,
                 }
             )
+            typed_runtime_provenance = training_metadata.get("typed_runtime_provenance")
+            if isinstance(typed_runtime_provenance, dict):
+                metadata["typed_runtime_provenance"] = dict(typed_runtime_provenance)
     metadata.update(classify_experiment_scale(metadata.get("config_profile", "unknown"), metadata.get("episodes", 0), metadata.get("run_update_count", 0)))
     metadata["update_count"] = metadata["run_update_count"]
     return metadata
@@ -1436,6 +1439,7 @@ def run_real_episode(
     rsu_states_override: list[RSUState] | None = None,
     mobility_frames_override: list[dict[str, Any]] | None = None,
     cache_capacity_profile: dict[str, Any] | None = None,
+    model_cache_runtime_contract: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     cache_capacity_profile = validate_agent_eviction_binding(
         agent_name, cache_capacity_profile, run_seed=seed
@@ -1510,12 +1514,41 @@ def run_real_episode(
             "checkpoint_run_id": checkpoint_metadata.get("run_id"),
             "checkpoint_profile": checkpoint_metadata.get("config_profile"),
             "checkpoint_is_smoke": checkpoint_metadata.get("is_smoke_checkpoint", False),
+            "model_cache_profile": (
+                model_cache_runtime_contract.get("model_cache_profile")
+                if model_cache_runtime_contract
+                else "legacy_adapter_only_v1"
+            ),
+            "runtime_contract_sha256": (
+                model_cache_runtime_contract.get("runtime_contract_sha256")
+                if model_cache_runtime_contract
+                else None
+            ),
+            "typed_catalog_fingerprint": (
+                model_cache_runtime_contract.get("typed_catalog_fingerprint")
+                if model_cache_runtime_contract
+                else None
+            ),
+            "cache_event_schema_version_contract": (
+                model_cache_runtime_contract.get("cache_event_schema_version")
+                if model_cache_runtime_contract
+                else None
+            ),
+            "cache_efficiency_metrics_contract_version": (
+                model_cache_runtime_contract.get(
+                    "cache_efficiency_metrics_contract_version"
+                )
+                if model_cache_runtime_contract
+                else None
+            ),
         },
         learn=False,
     )
     summary["episode_success"] = bool(summary.get("episode_status", {}).get("completed", False))
     summary["run_info"]["rsu_metadata"] = mobility_bundle.rsu_metadata
     summary["run_info"]["checkpoint_metadata"] = checkpoint_metadata
+    if model_cache_runtime_contract is not None:
+        summary["resolved_model_cache_runtime"] = dict(model_cache_runtime_contract)
     return summary
 
 
@@ -1791,6 +1824,19 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         "evaluation_unit_id": run_info.get("evaluation_unit_id"),
         "expected_workload_fingerprint": run_info.get("expected_workload_fingerprint"),
         "observed_request_stream_fingerprint": run_info.get("observed_request_stream_fingerprint"),
+        "model_cache_profile": run_info.get("model_cache_profile", "legacy_adapter_only_v1"),
+        "runtime_contract_sha256": run_info.get("runtime_contract_sha256"),
+        "typed_catalog_fingerprint": run_info.get("typed_catalog_fingerprint"),
+        "cache_event_schema_version_contract": run_info.get(
+            "cache_event_schema_version_contract"
+        ),
+        "cache_efficiency_metrics_contract_version": run_info.get(
+            "cache_efficiency_metrics_contract_version"
+        ),
+        "checkpoint_provenance_status": run_info.get(
+            "checkpoint_provenance_status", "not_applicable"
+        ),
+        "checkpoint_sha256": run_info.get("checkpoint_sha256"),
         "seed": run_info.get("seed"),
         "primary_vehicle_selection": run_info.get("primary_vehicle_selection", "stable_first"),
         "reward_positive_offset": reward_positive_offset,

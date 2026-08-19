@@ -18,7 +18,6 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from src.agents.registry import build_agent, get_algo_spec, list_trainable_agents
-from src.data.model_catalog.adapter_catalog import AdapterCatalog
 from src.data.mobility.replay_provider import ReplayProvider
 from src.envs.core.predictor_manager import PredictorManager
 from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv
@@ -33,10 +32,16 @@ from src.evaluators.main_results_support import (
     resolve_window_candidates,
 )
 from src.metrics.recorder import EpisodeRecorder
+from src.runtime.typed_model_cache_runtime import (
+    build_checkpoint_provenance,
+    load_runtime_catalog,
+    resolve_model_cache_runtime,
+    sha256_value,
+)
 from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
 
 
-TRAINABLE_BASELINES = [agent for agent in list_trainable_agents() if agent != "sa_ghmappo"]
+TRAINABLE_BASELINES = list_trainable_agents()
 REPLAY_BASELINES = {"dqn", "ddqn", "dueling_dqn", "dueling_ddqn", "qmix"}
 PROFILE_DEFAULTS = {
     "smoke": {"episodes": 2, "update_every": 1, "max_steps": 6, "batch_size": 8},
@@ -81,6 +86,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--gamma", type=float, default=0.99)
     parser.add_argument("--gae_lambda", type=float, default=0.95)
     parser.add_argument("--random_seed", type=int, default=7)
+    parser.add_argument(
+        "--model_cache_runtime_config",
+        type=str,
+        default="",
+        help="Shared legacy/typed runtime YAML; typed fields may not be overridden on the CLI.",
+    )
     parser.add_argument("--mobility_source", choices=["ngsim", "lust"], default="ngsim")
     parser.add_argument("--primary_vehicle_selection", choices=["stable_first", "handoff_pressure"], default="stable_first")
     parser.add_argument("--mobility_csv_path", type=str, default="")
@@ -220,6 +231,10 @@ def annotate_checkpoint(path: Path, metadata: dict[str, Any]) -> None:
 
 def main() -> None:
     args = parse_args()
+    runtime_contract = resolve_model_cache_runtime(
+        args.model_cache_runtime_config or None,
+        root=ROOT_DIR,
+    )
     run_id = datetime.now().strftime(f"{args.agent_name}_train_%Y%m%d_%H%M%S_%f_seed{args.random_seed}")
     output_root = Path(args.output_root) / args.agent_name / run_id
     episode_root = output_root / "episodes"
@@ -265,7 +280,16 @@ def main() -> None:
                 "window_class": "manual",
             }
         ]
-    adapter_catalog = AdapterCatalog.from_json(ROOT_DIR / "src" / "data" / "model_catalog" / "sample_model_catalog.json")
+    adapter_catalog = load_runtime_catalog(runtime_contract, root=ROOT_DIR)
+    cache_capacity_profile = dict(runtime_contract["cache_capacity_profile"])
+    if not cache_capacity_profile.get("enabled"):
+        cache_capacity_profile = None
+    window_plan_identity = {
+        "path": str(window_payload.get("frozen_window_plan_path") or args.window_plan_path or "runtime_selected"),
+        "protocol_version": str(window_payload.get("frozen_window_plan_protocol_version") or "runtime_selected_v1"),
+        "split": str(window_payload.get("frozen_window_plan_split") or "non_formal_runtime_selected"),
+        "selected_window_plan_sha256": sha256_value(selected_window_plan),
+    }
     agent_kwargs = {
         "random_seed": args.random_seed,
         "learning_rate": args.learning_rate,
@@ -316,6 +340,7 @@ def main() -> None:
             mobility_source=args.mobility_source,
             primary_vehicle_selection=args.primary_vehicle_selection,
             reward_positive_offset=args.reward_positive_offset,
+            cache_capacity_profile=cache_capacity_profile,
         )
         env = GymVecEnv(core_env=core_env, recorder=recorder)
         trainer = MARLOnPolicyTrainer(
@@ -339,6 +364,12 @@ def main() -> None:
                 "primary_vehicle_selection": args.primary_vehicle_selection,
                 "reward_positive_offset": args.reward_positive_offset,
                 "prediction_horizon": args.prediction_horizon,
+                "model_cache_profile": runtime_contract["model_cache_profile"],
+                "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
+                "cache_event_schema_version": runtime_contract["cache_event_schema_version"],
+                "cache_efficiency_metrics_contract_version": runtime_contract[
+                    "cache_efficiency_metrics_contract_version"
+                ],
             }
         )
         summary["episode_success"] = bool(summary.get("episode_status", {}).get("completed", False))
@@ -364,6 +395,14 @@ def main() -> None:
                 "update_count": update_index,
                 "is_smoke_checkpoint": args.profile == "smoke",
                 "script": "scripts/train_algo_pool_real_sample.py",
+                "typed_runtime_provenance": build_checkpoint_provenance(
+                    root=ROOT_DIR,
+                    agent_name=args.agent_name,
+                    training_seed=args.random_seed,
+                    runtime_contract=runtime_contract,
+                    reward_positive_offset=args.reward_positive_offset,
+                    train_window_plan_identity=window_plan_identity,
+                ),
             }
             annotate_checkpoint(checkpoint_path, checkpoint_metadata)
             annotate_checkpoint(latest_path, checkpoint_metadata)
@@ -415,6 +454,10 @@ def main() -> None:
         "window_scan_stride": args.window_scan_stride,
         "prediction_horizon": args.prediction_horizon,
         "agent_protocol": getattr(agent, "baseline_config", {}),
+        "resolved_model_cache_runtime": runtime_contract,
+        "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
+        "cache_capacity_profile": runtime_contract["cache_capacity_profile"],
+        "train_window_plan_identity": window_plan_identity,
         "mean_metrics": metric_means(rows),
         "rows": rows,
         "update_logs": update_logs,

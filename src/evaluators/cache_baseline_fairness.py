@@ -17,6 +17,16 @@ import yaml
 from src.agents.registry import get_algo_spec
 from src.data.model_catalog.adapter_catalog import AdapterCatalog
 from src.evaluators.main_results_support import build_selected_workflow_states
+from src.runtime.typed_model_cache_runtime import (
+    CACHE_EFFICIENCY_METRICS_CONTRACT_VERSION,
+    CACHE_EVENT_SCHEMA_VERSION,
+    CACHE_TRACE_CONTEXT_VERSION,
+    REQUEST_REPLAY_TYPED_CONTRACT_VERSION,
+    RUNTIME_CONTRACT_VERSION,
+    TYPED_CACHE_TRANSACTION_CONTRACT_VERSION,
+    RuntimeContractError,
+    resolve_model_cache_runtime,
+)
 
 
 MANIFEST_VERSION = "1.0.0"
@@ -267,51 +277,112 @@ def _catalog_resident_sizes(catalog: AdapterCatalog, workflows: Iterable[Any]) -
     return rows
 
 
-def build_typed_cache_fairness_binding(catalog: AdapterCatalog) -> dict[str, Any]:
+def build_typed_cache_fairness_binding(
+    catalog: AdapterCatalog,
+    *,
+    runtime_contract: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Build the policy-invariant typed portion embedded by a G13 fairness manifest."""
     if not catalog.typed_mode_enabled:
         raise FairnessManifestError("typed fairness binding requires typed catalog profile")
     catalog.validate_typed_catalog()
-    objects = [
-        {
-            "object_id": item.object_id,
-            "object_type": item.object_type,
-            "version": item.version,
-            "resident_size_mb": float(item.resident_size_mb),
-            "transfer_size_mb": float(item.transfer_size_mb),
-            "dependency_ids": list(item.dependency_ids),
-            "adapter_id": item.adapter_id,
-            "base_model_id": item.base_model_id,
-            "required_base_model_id": item.required_base_model_id,
-            "evictability": item.evictability,
-            "counts_toward_capacity": item.counts_toward_capacity,
+    if runtime_contract is None:
+        objects = [
+            {
+                "object_id": item.object_id,
+                "object_type": item.object_type,
+                "version": item.version,
+                "resident_size_mb": float(item.resident_size_mb),
+                "transfer_size_mb": float(item.transfer_size_mb),
+                "dependency_ids": list(item.dependency_ids),
+                "evictability": item.evictability,
+                "counts_toward_capacity": bool(item.counts_toward_capacity),
+                "stable_fingerprint": item.stable_fingerprint,
+            }
+            for item in sorted(catalog.typed_cache_objects, key=lambda row: row.object_id)
+        ]
+        initial = [
+            {
+                "rsu_id": item.rsu_id,
+                "resident_object_ids": list(item.resident_object_ids),
+            }
+            for item in sorted(catalog.rsu_typed_cache_profiles, key=lambda row: row.rsu_id)
+        ]
+        dependency_map = [
+            {
+                "object_id": item["object_id"],
+                "object_type": item["object_type"],
+                "dependency_ids": item["dependency_ids"],
+            }
+            for item in objects
+        ]
+        compatibility_map = {
+            key: list(values) for key, values in sorted(catalog.compatibility_map.items())
         }
-        for item in catalog.typed_cache_objects
-        if item.counts_toward_capacity
-    ]
-    initial = [
-        item.to_dict()
-        for item in sorted(catalog.rsu_typed_cache_profiles, key=lambda row: row.rsu_id)
-    ]
+        pinned_metadata = [
+            {
+                "object_id": item["object_id"],
+                "evictability": item["evictability"],
+                "counts_toward_capacity": item["counts_toward_capacity"],
+            }
+            for item in objects
+        ]
+        runtime_contract = {
+            "runtime_contract_version": RUNTIME_CONTRACT_VERSION,
+            "typed_catalog_path": "unavailable_standalone_binding",
+            "typed_catalog_fingerprint": catalog.canonical_fingerprint(),
+            "object_taxonomy": sorted({item["object_type"] for item in objects}),
+            "resident_objects": objects,
+            "dependency_map": dependency_map,
+            "dependency_fingerprint": sha256_value(dependency_map),
+            "compatibility_map": compatibility_map,
+            "compatibility_map_fingerprint": sha256_value(compatibility_map),
+            "pinned_evictability_metadata": pinned_metadata,
+            "pinned_evictability_fingerprint": sha256_value(pinned_metadata),
+            "initial_per_rsu_typed_state": initial,
+            "typed_initial_state_fingerprint": sha256_value(initial),
+            "transaction_contract": {
+                "max_logical_cache_actions_per_step": 1,
+                "max_dependency_bundle_objects": 2,
+                "action_before_lookup": True,
+                "admission_order": ["base_model", "adapter"],
+                "partial_admission": False,
+                "atomic_rollback": True,
+                "dependency_safe_base_eviction": "prohibit_while_resident_adapter_depends",
+            },
+        }
+    objects = list(runtime_contract["resident_objects"])
+    initial = list(runtime_contract["initial_per_rsu_typed_state"])
     payload = {
         "profile_id": catalog.model_cache_profile_id,
         "contract_version": catalog.typed_model_cache_contract_version,
-        "catalog_fingerprint": catalog.canonical_fingerprint(),
-        "compatibility_map": {
-            key: list(values) for key, values in sorted(catalog.compatibility_map.items())
-        },
+        "runtime_contract_version": runtime_contract["runtime_contract_version"],
+        "catalog_path": runtime_contract["typed_catalog_path"],
+        "catalog_fingerprint": runtime_contract["typed_catalog_fingerprint"],
+        "object_taxonomy": runtime_contract["object_taxonomy"],
+        "compatibility_map": runtime_contract["compatibility_map"],
+        "compatibility_map_fingerprint": runtime_contract[
+            "compatibility_map_fingerprint"
+        ],
+        "dependency_map": runtime_contract["dependency_map"],
+        "dependency_fingerprint": runtime_contract["dependency_fingerprint"],
+        "pinned_evictability_metadata": runtime_contract[
+            "pinned_evictability_metadata"
+        ],
+        "pinned_evictability_fingerprint": runtime_contract[
+            "pinned_evictability_fingerprint"
+        ],
         "resident_objects": objects,
         "initial_typed_cache_contents": initial,
-        "initial_typed_state_fingerprint": sha256_value(initial),
-        "transaction_contract": {
-            "max_logical_cache_actions_per_step": 1,
-            "max_dependency_bundle_objects": 2,
-            "admission_order": ["base_model", "adapter"],
-            "partial_admission": False,
-            "atomic_rollback": True,
-            "dependency_safe_base_eviction": "prohibit_while_resident_adapter_depends",
-        },
-        "type_aware_metric_version": "1.1.0",
+        "initial_typed_state_fingerprint": runtime_contract[
+            "typed_initial_state_fingerprint"
+        ],
+        "transaction_contract_version": TYPED_CACHE_TRANSACTION_CONTRACT_VERSION,
+        "transaction_contract": runtime_contract["transaction_contract"],
+        "cache_event_schema_version": CACHE_EVENT_SCHEMA_VERSION,
+        "type_aware_metric_version": CACHE_EFFICIENCY_METRICS_CONTRACT_VERSION,
+        "cache_trace_context_version": CACHE_TRACE_CONTEXT_VERSION,
+        "request_replay_typed_contract_version": REQUEST_REPLAY_TYPED_CONTRACT_VERSION,
         "oracle_compatibility": {
             "status": "compatible_tiny_exact_and_state_limit_guarded",
             "objective": "joint_base_adapter_hit",
@@ -332,6 +403,8 @@ def validate_typed_cache_fairness_binding(
         errors.append("typed fairness profile mismatch")
     if payload.get("contract_version") != "1.0.0":
         errors.append("typed fairness contract version mismatch")
+    if payload.get("runtime_contract_version") != RUNTIME_CONTRACT_VERSION:
+        errors.append("typed runtime contract version mismatch")
     objects = payload.get("resident_objects")
     if not isinstance(objects, list) or not objects:
         errors.append("typed fairness resident object table missing")
@@ -349,6 +422,36 @@ def validate_typed_cache_fairness_binding(
             errors.append(f"invalid typed size for {object_id}")
         if any(str(dependency) not in object_map for dependency in item.get("dependency_ids") or []):
             errors.append(f"missing typed dependency for {object_id}")
+    taxonomy = sorted({str(item.get("object_type")) for item in objects})
+    if taxonomy != payload.get("object_taxonomy"):
+        errors.append("typed object taxonomy mismatch")
+    dependency_map = [
+        {
+            "object_id": item["object_id"],
+            "object_type": item["object_type"],
+            "dependency_ids": item.get("dependency_ids") or [],
+        }
+        for item in objects
+    ]
+    if dependency_map != payload.get("dependency_map") or sha256_value(
+        dependency_map
+    ) != payload.get("dependency_fingerprint"):
+        errors.append("typed dependency fingerprint mismatch")
+    compatibility = payload.get("compatibility_map") or {}
+    if sha256_value(compatibility) != payload.get("compatibility_map_fingerprint"):
+        errors.append("typed compatibility fingerprint mismatch")
+    pinned = [
+        {
+            "object_id": item["object_id"],
+            "evictability": item.get("evictability"),
+            "counts_toward_capacity": item.get("counts_toward_capacity"),
+        }
+        for item in objects
+    ]
+    if pinned != payload.get("pinned_evictability_metadata") or sha256_value(
+        pinned
+    ) != payload.get("pinned_evictability_fingerprint"):
+        errors.append("typed pinned/evictability fingerprint mismatch")
     initial = payload.get("initial_typed_cache_contents")
     if not isinstance(initial, list) or sha256_value(initial) != payload.get("initial_typed_state_fingerprint"):
         errors.append("typed initial state fingerprint mismatch")
@@ -373,8 +476,20 @@ def validate_typed_cache_fairness_binding(
         errors.append("typed transaction action/bundle budget mismatch")
     if transaction.get("partial_admission") is not False or transaction.get("atomic_rollback") is not True:
         errors.append("typed transaction must be atomic without partial admission")
+    if payload.get("transaction_contract_version") != TYPED_CACHE_TRANSACTION_CONTRACT_VERSION:
+        errors.append("typed transaction contract version mismatch")
+    if transaction.get("action_before_lookup") is not True:
+        errors.append("typed action-before-lookup contract missing")
+    if transaction.get("dependency_safe_base_eviction") != "prohibit_while_resident_adapter_depends":
+        errors.append("typed dependency-safe eviction contract mismatch")
+    if payload.get("cache_event_schema_version") != CACHE_EVENT_SCHEMA_VERSION:
+        errors.append("typed CacheEvent version mismatch")
     if payload.get("type_aware_metric_version") != "1.1.0":
         errors.append("typed metric version mismatch")
+    if payload.get("cache_trace_context_version") != CACHE_TRACE_CONTEXT_VERSION:
+        errors.append("typed trace context version mismatch")
+    if payload.get("request_replay_typed_contract_version") != REQUEST_REPLAY_TYPED_CONTRACT_VERSION:
+        errors.append("typed request replay contract mismatch")
     if payload.get("oracle_compatibility", {}).get("atomic_dependency_bundle") is not True:
         errors.append("typed oracle compatibility missing")
     return {"status": "pass" if not errors else "fail", "errors": errors}
@@ -500,6 +615,7 @@ def build_manifest(
     output_root: str,
     evaluation_unit_limit: int | None = None,
     created_at: str | None = None,
+    controller_agents: list[str] | None = None,
 ) -> dict[str, Any]:
     root = Path(root).resolve()
     if not seeds or len(set(seeds)) != len(seeds):
@@ -524,6 +640,33 @@ def build_manifest(
         if missing:
             raise FairnessManifestError(f"window {index} missing raw identity fields: {sorted(missing)}")
     catalog = AdapterCatalog.from_json(catalog_path)
+    controller_agents = list(controller_agents or [])
+    if len(controller_agents) != len(set(controller_agents)):
+        raise FairnessManifestError("typed controller_agents must be unique")
+    if controller_agents and not catalog.typed_mode_enabled:
+        raise FairnessManifestError("controller_agents companion is available only for typed manifests")
+    runtime_contract: dict[str, Any] | None = None
+    if catalog.typed_mode_enabled:
+        if capacity_unit != "mb":
+            raise FairnessManifestError("typed fairness manifest requires MB capacity")
+        try:
+            runtime_contract = resolve_model_cache_runtime(
+                {
+                    "model_cache_profile": catalog.model_cache_profile_id,
+                    "typed_catalog_path": Path(catalog_path).resolve().relative_to(root).as_posix(),
+                    "typed_catalog_fingerprint": catalog.canonical_fingerprint(),
+                    "cache_capacity_profile": {
+                        "enabled": True,
+                        "unit": "mb",
+                        "capacity_mb": float(capacity_value),
+                        "eviction_policy": "lru",
+                        "telemetry_enabled": True,
+                    },
+                },
+                root=root,
+            )
+        except (RuntimeContractError, ValueError) as exc:
+            raise FairnessManifestError(str(exc)) from exc
     workflows_by_seed: dict[int, list[Any]] = {}
     for seed in seeds:
         workflows_by_seed[seed] = build_selected_workflow_states(
@@ -536,13 +679,13 @@ def build_manifest(
         )
     all_workflows = [workflow for workflows in workflows_by_seed.values() for workflow in workflows]
     initial_cache = _initial_cache_payload(catalog)
-    if capacity_unit == "adapter_slots" and any(
+    if not catalog.typed_mode_enabled and capacity_unit == "adapter_slots" and any(
         len(item["cached_adapter_ids"]) > int(capacity_value) for item in initial_cache
     ):
         raise FairnessManifestError(
             "G07 requires capacity to contain the identical declared initial cache without policy-specific trimming"
         )
-    if capacity_unit == "mb":
+    if not catalog.typed_mode_enabled and capacity_unit == "mb":
         for item in initial_cache:
             used_mb = sum(
                 catalog.resolve_adapter_resident_size_mb(adapter_id).size_mb
@@ -590,14 +733,19 @@ def build_manifest(
     commit, dirty_audit = _git_identity(root)
     manifest: dict[str, Any] = {
         "identity": {
-            "cache_baseline_fairness_manifest_version": MANIFEST_VERSION,
+            "cache_baseline_fairness_manifest_version": (
+                "1.1.0" if catalog.typed_mode_enabled else MANIFEST_VERSION
+            ),
             "manifest_id": "pending",
             "created_at": created_at or utc_now(),
             "purpose": "paper-grade matched classical cache baseline fairness protocol",
             "scope": "G07 classical reactive baselines; reusable by future G08 oracle",
             "git_commit": commit,
             "dirty_worktree_audit": dirty_audit,
-            "producer": {"script": "scripts/build_cache_baseline_fairness_manifest.py", "version": PRODUCER_VERSION},
+            "producer": {
+                "script": "scripts/build_cache_baseline_fairness_manifest.py",
+                "version": "g14a_v1" if catalog.typed_mode_enabled else PRODUCER_VERSION,
+            },
             "protocol_status": "pre_run_validated_not_executed",
             "paper_claim_boundary": "validation and controlled runs are not formal or paper-ready evidence",
         },
@@ -686,10 +834,26 @@ def build_manifest(
                 "expected_replay_fingerprint_status": "derived_by_policy_neutral_G08_companion_after_manifest_validation",
                 "compatibility": "optional consumer-safe G07 1.x field; old manifests remain valid",
             },
+            **(
+                {
+                    "typed_model_cache": {
+                        **build_typed_cache_fairness_binding(
+                            catalog, runtime_contract=runtime_contract
+                        ),
+                        "controller_agents": controller_agents,
+                    }
+                }
+                if runtime_contract is not None
+                else {}
+            ),
         },
         "baseline_matrix": [_load_baseline_entry(root, name) for name in BASELINE_NAMES],
         "metrics_aggregation": {
-            "contract_version": "cache_efficiency_metrics_contract_v1.0.0",
+            "contract_version": (
+                "cache_efficiency_metrics_contract_v1.1.0"
+                if catalog.typed_mode_enabled
+                else "cache_efficiency_metrics_contract_v1.0.0"
+            ),
             "metric_names": [
                 "cache_object_hit_rate", "cache_byte_hit_rate", "cache_churn_mb",
                 "cache_pollution_ratio", "cache_transfer_amplification_ratio",
@@ -906,6 +1070,63 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
             typed_cache, capacity=capacity
         )
         errors.extend(typed_report["errors"])
+        controller_agents = typed_cache.get("controller_agents") or []
+        if not isinstance(controller_agents, list) or len(controller_agents) != len(
+            set(controller_agents)
+        ):
+            errors.append("typed controller_agents must be a unique list")
+        else:
+            for agent_name in controller_agents:
+                try:
+                    spec = get_algo_spec(str(agent_name))
+                except KeyError:
+                    errors.append(f"unknown typed controller agent: {agent_name}")
+                    continue
+                if spec.get("support_level") != "trainable":
+                    errors.append(f"typed controller agent is not trainable: {agent_name}")
+        if check_files:
+            catalog_file = resolved_inputs.get("ppo_mec_sample_adapter_catalog")
+            if catalog_file is None:
+                errors.append("typed catalog input is unavailable for drift validation")
+            else:
+                try:
+                    declared_path = Path(str(typed_cache.get("catalog_path") or ""))
+                    if not declared_path.is_absolute():
+                        declared_path = root / declared_path
+                    if declared_path.resolve() != catalog_file.resolve():
+                        errors.append("typed catalog path differs from frozen dataset input")
+                    resolved_runtime = resolve_model_cache_runtime(
+                        {
+                            "model_cache_profile": typed_cache.get("profile_id"),
+                            "typed_catalog_path": declared_path,
+                            "typed_catalog_fingerprint": typed_cache.get(
+                                "catalog_fingerprint"
+                            ),
+                            "typed_initial_state_fingerprint": typed_cache.get(
+                                "initial_typed_state_fingerprint"
+                            ),
+                            "typed_dependency_fingerprint": typed_cache.get(
+                                "dependency_fingerprint"
+                            ),
+                            "typed_pinned_evictability_fingerprint": typed_cache.get(
+                                "pinned_evictability_fingerprint"
+                            ),
+                            "cache_capacity_profile": {
+                                **capacity,
+                                "eviction_policy": "lru",
+                            },
+                        },
+                        root=root,
+                    )
+                    rebuilt = build_typed_cache_fairness_binding(
+                        AdapterCatalog.from_json(catalog_file),
+                        runtime_contract=resolved_runtime,
+                    )
+                    for field, expected_value in rebuilt.items():
+                        if typed_cache.get(field) != expected_value:
+                            errors.append(f"typed catalog/runtime drift for {field}")
+                except (OSError, ValueError, RuntimeContractError) as exc:
+                    errors.append(f"typed catalog/runtime drift: {exc}")
     checked.append("capacity_catalog_initial_cache_and_cacheevent_contracts")
     matrix = manifest.get("baseline_matrix", [])
     names = [entry.get("agent_identity", {}).get("name") for entry in matrix]
@@ -939,7 +1160,12 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
         errors.append("pairwise protocol symmetry failed")
     checked.append("five_baselines_binding_and_10_pairwise_diffs")
     metrics = manifest.get("metrics_aggregation", {})
-    if metrics.get("contract_version") != "cache_efficiency_metrics_contract_v1.0.0":
+    expected_metrics_contract = (
+        "cache_efficiency_metrics_contract_v1.1.0"
+        if typed_cache is not None
+        else "cache_efficiency_metrics_contract_v1.0.0"
+    )
+    if metrics.get("contract_version") != expected_metrics_contract:
         errors.append("metrics contract mismatch")
     if not metrics.get("nullable_aggregation_contract"):
         errors.append("nullable aggregation contract missing")
@@ -1007,7 +1233,10 @@ def expected_unit(manifest: dict[str, Any], *, seed: int, window_id: str, workfl
 
 
 def enforce_benchmark_args(args: Any, manifest: dict[str, Any]) -> None:
-    expected_agents = list(BASELINE_NAMES)
+    typed_binding = manifest.get("cache_contract", {}).get("typed_model_cache")
+    expected_agents = list(BASELINE_NAMES) + list(
+        (typed_binding or {}).get("controller_agents") or []
+    )
     if list(args.agents) != expected_agents:
         raise FairnessManifestError(f"agents must exactly match manifest order {expected_agents}")
     seeds = manifest["seed_plan"]["benchmark_run_seeds"]
@@ -1056,10 +1285,62 @@ def enforce_benchmark_args(args: Any, manifest: dict[str, Any]) -> None:
     if plan_path != manifest_plan.resolve() or sha256_file(plan_path) != manifest["window_workload_plan"]["window_plan_sha256"]:
         raise FairnessManifestError("CLI window plan path/content overrides frozen manifest")
     capacity = manifest["cache_contract"]["capacity"]
-    if capacity["unit"] != "adapter_slots":
-        raise FairnessManifestError("benchmark_main_results currently consumes adapter_slots G07 strata only")
-    if int(args.classical_cache_slots) != int(capacity["rsu_adapter_slots"]):
-        raise FairnessManifestError("CLI classical_cache_slots overrides frozen manifest capacity")
+    runtime = getattr(args, "_resolved_model_cache_runtime", None)
+    if typed_binding is not None:
+        if not isinstance(runtime, dict) or runtime.get("model_cache_profile") != typed_binding.get(
+            "profile_id"
+        ):
+            raise FairnessManifestError("typed manifest cannot be consumed by legacy runtime")
+        runtime_capacity = runtime.get("cache_capacity_profile") or {}
+        if runtime_capacity.get("unit") != "mb" or runtime_capacity.get("enabled") is not True:
+            raise FairnessManifestError("typed runtime must consume frozen enabled MB capacity")
+        comparisons = {
+            "typed_catalog_fingerprint": typed_binding.get("catalog_fingerprint"),
+            "typed_initial_state_fingerprint": typed_binding.get(
+                "initial_typed_state_fingerprint"
+            ),
+            "dependency_fingerprint": typed_binding.get("dependency_fingerprint"),
+            "compatibility_map_fingerprint": typed_binding.get(
+                "compatibility_map_fingerprint"
+            ),
+            "pinned_evictability_fingerprint": typed_binding.get(
+                "pinned_evictability_fingerprint"
+            ),
+            "cache_event_schema_version": typed_binding.get(
+                "cache_event_schema_version"
+            ),
+            "cache_efficiency_metrics_contract_version": typed_binding.get(
+                "type_aware_metric_version"
+            ),
+            "cache_trace_context_version": typed_binding.get(
+                "cache_trace_context_version"
+            ),
+        }
+        for field, expected in comparisons.items():
+            if runtime.get(field) != expected:
+                raise FairnessManifestError(
+                    f"runtime {field} overrides frozen typed manifest"
+                )
+        if float(runtime_capacity.get("capacity_mb") or 0.0) != float(
+            capacity.get("capacity_mb") or 0.0
+        ):
+            raise FairnessManifestError("runtime MB capacity overrides frozen manifest")
+    elif isinstance(runtime, dict) and runtime.get("model_cache_profile") == "typed_base_adapter_state_v1":
+        raise FairnessManifestError("legacy fairness manifest cannot be consumed by typed runtime")
+    elif capacity["unit"] == "adapter_slots":
+        if int(args.classical_cache_slots) != int(capacity["rsu_adapter_slots"]):
+            raise FairnessManifestError("CLI classical_cache_slots overrides frozen manifest capacity")
+    else:
+        runtime_capacity = (runtime or {}).get("cache_capacity_profile") or {}
+        if (
+            runtime_capacity.get("enabled") is not True
+            or runtime_capacity.get("unit") != "mb"
+            or float(runtime_capacity.get("capacity_mb") or 0.0)
+            != float(capacity.get("capacity_mb") or 0.0)
+        ):
+            raise FairnessManifestError(
+                "legacy MB manifest requires the identical shared runtime MB capacity"
+            )
     if float(args.reward_positive_offset) != 0.0:
         raise FairnessManifestError("G07 fairness manifest freezes reward_positive_offset=0.0")
 
@@ -1077,10 +1358,15 @@ def stamp_summary_provenance(summary: dict[str, Any], manifest: dict[str, Any], 
     summary.setdefault("run_info", {}).update(provenance)
 
 
-def validate_observed_fingerprint_matrix(matrix: dict[str, dict[str, str]]) -> None:
+def validate_observed_fingerprint_matrix(
+    matrix: dict[str, dict[str, str]], *, expected_agents: list[str] | None = None
+) -> None:
+    expected = set(expected_agents or BASELINE_NAMES)
     for unit_id, by_agent in matrix.items():
-        if set(by_agent) != set(BASELINE_NAMES):
-            raise FairnessManifestError(f"unit {unit_id} did not execute all five baselines")
+        if set(by_agent) != expected:
+            raise FairnessManifestError(
+                f"unit {unit_id} did not execute the complete frozen agent matrix"
+            )
         if len(set(by_agent.values())) != 1:
             raise FairnessManifestError(
                 f"observed request stream fingerprint mismatch across baselines for {unit_id}"

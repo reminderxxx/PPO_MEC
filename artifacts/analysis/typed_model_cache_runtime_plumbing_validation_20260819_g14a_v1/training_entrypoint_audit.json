@@ -1,0 +1,134 @@
+{
+  "status": "pass",
+  "shared_entrypoint": "scripts/train_algo_pool_real_sample.py",
+  "typed_capable_controller_table": [
+    {
+      "agent_name": "sa_ghmappo",
+      "support": "supported_shared_entrypoint",
+      "observation_contract": "graph_surrogate_semantic_encoder",
+      "action_contract": "semantic_discrete_5_multi_head",
+      "rehearsed": false
+    },
+    {
+      "agent_name": "ppo",
+      "support": "supported_shared_entrypoint",
+      "observation_contract": "flat_semantic_encoder_v1",
+      "action_contract": "semantic_discrete_5",
+      "rehearsed": true
+    },
+    {
+      "agent_name": "mappo",
+      "support": "supported_shared_entrypoint",
+      "observation_contract": "flat_semantic_multi_controller_ctde_v1",
+      "action_contract": "semantic_discrete_5_multi_controller_3head",
+      "rehearsed": true
+    },
+    {
+      "agent_name": "cache_offload_drl",
+      "support": "supported_shared_entrypoint",
+      "observation_contract": "flat_semantic_plus_cache_offload_v1",
+      "action_contract": "semantic_discrete_5_cache_offload_3head",
+      "rehearsed": false
+    }
+  ],
+  "network_loss_reward_action_or_hyperparameter_change": false,
+  "formal_training_executed": false,
+  "tiny_runs": [
+    {
+      "capacity_label": "320mb",
+      "agent_name": "ppo",
+      "seed": 7,
+      "training_run_id": "ppo_train_20260819_230501_711200_seed7",
+      "training_summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/ppo/ppo_train_20260819_230501_711200_seed7/summary.json",
+      "checkpoint_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/ppo/ppo_train_20260819_230501_711200_seed7/checkpoints/latest.pt",
+      "checkpoint_sha256": "b004d7ab88938ded4b15dd675944652873176979f7df2e7b9d32fc5ce42f8ea1",
+      "status": "compatible",
+      "runtime_contract_sha256": "e6dfc12dd0c625a385d6eff77e59f55c2179f9faaa38a2c048888d6cba61d48e",
+      "formal_checkpoint": false
+    },
+    {
+      "capacity_label": "320mb",
+      "agent_name": "ppo",
+      "seed": 13,
+      "training_run_id": "ppo_train_20260819_230502_962299_seed13",
+      "training_summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/ppo/ppo_train_20260819_230502_962299_seed13/summary.json",
+      "checkpoint_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/ppo/ppo_train_20260819_230502_962299_seed13/checkpoints/latest.pt",
+      "checkpoint_sha256": "f5e31ec5207f6159c9096c522150aab44ebdc6fc71f1d018065c0b62b6f28bb5",
+      "status": "compatible",
+      "runtime_contract_sha256": "e6dfc12dd0c625a385d6eff77e59f55c2179f9faaa38a2c048888d6cba61d48e",
+      "formal_checkpoint": false
+    },
+    {
+      "capacity_label": "320mb",
+      "agent_name": "mappo",
+      "seed": 7,
+      "training_run_id": "mappo_train_20260819_230504_102839_seed7",
+      "training_summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/mappo/mappo_train_20260819_230504_102839_seed7/summary.json",
+      "checkpoint_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_7/mappo/mappo_train_20260819_230504_102839_seed7/checkpoints/latest.pt",
+      "checkpoint_sha256": "d11b989dc05642403778222f6557355b566a69ebe3aaa45bb3b85d55a4dd9ac4",
+      "status": "compatible",
+      "runtime_contract_sha256": "e6dfc12dd0c625a385d6eff77e59f55c2179f9faaa38a2c048888d6cba61d48e",
+      "formal_checkpoint": false
+    },
+    {
+      "capacity_label": "320mb",
+      "agent_name": "mappo",
+      "seed": 13,
+      "training_run_id": "mappo_train_20260819_230505_265112_seed13",
+      "training_summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/mappo/mappo_train_20260819_230505_265112_seed13/summary.json",
+      "checkpoint_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/320mb/seed_13/mappo/mappo_train_20260819_230505_265112_seed13/checkpoints/latest.pt",
+      "checkpoint_sha256": "37c643ad22e1fb03a3e30605bbf267ceea296795f4a7bb76e956fdcbfe8d1eea",
+      "status": "compatible",
+      "runtime_contract_sha256": "e6dfc12dd0c625a385d6eff77e59f55c2179f9faaa38a2c048888d6cba61d48e",
+      "formal_checkpoint": false
+    },
+    {
+      "capacity_label": "384mb",
+      "agent_name": "ppo",
+      "seed": 7,
+      "training_run_id": "ppo_train_20260819_230509_074953_seed7",
+      "training_summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/ppo/ppo_train_20260819_230509_074953_seed7/summary.json",
+      "checkpoint_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/ppo/ppo_train_20260819_230509_074953_seed7/checkpoints/latest.pt",
+      "checkpoint_sha256": "d732f2afd77dc4975854d7d9545a5d0e2c02cea81225041753535e8c80e8a11c",
+      "status": "compatible",
+      "runtime_contract_sha256": "d01c2919c24ffaa38e86a31e7e055403d3ce4691d8f8df1e766da2be6c0cf1c8",
+      "formal_checkpoint": false
+    },
+    {
+      "capacity_label": "384mb",
+      "agent_name": "ppo",
+      "seed": 13,
+      "training_run_id": "ppo_train_20260819_230510_191792_seed13",
+      "training_summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/ppo/ppo_train_20260819_230510_191792_seed13/summary.json",
+      "checkpoint_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/ppo/ppo_train_20260819_230510_191792_seed13/checkpoints/latest.pt",
+      "checkpoint_sha256": "57d34420f980b01b620a1e68409198f4079d196b7004157cb66e139406d05cc3",
+      "status": "compatible",
+      "runtime_contract_sha256": "d01c2919c24ffaa38e86a31e7e055403d3ce4691d8f8df1e766da2be6c0cf1c8",
+      "formal_checkpoint": false
+    },
+    {
+      "capacity_label": "384mb",
+      "agent_name": "mappo",
+      "seed": 7,
+      "training_run_id": "mappo_train_20260819_230511_327683_seed7",
+      "training_summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/mappo/mappo_train_20260819_230511_327683_seed7/summary.json",
+      "checkpoint_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_7/mappo/mappo_train_20260819_230511_327683_seed7/checkpoints/latest.pt",
+      "checkpoint_sha256": "b80872419547a40cd33b5d7a90a7655d6e11d5b0846e3f11e4294896554a2e52",
+      "status": "compatible",
+      "runtime_contract_sha256": "d01c2919c24ffaa38e86a31e7e055403d3ce4691d8f8df1e766da2be6c0cf1c8",
+      "formal_checkpoint": false
+    },
+    {
+      "capacity_label": "384mb",
+      "agent_name": "mappo",
+      "seed": 13,
+      "training_run_id": "mappo_train_20260819_230512_476631_seed13",
+      "training_summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/mappo/mappo_train_20260819_230512_476631_seed13/summary.json",
+      "checkpoint_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/rehearsal_runs/g14a_rehearsal_20260819_230456_872949/training/384mb/seed_13/mappo/mappo_train_20260819_230512_476631_seed13/checkpoints/latest.pt",
+      "checkpoint_sha256": "be2aec6cd44015c5035d1ec9542919bfeb9613086988384c08061b20dc340b1a",
+      "status": "compatible",
+      "runtime_contract_sha256": "d01c2919c24ffaa38e86a31e7e055403d3ce4691d8f8df1e766da2be6c0cf1c8",
+      "formal_checkpoint": false
+    }
+  ]
+}

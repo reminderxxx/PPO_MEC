@@ -22,9 +22,14 @@ from src.evaluators.main_results_support import (
     load_window_bundle,
     run_real_episode,
 )
+from src.runtime.typed_model_cache_runtime import (
+    load_runtime_catalog,
+    resolve_model_cache_runtime,
+    validate_checkpoint_provenance,
+)
 
 
-EVALUABLE_BASELINES = [agent for agent in list_evaluable_agents() if agent != "sa_ghmappo"]
+EVALUABLE_BASELINES = list_evaluable_agents()
 CHECKPOINT_REQUIRED = checkpoint_required_agents()
 SUMMARY_METRICS = [
     "total_reward",
@@ -51,6 +56,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Evaluate direction-matched baseline agents")
     parser.add_argument("--agent_name", choices=EVALUABLE_BASELINES, default="ppo")
     parser.add_argument("--checkpoint_path", default="")
+    parser.add_argument("--model_cache_runtime_config", default="")
+    parser.add_argument("--expected_train_window_plan_identity_path", default="")
     parser.add_argument("--mobility_source", choices=["ngsim", "lust"], default="ngsim")
     parser.add_argument("--primary_vehicle_selection", choices=["stable_first", "handoff_pressure"], default="stable_first")
     parser.add_argument("--mobility_csv_path", type=str, default="")
@@ -71,6 +78,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max_tasks", type=int, default=20)
     parser.add_argument("--random_seed", type=int, default=7)
     parser.add_argument("--classical_cache_slots", type=int, default=3)
+    parser.add_argument("--reward_positive_offset", type=float, default=5.0)
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "artifacts" / "eval" / "algo_pool"))
     args = parser.parse_args()
     if args.agent_name in CHECKPOINT_REQUIRED and not args.checkpoint_path:
@@ -95,6 +103,12 @@ def build_eval_row(summary: dict[str, Any]) -> dict[str, Any]:
         "window_id": summary["run_info"].get("window_id"),
         "seed": summary["run_info"].get("seed"),
         "primary_vehicle_selection": summary["run_info"].get("primary_vehicle_selection", "stable_first"),
+        "model_cache_profile": summary["run_info"].get("model_cache_profile"),
+        "runtime_contract_sha256": summary["run_info"].get("runtime_contract_sha256"),
+        "typed_catalog_fingerprint": summary["run_info"].get("typed_catalog_fingerprint"),
+        "checkpoint_provenance_status": summary["run_info"].get(
+            "checkpoint_provenance_status", "not_applicable"
+        ),
         "episode_success": bool(summary.get("episode_success", False)),
         "total_reward": float(summary["reward_breakdown"]["total"]["sum"]),
         "end_to_end_workflow_delay": metrics["end_to_end_workflow_delay"],
@@ -136,6 +150,11 @@ def metric_means(rows: list[dict[str, Any]]) -> dict[str, float]:
 
 def main() -> None:
     args = parse_args()
+    runtime_contract = resolve_model_cache_runtime(
+        args.model_cache_runtime_config or None,
+        root=ROOT_DIR,
+    )
+    adapter_catalog = load_runtime_catalog(runtime_contract, root=ROOT_DIR)
     run_id = datetime.now().strftime(f"{args.agent_name}_eval_%Y%m%d_%H%M%S")
     output_root = Path(args.output_root) / args.agent_name / run_id
     output_root.mkdir(parents=True, exist_ok=True)
@@ -160,21 +179,45 @@ def main() -> None:
     )
     checkpoint_map = {args.agent_name: args.checkpoint_path}
     algo_spec = get_algo_spec(args.agent_name)
-    cache_capacity_profile = None
+    cache_capacity_profile = dict(runtime_contract["cache_capacity_profile"])
+    if not cache_capacity_profile.get("enabled"):
+        cache_capacity_profile = None
     if algo_spec.get("required_eviction_policy"):
-        if args.classical_cache_slots <= 0:
-            raise ValueError("classical_cache_slots must be positive")
-        cache_capacity_profile = {
-            "enabled": True,
-            "unit": "adapter_slots",
-            "rsu_adapter_slots": args.classical_cache_slots,
-            "eviction_policy": algo_spec["required_eviction_policy"],
-            "eviction_policy_config": (
-                {"aging_interval": 8, "aging_factor": 0.5}
-                if args.agent_name == "reactive_aging_lfu"
-                else {}
-            ),
-        }
+        if cache_capacity_profile is None:
+            if args.classical_cache_slots <= 0:
+                raise ValueError("classical_cache_slots must be positive")
+            cache_capacity_profile = {
+                "enabled": True,
+                "unit": "adapter_slots",
+                "rsu_adapter_slots": args.classical_cache_slots,
+            }
+        cache_capacity_profile["eviction_policy"] = algo_spec["required_eviction_policy"]
+        cache_capacity_profile["eviction_policy_config"] = (
+            {"aging_interval": 8, "aging_factor": 0.5}
+            if args.agent_name == "reactive_aging_lfu"
+            else {}
+        )
+        if args.agent_name == "reactive_random":
+            cache_capacity_profile["eviction_policy_seed"] = args.random_seed
+    checkpoint_gate = {"status": "not_applicable", "checkpoint_sha256": None}
+    if args.checkpoint_path and runtime_contract["model_cache_profile"] == "typed_base_adapter_state_v1":
+        checkpoint_metadata = load_checkpoint_metadata(args.checkpoint_path)
+        provenance = checkpoint_metadata.get("typed_runtime_provenance") or {}
+        expected_window_identity = provenance.get("train_window_plan_identity") or {}
+        if args.expected_train_window_plan_identity_path:
+            expected_window_identity = json.loads(
+                Path(args.expected_train_window_plan_identity_path).read_text(encoding="utf-8-sig")
+            )
+        checkpoint_gate = validate_checkpoint_provenance(
+            args.checkpoint_path,
+            expected_agent_name=args.agent_name,
+            expected_seed=args.random_seed,
+            expected_runtime_contract=runtime_contract,
+            expected_reward_positive_offset=args.reward_positive_offset,
+            expected_window_plan_identity=expected_window_identity,
+        )
+        if checkpoint_gate["status"] != "compatible":
+            raise ValueError(f"typed checkpoint provenance gate failed: {checkpoint_gate}")
     rows: list[dict[str, Any]] = []
     episode_summaries: list[dict[str, Any]] = []
     for workflow_state in workflow_states:
@@ -189,12 +232,17 @@ def main() -> None:
             max_steps=args.max_steps,
             mobility_source=args.mobility_source,
             primary_vehicle_selection=args.primary_vehicle_selection,
+            reward_positive_offset=args.reward_positive_offset,
             cache_capacity_profile=cache_capacity_profile,
+            adapter_catalog_override=adapter_catalog,
+            model_cache_runtime_contract=runtime_contract,
             run_metadata={
                 "script": "scripts/eval_algo_pool_real_sample.py",
                 "run_id": run_id,
                 "evaluation_agent": args.agent_name,
                 "primary_vehicle_selection": args.primary_vehicle_selection,
+                "checkpoint_provenance_status": checkpoint_gate["status"],
+                "checkpoint_sha256": checkpoint_gate.get("checkpoint_sha256"),
             },
         )
         episode_summaries.append(summary)
@@ -208,6 +256,9 @@ def main() -> None:
         "agent_name": args.agent_name,
         "algo_spec": algo_spec,
         "cache_capacity_profile": cache_capacity_profile,
+        "resolved_model_cache_runtime": runtime_contract,
+        "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
+        "checkpoint_provenance_validation": checkpoint_gate,
         "checkpoint_path": args.checkpoint_path,
         "primary_vehicle_selection": args.primary_vehicle_selection,
         "checkpoint_metadata": (
