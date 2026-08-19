@@ -4,6 +4,7 @@
 
 ## Live 文档
 
+- `cache_information_sufficiency_marl_audit_contract.md`：G10 observation coverage、recoverability、aliasing、information gain和entity-level MARL necessity门禁
 - `cache_request_replay_contract.md`：G08 policy-neutral request replay schema、fingerprint和outcome隔离规则
 - `future_horizon_cache_oracle_contract.md`：G08 exact rolling finite-horizon oracle、可行域、objective、gap和artifact合同
 - `cache_oracle_identifiability_feasibility_audit.md`：G08修改前的request内生性、真实时序和可识别性源码审计

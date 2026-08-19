@@ -1,5 +1,16 @@
 # Artifact Records
 
+## 2026-08-19 G10 Cache Information Sufficiency validation
+
+- path: `artifacts/analysis/cache_information_sufficiency_validation_20260819_g10_v1/`
+- identity: `information_sufficiency_audit_contract_version=1.0.0`; agent=`sa_ghmappo`; matched G07 manifest/G08 replay fingerprint/G09 analysis fingerprint
+- architecture: one wrapper/controller emits one final action; SA-GHMAPPO has three controller-role heads and one centralized critic, without vehicle/RSU actor binding or independent entity-local observations
+- real input: NGSIM+Alibaba controlled G08 replay has 1 request/1 evaluation unit; G09 has 20 replicated baseline×H rows; no matched pre-action decision observation trace exists
+- result: source field coverage available; recoverability/aliasing/information gain unavailable; centralized information value, entity-level MARL necessity and GNN/GAT necessity are `UNVERIFIABLE`; overall verdict `UNVERIFIABLE`
+- synthetic: deterministic single-controller, local/global alias, global-conflict, all-condition entity-MARL gate, feature-removal and entropy/NMI/CMI cases pass; these validate the audit logic only
+- integrity: 8 required reports plus resolved config、synthetic validation、command log由`artifact_integrity_manifest.json`登记
+- boundary: not policy training, algorithm ranking, causal information effect, formal/holdout/hidden, paper readiness or G11 evidence
+
 ## 2026-08-19 G09 Cache Opportunity Analyzer validation
 
 - path: `artifacts/analysis/cache_opportunity_analyzer_validation_20260819_g09_v1/`

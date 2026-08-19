@@ -1,0 +1,135 @@
+{
+  "identity": {
+    "information_sufficiency_audit_contract_version": "1.0.0",
+    "decision_observation_trace_version": "unavailable",
+    "auditor_identity": "cache_information_sufficiency_marl_auditor_v1.0.0",
+    "agent_identity": "sa_ghmappo",
+    "request_replay_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+    "g07_manifest_id": "cbfm-90c2dda3fb82e270",
+    "g09_analysis_fingerprint": "e8f747034853c078b1c7cb274f1cbc2aaf8835bab28e1dd210b7e703ae5ff76c",
+    "reviewed_at": "2026-08-19",
+    "literature_cutoff": "2026-08-14",
+    "target_venue": "IEEE TMC",
+    "review_policy_version": "tmc_review_policy_v3_20260621",
+    "g07_manifest_git_commit": "5d76596aa08c6589e4cc028d78b3383d48b830e6",
+    "audit_fingerprint": "3ba9bad26d766f992904e1c1a77fe16730ea9ddfe237e071326230f1270c1554",
+    "artifact_run_id": "cache_information_sufficiency_validation_20260819_g10_v1",
+    "git_commit_reviewed": "471de1326037f5f431f371fa6721418438468189"
+  },
+  "report": {
+    "synthetic_validation_version": "1.0.0",
+    "diagnostic_only_not_policy_training": true,
+    "single_controller_sufficient_case": {
+      "verdict": "supported",
+      "reason": "one controller observes the complete synthetic state and emits the only joint action"
+    },
+    "local_alias_global_disambiguation_case": {
+      "local": {
+        "group_count": 1,
+        "alias_group_count": 1,
+        "conflicting_oracle_action_group_count": 1,
+        "conditional_label_entropy_bits": 1.0,
+        "conflict_request_count": 2,
+        "conflict_request_coverage": 1.0,
+        "conflict_mb": 2.0,
+        "examples": [
+          [
+            {
+              "request_id": "q1",
+              "oracle_action": "noop"
+            },
+            {
+              "request_id": "q2",
+              "oracle_action": "admit"
+            }
+          ]
+        ]
+      },
+      "global": {
+        "group_count": 2,
+        "alias_group_count": 0,
+        "conflicting_oracle_action_group_count": 0,
+        "conditional_label_entropy_bits": 0.0,
+        "conflict_request_count": 0,
+        "conflict_request_coverage": 0.0,
+        "conflict_mb": 0,
+        "examples": []
+      },
+      "passed": true
+    },
+    "global_observation_still_insufficient_case": {
+      "global": {
+        "group_count": 1,
+        "alias_group_count": 1,
+        "conflicting_oracle_action_group_count": 1,
+        "conditional_label_entropy_bits": 1.0,
+        "conflict_request_count": 2,
+        "conflict_request_coverage": 1.0,
+        "conflict_mb": 2.0,
+        "examples": [
+          [
+            {
+              "request_id": "q1",
+              "oracle_action": "noop"
+            },
+            {
+              "request_id": "q2",
+              "oracle_action": "admit"
+            }
+          ]
+        ]
+      },
+      "passed": true
+    },
+    "entity_level_marl_all_conditions_case": {
+      "verdict": "supported",
+      "gate": {
+        "two_or_more_real_decision_entities": true,
+        "independent_local_observations": true,
+        "entity_owned_actions": true,
+        "concurrent_or_coupled_actions": true,
+        "irreducible_local_information_limit": true,
+        "stable_cross_entity_incremental_information": true,
+        "nontrivial_cross_rsu_opportunity": true,
+        "multiple_independent_evaluation_units": true,
+        "centralized_controller_lacks_required_information": true
+      },
+      "passed": true
+    },
+    "hand_checkable_information_case": {
+      "labels": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "projection": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "expected_entropy_bits": 1.0,
+      "expected_nmi": 1.0,
+      "result": {
+        "estimator": "empirical_plugin_discrete_v1.0.0",
+        "sample_count": 4,
+        "independent_evaluation_unit_count": 2,
+        "effective_condition_cells": 2,
+        "mean_samples_per_cell": 2.0,
+        "sparse_cell_warning": true,
+        "mutual_information_is_causal": false,
+        "availability": "available",
+        "label_entropy_bits": 1.0,
+        "conditional_entropy_bits": 0.0,
+        "information_gain_bits": 1.0,
+        "normalized_mutual_information": 1.0
+      }
+    },
+    "feature_removal_projection_names": [
+      "without_cache_state",
+      "without_cross_rsu",
+      "without_handoff_prediction"
+    ]
+  }
+}

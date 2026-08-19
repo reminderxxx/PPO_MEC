@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-08-19: G10 将 centralized information value 与 entity-level MARL necessity 分离
+
+- 决定：architecture只按源码的actor binding、observation isolation、action ownership和execution aggregation分类，不按 PPO/MAPPO/SA-GHMAPPO 名称分类。当前 PPO=single controller；MAPPO/SA-GHMAPPO=controller-level CTDE，不是entity-level MARL。
+- 决定：缺matched pre-action trace时，动态recoverability/aliasing/information gain返回unavailable；不得用不同request rerun、CacheEvent outcome、aggregate或oracle future补齐。
+- 决定：aliasing使用固定exact/hash/coarsened keys和预注册feature-removal projection；统计使用fixed empirical plug-in estimator，并按evaluation unit而非H/baseline复制计独立样本。
+- 决定：entity-level MARL必须同时通过九项必要条件门禁；centralized information benefit、factorized controller benefit和graph representation benefit分别报告，互不替代。
+- 决定：当前1-request真实validation总 verdict 为`UNVERIFIABLE`。Synthetic supported案例仅证明判定器可到达，不是当前系统或算法的正面证据；G11不在本任务范围。
+
 ## 2026-08-19: G09 机会分析只消费匹配 raw artifact，并冻结互斥 taxonomy
 
 - 决定：机会存在由 external replay 描述，feasible opportunity由 G08 exact action trace描述，capture/loss只由逐request raw baseline outcome比较；reward、aggregate、hidden state和文档摘要永不作为输入。

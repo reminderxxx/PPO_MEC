@@ -1,5 +1,12 @@
 # Code Module Map
 
+## G10 information sufficiency and MARL necessity audit
+
+- `src/analysis/information_sufficiency_audit.py`：纯只读 G10 reducer；冻结源码architecture facts、15项field map、trace leakage/alignment、recoverability、aliasing/projection、plug-in entropy/NMI/CMI和entity-level必要条件门禁。
+- `scripts/audit_cache_information_sufficiency.py`：严格消费 G07/G08/G09 与可选 matched pre-action trace；默认拒绝覆盖，输出 resolved config、command log、synthetic validation与integrity manifest，不训练或修改checkpoint。
+- `tests/test_information_sufficiency_audit.py`：覆盖single/factorized/controller-CTDE/entity MARL、field/index/normalization/leakage、recoverability、local/global aliasing、fixed projection、统计小样本、identity/integrity与determinism。
+- `docs/project/cache_information_sufficiency_marl_audit_contract.md`：冻结controller-level/entity-level、GNN/GAT、prohibited claims和G11边界。
+
 ## G09 cache opportunity analyzer
 
 - `src/analysis/cache_opportunity_analyzer.py`：纯 G09 reducer；严格校验 G07/G08/raw baseline identity，生成 demand/oracle/capture-loss request rows、taxonomy、fixed buckets、concentration、information labels和reconciliation。

@@ -1,5 +1,19 @@
 # Runbook
 
+## G10 cache information sufficiency只读审计
+
+```bash
+.venv/bin/python scripts/audit_cache_information_sufficiency.py \
+  --fairness_manifest_path <g07_manifest.json> \
+  --request_replay_path <g08_request_replay.json> \
+  --oracle_action_trace_path <g08_oracle_action_trace.json> \
+  --opportunity_rows_path <g09_request_opportunity_rows.json> \
+  --agent_identity sa_ghmappo \
+  --output_dir artifacts/analysis/cache_information_sufficiency_validation_<run_id>
+```
+
+只有同一 request replay 上 action 前采集、通过 `decision_observation_trace_version=1.0.0` 校验的 trace 才可用 `--observation_trace_path`。旧artifact缺trace时保持unavailable，禁止从CacheEvent/outcome或不同rerun拼接。该命令不训练、不改checkpoint、不运行formal/holdout/hidden/G11；默认拒绝覆盖。
+
 ## G09 cache opportunity analyzer
 
 ```bash

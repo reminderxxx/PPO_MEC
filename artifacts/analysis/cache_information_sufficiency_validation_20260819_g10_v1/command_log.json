@@ -1,0 +1,37 @@
+{
+  "recorded_at": "2026-08-19T06:47:08.395741Z",
+  "argv": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "scripts/audit_cache_information_sufficiency.py",
+    "--fairness_manifest_path",
+    "artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/cache_baseline_fairness_manifest.json",
+    "--request_replay_path",
+    "artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/request_replay.json",
+    "--oracle_action_trace_path",
+    "artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/oracle_action_trace.json",
+    "--opportunity_rows_path",
+    "artifacts/analysis/cache_opportunity_analyzer_validation_20260819_g09_v1/request_opportunity_rows.json",
+    "--agent_identity",
+    "sa_ghmappo",
+    "--output_dir",
+    "artifacts/analysis/cache_information_sufficiency_validation_20260819_g10_v1"
+  ],
+  "shell_command": "/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/audit_cache_information_sufficiency.py --fairness_manifest_path artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/cache_baseline_fairness_manifest.json --request_replay_path artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/request_replay.json --oracle_action_trace_path artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/oracle_action_trace.json --opportunity_rows_path artifacts/analysis/cache_opportunity_analyzer_validation_20260819_g09_v1/request_opportunity_rows.json --agent_identity sa_ghmappo --output_dir artifacts/analysis/cache_information_sufficiency_validation_20260819_g10_v1",
+  "git_commit": "471de1326037f5f431f371fa6721418438468189",
+  "information_sufficiency_audit_contract_version": "1.0.0",
+  "reward_read": false,
+  "aggregate_read": false,
+  "oracle_future_treated_as_observable": false,
+  "hidden_read": false,
+  "training_executed": false,
+  "checkpoint_modified": false,
+  "formal_holdout_hidden_executed": false,
+  "g11_executed": false,
+  "input_paths": {
+    "fairness_manifest": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/cache_baseline_fairness_manifest_validation_20260819_g07_final/cache_baseline_fairness_manifest.json",
+    "request_replay": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/request_replay.json",
+    "oracle_action_trace": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/future_horizon_cache_oracle_validation_20260819_g08_v1/oracle_action_trace.json",
+    "opportunity_rows": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/cache_opportunity_analyzer_validation_20260819_g09_v1/request_opportunity_rows.json",
+    "observation_trace": null
+  }
+}

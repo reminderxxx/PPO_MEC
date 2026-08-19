@@ -1,0 +1,31 @@
+{
+  "identity": {
+    "information_sufficiency_audit_contract_version": "1.0.0",
+    "decision_observation_trace_version": "unavailable",
+    "auditor_identity": "cache_information_sufficiency_marl_auditor_v1.0.0",
+    "agent_identity": "sa_ghmappo",
+    "request_replay_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+    "g07_manifest_id": "cbfm-90c2dda3fb82e270",
+    "g09_analysis_fingerprint": "e8f747034853c078b1c7cb274f1cbc2aaf8835bab28e1dd210b7e703ae5ff76c",
+    "reviewed_at": "2026-08-19",
+    "literature_cutoff": "2026-08-14",
+    "target_venue": "IEEE TMC",
+    "review_policy_version": "tmc_review_policy_v3_20260621",
+    "g07_manifest_git_commit": "5d76596aa08c6589e4cc028d78b3383d48b830e6",
+    "audit_fingerprint": "3ba9bad26d766f992904e1c1a77fe16730ea9ddfe237e071326230f1270c1554",
+    "artifact_run_id": "cache_information_sufficiency_validation_20260819_g10_v1",
+    "git_commit_reviewed": "471de1326037f5f431f371fa6721418438468189"
+  },
+  "report": {
+    "status": "pass",
+    "errors": [],
+    "decision_observation_trace": {
+      "status": "unavailable",
+      "reason": "decision-time observation trace was not supplied; old artifacts are not reconstructed"
+    },
+    "request_count": 1,
+    "g09_row_count": 20,
+    "replicated_rows_are_independent_samples": false,
+    "request_replay_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4"
+  }
+}

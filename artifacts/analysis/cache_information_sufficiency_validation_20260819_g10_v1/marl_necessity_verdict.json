@@ -1,0 +1,78 @@
+{
+  "identity": {
+    "information_sufficiency_audit_contract_version": "1.0.0",
+    "decision_observation_trace_version": "unavailable",
+    "auditor_identity": "cache_information_sufficiency_marl_auditor_v1.0.0",
+    "agent_identity": "sa_ghmappo",
+    "request_replay_fingerprint": "7ebdc3636cdd060820332c2793ab04dd7843c17f4b38f2ca9ff1c2f743637ee4",
+    "g07_manifest_id": "cbfm-90c2dda3fb82e270",
+    "g09_analysis_fingerprint": "e8f747034853c078b1c7cb274f1cbc2aaf8835bab28e1dd210b7e703ae5ff76c",
+    "reviewed_at": "2026-08-19",
+    "literature_cutoff": "2026-08-14",
+    "target_venue": "IEEE TMC",
+    "review_policy_version": "tmc_review_policy_v3_20260621",
+    "g07_manifest_git_commit": "5d76596aa08c6589e4cc028d78b3383d48b830e6",
+    "audit_fingerprint": "3ba9bad26d766f992904e1c1a77fe16730ea9ddfe237e071326230f1270c1554",
+    "artifact_run_id": "cache_information_sufficiency_validation_20260819_g10_v1",
+    "git_commit_reviewed": "471de1326037f5f431f371fa6721418438468189"
+  },
+  "report": {
+    "overall_verdict": "UNVERIFIABLE",
+    "single_controller_sufficient_in_principle": "partially_supported",
+    "centralized_information_beneficial": "unverifiable",
+    "factorized_decision_beneficial": "partially_supported",
+    "entity_level_marl_evidence": "unverifiable",
+    "gnn_gat_necessity": "unverifiable",
+    "necessary_condition_gate": {
+      "two_or_more_real_decision_entities": false,
+      "independent_local_observations": false,
+      "entity_owned_actions": false,
+      "concurrent_or_coupled_actions": false,
+      "irreducible_local_information_limit": false,
+      "stable_cross_entity_incremental_information": false,
+      "nontrivial_cross_rsu_opportunity": false,
+      "multiple_independent_evaluation_units": false,
+      "centralized_controller_lacks_required_information": false
+    },
+    "all_entity_level_conditions_met": false,
+    "cross_rsu_unique_request_count": 0,
+    "independent_evaluation_unit_count": 1,
+    "blockers": [
+      "two_or_more_real_decision_entities",
+      "independent_local_observations",
+      "entity_owned_actions",
+      "concurrent_or_coupled_actions",
+      "irreducible_local_information_limit",
+      "stable_cross_entity_incremental_information",
+      "nontrivial_cross_rsu_opportunity",
+      "multiple_independent_evaluation_units",
+      "centralized_controller_lacks_required_information"
+    ],
+    "prohibited_claims": [
+      "MAPPO naming, multiple heads, parameter sharing, a centralized critic, or graph structure proves entity-level MARL necessity",
+      "centralized information benefit is equivalent to MARL necessity",
+      "mutual information or conditional mutual information is causal",
+      "replicated horizon/baseline rows are independent samples",
+      "GNN/GAT is necessary without matched feature-value evidence"
+    ],
+    "evidence_level": "E1_DOCUMENTED_CONTRACT_PLUS_MATCHED_G07_G09_WITHOUT_DECISION_TRACE",
+    "architecture_classification": "controller_level_ctde",
+    "conclusion_matrix": {
+      "observation_schema_coverage": "PARTIALLY_SUPPORTED",
+      "actor_local_sufficiency": "UNVERIFIABLE",
+      "controller_level_sufficiency": "UNVERIFIABLE",
+      "predictor_sufficiency": "UNVERIFIABLE",
+      "cross_rsu_information_value": "UNVERIFIABLE",
+      "centralized_information_benefit": "UNVERIFIABLE",
+      "factorized_decision_benefit": "PARTIALLY_SUPPORTED",
+      "entity_level_marl_necessity": "UNVERIFIABLE",
+      "gnn_gat_necessity": "UNVERIFIABLE"
+    },
+    "required_next_evidence": [
+      "matched pre-action decision_observation_trace_v1 on the exact G08 replay",
+      "multiple independent non-overlapping evaluation units with nontrivial cross-RSU opportunities",
+      "real entity-bound local observations and entity-owned coupled actions before an entity-level MARL claim",
+      "pre-registered graph/cross-RSU/handoff/cache-state projections followed by independent algorithm evaluation"
+    ]
+  }
+}

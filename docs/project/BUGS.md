@@ -2,6 +2,15 @@
 
 用途：记录当前有效问题、风险和禁止误读项。
 
+## 2026-08-19: G10 information audit frozen; entity-level MARL remains unverified
+
+- `RESOLVED / architecture naming`：源码级审计已冻结 PPO=single controller、MAPPO/SA-GHMAPPO=controller-level CTDE；多个controller head、参数共享或centralized critic不再视为vehicle/RSU-level actor证据。
+- `RESOLVED / diagnostic leakage`：G10拒绝reward、aggregate、hidden、oracle future、事后service/cache outcome和不同request流拼接；固定bucket/projection/plug-in estimator不能按结果调节。
+- `OPEN / decision trace`：现有 G07–G09 artifact缺逐request action前 observation trace，不能真实计算 recoverability、aliasing、NMI/CMI；禁止从CacheEvent或oracle future反推当前observation。
+- `OPEN / sample independence`：真实validation只有1 request/1 evaluation unit；1×4H×5baseline的20行不提供20个独立样本，cross-RSU信息价值、实体级MARL必要性和GNN/GAT必要性均`UNVERIFIABLE`。
+- `BLOCKER / entity MARL claim`：当前无两个真实entity actors、独立local observation、entity-owned concurrent/coupled actions；即使未来证明global information有用，也只支持centralized-information benefit，不自动支持entity-level MARL。
+- `BOUNDARY / G11`：G10只冻结诊断与接口，不授权扩展observation/encoder/agent/reward/action、训练或执行G11。
+
 ## 2026-08-19: G09 analyzer contract frozen; evidence scope remains diagnostic
 
 - `RESOLVED / request attribution contract`：G09现从matched external replay、exact oracle action trace和baseline raw request outcome重算机会；fingerprint/capacity/initial/H/objective/ID mismatch及taxonomy不守恒均fail-fast。

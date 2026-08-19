@@ -1,0 +1,65 @@
+{
+  "artifact_integrity_manifest_version": "1.0.0",
+  "information_sufficiency_audit_contract_version": "1.0.0",
+  "audit_fingerprint": "3ba9bad26d766f992904e1c1a77fe16730ea9ddfe237e071326230f1270c1554",
+  "manifest_validation_status": "pass",
+  "request_replay_validation_status": "pass",
+  "audit_input_validation_status": "pass",
+  "files": [
+    {
+      "path": "architecture_audit.json",
+      "size_bytes": 3852,
+      "sha256": "84c919bb167d282c8e5aafab87f63e0b297726043a367a7021aa96eaf398f370"
+    },
+    {
+      "path": "command_log.json",
+      "size_bytes": 2711,
+      "sha256": "6baa0c271f00b843acfae901610059946db8a86b41304a28a6fef2a71eaff0cf"
+    },
+    {
+      "path": "information_gain.json",
+      "size_bytes": 1158,
+      "sha256": "c4688f9e4e176c430dd86822f3937262d4a7cb9d3f5bdd8666b207beed89fca8"
+    },
+    {
+      "path": "input_validation_report.json",
+      "size_bytes": 1435,
+      "sha256": "550aee981f0378ccb56d498e0683f45801a815b9b992132c86d1a92447040fe5"
+    },
+    {
+      "path": "marl_necessity_verdict.json",
+      "size_bytes": 3950,
+      "sha256": "c22a65080d8b8785a6e2db252cfa4b6fabc6fd3689bc5646ce69916bc133714c"
+    },
+    {
+      "path": "observation_aliasing.json",
+      "size_bytes": 1158,
+      "sha256": "c4688f9e4e176c430dd86822f3937262d4a7cb9d3f5bdd8666b207beed89fca8"
+    },
+    {
+      "path": "observation_field_map.json",
+      "size_bytes": 30685,
+      "sha256": "d313c3026bf20e2944ec0c093a95c29cda6c9d8e12e31b76a6234f2f969448e3"
+    },
+    {
+      "path": "observation_recoverability.json",
+      "size_bytes": 1122,
+      "sha256": "37d9f0ce4fd7f9f5f76dd69c2eed158b6f8471ecf999a7f0ddb862ffa82305e4"
+    },
+    {
+      "path": "opportunity_identifiability.json",
+      "size_bytes": 4525,
+      "sha256": "c432f5ecc9de0eb698f5fae794185ea4cbbdf8f06f2342c9e14042a377acbe5a"
+    },
+    {
+      "path": "resolved_config.json",
+      "size_bytes": 1757,
+      "sha256": "419629ed3877b8dd3d3b040617c3f7d4f5cdb09aa07ac2df68f43440ee59dd0f"
+    },
+    {
+      "path": "synthetic_validation.json",
+      "size_bytes": 4365,
+      "sha256": "63e32752ffd2e297c52caf29107a44003ad1d5fb47be38e9aacf345ad810eebe"
+    }
+  ]
+}

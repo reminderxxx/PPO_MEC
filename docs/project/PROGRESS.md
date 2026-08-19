@@ -1,5 +1,14 @@
 ﻿# Progress
 
+## 2026-08-19: G10 Observation Information Sufficiency and MARL Necessity Audit frozen
+
+- 新增 `information_sufficiency_audit_contract_version=1.0.0`、只读 core reducer 与稳定 CLI；严格绑定 G07 manifest、G08 replay/oracle action trace、G09 request rows，拒绝 hidden、reward、aggregate、oracle future、事后 service result、duplicate/NaN/identity drift。
+- 源码审计确认：PPO 是 single controller/1 flat actor；MAPPO 和 SA-GHMAPPO 是 3 controller-role heads + 1 centralized critic 的 controller-level CTDE。三个 head 不绑定 vehicle/RSU，缺独立 entity-local observation 和 entity-owned action，最终仍集中聚合为一个 `semantic_discrete_5` action。
+- 冻结15项 field map、exact/lossy/absent/inconsistent recoverability、exact/hash/fixed-coarsened aliasing、local/global/critic/predictor scopes、三类 feature-removal projection及 empirical plug-in entropy/NMI/CMI；coverage不等于sufficiency，MI不作因果解释。
+- Validation artifact：`artifacts/analysis/cache_information_sufficiency_validation_20260819_g10_v1/`。真实 NGSIM+Alibaba controlled input仅1 request/1 evaluation unit，且 G07–G09 没有匹配的 pre-action observation trace；动态 recoverability/aliasing/MI unavailable，entity-level MARL和GNN/GAT verdict均`UNVERIFIABLE`。20个G09复制rows不计独立样本。
+- Synthetic validation覆盖 single-controller充分、local alias/global区分、global仍alias、entity-level全部门禁正例、feature removal和手工可核验 entropy/NMI/CMI；仅验证诊断器，不是policy或架构性能证据。
+- 未修改 observation、encoder、agent、critic、reward、action 或 checkpoint；未训练、调参、执行 G11、formal、holdout或hidden。
+
 ## 2026-08-19: G09 Cache Opportunity Analyzer Contract frozen
 
 - 新增 `cache_opportunity_analyzer_contract_version=1.0.0`、pure analyzer与稳定 CLI；输入严格限定为 G07 identity、G08 external replay/exact result/action trace、initial capacity/cache和matched baseline raw request outcome。
