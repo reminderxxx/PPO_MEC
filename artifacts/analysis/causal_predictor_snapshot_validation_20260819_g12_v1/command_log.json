@@ -7,7 +7,7 @@
   ],
   "cwd": "/Users/howen/Projects/PPO_MEC",
   "formal_holdout_hidden_executed": false,
-  "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
-  "reviewed_at": "2026-08-19T08:37:54.335664+00:00",
+  "git_commit": "39da3e7d40cca36e286c7a38b8846bb768562d2a",
+  "reviewed_at": "2026-08-19T08:41:05.501244+00:00",
   "training_or_tuning_executed": false
 }

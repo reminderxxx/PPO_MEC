@@ -44,7 +44,7 @@
   "evaluation_labels_used_for_fit": false,
   "fit_split": "calibration",
   "fit_split_manifest_sha256": "931a226b039d27501f84b10b33917cdb9bf55a54da17fa633b3bd217af1a7253",
-  "git_commit_at_generation": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+  "git_commit_at_generation": "39da3e7d40cca36e286c7a38b8846bb768562d2a",
   "parameters": {
     "handoff": {
       "converged": true,

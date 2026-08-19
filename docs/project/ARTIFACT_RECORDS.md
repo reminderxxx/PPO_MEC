@@ -2,7 +2,7 @@
 
 ## 2026-08-19: G12 causal predictor snapshot validation
 
-- Artifact root：`artifacts/analysis/causal_predictor_snapshot_validation_20260819_g12_v1/`；16个小型JSON，integrity aggregate SHA-256=`642547267d433bd2ac1455c3abe4f1670e063a03d644a259484361344fa1726d`。
+- Artifact root：`artifacts/analysis/causal_predictor_snapshot_validation_20260819_g12_v1/`；16个小型JSON，integrity aggregate SHA-256=`91c21a5775dd1c5d96561d03a52007be378570ed49111212e5dde847305d9cab`。
 - 输入：v112 checkpoint/quality/metrics manifest，v71 non-hidden train/dev plans，NGSIM前1500 rows内max-handoff 24-frame最小window及Alibaba ordered workflow；未复制raw payload。
 - 三段rows=`29,067/11,992/33,260`，跨split frame/time/segment-frame冲突0，split SHA-256=`931a226b039d27501f84b10b33917cdb9bf55a54da17fa633b3bd217af1a7253`。
 - binary handoff temperature=`1.0815913534284083`，threshold=`0.95`；dev Brier/NLL/ECE由`0.0414765/0.1496381/0.0111715`变为`0.0412311/0.1480085/0.0056475`。multiclass probability metrics因历史logits缺失为unavailable。

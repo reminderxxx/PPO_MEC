@@ -59,7 +59,7 @@ reliability bins 固定为 `[0,.1), ... [.9,1.0]`，最后一段含 1；每 bin 
 - MCE：`0.0954854545 -> 0.0572283667`
 - AUROC：`0.8729678455`，排序不变。
 
-历史 quality rows 未保留 next-RSU/target 全量 logits，因此真实 multiclass Brier/NLL/ECE 不能可靠重建，明确为 unavailable；不能用 hard accuracy冒充 calibration。hard-only dev next-RSU accuracy为 `0.9578828970`；handoff-positive eligible target top-1 为 `0.0018226002`，暴露当前 target head 与旧 all-row accuracy 的严重口径差异。ETA 在 1,646 个 handoff-positive rows 上 MAE `0.6821579496`、RMSE `0.8192647841`、median absolute error `0.9687415`，interval coverage unavailable。
+历史 quality rows 未保留 next-RSU/target 全量 logits，因此真实 multiclass Brier/NLL/ECE 不能可靠重建，明确为 unavailable；不能用 hard accuracy冒充 calibration。空的next-RSU label按冻结`__none__`类处理后，all-row dev hard top-1为 `0.9567047505`；handoff-positive eligible target top-1 为 `0.0018226002`，暴露当前 target head 与旧 all-row target accuracy 的严重口径差异。ETA 在 1,646 个 handoff-positive rows 上 MAE `0.6821579496`、RMSE `0.8192647841`、median absolute error `0.9687415`，interval coverage unavailable。
 
 ## 6. Selective prediction
 

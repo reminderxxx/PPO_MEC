@@ -1,5 +1,5 @@
 {
-  "aggregate_sha256": "642547267d433bd2ac1455c3abe4f1670e063a03d644a259484361344fa1726d",
+  "aggregate_sha256": "91c21a5775dd1c5d96561d03a52007be378570ed49111212e5dde847305d9cab",
   "artifact_integrity_contract_version": "g12_artifact_integrity_v1.0.0",
   "file_count_excluding_manifest": 15,
   "files": [
@@ -10,17 +10,17 @@
     },
     {
       "path": "calibration_parameters.json",
-      "sha256": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+      "sha256": "cf62cc5fc1ac177e4ffd800c1c284e23906414f6210f29aab3b1716ae5656407",
       "size_bytes": 2982
     },
     {
       "path": "command_log.json",
-      "sha256": "16497610e09e830329ea8e19f440f531d9ed9892b60414e8758b020c24b14a2e",
+      "sha256": "85588eb9bcb5625a48181d981e9a4c4cd58072b0c66f8976555c37f15fc05207",
       "size_bytes": 404
     },
     {
       "path": "decision_observation_trace_sample.json",
-      "sha256": "645b7bcfc7fd1d3d4c2f027b373d901cb6bd2807f11fc0b2e730408bf4b0b76b",
+      "sha256": "8b642ce0cd9d4be6a86a65044be33aabb384be926b03c1f8ee5221cefec09069",
       "size_bytes": 57492
     },
     {
@@ -30,17 +30,17 @@
     },
     {
       "path": "metrics_after_calibration.json",
-      "sha256": "534049c17fd41123848dcabc049236b2f6fc4e84813b2ff2adbf3c4d01e5fd45",
-      "size_bytes": 16139
+      "sha256": "3ff6a47d71faab6c53e4e6b3407b741ee0077150da23afd68a1cc9018640dd33",
+      "size_bytes": 16330
     },
     {
       "path": "metrics_before_calibration.json",
-      "sha256": "6e250c6fd96b05c258f1e94f90f46babf6035ad7f62bf39fb0930b7b16134287",
-      "size_bytes": 15806
+      "sha256": "23babda92595fd831a6e83d1a8ee299f0b43b8dd89936ffa91510022260d1d53",
+      "size_bytes": 15997
     },
     {
       "path": "predictor_causality_audit.json",
-      "sha256": "a411217f4c9be4aa4cee773627f972870930bd528d57ca9f4d7a04066a286c36",
+      "sha256": "47e1862080b8bdaab3d58b7637fae98676c7a27380500ff18cadbd98b00119e1",
       "size_bytes": 659
     },
     {
@@ -55,12 +55,12 @@
     },
     {
       "path": "snapshot_examples.json",
-      "sha256": "bfbcedf54020729518b54229c058a3b9d2ffc8206dcab2bc02e3daf47334dd92",
+      "sha256": "b7a2575ac31f481f75ab575754ad1c020784357eb2c0a678a8c47b354c34cb24",
       "size_bytes": 47974
     },
     {
       "path": "snapshot_validation.json",
-      "sha256": "7368bd9f8f7b32c4aaca47fc5f1c353d2ea9d787ab3a14d6a5eda739b65e7399",
+      "sha256": "edaf2f663ede42979524d722e1221168356146e29bf420e18726114dc4680f11",
       "size_bytes": 1519
     },
     {

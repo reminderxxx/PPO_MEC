@@ -11,6 +11,7 @@ from pathlib import Path
 
 import torch
 
+from scripts.audit_predictor_calibration import hard_classification_metrics
 from src.envs.core.predictor_manager import PredictorManager
 from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv
 from src.envs.specs import ControlAction
@@ -212,6 +213,22 @@ class CausalPredictorSnapshotTest(unittest.TestCase):
         self.assertAlmostEqual(metrics["negative_log_likelihood"], -(math.log(0.8) + math.log(0.9)) / 2)
         self.assertIn("a", metrics["classwise_calibration"])
         self.assertTrue(metrics["probability_simplex_validation"]["passed"])
+
+    def test_historical_empty_next_label_maps_to_none_class(self) -> None:
+        metrics = hard_classification_metrics(
+            [
+                {"next": "rsu_a", "prediction": "0"},
+                {"next": "", "prediction": "1"},
+            ],
+            label_key="next",
+            prediction_key="prediction",
+            class_names=["rsu_a", "__none__"],
+            empty_label_class="__none__",
+        )
+        self.assertEqual(metrics["sample_count"], 2)
+        self.assertEqual(metrics["empty_label_count"], 1)
+        self.assertEqual(metrics["unknown_class_count"], 0)
+        self.assertEqual(metrics["top_1_accuracy"], 1.0)
 
     def test_empty_bins_zero_denominators_and_missing_tasks_are_null(self) -> None:
         bins = reliability_bins([1], [0.95])

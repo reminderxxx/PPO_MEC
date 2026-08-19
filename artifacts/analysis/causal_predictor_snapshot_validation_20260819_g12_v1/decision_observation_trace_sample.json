@@ -121,7 +121,7 @@
             "availability_mask": 0,
             "predicted_handoff_target_rsu_id": null,
             "predicted_next_rsu_id": null,
-            "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+            "snapshot_id": "causal-predictor-d2ff128dec99402fb07e3fda"
           }
         },
         "post_decision_outcome": {
@@ -134,7 +134,7 @@
           "contract_version": "1.0.0",
           "generated_at_step": 0,
           "observation_as_of_step": 0,
-          "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+          "snapshot_id": "causal-predictor-d2ff128dec99402fb07e3fda"
         },
         "raw_semantic_fields": {
           "current_rsu_id": "rsu_b",
@@ -153,7 +153,7 @@
             "availability_mask": 0,
             "predicted_handoff_target_rsu_id": null,
             "predicted_next_rsu_id": null,
-            "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+            "snapshot_id": "causal-predictor-d2ff128dec99402fb07e3fda"
           },
           "primary_vehicle_id": "peachtree:846"
         },
@@ -275,7 +275,7 @@
             "availability_mask": 0,
             "predicted_handoff_target_rsu_id": null,
             "predicted_next_rsu_id": null,
-            "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+            "snapshot_id": "causal-predictor-d2ff128dec99402fb07e3fda"
           }
         },
         "post_decision_outcome": {
@@ -288,7 +288,7 @@
           "contract_version": "1.0.0",
           "generated_at_step": 0,
           "observation_as_of_step": 0,
-          "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+          "snapshot_id": "causal-predictor-d2ff128dec99402fb07e3fda"
         },
         "raw_semantic_fields": {
           "current_rsu_id": "rsu_c",
@@ -307,7 +307,7 @@
             "availability_mask": 0,
             "predicted_handoff_target_rsu_id": null,
             "predicted_next_rsu_id": null,
-            "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+            "snapshot_id": "causal-predictor-d2ff128dec99402fb07e3fda"
           },
           "primary_vehicle_id": "peachtree:846"
         },
@@ -429,7 +429,7 @@
             "availability_mask": 0,
             "predicted_handoff_target_rsu_id": null,
             "predicted_next_rsu_id": null,
-            "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+            "snapshot_id": "causal-predictor-d2ff128dec99402fb07e3fda"
           }
         },
         "post_decision_outcome": {
@@ -442,7 +442,7 @@
           "contract_version": "1.0.0",
           "generated_at_step": 0,
           "observation_as_of_step": 0,
-          "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+          "snapshot_id": "causal-predictor-d2ff128dec99402fb07e3fda"
         },
         "raw_semantic_fields": {
           "current_rsu_id": "rsu_c",
@@ -461,7 +461,7 @@
             "availability_mask": 0,
             "predicted_handoff_target_rsu_id": null,
             "predicted_next_rsu_id": null,
-            "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd"
+            "snapshot_id": "causal-predictor-d2ff128dec99402fb07e3fda"
           },
           "primary_vehicle_id": "peachtree:846"
         },
@@ -583,7 +583,7 @@
             "availability_mask": 0,
             "predicted_handoff_target_rsu_id": null,
             "predicted_next_rsu_id": null,
-            "snapshot_id": "causal-predictor-bcb4249be081e667ae24372f"
+            "snapshot_id": "causal-predictor-c5e93a4d6d2498f1134dcf4f"
           }
         },
         "post_decision_outcome": {
@@ -596,7 +596,7 @@
           "contract_version": "1.0.0",
           "generated_at_step": 3,
           "observation_as_of_step": 3,
-          "snapshot_id": "causal-predictor-bcb4249be081e667ae24372f"
+          "snapshot_id": "causal-predictor-c5e93a4d6d2498f1134dcf4f"
         },
         "raw_semantic_fields": {
           "current_rsu_id": "rsu_b",
@@ -615,7 +615,7 @@
             "availability_mask": 0,
             "predicted_handoff_target_rsu_id": null,
             "predicted_next_rsu_id": null,
-            "snapshot_id": "causal-predictor-bcb4249be081e667ae24372f"
+            "snapshot_id": "causal-predictor-c5e93a4d6d2498f1134dcf4f"
           },
           "primary_vehicle_id": "peachtree:847"
         },
@@ -737,7 +737,7 @@
             "availability_mask": 0,
             "predicted_handoff_target_rsu_id": null,
             "predicted_next_rsu_id": null,
-            "snapshot_id": "causal-predictor-bcb4249be081e667ae24372f"
+            "snapshot_id": "causal-predictor-c5e93a4d6d2498f1134dcf4f"
           }
         },
         "post_decision_outcome": {
@@ -750,7 +750,7 @@
           "contract_version": "1.0.0",
           "generated_at_step": 3,
           "observation_as_of_step": 3,
-          "snapshot_id": "causal-predictor-bcb4249be081e667ae24372f"
+          "snapshot_id": "causal-predictor-c5e93a4d6d2498f1134dcf4f"
         },
         "raw_semantic_fields": {
           "current_rsu_id": "rsu_b",
@@ -769,7 +769,7 @@
             "availability_mask": 0,
             "predicted_handoff_target_rsu_id": null,
             "predicted_next_rsu_id": null,
-            "snapshot_id": "causal-predictor-bcb4249be081e667ae24372f"
+            "snapshot_id": "causal-predictor-c5e93a4d6d2498f1134dcf4f"
           },
           "primary_vehicle_id": "peachtree:847"
         },
@@ -798,8 +798,8 @@
       "1.0.0"
     ],
     "snapshot_ids": [
-      "causal-predictor-6f84abc7ddf7af15a9d7abfd",
-      "causal-predictor-bcb4249be081e667ae24372f"
+      "causal-predictor-c5e93a4d6d2498f1134dcf4f",
+      "causal-predictor-d2ff128dec99402fb07e3fda"
     ]
   },
   "reward_changed": false,
@@ -857,7 +857,7 @@
         "valid_until_step": 3
       },
       "identity": {
-        "calibration_artifact_hash": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+        "calibration_artifact_hash": "cf62cc5fc1ac177e4ffd800c1c284e23906414f6210f29aab3b1716ae5656407",
         "calibration_method": {
           "handoff": "binary_temperature_scaling",
           "handoff_target": "identity",
@@ -865,7 +865,7 @@
         },
         "calibration_version": "deterministic_log_temperature_golden_v1.0.0",
         "contract_version": "1.0.0",
-        "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+        "git_commit": "39da3e7d40cca36e286c7a38b8846bb768562d2a",
         "oracle": false,
         "predictor_checkpoint_identity": {
           "checkpoint_schema_version": "supervised_handoff_predictor_checkpoint_v1",
@@ -895,10 +895,10 @@
           "run_id": "supervised_handoff_predictor_20260809_033406_140764",
           "sha256": "ea96a11717ab9588446b03d3b2115166b4108387514a7f03feb2c00b3eecd59e"
         },
-        "predictor_config_hash": "a76854b5057025b1da6cd3fe37d2938de725964af5250ec1df6f4ea7a114517f",
+        "predictor_config_hash": "c9bdd6a9abd3d08446beebac647d3aadf1c01ee3361d4eeffc17993cc42edff8",
         "predictor_kind": "supervised",
         "predictor_model_identity": "supervised_handoff_predictor_v1",
-        "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd",
+        "snapshot_id": "causal-predictor-d2ff128dec99402fb07e3fda",
         "source_dataset_identity": {
           "cross_source": false,
           "dataset": "NGSIM",
@@ -1113,7 +1113,7 @@
         "valid_until_step": 3
       },
       "identity": {
-        "calibration_artifact_hash": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+        "calibration_artifact_hash": "cf62cc5fc1ac177e4ffd800c1c284e23906414f6210f29aab3b1716ae5656407",
         "calibration_method": {
           "handoff": "binary_temperature_scaling",
           "handoff_target": "identity",
@@ -1121,7 +1121,7 @@
         },
         "calibration_version": "deterministic_log_temperature_golden_v1.0.0",
         "contract_version": "1.0.0",
-        "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+        "git_commit": "39da3e7d40cca36e286c7a38b8846bb768562d2a",
         "oracle": false,
         "predictor_checkpoint_identity": {
           "checkpoint_schema_version": "supervised_handoff_predictor_checkpoint_v1",
@@ -1151,10 +1151,10 @@
           "run_id": "supervised_handoff_predictor_20260809_033406_140764",
           "sha256": "ea96a11717ab9588446b03d3b2115166b4108387514a7f03feb2c00b3eecd59e"
         },
-        "predictor_config_hash": "a76854b5057025b1da6cd3fe37d2938de725964af5250ec1df6f4ea7a114517f",
+        "predictor_config_hash": "c9bdd6a9abd3d08446beebac647d3aadf1c01ee3361d4eeffc17993cc42edff8",
         "predictor_kind": "supervised",
         "predictor_model_identity": "supervised_handoff_predictor_v1",
-        "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd",
+        "snapshot_id": "causal-predictor-d2ff128dec99402fb07e3fda",
         "source_dataset_identity": {
           "cross_source": false,
           "dataset": "NGSIM",
@@ -1369,7 +1369,7 @@
         "valid_until_step": 3
       },
       "identity": {
-        "calibration_artifact_hash": "a5461ea061063ebf9df9f47e896cf077aad291b6fd4c98102898b4b2ccf11f4d",
+        "calibration_artifact_hash": "cf62cc5fc1ac177e4ffd800c1c284e23906414f6210f29aab3b1716ae5656407",
         "calibration_method": {
           "handoff": "binary_temperature_scaling",
           "handoff_target": "identity",
@@ -1377,7 +1377,7 @@
         },
         "calibration_version": "deterministic_log_temperature_golden_v1.0.0",
         "contract_version": "1.0.0",
-        "git_commit": "3248c4bfe6a608524823eaa62069a3e322d748c1",
+        "git_commit": "39da3e7d40cca36e286c7a38b8846bb768562d2a",
         "oracle": false,
         "predictor_checkpoint_identity": {
           "checkpoint_schema_version": "supervised_handoff_predictor_checkpoint_v1",
@@ -1407,10 +1407,10 @@
           "run_id": "supervised_handoff_predictor_20260809_033406_140764",
           "sha256": "ea96a11717ab9588446b03d3b2115166b4108387514a7f03feb2c00b3eecd59e"
         },
-        "predictor_config_hash": "a76854b5057025b1da6cd3fe37d2938de725964af5250ec1df6f4ea7a114517f",
+        "predictor_config_hash": "c9bdd6a9abd3d08446beebac647d3aadf1c01ee3361d4eeffc17993cc42edff8",
         "predictor_kind": "supervised",
         "predictor_model_identity": "supervised_handoff_predictor_v1",
-        "snapshot_id": "causal-predictor-6f84abc7ddf7af15a9d7abfd",
+        "snapshot_id": "causal-predictor-d2ff128dec99402fb07e3fda",
         "source_dataset_identity": {
           "cross_source": false,
           "dataset": "NGSIM",

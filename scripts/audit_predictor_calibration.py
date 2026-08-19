@@ -118,13 +118,23 @@ def partition_windows(train_windows: list[dict[str, Any]]) -> tuple[list[dict[st
 
 
 def hard_classification_metrics(
-    rows: list[dict[str, str]], *, label_key: str, prediction_key: str, class_names: list[str]
+    rows: list[dict[str, str]],
+    *,
+    label_key: str,
+    prediction_key: str,
+    class_names: list[str],
+    empty_label_class: str | None = None,
 ) -> dict[str, Any]:
     name_to_index = {name: index for index, name in enumerate(class_names)}
     pairs: list[tuple[int, int]] = []
     unknown = 0
+    empty_label_count = 0
     for row in rows:
         label_name = row.get(label_key, "")
+        if label_name == "":
+            empty_label_count += 1
+            if empty_label_class is not None:
+                label_name = empty_label_class
         try:
             prediction = int(row.get(prediction_key, ""))
         except ValueError:
@@ -155,7 +165,10 @@ def hard_classification_metrics(
         "macro_f1": sum(value for value, _ in f1_rows) / len(f1_rows) if f1_rows else None,
         "weighted_f1": sum(value * support for value, support in f1_rows) / count if count else None,
         "confusion_matrix": {"class_names": class_names, "rows": confusion},
-        "unknown_or_no_target_count": unknown,
+        "evaluated_coverage": count / len(rows) if rows else None,
+        "empty_label_count": empty_label_count,
+        "empty_label_class": empty_label_class,
+        "unknown_class_count": unknown,
         "probability_metrics": {
             "multiclass_brier_score": None,
             "negative_log_likelihood": None,
@@ -439,6 +452,7 @@ def main() -> None:
         label_key="next_rsu_label",
         prediction_key="next_rsu_pred_index",
         class_names=class_names,
+        empty_label_class="__none__",
     )
     target_rows = [row for row in rows_by_split["evaluation_dev"] if row.get("handoff_target_label")]
     target_hard = hard_classification_metrics(

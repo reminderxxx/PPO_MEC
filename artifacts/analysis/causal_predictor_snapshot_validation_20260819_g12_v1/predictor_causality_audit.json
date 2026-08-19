@@ -5,7 +5,7 @@
   "history_reset_at_window_or_episode": true,
   "label_horizon_steps": 3,
   "oracle_identity_isolated": true,
-  "reviewed_at": "2026-08-19T08:37:54.335664+00:00",
+  "reviewed_at": "2026-08-19T08:41:05.501244+00:00",
   "runtime_future_label_consumed": false,
   "runtime_reward_or_action_consumed": false,
   "snapshot_contract_version": "1.0.0",

@@ -550,6 +550,9 @@
         ]
       ]
     },
+    "empty_label_class": null,
+    "empty_label_count": 0,
+    "evaluated_coverage": 1.0,
     "macro_f1": 0.0032085561497326204,
     "probability_metrics": {
       "classwise_ece": null,
@@ -562,7 +565,7 @@
     "sample_count": 1646,
     "top_1_accuracy": 0.0018226002430133657,
     "unavailable_reason": "historical quality rows retain hard class indices but not full multiclass logits",
-    "unknown_or_no_target_count": 0,
+    "unknown_class_count": 0,
     "weighted_f1": 0.0035457859273169117
   },
   "next_rsu": {
@@ -893,27 +896,30 @@
           14
         ],
         [
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0,
-          0
+          26,
+          66,
+          66,
+          72,
+          59,
+          45,
+          36,
+          31,
+          23,
+          34,
+          46,
+          41,
+          45,
+          47,
+          42,
+          87,
+          16491
         ]
       ]
     },
-    "macro_f1": 0.9014996649815019,
+    "empty_label_class": "__none__",
+    "empty_label_count": 17257,
+    "evaluated_coverage": 1.0,
+    "macro_f1": 0.9380104242289543,
     "probability_metrics": {
       "classwise_ece": null,
       "multiclass_brier_score": null,
@@ -922,11 +928,11 @@
       "top_k_accuracy": null,
       "top_label_ece": null
     },
-    "sample_count": 16003,
-    "top_1_accuracy": 0.9578828969568206,
+    "sample_count": 33260,
+    "top_1_accuracy": 0.9567047504509922,
     "unavailable_reason": "historical quality rows retain hard class indices but not full multiclass logits",
-    "unknown_or_no_target_count": 17257,
-    "weighted_f1": 0.9595246699327293
+    "unknown_class_count": 0,
+    "weighted_f1": 0.957114255850339
   },
   "selected_evaluation_risk_coverage": {
     "abstention_rate": 0.25676488274203246,
