@@ -1,5 +1,13 @@
 ﻿# Progress
 
+## 2026-08-19: G14 Phase 0 typed model-cache formal readiness gate blocked
+
+- 已按 `docs/project/top_journal_review_policy.md` 完成 G14 只读 readiness 审查；结论为 `BLOCKED / E0_UNAVAILABLE`，证据包见 `artifacts/analysis/typed_model_cache_formal_readiness_20260819_g14_blocked_v1/typed_model_cache_formal_readiness_review.json`。
+- 当前 `benchmark_main_results.py` / G07 fairness runtime 仍只消费 `adapter_slots`，稳定 manifest builder 未绑定 typed MB profile；learned training runners 也不能消费 typed catalog 与 MB capacity，现有 checkpoint 均无 typed clean-retrain provenance。
+- 新的 train/dev/formal/sealed-holdout split 尚未完成冻结与全历史 frame/time/segment 排除审计；该结论仅表示 readiness 未验证，不表示 NGSIM 数据量不足。
+- 因硬 blocker，未冻结 G14 protocol version/hash，未创建 Commit A 或 clean execution worktree，未训练、未运行 formal/holdout、未打开 sealed holdout，且未执行 G15、调参或算法修改。
+- 主工作区原有 7 个用户修改文件保持未暂存、未覆盖；本轮未使用 stash/reset/checkout。
+
 ## 2026-08-19: G13 typed base/model/adapter/workflow-state cache frozen
 
 - 冻结`typed_model_cache_contract_version=1.0.0`、`CacheEvent=1.3.0`和type-aware metrics `1.1.0`；缺profile继续使用`legacy_adapter_only_v1`。

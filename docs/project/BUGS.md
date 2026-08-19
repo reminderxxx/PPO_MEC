@@ -1,5 +1,13 @@
 ﻿# Bugs And Risks
 
+## 2026-08-19: G14 typed MB formal pipeline blocked at Phase 0
+
+- `OPEN / hard blocker`：formal benchmark fairness runtime 明确拒绝 `capacity.unit != adapter_slots`；G07 stable builder 虽接受 MB 参数，但没有冻结并绑定 typed catalog fingerprint、typed initial state 与 base+adapter dependency contract。
+- `OPEN / hard blocker`：learned training runners 不接受 typed model-cache profile / MB capacity，现有 learned checkpoints 均为 legacy adapter-only provenance，不能冒充 typed clean-retrain checkpoints。
+- `OPEN / hard blocker`：当前链路无法端到端产出可追溯的 formal typed `CacheEvent 1.3` 原始记录与 summary；G13 minimal real artifact 只有事件计数，不是 G14 formal trace。
+- `UNVERIFIED / split`：新的 G14 train/dev/formal/sealed-holdout split 与全历史 frame/time/segment 排除审计尚未冻结；不能据此宣称 NGSIM 不足，也不能开始 formal 或打开 sealed holdout。
+- `BOUNDARY`：G14 readiness evidence level 为 `E0_UNAVAILABLE`；在上述 blocker 修复并重新通过独立 Phase 0 gate 前，不得冻结 protocol、执行 formal/holdout 或进入 G15。
+
 ## 2026-08-19: G13 typed model-cache contract frozen; real workload/latency evidence remains open
 
 - `RESOLVED / semantics`：vehicle base capability、RSU base resident、adapter resident与workflow-state migration payload现已分层；partial hit不再算full service。
