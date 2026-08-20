@@ -1,5 +1,26 @@
 ﻿# Bugs And Risks
 
+## 2026-08-20: G14R2 closes G14C v2 window/ledger blockers
+
+- `RESOLVED / source range`：formal mobility commands 现在必须显式传入冻结 prefix 11,850,526 raw rows；
+  1500 默认值、不同 source path/size、selector/length/RSU/vehicle override 均在 episode/checkpoint 前失败。
+- `RESOLVED / window identity`：60 个 evaluation units 绑定 segment、raw frame/time、provider offset、
+  preprocessing、vehicle coverage、RSU mapper、source interval 与 fingerprint；training/benchmark 使用同一
+  loader/fingerprint contract，60/60 实际 reachability 通过。
+- `RESOLVED / ledger`：ledger `2.0.0` 使用 running+terminal append records 和 SHA-256 chain，补齐
+  started/completed/wall-clock/return/retry/failure fields；G14C v2 return 1 被确定性分类为
+  `data_window_unreachable`，不再误重试或需要事后改账本。
+- `PERMANENT INVALID / G14C v2`：旧 run 0/150 training、0 checkpoint、0 formal，holdout 未开，禁止
+  resume、覆盖或删除；Protocol v1.1 状态为 `invalid_before_performance_execution`。
+- `OPEN / formal evidence`：Readiness v4 只证明 Protocol v1.2 execution contract 可执行；G14C v3 仍须
+  未来从 Commit A3 clean worktree 另立任务。当前没有正式 checkpoint、formal raw result、statistics 或
+  paper-ready evidence。
+- `OPEN / full-source I/O`：精确 provider-offset 语义要求完整 11,850,526-row prefix；direct loader 只
+  materialize 60 个目标窗口，但每个新的进程仍需扫描 2.12 GB CSV。后续 G14C v3 必须保留资源审计，
+  不得因耗时删窗口、seed 或 baseline。
+- `SEALED / holdout`：只完成 12 个窗口 identity/interval reachability；`sealed=true/opened=false/
+  consumed_permanently=false`，没有 agent、episode 或 performance 访问。
+
 ## 2026-08-20: G14R closes G14C Phase-0 execution blockers
 
 - `RESOLVED / B01`：checkpoint cadence 由 shared runner 真正消费；formal=4、legacy omission=1、resume

@@ -1,6 +1,28 @@
 # G14R Formal Execution Contract Repair and Protocol Restart
 
-## Review identity
+## G14R2 outcome
+
+G14C v2 `typed_model_cache_formal_20260820_164251_g14c_v2` 在首个 training cell 前失败：Protocol v1.1
+train command 未传 `max_mobility_rows`，共享入口使用 1500 raw-row default，仅形成 1,151 provider
+frames，无法定位 frozen train plan。该 run 永久为
+`INVALID_PROTOCOL_OR_IMPLEMENTATION / invalid_before_performance_execution`，0/150 training、0
+checkpoint、0 formal、holdout unopened；return code 1 分类为 `data_window_unreachable`，不可 retry 或
+resume，旧 artifact 不覆盖/删除/改写。
+
+G14R2 冻结 window consumption contract `1.0.0`，把原 60 windows 绑定到 11,850,526 raw-row prefix、
+73,871 provider frames、segment/raw frame/raw time/provider offset 与 fingerprint。60/60 reachability、
+150/150 training commands、30 条 dev/formal/support commands、ledger `2.0.0` append chain 和 16-cell
+non-formal rehearsal 均通过。Protocol v1.2 semantic SHA-256 为
+`718c0f78aabd5d01012df31267626eab74a51b2b621aaa67a535c5b60e655ca9`；split hash 保持
+`aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a`。Readiness v4 为
+`READY_FOR_G14C_V3_CLEAN_TRAIN_AND_FORMAL`。
+
+本轮没有训练正式 checkpoint，没有运行 formal/holdout/hidden，没有观察性能结果，没有启动 G14C v3
+或 G15。Holdout 仍 `sealed=true/opened=false/consumed_permanently=false`。详细合同与审计见
+`typed_model_cache_formal_window_consumption_contract.md` 及
+`artifacts/analysis/typed_model_cache_formal_window_repair_20260820_g14r2_v1/`。
+
+## G14R historical review identity
 
 - `reviewed_at`: `2026-08-20`
 - `literature_cutoff`: `2026-08-20`

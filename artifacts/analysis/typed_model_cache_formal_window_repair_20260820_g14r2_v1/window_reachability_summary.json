@@ -1,0 +1,19 @@
+{
+  "status": "pass",
+  "formal_window_consumption_contract_version": "1.0.0",
+  "window_count": 60,
+  "reachable_count": 60,
+  "split_reachable_counts": {
+    "train": 24,
+    "dev": 12,
+    "formal": 12,
+    "sealed_holdout": 12
+  },
+  "provider_frame_count": 73871,
+  "provider_frame_count_match": true,
+  "provider_identity_recomputed_from_raw_source": true,
+  "run_local_identity_recomputed_from_raw_source": true,
+  "holdout_metadata_only": true,
+  "agent_or_policy_executed": false,
+  "performance_fields_read": false
+}

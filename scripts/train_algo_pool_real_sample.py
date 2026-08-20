@@ -31,6 +31,11 @@ from src.evaluators.main_results_support import (
     load_window_bundle,
     resolve_window_candidates,
 )
+from src.evaluators.formal_window_consumption import (
+    FormalWindowConsumptionError,
+    load_contract as load_window_consumption_contract,
+    validate_window_plan_binding,
+)
 from src.metrics.recorder import EpisodeRecorder
 from src.metrics.cache_efficiency_metrics import reduce_cache_efficiency_summary
 from src.runtime.typed_model_cache_runtime import (
@@ -82,7 +87,7 @@ SUMMARY_METRICS = [
 ]
 
 
-def parse_args() -> argparse.Namespace:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Train direction-matched baseline agents")
     parser.add_argument("--agent_name", choices=TRAINABLE_BASELINES, default="ppo")
     parser.add_argument("--profile", choices=sorted(PROFILE_DEFAULTS), default="smoke")
@@ -143,6 +148,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_scan_stride", type=int, default=2)
     parser.add_argument("--window_mode", type=str, default="activating_only", choices=["activating_only", "mixed", "full", "mixed_informative", "full_stratified"])
     parser.add_argument("--window_plan_path", type=str, default="")
+    parser.add_argument(
+        "--formal_window_consumption_contract_path",
+        type=str,
+        default="",
+        help="Frozen raw/provider window identity contract; required for formal training.",
+    )
+    parser.add_argument(
+        "--formal_window_split",
+        choices=["train", "dev", "formal", "sealed_holdout"],
+        default="",
+    )
+    parser.add_argument(
+        "--window_consumption_mode",
+        choices=["formal", "rehearsal"],
+        default="formal",
+    )
     parser.add_argument("--prediction_horizon", type=int, default=3)
     parser.add_argument("--max_steps", type=int, default=None)
     parser.add_argument("--min_tasks", type=int, default=5)
@@ -154,8 +175,11 @@ def parse_args() -> argparse.Namespace:
         default="",
         help="Optional create-only stable run identity for protocol orchestration.",
     )
-    args = parser.parse_args()
-    return args
+    return parser
+
+
+def parse_args() -> argparse.Namespace:
+    return build_parser().parse_args()
 
 
 def agent_profile_kwargs(agent_name: str, profile: str) -> dict[str, Any]:
@@ -305,6 +329,45 @@ def main() -> None:
         args.model_cache_runtime_config or None,
         root=ROOT_DIR,
     )
+    window_consumption_contract: dict[str, Any] | None = None
+    window_binding: dict[str, Any] | None = None
+    if formal_protocol is not None and not args.formal_window_consumption_contract_path:
+        raise FormalWindowConsumptionError(
+            "formal training requires --formal_window_consumption_contract_path"
+        )
+    if args.formal_window_consumption_contract_path:
+        if not args.window_plan_path or not args.formal_window_split:
+            raise FormalWindowConsumptionError(
+                "frozen-window consumption requires window plan and split"
+            )
+        if formal_protocol is not None and args.formal_window_split != "train":
+            raise FormalWindowConsumptionError("formal training may consume only the train split")
+        window_consumption_contract = load_window_consumption_contract(
+            args.formal_window_consumption_contract_path
+        )
+        expected_contract_hash = (
+            formal_protocol.get("execution_contract", {})
+            .get("window_consumption_contract", {})
+            .get("semantic_sha256")
+            if formal_protocol is not None
+            else None
+        )
+        if expected_contract_hash and expected_contract_hash != window_consumption_contract["hashes"]["semantic_sha256"]:
+            raise FormalWindowConsumptionError(
+                "formal protocol/window consumption contract hash mismatch"
+            )
+        window_binding = validate_window_plan_binding(
+            contract=window_consumption_contract,
+            plan_path=args.window_plan_path,
+            split=args.formal_window_split,
+            max_mobility_rows=args.max_mobility_rows,
+            mobility_csv_path=args.mobility_csv_path,
+            window_selector=args.window_selector,
+            window_length=args.window_length,
+            rsu_layout=args.rsu_layout,
+            primary_vehicle_selection=args.primary_vehicle_selection,
+            mode=("formal" if formal_protocol is not None else args.window_consumption_mode),
+        )
     run_id = args.run_id or datetime.now().strftime(
         f"{args.agent_name}_train_%Y%m%d_%H%M%S_%f_seed{args.random_seed}"
     )
@@ -363,6 +426,12 @@ def main() -> None:
         "protocol_version": str(window_payload.get("frozen_window_plan_protocol_version") or "runtime_selected_v1"),
         "split": str(window_payload.get("frozen_window_plan_split") or "non_formal_runtime_selected"),
         "selected_window_plan_sha256": sha256_value(selected_window_plan),
+        "formal_window_consumption_contract_sha256": (
+            window_consumption_contract["hashes"]["semantic_sha256"]
+            if window_consumption_contract is not None
+            else None
+        ),
+        "formal_window_split": args.formal_window_split or None,
     }
     agent_kwargs = {
         "random_seed": args.random_seed,
@@ -424,6 +493,9 @@ def main() -> None:
             frame_offset=int(window_candidate.get("frame_offset", args.frame_offset)),
             window_length=int(window_candidate.get("window_length", args.window_length)),
             random_seed=args.random_seed,
+            formal_window_consumption_contract_path=args.formal_window_consumption_contract_path,
+            formal_window_split=args.formal_window_split,
+            expected_window_id=str(window_candidate.get("window_id", "")),
         )
         mobility_bundle.rsu_metadata["window_rank"] = window_candidate.get("window_rank")
         mobility_bundle.rsu_metadata["window_class"] = window_candidate.get("window_class")
@@ -579,6 +651,7 @@ def main() -> None:
         "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
         "cache_capacity_profile": runtime_contract["cache_capacity_profile"],
         "train_window_plan_identity": window_plan_identity,
+        "formal_window_consumption_binding": window_binding,
         "mean_metrics": metric_means(rows),
         "rows": rows,
         "update_logs": update_logs,

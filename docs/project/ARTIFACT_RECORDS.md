@@ -1,5 +1,27 @@
 # Artifact Records
 
+## 2026-08-20 G14R2 formal window repair and Protocol v1.2
+
+- path：`artifacts/analysis/typed_model_cache_formal_window_repair_20260820_g14r2_v1/`；config：
+  `configs/experiment/typed_model_cache_formal_protocol_v1_2_20260820/`。
+- G14C v2 failure reference 绑定 protocol v1.1 semantic hash、execution commit、旧 run ID、failure audit
+  SHA-256 `5da5e20395e5c1e48bf2e267ce757248d024246bdc121d4d2b33ca4f8c6c594b` 与旧 ledger
+  SHA-256 `78ac969b024f205da8dbdda5541527b01a5746bc4e5b8d3f12a7a0ed73574e79`；事实为
+  0/150 training、0 checkpoint、0 formal、holdout unopened、resume=false。
+- window contract `1.0.0` semantic SHA-256=`ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771`；
+  source prefix=11,850,526/11,850,526 raw rows，provider frame count=73,871，60/60 frozen windows
+  frame/time/provider/fingerprint/vehicle coverage 全部 reachable。
+- command evidence：150/150 training commands、150 unique outputs、30 dev/formal/support commands 均
+  parser/resolved-binding pass，无 holdout 或 1500-row default；protocol science-field diff 全部 unchanged。
+- ledger evidence：schema `2.0.0`，success/failure 各两条 running+terminal hash-chain record；完整时间、
+  wall-clock、failure enum、append-only/terminal immutable/round-trip/deterministic hash 均 pass。
+- rehearsal：4 agents × 2 seeds × 2 capacities=16 non-formal tiny training cells，cadence 4、restore 与
+  provenance pass；两档 tiny evaluation 各 36 rows。formal checkpoint/episode/performance count=0，
+  holdout episode=0，无 performance claim。
+- protocol v1.2 semantic SHA-256=`718c0f78aabd5d01012df31267626eab74a51b2b621aaa67a535c5b60e655ca9`；
+  split semantic SHA-256 未变。Readiness v4=`READY_FOR_G14C_V3_CLEAN_TRAIN_AND_FORMAL`，evidence
+  level=`E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE`，不是 formal 或 paper-ready 证据。
+
 ## 2026-08-20 G14R formal protocol restart
 
 - path：`artifacts/analysis/typed_model_cache_formal_protocol_restart_20260820_g14r_v1/`；config：

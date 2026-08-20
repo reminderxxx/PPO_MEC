@@ -1,5 +1,35 @@
 ﻿# Progress
 
+## 2026-08-20: G14R2 formal window consumption 与 phase ledger repair 完成
+
+- G14C v2 `typed_model_cache_formal_20260820_164251_g14c_v2` 永久记为
+  `INVALID_PROTOCOL_OR_IMPLEMENTATION / invalid_before_performance_execution`。其 train template 未传
+  `max_mobility_rows`，共享入口回落到 1500 raw rows/1,151 provider frames，首个 frozen train offset
+  不可达；return code 1 分类为 `data_window_unreachable`，不可 retry/resume。旧 run 保持原样，记录
+  0/150 training、0 checkpoint、0 formal、holdout unopened。
+- 冻结 `formal_window_consumption_contract_version=1.0.0`：`frame_offset` 是按 normalized segment/time
+  排序后的全局 provider-frame index，`max_mobility_rows` 在清洗/segment grouping 前截断 raw CSV。
+  全源 11,850,526 raw rows 解析为 73,871 provider frames；为保持任一 frozen I-80 offset 之前的 provider
+  顺序及目标 frame 的完整 vehicle coverage，四个 split 的安全 prefix 均为 11,850,526 rows，margin=0。
+- 使用与 training/benchmark 相同的 direct frozen segment/time loader 完成 60/60 reachability：train/dev/
+  formal/sealed-holdout=`24/12/12/12`；raw frame、raw time、provider offset、24-frame length、vehicle
+  coverage 与 fingerprint 全部一致。Holdout 只读取 identity/interval metadata，未运行 agent/episode。
+- 150/150 training commands 与 30 条 dev/formal/support commands 均通过 parser/window/source/runtime/
+  cadence/output/holdout 无训练审计；所有 mobility 命令显式绑定 11,850,526、ordered selector、24-frame
+  plan、vehicle selection 与 RSU layout，不再依赖 1500 默认值。
+- Phase runner/ledger 升级到 `2.0.0`：running 与 terminal 分记录，terminal 包含 completed time、
+  wall-clock、return code、retry、failure class、message reference 与 previous/current SHA-256 chain；return
+  code 75 仅对应 `infrastructure_retryable`，terminal record 不可改写，resume 只能 append。
+- Non-formal rehearsal 覆盖四个 learned agents、2 seeds、288/576 MB 共 16 个 tiny training cells，以及
+  两个 train boundary windows 的 tiny evaluation；cadence=4、checkpoint restore/provenance、summary/row/
+  metrics 均通过。正式 checkpoint/episode/performance count 仍为 0，无性能 claim。
+- Protocol v1.2 semantic SHA-256=`718c0f78aabd5d01012df31267626eab74a51b2b621aaa67a535c5b60e655ca9`；
+  split semantic SHA-256 保持 `aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a`，
+  科学字段未变化。Readiness v4=`READY_FOR_G14C_V3_CLEAN_TRAIN_AND_FORMAL`，但不是 formal/G14/
+  paper-ready 完成，不在本任务启动 G14C v3、holdout、hidden 或 G15。
+- 机器证据：`artifacts/analysis/typed_model_cache_formal_window_repair_20260820_g14r2_v1/`；合同：
+  `docs/project/typed_model_cache_formal_window_consumption_contract.md`。
+
 ## 2026-08-20: G14R formal execution contract repaired；protocol v1.1 ready
 
 - G14C v1 `typed_model_cache_formal_20260820_g14c_351fdb8_v1` 永久记录为

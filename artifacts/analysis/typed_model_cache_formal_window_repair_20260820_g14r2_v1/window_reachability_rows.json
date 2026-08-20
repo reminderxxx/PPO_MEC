@@ -1,0 +1,3201 @@
+{
+  "status": "pass",
+  "formal_window_consumption_contract_version": "1.0.0",
+  "window_count": 60,
+  "reachable_count": 60,
+  "split_reachable_counts": {
+    "train": 24,
+    "dev": 12,
+    "formal": 12,
+    "sealed_holdout": 12
+  },
+  "provider_frame_count": 73871,
+  "provider_frame_count_match": true,
+  "provider_identity_recomputed_from_raw_source": true,
+  "run_local_identity_recomputed_from_raw_source": true,
+  "holdout_metadata_only": true,
+  "agent_or_policy_executed": false,
+  "performance_fields_read": false,
+  "rows": [
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_002_f3723_3746_t1113437139200_1113437141500",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        3723,
+        3746
+      ],
+      "observed_time_interval": [
+        1113437139200,
+        1113437141500
+      ],
+      "observed_provider_interval": [
+        13730,
+        13753
+      ],
+      "observed_provider_run_local_interval": [
+        3717,
+        3740
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7288146,
+        "last_row_inclusive": 11840501,
+        "matched_raw_row_count": 4000
+      },
+      "vehicle_coverage": {
+        "minimum": 165,
+        "maximum": 169,
+        "mean": 166.666667
+      },
+      "expected_fingerprint": "a4942b9b0a2a5ad87503760a43e44b89548ab9c464bad4e1d4f69b6c050cdd56",
+      "observed_fingerprint": "a4942b9b0a2a5ad87503760a43e44b89548ab9c464bad4e1d4f69b6c050cdd56",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_003_f9925_9948_t1113438557400_1113438559700",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        9925,
+        9948
+      ],
+      "observed_time_interval": [
+        1113438557400,
+        1113438559700
+      ],
+      "observed_provider_interval": [
+        26106,
+        26129
+      ],
+      "observed_provider_run_local_interval": [
+        8112,
+        8135
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7292677,
+        "last_row_inclusive": 11840976,
+        "matched_raw_row_count": 3498
+      },
+      "vehicle_coverage": {
+        "minimum": 143,
+        "maximum": 148,
+        "mean": 145.75
+      },
+      "expected_fingerprint": "d7c8e03cf75fdf838a5a03816bd6919556a96dff1493f4a961b4a3638b00ac3b",
+      "observed_fingerprint": "d7c8e03cf75fdf838a5a03816bd6919556a96dff1493f4a961b4a3638b00ac3b",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_003_f2197_2220_t1113437784600_1113437786900",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        2197,
+        2220
+      ],
+      "observed_time_interval": [
+        1113437784600,
+        1113437786900
+      ],
+      "observed_provider_interval": [
+        18378,
+        18401
+      ],
+      "observed_provider_run_local_interval": [
+        384,
+        407
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7284786,
+        "last_row_inclusive": 11840734,
+        "matched_raw_row_count": 4211
+      },
+      "vehicle_coverage": {
+        "minimum": 174,
+        "maximum": 177,
+        "mean": 175.458333
+      },
+      "expected_fingerprint": "808a99cc71ce1237ab4de0c893c9864328306767bfebe6a19a771f6844ecb8b6",
+      "observed_fingerprint": "808a99cc71ce1237ab4de0c893c9864328306767bfebe6a19a771f6844ecb8b6",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_001_f6732_6755_t1113433808100_1113433810400",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        6732,
+        6755
+      ],
+      "observed_time_interval": [
+        1113433808100,
+        1113433810400
+      ],
+      "observed_provider_interval": [
+        6728,
+        6751
+      ],
+      "observed_provider_run_local_interval": [
+        6728,
+        6751
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7284399,
+        "last_row_inclusive": 11848499,
+        "matched_raw_row_count": 3740
+      },
+      "vehicle_coverage": {
+        "minimum": 154,
+        "maximum": 159,
+        "mean": 155.833333
+      },
+      "expected_fingerprint": "3b69ddcb5e322fc35d49ca1c04b3ec1c8c59cc0f1f6d60579794861852d465a9",
+      "observed_fingerprint": "3b69ddcb5e322fc35d49ca1c04b3ec1c8c59cc0f1f6d60579794861852d465a9",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_001_f3660_3683_t1113433500900_1113433503200",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        3660,
+        3683
+      ],
+      "observed_time_interval": [
+        1113433500900,
+        1113433503200
+      ],
+      "observed_provider_interval": [
+        3656,
+        3679
+      ],
+      "observed_provider_run_local_interval": [
+        3656,
+        3679
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850002,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7296437,
+        "last_row_inclusive": 11848143,
+        "matched_raw_row_count": 2742
+      },
+      "vehicle_coverage": {
+        "minimum": 113,
+        "maximum": 116,
+        "mean": 114.25
+      },
+      "expected_fingerprint": "dd786c1886d1523492944066cc37ced7046ac70d9cb85d916ade40cb93b1b67e",
+      "observed_fingerprint": "dd786c1886d1523492944066cc37ced7046ac70d9cb85d916ade40cb93b1b67e",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_001_f2988_3011_t1113433433700_1113433436000",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        2988,
+        3011
+      ],
+      "observed_time_interval": [
+        1113433433700,
+        1113433436000
+      ],
+      "observed_provider_interval": [
+        2984,
+        3007
+      ],
+      "observed_provider_run_local_interval": [
+        2984,
+        3007
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850002,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7292491,
+        "last_row_inclusive": 11840029,
+        "matched_raw_row_count": 2633
+      },
+      "vehicle_coverage": {
+        "minimum": 108,
+        "maximum": 111,
+        "mean": 109.708333
+      },
+      "expected_fingerprint": "287bd4ed581c2f35d3abffd9a3ed07e7c2a295ccebaf7c6ff01182bc33f8927c",
+      "observed_fingerprint": "287bd4ed581c2f35d3abffd9a3ed07e7c2a295ccebaf7c6ff01182bc33f8927c",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_003_f2965_2988_t1113437861400_1113437863700",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        2965,
+        2988
+      ],
+      "observed_time_interval": [
+        1113437861400,
+        1113437863700
+      ],
+      "observed_provider_interval": [
+        19146,
+        19169
+      ],
+      "observed_provider_run_local_interval": [
+        1152,
+        1175
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7289897,
+        "last_row_inclusive": 11839710,
+        "matched_raw_row_count": 3804
+      },
+      "vehicle_coverage": {
+        "minimum": 157,
+        "maximum": 160,
+        "mean": 158.5
+      },
+      "expected_fingerprint": "bc70b03dc032582cd8ea21264ed8b3eb44a4058f9168bb49f94b7f65e115f667",
+      "observed_fingerprint": "bc70b03dc032582cd8ea21264ed8b3eb44a4058f9168bb49f94b7f65e115f667",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_002_f363_386_t1113436803200_1113436805500",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        363,
+        386
+      ],
+      "observed_time_interval": [
+        1113436803200,
+        1113436805500
+      ],
+      "observed_provider_interval": [
+        10370,
+        10393
+      ],
+      "observed_provider_run_local_interval": [
+        357,
+        380
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7285158,
+        "last_row_inclusive": 10540380,
+        "matched_raw_row_count": 1947
+      },
+      "vehicle_coverage": {
+        "minimum": 78,
+        "maximum": 85,
+        "mean": 81.125
+      },
+      "expected_fingerprint": "ddddbec2fea350bc7bd3d99688bdfbb722bfb5d689a3bde2a937976fee647411",
+      "observed_fingerprint": "ddddbec2fea350bc7bd3d99688bdfbb722bfb5d689a3bde2a937976fee647411",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_003_f3829_3852_t1113437947800_1113437950100",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        3829,
+        3852
+      ],
+      "observed_time_interval": [
+        1113437947800,
+        1113437950100
+      ],
+      "observed_provider_interval": [
+        20010,
+        20033
+      ],
+      "observed_provider_run_local_interval": [
+        2016,
+        2039
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7285029,
+        "last_row_inclusive": 11840696,
+        "matched_raw_row_count": 4461
+      },
+      "vehicle_coverage": {
+        "minimum": 185,
+        "maximum": 188,
+        "mean": 185.875
+      },
+      "expected_fingerprint": "36e5c136ef6cc205b4b3e7d845ac5e3a8a2e2b55f601989b8c96082b5f7b4029",
+      "observed_fingerprint": "36e5c136ef6cc205b4b3e7d845ac5e3a8a2e2b55f601989b8c96082b5f7b4029",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_003_f10069_10092_t1113438571800_1113438574100",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        10069,
+        10092
+      ],
+      "observed_time_interval": [
+        1113438571800,
+        1113438574100
+      ],
+      "observed_provider_interval": [
+        26250,
+        26273
+      ],
+      "observed_provider_run_local_interval": [
+        8256,
+        8279
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7297039,
+        "last_row_inclusive": 11841406,
+        "matched_raw_row_count": 3019
+      },
+      "vehicle_coverage": {
+        "minimum": 125,
+        "maximum": 127,
+        "mean": 125.791667
+      },
+      "expected_fingerprint": "acce5bbaaf233d348f64d42924e2a603a3d1be63c8d183416f458b72147e5e3b",
+      "observed_fingerprint": "acce5bbaaf233d348f64d42924e2a603a3d1be63c8d183416f458b72147e5e3b",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_003_f3541_3564_t1113437919000_1113437921300",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        3541,
+        3564
+      ],
+      "observed_time_interval": [
+        1113437919000,
+        1113437921300
+      ],
+      "observed_provider_interval": [
+        19722,
+        19745
+      ],
+      "observed_provider_run_local_interval": [
+        1728,
+        1751
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7292165,
+        "last_row_inclusive": 11839655,
+        "matched_raw_row_count": 4628
+      },
+      "vehicle_coverage": {
+        "minimum": 191,
+        "maximum": 195,
+        "mean": 192.833333
+      },
+      "expected_fingerprint": "3c5eac2eaa88f7902b609f0d763bf9ca2c28c65ad5378d26bf5fe9428be4e8db",
+      "observed_fingerprint": "3c5eac2eaa88f7902b609f0d763bf9ca2c28c65ad5378d26bf5fe9428be4e8db",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_002_f4875_4898_t1113437254400_1113437256700",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        4875,
+        4898
+      ],
+      "observed_time_interval": [
+        1113437254400,
+        1113437256700
+      ],
+      "observed_provider_interval": [
+        14882,
+        14905
+      ],
+      "observed_provider_run_local_interval": [
+        4869,
+        4892
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7288843,
+        "last_row_inclusive": 11839656,
+        "matched_raw_row_count": 3885
+      },
+      "vehicle_coverage": {
+        "minimum": 161,
+        "maximum": 164,
+        "mean": 161.875
+      },
+      "expected_fingerprint": "8bd6f3cab1174cd17655056b53f6e835ca6be2a9324855c3ebddf2207da96dc0",
+      "observed_fingerprint": "8bd6f3cab1174cd17655056b53f6e835ca6be2a9324855c3ebddf2207da96dc0",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_002_f555_578_t1113436822400_1113436824700",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        555,
+        578
+      ],
+      "observed_time_interval": [
+        1113436822400,
+        1113436824700
+      ],
+      "observed_provider_interval": [
+        10562,
+        10585
+      ],
+      "observed_provider_run_local_interval": [
+        549,
+        572
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7289825,
+        "last_row_inclusive": 11849790,
+        "matched_raw_row_count": 3003
+      },
+      "vehicle_coverage": {
+        "minimum": 122,
+        "maximum": 127,
+        "mean": 125.125
+      },
+      "expected_fingerprint": "c895b808cfae1bdbf81cd1d02c04c1555d93aa79b943c8ee9f4dd323506bc1dc",
+      "observed_fingerprint": "c895b808cfae1bdbf81cd1d02c04c1555d93aa79b943c8ee9f4dd323506bc1dc",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_003_f5221_5244_t1113438087000_1113438089300",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        5221,
+        5244
+      ],
+      "observed_time_interval": [
+        1113438087000,
+        1113438089300
+      ],
+      "observed_provider_interval": [
+        21402,
+        21425
+      ],
+      "observed_provider_run_local_interval": [
+        3408,
+        3431
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7284998,
+        "last_row_inclusive": 11847254,
+        "matched_raw_row_count": 3501
+      },
+      "vehicle_coverage": {
+        "minimum": 144,
+        "maximum": 147,
+        "mean": 145.875
+      },
+      "expected_fingerprint": "62205ffc7e546cfd7d3f2be39e2fd06eb15a8bc9cb9208bf9d135e32f5155ac6",
+      "observed_fingerprint": "62205ffc7e546cfd7d3f2be39e2fd06eb15a8bc9cb9208bf9d135e32f5155ac6",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_003_f1813_1836_t1113437746200_1113437748500",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        1813,
+        1836
+      ],
+      "observed_time_interval": [
+        1113437746200,
+        1113437748500
+      ],
+      "observed_provider_interval": [
+        17994,
+        18017
+      ],
+      "observed_provider_run_local_interval": [
+        0,
+        23
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7284473,
+        "last_row_inclusive": 11838814,
+        "matched_raw_row_count": 4455
+      },
+      "vehicle_coverage": {
+        "minimum": 182,
+        "maximum": 187,
+        "mean": 185.625
+      },
+      "expected_fingerprint": "a59e9d7d19ff3409266f461d8405c313ffd412a6b2528611ea9c2e3a4ebb0c2f",
+      "observed_fingerprint": "a59e9d7d19ff3409266f461d8405c313ffd412a6b2528611ea9c2e3a4ebb0c2f",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_003_f6661_6684_t1113438231000_1113438233300",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        6661,
+        6684
+      ],
+      "observed_time_interval": [
+        1113438231000,
+        1113438233300
+      ],
+      "observed_provider_interval": [
+        22842,
+        22865
+      ],
+      "observed_provider_run_local_interval": [
+        4848,
+        4871
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7284527,
+        "last_row_inclusive": 11844203,
+        "matched_raw_row_count": 5757
+      },
+      "vehicle_coverage": {
+        "minimum": 239,
+        "maximum": 241,
+        "mean": 239.875
+      },
+      "expected_fingerprint": "7cd9cf9141cc3d580242c2e35cf5696a7a7c1f1dd09daed40752a0b6dbacd0d3",
+      "observed_fingerprint": "7cd9cf9141cc3d580242c2e35cf5696a7a7c1f1dd09daed40752a0b6dbacd0d3",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_001_f8316_8339_t1113433966500_1113433968800",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        8316,
+        8339
+      ],
+      "observed_time_interval": [
+        1113433966500,
+        1113433968800
+      ],
+      "observed_provider_interval": [
+        8312,
+        8335
+      ],
+      "observed_provider_run_local_interval": [
+        8312,
+        8335
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7291827,
+        "last_row_inclusive": 11833667,
+        "matched_raw_row_count": 4055
+      },
+      "vehicle_coverage": {
+        "minimum": 168,
+        "maximum": 170,
+        "mean": 168.958333
+      },
+      "expected_fingerprint": "6f9c2a384854d6c4c5f66aeb19789ef5f8ee3efb724bcae8ba9a732ae76cb00b",
+      "observed_fingerprint": "6f9c2a384854d6c4c5f66aeb19789ef5f8ee3efb724bcae8ba9a732ae76cb00b",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_003_f5557_5580_t1113438120600_1113438122900",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        5557,
+        5580
+      ],
+      "observed_time_interval": [
+        1113438120600,
+        1113438122900
+      ],
+      "observed_provider_interval": [
+        21738,
+        21761
+      ],
+      "observed_provider_run_local_interval": [
+        3744,
+        3767
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7288369,
+        "last_row_inclusive": 11839202,
+        "matched_raw_row_count": 3652
+      },
+      "vehicle_coverage": {
+        "minimum": 151,
+        "maximum": 153,
+        "mean": 152.166667
+      },
+      "expected_fingerprint": "8e257cf64515dee0bb4a0de4ddc7ccf25e34d4618d9ea6c3e4e221a32b88fb2a",
+      "observed_fingerprint": "8e257cf64515dee0bb4a0de4ddc7ccf25e34d4618d9ea6c3e4e221a32b88fb2a",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_002_f3819_3842_t1113437148800_1113437151100",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        3819,
+        3842
+      ],
+      "observed_time_interval": [
+        1113437148800,
+        1113437151100
+      ],
+      "observed_provider_interval": [
+        13826,
+        13849
+      ],
+      "observed_provider_run_local_interval": [
+        3813,
+        3836
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7290369,
+        "last_row_inclusive": 11847802,
+        "matched_raw_row_count": 3881
+      },
+      "vehicle_coverage": {
+        "minimum": 161,
+        "maximum": 163,
+        "mean": 161.708333
+      },
+      "expected_fingerprint": "a60ded31b9aa268c682a6d47d22126c536d16539a9258746ddb7963f7b783afa",
+      "observed_fingerprint": "a60ded31b9aa268c682a6d47d22126c536d16539a9258746ddb7963f7b783afa",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_001_f2460_2483_t1113433380900_1113433383200",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        2460,
+        2483
+      ],
+      "observed_time_interval": [
+        1113433380900,
+        1113433383200
+      ],
+      "observed_provider_interval": [
+        2456,
+        2479
+      ],
+      "observed_provider_run_local_interval": [
+        2456,
+        2479
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850002,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7289539,
+        "last_row_inclusive": 11840620,
+        "matched_raw_row_count": 3050
+      },
+      "vehicle_coverage": {
+        "minimum": 124,
+        "maximum": 129,
+        "mean": 127.083333
+      },
+      "expected_fingerprint": "df1af630f6ae24e5b4115de319842a33c7971b7af18ea8fd4c7f480a88efddcf",
+      "observed_fingerprint": "df1af630f6ae24e5b4115de319842a33c7971b7af18ea8fd4c7f480a88efddcf",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_002_f3531_3554_t1113437120000_1113437122300",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        3531,
+        3554
+      ],
+      "observed_time_interval": [
+        1113437120000,
+        1113437122300
+      ],
+      "observed_provider_interval": [
+        13538,
+        13561
+      ],
+      "observed_provider_run_local_interval": [
+        3525,
+        3548
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7285681,
+        "last_row_inclusive": 11844820,
+        "matched_raw_row_count": 4214
+      },
+      "vehicle_coverage": {
+        "minimum": 175,
+        "maximum": 177,
+        "mean": 175.583333
+      },
+      "expected_fingerprint": "1977d27955cfc17a8cb591630b211f0a12a82d494d827ca45f4369431ba10158",
+      "observed_fingerprint": "1977d27955cfc17a8cb591630b211f0a12a82d494d827ca45f4369431ba10158",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_003_f8629_8652_t1113438427800_1113438430100",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        8629,
+        8652
+      ],
+      "observed_time_interval": [
+        1113438427800,
+        1113438430100
+      ],
+      "observed_provider_interval": [
+        24810,
+        24833
+      ],
+      "observed_provider_run_local_interval": [
+        6816,
+        6839
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7293151,
+        "last_row_inclusive": 11836324,
+        "matched_raw_row_count": 5102
+      },
+      "vehicle_coverage": {
+        "minimum": 211,
+        "maximum": 214,
+        "mean": 212.583333
+      },
+      "expected_fingerprint": "9660d16ee38b00fdf18e4415527b573775542a2eabea998d445df30aa81b9bcf",
+      "observed_fingerprint": "9660d16ee38b00fdf18e4415527b573775542a2eabea998d445df30aa81b9bcf",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_003_f2485_2508_t1113437813400_1113437815700",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        2485,
+        2508
+      ],
+      "observed_time_interval": [
+        1113437813400,
+        1113437815700
+      ],
+      "observed_provider_interval": [
+        18666,
+        18689
+      ],
+      "observed_provider_run_local_interval": [
+        672,
+        695
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7285132,
+        "last_row_inclusive": 11838909,
+        "matched_raw_row_count": 3907
+      },
+      "vehicle_coverage": {
+        "minimum": 160,
+        "maximum": 164,
+        "mean": 162.791667
+      },
+      "expected_fingerprint": "f1b532396a50cf1ed40e8ec37e67b57257c264d5ebcb9e7e0eaf09030229763f",
+      "observed_fingerprint": "f1b532396a50cf1ed40e8ec37e67b57257c264d5ebcb9e7e0eaf09030229763f",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "train",
+      "window_id": "g14b_i_80_run_001_f8076_8099_t1113433942500_1113433944800",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        8076,
+        8099
+      ],
+      "observed_time_interval": [
+        1113433942500,
+        1113433944800
+      ],
+      "observed_provider_interval": [
+        8072,
+        8095
+      ],
+      "observed_provider_run_local_interval": [
+        8072,
+        8095
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7290401,
+        "last_row_inclusive": 11835733,
+        "matched_raw_row_count": 4193
+      },
+      "vehicle_coverage": {
+        "minimum": 173,
+        "maximum": 177,
+        "mean": 174.708333
+      },
+      "expected_fingerprint": "65ef60a8aa9272972057994ee6c3181bd5896b7456e8617eae30c718dadc2737",
+      "observed_fingerprint": "65ef60a8aa9272972057994ee6c3181bd5896b7456e8617eae30c718dadc2737",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "dev",
+      "window_id": "g14b_i_80_run_001_f1740_1763_t1113433308900_1113433311200",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        1740,
+        1763
+      ],
+      "observed_time_interval": [
+        1113433308900,
+        1113433311200
+      ],
+      "observed_provider_interval": [
+        1736,
+        1759
+      ],
+      "observed_provider_run_local_interval": [
+        1736,
+        1759
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850002,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7286359,
+        "last_row_inclusive": 11843557,
+        "matched_raw_row_count": 2953
+      },
+      "vehicle_coverage": {
+        "minimum": 122,
+        "maximum": 124,
+        "mean": 123.041667
+      },
+      "expected_fingerprint": "af091e3b45c5628851a1ccf73ca507f1d37ec4158935f47171e00ba5b51900e0",
+      "observed_fingerprint": "af091e3b45c5628851a1ccf73ca507f1d37ec4158935f47171e00ba5b51900e0",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "dev",
+      "window_id": "g14b_i_80_run_002_f6123_6146_t1113437379200_1113437381500",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        6123,
+        6146
+      ],
+      "observed_time_interval": [
+        1113437379200,
+        1113437381500
+      ],
+      "observed_provider_interval": [
+        16130,
+        16153
+      ],
+      "observed_provider_run_local_interval": [
+        6117,
+        6140
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7287440,
+        "last_row_inclusive": 11844582,
+        "matched_raw_row_count": 4170
+      },
+      "vehicle_coverage": {
+        "minimum": 172,
+        "maximum": 175,
+        "mean": 173.75
+      },
+      "expected_fingerprint": "a58c51b2674c147964b18d7e4c39f87aef8335d42e4df8c989c01357dc8e5ef5",
+      "observed_fingerprint": "a58c51b2674c147964b18d7e4c39f87aef8335d42e4df8c989c01357dc8e5ef5",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "dev",
+      "window_id": "g14b_i_80_run_002_f2139_2162_t1113436980800_1113436983100",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        2139,
+        2162
+      ],
+      "observed_time_interval": [
+        1113436980800,
+        1113436983100
+      ],
+      "observed_provider_interval": [
+        12146,
+        12169
+      ],
+      "observed_provider_run_local_interval": [
+        2133,
+        2156
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7285710,
+        "last_row_inclusive": 11845029,
+        "matched_raw_row_count": 3637
+      },
+      "vehicle_coverage": {
+        "minimum": 150,
+        "maximum": 153,
+        "mean": 151.541667
+      },
+      "expected_fingerprint": "2db7d95bb81229eeb5199c4f4005b1b3815f4c4b913cbea0024c88680fdcd0bd",
+      "observed_fingerprint": "2db7d95bb81229eeb5199c4f4005b1b3815f4c4b913cbea0024c88680fdcd0bd",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "dev",
+      "window_id": "g14b_i_80_run_003_f6421_6444_t1113438207000_1113438209300",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        6421,
+        6444
+      ],
+      "observed_time_interval": [
+        1113438207000,
+        1113438209300
+      ],
+      "observed_provider_interval": [
+        22602,
+        22625
+      ],
+      "observed_provider_run_local_interval": [
+        4608,
+        4631
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7289987,
+        "last_row_inclusive": 11838745,
+        "matched_raw_row_count": 5594
+      },
+      "vehicle_coverage": {
+        "minimum": 231,
+        "maximum": 234,
+        "mean": 233.083333
+      },
+      "expected_fingerprint": "e48f5e2649e0f32af08d353bff33a97cfe6fccb04e388249cbd8820423d0a88b",
+      "observed_fingerprint": "e48f5e2649e0f32af08d353bff33a97cfe6fccb04e388249cbd8820423d0a88b",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "dev",
+      "window_id": "g14b_i_80_run_003_f6613_6636_t1113438226200_1113438228500",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        6613,
+        6636
+      ],
+      "observed_time_interval": [
+        1113438226200,
+        1113438228500
+      ],
+      "observed_provider_interval": [
+        22794,
+        22817
+      ],
+      "observed_provider_run_local_interval": [
+        4800,
+        4823
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7284308,
+        "last_row_inclusive": 11820018,
+        "matched_raw_row_count": 5605
+      },
+      "vehicle_coverage": {
+        "minimum": 232,
+        "maximum": 236,
+        "mean": 233.541667
+      },
+      "expected_fingerprint": "90e947b5a4d45d0f5db340cbb1ad3e88fbc64b671d6f51d89bd1ab6917b88824",
+      "observed_fingerprint": "90e947b5a4d45d0f5db340cbb1ad3e88fbc64b671d6f51d89bd1ab6917b88824",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "dev",
+      "window_id": "g14b_i_80_run_003_f8821_8844_t1113438447000_1113438449300",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        8821,
+        8844
+      ],
+      "observed_time_interval": [
+        1113438447000,
+        1113438449300
+      ],
+      "observed_provider_interval": [
+        25002,
+        25025
+      ],
+      "observed_provider_run_local_interval": [
+        7008,
+        7031
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7284893,
+        "last_row_inclusive": 11846941,
+        "matched_raw_row_count": 5102
+      },
+      "vehicle_coverage": {
+        "minimum": 211,
+        "maximum": 215,
+        "mean": 212.583333
+      },
+      "expected_fingerprint": "4f684836da05331ace1debb19a2409e0a7c44fa4a5a14757990774896d664c6a",
+      "observed_fingerprint": "4f684836da05331ace1debb19a2409e0a7c44fa4a5a14757990774896d664c6a",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "dev",
+      "window_id": "g14b_i_80_run_003_f8341_8364_t1113438399000_1113438401300",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        8341,
+        8364
+      ],
+      "observed_time_interval": [
+        1113438399000,
+        1113438401300
+      ],
+      "observed_provider_interval": [
+        24522,
+        24545
+      ],
+      "observed_provider_run_local_interval": [
+        6528,
+        6551
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7284689,
+        "last_row_inclusive": 11844302,
+        "matched_raw_row_count": 5134
+      },
+      "vehicle_coverage": {
+        "minimum": 212,
+        "maximum": 216,
+        "mean": 213.916667
+      },
+      "expected_fingerprint": "8e1782005a0b0c9191d198a22f46b6e371218dccf4a8b4a0e7254116ba3738b2",
+      "observed_fingerprint": "8e1782005a0b0c9191d198a22f46b6e371218dccf4a8b4a0e7254116ba3738b2",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "dev",
+      "window_id": "g14b_i_80_run_001_f7452_7475_t1113433880100_1113433882400",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        7452,
+        7475
+      ],
+      "observed_time_interval": [
+        1113433880100,
+        1113433882400
+      ],
+      "observed_provider_interval": [
+        7448,
+        7471
+      ],
+      "observed_provider_run_local_interval": [
+        7448,
+        7471
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7286018,
+        "last_row_inclusive": 11845160,
+        "matched_raw_row_count": 3347
+      },
+      "vehicle_coverage": {
+        "minimum": 136,
+        "maximum": 143,
+        "mean": 139.458333
+      },
+      "expected_fingerprint": "abfd8e8cf99160fc109ac041e7536b3f2e433929de73ac339c1deec4de46cc09",
+      "observed_fingerprint": "abfd8e8cf99160fc109ac041e7536b3f2e433929de73ac339c1deec4de46cc09",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "dev",
+      "window_id": "g14b_i_80_run_003_f3589_3612_t1113437923800_1113437926100",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        3589,
+        3612
+      ],
+      "observed_time_interval": [
+        1113437923800,
+        1113437926100
+      ],
+      "observed_provider_interval": [
+        19770,
+        19793
+      ],
+      "observed_provider_run_local_interval": [
+        1776,
+        1799
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7284414,
+        "last_row_inclusive": 11839337,
+        "matched_raw_row_count": 4606
+      },
+      "vehicle_coverage": {
+        "minimum": 191,
+        "maximum": 193,
+        "mean": 191.916667
+      },
+      "expected_fingerprint": "716dc108ccea13262b88e09514160f9901b116aebfbc4cf41e314af3cb4f04e9",
+      "observed_fingerprint": "716dc108ccea13262b88e09514160f9901b116aebfbc4cf41e314af3cb4f04e9",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "dev",
+      "window_id": "g14b_i_80_run_003_f10501_10524_t1113438615000_1113438617300",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        10501,
+        10524
+      ],
+      "observed_time_interval": [
+        1113438615000,
+        1113438617300
+      ],
+      "observed_provider_interval": [
+        26682,
+        26705
+      ],
+      "observed_provider_run_local_interval": [
+        8688,
+        8711
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 10340945,
+        "last_row_inclusive": 11832230,
+        "matched_raw_row_count": 1268
+      },
+      "vehicle_coverage": {
+        "minimum": 51,
+        "maximum": 54,
+        "mean": 52.833333
+      },
+      "expected_fingerprint": "d4bfa63e18caef0d7c31ecf65f16814eb4ce29e70e79d999f3688813c063350d",
+      "observed_fingerprint": "d4bfa63e18caef0d7c31ecf65f16814eb4ce29e70e79d999f3688813c063350d",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "dev",
+      "window_id": "g14b_i_80_run_002_f4779_4802_t1113437244800_1113437247100",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        4779,
+        4802
+      ],
+      "observed_time_interval": [
+        1113437244800,
+        1113437247100
+      ],
+      "observed_provider_interval": [
+        14786,
+        14809
+      ],
+      "observed_provider_run_local_interval": [
+        4773,
+        4796
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7292955,
+        "last_row_inclusive": 11846681,
+        "matched_raw_row_count": 4022
+      },
+      "vehicle_coverage": {
+        "minimum": 166,
+        "maximum": 169,
+        "mean": 167.583333
+      },
+      "expected_fingerprint": "221651f747e94682c4fdbc97d251e394941fff44a25fa58857b7ba2b2651726f",
+      "observed_fingerprint": "221651f747e94682c4fdbc97d251e394941fff44a25fa58857b7ba2b2651726f",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "dev",
+      "window_id": "g14b_i_80_run_002_f7467_7490_t1113437513600_1113437515900",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        7467,
+        7490
+      ],
+      "observed_time_interval": [
+        1113437513600,
+        1113437515900
+      ],
+      "observed_provider_interval": [
+        17474,
+        17497
+      ],
+      "observed_provider_run_local_interval": [
+        7461,
+        7484
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7286414,
+        "last_row_inclusive": 11832613,
+        "matched_raw_row_count": 5858
+      },
+      "vehicle_coverage": {
+        "minimum": 242,
+        "maximum": 246,
+        "mean": 244.083333
+      },
+      "expected_fingerprint": "6bf51016700a5dbc31476fc71ad62878e8b1fcc9ad71c53c0f8771df4e08c34e",
+      "observed_fingerprint": "6bf51016700a5dbc31476fc71ad62878e8b1fcc9ad71c53c0f8771df4e08c34e",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "formal",
+      "window_id": "g14b_i_80_run_001_f6972_6995_t1113433832100_1113433834400",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        6972,
+        6995
+      ],
+      "observed_time_interval": [
+        1113433832100,
+        1113433834400
+      ],
+      "observed_provider_interval": [
+        6968,
+        6991
+      ],
+      "observed_provider_run_local_interval": [
+        6968,
+        6991
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7290737,
+        "last_row_inclusive": 11840509,
+        "matched_raw_row_count": 3739
+      },
+      "vehicle_coverage": {
+        "minimum": 154,
+        "maximum": 158,
+        "mean": 155.791667
+      },
+      "expected_fingerprint": "b470707160c278d8b5a5354258b0de22296ed63fb228a60a891b2772995df68b",
+      "observed_fingerprint": "b470707160c278d8b5a5354258b0de22296ed63fb228a60a891b2772995df68b",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "formal",
+      "window_id": "g14b_i_80_run_001_f5100_5123_t1113433644900_1113433647200",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        5100,
+        5123
+      ],
+      "observed_time_interval": [
+        1113433644900,
+        1113433647200
+      ],
+      "observed_provider_interval": [
+        5096,
+        5119
+      ],
+      "observed_provider_run_local_interval": [
+        5096,
+        5119
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850239,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7285182,
+        "last_row_inclusive": 11848695,
+        "matched_raw_row_count": 3576
+      },
+      "vehicle_coverage": {
+        "minimum": 147,
+        "maximum": 152,
+        "mean": 149.0
+      },
+      "expected_fingerprint": "acd756d7b2e98fa31bfc09c59c7dc60dd1633330fac079471477eba6b05362c1",
+      "observed_fingerprint": "acd756d7b2e98fa31bfc09c59c7dc60dd1633330fac079471477eba6b05362c1",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "formal",
+      "window_id": "g14b_i_80_run_003_f10933_10956_t1113438658200_1113438660500",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        10933,
+        10956
+      ],
+      "observed_time_interval": [
+        1113438658200,
+        1113438660500
+      ],
+      "observed_provider_interval": [
+        27114,
+        27137
+      ],
+      "observed_provider_run_local_interval": [
+        9120,
+        9143
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 11118299,
+        "last_row_inclusive": 11831109,
+        "matched_raw_row_count": 727
+      },
+      "vehicle_coverage": {
+        "minimum": 30,
+        "maximum": 31,
+        "mean": 30.291667
+      },
+      "expected_fingerprint": "0d3c98ae1c8ee447b27279d8bd27bd89f3aab4fe0326cbbd1a8c734a709b6101",
+      "observed_fingerprint": "0d3c98ae1c8ee447b27279d8bd27bd89f3aab4fe0326cbbd1a8c734a709b6101",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "formal",
+      "window_id": "g14b_i_80_run_002_f75_98_t1113436774400_1113436776700",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        75,
+        98
+      ],
+      "observed_time_interval": [
+        1113436774400,
+        1113436776700
+      ],
+      "observed_provider_interval": [
+        10082,
+        10105
+      ],
+      "observed_provider_run_local_interval": [
+        69,
+        92
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7285361,
+        "last_row_inclusive": 7909690,
+        "matched_raw_row_count": 320
+      },
+      "vehicle_coverage": {
+        "minimum": 10,
+        "maximum": 17,
+        "mean": 13.333333
+      },
+      "expected_fingerprint": "5616beb50660b34a99ee44de1a6009e4cbb1ced8c663df4b43fe5a806ea13bff",
+      "observed_fingerprint": "5616beb50660b34a99ee44de1a6009e4cbb1ced8c663df4b43fe5a806ea13bff",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "formal",
+      "window_id": "g14b_i_80_run_001_f7596_7619_t1113433894500_1113433896800",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        7596,
+        7619
+      ],
+      "observed_time_interval": [
+        1113433894500,
+        1113433896800
+      ],
+      "observed_provider_interval": [
+        7592,
+        7615
+      ],
+      "observed_provider_run_local_interval": [
+        7592,
+        7615
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7291116,
+        "last_row_inclusive": 11847587,
+        "matched_raw_row_count": 3577
+      },
+      "vehicle_coverage": {
+        "minimum": 145,
+        "maximum": 152,
+        "mean": 149.041667
+      },
+      "expected_fingerprint": "7f81441cface8a5dbc4c59ca336bffbc689861791f2018b4eff435e6d8a86e51",
+      "observed_fingerprint": "7f81441cface8a5dbc4c59ca336bffbc689861791f2018b4eff435e6d8a86e51",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "formal",
+      "window_id": "g14b_i_80_run_001_f8028_8051_t1113433937700_1113433940000",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        8028,
+        8051
+      ],
+      "observed_time_interval": [
+        1113433937700,
+        1113433940000
+      ],
+      "observed_provider_interval": [
+        8024,
+        8047
+      ],
+      "observed_provider_run_local_interval": [
+        8024,
+        8047
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7287262,
+        "last_row_inclusive": 11841824,
+        "matched_raw_row_count": 4223
+      },
+      "vehicle_coverage": {
+        "minimum": 175,
+        "maximum": 177,
+        "mean": 175.958333
+      },
+      "expected_fingerprint": "bef9fd0d4cb55ce89a4356ab7d141d5ec7304d20eb84695cd8df7343ab1e71e1",
+      "observed_fingerprint": "bef9fd0d4cb55ce89a4356ab7d141d5ec7304d20eb84695cd8df7343ab1e71e1",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "formal",
+      "window_id": "g14b_i_80_run_003_f4837_4860_t1113438048600_1113438050900",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        4837,
+        4860
+      ],
+      "observed_time_interval": [
+        1113438048600,
+        1113438050900
+      ],
+      "observed_provider_interval": [
+        21018,
+        21041
+      ],
+      "observed_provider_run_local_interval": [
+        3024,
+        3047
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7288139,
+        "last_row_inclusive": 11841917,
+        "matched_raw_row_count": 3649
+      },
+      "vehicle_coverage": {
+        "minimum": 150,
+        "maximum": 154,
+        "mean": 152.041667
+      },
+      "expected_fingerprint": "ac869ad6a8998faa9b2e9242dda73d2e2eaac249bd99da98f098de403c6b8f0e",
+      "observed_fingerprint": "ac869ad6a8998faa9b2e9242dda73d2e2eaac249bd99da98f098de403c6b8f0e",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "formal",
+      "window_id": "g14b_i_80_run_001_f5676_5699_t1113433702500_1113433704800",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        5676,
+        5699
+      ],
+      "observed_time_interval": [
+        1113433702500,
+        1113433704800
+      ],
+      "observed_provider_interval": [
+        5672,
+        5695
+      ],
+      "observed_provider_run_local_interval": [
+        5672,
+        5695
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7290814,
+        "last_row_inclusive": 11848838,
+        "matched_raw_row_count": 3243
+      },
+      "vehicle_coverage": {
+        "minimum": 133,
+        "maximum": 137,
+        "mean": 135.125
+      },
+      "expected_fingerprint": "a1a8f927b92a947a251892180808ea68596e9f476f692c3d4bb1b17f48a1e7b5",
+      "observed_fingerprint": "a1a8f927b92a947a251892180808ea68596e9f476f692c3d4bb1b17f48a1e7b5",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "formal",
+      "window_id": "g14b_i_80_run_001_f3804_3827_t1113433515300_1113433517600",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        3804,
+        3827
+      ],
+      "observed_time_interval": [
+        1113433515300,
+        1113433517600
+      ],
+      "observed_provider_interval": [
+        3800,
+        3823
+      ],
+      "observed_provider_run_local_interval": [
+        3800,
+        3823
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850002,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7295855,
+        "last_row_inclusive": 11841680,
+        "matched_raw_row_count": 2862
+      },
+      "vehicle_coverage": {
+        "minimum": 118,
+        "maximum": 121,
+        "mean": 119.25
+      },
+      "expected_fingerprint": "00b4cd2d4797db227aa70165bd894efb23ee4794b6b6ca2c1d6ee0164cf9c355",
+      "observed_fingerprint": "00b4cd2d4797db227aa70165bd894efb23ee4794b6b6ca2c1d6ee0164cf9c355",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "formal",
+      "window_id": "g14b_i_80_run_003_f4597_4620_t1113438024600_1113438026900",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        4597,
+        4620
+      ],
+      "observed_time_interval": [
+        1113438024600,
+        1113438026900
+      ],
+      "observed_provider_interval": [
+        20778,
+        20801
+      ],
+      "observed_provider_run_local_interval": [
+        2784,
+        2807
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7292623,
+        "last_row_inclusive": 11840369,
+        "matched_raw_row_count": 3730
+      },
+      "vehicle_coverage": {
+        "minimum": 153,
+        "maximum": 157,
+        "mean": 155.416667
+      },
+      "expected_fingerprint": "e8261a753bf8e3ad59de31eccef87f82905dd1b0fce6a11dce72d8092a61d327",
+      "observed_fingerprint": "e8261a753bf8e3ad59de31eccef87f82905dd1b0fce6a11dce72d8092a61d327",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "formal",
+      "window_id": "g14b_i_80_run_001_f3516_3539_t1113433486500_1113433488800",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        3516,
+        3539
+      ],
+      "observed_time_interval": [
+        1113433486500,
+        1113433488800
+      ],
+      "observed_provider_interval": [
+        3512,
+        3535
+      ],
+      "observed_provider_run_local_interval": [
+        3512,
+        3535
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850002,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7292549,
+        "last_row_inclusive": 11845187,
+        "matched_raw_row_count": 2794
+      },
+      "vehicle_coverage": {
+        "minimum": 115,
+        "maximum": 118,
+        "mean": 116.416667
+      },
+      "expected_fingerprint": "53cfc1e68671f308aa87eb4ae48d61007c6d814276e8750f12de250e6a7e949a",
+      "observed_fingerprint": "53cfc1e68671f308aa87eb4ae48d61007c6d814276e8750f12de250e6a7e949a",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "formal",
+      "window_id": "g14b_i_80_run_003_f4549_4572_t1113438019800_1113438022100",
+      "metadata_only": false,
+      "reachable": true,
+      "observed_frame_interval": [
+        4549,
+        4572
+      ],
+      "observed_time_interval": [
+        1113438019800,
+        1113438022100
+      ],
+      "observed_provider_interval": [
+        20730,
+        20753
+      ],
+      "observed_provider_run_local_interval": [
+        2736,
+        2759
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7286568,
+        "last_row_inclusive": 11838718,
+        "matched_raw_row_count": 3745
+      },
+      "vehicle_coverage": {
+        "minimum": 155,
+        "maximum": 158,
+        "mean": 156.041667
+      },
+      "expected_fingerprint": "60cefc34a295123333218f9354be24c7296781b38b0e9a2add81accb8806f962",
+      "observed_fingerprint": "60cefc34a295123333218f9354be24c7296781b38b0e9a2add81accb8806f962",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "sealed_holdout",
+      "window_id": "g14b_i_80_run_003_f5461_5484_t1113438111000_1113438113300",
+      "metadata_only": true,
+      "reachable": true,
+      "observed_frame_interval": [
+        5461,
+        5484
+      ],
+      "observed_time_interval": [
+        1113438111000,
+        1113438113300
+      ],
+      "observed_provider_interval": [
+        21642,
+        21665
+      ],
+      "observed_provider_run_local_interval": [
+        3648,
+        3671
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7295136,
+        "last_row_inclusive": 11838686,
+        "matched_raw_row_count": 3573
+      },
+      "vehicle_coverage": {
+        "minimum": 147,
+        "maximum": 151,
+        "mean": 148.875
+      },
+      "expected_fingerprint": "a3debacdc0856d268f4cece2b654c7828f883be942ab4a980c29971167494d59",
+      "observed_fingerprint": "a3debacdc0856d268f4cece2b654c7828f883be942ab4a980c29971167494d59",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "sealed_holdout",
+      "window_id": "g14b_i_80_run_003_f2293_2316_t1113437794200_1113437796500",
+      "metadata_only": true,
+      "reachable": true,
+      "observed_frame_interval": [
+        2293,
+        2316
+      ],
+      "observed_time_interval": [
+        1113437794200,
+        1113437796500
+      ],
+      "observed_provider_interval": [
+        18474,
+        18497
+      ],
+      "observed_provider_run_local_interval": [
+        480,
+        503
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7291972,
+        "last_row_inclusive": 11847828,
+        "matched_raw_row_count": 4188
+      },
+      "vehicle_coverage": {
+        "minimum": 173,
+        "maximum": 176,
+        "mean": 174.5
+      },
+      "expected_fingerprint": "7f86aa83941ebb6c247837c9cb7f5b2a7965520523bb85a081589e889159ab66",
+      "observed_fingerprint": "7f86aa83941ebb6c247837c9cb7f5b2a7965520523bb85a081589e889159ab66",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "sealed_holdout",
+      "window_id": "g14b_i_80_run_001_f2892_2915_t1113433424100_1113433426400",
+      "metadata_only": true,
+      "reachable": true,
+      "observed_frame_interval": [
+        2892,
+        2915
+      ],
+      "observed_time_interval": [
+        1113433424100,
+        1113433426400
+      ],
+      "observed_provider_interval": [
+        2888,
+        2911
+      ],
+      "observed_provider_run_local_interval": [
+        2888,
+        2911
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850002,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7285300,
+        "last_row_inclusive": 11846405,
+        "matched_raw_row_count": 2659
+      },
+      "vehicle_coverage": {
+        "minimum": 109,
+        "maximum": 112,
+        "mean": 110.791667
+      },
+      "expected_fingerprint": "822cd5df1a9780ec6a18a9c8fba2a12fe33065571928233030f5d5810dbea10a",
+      "observed_fingerprint": "822cd5df1a9780ec6a18a9c8fba2a12fe33065571928233030f5d5810dbea10a",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "sealed_holdout",
+      "window_id": "g14b_i_80_run_003_f11605_11628_t1113438725400_1113438727700",
+      "metadata_only": true,
+      "reachable": true,
+      "observed_frame_interval": [
+        11605,
+        11628
+      ],
+      "observed_time_interval": [
+        1113438725400,
+        1113438727700
+      ],
+      "observed_provider_interval": [
+        27786,
+        27809
+      ],
+      "observed_provider_run_local_interval": [
+        9792,
+        9815
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 11713976,
+        "last_row_inclusive": 11807616,
+        "matched_raw_row_count": 48
+      },
+      "vehicle_coverage": {
+        "minimum": 2,
+        "maximum": 2,
+        "mean": 2.0
+      },
+      "expected_fingerprint": "51b1f16df03ca563fdf44cdcf3908c7b7aa4872637b7623a69892cc657c0398f",
+      "observed_fingerprint": "51b1f16df03ca563fdf44cdcf3908c7b7aa4872637b7623a69892cc657c0398f",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "sealed_holdout",
+      "window_id": "g14b_i_80_run_003_f7621_7644_t1113438327000_1113438329300",
+      "metadata_only": true,
+      "reachable": true,
+      "observed_frame_interval": [
+        7621,
+        7644
+      ],
+      "observed_time_interval": [
+        1113438327000,
+        1113438329300
+      ],
+      "observed_provider_interval": [
+        23802,
+        23825
+      ],
+      "observed_provider_run_local_interval": [
+        5808,
+        5831
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7284752,
+        "last_row_inclusive": 11840988,
+        "matched_raw_row_count": 4675
+      },
+      "vehicle_coverage": {
+        "minimum": 193,
+        "maximum": 196,
+        "mean": 194.791667
+      },
+      "expected_fingerprint": "5f34c1a47458d442f6628e700b7fe54a424166d6b411964a0bd017a61963e136",
+      "observed_fingerprint": "5f34c1a47458d442f6628e700b7fe54a424166d6b411964a0bd017a61963e136",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "sealed_holdout",
+      "window_id": "g14b_i_80_run_002_f891_914_t1113436856000_1113436858300",
+      "metadata_only": true,
+      "reachable": true,
+      "observed_frame_interval": [
+        891,
+        914
+      ],
+      "observed_time_interval": [
+        1113436856000,
+        1113436858300
+      ],
+      "observed_provider_interval": [
+        10898,
+        10921
+      ],
+      "observed_provider_run_local_interval": [
+        885,
+        908
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7294998,
+        "last_row_inclusive": 11848451,
+        "matched_raw_row_count": 3222
+      },
+      "vehicle_coverage": {
+        "minimum": 134,
+        "maximum": 135,
+        "mean": 134.25
+      },
+      "expected_fingerprint": "ee7a83381d2006003a8101de924c376a52b93b83b67e09a0e997492cafb98714",
+      "observed_fingerprint": "ee7a83381d2006003a8101de924c376a52b93b83b67e09a0e997492cafb98714",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "sealed_holdout",
+      "window_id": "g14b_i_80_run_001_f8556_8579_t1113433990500_1113433992800",
+      "metadata_only": true,
+      "reachable": true,
+      "observed_frame_interval": [
+        8556,
+        8579
+      ],
+      "observed_time_interval": [
+        1113433990500,
+        1113433992800
+      ],
+      "observed_provider_interval": [
+        8552,
+        8575
+      ],
+      "observed_provider_run_local_interval": [
+        8552,
+        8575
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7293384,
+        "last_row_inclusive": 11847833,
+        "matched_raw_row_count": 3701
+      },
+      "vehicle_coverage": {
+        "minimum": 151,
+        "maximum": 156,
+        "mean": 154.208333
+      },
+      "expected_fingerprint": "b7b4a3d0d4ae92041b29015f314852bb941cb518cb9680554c72858176f21ee6",
+      "observed_fingerprint": "b7b4a3d0d4ae92041b29015f314852bb941cb518cb9680554c72858176f21ee6",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "sealed_holdout",
+      "window_id": "g14b_i_80_run_002_f7563_7586_t1113437523200_1113437525500",
+      "metadata_only": true,
+      "reachable": true,
+      "observed_frame_interval": [
+        7563,
+        7586
+      ],
+      "observed_time_interval": [
+        1113437523200,
+        1113437525500
+      ],
+      "observed_provider_interval": [
+        17570,
+        17593
+      ],
+      "observed_provider_run_local_interval": [
+        7557,
+        7580
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7288243,
+        "last_row_inclusive": 11849168,
+        "matched_raw_row_count": 5992
+      },
+      "vehicle_coverage": {
+        "minimum": 249,
+        "maximum": 251,
+        "mean": 249.666667
+      },
+      "expected_fingerprint": "a4258778ada6673c278cb62b10a1f2572a858e16a7e8b976287823083da00260",
+      "observed_fingerprint": "a4258778ada6673c278cb62b10a1f2572a858e16a7e8b976287823083da00260",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "sealed_holdout",
+      "window_id": "g14b_i_80_run_001_f7980_8003_t1113433932900_1113433935200",
+      "metadata_only": true,
+      "reachable": true,
+      "observed_frame_interval": [
+        7980,
+        8003
+      ],
+      "observed_time_interval": [
+        1113433932900,
+        1113433935200
+      ],
+      "observed_provider_interval": [
+        7976,
+        7999
+      ],
+      "observed_provider_run_local_interval": [
+        7976,
+        7999
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7287759,
+        "last_row_inclusive": 11834423,
+        "matched_raw_row_count": 4114
+      },
+      "vehicle_coverage": {
+        "minimum": 170,
+        "maximum": 172,
+        "mean": 171.416667
+      },
+      "expected_fingerprint": "55ce94c9ceb3d289c46114f2e5611de545deb536ca0e8cc601656f0d0e4ad344",
+      "observed_fingerprint": "55ce94c9ceb3d289c46114f2e5611de545deb536ca0e8cc601656f0d0e4ad344",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "sealed_holdout",
+      "window_id": "g14b_i_80_run_002_f5643_5666_t1113437331200_1113437333500",
+      "metadata_only": true,
+      "reachable": true,
+      "observed_frame_interval": [
+        5643,
+        5666
+      ],
+      "observed_time_interval": [
+        1113437331200,
+        1113437333500
+      ],
+      "observed_provider_interval": [
+        15650,
+        15673
+      ],
+      "observed_provider_run_local_interval": [
+        5637,
+        5660
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7287749,
+        "last_row_inclusive": 11840612,
+        "matched_raw_row_count": 3773
+      },
+      "vehicle_coverage": {
+        "minimum": 155,
+        "maximum": 159,
+        "mean": 157.208333
+      },
+      "expected_fingerprint": "3a6a0c404339cd3d9bed08ac7c73af7eeaebf039aba4d5d671404fc860c45f9f",
+      "observed_fingerprint": "3a6a0c404339cd3d9bed08ac7c73af7eeaebf039aba4d5d671404fc860c45f9f",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "sealed_holdout",
+      "window_id": "g14b_i_80_run_001_f8508_8531_t1113433985700_1113433988000",
+      "metadata_only": true,
+      "reachable": true,
+      "observed_frame_interval": [
+        8508,
+        8531
+      ],
+      "observed_time_interval": [
+        1113433985700,
+        1113433988000
+      ],
+      "observed_provider_interval": [
+        8504,
+        8527
+      ],
+      "observed_provider_run_local_interval": [
+        8504,
+        8527
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850514,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7285399,
+        "last_row_inclusive": 11839155,
+        "matched_raw_row_count": 3749
+      },
+      "vehicle_coverage": {
+        "minimum": 155,
+        "maximum": 157,
+        "mean": 156.208333
+      },
+      "expected_fingerprint": "5ff09247c715a1880f69ef75558e639ca97119e1272e480f32c120e448b63a53",
+      "observed_fingerprint": "5ff09247c715a1880f69ef75558e639ca97119e1272e480f32c120e448b63a53",
+      "fingerprint_match": true,
+      "errors": []
+    },
+    {
+      "split": "sealed_holdout",
+      "window_id": "g14b_i_80_run_003_f6997_7020_t1113438264600_1113438266900",
+      "metadata_only": true,
+      "reachable": true,
+      "observed_frame_interval": [
+        6997,
+        7020
+      ],
+      "observed_time_interval": [
+        1113438264600,
+        1113438266900
+      ],
+      "observed_provider_interval": [
+        23178,
+        23201
+      ],
+      "observed_provider_run_local_interval": [
+        5184,
+        5207
+      ],
+      "provider_frame_count": 73871,
+      "provider_frame_count_match": true,
+      "provider_identity_recomputed_from_raw_source": true,
+      "run_local_identity_recomputed_from_raw_source": true,
+      "required_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "derivation": "max raw row index + 1 over every i_80 provider frame at or before the frozen window end; preserves provider offset and full target vehicles"
+      },
+      "resolved_source_range": {
+        "start_row_inclusive": 0,
+        "end_row_exclusive": 11850526,
+        "source_row_count": 11850526,
+        "margin_rows": 0,
+        "exceeds_source_behavior": "reject",
+        "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+      },
+      "observed_source_interval": {
+        "first_row_inclusive": 7287947,
+        "last_row_inclusive": 11839807,
+        "matched_raw_row_count": 5737
+      },
+      "vehicle_coverage": {
+        "minimum": 236,
+        "maximum": 240,
+        "mean": 239.041667
+      },
+      "expected_fingerprint": "dba16bd72d1d8ce4d6a2531c2fe17211fd14be00801fea751661f017d9c19690",
+      "observed_fingerprint": "dba16bd72d1d8ce4d6a2531c2fe17211fd14be00801fea751661f017d9c19690",
+      "fingerprint_match": true,
+      "errors": []
+    }
+  ]
+}

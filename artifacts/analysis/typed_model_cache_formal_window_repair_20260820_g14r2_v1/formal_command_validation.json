@@ -1,0 +1,454 @@
+{
+  "status": "pass",
+  "formal_command_count": 30,
+  "rows": [
+    {
+      "phase": "dev_select",
+      "command_index": 0,
+      "status": "pass",
+      "command_identity": "875a2c7a11f5be515bbd2dd1f721d6d7e845ea4665614cd558db7368a94dc168",
+      "window_binding": "dev",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_ablation",
+      "command_index": 0,
+      "status": "pass",
+      "command_identity": "734ccdc7f014ccef2f931d1efda1cbef14284e660a114038c204ad0a06f138e3",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_ablation",
+      "command_index": 1,
+      "status": "pass",
+      "command_identity": "30c189a880e55dca47ea0e0af80f5cf8703facfcccfbc268f55d35097b1ca931",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_cache_policy",
+      "command_index": 0,
+      "status": "pass",
+      "command_identity": "31dd3ebd183dc215243c4f07b994184bf2e6e03e3fccac09aeb00a4b93075790",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_cache_policy",
+      "command_index": 1,
+      "status": "pass",
+      "command_identity": "43a4c7daaa0351cd5c87e887e6fde55fa4552382fc92ed7cd3aca54f3bba4f88",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_cache_policy",
+      "command_index": 2,
+      "status": "pass",
+      "command_identity": "8d414936eef254ed310a34435a2789e77d7643974eec59684827d8d09f10cfc0",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_controller",
+      "command_index": 0,
+      "status": "pass",
+      "command_identity": "c71f68cab57ff9c05058c85df00f00d97e63d421802aac75522a1d69b7bfbc39",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_controller",
+      "command_index": 1,
+      "status": "pass",
+      "command_identity": "ff65b6a76fb7ae06fcbd0256471ead4fffbf63d9b803a5e36eadbc3150fdb152",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_controller",
+      "command_index": 2,
+      "status": "pass",
+      "command_identity": "f04ddd4390e8f807c7ddd8857d9a819d9712c38849f3cb6f0e11fd7d271aa4c3",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_scalability",
+      "command_index": 0,
+      "status": "pass",
+      "command_identity": "21edd429cf1f80cc2d8ae1ba4aa8edab7442ae3e03ef970ddd79b8bc7a620cbb",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_scalability",
+      "command_index": 1,
+      "status": "pass",
+      "command_identity": "f4987a1bcae0ff0444dbad6e6df002bb5f8e7150a6a803204bc284ab3b8a3b06",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_scalability",
+      "command_index": 2,
+      "status": "pass",
+      "command_identity": "f54d5296246e268bc8460fd4f3ddb9ce21ee89c9bebfbae43cae381107c3cb6d",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_support",
+      "command_index": 0,
+      "status": "pass",
+      "command_identity": "230b004f1479efbfe74e024769abfaadeb52d07f7ccb0e7a83721921ccfe226b",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_support",
+      "command_index": 1,
+      "status": "pass",
+      "command_identity": "732e2067328b53328e1094e59aa2a70237991f424560d644ad1e5486349b6c8d",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_support",
+      "command_index": 2,
+      "status": "pass",
+      "command_identity": "dc2712288338a904ee58bd4ae0b48b929bf995c26e230702da014d9089ad17d7",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_support",
+      "command_index": 3,
+      "status": "pass",
+      "command_identity": "d7cfd9509ce3539e1cf75e9b55a38e2de3d44e4e56ef8a7940b1c1ace4e6aeaf",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_support",
+      "command_index": 4,
+      "status": "pass",
+      "command_identity": "5fba7a7db1f1ba1a01cd22ca50fe09ad6ba33b4390f3beaf1c268c2348ac6032",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_support",
+      "command_index": 5,
+      "status": "pass",
+      "command_identity": "e112a2cdbbda7ef9143f6a0214009ac200ffaea9db43d19fa57d1ffc95413db3",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_support",
+      "command_index": 6,
+      "status": "pass",
+      "command_identity": "f97600c9a220a91d70f6abaf736c4504784a91d08b409477f4f09347bf649fea",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_support",
+      "command_index": 7,
+      "status": "pass",
+      "command_identity": "8617d7626ea23b9bb0f52fc4d573beee8ffc1e45a95fbc3f05057b6236054134",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_support",
+      "command_index": 8,
+      "status": "pass",
+      "command_identity": "eb39f06a50a9ba2bffdbdcf749719472829cb65fe975a3fe58cd5ef5feca276d",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_support",
+      "command_index": 9,
+      "status": "pass",
+      "command_identity": "c2142359a11dd782df2266042cfe13cff6c9c195b1f69152d815cf439fc4a4c0",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "formal_support",
+      "command_index": 10,
+      "status": "pass",
+      "command_identity": "7a02d1451f58b04be7507fd31061bda325d081b395ce9d4e5e8780d4ea890ea6",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "prediction_boundary",
+      "command_index": 0,
+      "status": "pass",
+      "command_identity": "e112a2cdbbda7ef9143f6a0214009ac200ffaea9db43d19fa57d1ffc95413db3",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "prediction_boundary",
+      "command_index": 1,
+      "status": "pass",
+      "command_identity": "f97600c9a220a91d70f6abaf736c4504784a91d08b409477f4f09347bf649fea",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "prediction_boundary",
+      "command_index": 2,
+      "status": "pass",
+      "command_identity": "8617d7626ea23b9bb0f52fc4d573beee8ffc1e45a95fbc3f05057b6236054134",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "prediction_boundary",
+      "command_index": 3,
+      "status": "pass",
+      "command_identity": "eb39f06a50a9ba2bffdbdcf749719472829cb65fe975a3fe58cd5ef5feca276d",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "prediction_boundary",
+      "command_index": 4,
+      "status": "pass",
+      "command_identity": "c2142359a11dd782df2266042cfe13cff6c9c195b1f69152d815cf439fc4a4c0",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "prediction_boundary",
+      "command_index": 5,
+      "status": "pass",
+      "command_identity": "7a02d1451f58b04be7507fd31061bda325d081b395ce9d4e5e8780d4ea890ea6",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    },
+    {
+      "phase": "robustness",
+      "command_index": 0,
+      "status": "pass",
+      "command_identity": "8617d7626ea23b9bb0f52fc4d573beee8ffc1e45a95fbc3f05057b6236054134",
+      "window_binding": "formal",
+      "resolved_source_rows": 11850526,
+      "holdout": false
+    }
+  ],
+  "unavailable_support_settings": [
+    {
+      "setting_id": "sensitivity-821d6e0cebf10065",
+      "value": 0.75,
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "runtime catalog scaling would change catalog/dependency/initial fingerprints; no frozen safe transformer",
+      "parameters": {
+        "parameter": "object_size_scale",
+        "value": 0.75,
+        "unit": "multiplier"
+      }
+    },
+    {
+      "setting_id": "sensitivity-eea2d144b68b8e3e",
+      "value": 1.0,
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "runtime catalog scaling would change catalog/dependency/initial fingerprints; no frozen safe transformer",
+      "parameters": {
+        "parameter": "object_size_scale",
+        "value": 1.0,
+        "unit": "multiplier"
+      }
+    },
+    {
+      "setting_id": "sensitivity-f6b933406c35fad1",
+      "value": 1.25,
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "runtime catalog scaling would change catalog/dependency/initial fingerprints; no frozen safe transformer",
+      "parameters": {
+        "parameter": "object_size_scale",
+        "value": 1.25,
+        "unit": "multiplier"
+      }
+    },
+    {
+      "setting_id": "sensitivity-d1159f5aede308b3",
+      "value": 0.5,
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "environment exposes transfer bytes but no independent typed transfer-cost coefficient",
+      "parameters": {
+        "parameter": "transfer_cost_scale",
+        "value": 0.5,
+        "unit": "multiplier"
+      }
+    },
+    {
+      "setting_id": "sensitivity-192e09a3edc26f67",
+      "value": 1.0,
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "environment exposes transfer bytes but no independent typed transfer-cost coefficient",
+      "parameters": {
+        "parameter": "transfer_cost_scale",
+        "value": 1.0,
+        "unit": "multiplier"
+      }
+    },
+    {
+      "setting_id": "sensitivity-88de5df48f7ed6e2",
+      "value": 1.5,
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "environment exposes transfer bytes but no independent typed transfer-cost coefficient",
+      "parameters": {
+        "parameter": "transfer_cost_scale",
+        "value": 1.5,
+        "unit": "multiplier"
+      }
+    },
+    {
+      "setting_id": "sensitivity-a3217b26707d3c68",
+      "value": "low",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "no outcome-blind request-profile parameter exists; oracle-gap grouping is forbidden",
+      "parameters": {
+        "parameter": "reuse_opportunity",
+        "value": "low",
+        "unit": "predefined request profile"
+      }
+    },
+    {
+      "setting_id": "sensitivity-cd44f4a1995c06e4",
+      "value": "medium",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "no outcome-blind request-profile parameter exists; oracle-gap grouping is forbidden",
+      "parameters": {
+        "parameter": "reuse_opportunity",
+        "value": "medium",
+        "unit": "predefined request profile"
+      }
+    },
+    {
+      "setting_id": "sensitivity-cf6a5a308ff2b872",
+      "value": "high",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "no outcome-blind request-profile parameter exists; oracle-gap grouping is forbidden",
+      "parameters": {
+        "parameter": "reuse_opportunity",
+        "value": "high",
+        "unit": "predefined request profile"
+      }
+    },
+    {
+      "setting_id": "sensitivity-2b9310521d13dff2",
+      "value": 1,
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "no dependency-preserving typed catalog transformer with fixed object accounting exists",
+      "parameters": {
+        "parameter": "base_sharing_degree",
+        "value": 1,
+        "unit": "adapters per base"
+      }
+    },
+    {
+      "setting_id": "sensitivity-6b6ef17a7ae32b3e",
+      "value": 3,
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "no dependency-preserving typed catalog transformer with fixed object accounting exists",
+      "parameters": {
+        "parameter": "base_sharing_degree",
+        "value": 3,
+        "unit": "adapters per base"
+      }
+    },
+    {
+      "setting_id": "sensitivity-38f44ba00c4c9b48",
+      "value": 6,
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "no dependency-preserving typed catalog transformer with fixed object accounting exists",
+      "parameters": {
+        "parameter": "base_sharing_degree",
+        "value": 6,
+        "unit": "adapters per base"
+      }
+    },
+    {
+      "setting_id": "ablation-981f7431f6747f64",
+      "value": "legacy_adapter_only",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "variant lacks a typed fingerprint-preserving runtime transformer under the frozen contract",
+      "parameters": {
+        "parameter": "typed_semantics",
+        "value": "legacy_adapter_only",
+        "unit": "variant identity"
+      }
+    },
+    {
+      "setting_id": "ablation-21f2a09428fad811",
+      "value": "no_base_sharing",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "variant lacks a typed fingerprint-preserving runtime transformer under the frozen contract",
+      "parameters": {
+        "parameter": "typed_semantics",
+        "value": "no_base_sharing",
+        "unit": "variant identity"
+      }
+    },
+    {
+      "setting_id": "ablation-b34ed4fa87ca13bd",
+      "value": "no_workflow_state_migration",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "variant lacks a typed fingerprint-preserving runtime transformer under the frozen contract",
+      "parameters": {
+        "parameter": "typed_semantics",
+        "value": "no_workflow_state_migration",
+        "unit": "variant identity"
+      }
+    },
+    {
+      "setting_id": "ablation-99f8c7f3960d5ff4",
+      "value": "fixed_no_eviction",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "variant lacks a typed fingerprint-preserving runtime transformer under the frozen contract",
+      "parameters": {
+        "parameter": "typed_semantics",
+        "value": "fixed_no_eviction",
+        "unit": "variant identity"
+      }
+    }
+  ]
+}

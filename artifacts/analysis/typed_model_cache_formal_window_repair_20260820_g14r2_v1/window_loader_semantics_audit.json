@@ -1,0 +1,21 @@
+{
+  "status": "pass",
+  "frame_offset_semantics": "index in provider frames sorted by (normalized segment, Global_Time)",
+  "raw_row_semantics": "max_mobility_rows truncates raw CSV before grouping/preprocessing",
+  "raw_rows": 11850526,
+  "provider_frames": 73871,
+  "segment_selection_timing": "after raw prefix parse and provider global sort",
+  "frozen_segment": "i_80",
+  "maximum_frozen_offset": 27786,
+  "split_required_source_rows": {
+    "train": 11850526,
+    "dev": 11850526,
+    "formal": 11850526,
+    "sealed_holdout": 11850526
+  },
+  "vehicle_filtering_before_index": false,
+  "deduplication_before_index": "group by segment/time; raw vehicle rows preserved",
+  "training_benchmark_same_loader": true,
+  "max_rows_only_sufficient_but_not_memory_safe": true,
+  "selected_resolution": "explicit plan + segment/time identity loader over frozen full source range"
+}

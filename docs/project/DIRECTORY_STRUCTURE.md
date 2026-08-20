@@ -1,5 +1,14 @@
 ﻿# Directory Structure
 
+G14R2：Protocol v1.2 与 window contract 位于
+`configs/experiment/typed_model_cache_formal_protocol_v1_2_20260820/`；复用 v1.1 的 science/runtime/
+fairness assets，不复制或改写 G14B 四个 window plans。loader 合同位于
+`src/evaluators/formal_window_consumption.py`，修复/preflight/rehearsal 入口为
+`scripts/repair_typed_model_cache_formal_windows.py`、`scripts/validate_formal_window_consumption.py` 与
+`scripts/run_typed_model_cache_window_rehearsal.py`。机器审计包位于
+`artifacts/analysis/typed_model_cache_formal_window_repair_20260820_g14r2_v1/`；只提交根级 JSON，
+`rehearsal_runs/` 下 tiny checkpoints/raw rows 保持 ignored。该结构不含 G14C v3 正式输出。
+
 G14R：v1.1 配置与 companion 位于
 `configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/`，包括 protocol、agent config、
 三档 runtime、formal/dev 与 setting-specific fairness manifests、split companion 和 index。代码入口为
@@ -46,6 +55,8 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 - `configs/experiment/top_journal_v17_future_validation_time_audited_20260717/`：v17 time-audited future-validation 固定窗口计划；按 `frame_offset` 和 `time_index_start/end` 同时排除历史 split
 - `configs/experiment/typed_model_cache_formal_protocol_v1_20260820/`：G14B train/dev/formal/sealed-holdout 四个 outcome-blind window plans 与 protocol index；holdout 仍 sealed
 - `configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/`：G14R executable v1.1 protocol、agent/runtime/fairness/split companions 与完整 command matrix；不含正式结果
+- `configs/experiment/typed_model_cache_formal_protocol_v1_2_20260820/`：G14R2 executable v1.2 protocol、
+  frozen window consumption contract、agent/split companions 与 index；不含正式 checkpoint 或结果
 - `data/`：原始数据与处理后数据；通过 Git LFS 版本化，完整克隆后需执行 `git lfs pull`
 - `docs/`：长期维护文档，`docs/project/` 为事实来源，`docs/project/DATASET_SOURCES.md` 记录数据源声明，`docs/project/literature_reference_table.md` 记录顶刊/顶会 related-work 参考表，`docs/benchmark_plan_or_baseline_plan.md`、`docs/baseline_formalization_round1.md`、`docs/experiment_status_round1.md`、`docs/mechanism_activation_check_round1.md` 和 `docs/experiment_runbook_round1.md` 记录 baseline 计划、round1 状态、机制诊断与复跑命令
 - `scripts/`：数据检查、dry-run、训练、评估和 benchmark 入口

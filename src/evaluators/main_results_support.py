@@ -2241,7 +2241,27 @@ def load_window_bundle(
     random_seed: int,
     mobility_source: str = "ngsim",
     lust_scenario_root: str = "",
+    formal_window_consumption_contract_path: str = "",
+    formal_window_split: str = "",
+    expected_window_id: str = "",
 ) -> Any:
+    if formal_window_consumption_contract_path:
+        if mobility_source != "ngsim":
+            raise ValueError("formal frozen-window consumption currently requires NGSIM")
+        if not formal_window_split or not expected_window_id:
+            raise ValueError(
+                "formal frozen-window loading requires split and expected window_id"
+            )
+        from src.evaluators.formal_window_consumption import (
+            load_window_bundle_from_contract,
+        )
+
+        return load_window_bundle_from_contract(
+            contract_path=formal_window_consumption_contract_path,
+            split=formal_window_split,
+            window_id=expected_window_id,
+            rsu_layout=rsu_layout,
+        )
     return load_real_mobility_bundle(
         root_dir=root_dir,
         mobility_source=mobility_source,

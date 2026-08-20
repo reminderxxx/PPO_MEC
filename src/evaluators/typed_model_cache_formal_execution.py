@@ -1,4 +1,4 @@
-"""G14R executable contracts for typed model-cache protocol v1.1.
+"""Executable contracts for typed model-cache protocols v1.1 and v1.2.
 
 This module is intentionally outcome-blind.  It validates frozen settings,
 expands commands, binds support runs to typed provenance, and maintains an
@@ -14,8 +14,10 @@ import math
 import os
 import re
 import subprocess
+import time
 from copy import deepcopy
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
@@ -27,11 +29,15 @@ from src.evaluators.typed_model_cache_formal_protocol import (
 
 FORMAL_EXECUTION_PROTOCOL_VERSION = "1.1.0"
 FORMAL_EXECUTION_PROTOCOL_ID = "typed_model_cache_formal_protocol_v1_1"
-FORMAL_PHASE_RUNNER_VERSION = "1.0.0"
+FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION = "1.2.0"
+FORMAL_EXECUTION_PROTOCOL_V1_2_ID = "typed_model_cache_formal_protocol_v1_2"
+FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
+FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
 PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
 SUPPORT_RUNNER_CONTRACT_VERSION = "1.0.0"
 READINESS_REVIEW_VERSION = "3.0.0"
 READY_VERDICT = "READY_FOR_G14C_V2_CLEAN_TRAIN_AND_FORMAL"
+READY_V4_VERDICT = "READY_FOR_G14C_V3_CLEAN_TRAIN_AND_FORMAL"
 OLD_PROTOCOL_SEMANTIC_SHA256 = (
     "41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4"
 )
@@ -72,6 +78,19 @@ PRIMARY_ENDPOINTS = (
 )
 PLACEHOLDER_PATTERN = re.compile(r"\{([a-z][a-z0-9_]*)\}")
 HOLDOUT_TERMS = ("sealed_holdout", "holdout_token", "hidden", "--holdout")
+FAILURE_CLASSIFICATIONS = (
+    "infrastructure_retryable",
+    "infrastructure_terminal",
+    "protocol_mismatch",
+    "implementation_error",
+    "data_window_unreachable",
+    "test_failure",
+    "training_failure",
+    "artifact_integrity_failure",
+    "user_interruption",
+)
+TERMINAL_LEDGER_STATUSES = {"completed", "failed"}
+LEDGER_WALL_CLOCK_TOLERANCE_SECONDS = 2.0
 
 
 class FormalExecutionError(ValueError):
@@ -445,17 +464,50 @@ def validate_command_templates(
 
 def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
     _reject_non_finite(protocol)
-    if protocol.get("typed_model_cache_formal_protocol_version") != FORMAL_EXECUTION_PROTOCOL_VERSION:
+    version = protocol.get("typed_model_cache_formal_protocol_version")
+    if version not in {
+        FORMAL_EXECUTION_PROTOCOL_VERSION,
+        FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION,
+    }:
         raise FormalExecutionError("unsupported formal execution protocol version")
-    if protocol.get("protocol_id") != FORMAL_EXECUTION_PROTOCOL_ID:
+    expected_protocol_id = (
+        FORMAL_EXECUTION_PROTOCOL_ID
+        if version == FORMAL_EXECUTION_PROTOCOL_VERSION
+        else FORMAL_EXECUTION_PROTOCOL_V1_2_ID
+    )
+    if protocol.get("protocol_id") != expected_protocol_id:
         raise FormalExecutionError("formal execution protocol ID mismatch")
     supersession = protocol.get("supersession", {})
-    if supersession.get("supersedes_version") != "1.0.0":
-        raise FormalExecutionError("protocol v1.1 must supersede v1.0")
-    if supersession.get("old_protocol_status") != "invalid_before_execution":
-        raise FormalExecutionError("old protocol invalid status is missing")
-    if supersession.get("old_protocol_semantic_sha256") != OLD_PROTOCOL_SEMANTIC_SHA256:
-        raise FormalExecutionError("old protocol hash mismatch")
+    if version == FORMAL_EXECUTION_PROTOCOL_VERSION:
+        if supersession.get("supersedes_version") != "1.0.0":
+            raise FormalExecutionError("protocol v1.1 must supersede v1.0")
+        if supersession.get("old_protocol_status") != "invalid_before_execution":
+            raise FormalExecutionError("old protocol invalid status is missing")
+        if supersession.get("old_protocol_semantic_sha256") != OLD_PROTOCOL_SEMANTIC_SHA256:
+            raise FormalExecutionError("old protocol hash mismatch")
+    else:
+        if supersession.get("supersedes_version") != "1.1.0":
+            raise FormalExecutionError("protocol v1.2 must supersede v1.1")
+        if supersession.get("old_protocol_status") != "invalid_before_performance_execution":
+            raise FormalExecutionError("protocol v1.1 invalid status is missing")
+        if not supersession.get("failure_audit_sha256"):
+            raise FormalExecutionError("G14C v2 failure audit hash is missing")
+        window_contract = protocol.get("execution_contract", {}).get(
+            "window_consumption_contract", {}
+        )
+        if window_contract.get("version") != "1.0.0" or not window_contract.get(
+            "semantic_sha256"
+        ):
+            raise FormalExecutionError("formal window consumption contract is missing")
+        if window_contract.get("contract_identity") != window_contract.get(
+            "semantic_sha256"
+        ):
+            raise FormalExecutionError("formal window consumption identity is not hash-bound")
+        ledger = protocol.get("execution_contract", {}).get("phase_ledger", {})
+        if ledger.get("schema_version") != FORMAL_PHASE_LEDGER_SCHEMA_VERSION:
+            raise FormalExecutionError("phase ledger schema version mismatch")
+        if tuple(ledger.get("failure_classifications", [])) != FAILURE_CLASSIFICATIONS:
+            raise FormalExecutionError("phase failure classification enum mismatch")
     if protocol.get("identity", {}).get("split_semantic_sha256") != SPLIT_SEMANTIC_SHA256:
         raise FormalExecutionError("split semantic hash changed")
     if tuple(protocol.get("endpoints", {}).get("primary", [])) != PRIMARY_ENDPOINTS:
@@ -489,6 +541,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         raise FormalExecutionError("formal protocol semantic hash mismatch")
     return {
         "status": "pass",
+        "protocol_version": version,
         "semantic_sha256": observed,
         "split_semantic_sha256": SPLIT_SEMANTIC_SHA256,
         "primary_endpoint_count": len(PRIMARY_ENDPOINTS),
@@ -545,6 +598,35 @@ def readiness_v3(checks: Mapping[str, bool]) -> str:
     return READY_VERDICT if all(checks.values()) else "BLOCKED_G14R_READINESS_V3"
 
 
+def readiness_v4(checks: Mapping[str, bool]) -> str:
+    required = {
+        "window_reachability_60_of_60",
+        "frame_time_fingerprint_identity",
+        "training_commands_150_of_150",
+        "formal_commands_resolved",
+        "support_commands_resolved_or_unavailable",
+        "no_implicit_mobility_row_default",
+        "window_consumption_contract",
+        "ledger_schema_complete",
+        "ledger_append_chain",
+        "failure_classification",
+        "rehearsal",
+        "holdout_sealed",
+        "no_formal_training_or_results",
+    }
+    if set(checks) != required:
+        raise FormalExecutionError(
+            "readiness v4 check set mismatch: "
+            f"missing={sorted(required - set(checks))}, "
+            f"extra={sorted(set(checks) - required)}"
+        )
+    return (
+        READY_V4_VERDICT
+        if all(checks.values())
+        else "BLOCKED_G14R2_READINESS_V4"
+    )
+
+
 def protocol_hash_changes_on_mutation(
     protocol: Mapping[str, Any], dotted_path: str, value: Any
 ) -> bool:
@@ -577,8 +659,147 @@ class CommandResult:
     stderr: str = ""
 
 
+def _parse_ledger_timestamp(value: Any, field: str) -> datetime:
+    if not isinstance(value, str):
+        raise FormalExecutionError(f"phase ledger {field} must be an ISO timestamp")
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError as exc:
+        raise FormalExecutionError(f"invalid phase ledger timestamp: {field}") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise FormalExecutionError(f"phase ledger timestamp lacks timezone: {field}")
+    return parsed
+
+
+def _ledger_record_hash(record: Mapping[str, Any]) -> str:
+    return canonical_sha256(
+        {key: value for key, value in record.items() if key != "current_record_hash"}
+    )
+
+
+def validate_phase_ledger(
+    records: Sequence[Mapping[str, Any]],
+    *,
+    wall_clock_tolerance_seconds: float = LEDGER_WALL_CLOCK_TOLERANCE_SECONDS,
+) -> dict[str, Any]:
+    required = {
+        "phase_ledger_schema_version",
+        "phase",
+        "sequence_number",
+        "status",
+        "started_at",
+        "completed_at",
+        "wall_clock_seconds",
+        "input_hash",
+        "output_hash",
+        "expanded_command",
+        "command_identity",
+        "return_code",
+        "retry_count",
+        "failure_classification",
+        "failure_message_reference",
+        "previous_record_hash",
+        "current_record_hash",
+    }
+    previous_hash: str | None = None
+    terminal_by_phase: dict[str, str] = {}
+    for index, raw_record in enumerate(records, start=1):
+        record = dict(raw_record)
+        missing = required.difference(record)
+        if missing:
+            raise FormalExecutionError(
+                f"phase ledger record {index} missing fields: {sorted(missing)}"
+            )
+        if record["phase_ledger_schema_version"] != FORMAL_PHASE_LEDGER_SCHEMA_VERSION:
+            raise FormalExecutionError("phase ledger schema version mismatch")
+        if int(record["sequence_number"]) != index:
+            raise FormalExecutionError("phase ledger sequence number mismatch")
+        if record["previous_record_hash"] != previous_hash:
+            raise FormalExecutionError("phase ledger previous hash mismatch")
+        expected_hash = _ledger_record_hash(record)
+        if record["current_record_hash"] != expected_hash:
+            raise FormalExecutionError("phase ledger current hash mismatch")
+        previous_hash = expected_hash
+        phase = str(record["phase"])
+        status = str(record["status"])
+        if phase not in PHASE_ORDER or status not in {"running", *TERMINAL_LEDGER_STATUSES}:
+            raise FormalExecutionError("invalid phase ledger phase/status")
+        if phase in terminal_by_phase:
+            raise FormalExecutionError("terminal phase ledger record is immutable")
+        started = _parse_ledger_timestamp(record["started_at"], "started_at")
+        classification = record["failure_classification"]
+        return_code = record["return_code"]
+        if status == "running":
+            if record["completed_at"] is not None or record["wall_clock_seconds"] is not None:
+                raise FormalExecutionError("running phase record cannot have completion time")
+            if return_code is not None or classification is not None:
+                raise FormalExecutionError("running phase record cannot have terminal outcome")
+        else:
+            completed = _parse_ledger_timestamp(record["completed_at"], "completed_at")
+            if completed < started:
+                raise FormalExecutionError("phase ledger system time moved backwards")
+            wall_clock = float(record["wall_clock_seconds"])
+            if not math.isfinite(wall_clock) or wall_clock < 0:
+                raise FormalExecutionError("invalid phase ledger wall clock")
+            timestamp_delta = (completed - started).total_seconds()
+            if abs(timestamp_delta - wall_clock) > float(wall_clock_tolerance_seconds):
+                raise FormalExecutionError("phase ledger wall clock/timestamp mismatch")
+            terminal_by_phase[phase] = status
+            if status == "completed":
+                if return_code != 0 or classification is not None:
+                    raise FormalExecutionError("completed phase ledger outcome is invalid")
+            else:
+                if classification not in FAILURE_CLASSIFICATIONS:
+                    raise FormalExecutionError("missing or invalid failure classification")
+                if return_code == 75 and classification != "infrastructure_retryable":
+                    raise FormalExecutionError("return code 75 must be infrastructure_retryable")
+                if classification == "infrastructure_retryable" and return_code != 75:
+                    raise FormalExecutionError("infrastructure_retryable requires return code 75")
+        if int(record["retry_count"]) < 0:
+            raise FormalExecutionError("phase ledger retry count is invalid")
+    return {
+        "status": "pass",
+        "record_count": len(records),
+        "terminal_phase_count": len(terminal_by_phase),
+        "last_record_hash": previous_hash,
+    }
+
+
+def classify_phase_failure(
+    *, phase: str, return_code: int | None, message: str
+) -> str:
+    lowered = str(message or "").lower()
+    if return_code == 75:
+        return "infrastructure_retryable"
+    if any(
+        token in lowered
+        for token in (
+            "frame_offset",
+            "window unreachable",
+            "window_unreachable",
+            "data_window_unreachable",
+            "fingerprint mismatch",
+            "source range",
+        )
+    ):
+        return "data_window_unreachable"
+    if any(token in lowered for token in ("protocol mismatch", "contract mismatch", "override rejected")):
+        return "protocol_mismatch"
+    if phase == "tests":
+        return "test_failure"
+    if phase == "train":
+        return "training_failure"
+    if phase in {"formal_gate", "checkpoint_freeze"}:
+        return "artifact_integrity_failure"
+    if return_code in {130, -2}:
+        return "user_interruption"
+    if return_code is None:
+        return "implementation_error"
+    return "infrastructure_terminal" if return_code >= 64 else "implementation_error"
+
+
 class AppendOnlyPhaseRunner:
-    """Append phase events without rewriting or deleting earlier failures."""
+    """Hash-chained phase ledger with immutable terminal records."""
 
     def __init__(
         self,
@@ -586,14 +807,19 @@ class AppendOnlyPhaseRunner:
         protocol: Mapping[str, Any],
         output_root: str | Path,
         resume: bool = False,
+        clock: Callable[[], datetime] | None = None,
+        monotonic_clock: Callable[[], float] | None = None,
     ) -> None:
         validate_protocol_v1_1(protocol)
         self.protocol = dict(protocol)
         self.output_root = Path(output_root)
         self.ledger_path = self.output_root / "phase_state.jsonl"
+        self._clock = clock or (lambda: datetime.now(timezone.utc))
+        self._monotonic_clock = monotonic_clock or time.monotonic
         if resume:
             if not self.ledger_path.is_file():
                 raise FormalExecutionError("resume requires an existing phase ledger")
+            self.events()
         else:
             if self.output_root.exists() and any(self.output_root.iterdir()):
                 raise FormalExecutionError("output root conflict: non-empty path already exists")
@@ -604,39 +830,51 @@ class AppendOnlyPhaseRunner:
     def events(self) -> list[dict[str, Any]]:
         if not self.ledger_path.exists():
             return []
-        events: list[dict[str, Any]] = []
+        records: list[dict[str, Any]] = []
         for line_number, line in enumerate(
             self.ledger_path.read_text(encoding="utf-8").splitlines(), start=1
         ):
             if not line.strip():
                 continue
             try:
-                event = json.loads(line)
+                record = json.loads(line)
             except json.JSONDecodeError as exc:
                 raise FormalExecutionError(
                     f"invalid append-only phase ledger line {line_number}"
                 ) from exc
-            if not isinstance(event, dict):
+            if not isinstance(record, dict):
                 raise FormalExecutionError("phase ledger event must be an object")
-            events.append(event)
-        return events
+            records.append(record)
+        validate_phase_ledger(records)
+        return records
 
-    def _append(self, event: Mapping[str, Any]) -> None:
-        _reject_non_finite(event)
+    def _append_record(self, record: Mapping[str, Any]) -> dict[str, Any]:
+        existing = self.events()
+        previous_hash = existing[-1]["current_record_hash"] if existing else None
+        payload = {
+            "phase_ledger_schema_version": FORMAL_PHASE_LEDGER_SCHEMA_VERSION,
+            **dict(record),
+            "sequence_number": len(existing) + 1,
+            "previous_record_hash": previous_hash,
+        }
+        payload["current_record_hash"] = _ledger_record_hash(payload)
+        _reject_non_finite(payload)
+        validate_phase_ledger([*existing, payload])
         encoded = json.dumps(
-            dict(event), ensure_ascii=False, sort_keys=True, allow_nan=False
+            payload, ensure_ascii=False, sort_keys=True, allow_nan=False
         ) + "\n"
         with self.ledger_path.open("a", encoding="utf-8") as handle:
             handle.write(encoded)
             handle.flush()
             os.fsync(handle.fileno())
+        return payload
 
     def _completed(self) -> dict[str, dict[str, Any]]:
-        result: dict[str, dict[str, Any]] = {}
-        for event in self.events():
-            if event.get("status") == "completed":
-                result[str(event["phase"])] = event
-        return result
+        return {
+            str(record["phase"]): record
+            for record in self.events()
+            if record.get("status") == "completed"
+        }
 
     def _resolve_output_patterns(self, patterns: Sequence[str]) -> dict[str, str]:
         resolved: dict[str, str] = {}
@@ -644,14 +882,48 @@ class AppendOnlyPhaseRunner:
             candidate = Path(pattern)
             if candidate.is_absolute() or ".." in candidate.parts:
                 raise FormalExecutionError("expected output pattern must stay within output_root")
-            matches = sorted(self.output_root.glob(pattern))
-            files = [path for path in matches if path.is_file()]
+            files = [path for path in sorted(self.output_root.glob(pattern)) if path.is_file()]
             if not files:
                 raise FormalExecutionError(f"phase expected output missing: {pattern}")
             for path in files:
-                relative = path.relative_to(self.output_root).as_posix()
-                resolved[relative] = file_sha256(path)
+                resolved[path.relative_to(self.output_root).as_posix()] = file_sha256(path)
         return resolved
+
+    def _base_record(
+        self,
+        *,
+        phase: str,
+        status: str,
+        started_at: str,
+        completed_at: str | None,
+        wall_clock_seconds: float | None,
+        input_hash: str,
+        output_hash: str | None,
+        commands: list[list[str]],
+        return_code: int | None,
+        retry_count: int,
+        failure_classification: str | None,
+        failure_message_reference: str | None,
+        **extra: Any,
+    ) -> dict[str, Any]:
+        return {
+            "phase": phase,
+            "status": status,
+            "started_at": started_at,
+            "completed_at": completed_at,
+            "wall_clock_seconds": wall_clock_seconds,
+            "input_hash": input_hash,
+            "output_hash": output_hash,
+            "expanded_command": commands,
+            "commands": commands,
+            "command_identity": canonical_sha256(commands),
+            "return_code": return_code,
+            "returncode": return_code,
+            "retry_count": int(retry_count),
+            "failure_classification": failure_classification,
+            "failure_message_reference": failure_message_reference,
+            **extra,
+        }
 
     def run_phase(
         self,
@@ -675,9 +947,8 @@ class AppendOnlyPhaseRunner:
             validate_no_holdout_capability(item)
         if infrastructure_retries not in {0, 1}:
             raise FormalExecutionError("infrastructure retry may be at most one")
-        events = self.events()
-        failed = [event for event in events if event.get("status") == "failed"]
-        if failed:
+        records = self.events()
+        if any(record.get("status") == "failed" for record in records):
             raise FormalExecutionError("failed phase is terminal and cannot be overwritten")
         completed = self._completed()
         if phase == "train" and any(item in completed for item in FORMAL_PHASES):
@@ -699,60 +970,186 @@ class AppendOnlyPhaseRunner:
         if phase == "complete_without_holdout" and commands:
             raise FormalExecutionError("complete_without_holdout is an internal zero-command phase")
 
+        start_dt = self._clock()
+        if start_dt.tzinfo is None or start_dt.utcoffset() is None:
+            raise FormalExecutionError("phase runner clock must be timezone-aware")
+        started_at = start_dt.isoformat()
+        monotonic_start = float(self._monotonic_clock())
+        prior_running = sum(
+            record.get("phase") == phase and record.get("status") == "running"
+            for record in records
+        )
+        self._append_record(
+            self._base_record(
+                phase=phase,
+                status="running",
+                started_at=started_at,
+                completed_at=None,
+                wall_clock_seconds=None,
+                input_hash=input_hash,
+                output_hash=None,
+                commands=commands,
+                return_code=None,
+                retry_count=prior_running,
+                failure_classification=None,
+                failure_message_reference=None,
+            )
+        )
         execute = executor or self._subprocess_executor
         command_attempts: list[int] = []
         result = CommandResult(returncode=0)
-        for command_index, current_command in enumerate(commands):
-            attempts = 0
-            while True:
-                attempts += 1
-                result = execute(current_command)
-                if result.returncode == 0:
-                    break
-                # Exit 75 is the only frozen infrastructure-temporary code eligible for retry.
-                if result.returncode != 75 or attempts > infrastructure_retries:
-                    self._append(
-                        {
-                            "phase": phase,
-                            "status": "failed",
-                            "input_hash": input_hash,
-                            "commands": commands,
-                            "failed_command_index": command_index,
-                            "returncode": result.returncode,
-                            "attempts": attempts,
-                            "stderr": result.stderr[-4000:],
-                        }
+        total_retries = prior_running
+        try:
+            for command_index, current_command in enumerate(commands):
+                attempts = 0
+                while True:
+                    attempts += 1
+                    try:
+                        result = execute(current_command)
+                    except KeyboardInterrupt:
+                        raise
+                    except Exception as exc:  # noqa: BLE001 - ledger must capture executor failure.
+                        completed_at, wall_clock = self._terminal_time(
+                            start_dt, monotonic_start
+                        )
+                        classification = classify_phase_failure(
+                            phase=phase, return_code=None, message=str(exc)
+                        )
+                        self._append_record(
+                            self._base_record(
+                                phase=phase,
+                                status="failed",
+                                started_at=started_at,
+                                completed_at=completed_at,
+                                wall_clock_seconds=wall_clock,
+                                input_hash=input_hash,
+                                output_hash=None,
+                                commands=commands,
+                                return_code=None,
+                                retry_count=total_retries,
+                                failure_classification=classification,
+                                failure_message_reference=f"{type(exc).__name__}: {exc}"[-4000:],
+                                failed_command_index=command_index,
+                                attempts=attempts,
+                            )
+                        )
+                        raise FormalExecutionError(f"phase failed: {phase}") from exc
+                    if result.returncode == 0:
+                        break
+                    if result.returncode == 75 and attempts <= infrastructure_retries:
+                        total_retries += 1
+                        continue
+                    completed_at, wall_clock = self._terminal_time(
+                        start_dt, monotonic_start
+                    )
+                    message = result.stderr or result.stdout
+                    classification = classify_phase_failure(
+                        phase=phase,
+                        return_code=result.returncode,
+                        message=message,
+                    )
+                    self._append_record(
+                        self._base_record(
+                            phase=phase,
+                            status="failed",
+                            started_at=started_at,
+                            completed_at=completed_at,
+                            wall_clock_seconds=wall_clock,
+                            input_hash=input_hash,
+                            output_hash=None,
+                            commands=commands,
+                            return_code=result.returncode,
+                            retry_count=total_retries,
+                            failure_classification=classification,
+                            failure_message_reference=message[-4000:] or None,
+                            failed_command_index=command_index,
+                            attempts=attempts,
+                        )
                     )
                     raise FormalExecutionError(f"phase failed: {phase}")
-            command_attempts.append(attempts)
-        try:
-            output_hashes = self._resolve_output_patterns(expected_outputs)
-        except FormalExecutionError as exc:
-            self._append(
-                {
-                    "phase": phase,
-                    "status": "failed",
-                    "input_hash": input_hash,
-                    "commands": commands,
-                    "returncode": 0,
-                    "attempts": attempts,
-                    "missing_outputs": list(expected_outputs),
-                }
+                command_attempts.append(attempts)
+            try:
+                output_hashes = self._resolve_output_patterns(expected_outputs)
+            except FormalExecutionError as exc:
+                completed_at, wall_clock = self._terminal_time(start_dt, monotonic_start)
+                self._append_record(
+                    self._base_record(
+                        phase=phase,
+                        status="failed",
+                        started_at=started_at,
+                        completed_at=completed_at,
+                        wall_clock_seconds=wall_clock,
+                        input_hash=input_hash,
+                        output_hash=None,
+                        commands=commands,
+                        return_code=0,
+                        retry_count=total_retries,
+                        failure_classification="artifact_integrity_failure",
+                        failure_message_reference=str(exc),
+                        missing_outputs=list(expected_outputs),
+                        attempts=sum(command_attempts),
+                    )
+                )
+                raise
+        except KeyboardInterrupt as exc:
+            completed_at, wall_clock = self._terminal_time(start_dt, monotonic_start)
+            self._append_record(
+                self._base_record(
+                    phase=phase,
+                    status="failed",
+                    started_at=started_at,
+                    completed_at=completed_at,
+                    wall_clock_seconds=wall_clock,
+                    input_hash=input_hash,
+                    output_hash=None,
+                    commands=commands,
+                    return_code=130,
+                    retry_count=total_retries,
+                    failure_classification="user_interruption",
+                    failure_message_reference="KeyboardInterrupt",
+                    attempts=sum(command_attempts),
+                )
             )
-            raise exc
-        event = {
-            "phase": phase,
-            "status": "completed",
-            "input_hash": input_hash,
-            "commands": commands,
-            "returncode": result.returncode,
-            "command_attempts": command_attempts,
-            "attempts": sum(command_attempts),
-            "output_files": output_hashes,
-            "output_hash": canonical_sha256(output_hashes),
-        }
-        self._append(event)
+            raise FormalExecutionError(f"phase interrupted: {phase}") from exc
+
+        completed_at, wall_clock = self._terminal_time(start_dt, monotonic_start)
+        output_hash = canonical_sha256(output_hashes)
+        event = self._append_record(
+            self._base_record(
+                phase=phase,
+                status="completed",
+                started_at=started_at,
+                completed_at=completed_at,
+                wall_clock_seconds=wall_clock,
+                input_hash=input_hash,
+                output_hash=output_hash,
+                commands=commands,
+                return_code=0,
+                retry_count=total_retries,
+                failure_classification=None,
+                failure_message_reference=None,
+                command_attempts=command_attempts,
+                attempts=sum(command_attempts),
+                output_files=output_hashes,
+            )
+        )
         return event
+
+    def _terminal_time(
+        self, started: datetime, monotonic_started: float
+    ) -> tuple[str, float]:
+        completed = self._clock()
+        if completed.tzinfo is None or completed.utcoffset() is None:
+            raise FormalExecutionError("phase runner clock must be timezone-aware")
+        if completed < started:
+            raise FormalExecutionError("phase runner system time moved backwards")
+        monotonic_delta = float(self._monotonic_clock()) - monotonic_started
+        if not math.isfinite(monotonic_delta) or monotonic_delta < 0:
+            raise FormalExecutionError("phase runner monotonic clock is invalid")
+        timestamp_delta = (completed - started).total_seconds()
+        if abs(timestamp_delta - monotonic_delta) > LEDGER_WALL_CLOCK_TOLERANCE_SECONDS:
+            raise FormalExecutionError("phase runner wall clock diverged from system time")
+        return completed.isoformat(), round(monotonic_delta, 9)
 
     @staticmethod
     def _subprocess_executor(command: Sequence[str]) -> CommandResult:
@@ -776,23 +1173,31 @@ __all__ = [
     "CommandResult",
     "FORMAL_EXECUTION_PROTOCOL_ID",
     "FORMAL_EXECUTION_PROTOCOL_VERSION",
+    "FORMAL_EXECUTION_PROTOCOL_V1_2_ID",
+    "FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION",
+    "FORMAL_PHASE_LEDGER_SCHEMA_VERSION",
     "FORMAL_PHASE_RUNNER_VERSION",
+    "FAILURE_CLASSIFICATIONS",
     "FormalExecutionError",
     "PHASE_ORDER",
     "PRIMARY_ENDPOINTS",
     "READY_VERDICT",
+    "READY_V4_VERDICT",
     "READINESS_REVIEW_VERSION",
     "build_scalability_setting_matrix",
     "build_support_setting_matrix",
+    "classify_phase_failure",
     "endpoint_schema",
     "expand_command_template",
     "protocol_hash_changes_on_mutation",
     "readiness_v3",
+    "readiness_v4",
     "reconcile_primary_endpoint_row",
     "stable_setting_identity",
     "support_setting_by_id",
     "validate_command_templates",
     "validate_no_holdout_capability",
+    "validate_phase_ledger",
     "validate_protocol_v1_1",
     "validate_support_binding",
 ]

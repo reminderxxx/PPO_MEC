@@ -1,0 +1,10 @@
+{
+  "status": "pass",
+  "sealed": true,
+  "opened": false,
+  "consumed_permanently": false,
+  "identity_reachability_count": 12,
+  "metadata_only": true,
+  "agent_or_episode_execution": false,
+  "performance_fields_read": false
+}

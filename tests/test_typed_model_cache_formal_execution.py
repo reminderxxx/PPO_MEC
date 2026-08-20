@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from copy import deepcopy
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -25,6 +26,7 @@ from src.evaluators.typed_model_cache_formal_execution import (
     support_setting_by_id,
     validate_command_templates,
     validate_no_holdout_capability,
+    validate_phase_ledger,
     validate_protocol_v1_1,
 )
 from src.metrics.cache_efficiency_metrics import (
@@ -376,7 +378,9 @@ def test_31_phase_order(protocol: dict, tmp_path: Path) -> None:
 def test_32_append_only(protocol: dict, tmp_path: Path) -> None:
     runner = _phase_runner(protocol, tmp_path)
     _complete_phase(runner, "preflight")
-    assert len(runner.ledger_path.read_text().splitlines()) == 1
+    records = [json.loads(line) for line in runner.ledger_path.read_text().splitlines()]
+    assert [record["status"] for record in records] == ["running", "completed"]
+    assert records[1]["previous_record_hash"] == records[0]["current_record_hash"]
 
 
 def test_33_resume_skips_hash_match(protocol: dict, tmp_path: Path) -> None:
@@ -472,3 +476,146 @@ def test_48_nan_inf_rejected(protocol: dict, bad: float) -> None:
     mutated["training_budget"]["batch_size"] = bad
     with pytest.raises(FormalExecutionError, match="non-finite"):
         validate_protocol_v1_1(mutated)
+
+
+# Ledger v2 49-55
+def test_49_terminal_timing_and_wall_clock(protocol: dict, tmp_path: Path) -> None:
+    clocks = iter(
+        [
+            datetime(2026, 8, 20, 0, 0, 0, tzinfo=timezone.utc),
+            datetime(2026, 8, 20, 0, 0, 1, tzinfo=timezone.utc),
+        ]
+    )
+    monotonic = iter([10.0, 11.0])
+    runner = AppendOnlyPhaseRunner(
+        protocol=protocol,
+        output_root=tmp_path / "timed",
+        clock=lambda: next(clocks),
+        monotonic_clock=lambda: next(monotonic),
+    )
+    event = _complete_phase(runner, "preflight")
+    assert event["started_at"] <= event["completed_at"]
+    assert event["wall_clock_seconds"] == 1.0
+    assert validate_phase_ledger(runner.events())["terminal_phase_count"] == 1
+
+
+def test_50_running_record_can_resume_by_appending(protocol: dict, tmp_path: Path) -> None:
+    runner = _phase_runner(protocol, tmp_path)
+    started = datetime.now(timezone.utc).isoformat()
+    runner._append_record(  # noqa: SLF001 - contract-level crash/resume fixture.
+        runner._base_record(  # noqa: SLF001
+            phase="preflight",
+            status="running",
+            started_at=started,
+            completed_at=None,
+            wall_clock_seconds=None,
+            input_hash="same",
+            output_hash=None,
+            commands=[["ok"]],
+            return_code=None,
+            retry_count=0,
+            failure_classification=None,
+            failure_message_reference=None,
+        )
+    )
+    resumed = AppendOnlyPhaseRunner(
+        protocol=protocol, output_root=runner.output_root, resume=True
+    )
+    event = _complete_phase(resumed, "preflight", "same")
+    assert event["status"] == "completed"
+    assert [row["status"] for row in resumed.events()] == [
+        "running",
+        "running",
+        "completed",
+    ]
+
+
+def test_51_invalid_ledger_timestamp_is_rejected(protocol: dict, tmp_path: Path) -> None:
+    runner = _phase_runner(protocol, tmp_path)
+    with pytest.raises(FormalExecutionError, match="timestamp"):
+        runner._append_record(  # noqa: SLF001
+            runner._base_record(  # noqa: SLF001
+                phase="preflight",
+                status="running",
+                started_at="not-a-timestamp",
+                completed_at=None,
+                wall_clock_seconds=None,
+                input_hash="x",
+                output_hash=None,
+                commands=[],
+                return_code=None,
+                retry_count=0,
+                failure_classification=None,
+                failure_message_reference=None,
+            )
+        )
+
+
+def test_52_missing_failure_classification_is_rejected(
+    protocol: dict, tmp_path: Path
+) -> None:
+    runner = _phase_runner(protocol, tmp_path)
+    timestamp = datetime.now(timezone.utc).isoformat()
+    with pytest.raises(FormalExecutionError, match="failure classification"):
+        runner._append_record(  # noqa: SLF001
+            runner._base_record(  # noqa: SLF001
+                phase="preflight",
+                status="failed",
+                started_at=timestamp,
+                completed_at=timestamp,
+                wall_clock_seconds=0.0,
+                input_hash="x",
+                output_hash=None,
+                commands=[],
+                return_code=1,
+                retry_count=0,
+                failure_classification=None,
+                failure_message_reference="failure",
+            )
+        )
+
+
+def test_53_retry_code_and_classification_must_match(
+    protocol: dict, tmp_path: Path
+) -> None:
+    runner = _phase_runner(protocol, tmp_path)
+    timestamp = datetime.now(timezone.utc).isoformat()
+    with pytest.raises(FormalExecutionError, match="return code 75"):
+        runner._append_record(  # noqa: SLF001
+            runner._base_record(  # noqa: SLF001
+                phase="preflight",
+                status="failed",
+                started_at=timestamp,
+                completed_at=timestamp,
+                wall_clock_seconds=0.0,
+                input_hash="x",
+                output_hash=None,
+                commands=[],
+                return_code=75,
+                retry_count=1,
+                failure_classification="implementation_error",
+                failure_message_reference="failure",
+            )
+        )
+
+
+def test_54_hash_chain_tamper_is_rejected(protocol: dict, tmp_path: Path) -> None:
+    runner = _phase_runner(protocol, tmp_path)
+    _complete_phase(runner, "preflight")
+    records = runner.events()
+    records[1]["previous_record_hash"] = "tampered"
+    with pytest.raises(FormalExecutionError, match="previous hash mismatch"):
+        validate_phase_ledger(records)
+
+
+def test_55_ledger_json_round_trip_preserves_hashes(
+    protocol: dict, tmp_path: Path
+) -> None:
+    runner = _phase_runner(protocol, tmp_path)
+    _complete_phase(runner, "preflight")
+    records = runner.events()
+    round_tripped = json.loads(json.dumps(records, allow_nan=False))
+    assert round_tripped == records
+    assert validate_phase_ledger(round_tripped)["last_record_hash"] == records[-1][
+        "current_record_hash"
+    ]

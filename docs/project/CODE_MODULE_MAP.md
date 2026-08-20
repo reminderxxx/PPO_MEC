@@ -1,5 +1,31 @@
 # Code Module Map
 
+## G14R2 formal window consumption and ledger v2
+
+- `src/evaluators/formal_window_consumption.py`：冻结 window/source/loader identity、显式 raw-prefix scanner、
+  plan/CLI binding、direct `RealMobilityBundle` loader、frame/time/provider/fingerprint 校验与 60-window
+  reachability；sealed holdout 仅暴露 identity-only 模式。
+- `src/evaluators/main_results_support.py`：formal/rehearsal 分支通过 contract+split+window ID 加载同一 bundle，
+  不再对 frozen window 重新 rank/select。
+- `scripts/train_algo_pool_real_sample.py` 与 `scripts/benchmark_main_results.py`：消费显式 contract/source/
+  plan/split/mode，episode/checkpoint 前验证 range、selector、length、RSU、vehicle selection 与完整 split。
+- `scripts/validate_formal_window_consumption.py`：`--validate-window-plan-only` 身份可达性入口；不构建 agent、
+  不训练、不生成 performance result，holdout 只读 metadata。
+- `scripts/repair_typed_model_cache_formal_windows.py`：生成 Protocol v1.2、window/command/ledger/restart/
+  readiness/integrity 审计包；不启动 G14C v3。
+- `scripts/run_typed_model_cache_window_rehearsal.py`：四 agent、两 seed、两 capacity 的 bounded non-formal
+  frozen-train rehearsal，以及 train boundary tiny evaluation。
+- `scripts/run_typed_model_cache_formal_dev_selection.py`、`run_typed_model_cache_formal_cache_policy.py`、
+  `run_typed_model_cache_formal_support.py`：解析并向 benchmark 传递 frozen window contract；普通 runner
+  不展开 holdout。
+- `scripts/validate_typed_model_cache_formal_restart.py`：在 train 前执行真实 60-window loader reachability。
+- `src/evaluators/typed_model_cache_formal_execution.py`：兼容 v1.1/v1.2 protocol validator、Readiness v4、
+  failure classification 与 ledger `2.0.0` running/terminal hash chain。
+- `src/runtime/formal_training_contract.py`：接受 v1.1/v1.2 formal training manifest，保持 cadence/config
+  science contract 不变。
+- `tests/test_formal_window_consumption.py`：逐窗口 60-case reachability，以及 source/binding/commands/
+  protocol/ledger/rehearsal/readiness 专项回归。
+
 ## G14R executable formal protocol v1.1
 
 - `src/runtime/formal_training_contract.py`：legacy/formal training budget resolver、checkpoint cadence/index/

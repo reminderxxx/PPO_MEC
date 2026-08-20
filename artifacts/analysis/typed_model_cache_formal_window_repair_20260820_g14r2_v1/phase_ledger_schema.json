@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0.0",
+  "append_only": true,
+  "hash_chain": "previous_record_hash/current_record_hash",
+  "terminal_immutable": true,
+  "running_may_omit_completion": true,
+  "terminal_requires_completion": true,
+  "wall_clock_tolerance_seconds": 2.0,
+  "failure_classifications": [
+    "infrastructure_retryable",
+    "infrastructure_terminal",
+    "protocol_mismatch",
+    "implementation_error",
+    "data_window_unreachable",
+    "test_failure",
+    "training_failure",
+    "artifact_integrity_failure",
+    "user_interruption"
+  ],
+  "return_code_75_classification": "infrastructure_retryable"
+}

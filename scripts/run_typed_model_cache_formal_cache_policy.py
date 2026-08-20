@@ -21,14 +21,18 @@ from src.evaluators.typed_model_cache_formal_execution import (
 from src.oracles.cache_request_replay import build_policy_neutral_replay_from_manifest
 
 
-def parse_args() -> argparse.Namespace:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--protocol-path", required=True)
     parser.add_argument("--fairness-manifest-path", required=True)
     parser.add_argument("--evaluation-unit-id", required=True)
     parser.add_argument("--request-replay-path", required=True)
     parser.add_argument("--command", nargs=argparse.REMAINDER, required=True)
-    return parser.parse_args()
+    return parser
+
+
+def parse_args() -> argparse.Namespace:
+    return build_parser().parse_args()
 
 
 def main() -> None:

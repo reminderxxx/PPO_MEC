@@ -111,8 +111,8 @@ def validate_resume_checkpoint_schedule(
 
 
 def _formal_values(protocol: Mapping[str, Any], agent_name: str) -> dict[str, Any]:
-    if protocol.get("typed_model_cache_formal_protocol_version") != "1.1.0":
-        raise FormalTrainingContractError("formal training requires protocol version 1.1.0")
+    if protocol.get("typed_model_cache_formal_protocol_version") not in {"1.1.0", "1.2.0"}:
+        raise FormalTrainingContractError("formal training requires protocol version 1.1 or 1.2")
     budget = protocol.get("training_budget")
     if not isinstance(budget, Mapping):
         raise FormalTrainingContractError("formal protocol lacks training_budget")
@@ -276,7 +276,9 @@ def resolve_training_contract(
     )
     return ResolvedTrainingContract(
         contract_version=FORMAL_TRAINING_CONTRACT_VERSION,
-        formal_protocol_version="1.1.0",
+        formal_protocol_version=str(
+            formal_protocol.get("typed_model_cache_formal_protocol_version")
+        ),
         formal_protocol_semantic_sha256=formal_protocol.get("hashes", {}).get(
             "semantic_sha256"
         ),

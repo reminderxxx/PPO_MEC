@@ -6,6 +6,20 @@
 
 ## 项目状态
 
+- G14R2 formal execution baseline：Protocol v1.2 semantic SHA-256
+  `718c0f78aabd5d01012df31267626eab74a51b2b621aaa67a535c5b60e655ca9` 已冻结；window contract
+  `1.0.0` 将原 60-window split 绑定到完整 11,850,526-row NGSIM prefix、73,871 provider frames 与
+  raw frame/time/fingerprint identity，60/60 reachable。Split semantic SHA-256 仍为
+  `aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a`。150/150 training 与
+  30 条 dev/formal/support commands 通过无训练审计；ledger `2.0.0` 完整记录时间、wall-clock、失败枚举
+  与 hash chain。Readiness v4=`READY_FOR_G14C_V3_CLEAN_TRAIN_AND_FORMAL`，仅授权未来从 Commit A3
+  clean worktree 另立任务。当前 formal checkpoint/episode/performance count=0，holdout sealed/unopened，
+  不代表 G14 或 paper-ready 完成。
+
+- G14C v2 `typed_model_cache_formal_20260820_164251_g14c_v2` 永久无效：Protocol v1.1 train command
+  未传 source range，默认 1500 raw rows 使 frozen provider offset 在首个 training cell 前不可达。旧 run
+  0/150 training、0 checkpoint、0 formal、holdout unopened，禁止 resume/覆盖/删除。
+
 - G14B formal protocol freeze：历史账本 `1.0.0`、split protocol `1.0.0` 与 formal protocol `1.0.0` 已冻结；train/dev/formal/sealed-holdout=`24/12/12/12`，60 个 outer windows 的 1,770 对 raw frame/time/segment-run 审计全部 safe，minimum gap=24。Readiness v2=`READY_FOR_G14C_CLEAN_TRAIN_AND_FORMAL`，evidence level=`E2_PROTOCOL_AND_CONTRACT_VALIDATED_NO_PERFORMANCE_DATA`。Holdout 仍 sealed/unopened；正式 checkpoint、formal result 与 paper-ready evidence 均不存在。G14C 必须从包含 protocol semantic SHA-256 `41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4` 的 Commit A clean worktree 另立任务执行。
 
 - G08 live contract：`cache_request_replay_version=1.0.0` + `future_horizon_cache_oracle_contract_v1.0.0`。输入必须是独立policy-neutral DAG/mobility replay；oracle只控制current-RSU placement/admission/eviction，并按当前环境同step admission可命中的真实时序运行exact rolling H=1/3/6/12。matched gap仅为placement opportunity gap，不是causal regret或latency gain；当前validation未运行formal/holdout/hidden。

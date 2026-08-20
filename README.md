@@ -1,15 +1,19 @@
 # PPO_MEC
 
-G14R 已完成 formal execution contract repair，并在未运行正式训练或正式评估的前提下重新冻结
-`typed_model_cache_formal_protocol_version=1.1.0`。G14C v1 协议 `1.0.0` 与 run
-`typed_model_cache_formal_20260820_g14c_351fdb8_v1` 永久标记为
-`INVALID_PROTOCOL_OR_IMPLEMENTATION`：Phase-0 即停止，正式 checkpoint/episode/performance 均为 0。
-新协议实现 checkpoint cadence=4、SA `auxiliary_coef=0.06` 真实传递、metrics 1.2 primary
-endpoint producer、固定 support/scalability setting、typed support runner、完整命令矩阵与 append-only
-phase runner。非正式 rehearsal（4 agents、2 seeds、2 capacities）通过，Readiness v3 为
-`READY_FOR_G14C_V2_CLEAN_TRAIN_AND_FORMAL`；这只授权后续独立计划窗口从 Commit A2 clean worktree
-启动 G14C v2，不表示 formal 完成或 paper-ready。Holdout 仍为
-`sealed=true/opened=false/consumed_permanently=false`。详见
+G14R2 已修复 G14C v2 暴露的 formal frozen-window 消费与 phase ledger 缺口，并在未运行正式训练、
+formal、holdout 或 hidden 的前提下冻结 `typed_model_cache_formal_protocol_version=1.2.0`。G14C v2
+`typed_model_cache_formal_20260820_164251_g14c_v2` 因训练命令遗漏显式 source range、回落到
+`max_mobility_rows=1500` 而在首个训练单元前失败，永久标记为
+`INVALID_PROTOCOL_OR_IMPLEMENTATION / invalid_before_performance_execution`：0/150 training、0 checkpoint、
+0 formal，禁止 resume。新 window contract 按真实 loader 语义将 11,850,526 raw rows、73,871 provider
+frames 与原 60-window split 绑定，60/60 identity/interval/fingerprint 可达；150/150 training commands 与
+30 条 dev/formal/support commands 均显式传递完整 source/window 参数。Ledger `2.0.0` 记录 running/terminal
+时间、wall-clock、失败枚举和 previous/current hash chain。Protocol v1.2 semantic SHA-256 为
+`718c0f78aabd5d01012df31267626eab74a51b2b621aaa67a535c5b60e655ca9`，split hash 保持
+`aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a`，Readiness v4 为
+`READY_FOR_G14C_V3_CLEAN_TRAIN_AND_FORMAL`。这只授权未来从 Commit A3 clean worktree 另立任务，
+不表示 G14/formal 完成或 paper-ready；holdout 仍 sealed/unopened。详见
+`docs/project/typed_model_cache_formal_window_consumption_contract.md` 与
 `docs/project/typed_model_cache_formal_protocol_restart.md`。
 
 G14B 历史上冻结了 `historical_window_usage_registry_version=1.0.0`、

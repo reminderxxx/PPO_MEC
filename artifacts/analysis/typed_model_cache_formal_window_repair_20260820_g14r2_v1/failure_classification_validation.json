@@ -1,0 +1,17 @@
+{
+  "status": "pass",
+  "allowed": [
+    "infrastructure_retryable",
+    "infrastructure_terminal",
+    "protocol_mismatch",
+    "implementation_error",
+    "data_window_unreachable",
+    "test_failure",
+    "training_failure",
+    "artifact_integrity_failure",
+    "user_interruption"
+  ],
+  "g14c_v2_return_code_1_classification": "data_window_unreachable",
+  "g14c_v2_retry_eligible": false,
+  "return_code_75_only": "infrastructure_retryable"
+}

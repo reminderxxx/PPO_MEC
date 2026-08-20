@@ -20,10 +20,14 @@ from src.evaluators.typed_model_cache_formal_execution import (
     validate_protocol_v1_1,
     validate_support_binding,
 )
+from src.evaluators.formal_window_consumption import (
+    load_contract as load_window_consumption_contract,
+    validate_window_plan_binding,
+)
 from src.runtime.typed_model_cache_runtime import resolve_model_cache_runtime
 
 
-def parse_args() -> argparse.Namespace:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--protocol-path", required=True)
     parser.add_argument("--setting-id", required=True)
@@ -32,12 +36,28 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed-checkpoint-manifest-path", required=True)
     parser.add_argument("--checkpoint-provenance-manifest-path", required=True)
     parser.add_argument("--window-plan-path", required=True)
+    parser.add_argument("--formal-window-consumption-contract-path", required=True)
+    parser.add_argument("--formal-window-split", choices=["formal"], required=True)
+    parser.add_argument("--mobility-csv-path", required=True)
+    parser.add_argument("--max-mobility-rows", type=int, required=True)
+    parser.add_argument("--window-selector", choices=["ordered"], required=True)
+    parser.add_argument("--window-length", type=int, required=True)
+    parser.add_argument("--rsu-layout", required=True)
+    parser.add_argument(
+        "--primary-vehicle-selection",
+        choices=["stable_first", "handoff_pressure"],
+        required=True,
+    )
     parser.add_argument("--agents", nargs="+", required=True)
     parser.add_argument("--seeds", nargs="+", type=int, required=True)
     parser.add_argument("--output-root", required=True)
     parser.add_argument("--request-replay-path", default="")
     parser.add_argument("--dry-run", action="store_true")
-    return parser.parse_args()
+    return parser
+
+
+def parse_args() -> argparse.Namespace:
+    return build_parser().parse_args()
 
 
 def load_json(path: str | Path, label: str) -> dict:
@@ -145,6 +165,30 @@ def main() -> None:
                 f"capacity support setting mismatch: runtime={actual}, frozen={expected}"
             )
     selection = fairness["dataset_provenance"]["selection_filter_parameters"]
+    if selection.get("primary_vehicle_selection") != args.primary_vehicle_selection:
+        raise FormalExecutionError("support vehicle selection CLI/fairness mismatch")
+    window_contract = load_window_consumption_contract(
+        args.formal_window_consumption_contract_path
+    )
+    expected_contract_hash = (
+        protocol.get("execution_contract", {})
+        .get("window_consumption_contract", {})
+        .get("semantic_sha256")
+    )
+    if expected_contract_hash != window_contract["hashes"]["semantic_sha256"]:
+        raise FormalExecutionError("support window consumption contract hash mismatch")
+    validate_window_plan_binding(
+        contract=window_contract,
+        plan_path=args.window_plan_path,
+        split=args.formal_window_split,
+        max_mobility_rows=args.max_mobility_rows,
+        mobility_csv_path=args.mobility_csv_path,
+        window_selector=args.window_selector,
+        window_length=args.window_length,
+        rsu_layout=args.rsu_layout,
+        primary_vehicle_selection=args.primary_vehicle_selection,
+        mode="formal",
+    )
     parameter = setting.get("parameter")
     value = setting.get("value", setting.get("baseline"))
     expected_selection: dict[str, object] = {}
@@ -217,6 +261,13 @@ def main() -> None:
         "--cache_baseline_fairness_manifest_path", args.cache_baseline_fairness_manifest_path,
         "--model_cache_runtime_config", args.model_cache_runtime_config,
         "--window_plan_path", args.window_plan_path,
+        "--formal_window_consumption_contract_path", args.formal_window_consumption_contract_path,
+        "--formal_window_split", args.formal_window_split,
+        "--window_consumption_mode", "formal",
+        "--mobility_csv_path", args.mobility_csv_path,
+        "--window_selector", args.window_selector,
+        "--window_length", str(args.window_length),
+        "--rsu_layout", args.rsu_layout,
         "--output_root", args.output_root,
         "--max_mobility_rows", str(selection["max_mobility_rows"]),
         "--max_workflows", str(selection["max_workflows"]),

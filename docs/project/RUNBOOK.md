@@ -1,5 +1,44 @@
 # Runbook
 
+## G14R2 window consumption repair（只生成/验证，不启动 G14C v3）
+
+生成 Protocol v1.2 与审计包时必须显式使用冻结 G14B plans 和完整 NGSIM source。入口会运行真实
+60-window identity loader、逐条验证 150 个 training commands 与全部 dev/formal/support commands，但不
+构建正式 agent、不写正式 checkpoint、不运行 formal/holdout/hidden：
+
+```bash
+PYTHONPYCACHEPREFIX=/tmp/ppo_mec_g14r2_pycache \
+  .venv/bin/python scripts/repair_typed_model_cache_formal_windows.py \
+  --rehearsal-summary-path \
+  artifacts/analysis/typed_model_cache_formal_window_repair_20260820_g14r2_v1/tiny_training_rehearsal.json \
+  --tests-passed --smoke-passed --diff-check-passed
+```
+
+单独复核 60-window reachability：
+
+```bash
+PYTHONPYCACHEPREFIX=/tmp/ppo_mec_g14r2_pycache \
+  .venv/bin/python scripts/validate_formal_window_consumption.py \
+  --window-consumption-contract-path \
+  configs/experiment/typed_model_cache_formal_protocol_v1_2_20260820/formal_window_consumption_contract.json \
+  --validate-window-plan-only \
+  --output-path /tmp/g14r2_window_reachability.json
+```
+
+该 validator 扫描 11,850,526 raw rows但只 materialize 冻结 segment/time frames；sealed holdout 行仅验证
+identity/interval/fingerprint，`metadata_only=true`，不得交给 policy/agent。Non-formal rehearsal 的稳定入口：
+
+```bash
+PYTHONPYCACHEPREFIX=/tmp/ppo_mec_g14r2_pycache \
+  .venv/bin/python scripts/run_typed_model_cache_window_rehearsal.py
+```
+
+输出 config 为 `configs/experiment/typed_model_cache_formal_protocol_v1_2_20260820/`，机器证据为
+`artifacts/analysis/typed_model_cache_formal_window_repair_20260820_g14r2_v1/`。Protocol semantic SHA-256
+为 `718c0f78aabd5d01012df31267626eab74a51b2b621aaa67a535c5b60e655ca9`，Readiness v4 为
+`READY_FOR_G14C_V3_CLEAN_TRAIN_AND_FORMAL`。本节故意不提供 G14C v3、formal 或 holdout 启动命令；
+该状态不是 formal/G14/paper completion。
+
 ## G14B formal protocol freeze（只运行审计/preflight）
 
 冻结入口默认 create-only；它扫描历史 `selected_window_plan` metadata 和完整 NGSIM raw identity，

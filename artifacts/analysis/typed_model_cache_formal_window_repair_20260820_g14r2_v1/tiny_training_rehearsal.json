@@ -1,0 +1,336 @@
+{
+  "rehearsal_version": "2.0.0",
+  "rehearsal_id": "g14r2_non_formal_rehearsal_20260820_181947_453716",
+  "status": "pass",
+  "scope": "bounded non-formal frozen-train-window consumption rehearsal",
+  "agents": [
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "cache_offload_drl"
+  ],
+  "domain_baseline": "cache_offload_drl",
+  "seeds": [
+    7,
+    13
+  ],
+  "capacities_mb": [
+    288.0,
+    576.0
+  ],
+  "training_cell_count": 16,
+  "training_cells": [
+    {
+      "capacity_label": "constrained_288mb",
+      "capacity_mb": 288.0,
+      "agent": "sa_ghmappo",
+      "seed": 7,
+      "status": "pass",
+      "started_at": "2026-08-20T18:19:47.471796+08:00",
+      "completed_at": "2026-08-20T18:20:12.079879+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "constrained_288mb",
+      "capacity_mb": 288.0,
+      "agent": "sa_ghmappo",
+      "seed": 13,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:12.092755+08:00",
+      "completed_at": "2026-08-20T18:20:12.784833+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "constrained_288mb",
+      "capacity_mb": 288.0,
+      "agent": "ppo",
+      "seed": 7,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:12.797597+08:00",
+      "completed_at": "2026-08-20T18:20:13.389330+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "constrained_288mb",
+      "capacity_mb": 288.0,
+      "agent": "ppo",
+      "seed": 13,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:13.394674+08:00",
+      "completed_at": "2026-08-20T18:20:13.937391+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "constrained_288mb",
+      "capacity_mb": 288.0,
+      "agent": "mappo",
+      "seed": 7,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:13.942873+08:00",
+      "completed_at": "2026-08-20T18:20:14.571789+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "constrained_288mb",
+      "capacity_mb": 288.0,
+      "agent": "mappo",
+      "seed": 13,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:14.579110+08:00",
+      "completed_at": "2026-08-20T18:20:15.150623+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "constrained_288mb",
+      "capacity_mb": 288.0,
+      "agent": "cache_offload_drl",
+      "seed": 7,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:15.157805+08:00",
+      "completed_at": "2026-08-20T18:20:15.810867+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "constrained_288mb",
+      "capacity_mb": 288.0,
+      "agent": "cache_offload_drl",
+      "seed": 13,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:15.820089+08:00",
+      "completed_at": "2026-08-20T18:20:16.422462+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "capacity_mb": 576.0,
+      "agent": "sa_ghmappo",
+      "seed": 7,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:16.450002+08:00",
+      "completed_at": "2026-08-20T18:20:17.184998+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "capacity_mb": 576.0,
+      "agent": "sa_ghmappo",
+      "seed": 13,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:17.197838+08:00",
+      "completed_at": "2026-08-20T18:20:17.880735+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "capacity_mb": 576.0,
+      "agent": "ppo",
+      "seed": 7,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:17.893842+08:00",
+      "completed_at": "2026-08-20T18:20:18.487475+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "capacity_mb": 576.0,
+      "agent": "ppo",
+      "seed": 13,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:18.492897+08:00",
+      "completed_at": "2026-08-20T18:20:19.047952+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "capacity_mb": 576.0,
+      "agent": "mappo",
+      "seed": 7,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:19.053422+08:00",
+      "completed_at": "2026-08-20T18:20:19.683897+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "capacity_mb": 576.0,
+      "agent": "mappo",
+      "seed": 13,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:19.691018+08:00",
+      "completed_at": "2026-08-20T18:20:20.315118+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "capacity_mb": 576.0,
+      "agent": "cache_offload_drl",
+      "seed": 7,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:20.322374+08:00",
+      "completed_at": "2026-08-20T18:20:20.923340+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "capacity_mb": 576.0,
+      "agent": "cache_offload_drl",
+      "seed": 13,
+      "status": "pass",
+      "started_at": "2026-08-20T18:20:20.932415+08:00",
+      "completed_at": "2026-08-20T18:20:21.579192+08:00",
+      "saved_checkpoint_update_indices": [
+        4
+      ],
+      "checkpoint_restore_and_provenance": "compatible",
+      "formal_checkpoint": false,
+      "window_contract_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+    }
+  ],
+  "checkpoint_frequency_updates": 4,
+  "saved_checkpoint_update_indices": [
+    4
+  ],
+  "checkpoint_restore_and_provenance": "pass",
+  "tiny_evaluation": [
+    {
+      "capacity_label": "constrained_288mb",
+      "status": "pass",
+      "non_formal_identity": true,
+      "window_count": 2,
+      "seed_count": 2,
+      "agent_count": 9,
+      "benchmark_row_count": 36,
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_window_repair_20260820_g14r2_v1/rehearsal_runs/g14r2_non_formal_rehearsal_20260820_181947_453716/evaluation/constrained_288mb/main_results_mixed_informative_20260820_182025_204218/aggregate_summary.json",
+      "summary_sha256": "dde2a5ed4228e2afcfb5e53cf399c78792ea962d698f854fccf59c00197fe94c",
+      "rows_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_window_repair_20260820_g14r2_v1/rehearsal_runs/g14r2_non_formal_rehearsal_20260820_181947_453716/evaluation/constrained_288mb/main_results_mixed_informative_20260820_182025_204218/benchmark_rows.csv",
+      "rows_sha256": "0aa60155b9eb40a563bf9802a5fe0c62c723b259d7b71403b696b3fb43fe5d41",
+      "metrics_present": true,
+      "window_consumption_binding": {
+        "status": "pass",
+        "mode": "rehearsal",
+        "split": "train",
+        "window_count": 2,
+        "complete_split_bound": false,
+        "plan_file_sha256": "d69cc303171f863c9d19656db3b686406395b83494d0ec4333600028a8b717f1",
+        "resolved_source_rows": 11850526,
+        "contract_semantic_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+      },
+      "formal": false,
+      "holdout": false
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "status": "pass",
+      "non_formal_identity": true,
+      "window_count": 2,
+      "seed_count": 2,
+      "agent_count": 9,
+      "benchmark_row_count": 36,
+      "summary_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_window_repair_20260820_g14r2_v1/rehearsal_runs/g14r2_non_formal_rehearsal_20260820_181947_453716/evaluation/medium_576mb/main_results_mixed_informative_20260820_182031_737675/aggregate_summary.json",
+      "summary_sha256": "1bdc35a656c05d9a441a1cac6c6b8ddbcc818d76daa28f938c25c6f3a4e9cf82",
+      "rows_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_window_repair_20260820_g14r2_v1/rehearsal_runs/g14r2_non_formal_rehearsal_20260820_181947_453716/evaluation/medium_576mb/main_results_mixed_informative_20260820_182031_737675/benchmark_rows.csv",
+      "rows_sha256": "f0ccfb5589abd9210c68ab0c5b8625201b11cb80b63cde9ac45c3c63b09e3f96",
+      "metrics_present": true,
+      "window_consumption_binding": {
+        "status": "pass",
+        "mode": "rehearsal",
+        "split": "train",
+        "window_count": 2,
+        "complete_split_bound": false,
+        "plan_file_sha256": "d69cc303171f863c9d19656db3b686406395b83494d0ec4333600028a8b717f1",
+        "resolved_source_rows": 11850526,
+        "contract_semantic_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+      },
+      "formal": false,
+      "holdout": false
+    }
+  ],
+  "boundary_window_ids": [
+    "g14b_i_80_run_001_f2460_2483_t1113433380900_1113433383200",
+    "g14b_i_80_run_003_f10069_10092_t1113438571800_1113438574100"
+  ],
+  "window_consumption_contract_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_2_20260820/formal_window_consumption_contract.json",
+  "window_consumption_contract_sha256": "5b1773b6c5d66373ba607ac1c3989fd031e6923204ce3499cc1ed1f8a4459582",
+  "formal_checkpoint_count": 0,
+  "formal_episode_count": 0,
+  "formal_performance_result_count": 0,
+  "holdout_opened": false,
+  "holdout_episode_count": 0,
+  "performance_claims": [],
+  "rehearsal_root": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_window_repair_20260820_g14r2_v1/rehearsal_runs/g14r2_non_formal_rehearsal_20260820_181947_453716"
+}

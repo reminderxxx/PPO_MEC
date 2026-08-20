@@ -1,6 +1,38 @@
 # Typed Model-Cache Formal Protocol
 
-## 审查身份
+## G14R2 当前审查身份
+
+- `reviewed_at`: `2026-08-20T18:23:21.124778+08:00`
+- `literature_cutoff`: `2026-08-20`
+- `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`
+- `artifact_run_id`: `typed_model_cache_formal_window_repair_20260820_g14r2_v1`
+- `policy_version`: `tmc_review_policy_v3_20260621`
+- 实现基线 Git commit：`89049c92b41054d78294893643f241926181645a`
+- execution commit：Commit A3（包含本协议 exact semantic hash 的提交）
+- evidence level：`E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE`
+
+Protocol v1.2 supersede v1.1。v1.1/G14C v2 因 train command 未传显式 NGSIM source range、回落到
+1500 raw rows 而在首个 training cell 前发生 `data_window_unreachable`，永久状态为
+`invalid_before_performance_execution / INVALID_PROTOCOL_OR_IMPLEMENTATION`。旧 run 记录 0/150
+training、0 checkpoint、0 formal、holdout unopened，禁止 resume。
+
+v1.2 semantic SHA-256 为
+`718c0f78aabd5d01012df31267626eab74a51b2b621aaa67a535c5b60e655ca9`；split semantic SHA-256 仍为
+`aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a`。本次只修复
+window/source/command/ledger execution contract，没有按结果改 split、agent、seed、预算、capacity、
+endpoint、support、统计、claim、checkpoint cadence 或 SA coefficient。
+
+机器事实源：
+
+- `configs/experiment/typed_model_cache_formal_protocol_v1_2_20260820/protocol_v1_2_manifest.json`
+- `configs/experiment/typed_model_cache_formal_protocol_v1_2_20260820/formal_window_consumption_contract.json`
+- `artifacts/analysis/typed_model_cache_formal_window_repair_20260820_g14r2_v1/`
+
+Readiness v4=`READY_FOR_G14C_V3_CLEAN_TRAIN_AND_FORMAL`，只表示未来可从 Commit A3 clean worktree
+另立 G14C v3；正式 checkpoint/episode/performance 仍为 0，holdout sealed/unopened，不是 formal、G14
+或 paper-ready 完成。窗口消费细节见 `typed_model_cache_formal_window_consumption_contract.md`。
+
+## G14R/G14B 历史审查身份
 
 - `reviewed_at`: `2026-08-20T16:20:00+08:00`
 - `literature_cutoff`: `2026-08-20`

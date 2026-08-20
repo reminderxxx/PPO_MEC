@@ -46,6 +46,10 @@ from src.evaluators.main_results_support import (
     PAPER_PROTOCOL_VERSION,
     PAPER_PROTOCOL_FROZEN,
 )
+from src.evaluators.formal_window_consumption import (
+    load_contract as load_window_consumption_contract,
+    validate_window_plan_binding,
+)
 from src.runtime.typed_model_cache_runtime import (
     load_runtime_catalog,
     resolve_model_cache_runtime,
@@ -69,7 +73,7 @@ LOWER_IS_BETTER_FOR_ADVANTAGE = {
 }
 
 
-def parse_args() -> argparse.Namespace:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="运行主方法与方向匹配对照算法 benchmark")
     parser.add_argument("--agents", nargs="+", default=["sa_ghmappo"], choices=BENCHMARK_AGENT_CHOICES)
     parser.add_argument("--sa_ghmappo_checkpoint_path", type=str, default="")
@@ -110,6 +114,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--window_mode", type=str, default="mixed_informative", choices=["activating_only", "mixed", "full", "mixed_informative", "full_stratified"])
     parser.add_argument("--window_rank_offset", type=int, default=0)
     parser.add_argument("--window_plan_path", type=str, default="")
+    parser.add_argument(
+        "--formal_window_consumption_contract_path", type=str, default=""
+    )
+    parser.add_argument(
+        "--formal_window_split",
+        choices=["train", "dev", "formal", "sealed_holdout"],
+        default="",
+    )
+    parser.add_argument(
+        "--window_consumption_mode",
+        choices=["formal", "rehearsal"],
+        default="formal",
+    )
     parser.add_argument("--exclude_window_plan_path", action="append", default=[])
     parser.add_argument("--predictor_kind", type=str, default="baseline", choices=["baseline", "oracle", "learned_or_calibrated", "supervised"])
     parser.add_argument("--predictor_checkpoint_path", type=str, default="")
@@ -141,7 +158,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Record episode wall-clock and Python traced peak allocation for compute auditing.",
     )
-    return parser.parse_args()
+    return parser
+
+
+def parse_args() -> argparse.Namespace:
+    return build_parser().parse_args()
 
 
 def load_excluded_window_intervals(paths: list[str]) -> list[tuple[int, int]]:
@@ -441,6 +462,28 @@ def build_sa_advantage_diagnosis(
 
 def main() -> None:
     args = parse_args()
+    window_consumption_contract: dict[str, Any] | None = None
+    window_consumption_binding: dict[str, Any] | None = None
+    if args.formal_window_consumption_contract_path:
+        if not args.window_plan_path or not args.formal_window_split:
+            raise ValueError("frozen-window consumption requires window plan and split")
+        if args.formal_window_split == "sealed_holdout":
+            raise ValueError("sealed holdout cannot be executed by benchmark_main_results")
+        window_consumption_contract = load_window_consumption_contract(
+            args.formal_window_consumption_contract_path
+        )
+        window_consumption_binding = validate_window_plan_binding(
+            contract=window_consumption_contract,
+            plan_path=args.window_plan_path,
+            split=args.formal_window_split,
+            max_mobility_rows=args.max_mobility_rows,
+            mobility_csv_path=args.mobility_csv_path,
+            window_selector=args.window_selector,
+            window_length=args.window_length,
+            rsu_layout=args.rsu_layout,
+            primary_vehicle_selection=args.primary_vehicle_selection,
+            mode=args.window_consumption_mode,
+        )
     runtime_contract = resolve_model_cache_runtime(
         args.model_cache_runtime_config or None,
         root=ROOT_DIR,
@@ -560,9 +603,12 @@ def main() -> None:
                 frame_offset=int(window_candidate["frame_offset"]),
                 window_length=int(window_candidate["window_length"]),
                 random_seed=seed,
+                formal_window_consumption_contract_path=args.formal_window_consumption_contract_path,
+                formal_window_split=args.formal_window_split,
+                expected_window_id=str(window_candidate["window_id"]),
             )
-            mobility_bundle.rsu_metadata["window_rank"] = window_candidate["window_rank"]
-            mobility_bundle.rsu_metadata["window_class"] = window_candidate["window_class"]
+            mobility_bundle.rsu_metadata["window_rank"] = window_candidate.get("window_rank")
+            mobility_bundle.rsu_metadata["window_class"] = window_candidate.get("window_class")
             for workflow_state in workflow_states:
                 for agent_name in args.agents:
                     fairness_unit = None
@@ -660,8 +706,8 @@ def main() -> None:
                             "mainline": mainline_label,
                             "reward_positive_offset": args.reward_positive_offset,
                             "mobility_source_path": mobility_source_path,
-                            "window_rank": window_candidate["window_rank"],
-                            "window_class": window_candidate["window_class"],
+                            "window_rank": window_candidate.get("window_rank"),
+                            "window_class": window_candidate.get("window_class"),
                             "window_mode": args.window_mode,
                             "window_rank_offset": args.window_rank_offset,
                             "checkpoint_provenance_status": checkpoint_gate["status"],
@@ -758,6 +804,12 @@ def main() -> None:
         "frozen_window_plan_path": window_payload.get("frozen_window_plan_path", ""),
         "frozen_window_plan_protocol_version": window_payload.get("frozen_window_plan_protocol_version", ""),
         "frozen_window_plan_split": window_payload.get("frozen_window_plan_split", ""),
+        "formal_window_consumption_binding": window_consumption_binding,
+        "formal_window_consumption_contract_sha256": (
+            window_consumption_contract["hashes"]["semantic_sha256"]
+            if window_consumption_contract is not None
+            else None
+        ),
         "outcome_blind_window_selection": window_payload.get("outcome_blind_selection", False),
         "exclude_window_plan_paths": list(args.exclude_window_plan_path),
         "excluded_window_intervals": [list(interval) for interval in excluded_window_intervals],

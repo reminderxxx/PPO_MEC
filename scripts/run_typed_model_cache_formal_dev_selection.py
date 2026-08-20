@@ -25,17 +25,37 @@ from src.evaluators.typed_model_cache_formal_execution import (
     FormalExecutionError,
     validate_protocol_v1_1,
 )
+from src.evaluators.formal_window_consumption import (
+    load_contract as load_window_consumption_contract,
+    validate_window_plan_binding,
+)
 from src.evaluators.typed_model_cache_formal_protocol import sha256_file
 from src.runtime.formal_training_contract import checkpoint_snapshot_indices
 
 
-def parse_args() -> argparse.Namespace:
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--protocol-path", required=True)
     parser.add_argument("--training-root", required=True)
     parser.add_argument("--output-root", required=True)
     parser.add_argument("--output-path", required=True)
-    return parser.parse_args()
+    parser.add_argument("--formal-window-consumption-contract-path", required=True)
+    parser.add_argument("--window-plan-path", required=True)
+    parser.add_argument("--mobility-csv-path", required=True)
+    parser.add_argument("--max-mobility-rows", type=int, required=True)
+    parser.add_argument("--window-selector", choices=["ordered"], required=True)
+    parser.add_argument("--window-length", type=int, required=True)
+    parser.add_argument("--rsu-layout", required=True)
+    parser.add_argument(
+        "--primary-vehicle-selection",
+        choices=["stable_first", "handoff_pressure"],
+        required=True,
+    )
+    return parser
+
+
+def parse_args() -> argparse.Namespace:
+    return build_parser().parse_args()
 
 
 def write_create_only(path: Path, payload: object) -> None:
@@ -67,6 +87,28 @@ def main() -> None:
     protocol_path = Path(args.protocol_path).resolve()
     protocol = json.loads(protocol_path.read_text(encoding="utf-8-sig"))
     validate_protocol_v1_1(protocol)
+    window_contract = load_window_consumption_contract(
+        args.formal_window_consumption_contract_path
+    )
+    if (
+        protocol.get("execution_contract", {})
+        .get("window_consumption_contract", {})
+        .get("semantic_sha256")
+        != window_contract["hashes"]["semantic_sha256"]
+    ):
+        raise FormalExecutionError("dev window consumption contract hash mismatch")
+    validate_window_plan_binding(
+        contract=window_contract,
+        plan_path=args.window_plan_path,
+        split="dev",
+        max_mobility_rows=args.max_mobility_rows,
+        mobility_csv_path=args.mobility_csv_path,
+        window_selector=args.window_selector,
+        window_length=args.window_length,
+        rsu_layout=args.rsu_layout,
+        primary_vehicle_selection=args.primary_vehicle_selection,
+        mode="formal",
+    )
     config_root = protocol_path.parent
     index = json.loads((config_root / "protocol_index.json").read_text(encoding="utf-8-sig"))
     learned_agents = list(protocol["training_budget"]["agent_configs"])
@@ -85,6 +127,8 @@ def main() -> None:
         if report.get("status") != "pass":
             raise FormalExecutionError(f"dev fairness validation failed: {capacity_label}")
         selection = fairness["dataset_provenance"]["selection_filter_parameters"]
+        if selection.get("primary_vehicle_selection") != args.primary_vehicle_selection:
+            raise FormalExecutionError("dev vehicle selection CLI/fairness mismatch")
         max_steps = {int(unit["max_steps"]) for unit in fairness["window_workload_plan"]["evaluation_units"]}
         if len(max_steps) != 1:
             raise FormalExecutionError("dev fairness manifest has mixed max_steps")
@@ -137,6 +181,13 @@ def main() -> None:
                 "--cache_baseline_fairness_manifest_path", str(fairness_path),
                 "--model_cache_runtime_config", str(runtime_path),
                 "--window_plan_path", str(ROOT / fairness["window_workload_plan"]["window_plan_path"]),
+                "--formal_window_consumption_contract_path", args.formal_window_consumption_contract_path,
+                "--formal_window_split", "dev",
+                "--window_consumption_mode", "formal",
+                "--mobility_csv_path", args.mobility_csv_path,
+                "--window_selector", args.window_selector,
+                "--window_length", str(args.window_length),
+                "--rsu_layout", args.rsu_layout,
                 "--max_mobility_rows", str(selection["max_mobility_rows"]),
                 "--max_workflows", str(selection["max_workflows"]),
                 "--max_steps", str(next(iter(max_steps))),

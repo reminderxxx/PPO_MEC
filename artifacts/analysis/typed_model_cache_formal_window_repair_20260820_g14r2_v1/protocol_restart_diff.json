@@ -1,0 +1,27 @@
+{
+  "status": "pass",
+  "from_version": "1.1.0",
+  "to_version": "1.2.0",
+  "old_protocol_semantic_sha256": "b8bbb53d6af47d111b840efbb53d3389485535d66c8de19b747e2a5727786629",
+  "new_protocol_semantic_sha256": "718c0f78aabd5d01012df31267626eab74a51b2b621aaa67a535c5b60e655ca9",
+  "protocol_semantic_hash_changed": true,
+  "split_semantic_sha256": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+  "scientific_fields_unchanged": {
+    "agent_matrix": true,
+    "seed_plan": true,
+    "training_budget": true,
+    "typed_catalog_and_capacity": true,
+    "endpoints": true,
+    "statistics": true,
+    "comparisons": true,
+    "claim_evidence_map": true,
+    "workload": true
+  },
+  "changes": [
+    "formal frozen-window consumption",
+    "explicit source-row range",
+    "60-window loader reachability gate",
+    "all-command window binding validation",
+    "hash-chained phase ledger timing and failure classification"
+  ]
+}

@@ -4,7 +4,10 @@
 
 ## Live 文档
 
-- `typed_model_cache_formal_protocol.md`：G14B agent/seed/budget/capacity/metrics/statistics/claims/holdout seal 冻结合同
+- `typed_model_cache_formal_protocol.md`：G14B-G14R2 agent/seed/budget/capacity/metrics/statistics/claims/
+  execution/holdout seal 冻结合同
+- `typed_model_cache_formal_window_consumption_contract.md`：G14R2 raw/provider offset 语义、source-range
+  推导、60-window reachability、command binding、ledger v2 与 Readiness v4
 - `typed_model_cache_split_exclusion_audit.md`：G14B 全历史 interval ledger、NGSIM inventory、24/12/12/12 split 与 pairwise independence 审计
 
 - `model_cache_dataset_discovery_audit_20260819.md`：G11 public model-serving/KV/model-artifact dataset taxonomy、qualification、HF复核、mapping与claim boundary

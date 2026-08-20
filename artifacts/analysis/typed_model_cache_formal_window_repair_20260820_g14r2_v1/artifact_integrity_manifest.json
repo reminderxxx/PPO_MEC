@@ -1,0 +1,129 @@
+{
+  "artifact_integrity_manifest_version": "1.0.0",
+  "artifact_run_id": "typed_model_cache_formal_window_repair_20260820_g14r2_v1",
+  "integrity_status": "pass",
+  "file_count": 20,
+  "files": [
+    {
+      "path": "boundary_window_rehearsal.json",
+      "size_bytes": 15148,
+      "sha256": "2230d6de33a68812f6cdca00f09dd5938f1b65c23de82113735a863ebb5c68d5"
+    },
+    {
+      "path": "command_log.json",
+      "size_bytes": 1736,
+      "sha256": "55a88196ffad45007d866a5758689eb74cd2a527c7279281400bf5b2127351cf"
+    },
+    {
+      "path": "failure_classification_validation.json",
+      "size_bytes": 449,
+      "sha256": "cefb2e86ce10865e7bc131d831aefb790c4a585006c7920b2b7a39c3dd86c404"
+    },
+    {
+      "path": "formal_command_templates_v1_2.json",
+      "size_bytes": 189231,
+      "sha256": "13987f061c3d2993231f06fb7855cc4f19b9b6c89227aca4fbca23c204cbd4d5"
+    },
+    {
+      "path": "formal_command_validation.json",
+      "size_bytes": 15016,
+      "sha256": "eaeb56a9dc9f613ef9abf6fa109e7f4bcc5cf423d01e394556e7536c1f482d30"
+    },
+    {
+      "path": "formal_window_consumption_contract.json",
+      "size_bytes": 111461,
+      "sha256": "5b1773b6c5d66373ba607ac1c3989fd031e6923204ce3499cc1ed1f8a4459582"
+    },
+    {
+      "path": "g14c_v2_failure_reference.json",
+      "size_bytes": 1338,
+      "sha256": "d48ea070de41f8c3310a1baac28079b4ee0a1e79bbc1d1170d00b3bd5701e240"
+    },
+    {
+      "path": "holdout_seal_revalidation.json",
+      "size_bytes": 230,
+      "sha256": "ef9751dd2bb40ec78a2305d912866acc350952d472111ce484ea0e59912b4581"
+    },
+    {
+      "path": "phase_ledger_schema.json",
+      "size_bytes": 611,
+      "sha256": "43fcf4de754d5be8410ba2b77120ccf38795fe15f8afb965519bd7e68b125f4e"
+    },
+    {
+      "path": "phase_ledger_validation.json",
+      "size_bytes": 1072,
+      "sha256": "2a9f9db39e29f55b4bafadf9bbaa51f5f8acbf67469f9324743de876b57fcd39"
+    },
+    {
+      "path": "protocol_restart_diff.json",
+      "size_bytes": 945,
+      "sha256": "d95b98af9f9032f228069ab54933ac9dc77e9a28135c1b6616080c9c598bda74"
+    },
+    {
+      "path": "protocol_v1_2_manifest.json",
+      "size_bytes": 265799,
+      "sha256": "7b51ce6626c768f2a4da237de8d8a92d9c61894c783ff8a0d272d0f767c8e6f1"
+    },
+    {
+      "path": "readiness_review_v4.json",
+      "size_bytes": 1224,
+      "sha256": "53c3dbef10aaf378d817374ffd97be223dbff08bd5fd111f782ae49bba7164d8"
+    },
+    {
+      "path": "resolved_source_range.json",
+      "size_bytes": 315,
+      "sha256": "2bb9fab28ba7a8903c3fc584651f9e8b5b9612dbd933620769235d914cac9573"
+    },
+    {
+      "path": "tiny_training_rehearsal.json",
+      "size_bytes": 12761,
+      "sha256": "eb73999e012d537823f9c530661b64f1b94ef6ad0afc7b13505e1025ace1d0d3"
+    },
+    {
+      "path": "training_benchmark_fingerprint_parity.json",
+      "size_bytes": 20300,
+      "sha256": "8bf2f2a8811de4eaf388237c61541a9420efb2f626828eb92856e4d089b0c583"
+    },
+    {
+      "path": "training_command_validation_150.json",
+      "size_bytes": 82762,
+      "sha256": "899efee310dc2259c1cabd5d81891cfad1b00cb621e53ca0b224f63c2a2fd546"
+    },
+    {
+      "path": "window_loader_semantics_audit.json",
+      "size_bytes": 877,
+      "sha256": "1b773419b846a834346e405c18f7a93c8b107d5024405b48b8ec7a4f8eba53e1"
+    },
+    {
+      "path": "window_reachability_rows.json",
+      "size_bytes": 113397,
+      "sha256": "0601ffcccf71ec3933fb429bd77455fdece24b46e608c4af11221c3cb9491691"
+    },
+    {
+      "path": "window_reachability_summary.json",
+      "size_bytes": 527,
+      "sha256": "7c1f02f0fbbffd6970a2ae6f05e5893113f86729e7faa7f73477536d351f1c7d"
+    }
+  ],
+  "formal_checkpoint_count": 0,
+  "formal_episode_count": 0,
+  "formal_performance_result_count": 0,
+  "hashes": {
+    "full_sha256": "cc8c9418efa7c5570555a23e85dbec1bb0e06cc42160d84ebbea7d8a8deca90a",
+    "semantic_sha256": "cc8c9418efa7c5570555a23e85dbec1bb0e06cc42160d84ebbea7d8a8deca90a",
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ]
+  }
+}

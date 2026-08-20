@@ -1,0 +1,8 @@
+{
+  "start_row_inclusive": 0,
+  "end_row_exclusive": 11850526,
+  "source_row_count": 11850526,
+  "margin_rows": 0,
+  "exceeds_source_behavior": "reject",
+  "derivation": "max(per-window minimum safe prefix); NGSIM rows are vehicle-major and the last required preceding i_80 frame row occurs at the final raw row"
+}

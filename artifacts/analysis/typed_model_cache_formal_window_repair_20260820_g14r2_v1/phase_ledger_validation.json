@@ -1,0 +1,44 @@
+{
+  "status": "pass",
+  "schema_version": "2.0.0",
+  "required_fields": [
+    "attempts",
+    "command_attempts",
+    "command_identity",
+    "commands",
+    "completed_at",
+    "current_record_hash",
+    "expanded_command",
+    "failure_classification",
+    "failure_message_reference",
+    "input_hash",
+    "output_files",
+    "output_hash",
+    "phase",
+    "phase_ledger_schema_version",
+    "previous_record_hash",
+    "retry_count",
+    "return_code",
+    "returncode",
+    "sequence_number",
+    "started_at",
+    "status",
+    "wall_clock_seconds"
+  ],
+  "success_chain": {
+    "status": "pass",
+    "record_count": 2,
+    "terminal_phase_count": 1,
+    "last_record_hash": "22936d1d84241b1867ae6b0f301589d57c0a2ebdbca755d06650f83128f55847"
+  },
+  "failure_chain": {
+    "status": "pass",
+    "record_count": 2,
+    "terminal_phase_count": 1,
+    "last_record_hash": "a50632b5f87ac1c4f39b1645c79fc3ce50caa33dbe1f5db069c644fae6d81148"
+  },
+  "running_record_supported": true,
+  "terminal_immutable": true,
+  "JSON_round_trip": true,
+  "deterministic_hash": true
+}

@@ -1,5 +1,27 @@
 ﻿# Decision Log
 
+## 2026-08-20: G14R2 binds formal execution to raw identity, not implicit offsets
+
+- 决定：G14C v2 与 Protocol v1.1 永久 `invalid_before_performance_execution`；return code 1 是
+  `data_window_unreachable`，不是 retryable infrastructure failure。旧 run、failure audit 与 ledger 不
+  resume、不覆盖、不删除。
+- 决定：frozen `frame_offset` 解释为 normalized `(Location, Global_Time)` 分组并按 segment/time 排序后的
+  全局 provider-frame index。`max_mobility_rows` 是 grouping 前 raw CSV prefix；不得把 raw Frame_ID、
+  segment-local index、window rank 或 1500 默认值当作等价身份。
+- 决定：正式消费者使用 `formal_window_consumption_contract_version=1.0.0` 和显式 window plan，扫描冻结
+  source prefix、只 materialize 目标 segment/time frames。安全 prefix 取所有 evaluation units 所需前缀的
+  最大值；由于 NGSIM vehicle-major 行布局，结果为完整 11,850,526 rows、margin=0，而不是人为加 buffer。
+- 决定：training、benchmark、dev/formal/support 必须共享 loader/preprocessing/fingerprint contract；
+  CLI source/range/selector/length/RSU/vehicle-selection 漂移在任何 episode/checkpoint 写入前拒绝。
+- 决定：sealed holdout 仅允许 identity/interval reachability，禁止 agent、episode、result 或 performance
+  字段访问。60-window preflight 的 holdout 行必须标记 metadata-only。
+- 决定：phase ledger 升级为 `2.0.0`，每次 phase 先 append running、再 append immutable terminal；
+  previous/current hash chain、系统时间与 monotonic wall-clock 在冻结容差内共同验证。Return code 75
+  是唯一 `infrastructure_retryable` 分类。
+- 决定：Protocol v1.2 只改变 window consumption、source range、command validation 与 ledger provenance；
+  split、agent、seed、预算、capacity、endpoint、support、统计、claim 与 checkpoint cadence 不变。
+  Readiness v4 不等于 G14/formal/paper completion，未来 G14C v3 只能绑定 Commit A3 clean worktree。
+
 ## 2026-08-20: G14R supersede v1.0 without outcome-driven changes
 
 - 决定：G14C v1 protocol/run 在任何性能执行前已不可机械执行，永久标记 invalid；保留旧 artifact，
