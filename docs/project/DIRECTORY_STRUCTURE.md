@@ -1,5 +1,15 @@
 ﻿# Directory Structure
 
+G14R：v1.1 配置与 companion 位于
+`configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/`，包括 protocol、agent config、
+三档 runtime、formal/dev 与 setting-specific fairness manifests、split companion 和 index。代码入口为
+`scripts/restart_typed_model_cache_formal_protocol.py`、
+`scripts/run_typed_model_cache_formal_protocol.py`、typed support/dev/statistics/artifact wrappers；共享合同位于
+`src/runtime/formal_training_contract.py` 与
+`src/evaluators/typed_model_cache_formal_execution.py`。审计包位于
+`artifacts/analysis/typed_model_cache_formal_protocol_restart_20260820_g14r_v1/`；根级 JSON 纳入 Git，
+non-formal rehearsal checkpoints/raw episodes 保持 ignored。该结构不包含 G14C v2 正式输出。
+
 G14B：`src/evaluators/typed_model_cache_formal_protocol.py` 承载历史 interval registry、完整 NGSIM
 inventory、split/overlap/hash/formal/seal/readiness 纯合同；
 `scripts/freeze_typed_model_cache_formal_protocol.py` 是 create-only 非训练入口。冻结 plans 位于
@@ -35,6 +45,7 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 - `configs/experiment/top_journal_v8_strict_split_20260621/`：outcome-blind train/dev/formal/hidden 固定窗口计划与 SHA-256 manifest
 - `configs/experiment/top_journal_v17_future_validation_time_audited_20260717/`：v17 time-audited future-validation 固定窗口计划；按 `frame_offset` 和 `time_index_start/end` 同时排除历史 split
 - `configs/experiment/typed_model_cache_formal_protocol_v1_20260820/`：G14B train/dev/formal/sealed-holdout 四个 outcome-blind window plans 与 protocol index；holdout 仍 sealed
+- `configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/`：G14R executable v1.1 protocol、agent/runtime/fairness/split companions 与完整 command matrix；不含正式结果
 - `data/`：原始数据与处理后数据；通过 Git LFS 版本化，完整克隆后需执行 `git lfs pull`
 - `docs/`：长期维护文档，`docs/project/` 为事实来源，`docs/project/DATASET_SOURCES.md` 记录数据源声明，`docs/project/literature_reference_table.md` 记录顶刊/顶会 related-work 参考表，`docs/benchmark_plan_or_baseline_plan.md`、`docs/baseline_formalization_round1.md`、`docs/experiment_status_round1.md`、`docs/mechanism_activation_check_round1.md` 和 `docs/experiment_runbook_round1.md` 记录 baseline 计划、round1 状态、机制诊断与复跑命令
 - `scripts/`：数据检查、dry-run、训练、评估和 benchmark 入口
@@ -53,6 +64,8 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 - `scripts/validate_typed_model_cache.py`：生成 G13 typed base/adapter/state 受控验证包，覆盖原子事务、readiness、容量、五种 eviction、公平性、小规模 oracle 和真实数据最小链路
 - `scripts/run_typed_model_cache_runtime_rehearsal.py`：G14A non-formal typed training/checkpoint/benchmark/CacheEvent/metrics闭环验证；不运行formal/holdout/hidden
 - `scripts/freeze_typed_model_cache_formal_protocol.py`：G14B create-only 历史排除、split、formal protocol、holdout seal 与 readiness freeze；不运行 episode 或生成 checkpoint
+- `scripts/run_typed_model_cache_formal_protocol.py`：G14R 13 阶段 append-only G14C v2 执行入口；普通 runner 无 holdout capability
+- `scripts/run_typed_model_cache_formal_repair_rehearsal.py`：G14R bounded non-formal cadence/config/endpoint/support/phase rehearsal
 - `src/`：核心实现
 - `tests/`：自动化测试
 - `artifacts/`：当前保留的训练 checkpoint、benchmark 报告和论文表格产物
@@ -102,6 +115,7 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 - `artifacts/analysis/typed_model_cache_validation_20260819_g13_v1/`：G13 小规模 deterministic validation；`formal=false`、`training=false`，不得作为算法收益论文证据
 - `artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/`：G14A non-formal typed MB plumbing、tiny checkpoint gate与reconciliation；不得作为正式checkpoint或论文证据
 - `artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/`：G14B 历史账本、完整 interval inventory、split/overlap、formal/statistics/claim/seal/readiness 与 integrity JSON；checkpoint/performance result count均为0
+- `artifacts/analysis/typed_model_cache_formal_protocol_restart_20260820_g14r_v1/`：G14R v1 failure reference、execution matrix、v1.1 protocol/hash、endpoint/support/command/phase/rehearsal/readiness/integrity JSON；正式结果 count=0
 - `artifacts/audits/top_journal_v17_future_validation_time_audited_20260717/`：future split 与 train/dev/formal/hidden 的 frame/time 双区间独立性审计
 - `artifacts/experiments/top_journal_support_suite/`：v8-current support suite、机制归因、paired statistics 和 support gate report 输出根目录；dry-run 不能作为论文证据
 - `artifacts/experiments/strict_full_v8_*`：v8 formal、一次性 hidden 与 LuST external benchmark；正式结论只引用 `top_journal_readiness_audit_20260621.md` 列出的 run ID

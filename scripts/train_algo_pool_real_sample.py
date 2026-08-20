@@ -32,11 +32,21 @@ from src.evaluators.main_results_support import (
     resolve_window_candidates,
 )
 from src.metrics.recorder import EpisodeRecorder
+from src.metrics.cache_efficiency_metrics import reduce_cache_efficiency_summary
 from src.runtime.typed_model_cache_runtime import (
     build_checkpoint_provenance,
     load_runtime_catalog,
     resolve_model_cache_runtime,
     sha256_value,
+)
+from src.runtime.formal_training_contract import (
+    FormalTrainingContractError,
+    audited_agent_config,
+    checkpoint_schedule_metadata,
+    load_json_mapping,
+    resolve_training_contract,
+    should_save_checkpoint,
+    validate_resume_checkpoint_schedule,
 )
 from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
 
@@ -79,10 +89,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--episodes", type=int, default=None)
     parser.add_argument("--update_every", type=int, default=None)
     parser.add_argument("--batch_size", type=int, default=None)
-    parser.add_argument("--learning_rate", type=float, default=3e-4)
+    parser.add_argument("--learning_rate", type=float, default=None)
     parser.add_argument("--clip_ratio", type=float, default=0.2)
-    parser.add_argument("--entropy_coef", type=float, default=0.01)
-    parser.add_argument("--value_coef", type=float, default=0.5)
+    parser.add_argument("--entropy_coef", type=float, default=None)
+    parser.add_argument("--value_coef", type=float, default=None)
     parser.add_argument("--gamma", type=float, default=0.99)
     parser.add_argument("--gae_lambda", type=float, default=0.95)
     parser.add_argument("--random_seed", type=int, default=7)
@@ -92,6 +102,26 @@ def parse_args() -> argparse.Namespace:
         default="",
         help="Shared legacy/typed runtime YAML; typed fields may not be overridden on the CLI.",
     )
+    parser.add_argument(
+        "--formal_protocol_path",
+        type=str,
+        default="",
+        help="Optional typed formal protocol v1.1 manifest; semantic CLI overrides are rejected.",
+    )
+    parser.add_argument(
+        "--agent_config_path",
+        type=str,
+        default="",
+        help="Versioned per-agent training config companion; required with --formal_protocol_path.",
+    )
+    parser.add_argument(
+        "--checkpoint_every_updates",
+        type=int,
+        default=None,
+        help="Snapshot cadence. Legacy omission preserves one snapshot per update.",
+    )
+    parser.add_argument("--resume_checkpoint_path", type=str, default="")
+    parser.add_argument("--resume_completed_episodes", type=int, default=0)
     parser.add_argument("--mobility_source", choices=["ngsim", "lust"], default="ngsim")
     parser.add_argument("--primary_vehicle_selection", choices=["stable_first", "handoff_pressure"], default="stable_first")
     parser.add_argument("--mobility_csv_path", type=str, default="")
@@ -118,11 +148,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min_tasks", type=int, default=5)
     parser.add_argument("--max_tasks", type=int, default=20)
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "artifacts" / "training" / "algo_pool"))
+    parser.add_argument(
+        "--run_id",
+        type=str,
+        default="",
+        help="Optional create-only stable run identity for protocol orchestration.",
+    )
     args = parser.parse_args()
-    defaults = PROFILE_DEFAULTS[args.profile]
-    for field_name in ["episodes", "update_every", "batch_size", "max_steps"]:
-        if getattr(args, field_name) is None:
-            setattr(args, field_name, defaults[field_name])
     return args
 
 
@@ -229,16 +261,58 @@ def annotate_checkpoint(path: Path, metadata: dict[str, Any]) -> None:
         torch.save(payload, path)
 
 
+def load_checkpoint_training_metadata(path: str | Path) -> dict[str, Any]:
+    payload = torch.load(Path(path), map_location="cpu")
+    if not isinstance(payload, dict):
+        raise FormalTrainingContractError("resume checkpoint payload must be an object")
+    metadata = payload.get("training_metadata") or payload.get("checkpoint_metadata")
+    if not isinstance(metadata, dict):
+        return {}
+    return dict(metadata)
+
+
 def main() -> None:
     args = parse_args()
+    formal_protocol = (
+        load_json_mapping(args.formal_protocol_path, "formal protocol")
+        if args.formal_protocol_path
+        else None
+    )
+    agent_config_companion = (
+        load_json_mapping(args.agent_config_path, "agent config companion")
+        if args.agent_config_path
+        else None
+    )
+    resolved_training = resolve_training_contract(
+        agent_name=args.agent_name,
+        profile_defaults=PROFILE_DEFAULTS[args.profile],
+        cli_values={
+            "episodes": args.episodes,
+            "update_every": args.update_every,
+            "batch_size": args.batch_size,
+            "max_steps": args.max_steps,
+            "checkpoint_every_updates": args.checkpoint_every_updates,
+        },
+        formal_protocol=formal_protocol,
+        agent_config_companion=agent_config_companion,
+    )
+    args.episodes = resolved_training.episodes
+    args.update_every = resolved_training.update_every
+    args.batch_size = resolved_training.batch_size
+    args.max_steps = resolved_training.max_steps
+    args.checkpoint_every_updates = resolved_training.checkpoint_every_updates
     runtime_contract = resolve_model_cache_runtime(
         args.model_cache_runtime_config or None,
         root=ROOT_DIR,
     )
-    run_id = datetime.now().strftime(f"{args.agent_name}_train_%Y%m%d_%H%M%S_%f_seed{args.random_seed}")
+    run_id = args.run_id or datetime.now().strftime(
+        f"{args.agent_name}_train_%Y%m%d_%H%M%S_%f_seed{args.random_seed}"
+    )
     output_root = Path(args.output_root) / args.agent_name / run_id
     episode_root = output_root / "episodes"
     checkpoint_root = output_root / "checkpoints"
+    if output_root.exists() and any(output_root.iterdir()) and not args.resume_checkpoint_path:
+        raise FileExistsError(f"refusing to overwrite non-empty training run: {output_root}")
     episode_root.mkdir(parents=True, exist_ok=True)
     checkpoint_root.mkdir(parents=True, exist_ok=True)
 
@@ -292,25 +366,52 @@ def main() -> None:
     }
     agent_kwargs = {
         "random_seed": args.random_seed,
-        "learning_rate": args.learning_rate,
+        "learning_rate": 3e-4 if args.learning_rate is None else args.learning_rate,
         "clip_ratio": args.clip_ratio,
-        "entropy_coef": args.entropy_coef,
-        "value_coef": args.value_coef,
+        "entropy_coef": 0.01 if args.entropy_coef is None else args.entropy_coef,
+        "value_coef": 0.5 if args.value_coef is None else args.value_coef,
         "batch_size": args.batch_size,
         "deterministic_action": False,
     }
     agent_kwargs.update(agent_profile_kwargs(args.agent_name, args.profile))
+    for field_name, frozen_value in resolved_training.agent_config.items():
+        supplied = getattr(args, field_name, None)
+        if supplied is not None and supplied != frozen_value:
+            raise FormalTrainingContractError(
+                f"formal CLI/runtime mismatch for {field_name}: supplied={supplied}, frozen={frozen_value}"
+            )
+        agent_kwargs[field_name] = frozen_value
     if args.profile == "smoke" and args.agent_name in REPLAY_BASELINES:
         smoke_rollout_capacity = max(int(args.max_steps) * max(int(args.update_every), 1), 1)
         agent_kwargs["min_replay_size"] = max(1, min(int(args.batch_size), smoke_rollout_capacity))
     agent = build_agent(args.agent_name, **agent_kwargs)
+    resolved_agent_config = audited_agent_config(
+        agent, resolved_training.agent_config
+    )
+
+    resume_metadata: dict[str, Any] = {}
+    if args.resume_checkpoint_path:
+        resume_metadata = load_checkpoint_training_metadata(args.resume_checkpoint_path)
+        validate_resume_checkpoint_schedule(
+            resume_metadata,
+            checkpoint_every_updates=args.checkpoint_every_updates,
+        )
+        if int(resume_metadata.get("update_count", 0) or 0) < 0:
+            raise FormalTrainingContractError("resume checkpoint update_count is invalid")
+        agent.load(str(Path(args.resume_checkpoint_path)))
+    if args.resume_completed_episodes < 0 or args.resume_completed_episodes > args.episodes:
+        raise FormalTrainingContractError(
+            "resume_completed_episodes must be in [0, episodes]"
+        )
 
     pending_rollout: list[dict[str, Any]] = []
     rows: list[dict[str, Any]] = []
     update_logs: list[dict[str, Any]] = []
     latest_checkpoint_path = ""
-    update_index = 0
-    for episode_index in range(1, args.episodes + 1):
+    checkpoint_paths: list[str] = []
+    saved_checkpoint_update_indices: list[int] = []
+    update_index = int(resume_metadata.get("update_count", 0) or 0)
+    for episode_index in range(args.resume_completed_episodes + 1, args.episodes + 1):
         workflow_state = workflow_states[(episode_index - 1) % len(workflow_states)]
         window_candidate = selected_window_plan[(episode_index - 1) % len(selected_window_plan)]
         mobility_bundle = load_window_bundle(
@@ -373,6 +474,7 @@ def main() -> None:
             }
         )
         summary["episode_success"] = bool(summary.get("episode_status", {}).get("completed", False))
+        summary["cache_efficiency_metrics"] = reduce_cache_efficiency_summary(summary).to_dict()
         pending_rollout.extend(rollout)
         should_update = episode_index % max(args.update_every, 1) == 0 or episode_index == args.episodes
         if should_update:
@@ -381,9 +483,12 @@ def main() -> None:
             pending_rollout = []
             checkpoint_path = checkpoint_root / f"update_{update_index:04d}.pt"
             latest_path = checkpoint_root / "latest.pt"
-            agent.save(str(checkpoint_path))
             agent.save(str(latest_path))
             latest_checkpoint_path = str(latest_path)
+            schedule_metadata = checkpoint_schedule_metadata(
+                checkpoint_every_updates=args.checkpoint_every_updates,
+                expected_update_count=resolved_training.expected_update_count,
+            )
             checkpoint_metadata = {
                 "run_id": run_id,
                 "agent_name": args.agent_name,
@@ -393,6 +498,9 @@ def main() -> None:
                 "prediction_horizon": args.prediction_horizon,
                 "episodes": args.episodes,
                 "update_count": update_index,
+                "checkpoint_schedule": schedule_metadata,
+                "resolved_agent_config": resolved_agent_config,
+                "formal_training_contract": resolved_training.to_dict(),
                 "is_smoke_checkpoint": args.profile == "smoke",
                 "script": "scripts/train_algo_pool_real_sample.py",
                 "typed_runtime_provenance": build_checkpoint_provenance(
@@ -404,8 +512,12 @@ def main() -> None:
                     train_window_plan_identity=window_plan_identity,
                 ),
             }
-            annotate_checkpoint(checkpoint_path, checkpoint_metadata)
             annotate_checkpoint(latest_path, checkpoint_metadata)
+            if should_save_checkpoint(update_index, args.checkpoint_every_updates):
+                agent.save(str(checkpoint_path))
+                annotate_checkpoint(checkpoint_path, checkpoint_metadata)
+                checkpoint_paths.append(str(checkpoint_path))
+                saved_checkpoint_update_indices.append(update_index)
             update_logs.append({"episode_index": episode_index, **learn_info})
         else:
             learn_info = {
@@ -432,6 +544,13 @@ def main() -> None:
         "episodes": args.episodes,
         "update_every": args.update_every,
         "update_count": update_index,
+        "checkpoint_every_updates": args.checkpoint_every_updates,
+        "checkpoint_schedule": checkpoint_schedule_metadata(
+            checkpoint_every_updates=args.checkpoint_every_updates,
+            expected_update_count=resolved_training.expected_update_count,
+        ),
+        "checkpoint_paths": checkpoint_paths,
+        "saved_checkpoint_update_indices": saved_checkpoint_update_indices,
         "latest_checkpoint_path": latest_checkpoint_path,
         "output_dir": str(output_root),
         "train_csv_path": str(train_csv_path),
@@ -454,6 +573,8 @@ def main() -> None:
         "window_scan_stride": args.window_scan_stride,
         "prediction_horizon": args.prediction_horizon,
         "agent_protocol": getattr(agent, "baseline_config", {}),
+        "resolved_agent_config": resolved_agent_config,
+        "formal_training_contract": resolved_training.to_dict(),
         "resolved_model_cache_runtime": runtime_contract,
         "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
         "cache_capacity_profile": runtime_contract["cache_capacity_profile"],

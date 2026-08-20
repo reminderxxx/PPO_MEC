@@ -1,5 +1,25 @@
 ﻿# Progress
 
+## 2026-08-20: G14R formal execution contract repaired；protocol v1.1 ready
+
+- G14C v1 `typed_model_cache_formal_20260820_g14c_351fdb8_v1` 永久记录为
+  `INVALID_PROTOCOL_OR_IMPLEMENTATION`：六个 Phase-0 blockers 均在训练前发现，正式训练、checkpoint、
+  formal performance count 均为 0，旧 run 不 resume/覆盖/删除。
+- Protocol v1.1 补齐 cadence=4 的真实 checkpoint scheduler/resume metadata、SA
+  `auxiliary_coef=0.06` 共享入口传递与实例审计、metrics 1.2 两个 primary producer、fixed support/
+  scalability levels、typed provenance support runner、150-cell train plan、dev selection/freeze、完整
+  command templates 与 13 阶段 append-only runner。
+- Non-formal rehearsal 使用 4 agents、2 seeds、288/576 MB：16 个训练单元只保存 update 4；restore/
+  provenance、36 个 summary 的 raw/row endpoint reconciliation、ablation、prediction robustness、oracle
+  scalability 与 `complete_without_holdout` phase simulation 均通过。没有形成性能 claim。
+- 新 protocol semantic SHA-256=`b8bbb53d6af47d111b840efbb53d3389485535d66c8de19b747e2a5727786629`；
+  split semantic SHA-256 保持 `aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a`。
+- Readiness v3=`READY_FOR_G14C_V2_CLEAN_TRAIN_AND_FORMAL`；holdout 仍
+  `sealed=true/opened=false/consumed_permanently=false`。这不是 formal completed、G14 completed 或
+  paper-ready；不得在本任务自动启动 G14C v2/G15。
+- 机器证据：`artifacts/analysis/typed_model_cache_formal_protocol_restart_20260820_g14r_v1/`；长期说明：
+  `docs/project/typed_model_cache_formal_protocol_restart.md`。
+
 ## 2026-08-20: G14B historical exclusion、independent split 与 formal protocol 已冻结
 
 - 历史账本 `1.0.0` 以 metadata-only parser 扫描 1,209 个 plan/result JSON、34,661 个窗口引用，折叠为 668 个 unique outer intervals；250 个恢复 raw identity，418 个 unknown interval 对 lankershim/peachtree/us_101 形成保守排除。Registry semantic SHA-256=`09ee3109f6789cada996870bcb6a3dac9496a4d98f8373c11cb99f61f55beaae`。

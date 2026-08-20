@@ -1,0 +1,30 @@
+{
+  "readiness_review_version": "3.0.0",
+  "reviewed_at": "2026-08-20T16:13:37.044276+08:00",
+  "literature_cutoff": "2026-08-20",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "artifact_run_id": "typed_model_cache_formal_protocol_restart_20260820_g14r_v1",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "implementation_baseline_git_commit": "351fdb8a309614a751cedb180ecaccf2a681db2d",
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "checks": {
+    "protocol_fields_have_runtime_consumers": true,
+    "agent_commands_expand": true,
+    "checkpoint_frequency_consistent": true,
+    "sa_auxiliary_consistent": true,
+    "primary_endpoint_producer_exists": true,
+    "primary_endpoint_reconciliation": true,
+    "support_values_concrete_or_unavailable": true,
+    "typed_support_provenance": true,
+    "phase_runner_dry_run": true,
+    "fairness_manifests_persisted": true,
+    "runtime_configs_persisted": true,
+    "command_templates_persisted": true,
+    "output_schema_exists": true,
+    "clean_worktree_execution_plan": true,
+    "holdout_sealed": true
+  },
+  "verdict": "READY_FOR_G14C_V2_CLEAN_TRAIN_AND_FORMAL",
+  "formal_completed": false,
+  "paper_ready": false
+}

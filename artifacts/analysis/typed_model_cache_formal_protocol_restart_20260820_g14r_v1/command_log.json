@@ -1,0 +1,58 @@
+{
+  "command_log_version": "1.0.0",
+  "artifact_run_id": "typed_model_cache_formal_protocol_restart_20260820_g14r_v1",
+  "commands": [
+    {
+      "command": ".venv/bin/python scripts/restart_typed_model_cache_formal_protocol.py --force",
+      "status": "pass",
+      "scope": "protocol generation"
+    },
+    {
+      "command": ".venv/bin/python scripts/run_typed_model_cache_formal_protocol.py --preflight --dry-run",
+      "status": "pass",
+      "scope": "no-write full expansion"
+    },
+    {
+      "command": ".venv/bin/python scripts/run_typed_model_cache_formal_repair_rehearsal.py",
+      "status": "pass",
+      "scope": "non-formal rehearsal"
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/test_typed_model_cache.py -q",
+      "status": "pass"
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/test_typed_model_cache_runtime.py -q",
+      "status": "pass"
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/test_typed_model_cache_formal_protocol.py -q",
+      "status": "pass"
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/test_cache_efficiency_metrics.py -q",
+      "status": "pass"
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/test_top_journal_statistics.py -q",
+      "status": "pass"
+    },
+    {
+      "command": ".venv/bin/python -m pytest -q",
+      "status": "pass",
+      "result": "816 passed"
+    },
+    {
+      "command": ".venv/bin/python scripts/smoke_test.py",
+      "status": "pass"
+    },
+    {
+      "command": "git diff --check",
+      "status": "pass"
+    }
+  ],
+  "formal_training_commands": 0,
+  "formal_evaluation_commands": 0,
+  "holdout_commands": 0,
+  "g15_commands": 0
+}

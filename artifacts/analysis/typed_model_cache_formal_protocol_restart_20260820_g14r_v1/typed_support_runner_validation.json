@@ -1,0 +1,19 @@
+{
+  "status": "pass_contract_validation",
+  "runner": "scripts/run_typed_model_cache_formal_support.py",
+  "typed_slot_rejected": true,
+  "legacy_checkpoint_rejected": true,
+  "cli_override_rejected": true,
+  "g12_supervised_disabled": true,
+  "kv_disabled": true,
+  "hf_metadata_disabled": true,
+  "provenance_fields": [
+    "protocol",
+    "split",
+    "runtime",
+    "catalog",
+    "fairness",
+    "checkpoint",
+    "setting"
+  ]
+}

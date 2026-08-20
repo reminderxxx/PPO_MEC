@@ -1,0 +1,66 @@
+{
+  "rehearsal_version": "1.0.0",
+  "rehearsal_id": "g14r_rehearsal_20260820_160354_768755",
+  "status": "pass",
+  "scope": "bounded non-formal non-holdout execution-contract rehearsal",
+  "agents": [
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "cache_offload_drl"
+  ],
+  "domain_baseline": "cache_offload_drl",
+  "seeds": [
+    7,
+    13
+  ],
+  "capacities_mb": [
+    288.0,
+    576.0
+  ],
+  "training_cell_count": 16,
+  "checkpoint_frequency_updates": 4,
+  "saved_checkpoint_update_indices": [
+    4
+  ],
+  "sa_auxiliary_coef": 0.06,
+  "checkpoint_restore_and_provenance": "pass",
+  "endpoint_reconciliation": {
+    "status": "pass",
+    "episode_summary_count": 36,
+    "primary_endpoint_count": 6
+  },
+  "support_rehearsal": [
+    {
+      "family": "ablation",
+      "setting_id": "ablation-8aa367acf3bdf7a9",
+      "status": "pass",
+      "formal": false
+    },
+    {
+      "family": "robustness",
+      "setting_id": "prediction_boundary-efa09ee2409d3d87",
+      "status": "pass",
+      "formal": false
+    },
+    {
+      "family": "scalability",
+      "setting_id": "scalability-b05d0a8a8684c1f0",
+      "status": "pass",
+      "formal": false
+    }
+  ],
+  "phase_runner": {
+    "status": "pass",
+    "last_phase": "complete_without_holdout",
+    "event_count": 13,
+    "simulation_only": true,
+    "holdout_capability": false
+  },
+  "formal_checkpoint_count": 0,
+  "formal_episode_count": 0,
+  "holdout_opened": false,
+  "hidden_data_used": false,
+  "performance_claims": [],
+  "rehearsal_root": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_protocol_restart_20260820_g14r_v1/rehearsal_runs/g14r_rehearsal_20260820_160354_768755"
+}

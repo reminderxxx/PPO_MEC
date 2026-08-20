@@ -1,5 +1,29 @@
 # Code Module Map
 
+## G14R executable formal protocol v1.1
+
+- `src/runtime/formal_training_contract.py`：legacy/formal training budget resolver、checkpoint cadence/index/
+  resume contract 与 instantiated agent-config audit；不拥有训练 loop。
+- `scripts/train_algo_pool_real_sample.py`：消费 protocol v1.1/agent companion/cadence，保存 selection-eligible
+  scheduled checkpoints 与 selection-ineligible `latest.pt`，写 resolved config/schedule/provenance。
+- `src/metrics/cache_efficiency_metrics.py`：metrics 1.2 pure reducer；生产 byte-ready 与 typed
+  transfer/request primary fields并执行 stored/raw reconciliation。
+- `src/evaluators/typed_model_cache_formal_execution.py`：endpoint schema、support/scalability identity、
+  command-matrix expansion、readiness v3 与 append-only phase ledger。
+- `scripts/run_typed_model_cache_formal_dev_selection.py`：按 frozen dev fairness 评估全部 scheduled candidate
+  updates，并执行 outcome-blind lexicographic selection。
+- `scripts/manage_typed_model_cache_formal_artifacts.py`：selected checkpoint hash freeze、分 capacity
+  seed/provenance manifests、integrity inventory 与 completeness-only formal gate。
+- `scripts/run_typed_model_cache_formal_support.py`：统一 typed ablation/robustness/prediction/scalability/oracle
+  setting consumer；setting ID 外无自由语义 override。
+- `scripts/run_typed_model_cache_formal_cache_policy.py`：cache-policy benchmark 与 policy-neutral request replay
+  的同 phase wrapper。
+- `scripts/run_typed_model_cache_formal_statistics.py`：只收集 frozen controller rows 并调用预注册层级统计。
+- `scripts/run_typed_model_cache_formal_protocol.py`：13 阶段 append-only runner；不含 holdout execution API。
+- `scripts/restart_typed_model_cache_formal_protocol.py`：生成 protocol/config/Readiness v3/audit package；不训练。
+- `scripts/run_typed_model_cache_formal_repair_rehearsal.py`：controlled non-hidden bounded rehearsal；不产正式证据。
+- `tests/test_typed_model_cache_formal_execution.py`：48 类专项合同（参数化后 52 tests）。
+
 ## G14B historical exclusion、split 与 formal protocol
 
 - `src/evaluators/typed_model_cache_formal_protocol.py`：metadata-only 历史 plan parser、完整 NGSIM interval inventory、raw frame/time/segment-run overlap、result-blind deterministic split、canonical/full/semantic hash、formal/statistics/claim/holdout/readiness 合同与 fail-fast validator；不执行算法或环境 episode。

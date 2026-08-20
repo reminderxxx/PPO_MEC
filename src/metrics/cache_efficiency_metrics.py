@@ -12,7 +12,7 @@ from src.envs.specs import CACHE_EVENT_SCHEMA_VERSION, CacheEvent
 from src.metrics.cache_event_metrics import reduce_cache_events
 
 
-CACHE_EFFICIENCY_METRICS_VERSION = "1.1.0"
+CACHE_EFFICIENCY_METRICS_VERSION = "1.2.0"
 DEFAULT_REUSE_HORIZONS = (1, 3, 6, 12)
 HIT_SOURCES = (
     "vehicle_local", "current_rsu", "target_rsu", "neighbor_rsu", "cloud", "unserved"
@@ -351,6 +351,10 @@ def _type_aware_metrics(
     )
     requested_mb: dict[str, float] = {}
     hit_mb: dict[str, float] = {}
+    dependency_bytes_complete_count = 0
+    dependency_bytes_missing_count = 0
+    requested_service_dependency_mb = 0.0
+    full_service_ready_dependency_mb = 0.0
     sharing_hits = 0
     avoided_base_transfer_mb = 0.0
     base_reuse_count = 0
@@ -358,22 +362,52 @@ def _type_aware_metrics(
     base_to_adapters: dict[str, set[str]] = {}
     for item in typed:
         rows = list(item.get("requested_typed_objects") or [])
+        object_ids = [str(row.get("object_id") or "") for row in rows]
+        if not rows or any(not object_id for object_id in object_ids):
+            dependency_bytes_missing_count += 1
+        elif len(object_ids) != len(set(object_ids)):
+            raise ValueError(
+                "requested_typed_objects must contain unique dependency objects per request"
+            )
+        else:
+            sizes = [
+                _number(row.get("resident_size_mb"), "resident_size_mb", nullable=True)
+                for row in rows
+            ]
+            if any(size is None for size in sizes):
+                dependency_bytes_missing_count += 1
+            else:
+                dependency_bytes_complete_count += 1
+                event_dependency_mb = sum(float(size) for size in sizes if size is not None)
+                requested_service_dependency_mb += event_dependency_mb
+                if item.get("full_service_ready") is True:
+                    full_service_ready_dependency_mb += event_dependency_mb
         row_by_id = {str(row.get("object_id")): row for row in rows}
         lookup = list(item.get("per_object_lookup_results") or [])
         for row in rows:
             object_type = str(row.get("object_type"))
-            requested_mb[object_type] = requested_mb.get(object_type, 0.0) + float(
-                _number(row.get("resident_size_mb"), "resident_size_mb") or 0.0
+            resident_size_mb = _number(
+                row.get("resident_size_mb"), "resident_size_mb", nullable=True
             )
+            if resident_size_mb is not None:
+                requested_mb[object_type] = (
+                    requested_mb.get(object_type, 0.0) + float(resident_size_mb)
+                )
         for row in lookup:
             if not row.get("resident"):
                 continue
             source = row_by_id.get(str(row.get("object_id")))
             if source:
                 object_type = str(source.get("object_type"))
-                hit_mb[object_type] = hit_mb.get(object_type, 0.0) + float(
-                    _number(source.get("resident_size_mb"), "resident_size_mb") or 0.0
+                resident_size_mb = _number(
+                    source.get("resident_size_mb"),
+                    "resident_size_mb",
+                    nullable=True,
                 )
+                if resident_size_mb is not None:
+                    hit_mb[object_type] = (
+                        hit_mb.get(object_type, 0.0) + float(resident_size_mb)
+                    )
         base_row = next((row for row in rows if row.get("object_type") == "base_model"), None)
         adapter_row = next((row for row in rows if row.get("object_type") == "adapter"), None)
         if base_row:
@@ -424,12 +458,24 @@ def _type_aware_metrics(
             key: len(value) for key, value in sorted(base_adapter_sets.items())
         }
         pinned_mb = round(pinned_mb, 6)
-    full_ready_mb = sum(
-        float(item.get("size_mb") or 0.0)
-        for item in typed
-        if item.get("full_service_ready")
+    dependency_bytes_complete = dependency_bytes_complete_count == count
+    dependency_byte_hit_rate = (
+        _rate(full_service_ready_dependency_mb, requested_service_dependency_mb)
+        if dependency_bytes_complete
+        else None
     )
-    total_transfer = sum(transfer_by_type.values())
+    base_transfer_mb = float(transfer_by_type.get("base_model", 0.0))
+    adapter_transfer_mb = float(transfer_by_type.get("adapter", 0.0))
+    workflow_state_transfer_mb = float(transfer_by_type.get("workflow_state", 0.0))
+    other_transfer_mb = sum(
+        float(value)
+        for object_type, value in transfer_by_type.items()
+        if object_type not in {"base_model", "adapter", "workflow_state"}
+    )
+    primary_transfer_mb = (
+        base_transfer_mb + adapter_transfer_mb + workflow_state_transfer_mb
+    )
+    total_transfer = primary_transfer_mb + other_transfer_mb
     return {
         **_group("available", None, ["CacheEvent 1.3 typed fields"], count, 0),
         "typed_model_cache_contract_version": "1.0.0",
@@ -444,6 +490,31 @@ def _type_aware_metrics(
         "workflow_state_ready_rate": _rate(state_ready, count),
         "full_service_ready_count": full_ready,
         "full_service_ready_rate": _rate(full_ready, count),
+        "full_service_ready_request_rate": _rate(full_ready, count),
+        "requested_dependency_byte_coverage_count": dependency_bytes_complete_count,
+        "requested_dependency_byte_missing_count": dependency_bytes_missing_count,
+        "requested_dependency_byte_coverage_rate": _rate(
+            dependency_bytes_complete_count, count
+        ),
+        "requested_service_dependency_mb": (
+            round(requested_service_dependency_mb, 6)
+            if dependency_bytes_complete
+            else None
+        ),
+        "full_service_ready_dependency_mb": (
+            round(full_service_ready_dependency_mb, 6)
+            if dependency_bytes_complete
+            else None
+        ),
+        "full_service_ready_byte_hit_rate": dependency_byte_hit_rate,
+        "full_service_ready_byte_hit_rate_availability": (
+            "available" if dependency_bytes_complete else "partial"
+        ),
+        "dependency_byte_denominator_semantics": (
+            "sum unique base_model+adapter resident bytes once within each eligible typed request; "
+            "the same shared base is counted again only for a distinct request event because it is "
+            "a requested service dependency, never once per lookup row or resident inventory entry"
+        ),
         "miss_count_by_missing_object_type": dict(sorted(missing_types.items())),
         "compatibility_failure_count": compatibility_failures,
         "requested_mb_by_type": {key: round(value, 6) for key, value in sorted(requested_mb.items())},
@@ -475,7 +546,22 @@ def _type_aware_metrics(
             sum(admitted_by_type.values()) + sum(evicted_by_type.values()), 6
         ),
         "total_transfer_mb": round(total_transfer, 6),
-        "transfer_amplification": _rate(total_transfer, full_ready_mb),
+        "primary_transfer_mb": round(primary_transfer_mb, 6),
+        "base_model_transfer_mb": round(base_transfer_mb, 6),
+        "adapter_transfer_mb": round(adapter_transfer_mb, 6),
+        "workflow_state_migration_transfer_mb": round(workflow_state_transfer_mb, 6),
+        "other_typed_transfer_mb": round(other_transfer_mb, 6),
+        "transfer_mb_per_request": _rate(primary_transfer_mb, count),
+        "transfer_mb_per_request_availability": "available",
+        "primary_transfer_composition": [
+            "base_model_transfer_mb",
+            "adapter_transfer_mb",
+            "workflow_state_migration_transfer_mb",
+        ],
+        "other_typed_transfer_excluded_from_primary": True,
+        "transfer_amplification": _rate(
+            primary_transfer_mb, requested_service_dependency_mb
+        ) if dependency_bytes_complete else None,
         "latency_saved": {"availability": "unavailable", "value": None},
     }
 
@@ -670,8 +756,12 @@ def reduce_cache_efficiency_summary(summary: Mapping[str, Any], *, reuse_horizon
 def cache_efficiency_row_fields(summary: Mapping[str, Any]) -> dict[str, Any]:
     """Return lightweight nullable fields for benchmark rows and generic aggregates."""
     result = reduce_cache_efficiency_summary(summary)
+    stored = summary.get("cache_efficiency_metrics")
+    if stored is not None and stored != result.to_dict():
+        raise ValueError("stored cache efficiency metrics do not reconcile with raw CacheEvent")
     if result.availability != "available":
         return {"cache_efficiency_availability": "unavailable"}
+    type_aware = result.type_aware_metrics
     return {
         "cache_efficiency_availability": "available",
         "cache_object_hit_rate": result.request_metrics.get("object_hit_rate"),
@@ -681,9 +771,35 @@ def cache_efficiency_row_fields(summary: Mapping[str, Any]) -> dict[str, Any]:
         "cache_transfer_amplification_ratio": result.lifecycle_metrics.get("transfer_amplification_ratio"),
         "cache_capacity_mean_occupancy": result.capacity_metrics.get("mean_occupancy"),
         "cache_latency_saved_sum_ms": result.latency_saved_metrics.get("latency_saved_sum_ms"),
-        "cache_base_model_hit_rate": result.type_aware_metrics.get("base_hit_rate"),
-        "cache_adapter_hit_rate": result.type_aware_metrics.get("adapter_hit_rate"),
-        "cache_joint_model_hit_rate": result.type_aware_metrics.get("joint_base_adapter_hit_rate"),
-        "cache_full_service_ready_rate": result.type_aware_metrics.get("full_service_ready_rate"),
-        "cache_base_transfer_mb": result.type_aware_metrics.get("transfer_mb_by_type", {}).get("base_model") if isinstance(result.type_aware_metrics.get("transfer_mb_by_type"), dict) else None,
+        "cache_base_model_hit_rate": type_aware.get("base_hit_rate"),
+        "cache_adapter_hit_rate": type_aware.get("adapter_hit_rate"),
+        "cache_joint_model_hit_rate": type_aware.get("joint_base_adapter_hit_rate"),
+        "cache_full_service_ready_rate": type_aware.get("full_service_ready_rate"),
+        "cache_base_transfer_mb": type_aware.get("base_model_transfer_mb"),
+        "full_service_ready_byte_hit_rate": type_aware.get(
+            "full_service_ready_byte_hit_rate"
+        ),
+        "joint_base_adapter_hit_rate": type_aware.get(
+            "joint_base_adapter_hit_rate"
+        ),
+        "full_service_ready_request_rate": type_aware.get(
+            "full_service_ready_request_rate"
+        ),
+        "transfer_mb_per_request": type_aware.get("transfer_mb_per_request"),
+        "requested_dependency_byte_coverage_rate": type_aware.get(
+            "requested_dependency_byte_coverage_rate"
+        ),
+        "requested_service_dependency_mb": type_aware.get(
+            "requested_service_dependency_mb"
+        ),
+        "full_service_ready_dependency_mb": type_aware.get(
+            "full_service_ready_dependency_mb"
+        ),
+        "base_model_transfer_mb": type_aware.get("base_model_transfer_mb"),
+        "adapter_transfer_mb": type_aware.get("adapter_transfer_mb"),
+        "workflow_state_migration_transfer_mb": type_aware.get(
+            "workflow_state_migration_transfer_mb"
+        ),
+        "other_typed_transfer_mb": type_aware.get("other_typed_transfer_mb"),
+        "primary_transfer_mb": type_aware.get("primary_transfer_mb"),
     }

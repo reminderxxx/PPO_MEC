@@ -1,5 +1,22 @@
 ﻿# Bugs And Risks
 
+## 2026-08-20: G14R closes G14C Phase-0 execution blockers
+
+- `RESOLVED / B01`：checkpoint cadence 由 shared runner 真正消费；formal=4、legacy omission=1、resume
+  mismatch fail-fast，selection 不包含每 update 的 `latest.pt`。
+- `RESOLVED / B02`：SA frozen `auxiliary_coef=0.06` 经非 dirty 共享配置层传入并记录；其他 agent 隔离。
+- `RESOLVED / B03`：metrics 1.2 生产 `full_service_ready_byte_hit_rate` 与
+  `transfer_mb_per_request`，raw/summary/row/aggregate 对账完成。
+- `RESOLVED / B04-B06`：support/scalability 数值或 explicit unavailable、typed support provenance、完整
+  commands/dev freeze/integrity 与 append-only phase runner 均已实现。
+- `OPEN / unavailable support claims`：object-size、transfer-cost、reuse、base-sharing 与四个 system
+  scalability dimensions 缺少 fingerprint-safe runtime transformer，因此不能形成对应 claim；不得把
+  `unavailable_pre_execution` 解读为零效应。
+- `OPEN / formal evidence`：G14R 只有 E2 execution-contract 与 non-formal rehearsal，正式 checkpoint、
+  formal raw results、statistics 仍不存在；必须另立 G14C v2 clean execution。
+- `SEALED / holdout`：`sealed=true/opened=false/consumed_permanently=false`；普通 phase/support runner
+  无 token 或 holdout capability。
+
 ## 2026-08-20: G14B protocol ready；正式执行与证据仍开放
 
 - `RESOLVED / G14B split`：历史 frame/time/segment-run 排除账本和 24/12/12/12 split 已冻结；1,770 个 pairwise relations 全部 safe，minimum gap=24，formal/holdout outer count 均为12。

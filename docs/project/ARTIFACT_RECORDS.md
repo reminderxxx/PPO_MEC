@@ -1,5 +1,21 @@
 # Artifact Records
 
+## 2026-08-20 G14R formal protocol restart
+
+- path：`artifacts/analysis/typed_model_cache_formal_protocol_restart_20260820_g14r_v1/`；config：
+  `configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/`。
+- v1 failure reference 永久绑定旧 run、旧 semantic hash、failure audit hash、0 training/checkpoint/formal
+  facts 与 `resume_allowed=false`。
+- protocol-to-runtime matrix 覆盖 protocol/split/runtime/training/agent/endpoint/support/scalability/dev/
+  checkpoint/commands/phases/statistics/integrity/holdout，`unmapped_executable_field_count=0`。
+- protocol v1.1 semantic SHA-256=`b8bbb53d6af47d111b840efbb53d3389485535d66c8de19b747e2a5727786629`；
+  split semantic SHA-256=`aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a`。
+- rehearsal：16 non-formal training cells、36 endpoint reconciliation summaries、3 support families、13
+  phase events；formal checkpoint/episode/result count=0，holdout unopened，无 performance claim。
+- readiness v3=`READY_FOR_G14C_V2_CLEAN_TRAIN_AND_FORMAL`，evidence level=
+  `E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE`；artifact integrity 排除 Git-ignored rehearsal
+  checkpoints/raw episodes，但纳入根级 rehearsal summary 与全部协议审计 JSON。
+
 ## 2026-08-20 G14B typed model-cache formal protocol freeze
 
 - path：`artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/`；config：`configs/experiment/typed_model_cache_formal_protocol_v1_20260820/`。

@@ -1,5 +1,20 @@
 ﻿# Decision Log
 
+## 2026-08-20: G14R supersede v1.0 without outcome-driven changes
+
+- 决定：G14C v1 protocol/run 在任何性能执行前已不可机械执行，永久标记 invalid；保留旧 artifact，
+  不 resume、不覆盖、不用文档摘要替代缺失结果。
+- 决定：允许在没有正式结果的条件下发布 protocol v1.1，仅修复 consumer binding。科学问题、primary
+  comparisons、5 seeds、训练预算、288/576/864 MB 与 60-window split 不变。
+- 决定：formal checkpoint cadence=4；每 update 的 `latest.pt` 仅服务恢复，不能进入 dev selection。
+  SA 0.06 通过 shared config companion 传递，禁止改回默认 0.1 或修改 SA loss。
+- 决定：primary transfer 明确包含 base+adapter+workflow-state migration，其他 typed transfer 单列；
+  byte-ready denominator 是 per-request unique base+adapter dependency bytes complete case。
+- 决定：不能安全执行的 support/scalability level 必须 `unavailable_pre_execution`，不能保留空维度、
+  legacy fallback 或事后选值。
+- 决定：G14C v2 只能从 Commit A2 clean worktree、新 run ID 和 append-only phase root 启动。Readiness
+  v3 不等于 formal/G14/paper completion；本轮不自动启动 G14C v2、holdout 或 G15。
+
 ## 2026-08-20: G14B 采用全历史永久消费、I-80 result-blind split 与 sealed holdout
 
 - 决定：任何曾参与设计、调参、checkpoint selection 或结果观察的 raw interval 永久 consumed；formal/hidden 降级、文件改名或不再引用都不恢复资格。Mixed/full、seed/workflow 重复只计一个 outer interval。

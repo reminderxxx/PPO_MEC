@@ -1,0 +1,17 @@
+{
+  "status": "pass",
+  "legacy_default": 1,
+  "formal_resolved": 4,
+  "expected_update_count": 32,
+  "actual_candidate_update_indices_contract": [
+    4,
+    8,
+    12,
+    16,
+    20,
+    24,
+    28,
+    32
+  ],
+  "resume_latest_each_update_selection_ineligible": true
+}

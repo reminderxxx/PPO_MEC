@@ -1,0 +1,8 @@
+{
+  "split_companion_version": "1.0.0",
+  "split_semantic_sha256": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+  "source_split_manifest": "artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/split_manifest.json",
+  "source_window_plan_directory": "configs/experiment/typed_model_cache_formal_protocol_v1_20260820",
+  "split_semantics_rewritten": false,
+  "reason": "No formal/holdout performance was executed or viewed; G14R repairs execution contracts only."
+}

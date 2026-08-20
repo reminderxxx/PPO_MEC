@@ -484,7 +484,7 @@ def validate_typed_cache_fairness_binding(
         errors.append("typed dependency-safe eviction contract mismatch")
     if payload.get("cache_event_schema_version") != CACHE_EVENT_SCHEMA_VERSION:
         errors.append("typed CacheEvent version mismatch")
-    if payload.get("type_aware_metric_version") != "1.1.0":
+    if payload.get("type_aware_metric_version") != "1.2.0":
         errors.append("typed metric version mismatch")
     if payload.get("cache_trace_context_version") != CACHE_TRACE_CONTEXT_VERSION:
         errors.append("typed trace context version mismatch")
@@ -616,6 +616,13 @@ def build_manifest(
     evaluation_unit_limit: int | None = None,
     created_at: str | None = None,
     controller_agents: list[str] | None = None,
+    window_mode: str = "mixed_informative",
+    predictor_kind: str = "baseline",
+    prediction_horizon: int = 3,
+    prediction_noise_std: float = 0.0,
+    prediction_confidence_scale: float = 1.0,
+    prediction_delay_steps: int = 0,
+    drop_handoff_prediction_prob: float = 0.0,
 ) -> dict[str, Any]:
     root = Path(root).resolve()
     if not seeds or len(set(seeds)) != len(seeds):
@@ -772,13 +779,13 @@ def build_manifest(
                 "max_tasks": int(max_tasks),
                 "max_mobility_rows": int(max_mobility_rows),
                 "primary_vehicle_selection": primary_vehicle_selection,
-                "window_mode": "mixed_informative",
-                "predictor_kind": "baseline",
-                "prediction_horizon": 3,
-                "prediction_noise_std": 0.0,
-                "prediction_confidence_scale": 1.0,
-                "prediction_delay_steps": 0,
-                "drop_handoff_prediction_prob": 0.0,
+                "window_mode": window_mode,
+                "predictor_kind": predictor_kind,
+                "prediction_horizon": int(prediction_horizon),
+                "prediction_noise_std": float(prediction_noise_std),
+                "prediction_confidence_scale": float(prediction_confidence_scale),
+                "prediction_delay_steps": int(prediction_delay_steps),
+                "drop_handoff_prediction_prob": float(drop_handoff_prediction_prob),
                 "evaluation_unit_limit": evaluation_unit_limit,
             },
             "download_policy": "forbidden; builder validates existing local files only",
@@ -829,7 +836,7 @@ def build_manifest(
             "capacity_contract_version": "cache_capacity_contract_v1",
             "cache_event_schema_version": "1.3.0",
             "cache_trace_context_version": "1.0.0",
-            "cache_efficiency_metrics_contract_version": "1.1.0",
+            "cache_efficiency_metrics_contract_version": "1.2.0",
             "oracle_companion_contract": {
                 "cache_request_replay_version": "1.0.0",
                 "oracle_contract_version": "future_horizon_cache_oracle_contract_v1.0.0",
@@ -857,7 +864,7 @@ def build_manifest(
         "baseline_matrix": [_load_baseline_entry(root, name) for name in BASELINE_NAMES],
         "metrics_aggregation": {
             "contract_version": (
-                "cache_efficiency_metrics_contract_v1.1.0"
+                "cache_efficiency_metrics_contract_v1.2.0"
                 if catalog.typed_mode_enabled
                 else "cache_efficiency_metrics_contract_v1.0.0"
             ),
@@ -1071,7 +1078,7 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
         errors.append("incompatible CacheEvent schema major version")
     if cache.get("cache_trace_context_version") != "1.0.0":
         errors.append("cache trace context version mismatch")
-    if cache.get("cache_efficiency_metrics_contract_version") not in {"1.0.0", "1.1.0"}:
+    if cache.get("cache_efficiency_metrics_contract_version") not in {"1.0.0", "1.1.0", "1.2.0"}:
         errors.append("cache efficiency metrics contract version mismatch")
     if cache.get("size_resolver") != "AdapterCatalog.resolve_adapter_resident_size_mb/v1" or not cache.get("catalog_fallback_rule"):
         errors.append("resident size/fallback contract mismatch")
@@ -1180,7 +1187,7 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
     checked.append("five_baselines_binding_and_10_pairwise_diffs")
     metrics = manifest.get("metrics_aggregation", {})
     expected_metrics_contract = (
-        "cache_efficiency_metrics_contract_v1.1.0"
+        "cache_efficiency_metrics_contract_v1.2.0"
         if typed_cache is not None
         else "cache_efficiency_metrics_contract_v1.0.0"
     )

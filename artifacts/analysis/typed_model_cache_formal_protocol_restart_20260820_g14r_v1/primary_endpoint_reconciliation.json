@@ -1,0 +1,15 @@
+{
+  "status": "pass_contract_and_unit_cases",
+  "raw_event_reference_reducer": "src/metrics/cache_efficiency_metrics.py",
+  "summary_field": "cache_efficiency_metrics",
+  "row_fields": [
+    "full_service_ready_byte_hit_rate",
+    "joint_base_adapter_hit_rate",
+    "full_service_ready_request_rate",
+    "transfer_mb_per_request",
+    "workflow_continuity_rate",
+    "end_to_end_workflow_delay"
+  ],
+  "aggregate_semantics": "nullable available finite values only",
+  "formal_episode_count": 0
+}

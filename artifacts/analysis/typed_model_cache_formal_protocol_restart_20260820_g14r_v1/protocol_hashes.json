@@ -1,0 +1,12 @@
+{
+  "protocol_hash_bundle_version": "1.1.0",
+  "old_protocol_semantic_sha256": "41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4",
+  "new_protocol_full_sha256": "df6a056e7fcbbc7330006b3b4cf60378831b4379bbb778896954f6d10ce099f3",
+  "new_protocol_semantic_sha256": "b8bbb53d6af47d111b840efbb53d3389485535d66c8de19b747e2a5727786629",
+  "split_semantic_sha256": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+  "runtime_contract_hashes": {
+    "constrained": "82ef8858c101aed0f702fa118a11c03db9f5689c3c2776214ef95c70265a689f",
+    "medium": "8e3de284b1e839fc05076826308b506c81c419607d5b673d22ba09871d63de85",
+    "relaxed": "e314785d4fe14a106322687ee7a4e0e1e1d6739e8fd74f11a08a2ff1c71be3e0"
+  }
+}

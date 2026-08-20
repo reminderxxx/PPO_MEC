@@ -1,7 +1,7 @@
 # Typed Model Cache Runtime Contract
 
 版本：`typed_model_cache_runtime_contract_v1.0.0`
-状态：G14A 已实现；正式 split/protocol、正式 checkpoint 与正式实验仍由 G14B 负责。
+状态：G14R 已补齐 v1.1 formal execution binding；正式 checkpoint 与正式实验仍未运行。
 
 ## 目的与唯一解析入口
 
@@ -21,7 +21,7 @@
 - `initial_per_rsu_typed_state/typed_initial_state_fingerprint`；
 - `pinned_evictability_metadata/fingerprint`；
 - `typed_cache_transaction_contract_version` 与 action-before-lookup、atomic rollback、dependency-safe eviction；
-- `cache_event_schema_version=1.3.0`、`cache_efficiency_metrics_contract_version=1.1.0`、`cache_trace_context_version=1.0.0`；
+- `cache_event_schema_version=1.3.0`、`cache_efficiency_metrics_contract_version=1.2.0`、`cache_trace_context_version=1.0.0`；
 - `request_replay_typed_contract_version` 与 `runtime_contract_sha256`。
 
 Catalog fingerprint 在每次配置加载与 environment 消费前重算。Initial state 从 catalog 的 per-RSU typed profiles 排序解析，计算 resident MB 并验证无需 trim；dependency、compatibility 与 pinned/evictability 也分别重算。任何 config/fairness/checkpoint/benchmark 不一致都不能通过 gate。
@@ -29,6 +29,16 @@ Catalog fingerprint 在每次配置加载与 environment 消费前重算。Initi
 Repository controlled catalog 现显式包含 Alibaba `legacy_batch_type` workflow 产生的 `adapter_batch_type_1`，映射到 `base:veh_base_v1`，resident/transfer 均为 64 MB，来源仍是 `repository_native_controlled`。这只是受控 mapping，不是真实联合 model-cache trace。
 
 ## Training 与 checkpoint
+
+G14R 新增 `formal_training_contract 1.0.0`。未提供 formal protocol 时，遗漏
+`checkpoint_every_updates` 保持 legacy 每 update 保存；提供 v1.1 protocol 时，episodes、update
+interval、batch、max steps、expected update count、checkpoint cadence 与 agent config 全部从 manifest
+解析，任何 CLI 差异立即拒绝。`latest.pt` 每次 update 保存但永不进入 selection；正式 candidate
+只在 cadence 整除 update 保存。Resume checkpoint 必须带相同 schedule。
+
+Agent config companion 逐 agent 传入共享 registry 并通过 `_checkpoint_config()` 审计。SA-GHMAPPO 的
+`auxiliary_coef=0.06` 写入 resolved config、summary 与 checkpoint metadata；其他 agent 不接收该
+专用字段。该层没有修改 SA loss 公式，也没有改动 SA 专用训练入口。
 
 共享入口：
 
@@ -47,7 +57,7 @@ Checkpoint 的 `training_metadata.typed_runtime_provenance` 写入 execution Git
 
 ## Fairness 与 benchmark
 
-Typed fairness manifest 使用 consumer-safe `1.1.0`，旧 legacy manifest 继续是 `1.0.0`。`cache_contract.typed_model_cache` 冻结 catalog、taxonomy、dependency/compatibility/initial/pinned fingerprints、MB capacity、transaction、CacheEvent 1.3、metrics 1.1、trace context、typed replay 与 oracle compatibility。五个 reactive baseline 的 `baseline_matrix` 仍严格只有五项且 10 组 pairwise diff 只允许 policy identity 字段；可选 `controller_agents` 只扩展实际 benchmark agent matrix，不改变 reactive only-policy-difference 审计。
+Typed fairness manifest 使用 consumer-safe `1.1.0`，旧 legacy manifest 继续是 `1.0.0`。`cache_contract.typed_model_cache` 冻结 catalog、taxonomy、dependency/compatibility/initial/pinned fingerprints、MB capacity、transaction、CacheEvent 1.3、metrics 1.2、trace context、typed replay 与 oracle compatibility。五个 reactive baseline 的 `baseline_matrix` 仍严格只有五项且 10 组 pairwise diff 只允许 policy identity 字段；可选 `controller_agents` 只扩展实际 benchmark agent matrix，不改变 reactive only-policy-difference 审计。
 
 `scripts/benchmark_main_results.py` 支持：
 

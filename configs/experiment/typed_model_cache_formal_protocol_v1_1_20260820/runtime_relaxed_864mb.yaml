@@ -1,0 +1,47 @@
+profile_id: typed_model_cache_formal_v1_1_relaxed_864mb
+claim_boundary: G14R frozen pre-execution typed formal runtime; no performance outcome
+model_cache_profile: typed_base_adapter_state_v1
+typed_model_cache_contract_version: 1.0.0
+typed_cache_transaction_contract_version: typed_cache_transaction_contract_v1.0.0
+catalog_path: src/data/model_catalog/typed_model_cache_controlled.json
+typed_catalog_path: src/data/model_catalog/typed_model_cache_controlled.json
+typed_catalog_fingerprint: 89c548980b63df733553d748e8db3ca622965b63abcd08ebd4c231790b40a9d6
+typed_initial_state_fingerprint: fb0cdbfa761477f4c39bc3416181b475c8884a1c1433edc56d7f2541fc6cac46
+typed_dependency_fingerprint: 0f8fcd018635426d67eb78af567456d3f7b31a6bac48ac876baee751d09ddcb9
+typed_pinned_evictability_fingerprint: 220f27d6a38d28852e43f1e65e0af8b5aa8399ad6bd785a89246a3de7cd270c7
+cache_event_schema_version: 1.3.0
+cache_efficiency_metrics_contract_version: 1.2.0
+cache_capacity_profile:
+  model_cache_profile_id: typed_base_adapter_state_v1
+  enabled: true
+  unit: mb
+  capacity_mb: 864.0
+  count_base_model_separately: true
+  eviction_policy: lru
+  eviction_policy_seed: 7
+  telemetry_enabled: true
+transaction_contract:
+  max_logical_cache_actions_per_step: 1
+  max_dependency_bundle_objects: 2
+  admission_order:
+  - base_model
+  - adapter
+  transfer_order:
+  - base_model
+  - adapter
+  - workflow_state
+  partial_admission: false
+  atomic_rollback: true
+  dependency_safe_base_eviction: prohibit_while_resident_adapter_depends
+kv_prefix:
+  enabled: false
+  capacity_denominator: excluded
+  cache_event_denominator: excluded
+baseline_matrix:
+  agents:
+  - reactive_lru
+  - reactive_fifo
+  - reactive_lfu
+  - reactive_aging_lfu
+  - reactive_random
+  only_primary_difference: eviction_policy

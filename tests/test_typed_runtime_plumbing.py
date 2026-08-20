@@ -412,7 +412,7 @@ def test_24_metrics_11_recompute_matches_benchmark_scalars(tiny_training: dict) 
     episode = tiny_training["episode"]
     reduced = reduce_cache_efficiency_summary(episode)
     scalars = cache_efficiency_row_fields(episode)
-    assert reduced.cache_efficiency_metrics_version == "1.1.0"
+    assert reduced.cache_efficiency_metrics_version == "1.2.0"
     assert scalars["cache_joint_model_hit_rate"] == reduced.type_aware_metrics[
         "joint_base_adapter_hit_rate"
     ]

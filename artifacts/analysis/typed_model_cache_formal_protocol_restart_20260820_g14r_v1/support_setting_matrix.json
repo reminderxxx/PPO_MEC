@@ -1,0 +1,653 @@
+{
+  "support_setting_matrix_version": "1.0.0",
+  "settings": [
+    {
+      "family": "capacity",
+      "parameter": "capacity_mb",
+      "values": [
+        288.0,
+        576.0,
+        864.0
+      ],
+      "unit": "decimal MB",
+      "baseline": 576.0,
+      "range": [
+        288.0,
+        864.0
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "primary",
+      "status": "available",
+      "unavailable_reason": null,
+      "runtime_binding": "runtime config + fairness manifest",
+      "expected_artifact": "capacity/capacity_mb/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "same frozen formal evaluation unit budget",
+      "setting_id": "capacity-9f58c2ac2785c2b3",
+      "levels": [
+        {
+          "setting_id": "capacity-cbd9b8a225730814",
+          "value": 288.0,
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "capacity_mb",
+            "value": 288.0,
+            "unit": "decimal MB"
+          }
+        },
+        {
+          "setting_id": "capacity-00977fcec03ac209",
+          "value": 576.0,
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "capacity_mb",
+            "value": 576.0,
+            "unit": "decimal MB"
+          }
+        },
+        {
+          "setting_id": "capacity-c2f32db65e656f8f",
+          "value": 864.0,
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "capacity_mb",
+            "value": 864.0,
+            "unit": "decimal MB"
+          }
+        }
+      ]
+    },
+    {
+      "family": "sensitivity",
+      "parameter": "object_size_scale",
+      "values": [
+        0.75,
+        1.0,
+        1.25
+      ],
+      "unit": "multiplier",
+      "baseline": 1.0,
+      "range": [
+        0.75,
+        1.25
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "exploratory",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "runtime catalog scaling would change catalog/dependency/initial fingerprints; no frozen safe transformer",
+      "runtime_binding": "none",
+      "expected_artifact": "sensitivity/object_size_scale/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "same frozen formal evaluation unit budget",
+      "setting_id": "sensitivity-47dc3fd1b964fdc3",
+      "levels": [
+        {
+          "setting_id": "sensitivity-821d6e0cebf10065",
+          "value": 0.75,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "runtime catalog scaling would change catalog/dependency/initial fingerprints; no frozen safe transformer",
+          "parameters": {
+            "parameter": "object_size_scale",
+            "value": 0.75,
+            "unit": "multiplier"
+          }
+        },
+        {
+          "setting_id": "sensitivity-eea2d144b68b8e3e",
+          "value": 1.0,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "runtime catalog scaling would change catalog/dependency/initial fingerprints; no frozen safe transformer",
+          "parameters": {
+            "parameter": "object_size_scale",
+            "value": 1.0,
+            "unit": "multiplier"
+          }
+        },
+        {
+          "setting_id": "sensitivity-f6b933406c35fad1",
+          "value": 1.25,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "runtime catalog scaling would change catalog/dependency/initial fingerprints; no frozen safe transformer",
+          "parameters": {
+            "parameter": "object_size_scale",
+            "value": 1.25,
+            "unit": "multiplier"
+          }
+        }
+      ]
+    },
+    {
+      "family": "sensitivity",
+      "parameter": "transfer_cost_scale",
+      "values": [
+        0.5,
+        1.0,
+        1.5
+      ],
+      "unit": "multiplier",
+      "baseline": 1.0,
+      "range": [
+        0.5,
+        1.5
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "exploratory",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "environment exposes transfer bytes but no independent typed transfer-cost coefficient",
+      "runtime_binding": "none",
+      "expected_artifact": "sensitivity/transfer_cost_scale/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "same frozen formal evaluation unit budget",
+      "setting_id": "sensitivity-a423e0f542d5ab53",
+      "levels": [
+        {
+          "setting_id": "sensitivity-d1159f5aede308b3",
+          "value": 0.5,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "environment exposes transfer bytes but no independent typed transfer-cost coefficient",
+          "parameters": {
+            "parameter": "transfer_cost_scale",
+            "value": 0.5,
+            "unit": "multiplier"
+          }
+        },
+        {
+          "setting_id": "sensitivity-192e09a3edc26f67",
+          "value": 1.0,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "environment exposes transfer bytes but no independent typed transfer-cost coefficient",
+          "parameters": {
+            "parameter": "transfer_cost_scale",
+            "value": 1.0,
+            "unit": "multiplier"
+          }
+        },
+        {
+          "setting_id": "sensitivity-88de5df48f7ed6e2",
+          "value": 1.5,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "environment exposes transfer bytes but no independent typed transfer-cost coefficient",
+          "parameters": {
+            "parameter": "transfer_cost_scale",
+            "value": 1.5,
+            "unit": "multiplier"
+          }
+        }
+      ]
+    },
+    {
+      "family": "sensitivity",
+      "parameter": "handoff_pressure",
+      "values": [
+        "stable_first",
+        "handoff_pressure"
+      ],
+      "unit": "vehicle selection rule",
+      "baseline": "handoff_pressure",
+      "range": [
+        "stable_first",
+        "handoff_pressure"
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "exploratory",
+      "status": "available",
+      "unavailable_reason": null,
+      "runtime_binding": "--primary_vehicle_selection mapped before outcomes",
+      "expected_artifact": "sensitivity/handoff_pressure/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "same frozen formal evaluation unit budget",
+      "setting_id": "sensitivity-420ca77588f93463",
+      "levels": [
+        {
+          "setting_id": "sensitivity-27d16b068076937b",
+          "value": "stable_first",
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "handoff_pressure",
+            "value": "stable_first",
+            "unit": "vehicle selection rule"
+          }
+        },
+        {
+          "setting_id": "sensitivity-7c7c3a1659c6e221",
+          "value": "handoff_pressure",
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "handoff_pressure",
+            "value": "handoff_pressure",
+            "unit": "vehicle selection rule"
+          }
+        }
+      ]
+    },
+    {
+      "family": "sensitivity",
+      "parameter": "reuse_opportunity",
+      "values": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "unit": "predefined request profile",
+      "baseline": "medium",
+      "range": [
+        "low",
+        "high"
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "exploratory",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "no outcome-blind request-profile parameter exists; oracle-gap grouping is forbidden",
+      "runtime_binding": "none",
+      "expected_artifact": "sensitivity/reuse_opportunity/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "same frozen formal evaluation unit budget",
+      "setting_id": "sensitivity-93aabe3a1214fc99",
+      "levels": [
+        {
+          "setting_id": "sensitivity-a3217b26707d3c68",
+          "value": "low",
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "no outcome-blind request-profile parameter exists; oracle-gap grouping is forbidden",
+          "parameters": {
+            "parameter": "reuse_opportunity",
+            "value": "low",
+            "unit": "predefined request profile"
+          }
+        },
+        {
+          "setting_id": "sensitivity-cd44f4a1995c06e4",
+          "value": "medium",
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "no outcome-blind request-profile parameter exists; oracle-gap grouping is forbidden",
+          "parameters": {
+            "parameter": "reuse_opportunity",
+            "value": "medium",
+            "unit": "predefined request profile"
+          }
+        },
+        {
+          "setting_id": "sensitivity-cf6a5a308ff2b872",
+          "value": "high",
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "no outcome-blind request-profile parameter exists; oracle-gap grouping is forbidden",
+          "parameters": {
+            "parameter": "reuse_opportunity",
+            "value": "high",
+            "unit": "predefined request profile"
+          }
+        }
+      ]
+    },
+    {
+      "family": "sensitivity",
+      "parameter": "base_sharing_degree",
+      "values": [
+        1,
+        3,
+        6
+      ],
+      "unit": "adapters per base",
+      "baseline": 3,
+      "range": [
+        1,
+        6
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "exploratory",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "no dependency-preserving typed catalog transformer with fixed object accounting exists",
+      "runtime_binding": "none",
+      "expected_artifact": "sensitivity/base_sharing_degree/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "same frozen formal evaluation unit budget",
+      "setting_id": "sensitivity-79ef7dc4a57040f5",
+      "levels": [
+        {
+          "setting_id": "sensitivity-2b9310521d13dff2",
+          "value": 1,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "no dependency-preserving typed catalog transformer with fixed object accounting exists",
+          "parameters": {
+            "parameter": "base_sharing_degree",
+            "value": 1,
+            "unit": "adapters per base"
+          }
+        },
+        {
+          "setting_id": "sensitivity-6b6ef17a7ae32b3e",
+          "value": 3,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "no dependency-preserving typed catalog transformer with fixed object accounting exists",
+          "parameters": {
+            "parameter": "base_sharing_degree",
+            "value": 3,
+            "unit": "adapters per base"
+          }
+        },
+        {
+          "setting_id": "sensitivity-38f44ba00c4c9b48",
+          "value": 6,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "no dependency-preserving typed catalog transformer with fixed object accounting exists",
+          "parameters": {
+            "parameter": "base_sharing_degree",
+            "value": 6,
+            "unit": "adapters per base"
+          }
+        }
+      ]
+    },
+    {
+      "family": "ablation",
+      "parameter": "typed_semantics",
+      "values": [
+        "typed_full",
+        "legacy_adapter_only",
+        "no_base_sharing",
+        "no_workflow_state_migration",
+        "fixed_no_eviction",
+        "no_prediction"
+      ],
+      "unit": "variant identity",
+      "baseline": "typed_full",
+      "range": [
+        "typed_full",
+        "no_prediction"
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "exploratory",
+      "status": "partially_available",
+      "unavailable_reason": null,
+      "runtime_binding": "typed_full and no_prediction executable; other variants unavailable per setting",
+      "expected_artifact": "ablation/typed_semantics/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "same frozen formal evaluation unit budget",
+      "setting_id": "ablation-2c84d59ea3fade1a",
+      "levels": [
+        {
+          "setting_id": "ablation-f09814754dc92882",
+          "value": "typed_full",
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "typed_semantics",
+            "value": "typed_full",
+            "unit": "variant identity"
+          }
+        },
+        {
+          "setting_id": "ablation-981f7431f6747f64",
+          "value": "legacy_adapter_only",
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "variant lacks a typed fingerprint-preserving runtime transformer under the frozen contract",
+          "parameters": {
+            "parameter": "typed_semantics",
+            "value": "legacy_adapter_only",
+            "unit": "variant identity"
+          }
+        },
+        {
+          "setting_id": "ablation-21f2a09428fad811",
+          "value": "no_base_sharing",
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "variant lacks a typed fingerprint-preserving runtime transformer under the frozen contract",
+          "parameters": {
+            "parameter": "typed_semantics",
+            "value": "no_base_sharing",
+            "unit": "variant identity"
+          }
+        },
+        {
+          "setting_id": "ablation-b34ed4fa87ca13bd",
+          "value": "no_workflow_state_migration",
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "variant lacks a typed fingerprint-preserving runtime transformer under the frozen contract",
+          "parameters": {
+            "parameter": "typed_semantics",
+            "value": "no_workflow_state_migration",
+            "unit": "variant identity"
+          }
+        },
+        {
+          "setting_id": "ablation-99f8c7f3960d5ff4",
+          "value": "fixed_no_eviction",
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "variant lacks a typed fingerprint-preserving runtime transformer under the frozen contract",
+          "parameters": {
+            "parameter": "typed_semantics",
+            "value": "fixed_no_eviction",
+            "unit": "variant identity"
+          }
+        },
+        {
+          "setting_id": "ablation-8aa367acf3bdf7a9",
+          "value": "no_prediction",
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "typed_semantics",
+            "value": "no_prediction",
+            "unit": "variant identity"
+          }
+        }
+      ]
+    },
+    {
+      "family": "prediction_boundary",
+      "parameter": "prediction_condition",
+      "values": [
+        "baseline",
+        "no_prediction",
+        "noise_0.2",
+        "confidence_0.7",
+        "delay_2",
+        "drop_0.3"
+      ],
+      "unit": "fixed condition",
+      "baseline": "baseline",
+      "range": [
+        "baseline",
+        "drop_0.3"
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "exploratory",
+      "status": "available",
+      "unavailable_reason": null,
+      "runtime_binding": "benchmark predictor flags; G12 supervised remains disabled",
+      "expected_artifact": "prediction_boundary/prediction_condition/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "same frozen formal evaluation unit budget",
+      "setting_id": "prediction_boundary-68a57df94217de0b",
+      "levels": [
+        {
+          "setting_id": "prediction_boundary-5faa585ad5330f05",
+          "value": "baseline",
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "prediction_condition",
+            "value": "baseline",
+            "unit": "fixed condition"
+          }
+        },
+        {
+          "setting_id": "prediction_boundary-95fb72521455c776",
+          "value": "no_prediction",
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "prediction_condition",
+            "value": "no_prediction",
+            "unit": "fixed condition"
+          }
+        },
+        {
+          "setting_id": "prediction_boundary-efa09ee2409d3d87",
+          "value": "noise_0.2",
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "prediction_condition",
+            "value": "noise_0.2",
+            "unit": "fixed condition"
+          }
+        },
+        {
+          "setting_id": "prediction_boundary-a3a5789695404fae",
+          "value": "confidence_0.7",
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "prediction_condition",
+            "value": "confidence_0.7",
+            "unit": "fixed condition"
+          }
+        },
+        {
+          "setting_id": "prediction_boundary-ce96dbd5ea956212",
+          "value": "delay_2",
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "prediction_condition",
+            "value": "delay_2",
+            "unit": "fixed condition"
+          }
+        },
+        {
+          "setting_id": "prediction_boundary-df3bc5ade8c57014",
+          "value": "drop_0.3",
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "prediction_condition",
+            "value": "drop_0.3",
+            "unit": "fixed condition"
+          }
+        }
+      ]
+    },
+    {
+      "family": "oracle_state_limit",
+      "parameter": "state_limit",
+      "values": [
+        1000,
+        10000,
+        100000
+      ],
+      "unit": "visited states",
+      "baseline": 10000,
+      "range": [
+        1000,
+        100000
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "exploratory",
+      "status": "available",
+      "unavailable_reason": null,
+      "runtime_binding": "run_future_horizon_cache_oracle.py --state_limit",
+      "expected_artifact": "oracle_state_limit/state_limit/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "one exact solve per horizon/evaluation unit; unknown_state_limit retained",
+      "setting_id": "oracle_state_limit-0555d359d1a79a59",
+      "levels": [
+        {
+          "setting_id": "oracle_state_limit-885a507ee5df1432",
+          "value": 1000,
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "state_limit",
+            "value": 1000,
+            "unit": "visited states"
+          }
+        },
+        {
+          "setting_id": "oracle_state_limit-60470cc0a0b649e8",
+          "value": 10000,
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "state_limit",
+            "value": 10000,
+            "unit": "visited states"
+          }
+        },
+        {
+          "setting_id": "oracle_state_limit-16c8d8656140c737",
+          "value": 100000,
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "state_limit",
+            "value": 100000,
+            "unit": "visited states"
+          }
+        }
+      ]
+    }
+  ],
+  "g12_supervised_predictor_enabled": false,
+  "kv_enabled": false,
+  "hf_metadata_profile_enabled": false
+}

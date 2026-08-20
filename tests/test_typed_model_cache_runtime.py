@@ -13,9 +13,9 @@ ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "configs" / "benchmark" / "typed_model_cache_controlled_lru.yaml"
 CATALOG_FINGERPRINT = "89c548980b63df733553d748e8db3ca622965b63abcd08ebd4c231790b40a9d6"
 EXPECTED_RUNTIME_HASHES = {
-    "constrained": "84d88d58c71f0775858e2e38ea544bec4fa657d08ed918567d2c2dff48f418a0",
-    "medium": "e811a16576a21b499848d9325d02d7bd94c04e754854b22f5c453c80b66104d8",
-    "relaxed": "2ef6f7f98ad4007fc16bd5cf6d30a6ee026ae8340ce321b3aebe6272a50420ba",
+    "constrained": "82ef8858c101aed0f702fa118a11c03db9f5689c3c2776214ef95c70265a689f",
+    "medium": "8e3de284b1e839fc05076826308b506c81c419607d5b673d22ba09871d63de85",
+    "relaxed": "e314785d4fe14a106322687ee7a4e0e1e1d6739e8fd74f11a08a2ff1c71be3e0",
 }
 
 
@@ -39,7 +39,7 @@ def test_frozen_formal_capacity_runtime_hashes(stratum: str, capacity_mb: float)
     assert runtime["cache_capacity_profile"]["capacity_mb"] == capacity_mb
     assert runtime["typed_catalog_fingerprint"] == CATALOG_FINGERPRINT
     assert runtime["cache_event_schema_version"] == "1.3.0"
-    assert runtime["cache_efficiency_metrics_contract_version"] == "1.1.0"
+    assert runtime["cache_efficiency_metrics_contract_version"] == "1.2.0"
     assert runtime["runtime_contract_sha256"] == EXPECTED_RUNTIME_HASHES[stratum]
 
 

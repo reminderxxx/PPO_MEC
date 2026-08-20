@@ -1,6 +1,18 @@
 # PPO_MEC
 
-G14B 已冻结 `historical_window_usage_registry_version=1.0.0`、
+G14R 已完成 formal execution contract repair，并在未运行正式训练或正式评估的前提下重新冻结
+`typed_model_cache_formal_protocol_version=1.1.0`。G14C v1 协议 `1.0.0` 与 run
+`typed_model_cache_formal_20260820_g14c_351fdb8_v1` 永久标记为
+`INVALID_PROTOCOL_OR_IMPLEMENTATION`：Phase-0 即停止，正式 checkpoint/episode/performance 均为 0。
+新协议实现 checkpoint cadence=4、SA `auxiliary_coef=0.06` 真实传递、metrics 1.2 primary
+endpoint producer、固定 support/scalability setting、typed support runner、完整命令矩阵与 append-only
+phase runner。非正式 rehearsal（4 agents、2 seeds、2 capacities）通过，Readiness v3 为
+`READY_FOR_G14C_V2_CLEAN_TRAIN_AND_FORMAL`；这只授权后续独立计划窗口从 Commit A2 clean worktree
+启动 G14C v2，不表示 formal 完成或 paper-ready。Holdout 仍为
+`sealed=true/opened=false/consumed_permanently=false`。详见
+`docs/project/typed_model_cache_formal_protocol_restart.md`。
+
+G14B 历史上冻结了 `historical_window_usage_registry_version=1.0.0`、
 `typed_model_cache_split_protocol_version=1.0.0` 与
 `typed_model_cache_formal_protocol_version=1.0.0`。Metadata-only 历史账本汇总 34,661 个窗口引用并
 折叠为 668 个 outer intervals；无法恢复的 418 个 interval 对 lankershim/peachtree/us_101 形成保守

@@ -1,0 +1,56 @@
+{
+  "status": "pass",
+  "sa_ghmappo": {
+    "requested_auxiliary_coef": 0.06,
+    "resolved_auxiliary_coef": 0.06,
+    "checkpoint_metadata_path": "training_metadata.resolved_agent_config.auxiliary_coef"
+  },
+  "other_agents_receive_auxiliary_coef": false,
+  "agent_configs": {
+    "sa_ghmappo": {
+      "learning_rate": 0.0001,
+      "entropy_coef": 0.004,
+      "value_coef": 0.7,
+      "auxiliary_coef": 0.06
+    },
+    "ppo": {
+      "learning_rate": 0.0003,
+      "entropy_coef": 0.01,
+      "value_coef": 0.5
+    },
+    "mappo": {
+      "learning_rate": 0.0002,
+      "entropy_coef": 0.015,
+      "value_coef": 0.65
+    },
+    "dqn": {
+      "learning_rate": 0.0003
+    },
+    "dueling_dqn": {
+      "learning_rate": 0.0003
+    },
+    "qmix": {
+      "learning_rate": 0.0003
+    },
+    "controller_mat": {
+      "learning_rate": 0.0003,
+      "entropy_coef": 0.01,
+      "value_coef": 0.5
+    },
+    "dag_offload_drl": {
+      "learning_rate": 0.0003,
+      "entropy_coef": 0.01,
+      "value_coef": 0.5
+    },
+    "cache_offload_drl": {
+      "learning_rate": 0.0003,
+      "entropy_coef": 0.01,
+      "value_coef": 0.5
+    },
+    "dt_handoff_drl": {
+      "learning_rate": 0.0003,
+      "entropy_coef": 0.01,
+      "value_coef": 0.5
+    }
+  }
+}

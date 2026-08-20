@@ -1,0 +1,25 @@
+{
+  "status": "pass_contract_validation",
+  "runner_version": "1.0.0",
+  "phase_order": [
+    "preflight",
+    "tests",
+    "train",
+    "dev_select",
+    "checkpoint_freeze",
+    "formal_cache_policy",
+    "formal_controller",
+    "formal_ablation",
+    "formal_support",
+    "formal_scalability",
+    "formal_statistics",
+    "formal_gate",
+    "complete_without_holdout"
+  ],
+  "append_only": true,
+  "hash_bound_skip": true,
+  "failed_terminal": true,
+  "infrastructure_retry_max": 1,
+  "holdout_capability": false,
+  "dry_run_writes_results": false
+}

@@ -1,0 +1,17 @@
+{
+  "status": "pass",
+  "from_version": "1.0.0",
+  "to_version": "1.1.0",
+  "scientific_question_changed": false,
+  "primary_comparisons_changed": false,
+  "split_changed": false,
+  "endpoint_semantics_revision": "metrics 1.2 primary producer definitions",
+  "execution_repairs": [
+    "checkpoint cadence",
+    "SA config binding",
+    "primary endpoint producers",
+    "support values and runner",
+    "command templates",
+    "append-only phase orchestration"
+  ]
+}

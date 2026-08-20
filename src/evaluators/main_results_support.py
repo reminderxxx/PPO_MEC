@@ -24,7 +24,10 @@ from src.envs.specs import RSUState, VehicleState, WorkflowGraphState, WorkflowN
 from src.envs.wrappers.gym_vec_env import GymVecEnv
 from src.evaluators.real_eval_support import build_inference_agent, ensure_agent_checkpoint_path
 from src.evaluators.real_sample_support import RealMobilityBundle, load_real_mobility_bundle, load_real_source_frames, scan_mobility_windows
-from src.metrics.cache_efficiency_metrics import cache_efficiency_row_fields
+from src.metrics.cache_efficiency_metrics import (
+    cache_efficiency_row_fields,
+    reduce_cache_efficiency_summary,
+)
 from src.metrics.recorder import EpisodeRecorder
 from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
 
@@ -114,6 +117,18 @@ MAIN_RESULT_METRICS.extend([
     "cache_joint_model_hit_rate",
     "cache_full_service_ready_rate",
     "cache_base_transfer_mb",
+    "full_service_ready_byte_hit_rate",
+    "joint_base_adapter_hit_rate",
+    "full_service_ready_request_rate",
+    "transfer_mb_per_request",
+    "requested_dependency_byte_coverage_rate",
+    "requested_service_dependency_mb",
+    "full_service_ready_dependency_mb",
+    "base_model_transfer_mb",
+    "adapter_transfer_mb",
+    "workflow_state_migration_transfer_mb",
+    "other_typed_transfer_mb",
+    "primary_transfer_mb",
 ])
 ACTIONMIX_DIAGNOSTIC_METRICS = [
     "service_success_count",
@@ -1549,6 +1564,7 @@ def run_real_episode(
     summary["run_info"]["checkpoint_metadata"] = checkpoint_metadata
     if model_cache_runtime_contract is not None:
         summary["resolved_model_cache_runtime"] = dict(model_cache_runtime_contract)
+    summary["cache_efficiency_metrics"] = reduce_cache_efficiency_summary(summary).to_dict()
     return summary
 
 

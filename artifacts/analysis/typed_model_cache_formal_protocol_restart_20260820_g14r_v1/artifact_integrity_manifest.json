@@ -1,0 +1,137 @@
+{
+  "artifact_integrity_manifest_version": "1.0.0",
+  "artifact_run_id": "typed_model_cache_formal_protocol_restart_20260820_g14r_v1",
+  "integrity_status": "pass",
+  "file_count": 21,
+  "files": [
+    {
+      "path": "agent_config_resolution.json",
+      "sha256": "2bd474dc97e3b734792c1825f29767591e3bc4eeecbddc2a8dfb6922d002233b",
+      "size_bytes": 1253
+    },
+    {
+      "path": "checkpoint_frequency_validation.json",
+      "sha256": "04ba94c9f2e9656c03e4b4aa3045de35d83b0f000e296460c00469a8ac719197",
+      "size_bytes": 273
+    },
+    {
+      "path": "command_expansion_validation.json",
+      "sha256": "3ac27591afc1e2c2a4c4ab5017256df87219ba13b98966265dd637c1fdd38702",
+      "size_bytes": 454040
+    },
+    {
+      "path": "command_log.json",
+      "sha256": "d024b6076d53847eb4b11c5c6c904cd3775707bc65738350b4ff08c436b29c24",
+      "size_bytes": 1691
+    },
+    {
+      "path": "formal_command_templates.json",
+      "sha256": "a48b918cd5615bc495f6ab9aaaeca650d3a294811fd65fe64e2ddaf6c491693d",
+      "size_bytes": 156823
+    },
+    {
+      "path": "g14c_v1_failure_reference.json",
+      "sha256": "a822fb0d6d32f1f916b9cfeedf372636a0a29ee98fd11ae9c48b95d7eb126c44",
+      "size_bytes": 623
+    },
+    {
+      "path": "holdout_seal_revalidation.json",
+      "sha256": "6736784e153d0c173ad96048fec372a644b4993d63b415742637fdb50e18de5e",
+      "size_bytes": 153
+    },
+    {
+      "path": "phase_runner_validation.json",
+      "sha256": "f8fb410376fb85e5600941180ddfbb604d234324033880164da6a6bb93a0cd46",
+      "size_bytes": 556
+    },
+    {
+      "path": "primary_endpoint_reconciliation.json",
+      "sha256": "b6f93a20e824ec3bfb0b23638250fc68ad5ec7604788282a87d9269d3189a66e",
+      "size_bytes": 497
+    },
+    {
+      "path": "primary_endpoint_schema.json",
+      "sha256": "f85bfc4cdc7c1bac737a068a0cc269a9202a9ea9edba570121e62300c780c738",
+      "size_bytes": 1758
+    },
+    {
+      "path": "protected_user_file_hashes.json",
+      "sha256": "34d5e96171f3f45686f81c484ab9daeccefecd699522d289dcf1d995631aaa42",
+      "size_bytes": 802
+    },
+    {
+      "path": "protocol_hashes.json",
+      "sha256": "f9a43cbb94b55f7e541534da298399fb950b26f407cf69b284d24eb41a796ae0",
+      "size_bytes": 730
+    },
+    {
+      "path": "protocol_restart_diff.json",
+      "sha256": "c78eb128c26b76f779e331916d7873a7dcb5bf7e28b02c79b655017f47f96090",
+      "size_bytes": 469
+    },
+    {
+      "path": "protocol_to_runtime_executability_matrix.json",
+      "sha256": "f0d8143d9bc370bd9f844f22dbb161dbcb21addfe0023cf378252026d8e43045",
+      "size_bytes": 11847
+    },
+    {
+      "path": "protocol_v1_1_manifest.json",
+      "sha256": "ff41513643f40271cfe9b57a1102afdc6207b6a73230e77206b8fb52ae353fd7",
+      "size_bytes": 230578
+    },
+    {
+      "path": "readiness_review_v3.json",
+      "sha256": "0470f3ebfd243c0fd2392ff709801c8c659beac8aa72f990ab78634552a10804",
+      "size_bytes": 1233
+    },
+    {
+      "path": "rehearsal_summary.json",
+      "sha256": "fb508e452f3cc375f472856ee41b698ffdc3ed8d68188180c97e88e3c2340b68",
+      "size_bytes": 1671
+    },
+    {
+      "path": "scalability_setting_matrix.json",
+      "sha256": "332eff2e17ebcc16391de0d8381dd75165431da059099582db1ed028d7887e0e",
+      "size_bytes": 10354
+    },
+    {
+      "path": "split_revalidation.json",
+      "sha256": "ac7f9cf50c426221493db76012e3619032e583aaf34b65881c0b1fb5de19eea4",
+      "size_bytes": 448
+    },
+    {
+      "path": "support_setting_matrix.json",
+      "sha256": "33b2aa5a041efc97f9040f91735bc9a5c1591b2e37f46486cf169b7ddc0e9033",
+      "size_bytes": 20388
+    },
+    {
+      "path": "typed_support_runner_validation.json",
+      "sha256": "547cd939e07f49f0cbac66fe3b49c09344d8bcd3d21739dbde712f5d30f938f4",
+      "size_bytes": 435
+    }
+  ],
+  "excluded_runtime_output_roots": [
+    "rehearsal_runs/ (contains ignored non-formal checkpoints and raw episodes; root rehearsal_summary.json is integrity-tracked)"
+  ],
+  "formal_checkpoint_count": 0,
+  "formal_episode_count": 0,
+  "formal_performance_result_count": 0,
+  "hashes": {
+    "full_sha256": "6934bc6c5dd2aca79a61641e299db72eed67b1758e5db1afebab575f140b5669",
+    "semantic_sha256": "6934bc6c5dd2aca79a61641e299db72eed67b1758e5db1afebab575f140b5669",
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "primary_endpoint_schema_version": "1.0.0",
+  "cache_efficiency_metrics_contract_version": "1.2.0",
+  "event_eligibility": "CacheEvent event_type=request and model_cache_profile_id=typed_base_adapter_state_v1",
+  "full_service_ready_byte_hit_rate": {
+    "formula": "sum(unique requested dependency resident bytes within each eligible request where full_service_ready=true) / sum(unique requested dependency resident bytes within every eligible request)",
+    "dependency_types": [
+      "base_model",
+      "adapter"
+    ],
+    "shared_base_semantics": "one base object is counted once within one request; a distinct request counts its required base once again; lookup rows and resident inventory never add bytes",
+    "partial_readiness": "zero numerator bytes for the whole request",
+    "missing_size": "primary value null with partial availability and explicit coverage",
+    "zero_denominator": "null",
+    "unit": "ratio",
+    "legacy_trace": "unavailable"
+  },
+  "transfer_mb_per_request": {
+    "formula": "(base_model_transfer_mb + adapter_transfer_mb + workflow_state_migration_transfer_mb) / typed_request_event_count",
+    "components": [
+      "base_model_transfer_mb",
+      "adapter_transfer_mb",
+      "workflow_state_migration_transfer_mb"
+    ],
+    "other_typed_transfer": "reported separately and excluded from primary",
+    "zero_denominator": "null",
+    "unit": "decimal MB/request",
+    "legacy_trace": "unavailable"
+  },
+  "row_fields": [
+    "full_service_ready_byte_hit_rate",
+    "joint_base_adapter_hit_rate",
+    "full_service_ready_request_rate",
+    "transfer_mb_per_request",
+    "workflow_continuity_rate",
+    "end_to_end_workflow_delay"
+  ],
+  "nullable_aggregate": true,
+  "raw_event_recomputation_required": true
+}

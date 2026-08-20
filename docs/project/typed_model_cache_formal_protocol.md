@@ -2,17 +2,26 @@
 
 ## 审查身份
 
-- `reviewed_at`: `2026-08-20T12:00:00+08:00`
+- `reviewed_at`: `2026-08-20T16:20:00+08:00`
 - `literature_cutoff`: `2026-08-20`
 - `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`
-- `artifact_run_id`: `typed_model_cache_formal_protocol_freeze_20260820_g14b_v1`
+- `artifact_run_id`: `typed_model_cache_formal_protocol_restart_20260820_g14r_v1`
 - `policy_version`: `tmc_review_policy_v3_20260621`
-- 基线 Git commit：`5a14d6e4a8ace19b4e2c1612bd3c6989deeda633`
-- evidence level：`E2_PROTOCOL_AND_CONTRACT_VALIDATED_NO_PERFORMANCE_DATA`
+- 实现基线 Git commit：`351fdb8a309614a751cedb180ecaccf2a681db2d`
+- execution commit：Commit A2（本协议 exact semantic hash 的提交）
+- evidence level：`E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE`
 
 ## 状态与边界
 
-G14B 已冻结 `typed_model_cache_formal_protocol_version=1.0.0`，readiness verdict 为
+G14R 已用 `typed_model_cache_formal_protocol_version=1.1.0` supersede v1.0。v1.0 与其 G14C v1
+run 永久为 `invalid_before_execution` / `INVALID_PROTOCOL_OR_IMPLEMENTATION`；Phase-0 后没有运行测试、
+训练、checkpoint selection 或 formal，因此没有观察正式性能。v1.1 semantic SHA-256 为
+`b8bbb53d6af47d111b840efbb53d3389485535d66c8de19b747e2a5727786629`，Readiness v3 为
+`READY_FOR_G14C_V2_CLEAN_TRAIN_AND_FORMAL`。机器入口位于
+`configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/`，修复审计见
+`docs/project/typed_model_cache_formal_protocol_restart.md`。
+
+以下 G14B v1 内容保留为历史冻结背景。G14B 当时的 readiness verdict 为
 `READY_FOR_G14C_CLEAN_TRAIN_AND_FORMAL`。它只表示 split、runtime、agent、预算、统计和
 holdout 执行合同已通过运行前检查，不表示 formal 已完成、holdout 已打开、已有正式 checkpoint、
 存在性能结果或达到 paper-ready。
@@ -26,6 +35,30 @@ catalog 的跨源受控组合；它不是真实联合 model-cache request trace�
 - `artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/formal_protocol_manifest.json`
 - `artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/protocol_hashes.json`
 - `configs/experiment/typed_model_cache_formal_protocol_v1_20260820/protocol_index.json`
+
+G14R v1.1 机器事实源：
+
+- `configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/protocol_v1_1_manifest.json`
+- `configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/protocol_index.json`
+- `artifacts/analysis/typed_model_cache_formal_protocol_restart_20260820_g14r_v1/`
+
+## v1.1 executable repair
+
+- 共享训练入口机械消费 protocol、agent config 与 `checkpoint_every_updates=4`；`latest.pt` 只供
+  resume，只有 updates `[4,8,...,32]` 进入 dev candidate set。
+- SA-GHMAPPO 经共享 registry 实例化并审计 `auxiliary_coef=0.06`；其他 agent 不接收该字段。
+- metrics 1.2 从 raw CacheEvent 1.3 重算两个新增 primary endpoint，并强制 summary/row 对账。
+- support/scalability 每个 level 有 stable ID、数值、单位、baseline、seed、资源与 artifact 身份；
+  现有机制不能安全实例化的 level 显式 `unavailable_pre_execution`，不能静默回退。
+- command templates 展开 150 个 train cells，并覆盖 dev selection、checkpoint freeze、cache-policy、
+  controller、ablation、robustness/prediction、scalability、statistics、integrity 与 gate。
+- phase runner固定 13 阶段 append-only ledger；只有 input/output hash 完全一致的 completed phase
+  可 skip，失败 terminal，exit 75 最多原命令重试一次，formal 开始后禁止训练，普通 runner 不具备
+  holdout token 或执行接口。
+
+Split semantic SHA-256 仍为
+`aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a`：没有 formal 结果、没有
+holdout opening、没有按结果改窗口，因此只新增 companion metadata，不重写 60 个窗口语义。
 
 ## Identity 与不可变性
 

@@ -954,3 +954,41 @@ legacy 兼容 dry-run 默认仍为 `legacy_adapter_only_v1`。只有显式传入
 该入口固定label为`non_formal_typed_runtime_rehearsal`，只使用`controlled_non_hidden`计划，运行2 seed、320/384 MB、五reactive baseline与PPO/MAPPO tiny serialization/restore。输出位于`artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/`。不得把其中checkpoint复制到formal manifest。
 
 Typed benchmark必须同时给出validated fairness manifest；含learned agent时还必须给出`--checkpoint_provenance_manifest_path`。旧legacy benchmark可使用`legacy_adapter_slots_lru.yaml`或`legacy_adapter_mb_lru.yaml`，不提供fairness manifest时provenance明确为unavailable。G14B 已冻结协议，但 formal/holdout/hidden 仍只能由后续独立 G14C/holdout 任务按 seal gate 执行。
+# G14R protocol v1.1（只读 preflight；不要自动启动 G14C v2）
+
+G14C v1 run `typed_model_cache_formal_20260820_g14c_351fdb8_v1` 已作废，禁止 resume。v1.1 的稳定
+入口如下；G14R 验收阶段只运行 `--dry-run`，不会创建正式结果：
+
+```bash
+.venv/bin/python scripts/run_typed_model_cache_formal_protocol.py \
+  --protocol-path configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/protocol_v1_1_manifest.json \
+  --output-root /ABSOLUTE/NEW_G14C_V2_OUTPUT_ROOT \
+  --preflight \
+  --dry-run
+```
+
+后续经独立计划窗口授权 G14C v2 后，每次只推进一个 frozen phase；首次不用 `--resume`，后续使用
+同 output root 与 `--resume`。Runner 会展开 train 150 cells、完整 dev selection/freeze 和 formal/support
+矩阵。禁止增加模板外 CLI override，禁止指向旧 G14C v1 output root。
+
+```bash
+.venv/bin/python scripts/run_typed_model_cache_formal_protocol.py \
+  --protocol-path configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/protocol_v1_1_manifest.json \
+  --output-root /ABSOLUTE/NEW_G14C_V2_OUTPUT_ROOT \
+  --phase train \
+  --resume
+```
+
+Phase 顺序固定为 preflight、tests、train、dev_select、checkpoint_freeze、formal_cache_policy、
+formal_controller、formal_ablation、formal_support、formal_scalability、formal_statistics、formal_gate、
+complete_without_holdout。普通 runner 没有 holdout/hidden 参数或 token 能力。Completed phase 只有 input
+与 output hashes 均一致才 skip；failed phase terminal；formal 开始后禁止回到 train。
+
+G14R non-formal rehearsal 入口：
+
+```bash
+.venv/bin/python scripts/run_typed_model_cache_formal_repair_rehearsal.py
+```
+
+该命令只使用 controlled non-hidden smoke plan，产物中的 checkpoint 与 episode raw outputs 保持 Git
+ignored；根级 `rehearsal_summary.json` 进入 G14R integrity。它不能作为正式 checkpoint 或性能证据。

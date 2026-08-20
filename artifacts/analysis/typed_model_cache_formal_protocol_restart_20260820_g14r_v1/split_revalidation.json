@@ -1,0 +1,14 @@
+{
+  "status": "pass_unchanged",
+  "historical_registry_revalidated": true,
+  "split_semantic_sha256": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+  "expected_split_semantic_sha256": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+  "split_content_modified": false,
+  "window_counts": {
+    "train": 24,
+    "dev": 12,
+    "formal": 12,
+    "sealed_holdout": 12
+  },
+  "performance_results_used": false
+}

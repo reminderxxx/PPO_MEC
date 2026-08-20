@@ -1,6 +1,6 @@
 # Cache Efficiency Metrics Contract
 
-版本：`1.1.0`（G13 typed extension，2026-08-19；G06 legacy 指标保持兼容）
+版本：`1.2.0`（G14R primary endpoint extension，2026-08-20；G06/G13 legacy 指标保持兼容）
 输入：raw `CacheEvent 1.x` trace + 可选 `cache_trace_context 1.0.0`。参考实现为 `src/metrics/cache_efficiency_metrics.py`。
 
 ## 总原则
@@ -83,3 +83,22 @@ Benchmark row 只接入 object/byte hit、churn、pollution、transfer amplifica
 CacheEvent 1.3 raw fields独立重算base/adapter/joint hit、state/full readiness、missing type、compatibility failure、per-type requested/hit/resident/admitted/evicted/transfer MB、base/adapter occupancy、pinned MB、bundle rejection/churn、adapters per base、base reuse/sharing、严格可识别的avoided base transfer与orphan。pollution重建支持multi-object typed admission/eviction，right-censoring不变。旧1.0–1.2 trace的type-aware group为unavailable而非0。latency saved仍unavailable。
 
 G14A benchmark raw summary继续保留完整CacheEvent 1.3与trace context；`summary_to_row()`只输出nullable scalar和轻量runtime/fairness/checkpoint provenance，aggregate不复制raw event。`typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1`对28个typed episode从raw event独立重算metrics 1.1并与benchmark scalar一致；这只是reconciliation，不是性能比较。
+
+## G14R primary endpoints 1.2.0
+
+`full_service_ready_byte_hit_rate` 的 eligible unit 是 typed request event。每个 request 将其 unique
+dependency objects 的 `resident_size_mb` 求和，依赖类型为 base model + adapter；同一 base 在同一
+request 只计一次，不按 lookup row 或 resident inventory 重复，但在另一个独立 request 中作为该请求
+所需 service bytes 再计一次。`full_service_ready=true` 时该 request 的全部 dependency bytes 进入
+numerator；partial readiness 的整请求 numerator 为 0。任一 eligible request 缺 dependency size 时
+primary value 为 `null/partial` 并输出 coverage；合法零 denominator 为 `null`；legacy trace 为
+`unavailable`。
+
+`transfer_mb_per_request = (base_model_transfer_mb + adapter_transfer_mb +
+workflow_state_migration_transfer_mb) / typed_request_event_count`，单位 decimal MB/request。
+`other_typed_transfer_mb` 独立报告且不进入 primary total，避免把未知 migration 类型静默混入。
+
+参考 reducer、episode summary、benchmark row 与 nullable aggregate 使用同名 canonical 字段。
+若 summary 中已有 reducer snapshot，`cache_efficiency_row_fields()` 必须与 raw event 重算完全一致，
+否则 fail-fast。G14R 非正式 rehearsal 对 36 个 summary 完成六 primary fields 的 raw/row 对账；
+这不是正式性能证据。

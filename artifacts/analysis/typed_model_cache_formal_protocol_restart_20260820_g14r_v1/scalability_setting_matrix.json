@@ -1,0 +1,330 @@
+{
+  "scalability_setting_matrix_version": "1.0.0",
+  "settings": [
+    {
+      "parameter": "rsu_count",
+      "values": [
+        2,
+        3,
+        4
+      ],
+      "baseline": 3,
+      "unit": "RSUs",
+      "range": [
+        2,
+        4
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "exploratory",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "typed initial-state identity is fixed to three RSUs",
+      "setting_id": "scalability-5fc1159f1dbcf12f",
+      "levels": [
+        {
+          "setting_id": "scalability-055b6b84bf757b47",
+          "value": 2,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "typed initial-state identity is fixed to three RSUs",
+          "parameters": {
+            "parameter": "rsu_count",
+            "value": 2,
+            "unit": "RSUs"
+          }
+        },
+        {
+          "setting_id": "scalability-4faeff4c7f0a9c6e",
+          "value": 3,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "typed initial-state identity is fixed to three RSUs",
+          "parameters": {
+            "parameter": "rsu_count",
+            "value": 3,
+            "unit": "RSUs"
+          }
+        },
+        {
+          "setting_id": "scalability-0a0aa1967e3ca061",
+          "value": 4,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "typed initial-state identity is fixed to three RSUs",
+          "parameters": {
+            "parameter": "rsu_count",
+            "value": 4,
+            "unit": "RSUs"
+          }
+        }
+      ],
+      "wall_clock_repetitions": 3,
+      "memory_measurement": "Python tracemalloc peak increment bytes; process RSS unavailable and not inferred",
+      "expected_artifact": "scalability/rsu_count/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "3 repetitions x frozen evaluation units; exact oracle bounded by state_limit"
+    },
+    {
+      "parameter": "active_vehicle_count",
+      "values": [
+        4,
+        8,
+        16
+      ],
+      "baseline": 8,
+      "unit": "active vehicles/window",
+      "range": [
+        4,
+        16
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "exploratory",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "vehicle subsampling is not encoded by current fairness manifest",
+      "setting_id": "scalability-d060229256176631",
+      "levels": [
+        {
+          "setting_id": "scalability-c972cc65359385df",
+          "value": 4,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "vehicle subsampling is not encoded by current fairness manifest",
+          "parameters": {
+            "parameter": "active_vehicle_count",
+            "value": 4,
+            "unit": "active vehicles/window"
+          }
+        },
+        {
+          "setting_id": "scalability-364a64a6d9af4a15",
+          "value": 8,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "vehicle subsampling is not encoded by current fairness manifest",
+          "parameters": {
+            "parameter": "active_vehicle_count",
+            "value": 8,
+            "unit": "active vehicles/window"
+          }
+        },
+        {
+          "setting_id": "scalability-b68dbca02cc7d6e7",
+          "value": 16,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "vehicle subsampling is not encoded by current fairness manifest",
+          "parameters": {
+            "parameter": "active_vehicle_count",
+            "value": 16,
+            "unit": "active vehicles/window"
+          }
+        }
+      ],
+      "wall_clock_repetitions": 3,
+      "memory_measurement": "Python tracemalloc peak increment bytes; process RSS unavailable and not inferred",
+      "expected_artifact": "scalability/active_vehicle_count/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "3 repetitions x frozen evaluation units; exact oracle bounded by state_limit"
+    },
+    {
+      "parameter": "dag_node_count",
+      "values": [
+        5,
+        10,
+        20
+      ],
+      "baseline": 10,
+      "unit": "nodes/workflow",
+      "range": [
+        5,
+        20
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "exploratory",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "existing buckets do not instantiate exact node counts",
+      "setting_id": "scalability-88e0eb58fcc5e523",
+      "levels": [
+        {
+          "setting_id": "scalability-bacdbcb2da025cae",
+          "value": 5,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "existing buckets do not instantiate exact node counts",
+          "parameters": {
+            "parameter": "dag_node_count",
+            "value": 5,
+            "unit": "nodes/workflow"
+          }
+        },
+        {
+          "setting_id": "scalability-d29f800ac2295ee8",
+          "value": 10,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "existing buckets do not instantiate exact node counts",
+          "parameters": {
+            "parameter": "dag_node_count",
+            "value": 10,
+            "unit": "nodes/workflow"
+          }
+        },
+        {
+          "setting_id": "scalability-a9863d149e3fcf70",
+          "value": 20,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "existing buckets do not instantiate exact node counts",
+          "parameters": {
+            "parameter": "dag_node_count",
+            "value": 20,
+            "unit": "nodes/workflow"
+          }
+        }
+      ],
+      "wall_clock_repetitions": 3,
+      "memory_measurement": "Python tracemalloc peak increment bytes; process RSS unavailable and not inferred",
+      "expected_artifact": "scalability/dag_node_count/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "3 repetitions x frozen evaluation units; exact oracle bounded by state_limit"
+    },
+    {
+      "parameter": "typed_object_count",
+      "values": [
+        4,
+        8,
+        10
+      ],
+      "baseline": 8,
+      "unit": "capacity-counting objects",
+      "range": [
+        4,
+        10
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "exploratory",
+      "status": "unavailable_pre_execution",
+      "unavailable_reason": "existing adapter proxy is legacy and breaks typed catalog fingerprints",
+      "setting_id": "scalability-f06f772abbe200dd",
+      "levels": [
+        {
+          "setting_id": "scalability-91bac62ada9dcb4b",
+          "value": 4,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "existing adapter proxy is legacy and breaks typed catalog fingerprints",
+          "parameters": {
+            "parameter": "typed_object_count",
+            "value": 4,
+            "unit": "capacity-counting objects"
+          }
+        },
+        {
+          "setting_id": "scalability-c798b2065c4a1043",
+          "value": 8,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "existing adapter proxy is legacy and breaks typed catalog fingerprints",
+          "parameters": {
+            "parameter": "typed_object_count",
+            "value": 8,
+            "unit": "capacity-counting objects"
+          }
+        },
+        {
+          "setting_id": "scalability-9aa814c8a5da30e9",
+          "value": 10,
+          "status": "unavailable_pre_execution",
+          "unavailable_reason": "existing adapter proxy is legacy and breaks typed catalog fingerprints",
+          "parameters": {
+            "parameter": "typed_object_count",
+            "value": 10,
+            "unit": "capacity-counting objects"
+          }
+        }
+      ],
+      "wall_clock_repetitions": 3,
+      "memory_measurement": "Python tracemalloc peak increment bytes; process RSS unavailable and not inferred",
+      "expected_artifact": "scalability/typed_object_count/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "3 repetitions x frozen evaluation units; exact oracle bounded by state_limit"
+    },
+    {
+      "parameter": "oracle_state_limit",
+      "values": [
+        1000,
+        10000,
+        100000
+      ],
+      "baseline": 10000,
+      "unit": "visited states",
+      "range": [
+        1000,
+        100000
+      ],
+      "seed_plan": [
+        7,
+        13,
+        29,
+        43,
+        71
+      ],
+      "role": "exploratory",
+      "status": "available",
+      "unavailable_reason": null,
+      "setting_id": "scalability-7fd25e40591ae84c",
+      "levels": [
+        {
+          "setting_id": "scalability-b05d0a8a8684c1f0",
+          "value": 1000,
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "oracle_state_limit",
+            "value": 1000,
+            "unit": "visited states"
+          }
+        },
+        {
+          "setting_id": "scalability-d04bf61f3d213610",
+          "value": 10000,
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "oracle_state_limit",
+            "value": 10000,
+            "unit": "visited states"
+          }
+        },
+        {
+          "setting_id": "scalability-a6f0899cff90e905",
+          "value": 100000,
+          "status": "available",
+          "unavailable_reason": null,
+          "parameters": {
+            "parameter": "oracle_state_limit",
+            "value": 100000,
+            "unit": "visited states"
+          }
+        }
+      ],
+      "wall_clock_repetitions": 3,
+      "memory_measurement": "Python tracemalloc peak increment bytes; process RSS unavailable and not inferred",
+      "expected_artifact": "scalability/oracle_state_limit/<setting_id>",
+      "cli_override": "forbidden; select only a frozen setting_id",
+      "resource_budget": "3 repetitions x frozen evaluation units; exact oracle bounded by state_limit"
+    }
+  ]
+}

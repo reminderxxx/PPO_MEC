@@ -379,7 +379,7 @@ def reconcile_benchmark(
                 ),
             }
             if any(scalars.get(key) != value or row.get(key) != value for key, value in checks.items()):
-                raise RuntimeError("metrics 1.1 scalar reconciliation mismatch")
+                raise RuntimeError("metrics 1.2 scalar reconciliation mismatch")
             event_rows.append(
                 {
                     "capacity_label": capacity_label,
@@ -413,7 +413,7 @@ def reconcile_benchmark(
     }
     metric_report = {
         "status": "pass",
-        "cache_efficiency_metrics_contract_version": "1.1.0",
+        "cache_efficiency_metrics_contract_version": "1.2.0",
         "summary_count": len(metric_rows),
         "missing_trace_semantics": cache_efficiency_row_fields({}),
         "rows": metric_rows,

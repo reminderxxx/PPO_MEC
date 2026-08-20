@@ -1,0 +1,2282 @@
+{
+  "formal_command_template_version": "1.0.0",
+  "templates": {
+    "preflight": {
+      "expected_outputs": [
+        "preflight.json"
+      ],
+      "resume_phase": "preflight",
+      "timeout_seconds": 1800,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/validate_typed_model_cache_formal_restart.py",
+        "--protocol-path",
+        "{protocol_path}",
+        "--output-path",
+        "{preflight_output_path}"
+      ]
+    },
+    "tests": {
+      "expected_outputs": [
+        "tests.xml"
+      ],
+      "resume_phase": "tests",
+      "timeout_seconds": 7200,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "--junitxml",
+        "{tests_output_path}"
+      ]
+    },
+    "train": {
+      "expected_outputs": [
+        "training/{agent}/{training_run_id}/train_summary.json"
+      ],
+      "resume_phase": "train",
+      "timeout_seconds": 43200,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/train_algo_pool_real_sample.py",
+        "--agent_name",
+        "{agent}",
+        "--profile",
+        "baseline_safe",
+        "--formal_protocol_path",
+        "{protocol_path}",
+        "--agent_config_path",
+        "{agent_config_path}",
+        "--model_cache_runtime_config",
+        "{runtime_config_path}",
+        "--random_seed",
+        "{seed}",
+        "--window_plan_path",
+        "{train_window_plan_path}",
+        "--output_root",
+        "{training_output_root}",
+        "--run_id",
+        "{training_run_id}",
+        "--reward_positive_offset",
+        "0",
+        "--primary_vehicle_selection",
+        "handoff_pressure"
+      ],
+      "matrix_contexts": [
+        {
+          "agent": "sa_ghmappo",
+          "seed": 7,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_sa_ghmappo_seed7"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 13,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_sa_ghmappo_seed13"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 29,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_sa_ghmappo_seed29"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 43,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_sa_ghmappo_seed43"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 71,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_sa_ghmappo_seed71"
+        },
+        {
+          "agent": "ppo",
+          "seed": 7,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_ppo_seed7"
+        },
+        {
+          "agent": "ppo",
+          "seed": 13,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_ppo_seed13"
+        },
+        {
+          "agent": "ppo",
+          "seed": 29,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_ppo_seed29"
+        },
+        {
+          "agent": "ppo",
+          "seed": 43,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_ppo_seed43"
+        },
+        {
+          "agent": "ppo",
+          "seed": 71,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_ppo_seed71"
+        },
+        {
+          "agent": "mappo",
+          "seed": 7,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_mappo_seed7"
+        },
+        {
+          "agent": "mappo",
+          "seed": 13,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_mappo_seed13"
+        },
+        {
+          "agent": "mappo",
+          "seed": 29,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_mappo_seed29"
+        },
+        {
+          "agent": "mappo",
+          "seed": 43,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_mappo_seed43"
+        },
+        {
+          "agent": "mappo",
+          "seed": 71,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_mappo_seed71"
+        },
+        {
+          "agent": "dqn",
+          "seed": 7,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dqn_seed7"
+        },
+        {
+          "agent": "dqn",
+          "seed": 13,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dqn_seed13"
+        },
+        {
+          "agent": "dqn",
+          "seed": 29,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dqn_seed29"
+        },
+        {
+          "agent": "dqn",
+          "seed": 43,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dqn_seed43"
+        },
+        {
+          "agent": "dqn",
+          "seed": 71,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dqn_seed71"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 7,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dueling_dqn_seed7"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 13,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dueling_dqn_seed13"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 29,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dueling_dqn_seed29"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 43,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dueling_dqn_seed43"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 71,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dueling_dqn_seed71"
+        },
+        {
+          "agent": "qmix",
+          "seed": 7,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_qmix_seed7"
+        },
+        {
+          "agent": "qmix",
+          "seed": 13,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_qmix_seed13"
+        },
+        {
+          "agent": "qmix",
+          "seed": 29,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_qmix_seed29"
+        },
+        {
+          "agent": "qmix",
+          "seed": 43,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_qmix_seed43"
+        },
+        {
+          "agent": "qmix",
+          "seed": 71,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_qmix_seed71"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 7,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_controller_mat_seed7"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 13,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_controller_mat_seed13"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 29,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_controller_mat_seed29"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 43,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_controller_mat_seed43"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 71,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_controller_mat_seed71"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 7,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dag_offload_drl_seed7"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 13,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dag_offload_drl_seed13"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 29,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dag_offload_drl_seed29"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 43,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dag_offload_drl_seed43"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 71,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dag_offload_drl_seed71"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 7,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_cache_offload_drl_seed7"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 13,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_cache_offload_drl_seed13"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 29,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_cache_offload_drl_seed29"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 43,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_cache_offload_drl_seed43"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 71,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_cache_offload_drl_seed71"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 7,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dt_handoff_drl_seed7"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 13,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dt_handoff_drl_seed13"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 29,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dt_handoff_drl_seed29"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 43,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dt_handoff_drl_seed43"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 71,
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_constrained_288mb_dt_handoff_drl_seed71"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 7,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_sa_ghmappo_seed7"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 13,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_sa_ghmappo_seed13"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 29,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_sa_ghmappo_seed29"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 43,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_sa_ghmappo_seed43"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 71,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_sa_ghmappo_seed71"
+        },
+        {
+          "agent": "ppo",
+          "seed": 7,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_ppo_seed7"
+        },
+        {
+          "agent": "ppo",
+          "seed": 13,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_ppo_seed13"
+        },
+        {
+          "agent": "ppo",
+          "seed": 29,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_ppo_seed29"
+        },
+        {
+          "agent": "ppo",
+          "seed": 43,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_ppo_seed43"
+        },
+        {
+          "agent": "ppo",
+          "seed": 71,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_ppo_seed71"
+        },
+        {
+          "agent": "mappo",
+          "seed": 7,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_mappo_seed7"
+        },
+        {
+          "agent": "mappo",
+          "seed": 13,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_mappo_seed13"
+        },
+        {
+          "agent": "mappo",
+          "seed": 29,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_mappo_seed29"
+        },
+        {
+          "agent": "mappo",
+          "seed": 43,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_mappo_seed43"
+        },
+        {
+          "agent": "mappo",
+          "seed": 71,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_mappo_seed71"
+        },
+        {
+          "agent": "dqn",
+          "seed": 7,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dqn_seed7"
+        },
+        {
+          "agent": "dqn",
+          "seed": 13,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dqn_seed13"
+        },
+        {
+          "agent": "dqn",
+          "seed": 29,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dqn_seed29"
+        },
+        {
+          "agent": "dqn",
+          "seed": 43,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dqn_seed43"
+        },
+        {
+          "agent": "dqn",
+          "seed": 71,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dqn_seed71"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 7,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dueling_dqn_seed7"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 13,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dueling_dqn_seed13"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 29,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dueling_dqn_seed29"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 43,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dueling_dqn_seed43"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 71,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dueling_dqn_seed71"
+        },
+        {
+          "agent": "qmix",
+          "seed": 7,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_qmix_seed7"
+        },
+        {
+          "agent": "qmix",
+          "seed": 13,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_qmix_seed13"
+        },
+        {
+          "agent": "qmix",
+          "seed": 29,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_qmix_seed29"
+        },
+        {
+          "agent": "qmix",
+          "seed": 43,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_qmix_seed43"
+        },
+        {
+          "agent": "qmix",
+          "seed": 71,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_qmix_seed71"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 7,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_controller_mat_seed7"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 13,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_controller_mat_seed13"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 29,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_controller_mat_seed29"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 43,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_controller_mat_seed43"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 71,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_controller_mat_seed71"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 7,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dag_offload_drl_seed7"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 13,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dag_offload_drl_seed13"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 29,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dag_offload_drl_seed29"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 43,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dag_offload_drl_seed43"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 71,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dag_offload_drl_seed71"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 7,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_cache_offload_drl_seed7"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 13,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_cache_offload_drl_seed13"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 29,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_cache_offload_drl_seed29"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 43,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_cache_offload_drl_seed43"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 71,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_cache_offload_drl_seed71"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 7,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dt_handoff_drl_seed7"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 13,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dt_handoff_drl_seed13"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 29,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dt_handoff_drl_seed29"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 43,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dt_handoff_drl_seed43"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 71,
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_medium_576mb_dt_handoff_drl_seed71"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 7,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_sa_ghmappo_seed7"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 13,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_sa_ghmappo_seed13"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 29,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_sa_ghmappo_seed29"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 43,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_sa_ghmappo_seed43"
+        },
+        {
+          "agent": "sa_ghmappo",
+          "seed": 71,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_sa_ghmappo_seed71"
+        },
+        {
+          "agent": "ppo",
+          "seed": 7,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_ppo_seed7"
+        },
+        {
+          "agent": "ppo",
+          "seed": 13,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_ppo_seed13"
+        },
+        {
+          "agent": "ppo",
+          "seed": 29,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_ppo_seed29"
+        },
+        {
+          "agent": "ppo",
+          "seed": 43,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_ppo_seed43"
+        },
+        {
+          "agent": "ppo",
+          "seed": 71,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_ppo_seed71"
+        },
+        {
+          "agent": "mappo",
+          "seed": 7,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_mappo_seed7"
+        },
+        {
+          "agent": "mappo",
+          "seed": 13,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_mappo_seed13"
+        },
+        {
+          "agent": "mappo",
+          "seed": 29,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_mappo_seed29"
+        },
+        {
+          "agent": "mappo",
+          "seed": 43,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_mappo_seed43"
+        },
+        {
+          "agent": "mappo",
+          "seed": 71,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_mappo_seed71"
+        },
+        {
+          "agent": "dqn",
+          "seed": 7,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dqn_seed7"
+        },
+        {
+          "agent": "dqn",
+          "seed": 13,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dqn_seed13"
+        },
+        {
+          "agent": "dqn",
+          "seed": 29,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dqn_seed29"
+        },
+        {
+          "agent": "dqn",
+          "seed": 43,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dqn_seed43"
+        },
+        {
+          "agent": "dqn",
+          "seed": 71,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dqn_seed71"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 7,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dueling_dqn_seed7"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 13,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dueling_dqn_seed13"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 29,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dueling_dqn_seed29"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 43,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dueling_dqn_seed43"
+        },
+        {
+          "agent": "dueling_dqn",
+          "seed": 71,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dueling_dqn_seed71"
+        },
+        {
+          "agent": "qmix",
+          "seed": 7,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_qmix_seed7"
+        },
+        {
+          "agent": "qmix",
+          "seed": 13,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_qmix_seed13"
+        },
+        {
+          "agent": "qmix",
+          "seed": 29,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_qmix_seed29"
+        },
+        {
+          "agent": "qmix",
+          "seed": 43,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_qmix_seed43"
+        },
+        {
+          "agent": "qmix",
+          "seed": 71,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_qmix_seed71"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 7,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_controller_mat_seed7"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 13,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_controller_mat_seed13"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 29,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_controller_mat_seed29"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 43,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_controller_mat_seed43"
+        },
+        {
+          "agent": "controller_mat",
+          "seed": 71,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_controller_mat_seed71"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 7,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dag_offload_drl_seed7"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 13,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dag_offload_drl_seed13"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 29,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dag_offload_drl_seed29"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 43,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dag_offload_drl_seed43"
+        },
+        {
+          "agent": "dag_offload_drl",
+          "seed": 71,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dag_offload_drl_seed71"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 7,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_cache_offload_drl_seed7"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 13,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_cache_offload_drl_seed13"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 29,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_cache_offload_drl_seed29"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 43,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_cache_offload_drl_seed43"
+        },
+        {
+          "agent": "cache_offload_drl",
+          "seed": 71,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_cache_offload_drl_seed71"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 7,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dt_handoff_drl_seed7"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 13,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dt_handoff_drl_seed13"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 29,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dt_handoff_drl_seed29"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 43,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dt_handoff_drl_seed43"
+        },
+        {
+          "agent": "dt_handoff_drl",
+          "seed": 71,
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+          "training_run_id": "formal_relaxed_864mb_dt_handoff_drl_seed71"
+        }
+      ]
+    },
+    "dev_select": {
+      "expected_outputs": [
+        "checkpoint_candidates.json",
+        "dev_selection.json",
+        "dev_benchmarks/**/benchmark_rows.csv"
+      ],
+      "resume_phase": "dev_select",
+      "timeout_seconds": 172800,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/run_typed_model_cache_formal_dev_selection.py",
+        "--protocol-path",
+        "{protocol_path}",
+        "--training-root",
+        "{training_output_root}",
+        "--output-root",
+        "{dev_input_root}",
+        "--output-path",
+        "{dev_selection_output_path}"
+      ]
+    },
+    "checkpoint_freeze": {
+      "expected_outputs": [
+        "checkpoint_freeze.json",
+        "checkpoint_manifests/**/seed_checkpoint_manifest.json",
+        "checkpoint_manifests/**/checkpoint_provenance_manifest.json"
+      ],
+      "resume_phase": "checkpoint_freeze",
+      "timeout_seconds": 3600,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/manage_typed_model_cache_formal_artifacts.py",
+        "--action",
+        "checkpoint_freeze",
+        "--protocol-path",
+        "{protocol_path}",
+        "--input-root",
+        "{dev_input_root}",
+        "--output-path",
+        "{checkpoint_freeze_output_path}"
+      ]
+    },
+    "formal_cache_policy": {
+      "expected_outputs": [
+        "formal_cache_policy/**/aggregate_summary.json",
+        "formal_cache_policy/{capacity_label}/request_replay.json"
+      ],
+      "resume_phase": "formal_cache_policy",
+      "timeout_seconds": 43200,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/run_typed_model_cache_formal_cache_policy.py",
+        "--protocol-path",
+        "{protocol_path}",
+        "--fairness-manifest-path",
+        "{fairness_manifest_path}",
+        "--evaluation-unit-id",
+        "{request_replay_evaluation_unit_id}",
+        "--request-replay-path",
+        "{request_replay_path}",
+        "--command",
+        ".venv/bin/python",
+        "scripts/benchmark_main_results.py",
+        "--agents",
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl",
+        "--seeds",
+        "7",
+        "13",
+        "29",
+        "43",
+        "71",
+        "--seed_checkpoint_manifest_path",
+        "{seed_checkpoint_manifest_path}",
+        "--checkpoint_provenance_manifest_path",
+        "{checkpoint_provenance_manifest_path}",
+        "--cache_baseline_fairness_manifest_path",
+        "{fairness_manifest_path}",
+        "--model_cache_runtime_config",
+        "{runtime_config_path}",
+        "--window_plan_path",
+        "{formal_window_plan_path}",
+        "--max_mobility_rows",
+        "11850526",
+        "--max_workflows",
+        "3",
+        "--max_steps",
+        "22",
+        "--primary_vehicle_selection",
+        "handoff_pressure",
+        "--window_mode",
+        "mixed_informative",
+        "--prediction_horizon",
+        "3",
+        "--reward_positive_offset",
+        "0",
+        "--output_root",
+        "{formal_cache_policy_output_root}",
+        "--audit_runtime"
+      ],
+      "matrix_contexts": [
+        {
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "request_replay_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/formal_cache_policy/constrained_288mb/request_replay.json",
+          "request_replay_evaluation_unit_id": "seed_7/g14b_i_80_run_001_f6972_6995_t1113433832100_1113433834400/j_3",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "request_replay_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/formal_cache_policy/medium_576mb/request_replay.json",
+          "request_replay_evaluation_unit_id": "seed_7/g14b_i_80_run_001_f6972_6995_t1113433832100_1113433834400/j_3",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "request_replay_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/formal_cache_policy/relaxed_864mb/request_replay.json",
+          "request_replay_evaluation_unit_id": "seed_7/g14b_i_80_run_001_f6972_6995_t1113433832100_1113433834400/j_3",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json"
+        }
+      ]
+    },
+    "formal_controller": {
+      "expected_outputs": [
+        "formal_controller/**/aggregate_summary.json"
+      ],
+      "resume_phase": "formal_controller",
+      "timeout_seconds": 43200,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/benchmark_main_results.py",
+        "--agents",
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl",
+        "--seeds",
+        "7",
+        "13",
+        "29",
+        "43",
+        "71",
+        "--seed_checkpoint_manifest_path",
+        "{seed_checkpoint_manifest_path}",
+        "--checkpoint_provenance_manifest_path",
+        "{checkpoint_provenance_manifest_path}",
+        "--cache_baseline_fairness_manifest_path",
+        "{fairness_manifest_path}",
+        "--model_cache_runtime_config",
+        "{runtime_config_path}",
+        "--window_plan_path",
+        "{formal_window_plan_path}",
+        "--max_mobility_rows",
+        "11850526",
+        "--max_workflows",
+        "3",
+        "--max_steps",
+        "22",
+        "--primary_vehicle_selection",
+        "handoff_pressure",
+        "--window_mode",
+        "mixed_informative",
+        "--prediction_horizon",
+        "3",
+        "--reward_positive_offset",
+        "0",
+        "--output_root",
+        "{formal_controller_output_root}",
+        "--audit_runtime"
+      ],
+      "matrix_contexts": [
+        {
+          "capacity_label": "constrained_288mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "capacity_label": "medium_576mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "capacity_label": "relaxed_864mb",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json"
+        }
+      ]
+    },
+    "formal_ablation": {
+      "expected_outputs": [
+        "formal_ablation/**/support_provenance.json"
+      ],
+      "resume_phase": "formal_ablation",
+      "timeout_seconds": 43200,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/run_typed_model_cache_formal_support.py",
+        "--protocol-path",
+        "{protocol_path}",
+        "--setting-id",
+        "{ablation_setting_id}",
+        "--model-cache-runtime-config",
+        "{runtime_config_path}",
+        "--cache-baseline-fairness-manifest-path",
+        "{fairness_manifest_path}",
+        "--seed-checkpoint-manifest-path",
+        "{seed_checkpoint_manifest_path}",
+        "--checkpoint-provenance-manifest-path",
+        "{checkpoint_provenance_manifest_path}",
+        "--window-plan-path",
+        "{formal_window_plan_path}",
+        "--agents",
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl",
+        "--seeds",
+        "7",
+        "13",
+        "29",
+        "43",
+        "71",
+        "--output-root",
+        "{formal_ablation_output_root}"
+      ],
+      "matrix_contexts": [
+        {
+          "ablation_setting_id": "ablation-f09814754dc92882",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-f09814754dc92882.json"
+        },
+        {
+          "ablation_setting_id": "ablation-8aa367acf3bdf7a9",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-8aa367acf3bdf7a9.json"
+        }
+      ]
+    },
+    "formal_support": {
+      "expected_outputs": [
+        "formal_support/**/support_provenance.json"
+      ],
+      "resume_phase": "formal_support",
+      "timeout_seconds": 43200,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/run_typed_model_cache_formal_support.py",
+        "--protocol-path",
+        "{protocol_path}",
+        "--setting-id",
+        "{support_setting_id}",
+        "--model-cache-runtime-config",
+        "{runtime_config_path}",
+        "--cache-baseline-fairness-manifest-path",
+        "{fairness_manifest_path}",
+        "--seed-checkpoint-manifest-path",
+        "{seed_checkpoint_manifest_path}",
+        "--checkpoint-provenance-manifest-path",
+        "{checkpoint_provenance_manifest_path}",
+        "--window-plan-path",
+        "{formal_window_plan_path}",
+        "--agents",
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl",
+        "--seeds",
+        "7",
+        "13",
+        "29",
+        "43",
+        "71",
+        "--output-root",
+        "{formal_support_output_root}"
+      ],
+      "matrix_contexts": [
+        {
+          "support_setting_id": "capacity-cbd9b8a225730814",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "capacity-00977fcec03ac209",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "capacity-c2f32db65e656f8f",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "sensitivity-27d16b068076937b",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-27d16b068076937b.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "sensitivity-7c7c3a1659c6e221",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-7c7c3a1659c6e221.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "prediction_boundary-5faa585ad5330f05",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-5faa585ad5330f05.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "prediction_boundary-95fb72521455c776",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-95fb72521455c776.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "prediction_boundary-efa09ee2409d3d87",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-efa09ee2409d3d87.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "prediction_boundary-a3a5789695404fae",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-a3a5789695404fae.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "prediction_boundary-ce96dbd5ea956212",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-ce96dbd5ea956212.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "prediction_boundary-df3bc5ade8c57014",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-df3bc5ade8c57014.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        }
+      ]
+    },
+    "formal_scalability": {
+      "expected_outputs": [
+        "formal_scalability/**/support_provenance.json"
+      ],
+      "resume_phase": "formal_scalability",
+      "timeout_seconds": 43200,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/run_typed_model_cache_formal_support.py",
+        "--protocol-path",
+        "{protocol_path}",
+        "--setting-id",
+        "{scalability_setting_id}",
+        "--model-cache-runtime-config",
+        "{runtime_config_path}",
+        "--cache-baseline-fairness-manifest-path",
+        "{fairness_manifest_path}",
+        "--seed-checkpoint-manifest-path",
+        "{seed_checkpoint_manifest_path}",
+        "--checkpoint-provenance-manifest-path",
+        "{checkpoint_provenance_manifest_path}",
+        "--window-plan-path",
+        "{formal_window_plan_path}",
+        "--agents",
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl",
+        "--seeds",
+        "7",
+        "13",
+        "29",
+        "43",
+        "71",
+        "--request-replay-path",
+        "{request_replay_path}",
+        "--output-root",
+        "{formal_scalability_output_root}"
+      ],
+      "matrix_contexts": [
+        {
+          "scalability_setting_id": "scalability-b05d0a8a8684c1f0"
+        },
+        {
+          "scalability_setting_id": "scalability-d04bf61f3d213610"
+        },
+        {
+          "scalability_setting_id": "scalability-a6f0899cff90e905"
+        }
+      ]
+    },
+    "formal_statistics": {
+      "expected_outputs": [
+        "statistics/paired_statistics.json"
+      ],
+      "resume_phase": "formal_statistics",
+      "timeout_seconds": 7200,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/run_typed_model_cache_formal_statistics.py",
+        "--protocol-path",
+        "{protocol_path}",
+        "--input-root",
+        "{formal_output_root}",
+        "--output-root",
+        "{statistics_output_root}"
+      ]
+    },
+    "formal_gate": {
+      "expected_outputs": [
+        "artifact_integrity_manifest.json",
+        "formal_gate.json"
+      ],
+      "resume_phase": "formal_gate",
+      "timeout_seconds": 3600,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/manage_typed_model_cache_formal_artifacts.py",
+        "--action",
+        "integrity_and_formal_gate",
+        "--protocol-path",
+        "{protocol_path}",
+        "--input-root",
+        "{formal_output_root}",
+        "--output-path",
+        "{formal_gate_output_path}"
+      ]
+    },
+    "robustness": {
+      "expected_outputs": [
+        "formal_support/**/support_provenance.json"
+      ],
+      "resume_phase": "formal_support",
+      "timeout_seconds": 43200,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/run_typed_model_cache_formal_support.py",
+        "--protocol-path",
+        "{protocol_path}",
+        "--setting-id",
+        "{support_setting_id}",
+        "--model-cache-runtime-config",
+        "{runtime_config_path}",
+        "--cache-baseline-fairness-manifest-path",
+        "{fairness_manifest_path}",
+        "--seed-checkpoint-manifest-path",
+        "{seed_checkpoint_manifest_path}",
+        "--checkpoint-provenance-manifest-path",
+        "{checkpoint_provenance_manifest_path}",
+        "--window-plan-path",
+        "{formal_window_plan_path}",
+        "--agents",
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl",
+        "--seeds",
+        "7",
+        "13",
+        "29",
+        "43",
+        "71",
+        "--output-root",
+        "{formal_support_output_root}"
+      ],
+      "matrix_contexts": [
+        {
+          "support_setting_id": "prediction_boundary-efa09ee2409d3d87",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-efa09ee2409d3d87.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        }
+      ]
+    },
+    "prediction_boundary": {
+      "expected_outputs": [
+        "formal_support/**/support_provenance.json"
+      ],
+      "resume_phase": "formal_support",
+      "timeout_seconds": 43200,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/run_typed_model_cache_formal_support.py",
+        "--protocol-path",
+        "{protocol_path}",
+        "--setting-id",
+        "{support_setting_id}",
+        "--model-cache-runtime-config",
+        "{runtime_config_path}",
+        "--cache-baseline-fairness-manifest-path",
+        "{fairness_manifest_path}",
+        "--seed-checkpoint-manifest-path",
+        "{seed_checkpoint_manifest_path}",
+        "--checkpoint-provenance-manifest-path",
+        "{checkpoint_provenance_manifest_path}",
+        "--window-plan-path",
+        "{formal_window_plan_path}",
+        "--agents",
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl",
+        "--seeds",
+        "7",
+        "13",
+        "29",
+        "43",
+        "71",
+        "--output-root",
+        "{formal_support_output_root}"
+      ],
+      "matrix_contexts": [
+        {
+          "support_setting_id": "prediction_boundary-5faa585ad5330f05",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-5faa585ad5330f05.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "prediction_boundary-95fb72521455c776",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-95fb72521455c776.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "prediction_boundary-efa09ee2409d3d87",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-efa09ee2409d3d87.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "prediction_boundary-a3a5789695404fae",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-a3a5789695404fae.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "prediction_boundary-ce96dbd5ea956212",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-ce96dbd5ea956212.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        },
+        {
+          "support_setting_id": "prediction_boundary-df3bc5ade8c57014",
+          "runtime_config_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+          "fairness_manifest_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-df3bc5ade8c57014.json",
+          "seed_checkpoint_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+          "checkpoint_provenance_manifest_path": "/ABSOLUTE/FORMAL_OUTPUT_ROOT/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json"
+        }
+      ]
+    },
+    "integrity": {
+      "expected_outputs": [
+        "artifact_integrity_manifest.json"
+      ],
+      "resume_phase": "formal_gate",
+      "timeout_seconds": 3600,
+      "infrastructure_retries": 1,
+      "extra_cli_overrides": "forbidden",
+      "argv": [
+        ".venv/bin/python",
+        "scripts/manage_typed_model_cache_formal_artifacts.py",
+        "--action",
+        "integrity",
+        "--protocol-path",
+        "{protocol_path}",
+        "--input-root",
+        "{formal_output_root}",
+        "--output-path",
+        "{integrity_output_path}"
+      ]
+    }
+  }
+}

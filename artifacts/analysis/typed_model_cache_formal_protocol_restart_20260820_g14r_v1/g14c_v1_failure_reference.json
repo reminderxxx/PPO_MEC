@@ -1,0 +1,12 @@
+{
+  "status": "INVALID_PROTOCOL_OR_IMPLEMENTATION",
+  "old_run_id": "typed_model_cache_formal_20260820_g14c_351fdb8_v1",
+  "old_protocol_version": "1.0.0",
+  "old_protocol_semantic_sha256": "41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4",
+  "failure_audit_path": "artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260820_g14c_351fdb8_v1/audit/failure_audit.json",
+  "failure_audit_sha256": "fd04ee5e25737d74ae9f58d0e076d4d620eb913dd55a8aef039a61510c71a0b1",
+  "training_started": false,
+  "checkpoint_count": 0,
+  "formal_performance_observed": false,
+  "resume_allowed": false
+}
