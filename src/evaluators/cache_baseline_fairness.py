@@ -707,13 +707,20 @@ def build_manifest(
                         "benchmark_run_seed": seed,
                         "window_id": window["window_id"],
                         "raw_frame_interval": {
-                            "start": int(window["frame_offset"]),
-                            "end": int(window["frame_offset"]) + int(window["window_length"]) - 1,
+                            "start": int(window.get("raw_frame_start", window["frame_offset"])),
+                            "end": int(
+                                window.get(
+                                    "raw_frame_end",
+                                    int(window["frame_offset"]) + int(window["window_length"]) - 1,
+                                )
+                            ),
                         },
                         "raw_time_interval": {
-                            "start": int(window["time_index_start"]),
-                            "end": int(window["time_index_end"]),
+                            "start": int(window.get("raw_time_start", window["time_index_start"])),
+                            "end": int(window.get("raw_time_end", window["time_index_end"])),
                         },
+                        "source_segment_id": window.get("source_segment_id"),
+                        "source_segment_run_id": window.get("source_segment_run_id"),
                         "vehicle_selection": primary_vehicle_selection,
                         "workflow_id": workflow.workflow_id,
                         "workflow_selection": workflow_selector,
@@ -986,14 +993,26 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
                     errors.append(f"window absent from source plan: {unit.get('window_id')}")
                     continue
                 expected_frame = {
-                    "start": int(source["frame_offset"]),
-                    "end": int(source["frame_offset"]) + int(source["window_length"]) - 1,
+                    "start": int(source.get("raw_frame_start", source["frame_offset"])),
+                    "end": int(
+                        source.get(
+                            "raw_frame_end",
+                            int(source["frame_offset"]) + int(source["window_length"]) - 1,
+                        )
+                    ),
                 }
-                expected_time = {"start": int(source["time_index_start"]), "end": int(source["time_index_end"])}
+                expected_time = {
+                    "start": int(source.get("raw_time_start", source["time_index_start"])),
+                    "end": int(source.get("raw_time_end", source["time_index_end"])),
+                }
                 if unit.get("raw_frame_interval") != expected_frame:
                     errors.append(f"raw frame interval drift for {unit.get('evaluation_unit_id')}")
                 if unit.get("raw_time_interval") != expected_time:
                     errors.append(f"raw time interval drift for {unit.get('evaluation_unit_id')}")
+                if unit.get("source_segment_id") != source.get("source_segment_id"):
+                    errors.append(f"source segment drift for {unit.get('evaluation_unit_id')}")
+                if unit.get("source_segment_run_id") != source.get("source_segment_run_id"):
+                    errors.append(f"source segment-run drift for {unit.get('evaluation_unit_id')}")
         selection = dataset.get("selection_filter_parameters", {})
         workflow_file = resolved_inputs.get("alibaba_cluster_trace_2018_batch_task")
         if workflow_file is not None:

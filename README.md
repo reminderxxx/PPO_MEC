@@ -1,5 +1,15 @@
 # PPO_MEC
 
+G14B 已冻结 `historical_window_usage_registry_version=1.0.0`、
+`typed_model_cache_split_protocol_version=1.0.0` 与
+`typed_model_cache_formal_protocol_version=1.0.0`。Metadata-only 历史账本汇总 34,661 个窗口引用并
+折叠为 668 个 outer intervals；无法恢复的 418 个 interval 对 lankershim/peachtree/us_101 形成保守
+排除。完整 NGSIM 扫描在未消费 I-80 上构造 train/dev/formal/sealed-holdout=`24/12/12/12`，1,770
+个 pairwise interval 全部满足 raw frame/time/segment-run 互斥与 24-frame gap。Readiness v2 为
+`READY_FOR_G14C_CLEAN_TRAIN_AND_FORMAL`；这不是 formal 完成、checkpoint、性能结果或 paper-ready，
+holdout 仍 sealed。协议见 `docs/project/typed_model_cache_formal_protocol.md`，排除审计见
+`docs/project/typed_model_cache_split_exclusion_audit.md`。
+
 G13 冻结 `typed_model_cache_contract_version=1.0.0`：显式区分 RSU resident base model、adapter 与 migration-only workflow state；legacy adapter-only继续默认。typed profile只使用MB capacity，一个旧cache action确定性解析为最多2对象的atomic base+adapter dependency bundle，并提供dependency-safe eviction、CacheEvent 1.3 layered readiness/per-type bytes、G07 typed fairness binding、G08 tiny exact oracle和G06 type-aware metrics 1.1。受控及最小NGSIM+Alibaba验证位于`artifacts/analysis/typed_model_cache_validation_20260819_g13_v1/`；不是G14、算法优势或paper-ready证据。详见`docs/project/typed_model_cache_contract.md`。
 
 G11 冻结 `model_cache_dataset_registry_version=1.0.0`：截至 `2026-08-19` 从官方页面/API 核验 19 个 public model-serving、KV/prefix、model-artifact 与 AI workload 候选，固定 A–I taxonomy、19 项 field coverage、100 分 qualification 和 hard gates。结论为 A 类 joint VEC trace=0、C 类真实 adapter/LoRA request trace=0；BurstGPT 是最佳 B 类 request trace，Qwen-Bailian/Mooncake 是 D 类 KV trace，三个 HF 项仅可作 E 类 size metadata。接入严格 metadata-only，不改变 `NGSIM + Alibaba` 主线或正式 benchmark。详见 `docs/project/model_cache_dataset_discovery_audit_20260819.md`。

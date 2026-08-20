@@ -1,10 +1,12 @@
 ﻿# Context
 
-更新日期：2026-08-19
+更新日期：2026-08-20
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
 ## 项目状态
+
+- G14B formal protocol freeze：历史账本 `1.0.0`、split protocol `1.0.0` 与 formal protocol `1.0.0` 已冻结；train/dev/formal/sealed-holdout=`24/12/12/12`，60 个 outer windows 的 1,770 对 raw frame/time/segment-run 审计全部 safe，minimum gap=24。Readiness v2=`READY_FOR_G14C_CLEAN_TRAIN_AND_FORMAL`，evidence level=`E2_PROTOCOL_AND_CONTRACT_VALIDATED_NO_PERFORMANCE_DATA`。Holdout 仍 sealed/unopened；正式 checkpoint、formal result 与 paper-ready evidence 均不存在。G14C 必须从包含 protocol semantic SHA-256 `41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4` 的 Commit A clean worktree 另立任务执行。
 
 - G08 live contract：`cache_request_replay_version=1.0.0` + `future_horizon_cache_oracle_contract_v1.0.0`。输入必须是独立policy-neutral DAG/mobility replay；oracle只控制current-RSU placement/admission/eviction，并按当前环境同step admission可命中的真实时序运行exact rolling H=1/3/6/12。matched gap仅为placement opportunity gap，不是causal regret或latency gain；当前validation未运行formal/holdout/hidden。
 

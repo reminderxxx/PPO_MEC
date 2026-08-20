@@ -1,0 +1,44 @@
+{
+  "conservative_unknown_scope_segments": [
+    "lankershim",
+    "peachtree",
+    "us_101"
+  ],
+  "created_at": "2026-08-20T05:10:10.358272+00:00",
+  "duration_accounting": {
+    "conservatively_excluded_duration_time_units": 4599800,
+    "historically_consumed_union_duration_time_units": 455800,
+    "known_consumed_outside_conservative_scope_duration_time_units": 0,
+    "minimum_gap_excluded_duration_time_units": 0,
+    "overlap_accounting_rule": "known history inside a conservatively excluded segment is reported in the gross known union but subtracted only once through conservative exclusion",
+    "quality_excluded_duration_time_units": 9500,
+    "remaining_eligible_duration_time_units": 2777800,
+    "total_available_duration_time_units": 7387100
+  },
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "49ad0e1739ac17e361fb4100ebaab65a8e3aa16b5e8ce16c2d7c66c1cd02819f",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "54b9481dc134b34fa058bce3abd50b7fa14d46614b900012aaabbf21768a534c"
+  },
+  "historical_exclusion_audit_version": "1.0.0",
+  "historical_registry_semantic_sha256": "09ee3109f6789cada996870bcb6a3dac9496a4d98f8373c11cb99f61f55beaae",
+  "historically_consumed_duration_time_units": 455800,
+  "minimum_gap_frames": 24,
+  "passed": true,
+  "remaining_eligible_candidate_count": 579,
+  "result_blind": true,
+  "unknown_unique_interval_count": 418
+}

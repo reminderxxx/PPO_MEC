@@ -1,5 +1,16 @@
 # Artifact Records
 
+## 2026-08-20 G14B typed model-cache formal protocol freeze
+
+- path：`artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/`；config：`configs/experiment/typed_model_cache_formal_protocol_v1_20260820/`。
+- historical registry `1.0.0`：1,209 个 plan/result JSON、34,661 个 window references、931 个 unique run IDs，折叠为 668 个 outer intervals；250 known、418 unknown conservative。Semantic SHA-256=`09ee3109f6789cada996870bcb6a3dac9496a4d98f8373c11cb99f61f55beaae`。
+- full NGSIM inventory：11,850,526 rows、4 segments、10 continuous runs；remaining eligible duration=`2,777,800`，I-80 可形成 579 个不重叠 candidates。
+- split `1.0.0`：train/dev/formal/sealed-holdout=`24/12/12/12`，minimum gap=24；1,770/1,770 pairwise rows=`safe`。Semantic SHA-256=`aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a`。
+- formal protocol `1.0.0`：semantic SHA-256=`41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4`；agent/seed/equal budget/288-576-864 MB/endpoints/support/statistics/claims 全部训练前冻结。
+- readiness v2=`READY_FOR_G14C_CLEAN_TRAIN_AND_FORMAL`；evidence level=`E2_PROTOCOL_AND_CONTRACT_VALIDATED_NO_PERFORMANCE_DATA`；holdout sealed/unopened。
+- integrity manifest登记 18 个 artifact JSON 与 5 个 config JSON，共23个文件；semantic SHA-256=`7d8563ed9e0692ba8bc3ea77d11fbe268dae6e663c44b0b8f83a09400eec2e75`，checkpoint/performance result file count均为0。
+- boundary：formal episode=0、checkpoint=0、performance result=0；不是 formal completion、holdout evidence、algorithm ranking 或 paper-ready，不自动进入 G14C/G15。
+
 ## 2026-08-19: G12 causal predictor snapshot validation
 
 - Artifact root：`artifacts/analysis/causal_predictor_snapshot_validation_20260819_g12_v1/`；16个小型JSON，integrity aggregate SHA-256=`91c21a5775dd1c5d96561d03a52007be378570ed49111212e5dde847305d9cab`。
@@ -1208,4 +1219,4 @@ LRU/FIFO/LFU/Aging-LFU/Random 公平绑定、小规模 exact oracle，以及真�
 
 Run `g14a_rehearsal_20260819_230456_872949`使用`controlled_non_hidden`窗口、NGSIM + Alibaba最小骨架、seed 7/13、320/384 MB、五个reactive baseline与PPO/MAPPO。8个tiny checkpoint均通过typed provenance gate；28个typed episode的CacheEvent 1.3与metrics 1.1 reconciliation通过；legacy slot/MB各通过一次兼容运行。Top-level integrity manifest记录125个本地文件。
 
-证据边界：没有正式split/protocol、正式checkpoint、formal/holdout/hidden/support或G15；rehearsal checkpoint不进入Git或正式manifest。G14 readiness仍为blocked，下一步必须重新执行readiness gate。本记录不提供算法排名或paper-ready结论。
+证据边界：G14A 当时没有正式split/protocol、正式checkpoint、formal/holdout/hidden/support或G15；rehearsal checkpoint不进入Git或正式manifest。后续 G14B 已另行冻结 split/protocol 并通过 readiness v2，但没有追溯提升 G14A tiny checkpoint。本记录不提供算法排名或paper-ready结论。

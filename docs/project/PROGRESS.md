@@ -1,8 +1,17 @@
 ﻿# Progress
 
-## 2026-08-19: G14 Phase 0 typed model-cache formal readiness gate blocked
+## 2026-08-20: G14B historical exclusion、independent split 与 formal protocol 已冻结
 
-- 已按 `docs/project/top_journal_review_policy.md` 完成 G14 只读 readiness 审查；结论为 `BLOCKED / E0_UNAVAILABLE`，证据包见 `artifacts/analysis/typed_model_cache_formal_readiness_20260819_g14_blocked_v1/typed_model_cache_formal_readiness_review.json`。
+- 历史账本 `1.0.0` 以 metadata-only parser 扫描 1,209 个 plan/result JSON、34,661 个窗口引用，折叠为 668 个 unique outer intervals；250 个恢复 raw identity，418 个 unknown interval 对 lankershim/peachtree/us_101 形成保守排除。Registry semantic SHA-256=`09ee3109f6789cada996870bcb6a3dac9496a4d98f8373c11cb99f61f55beaae`。
+- 完整 NGSIM inventory 扫描 11,850,526 rows/4 segments/10 continuous runs；剩余 eligible duration=`2,777,800` time units，I-80 可形成 579 个不重叠 24-frame candidates。Split `1.0.0` 冻结 train/dev/formal/sealed-holdout=`24/12/12/12`，minimum gap=24；1,770 个 pairwise rows 全部 safe。Split semantic SHA-256=`aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a`。
+- Formal protocol `1.0.0` 冻结 11 个 controller-table agents、5 个 reactive policies、4 个 exact oracle cells、5 seeds、equal interaction budget、288/576/864 MB capacity、primary/secondary endpoints、ablation/support、hierarchical bootstrap/Holm 与 claim template。Protocol semantic SHA-256=`41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4`。
+- Readiness v2=`READY_FOR_G14C_CLEAN_TRAIN_AND_FORMAL`；preflight、三档 runtime/fairness、agent matrix、entrypoint parse、negative cases 与 holdout seal 均通过。Evidence level=`E2_PROTOCOL_AND_CONTRACT_VALIDATED_NO_PERFORMANCE_DATA`。
+- 本轮 formal episode=0、typed checkpoint=0、performance result=0；sealed holdout `opened=false`，未训练、未选 checkpoint、未运行 formal/holdout/hidden、未执行 G15。G14C 必须从 Commit A clean worktree 另立任务执行。
+- 合同：`docs/project/typed_model_cache_formal_protocol.md`；审计：`docs/project/typed_model_cache_split_exclusion_audit.md`；机器证据：`artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/`。
+
+## 2026-08-19: G14 Phase 0 typed model-cache formal readiness gate blocked（历史状态）
+
+- 已按 `docs/project/top_journal_review_policy.md` 完成 G14 只读 readiness 审查；当时结论为 `BLOCKED / E0_UNAVAILABLE`，证据包见 `artifacts/analysis/typed_model_cache_formal_readiness_20260819_g14_blocked_v1/typed_model_cache_formal_readiness_review.json`。该记录由 G14A/G14B 后续证据保留，但不再代表当前 readiness。
 - 当前 `benchmark_main_results.py` / G07 fairness runtime 仍只消费 `adapter_slots`，稳定 manifest builder 未绑定 typed MB profile；learned training runners 也不能消费 typed catalog 与 MB capacity，现有 checkpoint 均无 typed clean-retrain provenance。
 - 新的 train/dev/formal/sealed-holdout split 尚未完成冻结与全历史 frame/time/segment 排除审计；该结论仅表示 readiness 未验证，不表示 NGSIM 数据量不足。
 - 因硬 blocker，未冻结 G14 protocol version/hash，未创建 Commit A 或 clean execution worktree，未训练、未运行 formal/holdout、未打开 sealed holdout，且未执行 G15、调参或算法修改。
@@ -1440,4 +1449,4 @@ quick run 结果边界：
 - G07 fairness typed companion升级到consumer-safe 1.1；训练/评估/benchmark正式入口消费同一resolved runtime。Shared training入口覆盖SA-GHMAPPO、PPO、MAPPO和`cache_offload_drl`，checkpoint写typed provenance；typed learned benchmark强制external SHA/window/Git binding。
 - Controlled catalog补齐Alibaba `adapter_batch_type_1` repository-native映射；CacheEvent 1.3保证每typed request都有base+adapter dependency bundle，并修正typed vehicle-local miss为`unserved`。
 - `non_formal_typed_runtime_rehearsal`通过：2 seed × 2 MB capacity，8个PPO/MAPPO tiny checkpoint均compatible，五reactive + 两learned共28个typed episode；metrics 1.1独立重算一致；legacy slot/MB兼容通过。
-- G14 readiness仍未通过：split/final protocol未冻结、无正式checkpoint、未运行formal/holdout/hidden/G15。下一步必须重新执行readiness gate，不自动进入G14B。
+- 该 G14A 记录当时尚未通过 G14 readiness；后续 G14B 已冻结 split/final protocol 并通过 readiness v2。正式 checkpoint 仍不存在，且未运行 formal/holdout/hidden/G15；不得把 G14A tiny checkpoint升级为正式证据。

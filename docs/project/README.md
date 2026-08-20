@@ -4,6 +4,9 @@
 
 ## Live 文档
 
+- `typed_model_cache_formal_protocol.md`：G14B agent/seed/budget/capacity/metrics/statistics/claims/holdout seal 冻结合同
+- `typed_model_cache_split_exclusion_audit.md`：G14B 全历史 interval ledger、NGSIM inventory、24/12/12/12 split 与 pairwise independence 审计
+
 - `model_cache_dataset_discovery_audit_20260819.md`：G11 public model-serving/KV/model-artifact dataset taxonomy、qualification、HF复核、mapping与claim boundary
 - `cache_information_sufficiency_marl_audit_contract.md`：G10 observation coverage、recoverability、aliasing、information gain和entity-level MARL necessity门禁
 - `cache_request_replay_contract.md`：G08 policy-neutral request replay schema、fingerprint和outcome隔离规则
@@ -65,4 +68,11 @@
 - 合同：`typed_model_cache_runtime_contract.md`
 - 验证报告：`typed_model_cache_runtime_validation_report.md`
 - 机器证据：`../../artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/`
-- 状态：plumbing/rehearsal通过，但G14 readiness仍blocked；split/protocol与正式checkpoint留给G14B。
+- 状态：plumbing/rehearsal通过；后续 G14B 已冻结 split/protocol 并通过 readiness v2，但正式 checkpoint 仍不存在。
+
+## G14B formal protocol freeze
+
+- 合同：`typed_model_cache_formal_protocol.md`
+- 排除审计：`typed_model_cache_split_exclusion_audit.md`
+- 机器证据：`../../artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/`
+- 状态：`READY_FOR_G14C_CLEAN_TRAIN_AND_FORMAL`；formal episode/checkpoint/performance result均为0，holdout sealed/unopened，不是paper-ready。

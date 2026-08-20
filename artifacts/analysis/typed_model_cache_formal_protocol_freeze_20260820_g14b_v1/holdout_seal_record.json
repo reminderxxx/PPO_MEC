@@ -1,0 +1,75 @@
+{
+  "allowed_pre_open_metadata": [
+    "manifest identity",
+    "raw frame/time/segment intervals",
+    "outer count",
+    "dataset and split hashes"
+  ],
+  "consumed_permanently": false,
+  "execution_record": {
+    "append_only": true,
+    "maximum_successful_open_count": 1,
+    "required_fields": [
+      "opened_at",
+      "execution_commit",
+      "command",
+      "output_run_id",
+      "gate_results"
+    ]
+  },
+  "forbidden_pre_open_access": [
+    "reward",
+    "cache outcomes",
+    "agent outcomes",
+    "rankings",
+    "claim status"
+  ],
+  "formal_checkpoint_binding": "SHA-256 of immutable typed checkpoint provenance manifest required at opening",
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "3d9bcbe36d0e8749941067d3c134fee4733bc4c8614762af0ddc0f70bdb9de5f",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "3d9bcbe36d0e8749941067d3c134fee4733bc4c8614762af0ddc0f70bdb9de5f"
+  },
+  "holdout_manifest_identity": {
+    "outer_window_count": 12,
+    "outer_window_plan_sha256": "3570b5ab95ed1acd63ee0aea8d9b7714688e94f832f690a9584811dcba53bdfa",
+    "split_protocol_semantic_sha256": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a"
+  },
+  "holdout_seal_contract_version": "1.0.0",
+  "infrastructure_retry_conditions": [
+    "process terminated before any outcome row is durably written",
+    "verified storage corruption with original files retained",
+    "hardware/runtime failure unrelated to an agent outcome"
+  ],
+  "one_time_execution_token_sha256": null,
+  "one_time_execution_token_status": "not_issued_in_G14B",
+  "opened": false,
+  "opened_at": null,
+  "opening_gate": {
+    "allowed_checks": [
+      "training_and_eval_completeness",
+      "protocol_hash_consistency",
+      "checkpoint_provenance",
+      "fairness_manifest_validation",
+      "artifact_integrity",
+      "infrastructure_health"
+    ],
+    "formal_performance_threshold_forbidden": true,
+    "performance_gate_forbidden": true
+  },
+  "post_result_protocol_checkpoint_or_seed_change_forbidden": true,
+  "sealed": true
+}

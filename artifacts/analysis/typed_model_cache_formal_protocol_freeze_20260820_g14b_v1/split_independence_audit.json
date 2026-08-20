@@ -1,0 +1,38 @@
+{
+  "checked_interval_kinds": [
+    "raw_frame",
+    "raw_time",
+    "segment_frame"
+  ],
+  "conflicts": [],
+  "created_at": "2026-08-20T12:00:00+08:00",
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "3eeed0d1ad53258e87f3b9f5d053a7c97eb6a3be31481d09eb65b7ae8fe95993",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "799f24f9f69437aa8c459c643cedb678fc57932c12a4ef4e490f14f1c5e20dde"
+  },
+  "minimum_gap_frames": 24,
+  "mixed_full_variants_count_as_outer": false,
+  "outer_cluster_counts": {
+    "dev": 12,
+    "formal": 12,
+    "sealed_holdout": 12,
+    "train": 24
+  },
+  "passed": true,
+  "seed_workflow_repetitions_count_as_outer": false,
+  "split_independence_audit_version": "1.0.0"
+}

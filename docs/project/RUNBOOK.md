@@ -1,5 +1,44 @@
 # Runbook
 
+## G14B formal protocol freeze（只运行审计/preflight）
+
+冻结入口默认 create-only；它扫描历史 `selected_window_plan` metadata 和完整 NGSIM raw identity，
+不读取 reward/cache/oracle/agent outcome，不运行 episode 或生成 checkpoint：
+
+```bash
+PYTHONPYCACHEPREFIX=/tmp/ppo_mec_g14b_pycache \
+  .venv/bin/python scripts/freeze_typed_model_cache_formal_protocol.py \
+  --created_at 2026-08-20T12:00:00+08:00
+```
+
+冻结 config 位于 `configs/experiment/typed_model_cache_formal_protocol_v1_20260820/`，机器证据位于
+`artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/`。重复执行不得覆盖；
+若语义需要变化，必须升级 version、run ID 与 commit。现有 protocol semantic SHA-256 为
+`41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4`。
+
+完整性复核：
+
+```bash
+.venv/bin/python - <<'PY'
+import hashlib, json
+from pathlib import Path
+root = Path('artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1')
+config = Path('configs/experiment/typed_model_cache_formal_protocol_v1_20260820')
+manifest = json.loads((root / 'artifact_integrity_manifest.json').read_text())
+for row in manifest['files']:
+    base = root if row['scope'] == 'artifact' else config
+    assert hashlib.sha256((base / row['path']).read_bytes()).hexdigest() == row['sha256']
+assert manifest['checkpoint_file_count'] == 0
+assert manifest['performance_result_file_count'] == 0
+print(manifest['hashes']['semantic_sha256'])
+PY
+```
+
+Readiness 为 `READY_FOR_G14C_CLEAN_TRAIN_AND_FORMAL` 仅授权后续独立 G14C 任务从 Commit A clean
+worktree 开始。执行前必须核对 Git commit、protocol/split/runtime hash、formal output root 不存在和
+holdout `opened=false`。本节不提供 G14C 启动命令，不能用于打开 sealed holdout、运行 formal/hidden
+或执行 G15。
+
 ## G12 causal predictor calibration/snapshot audit
 
 稳定入口不训练 predictor、不运行 RL benchmark，也不读取 formal/holdout/hidden：
@@ -914,4 +953,4 @@ legacy 兼容 dry-run 默认仍为 `legacy_adapter_only_v1`。只有显式传入
 
 该入口固定label为`non_formal_typed_runtime_rehearsal`，只使用`controlled_non_hidden`计划，运行2 seed、320/384 MB、五reactive baseline与PPO/MAPPO tiny serialization/restore。输出位于`artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/`。不得把其中checkpoint复制到formal manifest。
 
-Typed benchmark必须同时给出validated fairness manifest；含learned agent时还必须给出`--checkpoint_provenance_manifest_path`。旧legacy benchmark可使用`legacy_adapter_slots_lru.yaml`或`legacy_adapter_mb_lru.yaml`，不提供fairness manifest时provenance明确为unavailable。G14B前不得运行formal/holdout/hidden。
+Typed benchmark必须同时给出validated fairness manifest；含learned agent时还必须给出`--checkpoint_provenance_manifest_path`。旧legacy benchmark可使用`legacy_adapter_slots_lru.yaml`或`legacy_adapter_mb_lru.yaml`，不提供fairness manifest时provenance明确为unavailable。G14B 已冻结协议，但 formal/holdout/hidden 仍只能由后续独立 G14C/holdout 任务按 seal gate 执行。

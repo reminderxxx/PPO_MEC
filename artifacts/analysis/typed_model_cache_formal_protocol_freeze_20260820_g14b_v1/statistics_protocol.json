@@ -1,0 +1,59 @@
+{
+  "confidence_intervals": [
+    "percentile_95",
+    "BCa_95"
+  ],
+  "created_at": "2026-08-20T12:00:00+08:00",
+  "effect_sizes": [
+    "paired Cohen dz",
+    "outer-window standardized mean delta"
+  ],
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "3a809642362da0bf32a659a9ce813a5b93b61689acdc9dc36848725d3e056292",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "a512897a28f24b02a983eff0211e17ba9478b80f4683ef4ac74c47ee96eefa24"
+  },
+  "hierarchical_bootstrap": {
+    "bootstrap_seed": 1401,
+    "inner_cluster_keys": [
+      "seed",
+      "workflow_id"
+    ],
+    "mixed_full_dependence": "same outer interval clustered once; never treated as two outer samples",
+    "outer_cluster_keys": [
+      "source_segment_run_id",
+      "window_id"
+    ],
+    "replicates": 10000
+  },
+  "missing_or_failed_run_policy": {
+    "algorithmic_failure": "retain as failure/missing under worst-case sensitivity; never delete seed/window",
+    "infrastructure_failure": "one identical-command retry; preserve both records",
+    "minimum_complete_outer_clusters": 12,
+    "post_result_seed_or_window_deletion": false
+  },
+  "multiplicity": {
+    "alpha": 0.05,
+    "method": "Holm",
+    "primary_family": "all preregistered primary comparisons x six primary endpoints",
+    "secondary_family": "exploratory; separate Holm family and no primary-confirmatory language"
+  },
+  "outer_unit": "raw-time mobility window",
+  "paired_test": "exact two-sided sign test after dropping preregistered numerical ties",
+  "statistics_protocol_version": "typed_model_cache_statistics_v1.0.0",
+  "tie_tolerance": 1e-09,
+  "win_tie_loss": true
+}

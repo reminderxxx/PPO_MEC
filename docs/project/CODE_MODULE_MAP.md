@@ -1,5 +1,14 @@
 # Code Module Map
 
+## G14B historical exclusion、split 与 formal protocol
+
+- `src/evaluators/typed_model_cache_formal_protocol.py`：metadata-only 历史 plan parser、完整 NGSIM interval inventory、raw frame/time/segment-run overlap、result-blind deterministic split、canonical/full/semantic hash、formal/statistics/claim/holdout/readiness 合同与 fail-fast validator；不执行算法或环境 episode。
+- `scripts/freeze_typed_model_cache_formal_protocol.py`：create-only transactional freeze 入口；编排历史账本、I-80 candidates、24/12/12/12 split、agent/capacity/fairness/CLI preflight、seal/readiness 和 integrity manifest，不训练或生成 checkpoint。
+- `src/evaluators/cache_baseline_fairness.py`：fairness window identity 绑定扩展为 raw frame/time 和 source segment/run，避免把 provider offset 冒充 raw interval；legacy optional 字段保持兼容。
+- `configs/experiment/typed_model_cache_formal_protocol_v1_20260820/`：四个冻结 window plans 与 protocol index；sealed holdout 只允许 validator 读取 identity/interval。
+- `tests/test_typed_model_cache_formal_protocol.py`：历史、overlap/gap、12+12、result-blind、hash、agent/budget/capacity/statistics/claim、CLI、seal/append-only/readiness/round-trip 专项合同测试。
+- `docs/project/typed_model_cache_formal_protocol.md` 与 `typed_model_cache_split_exclusion_audit.md`：协议与证据边界的长期事实源。
+
 ## G12 causal calibrated predictor snapshots
 
 - `src/predictors/calibration.py`：pure binary/multiclass/ETA/reliability/selective reducers，deterministic temperature fit、三段split interval audit与canonical hash。

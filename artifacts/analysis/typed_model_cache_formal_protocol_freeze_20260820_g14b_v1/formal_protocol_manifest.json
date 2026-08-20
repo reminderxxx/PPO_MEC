@@ -1,0 +1,686 @@
+{
+  "ablation_and_support": {
+    "capacity": [
+      "constrained",
+      "medium",
+      "relaxed"
+    ],
+    "oracle_state_limit": "report exact or unknown_state_limit",
+    "predictor_boundary": "baseline only; G12 supervised disabled",
+    "scalability": [
+      "rsu_count",
+      "vehicle_count",
+      "dag_size",
+      "object_count"
+    ],
+    "sensitivity": [
+      "object_size_scale",
+      "transfer_cost_scale",
+      "handoff_pressure",
+      "reuse_opportunity",
+      "base_sharing_degree"
+    ],
+    "typed_semantics": [
+      "typed_full",
+      "legacy_adapter_only",
+      "no_base_sharing",
+      "no_workflow_state_migration",
+      "fixed_no_eviction",
+      "no_prediction"
+    ]
+  },
+  "agent_matrix": {
+    "controller_level_boundary": "SA-GHMAPPO, MAPPO, QMIX, and MAT are controller-level contracts, not vehicle/RSU entity-level MARL.",
+    "controller_table": [
+      {
+        "action_contract": "semantic_discrete_5_multi_head",
+        "agent": "sa_ghmappo",
+        "budget_class": "neural_equal_environment_interactions",
+        "checkpoint_selection_rule": "frozen dev lexicographic system endpoint rule; never formal/holdout",
+        "incompatibility_handling": "fail-fast; no legacy checkpoint substitution and no post-run deletion",
+        "observation_contract": "graph_surrogate_semantic_encoder",
+        "registry_identity": "sa_ghmappo",
+        "status": "paper_grade_current_contract",
+        "training_requirement": "clean_typed_checkpoint_per_seed_and_capacity"
+      },
+      {
+        "action_contract": "semantic_discrete_5",
+        "agent": "ppo",
+        "budget_class": "neural_equal_environment_interactions",
+        "checkpoint_selection_rule": "frozen dev lexicographic system endpoint rule; never formal/holdout",
+        "incompatibility_handling": "fail-fast; no legacy checkpoint substitution and no post-run deletion",
+        "observation_contract": "flat_semantic_encoder_v1",
+        "registry_identity": "ppo",
+        "status": "paper_grade_current_contract",
+        "training_requirement": "clean_typed_checkpoint_per_seed_and_capacity"
+      },
+      {
+        "action_contract": "semantic_discrete_5_multi_controller_3head",
+        "agent": "mappo",
+        "budget_class": "neural_equal_environment_interactions",
+        "checkpoint_selection_rule": "frozen dev lexicographic system endpoint rule; never formal/holdout",
+        "incompatibility_handling": "fail-fast; no legacy checkpoint substitution and no post-run deletion",
+        "observation_contract": "flat_semantic_multi_controller_ctde_v1",
+        "registry_identity": "mappo",
+        "status": "paper_grade_current_contract",
+        "training_requirement": "clean_typed_checkpoint_per_seed_and_capacity"
+      },
+      {
+        "action_contract": "semantic_discrete_5",
+        "agent": "dqn",
+        "budget_class": "neural_equal_environment_interactions",
+        "checkpoint_selection_rule": "frozen dev lexicographic system endpoint rule; never formal/holdout",
+        "incompatibility_handling": "fail-fast; no legacy checkpoint substitution and no post-run deletion",
+        "observation_contract": "flat_semantic_encoder_v1",
+        "registry_identity": "dqn",
+        "status": "paper_grade_current_contract",
+        "training_requirement": "clean_typed_checkpoint_per_seed_and_capacity"
+      },
+      {
+        "action_contract": "semantic_discrete_5",
+        "agent": "dueling_dqn",
+        "budget_class": "neural_equal_environment_interactions",
+        "checkpoint_selection_rule": "frozen dev lexicographic system endpoint rule; never formal/holdout",
+        "incompatibility_handling": "fail-fast; no legacy checkpoint substitution and no post-run deletion",
+        "observation_contract": "flat_semantic_encoder_v1",
+        "registry_identity": "dueling_dqn",
+        "status": "paper_grade_current_contract",
+        "training_requirement": "clean_typed_checkpoint_per_seed_and_capacity"
+      },
+      {
+        "action_contract": "semantic_discrete_5_multi_controller_3head_qmix",
+        "agent": "qmix",
+        "budget_class": "neural_equal_environment_interactions",
+        "checkpoint_selection_rule": "frozen dev lexicographic system endpoint rule; never formal/holdout",
+        "incompatibility_handling": "fail-fast; no legacy checkpoint substitution and no post-run deletion",
+        "observation_contract": "flat_semantic_multi_controller_ctde_v1",
+        "registry_identity": "qmix",
+        "status": "paper_grade_current_contract",
+        "training_requirement": "clean_typed_checkpoint_per_seed_and_capacity"
+      },
+      {
+        "action_contract": "semantic_discrete_5_controller_transformer_3head",
+        "agent": "controller_mat",
+        "budget_class": "neural_equal_environment_interactions",
+        "checkpoint_selection_rule": "frozen dev lexicographic system endpoint rule; never formal/holdout",
+        "incompatibility_handling": "fail-fast; no legacy checkpoint substitution and no post-run deletion",
+        "observation_contract": "flat_semantic_controller_transformer_ctde_v1",
+        "registry_identity": "controller_mat",
+        "status": "paper_grade_current_contract",
+        "training_requirement": "clean_typed_checkpoint_per_seed_and_capacity"
+      },
+      {
+        "action_contract": "semantic_discrete_5_dag_offload_3head",
+        "agent": "dag_offload_drl",
+        "budget_class": "neural_equal_environment_interactions",
+        "checkpoint_selection_rule": "frozen dev lexicographic system endpoint rule; never formal/holdout",
+        "incompatibility_handling": "fail-fast; no legacy checkpoint substitution and no post-run deletion",
+        "observation_contract": "flat_semantic_plus_dag_scalar_offload_v1",
+        "registry_identity": "dag_offload_drl",
+        "status": "paper_grade_current_contract",
+        "training_requirement": "clean_typed_checkpoint_per_seed_and_capacity"
+      },
+      {
+        "action_contract": "semantic_discrete_5_cache_offload_3head",
+        "agent": "cache_offload_drl",
+        "budget_class": "neural_equal_environment_interactions",
+        "checkpoint_selection_rule": "frozen dev lexicographic system endpoint rule; never formal/holdout",
+        "incompatibility_handling": "fail-fast; no legacy checkpoint substitution and no post-run deletion",
+        "observation_contract": "flat_semantic_plus_cache_offload_v1",
+        "registry_identity": "cache_offload_drl",
+        "status": "paper_grade_current_contract",
+        "training_requirement": "clean_typed_checkpoint_per_seed_and_capacity"
+      },
+      {
+        "action_contract": "semantic_discrete_5_dt_handoff_3head",
+        "agent": "dt_handoff_drl",
+        "budget_class": "neural_equal_environment_interactions",
+        "checkpoint_selection_rule": "frozen dev lexicographic system endpoint rule; never formal/holdout",
+        "incompatibility_handling": "fail-fast; no legacy checkpoint substitution and no post-run deletion",
+        "observation_contract": "flat_semantic_plus_dt_handoff_v1",
+        "registry_identity": "dt_handoff_drl",
+        "status": "paper_grade_current_contract",
+        "training_requirement": "clean_typed_checkpoint_per_seed_and_capacity"
+      },
+      {
+        "action_contract": "semantic_discrete_5",
+        "agent": "popularity_cache_heuristic",
+        "budget_class": "checkpoint_free_controller",
+        "checkpoint_selection_rule": "frozen dev lexicographic system endpoint rule; never formal/holdout",
+        "incompatibility_handling": "fail-fast; no legacy checkpoint substitution and no post-run deletion",
+        "observation_contract": "semantic_state_info_v1",
+        "registry_identity": "popularity_cache_heuristic",
+        "status": "matched_heuristic",
+        "training_requirement": "checkpoint_free"
+      }
+    ],
+    "exact_oracle_cells": [
+      {
+        "agent": "exact_oracle_h1",
+        "budget_class": "exact_solver_state_limit",
+        "horizon": 1,
+        "status": "report_only_when_solver_status_exact",
+        "training_requirement": "none",
+        "unknown_handling": "unknown_state_limit; never greedy fallback or upper-bound claim"
+      },
+      {
+        "agent": "exact_oracle_h3",
+        "budget_class": "exact_solver_state_limit",
+        "horizon": 3,
+        "status": "report_only_when_solver_status_exact",
+        "training_requirement": "none",
+        "unknown_handling": "unknown_state_limit; never greedy fallback or upper-bound claim"
+      },
+      {
+        "agent": "exact_oracle_h6",
+        "budget_class": "exact_solver_state_limit",
+        "horizon": 6,
+        "status": "report_only_when_solver_status_exact",
+        "training_requirement": "none",
+        "unknown_handling": "unknown_state_limit; never greedy fallback or upper-bound claim"
+      },
+      {
+        "agent": "exact_oracle_h12",
+        "budget_class": "exact_solver_state_limit",
+        "horizon": 12,
+        "status": "report_only_when_solver_status_exact",
+        "training_requirement": "none",
+        "unknown_handling": "unknown_state_limit; never greedy fallback or upper-bound claim"
+      }
+    ],
+    "excluded_live_agents": {
+      "ddqn": "independent implementation but not in the frozen current paper-grade default set",
+      "dueling_ddqn": "independent implementation but not in the frozen current paper-grade default set",
+      "ippo": "diagnostic only; current wrapper is not independent entity-level IPPO",
+      "reactive_greedy": "superseded for cache-policy isolation by the five matched reactive policies"
+    },
+    "post_result_baseline_removal_forbidden": true,
+    "reactive_cache_policy_isolation": [
+      {
+        "agent": "reactive_lru",
+        "budget_class": "checkpoint_free_reactive",
+        "eviction_policy": "lru",
+        "only_primary_difference": "eviction_policy",
+        "registry_identity": "reactive_lru",
+        "training_requirement": "none"
+      },
+      {
+        "agent": "reactive_fifo",
+        "budget_class": "checkpoint_free_reactive",
+        "eviction_policy": "fifo",
+        "only_primary_difference": "eviction_policy",
+        "registry_identity": "reactive_fifo",
+        "training_requirement": "none"
+      },
+      {
+        "agent": "reactive_lfu",
+        "budget_class": "checkpoint_free_reactive",
+        "eviction_policy": "lfu",
+        "only_primary_difference": "eviction_policy",
+        "registry_identity": "reactive_lfu",
+        "training_requirement": "none"
+      },
+      {
+        "agent": "reactive_aging_lfu",
+        "budget_class": "checkpoint_free_reactive",
+        "eviction_policy": "aging_lfu",
+        "only_primary_difference": "eviction_policy",
+        "registry_identity": "reactive_aging_lfu",
+        "training_requirement": "none"
+      },
+      {
+        "agent": "reactive_random",
+        "budget_class": "checkpoint_free_reactive",
+        "eviction_policy": "random_seed_bound_to_benchmark_seed",
+        "only_primary_difference": "eviction_policy",
+        "registry_identity": "reactive_random",
+        "training_requirement": "none"
+      }
+    ]
+  },
+  "claim_evidence_map": {
+    "claim_evidence_template_version": "1.0.0",
+    "no_result_status_assigned_during_g14b": true,
+    "pre_registered_before_training": true,
+    "rows": [
+      {
+        "allowed_result_statuses": [
+          "supported",
+          "mixed",
+          "unsupported",
+          "contradicted",
+          "unavailable"
+        ],
+        "claim_id": "typed_base_sharing",
+        "claim_text": null,
+        "endpoint_or_boundary": "sharing_reuse_and_avoided_duplicate_transfer",
+        "formal_evidence_path": null,
+        "required_evidence": "typed full vs no-base-sharing",
+        "result_status": null,
+        "sealed_holdout_evidence_path": null
+      },
+      {
+        "allowed_result_statuses": [
+          "supported",
+          "mixed",
+          "unsupported",
+          "contradicted",
+          "unavailable"
+        ],
+        "claim_id": "byte_hit",
+        "claim_text": null,
+        "endpoint_or_boundary": "full_service_ready_byte_hit_rate",
+        "formal_evidence_path": null,
+        "required_evidence": "typed full vs matched non-oracle baselines",
+        "result_status": null,
+        "sealed_holdout_evidence_path": null
+      },
+      {
+        "allowed_result_statuses": [
+          "supported",
+          "mixed",
+          "unsupported",
+          "contradicted",
+          "unavailable"
+        ],
+        "claim_id": "transfer_overhead",
+        "claim_text": null,
+        "endpoint_or_boundary": "transfer_mb_per_request",
+        "formal_evidence_path": null,
+        "required_evidence": "paired raw CacheEvent transfer bytes",
+        "result_status": null,
+        "sealed_holdout_evidence_path": null
+      },
+      {
+        "allowed_result_statuses": [
+          "supported",
+          "mixed",
+          "unsupported",
+          "contradicted",
+          "unavailable"
+        ],
+        "claim_id": "workflow_continuity",
+        "claim_text": null,
+        "endpoint_or_boundary": "workflow_continuity_rate",
+        "formal_evidence_path": null,
+        "required_evidence": "paired workflow outcomes by outer window",
+        "result_status": null,
+        "sealed_holdout_evidence_path": null
+      },
+      {
+        "allowed_result_statuses": [
+          "supported",
+          "mixed",
+          "unsupported",
+          "contradicted",
+          "unavailable"
+        ],
+        "claim_id": "capacity_pressure",
+        "claim_text": null,
+        "endpoint_or_boundary": "primary endpoints across three frozen MB strata",
+        "formal_evidence_path": null,
+        "required_evidence": "capacity support matrix",
+        "result_status": null,
+        "sealed_holdout_evidence_path": null
+      },
+      {
+        "allowed_result_statuses": [
+          "supported",
+          "mixed",
+          "unsupported",
+          "contradicted",
+          "unavailable"
+        ],
+        "claim_id": "eviction_policy",
+        "claim_text": null,
+        "endpoint_or_boundary": "hit/transfer/pollution/churn",
+        "formal_evidence_path": null,
+        "required_evidence": "five reactive policies under G07 only-policy difference",
+        "result_status": null,
+        "sealed_holdout_evidence_path": null
+      },
+      {
+        "allowed_result_statuses": [
+          "supported",
+          "mixed",
+          "unsupported",
+          "contradicted",
+          "unavailable"
+        ],
+        "claim_id": "oracle_opportunity",
+        "claim_text": null,
+        "endpoint_or_boundary": "exact feasible opportunity gap",
+        "formal_evidence_path": null,
+        "required_evidence": "H=1/3/6/12 exact cells only",
+        "result_status": null,
+        "sealed_holdout_evidence_path": null
+      },
+      {
+        "allowed_result_statuses": [
+          "supported",
+          "mixed",
+          "unsupported",
+          "contradicted",
+          "unavailable"
+        ],
+        "claim_id": "controller_comparison",
+        "claim_text": null,
+        "endpoint_or_boundary": "six primary endpoints",
+        "formal_evidence_path": null,
+        "required_evidence": "SA-GHMAPPO vs preregistered strongest dev baseline",
+        "result_status": null,
+        "sealed_holdout_evidence_path": null
+      },
+      {
+        "allowed_result_statuses": [
+          "supported",
+          "mixed",
+          "unsupported",
+          "contradicted",
+          "unavailable"
+        ],
+        "claim_id": "predictor_boundary",
+        "claim_text": null,
+        "endpoint_or_boundary": "prediction support endpoints",
+        "formal_evidence_path": null,
+        "required_evidence": "baseline predictor; G12 supervised disabled",
+        "result_status": null,
+        "sealed_holdout_evidence_path": null
+      },
+      {
+        "allowed_result_statuses": [
+          "supported",
+          "mixed",
+          "unsupported",
+          "contradicted",
+          "unavailable"
+        ],
+        "claim_id": "data_realism_boundary",
+        "claim_text": null,
+        "endpoint_or_boundary": "provenance only",
+        "formal_evidence_path": null,
+        "required_evidence": "NGSIM + Alibaba DAG + controlled typed catalog statement",
+        "result_status": null,
+        "sealed_holdout_evidence_path": null
+      }
+    ]
+  },
+  "comparisons": {
+    "formal_or_holdout_strongest_selection_forbidden": true,
+    "primary": [
+      "SA-GHMAPPO vs strongest matched non-oracle baseline selected once on dev",
+      "typed full vs legacy adapter-only",
+      "best compatible learned controller vs best reactive baseline",
+      "five reactive policies vs exact oracle only in exact solver cells"
+    ],
+    "strongest_baseline_dev_rule": [
+      "eligible non-oracle controller-table baselines excluding SA-GHMAPPO",
+      "maximize full_service_ready_byte_hit_rate",
+      "maximize workflow_continuity_rate",
+      "minimize transfer_mb_per_request",
+      "minimize end_to_end_workflow_delay",
+      "lexical agent identity tie-break"
+    ]
+  },
+  "created_at": "2026-08-20T12:00:00+08:00",
+  "endpoints": {
+    "latency_saved_status": "unavailable",
+    "primary": [
+      "full_service_ready_byte_hit_rate",
+      "joint_base_adapter_hit_rate",
+      "full_service_ready_request_rate",
+      "transfer_mb_per_request",
+      "workflow_continuity_rate",
+      "end_to_end_workflow_delay"
+    ],
+    "secondary": [
+      "base_model_hit_rate",
+      "adapter_hit_rate",
+      "base_sharing_reuse",
+      "avoided_duplicate_transfer_mb",
+      "cache_pollution_ratio",
+      "cache_churn_mb",
+      "eviction_future_reuse_proxy",
+      "occupancy_and_saturation",
+      "bundle_rejection_rate",
+      "backhaul_traffic_cost",
+      "handoff_failure_rate",
+      "workflow_state_migration_overhead",
+      "total_reward",
+      "inference_wall_clock_sec",
+      "python_peak_increment_bytes",
+      "oracle_state_count_and_solve_time",
+      "cache_latency_saved_sum_ms_unavailable"
+    ]
+  },
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "34b3e9c6b449260b1c411f9ba23fa50d831aef4396eff32f87ea06dee1765361",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4"
+  },
+  "holdout_execution_contract": {
+    "opened": false,
+    "performance_gate_forbidden": true,
+    "seal_semantic_sha256": "3d9bcbe36d0e8749941067d3c134fee4733bc4c8614762af0ddc0f70bdb9de5f",
+    "sealed": true
+  },
+  "identity": {
+    "cache_efficiency_metrics_contract_version": "1.1.0",
+    "cache_event_schema_version": "1.3.0",
+    "catalog_fingerprint": "89c548980b63df733553d748e8db3ca622965b63abcd08ebd4c231790b40a9d6",
+    "dataset_hashes": {
+      "alibaba_batch_task_sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc",
+      "ngsim_sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+      "typed_catalog_file_sha256": "0be81a904f09ca0e8976926caf064f095f6d9fb4173cfa1f0a8eed7042f62b2c"
+    },
+    "execution_git_commit_binding": "Commit A containing this exact protocol semantic hash; clean worktree must resolve to that commit",
+    "fairness_manifest_version": "1.1.0",
+    "historical_registry_semantic_sha256": "09ee3109f6789cada996870bcb6a3dac9496a4d98f8373c11cb99f61f55beaae",
+    "split_semantic_sha256": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+    "top_journal_policy_version": "tmc_review_policy_v3_20260621",
+    "typed_runtime_contract_hashes_by_capacity": {
+      "constrained": "84d88d58c71f0775858e2e38ea544bec4fa657d08ed918567d2c2dff48f418a0",
+      "medium": "e811a16576a21b499848d9325d02d7bd94c04e754854b22f5c453c80b66104d8",
+      "relaxed": "2ef6f7f98ad4007fc16bd5cf6d30a6ee026ae8340ce321b3aebe6272a50420ba"
+    },
+    "typed_runtime_contract_version": "typed_model_cache_runtime_contract_v1.0.0"
+  },
+  "immutability": {
+    "canonical_json": "sorted UTF-8 compact JSON; NaN/Infinity rejected",
+    "change_rule": "new version + new Git commit + new run ID; old protocol retained",
+    "cli_semantic_overrides": "rejected",
+    "semantic_nonsemantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "validator_mode": "read-only after freeze"
+  },
+  "paper_claim_boundary": "Protocol freeze is not formal completion, not holdout opening, not a checkpoint, not a performance result, and not paper-ready evidence.",
+  "protocol_id": "typed_model_cache_formal_protocol_v1",
+  "seed_plan": {
+    "resource_decision": "five seeds frozen before execution; no post-run deletion or reduction",
+    "seeds": [
+      7,
+      13,
+      29,
+      43,
+      71
+    ]
+  },
+  "statistics": {
+    "confidence_intervals": [
+      "percentile_95",
+      "BCa_95"
+    ],
+    "effect_sizes": [
+      "paired Cohen dz",
+      "outer-window standardized mean delta"
+    ],
+    "hierarchical_bootstrap": {
+      "bootstrap_seed": 1401,
+      "inner_cluster_keys": [
+        "seed",
+        "workflow_id"
+      ],
+      "mixed_full_dependence": "same outer interval clustered once; never treated as two outer samples",
+      "outer_cluster_keys": [
+        "source_segment_run_id",
+        "window_id"
+      ],
+      "replicates": 10000
+    },
+    "missing_or_failed_run_policy": {
+      "algorithmic_failure": "retain as failure/missing under worst-case sensitivity; never delete seed/window",
+      "infrastructure_failure": "one identical-command retry; preserve both records",
+      "minimum_complete_outer_clusters": 12,
+      "post_result_seed_or_window_deletion": false
+    },
+    "multiplicity": {
+      "alpha": 0.05,
+      "method": "Holm",
+      "primary_family": "all preregistered primary comparisons x six primary endpoints",
+      "secondary_family": "exploratory; separate Holm family and no primary-confirmatory language"
+    },
+    "outer_unit": "raw-time mobility window",
+    "paired_test": "exact two-sided sign test after dropping preregistered numerical ties",
+    "statistics_protocol_version": "typed_model_cache_statistics_v1.0.0",
+    "tie_tolerance": 1e-09,
+    "win_tie_loss": true
+  },
+  "status": "frozen_pre_training_no_performance_data",
+  "training_budget": {
+    "algorithm_intrinsic_differences": [
+      "on-policy vs replay-based update mechanics",
+      "controller-level CTDE/value decomposition vs flat controller",
+      "network architecture and optimizer state size"
+    ],
+    "batch_size": 64,
+    "budget_version": "typed_model_cache_equal_interaction_budget_v1.0.0",
+    "checkpoint_frequency_updates": 4,
+    "checkpoint_selection": {
+      "formal_or_holdout_selection_forbidden": true,
+      "metric_rule": [
+        "maximize full_service_ready_byte_hit_rate",
+        "maximize workflow_continuity_rate",
+        "minimize transfer_mb_per_request",
+        "minimize end_to_end_workflow_delay",
+        "earlier update then lexical checkpoint hash tie-break"
+      ],
+      "split": "dev"
+    },
+    "device": "cpu",
+    "early_stop": "disabled; fixed interaction budget",
+    "entropy_and_value_coefficients": {
+      "mappo": {
+        "entropy_coef": 0.015,
+        "value_coef": 0.65
+      },
+      "other_on_policy": {
+        "entropy_coef": 0.01,
+        "value_coef": 0.5
+      },
+      "sa_ghmappo": {
+        "auxiliary_coef": 0.06,
+        "entropy_coef": 0.004,
+        "value_coef": 0.7
+      },
+      "value_based": {
+        "entropy_coef": "not_applicable",
+        "value_coef": 1.0
+      }
+    },
+    "episodes_per_learned_agent_seed_capacity": 256,
+    "equal_budget_rule": "all learned agents receive identical maximum environment interactions per seed/capacity; intrinsic update/replay differences are retained and reported",
+    "expected_update_count": 32,
+    "learning_rates": {
+      "cache_offload_drl": 0.0003,
+      "controller_mat": 0.0003,
+      "dag_offload_drl": 0.0003,
+      "dqn": 0.0003,
+      "dt_handoff_drl": 0.0003,
+      "dueling_dqn": 0.0003,
+      "mappo": 0.0002,
+      "ppo": 0.0003,
+      "qmix": 0.0003,
+      "sa_ghmappo": 0.0001
+    },
+    "max_steps_per_episode": 22,
+    "maximum_environment_interactions_per_learned_agent_seed_capacity": 5632,
+    "maximum_total_compute_budget_cpu_hours": 2500,
+    "maximum_wall_clock_per_learned_agent_seed_capacity_hours": 12,
+    "optimizer": "Adam (algorithm-native implementation; no optimizer substitution after freeze)",
+    "retry": "one identical-command infrastructure retry; no reseed or post-result replacement",
+    "train_window_count": 24,
+    "update_interval_episodes": 8,
+    "workflow_count": 3
+  },
+  "typed_catalog_and_capacity": {
+    "base_adapter_dependency_fingerprint": "0f8fcd018635426d67eb78af567456d3f7b31a6bac48ac876baee751d09ddcb9",
+    "capacity_contract_semantic_sha256": "4770ca66905242c53f3b8cf9d9a54f2a8fc1971a18f6cf1b336fa759d76cd768",
+    "capacity_result_dependent_adjustment": false,
+    "capacity_strata": [
+      {
+        "capacity_mb": 288.0,
+        "derivation": "ceil(max(max initial-RSU resident MB, largest atomic base+adapter bundle MB)/32)*32",
+        "stratum": "constrained"
+      },
+      {
+        "capacity_mb": 576.0,
+        "derivation": "ceil(mean(constrained MB, relaxed MB)/32)*32",
+        "stratum": "medium"
+      },
+      {
+        "capacity_mb": 864.0,
+        "derivation": "ceil(total repository-controlled capacity-counting base+adapter resident MB/32)*32",
+        "stratum": "relaxed"
+      }
+    ],
+    "catalog_fingerprint": "89c548980b63df733553d748e8db3ca622965b63abcd08ebd4c231790b40a9d6",
+    "catalog_source": "repository-controlled typed_model_cache_controlled.json",
+    "hf_metadata_formal_use": false,
+    "initial_typed_state_fingerprint": "fb0cdbfa761477f4c39bc3416181b475c8884a1c1433edc56d7f2541fc6cac46",
+    "kv_prefix_enabled": false,
+    "pinned_evictability_fingerprint": "220f27d6a38d28852e43f1e65e0af8b5aa8399ad6bd785a89246a3de7cd270c7",
+    "workflow_state_long_term_capacity": false
+  },
+  "typed_model_cache_formal_protocol_version": "1.0.0",
+  "workload": {
+    "cross_source_boundary": "NGSIM mobility + Alibaba DAG + repository-controlled typed catalog; not a real joint model-cache request trace",
+    "g12_supervised_predictor_enabled": false,
+    "max_steps": 22,
+    "mobility": "NGSIM",
+    "predictor_kind": "baseline",
+    "request_replay": "static DAG pre-run fingerprint plus observed identical cross-agent request fingerprint",
+    "rsu_layout": "auto_dominant_tight",
+    "vehicle_selection": "handoff_pressure frozen runner rule; split selection itself did not use handoff outcomes",
+    "window_length": 24,
+    "workflow_ids": [
+      "j_3",
+      "j_8",
+      "j_15"
+    ],
+    "workflow_structure": "Alibaba 2018 batch DAG"
+  }
+}

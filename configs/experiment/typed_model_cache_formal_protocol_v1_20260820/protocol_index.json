@@ -1,0 +1,11 @@
+{
+  "artifact_path": "artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1",
+  "artifact_run_id": "typed_model_cache_formal_protocol_freeze_20260820_g14b_v1",
+  "execution_commit_binding": "Commit A containing this exact index and protocol hash",
+  "formal_protocol_semantic_sha256": "41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4",
+  "holdout_sealed": true,
+  "performance_results_present": false,
+  "split_semantic_sha256": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+  "status": "frozen_pre_training_no_performance_data",
+  "typed_model_cache_formal_protocol_version": "1.0.0"
+}

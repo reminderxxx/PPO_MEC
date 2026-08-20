@@ -1,0 +1,146 @@
+{
+  "agent_compatibility_audit_version": "1.0.0",
+  "created_at": "2026-08-20T12:00:00+08:00",
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "d92b76b231e2c04f72c2f7bb5c148075755bf2efea92f9cafc33ce0f557f7ba2",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "298a02607212becab415c45f284b240d660cb2b87004992940b8007fd1e8954b"
+  },
+  "paper_grade_controller_boundary": "SA-GHMAPPO, MAPPO, QMIX, and MAT are controller-level contracts, not vehicle/RSU entity-level MARL.",
+  "passed": true,
+  "rows": [
+    {
+      "agent": "sa_ghmappo",
+      "class": "SAGHMAPPOAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "ppo",
+      "class": "PPOAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "mappo",
+      "class": "MAPPOAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "dqn",
+      "class": "DQNAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "dueling_dqn",
+      "class": "DuelingDQNAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "qmix",
+      "class": "QMIXAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "controller_mat",
+      "class": "ControllerMATAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "dag_offload_drl",
+      "class": "DAGOffloadDRLAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "cache_offload_drl",
+      "class": "CacheOffloadDRLAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "dt_handoff_drl",
+      "class": "DTHandoffDRLAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "popularity_cache_heuristic",
+      "class": "PopularityCacheHeuristicAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "reactive_lru",
+      "class": "ReactiveLruAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "reactive_fifo",
+      "class": "ReactiveFifoAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "reactive_lfu",
+      "class": "ReactiveLfuAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "reactive_aging_lfu",
+      "class": "ReactiveAgingLfuAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "reactive_random",
+      "class": "ReactiveRandomAgent",
+      "formal_episode_executed": false,
+      "status": "pass"
+    },
+    {
+      "agent": "exact_oracle_h1",
+      "exact_only": true,
+      "formal_episode_executed": false,
+      "status": "pass_contract_only"
+    },
+    {
+      "agent": "exact_oracle_h3",
+      "exact_only": true,
+      "formal_episode_executed": false,
+      "status": "pass_contract_only"
+    },
+    {
+      "agent": "exact_oracle_h6",
+      "exact_only": true,
+      "formal_episode_executed": false,
+      "status": "pass_contract_only"
+    },
+    {
+      "agent": "exact_oracle_h12",
+      "exact_only": true,
+      "formal_episode_executed": false,
+      "status": "pass_contract_only"
+    }
+  ]
+}

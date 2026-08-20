@@ -1,0 +1,186 @@
+{
+  "claim_evidence_template_version": "1.0.0",
+  "created_at": "2026-08-20T12:00:00+08:00",
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "45078d18a2ea37e1a9d1ef1bd72b0342b45f5ad2ba16b663f37db937b107b6fc",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "3d8f01523060c2cca5de0d0afd90f01fe3c878fab1d0ef77c2a41240868c8eb0"
+  },
+  "no_result_status_assigned_during_g14b": true,
+  "pre_registered_before_training": true,
+  "rows": [
+    {
+      "allowed_result_statuses": [
+        "supported",
+        "mixed",
+        "unsupported",
+        "contradicted",
+        "unavailable"
+      ],
+      "claim_id": "typed_base_sharing",
+      "claim_text": null,
+      "endpoint_or_boundary": "sharing_reuse_and_avoided_duplicate_transfer",
+      "formal_evidence_path": null,
+      "required_evidence": "typed full vs no-base-sharing",
+      "result_status": null,
+      "sealed_holdout_evidence_path": null
+    },
+    {
+      "allowed_result_statuses": [
+        "supported",
+        "mixed",
+        "unsupported",
+        "contradicted",
+        "unavailable"
+      ],
+      "claim_id": "byte_hit",
+      "claim_text": null,
+      "endpoint_or_boundary": "full_service_ready_byte_hit_rate",
+      "formal_evidence_path": null,
+      "required_evidence": "typed full vs matched non-oracle baselines",
+      "result_status": null,
+      "sealed_holdout_evidence_path": null
+    },
+    {
+      "allowed_result_statuses": [
+        "supported",
+        "mixed",
+        "unsupported",
+        "contradicted",
+        "unavailable"
+      ],
+      "claim_id": "transfer_overhead",
+      "claim_text": null,
+      "endpoint_or_boundary": "transfer_mb_per_request",
+      "formal_evidence_path": null,
+      "required_evidence": "paired raw CacheEvent transfer bytes",
+      "result_status": null,
+      "sealed_holdout_evidence_path": null
+    },
+    {
+      "allowed_result_statuses": [
+        "supported",
+        "mixed",
+        "unsupported",
+        "contradicted",
+        "unavailable"
+      ],
+      "claim_id": "workflow_continuity",
+      "claim_text": null,
+      "endpoint_or_boundary": "workflow_continuity_rate",
+      "formal_evidence_path": null,
+      "required_evidence": "paired workflow outcomes by outer window",
+      "result_status": null,
+      "sealed_holdout_evidence_path": null
+    },
+    {
+      "allowed_result_statuses": [
+        "supported",
+        "mixed",
+        "unsupported",
+        "contradicted",
+        "unavailable"
+      ],
+      "claim_id": "capacity_pressure",
+      "claim_text": null,
+      "endpoint_or_boundary": "primary endpoints across three frozen MB strata",
+      "formal_evidence_path": null,
+      "required_evidence": "capacity support matrix",
+      "result_status": null,
+      "sealed_holdout_evidence_path": null
+    },
+    {
+      "allowed_result_statuses": [
+        "supported",
+        "mixed",
+        "unsupported",
+        "contradicted",
+        "unavailable"
+      ],
+      "claim_id": "eviction_policy",
+      "claim_text": null,
+      "endpoint_or_boundary": "hit/transfer/pollution/churn",
+      "formal_evidence_path": null,
+      "required_evidence": "five reactive policies under G07 only-policy difference",
+      "result_status": null,
+      "sealed_holdout_evidence_path": null
+    },
+    {
+      "allowed_result_statuses": [
+        "supported",
+        "mixed",
+        "unsupported",
+        "contradicted",
+        "unavailable"
+      ],
+      "claim_id": "oracle_opportunity",
+      "claim_text": null,
+      "endpoint_or_boundary": "exact feasible opportunity gap",
+      "formal_evidence_path": null,
+      "required_evidence": "H=1/3/6/12 exact cells only",
+      "result_status": null,
+      "sealed_holdout_evidence_path": null
+    },
+    {
+      "allowed_result_statuses": [
+        "supported",
+        "mixed",
+        "unsupported",
+        "contradicted",
+        "unavailable"
+      ],
+      "claim_id": "controller_comparison",
+      "claim_text": null,
+      "endpoint_or_boundary": "six primary endpoints",
+      "formal_evidence_path": null,
+      "required_evidence": "SA-GHMAPPO vs preregistered strongest dev baseline",
+      "result_status": null,
+      "sealed_holdout_evidence_path": null
+    },
+    {
+      "allowed_result_statuses": [
+        "supported",
+        "mixed",
+        "unsupported",
+        "contradicted",
+        "unavailable"
+      ],
+      "claim_id": "predictor_boundary",
+      "claim_text": null,
+      "endpoint_or_boundary": "prediction support endpoints",
+      "formal_evidence_path": null,
+      "required_evidence": "baseline predictor; G12 supervised disabled",
+      "result_status": null,
+      "sealed_holdout_evidence_path": null
+    },
+    {
+      "allowed_result_statuses": [
+        "supported",
+        "mixed",
+        "unsupported",
+        "contradicted",
+        "unavailable"
+      ],
+      "claim_id": "data_realism_boundary",
+      "claim_text": null,
+      "endpoint_or_boundary": "provenance only",
+      "formal_evidence_path": null,
+      "required_evidence": "NGSIM + Alibaba DAG + controlled typed catalog statement",
+      "result_status": null,
+      "sealed_holdout_evidence_path": null
+    }
+  ]
+}

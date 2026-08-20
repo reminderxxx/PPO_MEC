@@ -1,0 +1,33 @@
+{
+  "checks": {
+    "all_unknowns_have_conservative_scope": true,
+    "canonical_round_trip": true,
+    "duplicate_history_collapsed": true,
+    "mixed_full_outer_deduplicated": true,
+    "performance_fields_not_decoded": true,
+    "seed_workflow_do_not_increase_outer_count": true
+  },
+  "created_at": "2026-08-20T05:10:02.352038+00:00",
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "73e9e99cabd1a4e1af53deb8f91b2923764827e71d48cafe3198890a6f8794fe",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "73d067d3fbc82ee82fe3f0f479ab693441c492d1ccd1175f795477fbc6816c9d"
+  },
+  "historical_registry_validation_version": "1.0.0",
+  "parse_failures": [],
+  "passed": true,
+  "registry_semantic_sha256": "09ee3109f6789cada996870bcb6a3dac9496a4d98f8373c11cb99f61f55beaae"
+}

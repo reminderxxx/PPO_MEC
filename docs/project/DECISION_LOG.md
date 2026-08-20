@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-08-20: G14B 采用全历史永久消费、I-80 result-blind split 与 sealed holdout
+
+- 决定：任何曾参与设计、调参、checkpoint selection 或结果观察的 raw interval 永久 consumed；formal/hidden 降级、文件改名或不再引用都不恢复资格。Mixed/full、seed/workflow 重复只计一个 outer interval。
+- 决定：无法唯一恢复 raw interval 的 418 个历史条目按 segment scope 保守排除 lankershim/peachtree/us_101，不降低 formal/holdout 12+12 标准。完整 NGSIM inventory 中未消费 I-80 提供 579 个 result-blind candidates。
+- 决定：split builder 只使用 continuity、vehicle availability、coordinate validity、historical exclusion 和 24-frame gap；selection seed=1401，hash tie-break固定。禁止读取 handoff/cache/reward/oracle/agent outcome。
+- 决定：正式 protocol 在训练前冻结 5 seeds、equal interaction budget、controller/reactive/exact-oracle matrix、288/576/864 MB、metrics、support、Holm family 与 claim template。任何语义变化必须新 version/run ID/commit，CLI 不得覆盖。
+- 决定：sealed holdout 的 opening gate 不得使用 formal performance；成功开启最多一次并 append-only 记录。G14B 只输出 `READY_FOR_G14C_CLEAN_TRAIN_AND_FORMAL`，不运行 G14C、不生成 checkpoint、不声明 paper-ready。
+
 ## 2026-08-19: G12采用独立calibration段、temperature scaling和默认关闭的mask-only消费
 
 - 决定：v71 train plan按预先固定的顺序模4规则拆成predictor-train/calibration，原dev仅evaluation；不沿用v112在dev选F1 threshold并同split报告的口径。
@@ -843,5 +851,5 @@
 - 决策：training、evaluation、benchmark与fairness不得复制typed解析；统一消费`src/runtime/typed_model_cache_runtime.py`。Typed必须显式MB/fingerprint，legacy保持默认adapter-only。
 - 决策：checkpoint文件内记录runtime provenance，文件SHA在序列化完成后由外部per-agent/per-seed manifest绑定；不使用不可能稳定的checkpoint self-hash。Typed learned benchmark只接受`compatible`。
 - 决策：typed fairness继续将五reactive baseline严格保留在pairwise matrix，learned controller只放optional companion agent list；因此only-policy-difference不被算法结构差异污染。
-- 决策：typed formal-capable benchmark强制fairness manifest；无manifest兼容仅限legacy并标记unavailable。G14A不冻结split/protocol，G14B必须在新readiness gate后另立任务。
+- 决策：typed formal-capable benchmark强制fairness manifest；无manifest兼容仅限legacy并标记unavailable。G14A不冻结split/protocol；后续 G14B 已按独立任务冻结并通过新 readiness gate。
 - 证据：`artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/`，evidence level为non-formal contract validation。

@@ -1,0 +1,50 @@
+{
+  "capacity_strata_version": "1.0.0",
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "4770ca66905242c53f3b8cf9d9a54f2a8fc1971a18f6cf1b336fa759d76cd768",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "4770ca66905242c53f3b8cf9d9a54f2a8fc1971a18f6cf1b336fa759d76cd768"
+  },
+  "hf_metadata_formal_use": false,
+  "inputs": {
+    "largest_atomic_dependency_bundle_mb": 280.0,
+    "max_initial_rsu_resident_mb": 276.0,
+    "total_capacity_counting_catalog_resident_mb": 856.0
+  },
+  "kv_prefix_enabled": false,
+  "oversized_semantics": "atomic rolled_back_no_mutation; no partial base or adapter admission",
+  "result_dependent_adjustment_forbidden": true,
+  "rounding_quantum_mb": 32.0,
+  "strata": [
+    {
+      "capacity_mb": 288.0,
+      "derivation": "ceil(max(max initial-RSU resident MB, largest atomic base+adapter bundle MB)/32)*32",
+      "stratum": "constrained"
+    },
+    {
+      "capacity_mb": 576.0,
+      "derivation": "ceil(mean(constrained MB, relaxed MB)/32)*32",
+      "stratum": "medium"
+    },
+    {
+      "capacity_mb": 864.0,
+      "derivation": "ceil(total repository-controlled capacity-counting base+adapter resident MB/32)*32",
+      "stratum": "relaxed"
+    }
+  ],
+  "unit": "MB (decimal megabytes, repository contract unit)",
+  "workflow_state_counts_toward_long_term_capacity": false
+}

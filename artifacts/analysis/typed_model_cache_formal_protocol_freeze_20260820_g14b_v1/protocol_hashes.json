@@ -1,0 +1,34 @@
+{
+  "catalog_file_sha256": "0be81a904f09ca0e8976926caf064f095f6d9fb4173cfa1f0a8eed7042f62b2c",
+  "catalog_fingerprint": "89c548980b63df733553d748e8db3ca622965b63abcd08ebd4c231790b40a9d6",
+  "formal_protocol_full_sha256": "34b3e9c6b449260b1c411f9ba23fa50d831aef4396eff32f87ea06dee1765361",
+  "formal_protocol_semantic_sha256": "41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4",
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "bea9ca01b724998e424acab92e85d7b9e01b7727a11a14c4f6b4b87f87bb99cd",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "bea9ca01b724998e424acab92e85d7b9e01b7727a11a14c4f6b4b87f87bb99cd"
+  },
+  "historical_registry_full_sha256": "9f86bc9ad3fd3d23907d61ffff39ba01a34a96aa4bc83a4a90bc4d8a58df2d95",
+  "historical_registry_semantic_sha256": "09ee3109f6789cada996870bcb6a3dac9496a4d98f8373c11cb99f61f55beaae",
+  "protocol_hash_bundle_version": "1.0.0",
+  "runtime_contract_hashes_by_capacity": {
+    "constrained": "84d88d58c71f0775858e2e38ea544bec4fa657d08ed918567d2c2dff48f418a0",
+    "medium": "e811a16576a21b499848d9325d02d7bd94c04e754854b22f5c453c80b66104d8",
+    "relaxed": "2ef6f7f98ad4007fc16bd5cf6d30a6ee026ae8340ce321b3aebe6272a50420ba"
+  },
+  "split_full_sha256": "3eee9097d5ee7b9922420fc6a3c499b87e3647a5d139c61a9fc3c8b753810e12",
+  "split_semantic_sha256": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a"
+}

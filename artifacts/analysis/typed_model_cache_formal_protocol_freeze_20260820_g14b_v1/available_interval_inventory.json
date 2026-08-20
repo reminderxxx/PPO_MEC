@@ -1,0 +1,296 @@
+{
+  "continuous_runs": [
+    {
+      "coordinate_coverage_min": 1.0,
+      "duration_time_units": 1001300,
+      "frame_count": 10013,
+      "raw_frame_end": 10016,
+      "raw_frame_start": 4,
+      "raw_time_end": 1113434136500,
+      "raw_time_start": 1113433135300,
+      "rsu_mapper_available": true,
+      "sampling_interval": 100,
+      "source_segment_id": "i_80",
+      "source_segment_run_id": "i_80_run_001",
+      "vehicle_coverage": {
+        "maximum": 181,
+        "mean": 126.103865,
+        "minimum": 1
+      },
+      "window_length_24_feasible": true
+    },
+    {
+      "coordinate_coverage_min": 1.0,
+      "duration_time_units": 798100,
+      "frame_count": 7981,
+      "raw_frame_end": 7986,
+      "raw_frame_start": 6,
+      "raw_time_end": 1113437565500,
+      "raw_time_start": 1113436767500,
+      "rsu_mapper_available": true,
+      "sampling_interval": 100,
+      "source_segment_id": "i_80",
+      "source_segment_run_id": "i_80_run_002",
+      "vehicle_coverage": {
+        "maximum": 252,
+        "mean": 163.801779,
+        "minimum": 1
+      },
+      "window_length_24_feasible": true
+    },
+    {
+      "coordinate_coverage_min": 1.0,
+      "duration_time_units": 987900,
+      "frame_count": 9879,
+      "raw_frame_end": 11691,
+      "raw_frame_start": 1813,
+      "raw_time_end": 1113438734000,
+      "raw_time_start": 1113437746200,
+      "rsu_mapper_available": true,
+      "sampling_interval": 100,
+      "source_segment_id": "i_80",
+      "source_segment_run_id": "i_80_run_003",
+      "vehicle_coverage": {
+        "maximum": 248,
+        "mean": 163.786416,
+        "minimum": 1
+      },
+      "window_length_24_feasible": true
+    },
+    {
+      "coordinate_coverage_min": 1.0,
+      "duration_time_units": 1019800,
+      "frame_count": 10198,
+      "raw_frame_end": 10200,
+      "raw_frame_start": 3,
+      "raw_time_end": 1118936699900,
+      "raw_time_start": 1118935680200,
+      "rsu_mapper_available": true,
+      "sampling_interval": 100,
+      "source_segment_id": "lankershim",
+      "source_segment_run_id": "lankershim_run_001",
+      "vehicle_coverage": {
+        "maximum": 100,
+        "mean": 66.250539,
+        "minimum": 2
+      },
+      "window_length_24_feasible": true
+    },
+    {
+      "coordinate_coverage_min": 1.0,
+      "duration_time_units": 946400,
+      "frame_count": 9464,
+      "raw_frame_end": 10471,
+      "raw_frame_start": 1008,
+      "raw_time_end": 1118937747000,
+      "raw_time_start": 1118936800700,
+      "rsu_mapper_available": true,
+      "sampling_interval": 100,
+      "source_segment_id": "lankershim",
+      "source_segment_run_id": "lankershim_run_002",
+      "vehicle_coverage": {
+        "maximum": 141,
+        "mean": 89.900782,
+        "minimum": 1
+      },
+      "window_length_24_feasible": true
+    },
+    {
+      "coordinate_coverage_min": 1.0,
+      "duration_time_units": 11400,
+      "frame_count": 114,
+      "raw_frame_end": 118,
+      "raw_frame_start": 5,
+      "raw_time_end": 1163030400,
+      "raw_time_start": 1163019100,
+      "rsu_mapper_available": true,
+      "sampling_interval": 100,
+      "source_segment_id": "peachtree",
+      "source_segment_run_id": "peachtree_run_001",
+      "vehicle_coverage": {
+        "maximum": 13,
+        "mean": 6.587719,
+        "minimum": 2
+      },
+      "window_length_24_feasible": true
+    },
+    {
+      "coordinate_coverage_min": 1.0,
+      "duration_time_units": 23800,
+      "frame_count": 238,
+      "raw_frame_end": 10329,
+      "raw_frame_start": 10092,
+      "raw_time_end": 1164063200,
+      "raw_time_start": 1164039500,
+      "rsu_mapper_available": true,
+      "sampling_interval": 100,
+      "source_segment_id": "peachtree",
+      "source_segment_run_id": "peachtree_run_002",
+      "vehicle_coverage": {
+        "maximum": 7,
+        "mean": 5.016807,
+        "minimum": 1
+      },
+      "window_length_24_feasible": true
+    },
+    {
+      "coordinate_coverage_min": 1.0,
+      "duration_time_units": 863300,
+      "frame_count": 8633,
+      "raw_frame_end": 8640,
+      "raw_frame_start": 8,
+      "raw_time_end": 1118847842900,
+      "raw_time_start": 1118846979700,
+      "rsu_mapper_available": true,
+      "sampling_interval": 100,
+      "source_segment_id": "us_101",
+      "source_segment_run_id": "us_101_run_001",
+      "vehicle_coverage": {
+        "maximum": 194,
+        "mean": 127.292714,
+        "minimum": 1
+      },
+      "window_length_24_feasible": true
+    },
+    {
+      "coordinate_coverage_min": 1.0,
+      "duration_time_units": 824900,
+      "frame_count": 8249,
+      "raw_frame_end": 9154,
+      "raw_frame_start": 906,
+      "raw_time_end": 1118848757400,
+      "raw_time_start": 1118847932600,
+      "rsu_mapper_available": true,
+      "sampling_interval": 100,
+      "source_segment_id": "us_101",
+      "source_segment_run_id": "us_101_run_002",
+      "vehicle_coverage": {
+        "maximum": 396,
+        "mean": 241.087526,
+        "minimum": 121
+      },
+      "window_length_24_feasible": true
+    },
+    {
+      "coordinate_coverage_min": 1.0,
+      "duration_time_units": 910200,
+      "frame_count": 9102,
+      "raw_frame_end": 9952,
+      "raw_frame_start": 851,
+      "raw_time_end": 1118849752200,
+      "raw_time_start": 1118848842100,
+      "rsu_mapper_available": true,
+      "sampling_interval": 100,
+      "source_segment_id": "us_101",
+      "source_segment_run_id": "us_101_run_003",
+      "vehicle_coverage": {
+        "maximum": 211,
+        "mean": 159.789607,
+        "minimum": 1
+      },
+      "window_length_24_feasible": true
+    }
+  ],
+  "created_at": "2026-08-20T05:06:12.169350+00:00",
+  "dataset": {
+    "path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+    "row_count": 11850526,
+    "sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+    "size_bytes": 2118175938
+  },
+  "discontinuities_and_missing_ranges": [
+    {
+      "frame_delta": -10010,
+      "left_raw_frame": 10016,
+      "left_raw_time": 1113434136500,
+      "right_raw_frame": 6,
+      "right_raw_time": 1113436767500,
+      "source_segment_id": "i_80",
+      "time_delta": 2631000
+    }
+  ],
+  "duration_accounting": {
+    "conservatively_excluded_duration_time_units": 4599800,
+    "conservatively_excluded_unknown_segment_count": 3,
+    "historically_consumed_union_duration_time_units": 455800,
+    "known_consumed_outside_conservative_scope_duration_time_units": 0,
+    "minimum_gap_excluded_duration_time_units": 0,
+    "overlap_accounting_rule": "known history inside a conservatively excluded segment is reported in the gross known union but subtracted only once through conservative exclusion",
+    "quality_excluded_duration_time_units": 9500,
+    "remaining_eligible_duration_time_units": 2777800,
+    "remaining_eligible_non_overlapping_window_count_in_frozen_runner_scope": 579,
+    "total_available_duration_time_units": 7387100
+  },
+  "full_runner_scope": {
+    "loaded_frame_count": 73871,
+    "max_mobility_rows": 11850526,
+    "source_segments": [
+      "i_80",
+      "lankershim",
+      "peachtree",
+      "us_101"
+    ]
+  },
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "4c2be1b940d449ba11442272a2d2431d4b26fcffb4fc54959cc2419011923628",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "0f9d6fa48b9dbc574feeddb60c8e91076c1469088c0626c1b71d453d99c92702"
+  },
+  "inventory_version": "ngsim_available_interval_inventory_v1.0.0",
+  "runner_prefix_scope": {
+    "loaded_frame_count": 45146,
+    "max_mobility_rows": 5000000,
+    "partial_cutoff_frame_count": 46843,
+    "partial_cutoff_ranges_conservatively_invalid": [
+      {
+        "frame_count": 1824,
+        "raw_time_end": 1118935865600,
+        "raw_time_start": 1118935683300,
+        "sampling_interval": 100,
+        "source_segment_id": "lankershim"
+      },
+      {
+        "frame_count": 18061,
+        "raw_time_end": 1118937676700,
+        "raw_time_start": 1118935870700,
+        "sampling_interval": 100,
+        "source_segment_id": "lankershim"
+      },
+      {
+        "frame_count": 26958,
+        "raw_time_end": 1118849685300,
+        "raw_time_start": 1118846989600,
+        "sampling_interval": 100,
+        "source_segment_id": "us_101"
+      }
+    ],
+    "source_segments": [
+      "lankershim",
+      "peachtree",
+      "us_101"
+    ]
+  },
+  "selection_boundary": "Inventory uses only raw identity, continuity, coordinate validity, and vehicle coverage; no handoff/cache/reward/oracle/agent outcome is computed.",
+  "summary": {
+    "conflicting_frame_identity_count": 14645,
+    "continuous_run_count": 10,
+    "discontinuity_count": 1,
+    "invalid_numeric_row_count": 0,
+    "raw_unique_frame_count": 88516,
+    "segment_count": 4,
+    "total_available_duration_time_units": 7387100
+  }
+}

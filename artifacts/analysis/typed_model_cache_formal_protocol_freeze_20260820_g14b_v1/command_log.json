@@ -1,0 +1,59 @@
+{
+  "command_log_version": "1.0.0",
+  "commands": [
+    [
+      "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "scripts/freeze_typed_model_cache_formal_protocol.py",
+      "--created_at",
+      "2026-08-20T12:00:00+08:00"
+    ],
+    [
+      "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "scripts/train_sa_ghmappo_real_sample.py",
+      "--help"
+    ],
+    [
+      "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "scripts/train_algo_pool_real_sample.py",
+      "--help"
+    ],
+    [
+      "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "scripts/benchmark_main_results.py",
+      "--help"
+    ],
+    [
+      "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "scripts/analyze_top_journal_statistics.py",
+      "--help"
+    ]
+  ],
+  "created_at": "2026-08-20T12:00:00+08:00",
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "cff4f3d7d16b5f73c3d90202d22216ad7d0c16ca793d408e4d42afb7473dfb6b",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "66b3b3238e09debfe8f3055d0023f4e50bb8c164b6aa190a933bef4a8c69ac2d"
+  },
+  "prohibited_work_not_executed": [
+    "formal agent training",
+    "formal benchmark",
+    "sealed holdout",
+    "hidden evaluation",
+    "G15",
+    "algorithm/reward/action/network modification",
+    "performance-driven split selection"
+  ]
+}

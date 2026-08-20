@@ -1,0 +1,301 @@
+{
+  "agent_compatibility": {
+    "agent_compatibility_audit_version": "1.0.0",
+    "created_at": "2026-08-20T12:00:00+08:00",
+    "hashes": {
+      "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+      "full_sha256": "d92b76b231e2c04f72c2f7bb5c148075755bf2efea92f9cafc33ce0f557f7ba2",
+      "semantic_exclusions": [
+        "absolute_path",
+        "artifact_path",
+        "captured_at",
+        "created_at",
+        "full_sha256",
+        "generated_at",
+        "hashes",
+        "output_path",
+        "output_root",
+        "reviewed_at",
+        "semantic_sha256"
+      ],
+      "semantic_sha256": "298a02607212becab415c45f284b240d660cb2b87004992940b8007fd1e8954b"
+    },
+    "paper_grade_controller_boundary": "SA-GHMAPPO, MAPPO, QMIX, and MAT are controller-level contracts, not vehicle/RSU entity-level MARL.",
+    "passed": true,
+    "rows": [
+      {
+        "agent": "sa_ghmappo",
+        "class": "SAGHMAPPOAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "ppo",
+        "class": "PPOAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "mappo",
+        "class": "MAPPOAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "dqn",
+        "class": "DQNAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "dueling_dqn",
+        "class": "DuelingDQNAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "qmix",
+        "class": "QMIXAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "controller_mat",
+        "class": "ControllerMATAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "dag_offload_drl",
+        "class": "DAGOffloadDRLAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "cache_offload_drl",
+        "class": "CacheOffloadDRLAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "dt_handoff_drl",
+        "class": "DTHandoffDRLAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "popularity_cache_heuristic",
+        "class": "PopularityCacheHeuristicAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "reactive_lru",
+        "class": "ReactiveLruAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "reactive_fifo",
+        "class": "ReactiveFifoAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "reactive_lfu",
+        "class": "ReactiveLfuAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "reactive_aging_lfu",
+        "class": "ReactiveAgingLfuAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "reactive_random",
+        "class": "ReactiveRandomAgent",
+        "formal_episode_executed": false,
+        "status": "pass"
+      },
+      {
+        "agent": "exact_oracle_h1",
+        "exact_only": true,
+        "formal_episode_executed": false,
+        "status": "pass_contract_only"
+      },
+      {
+        "agent": "exact_oracle_h3",
+        "exact_only": true,
+        "formal_episode_executed": false,
+        "status": "pass_contract_only"
+      },
+      {
+        "agent": "exact_oracle_h6",
+        "exact_only": true,
+        "formal_episode_executed": false,
+        "status": "pass_contract_only"
+      },
+      {
+        "agent": "exact_oracle_h12",
+        "exact_only": true,
+        "formal_episode_executed": false,
+        "status": "pass_contract_only"
+      }
+    ]
+  },
+  "capacity_runtime_contracts": {
+    "constrained": {
+      "capacity_mb": 288.0,
+      "runtime_contract_sha256": "84d88d58c71f0775858e2e38ea544bec4fa657d08ed918567d2c2dff48f418a0"
+    },
+    "medium": {
+      "capacity_mb": 576.0,
+      "runtime_contract_sha256": "e811a16576a21b499848d9325d02d7bd94c04e754854b22f5c453c80b66104d8"
+    },
+    "relaxed": {
+      "capacity_mb": 864.0,
+      "runtime_contract_sha256": "2ef6f7f98ad4007fc16bd5cf6d30a6ee026ae8340ce321b3aebe6272a50420ba"
+    }
+  },
+  "checkpoint_count": 0,
+  "clean_worktree_plan": {
+    "candidate_execution_commit_binding": "Commit A containing the exact frozen protocol semantic hash",
+    "current_worktree_need_not_be_clean_because_user_seven_files_are_preserved": true,
+    "disk_free_bytes": 715442925568,
+    "disk_sufficient": true,
+    "minimum_required_free_bytes": 21474836480,
+    "status": "feasible_not_created",
+    "worktree_root_plan": "/tmp/ppo_mec_g14c_<commit>/"
+  },
+  "created_at": "2026-08-20T12:00:00+08:00",
+  "entrypoint_parse_preflight": [
+    {
+      "command": [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "scripts/train_sa_ghmappo_real_sample.py",
+        "--help"
+      ],
+      "help_output_detected": true,
+      "passed": true,
+      "return_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "scripts/train_algo_pool_real_sample.py",
+        "--help"
+      ],
+      "help_output_detected": true,
+      "passed": true,
+      "return_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "scripts/benchmark_main_results.py",
+        "--help"
+      ],
+      "help_output_detected": true,
+      "passed": true,
+      "return_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "scripts/analyze_top_journal_statistics.py",
+        "--help"
+      ],
+      "help_output_detected": true,
+      "passed": true,
+      "return_code": 0,
+      "stderr": ""
+    }
+  ],
+  "fairness_manifest_preflight": {
+    "passed": true,
+    "rows": [
+      {
+        "capacity_mb": 288.0,
+        "evaluation_unit_count": 15,
+        "manifest_semantic_sha256": "ba3509167eaa465b52bed25dfad85cbe438737521612d484ad79cbb10a215f10",
+        "status": "pass",
+        "stratum": "constrained"
+      },
+      {
+        "capacity_mb": 576.0,
+        "evaluation_unit_count": 15,
+        "manifest_semantic_sha256": "e563285a1b5f077b66fe85163f523c3a1f18f9231ce7ff81a316948f721be015",
+        "status": "pass",
+        "stratum": "medium"
+      },
+      {
+        "capacity_mb": 864.0,
+        "evaluation_unit_count": 15,
+        "manifest_semantic_sha256": "9b32d52e64e9a281ddf96c2c19773df5a4529a7b4b066bd2d9345df6c8e1390b",
+        "status": "pass",
+        "stratum": "relaxed"
+      }
+    ]
+  },
+  "formal_episode_count": 0,
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "6a9d846f58a704ea90b7f65935a7ebe31c11006d5f8fbe0b835b126bb85f0858",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "41124ca0cc8289d8f5bbb7fdb2e416604a33c2c7db48bab85b074e214cf1abdd"
+  },
+  "output_root_absent": true,
+  "passed": true,
+  "preflight_report_version": "1.0.0",
+  "protocol_repeat_build_semantic_hash_stable": true,
+  "semantic_negative_cases": {
+    "passed": true,
+    "rows": [
+      {
+        "case": "same_interval_different_id",
+        "passed": true
+      },
+      {
+        "case": "insufficient_gap",
+        "passed": true
+      },
+      {
+        "case": "formal_below_12",
+        "passed": true
+      },
+      {
+        "case": "semantic_cli_override",
+        "passed": true
+      },
+      {
+        "case": "ordinary_runner_holdout_open",
+        "passed": true
+      },
+      {
+        "case": "semantic_mutation_changes_hash",
+        "passed": true
+      },
+      {
+        "case": "created_at_semantic_stability",
+        "passed": true
+      }
+    ]
+  }
+}

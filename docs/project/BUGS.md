@@ -1,12 +1,20 @@
 ﻿# Bugs And Risks
 
-## 2026-08-19: G14 typed MB formal pipeline blocked at Phase 0
+## 2026-08-20: G14B protocol ready；正式执行与证据仍开放
 
-- `OPEN / hard blocker`：formal benchmark fairness runtime 明确拒绝 `capacity.unit != adapter_slots`；G07 stable builder 虽接受 MB 参数，但没有冻结并绑定 typed catalog fingerprint、typed initial state 与 base+adapter dependency contract。
-- `OPEN / hard blocker`：learned training runners 不接受 typed model-cache profile / MB capacity，现有 learned checkpoints 均为 legacy adapter-only provenance，不能冒充 typed clean-retrain checkpoints。
-- `OPEN / hard blocker`：当前链路无法端到端产出可追溯的 formal typed `CacheEvent 1.3` 原始记录与 summary；G13 minimal real artifact 只有事件计数，不是 G14 formal trace。
-- `UNVERIFIED / split`：新的 G14 train/dev/formal/sealed-holdout split 与全历史 frame/time/segment 排除审计尚未冻结；不能据此宣称 NGSIM 不足，也不能开始 formal 或打开 sealed holdout。
-- `BOUNDARY`：G14 readiness evidence level 为 `E0_UNAVAILABLE`；在上述 blocker 修复并重新通过独立 Phase 0 gate 前，不得冻结 protocol、执行 formal/holdout 或进入 G15。
+- `RESOLVED / G14B split`：历史 frame/time/segment-run 排除账本和 24/12/12/12 split 已冻结；1,770 个 pairwise relations 全部 safe，minimum gap=24，formal/holdout outer count 均为12。
+- `RESOLVED / protocol readiness`：G14A typed runtime 与 G14B agent/seed/budget/capacity/metrics/statistics/claim pre-registration 通过；readiness v2=`READY_FOR_G14C_CLEAN_TRAIN_AND_FORMAL`。
+- `OPEN / G14C execution`：尚无 clean typed formal checkpoint、formal raw result、checkpoint selection record 或正式统计；必须从 Commit A clean worktree 另立任务执行，当前证据不能替代性能结果。
+- `SEALED / holdout`：sealed holdout `opened=false`，一次性 token 未签发；只能在训练/eval/protocol/provenance/fairness/integrity/infrastructure gate 通过后开启，不能使用 formal performance gate。
+- `OPEN / compute and I/O`：协议冻结每 learned agent/seed/capacity 最大12小时与总2,500 CPU-hours，但完整 2.12GB NGSIM 读取的实际 G14C wall-clock 尚未实测；不得因运行耗时事后删 seed、窗口或 baseline。
+- `OPEN / realism`：NGSIM + Alibaba + controlled typed catalog 仍是跨源受控组合，不是真实联合 model-cache trace；latency saved 继续 unavailable，HF metadata/KV/G12 supervised predictor 不进入 formal。
+- `BOUNDARY`：G14B formal episode=0、checkpoint=0、performance result=0、paper_ready=false；不得据此宣称算法优势或自动进入 G15。
+
+## 2026-08-19: G14 typed MB formal pipeline blocked at Phase 0（历史状态）
+
+- `RESOLVED BY G14A`：当时 formal benchmark/training/fairness/CacheEvent typed runtime plumbing 不完整；G14A 已补齐并保留原 blocked artifact 作为历史证据。
+- `RESOLVED BY G14B`：当时新的 split 与全历史排除审计未冻结；G14B 已冻结独立 split 和 protocol，并重新执行 readiness v2。
+- `HISTORICAL BOUNDARY`：该 `E0_UNAVAILABLE` 只描述 2026-08-19 审查时点，不覆盖 2026-08-20 G14B；历史 artifact 不删除或改写。
 
 ## 2026-08-19: G13 typed model-cache contract frozen; real workload/latency evidence remains open
 
@@ -331,5 +339,5 @@
 
 - `RESOLVED / typed runtime plumbing`：typed catalog、MB capacity、initial/dependency/pinned contract、training/checkpoint provenance、fairness 1.1、benchmark、CacheEvent 1.3与metrics 1.1已端到端接通；legacy slot/MB未回归。
 - `RESOLVED / controlled Alibaba adapter mapping`：repository controlled catalog已显式声明`adapter_batch_type_1 -> base:veh_base_v1`，不再在NGSIM+Alibaba入口因未知typed adapter失败。
-- `OPEN BLOCKER / G14B`：正式split exclusion/final protocol尚未冻结；没有正式checkpoint、formal raw trace、holdout/support或重跑后的readiness审计。G14A artifact和tiny checkpoint不得进入论文主表。
+- `RESOLVED BY G14B / split protocol`：正式 split exclusion/final protocol 与 readiness v2 已冻结；但正式 checkpoint、formal raw trace、holdout/support仍不存在。G14A artifact和tiny checkpoint不得进入论文主表。
 - `OPEN / latency saved`：metrics 1.1继续输出null；G14A没有新增request-aligned counterfactual latency，不能将reward/delay替代。

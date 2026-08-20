@@ -1,0 +1,89 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_protocol_freeze_20260820_g14b_v1",
+  "candidate_execution_commit_binding": "Commit A containing the exact frozen protocol semantic hash",
+  "checks": {
+    "agent_compatibility": true,
+    "cache_event_and_metrics_contract": true,
+    "clean_worktree_plan": true,
+    "data_hash_and_inventory": true,
+    "fairness_manifest_each_capacity": true,
+    "formal_outer_count": true,
+    "g14a_runtime": true,
+    "g14c_output_root_absent": true,
+    "historical_exclusion": true,
+    "holdout_sealed_unopened": true,
+    "negative_preflight": true,
+    "sealed_holdout_outer_count": true,
+    "seed_and_budget_frozen": true,
+    "split_independence": true,
+    "training_and_benchmark_entrypoints_parse": true,
+    "typed_checkpoint_requirement_frozen": true,
+    "user_seven_files_unchanged": true
+  },
+  "claim_boundary": "Readiness authorizes only a future clean-worktree G14C execution; it is not performance or paper-ready evidence.",
+  "clean_worktree_plan": {
+    "candidate_execution_commit_binding": "Commit A containing the exact frozen protocol semantic hash",
+    "current_worktree_need_not_be_clean_because_user_seven_files_are_preserved": true,
+    "disk_free_bytes": 715442925568,
+    "disk_sufficient": true,
+    "minimum_required_free_bytes": 21474836480,
+    "status": "feasible_not_created",
+    "worktree_root_plan": "/tmp/ppo_mec_g14c_<commit>/"
+  },
+  "evidence_level": "E2_PROTOCOL_AND_CONTRACT_VALIDATED_NO_PERFORMANCE_DATA",
+  "formal_completed": false,
+  "git_commit": "5a14d6e4a8ace19b4e2c1612bd3c6989deeda633",
+  "hashes": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+    "full_sha256": "2138d265354b6cc7caf79e2dd2f410b3b26864fd335cdf8552eb852fa4334564",
+    "semantic_exclusions": [
+      "absolute_path",
+      "artifact_path",
+      "captured_at",
+      "created_at",
+      "full_sha256",
+      "generated_at",
+      "hashes",
+      "output_path",
+      "output_root",
+      "reviewed_at",
+      "semantic_sha256"
+    ],
+    "semantic_sha256": "d494ebb14c4f3700d37af56825014d9fb9f79be085780002afa4031280a529d1"
+  },
+  "holdout_opened": false,
+  "initial_git_status": {
+    "short": [
+      " M scripts/train_sa_ghmappo_real_sample.py",
+      " M src/agents/sa_ghmappo_agent.py",
+      " M src/agents/sa_ghmappo_core.py",
+      " M src/encoders/fusion_encoder.py",
+      " M src/evaluators/cache_baseline_fairness.py",
+      " M src/evaluators/real_eval_support.py",
+      " M tests/test_algo_pool_contract.py",
+      " M tests/test_checkpoint_compat.py",
+      "?? scripts/freeze_typed_model_cache_formal_protocol.py",
+      "?? src/evaluators/typed_model_cache_formal_protocol.py",
+      "?? tests/test_typed_model_cache_formal_protocol.py"
+    ],
+    "staged": []
+  },
+  "literature_cutoff": "2026-08-20",
+  "paper_ready": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "protected_user_file_hashes": {
+    "scripts/train_sa_ghmappo_real_sample.py": "aed850f5561f94ecba824e22bd323cdd142ee6c74255a3599129a2a6782e0eba",
+    "src/agents/sa_ghmappo_agent.py": "06638c1aea5097a7fa4088db6b77648648655053dc87e1a1c817b09a7709c171",
+    "src/agents/sa_ghmappo_core.py": "9951badce0ce78e608e690d6bed8d07a59d19dfef1e82f94a89d88403ac0d6b9",
+    "src/encoders/fusion_encoder.py": "cde948c13f487790cf255389bc26b7af191ecc66449a7e939b217c638327954d",
+    "src/evaluators/real_eval_support.py": "0a092cc15224b9b1be6a3476555c6e8eb8293573b3e27acf3fa91630db948cb6",
+    "tests/test_algo_pool_contract.py": "41f2ca2f6920940bc11cd16bbc4c96104452c5653812a2b69c0e1a8e6794e75b",
+    "tests/test_checkpoint_compat.py": "6b09b63b4a5cd9b527e7f3a146962ee37b9b1c9f8da78893d213b40bc6dc2cbf"
+  },
+  "readiness_review_version": "2.0.0",
+  "reviewed_at": "2026-08-20T12:00:00+08:00",
+  "target_venue": "IEEE Transactions on Mobile Computing",
+  "typed_checkpoint_count": 0,
+  "unresolved_blockers": [],
+  "verdict": "READY_FOR_G14C_CLEAN_TRAIN_AND_FORMAL"
+}
