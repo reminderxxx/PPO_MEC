@@ -1,0 +1,25 @@
+{
+  "version": "1.0.0",
+  "resource_resolver_version": "1.0.0",
+  "scientific_identity_rule": "scientific identity != host absolute path",
+  "resource_registry_path": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/portable_resource_registry.json",
+  "resource_registry_semantic_sha256": "810f0fa987202da0e018f309509a286d811bfe867ab62acdf1f476a987c086d7",
+  "absolute_path_in_protocol_semantic_hash": false,
+  "content_identical_path_relocation": "allowed_after_logical_id_role_hash_size_schema_validation",
+  "content_drift": "fail_fast",
+  "network_download": false,
+  "automatic_large_file_copy": false,
+  "semantic_identity_fields": [
+    "logical_resource_id",
+    "resource_role",
+    "content_sha256",
+    "size_bytes",
+    "schema_version",
+    "revision",
+    "expected_logical_relative_path",
+    "required",
+    "allowed_resolvers",
+    "provenance",
+    "path_relocation_allowed"
+  ]
+}

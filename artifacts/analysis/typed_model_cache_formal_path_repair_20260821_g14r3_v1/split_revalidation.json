@@ -1,0 +1,8 @@
+{
+  "status": "pass",
+  "expected": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+  "observed": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+  "changed": false,
+  "window_contract_semantic_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771",
+  "catalog_fingerprint": "89c548980b63df733553d748e8db3ca622965b63abcd08ebd4c231790b40a9d6"
+}

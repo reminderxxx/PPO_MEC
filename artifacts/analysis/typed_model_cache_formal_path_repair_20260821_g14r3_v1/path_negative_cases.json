@@ -1,0 +1,78 @@
+{
+  "path_negative_cases_version": "1.0.0",
+  "status": "pass",
+  "cases": [
+    {
+      "case": "same_content_different_absolute_path",
+      "expected": "allow",
+      "observed": "pass",
+      "status": "pass"
+    },
+    {
+      "case": "same_path_content_change",
+      "expected": "reject",
+      "observed": "rejected:PortableResourceError",
+      "status": "pass"
+    },
+    {
+      "case": "same_filename_different_hash",
+      "expected": "reject",
+      "observed": "rejected:PortableResourceError",
+      "status": "pass"
+    },
+    {
+      "case": "wrong_logical_id",
+      "expected": "reject",
+      "observed": "rejected:PortableResourceError",
+      "status": "pass"
+    },
+    {
+      "case": "mobility_workflow_role_swap",
+      "expected": "reject",
+      "observed": "rejected:PortableResourceError",
+      "status": "pass"
+    },
+    {
+      "case": "schema_change",
+      "expected": "reject",
+      "observed": "rejected:PortableResourceError",
+      "status": "pass"
+    },
+    {
+      "case": "file_size_change",
+      "expected": "reject",
+      "observed": "rejected:PortableResourceError",
+      "status": "pass"
+    },
+    {
+      "case": "symlink_resolution_audited",
+      "expected": "allow",
+      "observed": "pass",
+      "status": "pass"
+    },
+    {
+      "case": "missing_file",
+      "expected": "reject",
+      "observed": "rejected:PortableResourceError",
+      "status": "pass"
+    },
+    {
+      "case": "multiple_conflicting_candidates",
+      "expected": "reject",
+      "observed": "rejected:PortableResourceError",
+      "status": "pass"
+    },
+    {
+      "case": "cli_workflow_content_override",
+      "expected": "reject",
+      "observed": "rejected:PortableResourceError",
+      "status": "pass"
+    },
+    {
+      "case": "invalid_g14c_v3_checkpoint_reference",
+      "expected": "reject",
+      "observed": "rejected:PortableResourceError",
+      "status": "pass"
+    }
+  ]
+}

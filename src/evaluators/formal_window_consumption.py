@@ -276,11 +276,19 @@ def validate_window_plan_binding(
             "formal max_mobility_rows must equal the frozen resolved source range"
         )
     source_path = Path(mobility_csv_path).resolve()
-    contract_path = Path(str(source["path"])).resolve()
-    if source_path != contract_path:
+    portable_resolution = source.get("runtime_resolution") or {}
+    portable = (
+        portable_resolution.get("portable_resource_identity_contract_version")
+        == "1.0.0"
+    )
+    if not source_path.is_file():
+        raise FormalWindowConsumptionError("formal mobility source is missing")
+    if not portable and source_path != Path(source["path"]).resolve():
         raise FormalWindowConsumptionError("formal mobility source path mismatch")
-    if not source_path.is_file() or source_path.stat().st_size != int(source["size_bytes"]):
+    if source_path.stat().st_size != int(source["size_bytes"]):
         raise FormalWindowConsumptionError("formal mobility source size mismatch")
+    if portable and file_sha256(source_path) != source["sha256"]:
+        raise FormalWindowConsumptionError("formal mobility source content mismatch")
     if window_selector != "ordered":
         raise FormalWindowConsumptionError("frozen windows require ordered exact-offset loading")
     if int(window_length) != int(contract["window_length"]):

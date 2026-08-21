@@ -108,3 +108,16 @@ setting，并将 phase simulation 推进至 `complete_without_holdout`。该 reh
 
 Readiness 只表示 execution contract 可从 Commit A2 的 clean worktree 启动；protocol v1.1 仍不等于
 formal completed、paper-ready 或 G14 completed。完成 G14R 后必须返回计划窗口，不自动启动 G14C v2。
+
+## 2026-08-24 G14R3 restart boundary
+
+后续 Protocol v1.2/G14C v3 在 150/150 training cells 与 1,200 candidates 之后、首次 dev performance
+之前因 clean-worktree workflow path 身份错绑失败，永久状态为
+`invalid_before_dev_performance_execution`。Dev performance/selection/formal 均为 0，holdout 未开启；旧 run
+禁止 resume 或 checkpoint salvage。
+
+G14R3 冻结 Protocol v1.3、portable identity 1.0.0 与 Readiness v5。成功 exact non-formal rehearsal 使用
+全新 root、真实 dev selector/freeze，完成 13 phase 至 `complete_without_holdout`；没有正式数值或 claim。
+Protocol semantic SHA-256 为 `1525b7cb...ac17`，Readiness 为
+`READY_FOR_G14C_V4_CLEAN_TRAIN_AND_FORMAL`。下一步仍必须由独立 G14C v4 任务在最终 A4 clean worktree
+从头训练，不自动启动。

@@ -47,6 +47,13 @@ NON_SEMANTIC_FIELDS = {
     "output_root",
     "artifact_path",
     "absolute_path",
+    "resolved_absolute_path",
+    "resolution_root",
+    "runtime_resolution",
+    "validation_time",
+    "validated_at",
+    "original_location",
+    "resolved_location",
     "full_sha256",
     "semantic_sha256",
 }

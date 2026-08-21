@@ -1500,3 +1500,14 @@ quick run 结果边界：
 - Controlled catalog补齐Alibaba `adapter_batch_type_1` repository-native映射；CacheEvent 1.3保证每typed request都有base+adapter dependency bundle，并修正typed vehicle-local miss为`unserved`。
 - `non_formal_typed_runtime_rehearsal`通过：2 seed × 2 MB capacity，8个PPO/MAPPO tiny checkpoint均compatible，五reactive + 两learned共28个typed episode；metrics 1.1独立重算一致；legacy slot/MB兼容通过。
 - 该 G14A 记录当时尚未通过 G14 readiness；后续 G14B 已冻结 split/final protocol 并通过 readiness v2。正式 checkpoint 仍不存在，且未运行 formal/holdout/hidden/G15；不得把 G14A tiny checkpoint升级为正式证据。
+
+## 2026-08-24 G14R3 complete — portable dataset identity and dev binding
+
+- Protocol v1.3 semantic `1525b7cb...ac17` 与 registry semantic `810f0fa9...86d7` 已冻结；split/window/catalog/
+  matrix/seeds/budget/endpoints/support/statistics/claims/cadence/SA 0.06 未变。
+- 35 项 external resource matrix、186 commands（150 train、24 formal/support）、main/clean 186/186 parity、
+  12 negative cases 全部通过。
+- Clean-tree exact non-formal rehearsal 完成 16 training cells、真实 dev selector 16/16、真实 freeze 16、
+  cache/controller/support/statistics/integrity/gate 与 13 phase ledger。
+- Readiness v5：`READY_FOR_G14C_V4_CLEAN_TRAIN_AND_FORMAL`；正式训练/formal/holdout/hidden/G15 为 0/未启动。
+- G14C v3 永久 invalid；旧 run 保留且禁止 resume、salvage 或 checkpoint reuse。

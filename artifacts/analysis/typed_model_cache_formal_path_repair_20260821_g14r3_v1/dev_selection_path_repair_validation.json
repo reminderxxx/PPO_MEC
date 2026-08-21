@@ -1,0 +1,7 @@
+{
+  "status": "pass",
+  "explicit_workflow_resolution": true,
+  "shared_resolver": true,
+  "selection_rule_changed": false,
+  "formal_or_holdout_access": false
+}

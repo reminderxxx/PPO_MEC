@@ -1,0 +1,7 @@
+{
+  "status": "pass",
+  "same_hash_different_path": "compatible",
+  "same_name_different_hash": "rejected",
+  "cross_agent_seed_capacity": "rejected",
+  "invalid_g14c_v3_reference": "rejected"
+}

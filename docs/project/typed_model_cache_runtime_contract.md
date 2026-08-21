@@ -55,6 +55,15 @@ Checkpoint 的 `training_metadata.typed_runtime_provenance` 写入 execution Git
 
 `validate_checkpoint_provenance()` 只返回三种状态：`compatible`、`incompatible`、`unavailable_legacy_metadata`。Typed learned benchmark 必须有外部 per-agent/per-seed binding 且 gate 为 `compatible`；旧 checkpoint、错误 agent/seed/Git/catalog/capacity/shape/reward/environment/window/hash不能冒充 typed checkpoint。
 
+## G14R3 portable resource and checkpoint location binding
+
+训练、dev、formal 与 support 现在共同消费 `portable_resource_identity.py`。Runtime config、dataset、window、
+fairness 与 checkpoint manifest 都由 logical ID + role + schema + size/hash 解析；cwd 猜测和隐式 workflow default
+不能进入正式链。Checkpoint scientific identity 与 artifact location 分离，freeze hash 不包含主机路径；迁移后
+必须重新验证 checkpoint hash、agent、seed、capacity、Protocol/catalog/runtime/split/window 与 selection
+provenance。无效 G14C v3 root 有硬拒绝规则。Legacy 未传 registry 的非正式入口仍兼容，但 v1.3 正式模板均
+显式传入 registry/root/resource IDs。
+
 ## Fairness 与 benchmark
 
 Typed fairness manifest 使用 consumer-safe `1.1.0`，旧 legacy manifest 继续是 `1.0.0`。`cache_contract.typed_model_cache` 冻结 catalog、taxonomy、dependency/compatibility/initial/pinned fingerprints、MB capacity、transaction、CacheEvent 1.3、metrics 1.2、trace context、typed replay 与 oracle compatibility。五个 reactive baseline 的 `baseline_matrix` 仍严格只有五项且 10 组 pairwise diff 只允许 policy identity 字段；可选 `controller_agents` 只扩展实际 benchmark agent matrix，不改变 reactive only-policy-difference 审计。

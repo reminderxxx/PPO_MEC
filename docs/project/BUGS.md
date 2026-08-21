@@ -379,3 +379,12 @@
 - `RESOLVED / controlled Alibaba adapter mapping`：repository controlled catalog已显式声明`adapter_batch_type_1 -> base:veh_base_v1`，不再在NGSIM+Alibaba入口因未知typed adapter失败。
 - `RESOLVED BY G14B / split protocol`：正式 split exclusion/final protocol 与 readiness v2 已冻结；但正式 checkpoint、formal raw trace、holdout/support仍不存在。G14A artifact和tiny checkpoint不得进入论文主表。
 - `OPEN / latency saved`：metrics 1.1继续输出null；G14A没有新增request-aligned counterfactual latency，不能将reward/delay替代。
+
+## 2026-08-24 Closed: clean-worktree external-resource identity mismatch
+
+G14C v3 dev selector 未显式传递 workflow path，benchmark fallback 指向 clean worktree，而 fairness 仍冻结主
+worktree absolute path，导致在首次 dev performance 前失败。G14R3 通过 content-addressed logical identity、共享
+resolver、explicit workflow propagation、portable fairness companion 与 checkpoint location contract 关闭该问题。
+
+残余风险：Readiness 不等于正式结果；G14C v4 仍需从头训练并可能暴露运行时间/基础设施问题。任何自动下载、
+cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 holdout capability 都仍是 blocker。

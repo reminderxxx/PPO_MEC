@@ -1,0 +1,1091 @@
+[
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "baseline_config.reactive_aging_lfu",
+    "resource_role": "baseline_config",
+    "semantic_identity_fingerprint": "922fbd3a04ee0cd78311719f97bba6ba375fbda5f5225b8fe85445a99b223be3",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_aging_lfu.yaml",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "14e8c7a1e3e966c755012600dc0648ce72d77a86ff37ebe176df9965d56caf6f",
+    "observed_size_bytes": 398,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_aging_lfu.yaml",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_aging_lfu.yaml"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_aging_lfu.yaml",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_aging_lfu.yaml",
+        "observed_sha256": "14e8c7a1e3e966c755012600dc0648ce72d77a86ff37ebe176df9965d56caf6f",
+        "observed_size_bytes": 398,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:26.575383Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "baseline_config.reactive_fifo",
+    "resource_role": "baseline_config",
+    "semantic_identity_fingerprint": "97bc9799bcf5e8a2397f56eca41b094faf7431e20ea279b6efaa11adae4f58e5",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_fifo.yaml",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "f203414a190ba70a0e6f3ca2ce1559ec712fcf9eeee69db84ec81562ca7cc726",
+    "observed_size_bytes": 352,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_fifo.yaml",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_fifo.yaml"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_fifo.yaml",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_fifo.yaml",
+        "observed_sha256": "f203414a190ba70a0e6f3ca2ce1559ec712fcf9eeee69db84ec81562ca7cc726",
+        "observed_size_bytes": 352,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:26.576721Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "baseline_config.reactive_lfu",
+    "resource_role": "baseline_config",
+    "semantic_identity_fingerprint": "e72b61f79cb1cd5bb7b0019f3d7c2c1d72d6bb56456e237d323774f896c63f49",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lfu.yaml",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "0090775cd0d298d8d48bae7212c454e8370860435c74ad34757c80ba3b0d31e2",
+    "observed_size_bytes": 350,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lfu.yaml",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lfu.yaml"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lfu.yaml",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lfu.yaml",
+        "observed_sha256": "0090775cd0d298d8d48bae7212c454e8370860435c74ad34757c80ba3b0d31e2",
+        "observed_size_bytes": 350,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:26.578041Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "baseline_config.reactive_lru",
+    "resource_role": "baseline_config",
+    "semantic_identity_fingerprint": "5adf558ddc67abe6f306c1ae3d1bbd3883fa1d333aacacbbb990d9825cd949c8",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lru.yaml",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "cd08bed1fd55b05bdb7648f9ded74c2f0ac78754ee56720997485a520f9db060",
+    "observed_size_bytes": 350,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lru.yaml",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lru.yaml"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lru.yaml",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_lru.yaml",
+        "observed_sha256": "cd08bed1fd55b05bdb7648f9ded74c2f0ac78754ee56720997485a520f9db060",
+        "observed_size_bytes": 350,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:26.579364Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "baseline_config.reactive_random",
+    "resource_role": "baseline_config",
+    "semantic_identity_fingerprint": "f6a0a6802200ad2806f53095a698c8df182db3295fb2dad1fe65d5bc9717dbd2",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_random.yaml",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "54f1b3862769895066ac251cf73ecda05fda632814f83f4d26e38228a88c8316",
+    "observed_size_bytes": 410,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_random.yaml",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_random.yaml"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_random.yaml",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/algo/reactive_random.yaml",
+        "observed_sha256": "54f1b3862769895066ac251cf73ecda05fda632814f83f4d26e38228a88c8316",
+        "observed_size_bytes": 410,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:26.580794Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "catalog.typed_model_cache.controlled",
+    "resource_role": "typed_catalog",
+    "semantic_identity_fingerprint": "45990df1c0c2f623b2a315d421bc5d91dc6cbe940f7edcc946ba3336f81a99f4",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/src/data/model_catalog/typed_model_cache_controlled.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "0be81a904f09ca0e8976926caf064f095f6d9fb4173cfa1f0a8eed7042f62b2c",
+    "observed_size_bytes": 13823,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/src/data/model_catalog/typed_model_cache_controlled.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/src/data/model_catalog/typed_model_cache_controlled.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/src/data/model_catalog/typed_model_cache_controlled.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/src/data/model_catalog/typed_model_cache_controlled.json",
+        "observed_sha256": "0be81a904f09ca0e8976926caf064f095f6d9fb4173cfa1f0a8eed7042f62b2c",
+        "observed_size_bytes": 13823,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:26.582142Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "dataset.mobility.ngsim.vehicle_trajectories",
+    "resource_role": "mobility_dataset",
+    "semantic_identity_fingerprint": "440d576dd38dfdef38829b677f6eae666ea6d15ecacb82e23cc7d3b8bf82ddda",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC/data",
+    "resolution_method": "data_root",
+    "observed_sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+    "observed_size_bytes": 2118175938,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+        "resolution_method": "data_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC/data",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+        "observed_sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+        "observed_size_bytes": 2118175938,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.313281Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "dataset.workflow.alibaba2018.batch_task",
+    "resource_role": "workflow_dataset",
+    "semantic_identity_fingerprint": "a4c1d06c8d0e623224b52f2a38a32a52210340b28ae1a751b4f5e036e4b0dfb1",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/data/raw/workflow/alibaba2018/batch_task.csv",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC/data",
+    "resolution_method": "data_root",
+    "observed_sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc",
+    "observed_size_bytes": 802261444,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/data/raw/workflow/alibaba2018/batch_task.csv",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/data/raw/workflow/alibaba2018/batch_task.csv"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/data/raw/workflow/alibaba2018/batch_task.csv",
+        "resolution_method": "data_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC/data",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/data/raw/workflow/alibaba2018/batch_task.csv",
+        "observed_sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc",
+        "observed_size_bytes": 802261444,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.594471Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.dev.constrained_288mb",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "81ccff702a44112241e771ae39119927867e48da3007ab6025b6b72e7f3813b5",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_constrained_288mb.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "5876283b1d5c9244f3e7fd1b975d7220d41d999e36127292ae2dfe226ac9e25a",
+    "observed_size_bytes": 273566,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_constrained_288mb.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_constrained_288mb.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_constrained_288mb.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_constrained_288mb.json",
+        "observed_sha256": "5876283b1d5c9244f3e7fd1b975d7220d41d999e36127292ae2dfe226ac9e25a",
+        "observed_size_bytes": 273566,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.596049Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.dev.medium_576mb",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "8dad0076466a5b371093b012401c0a3742689e2b150e06463af0ea57ca646c09",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_medium_576mb.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "db943de9dda7e302778bfcd3727875fda94ffbbb9b029c9dbd29712ed4e94242",
+    "observed_size_bytes": 273566,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_medium_576mb.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_medium_576mb.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_medium_576mb.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_medium_576mb.json",
+        "observed_sha256": "db943de9dda7e302778bfcd3727875fda94ffbbb9b029c9dbd29712ed4e94242",
+        "observed_size_bytes": 273566,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.597638Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.dev.relaxed_864mb",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "5123f563b2b7c012854016bc9ad75b78b1d2d2f34c2dd05fbaeafde7288ef2b4",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_relaxed_864mb.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "0c20449ed32868857dbf6b1b85a22b4b25e6c22a994e470286031b382b85b711",
+    "observed_size_bytes": 273566,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_relaxed_864mb.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_relaxed_864mb.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_relaxed_864mb.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_relaxed_864mb.json",
+        "observed_sha256": "0c20449ed32868857dbf6b1b85a22b4b25e6c22a994e470286031b382b85b711",
+        "observed_size_bytes": 273566,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.599059Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.formal.constrained_288mb",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "f91400c7cc708a9f8d0cce5f5478dbf988d8cac38a808c8eb1e14536a533f77d",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "6404d00e5be542a91c09febe921d2a43171570687eccf68710131df1cc300c24",
+    "observed_size_bytes": 273401,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+        "observed_sha256": "6404d00e5be542a91c09febe921d2a43171570687eccf68710131df1cc300c24",
+        "observed_size_bytes": 273401,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.600479Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.formal.medium_576mb",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "fb225e66288b115dbe0f0680b8ee339887a141e96c808e5b20c1045669563e53",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "51dae2eccb0eef6e6a52a69096543f7e1a3bccb002b52902759c2009076dc555",
+    "observed_size_bytes": 273401,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+        "observed_sha256": "51dae2eccb0eef6e6a52a69096543f7e1a3bccb002b52902759c2009076dc555",
+        "observed_size_bytes": 273401,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.601917Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.formal.relaxed_864mb",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "0ae2da2c2848feb5cb2370f546640b80df33a1909414754c2187484376dcce16",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "ed62a1e5992c4a4c5a878b18eb6986ee1b0280be573a87b25eb8310ce10800a0",
+    "observed_size_bytes": 273401,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+        "observed_sha256": "ed62a1e5992c4a4c5a878b18eb6986ee1b0280be573a87b25eb8310ce10800a0",
+        "observed_size_bytes": 273401,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.603325Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.support.ablation-8aa367acf3bdf7a9",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "31b982a1510a748d11d00aa58fb892c8dec892b5039458b782a7e5ce96989c29",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-8aa367acf3bdf7a9.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "b62604da052e78748c1ebebd693f03052f9bed7e35355de455f79b5c30351c73",
+    "observed_size_bytes": 273401,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-8aa367acf3bdf7a9.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-8aa367acf3bdf7a9.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-8aa367acf3bdf7a9.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-8aa367acf3bdf7a9.json",
+        "observed_sha256": "b62604da052e78748c1ebebd693f03052f9bed7e35355de455f79b5c30351c73",
+        "observed_size_bytes": 273401,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.604782Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.support.ablation-f09814754dc92882",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "7839964023e06340a130f0a3cd361276727cc7d1c8137079a343f05329524c4d",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-f09814754dc92882.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "ce8403811a89d3f39939cae1661306cfea67144f50525b5e4f13147075a31429",
+    "observed_size_bytes": 273401,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-f09814754dc92882.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-f09814754dc92882.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-f09814754dc92882.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-f09814754dc92882.json",
+        "observed_sha256": "ce8403811a89d3f39939cae1661306cfea67144f50525b5e4f13147075a31429",
+        "observed_size_bytes": 273401,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.606359Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.support.prediction_boundary-5faa585ad5330f05",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "022b2c2dead5e23b37f56fe684431117d3b9ef5b66ac093995c30aff7df9e3a0",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-5faa585ad5330f05.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "083ae5b4352452a776d670942a5f8b922ea4178be083474aed0c6706510f098c",
+    "observed_size_bytes": 273401,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-5faa585ad5330f05.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-5faa585ad5330f05.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-5faa585ad5330f05.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-5faa585ad5330f05.json",
+        "observed_sha256": "083ae5b4352452a776d670942a5f8b922ea4178be083474aed0c6706510f098c",
+        "observed_size_bytes": 273401,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.607890Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.support.prediction_boundary-95fb72521455c776",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "8c3b4b1462a948a22e68f19725a57fb74c8a10dfc642ca9c4960b6fcecb730da",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-95fb72521455c776.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "b4ddb48a42a31f1768debf16a2ca38643ce4c64fb3e0db6030e67264d1742151",
+    "observed_size_bytes": 273401,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-95fb72521455c776.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-95fb72521455c776.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-95fb72521455c776.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-95fb72521455c776.json",
+        "observed_sha256": "b4ddb48a42a31f1768debf16a2ca38643ce4c64fb3e0db6030e67264d1742151",
+        "observed_size_bytes": 273401,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.609329Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.support.prediction_boundary-a3a5789695404fae",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "ab61b367eba21508ca25581b4bfe44628db7841299a3449b93ef97d9f4f7778f",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-a3a5789695404fae.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "864ef790936476260f96015ae7ba8a8837746896fe2d11e2b5e2a2d2cd906b5b",
+    "observed_size_bytes": 273401,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-a3a5789695404fae.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-a3a5789695404fae.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-a3a5789695404fae.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-a3a5789695404fae.json",
+        "observed_sha256": "864ef790936476260f96015ae7ba8a8837746896fe2d11e2b5e2a2d2cd906b5b",
+        "observed_size_bytes": 273401,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.610755Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.support.prediction_boundary-ce96dbd5ea956212",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "b8f0422f8b12520285e6c07d6efac2605afd1dca637e740b5953f67b4b00ceb7",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-ce96dbd5ea956212.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "f0d9263ee40ecf629916d1663b4162f66cb30233063cf566d73698cf4d9d2f75",
+    "observed_size_bytes": 273401,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-ce96dbd5ea956212.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-ce96dbd5ea956212.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-ce96dbd5ea956212.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-ce96dbd5ea956212.json",
+        "observed_sha256": "f0d9263ee40ecf629916d1663b4162f66cb30233063cf566d73698cf4d9d2f75",
+        "observed_size_bytes": 273401,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.612177Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.support.prediction_boundary-df3bc5ade8c57014",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "e73f771a339ceb0187522c5b096222314116f13d4d2592a5d99d440092f56438",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-df3bc5ade8c57014.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "ab78587f9f7566c59ceb1921f33902ce914cd297cf50c12125dce95afada392d",
+    "observed_size_bytes": 273401,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-df3bc5ade8c57014.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-df3bc5ade8c57014.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-df3bc5ade8c57014.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-df3bc5ade8c57014.json",
+        "observed_sha256": "ab78587f9f7566c59ceb1921f33902ce914cd297cf50c12125dce95afada392d",
+        "observed_size_bytes": 273401,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.613653Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.support.prediction_boundary-efa09ee2409d3d87",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "69165df0d2636bf4ee50302016f155a83b5da940139a5f14ba94250b3b159e8d",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-efa09ee2409d3d87.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "deffe01c07f7342033d1d124b00aa7f7b2a69a56ae56fbde1d990015d47ed969",
+    "observed_size_bytes": 273401,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-efa09ee2409d3d87.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-efa09ee2409d3d87.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-efa09ee2409d3d87.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-efa09ee2409d3d87.json",
+        "observed_sha256": "deffe01c07f7342033d1d124b00aa7f7b2a69a56ae56fbde1d990015d47ed969",
+        "observed_size_bytes": 273401,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.615072Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.support.sensitivity-27d16b068076937b",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "a117229180b6ef4dfa1f6ddfa26bb2835f3c247575e677db85477c6a9de13dd1",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-27d16b068076937b.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "1e931c0148302a616946cefefe0fcec456aa060796ece71fa0b04f6814b1a9bb",
+    "observed_size_bytes": 272677,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-27d16b068076937b.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-27d16b068076937b.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-27d16b068076937b.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-27d16b068076937b.json",
+        "observed_sha256": "1e931c0148302a616946cefefe0fcec456aa060796ece71fa0b04f6814b1a9bb",
+        "observed_size_bytes": 272677,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.616480Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "fairness_manifest.support.sensitivity-7c7c3a1659c6e221",
+    "resource_role": "fairness_manifest",
+    "semantic_identity_fingerprint": "7ee5cb39304bcc754af8b44e513f2a9dd9b15df0f803f0a05094b686d1240f60",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-7c7c3a1659c6e221.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "150c8006e7220b537228eee3e7cf4f2af1804f1b462b23ace85549423f57b8c8",
+    "observed_size_bytes": 273401,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-7c7c3a1659c6e221.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-7c7c3a1659c6e221.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-7c7c3a1659c6e221.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-7c7c3a1659c6e221.json",
+        "observed_sha256": "150c8006e7220b537228eee3e7cf4f2af1804f1b462b23ace85549423f57b8c8",
+        "observed_size_bytes": 273401,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.617915Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "runtime_config.constrained_288mb",
+    "resource_role": "runtime_config",
+    "semantic_identity_fingerprint": "7053f7b817572a7e0cfd16f37d0bcd1da8d917b7b3060dfed9b0cc540ff09443",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "a7de83b51c5cf5a0c72103fd4bad7146e9e6aafccc6befc8616ea5d0d01cbf69",
+    "observed_size_bytes": 1770,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+        "observed_sha256": "a7de83b51c5cf5a0c72103fd4bad7146e9e6aafccc6befc8616ea5d0d01cbf69",
+        "observed_size_bytes": 1770,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.619229Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "runtime_config.medium_576mb",
+    "resource_role": "runtime_config",
+    "semantic_identity_fingerprint": "5940bca08ae65b445a9bf7fce5fe4cd7a637b41180fc4cb244c65449a5ce6663",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "37553cf9bff75967801cffd173abf4c6c89039063948fc21a0816d412097abc1",
+    "observed_size_bytes": 1765,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+        "observed_sha256": "37553cf9bff75967801cffd173abf4c6c89039063948fc21a0816d412097abc1",
+        "observed_size_bytes": 1765,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.620563Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "runtime_config.relaxed_864mb",
+    "resource_role": "runtime_config",
+    "semantic_identity_fingerprint": "1ebe4919bd858f3d46204f88ec15f886f71318df260d2727e9e777b58b13007d",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "6fb2049650e41d6e7120d1165f392e07d1b7d8beca31e76591e62b86cfaa5124",
+    "observed_size_bytes": 1766,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+        "observed_sha256": "6fb2049650e41d6e7120d1165f392e07d1b7d8beca31e76591e62b86cfaa5124",
+        "observed_size_bytes": 1766,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.621921Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "split.typed_model_cache.strict_v1",
+    "resource_role": "split_manifest",
+    "semantic_identity_fingerprint": "185e55ed87087a625005ef4ad8733f5215b26a920a0b21020b41aa517172cd19",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/split_manifest.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "b3f31dec5b161860ebcc13b00896ab7a1ff8f89c0ea6d24d9a87dcf7ccb24c29",
+    "observed_size_bytes": 81804,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/split_manifest.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/split_manifest.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/split_manifest.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/split_manifest.json",
+        "observed_sha256": "b3f31dec5b161860ebcc13b00896ab7a1ff8f89c0ea6d24d9a87dcf7ccb24c29",
+        "observed_size_bytes": 81804,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.623309Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "window_contract.typed_model_cache.formal_v1",
+    "resource_role": "window_contract",
+    "semantic_identity_fingerprint": "7ecf58791893a65412cb2c15e15b82170817f72f057a6aed482d39f1c4e59867",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/formal_window_consumption_contract.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "af16ad4cf4e15fbcc556554d964cdd92a9485bcf9973ce73e6728711ad91d16d",
+    "observed_size_bytes": 111745,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/formal_window_consumption_contract.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/formal_window_consumption_contract.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/formal_window_consumption_contract.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/formal_window_consumption_contract.json",
+        "observed_sha256": "af16ad4cf4e15fbcc556554d964cdd92a9485bcf9973ce73e6728711ad91d16d",
+        "observed_size_bytes": 111745,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.624674Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "window_plan.typed_model_cache.dev",
+    "resource_role": "window_plan",
+    "semantic_identity_fingerprint": "39a53c4feb8a065087cbce93cdc8e47f09c11b263fc9df0a3e665cad720d791b",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/dev_window_plan.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "736a56b3a8d475ed62c11fecae3942c82d9a2227ab4044dd4b17b1c48e30dd93",
+    "observed_size_bytes": 13771,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/dev_window_plan.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/dev_window_plan.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/dev_window_plan.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/dev_window_plan.json",
+        "observed_sha256": "736a56b3a8d475ed62c11fecae3942c82d9a2227ab4044dd4b17b1c48e30dd93",
+        "observed_size_bytes": 13771,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.625989Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "window_plan.typed_model_cache.formal",
+    "resource_role": "window_plan",
+    "semantic_identity_fingerprint": "35c59ab0908d1af80b611c234b52a0ca4f57ac4f357903fa4334185f9c091ea7",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/formal_window_plan.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "14945cf60a9f3b973145ec2a304e37235a43c465b0ff35391f46c15e30bd3332",
+    "observed_size_bytes": 13737,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/formal_window_plan.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/formal_window_plan.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/formal_window_plan.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/formal_window_plan.json",
+        "observed_sha256": "14945cf60a9f3b973145ec2a304e37235a43c465b0ff35391f46c15e30bd3332",
+        "observed_size_bytes": 13737,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.627300Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "window_plan.typed_model_cache.sealed_holdout",
+    "resource_role": "window_plan",
+    "semantic_identity_fingerprint": "b960a48118a1e18aff3a36ca9a381ee0cac1f59b585411b49f6dcb0d65b76504",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/sealed_holdout_window_plan.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "8e560ae6b84604184f3a54f70d9d931c411c7dbf6f887b3ab6d2e2cec1135c06",
+    "observed_size_bytes": 13751,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/sealed_holdout_window_plan.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/sealed_holdout_window_plan.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/sealed_holdout_window_plan.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/sealed_holdout_window_plan.json",
+        "observed_sha256": "8e560ae6b84604184f3a54f70d9d931c411c7dbf6f887b3ab6d2e2cec1135c06",
+        "observed_size_bytes": 13751,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.628622Z"
+  },
+  {
+    "portable_resource_resolution_version": "1.0.0",
+    "logical_resource_id": "window_plan.typed_model_cache.train",
+    "resource_role": "window_plan",
+    "semantic_identity_fingerprint": "41a8119a03e88f7308dd2eb67ff2e09b7536b4eaa429a6dd7527a694b89b8333",
+    "status": "compatible",
+    "portability_status": "exact_or_single_content_identity_match",
+    "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/train_window_plan.json",
+    "resolution_root": "/Users/howen/Projects/PPO_MEC",
+    "resolution_method": "worktree_root",
+    "observed_sha256": "9e892783c661b9ab94c5247f784941c6f5701c270d490efacc85130290f1bcb2",
+    "observed_size_bytes": 27210,
+    "symlink_audit": {
+      "lexical_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/train_window_plan.json",
+      "is_symlink": false,
+      "resolved_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/train_window_plan.json"
+    },
+    "observations": [
+      {
+        "candidate_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/train_window_plan.json",
+        "resolution_method": "worktree_root",
+        "resolution_root": "/Users/howen/Projects/PPO_MEC",
+        "exists": true,
+        "is_symlink": false,
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/train_window_plan.json",
+        "observed_sha256": "9e892783c661b9ab94c5247f784941c6f5701c270d490efacc85130290f1bcb2",
+        "observed_size_bytes": 27210,
+        "compatible": true,
+        "mismatch_reason": null
+      }
+    ],
+    "validated_at": "2026-08-24T01:51:27.629965Z"
+  }
+]

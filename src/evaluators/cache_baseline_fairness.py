@@ -27,6 +27,7 @@ from src.runtime.typed_model_cache_runtime import (
     RuntimeContractError,
     resolve_model_cache_runtime,
 )
+from src.runtime.portable_resource_identity import scientific_identity_fingerprint
 
 
 MANIFEST_VERSION = "1.0.0"
@@ -135,6 +136,7 @@ def semantic_projection(manifest: dict[str, Any]) -> dict[str, Any]:
     projected.pop("artifact_plan", None)
     for dataset in projected.get("dataset_provenance", {}).get("inputs", []):
         dataset.pop("normalized_absolute_path", None)
+        dataset.pop("runtime_resolution", None)
     for baseline in projected.get("baseline_matrix", []):
         baseline.get("config", {}).pop("normalized_absolute_path", None)
     return projected
@@ -954,17 +956,47 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
         resolved_inputs: dict[str, Path] = {}
         for item in dataset.get("inputs", []):
             logical_path = item.get("logical_path")
-            candidate = Path(item.get("normalized_absolute_path") or "")
-            if item.get("path_kind") == "repository_relative":
-                candidate = root / str(logical_path)
-            if not candidate.is_file():
-                errors.append(f"dataset input missing: {logical_path}")
+            candidates = []
+            for candidate in (
+                Path(item.get("normalized_absolute_path") or ""),
+                root / str(logical_path),
+            ):
+                if str(candidate) and candidate not in candidates:
+                    candidates.append(candidate)
+            existing = [candidate for candidate in candidates if candidate.is_file()]
+            compatible = [
+                candidate
+                for candidate in existing
+                if candidate.stat().st_size == item.get("size_bytes")
+                and sha256_file(candidate) == item.get("sha256")
+            ]
+            observed_identities = {
+                (candidate.stat().st_size, sha256_file(candidate))
+                for candidate in existing
+            }
+            if len(observed_identities) > 1:
+                errors.append(f"conflicting dataset candidates: {logical_path}")
+            if not compatible:
+                if existing and any(
+                    candidate.stat().st_size != item.get("size_bytes")
+                    for candidate in existing
+                ):
+                    errors.append(f"dataset size mismatch: {logical_path}")
+                elif existing:
+                    errors.append(f"dataset hash mismatch: {logical_path}")
+                else:
+                    errors.append(f"dataset input missing: {logical_path}")
                 continue
-            if candidate.stat().st_size != item.get("size_bytes"):
-                errors.append(f"dataset size mismatch: {logical_path}")
-            if sha256_file(candidate) != item.get("sha256"):
-                errors.append(f"dataset hash mismatch: {logical_path}")
+            candidate = compatible[0].resolve()
             resolved_inputs[str(item.get("logical_dataset_id"))] = candidate
+            if item.get("portable_identity"):
+                portable = item["portable_identity"]
+                if portable.get("content_sha256") != item.get("sha256"):
+                    errors.append(f"portable dataset hash mismatch: {logical_path}")
+                if portable.get("size_bytes") != item.get("size_bytes"):
+                    errors.append(f"portable dataset size mismatch: {logical_path}")
+                if portable.get("semantic_identity_fingerprint") != scientific_identity_fingerprint(portable):
+                    errors.append(f"portable dataset fingerprint mismatch: {logical_path}")
         checked.append("dataset_file_size_and_sha256")
     else:
         resolved_inputs = {}
@@ -1119,8 +1151,12 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
                     declared_path = Path(str(typed_cache.get("catalog_path") or ""))
                     if not declared_path.is_absolute():
                         declared_path = root / declared_path
-                    if declared_path.resolve() != catalog_file.resolve():
-                        errors.append("typed catalog path differs from frozen dataset input")
+                    if (
+                        not declared_path.is_file()
+                        or declared_path.stat().st_size != catalog_file.stat().st_size
+                        or sha256_file(declared_path) != sha256_file(catalog_file)
+                    ):
+                        errors.append("typed catalog content differs from frozen dataset input")
                     resolved_runtime = resolve_model_cache_runtime(
                         {
                             "model_cache_profile": typed_cache.get("profile_id"),
@@ -1297,18 +1333,25 @@ def enforce_benchmark_args(args: Any, manifest: dict[str, Any]) -> None:
         item["logical_dataset_id"]: item
         for item in manifest["dataset_provenance"]["inputs"]
     }
-    workflow_path = Path(inputs["alibaba_cluster_trace_2018_batch_task"]["normalized_absolute_path"]).resolve()
-    if Path(args.workflow_csv_path).resolve() != workflow_path or sha256_file(workflow_path) != inputs["alibaba_cluster_trace_2018_batch_task"]["sha256"]:
+    workflow_input = inputs["alibaba_cluster_trace_2018_batch_task"]
+    workflow_path = Path(args.workflow_csv_path).resolve()
+    if (
+        not workflow_path.is_file()
+        or workflow_path.stat().st_size != workflow_input["size_bytes"]
+        or sha256_file(workflow_path) != workflow_input["sha256"]
+    ):
         raise FairnessManifestError("CLI workflow path/content overrides frozen manifest")
     if args.mobility_csv_path:
-        mobility_path = Path(inputs["ngsim_vehicle_trajectories"]["normalized_absolute_path"]).resolve()
-        if Path(args.mobility_csv_path).resolve() != mobility_path:
+        mobility_input = inputs["ngsim_vehicle_trajectories"]
+        mobility_path = Path(args.mobility_csv_path).resolve()
+        if (
+            not mobility_path.is_file()
+            or mobility_path.stat().st_size != mobility_input["size_bytes"]
+            or sha256_file(mobility_path) != mobility_input["sha256"]
+        ):
             raise FairnessManifestError("CLI mobility path overrides frozen manifest")
     plan_path = Path(args.window_plan_path).resolve()
-    manifest_plan = Path(manifest["window_workload_plan"]["window_plan_path"])
-    if not manifest_plan.is_absolute():
-        manifest_plan = Path(args._fairness_root) / manifest_plan
-    if plan_path != manifest_plan.resolve() or sha256_file(plan_path) != manifest["window_workload_plan"]["window_plan_sha256"]:
+    if not plan_path.is_file() or sha256_file(plan_path) != manifest["window_workload_plan"]["window_plan_sha256"]:
         raise FairnessManifestError("CLI window plan path/content overrides frozen manifest")
     capacity = manifest["cache_contract"]["capacity"]
     runtime = getattr(args, "_resolved_model_cache_runtime", None)

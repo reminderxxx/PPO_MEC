@@ -25,6 +25,10 @@ from src.evaluators.formal_window_consumption import (
     validate_window_plan_binding,
 )
 from src.runtime.typed_model_cache_runtime import resolve_model_cache_runtime
+from src.runtime.portable_resource_identity import (
+    add_portable_resource_arguments,
+    resolve_argument_resources,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -36,9 +40,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--seed-checkpoint-manifest-path", required=True)
     parser.add_argument("--checkpoint-provenance-manifest-path", required=True)
     parser.add_argument("--window-plan-path", required=True)
-    parser.add_argument("--formal-window-consumption-contract-path", required=True)
-    parser.add_argument("--formal-window-split", choices=["formal"], required=True)
+    parser.add_argument("--formal-window-consumption-contract-path", default="")
+    parser.add_argument("--formal-window-split", choices=["formal"], default="formal")
     parser.add_argument("--mobility-csv-path", required=True)
+    parser.add_argument("--workflow-csv-path", required=True)
     parser.add_argument("--max-mobility-rows", type=int, required=True)
     parser.add_argument("--window-selector", choices=["ordered"], required=True)
     parser.add_argument("--window-length", type=int, required=True)
@@ -52,7 +57,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--seeds", nargs="+", type=int, required=True)
     parser.add_argument("--output-root", required=True)
     parser.add_argument("--request-replay-path", default="")
+    parser.add_argument("--non-formal-rehearsal", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
+    add_portable_resource_arguments(parser)
     return parser
 
 
@@ -137,6 +144,18 @@ def stamp_outputs(run_root: Path, provenance: dict) -> None:
 
 def main() -> None:
     args = parse_args()
+    if args.resource_registry_path:
+        resolve_argument_resources(
+            args,
+            bindings=(
+                ("mobility_resource_id", "mobility_csv_path", "mobility_dataset"),
+                ("workflow_resource_id", "workflow_csv_path", "workflow_dataset"),
+                ("window_plan_resource_id", "window_plan_path", "window_plan"),
+                ("runtime_config_resource_id", "model_cache_runtime_config", "runtime_config"),
+                ("fairness_manifest_resource_id", "cache_baseline_fairness_manifest_path", "fairness_manifest"),
+                ("checkpoint_manifest_id", "seed_checkpoint_manifest_path", "checkpoint_manifest"),
+            ),
+        )
     protocol = load_json(args.protocol_path, "protocol")
     validate_protocol_v1_1(protocol)
     setting = support_setting_by_id(protocol, args.setting_id)
@@ -167,28 +186,36 @@ def main() -> None:
     selection = fairness["dataset_provenance"]["selection_filter_parameters"]
     if selection.get("primary_vehicle_selection") != args.primary_vehicle_selection:
         raise FormalExecutionError("support vehicle selection CLI/fairness mismatch")
-    window_contract = load_window_consumption_contract(
-        args.formal_window_consumption_contract_path
-    )
-    expected_contract_hash = (
-        protocol.get("execution_contract", {})
-        .get("window_consumption_contract", {})
-        .get("semantic_sha256")
-    )
-    if expected_contract_hash != window_contract["hashes"]["semantic_sha256"]:
-        raise FormalExecutionError("support window consumption contract hash mismatch")
-    validate_window_plan_binding(
-        contract=window_contract,
-        plan_path=args.window_plan_path,
-        split=args.formal_window_split,
-        max_mobility_rows=args.max_mobility_rows,
-        mobility_csv_path=args.mobility_csv_path,
-        window_selector=args.window_selector,
-        window_length=args.window_length,
-        rsu_layout=args.rsu_layout,
-        primary_vehicle_selection=args.primary_vehicle_selection,
-        mode="formal",
-    )
+    if args.non_formal_rehearsal:
+        if args.formal_window_consumption_contract_path:
+            raise FormalExecutionError(
+                "non-formal support rehearsal must not bind the formal window contract"
+            )
+    else:
+        if not args.formal_window_consumption_contract_path:
+            raise FormalExecutionError("formal support requires the window contract")
+        window_contract = load_window_consumption_contract(
+            args.formal_window_consumption_contract_path
+        )
+        expected_contract_hash = (
+            protocol.get("execution_contract", {})
+            .get("window_consumption_contract", {})
+            .get("semantic_sha256")
+        )
+        if expected_contract_hash != window_contract["hashes"]["semantic_sha256"]:
+            raise FormalExecutionError("support window consumption contract hash mismatch")
+        validate_window_plan_binding(
+            contract=window_contract,
+            plan_path=args.window_plan_path,
+            split=args.formal_window_split,
+            max_mobility_rows=args.max_mobility_rows,
+            mobility_csv_path=args.mobility_csv_path,
+            window_selector=args.window_selector,
+            window_length=args.window_length,
+            rsu_layout=args.rsu_layout,
+            primary_vehicle_selection=args.primary_vehicle_selection,
+            mode="formal",
+        )
     parameter = setting.get("parameter")
     value = setting.get("value", setting.get("baseline"))
     expected_selection: dict[str, object] = {}
@@ -244,7 +271,7 @@ def main() -> None:
         )
         print(json.dumps({"status": "pass", "run_root": str(run_root), "support_provenance": provenance}, ensure_ascii=False, indent=2, allow_nan=False))
         return
-    benchmark_flags(setting)  # Fail fast when no safe binding is implemented.
+    setting_flags = benchmark_flags(setting)
     max_steps = {
         int(unit["max_steps"])
         for unit in fairness["window_workload_plan"]["evaluation_units"]
@@ -261,10 +288,8 @@ def main() -> None:
         "--cache_baseline_fairness_manifest_path", args.cache_baseline_fairness_manifest_path,
         "--model_cache_runtime_config", args.model_cache_runtime_config,
         "--window_plan_path", args.window_plan_path,
-        "--formal_window_consumption_contract_path", args.formal_window_consumption_contract_path,
-        "--formal_window_split", args.formal_window_split,
-        "--window_consumption_mode", "formal",
         "--mobility_csv_path", args.mobility_csv_path,
+        "--workflow_csv_path", args.workflow_csv_path,
         "--window_selector", args.window_selector,
         "--window_length", str(args.window_length),
         "--rsu_layout", args.rsu_layout,
@@ -286,6 +311,34 @@ def main() -> None:
         "--reward_positive_offset", "0",
         "--audit_runtime",
     ]
+    if not args.non_formal_rehearsal:
+        command.extend(
+            [
+                "--formal_window_consumption_contract_path",
+                args.formal_window_consumption_contract_path,
+                "--formal_window_split",
+                args.formal_window_split,
+                "--window_consumption_mode",
+                "formal",
+            ]
+        )
+    command.extend(setting_flags)
+    if args.resource_registry_path:
+        command.extend(
+            [
+                "--resource-registry-path", args.resource_registry_path,
+                "--repository-root", args.repository_root or str(ROOT),
+                "--data-root", args.data_root,
+                "--protocol-artifact-root", args.protocol_artifact_root,
+                "--checkpoint-root", args.checkpoint_root,
+                "--mobility-resource-id", args.mobility_resource_id,
+                "--workflow-resource-id", args.workflow_resource_id,
+                "--window-plan-resource-id", args.window_plan_resource_id,
+                "--runtime-config-resource-id", args.runtime_config_resource_id,
+                "--fairness-manifest-resource-id", args.fairness_manifest_resource_id,
+                "--checkpoint-manifest-id", args.checkpoint_manifest_id,
+            ]
+        )
     if args.dry_run:
         print(
             json.dumps(

@@ -1,0 +1,9 @@
+{
+  "command_log_version": "1.0.0",
+  "generated_at": "2026-08-24T01:51:27.636540Z",
+  "commands": [
+    "scripts/repair_typed_model_cache_formal_paths.py --generate",
+    "portable main/clean command expansion and negative-case validation"
+  ],
+  "formal_or_holdout_command_executed": false
+}

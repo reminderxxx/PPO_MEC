@@ -16,6 +16,7 @@ from src.evaluators.typed_model_cache_formal_execution import (
     FormalExecutionError,
     validate_protocol_v1_1,
 )
+from src.runtime.portable_resource_identity import add_portable_resource_arguments
 
 
 def parse_args() -> argparse.Namespace:
@@ -23,6 +24,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--protocol-path", required=True)
     parser.add_argument("--input-root", required=True)
     parser.add_argument("--output-root", required=True)
+    add_portable_resource_arguments(parser)
     return parser.parse_args()
 
 

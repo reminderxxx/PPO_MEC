@@ -1,0 +1,7 @@
+{
+  "status": "reproduced_from_failure_audit",
+  "failed_before_dev_performance": true,
+  "missing_flag": "--workflow_csv_path",
+  "candidate_evaluations_completed": 0,
+  "exception": "CLI workflow path/content overrides frozen manifest"
+}

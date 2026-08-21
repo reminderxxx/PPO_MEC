@@ -63,3 +63,12 @@ G08 必须直接消费同一 validated manifest与evaluation units，在相同 r
 Typed producer使用consumer-safe manifest `1.1.0`，并新增catalog logical path、object taxonomy、dependency/compatibility/pinned-evictability独立fingerprint、resident/transfer size、transaction contract version、action-before-lookup、CacheEvent 1.3、metrics 1.1、trace context 1.0和typed replay identity。Validator从冻结catalog文件重新构建binding；catalog、dependency、initial state、MB值或pinned metadata任一漂移即失败。
 
 `baseline_matrix`仍严格只含五个reactive baseline并执行10组only-policy-difference审计。可选`typed_model_cache.controller_agents`只冻结同一evaluation unit实际需要追加的learned controller身份，不进入reactive pairwise diff。Typed manifest不得由legacy runtime消费，legacy manifest也不得被typed runtime冒充。
+
+## G14R3 portable identity companion
+
+历史 fairness 1.0/1.1 manifest 不重写。G14R3 companion 1.0.0 将 absolute path、runtime resolution 与
+validation time 明确排除在 semantic projection 之外，并以 logical ID、role、schema、size、content SHA-256
+和 scientific fingerprint 绑定 mobility、workflow、catalog、window plan、baseline config 与 fairness 文件。
+Validator 可接受 content-identical relocation，但拒绝同名异 hash、多候选冲突、role/schema/size 漂移与 CLI
+content override。Benchmark 参数由 path equality 改为 content identity 对账；policy/workload/capacity 等原有
+fairness 语义不变。

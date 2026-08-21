@@ -1258,3 +1258,16 @@ LRU/FIFO/LFU/Aging-LFU/Random 公平绑定、小规模 exact oracle，以及真�
 Run `g14a_rehearsal_20260819_230456_872949`使用`controlled_non_hidden`窗口、NGSIM + Alibaba最小骨架、seed 7/13、320/384 MB、五个reactive baseline与PPO/MAPPO。8个tiny checkpoint均通过typed provenance gate；28个typed episode的CacheEvent 1.3与metrics 1.1 reconciliation通过；legacy slot/MB各通过一次兼容运行。Top-level integrity manifest记录125个本地文件。
 
 证据边界：G14A 当时没有正式split/protocol、正式checkpoint、formal/holdout/hidden/support或G15；rehearsal checkpoint不进入Git或正式manifest。后续 G14B 已另行冻结 split/protocol 并通过 readiness v2，但没有追溯提升 G14A tiny checkpoint。本记录不提供算法排名或paper-ready结论。
+
+## 2026-08-24 G14R3 portable resource repair
+
+- Root：`artifacts/analysis/typed_model_cache_formal_path_repair_20260821_g14r3_v1/`
+- Protocol semantic：`1525b7cbfaea123b360ffbedd06ef9177b9f8996987d0e49dfd67cafb411ac17`
+- Registry semantic：`810f0fa987202da0e018f309509a286d811bfe867ab62acdf1f476a987c086d7`
+- Resource matrix file SHA-256：`790f0e29644d8b9e412829ca0173d475412b5f1c5c6eec8fb8c3b32842b44a26`
+- Command validation file SHA-256：`d2b0da4f039b626d732cd7f1336d1bd0d5c47d326218f4514d72a40c4f7b3f8a`
+- Negative cases file SHA-256：`82efec4f54ac4aa75606e176fc3a483713d4d196833c7e861291527346871aef`
+- Successful rehearsal summary SHA-256：`ffc521708ed5e7961d06758e3940360d76ad2a649827d9cbfda14d5a776c82f2`
+- Readiness v5 file SHA-256：`bea010290f326604983b32ed1a16a8b06f66e9afa1f60d7aaaaff6e5a68bd985`
+- Artifact integrity identity：`4beccd3299905a139f6a0d43895603b0f1bb565129ddc8931abdc962d3ee4bf8`
+- Evidence level：execution-contract validated、non-formal rehearsal；不是 formal/holdout/paper claim。

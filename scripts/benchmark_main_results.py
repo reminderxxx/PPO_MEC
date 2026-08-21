@@ -55,6 +55,10 @@ from src.runtime.typed_model_cache_runtime import (
     resolve_model_cache_runtime,
     validate_checkpoint_provenance,
 )
+from src.runtime.portable_resource_identity import (
+    add_portable_resource_arguments,
+    resolve_argument_resources,
+)
 
 BENCHMARK_AGENT_CHOICES = list_evaluable_agents()
 SA_ADVANTAGE_FOCUS_METRICS = [
@@ -158,6 +162,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Record episode wall-clock and Python traced peak allocation for compute auditing.",
     )
+    add_portable_resource_arguments(parser)
     return parser
 
 
@@ -243,6 +248,35 @@ def load_seed_checkpoint_manifest(path: str) -> dict[str, dict[str, str]]:
     payload = json.loads(manifest_path.read_text(encoding="utf-8-sig"))
     if not isinstance(payload, dict):
         raise ValueError(f"seed checkpoint manifest must be a mapping: {manifest_path}")
+    portable = payload.get("_portable_checkpoint_manifest")
+    if portable is not None:
+        if not isinstance(portable, dict) or portable.get("checkpoint_location_contract_version") != "1.0.0":
+            raise ValueError("portable checkpoint location contract is invalid")
+        invalid_roots = [Path(item).resolve() for item in portable.get("invalid_run_roots", [])]
+        entries = {
+            (str(item.get("agent")), str(item.get("seed"))): item
+            for item in portable.get("entries", [])
+            if isinstance(item, dict)
+        }
+        for agent_name, seed_map in payload.items():
+            if str(agent_name).startswith("_") or not isinstance(seed_map, dict):
+                continue
+            for seed, raw_checkpoint_path in seed_map.items():
+                checkpoint_path = Path(str(raw_checkpoint_path)).resolve()
+                if any(
+                    checkpoint_path == root or root in checkpoint_path.parents
+                    for root in invalid_roots
+                ):
+                    raise ValueError("invalid G14C v3 checkpoint reference rejected")
+                entry = entries.get((str(agent_name), str(seed)))
+                if entry is None:
+                    raise ValueError("portable checkpoint manifest entry is missing")
+                identity = entry.get("checkpoint_identity") or {}
+                if (
+                    not checkpoint_path.is_file()
+                    or sha256_file(checkpoint_path) != identity.get("checkpoint_sha256")
+                ):
+                    raise ValueError("portable checkpoint content identity mismatch")
     normalized: dict[str, dict[str, str]] = {}
     for agent_name, seed_map in payload.items():
         agent_key = str(agent_name)
@@ -462,6 +496,19 @@ def build_sa_advantage_diagnosis(
 
 def main() -> None:
     args = parse_args()
+    if args.resource_registry_path:
+        bindings = [
+            ("mobility_resource_id", "mobility_csv_path", "mobility_dataset"),
+            ("workflow_resource_id", "workflow_csv_path", "workflow_dataset"),
+            ("window_plan_resource_id", "window_plan_path", "window_plan"),
+            ("runtime_config_resource_id", "model_cache_runtime_config", "runtime_config"),
+            ("fairness_manifest_resource_id", "cache_baseline_fairness_manifest_path", "fairness_manifest"),
+        ]
+        if args.checkpoint_manifest_id:
+            bindings.append(
+                ("checkpoint_manifest_id", "seed_checkpoint_manifest_path", "checkpoint_manifest")
+            )
+        resolve_argument_resources(args, bindings=bindings)
     window_consumption_contract: dict[str, Any] | None = None
     window_consumption_binding: dict[str, Any] | None = None
     if args.formal_window_consumption_contract_path:

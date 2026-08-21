@@ -890,3 +890,14 @@
 - 决策：typed fairness继续将五reactive baseline严格保留在pairwise matrix，learned controller只放optional companion agent list；因此only-policy-difference不被算法结构差异污染。
 - 决策：typed formal-capable benchmark强制fairness manifest；无manifest兼容仅限legacy并标记unavailable。G14A不冻结split/protocol；后续 G14B 已按独立任务冻结并通过新 readiness gate。
 - 证据：`artifacts/analysis/typed_model_cache_runtime_plumbing_validation_20260819_g14a_v1/`，evidence level为non-formal contract validation。
+
+## 2026-08-24: scientific resource identity is content-addressed, not host-path-addressed
+
+- 决策：正式外部资源以 logical ID、role、schema、size、content hash 与 revision 定义科学身份；absolute path 只作
+  runtime audit。解析仅允许显式 root classes，禁止 cwd 猜测。
+- 决策：历史 fairness/window scientific semantics 不重写；通过 nonsemantic portability companion 与 shared
+  resolver 接受 content-identical relocation。
+- 决策：dev selection hash 与 checkpoint freeze hash 排除 artifact location；checkpoint location 可迁移但必须重验
+  hash 与 agent/seed/capacity/Protocol provenance。
+- 决策：G14C v3 永久 `invalid_before_dev_performance_execution`，不建立 salvage 例外。G14C v4 必须从最终 A4、
+  新 run root、冻结矩阵从头执行。

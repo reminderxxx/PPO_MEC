@@ -8,6 +8,8 @@
   execution/holdout seal 冻结合同
 - `typed_model_cache_formal_window_consumption_contract.md`：G14R2 raw/provider offset 语义、source-range
   推导、60-window reachability、command binding、ledger v2 与 Readiness v4
+- `typed_model_cache_formal_portable_resource_contract.md`：G14R3 content-addressed external resources、fairness/window/
+  checkpoint location、dev workflow binding、clean-tree rehearsal 与 Readiness v5
 - `typed_model_cache_split_exclusion_audit.md`：G14B 全历史 interval ledger、NGSIM inventory、24/12/12/12 split 与 pairwise independence 审计
 
 - `model_cache_dataset_discovery_audit_20260819.md`：G11 public model-serving/KV/model-artifact dataset taxonomy、qualification、HF复核、mapping与claim boundary
@@ -79,3 +81,10 @@
 - 排除审计：`typed_model_cache_split_exclusion_audit.md`
 - 机器证据：`../../artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/`
 - 状态：`READY_FOR_G14C_CLEAN_TRAIN_AND_FORMAL`；formal episode/checkpoint/performance result均为0，holdout sealed/unopened，不是paper-ready。
+
+## G14R3 portable execution path repair
+
+- Protocol v1.3 semantic：`1525b7cb...ac17`
+- Readiness v5：`READY_FOR_G14C_V4_CLEAN_TRAIN_AND_FORMAL`
+- 机器证据：`../../artifacts/analysis/typed_model_cache_formal_path_repair_20260821_g14r3_v1/`
+- 状态：portable binding 与 non-formal exact rehearsal 已通过；G14C v4/formal/holdout/G15 尚未启动。

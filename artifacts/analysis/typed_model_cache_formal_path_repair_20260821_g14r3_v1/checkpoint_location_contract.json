@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "absolute_path_is_scientific_identity": false,
+  "content_hash_is_required": true,
+  "relocation_requires_identical_hash": true,
+  "agent_seed_capacity_match_required": true,
+  "invalid_g14c_v3_run_root": "/private/tmp/ppo_mec_g14c_v3_a7c9e8e/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260820_203430_g14c_v3",
+  "invalid_run_candidate_reuse": false,
+  "formal_location_source": "checkpoint manifest"
+}

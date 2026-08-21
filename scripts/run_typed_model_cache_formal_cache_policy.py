@@ -19,6 +19,7 @@ from src.evaluators.typed_model_cache_formal_execution import (
     validate_protocol_v1_1,
 )
 from src.oracles.cache_request_replay import build_policy_neutral_replay_from_manifest
+from src.runtime.portable_resource_identity import add_portable_resource_arguments
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -28,6 +29,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--evaluation-unit-id", required=True)
     parser.add_argument("--request-replay-path", required=True)
     parser.add_argument("--command", nargs=argparse.REMAINDER, required=True)
+    add_portable_resource_arguments(parser)
     return parser
 
 

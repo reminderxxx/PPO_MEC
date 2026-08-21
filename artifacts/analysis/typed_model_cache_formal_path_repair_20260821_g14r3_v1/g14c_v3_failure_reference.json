@@ -1,0 +1,15 @@
+{
+  "status": "invalid_before_dev_performance_execution",
+  "run_root": "/private/tmp/ppo_mec_g14c_v3_a7c9e8e/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260820_203430_g14c_v3",
+  "failure_audit_sha256": "476cfc3f57312263da7dff388a89c088e4716d43b1949eb121598c86dc5ac3af",
+  "protocol_version": "1.2.0",
+  "training_cells_completed": 150,
+  "checkpoint_candidates_created": 1200,
+  "dev_performance_count": 0,
+  "selected_checkpoint_count": 0,
+  "formal_count": 0,
+  "holdout_opened": false,
+  "resume_allowed": false,
+  "candidate_reuse_allowed": false,
+  "evidence_retained_not_deleted": true
+}

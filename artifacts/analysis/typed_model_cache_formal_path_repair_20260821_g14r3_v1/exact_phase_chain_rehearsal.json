@@ -1,0 +1,95 @@
+{
+  "g14r3_non_formal_rehearsal_version": "1.0.0",
+  "status": "pass",
+  "execution_mode": "non_formal_rehearsal",
+  "protocol_semantic_sha256": "1525b7cbfaea123b360ffbedd06ef9177b9f8996987d0e49dfd67cafb411ac17",
+  "phase_order": [
+    "preflight",
+    "tests",
+    "train",
+    "dev_select",
+    "checkpoint_freeze",
+    "formal_cache_policy",
+    "formal_controller",
+    "formal_ablation",
+    "formal_support",
+    "formal_scalability",
+    "formal_statistics",
+    "formal_gate",
+    "complete_without_holdout"
+  ],
+  "completed_phase_order": [
+    "preflight",
+    "tests",
+    "train",
+    "dev_select",
+    "checkpoint_freeze",
+    "formal_cache_policy",
+    "formal_controller",
+    "formal_ablation",
+    "formal_support",
+    "formal_scalability",
+    "formal_statistics",
+    "formal_gate",
+    "complete_without_holdout"
+  ],
+  "phase_ledger_validation": {
+    "status": "pass",
+    "record_count": 26,
+    "terminal_phase_count": 13,
+    "last_record_hash": "817b0dd40488dc72e9103efd3a3f2e5912dde1fdaf80597e8156146a2e13da29"
+  },
+  "agents": [
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "cache_offload_drl"
+  ],
+  "domain_baseline": "cache_offload_drl",
+  "seeds": [
+    7,
+    13
+  ],
+  "capacities_mb": [
+    288.0,
+    576.0
+  ],
+  "training_cell_count": 16,
+  "checkpoint_frequency_updates": 4,
+  "saved_checkpoint_update_indices": [
+    4
+  ],
+  "sa_auxiliary_coef": [
+    0.06
+  ],
+  "dev_selector": {
+    "real_consumer_executed": true,
+    "candidate_count": 16,
+    "selected_count": 16,
+    "formal_or_holdout_used": false
+  },
+  "checkpoint_freeze": {
+    "real_consumer_executed": true,
+    "frozen_checkpoint_count": 16,
+    "freeze_sha256": "5ef988d07ca1907867ff1c219f1b1dd3f4cf38db87a3339993948a89fd83267c",
+    "location_nonsemantic": true
+  },
+  "cache_policy_executed": true,
+  "controller_evaluation_executed": true,
+  "ablation_support_executed": true,
+  "robustness_support_executed": true,
+  "scalability_support_executed": true,
+  "statistics_executed": true,
+  "artifact_integrity_executed": true,
+  "non_formal_completeness_gate_passed": true,
+  "formal_training_count": 0,
+  "formal_evaluation_count": 0,
+  "holdout_opened": false,
+  "hidden_data_used": false,
+  "paper_claims": [],
+  "invalid_g14c_v3_checkpoint_reused": false,
+  "old_run_resumed": false,
+  "rehearsal_root": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_path_repair_20260821_g14r3_v1/rehearsal_runs/g14r3_clean_c3b99bc",
+  "clean_execution_worktree": "/private/tmp/ppo_mec_g14r3_clean_c3b99bc",
+  "external_data_root": "/Users/howen/Projects/PPO_MEC/data"
+}

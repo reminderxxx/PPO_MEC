@@ -1,0 +1,12 @@
+{
+  "split_companion_version": "1.2.0",
+  "split_semantic_sha256": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+  "source_window_plan_directory": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_20260820",
+  "split_semantics_rewritten": false,
+  "reason": "G14R2 repairs only window consumption and ledger provenance.",
+  "portable_resource_identity_companion": {
+    "nonsemantic": true,
+    "resource_registry_semantic_sha256": "810f0fa987202da0e018f309509a286d811bfe867ab62acdf1f476a987c086d7",
+    "split_semantic_sha256_unchanged": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a"
+  }
+}

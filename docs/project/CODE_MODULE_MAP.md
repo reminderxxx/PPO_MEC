@@ -428,3 +428,19 @@
 - `src/evaluators/cache_baseline_fairness.py`：typed manifest 1.1 producer/validator及runtime CLI enforcement；五reactive pairwise matrix不被controller companion改变。
 - `scripts/run_typed_model_cache_runtime_rehearsal.py`：只生成non-formal tiny training/restore/benchmark/reconciliation与integrity证据。
 - `tests/test_typed_runtime_plumbing.py`：G14A配置、fairness、training、checkpoint、legacy、event、metrics、hash/JSON专项合同测试。
+
+## 2026-08-24 G14R3 portable formal resources
+
+- `src/runtime/portable_resource_identity.py`：portable contract、registry、scientific fingerprint、六类 root resolver、
+  conflict/symlink/content audit 与共享 CLI binding。
+- `src/evaluators/cache_baseline_fairness.py`、`formal_window_consumption.py`：content-identical relocation、legacy
+  exact-path compatibility 与 portable companion enforcement。
+- `scripts/run_typed_model_cache_formal_dev_selection.py`：explicit workflow propagation、真实 dev candidate evaluation
+  与受控 non-formal rehearsal matrix。
+- `scripts/manage_typed_model_cache_formal_artifacts.py`：path-invariant selection、portable checkpoint freeze/companions、
+  invalid G14C v3 hard reject、integrity 与 non-formal completeness gate。
+- `scripts/repair_typed_model_cache_formal_paths.py`：Protocol v1.3/config/evidence/readiness generator、186-command parity 与
+  12 negative cases。
+- `scripts/run_typed_model_cache_formal_path_rehearsal.py`：16-cell public controlled exact phase-chain rehearsal；不具备
+  formal/holdout/hidden capability。
+- `tests/test_portable_resource_identity.py`：portable identity、resolver、parser、checkpoint、command/readiness regressions。

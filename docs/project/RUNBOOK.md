@@ -1031,3 +1031,20 @@ G14R non-formal rehearsal 入口：
 
 该命令只使用 controlled non-hidden smoke plan，产物中的 checkpoint 与 episode raw outputs 保持 Git
 ignored；根级 `rehearsal_summary.json` 进入 G14R integrity。它不能作为正式 checkpoint 或性能证据。
+
+## 2026-08-24 G14R3 portable-path handoff
+
+当前唯一 readiness 为 `READY_FOR_G14C_V4_CLEAN_TRAIN_AND_FORMAL`，Protocol v1.3 semantic SHA-256 为
+`1525b7cbfaea123b360ffbedd06ef9177b9f8996987d0e49dfd67cafb411ac17`。准备/审计入口：
+
+```bash
+.venv/bin/python scripts/repair_typed_model_cache_formal_paths.py --generate \
+  --clean-root <clean-worktree> \
+  --rehearsal-summary <successful-non-formal-rehearsal-summary>
+.venv/bin/python -m pytest tests/test_portable_resource_identity.py -q
+```
+
+不得在 G14R3 中运行正式 template。未来 G14C v4 必须在 push 后的最终 A4 clean worktree、新 run root 从头
+执行；不得 resume/复制 G14C v3 candidates。Dev/formal/support 命令必须保留 explicit workflow path、registry、
+repository/data/checkpoint roots 与各 resource ID。任何 unresolved path、hash/role/schema 冲突或 invalid-run
+checkpoint 必须停止执行。

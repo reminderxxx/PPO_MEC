@@ -31,6 +31,8 @@ FORMAL_EXECUTION_PROTOCOL_VERSION = "1.1.0"
 FORMAL_EXECUTION_PROTOCOL_ID = "typed_model_cache_formal_protocol_v1_1"
 FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION = "1.2.0"
 FORMAL_EXECUTION_PROTOCOL_V1_2_ID = "typed_model_cache_formal_protocol_v1_2"
+FORMAL_EXECUTION_PROTOCOL_V1_3_VERSION = "1.3.0"
+FORMAL_EXECUTION_PROTOCOL_V1_3_ID = "typed_model_cache_formal_protocol_v1_3"
 FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
 FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
 PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
@@ -38,6 +40,7 @@ SUPPORT_RUNNER_CONTRACT_VERSION = "1.0.0"
 READINESS_REVIEW_VERSION = "3.0.0"
 READY_VERDICT = "READY_FOR_G14C_V2_CLEAN_TRAIN_AND_FORMAL"
 READY_V4_VERDICT = "READY_FOR_G14C_V3_CLEAN_TRAIN_AND_FORMAL"
+READY_V5_VERDICT = "READY_FOR_G14C_V4_CLEAN_TRAIN_AND_FORMAL"
 OLD_PROTOCOL_SEMANTIC_SHA256 = (
     "41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4"
 )
@@ -468,13 +471,14 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
     if version not in {
         FORMAL_EXECUTION_PROTOCOL_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION,
+        FORMAL_EXECUTION_PROTOCOL_V1_3_VERSION,
     }:
         raise FormalExecutionError("unsupported formal execution protocol version")
-    expected_protocol_id = (
-        FORMAL_EXECUTION_PROTOCOL_ID
-        if version == FORMAL_EXECUTION_PROTOCOL_VERSION
-        else FORMAL_EXECUTION_PROTOCOL_V1_2_ID
-    )
+    expected_protocol_id = {
+        FORMAL_EXECUTION_PROTOCOL_VERSION: FORMAL_EXECUTION_PROTOCOL_ID,
+        FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_2_ID,
+        FORMAL_EXECUTION_PROTOCOL_V1_3_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_3_ID,
+    }[version]
     if protocol.get("protocol_id") != expected_protocol_id:
         raise FormalExecutionError("formal execution protocol ID mismatch")
     supersession = protocol.get("supersession", {})
@@ -485,7 +489,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
             raise FormalExecutionError("old protocol invalid status is missing")
         if supersession.get("old_protocol_semantic_sha256") != OLD_PROTOCOL_SEMANTIC_SHA256:
             raise FormalExecutionError("old protocol hash mismatch")
-    else:
+    elif version == FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION:
         if supersession.get("supersedes_version") != "1.1.0":
             raise FormalExecutionError("protocol v1.2 must supersede v1.1")
         if supersession.get("old_protocol_status") != "invalid_before_performance_execution":
@@ -508,6 +512,34 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
             raise FormalExecutionError("phase ledger schema version mismatch")
         if tuple(ledger.get("failure_classifications", [])) != FAILURE_CLASSIFICATIONS:
             raise FormalExecutionError("phase failure classification enum mismatch")
+    else:
+        if supersession.get("supersedes_version") != "1.2.0":
+            raise FormalExecutionError("protocol v1.3 must supersede v1.2")
+        if supersession.get("old_protocol_status") != "invalid_before_dev_performance_execution":
+            raise FormalExecutionError("protocol v1.2 invalid dev status is missing")
+        if supersession.get("failure_audit_sha256") != "476cfc3f57312263da7dff388a89c088e4716d43b1949eb121598c86dc5ac3af":
+            raise FormalExecutionError("G14C v3 failure audit hash mismatch")
+        portable = protocol.get("portable_resource_identity_contract", {})
+        if portable.get("version") != "1.0.0" or portable.get("resource_resolver_version") != "1.0.0":
+            raise FormalExecutionError("portable resource identity contract is missing")
+        if portable.get("scientific_identity_rule") != "scientific identity != host absolute path":
+            raise FormalExecutionError("portable scientific identity rule changed")
+        if not portable.get("resource_registry_semantic_sha256"):
+            raise FormalExecutionError("portable resource registry hash is missing")
+        fairness = protocol.get("fairness_portability", {})
+        if fairness.get("companion_version") != "1.0.0":
+            raise FormalExecutionError("fairness portability companion is missing")
+        checkpoint = protocol.get("checkpoint_location_contract", {})
+        if checkpoint.get("version") != "1.0.0" or checkpoint.get("absolute_path_is_scientific_identity") is not False:
+            raise FormalExecutionError("checkpoint location contract is missing")
+        window_contract = protocol.get("execution_contract", {}).get(
+            "window_consumption_contract", {}
+        )
+        if window_contract.get("semantic_sha256") != "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771":
+            raise FormalExecutionError("window consumption semantic hash changed")
+        ledger = protocol.get("execution_contract", {}).get("phase_ledger", {})
+        if ledger.get("schema_version") != FORMAL_PHASE_LEDGER_SCHEMA_VERSION:
+            raise FormalExecutionError("phase ledger schema version mismatch")
     if protocol.get("identity", {}).get("split_semantic_sha256") != SPLIT_SEMANTIC_SHA256:
         raise FormalExecutionError("split semantic hash changed")
     if tuple(protocol.get("endpoints", {}).get("primary", [])) != PRIMARY_ENDPOINTS:
@@ -625,6 +657,30 @@ def readiness_v4(checks: Mapping[str, bool]) -> str:
         if all(checks.values())
         else "BLOCKED_G14R2_READINESS_V4"
     )
+
+
+def readiness_v5(checks: Mapping[str, bool]) -> str:
+    required = {
+        "external_resource_matrix_complete",
+        "all_resources_content_addressed",
+        "no_cwd_path_guessing",
+        "main_clean_scientific_identity_parity",
+        "training_commands_150_of_150",
+        "dev_selector_complete",
+        "checkpoint_freeze_complete",
+        "formal_support_resolution_complete",
+        "exact_non_formal_phase_chain_complete",
+        "invalid_g14c_v3_checkpoints_not_reused",
+        "holdout_sealed",
+        "no_formal_performance_results",
+    }
+    if set(checks) != required:
+        raise FormalExecutionError(
+            "readiness v5 check set mismatch: "
+            f"missing={sorted(required - set(checks))}, "
+            f"extra={sorted(set(checks) - required)}"
+        )
+    return READY_V5_VERDICT if all(checks.values()) else "BLOCKED_G14R3_READINESS_V5"
 
 
 def protocol_hash_changes_on_mutation(
@@ -1175,6 +1231,8 @@ __all__ = [
     "FORMAL_EXECUTION_PROTOCOL_VERSION",
     "FORMAL_EXECUTION_PROTOCOL_V1_2_ID",
     "FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION",
+    "FORMAL_EXECUTION_PROTOCOL_V1_3_ID",
+    "FORMAL_EXECUTION_PROTOCOL_V1_3_VERSION",
     "FORMAL_PHASE_LEDGER_SCHEMA_VERSION",
     "FORMAL_PHASE_RUNNER_VERSION",
     "FAILURE_CLASSIFICATIONS",
@@ -1183,6 +1241,7 @@ __all__ = [
     "PRIMARY_ENDPOINTS",
     "READY_VERDICT",
     "READY_V4_VERDICT",
+    "READY_V5_VERDICT",
     "READINESS_REVIEW_VERSION",
     "build_scalability_setting_matrix",
     "build_support_setting_matrix",
@@ -1192,6 +1251,7 @@ __all__ = [
     "protocol_hash_changes_on_mutation",
     "readiness_v3",
     "readiness_v4",
+    "readiness_v5",
     "reconcile_primary_endpoint_row",
     "stable_setting_identity",
     "support_setting_by_id",

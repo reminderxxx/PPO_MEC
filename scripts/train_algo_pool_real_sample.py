@@ -53,6 +53,10 @@ from src.runtime.formal_training_contract import (
     should_save_checkpoint,
     validate_resume_checkpoint_schedule,
 )
+from src.runtime.portable_resource_identity import (
+    add_portable_resource_arguments,
+    resolve_argument_resources,
+)
 from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
 
 
@@ -175,6 +179,7 @@ def build_parser() -> argparse.ArgumentParser:
         default="",
         help="Optional create-only stable run identity for protocol orchestration.",
     )
+    add_portable_resource_arguments(parser)
     return parser
 
 
@@ -297,6 +302,16 @@ def load_checkpoint_training_metadata(path: str | Path) -> dict[str, Any]:
 
 def main() -> None:
     args = parse_args()
+    if args.resource_registry_path:
+        resolve_argument_resources(
+            args,
+            bindings=(
+                ("mobility_resource_id", "mobility_csv_path", "mobility_dataset"),
+                ("workflow_resource_id", "workflow_csv_path", "workflow_dataset"),
+                ("window_plan_resource_id", "window_plan_path", "window_plan"),
+                ("runtime_config_resource_id", "model_cache_runtime_config", "runtime_config"),
+            ),
+        )
     formal_protocol = (
         load_json_mapping(args.formal_protocol_path, "formal protocol")
         if args.formal_protocol_path

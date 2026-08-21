@@ -1,0 +1,7 @@
+{
+  "status": "pass",
+  "legacy_exact_path": "compatible_legacy_path",
+  "legacy_relocation": "relocatable_after_content_validation",
+  "content_override": "incompatible",
+  "g14c_v3_path_case": "allowed_content_identical_path_relocation"
+}

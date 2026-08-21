@@ -1,0 +1,10 @@
+{
+  "status": "pass",
+  "old_version": "1.2.0",
+  "new_version": "1.3.0",
+  "old_semantic_sha256": "718c0f78aabd5d01012df31267626eab74a51b2b621aaa67a535c5b60e655ca9",
+  "new_semantic_sha256": "1525b7cbfaea123b360ffbedd06ef9177b9f8996987d0e49dfd67cafb411ac17",
+  "semantic_hash_changed": true,
+  "scientific_fields_changed": false,
+  "repair_only": true
+}

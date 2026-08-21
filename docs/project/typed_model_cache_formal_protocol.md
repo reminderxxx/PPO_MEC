@@ -210,3 +210,15 @@ provenance hash、执行 commit、命令、时间和输出 run ID。
 Readiness v2 为 `READY_FOR_G14C_CLEAN_TRAIN_AND_FORMAL`，但 `formal_completed=false`、
 `paper_ready=false`、typed checkpoint count=0、formal episode count=0、holdout unopened。G14C 仍须
 独立任务从 Commit A clean worktree 开始；本文件不授权自动执行 G14C、formal、holdout、hidden 或 G15。
+
+## 2026-08-24 G14R3 Protocol v1.3 portability repair
+
+Protocol v1.2 与 G14C v3 永久为 `invalid_before_dev_performance_execution`；failure audit SHA-256 为
+`476cfc3f57312263da7dff388a89c088e4716d43b1949eb121598c86dc5ac3af`。v1.3 只修复资源身份/位置与
+dev-selection/checkpoint binding，不改变 split、window semantics、catalog、agent matrix、seeds、budget、
+capacity、endpoints、support/statistics/claims、cadence 或 SA 0.06。
+
+v1.3 semantic SHA-256 为 `1525b7cbfaea123b360ffbedd06ef9177b9f8996987d0e49dfd67cafb411ac17`；
+split 仍为 `aa9a7400...d76a`，window contract 仍为 `ec475799...2771`。Portable registry semantic SHA-256
+为 `810f0fa9...86d7`。详细合同见 `typed_model_cache_formal_portable_resource_contract.md`。Readiness v5
+为 `READY_FOR_G14C_V4_CLEAN_TRAIN_AND_FORMAL`，但正式训练/formal/holdout/G15 均未启动。

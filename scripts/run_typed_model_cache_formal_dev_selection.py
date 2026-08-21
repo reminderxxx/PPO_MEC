@@ -31,6 +31,10 @@ from src.evaluators.formal_window_consumption import (
 )
 from src.evaluators.typed_model_cache_formal_protocol import sha256_file
 from src.runtime.formal_training_contract import checkpoint_snapshot_indices
+from src.runtime.portable_resource_identity import (
+    add_portable_resource_arguments,
+    resolve_argument_resources,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -39,9 +43,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--training-root", required=True)
     parser.add_argument("--output-root", required=True)
     parser.add_argument("--output-path", required=True)
-    parser.add_argument("--formal-window-consumption-contract-path", required=True)
+    parser.add_argument("--formal-window-consumption-contract-path", default="")
     parser.add_argument("--window-plan-path", required=True)
     parser.add_argument("--mobility-csv-path", required=True)
+    parser.add_argument("--workflow-csv-path", required=True)
     parser.add_argument("--max-mobility-rows", type=int, required=True)
     parser.add_argument("--window-selector", choices=["ordered"], required=True)
     parser.add_argument("--window-length", type=int, required=True)
@@ -51,6 +56,19 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["stable_first", "handoff_pressure"],
         required=True,
     )
+    parser.add_argument("--non-formal-rehearsal", action="store_true")
+    parser.add_argument("--rehearsal-agent", action="append", default=[])
+    parser.add_argument("--rehearsal-seed", action="append", type=int, default=[])
+    parser.add_argument(
+        "--rehearsal-capacity",
+        action="append",
+        nargs=3,
+        metavar=("LABEL", "RUNTIME_CONFIG", "FAIRNESS_MANIFEST"),
+        default=[],
+    )
+    parser.add_argument("--rehearsal-update-index", type=int, default=4)
+    parser.add_argument("--training-run-prefix", default="formal")
+    add_portable_resource_arguments(parser)
     return parser
 
 
@@ -84,45 +102,88 @@ def finite_mean(rows: list[dict[str, str]], field: str) -> float:
 
 def main() -> None:
     args = parse_args()
+    if args.resource_registry_path:
+        resolve_argument_resources(
+            args,
+            bindings=(
+                ("mobility_resource_id", "mobility_csv_path", "mobility_dataset"),
+                ("workflow_resource_id", "workflow_csv_path", "workflow_dataset"),
+                ("window_plan_resource_id", "window_plan_path", "window_plan"),
+            ),
+        )
     protocol_path = Path(args.protocol_path).resolve()
     protocol = json.loads(protocol_path.read_text(encoding="utf-8-sig"))
     validate_protocol_v1_1(protocol)
-    window_contract = load_window_consumption_contract(
-        args.formal_window_consumption_contract_path
-    )
-    if (
-        protocol.get("execution_contract", {})
-        .get("window_consumption_contract", {})
-        .get("semantic_sha256")
-        != window_contract["hashes"]["semantic_sha256"]
-    ):
-        raise FormalExecutionError("dev window consumption contract hash mismatch")
-    validate_window_plan_binding(
-        contract=window_contract,
-        plan_path=args.window_plan_path,
-        split="dev",
-        max_mobility_rows=args.max_mobility_rows,
-        mobility_csv_path=args.mobility_csv_path,
-        window_selector=args.window_selector,
-        window_length=args.window_length,
-        rsu_layout=args.rsu_layout,
-        primary_vehicle_selection=args.primary_vehicle_selection,
-        mode="formal",
-    )
+    if args.non_formal_rehearsal:
+        if args.formal_window_consumption_contract_path:
+            raise FormalExecutionError(
+                "non-formal rehearsal must not bind the formal window contract"
+            )
+        if not args.rehearsal_agent or not args.rehearsal_seed or not args.rehearsal_capacity:
+            raise FormalExecutionError("non-formal rehearsal matrix is incomplete")
+    else:
+        if not args.formal_window_consumption_contract_path:
+            raise FormalExecutionError("formal dev selection requires the window contract")
+        window_contract = load_window_consumption_contract(
+            args.formal_window_consumption_contract_path
+        )
+        if (
+            protocol.get("execution_contract", {})
+            .get("window_consumption_contract", {})
+            .get("semantic_sha256")
+            != window_contract["hashes"]["semantic_sha256"]
+        ):
+            raise FormalExecutionError("dev window consumption contract hash mismatch")
+        validate_window_plan_binding(
+            contract=window_contract,
+            plan_path=args.window_plan_path,
+            split="dev",
+            max_mobility_rows=args.max_mobility_rows,
+            mobility_csv_path=args.mobility_csv_path,
+            window_selector=args.window_selector,
+            window_length=args.window_length,
+            rsu_layout=args.rsu_layout,
+            primary_vehicle_selection=args.primary_vehicle_selection,
+            mode="formal",
+        )
     config_root = protocol_path.parent
     index = json.loads((config_root / "protocol_index.json").read_text(encoding="utf-8-sig"))
-    learned_agents = list(protocol["training_budget"]["agent_configs"])
-    seeds = list(protocol["seed_plan"]["seeds"])
+    learned_agents = (
+        list(args.rehearsal_agent)
+        if args.non_formal_rehearsal
+        else list(protocol["training_budget"]["agent_configs"])
+    )
+    seeds = (
+        list(args.rehearsal_seed)
+        if args.non_formal_rehearsal
+        else list(protocol["seed_plan"]["seeds"])
+    )
     cadence = int(protocol["training_budget"]["checkpoint_frequency_updates"])
     expected_updates = int(protocol["training_budget"]["expected_update_count"])
-    update_indices = checkpoint_snapshot_indices(expected_updates, cadence)
+    update_indices = (
+        [int(args.rehearsal_update_index)]
+        if args.non_formal_rehearsal
+        else checkpoint_snapshot_indices(expected_updates, cadence)
+    )
     output_root = Path(args.output_root).resolve()
     output_root.mkdir(parents=True, exist_ok=True)
     candidates: list[dict] = []
 
-    for capacity_label, runtime_relative in index["runtime_configs"].items():
-        runtime_path = ROOT / runtime_relative
-        fairness_path = ROOT / index["dev_fairness_manifests"][capacity_label]
+    capacity_inputs = (
+        {
+            label: (Path(runtime_path), Path(fairness_path))
+            for label, runtime_path, fairness_path in args.rehearsal_capacity
+        }
+        if args.non_formal_rehearsal
+        else {
+            label: (
+                ROOT / runtime_relative,
+                ROOT / index["dev_fairness_manifests"][label],
+            )
+            for label, runtime_relative in index["runtime_configs"].items()
+        }
+    )
+    for capacity_label, (runtime_path, fairness_path) in capacity_inputs.items():
         fairness, report = load_and_validate_manifest(fairness_path, root=ROOT, check_files=True)
         if report.get("status") != "pass":
             raise FormalExecutionError(f"dev fairness validation failed: {capacity_label}")
@@ -141,7 +202,7 @@ def main() -> None:
                     checkpoint_path = (
                         Path(args.training_root)
                         / agent
-                        / f"formal_{capacity_label}_{agent}_seed{seed}"
+                        / f"{args.training_run_prefix}_{capacity_label}_{agent}_seed{seed}"
                         / "checkpoints"
                         / f"update_{update_index:04d}.pt"
                     ).resolve()
@@ -153,8 +214,11 @@ def main() -> None:
                     if (
                         int(metadata.get("update_count", -1)) != update_index
                         or int(schedule.get("checkpoint_every_updates", -1)) != cadence
-                        or contract.get("formal_protocol_semantic_sha256")
-                        != protocol["hashes"]["semantic_sha256"]
+                        or (
+                            not args.non_formal_rehearsal
+                            and contract.get("formal_protocol_semantic_sha256")
+                            != protocol["hashes"]["semantic_sha256"]
+                        )
                     ):
                         raise FormalExecutionError("dev checkpoint formal binding mismatch")
                     seed_manifest.setdefault(agent, {})[str(seed)] = str(checkpoint_path)
@@ -181,10 +245,8 @@ def main() -> None:
                 "--cache_baseline_fairness_manifest_path", str(fairness_path),
                 "--model_cache_runtime_config", str(runtime_path),
                 "--window_plan_path", str(ROOT / fairness["window_workload_plan"]["window_plan_path"]),
-                "--formal_window_consumption_contract_path", args.formal_window_consumption_contract_path,
-                "--formal_window_split", "dev",
-                "--window_consumption_mode", "formal",
                 "--mobility_csv_path", args.mobility_csv_path,
+                "--workflow_csv_path", args.workflow_csv_path,
                 "--window_selector", args.window_selector,
                 "--window_length", str(args.window_length),
                 "--rsu_layout", args.rsu_layout,
@@ -200,6 +262,34 @@ def main() -> None:
                 "--reward_positive_offset", "0",
                 "--output_root", str(benchmark_root),
             ]
+            if not args.non_formal_rehearsal:
+                command.extend(
+                    [
+                        "--formal_window_consumption_contract_path",
+                        args.formal_window_consumption_contract_path,
+                        "--formal_window_split", "dev",
+                        "--window_consumption_mode", "formal",
+                    ]
+                )
+            if args.resource_registry_path:
+                command.extend(
+                    [
+                        "--resource-registry-path", args.resource_registry_path,
+                        "--repository-root", args.repository_root or str(ROOT),
+                        "--data-root", args.data_root,
+                        "--protocol-artifact-root", args.protocol_artifact_root,
+                        "--checkpoint-root", args.checkpoint_root or str(Path(args.training_root)),
+                        "--mobility-resource-id", args.mobility_resource_id,
+                        "--workflow-resource-id", args.workflow_resource_id,
+                        "--window-plan-resource-id", args.window_plan_resource_id,
+                        "--runtime-config-resource-id", f"runtime_config.{capacity_label}",
+                        "--fairness-manifest-resource-id", (
+                            f"fairness_manifest.rehearsal.{capacity_label}"
+                            if args.non_formal_rehearsal
+                            else f"fairness_manifest.dev.{capacity_label}"
+                        ),
+                    ]
+                )
             before = set(benchmark_root.iterdir()) if benchmark_root.exists() else set()
             result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True, check=False)
             if result.returncode != 0:
@@ -233,6 +323,8 @@ def main() -> None:
                             "runtime_contract_sha256": metadata["typed_runtime_provenance"]["runtime_contract_sha256"],
                             "resolved_agent_config": metadata.get("resolved_agent_config"),
                             "checkpoint_schedule": metadata.get("checkpoint_schedule"),
+                            "formal_training_contract": metadata.get("formal_training_contract"),
+                            "non_formal_rehearsal": bool(args.non_formal_rehearsal),
                             "typed_runtime_provenance": metadata.get("typed_runtime_provenance"),
                         }
                     )
@@ -240,6 +332,7 @@ def main() -> None:
     candidates_path = output_root / "checkpoint_candidates.json"
     write_create_only(candidates_path, candidates)
     selection_payload = dev_select(output_root, protocol)
+    selection_payload["non_formal_rehearsal"] = bool(args.non_formal_rehearsal)
     write_create_only(Path(args.output_path), selection_payload)
     print(json.dumps(selection_payload, ensure_ascii=False, indent=2, allow_nan=False))
 

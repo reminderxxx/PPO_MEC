@@ -15,6 +15,13 @@ if str(ROOT) not in sys.path:
 
 from src.evaluators.typed_model_cache_formal_execution import validate_protocol_v1_1
 from src.evaluators.typed_model_cache_formal_protocol import canonical_sha256, sha256_file
+from src.runtime.portable_resource_identity import add_portable_resource_arguments
+
+
+INVALID_G14C_V3_RUN_ROOT = Path(
+    "/private/tmp/ppo_mec_g14c_v3_a7c9e8e/artifacts/experiments/typed_model_cache_formal/"
+    "typed_model_cache_formal_20260820_203430_g14c_v3"
+).resolve()
 
 
 def parse_args() -> argparse.Namespace:
@@ -33,6 +40,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--protocol-path", required=True)
     parser.add_argument("--input-root", required=True)
     parser.add_argument("--output-path", required=True)
+    add_portable_resource_arguments(parser)
     return parser.parse_args()
 
 
@@ -52,6 +60,22 @@ def finite(value: Any, field: str) -> float:
     if not math.isfinite(result):
         raise ValueError(f"non-finite dev endpoint: {field}")
     return result
+
+
+def path_is_within(path: Path, root: Path) -> bool:
+    try:
+        path.resolve().relative_to(root.resolve())
+        return True
+    except ValueError:
+        return False
+
+
+def scientific_candidate_projection(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        key: value
+        for key, value in row.items()
+        if key not in {"checkpoint_path", "artifact_location", "runtime_resolution"}
+    }
 
 
 def dev_select(input_root: Path, protocol: dict) -> dict:
@@ -86,7 +110,10 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
         "formal_or_holdout_used": False,
         "selection_rule": protocol["training_budget"]["checkpoint_selection"]["metric_rule"],
         "selected": selected,
-        "selection_sha256": canonical_sha256(selected),
+        "selection_sha256": canonical_sha256(
+            [scientific_candidate_projection(row) for row in selected]
+        ),
+        "checkpoint_locations_nonsemantic": True,
     }
 
 
@@ -96,13 +123,51 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
         raise ValueError("dev selection protocol hash mismatch")
     frozen = []
     for row in selection.get("selected", []):
-        path = Path(row["checkpoint_path"])
+        path = Path(row["checkpoint_path"]).resolve()
+        if path_is_within(path, INVALID_G14C_V3_RUN_ROOT):
+            raise ValueError("invalid G14C v3 checkpoint reference rejected")
         if not path.is_file():
             raise FileNotFoundError(path)
         digest = sha256_file(path)
         if digest != row.get("checkpoint_sha256"):
             raise ValueError(f"checkpoint hash mismatch: {path}")
-        frozen.append({**row, "checkpoint_path": str(path.resolve())})
+        typed = row.get("typed_runtime_provenance") or {}
+        identity = {
+            "checkpoint_sha256": digest,
+            "agent": str(row["agent_name"]),
+            "seed": int(row["seed"]),
+            "capacity": str(row["capacity_label"]),
+            "execution_commit": typed.get("execution_git_commit"),
+            "training_protocol": protocol["hashes"]["semantic_sha256"],
+            "catalog_identity": typed.get("typed_catalog_fingerprint"),
+            "runtime_identity": row.get("runtime_contract_sha256"),
+            "split_identity": protocol["identity"]["split_semantic_sha256"],
+            "window_identity": typed.get("train_window_plan_identity"),
+            "selection_metric_values": {
+                field: row[field]
+                for field in (
+                    "full_service_ready_byte_hit_rate",
+                    "workflow_continuity_rate",
+                    "transfer_mb_per_request",
+                    "end_to_end_workflow_delay",
+                )
+            },
+            "update_index": int(row["update_index"]),
+        }
+        identity["semantic_identity_fingerprint"] = canonical_sha256(identity)
+        frozen.append(
+            {
+                **row,
+                "checkpoint_path": str(path),
+                "checkpoint_identity": identity,
+                "artifact_location": {
+                    "original_location": str(path),
+                    "resolved_location": str(path),
+                    "location_is_scientific_identity": False,
+                    "path_relocation_allowed_after_hash_validation": True,
+                },
+            }
+        )
     return {
         "checkpoint_freeze_version": "1.0.0",
         "protocol_semantic_sha256": protocol["hashes"]["semantic_sha256"],
@@ -110,7 +175,11 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
         "frozen_checkpoint_count": len(frozen),
         "frozen_checkpoints": frozen,
         "formal_or_holdout_used": False,
-        "freeze_sha256": canonical_sha256(frozen),
+        "freeze_sha256": canonical_sha256(
+            [row["checkpoint_identity"] for row in frozen]
+        ),
+        "checkpoint_location_contract_version": "1.0.0",
+        "invalid_run_roots": [str(INVALID_G14C_V3_RUN_ROOT)],
     }
 
 
@@ -138,12 +207,33 @@ def write_checkpoint_companions(input_root: Path, freeze: dict) -> list[dict]:
                 "resolved_agent_config": row.get("resolved_agent_config"),
                 "checkpoint_schedule": row.get("checkpoint_schedule"),
                 "selection_sha256": freeze["selection_sha256"],
+                "checkpoint_identity": row["checkpoint_identity"],
+                "artifact_location": row["artifact_location"],
             }
         target = input_root / "checkpoint_manifests" / capacity_label
         target.mkdir(parents=True, exist_ok=True)
         seed_path = target / "seed_checkpoint_manifest.json"
         provenance_path = target / "checkpoint_provenance_manifest.json"
-        write_create_only(seed_path, seed_manifest)
+        seed_payload: dict[str, Any] = {
+            "_portable_checkpoint_manifest": {
+                "checkpoint_manifest_version": "1.1.0",
+                "checkpoint_location_contract_version": "1.0.0",
+                "manifest_id": f"checkpoint-manifest-{capacity_label}",
+                "protocol_semantic_sha256": freeze["protocol_semantic_sha256"],
+                "entries": [
+                    {
+                        "agent": row["agent_name"],
+                        "seed": int(row["seed"]),
+                        "checkpoint_identity": row["checkpoint_identity"],
+                        "artifact_location": row["artifact_location"],
+                    }
+                    for row in rows
+                ],
+                "invalid_run_roots": [str(INVALID_G14C_V3_RUN_ROOT)],
+            },
+            **seed_manifest,
+        }
+        write_create_only(seed_path, seed_payload)
         write_create_only(provenance_path, provenance_manifest)
         outputs.append(
             {
@@ -157,6 +247,8 @@ def write_checkpoint_companions(input_root: Path, freeze: dict) -> list[dict]:
 
 
 def formal_gate(input_root: Path, protocol: dict) -> dict:
+    rehearsal_marker = input_root / "non_formal_rehearsal.json"
+    non_formal_rehearsal = rehearsal_marker.is_file()
     required = [
         "checkpoint_freeze.json",
         "formal_cache_policy/**/aggregate_summary.json",
@@ -176,10 +268,16 @@ def formal_gate(input_root: Path, protocol: dict) -> dict:
         "performance_threshold_used": False,
         "holdout_opened": False,
         "completeness_only": True,
+        "execution_mode": (
+            "non_formal_rehearsal" if non_formal_rehearsal else "formal"
+        ),
+        "formal_execution_started": not non_formal_rehearsal,
+        "paper_claims_permitted": False if non_formal_rehearsal else None,
     }
 
 
 def artifact_integrity(input_root: Path, protocol: dict, output_path: Path) -> dict:
+    non_formal_rehearsal = (input_root / "non_formal_rehearsal.json").is_file()
     files = []
     for path in sorted(input_root.rglob("*")):
         if (
@@ -207,6 +305,10 @@ def artifact_integrity(input_root: Path, protocol: dict, output_path: Path) -> d
         ],
         "performance_threshold_used": False,
         "holdout_opened": False,
+        "execution_mode": (
+            "non_formal_rehearsal" if non_formal_rehearsal else "formal"
+        ),
+        "formal_execution_started": not non_formal_rehearsal,
     }
 
 
