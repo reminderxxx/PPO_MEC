@@ -1,0 +1,228 @@
+{
+  "producer_consumer_matrix_version": "1.0.0",
+  "rows": [
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": false,
+      "component": "Protocol training_budget.agent_configs",
+      "execution_binding_producer": false,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": true,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "audit_only_legacy",
+      "cli_or_path_consumer": false,
+      "component": "legacy agent_training_configs.json",
+      "execution_binding_producer": false,
+      "failure_behavior": "audit_only_no_active_execution",
+      "hash_fields": [
+        "protocol_semantic_sha256"
+      ],
+      "runtime_validator": false,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": true,
+      "component": "default expansion agent config path",
+      "execution_binding_producer": false,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": true,
+      "component": "train command template",
+      "execution_binding_producer": false,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": true,
+      "component": "train_algo_pool_real_sample.py",
+      "execution_binding_producer": false,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": false,
+      "component": "formal_training_contract.py",
+      "execution_binding_producer": false,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": false,
+      "component": "agent instantiation/checkpoint config audit",
+      "execution_binding_producer": false,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": false,
+      "component": "train summary/candidate metadata",
+      "execution_binding_producer": false,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": false,
+      "component": "dev selection",
+      "execution_binding_producer": false,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": false,
+      "component": "checkpoint freeze",
+      "execution_binding_producer": false,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": false,
+      "component": "checkpoint provenance manifest",
+      "execution_binding_producer": false,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": false,
+      "component": "formal benchmark loading",
+      "execution_binding_producer": false,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": false,
+      "component": "resolved execution context",
+      "execution_binding_producer": true,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": false,
+      "component": "portable resource registry",
+      "execution_binding_producer": false,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "scientific_config_sha256+execution_binding_sha256",
+      "cli_or_path_consumer": false,
+      "component": "fairness/provenance consumer",
+      "execution_binding_producer": false,
+      "failure_behavior": "fail_before_consumer_action",
+      "hash_fields": [
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256"
+      ],
+      "runtime_validator": true,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    },
+    {
+      "artifact_field": "audit_only_legacy",
+      "cli_or_path_consumer": false,
+      "component": "historical artifact reader",
+      "execution_binding_producer": false,
+      "failure_behavior": "audit_only_no_active_execution",
+      "hash_fields": [
+        "protocol_semantic_sha256"
+      ],
+      "runtime_validator": false,
+      "scientific_config_producer": false,
+      "test_coverage": "tests/test_formal_training_identity_v16.py"
+    }
+  ],
+  "status": "pass"
+}

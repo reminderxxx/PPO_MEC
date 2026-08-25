@@ -1,5 +1,18 @@
 # Artifact Records
 
+## 2026-08-25 G14R6 formal training identity repair
+
+- path：`artifacts/analysis/typed_model_cache_formal_training_binding_repair_20260825_g14r6_v1/`；config：
+  `configs/experiment/typed_model_cache_formal_protocol_v1_6_20260825/`。
+- G14C v6 failure/integrity SHA-256=`2cc81ffd...0725a`/`5f69b811...dc0e`；永久边界为首个training
+  cell、episode 0前，episode/interaction/update/checkpoint均为0，禁止retry/resume/finalize/salvage/reuse。
+- scientific config `2.0.0` SHA-256=`f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8`；
+  execution binding `1.0.0`；resolved context `2.0.0`；10-agent parity通过，无超参数变化。
+- Protocol v1.6 semantic SHA-256=`f2c9e729f126d9e87f56fcdccf13f2ecd018c28ca3102b8d02b2bbd6abca95c0`；
+  Readiness v8=`READY_FOR_G14C_V7_CLEAN_TRAIN_AND_FORMAL`。
+- evidence仅为contract与非正式clean-worktree验收：正式training/checkpoint/performance仍为0，holdout
+  sealed/unopened，未启动G14C v7/G14D/G15，不构成formal或paper-ready结论。
+
 ## 2026-08-20 G14R2 formal window repair and Protocol v1.2
 
 - path：`artifacts/analysis/typed_model_cache_formal_window_repair_20260820_g14r2_v1/`；config：

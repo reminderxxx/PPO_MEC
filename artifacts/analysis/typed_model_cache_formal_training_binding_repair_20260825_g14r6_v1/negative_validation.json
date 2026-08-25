@@ -1,0 +1,28 @@
+{
+  "case_count": 19,
+  "cases": [
+    "exact_g14c_v6_legacy_companion_rejected",
+    "scientific_config_and_current_binding_accepted",
+    "old_protocol_hash_rejected",
+    "missing_binding_rejected",
+    "scientific_config_hash_tamper_rejected",
+    "agent_learning_rate_drift_rejected",
+    "sa_auxiliary_coefficient_drift_rejected",
+    "missing_duplicate_or_unknown_agent_rejected",
+    "binding_scientific_config_cross_pair_rejected",
+    "protocol_semantic_drift_rejected",
+    "execution_commit_drift_rejected",
+    "environment_or_dependency_drift_rejected",
+    "split_window_catalog_or_runtime_drift_rejected",
+    "resolved_context_or_command_matrix_drift_rejected",
+    "g14c_v6_root_resume_finalize_or_checkpoint_reference_rejected",
+    "content_identical_path_relocation_allowed_and_same_name_drift_rejected",
+    "checkpoint_missing_config_or_binding_identity_rejected",
+    "nan_infinity_implicit_default_or_unknown_field_rejected",
+    "duplicate_json_key_or_canonical_serialization_drift_rejected"
+  ],
+  "episode_zero_fail_fast": true,
+  "formal": false,
+  "performance_evidence": false,
+  "status": "pass"
+}

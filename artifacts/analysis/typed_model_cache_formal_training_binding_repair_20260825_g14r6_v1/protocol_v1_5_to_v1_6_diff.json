@@ -1,0 +1,11 @@
+{
+  "changed_scope": [
+    "separate stable agent scientific config from execution binding",
+    "bind current Protocol/commit/environment/context/command matrix at runtime",
+    "propagate config and binding identities through checkpoints and consumers"
+  ],
+  "new_semantic_sha256": "f2c9e729f126d9e87f56fcdccf13f2ecd018c28ca3102b8d02b2bbd6abca95c0",
+  "old_semantic_sha256": "feb7ccc489d66aeba502fbef2fef70c911ecdd66218a8ea3d475725ec61d829a",
+  "scientific_fields_changed": false,
+  "status": "pass"
+}

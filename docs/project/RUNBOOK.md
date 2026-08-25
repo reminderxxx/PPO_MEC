@@ -1,5 +1,31 @@
 # Runbook
 
+## G14R6 training identity repair（只生成/验证，不启动 G14C v7）
+
+active config位于`configs/experiment/typed_model_cache_formal_protocol_v1_6_20260825/`。生成/刷新
+outcome-blind config与审计骨架：
+
+```bash
+PYTHONPYCACHEPREFIX=/tmp/ppo_mec_g14r6_pycache \
+  /Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/repair_typed_model_cache_formal_training_binding.py \
+  --python-executable /Users/howen/Projects/PPO_MEC/.venv/bin/python
+```
+
+专项合同测试：
+
+```bash
+PYTHONPYCACHEPREFIX=/tmp/ppo_mec_g14r6_pycache \
+  .venv/bin/python -m pytest tests/test_formal_training_identity_v16.py -q
+```
+
+Protocol v1.6正式命令只允许由`run_typed_model_cache_formal_protocol.py`从clean detached worktree展开；
+outer runner会create-only写入`formal_training_execution_binding.json`和`resolved_execution_context.json`。
+train child必须同时收到scientific config、execution binding、Protocol与resolved context。合同验收使用
+`--formal_contract_preflight_only`逐个实例化10个agent并在episode 0前退出；输出不可作为checkpoint、dev/
+formal或performance evidence。Protocol v1.0–v1.5均为audit-only。未来G14C v7必须另立任务并重新执行
+preflight/tests，不得复用G14C v6或G14R6的结果。
+
 ## G14R2 window consumption repair（只生成/验证，不启动 G14C v3）
 
 生成 Protocol v1.2 与审计包时必须显式使用冻结 G14B plans 和完整 NGSIM source。入口会运行真实

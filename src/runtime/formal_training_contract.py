@@ -13,8 +13,16 @@ from math import isfinite
 from pathlib import Path
 from typing import Any, Mapping
 
+from src.runtime.formal_training_identity import (
+    FormalTrainingIdentityError,
+    resolved_agent_hyperparameters,
+    validate_execution_binding,
+    validate_scientific_config,
+)
+
 
 FORMAL_TRAINING_CONTRACT_VERSION = "1.0.0"
+FORMAL_TRAINING_CONTRACT_V2_VERSION = "2.0.0"
 LEGACY_CHECKPOINT_EVERY_UPDATES = 1
 
 
@@ -117,6 +125,7 @@ def _formal_values(protocol: Mapping[str, Any], agent_name: str) -> dict[str, An
         "1.3.0",
         "1.4.0",
         "1.5.0",
+        "1.6.0",
     }:
         raise FormalTrainingContractError("formal training requires protocol version 1.1, 1.2, or 1.3")
     budget = protocol.get("training_budget")
@@ -193,6 +202,12 @@ class ResolvedTrainingContract:
     checkpoint_every_updates: int
     expected_update_count: int
     agent_config: dict[str, Any]
+    agent_scientific_config_semantic_sha256: str | None = None
+    formal_training_execution_binding_sha256: str | None = None
+    execution_commit: str | None = None
+    resolved_execution_context_sha256: str | None = None
+    environment_fingerprint: str | None = None
+    dependency_fingerprint: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -206,6 +221,18 @@ class ResolvedTrainingContract:
             "checkpoint_every_updates": self.checkpoint_every_updates,
             "expected_update_count": self.expected_update_count,
             "agent_config": dict(self.agent_config),
+            "agent_scientific_config_semantic_sha256": (
+                self.agent_scientific_config_semantic_sha256
+            ),
+            "formal_training_execution_binding_sha256": (
+                self.formal_training_execution_binding_sha256
+            ),
+            "execution_commit": self.execution_commit,
+            "resolved_execution_context_sha256": (
+                self.resolved_execution_context_sha256
+            ),
+            "environment_fingerprint": self.environment_fingerprint,
+            "dependency_fingerprint": self.dependency_fingerprint,
         }
 
 
@@ -216,6 +243,9 @@ def resolve_training_contract(
     cli_values: Mapping[str, Any],
     formal_protocol: Mapping[str, Any] | None = None,
     agent_config_companion: Mapping[str, Any] | None = None,
+    scientific_config: Mapping[str, Any] | None = None,
+    execution_binding: Mapping[str, Any] | None = None,
+    resolved_execution_context: Mapping[str, Any] | None = None,
 ) -> ResolvedTrainingContract:
     """Resolve legacy defaults or enforce an exact manifest-bound formal contract."""
 
@@ -275,16 +305,102 @@ def resolve_training_contract(
         supplied_cadence, "checkpoint_every_updates"
     ) != frozen["checkpoint_every_updates"]:
         raise FormalTrainingContractError("formal CLI override rejected for checkpoint_every_updates")
-    if agent_config_companion is None:
-        raise FormalTrainingContractError("formal training requires --agent_config_path")
-    agent_config = _validate_agent_config_companion(
-        agent_config_companion, protocol=formal_protocol, agent_name=agent_name
+    protocol_version = str(
+        formal_protocol.get("typed_model_cache_formal_protocol_version")
     )
+    identity_values: dict[str, str | None] = {
+        "agent_scientific_config_semantic_sha256": None,
+        "formal_training_execution_binding_sha256": None,
+        "execution_commit": None,
+        "resolved_execution_context_sha256": None,
+        "environment_fingerprint": None,
+        "dependency_fingerprint": None,
+    }
+    contract_version = FORMAL_TRAINING_CONTRACT_VERSION
+    if protocol_version == "1.6.0":
+        if agent_config_companion is not None:
+            raise FormalTrainingContractError(
+                "Protocol v1.6 rejects legacy --agent_config_path companion"
+            )
+        if scientific_config is None:
+            raise FormalTrainingContractError(
+                "formal training requires --agent_scientific_config_path"
+            )
+        if execution_binding is None:
+            raise FormalTrainingContractError(
+                "formal training requires --formal_training_execution_binding_path"
+            )
+        if resolved_execution_context is None:
+            raise FormalTrainingContractError(
+                "formal training requires --resolved_execution_context_path"
+            )
+        scientific_identity = resolved_execution_context.get("scientific_identity")
+        command = resolved_execution_context.get("command_expansion")
+        if not isinstance(scientific_identity, Mapping) or not isinstance(command, Mapping):
+            raise FormalTrainingContractError("resolved execution context identity is incomplete")
+        try:
+            scientific_report = validate_scientific_config(
+                scientific_config, protocol=formal_protocol
+            )
+            binding_report = validate_execution_binding(
+                execution_binding,
+                protocol=formal_protocol,
+                scientific_config=scientific_config,
+                execution_commit=str(scientific_identity.get("execution_commit") or ""),
+                environment_identity=scientific_identity,
+                command_matrix_sha256=str(
+                    command.get("resolved_command_matrix_sha256") or ""
+                ),
+            )
+            agent_config = resolved_agent_hyperparameters(
+                scientific_config, agent_name
+            )
+        except FormalTrainingIdentityError as exc:
+            raise FormalTrainingContractError(str(exc)) from exc
+        if agent_config != frozen["agent_config"]:
+            raise FormalTrainingContractError(
+                f"scientific config/protocol mismatch for {agent_name}"
+            )
+        identity_values = {
+            "agent_scientific_config_semantic_sha256": scientific_report[
+                "config_semantic_sha256"
+            ],
+            "formal_training_execution_binding_sha256": binding_report[
+                "binding_full_sha256"
+            ],
+            "execution_commit": str(scientific_identity["execution_commit"]),
+            "resolved_execution_context_sha256": str(
+                resolved_execution_context.get("context_sha256") or ""
+            ),
+            "environment_fingerprint": str(
+                scientific_identity.get("environment_fingerprint") or ""
+            ),
+            "dependency_fingerprint": str(
+                scientific_identity.get("dependency_fingerprint") or ""
+            ),
+        }
+        if scientific_identity.get("agent_scientific_config_semantic_sha256") != (
+            identity_values["agent_scientific_config_semantic_sha256"]
+        ):
+            raise FormalTrainingContractError(
+                "resolved context scientific config identity mismatch"
+            )
+        if scientific_identity.get("formal_training_execution_binding_sha256") != (
+            identity_values["formal_training_execution_binding_sha256"]
+        ):
+            raise FormalTrainingContractError(
+                "resolved context execution binding identity mismatch"
+            )
+        contract_version = FORMAL_TRAINING_CONTRACT_V2_VERSION
+    else:
+        if agent_config_companion is None:
+            raise FormalTrainingContractError("formal training requires --agent_config_path")
+        agent_config = _validate_agent_config_companion(
+            agent_config_companion, protocol=formal_protocol, agent_name=agent_name
+        )
     return ResolvedTrainingContract(
-        contract_version=FORMAL_TRAINING_CONTRACT_VERSION,
-        formal_protocol_version=str(
-            formal_protocol.get("typed_model_cache_formal_protocol_version")
-        ),
+        contract_version=contract_version,
+        formal_protocol_version=protocol_version,
         formal_protocol_semantic_sha256=formal_protocol.get("hashes", {}).get(
             "semantic_sha256"
         ),
@@ -295,6 +411,7 @@ def resolve_training_contract(
         checkpoint_every_updates=frozen["checkpoint_every_updates"],
         expected_update_count=frozen["expected_update_count"],
         agent_config=agent_config,
+        **identity_values,
     )
 
 
@@ -331,6 +448,7 @@ def audited_agent_config(agent: Any, requested: Mapping[str, Any]) -> dict[str, 
 
 __all__ = [
     "FORMAL_TRAINING_CONTRACT_VERSION",
+    "FORMAL_TRAINING_CONTRACT_V2_VERSION",
     "FormalTrainingContractError",
     "ResolvedTrainingContract",
     "audited_agent_config",

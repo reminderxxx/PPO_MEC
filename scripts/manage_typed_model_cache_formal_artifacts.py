@@ -51,11 +51,17 @@ INVALID_G14C_V5_RUN_ROOT = (
     / "artifacts/experiments/typed_model_cache_formal"
     / "typed_model_cache_formal_20260825_111625_g14c_v5"
 ).resolve()
+INVALID_G14C_V6_RUN_ROOT = (
+    ROOT
+    / "artifacts/experiments/typed_model_cache_formal"
+    / "typed_model_cache_formal_20260825_135122_g14c_v6"
+).resolve()
 INVALID_FORMAL_RUN_ROOTS = (
     *INVALID_G14C_V1_V2_RUN_ROOTS,
     INVALID_G14C_V3_RUN_ROOT,
     *INVALID_G14C_V4_RUN_ROOTS,
     INVALID_G14C_V5_RUN_ROOT,
+    INVALID_G14C_V6_RUN_ROOT,
 )
 
 
@@ -138,6 +144,24 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
         )
         winner = dict(ranked[0])
         selected.append(winner)
+    training_identity_fields = (
+        "agent_scientific_config_semantic_sha256",
+        "formal_training_execution_binding_sha256",
+        "formal_protocol_semantic_sha256",
+        "execution_commit",
+        "resolved_execution_context_sha256",
+    )
+    training_identity = None
+    if protocol["typed_model_cache_formal_protocol_version"] == "1.6.0":
+        identities = {
+            tuple(row.get(field) for field in training_identity_fields)
+            for row in candidates
+        }
+        if len(identities) != 1 or any(value in {None, ""} for value in next(iter(identities))):
+            raise ValueError("dev candidates do not share one complete training identity")
+        training_identity = dict(zip(training_identity_fields, next(iter(identities))))
+        if training_identity["formal_protocol_semantic_sha256"] != protocol["hashes"]["semantic_sha256"]:
+            raise ValueError("dev candidate active Protocol identity mismatch")
     return {
         "dev_checkpoint_selection_version": "1.0.0",
         "protocol_semantic_sha256": protocol["hashes"]["semantic_sha256"],
@@ -149,6 +173,7 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
             [scientific_candidate_projection(row) for row in selected]
         ),
         "checkpoint_locations_nonsemantic": True,
+        "formal_training_identity": training_identity,
     }
 
 
@@ -156,13 +181,19 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
     selection = read_json(input_root / "dev_selection.json")
     if selection.get("protocol_semantic_sha256") != protocol["hashes"]["semantic_sha256"]:
         raise ValueError("dev selection protocol hash mismatch")
+    formal_training_identity = selection.get("formal_training_identity")
+    if protocol["typed_model_cache_formal_protocol_version"] == "1.6.0":
+        if not isinstance(formal_training_identity, dict):
+            raise ValueError("dev selection lacks formal training identity")
+        if formal_training_identity.get("formal_protocol_semantic_sha256") != protocol["hashes"]["semantic_sha256"]:
+            raise ValueError("dev selection formal training Protocol identity mismatch")
     frozen = []
     for row in selection.get("selected", []):
         path = Path(row["checkpoint_path"]).resolve()
         if any(path_is_within(path, root) for root in INVALID_FORMAL_RUN_ROOTS):
             raise ValueError(
                 "invalid G14C v3/v4 checkpoint reference rejected; "
-                "the hard rejection set covers all G14C v1-v5 invalid runs"
+                "the hard rejection set covers all G14C v1-v5 invalid runs and G14C v6"
             )
         if not path.is_file():
             raise FileNotFoundError(path)
@@ -170,6 +201,10 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
         if digest != row.get("checkpoint_sha256"):
             raise ValueError(f"checkpoint hash mismatch: {path}")
         typed = row.get("typed_runtime_provenance") or {}
+        if formal_training_identity is not None:
+            for field, expected in formal_training_identity.items():
+                if row.get(field) != expected:
+                    raise ValueError(f"selected checkpoint training identity mismatch: {field}")
         identity = {
             "checkpoint_sha256": digest,
             "agent": str(row["agent_name"]),
@@ -191,6 +226,15 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
                 )
             },
             "update_index": int(row["update_index"]),
+            "agent_scientific_config_semantic_sha256": row.get(
+                "agent_scientific_config_semantic_sha256"
+            ),
+            "formal_training_execution_binding_sha256": row.get(
+                "formal_training_execution_binding_sha256"
+            ),
+            "resolved_execution_context_sha256": row.get(
+                "resolved_execution_context_sha256"
+            ),
         }
         identity["semantic_identity_fingerprint"] = canonical_sha256(identity)
         frozen.append(
@@ -218,6 +262,7 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
         ),
         "checkpoint_location_contract_version": "1.0.0",
         "invalid_run_roots": [str(root) for root in INVALID_FORMAL_RUN_ROOTS],
+        "formal_training_identity": formal_training_identity,
     }
 
 
@@ -241,6 +286,16 @@ def write_checkpoint_companions(input_root: Path, freeze: dict) -> list[dict]:
                     "train_window_plan_identity"
                 ),
                 "formal_protocol_semantic_sha256": freeze["protocol_semantic_sha256"],
+                "agent_scientific_config_semantic_sha256": row.get(
+                    "agent_scientific_config_semantic_sha256"
+                ),
+                "formal_training_execution_binding_sha256": row.get(
+                    "formal_training_execution_binding_sha256"
+                ),
+                "execution_commit": row.get("execution_commit"),
+                "resolved_execution_context_sha256": row.get(
+                    "resolved_execution_context_sha256"
+                ),
                 "runtime_contract_sha256": row.get("runtime_contract_sha256"),
                 "resolved_agent_config": row.get("resolved_agent_config"),
                 "checkpoint_schedule": row.get("checkpoint_schedule"),
@@ -258,6 +313,7 @@ def write_checkpoint_companions(input_root: Path, freeze: dict) -> list[dict]:
                 "checkpoint_location_contract_version": "1.0.0",
                 "manifest_id": f"checkpoint-manifest-{capacity_label}",
                 "protocol_semantic_sha256": freeze["protocol_semantic_sha256"],
+                "formal_training_identity": freeze.get("formal_training_identity"),
                 "entries": [
                     {
                         "agent": row["agent_name"],

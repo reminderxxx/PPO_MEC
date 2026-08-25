@@ -1,0 +1,16 @@
+{
+  "errors": 0,
+  "failures": 0,
+  "max_mobility_rows": 11850526,
+  "provider_frame_count": 73871,
+  "reachable_count": 60,
+  "split_reachable_counts": {
+    "dev": 12,
+    "formal": 12,
+    "sealed_holdout": 12,
+    "train": 24
+  },
+  "status": "pass",
+  "tests": 1063,
+  "window_count": 60
+}

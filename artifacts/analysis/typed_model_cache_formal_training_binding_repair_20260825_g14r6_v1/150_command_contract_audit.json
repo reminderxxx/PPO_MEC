@@ -1,0 +1,11 @@
+{
+  "command_count": 186,
+  "nested_expansion_sha256": "9bebe7805a51bfaaafd042c4b7c262944fc094488828af0e31a1a5aee656b4c5",
+  "outer_expansion_sha256": "9bebe7805a51bfaaafd042c4b7c262944fc094488828af0e31a1a5aee656b4c5",
+  "outer_nested_equal": true,
+  "phase_template_count": 15,
+  "shared_identity_triplet_count": 1,
+  "status": "pass",
+  "training_command_count": 150,
+  "unique_training_command_count": 150
+}

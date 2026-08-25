@@ -1,0 +1,9 @@
+{
+  "agent_count": 10,
+  "field_by_field_equal": true,
+  "hyperparameters_changed": false,
+  "scientific_config_semantic_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+  "source_protocol_semantic_sha256": "feb7ccc489d66aeba502fbef2fef70c911ecdd66218a8ea3d475725ec61d829a",
+  "source_protocol_version": "1.5.0",
+  "status": "pass"
+}

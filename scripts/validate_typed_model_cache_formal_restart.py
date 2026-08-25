@@ -35,9 +35,9 @@ def main() -> None:
     protocol_report = validate_protocol_v1_1(protocol)
     execution = protocol["execution_contract"]
     context_report = None
-    if protocol["typed_model_cache_formal_protocol_version"] == "1.5.0":
+    if protocol["typed_model_cache_formal_protocol_version"] in {"1.5.0", "1.6.0"}:
         if not args.resolved_execution_context_path:
-            raise ValueError("protocol v1.5 preflight requires resolved execution context")
+            raise ValueError("active protocol preflight requires resolved execution context")
         context_payload, context_report = load_resolved_formal_execution_context(
             args.resolved_execution_context_path,
             protocol=protocol,

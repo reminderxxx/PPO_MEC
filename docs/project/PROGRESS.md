@@ -1,5 +1,25 @@
 ﻿# Progress
 
+## 2026-08-25: G14R6 scientific config / execution binding repair
+
+- G14C v6 `typed_model_cache_formal_20260825_135122_g14c_v6` 因 v1.3 legacy companion 的
+  `protocol_semantic_sha256` 与 active Protocol v1.5 不一致，在首个 training cell、episode 0 前正确失败；
+  episode/interaction/update/checkpoint均为0，永久禁止retry/resume/finalize/salvage/reuse。
+- 冻结 `agent_training_scientific_config_contract_version=2.0.0`，semantic SHA-256=
+  `f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8`。10/10 agent 与 v1.5
+  `training_budget.agent_configs` 逐字段相等，SA `auxiliary_coef=0.06`，无超参数变化。
+- 冻结 runtime `formal_training_execution_binding_version=1.0.0` 与 resolved context `2.0.0`：outer runner
+  在 Protocol hash 后绑定 observed clean commit、environment/dependency、split/window/catalog/runtime、完整
+  command matrix与portable resources；binding hash进入context、ledger/input、summary/checkpoint、dev/freeze/
+  provenance/formal benchmark gate，不存在hash自引用。
+- Protocol v1.6 semantic SHA-256=`f2c9e729f126d9e87f56fcdccf13f2ecd018c28ca3102b8d02b2bbd6abca95c0`。
+  10-agent、5-seed、256-episode/32-update/cadence-4、三档capacity及全部科学/评估/holdout字段保持不变；
+  v1.0–v1.5均为audit-only。
+- Readiness v8=`READY_FOR_G14C_V7_CLEAN_TRAIN_AND_FORMAL`只授权未来独立clean run。本轮正式training/
+  checkpoint/performance仍为0，未运行formal/holdout，未启动G14C v7/G14D/G15，holdout sealed/unopened。
+- 合同：`docs/project/typed_model_cache_formal_training_identity_contract.md`；机器证据：
+  `artifacts/analysis/typed_model_cache_formal_training_binding_repair_20260825_g14r6_v1/`。
+
 ## 2026-08-20: G14R2 formal window consumption 与 phase ledger repair 完成
 
 - G14C v2 `typed_model_cache_formal_20260820_164251_g14c_v2` 永久记为

@@ -1,0 +1,35 @@
+{
+  "formal_execution_environment_contract_version": "1.0.0",
+  "runtime_location": {
+    "resolved_python_absolute_path": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "site_packages_paths": [
+      "/Users/howen/Projects/PPO_MEC/.venv/lib/python3.9/site-packages"
+    ],
+    "virtual_environment_root": "/Users/howen/Projects/PPO_MEC/.venv"
+  },
+  "runtime_location_is_scientific_identity": false,
+  "scientific_identity": {
+    "architecture": "arm64",
+    "critical_package_versions": {
+      "PyYAML": "6.0.3",
+      "numpy": "2.0.2",
+      "pandas": "2.3.3",
+      "pytest": "8.4.2",
+      "torch": "2.8.0"
+    },
+    "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+    "environment_fingerprint": "a8126811569850dc77f4d9586df4c20166fe78a16ac3386fc59e6f973e5d7257",
+    "execution_commit": "Commit A7 (runtime binding requires exact observed clean Git HEAD)",
+    "formal_execution_environment_contract_version": "1.0.0",
+    "identity_rule": "environment identity != host-specific Python absolute path",
+    "installed_package_count": 31,
+    "platform_system": "Darwin",
+    "python_implementation": "CPython",
+    "python_version": "3.9.6",
+    "source_root_identity": {
+      "project_package": "src",
+      "source_tree_sha256": "Commit A7 Git tree (runtime-audited; no self-reference)"
+    },
+    "torch_version": "2.8.0"
+  }
+}

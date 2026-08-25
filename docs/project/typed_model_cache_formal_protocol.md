@@ -1,5 +1,25 @@
 # Typed Model-Cache Formal Protocol
 
+## G14R6 active Protocol v1.6
+
+- `reviewed_at`: `2026-08-25`
+- `literature_cutoff`: `2026-08-25`
+- `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`
+- `artifact_run_id`: `typed_model_cache_formal_training_binding_repair_20260825_g14r6_v1`
+- `policy_version`: `tmc_review_policy_v3_20260621`
+- evidence level：`E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE`
+
+Protocol v1.6 supersede v1.5，semantic SHA-256为
+`f2c9e729f126d9e87f56fcdccf13f2ecd018c28ca3102b8d02b2bbd6abca95c0`。它将scientific config
+`2.0.0`（SHA-256=`f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8`）与runtime execution
+binding `1.0.0`拆分，并升级resolved context到`2.0.0`。完整合同见
+`typed_model_cache_formal_training_identity_contract.md`。
+
+G14C v6永久为`invalid_during_first_training_cell_before_episode_zero`，episode/interaction/update/checkpoint
+全部为0，禁止retry/resume/finalize/salvage/reuse。v1.0–v1.5均为audit-only。Readiness v8=
+`READY_FOR_G14C_V7_CLEAN_TRAIN_AND_FORMAL`只授权未来独立clean run；正式training/checkpoint/performance仍为0，
+holdout sealed/unopened，未启动G14C v7/G14D/G15。
+
 ## G14R2 当前审查身份
 
 - `reviewed_at`: `2026-08-20T18:23:21.124778+08:00`

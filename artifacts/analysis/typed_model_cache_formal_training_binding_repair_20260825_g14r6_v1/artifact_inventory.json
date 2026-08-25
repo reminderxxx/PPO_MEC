@@ -1,0 +1,116 @@
+{
+  "file_count": 22,
+  "files": [
+    {
+      "path": "10_agent_entrypoint_audit.json",
+      "sha256": "f1b4e0e0575feb5f956ac9c042f0444d20efac704005b671af115a705c6f0806",
+      "size_bytes": 5560
+    },
+    {
+      "path": "150_command_contract_audit.json",
+      "sha256": "119b11dcb7a141d0b4194a52b1818f78a7ee5e2c10528e2665ec6669a07266fa",
+      "size_bytes": 411
+    },
+    {
+      "path": "agent_training_scientific_config_contract.json",
+      "sha256": "8c130bda6b851dd1c83df511e262b90dfcf2590d564d1323f85b99963fd9e707",
+      "size_bytes": 4465
+    },
+    {
+      "path": "checkpoint_provenance_schema_audit.json",
+      "sha256": "7a334470f1e39a967e04b3d8a4184d328f743db05ef06d1dd20d35fb4605709f",
+      "size_bytes": 828
+    },
+    {
+      "path": "clean_worktree_acceptance.json",
+      "sha256": "104fbe9149125db37bc8d3b7a06f4c6cc4c4198170b033820592a8209133c6f3",
+      "size_bytes": 8018
+    },
+    {
+      "path": "clean_worktree_preflight_tests.json",
+      "sha256": "0692d817d35a436ca4586a74835c5858453fed2874b9507916130bdcead20686",
+      "size_bytes": 295
+    },
+    {
+      "path": "config_parity_audit.json",
+      "sha256": "b6798857d8535c1991df2025a99a5799e37e71bdd3404d81057e8de7812a43a5",
+      "size_bytes": 362
+    },
+    {
+      "path": "environment_identity.json",
+      "sha256": "96d28d5d78d78f1588aa5f6a7902afdbe6a533b8911a7870fb2e6fc2e1697c8a",
+      "size_bytes": 912
+    },
+    {
+      "path": "formal_training_execution_binding_contract.json",
+      "sha256": "768dcf82e044e98e1587c95ffd01ccf0854e8f212eddab7c6d648fa439e6ddba",
+      "size_bytes": 561
+    },
+    {
+      "path": "g14c_v6_invalid_run_registration.json",
+      "sha256": "36be0ee9d78fa0168022c1c92998b00744b8531be2d76ea34534f8e6daf57687",
+      "size_bytes": 1117
+    },
+    {
+      "path": "holdout_seal_revalidation.json",
+      "sha256": "331723084af60975d66bdd689f2bdb39f21ff8f7b322d111b829c4f59ce8ab30",
+      "size_bytes": 138
+    },
+    {
+      "path": "negative_validation.json",
+      "sha256": "2c2bd10ea477eba202e22bcc88883ebd621486e6c7e35f5c06aa4b57bf2965ed",
+      "size_bytes": 1130
+    },
+    {
+      "path": "non_formal_training_contract_rehearsal.json",
+      "sha256": "f1b4e0e0575feb5f956ac9c042f0444d20efac704005b671af115a705c6f0806",
+      "size_bytes": 5560
+    },
+    {
+      "path": "phase_cell_ledger_regression.json",
+      "sha256": "b07b22dde7f531deaa9c4f4b4bcd4bc0a5879749e85d0d6db8d213542fb4034a",
+      "size_bytes": 311
+    },
+    {
+      "path": "producer_consumer_matrix.json",
+      "sha256": "fb1af4bf2db568c4d286a3371e045694637fd82150e872946334d96563beb8a7",
+      "size_bytes": 8790
+    },
+    {
+      "path": "protected_user_file_hashes_end.json",
+      "sha256": "4fbd3dc50200e554240b2c397f3a576a07fcc458ee3ef017478665a02f2629fe",
+      "size_bytes": 862
+    },
+    {
+      "path": "protected_user_file_hashes_start.json",
+      "sha256": "a26361a01391ad8b7ac71cb007c437b9ebc9be05b7bd13a371018eb106f90833",
+      "size_bytes": 805
+    },
+    {
+      "path": "protocol_v1_5_to_v1_6_diff.json",
+      "sha256": "f855c2abdc59ac1e051d5d675ba8c57b1122ca8cd3f05569c57dcbcf399a9d40",
+      "size_bytes": 505
+    },
+    {
+      "path": "protocol_v1_6_manifest.json",
+      "sha256": "87a5877026be4194fb3f8025bca303e51566bd221ff05d2dcef4ff3421f75f72",
+      "size_bytes": 321210
+    },
+    {
+      "path": "readiness_review_v8.json",
+      "sha256": "c3dab4855e8fc9df1b45191d0ac2e04e89d6f60228502b2a71d467fece27081b",
+      "size_bytes": 1622
+    },
+    {
+      "path": "root_cause_audit.json",
+      "sha256": "80b148265942591bedcc6046770eaf3d96469f26c7d882cc1ac6db0a895e521f",
+      "size_bytes": 531
+    },
+    {
+      "path": "tests_result.json",
+      "sha256": "bb38d9b91666a33335c5106a67a1f2677ad08fe57d5aef9564a39495f523eb39",
+      "size_bytes": 473
+    }
+  ],
+  "status": "pass"
+}

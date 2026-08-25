@@ -1,0 +1,29 @@
+{
+  "checkpoint_count": 0,
+  "cross_protocol_commit_run_reuse_rejected": true,
+  "path_identity_substitution_rejected": true,
+  "required_fields": [
+    "agent_scientific_config_semantic_sha256",
+    "formal_training_execution_binding_sha256",
+    "formal_protocol_semantic_sha256",
+    "execution_git_commit",
+    "resolved_execution_context_sha256",
+    "environment_fingerprint",
+    "dependency_fingerprint",
+    "seed",
+    "capacity_bytes",
+    "episodes",
+    "update_every",
+    "checkpoint_every"
+  ],
+  "status": "pass",
+  "validated_consumers": [
+    "train summary and checkpoint exporter",
+    "resume loader",
+    "dev selection",
+    "checkpoint freeze and provenance manifest",
+    "formal benchmark checkpoint gate",
+    "resolved execution context",
+    "portable resource and fairness provenance paths"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_training_binding_repair_20260825_g14r6_v1",
+  "file_count": 22,
+  "formal": false,
+  "holdout_opened": false,
+  "inventory_sha256": "9e87712742e676eba048aae1ba8a02bd85620e0522092146ae33add6d375b016",
+  "performance_evidence": false,
+  "status": "pass",
+  "training": false
+}

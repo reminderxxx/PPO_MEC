@@ -1,0 +1,25 @@
+{
+  "compileall": "pass",
+  "formal_regression": {
+    "failed": 0,
+    "passed": 334
+  },
+  "formal_training_executed": false,
+  "full_pytest_clean_candidate": {
+    "failed": 0,
+    "passed": 1063
+  },
+  "full_pytest_working_tree": {
+    "failed": 0,
+    "passed": 1067
+  },
+  "g14r6_targeted": {
+    "failed": 0,
+    "passed": 25
+  },
+  "git_diff_check": "pass",
+  "imports": "pass",
+  "performance_evidence_created": false,
+  "smoke_test": "pass",
+  "status": "pass"
+}

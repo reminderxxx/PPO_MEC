@@ -1,5 +1,17 @@
 ﻿# Decision Log
 
+## 2026-08-25: G14R6 separates scientific hyperparameters from execution binding
+
+- 决定：agent超参数是稳定scientific config identity，不再包含Protocol、commit、run、host path或结果；
+  v1.5 agent config 10/10逐字段迁移到contract `2.0.0`且不改数值。
+- 决定：Protocol semantic projection只绑定scientific config content hash与execution-binding schema/rule。
+  outer runner在Protocol hash后用observed clean Git HEAD、environment/dependency、split/window/catalog/runtime、
+  command matrix与portable resource生成单一binding实例；binding hash进入context和全链provenance。
+- 决定：不以迭代hash、忽略校验或多binding容忍解决自引用。runtime binding不含host path；scientific
+  config允许同内容路径迁移，但同名异hash拒绝。
+- 决定：Protocol v1.0–v1.5均为audit-only；G14C v6永久invalid且其preflight/tests不可复用。Readiness v8
+  只授权未来独立G14C v7，不授权本任务启动训练、formal、holdout、G14D或G15。
+
 ## 2026-08-20: G14R2 binds formal execution to raw identity, not implicit offsets
 
 - 决定：G14C v2 与 Protocol v1.1 永久 `invalid_before_performance_execution`；return code 1 是

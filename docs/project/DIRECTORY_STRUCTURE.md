@@ -1,5 +1,19 @@
 ﻿# Directory Structure
 
+G14R6：active Protocol v1.6、scientific config、binding schema与environment/index位于
+`configs/experiment/typed_model_cache_formal_protocol_v1_6_20260825/`；runtime binding实例只允许写入未来
+durable run root。共享验证位于`src/runtime/formal_training_identity.py`，生成器为
+`scripts/repair_typed_model_cache_formal_training_binding.py`，机器审计包位于
+`artifacts/analysis/typed_model_cache_formal_training_binding_repair_20260825_g14r6_v1/`。该结构不含正式
+checkpoint或performance result。
+
+G14R6：active Protocol v1.6、scientific config、binding schema与environment/index位于
+`configs/experiment/typed_model_cache_formal_protocol_v1_6_20260825/`；runtime binding实例只允许写入未来
+durable run root。共享验证位于`src/runtime/formal_training_identity.py`，生成器为
+`scripts/repair_typed_model_cache_formal_training_binding.py`，机器审计包位于
+`artifacts/analysis/typed_model_cache_formal_training_binding_repair_20260825_g14r6_v1/`。该结构不含正式
+checkpoint或performance result。
+
 G14R2：Protocol v1.2 与 window contract 位于
 `configs/experiment/typed_model_cache_formal_protocol_v1_2_20260820/`；复用 v1.1 的 science/runtime/
 fairness assets，不复制或改写 G14B 四个 window plans。loader 合同位于
@@ -57,6 +71,10 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 - `configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/`：G14R executable v1.1 protocol、agent/runtime/fairness/split companions 与完整 command matrix；不含正式结果
 - `configs/experiment/typed_model_cache_formal_protocol_v1_2_20260820/`：G14R2 executable v1.2 protocol、
   frozen window consumption contract、agent/split companions 与 index；不含正式 checkpoint 或结果
+- `configs/experiment/typed_model_cache_formal_protocol_v1_6_20260825/`：G14R6 active v1.6 protocol、
+  execution-neutral scientific config、binding schema、environment manifest与index；runtime binding不写入该目录
+- `configs/experiment/typed_model_cache_formal_protocol_v1_6_20260825/`：G14R6 active v1.6 protocol、
+  execution-neutral scientific config、binding schema、environment manifest与index；runtime binding不写入该目录
 - `data/`：原始数据与处理后数据；通过 Git LFS 版本化，完整克隆后需执行 `git lfs pull`
 - `docs/`：长期维护文档，`docs/project/` 为事实来源，`docs/project/DATASET_SOURCES.md` 记录数据源声明，`docs/project/literature_reference_table.md` 记录顶刊/顶会 related-work 参考表，`docs/benchmark_plan_or_baseline_plan.md`、`docs/baseline_formalization_round1.md`、`docs/experiment_status_round1.md`、`docs/mechanism_activation_check_round1.md` 和 `docs/experiment_runbook_round1.md` 记录 baseline 计划、round1 状态、机制诊断与复跑命令
 - `scripts/`：数据检查、dry-run、训练、评估和 benchmark 入口

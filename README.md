@@ -1,5 +1,14 @@
 # PPO_MEC
 
+G14R6 已将 formal learned-agent 超参数的科学身份与每次执行的 Protocol/commit/runtime 绑定拆分，冻结
+scientific config `2.0.0`、execution binding `1.0.0`、resolved context `2.0.0` 与 Protocol `1.6.0`。
+scientific config semantic SHA-256 为 `f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8`，
+Protocol semantic SHA-256 为 `f2c9e729f126d9e87f56fcdccf13f2ecd018c28ca3102b8d02b2bbd6abca95c0`。
+G14C v6 永久 invalid 于首个 training cell、episode 0 前，episode/interaction/update/checkpoint全部为0且
+禁止retry/resume/finalize/salvage/reuse。Readiness v8仅授权未来独立 G14C v7 clean run；本轮未启动
+正式training/formal/holdout/G14D/G15，holdout保持sealed/unopened。详见
+`docs/project/typed_model_cache_formal_training_identity_contract.md`。
+
 G14R5 已修复 G14C v5 暴露的 outer/nested execution context 分叉，并冻结 Protocol v1.5 与 resolved context
 `1.0.0`。G14C v5 永久 invalid，tests/training/dev/formal/holdout 均为0且禁止resume/finalize/checkpoint reuse。
 detached Commit A6候选无本地`.venv`，使用共享绝对Python完成186-command dry-run和真实非正式

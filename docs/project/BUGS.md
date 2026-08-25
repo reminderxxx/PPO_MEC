@@ -1,5 +1,16 @@
 ﻿# Bugs And Risks
 
+## 2026-08-25: G14C v6 legacy agent-config identity coupling（RESOLVED；run永久invalid）
+
+- 根因：v1.5 train template仍消费 v1.3 `agent_training_configs.json`；该文件把稳定超参数与旧 Protocol
+  semantic hash耦合，导致 active v1.5 在首个cell、episode 0前fail-fast。
+- 修复：Protocol v1.6使用execution-neutral scientific config `2.0.0` 与runtime execution binding `1.0.0`；
+  缺config/binding/context、跨Protocol/commit/environment/data/runtime/command配对、checkpoint identity缺失
+  或content drift均在消费前拒绝。
+- 历史边界：G14C v6 及 v1–v5 invalid roots/checkpoints继续硬拒绝；不得将 v6 已完成的preflight/tests复用
+  为未来G14C v7证据。
+- 仍开放：尚无任何Protocol v1.6正式checkpoint或performance evidence；Readiness v8不是formal或paper-ready。
+
 ## 2026-08-20: G14R2 closes G14C v2 window/ledger blockers
 
 - `RESOLVED / source range`：formal mobility commands 现在必须显式传入冻结 prefix 11,850,526 raw rows；

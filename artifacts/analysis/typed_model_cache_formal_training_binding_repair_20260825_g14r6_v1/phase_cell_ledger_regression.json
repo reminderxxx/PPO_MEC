@@ -1,0 +1,7 @@
+{
+  "cell_resume_finalize_regression_covered_by_tests_phase": true,
+  "phase_ledger_path": "/private/tmp/ppo_mec_g14r6_acceptance_run_v3/phase_state.jsonl",
+  "phase_ledger_sha256": "738b5f7ec39e3a7fb6c32c59f90a7ee1af07f80ca0414ee8232317ad49704062",
+  "preflight_and_tests_terminal": true,
+  "status": "pass"
+}

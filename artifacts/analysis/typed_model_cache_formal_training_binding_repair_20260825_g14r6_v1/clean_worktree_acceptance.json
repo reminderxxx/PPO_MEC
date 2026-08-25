@@ -1,0 +1,197 @@
+{
+  "checkpoint_count": 0,
+  "clean_worktree_has_local_venv": false,
+  "clean_worktree_root": "/private/tmp/ppo_mec_g14r6_candidate.rjCiYR",
+  "command_audit": {
+    "command_count": 186,
+    "nested_expansion_sha256": "9bebe7805a51bfaaafd042c4b7c262944fc094488828af0e31a1a5aee656b4c5",
+    "outer_expansion_sha256": "9bebe7805a51bfaaafd042c4b7c262944fc094488828af0e31a1a5aee656b4c5",
+    "outer_nested_equal": true,
+    "phase_template_count": 15,
+    "shared_identity_triplet_count": 1,
+    "status": "pass",
+    "training_command_count": 150,
+    "unique_training_command_count": 150
+  },
+  "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+  "entrypoint_rehearsal": {
+    "agent_count": 10,
+    "agents": [
+      {
+        "agent": "sa_ghmappo",
+        "artifact_sha256": "3537a9c03a83c720d2d2ca3b34c2530056cc97d84219433e22e844dc921dd015",
+        "checkpoint_created": false,
+        "episode_count": 0,
+        "execution_binding_sha256": "f93b99ed6ccbeaad9e6ad48c529c7a0cc4487124cf2406c6da058ba8132fcb1c",
+        "resolved_agent_config": {
+          "auxiliary_coef": 0.06,
+          "entropy_coef": 0.004,
+          "learning_rate": 0.0001,
+          "value_coef": 0.7
+        },
+        "scientific_config_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+        "status": "pass"
+      },
+      {
+        "agent": "ppo",
+        "artifact_sha256": "b701d9db33913cb96d661e189e0701a0a827411ef5cfdb5d212a153d1740048c",
+        "checkpoint_created": false,
+        "episode_count": 0,
+        "execution_binding_sha256": "f93b99ed6ccbeaad9e6ad48c529c7a0cc4487124cf2406c6da058ba8132fcb1c",
+        "resolved_agent_config": {
+          "entropy_coef": 0.01,
+          "learning_rate": 0.0003,
+          "value_coef": 0.5
+        },
+        "scientific_config_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+        "status": "pass"
+      },
+      {
+        "agent": "mappo",
+        "artifact_sha256": "0fb854b6cb4f19a112665ef9cea58317dd339792daa920e2222e6465b6340bbd",
+        "checkpoint_created": false,
+        "episode_count": 0,
+        "execution_binding_sha256": "f93b99ed6ccbeaad9e6ad48c529c7a0cc4487124cf2406c6da058ba8132fcb1c",
+        "resolved_agent_config": {
+          "entropy_coef": 0.015,
+          "learning_rate": 0.0002,
+          "value_coef": 0.65
+        },
+        "scientific_config_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+        "status": "pass"
+      },
+      {
+        "agent": "dqn",
+        "artifact_sha256": "8d758651b49de65b8a00bfe36e09f1a4acd790924a6952f64729f39fa23b4d9f",
+        "checkpoint_created": false,
+        "episode_count": 0,
+        "execution_binding_sha256": "f93b99ed6ccbeaad9e6ad48c529c7a0cc4487124cf2406c6da058ba8132fcb1c",
+        "resolved_agent_config": {
+          "learning_rate": 0.0003
+        },
+        "scientific_config_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+        "status": "pass"
+      },
+      {
+        "agent": "dueling_dqn",
+        "artifact_sha256": "5d51422ef33fac6f6c57d0d6e0d3dc9f8c67346176d093e0e1719fcd394b1154",
+        "checkpoint_created": false,
+        "episode_count": 0,
+        "execution_binding_sha256": "f93b99ed6ccbeaad9e6ad48c529c7a0cc4487124cf2406c6da058ba8132fcb1c",
+        "resolved_agent_config": {
+          "learning_rate": 0.0003
+        },
+        "scientific_config_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+        "status": "pass"
+      },
+      {
+        "agent": "qmix",
+        "artifact_sha256": "f2d3cb3ff094b46de69eacf2a9dd5c56fa4ad88de6a43acd01abc2fa0748f5de",
+        "checkpoint_created": false,
+        "episode_count": 0,
+        "execution_binding_sha256": "f93b99ed6ccbeaad9e6ad48c529c7a0cc4487124cf2406c6da058ba8132fcb1c",
+        "resolved_agent_config": {
+          "learning_rate": 0.0003
+        },
+        "scientific_config_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+        "status": "pass"
+      },
+      {
+        "agent": "controller_mat",
+        "artifact_sha256": "6d32bb5ac8c0527ce682c3d4c83f404b29abbbdc0f756888b15790f78c3610d5",
+        "checkpoint_created": false,
+        "episode_count": 0,
+        "execution_binding_sha256": "f93b99ed6ccbeaad9e6ad48c529c7a0cc4487124cf2406c6da058ba8132fcb1c",
+        "resolved_agent_config": {
+          "entropy_coef": 0.01,
+          "learning_rate": 0.0003,
+          "value_coef": 0.5
+        },
+        "scientific_config_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+        "status": "pass"
+      },
+      {
+        "agent": "dag_offload_drl",
+        "artifact_sha256": "9b41e145d6d9df76d03efbb80bda7787dfacc921cc7f557a2598ec3d7b941eab",
+        "checkpoint_created": false,
+        "episode_count": 0,
+        "execution_binding_sha256": "f93b99ed6ccbeaad9e6ad48c529c7a0cc4487124cf2406c6da058ba8132fcb1c",
+        "resolved_agent_config": {
+          "entropy_coef": 0.01,
+          "learning_rate": 0.0003,
+          "value_coef": 0.5
+        },
+        "scientific_config_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+        "status": "pass"
+      },
+      {
+        "agent": "cache_offload_drl",
+        "artifact_sha256": "834461c0404bf15ede506adf0076adc9cdfa1213977d4204a1884a6443ddbc19",
+        "checkpoint_created": false,
+        "episode_count": 0,
+        "execution_binding_sha256": "f93b99ed6ccbeaad9e6ad48c529c7a0cc4487124cf2406c6da058ba8132fcb1c",
+        "resolved_agent_config": {
+          "entropy_coef": 0.01,
+          "learning_rate": 0.0003,
+          "value_coef": 0.5
+        },
+        "scientific_config_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+        "status": "pass"
+      },
+      {
+        "agent": "dt_handoff_drl",
+        "artifact_sha256": "5a2cafde63eadccb9ca88cde119249315b4535de72c20a185322bf1799a66294",
+        "checkpoint_created": false,
+        "episode_count": 0,
+        "execution_binding_sha256": "f93b99ed6ccbeaad9e6ad48c529c7a0cc4487124cf2406c6da058ba8132fcb1c",
+        "resolved_agent_config": {
+          "entropy_coef": 0.01,
+          "learning_rate": 0.0003,
+          "value_coef": 0.5
+        },
+        "scientific_config_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+        "status": "pass"
+      }
+    ],
+    "checkpoint_count": 0,
+    "formal": false,
+    "performance_evidence": false,
+    "status": "pass",
+    "training": false
+  },
+  "environment_fingerprint": "a8126811569850dc77f4d9586df4c20166fe78a16ac3386fc59e6f973e5d7257",
+  "execution_binding_full_sha256": "f93b99ed6ccbeaad9e6ad48c529c7a0cc4487124cf2406c6da058ba8132fcb1c",
+  "execution_commit": "e7ce86fdb52175c0a91d7465abba93cbdbe9b973",
+  "formal": false,
+  "holdout_opened": false,
+  "ledger_regression": {
+    "cell_resume_finalize_regression_covered_by_tests_phase": true,
+    "phase_ledger_path": "/private/tmp/ppo_mec_g14r6_acceptance_run_v3/phase_state.jsonl",
+    "phase_ledger_sha256": "738b5f7ec39e3a7fb6c32c59f90a7ee1af07f80ca0414ee8232317ad49704062",
+    "preflight_and_tests_terminal": true,
+    "status": "pass"
+  },
+  "performance_evidence": false,
+  "preflight": {
+    "errors": 0,
+    "failures": 0,
+    "max_mobility_rows": 11850526,
+    "provider_frame_count": 73871,
+    "reachable_count": 60,
+    "split_reachable_counts": {
+      "dev": 12,
+      "formal": 12,
+      "sealed_holdout": 12,
+      "train": 24
+    },
+    "status": "pass",
+    "tests": 1063,
+    "window_count": 60
+  },
+  "protocol_semantic_sha256": "f2c9e729f126d9e87f56fcdccf13f2ecd018c28ca3102b8d02b2bbd6abca95c0",
+  "resolved_context_sha256": "659bfc79f4fd7ccc5de67e23bca234357f60a590899a4d4c0f173e20b9f178fd",
+  "resolved_shared_python": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "scientific_config_semantic_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+  "status": "pass",
+  "training": false
+}

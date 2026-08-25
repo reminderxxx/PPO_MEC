@@ -720,6 +720,13 @@ def main() -> None:
                             or {},
                             expected_checkpoint_sha256=binding.get("checkpoint_sha256"),
                             require_git_commit=binding.get("execution_git_commit"),
+                            expected_formal_training_identity=(
+                                binding
+                                if binding.get(
+                                    "formal_training_execution_binding_sha256"
+                                )
+                                else None
+                            ),
                         )
                         if checkpoint_gate["status"] != "compatible":
                             raise ValueError(

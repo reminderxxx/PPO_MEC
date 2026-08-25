@@ -38,6 +38,12 @@ from src.evaluators.formal_cell_transaction import (
     stable_cell_id,
 )
 from src.runtime.formal_execution_environment import resolve_execution_environment
+from src.runtime.formal_training_identity import (
+    atomic_create_execution_binding,
+    build_execution_binding,
+    load_strict_json_mapping,
+    validate_execution_binding,
+)
 from src.runtime.resolved_formal_execution_context import (
     RESOLVED_FORMAL_EXECUTION_CONTEXT_FILENAME,
     atomic_create_resolved_formal_execution_context,
@@ -48,6 +54,7 @@ from src.runtime.resolved_formal_execution_context import (
 
 PROTOCOL_V14 = "1.4.0"
 PROTOCOL_V15 = "1.5.0"
+PROTOCOL_V16 = "1.6.0"
 
 
 def _absolute_project_path(value: str) -> str:
@@ -83,6 +90,10 @@ def resolved_expansion_context(
             Path(requested_output_root)
             / RESOLVED_FORMAL_EXECUTION_CONTEXT_FILENAME
         ),
+        formal_training_execution_binding_path=str(
+            Path(requested_output_root)
+            / "formal_training_execution_binding.json"
+        ),
         resolve_relative_paths_against_repository_root=True,
     )
     for _ in range(4):
@@ -106,6 +117,7 @@ def resolved_expansion_context(
         "protocol_artifact_root",
         "resource_registry_path",
         "agent_config_path",
+        "agent_scientific_config_path",
         "dev_window_plan_path",
         "formal_window_plan_path",
         "train_window_plan_path",
@@ -151,7 +163,7 @@ def reject_invalid_run_root(protocol: dict, output_root: str | Path) -> None:
     supersession = protocol.get("supersession", {})
     references = (
         supersession.get("invalid_execution_runs", [])
-        if version == PROTOCOL_V15
+        if version in {PROTOCOL_V15, PROTOCOL_V16}
         else supersession.get("invalid_g14c_v4_runs", [])
         if version == PROTOCOL_V14
         else []
@@ -185,16 +197,16 @@ def main() -> None:
     reject_invalid_run_root(protocol, requested_output_root)
     environment_resolution = None
     environment_manifest = None
-    if protocol_version == PROTOCOL_V15:
+    if protocol_version in {PROTOCOL_V15, PROTOCOL_V16}:
         if not args.python_executable or not args.execution_environment_manifest:
             raise FormalExecutionError(
-                "protocol v1.5 requires explicit Python and execution environment manifest"
+                "active formal protocol requires explicit Python and execution environment manifest"
             )
         if not Path(args.python_executable).is_absolute():
             raise FormalExecutionError(
-                "protocol v1.5 forbids relative Python or .venv fallback"
+                "active formal protocol forbids relative Python or .venv fallback"
             )
-    if protocol_version in {PROTOCOL_V14, PROTOCOL_V15}:
+    if protocol_version in {PROTOCOL_V14, PROTOCOL_V15, PROTOCOL_V16}:
         if args.execution_environment_manifest:
             environment_manifest = json.loads(
                 Path(args.execution_environment_manifest).read_text(encoding="utf-8-sig")
@@ -213,11 +225,11 @@ def main() -> None:
             ),
             require_clean_git_worktree=True,
         )
-        if protocol_version == PROTOCOL_V15 and environment_resolution.runtime_audit.get(
+        if protocol_version in {PROTOCOL_V15, PROTOCOL_V16} and environment_resolution.runtime_audit.get(
             "resolution_source"
         ) != "explicit_python_executable":
             raise FormalExecutionError(
-                "protocol v1.5 Python must come from explicit outer resolution"
+                "active formal protocol Python must come from explicit outer resolution"
             )
     resolved_python = (
         environment_resolution.python_executable
@@ -231,10 +243,42 @@ def main() -> None:
         python_executable=resolved_python,
     )
     outer_validation = validate_command_templates(templates, context)
+    scientific_config = None
+    execution_binding = None
+    if protocol_version == PROTOCOL_V16:
+        if environment_resolution is None:
+            raise FormalExecutionError("Protocol v1.6 environment was not resolved")
+        scientific_config = load_strict_json_mapping(
+            context["agent_scientific_config_path"], "agent scientific config"
+        )
+        binding_path = Path(context["formal_training_execution_binding_path"])
+        observed_commit = str(
+            environment_resolution.runtime_audit.get("observed_execution_commit") or ""
+        )
+        if args.resume or args.finalize_phase_only:
+            execution_binding = load_strict_json_mapping(
+                binding_path, "formal training execution binding"
+            )
+            validate_execution_binding(
+                execution_binding,
+                protocol=protocol,
+                scientific_config=scientific_config,
+                execution_commit=observed_commit,
+                environment_identity=environment_resolution.environment_identity,
+                command_matrix_sha256=outer_validation["command_matrix_sha256"],
+            )
+        else:
+            execution_binding = build_execution_binding(
+                protocol=protocol,
+                scientific_config=scientific_config,
+                execution_commit=observed_commit,
+                environment_identity=environment_resolution.environment_identity,
+                command_matrix_sha256=outer_validation["command_matrix_sha256"],
+            )
     resolved_context_payload = None
     resolved_context_report = None
     resolved_context_file_sha256 = None
-    if protocol_version == PROTOCOL_V15:
+    if protocol_version in {PROTOCOL_V15, PROTOCOL_V16}:
         if environment_resolution is None or not args.execution_environment_manifest:
             raise FormalExecutionError("protocol v1.5 environment was not resolved")
         context_path = Path(context["resolved_execution_context_path"])
@@ -271,6 +315,7 @@ def main() -> None:
                 outer_expansion_sha256=outer_validation["command_matrix_sha256"],
                 phase_count=outer_validation["phase_count"],
                 command_count=outer_validation["command_count"],
+                execution_binding=execution_binding,
             )
             encoded_context = (
                 json.dumps(
@@ -313,6 +358,16 @@ def main() -> None:
                         if environment_resolution is not None
                         else None
                     ),
+                    "formal_training_execution_binding": (
+                        {
+                            "binding_full_sha256": execution_binding[
+                                "binding_full_sha256"
+                            ],
+                            "persisted": False,
+                        }
+                        if execution_binding is not None
+                        else None
+                    ),
                 },
                 ensure_ascii=False,
                 indent=2,
@@ -321,9 +376,9 @@ def main() -> None:
         )
         return
 
-    if protocol_version != PROTOCOL_V15:
+    if protocol_version != PROTOCOL_V16:
         raise FormalExecutionError(
-            "formal Protocol v1.0-v1.4 is audit-only; new execution requires v1.5"
+            "formal Protocol v1.0-v1.5 is audit-only; new execution requires v1.6"
         )
 
     if phase == "complete_without_holdout":
@@ -349,9 +404,12 @@ def main() -> None:
             "resolved_execution_context_file_sha256": (
                 resolved_context_file_sha256
             ),
+            "formal_training_execution_binding_sha256": execution_binding[
+                "binding_full_sha256"
+            ],
         }
     )
-    if protocol_version == PROTOCOL_V15:
+    if protocol_version == PROTOCOL_V16:
         if environment_resolution is None or resolved_context_payload is None:
             raise FormalExecutionError("protocol v1.5 context was not resolved")
         ledger_resume_phases = {
@@ -396,6 +454,9 @@ def main() -> None:
                 "resolved_execution_context_file_sha256": (
                     resolved_context_file_sha256
                 ),
+                "formal_training_execution_binding_sha256": execution_binding[
+                    "binding_full_sha256"
+                ],
             }
         )
         runner_v3 = TransactionalPhaseRunner(
@@ -411,6 +472,9 @@ def main() -> None:
             ),
         )
         if not (args.resume or args.finalize_phase_only):
+            atomic_create_execution_binding(
+                context["formal_training_execution_binding_path"], execution_binding
+            )
             persisted = atomic_create_resolved_formal_execution_context(
                 context["resolved_execution_context_path"],
                 resolved_context_payload,
@@ -458,6 +522,9 @@ def main() -> None:
                         "resolved_execution_context_sha256": (
                             resolved_context_payload["context_sha256"]
                         ),
+                        "formal_training_execution_binding_sha256": execution_binding[
+                            "binding_full_sha256"
+                        ],
                     }
                 ),
             )

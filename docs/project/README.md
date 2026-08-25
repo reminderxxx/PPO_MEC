@@ -4,6 +4,9 @@
 
 ## Live 文档
 
+- `typed_model_cache_formal_training_identity_contract.md`：G14R6 scientific config 2.0、runtime execution
+  binding 1.0、resolved context 2.0、checkpoint/downstream provenance 与 Readiness v8
+
 - `typed_model_cache_formal_protocol.md`：G14B-G14R2 agent/seed/budget/capacity/metrics/statistics/claims/
   execution/holdout seal 冻结合同
 - `typed_model_cache_formal_window_consumption_contract.md`：G14R2 raw/provider offset 语义、source-range
@@ -106,3 +109,12 @@
 - 机器证据：`../../artifacts/analysis/typed_model_cache_formal_preflight_context_repair_20260825_g14r5_v1/`
 - 状态：detached no-.venv clean preflight/tests 已通过；G14C v5永久invalid；正式training/checkpoint/performance为0，
   holdout sealed/unopened，G14C v6/G14D/G15未启动。
+
+## G14R6 formal training identity repair
+
+- 合同：`typed_model_cache_formal_training_identity_contract.md`
+- Protocol v1.6 semantic：`f2c9e729...a95c0`
+- Scientific config semantic：`f83587cd...49bc8`
+- 机器证据：`../../artifacts/analysis/typed_model_cache_formal_training_binding_repair_20260825_g14r6_v1/`
+- 状态：只完成配置/执行身份合同与非正式验收；G14C v6永久invalid，正式training/checkpoint/performance仍为0，
+  holdout sealed/unopened，未启动G14C v7/G14D/G15。

@@ -1,0 +1,14 @@
+{
+  "episode_interaction_update_checkpoint_counts": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "failure_audit_sha256": "2cc81ffcd375323caa71c0966ffce36059c43a8da0aad5e7245078727dd0725a",
+  "failure_integrity_sha256": "5f69b81191136354b79f99d2d1599899dbf2a34a537335daafb0f5a5a9bddc0e",
+  "performance_observed": false,
+  "repair": "execution-neutral scientific config plus post-Protocol runtime execution binding",
+  "root_cause": "legacy companion coupled stable hyperparameters to Protocol v1.3 semantic hash",
+  "status": "confirmed"
+}

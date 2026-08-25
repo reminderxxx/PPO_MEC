@@ -53,6 +53,15 @@ from src.runtime.formal_training_contract import (
     should_save_checkpoint,
     validate_resume_checkpoint_schedule,
 )
+from src.runtime.formal_training_identity import (
+    FormalTrainingIdentityError,
+    load_strict_json_mapping,
+    validate_checkpoint_training_identity,
+)
+from src.runtime.resolved_formal_execution_context import (
+    load_resolved_formal_execution_context,
+    resolved_python_for_nested_consumer,
+)
 from src.runtime.portable_resource_identity import (
     add_portable_resource_arguments,
     resolve_argument_resources,
@@ -124,6 +133,24 @@ def build_parser() -> argparse.ArgumentParser:
         help="Versioned per-agent training config companion; required with --formal_protocol_path.",
     )
     parser.add_argument(
+        "--agent_scientific_config_path",
+        type=str,
+        default="",
+        help="Protocol v1.6 scientific hyperparameter identity; execution-neutral.",
+    )
+    parser.add_argument(
+        "--formal_training_execution_binding_path",
+        type=str,
+        default="",
+        help="Protocol v1.6 run/commit/environment/command binding artifact.",
+    )
+    parser.add_argument(
+        "--resolved_execution_context_path",
+        type=str,
+        default="",
+        help="Protocol v1.6 immutable resolved execution context artifact.",
+    )
+    parser.add_argument(
         "--checkpoint_every_updates",
         type=int,
         default=None,
@@ -178,6 +205,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=str,
         default="",
         help="Optional create-only stable run identity for protocol orchestration.",
+    )
+    parser.add_argument(
+        "--formal_contract_preflight_only",
+        action="store_true",
+        help="Resolve Protocol v1.6 and instantiate/audit one agent, then exit before episode 0.",
     )
     add_portable_resource_arguments(parser)
     return parser
@@ -322,6 +354,37 @@ def main() -> None:
         if args.agent_config_path
         else None
     )
+    scientific_config = (
+        load_strict_json_mapping(
+            args.agent_scientific_config_path, "agent scientific config"
+        )
+        if args.agent_scientific_config_path
+        else None
+    )
+    execution_binding = (
+        load_strict_json_mapping(
+            args.formal_training_execution_binding_path,
+            "formal training execution binding",
+        )
+        if args.formal_training_execution_binding_path
+        else None
+    )
+    resolved_execution_context = None
+    if args.resolved_execution_context_path:
+        if formal_protocol is None:
+            raise FormalTrainingContractError(
+                "resolved execution context requires a formal protocol"
+            )
+        resolved_execution_context, _ = load_resolved_formal_execution_context(
+            args.resolved_execution_context_path,
+            protocol=formal_protocol,
+            clean_worktree_root=ROOT_DIR,
+            durable_run_root=Path(args.resolved_execution_context_path).resolve().parent,
+            check_git=True,
+        )
+        resolved_python_for_nested_consumer(
+            resolved_execution_context, observed_sys_executable=sys.executable
+        )
     resolved_training = resolve_training_contract(
         agent_name=args.agent_name,
         profile_defaults=PROFILE_DEFAULTS[args.profile],
@@ -334,6 +397,9 @@ def main() -> None:
         },
         formal_protocol=formal_protocol,
         agent_config_companion=agent_config_companion,
+        scientific_config=scientific_config,
+        execution_binding=execution_binding,
+        resolved_execution_context=resolved_execution_context,
     )
     args.episodes = resolved_training.episodes
     args.update_every = resolved_training.update_every
@@ -473,6 +539,31 @@ def main() -> None:
         agent, resolved_training.agent_config
     )
 
+    if args.formal_contract_preflight_only:
+        if resolved_training.formal_protocol_version != "1.6.0":
+            raise FormalTrainingContractError(
+                "formal contract preflight is restricted to Protocol v1.6"
+            )
+        payload = {
+            "formal_training_contract_preflight_version": "1.0.0",
+            "formal": False,
+            "training": False,
+            "performance_evidence": False,
+            "checkpoint_created": False,
+            "episode_count": 0,
+            "agent_name": args.agent_name,
+            "seed": args.random_seed,
+            "resolved_agent_config": resolved_agent_config,
+            "formal_training_contract": resolved_training.to_dict(),
+        }
+        target = output_root / "formal_contract_preflight.json"
+        target.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
+            encoding="utf-8",
+        )
+        print(json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False))
+        return
+
     resume_metadata: dict[str, Any] = {}
     if args.resume_checkpoint_path:
         resume_metadata = load_checkpoint_training_metadata(args.resume_checkpoint_path)
@@ -482,6 +573,26 @@ def main() -> None:
         )
         if int(resume_metadata.get("update_count", 0) or 0) < 0:
             raise FormalTrainingContractError("resume checkpoint update_count is invalid")
+        if resolved_training.formal_training_execution_binding_sha256:
+            try:
+                validate_checkpoint_training_identity(
+                    resume_metadata,
+                    scientific_config_sha256=str(
+                        resolved_training.agent_scientific_config_semantic_sha256
+                    ),
+                    binding_sha256=str(
+                        resolved_training.formal_training_execution_binding_sha256
+                    ),
+                    protocol_semantic_sha256=str(
+                        resolved_training.formal_protocol_semantic_sha256
+                    ),
+                    execution_commit=str(resolved_training.execution_commit),
+                    resolved_context_sha256=str(
+                        resolved_training.resolved_execution_context_sha256
+                    ),
+                )
+            except FormalTrainingIdentityError as exc:
+                raise FormalTrainingContractError(str(exc)) from exc
         agent.load(str(Path(args.resume_checkpoint_path)))
     if args.resume_completed_episodes < 0 or args.resume_completed_episodes > args.episodes:
         raise FormalTrainingContractError(
@@ -588,6 +699,21 @@ def main() -> None:
                 "checkpoint_schedule": schedule_metadata,
                 "resolved_agent_config": resolved_agent_config,
                 "formal_training_contract": resolved_training.to_dict(),
+                "agent_scientific_config_semantic_sha256": (
+                    resolved_training.agent_scientific_config_semantic_sha256
+                ),
+                "formal_training_execution_binding_sha256": (
+                    resolved_training.formal_training_execution_binding_sha256
+                ),
+                "formal_protocol_semantic_sha256": (
+                    resolved_training.formal_protocol_semantic_sha256
+                ),
+                "execution_commit": resolved_training.execution_commit,
+                "resolved_execution_context_sha256": (
+                    resolved_training.resolved_execution_context_sha256
+                ),
+                "environment_fingerprint": resolved_training.environment_fingerprint,
+                "dependency_fingerprint": resolved_training.dependency_fingerprint,
                 "is_smoke_checkpoint": args.profile == "smoke",
                 "script": "scripts/train_algo_pool_real_sample.py",
                 "typed_runtime_provenance": build_checkpoint_provenance(
@@ -662,6 +788,21 @@ def main() -> None:
         "agent_protocol": getattr(agent, "baseline_config", {}),
         "resolved_agent_config": resolved_agent_config,
         "formal_training_contract": resolved_training.to_dict(),
+        "agent_scientific_config_semantic_sha256": (
+            resolved_training.agent_scientific_config_semantic_sha256
+        ),
+        "formal_training_execution_binding_sha256": (
+            resolved_training.formal_training_execution_binding_sha256
+        ),
+        "formal_protocol_semantic_sha256": (
+            resolved_training.formal_protocol_semantic_sha256
+        ),
+        "execution_commit": resolved_training.execution_commit,
+        "resolved_execution_context_sha256": (
+            resolved_training.resolved_execution_context_sha256
+        ),
+        "environment_fingerprint": resolved_training.environment_fingerprint,
+        "dependency_fingerprint": resolved_training.dependency_fingerprint,
         "resolved_model_cache_runtime": runtime_contract,
         "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
         "cache_capacity_profile": runtime_contract["cache_capacity_profile"],

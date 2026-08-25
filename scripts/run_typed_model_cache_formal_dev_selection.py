@@ -38,6 +38,10 @@ from src.evaluators.formal_cell_transaction import (
     stable_cell_id,
 )
 from src.runtime.formal_training_contract import checkpoint_snapshot_indices
+from src.runtime.formal_training_identity import (
+    FormalTrainingIdentityError,
+    validate_checkpoint_training_identity,
+)
 from src.runtime.portable_resource_identity import (
     add_portable_resource_arguments,
     resolve_argument_resources,
@@ -133,10 +137,12 @@ def main() -> None:
     protocol = json.loads(protocol_path.read_text(encoding="utf-8-sig"))
     validate_protocol_v1_1(protocol)
     nested_python = sys.executable
-    if protocol["typed_model_cache_formal_protocol_version"] == "1.5.0":
+    protocol_version = protocol["typed_model_cache_formal_protocol_version"]
+    resolved_context = None
+    if protocol_version in {"1.5.0", "1.6.0"}:
         if not args.resolved_execution_context_path:
             raise FormalExecutionError(
-                "protocol v1.5 dev selection requires resolved execution context"
+                "active protocol dev selection requires resolved execution context"
             )
         resolved_context, _ = load_resolved_formal_execution_context(
             args.resolved_execution_context_path,
@@ -275,6 +281,33 @@ def main() -> None:
                         )
                     ):
                         raise FormalExecutionError("dev checkpoint formal binding mismatch")
+                    if protocol_version == "1.6.0":
+                        scientific_identity = resolved_context["scientific_identity"]
+                        try:
+                            validate_checkpoint_training_identity(
+                                metadata,
+                                scientific_config_sha256=str(
+                                    scientific_identity[
+                                        "agent_scientific_config_semantic_sha256"
+                                    ]
+                                ),
+                                binding_sha256=str(
+                                    scientific_identity[
+                                        "formal_training_execution_binding_sha256"
+                                    ]
+                                ),
+                                protocol_semantic_sha256=protocol["hashes"][
+                                    "semantic_sha256"
+                                ],
+                                execution_commit=str(
+                                    scientific_identity["execution_commit"]
+                                ),
+                                resolved_context_sha256=str(
+                                    resolved_context["context_sha256"]
+                                ),
+                            )
+                        except FormalTrainingIdentityError as exc:
+                            raise FormalExecutionError(str(exc)) from exc
                     seed_manifest.setdefault(agent, {})[str(seed)] = str(checkpoint_path)
                     typed = metadata.get("typed_runtime_provenance") or {}
                     provenance_manifest.setdefault(agent, {})[str(seed)] = {
@@ -435,6 +468,19 @@ def main() -> None:
                             "resolved_agent_config": metadata.get("resolved_agent_config"),
                             "checkpoint_schedule": metadata.get("checkpoint_schedule"),
                             "formal_training_contract": metadata.get("formal_training_contract"),
+                            "agent_scientific_config_semantic_sha256": metadata.get(
+                                "agent_scientific_config_semantic_sha256"
+                            ),
+                            "formal_training_execution_binding_sha256": metadata.get(
+                                "formal_training_execution_binding_sha256"
+                            ),
+                            "formal_protocol_semantic_sha256": metadata.get(
+                                "formal_protocol_semantic_sha256"
+                            ),
+                            "execution_commit": metadata.get("execution_commit"),
+                            "resolved_execution_context_sha256": metadata.get(
+                                "resolved_execution_context_sha256"
+                            ),
                             "non_formal_rehearsal": bool(args.non_formal_rehearsal),
                             "typed_runtime_provenance": metadata.get("typed_runtime_provenance"),
                         }

@@ -1,5 +1,23 @@
 # Code Module Map
 
+## G14R6 formal training identity split
+
+- `src/runtime/formal_training_identity.py`：scientific config `2.0.0`、execution binding `1.0.0`、strict JSON、
+  canonical hash、Protocol parity、runtime binding与checkpoint identity验证。
+- `src/runtime/formal_training_contract.py`：v1.6同时消费scientific config/binding/context，legacy companion只供
+  v1.1–v1.5审计，所有漂移在episode 0前拒绝。
+- `src/runtime/resolved_formal_execution_context.py`：context `2.0.0`写入scientific config和binding SHA；
+  host path仍只属于runtime audit/full context。
+- `scripts/run_typed_model_cache_formal_protocol.py`：binding唯一producer；在Protocol hash、observed clean commit、
+  environment和186-command matrix确定后生成binding，再生成resolved context。
+- `scripts/train_algo_pool_real_sample.py`：真实训练入口的四件套解析、agent实例config审计、checkpoint/summary
+  provenance与episode-0 contract-only rehearsal。
+- `scripts/run_typed_model_cache_formal_dev_selection.py`、`manage_typed_model_cache_formal_artifacts.py`、
+  `benchmark_main_results.py`：dev candidate、selection/freeze/provenance与formal checkpoint loading的binding消费端。
+- `scripts/repair_typed_model_cache_formal_training_binding.py`：生成Protocol v1.6、config/index/schema与G14R6审计包；
+  不训练、不运行formal/holdout。
+- `tests/test_formal_training_identity_v16.py`：G14C v6复现、两层正例、18类负例、150-cell与Readiness v8回归。
+
 ## G14R2 formal window consumption and ledger v2
 
 - `src/evaluators/formal_window_consumption.py`：冻结 window/source/loader identity、显式 raw-prefix scanner、

@@ -20,6 +20,7 @@ from typing import Any, Mapping
 
 
 RESOLVED_FORMAL_EXECUTION_CONTEXT_VERSION = "1.0.0"
+RESOLVED_FORMAL_EXECUTION_CONTEXT_V2_VERSION = "2.0.0"
 RESOLVED_FORMAL_EXECUTION_CONTEXT_FILENAME = "resolved_execution_context.json"
 
 
@@ -120,6 +121,7 @@ def build_resolved_formal_execution_context(
     outer_expansion_sha256: str,
     phase_count: int,
     command_count: int,
+    execution_binding: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one full host-bound context after environment resolution."""
 
@@ -138,6 +140,27 @@ def build_resolved_formal_execution_context(
         "semantic_sha256"
     ]
     execution_commit = str(runtime_audit.get("observed_execution_commit") or "")
+    context_contract_version = str(
+        protocol.get("resolved_formal_execution_context_contract", {}).get(
+            "version", RESOLVED_FORMAL_EXECUTION_CONTEXT_VERSION
+        )
+    )
+    if context_contract_version == RESOLVED_FORMAL_EXECUTION_CONTEXT_V2_VERSION:
+        if not isinstance(execution_binding, Mapping):
+            raise ResolvedFormalExecutionContextError(
+                "resolved context v2 requires formal training execution binding"
+            )
+        binding_sha256 = str(execution_binding.get("binding_full_sha256") or "")
+        scientific_config_sha256 = str(
+            execution_binding.get("agent_scientific_config_semantic_sha256") or ""
+        )
+        if not binding_sha256 or not scientific_config_sha256:
+            raise ResolvedFormalExecutionContextError(
+                "formal training execution binding identity is incomplete"
+            )
+    else:
+        binding_sha256 = None
+        scientific_config_sha256 = None
     created_for_run_identity = canonical_sha256(
         {
             "execution_commit": execution_commit,
@@ -151,9 +174,7 @@ def build_resolved_formal_execution_context(
         }
     )
     payload: dict[str, Any] = {
-        "resolved_formal_execution_context_version": (
-            RESOLVED_FORMAL_EXECUTION_CONTEXT_VERSION
-        ),
+        "resolved_formal_execution_context_version": context_contract_version,
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "created_for_run_identity": created_for_run_identity,
         "scientific_identity": {
@@ -178,6 +199,8 @@ def build_resolved_formal_execution_context(
             "dependency_fingerprint": environment_identity[
                 "dependency_fingerprint"
             ],
+            "agent_scientific_config_semantic_sha256": scientific_config_sha256,
+            "formal_training_execution_binding_sha256": binding_sha256,
             "host_paths_are_scientific_identity": False,
         },
         "runtime_location": {
@@ -202,6 +225,9 @@ def build_resolved_formal_execution_context(
             "execution_environment_manifest_path": str(manifest_path),
             "execution_environment_manifest_sha256": sha256_file(manifest_path),
             "resolved_execution_context_path": str(context_path),
+            "formal_training_execution_binding_path": str(
+                Path(str(expansion_context["formal_training_execution_binding_path"])).resolve()
+            ) if context_contract_version == RESOLVED_FORMAL_EXECUTION_CONTEXT_V2_VERSION else None,
             "cwd_guessing_allowed": False,
             "implicit_sys_executable_fallback_allowed": False,
             "relative_venv_fallback_allowed": False,
@@ -238,9 +264,11 @@ def validate_resolved_formal_execution_context(
     """Validate hash, identities, host paths, and optional live bindings."""
 
     _reject_non_finite(payload)
-    if payload.get("resolved_formal_execution_context_version") != (
-        RESOLVED_FORMAL_EXECUTION_CONTEXT_VERSION
-    ):
+    context_version = payload.get("resolved_formal_execution_context_version")
+    if context_version not in {
+        RESOLVED_FORMAL_EXECUTION_CONTEXT_VERSION,
+        RESOLVED_FORMAL_EXECUTION_CONTEXT_V2_VERSION,
+    }:
         raise ResolvedFormalExecutionContextError(
             "resolved formal execution context version mismatch"
         )
@@ -270,6 +298,16 @@ def validate_resolved_formal_execution_context(
         "execution_environment_manifest_path",
         "resolved_execution_context_path",
     )
+    if context_version == RESOLVED_FORMAL_EXECUTION_CONTEXT_V2_VERSION:
+        required_runtime_paths = (*required_runtime_paths, "formal_training_execution_binding_path")
+        if not scientific.get("agent_scientific_config_semantic_sha256"):
+            raise ResolvedFormalExecutionContextError(
+                "resolved context lacks scientific config identity"
+            )
+        if not scientific.get("formal_training_execution_binding_sha256"):
+            raise ResolvedFormalExecutionContextError(
+                "resolved context lacks execution binding identity"
+            )
     for field in required_runtime_paths:
         _require_absolute_path(runtime.get(field), field)
     python = Path(str(runtime["resolved_python_absolute_path"]))
@@ -479,6 +517,7 @@ def resolved_python_for_nested_consumer(
 __all__ = [
     "RESOLVED_FORMAL_EXECUTION_CONTEXT_FILENAME",
     "RESOLVED_FORMAL_EXECUTION_CONTEXT_VERSION",
+    "RESOLVED_FORMAL_EXECUTION_CONTEXT_V2_VERSION",
     "ResolvedFormalExecutionContextError",
     "atomic_create_resolved_formal_execution_context",
     "build_resolved_formal_execution_context",

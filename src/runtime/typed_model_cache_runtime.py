@@ -496,6 +496,7 @@ def validate_checkpoint_provenance(
     expected_window_plan_identity: Mapping[str, Any],
     expected_checkpoint_sha256: str | None = None,
     require_git_commit: str | None = None,
+    expected_formal_training_identity: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Return the three-state typed checkpoint provenance gate result."""
 
@@ -560,6 +561,17 @@ def validate_checkpoint_provenance(
         errors.append("execution_git_commit missing")
     if expected_checkpoint_sha256 is not None and file_hash != expected_checkpoint_sha256:
         errors.append("checkpoint SHA-256 mismatch")
+    if expected_formal_training_identity is not None:
+        for field in (
+            "agent_scientific_config_semantic_sha256",
+            "formal_training_execution_binding_sha256",
+            "formal_protocol_semantic_sha256",
+            "execution_commit",
+            "resolved_execution_context_sha256",
+        ):
+            expected = expected_formal_training_identity.get(field)
+            if not expected or metadata.get(field) != expected:
+                errors.append(f"formal training identity mismatch: {field}")
     return {
         "status": "compatible" if not errors else "incompatible",
         "checkpoint_path": path.as_posix(),
