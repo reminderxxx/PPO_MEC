@@ -8,6 +8,7 @@ import json
 import statistics
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import torch
@@ -29,7 +30,13 @@ from src.evaluators.formal_window_consumption import (
     load_contract as load_window_consumption_contract,
     validate_window_plan_binding,
 )
-from src.evaluators.typed_model_cache_formal_protocol import sha256_file
+from src.evaluators.typed_model_cache_formal_protocol import canonical_sha256, sha256_file
+from src.evaluators.formal_cell_transaction import (
+    CellExecutionIdentity,
+    FormalCellLedger,
+    atomic_write_json_create_only,
+    stable_cell_id,
+)
 from src.runtime.formal_training_contract import checkpoint_snapshot_indices
 from src.runtime.portable_resource_identity import (
     add_portable_resource_arguments,
@@ -77,10 +84,16 @@ def parse_args() -> argparse.Namespace:
 
 
 def write_create_only(path: Path, payload: object) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("x", encoding="utf-8") as handle:
-        json.dump(payload, handle, ensure_ascii=False, indent=2, allow_nan=False)
-        handle.write("\n")
+    atomic_write_json_create_only(path, payload)
+
+
+def write_create_only_or_verify(path: Path, payload: object) -> None:
+    if path.is_file():
+        observed = json.loads(path.read_text(encoding="utf-8-sig"))
+        if observed != payload:
+            raise FormalExecutionError(f"existing immutable JSON differs: {path}")
+        return
+    atomic_write_json_create_only(path, payload)
 
 
 def checkpoint_metadata(path: Path) -> dict:
@@ -168,6 +181,21 @@ def main() -> None:
     output_root = Path(args.output_root).resolve()
     output_root.mkdir(parents=True, exist_ok=True)
     candidates: list[dict] = []
+    cell_ledger = None
+    expected_dev_cell_ids: list[str] = []
+    if protocol["typed_model_cache_formal_protocol_version"] == "1.4.0":
+        identity_path = output_root / "cell_ledger_identity.json"
+        if not identity_path.is_file():
+            raise FormalExecutionError(
+                "protocol v1.4 dev resume requires the training cell ledger identity"
+            )
+        identity_payload = json.loads(identity_path.read_text(encoding="utf-8-sig"))
+        identity = CellExecutionIdentity(**identity_payload["identity"])
+        cell_ledger = FormalCellLedger(
+            run_root=output_root,
+            identity=identity,
+            resume=True,
+        )
 
     capacity_inputs = (
         {
@@ -194,6 +222,11 @@ def main() -> None:
         if len(max_steps) != 1:
             raise FormalExecutionError("dev fairness manifest has mixed max_steps")
         for update_index in update_indices:
+            coordinates = {
+                "capacity_label": capacity_label,
+                "update_index": int(update_index),
+            }
+            expected_dev_cell_ids.append(stable_cell_id("dev_select", coordinates))
             seed_manifest: dict[str, dict[str, str]] = {}
             provenance_manifest: dict[str, dict[str, dict]] = {}
             metadata_by_agent_seed: dict[tuple[str, int], dict] = {}
@@ -229,12 +262,22 @@ def main() -> None:
                         "train_window_plan_identity": typed.get("train_window_plan_identity"),
                     }
                     metadata_by_agent_seed[(agent, seed)] = metadata
-            cell_root = output_root / "dev_inputs" / capacity_label / f"update_{update_index:04d}"
-            seed_path = cell_root / "seed_checkpoint_manifest.json"
-            provenance_path = cell_root / "checkpoint_provenance_manifest.json"
-            write_create_only(seed_path, seed_manifest)
-            write_create_only(provenance_path, provenance_manifest)
-            benchmark_root = output_root / "dev_benchmarks" / capacity_label / f"update_{update_index:04d}"
+            if cell_ledger is None:
+                cell_root = output_root / "dev_inputs" / capacity_label / f"update_{update_index:04d}"
+                committed_cell_root = None
+                seed_path = cell_root / "seed_checkpoint_manifest.json"
+                provenance_path = cell_root / "checkpoint_provenance_manifest.json"
+                benchmark_root = output_root / "dev_benchmarks" / capacity_label / f"update_{update_index:04d}"
+            else:
+                committed_cell_root = (
+                    output_root
+                    / "dev_benchmarks"
+                    / capacity_label
+                    / f"update_{update_index:04d}"
+                )
+                seed_path = committed_cell_root / "seed_checkpoint_manifest.json"
+                provenance_path = committed_cell_root / "checkpoint_provenance_manifest.json"
+                benchmark_root = committed_cell_root / "benchmark"
             command = [
                 sys.executable,
                 str(ROOT / "scripts/benchmark_main_results.py"),
@@ -290,15 +333,62 @@ def main() -> None:
                         ),
                     ]
                 )
+            begun = None
+            if cell_ledger is not None:
+                input_identity = canonical_sha256(
+                    {
+                        "protocol_semantic_sha256": protocol["hashes"]["semantic_sha256"],
+                        "coordinates": coordinates,
+                        "seed_checkpoint_manifest": seed_manifest,
+                        "checkpoint_provenance_manifest": provenance_manifest,
+                        "fairness_manifest_sha256": sha256_file(fairness_path),
+                        "runtime_config_sha256": sha256_file(runtime_path),
+                    }
+                )
+                begun = cell_ledger.begin_cell(
+                    phase="dev_select",
+                    coordinates=coordinates,
+                    command=command,
+                    input_hash=input_identity,
+                    committed_path=committed_cell_root,
+                )
+                if begun["status"] == "skipped_committed":
+                    committed_candidates = json.loads(
+                        (committed_cell_root / "candidate_rows.json").read_text(
+                            encoding="utf-8-sig"
+                        )
+                    )
+                    if not isinstance(committed_candidates, list):
+                        raise FormalExecutionError("committed dev candidate rows are invalid")
+                    candidates.extend(committed_candidates)
+                    continue
+                staging_root = Path(begun["record"]["staging_path"])
+                seed_path = staging_root / "seed_checkpoint_manifest.json"
+                provenance_path = staging_root / "checkpoint_provenance_manifest.json"
+                benchmark_root = staging_root / "benchmark"
+                command[command.index("--seed_checkpoint_manifest_path") + 1] = str(seed_path)
+                command[command.index("--checkpoint_provenance_manifest_path") + 1] = str(provenance_path)
+                command[command.index("--output_root") + 1] = str(benchmark_root)
+            write_create_only(seed_path, seed_manifest)
+            write_create_only(provenance_path, provenance_manifest)
             before = set(benchmark_root.iterdir()) if benchmark_root.exists() else set()
+            started_ns = time.monotonic_ns()
             result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True, check=False)
             if result.returncode != 0:
+                if cell_ledger is not None and begun is not None:
+                    cell_ledger.fail_cell(
+                        begun["cell_id"],
+                        return_code=result.returncode,
+                        classification="dev_candidate_evaluation_failure",
+                        retryable=result.returncode == 75,
+                    )
                 raise RuntimeError(result.stderr or result.stdout)
             created = sorted(set(benchmark_root.iterdir()) - before)
             if len(created) != 1:
                 raise FormalExecutionError("dev benchmark did not create exactly one run")
             with (created[0] / "benchmark_rows.csv").open(encoding="utf-8-sig", newline="") as handle:
                 rows = list(csv.DictReader(handle))
+            cell_candidates: list[dict] = []
             for agent in learned_agents:
                 for seed in seeds:
                     selected_rows = [
@@ -308,7 +398,7 @@ def main() -> None:
                     ]
                     metadata = metadata_by_agent_seed[(agent, seed)]
                     checkpoint_path = Path(seed_manifest[agent][str(seed)])
-                    candidates.append(
+                    cell_candidates.append(
                         {
                             "agent_name": agent,
                             "seed": seed,
@@ -328,12 +418,32 @@ def main() -> None:
                             "typed_runtime_provenance": metadata.get("typed_runtime_provenance"),
                         }
                     )
+            if cell_ledger is not None and begun is not None:
+                write_create_only(
+                    Path(begun["record"]["staging_path"]) / "candidate_rows.json",
+                    cell_candidates,
+                )
+                cell_ledger.commit_cell(
+                    begun["cell_id"],
+                    required_paths=[
+                        "candidate_rows.json",
+                        "seed_checkpoint_manifest.json",
+                        "checkpoint_provenance_manifest.json",
+                    ],
+                    monotonic_started_ns=started_ns,
+                )
+            candidates.extend(cell_candidates)
 
+    if cell_ledger is not None:
+        cell_ledger.assert_complete_matrix(
+            phase="dev_select",
+            expected_cell_ids=expected_dev_cell_ids,
+        )
     candidates_path = output_root / "checkpoint_candidates.json"
-    write_create_only(candidates_path, candidates)
+    write_create_only_or_verify(candidates_path, candidates)
     selection_payload = dev_select(output_root, protocol)
     selection_payload["non_formal_rehearsal"] = bool(args.non_formal_rehearsal)
-    write_create_only(Path(args.output_path), selection_payload)
+    write_create_only_or_verify(Path(args.output_path), selection_payload)
     print(json.dumps(selection_payload, ensure_ascii=False, indent=2, allow_nan=False))
 
 

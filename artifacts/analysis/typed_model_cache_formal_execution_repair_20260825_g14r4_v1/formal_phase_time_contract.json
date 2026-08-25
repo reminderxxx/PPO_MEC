@@ -1,0 +1,10 @@
+{
+  "UTC_role": "audit timestamp",
+  "absolute_sanity_seconds": 259200,
+  "clock_adjustment_is_audited_not_terminal": true,
+  "cross_process_monotonic_origins_compared": false,
+  "duration_authority": "monotonic_clock",
+  "relative_child_plus_finalization_tolerance_seconds": 1e-06,
+  "rounded_cell_duration_sum_used_as_phase_duration": false,
+  "schema_version": "3.0.0"
+}

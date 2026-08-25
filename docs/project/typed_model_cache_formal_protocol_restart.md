@@ -121,3 +121,16 @@ G14R3 冻结 Protocol v1.3、portable identity 1.0.0 与 Readiness v5。成功 e
 Protocol semantic SHA-256 为 `1525b7cb...ac17`，Readiness 为
 `READY_FOR_G14C_V4_CLEAN_TRAIN_AND_FORMAL`。下一步仍必须由独立 G14C v4 任务在最终 A4 clean worktree
 从头训练，不自动启动。
+
+## 2026-08-25 G14R4+ restart boundary
+
+G14C v4 Run A 在 150/150 training cells 后因 ledger terminalization timing contract 失败；Run B 在首个
+冻结子命令前因相对 `.venv/bin/python` 失败。两者均为永久 `INVALID_PROTOCOL_OR_IMPLEMENTATION`，不能
+合并、resume、finalize、复制 checkpoint 或作为新 run 的 ledger/cell marker 来源。
+
+G14R4+ 冻结 Protocol v1.4（semantic `4429531d...4155d`）、portable execution environment `1.0.0`、
+phase ledger `3.0.0`、cell ledger `1.0.0` 和 Readiness v6。no-.venv clean snapshot 的非正式链通过
+4 agents × 2 seeds × 2 capacities、8/16 same-run resume、75/150 interruption、150/150 后 simulated
+terminal append failure 与 finalize-only，并完成真实 dev/freeze/tiny formal-like/support/statistics/integrity。
+本轮正式训练/formal/holdout/hidden/G15 计数均为 0；下一步只能由独立任务从 pushed Commit A5 新建
+G14C v5 run。

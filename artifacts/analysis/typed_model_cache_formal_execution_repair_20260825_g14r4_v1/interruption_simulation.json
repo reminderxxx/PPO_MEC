@@ -1,0 +1,33 @@
+{
+  "interruption_75_of_150": {
+    "committed_cells_skipped_on_resume": 75,
+    "duplicate_cell_count": 0,
+    "final_committed_cell_count": 150,
+    "interrupted_after_committed_cells": 75,
+    "status": "pass"
+  },
+  "interruption_8_of_16": {
+    "agents": [
+      "sa_ghmappo",
+      "ppo",
+      "mappo",
+      "cache_offload_drl"
+    ],
+    "capacities_mb": [
+      288,
+      576
+    ],
+    "committed_cells_skipped_on_resume": 8,
+    "duplicate_cell_count": 0,
+    "final_committed_cell_count": 16,
+    "interrupted_after_committed_cells": 8,
+    "new_cells_executed_after_resume": 8,
+    "seeds": [
+      7,
+      13
+    ],
+    "status": "pass",
+    "training_cell_count": 16
+  },
+  "status": "pass"
+}

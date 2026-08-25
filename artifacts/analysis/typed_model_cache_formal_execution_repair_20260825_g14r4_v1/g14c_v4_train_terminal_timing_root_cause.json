@@ -1,0 +1,24 @@
+{
+  "failure_audit_sha256": "aaf5cfa717d543ffec5ea15dc5e4e8e7dac107dea51647cea10a9b1884118117",
+  "failure_run": "typed_model_cache_formal_20260824_110016_g14c_v4",
+  "first_order_failure_location": "after child command completion and output resolution; before terminal ledger append",
+  "legacy_run_salvage_allowed": false,
+  "old_contract": {
+    "completion_candidate": false,
+    "duration_authority": "ambiguous UTC/monotonic equality",
+    "finalize_phase_only": false,
+    "per_cell_transaction": false,
+    "phase_ledger_version": "2.0.0"
+  },
+  "recorded_at": "2026-08-25T09:34:02.818118+08:00",
+  "repair": {
+    "UTC_role": "audit timestamp with explicit adjustment/anomaly status",
+    "completion_candidate": true,
+    "duration_authority": "monotonic_clock",
+    "finalize_phase_only": true,
+    "per_cell_transaction": true,
+    "phase_ledger_version": "3.0.0"
+  },
+  "root_cause": "AppendOnlyPhaseRunner._terminal_time treated UTC timestamp delta and monotonic elapsed time as equal within two seconds. During the long train phase the system wall clock adjusted, so all 150 children and 1,200 candidates existed but the train terminal record could not be appended.",
+  "root_cause_audit_version": "1.0.0"
+}

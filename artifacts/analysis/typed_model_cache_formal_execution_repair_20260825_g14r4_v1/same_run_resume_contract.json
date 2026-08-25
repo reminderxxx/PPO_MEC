@@ -1,0 +1,29 @@
+{
+  "bindings": [
+    "run_root",
+    "execution_commit",
+    "protocol_semantic_sha256",
+    "resource_registry_semantic_sha256",
+    "environment_fingerprint",
+    "split_semantic_sha256",
+    "window_contract_semantic_sha256",
+    "catalog_fingerprint",
+    "runtime_identity",
+    "command_matrix_sha256"
+  ],
+  "committed_behavior": "verify_hashes_and_skip",
+  "cross_run_import_allowed": false,
+  "failed_retryable_behavior": "one_identical_command_retry",
+  "failed_terminal_behavior": "reject",
+  "flags": [
+    "--resume",
+    "--resume-from-cell-ledger",
+    "--finalize-phase-only",
+    "--python-executable",
+    "--execution-environment-manifest"
+  ],
+  "incomplete_behavior": "mark_incomplete_and_restart_cell_as_new_attempt",
+  "legacy_v4_marker_or_checkpoint_allowed": false,
+  "single_cell_checkpoint_resume": false,
+  "version": "1.0.0"
+}

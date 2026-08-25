@@ -22,6 +22,19 @@ INVALID_G14C_V3_RUN_ROOT = Path(
     "/private/tmp/ppo_mec_g14c_v3_a7c9e8e/artifacts/experiments/typed_model_cache_formal/"
     "typed_model_cache_formal_20260820_203430_g14c_v3"
 ).resolve()
+INVALID_G14C_V4_RUN_ROOTS = (
+    (
+        ROOT
+        / "artifacts/experiments/typed_model_cache_formal"
+        / "typed_model_cache_formal_20260824_110016_g14c_v4"
+    ).resolve(),
+    (
+        ROOT
+        / "artifacts/experiments/typed_model_cache_formal"
+        / "typed_model_cache_formal_20260824_235839_g14c_v4"
+    ).resolve(),
+)
+INVALID_FORMAL_RUN_ROOTS = (INVALID_G14C_V3_RUN_ROOT, *INVALID_G14C_V4_RUN_ROOTS)
 
 
 def parse_args() -> argparse.Namespace:
@@ -124,8 +137,8 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
     frozen = []
     for row in selection.get("selected", []):
         path = Path(row["checkpoint_path"]).resolve()
-        if path_is_within(path, INVALID_G14C_V3_RUN_ROOT):
-            raise ValueError("invalid G14C v3 checkpoint reference rejected")
+        if any(path_is_within(path, root) for root in INVALID_FORMAL_RUN_ROOTS):
+            raise ValueError("invalid G14C v3/v4 checkpoint reference rejected")
         if not path.is_file():
             raise FileNotFoundError(path)
         digest = sha256_file(path)
@@ -179,7 +192,7 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
             [row["checkpoint_identity"] for row in frozen]
         ),
         "checkpoint_location_contract_version": "1.0.0",
-        "invalid_run_roots": [str(INVALID_G14C_V3_RUN_ROOT)],
+        "invalid_run_roots": [str(root) for root in INVALID_FORMAL_RUN_ROOTS],
     }
 
 

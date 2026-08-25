@@ -901,3 +901,14 @@
   hash 与 agent/seed/capacity/Protocol provenance。
 - 决策：G14C v3 永久 `invalid_before_dev_performance_execution`，不建立 salvage 例外。G14C v4 必须从最终 A4、
   新 run root、冻结矩阵从头执行。
+
+## 2026-08-25: formal execution is environment-portable and transactionally resumable
+
+- 决策：科学 environment identity 与 host Python absolute path 分离；共享 venv 允许 relocation，但 dependency
+  fingerprint、关键版本、clean source identity 和 import origin 必须一致。
+- 决策：所有 formal 子命令只消费 resolver 展开的绝对 Python；相对 `.venv/bin/python` 与手工 symlink 不属于合同。
+- 决策：phase elapsed 只以 monotonic 为权威；UTC jump 是 audit anomaly，不是合法长 phase 的失败条件。
+- 决策：phase 使用 completion candidate/terminal 两阶段提交；per-cell 使用 unique staging、inventory hash 和
+  immutable committed marker。Selection/aggregate/statistics 只读 committed cells。
+- 决策：resume 只允许同一 run 全 identity/hash 匹配；committed skip，incomplete 新 attempt，terminal reject。
+  两个 G14C v4 run 不获得 retrospective finalize/salvage 例外。

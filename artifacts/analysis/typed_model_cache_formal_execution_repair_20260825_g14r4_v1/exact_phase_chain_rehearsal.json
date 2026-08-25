@@ -1,0 +1,205 @@
+{
+  "all_project_imports_from_clean_worktree": true,
+  "checkpoint_freeze_real": true,
+  "child_environment_parity": {
+    "same_environment_fingerprint": true,
+    "same_python": true,
+    "status": "pass"
+  },
+  "clean_worktree_has_local_venv": false,
+  "clean_worktree_root": "/private/tmp/ppo_mec_g14r4_clean_snapshot_20260825_v6",
+  "complete_without_holdout": true,
+  "dev_selection_real": true,
+  "environment_fingerprint": "3f67463de5808cd5724d2c3cd78eb1b0d7e8cc703f3b3c8da5e9dbeee1b2203e",
+  "environment_resolution": {
+    "clean_worktree_root": "/private/tmp/ppo_mec_g14r4_clean_snapshot_20260825_v6",
+    "cwd": "/private/tmp/ppo_mec_g14r4_clean_snapshot_20260825_v6",
+    "editable_install_detected": false,
+    "editable_installs": [],
+    "environment_variables": {
+      "PPO_MEC_CLEAN_WORKTREE_ROOT": "/private/tmp/ppo_mec_g14r4_clean_snapshot_20260825_v6",
+      "PPO_MEC_EXECUTION_COMMIT": "31f61fb3c2cf9ffb31eb6c43345e1814a9753333",
+      "PYTHONNOUSERSITE": "1",
+      "PYTHONPATH": "/private/tmp/ppo_mec_g14r4_clean_snapshot_20260825_v6"
+    },
+    "execution_environment_resolver_version": "1.0.0",
+    "forbidden_project_source_roots": [
+      "/Users/howen/Projects/PPO_MEC"
+    ],
+    "host_paths_excluded_from_scientific_identity": true,
+    "import_origin": {
+      "src": "/private/tmp/ppo_mec_g14r4_clean_snapshot_20260825_v6/src/__init__.py",
+      "src.evaluators.typed_model_cache_formal_execution": "/private/tmp/ppo_mec_g14r4_clean_snapshot_20260825_v6/src/evaluators/typed_model_cache_formal_execution.py"
+    },
+    "observed_execution_commit": "31f61fb3c2cf9ffb31eb6c43345e1814a9753333",
+    "observed_source_tree_sha256": "4d4a71d817559e1c6f7f9af1145a10e75fc0aaa88cc7e3bc8c882d314e2518d4",
+    "resolution_source": "explicit_python_executable",
+    "resolved_python_absolute_path": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "site_packages_paths": [
+      "/Users/howen/Projects/PPO_MEC/.venv/lib/python3.9/site-packages"
+    ],
+    "sys_path": [
+      "",
+      "/private/tmp/ppo_mec_g14r4_clean_snapshot_20260825_v6",
+      "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python39.zip",
+      "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9",
+      "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/lib-dynload",
+      "/Users/howen/Projects/PPO_MEC/.venv/lib/python3.9/site-packages"
+    ],
+    "virtual_environment_root": "/Users/howen/Projects/PPO_MEC/.venv"
+  },
+  "execution_mode": "non_formal_rehearsal",
+  "finalize_only": {
+    "commands_rerun_during_finalize": 0,
+    "completion_candidate_present": true,
+    "duplicate_finalize_status": "already_finalized",
+    "output_hash_revalidated": true,
+    "status": "pass",
+    "terminal_status": "completed"
+  },
+  "formal_evaluation_count": 0,
+  "formal_training_count": 0,
+  "g14r4_exact_non_formal_rehearsal_version": "1.0.0",
+  "holdout_interface_accessible": false,
+  "holdout_opened": false,
+  "integrity_real": true,
+  "interruption_75_of_150": {
+    "committed_cells_skipped_on_resume": 75,
+    "duplicate_cell_count": 0,
+    "final_committed_cell_count": 150,
+    "interrupted_after_committed_cells": 75,
+    "status": "pass"
+  },
+  "interruption_8_of_16": {
+    "agents": [
+      "sa_ghmappo",
+      "ppo",
+      "mappo",
+      "cache_offload_drl"
+    ],
+    "capacities_mb": [
+      288,
+      576
+    ],
+    "committed_cells_skipped_on_resume": 8,
+    "duplicate_cell_count": 0,
+    "final_committed_cell_count": 16,
+    "interrupted_after_committed_cells": 8,
+    "new_cells_executed_after_resume": 8,
+    "seeds": [
+      7,
+      13
+    ],
+    "status": "pass",
+    "training_cell_count": 16
+  },
+  "old_v4_checkpoint_reused": false,
+  "performance_claims": [],
+  "protocol_semantic_sha256": "4429531dc3cf98e7ef332367e55e1d0a3dbc33773c20a3fe2e53e57d3534155d",
+  "protocol_version": "1.4.0",
+  "real_tiny_phase_chain": {
+    "ablation_support_executed": true,
+    "agents": [
+      "sa_ghmappo",
+      "ppo",
+      "mappo",
+      "cache_offload_drl"
+    ],
+    "artifact_integrity_executed": true,
+    "cache_policy_executed": true,
+    "capacities_mb": [
+      288.0,
+      576.0
+    ],
+    "checkpoint_freeze": {
+      "freeze_sha256": "2f4e309f29b0171b3494059e7a81669fd0c8998421540f9aaa5cea2ec0274411",
+      "frozen_checkpoint_count": 16,
+      "location_nonsemantic": true,
+      "real_consumer_executed": true
+    },
+    "checkpoint_freeze_complete": true,
+    "checkpoint_frequency_updates": 4,
+    "clean_execution_worktree": "/private/tmp/ppo_mec_g14r4_clean_snapshot_20260825_v6",
+    "completed_phase_order": [
+      "preflight",
+      "tests",
+      "train",
+      "dev_select",
+      "checkpoint_freeze",
+      "formal_cache_policy",
+      "formal_controller",
+      "formal_ablation",
+      "formal_support",
+      "formal_scalability",
+      "formal_statistics",
+      "formal_gate",
+      "complete_without_holdout"
+    ],
+    "controller_evaluation_executed": true,
+    "dev_selector": {
+      "candidate_count": 16,
+      "formal_or_holdout_used": false,
+      "real_consumer_executed": true,
+      "selected_count": 16
+    },
+    "dev_selector_complete": true,
+    "domain_baseline": "cache_offload_drl",
+    "execution_mode": "non_formal_rehearsal",
+    "external_data_root": "/Users/howen/Projects/PPO_MEC/data",
+    "formal": false,
+    "formal_evaluation_count": 0,
+    "formal_training_count": 0,
+    "g14r3_non_formal_rehearsal_version": "1.0.0",
+    "hidden_data_used": false,
+    "holdout_opened": false,
+    "holdout_used": false,
+    "invalid_g14c_v3_checkpoint_reused": false,
+    "non_formal_completeness_gate_passed": true,
+    "old_run_resumed": false,
+    "paper_claim": false,
+    "paper_claims": [],
+    "phase_ledger_validation": {
+      "last_record_hash": "d9f05570c5b117aca2d0c16bf28851cd3f1dede257a42392d2be6409fbf1b907",
+      "record_count": 26,
+      "status": "pass",
+      "terminal_phase_count": 13
+    },
+    "phase_order": [
+      "preflight",
+      "tests",
+      "train",
+      "dev_select",
+      "checkpoint_freeze",
+      "formal_cache_policy",
+      "formal_controller",
+      "formal_ablation",
+      "formal_support",
+      "formal_scalability",
+      "formal_statistics",
+      "formal_gate",
+      "complete_without_holdout"
+    ],
+    "protocol_semantic_sha256": "1525b7cbfaea123b360ffbedd06ef9177b9f8996987d0e49dfd67cafb411ac17",
+    "rehearsal_root": "/private/tmp/ppo_mec_g14r4_real_chain_20260825_v6",
+    "robustness_support_executed": true,
+    "sa_auxiliary_coef": [
+      0.06
+    ],
+    "saved_checkpoint_update_indices": [
+      4
+    ],
+    "scalability_support_executed": true,
+    "seeds": [
+      7,
+      13
+    ],
+    "statistics_executed": true,
+    "status": "pass",
+    "training_cell_count": 16
+  },
+  "resolved_shared_python": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "statistics_real": true,
+  "status": "pass",
+  "support_real": true,
+  "tiny_formal_like_real": true
+}

@@ -1271,3 +1271,15 @@ Run `g14a_rehearsal_20260819_230456_872949`使用`controlled_non_hidden`窗口�
 - Readiness v5 file SHA-256：`bea010290f326604983b32ed1a16a8b06f66e9afa1f60d7aaaaff6e5a68bd985`
 - Artifact integrity identity：`4beccd3299905a139f6a0d43895603b0f1bb565129ddc8931abdc962d3ee4bf8`
 - Evidence level：execution-contract validated、non-formal rehearsal；不是 formal/holdout/paper claim。
+
+## 2026-08-25 G14R4+ transactional execution repair
+
+- Root：`artifacts/analysis/typed_model_cache_formal_execution_repair_20260825_g14r4_v1/`
+- Protocol v1.4 semantic：`4429531dc3cf98e7ef332367e55e1d0a3dbc33773c20a3fe2e53e57d3534155d`
+- Environment fingerprint：`3f67463de5808cd5724d2c3cd78eb1b0d7e8cc703f3b3c8da5e9dbeee1b2203e`
+- Run A failure audit：`aaf5cfa717d543ffec5ea15dc5e4e8e7dac107dea51647cea10a9b1884118117`
+- Run B failure audit：`bff76afccff2ea9485555a0bd20b33f5081e2ccaabebeff932f2ef74e8e6f42d`
+- Rehearsal：no-.venv clean import、真实 16-cell phase chain、8/16 与 75/150 resume、finalize-only、
+  dev/freeze/formal-like/support/statistics/integrity 全部 pass。
+- Readiness v6：`READY_FOR_G14C_V5_CLEAN_TRAIN_AND_FORMAL`。
+- Evidence boundary：execution-contract/non-formal rehearsal；正式 checkpoint/performance/holdout/G15 计数为 0。

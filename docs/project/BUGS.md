@@ -388,3 +388,17 @@ resolver、explicit workflow propagation、portable fairness companion 与 check
 
 残余风险：Readiness 不等于正式结果；G14C v4 仍需从头训练并可能暴露运行时间/基础设施问题。任何自动下载、
 cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 holdout capability 都仍是 blocker。
+
+## 2026-08-25 Closed: long-phase terminal timing and clean-worktree Python portability
+
+- `RESOLVED / timing`：phase ledger v2 错把 UTC delta 与 monotonic elapsed 要求在 2 秒内一致；ledger v3 改为
+  monotonic authoritative duration，并单独审计 UTC adjustment、child 与 finalization duration。
+- `RESOLVED / terminal transaction`：commands 完成后先提交 completion candidate；terminal append 失败可在同一
+  v1.4 run 通过 finalize-only 重验 output hashes 后完成，不重跑 commands。
+- `RESOLVED / per-cell resume`：cell ledger、unique staging、immutable commit marker 与 committed-only consumer
+  防止完整 cells 重跑或 partial output 进入 selection/aggregate。
+- `RESOLVED / Python`：v1.4 templates 使用 resolved absolute interpreter，clean worktree 无需 `.venv`；项目 import
+  必须来自 clean source，依赖可来自共享 venv。
+
+残余风险：G14C v5 尚未启动，新的长正式执行仍可能暴露未覆盖的 OS/磁盘/进程级故障。当前 cell transaction
+不支持单 cell 内 checkpoint 续训；未提交 cell 只能新 attempt 从头运行。Readiness 不是性能或 paper-ready 证据。

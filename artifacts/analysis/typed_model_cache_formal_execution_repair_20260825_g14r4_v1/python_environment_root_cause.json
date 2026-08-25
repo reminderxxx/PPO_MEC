@@ -1,0 +1,87 @@
+{
+  "all_command_families_share_new_resolver": [
+    "preflight",
+    "tests",
+    "smoke",
+    "train",
+    "dev_select",
+    "checkpoint_freeze",
+    "formal_cache_policy",
+    "formal_controller",
+    "formal_ablation",
+    "formal_support",
+    "formal_scalability",
+    "formal_statistics",
+    "integrity",
+    "formal_gate"
+  ],
+  "clean_worktree_missing_venv_reason": ".venv is ignored host state and is not part of a Git clean worktree checkout",
+  "failure_audit_sha256": "bff76afccff2ea9485555a0bd20b33f5081e2ccaabebeff932f2ef74e8e6f42d",
+  "failure_run": "typed_model_cache_formal_20260824_235839_g14c_v4",
+  "hardcoded_subcommand_count": 15,
+  "hardcoded_subcommands": [
+    "checkpoint_freeze",
+    "dev_select",
+    "formal_ablation",
+    "formal_cache_policy",
+    "formal_controller",
+    "formal_gate",
+    "formal_scalability",
+    "formal_statistics",
+    "formal_support",
+    "integrity",
+    "prediction_boundary",
+    "preflight",
+    "robustness",
+    "tests",
+    "train"
+  ],
+  "import_contract": "third-party dependencies may load from the shared virtual environment, but src and project modules must load from the clean execution worktree",
+  "manual_symlink_repair_allowed": false,
+  "observed_main_worktree": {
+    "PYTHONPATH": "/Users/howen/Projects/PPO_MEC",
+    "cwd": "/Users/howen/Projects/PPO_MEC",
+    "dirty_source_import_risk_without_gate": true,
+    "editable_install_detected": false,
+    "project_imports": {
+      "src": {
+        "file": "/Users/howen/Projects/PPO_MEC/src/__init__.py",
+        "version": ""
+      },
+      "src.evaluators.typed_model_cache_formal_execution": {
+        "file": "/Users/howen/Projects/PPO_MEC/src/evaluators/typed_model_cache_formal_execution.py",
+        "version": ""
+      }
+    },
+    "sys_path": [
+      "",
+      "/Users/howen/Projects/PPO_MEC",
+      "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python39.zip",
+      "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9",
+      "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/lib-dynload",
+      "/Users/howen/Projects/PPO_MEC/.venv/lib/python3.9/site-packages"
+    ]
+  },
+  "outer_runner_python": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "recorded_at": "2026-08-25T09:34:02.818745+08:00",
+  "root_cause_audit_version": "1.0.0",
+  "shared_environment": {
+    "critical_packages": {
+      "PyYAML": "6.0.3",
+      "numpy": "2.0.2",
+      "pandas": "2.3.3",
+      "pytest": "8.4.2",
+      "torch": "2.8.0"
+    },
+    "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+    "implementation": "CPython",
+    "installed_package_count": 31,
+    "python_executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "python_version": "3.9.6",
+    "site_packages": [
+      "/Users/howen/Projects/PPO_MEC/.venv/lib/python3.9/site-packages"
+    ]
+  },
+  "short_rehearsal_masking": "G14R/G14R2 short rehearsals ran in the main worktree where .venv existed; the successful G14R3 rehearsal passed an absolute Python directly but did not replace the frozen v1.3 command-template token.",
+  "template_expansion_reason": "Protocol v1.3 froze the literal first argv token .venv/bin/python; the outer interpreter was never propagated into frozen child templates."
+}

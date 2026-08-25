@@ -1,0 +1,70 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_execution_repair_20260825_g14r4_v1",
+  "command_log_version": "1.0.0",
+  "commands": [
+    {
+      "command": "shared-python scripts/repair_typed_model_cache_formal_execution.py",
+      "scope": "outcome-blind Protocol v1.4 generation",
+      "status": "pass"
+    },
+    {
+      "command": "shared-python scripts/run_typed_model_cache_formal_path_rehearsal.py",
+      "scope": "real no-.venv non-formal tiny phase chain",
+      "status": "pass"
+    },
+    {
+      "command": "shared-python scripts/run_typed_model_cache_formal_execution_rehearsal.py",
+      "scope": "transaction/resume/finalize simulations",
+      "status": "pass"
+    },
+    {
+      "command": "shared-python scripts/run_typed_model_cache_formal_protocol.py --preflight --dry-run --python-executable shared-python",
+      "result": "186 commands; one resolved absolute interpreter; zero unresolved absolute-path sentinels",
+      "scope": "Git-clean no-.venv execution snapshot",
+      "status": "pass"
+    },
+    {
+      "command": "shared-python -m pytest tests/test_typed_model_cache_formal_execution_v14.py -q",
+      "result": "54 passed",
+      "status": "pass"
+    },
+    {
+      "command": "shared-python -m pytest tests/test_typed_model_cache_formal_execution.py -q",
+      "result": "59 passed",
+      "status": "pass"
+    },
+    {
+      "command": "shared-python -m pytest tests/test_typed_model_cache_formal_protocol.py -q",
+      "result": "32 passed",
+      "status": "pass"
+    },
+    {
+      "command": "shared-python -m pytest tests/test_portable_resource_identity.py -q",
+      "result": "38 passed",
+      "status": "pass"
+    },
+    {
+      "command": "shared-python -m pytest tests/test_cache_baseline_fairness_manifest.py -q",
+      "result": "38 passed",
+      "status": "pass"
+    },
+    {
+      "command": "shared-python -m pytest -q",
+      "result": "1027 passed",
+      "status": "pass"
+    },
+    {
+      "command": "shared-python scripts/smoke_test.py",
+      "result": "toy smoke completed",
+      "status": "pass"
+    },
+    {
+      "command": "git diff --check",
+      "status": "pass"
+    }
+  ],
+  "formal_evaluation_commands": 0,
+  "formal_training_commands": 0,
+  "g15_commands": 0,
+  "holdout_commands": 0
+}

@@ -1,0 +1,14 @@
+{
+  "candidate_requires_output_hash_validation": true,
+  "finalize_phase_only": true,
+  "finalize_reruns_commands": false,
+  "legacy_protocol_finalize_allowed": false,
+  "output_drift_fails": true,
+  "states": [
+    "running",
+    "completion_candidate",
+    "completed"
+  ],
+  "terminal_append_only": true,
+  "version": "1.0.0"
+}

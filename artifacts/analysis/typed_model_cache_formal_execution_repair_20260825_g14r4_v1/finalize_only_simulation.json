@@ -1,0 +1,8 @@
+{
+  "commands_rerun_during_finalize": 0,
+  "completion_candidate_present": true,
+  "duplicate_finalize_status": "already_finalized",
+  "output_hash_revalidated": true,
+  "status": "pass",
+  "terminal_status": "completed"
+}

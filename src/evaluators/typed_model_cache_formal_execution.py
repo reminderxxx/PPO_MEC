@@ -33,6 +33,8 @@ FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION = "1.2.0"
 FORMAL_EXECUTION_PROTOCOL_V1_2_ID = "typed_model_cache_formal_protocol_v1_2"
 FORMAL_EXECUTION_PROTOCOL_V1_3_VERSION = "1.3.0"
 FORMAL_EXECUTION_PROTOCOL_V1_3_ID = "typed_model_cache_formal_protocol_v1_3"
+FORMAL_EXECUTION_PROTOCOL_V1_4_VERSION = "1.4.0"
+FORMAL_EXECUTION_PROTOCOL_V1_4_ID = "typed_model_cache_formal_protocol_v1_4"
 FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
 FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
 PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
@@ -41,6 +43,7 @@ READINESS_REVIEW_VERSION = "3.0.0"
 READY_VERDICT = "READY_FOR_G14C_V2_CLEAN_TRAIN_AND_FORMAL"
 READY_V4_VERDICT = "READY_FOR_G14C_V3_CLEAN_TRAIN_AND_FORMAL"
 READY_V5_VERDICT = "READY_FOR_G14C_V4_CLEAN_TRAIN_AND_FORMAL"
+READY_V6_VERDICT = "READY_FOR_G14C_V5_CLEAN_TRAIN_AND_FORMAL"
 OLD_PROTOCOL_SEMANTIC_SHA256 = (
     "41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4"
 )
@@ -401,6 +404,23 @@ def expand_command_plan(
 ) -> dict[str, Any]:
     """Expand every frozen matrix cell for one phase command specification."""
 
+    base_context = dict(expansion_context)
+    location_sentinels = {
+        "/ABSOLUTE/FORMAL_OUTPUT_ROOT": base_context.get("output_root"),
+        "/ABSOLUTE/CLEAN_WORKTREE_ROOT": base_context.get("clean_worktree_root"),
+    }
+
+    def resolve_location(value: Any) -> Any:
+        if not isinstance(value, str):
+            return value
+        for sentinel, root in location_sentinels.items():
+            if root is not None and value.startswith(sentinel):
+                return str(root) + value[len(sentinel):]
+        return value
+
+    base_context = {
+        key: resolve_location(value) for key, value in base_context.items()
+    }
     raw_contexts = spec.get("matrix_contexts", [{}])
     if not isinstance(raw_contexts, list) or not raw_contexts:
         raise FormalExecutionError("command template matrix_contexts must be non-empty")
@@ -412,7 +432,10 @@ def expand_command_plan(
             raise FormalExecutionError(
                 f"command template matrix context {index} must be an object"
             )
-        context = {**expansion_context, **dict(overlay)}
+        resolved_overlay = {
+            key: resolve_location(value) for key, value in dict(overlay).items()
+        }
+        context = {**base_context, **resolved_overlay}
         commands.append(expand_command_template(spec["argv"], context))
         for pattern in spec["expected_outputs"]:
             rendered = expand_command_template([str(pattern)], context)[0]
@@ -472,12 +495,14 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         FORMAL_EXECUTION_PROTOCOL_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V1_3_VERSION,
+        FORMAL_EXECUTION_PROTOCOL_V1_4_VERSION,
     }:
         raise FormalExecutionError("unsupported formal execution protocol version")
     expected_protocol_id = {
         FORMAL_EXECUTION_PROTOCOL_VERSION: FORMAL_EXECUTION_PROTOCOL_ID,
         FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_2_ID,
         FORMAL_EXECUTION_PROTOCOL_V1_3_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_3_ID,
+        FORMAL_EXECUTION_PROTOCOL_V1_4_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_4_ID,
     }[version]
     if protocol.get("protocol_id") != expected_protocol_id:
         raise FormalExecutionError("formal execution protocol ID mismatch")
@@ -512,7 +537,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
             raise FormalExecutionError("phase ledger schema version mismatch")
         if tuple(ledger.get("failure_classifications", [])) != FAILURE_CLASSIFICATIONS:
             raise FormalExecutionError("phase failure classification enum mismatch")
-    else:
+    elif version == FORMAL_EXECUTION_PROTOCOL_V1_3_VERSION:
         if supersession.get("supersedes_version") != "1.2.0":
             raise FormalExecutionError("protocol v1.3 must supersede v1.2")
         if supersession.get("old_protocol_status") != "invalid_before_dev_performance_execution":
@@ -540,6 +565,102 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         ledger = protocol.get("execution_contract", {}).get("phase_ledger", {})
         if ledger.get("schema_version") != FORMAL_PHASE_LEDGER_SCHEMA_VERSION:
             raise FormalExecutionError("phase ledger schema version mismatch")
+    else:
+        if supersession.get("supersedes_version") != "1.3.0":
+            raise FormalExecutionError("protocol v1.4 must supersede v1.3")
+        failures = supersession.get("invalid_g14c_v4_runs", [])
+        expected_failures = {
+            (
+                "typed_model_cache_formal_20260824_110016_g14c_v4",
+                "aaf5cfa717d543ffec5ea15dc5e4e8e7dac107dea51647cea10a9b1884118117",
+            ),
+            (
+                "typed_model_cache_formal_20260824_235839_g14c_v4",
+                "bff76afccff2ea9485555a0bd20b33f5081e2ccaabebeff932f2ef74e8e6f42d",
+            ),
+        }
+        observed_failures = {
+            (str(item.get("run_id")), str(item.get("failure_audit_sha256")))
+            for item in failures
+            if isinstance(item, Mapping)
+        }
+        if observed_failures != expected_failures:
+            raise FormalExecutionError("G14C v4 invalid run references are incomplete")
+        failures_by_run = {
+            str(item["run_id"]): item for item in failures if isinstance(item, Mapping)
+        }
+        expected_boundaries = {
+            "typed_model_cache_formal_20260824_110016_g14c_v4": (
+                "invalid_after_training_before_dev_performance_execution",
+                150,
+                1200,
+            ),
+            "typed_model_cache_formal_20260824_235839_g14c_v4": (
+                "invalid_before_first_frozen_subcommand",
+                0,
+                0,
+            ),
+        }
+        for run_id, (boundary, training_cells, candidates) in expected_boundaries.items():
+            reference = failures_by_run[run_id]
+            if (
+                reference.get("failure_boundary") != boundary
+                or reference.get("training_cells_executed") != training_cells
+                or reference.get("candidate_checkpoint_count") != candidates
+                or reference.get("dev_performance_count") != 0
+                or reference.get("formal_performance_count") != 0
+                or reference.get("resume_allowed") is not False
+                or reference.get("checkpoint_reuse_allowed") is not False
+                or reference.get("legacy_phase_finalize_allowed") is not False
+            ):
+                raise FormalExecutionError("G14C v4 invalid boundary or reuse rule changed")
+        environment = protocol.get("formal_execution_environment_contract", {})
+        if environment.get("version") != "1.0.0":
+            raise FormalExecutionError("formal execution environment contract is missing")
+        if environment.get("scientific_identity", {}).get("identity_rule") != (
+            "environment identity != host-specific Python absolute path"
+        ):
+            raise FormalExecutionError("formal environment identity/path rule changed")
+        if not environment.get("scientific_identity", {}).get(
+            "environment_fingerprint"
+        ):
+            raise FormalExecutionError("formal environment fingerprint is missing")
+        resolver = environment.get("resolver", {})
+        if resolver.get("version") != "1.0.0" or resolver.get("priority") != [
+            "explicit_python_executable",
+            "execution_environment_manifest",
+            "current_runner_sys_executable",
+            "protocol_allowed_candidate",
+        ]:
+            raise FormalExecutionError("formal Python resolver priority changed")
+        execution = protocol.get("execution_contract", {})
+        ledger = execution.get("phase_ledger", {})
+        if (
+            ledger.get("schema_version") != "3.0.0"
+            or ledger.get("duration_authority") != "monotonic_clock"
+            or ledger.get("absolute_sanity_seconds") != 259200
+            or ledger.get("clock_adjustment_is_audited_not_terminal") is not True
+        ):
+            raise FormalExecutionError("phase ledger v3 contract is missing")
+        if execution.get("cell_ledger", {}).get("schema_version") != "1.0.0":
+            raise FormalExecutionError("cell ledger v1 contract is missing")
+        if execution.get("phase_completion_transaction", {}).get("version") != "1.0.0":
+            raise FormalExecutionError("phase completion transaction is missing")
+        resume = execution.get("same_run_resume", {})
+        if resume.get("version") != "1.0.0" or resume.get("cross_run_import_allowed") is not False:
+            raise FormalExecutionError("same-run resume contract is missing")
+        templates = execution.get("command_templates", {})
+        cell_phases = set(execution.get("cell_ledger", {}).get("phases", []))
+        for phase, spec in templates.items():
+            argv = spec.get("argv", []) if isinstance(spec, Mapping) else []
+            if not argv or argv[0] != "{python_executable}":
+                raise FormalExecutionError(
+                    f"formal command lacks Python placeholder: {phase}"
+                )
+            if any(".venv/bin/python" in str(token) for token in argv):
+                raise FormalExecutionError("formal command hard-codes .venv Python")
+            if phase in cell_phases and spec.get("cell_transaction") is not True:
+                raise FormalExecutionError(f"formal cell transaction missing: {phase}")
     if protocol.get("identity", {}).get("split_semantic_sha256") != SPLIT_SEMANTIC_SHA256:
         raise FormalExecutionError("split semantic hash changed")
     if tuple(protocol.get("endpoints", {}).get("primary", [])) != PRIMARY_ENDPOINTS:
@@ -681,6 +802,32 @@ def readiness_v5(checks: Mapping[str, bool]) -> str:
             f"extra={sorted(set(checks) - required)}"
         )
     return READY_V5_VERDICT if all(checks.values()) else "BLOCKED_G14R3_READINESS_V5"
+
+
+def readiness_v6(checks: Mapping[str, bool]) -> str:
+    required = {
+        "two_v4_failures_registered",
+        "clean_worktree_without_local_venv",
+        "all_commands_use_resolved_interpreter",
+        "clean_import_origin",
+        "environment_fingerprint",
+        "long_phase_and_clock_jump",
+        "phase_transaction_and_finalize_only",
+        "cell_ledger_and_atomic_commit",
+        "same_run_resume",
+        "interruption_75_of_150",
+        "dev_formal_committed_only",
+        "old_runs_hard_rejected",
+        "holdout_sealed",
+        "no_formal_performance_results",
+    }
+    if set(checks) != required:
+        raise FormalExecutionError(
+            "readiness v6 check set mismatch: "
+            f"missing={sorted(required - set(checks))}, "
+            f"extra={sorted(set(checks) - required)}"
+        )
+    return READY_V6_VERDICT if all(checks.values()) else "BLOCKED_G14R4_READINESS_V6"
 
 
 def protocol_hash_changes_on_mutation(
@@ -1233,6 +1380,8 @@ __all__ = [
     "FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION",
     "FORMAL_EXECUTION_PROTOCOL_V1_3_ID",
     "FORMAL_EXECUTION_PROTOCOL_V1_3_VERSION",
+    "FORMAL_EXECUTION_PROTOCOL_V1_4_ID",
+    "FORMAL_EXECUTION_PROTOCOL_V1_4_VERSION",
     "FORMAL_PHASE_LEDGER_SCHEMA_VERSION",
     "FORMAL_PHASE_RUNNER_VERSION",
     "FAILURE_CLASSIFICATIONS",
@@ -1242,6 +1391,7 @@ __all__ = [
     "READY_VERDICT",
     "READY_V4_VERDICT",
     "READY_V5_VERDICT",
+    "READY_V6_VERDICT",
     "READINESS_REVIEW_VERSION",
     "build_scalability_setting_matrix",
     "build_support_setting_matrix",
@@ -1252,6 +1402,7 @@ __all__ = [
     "readiness_v3",
     "readiness_v4",
     "readiness_v5",
+    "readiness_v6",
     "reconcile_primary_endpoint_row",
     "stable_setting_identity",
     "support_setting_by_id",

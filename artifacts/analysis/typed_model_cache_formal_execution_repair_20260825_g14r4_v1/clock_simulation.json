@@ -1,0 +1,12 @@
+{
+  "UTC_adjustment_is_terminal": false,
+  "cases": [
+    "logical_five_hour_phase",
+    "forward_system_clock_adjustment",
+    "backward_system_clock_adjustment",
+    "timezone_offset",
+    "nanosecond_rounding"
+  ],
+  "duration_authority": "monotonic_clock",
+  "status": "pass"
+}

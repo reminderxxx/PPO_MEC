@@ -222,3 +222,26 @@ v1.3 semantic SHA-256 为 `1525b7cbfaea123b360ffbedd06ef9177b9f8996987d0e49dfd67
 split 仍为 `aa9a7400...d76a`，window contract 仍为 `ec475799...2771`。Portable registry semantic SHA-256
 为 `810f0fa9...86d7`。详细合同见 `typed_model_cache_formal_portable_resource_contract.md`。Readiness v5
 为 `READY_FOR_G14C_V4_CLEAN_TRAIN_AND_FORMAL`，但正式训练/formal/holdout/G15 均未启动。
+
+## 2026-08-25 G14R4+ Protocol v1.4 transactional execution repair
+
+G14C v4 的两个 run 均永久无效且彼此独立登记。Run A
+`typed_model_cache_formal_20260824_110016_g14c_v4` 在 150/150 training cells 和 1,200 candidates 后，
+因 phase ledger v2 把 UTC delta 与 monotonic elapsed 强制近似相等而无法追加 train terminal record；其
+failure audit SHA-256 为 `aaf5cfa717d543ffec5ea15dc5e4e8e7dac107dea51647cea10a9b1884118117`。
+Run B `typed_model_cache_formal_20260824_235839_g14c_v4` 在首个 preflight 子命令前因冻结模板仍使用
+`.venv/bin/python` 失败；failure audit SHA-256 为
+`bff76afccff2ea9485555a0bd20b33f5081e2ccaabebeff932f2ef74e8e6f42d`。两者均禁止 resume、
+finalize-only、checkpoint reuse/salvage 或进入 dev/formal。
+
+Protocol v1.4 增加 execution environment `1.0.0`、phase ledger `3.0.0`、cell ledger `1.0.0`、
+running → completion candidate → terminal commit、`--finalize-phase-only` 和同 run hash-bound resume。
+所有冻结命令使用 `{python_executable}`，运行前解析为同一个绝对解释器；科学环境 identity 排除主机绝对
+路径，runtime audit 单独记录解释器、venv、site-packages、cwd、sys.path 与 import origin。Phase elapsed
+只以 monotonic 为权威，UTC 跳变进入 adjustment/anomaly 字段而不误杀合法长 phase。
+
+split、window contract、portable resource registry、catalog、agent matrix、seeds、budget、capacities、
+endpoints、support、statistics、claims、checkpoint cadence 与 SA coefficient 均与 v1.3 相同。v1.4 semantic
+SHA-256 为 `4429531dc3cf98e7ef332367e55e1d0a3dbc33773c20a3fe2e53e57d3534155d`；Readiness v6 为
+`READY_FOR_G14C_V5_CLEAN_TRAIN_AND_FORMAL`。本轮没有正式训练或性能结果，holdout 仍 sealed/unopened，
+不自动启动 G14C v5/G15。

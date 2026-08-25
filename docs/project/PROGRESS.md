@@ -1511,3 +1511,17 @@ quick run 结果边界：
   cache/controller/support/statistics/integrity/gate 与 13 phase ledger。
 - Readiness v5：`READY_FOR_G14C_V4_CLEAN_TRAIN_AND_FORMAL`；正式训练/formal/holdout/hidden/G15 为 0/未启动。
 - G14C v3 永久 invalid；旧 run 保留且禁止 resume、salvage 或 checkpoint reuse。
+
+## 2026-08-25 G14R4+ complete — portable environment and transactional resume
+
+- G14C v4 Run A 永久登记为 `invalid_after_training_before_dev_performance_execution`：150/150 cells、1,200
+  candidates、dev/formal=0；failure audit SHA-256=`aaf5cfa7...118117`。Run B 永久登记为
+  `invalid_before_first_frozen_subcommand`：全部执行计数为 0；failure audit SHA-256=`bff76afc...6f42d`。
+- 新增 execution environment `1.0.0`、resolver/import gate、phase ledger `3.0.0`、cell ledger `1.0.0`、
+  completion candidate、finalize-only、atomic cell commit 与同 run resume；所有 v1.4 command templates 使用
+  `{python_executable}`。
+- no-.venv clean snapshot 完成真实 16-cell tiny phase chain与 dev/freeze/formal-like/support/statistics/integrity；
+  8/16 和 75/150 resume、150/150 terminal append failure/finalize-only 均通过且 committed cells 未重跑。
+- Protocol v1.4 semantic=`4429531d...4155d`；科学字段与 v1.3 不变。Readiness v6=
+  `READY_FOR_G14C_V5_CLEAN_TRAIN_AND_FORMAL`。
+- 正式 checkpoint/training/formal/holdout/hidden/G15 均未执行；holdout sealed/unopened，旧 v4 checkpoint 禁止复用。

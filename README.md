@@ -1,5 +1,20 @@
 # PPO_MEC
 
+G14R4+ 已联合修复 G14C v4 暴露的长 phase 终结、per-cell 事务/same-run resume 与 clean-worktree
+Python 解析问题，并在未训练正式 checkpoint、未运行 formal/holdout/hidden、未启动 G14C v5/G15 的
+前提下冻结 `typed_model_cache_formal_protocol_version=1.4.0`。两个 v4 run 分别永久登记为
+`invalid_after_training_before_dev_performance_execution`（150/150 cells、1,200 candidates、dev/formal=0）
+和 `invalid_before_first_frozen_subcommand`（所有执行计数为 0）；两者均禁止 resume、finalize 或 checkpoint
+salvage。新合同包含 portable execution environment `1.0.0`、phase ledger `3.0.0`、cell ledger `1.0.0`、
+completion candidate/finalize-only 和 hash-bound atomic commit。真正不含 `.venv` 的临时 clean snapshot 使用
+共享绝对 Python 完成 16-cell 非正式 exact chain，并通过 8/16、75/150 中断恢复及 train terminal append
+失败模拟；项目 import 全部来自 clean snapshot。Protocol v1.4 semantic SHA-256 为
+`4429531dc3cf98e7ef332367e55e1d0a3dbc33773c20a3fe2e53e57d3534155d`，Readiness v6 为
+`READY_FOR_G14C_V5_CLEAN_TRAIN_AND_FORMAL`。该状态只授权未来独立任务从最终 pushed Commit A5 的 clean
+worktree 新建 run；holdout 仍 sealed/unopened，旧 v4 产物不可复用，G14 尚未完成。详见
+`docs/project/typed_model_cache_formal_execution_environment_contract.md` 与
+`docs/project/typed_model_cache_formal_execution_resume_contract.md`。
+
 G14R2 已修复 G14C v2 暴露的 formal frozen-window 消费与 phase ledger 缺口，并在未运行正式训练、
 formal、holdout 或 hidden 的前提下冻结 `typed_model_cache_formal_protocol_version=1.2.0`。G14C v2
 `typed_model_cache_formal_20260820_164251_g14c_v2` 因训练命令遗漏显式 source range、回落到

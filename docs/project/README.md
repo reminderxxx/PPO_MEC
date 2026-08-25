@@ -88,3 +88,12 @@
 - Readiness v5：`READY_FOR_G14C_V4_CLEAN_TRAIN_AND_FORMAL`
 - 机器证据：`../../artifacts/analysis/typed_model_cache_formal_path_repair_20260821_g14r3_v1/`
 - 状态：portable binding 与 non-formal exact rehearsal 已通过；G14C v4/formal/holdout/G15 尚未启动。
+
+## G14R4+ transactional portable execution repair
+
+- 环境合同：`typed_model_cache_formal_execution_environment_contract.md`
+- Resume 合同：`typed_model_cache_formal_execution_resume_contract.md`
+- Protocol v1.4 semantic：`4429531d...4155d`
+- Readiness v6：`READY_FOR_G14C_V5_CLEAN_TRAIN_AND_FORMAL`
+- 机器证据：`../../artifacts/analysis/typed_model_cache_formal_execution_repair_20260825_g14r4_v1/`
+- 状态：no-.venv exact rehearsal 与 transaction/resume/finalize 验证通过；G14C v5/formal/holdout/G15 未启动。

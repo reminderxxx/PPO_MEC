@@ -1,0 +1,146 @@
+{
+  "artifact_integrity_manifest_version": "1.0.0",
+  "artifact_run_id": "typed_model_cache_formal_execution_repair_20260825_g14r4_v1",
+  "file_count": 27,
+  "files": [
+    {
+      "path": "atomic_cell_commit_validation.json",
+      "sha256": "211de746e31859a7b4fba06694b03b2fd2d63d5396f2ec516414888a5f79fc00",
+      "size_bytes": 713
+    },
+    {
+      "path": "cell_ledger_schema.json",
+      "sha256": "770c299db57f6bb1888faf527cbabfacf97e471d09d7b16e518c258debf6828c",
+      "size_bytes": 340
+    },
+    {
+      "path": "clean_import_origin_validation.json",
+      "sha256": "c2185874751903329ff159da031059f5c54ff65b9e5e8d422e9c0b9549fcd2d6",
+      "size_bytes": 727
+    },
+    {
+      "path": "clock_simulation.json",
+      "sha256": "0bcebb2010aa5a54c08d3ccab571ad35e64565635e7c03d10e70887633ebdce2",
+      "size_bytes": 282
+    },
+    {
+      "path": "command_log.json",
+      "sha256": "983222ebe6f346a1ce01753077fbd380dbda203098322100ca29b1c4e8e0091a",
+      "size_bytes": 2263
+    },
+    {
+      "path": "exact_phase_chain_rehearsal.json",
+      "sha256": "bc86d966122c76aff0cc85f2dc4d096d848f3d5521b43ed7937c99aa37d93cd9",
+      "size_bytes": 7031
+    },
+    {
+      "path": "execution_environment_contract.json",
+      "sha256": "53234dbcc8771f0006ead00102f6f45864762e910030c8a47d1a7317d83a4e4c",
+      "size_bytes": 2031
+    },
+    {
+      "path": "execution_environment_resolution.json",
+      "sha256": "ec622b6c7d15ca21a44cafdeedfeeedbf3bde97084352c49750c0e7733a6451c",
+      "size_bytes": 2089
+    },
+    {
+      "path": "finalize_only_simulation.json",
+      "sha256": "3c863aac63053bc6ee03b99e4290c266bf9cd0849d9d774346762d29a91f0473",
+      "size_bytes": 223
+    },
+    {
+      "path": "formal_phase_time_contract.json",
+      "sha256": "b249ac87e1f7ac088b555218def082f48c53cf495868141e5c88605821bc2b0b",
+      "size_bytes": 374
+    },
+    {
+      "path": "g14c_v4_failure_reference_run_a.json",
+      "sha256": "feb95e49f7ed6f0b036376110ffcea73fffad6d979af4a79ac0c44ef4cad8c35",
+      "size_bytes": 704
+    },
+    {
+      "path": "g14c_v4_failure_reference_run_b.json",
+      "sha256": "e42db58df86f576061d94d7f98eef15fb2773de476b811ffced4ad21ad5626d6",
+      "size_bytes": 682
+    },
+    {
+      "path": "g14c_v4_python_environment_root_cause.json",
+      "sha256": "95570b9ec70628ee7e3158b6b88ff6ca3ab5f820415fc5878fea6790972a9057",
+      "size_bytes": 3389
+    },
+    {
+      "path": "g14c_v4_train_terminal_timing_root_cause.json",
+      "sha256": "5b12e3a50894f5388d07695a9c9206049fd1a2a126e4aa1dbd1460a9dd97980c",
+      "size_bytes": 1223
+    },
+    {
+      "path": "holdout_seal_revalidation.json",
+      "sha256": "6b80031c7a9c6d0c7ce36519b994262849982fdbb38b58fb69ba256d781549b3",
+      "size_bytes": 158
+    },
+    {
+      "path": "interruption_simulation.json",
+      "sha256": "f2f901b2810bd709b5fef56fa8a850f93ac20fc57766bef5cacc0d1f8a4e7ac3",
+      "size_bytes": 711
+    },
+    {
+      "path": "phase_completion_transaction.json",
+      "sha256": "5ad60402fc033828670dcfd1d111890f822d9c7f2b8d21185d481e10a5e57bab",
+      "size_bytes": 331
+    },
+    {
+      "path": "phase_ledger_schema_v3.json",
+      "sha256": "b728664fa6f1edd2786f617b8a2cc087ab0920ae93bbc9ccffb1fa52f5cdc490",
+      "size_bytes": 671
+    },
+    {
+      "path": "protected_user_file_hashes_end.json",
+      "sha256": "05e52289b109c895c942ca7a126c8ebc0b32da8851729a181e3bc65e752d52d0",
+      "size_bytes": 828
+    },
+    {
+      "path": "protected_user_file_hashes_start.json",
+      "sha256": "465a811d5f5990950d0d48637f5d7a79339b04363c1b1bb7f9e5586739afa627",
+      "size_bytes": 802
+    },
+    {
+      "path": "protocol_restart_diff.json",
+      "sha256": "67163c600fec79882dc9a82dcca167f4b47740debcb9c927a195e09289e346d2",
+      "size_bytes": 931083
+    },
+    {
+      "path": "protocol_v1_4_manifest.json",
+      "sha256": "f7220903da8fc2b658a883d591642ecd6fd85c20fae8a7a57ed828a0d35d3a21",
+      "size_bytes": 313669
+    },
+    {
+      "path": "python_environment_root_cause.json",
+      "sha256": "95570b9ec70628ee7e3158b6b88ff6ca3ab5f820415fc5878fea6790972a9057",
+      "size_bytes": 3389
+    },
+    {
+      "path": "readiness_review_v6.json",
+      "sha256": "a4b6585b74508f8eae312d28fc1b0afeec5b553efe25a7d477b525d19c57f7c9",
+      "size_bytes": 1246
+    },
+    {
+      "path": "resume_command_templates.json",
+      "sha256": "82dbb443e4a8158d1617fb58565a1658753d2febd285313914cfe68ba0d4e6d4",
+      "size_bytes": 227733
+    },
+    {
+      "path": "same_run_resume_contract.json",
+      "sha256": "2462686a4a7e1edf7f9082733834d1bce5c3f4b18229e1a453635cd59d5a3064",
+      "size_bytes": 857
+    },
+    {
+      "path": "timing_failure_root_cause.json",
+      "sha256": "5b12e3a50894f5388d07695a9c9206049fd1a2a126e4aa1dbd1460a9dd97980c",
+      "size_bytes": 1223
+    }
+  ],
+  "formal_checkpoint_count": 0,
+  "formal_performance_result_count": 0,
+  "holdout_opened": false,
+  "status": "pass"
+}

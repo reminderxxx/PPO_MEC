@@ -1,0 +1,51 @@
+{
+  "clean_worktree_validation": "see clean_import_origin_validation.json",
+  "outer_runner_python": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "probe": {
+    "architecture": "arm64",
+    "base_prefix": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9",
+    "critical_packages": {
+      "PyYAML": "6.0.3",
+      "numpy": "2.0.2",
+      "pandas": "2.3.3",
+      "pytest": "8.4.2",
+      "torch": "2.8.0"
+    },
+    "cwd": "/Users/howen/Projects/PPO_MEC",
+    "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+    "editable_installs": [],
+    "execution_commit": "4066144653bb879bd5657e67a096836dcc836314",
+    "implementation": "CPython",
+    "imports": {
+      "src": {
+        "file": "/Users/howen/Projects/PPO_MEC/src/__init__.py",
+        "version": ""
+      },
+      "src.evaluators.typed_model_cache_formal_execution": {
+        "file": "/Users/howen/Projects/PPO_MEC/src/evaluators/typed_model_cache_formal_execution.py",
+        "version": ""
+      }
+    },
+    "installed_package_count": 31,
+    "platform_release": "25.5.0",
+    "platform_system": "Darwin",
+    "python_no_user_site": "1",
+    "python_version": "3.9.6",
+    "pythonpath": "/Users/howen/Projects/PPO_MEC",
+    "site_packages": [
+      "/Users/howen/Projects/PPO_MEC/.venv/lib/python3.9/site-packages"
+    ],
+    "sys_executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "sys_path": [
+      "",
+      "/Users/howen/Projects/PPO_MEC",
+      "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python39.zip",
+      "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9",
+      "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/lib-dynload",
+      "/Users/howen/Projects/PPO_MEC/.venv/lib/python3.9/site-packages"
+    ],
+    "sys_prefix": "/Users/howen/Projects/PPO_MEC/.venv"
+  },
+  "runtime_location_is_scientific_identity": false,
+  "status": "main_worktree_audit_only"
+}

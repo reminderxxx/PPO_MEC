@@ -1048,3 +1048,22 @@ ignored；根级 `rehearsal_summary.json` 进入 G14R integrity。它不能作�
 执行；不得 resume/复制 G14C v3 candidates。Dev/formal/support 命令必须保留 explicit workflow path、registry、
 repository/data/checkpoint roots 与各 resource ID。任何 unresolved path、hash/role/schema 冲突或 invalid-run
 checkpoint 必须停止执行。
+
+## G14R4+ portable Python and transactional resume
+
+Protocol v1.4 生成与只读 preflight：
+
+```bash
+.venv/bin/python scripts/repair_typed_model_cache_formal_execution.py \
+  --python-executable .venv/bin/python
+.venv/bin/python scripts/run_typed_model_cache_formal_protocol.py \
+  --protocol-path configs/experiment/typed_model_cache_formal_protocol_v1_4_20260825/protocol_v1_4_manifest.json \
+  --output-root <new-run-root> --preflight --dry-run \
+  --python-executable <shared-absolute-python>
+```
+
+未来 G14C v5 必须在 pushed Commit A5 的 clean worktree 使用新 run root。Clean worktree 不需要本地 `.venv`；
+resolver 必须收到共享绝对 Python 或 environment manifest，并验证 dependency/environment fingerprint 与 clean
+import origin。中断后只允许同一 run 使用 `--resume --resume-from-cell-ledger`；commands 已完成且存在合法
+completion candidate 时可使用 `--finalize-phase-only`，不得重跑 phase commands。旧 v4 run、ledger、marker 和
+checkpoint 一律拒绝。Readiness v6 不授权自动启动 G14C v5，holdout 仍不可访问。

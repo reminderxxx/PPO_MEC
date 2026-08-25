@@ -444,3 +444,19 @@
 - `scripts/run_typed_model_cache_formal_path_rehearsal.py`：16-cell public controlled exact phase-chain rehearsal；不具备
   formal/holdout/hidden capability。
 - `tests/test_portable_resource_identity.py`：portable identity、resolver、parser、checkpoint、command/readiness regressions。
+
+## G14R4+ execution transaction modules
+
+- `src/runtime/formal_execution_environment.py`：Python resolver、dependency/environment fingerprint、clean-worktree
+  import probe、child environment parity 与 runtime-location audit。
+- `src/evaluators/formal_phase_transaction.py`：phase ledger v3、monotonic timing、completion candidate、immutable terminal
+  commit 与 finalize-only。
+- `src/evaluators/formal_cell_transaction.py`：cell ledger v1、stable cell/episode ID、attempt staging、artifact inventory、
+  atomic marker/commit、same-run resume 与 committed-only matrix validation。
+- `scripts/run_typed_model_cache_formal_protocol.py`：v1.4 resolver 与 transactional phase入口；legacy v1.1-v1.3 继续
+  保留旧 runner 兼容但不能使用 finalize-only。
+- `scripts/manage_typed_model_cache_formal_artifacts.py`：checkpoint freeze 同时硬拒绝 G14C v3 与两个永久无效
+  G14C v4 run root，旧 checkpoint 不可进入新 freeze manifest。
+- `scripts/repair_typed_model_cache_formal_execution.py`：Protocol v1.4/config/root-cause/artifact/Readiness v6 generator。
+- `scripts/run_typed_model_cache_formal_execution_rehearsal.py`：no-.venv import、8/16、75/150 与 finalize-only 非正式审计。
+- `tests/test_typed_model_cache_formal_execution_v14.py`：environment/timing/cell/dev-formal/protocol 事务专项回归。

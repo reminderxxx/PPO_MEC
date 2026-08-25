@@ -1,0 +1,15 @@
+{
+  "committed_only_downstream": true,
+  "hash_chain": "previous_ledger_hash/current_ledger_hash",
+  "phases": [
+    "train",
+    "dev_select",
+    "formal_cache_policy",
+    "formal_controller",
+    "formal_ablation",
+    "formal_support",
+    "formal_scalability"
+  ],
+  "schema_version": "1.0.0",
+  "stable_cell_and_episode_ids": true
+}
