@@ -97,3 +97,12 @@
 - Readiness v6：`READY_FOR_G14C_V5_CLEAN_TRAIN_AND_FORMAL`
 - 机器证据：`../../artifacts/analysis/typed_model_cache_formal_execution_repair_20260825_g14r4_v1/`
 - 状态：no-.venv exact rehearsal 与 transaction/resume/finalize 验证通过；G14C v5/formal/holdout/G15 未启动。
+
+## G14R5 resolved formal execution context repair
+
+- 合同：`typed_model_cache_formal_resolved_execution_context_contract.md`
+- Protocol v1.5 semantic：`feb7ccc4...d829a`
+- Readiness v7：`READY_FOR_G14C_V6_CLEAN_TRAIN_AND_FORMAL`
+- 机器证据：`../../artifacts/analysis/typed_model_cache_formal_preflight_context_repair_20260825_g14r5_v1/`
+- 状态：detached no-.venv clean preflight/tests 已通过；G14C v5永久invalid；正式training/checkpoint/performance为0，
+  holdout sealed/unopened，G14C v6/G14D/G15未启动。

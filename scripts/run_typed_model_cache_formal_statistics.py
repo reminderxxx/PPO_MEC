@@ -17,6 +17,10 @@ from src.evaluators.typed_model_cache_formal_execution import (
     validate_protocol_v1_1,
 )
 from src.runtime.portable_resource_identity import add_portable_resource_arguments
+from src.runtime.resolved_formal_execution_context import (
+    load_resolved_formal_execution_context,
+    resolved_python_for_nested_consumer,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -24,6 +28,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--protocol-path", required=True)
     parser.add_argument("--input-root", required=True)
     parser.add_argument("--output-root", required=True)
+    parser.add_argument("--resolved-execution-context-path", default="")
     add_portable_resource_arguments(parser)
     return parser.parse_args()
 
@@ -32,12 +37,28 @@ def main() -> None:
     args = parse_args()
     protocol = json.loads(Path(args.protocol_path).read_text(encoding="utf-8-sig"))
     validate_protocol_v1_1(protocol)
+    nested_python = sys.executable
+    if protocol["typed_model_cache_formal_protocol_version"] == "1.5.0":
+        if not args.resolved_execution_context_path:
+            raise FormalExecutionError(
+                "protocol v1.5 statistics requires resolved execution context"
+            )
+        resolved_context, _ = load_resolved_formal_execution_context(
+            args.resolved_execution_context_path,
+            protocol=protocol,
+            clean_worktree_root=ROOT,
+            durable_run_root=Path(args.resolved_execution_context_path).resolve().parent,
+            check_git=True,
+        )
+        nested_python = resolved_python_for_nested_consumer(
+            resolved_context, observed_sys_executable=sys.executable
+        )
     input_root = Path(args.input_root)
     rows = sorted(input_root.glob("formal_controller/**/benchmark_rows.csv"))
     if not rows:
         raise FormalExecutionError("formal controller rows are missing")
     command = [
-        sys.executable,
+        nested_python,
         str(ROOT / "scripts/analyze_top_journal_statistics.py"),
     ]
     for path in rows:

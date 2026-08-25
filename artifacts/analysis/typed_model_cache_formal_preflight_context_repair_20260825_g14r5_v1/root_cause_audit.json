@@ -1,0 +1,8 @@
+{
+  "failure": "nested preflight expanded raw default_expansion_context without python_executable",
+  "failure_audit_sha256": "3c0de5bfebb5877e1b5a53f42fea1e07504f4355bd1636ad17ed38145439ff93",
+  "performance_observed": false,
+  "repair": "outer runner is the unique context producer; nested consumers load and validate its create-only artifact",
+  "status": "confirmed",
+  "temporary_sys_executable_injection_allowed": false
+}

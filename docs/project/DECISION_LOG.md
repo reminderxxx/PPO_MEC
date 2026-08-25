@@ -912,3 +912,15 @@
   immutable committed marker。Selection/aggregate/statistics 只读 committed cells。
 - 决策：resume 只允许同一 run 全 identity/hash 匹配；committed skip，incomplete 新 attempt，terminal reject。
   两个 G14C v4 run 不获得 retrospective finalize/salvage 例外。
+
+## 2026-08-25: outer runner uniquely owns resolved formal execution context
+
+- 决策：Protocol v1.5冻结 resolved context `1.0.0`；outer runner在environment resolution之后、首条ledger记录之前
+  唯一生产 create-only artifact。子进程不得自行补全 runtime字段。
+- 决策：portable/scientific identity继续排除host absolute paths；host paths进入runtime audit与full context hash，
+  以绑定同一run而不改变算法比较变量。
+- 决策：preflight必须使用同一 artifact重展开全部 phase/cell，并要求phase order、coordinates、argv、outputs、
+  timeout/retry/resume与command-matrix SHA逐项一致。
+- 决策：context SHA和file SHA进入phase input、run identity、ledger与integrity。resume/finalize只允许同run hash复验，
+  缺失/篡改/跨run/commit/environment/path均拒绝。
+- 决策：v1.0–v1.4保留审计读取但不能开始新的G14C execution；G14C v1–v5 invalid artifacts一律不可复用。

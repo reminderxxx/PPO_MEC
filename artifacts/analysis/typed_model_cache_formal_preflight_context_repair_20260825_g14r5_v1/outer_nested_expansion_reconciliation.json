@@ -1,0 +1,11 @@
+{
+  "command_count": 186,
+  "context_sha256": "91698e3d093e03828a110e6c37aa5024373594f9b5c1b27f958b2e819a7170c2",
+  "expansion_equal": true,
+  "file_sha256": "47898b315b9cecf5e87776f1444cc8a4ec58654df344bcbe1ca636c2837c1b0b",
+  "nested_expansion_sha256": "e606ef7f5d50b7c4ed847697a65255edeb9c72171aa6dd1e06f53bd15a428bb2",
+  "outer_expansion_sha256": "e606ef7f5d50b7c4ed847697a65255edeb9c72171aa6dd1e06f53bd15a428bb2",
+  "outer_nested_same_context": true,
+  "phase_template_count": 15,
+  "status": "pass"
+}

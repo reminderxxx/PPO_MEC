@@ -116,6 +116,7 @@ def _formal_values(protocol: Mapping[str, Any], agent_name: str) -> dict[str, An
         "1.2.0",
         "1.3.0",
         "1.4.0",
+        "1.5.0",
     }:
         raise FormalTrainingContractError("formal training requires protocol version 1.1, 1.2, or 1.3")
     budget = protocol.get("training_budget")

@@ -1,0 +1,32 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_preflight_context_repair_20260825_g14r5_v1",
+  "checks": {
+    "clean_import_origin": true,
+    "clean_worktree_without_local_venv": true,
+    "context_negative_cases_pass": true,
+    "full_pytest_and_smoke_pass": true,
+    "g14c_v5_failure_registered": true,
+    "holdout_sealed": true,
+    "legacy_invalid_runs_hard_rejected": true,
+    "no_formal_training_or_performance": true,
+    "outer_nested_expansion_equal": true,
+    "phase_and_cell_transactions_regression": true,
+    "portable_fairness_checkpoint_regression": true,
+    "producer_consumer_matrix_complete": true,
+    "real_preflight_completed": true,
+    "real_tests_phase_completed": true,
+    "resolved_context_contract_frozen": true,
+    "window_reachability_60_of_60": true
+  },
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "execution_commit": "Commit A6 exact pushed commit bound out-of-band",
+  "formal_completed": false,
+  "implementation_baseline_git_commit": "c137bbe12794a8767720f767227b462bc590112e",
+  "literature_cutoff": "2026-08-25",
+  "paper_ready": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "readiness_review_version": "7.0.0",
+  "reviewed_at": "2026-08-25T12:28:13.171465+08:00",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "verdict": "READY_FOR_G14C_V6_CLEAN_TRAIN_AND_FORMAL"
+}

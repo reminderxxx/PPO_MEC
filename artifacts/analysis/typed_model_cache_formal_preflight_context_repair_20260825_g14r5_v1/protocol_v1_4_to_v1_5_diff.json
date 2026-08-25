@@ -1,0 +1,12 @@
+{
+  "changed_scope": [
+    "resolved execution context propagation",
+    "outer/nested command expansion reconciliation",
+    "immutable same-run context binding",
+    "implicit runtime fallback removal"
+  ],
+  "new_semantic_sha256": "feb7ccc489d66aeba502fbef2fef70c911ecdd66218a8ea3d475725ec61d829a",
+  "old_semantic_sha256": "4429531dc3cf98e7ef332367e55e1d0a3dbc33773c20a3fe2e53e57d3534155d",
+  "scientific_fields_changed": false,
+  "status": "pass"
+}

@@ -460,3 +460,18 @@
 - `scripts/repair_typed_model_cache_formal_execution.py`：Protocol v1.4/config/root-cause/artifact/Readiness v6 generator。
 - `scripts/run_typed_model_cache_formal_execution_rehearsal.py`：no-.venv import、8/16、75/150 与 finalize-only 非正式审计。
 - `tests/test_typed_model_cache_formal_execution_v14.py`：environment/timing/cell/dev-formal/protocol 事务专项回归。
+
+## 2026-08-25 G14R5 resolved context modules
+
+- `src/runtime/resolved_formal_execution_context.py`：resolved context `1.0.0` canonical hash、finite/path/identity校验、
+  atomic create-only、same-run load与nested Python parity。
+- `scripts/run_typed_model_cache_formal_protocol.py`：v1.5唯一 context producer；fresh/dry-run/resume/finalize共用完整
+  resolution，context/file SHA进入input、run identity和phase ledger；v1.0–v1.4 active execution关闭。
+- `scripts/validate_typed_model_cache_formal_restart.py`：加载 outer context，重展开全部templates并比对186-command hash，
+  同时执行11,850,526-row/60-window metadata-only reachability。
+- `scripts/run_typed_model_cache_formal_dev_selection.py`、`run_typed_model_cache_formal_support.py`、
+  `run_typed_model_cache_formal_statistics.py`：nested subprocess只消费context内绝对Python。
+- `scripts/repair_typed_model_cache_formal_preflight_context.py`：Protocol v1.5/config、G14C v5登记、producer/consumer
+  matrix、G14R5 artifact与Readiness v7 generator。
+- `tests/test_typed_model_cache_formal_execution_v15.py`：outer/nested parity、context tamper/drift/fallback、invalid-run和
+  holdout边界专项回归。

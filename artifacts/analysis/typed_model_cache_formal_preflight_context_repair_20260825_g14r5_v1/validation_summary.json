@@ -1,0 +1,66 @@
+{
+  "checkpoint_count": 0,
+  "clean_import": {
+    "dirty_main_source_imported": false,
+    "project_modules_from_candidate_worktree": true,
+    "status": "pass"
+  },
+  "formal_training_count": 0,
+  "full_pytest": {
+    "clean_detached_candidate": true,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "status": "pass",
+    "tests": 1038
+  },
+  "git_diff_check": "pass",
+  "holdout_capability": false,
+  "holdout_opened": false,
+  "negative_validation": {
+    "case_count": 14,
+    "cases": {
+      "absolute_sentinel_rejected": "pass",
+      "clean_worktree_git_root_drift_rejected": "pass",
+      "context_sha_tamper_rejected": "pass",
+      "cross_run_output_root_reuse_rejected": "pass",
+      "dependency_fingerprint_drift_rejected": "pass",
+      "environment_fingerprint_drift_rejected": "pass",
+      "execution_commit_drift_rejected": "pass",
+      "g14c_v5_resume_finalize_checkpoint_references_rejected": "pass",
+      "implicit_sys_executable_fallback_rejected": "pass",
+      "protocol_semantic_hash_drift_rejected": "pass",
+      "python_path_drift_rejected": "pass",
+      "relative_venv_python_rejected": "pass",
+      "v1_4_unresolved_python_reproduced": "pass",
+      "v1_5_missing_resolved_context_rejected": "pass"
+    },
+    "status": "pass"
+  },
+  "performance_row_count": 0,
+  "python_compile": {
+    "changed_python_file_count": 12,
+    "status": "pass"
+  },
+  "smoke_test": {
+    "completed_node_count": 6,
+    "status": "pass",
+    "terminated": true
+  },
+  "status": "pass",
+  "targeted_contract_tests": {
+    "coverage": [
+      "G14R5 resolved context",
+      "formal execution and protocol",
+      "phase/cell transaction and resume/finalize",
+      "portable resource identity",
+      "cache fairness",
+      "window reachability",
+      "checkpoint compatibility"
+    ],
+    "failures": 0,
+    "status": "pass",
+    "tests": 379
+  },
+  "validation_summary_version": "1.0.0"
+}

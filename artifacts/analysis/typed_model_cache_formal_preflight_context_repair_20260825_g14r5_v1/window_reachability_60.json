@@ -1,0 +1,16 @@
+{
+  "agent_or_policy_executed": false,
+  "max_mobility_rows": 11850526,
+  "metadata_only": true,
+  "performance_fields_read": false,
+  "provider_frame_count": 73871,
+  "reachable_count": 60,
+  "split_reachable_counts": {
+    "dev": 12,
+    "formal": 12,
+    "sealed_holdout": 12,
+    "train": 24
+  },
+  "status": "pass",
+  "window_count": 60
+}

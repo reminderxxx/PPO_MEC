@@ -22,6 +22,18 @@ INVALID_G14C_V3_RUN_ROOT = Path(
     "/private/tmp/ppo_mec_g14c_v3_a7c9e8e/artifacts/experiments/typed_model_cache_formal/"
     "typed_model_cache_formal_20260820_203430_g14c_v3"
 ).resolve()
+INVALID_G14C_V1_V2_RUN_ROOTS = (
+    (
+        ROOT
+        / "artifacts/experiments/typed_model_cache_formal"
+        / "typed_model_cache_formal_20260820_g14c_351fdb8_v1"
+    ).resolve(),
+    (
+        ROOT
+        / "artifacts/experiments/typed_model_cache_formal"
+        / "typed_model_cache_formal_20260820_164251_g14c_v2"
+    ).resolve(),
+)
 INVALID_G14C_V4_RUN_ROOTS = (
     (
         ROOT
@@ -34,7 +46,17 @@ INVALID_G14C_V4_RUN_ROOTS = (
         / "typed_model_cache_formal_20260824_235839_g14c_v4"
     ).resolve(),
 )
-INVALID_FORMAL_RUN_ROOTS = (INVALID_G14C_V3_RUN_ROOT, *INVALID_G14C_V4_RUN_ROOTS)
+INVALID_G14C_V5_RUN_ROOT = (
+    ROOT
+    / "artifacts/experiments/typed_model_cache_formal"
+    / "typed_model_cache_formal_20260825_111625_g14c_v5"
+).resolve()
+INVALID_FORMAL_RUN_ROOTS = (
+    *INVALID_G14C_V1_V2_RUN_ROOTS,
+    INVALID_G14C_V3_RUN_ROOT,
+    *INVALID_G14C_V4_RUN_ROOTS,
+    INVALID_G14C_V5_RUN_ROOT,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -138,7 +160,10 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
     for row in selection.get("selected", []):
         path = Path(row["checkpoint_path"]).resolve()
         if any(path_is_within(path, root) for root in INVALID_FORMAL_RUN_ROOTS):
-            raise ValueError("invalid G14C v3/v4 checkpoint reference rejected")
+            raise ValueError(
+                "invalid G14C v3/v4 checkpoint reference rejected; "
+                "the hard rejection set covers all G14C v1-v5 invalid runs"
+            )
         if not path.is_file():
             raise FileNotFoundError(path)
         digest = sha256_file(path)

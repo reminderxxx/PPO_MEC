@@ -1,0 +1,15 @@
+{
+  "candidate_checkpoint_count": 0,
+  "checkpoint_reuse_allowed": false,
+  "dev_performance_count": 0,
+  "failure_audit_path": "artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260825_111625_g14c_v5/failure_audit.json",
+  "failure_audit_sha256": "3c0de5bfebb5877e1b5a53f42fea1e07504f4355bd1636ad17ed38145439ff93",
+  "failure_boundary": "invalid_during_first_preflight_child_before_window_reachability",
+  "formal_performance_count": 0,
+  "immutable_old_run": true,
+  "legacy_phase_finalize_allowed": false,
+  "resume_allowed": false,
+  "run_id": "typed_model_cache_formal_20260825_111625_g14c_v5",
+  "status": "INVALID_PROTOCOL_OR_IMPLEMENTATION",
+  "training_cells_executed": 0
+}

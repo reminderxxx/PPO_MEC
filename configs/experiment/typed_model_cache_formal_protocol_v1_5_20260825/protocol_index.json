@@ -1,0 +1,40 @@
+{
+  "agent_config": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/agent_training_configs.json",
+  "dev_fairness_manifests": {
+    "constrained_288mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_constrained_288mb.json",
+    "medium_576mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_medium_576mb.json",
+    "relaxed_864mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_relaxed_864mb.json"
+  },
+  "execution_environment_manifest": "configs/experiment/typed_model_cache_formal_protocol_v1_5_20260825/execution_environment_manifest.json",
+  "fairness_manifests": {
+    "constrained_288mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+    "medium_576mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+    "relaxed_864mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json"
+  },
+  "fairness_portable_identity_companion": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/fairness_portable_identity_companion.json",
+  "portable_resource_registry": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/portable_resource_registry.json",
+  "protocol_index_version": "1.5.0",
+  "protocol_manifest": "configs/experiment/typed_model_cache_formal_protocol_v1_5_20260825/protocol_v1_5_manifest.json",
+  "protocol_semantic_sha256": "feb7ccc489d66aeba502fbef2fef70c911ecdd66218a8ea3d475725ec61d829a",
+  "resolved_execution_context_contract_version": "1.0.0",
+  "runtime_configs": {
+    "constrained_288mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+    "medium_576mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+    "relaxed_864mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml"
+  },
+  "split_companion": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/split_companion.json",
+  "status": "READY_FOR_G14C_V6_CLEAN_TRAIN_AND_FORMAL",
+  "support_fairness_manifests": {
+    "ablation-8aa367acf3bdf7a9": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-8aa367acf3bdf7a9.json",
+    "ablation-f09814754dc92882": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-f09814754dc92882.json",
+    "prediction_boundary-5faa585ad5330f05": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-5faa585ad5330f05.json",
+    "prediction_boundary-95fb72521455c776": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-95fb72521455c776.json",
+    "prediction_boundary-a3a5789695404fae": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-a3a5789695404fae.json",
+    "prediction_boundary-ce96dbd5ea956212": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-ce96dbd5ea956212.json",
+    "prediction_boundary-df3bc5ade8c57014": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-df3bc5ade8c57014.json",
+    "prediction_boundary-efa09ee2409d3d87": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-efa09ee2409d3d87.json",
+    "sensitivity-27d16b068076937b": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-27d16b068076937b.json",
+    "sensitivity-7c7c3a1659c6e221": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-7c7c3a1659c6e221.json"
+  },
+  "window_consumption_contract": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/formal_window_consumption_contract.json"
+}

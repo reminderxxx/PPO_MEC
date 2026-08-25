@@ -1525,3 +1525,21 @@ quick run 结果边界：
 - Protocol v1.4 semantic=`4429531d...4155d`；科学字段与 v1.3 不变。Readiness v6=
   `READY_FOR_G14C_V5_CLEAN_TRAIN_AND_FORMAL`。
 - 正式 checkpoint/training/formal/holdout/hidden/G15 均未执行；holdout sealed/unopened，旧 v4 checkpoint 禁止复用。
+
+## 2026-08-25 G14R5 complete — resolved execution context propagation
+
+- G14C v5 `typed_model_cache_formal_20260825_111625_g14c_v5` 永久登记为
+  `invalid_during_first_preflight_child_before_window_reachability`；failure audit SHA-256=
+  `3c0de5bf...ff93`，tests/training/dev/formal/holdout 均为 0，禁止 resume/finalize/salvage/checkpoint reuse。
+- 冻结 resolved execution context `1.0.0`：outer runner 是唯一 producer；preflight、dev selection、support/
+  scalability/statistics 显式消费同一 create-only artifact。Context/file SHA 进入 phase input、run identity、ledger
+  与 integrity；v1.5 不允许 cwd、`sys.executable` 或相对 `.venv` 回退。
+- detached clean candidate `c137bbe...112e` 无 `.venv`：186-command dry-run通过；真实 preflight 消费
+  `11,850,526` raw rows，60/60 windows可达，outer/nested expansion均为 `e606ef7f...28bb2`；同一 context SHA=
+  `91698e3d...170c2`。
+- 同 run tests phase完成全仓 `1038 passed`；phase ledger v3 为 6 records、2 candidates、2 completed terminals。
+  专项/相邻合同 `379 passed`，smoke、compile/import、`git diff --check` 均通过。
+- Protocol v1.5 semantic=`feb7ccc4...d829a`；environment/dependency fingerprint分别为
+  `bd3fccce...6545c` / `88963f61...e2d00`。Readiness v7=
+  `READY_FOR_G14C_V6_CLEAN_TRAIN_AND_FORMAL`。
+- G14R5 正式 training/checkpoint/performance row 仍为 0；holdout sealed/unopened；未启动 G14C v6、G14D 或 G15。

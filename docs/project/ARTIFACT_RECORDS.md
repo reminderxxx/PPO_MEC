@@ -1283,3 +1283,18 @@ Run `g14a_rehearsal_20260819_230456_872949`使用`controlled_non_hidden`窗口�
   dev/freeze/formal-like/support/statistics/integrity 全部 pass。
 - Readiness v6：`READY_FOR_G14C_V5_CLEAN_TRAIN_AND_FORMAL`。
 - Evidence boundary：execution-contract/non-formal rehearsal；正式 checkpoint/performance/holdout/G15 计数为 0。
+
+## 2026-08-25 G14R5 preflight resolved-context repair
+
+- Root：`artifacts/analysis/typed_model_cache_formal_preflight_context_repair_20260825_g14r5_v1/`
+- Protocol v1.5 semantic：`feb7ccc489d66aeba502fbef2fef70c911ecdd66218a8ea3d475725ec61d829a`
+- Environment/dependency fingerprint：`bd3fccce3af2f8aca818a89b0a94a5b522a4920df5615c742ce659697c86545c` /
+  `88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00`
+- G14C v5 failure audit：`3c0de5bfebb5877e1b5a53f42fea1e07504f4355bd1636ad17ed38145439ff93`；
+  invalid before window reachability，全部performance/training/checkpoint计数为0，禁止resume/finalize/reuse。
+- Clean acceptance：detached candidate `c137bbe...112e`、无`.venv`；dry-run 186 commands；真实preflight
+  `11,850,526` rows、60/60 windows；outer/nested SHA=`e606ef7f...28bb2`；context SHA=`91698e3d...170c2`。
+- Tests：同run ledger tests phase `1038 passed`；专项/相邻合同 `379 passed`；smoke/compile/import/diff-check通过。
+- Readiness v7：`READY_FOR_G14C_V6_CLEAN_TRAIN_AND_FORMAL`。
+- Evidence boundary：execution-contract/non-formal preflight/tests；正式training/checkpoint/performance/holdout为0；
+  未启动G14C v6/G14D/G15。

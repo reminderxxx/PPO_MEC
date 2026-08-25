@@ -1,0 +1,9 @@
+{
+  "errors": 0,
+  "failures": 0,
+  "junit_sha256": "afe4fcc526cedcc72dc45ca49088fa6124682c5fafea3aef3917ffeb808e2bd8",
+  "skipped": 0,
+  "status": "completed",
+  "tests": 1038,
+  "wall_clock_seconds": 51.076879042
+}

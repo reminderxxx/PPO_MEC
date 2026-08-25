@@ -7,7 +7,9 @@ Use ``--dry-run`` during G14R to validate expansion without creating results.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import re
 import subprocess
 import sys
 import time
@@ -36,6 +38,92 @@ from src.evaluators.formal_cell_transaction import (
     stable_cell_id,
 )
 from src.runtime.formal_execution_environment import resolve_execution_environment
+from src.runtime.resolved_formal_execution_context import (
+    RESOLVED_FORMAL_EXECUTION_CONTEXT_FILENAME,
+    atomic_create_resolved_formal_execution_context,
+    build_resolved_formal_execution_context,
+    load_resolved_formal_execution_context,
+)
+
+
+PROTOCOL_V14 = "1.4.0"
+PROTOCOL_V15 = "1.5.0"
+
+
+def _absolute_project_path(value: str) -> str:
+    path = Path(value)
+    return str(path if path.is_absolute() else (ROOT / path).resolve())
+
+
+def resolved_expansion_context(
+    protocol: dict,
+    *,
+    protocol_path: str,
+    output_root: str,
+    python_executable: str,
+) -> dict:
+    """Resolve every host/run location once at the outermost runner."""
+
+    context = dict(protocol["execution_contract"]["default_expansion_context"])
+    requested_output_root = str(Path(output_root).resolve())
+    for key, value in list(context.items()):
+        if isinstance(value, str) and value.startswith("/ABSOLUTE/FORMAL_OUTPUT_ROOT"):
+            context[key] = requested_output_root + value[
+                len("/ABSOLUTE/FORMAL_OUTPUT_ROOT"):
+            ]
+    context.update(
+        protocol_path=str(Path(protocol_path).resolve()),
+        output_root=requested_output_root,
+        python_executable=str(Path(python_executable).absolute()),
+        clean_worktree_root=str(ROOT),
+        repository_root=str(ROOT),
+        data_root=str((ROOT / "data").resolve()),
+        checkpoint_root=requested_output_root,
+        resolved_execution_context_path=str(
+            Path(requested_output_root)
+            / RESOLVED_FORMAL_EXECUTION_CONTEXT_FILENAME
+        ),
+        resolve_relative_paths_against_repository_root=True,
+    )
+    for _ in range(4):
+        changed = False
+        for key, value in list(context.items()):
+            if not isinstance(value, str):
+                continue
+            rendered = value
+            for name in re.findall(r"\{([a-z][a-z0-9_]*)\}", value):
+                replacement = context.get(name)
+                if replacement is not None and not isinstance(
+                    replacement, (dict, list, tuple)
+                ):
+                    rendered = rendered.replace("{" + name + "}", str(replacement))
+            if rendered != value:
+                context[key] = rendered
+                changed = True
+        if not changed:
+            break
+    for key in (
+        "protocol_artifact_root",
+        "resource_registry_path",
+        "agent_config_path",
+        "dev_window_plan_path",
+        "formal_window_plan_path",
+        "train_window_plan_path",
+        "window_consumption_contract_path",
+    ):
+        value = context.get(key)
+        if isinstance(value, str) and value and "{" not in value:
+            context[key] = _absolute_project_path(value)
+    unresolved = {
+        key: value
+        for key, value in context.items()
+        if isinstance(value, str) and ("{" in value or "}" in value)
+    }
+    if unresolved:
+        raise FormalExecutionError(
+            f"resolved execution context contains placeholders: {sorted(unresolved)}"
+        )
+    return context
 
 
 def parse_args() -> argparse.Namespace:
@@ -58,6 +146,27 @@ def parse_args() -> argparse.Namespace:
     return args
 
 
+def reject_invalid_run_root(protocol: dict, output_root: str | Path) -> None:
+    version = protocol.get("typed_model_cache_formal_protocol_version")
+    supersession = protocol.get("supersession", {})
+    references = (
+        supersession.get("invalid_execution_runs", [])
+        if version == PROTOCOL_V15
+        else supersession.get("invalid_g14c_v4_runs", [])
+        if version == PROTOCOL_V14
+        else []
+    )
+    invalid_run_ids = {
+        str(item.get("run_id"))
+        for item in references
+        if isinstance(item, dict) and item.get("run_id")
+    }
+    if any(part in invalid_run_ids for part in Path(output_root).resolve().parts):
+        raise FormalExecutionError(
+            "legacy invalid G14C run root is permanently rejected"
+        )
+
+
 def load_protocol(path: str | Path) -> dict:
     payload = json.loads(Path(path).read_text(encoding="utf-8-sig"))
     if not isinstance(payload, dict):
@@ -72,18 +181,20 @@ def main() -> None:
     protocol_version = protocol["typed_model_cache_formal_protocol_version"]
     phase = "preflight" if args.preflight else args.phase
     templates = protocol["execution_contract"]["command_templates"]
-    context = dict(protocol["execution_contract"]["default_expansion_context"])
     requested_output_root = str(Path(args.output_root).resolve())
-    for key, value in list(context.items()):
-        if isinstance(value, str) and value.startswith("/ABSOLUTE/FORMAL_OUTPUT_ROOT"):
-            context[key] = requested_output_root + value[len("/ABSOLUTE/FORMAL_OUTPUT_ROOT"):]
-    context.update(
-        protocol_path=str(Path(args.protocol_path).resolve()),
-        output_root=requested_output_root,
-    )
+    reject_invalid_run_root(protocol, requested_output_root)
     environment_resolution = None
-    if protocol_version == "1.4.0":
-        environment_manifest = None
+    environment_manifest = None
+    if protocol_version == PROTOCOL_V15:
+        if not args.python_executable or not args.execution_environment_manifest:
+            raise FormalExecutionError(
+                "protocol v1.5 requires explicit Python and execution environment manifest"
+            )
+        if not Path(args.python_executable).is_absolute():
+            raise FormalExecutionError(
+                "protocol v1.5 forbids relative Python or .venv fallback"
+            )
+    if protocol_version in {PROTOCOL_V14, PROTOCOL_V15}:
         if args.execution_environment_manifest:
             environment_manifest = json.loads(
                 Path(args.execution_environment_manifest).read_text(encoding="utf-8-sig")
@@ -102,32 +213,78 @@ def main() -> None:
             ),
             require_clean_git_worktree=True,
         )
-        context["python_executable"] = environment_resolution.python_executable
-        context["clean_worktree_root"] = str(ROOT)
-        legacy_roots = []
-        project_roots = [
-            ROOT,
-            *[
-                Path(item)
-                for item in environment_resolution.runtime_audit.get(
-                    "forbidden_project_source_roots", []
-                )
-            ],
-        ]
-        for reference in protocol["supersession"]["invalid_g14c_v4_runs"]:
-            relative_run = Path(reference["failure_audit_path"]).parent
-            legacy_roots.extend(root / relative_run for root in project_roots)
-        requested_root_path = Path(requested_output_root)
-        for legacy_root in legacy_roots:
-            try:
-                requested_root_path.relative_to(legacy_root.resolve())
-            except ValueError:
-                continue
+        if protocol_version == PROTOCOL_V15 and environment_resolution.runtime_audit.get(
+            "resolution_source"
+        ) != "explicit_python_executable":
             raise FormalExecutionError(
-                f"legacy G14C v4 run root is permanently invalid: {legacy_root}"
+                "protocol v1.5 Python must come from explicit outer resolution"
             )
+    resolved_python = (
+        environment_resolution.python_executable
+        if environment_resolution is not None
+        else args.python_executable or sys.executable
+    )
+    context = resolved_expansion_context(
+        protocol,
+        protocol_path=args.protocol_path,
+        output_root=requested_output_root,
+        python_executable=resolved_python,
+    )
+    outer_validation = validate_command_templates(templates, context)
+    resolved_context_payload = None
+    resolved_context_report = None
+    resolved_context_file_sha256 = None
+    if protocol_version == PROTOCOL_V15:
+        if environment_resolution is None or not args.execution_environment_manifest:
+            raise FormalExecutionError("protocol v1.5 environment was not resolved")
+        context_path = Path(context["resolved_execution_context_path"])
+        if args.resume or args.finalize_phase_only:
+            resolved_context_payload, resolved_context_report = (
+                load_resolved_formal_execution_context(
+                    context_path,
+                    protocol=protocol,
+                    clean_worktree_root=ROOT,
+                    durable_run_root=requested_output_root,
+                    environment_identity=environment_resolution.environment_identity,
+                    runtime_audit=environment_resolution.runtime_audit,
+                    check_git=True,
+                )
+            )
+            if resolved_context_payload["resolved_expansion_context"] != context:
+                raise FormalExecutionError(
+                    "same-run resolved expansion context drift"
+                )
+            if resolved_context_payload["command_expansion"][
+                "outer_expansion_sha256"
+            ] != outer_validation["command_matrix_sha256"]:
+                raise FormalExecutionError(
+                    "same-run resolved command matrix drift"
+                )
+            resolved_context_file_sha256 = resolved_context_report["file_sha256"]
+        else:
+            resolved_context_payload = build_resolved_formal_execution_context(
+                protocol=protocol,
+                expansion_context=context,
+                environment_identity=environment_resolution.environment_identity,
+                runtime_audit=environment_resolution.runtime_audit,
+                environment_manifest_path=args.execution_environment_manifest,
+                outer_expansion_sha256=outer_validation["command_matrix_sha256"],
+                phase_count=outer_validation["phase_count"],
+                command_count=outer_validation["command_count"],
+            )
+            encoded_context = (
+                json.dumps(
+                    resolved_context_payload,
+                    ensure_ascii=False,
+                    indent=2,
+                    allow_nan=False,
+                )
+                + "\n"
+            ).encode("utf-8")
+            resolved_context_file_sha256 = hashlib.sha256(
+                encoded_context
+            ).hexdigest()
     if args.dry_run:
-        validation = validate_command_templates(templates, context)
         print(
             json.dumps(
                 {
@@ -136,7 +293,21 @@ def main() -> None:
                     "writes_performed": False,
                     "holdout_capability": False,
                     "phase_order": list(PHASE_ORDER),
-                    "command_expansion": validation,
+                    "command_expansion": outer_validation,
+                    "resolved_execution_context": (
+                        {
+                            "context_sha256": resolved_context_payload[
+                                "context_sha256"
+                            ],
+                            "file_sha256": resolved_context_file_sha256,
+                            "persisted": False,
+                            "outer_expansion_sha256": outer_validation[
+                                "command_matrix_sha256"
+                            ],
+                        }
+                        if resolved_context_payload is not None
+                        else None
+                    ),
                     "execution_environment": (
                         environment_resolution.runtime_audit
                         if environment_resolution is not None
@@ -149,6 +320,11 @@ def main() -> None:
             )
         )
         return
+
+    if protocol_version != PROTOCOL_V15:
+        raise FormalExecutionError(
+            "formal Protocol v1.0-v1.4 is audit-only; new execution requires v1.5"
+        )
 
     if phase == "complete_without_holdout":
         command: list[str] | list[list[str]] = []
@@ -167,11 +343,17 @@ def main() -> None:
             "protocol": protocol["hashes"]["semantic_sha256"],
             "phase": phase,
             "commands": command,
+            "resolved_execution_context_sha256": resolved_context_payload[
+                "context_sha256"
+            ],
+            "resolved_execution_context_file_sha256": (
+                resolved_context_file_sha256
+            ),
         }
     )
-    if protocol_version == "1.4.0":
-        if environment_resolution is None:
-            raise FormalExecutionError("protocol v1.4 environment was not resolved")
+    if protocol_version == PROTOCOL_V15:
+        if environment_resolution is None or resolved_context_payload is None:
+            raise FormalExecutionError("protocol v1.5 context was not resolved")
         ledger_resume_phases = {
             "train",
             "dev_select",
@@ -208,6 +390,12 @@ def main() -> None:
                 "execution_commit": environment_resolution.runtime_audit[
                     "observed_execution_commit"
                 ],
+                "resolved_execution_context_sha256": resolved_context_payload[
+                    "context_sha256"
+                ],
+                "resolved_execution_context_file_sha256": (
+                    resolved_context_file_sha256
+                ),
             }
         )
         runner_v3 = TransactionalPhaseRunner(
@@ -215,7 +403,22 @@ def main() -> None:
             run_identity_fingerprint=run_identity,
             phase_order=PHASE_ORDER,
             resume=args.resume or args.finalize_phase_only,
+            resolved_execution_context_sha256=resolved_context_payload[
+                "context_sha256"
+            ],
+            resolved_execution_context_file_sha256=(
+                resolved_context_file_sha256
+            ),
         )
+        if not (args.resume or args.finalize_phase_only):
+            persisted = atomic_create_resolved_formal_execution_context(
+                context["resolved_execution_context_path"],
+                resolved_context_payload,
+            )
+            if persisted["file_sha256"] != resolved_context_file_sha256:
+                raise FormalExecutionError(
+                    "resolved execution context artifact hash drift"
+                )
 
         cell_ledger = None
         cell_transaction_phases = {
@@ -248,7 +451,14 @@ def main() -> None:
                     protocol["identity"]["typed_runtime_contract_hashes_by_capacity"]
                 ),
                 command_matrix_sha256=canonical_sha256(
-                    protocol["execution_contract"]["command_templates"]
+                    {
+                        "command_templates": protocol["execution_contract"][
+                            "command_templates"
+                        ],
+                        "resolved_execution_context_sha256": (
+                            resolved_context_payload["context_sha256"]
+                        ),
+                    }
                 ),
             )
             cell_identity_path = Path(args.output_root) / "cell_ledger_identity.json"

@@ -35,6 +35,8 @@ FORMAL_EXECUTION_PROTOCOL_V1_3_VERSION = "1.3.0"
 FORMAL_EXECUTION_PROTOCOL_V1_3_ID = "typed_model_cache_formal_protocol_v1_3"
 FORMAL_EXECUTION_PROTOCOL_V1_4_VERSION = "1.4.0"
 FORMAL_EXECUTION_PROTOCOL_V1_4_ID = "typed_model_cache_formal_protocol_v1_4"
+FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION = "1.5.0"
+FORMAL_EXECUTION_PROTOCOL_V1_5_ID = "typed_model_cache_formal_protocol_v1_5"
 FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
 FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
 PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
@@ -44,6 +46,7 @@ READY_VERDICT = "READY_FOR_G14C_V2_CLEAN_TRAIN_AND_FORMAL"
 READY_V4_VERDICT = "READY_FOR_G14C_V3_CLEAN_TRAIN_AND_FORMAL"
 READY_V5_VERDICT = "READY_FOR_G14C_V4_CLEAN_TRAIN_AND_FORMAL"
 READY_V6_VERDICT = "READY_FOR_G14C_V5_CLEAN_TRAIN_AND_FORMAL"
+READY_V7_VERDICT = "READY_FOR_G14C_V6_CLEAN_TRAIN_AND_FORMAL"
 OLD_PROTOCOL_SEMANTIC_SHA256 = (
     "41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4"
 )
@@ -410,16 +413,30 @@ def expand_command_plan(
         "/ABSOLUTE/CLEAN_WORKTREE_ROOT": base_context.get("clean_worktree_root"),
     }
 
-    def resolve_location(value: Any) -> Any:
+    def resolve_location(value: Any, key: str | None = None) -> Any:
         if not isinstance(value, str):
             return value
         for sentinel, root in location_sentinels.items():
             if root is not None and value.startswith(sentinel):
-                return str(root) + value[len(sentinel):]
+                value = str(root) + value[len(sentinel):]
+                break
+        if (
+            base_context.get("resolve_relative_paths_against_repository_root") is True
+            and key is not None
+            and (key.endswith("_path") or key.endswith("_root"))
+            and "{" not in value
+            and not Path(value).is_absolute()
+        ):
+            repository_root = base_context.get("repository_root")
+            if not repository_root or not Path(str(repository_root)).is_absolute():
+                raise FormalExecutionError(
+                    "resolved command expansion requires an absolute repository root"
+                )
+            value = str((Path(str(repository_root)) / value).resolve())
         return value
 
     base_context = {
-        key: resolve_location(value) for key, value in base_context.items()
+        key: resolve_location(value, key) for key, value in base_context.items()
     }
     raw_contexts = spec.get("matrix_contexts", [{}])
     if not isinstance(raw_contexts, list) or not raw_contexts:
@@ -433,7 +450,7 @@ def expand_command_plan(
                 f"command template matrix context {index} must be an object"
             )
         resolved_overlay = {
-            key: resolve_location(value) for key, value in dict(overlay).items()
+            key: resolve_location(value, key) for key, value in dict(overlay).items()
         }
         context = {**base_context, **resolved_overlay}
         commands.append(expand_command_template(spec["argv"], context))
@@ -441,6 +458,8 @@ def expand_command_plan(
             rendered = expand_command_template([str(pattern)], context)[0]
             if rendered not in expected_outputs:
                 expected_outputs.append(rendered)
+        # Coordinates deliberately retain portable/scientific values; resolved
+        # host paths live only in argv/expected outputs and the full context.
         resolved_contexts.append(dict(overlay))
     return {
         "commands": commands,
@@ -485,7 +504,23 @@ def validate_command_templates(
             "timeout_seconds": int(spec.get("timeout_seconds", 0)),
             "infrastructure_retries": retries,
         }
-    return {"status": "pass", "expanded": expanded}
+    canonical_expansion = {
+        "phase_order": [
+            *[phase for phase in PHASE_ORDER if phase in expanded],
+            *sorted(set(expanded) - set(PHASE_ORDER)),
+        ],
+        "phases": expanded,
+    }
+    return {
+        "status": "pass",
+        "expanded": expanded,
+        "canonical_expansion": canonical_expansion,
+        "command_matrix_sha256": canonical_sha256(canonical_expansion),
+        "phase_count": len(expanded),
+        "command_count": sum(
+            int(item["matrix_cell_count"]) for item in expanded.values()
+        ),
+    }
 
 
 def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
@@ -496,6 +531,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V1_3_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V1_4_VERSION,
+        FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION,
     }:
         raise FormalExecutionError("unsupported formal execution protocol version")
     expected_protocol_id = {
@@ -503,6 +539,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_2_ID,
         FORMAL_EXECUTION_PROTOCOL_V1_3_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_3_ID,
         FORMAL_EXECUTION_PROTOCOL_V1_4_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_4_ID,
+        FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_5_ID,
     }[version]
     if protocol.get("protocol_id") != expected_protocol_id:
         raise FormalExecutionError("formal execution protocol ID mismatch")
@@ -566,18 +603,72 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         if ledger.get("schema_version") != FORMAL_PHASE_LEDGER_SCHEMA_VERSION:
             raise FormalExecutionError("phase ledger schema version mismatch")
     else:
-        if supersession.get("supersedes_version") != "1.3.0":
-            raise FormalExecutionError("protocol v1.4 must supersede v1.3")
-        failures = supersession.get("invalid_g14c_v4_runs", [])
+        if version == FORMAL_EXECUTION_PROTOCOL_V1_4_VERSION:
+            if supersession.get("supersedes_version") != "1.3.0":
+                raise FormalExecutionError("protocol v1.4 must supersede v1.3")
+            failures = supersession.get("invalid_g14c_v4_runs", [])
+            expected_boundaries = {
+                "typed_model_cache_formal_20260824_110016_g14c_v4": (
+                    "invalid_after_training_before_dev_performance_execution",
+                    "aaf5cfa717d543ffec5ea15dc5e4e8e7dac107dea51647cea10a9b1884118117",
+                    150,
+                    1200,
+                ),
+                "typed_model_cache_formal_20260824_235839_g14c_v4": (
+                    "invalid_before_first_frozen_subcommand",
+                    "bff76afccff2ea9485555a0bd20b33f5081e2ccaabebeff932f2ef74e8e6f42d",
+                    0,
+                    0,
+                ),
+            }
+        else:
+            if supersession.get("supersedes_version") != "1.4.0":
+                raise FormalExecutionError("protocol v1.5 must supersede v1.4")
+            if supersession.get("old_protocol_status") != (
+                "invalid_during_first_preflight_child_before_window_reachability"
+            ):
+                raise FormalExecutionError("G14C v5 invalid status is missing")
+            failures = supersession.get("invalid_execution_runs", [])
+            expected_boundaries = {
+                "typed_model_cache_formal_20260820_g14c_351fdb8_v1": (
+                    "invalid_before_execution",
+                    "fd04ee5e25737d74ae9f58d0e076d4d620eb913dd55a8aef039a61510c71a0b1",
+                    0,
+                    0,
+                ),
+                "typed_model_cache_formal_20260820_164251_g14c_v2": (
+                    "invalid_before_performance_execution",
+                    "5da5e20395e5c1e48bf2e267ce757248d024246bdc121d4d2b33ca4f8c6c594b",
+                    0,
+                    0,
+                ),
+                "typed_model_cache_formal_20260820_203430_g14c_v3": (
+                    "invalid_before_dev_performance_execution",
+                    "476cfc3f57312263da7dff388a89c088e4716d43b1949eb121598c86dc5ac3af",
+                    150,
+                    1200,
+                ),
+                "typed_model_cache_formal_20260824_110016_g14c_v4": (
+                    "invalid_after_training_before_dev_performance_execution",
+                    "aaf5cfa717d543ffec5ea15dc5e4e8e7dac107dea51647cea10a9b1884118117",
+                    150,
+                    1200,
+                ),
+                "typed_model_cache_formal_20260824_235839_g14c_v4": (
+                    "invalid_before_first_frozen_subcommand",
+                    "bff76afccff2ea9485555a0bd20b33f5081e2ccaabebeff932f2ef74e8e6f42d",
+                    0,
+                    0,
+                ),
+                "typed_model_cache_formal_20260825_111625_g14c_v5": (
+                    "invalid_during_first_preflight_child_before_window_reachability",
+                    "3c0de5bfebb5877e1b5a53f42fea1e07504f4355bd1636ad17ed38145439ff93",
+                    0,
+                    0,
+                ),
+            }
         expected_failures = {
-            (
-                "typed_model_cache_formal_20260824_110016_g14c_v4",
-                "aaf5cfa717d543ffec5ea15dc5e4e8e7dac107dea51647cea10a9b1884118117",
-            ),
-            (
-                "typed_model_cache_formal_20260824_235839_g14c_v4",
-                "bff76afccff2ea9485555a0bd20b33f5081e2ccaabebeff932f2ef74e8e6f42d",
-            ),
+            (run_id, values[1]) for run_id, values in expected_boundaries.items()
         }
         observed_failures = {
             (str(item.get("run_id")), str(item.get("failure_audit_sha256")))
@@ -585,23 +676,16 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
             if isinstance(item, Mapping)
         }
         if observed_failures != expected_failures:
-            raise FormalExecutionError("G14C v4 invalid run references are incomplete")
+            raise FormalExecutionError("invalid formal run references are incomplete")
         failures_by_run = {
             str(item["run_id"]): item for item in failures if isinstance(item, Mapping)
         }
-        expected_boundaries = {
-            "typed_model_cache_formal_20260824_110016_g14c_v4": (
-                "invalid_after_training_before_dev_performance_execution",
-                150,
-                1200,
-            ),
-            "typed_model_cache_formal_20260824_235839_g14c_v4": (
-                "invalid_before_first_frozen_subcommand",
-                0,
-                0,
-            ),
-        }
-        for run_id, (boundary, training_cells, candidates) in expected_boundaries.items():
+        for run_id, (
+            boundary,
+            _failure_hash,
+            training_cells,
+            candidates,
+        ) in expected_boundaries.items():
             reference = failures_by_run[run_id]
             if (
                 reference.get("failure_boundary") != boundary
@@ -613,7 +697,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 or reference.get("checkpoint_reuse_allowed") is not False
                 or reference.get("legacy_phase_finalize_allowed") is not False
             ):
-                raise FormalExecutionError("G14C v4 invalid boundary or reuse rule changed")
+                raise FormalExecutionError("invalid formal run boundary or reuse rule changed")
         environment = protocol.get("formal_execution_environment_contract", {})
         if environment.get("version") != "1.0.0":
             raise FormalExecutionError("formal execution environment contract is missing")
@@ -626,12 +710,17 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         ):
             raise FormalExecutionError("formal environment fingerprint is missing")
         resolver = environment.get("resolver", {})
-        if resolver.get("version") != "1.0.0" or resolver.get("priority") != [
-            "explicit_python_executable",
-            "execution_environment_manifest",
-            "current_runner_sys_executable",
-            "protocol_allowed_candidate",
-        ]:
+        expected_priority = (
+            ["explicit_python_executable"]
+            if version == FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION
+            else [
+                "explicit_python_executable",
+                "execution_environment_manifest",
+                "current_runner_sys_executable",
+                "protocol_allowed_candidate",
+            ]
+        )
+        if resolver.get("version") != "1.0.0" or resolver.get("priority") != expected_priority:
             raise FormalExecutionError("formal Python resolver priority changed")
         execution = protocol.get("execution_contract", {})
         ledger = execution.get("phase_ledger", {})
@@ -661,6 +750,38 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 raise FormalExecutionError("formal command hard-codes .venv Python")
             if phase in cell_phases and spec.get("cell_transaction") is not True:
                 raise FormalExecutionError(f"formal cell transaction missing: {phase}")
+        if version == FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION:
+            resolved = protocol.get("resolved_formal_execution_context_contract", {})
+            if (
+                resolved.get("version") != "1.0.0"
+                or resolved.get("outer_runner_is_unique_producer") is not True
+                or resolved.get("atomic_create_only") is not True
+                or resolved.get("context_in_phase_input_hash") is not True
+                or resolved.get("resume_revalidates_context_hash") is not True
+                or resolved.get("implicit_runtime_fallback_allowed") is not False
+            ):
+                raise FormalExecutionError(
+                    "resolved formal execution context contract is incomplete"
+                )
+            resume_bindings = set(resume.get("bindings", []))
+            if "resolved_execution_context_sha256" not in resume_bindings:
+                raise FormalExecutionError(
+                    "same-run resume does not bind resolved execution context"
+                )
+            required_context_consumers = {
+                "preflight",
+                "dev_select",
+                "formal_ablation",
+                "formal_support",
+                "formal_scalability",
+                "formal_statistics",
+            }
+            for phase in required_context_consumers:
+                argv = templates[phase]["argv"]
+                if "--resolved-execution-context-path" not in argv:
+                    raise FormalExecutionError(
+                        f"nested formal consumer lacks resolved context: {phase}"
+                    )
     if protocol.get("identity", {}).get("split_semantic_sha256") != SPLIT_SEMANTIC_SHA256:
         raise FormalExecutionError("split semantic hash changed")
     if tuple(protocol.get("endpoints", {}).get("primary", [])) != PRIMARY_ENDPOINTS:
@@ -828,6 +949,34 @@ def readiness_v6(checks: Mapping[str, bool]) -> str:
             f"extra={sorted(set(checks) - required)}"
         )
     return READY_V6_VERDICT if all(checks.values()) else "BLOCKED_G14R4_READINESS_V6"
+
+
+def readiness_v7(checks: Mapping[str, bool]) -> str:
+    required = {
+        "g14c_v5_failure_registered",
+        "producer_consumer_matrix_complete",
+        "resolved_context_contract_frozen",
+        "outer_nested_expansion_equal",
+        "context_negative_cases_pass",
+        "legacy_invalid_runs_hard_rejected",
+        "clean_worktree_without_local_venv",
+        "clean_import_origin",
+        "window_reachability_60_of_60",
+        "real_preflight_completed",
+        "real_tests_phase_completed",
+        "phase_and_cell_transactions_regression",
+        "portable_fairness_checkpoint_regression",
+        "full_pytest_and_smoke_pass",
+        "holdout_sealed",
+        "no_formal_training_or_performance",
+    }
+    if set(checks) != required:
+        raise FormalExecutionError(
+            "readiness v7 check set mismatch: "
+            f"missing={sorted(required - set(checks))}, "
+            f"extra={sorted(set(checks) - required)}"
+        )
+    return READY_V7_VERDICT if all(checks.values()) else "BLOCKED_G14R5_READINESS_V7"
 
 
 def protocol_hash_changes_on_mutation(
@@ -1382,6 +1531,8 @@ __all__ = [
     "FORMAL_EXECUTION_PROTOCOL_V1_3_VERSION",
     "FORMAL_EXECUTION_PROTOCOL_V1_4_ID",
     "FORMAL_EXECUTION_PROTOCOL_V1_4_VERSION",
+    "FORMAL_EXECUTION_PROTOCOL_V1_5_ID",
+    "FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION",
     "FORMAL_PHASE_LEDGER_SCHEMA_VERSION",
     "FORMAL_PHASE_RUNNER_VERSION",
     "FAILURE_CLASSIFICATIONS",
@@ -1392,6 +1543,7 @@ __all__ = [
     "READY_V4_VERDICT",
     "READY_V5_VERDICT",
     "READY_V6_VERDICT",
+    "READY_V7_VERDICT",
     "READINESS_REVIEW_VERSION",
     "build_scalability_setting_matrix",
     "build_support_setting_matrix",
@@ -1403,6 +1555,7 @@ __all__ = [
     "readiness_v4",
     "readiness_v5",
     "readiness_v6",
+    "readiness_v7",
     "reconcile_primary_endpoint_row",
     "stable_setting_identity",
     "support_setting_by_id",

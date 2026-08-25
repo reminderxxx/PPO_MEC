@@ -402,3 +402,14 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 
 残余风险：G14C v5 尚未启动，新的长正式执行仍可能暴露未覆盖的 OS/磁盘/进程级故障。当前 cell transaction
 不支持单 cell 内 checkpoint 续训；未提交 cell 只能新 attempt 从头运行。Readiness 不是性能或 paper-ready 证据。
+
+## 2026-08-25 G14C v5 preflight context failure / G14R5 resolution
+
+- `RESOLVED / nested expansion`：v1.4 outer runner 已解析绝对 Python，但 preflight child 从未覆盖的
+  `default_expansion_context` 二次展开，首条命令因缺 `python_executable` 失败。G14C v5 永久 invalid，不得恢复。
+- `RESOLVED / context divergence`：v1.5 outer runner唯一生成 resolved context `1.0.0`；nested consumers只加载并
+  hash-verify该 artifact，preflight强制 outer/nested 186-command expansion SHA相等。
+- `RESOLVED / implicit fallback`：active v1.5要求显式绝对 Python与environment manifest；cwd猜测、相对 `.venv`、
+  child `sys.executable`补位、跨 run/commit/environment/path复用均 fail-fast。
+- 残余风险：Readiness v7只验证 preflight/tests 与既有 transaction regressions；G14C v6 长训练仍可能暴露新的
+  OS/磁盘/进程级故障。该风险不授权复用任何 G14C v1–v5 invalid artifact。

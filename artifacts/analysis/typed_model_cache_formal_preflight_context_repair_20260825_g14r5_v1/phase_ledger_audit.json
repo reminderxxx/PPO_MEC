@@ -1,0 +1,13 @@
+{
+  "completed_phases": [
+    "preflight",
+    "tests"
+  ],
+  "completion_candidate_count": 2,
+  "last_record_hash": "932d5b75d35ae3708129f96650c3b4ac522c2253f2aeaaa918302e9f900da20b",
+  "record_count": 6,
+  "schema_version": "3.0.0",
+  "sha256": "ce6094de5cb5a5338e9b2b067dbc9005022b15bb3ec47a6f7b9e40daee65b452",
+  "status": "pass",
+  "terminal_phase_count": 2
+}

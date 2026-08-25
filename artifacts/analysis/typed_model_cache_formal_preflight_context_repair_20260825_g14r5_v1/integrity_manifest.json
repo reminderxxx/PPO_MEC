@@ -1,0 +1,10 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_preflight_context_repair_20260825_g14r5_v1",
+  "file_count": 18,
+  "formal": false,
+  "holdout_opened": false,
+  "inventory_sha256": "c602907ff71745c37bcaab2782b8402b2b5574d0c42d2db7403d479502bc93d0",
+  "performance_evidence": false,
+  "status": "pass",
+  "training": false
+}

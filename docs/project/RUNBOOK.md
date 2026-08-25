@@ -1067,3 +1067,27 @@ resolver 必须收到共享绝对 Python 或 environment manifest，并验证 de
 import origin。中断后只允许同一 run 使用 `--resume --resume-from-cell-ledger`；commands 已完成且存在合法
 completion candidate 时可使用 `--finalize-phase-only`，不得重跑 phase commands。旧 v4 run、ledger、marker 和
 checkpoint 一律拒绝。Readiness v6 不授权自动启动 G14C v5，holdout 仍不可访问。
+
+## G14R5 Protocol v1.5 resolved context 与 preflight/tests
+
+Protocol v1.5 active execution必须从 pushed Commit A6 的 detached clean worktree运行，并显式传递共享绝对 Python和
+environment manifest。首次 phase 不加 `--resume`；后续 phase在同一 durable run root加 `--resume`：
+
+```bash
+<shared-absolute-python> scripts/run_typed_model_cache_formal_protocol.py \
+  --protocol-path configs/experiment/typed_model_cache_formal_protocol_v1_5_20260825/protocol_v1_5_manifest.json \
+  --output-root <new-unique-durable-run-root> --preflight \
+  --python-executable <shared-absolute-python> \
+  --execution-environment-manifest configs/experiment/typed_model_cache_formal_protocol_v1_5_20260825/execution_environment_manifest.json
+
+<shared-absolute-python> scripts/run_typed_model_cache_formal_protocol.py \
+  --protocol-path configs/experiment/typed_model_cache_formal_protocol_v1_5_20260825/protocol_v1_5_manifest.json \
+  --output-root <same-run-root> --phase tests --resume \
+  --python-executable <shared-absolute-python> \
+  --execution-environment-manifest configs/experiment/typed_model_cache_formal_protocol_v1_5_20260825/execution_environment_manifest.json
+```
+
+fresh run会 create-only写入 `<run-root>/resolved_execution_context.json`。resume/finalize-only必须复验 context/file SHA、
+Git root/commit、environment/dependency、Python、paths和command matrix；不得替换或重建该文件。v1.0–v1.4只读审计，
+不能启动新 formal execution；G14C v1–v5 run root、ledger、marker、checkpoint全部硬拒绝。Readiness v7不授权自动启动
+G14C v6；holdout/hidden仍不可访问。

@@ -19,6 +19,9 @@ from src.evaluators.formal_window_consumption import (
     load_contract as load_window_consumption_contract,
     validate_reachability,
 )
+from src.runtime.resolved_formal_execution_context import (
+    load_resolved_formal_execution_context,
+)
 
 
 def main() -> None:
@@ -26,13 +29,36 @@ def main() -> None:
     parser.add_argument("--protocol-path", required=True)
     parser.add_argument("--output-path", required=True)
     parser.add_argument("--window-consumption-contract-path", required=True)
+    parser.add_argument("--resolved-execution-context-path", default="")
     args = parser.parse_args()
     protocol = json.loads(Path(args.protocol_path).read_text(encoding="utf-8-sig"))
     protocol_report = validate_protocol_v1_1(protocol)
     execution = protocol["execution_contract"]
+    context_report = None
+    if protocol["typed_model_cache_formal_protocol_version"] == "1.5.0":
+        if not args.resolved_execution_context_path:
+            raise ValueError("protocol v1.5 preflight requires resolved execution context")
+        context_payload, context_report = load_resolved_formal_execution_context(
+            args.resolved_execution_context_path,
+            protocol=protocol,
+            clean_worktree_root=ROOT,
+            durable_run_root=Path(args.resolved_execution_context_path).resolve().parent,
+            check_git=True,
+        )
+        expansion_context = context_payload["resolved_expansion_context"]
+    else:
+        expansion_context = execution["default_expansion_context"]
     command_report = validate_command_templates(
-        execution["command_templates"], execution["default_expansion_context"]
+        execution["command_templates"], expansion_context
     )
+    if context_report is not None:
+        if (
+            command_report["command_matrix_sha256"]
+            != context_report["outer_expansion_sha256"]
+        ):
+            raise ValueError("nested/outer resolved command expansion hash mismatch")
+        if int(expansion_context.get("max_mobility_rows", 0)) != 11_850_526:
+            raise ValueError("formal preflight rejects default or truncated mobility rows")
     window_contract = load_window_consumption_contract(
         args.window_consumption_contract_path
     )
@@ -48,7 +74,42 @@ def main() -> None:
         "status": "pass",
         "protocol": protocol_report,
         "command_expansion": command_report,
+        "resolved_execution_context": (
+            {
+                **context_report,
+                "outer_expansion_sha256": context_report[
+                    "outer_expansion_sha256"
+                ],
+                "nested_expansion_sha256": command_report[
+                    "command_matrix_sha256"
+                ],
+                "expansion_equal": True,
+                "resolved_python_absolute_path": context_payload[
+                    "runtime_location"
+                ]["resolved_python_absolute_path"],
+                "python_resolution_source": context_payload["runtime_location"][
+                    "python_resolution_source"
+                ],
+                "clean_import_root": context_payload["runtime_location"][
+                    "clean_worktree_root"
+                ],
+                "durable_run_root": context_payload["runtime_location"][
+                    "durable_run_root"
+                ],
+                "context_sha256": context_payload["context_sha256"],
+            }
+            if context_report is not None
+            else None
+        ),
         "window_reachability": reachability,
+        "execution_boundary": {
+            "max_mobility_rows": 11_850_526,
+            "reachable_windows": 60,
+            "train_metadata_only": True,
+            "dev_metadata_only": True,
+            "formal_metadata_only": True,
+            "holdout_metadata_only": True,
+        },
         "holdout_capability": False,
     }
     output_path = Path(args.output_path)

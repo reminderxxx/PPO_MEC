@@ -1,5 +1,15 @@
 # PPO_MEC
 
+G14R5 已修复 G14C v5 暴露的 outer/nested execution context 分叉，并冻结 Protocol v1.5 与 resolved context
+`1.0.0`。G14C v5 永久 invalid，tests/training/dev/formal/holdout 均为0且禁止resume/finalize/checkpoint reuse。
+detached Commit A6候选无本地`.venv`，使用共享绝对Python完成186-command dry-run和真实非正式
+`preflight → tests`：NGSIM完整`11,850,526` rows、60/60 frozen windows可达，outer/nested expansion hash一致，
+全仓`1038 passed`。Protocol semantic SHA-256为
+`feb7ccc489d66aeba502fbef2fef70c911ecdd66218a8ea3d475725ec61d829a`，Readiness v7为
+`READY_FOR_G14C_V6_CLEAN_TRAIN_AND_FORMAL`。该状态仅授权未来独立任务新建G14C v6 run；正式training/
+checkpoint/performance仍为0，holdout sealed/unopened，G14D/G15未启动。详见
+`docs/project/typed_model_cache_formal_resolved_execution_context_contract.md`。
+
 G14R4+ 已联合修复 G14C v4 暴露的长 phase 终结、per-cell 事务/same-run resume 与 clean-worktree
 Python 解析问题，并在未训练正式 checkpoint、未运行 formal/holdout/hidden、未启动 G14C v5/G15 的
 前提下冻结 `typed_model_cache_formal_protocol_version=1.4.0`。两个 v4 run 分别永久登记为

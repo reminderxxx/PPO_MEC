@@ -1,0 +1,65 @@
+{
+  "consumers": [
+    {
+      "consumer": "outer phase expansion",
+      "fallback": false,
+      "mode": "direct"
+    },
+    {
+      "consumer": "preflight all-template expansion",
+      "fallback": false,
+      "mode": "persisted_context"
+    },
+    {
+      "consumer": "dev selection nested evaluator",
+      "fallback": false,
+      "mode": "persisted_context_python"
+    },
+    {
+      "consumer": "formal ablation/support/scalability nested evaluator",
+      "fallback": false,
+      "mode": "persisted_context_python"
+    },
+    {
+      "consumer": "formal statistics nested analyzer",
+      "fallback": false,
+      "mode": "persisted_context_python"
+    },
+    {
+      "consumer": "checkpoint freeze",
+      "fallback": false,
+      "mode": "outer_expanded_no_nested_python"
+    },
+    {
+      "consumer": "formal cache policy/controller/gate",
+      "fallback": false,
+      "mode": "outer_expanded_or_explicit_command"
+    },
+    {
+      "consumer": "dry-run/fresh/resume/finalize-only",
+      "fallback": false,
+      "mode": "same_builder_or_hash_verified_artifact"
+    }
+  ],
+  "historical_default_context_consumers": [
+    "protocol/config generation scripts (audit-only)",
+    "v1.0-v1.4 validators and regression fixtures (audit-only)"
+  ],
+  "producer_stage": "after environment resolution and before first phase ledger append",
+  "resolved_fields": [
+    "python_executable",
+    "execution_environment_manifest",
+    "clean_worktree_root",
+    "durable_run_root",
+    "protocol_path",
+    "repository_root",
+    "data_root",
+    "checkpoint_root",
+    "protocol_artifact_root",
+    "portable_resources",
+    "environment_identity"
+  ],
+  "status": "pass",
+  "unique_producer": "scripts/run_typed_model_cache_formal_protocol.py",
+  "version": "1.0.0"
+}

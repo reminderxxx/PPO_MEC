@@ -124,6 +124,7 @@ def validate_phase_ledger_v3(
     records: Sequence[Mapping[str, Any]],
 ) -> dict[str, Any]:
     previous: str | None = None
+    context_binding: tuple[str, str] | None = None
     terminal_by_phase: dict[str, str] = {}
     candidates: dict[str, Mapping[str, Any]] = {}
     for index, raw in enumerate(records, start=1):
@@ -173,6 +174,21 @@ def validate_phase_ledger_v3(
         expected_hash = _record_hash(record)
         if record["current_record_hash"] != expected_hash:
             raise PhaseTransactionError("phase ledger v3 current hash mismatch")
+        if "resolved_execution_context_sha256" in record:
+            binding = (
+                str(record.get("resolved_execution_context_sha256") or ""),
+                str(record.get("resolved_execution_context_file_sha256") or ""),
+            )
+            if not all(binding):
+                raise PhaseTransactionError(
+                    "phase ledger resolved execution context binding is incomplete"
+                )
+            if context_binding is None:
+                context_binding = binding
+            elif binding != context_binding:
+                raise PhaseTransactionError(
+                    "phase ledger resolved execution context drift"
+                )
         previous = expected_hash
         phase = str(record["phase"])
         status = str(record["status"])
@@ -234,6 +250,9 @@ def validate_phase_ledger_v3(
         "completion_candidate_count": len(candidates),
         "terminal_phase_count": len(terminal_by_phase),
         "last_record_hash": previous,
+        "resolved_execution_context_sha256": (
+            context_binding[0] if context_binding is not None else None
+        ),
     }
 
 
@@ -256,6 +275,8 @@ class TransactionalPhaseRunner:
         resume: bool = False,
         utc_clock: Callable[[], datetime] | None = None,
         monotonic_ns: Callable[[], int] | None = None,
+        resolved_execution_context_sha256: str | None = None,
+        resolved_execution_context_file_sha256: str | None = None,
     ) -> None:
         self.output_root = Path(output_root)
         self.ledger_path = self.output_root / "phase_state.jsonl"
@@ -263,6 +284,22 @@ class TransactionalPhaseRunner:
         self.phase_order = tuple(phase_order)
         self._utc_clock = utc_clock or (lambda: datetime.now(timezone.utc))
         self._monotonic_ns = monotonic_ns or time.monotonic_ns
+        self.resolved_execution_context_sha256 = (
+            str(resolved_execution_context_sha256)
+            if resolved_execution_context_sha256
+            else None
+        )
+        self.resolved_execution_context_file_sha256 = (
+            str(resolved_execution_context_file_sha256)
+            if resolved_execution_context_file_sha256
+            else None
+        )
+        if bool(self.resolved_execution_context_sha256) != bool(
+            self.resolved_execution_context_file_sha256
+        ):
+            raise PhaseTransactionError(
+                "phase runner resolved execution context binding is incomplete"
+            )
         if resume:
             if not self.ledger_path.is_file():
                 raise PhaseTransactionError("phase resume requires an existing ledger")
@@ -368,7 +405,7 @@ class TransactionalPhaseRunner:
         **extra: Any,
     ) -> dict[str, Any]:
         command_rows = [list(command) for command in commands]
-        return {
+        record = {
             "phase": phase,
             "status": status,
             "input_hash": input_hash,
@@ -382,6 +419,18 @@ class TransactionalPhaseRunner:
             "completion_candidate_hash": completion_candidate_hash,
             **extra,
         }
+        if self.resolved_execution_context_sha256 is not None:
+            record.update(
+                {
+                    "resolved_execution_context_sha256": (
+                        self.resolved_execution_context_sha256
+                    ),
+                    "resolved_execution_context_file_sha256": (
+                        self.resolved_execution_context_file_sha256
+                    ),
+                }
+            )
+        return record
 
     def _check_order(self, phase: str) -> None:
         if phase not in self.phase_order:

@@ -29,6 +29,10 @@ from src.runtime.portable_resource_identity import (
     add_portable_resource_arguments,
     resolve_argument_resources,
 )
+from src.runtime.resolved_formal_execution_context import (
+    load_resolved_formal_execution_context,
+    resolved_python_for_nested_consumer,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -59,6 +63,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--request-replay-path", default="")
     parser.add_argument("--non-formal-rehearsal", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--resolved-execution-context-path", default="")
     add_portable_resource_arguments(parser)
     return parser
 
@@ -158,6 +163,22 @@ def main() -> None:
         )
     protocol = load_json(args.protocol_path, "protocol")
     validate_protocol_v1_1(protocol)
+    nested_python = sys.executable
+    if protocol["typed_model_cache_formal_protocol_version"] == "1.5.0":
+        if not args.resolved_execution_context_path:
+            raise FormalExecutionError(
+                "protocol v1.5 support requires resolved execution context"
+            )
+        resolved_context, _ = load_resolved_formal_execution_context(
+            args.resolved_execution_context_path,
+            protocol=protocol,
+            clean_worktree_root=ROOT,
+            durable_run_root=Path(args.resolved_execution_context_path).resolve().parent,
+            check_git=True,
+        )
+        nested_python = resolved_python_for_nested_consumer(
+            resolved_context, observed_sys_executable=sys.executable
+        )
     setting = support_setting_by_id(protocol, args.setting_id)
     runtime = resolve_model_cache_runtime(args.model_cache_runtime_config, root=ROOT)
     fairness, fairness_report = load_and_validate_manifest(
@@ -250,7 +271,7 @@ def main() -> None:
         if not args.request_replay_path:
             raise FormalExecutionError("oracle state-limit setting requires --request-replay-path")
         command = [
-            sys.executable,
+            nested_python,
             str(ROOT / "scripts/run_future_horizon_cache_oracle.py"),
             "--fairness_manifest_path", args.cache_baseline_fairness_manifest_path,
             "--request_replay_path", args.request_replay_path,
@@ -279,7 +300,7 @@ def main() -> None:
     if len(max_steps) != 1:
         raise FormalExecutionError("support fairness manifest has mixed max_steps")
     command = [
-        sys.executable,
+        nested_python,
         str(ROOT / "scripts/benchmark_main_results.py"),
         "--agents", *args.agents,
         "--seeds", *[str(seed) for seed in args.seeds],

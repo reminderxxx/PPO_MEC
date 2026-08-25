@@ -1,0 +1,11 @@
+{
+  "clean_worktree_has_local_venv": false,
+  "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+  "dirty_main_source_imported": false,
+  "editable_install_detected": false,
+  "environment_fingerprint": "bd3fccce3af2f8aca818a89b0a94a5b522a4920df5615c742ce659697c86545c",
+  "formal_execution_origin": "/private/tmp/ppo_mec_g14r5_a6_candidate_20260825_120500/src/evaluators/typed_model_cache_formal_execution.py",
+  "resolved_shared_python": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "src_origin": "/private/tmp/ppo_mec_g14r5_a6_candidate_20260825_120500/src/__init__.py",
+  "status": "pass"
+}
