@@ -39,6 +39,8 @@ FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION = "1.5.0"
 FORMAL_EXECUTION_PROTOCOL_V1_5_ID = "typed_model_cache_formal_protocol_v1_5"
 FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION = "1.6.0"
 FORMAL_EXECUTION_PROTOCOL_V1_6_ID = "typed_model_cache_formal_protocol_v1_6"
+FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION = "1.7.0"
+FORMAL_EXECUTION_PROTOCOL_V1_7_ID = "typed_model_cache_formal_protocol_v1_7"
 FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
 FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
 PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
@@ -50,6 +52,7 @@ READY_V5_VERDICT = "READY_FOR_G14C_V4_CLEAN_TRAIN_AND_FORMAL"
 READY_V6_VERDICT = "READY_FOR_G14C_V5_CLEAN_TRAIN_AND_FORMAL"
 READY_V7_VERDICT = "READY_FOR_G14C_V6_CLEAN_TRAIN_AND_FORMAL"
 READY_V8_VERDICT = "READY_FOR_G14C_V7_CLEAN_TRAIN_AND_FORMAL"
+READY_V9_VERDICT = "READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL"
 OLD_PROTOCOL_SEMANTIC_SHA256 = (
     "41fbfab4ac10bae96250d7ead816d907fd6551bb9651ae03210e801c9e2478b4"
 )
@@ -536,6 +539,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         FORMAL_EXECUTION_PROTOCOL_V1_4_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION,
+        FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
     }:
         raise FormalExecutionError("unsupported formal execution protocol version")
     expected_protocol_id = {
@@ -545,6 +549,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         FORMAL_EXECUTION_PROTOCOL_V1_4_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_4_ID,
         FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_5_ID,
         FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_6_ID,
+        FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_7_ID,
     }[version]
     if protocol.get("protocol_id") != expected_protocol_id:
         raise FormalExecutionError("formal execution protocol ID mismatch")
@@ -672,7 +677,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                     0,
                 ),
             }
-        else:
+        elif version == FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION:
             if supersession.get("supersedes_version") != "1.5.0":
                 raise FormalExecutionError("protocol v1.6 must supersede v1.5")
             if supersession.get("old_protocol_status") != (
@@ -701,6 +706,40 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 ),
                 "typed_model_cache_formal_20260825_135122_g14c_v6": (
                     "invalid_during_first_training_cell_before_episode_zero", "2cc81ffcd375323caa71c0966ffce36059c43a8da0aad5e7245078727dd0725a", 0, 0,
+                ),
+            }
+        else:
+            if supersession.get("supersedes_version") != "1.6.0":
+                raise FormalExecutionError("protocol v1.7 must supersede v1.6")
+            if supersession.get("old_protocol_status") != (
+                "invalid_after_training_before_dev_performance_execution"
+            ):
+                raise FormalExecutionError("G14C v7 invalid status is missing")
+            failures = supersession.get("invalid_execution_runs", [])
+            expected_boundaries = {
+                "typed_model_cache_formal_20260820_g14c_351fdb8_v1": (
+                    "invalid_before_execution", "fd04ee5e25737d74ae9f58d0e076d4d620eb913dd55a8aef039a61510c71a0b1", 0, 0,
+                ),
+                "typed_model_cache_formal_20260820_164251_g14c_v2": (
+                    "invalid_before_performance_execution", "5da5e20395e5c1e48bf2e267ce757248d024246bdc121d4d2b33ca4f8c6c594b", 0, 0,
+                ),
+                "typed_model_cache_formal_20260820_203430_g14c_v3": (
+                    "invalid_before_dev_performance_execution", "476cfc3f57312263da7dff388a89c088e4716d43b1949eb121598c86dc5ac3af", 150, 1200,
+                ),
+                "typed_model_cache_formal_20260824_110016_g14c_v4": (
+                    "invalid_after_training_before_dev_performance_execution", "aaf5cfa717d543ffec5ea15dc5e4e8e7dac107dea51647cea10a9b1884118117", 150, 1200,
+                ),
+                "typed_model_cache_formal_20260824_235839_g14c_v4": (
+                    "invalid_before_first_frozen_subcommand", "bff76afccff2ea9485555a0bd20b33f5081e2ccaabebeff932f2ef74e8e6f42d", 0, 0,
+                ),
+                "typed_model_cache_formal_20260825_111625_g14c_v5": (
+                    "invalid_during_first_preflight_child_before_window_reachability", "3c0de5bfebb5877e1b5a53f42fea1e07504f4355bd1636ad17ed38145439ff93", 0, 0,
+                ),
+                "typed_model_cache_formal_20260825_135122_g14c_v6": (
+                    "invalid_during_first_training_cell_before_episode_zero", "2cc81ffcd375323caa71c0966ffce36059c43a8da0aad5e7245078727dd0725a", 0, 0,
+                ),
+                "typed_model_cache_formal_20260826_233222_g14c_v7": (
+                    "invalid_after_training_before_dev_performance_execution", "7fc3685470c1f536def5c504dfbeab83b14dd070a644caefed08e690e10247ba", 150, 1200,
                 ),
             }
         expected_failures = {
@@ -751,6 +790,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
             if version in {
                 FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION,
+                FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
             }
             else [
                 "explicit_python_executable",
@@ -792,12 +832,16 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         if version in {
             FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION,
             FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION,
+            FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
         }:
             resolved = protocol.get("resolved_formal_execution_context_contract", {})
             if (
                 resolved.get("version") != (
                     "2.0.0"
-                    if version == FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION
+                    if version in {
+                        FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION,
+                        FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
+                    }
                     else "1.0.0"
                 )
                 or resolved.get("outer_runner_is_unique_producer") is not True
@@ -828,7 +872,10 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                     raise FormalExecutionError(
                         f"nested formal consumer lacks resolved context: {phase}"
                     )
-            if version == FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION:
+            if version in {
+                FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION,
+                FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
+            }:
                 scientific = protocol.get(
                     "agent_training_scientific_config_contract", {}
                 )
@@ -858,6 +905,30 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                     raise FormalExecutionError(
                         "Protocol v1.6 train command retains legacy companion"
                     )
+                if version == FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION:
+                    from src.runtime.formal_agent_order import (
+                        FormalAgentOrderError,
+                        resolve_formal_agent_order,
+                    )
+
+                    try:
+                        order_audit = resolve_formal_agent_order(protocol=protocol)
+                    except FormalAgentOrderError as exc:
+                        raise FormalExecutionError(str(exc)) from exc
+                    if protocol.get("identity", {}).get(
+                        "formal_agent_order_contract_semantic_sha256"
+                    ) != order_audit["semantic_sha256"]:
+                        raise FormalExecutionError("Protocol identity/order contract hash mismatch")
+                    for phase in (
+                        "dev_select",
+                        "formal_cache_policy",
+                        "formal_controller",
+                        "formal_statistics",
+                    ):
+                        if "--formal-agent-order-contract-path" not in templates[phase]["argv"]:
+                            raise FormalExecutionError(
+                                f"Protocol v1.7 {phase} lacks formal agent order contract"
+                            )
     if protocol.get("identity", {}).get("split_semantic_sha256") != SPLIT_SEMANTIC_SHA256:
         raise FormalExecutionError("split semantic hash changed")
     if tuple(protocol.get("endpoints", {}).get("primary", [])) != PRIMARY_ENDPOINTS:
@@ -1084,6 +1155,41 @@ def readiness_v8(checks: Mapping[str, bool]) -> str:
             f"extra={sorted(set(checks) - required)}"
         )
     return READY_V8_VERDICT if all(checks.values()) else "BLOCKED_G14R6_READINESS_V8"
+
+
+def readiness_v9(checks: Mapping[str, bool]) -> str:
+    required = {
+        "g14c_v7_failure_registered",
+        "formal_agent_order_contract_frozen",
+        "producer_consumer_matrix_complete",
+        "scientific_config_hash_unchanged",
+        "protocol_fairness_command_order_reconciled",
+        "training_commands_150_order_audited",
+        "all_dev_commands_order_audited",
+        "formal_support_scalability_order_audited",
+        "full_15_agent_nonformal_rehearsal",
+        "checkpoint_selection_freeze_order_stable",
+        "statistics_order_invariant",
+        "negative_validation_complete",
+        "binding_context_order_hash_bound",
+        "outer_nested_expansion_equal",
+        "clean_worktree_without_local_venv",
+        "clean_import_origin",
+        "window_reachability_60_of_60",
+        "real_preflight_completed",
+        "real_tests_phase_completed",
+        "phase_cell_resume_finalize_regression",
+        "full_pytest_and_smoke_pass",
+        "holdout_sealed",
+        "no_formal_training_checkpoint_or_performance",
+    }
+    if set(checks) != required:
+        raise FormalExecutionError(
+            "readiness v9 check set mismatch: "
+            f"missing={sorted(required - set(checks))}, "
+            f"extra={sorted(set(checks) - required)}"
+        )
+    return READY_V9_VERDICT if all(checks.values()) else "BLOCKED_G14R7_READINESS_V9"
 
 
 def protocol_hash_changes_on_mutation(
@@ -1642,6 +1748,8 @@ __all__ = [
     "FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION",
     "FORMAL_EXECUTION_PROTOCOL_V1_6_ID",
     "FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION",
+    "FORMAL_EXECUTION_PROTOCOL_V1_7_ID",
+    "FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION",
     "FORMAL_PHASE_LEDGER_SCHEMA_VERSION",
     "FORMAL_PHASE_RUNNER_VERSION",
     "FAILURE_CLASSIFICATIONS",
@@ -1654,6 +1762,7 @@ __all__ = [
     "READY_V6_VERDICT",
     "READY_V7_VERDICT",
     "READY_V8_VERDICT",
+    "READY_V9_VERDICT",
     "READINESS_REVIEW_VERSION",
     "build_scalability_setting_matrix",
     "build_support_setting_matrix",
@@ -1667,6 +1776,7 @@ __all__ = [
     "readiness_v6",
     "readiness_v7",
     "readiness_v8",
+    "readiness_v9",
     "reconcile_primary_endpoint_row",
     "stable_setting_identity",
     "support_setting_by_id",

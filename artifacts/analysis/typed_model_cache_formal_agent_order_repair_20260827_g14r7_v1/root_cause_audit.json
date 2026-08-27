@@ -1,0 +1,17 @@
+{
+  "correct_authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+  "failure_audit_sha256": "7fc3685470c1f536def5c504dfbeab83b14dd070a644caefed08e690e10247ba",
+  "failure_boundary": "invalid_after_training_before_dev_performance_execution",
+  "failure_integrity_sha256": "ab38f022aa14f51079d74799d73bf88a2382e9809f04a3ba0b22285826e466a2",
+  "performance_observed": false,
+  "root_cause": "dev selector used list(protocol['training_budget']['agent_configs']); sorted-key JSON mapping insertion order became execution identity",
+  "status": "confirmed",
+  "training_cells_candidates_dev_selected_frozen_formal": [
+    150,
+    1200,
+    0,
+    0,
+    0,
+    0
+  ]
+}

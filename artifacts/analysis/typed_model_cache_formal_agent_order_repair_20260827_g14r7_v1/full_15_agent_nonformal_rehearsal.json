@@ -1,0 +1,33 @@
+{
+  "dev_nested_benchmark_count": 1,
+  "execution_commit": "9ff38537143923a58164083e4bda5a9eee7d0eab",
+  "formal": false,
+  "formal_agent_order_contract_semantic_sha256": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0",
+  "frozen_checkpoint_count": 10,
+  "holdout_opened": false,
+  "observed_agent_order": [
+    "reactive_lru",
+    "reactive_fifo",
+    "reactive_lfu",
+    "reactive_aging_lfu",
+    "reactive_random",
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "performance_evidence": false,
+  "raw_row_count": 15,
+  "rows_path": "/private/tmp/ppo_mec_g14r7_acceptance/nonformal_rehearsal/dev/dev_benchmarks/tiny_288mb/update_0004/main_results_mixed_informative_20260827_165834_275533/benchmark_rows.csv",
+  "rows_sha256": "5d078f3b7b168ea8fe0ccde543f9d3059c1db53e81906f5efcaa7dc05e76ba9b",
+  "selection_count": 10,
+  "status": "pass",
+  "tiny_checkpoint_count": 10,
+  "training_agent_count": 10
+}

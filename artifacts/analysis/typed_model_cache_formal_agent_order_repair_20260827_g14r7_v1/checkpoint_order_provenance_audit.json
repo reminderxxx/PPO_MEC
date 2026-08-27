@@ -1,0 +1,35 @@
+{
+  "execution_binding_full_sha256": "af72b92dbc41c1e860827914cb0946228a6aa021d00683fca3c4c6ae69b7664f",
+  "formal": false,
+  "frozen_agent_order": [
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "frozen_checkpoint_count": 10,
+  "g14c_v7_reference_count": 0,
+  "order_contract_semantic_sha256": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0",
+  "performance_evidence": false,
+  "resolved_context_sha256": "3becb0b32e170cf85eeb1dbab9fc3ed2c3c294679ca0dc5b8bc87d0e8e0f371f",
+  "selected_agent_order": [
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "selection_count": 10,
+  "status": "pass"
+}

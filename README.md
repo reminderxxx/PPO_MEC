@@ -1,5 +1,17 @@
 # PPO_MEC
 
+G14R7 已冻结 Formal Agent Order Contract `1.0.0` 与 Protocol `1.7.0`。唯一主序列为 5 个
+reactive（LRU/FIFO/LFU/Aging-LFU/Random）后接 10 个 learned（SA-GHMAPPO、PPO、MAPPO、DQN、
+Dueling DQN、QMIX、Controller MAT、DAG Offload DRL、Cache Offload DRL、DT Handoff DRL）；JSON
+mapping 插入顺序与 alphabetical sort 均不再构成身份。Order contract semantic SHA-256 为
+`82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0`，Protocol semantic SHA-256 为
+`5a1c2070529674ecf65c8b836706849f0937853a59b6dfbc3b987d88ac4f50a5`。G14C v7 永久 invalid 于
+150/150 training、1,200 candidates完成后且dev performance前，旧 checkpoint/candidate/ledger均禁止复用。
+clean detached验收完成150-command、60/60真实preflight、15-agent non-formal dev/freeze/statistics链路与
+全量tests，Readiness v9=`READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL`；它只授权未来独立G14C v8，
+不代表formal或paper-ready。本轮正式training/checkpoint/performance均为0，holdout sealed/unopened，未启动
+G14C v8/G14D/G15。详见`docs/project/formal_agent_order_contract.md`。
+
 G14R6 已将 formal learned-agent 超参数的科学身份与每次执行的 Protocol/commit/runtime 绑定拆分，冻结
 scientific config `2.0.0`、execution binding `1.0.0`、resolved context `2.0.0` 与 Protocol `1.6.0`。
 scientific config semantic SHA-256 为 `f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8`，

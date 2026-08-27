@@ -55,6 +55,7 @@ from src.runtime.resolved_formal_execution_context import (
 PROTOCOL_V14 = "1.4.0"
 PROTOCOL_V15 = "1.5.0"
 PROTOCOL_V16 = "1.6.0"
+PROTOCOL_V17 = "1.7.0"
 
 
 def _absolute_project_path(value: str) -> str:
@@ -118,6 +119,7 @@ def resolved_expansion_context(
         "resource_registry_path",
         "agent_config_path",
         "agent_scientific_config_path",
+        "formal_agent_order_contract_path",
         "dev_window_plan_path",
         "formal_window_plan_path",
         "train_window_plan_path",
@@ -163,7 +165,7 @@ def reject_invalid_run_root(protocol: dict, output_root: str | Path) -> None:
     supersession = protocol.get("supersession", {})
     references = (
         supersession.get("invalid_execution_runs", [])
-        if version in {PROTOCOL_V15, PROTOCOL_V16}
+        if version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17}
         else supersession.get("invalid_g14c_v4_runs", [])
         if version == PROTOCOL_V14
         else []
@@ -197,7 +199,7 @@ def main() -> None:
     reject_invalid_run_root(protocol, requested_output_root)
     environment_resolution = None
     environment_manifest = None
-    if protocol_version in {PROTOCOL_V15, PROTOCOL_V16}:
+    if protocol_version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17}:
         if not args.python_executable or not args.execution_environment_manifest:
             raise FormalExecutionError(
                 "active formal protocol requires explicit Python and execution environment manifest"
@@ -206,7 +208,7 @@ def main() -> None:
             raise FormalExecutionError(
                 "active formal protocol forbids relative Python or .venv fallback"
             )
-    if protocol_version in {PROTOCOL_V14, PROTOCOL_V15, PROTOCOL_V16}:
+    if protocol_version in {PROTOCOL_V14, PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17}:
         if args.execution_environment_manifest:
             environment_manifest = json.loads(
                 Path(args.execution_environment_manifest).read_text(encoding="utf-8-sig")
@@ -225,7 +227,7 @@ def main() -> None:
             ),
             require_clean_git_worktree=True,
         )
-        if protocol_version in {PROTOCOL_V15, PROTOCOL_V16} and environment_resolution.runtime_audit.get(
+        if protocol_version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17} and environment_resolution.runtime_audit.get(
             "resolution_source"
         ) != "explicit_python_executable":
             raise FormalExecutionError(
@@ -245,7 +247,7 @@ def main() -> None:
     outer_validation = validate_command_templates(templates, context)
     scientific_config = None
     execution_binding = None
-    if protocol_version == PROTOCOL_V16:
+    if protocol_version in {PROTOCOL_V16, PROTOCOL_V17}:
         if environment_resolution is None:
             raise FormalExecutionError("Protocol v1.6 environment was not resolved")
         scientific_config = load_strict_json_mapping(
@@ -278,7 +280,7 @@ def main() -> None:
     resolved_context_payload = None
     resolved_context_report = None
     resolved_context_file_sha256 = None
-    if protocol_version in {PROTOCOL_V15, PROTOCOL_V16}:
+    if protocol_version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17}:
         if environment_resolution is None or not args.execution_environment_manifest:
             raise FormalExecutionError("protocol v1.5 environment was not resolved")
         context_path = Path(context["resolved_execution_context_path"])
@@ -376,9 +378,9 @@ def main() -> None:
         )
         return
 
-    if protocol_version != PROTOCOL_V16:
+    if protocol_version != PROTOCOL_V17:
         raise FormalExecutionError(
-            "formal Protocol v1.0-v1.5 is audit-only; new execution requires v1.6"
+            "formal Protocol v1.0-v1.6 is audit-only; new execution requires v1.7"
         )
 
     if phase == "complete_without_holdout":
@@ -409,7 +411,7 @@ def main() -> None:
             ],
         }
     )
-    if protocol_version == PROTOCOL_V16:
+    if protocol_version == PROTOCOL_V17:
         if environment_resolution is None or resolved_context_payload is None:
             raise FormalExecutionError("protocol v1.5 context was not resolved")
         ledger_resume_phases = {

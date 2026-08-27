@@ -4,6 +4,9 @@
 
 ## Live 文档
 
+- `formal_agent_order_contract.md`：G14R7 order contract 1.0、Protocol v1.7、15-agent序列、consumer
+  fail-fast、G14C v7永久拒绝、clean non-formal验收与Readiness v9边界
+
 - `typed_model_cache_formal_training_identity_contract.md`：G14R6 scientific config 2.0、runtime execution
   binding 1.0、resolved context 2.0、checkpoint/downstream provenance 与 Readiness v8
 

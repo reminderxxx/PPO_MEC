@@ -1,5 +1,41 @@
 # Runbook
 
+## G14R7 formal agent order（只验证，不启动 G14C v8）
+
+active config位于`configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827/`；唯一顺序合同是
+`formal_agent_order_contract.json`。重新生成冻结Protocol骨架：
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python \
+  scripts/repair_typed_model_cache_formal_agent_order.py \
+  --python-executable .venv/bin/python
+```
+
+专项及全仓验证：
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q \
+  tests/test_formal_agent_order_v17.py
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python scripts/smoke_test.py
+```
+
+clean acceptance必须在detached Git-clean worktree执行，候选树内不得有`.venv`，但可显式传共享Python；
+验收器只运行Protocol dry-run/preflight/tests与受控non-formal tiny链路：
+
+```bash
+/absolute/shared/.venv/bin/python \
+  scripts/run_typed_model_cache_formal_agent_order_acceptance.py \
+  --clean-worktree-root /absolute/detached/candidate \
+  --python-executable /absolute/shared/.venv/bin/python \
+  --data-root /absolute/PPO_MEC/data \
+  --output-root /tmp/ppo_mec_g14r7_acceptance \
+  --summary-path /absolute/PPO_MEC/artifacts/analysis/typed_model_cache_formal_agent_order_repair_20260827_g14r7_v1/clean_acceptance_summary.json
+```
+
+该入口不得改为formal mode，不得复用G14C v7的任何路径。Protocol v1.0–v1.6只允许历史审计；Readiness v9
+只授权未来独立G14C v8任务，本节不提供G14C v8/formal/holdout启动命令。
+
 ## G14R6 training identity repair（只生成/验证，不启动 G14C v7）
 
 active config位于`configs/experiment/typed_model_cache_formal_protocol_v1_6_20260825/`。生成/刷新

@@ -1,0 +1,161 @@
+{
+  "agent_training_scientific_config_contract_version": "2.0.0",
+  "agents": {
+    "cache_offload_drl": {
+      "agent_identity": "cache_offload_drl",
+      "field_applicability": {
+        "auxiliary_coef": "not_applicable",
+        "entropy_coef": "applicable",
+        "learning_rate": "applicable",
+        "value_coef": "applicable"
+      },
+      "hyperparameters": {
+        "entropy_coef": 0.01,
+        "learning_rate": 0.0003,
+        "value_coef": 0.5
+      }
+    },
+    "controller_mat": {
+      "agent_identity": "controller_mat",
+      "field_applicability": {
+        "auxiliary_coef": "not_applicable",
+        "entropy_coef": "applicable",
+        "learning_rate": "applicable",
+        "value_coef": "applicable"
+      },
+      "hyperparameters": {
+        "entropy_coef": 0.01,
+        "learning_rate": 0.0003,
+        "value_coef": 0.5
+      }
+    },
+    "dag_offload_drl": {
+      "agent_identity": "dag_offload_drl",
+      "field_applicability": {
+        "auxiliary_coef": "not_applicable",
+        "entropy_coef": "applicable",
+        "learning_rate": "applicable",
+        "value_coef": "applicable"
+      },
+      "hyperparameters": {
+        "entropy_coef": 0.01,
+        "learning_rate": 0.0003,
+        "value_coef": 0.5
+      }
+    },
+    "dqn": {
+      "agent_identity": "dqn",
+      "field_applicability": {
+        "auxiliary_coef": "not_applicable",
+        "entropy_coef": "not_applicable",
+        "learning_rate": "applicable",
+        "value_coef": "not_applicable"
+      },
+      "hyperparameters": {
+        "learning_rate": 0.0003
+      }
+    },
+    "dt_handoff_drl": {
+      "agent_identity": "dt_handoff_drl",
+      "field_applicability": {
+        "auxiliary_coef": "not_applicable",
+        "entropy_coef": "applicable",
+        "learning_rate": "applicable",
+        "value_coef": "applicable"
+      },
+      "hyperparameters": {
+        "entropy_coef": 0.01,
+        "learning_rate": 0.0003,
+        "value_coef": 0.5
+      }
+    },
+    "dueling_dqn": {
+      "agent_identity": "dueling_dqn",
+      "field_applicability": {
+        "auxiliary_coef": "not_applicable",
+        "entropy_coef": "not_applicable",
+        "learning_rate": "applicable",
+        "value_coef": "not_applicable"
+      },
+      "hyperparameters": {
+        "learning_rate": 0.0003
+      }
+    },
+    "mappo": {
+      "agent_identity": "mappo",
+      "field_applicability": {
+        "auxiliary_coef": "not_applicable",
+        "entropy_coef": "applicable",
+        "learning_rate": "applicable",
+        "value_coef": "applicable"
+      },
+      "hyperparameters": {
+        "entropy_coef": 0.015,
+        "learning_rate": 0.0002,
+        "value_coef": 0.65
+      }
+    },
+    "ppo": {
+      "agent_identity": "ppo",
+      "field_applicability": {
+        "auxiliary_coef": "not_applicable",
+        "entropy_coef": "applicable",
+        "learning_rate": "applicable",
+        "value_coef": "applicable"
+      },
+      "hyperparameters": {
+        "entropy_coef": 0.01,
+        "learning_rate": 0.0003,
+        "value_coef": 0.5
+      }
+    },
+    "qmix": {
+      "agent_identity": "qmix",
+      "field_applicability": {
+        "auxiliary_coef": "not_applicable",
+        "entropy_coef": "not_applicable",
+        "learning_rate": "applicable",
+        "value_coef": "not_applicable"
+      },
+      "hyperparameters": {
+        "learning_rate": 0.0003
+      }
+    },
+    "sa_ghmappo": {
+      "agent_identity": "sa_ghmappo",
+      "field_applicability": {
+        "auxiliary_coef": "applicable",
+        "entropy_coef": "applicable",
+        "learning_rate": "applicable",
+        "value_coef": "applicable"
+      },
+      "hyperparameters": {
+        "auxiliary_coef": 0.06,
+        "entropy_coef": 0.004,
+        "learning_rate": 0.0001,
+        "value_coef": 0.7
+      }
+    }
+  },
+  "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity and duplicate/unknown fields rejected",
+  "config_semantic_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+  "learned_agent_order": [
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "not_applicable_semantics": "field absent from hyperparameters and marked not_applicable; null/default inference forbidden",
+  "scientific_fields": [
+    "learning_rate",
+    "entropy_coef",
+    "value_coef",
+    "auxiliary_coef"
+  ]
+}

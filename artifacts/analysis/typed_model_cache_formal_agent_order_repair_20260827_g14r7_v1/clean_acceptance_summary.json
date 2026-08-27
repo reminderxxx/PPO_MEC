@@ -1,0 +1,248 @@
+{
+  "clean_worktree_has_local_venv": false,
+  "clean_worktree_root": "/private/tmp/ppo_mec_g14r7_candidate.1sPn3X",
+  "clean_worktree_status_end": "clean",
+  "command_audit": {
+    "agent_command_phases": {
+      "formal_ablation": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 2
+      },
+      "formal_cache_policy": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 3
+      },
+      "formal_controller": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 3
+      },
+      "formal_scalability": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 3
+      },
+      "formal_support": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 11
+      },
+      "prediction_boundary": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 6
+      },
+      "robustness": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 1
+      }
+    },
+    "nested_expansion_sha256": "04ff3b7d93c95d62cb479f8650fb13e879b302a1bfd3b9462c5b9edbe9e3b0f9",
+    "outer_expansion_sha256": "04ff3b7d93c95d62cb479f8650fb13e879b302a1bfd3b9462c5b9edbe9e3b0f9",
+    "outer_nested_equal": true,
+    "status": "pass",
+    "total_command_count": 186,
+    "training_agent_order": [
+      "sa_ghmappo",
+      "ppo",
+      "mappo",
+      "dqn",
+      "dueling_dqn",
+      "qmix",
+      "controller_mat",
+      "dag_offload_drl",
+      "cache_offload_drl",
+      "dt_handoff_drl"
+    ],
+    "training_command_count": 150,
+    "unique_training_command_count": 150
+  },
+  "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+  "environment_fingerprint": "55c84dfd45ba8177548adeb1c46ddf45d28a9d1decefcb527b2f68e3c7d25a98",
+  "execution_binding_full_sha256": "af72b92dbc41c1e860827914cb0946228a6aa021d00683fca3c4c6ae69b7664f",
+  "execution_commit": "9ff38537143923a58164083e4bda5a9eee7d0eab",
+  "formal": false,
+  "formal_agent_order_contract_semantic_sha256": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0",
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "holdout_opened": false,
+  "ledger_regression": {
+    "phase_ledger_sha256": "b2e3cb918ca65048205e462e725de4632e7ede6be9205f421caccc60f0450745",
+    "preflight_and_tests_terminal": true,
+    "resume_finalize_regression_covered_by_tests_phase": true,
+    "status": "pass"
+  },
+  "nonformal_dev_rehearsal": {
+    "dev_nested_benchmark_count": 1,
+    "formal": false,
+    "frozen_checkpoint_count": 10,
+    "observed_agent_order": [
+      "reactive_lru",
+      "reactive_fifo",
+      "reactive_lfu",
+      "reactive_aging_lfu",
+      "reactive_random",
+      "sa_ghmappo",
+      "ppo",
+      "mappo",
+      "dqn",
+      "dueling_dqn",
+      "qmix",
+      "controller_mat",
+      "dag_offload_drl",
+      "cache_offload_drl",
+      "dt_handoff_drl"
+    ],
+    "performance_evidence": false,
+    "raw_row_count": 15,
+    "rows_path": "/private/tmp/ppo_mec_g14r7_acceptance/nonformal_rehearsal/dev/dev_benchmarks/tiny_288mb/update_0004/main_results_mixed_informative_20260827_165834_275533/benchmark_rows.csv",
+    "rows_sha256": "5d078f3b7b168ea8fe0ccde543f9d3059c1db53e81906f5efcaa7dc05e76ba9b",
+    "selection_count": 10,
+    "status": "pass",
+    "tiny_checkpoint_count": 10,
+    "training_agent_count": 10
+  },
+  "performance_evidence": false,
+  "preflight": {
+    "errors": 0,
+    "failures": 0,
+    "provider_frame_count": 73871,
+    "raw_rows": 11850526,
+    "reachable_count": 60,
+    "skipped": 0,
+    "split_reachable_counts": {
+      "dev": 12,
+      "formal": 12,
+      "sealed_holdout": 12,
+      "train": 24
+    },
+    "status": "pass",
+    "tests": 1077,
+    "window_count": 60
+  },
+  "protocol_semantic_sha256": "5a1c2070529674ecf65c8b836706849f0937853a59b6dfbc3b987d88ac4f50a5",
+  "resolved_context_sha256": "3becb0b32e170cf85eeb1dbab9fc3ed2c3c294679ca0dc5b8bc87d0e8e0f371f",
+  "scientific_config_semantic_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+  "statistics_order_invariance": {
+    "comparison_row_count": 14,
+    "reordered_input_equal": true,
+    "status": "pass"
+  },
+  "status": "pass"
+}

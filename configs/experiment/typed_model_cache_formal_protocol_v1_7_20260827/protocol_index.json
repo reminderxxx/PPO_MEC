@@ -1,0 +1,45 @@
+{
+  "agent_scientific_config": "configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827/agent_training_scientific_config.json",
+  "agent_scientific_config_semantic_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+  "dev_fairness_manifests": {
+    "constrained_288mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_constrained_288mb.json",
+    "medium_576mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_medium_576mb.json",
+    "relaxed_864mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_relaxed_864mb.json"
+  },
+  "execution_environment_manifest": "configs/experiment/typed_model_cache_formal_protocol_v1_6_20260825/execution_environment_manifest.json",
+  "fairness_manifests": {
+    "constrained_288mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+    "medium_576mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+    "relaxed_864mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json"
+  },
+  "fairness_portable_identity_companion": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/fairness_portable_identity_companion.json",
+  "formal_agent_order_contract": "configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827/formal_agent_order_contract.json",
+  "formal_agent_order_contract_semantic_sha256": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0",
+  "formal_agent_order_contract_version": "1.0.0",
+  "formal_training_execution_binding_version": "1.0.0",
+  "portable_resource_registry": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/portable_resource_registry.json",
+  "protocol_index_version": "1.7.0",
+  "protocol_manifest": "configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827/protocol_v1_7_manifest.json",
+  "protocol_semantic_sha256": "5a1c2070529674ecf65c8b836706849f0937853a59b6dfbc3b987d88ac4f50a5",
+  "resolved_execution_context_contract_version": "2.0.0",
+  "runtime_configs": {
+    "constrained_288mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+    "medium_576mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+    "relaxed_864mb": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml"
+  },
+  "split_companion": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/split_companion.json",
+  "status": "PENDING_G14R7_VALIDATION",
+  "support_fairness_manifests": {
+    "ablation-8aa367acf3bdf7a9": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-8aa367acf3bdf7a9.json",
+    "ablation-f09814754dc92882": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-f09814754dc92882.json",
+    "prediction_boundary-5faa585ad5330f05": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-5faa585ad5330f05.json",
+    "prediction_boundary-95fb72521455c776": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-95fb72521455c776.json",
+    "prediction_boundary-a3a5789695404fae": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-a3a5789695404fae.json",
+    "prediction_boundary-ce96dbd5ea956212": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-ce96dbd5ea956212.json",
+    "prediction_boundary-df3bc5ade8c57014": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-df3bc5ade8c57014.json",
+    "prediction_boundary-efa09ee2409d3d87": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-efa09ee2409d3d87.json",
+    "sensitivity-27d16b068076937b": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-27d16b068076937b.json",
+    "sensitivity-7c7c3a1659c6e221": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-7c7c3a1659c6e221.json"
+  },
+  "window_consumption_contract": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/formal_window_consumption_contract.json"
+}

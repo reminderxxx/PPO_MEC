@@ -1,5 +1,26 @@
 ﻿# Progress
 
+## 2026-08-27: G14R7 unified formal agent-order repair完成
+
+- G14C v7 `typed_model_cache_formal_20260826_233222_g14c_v7` 永久登记为
+  `invalid_after_training_before_dev_performance_execution`：150/150 training、1,200 candidates已写入，dev
+  rows/selected/frozen/formal=`0/0/0/0`；旧checkpoint、candidate、partial dev input、ledger与marker均禁止
+  resume/finalize/salvage/reuse。
+- 根因为dev selector读取`training_budget.agent_configs`的JSON mapping插入顺序，而fairness使用预冻结
+  learned序列。新增Formal Agent Order Contract `1.0.0`和唯一resolver，逐元素绑定reactive、learned、
+  15-agent main、report-only、checkpoint、row display与pairwise/statistics身份；相同集合不同顺序fail-fast。
+- Order semantic SHA-256=`82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0`；
+  Protocol v1.7 semantic SHA-256=`5a1c2070529674ecf65c8b836706849f0937853a59b6dfbc3b987d88ac4f50a5`。
+  Scientific Config `2.0.0` hash保持`f83587cd...9bc8`，dependency fingerprint保持`88963f61...2d00`。
+- clean detached候选无`.venv`，完成186-command dry-run、150/150 training order、24个dev nested command/
+  1,200 candidates审计、完整NGSIM 11,850,526 rows/73,871 frames/60-of-60 preflight、1077项clean tests、
+  实际10-agent tiny checkpoint→dev selector→15-row nested benchmark→10/10 freeze及14-comparison重排不变性。
+- 主工作区全仓`1081 passed`，smoke/compile/import/diff-check通过。Readiness v9=
+  `READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL`；正式training/checkpoint/performance仍为0，holdout
+  sealed/unopened，未启动G14C v8/G14D/G15，无性能或paper-ready结论。
+- 合同：`docs/project/formal_agent_order_contract.md`；机器证据：
+  `artifacts/analysis/typed_model_cache_formal_agent_order_repair_20260827_g14r7_v1/`。
+
 ## 2026-08-25: G14R6 scientific config / execution binding repair
 
 - G14C v6 `typed_model_cache_formal_20260825_135122_g14c_v6` 因 v1.3 legacy companion 的

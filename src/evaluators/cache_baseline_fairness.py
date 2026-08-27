@@ -28,18 +28,18 @@ from src.runtime.typed_model_cache_runtime import (
     resolve_model_cache_runtime,
 )
 from src.runtime.portable_resource_identity import scientific_identity_fingerprint
+from src.runtime.formal_agent_order import (
+    FormalAgentOrderError,
+    load_formal_agent_order_contract,
+    resolve_formal_agent_order,
+)
 
 
 MANIFEST_VERSION = "1.0.0"
 PRODUCER_VERSION = "g07_v1"
 SEED_DERIVATION_VERSION = "benchmark_seed_identity_v1"
-BASELINE_NAMES = (
-    "reactive_lru",
-    "reactive_fifo",
-    "reactive_lfu",
-    "reactive_aging_lfu",
-    "reactive_random",
-)
+_FORMAL_AGENT_ORDER = load_formal_agent_order_contract()
+BASELINE_NAMES = tuple(_FORMAL_AGENT_ORDER["reactive_agent_order"])
 POLICY_BY_BASELINE = {
     "reactive_lru": "lru",
     "reactive_fifo": "fifo",
@@ -1142,6 +1142,15 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
                     continue
                 if spec.get("support_level") != "trainable":
                     errors.append(f"typed controller agent is not trainable: {agent_name}")
+            if len(controller_agents) == 10:
+                try:
+                    resolve_formal_agent_order(
+                        contract=_FORMAL_AGENT_ORDER,
+                        fairness_manifests=[manifest],
+                        reactive_baseline_order=BASELINE_NAMES,
+                    )
+                except FormalAgentOrderError as exc:
+                    errors.append(str(exc))
         if check_files:
             catalog_file = resolved_inputs.get("ppo_mec_sample_adapter_catalog")
             if catalog_file is None:
@@ -1194,8 +1203,8 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
     names = [entry.get("agent_identity", {}).get("name") for entry in matrix]
     if len(names) != len(set(names)):
         errors.append("baseline matrix contains duplicate agents")
-    if set(names) != set(BASELINE_NAMES) or len(names) != 5:
-        errors.append(f"baseline matrix must contain exactly {list(BASELINE_NAMES)}")
+    if names != list(BASELINE_NAMES):
+        errors.append(f"baseline matrix must exactly match order {list(BASELINE_NAMES)}")
     for entry in matrix:
         name = entry.get("agent_identity", {}).get("name")
         if name not in POLICY_BY_BASELINE:
@@ -1217,7 +1226,7 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
             config_path = root / str(entry.get("config", {}).get("path", ""))
             if not config_path.is_file() or sha256_file(config_path) != entry.get("config", {}).get("sha256"):
                 errors.append(f"config content hash mismatch for {name}")
-    pairwise = build_pairwise_protocol_diff(manifest) if len(matrix) == 5 and set(names) == set(BASELINE_NAMES) else {"comparison_count": 0, "status": "fail", "comparisons": []}
+    pairwise = build_pairwise_protocol_diff(manifest) if names == list(BASELINE_NAMES) else {"comparison_count": 0, "status": "fail", "comparisons": []}
     if pairwise.get("comparison_count") != 10 or pairwise.get("status") != "pass":
         errors.append("pairwise protocol symmetry failed")
     checked.append("five_baselines_binding_and_10_pairwise_diffs")

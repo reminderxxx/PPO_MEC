@@ -16,6 +16,11 @@ if str(ROOT) not in sys.path:
 from src.evaluators.typed_model_cache_formal_execution import validate_protocol_v1_1
 from src.evaluators.typed_model_cache_formal_protocol import canonical_sha256, sha256_file
 from src.runtime.portable_resource_identity import add_portable_resource_arguments
+from src.runtime.formal_agent_order import (
+    FormalAgentOrderError,
+    reject_permanently_invalid_run_references,
+    resolve_formal_agent_order,
+)
 
 
 INVALID_G14C_V3_RUN_ROOT = Path(
@@ -56,12 +61,18 @@ INVALID_G14C_V6_RUN_ROOT = (
     / "artifacts/experiments/typed_model_cache_formal"
     / "typed_model_cache_formal_20260825_135122_g14c_v6"
 ).resolve()
+INVALID_G14C_V7_RUN_ROOT = (
+    ROOT
+    / "artifacts/experiments/typed_model_cache_formal"
+    / "typed_model_cache_formal_20260826_233222_g14c_v7"
+).resolve()
 INVALID_FORMAL_RUN_ROOTS = (
     *INVALID_G14C_V1_V2_RUN_ROOTS,
     INVALID_G14C_V3_RUN_ROOT,
     *INVALID_G14C_V4_RUN_ROOTS,
     INVALID_G14C_V5_RUN_ROOT,
     INVALID_G14C_V6_RUN_ROOT,
+    INVALID_G14C_V7_RUN_ROOT,
 )
 
 
@@ -123,14 +134,56 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
     candidates = read_json(input_root / "checkpoint_candidates.json")
     if not isinstance(candidates, list) or not candidates:
         raise ValueError("checkpoint_candidates.json must contain a non-empty list")
+    non_formal_rehearsal = all(
+        bool(row.get("non_formal_rehearsal"))
+        for row in candidates
+        if isinstance(row, dict)
+    )
     selected = []
+    order_audit = None
+    if protocol["typed_model_cache_formal_protocol_version"] == "1.7.0":
+        try:
+            order_audit = resolve_formal_agent_order(protocol=protocol)
+            reject_permanently_invalid_run_references([input_root])
+        except FormalAgentOrderError as exc:
+            raise ValueError(str(exc)) from exc
     groups: dict[tuple[str, int, str], list[dict]] = {}
     for row in candidates:
         if not isinstance(row, dict):
             raise ValueError("checkpoint candidate must be an object")
         key = (str(row["agent_name"]), int(row["seed"]), str(row["capacity_label"]))
         groups.setdefault(key, []).append(row)
-    for key, rows in sorted(groups.items()):
+    if order_audit is None:
+        ordered_group_keys = sorted(groups)
+    else:
+        matrix = protocol["execution_contract"]["command_templates"]["train"][
+            "matrix_contexts"
+        ]
+        capacities = (
+            list(dict.fromkeys(str(row["capacity_label"]) for row in candidates))
+            if non_formal_rehearsal
+            else list(dict.fromkeys(str(row["capacity_label"]) for row in matrix))
+        )
+        seeds = (
+            sorted({int(row["seed"]) for row in candidates})
+            if non_formal_rehearsal
+            else [int(seed) for seed in protocol["seed_plan"]["seeds"]]
+        )
+        ordered_group_keys = [
+            (agent, seed, capacity)
+            for capacity in capacities
+            for agent in order_audit["learned_agent_order"]
+            for seed in seeds
+        ]
+        if set(groups) != set(ordered_group_keys):
+            raise ValueError("dev checkpoint candidate group membership drift")
+        order_hashes = {
+            row.get("formal_agent_order_contract_semantic_sha256") for row in candidates
+        }
+        if order_hashes != {order_audit["semantic_sha256"]}:
+            raise ValueError("dev checkpoint candidate order-contract identity drift")
+    for key in ordered_group_keys:
+        rows = groups[key]
         ranked = sorted(
             rows,
             key=lambda row: (
@@ -152,7 +205,10 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
         "resolved_execution_context_sha256",
     )
     training_identity = None
-    if protocol["typed_model_cache_formal_protocol_version"] == "1.6.0":
+    if (
+        not non_formal_rehearsal
+        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0"}
+    ):
         identities = {
             tuple(row.get(field) for field in training_identity_fields)
             for row in candidates
@@ -174,6 +230,13 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
         ),
         "checkpoint_locations_nonsemantic": True,
         "formal_training_identity": training_identity,
+        "formal_agent_order_contract_semantic_sha256": (
+            order_audit["semantic_sha256"] if order_audit else None
+        ),
+        "selected_agent_order": (
+            order_audit["learned_agent_order"] if order_audit else None
+        ),
+        "non_formal_rehearsal": non_formal_rehearsal,
     }
 
 
@@ -182,7 +245,25 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
     if selection.get("protocol_semantic_sha256") != protocol["hashes"]["semantic_sha256"]:
         raise ValueError("dev selection protocol hash mismatch")
     formal_training_identity = selection.get("formal_training_identity")
-    if protocol["typed_model_cache_formal_protocol_version"] == "1.6.0":
+    order_audit = None
+    if protocol["typed_model_cache_formal_protocol_version"] == "1.7.0":
+        try:
+            order_audit = resolve_formal_agent_order(protocol=protocol)
+        except FormalAgentOrderError as exc:
+            raise ValueError(str(exc)) from exc
+        if selection.get("formal_agent_order_contract_semantic_sha256") != order_audit[
+            "semantic_sha256"
+        ]:
+            raise ValueError("dev selection formal agent order contract mismatch")
+        observed_selected_agents = list(
+            dict.fromkeys(str(row.get("agent_name")) for row in selection.get("selected", []))
+        )
+        if observed_selected_agents != order_audit["learned_agent_order"]:
+            raise ValueError("dev selection learned-agent order drift")
+    if (
+        not bool(selection.get("non_formal_rehearsal"))
+        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0"}
+    ):
         if not isinstance(formal_training_identity, dict):
             raise ValueError("dev selection lacks formal training identity")
         if formal_training_identity.get("formal_protocol_semantic_sha256") != protocol["hashes"]["semantic_sha256"]:
@@ -193,7 +274,8 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
         if any(path_is_within(path, root) for root in INVALID_FORMAL_RUN_ROOTS):
             raise ValueError(
                 "invalid G14C v3/v4 checkpoint reference rejected; "
-                "the hard rejection set covers all G14C v1-v5 invalid runs and G14C v6"
+                "the hard rejection set covers all G14C v1-v5 invalid runs "
+                "and G14C v6/v7"
             )
         if not path.is_file():
             raise FileNotFoundError(path)
@@ -235,6 +317,9 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
             "resolved_execution_context_sha256": row.get(
                 "resolved_execution_context_sha256"
             ),
+            "formal_agent_order_contract_semantic_sha256": row.get(
+                "formal_agent_order_contract_semantic_sha256"
+            ),
         }
         identity["semantic_identity_fingerprint"] = canonical_sha256(identity)
         frozen.append(
@@ -263,6 +348,10 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
         "checkpoint_location_contract_version": "1.0.0",
         "invalid_run_roots": [str(root) for root in INVALID_FORMAL_RUN_ROOTS],
         "formal_training_identity": formal_training_identity,
+        "formal_agent_order_contract_semantic_sha256": (
+            order_audit["semantic_sha256"] if order_audit else None
+        ),
+        "frozen_agent_order": order_audit["learned_agent_order"] if order_audit else None,
     }
 
 
@@ -296,6 +385,9 @@ def write_checkpoint_companions(input_root: Path, freeze: dict) -> list[dict]:
                 "resolved_execution_context_sha256": row.get(
                     "resolved_execution_context_sha256"
                 ),
+                "formal_agent_order_contract_semantic_sha256": row.get(
+                    "formal_agent_order_contract_semantic_sha256"
+                ),
                 "runtime_contract_sha256": row.get("runtime_contract_sha256"),
                 "resolved_agent_config": row.get("resolved_agent_config"),
                 "checkpoint_schedule": row.get("checkpoint_schedule"),
@@ -314,6 +406,9 @@ def write_checkpoint_companions(input_root: Path, freeze: dict) -> list[dict]:
                 "manifest_id": f"checkpoint-manifest-{capacity_label}",
                 "protocol_semantic_sha256": freeze["protocol_semantic_sha256"],
                 "formal_training_identity": freeze.get("formal_training_identity"),
+                "formal_agent_order_contract_semantic_sha256": freeze.get(
+                    "formal_agent_order_contract_semantic_sha256"
+                ),
                 "entries": [
                     {
                         "agent": row["agent_name"],
@@ -323,7 +418,7 @@ def write_checkpoint_companions(input_root: Path, freeze: dict) -> list[dict]:
                     }
                     for row in rows
                 ],
-                "invalid_run_roots": [str(INVALID_G14C_V3_RUN_ROOT)],
+                "invalid_run_roots": [str(root) for root in INVALID_FORMAL_RUN_ROOTS],
             },
             **seed_manifest,
         }

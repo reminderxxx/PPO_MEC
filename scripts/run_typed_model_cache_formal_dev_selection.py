@@ -40,7 +40,13 @@ from src.evaluators.formal_cell_transaction import (
 from src.runtime.formal_training_contract import checkpoint_snapshot_indices
 from src.runtime.formal_training_identity import (
     FormalTrainingIdentityError,
+    learned_agent_rows,
     validate_checkpoint_training_identity,
+)
+from src.runtime.formal_agent_order import (
+    FormalAgentOrderError,
+    reject_permanently_invalid_run_references,
+    resolve_formal_agent_order,
 )
 from src.runtime.portable_resource_identity import (
     add_portable_resource_arguments,
@@ -84,6 +90,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--rehearsal-update-index", type=int, default=4)
     parser.add_argument("--training-run-prefix", default="formal")
     parser.add_argument("--resolved-execution-context-path", default="")
+    parser.add_argument("--formal-agent-order-contract-path", default="")
     add_portable_resource_arguments(parser)
     return parser
 
@@ -139,7 +146,7 @@ def main() -> None:
     nested_python = sys.executable
     protocol_version = protocol["typed_model_cache_formal_protocol_version"]
     resolved_context = None
-    if protocol_version in {"1.5.0", "1.6.0"}:
+    if protocol_version in {"1.5.0", "1.6.0", "1.7.0"}:
         if not args.resolved_execution_context_path:
             raise FormalExecutionError(
                 "active protocol dev selection requires resolved execution context"
@@ -188,11 +195,43 @@ def main() -> None:
         )
     config_root = protocol_path.parent
     index = json.loads((config_root / "protocol_index.json").read_text(encoding="utf-8-sig"))
-    learned_agents = (
-        list(args.rehearsal_agent)
-        if args.non_formal_rehearsal
-        else list(protocol["training_budget"]["agent_configs"])
-    )
+    order_audit = None
+    if protocol_version == "1.7.0":
+        if not args.formal_agent_order_contract_path:
+            raise FormalExecutionError("Protocol v1.7 dev selection requires agent order contract")
+        scientific = json.loads(
+            (config_root / "agent_training_scientific_config.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+        try:
+            order_audit = resolve_formal_agent_order(
+                contract_path=args.formal_agent_order_contract_path,
+                protocol=protocol,
+                scientific_config=scientific,
+                reactive_baseline_order=BASELINE_NAMES,
+            )
+            reject_permanently_invalid_run_references(
+                [args.training_root],
+                contract=json.loads(
+                    Path(args.formal_agent_order_contract_path).read_text(
+                        encoding="utf-8-sig"
+                    )
+                ),
+            )
+        except FormalAgentOrderError as exc:
+            raise FormalExecutionError(str(exc)) from exc
+        learned_agents = list(order_audit["learned_agent_order"])
+        if args.non_formal_rehearsal and list(args.rehearsal_agent) != learned_agents:
+            raise FormalExecutionError(
+                "Protocol v1.7 non-formal rehearsal must use the complete learned-agent order"
+            )
+    else:
+        learned_agents = (
+            list(args.rehearsal_agent)
+            if args.non_formal_rehearsal
+            else [str(row["agent"]) for row in learned_agent_rows(protocol)]
+        )
     seeds = (
         list(args.rehearsal_seed)
         if args.non_formal_rehearsal
@@ -210,7 +249,9 @@ def main() -> None:
     candidates: list[dict] = []
     cell_ledger = None
     expected_dev_cell_ids: list[str] = []
-    if protocol["typed_model_cache_formal_protocol_version"] in {"1.4.0", "1.5.0"}:
+    if not args.non_formal_rehearsal and protocol["typed_model_cache_formal_protocol_version"] in {
+        "1.4.0", "1.5.0", "1.6.0", "1.7.0"
+    }:
         identity_path = output_root / "cell_ledger_identity.json"
         if not identity_path.is_file():
             raise FormalExecutionError(
@@ -242,6 +283,16 @@ def main() -> None:
         fairness, report = load_and_validate_manifest(fairness_path, root=ROOT, check_files=True)
         if report.get("status") != "pass":
             raise FormalExecutionError(f"dev fairness validation failed: {capacity_label}")
+        if order_audit is not None:
+            try:
+                resolve_formal_agent_order(
+                    contract_path=args.formal_agent_order_contract_path,
+                    protocol=protocol,
+                    fairness_manifests=[fairness],
+                    reactive_baseline_order=BASELINE_NAMES,
+                )
+            except FormalAgentOrderError as exc:
+                raise FormalExecutionError(str(exc)) from exc
         selection = fairness["dataset_provenance"]["selection_filter_parameters"]
         if selection.get("primary_vehicle_selection") != args.primary_vehicle_selection:
             raise FormalExecutionError("dev vehicle selection CLI/fairness mismatch")
@@ -281,7 +332,10 @@ def main() -> None:
                         )
                     ):
                         raise FormalExecutionError("dev checkpoint formal binding mismatch")
-                    if protocol_version == "1.6.0":
+                    if (
+                        not args.non_formal_rehearsal
+                        and protocol_version in {"1.6.0", "1.7.0"}
+                    ):
                         scientific_identity = resolved_context["scientific_identity"]
                         try:
                             validate_checkpoint_training_identity(
@@ -304,6 +358,11 @@ def main() -> None:
                                 ),
                                 resolved_context_sha256=str(
                                     resolved_context["context_sha256"]
+                                ),
+                                formal_agent_order_contract_semantic_sha256=(
+                                    order_audit["semantic_sha256"]
+                                    if order_audit is not None
+                                    else None
                                 ),
                             )
                         except FormalTrainingIdentityError as exc:
@@ -359,6 +418,13 @@ def main() -> None:
                 "--reward_positive_offset", "0",
                 "--output_root", str(benchmark_root),
             ]
+            if order_audit is not None:
+                command.extend(
+                    [
+                        "--formal-agent-order-contract-path",
+                        str(Path(args.formal_agent_order_contract_path).resolve()),
+                    ]
+                )
             if not args.non_formal_rehearsal:
                 command.extend(
                     [
@@ -392,6 +458,9 @@ def main() -> None:
                 input_identity = canonical_sha256(
                     {
                         "protocol_semantic_sha256": protocol["hashes"]["semantic_sha256"],
+                        "formal_agent_order_contract_semantic_sha256": (
+                            order_audit["semantic_sha256"] if order_audit else None
+                        ),
                         "coordinates": coordinates,
                         "seed_checkpoint_manifest": seed_manifest,
                         "checkpoint_provenance_manifest": provenance_manifest,
@@ -480,6 +549,9 @@ def main() -> None:
                             "execution_commit": metadata.get("execution_commit"),
                             "resolved_execution_context_sha256": metadata.get(
                                 "resolved_execution_context_sha256"
+                            ),
+                            "formal_agent_order_contract_semantic_sha256": (
+                                order_audit["semantic_sha256"] if order_audit else None
                             ),
                             "non_formal_rehearsal": bool(args.non_formal_rehearsal),
                             "typed_runtime_provenance": metadata.get("typed_runtime_provenance"),

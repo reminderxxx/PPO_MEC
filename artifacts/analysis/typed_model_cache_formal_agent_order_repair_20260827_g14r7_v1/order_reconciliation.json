@@ -1,0 +1,83 @@
+{
+  "formal_agent_order_contract_version": "1.0.0",
+  "learned_agent_order": [
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "main_benchmark_agent_order": [
+    "reactive_lru",
+    "reactive_fifo",
+    "reactive_lfu",
+    "reactive_aging_lfu",
+    "reactive_random",
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "order_audit_semantic_sha256": "e603029ef45793452fe55b5a64aa9bdd63fdaf3e04735549a59ab1911488fb94",
+  "reactive_agent_order": [
+    "reactive_lru",
+    "reactive_fifo",
+    "reactive_lfu",
+    "reactive_aging_lfu",
+    "reactive_random"
+  ],
+  "row_display_order": [
+    "reactive_lru",
+    "reactive_fifo",
+    "reactive_lfu",
+    "reactive_aging_lfu",
+    "reactive_random",
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "semantic_sha256": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0",
+  "statistics_baseline_agent_order": [
+    "reactive_lru",
+    "reactive_fifo",
+    "reactive_lfu",
+    "reactive_aging_lfu",
+    "reactive_random",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "statistics_candidate_agent": "sa_ghmappo",
+  "status": "pass",
+  "validated_components": [
+    "order_contract",
+    "scientific_config",
+    "protocol",
+    "reactive_baselines",
+    "command_templates:7"
+  ]
+}

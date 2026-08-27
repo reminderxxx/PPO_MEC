@@ -1,0 +1,26 @@
+{
+  "case_count": 18,
+  "cases": [
+    "g14c_v7_mapping_order_exact_reproduction",
+    "same_set_wrong_order",
+    "alphabetical_mapping_reserialization",
+    "missing_learned_agent",
+    "duplicate_agent",
+    "extra_or_unknown_agent",
+    "reactive_learned_role_swap",
+    "popularity_report_only_in_main",
+    "scientific_config_order_drift",
+    "fairness_controller_order_drift",
+    "protocol_template_order_drift",
+    "dev_selector_mapping_bypass",
+    "checkpoint_selection_freeze_order_drift",
+    "statistics_wrong_pairing",
+    "random_json_mapping_reorder",
+    "g14c_v7_any_reference",
+    "protocol_binding_context_order_hash_drift",
+    "holdout_capability_false"
+  ],
+  "clean_full_pytest_failures": 0,
+  "status": "pass",
+  "test_file": "tests/test_formal_agent_order_v17.py"
+}

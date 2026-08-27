@@ -21,6 +21,10 @@ from src.runtime.resolved_formal_execution_context import (
     load_resolved_formal_execution_context,
     resolved_python_for_nested_consumer,
 )
+from src.runtime.formal_agent_order import (
+    FormalAgentOrderError,
+    resolve_formal_agent_order,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -29,6 +33,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--input-root", required=True)
     parser.add_argument("--output-root", required=True)
     parser.add_argument("--resolved-execution-context-path", default="")
+    parser.add_argument("--formal-agent-order-contract-path", default="")
     add_portable_resource_arguments(parser)
     return parser.parse_args()
 
@@ -38,7 +43,8 @@ def main() -> None:
     protocol = json.loads(Path(args.protocol_path).read_text(encoding="utf-8-sig"))
     validate_protocol_v1_1(protocol)
     nested_python = sys.executable
-    if protocol["typed_model_cache_formal_protocol_version"] == "1.5.0":
+    protocol_version = protocol["typed_model_cache_formal_protocol_version"]
+    if protocol_version in {"1.5.0", "1.6.0", "1.7.0"}:
         if not args.resolved_execution_context_path:
             raise FormalExecutionError(
                 "protocol v1.5 statistics requires resolved execution context"
@@ -53,6 +59,17 @@ def main() -> None:
         nested_python = resolved_python_for_nested_consumer(
             resolved_context, observed_sys_executable=sys.executable
         )
+    order_audit = None
+    if protocol_version == "1.7.0":
+        if not args.formal_agent_order_contract_path:
+            raise FormalExecutionError("Protocol v1.7 statistics requires agent order contract")
+        try:
+            order_audit = resolve_formal_agent_order(
+                contract_path=args.formal_agent_order_contract_path,
+                protocol=protocol,
+            )
+        except FormalAgentOrderError as exc:
+            raise FormalExecutionError(str(exc)) from exc
     input_root = Path(args.input_root)
     rows = sorted(input_root.glob("formal_controller/**/benchmark_rows.csv"))
     if not rows:
@@ -81,9 +98,30 @@ def main() -> None:
             "1401",
         ]
     )
+    if order_audit is not None:
+        command.extend(
+            [
+                "--candidate_agent",
+                order_audit["statistics_candidate_agent"],
+                "--baseline_agents",
+                *order_audit["statistics_baseline_agent_order"],
+                "--formal-agent-order-contract-path",
+                str(Path(args.formal_agent_order_contract_path).resolve()),
+            ]
+        )
     result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True, check=False)
     if result.returncode != 0:
         raise RuntimeError(result.stderr or result.stdout)
+    if order_audit is not None:
+        statistics_payload = json.loads(
+            (Path(args.output_root) / "paired_statistics.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+        if statistics_payload.get(
+            "formal_agent_order_contract_semantic_sha256"
+        ) != order_audit["semantic_sha256"]:
+            raise FormalExecutionError("statistics output order-contract identity drift")
     print(
         json.dumps(
             {

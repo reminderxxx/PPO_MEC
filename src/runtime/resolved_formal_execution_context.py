@@ -246,6 +246,10 @@ def build_resolved_formal_execution_context(
             "network_or_cwd_discovery_allowed": False,
         },
     }
+    if protocol.get("typed_model_cache_formal_protocol_version") == "1.7.0":
+        payload["scientific_identity"][
+            "formal_agent_order_contract_semantic_sha256"
+        ] = protocol["formal_agent_order_contract"]["semantic_sha256"]
     payload["context_sha256"] = canonical_sha256(_context_projection(payload))
     validate_resolved_formal_execution_context(payload)
     return payload
@@ -364,6 +368,10 @@ def validate_resolved_formal_execution_context(
                 "typed_runtime_contract_hashes_by_capacity"
             ],
         }
+        if protocol.get("typed_model_cache_formal_protocol_version") == "1.7.0":
+            comparisons["formal_agent_order_contract_semantic_sha256"] = protocol[
+                "formal_agent_order_contract"
+            ]["semantic_sha256"]
         for field, expected in comparisons.items():
             if scientific.get(field) != expected:
                 raise ResolvedFormalExecutionContextError(

@@ -1,5 +1,22 @@
 # Artifact Records
 
+## 2026-08-27 G14R7 formal agent-order repair
+
+- path：`artifacts/analysis/typed_model_cache_formal_agent_order_repair_20260827_g14r7_v1/`；config：
+  `configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827/`。
+- G14C v7 failure/integrity SHA-256=`7fc3685470c1f536def5c504dfbeab83b14dd070a644caefed08e690e10247ba`/
+  `ab38f022aa14f51079d74799d73bf88a2382e9809f04a3ba0b22285826e466a2`；边界为150/150 training、
+  1,200 candidates之后且dev performance前，dev/selected/frozen/formal均为0，永久禁止复用。
+- Formal Agent Order Contract `1.0.0` semantic SHA-256=`82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0`；
+  producer/consumer matrix 18项通过。Protocol v1.7 semantic SHA-256=
+  `5a1c2070529674ecf65c8b836706849f0937853a59b6dfbc3b987d88ac4f50a5`。
+- clean detached验收：186 commands、150/150 train、24 dev nested/1,200 candidate audit、11,850,526 rows、
+  73,871 frames、60/60 windows、1077 tests；实际10个tiny learned checkpoints生成15-agent raw rows，
+  10/10 selection/freeze，14个pairwise comparison对输入重排不变。
+- Readiness v9=`READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL`，evidence level=
+  `E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE`；正式training/checkpoint/performance=0，
+  holdout sealed/unopened，不是formal或paper-ready证据。
+
 ## 2026-08-25 G14R6 formal training identity repair
 
 - path：`artifacts/analysis/typed_model_cache_formal_training_binding_repair_20260825_g14r6_v1/`；config：

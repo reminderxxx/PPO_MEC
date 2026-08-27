@@ -1,5 +1,25 @@
 # Code Module Map
 
+## G14R7 unified formal agent order
+
+- `src/runtime/formal_agent_order.py`：versioned order contract加载、strict schema/canonical hash、reactive/
+  learned/main/report-only/statistics角色解析及Protocol/scientific/fairness/template exact-order验证。
+- `src/evaluators/cache_baseline_fairness.py`：`BASELINE_NAMES`来自order contract；baseline matrix与
+  `controller_agents`均逐元素验证，不接受set equality。
+- `scripts/run_typed_model_cache_formal_dev_selection.py`：只用resolver learned order构建candidate与nested
+  benchmark；G14C v7路径硬拒绝。
+- `scripts/manage_typed_model_cache_formal_artifacts.py`：candidate selection、freeze和seed/provenance companion
+  按权威顺序输出并绑定order hash；v1–v7 invalid roots全部拒绝。
+- `scripts/benchmark_main_results.py`、`src/evaluators/main_results_support.py`：15-agent argv exact gate、raw row
+  稳定排序、aggregate/display顺序与checkpoint path拒绝。
+- `scripts/analyze_top_journal_statistics.py`、`run_typed_model_cache_formal_statistics.py`：candidate/baseline
+  配对身份、完整15-agent pair、重复/缺失检测、稳定key traversal与Holm顺序绑定。
+- `src/runtime/formal_training_identity.py`、`formal_training_contract.py`、
+  `resolved_formal_execution_context.py`：order semantic hash进入binding、context、training/checkpoint provenance。
+- `scripts/repair_typed_model_cache_formal_agent_order.py`：生成Protocol v1.7/config/audit骨架；
+  `run_typed_model_cache_formal_agent_order_acceptance.py`执行clean non-formal验收；finalizer生成Readiness v9。
+- `tests/test_formal_agent_order_v17.py`：G14C v7复现、order/schema/role/consumer/hash/holdout 18类负例。
+
 ## G14R6 formal training identity split
 
 - `src/runtime/formal_training_identity.py`：scientific config `2.0.0`、execution binding `1.0.0`、strict JSON、

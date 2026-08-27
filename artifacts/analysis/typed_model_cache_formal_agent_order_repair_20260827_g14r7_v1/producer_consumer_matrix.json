@@ -1,0 +1,516 @@
+{
+  "formal_agent_order_contract_semantic_sha256": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0",
+  "row_count": 18,
+  "rows": [
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "protocol_agent_matrix",
+      "failure_behavior": "reject membership, role, duplicate, or order drift",
+      "implementation": [
+        "configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827/protocol_v1_7_manifest.json"
+      ],
+      "observed_order": [
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "role-filtered exact list equality"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "training_budget_agent_configs",
+      "failure_behavior": "reject missing/extra config or explicit order drift",
+      "implementation": [
+        "configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827/protocol_v1_7_manifest.json"
+      ],
+      "observed_order": [
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "mapping membership plus explicit learned_agent_order; mapping insertion order ignored"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "scientific_config_learned_agent_order",
+      "failure_behavior": "reject before command execution",
+      "implementation": [
+        "configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827/agent_training_scientific_config.json"
+      ],
+      "observed_order": [
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "exact list equality and frozen semantic hash"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "training_command_matrix",
+      "failure_behavior": "reject before training",
+      "implementation": [
+        "execution_contract.command_templates.train.matrix_contexts"
+      ],
+      "observed_order": [
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "150-cell sequence and 15 cells per learned agent"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "dev_selector",
+      "failure_behavior": "reject before nested benchmark",
+      "implementation": [
+        "scripts/run_typed_model_cache_formal_dev_selection.py"
+      ],
+      "observed_order": [
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "resolver output only; direct mapping-order source guard"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "reactive_BASELINE_NAMES",
+      "failure_behavior": "manifest validation fails",
+      "implementation": [
+        "src/evaluators/cache_baseline_fairness.py"
+      ],
+      "observed_order": [
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "contract-derived exact tuple"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "fairness_controller_agents",
+      "failure_behavior": "fairness manifest fails",
+      "implementation": [
+        "src/evaluators/cache_baseline_fairness.py"
+      ],
+      "observed_order": [
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "exact controller and reactive baseline order"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "enforce_benchmark_args",
+      "failure_behavior": "benchmark fails before evaluation",
+      "implementation": [
+        "src/evaluators/cache_baseline_fairness.py"
+      ],
+      "observed_order": [
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "exact argv list equality; set equality forbidden"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "formal_controller_commands",
+      "failure_behavior": "Protocol expansion fails",
+      "implementation": [
+        "execution_contract.command_templates.formal_controller"
+      ],
+      "observed_order": [
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "3/3 expanded --agents lists exact"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "formal_cache_policy_commands",
+      "failure_behavior": "Protocol expansion fails",
+      "implementation": [
+        "execution_contract.command_templates.formal_cache_policy"
+      ],
+      "observed_order": [
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "3/3 nested --agents lists exact"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "ablation_support_scalability_commands",
+      "failure_behavior": "Protocol or support runner fails",
+      "implementation": [
+        "scripts/run_typed_model_cache_formal_support.py"
+      ],
+      "observed_order": [
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "23/23 ablation/support/scalability/prediction/robustness lists exact"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "checkpoint_candidates",
+      "failure_behavior": "candidate matrix fails",
+      "implementation": [
+        "scripts/run_typed_model_cache_formal_dev_selection.py"
+      ],
+      "observed_order": [
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "capacity × agent × seed stable traversal and order hash"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "checkpoint_selection_and_freeze",
+      "failure_behavior": "freeze fails before companion write",
+      "implementation": [
+        "scripts/manage_typed_model_cache_formal_artifacts.py"
+      ],
+      "observed_order": [
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "selected/frozen exact order and permanent invalid-root rejection"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "benchmark_raw_rows",
+      "failure_behavior": "benchmark fails on unknown agent",
+      "implementation": [
+        "scripts/benchmark_main_results.py"
+      ],
+      "observed_order": [
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "stable seed/window/workflow/contract-index sort"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "benchmark_aggregate_rows",
+      "failure_behavior": "aggregate consumer fails",
+      "implementation": [
+        "src/evaluators/main_results_support.py"
+      ],
+      "observed_order": [
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "contract order propagated to aggregate and mechanism diagnosis"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "statistics_pairwise_holm",
+      "failure_behavior": "duplicate/missing/wrong-order pair fails",
+      "implementation": [
+        "scripts/analyze_top_journal_statistics.py",
+        "scripts/run_typed_model_cache_formal_statistics.py"
+      ],
+      "observed_order": [
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "candidate plus exact baseline order; sorted pair keys; complete 15-agent matrix"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "claim_evidence_and_paper_display",
+      "failure_behavior": "Protocol validation fails",
+      "implementation": [
+        "claim_evidence_map.paper_display_agent_order"
+      ],
+      "observed_order": [
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "exact contract display order and order hash"
+    },
+    {
+      "authority": "formal_agent_order_contract.json via resolve_formal_agent_order",
+      "consumer_id": "artifact_integrity_and_provenance",
+      "failure_behavior": "hash mismatch fails before consumption",
+      "implementation": [
+        "src/runtime/formal_training_identity.py",
+        "src/runtime/resolved_formal_execution_context.py"
+      ],
+      "observed_order": [
+        "reactive_lru",
+        "reactive_fifo",
+        "reactive_lfu",
+        "reactive_aging_lfu",
+        "reactive_random",
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "status": "pass",
+      "test_evidence": [
+        "tests/test_formal_agent_order_v17.py",
+        "clean full pytest phase"
+      ],
+      "validation_method": "order hash bound into execution binding/context/checkpoint/rows"
+    }
+  ],
+  "status": "pass"
+}

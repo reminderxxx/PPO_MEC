@@ -1,5 +1,18 @@
 ﻿# Decision Log
 
+## 2026-08-27: G14R7 freezes one agent-order identity authority
+
+- 决定：Formal Agent Order Contract `1.0.0`是active Protocol v1.7执行、artifact、display和统计配对的唯一
+  顺序权威；JSON object insertion order与alphabetical sort都不是科学或执行身份。
+- 决定：main benchmark严格为5个reactive后接10个learned；`popularity_cache_heuristic`与exact oracle保持
+  checkpoint-free/report-only角色，不进入15-agent主序列。
+- 决定：相同集合但不同顺序与缺失、重复、额外、未知或角色交换等价地在执行前失败；生产者必须输出
+  权威顺序，不能通过把fairness/benchmark消费者降级为set equality来兼容错误生产者。
+- 决定：Protocol/scientific config/fairness/commands/checkpoint/raw/aggregate/statistics/claim/provenance的重复
+  序列必须逐元素一致；mapping可用于存储，但遍历与论文显示必须经resolver。
+- 决定：G14C v7永久invalid且不可resume/finalize/salvage/reuse。Protocol v1.0–v1.6只供审计；Readiness v9
+  只授权未来独立G14C v8，不授权本任务启动正式训练、formal、holdout、G14D或G15。
+
 ## 2026-08-25: G14R6 separates scientific hyperparameters from execution binding
 
 - 决定：agent超参数是稳定scientific config identity，不再包含Protocol、commit、run、host path或结果；

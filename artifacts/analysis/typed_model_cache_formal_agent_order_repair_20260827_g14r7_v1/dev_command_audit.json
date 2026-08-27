@@ -1,0 +1,229 @@
+{
+  "actual_dev_selector_nested_command_count": 1,
+  "actual_raw_row_count": 15,
+  "all_same_order": true,
+  "capacity_order": [
+    "constrained_288mb",
+    "medium_576mb",
+    "relaxed_864mb"
+  ],
+  "checkpoint_update_order": [
+    4,
+    8,
+    12,
+    16,
+    20,
+    24,
+    28,
+    32
+  ],
+  "dev_candidate_checkpoint_count": 1200,
+  "dev_nested_command_count": 24,
+  "every_nested_command_agent_order": [
+    "reactive_lru",
+    "reactive_fifo",
+    "reactive_lfu",
+    "reactive_aging_lfu",
+    "reactive_random",
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "formal_command_audit": {
+    "agent_command_phases": {
+      "formal_ablation": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 2
+      },
+      "formal_cache_policy": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 3
+      },
+      "formal_controller": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 3
+      },
+      "formal_scalability": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 3
+      },
+      "formal_support": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 11
+      },
+      "prediction_boundary": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 6
+      },
+      "robustness": {
+        "agent_order": [
+          "reactive_lru",
+          "reactive_fifo",
+          "reactive_lfu",
+          "reactive_aging_lfu",
+          "reactive_random",
+          "sa_ghmappo",
+          "ppo",
+          "mappo",
+          "dqn",
+          "dueling_dqn",
+          "qmix",
+          "controller_mat",
+          "dag_offload_drl",
+          "cache_offload_drl",
+          "dt_handoff_drl"
+        ],
+        "all_commands_equal": true,
+        "command_count": 1
+      }
+    },
+    "nested_expansion_sha256": "04ff3b7d93c95d62cb479f8650fb13e879b302a1bfd3b9462c5b9edbe9e3b0f9",
+    "outer_expansion_sha256": "04ff3b7d93c95d62cb479f8650fb13e879b302a1bfd3b9462c5b9edbe9e3b0f9",
+    "outer_nested_equal": true,
+    "status": "pass",
+    "total_command_count": 186,
+    "training_agent_order": [
+      "sa_ghmappo",
+      "ppo",
+      "mappo",
+      "dqn",
+      "dueling_dqn",
+      "qmix",
+      "controller_mat",
+      "dag_offload_drl",
+      "cache_offload_drl",
+      "dt_handoff_drl"
+    ],
+    "training_command_count": 150,
+    "unique_training_command_count": 150
+  },
+  "learned_agent_order": [
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "seed_order": [
+    7,
+    13,
+    29,
+    43,
+    71
+  ],
+  "status": "pass"
+}

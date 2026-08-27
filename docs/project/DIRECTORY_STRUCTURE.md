@@ -1,5 +1,13 @@
 ﻿# Directory Structure
 
+G14R7：active Protocol v1.7、Formal Agent Order Contract `1.0.0`、scientific config与binding/environment/index
+位于`configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827/`；共享resolver位于
+`src/runtime/formal_agent_order.py`，生成/验收/finalize入口位于`scripts/repair_typed_model_cache_formal_agent_order.py`、
+`scripts/run_typed_model_cache_formal_agent_order_acceptance.py`与
+`scripts/finalize_typed_model_cache_formal_agent_order_repair.py`。机器证据位于
+`artifacts/analysis/typed_model_cache_formal_agent_order_repair_20260827_g14r7_v1/`；只提交根级JSON，
+tiny checkpoint/raw rows与临时worktree保持ignored并在交付前移除。该结构不含正式checkpoint或performance。
+
 G14R6：active Protocol v1.6、scientific config、binding schema与environment/index位于
 `configs/experiment/typed_model_cache_formal_protocol_v1_6_20260825/`；runtime binding实例只允许写入未来
 durable run root。共享验证位于`src/runtime/formal_training_identity.py`，生成器为

@@ -33,6 +33,10 @@ from src.runtime.resolved_formal_execution_context import (
     load_resolved_formal_execution_context,
     resolved_python_for_nested_consumer,
 )
+from src.runtime.formal_agent_order import (
+    FormalAgentOrderError,
+    resolve_formal_agent_order,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -64,6 +68,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--non-formal-rehearsal", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--resolved-execution-context-path", default="")
+    parser.add_argument("--formal-agent-order-contract-path", default="")
     add_portable_resource_arguments(parser)
     return parser
 
@@ -164,7 +169,8 @@ def main() -> None:
     protocol = load_json(args.protocol_path, "protocol")
     validate_protocol_v1_1(protocol)
     nested_python = sys.executable
-    if protocol["typed_model_cache_formal_protocol_version"] == "1.5.0":
+    protocol_version = protocol["typed_model_cache_formal_protocol_version"]
+    if protocol_version in {"1.5.0", "1.6.0", "1.7.0"}:
         if not args.resolved_execution_context_path:
             raise FormalExecutionError(
                 "protocol v1.5 support requires resolved execution context"
@@ -186,6 +192,20 @@ def main() -> None:
     )
     if fairness_report.get("status") != "pass":
         raise FormalExecutionError("fairness manifest validation failed")
+    order_audit = None
+    if protocol_version == "1.7.0":
+        if not args.formal_agent_order_contract_path:
+            raise FormalExecutionError("Protocol v1.7 support requires agent order contract")
+        try:
+            order_audit = resolve_formal_agent_order(
+                contract_path=args.formal_agent_order_contract_path,
+                protocol=protocol,
+                fairness_manifests=[fairness],
+            )
+        except FormalAgentOrderError as exc:
+            raise FormalExecutionError(str(exc)) from exc
+        if list(args.agents) != order_audit["main_benchmark_agent_order"]:
+            raise FormalExecutionError("support agent order differs from formal contract")
     checkpoint_provenance = load_json(
         args.checkpoint_provenance_manifest_path, "checkpoint provenance"
     )
@@ -197,6 +217,10 @@ def main() -> None:
         fairness_manifest=fairness,
         checkpoint_provenance=checkpoint_provenance,
     )
+    if order_audit is not None:
+        provenance["formal_agent_order_contract_semantic_sha256"] = order_audit[
+            "semantic_sha256"
+        ]
     if setting.get("parameter") == "capacity_mb":
         actual = float(runtime["cache_capacity_profile"]["capacity_mb"])
         expected = float(setting.get("value", setting.get("baseline")))
@@ -332,6 +356,13 @@ def main() -> None:
         "--reward_positive_offset", "0",
         "--audit_runtime",
     ]
+    if order_audit is not None:
+        command.extend(
+            [
+                "--formal-agent-order-contract-path",
+                str(Path(args.formal_agent_order_contract_path).resolve()),
+            ]
+        )
     if not args.non_formal_rehearsal:
         command.extend(
             [

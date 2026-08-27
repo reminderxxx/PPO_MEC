@@ -540,9 +540,9 @@ def main() -> None:
     )
 
     if args.formal_contract_preflight_only:
-        if resolved_training.formal_protocol_version != "1.6.0":
+        if resolved_training.formal_protocol_version not in {"1.6.0", "1.7.0"}:
             raise FormalTrainingContractError(
-                "formal contract preflight is restricted to Protocol v1.6"
+                "formal contract preflight is restricted to Protocol v1.6/v1.7"
             )
         payload = {
             "formal_training_contract_preflight_version": "1.0.0",
@@ -589,6 +589,9 @@ def main() -> None:
                     execution_commit=str(resolved_training.execution_commit),
                     resolved_context_sha256=str(
                         resolved_training.resolved_execution_context_sha256
+                    ),
+                    formal_agent_order_contract_semantic_sha256=(
+                        resolved_training.formal_agent_order_contract_semantic_sha256
                     ),
                 )
             except FormalTrainingIdentityError as exc:
@@ -714,6 +717,9 @@ def main() -> None:
                 ),
                 "environment_fingerprint": resolved_training.environment_fingerprint,
                 "dependency_fingerprint": resolved_training.dependency_fingerprint,
+                "formal_agent_order_contract_semantic_sha256": (
+                    resolved_training.formal_agent_order_contract_semantic_sha256
+                ),
                 "is_smoke_checkpoint": args.profile == "smoke",
                 "script": "scripts/train_algo_pool_real_sample.py",
                 "typed_runtime_provenance": build_checkpoint_provenance(
@@ -803,6 +809,9 @@ def main() -> None:
         ),
         "environment_fingerprint": resolved_training.environment_fingerprint,
         "dependency_fingerprint": resolved_training.dependency_fingerprint,
+        "formal_agent_order_contract_semantic_sha256": (
+            resolved_training.formal_agent_order_contract_semantic_sha256
+        ),
         "resolved_model_cache_runtime": runtime_contract,
         "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
         "cache_capacity_profile": runtime_contract["cache_capacity_profile"],

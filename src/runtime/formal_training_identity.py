@@ -207,6 +207,19 @@ def validate_scientific_config(
             raise FormalTrainingIdentityError("protocol scientific config contract version mismatch")
         if contract.get("config_semantic_sha256") != expected_hash:
             raise FormalTrainingIdentityError("protocol scientific config hash mismatch")
+        if protocol.get("typed_model_cache_formal_protocol_version") == "1.7.0":
+            from src.runtime.formal_agent_order import (
+                FormalAgentOrderError,
+                resolve_formal_agent_order,
+            )
+
+            try:
+                resolve_formal_agent_order(
+                    protocol=protocol,
+                    scientific_config=config,
+                )
+            except FormalAgentOrderError as exc:
+                raise FormalTrainingIdentityError(str(exc)) from exc
     return {
         "status": "pass",
         "config_semantic_sha256": expected_hash,
@@ -289,6 +302,18 @@ def build_execution_binding(
         int(execution_commit, 16)
     except ValueError as exc:
         raise FormalTrainingIdentityError("execution binding commit is not hexadecimal") from exc
+    data_and_runtime_identity = {
+        "split_semantic_sha256": protocol["identity"]["split_semantic_sha256"],
+        "window_contract_semantic_sha256": protocol["execution_contract"]
+        ["window_consumption_contract"]["semantic_sha256"],
+        "catalog_fingerprint": protocol["identity"]["catalog_fingerprint"],
+        "typed_runtime_identities": protocol["identity"]
+        ["typed_runtime_contract_hashes_by_capacity"],
+    }
+    if protocol.get("typed_model_cache_formal_protocol_version") == "1.7.0":
+        data_and_runtime_identity["formal_agent_order_contract_semantic_sha256"] = (
+            protocol["formal_agent_order_contract"]["semantic_sha256"]
+        )
     payload: dict[str, Any] = {
         "formal_training_execution_binding_version": FORMAL_TRAINING_EXECUTION_BINDING_VERSION,
         "protocol_identity": {
@@ -307,14 +332,7 @@ def build_execution_binding(
             "environment_fingerprint": environment_identity["environment_fingerprint"],
             "dependency_fingerprint": environment_identity["dependency_fingerprint"],
         },
-        "data_and_runtime_identity": {
-            "split_semantic_sha256": protocol["identity"]["split_semantic_sha256"],
-            "window_contract_semantic_sha256": protocol["execution_contract"]
-            ["window_consumption_contract"]["semantic_sha256"],
-            "catalog_fingerprint": protocol["identity"]["catalog_fingerprint"],
-            "typed_runtime_identities": protocol["identity"]
-            ["typed_runtime_contract_hashes_by_capacity"],
-        },
+        "data_and_runtime_identity": data_and_runtime_identity,
         "command_matrix_sha256": command_matrix_sha256,
         "portable_resource_identity": {
             "resource_registry_semantic_sha256": protocol[
@@ -355,6 +373,18 @@ def validate_execution_binding(
     if binding.get("binding_full_sha256") != observed_hash:
         raise FormalTrainingIdentityError("execution binding full SHA-256 mismatch")
     scientific = validate_scientific_config(scientific_config, protocol=protocol)
+    data_and_runtime_identity = {
+        "split_semantic_sha256": protocol["identity"]["split_semantic_sha256"],
+        "window_contract_semantic_sha256": protocol["execution_contract"]
+        ["window_consumption_contract"]["semantic_sha256"],
+        "catalog_fingerprint": protocol["identity"]["catalog_fingerprint"],
+        "typed_runtime_identities": protocol["identity"]
+        ["typed_runtime_contract_hashes_by_capacity"],
+    }
+    if protocol.get("typed_model_cache_formal_protocol_version") == "1.7.0":
+        data_and_runtime_identity["formal_agent_order_contract_semantic_sha256"] = (
+            protocol["formal_agent_order_contract"]["semantic_sha256"]
+        )
     comparisons = {
         "protocol_identity": {
             "protocol_id": protocol["protocol_id"],
@@ -372,14 +402,7 @@ def validate_execution_binding(
             "environment_fingerprint": environment_identity["environment_fingerprint"],
             "dependency_fingerprint": environment_identity["dependency_fingerprint"],
         },
-        "data_and_runtime_identity": {
-            "split_semantic_sha256": protocol["identity"]["split_semantic_sha256"],
-            "window_contract_semantic_sha256": protocol["execution_contract"]
-            ["window_consumption_contract"]["semantic_sha256"],
-            "catalog_fingerprint": protocol["identity"]["catalog_fingerprint"],
-            "typed_runtime_identities": protocol["identity"]
-            ["typed_runtime_contract_hashes_by_capacity"],
-        },
+        "data_and_runtime_identity": data_and_runtime_identity,
         "command_matrix_sha256": command_matrix_sha256,
         "portable_resource_identity": {
             "resource_registry_semantic_sha256": protocol[
@@ -406,6 +429,7 @@ def validate_execution_binding(
 def validate_checkpoint_training_identity(
     metadata: Mapping[str, Any], *, scientific_config_sha256: str, binding_sha256: str,
     protocol_semantic_sha256: str, execution_commit: str, resolved_context_sha256: str,
+    formal_agent_order_contract_semantic_sha256: str | None = None,
 ) -> dict[str, Any]:
     expected = {
         "agent_scientific_config_semantic_sha256": scientific_config_sha256,
@@ -414,6 +438,10 @@ def validate_checkpoint_training_identity(
         "execution_commit": execution_commit,
         "resolved_execution_context_sha256": resolved_context_sha256,
     }
+    if formal_agent_order_contract_semantic_sha256 is not None:
+        expected["formal_agent_order_contract_semantic_sha256"] = (
+            formal_agent_order_contract_semantic_sha256
+        )
     for field, value in expected.items():
         if metadata.get(field) != value:
             raise FormalTrainingIdentityError(f"checkpoint provenance identity mismatch: {field}")

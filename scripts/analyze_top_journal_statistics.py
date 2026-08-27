@@ -7,9 +7,19 @@ import csv
 import json
 import math
 import random
+import sys
 from pathlib import Path
 from statistics import NormalDist, fmean, stdev
 from typing import Any
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from src.runtime.formal_agent_order import (
+    FormalAgentOrderError,
+    resolve_formal_agent_order,
+)
 
 
 DEFAULT_METRICS = [
@@ -74,6 +84,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--bootstrap_samples", type=int, default=5000)
     parser.add_argument("--random_seed", type=int, default=7)
     parser.add_argument("--output_root", type=str, required=True)
+    parser.add_argument("--formal-agent-order-contract-path", default="")
     args = parser.parse_args()
     if args.cluster_keys and args.outer_cluster_keys:
         parser.error("--cluster_keys cannot be combined with --outer_cluster_keys")
@@ -442,12 +453,33 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
 
 def main() -> None:
     args = parse_args()
+    order_audit = None
+    if args.formal_agent_order_contract_path:
+        try:
+            order_audit = resolve_formal_agent_order(
+                contract_path=args.formal_agent_order_contract_path
+            )
+        except FormalAgentOrderError as exc:
+            raise ValueError(str(exc)) from exc
+        if args.candidate_agent != order_audit["statistics_candidate_agent"]:
+            raise ValueError("statistics candidate agent identity drift")
+        if list(args.baseline_agents) != order_audit["statistics_baseline_agent_order"]:
+            raise ValueError("statistics baseline agent order identity drift")
     rng = random.Random(args.random_seed)
     rows = load_rows(args.rows_path)
     by_key_and_agent: dict[tuple[str, ...], dict[str, dict[str, str]]] = {}
     for row in rows:
         key = pair_key(row, args.pair_keys)
-        by_key_and_agent.setdefault(key, {})[row.get("agent_name", "")] = row
+        agent_name = row.get("agent_name", "")
+        bucket = by_key_and_agent.setdefault(key, {})
+        if agent_name in bucket:
+            raise ValueError(f"duplicate statistics pair row: key={key}, agent={agent_name}")
+        bucket[agent_name] = row
+    if order_audit is not None:
+        expected = set(order_audit["main_benchmark_agent_order"])
+        for key, bucket in by_key_and_agent.items():
+            if set(bucket) != expected:
+                raise ValueError(f"statistics pair agent matrix drift: key={key}")
 
     output_rows: list[dict[str, Any]] = []
     for baseline_agent in args.baseline_agents:
@@ -457,7 +489,8 @@ def main() -> None:
             delta_clusters: list[tuple[str, ...]] = []
             delta_outer_clusters: list[tuple[str, ...]] = []
             delta_inner_clusters: list[tuple[str, ...]] = []
-            for key, agents_by_key in by_key_and_agent.items():
+            for key in sorted(by_key_and_agent):
+                agents_by_key = by_key_and_agent[key]
                 candidate_row = agents_by_key.get(args.candidate_agent)
                 baseline_row = agents_by_key.get(baseline_agent)
                 if candidate_row is None or baseline_row is None:
@@ -529,6 +562,19 @@ def main() -> None:
                 "bootstrap_samples": args.bootstrap_samples,
                 "rows": output_rows,
                 "source_rows_path": args.rows_path,
+                "formal_agent_order_contract_semantic_sha256": (
+                    order_audit["semantic_sha256"] if order_audit else None
+                ),
+                "pairwise_comparison_identity": (
+                    {
+                        "candidate_agent": order_audit["statistics_candidate_agent"],
+                        "baseline_agent_order": order_audit[
+                            "statistics_baseline_agent_order"
+                        ],
+                    }
+                    if order_audit
+                    else None
+                ),
             },
             ensure_ascii=False,
             indent=2,

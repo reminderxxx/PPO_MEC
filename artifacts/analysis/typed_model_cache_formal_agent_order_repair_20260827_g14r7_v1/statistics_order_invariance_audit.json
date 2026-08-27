@@ -1,0 +1,23 @@
+{
+  "baseline_agent_order": [
+    "reactive_lru",
+    "reactive_fifo",
+    "reactive_lfu",
+    "reactive_aging_lfu",
+    "reactive_random",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "candidate_agent": "sa_ghmappo",
+  "comparison_row_count": 14,
+  "holm_consumer_order_bound": true,
+  "reordered_input_equal": true,
+  "status": "pass"
+}

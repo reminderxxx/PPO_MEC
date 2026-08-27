@@ -1853,6 +1853,10 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
             "checkpoint_provenance_status", "not_applicable"
         ),
         "checkpoint_sha256": run_info.get("checkpoint_sha256"),
+        "formal_agent_order_contract_semantic_sha256": run_info.get(
+            "formal_agent_order_contract_semantic_sha256"
+        ),
+        "formal_agent_order_index": run_info.get("formal_agent_order_index"),
         "seed": run_info.get("seed"),
         "primary_vehicle_selection": run_info.get("primary_vehicle_selection", "stable_first"),
         "reward_positive_offset": reward_positive_offset,
@@ -2184,7 +2188,9 @@ def build_win_tie_loss_summary(
     )
 
 
-def build_mechanism_diagnosis(rows: list[dict[str, Any]]) -> dict[str, Any]:
+def build_mechanism_diagnosis(
+    rows: list[dict[str, Any]], *, agent_order: list[str] | None = None
+) -> dict[str, Any]:
     triggered = {
         "predictive_prefetch_request_count": int(sum(float(row["predictive_prefetch_request_count"]) for row in rows)),
         "migration_prepare_count": int(sum(float(row["migration_prepare_count"]) for row in rows)),
@@ -2196,7 +2202,15 @@ def build_mechanism_diagnosis(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "migration_during_handoff_count": int(sum(float(row["migration_during_handoff_count"]) for row in rows)),
     }
     per_agent: dict[str, Any] = {}
-    for agent_name in sorted({str(row["agent_name"]) for row in rows}):
+    observed_agents = {str(row["agent_name"]) for row in rows}
+    ordered_agents = (
+        list(agent_order)
+        if agent_order is not None
+        else sorted(observed_agents)
+    )
+    if set(ordered_agents) != observed_agents:
+        raise ValueError("mechanism diagnosis agent order/membership drift")
+    for agent_name in ordered_agents:
         agent_rows = [row for row in rows if str(row["agent_name"]) == agent_name]
         per_agent[agent_name] = {
             "successful_episode_rate": round(fmean(float(row["successful_episode_rate"]) for row in agent_rows), 6) if agent_rows else 0.0,

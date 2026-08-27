@@ -59,6 +59,11 @@ from src.runtime.portable_resource_identity import (
     add_portable_resource_arguments,
     resolve_argument_resources,
 )
+from src.runtime.formal_agent_order import (
+    FormalAgentOrderError,
+    reject_permanently_invalid_run_references,
+    resolve_formal_agent_order,
+)
 
 BENCHMARK_AGENT_CHOICES = list_evaluable_agents()
 SA_ADVANTAGE_FOCUS_METRICS = [
@@ -87,6 +92,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--seed_checkpoint_manifest_path", type=str, default="")
     parser.add_argument("--checkpoint_provenance_manifest_path", type=str, default="")
     parser.add_argument("--cache_baseline_fairness_manifest_path", type=str, default="")
+    parser.add_argument("--formal-agent-order-contract-path", default="")
     parser.add_argument(
         "--model_cache_runtime_config",
         type=str,
@@ -496,6 +502,19 @@ def build_sa_advantage_diagnosis(
 
 def main() -> None:
     args = parse_args()
+    order_audit = None
+    if args.formal_agent_order_contract_path:
+        try:
+            order_audit = resolve_formal_agent_order(
+                contract_path=args.formal_agent_order_contract_path,
+                reactive_baseline_order=BASELINE_NAMES,
+            )
+        except FormalAgentOrderError as exc:
+            raise FairnessManifestError(str(exc)) from exc
+        if list(args.agents) != order_audit["main_benchmark_agent_order"]:
+            raise FairnessManifestError(
+                "benchmark agents differ from the formal main benchmark order"
+            )
     if args.resource_registry_path:
         bindings = [
             ("mobility_resource_id", "mobility_csv_path", "mobility_dataset"),
@@ -552,6 +571,15 @@ def main() -> None:
         args._fairness_root = ROOT_DIR
         args._resolved_model_cache_runtime = runtime_contract
         enforce_benchmark_args(args, fairness_manifest)
+        if order_audit is not None:
+            try:
+                order_audit = resolve_formal_agent_order(
+                    contract_path=args.formal_agent_order_contract_path,
+                    fairness_manifests=[fairness_manifest],
+                    reactive_baseline_order=BASELINE_NAMES,
+                )
+            except FormalAgentOrderError as exc:
+                raise FairnessManifestError(str(exc)) from exc
     excluded_window_intervals = load_excluded_window_intervals(args.exclude_window_plan_path)
     mainline_label = "LuST(SUMO) + Alibaba" if args.mobility_source == "lust" else "NGSIM + Alibaba"
     base_checkpoint_map = expand_checkpoint_aliases(build_checkpoint_map(args))
@@ -559,6 +587,18 @@ def main() -> None:
     checkpoint_provenance_manifest = load_checkpoint_provenance_manifest(
         args.checkpoint_provenance_manifest_path
     )
+    if order_audit is not None:
+        checkpoint_paths = [
+            path
+            for by_seed in seed_checkpoint_manifest.values()
+            if isinstance(by_seed, dict)
+            for path in by_seed.values()
+            if isinstance(path, str)
+        ]
+        try:
+            reject_permanently_invalid_run_references(checkpoint_paths)
+        except FormalAgentOrderError as exc:
+            raise FairnessManifestError(str(exc)) from exc
     audit_checkpoint_source_map = representative_checkpoint_map(
         base_checkpoint_map=base_checkpoint_map,
         seed_checkpoint_manifest=seed_checkpoint_manifest,
@@ -766,6 +806,13 @@ def main() -> None:
                             "window_rank_offset": args.window_rank_offset,
                             "checkpoint_provenance_status": checkpoint_gate["status"],
                             "checkpoint_sha256": checkpoint_gate.get("checkpoint_sha256"),
+                            "formal_agent_order_contract_semantic_sha256": (
+                                order_audit["semantic_sha256"] if order_audit else None
+                            ),
+                            "formal_agent_order_index": (
+                                order_audit["main_benchmark_agent_order"].index(agent_name)
+                                if order_audit else None
+                            ),
                         },
                         predictor_kwargs={
                             **({"random_seed": seed} if fairness_manifest is not None else {}),
@@ -807,6 +854,19 @@ def main() -> None:
             observed_request_fingerprints, expected_agents=args.agents
         )
 
+    if order_audit is not None:
+        agent_index = {
+            name: index
+            for index, name in enumerate(order_audit["main_benchmark_agent_order"])
+        }
+        rows.sort(
+            key=lambda row: (
+                int(row.get("seed", 0)),
+                str(row.get("window_id", "")),
+                str(row.get("workflow_id", "")),
+                agent_index[str(row.get("agent_name"))],
+            )
+        )
     aggregate_by_agent = aggregate_rows(rows, group_keys=["agent_name"], metrics=MAIN_RESULT_METRICS)
     aggregate_by_seed_and_agent = aggregate_rows(rows, group_keys=["seed", "agent_name"], metrics=MAIN_RESULT_METRICS)
     aggregate_by_workflow_and_agent = aggregate_rows(rows, group_keys=["workflow_id", "agent_name"], metrics=MAIN_RESULT_METRICS)
@@ -887,6 +947,10 @@ def main() -> None:
         },
         "mainline": mainline_label,
         "agents": args.agents,
+        "formal_agent_order_contract_semantic_sha256": (
+            order_audit["semantic_sha256"] if order_audit else None
+        ),
+        "formal_agent_order_audit": order_audit,
         "classical_cache_slots": args.classical_cache_slots,
         "algorithm_specs": {agent: get_algo_spec(agent) for agent in args.agents},
         "seeds": args.seeds,
@@ -926,7 +990,12 @@ def main() -> None:
         "aggregate_by_fairness_stratum_and_agent": aggregate_by_fairness_stratum_and_agent,
         "aggregate_non_mechanism_windows_by_agent": aggregate_active_non_mechanism_windows_by_agent,
         "pairwise_comparison": pairwise_comparison,
-        "mechanism_diagnosis": build_mechanism_diagnosis(rows),
+        "mechanism_diagnosis": build_mechanism_diagnosis(
+            rows,
+            agent_order=(
+                order_audit["main_benchmark_agent_order"] if order_audit else None
+            ),
+        ),
         "win_tie_loss_summary": win_tie_loss_summary,
         "comparison_against_popularity": comparison_against_popularity,
         "sa_advantage_diagnosis": sa_advantage_diagnosis,

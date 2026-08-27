@@ -1,5 +1,19 @@
 ﻿# Bugs And Risks
 
+## 2026-08-27: G14C v7 agent mapping-order identity drift（RESOLVED；run永久invalid）
+
+- 根因：dev selector曾直接遍历`training_budget.agent_configs`，使sorted-key JSON mapping从
+  `cache_offload_drl, controller_mat, ...`开始；这与fairness冻结的`sa_ghmappo, ppo, ...`顺序冲突，
+  在任何dev performance前失败。
+- 修复：Formal Agent Order Contract `1.0.0`是active Protocol v1.7的唯一顺序权威；Protocol、scientific
+  config、fairness、commands、checkpoint、benchmark rows、statistics/Holm、claim/display及provenance均
+  使用共享resolver和exact-order验证。Mapping insertion order与alphabetical sort明确禁止作为身份。
+- 历史边界：G14C v7保留150个training cells和1,200 candidates的失败事实，但所有旧checkpoint/candidate/
+  dev input/ledger/marker均不可复用。active execution、dev、freeze、benchmark均硬拒绝其run root引用。
+- 仍开放：Readiness v9只证明Protocol v1.7执行合同与non-formal链路可执行；没有任何v1.7正式checkpoint、
+  formal performance或holdout evidence，不能产生算法优势、G14完成或paper-ready结论。
+- SEALED：holdout仍`sealed=true/opened=false/consumed_permanently=false`；G14R7未运行G14C v8/G14D/G15。
+
 ## 2026-08-25: G14C v6 legacy agent-config identity coupling（RESOLVED；run永久invalid）
 
 - 根因：v1.5 train template仍消费 v1.3 `agent_training_configs.json`；该文件把稳定超参数与旧 Protocol

@@ -1,10 +1,21 @@
 ﻿# Context
 
-更新日期：2026-08-20
+更新日期：2026-08-27
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
 ## 项目状态
+
+- G14R7 active formal execution baseline：Protocol v1.7 semantic SHA-256
+  `5a1c2070529674ecf65c8b836706849f0937853a59b6dfbc3b987d88ac4f50a5`，Formal Agent Order Contract
+  `1.0.0` semantic SHA-256 `82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0`。
+  main agent order严格为5 reactive + 10 learned；mapping key order不构成身份。Scientific config hash与
+  dependency fingerprint未变。Readiness v9=`READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL`仅授权未来独立
+  clean run；当前v1.7正式training/checkpoint/performance=0，holdout sealed/unopened，不是formal或paper-ready。
+
+- G14C v7 `typed_model_cache_formal_20260826_233222_g14c_v7`永久无效：150/150 training与1,200 candidates
+  已完成，但在dev performance前因mapping order/fairness order冲突失败；dev rows/selection/freeze/formal全为0，
+  checkpoint、candidate、partial dev input、ledger与marker均禁止复用。
 
 - G14R2 formal execution baseline：Protocol v1.2 semantic SHA-256
   `718c0f78aabd5d01012df31267626eab74a51b2b621aaa67a535c5b60e655ca9` 已冻结；window contract
