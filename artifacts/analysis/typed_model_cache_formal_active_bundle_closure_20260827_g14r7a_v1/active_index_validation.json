@@ -1,0 +1,63 @@
+{
+  "active_bundle_core_sha256": "96627ac414cb5dc80785c907ded2c9588dcdcf69469a5821b75fc07dc25e5b65",
+  "active_formal_bundle_sha256": "793f5106b83f9687044aeeac122179a8c5805688d4a041c0418292345f9138bd",
+  "active_protocol_index": "configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/protocol_index.json",
+  "environment_identity": {
+    "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+    "environment_fingerprint": "9d33a93ca0688f8168b77ba9b0cd94023c12ab84b06e7687ce04d4aa6ae520aa"
+  },
+  "execution_commit_gate": {
+    "exact_40_hex_recorded_in_execution_binding": true,
+    "index_embeds_own_commit_hash": false,
+    "mode": "observed_clean_head_equal_origin_main",
+    "self_reference_avoided": true
+  },
+  "holdout_capability": false,
+  "index_status": "READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL",
+  "protocol_identity": {
+    "protocol_full_sha256": "df490be510d98be9e04c5c67a48184bb5d17fb17ade56ce62d6b63a53d5914d3",
+    "protocol_id": "typed_model_cache_formal_protocol_v1_8",
+    "protocol_semantic_sha256": "9799bf2c2f4b4665b8390c6fc5d5aa235faf11d6525e043eac289c061633b3de",
+    "protocol_version": "1.8.0"
+  },
+  "readiness_companion": {
+    "content_sha256": "23f9307095f7e2fac0ac0e732ef59e5e83dc97f6c4b02edda41ddf35849fe474",
+    "evidence_manifest_sha256": "70bbd256eaa1a9db594974dd6a54eed5056f1ad716eca4bb482393fdb5336991",
+    "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/readiness_v10.json",
+    "version": "10.0.0"
+  },
+  "resource_count": 30,
+  "resource_ids": [
+    "agent_training_scientific_config",
+    "dev_fairness_manifests.constrained_288mb",
+    "dev_fairness_manifests.medium_576mb",
+    "dev_fairness_manifests.relaxed_864mb",
+    "execution_environment_manifest",
+    "fairness_manifests.constrained_288mb",
+    "fairness_manifests.medium_576mb",
+    "fairness_manifests.relaxed_864mb",
+    "fairness_portable_identity_companion",
+    "formal_agent_order_contract",
+    "formal_training_execution_binding_schema",
+    "portable_resource_registry",
+    "protocol_manifest",
+    "readiness_companion",
+    "resolved_execution_context_schema",
+    "runtime_configs.constrained_288mb",
+    "runtime_configs.medium_576mb",
+    "runtime_configs.relaxed_864mb",
+    "split_companion",
+    "support_fairness_manifests.ablation-8aa367acf3bdf7a9",
+    "support_fairness_manifests.ablation-f09814754dc92882",
+    "support_fairness_manifests.prediction_boundary-5faa585ad5330f05",
+    "support_fairness_manifests.prediction_boundary-95fb72521455c776",
+    "support_fairness_manifests.prediction_boundary-a3a5789695404fae",
+    "support_fairness_manifests.prediction_boundary-ce96dbd5ea956212",
+    "support_fairness_manifests.prediction_boundary-df3bc5ade8c57014",
+    "support_fairness_manifests.prediction_boundary-efa09ee2409d3d87",
+    "support_fairness_manifests.sensitivity-27d16b068076937b",
+    "support_fairness_manifests.sensitivity-7c7c3a1659c6e221",
+    "window_consumption_contract"
+  ],
+  "status": "pass"
+}

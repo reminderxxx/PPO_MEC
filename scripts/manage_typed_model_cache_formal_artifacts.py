@@ -141,7 +141,7 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
     )
     selected = []
     order_audit = None
-    if protocol["typed_model_cache_formal_protocol_version"] == "1.7.0":
+    if protocol["typed_model_cache_formal_protocol_version"] in {"1.7.0", "1.8.0"}:
         try:
             order_audit = resolve_formal_agent_order(protocol=protocol)
             reject_permanently_invalid_run_references([input_root])
@@ -204,10 +204,12 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
         "execution_commit",
         "resolved_execution_context_sha256",
     )
+    if protocol["typed_model_cache_formal_protocol_version"] == "1.8.0":
+        training_identity_fields = (*training_identity_fields, "active_formal_bundle_sha256")
     training_identity = None
     if (
         not non_formal_rehearsal
-        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0"}
+        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0", "1.8.0"}
     ):
         identities = {
             tuple(row.get(field) for field in training_identity_fields)
@@ -246,7 +248,7 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
         raise ValueError("dev selection protocol hash mismatch")
     formal_training_identity = selection.get("formal_training_identity")
     order_audit = None
-    if protocol["typed_model_cache_formal_protocol_version"] == "1.7.0":
+    if protocol["typed_model_cache_formal_protocol_version"] in {"1.7.0", "1.8.0"}:
         try:
             order_audit = resolve_formal_agent_order(protocol=protocol)
         except FormalAgentOrderError as exc:
@@ -262,7 +264,7 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
             raise ValueError("dev selection learned-agent order drift")
     if (
         not bool(selection.get("non_formal_rehearsal"))
-        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0"}
+        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0", "1.8.0"}
     ):
         if not isinstance(formal_training_identity, dict):
             raise ValueError("dev selection lacks formal training identity")
@@ -319,6 +321,9 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
             ),
             "formal_agent_order_contract_semantic_sha256": row.get(
                 "formal_agent_order_contract_semantic_sha256"
+            ),
+            "active_formal_bundle_sha256": row.get(
+                "active_formal_bundle_sha256"
             ),
         }
         identity["semantic_identity_fingerprint"] = canonical_sha256(identity)
@@ -388,6 +393,9 @@ def write_checkpoint_companions(input_root: Path, freeze: dict) -> list[dict]:
                 "formal_agent_order_contract_semantic_sha256": row.get(
                     "formal_agent_order_contract_semantic_sha256"
                 ),
+                "active_formal_bundle_sha256": row.get(
+                    "active_formal_bundle_sha256"
+                ),
                 "runtime_contract_sha256": row.get("runtime_contract_sha256"),
                 "resolved_agent_config": row.get("resolved_agent_config"),
                 "checkpoint_schedule": row.get("checkpoint_schedule"),
@@ -409,6 +417,9 @@ def write_checkpoint_companions(input_root: Path, freeze: dict) -> list[dict]:
                 "formal_agent_order_contract_semantic_sha256": freeze.get(
                     "formal_agent_order_contract_semantic_sha256"
                 ),
+                "active_formal_bundle_sha256": (
+                    freeze.get("formal_training_identity", {}) or {}
+                ).get("active_formal_bundle_sha256"),
                 "entries": [
                     {
                         "agent": row["agent_name"],

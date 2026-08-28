@@ -41,6 +41,8 @@ FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION = "1.6.0"
 FORMAL_EXECUTION_PROTOCOL_V1_6_ID = "typed_model_cache_formal_protocol_v1_6"
 FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION = "1.7.0"
 FORMAL_EXECUTION_PROTOCOL_V1_7_ID = "typed_model_cache_formal_protocol_v1_7"
+FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION = "1.8.0"
+FORMAL_EXECUTION_PROTOCOL_V1_8_ID = "typed_model_cache_formal_protocol_v1_8"
 FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
 FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
 PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
@@ -540,6 +542,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
+        FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION,
     }:
         raise FormalExecutionError("unsupported formal execution protocol version")
     expected_protocol_id = {
@@ -550,6 +553,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_5_ID,
         FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_6_ID,
         FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_7_ID,
+        FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_8_ID,
     }[version]
     if protocol.get("protocol_id") != expected_protocol_id:
         raise FormalExecutionError("formal execution protocol ID mismatch")
@@ -709,12 +713,22 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 ),
             }
         else:
-            if supersession.get("supersedes_version") != "1.6.0":
-                raise FormalExecutionError("protocol v1.7 must supersede v1.6")
-            if supersession.get("old_protocol_status") != (
+            expected_supersedes = (
+                "1.6.0"
+                if version == FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION
+                else "1.7.0"
+            )
+            expected_old_status = (
                 "invalid_after_training_before_dev_performance_execution"
-            ):
-                raise FormalExecutionError("G14C v7 invalid status is missing")
+                if version == FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION
+                else "audit_only_active_index_readiness_inconsistent"
+            )
+            if supersession.get("supersedes_version") != expected_supersedes:
+                raise FormalExecutionError(
+                    f"protocol {version} must supersede {expected_supersedes}"
+                )
+            if supersession.get("old_protocol_status") != expected_old_status:
+                raise FormalExecutionError("active predecessor status is missing")
             failures = supersession.get("invalid_execution_runs", [])
             expected_boundaries = {
                 "typed_model_cache_formal_20260820_g14c_351fdb8_v1": (
@@ -791,6 +805,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
+                FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION,
             }
             else [
                 "explicit_python_executable",
@@ -833,6 +848,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
             FORMAL_EXECUTION_PROTOCOL_V1_5_VERSION,
             FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION,
             FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
+            FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION,
         }:
             resolved = protocol.get("resolved_formal_execution_context_contract", {})
             if (
@@ -841,6 +857,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                     if version in {
                         FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION,
                         FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
+                        FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION,
                     }
                     else "1.0.0"
                 )
@@ -875,6 +892,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
             if version in {
                 FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
+                FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION,
             }:
                 scientific = protocol.get(
                     "agent_training_scientific_config_contract", {}
@@ -905,7 +923,10 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                     raise FormalExecutionError(
                         "Protocol v1.6 train command retains legacy companion"
                     )
-                if version == FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION:
+                if version in {
+                    FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
+                    FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION,
+                }:
                     from src.runtime.formal_agent_order import (
                         FormalAgentOrderError,
                         resolve_formal_agent_order,
@@ -927,7 +948,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                     ):
                         if "--formal-agent-order-contract-path" not in templates[phase]["argv"]:
                             raise FormalExecutionError(
-                                f"Protocol v1.7 {phase} lacks formal agent order contract"
+                                f"Protocol v1.7+ {phase} lacks formal agent order contract"
                             )
     if protocol.get("identity", {}).get("split_semantic_sha256") != SPLIT_SEMANTIC_SHA256:
         raise FormalExecutionError("split semantic hash changed")
@@ -1750,6 +1771,8 @@ __all__ = [
     "FORMAL_EXECUTION_PROTOCOL_V1_6_VERSION",
     "FORMAL_EXECUTION_PROTOCOL_V1_7_ID",
     "FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION",
+    "FORMAL_EXECUTION_PROTOCOL_V1_8_ID",
+    "FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION",
     "FORMAL_PHASE_LEDGER_SCHEMA_VERSION",
     "FORMAL_PHASE_RUNNER_VERSION",
     "FAILURE_CLASSIFICATIONS",

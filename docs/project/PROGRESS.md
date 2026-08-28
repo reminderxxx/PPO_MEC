@@ -1,5 +1,27 @@
 ﻿# Progress
 
+## 2026-08-28: G14R7A active formal bundle closure完成
+
+- 确认v1.7 active index仍为`PENDING_G14R7_VALIDATION`且指向v1.6 environment，而Readiness v9声称ready；
+  两个environment fingerprint为`a8126811...7257`与`55c84dfd...25a98`。根因是v1.7 generator深拷贝
+  v1.6 index遗漏environment路径，finalizer只写analysis readiness且outer runner允许CLI绕过index。
+- 冻结Active Formal Bundle Contract `1.0.0`与Protocol v1.8。Protocol semantic SHA-256=
+  `9799bf2c2f4b4665b8390c6fc5d5aa235faf11d6525e043eac289c061633b3de`，bundle core/final SHA-256=
+  `96627ac414cb5dc80785c907ded2c9588dcdcf69469a5821b75fc07dc25e5b65`/
+  `793f5106b83f9687044aeeac122179a8c5805688d4a041c0418292345f9138bd`。Scientific/Order/dependency身份不变，
+  v1.8 environment fingerprint=`9d33a93ca0688f8168b77ba9b0cd94023c12ab84b06e7687ce04d4aa6ae520aa`。
+- generator只可写pending，evidence-gated finalizer create-only生成Readiness v10并原子冻结ready index；ready
+  bundle不可被普通generator降级。outer runner默认从唯一index解析资源，在run root/binding/context/ledger前
+  验证完整bundle、Readiness证据、content hash、clean HEAD和origin/main，dry-run与真实执行相同。
+- Git-clean、无`.venv` candidate完成186-command展开、150 training identity、24 dev nested identity、
+  15-agent probe、真实11,850,526 rows/73,871 frames/60-of-60 preflight及clean tests；ready outer runner再次
+  完成真实`preflight → tests`，1093/1093通过，bundle hash进入binding/context。
+- 主工作区G14R7A/contract专项656项、全仓1097项通过。Readiness v10=
+  `READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL`只授权未来独立clean G14C v8；正式training/checkpoint/
+  performance仍为0，holdout sealed/unopened，未启动G14C v8/G14D/G15，无性能或paper-ready结论。
+- 合同：`docs/project/active_formal_bundle_contract.md`；机器证据：
+  `artifacts/analysis/typed_model_cache_formal_active_bundle_closure_20260827_g14r7a_v1/`。
+
 ## 2026-08-27: G14R7 unified formal agent-order repair完成
 
 - G14C v7 `typed_model_cache_formal_20260826_233222_g14c_v7` 永久登记为

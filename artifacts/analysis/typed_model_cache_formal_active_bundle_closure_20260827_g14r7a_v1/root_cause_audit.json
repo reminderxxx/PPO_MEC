@@ -1,0 +1,15 @@
+{
+  "audited_at": "2026-08-28T09:54:24.563211+08:00",
+  "findings": [
+    "repair_typed_model_cache_formal_agent_order.py deep-copied the v1.6 index",
+    "the generator wrote v1.7 Protocol/environment but omitted index execution_environment_manifest update",
+    "the generator fixed index status to PENDING_G14R7_VALIDATION",
+    "Readiness v9 generation neither atomically updated nor froze the active index",
+    "Readiness v9 did not audit index status/path/environment content or full Protocol references",
+    "the old outer runner accepted caller-selected Protocol/environment without active-index validation"
+  ],
+  "post_fix_contract": "active_formal_bundle_contract_version=1.0.0",
+  "post_fix_status": "READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL",
+  "pre_fix_status": "PRE_EXECUTION_BLOCKED_ACTIVE_BUNDLE_INCONSISTENT",
+  "status": "confirmed_and_closed"
+}

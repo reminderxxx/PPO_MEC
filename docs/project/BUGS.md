@@ -1,5 +1,19 @@
 ﻿# Bugs And Risks
 
+## 2026-08-28: v1.7 active index / Readiness / environment split（RESOLVED；v1.7 audit-only）
+
+- 根因：v1.7 generator从v1.6 index深拷贝后遗漏`execution_environment_manifest`更新，并固定写pending；
+  Readiness v9 finalizer未审计或冻结index。outer runner只验证调用者给出的Protocol/environment，能绕过错误index。
+- 修复：Protocol v1.8以Active Formal Bundle Contract `1.0.0`绑定index、Protocol、environment、Scientific、
+  Order、binding/context schema、portable/split/window/catalog/runtime/fairness、Readiness evidence、command matrix、
+  execution commit rule和holdout seal。ready index最终SHA-256=`793f5106...38bd`。
+- 门禁：outer runner在任何run-root写入前自动解析唯一index；CLI只可作一致性断言。pending/ready分叉、旧路径、
+  content/fingerprint/commit/shared-resource/evidence/symlink/cwd漂移与dry-run bypass均fail-fast。
+- 历史边界：v1.0–v1.7全部audit-only；G14C v1–v7 invalid roots/checkpoints继续拒绝。v1.7 Readiness v9只作
+  历史不一致证据，不再授权执行。
+- 仍开放：Readiness v10仅证明pre-execution合同，不包含正式checkpoint、formal performance或算法优势；
+  G14C v8必须未来另立任务，holdout继续sealed/unopened。
+
 ## 2026-08-27: G14C v7 agent mapping-order identity drift（RESOLVED；run永久invalid）
 
 - 根因：dev selector曾直接遍历`training_budget.agent_configs`，使sorted-key JSON mapping从

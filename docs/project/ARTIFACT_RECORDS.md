@@ -1,5 +1,25 @@
 # Artifact Records
 
+## 2026-08-28 G14R7A active formal bundle closure
+
+- path：`artifacts/analysis/typed_model_cache_formal_active_bundle_closure_20260827_g14r7a_v1/`；config：
+  `configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/`。
+- v1.7 inconsistency：index status=`PENDING_G14R7_VALIDATION`，indexed/actual environment fingerprint=
+  `a8126811569850dc77f4d9586df4c20166fe78a16ac3386fc59e6f973e5d7257`/
+  `55c84dfd45ba8177548adeb1c46ddf45d28a9d1decefcb527b2f68e3c7d25a98`，Readiness v9却为ready。
+- Active Formal Bundle Contract `1.0.0`；Protocol v1.8 semantic SHA-256=
+  `9799bf2c2f4b4665b8390c6fc5d5aa235faf11d6525e043eac289c061633b3de`；bundle core/final SHA-256=
+  `96627ac414cb5dc80785c907ded2c9588dcdcf69469a5821b75fc07dc25e5b65`/
+  `793f5106b83f9687044aeeac122179a8c5805688d4a041c0418292345f9138bd`。
+- Readiness v10 evidence SHA-256=`70bbd256eaa1a9db594974dd6a54eed5056f1ad716eca4bb482393fdb5336991`；
+  verdict=`READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL`，evidence level=
+  `E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE`。
+- clean acceptance：186 commands、150 training identities、24 dev nested identities、15-agent probe、
+  11,850,526 rows、73,871 frames、60/60 windows；ready outer runner的真实preflight/tests为1093/1093通过，
+  主工作区专项656、全仓1097通过。
+- boundary：formal training/checkpoint/performance均为0，holdout sealed/unopened；未启动G14C v8/G14D/G15，
+  不是formal或paper-ready证据。
+
 ## 2026-08-27 G14R7 formal agent-order repair
 
 - path：`artifacts/analysis/typed_model_cache_formal_agent_order_repair_20260827_g14r7_v1/`；config：

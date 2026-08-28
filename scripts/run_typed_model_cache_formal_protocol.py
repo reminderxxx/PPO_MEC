@@ -38,6 +38,12 @@ from src.evaluators.formal_cell_transaction import (
     stable_cell_id,
 )
 from src.runtime.formal_execution_environment import resolve_execution_environment
+from src.runtime.active_formal_bundle import (
+    ACTIVE_PROTOCOL_VERSION,
+    ActiveFormalBundleError,
+    DEFAULT_ACTIVE_INDEX_RELATIVE,
+    validate_active_formal_bundle,
+)
 from src.runtime.formal_training_identity import (
     atomic_create_execution_binding,
     build_execution_binding,
@@ -56,6 +62,7 @@ PROTOCOL_V14 = "1.4.0"
 PROTOCOL_V15 = "1.5.0"
 PROTOCOL_V16 = "1.6.0"
 PROTOCOL_V17 = "1.7.0"
+PROTOCOL_V18 = "1.8.0"
 
 
 def _absolute_project_path(value: str) -> str:
@@ -69,6 +76,8 @@ def resolved_expansion_context(
     protocol_path: str,
     output_root: str,
     python_executable: str,
+    active_formal_bundle_sha256: str | None = None,
+    active_protocol_index_path: str | None = None,
 ) -> dict:
     """Resolve every host/run location once at the outermost runner."""
 
@@ -97,6 +106,12 @@ def resolved_expansion_context(
         ),
         resolve_relative_paths_against_repository_root=True,
     )
+    if active_formal_bundle_sha256 is not None:
+        context["active_formal_bundle_sha256"] = active_formal_bundle_sha256
+    if active_protocol_index_path is not None:
+        context["active_protocol_index_path"] = str(
+            Path(active_protocol_index_path).resolve()
+        )
     for _ in range(4):
         changed = False
         for key, value in list(context.items()):
@@ -142,7 +157,16 @@ def resolved_expansion_context(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--protocol-path", required=True)
+    parser.add_argument(
+        "--protocol-path",
+        default="",
+        help="optional v1.8 consistency assertion; omitted path is resolved from the active index",
+    )
+    parser.add_argument(
+        "--active-protocol-index",
+        default=DEFAULT_ACTIVE_INDEX_RELATIVE,
+        help="unique active Protocol index; alternate indexes are rejected",
+    )
     parser.add_argument("--output-root", required=True)
     parser.add_argument("--preflight", action="store_true")
     parser.add_argument("--phase", choices=PHASE_ORDER)
@@ -165,7 +189,7 @@ def reject_invalid_run_root(protocol: dict, output_root: str | Path) -> None:
     supersession = protocol.get("supersession", {})
     references = (
         supersession.get("invalid_execution_runs", [])
-        if version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17}
+        if version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17, PROTOCOL_V18}
         else supersession.get("invalid_g14c_v4_runs", [])
         if version == PROTOCOL_V14
         else []
@@ -191,15 +215,51 @@ def load_protocol(path: str | Path) -> dict:
 
 def main() -> None:
     args = parse_args()
+    active_bundle = None
+    if not args.protocol_path:
+        try:
+            active_bundle = validate_active_formal_bundle(
+                repository_root=ROOT,
+                index_path=args.active_protocol_index,
+                execution_environment_manifest_path=(
+                    args.execution_environment_manifest or None
+                ),
+            )
+        except ActiveFormalBundleError as exc:
+            raise FormalExecutionError(f"active formal bundle gate failed: {exc}") from exc
+        args.protocol_path = active_bundle["protocol_path"]
+        args.execution_environment_manifest = active_bundle[
+            "execution_environment_manifest_path"
+        ]
     protocol = load_protocol(args.protocol_path)
     protocol_version = protocol["typed_model_cache_formal_protocol_version"]
+    if protocol_version == PROTOCOL_V18 and active_bundle is None:
+        try:
+            active_bundle = validate_active_formal_bundle(
+                repository_root=ROOT,
+                index_path=args.active_protocol_index,
+                protocol_path=args.protocol_path,
+                execution_environment_manifest_path=(
+                    args.execution_environment_manifest or None
+                ),
+            )
+        except ActiveFormalBundleError as exc:
+            raise FormalExecutionError(f"active formal bundle gate failed: {exc}") from exc
+        if not args.execution_environment_manifest:
+            args.execution_environment_manifest = active_bundle[
+                "execution_environment_manifest_path"
+            ]
+    elif protocol_version == PROTOCOL_V17:
+        raise FormalExecutionError(
+            "formal Protocol v1.0-v1.7 is audit-only; v1.7 pending index is not executable"
+        )
     phase = "preflight" if args.preflight else args.phase
     templates = protocol["execution_contract"]["command_templates"]
     requested_output_root = str(Path(args.output_root).resolve())
     reject_invalid_run_root(protocol, requested_output_root)
     environment_resolution = None
     environment_manifest = None
-    if protocol_version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17}:
+    if protocol_version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17, PROTOCOL_V18}:
         if not args.python_executable or not args.execution_environment_manifest:
             raise FormalExecutionError(
                 "active formal protocol requires explicit Python and execution environment manifest"
@@ -208,7 +268,7 @@ def main() -> None:
             raise FormalExecutionError(
                 "active formal protocol forbids relative Python or .venv fallback"
             )
-    if protocol_version in {PROTOCOL_V14, PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17}:
+    if protocol_version in {PROTOCOL_V14, PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17, PROTOCOL_V18}:
         if args.execution_environment_manifest:
             environment_manifest = json.loads(
                 Path(args.execution_environment_manifest).read_text(encoding="utf-8-sig")
@@ -227,7 +287,7 @@ def main() -> None:
             ),
             require_clean_git_worktree=True,
         )
-        if protocol_version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17} and environment_resolution.runtime_audit.get(
+        if protocol_version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17, PROTOCOL_V18} and environment_resolution.runtime_audit.get(
             "resolution_source"
         ) != "explicit_python_executable":
             raise FormalExecutionError(
@@ -243,11 +303,19 @@ def main() -> None:
         protocol_path=args.protocol_path,
         output_root=requested_output_root,
         python_executable=resolved_python,
+        active_formal_bundle_sha256=(
+            active_bundle["active_formal_bundle_sha256"]
+            if active_bundle is not None
+            else None
+        ),
+        active_protocol_index_path=(
+            args.active_protocol_index if active_bundle is not None else None
+        ),
     )
     outer_validation = validate_command_templates(templates, context)
     scientific_config = None
     execution_binding = None
-    if protocol_version in {PROTOCOL_V16, PROTOCOL_V17}:
+    if protocol_version in {PROTOCOL_V16, PROTOCOL_V17, PROTOCOL_V18}:
         if environment_resolution is None:
             raise FormalExecutionError("Protocol v1.6 environment was not resolved")
         scientific_config = load_strict_json_mapping(
@@ -268,6 +336,11 @@ def main() -> None:
                 execution_commit=observed_commit,
                 environment_identity=environment_resolution.environment_identity,
                 command_matrix_sha256=outer_validation["command_matrix_sha256"],
+                active_formal_bundle_sha256=(
+                    active_bundle["active_formal_bundle_sha256"]
+                    if active_bundle is not None
+                    else None
+                ),
             )
         else:
             execution_binding = build_execution_binding(
@@ -276,11 +349,16 @@ def main() -> None:
                 execution_commit=observed_commit,
                 environment_identity=environment_resolution.environment_identity,
                 command_matrix_sha256=outer_validation["command_matrix_sha256"],
+                active_formal_bundle_sha256=(
+                    active_bundle["active_formal_bundle_sha256"]
+                    if active_bundle is not None
+                    else None
+                ),
             )
     resolved_context_payload = None
     resolved_context_report = None
     resolved_context_file_sha256 = None
-    if protocol_version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17}:
+    if protocol_version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17, PROTOCOL_V18}:
         if environment_resolution is None or not args.execution_environment_manifest:
             raise FormalExecutionError("protocol v1.5 environment was not resolved")
         context_path = Path(context["resolved_execution_context_path"])
@@ -318,6 +396,11 @@ def main() -> None:
                 phase_count=outer_validation["phase_count"],
                 command_count=outer_validation["command_count"],
                 execution_binding=execution_binding,
+                active_formal_bundle_sha256=(
+                    active_bundle["active_formal_bundle_sha256"]
+                    if active_bundle is not None
+                    else None
+                ),
             )
             encoded_context = (
                 json.dumps(
@@ -370,6 +453,19 @@ def main() -> None:
                         if execution_binding is not None
                         else None
                     ),
+                    "active_formal_bundle": (
+                        {
+                            "contract_version": active_bundle[
+                                "active_formal_bundle_contract_version"
+                            ],
+                            "active_formal_bundle_sha256": active_bundle[
+                                "active_formal_bundle_sha256"
+                            ],
+                            "execution_commit": active_bundle["execution_commit"],
+                        }
+                        if active_bundle is not None
+                        else None
+                    ),
                 },
                 ensure_ascii=False,
                 indent=2,
@@ -378,9 +474,9 @@ def main() -> None:
         )
         return
 
-    if protocol_version != PROTOCOL_V17:
+    if protocol_version != PROTOCOL_V18:
         raise FormalExecutionError(
-            "formal Protocol v1.0-v1.6 is audit-only; new execution requires v1.7"
+            "formal Protocol v1.0-v1.7 is audit-only; new execution requires v1.8"
         )
 
     if phase == "complete_without_holdout":
@@ -409,9 +505,12 @@ def main() -> None:
             "formal_training_execution_binding_sha256": execution_binding[
                 "binding_full_sha256"
             ],
+            "active_formal_bundle_sha256": active_bundle[
+                "active_formal_bundle_sha256"
+            ],
         }
     )
-    if protocol_version == PROTOCOL_V17:
+    if protocol_version == PROTOCOL_V18:
         if environment_resolution is None or resolved_context_payload is None:
             raise FormalExecutionError("protocol v1.5 context was not resolved")
         ledger_resume_phases = {
@@ -458,6 +557,9 @@ def main() -> None:
                 ),
                 "formal_training_execution_binding_sha256": execution_binding[
                     "binding_full_sha256"
+                ],
+                "active_formal_bundle_sha256": active_bundle[
+                    "active_formal_bundle_sha256"
                 ],
             }
         )
@@ -527,6 +629,9 @@ def main() -> None:
                         "formal_training_execution_binding_sha256": execution_binding[
                             "binding_full_sha256"
                         ],
+                        "active_formal_bundle_sha256": active_bundle[
+                            "active_formal_bundle_sha256"
+                        ],
                     }
                 ),
             )
@@ -563,6 +668,9 @@ def main() -> None:
                         "phase": phase,
                         "coordinates": coordinates,
                         "command": original,
+                        "active_formal_bundle_sha256": active_bundle[
+                            "active_formal_bundle_sha256"
+                        ],
                     }
                 )
                 output_flag = "--output_root"
@@ -633,6 +741,9 @@ def main() -> None:
                         "phase": phase,
                         "coordinates": coordinates,
                         "command": original,
+                        "active_formal_bundle_sha256": active_bundle[
+                            "active_formal_bundle_sha256"
+                        ],
                     }
                 )
                 output_flag = "--output_root" if "--output_root" in original else "--output-root"

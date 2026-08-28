@@ -1,5 +1,25 @@
 # Code Module Map
 
+## G14R7A active formal bundle gate
+
+- `src/runtime/active_formal_bundle.py`：Active Formal Bundle Contract `1.0.0`、strict JSON/path/content/shared
+  resource验证、无环core/ready hash投影、Readiness evidence、clean HEAD/origin gate与唯一index解析。
+- `scripts/repair_typed_model_cache_formal_active_bundle.py`：只生成Protocol v1.8 pending candidate；ready index
+  存在时拒绝覆盖或降级。
+- `scripts/finalize_typed_model_cache_formal_active_bundle.py`：验证clean acceptance evidence，create-only写
+  Readiness v10/evidence并atomic replace冻结ready index；身份不变时幂等。
+- `scripts/run_typed_model_cache_formal_protocol.py`：默认从唯一index自动解析Protocol/environment，并在
+  output root、binding、context或ledger前执行同一dry-run/real bundle gate。
+- `src/runtime/formal_training_identity.py`、`formal_training_contract.py`、
+  `resolved_formal_execution_context.py`：active bundle SHA进入binding/context/training/checkpoint identity。
+- `scripts/train_algo_pool_real_sample.py`、`run_typed_model_cache_formal_dev_selection.py`、
+  `manage_typed_model_cache_formal_artifacts.py`：bundle SHA进入checkpoint metadata、dev candidate、selection/
+  freeze companion和checkpoint provenance。
+- `scripts/build_typed_model_cache_formal_active_bundle_acceptance.py`：从clean candidate的raw preflight/JUnit/
+  command/order与保护文件证据生成finalizer输入，不运行正式training/formal/holdout。
+- `tests/test_active_formal_bundle_v18.py`：16类ready/pending、path/hash/content/commit/shared/evidence/symlink/
+  dry-run/invalid-root/holdout负例。
+
 ## G14R7 unified formal agent order
 
 - `src/runtime/formal_agent_order.py`：versioned order contract加载、strict schema/canonical hash、reactive/

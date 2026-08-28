@@ -122,6 +122,7 @@ def build_resolved_formal_execution_context(
     phase_count: int,
     command_count: int,
     execution_binding: Mapping[str, Any] | None = None,
+    active_formal_bundle_sha256: str | None = None,
 ) -> dict[str, Any]:
     """Build one full host-bound context after environment resolution."""
 
@@ -158,6 +159,13 @@ def build_resolved_formal_execution_context(
             raise ResolvedFormalExecutionContextError(
                 "formal training execution binding identity is incomplete"
             )
+        if protocol.get("typed_model_cache_formal_protocol_version") == "1.8.0":
+            if active_formal_bundle_sha256 != execution_binding.get(
+                "active_formal_bundle_sha256"
+            ):
+                raise ResolvedFormalExecutionContextError(
+                    "resolved context active formal bundle identity drift"
+                )
     else:
         binding_sha256 = None
         scientific_config_sha256 = None
@@ -246,10 +254,20 @@ def build_resolved_formal_execution_context(
             "network_or_cwd_discovery_allowed": False,
         },
     }
-    if protocol.get("typed_model_cache_formal_protocol_version") == "1.7.0":
+    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0"}:
         payload["scientific_identity"][
             "formal_agent_order_contract_semantic_sha256"
         ] = protocol["formal_agent_order_contract"]["semantic_sha256"]
+    if protocol.get("typed_model_cache_formal_protocol_version") == "1.8.0":
+        if not isinstance(active_formal_bundle_sha256, str) or len(
+            active_formal_bundle_sha256
+        ) != 64:
+            raise ResolvedFormalExecutionContextError(
+                "Protocol v1.8 resolved context requires active formal bundle SHA-256"
+            )
+        payload["scientific_identity"]["active_formal_bundle_sha256"] = (
+            active_formal_bundle_sha256
+        )
     payload["context_sha256"] = canonical_sha256(_context_projection(payload))
     validate_resolved_formal_execution_context(payload)
     return payload
@@ -368,10 +386,19 @@ def validate_resolved_formal_execution_context(
                 "typed_runtime_contract_hashes_by_capacity"
             ],
         }
-        if protocol.get("typed_model_cache_formal_protocol_version") == "1.7.0":
+        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0"}:
             comparisons["formal_agent_order_contract_semantic_sha256"] = protocol[
                 "formal_agent_order_contract"
             ]["semantic_sha256"]
+        if protocol.get("typed_model_cache_formal_protocol_version") == "1.8.0":
+            expected_bundle = payload.get("resolved_expansion_context", {}).get(
+                "active_formal_bundle_sha256"
+            )
+            if not isinstance(expected_bundle, str) or len(expected_bundle) != 64:
+                raise ResolvedFormalExecutionContextError(
+                    "resolved context lacks active formal bundle identity"
+                )
+            comparisons["active_formal_bundle_sha256"] = expected_bundle
         for field, expected in comparisons.items():
             if scientific.get(field) != expected:
                 raise ResolvedFormalExecutionContextError(

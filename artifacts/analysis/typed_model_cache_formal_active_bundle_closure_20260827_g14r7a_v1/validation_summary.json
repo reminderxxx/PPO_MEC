@@ -1,0 +1,14 @@
+{
+  "clean_ready_outer_pytest_count": 1093,
+  "compile_import_pass": true,
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "full_pytest_count": 1097,
+  "git_diff_check_pass": true,
+  "holdout_opened": false,
+  "protected_user_files_unchanged": true,
+  "smoke_pass": true,
+  "status": "pass",
+  "targeted_pytest_count": 656
+}

@@ -1,0 +1,24 @@
+{
+  "active_formal_bundle_sha256": "793f5106b83f9687044aeeac122179a8c5805688d4a041c0418292345f9138bd",
+  "binding_full_sha256": "e66f0f96c529b56557bed8a72a62f8271fc5ca3c2b772f648d56f732aa4fef96",
+  "bundle_in_binding": true,
+  "bundle_in_context": true,
+  "dry_run_writes_performed": false,
+  "expected_windows": 60,
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "holdout_capability": false,
+  "ngsim_raw_rows": 11850526,
+  "provider_frames": 73871,
+  "reachable_windows": 60,
+  "real_preflight_status": "pass",
+  "resolved_context_sha256": "179a0b7a8256a2b6b14cfea24a418f57702ca008877f7d8b356d3daf8860aa7c",
+  "status": "pass",
+  "tests": {
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0,
+    "tests": 1093
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "case_count": 16,
+  "cases": [
+    "v1.7_pending_index_rejected",
+    "readiness_ready_index_pending_rejected",
+    "index_ready_readiness_pending_or_missing_rejected",
+    "index_v1.6_environment_rejected",
+    "correct_cli_environment_cannot_bypass_wrong_index",
+    "environment_content_or_fingerprint_drift_rejected",
+    "protocol_path_or_hash_drift_rejected",
+    "scientific_config_or_order_contract_drift_rejected",
+    "dirty_or_origin_execution_commit_drift_rejected",
+    "undeclared_cross_version_shared_resource_rejected",
+    "missing_readiness_evidence_rejected",
+    "status_without_evidence_or_final_hash_rejected",
+    "symlink_cwd_guessing_or_same_name_different_hash_rejected",
+    "dry_run_uses_same_pre_write_gate",
+    "g14c_v1_through_v7_invalid_roots_rejected",
+    "holdout_capability_remains_false"
+  ],
+  "failures": 0,
+  "status": "pass",
+  "test_count": 16,
+  "test_file": "tests/test_active_formal_bundle_v18.py"
+}

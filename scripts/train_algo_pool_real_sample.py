@@ -593,6 +593,9 @@ def main() -> None:
                     formal_agent_order_contract_semantic_sha256=(
                         resolved_training.formal_agent_order_contract_semantic_sha256
                     ),
+                    active_formal_bundle_sha256=(
+                        resolved_training.active_formal_bundle_sha256
+                    ),
                 )
             except FormalTrainingIdentityError as exc:
                 raise FormalTrainingContractError(str(exc)) from exc
@@ -720,6 +723,9 @@ def main() -> None:
                 "formal_agent_order_contract_semantic_sha256": (
                     resolved_training.formal_agent_order_contract_semantic_sha256
                 ),
+                "active_formal_bundle_sha256": (
+                    resolved_training.active_formal_bundle_sha256
+                ),
                 "is_smoke_checkpoint": args.profile == "smoke",
                 "script": "scripts/train_algo_pool_real_sample.py",
                 "typed_runtime_provenance": build_checkpoint_provenance(
@@ -811,6 +817,9 @@ def main() -> None:
         "dependency_fingerprint": resolved_training.dependency_fingerprint,
         "formal_agent_order_contract_semantic_sha256": (
             resolved_training.formal_agent_order_contract_semantic_sha256
+        ),
+        "active_formal_bundle_sha256": (
+            resolved_training.active_formal_bundle_sha256
         ),
         "resolved_model_cache_runtime": runtime_contract,
         "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],

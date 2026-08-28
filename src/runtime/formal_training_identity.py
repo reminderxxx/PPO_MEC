@@ -207,7 +207,7 @@ def validate_scientific_config(
             raise FormalTrainingIdentityError("protocol scientific config contract version mismatch")
         if contract.get("config_semantic_sha256") != expected_hash:
             raise FormalTrainingIdentityError("protocol scientific config hash mismatch")
-        if protocol.get("typed_model_cache_formal_protocol_version") == "1.7.0":
+        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0"}:
             from src.runtime.formal_agent_order import (
                 FormalAgentOrderError,
                 resolve_formal_agent_order,
@@ -294,6 +294,7 @@ def build_execution_binding(
     execution_commit: str,
     environment_identity: Mapping[str, Any],
     command_matrix_sha256: str,
+    active_formal_bundle_sha256: str | None = None,
 ) -> dict[str, Any]:
     scientific = validate_scientific_config(scientific_config, protocol=protocol)
     if not isinstance(execution_commit, str) or len(execution_commit) != 40:
@@ -310,7 +311,7 @@ def build_execution_binding(
         "typed_runtime_identities": protocol["identity"]
         ["typed_runtime_contract_hashes_by_capacity"],
     }
-    if protocol.get("typed_model_cache_formal_protocol_version") == "1.7.0":
+    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0"}:
         data_and_runtime_identity["formal_agent_order_contract_semantic_sha256"] = (
             protocol["formal_agent_order_contract"]["semantic_sha256"]
         )
@@ -343,6 +344,14 @@ def build_execution_binding(
         },
         "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
     }
+    if protocol.get("typed_model_cache_formal_protocol_version") == "1.8.0":
+        if not isinstance(active_formal_bundle_sha256, str) or len(
+            active_formal_bundle_sha256
+        ) != 64:
+            raise FormalTrainingIdentityError(
+                "Protocol v1.8 execution binding requires active formal bundle SHA-256"
+            )
+        payload["active_formal_bundle_sha256"] = active_formal_bundle_sha256
     payload["binding_full_sha256"] = canonical_sha256(binding_projection(payload))
     validate_execution_binding(
         payload,
@@ -351,6 +360,7 @@ def build_execution_binding(
         execution_commit=execution_commit,
         environment_identity=environment_identity,
         command_matrix_sha256=command_matrix_sha256,
+        active_formal_bundle_sha256=active_formal_bundle_sha256,
     )
     return payload
 
@@ -363,6 +373,7 @@ def validate_execution_binding(
     execution_commit: str,
     environment_identity: Mapping[str, Any],
     command_matrix_sha256: str,
+    active_formal_bundle_sha256: str | None = None,
 ) -> dict[str, Any]:
     _reject_non_finite(binding)
     if binding.get("formal_training_execution_binding_version") != (
@@ -381,7 +392,7 @@ def validate_execution_binding(
         "typed_runtime_identities": protocol["identity"]
         ["typed_runtime_contract_hashes_by_capacity"],
     }
-    if protocol.get("typed_model_cache_formal_protocol_version") == "1.7.0":
+    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0"}:
         data_and_runtime_identity["formal_agent_order_contract_semantic_sha256"] = (
             protocol["formal_agent_order_contract"]["semantic_sha256"]
         )
@@ -413,6 +424,14 @@ def validate_execution_binding(
         },
         "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
     }
+    if protocol.get("typed_model_cache_formal_protocol_version") == "1.8.0":
+        if not isinstance(active_formal_bundle_sha256, str) or len(
+            active_formal_bundle_sha256
+        ) != 64:
+            raise FormalTrainingIdentityError(
+                "Protocol v1.8 execution binding requires active formal bundle SHA-256"
+            )
+        comparisons["active_formal_bundle_sha256"] = active_formal_bundle_sha256
     allowed = {
         "formal_training_execution_binding_version",
         *comparisons.keys(),
@@ -430,6 +449,7 @@ def validate_checkpoint_training_identity(
     metadata: Mapping[str, Any], *, scientific_config_sha256: str, binding_sha256: str,
     protocol_semantic_sha256: str, execution_commit: str, resolved_context_sha256: str,
     formal_agent_order_contract_semantic_sha256: str | None = None,
+    active_formal_bundle_sha256: str | None = None,
 ) -> dict[str, Any]:
     expected = {
         "agent_scientific_config_semantic_sha256": scientific_config_sha256,
@@ -442,6 +462,8 @@ def validate_checkpoint_training_identity(
         expected["formal_agent_order_contract_semantic_sha256"] = (
             formal_agent_order_contract_semantic_sha256
         )
+    if active_formal_bundle_sha256 is not None:
+        expected["active_formal_bundle_sha256"] = active_formal_bundle_sha256
     for field, value in expected.items():
         if metadata.get(field) != value:
             raise FormalTrainingIdentityError(f"checkpoint provenance identity mismatch: {field}")

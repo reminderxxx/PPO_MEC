@@ -1,8 +1,57 @@
 # Runbook
 
-## G14R7 formal agent order（只验证，不启动 G14C v8）
+## G14R7A Active Formal Bundle 与未来 G14C v8 启动
 
-active config位于`configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827/`；唯一顺序合同是
+唯一active index：
+
+`configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/protocol_index.json`
+
+普通generator只能生成pending候选；ready bundle已冻结后不得重跑generator降级。合同/负例验证：
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q \
+  tests/test_active_formal_bundle_v18.py
+```
+
+未来单独获授权的G14C v8必须从pushed、Git-clean、`HEAD == origin/main`的detached worktree新建唯一run root。
+候选树不得含本地`.venv`，解释器必须使用共享绝对路径。Protocol与environment由index自动解析，命令不要求
+人工选择这两个文件；若显式传入，只能作为与index完全一致的断言。启动preflight与tests：
+
+```bash
+<shared-absolute-python> scripts/run_typed_model_cache_formal_protocol.py \
+  --active-protocol-index \
+  configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/protocol_index.json \
+  --output-root <new-unique-g14c-v8-run-root> \
+  --python-executable <shared-absolute-python> \
+  --preflight
+
+<shared-absolute-python> scripts/run_typed_model_cache_formal_protocol.py \
+  --active-protocol-index \
+  configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/protocol_index.json \
+  --output-root <same-g14c-v8-run-root> \
+  --python-executable <shared-absolute-python> \
+  --phase tests --resume
+```
+
+只有上述两阶段与run-local binding/context复验通过后，未来G14C v8任务才可明确执行training phase；不得在
+G14R7A中运行下列命令：
+
+```bash
+<shared-absolute-python> scripts/run_typed_model_cache_formal_protocol.py \
+  --active-protocol-index \
+  configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/protocol_index.json \
+  --output-root <same-g14c-v8-run-root> \
+  --python-executable <shared-absolute-python> \
+  --phase train --resume
+```
+
+dry-run与真实运行通过同一active bundle validator；pending/blocked/missing、旧Protocol、CLI path/hash漂移、
+dirty commit、`HEAD != origin/main`均在run-root写入前拒绝。v1.0–v1.7全部audit-only，G14C v1–v7
+roots/checkpoints不得复用。outer runner无holdout capability；不得用本入口打开sealed holdout。
+
+## G14R7 formal agent order（历史审计；不再是active入口）
+
+历史config位于`configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827/`；唯一顺序合同是
 `formal_agent_order_contract.json`。重新生成冻结Protocol骨架：
 
 ```bash
@@ -33,8 +82,8 @@ clean acceptance必须在detached Git-clean worktree执行，候选树内不得�
   --summary-path /absolute/PPO_MEC/artifacts/analysis/typed_model_cache_formal_agent_order_repair_20260827_g14r7_v1/clean_acceptance_summary.json
 ```
 
-该入口不得改为formal mode，不得复用G14C v7的任何路径。Protocol v1.0–v1.6只允许历史审计；Readiness v9
-只授权未来独立G14C v8任务，本节不提供G14C v8/formal/holdout启动命令。
+该入口不得改为formal mode，不得复用G14C v7的任何路径。Protocol v1.0–v1.7只允许历史审计；Readiness v9
+因active index不一致不再授权执行，未来G14C v8只能使用上方v1.8 index入口。
 
 ## G14R6 training identity repair（只生成/验证，不启动 G14C v7）
 

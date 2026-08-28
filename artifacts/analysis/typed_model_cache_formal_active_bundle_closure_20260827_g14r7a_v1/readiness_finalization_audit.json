@@ -1,0 +1,14 @@
+{
+  "active_formal_bundle_sha256": "793f5106b83f9687044aeeac122179a8c5805688d4a041c0418292345f9138bd",
+  "atomic_index_replace": true,
+  "create_only_readiness": true,
+  "evidence_manifest_sha256": "70bbd256eaa1a9db594974dd6a54eed5056f1ad716eca4bb482393fdb5336991",
+  "finalizer_reentry": "idempotent only if all identities are unchanged",
+  "ordinary_generator_ready_overwrite_refused": true,
+  "readiness_content_sha256": "23f9307095f7e2fac0ac0e732ef59e5e83dc97f6c4b02edda41ddf35849fe474",
+  "status": "pass",
+  "transition": [
+    "PENDING_G14R7A_CLEAN_ACCEPTANCE",
+    "READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL"
+  ]
+}

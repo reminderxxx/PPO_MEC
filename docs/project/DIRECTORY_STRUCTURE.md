@@ -1,5 +1,14 @@
 ﻿# Directory Structure
 
+G14R7A：唯一active Protocol v1.8、ready index、environment、Scientific Config、Order Contract、binding/context
+schema与Readiness v10位于`configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/`；共享门禁位于
+`src/runtime/active_formal_bundle.py`，pending generator/finalizer/acceptance builder位于
+`scripts/repair_typed_model_cache_formal_active_bundle.py`、
+`scripts/finalize_typed_model_cache_formal_active_bundle.py`与
+`scripts/build_typed_model_cache_formal_active_bundle_acceptance.py`。机器证据位于
+`artifacts/analysis/typed_model_cache_formal_active_bundle_closure_20260827_g14r7a_v1/`；只含JSON审计，不含
+正式checkpoint、training或performance result。v1.0–v1.7目录均为audit-only。
+
 G14R7：active Protocol v1.7、Formal Agent Order Contract `1.0.0`、scientific config与binding/environment/index
 位于`configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827/`；共享resolver位于
 `src/runtime/formal_agent_order.py`，生成/验收/finalize入口位于`scripts/repair_typed_model_cache_formal_agent_order.py`、

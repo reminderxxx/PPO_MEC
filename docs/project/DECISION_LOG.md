@@ -1,5 +1,22 @@
 ﻿# Decision Log
 
+## 2026-08-28: G14R7A makes the active index the non-bypassable execution authority
+
+- 决定：Active Formal Bundle Contract `1.0.0`和Protocol v1.8替代v1.7作为唯一active execution identity；
+  v1.0–v1.7全部audit-only。Readiness companion不能脱离ready index单独授权执行。
+- 决定：outer runner默认从唯一index自动解析Protocol/environment；CLI只能作相同path/content断言，不能
+  覆盖错误index。完整gate必须在output root、binding、context、ledger前运行，dry-run不例外。
+- 决定：当前版本专属资源全部位于v1.8目录；跨版本稳定资源必须逐项登记role/content hash/size/shared reason。
+  symlink、cwd guessing、repository escape、同名异hash和未声明shared资源全部拒绝。
+- 决定：采用无环三层身份：resource core → Readiness+acceptance evidence → ready index final hash。Readiness不
+  反向嵌入final index hash，不使用迭代碰撞或排除status/evidence的伪hash。
+- 决定：普通generator只能写pending且不能降级ready；finalizer create-only写Readiness/evidence并原子替换
+  index。evidence drift、测试缺失或resource drift拒绝，身份不变的重复finalize只返回幂等结果。
+- 决定：commit不在包含自身的index中嵌入40-hex SHA；执行时gate观察clean `HEAD==origin/main`，再把exact
+  40-hex commit与bundle SHA写入binding/context/checkpoint provenance，以避免Git自引用同时保证精确执行身份。
+- 边界：Readiness v10只授权未来独立G14C v8，不授权G14R7A启动training/formal/holdout/G14D/G15；正式
+  training/checkpoint/performance保持0，holdout sealed/unopened。
+
 ## 2026-08-27: G14R7 freezes one agent-order identity authority
 
 - 决定：Formal Agent Order Contract `1.0.0`是active Protocol v1.7执行、artifact、display和统计配对的唯一

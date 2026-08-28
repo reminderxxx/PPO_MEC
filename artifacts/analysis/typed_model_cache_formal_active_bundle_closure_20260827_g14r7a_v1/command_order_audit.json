@@ -1,0 +1,13 @@
+{
+  "absolute_command_sentinel_count": 0,
+  "dev_fairness_probe_pass": true,
+  "dev_nested_command_count": 24,
+  "dev_outer_command_count": 1,
+  "main_agent_count": 15,
+  "outer_nested_expansion_equal": true,
+  "protocol_command_count": 186,
+  "status": "pass",
+  "training_command_count": 150,
+  "training_command_order_audit_pass": true,
+  "unresolved_placeholder_count": 0
+}

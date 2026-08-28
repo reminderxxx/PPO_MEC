@@ -1,0 +1,11 @@
+{
+  "actual_environment_fingerprint": "55c84dfd45ba8177548adeb1c46ddf45d28a9d1decefcb527b2f68e3c7d25a98",
+  "audited_at": "2026-08-27T21:07:43.220015+08:00",
+  "consistent": false,
+  "indexed_environment_fingerprint": "a8126811569850dc77f4d9586df4c20166fe78a16ac3386fc59e6f973e5d7257",
+  "readiness_v9_verdict": "READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL",
+  "status": "PRE_EXECUTION_BLOCKED_ACTIVE_BUNDLE_INCONSISTENT",
+  "v1_7_actual_environment_path": "configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827/execution_environment_manifest.json",
+  "v1_7_index_environment_path": "configs/experiment/typed_model_cache_formal_protocol_v1_6_20260825/execution_environment_manifest.json",
+  "v1_7_index_status": "PENDING_G14R7_VALIDATION"
+}

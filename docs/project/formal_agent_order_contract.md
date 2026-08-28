@@ -1,9 +1,9 @@
 # Formal Agent Order Contract
 
 - contract version：`1.0.0`
-- active Protocol：`1.7.0`
+- active Protocol：`1.8.0`（v1.7为audit-only predecessor）
 - order semantic SHA-256：`82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0`
-- Protocol semantic SHA-256：`5a1c2070529674ecf65c8b836706849f0937853a59b6dfbc3b987d88ac4f50a5`
+- Protocol semantic SHA-256：`9799bf2c2f4b4665b8390c6fc5d5aa235faf11d6525e043eac289c061633b3de`
 - evidence boundary：non-formal execution-contract validation；无正式性能结论
 
 ## 权威序列
@@ -47,13 +47,14 @@ learned checkpoint。
 
 ## Consumer边界
 
-Dev selector不再读取`list(training_budget.agent_configs)`；Protocol v1.7必须提供order contract path，
+Dev selector不再读取`list(training_budget.agent_configs)`；Protocol v1.8必须提供order contract path，
 并在任何nested benchmark前验证scientific config、Protocol matrix、reactive baseline和fairness controller
 顺序。`enforce_benchmark_args`继续使用exact list equality，不降级为set equality。
 
 Execution Binding与Resolved Context绑定order semantic hash；training checkpoint metadata、dev candidate、
 selection/freeze companion、benchmark raw row/aggregate/statistics和claim/display均携带或验证同一身份。
-Protocol v1.0–v1.6只允许历史审计，不得启动新的active formal执行。
+Protocol v1.0–v1.7只允许历史审计，不得启动新的active formal执行。v1.8完整执行身份还必须通过
+`active_formal_bundle_contract.md`定义的active index gate。
 
 ## G14C v7失败登记
 
@@ -74,6 +75,7 @@ non-formal链路新训练10个tiny checkpoints，由实际dev selector生成nest
 synthetic统计对两种input mapping/row order输出相同14个comparison。所有输出均标记`formal=false`、
 `performance_evidence=false`。
 
-Readiness v9为`READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL`。这只授权未来独立任务从最终Commit A8 clean
-worktree新建G14C v8 run；不表示G14完成、formal完成、holdout evidence、算法优势或paper-ready。本任务未
-启动G14C v8、G14D或G15；正式training/checkpoint/performance仍为0，holdout保持sealed/unopened。
+Readiness v9因active index/environment不一致降级为历史审计记录。Readiness v10=
+`READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL`与Protocol v1.8 ready index原子一致；它只授权未来独立任务从
+最终pushed clean commit新建G14C v8 run，不表示G14/formal完成、holdout evidence、算法优势或paper-ready。
+G14R7A未启动G14C v8、G14D或G15；正式training/checkpoint/performance仍为0，holdout保持sealed/unopened。

@@ -4,6 +4,9 @@
 
 ## Live 文档
 
+- `active_formal_bundle_contract.md`：G14R7A Active Formal Bundle Contract 1.0、Protocol v1.8、唯一active
+  index、Readiness v10原子finalization、outer pre-write gate与全链provenance
+
 - `formal_agent_order_contract.md`：G14R7 order contract 1.0、Protocol v1.7、15-agent序列、consumer
   fail-fast、G14C v7永久拒绝、clean non-formal验收与Readiness v9边界
 
@@ -121,3 +124,12 @@
 - 机器证据：`../../artifacts/analysis/typed_model_cache_formal_training_binding_repair_20260825_g14r6_v1/`
 - 状态：只完成配置/执行身份合同与非正式验收；G14C v6永久invalid，正式training/checkpoint/performance仍为0，
   holdout sealed/unopened，未启动G14C v7/G14D/G15。
+
+## G14R7A active formal bundle closure
+
+- 合同：`active_formal_bundle_contract.md`
+- Protocol v1.8 semantic：`9799bf2c...b3de`
+- active bundle core/final：`96627ac4...5b65` / `793f5106...38bd`
+- 机器证据：`../../artifacts/analysis/typed_model_cache_formal_active_bundle_closure_20260827_g14r7a_v1/`
+- 状态：Readiness v10与ready index一致；v1.0–v1.7 audit-only。只完成pre-execution gate与clean验收，
+  正式training/checkpoint/performance仍为0，holdout sealed/unopened，未启动G14C v8/G14D/G15。

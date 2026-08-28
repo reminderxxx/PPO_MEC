@@ -1,0 +1,21 @@
+{
+  "active_bundle_core_sha256": "96627ac414cb5dc80785c907ded2c9588dcdcf69469a5821b75fc07dc25e5b65",
+  "artifact_run_id": "typed_model_cache_formal_active_bundle_closure_20260827_g14r7a_v1",
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "evidence_manifest_path": "artifacts/analysis/typed_model_cache_formal_active_bundle_closure_20260827_g14r7a_v1/readiness_evidence_manifest_v10.json",
+  "evidence_manifest_sha256": "70bbd256eaa1a9db594974dd6a54eed5056f1ad716eca4bb482393fdb5336991",
+  "formal_checkpoint_count": 0,
+  "formal_completed": false,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "git_commit_binding": "exact observed clean 40-hex HEAD == origin/main at execution",
+  "holdout_opened": false,
+  "literature_cutoff": "2026-08-27",
+  "paper_ready": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "readiness_review_version": "10.0.0",
+  "reviewed_at": "2026-08-28T09:27:47.542448+08:00",
+  "status": "ready",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "verdict": "READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL"
+}

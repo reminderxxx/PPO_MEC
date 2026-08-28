@@ -1,5 +1,16 @@
 # PPO_MEC
 
+G14R7A 已修复 Protocol active index 与 Readiness 分叉，并冻结 Active Formal Bundle Contract `1.0.0`、
+Protocol `1.8.0` 和 Readiness v10=`READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL`。唯一active index为
+`configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/protocol_index.json`；Protocol semantic
+SHA-256=`9799bf2c2f4b4665b8390c6fc5d5aa235faf11d6525e043eac289c061633b3de`，active bundle core/final SHA-256为
+`96627ac414cb5dc80785c907ded2c9588dcdcf69469a5821b75fc07dc25e5b65`/
+`793f5106b83f9687044aeeac122179a8c5805688d4a041c0418292345f9138bd`。outer runner在任何run-root写入前
+自动从index验证Protocol、environment、scientific/order/schema、portable/fairness/data/runtime、Readiness和
+clean `HEAD==origin/main`；手工CLI不能覆盖错误index。v1.0–v1.7全部audit-only。本轮正式training/
+checkpoint/performance仍为0，holdout sealed/unopened，未启动G14C v8/G14D/G15。详见
+`docs/project/active_formal_bundle_contract.md`。
+
 G14R7 已冻结 Formal Agent Order Contract `1.0.0` 与 Protocol `1.7.0`。唯一主序列为 5 个
 reactive（LRU/FIFO/LFU/Aging-LFU/Random）后接 10 个 learned（SA-GHMAPPO、PPO、MAPPO、DQN、
 Dueling DQN、QMIX、Controller MAT、DAG Offload DRL、Cache Offload DRL、DT Handoff DRL）；JSON

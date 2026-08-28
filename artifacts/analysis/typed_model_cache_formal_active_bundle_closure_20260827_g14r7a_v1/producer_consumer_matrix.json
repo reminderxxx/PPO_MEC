@@ -1,0 +1,33 @@
+{
+  "rows": [
+    {
+      "consumer": "v1.7 protocol_index.json",
+      "old_behavior": "pending index plus separately ready Readiness v9",
+      "producer": "repair_typed_model_cache_formal_agent_order.py",
+      "root_cause": "deep-copied v1.6 index without updating execution_environment_manifest",
+      "v1_8_control": "ordinary generator can only write pending; finalizer atomically freezes ready"
+    },
+    {
+      "consumer": "Readiness v9 artifact only",
+      "old_behavior": "readiness could diverge from active index",
+      "producer": "finalize_typed_model_cache_formal_agent_order_repair.py",
+      "root_cause": "did not audit or update active index status/path/content identity",
+      "v1_8_control": "Readiness content hash and evidence hash enter the ready index hash"
+    },
+    {
+      "consumer": "Protocol and environment chosen by caller",
+      "old_behavior": "correct CLI environment could bypass an incorrect index",
+      "producer": "run_typed_model_cache_formal_protocol.py CLI",
+      "root_cause": "no active-index authority existed",
+      "v1_8_control": "complete active bundle validates before output-root creation in dry-run and real execution"
+    },
+    {
+      "consumer": "binding/context/phase/cell/checkpoint/integrity provenance",
+      "old_behavior": "only separately supplied Protocol/environment identities propagated",
+      "producer": "active Protocol v1.8 bundle",
+      "root_cause": "bundle identity was absent downstream",
+      "v1_8_control": "active_formal_bundle_sha256 is a required downstream identity"
+    }
+  ],
+  "status": "pass"
+}

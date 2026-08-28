@@ -1,0 +1,9 @@
+{
+  "active_bundle_core_sha256": "96627ac414cb5dc80785c907ded2c9588dcdcf69469a5821b75fc07dc25e5b65",
+  "active_formal_bundle_contract_version": "1.0.0",
+  "active_formal_bundle_sha256": "793f5106b83f9687044aeeac122179a8c5805688d4a041c0418292345f9138bd",
+  "hash_graph_is_acyclic": true,
+  "holdout_capability": false,
+  "manual_cli_override_allowed": false,
+  "outer_runner_gate_before_writes": true
+}

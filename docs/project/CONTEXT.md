@@ -1,10 +1,18 @@
 ﻿# Context
 
-更新日期：2026-08-27
+更新日期：2026-08-28
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
 ## 项目状态
+
+- G14R7A active formal execution baseline：Active Formal Bundle Contract `1.0.0`，Protocol v1.8 semantic
+  SHA-256 `9799bf2c2f4b4665b8390c6fc5d5aa235faf11d6525e043eac289c061633b3de`，bundle core/final SHA-256
+  `96627ac414cb5dc80785c907ded2c9588dcdcf69469a5821b75fc07dc25e5b65`/
+  `793f5106b83f9687044aeeac122179a8c5805688d4a041c0418292345f9138bd`。Readiness v10=
+  `READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL`与ready index原子一致；outer runner在任何run-root写入前从
+  唯一index验证完整bundle及clean `HEAD==origin/main`。v1.0–v1.7 audit-only；正式training/checkpoint/
+  performance=0，holdout sealed/unopened，未启动G14C v8/G14D/G15，不是formal或paper-ready。
 
 - G14R7 active formal execution baseline：Protocol v1.7 semantic SHA-256
   `5a1c2070529674ecf65c8b836706849f0937853a59b6dfbc3b987d88ac4f50a5`，Formal Agent Order Contract
