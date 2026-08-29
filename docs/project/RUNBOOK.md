@@ -1,5 +1,35 @@
 # Runbook
 
+## G14R8 Resource Resolver 与未来 G14C v9 启动
+
+唯一active index：
+
+`configs/experiment/typed_model_cache_formal_protocol_v1_9_20260829/protocol_index.json`
+
+v1.0–v1.8只作历史审计，不得执行。active consumer必须先验证完整bundle，再通过
+`resolve_active_bundle_resource` / `resolve_capacity_resource_pairs`解析资源；不得从cwd、Protocol sibling或
+旧index顶层字段猜测路径。合同与专项验证：
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 <shared-absolute-python> -m pytest -q \
+  tests/test_active_bundle_resource_resolution_v19.py
+```
+
+未来单独获授权的G14C v9必须从pushed、Git-clean、`HEAD == origin/main == Commit A10`的detached worktree
+创建全新run root，且候选树内不得有`.venv`。preflight示例：
+
+```bash
+<shared-absolute-python> scripts/run_typed_model_cache_formal_protocol.py \
+  --active-protocol-index \
+  configs/experiment/typed_model_cache_formal_protocol_v1_9_20260829/protocol_index.json \
+  --output-root <new-unique-g14c-v9-run-root> \
+  --python-executable <shared-absolute-python> \
+  --preflight
+```
+
+G14C v8 root、checkpoint、candidate、ledger与partial dev input全部禁止传入任何active命令。本G14R8不得执行
+train/formal/holdout phase；Readiness v11只授权未来独立G14C v9任务。
+
 ## G14R7A Active Formal Bundle 与未来 G14C v8 启动
 
 唯一active index：

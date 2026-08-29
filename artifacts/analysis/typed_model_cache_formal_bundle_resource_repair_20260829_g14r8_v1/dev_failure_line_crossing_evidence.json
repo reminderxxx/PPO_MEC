@@ -1,0 +1,11 @@
+{
+  "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+  "nested_benchmark_commands_executed": 3,
+  "new_path": "validated bundle -> resolve_capacity_resource_pairs -> nested benchmark",
+  "old_failure_expression": "index[\"runtime_configs\"]",
+  "performance_evidence": false,
+  "resource_resolution_audit_sha256": "eee00c2492538897ed7643be1398a6838b3468689c6e80282276806027910af9",
+  "resource_resolution_completed_before_checkpoint_read": true,
+  "status": "pass",
+  "v1_8_keyerror_line_crossed": true
+}

@@ -533,3 +533,16 @@
   matrix、G14R5 artifact与Readiness v7 generator。
 - `tests/test_typed_model_cache_formal_execution_v15.py`：outer/nested parity、context tamper/drift/fallback、invalid-run和
   holdout边界专项回归。
+## G14R8 active bundle resource resolution
+
+- `src/runtime/active_formal_bundle.py`：唯一active index验证、content/path/scope gate、单资源/group/capacity/
+  support resolver与order-independent resolution audit。
+- `scripts/run_typed_model_cache_formal_protocol.py`：任何run-root写入前验证bundle并将resolution audit hash加入
+  resolved expansion context/command identity。
+- `scripts/run_typed_model_cache_formal_dev_selection.py`：从run-local resolved context重新验证bundle；formal与
+  nonformal rehearsal共用三档dev capacity resolver，在checkpoint读取前持久化resource audit。
+- `scripts/run_typed_model_cache_formal_support.py`：验证显式runtime/fairness路径与active登记的capacity/setting
+  resource一致。
+- `scripts/repair_typed_model_cache_formal_bundle_resources.py`：生成Protocol v1.9、Readiness v11与唯一无旧顶层
+  compatibility mapping的active index。
+- `tests/test_active_bundle_resource_resolution_v19.py`：v1.8失败复现、18类fail-closed负例和历史执行拒绝。

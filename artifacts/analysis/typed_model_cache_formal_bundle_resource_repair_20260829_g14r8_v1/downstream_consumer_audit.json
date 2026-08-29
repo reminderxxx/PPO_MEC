@@ -1,0 +1,9 @@
+{
+  "active_bundle_hash_bound": true,
+  "dev_revalidates_run_local_bundle_before_checkpoint_read": true,
+  "historical_execution_allowed": false,
+  "nonformal_uses_formal_capacity_resolver_core": true,
+  "resource_audit_hash_bound_to_context_and_command_matrix": true,
+  "status": "pass",
+  "support_explicit_paths_checked_against_inventory": true
+}

@@ -1,5 +1,14 @@
 # PPO_MEC
 
+G14R8 已建立 Active Bundle Resource Resolution Contract `1.0.0`，冻结 Protocol `1.9.0`、Active Formal
+Bundle Contract `1.1.0` 与 Readiness v11=`READY_FOR_G14C_V9_CLEAN_TRAIN_AND_FORMAL`。唯一 active index 为
+`configs/experiment/typed_model_cache_formal_protocol_v1_9_20260829/protocol_index.json`；所有 active consumer
+只能从已验证 bundle 的 `active_bundle_resources` 解析资源，不得读取历史 `runtime_configs`/
+`dev_fairness_manifests` 顶层字段。G14C v8 永久 invalid 于150/150 training、1,200 candidates完成后且首个
+dev performance row前；其 checkpoint/candidate/partial dev input全部禁止复用。v1.0–v1.8均为audit-only，
+holdout sealed/unopened；本轮未启动G14C v9、formal、G14D或G15。详见
+`docs/project/active_bundle_resource_resolution_contract.md`。
+
 G14R7A 已修复 Protocol active index 与 Readiness 分叉，并冻结 Active Formal Bundle Contract `1.0.0`、
 Protocol `1.8.0` 和 Readiness v10=`READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL`。唯一active index为
 `configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/protocol_index.json`；Protocol semantic

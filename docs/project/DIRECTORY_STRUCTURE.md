@@ -1,5 +1,13 @@
 ﻿# Directory Structure
 
+G14R8：唯一active Protocol v1.9、resource-resolution contract、ready index、environment、Scientific/Order、
+binding/context schema与Readiness v11位于`configs/experiment/typed_model_cache_formal_protocol_v1_9_20260829/`；
+共享resolver位于`src/runtime/active_formal_bundle.py`，生成器位于
+`scripts/repair_typed_model_cache_formal_bundle_resources.py`，专项测试为
+`tests/test_active_bundle_resource_resolution_v19.py`。机器证据位于
+`artifacts/analysis/typed_model_cache_formal_bundle_resource_repair_20260829_g14r8_v1/`，不含正式checkpoint、
+training或performance result。v1.0–v1.8目录全部audit-only。
+
 G14R7A：唯一active Protocol v1.8、ready index、environment、Scientific Config、Order Contract、binding/context
 schema与Readiness v10位于`configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/`；共享门禁位于
 `src/runtime/active_formal_bundle.py`，pending generator/finalizer/acceptance builder位于

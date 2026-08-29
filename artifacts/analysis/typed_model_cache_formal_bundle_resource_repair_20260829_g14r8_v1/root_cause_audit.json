@@ -1,0 +1,12 @@
+{
+  "compatibility_top_level_fields_restored": false,
+  "failing_consumer": "scripts/run_typed_model_cache_formal_dev_selection.py",
+  "failure_timing": "before first nested benchmark and before any dev performance row",
+  "producer_schema": "active_bundle_resources rows",
+  "removed_fields_read": [
+    "runtime_configs",
+    "dev_fairness_manifests"
+  ],
+  "repair": "validated active bundle shared resource resolver",
+  "status": "confirmed"
+}

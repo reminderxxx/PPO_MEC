@@ -1,0 +1,11 @@
+{
+  "command_matrix_sha256": "1a990638d0034dabd37eefb20d6921eac48e81c1f9c19a2a95f14852cf6ff4a3",
+  "dev_outer_command_count": 1,
+  "holdout_capability": false,
+  "phase_count": 15,
+  "protocol_command_count": 186,
+  "status": "pass",
+  "training_command_count": 150,
+  "training_order_identity": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0",
+  "unresolved_placeholder_count": 0
+}

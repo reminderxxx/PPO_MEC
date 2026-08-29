@@ -1,0 +1,87 @@
+{
+  "file_count": 16,
+  "files": [
+    {
+      "path": "acceptance_evidence_manifest.json",
+      "sha256": "484d9e77a209bc4f5f47d3df0ca3c6ee5734b5fb328aa10d55e4828d6b4dd790",
+      "size_bytes": 322
+    },
+    {
+      "path": "capacity_pairing_audit.json",
+      "sha256": "8d700401a0850a9c28c5461e8559ff36784b5a4b47e9c238694deb262a5392fe",
+      "size_bytes": 10495
+    },
+    {
+      "path": "clean_preflight_tests.json",
+      "sha256": "c8b722d9f21f6a4fdde6a1fcf6a369e91c8f83d17aff1881e454862fc7ea3d0c",
+      "size_bytes": 494
+    },
+    {
+      "path": "command_expansion_audit.json",
+      "sha256": "c0f8fb559db58ffa6adb819290e3afa721670acc9d1706ea296e9ceb41341f87",
+      "size_bytes": 402
+    },
+    {
+      "path": "dev_failure_line_crossing_evidence.json",
+      "sha256": "fe6ca053dc161bd0a3ff9f761bcb58dfb0d29435e88833f6d22e3de469ab0f39",
+      "size_bytes": 548
+    },
+    {
+      "path": "downstream_consumer_audit.json",
+      "sha256": "625341b947e4eb0783b1d18d76bdb822c320060be5ecb9241e23e937e232e957",
+      "size_bytes": 350
+    },
+    {
+      "path": "g14c_v8_invalid_registration.json",
+      "sha256": "fa2a36256eeb08f5bccef4eb8b6f34d5f7132003f695e1fb578e549e1cc94b5d",
+      "size_bytes": 878
+    },
+    {
+      "path": "negative_validation.json",
+      "sha256": "f476acfa6b02b1072053faca6237f30d6ddf610229acd01d2e1aaf0e94609dda",
+      "size_bytes": 808
+    },
+    {
+      "path": "nonformal_dev_rehearsal.json",
+      "sha256": "d9feb443d71bf75c33e028e6d494bcc078a379738d4b4813db474953b6166346",
+      "size_bytes": 1024
+    },
+    {
+      "path": "producer_consumer_matrix.json",
+      "sha256": "45cd4978891f7dffca2856ae636bab9c2952cfc161751e42817974137d3df131",
+      "size_bytes": 2953
+    },
+    {
+      "path": "protected_user_file_hashes_end.json",
+      "sha256": "e95447b317d1916ac5ac12dc5de6f857b23e0caf0c0678dde0cafd6dff5d13ca",
+      "size_bytes": 799
+    },
+    {
+      "path": "protected_user_file_hashes_start.json",
+      "sha256": "639b8501e3087fc1f5c16219707993f2b1cf44208c960866a53a82990d4c6227",
+      "size_bytes": 778
+    },
+    {
+      "path": "readiness_review_v11.json",
+      "sha256": "0be4c7808c202f33f04e3d5856f0c540863e2c0f5f39ab8b75acdcf8c332f738",
+      "size_bytes": 1507
+    },
+    {
+      "path": "resolved_resource_inventory.json",
+      "sha256": "30545adba858a5287497bc0aaf2951d2578471fcfca34fd53f9cd7919a5a3933",
+      "size_bytes": 50553
+    },
+    {
+      "path": "resource_resolution_contract.json",
+      "sha256": "3b20de50ee6eb3a8b5b88b7a2a2f575457a536f02abedc6a435d535062a6b26c",
+      "size_bytes": 1752
+    },
+    {
+      "path": "root_cause_audit.json",
+      "sha256": "82bdf90261778fd030e02fcac134d5fd08ed525b3d49a5abe5e5645f00f03a0f",
+      "size_bytes": 448
+    }
+  ],
+  "inventory_canonical_sha256": "a5fd12f1fda808047ebee10400b80aac55b9ab4eb73e7dbb2363cf5061761e86",
+  "status": "pass"
+}

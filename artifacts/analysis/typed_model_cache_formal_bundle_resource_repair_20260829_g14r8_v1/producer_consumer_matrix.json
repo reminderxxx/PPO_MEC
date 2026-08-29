@@ -1,0 +1,96 @@
+{
+  "rows": [
+    {
+      "active_raw_index_layout_access_allowed": false,
+      "component": "active index producer",
+      "implementation": "repair_typed_model_cache_formal_bundle_resources.py",
+      "kind": "producer",
+      "scope": "active"
+    },
+    {
+      "active_raw_index_layout_access_allowed": false,
+      "component": "outer formal runner",
+      "implementation": "run_typed_model_cache_formal_protocol.py",
+      "kind": "consumer",
+      "scope": "active"
+    },
+    {
+      "active_raw_index_layout_access_allowed": false,
+      "component": "preflight validator",
+      "implementation": "validate_typed_model_cache_formal_restart.py",
+      "kind": "consumer",
+      "scope": "active"
+    },
+    {
+      "active_raw_index_layout_access_allowed": false,
+      "component": "training",
+      "implementation": "train_algo_pool_real_sample.py",
+      "kind": "consumer",
+      "scope": "active"
+    },
+    {
+      "active_raw_index_layout_access_allowed": false,
+      "component": "dev selection",
+      "implementation": "run_typed_model_cache_formal_dev_selection.py",
+      "kind": "consumer",
+      "scope": "active"
+    },
+    {
+      "active_raw_index_layout_access_allowed": false,
+      "component": "checkpoint selection/freeze",
+      "implementation": "manage_typed_model_cache_formal_artifacts.py",
+      "kind": "consumer",
+      "scope": "active"
+    },
+    {
+      "active_raw_index_layout_access_allowed": false,
+      "component": "cache-policy/controller",
+      "implementation": "benchmark_main_results.py",
+      "kind": "consumer",
+      "scope": "active"
+    },
+    {
+      "active_raw_index_layout_access_allowed": false,
+      "component": "ablation/support/scalability",
+      "implementation": "run_typed_model_cache_formal_support.py",
+      "kind": "consumer",
+      "scope": "active"
+    },
+    {
+      "active_raw_index_layout_access_allowed": false,
+      "component": "statistics",
+      "implementation": "run_typed_model_cache_formal_statistics.py",
+      "kind": "consumer",
+      "scope": "active"
+    },
+    {
+      "active_raw_index_layout_access_allowed": false,
+      "component": "integrity",
+      "implementation": "audit_artifact_integrity.py",
+      "kind": "consumer",
+      "scope": "active"
+    },
+    {
+      "active_raw_index_layout_access_allowed": false,
+      "component": "checkpoint provenance",
+      "implementation": "formal_training_identity.py",
+      "kind": "consumer",
+      "scope": "active"
+    },
+    {
+      "active_raw_index_layout_access_allowed": null,
+      "component": "rehearsal/acceptance",
+      "implementation": "G14R8 clean candidate",
+      "kind": "consumer",
+      "scope": "nonformal"
+    },
+    {
+      "active_raw_index_layout_access_allowed": null,
+      "component": "Protocol v1.0-v1.8 readers",
+      "implementation": "repair/history scripts",
+      "kind": "consumer",
+      "scope": "historical_audit_only"
+    }
+  ],
+  "status": "pass"
+}

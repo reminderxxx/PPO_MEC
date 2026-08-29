@@ -1,0 +1,39 @@
+{
+  "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+  "capacity_order": [
+    "constrained_288mb",
+    "medium_576mb",
+    "relaxed_864mb"
+  ],
+  "capacity_pair_resolver": "src.runtime.active_formal_bundle.resolve_capacity_resource_pairs",
+  "contract_resource": {
+    "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+    "content_sha256": "86cf98f0fa2c769003aedab9c2ed6003d94b80003ab476e2d2c410ab6618e309",
+    "logical_id": "active_bundle_resource_resolution_contract",
+    "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_9_20260829/active_bundle_resource_resolution_contract.json",
+    "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_9_20260829/active_bundle_resource_resolution_contract.json",
+    "role": "Active Bundle Resource Resolution Contract 1.0.0",
+    "semantic_sha256": "c9ddcc291b56b0b63de4d6b78f2be9cb99aa0d6be3f756bb39c82b9121f41b9f",
+    "size_bytes": 781,
+    "validation_status": "validated",
+    "version_scope": "current_protocol_version"
+  },
+  "fail_fast": [
+    "missing",
+    "duplicate",
+    "extra",
+    "role_swap",
+    "content_drift",
+    "size_drift",
+    "path_escape",
+    "symlink",
+    "version_scope_drift"
+  ],
+  "group_resolver": "src.runtime.active_formal_bundle.resolve_active_bundle_group",
+  "raw_index_layout_is_consumer_api": false,
+  "resolver": "src.runtime.active_formal_bundle.resolve_active_bundle_resource",
+  "resource_catalog": "active_bundle_resources",
+  "resource_resolution_audit_sha256": "eee00c2492538897ed7643be1398a6838b3468689c6e80282276806027910af9",
+  "validated_bundle_required": true,
+  "version": "1.0.0"
+}

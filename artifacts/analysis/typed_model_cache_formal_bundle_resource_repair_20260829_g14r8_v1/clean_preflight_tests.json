@@ -1,0 +1,17 @@
+{
+  "clean_candidate_commit": "a29171b849ffaf659627e8b1da8a154301c5214c",
+  "clean_candidate_has_local_venv": false,
+  "dry_run_phase_count": 13,
+  "expected_ngsim_rows": 11850526,
+  "expected_provider_frames": 73871,
+  "expected_windows": 60,
+  "junit_errors": 0,
+  "junit_failures": 0,
+  "junit_skipped": 16,
+  "junit_tests": 1112,
+  "main_worktree_full_pytest": "1100 passed, 16 skipped",
+  "ngsim_rows": 11850526,
+  "provider_frames": 73871,
+  "reachable_windows": 60,
+  "status": "pass"
+}

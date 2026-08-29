@@ -1,0 +1,10 @@
+{
+  "active_bundle_core_sha256": "ef2c841f9012db89be10193a53073a16002bb39f7a6b25998c84db581035d092",
+  "clean_candidate": true,
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "holdout_opened": false,
+  "resource_resolution_contract_version": "1.0.0",
+  "status": "pass"
+}

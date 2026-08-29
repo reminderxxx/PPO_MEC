@@ -1,5 +1,20 @@
 # Artifact Records
 
+## 2026-08-29 G14R8 active bundle resource resolver repair
+
+- path：`artifacts/analysis/typed_model_cache_formal_bundle_resource_repair_20260829_g14r8_v1/`；config：
+  `configs/experiment/typed_model_cache_formal_protocol_v1_9_20260829/`。
+- G14C v8 failure/integrity/inventory SHA-256=`2c09cd14028051a012ddedf756bd6b186b4d1680582c5944acc0da986aa40ba5`/
+  `d2a02fb61bd5b1f9964a7516441ac3ec31d95c0b4451190291be6a9bd1bf3bba`/
+  `025b616efcbf9a41289f0a05a0f07bd2a8d1afaa22698ef70fc21c15d034aba5`；150/150 training、1,200
+  candidates后且dev performance前永久invalid，禁止任何复用。
+- Resource Resolution Contract `1.0.0`；Protocol v1.9 semantic/full、bundle core/final、environment identities
+  以该artifact的`readiness_review_v11.json`与`resolved_resource_inventory.json`为准。Scientific Config=
+  `f83587cd...9bc8`、Order=`82e56275...55e0`、dependency=`88963f61...2d00`保持不变。
+- 主工作区专项/回归379项、全仓1100项通过；clean detached候选完成真实60/60 preflight、1112 tests、
+  三档各15-agent nonformal rows和30/30 selection/freeze。正式training/checkpoint/performance=0，holdout sealed/unopened，
+  未启动G14C v9/G14D/G15。本artifact是execution-contract evidence，不是正式性能证据。
+
 ## 2026-08-28 G14R7A active formal bundle closure
 
 - path：`artifacts/analysis/typed_model_cache_formal_active_bundle_closure_20260827_g14r7a_v1/`；config：

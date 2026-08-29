@@ -1,5 +1,24 @@
 ﻿# Progress
 
+## 2026-08-29: G14R8 active bundle resource resolver repair
+
+- G14C v8 `typed_model_cache_formal_20260828_101804_g14c_v8` 永久登记为
+  `invalid_after_training_before_dev_performance_execution`：150/150 training、1,200 candidates完成，dev rows/
+  selection/freeze/formal均为0；resume/retry/finalize/salvage/checkpoint/candidate/partial-dev复用全部禁止。
+- 根因是v1.8 dev selector仍读取已删除的`index["runtime_configs"]`与
+  `index["dev_fairness_manifests"]`。v1.9不恢复兼容顶层字段，新增只接受validated bundle的共享resource/
+  group/capacity/support resolver；三档runtime与formal/dev fairness按冻结label/order精确配对。
+- 冻结Active Bundle Resource Resolution Contract `1.0.0`、Active Formal Bundle Contract `1.1.0`、Protocol
+  `1.9.0`与Readiness v11=`READY_FOR_G14C_V9_CLEAN_TRAIN_AND_FORMAL`。Scientific Config、Agent Order、
+  dependency fingerprint及全部科学字段不变；v1.0–v1.8全部audit-only。
+- 专项负例、formal execution/training identity/order/fairness/window/statistics/protocol回归共379项通过；主工作区
+  全仓`1100 passed, 16 skipped`。clean detached候选完成186-command、150 training identity、真实
+  11,850,526 rows/73,871 frames/60-of-60 preflight、1112 tests，以及三档各15-agent nonformal rows与30/30
+  selection/freeze。正式training/checkpoint/performance仍为0，holdout sealed/unopened，未启动
+  G14C v9/G14D/G15。
+- 合同：`docs/project/active_bundle_resource_resolution_contract.md`；机器证据：
+  `artifacts/analysis/typed_model_cache_formal_bundle_resource_repair_20260829_g14r8_v1/`。
+
 ## 2026-08-28: G14R7A active formal bundle closure完成
 
 - 确认v1.7 active index仍为`PENDING_G14R7_VALIDATION`且指向v1.6 environment，而Readiness v9声称ready；

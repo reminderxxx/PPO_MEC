@@ -1,5 +1,17 @@
 ﻿# Bugs And Risks
 
+## 2026-08-29: v1.8 active resource schema misread（RESOLVED；G14C v8永久invalid）
+
+- 根因：v1.8 index的唯一目录是`active_bundle_resources`，dev selector却仍直接读取旧顶层
+  `runtime_configs`和`dev_fairness_manifests`，故第一条dev命令在任何performance row前抛出`KeyError`。
+- 修复：v1.9 active consumer只接受`validate_active_formal_bundle()`结果，通过Resource Resolution Contract
+  `1.0.0`解析单资源、group、三档capacity pair和support setting；missing/duplicate/extra/role/hash/size/path/
+  symlink/scope/CLI mismatch全部fail-fast。nonformal与formal dev共用同一capacity resolver。
+- 历史边界：G14C v8的150 training cells与1,200 candidates只保留失败事实，任何checkpoint/candidate/dev
+  input均不可复用；v1.0–v1.8全部audit-only。
+- 仍开放：Readiness v11不是正式performance或paper-ready证据；G14C v9必须未来另立任务从pushed clean
+  Commit A10运行。Holdout仍sealed/unopened。
+
 ## 2026-08-28: v1.7 active index / Readiness / environment split（RESOLVED；v1.7 audit-only）
 
 - 根因：v1.7 generator从v1.6 index深拷贝后遗漏`execution_environment_manifest`更新，并固定写pending；

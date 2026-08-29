@@ -1,0 +1,32 @@
+{
+  "capacity_count": 3,
+  "checkpoint_freeze_count": 30,
+  "checkpoint_freeze_sha256": "326418c27a10661c36b2f5adb2c3eb8699b91c2948c0aaf98cda099bf0b8bb51",
+  "expected_agent_count": 15,
+  "formal": false,
+  "nested_benchmark_count": 3,
+  "performance_evidence": false,
+  "row_count_per_capacity": 15,
+  "rows": [
+    {
+      "capacity_label": "constrained_288mb",
+      "row_count": 15,
+      "rows_sha256": "c5fb3f40824349c11ac81fcfb3ea6fbb88fe6173e85878e73956621551963adc"
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "row_count": 15,
+      "rows_sha256": "d72c0eab954e492e177ff0ddcb1fdfd79bfe91b9b0ea26630101bd5c9acade35"
+    },
+    {
+      "capacity_label": "relaxed_864mb",
+      "row_count": 15,
+      "rows_sha256": "0e638e7bd46d5308505bf422648194af712c27f875e30d805928cda224190dde"
+    }
+  ],
+  "selection_count": 30,
+  "selection_sha256": "70808d84f2faf7da36826c6f669632d25a97e10475d94bd1f90c1b4a3a29365b",
+  "status": "pass",
+  "tiny_checkpoint_count": 30,
+  "validated_fairness_enforcement": true
+}

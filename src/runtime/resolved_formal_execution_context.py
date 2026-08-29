@@ -159,7 +159,7 @@ def build_resolved_formal_execution_context(
             raise ResolvedFormalExecutionContextError(
                 "formal training execution binding identity is incomplete"
             )
-        if protocol.get("typed_model_cache_formal_protocol_version") == "1.8.0":
+        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0"}:
             if active_formal_bundle_sha256 != execution_binding.get(
                 "active_formal_bundle_sha256"
             ):
@@ -254,16 +254,16 @@ def build_resolved_formal_execution_context(
             "network_or_cwd_discovery_allowed": False,
         },
     }
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0"}:
+    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0", "1.9.0"}:
         payload["scientific_identity"][
             "formal_agent_order_contract_semantic_sha256"
         ] = protocol["formal_agent_order_contract"]["semantic_sha256"]
-    if protocol.get("typed_model_cache_formal_protocol_version") == "1.8.0":
+    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0"}:
         if not isinstance(active_formal_bundle_sha256, str) or len(
             active_formal_bundle_sha256
         ) != 64:
             raise ResolvedFormalExecutionContextError(
-                "Protocol v1.8 resolved context requires active formal bundle SHA-256"
+                "active resolved context requires active formal bundle SHA-256"
             )
         payload["scientific_identity"]["active_formal_bundle_sha256"] = (
             active_formal_bundle_sha256
@@ -386,11 +386,11 @@ def validate_resolved_formal_execution_context(
                 "typed_runtime_contract_hashes_by_capacity"
             ],
         }
-        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0"}:
+        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0", "1.9.0"}:
             comparisons["formal_agent_order_contract_semantic_sha256"] = protocol[
                 "formal_agent_order_contract"
             ]["semantic_sha256"]
-        if protocol.get("typed_model_cache_formal_protocol_version") == "1.8.0":
+        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0"}:
             expected_bundle = payload.get("resolved_expansion_context", {}).get(
                 "active_formal_bundle_sha256"
             )

@@ -1,0 +1,25 @@
+{
+  "case_count": 19,
+  "cases": [
+    "v1.8 legacy field KeyError reproduced",
+    "legacy field access absent in active dev consumer",
+    "runtime missing capacity rejected",
+    "dev fairness missing/extra rejected",
+    "capacity label mismatch rejected",
+    "duplicate logical ID rejected",
+    "wrong role rejected",
+    "content hash drift rejected",
+    "size drift rejected",
+    "path escape/symlink rejected",
+    "version scope drift rejected",
+    "resource order randomization invariant",
+    "same-name different-hash rejected",
+    "bundle/context mismatch rejected",
+    "CLI/registered path mismatch rejected",
+    "support setting mismatch rejected",
+    "G14C v8 references rejected",
+    "historical active execution rejected",
+    "holdout capability false"
+  ],
+  "status": "pass"
+}

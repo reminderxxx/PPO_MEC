@@ -1,0 +1,14 @@
+{
+  "active_formal_bundle_hash_enters_binding_context_commands_and_checkpoint": true,
+  "agent_order_contract_hash_enters_binding_context_and_commands": true,
+  "binding_hash_enters_checkpoint_and_downstream_provenance": true,
+  "binding_hash_enters_phase_and_cell_input_identity": true,
+  "binding_hash_enters_resolved_context": true,
+  "execution_commit_is_observed_clean_git_head": true,
+  "host_paths_in_binding_identity": false,
+  "iterative_hashing_or_conflicting_binding_allowed": false,
+  "protocol_binds_schema_not_runtime_instance": true,
+  "runtime_instance_created_after_protocol_hash": true,
+  "runtime_instance_unique_producer": "scripts/run_typed_model_cache_formal_protocol.py",
+  "version": "1.0.0"
+}

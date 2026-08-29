@@ -1,0 +1,186 @@
+{
+  "capacity_order": [
+    "constrained_288mb",
+    "medium_576mb",
+    "relaxed_864mb"
+  ],
+  "dev_pairs": [
+    {
+      "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+      "capacity_label": "constrained_288mb",
+      "fairness": {
+        "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+        "content_sha256": "5876283b1d5c9244f3e7fd1b975d7220d41d999e36127292ae2dfe226ac9e25a",
+        "logical_id": "dev_fairness_manifests.constrained_288mb",
+        "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_constrained_288mb.json",
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_constrained_288mb.json",
+        "role": "dev fairness manifest",
+        "semantic_sha256": null,
+        "size_bytes": 273566,
+        "validation_status": "validated",
+        "version_scope": "shared_historical_stable"
+      },
+      "runtime": {
+        "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+        "content_sha256": "a7de83b51c5cf5a0c72103fd4bad7146e9e6aafccc6befc8616ea5d0d01cbf69",
+        "logical_id": "runtime_configs.constrained_288mb",
+        "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+        "role": "typed runtime config",
+        "semantic_sha256": null,
+        "size_bytes": 1770,
+        "validation_status": "validated",
+        "version_scope": "shared_historical_stable"
+      },
+      "validation_status": "validated"
+    },
+    {
+      "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+      "capacity_label": "medium_576mb",
+      "fairness": {
+        "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+        "content_sha256": "db943de9dda7e302778bfcd3727875fda94ffbbb9b029c9dbd29712ed4e94242",
+        "logical_id": "dev_fairness_manifests.medium_576mb",
+        "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_medium_576mb.json",
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_medium_576mb.json",
+        "role": "dev fairness manifest",
+        "semantic_sha256": null,
+        "size_bytes": 273566,
+        "validation_status": "validated",
+        "version_scope": "shared_historical_stable"
+      },
+      "runtime": {
+        "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+        "content_sha256": "37553cf9bff75967801cffd173abf4c6c89039063948fc21a0816d412097abc1",
+        "logical_id": "runtime_configs.medium_576mb",
+        "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+        "role": "typed runtime config",
+        "semantic_sha256": null,
+        "size_bytes": 1765,
+        "validation_status": "validated",
+        "version_scope": "shared_historical_stable"
+      },
+      "validation_status": "validated"
+    },
+    {
+      "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+      "capacity_label": "relaxed_864mb",
+      "fairness": {
+        "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+        "content_sha256": "0c20449ed32868857dbf6b1b85a22b4b25e6c22a994e470286031b382b85b711",
+        "logical_id": "dev_fairness_manifests.relaxed_864mb",
+        "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_relaxed_864mb.json",
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_relaxed_864mb.json",
+        "role": "dev fairness manifest",
+        "semantic_sha256": null,
+        "size_bytes": 273566,
+        "validation_status": "validated",
+        "version_scope": "shared_historical_stable"
+      },
+      "runtime": {
+        "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+        "content_sha256": "6fb2049650e41d6e7120d1165f392e07d1b7d8beca31e76591e62b86cfaa5124",
+        "logical_id": "runtime_configs.relaxed_864mb",
+        "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+        "role": "typed runtime config",
+        "semantic_sha256": null,
+        "size_bytes": 1766,
+        "validation_status": "validated",
+        "version_scope": "shared_historical_stable"
+      },
+      "validation_status": "validated"
+    }
+  ],
+  "formal_pairs": [
+    {
+      "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+      "capacity_label": "constrained_288mb",
+      "fairness": {
+        "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+        "content_sha256": "6404d00e5be542a91c09febe921d2a43171570687eccf68710131df1cc300c24",
+        "logical_id": "fairness_manifests.constrained_288mb",
+        "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+        "role": "formal fairness manifest",
+        "semantic_sha256": null,
+        "size_bytes": 273401,
+        "validation_status": "validated",
+        "version_scope": "shared_historical_stable"
+      },
+      "runtime": {
+        "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+        "content_sha256": "a7de83b51c5cf5a0c72103fd4bad7146e9e6aafccc6befc8616ea5d0d01cbf69",
+        "logical_id": "runtime_configs.constrained_288mb",
+        "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+        "role": "typed runtime config",
+        "semantic_sha256": null,
+        "size_bytes": 1770,
+        "validation_status": "validated",
+        "version_scope": "shared_historical_stable"
+      },
+      "validation_status": "validated"
+    },
+    {
+      "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+      "capacity_label": "medium_576mb",
+      "fairness": {
+        "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+        "content_sha256": "51dae2eccb0eef6e6a52a69096543f7e1a3bccb002b52902759c2009076dc555",
+        "logical_id": "fairness_manifests.medium_576mb",
+        "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+        "role": "formal fairness manifest",
+        "semantic_sha256": null,
+        "size_bytes": 273401,
+        "validation_status": "validated",
+        "version_scope": "shared_historical_stable"
+      },
+      "runtime": {
+        "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+        "content_sha256": "37553cf9bff75967801cffd173abf4c6c89039063948fc21a0816d412097abc1",
+        "logical_id": "runtime_configs.medium_576mb",
+        "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+        "role": "typed runtime config",
+        "semantic_sha256": null,
+        "size_bytes": 1765,
+        "validation_status": "validated",
+        "version_scope": "shared_historical_stable"
+      },
+      "validation_status": "validated"
+    },
+    {
+      "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+      "capacity_label": "relaxed_864mb",
+      "fairness": {
+        "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+        "content_sha256": "ed62a1e5992c4a4c5a878b18eb6986ee1b0280be573a87b25eb8310ce10800a0",
+        "logical_id": "fairness_manifests.relaxed_864mb",
+        "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+        "role": "formal fairness manifest",
+        "semantic_sha256": null,
+        "size_bytes": 273401,
+        "validation_status": "validated",
+        "version_scope": "shared_historical_stable"
+      },
+      "runtime": {
+        "active_bundle_sha256": "7cee48e6972bf136a35b949d52a5f27a2add681b30d9ff6a4820212322cdf2a9",
+        "content_sha256": "6fb2049650e41d6e7120d1165f392e07d1b7d8beca31e76591e62b86cfaa5124",
+        "logical_id": "runtime_configs.relaxed_864mb",
+        "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+        "resolved_absolute_path": "/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+        "role": "typed runtime config",
+        "semantic_sha256": null,
+        "size_bytes": 1766,
+        "validation_status": "validated",
+        "version_scope": "shared_historical_stable"
+      },
+      "validation_status": "validated"
+    }
+  ],
+  "status": "pass"
+}

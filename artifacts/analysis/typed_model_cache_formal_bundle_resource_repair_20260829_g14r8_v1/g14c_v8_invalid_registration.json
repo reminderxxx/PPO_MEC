@@ -1,0 +1,17 @@
+{
+  "candidate_count": 1200,
+  "dev_rows": 0,
+  "execution_commit": "af846936d626902423a7d195bd4938c706242914",
+  "failure_audit_sha256": "2c09cd14028051a012ddedf756bd6b186b4d1680582c5944acc0da986aa40ba5",
+  "failure_boundary": "invalid_after_training_before_dev_performance_execution",
+  "failure_integrity_sha256": "d2a02fb61bd5b1f9964a7516441ac3ec31d95c0b4451190291be6a9bd1bf3bba",
+  "formal_count": 0,
+  "freeze_count": 0,
+  "inventory_canonical_sha256": "025b616efcbf9a41289f0a05a0f07bd2a8d1afaa22698ef70fc21c15d034aba5",
+  "resume_retry_finalize_salvage_or_reuse_allowed": false,
+  "run_id": "typed_model_cache_formal_20260828_101804_g14c_v8",
+  "run_root": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260828_101804_g14c_v8",
+  "selection_count": 0,
+  "status": "PERMANENTLY_INVALID",
+  "training_cells": 150
+}

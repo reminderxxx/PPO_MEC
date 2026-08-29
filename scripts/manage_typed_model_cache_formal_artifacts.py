@@ -66,6 +66,11 @@ INVALID_G14C_V7_RUN_ROOT = (
     / "artifacts/experiments/typed_model_cache_formal"
     / "typed_model_cache_formal_20260826_233222_g14c_v7"
 ).resolve()
+INVALID_G14C_V8_RUN_ROOT = (
+    ROOT
+    / "artifacts/experiments/typed_model_cache_formal"
+    / "typed_model_cache_formal_20260828_101804_g14c_v8"
+).resolve()
 INVALID_FORMAL_RUN_ROOTS = (
     *INVALID_G14C_V1_V2_RUN_ROOTS,
     INVALID_G14C_V3_RUN_ROOT,
@@ -73,6 +78,7 @@ INVALID_FORMAL_RUN_ROOTS = (
     INVALID_G14C_V5_RUN_ROOT,
     INVALID_G14C_V6_RUN_ROOT,
     INVALID_G14C_V7_RUN_ROOT,
+    INVALID_G14C_V8_RUN_ROOT,
 )
 
 
@@ -141,7 +147,7 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
     )
     selected = []
     order_audit = None
-    if protocol["typed_model_cache_formal_protocol_version"] in {"1.7.0", "1.8.0"}:
+    if protocol["typed_model_cache_formal_protocol_version"] in {"1.7.0", "1.8.0", "1.9.0"}:
         try:
             order_audit = resolve_formal_agent_order(protocol=protocol)
             reject_permanently_invalid_run_references([input_root])
@@ -204,12 +210,12 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
         "execution_commit",
         "resolved_execution_context_sha256",
     )
-    if protocol["typed_model_cache_formal_protocol_version"] == "1.8.0":
+    if protocol["typed_model_cache_formal_protocol_version"] in {"1.8.0", "1.9.0"}:
         training_identity_fields = (*training_identity_fields, "active_formal_bundle_sha256")
     training_identity = None
     if (
         not non_formal_rehearsal
-        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0", "1.8.0"}
+        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0", "1.8.0", "1.9.0"}
     ):
         identities = {
             tuple(row.get(field) for field in training_identity_fields)
@@ -248,7 +254,7 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
         raise ValueError("dev selection protocol hash mismatch")
     formal_training_identity = selection.get("formal_training_identity")
     order_audit = None
-    if protocol["typed_model_cache_formal_protocol_version"] in {"1.7.0", "1.8.0"}:
+    if protocol["typed_model_cache_formal_protocol_version"] in {"1.7.0", "1.8.0", "1.9.0"}:
         try:
             order_audit = resolve_formal_agent_order(protocol=protocol)
         except FormalAgentOrderError as exc:
@@ -264,7 +270,7 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
             raise ValueError("dev selection learned-agent order drift")
     if (
         not bool(selection.get("non_formal_rehearsal"))
-        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0", "1.8.0"}
+        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0", "1.8.0", "1.9.0"}
     ):
         if not isinstance(formal_training_identity, dict):
             raise ValueError("dev selection lacks formal training identity")

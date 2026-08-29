@@ -56,6 +56,12 @@ from src.runtime.resolved_formal_execution_context import (
     load_resolved_formal_execution_context,
     resolved_python_for_nested_consumer,
 )
+from src.runtime.active_formal_bundle import (
+    ActiveFormalBundleError,
+    resolve_capacity_resource_pairs,
+    validate_active_formal_bundle,
+    validate_registered_resource_path,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -146,7 +152,7 @@ def main() -> None:
     nested_python = sys.executable
     protocol_version = protocol["typed_model_cache_formal_protocol_version"]
     resolved_context = None
-    if protocol_version in {"1.5.0", "1.6.0", "1.7.0", "1.8.0"}:
+    if protocol_version in {"1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"}:
         if not args.resolved_execution_context_path:
             raise FormalExecutionError(
                 "active protocol dev selection requires resolved execution context"
@@ -166,7 +172,7 @@ def main() -> None:
             raise FormalExecutionError(
                 "non-formal rehearsal must not bind the formal window contract"
             )
-        if not args.rehearsal_agent or not args.rehearsal_seed or not args.rehearsal_capacity:
+        if not args.rehearsal_agent or not args.rehearsal_seed:
             raise FormalExecutionError("non-formal rehearsal matrix is incomplete")
     else:
         if not args.formal_window_consumption_contract_path:
@@ -194,9 +200,57 @@ def main() -> None:
             mode="formal",
         )
     config_root = protocol_path.parent
-    index = json.loads((config_root / "protocol_index.json").read_text(encoding="utf-8-sig"))
+    active_bundle = None
+    resolved_capacity_pairs = None
+    if protocol_version == "1.9.0":
+        try:
+            active_index_path = resolved_context["resolved_expansion_context"][
+                "active_protocol_index_path"
+            ]
+            active_bundle = validate_active_formal_bundle(
+                repository_root=ROOT,
+                index_path=active_index_path,
+                protocol_path=protocol_path,
+                require_clean_git=False,
+                require_origin_main_match=False,
+            )
+            expected_bundle = resolved_context["scientific_identity"].get(
+                "active_formal_bundle_sha256"
+            )
+            if active_bundle["active_formal_bundle_sha256"] != expected_bundle:
+                raise ActiveFormalBundleError(
+                    "active bundle hash differs from run-local resolved context"
+                )
+            resolved_capacity_pairs = resolve_capacity_resource_pairs(
+                active_bundle,
+                fairness_group=(
+                    "rehearsal_fairness_manifests"
+                    if args.non_formal_rehearsal
+                    else "dev_fairness_manifests"
+                ),
+            )
+            supplied_rehearsal = {
+                label: (runtime_path, fairness_path)
+                for label, runtime_path, fairness_path in args.rehearsal_capacity
+            }
+            if supplied_rehearsal:
+                for pair in resolved_capacity_pairs:
+                    label = pair["capacity_label"]
+                    if label not in supplied_rehearsal:
+                        raise ActiveFormalBundleError(
+                            "rehearsal capacity list differs from active inventory"
+                        )
+                    runtime_path, fairness_path = supplied_rehearsal[label]
+                    validate_registered_resource_path(pair["runtime"], Path(runtime_path).resolve())
+                    validate_registered_resource_path(pair["fairness"], Path(fairness_path).resolve())
+                if set(supplied_rehearsal) != {row["capacity_label"] for row in resolved_capacity_pairs}:
+                    raise ActiveFormalBundleError(
+                        "rehearsal capacity list contains an unregistered label"
+                    )
+        except (ActiveFormalBundleError, KeyError) as exc:
+            raise FormalExecutionError(f"active bundle resource resolution failed: {exc}") from exc
     order_audit = None
-    if protocol_version in {"1.7.0", "1.8.0"}:
+    if protocol_version in {"1.7.0", "1.8.0", "1.9.0"}:
         if not args.formal_agent_order_contract_path:
             raise FormalExecutionError("Protocol v1.7 dev selection requires agent order contract")
         scientific = json.loads(
@@ -250,7 +304,7 @@ def main() -> None:
     cell_ledger = None
     expected_dev_cell_ids: list[str] = []
     if not args.non_formal_rehearsal and protocol["typed_model_cache_formal_protocol_version"] in {
-        "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0"
+        "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"
     }:
         identity_path = output_root / "cell_ledger_identity.json"
         if not identity_path.is_file():
@@ -265,20 +319,29 @@ def main() -> None:
             resume=True,
         )
 
-    capacity_inputs = (
-        {
-            label: (Path(runtime_path), Path(fairness_path))
-            for label, runtime_path, fairness_path in args.rehearsal_capacity
-        }
-        if args.non_formal_rehearsal
-        else {
-            label: (
-                ROOT / runtime_relative,
-                ROOT / index["dev_fairness_manifests"][label],
+    resolution_audit = None
+    if resolved_capacity_pairs is not None:
+        capacity_inputs = {
+            pair["capacity_label"]: (
+                Path(pair["runtime"]["resolved_absolute_path"]),
+                Path(pair["fairness"]["resolved_absolute_path"]),
             )
-            for label, runtime_relative in index["runtime_configs"].items()
+            for pair in resolved_capacity_pairs
         }
-    )
+        resolution_audit = {
+            "active_bundle_resource_resolution_contract_version": "1.0.0",
+            "active_bundle_sha256": active_bundle["active_formal_bundle_sha256"],
+            "validation_status": "validated",
+            "capacity_pairs": resolved_capacity_pairs,
+            "non_formal_rehearsal": bool(args.non_formal_rehearsal),
+        }
+        write_create_only_or_verify(
+            output_root / "dev_resource_resolution_audit.json", resolution_audit
+        )
+    else:
+        raise FormalExecutionError(
+            "Protocol v1.0-v1.8 dev execution is audit-only; active resource resolver required"
+        )
     for capacity_label, (runtime_path, fairness_path) in capacity_inputs.items():
         fairness, report = load_and_validate_manifest(fairness_path, root=ROOT, check_files=True)
         if report.get("status") != "pass":
@@ -334,7 +397,7 @@ def main() -> None:
                         raise FormalExecutionError("dev checkpoint formal binding mismatch")
                     if (
                         not args.non_formal_rehearsal
-                        and protocol_version in {"1.6.0", "1.7.0", "1.8.0"}
+                        and protocol_version in {"1.6.0", "1.7.0", "1.8.0", "1.9.0"}
                     ):
                         scientific_identity = resolved_context["scientific_identity"]
                         try:
@@ -371,7 +434,7 @@ def main() -> None:
                                         )
                                         or ""
                                     )
-                                    if protocol_version == "1.8.0"
+                                    if protocol_version in {"1.8.0", "1.9.0"}
                                     else None
                                 ),
                             )
@@ -383,6 +446,11 @@ def main() -> None:
                         "checkpoint_sha256": sha256_file(checkpoint_path),
                         "execution_git_commit": typed.get("execution_git_commit"),
                         "train_window_plan_identity": typed.get("train_window_plan_identity"),
+                        "active_bundle_resource_resolution_audit_sha256": (
+                            canonical_sha256(resolution_audit)
+                            if resolution_audit is not None
+                            else None
+                        ),
                     }
                     metadata_by_agent_seed[(agent, seed)] = metadata
             if cell_ledger is None:
@@ -475,7 +543,7 @@ def main() -> None:
                             resolved_context.get("scientific_identity", {}).get(
                                 "active_formal_bundle_sha256"
                             )
-                            if protocol_version == "1.8.0"
+                            if protocol_version in {"1.8.0", "1.9.0"}
                             else None
                         ),
                         "coordinates": coordinates,
@@ -483,6 +551,11 @@ def main() -> None:
                         "checkpoint_provenance_manifest": provenance_manifest,
                         "fairness_manifest_sha256": sha256_file(fairness_path),
                         "runtime_config_sha256": sha256_file(runtime_path),
+                        "active_bundle_resource_resolution_audit_sha256": (
+                            canonical_sha256(resolution_audit)
+                            if resolution_audit is not None
+                            else None
+                        ),
                     }
                 )
                 begun = cell_ledger.begin_cell(
@@ -572,6 +645,11 @@ def main() -> None:
                             ),
                             "active_formal_bundle_sha256": metadata.get(
                                 "active_formal_bundle_sha256"
+                            ),
+                            "active_bundle_resource_resolution_audit_sha256": (
+                                canonical_sha256(resolution_audit)
+                                if resolution_audit is not None
+                                else None
                             ),
                             "non_formal_rehearsal": bool(args.non_formal_rehearsal),
                             "typed_runtime_provenance": metadata.get("typed_runtime_provenance"),

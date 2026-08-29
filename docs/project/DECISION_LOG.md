@@ -966,3 +966,12 @@
 - 决策：context SHA和file SHA进入phase input、run identity、ledger与integrity。resume/finalize只允许同run hash复验，
   缺失/篡改/跨run/commit/environment/path均拒绝。
 - 决策：v1.0–v1.4保留审计读取但不能开始新的G14C execution；G14C v1–v5 invalid artifacts一律不可复用。
+## 2026-08-29: active bundle resources只有一个可信解析面
+
+- 决定：`active_bundle_resources`是active Protocol唯一资源目录；不恢复`runtime_configs`、
+  `fairness_manifests`、`dev_fairness_manifests`或`support_fairness_manifests`顶层兼容映射。
+- 决定：resolver只接受`validate_active_formal_bundle()`在当前进程返回的validated result；裸index不是可信API。
+- 决定：capacity pair按`constrained_288mb → medium_576mb → relaxed_864mb`冻结顺序输出，JSON list顺序不构成
+  科学身份；support fairness按setting ID，显式CLI路径必须与登记path/hash/size一致。
+- 决定：G14C v8永久invalid且禁止所有产物复用；Protocol v1.0–v1.8只作audit。Readiness v11不代表formal、
+  holdout、算法优势或paper-ready。

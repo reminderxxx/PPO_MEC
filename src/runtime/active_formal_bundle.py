@@ -21,15 +21,22 @@ from pathlib import Path
 from typing import Any, Mapping
 
 
-ACTIVE_FORMAL_BUNDLE_CONTRACT_VERSION = "1.0.0"
-ACTIVE_PROTOCOL_VERSION = "1.8.0"
-ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v1_8"
-READY_STATUS = "READY_FOR_G14C_V8_CLEAN_TRAIN_AND_FORMAL"
-READINESS_VERSION = "10.0.0"
+ACTIVE_FORMAL_BUNDLE_CONTRACT_VERSION = "1.1.0"
+ACTIVE_BUNDLE_RESOURCE_RESOLUTION_CONTRACT_VERSION = "1.0.0"
+ACTIVE_PROTOCOL_VERSION = "1.9.0"
+ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v1_9"
+READY_STATUS = "READY_FOR_G14C_V9_CLEAN_TRAIN_AND_FORMAL"
+READINESS_VERSION = "11.0.0"
 DEFAULT_ACTIVE_INDEX_RELATIVE = (
-    "configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/"
+    "configs/experiment/typed_model_cache_formal_protocol_v1_9_20260829/"
     "protocol_index.json"
 )
+CAPACITY_ORDER = (
+    "constrained_288mb",
+    "medium_576mb",
+    "relaxed_864mb",
+)
+_VALIDATED_BUNDLE_TOKEN = object()
 
 
 class ActiveFormalBundleError(ValueError):
@@ -129,6 +136,9 @@ def active_bundle_core_projection(index: Mapping[str, Any]) -> dict[str, Any]:
         "active_formal_bundle_contract_version": index.get(
             "active_formal_bundle_contract_version"
         ),
+        "active_bundle_resource_resolution_contract_version": index.get(
+            "active_bundle_resource_resolution_contract_version"
+        ),
         "protocol_index_version": index.get("protocol_index_version"),
         "protocol_identity": deepcopy(index.get("protocol_identity")),
         "execution_commit_binding": deepcopy(index.get("execution_commit_binding")),
@@ -186,9 +196,7 @@ def _validate_resource_rows(
     if not isinstance(rows, list) or not rows:
         raise ActiveFormalBundleError("active bundle resource inventory is missing")
     observed: dict[str, dict[str, Any]] = {}
-    current_root = (
-        "configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/"
-    )
+    current_root = Path(DEFAULT_ACTIVE_INDEX_RELATIVE).parent.as_posix() + "/"
     for raw in rows:
         if not isinstance(raw, Mapping):
             raise ActiveFormalBundleError("active bundle resource row is not an object")
@@ -206,7 +214,7 @@ def _validate_resource_rows(
         if scope == "current_protocol_version":
             if not logical_path.startswith(current_root):
                 raise ActiveFormalBundleError(
-                    f"current-version resource points outside v1.8: {logical_id}"
+                    f"current-version resource points outside the active Protocol: {logical_id}"
                 )
             if "shared_reason" in row:
                 raise ActiveFormalBundleError(
@@ -227,6 +235,7 @@ def _validate_resource_rows(
         "formal_agent_order_contract",
         "formal_training_execution_binding_schema",
         "resolved_execution_context_schema",
+        "active_bundle_resource_resolution_contract",
         "portable_resource_registry",
         "split_companion",
         "window_consumption_contract",
@@ -260,7 +269,7 @@ def validate_active_formal_bundle(
         selected_relative = selected_index.relative_to(root)
     except ValueError as exc:
         raise ActiveFormalBundleError(
-            "only the unique v1.8 active protocol index is accepted"
+            "only the unique active protocol index is accepted"
         ) from exc
     if any(part in {".", ".."} for part in selected_relative.parts):
         raise ActiveFormalBundleError(
@@ -271,15 +280,21 @@ def validate_active_formal_bundle(
         current = current / part
         if current.is_symlink():
             raise ActiveFormalBundleError(
-                "only the unique non-symlinked v1.8 active protocol index is accepted"
+                "only the unique non-symlinked active protocol index is accepted"
             )
     if selected_index.resolve() != expected_index.resolve():
-        raise ActiveFormalBundleError("only the unique v1.8 active protocol index is accepted")
+        raise ActiveFormalBundleError("only the unique active protocol index is accepted")
     index = _strict_object(selected_index.resolve(), "active protocol index")
     if index.get("active_formal_bundle_contract_version") != (
         ACTIVE_FORMAL_BUNDLE_CONTRACT_VERSION
     ):
         raise ActiveFormalBundleError("active formal bundle contract version mismatch")
+    if index.get("active_bundle_resource_resolution_contract_version") != (
+        ACTIVE_BUNDLE_RESOURCE_RESOLUTION_CONTRACT_VERSION
+    ):
+        raise ActiveFormalBundleError(
+            "active bundle resource resolution contract version mismatch"
+        )
     if index.get("protocol_index_version") != ACTIVE_PROTOCOL_VERSION:
         raise ActiveFormalBundleError("active protocol index version mismatch")
     if require_ready and index.get("status") != READY_STATUS:
@@ -399,7 +414,7 @@ def validate_active_formal_bundle(
         readiness_row = resources["readiness_companion"]
         readiness = _strict_object(
             _resolve_registered_path(root, readiness_row["logical_path"], "readiness"),
-            "Readiness v10 companion",
+            "Readiness v11 companion",
         )
         if readiness.get("readiness_review_version") != READINESS_VERSION:
             raise ActiveFormalBundleError("Readiness companion version mismatch")
@@ -455,15 +470,201 @@ def validate_active_formal_bundle(
         "resource_ids": resource_ids,
         "execution_commit": head,
         "holdout_capability": False,
+        "repository_root": str(root),
+        "validation_status": "validated_active_formal_bundle",
+        "_validation_token": _VALIDATED_BUNDLE_TOKEN,
     }
 
 
+def _require_validated_bundle(bundle: Mapping[str, Any]) -> None:
+    if (
+        not isinstance(bundle, Mapping)
+        or bundle.get("_validation_token") is not _VALIDATED_BUNDLE_TOKEN
+        or bundle.get("validation_status") != "validated_active_formal_bundle"
+        or bundle.get("status") != "pass"
+    ):
+        raise ActiveFormalBundleError(
+            "resource resolver requires validate_active_formal_bundle() output"
+        )
+
+
+def resolve_active_bundle_resource(
+    bundle: Mapping[str, Any], logical_id: str, *, expected_role: str | None = None
+) -> dict[str, Any]:
+    """Resolve one content-addressed resource from a validated active bundle."""
+
+    _require_validated_bundle(bundle)
+    rows = bundle["index"].get("active_bundle_resources")
+    matches = [
+        dict(row)
+        for row in rows
+        if isinstance(row, Mapping) and row.get("logical_id") == logical_id
+    ]
+    if len(matches) != 1:
+        raise ActiveFormalBundleError(
+            f"active bundle resource must resolve exactly once: {logical_id}"
+        )
+    row = matches[0]
+    if expected_role is not None and row.get("role") != expected_role:
+        raise ActiveFormalBundleError(
+            f"active bundle resource role mismatch: {logical_id}"
+        )
+    root = Path(str(bundle["repository_root"])).resolve()
+    resolved = _resolve_registered_path(root, row["logical_path"], logical_id)
+    return {
+        "logical_id": logical_id,
+        "role": row["role"],
+        "logical_path": row["logical_path"],
+        "resolved_absolute_path": str(resolved),
+        "version_scope": row["version_scope"],
+        "content_sha256": row["content_sha256"],
+        "size_bytes": row["size_bytes"],
+        "semantic_sha256": row.get("semantic_sha256"),
+        "active_bundle_sha256": bundle["active_formal_bundle_sha256"],
+        "validation_status": "validated",
+    }
+
+
+def resolve_active_bundle_group(
+    bundle: Mapping[str, Any], prefix: str, *, expected_role: str
+) -> list[dict[str, Any]]:
+    """Resolve a logical group without depending on inventory order."""
+
+    _require_validated_bundle(bundle)
+    normalized = prefix.rstrip(".") + "."
+    logical_ids = [
+        str(row.get("logical_id"))
+        for row in bundle["index"].get("active_bundle_resources", [])
+        if isinstance(row, Mapping)
+        and str(row.get("logical_id", "")).startswith(normalized)
+    ]
+    if not logical_ids:
+        raise ActiveFormalBundleError(f"active bundle resource group is missing: {prefix}")
+    return [
+        resolve_active_bundle_resource(bundle, logical_id, expected_role=expected_role)
+        for logical_id in sorted(logical_ids)
+    ]
+
+
+def resolve_capacity_resource_pairs(
+    bundle: Mapping[str, Any], *, fairness_group: str
+) -> list[dict[str, Any]]:
+    """Resolve runtime/fairness pairs in the frozen capacity order."""
+
+    fairness_roles = {
+        "fairness_manifests": "formal fairness manifest",
+        "dev_fairness_manifests": "dev fairness manifest",
+        "rehearsal_fairness_manifests": "nonformal rehearsal fairness manifest",
+    }
+    if fairness_group not in fairness_roles:
+        raise ActiveFormalBundleError(f"unsupported capacity fairness group: {fairness_group}")
+    runtime = {
+        row["logical_id"].split(".", 1)[1]: row
+        for row in resolve_active_bundle_group(
+            bundle, "runtime_configs", expected_role="typed runtime config"
+        )
+    }
+    fairness = {
+        row["logical_id"].split(".", 1)[1]: row
+        for row in resolve_active_bundle_group(
+            bundle, fairness_group, expected_role=fairness_roles[fairness_group]
+        )
+    }
+    expected = set(CAPACITY_ORDER)
+    if set(runtime) != expected or set(fairness) != expected:
+        raise ActiveFormalBundleError(
+            "capacity resources must contain exactly the frozen three labels"
+        )
+    return [
+        {
+            "capacity_label": label,
+            "runtime": runtime[label],
+            "fairness": fairness[label],
+            "active_bundle_sha256": bundle["active_formal_bundle_sha256"],
+            "validation_status": "validated",
+        }
+        for label in CAPACITY_ORDER
+    ]
+
+
+def resolve_support_resource(
+    bundle: Mapping[str, Any], setting_id: str
+) -> dict[str, Any]:
+    return resolve_active_bundle_resource(
+        bundle,
+        f"support_fairness_manifests.{setting_id}",
+        expected_role="support fairness manifest",
+    )
+
+
+def validate_registered_resource_path(
+    resource: Mapping[str, Any], supplied_path: str | Path
+) -> dict[str, Any]:
+    """Fail if an explicit CLI path is not the registered resolved resource."""
+
+    expected = Path(str(resource.get("resolved_absolute_path"))).resolve()
+    supplied = Path(supplied_path)
+    if not supplied.is_absolute():
+        raise ActiveFormalBundleError("active consumer resource path must be absolute")
+    if supplied.is_symlink() or supplied.resolve() != expected:
+        raise ActiveFormalBundleError(
+            f"explicit path differs from registered resource: {resource.get('logical_id')}"
+        )
+    if sha256_file(supplied) != resource.get("content_sha256"):
+        raise ActiveFormalBundleError(
+            f"explicit resource content drift: {resource.get('logical_id')}"
+        )
+    if supplied.stat().st_size != resource.get("size_bytes"):
+        raise ActiveFormalBundleError(
+            f"explicit resource size drift: {resource.get('logical_id')}"
+        )
+    return dict(resource)
+
+
+def build_active_bundle_resource_resolution_audit(
+    bundle: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Build the order-independent inventory audit bound into every active run."""
+
+    _require_validated_bundle(bundle)
+    resources = [
+        resolve_active_bundle_resource(bundle, logical_id)
+        for logical_id in sorted(bundle["resource_ids"])
+    ]
+    payload = {
+        "active_bundle_resource_resolution_contract_version": (
+            ACTIVE_BUNDLE_RESOURCE_RESOLUTION_CONTRACT_VERSION
+        ),
+        "active_bundle_sha256": bundle["active_formal_bundle_sha256"],
+        "validation_status": "validated",
+        "resources": resources,
+        "formal_capacity_pairs": resolve_capacity_resource_pairs(
+            bundle, fairness_group="fairness_manifests"
+        ),
+        "dev_capacity_pairs": resolve_capacity_resource_pairs(
+            bundle, fairness_group="dev_fairness_manifests"
+        ),
+        "nonformal_rehearsal_capacity_pairs": resolve_capacity_resource_pairs(
+            bundle, fairness_group="rehearsal_fairness_manifests"
+        ),
+        "support_resources": resolve_active_bundle_group(
+            bundle,
+            "support_fairness_manifests",
+            expected_role="support fairness manifest",
+        ),
+    }
+    payload["audit_sha256"] = canonical_sha256(payload)
+    return payload
+
+
 __all__ = [
+    "ACTIVE_BUNDLE_RESOURCE_RESOLUTION_CONTRACT_VERSION",
     "ACTIVE_FORMAL_BUNDLE_CONTRACT_VERSION",
     "ACTIVE_PROTOCOL_ID",
     "ACTIVE_PROTOCOL_VERSION",
     "ActiveFormalBundleError",
     "DEFAULT_ACTIVE_INDEX_RELATIVE",
+    "CAPACITY_ORDER",
     "READINESS_VERSION",
     "READY_STATUS",
     "active_bundle_core_projection",
@@ -472,4 +673,10 @@ __all__ = [
     "ready_index_projection",
     "sha256_file",
     "validate_active_formal_bundle",
+    "resolve_active_bundle_resource",
+    "resolve_active_bundle_group",
+    "resolve_capacity_resource_pairs",
+    "resolve_support_resource",
+    "validate_registered_resource_path",
+    "build_active_bundle_resource_resolution_audit",
 ]

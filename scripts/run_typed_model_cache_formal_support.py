@@ -37,6 +37,14 @@ from src.runtime.formal_agent_order import (
     FormalAgentOrderError,
     resolve_formal_agent_order,
 )
+from src.runtime.active_formal_bundle import (
+    ActiveFormalBundleError,
+    resolve_active_bundle_resource,
+    resolve_active_bundle_group,
+    resolve_support_resource,
+    validate_active_formal_bundle,
+    validate_registered_resource_path,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -170,7 +178,8 @@ def main() -> None:
     validate_protocol_v1_1(protocol)
     nested_python = sys.executable
     protocol_version = protocol["typed_model_cache_formal_protocol_version"]
-    if protocol_version in {"1.5.0", "1.6.0", "1.7.0"}:
+    resolved_context = None
+    if protocol_version in {"1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"}:
         if not args.resolved_execution_context_path:
             raise FormalExecutionError(
                 "protocol v1.5 support requires resolved execution context"
@@ -185,6 +194,63 @@ def main() -> None:
         nested_python = resolved_python_for_nested_consumer(
             resolved_context, observed_sys_executable=sys.executable
         )
+    resource_resolution_audit = None
+    if protocol_version == "1.9.0":
+        try:
+            bundle = validate_active_formal_bundle(
+                repository_root=ROOT,
+                index_path=resolved_context["resolved_expansion_context"][
+                    "active_protocol_index_path"
+                ],
+                protocol_path=args.protocol_path,
+                require_clean_git=False,
+                require_origin_main_match=False,
+            )
+            if bundle["active_formal_bundle_sha256"] != resolved_context[
+                "scientific_identity"
+            ].get("active_formal_bundle_sha256"):
+                raise ActiveFormalBundleError(
+                    "support active bundle differs from resolved context"
+                )
+            supplied_runtime = Path(args.model_cache_runtime_config).resolve()
+            runtime_matches = [
+                row
+                for row in resolve_active_bundle_group(
+                    bundle, "runtime_configs", expected_role="typed runtime config"
+                )
+                if Path(row["resolved_absolute_path"]) == supplied_runtime
+            ]
+            if len(runtime_matches) != 1:
+                raise ActiveFormalBundleError(
+                    "support runtime path is not one registered capacity resource"
+                )
+            runtime_resource = runtime_matches[0]
+            setting = support_setting_by_id(protocol, args.setting_id)
+            if setting.get("family") == "capacity":
+                label = runtime_resource["logical_id"].split(".", 1)[1]
+                fairness_resource = resolve_active_bundle_resource(
+                    bundle,
+                    f"fairness_manifests.{label}",
+                    expected_role="formal fairness manifest",
+                )
+            else:
+                fairness_resource = resolve_support_resource(bundle, args.setting_id)
+            validate_registered_resource_path(runtime_resource, supplied_runtime)
+            validate_registered_resource_path(
+                fairness_resource,
+                Path(args.cache_baseline_fairness_manifest_path).resolve(),
+            )
+            resource_resolution_audit = {
+                "active_bundle_resource_resolution_contract_version": "1.0.0",
+                "active_bundle_sha256": bundle["active_formal_bundle_sha256"],
+                "runtime": runtime_resource,
+                "fairness": fairness_resource,
+                "validation_status": "validated",
+            }
+        except (ActiveFormalBundleError, KeyError) as exc:
+            raise FormalExecutionError(
+                f"support active bundle resource resolution failed: {exc}"
+            ) from exc
     setting = support_setting_by_id(protocol, args.setting_id)
     runtime = resolve_model_cache_runtime(args.model_cache_runtime_config, root=ROOT)
     fairness, fairness_report = load_and_validate_manifest(
@@ -193,7 +259,7 @@ def main() -> None:
     if fairness_report.get("status") != "pass":
         raise FormalExecutionError("fairness manifest validation failed")
     order_audit = None
-    if protocol_version == "1.7.0":
+    if protocol_version in {"1.7.0", "1.8.0", "1.9.0"}:
         if not args.formal_agent_order_contract_path:
             raise FormalExecutionError("Protocol v1.7 support requires agent order contract")
         try:
@@ -221,6 +287,8 @@ def main() -> None:
         provenance["formal_agent_order_contract_semantic_sha256"] = order_audit[
             "semantic_sha256"
         ]
+    if resource_resolution_audit is not None:
+        provenance["active_bundle_resource_resolution"] = resource_resolution_audit
     if setting.get("parameter") == "capacity_mb":
         actual = float(runtime["cache_capacity_profile"]["capacity_mb"])
         expected = float(setting.get("value", setting.get("baseline")))

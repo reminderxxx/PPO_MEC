@@ -44,7 +44,7 @@ def main() -> None:
     validate_protocol_v1_1(protocol)
     nested_python = sys.executable
     protocol_version = protocol["typed_model_cache_formal_protocol_version"]
-    if protocol_version in {"1.5.0", "1.6.0", "1.7.0"}:
+    if protocol_version in {"1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0"}:
         if not args.resolved_execution_context_path:
             raise FormalExecutionError(
                 "protocol v1.5 statistics requires resolved execution context"
