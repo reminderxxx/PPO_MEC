@@ -20,12 +20,46 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 
-FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION = "1.0.0"
-EXECUTION_ENVIRONMENT_RESOLVER_VERSION = "1.0.0"
+FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION = "1.1.0"
+LEGACY_FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION = "1.0.0"
+FORMAL_ENVIRONMENT_IDENTITY_PROJECTION_CONTRACT_VERSION = "1.0.0"
+EXECUTION_ENVIRONMENT_RESOLVER_VERSION = "1.1.0"
 CRITICAL_PACKAGES = ("torch", "numpy", "pandas", "PyYAML", "pytest")
 DEFAULT_IMPORT_MODULES = (
     "src",
     "src.evaluators.typed_model_cache_formal_execution",
+)
+RUNTIME_OBSERVABLE_IDENTITY_FIELDS = (
+    "formal_execution_environment_contract_version",
+    "python_implementation",
+    "python_version",
+    "platform_system",
+    "architecture",
+    "dependency_fingerprint",
+    "installed_package_count",
+    "torch_version",
+    "critical_package_versions",
+    "execution_commit",
+    "source_root_identity",
+    "identity_rule",
+)
+PROTOCOL_BOUND_EXTENSION_FIELDS = (
+    "formal_endpoint_metrics_contract_version",
+    "formal_exogenous_request_execution_contract_version",
+    "formal_request_exposure_trace_version",
+)
+ENVIRONMENT_FINGERPRINT_FIELD = "environment_fingerprint"
+EXECUTION_COMMIT_IDENTITY_RULE = (
+    "observed_clean_40_hex_HEAD_equal_main_equal_origin_main_bound_at_execution"
+)
+SOURCE_ROOT_IDENTITY_RULE = {
+    "project_package": "src",
+    "source_tree_identity_rule": (
+        "observed_tracked_src_and_scripts_tree_sha256_bound_at_execution"
+    ),
+}
+ENVIRONMENT_IDENTITY_RULE = (
+    "full_projection_v1_excludes_host_paths_and_binds_observed_commit_and_tree_out_of_band"
 )
 
 
@@ -55,6 +89,180 @@ def _canonical_sha256(value: Any) -> str:
         allow_nan=False,
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _require_exact_fields(
+    value: Mapping[str, Any], expected: set[str], *, label: str
+) -> None:
+    observed = set(value)
+    if observed != expected:
+        missing = sorted(expected - observed)
+        unknown = sorted(observed - expected)
+        raise ExecutionEnvironmentError(
+            f"{label} has missing or unknown fields: missing={missing}, unknown={unknown}"
+        )
+
+
+def _require_nonempty_string(value: Any, *, field: str) -> str:
+    if not isinstance(value, str) or not value:
+        raise ExecutionEnvironmentError(f"environment identity field has wrong type: {field}")
+    return value
+
+
+def _validate_contract_version(value: Any, *, field: str, expected: str) -> str:
+    version = _require_nonempty_string(value, field=field)
+    try:
+        major = int(version.split(".", 1)[0])
+    except (TypeError, ValueError) as exc:
+        raise ExecutionEnvironmentError(
+            f"environment identity version is invalid: {field}"
+        ) from exc
+    if major != int(expected.split(".", 1)[0]):
+        raise ExecutionEnvironmentError(
+            f"unsupported environment identity contract major: {field}={version}"
+        )
+    if version != expected:
+        raise ExecutionEnvironmentError(
+            f"environment identity contract version mismatch: {field}"
+        )
+    return version
+
+
+def normalize_protocol_bound_extensions(
+    extensions: Mapping[str, Any],
+) -> dict[str, str]:
+    """Validate the only Protocol fields allowed to extend environment identity."""
+
+    if not isinstance(extensions, Mapping):
+        raise ExecutionEnvironmentError("protocol-bound environment extensions must be an object")
+    _require_exact_fields(
+        extensions, set(PROTOCOL_BOUND_EXTENSION_FIELDS), label="protocol-bound extensions"
+    )
+    normalized = {
+        field: _require_nonempty_string(extensions.get(field), field=field)
+        for field in PROTOCOL_BOUND_EXTENSION_FIELDS
+    }
+    expected_versions = {
+        "formal_endpoint_metrics_contract_version": "2.0.0",
+        "formal_exogenous_request_execution_contract_version": "1.0.0",
+        "formal_request_exposure_trace_version": "1.0.0",
+    }
+    for field, expected in expected_versions.items():
+        _validate_contract_version(normalized[field], field=field, expected=expected)
+    return normalized
+
+
+def protocol_bound_extensions_from_protocol(
+    protocol: Mapping[str, Any],
+) -> dict[str, str]:
+    """Project extension versions from a validated Protocol-shaped object."""
+
+    request_contract = protocol.get("formal_exogenous_request_execution_contract")
+    endpoint = protocol.get("endpoint_schema")
+    if not isinstance(request_contract, Mapping) or not isinstance(endpoint, Mapping):
+        raise ExecutionEnvironmentError(
+            "Protocol lacks environment identity extension contracts"
+        )
+    return normalize_protocol_bound_extensions(
+        {
+            "formal_endpoint_metrics_contract_version": endpoint.get(
+                "formal_endpoint_metrics_contract_version"
+            ),
+            "formal_exogenous_request_execution_contract_version": request_contract.get(
+                "version"
+            ),
+            "formal_request_exposure_trace_version": request_contract.get(
+                "request_exposure_trace_version"
+            ),
+        }
+    )
+
+
+def normalize_environment_identity(
+    identity: Mapping[str, Any], *, require_fingerprint: bool = True
+) -> dict[str, Any]:
+    """Return the canonical full v1.1 projection and reject every schema ambiguity."""
+
+    if not isinstance(identity, Mapping):
+        raise ExecutionEnvironmentError("environment scientific identity must be an object")
+    expected = set(RUNTIME_OBSERVABLE_IDENTITY_FIELDS) | set(
+        PROTOCOL_BOUND_EXTENSION_FIELDS
+    )
+    if require_fingerprint:
+        expected.add(ENVIRONMENT_FINGERPRINT_FIELD)
+    _require_exact_fields(identity, expected, label="environment scientific identity")
+    _validate_contract_version(
+        identity.get("formal_execution_environment_contract_version"),
+        field="formal_execution_environment_contract_version",
+        expected=FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION,
+    )
+    normalized: dict[str, Any] = {}
+    for field in RUNTIME_OBSERVABLE_IDENTITY_FIELDS:
+        value = identity.get(field)
+        if field == "installed_package_count":
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                raise ExecutionEnvironmentError(
+                    "environment identity field has wrong type: installed_package_count"
+                )
+        elif field == "critical_package_versions":
+            if not isinstance(value, Mapping):
+                raise ExecutionEnvironmentError(
+                    "environment identity field has wrong type: critical_package_versions"
+                )
+            _require_exact_fields(
+                value, set(CRITICAL_PACKAGES), label="critical package versions"
+            )
+            for package, version in value.items():
+                _require_nonempty_string(version, field=f"critical_package_versions.{package}")
+            value = {str(key): value[key] for key in sorted(value)}
+        elif field == "source_root_identity":
+            if not isinstance(value, Mapping):
+                raise ExecutionEnvironmentError(
+                    "environment identity field has wrong type: source_root_identity"
+                )
+            _require_exact_fields(
+                value, set(SOURCE_ROOT_IDENTITY_RULE), label="source root identity"
+            )
+            if dict(value) != SOURCE_ROOT_IDENTITY_RULE:
+                raise ExecutionEnvironmentError("source root identity rule drift")
+            value = dict(SOURCE_ROOT_IDENTITY_RULE)
+        else:
+            value = _require_nonempty_string(value, field=field)
+        normalized[field] = value
+    normalized.update(
+        normalize_protocol_bound_extensions(
+            {field: identity.get(field) for field in PROTOCOL_BOUND_EXTENSION_FIELDS}
+        )
+    )
+    _canonical_sha256(normalized)
+    if require_fingerprint:
+        fingerprint = _require_nonempty_string(
+            identity.get(ENVIRONMENT_FINGERPRINT_FIELD),
+            field=ENVIRONMENT_FINGERPRINT_FIELD,
+        )
+        if len(fingerprint) != 64 or fingerprint != _canonical_sha256(normalized):
+            raise ExecutionEnvironmentError("environment fingerprint mismatch")
+        normalized[ENVIRONMENT_FINGERPRINT_FIELD] = fingerprint
+    return normalized
+
+
+def build_environment_identity_projection(
+    runtime_observable: Mapping[str, Any],
+    protocol_bound_extensions: Mapping[str, Any],
+) -> dict[str, Any]:
+    """The sole producer for the normalized Protocol 2.x scientific identity."""
+
+    if not isinstance(runtime_observable, Mapping):
+        raise ExecutionEnvironmentError("runtime-observable environment identity must be an object")
+    _require_exact_fields(
+        runtime_observable,
+        set(RUNTIME_OBSERVABLE_IDENTITY_FIELDS),
+        label="runtime-observable environment identity",
+    )
+    candidate = {**dict(runtime_observable), **normalize_protocol_bound_extensions(protocol_bound_extensions)}
+    normalized = normalize_environment_identity(candidate, require_fingerprint=False)
+    normalized[ENVIRONMENT_FINGERPRINT_FIELD] = _canonical_sha256(normalized)
+    return normalize_environment_identity(normalized)
 
 
 def source_tree_fingerprint(root: str | Path) -> str:
@@ -203,12 +411,12 @@ def scientific_environment_identity(
     *,
     execution_commit: str,
     source_tree_sha256: str,
+    protocol_bound_extensions: Mapping[str, Any] | None = None,
+    contract_version: str = LEGACY_FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION,
 ) -> dict[str, Any]:
     critical = dict(probe.get("critical_packages", {}))
     identity = {
-        "formal_execution_environment_contract_version": (
-            FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION
-        ),
+        "formal_execution_environment_contract_version": contract_version,
         "python_implementation": probe.get("implementation"),
         "python_version": probe.get("python_version"),
         "platform_system": probe.get("platform_system"),
@@ -224,6 +432,21 @@ def scientific_environment_identity(
         },
         "identity_rule": "environment identity != host-specific Python absolute path",
     }
+    if contract_version == FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION:
+        if protocol_bound_extensions is None:
+            raise ExecutionEnvironmentError(
+                "formal environment 1.1 requires Protocol-bound extensions"
+            )
+        identity["execution_commit"] = EXECUTION_COMMIT_IDENTITY_RULE
+        identity["source_root_identity"] = dict(SOURCE_ROOT_IDENTITY_RULE)
+        identity["identity_rule"] = ENVIRONMENT_IDENTITY_RULE
+        return build_environment_identity_projection(
+            identity, protocol_bound_extensions
+        )
+    if contract_version != LEGACY_FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION:
+        raise ExecutionEnvironmentError(
+            "unsupported formal execution environment contract version"
+        )
     identity["environment_fingerprint"] = _canonical_sha256(identity)
     return identity
 
@@ -291,6 +514,7 @@ def resolve_execution_environment(
     python_executable: str | Path | None = None,
     environment_manifest: Mapping[str, Any] | None = None,
     expected_identity: Mapping[str, Any] | None = None,
+    protocol_bound_extensions: Mapping[str, Any] | None = None,
     forbidden_source_roots: Sequence[str | Path] = (),
     import_modules: Sequence[str] = DEFAULT_IMPORT_MODULES,
     require_clean_git_worktree: bool = False,
@@ -348,34 +572,58 @@ def resolve_execution_environment(
         forbidden_source_roots=effective_forbidden,
     )
     tree_hash = source_tree_fingerprint(clean_worktree_root)
+    expected = dict(expected_identity or manifest.get("scientific_identity", {}) or {})
+    contract_version = str(
+        expected.get(
+            "formal_execution_environment_contract_version",
+            LEGACY_FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION,
+        )
+    )
+    extensions = protocol_bound_extensions
+    if contract_version == FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION:
+        expected = normalize_environment_identity(expected)
+        expected_extensions = {
+            field: expected[field] for field in PROTOCOL_BOUND_EXTENSION_FIELDS
+        }
+        if extensions is None:
+            extensions = expected_extensions
+        elif normalize_protocol_bound_extensions(extensions) != expected_extensions:
+            raise ExecutionEnvironmentError(
+                "Protocol/environment extension version mismatch"
+            )
     identity = scientific_environment_identity(
         probe,
         execution_commit=execution_commit,
         source_tree_sha256=tree_hash,
+        protocol_bound_extensions=extensions,
+        contract_version=contract_version,
     )
-    expected = dict(expected_identity or manifest.get("scientific_identity", {}) or {})
     if expected:
         # Commit/tree bindings may be logical out-of-band identities because a
         # commit cannot contain its own hash. Runtime locations remain audited,
         # while the immutable protocol provides the scientific binding.
-        if expected.get("execution_commit"):
+        if contract_version == LEGACY_FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION and expected.get("execution_commit"):
             identity["execution_commit"] = expected["execution_commit"]
-        if expected.get("source_root_identity"):
+        if contract_version == LEGACY_FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION and expected.get("source_root_identity"):
             identity["source_root_identity"] = expected["source_root_identity"]
-        identity.pop("environment_fingerprint", None)
-        identity["environment_fingerprint"] = _canonical_sha256(identity)
-        for key in (
-            "python_implementation",
-            "python_version",
-            "platform_system",
-            "architecture",
-            "dependency_fingerprint",
-            "torch_version",
-            "critical_package_versions",
-            "execution_commit",
-            "source_root_identity",
-            "environment_fingerprint",
-        ):
+        if contract_version == LEGACY_FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION:
+            identity.pop("environment_fingerprint", None)
+            identity["environment_fingerprint"] = _canonical_sha256(identity)
+            comparison_fields = (
+                "python_implementation",
+                "python_version",
+                "platform_system",
+                "architecture",
+                "dependency_fingerprint",
+                "torch_version",
+                "critical_package_versions",
+                "execution_commit",
+                "source_root_identity",
+                "environment_fingerprint",
+            )
+        else:
+            comparison_fields = (*RUNTIME_OBSERVABLE_IDENTITY_FIELDS, *PROTOCOL_BOUND_EXTENSION_FIELDS, ENVIRONMENT_FINGERPRINT_FIELD)
+        for key in comparison_fields:
             if expected.get(key) != identity.get(key):
                 raise ExecutionEnvironmentError(
                     f"execution environment identity mismatch: {key}"
@@ -395,6 +643,10 @@ def resolve_execution_environment(
         raise ExecutionEnvironmentError("clean source root lacks an execution commit")
     runtime_audit = {
         "execution_environment_resolver_version": EXECUTION_ENVIRONMENT_RESOLVER_VERSION,
+        "formal_environment_identity_projection_contract_version": (
+            FORMAL_ENVIRONMENT_IDENTITY_PROJECTION_CONTRACT_VERSION
+        ),
+        "full_normalized_environment_projection": identity,
         "resolution_source": source,
         "resolved_python_absolute_path": str(python),
         "virtual_environment_root": probe.get("sys_prefix"),
@@ -441,6 +693,15 @@ def assert_child_environment_parity(
         execution_commit=execution_commit,
         python_executable=resolution.python_executable,
         expected_identity=resolution.environment_identity,
+        protocol_bound_extensions={
+            field: resolution.environment_identity[field]
+            for field in PROTOCOL_BOUND_EXTENSION_FIELDS
+        }
+        if resolution.environment_identity.get(
+            "formal_execution_environment_contract_version"
+        )
+        == FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION
+        else None,
         forbidden_source_roots=forbidden_source_roots,
     )
     return {
@@ -459,11 +720,18 @@ __all__ = [
     "EXECUTION_ENVIRONMENT_RESOLVER_VERSION",
     "ExecutionEnvironmentError",
     "FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION",
+    "FORMAL_ENVIRONMENT_IDENTITY_PROJECTION_CONTRACT_VERSION",
+    "PROTOCOL_BOUND_EXTENSION_FIELDS",
+    "RUNTIME_OBSERVABLE_IDENTITY_FIELDS",
     "ResolvedExecutionEnvironment",
     "assert_child_environment_parity",
     "assert_clean_git_worktree",
+    "build_environment_identity_projection",
     "child_environment",
+    "normalize_environment_identity",
+    "normalize_protocol_bound_extensions",
     "probe_python_environment",
+    "protocol_bound_extensions_from_protocol",
     "resolve_execution_environment",
     "scientific_environment_identity",
     "source_tree_fingerprint",

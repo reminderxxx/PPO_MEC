@@ -981,4 +981,13 @@
 
 原因：G14C v9 证明 legacy closed-loop progression 会使不同策略面对不同 request denominator，破坏 classical cache policy、learned controller、dev selection 和 formal comparison 的 matched estimand。
 
+# 2026-08-31 — D-G14R10 full environment projection 是唯一 scientific identity
+
+决定：Protocol 2.x environment fingerprint 必须由一个共享 strict producer 对 runtime-observable 字段与三个
+validated Protocol extension 合成；manifest、resolver 和 validator 禁止各自维护字段集合。host paths 只进入
+runtime audit，commit/source 使用无自引用 rule 并在启动时记录 observed 40-hex/tree hash。
+
+原因：Protocol 2.0 manifest 与 A11 resolver 对同一环境使用不同 projection，导致正确的 pre-execution stop。
+删除 extension、接受旧小 hash 或硬编码 expected fingerprint 都会掩盖科学身份分叉。
+
 约束：G08 replay 保持 analytical oracle 身份，不升级为 formal execution producer；legacy non-formal 默认路径继续兼容。Endpoint schema 升级为 2.0，失败/不完整 workflow delay 为 `null/unavailable`。

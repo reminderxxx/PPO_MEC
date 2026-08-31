@@ -1,0 +1,13 @@
+{
+  "cell_ledger_count": 0,
+  "checkpoint_candidate_row_count": 0,
+  "classification": "PRE-EXECUTION STOP / EXECUTION_IDENTITY_MISMATCH",
+  "clean_candidate": "/private/tmp/ppo_mec_g14c_v10_8402d2e_20260831_161419",
+  "durable_run_root_created": false,
+  "formal_run_id": null,
+  "holdout_opened": false,
+  "phase_ledger_count": 0,
+  "preflight_child_executed": false,
+  "resume_or_salvage_allowed": false,
+  "tests_train_dev_formal_statistics_gate_count": 0
+}

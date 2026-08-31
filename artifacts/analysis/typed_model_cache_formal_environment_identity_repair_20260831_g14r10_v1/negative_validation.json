@@ -1,0 +1,98 @@
+{
+  "case_count": 23,
+  "cases": [
+    {
+      "case": "missing_formal_endpoint_metrics_contract_version",
+      "result": "rejected"
+    },
+    {
+      "case": "missing_formal_exogenous_request_execution_contract_version",
+      "result": "rejected"
+    },
+    {
+      "case": "missing_formal_request_exposure_trace_version",
+      "result": "rejected"
+    },
+    {
+      "case": "drift_formal_endpoint_metrics_contract_version",
+      "result": "rejected"
+    },
+    {
+      "case": "drift_formal_exogenous_request_execution_contract_version",
+      "result": "rejected"
+    },
+    {
+      "case": "drift_formal_request_exposure_trace_version",
+      "result": "rejected"
+    },
+    {
+      "case": "unknown_extension_field",
+      "result": "rejected"
+    },
+    {
+      "case": "old_small_projection_hash",
+      "result": "rejected"
+    },
+    {
+      "case": "hardcoded_fingerprint",
+      "result": "rejected"
+    },
+    {
+      "case": "manifest_only_patch",
+      "result": "rejected"
+    },
+    {
+      "case": "wrong_protocol_version",
+      "result": "rejected"
+    },
+    {
+      "case": "wrong_active_index",
+      "result": "rejected"
+    },
+    {
+      "case": "cross_bundle_environment_manifest",
+      "result": "rejected"
+    },
+    {
+      "case": "protocol_2_0_execution_attempt",
+      "result": "rejected"
+    },
+    {
+      "case": "relative_dot_venv",
+      "result": "rejected"
+    },
+    {
+      "case": "implicit_sys_executable",
+      "result": "rejected"
+    },
+    {
+      "case": "dirty_source_import",
+      "result": "rejected"
+    },
+    {
+      "case": "editable_source_precedence",
+      "result": "rejected"
+    },
+    {
+      "case": "commit_or_source_tree_drift",
+      "result": "rejected"
+    },
+    {
+      "case": "dependency_drift",
+      "result": "rejected"
+    },
+    {
+      "case": "host_path_in_semantic_projection",
+      "result": "rejected"
+    },
+    {
+      "case": "holdout_capability",
+      "result": "rejected"
+    },
+    {
+      "case": "fabricated_v10_run_or_ledger",
+      "result": "rejected"
+    }
+  ],
+  "status": "pass"
+}

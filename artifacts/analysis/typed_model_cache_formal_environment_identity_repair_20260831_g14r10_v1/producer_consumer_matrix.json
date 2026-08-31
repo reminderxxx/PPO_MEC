@@ -1,0 +1,194 @@
+{
+  "rows": [
+    {
+      "consumer": "environment manifest builder",
+      "implementation": "scripts/repair_formal_environment_identity_projection.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "direct shared producer",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "Protocol manifest",
+      "implementation": "protocol_v2_1_manifest.json",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "exact embedded projection",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "protocol index",
+      "implementation": "protocol_index.json",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "fingerprint plus projection resource identity",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "active bundle validator",
+      "implementation": "src/runtime/active_formal_bundle.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "strict full projection validation",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "runtime resolver",
+      "implementation": "src/runtime/formal_execution_environment.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "runtime probe plus validated Protocol extensions",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "child parity",
+      "implementation": "assert_child_environment_parity",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "repeat resolver full equality",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "outer preflight",
+      "implementation": "scripts/run_typed_model_cache_formal_protocol.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "resolved context content hash",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "nested preflight",
+      "implementation": "scripts/validate_typed_model_cache_formal_restart.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "persisted resolved context",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "resolved context",
+      "implementation": "src/runtime/resolved_formal_execution_context.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "full normalized projection",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "training binding",
+      "implementation": "src/runtime/formal_training_identity.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "full normalized projection",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "formal training entrypoint",
+      "implementation": "scripts/train_algo_pool_real_sample.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "training contract and checkpoint metadata",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "dev selection",
+      "implementation": "scripts/run_typed_model_cache_formal_dev_selection.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "resolved context and binding hashes",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "checkpoint freeze",
+      "implementation": "scripts/manage_typed_model_cache_formal_artifacts.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "checkpoint/context provenance",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "formal controller/cache policy",
+      "implementation": "scripts/run_typed_model_cache_formal_support.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "resolved context and checkpoint provenance",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "support/scalability",
+      "implementation": "scripts/run_typed_model_cache_formal_support.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "resolved context and checkpoint provenance",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "phase ledger",
+      "implementation": "scripts/run_typed_model_cache_formal_protocol.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "context and binding hashes",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "cell ledger",
+      "implementation": "src/evaluators/formal_cell_transaction.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "environment/context/binding content identities",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "checkpoint provenance",
+      "implementation": "scripts/train_algo_pool_real_sample.py",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "full normalized projection plus fingerprints",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    },
+    {
+      "consumer": "artifact integrity",
+      "implementation": "artifact_integrity_manifest.json",
+      "mismatch_behavior": "fail_fast_before_new_scientific_output",
+      "projection_contract_version": "1.0.0",
+      "recording": "content-addressed projection artifacts",
+      "records_dependency_fingerprint": true,
+      "records_environment_fingerprint": true,
+      "required_identity": "full_normalized_environment_projection"
+    }
+  ]
+}

@@ -8,6 +8,7 @@ values that the shared training entrypoint is allowed to consume.
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from dataclasses import dataclass
 from math import isfinite
 from pathlib import Path
@@ -130,8 +131,9 @@ def _formal_values(protocol: Mapping[str, Any], agent_name: str) -> dict[str, An
         "1.8.0",
         "1.9.0",
         "2.0.0",
+        "2.1.0",
     }:
-        raise FormalTrainingContractError("formal training requires protocol version 1.1, 1.2, or 1.3")
+        raise FormalTrainingContractError("unsupported formal training protocol version")
     budget = protocol.get("training_budget")
     if not isinstance(budget, Mapping):
         raise FormalTrainingContractError("formal protocol lacks training_budget")
@@ -212,6 +214,8 @@ class ResolvedTrainingContract:
     resolved_execution_context_sha256: str | None = None
     environment_fingerprint: str | None = None
     dependency_fingerprint: str | None = None
+    environment_identity_projection_contract_version: str | None = None
+    full_normalized_environment_projection: dict[str, Any] | None = None
     formal_agent_order_contract_semantic_sha256: str | None = None
     active_formal_bundle_sha256: str | None = None
 
@@ -239,6 +243,12 @@ class ResolvedTrainingContract:
             ),
             "environment_fingerprint": self.environment_fingerprint,
             "dependency_fingerprint": self.dependency_fingerprint,
+            "environment_identity_projection_contract_version": (
+                self.environment_identity_projection_contract_version
+            ),
+            "full_normalized_environment_projection": deepcopy(
+                self.full_normalized_environment_projection
+            ),
             "formal_agent_order_contract_semantic_sha256": (
                 self.formal_agent_order_contract_semantic_sha256
             ),
@@ -325,11 +335,13 @@ def resolve_training_contract(
         "resolved_execution_context_sha256": None,
         "environment_fingerprint": None,
         "dependency_fingerprint": None,
+        "environment_identity_projection_contract_version": None,
+        "full_normalized_environment_projection": None,
         "formal_agent_order_contract_semantic_sha256": None,
         "active_formal_bundle_sha256": None,
     }
     contract_version = FORMAL_TRAINING_CONTRACT_VERSION
-    if protocol_version in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0"}:
+    if protocol_version in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0"}:
         if agent_config_companion is not None:
             raise FormalTrainingContractError(
                 "Protocol v1.6 rejects legacy --agent_config_path companion"
@@ -359,13 +371,17 @@ def resolve_training_contract(
                 protocol=formal_protocol,
                 scientific_config=scientific_config,
                 execution_commit=str(scientific_identity.get("execution_commit") or ""),
-                environment_identity=scientific_identity,
+                environment_identity=(
+                    scientific_identity["full_normalized_environment_projection"]
+                    if protocol_version == "2.1.0"
+                    else scientific_identity
+                ),
                 command_matrix_sha256=str(
                     command.get("resolved_command_matrix_sha256") or ""
                 ),
                 active_formal_bundle_sha256=(
                     str(scientific_identity.get("active_formal_bundle_sha256") or "")
-                    if protocol_version in {"1.8.0", "1.9.0", "2.0.0"}
+                    if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0"}
                     else None
                 ),
             )
@@ -395,6 +411,25 @@ def resolve_training_contract(
             "dependency_fingerprint": str(
                 scientific_identity.get("dependency_fingerprint") or ""
             ),
+            "environment_identity_projection_contract_version": (
+                str(
+                    scientific_identity.get(
+                        "environment_identity_projection_contract_version"
+                    )
+                    or ""
+                )
+                if protocol_version == "2.1.0"
+                else None
+            ),
+            "full_normalized_environment_projection": (
+                deepcopy(
+                    scientific_identity.get(
+                        "full_normalized_environment_projection"
+                    )
+                )
+                if protocol_version == "2.1.0"
+                else None
+            ),
             "formal_agent_order_contract_semantic_sha256": (
                 str(
                     scientific_identity.get(
@@ -402,12 +437,12 @@ def resolve_training_contract(
                     )
                     or ""
                 )
-                if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0"}
+                if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0"}
                 else None
             ),
             "active_formal_bundle_sha256": (
                 str(scientific_identity.get("active_formal_bundle_sha256") or "")
-                if protocol_version in {"1.8.0", "1.9.0", "2.0.0"}
+                if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0"}
                 else None
             ),
         }
@@ -423,13 +458,23 @@ def resolve_training_contract(
             raise FormalTrainingContractError(
                 "resolved context execution binding identity mismatch"
             )
-        if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0"} and identity_values[
+        if protocol_version == "2.1.0" and (
+            identity_values["environment_identity_projection_contract_version"]
+            != "1.0.0"
+            or not isinstance(
+                identity_values["full_normalized_environment_projection"], Mapping
+            )
+        ):
+            raise FormalTrainingContractError(
+                "resolved context full environment projection is missing"
+            )
+        if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0"} and identity_values[
             "formal_agent_order_contract_semantic_sha256"
         ] != formal_protocol["formal_agent_order_contract"]["semantic_sha256"]:
             raise FormalTrainingContractError(
                 "resolved context formal agent order contract identity mismatch"
             )
-        if protocol_version in {"1.8.0", "1.9.0", "2.0.0"} and identity_values[
+        if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0"} and identity_values[
             "active_formal_bundle_sha256"
         ] != execution_binding.get("active_formal_bundle_sha256"):
             raise FormalTrainingContractError(

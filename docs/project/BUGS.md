@@ -470,3 +470,12 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - 永久边界：`typed_model_cache_formal_20260830_113339_g14c_v9` 以及其 checkpoints、candidates 和 partial dev outputs 禁止 resume、retry、finalize、salvage、复制或进入新 manifest。
 - 修复：Protocol 2.0 在 agent action 前生成统一 request exposure，outcome 不再反向改变 progression；跨 agent request 与 outcome fingerprint 分离。
 - 剩余风险：本轮只有 non-formal tiny/controlled rehearsal，不构成算法性能、论文结论或 holdout 证据；G14C v10 必须从全新 clean formal training 开始。
+
+# 2026-08-31 — G14C v10 environment projection mismatch（已在执行前合同修复）
+
+- 已确认：Protocol 2.0 manifest full identity=`acc61f8f...8196`，A11 runtime small projection 重算为
+  `3858b1ba...76de`；三个 Protocol-bound extension 未进入 resolver producer。
+- 已修复：Protocol 2.1 由一个 strict projection producer 生成 manifest/runtime identity，并将 full normalized
+  projection 传入 binding、resolved context、training/checkpoint provenance；active validator 逐字段验证。
+- v10 不是 invalid formal run：durable run、ledger、checkpoint、row 均不存在，禁止伪造 run/failure artifact。
+- 剩余风险：readiness 仅授权未来独立 G14C v11，不是 formal/performance/paper-ready 证据；holdout 继续 sealed。

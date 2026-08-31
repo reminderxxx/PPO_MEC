@@ -1250,6 +1250,22 @@ configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/protocol_inde
 
 G14R9 合同级非正式复验入口：
 
+# Protocol 2.1 environment identity projection
+
+唯一 active index：
+
+```text
+configs/experiment/typed_model_cache_formal_protocol_v2_1_20260831/protocol_index.json
+```
+
+启动未来独立 G14C v11 前，必须从 pushed、Git-clean、`HEAD == main == origin/main` 的 worktree 使用显式绝对
+Python。outer gate 必须先验证 active bundle、full normalized environment projection、dependency fingerprint、
+186-command expansion、60/60 frozen windows 与 holdout seal，再创建 durable run。Protocol 2.0/A11 与 v10
+pre-execution candidate 不得作为 active execution 或 resume 来源。
+
+G14R10 的 non-formal acceptance 只允许 preflight/tests 和无训练的 consumer rehearsal，必须记录
+`formal=false`、`performance_evidence=false`、`holdout_opened=false`；不得生成正式 checkpoint 或 formal row。
+
 ```bash
 python scripts/run_formal_exogenous_request_rehearsal.py \
   --work-root /private/tmp/ppo_mec_g14r9_rehearsal \

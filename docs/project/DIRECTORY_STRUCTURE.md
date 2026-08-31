@@ -192,6 +192,13 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 `artifacts/analysis/classical_cache_baseline_validation_<run_id>/` 保存五种 matched reactive baseline 的 controlled mechanism validation；非 formal 结果。
 # Protocol 2.0 additions
 
+# Protocol 2.1 additions
+
+- `configs/experiment/typed_model_cache_formal_protocol_v2_1_20260831/`：唯一 active Protocol/index、environment
+  manifest、projection contract、binding/context schema 与 Readiness v13。
+- `artifacts/analysis/typed_model_cache_formal_environment_identity_repair_20260831_g14r10_v1/`：G14R10
+  pre-execution stop、projection/matrix/negative/clean acceptance/integrity 证据。
+- `docs/project/formal_environment_identity_projection_contract.md`：projection 规范与 claim boundary。
 ```text
 configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/
   protocol_index.json

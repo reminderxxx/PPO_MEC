@@ -561,7 +561,7 @@ def main() -> None:
     )
 
     if args.formal_contract_preflight_only:
-        if resolved_training.formal_protocol_version not in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0"}:
+        if resolved_training.formal_protocol_version not in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0"}:
             raise FormalTrainingContractError(
                 "formal contract preflight is restricted to Protocol v1.6/v1.7"
             )
@@ -815,6 +815,12 @@ def main() -> None:
                 ),
                 "environment_fingerprint": resolved_training.environment_fingerprint,
                 "dependency_fingerprint": resolved_training.dependency_fingerprint,
+                "environment_identity_projection_contract_version": (
+                    resolved_training.environment_identity_projection_contract_version
+                ),
+                "full_normalized_environment_projection": (
+                    resolved_training.full_normalized_environment_projection
+                ),
                 "formal_agent_order_contract_semantic_sha256": (
                     resolved_training.formal_agent_order_contract_semantic_sha256
                 ),
@@ -921,6 +927,12 @@ def main() -> None:
         ),
         "environment_fingerprint": resolved_training.environment_fingerprint,
         "dependency_fingerprint": resolved_training.dependency_fingerprint,
+        "environment_identity_projection_contract_version": (
+            resolved_training.environment_identity_projection_contract_version
+        ),
+        "full_normalized_environment_projection": (
+            resolved_training.full_normalized_environment_projection
+        ),
         "formal_agent_order_contract_semantic_sha256": (
             resolved_training.formal_agent_order_contract_semantic_sha256
         ),

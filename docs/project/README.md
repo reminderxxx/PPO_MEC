@@ -136,3 +136,8 @@
 # 2026-08-31 formal request contract
 
 - `formal_exogenous_request_execution_contract.md`：Protocol 2.0 外生 request exposure、因果信息边界、Endpoint 2.0 与 fail-fast 规则。
+
+# 2026-08-31 formal environment projection contract
+
+- `formal_environment_identity_projection_contract.md`：Protocol 2.1 full scientific environment projection、
+  Protocol-bound extensions、canonical fingerprint、host audit 与 v10 pre-execution stop 边界。

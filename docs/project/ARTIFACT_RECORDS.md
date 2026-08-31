@@ -1365,6 +1365,14 @@ Run `g14a_rehearsal_20260819_230456_872949`使用`controlled_non_hidden`窗口�
   未启动G14C v6/G14D/G15。
 # 2026-08-31 — G14R9 formal exogenous request repair
 
+# 2026-08-31 — G14R10 formal environment identity projection repair
+
+- artifact：`artifacts/analysis/typed_model_cache_formal_environment_identity_repair_20260831_g14r10_v1/`
+- 内容：v10 pre-execution stop、projection root cause/contract、producer-consumer matrix、manifest/runtime diff、
+  clean resolution、outer/nested parity、186-command audit、non-formal consumer rehearsal、negative validation、
+  七文件保护、readiness 与 content integrity。
+- 证据边界：execution-contract evidence only；formal training/checkpoint/performance=`0/0/0`，holdout
+  sealed/unopened，未启动 G14C v11/G14D/G15。
 - Artifact root：`artifacts/analysis/typed_model_cache_formal_exogenous_request_repair_20260831_g14r9_v1/`
 - Evidence level：contract + synthetic mechanism + exact real-unit non-formal rehearsal；不是 formal performance。
 - Exact unit：`seed_7/g14b_i_80_run_003_f10501_10524_t1113438615000_1113438617300/j_8`，288 MB，22 steps，15 agents，单一 external exposure fingerprint，alignment 全通过。

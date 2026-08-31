@@ -1,0 +1,12 @@
+{
+  "candidate_root": "/private/tmp/ppo_mec_g14r10_acceptance_63fbf59",
+  "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+  "dot_venv_present_in_candidate": false,
+  "environment_fingerprint": "94c0c3d08a11eae4a0a2caba45d5d42ac7b1cc944a5b1ab1e2011276368f7f0f",
+  "ngsim_raw_rows": 11850526,
+  "project_import_from_clean_candidate": true,
+  "provider_frames": 73871,
+  "reachable_windows": 60,
+  "shared_absolute_python": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "status": "pass"
+}

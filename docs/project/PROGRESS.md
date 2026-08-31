@@ -1632,3 +1632,20 @@ quick run 结果边界：
 - active Protocol 升级为 `2.0.0`。exact `seed_7/.../j_8` 已用全新 non-formal tiny checkpoints 完成 15-agent、288 MB、22-step 验收；三容量均完成 15-agent 对账。
 - detached clean candidate `2477d23cefd542386adbfeb9a984cd671235e8f2` 在无本地 `.venv` 条件下完成到 `complete_without_holdout` 的 13-phase ledger；formal training/checkpoint/performance 仍为 0，holdout 未打开。
 - 当前 readiness：`READY_FOR_G14C_V10_CLEAN_TRAIN_AND_FORMAL`。没有启动 G14C v10、G14D 或 G15。
+
+# 2026-08-31 — G14R10 formal environment identity projection closure
+
+- G14C v10 在 durable run 创建前因 environment fingerprint mismatch 停止，永久分类为
+  `PRE-EXECUTION STOP / EXECUTION_IDENTITY_MISMATCH`；preflight child、tests/train/dev/formal/statistics/gate、
+  phase/cell ledger、checkpoint/candidate/row 均为 0，不存在 run ID 或可 resume/salvage 状态。
+- 根因是 Protocol 2.0 manifest 的 scientific identity 含 endpoint/request-execution/request-trace 三个版本字段，
+  A11 resolver 却按较小 runtime projection 重算。共同 Python/Torch/package/platform/dependency 字段完全一致，
+  因此不是环境漂移。
+- 冻结 environment projection `1.0.0`、execution environment `1.1.0` 与 Protocol `2.1.0`。共享 producer
+  严格拒绝缺失、未知、错误类型、unsupported major、NaN/Infinity 和 extension 漂移；host path 只进入 audit。
+- Protocol 2.0/A11 及更早版本均 audit-only。新 readiness v13 为
+  `READY_FOR_G14C_V11_CLEAN_TRAIN_AND_FORMAL`；本轮正式 training/checkpoint/performance 为 0，holdout
+  sealed/unopened，未启动 G14C v11、G14D 或 G15。
+- clean detached 候选无 `.venv`，使用共享绝对 Python 通过真实 outer preflight、11,850,526 rows、73,871
+  frames、60/60 windows、186-command outer/nested parity、`1134 passed, 16 skipped` clean tests，以及不训练、
+  不写 checkpoint/row 的 binding→context→agent/dev/provenance rehearsal。

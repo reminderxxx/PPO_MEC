@@ -1,0 +1,22 @@
+{
+  "active_bundle_core_sha256": "7d1a06815559bef2a9b72821825f6f183ddc40db230cf5b5428a1f80fc40b55c",
+  "active_formal_bundle_sha256": "9214ac51501e1f4e5b4427c8baa902b6e0ac71ba4a99290426684776f70f9757",
+  "artifact_run_id": "typed_model_cache_formal_environment_identity_repair_20260831_g14r10_v1",
+  "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+  "environment_fingerprint": "94c0c3d08a11eae4a0a2caba45d5d42ac7b1cc944a5b1ab1e2011276368f7f0f",
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "g14c_v11_started": false,
+  "git_commit": "Commit A12 candidate; exact 40-hex recorded after commit",
+  "holdout_sealed_unopened": true,
+  "literature_cutoff": "2026-08-31",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "protocol_full_sha256": "2f925a548d10b6ec8428bf4ef640b4aff9ece77d34f2adf6547c5ea76440cb20",
+  "protocol_semantic_sha256": "cec5bc67a7ca499b13d74877f4f8f05c96a7a31547b44e40e92fc72555acc75d",
+  "reviewed_at": "2026-08-31T23:59:00+08:00",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "test_summary": "1134 passed, 16 skipped",
+  "verdict": "READY_FOR_G14C_V11_CLEAN_TRAIN_AND_FORMAL"
+}

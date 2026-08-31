@@ -269,4 +269,11 @@ SHA-256 为 `4429531dc3cf98e7ef332367e55e1d0a3dbc33773c20a3fe2e53e57d3534155d`�
 
 Protocol 2.0 将 request progression 纳入 formal scientific identity：train、dev、formal 使用预生成的 policy-neutral exposure；所有命令必须显式启用 `--formal-exogenous-request-execution`。request/outcome fingerprint 分离，Endpoint schema 升级为 2.0。v1.0–v1.9 全部为 historical audit-only；G14C v9 永久无效且不可复用。
 
+# Protocol 2.1 supersession（2026-08-31）
+
+Protocol 2.1 不改变 Protocol 2.0 的 request、endpoint、agent/order、seed、capacity、split/window、budget、
+hyperparameter、reward/action、checkpoint cadence、selection、statistics 或 holdout 语义。它只冻结 environment
+projection `1.0.0` 与 execution environment `1.1.0`，使 manifest/resolver/validator 对完整 scientific identity
+逐字段一致。Protocol 2.0/A11 变为 audit-only；G14C v10 仅为 pre-execution stop，不是已创建的 invalid run。
+
 完整语义见 `docs/project/formal_exogenous_request_execution_contract.md`，唯一 active index 为 `configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/protocol_index.json`。

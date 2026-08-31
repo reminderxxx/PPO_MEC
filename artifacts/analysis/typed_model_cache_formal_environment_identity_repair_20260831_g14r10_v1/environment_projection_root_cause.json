@@ -1,0 +1,22 @@
+{
+  "a11_runtime_small_projection_fingerprint": "3858b1ba1d25eee329e8601feaaf7136083df3dd3678e00d79496c9e77d176de",
+  "classification": "producer_consumer_projection_mismatch_not_environment_drift",
+  "common_fields_equal": [
+    "python_implementation",
+    "python_version",
+    "platform_system",
+    "architecture",
+    "dependency_fingerprint",
+    "installed_package_count",
+    "torch_version",
+    "critical_package_versions"
+  ],
+  "dependency_change_required": false,
+  "manifest_environment_fingerprint": "acc61f8f3eff6a6e9326af9c3884484338f0b8bba0934ce3a0bc721cdd8d8196",
+  "missing_runtime_projection_fields": [
+    "formal_endpoint_metrics_contract_version",
+    "formal_exogenous_request_execution_contract_version",
+    "formal_request_exposure_trace_version"
+  ],
+  "status": "confirmed"
+}

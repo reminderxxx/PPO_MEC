@@ -1,0 +1,26 @@
+{
+  "manifest_runtime_equal": true,
+  "new_environment_fingerprint": "94c0c3d08a11eae4a0a2caba45d5d42ac7b1cc944a5b1ab1e2011276368f7f0f",
+  "new_full_projection_field_count_excluding_fingerprint": 15,
+  "old_manifest_field_count": 16,
+  "old_runtime_projection_field_count": 13,
+  "protocol_extension_fields": [
+    "formal_endpoint_metrics_contract_version",
+    "formal_exogenous_request_execution_contract_version",
+    "formal_request_exposure_trace_version"
+  ],
+  "runtime_observable_fields": [
+    "formal_execution_environment_contract_version",
+    "python_implementation",
+    "python_version",
+    "platform_system",
+    "architecture",
+    "dependency_fingerprint",
+    "installed_package_count",
+    "torch_version",
+    "critical_package_versions",
+    "execution_commit",
+    "source_root_identity",
+    "identity_rule"
+  ]
+}

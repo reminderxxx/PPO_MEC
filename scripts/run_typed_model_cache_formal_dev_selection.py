@@ -152,7 +152,7 @@ def main() -> None:
     nested_python = sys.executable
     protocol_version = protocol["typed_model_cache_formal_protocol_version"]
     resolved_context = None
-    if protocol_version in {"1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0"}:
+    if protocol_version in {"1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0"}:
         if not args.resolved_execution_context_path:
             raise FormalExecutionError(
                 "active protocol dev selection requires resolved execution context"
@@ -202,7 +202,7 @@ def main() -> None:
     config_root = protocol_path.parent
     active_bundle = None
     resolved_capacity_pairs = None
-    if protocol_version in {"1.9.0", "2.0.0"}:
+    if protocol_version in {"1.9.0", "2.0.0", "2.1.0"}:
         try:
             active_index_path = resolved_context["resolved_expansion_context"][
                 "active_protocol_index_path"
@@ -250,7 +250,7 @@ def main() -> None:
         except (ActiveFormalBundleError, KeyError) as exc:
             raise FormalExecutionError(f"active bundle resource resolution failed: {exc}") from exc
     order_audit = None
-    if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0"}:
+    if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0"}:
         if not args.formal_agent_order_contract_path:
             raise FormalExecutionError("Protocol v1.7 dev selection requires agent order contract")
         scientific = json.loads(
@@ -304,7 +304,7 @@ def main() -> None:
     cell_ledger = None
     expected_dev_cell_ids: list[str] = []
     if not args.non_formal_rehearsal and protocol["typed_model_cache_formal_protocol_version"] in {
-        "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0"
+        "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0"
     }:
         identity_path = output_root / "cell_ledger_identity.json"
         if not identity_path.is_file():
@@ -397,7 +397,7 @@ def main() -> None:
                         raise FormalExecutionError("dev checkpoint formal binding mismatch")
                     if (
                         not args.non_formal_rehearsal
-                        and protocol_version in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0"}
+                        and protocol_version in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0"}
                     ):
                         scientific_identity = resolved_context["scientific_identity"]
                         try:
@@ -434,7 +434,7 @@ def main() -> None:
                                         )
                                         or ""
                                     )
-                                    if protocol_version in {"1.8.0", "1.9.0", "2.0.0"}
+                                    if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0"}
                                     else None
                                 ),
                             )
@@ -496,7 +496,7 @@ def main() -> None:
                 "--reward_positive_offset", "0",
                 "--output_root", str(benchmark_root),
             ]
-            if protocol_version == "2.0.0":
+            if protocol_version in {"2.0.0", "2.1.0"}:
                 command.append("--formal-exogenous-request-execution")
             if order_audit is not None:
                 command.extend(
@@ -545,7 +545,7 @@ def main() -> None:
                             resolved_context.get("scientific_identity", {}).get(
                                 "active_formal_bundle_sha256"
                             )
-                            if protocol_version in {"1.8.0", "1.9.0", "2.0.0"}
+                            if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0"}
                             else None
                         ),
                         "coordinates": coordinates,

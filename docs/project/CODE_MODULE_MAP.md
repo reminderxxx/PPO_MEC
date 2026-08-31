@@ -554,4 +554,16 @@
 - `scripts/train_algo_pool_real_sample.py`：Protocol 2.0 train exposure 与 checkpoint provenance producer。
 - `scripts/benchmark_main_results.py`：每 unit 单一 pre-agent producer、15-agent fingerprint matrix 与 manifest consumer。
 - `src/runtime/active_formal_bundle.py`：Protocol 2.0 唯一 active index 及 request contract/schema resource gate。
+
+# G14R10 environment identity projection modules
+
+- `src/runtime/formal_execution_environment.py`：projection 字段合同、唯一 builder、Protocol extension projector、
+  runtime probe/resolver、child parity 与 host-only audit。
+- `src/runtime/active_formal_bundle.py`：Protocol 2.1/index/environment/projection-contract 原子验证。
+- `src/runtime/formal_training_identity.py`：full projection 进入 execution binding。
+- `src/runtime/resolved_formal_execution_context.py`：full projection 进入 persisted context。
+- `src/runtime/formal_training_contract.py` 与 `scripts/train_algo_pool_real_sample.py`：training/checkpoint provenance
+  消费并记录 projection。
+- `scripts/repair_formal_environment_identity_projection.py`：Protocol 2.1/config bundle generator。
+- `scripts/build_formal_environment_identity_repair_artifacts.py`：G14R10 finite audit/integrity producer。
 - `scripts/run_formal_exogenous_request_rehearsal.py`、`scripts/run_formal_exogenous_phase_chain_rehearsal.py`：non-formal exact/capacity/phase-chain 验收；不产生 formal evidence。

@@ -1,0 +1,22 @@
+{
+  "artifact_id": "typed_model_cache_formal_environment_identity_repair_20260831_g14r10_v1",
+  "formal_evidence_count": 0,
+  "holdout_opened": false,
+  "required_file_count": 14,
+  "required_files": [
+    "g14c_v10_pre_execution_stop_audit.json",
+    "environment_projection_root_cause.json",
+    "environment_identity_projection_contract.json",
+    "producer_consumer_matrix.json",
+    "manifest_runtime_projection_diff.json",
+    "clean_candidate_environment_resolution.json",
+    "outer_nested_parity.json",
+    "command_matrix_audit.json",
+    "nonformal_rehearsal.json",
+    "negative_validation.json",
+    "protected_user_files_audit.json",
+    "readiness_review.json",
+    "artifact_inventory.json",
+    "artifact_integrity_manifest.json"
+  ]
+}
