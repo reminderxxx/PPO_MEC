@@ -1,0 +1,72 @@
+{
+  "case_count": 13,
+  "cases": [
+    {
+      "case": "missing request",
+      "expected": "fail_fast",
+      "observed": "fail_fast"
+    },
+    {
+      "case": "duplicate request",
+      "expected": "fail_fast",
+      "observed": "fail_fast"
+    },
+    {
+      "case": "extra request",
+      "expected": "fail_fast",
+      "observed": "fail_fast"
+    },
+    {
+      "case": "out-of-order request",
+      "expected": "fail_fast",
+      "observed": "fail_fast"
+    },
+    {
+      "case": "observed event identity drift",
+      "expected": "fail_fast",
+      "observed": "fail_fast"
+    },
+    {
+      "case": "catalog/dependency/size drift",
+      "expected": "fail_fast",
+      "observed": "fail_fast"
+    },
+    {
+      "case": "seed/window/workflow/vehicle/RSU drift",
+      "expected": "fail_fast",
+      "observed": "fail_fast"
+    },
+    {
+      "case": "outcome pollution",
+      "expected": "fail_fast",
+      "observed": "fail_fast"
+    },
+    {
+      "case": "endogenous formal fallback",
+      "expected": "fail_fast",
+      "observed": "fail_fast"
+    },
+    {
+      "case": "future topology leakage",
+      "expected": "fail_fast",
+      "observed": "fail_fast"
+    },
+    {
+      "case": "historical active bundle",
+      "expected": "fail_fast",
+      "observed": "fail_fast"
+    },
+    {
+      "case": "v9 run or checkpoint reference",
+      "expected": "fail_fast",
+      "observed": "fail_fast"
+    },
+    {
+      "case": "non-finite JSON",
+      "expected": "fail_fast",
+      "observed": "fail_fast"
+    }
+  ],
+  "evidence": "tests/test_formal_exogenous_request_execution.py plus active bundle/order gates",
+  "status": "pass"
+}

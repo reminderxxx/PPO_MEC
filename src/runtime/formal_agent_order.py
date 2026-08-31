@@ -348,10 +348,11 @@ def reject_permanently_invalid_run_references(
     payload = dict(contract) if contract is not None else load_formal_agent_order_contract()
     validate_formal_agent_order_contract(payload)
     rejected = set(payload["permanently_rejected_run_ids"])
-    # G14C v8 failed after training but before any dev performance row.  This
+    # G14C v8/v9 failed after training but before any valid dev selection.  This
     # implementation-level denylist extends rejection without changing the
     # frozen Agent Order Contract 1.0.0 scientific semantic identity.
     rejected.add("typed_model_cache_formal_20260828_101804_g14c_v8")
+    rejected.add("typed_model_cache_formal_20260830_113339_g14c_v9")
     for path in paths:
         parts = set(Path(path).resolve().parts)
         hit = sorted(rejected & parts)

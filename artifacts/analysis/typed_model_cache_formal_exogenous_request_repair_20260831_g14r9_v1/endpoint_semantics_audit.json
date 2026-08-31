@@ -1,0 +1,17 @@
+{
+  "common_external_request_denominator_endpoints": [
+    "full_service_ready_byte_hit_rate",
+    "joint_base_adapter_hit_rate",
+    "full_service_ready_request_rate",
+    "transfer_mb_per_request"
+  ],
+  "failed_or_incomplete_workflow_delay": null,
+  "formal_endpoint_metrics_contract_version": "2.0.0",
+  "predecessor_failure_suppresses_later_exposure": false,
+  "primary_endpoint_schema_version": "2.0.0",
+  "right_censoring_explicit": true,
+  "selection_null_rule": "null is unavailable and ordered after finite values",
+  "status": "pass",
+  "unavailable_delay_imputed_from_reward": false,
+  "workflow_continuity_rate": "successful service outcomes / external exposures"
+}

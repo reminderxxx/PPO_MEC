@@ -1,0 +1,10 @@
+{
+  "action_before_lookup": true,
+  "actor_observation_contains_current_request_identity": true,
+  "actor_observation_contains_outcome_fields": false,
+  "future_or_outcome_pollution_fails_fast": true,
+  "oracle_only_future_topology_actor_visible": false,
+  "oracle_only_future_topology_controller_visible": false,
+  "outcome_to_exposure_feedback_allowed": false,
+  "status": "pass"
+}

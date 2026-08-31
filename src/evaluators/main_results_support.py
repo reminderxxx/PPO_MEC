@@ -30,6 +30,10 @@ from src.metrics.cache_efficiency_metrics import (
 )
 from src.metrics.recorder import EpisodeRecorder
 from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
+from src.runtime.formal_exogenous_request_execution import (
+    build_formal_request_exposure_trace,
+    compute_formal_endpoint_metrics,
+)
 
 
 PAPER_PROTOCOL_VERSION = "paper_protocol_v1_20260409"
@@ -1455,6 +1459,7 @@ def run_real_episode(
     mobility_frames_override: list[dict[str, Any]] | None = None,
     cache_capacity_profile: dict[str, Any] | None = None,
     model_cache_runtime_contract: dict[str, Any] | None = None,
+    formal_request_exposure_trace: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     cache_capacity_profile = validate_agent_eviction_binding(
         agent_name, cache_capacity_profile, run_seed=seed
@@ -1489,6 +1494,7 @@ def run_real_episode(
         primary_vehicle_selection=primary_vehicle_selection,
         reward_positive_offset=reward_positive_offset,
         cache_capacity_profile=cache_capacity_profile,
+        formal_request_exposure_trace=formal_request_exposure_trace,
     )
     env = GymVecEnv(core_env=core_env, recorder=recorder)
     runtime_agent_config_overrides = build_window_context_agent_overrides(
@@ -1556,6 +1562,14 @@ def run_real_episode(
                 if model_cache_runtime_contract
                 else None
             ),
+            "formal_exogenous_request_execution_contract_version": (
+                "1.0.0" if formal_request_exposure_trace is not None else None
+            ),
+            "request_exposure_fingerprint": (
+                formal_request_exposure_trace.get("request_exposure_fingerprint")
+                if formal_request_exposure_trace is not None
+                else None
+            ),
         },
         learn=False,
     )
@@ -1565,7 +1579,79 @@ def run_real_episode(
     if model_cache_runtime_contract is not None:
         summary["resolved_model_cache_runtime"] = dict(model_cache_runtime_contract)
     summary["cache_efficiency_metrics"] = reduce_cache_efficiency_summary(summary).to_dict()
+    if formal_request_exposure_trace is not None:
+        endpoint_metrics = compute_formal_endpoint_metrics(
+            summary["cache_event_trace"],
+            formal_request_exposure_trace,
+            truncated=bool(summary.get("episode_status", {}).get("truncated", False)),
+        )
+        summary["formal_request_exposure"] = deepcopy(formal_request_exposure_trace)
+        summary["formal_request_execution_audit"] = endpoint_metrics
+        summary["system_metrics"].update(
+            {
+                key: endpoint_metrics[key]
+                for key in (
+                    "full_service_ready_byte_hit_rate",
+                    "joint_base_adapter_hit_rate",
+                    "full_service_ready_request_rate",
+                    "transfer_mb_per_request",
+                    "workflow_continuity_rate",
+                    "end_to_end_workflow_delay",
+                )
+            }
+        )
+        summary["episode_status"]["workflow_completed_under_exogenous_execution"] = (
+            endpoint_metrics["workflow_completed_under_exogenous_execution"]
+        )
+        summary["episode_success"] = bool(
+            endpoint_metrics["workflow_completed_under_exogenous_execution"]
+        )
     return summary
+
+
+def build_episode_formal_request_exposure(
+    *,
+    workflow_state: WorkflowGraphState,
+    mobility_bundle: Any,
+    adapter_catalog: AdapterCatalog,
+    max_steps: int,
+    mobility_source: str,
+    primary_vehicle_selection: str,
+    cache_capacity_profile: dict[str, Any] | None,
+    evaluation_unit: dict[str, Any],
+    source_provenance: dict[str, Any],
+) -> dict[str, Any]:
+    """Resolve the exact environment primary vehicle, then freeze exposure."""
+
+    frames = clone_frames(mobility_bundle.frames)
+    rsus = [clone_rsu_state(row) for row in mobility_bundle.rsu_states]
+    probe = VecWorkflowCoreEnv(
+        mobility_provider=ReplayProvider(trajectory_frames=clone_frames(frames)),
+        workflow_state=clone_workflow_state(workflow_state),
+        adapter_catalog=deepcopy(adapter_catalog),
+        rsu_states=[clone_rsu_state(row) for row in rsus],
+        predictor_manager=PredictorManager(),
+        max_steps=max(max_steps + 2, 8),
+        mobility_source=mobility_source,
+        primary_vehicle_selection=primary_vehicle_selection,
+        reward_positive_offset=0.0,
+        cache_capacity_profile=cache_capacity_profile,
+    )
+    state, _ = probe.reset()
+    primary_vehicle_id = state.get("primary_vehicle_id")
+    if primary_vehicle_id is None:
+        raise ValueError("formal request exposure has no primary vehicle")
+    return build_formal_request_exposure_trace(
+        evaluation_unit=evaluation_unit,
+        workflow_state=workflow_state,
+        mobility_frames=frames,
+        rsu_mapper=RSUMapper(rsus),
+        adapter_catalog=adapter_catalog,
+        primary_vehicle_id=str(primary_vehicle_id),
+        primary_vehicle_selection=primary_vehicle_selection,
+        max_steps=max_steps,
+        source_provenance=source_provenance,
+    )
 
 
 def _bool_value(value: Any) -> bool:
@@ -1819,6 +1905,19 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
     )
     actionmix_diagnostics = _build_actionmix_diagnostics(summary)
     cache_efficiency_fields = cache_efficiency_row_fields(summary)
+    formal_request_audit = dict(summary.get("formal_request_execution_audit") or {})
+    if formal_request_audit:
+        cache_efficiency_fields.update(
+            {
+                key: formal_request_audit.get(key)
+                for key in (
+                    "full_service_ready_byte_hit_rate",
+                    "joint_base_adapter_hit_rate",
+                    "full_service_ready_request_rate",
+                    "transfer_mb_per_request",
+                )
+            }
+        )
     compute_audit = summary.get("compute_audit", {})
     predictor_snapshot_provenance = dict(summary.get("predictor_snapshot_provenance", {}))
     return {
@@ -1840,6 +1939,21 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         "evaluation_unit_id": run_info.get("evaluation_unit_id"),
         "expected_workload_fingerprint": run_info.get("expected_workload_fingerprint"),
         "observed_request_stream_fingerprint": run_info.get("observed_request_stream_fingerprint"),
+        "formal_exogenous_request_execution_contract_version": run_info.get(
+            "formal_exogenous_request_execution_contract_version"
+        ),
+        "request_exposure_fingerprint": run_info.get("request_exposure_fingerprint"),
+        "request_alignment_status": formal_request_audit.get("request_alignment_status"),
+        "outcome_fingerprint": formal_request_audit.get("outcome_fingerprint"),
+        "formal_endpoint_metrics_contract_version": formal_request_audit.get(
+            "formal_endpoint_metrics_contract_version"
+        ),
+        "external_request_denominator": formal_request_audit.get(
+            "external_request_denominator"
+        ),
+        "end_to_end_workflow_delay_availability": formal_request_audit.get(
+            "end_to_end_workflow_delay_availability"
+        ),
         "model_cache_profile": run_info.get("model_cache_profile", "legacy_adapter_only_v1"),
         "runtime_contract_sha256": run_info.get("runtime_contract_sha256"),
         "typed_catalog_fingerprint": run_info.get("typed_catalog_fingerprint"),

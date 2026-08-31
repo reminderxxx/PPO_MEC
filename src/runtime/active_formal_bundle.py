@@ -23,12 +23,12 @@ from typing import Any, Mapping
 
 ACTIVE_FORMAL_BUNDLE_CONTRACT_VERSION = "1.1.0"
 ACTIVE_BUNDLE_RESOURCE_RESOLUTION_CONTRACT_VERSION = "1.0.0"
-ACTIVE_PROTOCOL_VERSION = "1.9.0"
-ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v1_9"
-READY_STATUS = "READY_FOR_G14C_V9_CLEAN_TRAIN_AND_FORMAL"
-READINESS_VERSION = "11.0.0"
+ACTIVE_PROTOCOL_VERSION = "2.0.0"
+ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v2_0"
+READY_STATUS = "READY_FOR_G14C_V10_CLEAN_TRAIN_AND_FORMAL"
+READINESS_VERSION = "12.0.0"
 DEFAULT_ACTIVE_INDEX_RELATIVE = (
-    "configs/experiment/typed_model_cache_formal_protocol_v1_9_20260829/"
+    "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/"
     "protocol_index.json"
 )
 CAPACITY_ORDER = (
@@ -239,6 +239,8 @@ def _validate_resource_rows(
         "portable_resource_registry",
         "split_companion",
         "window_consumption_contract",
+        "formal_exogenous_request_execution_contract",
+        "formal_request_exposure_schema",
     }
     if require_readiness:
         required.add("readiness_companion")
@@ -414,7 +416,7 @@ def validate_active_formal_bundle(
         readiness_row = resources["readiness_companion"]
         readiness = _strict_object(
             _resolve_registered_path(root, readiness_row["logical_path"], "readiness"),
-            "Readiness v11 companion",
+            "Readiness v12 companion",
         )
         if readiness.get("readiness_review_version") != READINESS_VERSION:
             raise ActiveFormalBundleError("Readiness companion version mismatch")

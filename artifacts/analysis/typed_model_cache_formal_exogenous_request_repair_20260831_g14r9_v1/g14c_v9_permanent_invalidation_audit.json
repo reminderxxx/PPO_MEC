@@ -1,0 +1,21 @@
+{
+  "cell_ledger_sha256": "c0a8cbe94601576e8a8b9c03df5411561b68044ebb9dba7b3910aaaec0b75f4e",
+  "failed_terminal_count": 1,
+  "failure_classification": "dev_candidate_evaluation_failure",
+  "first_failed_cell_id": "dev_select-c3478d7ad41121239936ac3c",
+  "formal_performance_count": 0,
+  "frozen_checkpoint_count": 0,
+  "permanent_status": "invalid_after_training_during_first_dev_candidate_evaluation_before_dev_selection",
+  "phase_ledger_sha256": "ec6b04fee48c4abda056b62f508f186345f10ab580efd896f9f43979d1d728fe",
+  "preflight_completed": true,
+  "resume_retry_finalize_salvage_or_copy_allowed": false,
+  "retry_allowed": false,
+  "return_code": 1,
+  "run_id": "typed_model_cache_formal_20260830_113339_g14c_v9",
+  "status": "pass",
+  "tests_completed": true,
+  "training_cells_committed": 150,
+  "training_cells_expected": 150,
+  "v9_root_modified": false,
+  "valid_dev_selection_count": 0
+}

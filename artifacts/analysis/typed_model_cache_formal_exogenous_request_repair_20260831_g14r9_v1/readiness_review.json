@@ -1,0 +1,37 @@
+{
+  "active_bundle_core_sha256": "ff33ce2bba99daeb50cdcd55058be96febed2bee92c1bc5c38ac1d50cb49a30c",
+  "active_formal_bundle_sha256": "7e77ae6c7f27ac169a466aeed06de0c56be6ba50addafe6af2cfa017ca60c124",
+  "environment_fingerprint": "acc61f8f3eff6a6e9326af9c3884484338f0b8bba0934ce3a0bc721cdd8d8196",
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "g14c_v10_started": false,
+  "g14d_started": false,
+  "g15_started": false,
+  "holdout_opened": false,
+  "protocol_full_sha256": "f3bae801ece00f57c84301d87629d15caeedb277e831deebca38039810e6949d",
+  "protocol_semantic_sha256": "f449c800f6de3562d30ed78fc868e000cf62af5fae6e339304b272b8f7699fc1",
+  "requirements": {
+    "active_consumers_bound": true,
+    "clean_candidate_phase_chain_complete": true,
+    "exact_15_agent_unit_pass": true,
+    "formal_evidence_count_zero": true,
+    "holdout_sealed_unopened": true,
+    "protected_user_files_unchanged": true,
+    "request_contract_frozen": true,
+    "three_capacities_pass": true,
+    "v9_permanently_invalid": true
+  },
+  "reviewed_at": "2026-08-31T00:00:00+08:00",
+  "status": "ready",
+  "validation_summary": {
+    "compile_import": "pass",
+    "full_pytest_failed": 0,
+    "full_pytest_passed": 1110,
+    "full_pytest_skipped": 16,
+    "git_diff_check": "pass",
+    "smoke_test": "pass",
+    "strict_json_files_validated": 52
+  },
+  "verdict": "READY_FOR_G14C_V10_CLEAN_TRAIN_AND_FORMAL"
+}

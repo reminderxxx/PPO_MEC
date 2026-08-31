@@ -45,9 +45,12 @@ FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION = "1.8.0"
 FORMAL_EXECUTION_PROTOCOL_V1_8_ID = "typed_model_cache_formal_protocol_v1_8"
 FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION = "1.9.0"
 FORMAL_EXECUTION_PROTOCOL_V1_9_ID = "typed_model_cache_formal_protocol_v1_9"
+FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION = "2.0.0"
+FORMAL_EXECUTION_PROTOCOL_V2_0_ID = "typed_model_cache_formal_protocol_v2_0"
 FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
 FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
-PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
+LEGACY_PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
+PRIMARY_ENDPOINT_SCHEMA_VERSION = "2.0.0"
 SUPPORT_RUNNER_CONTRACT_VERSION = "1.0.0"
 READINESS_REVIEW_VERSION = "3.0.0"
 READY_VERDICT = "READY_FOR_G14C_V2_CLEAN_TRAIN_AND_FORMAL"
@@ -138,7 +141,15 @@ def stable_setting_identity(family: str, parameters: Mapping[str, Any]) -> str:
 def endpoint_schema() -> dict[str, Any]:
     return {
         "primary_endpoint_schema_version": PRIMARY_ENDPOINT_SCHEMA_VERSION,
-        "cache_efficiency_metrics_contract_version": "1.2.0",
+        "formal_endpoint_metrics_contract_version": "2.0.0",
+        "request_execution_contract_version": "1.0.0",
+        "request_exposure_trace_version": "1.0.0",
+        "external_request_denominator": (
+            "exactly one frozen policy-neutral request exposure per request-level CacheEvent"
+        ),
+        "outcome_independence": (
+            "service/cache/workflow outcomes never add, remove, reorder, or retry exposure rows"
+        ),
         "event_eligibility": (
             "CacheEvent event_type=request and model_cache_profile_id="
             "typed_base_adapter_state_v1"
@@ -174,6 +185,21 @@ def endpoint_schema() -> dict[str, Any]:
             "zero_denominator": "null",
             "unit": "decimal MB/request",
             "legacy_trace": "unavailable",
+        },
+        "workflow_continuity_rate": {
+            "formula": "successful request-level service outcomes / external request denominator",
+            "predecessor_failure": "later frozen exposures remain in the denominator",
+            "right_censoring": "reported explicitly; exposed requests remain identifiable",
+            "zero_denominator": "null",
+            "unit": "ratio",
+        },
+        "end_to_end_workflow_delay": {
+            "availability": (
+                "available only for a complete, uncensored workflow whose every exposed request succeeds"
+            ),
+            "failed_or_incomplete_workflow": "null/unavailable",
+            "selection_rule": "null is never imputed from reward and is ordered after finite values",
+            "unit": "environment time units",
         },
         "row_fields": list(PRIMARY_ENDPOINTS),
         "nullable_aggregate": True,
@@ -546,6 +572,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
+        FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
     }:
         raise FormalExecutionError("unsupported formal execution protocol version")
     expected_protocol_id = {
@@ -558,6 +585,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_7_ID,
         FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_8_ID,
         FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_9_ID,
+        FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION: FORMAL_EXECUTION_PROTOCOL_V2_0_ID,
     }[version]
     if protocol.get("protocol_id") != expected_protocol_id:
         raise FormalExecutionError("formal execution protocol ID mismatch")
@@ -721,11 +749,15 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION: "1.6.0",
                 FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION: "1.7.0",
                 FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION: "1.8.0",
+                FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION: "1.9.0",
             }[version]
             expected_old_status = {
                 FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION: "invalid_after_training_before_dev_performance_execution",
                 FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION: "audit_only_active_index_readiness_inconsistent",
                 FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION: "invalid_after_training_before_dev_performance_execution",
+                FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION: (
+                    "invalid_after_training_during_first_dev_candidate_evaluation_before_dev_selection"
+                ),
             }[version]
             if supersession.get("supersedes_version") != expected_supersedes:
                 raise FormalExecutionError(
@@ -760,10 +792,22 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                     "invalid_after_training_before_dev_performance_execution", "7fc3685470c1f536def5c504dfbeab83b14dd070a644caefed08e690e10247ba", 150, 1200,
                 ),
             }
-            if version == FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION:
+            if version in {
+                FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
+                FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
+            }:
                 expected_boundaries["typed_model_cache_formal_20260828_101804_g14c_v8"] = (
                     "invalid_after_training_before_dev_performance_execution",
                     "2c09cd14028051a012ddedf756bd6b186b4d1680582c5944acc0da986aa40ba5",
+                    150,
+                    1200,
+                )
+            if version == FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION:
+                expected_boundaries[
+                    "typed_model_cache_formal_20260830_113339_g14c_v9"
+                ] = (
+                    "invalid_after_training_during_first_dev_candidate_evaluation_before_dev_selection",
+                    "ec6b04fee48c4abda056b62f508f186345f10ab580efd896f9f43979d1d728fe",
                     150,
                     1200,
                 )
@@ -771,7 +815,15 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
             (run_id, values[1]) for run_id, values in expected_boundaries.items()
         }
         observed_failures = {
-            (str(item.get("run_id")), str(item.get("failure_audit_sha256")))
+            (
+                str(item.get("run_id")),
+                str(
+                    item.get("phase_ledger_sha256")
+                    if item.get("run_id")
+                    == "typed_model_cache_formal_20260830_113339_g14c_v9"
+                    else item.get("failure_audit_sha256")
+                ),
+            )
             for item in failures
             if isinstance(item, Mapping)
         }
@@ -818,6 +870,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
+                FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
             }
             else [
                 "explicit_python_executable",
@@ -862,6 +915,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
             FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
             FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION,
             FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
+            FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
         }:
             resolved = protocol.get("resolved_formal_execution_context_contract", {})
             if (
@@ -872,6 +926,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                         FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
                         FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION,
                         FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
+                        FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
                     }
                     else "1.0.0"
                 )
@@ -908,6 +963,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
+                FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
             }:
                 scientific = protocol.get(
                     "agent_training_scientific_config_contract", {}
@@ -942,6 +998,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                     FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION,
                     FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION,
                     FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
+                    FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
                 }:
                     from src.runtime.formal_agent_order import (
                         FormalAgentOrderError,
@@ -966,7 +1023,11 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                             raise FormalExecutionError(
                                 f"Protocol v1.7+ {phase} lacks formal agent order contract"
                             )
-                if version == FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION:
+                if version in {
+                    FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
+                    FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
+                    FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
+                }:
                     resource_contract = protocol.get(
                         "active_bundle_resource_resolution_contract", {}
                     )
@@ -984,8 +1045,24 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         raise FormalExecutionError("split semantic hash changed")
     if tuple(protocol.get("endpoints", {}).get("primary", [])) != PRIMARY_ENDPOINTS:
         raise FormalExecutionError("primary endpoint order or identity mismatch")
-    if protocol.get("endpoint_schema", {}).get("primary_endpoint_schema_version") != PRIMARY_ENDPOINT_SCHEMA_VERSION:
+    expected_endpoint_schema_version = (
+        PRIMARY_ENDPOINT_SCHEMA_VERSION
+        if version == FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION
+        else LEGACY_PRIMARY_ENDPOINT_SCHEMA_VERSION
+    )
+    if protocol.get("endpoint_schema", {}).get("primary_endpoint_schema_version") != expected_endpoint_schema_version:
         raise FormalExecutionError("primary endpoint schema missing")
+    if version == FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION:
+        request_contract = protocol.get("formal_exogenous_request_execution_contract", {})
+        if (
+            request_contract.get("version") != "1.0.0"
+            or request_contract.get("request_exposure_trace_version") != "1.0.0"
+            or request_contract.get("default_enabled") is not False
+            or request_contract.get("formal_explicit_enable_required") is not True
+        ):
+            raise FormalExecutionError(
+                "Protocol v2.0 formal exogenous request execution contract is incomplete"
+            )
     budget = protocol.get("training_budget", {})
     if budget.get("checkpoint_frequency_updates") != 4:
         raise FormalExecutionError("checkpoint frequency must equal four updates")
@@ -1805,6 +1882,8 @@ __all__ = [
     "FORMAL_EXECUTION_PROTOCOL_V1_8_VERSION",
     "FORMAL_EXECUTION_PROTOCOL_V1_9_ID",
     "FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION",
+    "FORMAL_EXECUTION_PROTOCOL_V2_0_ID",
+    "FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION",
     "FORMAL_PHASE_LEDGER_SCHEMA_VERSION",
     "FORMAL_PHASE_RUNNER_VERSION",
     "FAILURE_CLASSIFICATIONS",

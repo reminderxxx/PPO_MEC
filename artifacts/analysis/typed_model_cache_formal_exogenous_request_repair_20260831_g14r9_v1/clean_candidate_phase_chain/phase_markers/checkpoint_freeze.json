@@ -1,0 +1,13 @@
+{
+  "active_bundle_core_sha256": "ff33ce2bba99daeb50cdcd55058be96febed2bee92c1bc5c38ac1d50cb49a30c",
+  "formal": false,
+  "holdout_opened": false,
+  "performance_evidence": false,
+  "phase": "checkpoint_freeze",
+  "request_execution_contract_version": "1.0.0",
+  "request_exposure_fingerprint": "a2bc97ca8bbd94ecb1dd5d17ed9fa2a16e7ce7e859c15711279485110e3d4b92",
+  "sources": [
+    "10 fresh checkpoint SHA-256 identities"
+  ],
+  "status": "pass"
+}

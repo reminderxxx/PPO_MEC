@@ -34,6 +34,7 @@ from src.evaluators.main_results_support import (
     audit_checkpoint_map,
     build_pairwise_comparison,
     build_mechanism_diagnosis,
+    build_episode_formal_request_exposure,
     build_selected_workflow_states,
     build_win_tie_loss_summary,
     infer_benchmark_config_profile,
@@ -93,6 +94,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--checkpoint_provenance_manifest_path", type=str, default="")
     parser.add_argument("--cache_baseline_fairness_manifest_path", type=str, default="")
     parser.add_argument("--formal-agent-order-contract-path", default="")
+    parser.add_argument(
+        "--formal-exogenous-request-execution",
+        action="store_true",
+        help="Explicitly enable fail-closed replay-driven formal request exposure.",
+    )
     parser.add_argument(
         "--model_cache_runtime_config",
         type=str,
@@ -660,6 +666,7 @@ def main() -> None:
         if not selected_window_plan or {window["window_id"] for window in selected_window_plan} != allowed_window_ids:
             raise FairnessManifestError("runtime window plan does not resolve every manifest window")
     observed_request_fingerprints: dict[str, dict[str, str]] = {}
+    request_exposure_fingerprints: dict[str, dict[str, str]] = {}
     checkpoint_provenance_validation: dict[str, dict[str, dict[str, Any]]] = {}
     if args.audit_runtime:
         tracemalloc.start()
@@ -697,20 +704,43 @@ def main() -> None:
             mobility_bundle.rsu_metadata["window_rank"] = window_candidate.get("window_rank")
             mobility_bundle.rsu_metadata["window_class"] = window_candidate.get("window_class")
             for workflow_state in workflow_states:
-                for agent_name in args.agents:
-                    fairness_unit = None
-                    if fairness_manifest is not None:
-                        fairness_unit = expected_unit(
-                            fairness_manifest,
-                            seed=seed,
-                            window_id=str(window_candidate["window_id"]),
-                            workflow_id=workflow_state.workflow_id,
+                fairness_unit = None
+                if fairness_manifest is not None:
+                    fairness_unit = expected_unit(
+                        fairness_manifest,
+                        seed=seed,
+                        window_id=str(window_candidate["window_id"]),
+                        workflow_id=workflow_state.workflow_id,
+                    )
+                    actual_workload_fingerprint = workload_fingerprint(workflow_state)
+                    if actual_workload_fingerprint != fairness_unit["expected_workload_fingerprint"]:
+                        raise FairnessManifestError(
+                            f"observed workload fingerprint mismatch for {fairness_unit['evaluation_unit_id']}"
                         )
-                        actual_workload_fingerprint = workload_fingerprint(workflow_state)
-                        if actual_workload_fingerprint != fairness_unit["expected_workload_fingerprint"]:
-                            raise FairnessManifestError(
-                                f"observed workload fingerprint mismatch for {fairness_unit['evaluation_unit_id']}"
-                            )
+                formal_request_exposure_trace = None
+                if args.formal_exogenous_request_execution:
+                    if fairness_unit is None or not typed_runtime:
+                        raise FairnessManifestError(
+                            "formal exogenous request execution requires typed runtime and fairness unit"
+                        )
+                    formal_request_exposure_trace = build_episode_formal_request_exposure(
+                        workflow_state=workflow_state,
+                        mobility_bundle=mobility_bundle,
+                        adapter_catalog=runtime_catalog,
+                        max_steps=args.max_steps,
+                        mobility_source=args.mobility_source,
+                        primary_vehicle_selection=args.primary_vehicle_selection,
+                        cache_capacity_profile=dict(runtime_contract["cache_capacity_profile"]),
+                        evaluation_unit=dict(fairness_unit),
+                        source_provenance={
+                            "producer_consumer": "benchmark_main_results_pre_agent",
+                            "fairness_manifest_id": fairness_manifest["identity"]["manifest_id"],
+                            "fairness_manifest_sha256": fairness_manifest["hashes"]["full_manifest_sha256"],
+                            "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
+                            "phase": "evaluation",
+                        },
+                    )
+                for agent_name in args.agents:
                     algo_spec = get_algo_spec(agent_name)
                     cache_capacity_profile = dict(runtime_contract["cache_capacity_profile"])
                     if not cache_capacity_profile.get("enabled"):
@@ -794,6 +824,7 @@ def main() -> None:
                         cache_capacity_profile=cache_capacity_profile,
                         adapter_catalog_override=runtime_catalog,
                         model_cache_runtime_contract=runtime_contract,
+                        formal_request_exposure_trace=formal_request_exposure_trace,
                         run_metadata={
                             "script": "scripts/benchmark_main_results.py",
                             "benchmark_run_id": benchmark_run_id,
@@ -812,6 +843,14 @@ def main() -> None:
                             "formal_agent_order_index": (
                                 order_audit["main_benchmark_agent_order"].index(agent_name)
                                 if order_audit else None
+                            ),
+                            "evaluation_unit_id": (
+                                fairness_unit["evaluation_unit_id"] if fairness_unit else None
+                            ),
+                            "request_exposure_fingerprint": (
+                                formal_request_exposure_trace["request_exposure_fingerprint"]
+                                if formal_request_exposure_trace is not None
+                                else None
                             ),
                         },
                         predictor_kwargs={
@@ -843,6 +882,10 @@ def main() -> None:
                         stamp_summary_provenance(summary, fairness_manifest, fairness_unit)
                         unit_id = fairness_unit["evaluation_unit_id"]
                         observed_request_fingerprints.setdefault(unit_id, {})[agent_name] = summary["run_info"]["observed_request_stream_fingerprint"]
+                        if formal_request_exposure_trace is not None:
+                            request_exposure_fingerprints.setdefault(unit_id, {})[
+                                agent_name
+                            ] = summary["run_info"]["request_exposure_fingerprint"]
                     summary_path = episode_root / str(mobility_bundle.rsu_metadata.get("window_id")) / workflow_state.workflow_id / agent_name / f"seed_{seed}.summary.json"
                     summary_path.parent.mkdir(parents=True, exist_ok=True)
                     summary["run_info"]["summary_path"] = str(summary_path)
@@ -853,6 +896,10 @@ def main() -> None:
         validate_observed_fingerprint_matrix(
             observed_request_fingerprints, expected_agents=args.agents
         )
+        if args.formal_exogenous_request_execution:
+            validate_observed_fingerprint_matrix(
+                request_exposure_fingerprints, expected_agents=args.agents
+            )
 
     if order_audit is not None:
         agent_index = {
@@ -1025,6 +1072,13 @@ def main() -> None:
         "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
         "model_cache_profile": runtime_contract["model_cache_profile"],
         "typed_catalog_fingerprint": runtime_contract["typed_catalog_fingerprint"],
+        "formal_exogenous_request_execution_enabled": bool(
+            args.formal_exogenous_request_execution
+        ),
+        "formal_exogenous_request_execution_contract_version": (
+            "1.0.0" if args.formal_exogenous_request_execution else None
+        ),
+        "request_exposure_fingerprints": request_exposure_fingerprints,
         "checkpoint_provenance_validation": checkpoint_provenance_validation,
         "agents": args.agents,
         "seeds": args.seeds,
@@ -1042,9 +1096,13 @@ def main() -> None:
             "status": "pass",
             "validation_report": fairness_validation_report,
             "observed_request_fingerprints": observed_request_fingerprints,
+            "request_exposure_fingerprints": request_exposure_fingerprints,
             "all_manifest_agents_per_unit": True,
             "five_reactive_baselines_only_policy_difference": True,
             "observed_request_streams_identical_per_unit": True,
+            "request_exposure_streams_identical_per_unit": bool(
+                args.formal_exogenous_request_execution
+            ),
             "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
         }
         fairness_audit_path.write_text(json.dumps(fairness_audit, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")

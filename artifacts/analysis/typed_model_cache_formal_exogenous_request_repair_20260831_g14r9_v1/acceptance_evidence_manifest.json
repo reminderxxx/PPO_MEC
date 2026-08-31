@@ -1,0 +1,15 @@
+{
+  "acceptance_scope": "nonformal_g14r9_contract_rehearsal",
+  "active_bundle_core_sha256": "ff33ce2bba99daeb50cdcd55058be96febed2bee92c1bc5c38ac1d50cb49a30c",
+  "clean_candidate": true,
+  "exact_failure_unit_rehearsal_sha256": "f431675ef70753954d58578f552b592f9f382200b29a2b5e9c22fb4b586d0473",
+  "formal": false,
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "holdout_opened": false,
+  "performance_evidence": false,
+  "phase_chain_rehearsal_sha256": "3ca6c0ad88cdad3835663ed7d021a6c1ad61aaead300d98daba3486b4a6396f0",
+  "status": "pass",
+  "three_capacity_rehearsal_sha256": "4e58838b2d806ab1e052cc8a76cd9f3de5366b9c0de3884f3d78c67e27e7f9a4"
+}

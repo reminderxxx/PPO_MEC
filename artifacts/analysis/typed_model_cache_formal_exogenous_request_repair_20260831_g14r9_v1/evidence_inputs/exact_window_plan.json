@@ -1,0 +1,40 @@
+{
+  "outcome_blind_selection": true,
+  "protocol_version": "g14r9_nonformal_rehearsal_v1",
+  "sealed": false,
+  "selected_window_plan": [
+    {
+      "active_vehicle_count_max": 54,
+      "active_vehicle_count_mean": 52.833333,
+      "active_vehicle_count_min": 51,
+      "frame_offset": 26682,
+      "provider_frame_offset": 26682,
+      "provider_segment_frame_end": 8711,
+      "provider_segment_frame_start": 8688,
+      "raw_frame_end": 10524,
+      "raw_frame_start": 10501,
+      "raw_time_end": 1113438617300,
+      "raw_time_start": 1113438615000,
+      "recommended_rsu_layout": "auto_dominant_tight",
+      "sampling_interval": 100,
+      "segment_frame_end": 10524,
+      "segment_frame_start": 10501,
+      "selection_features": [
+        "raw continuity",
+        "minimum vehicle availability",
+        "coordinate validity",
+        "historical exclusion",
+        "minimum gap"
+      ],
+      "source_location": "i_80",
+      "source_segment_id": "i_80",
+      "source_segment_run_id": "i_80_run_003",
+      "time_index_end": 1113438617300,
+      "time_index_start": 1113438615000,
+      "window_class": "coverage_only_result_blind",
+      "window_id": "g14b_i_80_run_003_f10501_10524_t1113438615000_1113438617300",
+      "window_length": 24
+    }
+  ],
+  "split": "nonformal_rehearsal"
+}

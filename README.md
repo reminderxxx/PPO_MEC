@@ -419,3 +419,12 @@ python scripts/build_top_journal_comparison_report.py --final_run_root artifacts
 ```
 
 该入口只生成`non_formal_typed_runtime_rehearsal`，不冻结G14 split/protocol，不训练正式checkpoint，不运行formal、holdout、hidden或G15。合同与运行方法见`docs/project/typed_model_cache_runtime_contract.md`和`docs/project/typed_model_cache_runtime_validation_report.md`。
+# Protocol 2.0 formal request execution
+
+正式 typed model-cache 主线现使用 Protocol 2.0 的外生 request exposure 合同。唯一 active index：
+
+```text
+configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/protocol_index.json
+```
+
+formal train/dev/evaluation 必须由 active bundle 命令模板显式启用 `--formal-exogenous-request-execution`；v1.0–v1.9 与 G14C v9 仅供审计，不得 resume 或复用 checkpoint。合同说明见 `docs/project/formal_exogenous_request_execution_contract.md`。

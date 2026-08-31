@@ -1,0 +1,48 @@
+{
+  "consumer_count": 10,
+  "consumers": [
+    {
+      "consumer": "environment reset/step",
+      "request_identity_bound": true
+    },
+    {
+      "consumer": "CacheEvent 1.3 alignment",
+      "request_identity_bound": true
+    },
+    {
+      "consumer": "training summary and checkpoint provenance",
+      "request_identity_bound": true
+    },
+    {
+      "consumer": "dev selection nested benchmark",
+      "request_identity_bound": true
+    },
+    {
+      "consumer": "checkpoint freeze provenance",
+      "request_identity_bound": true
+    },
+    {
+      "consumer": "formal cache-policy/controller",
+      "request_identity_bound": true
+    },
+    {
+      "consumer": "ablation/support/scalability",
+      "request_identity_bound": true
+    },
+    {
+      "consumer": "statistics/integrity/claim-evidence",
+      "request_identity_bound": true
+    },
+    {
+      "consumer": "G08 analytical oracle provenance",
+      "request_identity_bound": true
+    },
+    {
+      "consumer": "G09 opportunity provenance",
+      "request_identity_bound": true
+    }
+  ],
+  "producer": "formal_request_exposure_producer_v1.0.0",
+  "producer_executes_compared_agent": false,
+  "status": "pass"
+}

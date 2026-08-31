@@ -464,3 +464,9 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
   child `sys.executable`补位、跨 run/commit/environment/path复用均 fail-fast。
 - 残余风险：Readiness v7只验证 preflight/tests 与既有 transaction regressions；G14C v6 长训练仍可能暴露新的
   OS/磁盘/进程级故障。该风险不授权复用任何 G14C v1–v5 invalid artifact。
+# 2026-08-31 — G14C v9 request divergence（已合同修复，run 永久无效）
+
+- 根因：legacy service success/failure 会改变 workflow progression 和下一 request，因此比较策略的 observed request denominator 不是外生 matched estimand；这不是 path、resource 或 checkpoint plumbing 故障。
+- 永久边界：`typed_model_cache_formal_20260830_113339_g14c_v9` 以及其 checkpoints、candidates 和 partial dev outputs 禁止 resume、retry、finalize、salvage、复制或进入新 manifest。
+- 修复：Protocol 2.0 在 agent action 前生成统一 request exposure，outcome 不再反向改变 progression；跨 agent request 与 outcome fingerprint 分离。
+- 剩余风险：本轮只有 non-formal tiny/controlled rehearsal，不构成算法性能、论文结论或 holdout 证据；G14C v10 必须从全新 clean formal training 开始。

@@ -1,0 +1,36 @@
+{
+  "capacities": [
+    {
+      "agent_count": 15,
+      "alignment_all_pass": true,
+      "capacity_label": "constrained_288mb",
+      "capacity_mb": 288.0,
+      "request_exposure_fingerprint": "761b05a56dc4a55f169d204e635ba511279949c655ed17447569dbbafd562b45",
+      "request_exposure_fingerprint_count": 1,
+      "runtime_contract_sha256": "82ef8858c101aed0f702fa118a11c03db9f5689c3c2776214ef95c70265a689f"
+    },
+    {
+      "agent_count": 15,
+      "alignment_all_pass": true,
+      "capacity_label": "medium_576mb",
+      "capacity_mb": 576.0,
+      "request_exposure_fingerprint": "49f6b155d5d8d15255029a372edb5900f3ba508480a187caece6b512eb7cd3e1",
+      "request_exposure_fingerprint_count": 1,
+      "runtime_contract_sha256": "8e3de284b1e839fc05076826308b506c81c419607d5b673d22ba09871d63de85"
+    },
+    {
+      "agent_count": 15,
+      "alignment_all_pass": true,
+      "capacity_label": "relaxed_864mb",
+      "capacity_mb": 864.0,
+      "request_exposure_fingerprint": "0d8bb1a1ebc2c9aceb8a11a482bc566280a31c7b4303c416c44d8a51bd3d61e5",
+      "request_exposure_fingerprint_count": 1,
+      "runtime_contract_sha256": "e314785d4fe14a106322687ee7a4e0e1e1d6739e8fd74f11a08a2ff1c71be3e0"
+    }
+  ],
+  "controlled_max_steps": 1,
+  "formal": false,
+  "holdout_opened": false,
+  "performance_evidence": false,
+  "status": "pass"
+}

@@ -265,3 +265,8 @@ endpoints、support、statistics、claims、checkpoint cadence 与 SA coefficien
 SHA-256 为 `4429531dc3cf98e7ef332367e55e1d0a3dbc33773c20a3fe2e53e57d3534155d`；Readiness v6 为
 `READY_FOR_G14C_V5_CLEAN_TRAIN_AND_FORMAL`。本轮没有正式训练或性能结果，holdout 仍 sealed/unopened，
 不自动启动 G14C v5/G15。
+# Protocol 2.0 supersession（2026-08-31）
+
+Protocol 2.0 将 request progression 纳入 formal scientific identity：train、dev、formal 使用预生成的 policy-neutral exposure；所有命令必须显式启用 `--formal-exogenous-request-execution`。request/outcome fingerprint 分离，Endpoint schema 升级为 2.0。v1.0–v1.9 全部为 historical audit-only；G14C v9 永久无效且不可复用。
+
+完整语义见 `docs/project/formal_exogenous_request_execution_contract.md`，唯一 active index 为 `configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/protocol_index.json`。

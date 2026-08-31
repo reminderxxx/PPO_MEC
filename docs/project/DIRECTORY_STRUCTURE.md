@@ -190,3 +190,20 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 `artifacts/analysis/cache_capacity_mb_validation_<run_id>/` 保存 MB capacity contract validation 的 summary、scenario/event snapshots 与 invariant 结果，不覆盖历史 validation。
 
 `artifacts/analysis/classical_cache_baseline_validation_<run_id>/` 保存五种 matched reactive baseline 的 controlled mechanism validation；非 formal 结果。
+# Protocol 2.0 additions
+
+```text
+configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/
+  protocol_index.json
+  protocol_v2_0_manifest.json
+  formal_exogenous_request_execution_contract.json
+  formal_request_exposure_schema.json
+  readiness_v12.json
+
+src/runtime/formal_exogenous_request_execution.py
+scripts/run_formal_exogenous_request_rehearsal.py
+scripts/run_formal_exogenous_phase_chain_rehearsal.py
+artifacts/analysis/typed_model_cache_formal_exogenous_request_repair_20260831_g14r9_v1/
+```
+
+v1.0–v1.9 Protocol 目录仅保留 historical audit，不再是 live active path。

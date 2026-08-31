@@ -133,3 +133,6 @@
 - 机器证据：`../../artifacts/analysis/typed_model_cache_formal_active_bundle_closure_20260827_g14r7a_v1/`
 - 状态：Readiness v10与ready index一致；v1.0–v1.7 audit-only。只完成pre-execution gate与clean验收，
   正式training/checkpoint/performance仍为0，holdout sealed/unopened，未启动G14C v8/G14D/G15。
+# 2026-08-31 formal request contract
+
+- `formal_exogenous_request_execution_contract.md`：Protocol 2.0 外生 request exposure、因果信息边界、Endpoint 2.0 与 fail-fast 规则。

@@ -28,6 +28,11 @@ from src.envs.specs import (
     VehicleState,
     WorkflowGraphState,
 )
+from src.runtime.formal_exogenous_request_execution import (
+    FormalRequestExposureError,
+    align_cache_event_to_request,
+    validate_formal_request_exposure_trace,
+)
 
 
 PRIMARY_VEHICLE_SELECTION_CHOICES = {"stable_first", "handoff_pressure"}
@@ -52,6 +57,7 @@ class VecWorkflowCoreEnv:
         mobility_source: str = "ngsim",
         cache_capacity_profile: dict[str, Any] | None = None,
         primary_vehicle_selection: str = "stable_first",
+        formal_request_exposure_trace: dict[str, Any] | None = None,
     ) -> None:
         self._mobility_provider = mobility_provider or ReplayProvider()
         self._mobility_source = str(mobility_source or "ngsim").strip().lower()
@@ -71,6 +77,13 @@ class VecWorkflowCoreEnv:
         self._handoff_prepare_window = max(1, int(handoff_prepare_window))
         self._reward_positive_offset = max(float(reward_positive_offset), 0.0)
         self._cache_capacity_profile = self._normalize_cache_capacity_profile(cache_capacity_profile)
+        self._formal_request_exposure_trace = (
+            deepcopy(formal_request_exposure_trace)
+            if formal_request_exposure_trace is not None
+            else None
+        )
+        if self._formal_request_exposure_trace is not None:
+            validate_formal_request_exposure_trace(self._formal_request_exposure_trace)
         self._eviction_policy = build_eviction_policy(
             self._cache_capacity_profile["eviction_policy"],
             seed=self._cache_capacity_profile.get("eviction_policy_seed"),
@@ -93,6 +106,7 @@ class VecWorkflowCoreEnv:
         self._node_remaining_service_steps: dict[str, int] = {}
         self._typed_resident_object_ids: dict[str, list[str]] = {}
         self._typed_workflow_state_ready: dict[str, set[str]] = {}
+        self._formal_request_exposure_index = 0
 
     @property
     def reward_positive_offset(self) -> float:
@@ -155,6 +169,10 @@ class VecWorkflowCoreEnv:
             })
         return {"snapshot_step_index": int(self._episode_steps), "rsus": rsus}
 
+    @property
+    def formal_request_exposure_trace(self) -> dict[str, Any] | None:
+        return deepcopy(self._formal_request_exposure_trace)
+
     def reset(self) -> tuple[dict[str, Any], dict[str, Any]]:
         """重置环境并返回语义状态字典。"""
         self._episode_steps = 0
@@ -182,6 +200,9 @@ class VecWorkflowCoreEnv:
         self._mapper.update_rsus(self.rsu_states)
         vehicles = self._mobility_provider.reset()
         self._initialize_primary_vehicle_id(vehicles)
+        self._formal_request_exposure_index = 0
+        if self._formal_request_exposure_trace is not None:
+            self._initialize_formal_request_exposure()
         associations = self._mapper.associate(vehicles)
         self._apply_associations(vehicles, associations)
         predictions = self._build_predictions(vehicles, associations)
@@ -253,6 +274,15 @@ class VecWorkflowCoreEnv:
 
         primary_vehicle = self._select_primary_vehicle(vehicles)
         current_node = self.workflow_state.current_node()
+        if self._formal_request_exposure_trace is not None:
+            self._validate_formal_request_runtime_identity(
+                current_node=current_node,
+                primary_vehicle=primary_vehicle,
+                request_rsu_id=pre_action_associated_rsu_id,
+                current_service_rsu_id=(
+                    primary_vehicle.associated_rsu_id if primary_vehicle else None
+                ),
+            )
         current_required_adapter = current_node.required_adapter if current_node else None
         tracked_vehicle_id = primary_vehicle.vehicle_id if primary_vehicle else pre_action_vehicle_id
         offload_target_rsu_id = self._resolve_target_rsu_id(primary_vehicle, control)
@@ -476,7 +506,11 @@ class VecWorkflowCoreEnv:
         if stall_occurred:
             delay_penalty += 0.8
         else:
-            if self._advance_current_node_service(current_node):
+            if self._formal_request_exposure_trace is not None:
+                service_completed = True
+            else:
+                service_completed = self._advance_current_node_service(current_node)
+            if service_completed:
                 service_reward += 1.15
 
         if cache_result["added_new_adapter"] and cache_hit:
@@ -507,6 +541,66 @@ class VecWorkflowCoreEnv:
             mechanism_exploration_bonus=mechanism_exploration_bonus,
             constraint_penalty=constraint_penalty,
         )
+
+        if self._formal_request_exposure_trace is not None:
+            info = self._build_info(
+                current_node=current_node,
+                primary_vehicle=primary_vehicle,
+                handoff_events=handoff_events,
+                cache_hit=cache_hit,
+                offload_target_rsu_id=offload_target_rsu_id,
+                stall_occurred=stall_occurred,
+                reward=reward,
+                control=control,
+                cache_result=cache_result,
+                handoff_count=mobility_transfer_count,
+                raw_handoff_count=handoff_count,
+                gap_transfer_count=gap_transfer_count,
+                pre_action_associated_rsu_id=pre_action_associated_rsu_id,
+                pre_action_prediction_snapshot=pre_action_prediction_snapshot,
+                realized_prepare=realized_prepare,
+                pre_execution_cache_hit=pre_execution_cache_hit,
+            )
+            request = self._current_formal_request()
+            info["cache_event"]["requested_typed_objects"] = deepcopy(
+                request["requested_typed_objects"]
+            )
+            info["cache_event"]["dependency_bundle"] = deepcopy(
+                request["dependency_bundle"]
+            )
+            aligned_event = align_cache_event_to_request(
+                info["cache_event"],
+                request,
+                trace_fingerprint=str(
+                    self._formal_request_exposure_trace["request_exposure_fingerprint"]
+                ),
+            )
+            info["cache_event"] = aligned_event
+            info["metrics_protocol"]["cache_event"] = deepcopy(aligned_event)
+            info["metrics_protocol"].update(
+                formal_request_id=request["request_id"],
+                formal_request_order=request["request_order"],
+                request_exposure_fingerprint=self._formal_request_exposure_trace[
+                    "request_exposure_fingerprint"
+                ],
+                request_alignment_status="matched_exactly_once",
+            )
+            exposure_exhausted = self._advance_formal_request_exposure(
+                service_success=not stall_occurred
+            )
+            predictions = self._build_predictions(vehicles, associations)
+            self._last_associations = associations
+            self._last_state = self._build_state_dict(
+                vehicles=vehicles,
+                associations=associations,
+                predictions=predictions,
+                handoff_events=handoff_events,
+            )
+            self._register_prepare_action(prepare_action_context, realized_prepare)
+            truncated = bool(
+                self._episode_steps >= self._max_steps and not exposure_exhausted
+            )
+            return deepcopy(self._last_state), reward, exposure_exhausted, truncated, info
 
         predictions = self._build_predictions(vehicles, associations)
         self._last_associations = associations
@@ -540,6 +634,93 @@ class VecWorkflowCoreEnv:
         )
         return deepcopy(self._last_state), reward, terminated, truncated, info
 
+    def _initialize_formal_request_exposure(self) -> None:
+        trace = self._formal_request_exposure_trace
+        if trace is None:
+            raise FormalRequestExposureError("formal request exposure is missing")
+        validate_formal_request_exposure_trace(trace)
+        unit = trace.get("evaluation_unit") or {}
+        if str(unit.get("workflow_id")) != str(self.workflow_state.workflow_id):
+            raise FormalRequestExposureError("workflow identity drift in request exposure")
+        semantics = trace.get("execution_semantics") or {}
+        if semantics.get("primary_vehicle_selection") != self._primary_vehicle_selection:
+            raise FormalRequestExposureError("primary vehicle selection drift")
+        if str(trace["requests"][0]["vehicle_id"]) != str(self._primary_vehicle_id):
+            raise FormalRequestExposureError("primary vehicle identity drift")
+        catalog_fingerprints = {
+            str(request.get("catalog_fingerprint")) for request in trace["requests"]
+        }
+        if catalog_fingerprints != {self.adapter_catalog.canonical_fingerprint()}:
+            raise FormalRequestExposureError("catalog identity drift in request exposure")
+        self.workflow_state.completed_node_ids = []
+        self.workflow_state.is_completed = False
+        self.workflow_state.current_node_id = str(trace["requests"][0]["node_id"])
+
+    def _current_formal_request(self) -> dict[str, Any]:
+        if self._formal_request_exposure_trace is None:
+            raise FormalRequestExposureError("formal request exposure is not enabled")
+        requests = self._formal_request_exposure_trace["requests"]
+        if self._formal_request_exposure_index >= len(requests):
+            raise FormalRequestExposureError("extra environment request after exposure exhaustion")
+        return requests[self._formal_request_exposure_index]
+
+    def _validate_formal_request_runtime_identity(
+        self,
+        *,
+        current_node: Any,
+        primary_vehicle: VehicleState | None,
+        request_rsu_id: str | None,
+        current_service_rsu_id: str | None,
+    ) -> None:
+        request = self._current_formal_request()
+        checks = {
+            "step_index": (self._episode_steps, request["step_index"]),
+            "time_index": (self._mobility_provider.get_time(), request["time_index"]),
+            "vehicle_id": (
+                primary_vehicle.vehicle_id if primary_vehicle else self._primary_vehicle_id,
+                request["vehicle_id"],
+            ),
+            "workflow_id": (self.workflow_state.workflow_id, request["workflow_id"]),
+            "node_id": (current_node.node_id if current_node else None, request["node_id"]),
+            "required_base_model": (
+                current_node.required_base_model if current_node else None,
+                request["required_base_model"],
+            ),
+            "adapter_id": (
+                current_node.required_adapter if current_node else None,
+                request["adapter_id"],
+            ),
+            "request_rsu_id": (request_rsu_id, request["request_rsu_id"]),
+            "current_service_rsu_id": (
+                current_service_rsu_id,
+                request["current_service_rsu_id"],
+            ),
+        }
+        drift = [name for name, values in checks.items() if values[0] != values[1]]
+        if drift:
+            raise FormalRequestExposureError(
+                "formal request runtime identity drift: " + ", ".join(drift)
+            )
+
+    def _advance_formal_request_exposure(self, *, service_success: bool) -> bool:
+        request = self._current_formal_request()
+        if service_success and request["node_id"] not in self.workflow_state.completed_node_ids:
+            self.workflow_state.completed_node_ids.append(str(request["node_id"]))
+        self._formal_request_exposure_index += 1
+        assert self._formal_request_exposure_trace is not None
+        requests = self._formal_request_exposure_trace["requests"]
+        if self._formal_request_exposure_index >= len(requests):
+            self.workflow_state.current_node_id = None
+            self.workflow_state.is_completed = len(self.workflow_state.completed_node_ids) == len(
+                requests
+            )
+            return True
+        self.workflow_state.current_node_id = str(
+            requests[self._formal_request_exposure_index]["node_id"]
+        )
+        self.workflow_state.is_completed = False
+        return False
+
     def _build_state_dict(
         self,
         vehicles: list[VehicleState],
@@ -551,7 +732,7 @@ class VecWorkflowCoreEnv:
         ordered_vehicles, primary_vehicle_present, primary_vehicle_reordered_to_front = self._order_vehicles_for_primary(
             vehicles
         )
-        return {
+        state = {
             "time_index": self._mobility_provider.get_time(),
             "vehicles": [vehicle.to_dict() for vehicle in ordered_vehicles],
             "primary_vehicle_id": self._primary_vehicle_id,
@@ -568,6 +749,18 @@ class VecWorkflowCoreEnv:
             "predictions": deepcopy(predictions),
             "handoff_events": handoff_events,
         }
+        if self._formal_request_exposure_trace is not None:
+            state["formal_request_exposure"] = {
+                "contract_version": "1.0.0",
+                "request_exposure_fingerprint": self._formal_request_exposure_trace[
+                    "request_exposure_fingerprint"
+                ],
+                "current_request_index": int(self._formal_request_exposure_index),
+                "request_count": len(self._formal_request_exposure_trace["requests"]),
+                "oracle_future_fields_actor_visible": False,
+                "outcome_fields_present": False,
+            }
+        return state
 
     def _order_vehicles_for_primary(
         self,

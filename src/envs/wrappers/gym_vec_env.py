@@ -220,7 +220,12 @@ class GymVecEnv(gym.Env):
                     current_rsu_cache_size = float(len(rsu.get("cached_adapter_ids", [])))
                     break
         progress = 0.0
-        if execution_order:
+        exposure = state.get("formal_request_exposure") or {}
+        if exposure:
+            progress = float(exposure.get("current_request_index", 0)) / float(
+                max(int(exposure.get("request_count", 0)), 1)
+            )
+        elif execution_order:
             progress = float(len(completed_node_ids)) / float(len(execution_order))
         predicted_handoffs = predictions.get("predicted_handoff_vehicle_ids", [])
         future_load = predictions.get("future_load", {})

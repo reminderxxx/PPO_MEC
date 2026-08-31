@@ -1625,3 +1625,10 @@ quick run 结果边界：
   `bd3fccce...6545c` / `88963f61...e2d00`。Readiness v7=
   `READY_FOR_G14C_V6_CLEAN_TRAIN_AND_FORMAL`。
 - G14R5 正式 training/checkpoint/performance row 仍为 0；holdout sealed/unopened；未启动 G14C v6、G14D 或 G15。
+# 2026-08-31 — G14R9 exogenous request execution repair
+
+- G14C v9 已永久登记为 `invalid_after_training_during_first_dev_candidate_evaluation_before_dev_selection`：150/150 train cells committed，首个 dev cell `dev_select-c3478d7ad41121239936ac3c` 因跨策略 observed request fingerprint 分歧失败，未产生合法 dev selection、freeze 或 formal evidence。
+- 冻结 `formal_exogenous_request_execution_contract_version=1.0.0`、request exposure schema `1.0.0` 和 endpoint metrics `2.0.0`。train/dev/formal 使用同一外生 progression；legacy 路径不变。
+- active Protocol 升级为 `2.0.0`。exact `seed_7/.../j_8` 已用全新 non-formal tiny checkpoints 完成 15-agent、288 MB、22-step 验收；三容量均完成 15-agent 对账。
+- detached clean candidate `2477d23cefd542386adbfeb9a984cd671235e8f2` 在无本地 `.venv` 条件下完成到 `complete_without_holdout` 的 13-phase ledger；formal training/checkpoint/performance 仍为 0，holdout 未打开。
+- 当前 readiness：`READY_FOR_G14C_V10_CLEAN_TRAIN_AND_FORMAL`。没有启动 G14C v10、G14D 或 G15。

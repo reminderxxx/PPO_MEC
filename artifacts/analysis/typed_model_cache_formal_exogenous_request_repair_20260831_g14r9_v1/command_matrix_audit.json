@@ -1,0 +1,10 @@
+{
+  "absolute_sentinel_count": 0,
+  "command_count": 186,
+  "command_matrix_sha256": "3fd42b4db828a3347c1b494e2cb6eb2bc0eb7c80fa211e0d81974057fe6741f9",
+  "formal_request_mode_explicit_in_train_and_benchmark_templates": true,
+  "holdout_capability": false,
+  "phase_template_count": 15,
+  "status": "pass",
+  "unresolved_placeholder_count": 0
+}

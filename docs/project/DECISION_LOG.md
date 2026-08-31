@@ -975,3 +975,10 @@
   科学身份；support fairness按setting ID，显式CLI路径必须与登记path/hash/size一致。
 - 决定：G14C v8永久invalid且禁止所有产物复用；Protocol v1.0–v1.8只作audit。Readiness v11不代表formal、
   holdout、算法优势或paper-ready。
+# 2026-08-31 — D-G14R9 外生 request exposure 取代 formal endogenous progression
+
+决定：Protocol 2.0 的 train/dev/formal evaluation unit 都在 agent action 前冻结 policy-neutral request exposure。service failure 只影响 outcome/continuity/delay，不再触发 exposure retry、suppression 或 early termination。request fingerprint 与 outcome fingerprint 分离。
+
+原因：G14C v9 证明 legacy closed-loop progression 会使不同策略面对不同 request denominator，破坏 classical cache policy、learned controller、dev selection 和 formal comparison 的 matched estimand。
+
+约束：G08 replay 保持 analytical oracle 身份，不升级为 formal execution producer；legacy non-formal 默认路径继续兼容。Endpoint schema 升级为 2.0，失败/不完整 workflow delay 为 `null/unavailable`。

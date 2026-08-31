@@ -1,0 +1,26 @@
+{
+  "causal_chain": [
+    "agent action",
+    "cache/admission/offload/service outcome",
+    "workflow node completion or failure",
+    "legacy workflow progression, retry, or termination",
+    "next requested node",
+    "observed request stream fingerprint"
+  ],
+  "classification": "scientific_contract_failure_not_plumbing",
+  "g08_differences": [
+    "first_ids[0] instead of handoff_pressure primary vehicle selection",
+    "static one-node-per-step DAG plan rather than closed-loop formal execution",
+    "analytical oracle replay does not own typed service outcome progression"
+  ],
+  "g08_identity_result": "not_formal_execution_replay",
+  "plumbing_boundaries_passed_before_failure": [
+    "active bundle resolution",
+    "runtime/fairness pairing",
+    "checkpoint provenance",
+    "nested benchmark launch",
+    "real evaluation episodes"
+  ],
+  "status": "pass_source_audited",
+  "v9_failure": "observed request stream fingerprint mismatch across baselines for seed_7/g14b_i_80_run_003_f10501_10524_t1113438615000_1113438617300/j_8"
+}

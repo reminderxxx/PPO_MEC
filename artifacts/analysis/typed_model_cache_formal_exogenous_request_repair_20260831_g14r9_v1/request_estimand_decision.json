@@ -1,0 +1,18 @@
+{
+  "cache_service_execution_outcome": "policy-dependent",
+  "decision": "policy-neutral exogenous request exposure for train, dev, and formal",
+  "decision_action": "policy-dependent",
+  "formal_exogenous_request_execution_contract_version": "1.0.0",
+  "formal_request_exposure_trace_version": "1.0.0",
+  "phase_modes": {
+    "dev": "replay_driven_exogenous_request_exposure",
+    "formal": "replay_driven_exogenous_request_exposure",
+    "legacy_nonformal": "legacy_endogenous_progression_default",
+    "train": "replay_driven_exogenous_request_exposure"
+  },
+  "request_and_outcome_fingerprints_are_distinct": true,
+  "request_exposure": "pre-agent and outcome-blind",
+  "status": "frozen",
+  "training_evaluation_distribution_shift": false,
+  "workflow_outcome": "derived from request outcomes without changing exposure"
+}

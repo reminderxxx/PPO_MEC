@@ -1,0 +1,34 @@
+{
+  "action_before_lookup": true,
+  "actor_or_controller_may_observe_oracle_future_topology": false,
+  "cache_event_alignment": "exactly_one_request_level_CacheEvent_per_exposure",
+  "default_enabled": false,
+  "execution_entrypoint": "src.envs.core.vec_workflow_core_env.VecWorkflowCoreEnv",
+  "fail_fast": [
+    "missing_replay",
+    "duplicate_missing_extra_or_out_of_order_request",
+    "cross_agent_fingerprint_drift",
+    "request_event_identity_drift",
+    "catalog_dependency_size_or_evaluation_unit_drift",
+    "outcome_pollution",
+    "endogenous_fallback",
+    "future_topology_leakage",
+    "historical_bundle_or_v9_reference"
+  ],
+  "formal_explicit_enable_required": true,
+  "g08_replay_role": "analytical_oracle_only_not_formal_execution_producer",
+  "g09_opportunity_role": "outcome_blind_analysis_bound_to_exposure_provenance",
+  "phase_modes": {
+    "dev": "replay_driven_exogenous_request_exposure",
+    "formal": "replay_driven_exogenous_request_exposure",
+    "legacy_nonformal": "legacy_endogenous_progression",
+    "train": "replay_driven_exogenous_request_exposure"
+  },
+  "producer_entrypoint": "src.evaluators.main_results_support.build_episode_formal_request_exposure",
+  "producer_identity": "formal_request_exposure_producer_v1.0.0",
+  "request_exposure_trace_version": "1.0.0",
+  "request_fingerprint_is_outcome_fingerprint": false,
+  "semantic_sha256": "6ebc1d7d7ef130b9f71de8d4f3cabcb19118145508e93acb62f19720abfcd273",
+  "service_failure_changes_future_exposure": false,
+  "version": "1.0.0"
+}

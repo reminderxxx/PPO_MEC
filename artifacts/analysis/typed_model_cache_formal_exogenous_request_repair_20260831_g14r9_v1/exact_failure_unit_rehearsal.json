@@ -1,0 +1,111 @@
+{
+  "agent_count": 15,
+  "agent_order": [
+    "reactive_lru",
+    "reactive_fifo",
+    "reactive_lfu",
+    "reactive_aging_lfu",
+    "reactive_random",
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "benchmark_rows_sha256": "2b524c09214a4124220d1d3fc0e3d0a75b47b6f998675af285ad2ff5426882bf",
+  "candidate_commit": "2477d23cefd542386adbfeb9a984cd671235e8f2",
+  "candidate_has_local_venv": false,
+  "candidate_selection_input_count": 10,
+  "capacity_mb": 288.0,
+  "checkpoint_reports": [
+    {
+      "agent": "sa_ghmappo",
+      "checkpoint_sha256": "a7f1bebb6feb6b47215275fdb93d751867fff856700cd46fe5ddb6928d6b9fa2",
+      "formal": false,
+      "performance_evidence": false,
+      "source_contains_v9": false
+    },
+    {
+      "agent": "ppo",
+      "checkpoint_sha256": "8ac918ae75a2b72bbc92220ba16547b4ffe6428ca41f3697d14d8bb51db97502",
+      "formal": false,
+      "performance_evidence": false,
+      "source_contains_v9": false
+    },
+    {
+      "agent": "mappo",
+      "checkpoint_sha256": "2b899367457e0e862a5376166aa5bbac4a695ce17d2778ed48bff90fc2b6bd4e",
+      "formal": false,
+      "performance_evidence": false,
+      "source_contains_v9": false
+    },
+    {
+      "agent": "dqn",
+      "checkpoint_sha256": "ca2a1e16a12b2d8e96928f26af05c5e7ff12d1de7c4870600be7dd3cf92c9bb3",
+      "formal": false,
+      "performance_evidence": false,
+      "source_contains_v9": false
+    },
+    {
+      "agent": "dueling_dqn",
+      "checkpoint_sha256": "80599ef3498f701c5793b40f7de33806f2b264e9eeace29e74eb9e4e9cbba3eb",
+      "formal": false,
+      "performance_evidence": false,
+      "source_contains_v9": false
+    },
+    {
+      "agent": "qmix",
+      "checkpoint_sha256": "86563ec6b6de5ccf9b101bc05c217ed72fac327fa1d097f66ce1f7abb2aa14a1",
+      "formal": false,
+      "performance_evidence": false,
+      "source_contains_v9": false
+    },
+    {
+      "agent": "controller_mat",
+      "checkpoint_sha256": "c85bad4f6be8ac62e5002254f2a11852110d18db5ef0f9ddfca344cbc83c8c1f",
+      "formal": false,
+      "performance_evidence": false,
+      "source_contains_v9": false
+    },
+    {
+      "agent": "dag_offload_drl",
+      "checkpoint_sha256": "41366a6082bbdc7d2ce1a05b88f8b59d204964415f36908b86a839dfe629f2f1",
+      "formal": false,
+      "performance_evidence": false,
+      "source_contains_v9": false
+    },
+    {
+      "agent": "cache_offload_drl",
+      "checkpoint_sha256": "70e3d4eed338a0c36ea5fb440fbf7f85f893a614210b7bb3e91beaa697e76c3a",
+      "formal": false,
+      "performance_evidence": false,
+      "source_contains_v9": false
+    },
+    {
+      "agent": "dt_handoff_drl",
+      "checkpoint_sha256": "24ed06cbad1e4a4783828b3cb5edcf21dacd56f1fe2bd711d18e652d45880816",
+      "formal": false,
+      "performance_evidence": false,
+      "source_contains_v9": false
+    }
+  ],
+  "clean_candidate_start": true,
+  "cross_agent_validation_position_passed": true,
+  "detached_candidate": true,
+  "evaluation_unit_id": "seed_7/g14b_i_80_run_003_f10501_10524_t1113438615000_1113438617300/j_8",
+  "fingerprint_count": 1,
+  "formal": false,
+  "fresh_tiny_checkpoint_count": 10,
+  "holdout_opened": false,
+  "max_steps": 22,
+  "observed_alignment_all_pass": true,
+  "performance_evidence": false,
+  "request_exposure_fingerprint": "a2bc97ca8bbd94ecb1dd5d17ed9fa2a16e7ce7e859c15711279485110e3d4b92",
+  "status": "pass",
+  "v9_checkpoint_reused": false
+}

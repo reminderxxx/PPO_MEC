@@ -546,3 +546,12 @@
 - `scripts/repair_typed_model_cache_formal_bundle_resources.py`：生成Protocol v1.9、Readiness v11与唯一无旧顶层
   compatibility mapping的active index。
 - `tests/test_active_bundle_resource_resolution_v19.py`：v1.8失败复现、18类fail-closed负例和历史执行拒绝。
+# G14R9 request execution modules
+
+- `src/runtime/formal_exogenous_request_execution.py`：request exposure producer、strict schema/canonical SHA-256、CacheEvent alignment、outcome audit 和 Endpoint 2.0 reducer。
+- `src/envs/core/vec_workflow_core_env.py`：显式 replay-driven request injection、request/workflow state 分离、failure 后外生推进与 causal observation boundary。
+- `src/evaluators/main_results_support.py`：evaluation-unit exposure 预生成、summary/row provenance 和 formal endpoint 写入。
+- `scripts/train_algo_pool_real_sample.py`：Protocol 2.0 train exposure 与 checkpoint provenance producer。
+- `scripts/benchmark_main_results.py`：每 unit 单一 pre-agent producer、15-agent fingerprint matrix 与 manifest consumer。
+- `src/runtime/active_formal_bundle.py`：Protocol 2.0 唯一 active index 及 request contract/schema resource gate。
+- `scripts/run_formal_exogenous_request_rehearsal.py`、`scripts/run_formal_exogenous_phase_chain_rehearsal.py`：non-formal exact/capacity/phase-chain 验收；不产生 formal evidence。

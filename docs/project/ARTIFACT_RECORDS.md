@@ -1363,3 +1363,11 @@ Run `g14a_rehearsal_20260819_230456_872949`使用`controlled_non_hidden`窗口�
 - Readiness v7：`READY_FOR_G14C_V6_CLEAN_TRAIN_AND_FORMAL`。
 - Evidence boundary：execution-contract/non-formal preflight/tests；正式training/checkpoint/performance/holdout为0；
   未启动G14C v6/G14D/G15。
+# 2026-08-31 — G14R9 formal exogenous request repair
+
+- Artifact root：`artifacts/analysis/typed_model_cache_formal_exogenous_request_repair_20260831_g14r9_v1/`
+- Evidence level：contract + synthetic mechanism + exact real-unit non-formal rehearsal；不是 formal performance。
+- Exact unit：`seed_7/g14b_i_80_run_003_f10501_10524_t1113438615000_1113438617300/j_8`，288 MB，22 steps，15 agents，单一 external exposure fingerprint，alignment 全通过。
+- Capacity rehearsal：288/576/864 MB 均为完整 15-agent matrix，单一 exposure identity。
+- Phase chain：detached clean no-`.venv` candidate，13 phases 到 `complete_without_holdout`，186 commands，placeholder/sentinel 均为 0。
+- Formal/holdout boundary：formal training=0、formal checkpoint=0、formal performance=0、holdout opened=false。

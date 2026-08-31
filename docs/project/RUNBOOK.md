@@ -1232,3 +1232,28 @@ fresh run会 create-only写入 `<run-root>/resolved_execution_context.json`。re
 Git root/commit、environment/dependency、Python、paths和command matrix；不得替换或重建该文件。v1.0–v1.4只读审计，
 不能启动新 formal execution；G14C v1–v5 run root、ledger、marker、checkpoint全部硬拒绝。Readiness v7不授权自动启动
 G14C v6；holdout/hidden仍不可访问。
+# Protocol 2.0 request execution
+
+正式 train/dev/formal 命令只能通过 active bundle 展开，并必须显式包含：
+
+```bash
+--formal-exogenous-request-execution
+```
+
+该 flag 默认关闭，用于 legacy/non-formal 兼容；Protocol 2.x 若缺失会 fail-fast。active index 为：
+
+```text
+configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/protocol_index.json
+```
+
+启动 G14C v10 前必须重新核验 clean `HEAD == main == origin/main`、active bundle、186-command expansion、holdout sealed，以及 G14C v9 denylist。禁止将 v9 checkpoint 或 partial dev output 复制到新 run。
+
+G14R9 合同级非正式复验入口：
+
+```bash
+python scripts/run_formal_exogenous_request_rehearsal.py \
+  --work-root /private/tmp/ppo_mec_g14r9_rehearsal \
+  --artifact-root artifacts/analysis/typed_model_cache_formal_exogenous_request_repair_20260831_g14r9_v1
+```
+
+该命令只生成 `formal=false` rehearsal，不得作为 formal performance 使用。

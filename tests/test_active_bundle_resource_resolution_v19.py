@@ -181,7 +181,7 @@ def test_symlink_and_relative_cli_paths_are_rejected(bundle: dict, tmp_path: Pat
 def test_version_scope_and_same_name_different_hash_are_rejected(bundle: dict) -> None:
     protocol = active.resolve_active_bundle_resource(bundle, "protocol_manifest")
     assert protocol["version_scope"] == "current_protocol_version"
-    assert "v1_9" in protocol["logical_path"]
+    assert "v2_0" in protocol["logical_path"]
     shared = active.resolve_active_bundle_resource(bundle, "portable_resource_registry")
     assert shared["version_scope"] == "shared_historical_stable"
     altered = dict(protocol)
@@ -226,6 +226,7 @@ def test_v8_run_is_permanently_rejected_without_order_hash_change(bundle: dict) 
             contract=contract,
         )
     assert any(V8_RUN in str(path) for path in INVALID_FORMAL_RUN_ROOTS)
+    assert any("typed_model_cache_formal_20260830_113339_g14c_v9" in str(path) for path in INVALID_FORMAL_RUN_ROOTS)
 
 
 def test_historical_index_cannot_start_active_execution(monkeypatch: pytest.MonkeyPatch) -> None:

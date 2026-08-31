@@ -1,0 +1,358 @@
+{
+  "active_bundle_core_sha256": "ff33ce2bba99daeb50cdcd55058be96febed2bee92c1bc5c38ac1d50cb49a30c",
+  "active_bundle_resource_resolution_contract_version": "1.0.0",
+  "active_bundle_resources": [
+    {
+      "content_sha256": "b1567b9ee1d9923482b9685ec2b90dee734396f5be7d6b8d753400585aa76db0",
+      "logical_id": "protocol_manifest",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/protocol_v2_0_manifest.json",
+      "role": "active Protocol manifest",
+      "semantic_sha256": "f449c800f6de3562d30ed78fc868e000cf62af5fae6e339304b272b8f7699fc1",
+      "size_bytes": 333796,
+      "version_scope": "current_protocol_version"
+    },
+    {
+      "content_sha256": "a52800bd7527a80943e019283eefdf6cc3102b35d9bd8dff042057634f49b544",
+      "logical_id": "execution_environment_manifest",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/execution_environment_manifest.json",
+      "role": "active execution environment identity",
+      "size_bytes": 1628,
+      "version_scope": "current_protocol_version"
+    },
+    {
+      "content_sha256": "8c130bda6b851dd1c83df511e262b90dfcf2590d564d1323f85b99963fd9e707",
+      "logical_id": "agent_training_scientific_config",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/agent_training_scientific_config.json",
+      "role": "Scientific Config 2.0.0",
+      "semantic_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+      "size_bytes": 4465,
+      "version_scope": "current_protocol_version"
+    },
+    {
+      "content_sha256": "9776a733748cb645563ec05b65f8e588816806074d2f02c5e713cba63a3f90c2",
+      "logical_id": "formal_agent_order_contract",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/formal_agent_order_contract.json",
+      "role": "Formal Agent Order Contract 1.0.0",
+      "semantic_sha256": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0",
+      "size_bytes": 2835,
+      "version_scope": "current_protocol_version"
+    },
+    {
+      "content_sha256": "abc759e84f4bc2e31b05075317feae55bf85e71cd66045c3768645923403802a",
+      "logical_id": "formal_training_execution_binding_schema",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/formal_training_execution_binding_contract.json",
+      "role": "formal execution binding schema",
+      "size_bytes": 718,
+      "version_scope": "current_protocol_version"
+    },
+    {
+      "content_sha256": "35b0acb75505680241ed7d00be09c7d67807f9e6843ebb5f1683f8f2616b64cd",
+      "logical_id": "resolved_execution_context_schema",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/resolved_execution_context_contract.json",
+      "role": "resolved context schema",
+      "size_bytes": 790,
+      "version_scope": "current_protocol_version"
+    },
+    {
+      "content_sha256": "86cf98f0fa2c769003aedab9c2ed6003d94b80003ab476e2d2c410ab6618e309",
+      "logical_id": "active_bundle_resource_resolution_contract",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/active_bundle_resource_resolution_contract.json",
+      "role": "active bundle resource resolver",
+      "semantic_sha256": "c9ddcc291b56b0b63de4d6b78f2be9cb99aa0d6be3f756bb39c82b9121f41b9f",
+      "size_bytes": 781,
+      "version_scope": "current_protocol_version"
+    },
+    {
+      "content_sha256": "04ff8fe553b1a9e49e7adf092b6ccd0f1dd6876b53c0fbf55f9c6c7c331bbd30",
+      "logical_id": "formal_exogenous_request_execution_contract",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/formal_exogenous_request_execution_contract.json",
+      "role": "formal exogenous request execution contract",
+      "semantic_sha256": "6ebc1d7d7ef130b9f71de8d4f3cabcb19118145508e93acb62f19720abfcd273",
+      "size_bytes": 1527,
+      "version_scope": "current_protocol_version"
+    },
+    {
+      "content_sha256": "060e5563c6379bebbef5cdda097b6713e783f7091b9eb91b8b756811e3670f62",
+      "logical_id": "formal_request_exposure_schema",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/formal_request_exposure_schema.json",
+      "role": "formal request exposure schema",
+      "semantic_sha256": "c34c057565fb31b45c2be2bd62667d045a6814f8c60b5c1b5c9a3c146fa01194",
+      "size_bytes": 922,
+      "version_scope": "current_protocol_version"
+    },
+    {
+      "content_sha256": "edb6466ad6441c7fd7912f4991a3d44246cac6aae42d51711757dbc361af3fc3",
+      "logical_id": "rehearsal_fairness_manifests.constrained_288mb",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/nonformal_rehearsal_fairness_constrained_288mb.json",
+      "role": "nonformal rehearsal fairness manifest",
+      "size_bytes": 35204,
+      "version_scope": "current_protocol_version"
+    },
+    {
+      "content_sha256": "37384ebb05d39403431d4d65b8a4019c65a8e162eb216f470b06793c01cd7145",
+      "logical_id": "rehearsal_fairness_manifests.medium_576mb",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/nonformal_rehearsal_fairness_medium_576mb.json",
+      "role": "nonformal rehearsal fairness manifest",
+      "size_bytes": 35204,
+      "version_scope": "current_protocol_version"
+    },
+    {
+      "content_sha256": "2574a6cda6faa78e548238c58fdb78b309ec35697ba896e08326343bd536df72",
+      "logical_id": "rehearsal_fairness_manifests.relaxed_864mb",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/nonformal_rehearsal_fairness_relaxed_864mb.json",
+      "role": "nonformal rehearsal fairness manifest",
+      "size_bytes": 35204,
+      "version_scope": "current_protocol_version"
+    },
+    {
+      "content_sha256": "c48abc317ddac5574e83816f78f8efcdec72244b6bf92de731c05ac38b86b447",
+      "logical_id": "portable_resource_registry",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/portable_resource_registry.json",
+      "role": "portable resource registry",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 28194,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "06aab0aaf144962e3b16d5c20f87ea10ac56846e82a82d429de0cfd1e3679bda",
+      "logical_id": "split_companion",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/split_companion.json",
+      "role": "formal split identity",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 671,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "af16ad4cf4e15fbcc556554d964cdd92a9485bcf9973ce73e6728711ad91d16d",
+      "logical_id": "window_consumption_contract",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/formal_window_consumption_contract.json",
+      "role": "formal window consumption contract",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 111745,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "37622c71e0a1e0e886d317dc38404a001daf6fea0660ef0663ee26ce24432a14",
+      "logical_id": "fairness_portable_identity_companion",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/fairness_portable_identity_companion.json",
+      "role": "portable fairness identity",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 14441,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "a7de83b51c5cf5a0c72103fd4bad7146e9e6aafccc6befc8616ea5d0d01cbf69",
+      "logical_id": "runtime_configs.constrained_288mb",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_constrained_288mb.yaml",
+      "role": "typed runtime config",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 1770,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "37553cf9bff75967801cffd173abf4c6c89039063948fc21a0816d412097abc1",
+      "logical_id": "runtime_configs.medium_576mb",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_medium_576mb.yaml",
+      "role": "typed runtime config",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 1765,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "6fb2049650e41d6e7120d1165f392e07d1b7d8beca31e76591e62b86cfaa5124",
+      "logical_id": "runtime_configs.relaxed_864mb",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/runtime_relaxed_864mb.yaml",
+      "role": "typed runtime config",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 1766,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "6404d00e5be542a91c09febe921d2a43171570687eccf68710131df1cc300c24",
+      "logical_id": "fairness_manifests.constrained_288mb",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_constrained_288mb.json",
+      "role": "formal fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273401,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "51dae2eccb0eef6e6a52a69096543f7e1a3bccb002b52902759c2009076dc555",
+      "logical_id": "fairness_manifests.medium_576mb",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_medium_576mb.json",
+      "role": "formal fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273401,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "ed62a1e5992c4a4c5a878b18eb6986ee1b0280be573a87b25eb8310ce10800a0",
+      "logical_id": "fairness_manifests.relaxed_864mb",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_relaxed_864mb.json",
+      "role": "formal fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273401,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "5876283b1d5c9244f3e7fd1b975d7220d41d999e36127292ae2dfe226ac9e25a",
+      "logical_id": "dev_fairness_manifests.constrained_288mb",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_constrained_288mb.json",
+      "role": "dev fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273566,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "db943de9dda7e302778bfcd3727875fda94ffbbb9b029c9dbd29712ed4e94242",
+      "logical_id": "dev_fairness_manifests.medium_576mb",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_medium_576mb.json",
+      "role": "dev fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273566,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "0c20449ed32868857dbf6b1b85a22b4b25e6c22a994e470286031b382b85b711",
+      "logical_id": "dev_fairness_manifests.relaxed_864mb",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/dev_fairness_relaxed_864mb.json",
+      "role": "dev fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273566,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "b62604da052e78748c1ebebd693f03052f9bed7e35355de455f79b5c30351c73",
+      "logical_id": "support_fairness_manifests.ablation-8aa367acf3bdf7a9",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-8aa367acf3bdf7a9.json",
+      "role": "support fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273401,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "ce8403811a89d3f39939cae1661306cfea67144f50525b5e4f13147075a31429",
+      "logical_id": "support_fairness_manifests.ablation-f09814754dc92882",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_ablation-f09814754dc92882.json",
+      "role": "support fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273401,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "083ae5b4352452a776d670942a5f8b922ea4178be083474aed0c6706510f098c",
+      "logical_id": "support_fairness_manifests.prediction_boundary-5faa585ad5330f05",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-5faa585ad5330f05.json",
+      "role": "support fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273401,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "b4ddb48a42a31f1768debf16a2ca38643ce4c64fb3e0db6030e67264d1742151",
+      "logical_id": "support_fairness_manifests.prediction_boundary-95fb72521455c776",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-95fb72521455c776.json",
+      "role": "support fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273401,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "864ef790936476260f96015ae7ba8a8837746896fe2d11e2b5e2a2d2cd906b5b",
+      "logical_id": "support_fairness_manifests.prediction_boundary-a3a5789695404fae",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-a3a5789695404fae.json",
+      "role": "support fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273401,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "f0d9263ee40ecf629916d1663b4162f66cb30233063cf566d73698cf4d9d2f75",
+      "logical_id": "support_fairness_manifests.prediction_boundary-ce96dbd5ea956212",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-ce96dbd5ea956212.json",
+      "role": "support fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273401,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "ab78587f9f7566c59ceb1921f33902ce914cd297cf50c12125dce95afada392d",
+      "logical_id": "support_fairness_manifests.prediction_boundary-df3bc5ade8c57014",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-df3bc5ade8c57014.json",
+      "role": "support fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273401,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "deffe01c07f7342033d1d124b00aa7f7b2a69a56ae56fbde1d990015d47ed969",
+      "logical_id": "support_fairness_manifests.prediction_boundary-efa09ee2409d3d87",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_prediction_boundary-efa09ee2409d3d87.json",
+      "role": "support fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273401,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "1e931c0148302a616946cefefe0fcec456aa060796ece71fa0b04f6814b1a9bb",
+      "logical_id": "support_fairness_manifests.sensitivity-27d16b068076937b",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-27d16b068076937b.json",
+      "role": "support fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 272677,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "150c8006e7220b537228eee3e7cf4f2af1804f1b462b23ace85549423f57b8c8",
+      "logical_id": "support_fairness_manifests.sensitivity-7c7c3a1659c6e221",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v1_1_20260820/fairness_support_sensitivity-7c7c3a1659c6e221.json",
+      "role": "support fairness manifest",
+      "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
+      "size_bytes": 273401,
+      "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "a3a2420366eb43ad7ce836ea2e227f861f27eb339635589fc0ac502d4471ea74",
+      "logical_id": "readiness_companion",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/readiness_v12.json",
+      "role": "Readiness v12 evidence companion",
+      "size_bytes": 601,
+      "version_scope": "current_protocol_version"
+    }
+  ],
+  "active_formal_bundle_contract_version": "1.1.0",
+  "active_formal_bundle_sha256": "7e77ae6c7f27ac169a466aeed06de0c56be6ba50addafe6af2cfa017ca60c124",
+  "command_matrix_identity": {
+    "command_templates_sha256": "9e37980ea3c5bf5f9d05a0f2e750057e652801074a2241f0ce4aa1993778a415",
+    "outer_nested_expansion_equality_required": true
+  },
+  "environment_identity": {
+    "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+    "environment_fingerprint": "acc61f8f3eff6a6e9326af9c3884484338f0b8bba0934ce3a0bc721cdd8d8196"
+  },
+  "execution_commit_binding": {
+    "exact_40_hex_recorded_in_execution_binding": true,
+    "index_embeds_own_commit_hash": false,
+    "mode": "observed_clean_head_equal_origin_main",
+    "self_reference_avoided": true
+  },
+  "holdout_seal": {
+    "consumed_permanently": false,
+    "opened": false,
+    "performance_gate_forbidden": true,
+    "seal_semantic_sha256": "3d9bcbe36d0e8749941067d3c134fee4733bc4c8614762af0ddc0f70bdb9de5f",
+    "sealed": true
+  },
+  "protocol_identity": {
+    "protocol_full_sha256": "f3bae801ece00f57c84301d87629d15caeedb277e831deebca38039810e6949d",
+    "protocol_id": "typed_model_cache_formal_protocol_v2_0",
+    "protocol_semantic_sha256": "f449c800f6de3562d30ed78fc868e000cf62af5fae6e339304b272b8f7699fc1",
+    "protocol_version": "2.0.0"
+  },
+  "protocol_index_version": "2.0.0",
+  "readiness_companion": {
+    "content_sha256": "a3a2420366eb43ad7ce836ea2e227f861f27eb339635589fc0ac502d4471ea74",
+    "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/readiness_v12.json"
+  },
+  "status": "READY_FOR_G14C_V10_CLEAN_TRAIN_AND_FORMAL"
+}

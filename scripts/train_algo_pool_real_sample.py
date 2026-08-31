@@ -25,6 +25,7 @@ from src.envs.wrappers.gym_vec_env import GymVecEnv
 from src.evaluators.main_results_support import (
     apply_frozen_window_plan,
     build_selected_workflow_states,
+    build_episode_formal_request_exposure,
     clone_frames,
     clone_rsu_state,
     clone_workflow_state,
@@ -66,6 +67,7 @@ from src.runtime.portable_resource_identity import (
     add_portable_resource_arguments,
     resolve_argument_resources,
 )
+from src.runtime.formal_exogenous_request_execution import compute_formal_endpoint_metrics
 from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
 
 
@@ -125,6 +127,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=str,
         default="",
         help="Optional typed formal protocol v1.1 manifest; semantic CLI overrides are rejected.",
+    )
+    parser.add_argument(
+        "--formal-exogenous-request-execution",
+        action="store_true",
+        help="Explicitly enable replay-driven request exposure (required by Protocol 2.x).",
     )
     parser.add_argument(
         "--agent_config_path",
@@ -270,6 +277,12 @@ def build_summary_row(summary: dict[str, Any], *, episode_index: int, updated: b
         "agent_name": summary["run_info"].get("agent_name"),
         "workflow_id": summary["run_info"].get("workflow_id"),
         "window_id": summary["run_info"].get("window_id"),
+        "request_exposure_fingerprint": summary["run_info"].get(
+            "request_exposure_fingerprint"
+        ),
+        "outcome_fingerprint": summary.get("formal_request_execution_audit", {}).get(
+            "outcome_fingerprint"
+        ),
         "primary_vehicle_selection": summary["run_info"].get("primary_vehicle_selection", "stable_first"),
         "reward_positive_offset": reward_positive_offset,
         "updated": bool(updated),
@@ -349,6 +362,14 @@ def main() -> None:
         if args.formal_protocol_path
         else None
     )
+    if formal_protocol is not None:
+        formal_version = str(
+            formal_protocol.get("typed_model_cache_formal_protocol_version", "")
+        )
+        if formal_version.startswith("2.") and not args.formal_exogenous_request_execution:
+            raise FormalTrainingContractError(
+                "Protocol 2.x forbids endogenous request progression"
+            )
     agent_config_companion = (
         load_json_mapping(args.agent_config_path, "agent config companion")
         if args.agent_config_path
@@ -540,7 +561,7 @@ def main() -> None:
     )
 
     if args.formal_contract_preflight_only:
-        if resolved_training.formal_protocol_version not in {"1.6.0", "1.7.0", "1.8.0", "1.9.0"}:
+        if resolved_training.formal_protocol_version not in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0"}:
             raise FormalTrainingContractError(
                 "formal contract preflight is restricted to Protocol v1.6/v1.7"
             )
@@ -631,6 +652,42 @@ def main() -> None:
         )
         mobility_bundle.rsu_metadata["window_rank"] = window_candidate.get("window_rank")
         mobility_bundle.rsu_metadata["window_class"] = window_candidate.get("window_class")
+        formal_request_exposure_trace = None
+        if args.formal_exogenous_request_execution:
+            evaluation_unit_id = (
+                f"seed_{args.random_seed}/{mobility_bundle.rsu_metadata.get('window_id')}/"
+                f"{workflow_state.workflow_id}"
+            )
+            formal_request_exposure_trace = build_episode_formal_request_exposure(
+                workflow_state=workflow_state,
+                mobility_bundle=mobility_bundle,
+                adapter_catalog=adapter_catalog,
+                max_steps=args.max_steps,
+                mobility_source=args.mobility_source,
+                primary_vehicle_selection=args.primary_vehicle_selection,
+                cache_capacity_profile=cache_capacity_profile,
+                evaluation_unit={
+                    "evaluation_unit_id": evaluation_unit_id,
+                    "benchmark_run_seed": args.random_seed,
+                    "window_id": str(mobility_bundle.rsu_metadata.get("window_id")),
+                    "workflow_id": workflow_state.workflow_id,
+                    "raw_frame_interval": {
+                        "start": int(window_candidate.get("frame_offset", args.frame_offset)),
+                        "end": int(window_candidate.get("frame_offset", args.frame_offset))
+                        + int(window_candidate.get("window_length", args.window_length))
+                        - 1,
+                    },
+                },
+                source_provenance={
+                    "producer_consumer": "train_algo_pool_real_sample_pre_agent",
+                    "phase": "train",
+                    "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
+                    "window_plan_identity": window_plan_identity,
+                    "formal_protocol_semantic_sha256": (
+                        resolved_training.formal_protocol_semantic_sha256
+                    ),
+                },
+            )
         recorder = EpisodeRecorder(prefetch_validation_window=6)
         core_env = VecWorkflowCoreEnv(
             mobility_provider=ReplayProvider(trajectory_frames=clone_frames(mobility_bundle.frames)),
@@ -646,6 +703,7 @@ def main() -> None:
             primary_vehicle_selection=args.primary_vehicle_selection,
             reward_positive_offset=args.reward_positive_offset,
             cache_capacity_profile=cache_capacity_profile,
+            formal_request_exposure_trace=formal_request_exposure_trace,
         )
         env = GymVecEnv(core_env=core_env, recorder=recorder)
         trainer = MARLOnPolicyTrainer(
@@ -675,10 +733,47 @@ def main() -> None:
                 "cache_efficiency_metrics_contract_version": runtime_contract[
                     "cache_efficiency_metrics_contract_version"
                 ],
+                "evaluation_unit_id": (
+                    formal_request_exposure_trace["evaluation_unit"]["evaluation_unit_id"]
+                    if formal_request_exposure_trace is not None
+                    else None
+                ),
+                "formal_exogenous_request_execution_contract_version": (
+                    "1.0.0" if formal_request_exposure_trace is not None else None
+                ),
+                "request_exposure_fingerprint": (
+                    formal_request_exposure_trace["request_exposure_fingerprint"]
+                    if formal_request_exposure_trace is not None
+                    else None
+                ),
             }
         )
         summary["episode_success"] = bool(summary.get("episode_status", {}).get("completed", False))
         summary["cache_efficiency_metrics"] = reduce_cache_efficiency_summary(summary).to_dict()
+        if formal_request_exposure_trace is not None:
+            endpoint_metrics = compute_formal_endpoint_metrics(
+                summary["cache_event_trace"],
+                formal_request_exposure_trace,
+                truncated=bool(summary.get("episode_status", {}).get("truncated", False)),
+            )
+            summary["formal_request_exposure"] = formal_request_exposure_trace
+            summary["formal_request_execution_audit"] = endpoint_metrics
+            summary["system_metrics"].update(
+                {
+                    key: endpoint_metrics[key]
+                    for key in (
+                        "full_service_ready_byte_hit_rate",
+                        "joint_base_adapter_hit_rate",
+                        "full_service_ready_request_rate",
+                        "transfer_mb_per_request",
+                        "workflow_continuity_rate",
+                        "end_to_end_workflow_delay",
+                    )
+                }
+            )
+            summary["episode_success"] = bool(
+                endpoint_metrics["workflow_completed_under_exogenous_execution"]
+            )
         pending_rollout.extend(rollout)
         should_update = episode_index % max(args.update_every, 1) == 0 or episode_index == args.episodes
         if should_update:
@@ -725,6 +820,17 @@ def main() -> None:
                 ),
                 "active_formal_bundle_sha256": (
                     resolved_training.active_formal_bundle_sha256
+                ),
+                "formal_exogenous_request_execution_contract_version": (
+                    "1.0.0" if args.formal_exogenous_request_execution else None
+                ),
+                "formal_request_exposure_trace_version": (
+                    "1.0.0" if args.formal_exogenous_request_execution else None
+                ),
+                "request_execution_mode": (
+                    "replay_driven_exogenous_request_exposure"
+                    if args.formal_exogenous_request_execution
+                    else "legacy_endogenous_progression"
                 ),
                 "is_smoke_checkpoint": args.profile == "smoke",
                 "script": "scripts/train_algo_pool_real_sample.py",
@@ -820,6 +926,24 @@ def main() -> None:
         ),
         "active_formal_bundle_sha256": (
             resolved_training.active_formal_bundle_sha256
+        ),
+        "formal_exogenous_request_execution_contract_version": (
+            "1.0.0" if args.formal_exogenous_request_execution else None
+        ),
+        "formal_request_exposure_trace_version": (
+            "1.0.0" if args.formal_exogenous_request_execution else None
+        ),
+        "request_execution_mode": (
+            "replay_driven_exogenous_request_exposure"
+            if args.formal_exogenous_request_execution
+            else "legacy_endogenous_progression"
+        ),
+        "request_exposure_fingerprints": sorted(
+            {
+                str(row.get("request_exposure_fingerprint"))
+                for row in rows
+                if row.get("request_exposure_fingerprint")
+            }
         ),
         "resolved_model_cache_runtime": runtime_contract,
         "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],

@@ -129,6 +129,7 @@ def _formal_values(protocol: Mapping[str, Any], agent_name: str) -> dict[str, An
         "1.7.0",
         "1.8.0",
         "1.9.0",
+        "2.0.0",
     }:
         raise FormalTrainingContractError("formal training requires protocol version 1.1, 1.2, or 1.3")
     budget = protocol.get("training_budget")
@@ -328,7 +329,7 @@ def resolve_training_contract(
         "active_formal_bundle_sha256": None,
     }
     contract_version = FORMAL_TRAINING_CONTRACT_VERSION
-    if protocol_version in {"1.6.0", "1.7.0", "1.8.0", "1.9.0"}:
+    if protocol_version in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0"}:
         if agent_config_companion is not None:
             raise FormalTrainingContractError(
                 "Protocol v1.6 rejects legacy --agent_config_path companion"
@@ -364,7 +365,7 @@ def resolve_training_contract(
                 ),
                 active_formal_bundle_sha256=(
                     str(scientific_identity.get("active_formal_bundle_sha256") or "")
-                    if protocol_version in {"1.8.0", "1.9.0"}
+                    if protocol_version in {"1.8.0", "1.9.0", "2.0.0"}
                     else None
                 ),
             )
@@ -401,12 +402,12 @@ def resolve_training_contract(
                     )
                     or ""
                 )
-                if protocol_version in {"1.7.0", "1.8.0", "1.9.0"}
+                if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0"}
                 else None
             ),
             "active_formal_bundle_sha256": (
                 str(scientific_identity.get("active_formal_bundle_sha256") or "")
-                if protocol_version in {"1.8.0", "1.9.0"}
+                if protocol_version in {"1.8.0", "1.9.0", "2.0.0"}
                 else None
             ),
         }
@@ -422,13 +423,13 @@ def resolve_training_contract(
             raise FormalTrainingContractError(
                 "resolved context execution binding identity mismatch"
             )
-        if protocol_version in {"1.7.0", "1.8.0", "1.9.0"} and identity_values[
+        if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0"} and identity_values[
             "formal_agent_order_contract_semantic_sha256"
         ] != formal_protocol["formal_agent_order_contract"]["semantic_sha256"]:
             raise FormalTrainingContractError(
                 "resolved context formal agent order contract identity mismatch"
             )
-        if protocol_version in {"1.8.0", "1.9.0"} and identity_values[
+        if protocol_version in {"1.8.0", "1.9.0", "2.0.0"} and identity_values[
             "active_formal_bundle_sha256"
         ] != execution_binding.get("active_formal_bundle_sha256"):
             raise FormalTrainingContractError(
