@@ -8,10 +8,15 @@ import pytest
 from src.evaluators.cache_baseline_fairness import full_manifest_sha256, semantic_protocol_sha256, sha256_value
 from src.oracles.cache_request_replay import (
     CacheRequestReplayError,
+    FORMAL_LIFECYCLE_REQUEST_REPLAY_PRODUCER_VERSION,
     build_request_replay,
     missing_replay_status,
     request_replay_fingerprint,
     validate_request_replay,
+)
+from src.runtime.formal_exogenous_request_execution import (
+    FORMAL_REQUEST_PHYSICAL_CONTINUITY_RULE_VERSION,
+    FORMAL_REQUEST_SUBJECT_SELECTION_VERSION,
 )
 from src.oracles.future_horizon_cache_oracle import (
     CacheOracleError,
@@ -146,6 +151,50 @@ def test_replay_rejects_endogenous_divergence_duplicate_and_invalid_size() -> No
 
 def test_missing_old_replay_is_unavailable_not_guessed() -> None:
     assert missing_replay_status()["availability"] == "unavailable"
+
+
+def test_formal_lifecycle_replay_is_strict_and_oracle_consumable() -> None:
+    source = manifest()
+    value = replay([request(0, "a", 2.0), request(1, "b", 3.0)], source)
+    value["producer"]["identity"] = (
+        FORMAL_LIFECYCLE_REQUEST_REPLAY_PRODUCER_VERSION
+    )
+    value["formal_request_subject_lifecycle"] = {
+        "contract_version": "1.0.0",
+        "selection_mode": "handoff_pressure",
+        "selection_version": FORMAL_REQUEST_SUBJECT_SELECTION_VERSION,
+        "exposure_horizon": 2,
+        "selected_primary_vehicle_id": "v",
+        "eligible_candidate_count": 2,
+        "eligible_candidate_canonical_fingerprint": "a" * 64,
+        "physical_continuity_rule_version": (
+            FORMAL_REQUEST_PHYSICAL_CONTINUITY_RULE_VERSION
+        ),
+        "reselection_policy": "forbidden_during_formal_episode",
+        "selection_evidence_actor_visible": False,
+        "selection_evidence_controller_visible": False,
+        "outcome_independence": True,
+    }
+    value["formal_request_exposure_fingerprint"] = "b" * 64
+    value["request_semantics"].update(
+        formal_request_exposure_trace_version="2.0.0",
+        formal_request_subject_lifecycle_contract_version="1.0.0",
+        subject_reselection_policy="forbidden_during_formal_episode",
+    )
+    value["request_replay_fingerprint"] = request_replay_fingerprint(value)
+    assert validate_request_replay(value, source_manifest=source)["status"] == "pass"
+    assert solve_future_horizon_cache_oracle(
+        replay=value, manifest=source, horizon=1
+    )["identity"]["request_replay_fingerprint"] == value[
+        "request_replay_fingerprint"
+    ]
+
+    tampered = deepcopy(value)
+    tampered["formal_request_subject_lifecycle"]["unexpected"] = True
+    tampered["request_replay_fingerprint"] = request_replay_fingerprint(tampered)
+    report = validate_request_replay(tampered, source_manifest=source)
+    assert report["status"] == "fail"
+    assert "lifecycle evidence fields drift" in "; ".join(report["errors"])
 
 
 def test_unknown_major_and_nonfinite_fail() -> None:

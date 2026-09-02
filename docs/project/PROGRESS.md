@@ -1649,3 +1649,18 @@ quick run 结果边界：
 - clean detached 候选无 `.venv`，使用共享绝对 Python 通过真实 outer preflight、11,850,526 rows、73,871
   frames、60/60 windows、186-command outer/nested parity、`1134 passed, 16 skipped` clean tests，以及不训练、
   不写 checkpoint/row 的 binding→context→agent/dev/provenance rehearsal。
+
+# 2026-09-02 — G14R11 formal request subject lifecycle closure
+
+- 只读复算 G14C v11 首个失败单元，确认 reset subject `i_80:1116` 只存在 frame 0–3；frame 4 runtime 静默重选
+  `i_80:1120`，而 producer 仍冻结旧 subject，导致 `vehicle_id/current_service_rsu_id` 漂移。v11 永久分类为
+  `INVALID_PROTOCOL_OR_IMPLEMENTATION / invalid_during_first_training_cell_before_first_episode_commit`，所有
+  resume/retry/finalize/salvage/checkpoint reuse 禁止。
+- 冻结 lifecycle `1.0.0`、request trace `2.0.0`、exogenous execution `1.1.0`、environment projection `1.1.0`、
+  execution environment `1.2.0` 与 Protocol `2.2.0`。train/dev/formal 先过滤 horizon-long persistent physical
+  vehicles，再使用原 handoff-pressure 排序；runtime reselection 被禁止。
+- Exact non-formal rehearsal 使用同一 failure window、`j_3`、seed 7、288 MB 与 SA-GHMAPPO runtime shape，
+  9/9 request、9/9 CacheEvent、denominator 9 全部对齐并越过原失败位置。48 个未封存窗口 × 3 workflows=144
+  单元均有合格 subject；15 agents × 3 capacities 共 6,480 cells 的每单元 exposure fingerprint 唯一数均为 1。
+- G14R11 formal training/checkpoint/performance=`0/0/0`；12 个 holdout window 只核验 seal/metadata，未生成
+  exposure、未选择车辆、未产生 performance。未启动 G14C v12、G14D 或 G15。

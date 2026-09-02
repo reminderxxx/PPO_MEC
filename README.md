@@ -1,13 +1,14 @@
 # PPO_MEC
 
-G14R10 已修复 G14C v10 启动前发现的 environment identity producer/consumer projection 分叉，冻结
-Formal Environment Identity Projection Contract `1.0.0`、Formal Execution Environment Contract `1.1.0`、
-Protocol `2.1.0` 与 Readiness v13=`READY_FOR_G14C_V11_CLEAN_TRAIN_AND_FORMAL`。唯一 active index 为
-`configs/experiment/typed_model_cache_formal_protocol_v2_1_20260831/protocol_index.json`；Protocol 2.0/A11
-及更早版本全部 audit-only。v10 仅登记为 `PRE-EXECUTION STOP / EXECUTION_IDENTITY_MISMATCH`，没有 durable
-run root、ledger、checkpoint、row 或可复用状态。本轮正式 training/checkpoint/performance 均为 0，holdout
-sealed/unopened，未启动 G14C v11、G14D 或 G15。详见
-`docs/project/formal_environment_identity_projection_contract.md`。
+G14R11 已修复 G14C v11 首个训练单元暴露的 request subject 生命周期分叉，冻结 Formal Request Subject
+Lifecycle Contract `1.0.0`、Formal Request Exposure Trace `2.0.0`、Formal Exogenous Request Execution
+Contract `1.1.0`、Environment Identity Projection `1.1.0`、Execution Environment `1.2.0` 和 Protocol
+`2.2.0`。唯一 active index 为
+`configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901/protocol_index.json`；Protocol 2.1/A12
+及更早版本全部 audit-only。v11 永久登记为 `INVALID_PROTOCOL_OR_IMPLEMENTATION /`
+`invalid_during_first_training_cell_before_first_episode_commit`，禁止 resume、retry、finalize、salvage 或
+checkpoint reuse。G14R11 的 formal training/checkpoint/performance 均为 0，holdout sealed/unopened；没有启动
+G14C v12、G14D 或 G15。详见 `docs/project/formal_request_subject_lifecycle_contract.md`。
 
 G14R8 已建立 Active Bundle Resource Resolution Contract `1.0.0`，冻结 Protocol `1.9.0`、Active Formal
 Bundle Contract `1.1.0` 与 Readiness v11=`READY_FOR_G14C_V9_CLEAN_TRAIN_AND_FORMAL`。唯一 active index 为
@@ -428,16 +429,18 @@ python scripts/build_top_journal_comparison_report.py --final_run_root artifacts
 ```
 
 该入口只生成`non_formal_typed_runtime_rehearsal`，不冻结G14 split/protocol，不训练正式checkpoint，不运行formal、holdout、hidden或G15。合同与运行方法见`docs/project/typed_model_cache_runtime_contract.md`和`docs/project/typed_model_cache_runtime_validation_report.md`。
-# Protocol 2.1 formal request execution and environment identity
+# Protocol 2.2 formal request subject lifecycle
 
-正式 typed model-cache 主线现使用 Protocol 2.1；外生 request exposure 语义保持 Protocol 2.0 不变，并新增
-统一 environment identity projection。唯一 active index：
+正式 typed model-cache 主线现使用 Protocol 2.2。每个 evaluation unit 先按 request horizon 过滤在全部 frame
+持续存在且通过物理连续性检查的车辆，再在该集合内应用原有 `handoff_pressure` 排序；选中的单一车辆在整条
+workflow request exposure 内冻结，runtime 不得静默重选。唯一 active index：
 
 ```text
-configs/experiment/typed_model_cache_formal_protocol_v2_1_20260831/protocol_index.json
+configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901/protocol_index.json
 ```
 
 formal train/dev/evaluation 必须由 active bundle 命令模板显式启用 `--formal-exogenous-request-execution`；
-v1.0–v2.0、G14C v9 与 pre-execution-stopped v10 均只供审计。合同说明见
+v1.0–v2.1、G14C v9/v11 与 pre-execution-stopped v10 均只供审计。合同说明见
+`docs/project/formal_request_subject_lifecycle_contract.md`、
 `docs/project/formal_exogenous_request_execution_contract.md` 与
 `docs/project/formal_environment_identity_projection_contract.md`。

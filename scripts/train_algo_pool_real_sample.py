@@ -59,6 +59,11 @@ from src.runtime.formal_training_identity import (
     load_strict_json_mapping,
     validate_checkpoint_training_identity,
 )
+from src.runtime.formal_exogenous_request_execution import (
+    FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION,
+    FORMAL_REQUEST_EXPOSURE_TRACE_VERSION,
+    FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION,
+)
 from src.runtime.resolved_formal_execution_context import (
     load_resolved_formal_execution_context,
     resolved_python_for_nested_consumer,
@@ -561,7 +566,7 @@ def main() -> None:
     )
 
     if args.formal_contract_preflight_only:
-        if resolved_training.formal_protocol_version not in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0"}:
+        if resolved_training.formal_protocol_version not in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
             raise FormalTrainingContractError(
                 "formal contract preflight is restricted to Protocol v1.6/v1.7"
             )
@@ -739,7 +744,14 @@ def main() -> None:
                     else None
                 ),
                 "formal_exogenous_request_execution_contract_version": (
-                    "1.0.0" if formal_request_exposure_trace is not None else None
+                    FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION
+                    if formal_request_exposure_trace is not None
+                    else None
+                ),
+                "formal_request_subject_lifecycle_contract_version": (
+                    FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION
+                    if formal_request_exposure_trace is not None
+                    else None
                 ),
                 "request_exposure_fingerprint": (
                     formal_request_exposure_trace["request_exposure_fingerprint"]
@@ -828,10 +840,19 @@ def main() -> None:
                     resolved_training.active_formal_bundle_sha256
                 ),
                 "formal_exogenous_request_execution_contract_version": (
-                    "1.0.0" if args.formal_exogenous_request_execution else None
+                    FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION
+                    if args.formal_exogenous_request_execution
+                    else None
                 ),
                 "formal_request_exposure_trace_version": (
-                    "1.0.0" if args.formal_exogenous_request_execution else None
+                    FORMAL_REQUEST_EXPOSURE_TRACE_VERSION
+                    if args.formal_exogenous_request_execution
+                    else None
+                ),
+                "formal_request_subject_lifecycle_contract_version": (
+                    FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION
+                    if args.formal_exogenous_request_execution
+                    else None
                 ),
                 "request_execution_mode": (
                     "replay_driven_exogenous_request_exposure"
@@ -940,10 +961,19 @@ def main() -> None:
             resolved_training.active_formal_bundle_sha256
         ),
         "formal_exogenous_request_execution_contract_version": (
-            "1.0.0" if args.formal_exogenous_request_execution else None
+            FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION
+            if args.formal_exogenous_request_execution
+            else None
         ),
         "formal_request_exposure_trace_version": (
-            "1.0.0" if args.formal_exogenous_request_execution else None
+            FORMAL_REQUEST_EXPOSURE_TRACE_VERSION
+            if args.formal_exogenous_request_execution
+            else None
+        ),
+        "formal_request_subject_lifecycle_contract_version": (
+            FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION
+            if args.formal_exogenous_request_execution
+            else None
         ),
         "request_execution_mode": (
             "replay_driven_exogenous_request_exposure"

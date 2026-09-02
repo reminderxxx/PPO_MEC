@@ -141,3 +141,8 @@
 
 - `formal_environment_identity_projection_contract.md`：Protocol 2.1 full scientific environment projection、
   Protocol-bound extensions、canonical fingerprint、host audit 与 v10 pre-execution stop 边界。
+
+# 2026-09-02 formal request subject lifecycle contract
+
+- `formal_request_subject_lifecycle_contract.md`：Protocol 2.2 持续主体资格、冻结选择证据、RSU/time 对齐、
+  runtime reselection 禁止、analytical replay闭环与 v11 terminal 边界。

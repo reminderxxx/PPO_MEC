@@ -1,0 +1,17 @@
+{
+  "acceptance_evidence_manifest_sha256": "24a43d2569bb3ac4f42439eddb559c9e60bddccbf4e8d879114d22829a82bbf6",
+  "active_bundle_core_sha256": "3242f59cea4b5a113ec4b9b8706a897a07e85f75267c6e649db4d1f3567286c2",
+  "active_formal_bundle_sha256": "6125d2f55209618bab2fbed70d21b9c80501b2b817acd2219bbf452318b48ef7",
+  "clean_candidate_status": "pass",
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "holdout_sealed_unopened": true,
+  "protocol_semantic_sha256": "78d06736734fd8297ccff79e52782068fc37e486375fadcd8112b127db89803e",
+  "protocol_version": "2.2.0",
+  "readiness_review_version": "14.0.0",
+  "scope_boundary": "execution contract readiness only; no G14C v12 run, formal performance, holdout, G14D, G15, algorithm advantage, gate, TMC-ready, or paper-ready claim",
+  "status": "pass",
+  "validation_status": "pass",
+  "verdict": "READY_FOR_G14C_V12_CLEAN_TRAIN_AND_FORMAL"
+}

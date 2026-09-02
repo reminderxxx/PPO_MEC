@@ -32,7 +32,10 @@ def bundle(monkeypatch: pytest.MonkeyPatch) -> dict:
         return "a" * 40
 
     monkeypatch.setattr(active, "_git", fake_git)
-    return active.validate_active_formal_bundle(repository_root=ROOT)
+    ready = load(INDEX).get("status") == active.READY_STATUS
+    return active.validate_active_formal_bundle(
+        repository_root=ROOT, require_ready=ready
+    )
 
 
 def test_v18_schema_failure_is_reproduced_and_not_reintroduced() -> None:
@@ -181,7 +184,7 @@ def test_symlink_and_relative_cli_paths_are_rejected(bundle: dict, tmp_path: Pat
 def test_version_scope_and_same_name_different_hash_are_rejected(bundle: dict) -> None:
     protocol = active.resolve_active_bundle_resource(bundle, "protocol_manifest")
     assert protocol["version_scope"] == "current_protocol_version"
-    assert "v2_1" in protocol["logical_path"]
+    assert "v2_2" in protocol["logical_path"]
     shared = active.resolve_active_bundle_resource(bundle, "portable_resource_registry")
     assert shared["version_scope"] == "shared_historical_stable"
     altered = dict(protocol)

@@ -1,0 +1,33 @@
+{
+  "acceptance_evidence_manifest_version": "1.0.0",
+  "active_bundle_core_sha256": "3242f59cea4b5a113ec4b9b8706a897a07e85f75267c6e649db4d1f3567286c2",
+  "checks": {
+    "clean_detached_candidate": "pass",
+    "cross_agent_capacity_exposure_parity": "pass",
+    "exact_failure_unit_rehearsal": "pass",
+    "exposure_eligibility_audit": "pass",
+    "full_repository_pytest": "pass",
+    "json_round_trip_and_inventory": "pass",
+    "lifecycle_contract": "pass",
+    "negative_validation": "pass",
+    "producer_consumer_matrix": "pass",
+    "protected_files": "pass",
+    "root_cause_audit": "pass",
+    "smoke_test": "pass"
+  },
+  "clean_candidate": {
+    "candidate_commit": "d7e8e96c37f8e69cc9f055a31e4a6a1e3fe03f9d",
+    "detached_head": true,
+    "git_clean": true,
+    "local_venv_present": false,
+    "status": "pass"
+  },
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "g14c_v12_started": false,
+  "g14d_started": false,
+  "g15_started": false,
+  "holdout_sealed_unopened": true,
+  "status": "pass"
+}

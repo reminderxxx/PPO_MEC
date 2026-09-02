@@ -18,6 +18,9 @@ from src.evaluators.cache_baseline_fairness import (
 
 CACHE_REQUEST_REPLAY_VERSION = "1.0.0"
 REQUEST_REPLAY_PRODUCER_VERSION = "policy_neutral_dag_mobility_replay_v1"
+FORMAL_LIFECYCLE_REQUEST_REPLAY_PRODUCER_VERSION = (
+    "policy_neutral_formal_lifecycle_replay_v2"
+)
 FORBIDDEN_INPUT_FIELDS = {
     "actual_cache_hit",
     "cache_hit",
@@ -172,6 +175,50 @@ def validate_request_replay(
     producer = replay.get("producer") or {}
     if producer.get("policy_neutral") is not True or producer.get("executes_cache_policy") is not False:
         errors.append("request replay producer must be policy-neutral and must not execute cache policy")
+    if producer.get("identity") == FORMAL_LIFECYCLE_REQUEST_REPLAY_PRODUCER_VERSION:
+        from src.runtime.formal_exogenous_request_execution import (
+            FORMAL_REQUEST_EXPOSURE_TRACE_VERSION,
+            FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION,
+            FORMAL_REQUEST_SUBJECT_SELECTION_VERSION,
+            REQUIRED_SUBJECT_LIFECYCLE_FIELDS,
+        )
+
+        lifecycle = replay.get("formal_request_subject_lifecycle")
+        semantics = replay.get("request_semantics") or {}
+        fingerprint = replay.get("formal_request_exposure_fingerprint")
+        if not isinstance(lifecycle, dict) or set(lifecycle) != set(
+            REQUIRED_SUBJECT_LIFECYCLE_FIELDS
+        ):
+            errors.append("formal request replay lifecycle evidence fields drift")
+        else:
+            if lifecycle.get("contract_version") != (
+                FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION
+            ):
+                errors.append("formal request replay lifecycle version mismatch")
+            if lifecycle.get("selection_version") != (
+                FORMAL_REQUEST_SUBJECT_SELECTION_VERSION
+            ):
+                errors.append("formal request replay selection version mismatch")
+            if lifecycle.get("reselection_policy") != (
+                "forbidden_during_formal_episode"
+            ):
+                errors.append("formal request replay reselection policy drift")
+            if lifecycle.get("selection_evidence_actor_visible") is not False or lifecycle.get(
+                "selection_evidence_controller_visible"
+            ) is not False:
+                errors.append("formal request replay lifecycle evidence is actor-visible")
+            if lifecycle.get("outcome_independence") is not True:
+                errors.append("formal request replay lifecycle is outcome-dependent")
+        if semantics.get("formal_request_exposure_trace_version") != (
+            FORMAL_REQUEST_EXPOSURE_TRACE_VERSION
+        ):
+            errors.append("formal request replay exposure trace version mismatch")
+        if semantics.get("formal_request_subject_lifecycle_contract_version") != (
+            FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION
+        ):
+            errors.append("formal request replay lifecycle contract version mismatch")
+        if not isinstance(fingerprint, str) or len(fingerprint) != 64:
+            errors.append("formal request replay exposure fingerprint is missing")
     requests = replay.get("requests")
     if not isinstance(requests, list):
         errors.append("requests must be a list")
@@ -238,6 +285,13 @@ def validate_request_replay(
                 errors.append(f"request[{index}].{field} must be a canonical sorted unique list")
         if request.get("current_service_rsu_id") is not None and request["current_service_rsu_id"] not in request["eligible_service_rsu_ids"]:
             errors.append(f"request[{index}] current_service_rsu_id is not service-eligible")
+    if producer.get("identity") == FORMAL_LIFECYCLE_REQUEST_REPLAY_PRODUCER_VERSION:
+        lifecycle = replay.get("formal_request_subject_lifecycle") or {}
+        selected_vehicle_id = lifecycle.get("selected_primary_vehicle_id")
+        if lifecycle.get("exposure_horizon") != len(requests):
+            errors.append("formal request replay exposure horizon mismatch")
+        if any(request.get("vehicle_id") != selected_vehicle_id for request in requests):
+            errors.append("formal request replay vehicle differs from frozen subject")
     expected = replay.get("request_replay_fingerprint")
     if not isinstance(expected, str) or expected != request_replay_fingerprint(replay):
         errors.append("request replay canonical fingerprint mismatch")
@@ -298,9 +352,12 @@ def _input_path(manifest: dict[str, Any], logical_id: str, root: Path) -> Path:
 def build_policy_neutral_replay_from_manifest(
     *, root: str | Path, manifest: dict[str, Any], evaluation_unit_id: str
 ) -> dict[str, Any]:
-    """Reuse the formal workflow/provider/mapper path without executing a policy."""
-    from src.data.mobility.rsu_mapper import RSUMapper
-    from src.evaluators.main_results_support import build_selected_workflow_states, load_window_bundle
+    """Reuse the frozen formal exposure producer without executing a policy."""
+    from src.evaluators.main_results_support import (
+        build_episode_formal_request_exposure,
+        build_selected_workflow_states,
+        load_window_bundle,
+    )
 
     root_path = Path(root).resolve()
     manifest_report = validate_manifest(manifest, root=root_path, check_files=True)
@@ -341,46 +398,67 @@ def build_policy_neutral_replay_from_manifest(
     frames = bundle.frames
     if not frames:
         raise CacheRequestReplayError("mobility window contains no frames")
-    mapper = RSUMapper(bundle.rsu_states)
-    association_maps = [mapper.associate(frame.get("vehicles", [])) for frame in frames]
-    first_ids = sorted(vehicle.vehicle_id for vehicle in frames[0].get("vehicles", []))
-    if not first_ids:
-        raise CacheRequestReplayError("mobility window has no primary vehicle candidate")
-    vehicle_id = first_ids[0]
     catalog_path = _input_path(manifest, "ppo_mec_sample_adapter_catalog", root_path)
     from src.data.model_catalog.adapter_catalog import AdapterCatalog
 
     catalog = AdapterCatalog.from_json(catalog_path)
-    node_map = {node.node_id: node for node in workflow.nodes}
-    max_requests = min(int(unit["max_steps"]), len(workflow.execution_order), max(len(frames) - 1, 0))
+    exposure = build_episode_formal_request_exposure(
+        workflow_state=workflow,
+        mobility_bundle=bundle,
+        adapter_catalog=catalog,
+        max_steps=int(unit["max_steps"]),
+        mobility_source="ngsim",
+        primary_vehicle_selection=str(
+            filters.get("primary_vehicle_selection") or unit["vehicle_selection"]
+        ),
+        cache_capacity_profile={
+            "model_cache_profile_id": "typed_base_adapter_state_v1",
+            "enabled": True,
+            "unit": "mb",
+            "capacity_mb": 288.0,
+            "count_base_model_separately": True,
+            "eviction_policy": "lru",
+            "eviction_policy_seed": int(unit["benchmark_run_seed"]),
+            "telemetry_enabled": True,
+        },
+        evaluation_unit=unit,
+        source_provenance={
+            "phase": "analytical_request_replay",
+            "formal": False,
+            "training": False,
+            "performance_evidence": False,
+            "manifest_id": manifest["identity"]["manifest_id"],
+        },
+    )
     requests: list[dict[str, Any]] = []
     episode_id = f"policy-neutral/{unit['evaluation_unit_id']}"
-    for offset, node_id in enumerate(workflow.execution_order[:max_requests], start=1):
-        node = node_map[node_id]
-        frame_index = offset
-        request_rsu = association_maps[frame_index - 1].get(vehicle_id)
-        current_rsu = association_maps[frame_index].get(vehicle_id)
-        previous_rsu = association_maps[frame_index - 2].get(vehicle_id) if frame_index >= 2 else None
-        next_rsu = association_maps[frame_index + 1].get(vehicle_id) if frame_index + 1 < len(frames) else None
-        resolution = catalog.resolve_adapter_resident_size_mb(node.required_adapter)
-        cache_object = next((item for item in catalog.cache_objects if item.adapter_id == node.required_adapter), None)
-        eligible = [current_rsu] if current_rsu is not None else []
+    for index, formal_request in enumerate(exposure["requests"]):
+        current_rsu = formal_request["current_service_rsu_id"]
+        request_rsu = formal_request["request_rsu_id"]
+        previous_rsu = (
+            exposure["requests"][index - 1]["request_rsu_id"]
+            if index > 0
+            else None
+        )
+        next_rsu = formal_request["oracle_only_future_topology"][
+            "actual_next_rsu_id"
+        ]
         requests.append(
             {
-                "request_id": f"{unit['evaluation_unit_id']}/request_{offset:06d}",
+                "request_id": formal_request["request_id"],
                 "evaluation_unit_id": unit["evaluation_unit_id"],
                 "episode_id": episode_id,
-                "step_index": offset,
-                "time_index": int(frames[frame_index]["time_index"]),
-                "request_order": offset - 1,
-                "vehicle_id": vehicle_id,
-                "workflow_id": workflow.workflow_id,
-                "node_id": node.node_id,
-                "required_base_model": node.required_base_model,
-                "object_id": cache_object.object_id if cache_object else f"adapter:{node.required_adapter}",
-                "adapter_id": node.required_adapter,
-                "object_size_mb": float(resolution.size_mb),
-                "size_source": resolution.source,
+                "step_index": formal_request["step_index"],
+                "time_index": formal_request["time_index"],
+                "request_order": formal_request["request_order"],
+                "vehicle_id": formal_request["vehicle_id"],
+                "workflow_id": formal_request["workflow_id"],
+                "node_id": formal_request["node_id"],
+                "required_base_model": formal_request["required_base_model"],
+                "object_id": formal_request["object_id"],
+                "adapter_id": formal_request["adapter_id"],
+                "object_size_mb": formal_request["object_size_mb"],
+                "size_source": "typed_catalog",
                 "request_rsu_id": request_rsu,
                 "current_service_rsu_id": current_rsu,
                 "previous_rsu_id": previous_rsu,
@@ -388,18 +466,31 @@ def build_policy_neutral_replay_from_manifest(
                 "predicted_next_rsu_id": None,
                 "actual_handoff_target_rsu_id": current_rsu if current_rsu != request_rsu else None,
                 "predicted_handoff_target_rsu_id": None,
-                "eligible_service_rsu_ids": sorted(eligible),
-                "eligible_cache_target_rsu_ids": sorted(eligible),
+                "eligible_service_rsu_ids": formal_request[
+                    "eligible_service_rsu_ids"
+                ],
+                "eligible_cache_target_rsu_ids": formal_request[
+                    "eligible_cache_target_rsu_ids"
+                ],
                 "dag_provenance": {
                     "workflow_dag_sha256": unit["workflow_dag_sha256"],
-                    "execution_order_index": offset - 1,
-                    "predecessors": sorted(node.predecessors),
-                    "successors": sorted(node.successors),
+                    **formal_request["dag_provenance"],
                     "policy_neutral_progression": True,
                 },
+                "model_cache_profile_id": formal_request[
+                    "model_cache_profile_id"
+                ],
+                "typed_model_cache_contract_version": formal_request[
+                    "typed_model_cache_contract_version"
+                ],
+                "catalog_fingerprint": formal_request["catalog_fingerprint"],
+                "requested_typed_objects": formal_request[
+                    "requested_typed_objects"
+                ],
+                "dependency_bundle": formal_request["dependency_bundle"],
             }
         )
-    return build_request_replay(
+    replay = build_request_replay(
         requests=requests,
         evaluation_unit=unit,
         source_manifest=manifest,
@@ -413,3 +504,26 @@ def build_policy_neutral_replay_from_manifest(
             "rsu_mapper": "RSUMapper",
         },
     )
+    replay["formal_request_subject_lifecycle"] = deepcopy(
+        exposure["subject_lifecycle"]
+    )
+    replay["producer"]["identity"] = (
+        FORMAL_LIFECYCLE_REQUEST_REPLAY_PRODUCER_VERSION
+    )
+    replay["formal_request_exposure_fingerprint"] = exposure[
+        "request_exposure_fingerprint"
+    ]
+    replay["request_semantics"].update(
+        formal_request_exposure_trace_version=exposure[
+            "formal_request_exposure_trace_version"
+        ],
+        formal_request_subject_lifecycle_contract_version=exposure[
+            "formal_request_subject_lifecycle_contract_version"
+        ],
+        subject_reselection_policy="forbidden_during_formal_episode",
+    )
+    replay["request_replay_fingerprint"] = request_replay_fingerprint(replay)
+    report = validate_request_replay(replay, source_manifest=manifest)
+    if report["status"] != "pass":
+        raise CacheRequestReplayError("; ".join(report["errors"]))
+    return replay

@@ -20,10 +20,10 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 
-FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION = "1.1.0"
+FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION = "1.2.0"
 LEGACY_FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION = "1.0.0"
-FORMAL_ENVIRONMENT_IDENTITY_PROJECTION_CONTRACT_VERSION = "1.0.0"
-EXECUTION_ENVIRONMENT_RESOLVER_VERSION = "1.1.0"
+FORMAL_ENVIRONMENT_IDENTITY_PROJECTION_CONTRACT_VERSION = "1.1.0"
+EXECUTION_ENVIRONMENT_RESOLVER_VERSION = "1.2.0"
 CRITICAL_PACKAGES = ("torch", "numpy", "pandas", "PyYAML", "pytest")
 DEFAULT_IMPORT_MODULES = (
     "src",
@@ -47,6 +47,7 @@ PROTOCOL_BOUND_EXTENSION_FIELDS = (
     "formal_endpoint_metrics_contract_version",
     "formal_exogenous_request_execution_contract_version",
     "formal_request_exposure_trace_version",
+    "formal_request_subject_lifecycle_contract_version",
 )
 ENVIRONMENT_FINGERPRINT_FIELD = "environment_fingerprint"
 EXECUTION_COMMIT_IDENTITY_RULE = (
@@ -144,8 +145,9 @@ def normalize_protocol_bound_extensions(
     }
     expected_versions = {
         "formal_endpoint_metrics_contract_version": "2.0.0",
-        "formal_exogenous_request_execution_contract_version": "1.0.0",
-        "formal_request_exposure_trace_version": "1.0.0",
+        "formal_exogenous_request_execution_contract_version": "1.1.0",
+        "formal_request_exposure_trace_version": "2.0.0",
+        "formal_request_subject_lifecycle_contract_version": "1.0.0",
     }
     for field, expected in expected_versions.items():
         _validate_contract_version(normalized[field], field=field, expected=expected)
@@ -173,6 +175,9 @@ def protocol_bound_extensions_from_protocol(
             ),
             "formal_request_exposure_trace_version": request_contract.get(
                 "request_exposure_trace_version"
+            ),
+            "formal_request_subject_lifecycle_contract_version": request_contract.get(
+                "request_subject_lifecycle_contract_version"
             ),
         }
     )
@@ -435,7 +440,7 @@ def scientific_environment_identity(
     if contract_version == FORMAL_EXECUTION_ENVIRONMENT_CONTRACT_VERSION:
         if protocol_bound_extensions is None:
             raise ExecutionEnvironmentError(
-                "formal environment 1.1 requires Protocol-bound extensions"
+                "formal environment 1.2 requires Protocol-bound extensions"
             )
         identity["execution_commit"] = EXECUTION_COMMIT_IDENTITY_RULE
         identity["source_root_identity"] = dict(SOURCE_ROOT_IDENTITY_RULE)

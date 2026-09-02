@@ -1,0 +1,23 @@
+{
+  "active_formal_bundle_hash_in_context": true,
+  "artifact_name": "resolved_execution_context.json",
+  "atomic_create_only": true,
+  "canonical_json_finite_only": true,
+  "context_in_integrity_manifest": true,
+  "context_in_phase_input_hash": true,
+  "context_in_phase_ledger": true,
+  "cross_run_or_cross_commit_reuse_allowed": false,
+  "environment_projection_contract_version": "1.1.0",
+  "execution_binding_hash_in_context": true,
+  "full_normalized_environment_projection_in_context": true,
+  "host_paths_in_full_context_hash": true,
+  "implicit_runtime_fallback_allowed": false,
+  "nested_consumers_use_persisted_context": true,
+  "outer_nested_command_matrix_equality_required": true,
+  "outer_runner_is_unique_producer": true,
+  "request_subject_lifecycle_hash_in_context": true,
+  "resume_revalidates_context_hash": true,
+  "scientific_config_hash_in_context": true,
+  "scientific_identity_separate_from_host_paths": true,
+  "version": "2.0.0"
+}

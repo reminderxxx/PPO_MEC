@@ -1,0 +1,154 @@
+{
+  "case_count": 18,
+  "cases": [
+    {
+      "case_id": "missing_lifecycle_field",
+      "error_message": "formal request subject lifecycle fields drift: missing=['eligible_candidate_count'], extra=[]",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "extra_lifecycle_field",
+      "error_message": "formal request subject lifecycle fields drift: missing=[], extra=['unexpected']",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "embedded_lifecycle_version_drift",
+      "error_message": "subject lifecycle embedded contract version mismatch",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "top_level_lifecycle_version_drift",
+      "error_message": "formal request subject lifecycle version mismatch",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "selected_vehicle_tamper",
+      "error_message": "request vehicle differs from frozen subject",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "request_vehicle_tamper",
+      "error_message": "request vehicle differs from frozen subject",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "selection_evidence_visibility_tamper",
+      "error_message": "subject lifecycle selection evidence leaks to actor",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "reselection_policy_tamper",
+      "error_message": "subject lifecycle reselection policy drift",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "outcome_pollution",
+      "error_message": "outcome field contaminates request exposure: trace.requests[0].cache_hit",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "invalid_v11_run_reference",
+      "error_message": "historical invalid G14C v11 source reference is forbidden at trace.source_provenance.historical_source",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "invalid_v11_checkpoint_root_reference",
+      "error_message": "historical invalid G14C v11 source reference is forbidden at trace.source_provenance.checkpoint",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "nonfinite_json",
+      "error_message": "non-finite JSON value at $.requests[0].object_size_mb",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "fingerprint_tamper",
+      "error_message": "request exposure canonical fingerprint mismatch",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "runtime_subject_disappearance",
+      "error_message": "selected formal request subject is not eligible",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "runtime_physical_continuity_failure",
+      "error_message": "selected formal request subject is not eligible",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "runtime_rsu_recomputation_drift",
+      "error_message": "formal request subject current RSU drift",
+      "error_type": "FormalRequestExposureError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "historical_protocol_2_1_active_start",
+      "error_message": "only the unique active protocol index is accepted",
+      "error_type": "ActiveFormalBundleError",
+      "expected_error_fragment_present": true,
+      "expected_failure": true,
+      "status": "pass"
+    },
+    {
+      "case_id": "no_horizon_persistent_subject",
+      "eligible_candidate_count": 0,
+      "expected_failure": true,
+      "status": "pass",
+      "verdict": "BLOCKED_BY_FORMAL_REQUEST_SUBJECT_ELIGIBILITY"
+    }
+  ],
+  "formal": false,
+  "holdout_opened": false,
+  "negative_validation_version": "1.0.0",
+  "performance_evidence": false,
+  "status": "pass",
+  "training": false
+}

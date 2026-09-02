@@ -567,3 +567,20 @@
 - `scripts/repair_formal_environment_identity_projection.py`：Protocol 2.1/config bundle generator。
 - `scripts/build_formal_environment_identity_repair_artifacts.py`：G14R10 finite audit/integrity producer。
 - `scripts/run_formal_exogenous_request_rehearsal.py`、`scripts/run_formal_exogenous_phase_chain_rehearsal.py`：non-formal exact/capacity/phase-chain 验收；不产生 formal evidence。
+
+# G14R11 formal request subject lifecycle modules
+
+- `src/runtime/formal_exogenous_request_execution.py`：lifecycle/trace 版本、候选连续性与 canonical fingerprint、strict
+  validator、CacheEvent vehicle/request/current-RSU alignment 和 endpoint reducer。
+- `src/evaluators/main_results_support.py`：完整 horizon eligibility filter、原 handoff-pressure 排序与 lifecycle producer。
+- `src/envs/core/vec_workflow_core_env.py`：reset 绑定 frozen subject、独立候选/RSU/time 复算与 formal reselection 禁止；
+  legacy 路径保持动态 reselection。
+- `src/oracles/cache_request_replay.py`：analytical replay 复用 lifecycle exposure producer并绑定 exposure fingerprint；
+  oracle/opportunity 不得独立选车。
+- `src/runtime/formal_execution_environment.py`、`formal_training_identity.py`、`resolved_formal_execution_context.py`、
+  `formal_training_contract.py`：Protocol 2.2 lifecycle extension进入 environment、binding、context和checkpoint provenance。
+- `src/runtime/active_formal_bundle.py`：Protocol 2.2 lifecycle contract/schema/environment/readiness 原子 resource gate。
+- `scripts/repair_formal_request_subject_lifecycle.py`：Protocol 2.2/config bundle generator。
+- `scripts/run_formal_request_subject_lifecycle_rehearsal.py`：exact failure-unit 与全未封存窗口 non-formal audit。
+- `scripts/build_formal_request_subject_lifecycle_artifacts.py`：negative/matrix/readiness/integrity evidence producer。
+- `tests/test_formal_request_subject_lifecycle.py`：subject lifecycle、RSU、visibility、legacy compatibility 与 schema 负例。

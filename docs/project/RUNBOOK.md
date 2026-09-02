@@ -1273,3 +1273,26 @@ python scripts/run_formal_exogenous_request_rehearsal.py \
 ```
 
 该命令只生成 `formal=false` rehearsal，不得作为 formal performance 使用。
+
+# Protocol 2.2 formal request subject lifecycle
+
+唯一 active index：
+
+```text
+configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901/protocol_index.json
+```
+
+只读/非正式验收入口：
+
+```bash
+.venv/bin/python scripts/run_formal_request_subject_lifecycle_rehearsal.py --mode exact
+.venv/bin/python scripts/run_formal_request_subject_lifecycle_rehearsal.py --mode eligibility
+```
+
+`exact` 只重演 v11 首个失败单元并禁止 optimizer/checkpoint/performance；`eligibility` 只扫描未封存
+train/dev/formal 的 frozen windows/workflows，holdout 仅读取 seal/metadata。两者不得用于算法选择或论文结果。
+
+未来独立 G14C v12 必须从 pushed、Git-clean、`HEAD == main == origin/main` 的新 worktree 启动；outer gate 必须
+先验证 ready Protocol 2.2 bundle、environment projection、60/60 reachability、186-command expansion、
+holdout capability=false 以及 v11 denylist。Protocol 2.1/v11 artifact 不得作为 resume、checkpoint、candidate、
+replay 或 manifest 输入。

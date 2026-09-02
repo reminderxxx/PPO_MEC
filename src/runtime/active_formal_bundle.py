@@ -29,12 +29,12 @@ from src.runtime.formal_execution_environment import (
 
 ACTIVE_FORMAL_BUNDLE_CONTRACT_VERSION = "1.1.0"
 ACTIVE_BUNDLE_RESOURCE_RESOLUTION_CONTRACT_VERSION = "1.0.0"
-ACTIVE_PROTOCOL_VERSION = "2.1.0"
-ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v2_1"
-READY_STATUS = "READY_FOR_G14C_V11_CLEAN_TRAIN_AND_FORMAL"
-READINESS_VERSION = "13.0.0"
+ACTIVE_PROTOCOL_VERSION = "2.2.0"
+ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v2_2"
+READY_STATUS = "READY_FOR_G14C_V12_CLEAN_TRAIN_AND_FORMAL"
+READINESS_VERSION = "14.0.0"
 DEFAULT_ACTIVE_INDEX_RELATIVE = (
-    "configs/experiment/typed_model_cache_formal_protocol_v2_1_20260831/"
+    "configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901/"
     "protocol_index.json"
 )
 CAPACITY_ORDER = (
@@ -247,6 +247,7 @@ def _validate_resource_rows(
         "window_consumption_contract",
         "formal_exogenous_request_execution_contract",
         "formal_request_exposure_schema",
+        "formal_request_subject_lifecycle_contract",
         "environment_identity_projection_contract",
     }
     if require_readiness:
@@ -450,7 +451,7 @@ def validate_active_formal_bundle(
         readiness_row = resources["readiness_companion"]
         readiness = _strict_object(
             _resolve_registered_path(root, readiness_row["logical_path"], "readiness"),
-            "Readiness v13 companion",
+            "Readiness v14 companion",
         )
         if readiness.get("readiness_review_version") != READINESS_VERSION:
             raise ActiveFormalBundleError("Readiness companion version mismatch")

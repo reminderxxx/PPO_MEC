@@ -31,8 +31,16 @@ from src.metrics.cache_efficiency_metrics import (
 from src.metrics.recorder import EpisodeRecorder
 from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
 from src.runtime.formal_exogenous_request_execution import (
+    FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION,
+    FORMAL_REQUEST_EXPOSURE_TRACE_VERSION,
+    FORMAL_REQUEST_PHYSICAL_CONTINUITY_RULE_VERSION,
+    FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION,
+    FORMAL_REQUEST_SUBJECT_SELECTION_VERSION,
+    FormalRequestExposureError,
     build_formal_request_exposure_trace,
     compute_formal_endpoint_metrics,
+    eligible_candidate_fingerprint,
+    eligible_formal_request_subject_ids,
 )
 
 
@@ -1563,7 +1571,9 @@ def run_real_episode(
                 else None
             ),
             "formal_exogenous_request_execution_contract_version": (
-                "1.0.0" if formal_request_exposure_trace is not None else None
+                FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION
+                if formal_request_exposure_trace is not None
+                else None
             ),
             "request_exposure_fingerprint": (
                 formal_request_exposure_trace.get("request_exposure_fingerprint")
@@ -1637,10 +1647,40 @@ def build_episode_formal_request_exposure(
         reward_positive_offset=0.0,
         cache_capacity_profile=cache_capacity_profile,
     )
-    state, _ = probe.reset()
-    primary_vehicle_id = state.get("primary_vehicle_id")
+    request_count = min(len(workflow_state.execution_order), int(max_steps), len(frames) - 1)
+    eligible_vehicle_ids = eligible_formal_request_subject_ids(
+        frames, request_count=request_count
+    )
+    if not eligible_vehicle_ids:
+        raise FormalRequestExposureError(
+            "BLOCKED_BY_FORMAL_REQUEST_SUBJECT_ELIGIBILITY: "
+            "evaluation unit has no horizon-persistent physical vehicle"
+        )
+    primary_vehicle_id = None
+    if probe._uses_handoff_pressure_primary_selection():
+        primary_vehicle_id = probe._select_high_pressure_vehicle_id(
+            candidate_vehicle_ids=set(eligible_vehicle_ids)
+        )
     if primary_vehicle_id is None:
-        raise ValueError("formal request exposure has no primary vehicle")
+        primary_vehicle_id = eligible_vehicle_ids[0]
+    subject_lifecycle = {
+        "contract_version": FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION,
+        "selection_mode": str(primary_vehicle_selection),
+        "selection_version": FORMAL_REQUEST_SUBJECT_SELECTION_VERSION,
+        "exposure_horizon": request_count,
+        "selected_primary_vehicle_id": str(primary_vehicle_id),
+        "eligible_candidate_count": len(eligible_vehicle_ids),
+        "eligible_candidate_canonical_fingerprint": eligible_candidate_fingerprint(
+            eligible_vehicle_ids
+        ),
+        "physical_continuity_rule_version": (
+            FORMAL_REQUEST_PHYSICAL_CONTINUITY_RULE_VERSION
+        ),
+        "reselection_policy": "forbidden_during_formal_episode",
+        "selection_evidence_actor_visible": False,
+        "selection_evidence_controller_visible": False,
+        "outcome_independence": True,
+    }
     return build_formal_request_exposure_trace(
         evaluation_unit=evaluation_unit,
         workflow_state=workflow_state,
@@ -1649,6 +1689,7 @@ def build_episode_formal_request_exposure(
         adapter_catalog=adapter_catalog,
         primary_vehicle_id=str(primary_vehicle_id),
         primary_vehicle_selection=primary_vehicle_selection,
+        subject_lifecycle=subject_lifecycle,
         max_steps=max_steps,
         source_provenance=source_provenance,
     )

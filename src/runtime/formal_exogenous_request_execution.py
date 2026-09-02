@@ -14,8 +14,15 @@ from copy import deepcopy
 from typing import Any, Iterable, Mapping
 
 
-FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION = "1.0.0"
-FORMAL_REQUEST_EXPOSURE_TRACE_VERSION = "1.0.0"
+FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION = "1.1.0"
+FORMAL_REQUEST_EXPOSURE_TRACE_VERSION = "2.0.0"
+FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION = "1.0.0"
+FORMAL_REQUEST_SUBJECT_SELECTION_VERSION = "persistent_subject_selection_v1.0.0"
+FORMAL_REQUEST_PHYSICAL_CONTINUITY_RULE_VERSION = "vec_displacement_speed_guard_v1.0.0"
+DENIED_FORMAL_REQUEST_SOURCE_TOKENS = (
+    "typed_model_cache_formal_20260901_155201_g14c_v11",
+    "ppo_mec_g14c_v11_e19108a_20260901_155201",
+)
 FORMAL_ENDPOINT_METRICS_CONTRACT_VERSION = "2.0.0"
 FORMAL_OUTCOME_TRACE_VERSION = "1.0.0"
 
@@ -74,6 +81,22 @@ REQUIRED_REQUEST_FIELDS = frozenset(
         "oracle_only_future_topology",
     }
 )
+REQUIRED_SUBJECT_LIFECYCLE_FIELDS = frozenset(
+    {
+        "contract_version",
+        "selection_mode",
+        "selection_version",
+        "exposure_horizon",
+        "selected_primary_vehicle_id",
+        "eligible_candidate_count",
+        "eligible_candidate_canonical_fingerprint",
+        "physical_continuity_rule_version",
+        "reselection_policy",
+        "selection_evidence_actor_visible",
+        "selection_evidence_controller_visible",
+        "outcome_independence",
+    }
+)
 
 
 class FormalRequestExposureError(ValueError):
@@ -93,6 +116,76 @@ def canonical_json_bytes(value: Any) -> bytes:
 
 def canonical_sha256(value: Any) -> str:
     return hashlib.sha256(canonical_json_bytes(value)).hexdigest()
+
+
+def _vehicle_value(vehicle: Any, field: str) -> Any:
+    if isinstance(vehicle, Mapping):
+        return vehicle.get(field)
+    return getattr(vehicle, field)
+
+
+def formal_request_vehicle_step_is_physical(previous_vehicle: Any, current_vehicle: Any) -> bool:
+    """The existing VEC displacement/speed guard, frozen for subject eligibility."""
+
+    previous_position = (
+        float(_vehicle_value(previous_vehicle, "position_x")),
+        float(_vehicle_value(previous_vehicle, "position_y")),
+    )
+    current_position = (
+        float(_vehicle_value(current_vehicle, "position_x")),
+        float(_vehicle_value(current_vehicle, "position_y")),
+    )
+    displacement = math.dist(previous_position, current_position)
+    max_speed = max(
+        float(_vehicle_value(previous_vehicle, "speed") or 0.0),
+        float(_vehicle_value(current_vehicle, "speed") or 0.0),
+    )
+    return bool(displacement <= max(25.0, 0.5 * max_speed))
+
+
+def eligible_formal_request_subject_ids(
+    mobility_frames: Iterable[Mapping[str, Any]], *, request_count: int
+) -> list[str]:
+    """Return canonical subjects present and physically continuous for frames 0..H."""
+
+    frames = list(mobility_frames)
+    horizon = int(request_count)
+    if horizon <= 0 or len(frames) <= horizon:
+        raise FormalRequestExposureError("formal request subject horizon is not reachable")
+    vehicle_maps: list[dict[str, Any]] = []
+    segment_run_ids: set[str] = set()
+    for frame in frames[: horizon + 1]:
+        segment_run_id = frame.get("source_segment_run_id")
+        if segment_run_id is not None:
+            segment_run_ids.add(str(segment_run_id))
+        vehicle_map: dict[str, Any] = {}
+        for vehicle in frame.get("vehicles", []):
+            vehicle_id = str(_vehicle_value(vehicle, "vehicle_id"))
+            if vehicle_id in vehicle_map:
+                raise FormalRequestExposureError(
+                    f"duplicate vehicle identity within mobility frame: {vehicle_id}"
+                )
+            vehicle_map[vehicle_id] = vehicle
+        vehicle_maps.append(vehicle_map)
+    if len(segment_run_ids) > 1:
+        raise FormalRequestExposureError("formal subject horizon crosses segment-run identity")
+    common_ids = set(vehicle_maps[0])
+    for vehicle_map in vehicle_maps[1:]:
+        common_ids.intersection_update(vehicle_map)
+    eligible: list[str] = []
+    for vehicle_id in sorted(common_ids):
+        if all(
+            formal_request_vehicle_step_is_physical(
+                vehicle_maps[index - 1][vehicle_id], vehicle_maps[index][vehicle_id]
+            )
+            for index in range(1, len(vehicle_maps))
+        ):
+            eligible.append(vehicle_id)
+    return eligible
+
+
+def eligible_candidate_fingerprint(vehicle_ids: Iterable[str]) -> str:
+    return canonical_sha256({"eligible_vehicle_ids": sorted(str(row) for row in vehicle_ids)})
 
 
 def _validate_json(value: Any, path: str = "$") -> None:
@@ -137,7 +230,24 @@ def request_exposure_fingerprint(trace: Mapping[str, Any]) -> str:
     payload = deepcopy(dict(trace))
     payload.pop("request_exposure_fingerprint", None)
     payload.pop("validation", None)
+    # Execution paths, capacity-specific runtime hashes, agent labels, and phase
+    # labels remain auditable provenance but are not part of exogenous demand.
+    payload.pop("source_provenance", None)
     return canonical_sha256(payload)
+
+
+def _reject_denied_source_references(value: Any, *, path: str = "trace") -> None:
+    if isinstance(value, str):
+        if any(token in value for token in DENIED_FORMAL_REQUEST_SOURCE_TOKENS):
+            raise FormalRequestExposureError(
+                f"historical invalid G14C v11 source reference is forbidden at {path}"
+            )
+    elif isinstance(value, Mapping):
+        for key, child in value.items():
+            _reject_denied_source_references(child, path=f"{path}.{key}")
+    elif isinstance(value, (list, tuple)):
+        for index, child in enumerate(value):
+            _reject_denied_source_references(child, path=f"{path}[{index}]")
 
 
 def build_formal_request_exposure_trace(
@@ -149,6 +259,7 @@ def build_formal_request_exposure_trace(
     adapter_catalog: Any,
     primary_vehicle_id: str,
     primary_vehicle_selection: str,
+    subject_lifecycle: Mapping[str, Any],
     max_steps: int,
     source_provenance: Mapping[str, Any],
 ) -> dict[str, Any]:
@@ -238,14 +349,18 @@ def build_formal_request_exposure_trace(
         "formal_exogenous_request_execution_contract_version": (
             FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION
         ),
+        "formal_request_subject_lifecycle_contract_version": (
+            FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION
+        ),
         "producer": {
-            "identity": "formal_request_exposure_producer_v1.0.0",
+            "identity": "formal_request_exposure_producer_v2.0.0",
             "policy_neutral": True,
             "executes_agent": False,
             "executes_cache_service_or_workflow_outcome": False,
         },
         "evaluation_unit": deepcopy(dict(evaluation_unit)),
         "source_provenance": deepcopy(dict(source_provenance)),
+        "subject_lifecycle": deepcopy(dict(subject_lifecycle)),
         "execution_semantics": {
             "mode": "replay_driven_exogenous_request_exposure",
             "default_enabled": False,
@@ -277,12 +392,17 @@ def build_formal_request_exposure_trace(
 def validate_formal_request_exposure_trace(trace: Mapping[str, Any]) -> dict[str, Any]:
     _validate_json(trace)
     _walk_forbidden(trace, path="trace")
+    _reject_denied_source_references(trace)
     if trace.get("formal_request_exposure_trace_version") != FORMAL_REQUEST_EXPOSURE_TRACE_VERSION:
         raise FormalRequestExposureError("unsupported formal request exposure trace version")
     if trace.get("formal_exogenous_request_execution_contract_version") != (
         FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION
     ):
         raise FormalRequestExposureError("formal execution contract version mismatch")
+    if trace.get("formal_request_subject_lifecycle_contract_version") != (
+        FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION
+    ):
+        raise FormalRequestExposureError("formal request subject lifecycle version mismatch")
     producer = trace.get("producer") or {}
     if producer.get("policy_neutral") is not True or producer.get("executes_agent") is not False:
         raise FormalRequestExposureError("request exposure producer is not policy-neutral")
@@ -292,6 +412,41 @@ def validate_formal_request_exposure_trace(trace: Mapping[str, Any]) -> dict[str
     requests = trace.get("requests")
     if not isinstance(requests, list) or not requests:
         raise FormalRequestExposureError("formal request exposure is missing or empty")
+    lifecycle = trace.get("subject_lifecycle")
+    if not isinstance(lifecycle, Mapping):
+        raise FormalRequestExposureError("formal request subject lifecycle evidence is missing")
+    lifecycle_fields = set(lifecycle)
+    if lifecycle_fields != REQUIRED_SUBJECT_LIFECYCLE_FIELDS:
+        missing = sorted(REQUIRED_SUBJECT_LIFECYCLE_FIELDS - lifecycle_fields)
+        extra = sorted(lifecycle_fields - REQUIRED_SUBJECT_LIFECYCLE_FIELDS)
+        raise FormalRequestExposureError(
+            f"formal request subject lifecycle fields drift: missing={missing}, extra={extra}"
+        )
+    if lifecycle.get("contract_version") != FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION:
+        raise FormalRequestExposureError("subject lifecycle embedded contract version mismatch")
+    if lifecycle.get("selection_version") != FORMAL_REQUEST_SUBJECT_SELECTION_VERSION:
+        raise FormalRequestExposureError("subject lifecycle selection version mismatch")
+    if lifecycle.get("physical_continuity_rule_version") != (
+        FORMAL_REQUEST_PHYSICAL_CONTINUITY_RULE_VERSION
+    ):
+        raise FormalRequestExposureError("subject lifecycle physical continuity version mismatch")
+    if lifecycle.get("selection_mode") != semantics.get("primary_vehicle_selection"):
+        raise FormalRequestExposureError("subject lifecycle selection mode mismatch")
+    if int(lifecycle.get("exposure_horizon", -1)) != len(requests):
+        raise FormalRequestExposureError("subject lifecycle exposure horizon mismatch")
+    if int(lifecycle.get("eligible_candidate_count", 0)) <= 0:
+        raise FormalRequestExposureError("subject lifecycle has no eligible candidate")
+    if not isinstance(lifecycle.get("eligible_candidate_canonical_fingerprint"), str):
+        raise FormalRequestExposureError("subject lifecycle candidate fingerprint is missing")
+    if lifecycle.get("reselection_policy") != "forbidden_during_formal_episode":
+        raise FormalRequestExposureError("subject lifecycle reselection policy drift")
+    if lifecycle.get("selection_evidence_actor_visible") is not False:
+        raise FormalRequestExposureError("subject lifecycle selection evidence leaks to actor")
+    if lifecycle.get("selection_evidence_controller_visible") is not False:
+        raise FormalRequestExposureError("subject lifecycle selection evidence leaks to controller")
+    if lifecycle.get("outcome_independence") is not True:
+        raise FormalRequestExposureError("subject lifecycle is not outcome independent")
+    selected_vehicle_id = str(lifecycle.get("selected_primary_vehicle_id"))
     seen: set[str] = set()
     for index, request in enumerate(requests):
         if not isinstance(request, Mapping):
@@ -303,6 +458,8 @@ def validate_formal_request_exposure_trace(trace: Mapping[str, Any]) -> dict[str
         if request_id in seen:
             raise FormalRequestExposureError(f"duplicate request exposure: {request_id}")
         seen.add(request_id)
+        if str(request["vehicle_id"]) != selected_vehicle_id:
+            raise FormalRequestExposureError("request vehicle differs from frozen subject")
         if int(request["request_order"]) != index or int(request["step_index"]) != index + 1:
             raise FormalRequestExposureError("request exposure is missing or out of order")
         for field in ("eligible_service_rsu_ids", "eligible_cache_target_rsu_ids"):
@@ -342,6 +499,8 @@ def validate_formal_request_exposure_trace(trace: Mapping[str, Any]) -> dict[str
         "request_exposure_fingerprint": expected,
         "future_fields_actor_visible": False,
         "outcome_fields_present": False,
+        "subject_lifecycle_status": "pass",
+        "selected_primary_vehicle_id": selected_vehicle_id,
     }
 
 
@@ -379,6 +538,7 @@ def align_cache_event_to_request(
         formal_request_alignment_version="1.0.0",
         formal_request_id=str(request["request_id"]),
         formal_request_order=int(request["request_order"]),
+        current_service_rsu_id=request["current_service_rsu_id"],
         request_exposure_fingerprint=str(trace_fingerprint),
         request_alignment_status="matched_exactly_once",
     )
@@ -502,12 +662,19 @@ __all__ = [
     "FORMAL_ENDPOINT_METRICS_CONTRACT_VERSION",
     "FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION",
     "FORMAL_REQUEST_EXPOSURE_TRACE_VERSION",
+    "FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION",
+    "FORMAL_REQUEST_SUBJECT_SELECTION_VERSION",
+    "FORMAL_REQUEST_PHYSICAL_CONTINUITY_RULE_VERSION",
+    "REQUIRED_SUBJECT_LIFECYCLE_FIELDS",
     "FormalRequestExposureError",
     "align_cache_event_to_request",
     "build_formal_request_exposure_trace",
     "build_outcome_audit",
     "canonical_sha256",
     "compute_formal_endpoint_metrics",
+    "eligible_candidate_fingerprint",
+    "eligible_formal_request_subject_ids",
+    "formal_request_vehicle_step_is_physical",
     "request_exposure_fingerprint",
     "validate_formal_request_exposure_trace",
 ]

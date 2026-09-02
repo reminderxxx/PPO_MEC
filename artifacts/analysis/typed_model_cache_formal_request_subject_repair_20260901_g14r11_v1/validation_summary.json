@@ -1,0 +1,48 @@
+{
+  "clean_candidate": {
+    "candidate_commit": "b4c64498d5f9217c918c6348376e29158194d54c",
+    "detached": true,
+    "git_clean": true,
+    "local_venv_present": false,
+    "ready_required": true,
+    "status": "pass"
+  },
+  "compile_import": {
+    "command": "PYTHONPYCACHEPREFIX=/private/tmp/g14r11_ready_b4c6449_pycache /Users/howen/Projects/PPO_MEC/.venv/bin/python -m compileall -q src scripts tests",
+    "status": "pass"
+  },
+  "full_repository_pytest": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 /Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q",
+    "failed": 0,
+    "passed": 1171,
+    "skipped": 0,
+    "status": "pass"
+  },
+  "git_diff_check": {
+    "command": "git diff --check",
+    "status": "pass"
+  },
+  "json_round_trip_and_inventory": {
+    "scope": "Protocol 2.2 config plus G14R11 analysis artifact; final self-excluding inventory is emitted after readiness finalization",
+    "status": "pass"
+  },
+  "lifecycle_and_consumer_regression": {
+    "failed": 0,
+    "passed": 500,
+    "status": "pass"
+  },
+  "ready_bundle_regression": {
+    "failed": 0,
+    "passed": 66,
+    "skipped": 0,
+    "status": "pass"
+  },
+  "smoke_test": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 /Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/smoke_test.py",
+    "status": "pass",
+    "terminated": true,
+    "truncated": false
+  },
+  "status": "pass",
+  "validation_summary_version": "1.0.0"
+}

@@ -479,3 +479,14 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
   projection 传入 binding、resolved context、training/checkpoint provenance；active validator 逐字段验证。
 - v10 不是 invalid formal run：durable run、ledger、checkpoint、row 均不存在，禁止伪造 run/failure artifact。
 - 剩余风险：readiness 仅授权未来独立 G14C v11，不是 formal/performance/paper-ready 证据；holdout 继续 sealed。
+
+# 2026-09-02 — G14C v11 formal request subject lifecycle drift（已合同修复）
+
+- 已确认：Protocol 2.1 exposure producer 在 reset 冻结 `i_80:1116`，但没有证明该车辆覆盖完整 request horizon；
+  frame 4 缺失后 legacy runtime 重选 `i_80:1120`，造成 request trace 与 runtime/CacheEvent 身份分叉。
+- 已修复：Protocol 2.2 在 exposure 前过滤 frame `0..request_count` 持续存在且物理连续的车辆，随后按原
+  `handoff_pressure` 选择并冻结一个 subject；runtime 禁止 formal episode 内静默重选并独立复算候选/RSU/time。
+- 永久边界：v11 run/root/checkpoint/candidate/partial output 全部禁止 resume、retry、finalize、salvage、复制或
+  复用。Protocol 2.1 仅保留 audit compatibility，不得作为 active execution。
+- 剩余风险：G14R11 只证明 execution contract 与 non-formal rehearsal；尚未运行 G14C v12、formal performance
+  或 holdout，不能形成算法优势、formal gate、G14/TMC/paper-ready 结论。

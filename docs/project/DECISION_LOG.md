@@ -991,3 +991,17 @@ runtime audit，commit/source 使用无自引用 rule 并在启动时记录 obse
 删除 extension、接受旧小 hash 或硬编码 expected fingerprint 都会掩盖科学身份分叉。
 
 约束：G08 replay 保持 analytical oracle 身份，不升级为 formal execution producer；legacy non-formal 默认路径继续兼容。Endpoint schema 升级为 2.0，失败/不完整 workflow delay 为 `null/unavailable`。
+
+# 2026-09-02 — D-G14R11 单 workflow 单连续车辆是唯一 formal request subject lifecycle
+
+决定：Protocol 2.2 对每个 evaluation unit 先按完整 request horizon 过滤持续存在且通过既有 physical-continuity
+guard 的车辆，再在合格集合内应用未改变的 `handoff_pressure` 排序和确定性 tie-break。选中车辆在该 workflow
+episode 的全部 request 中冻结；formal runtime 不得重选或反向修改 exposure。
+
+原因：G14C v11 证明 reset-time 车辆选择与 runtime missing-primary reselection 的生命周期不同，会使 producer、
+runtime 与 CacheEvent 的 vehicle/current-RSU identity 在首个单元内分叉。删除 identity 字段、接受任意车辆/RSU
+或放宽 validator 都会掩盖 matched estimand 破坏。
+
+约束：资格和选择不读取 action/reward/cache/service/checkpoint/holdout outcome；selection evidence 不进入 actor/
+controller observation。Analytical request replay 必须复用 lifecycle producer，但继续保持 oracle-only、outcome-blind
+角色。Legacy/non-formal dynamic reselection 保持兼容。

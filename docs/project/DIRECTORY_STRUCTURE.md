@@ -199,6 +199,14 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 - `artifacts/analysis/typed_model_cache_formal_environment_identity_repair_20260831_g14r10_v1/`：G14R10
   pre-execution stop、projection/matrix/negative/clean acceptance/integrity 证据。
 - `docs/project/formal_environment_identity_projection_contract.md`：projection 规范与 claim boundary。
+
+# Protocol 2.2 additions
+
+- `configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901/`：唯一 active Protocol/index、request
+  lifecycle/trace contract、environment projection、binding/context schema 与 Readiness v14。
+- `artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1/`：G14R11 root cause、
+  matrix、negative、eligibility/parity、exact/clean acceptance 与 integrity 证据。
+- `docs/project/formal_request_subject_lifecycle_contract.md`：单 workflow 单连续车辆、RSU/time、runtime 与 claim boundary。
 ```text
 configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831/
   protocol_index.json

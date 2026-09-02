@@ -56,6 +56,10 @@ from src.runtime.typed_model_cache_runtime import (
     resolve_model_cache_runtime,
     validate_checkpoint_provenance,
 )
+from src.runtime.formal_exogenous_request_execution import (
+    FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION,
+    FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION,
+)
 from src.runtime.portable_resource_identity import (
     add_portable_resource_arguments,
     resolve_argument_resources,
@@ -1076,7 +1080,14 @@ def main() -> None:
             args.formal_exogenous_request_execution
         ),
         "formal_exogenous_request_execution_contract_version": (
-            "1.0.0" if args.formal_exogenous_request_execution else None
+            FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION
+            if args.formal_exogenous_request_execution
+            else None
+        ),
+        "formal_request_subject_lifecycle_contract_version": (
+            FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION
+            if args.formal_exogenous_request_execution
+            else None
         ),
         "request_exposure_fingerprints": request_exposure_fingerprints,
         "checkpoint_provenance_validation": checkpoint_provenance_validation,

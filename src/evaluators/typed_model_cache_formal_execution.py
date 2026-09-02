@@ -49,6 +49,8 @@ FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION = "2.0.0"
 FORMAL_EXECUTION_PROTOCOL_V2_0_ID = "typed_model_cache_formal_protocol_v2_0"
 FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION = "2.1.0"
 FORMAL_EXECUTION_PROTOCOL_V2_1_ID = "typed_model_cache_formal_protocol_v2_1"
+FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION = "2.2.0"
+FORMAL_EXECUTION_PROTOCOL_V2_2_ID = "typed_model_cache_formal_protocol_v2_2"
 FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
 FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
 LEGACY_PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
@@ -576,6 +578,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION,
+        FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION,
     }:
         raise FormalExecutionError("unsupported formal execution protocol version")
     expected_protocol_id = {
@@ -590,6 +593,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION: FORMAL_EXECUTION_PROTOCOL_V1_9_ID,
         FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION: FORMAL_EXECUTION_PROTOCOL_V2_0_ID,
         FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION: FORMAL_EXECUTION_PROTOCOL_V2_1_ID,
+        FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION: FORMAL_EXECUTION_PROTOCOL_V2_2_ID,
     }[version]
     if protocol.get("protocol_id") != expected_protocol_id:
         raise FormalExecutionError("formal execution protocol ID mismatch")
@@ -755,6 +759,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION: "1.8.0",
                 FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION: "1.9.0",
                 FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION: "2.0.0",
+                FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION: "2.1.0",
             }[version]
             expected_old_status = {
                 FORMAL_EXECUTION_PROTOCOL_V1_7_VERSION: "invalid_after_training_before_dev_performance_execution",
@@ -766,6 +771,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION: (
                     "audit_only_after_pre_execution_identity_mismatch"
                 ),
+                FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION: "invalid_protocol_or_implementation",
             }[version]
             if supersession.get("supersedes_version") != expected_supersedes:
                 raise FormalExecutionError(
@@ -804,6 +810,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION,
+                FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION,
             }:
                 expected_boundaries["typed_model_cache_formal_20260828_101804_g14c_v8"] = (
                     "invalid_after_training_before_dev_performance_execution",
@@ -814,6 +821,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
             if version in {
                 FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION,
+                FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION,
             }:
                 expected_boundaries[
                     "typed_model_cache_formal_20260830_113339_g14c_v9"
@@ -822,6 +830,15 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                     "ec6b04fee48c4abda056b62f508f186345f10ab580efd896f9f43979d1d728fe",
                     150,
                     1200,
+                )
+            if version == FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION:
+                expected_boundaries[
+                    "typed_model_cache_formal_20260901_155201_g14c_v11"
+                ] = (
+                    "invalid_during_first_training_cell_before_first_episode_commit",
+                    "b5eb0063c0cde2670d298027a8aeea1b4661b77fc404b72f673970642662e362",
+                    0,
+                    0,
                 )
         expected_failures = {
             (run_id, values[1]) for run_id, values in expected_boundaries.items()
@@ -863,16 +880,18 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
             ):
                 raise FormalExecutionError("invalid formal run boundary or reuse rule changed")
         environment = protocol.get("formal_execution_environment_contract", {})
-        expected_environment_version = (
-            "1.1.0"
-            if version == FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION
-            else "1.0.0"
-        )
+        expected_environment_version = {
+            FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION: "1.1.0",
+            FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION: "1.2.0",
+        }.get(version, "1.0.0")
         if environment.get("version") != expected_environment_version:
             raise FormalExecutionError("formal execution environment contract is missing")
         expected_identity_rule = (
             "full_projection_v1_excludes_host_paths_and_binds_observed_commit_and_tree_out_of_band"
-            if version == FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION
+            if version in {
+                FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION,
+                FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION,
+            }
             else "environment identity != host-specific Python absolute path"
         )
         if environment.get("scientific_identity", {}).get("identity_rule") != expected_identity_rule:
@@ -892,6 +911,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION,
+                FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION,
             }
             else [
                 "explicit_python_executable",
@@ -900,11 +920,10 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 "protocol_allowed_candidate",
             ]
         )
-        expected_resolver_version = (
-            "1.1.0"
-            if version == FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION
-            else "1.0.0"
-        )
+        expected_resolver_version = {
+            FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION: "1.1.0",
+            FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION: "1.2.0",
+        }.get(version, "1.0.0")
         if resolver.get("version") != expected_resolver_version or resolver.get("priority") != expected_priority:
             raise FormalExecutionError("formal Python resolver priority changed")
         execution = protocol.get("execution_contract", {})
@@ -943,6 +962,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
             FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
             FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
             FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION,
+            FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION,
         }:
             resolved = protocol.get("resolved_formal_execution_context_contract", {})
             if (
@@ -955,6 +975,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                         FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
                         FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
                         FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION,
+                        FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION,
                     }
                     else "1.0.0"
                 )
@@ -993,6 +1014,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                 FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
                 FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION,
+                FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION,
             }:
                 scientific = protocol.get(
                     "agent_training_scientific_config_contract", {}
@@ -1029,6 +1051,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                     FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
                     FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
                     FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION,
+                    FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION,
                 }:
                     from src.runtime.formal_agent_order import (
                         FormalAgentOrderError,
@@ -1057,6 +1080,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
                     FORMAL_EXECUTION_PROTOCOL_V1_9_VERSION,
                     FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
                     FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION,
+                    FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION,
                 }:
                     resource_contract = protocol.get(
                         "active_bundle_resource_resolution_contract", {}
@@ -1080,6 +1104,7 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
         if version in {
             FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
             FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION,
+            FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION,
         }
         else LEGACY_PRIMARY_ENDPOINT_SCHEMA_VERSION
     )
@@ -1088,11 +1113,20 @@ def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
     if version in {
         FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION,
+        FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION,
     }:
         request_contract = protocol.get("formal_exogenous_request_execution_contract", {})
+        expected_request_contract = (
+            ("1.1.0", "2.0.0", "1.0.0")
+            if version == FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION
+            else ("1.0.0", "1.0.0", None)
+        )
         if (
-            request_contract.get("version") != "1.0.0"
-            or request_contract.get("request_exposure_trace_version") != "1.0.0"
+            request_contract.get("version") != expected_request_contract[0]
+            or request_contract.get("request_exposure_trace_version")
+            != expected_request_contract[1]
+            or request_contract.get("request_subject_lifecycle_contract_version")
+            != expected_request_contract[2]
             or request_contract.get("default_enabled") is not False
             or request_contract.get("formal_explicit_enable_required") is not True
         ):
@@ -1922,6 +1956,8 @@ __all__ = [
     "FORMAL_EXECUTION_PROTOCOL_V2_0_VERSION",
     "FORMAL_EXECUTION_PROTOCOL_V2_1_ID",
     "FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION",
+    "FORMAL_EXECUTION_PROTOCOL_V2_2_ID",
+    "FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION",
     "FORMAL_PHASE_LEDGER_SCHEMA_VERSION",
     "FORMAL_PHASE_RUNNER_VERSION",
     "FAILURE_CLASSIFICATIONS",

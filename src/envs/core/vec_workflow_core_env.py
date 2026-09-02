@@ -31,6 +31,9 @@ from src.envs.specs import (
 from src.runtime.formal_exogenous_request_execution import (
     FormalRequestExposureError,
     align_cache_event_to_request,
+    eligible_candidate_fingerprint,
+    eligible_formal_request_subject_ids,
+    formal_request_vehicle_step_is_physical,
     validate_formal_request_exposure_trace,
 )
 
@@ -199,10 +202,13 @@ class VecWorkflowCoreEnv:
 
         self._mapper.update_rsus(self.rsu_states)
         vehicles = self._mobility_provider.reset()
-        self._initialize_primary_vehicle_id(vehicles)
         self._formal_request_exposure_index = 0
         if self._formal_request_exposure_trace is not None:
+            lifecycle = self._formal_request_exposure_trace["subject_lifecycle"]
+            self._primary_vehicle_id = str(lifecycle["selected_primary_vehicle_id"])
             self._initialize_formal_request_exposure()
+        else:
+            self._initialize_primary_vehicle_id(vehicles)
         associations = self._mapper.associate(vehicles)
         self._apply_associations(vehicles, associations)
         predictions = self._build_predictions(vehicles, associations)
@@ -261,6 +267,25 @@ class VecWorkflowCoreEnv:
 
         vehicles = self._mobility_provider.step()
         self._ensure_primary_vehicle_id(vehicles)
+        if self._formal_request_exposure_trace is not None:
+            current_subject = next(
+                (
+                    vehicle
+                    for vehicle in vehicles
+                    if vehicle.vehicle_id == self._primary_vehicle_id
+                ),
+                None,
+            )
+            if current_subject is None:
+                raise FormalRequestExposureError(
+                    "formal request subject missing during frozen episode"
+                )
+            if not pre_action_vehicle or not formal_request_vehicle_step_is_physical(
+                pre_action_vehicle, current_subject
+            ):
+                raise FormalRequestExposureError(
+                    "formal request subject physical continuity failure"
+                )
         associations = self._mapper.associate(vehicles)
         handoff_events = [
             event.to_dict()
@@ -645,8 +670,35 @@ class VecWorkflowCoreEnv:
         semantics = trace.get("execution_semantics") or {}
         if semantics.get("primary_vehicle_selection") != self._primary_vehicle_selection:
             raise FormalRequestExposureError("primary vehicle selection drift")
-        if str(trace["requests"][0]["vehicle_id"]) != str(self._primary_vehicle_id):
+        lifecycle = trace["subject_lifecycle"]
+        selected_vehicle_id = str(lifecycle["selected_primary_vehicle_id"])
+        if str(trace["requests"][0]["vehicle_id"]) != selected_vehicle_id:
             raise FormalRequestExposureError("primary vehicle identity drift")
+        trajectory_frames = list(getattr(self._mobility_provider, "_trajectory_frames", []))
+        eligible_vehicle_ids = eligible_formal_request_subject_ids(
+            trajectory_frames, request_count=len(trace["requests"])
+        )
+        if selected_vehicle_id not in eligible_vehicle_ids:
+            raise FormalRequestExposureError("selected formal request subject is not eligible")
+        if int(lifecycle["eligible_candidate_count"]) != len(eligible_vehicle_ids):
+            raise FormalRequestExposureError("formal request subject candidate count drift")
+        if lifecycle["eligible_candidate_canonical_fingerprint"] != (
+            eligible_candidate_fingerprint(eligible_vehicle_ids)
+        ):
+            raise FormalRequestExposureError("formal request subject candidate fingerprint drift")
+        associations = [
+            self._mapper.associate(self._frame_to_vehicle_states(frame))
+            for frame in trajectory_frames[: len(trace["requests"]) + 1]
+        ]
+        for index, request in enumerate(trace["requests"], start=1):
+            if int(request["time_index"]) != int(trajectory_frames[index]["time_index"]):
+                raise FormalRequestExposureError("formal request subject time identity drift")
+            if request["request_rsu_id"] != associations[index - 1].get(selected_vehicle_id):
+                raise FormalRequestExposureError("formal request subject request RSU drift")
+            if request["current_service_rsu_id"] != associations[index].get(
+                selected_vehicle_id
+            ):
+                raise FormalRequestExposureError("formal request subject current RSU drift")
         catalog_fingerprints = {
             str(request.get("catalog_fingerprint")) for request in trace["requests"]
         }
@@ -751,14 +803,13 @@ class VecWorkflowCoreEnv:
         }
         if self._formal_request_exposure_trace is not None:
             state["formal_request_exposure"] = {
-                "contract_version": "1.0.0",
-                "request_exposure_fingerprint": self._formal_request_exposure_trace[
-                    "request_exposure_fingerprint"
-                ],
+                "contract_version": "2.0.0",
                 "current_request_index": int(self._formal_request_exposure_index),
                 "request_count": len(self._formal_request_exposure_trace["requests"]),
                 "oracle_future_fields_actor_visible": False,
                 "outcome_fields_present": False,
+                "selection_evidence_actor_visible": False,
+                "selection_evidence_controller_visible": False,
             }
         return state
 
@@ -825,6 +876,10 @@ class VecWorkflowCoreEnv:
     def _ensure_primary_vehicle_id(self, vehicles: list[VehicleState]) -> None:
         if self._primary_vehicle_id and any(vehicle.vehicle_id == self._primary_vehicle_id for vehicle in vehicles):
             return
+        if self._formal_request_exposure_trace is not None:
+            raise FormalRequestExposureError(
+                "formal request subject missing; reselection is forbidden"
+            )
         if self._mobility_source == "lust" and self._primary_vehicle_id:
             return
         self._initialize_primary_vehicle_id(vehicles)
@@ -834,6 +889,10 @@ class VecWorkflowCoreEnv:
         vehicles: list[VehicleState],
     ) -> VehicleState | None:
         if not vehicles:
+            if self._formal_request_exposure_trace is not None:
+                raise FormalRequestExposureError(
+                    "formal request subject frame is empty; reselection is forbidden"
+                )
             self._primary_vehicle_id = None
             return None
         self._ensure_primary_vehicle_id(vehicles)
@@ -2603,12 +2662,7 @@ class VecWorkflowCoreEnv:
         previous_vehicle: VehicleState,
         current_vehicle: VehicleState,
     ) -> bool:
-        displacement = math.dist(
-            (float(previous_vehicle.position_x), float(previous_vehicle.position_y)),
-            (float(current_vehicle.position_x), float(current_vehicle.position_y)),
-        )
-        max_speed = max(float(previous_vehicle.speed or 0.0), float(current_vehicle.speed or 0.0))
-        return bool(displacement <= max(25.0, 0.5 * max_speed))
+        return formal_request_vehicle_step_is_physical(previous_vehicle, current_vehicle)
 
     def _frame_to_vehicle_states(self, frame: dict[str, Any]) -> list[VehicleState]:
         vehicles: list[VehicleState] = []

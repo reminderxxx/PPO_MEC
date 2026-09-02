@@ -1,0 +1,76 @@
+{
+  "all_files_strict_json_finite_round_trip": true,
+  "artifact_integrity_manifest_version": "1.0.0",
+  "artifact_root": "artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1",
+  "file_count_excluding_self": 11,
+  "files": [
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1/acceptance_evidence_manifest.json",
+      "sha256": "24a43d2569bb3ac4f42439eddb559c9e60bddccbf4e8d879114d22829a82bbf6",
+      "size_bytes": 1058,
+      "strict_json_finite_round_trip": true
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1/clean_candidate_validation.json",
+      "sha256": "74a252a47cf2185854718cb103b03c42a520638776af2607dfdc996feb04c2c5",
+      "size_bytes": 1857,
+      "strict_json_finite_round_trip": true
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1/cross_agent_capacity_exposure_parity.json",
+      "sha256": "8b7ac8db61cbca209d1692bb33ecca8c42e4d58ac7f20d09700dd210a6fb41cc",
+      "size_bytes": 54119,
+      "strict_json_finite_round_trip": true
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1/exact_v11_failure_unit_rehearsal.json",
+      "sha256": "ac4c0387dc17d3d098a89577e35ce36cb1b4d7199f07307791ccba258ee1c5b6",
+      "size_bytes": 4501,
+      "strict_json_finite_round_trip": true
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1/exposure_eligibility_audit.json",
+      "sha256": "864e7df94572ba542052fd5ac90864b6ebc2c51a01eb51b03e4ccf34289a6d2e",
+      "size_bytes": 79880,
+      "strict_json_finite_round_trip": true
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1/formal_request_subject_lifecycle_contract.json",
+      "sha256": "c3f6720d7bf986f92869f53488df79f9045ed3d79a63118abf6a54ee00aabeea",
+      "size_bytes": 1908,
+      "strict_json_finite_round_trip": true
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1/negative_validation.json",
+      "sha256": "ed62471dfae5a9eadf77eba6a1466cf5fbb07ff6f4bf2d6736811617c80754f3",
+      "size_bytes": 5502,
+      "strict_json_finite_round_trip": true
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1/producer_consumer_matrix.json",
+      "sha256": "4b8806560a578b59391e1c1b006b41a7c340a68a2b32e3d6229a5dee517c5d58",
+      "size_bytes": 5346,
+      "strict_json_finite_round_trip": true
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1/readiness_review.json",
+      "sha256": "dffcacf91f66188d01ac49bc86d33d09eb877d69f16373f649f99bc217f596ca",
+      "size_bytes": 930,
+      "strict_json_finite_round_trip": true
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1/root_cause_audit.json",
+      "sha256": "c901dd0a5e006162fceebf31204a8e140520e569326fa7890ab4acafc3f15572",
+      "size_bytes": 6628,
+      "strict_json_finite_round_trip": true
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1/validation_summary.json",
+      "sha256": "4a292bc84d0c3185c7176b7c3dd39cf57222b659a0ec0455f675a950514d3c18",
+      "size_bytes": 1414,
+      "strict_json_finite_round_trip": true
+    }
+  ],
+  "inventory_recomputed": true,
+  "status": "pass"
+}

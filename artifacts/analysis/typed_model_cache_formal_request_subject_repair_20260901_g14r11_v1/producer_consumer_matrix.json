@@ -1,0 +1,146 @@
+{
+  "formal_request_vehicle_and_rsu_fields_retained": true,
+  "producer_consumer_matrix_version": "1.0.0",
+  "row_count": 17,
+  "rows": [
+    {
+      "closure": "direct lifecycle producer",
+      "consumer_id": "exposure_builder",
+      "path": "src/evaluators/main_results_support.py",
+      "required_evidence_token": "eligible_formal_request_subject_ids",
+      "role": "producer",
+      "status": "pass"
+    },
+    {
+      "closure": "direct independent recomputation and fail-fast",
+      "consumer_id": "runtime_environment",
+      "path": "src/envs/core/vec_workflow_core_env.py",
+      "required_evidence_token": "selected formal request subject is not eligible",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "direct trace provenance",
+      "consumer_id": "training",
+      "path": "scripts/train_algo_pool_real_sample.py",
+      "required_evidence_token": "FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "same Protocol 2.2 execution flag",
+      "consumer_id": "dev_selection",
+      "path": "scripts/run_typed_model_cache_formal_dev_selection.py",
+      "required_evidence_token": "--formal-exogenous-request-execution",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "lifecycle semantic hash transitively bound by request contract",
+      "consumer_id": "checkpoint_freeze_provenance",
+      "path": "src/runtime/formal_training_identity.py",
+      "required_evidence_token": "formal_exogenous_request_execution",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "lifecycle semantic hash transitively bound by request contract",
+      "consumer_id": "resolved_execution_context",
+      "path": "src/runtime/resolved_formal_execution_context.py",
+      "required_evidence_token": "formal_exogenous_request_execution",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "direct lifecycle replay gate",
+      "consumer_id": "formal_cache_policy",
+      "path": "scripts/run_typed_model_cache_formal_cache_policy.py",
+      "required_evidence_token": "formal_request_subject_lifecycle",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "direct episode provenance",
+      "consumer_id": "formal_controller",
+      "path": "scripts/benchmark_main_results.py",
+      "required_evidence_token": "formal_request_subject_lifecycle_contract_version",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "direct request/runtime/event alignment companion",
+      "consumer_id": "cache_event_alignment",
+      "path": "src/runtime/formal_exogenous_request_execution.py",
+      "required_evidence_token": "current_service_rsu_id=request",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "strict aligned-event denominator",
+      "consumer_id": "endpoint_reducer",
+      "path": "src/runtime/formal_exogenous_request_execution.py",
+      "required_evidence_token": "compute_formal_endpoint_metrics",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "one exposure fingerprint per evaluation unit",
+      "consumer_id": "cross_agent_fairness",
+      "path": "scripts/benchmark_main_results.py",
+      "required_evidence_token": "validate_observed_fingerprint_matrix",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "reuses direct lifecycle producer and validates evidence",
+      "consumer_id": "request_replay",
+      "path": "src/oracles/cache_request_replay.py",
+      "required_evidence_token": "FORMAL_LIFECYCLE_REQUEST_REPLAY_PRODUCER_VERSION",
+      "role": "producer_consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "strict replay consumer; cannot select another subject",
+      "consumer_id": "future_oracle",
+      "path": "scripts/run_future_horizon_cache_oracle.py",
+      "required_evidence_token": "load_and_validate_request_replay",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "strict replay consumer; outcome remains separate",
+      "consumer_id": "opportunity_analyzer",
+      "path": "scripts/analyze_cache_opportunities.py",
+      "required_evidence_token": "load_and_validate_request_replay",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "Protocol and resolved-context gate",
+      "consumer_id": "statistics",
+      "path": "scripts/run_typed_model_cache_formal_statistics.py",
+      "required_evidence_token": "validate_protocol_v1_1",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "active bundle gate before run-root write",
+      "consumer_id": "integrity_and_gate",
+      "path": "scripts/run_typed_model_cache_formal_protocol.py",
+      "required_evidence_token": "validate_active_formal_bundle",
+      "role": "consumer",
+      "status": "pass"
+    },
+    {
+      "closure": "atomic lifecycle resource identity",
+      "consumer_id": "active_bundle",
+      "path": "src/runtime/active_formal_bundle.py",
+      "required_evidence_token": "formal_request_subject_lifecycle_contract",
+      "role": "consumer",
+      "status": "pass"
+    }
+  ],
+  "scientific_fields_removed_or_relaxed": false,
+  "status": "pass",
+  "validator_bypass_allowed": false
+}

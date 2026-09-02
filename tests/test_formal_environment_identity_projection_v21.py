@@ -32,12 +32,15 @@ from scripts.run_typed_model_cache_formal_protocol import resolved_expansion_con
 
 
 ROOT = Path(__file__).resolve().parents[1]
-V21 = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_1_20260831"
+V22 = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901"
 V20 = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_0_20260831"
-PROTOCOL = json.loads((V21 / "protocol_v2_1_manifest.json").read_text())
-MANIFEST = json.loads((V21 / "execution_environment_manifest.json").read_text())
+V21 = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_1_20260831"
+PROTOCOL = json.loads((V22 / "protocol_v2_2_manifest.json").read_text())
+MANIFEST = json.loads((V22 / "execution_environment_manifest.json").read_text())
 IDENTITY = MANIFEST["scientific_identity"]
 EXTENSIONS = protocol_bound_extensions_from_protocol(PROTOCOL)
+INDEX_PAYLOAD = json.loads((V22 / "protocol_index.json").read_text())
+ACTIVE_READY = INDEX_PAYLOAD.get("status") == "READY_FOR_G14C_V12_CLEAN_TRAIN_AND_FORMAL"
 
 
 def runtime_projection() -> dict:
@@ -163,6 +166,7 @@ def test_10_builder_resolver_and_child_parity_are_deterministic() -> None:
 def test_11_active_index_manifest_protocol_and_projection_are_atomic() -> None:
     bundle = validate_active_formal_bundle(
         repository_root=ROOT,
+        require_ready=ACTIVE_READY,
         require_clean_git=False,
         require_origin_main_match=False,
     )
@@ -182,6 +186,7 @@ def test_11b_unpushed_candidate_is_rejected_by_formal_origin_gate() -> None:
     if head == origin:
         validate_active_formal_bundle(
             repository_root=ROOT,
+            require_ready=ACTIVE_READY,
             require_clean_git=False,
             require_origin_main_match=True,
         )
@@ -189,6 +194,7 @@ def test_11b_unpushed_candidate_is_rejected_by_formal_origin_gate() -> None:
         with pytest.raises(ActiveFormalBundleError, match="HEAD == origin/main"):
             validate_active_formal_bundle(
                 repository_root=ROOT,
+                require_ready=ACTIVE_READY,
                 require_clean_git=False,
                 require_origin_main_match=True,
             )
@@ -199,6 +205,17 @@ def test_12_protocol_20_active_execution_is_rejected() -> None:
         validate_active_formal_bundle(
             repository_root=ROOT,
             index_path=V20 / "protocol_index.json",
+            require_clean_git=False,
+        )
+
+
+def test_12b_protocol_21_is_historical_audit_only_and_rejected_as_active() -> None:
+    historical = json.loads((V21 / "protocol_v2_1_manifest.json").read_text())
+    assert historical["typed_model_cache_formal_protocol_version"] == "2.1.0"
+    with pytest.raises(ActiveFormalBundleError, match="unique active protocol index"):
+        validate_active_formal_bundle(
+            repository_root=ROOT,
+            index_path=V21 / "protocol_index.json",
             require_clean_git=False,
         )
 
@@ -236,15 +253,15 @@ def test_15_wrong_types_and_unsupported_major_are_rejected() -> None:
 
 def test_16_binding_and_resolved_context_record_the_full_projection(tmp_path: Path) -> None:
     result = resolved()
-    index = json.loads((V21 / "protocol_index.json").read_text())
-    scientific = json.loads((V21 / "agent_training_scientific_config.json").read_text())
+    index = json.loads((V22 / "protocol_index.json").read_text())
+    scientific = json.loads((V22 / "agent_training_scientific_config.json").read_text())
     expansion = resolved_expansion_context(
         PROTOCOL,
-        protocol_path=str(V21 / "protocol_v2_1_manifest.json"),
+        protocol_path=str(V22 / "protocol_v2_2_manifest.json"),
         output_root=str(tmp_path),
         python_executable=sys.executable,
         active_formal_bundle_sha256=index["active_formal_bundle_sha256"],
-        active_protocol_index_path=str(V21 / "protocol_index.json"),
+        active_protocol_index_path=str(V22 / "protocol_index.json"),
         active_bundle_resource_resolution_audit_sha256="a" * 64,
     )
     binding = build_execution_binding(
@@ -261,7 +278,7 @@ def test_16_binding_and_resolved_context_record_the_full_projection(tmp_path: Pa
         expansion_context=expansion,
         environment_identity=result.environment_identity,
         runtime_audit=result.runtime_audit,
-        environment_manifest_path=V21 / "execution_environment_manifest.json",
+        environment_manifest_path=V22 / "execution_environment_manifest.json",
         outer_expansion_sha256="b" * 64,
         phase_count=15,
         command_count=186,
@@ -285,7 +302,7 @@ def test_16_binding_and_resolved_context_record_the_full_projection(tmp_path: Pa
         execution_binding=binding,
         resolved_execution_context=context,
     )
-    assert training.formal_protocol_version == "2.1.0"
+    assert training.formal_protocol_version == "2.2.0"
     assert training.full_normalized_environment_projection == IDENTITY
     order = resolve_formal_agent_order(protocol=PROTOCOL, scientific_config=scientific)
     assert len(order["main_benchmark_agent_order"]) == 15

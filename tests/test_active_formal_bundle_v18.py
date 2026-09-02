@@ -13,8 +13,8 @@ from src.evaluators.typed_model_cache_formal_execution import FormalExecutionErr
 
 
 ROOT = Path(__file__).resolve().parents[1]
-V18 = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827"
-INDEX = V18 / "protocol_index.json"
+ACTIVE_ROOT = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901"
+INDEX = ACTIVE_ROOT / "protocol_index.json"
 V17_INDEX = (
     ROOT
     / "configs/experiment/typed_model_cache_formal_protocol_v1_7_20260827"
@@ -152,10 +152,10 @@ def test_old_environment_path_rejected_even_with_correct_cli_environment(
     )
     refresh_ready_hash(bundle_root, index)
     correct_cli = bundle_root / (
-        "configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827/"
+        "configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901/"
         "execution_environment_manifest.json"
     )
-    with pytest.raises(active.ActiveFormalBundleError, match="outside v1.8|does not equal"):
+    with pytest.raises(active.ActiveFormalBundleError, match="outside the active Protocol|does not equal"):
         validate(
             bundle_root,
             execution_environment_manifest_path=correct_cli,
@@ -187,9 +187,9 @@ def test_active_resource_content_or_identity_drift_is_rejected(
 def test_protocol_path_hash_drift_and_same_name_different_hash_are_rejected(
     bundle_root: Path,
 ) -> None:
-    different = bundle_root / "elsewhere/protocol_v1_8_manifest.json"
+    different = bundle_root / "elsewhere/protocol_v2_2_manifest.json"
     different.parent.mkdir(parents=True)
-    different.write_bytes((V18 / "protocol_v1_8_manifest.json").read_bytes() + b"\n")
+    different.write_bytes((ACTIVE_ROOT / "protocol_v2_2_manifest.json").read_bytes() + b"\n")
     with pytest.raises(active.ActiveFormalBundleError, match="does not equal"):
         validate(bundle_root, protocol_path=different)
 
@@ -261,11 +261,11 @@ def test_symlink_cwd_guessing_and_alternate_index_are_rejected(
     alias = bundle_root / "protocol_alias"
     alias.symlink_to(
         bundle_root
-        / "configs/experiment/typed_model_cache_formal_protocol_v1_8_20260827",
+        / "configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901",
         target_is_directory=True,
     )
     with pytest.raises(active.ActiveFormalBundleError, match="symlink"):
-        validate(bundle_root, protocol_path=alias / "protocol_v1_8_manifest.json")
+        validate(bundle_root, protocol_path=alias / "protocol_v2_2_manifest.json")
 
 
 def test_outer_runner_source_gates_dry_run_before_output_writes() -> None:
@@ -274,11 +274,12 @@ def test_outer_runner_source_gates_dry_run_before_output_writes() -> None:
     dry = source.index("if args.dry_run:")
     binding_write = source.index("atomic_create_execution_binding(", dry)
     assert gate < dry < binding_write
-    assert "formal Protocol v1.0-v1.7 is audit-only" in source
+    assert "formal Protocol v1.0-v2.1 is audit-only" in source
 
 
-def test_g14c_v1_through_v7_invalid_roots_remain_rejected() -> None:
-    protocol = load(V18 / "protocol_v1_8_manifest.json")
+def test_all_registered_invalid_roots_including_v11_remain_rejected() -> None:
+    protocol = load(ACTIVE_ROOT / "protocol_v2_2_manifest.json")
+    assert any(item["run_id"].endswith("g14c_v11") for item in protocol["supersession"]["invalid_execution_runs"])
     for item in protocol["supersession"]["invalid_execution_runs"]:
         root = ROOT / "artifacts/experiments/typed_model_cache_formal" / item["run_id"]
         with pytest.raises(FormalExecutionError, match="permanently rejected"):

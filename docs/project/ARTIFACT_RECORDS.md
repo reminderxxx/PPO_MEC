@@ -1373,6 +1373,18 @@ Run `g14a_rehearsal_20260819_230456_872949`使用`controlled_non_hidden`窗口�
   七文件保护、readiness 与 content integrity。
 - 证据边界：execution-contract evidence only；formal training/checkpoint/performance=`0/0/0`，holdout
   sealed/unopened，未启动 G14C v11/G14D/G15。
+
+# 2026-09-02 — G14R11 formal request subject lifecycle repair
+
+- artifact：`artifacts/analysis/typed_model_cache_formal_request_subject_repair_20260901_g14r11_v1/`
+- 内容：v11 exact root-cause audit、lifecycle contract、producer/consumer matrix、18-case negative validation、
+  exact failure-unit rehearsal、144-unit eligibility audit、6,480-cell cross-agent/capacity parity、clean candidate、
+  readiness 与 inventory/hash/size integrity。
+- Exact unit：`seed_7/g14b_i_80_run_002_f3723_3746_t1113437139200_1113437141500/j_3`，288 MB，
+  SA-GHMAPPO runtime shape，9 requests/9 CacheEvents/denominator 9，固定 subject `i_80:1120`。
+- Holdout：12-window seal/metadata only；opened=false，request exposure/vehicle selection/performance均未生成。
+- 证据边界：execution-contract + real non-formal rehearsal；formal training/checkpoint/performance=`0/0/0`，未启动
+  G14C v12/G14D/G15，不支持算法优势、formal gate、G14/TMC/paper-ready 结论。
 - Artifact root：`artifacts/analysis/typed_model_cache_formal_exogenous_request_repair_20260831_g14r9_v1/`
 - Evidence level：contract + synthetic mechanism + exact real-unit non-formal rehearsal；不是 formal performance。
 - Exact unit：`seed_7/g14b_i_80_run_003_f10501_10524_t1113438615000_1113438617300/j_8`，288 MB，22 steps，15 agents，单一 external exposure fingerprint，alignment 全通过。

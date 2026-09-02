@@ -43,6 +43,7 @@ def main() -> None:
         "1.9.0",
         "2.0.0",
         "2.1.0",
+        "2.2.0",
     }:
         if not args.resolved_execution_context_path:
             raise ValueError("active protocol preflight requires resolved execution context")
