@@ -1,0 +1,26 @@
+{
+  "active_bundle_core_sha256": "126150c8e4ed060575e00de640aeaef9e1b8b445a2994daad85045883b562601",
+  "checks": {
+    "clean_candidate_validation": "pass",
+    "exact_wrapper_preflight_after_fix": "pass",
+    "exact_wrapper_reproduction_before_fix": "pass",
+    "full_repository_pytest": "pass",
+    "g14c_v13_pre_execution_stop": "pass",
+    "negative_validation": "pass",
+    "phase_chain_rehearsal": "pass",
+    "producer_consumer_matrix": "pass",
+    "protected_files": "pass",
+    "protocol_capability_matrix": "pass",
+    "protocol_v2_4_diff_audit": "pass",
+    "root_cause_analysis": "pass",
+    "smoke_test": "pass",
+    "strict_serialization_and_integrity": "pass"
+  },
+  "clean_candidate": true,
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "holdout_capability": false,
+  "holdout_sealed_unopened_unconsumed": true,
+  "status": "pass"
+}

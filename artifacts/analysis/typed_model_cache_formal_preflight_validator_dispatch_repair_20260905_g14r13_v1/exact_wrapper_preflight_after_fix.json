@@ -1,0 +1,23 @@
+{
+  "absolute_sentinel_count": 0,
+  "candidate_commit": "9525c91803feb2fb613095d3dbd5b273c737a866",
+  "command_count": 186,
+  "execution_path": "real nested validator subprocess with persisted resolved context",
+  "holdout_metadata_only": true,
+  "nested_command_matrix_sha256": "7e5f5f33a7dd4261dd2318d419fd826c52923db063763ceb253a02315745af16",
+  "outer_command_matrix_sha256": "7e5f5f33a7dd4261dd2318d419fd826c52923db063763ceb253a02315745af16",
+  "outer_nested_expansion_equal": true,
+  "performance_fields_read": false,
+  "phase_count": 15,
+  "protocol_version": "2.4.0",
+  "provider_frame_count": 73871,
+  "python_executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "raw_rows_scanned": 11850526,
+  "resolved_context_consumed": true,
+  "resolved_context_sha256": "ea40aecca28ed9ec704164fe8076232580617c5d6947073c9c313a0dfae33e48",
+  "single_absolute_python": true,
+  "status": "pass",
+  "training_command_count": 150,
+  "unresolved_placeholder_count": 0,
+  "window_reachability": "60/60"
+}

@@ -1,0 +1,23 @@
+{
+  "candidate_commit": "9525c91803feb2fb613095d3dbd5b273c737a866",
+  "candidate_has_local_venv": false,
+  "candidate_local_venv_is_symlink": false,
+  "command_count": 186,
+  "detached_git_clean_candidate": true,
+  "explicit_shared_absolute_python": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "full_pytest": {
+    "failed": 0,
+    "passed": 1182,
+    "skipped": 16
+  },
+  "git_diff_check": "pass",
+  "head_equals_origin_main_during_acceptance": true,
+  "imports_from_clean_candidate": true,
+  "outer_nested_expansion_equal": true,
+  "provider_frames_rebuilt": 73871,
+  "raw_rows_scanned": 11850526,
+  "real_nested_preflight": "pass",
+  "status": "pass",
+  "tests_phase_junit_path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/tests_phase_junit.xml",
+  "window_reachability": "60/60"
+}

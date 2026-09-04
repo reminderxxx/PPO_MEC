@@ -1,0 +1,12 @@
+{
+  "candidate_commit": "95106b0b53a937f8944fc39f6e9ba8b78b377b10",
+  "expected_failure_reproduced": true,
+  "failure_classification": "child_command_failure",
+  "failure_message": "Traceback (most recent call last):\n  File \"/private/tmp/ppo_mec_g14r13_before_95106b0/scripts/validate_typed_model_cache_formal_restart.py\", line 133, in <module>\n    main()\n  File \"/private/tmp/ppo_mec_g14r13_before_95106b0/scripts/validate_typed_model_cache_formal_restart.py\", line 60, in main\n    command_report = validate_command_templates(\n  File \"/private/tmp/ppo_mec_g14r13_before_95106b0/src/evaluators/typed_model_cache_formal_execution.py\", line 533, in validate_command_templates\n    plan = expand_command_plan(spec, expansion_context)\n  File \"/private/tmp/ppo_mec_g14r13_before_95106b0/src/evaluators/typed_model_cache_formal_execution.py\", line 481, in expand_command_plan\n    base_context = {\n  File \"/private/tmp/ppo_mec_g14r13_before_95106b0/src/evaluators/typed_model_cache_formal_execution.py\", line 482, in <dictcomp>\n    key: resolve_location(value, key) for key, value in base_context.items()\n  File \"/private/tmp/ppo_mec_g14r13_before_95106b0/src/evaluators/typed_model_cache_formal_execution.py\", line 475, in resolve_location\n    raise FormalExecutionError(\nsrc.evaluators.typed_model_cache_formal_execution.FormalExecutionError: resolved command expansion requires an absolute repository root\n",
+  "phase_ledger_terminal_hash": "e1bc57e16a7df77126b8a0e48d42cd8ce1a81b21cdf48229680a74042140a5cb",
+  "public_outer_runner": true,
+  "resolved_execution_context_argument_present": true,
+  "return_code": 1,
+  "selected_phase": "preflight",
+  "status": "pass"
+}

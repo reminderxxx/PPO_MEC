@@ -1,0 +1,13 @@
+{
+  "active_bundle_core_sha256": "126150c8e4ed060575e00de640aeaef9e1b8b445a2994daad85045883b562601",
+  "evidence_manifest_path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/acceptance_evidence_manifest.json",
+  "evidence_manifest_sha256": "c5f6c99395057f50f828c4e1ce36ae5d186230888627cef35dc7c8f6fc61c55e",
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "holdout_capability": false,
+  "holdout_sealed_unopened_unconsumed": true,
+  "readiness_review_version": "16.0.0",
+  "status": "ready",
+  "verdict": "READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL"
+}

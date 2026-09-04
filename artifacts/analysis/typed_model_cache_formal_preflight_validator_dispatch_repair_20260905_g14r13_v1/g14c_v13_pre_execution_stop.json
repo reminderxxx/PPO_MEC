@@ -1,0 +1,16 @@
+{
+  "checkpoint_denylist_entry_created": false,
+  "classification": "PRE_EXECUTION_STOP / VALIDATOR_VERSION_DISPATCH_MISMATCH",
+  "clean_execution_worktree_created": false,
+  "durable_formal_run_root_created": false,
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_preflight_child_executed": false,
+  "formal_training_count": 0,
+  "g14c_attempt": "v13",
+  "holdout_sealed_unopened_unconsumed": true,
+  "invalid_run_record_created": false,
+  "phase_or_cell_ledger_created": false,
+  "status": "pass",
+  "tests_executed": false
+}

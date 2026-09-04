@@ -1,0 +1,83 @@
+{
+  "artifact_count_excluding_this_manifest": 14,
+  "artifact_inventory_sha256": "83dcf118f846cce9b181c7278fb3ffa210bdeb5bc297c03ccd33877828291637",
+  "artifacts": [
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/acceptance_evidence_manifest.json",
+      "sha256": "c5f6c99395057f50f828c4e1ce36ae5d186230888627cef35dc7c8f6fc61c55e",
+      "size_bytes": 900
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/clean_candidate_validation.json",
+      "sha256": "61fef0c0307b74f42fbc343abc0aa089b376f5e6ad3de100e281a4bd61b63776",
+      "size_bytes": 850
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/exact_wrapper_preflight_after_fix.json",
+      "sha256": "d38d2140be81d76670faa2d6160a891f228fd0bdb3baaca1a7acc30c076649f1",
+      "size_bytes": 1007
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/exact_wrapper_reproduction_before_fix.json",
+      "sha256": "e4a75d16ca9d1c9648df8605da264ffa5a502b529ddd42bd269707bb20eb781e",
+      "size_bytes": 1690
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/g14c_v13_pre_execution_stop.json",
+      "sha256": "77d73857b0d1a582041e3c413ed9edff05e4cf23486cdb571990722ed2dcedd0",
+      "size_bytes": 555
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/negative_validation.json",
+      "sha256": "53407ffa4cd2335ad179d82809aa48845568d867ba4f640646da56405d960b92",
+      "size_bytes": 2022
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/phase_chain_rehearsal.json",
+      "sha256": "ef25aef8279513a73163992b797cd771d74f258f175090cae196bb4470cc0990",
+      "size_bytes": 2809
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/producer_consumer_matrix.json",
+      "sha256": "7faf3e57e214039ca853b0b753f0deea5438e0296b31ced4ca1f4815c2568b62",
+      "size_bytes": 2397
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/protocol_capability_matrix.json",
+      "sha256": "db19a414a2d8c9bbdb79dabef33624cf21b9240d3ee86d286c9f0c2d87e6c381",
+      "size_bytes": 11474
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/protocol_v2_4_diff_audit.json",
+      "sha256": "9a2ffe2f1ef1efe3e60fcb3d7feca07ca97e023475c87a0697ce655de0ff4102",
+      "size_bytes": 2535
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/readiness_review_v16.json",
+      "sha256": "38d83fcf6582a0d89e5a09758eef1aad440a4c7812e2a03bd0a97f1f447efa94",
+      "size_bytes": 1248
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/root_cause_analysis.json",
+      "sha256": "17645f709ba145390d08b39762ceee8e8c9f225c705166dc3a9162ee175cee7f",
+      "size_bytes": 677
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/tests_phase_junit.xml",
+      "sha256": "a20280c7e83978e2e56fe76387a804fbb4490bdb4c775491e028b927946c02f8",
+      "size_bytes": 184747
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/validation_summary.json",
+      "sha256": "91ebd168e2e730b1f80510277ad1bf7d2999582fbf8609f4fd0499d65103fe4b",
+      "size_bytes": 2477
+    }
+  ],
+  "inventory_scope": "G14R13 compact audit package; excludes this manifest",
+  "manifest_version": "1.0.0",
+  "self_reference_excluded": true,
+  "status": "pass",
+  "strict_finite_json_round_trip": true,
+  "strict_xml_parse": true,
+  "total_size_bytes_excluding_this_manifest": 215388
+}

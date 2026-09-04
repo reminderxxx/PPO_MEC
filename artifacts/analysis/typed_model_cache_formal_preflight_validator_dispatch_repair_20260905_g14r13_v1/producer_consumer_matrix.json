@@ -1,0 +1,79 @@
+{
+  "active_consumer_count": 11,
+  "historical_builders_not_mechanically_rewritten": true,
+  "rows": [
+    {
+      "path": "scripts/run_typed_model_cache_formal_protocol.py",
+      "role": "outer runner",
+      "scope": "active execution",
+      "shared_capability_routing": true
+    },
+    {
+      "path": "scripts/validate_typed_model_cache_formal_restart.py",
+      "role": "nested preflight",
+      "scope": "active execution",
+      "shared_capability_routing": true
+    },
+    {
+      "path": "src/runtime/active_formal_bundle.py",
+      "role": "bundle/index/readiness",
+      "scope": "active execution",
+      "shared_capability_routing": true
+    },
+    {
+      "path": "src/runtime/resolved_formal_execution_context.py",
+      "role": "resolved context",
+      "scope": "active execution",
+      "shared_capability_routing": true
+    },
+    {
+      "path": "src/runtime/formal_training_contract.py",
+      "role": "training contract",
+      "scope": "active execution",
+      "shared_capability_routing": true
+    },
+    {
+      "path": "src/runtime/formal_training_identity.py",
+      "role": "binding/provenance",
+      "scope": "active execution",
+      "shared_capability_routing": true
+    },
+    {
+      "path": "scripts/run_typed_model_cache_formal_dev_selection.py",
+      "role": "dev selection",
+      "scope": "active execution",
+      "shared_capability_routing": true
+    },
+    {
+      "path": "scripts/manage_typed_model_cache_formal_artifacts.py",
+      "role": "freeze/integrity/gate",
+      "scope": "active execution",
+      "shared_capability_routing": true
+    },
+    {
+      "path": "scripts/run_typed_model_cache_formal_cache_policy.py",
+      "role": "cache policy",
+      "scope": "active execution",
+      "shared_capability_routing": true
+    },
+    {
+      "path": "scripts/run_typed_model_cache_formal_support.py",
+      "role": "ablation/support/scalability",
+      "scope": "active execution",
+      "shared_capability_routing": true
+    },
+    {
+      "path": "scripts/run_typed_model_cache_formal_statistics.py",
+      "role": "statistics",
+      "scope": "active execution",
+      "shared_capability_routing": true
+    },
+    {
+      "path": "scripts/repair_formal_protocol_capability_routing.py",
+      "role": "Protocol 2.4 builder",
+      "scope": "historical repair/freeze",
+      "shared_capability_routing": false
+    }
+  ],
+  "status": "pass"
+}

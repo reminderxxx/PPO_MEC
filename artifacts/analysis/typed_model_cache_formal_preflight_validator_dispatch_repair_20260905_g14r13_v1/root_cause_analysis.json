@@ -1,0 +1,13 @@
+{
+  "affected_protocol_version": "2.3.0",
+  "baseline_commit": "95106b0b53a937f8944fc39f6e9ba8b78b377b10",
+  "category_fix": "explicit shared fail-closed capability registry",
+  "classification": "wrapper_level_protocol_capability_dispatch_omission",
+  "direct_location": "scripts/validate_typed_model_cache_formal_restart.py",
+  "nested_consumed_resolved_execution_context_before_fix": false,
+  "nested_fallback": "execution_contract.default_expansion_context",
+  "not_data_dependency_or_algorithm_error": true,
+  "observed_error": "resolved command expansion requires an absolute repository root",
+  "outer_passed_resolved_execution_context_path": true,
+  "status": "pass"
+}

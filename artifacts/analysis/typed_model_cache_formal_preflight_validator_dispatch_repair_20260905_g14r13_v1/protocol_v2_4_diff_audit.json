@@ -1,0 +1,56 @@
+{
+  "all_audited_resource_semantics_unchanged": true,
+  "execution_contract_change": "central capability routing and mandatory persisted context consumption",
+  "formal_performance_observed": false,
+  "holdout_contract_changed": false,
+  "new_protocol_semantic_sha256": "37604b03b9ce5da3a5b0341d46e5c14f2b897a1b4578987c87d2634cb477159b",
+  "new_protocol_version": "2.4.0",
+  "old_protocol_semantic_sha256": "4c84a159368025dec06470aba42ebc27f096690af44d55ddb232ebddf6c4619d",
+  "old_protocol_version": "2.3.0",
+  "resource_semantic_audit": [
+    {
+      "new_semantic_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+      "old_semantic_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+      "resource": "agent_training_scientific_config.json",
+      "semantic_identity_unchanged": true
+    },
+    {
+      "new_semantic_sha256": "50a9983d21afdc06ec9df309c29f75f5009e062013990bb491ed58c442470889",
+      "old_semantic_sha256": "50a9983d21afdc06ec9df309c29f75f5009e062013990bb491ed58c442470889",
+      "resource": "formal_nullable_metric_aggregation_contract.json",
+      "semantic_identity_unchanged": true
+    },
+    {
+      "new_semantic_sha256": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0",
+      "old_semantic_sha256": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0",
+      "resource": "formal_agent_order_contract.json",
+      "semantic_identity_unchanged": true
+    },
+    {
+      "new_semantic_sha256": "1c6e5459433e450cfe80517e41b4affca57ebb87a01c3db48056316eedcce556",
+      "old_semantic_sha256": "1c6e5459433e450cfe80517e41b4affca57ebb87a01c3db48056316eedcce556",
+      "resource": "formal_exogenous_request_execution_contract.json",
+      "semantic_identity_unchanged": true
+    },
+    {
+      "new_semantic_sha256": "e5cbc6cdbd03052ce01d601500762231655b90b056d3b8c55f27d82ee39b457d",
+      "old_semantic_sha256": "e5cbc6cdbd03052ce01d601500762231655b90b056d3b8c55f27d82ee39b457d",
+      "resource": "formal_request_subject_lifecycle_contract.json",
+      "semantic_identity_unchanged": true
+    },
+    {
+      "new_semantic_sha256": null,
+      "old_semantic_sha256": null,
+      "resource": "execution_environment_manifest.json",
+      "semantic_identity_unchanged": true
+    },
+    {
+      "new_semantic_sha256": null,
+      "old_semantic_sha256": null,
+      "resource": "nonformal_rehearsal_window_plan.json",
+      "semantic_identity_unchanged": true
+    }
+  ],
+  "scientific_fields_changed": false,
+  "status": "pass"
+}

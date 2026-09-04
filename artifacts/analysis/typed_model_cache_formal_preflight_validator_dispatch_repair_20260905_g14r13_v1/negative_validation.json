@@ -1,0 +1,66 @@
+{
+  "case_count": 12,
+  "cases": [
+    {
+      "case": "active Protocol missing context argument",
+      "evidence": "tests/test_formal_protocol_capability_routing_v24.py",
+      "status": "pass"
+    },
+    {
+      "case": "context file missing",
+      "evidence": "tests/test_typed_model_cache_formal_execution_v15.py",
+      "status": "pass"
+    },
+    {
+      "case": "context SHA or content tamper",
+      "evidence": "tests/test_formal_protocol_capability_routing_v24.py",
+      "status": "pass"
+    },
+    {
+      "case": "cross-run, cross-Protocol, or cross-commit context",
+      "evidence": "tests/test_typed_model_cache_formal_execution_v15.py",
+      "status": "pass"
+    },
+    {
+      "case": "Python, repository, environment, or dependency drift",
+      "evidence": "tests/test_typed_model_cache_formal_execution_v15.py",
+      "status": "pass"
+    },
+    {
+      "case": "active fallback to default context",
+      "evidence": "tests/test_formal_protocol_capability_routing_v24.py",
+      "status": "pass"
+    },
+    {
+      "case": "Protocol 2.3 live execution",
+      "evidence": "tests/test_formal_protocol_capability_routing_v24.py",
+      "status": "pass"
+    },
+    {
+      "case": "unknown future Protocol 2.5",
+      "evidence": "tests/test_formal_protocol_capability_routing_v24.py",
+      "status": "pass"
+    },
+    {
+      "case": "pending, version-mismatched, or old active index",
+      "evidence": "tests/test_active_formal_bundle_v18.py",
+      "status": "pass"
+    },
+    {
+      "case": "unexpected holdout capability",
+      "evidence": "tests/test_active_bundle_resource_resolution_v19.py",
+      "status": "pass"
+    },
+    {
+      "case": "relative .venv, cwd guess, or implicit Python",
+      "evidence": "tests/test_typed_model_cache_formal_execution_v15.py",
+      "status": "pass"
+    },
+    {
+      "case": "Protocol 1.5 resolved-context regression",
+      "evidence": "tests/test_typed_model_cache_formal_execution_v15.py",
+      "status": "pass"
+    }
+  ],
+  "status": "pass"
+}
