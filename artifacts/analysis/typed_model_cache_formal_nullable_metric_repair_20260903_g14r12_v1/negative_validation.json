@@ -1,0 +1,17 @@
+{
+  "holdout_access_attempted": false,
+  "rejected": [
+    "v12 run root",
+    "v12 staging path",
+    "v12 checkpoint path",
+    "v12 nested checkpoint manifest",
+    "bool metric",
+    "invalid numeric string",
+    "NaN",
+    "+Infinity",
+    "-Infinity",
+    "missing formal required field"
+  ],
+  "status": "pass",
+  "zero_pair_endpoint": "UNAVAILABLE_not_tie_pass_or_fail"
+}

@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
 from src.evaluators.typed_model_cache_formal_protocol import (
+    attach_hashes,
     canonical_sha256,
     semantic_projection,
 )
@@ -51,6 +52,8 @@ FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION = "2.1.0"
 FORMAL_EXECUTION_PROTOCOL_V2_1_ID = "typed_model_cache_formal_protocol_v2_1"
 FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION = "2.2.0"
 FORMAL_EXECUTION_PROTOCOL_V2_2_ID = "typed_model_cache_formal_protocol_v2_2"
+FORMAL_EXECUTION_PROTOCOL_V2_3_VERSION = "2.3.0"
+FORMAL_EXECUTION_PROTOCOL_V2_3_ID = "typed_model_cache_formal_protocol_v2_3"
 FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
 FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
 LEGACY_PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
@@ -566,6 +569,86 @@ def validate_command_templates(
 def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
     _reject_non_finite(protocol)
     version = protocol.get("typed_model_cache_formal_protocol_version")
+    if version == FORMAL_EXECUTION_PROTOCOL_V2_3_VERSION:
+        if protocol.get("protocol_id") != FORMAL_EXECUTION_PROTOCOL_V2_3_ID:
+            raise FormalExecutionError("formal execution protocol v2.3 ID mismatch")
+        supersession = protocol.get("supersession", {})
+        if (
+            supersession.get("supersedes_version") != "2.2.0"
+            or supersession.get("old_protocol_status")
+            != "invalid_protocol_or_implementation"
+        ):
+            raise FormalExecutionError("Protocol v2.3 predecessor status is missing")
+        failures = supersession.get("invalid_execution_runs", [])
+        v12 = next(
+            (
+                row
+                for row in failures
+                if isinstance(row, Mapping)
+                and row.get("run_id")
+                == "typed_model_cache_formal_20260902_162203_g14c_v12"
+            ),
+            None,
+        )
+        if not isinstance(v12, Mapping) or (
+            v12.get("failure_boundary")
+            != "invalid_during_first_training_cell_after_episode_generation_before_cell_commit"
+            or v12.get("failure_audit_sha256")
+            != "edb85d74152feefff37b1180d9bc5cb2d04cefa64c226eda831db22539cd39e5"
+            or v12.get("training_cells_executed") != 0
+            or v12.get("candidate_checkpoint_count") != 0
+            or v12.get("dev_performance_count") != 0
+            or v12.get("formal_performance_count") != 0
+            or v12.get("resume_allowed") is not False
+            or v12.get("retry_allowed") is not False
+            or v12.get("legacy_phase_finalize_allowed") is not False
+            or v12.get("checkpoint_reuse_allowed") is not False
+        ):
+            raise FormalExecutionError("G14C v12 permanent invalidation is incomplete")
+        nullable = protocol.get("formal_nullable_metric_aggregation_contract", {})
+        nullable_hash = nullable.get("semantic_sha256")
+        if (
+            nullable.get("version") != "1.0.0"
+            or not isinstance(nullable_hash, str)
+            or len(nullable_hash) != 64
+            or protocol.get("identity", {}).get(
+                "formal_nullable_metric_aggregation_contract_semantic_sha256"
+            )
+            != nullable_hash
+        ):
+            raise FormalExecutionError("nullable metric aggregation contract is missing")
+        expected = canonical_sha256(
+            semantic_projection(
+                {key: value for key, value in protocol.items() if key != "hashes"}
+            )
+        )
+        if protocol.get("hashes", {}).get("semantic_sha256") != expected:
+            raise FormalExecutionError("formal protocol v2.3 semantic hash mismatch")
+        inherited = deepcopy(dict(protocol))
+        inherited["typed_model_cache_formal_protocol_version"] = (
+            FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION
+        )
+        inherited["protocol_id"] = FORMAL_EXECUTION_PROTOCOL_V2_2_ID
+        inherited["supersession"]["supersedes_version"] = "2.1.0"
+        inherited["supersession"]["old_protocol_status"] = (
+            "invalid_protocol_or_implementation"
+        )
+        inherited["supersession"]["invalid_execution_runs"] = [
+            row
+            for row in inherited["supersession"]["invalid_execution_runs"]
+            if row.get("run_id")
+            != "typed_model_cache_formal_20260902_162203_g14c_v12"
+        ]
+        inherited = attach_hashes(inherited)
+        validate_protocol_v1_1(inherited)
+        return {
+            "status": "pass",
+            "protocol_version": version,
+            "semantic_sha256": expected,
+            "split_semantic_sha256": SPLIT_SEMANTIC_SHA256,
+            "primary_endpoint_count": len(PRIMARY_ENDPOINTS),
+            "phase_count": len(PHASE_ORDER),
+        }
     if version not in {
         FORMAL_EXECUTION_PROTOCOL_VERSION,
         FORMAL_EXECUTION_PROTOCOL_V1_2_VERSION,
@@ -1958,6 +2041,8 @@ __all__ = [
     "FORMAL_EXECUTION_PROTOCOL_V2_1_VERSION",
     "FORMAL_EXECUTION_PROTOCOL_V2_2_ID",
     "FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION",
+    "FORMAL_EXECUTION_PROTOCOL_V2_3_ID",
+    "FORMAL_EXECUTION_PROTOCOL_V2_3_VERSION",
     "FORMAL_PHASE_LEDGER_SCHEMA_VERSION",
     "FORMAL_PHASE_RUNNER_VERSION",
     "FAILURE_CLASSIFICATIONS",

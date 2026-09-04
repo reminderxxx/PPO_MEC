@@ -222,3 +222,14 @@ artifacts/analysis/typed_model_cache_formal_exogenous_request_repair_20260831_g1
 ```
 
 v1.0–v1.9 Protocol 目录仅保留 historical audit，不再是 live active path。
+
+# Protocol 2.3 additions
+
+- `configs/experiment/typed_model_cache_formal_protocol_v2_3_20260903/`：唯一 active Protocol/index、Nullable
+  Metric Aggregation Contract 1.0.0、environment/binding/context resources 与 Readiness v15。
+- `artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/`：G14R12 compact audit
+  package；其 `rehearsal_runtime/` 是 ignored non-formal runtime evidence，不提交大型 checkpoints。
+- `docs/project/formal_nullable_metric_aggregation_contract.md`：aggregation、selection、statistics、gate 和 claim
+  availability规范。
+
+Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 v2.3 唯一 active index。

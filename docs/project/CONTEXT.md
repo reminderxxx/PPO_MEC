@@ -62,6 +62,9 @@
 - 当前非学习启发式对照：`reactive_greedy`、`popularity_cache_heuristic`
 - 历史 artifact 路径中仍可能出现 `flat_ppo` / `flat_mappo` run 名称，但它们不再作为 live agent 注册。
 - 当前未注册骨架算法：`td3`、`sac`、`maddpg`；后续接入前必须先冻结匹配的 observation/action contract
+- 当前 typed model-cache active execution contract 为 Protocol 2.3 + Nullable Metric Aggregation Contract 1.0.0。
+  G14C v12 因 nullable consumer 实现错误永久无效；其 256 episodes、8 staging candidates 和 latest checkpoint
+  均不是正式证据。G14R12 readiness 只授权未来全新 G14C v13，不代表 formal/G14/TMC/paper-ready。
 
 ## 正式入口
 

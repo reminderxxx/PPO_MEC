@@ -146,3 +146,11 @@
 
 - `formal_request_subject_lifecycle_contract.md`：Protocol 2.2 持续主体资格、冻结选择证据、RSU/time 对齐、
   runtime reselection 禁止、analytical replay闭环与 v11 terminal 边界。
+
+# 2026-09-04 formal nullable metric contract
+
+- `formal_nullable_metric_aggregation_contract.md`：Protocol 2.3 的 finite/null、required missing、CSV/JSON、Dev
+  selection、paired statistics、Holm、gate/claim `UNAVAILABLE` 规范。
+- 机器证据：`../../artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/`
+- 状态：v12 永久 invalid；exact 256-episode 与 13-phase non-formal rehearsal 已闭环，正式
+  training/checkpoint/performance仍为0，holdout sealed/unopened，未启动G14C v13/G14D/G15。

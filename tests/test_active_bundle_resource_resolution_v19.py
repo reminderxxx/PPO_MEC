@@ -184,7 +184,9 @@ def test_symlink_and_relative_cli_paths_are_rejected(bundle: dict, tmp_path: Pat
 def test_version_scope_and_same_name_different_hash_are_rejected(bundle: dict) -> None:
     protocol = active.resolve_active_bundle_resource(bundle, "protocol_manifest")
     assert protocol["version_scope"] == "current_protocol_version"
-    assert "v2_2" in protocol["logical_path"]
+    assert f"v{active.ACTIVE_PROTOCOL_VERSION.replace('.', '_')[:3]}" in protocol[
+        "logical_path"
+    ]
     shared = active.resolve_active_bundle_resource(bundle, "portable_resource_registry")
     assert shared["version_scope"] == "shared_historical_stable"
     altered = dict(protocol)

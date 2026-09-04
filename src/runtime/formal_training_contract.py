@@ -133,6 +133,7 @@ def _formal_values(protocol: Mapping[str, Any], agent_name: str) -> dict[str, An
         "2.0.0",
         "2.1.0",
         "2.2.0",
+        "2.3.0",
     }:
         raise FormalTrainingContractError("unsupported formal training protocol version")
     budget = protocol.get("training_budget")
@@ -219,6 +220,7 @@ class ResolvedTrainingContract:
     full_normalized_environment_projection: dict[str, Any] | None = None
     formal_agent_order_contract_semantic_sha256: str | None = None
     active_formal_bundle_sha256: str | None = None
+    formal_nullable_metric_aggregation_contract_semantic_sha256: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -254,6 +256,9 @@ class ResolvedTrainingContract:
                 self.formal_agent_order_contract_semantic_sha256
             ),
             "active_formal_bundle_sha256": self.active_formal_bundle_sha256,
+            "formal_nullable_metric_aggregation_contract_semantic_sha256": (
+                self.formal_nullable_metric_aggregation_contract_semantic_sha256
+            ),
         }
 
 
@@ -340,9 +345,10 @@ def resolve_training_contract(
         "full_normalized_environment_projection": None,
         "formal_agent_order_contract_semantic_sha256": None,
         "active_formal_bundle_sha256": None,
+        "formal_nullable_metric_aggregation_contract_semantic_sha256": None,
     }
     contract_version = FORMAL_TRAINING_CONTRACT_VERSION
-    if protocol_version in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
+    if protocol_version in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
         if agent_config_companion is not None:
             raise FormalTrainingContractError(
                 "Protocol v1.6 rejects legacy --agent_config_path companion"
@@ -374,7 +380,7 @@ def resolve_training_contract(
                 execution_commit=str(scientific_identity.get("execution_commit") or ""),
                 environment_identity=(
                     scientific_identity["full_normalized_environment_projection"]
-                    if protocol_version in {"2.1.0", "2.2.0"}
+                    if protocol_version in {"2.1.0", "2.2.0", "2.3.0"}
                     else scientific_identity
                 ),
                 command_matrix_sha256=str(
@@ -382,7 +388,7 @@ def resolve_training_contract(
                 ),
                 active_formal_bundle_sha256=(
                     str(scientific_identity.get("active_formal_bundle_sha256") or "")
-                    if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}
+                    if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}
                     else None
                 ),
             )
@@ -419,7 +425,7 @@ def resolve_training_contract(
                     )
                     or ""
                 )
-                if protocol_version in {"2.1.0", "2.2.0"}
+                if protocol_version in {"2.1.0", "2.2.0", "2.3.0"}
                 else None
             ),
             "full_normalized_environment_projection": (
@@ -428,7 +434,7 @@ def resolve_training_contract(
                         "full_normalized_environment_projection"
                     )
                 )
-                if protocol_version in {"2.1.0", "2.2.0"}
+                if protocol_version in {"2.1.0", "2.2.0", "2.3.0"}
                 else None
             ),
             "formal_agent_order_contract_semantic_sha256": (
@@ -438,12 +444,12 @@ def resolve_training_contract(
                     )
                     or ""
                 )
-                if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}
+                if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}
                 else None
             ),
             "active_formal_bundle_sha256": (
                 str(scientific_identity.get("active_formal_bundle_sha256") or "")
-                if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}
+                if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}
                 else None
             ),
         }
@@ -460,9 +466,9 @@ def resolve_training_contract(
                 "resolved context execution binding identity mismatch"
             )
         expected_environment_projection_version = (
-            "1.1.0" if protocol_version == "2.2.0" else "1.0.0"
+            "1.1.0" if protocol_version in {"2.2.0", "2.3.0"} else "1.0.0"
         )
-        if protocol_version in {"2.1.0", "2.2.0"} and (
+        if protocol_version in {"2.1.0", "2.2.0", "2.3.0"} and (
             identity_values["environment_identity_projection_contract_version"]
             != expected_environment_projection_version
             or not isinstance(
@@ -472,18 +478,36 @@ def resolve_training_contract(
             raise FormalTrainingContractError(
                 "resolved context full environment projection is missing"
             )
-        if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"} and identity_values[
+        if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"} and identity_values[
             "formal_agent_order_contract_semantic_sha256"
         ] != formal_protocol["formal_agent_order_contract"]["semantic_sha256"]:
             raise FormalTrainingContractError(
                 "resolved context formal agent order contract identity mismatch"
             )
-        if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"} and identity_values[
+        if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"} and identity_values[
             "active_formal_bundle_sha256"
         ] != execution_binding.get("active_formal_bundle_sha256"):
             raise FormalTrainingContractError(
                 "resolved context active formal bundle identity mismatch"
             )
+        if protocol_version == "2.3.0":
+            expected_nullable_hash = protocol["formal_nullable_metric_aggregation_contract"][
+                "semantic_sha256"
+            ]
+            identity_values[
+                "formal_nullable_metric_aggregation_contract_semantic_sha256"
+            ] = str(
+                scientific_identity.get(
+                    "formal_nullable_metric_aggregation_contract_semantic_sha256"
+                )
+                or ""
+            )
+            if identity_values[
+                "formal_nullable_metric_aggregation_contract_semantic_sha256"
+            ] != expected_nullable_hash:
+                raise FormalTrainingContractError(
+                    "resolved context nullable metric contract identity mismatch"
+                )
         contract_version = FORMAL_TRAINING_CONTRACT_V2_VERSION
     else:
         if agent_config_companion is None:

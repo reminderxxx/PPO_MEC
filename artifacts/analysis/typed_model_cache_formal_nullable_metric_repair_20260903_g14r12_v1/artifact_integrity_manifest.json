@@ -1,0 +1,77 @@
+{
+  "artifact_count_excluding_this_manifest": 13,
+  "artifact_inventory_sha256": "6e2eab83a23eeb8a24cfb05032c04f0b65402c69b30574c3b03eaed1cfb58aad",
+  "artifacts": [
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/acceptance_evidence_manifest.json",
+      "sha256": "97bd9e755fa7b1d3cced026ebdcea67b0d167b6299cd3a773019339ba4f59687",
+      "size_bytes": 876
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/clean_candidate_validation.json",
+      "sha256": "bf75e9941cd216d1ffc44da629d21a7080e73942995881ae078287a7be2808e8",
+      "size_bytes": 1559
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/dev_selection_nullable_validation.json",
+      "sha256": "a7d09b49b46a5a0cf5ed31ede0e136d4e1ea7ef63d72086251eedcdca9f512c4",
+      "size_bytes": 5759
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/exact_v12_failure_unit_rehearsal.json",
+      "sha256": "ecf636c781050d21c01a4bc5d03173c9fcd919f5fc22890ee0a9b4d0c5a1e475",
+      "size_bytes": 1188
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/negative_validation.json",
+      "sha256": "065b0219ff8b603980f34d7741b61b8aac6c284baab370a8c63fc6139db5a383",
+      "size_bytes": 380
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/nullable_metric_aggregation_contract.json",
+      "sha256": "42b7313477870823bf91618ed53bab31bb9cfe949e26c3015a8bc0e1ac38589a",
+      "size_bytes": 3478
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/producer_consumer_matrix.json",
+      "sha256": "341c4f51c0853b69f3f516cdd4c1947852653faa935a7f6c0ed950c51f99af6a",
+      "size_bytes": 2983
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/readiness_review.json",
+      "sha256": "f41034e6b745465682196d82f2f94697a73ac44eda70e923c321c283d248e479",
+      "size_bytes": 1271
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/root_cause_audit.json",
+      "sha256": "048837285f7a77508a46e18787e727d049a0b37c0c13771a6a99a99164d9fd40",
+      "size_bytes": 1780
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/statistics_nullable_validation.json",
+      "sha256": "7e4e75b12379a3cf299f52256aa6caa71f926e1c6a7d313ccc5b7329fd10956a",
+      "size_bytes": 2227
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/synthetic_validation.json",
+      "sha256": "c40c46dad153250250fa3136ace584eba650c66c2e978c360c91e88934afaaae",
+      "size_bytes": 426
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/v12_permanent_invalidation.json",
+      "sha256": "c200a5c1250fe4fdc15b91b9db64594712ef9003056dab9fc88c684636e2a88c",
+      "size_bytes": 4079
+    },
+    {
+      "path": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/validation_summary.json",
+      "sha256": "6eb9062a14f5207f314b49ba04ac247985995d0bd3eb21187017cd488ed55cf9",
+      "size_bytes": 2263
+    }
+  ],
+  "inventory_scope": "compact G14R12 audit JSON files; excludes this manifest and rehearsal runtime",
+  "manifest_version": "1.0.0",
+  "self_reference_excluded": true,
+  "status": "pass",
+  "strict_finite_json_round_trip": true,
+  "total_size_bytes_excluding_this_manifest": 28269
+}

@@ -63,7 +63,7 @@ def main() -> None:
         manifest=manifest,
         evaluation_unit_id=args.evaluation_unit_id,
     )
-    if protocol.get("typed_model_cache_formal_protocol_version") == "2.2.0":
+    if protocol.get("typed_model_cache_formal_protocol_version") in {"2.2.0", "2.3.0"}:
         lifecycle = replay.get("formal_request_subject_lifecycle") or {}
         if lifecycle.get("contract_version") != "1.0.0" or not replay.get(
             "formal_request_exposure_fingerprint"

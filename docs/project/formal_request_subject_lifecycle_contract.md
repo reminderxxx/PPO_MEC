@@ -2,11 +2,11 @@
 
 ## Scope
 
-Protocol 2.2 为 formal train、dev 与 formal evaluation 冻结同一套“单 workflow、单连续车辆”request subject
+Protocol 2.2 冻结、Protocol 2.3 原样继承 formal train、dev 与 formal evaluation 的“单 workflow、单连续车辆”request subject
 语义。合同修复执行身份，不改变 agent architecture、observation/action ID、reward/loss、超参数、seed、capacity、
 split、window、workflow、checkpoint cadence、endpoint 或 Holm 规则。
 
-本合同的 readiness 只授权未来独立任务从全新 clean worktree 启动 G14C v12；它不是 formal performance、
+本合同与 Protocol 2.3 nullable repair 的 readiness 只授权未来独立任务从全新 clean worktree 启动 G14C v13；它不是 formal performance、
 holdout、G14、TMC-ready 或 paper-ready 证据。
 
 ## Request horizon and eligibility

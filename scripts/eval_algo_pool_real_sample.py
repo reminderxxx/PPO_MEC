@@ -8,7 +8,6 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from statistics import fmean
 from typing import Any
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -26,6 +25,14 @@ from src.runtime.typed_model_cache_runtime import (
     load_runtime_catalog,
     resolve_model_cache_runtime,
     validate_checkpoint_provenance,
+)
+from src.metrics.formal_nullable_metrics import (
+    FORMAL_NULLABLE_METRIC_AGGREGATION_CONTRACT_VERSION,
+    reduce_nullable_metric_rows,
+    validate_end_to_end_delay_reason,
+)
+from src.runtime.formal_invalid_run_registry import (
+    reject_permanently_invalid_formal_references,
 )
 
 
@@ -96,6 +103,12 @@ def build_eval_row(summary: dict[str, Any]) -> dict[str, Any]:
         or handoff.get("handoff_ready_count", 0) > 0
         or handoff.get("migration_during_handoff_count", 0) > 0
     )
+    endpoint_audit = summary.get("formal_request_execution_audit") or {}
+    delay_reason = endpoint_audit.get("end_to_end_workflow_delay_availability")
+    if delay_reason is not None:
+        validate_end_to_end_delay_reason(
+            metrics["end_to_end_workflow_delay"], delay_reason
+        )
     return {
         "agent_name": summary["run_info"].get("agent_name"),
         "eviction_policy": summary["run_info"].get("eviction_policy", "not_applicable"),
@@ -112,6 +125,7 @@ def build_eval_row(summary: dict[str, Any]) -> dict[str, Any]:
         "episode_success": bool(summary.get("episode_success", False)),
         "total_reward": float(summary["reward_breakdown"]["total"]["sum"]),
         "end_to_end_workflow_delay": metrics["end_to_end_workflow_delay"],
+        "end_to_end_workflow_delay_availability": delay_reason,
         "workflow_continuity_rate": metrics["workflow_continuity_rate"],
         "handoff_failure_rate": metrics["handoff_failure_rate"],
         "handoff_ready_ratio": metrics["handoff_ready_ratio"],
@@ -141,15 +155,21 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
-def metric_means(rows: list[dict[str, Any]]) -> dict[str, float]:
-    return {
-        name: round(fmean(float(row[name]) for row in rows), 6) if rows else 0.0
-        for name in SUMMARY_METRICS
-    }
+def metric_means(rows: list[dict[str, Any]]) -> dict[str, float | None]:
+    means, _ = reduce_nullable_metric_rows(rows, SUMMARY_METRICS)
+    return means
+
+
+def metric_availability(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    _, availability = reduce_nullable_metric_rows(rows, SUMMARY_METRICS)
+    return availability
 
 
 def main() -> None:
     args = parse_args()
+    reject_permanently_invalid_formal_references(
+        [args.output_root, args.checkpoint_path]
+    )
     runtime_contract = resolve_model_cache_runtime(
         args.model_cache_runtime_config or None,
         root=ROOT_DIR,
@@ -251,6 +271,9 @@ def main() -> None:
     eval_csv_path = output_root / "eval.csv"
     summary_path = output_root / "summary.json"
     write_csv(eval_csv_path, rows)
+    mean_metrics, mean_metric_availability = reduce_nullable_metric_rows(
+        rows, SUMMARY_METRICS
+    )
     summary_payload = {
         "run_id": run_id,
         "agent_name": args.agent_name,
@@ -275,11 +298,18 @@ def main() -> None:
         "eval_csv_path": str(eval_csv_path),
         "summary_json_path": str(summary_path),
         "window_metadata": mobility_bundle.rsu_metadata,
-        "mean_metrics": metric_means(rows),
+        "formal_nullable_metric_aggregation_contract_version": (
+            FORMAL_NULLABLE_METRIC_AGGREGATION_CONTRACT_VERSION
+        ),
+        "mean_metrics": mean_metrics,
+        "mean_metric_availability": mean_metric_availability,
         "rows": rows,
         "episode_summaries": episode_summaries,
     }
-    summary_path.write_text(json.dumps(summary_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    summary_path.write_text(
+        json.dumps(summary_payload, ensure_ascii=False, indent=2, allow_nan=False),
+        encoding="utf-8",
+    )
 
     print("algo pool evaluation complete")
     print(f"run_id: {run_id}")

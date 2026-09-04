@@ -1,0 +1,87 @@
+{
+  "active_scope_only": true,
+  "rows": [
+    {
+      "closure": "scalar mean_metrics plus availability companion; strict JSON",
+      "consumer": "scripts/train_algo_pool_real_sample.py",
+      "role": "producer"
+    },
+    {
+      "closure": "same reducer and output compatibility",
+      "consumer": "scripts/eval_algo_pool_real_sample.py",
+      "role": "producer"
+    },
+    {
+      "closure": "finite-only stats and unavailable companion",
+      "consumer": "src/evaluators/main_results_support.py",
+      "role": "benchmark aggregation"
+    },
+    {
+      "closure": "required-field check, null propagation, strict JSON, invalid-run rejection",
+      "consumer": "scripts/benchmark_main_results.py",
+      "role": "formal benchmark"
+    },
+    {
+      "closure": "nullable scalar and per-candidate availability counts",
+      "consumer": "scripts/run_typed_model_cache_formal_dev_selection.py",
+      "role": "candidate producer"
+    },
+    {
+      "closure": "finite-before-unavailable comparator, counts, provenance and v12 rejection",
+      "consumer": "scripts/manage_typed_model_cache_formal_artifacts.py",
+      "role": "selection/freeze/integrity/gate"
+    },
+    {
+      "closure": "paired availability, lower-is-better, null zero-pair effects, finite-only Holm",
+      "consumer": "scripts/analyze_top_journal_statistics.py",
+      "role": "paired statistics"
+    },
+    {
+      "closure": "active nullable identity and strict nonformal/formal boundary",
+      "consumer": "scripts/run_typed_model_cache_formal_statistics.py",
+      "role": "statistics wrapper"
+    },
+    {
+      "closure": "Protocol 2.3 nullable resource and permanent invalidation",
+      "consumer": "src/evaluators/typed_model_cache_formal_execution.py",
+      "role": "Protocol validator"
+    },
+    {
+      "closure": "nullable resource size/content/semantic hash",
+      "consumer": "src/runtime/active_formal_bundle.py",
+      "role": "active bundle"
+    },
+    {
+      "closure": "nullable semantic hash in execution binding",
+      "consumer": "src/runtime/formal_training_contract.py",
+      "role": "training binding"
+    },
+    {
+      "closure": "nullable semantic hash in phase and cell input identity",
+      "consumer": "src/runtime/formal_training_identity.py",
+      "role": "phase/cell identity"
+    },
+    {
+      "closure": "nullable semantic hash in context",
+      "consumer": "src/runtime/resolved_formal_execution_context.py",
+      "role": "resolved context"
+    },
+    {
+      "closure": "recursive run/root/staging/checkpoint rejection through v12",
+      "consumer": "src/runtime/formal_invalid_run_registry.py",
+      "role": "shared denylist"
+    }
+  ],
+  "scan_patterns": [
+    "float(None)",
+    "value or 0.0",
+    ".get(..., 0.0)",
+    "nullable :.3f",
+    "no-row zero",
+    "NaN/Infinity",
+    "lower-is-better unavailable-as-best"
+  ],
+  "scientific_estimand_changed": false,
+  "shared_reducer": "src/metrics/formal_nullable_metrics.py",
+  "status": "pass"
+}

@@ -429,18 +429,19 @@ python scripts/build_top_journal_comparison_report.py --final_run_root artifacts
 ```
 
 该入口只生成`non_formal_typed_runtime_rehearsal`，不冻结G14 split/protocol，不训练正式checkpoint，不运行formal、holdout、hidden或G15。合同与运行方法见`docs/project/typed_model_cache_runtime_contract.md`和`docs/project/typed_model_cache_runtime_validation_report.md`。
-# Protocol 2.2 formal request subject lifecycle
+# Protocol 2.3 nullable formal metrics
 
-正式 typed model-cache 主线现使用 Protocol 2.2。每个 evaluation unit 先按 request horizon 过滤在全部 frame
-持续存在且通过物理连续性检查的车辆，再在该集合内应用原有 `handoff_pressure` 排序；选中的单一车辆在整条
-workflow request exposure 内冻结，runtime 不得静默重选。唯一 active index：
+正式 typed model-cache 执行合同现使用 Protocol 2.3。Protocol 2.2 的持续 subject lifecycle、外生 request、split、
+window、catalog、训练预算与选择顺序保持冻结；新增 Nullable Metric Aggregation Contract 1.0.0，统一 train/eval、
+Dev selection、checkpoint freeze、benchmark、statistics、gate 与 claim map 的 `float|null` 语义。唯一 active index：
 
 ```text
-configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901/protocol_index.json
+configs/experiment/typed_model_cache_formal_protocol_v2_3_20260903/protocol_index.json
 ```
 
-formal train/dev/evaluation 必须由 active bundle 命令模板显式启用 `--formal-exogenous-request-execution`；
-v1.0–v2.1、G14C v9/v11 与 pre-execution-stopped v10 均只供审计。合同说明见
+G14C v12 `typed_model_cache_formal_20260902_162203_g14c_v12` 永久无效，run/root/staging/checkpoint 不得 resume、
+retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol v1.0–v2.2 仅供审计。合同说明见
+`docs/project/formal_nullable_metric_aggregation_contract.md`、
 `docs/project/formal_request_subject_lifecycle_contract.md`、
 `docs/project/formal_exogenous_request_execution_contract.md` 与
 `docs/project/formal_environment_identity_projection_contract.md`。

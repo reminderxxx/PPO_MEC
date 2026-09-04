@@ -9,6 +9,11 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from src.runtime.formal_invalid_run_registry import (
+    PermanentlyInvalidFormalReferenceError,
+    reject_permanently_invalid_formal_references,
+)
+
 
 FORMAL_AGENT_ORDER_CONTRACT_VERSION = "1.0.0"
 ROOT = Path(__file__).resolve().parents[2]
@@ -353,6 +358,10 @@ def reject_permanently_invalid_run_references(
     # frozen Agent Order Contract 1.0.0 scientific semantic identity.
     rejected.add("typed_model_cache_formal_20260828_101804_g14c_v8")
     rejected.add("typed_model_cache_formal_20260830_113339_g14c_v9")
+    try:
+        reject_permanently_invalid_formal_references(paths)
+    except PermanentlyInvalidFormalReferenceError as exc:
+        raise FormalAgentOrderError(str(exc)) from exc
     for path in paths:
         parts = set(Path(path).resolve().parts)
         hit = sorted(rejected & parts)

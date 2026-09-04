@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import argparse
+from functools import cmp_to_key
 import json
-import math
 import sys
 from pathlib import Path
 from typing import Any
@@ -20,6 +20,11 @@ from src.runtime.formal_agent_order import (
     FormalAgentOrderError,
     reject_permanently_invalid_run_references,
     resolve_formal_agent_order,
+)
+from src.metrics.formal_nullable_metrics import nullable_finite_value
+from src.runtime.formal_invalid_run_registry import (
+    PermanentlyInvalidFormalReferenceError,
+    reject_permanently_invalid_formal_references,
 )
 
 
@@ -119,11 +124,37 @@ def write_create_only(path: Path, payload: Any) -> None:
         handle.write("\n")
 
 
-def finite(value: Any, field: str) -> float:
-    result = float(value)
-    if not math.isfinite(result):
-        raise ValueError(f"non-finite dev endpoint: {field}")
-    return result
+SELECTION_METRICS = (
+    ("full_service_ready_byte_hit_rate", "maximize"),
+    ("workflow_continuity_rate", "maximize"),
+    ("transfer_mb_per_request", "minimize"),
+    ("end_to_end_workflow_delay", "minimize"),
+)
+
+
+def _candidate_metric(row: dict[str, Any], field: str) -> float | None:
+    if field not in row:
+        raise ValueError(f"required dev selection metric missing: {field}")
+    return nullable_finite_value(row[field], field=field)
+
+
+def _compare_candidates(left: dict[str, Any], right: dict[str, Any]) -> int:
+    for field, direction in SELECTION_METRICS:
+        left_value = _candidate_metric(left, field)
+        right_value = _candidate_metric(right, field)
+        if left_value is None and right_value is None:
+            continue
+        if left_value is None:
+            return 1
+        if right_value is None:
+            return -1
+        if left_value != right_value:
+            if direction == "maximize":
+                return -1 if left_value > right_value else 1
+            return -1 if left_value < right_value else 1
+    left_tie = (int(left["update_index"]), str(left["checkpoint_sha256"]))
+    right_tie = (int(right["update_index"]), str(right["checkpoint_sha256"]))
+    return (left_tie > right_tie) - (left_tie < right_tie)
 
 
 def path_is_within(path: Path, root: Path) -> bool:
@@ -143,6 +174,10 @@ def scientific_candidate_projection(row: dict[str, Any]) -> dict[str, Any]:
 
 
 def dev_select(input_root: Path, protocol: dict) -> dict:
+    try:
+        reject_permanently_invalid_formal_references([input_root])
+    except PermanentlyInvalidFormalReferenceError as exc:
+        raise ValueError(str(exc)) from exc
     candidates = read_json(input_root / "checkpoint_candidates.json")
     if not isinstance(candidates, list) or not candidates:
         raise ValueError("checkpoint_candidates.json must contain a non-empty list")
@@ -153,7 +188,7 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
     )
     selected = []
     order_audit = None
-    if protocol["typed_model_cache_formal_protocol_version"] in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
+    if protocol["typed_model_cache_formal_protocol_version"] in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
         try:
             order_audit = resolve_formal_agent_order(protocol=protocol)
             reject_permanently_invalid_run_references([input_root])
@@ -163,6 +198,25 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
     for row in candidates:
         if not isinstance(row, dict):
             raise ValueError("checkpoint candidate must be an object")
+        if protocol["typed_model_cache_formal_protocol_version"] == "2.3.0":
+            companion = row.get("selection_metric_availability")
+            if not isinstance(companion, dict):
+                raise ValueError("Protocol v2.3 candidate lacks metric availability counts")
+            for field, _ in SELECTION_METRICS:
+                counts = companion.get(field)
+                if not isinstance(counts, dict):
+                    raise ValueError(f"candidate availability missing: {field}")
+                available = int(counts.get("available_count", -1))
+                unavailable = int(counts.get("unavailable_count", -1))
+                total = int(counts.get("total_count", -1))
+                if (
+                    total < 0
+                    or available < 0
+                    or unavailable < 0
+                    or available + unavailable != total
+                    or (_candidate_metric(row, field) is None) != (available == 0)
+                ):
+                    raise ValueError(f"candidate availability/value mismatch: {field}")
         key = (str(row["agent_name"]), int(row["seed"]), str(row["capacity_label"]))
         groups.setdefault(key, []).append(row)
     if order_audit is None:
@@ -181,10 +235,21 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
             if non_formal_rehearsal
             else [int(seed) for seed in protocol["seed_plan"]["seeds"]]
         )
+        selected_agents = (
+            [
+                agent
+                for agent in order_audit["learned_agent_order"]
+                if agent in {key[0] for key in groups}
+            ]
+            if non_formal_rehearsal
+            else order_audit["learned_agent_order"]
+        )
+        if not selected_agents:
+            raise ValueError("non-formal dev selection has no learned agent")
         ordered_group_keys = [
             (agent, seed, capacity)
             for capacity in capacities
-            for agent in order_audit["learned_agent_order"]
+            for agent in selected_agents
             for seed in seeds
         ]
         if set(groups) != set(ordered_group_keys):
@@ -196,17 +261,7 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
             raise ValueError("dev checkpoint candidate order-contract identity drift")
     for key in ordered_group_keys:
         rows = groups[key]
-        ranked = sorted(
-            rows,
-            key=lambda row: (
-                -finite(row["full_service_ready_byte_hit_rate"], "full_service_ready_byte_hit_rate"),
-                -finite(row["workflow_continuity_rate"], "workflow_continuity_rate"),
-                finite(row["transfer_mb_per_request"], "transfer_mb_per_request"),
-                finite(row["end_to_end_workflow_delay"], "end_to_end_workflow_delay"),
-                int(row["update_index"]),
-                str(row["checkpoint_sha256"]),
-            ),
-        )
+        ranked = sorted(rows, key=cmp_to_key(_compare_candidates))
         winner = dict(ranked[0])
         selected.append(winner)
     training_identity_fields = (
@@ -216,12 +271,17 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
         "execution_commit",
         "resolved_execution_context_sha256",
     )
-    if protocol["typed_model_cache_formal_protocol_version"] in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
+    if protocol["typed_model_cache_formal_protocol_version"] in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
         training_identity_fields = (*training_identity_fields, "active_formal_bundle_sha256")
+    if protocol["typed_model_cache_formal_protocol_version"] == "2.3.0":
+        training_identity_fields = (
+            *training_identity_fields,
+            "formal_nullable_metric_aggregation_contract_semantic_sha256",
+        )
     training_identity = None
     if (
         not non_formal_rehearsal
-        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}
+        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}
     ):
         identities = {
             tuple(row.get(field) for field in training_identity_fields)
@@ -232,12 +292,35 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
         training_identity = dict(zip(training_identity_fields, next(iter(identities))))
         if training_identity["formal_protocol_semantic_sha256"] != protocol["hashes"]["semantic_sha256"]:
             raise ValueError("dev candidate active Protocol identity mismatch")
+    metric_candidate_availability = {
+        field: {
+            "candidate_count": len(candidates),
+            "available_candidate_count": sum(
+                _candidate_metric(row, field) is not None for row in candidates
+            ),
+            "unavailable_candidate_count": sum(
+                _candidate_metric(row, field) is None for row in candidates
+            ),
+            "dimension_participated": any(
+                _candidate_metric(row, field) is not None for row in candidates
+            ),
+        }
+        for field, _ in SELECTION_METRICS
+    }
     return {
-        "dev_checkpoint_selection_version": "1.0.0",
+        "dev_checkpoint_selection_version": "1.1.0",
         "protocol_semantic_sha256": protocol["hashes"]["semantic_sha256"],
         "selection_split": "dev",
         "formal_or_holdout_used": False,
         "selection_rule": protocol["training_budget"]["checkpoint_selection"]["metric_rule"],
+        "nullable_ordering_rule": (
+            "finite_before_unavailable_per_dimension; both_unavailable_skips_dimension; "
+            "no_numeric_sentinel"
+        ),
+        "selection_metric_candidate_availability": metric_candidate_availability,
+        "formal_nullable_metric_aggregation_contract_semantic_sha256": protocol.get(
+            "formal_nullable_metric_aggregation_contract", {}
+        ).get("semantic_sha256"),
         "selected": selected,
         "selection_sha256": canonical_sha256(
             [scientific_candidate_projection(row) for row in selected]
@@ -248,19 +331,25 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
             order_audit["semantic_sha256"] if order_audit else None
         ),
         "selected_agent_order": (
-            order_audit["learned_agent_order"] if order_audit else None
+            list(dict.fromkeys(str(row["agent_name"]) for row in selected))
+            if order_audit
+            else None
         ),
         "non_formal_rehearsal": non_formal_rehearsal,
     }
 
 
 def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
+    try:
+        reject_permanently_invalid_formal_references([input_root])
+    except PermanentlyInvalidFormalReferenceError as exc:
+        raise ValueError(str(exc)) from exc
     selection = read_json(input_root / "dev_selection.json")
     if selection.get("protocol_semantic_sha256") != protocol["hashes"]["semantic_sha256"]:
         raise ValueError("dev selection protocol hash mismatch")
     formal_training_identity = selection.get("formal_training_identity")
     order_audit = None
-    if protocol["typed_model_cache_formal_protocol_version"] in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
+    if protocol["typed_model_cache_formal_protocol_version"] in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
         try:
             order_audit = resolve_formal_agent_order(protocol=protocol)
         except FormalAgentOrderError as exc:
@@ -272,11 +361,24 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
         observed_selected_agents = list(
             dict.fromkeys(str(row.get("agent_name")) for row in selection.get("selected", []))
         )
-        if observed_selected_agents != order_audit["learned_agent_order"]:
+        expected_selected_agents = (
+            [
+                agent
+                for agent in order_audit["learned_agent_order"]
+                if agent in set(observed_selected_agents)
+            ]
+            if bool(selection.get("non_formal_rehearsal"))
+            else order_audit["learned_agent_order"]
+        )
+        if observed_selected_agents != expected_selected_agents:
             raise ValueError("dev selection learned-agent order drift")
+        if protocol["typed_model_cache_formal_protocol_version"] == "2.3.0" and selection.get(
+            "formal_nullable_metric_aggregation_contract_semantic_sha256"
+        ) != protocol["formal_nullable_metric_aggregation_contract"]["semantic_sha256"]:
+            raise ValueError("dev selection nullable metric contract mismatch")
     if (
         not bool(selection.get("non_formal_rehearsal"))
-        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}
+        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}
     ):
         if not isinstance(formal_training_identity, dict):
             raise ValueError("dev selection lacks formal training identity")
@@ -285,6 +387,15 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
     frozen = []
     for row in selection.get("selected", []):
         path = Path(row["checkpoint_path"]).resolve()
+        try:
+            reject_permanently_invalid_formal_references([path, row])
+        except PermanentlyInvalidFormalReferenceError as exc:
+            raise ValueError(
+                "invalid G14C v3/v4 checkpoint reference rejected; "
+                "the hard rejection set covers all G14C v1-v5 invalid runs "
+                "and every later permanently invalid run through G14C v12; "
+                + str(exc)
+            ) from exc
         if any(path_is_within(path, root) for root in INVALID_FORMAL_RUN_ROOTS):
             raise ValueError(
                 "invalid G14C v3/v4 checkpoint reference rejected; "
@@ -321,6 +432,12 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
                     "end_to_end_workflow_delay",
                 )
             },
+            "selection_metric_availability": row.get(
+                "selection_metric_availability", {}
+            ),
+            "formal_nullable_metric_aggregation_contract_semantic_sha256": row.get(
+                "formal_nullable_metric_aggregation_contract_semantic_sha256"
+            ),
             "update_index": int(row["update_index"]),
             "agent_scientific_config_semantic_sha256": row.get(
                 "agent_scientific_config_semantic_sha256"
@@ -368,6 +485,9 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
         "formal_agent_order_contract_semantic_sha256": (
             order_audit["semantic_sha256"] if order_audit else None
         ),
+        "formal_nullable_metric_aggregation_contract_semantic_sha256": protocol.get(
+            "formal_nullable_metric_aggregation_contract", {}
+        ).get("semantic_sha256"),
         "frozen_agent_order": order_audit["learned_agent_order"] if order_audit else None,
     }
 
@@ -407,6 +527,9 @@ def write_checkpoint_companions(input_root: Path, freeze: dict) -> list[dict]:
                 ),
                 "active_formal_bundle_sha256": row.get(
                     "active_formal_bundle_sha256"
+                ),
+                "formal_nullable_metric_aggregation_contract_semantic_sha256": row.get(
+                    "formal_nullable_metric_aggregation_contract_semantic_sha256"
                 ),
                 "runtime_contract_sha256": row.get("runtime_contract_sha256"),
                 "resolved_agent_config": row.get("resolved_agent_config"),
@@ -472,14 +595,51 @@ def formal_gate(input_root: Path, protocol: dict) -> dict:
         "artifact_integrity_manifest.json",
     ]
     missing = [pattern for pattern in required if not any(input_root.glob(pattern))]
+    endpoint_availability: dict[str, str] = {}
+    comparison_availability: list[dict[str, Any]] = []
+    statistics_path = input_root / "statistics" / "paired_statistics.json"
+    if statistics_path.is_file():
+        statistics_payload = read_json(statistics_path)
+        for row in statistics_payload.get("rows", []):
+            if not isinstance(row, dict):
+                raise ValueError("statistics comparison row must be an object")
+            status = (
+                "AVAILABLE"
+                if int(row.get("available_paired_count", row.get("paired_count", 0))) > 0
+                else "UNAVAILABLE"
+            )
+            metric = str(row.get("metric"))
+            existing = endpoint_availability.get(metric)
+            endpoint_availability[metric] = (
+                "AVAILABLE" if existing == "AVAILABLE" or status == "AVAILABLE" else status
+            )
+            comparison_availability.append(
+                {
+                    "candidate_agent": row.get("candidate_agent"),
+                    "baseline_agent": row.get("baseline_agent"),
+                    "metric": metric,
+                    "status": status,
+                    "available_paired_count": int(
+                        row.get("available_paired_count", row.get("paired_count", 0))
+                    ),
+                    "claim_interpretation": (
+                        "eligible_for_statistical_interpretation"
+                        if status == "AVAILABLE"
+                        else "UNAVAILABLE_not_tie_pass_or_fail"
+                    ),
+                }
+            )
     return {
-        "formal_execution_gate_version": "1.0.0",
+        "formal_execution_gate_version": "1.1.0",
         "protocol_semantic_sha256": protocol["hashes"]["semantic_sha256"],
         "passed": not missing,
         "missing_outputs": missing,
         "performance_threshold_used": False,
         "holdout_opened": False,
         "completeness_only": True,
+        "endpoint_availability": endpoint_availability,
+        "claim_map_availability": comparison_availability,
+        "zero_pair_rule": "UNAVAILABLE_not_tie_pass_or_fail",
         "execution_mode": (
             "non_formal_rehearsal" if non_formal_rehearsal else "formal"
         ),
@@ -526,6 +686,12 @@ def artifact_integrity(input_root: Path, protocol: dict, output_path: Path) -> d
 
 def main() -> None:
     args = parse_args()
+    try:
+        reject_permanently_invalid_formal_references(
+            [args.input_root, args.output_path]
+        )
+    except PermanentlyInvalidFormalReferenceError as exc:
+        raise ValueError(str(exc)) from exc
     protocol = read_json(Path(args.protocol_path))
     validate_protocol_v1_1(protocol)
     input_root = Path(args.input_root)

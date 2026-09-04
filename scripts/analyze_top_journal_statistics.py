@@ -34,6 +34,8 @@ LOWER_IS_BETTER = {
     "handoff_failure_rate",
     "backhaul_traffic_cost",
     "adapter_state_migration_overhead",
+    "transfer_mb_per_request",
+    "end_to_end_workflow_delay",
 }
 DEFAULT_PAIR_KEYS = [
     "seed",
@@ -106,13 +108,18 @@ def load_rows(paths: list[str]) -> list[dict[str, str]]:
 
 
 def float_value(row: dict[str, str], field_name: str) -> float | None:
-    value = row.get(field_name)
+    if field_name not in row:
+        raise ValueError(f"required statistics metric missing: {field_name}")
+    value = row[field_name]
     if value is None or value == "":
         return None
     try:
-        return float(value)
-    except ValueError:
-        return None
+        result = float(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"invalid statistics metric: {field_name}") from exc
+    if not math.isfinite(result):
+        raise ValueError(f"non-finite statistics metric: {field_name}")
+    return result
 
 
 def pair_key(row: dict[str, str], key_fields: list[str]) -> tuple[str, ...]:
@@ -332,23 +339,23 @@ def summarize_deltas(
             "cluster_count": 0,
             "outer_cluster_count": 0,
             "inner_cluster_count": 0,
-            "mean_delta": 0.0,
-            "ci95_low": 0.0,
-            "ci95_high": 0.0,
+            "mean_delta": None,
+            "ci95_low": None,
+            "ci95_high": None,
             "ci95_method": ci_method,
-            "percentile_ci95_low": 0.0,
-            "percentile_ci95_high": 0.0,
-            "bca_ci95_low": 0.0,
-            "bca_ci95_high": 0.0,
+            "percentile_ci95_low": None,
+            "percentile_ci95_high": None,
+            "bca_ci95_low": None,
+            "bca_ci95_high": None,
             "bca_available": False,
-            "std_delta": 0.0,
-            "cohen_dz": 0.0,
-            "outer_cluster_std_delta": 0.0,
-            "outer_cluster_cohen_d": 0.0,
+            "std_delta": None,
+            "cohen_dz": None,
+            "outer_cluster_std_delta": None,
+            "outer_cluster_cohen_d": None,
             "wins": 0,
             "ties": 0,
             "losses": 0,
-            "sign_test_pvalue": 1.0,
+            "sign_test_pvalue": None,
         }
     std_delta = stdev(deltas) if len(deltas) > 1 else 0.0
     outer_cluster_means: list[float] = []
@@ -489,16 +496,29 @@ def main() -> None:
             delta_clusters: list[tuple[str, ...]] = []
             delta_outer_clusters: list[tuple[str, ...]] = []
             delta_inner_clusters: list[tuple[str, ...]] = []
+            total_pair_count = 0
+            candidate_only_available_count = 0
+            baseline_only_available_count = 0
+            both_unavailable_count = 0
             for key in sorted(by_key_and_agent):
                 agents_by_key = by_key_and_agent[key]
                 candidate_row = agents_by_key.get(args.candidate_agent)
                 baseline_row = agents_by_key.get(baseline_agent)
                 if candidate_row is None or baseline_row is None:
                     continue
+                total_pair_count += 1
                 candidate_value = float_value(candidate_row, metric)
                 baseline_value = float_value(baseline_row, metric)
-                if candidate_value is None or baseline_value is None:
+                if candidate_value is None and baseline_value is None:
+                    both_unavailable_count += 1
                     continue
+                if candidate_value is not None and baseline_value is None:
+                    candidate_only_available_count += 1
+                    continue
+                if candidate_value is None and baseline_value is not None:
+                    baseline_only_available_count += 1
+                    continue
+                assert candidate_value is not None and baseline_value is not None
                 raw_delta = candidate_value - baseline_value
                 raw_deltas.append(raw_delta)
                 signed_deltas.append(-raw_delta if metric in LOWER_IS_BETTER else raw_delta)
@@ -533,6 +553,19 @@ def main() -> None:
                     "metric": metric,
                     "higher_is_better": metric not in LOWER_IS_BETTER,
                     "signed_positive_favors_candidate": True,
+                    "total_pair_count": total_pair_count,
+                    "available_paired_count": len(signed_deltas),
+                    "candidate_only_available_drop_count": candidate_only_available_count,
+                    "baseline_only_available_drop_count": baseline_only_available_count,
+                    "both_unavailable_drop_count": both_unavailable_count,
+                    "availability_coverage": (
+                        round(len(signed_deltas) / total_pair_count, 6)
+                        if total_pair_count
+                        else None
+                    ),
+                    "endpoint_availability": (
+                        "AVAILABLE" if signed_deltas else "UNAVAILABLE"
+                    ),
                     **summary,
                     "raw_mean_delta_candidate_minus_baseline": raw_summary["mean_delta"],
                     "raw_ci95_low": raw_summary["ci95_low"],
@@ -540,10 +573,20 @@ def main() -> None:
                 }
             )
 
-    adjusted_sign_tests = holm_adjust([float(row["sign_test_pvalue"]) for row in output_rows])
-    for row, adjusted_pvalue in zip(output_rows, adjusted_sign_tests):
-        row["holm_sign_test_pvalue"] = round(adjusted_pvalue, 6)
+    available_pvalue_rows = [
+        (index, float(row["sign_test_pvalue"]))
+        for index, row in enumerate(output_rows)
+        if row["sign_test_pvalue"] is not None
+    ]
+    adjusted_sign_tests = holm_adjust([item[1] for item in available_pvalue_rows])
+    adjusted_by_index = {
+        row_index: round(adjusted, 6)
+        for (row_index, _), adjusted in zip(available_pvalue_rows, adjusted_sign_tests)
+    }
+    for index, row in enumerate(output_rows):
+        row["holm_sign_test_pvalue"] = adjusted_by_index.get(index)
         row["holm_family"] = "all_baseline_metric_comparisons"
+        row["holm_available_family_size"] = len(available_pvalue_rows)
 
     output_root = Path(args.output_root)
     output_root.mkdir(parents=True, exist_ok=True)
@@ -578,6 +621,7 @@ def main() -> None:
             },
             ensure_ascii=False,
             indent=2,
+            allow_nan=False,
         ),
         encoding="utf-8",
     )

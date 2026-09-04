@@ -1664,3 +1664,17 @@ quick run 结果边界：
   单元均有合格 subject；15 agents × 3 capacities 共 6,480 cells 的每单元 exposure fingerprint 唯一数均为 1。
 - G14R11 formal training/checkpoint/performance=`0/0/0`；12 个 holdout window 只核验 seal/metadata，未生成
   exposure、未选择车辆、未产生 performance。未启动 G14C v12、G14D 或 G15。
+
+# 2026-09-04 — G14R12 nullable metric execution-contract closure
+
+- G14C v12 首 train cell 已生成 256 episode rows、2,644 interactions/CacheEvents、32 updates 与 8 个 staging
+  cadence checkpoints，但 `metric_means()` 对 215 个合法 delay `null` 调用 `float(None)`，在 cell commit 前终止。
+  这是 Endpoint 2.0 nullable consumer 类别错误，不是数据损坏或算法性能失败；v12 全 run/staging 永久拒用。
+- 冻结 Nullable Metric Aggregation Contract `1.0.0` 与 Protocol `2.3.0`。`mean_metrics` 保持 scalar
+  `float|null`，availability companion 独立记录；Dev 选择 finite 优先且不使用数值 sentinel；paired statistics
+  只消费双边 finite pair，zero-pair endpoint 在 gate/claim map 中为 `UNAVAILABLE`。
+- exact non-formal 复演完成 256/256 rows，delay available/unavailable=`41/215`，2,644/2,644 request/Event
+  exact alignment，32 updates 与 cadence `[4,8,12,16,20,24,28,32]`。13-phase clean rehearsal 到
+  `complete_without_holdout`，186 commands、placeholder/sentinel 0，formal training/checkpoint/performance=`0/0/0`。
+- Readiness 只表示未来全新 G14C v13 执行合同可用，不是 formal/G14/TMC/paper-ready；holdout 仍 sealed/unopened，
+  未启动 G14C v13、G14D 或 G15。

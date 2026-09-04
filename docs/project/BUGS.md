@@ -490,3 +490,15 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
   复用。Protocol 2.1 仅保留 audit compatibility，不得作为 active execution。
 - 剩余风险：G14R11 只证明 execution contract 与 non-formal rehearsal；尚未运行 G14C v12、formal performance
   或 holdout，不能形成算法优势、formal gate、G14/TMC/paper-ready 结论。
+
+# 2026-09-04 — G14C v12 nullable aggregation failure（已修合同，run 永久无效）
+
+- 根因：`scripts/train_algo_pool_real_sample.py` 的旧 `metric_means()` 对每行执行 `float(row[name])`；Endpoint 2.0
+  合法产生的 215 个 `end_to_end_workflow_delay=null` 触发 `TypeError`。数据、episode、request/Event alignment
+  没有损坏，这也不是算法性能失败。
+- 永久边界：`typed_model_cache_formal_20260902_162203_g14c_v12` 的 256 episodes、32 updates、8 candidates、
+  latest checkpoint 及全部 staging 引用不得 resume/retry/finalize/salvage/reuse，也不得进入 selection、freeze、
+  benchmark、statistics、gate 或 formal manifest。
+- 修复：Protocol 2.3 统一严格 nullable reducer、availability counts、Dev finite-first ordering、paired availability、
+  finite-only Holm 与 zero-pair `UNAVAILABLE` gate/claim semantics；共享 denylist覆盖完整 active command graph。
+- 剩余风险：长时 G14C v13 尚未执行；non-formal exact/phase-chain 验收不构成 performance 或 paper-ready 证据。

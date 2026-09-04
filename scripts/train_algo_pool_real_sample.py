@@ -8,7 +8,6 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from statistics import fmean
 from typing import Any
 
 import torch
@@ -39,6 +38,11 @@ from src.evaluators.formal_window_consumption import (
 )
 from src.metrics.recorder import EpisodeRecorder
 from src.metrics.cache_efficiency_metrics import reduce_cache_efficiency_summary
+from src.metrics.formal_nullable_metrics import (
+    FORMAL_NULLABLE_METRIC_AGGREGATION_CONTRACT_VERSION,
+    reduce_nullable_metric_rows,
+    validate_end_to_end_delay_reason,
+)
 from src.runtime.typed_model_cache_runtime import (
     build_checkpoint_provenance,
     load_runtime_catalog,
@@ -58,6 +62,9 @@ from src.runtime.formal_training_identity import (
     FormalTrainingIdentityError,
     load_strict_json_mapping,
     validate_checkpoint_training_identity,
+)
+from src.runtime.formal_invalid_run_registry import (
+    reject_permanently_invalid_formal_references,
 )
 from src.runtime.formal_exogenous_request_execution import (
     FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION,
@@ -118,6 +125,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--clip_ratio", type=float, default=0.2)
     parser.add_argument("--entropy_coef", type=float, default=None)
     parser.add_argument("--value_coef", type=float, default=None)
+    parser.add_argument("--auxiliary_coef", type=float, default=None)
     parser.add_argument("--gamma", type=float, default=0.99)
     parser.add_argument("--gae_lambda", type=float, default=0.95)
     parser.add_argument("--random_seed", type=int, default=7)
@@ -137,6 +145,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--formal-exogenous-request-execution",
         action="store_true",
         help="Explicitly enable replay-driven request exposure (required by Protocol 2.x).",
+    )
+    parser.add_argument(
+        "--non-formal-rehearsal",
+        action="store_true",
+        help="Mark a repair rehearsal as non-formal and ineligible for formal evidence.",
     )
     parser.add_argument(
         "--agent_config_path",
@@ -277,6 +290,12 @@ def build_summary_row(summary: dict[str, Any], *, episode_index: int, updated: b
     if reward_positive_offset_component <= 0.0 and reward_positive_offset > 0.0:
         reward_positive_offset_component = reward_positive_offset * float(len(step_trace))
     total_reward = float(summary["reward_breakdown"]["total"]["sum"])
+    endpoint_audit = summary.get("formal_request_execution_audit") or {}
+    delay_reason = endpoint_audit.get("end_to_end_workflow_delay_availability")
+    if delay_reason is not None:
+        validate_end_to_end_delay_reason(
+            metrics["end_to_end_workflow_delay"], delay_reason
+        )
     return {
         "episode_index": episode_index,
         "agent_name": summary["run_info"].get("agent_name"),
@@ -297,6 +316,7 @@ def build_summary_row(summary: dict[str, Any], *, episode_index: int, updated: b
         "reward_positive_offset_component": round(float(reward_positive_offset_component), 6),
         "episode_step_count": len(step_trace),
         "end_to_end_workflow_delay": metrics["end_to_end_workflow_delay"],
+        "end_to_end_workflow_delay_availability": delay_reason,
         "workflow_continuity_rate": metrics["workflow_continuity_rate"],
         "handoff_failure_rate": metrics["handoff_failure_rate"],
         "handoff_ready_ratio": metrics["handoff_ready_ratio"],
@@ -326,11 +346,14 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
-def metric_means(rows: list[dict[str, Any]]) -> dict[str, float]:
-    return {
-        name: round(fmean(float(row[name]) for row in rows), 6) if rows else 0.0
-        for name in SUMMARY_METRICS
-    }
+def metric_means(rows: list[dict[str, Any]]) -> dict[str, float | None]:
+    means, _ = reduce_nullable_metric_rows(rows, SUMMARY_METRICS)
+    return means
+
+
+def metric_availability(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    _, availability = reduce_nullable_metric_rows(rows, SUMMARY_METRICS)
+    return availability
 
 
 def annotate_checkpoint(path: Path, metadata: dict[str, Any]) -> None:
@@ -352,6 +375,13 @@ def load_checkpoint_training_metadata(path: str | Path) -> dict[str, Any]:
 
 def main() -> None:
     args = parse_args()
+    reject_permanently_invalid_formal_references(
+        [
+            args.output_root,
+            getattr(args, "resume_checkpoint_path", ""),
+            getattr(args, "resolved_execution_context_path", ""),
+        ]
+    )
     if args.resource_registry_path:
         resolve_argument_resources(
             args,
@@ -549,6 +579,12 @@ def main() -> None:
         "batch_size": args.batch_size,
         "deterministic_action": False,
     }
+    if args.auxiliary_coef is not None:
+        if args.agent_name != "sa_ghmappo":
+            raise FormalTrainingContractError(
+                "--auxiliary_coef is only valid for sa_ghmappo"
+            )
+        agent_kwargs["auxiliary_coef"] = args.auxiliary_coef
     agent_kwargs.update(agent_profile_kwargs(args.agent_name, args.profile))
     for field_name, frozen_value in resolved_training.agent_config.items():
         supplied = getattr(args, field_name, None)
@@ -566,7 +602,7 @@ def main() -> None:
     )
 
     if args.formal_contract_preflight_only:
-        if resolved_training.formal_protocol_version not in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
+        if resolved_training.formal_protocol_version not in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
             raise FormalTrainingContractError(
                 "formal contract preflight is restricted to Protocol v1.6/v1.7"
             )
@@ -893,8 +929,13 @@ def main() -> None:
     summary_path = output_root / "summary.json"
     train_summary_path = output_root / "train_summary.json"
     write_csv(train_csv_path, rows)
+    mean_metrics, mean_metric_availability = reduce_nullable_metric_rows(
+        rows, SUMMARY_METRICS
+    )
     summary_payload = {
         "run_id": run_id,
+        "non_formal_rehearsal": bool(args.non_formal_rehearsal),
+        "formal_performance_evidence": False if args.non_formal_rehearsal else None,
         "agent_name": args.agent_name,
         "algo_spec": get_algo_spec(args.agent_name),
         "profile": args.profile,
@@ -992,12 +1033,19 @@ def main() -> None:
         "cache_capacity_profile": runtime_contract["cache_capacity_profile"],
         "train_window_plan_identity": window_plan_identity,
         "formal_window_consumption_binding": window_binding,
-        "mean_metrics": metric_means(rows),
+        "formal_nullable_metric_aggregation_contract_version": (
+            FORMAL_NULLABLE_METRIC_AGGREGATION_CONTRACT_VERSION
+        ),
+        "mean_metrics": mean_metrics,
+        "mean_metric_availability": mean_metric_availability,
         "rows": rows,
         "update_logs": update_logs,
     }
-    summary_path.write_text(json.dumps(summary_payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    train_summary_path.write_text(json.dumps(summary_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    serialized_summary = json.dumps(
+        summary_payload, ensure_ascii=False, indent=2, allow_nan=False
+    )
+    summary_path.write_text(serialized_summary, encoding="utf-8")
+    train_summary_path.write_text(serialized_summary, encoding="utf-8")
 
     print("algo pool training complete")
     print(f"run_id: {run_id}")

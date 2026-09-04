@@ -69,6 +69,9 @@ from src.runtime.formal_agent_order import (
     reject_permanently_invalid_run_references,
     resolve_formal_agent_order,
 )
+from src.runtime.formal_invalid_run_registry import (
+    reject_permanently_invalid_formal_references,
+)
 
 BENCHMARK_AGENT_CHOICES = list_evaluable_agents()
 SA_ADVANTAGE_FOCUS_METRICS = [
@@ -102,6 +105,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--formal-exogenous-request-execution",
         action="store_true",
         help="Explicitly enable fail-closed replay-driven formal request exposure.",
+    )
+    parser.add_argument(
+        "--non-formal-rehearsal",
+        action="store_true",
+        help="Allow a reduced manifest-ordered agent set and mark outputs non-formal.",
     )
     parser.add_argument(
         "--model_cache_runtime_config",
@@ -512,6 +520,17 @@ def build_sa_advantage_diagnosis(
 
 def main() -> None:
     args = parse_args()
+    reject_permanently_invalid_formal_references(
+        [
+            args.output_root,
+            args.seed_checkpoint_manifest_path,
+            args.checkpoint_provenance_manifest_path,
+            args.sa_ghmappo_checkpoint_path,
+            args.flat_ppo_checkpoint_path,
+            args.flat_mappo_checkpoint_path,
+            args.cache_offload_drl_checkpoint_path,
+        ]
+    )
     order_audit = None
     if args.formal_agent_order_contract_path:
         try:
@@ -580,7 +599,11 @@ def main() -> None:
         )
         args._fairness_root = ROOT_DIR
         args._resolved_model_cache_runtime = runtime_contract
-        enforce_benchmark_args(args, fairness_manifest)
+        enforce_benchmark_args(
+            args,
+            fairness_manifest,
+            allow_nonformal_agent_subset=bool(args.non_formal_rehearsal),
+        )
         if order_audit is not None:
             try:
                 order_audit = resolve_formal_agent_order(
@@ -893,7 +916,15 @@ def main() -> None:
                     summary_path = episode_root / str(mobility_bundle.rsu_metadata.get("window_id")) / workflow_state.workflow_id / agent_name / f"seed_{seed}.summary.json"
                     summary_path.parent.mkdir(parents=True, exist_ok=True)
                     summary["run_info"]["summary_path"] = str(summary_path)
-                    summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+                    summary_path.write_text(
+                        json.dumps(
+                            summary,
+                            ensure_ascii=False,
+                            indent=2,
+                            allow_nan=False,
+                        ),
+                        encoding="utf-8",
+                    )
                     rows.append(summary_to_row(summary))
 
     if fairness_manifest is not None:
@@ -918,6 +949,13 @@ def main() -> None:
                 agent_index[str(row.get("agent_name"))],
             )
         )
+    if args.formal_exogenous_request_execution:
+        for row_index, row in enumerate(rows):
+            missing_metrics = [name for name in MAIN_RESULT_METRICS if name not in row]
+            if missing_metrics:
+                raise ValueError(
+                    f"formal benchmark row {row_index} misses required metrics: {missing_metrics}"
+                )
     aggregate_by_agent = aggregate_rows(rows, group_keys=["agent_name"], metrics=MAIN_RESULT_METRICS)
     aggregate_by_seed_and_agent = aggregate_rows(rows, group_keys=["seed", "agent_name"], metrics=MAIN_RESULT_METRICS)
     aggregate_by_workflow_and_agent = aggregate_rows(rows, group_keys=["workflow_id", "agent_name"], metrics=MAIN_RESULT_METRICS)
@@ -1062,9 +1100,9 @@ def main() -> None:
     resolved_manifest_path = output_root / "cache_baseline_fairness_manifest.json"
     command_log_path = output_root / "resolved_command.txt"
     integrity_path = output_root / "artifact_integrity_manifest.json"
-    aggregate_path.write_text(json.dumps(aggregate_summary, ensure_ascii=False, indent=2), encoding="utf-8")
-    comparison_path.write_text(json.dumps(comparison_against_popularity, ensure_ascii=False, indent=2), encoding="utf-8")
-    diagnosis_path.write_text(json.dumps(sa_advantage_diagnosis, ensure_ascii=False, indent=2), encoding="utf-8")
+    aggregate_path.write_text(json.dumps(aggregate_summary, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
+    comparison_path.write_text(json.dumps(comparison_against_popularity, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
+    diagnosis_path.write_text(json.dumps(sa_advantage_diagnosis, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
     write_rows_csv(rows_path, rows)
     command_log_path.write_text(" ".join(shlex.quote(item) for item in sys.argv) + "\n", encoding="utf-8")
     run_manifest = {
@@ -1079,6 +1117,8 @@ def main() -> None:
         "formal_exogenous_request_execution_enabled": bool(
             args.formal_exogenous_request_execution
         ),
+        "non_formal_rehearsal": bool(args.non_formal_rehearsal),
+        "formal_performance_evidence": False if args.non_formal_rehearsal else None,
         "formal_exogenous_request_execution_contract_version": (
             FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION
             if args.formal_exogenous_request_execution
@@ -1100,7 +1140,7 @@ def main() -> None:
             "command_log": str(command_log_path),
         },
     }
-    run_manifest_path.write_text(json.dumps(run_manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    run_manifest_path.write_text(json.dumps(run_manifest, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     if fairness_manifest is not None:
         resolved_manifest_path.write_text(json.dumps(fairness_manifest, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
         fairness_audit = {
@@ -1128,7 +1168,7 @@ def main() -> None:
             for path in integrity_files
         ],
     }
-    integrity_path.write_text(json.dumps(integrity_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    integrity_path.write_text(json.dumps(integrity_payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
 
     print("main results benchmark complete")
     print(f"run_id: {benchmark_run_id}")

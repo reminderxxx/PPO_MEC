@@ -29,6 +29,7 @@ from src.metrics.cache_efficiency_metrics import (
     reduce_cache_efficiency_summary,
 )
 from src.metrics.recorder import EpisodeRecorder
+from src.metrics.formal_nullable_metrics import nullable_finite_value
 from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
 from src.runtime.formal_exogenous_request_execution import (
     FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION,
@@ -2160,13 +2161,12 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
 
 
 def _optional_float(value: Any) -> float | None:
-    if value is None:
-        return None
-    try:
-        numeric = float(value)
-    except (TypeError, ValueError):
-        return None
-    return numeric if isfinite(numeric) else None
+    return nullable_finite_value(
+        value,
+        field="aggregate_metric",
+        csv_empty_is_null=True,
+        numeric_strings_allowed=True,
+    )
 
 
 def metric_stats(values: list[Any]) -> dict[str, float | int | None]:

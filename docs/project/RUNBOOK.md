@@ -1296,3 +1296,20 @@ train/dev/formal 的 frozen windows/workflows，holdout 仅读取 seal/metadata�
 先验证 ready Protocol 2.2 bundle、environment projection、60/60 reachability、186-command expansion、
 holdout capability=false 以及 v11 denylist。Protocol 2.1/v11 artifact 不得作为 resume、checkpoint、candidate、
 replay 或 manifest 输入。
+
+# Protocol 2.3 nullable metric execution contract
+
+唯一 active index：
+
+```text
+configs/experiment/typed_model_cache_formal_protocol_v2_3_20260903/protocol_index.json
+```
+
+Protocol 2.2 已降为 audit-only。所有 formal train/eval/Dev/freeze/benchmark/statistics/gate 路径必须使用 active
+index 中的 Nullable Metric Aggregation Contract 1.0.0；显式 `null` 保留为 unavailable，required-field missing、
+bool、invalid string、NaN/Infinity fail-fast。不得用 CLI 指向旧 Protocol 绕过 active index。
+
+`typed_model_cache_formal_20260902_162203_g14c_v12` 及其 `.staging`、candidate/latest checkpoints 永久禁止
+resume、retry、finalize-only、salvage、复制或消费。G14R12 audit 和 `rehearsal_runtime/` 仅是 non-formal repair
+evidence。未来 G14C v13 只能从 pushed、Git-clean、`HEAD == main == origin/main` 的全新 worktree 运行；当前任务
+不启动 v13，holdout capability 必须保持 false。

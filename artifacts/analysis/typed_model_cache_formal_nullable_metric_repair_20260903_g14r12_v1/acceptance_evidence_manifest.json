@@ -1,0 +1,26 @@
+{
+  "active_bundle_core_sha256": "2bc39b436b5a1fe47d5cf6ca4c082bb9e2de50175604c6555a377fb4e2cf2955",
+  "checks": {
+    "clean_detached_candidate": "pass",
+    "dev_selection_nullable_validation": "pass",
+    "exact_v12_failure_unit_rehearsal": "pass",
+    "full_repository_pytest": "pass",
+    "nullable_contract": "pass",
+    "phase_chain_rehearsal": "pass",
+    "producer_consumer_matrix": "pass",
+    "protected_files": "pass",
+    "root_cause_audit": "pass",
+    "smoke_test": "pass",
+    "statistics_nullable_validation": "pass",
+    "strict_serialization_and_integrity": "pass",
+    "synthetic_validation": "pass",
+    "v12_permanent_invalidation": "pass"
+  },
+  "clean_candidate": true,
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "holdout_capability": false,
+  "holdout_sealed_unopened": true,
+  "status": "pass"
+}

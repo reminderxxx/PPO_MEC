@@ -1,0 +1,142 @@
+{
+  "consumer_identity": "run_typed_model_cache_formal_dev_selection imports artifact-manager dev_select",
+  "frozen_order": [
+    "maximize full_service_ready_byte_hit_rate",
+    "maximize workflow_continuity_rate",
+    "minimize transfer_mb_per_request",
+    "minimize end_to_end_workflow_delay",
+    "update index",
+    "checkpoint SHA-256"
+  ],
+  "metric_candidate_availability": {
+    "end_to_end_workflow_delay": {
+      "available_candidate_count": 2,
+      "candidate_count": 2,
+      "dimension_participated": true,
+      "unavailable_candidate_count": 0
+    },
+    "full_service_ready_byte_hit_rate": {
+      "available_candidate_count": 2,
+      "candidate_count": 2,
+      "dimension_participated": true,
+      "unavailable_candidate_count": 0
+    },
+    "transfer_mb_per_request": {
+      "available_candidate_count": 2,
+      "candidate_count": 2,
+      "dimension_participated": true,
+      "unavailable_candidate_count": 0
+    },
+    "workflow_continuity_rate": {
+      "available_candidate_count": 2,
+      "candidate_count": 2,
+      "dimension_participated": true,
+      "unavailable_candidate_count": 0
+    }
+  },
+  "null_can_be_zero_delay_winner": false,
+  "nullable_ordering": "finite_before_unavailable; both_unavailable_skip_dimension",
+  "selected": [
+    {
+      "agent_name": "sa_ghmappo",
+      "capacity_label": "constrained_288mb",
+      "checkpoint_path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/rehearsal_runtime/exact_v12_failure_unit/training/sa_ghmappo/nonformal_repair_constrained_288mb_sa_ghmappo_seed7/checkpoints/update_0004.pt",
+      "checkpoint_schedule": {
+        "candidate_update_indices": [
+          4,
+          8,
+          12,
+          16,
+          20,
+          24,
+          28,
+          32
+        ],
+        "checkpoint_every_updates": 4,
+        "checkpoint_schedule_version": "1.0.0",
+        "resume_latest_saved_each_update": true,
+        "resume_latest_selection_eligible": false
+      },
+      "checkpoint_sha256": "3d6fa1df8dec19c82ea49c1a0b2131ba81b2e3e62182779d75f2330fee9ae94b",
+      "end_to_end_workflow_delay": 635.146341,
+      "formal_agent_order_contract_semantic_sha256": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0",
+      "formal_candidate": false,
+      "formal_nullable_metric_aggregation_contract_semantic_sha256": "50a9983d21afdc06ec9df309c29f75f5009e062013990bb491ed58c442470889",
+      "full_service_ready_byte_hit_rate": 0.471267,
+      "non_formal_rehearsal": true,
+      "resolved_agent_config": {},
+      "runtime_contract_sha256": "82ef8858c101aed0f702fa118a11c03db9f5689c3c2776214ef95c70265a689f",
+      "seed": 7,
+      "selection_metric_availability": {
+        "end_to_end_workflow_delay": {
+          "availability_status": "available_partial",
+          "available_count": 41,
+          "total_count": 256,
+          "unavailable_count": 215
+        },
+        "full_service_ready_byte_hit_rate": {
+          "availability_status": "available_complete",
+          "available_count": 256,
+          "total_count": 256,
+          "unavailable_count": 0
+        },
+        "transfer_mb_per_request": {
+          "availability_status": "available_complete",
+          "available_count": 256,
+          "total_count": 256,
+          "unavailable_count": 0
+        },
+        "workflow_continuity_rate": {
+          "availability_status": "available_complete",
+          "available_count": 256,
+          "total_count": 256,
+          "unavailable_count": 0
+        }
+      },
+      "transfer_mb_per_request": 18.460784,
+      "typed_runtime_provenance": {
+        "action_contract": "semantic_discrete_5_multi_head",
+        "action_shape": [
+          5
+        ],
+        "agent_identity": "sa_ghmappo",
+        "cache_efficiency_metrics_contract_version": "1.2.0",
+        "cache_event_schema_version": "1.3.0",
+        "capacity_unit": "mb",
+        "capacity_value": 288.0,
+        "checkpoint_provenance_version": "typed_checkpoint_provenance_v1.0.0",
+        "checkpoint_sha256_binding": "external_manifest_after_serialization",
+        "environment_contract": "VecWorkflowCoreEnv+GymVecEnv/v1",
+        "eviction_policy": "lru",
+        "execution_git_commit": "unavailable",
+        "model_cache_profile": "typed_base_adapter_state_v1",
+        "observation_contract": "graph_surrogate_semantic_encoder",
+        "observation_shape": [
+          9
+        ],
+        "reward_contract": {
+          "reward_positive_offset": 0.0,
+          "version": "vec_workflow_reward_breakdown_v1"
+        },
+        "runtime_contract_sha256": "82ef8858c101aed0f702fa118a11c03db9f5689c3c2776214ef95c70265a689f",
+        "train_window_plan_identity": {
+          "formal_window_consumption_contract_sha256": null,
+          "formal_window_split": null,
+          "path": "/private/tmp/ppo_mec_g14r12_replay.a8HQTh/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/train_window_plan.json",
+          "protocol_version": "typed_model_cache_split_protocol_v1.0.0",
+          "selected_window_plan_sha256": "8384ea6027382d6f002c767e8060bf0df3837a340111296ae4bd9cb903e760b8",
+          "split": "train"
+        },
+        "training_seed": 7,
+        "typed_catalog_fingerprint": "89c548980b63df733553d748e8db3ca622965b63abcd08ebd4c231790b40a9d6",
+        "typed_initial_state_fingerprint": "fb0cdbfa761477f4c39bc3416181b475c8884a1c1433edc56d7f2541fc6cac46",
+        "typed_model_cache_contract_version": "1.0.0"
+      },
+      "update_index": 4,
+      "workflow_continuity_rate": 0.471267
+    }
+  ],
+  "selection_sha256": "621b5562691e4a041c49ed671a0e62ea561a2bef3b2b637b51627405fe92a9f5",
+  "status": "pass",
+  "winner_and_hash_identical_across_consumers": true
+}

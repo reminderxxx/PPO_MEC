@@ -584,3 +584,23 @@
 - `scripts/run_formal_request_subject_lifecycle_rehearsal.py`：exact failure-unit 与全未封存窗口 non-formal audit。
 - `scripts/build_formal_request_subject_lifecycle_artifacts.py`：negative/matrix/readiness/integrity evidence producer。
 - `tests/test_formal_request_subject_lifecycle.py`：subject lifecycle、RSU、visibility、legacy compatibility 与 schema 负例。
+
+# G14R12 nullable metric modules
+
+- `src/metrics/formal_nullable_metrics.py`：strict nullable value parser、available-only reducer、endpoint
+  value/reason consistency 与 canonical finite JSON hash。
+- `src/runtime/formal_invalid_run_registry.py`：active train/resume/selection/freeze/benchmark/statistics/artifact
+  manager 共用的 permanent invalid-run/reference denylist。
+- `scripts/train_algo_pool_real_sample.py`、`scripts/eval_algo_pool_real_sample.py`：兼容 scalar `mean_metrics` 与
+  独立 `mean_metric_availability` producer。
+- `src/evaluators/main_results_support.py`、`scripts/benchmark_main_results.py`：CSV null round-trip、required-field
+  validation、available-only aggregate 与 strict JSON benchmark consumer。
+- `scripts/run_typed_model_cache_formal_dev_selection.py`、`scripts/manage_typed_model_cache_formal_artifacts.py`：
+  candidate availability、finite-first frozen comparator、selection hash、freeze/provenance/integrity/gate。
+- `scripts/analyze_top_journal_statistics.py`、`scripts/run_typed_model_cache_formal_statistics.py`：paired availability、
+  lower-is-better sign、drop coverage、zero-pair null statistics 与 finite-only Holm。
+- `scripts/repair_formal_nullable_metric_contract.py`：Protocol 2.3/Readiness v15/active bundle generator。
+- `scripts/build_formal_nullable_metric_repair_artifacts.py`：original-artifact复算、non-formal rehearsal摘要与
+  self-excluding integrity evidence producer。
+- `tests/test_formal_nullable_metric_contract.py`：pure reducer、producer compatibility、selection、statistics、
+  strict serialization 与 v12 rejection regressions。

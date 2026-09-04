@@ -1303,12 +1303,26 @@ def expected_unit(manifest: dict[str, Any], *, seed: int, window_id: str, workfl
     return matches[0]
 
 
-def enforce_benchmark_args(args: Any, manifest: dict[str, Any]) -> None:
+def enforce_benchmark_args(
+    args: Any,
+    manifest: dict[str, Any],
+    *,
+    allow_nonformal_agent_subset: bool = False,
+) -> None:
     typed_binding = manifest.get("cache_contract", {}).get("typed_model_cache")
     expected_agents = list(BASELINE_NAMES) + list(
         (typed_binding or {}).get("controller_agents") or []
     )
-    if list(args.agents) != expected_agents:
+    observed_agents = list(args.agents)
+    subset_is_ordered = observed_agents == [
+        agent for agent in expected_agents if agent in set(observed_agents)
+    ]
+    if allow_nonformal_agent_subset:
+        if not observed_agents or not subset_is_ordered:
+            raise FairnessManifestError(
+                "non-formal rehearsal agents must be a non-empty ordered manifest subset"
+            )
+    elif observed_agents != expected_agents:
         raise FairnessManifestError(f"agents must exactly match manifest order {expected_agents}")
     seeds = manifest["seed_plan"]["benchmark_run_seeds"]
     if list(args.seeds) != seeds:

@@ -29,12 +29,12 @@ from src.runtime.formal_execution_environment import (
 
 ACTIVE_FORMAL_BUNDLE_CONTRACT_VERSION = "1.1.0"
 ACTIVE_BUNDLE_RESOURCE_RESOLUTION_CONTRACT_VERSION = "1.0.0"
-ACTIVE_PROTOCOL_VERSION = "2.2.0"
-ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v2_2"
-READY_STATUS = "READY_FOR_G14C_V12_CLEAN_TRAIN_AND_FORMAL"
-READINESS_VERSION = "14.0.0"
+ACTIVE_PROTOCOL_VERSION = "2.3.0"
+ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v2_3"
+READY_STATUS = "READY_FOR_G14C_V13_CLEAN_TRAIN_AND_FORMAL"
+READINESS_VERSION = "15.0.0"
 DEFAULT_ACTIVE_INDEX_RELATIVE = (
-    "configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901/"
+    "configs/experiment/typed_model_cache_formal_protocol_v2_3_20260903/"
     "protocol_index.json"
 )
 CAPACITY_ORDER = (
@@ -249,6 +249,7 @@ def _validate_resource_rows(
         "formal_request_exposure_schema",
         "formal_request_subject_lifecycle_contract",
         "environment_identity_projection_contract",
+        "formal_nullable_metric_aggregation_contract",
     }
     if require_readiness:
         required.add("readiness_companion")

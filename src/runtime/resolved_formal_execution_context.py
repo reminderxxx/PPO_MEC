@@ -160,7 +160,7 @@ def build_resolved_formal_execution_context(
             raise ResolvedFormalExecutionContextError(
                 "formal training execution binding identity is incomplete"
             )
-        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
+        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
             if active_formal_bundle_sha256 != execution_binding.get(
                 "active_formal_bundle_sha256"
             ):
@@ -255,15 +255,19 @@ def build_resolved_formal_execution_context(
             "network_or_cwd_discovery_allowed": False,
         },
     }
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
+    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
         payload["scientific_identity"][
             "formal_agent_order_contract_semantic_sha256"
         ] = protocol["formal_agent_order_contract"]["semantic_sha256"]
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"2.0.0", "2.1.0", "2.2.0"}:
+    if protocol.get("typed_model_cache_formal_protocol_version") in {"2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
         payload["scientific_identity"]["formal_exogenous_request_execution"] = deepcopy(
             protocol["formal_exogenous_request_execution_contract"]
         )
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"2.1.0", "2.2.0"}:
+    if protocol.get("typed_model_cache_formal_protocol_version") == "2.3.0":
+        payload["scientific_identity"][
+            "formal_nullable_metric_aggregation_contract_semantic_sha256"
+        ] = protocol["formal_nullable_metric_aggregation_contract"]["semantic_sha256"]
+    if protocol.get("typed_model_cache_formal_protocol_version") in {"2.1.0", "2.2.0", "2.3.0"}:
         payload["scientific_identity"][
             "environment_identity_projection_contract_version"
         ] = protocol["formal_execution_environment_contract"][
@@ -272,7 +276,7 @@ def build_resolved_formal_execution_context(
         payload["scientific_identity"][
             "full_normalized_environment_projection"
         ] = deepcopy(dict(environment_identity))
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
+    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
         if not isinstance(active_formal_bundle_sha256, str) or len(
             active_formal_bundle_sha256
         ) != 64:
@@ -400,15 +404,21 @@ def validate_resolved_formal_execution_context(
                 "typed_runtime_contract_hashes_by_capacity"
             ],
         }
-        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
+        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
             comparisons["formal_agent_order_contract_semantic_sha256"] = protocol[
                 "formal_agent_order_contract"
             ]["semantic_sha256"]
-        if protocol.get("typed_model_cache_formal_protocol_version") in {"2.0.0", "2.1.0", "2.2.0"}:
+        if protocol.get("typed_model_cache_formal_protocol_version") in {"2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
             comparisons["formal_exogenous_request_execution"] = protocol[
                 "formal_exogenous_request_execution_contract"
             ]
-        if protocol.get("typed_model_cache_formal_protocol_version") in {"2.1.0", "2.2.0"}:
+        if protocol.get("typed_model_cache_formal_protocol_version") == "2.3.0":
+            comparisons[
+                "formal_nullable_metric_aggregation_contract_semantic_sha256"
+            ] = protocol["formal_nullable_metric_aggregation_contract"][
+                "semantic_sha256"
+            ]
+        if protocol.get("typed_model_cache_formal_protocol_version") in {"2.1.0", "2.2.0", "2.3.0"}:
             comparisons["environment_identity_projection_contract_version"] = protocol[
                 "formal_execution_environment_contract"
             ]["identity_projection_contract_version"]
@@ -416,7 +426,7 @@ def validate_resolved_formal_execution_context(
                 comparisons["full_normalized_environment_projection"] = dict(
                     environment_identity
                 )
-        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
+        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
             expected_bundle = payload.get("resolved_expansion_context", {}).get(
                 "active_formal_bundle_sha256"
             )
@@ -462,7 +472,7 @@ def validate_resolved_formal_execution_context(
                 raise ResolvedFormalExecutionContextError(
                     f"resolved context environment identity drift: {field}"
                 )
-        if scientific.get("protocol_version") in {"2.1.0", "2.2.0"} and scientific.get(
+        if scientific.get("protocol_version") in {"2.1.0", "2.2.0", "2.3.0"} and scientific.get(
             "full_normalized_environment_projection"
         ) != dict(environment_identity):
             raise ResolvedFormalExecutionContextError(

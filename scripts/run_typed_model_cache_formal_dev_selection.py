@@ -5,7 +5,6 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import statistics
 import subprocess
 import sys
 import time
@@ -61,6 +60,11 @@ from src.runtime.active_formal_bundle import (
     resolve_capacity_resource_pairs,
     validate_active_formal_bundle,
     validate_registered_resource_path,
+)
+from src.metrics.formal_nullable_metrics import reduce_nullable_metric_rows
+from src.runtime.formal_invalid_run_registry import (
+    PermanentlyInvalidFormalReferenceError,
+    reject_permanently_invalid_formal_references,
 )
 
 
@@ -128,15 +132,26 @@ def checkpoint_metadata(path: Path) -> dict:
     return dict(metadata)
 
 
-def finite_mean(rows: list[dict[str, str]], field: str) -> float:
-    values = [float(row[field]) for row in rows if row.get(field) not in {None, ""}]
-    if not values:
-        raise FormalExecutionError(f"dev endpoint is unavailable: {field}")
-    return statistics.fmean(values)
+def nullable_mean(
+    rows: list[dict[str, str]], field: str
+) -> tuple[float | None, dict[str, object]]:
+    means, availability = reduce_nullable_metric_rows(
+        rows,
+        [field],
+        csv_empty_is_null=True,
+        numeric_strings_allowed=True,
+    )
+    return means[field], availability[field]
 
 
 def main() -> None:
     args = parse_args()
+    try:
+        reject_permanently_invalid_formal_references(
+            [args.training_root, args.output_root, args.output_path]
+        )
+    except PermanentlyInvalidFormalReferenceError as exc:
+        raise FormalExecutionError(str(exc)) from exc
     if args.resource_registry_path:
         resolve_argument_resources(
             args,
@@ -152,7 +167,7 @@ def main() -> None:
     nested_python = sys.executable
     protocol_version = protocol["typed_model_cache_formal_protocol_version"]
     resolved_context = None
-    if protocol_version in {"1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
+    if protocol_version in {"1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
         if not args.resolved_execution_context_path:
             raise FormalExecutionError(
                 "active protocol dev selection requires resolved execution context"
@@ -202,7 +217,7 @@ def main() -> None:
     config_root = protocol_path.parent
     active_bundle = None
     resolved_capacity_pairs = None
-    if protocol_version in {"1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
+    if protocol_version in {"1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
         try:
             active_index_path = resolved_context["resolved_expansion_context"][
                 "active_protocol_index_path"
@@ -250,7 +265,7 @@ def main() -> None:
         except (ActiveFormalBundleError, KeyError) as exc:
             raise FormalExecutionError(f"active bundle resource resolution failed: {exc}") from exc
     order_audit = None
-    if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}:
+    if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
         if not args.formal_agent_order_contract_path:
             raise FormalExecutionError("Protocol v1.7 dev selection requires agent order contract")
         scientific = json.loads(
@@ -304,7 +319,7 @@ def main() -> None:
     cell_ledger = None
     expected_dev_cell_ids: list[str] = []
     if not args.non_formal_rehearsal and protocol["typed_model_cache_formal_protocol_version"] in {
-        "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"
+        "1.4.0", "1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"
     }:
         identity_path = output_root / "cell_ledger_identity.json"
         if not identity_path.is_file():
@@ -397,7 +412,7 @@ def main() -> None:
                         raise FormalExecutionError("dev checkpoint formal binding mismatch")
                     if (
                         not args.non_formal_rehearsal
-                        and protocol_version in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}
+                        and protocol_version in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}
                     ):
                         scientific_identity = resolved_context["scientific_identity"]
                         try:
@@ -434,7 +449,7 @@ def main() -> None:
                                         )
                                         or ""
                                     )
-                                    if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}
+                                    if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}
                                     else None
                                 ),
                             )
@@ -451,6 +466,9 @@ def main() -> None:
                             if resolution_audit is not None
                             else None
                         ),
+                        "formal_nullable_metric_aggregation_contract_semantic_sha256": protocol[
+                            "formal_nullable_metric_aggregation_contract"
+                        ]["semantic_sha256"],
                     }
                     metadata_by_agent_seed[(agent, seed)] = metadata
             if cell_ledger is None:
@@ -496,7 +514,7 @@ def main() -> None:
                 "--reward_positive_offset", "0",
                 "--output_root", str(benchmark_root),
             ]
-            if protocol_version in {"2.0.0", "2.1.0", "2.2.0"}:
+            if protocol_version in {"2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
                 command.append("--formal-exogenous-request-execution")
             if order_audit is not None:
                 command.extend(
@@ -545,7 +563,7 @@ def main() -> None:
                             resolved_context.get("scientific_identity", {}).get(
                                 "active_formal_bundle_sha256"
                             )
-                            if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0"}
+                            if protocol_version in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}
                             else None
                         ),
                         "coordinates": coordinates,
@@ -613,6 +631,17 @@ def main() -> None:
                     ]
                     metadata = metadata_by_agent_seed[(agent, seed)]
                     checkpoint_path = Path(seed_manifest[agent][str(seed)])
+                    metric_values: dict[str, float | None] = {}
+                    metric_availability: dict[str, dict[str, object]] = {}
+                    for metric in (
+                        "full_service_ready_byte_hit_rate",
+                        "workflow_continuity_rate",
+                        "transfer_mb_per_request",
+                        "end_to_end_workflow_delay",
+                    ):
+                        value, availability = nullable_mean(selected_rows, metric)
+                        metric_values[metric] = value
+                        metric_availability[metric] = availability
                     cell_candidates.append(
                         {
                             "agent_name": agent,
@@ -621,10 +650,8 @@ def main() -> None:
                             "update_index": update_index,
                             "checkpoint_path": str(checkpoint_path),
                             "checkpoint_sha256": sha256_file(checkpoint_path),
-                            "full_service_ready_byte_hit_rate": finite_mean(selected_rows, "full_service_ready_byte_hit_rate"),
-                            "workflow_continuity_rate": finite_mean(selected_rows, "workflow_continuity_rate"),
-                            "transfer_mb_per_request": finite_mean(selected_rows, "transfer_mb_per_request"),
-                            "end_to_end_workflow_delay": finite_mean(selected_rows, "end_to_end_workflow_delay"),
+                            **metric_values,
+                            "selection_metric_availability": metric_availability,
                             "runtime_contract_sha256": metadata["typed_runtime_provenance"]["runtime_contract_sha256"],
                             "resolved_agent_config": metadata.get("resolved_agent_config"),
                             "checkpoint_schedule": metadata.get("checkpoint_schedule"),
@@ -647,6 +674,9 @@ def main() -> None:
                             ),
                             "active_formal_bundle_sha256": metadata.get(
                                 "active_formal_bundle_sha256"
+                            ),
+                            "formal_nullable_metric_aggregation_contract_semantic_sha256": metadata.get(
+                                "formal_nullable_metric_aggregation_contract_semantic_sha256"
                             ),
                             "active_bundle_resource_resolution_audit_sha256": (
                                 canonical_sha256(resolution_audit)

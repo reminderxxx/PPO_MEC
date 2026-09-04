@@ -1005,3 +1005,17 @@ runtime 与 CacheEvent 的 vehicle/current-RSU identity 在首个单元内分叉
 约束：资格和选择不读取 action/reward/cache/service/checkpoint/holdout outcome；selection evidence 不进入 actor/
 controller observation。Analytical request replay 必须复用 lifecycle producer，但继续保持 oracle-only、outcome-blind
 角色。Legacy/non-formal dynamic reselection 保持兼容。
+
+# 2026-09-04 — D-G14R12 nullable 是 metric availability，不是数值
+
+决定：Protocol 2.3 使用唯一 pure reducer定义 formal metric availability。有限数值（包括真实零）为 available；
+显式 `null` 为 unavailable；required field missing、bool、invalid string 与非有限数 fail-fast。`mean_metrics` 保持
+scalar `float|null`，counts/status 由独立 companion 承载，所有 JSON 严格禁止 NaN/Infinity。
+
+Dev selection 在每一冻结 metric 上 finite 优先于 unavailable，双 null 跳过该维度；不允许 zero/infinity/reward
+sentinel。Statistics 只对双边 available pair 计算；zero available pairs 的 effect/CI/p/Holm 均为 null，gate 与
+claim map 必须报告 `UNAVAILABLE`。
+
+原因：G14C v12 的 215 个 delay null 是 Endpoint 2.0 对 failed/incomplete/right-censored workflow 的正确表达，
+旧聚合器的 `float(None)` 是 consumer 类别错误。将 null 改为零、删除 episode 或复用 staging checkpoint 都会
+改变 estimand 或污染正式证据。

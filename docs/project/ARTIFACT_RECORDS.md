@@ -1391,3 +1391,14 @@ Run `g14a_rehearsal_20260819_230456_872949`使用`controlled_non_hidden`窗口�
 - Capacity rehearsal：288/576/864 MB 均为完整 15-agent matrix，单一 exposure identity。
 - Phase chain：detached clean no-`.venv` candidate，13 phases 到 `complete_without_holdout`，186 commands，placeholder/sentinel 均为 0。
 - Formal/holdout boundary：formal training=0、formal checkpoint=0、formal performance=0、holdout opened=false。
+
+# 2026-09-04 — G14R12 nullable metric repair
+
+- Artifact root：`artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/`
+- 内容：v12 original-artifact root cause 与 permanent invalidation、Nullable Contract 1.0.0、active consumer matrix、
+  synthetic/train/eval/selection/statistics validation、exact 256-episode rehearsal、13-phase clean rehearsal、
+  negative validation、readiness 与 compact finite-JSON integrity manifest。
+- Exact unit：SA-GHMAPPO、288 MB、seed 7、256 episodes/32 updates；delay available/unavailable=`41/215`，
+  request exposure/CacheEvent=`2644/2644`；checkpoint 仅为 non-formal repair evidence。
+- Evidence boundary：execution-contract only；formal training/checkpoint/performance=`0/0/0`，holdout sealed/unopened，
+  未启动 G14C v13/G14D/G15，不支持算法优势、formal gate、G14/TMC/paper-ready 结论。

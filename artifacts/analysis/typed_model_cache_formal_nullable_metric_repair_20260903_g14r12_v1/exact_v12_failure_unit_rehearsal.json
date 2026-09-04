@@ -1,0 +1,39 @@
+{
+  "alignment_failure_count": 0,
+  "checkpoint_evidence_class": "non_formal_repair_evidence_only",
+  "delay_availability_reason_counts": {
+    "available_completed_workflow": 41,
+    "unavailable_failed_or_incomplete_workflow": 215
+  },
+  "delay_available_count": 41,
+  "delay_unavailable_count": 215,
+  "episode_rows": 256,
+  "formal_performance_evidence": false,
+  "independent_available_only_mean": 635.1463414634146,
+  "mean_match_at_producer_precision": true,
+  "non_formal_rehearsal": true,
+  "producer_available_only_mean": 635.146341,
+  "request_cache_event_count": 2644,
+  "request_exposure_count": 2644,
+  "scientific_cell": {
+    "agent": "sa_ghmappo",
+    "capacity_label": "constrained_288mb",
+    "capacity_mb": 288,
+    "checkpoint_cadence": [
+      4,
+      8,
+      12,
+      16,
+      20,
+      24,
+      28,
+      32
+    ],
+    "episodes": 256,
+    "seed": 7,
+    "updates": 32
+  },
+  "source_root": "artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/rehearsal_runtime/exact_v12_failure_unit/training/sa_ghmappo/nonformal_repair_constrained_288mb_sa_ghmappo_seed7",
+  "status": "pass",
+  "v12_checkpoint_or_episode_reused": false
+}

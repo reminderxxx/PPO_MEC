@@ -1,0 +1,91 @@
+{
+  "artifact_count_excluding_failure_integrity": 280,
+  "artifact_inventory_sha256": "de64c6f636539cd5f664be5e173c964609fed2693b439d70fd8ca12f1ef36576",
+  "cell_ledger_status": "pass",
+  "checkpoint_or_episode_reuse": false,
+  "covered_consumers": [
+    "train",
+    "resume",
+    "dev_selection",
+    "checkpoint_freeze",
+    "formal_benchmark",
+    "formal_statistics",
+    "artifact_manager"
+  ],
+  "direct_recomputed_sha256": {
+    "cell_state.jsonl": "c21ebe0f885a7fa3b98a71df0d6641cb2aa0f8d55ce653eaffc97886f5676ac9",
+    "failure_audit.json": "edb85d74152feefff37b1180d9bc5cb2d04cefa64c226eda831db22539cd39e5",
+    "failure_integrity.json": "cff0fedde3b0a58fdd3cb9100fb00a84108c6eddf31685125c9f8bfa98eb51f6",
+    "phase_state.jsonl": "47522ad353b5cc22980bb2e9de9608bb3c157e50286a394051629b4616ed7e23",
+    "run_status.json": "d605ba8d53a39a1f9e85b306903edeb4d5bb83b8764951827d5284255958dde3"
+  },
+  "failed_staging_inventory": {
+    "committed": false,
+    "file_count": 268,
+    "groups": {
+      "checkpoint_files": {
+        "file_count": 9,
+        "inventory_sha256": "b94c5aef191086d7469f6484b540a53f0e17ba0e9204bcd62ec3123cbe59b5e7",
+        "scientific_status": "invalid_staging_evidence_not_candidates_or_latest_for_reuse",
+        "total_size_bytes": 18835553
+      },
+      "episode_summaries": {
+        "file_count": 256,
+        "inventory_sha256": "97b9f046bbd18e8ebe08acf3b638c74a7996564af66e1582299a9c079df6b917",
+        "total_size_bytes": 76199270
+      },
+      "logs": {
+        "file_count": 2,
+        "files": [
+          {
+            "path": ".staging/train/train-1c3b19e9fb47bc7108c563a0/attempt_01/sa_ghmappo/formal_constrained_288mb_sa_ghmappo_seed7/cell_stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "size_bytes": 0
+          },
+          {
+            "path": ".staging/train/train-1c3b19e9fb47bc7108c563a0/attempt_01/sa_ghmappo/formal_constrained_288mb_sa_ghmappo_seed7/cell_stderr.log",
+            "sha256": "3c995ad5372718114573ae78ae85c82322357f86b181d8ba16229fb8c5440960",
+            "size_bytes": 1634
+          }
+        ],
+        "inventory_sha256": "7450a02827987ff41c8b849dec1c58b2f42456dfd2d737a31557993e31f72472",
+        "total_size_bytes": 1634
+      },
+      "train_csv": {
+        "file_count": 1,
+        "inventory_sha256": "9db3cb32e44972732535105ed4db2a4561704eac8364157e2753e6d704df3ba3",
+        "path": ".staging/train/train-1c3b19e9fb47bc7108c563a0/attempt_01/sa_ghmappo/formal_constrained_288mb_sa_ghmappo_seed7/train.csv",
+        "sha256": "b4386847024b59ed12f1b14a3071e8abc90438b86ed02f824c766233323cf49b",
+        "total_size_bytes": 82054
+      }
+    },
+    "inventory_sha256": "6f1c27bf6beaec58c7f43b50899ec8453e7e38ab6cbb18ae3a9116b57c5f4050",
+    "path": ".staging/train/train-1c3b19e9fb47bc7108c563a0/attempt_01",
+    "reusable": false,
+    "total_size_bytes": 95118511
+  },
+  "failure_audit_status": "INVALID_PROTOCOL_OR_IMPLEMENTATION",
+  "failure_integrity_status": "pass_for_invalid_run_evidence",
+  "finalize_only": false,
+  "formal_checkpoint_candidates": 0,
+  "formal_performance_count": 0,
+  "formal_training_cells": 0,
+  "independently_recomputed_inventory": {
+    "artifact_count_excluding_failure_integrity": 280,
+    "artifact_inventory_sha256": "de64c6f636539cd5f664be5e173c964609fed2693b439d70fd8ca12f1ef36576",
+    "staging_file_count": 268,
+    "staging_inventory_sha256": "6f1c27bf6beaec58c7f43b50899ec8453e7e38ab6cbb18ae3a9116b57c5f4050",
+    "staging_total_size_bytes": 95118511,
+    "total_size_bytes_excluding_failure_integrity": 99076482
+  },
+  "permanent_status": "INVALID_PROTOCOL_OR_IMPLEMENTATION",
+  "phase_ledger_status": "pass",
+  "recorded_inventory_exact_match": true,
+  "resume": false,
+  "retry": false,
+  "run_id": "typed_model_cache_formal_20260902_162203_g14c_v12",
+  "run_root": "artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260902_162203_g14c_v12",
+  "salvage": false,
+  "status": "pass",
+  "unified_rejection_module": "src/runtime/formal_invalid_run_registry.py"
+}

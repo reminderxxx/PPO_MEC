@@ -1,0 +1,21 @@
+{
+  "cases": [
+    "[null]",
+    "[0.0]",
+    "[null,6.0]",
+    "empty",
+    "required missing",
+    "bool",
+    "invalid string",
+    "NaN",
+    "+Infinity",
+    "-Infinity",
+    "CSV/JSON round-trip",
+    "deterministic canonical hash",
+    "train/eval compatibility"
+  ],
+  "pytest_file": "tests/test_formal_nullable_metric_contract.py",
+  "status": "pass",
+  "targeted_suite_passed": 388,
+  "targeted_suite_skipped": 16
+}
