@@ -1,5 +1,34 @@
 # Runbook
 
+## Protocol 2.4 与未来 G14C v14 入口
+
+唯一 active index：
+
+`configs/experiment/typed_model_cache_formal_protocol_v2_4_20260905/protocol_index.json`
+
+Protocol v1.0–v2.3 只允许历史审计。未来 G14C v14 必须由单独授权任务在 pushed、Git-clean、
+`HEAD == main == origin/main` 的全新 detached worktree 中创建全新 durable run root；候选目录不得含本地
+`.venv`，必须显式传共享环境的绝对 Python。先运行：
+
+```bash
+<shared-absolute-python> scripts/run_typed_model_cache_formal_protocol.py \
+  --active-protocol-index \
+  configs/experiment/typed_model_cache_formal_protocol_v2_4_20260905/protocol_index.json \
+  --output-root <new-unique-g14c-v14-run-root> \
+  --python-executable <shared-absolute-python> \
+  --preflight
+```
+
+只有 preflight 和 tests phase 的真实 child、JUnit 与 ledger 全部通过后，未来任务才可继续 train。本 G14R13
+不得运行 train/formal/holdout；不得复用 G14C v13 名义下不存在的 run 或 checkpoint。Capability routing 专项：
+
+```bash
+<shared-absolute-python> -m pytest -q \
+  tests/test_formal_protocol_capability_routing_v24.py \
+  tests/test_typed_model_cache_formal_execution_v15.py \
+  tests/test_active_formal_bundle_v18.py
+```
+
 ## G14R8 Resource Resolver 与未来 G14C v9 启动
 
 唯一active index：

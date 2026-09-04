@@ -4,6 +4,9 @@
 
 ## Live 文档
 
+- `formal_protocol_capability_routing_contract.md`：G14R13 fail-closed capability registry、Protocol 2.4、
+  persisted context outer/nested identity、G14C v13 pre-execution boundary 与 Readiness v16
+
 - `active_formal_bundle_contract.md`：G14R7A Active Formal Bundle Contract 1.0、Protocol v1.8、唯一active
   index、Readiness v10原子finalization、outer pre-write gate与全链provenance
 

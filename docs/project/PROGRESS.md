@@ -1,5 +1,20 @@
 ﻿# Progress
 
+## 2026-09-05: G14R13 Protocol capability routing closure
+
+- 精确复现 Protocol 2.3 outer runner 已传 `--resolved-execution-context-path`，nested validator 却因版本集合漏配
+  回退 legacy default context，并以 `resolved command expansion requires an absolute repository root` 失败。
+- 新增共享、显式、fail-closed capability registry；Protocol 2.4 是唯一 live execution 版本，v1.0–v2.3
+  audit-only，未知 2.5 等版本拒绝。outer/nested、bundle/context、training/binding、dev/freeze、benchmark、
+  statistics/integrity/gate 全部经共享 capability 路由。
+- G14C v13 仅为 `PRE_EXECUTION_STOP / VALIDATOR_VERSION_DISPATCH_MISMATCH`，没有 clean execution
+  worktree、durable run、ledger、checkpoint、candidate、selection 或 formal row，也不进入 invalid-run/denylist。
+- 冻结 Protocol 2.4、Capability Routing Contract 1.0.0 与 Readiness v16；Scientific Config、nullable/lifecycle/
+  exogenous/data/split/window/catalog/dependency/order/budget/endpoints/statistics/Holm/holdout 语义均不变。
+- clean detached、无本地 `.venv` 候选完成真实 nested/public preflight、11,850,526 rows、73,871 frames、
+  60/60 windows、15 phases/186 commands/150 training commands、tests JUnit 与 non-formal 13-phase chain。
+  formal training/checkpoint/performance=0，holdout sealed/unopened/unconsumed，未启动 G14C v14/G14D/G15。
+
 ## 2026-08-29: G14R8 active bundle resource resolver repair
 
 - G14C v8 `typed_model_cache_formal_20260828_101804_g14c_v8` 永久登记为

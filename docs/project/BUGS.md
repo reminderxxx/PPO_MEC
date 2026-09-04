@@ -1,5 +1,15 @@
 ﻿# Bugs And Risks
 
+## 2026-09-05: Protocol 2.3 nested preflight capability dispatch omission（RESOLVED）
+
+- 根因：nested restart validator 的本地 resolved-context 版本集合停在 2.2，导致 active 2.3 即使收到 persisted
+  context 参数仍回退 unresolved default context；这是 wrapper-level dispatch 错误，不是数据、依赖或算法错误。
+- 修复：Protocol 2.4 由共享显式 registry 路由；只有 2.4 可 live execution，historical/unknown/default fallback/
+  relative Python/cwd guessing/identity drift/holdout capability 均 fail-fast。
+- 历史边界：G14C v13 是 pre-execution stop，不虚构 run/ledger/failure artifact，不登记 executed invalid run，
+  不新增 checkpoint denylist。Protocol 2.3/Readiness v15 均 superseded/audit-only。
+- 剩余风险：Readiness v16 没有正式性能证据；G14C v14 尚未运行，holdout 仍 sealed/unopened/unconsumed。
+
 ## 2026-08-29: v1.8 active resource schema misread（RESOLVED；G14C v8永久invalid）
 
 - 根因：v1.8 index的唯一目录是`active_bundle_resources`，dev selector却仍直接读取旧顶层

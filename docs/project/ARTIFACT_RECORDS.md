@@ -1,5 +1,17 @@
 # Artifact Records
 
+## 2026-09-05 G14R13 formal preflight capability-routing repair
+
+- path：`artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/`；
+  config：`configs/experiment/typed_model_cache_formal_protocol_v2_4_20260905/`。
+- 证据包含 Protocol 2.3 精确 public-wrapper 失败复现、Protocol 2.4 真实 nested/public preflight、capability 与
+  producer/consumer matrix、12类负例、clean detached validation、JUnit、13-phase non-formal ledger、Readiness
+  v16 与自排除完整性 inventory。
+- 真实 preflight 覆盖 11,850,526 raw rows、73,871 provider frames、60/60 windows、15 internal phases、186
+  commands、150 training commands，并证明 outer/nested expansion hash 相同及 persisted context 被实际读取。
+- 边界：formal training/checkpoint/performance=0，holdout sealed/unopened/unconsumed；未启动 G14C v14、G14D、
+  G15，不支持算法优势、formal gate、G14/TMC/paper-ready 结论。
+
 ## 2026-08-29 G14R8 active bundle resource resolver repair
 
 - path：`artifacts/analysis/typed_model_cache_formal_bundle_resource_repair_20260829_g14r8_v1/`；config：

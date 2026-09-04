@@ -1,5 +1,15 @@
 ﻿# Directory Structure
 
+G14R13：唯一 active Protocol 2.4、Capability Routing Contract 1.0.0、ready index、environment、Scientific/
+Order/nullable/lifecycle/exogenous/binding/context 与 Readiness v16 位于
+`configs/experiment/typed_model_cache_formal_protocol_v2_4_20260905/`。共享 registry 位于
+`src/runtime/formal_protocol_capabilities.py`；freeze、phase rehearsal、artifact builder 分别为
+`scripts/repair_formal_protocol_capability_routing.py`、
+`scripts/run_formal_protocol_capability_phase_chain_rehearsal.py`、
+`scripts/build_formal_protocol_capability_routing_artifacts.py`。机器证据位于
+`artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/`，不含正式
+checkpoint、training 或 performance result。v1.0–v2.3 目录均 audit-only。
+
 G14R8：唯一active Protocol v1.9、resource-resolution contract、ready index、environment、Scientific/Order、
 binding/context schema与Readiness v11位于`configs/experiment/typed_model_cache_formal_protocol_v1_9_20260829/`；
 共享resolver位于`src/runtime/active_formal_bundle.py`，生成器位于

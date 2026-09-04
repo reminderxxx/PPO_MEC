@@ -1,5 +1,22 @@
 # Code Module Map
 
+## G14R13 formal Protocol capability routing
+
+- `src/runtime/formal_protocol_capabilities.py`：显式 per-version capability registry、唯一 active 2.4、historical
+  audit-only 与 unknown fail-closed。
+- `scripts/run_typed_model_cache_formal_protocol.py`、`validate_typed_model_cache_formal_restart.py`：outer/nested
+  共享能力路由；active preflight 强制消费 persisted resolved execution context。
+- `src/runtime/active_formal_bundle.py`、`resolved_formal_execution_context.py`、`formal_training_contract.py`、
+  `formal_training_identity.py`：bundle/context/environment/binding/provenance 的 capability gate。
+- `scripts/run_typed_model_cache_formal_dev_selection.py`、`manage_typed_model_cache_formal_artifacts.py`、
+  `run_typed_model_cache_formal_cache_policy.py`、`run_typed_model_cache_formal_support.py`、
+  `run_typed_model_cache_formal_statistics.py`：下游 active consumer closure。
+- `scripts/repair_formal_protocol_capability_routing.py`：生成 Protocol 2.4 pending/ready bundle；
+  `run_formal_protocol_capability_phase_chain_rehearsal.py` 与
+  `build_formal_protocol_capability_routing_artifacts.py`：non-formal transaction 与严格审计包。
+- `tests/test_formal_protocol_capability_routing_v24.py`：真实 nested subprocess、outer/nested identity、版本路由与
+  context tamper 回归。
+
 ## G14R7A active formal bundle gate
 
 - `src/runtime/active_formal_bundle.py`：Active Formal Bundle Contract `1.0.0`、strict JSON/path/content/shared

@@ -1,5 +1,16 @@
 ﻿# Decision Log
 
+## 2026-09-05: G14R13 makes Protocol capabilities explicit and fail-closed
+
+- 决定：`src/runtime/formal_protocol_capabilities.py` 是版本能力唯一权威；每个已知版本显式登记，不允许 major/
+  lexical/range 推断。新增版本在审查并登记前一律 unknown/fail-closed。
+- 决定：Protocol 2.4 是唯一 live execution 版本，v1.0–v2.3 audit-only。active outer/nested 必须共享路由并
+  消费同一 persisted resolved context；default context、cwd、相对 `.venv`、隐式 Python 均不能补猜。
+- 决定：active capability row 必须覆盖 environment、binding、order、bundle/resource、exogenous request、full
+  projection、lifecycle 与 nullable；holdout capability 固定为 false。
+- 决定：G14C v13 只记录 pre-execution stop，不构造不存在的 run/ledger/checkpoint，也不污染 invalid registry。
+- 边界：Readiness v16 只授权未来独立 G14C v14；G14R13 不运行 formal training/performance/holdout/G14D/G15。
+
 ## 2026-08-28: G14R7A makes the active index the non-bypassable execution authority
 
 - 决定：Active Formal Bundle Contract `1.0.0`和Protocol v1.8替代v1.7作为唯一active execution identity；

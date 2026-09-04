@@ -1,5 +1,13 @@
 # PPO_MEC
 
+G14R13 已修复 active preflight 的 Protocol capability routing 漏配，冻结 Formal Protocol `2.4.0`、
+Capability Routing Contract `1.0.0` 与 Readiness v16=`READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL`。唯一
+active index 为 `configs/experiment/typed_model_cache_formal_protocol_v2_4_20260905/protocol_index.json`；
+v1.0–v2.3 全部 audit-only，未知版本 fail-closed。G14C v13 仅登记为
+`PRE_EXECUTION_STOP / VALIDATOR_VERSION_DISPATCH_MISMATCH`，没有 run、ledger、checkpoint 或 performance；
+本轮 formal training/checkpoint/performance 仍为 0，holdout sealed/unopened/unconsumed，未启动 G14C v14、
+G14D 或 G15。详见 `docs/project/formal_protocol_capability_routing_contract.md`。
+
 G14R11 已修复 G14C v11 首个训练单元暴露的 request subject 生命周期分叉，冻结 Formal Request Subject
 Lifecycle Contract `1.0.0`、Formal Request Exposure Trace `2.0.0`、Formal Exogenous Request Execution
 Contract `1.1.0`、Environment Identity Projection `1.1.0`、Execution Environment `1.2.0` 和 Protocol

@@ -1,10 +1,17 @@
 ﻿# Context
 
-更新日期：2026-08-28
+更新日期：2026-09-05
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
 ## 项目状态
+
+- 当前唯一 live typed model-cache execution contract 是 Protocol 2.4.0 + Formal Protocol Capability Routing
+  Contract 1.0.0；active index 位于
+  `configs/experiment/typed_model_cache_formal_protocol_v2_4_20260905/protocol_index.json`。v1.0–v2.3均为
+  audit-only，未知版本 fail-closed，active nested preflight 必须消费 outer 持久化 resolved context，不能回退
+  default context。Readiness v16只授权未来独立 G14C v14；当前 formal training/checkpoint/performance=0，
+  holdout sealed/unopened/unconsumed，不是 formal、G14、TMC 或 paper-ready 证据。
 
 - G14R7A active formal execution baseline：Active Formal Bundle Contract `1.0.0`，Protocol v1.8 semantic
   SHA-256 `9799bf2c2f4b4665b8390c6fc5d5aa235faf11d6525e043eac289c061633b3de`，bundle core/final SHA-256
