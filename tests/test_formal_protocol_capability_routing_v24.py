@@ -14,7 +14,7 @@ from src.evaluators.typed_model_cache_formal_execution import (
     validate_command_templates,
     validate_protocol_v1_1,
 )
-from src.runtime.active_formal_bundle import validate_active_formal_bundle
+from src.runtime.active_formal_bundle import READY_STATUS, validate_active_formal_bundle
 from src.runtime.formal_protocol_capabilities import (
     ACTIVE_EXECUTION_PROTOCOL_VERSION,
     FORMAL_PROTOCOL_CAPABILITY_ROUTING_CONTRACT_VERSION,
@@ -66,7 +66,11 @@ def git_clean() -> bool:
 def build_persisted_context(tmp_path: Path) -> tuple[dict, dict, Path]:
     protocol = load(V24)
     validate_protocol_v1_1(protocol)
-    bundle = validate_active_formal_bundle(repository_root=ROOT)
+    index = load(V24_ROOT / "protocol_index.json")
+    bundle = validate_active_formal_bundle(
+        repository_root=ROOT,
+        require_ready=index.get("status") == READY_STATUS,
+    )
     output_root = tmp_path / "durable-run"
     expansion = resolved_expansion_context(
         protocol,
