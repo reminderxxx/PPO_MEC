@@ -4,6 +4,7 @@ import csv
 import json
 import random
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -222,7 +223,7 @@ def test_statistics_reports_nullable_pair_coverage_and_lower_direction(tmp_path:
     output = tmp_path / "statistics"
     result = subprocess.run(
         [
-            str(ROOT / ".venv/bin/python"),
+            sys.executable,
             str(ROOT / "scripts/analyze_top_journal_statistics.py"),
             "--rows_path", str(rows_path),
             "--candidate_agent", "candidate",
