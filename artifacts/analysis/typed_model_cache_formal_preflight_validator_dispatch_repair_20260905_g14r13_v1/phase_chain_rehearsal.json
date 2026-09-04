@@ -1,10 +1,10 @@
 {
   "absolute_sentinel_count": 0,
-  "acceptance_bootstrap_pending_index": true,
+  "acceptance_bootstrap_pending_index": false,
   "active_bundle_core_sha256": "126150c8e4ed060575e00de640aeaef9e1b8b445a2994daad85045883b562601",
-  "active_formal_bundle_sha256": "bf363d1ca2009215d77076443f6fed515feb645059ecb816560b0049fded66e1",
-  "candidate_commit": "9525c91803feb2fb613095d3dbd5b273c737a866",
-  "command_matrix_sha256": "f7479fe8b4c6b1478daab0e3edd0b8a7c8629c28d2a8acb071c2acd8f2ebbbd5",
+  "active_formal_bundle_sha256": "d2c547d414ec5d31007062f262c91a6051fa263bbc77e010db1a64054d0722f7",
+  "candidate_commit": "47058275285c59020740a9db9700840c10ce2e97",
+  "command_matrix_sha256": "acca3be92fbbc4ade74f93df8c3c4ada9cfd8981e7fe600b8f9ccec3772a3858",
   "complete_without_holdout": true,
   "completed_phase_order": [
     "preflight",
@@ -75,7 +75,7 @@
   "performance_evidence": false,
   "phase_count": 13,
   "phase_ledger_validation": {
-    "last_record_hash": "0196d4775c27892dddfc38c7969a6ce27a47c5ba4f5ca0d61da1897369094b9f",
+    "last_record_hash": "5b3c484ef607cb15f41e4647587262ac7c67dab4fe376cfacec41f0d41bdae60",
     "record_count": 26,
     "status": "pass",
     "terminal_phase_count": 13

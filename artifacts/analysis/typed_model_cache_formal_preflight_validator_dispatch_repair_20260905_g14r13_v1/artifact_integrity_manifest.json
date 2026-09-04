@@ -1,6 +1,6 @@
 {
   "artifact_count_excluding_this_manifest": 14,
-  "artifact_inventory_sha256": "83dcf118f846cce9b181c7278fb3ffa210bdeb5bc297c03ccd33877828291637",
+  "artifact_inventory_sha256": "3a87314b5226b7eb872367f6dcf1bedafca490175934cc55d1f354dc1b294a81",
   "artifacts": [
     {
       "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/acceptance_evidence_manifest.json",
@@ -9,13 +9,13 @@
     },
     {
       "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/clean_candidate_validation.json",
-      "sha256": "61fef0c0307b74f42fbc343abc0aa089b376f5e6ad3de100e281a4bd61b63776",
-      "size_bytes": 850
+      "sha256": "1053e14b2a53539aea7f795434334cafbb953dd363be1700c130d92bd77a4f07",
+      "size_bytes": 938
     },
     {
       "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/exact_wrapper_preflight_after_fix.json",
-      "sha256": "d38d2140be81d76670faa2d6160a891f228fd0bdb3baaca1a7acc30c076649f1",
-      "size_bytes": 1007
+      "sha256": "4ba408a6c2b3df6df104ff2250c8fc09ac244a5286cfdd9cc6f1e818b7c325a1",
+      "size_bytes": 1466
     },
     {
       "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/exact_wrapper_reproduction_before_fix.json",
@@ -34,8 +34,8 @@
     },
     {
       "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/phase_chain_rehearsal.json",
-      "sha256": "ef25aef8279513a73163992b797cd771d74f258f175090cae196bb4470cc0990",
-      "size_bytes": 2809
+      "sha256": "55c28d28174ef43be839b6e6f37f38d25db1b051bd360aeaacf1e06348d5bbc4",
+      "size_bytes": 2810
     },
     {
       "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/producer_consumer_matrix.json",
@@ -54,8 +54,8 @@
     },
     {
       "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/readiness_review_v16.json",
-      "sha256": "38d83fcf6582a0d89e5a09758eef1aad440a4c7812e2a03bd0a97f1f447efa94",
-      "size_bytes": 1248
+      "sha256": "1b5b754ecafb5c06ac2fc2a84321889451a2a7bd72ee9cead671828023304301",
+      "size_bytes": 1349
     },
     {
       "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/root_cause_analysis.json",
@@ -64,12 +64,12 @@
     },
     {
       "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/tests_phase_junit.xml",
-      "sha256": "a20280c7e83978e2e56fe76387a804fbb4490bdb4c775491e028b927946c02f8",
-      "size_bytes": 184747
+      "sha256": "1314f5fba5039a1f174183e62070b0e9baa894a22c54018b159574b5a8a800c5",
+      "size_bytes": 184697
     },
     {
       "path": "artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/validation_summary.json",
-      "sha256": "91ebd168e2e730b1f80510277ad1bf7d2999582fbf8609f4fd0499d65103fe4b",
+      "sha256": "333991060ad7e9e53f342ed5749d8cd6384e2ecc64deeb71d5a3323abeff954a",
       "size_bytes": 2477
     }
   ],
@@ -79,5 +79,5 @@
   "status": "pass",
   "strict_finite_json_round_trip": true,
   "strict_xml_parse": true,
-  "total_size_bytes_excluding_this_manifest": 215388
+  "total_size_bytes_excluding_this_manifest": 215987
 }

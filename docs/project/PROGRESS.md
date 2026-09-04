@@ -11,6 +11,11 @@
   worktree、durable run、ledger、checkpoint、candidate、selection 或 formal row，也不进入 invalid-run/denylist。
 - 冻结 Protocol 2.4、Capability Routing Contract 1.0.0 与 Readiness v16；Scientific Config、nullable/lifecycle/
   exogenous/data/split/window/catalog/dependency/order/budget/endpoints/statistics/Holm/holdout 语义均不变。
+- Protocol semantic/full SHA-256=`37604b03b9ce5da3a5b0341d46e5c14f2b897a1b4578987c87d2634cb477159b`/
+  `6e21a7ec5e529fb9c4d7a889945c63d039deb2d58a7409d852a46e5998d5c924`；capability semantic SHA-256=
+  `b040bd6bf696777cff4e4ec35804f82477072996ab60fadcf61bf432358d3fea`；bundle core/final SHA-256=
+  `126150c8e4ed060575e00de640aeaef9e1b8b445a2994daad85045883b562601`/
+  `d2c547d414ec5d31007062f262c91a6051fa263bbc77e010db1a64054d0722f7`。
 - clean detached、无本地 `.venv` 候选完成真实 nested/public preflight、11,850,526 rows、73,871 frames、
   60/60 windows、15 phases/186 commands/150 training commands、tests JUnit 与 non-formal 13-phase chain。
   formal training/checkpoint/performance=0，holdout sealed/unopened/unconsumed，未启动 G14C v14/G14D/G15。

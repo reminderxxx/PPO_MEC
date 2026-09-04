@@ -1,5 +1,5 @@
 {
-  "candidate_commit": "9525c91803feb2fb613095d3dbd5b273c737a866",
+  "candidate_commit": "47058275285c59020740a9db9700840c10ce2e97",
   "commands": [
     {
       "command": "targeted wrapper/capability regression",

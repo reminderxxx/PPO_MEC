@@ -1,5 +1,6 @@
 {
-  "candidate_commit": "9525c91803feb2fb613095d3dbd5b273c737a866",
+  "active_bundle_readiness_gate": "pass",
+  "candidate_commit": "47058275285c59020740a9db9700840c10ce2e97",
   "candidate_has_local_venv": false,
   "candidate_local_venv_is_symlink": false,
   "command_count": 186,
@@ -15,6 +16,7 @@
   "imports_from_clean_candidate": true,
   "outer_nested_expansion_equal": true,
   "provider_frames_rebuilt": 73871,
+  "public_outer_preflight_and_tests": "pass",
   "raw_rows_scanned": 11850526,
   "real_nested_preflight": "pass",
   "status": "pass",

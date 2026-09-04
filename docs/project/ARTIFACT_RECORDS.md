@@ -9,6 +9,9 @@
   v16 与自排除完整性 inventory。
 - 真实 preflight 覆盖 11,850,526 raw rows、73,871 provider frames、60/60 windows、15 internal phases、186
   commands、150 training commands，并证明 outer/nested expansion hash 相同及 persisted context 被实际读取。
+- Protocol semantic/full、capability semantic、bundle core/final SHA-256分别为
+  `37604b03...7159b`/`6e21a7ec...c924`、`b040bd6b...d3fea`、
+  `126150c8...2601`/`d2c547d4...22f7`；完整值以 `readiness_review_v16.json` 和 ready index 为准。
 - 边界：formal training/checkpoint/performance=0，holdout sealed/unopened/unconsumed；未启动 G14C v14、G14D、
   G15，不支持算法优势、formal gate、G14/TMC/paper-ready 结论。
 

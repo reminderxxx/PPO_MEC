@@ -76,6 +76,7 @@ def main() -> None:
     parser.add_argument("--nested-preflight", required=True)
     parser.add_argument("--phase-chain-summary", required=True)
     parser.add_argument("--junit", required=True)
+    parser.add_argument("--public-outer-run-root")
     parser.add_argument("--full-pytest-passed", type=int, required=True)
     parser.add_argument("--full-pytest-skipped", type=int, required=True)
     parser.add_argument("--targeted-pytest-passed", type=int, required=True)
@@ -94,6 +95,26 @@ def main() -> None:
     ET.parse(junit_path)
     ARTIFACT.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(junit_path, ARTIFACT / "tests_phase_junit.xml")
+    public_outer: dict[str, Any] | None = None
+    if args.public_outer_run_root:
+        outer_root = Path(args.public_outer_run_root)
+        outer_ledger = [
+            json.loads(line)
+            for line in (outer_root / "phase_state.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        completed = [row for row in outer_ledger if row.get("status") == "completed"]
+        public_outer = {
+            "run_root": str(outer_root),
+            "completed_phases": [row["phase"] for row in completed],
+            "preflight_terminal_hash": next(
+                row["current_record_hash"] for row in completed if row["phase"] == "preflight"
+            ),
+            "tests_terminal_hash": next(
+                row["current_record_hash"] for row in completed if row["phase"] == "tests"
+            ),
+            "tests_junit_sha256": sha256_file(outer_root / "tests.xml"),
+        }
 
     before_root = Path(args.before_run_root)
     ledger = [
@@ -223,7 +244,8 @@ def main() -> None:
     commands = [command for phase_row in command_expansion["expanded"].values() for command in phase_row["commands"]]
     after = {
         "status": "pass",
-        "execution_path": "real nested validator subprocess with persisted resolved context",
+        "execution_path": "public outer runner -> real nested validator subprocess with persisted resolved context",
+        "public_outer_runner": public_outer,
         "candidate_commit": args.candidate_commit,
         "protocol_version": "2.4.0",
         "phase_count": command_expansion["phase_count"],
@@ -280,8 +302,10 @@ def main() -> None:
         "imports_from_clean_candidate": True,
         "explicit_shared_absolute_python": after["python_executable"],
         "head_equals_origin_main_during_acceptance": True,
+        "active_bundle_readiness_gate": "pass",
         "git_diff_check": "pass",
         "real_nested_preflight": "pass",
+        "public_outer_preflight_and_tests": "pass" if public_outer else "not_recorded",
         "raw_rows_scanned": after["raw_rows_scanned"],
         "provider_frames_rebuilt": after["provider_frame_count"],
         "window_reachability": after["window_reachability"],
@@ -330,6 +354,7 @@ def main() -> None:
         "protocol_semantic_sha256": protocol24["hashes"]["semantic_sha256"],
         "protocol_full_sha256": protocol24["hashes"]["full_sha256"],
         "active_bundle_core_sha256": index["active_bundle_core_sha256"],
+        "active_formal_bundle_sha256": index["active_formal_bundle_sha256"],
         "formal_training_count": 0,
         "formal_checkpoint_count": 0,
         "formal_performance_count": 0,
