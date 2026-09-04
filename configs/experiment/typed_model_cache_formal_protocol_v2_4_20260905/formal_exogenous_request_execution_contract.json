@@ -1,0 +1,41 @@
+{
+  "action_before_lookup": true,
+  "actor_or_controller_may_observe_oracle_future_topology": false,
+  "actor_or_controller_may_observe_subject_selection_evidence": false,
+  "cache_event_alignment": "exactly_one_request_level_CacheEvent_per_exposure",
+  "default_enabled": false,
+  "execution_entrypoint": "src.envs.core.vec_workflow_core_env.VecWorkflowCoreEnv",
+  "fail_fast": [
+    "missing_replay",
+    "duplicate_missing_extra_or_out_of_order_request",
+    "cross_agent_or_capacity_fingerprint_drift",
+    "request_event_identity_drift",
+    "catalog_dependency_size_or_evaluation_unit_drift",
+    "subject_missing_or_nonphysical",
+    "subject_candidate_count_or_fingerprint_drift",
+    "subject_or_rsu_runtime_drift",
+    "outcome_pollution",
+    "endogenous_fallback",
+    "future_topology_leakage",
+    "historical_bundle_v9_or_v11_reference"
+  ],
+  "formal_explicit_enable_required": true,
+  "g08_replay_role": "outcome_blind_analytical_replay_reuses_formal_lifecycle_producer",
+  "g09_opportunity_role": "outcome_blind_analysis_bound_to_exposure_provenance",
+  "phase_modes": {
+    "dev": "replay_driven_exogenous_request_exposure",
+    "formal": "replay_driven_exogenous_request_exposure",
+    "legacy_nonformal": "legacy_endogenous_progression",
+    "train": "replay_driven_exogenous_request_exposure"
+  },
+  "producer_entrypoint": "src.evaluators.main_results_support.build_episode_formal_request_exposure",
+  "producer_identity": "formal_request_exposure_producer_v2.0.0",
+  "request_exposure_trace_version": "2.0.0",
+  "request_fingerprint_excludes_execution_specific_provenance": true,
+  "request_fingerprint_is_outcome_fingerprint": false,
+  "request_subject_lifecycle_contract_semantic_sha256": "e5cbc6cdbd03052ce01d601500762231655b90b056d3b8c55f27d82ee39b457d",
+  "request_subject_lifecycle_contract_version": "1.0.0",
+  "semantic_sha256": "1c6e5459433e450cfe80517e41b4affca57ebb87a01c3db48056316eedcce556",
+  "service_failure_changes_future_exposure": false,
+  "version": "1.1.0"
+}

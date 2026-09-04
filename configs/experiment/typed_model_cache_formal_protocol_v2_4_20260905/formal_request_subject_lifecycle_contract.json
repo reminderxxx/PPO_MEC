@@ -1,0 +1,51 @@
+{
+  "eligibility": {
+    "outcome_inputs_allowed": false,
+    "physical_continuity_rule_version": "vec_displacement_speed_guard_v1.0.0",
+    "presence_frames": "0..request_count inclusive",
+    "same_vehicle_id_required": true,
+    "vehicle_id_reuse_teleport_or_segment_drift_allowed": false
+  },
+  "evidence_fields": [
+    "contract_version",
+    "eligible_candidate_canonical_fingerprint",
+    "eligible_candidate_count",
+    "exposure_horizon",
+    "outcome_independence",
+    "physical_continuity_rule_version",
+    "reselection_policy",
+    "selected_primary_vehicle_id",
+    "selection_evidence_actor_visible",
+    "selection_evidence_controller_visible",
+    "selection_mode",
+    "selection_version"
+  ],
+  "mode": "one_workflow_one_persistent_vehicle",
+  "no_eligible_subject_verdict": "BLOCKED_BY_FORMAL_REQUEST_SUBJECT_ELIGIBILITY",
+  "request_count_rule": "min(DAG_execution_order_length,max_steps,mobility_frame_count_minus_one)",
+  "rsu_time_semantics": {
+    "current_service_rsu_frame": "step_index",
+    "null_association_preserved": true,
+    "request_rsu_frame": "step_index_minus_one",
+    "same_selected_vehicle_and_mapper_required": true,
+    "time_index_frame": "step_index"
+  },
+  "runtime": {
+    "legacy_nonformal_reselection_unchanged": true,
+    "missing_or_nonphysical_subject": "fail_fast",
+    "reselection_policy": "forbidden_during_formal_episode",
+    "runtime_may_rewrite_exposure": false
+  },
+  "selection": {
+    "deterministic_tie_break_required": true,
+    "handoff_pressure_definition_changed": false,
+    "mode": "existing_primary_vehicle_selection_after_eligibility_filter",
+    "version": "persistent_subject_selection_v1.0.0"
+  },
+  "semantic_sha256": "e5cbc6cdbd03052ce01d601500762231655b90b056d3b8c55f27d82ee39b457d",
+  "version": "1.0.0",
+  "visibility": {
+    "selection_evidence_actor_visible": false,
+    "selection_evidence_controller_visible": false
+  }
+}

@@ -19,6 +19,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
+from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
+
 
 RESOLVED_FORMAL_EXECUTION_CONTEXT_VERSION = "1.0.0"
 RESOLVED_FORMAL_EXECUTION_CONTEXT_V2_VERSION = "2.0.0"
@@ -127,6 +129,10 @@ def build_resolved_formal_execution_context(
 ) -> dict[str, Any]:
     """Build one full host-bound context after environment resolution."""
 
+    capabilities = get_protocol_capabilities(
+        protocol.get("typed_model_cache_formal_protocol_version")
+    )
+
     protocol_path = Path(str(expansion_context["protocol_path"])).resolve()
     clean_root = Path(str(expansion_context["clean_worktree_root"])).resolve()
     output_root = Path(str(expansion_context["output_root"])).resolve()
@@ -160,7 +166,7 @@ def build_resolved_formal_execution_context(
             raise ResolvedFormalExecutionContextError(
                 "formal training execution binding identity is incomplete"
             )
-        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+        if capabilities.active_bundle_required:
             if active_formal_bundle_sha256 != execution_binding.get(
                 "active_formal_bundle_sha256"
             ):
@@ -255,19 +261,19 @@ def build_resolved_formal_execution_context(
             "network_or_cwd_discovery_allowed": False,
         },
     }
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.agent_order_contract_required:
         payload["scientific_identity"][
             "formal_agent_order_contract_semantic_sha256"
         ] = protocol["formal_agent_order_contract"]["semantic_sha256"]
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.exogenous_request_execution_required:
         payload["scientific_identity"]["formal_exogenous_request_execution"] = deepcopy(
             protocol["formal_exogenous_request_execution_contract"]
         )
-    if protocol.get("typed_model_cache_formal_protocol_version") == "2.3.0":
+    if capabilities.nullable_metric_contract_required:
         payload["scientific_identity"][
             "formal_nullable_metric_aggregation_contract_semantic_sha256"
         ] = protocol["formal_nullable_metric_aggregation_contract"]["semantic_sha256"]
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.full_environment_projection_required:
         payload["scientific_identity"][
             "environment_identity_projection_contract_version"
         ] = protocol["formal_execution_environment_contract"][
@@ -276,7 +282,7 @@ def build_resolved_formal_execution_context(
         payload["scientific_identity"][
             "full_normalized_environment_projection"
         ] = deepcopy(dict(environment_identity))
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.active_bundle_required:
         if not isinstance(active_formal_bundle_sha256, str) or len(
             active_formal_bundle_sha256
         ) != 64:
@@ -384,6 +390,9 @@ def validate_resolved_formal_execution_context(
             "resolved context path is not bound to the durable run root"
         )
     if protocol is not None:
+        capabilities = get_protocol_capabilities(
+            protocol.get("typed_model_cache_formal_protocol_version")
+        )
         comparisons = {
             "protocol_id": protocol["protocol_id"],
             "protocol_version": protocol[
@@ -404,21 +413,21 @@ def validate_resolved_formal_execution_context(
                 "typed_runtime_contract_hashes_by_capacity"
             ],
         }
-        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+        if capabilities.agent_order_contract_required:
             comparisons["formal_agent_order_contract_semantic_sha256"] = protocol[
                 "formal_agent_order_contract"
             ]["semantic_sha256"]
-        if protocol.get("typed_model_cache_formal_protocol_version") in {"2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+        if capabilities.exogenous_request_execution_required:
             comparisons["formal_exogenous_request_execution"] = protocol[
                 "formal_exogenous_request_execution_contract"
             ]
-        if protocol.get("typed_model_cache_formal_protocol_version") == "2.3.0":
+        if capabilities.nullable_metric_contract_required:
             comparisons[
                 "formal_nullable_metric_aggregation_contract_semantic_sha256"
             ] = protocol["formal_nullable_metric_aggregation_contract"][
                 "semantic_sha256"
             ]
-        if protocol.get("typed_model_cache_formal_protocol_version") in {"2.1.0", "2.2.0", "2.3.0"}:
+        if capabilities.full_environment_projection_required:
             comparisons["environment_identity_projection_contract_version"] = protocol[
                 "formal_execution_environment_contract"
             ]["identity_projection_contract_version"]
@@ -426,7 +435,7 @@ def validate_resolved_formal_execution_context(
                 comparisons["full_normalized_environment_projection"] = dict(
                     environment_identity
                 )
-        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+        if capabilities.active_bundle_required:
             expected_bundle = payload.get("resolved_expansion_context", {}).get(
                 "active_formal_bundle_sha256"
             )
@@ -472,7 +481,10 @@ def validate_resolved_formal_execution_context(
                 raise ResolvedFormalExecutionContextError(
                     f"resolved context environment identity drift: {field}"
                 )
-        if scientific.get("protocol_version") in {"2.1.0", "2.2.0", "2.3.0"} and scientific.get(
+        scientific_capabilities = get_protocol_capabilities(
+            scientific.get("protocol_version")
+        )
+        if scientific_capabilities.full_environment_projection_required and scientific.get(
             "full_normalized_environment_projection"
         ) != dict(environment_identity):
             raise ResolvedFormalExecutionContextError(

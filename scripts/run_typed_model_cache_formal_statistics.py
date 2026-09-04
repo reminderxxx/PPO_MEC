@@ -28,6 +28,7 @@ from src.runtime.formal_agent_order import (
 from src.runtime.formal_invalid_run_registry import (
     reject_permanently_invalid_formal_references,
 )
+from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
 
 
 def parse_args() -> argparse.Namespace:
@@ -52,7 +53,8 @@ def main() -> None:
     validate_protocol_v1_1(protocol)
     nested_python = sys.executable
     protocol_version = protocol["typed_model_cache_formal_protocol_version"]
-    if protocol_version in {"1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"} and not args.non_formal_rehearsal:
+    capabilities = get_protocol_capabilities(protocol_version)
+    if capabilities.persisted_resolved_execution_context_required:
         if not args.resolved_execution_context_path:
             raise FormalExecutionError(
                 "protocol v1.5 statistics requires resolved execution context"
@@ -68,7 +70,7 @@ def main() -> None:
             resolved_context, observed_sys_executable=sys.executable
         )
     order_audit = None
-    if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.agent_order_contract_required:
         if not args.formal_agent_order_contract_path:
             raise FormalExecutionError("Protocol v1.7 statistics requires agent order contract")
         try:
@@ -154,7 +156,7 @@ def main() -> None:
     nullable_hash = protocol.get(
         "formal_nullable_metric_aggregation_contract", {}
     ).get("semantic_sha256")
-    if protocol_version == "2.3.0":
+    if capabilities.nullable_metric_contract_required:
         statistics_payload[
             "formal_nullable_metric_aggregation_contract_semantic_sha256"
         ] = nullable_hash

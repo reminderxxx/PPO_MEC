@@ -9,6 +9,8 @@ import pytest
 
 from src.runtime.active_formal_bundle import (
     ActiveFormalBundleError,
+    DEFAULT_ACTIVE_INDEX_RELATIVE,
+    READY_STATUS,
     validate_active_formal_bundle,
 )
 from src.runtime.formal_execution_environment import (
@@ -40,7 +42,8 @@ MANIFEST = json.loads((V22 / "execution_environment_manifest.json").read_text())
 IDENTITY = MANIFEST["scientific_identity"]
 EXTENSIONS = protocol_bound_extensions_from_protocol(PROTOCOL)
 INDEX_PAYLOAD = json.loads((V22 / "protocol_index.json").read_text())
-ACTIVE_READY = INDEX_PAYLOAD.get("status") == "READY_FOR_G14C_V12_CLEAN_TRAIN_AND_FORMAL"
+ACTIVE_INDEX_PAYLOAD = json.loads((ROOT / DEFAULT_ACTIVE_INDEX_RELATIVE).read_text())
+ACTIVE_READY = ACTIVE_INDEX_PAYLOAD.get("status") == READY_STATUS
 
 
 def runtime_projection() -> dict:

@@ -20,6 +20,7 @@ from src.evaluators.typed_model_cache_formal_execution import (
 )
 from src.oracles.cache_request_replay import build_policy_neutral_replay_from_manifest
 from src.runtime.portable_resource_identity import add_portable_resource_arguments
+from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -41,6 +42,9 @@ def main() -> None:
     args = parse_args()
     protocol = json.loads(Path(args.protocol_path).read_text(encoding="utf-8-sig"))
     validate_protocol_v1_1(protocol)
+    capabilities = get_protocol_capabilities(
+        protocol.get("typed_model_cache_formal_protocol_version")
+    )
     manifest, report = load_and_validate_manifest(
         args.fairness_manifest_path, root=ROOT, check_files=True
     )
@@ -63,7 +67,7 @@ def main() -> None:
         manifest=manifest,
         evaluation_unit_id=args.evaluation_unit_id,
     )
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"2.2.0", "2.3.0"}:
+    if capabilities.request_subject_lifecycle_required:
         lifecycle = replay.get("formal_request_subject_lifecycle") or {}
         if lifecycle.get("contract_version") != "1.0.0" or not replay.get(
             "formal_request_exposure_fingerprint"

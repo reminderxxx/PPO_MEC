@@ -26,6 +26,7 @@ from src.runtime.formal_invalid_run_registry import (
     PermanentlyInvalidFormalReferenceError,
     reject_permanently_invalid_formal_references,
 )
+from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
 
 
 INVALID_G14C_V3_RUN_ROOT = Path(
@@ -174,6 +175,9 @@ def scientific_candidate_projection(row: dict[str, Any]) -> dict[str, Any]:
 
 
 def dev_select(input_root: Path, protocol: dict) -> dict:
+    capabilities = get_protocol_capabilities(
+        protocol["typed_model_cache_formal_protocol_version"]
+    )
     try:
         reject_permanently_invalid_formal_references([input_root])
     except PermanentlyInvalidFormalReferenceError as exc:
@@ -188,7 +192,7 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
     )
     selected = []
     order_audit = None
-    if protocol["typed_model_cache_formal_protocol_version"] in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.agent_order_contract_required:
         try:
             order_audit = resolve_formal_agent_order(protocol=protocol)
             reject_permanently_invalid_run_references([input_root])
@@ -198,7 +202,7 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
     for row in candidates:
         if not isinstance(row, dict):
             raise ValueError("checkpoint candidate must be an object")
-        if protocol["typed_model_cache_formal_protocol_version"] == "2.3.0":
+        if capabilities.nullable_metric_contract_required:
             companion = row.get("selection_metric_availability")
             if not isinstance(companion, dict):
                 raise ValueError("Protocol v2.3 candidate lacks metric availability counts")
@@ -271,9 +275,9 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
         "execution_commit",
         "resolved_execution_context_sha256",
     )
-    if protocol["typed_model_cache_formal_protocol_version"] in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.active_bundle_required:
         training_identity_fields = (*training_identity_fields, "active_formal_bundle_sha256")
-    if protocol["typed_model_cache_formal_protocol_version"] == "2.3.0":
+    if capabilities.nullable_metric_contract_required:
         training_identity_fields = (
             *training_identity_fields,
             "formal_nullable_metric_aggregation_contract_semantic_sha256",
@@ -281,7 +285,7 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
     training_identity = None
     if (
         not non_formal_rehearsal
-        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}
+        and capabilities.execution_binding_required
     ):
         identities = {
             tuple(row.get(field) for field in training_identity_fields)
@@ -340,6 +344,9 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
 
 
 def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
+    capabilities = get_protocol_capabilities(
+        protocol["typed_model_cache_formal_protocol_version"]
+    )
     try:
         reject_permanently_invalid_formal_references([input_root])
     except PermanentlyInvalidFormalReferenceError as exc:
@@ -349,7 +356,7 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
         raise ValueError("dev selection protocol hash mismatch")
     formal_training_identity = selection.get("formal_training_identity")
     order_audit = None
-    if protocol["typed_model_cache_formal_protocol_version"] in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.agent_order_contract_required:
         try:
             order_audit = resolve_formal_agent_order(protocol=protocol)
         except FormalAgentOrderError as exc:
@@ -372,13 +379,13 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
         )
         if observed_selected_agents != expected_selected_agents:
             raise ValueError("dev selection learned-agent order drift")
-        if protocol["typed_model_cache_formal_protocol_version"] == "2.3.0" and selection.get(
+        if capabilities.nullable_metric_contract_required and selection.get(
             "formal_nullable_metric_aggregation_contract_semantic_sha256"
         ) != protocol["formal_nullable_metric_aggregation_contract"]["semantic_sha256"]:
             raise ValueError("dev selection nullable metric contract mismatch")
     if (
         not bool(selection.get("non_formal_rehearsal"))
-        and protocol["typed_model_cache_formal_protocol_version"] in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}
+        and capabilities.execution_binding_required
     ):
         if not isinstance(formal_training_identity, dict):
             raise ValueError("dev selection lacks formal training identity")

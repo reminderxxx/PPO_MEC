@@ -22,6 +22,10 @@ from src.evaluators.formal_window_consumption import (
 from src.runtime.resolved_formal_execution_context import (
     load_resolved_formal_execution_context,
 )
+from src.runtime.formal_protocol_capabilities import (
+    FormalProtocolCapabilityError,
+    get_protocol_capabilities,
+)
 
 
 def main() -> None:
@@ -35,16 +39,13 @@ def main() -> None:
     protocol_report = validate_protocol_v1_1(protocol)
     execution = protocol["execution_contract"]
     context_report = None
-    if protocol["typed_model_cache_formal_protocol_version"] in {
-        "1.5.0",
-        "1.6.0",
-        "1.7.0",
-        "1.8.0",
-        "1.9.0",
-        "2.0.0",
-        "2.1.0",
-        "2.2.0",
-    }:
+    try:
+        capabilities = get_protocol_capabilities(
+            protocol["typed_model_cache_formal_protocol_version"]
+        )
+    except FormalProtocolCapabilityError as exc:
+        raise ValueError(str(exc)) from exc
+    if capabilities.persisted_resolved_execution_context_required:
         if not args.resolved_execution_context_path:
             raise ValueError("active protocol preflight requires resolved execution context")
         context_payload, context_report = load_resolved_formal_execution_context(
@@ -55,6 +56,8 @@ def main() -> None:
             check_git=True,
         )
         expansion_context = context_payload["resolved_expansion_context"]
+    elif capabilities.live_execution_allowed:
+        raise ValueError("active protocol preflight cannot use default expansion context")
     else:
         expansion_context = execution["default_expansion_context"]
     command_report = validate_command_templates(

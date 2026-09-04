@@ -180,10 +180,15 @@ def test_dev_selector_source_cannot_bypass_resolver() -> None:
     )
     assert "resolve_formal_agent_order" in source
     assert 'list(protocol["training_budget"]["agent_configs"])' not in source
+    from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
+
+    capabilities = get_protocol_capabilities("1.7.0")
+    assert capabilities.persisted_resolved_execution_context_required
+    assert capabilities.agent_order_contract_required
+    assert not capabilities.live_execution_allowed
     preflight_source = (
         ROOT / "scripts/validate_typed_model_cache_formal_restart.py"
     ).read_text(encoding="utf-8")
-    assert '"1.7.0"' in preflight_source
     assert "load_resolved_formal_execution_context" in preflight_source
 
 

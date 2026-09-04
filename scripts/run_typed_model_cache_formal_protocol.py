@@ -64,18 +64,11 @@ from src.runtime.formal_invalid_run_registry import (
     PermanentlyInvalidFormalReferenceError,
     reject_permanently_invalid_formal_references,
 )
-
-
-PROTOCOL_V14 = "1.4.0"
-PROTOCOL_V15 = "1.5.0"
-PROTOCOL_V16 = "1.6.0"
-PROTOCOL_V17 = "1.7.0"
-PROTOCOL_V18 = "1.8.0"
-PROTOCOL_V19 = "1.9.0"
-PROTOCOL_V20 = "2.0.0"
-PROTOCOL_V21 = "2.1.0"
-PROTOCOL_V22 = "2.2.0"
-PROTOCOL_V23 = "2.3.0"
+from src.runtime.formal_protocol_capabilities import (
+    FormalProtocolCapabilityError,
+    get_protocol_capabilities,
+    require_live_execution_protocol,
+)
 
 
 def _absolute_project_path(value: str) -> str:
@@ -204,12 +197,13 @@ def parse_args() -> argparse.Namespace:
 
 def reject_invalid_run_root(protocol: dict, output_root: str | Path) -> None:
     version = protocol.get("typed_model_cache_formal_protocol_version")
+    capabilities = get_protocol_capabilities(version)
     supersession = protocol.get("supersession", {})
     references = (
         supersession.get("invalid_execution_runs", [])
-        if version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17, PROTOCOL_V18, PROTOCOL_V19, PROTOCOL_V20, PROTOCOL_V21, PROTOCOL_V22, PROTOCOL_V23}
+        if capabilities.persisted_resolved_execution_context_required
         else supersession.get("invalid_g14c_v4_runs", [])
-        if version == PROTOCOL_V14
+        if version == "1.4.0"
         else []
     )
     invalid_run_ids = {
@@ -257,7 +251,11 @@ def main() -> None:
         ]
     protocol = load_protocol(args.protocol_path)
     protocol_version = protocol["typed_model_cache_formal_protocol_version"]
-    if protocol_version == PROTOCOL_V23 and active_bundle is None:
+    try:
+        capabilities = get_protocol_capabilities(protocol_version)
+    except FormalProtocolCapabilityError as exc:
+        raise FormalExecutionError(str(exc)) from exc
+    if capabilities.live_execution_allowed and active_bundle is None:
         try:
             active_bundle = validate_active_formal_bundle(
                 repository_root=ROOT,
@@ -273,10 +271,6 @@ def main() -> None:
             args.execution_environment_manifest = active_bundle[
                 "execution_environment_manifest_path"
             ]
-    elif protocol_version in {PROTOCOL_V17, PROTOCOL_V18, PROTOCOL_V19, PROTOCOL_V20, PROTOCOL_V21, PROTOCOL_V22}:
-        raise FormalExecutionError(
-            "formal Protocol v1.0-v1.9 is audit-only"
-        )
     phase = "preflight" if args.preflight else args.phase
     resource_resolution_audit = (
         build_active_bundle_resource_resolution_audit(active_bundle)
@@ -288,7 +282,7 @@ def main() -> None:
     reject_invalid_run_root(protocol, requested_output_root)
     environment_resolution = None
     environment_manifest = None
-    if protocol_version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17, PROTOCOL_V18, PROTOCOL_V19, PROTOCOL_V20, PROTOCOL_V21, PROTOCOL_V22, PROTOCOL_V23}:
+    if capabilities.explicit_python_and_environment_required:
         if not args.python_executable or not args.execution_environment_manifest:
             raise FormalExecutionError(
                 "active formal protocol requires explicit Python and execution environment manifest"
@@ -297,7 +291,7 @@ def main() -> None:
             raise FormalExecutionError(
                 "active formal protocol forbids relative Python or .venv fallback"
             )
-    if protocol_version in {PROTOCOL_V14, PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17, PROTOCOL_V18, PROTOCOL_V19, PROTOCOL_V20, PROTOCOL_V21, PROTOCOL_V22, PROTOCOL_V23}:
+    if protocol_version == "1.4.0" or capabilities.explicit_python_and_environment_required:
         if args.execution_environment_manifest:
             environment_manifest = json.loads(
                 Path(args.execution_environment_manifest).read_text(encoding="utf-8-sig")
@@ -313,7 +307,7 @@ def main() -> None:
             expected_identity=environment_contract["scientific_identity"],
             protocol_bound_extensions=(
                 protocol_bound_extensions_from_protocol(protocol)
-                if protocol_version in {PROTOCOL_V21, PROTOCOL_V22, PROTOCOL_V23}
+                if capabilities.full_environment_projection_required
                 else None
             ),
             forbidden_source_roots=environment_contract.get(
@@ -321,7 +315,7 @@ def main() -> None:
             ),
             require_clean_git_worktree=True,
         )
-        if protocol_version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17, PROTOCOL_V18, PROTOCOL_V19, PROTOCOL_V20, PROTOCOL_V21, PROTOCOL_V22, PROTOCOL_V23} and environment_resolution.runtime_audit.get(
+        if capabilities.explicit_python_and_environment_required and environment_resolution.runtime_audit.get(
             "resolution_source"
         ) != "explicit_python_executable":
             raise FormalExecutionError(
@@ -354,7 +348,7 @@ def main() -> None:
     outer_validation = validate_command_templates(templates, context)
     scientific_config = None
     execution_binding = None
-    if protocol_version in {PROTOCOL_V16, PROTOCOL_V17, PROTOCOL_V18, PROTOCOL_V19, PROTOCOL_V20, PROTOCOL_V21, PROTOCOL_V22, PROTOCOL_V23}:
+    if capabilities.execution_binding_required:
         if environment_resolution is None:
             raise FormalExecutionError("Protocol v1.6 environment was not resolved")
         scientific_config = load_strict_json_mapping(
@@ -397,7 +391,7 @@ def main() -> None:
     resolved_context_payload = None
     resolved_context_report = None
     resolved_context_file_sha256 = None
-    if protocol_version in {PROTOCOL_V15, PROTOCOL_V16, PROTOCOL_V17, PROTOCOL_V18, PROTOCOL_V19, PROTOCOL_V20, PROTOCOL_V21, PROTOCOL_V22, PROTOCOL_V23}:
+    if capabilities.persisted_resolved_execution_context_required:
         if environment_resolution is None or not args.execution_environment_manifest:
             raise FormalExecutionError("protocol v1.5 environment was not resolved")
         context_path = Path(context["resolved_execution_context_path"])
@@ -514,10 +508,10 @@ def main() -> None:
         )
         return
 
-    if protocol_version != PROTOCOL_V23:
-        raise FormalExecutionError(
-            "formal Protocol v1.0-v2.2 is audit-only; new execution requires v2.3"
-        )
+    try:
+        require_live_execution_protocol(protocol_version)
+    except FormalProtocolCapabilityError as exc:
+        raise FormalExecutionError(str(exc)) from exc
 
     if phase == "complete_without_holdout":
         command: list[str] | list[list[str]] = []
@@ -553,7 +547,7 @@ def main() -> None:
             ]["semantic_sha256"],
         }
     )
-    if protocol_version == PROTOCOL_V23:
+    if capabilities.live_execution_allowed:
         if environment_resolution is None or resolved_context_payload is None:
             raise FormalExecutionError("protocol v1.5 context was not resolved")
         ledger_resume_phases = {

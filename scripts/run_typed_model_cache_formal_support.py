@@ -45,6 +45,7 @@ from src.runtime.active_formal_bundle import (
     validate_active_formal_bundle,
     validate_registered_resource_path,
 )
+from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -178,8 +179,9 @@ def main() -> None:
     validate_protocol_v1_1(protocol)
     nested_python = sys.executable
     protocol_version = protocol["typed_model_cache_formal_protocol_version"]
+    capabilities = get_protocol_capabilities(protocol_version)
     resolved_context = None
-    if protocol_version in {"1.5.0", "1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.persisted_resolved_execution_context_required:
         if not args.resolved_execution_context_path:
             raise FormalExecutionError(
                 "protocol v1.5 support requires resolved execution context"
@@ -195,7 +197,7 @@ def main() -> None:
             resolved_context, observed_sys_executable=sys.executable
         )
     resource_resolution_audit = None
-    if protocol_version in {"1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.active_bundle_resource_resolution_required:
         try:
             bundle = validate_active_formal_bundle(
                 repository_root=ROOT,
@@ -259,7 +261,7 @@ def main() -> None:
     if fairness_report.get("status") != "pass":
         raise FormalExecutionError("fairness manifest validation failed")
     order_audit = None
-    if protocol_version in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.agent_order_contract_required:
         if not args.formal_agent_order_contract_path:
             raise FormalExecutionError("Protocol v1.7 support requires agent order contract")
         try:
@@ -424,7 +426,7 @@ def main() -> None:
         "--reward_positive_offset", "0",
         "--audit_runtime",
     ]
-    if protocol_version in {"2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.exogenous_request_execution_required:
         command.append("--formal-exogenous-request-execution")
     if order_audit is not None:
         command.extend(

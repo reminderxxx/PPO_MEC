@@ -11,6 +11,8 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
+
 
 AGENT_TRAINING_SCIENTIFIC_CONFIG_CONTRACT_VERSION = "2.0.0"
 FORMAL_TRAINING_EXECUTION_BINDING_VERSION = "1.0.0"
@@ -191,6 +193,9 @@ def validate_scientific_config(
     if config.get("config_semantic_sha256") != expected_hash:
         raise FormalTrainingIdentityError("scientific config semantic SHA-256 mismatch")
     if protocol is not None:
+        capabilities = get_protocol_capabilities(
+            protocol.get("typed_model_cache_formal_protocol_version")
+        )
         protocol_names = [str(row["agent"]) for row in learned_agent_rows(protocol)]
         if list(order) != protocol_names:
             raise FormalTrainingIdentityError("scientific config/protocol agent order mismatch")
@@ -207,7 +212,7 @@ def validate_scientific_config(
             raise FormalTrainingIdentityError("protocol scientific config contract version mismatch")
         if contract.get("config_semantic_sha256") != expected_hash:
             raise FormalTrainingIdentityError("protocol scientific config hash mismatch")
-        if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+        if capabilities.agent_order_contract_required:
             from src.runtime.formal_agent_order import (
                 FormalAgentOrderError,
                 resolve_formal_agent_order,
@@ -296,6 +301,9 @@ def build_execution_binding(
     command_matrix_sha256: str,
     active_formal_bundle_sha256: str | None = None,
 ) -> dict[str, Any]:
+    capabilities = get_protocol_capabilities(
+        protocol.get("typed_model_cache_formal_protocol_version")
+    )
     scientific = validate_scientific_config(scientific_config, protocol=protocol)
     if not isinstance(execution_commit, str) or len(execution_commit) != 40:
         raise FormalTrainingIdentityError("execution binding requires exact 40-hex commit")
@@ -311,15 +319,15 @@ def build_execution_binding(
         "typed_runtime_identities": protocol["identity"]
         ["typed_runtime_contract_hashes_by_capacity"],
     }
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.agent_order_contract_required:
         data_and_runtime_identity["formal_agent_order_contract_semantic_sha256"] = (
             protocol["formal_agent_order_contract"]["semantic_sha256"]
         )
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.exogenous_request_execution_required:
         data_and_runtime_identity["formal_exogenous_request_execution"] = deepcopy(
             protocol["formal_exogenous_request_execution_contract"]
         )
-    if protocol.get("typed_model_cache_formal_protocol_version") == "2.3.0":
+    if capabilities.nullable_metric_contract_required:
         data_and_runtime_identity[
             "formal_nullable_metric_aggregation_contract_semantic_sha256"
         ] = protocol["formal_nullable_metric_aggregation_contract"]["semantic_sha256"]
@@ -352,7 +360,7 @@ def build_execution_binding(
         },
         "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
     }
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.full_environment_projection_required:
         payload["environment_identity"] = {
             "projection_contract_version": protocol[
                 "formal_execution_environment_contract"
@@ -361,7 +369,7 @@ def build_execution_binding(
             "environment_fingerprint": environment_identity["environment_fingerprint"],
             "dependency_fingerprint": environment_identity["dependency_fingerprint"],
         }
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.active_bundle_required:
         if not isinstance(active_formal_bundle_sha256, str) or len(
             active_formal_bundle_sha256
         ) != 64:
@@ -392,6 +400,9 @@ def validate_execution_binding(
     command_matrix_sha256: str,
     active_formal_bundle_sha256: str | None = None,
 ) -> dict[str, Any]:
+    capabilities = get_protocol_capabilities(
+        protocol.get("typed_model_cache_formal_protocol_version")
+    )
     _reject_non_finite(binding)
     if binding.get("formal_training_execution_binding_version") != (
         FORMAL_TRAINING_EXECUTION_BINDING_VERSION
@@ -409,15 +420,15 @@ def validate_execution_binding(
         "typed_runtime_identities": protocol["identity"]
         ["typed_runtime_contract_hashes_by_capacity"],
     }
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.agent_order_contract_required:
         data_and_runtime_identity["formal_agent_order_contract_semantic_sha256"] = (
             protocol["formal_agent_order_contract"]["semantic_sha256"]
         )
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.exogenous_request_execution_required:
         data_and_runtime_identity["formal_exogenous_request_execution"] = deepcopy(
             protocol["formal_exogenous_request_execution_contract"]
         )
-    if protocol.get("typed_model_cache_formal_protocol_version") == "2.3.0":
+    if capabilities.nullable_metric_contract_required:
         data_and_runtime_identity[
             "formal_nullable_metric_aggregation_contract_semantic_sha256"
         ] = protocol["formal_nullable_metric_aggregation_contract"]["semantic_sha256"]
@@ -449,7 +460,7 @@ def validate_execution_binding(
         },
         "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
     }
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.full_environment_projection_required:
         comparisons["environment_identity"] = {
             "projection_contract_version": protocol[
                 "formal_execution_environment_contract"
@@ -458,7 +469,7 @@ def validate_execution_binding(
             "environment_fingerprint": environment_identity["environment_fingerprint"],
             "dependency_fingerprint": environment_identity["dependency_fingerprint"],
         }
-    if protocol.get("typed_model_cache_formal_protocol_version") in {"1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+    if capabilities.active_bundle_required:
         if not isinstance(active_formal_bundle_sha256, str) or len(
             active_formal_bundle_sha256
         ) != 64:

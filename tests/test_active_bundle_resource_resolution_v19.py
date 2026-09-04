@@ -13,6 +13,7 @@ from src.runtime.formal_agent_order import (
     reject_permanently_invalid_run_references,
 )
 from scripts.manage_typed_model_cache_formal_artifacts import INVALID_FORMAL_RUN_ROOTS
+from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,15 +60,13 @@ def test_active_dev_consumer_has_no_raw_legacy_index_access() -> None:
     assert "resolve_capacity_resource_pairs(" in source
 
 
-def test_all_active_version_gates_include_v19() -> None:
-    consumers = (
-        "scripts/validate_typed_model_cache_formal_restart.py",
-        "scripts/run_typed_model_cache_formal_statistics.py",
-        "scripts/train_algo_pool_real_sample.py",
-        "src/runtime/formal_training_contract.py",
-    )
-    for relative in consumers:
-        assert '"1.9.0"' in (ROOT / relative).read_text(encoding="utf-8")
+def test_v19_capabilities_are_preserved_by_the_shared_registry() -> None:
+    capabilities = get_protocol_capabilities("1.9.0")
+    assert capabilities.persisted_resolved_execution_context_required
+    assert capabilities.execution_binding_required
+    assert capabilities.agent_order_contract_required
+    assert capabilities.active_bundle_resource_resolution_required
+    assert not capabilities.live_execution_allowed
 
 
 def test_resolver_requires_validated_bundle() -> None:

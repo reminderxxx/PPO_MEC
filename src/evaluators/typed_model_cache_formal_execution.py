@@ -26,6 +26,11 @@ from src.evaluators.typed_model_cache_formal_protocol import (
     canonical_sha256,
     semantic_projection,
 )
+from src.runtime.formal_protocol_capabilities import (
+    FORMAL_PROTOCOL_CAPABILITY_ROUTING_CONTRACT_VERSION,
+    get_protocol_capabilities,
+    require_live_execution_protocol,
+)
 
 
 FORMAL_EXECUTION_PROTOCOL_VERSION = "1.1.0"
@@ -54,6 +59,8 @@ FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION = "2.2.0"
 FORMAL_EXECUTION_PROTOCOL_V2_2_ID = "typed_model_cache_formal_protocol_v2_2"
 FORMAL_EXECUTION_PROTOCOL_V2_3_VERSION = "2.3.0"
 FORMAL_EXECUTION_PROTOCOL_V2_3_ID = "typed_model_cache_formal_protocol_v2_3"
+FORMAL_EXECUTION_PROTOCOL_V2_4_VERSION = "2.4.0"
+FORMAL_EXECUTION_PROTOCOL_V2_4_ID = "typed_model_cache_formal_protocol_v2_4"
 FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
 FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
 LEGACY_PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
@@ -569,6 +576,80 @@ def validate_command_templates(
 def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
     _reject_non_finite(protocol)
     version = protocol.get("typed_model_cache_formal_protocol_version")
+    if version == FORMAL_EXECUTION_PROTOCOL_V2_4_VERSION:
+        if protocol.get("protocol_id") != FORMAL_EXECUTION_PROTOCOL_V2_4_ID:
+            raise FormalExecutionError("formal execution protocol v2.4 ID mismatch")
+        capabilities = require_live_execution_protocol(version)
+        supersession = protocol.get("supersession", {})
+        if (
+            supersession.get("supersedes_version") != "2.3.0"
+            or supersession.get("old_protocol_status")
+            != "audit_only_after_pre_execution_validator_version_dispatch_mismatch"
+        ):
+            raise FormalExecutionError("Protocol v2.4 predecessor status is missing")
+        stop = supersession.get("g14c_v13_pre_execution_stop", {})
+        if (
+            stop.get("classification")
+            != "PRE_EXECUTION_STOP / VALIDATOR_VERSION_DISPATCH_MISMATCH"
+            or stop.get("durable_run_root_created") is not False
+            or stop.get("phase_or_cell_ledger_created") is not False
+            or stop.get("formal_training_count") != 0
+            or stop.get("formal_checkpoint_count") != 0
+            or stop.get("formal_performance_count") != 0
+        ):
+            raise FormalExecutionError("G14C v13 pre-execution stop audit is incomplete")
+        if any(
+            isinstance(row, Mapping) and "g14c_v13" in str(row.get("run_id", ""))
+            for row in supersession.get("invalid_execution_runs", [])
+        ):
+            raise FormalExecutionError("G14C v13 must not be registered as an invalid run")
+        routing = protocol.get("formal_protocol_capability_routing_contract", {})
+        routing_hash = routing.get("semantic_sha256")
+        if (
+            routing.get("version")
+            != FORMAL_PROTOCOL_CAPABILITY_ROUTING_CONTRACT_VERSION
+            or not isinstance(routing_hash, str)
+            or len(routing_hash) != 64
+            or protocol.get("identity", {}).get(
+                "formal_protocol_capability_routing_contract_semantic_sha256"
+            )
+            != routing_hash
+            or not capabilities.persisted_resolved_execution_context_required
+            or not capabilities.nullable_metric_contract_required
+            or capabilities.holdout_capability
+        ):
+            raise FormalExecutionError("Protocol v2.4 capability routing contract is missing")
+        expected = canonical_sha256(
+            semantic_projection(
+                {key: value for key, value in protocol.items() if key != "hashes"}
+            )
+        )
+        if protocol.get("hashes", {}).get("semantic_sha256") != expected:
+            raise FormalExecutionError("formal protocol v2.4 semantic hash mismatch")
+        inherited = deepcopy(dict(protocol))
+        inherited["typed_model_cache_formal_protocol_version"] = (
+            FORMAL_EXECUTION_PROTOCOL_V2_3_VERSION
+        )
+        inherited["protocol_id"] = FORMAL_EXECUTION_PROTOCOL_V2_3_ID
+        inherited.pop("formal_protocol_capability_routing_contract", None)
+        inherited.get("identity", {}).pop(
+            "formal_protocol_capability_routing_contract_semantic_sha256", None
+        )
+        inherited["supersession"].pop("g14c_v13_pre_execution_stop", None)
+        inherited["supersession"].update(
+            supersedes_version="2.2.0",
+            old_protocol_status="invalid_protocol_or_implementation",
+        )
+        inherited = attach_hashes(inherited)
+        validate_protocol_v1_1(inherited)
+        return {
+            "status": "pass",
+            "protocol_version": version,
+            "semantic_sha256": expected,
+            "split_semantic_sha256": SPLIT_SEMANTIC_SHA256,
+            "primary_endpoint_count": len(PRIMARY_ENDPOINTS),
+            "phase_count": len(PHASE_ORDER),
+        }
     if version == FORMAL_EXECUTION_PROTOCOL_V2_3_VERSION:
         if protocol.get("protocol_id") != FORMAL_EXECUTION_PROTOCOL_V2_3_ID:
             raise FormalExecutionError("formal execution protocol v2.3 ID mismatch")

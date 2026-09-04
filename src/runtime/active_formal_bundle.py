@@ -25,16 +25,21 @@ from src.runtime.formal_execution_environment import (
     normalize_environment_identity,
     protocol_bound_extensions_from_protocol,
 )
+from src.runtime.formal_protocol_capabilities import (
+    FORMAL_PROTOCOL_CAPABILITY_ROUTING_CONTRACT_VERSION,
+    protocol_capability_matrix,
+    require_live_execution_protocol,
+)
 
 
 ACTIVE_FORMAL_BUNDLE_CONTRACT_VERSION = "1.1.0"
 ACTIVE_BUNDLE_RESOURCE_RESOLUTION_CONTRACT_VERSION = "1.0.0"
-ACTIVE_PROTOCOL_VERSION = "2.3.0"
-ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v2_3"
-READY_STATUS = "READY_FOR_G14C_V13_CLEAN_TRAIN_AND_FORMAL"
-READINESS_VERSION = "15.0.0"
+ACTIVE_PROTOCOL_VERSION = "2.4.0"
+ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v2_4"
+READY_STATUS = "READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL"
+READINESS_VERSION = "16.0.0"
 DEFAULT_ACTIVE_INDEX_RELATIVE = (
-    "configs/experiment/typed_model_cache_formal_protocol_v2_3_20260903/"
+    "configs/experiment/typed_model_cache_formal_protocol_v2_4_20260905/"
     "protocol_index.json"
 )
 CAPACITY_ORDER = (
@@ -250,6 +255,7 @@ def _validate_resource_rows(
         "formal_request_subject_lifecycle_contract",
         "environment_identity_projection_contract",
         "formal_nullable_metric_aggregation_contract",
+        "formal_protocol_capability_routing_contract",
     }
     if require_readiness:
         required.add("readiness_companion")
@@ -380,6 +386,38 @@ def validate_active_formal_bundle(
         raise ActiveFormalBundleError("old or unexpected Protocol is audit-only")
     if protocol_row.get("semantic_sha256") != comparisons["protocol_semantic_sha256"]:
         raise ActiveFormalBundleError("Protocol resource semantic identity drift")
+    try:
+        capabilities = require_live_execution_protocol(comparisons["protocol_version"])
+    except ValueError as exc:
+        raise ActiveFormalBundleError(str(exc)) from exc
+    if (
+        not capabilities.persisted_resolved_execution_context_required
+        or not capabilities.nullable_metric_contract_required
+        or capabilities.holdout_capability
+    ):
+        raise ActiveFormalBundleError("active Protocol capability route is unsafe")
+    routing = _strict_object(
+        _resolve_registered_path(
+            root,
+            resources["formal_protocol_capability_routing_contract"]["logical_path"],
+            "formal protocol capability routing contract",
+        ),
+        "formal protocol capability routing contract",
+    )
+    if (
+        routing.get("version")
+        != FORMAL_PROTOCOL_CAPABILITY_ROUTING_CONTRACT_VERSION
+        or routing.get("capability_matrix") != protocol_capability_matrix()
+        or routing.get("semantic_sha256")
+        != canonical_sha256(
+            {key: value for key, value in routing.items() if key != "semantic_sha256"}
+        )
+        or routing.get("semantic_sha256")
+        != protocol.get("formal_protocol_capability_routing_contract", {}).get(
+            "semantic_sha256"
+        )
+    ):
+        raise ActiveFormalBundleError("formal Protocol capability routing drift")
 
     scientific = _strict_object(
         _resolve_registered_path(
@@ -452,7 +490,7 @@ def validate_active_formal_bundle(
         readiness_row = resources["readiness_companion"]
         readiness = _strict_object(
             _resolve_registered_path(root, readiness_row["logical_path"], "readiness"),
-            "Readiness v14 companion",
+            "Readiness v16 companion",
         )
         if readiness.get("readiness_review_version") != READINESS_VERSION:
             raise ActiveFormalBundleError("Readiness companion version mismatch")

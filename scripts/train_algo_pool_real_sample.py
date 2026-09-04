@@ -66,6 +66,7 @@ from src.runtime.formal_training_identity import (
 from src.runtime.formal_invalid_run_registry import (
     reject_permanently_invalid_formal_references,
 )
+from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
 from src.runtime.formal_exogenous_request_execution import (
     FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION,
     FORMAL_REQUEST_EXPOSURE_TRACE_VERSION,
@@ -401,7 +402,11 @@ def main() -> None:
         formal_version = str(
             formal_protocol.get("typed_model_cache_formal_protocol_version", "")
         )
-        if formal_version.startswith("2.") and not args.formal_exogenous_request_execution:
+        formal_capabilities = get_protocol_capabilities(formal_version)
+        if (
+            formal_capabilities.exogenous_request_execution_required
+            and not args.formal_exogenous_request_execution
+        ):
             raise FormalTrainingContractError(
                 "Protocol 2.x forbids endogenous request progression"
             )
@@ -602,7 +607,9 @@ def main() -> None:
     )
 
     if args.formal_contract_preflight_only:
-        if resolved_training.formal_protocol_version not in {"1.6.0", "1.7.0", "1.8.0", "1.9.0", "2.0.0", "2.1.0", "2.2.0", "2.3.0"}:
+        if not get_protocol_capabilities(
+            resolved_training.formal_protocol_version
+        ).execution_binding_required:
             raise FormalTrainingContractError(
                 "formal contract preflight is restricted to Protocol v1.6/v1.7"
             )
