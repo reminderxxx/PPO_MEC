@@ -7,7 +7,7 @@
 - 冻结 Protocol 2.5、Generated Contract 1.0.0 与 Readiness v17。Protocol semantic/full SHA-256 为
   `001465ad91d95383e5bde7863fe1a967a4a86cd57a477b993deb0945a1a22e7a`/
   `763b47b5b180137ed9b3c8424529592ba4ed7ff92fda9ae8c5586de2f500413b`；bundle final SHA-256 为
-  `82612aea25f0bf12d6a47848d3c6cd9524d20d8a846bd2c67bd29fae2feeb981`。
+  `2b24f25253db641bc9d3305e7582b8312c887753c4c002e9a221c49d7b837f4b`。
 - clean detached、无本地 `.venv` 的真实 non-formal rehearsal 完成 13/13 terminal、30 train/dev/freeze、
   三档 cache outer+nested/controller/support、2 ablation、3 scalability、statistics 与 exact gate；generated
   registry canonical SHA-256=`028fb1d742d8553d1a9d1faf4870e91709f667a8798b17de5d270b1be184e578`。

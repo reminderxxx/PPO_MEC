@@ -510,6 +510,32 @@ def validate_active_formal_bundle(
             raise ActiveFormalBundleError("Readiness acceptance evidence is missing or incomplete")
         if evidence.get("active_bundle_core_sha256") != expected_core:
             raise ActiveFormalBundleError("acceptance evidence bundle identity drift")
+        rehearsal_path = _resolve_registered_path(
+            root,
+            evidence.get("real_downstream_consumer_rehearsal_path"),
+            "real downstream consumer rehearsal",
+        )
+        if sha256_file(rehearsal_path) != evidence.get(
+            "real_downstream_consumer_rehearsal_sha256"
+        ):
+            raise ActiveFormalBundleError("real downstream consumer rehearsal drift")
+        rehearsal = _strict_object(
+            rehearsal_path, "real downstream consumer rehearsal"
+        )
+        if not all(
+            (
+                evidence.get("real_downstream_consumer_rehearsal_status") == "pass",
+                rehearsal.get("status") == "pass",
+                rehearsal.get("clean_detached_candidate") is True,
+                rehearsal.get("completed_phase_terminal_count") == 13,
+                rehearsal.get("formal") is False,
+                rehearsal.get("performance_evidence") is False,
+                rehearsal.get("holdout_capability") is False,
+            )
+        ):
+            raise ActiveFormalBundleError(
+                "real downstream consumer rehearsal is missing or incomplete"
+            )
 
     if require_ready:
         readiness_row = resources["readiness_companion"]

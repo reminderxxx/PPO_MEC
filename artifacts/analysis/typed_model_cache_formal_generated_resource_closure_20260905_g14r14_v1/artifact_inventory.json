@@ -6,8 +6,8 @@
   "files": [
     {
       "path": "acceptance_evidence_manifest.json",
-      "sha256": "c23d947bc3e6d559f5cc68f517fd53d13475632fe67f0c24194223403399879d",
-      "size_bytes": 843
+      "sha256": "6c82cf8e5f4a5f8cbe6a8368fa05a6660607c17458172c50e1549ce4927f05e5",
+      "size_bytes": 1241
     },
     {
       "path": "capacity_resource_mapping_audit.json",
@@ -61,7 +61,7 @@
     },
     {
       "path": "readiness_review_v17.json",
-      "sha256": "cc54f48d3dc697d481f6fce87f7105bb1af5769866a1afbdd7f88ba27d8993a8",
+      "sha256": "0a335f32a40132cf3c0438fbc49fe02186c472278c76468f2c8dda49828dea27",
       "size_bytes": 1191
     },
     {

@@ -365,7 +365,7 @@
       "version_scope": "shared_historical_stable"
     },
     {
-      "content_sha256": "9ed32fd619a9f70d0de77f7338782082c7346f6bbaa38a30a4ff71d16a703831",
+      "content_sha256": "c34498526dfb79f4caede48a411cf64f812a389b740844ac796aed51f76eebfc",
       "logical_id": "readiness_companion",
       "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_5_20260905/readiness_v17.json",
       "role": "Readiness v17 evidence companion",
@@ -374,7 +374,7 @@
     }
   ],
   "active_formal_bundle_contract_version": "1.1.0",
-  "active_formal_bundle_sha256": "82612aea25f0bf12d6a47848d3c6cd9524d20d8a846bd2c67bd29fae2feeb981",
+  "active_formal_bundle_sha256": "2b24f25253db641bc9d3305e7582b8312c887753c4c002e9a221c49d7b837f4b",
   "command_matrix_identity": {
     "command_templates_sha256": "771a481009e24231f0e15acecf65c28e2e417844e2804fa8ff4ab88a1422b576",
     "outer_nested_expansion_equality_required": true
@@ -405,7 +405,7 @@
   },
   "protocol_index_version": "2.5.0",
   "readiness_companion": {
-    "content_sha256": "9ed32fd619a9f70d0de77f7338782082c7346f6bbaa38a30a4ff71d16a703831",
+    "content_sha256": "c34498526dfb79f4caede48a411cf64f812a389b740844ac796aed51f76eebfc",
     "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_5_20260905/readiness_v17.json"
   },
   "status": "READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL"

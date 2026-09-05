@@ -1,7 +1,7 @@
 {
   "active_bundle_core_sha256": "c6b4d793bf353882cea6985640bc1c4384b48946e4052a706038008f9cd6f6e7",
   "evidence_manifest_path": "artifacts/analysis/typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1/acceptance_evidence_manifest.json",
-  "evidence_manifest_sha256": "c23d947bc3e6d559f5cc68f517fd53d13475632fe67f0c24194223403399879d",
+  "evidence_manifest_sha256": "6c82cf8e5f4a5f8cbe6a8368fa05a6660607c17458172c50e1549ce4927f05e5",
   "formal_checkpoint_count": 0,
   "formal_performance_count": 0,
   "formal_training_count": 0,

@@ -7,6 +7,7 @@
     "generated_resource_contract_unit_validation": "pass",
     "outer_nested_argument_closure": "pass",
     "protocol_capability_routing": "pass",
+    "real_downstream_consumer_rehearsal": "pass",
     "static_generated_registry_separation": "pass"
   },
   "clean_candidate": true,
@@ -15,6 +16,9 @@
   "formal_training_count": 0,
   "holdout_capability": false,
   "holdout_sealed_unopened_unconsumed": true,
+  "real_downstream_consumer_rehearsal_path": "artifacts/analysis/typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1/real_downstream_consumer_rehearsal.json",
+  "real_downstream_consumer_rehearsal_sha256": "53631b48031f3835b6f98f7695c6009b8de1bbd0570ebfa30e2ba3c3d85ad387",
+  "real_downstream_consumer_rehearsal_status": "pass",
   "scope": "outcome-blind pre-execution contract acceptance; real non-formal rehearsal is recorded separately and is required by the enclosing G14R14 readiness review",
   "status": "pass"
 }
