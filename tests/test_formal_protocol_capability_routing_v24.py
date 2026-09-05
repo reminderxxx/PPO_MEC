@@ -122,31 +122,34 @@ def build_persisted_context(tmp_path: Path) -> tuple[dict, dict, Path]:
 def test_capability_registry_is_explicit_active_unique_and_fail_closed() -> None:
     matrix = protocol_capability_matrix()
     assert matrix["formal_protocol_capability_routing_contract_version"] == "1.0.0"
-    assert matrix["active_execution_protocol_version"] == "2.4.0"
-    assert ACTIVE_EXECUTION_PROTOCOL_VERSION == "2.4.0"
+    assert matrix["active_execution_protocol_version"] == "2.5.0"
+    assert ACTIVE_EXECUTION_PROTOCOL_VERSION == "2.5.0"
     assert FORMAL_PROTOCOL_CAPABILITY_ROUTING_CONTRACT_VERSION == "1.0.0"
     active = [
         version
         for version, row in matrix["versions"].items()
         if row["live_execution_allowed"]
     ]
-    assert active == ["2.4.0"]
+    assert active == ["2.5.0"]
     assert get_protocol_capabilities("2.4.0").persisted_resolved_execution_context_required
     assert get_protocol_capabilities("2.4.0").nullable_metric_contract_required
-    assert not get_protocol_capabilities("2.4.0").holdout_capability
+    assert not get_protocol_capabilities("2.4.0").live_execution_allowed
+    assert get_protocol_capabilities("2.5.0").generated_checkpoint_resource_required
+    assert not get_protocol_capabilities("2.5.0").holdout_capability
     assert get_protocol_capabilities("2.3.0").execution_status == "historical_audit_only"
     assert get_protocol_capabilities("1.5.0").persisted_resolved_execution_context_required
     with pytest.raises(FormalProtocolCapabilityError, match="audit-only"):
         require_live_execution_protocol("2.3.0")
     with pytest.raises(FormalProtocolCapabilityError, match="unregistered"):
-        get_protocol_capabilities("2.5.0")
+        get_protocol_capabilities("2.6.0")
 
 
 def test_v24_protocol_contract_and_command_matrix_identity() -> None:
     protocol = load(V24)
     assert validate_protocol_v1_1(protocol)["status"] == "pass"
     routing = load(V24_ROOT / "formal_protocol_capability_routing_contract.json")
-    assert routing["capability_matrix"] == protocol_capability_matrix()
+    assert routing["capability_matrix"]["active_execution_protocol_version"] == "2.4.0"
+    assert routing["capability_matrix"] != protocol_capability_matrix()
     assert routing["semantic_sha256"] == protocol[
         "formal_protocol_capability_routing_contract"
     ]["semantic_sha256"]

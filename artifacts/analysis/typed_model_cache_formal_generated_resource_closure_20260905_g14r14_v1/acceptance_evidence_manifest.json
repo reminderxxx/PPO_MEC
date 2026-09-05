@@ -1,0 +1,20 @@
+{
+  "acceptance_evidence_manifest_version": "1.0.0",
+  "active_bundle_core_sha256": "c6b4d793bf353882cea6985640bc1c4384b48946e4052a706038008f9cd6f6e7",
+  "checks": {
+    "authorization_boundary_frozen": "pass",
+    "capacity_command_mapping": "pass",
+    "generated_resource_contract_unit_validation": "pass",
+    "outer_nested_argument_closure": "pass",
+    "protocol_capability_routing": "pass",
+    "static_generated_registry_separation": "pass"
+  },
+  "clean_candidate": true,
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "holdout_capability": false,
+  "holdout_sealed_unopened_unconsumed": true,
+  "scope": "outcome-blind pre-execution contract acceptance; real non-formal rehearsal is recorded separately and is required by the enclosing G14R14 readiness review",
+  "status": "pass"
+}

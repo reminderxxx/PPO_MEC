@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import argparse
+import csv
 from functools import cmp_to_key
 import json
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -15,7 +16,12 @@ if str(ROOT) not in sys.path:
 
 from src.evaluators.typed_model_cache_formal_execution import validate_protocol_v1_1
 from src.evaluators.typed_model_cache_formal_protocol import canonical_sha256, sha256_file
-from src.runtime.portable_resource_identity import add_portable_resource_arguments
+from src.runtime.portable_resource_identity import add_portable_resource_arguments, load_registry
+from src.runtime.generated_checkpoint_resources import (
+    add_generated_checkpoint_resource_arguments,
+    load_generated_checkpoint_registry,
+    resolve_generated_checkpoint_arguments,
+)
 from src.runtime.formal_agent_order import (
     FormalAgentOrderError,
     reject_permanently_invalid_run_references,
@@ -111,6 +117,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--input-root", required=True)
     parser.add_argument("--output-path", required=True)
     add_portable_resource_arguments(parser)
+    add_generated_checkpoint_resource_arguments(parser)
     return parser.parse_args()
 
 
@@ -588,7 +595,74 @@ def write_checkpoint_companions(input_root: Path, freeze: dict) -> list[dict]:
     return outputs
 
 
-def formal_gate(input_root: Path, protocol: dict) -> dict:
+def _jsonl_rows(path: Path) -> list[dict[str, Any]]:
+    if not path.is_file():
+        return []
+    rows = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            value = json.loads(line)
+            if isinstance(value, dict):
+                rows.append(value)
+    return rows
+
+
+def _csv_count(paths: list[Path]) -> tuple[int, set[str]]:
+    count = 0
+    windows: set[str] = set()
+    for path in paths:
+        with path.open("r", encoding="utf-8-sig", newline="") as handle:
+            for row in csv.DictReader(handle):
+                count += 1
+                if row.get("window_id"):
+                    windows.add(str(row["window_id"]))
+    return count, windows
+
+
+def _claim_evidence_rows(statistics_payload: Mapping[str, Any]) -> list[dict[str, Any]]:
+    lower_is_better = {
+        "transfer_mb_per_request", "end_to_end_workflow_delay",
+        "handoff_failure_rate", "backhaul_traffic_cost",
+        "adapter_state_migration_overhead",
+    }
+    result = []
+    for row in statistics_payload.get("rows", []):
+        if not isinstance(row, Mapping):
+            continue
+        available = int(row.get("available_paired_count", row.get("paired_count", 0)))
+        low = row.get("ci95_low", row.get("bootstrap_ci_low"))
+        high = row.get("ci95_high", row.get("bootstrap_ci_high"))
+        status = "unsupported"
+        if available <= 0:
+            status = "unavailable"
+        elif not isinstance(low, (int, float)) or not isinstance(high, (int, float)):
+            status = "unsupported"
+        else:
+            desired_positive = str(row.get("metric")) not in lower_is_better
+            if low > 0:
+                status = "supported" if desired_positive else "contradicted"
+            elif high < 0:
+                status = "contradicted" if desired_positive else "supported"
+            else:
+                status = "mixed"
+        result.append(
+            {
+                "candidate_agent": row.get("candidate_agent"),
+                "baseline_agent": row.get("baseline_agent"),
+                "metric": row.get("metric"),
+                "status": status,
+                "available_paired_count": available,
+            }
+        )
+    return result
+
+
+def formal_gate(
+    input_root: Path,
+    protocol: dict,
+    *,
+    generated_registry_audit: Mapping[str, Any] | None = None,
+) -> dict:
     rehearsal_marker = input_root / "non_formal_rehearsal.json"
     non_formal_rehearsal = rehearsal_marker.is_file()
     required = [
@@ -605,6 +679,7 @@ def formal_gate(input_root: Path, protocol: dict) -> dict:
     endpoint_availability: dict[str, str] = {}
     comparison_availability: list[dict[str, Any]] = []
     statistics_path = input_root / "statistics" / "paired_statistics.json"
+    statistics_payload: dict[str, Any] = {}
     if statistics_path.is_file():
         statistics_payload = read_json(statistics_path)
         for row in statistics_payload.get("rows", []):
@@ -636,10 +711,107 @@ def formal_gate(input_root: Path, protocol: dict) -> dict:
                     ),
                 }
             )
+    cell_rows = _jsonl_rows(input_root / "cell_state.jsonl")
+    committed_by_phase: dict[str, int] = {}
+    for row in cell_rows:
+        if row.get("status") == "committed":
+            phase = str(row.get("phase"))
+            committed_by_phase[phase] = committed_by_phase.get(phase, 0) + 1
+    candidates = (
+        read_json(input_root / "checkpoint_candidates.json")
+        if (input_root / "checkpoint_candidates.json").is_file() else []
+    )
+    selection = (
+        read_json(input_root / "dev_selection.json")
+        if (input_root / "dev_selection.json").is_file() else {}
+    )
+    freeze = (
+        read_json(input_root / "checkpoint_freeze.json")
+        if (input_root / "checkpoint_freeze.json").is_file() else {}
+    )
+    frozen_capacity_counts = {
+        capacity: sum(
+            str(row.get("capacity_label")) == capacity
+            for row in freeze.get("frozen_checkpoints", [])
+            if isinstance(row, dict)
+        )
+        for capacity in ("constrained_288mb", "medium_576mb", "relaxed_864mb")
+    }
+    _, controller_windows = _csv_count(
+        sorted(input_root.glob("formal_controller/**/benchmark_rows.csv"))
+    )
+    observed_counts = {
+        "committed_training_cells": (
+            committed_by_phase.get("train", 0)
+            or (
+                len(list(input_root.glob("training/**/train_summary.json")))
+                if non_formal_rehearsal else 0
+            )
+        ),
+        "candidate_checkpoints": len(candidates) if isinstance(candidates, list) else 0,
+        "latest_checkpoints": len(list(input_root.glob("training/**/checkpoints/latest.pt"))),
+        "dev_candidate_evaluations": len(candidates) if isinstance(candidates, list) else 0,
+        "selections": len(selection.get("selected", [])),
+        "frozen_checkpoints": int(freeze.get("frozen_checkpoint_count", 0)),
+        "frozen_checkpoints_by_capacity": frozen_capacity_counts,
+        "cache_policy_cells": committed_by_phase.get("formal_cache_policy", 0) or (
+            len(list(input_root.glob("formal_cache_policy/**/aggregate_summary.json")))
+            if non_formal_rehearsal else 0
+        ),
+        "controller_cells": committed_by_phase.get("formal_controller", 0) or (
+            len(list(input_root.glob("formal_controller/**/aggregate_summary.json")))
+            if non_formal_rehearsal else 0
+        ),
+        "ablation_settings": committed_by_phase.get("formal_ablation", 0) or (
+            len(list(input_root.glob("formal_ablation/**/support_provenance.json")))
+            if non_formal_rehearsal else 0
+        ),
+        "support_settings": committed_by_phase.get("formal_support", 0) or (
+            len(list(input_root.glob("formal_support/**/support_provenance.json")))
+            if non_formal_rehearsal else 0
+        ),
+        "scalability_settings": committed_by_phase.get("formal_scalability", 0) or (
+            len(list(input_root.glob("formal_scalability/**/support_provenance.json")))
+            if non_formal_rehearsal else 0
+        ),
+        "primary_comparison_rows": len(statistics_payload.get("rows", [])),
+        "formal_outer_window_clusters": len(controller_windows),
+    }
+    formal_expected = {
+        "committed_training_cells": 150,
+        "candidate_checkpoints": 1200,
+        "latest_checkpoints": 150,
+        "dev_candidate_evaluations": 1200,
+        "selections": 150,
+        "frozen_checkpoints": 150,
+        "frozen_checkpoints_by_capacity": {
+            "constrained_288mb": 50, "medium_576mb": 50, "relaxed_864mb": 50,
+        },
+        "cache_policy_cells": 3,
+        "controller_cells": 3,
+        "ablation_settings": 2,
+        "support_settings": 11,
+        "scalability_settings": 3,
+        "primary_comparison_rows": 84,
+        "formal_outer_window_clusters": 12,
+    }
+    rehearsal = read_json(rehearsal_marker) if non_formal_rehearsal else {}
+    expected_counts = (
+        rehearsal.get("expected_counts", {}) if non_formal_rehearsal else formal_expected
+    )
+    exact_count_mismatches = {
+        key: {"expected": expected, "observed": observed_counts.get(key)}
+        for key, expected in expected_counts.items()
+        if observed_counts.get(key) != expected
+    }
+    generated_ok = (
+        isinstance(generated_registry_audit, Mapping)
+        and generated_registry_audit.get("status") == "pass"
+    )
     return {
-        "formal_execution_gate_version": "1.1.0",
+        "formal_execution_gate_version": "2.0.0",
         "protocol_semantic_sha256": protocol["hashes"]["semantic_sha256"],
-        "passed": not missing,
+        "passed": not missing and not exact_count_mismatches and generated_ok,
         "missing_outputs": missing,
         "performance_threshold_used": False,
         "holdout_opened": False,
@@ -647,6 +819,17 @@ def formal_gate(input_root: Path, protocol: dict) -> dict:
         "endpoint_availability": endpoint_availability,
         "claim_map_availability": comparison_availability,
         "zero_pair_rule": "UNAVAILABLE_not_tie_pass_or_fail",
+        "generated_checkpoint_registry_audit": dict(generated_registry_audit or {}),
+        "generated_checkpoint_registry_required": True,
+        "observed_counts": observed_counts,
+        "expected_counts": expected_counts,
+        "exact_count_mismatches": exact_count_mismatches,
+        "exact_count_status": "pass" if not exact_count_mismatches else "fail",
+        "claim_evidence_map": _claim_evidence_rows(statistics_payload),
+        "claim_evidence_status_enum": [
+            "supported", "mixed", "unsupported", "contradicted", "unavailable"
+        ],
+        "outcome_blind_gate": True,
         "execution_mode": (
             "non_formal_rehearsal" if non_formal_rehearsal else "formal"
         ),
@@ -703,6 +886,29 @@ def main() -> None:
     validate_protocol_v1_1(protocol)
     input_root = Path(args.input_root)
     output_path = Path(args.output_path)
+    generated_registry_audit = None
+    capabilities = get_protocol_capabilities(
+        protocol["typed_model_cache_formal_protocol_version"]
+    )
+    if capabilities.generated_checkpoint_resource_required and args.action in {
+        "integrity", "integrity_and_formal_gate", "formal_gate"
+    }:
+        registry_path = Path(args.generated_checkpoint_registry_path)
+        static_registry = load_registry(args.resource_registry_path)
+        context = read_json(input_root / "resolved_execution_context.json")
+        binding = read_json(input_root / "formal_training_execution_binding.json")
+        _, generated_registry_audit = load_generated_checkpoint_registry(
+            registry_path,
+            run_root=input_root,
+            expected_run_id=input_root.resolve().name,
+            static_registry_semantic_sha256=static_registry["hashes"]["semantic_sha256"],
+            protocol_semantic_sha256=protocol["hashes"]["semantic_sha256"],
+            protocol_full_sha256=protocol["hashes"]["full_sha256"],
+            active_formal_bundle_sha256=context["scientific_identity"]["active_formal_bundle_sha256"],
+            execution_commit=context["scientific_identity"]["execution_commit"],
+            resolved_execution_context_sha256=context["context_sha256"],
+            formal_training_execution_binding_sha256=binding["binding_full_sha256"],
+        )
     if args.action == "dev_select":
         payload = dev_select(input_root, protocol)
     elif args.action == "checkpoint_freeze":
@@ -718,9 +924,13 @@ def main() -> None:
             integrity_path,
             artifact_integrity(input_root, protocol, integrity_path),
         )
-        payload = formal_gate(input_root, protocol)
+        payload = formal_gate(
+            input_root, protocol, generated_registry_audit=generated_registry_audit
+        )
     else:
-        payload = formal_gate(input_root, protocol)
+        payload = formal_gate(
+            input_root, protocol, generated_registry_audit=generated_registry_audit
+        )
     write_create_only(output_path, payload)
     print(json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False))
 

@@ -1,0 +1,40 @@
+{
+  "formal_execution_environment_contract_version": "1.2.0",
+  "projection_contract_version": "1.1.0",
+  "runtime_location": {
+    "resolved_python_absolute_path": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "site_packages_paths": [
+      "/Users/howen/Projects/PPO_MEC/.venv/lib/python3.9/site-packages"
+    ],
+    "virtual_environment_root": "/Users/howen/Projects/PPO_MEC/.venv"
+  },
+  "runtime_location_is_scientific_identity": false,
+  "scientific_identity": {
+    "architecture": "arm64",
+    "critical_package_versions": {
+      "PyYAML": "6.0.3",
+      "numpy": "2.0.2",
+      "pandas": "2.3.3",
+      "pytest": "8.4.2",
+      "torch": "2.8.0"
+    },
+    "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+    "environment_fingerprint": "ed6630bd191a12a9ff58b3b26106ebe1e4015f1c9167f401ac10d3a973ee3b5a",
+    "execution_commit": "observed_clean_40_hex_HEAD_equal_main_equal_origin_main_bound_at_execution",
+    "formal_endpoint_metrics_contract_version": "2.0.0",
+    "formal_execution_environment_contract_version": "1.2.0",
+    "formal_exogenous_request_execution_contract_version": "1.1.0",
+    "formal_request_exposure_trace_version": "2.0.0",
+    "formal_request_subject_lifecycle_contract_version": "1.0.0",
+    "identity_rule": "full_projection_v1_excludes_host_paths_and_binds_observed_commit_and_tree_out_of_band",
+    "installed_package_count": 31,
+    "platform_system": "Darwin",
+    "python_implementation": "CPython",
+    "python_version": "3.9.6",
+    "source_root_identity": {
+      "project_package": "src",
+      "source_tree_identity_rule": "observed_tracked_src_and_scripts_tree_sha256_bound_at_execution"
+    },
+    "torch_version": "2.8.0"
+  }
+}

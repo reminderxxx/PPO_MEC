@@ -61,6 +61,8 @@ FORMAL_EXECUTION_PROTOCOL_V2_3_VERSION = "2.3.0"
 FORMAL_EXECUTION_PROTOCOL_V2_3_ID = "typed_model_cache_formal_protocol_v2_3"
 FORMAL_EXECUTION_PROTOCOL_V2_4_VERSION = "2.4.0"
 FORMAL_EXECUTION_PROTOCOL_V2_4_ID = "typed_model_cache_formal_protocol_v2_4"
+FORMAL_EXECUTION_PROTOCOL_V2_5_VERSION = "2.5.0"
+FORMAL_EXECUTION_PROTOCOL_V2_5_ID = "typed_model_cache_formal_protocol_v2_5"
 FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
 FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
 LEGACY_PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
@@ -576,10 +578,85 @@ def validate_command_templates(
 def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
     _reject_non_finite(protocol)
     version = protocol.get("typed_model_cache_formal_protocol_version")
+    if version == FORMAL_EXECUTION_PROTOCOL_V2_5_VERSION:
+        if protocol.get("protocol_id") != FORMAL_EXECUTION_PROTOCOL_V2_5_ID:
+            raise FormalExecutionError("formal execution protocol v2.5 ID mismatch")
+        capabilities = require_live_execution_protocol(version)
+        supersession = protocol.get("supersession", {})
+        if (
+            supersession.get("supersedes_version") != "2.4.0"
+            or supersession.get("old_protocol_status")
+            != "historical_audit_only_after_generated_resource_binding_gap"
+        ):
+            raise FormalExecutionError("Protocol v2.5 predecessor status is missing")
+        authorization = supersession.get("g14r14_authorization_boundary", {})
+        if (
+            authorization.get("status")
+            != "PRE-EXECUTION AUTHORIZATION WITHHELD / DOWNSTREAM_RESOURCE_BINDING_NOT_CLOSED"
+            or authorization.get("g14c_v14_created") is not False
+            or authorization.get("formal_training_count") != 0
+            or authorization.get("formal_checkpoint_count") != 0
+            or authorization.get("formal_performance_count") != 0
+            or authorization.get("holdout_capability") is not False
+        ):
+            raise FormalExecutionError("G14R14 authorization boundary is incomplete")
+        generated = protocol.get("formal_generated_checkpoint_resource_identity_contract", {})
+        if (
+            generated.get("version") != "1.0.0"
+            or not isinstance(generated.get("semantic_sha256"), str)
+            or len(generated["semantic_sha256"]) != 64
+            or not capabilities.generated_checkpoint_resource_required
+            or capabilities.holdout_capability
+        ):
+            raise FormalExecutionError("Protocol v2.5 generated resource contract is missing")
+        templates = protocol.get("execution_contract", {}).get("command_templates", {})
+        consumers = (
+            "formal_cache_policy", "formal_controller", "formal_ablation",
+            "formal_support", "formal_scalability", "formal_statistics", "formal_gate",
+        )
+        for phase in consumers:
+            argv = templates.get(phase, {}).get("argv", [])
+            if "--generated-checkpoint-registry-path" not in argv:
+                raise FormalExecutionError(
+                    f"Protocol v2.5 generated registry flag missing: {phase}"
+                )
+        capacity_rows = [
+            row for row in templates.get("formal_support", {}).get("matrix_contexts", [])
+            if str(row.get("support_setting_id", "")).startswith("capacity-")
+        ]
+        observed = {
+            (
+                row.get("capacity_label"), row.get("runtime_config_resource_id"),
+                row.get("checkpoint_manifest_id"), row.get("checkpoint_provenance_id"),
+            )
+            for row in capacity_rows
+        }
+        expected_capacity = {
+            (label, f"runtime_config.{label}", f"checkpoint_manifest.{label}",
+             f"checkpoint_provenance.{label}")
+            for label in ("constrained_288mb", "medium_576mb", "relaxed_864mb")
+        }
+        if observed != expected_capacity:
+            raise FormalExecutionError("Protocol v2.5 capacity resource mapping drift")
+        expected = canonical_sha256(
+            semantic_projection(
+                {key: value for key, value in protocol.items() if key != "hashes"}
+            )
+        )
+        if protocol.get("hashes", {}).get("semantic_sha256") != expected:
+            raise FormalExecutionError("formal protocol v2.5 semantic hash mismatch")
+        return {
+            "status": "pass",
+            "protocol_version": version,
+            "semantic_sha256": expected,
+            "split_semantic_sha256": SPLIT_SEMANTIC_SHA256,
+            "primary_endpoint_count": len(PRIMARY_ENDPOINTS),
+            "phase_count": len(PHASE_ORDER),
+        }
     if version == FORMAL_EXECUTION_PROTOCOL_V2_4_VERSION:
         if protocol.get("protocol_id") != FORMAL_EXECUTION_PROTOCOL_V2_4_ID:
             raise FormalExecutionError("formal execution protocol v2.4 ID mismatch")
-        capabilities = require_live_execution_protocol(version)
+        capabilities = get_protocol_capabilities(version)
         supersession = protocol.get("supersession", {})
         if (
             supersession.get("supersedes_version") != "2.3.0"

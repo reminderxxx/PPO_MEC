@@ -64,6 +64,10 @@ from src.runtime.portable_resource_identity import (
     add_portable_resource_arguments,
     resolve_argument_resources,
 )
+from src.runtime.generated_checkpoint_resources import (
+    add_generated_checkpoint_resource_arguments,
+    resolve_generated_checkpoint_arguments,
+)
 from src.runtime.formal_agent_order import (
     FormalAgentOrderError,
     reject_permanently_invalid_run_references,
@@ -101,6 +105,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--checkpoint_provenance_manifest_path", type=str, default="")
     parser.add_argument("--cache_baseline_fairness_manifest_path", type=str, default="")
     parser.add_argument("--formal-agent-order-contract-path", default="")
+    parser.add_argument("--protocol-path", default="")
+    parser.add_argument("--resolved-execution-context-path", default="")
+    parser.add_argument("--formal-training-execution-binding-path", default="")
     parser.add_argument(
         "--formal-exogenous-request-execution",
         action="store_true",
@@ -187,6 +194,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Record episode wall-clock and Python traced peak allocation for compute auditing.",
     )
     add_portable_resource_arguments(parser)
+    add_generated_checkpoint_resource_arguments(parser)
     return parser
 
 
@@ -552,11 +560,31 @@ def main() -> None:
             ("runtime_config_resource_id", "model_cache_runtime_config", "runtime_config"),
             ("fairness_manifest_resource_id", "cache_baseline_fairness_manifest_path", "fairness_manifest"),
         ]
-        if args.checkpoint_manifest_id:
-            bindings.append(
-                ("checkpoint_manifest_id", "seed_checkpoint_manifest_path", "checkpoint_manifest")
-            )
         resolve_argument_resources(args, bindings=bindings)
+    generated_checkpoint_resource_audit = None
+    if args.generated_checkpoint_registry_path:
+        protocol = (
+            json.loads(Path(args.protocol_path).read_text(encoding="utf-8-sig"))
+            if args.protocol_path else None
+        )
+        resolved_context = (
+            json.loads(Path(args.resolved_execution_context_path).read_text(encoding="utf-8-sig"))
+            if args.resolved_execution_context_path else None
+        )
+        execution_binding = (
+            json.loads(Path(args.formal_training_execution_binding_path).read_text(encoding="utf-8-sig"))
+            if args.formal_training_execution_binding_path else None
+        )
+        generated_checkpoint_resource_audit = resolve_generated_checkpoint_arguments(
+            args,
+            expected_capacity_label=(
+                str(args.runtime_config_resource_id).split(".", 1)[1]
+                if "." in str(args.runtime_config_resource_id) else None
+            ),
+            protocol=protocol,
+            resolved_execution_context=resolved_context,
+            execution_binding=execution_binding,
+        )
     window_consumption_contract: dict[str, Any] | None = None
     window_consumption_binding: dict[str, Any] | None = None
     if args.formal_window_consumption_contract_path:
@@ -997,6 +1025,7 @@ def main() -> None:
         "resolved_model_cache_runtime": runtime_contract,
         "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
         "checkpoint_provenance_validation": checkpoint_provenance_validation,
+        "generated_checkpoint_resource_audit": generated_checkpoint_resource_audit,
         "protocol_version": PAPER_PROTOCOL_VERSION,
         "paper_protocol_frozen": PAPER_PROTOCOL_FROZEN,
         "canonical_paper_protocol": bool(args.window_mode in {"activating_only", "mixed_informative", "full_stratified"}),
@@ -1131,6 +1160,7 @@ def main() -> None:
         ),
         "request_exposure_fingerprints": request_exposure_fingerprints,
         "checkpoint_provenance_validation": checkpoint_provenance_validation,
+        "generated_checkpoint_resource_audit": generated_checkpoint_resource_audit,
         "agents": args.agents,
         "seeds": args.seeds,
         "output_paths": {

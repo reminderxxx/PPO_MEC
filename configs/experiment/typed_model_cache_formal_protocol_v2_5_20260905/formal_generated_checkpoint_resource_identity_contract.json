@@ -1,0 +1,58 @@
+{
+  "checkpoint_coverage": {
+    "duplicates_missing_cross_capacity_and_escape_rejected": true,
+    "every_manifest_entry_has_provenance": true,
+    "every_provenance_entry_has_manifest_entry": true
+  },
+  "fail_closed": [
+    "missing_or_duplicate_id",
+    "static_generated_id_collision",
+    "role_schema_capacity_drift",
+    "content_hash_or_size_drift",
+    "explicit_path_identity_conflict",
+    "symlink_or_path_escape",
+    "cross_run_or_staging_reference",
+    "uncommitted_or_failed_phase",
+    "stale_protocol_bundle_context_selection_or_freeze",
+    "historical_g14c_v1_v13_reference",
+    "post_publication_rewrite",
+    "outer_nested_resource_argument_divergence"
+  ],
+  "identity_fields": [
+    "logical_resource_id",
+    "resource_role",
+    "schema_version",
+    "capacity_label",
+    "capacity_mb",
+    "durable_run_root_relative_path",
+    "size_bytes",
+    "content_sha256",
+    "protocol_semantic_sha256",
+    "protocol_full_sha256",
+    "active_formal_bundle_sha256",
+    "execution_commit",
+    "resolved_execution_context_sha256",
+    "agent_scientific_config_semantic_sha256",
+    "formal_training_execution_binding_sha256",
+    "dev_selection_sha256",
+    "checkpoint_freeze_sha256",
+    "source_phase_committed_ledger_identity",
+    "current_run_id",
+    "registry_canonical_sha256"
+  ],
+  "publication": {
+    "after_committed_terminal_only": true,
+    "atomic": true,
+    "canonical_json": true,
+    "create_only": true,
+    "finite_json": true,
+    "producer_phase": "checkpoint_freeze",
+    "static_registry_mutation_forbidden": true
+  },
+  "resource_layers": {
+    "generated_checkpoint_registry": "current-run checkpoint-freeze outputs only",
+    "static_registry": "pre-run immutable inputs only"
+  },
+  "semantic_sha256": "04f9874c8912b619061d85cb478b77a07435d241f961d26ddf5d3dc692ffb352",
+  "version": "1.0.0"
+}

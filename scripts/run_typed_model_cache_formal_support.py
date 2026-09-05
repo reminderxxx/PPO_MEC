@@ -29,6 +29,10 @@ from src.runtime.portable_resource_identity import (
     add_portable_resource_arguments,
     resolve_argument_resources,
 )
+from src.runtime.generated_checkpoint_resources import (
+    add_generated_checkpoint_resource_arguments,
+    resolve_generated_checkpoint_arguments,
+)
 from src.runtime.resolved_formal_execution_context import (
     load_resolved_formal_execution_context,
     resolved_python_for_nested_consumer,
@@ -79,6 +83,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--resolved-execution-context-path", default="")
     parser.add_argument("--formal-agent-order-contract-path", default="")
     add_portable_resource_arguments(parser)
+    add_generated_checkpoint_resource_arguments(parser)
     return parser
 
 
@@ -172,7 +177,6 @@ def main() -> None:
                 ("window_plan_resource_id", "window_plan_path", "window_plan"),
                 ("runtime_config_resource_id", "model_cache_runtime_config", "runtime_config"),
                 ("fairness_manifest_resource_id", "cache_baseline_fairness_manifest_path", "fairness_manifest"),
-                ("checkpoint_manifest_id", "seed_checkpoint_manifest_path", "checkpoint_manifest"),
             ),
         )
     protocol = load_json(args.protocol_path, "protocol")
@@ -195,6 +199,24 @@ def main() -> None:
         )
         nested_python = resolved_python_for_nested_consumer(
             resolved_context, observed_sys_executable=sys.executable
+        )
+    execution_binding = None
+    if resolved_context is not None:
+        binding_path = resolved_context["resolved_expansion_context"][
+            "formal_training_execution_binding_path"
+        ]
+        execution_binding = load_json(binding_path, "formal training execution binding")
+    generated_checkpoint_resource_audit = None
+    if capabilities.generated_checkpoint_resource_required:
+        generated_checkpoint_resource_audit = resolve_generated_checkpoint_arguments(
+            args,
+            expected_capacity_label=(
+                str(args.runtime_config_resource_id).split(".", 1)[1]
+                if "." in str(args.runtime_config_resource_id) else None
+            ),
+            protocol=protocol,
+            resolved_execution_context=resolved_context,
+            execution_binding=execution_binding,
         )
     resource_resolution_audit = None
     if capabilities.active_bundle_resource_resolution_required:
@@ -227,21 +249,40 @@ def main() -> None:
                     "support runtime path is not one registered capacity resource"
                 )
             runtime_resource = runtime_matches[0]
+            validate_registered_resource_path(runtime_resource, supplied_runtime)
             setting = support_setting_by_id(protocol, args.setting_id)
-            if setting.get("family") == "capacity":
+            if args.non_formal_rehearsal:
+                fairness_resource = next(
+                    (
+                        row for row in getattr(
+                            args, "_portable_resource_resolution", {}
+                        ).get("resolutions", [])
+                        if row.get("logical_resource_id")
+                        == args.fairness_manifest_resource_id
+                    ),
+                    None,
+                )
+                if fairness_resource is None:
+                    raise ActiveFormalBundleError(
+                        "non-formal support fairness lacks static registry audit"
+                    )
+            elif setting.get("family") == "capacity":
                 label = runtime_resource["logical_id"].split(".", 1)[1]
                 fairness_resource = resolve_active_bundle_resource(
                     bundle,
                     f"fairness_manifests.{label}",
                     expected_role="formal fairness manifest",
                 )
+                validate_registered_resource_path(
+                    fairness_resource,
+                    Path(args.cache_baseline_fairness_manifest_path).resolve(),
+                )
             else:
                 fairness_resource = resolve_support_resource(bundle, args.setting_id)
-            validate_registered_resource_path(runtime_resource, supplied_runtime)
-            validate_registered_resource_path(
-                fairness_resource,
-                Path(args.cache_baseline_fairness_manifest_path).resolve(),
-            )
+                validate_registered_resource_path(
+                    fairness_resource,
+                    Path(args.cache_baseline_fairness_manifest_path).resolve(),
+                )
             resource_resolution_audit = {
                 "active_bundle_resource_resolution_contract_version": "1.0.0",
                 "active_bundle_sha256": bundle["active_formal_bundle_sha256"],
@@ -272,7 +313,12 @@ def main() -> None:
             )
         except FormalAgentOrderError as exc:
             raise FormalExecutionError(str(exc)) from exc
-        if list(args.agents) != order_audit["main_benchmark_agent_order"]:
+        expected_agents = order_audit["main_benchmark_agent_order"]
+        if args.non_formal_rehearsal:
+            expected_agents = [
+                agent for agent in expected_agents if agent in set(args.agents)
+            ]
+        if not expected_agents or list(args.agents) != expected_agents:
             raise FormalExecutionError("support agent order differs from formal contract")
     checkpoint_provenance = load_json(
         args.checkpoint_provenance_manifest_path, "checkpoint provenance"
@@ -285,6 +331,7 @@ def main() -> None:
         fairness_manifest=fairness,
         checkpoint_provenance=checkpoint_provenance,
     )
+    provenance["generated_checkpoint_resource_audit"] = generated_checkpoint_resource_audit
     if order_audit is not None:
         provenance["formal_agent_order_contract_semantic_sha256"] = order_audit[
             "semantic_sha256"
@@ -400,6 +447,15 @@ def main() -> None:
         "--seeds", *[str(seed) for seed in args.seeds],
         "--seed_checkpoint_manifest_path", args.seed_checkpoint_manifest_path,
         "--checkpoint_provenance_manifest_path", args.checkpoint_provenance_manifest_path,
+        "--generated-checkpoint-registry-path", args.generated_checkpoint_registry_path,
+        "--checkpoint-manifest-id", args.checkpoint_manifest_id,
+        "--checkpoint-provenance-id", args.checkpoint_provenance_id,
+        "--protocol-path", args.protocol_path,
+        "--resolved-execution-context-path", args.resolved_execution_context_path,
+        "--formal-training-execution-binding-path", (
+            resolved_context["resolved_expansion_context"]["formal_training_execution_binding_path"]
+            if resolved_context is not None else ""
+        ),
         "--cache_baseline_fairness_manifest_path", args.cache_baseline_fairness_manifest_path,
         "--model_cache_runtime_config", args.model_cache_runtime_config,
         "--window_plan_path", args.window_plan_path,
@@ -460,7 +516,6 @@ def main() -> None:
                 "--window-plan-resource-id", args.window_plan_resource_id,
                 "--runtime-config-resource-id", args.runtime_config_resource_id,
                 "--fairness-manifest-resource-id", args.fairness_manifest_resource_id,
-                "--checkpoint-manifest-id", args.checkpoint_manifest_id,
             ]
         )
     if args.dry_run:

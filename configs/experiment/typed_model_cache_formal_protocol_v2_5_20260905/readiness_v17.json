@@ -1,0 +1,13 @@
+{
+  "active_bundle_core_sha256": "c6b4d793bf353882cea6985640bc1c4384b48946e4052a706038008f9cd6f6e7",
+  "evidence_manifest_path": "artifacts/analysis/typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1/acceptance_evidence_manifest.json",
+  "evidence_manifest_sha256": "c23d947bc3e6d559f5cc68f517fd53d13475632fe67f0c24194223403399879d",
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "holdout_capability": false,
+  "holdout_sealed_unopened_unconsumed": true,
+  "readiness_review_version": "17.0.0",
+  "status": "ready",
+  "verdict": "READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL"
+}

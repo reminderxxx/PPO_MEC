@@ -16,7 +16,11 @@ from src.evaluators.typed_model_cache_formal_execution import (
     FormalExecutionError,
     validate_protocol_v1_1,
 )
-from src.runtime.portable_resource_identity import add_portable_resource_arguments
+from src.runtime.portable_resource_identity import add_portable_resource_arguments, load_registry
+from src.runtime.generated_checkpoint_resources import (
+    add_generated_checkpoint_resource_arguments,
+    load_generated_checkpoint_registry,
+)
 from src.runtime.resolved_formal_execution_context import (
     load_resolved_formal_execution_context,
     resolved_python_for_nested_consumer,
@@ -41,6 +45,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--non-formal-rehearsal", action="store_true")
     parser.add_argument("--rehearsal-baseline-agent", action="append", default=[])
     add_portable_resource_arguments(parser)
+    add_generated_checkpoint_resource_arguments(parser)
     return parser.parse_args()
 
 
@@ -68,6 +73,25 @@ def main() -> None:
         )
         nested_python = resolved_python_for_nested_consumer(
             resolved_context, observed_sys_executable=sys.executable
+        )
+    generated_checkpoint_resource_audit = None
+    if capabilities.generated_checkpoint_resource_required:
+        static_registry = load_registry(args.resource_registry_path)
+        binding_path = resolved_context["resolved_expansion_context"][
+            "formal_training_execution_binding_path"
+        ]
+        binding = json.loads(Path(binding_path).read_text(encoding="utf-8-sig"))
+        _, generated_checkpoint_resource_audit = load_generated_checkpoint_registry(
+            args.generated_checkpoint_registry_path,
+            run_root=Path(args.input_root).resolve(),
+            expected_run_id=Path(args.input_root).resolve().name,
+            static_registry_semantic_sha256=static_registry["hashes"]["semantic_sha256"],
+            protocol_semantic_sha256=protocol["hashes"]["semantic_sha256"],
+            protocol_full_sha256=protocol["hashes"]["full_sha256"],
+            active_formal_bundle_sha256=resolved_context["scientific_identity"]["active_formal_bundle_sha256"],
+            execution_commit=resolved_context["scientific_identity"]["execution_commit"],
+            resolved_execution_context_sha256=resolved_context["context_sha256"],
+            formal_training_execution_binding_sha256=binding["binding_full_sha256"],
         )
     order_audit = None
     if capabilities.agent_order_contract_required:
@@ -167,6 +191,9 @@ def main() -> None:
         statistics_payload["formal_agent_order_contract_semantic_sha256"] = (
             order_audit["semantic_sha256"] if order_audit else None
         )
+        statistics_payload["generated_checkpoint_resource_audit"] = (
+            generated_checkpoint_resource_audit
+        )
         (Path(args.output_root) / "paired_statistics.json").write_text(
             json.dumps(
                 statistics_payload,
@@ -183,6 +210,7 @@ def main() -> None:
                 "status": "pass",
                 "row_artifact_count": len(rows),
                 "output_root": str(Path(args.output_root).resolve()),
+                "generated_checkpoint_resource_audit": generated_checkpoint_resource_audit,
             },
             ensure_ascii=False,
             indent=2,

@@ -48,6 +48,12 @@ from src.runtime.active_formal_bundle import (
     build_active_bundle_resource_resolution_audit,
     validate_active_formal_bundle,
 )
+from src.runtime.portable_resource_identity import load_registry
+from src.runtime.generated_checkpoint_resources import (
+    atomic_create_registry,
+    build_generated_checkpoint_registry,
+    load_generated_checkpoint_registry,
+)
 from src.runtime.formal_training_identity import (
     atomic_create_execution_binding,
     build_execution_binding,
@@ -545,8 +551,52 @@ def main() -> None:
             "formal_nullable_metric_aggregation_contract_semantic_sha256": protocol[
                 "formal_nullable_metric_aggregation_contract"
             ]["semantic_sha256"],
+            "generated_checkpoint_registry_canonical_sha256": None,
         }
     )
+    generated_registry_audit = None
+    generated_registry_path = Path(
+        context.get(
+            "generated_checkpoint_registry_path",
+            Path(args.output_root) / "generated_checkpoint_resource_registry.json",
+        )
+    )
+    if capabilities.generated_checkpoint_resource_required and phase in {
+        "formal_cache_policy",
+        "formal_controller",
+        "formal_ablation",
+        "formal_support",
+        "formal_scalability",
+        "formal_statistics",
+        "formal_gate",
+        "complete_without_holdout",
+    }:
+        _, generated_registry_audit = load_generated_checkpoint_registry(
+            generated_registry_path,
+            run_root=Path(args.output_root).resolve(),
+            expected_run_id=Path(args.output_root).resolve().name,
+            static_registry_semantic_sha256=protocol[
+                "portable_resource_identity_contract"
+            ]["resource_registry_semantic_sha256"],
+            protocol_semantic_sha256=protocol["hashes"]["semantic_sha256"],
+            protocol_full_sha256=protocol["hashes"]["full_sha256"],
+            active_formal_bundle_sha256=active_bundle["active_formal_bundle_sha256"],
+            execution_commit=environment_resolution.runtime_audit[
+                "observed_execution_commit"
+            ],
+            resolved_execution_context_sha256=resolved_context_payload["context_sha256"],
+            formal_training_execution_binding_sha256=execution_binding[
+                "binding_full_sha256"
+            ],
+        )
+        input_hash = canonical_sha256(
+            {
+                "base_phase_input_hash": input_hash,
+                "generated_checkpoint_registry_canonical_sha256": (
+                    generated_registry_audit["registry_canonical_sha256"]
+                ),
+            }
+        )
     if capabilities.live_execution_allowed:
         if environment_resolution is None or resolved_context_payload is None:
             raise FormalExecutionError("protocol v1.5 context was not resolved")
@@ -714,6 +764,10 @@ def main() -> None:
                         "formal_nullable_metric_aggregation_contract_semantic_sha256": protocol[
                             "formal_nullable_metric_aggregation_contract"
                         ]["semantic_sha256"],
+                        "generated_checkpoint_registry_canonical_sha256": (
+                            generated_registry_audit["registry_canonical_sha256"]
+                            if generated_registry_audit is not None else None
+                        ),
                     }
                 )
                 output_flag = "--output_root"
@@ -790,6 +844,10 @@ def main() -> None:
                         "formal_nullable_metric_aggregation_contract_semantic_sha256": protocol[
                             "formal_nullable_metric_aggregation_contract"
                         ]["semantic_sha256"],
+                        "generated_checkpoint_registry_canonical_sha256": (
+                            generated_registry_audit["registry_canonical_sha256"]
+                            if generated_registry_audit is not None else None
+                        ),
                     }
                 )
                 output_flag = "--output_root" if "--output_root" in original else "--output-root"
@@ -933,6 +991,21 @@ def main() -> None:
                     for context_row in matrix_contexts
                 ],
             )
+        if (
+            phase == "checkpoint_freeze"
+            and capabilities.generated_checkpoint_resource_required
+            and result.get("status") in {"completed", "skipped_completed_hash_match"}
+        ):
+            static_registry = load_registry(context["resource_registry_path"])
+            registry = build_generated_checkpoint_registry(
+                run_root=args.output_root,
+                protocol=protocol,
+                static_registry=static_registry,
+                resolved_execution_context=resolved_context_payload,
+                execution_binding=execution_binding,
+            )
+            publication = atomic_create_registry(generated_registry_path, registry)
+            result = {**result, "generated_checkpoint_registry": publication}
     else:
         if args.finalize_phase_only or args.resume_from_cell_ledger:
             raise FormalExecutionError(

@@ -11,7 +11,7 @@ from typing import Final
 
 
 FORMAL_PROTOCOL_CAPABILITY_ROUTING_CONTRACT_VERSION: Final = "1.0.0"
-ACTIVE_EXECUTION_PROTOCOL_VERSION: Final = "2.4.0"
+ACTIVE_EXECUTION_PROTOCOL_VERSION: Final = "2.5.0"
 
 
 class FormalProtocolCapabilityError(ValueError):
@@ -32,6 +32,7 @@ class FormalProtocolCapabilities:
     full_environment_projection_required: bool
     request_subject_lifecycle_required: bool
     nullable_metric_contract_required: bool
+    generated_checkpoint_resource_required: bool
     holdout_capability: bool = False
 
     @property
@@ -56,6 +57,7 @@ def _capabilities(
     projection: bool = False,
     lifecycle: bool = False,
     nullable: bool = False,
+    generated_checkpoints: bool = False,
 ) -> FormalProtocolCapabilities:
     return FormalProtocolCapabilities(
         version=version,
@@ -70,6 +72,7 @@ def _capabilities(
         full_environment_projection_required=projection,
         request_subject_lifecycle_required=lifecycle,
         nullable_metric_contract_required=nullable,
+        generated_checkpoint_resource_required=generated_checkpoints,
     )
 
 
@@ -113,9 +116,15 @@ _REGISTRY: Final[dict[str, FormalProtocolCapabilities]] = {
         lifecycle=True, nullable=True,
     ),
     "2.4.0": _capabilities(
-        "2.4.0", status="active_execution", context=True, environment=True,
+        "2.4.0", context=True, environment=True,
         binding=True, order=True, bundle=True, bundle_resources=True,
         exogenous=True, projection=True, lifecycle=True, nullable=True,
+    ),
+    "2.5.0": _capabilities(
+        "2.5.0", status="active_execution", context=True, environment=True,
+        binding=True, order=True, bundle=True, bundle_resources=True,
+        exogenous=True, projection=True, lifecycle=True, nullable=True,
+        generated_checkpoints=True,
     ),
 }
 

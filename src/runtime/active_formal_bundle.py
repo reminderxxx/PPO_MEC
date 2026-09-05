@@ -34,12 +34,12 @@ from src.runtime.formal_protocol_capabilities import (
 
 ACTIVE_FORMAL_BUNDLE_CONTRACT_VERSION = "1.1.0"
 ACTIVE_BUNDLE_RESOURCE_RESOLUTION_CONTRACT_VERSION = "1.0.0"
-ACTIVE_PROTOCOL_VERSION = "2.4.0"
-ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v2_4"
+ACTIVE_PROTOCOL_VERSION = "2.5.0"
+ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v2_5"
 READY_STATUS = "READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL"
-READINESS_VERSION = "16.0.0"
+READINESS_VERSION = "17.0.0"
 DEFAULT_ACTIVE_INDEX_RELATIVE = (
-    "configs/experiment/typed_model_cache_formal_protocol_v2_4_20260905/"
+    "configs/experiment/typed_model_cache_formal_protocol_v2_5_20260905/"
     "protocol_index.json"
 )
 CAPACITY_ORDER = (
@@ -256,6 +256,7 @@ def _validate_resource_rows(
         "environment_identity_projection_contract",
         "formal_nullable_metric_aggregation_contract",
         "formal_protocol_capability_routing_contract",
+        "formal_generated_checkpoint_resource_identity_contract",
     }
     if require_readiness:
         required.add("readiness_companion")
@@ -393,6 +394,7 @@ def validate_active_formal_bundle(
     if (
         not capabilities.persisted_resolved_execution_context_required
         or not capabilities.nullable_metric_contract_required
+        or not capabilities.generated_checkpoint_resource_required
         or capabilities.holdout_capability
     ):
         raise ActiveFormalBundleError("active Protocol capability route is unsafe")
@@ -490,7 +492,7 @@ def validate_active_formal_bundle(
         readiness_row = resources["readiness_companion"]
         readiness = _strict_object(
             _resolve_registered_path(root, readiness_row["logical_path"], "readiness"),
-            "Readiness v16 companion",
+            "Readiness v17 companion",
         )
         if readiness.get("readiness_review_version") != READINESS_VERSION:
             raise ActiveFormalBundleError("Readiness companion version mismatch")
