@@ -174,11 +174,21 @@ def static_flags(
     return result
 
 
-def generated_flags(run_root: Path, capacity: str) -> list[str]:
+def generated_flags(
+    run_root: Path, capacity: str, *, dashed_paths: bool = False
+) -> list[str]:
     checkpoint_root = run_root / "checkpoint_manifests" / capacity
     return [
-        "--seed_checkpoint_manifest_path", str(checkpoint_root / "seed_checkpoint_manifest.json"),
-        "--checkpoint_provenance_manifest_path", str(checkpoint_root / "checkpoint_provenance_manifest.json"),
+        (
+            "--seed-checkpoint-manifest-path"
+            if dashed_paths else "--seed_checkpoint_manifest_path"
+        ),
+        str(checkpoint_root / "seed_checkpoint_manifest.json"),
+        (
+            "--checkpoint-provenance-manifest-path"
+            if dashed_paths else "--checkpoint_provenance_manifest_path"
+        ),
+        str(checkpoint_root / "checkpoint_provenance_manifest.json"),
         "--generated-checkpoint-registry-path", str(run_root / "generated_checkpoint_resource_registry.json"),
         "--checkpoint-manifest-id", f"checkpoint_manifest.{capacity}",
         "--checkpoint-provenance-id", f"checkpoint_provenance.{capacity}",
@@ -279,7 +289,7 @@ def support_command(
         "--protocol-path", str(ROOT / PROTOCOL_PATH), "--setting-id", setting_id,
         "--model-cache-runtime-config", str(ROOT / RUNTIME_DIR / f"runtime_{capacity}.yaml"),
         "--cache-baseline-fairness-manifest-path", str(fairness_paths[fairness_label]),
-        *generated_flags(run_root, capacity),
+        *generated_flags(run_root, capacity, dashed_paths=True),
         "--window-plan-path", str(ROOT / PLAN_PATH),
         "--mobility-csv-path", str(data_root / MOBILITY_RELATIVE),
         "--workflow-csv-path", str(data_root / WORKFLOW_RELATIVE),
@@ -452,7 +462,7 @@ def main() -> None:
             "--fairness-manifest-path", str(fairness_paths[capacity]),
             "--evaluation-unit-id", evaluation_units[capacity],
             "--request-replay-path", str(run_root / "cache_policy_replay" / f"{capacity}.json"),
-            *generated_flags(run_root, capacity),
+            *generated_flags(run_root, capacity, dashed_paths=True),
             "--resolved-execution-context-path", str(run_root / "resolved_execution_context.json"),
             "--formal-training-execution-binding-path", str(run_root / "formal_training_execution_binding.json"),
             *static_flags(registry, data_root, run_root, capacity, fairness_ids[capacity]),
