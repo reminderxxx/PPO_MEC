@@ -14,8 +14,10 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
 
-FORMAL_CELL_LEDGER_VERSION = "1.0.0"
-CELL_IDENTITY_VERSION = "1.0.0"
+FORMAL_CELL_LEDGER_VERSION = "2.0.0"
+CELL_IDENTITY_VERSION = "1.1.0"
+CELL_ARTIFACT_PUBLICATION_CONTRACT_VERSION = "1.0.0"
+CELL_CHILD_OUTPUT_DESCRIPTOR_VERSION = "1.0.0"
 CELL_STATUSES = {
     "running",
     "incomplete",
@@ -64,10 +66,14 @@ def _file_sha256(path: Path) -> str:
 
 def artifact_inventory(root: str | Path) -> list[dict[str, Any]]:
     base = Path(root)
-    if not base.is_dir():
+    if base.is_symlink() or not base.is_dir():
         raise CellTransactionError(f"cell artifact directory is missing: {base}")
     rows = []
-    for path in sorted(item for item in base.rglob("*") if item.is_file()):
+    for path in sorted(base.rglob("*")):
+        if path.is_symlink():
+            raise CellTransactionError(f"cell artifact symlink is forbidden: {path}")
+        if not path.is_file():
+            continue
         relative = path.relative_to(base).as_posix()
         if relative == "committed_marker.json":
             continue
@@ -81,6 +87,159 @@ def artifact_inventory(root: str | Path) -> list[dict[str, Any]]:
     if not rows:
         raise CellTransactionError("cell artifact inventory is empty")
     return rows
+
+
+def _safe_relative_path(value: Any, label: str) -> Path:
+    if not isinstance(value, str) or not value or Path(value).is_absolute():
+        raise CellTransactionError(f"{label} must be a non-empty relative path")
+    relative = Path(value)
+    if any(part in {"", ".", ".."} for part in relative.parts):
+        raise CellTransactionError(f"{label} contains forbidden path normalization")
+    return relative
+
+
+def write_child_output_descriptor(
+    path: str | Path,
+    *,
+    cell_id: str,
+    phase: str,
+    logical_setting_id: str,
+    output_root: str | Path,
+    artifact_root: str | Path,
+    producer_kind: str,
+    required_payload: Sequence[str],
+) -> dict[str, Any]:
+    """Publish the exact child payload root; callers never guess a latest directory."""
+
+    target = Path(path)
+    root = Path(output_root).resolve()
+    artifact = Path(artifact_root)
+    if target.exists() or target.is_symlink():
+        raise CellTransactionError("child output descriptor is create-only")
+    if target.resolve(strict=False).parent != root:
+        raise CellTransactionError("child output descriptor must be in child output root")
+    if artifact.is_symlink() or not artifact.is_dir():
+        raise CellTransactionError("child artifact root is missing or a symlink")
+    try:
+        relative = artifact.resolve().relative_to(root).as_posix()
+    except ValueError as exc:
+        raise CellTransactionError("child artifact root escapes output root") from exc
+    payload = {
+        "cell_child_output_descriptor_version": CELL_CHILD_OUTPUT_DESCRIPTOR_VERSION,
+        "cell_artifact_publication_contract_version": (
+            CELL_ARTIFACT_PUBLICATION_CONTRACT_VERSION
+        ),
+        "cell_id": cell_id,
+        "phase": phase,
+        "logical_setting_id": logical_setting_id,
+        "producer_kind": producer_kind,
+        "artifact_root_relative_path": relative,
+        "required_payload": list(required_payload),
+        "artifact_inventory": artifact_inventory(artifact),
+    }
+    payload["artifact_inventory_sha256"] = _canonical_sha256(
+        payload["artifact_inventory"]
+    )
+    atomic_write_json_create_only(target, payload)
+    return payload
+
+
+def resolve_child_output_descriptor(
+    path: str | Path,
+    *,
+    output_root: str | Path,
+    expected_cell_id: str,
+    expected_phase: str,
+    expected_setting_id: str,
+) -> tuple[Path, dict[str, Any]]:
+    descriptor_path = Path(path)
+    root = Path(output_root).resolve()
+    if descriptor_path.is_symlink() or not descriptor_path.is_file():
+        raise CellTransactionError("child output descriptor is missing or a symlink")
+    if descriptor_path.resolve().parent != root:
+        raise CellTransactionError("child output descriptor is outside output root")
+    try:
+        descriptor = json.loads(descriptor_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise CellTransactionError("child output descriptor is invalid JSON") from exc
+    expected = {
+        "cell_child_output_descriptor_version": CELL_CHILD_OUTPUT_DESCRIPTOR_VERSION,
+        "cell_artifact_publication_contract_version": (
+            CELL_ARTIFACT_PUBLICATION_CONTRACT_VERSION
+        ),
+        "cell_id": expected_cell_id,
+        "phase": expected_phase,
+        "logical_setting_id": expected_setting_id,
+    }
+    if not isinstance(descriptor, Mapping) or any(
+        descriptor.get(key) != value for key, value in expected.items()
+    ):
+        raise CellTransactionError("child output descriptor identity mismatch")
+    relative = _safe_relative_path(
+        descriptor.get("artifact_root_relative_path"), "child artifact root"
+    )
+    artifact = root / relative
+    if artifact.is_symlink() or not artifact.is_dir():
+        raise CellTransactionError("child descriptor artifact root is missing")
+    try:
+        artifact.resolve().relative_to(root)
+    except ValueError as exc:
+        raise CellTransactionError("child descriptor artifact root escapes output root") from exc
+    expected_children = {descriptor_path.name, relative.parts[0]}
+    observed_children = {item.name for item in root.iterdir()}
+    if observed_children != expected_children:
+        raise CellTransactionError("child output root contains conflicting outputs")
+    inventory = artifact_inventory(artifact)
+    if descriptor.get("artifact_inventory") != inventory or descriptor.get(
+        "artifact_inventory_sha256"
+    ) != _canonical_sha256(inventory):
+        raise CellTransactionError("child descriptor payload inventory drift")
+    required = descriptor.get("required_payload")
+    if not isinstance(required, list) or not required:
+        raise CellTransactionError("child descriptor required payload is empty")
+    for value in required:
+        relative_required = _safe_relative_path(value, "required payload")
+        target = artifact / relative_required
+        if target.is_symlink() or not target.is_file():
+            raise CellTransactionError(f"cell required artifact is missing: {value}")
+    return artifact, dict(descriptor)
+
+
+def single_child_directory(root: str | Path) -> Path:
+    """Return one exact immediate child directory from a dedicated empty output root."""
+
+    base = Path(root)
+    if base.is_symlink() or not base.is_dir():
+        raise CellTransactionError("dedicated child output root is missing")
+    children = list(base.iterdir())
+    if len(children) != 1 or children[0].is_symlink() or not children[0].is_dir():
+        raise CellTransactionError("child output root must contain exactly one directory")
+    return children[0]
+
+
+def _rebase_internal_paths(source: Path, destination: Path) -> int:
+    """Rebase UTF-8 path fields before atomic publication from staging to durable root."""
+
+    old = str(source.resolve()).encode("utf-8")
+    new = str(destination.resolve(strict=False)).encode("utf-8")
+    changed = 0
+    for path in sorted(source.rglob("*")):
+        if path.is_symlink():
+            raise CellTransactionError(f"cell artifact symlink is forbidden: {path}")
+        if not path.is_file() or path.name in {"cell_stdout.log", "cell_stderr.log"}:
+            continue
+        data = path.read_bytes()
+        if old not in data:
+            continue
+        try:
+            data.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise CellTransactionError(
+                f"binary artifact embeds staging path and cannot be relocated: {path}"
+            ) from exc
+        path.write_bytes(data.replace(old, new))
+        changed += 1
+    return changed
 
 
 def stable_cell_id(phase: str, coordinates: Mapping[str, Any]) -> str:
@@ -188,6 +347,10 @@ def validate_cell_ledger(
             "committed_path",
             "artifact_inventory",
             "artifact_inventory_sha256",
+            "cell_artifact_publication_contract_version",
+            "child_output_path",
+            "validated_artifact_path",
+            "publication_state",
             "previous_ledger_hash",
             "current_ledger_hash",
         }
@@ -352,6 +515,9 @@ class FormalCellLedger:
         staging_path: Path,
         committed_path: Path,
         inventory: Sequence[Mapping[str, Any]] | None = None,
+        child_output_path: Path | None = None,
+        validated_artifact_path: Path | None = None,
+        publication_state: str | None = None,
     ) -> dict[str, Any]:
         rows = [dict(item) for item in (inventory or [])]
         return {
@@ -377,6 +543,14 @@ class FormalCellLedger:
             "committed_path": str(committed_path),
             "artifact_inventory": rows,
             "artifact_inventory_sha256": _canonical_sha256(rows) if rows else None,
+            "cell_artifact_publication_contract_version": (
+                CELL_ARTIFACT_PUBLICATION_CONTRACT_VERSION
+            ),
+            "child_output_path": str(child_output_path or staging_path),
+            "validated_artifact_path": (
+                str(validated_artifact_path) if validated_artifact_path else None
+            ),
+            "publication_state": publication_state or status,
         }
 
     def verify_committed(self, cell_id: str) -> dict[str, Any]:
@@ -400,6 +574,10 @@ class FormalCellLedger:
             raise CellTransactionError("committed marker cross-run mismatch")
         if marker.get("cell_id") != cell_id:
             raise CellTransactionError("committed marker cell ID mismatch")
+        if marker.get("cell_artifact_publication_contract_version") != (
+            CELL_ARTIFACT_PUBLICATION_CONTRACT_VERSION
+        ):
+            raise CellTransactionError("committed marker publication contract mismatch")
         return record
 
     def _recover_published_cell(self, cell_id: str) -> dict[str, Any] | None:
@@ -447,6 +625,9 @@ class FormalCellLedger:
                 staging_path=Path(record["staging_path"]),
                 committed_path=target,
                 inventory=inventory,
+                child_output_path=Path(record["child_output_path"]),
+                validated_artifact_path=target,
+                publication_state="committed_recovered_after_publish",
             )
         )
 
@@ -538,6 +719,9 @@ class FormalCellLedger:
         required_paths: Sequence[str] = (),
         monotonic_started_ns: int | None = None,
         artifact_subpath: str | Path = ".",
+        validated_artifact_root: str | Path | None = None,
+        child_output_path: str | Path | None = None,
+        rebase_internal_paths: bool = True,
     ) -> dict[str, Any]:
         running = self._active_running(self._records_for(cell_id))
         if not running:
@@ -550,14 +734,24 @@ class FormalCellLedger:
         record = running[-1]
         staging = Path(record["staging_path"])
         target = Path(record["committed_path"])
-        artifact_root = (staging / Path(artifact_subpath)).resolve()
+        artifact_root = (
+            Path(validated_artifact_root).resolve()
+            if validated_artifact_root is not None
+            else (staging / Path(artifact_subpath)).resolve()
+        )
         try:
             artifact_root.relative_to(staging.resolve())
         except ValueError as exc:
             raise CellTransactionError("cell artifact subpath escapes staging") from exc
         for relative in required_paths:
-            if not (artifact_root / relative).is_file():
+            required = _safe_relative_path(relative, "required artifact")
+            required_path = artifact_root / required
+            if required_path.is_symlink() or not required_path.is_file():
                 raise CellTransactionError(f"cell required artifact is missing: {relative}")
+        relocated_file_count = (
+            _rebase_internal_paths(artifact_root, target)
+            if rebase_internal_paths else 0
+        )
         inventory = artifact_inventory(artifact_root)
         inventory_hash = _canonical_sha256(inventory)
         marker = {
@@ -567,6 +761,18 @@ class FormalCellLedger:
             "command_hash": record["command_hash"],
             "input_hash": record["input_hash"],
             "artifact_inventory_sha256": inventory_hash,
+            "cell_artifact_publication_contract_version": (
+                CELL_ARTIFACT_PUBLICATION_CONTRACT_VERSION
+            ),
+            "validated_payload_path_before_publication": str(artifact_root),
+            "committed_destination": str(target),
+            "internal_path_relocation_file_count": relocated_file_count,
+            "publication_order": [
+                "validate_complete_payload",
+                "write_committed_marker_in_staging",
+                "atomic_rename_to_committed_destination",
+                "append_committed_ledger_terminal",
+            ],
         }
         (artifact_root / "committed_marker.json").write_text(
             json.dumps(marker, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
@@ -601,6 +807,9 @@ class FormalCellLedger:
                 staging_path=Path(record["staging_path"]),
                 committed_path=target,
                 inventory=inventory,
+                child_output_path=Path(child_output_path or record["child_output_path"]),
+                validated_artifact_path=target,
+                publication_state="committed",
             )
         )
         self.verify_committed(cell_id)
@@ -728,7 +937,106 @@ def run_transactional_cell(
     )
 
 
+def execute_cell_artifact_transaction(
+    ledger: FormalCellLedger,
+    *,
+    phase: str,
+    coordinates: Mapping[str, Any],
+    command: Sequence[str],
+    input_hash: str,
+    committed_path: str | Path,
+    command_builder: Callable[[Path, str], Sequence[str]],
+    artifact_resolver: Callable[
+        [Path, str, subprocess.CompletedProcess[str]],
+        tuple[Path, Sequence[str], Path],
+    ],
+    environment: Mapping[str, str] | None = None,
+    cwd: str | Path | None = None,
+    command_failure_classification: str = "cell_command_failure",
+) -> dict[str, Any]:
+    """Shared formal/rehearsal cell dispatch, validation, publication, and recovery."""
+
+    begun = ledger.begin_cell(
+        phase=phase,
+        coordinates=coordinates,
+        command=command,
+        input_hash=input_hash,
+        committed_path=committed_path,
+    )
+    if begun["status"] == "skipped_committed":
+        return begun
+    staging = Path(begun["record"]["staging_path"])
+    actual_command = list(command_builder(staging, begun["cell_id"]))
+    started_ns = time.monotonic_ns()
+    completed = subprocess.run(
+        actual_command,
+        cwd=cwd,
+        env=dict(environment) if environment is not None else None,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if completed.returncode != 0:
+        (staging / "cell_stdout.log").write_text(completed.stdout, encoding="utf-8")
+        (staging / "cell_stderr.log").write_text(completed.stderr, encoding="utf-8")
+        ledger.fail_cell(
+            begun["cell_id"],
+            return_code=completed.returncode,
+            classification=(
+                "infrastructure_retryable"
+                if completed.returncode == 75
+                else command_failure_classification
+            ),
+            retryable=completed.returncode == 75,
+        )
+        return {
+            "status": "failed",
+            "cell_id": begun["cell_id"],
+            "return_code": completed.returncode,
+            "stdout": completed.stdout,
+            "stderr": completed.stderr,
+        }
+    try:
+        artifact_root, required_paths, child_output_path = artifact_resolver(
+            staging, begun["cell_id"], completed
+        )
+        if artifact_root.is_symlink() or not artifact_root.is_dir():
+            raise CellTransactionError("resolved cell artifact root is invalid")
+        (artifact_root / "cell_stdout.log").write_text(
+            completed.stdout, encoding="utf-8"
+        )
+        (artifact_root / "cell_stderr.log").write_text(
+            completed.stderr, encoding="utf-8"
+        )
+        event = ledger.commit_cell(
+            begun["cell_id"],
+            required_paths=[
+                *required_paths, "cell_stdout.log", "cell_stderr.log"
+            ],
+            monotonic_started_ns=started_ns,
+            validated_artifact_root=artifact_root,
+            child_output_path=child_output_path,
+        )
+    except Exception:
+        ledger.fail_cell(
+            begun["cell_id"],
+            return_code=0,
+            classification="cell_artifact_publication_validation_failure",
+            retryable=False,
+        )
+        raise
+    return {
+        "status": "committed",
+        "cell_id": begun["cell_id"],
+        "record": event,
+        "stdout": completed.stdout,
+        "stderr": completed.stderr,
+    }
+
+
 __all__ = [
+    "CELL_ARTIFACT_PUBLICATION_CONTRACT_VERSION",
+    "CELL_CHILD_OUTPUT_DESCRIPTOR_VERSION",
     "CELL_IDENTITY_VERSION",
     "CELL_STATUSES",
     "CellExecutionIdentity",
@@ -737,8 +1045,12 @@ __all__ = [
     "FormalCellLedger",
     "artifact_inventory",
     "atomic_write_json_create_only",
+    "execute_cell_artifact_transaction",
+    "resolve_child_output_descriptor",
     "run_transactional_cell",
+    "single_child_directory",
     "stable_cell_id",
     "stable_episode_id",
     "validate_cell_ledger",
+    "write_child_output_descriptor",
 ]

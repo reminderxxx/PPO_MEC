@@ -24,6 +24,7 @@ from src.evaluators.formal_window_consumption import (
     load_contract as load_window_consumption_contract,
     validate_window_plan_binding,
 )
+from src.evaluators.formal_cell_transaction import write_child_output_descriptor
 from src.runtime.typed_model_cache_runtime import resolve_model_cache_runtime
 from src.runtime.portable_resource_identity import (
     add_portable_resource_arguments,
@@ -82,6 +83,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--resolved-execution-context-path", default="")
     parser.add_argument("--formal-agent-order-contract-path", default="")
+    parser.add_argument("--cell-id", default="")
+    parser.add_argument("--cell-phase", default="")
+    parser.add_argument("--cell-output-descriptor-path", default="")
     add_portable_resource_arguments(parser)
     add_generated_checkpoint_resource_arguments(parser)
     return parser
@@ -168,6 +172,17 @@ def stamp_outputs(run_root: Path, provenance: dict) -> None:
 
 def main() -> None:
     args = parse_args()
+    transaction_values = (
+        args.cell_id, args.cell_phase, args.cell_output_descriptor_path
+    )
+    if any(transaction_values) != all(transaction_values):
+        raise FormalExecutionError(
+            "cell transaction identity and output descriptor must be supplied together"
+        )
+    if args.cell_phase and args.cell_phase not in {
+        "formal_ablation", "formal_support", "formal_scalability"
+    }:
+        raise FormalExecutionError("support producer received an invalid cell phase")
     if args.resource_registry_path:
         resolve_argument_resources(
             args,
@@ -431,6 +446,17 @@ def main() -> None:
             json.dumps(provenance, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
             encoding="utf-8",
         )
+        if args.cell_output_descriptor_path:
+            write_child_output_descriptor(
+                args.cell_output_descriptor_path,
+                cell_id=args.cell_id,
+                phase=args.cell_phase,
+                logical_setting_id=args.setting_id,
+                output_root=args.output_root,
+                artifact_root=run_root,
+                producer_kind="oracle_support",
+                required_payload=["support_provenance.json"],
+            )
         print(json.dumps({"status": "pass", "run_root": str(run_root), "support_provenance": provenance}, ensure_ascii=False, indent=2, allow_nan=False))
         return
     setting_flags = benchmark_flags(setting)
@@ -535,15 +561,32 @@ def main() -> None:
         )
         return
     output_root = Path(args.output_root)
+    if args.cell_output_descriptor_path and output_root.exists() and any(output_root.iterdir()):
+        raise FormalExecutionError("transaction child output root must be empty")
     before = set(output_root.iterdir()) if output_root.exists() else set()
     result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True, check=False)
     if result.returncode != 0:
         raise RuntimeError(result.stderr or result.stdout)
     after = set(output_root.iterdir())
-    created = sorted(after - before, key=lambda path: path.stat().st_mtime_ns)
+    created = list(after - before)
     if len(created) != 1 or not created[0].is_dir():
         raise FormalExecutionError("typed support runner could not identify one new run root")
     stamp_outputs(created[0], provenance)
+    if args.cell_output_descriptor_path:
+        write_child_output_descriptor(
+            args.cell_output_descriptor_path,
+            cell_id=args.cell_id,
+            phase=args.cell_phase,
+            logical_setting_id=args.setting_id,
+            output_root=args.output_root,
+            artifact_root=created[0],
+            producer_kind="benchmark_support",
+            required_payload=[
+                "support_provenance.json",
+                "aggregate_summary.json",
+                "benchmark_rows.csv",
+            ],
+        )
     print(
         json.dumps(
             {"status": "pass", "run_root": str(created[0]), "support_provenance": provenance},

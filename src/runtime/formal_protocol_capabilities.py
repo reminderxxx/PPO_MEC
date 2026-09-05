@@ -11,7 +11,7 @@ from typing import Final
 
 
 FORMAL_PROTOCOL_CAPABILITY_ROUTING_CONTRACT_VERSION: Final = "1.0.0"
-ACTIVE_EXECUTION_PROTOCOL_VERSION: Final = "2.5.0"
+ACTIVE_EXECUTION_PROTOCOL_VERSION: Final = "2.6.0"
 
 
 class FormalProtocolCapabilityError(ValueError):
@@ -33,6 +33,7 @@ class FormalProtocolCapabilities:
     request_subject_lifecycle_required: bool
     nullable_metric_contract_required: bool
     generated_checkpoint_resource_required: bool
+    cell_artifact_publication_required: bool
     holdout_capability: bool = False
 
     @property
@@ -58,6 +59,7 @@ def _capabilities(
     lifecycle: bool = False,
     nullable: bool = False,
     generated_checkpoints: bool = False,
+    cell_publication: bool = False,
 ) -> FormalProtocolCapabilities:
     return FormalProtocolCapabilities(
         version=version,
@@ -73,6 +75,7 @@ def _capabilities(
         request_subject_lifecycle_required=lifecycle,
         nullable_metric_contract_required=nullable,
         generated_checkpoint_resource_required=generated_checkpoints,
+        cell_artifact_publication_required=cell_publication,
     )
 
 
@@ -121,10 +124,16 @@ _REGISTRY: Final[dict[str, FormalProtocolCapabilities]] = {
         exogenous=True, projection=True, lifecycle=True, nullable=True,
     ),
     "2.5.0": _capabilities(
-        "2.5.0", status="active_execution", context=True, environment=True,
+        "2.5.0", context=True, environment=True,
         binding=True, order=True, bundle=True, bundle_resources=True,
         exogenous=True, projection=True, lifecycle=True, nullable=True,
         generated_checkpoints=True,
+    ),
+    "2.6.0": _capabilities(
+        "2.6.0", status="active_execution", context=True, environment=True,
+        binding=True, order=True, bundle=True, bundle_resources=True,
+        exogenous=True, projection=True, lifecycle=True, nullable=True,
+        generated_checkpoints=True, cell_publication=True,
     ),
 }
 

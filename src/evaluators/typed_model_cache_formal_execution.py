@@ -63,6 +63,8 @@ FORMAL_EXECUTION_PROTOCOL_V2_4_VERSION = "2.4.0"
 FORMAL_EXECUTION_PROTOCOL_V2_4_ID = "typed_model_cache_formal_protocol_v2_4"
 FORMAL_EXECUTION_PROTOCOL_V2_5_VERSION = "2.5.0"
 FORMAL_EXECUTION_PROTOCOL_V2_5_ID = "typed_model_cache_formal_protocol_v2_5"
+FORMAL_EXECUTION_PROTOCOL_V2_6_VERSION = "2.6.0"
+FORMAL_EXECUTION_PROTOCOL_V2_6_ID = "typed_model_cache_formal_protocol_v2_6"
 FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
 FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
 LEGACY_PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
@@ -578,10 +580,69 @@ def validate_command_templates(
 def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
     _reject_non_finite(protocol)
     version = protocol.get("typed_model_cache_formal_protocol_version")
+    if version == FORMAL_EXECUTION_PROTOCOL_V2_6_VERSION:
+        if protocol.get("protocol_id") != FORMAL_EXECUTION_PROTOCOL_V2_6_ID:
+            raise FormalExecutionError("formal execution protocol v2.6 ID mismatch")
+        capabilities = require_live_execution_protocol(version)
+        supersession = protocol.get("supersession", {})
+        authorization = supersession.get("g14r15_authorization_boundary", {})
+        if (
+            supersession.get("supersedes_version") != "2.5.0"
+            or supersession.get("old_protocol_status")
+            != "historical_audit_only_after_cell_publication_contract_mismatch"
+            or authorization.get("status")
+            != "PRE-EXECUTION AUTHORIZATION WITHHELD / CELL_ARTIFACT_PUBLICATION_CONTRACT_MISMATCH"
+            or authorization.get("g14c_v14_created") is not False
+            or authorization.get("formal_training_count") != 0
+            or authorization.get("formal_checkpoint_count") != 0
+            or authorization.get("formal_performance_count") != 0
+            or authorization.get("holdout_opened") is not False
+        ):
+            raise FormalExecutionError("Protocol v2.6 authorization boundary is incomplete")
+        publication = protocol.get("formal_cell_artifact_publication_contract", {})
+        generated = protocol.get(
+            "formal_generated_checkpoint_resource_identity_contract", {}
+        )
+        if (
+            publication.get("version") != "1.0.0"
+            or not isinstance(publication.get("semantic_sha256"), str)
+            or len(publication["semantic_sha256"]) != 64
+            or generated.get("version") != "1.1.0"
+            or not isinstance(generated.get("semantic_sha256"), str)
+            or len(generated["semantic_sha256"]) != 64
+            or not capabilities.generated_checkpoint_resource_required
+            or not capabilities.cell_artifact_publication_required
+            or capabilities.holdout_capability
+        ):
+            raise FormalExecutionError("Protocol v2.6 execution contracts are missing")
+        profile = protocol.get("execution_contract", {}).get(
+            "nonformal_rehearsal_profile", {}
+        )
+        if (
+            not isinstance(profile.get("path"), str)
+            or not isinstance(profile.get("semantic_sha256"), str)
+            or profile.get("cannot_override_formal_profile") is not True
+        ):
+            raise FormalExecutionError("Protocol v2.6 rehearsal profile is missing")
+        expected = canonical_sha256(
+            semantic_projection(
+                {key: value for key, value in protocol.items() if key != "hashes"}
+            )
+        )
+        if protocol.get("hashes", {}).get("semantic_sha256") != expected:
+            raise FormalExecutionError("formal protocol v2.6 semantic hash mismatch")
+        return {
+            "status": "pass",
+            "protocol_version": version,
+            "semantic_sha256": expected,
+            "split_semantic_sha256": SPLIT_SEMANTIC_SHA256,
+            "primary_endpoint_count": len(PRIMARY_ENDPOINTS),
+            "phase_count": len(PHASE_ORDER),
+        }
     if version == FORMAL_EXECUTION_PROTOCOL_V2_5_VERSION:
         if protocol.get("protocol_id") != FORMAL_EXECUTION_PROTOCOL_V2_5_ID:
             raise FormalExecutionError("formal execution protocol v2.5 ID mismatch")
-        capabilities = require_live_execution_protocol(version)
+        capabilities = get_protocol_capabilities(version)
         supersession = protocol.get("supersession", {})
         if (
             supersession.get("supersedes_version") != "2.4.0"
@@ -2201,6 +2262,8 @@ __all__ = [
     "FORMAL_EXECUTION_PROTOCOL_V2_2_VERSION",
     "FORMAL_EXECUTION_PROTOCOL_V2_3_ID",
     "FORMAL_EXECUTION_PROTOCOL_V2_3_VERSION",
+    "FORMAL_EXECUTION_PROTOCOL_V2_6_ID",
+    "FORMAL_EXECUTION_PROTOCOL_V2_6_VERSION",
     "FORMAL_PHASE_LEDGER_SCHEMA_VERSION",
     "FORMAL_PHASE_RUNNER_VERSION",
     "FAILURE_CLASSIFICATIONS",

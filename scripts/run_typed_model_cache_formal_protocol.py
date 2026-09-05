@@ -34,7 +34,11 @@ from src.evaluators.formal_phase_transaction import (
 )
 from src.evaluators.formal_cell_transaction import (
     CellExecutionIdentity,
+    CellTransactionError,
     FormalCellLedger,
+    execute_cell_artifact_transaction,
+    resolve_child_output_descriptor,
+    single_child_directory,
     stable_cell_id,
 )
 from src.runtime.formal_execution_environment import (
@@ -50,9 +54,9 @@ from src.runtime.active_formal_bundle import (
 )
 from src.runtime.portable_resource_identity import load_registry
 from src.runtime.generated_checkpoint_resources import (
-    atomic_create_registry,
     build_generated_checkpoint_registry,
     load_generated_checkpoint_registry,
+    publish_or_validate_generated_checkpoint_registry,
 )
 from src.runtime.formal_training_identity import (
     atomic_create_execution_binding,
@@ -229,6 +233,55 @@ def load_protocol(path: str | Path) -> dict:
         raise FormalExecutionError("protocol manifest must be an object")
     validate_protocol_v1_1(payload)
     return payload
+
+
+def validate_complete_without_holdout_gate(
+    run_root: str | Path, protocol: dict
+) -> dict:
+    root = Path(run_root)
+    gate_path = root / "formal_gate.json"
+    if gate_path.is_symlink() or not gate_path.is_file():
+        raise FormalExecutionError(
+            "complete_without_holdout requires a legal formal_gate.json"
+        )
+    gate = json.loads(gate_path.read_text(encoding="utf-8-sig"))
+    required = {
+        "passed": True,
+        "protocol_semantic_sha256": protocol["hashes"]["semantic_sha256"],
+        "completeness_only": True,
+        "performance_threshold_used": False,
+        "holdout_opened": False,
+        "exact_count_status": "pass",
+    }
+    if not isinstance(gate, dict) or any(
+        gate.get(key) != value for key, value in required.items()
+    ):
+        raise FormalExecutionError(
+            "complete_without_holdout rejected an invalid or failed formal gate"
+        )
+    if gate.get("missing_outputs") or gate.get("exact_count_mismatches"):
+        raise FormalExecutionError("complete_without_holdout gate is incomplete")
+    registry = gate.get("generated_checkpoint_registry_audit")
+    if not isinstance(registry, dict) or registry.get("status") != "pass":
+        raise FormalExecutionError(
+            "complete_without_holdout gate lacks generated registry validation"
+        )
+    ledger_path = root / "phase_state.jsonl"
+    if ledger_path.is_symlink() or not ledger_path.is_file():
+        raise FormalExecutionError(
+            "complete_without_holdout requires the phase ledger"
+        )
+    terminals = []
+    for line in ledger_path.read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            row = json.loads(line)
+            if row.get("phase") == "formal_gate" and row.get("status") == "completed":
+                terminals.append(row)
+    if len(terminals) != 1:
+        raise FormalExecutionError(
+            "complete_without_holdout requires one completed formal_gate terminal"
+        )
+    return gate
 
 
 def main() -> None:
@@ -520,6 +573,7 @@ def main() -> None:
         raise FormalExecutionError(str(exc)) from exc
 
     if phase == "complete_without_holdout":
+        validate_complete_without_holdout_gate(args.output_root, protocol)
         command: list[str] | list[list[str]] = []
         expected_outputs: list[str] = []
         retries = 0
@@ -749,6 +803,163 @@ def main() -> None:
             raise FormalExecutionError("transactional command matrix contains duplicate commands")
 
         def execute(argv):
+            if (
+                capabilities.cell_artifact_publication_required
+                and phase in cell_transaction_phases
+                and cell_ledger is not None
+            ):
+                original = list(argv)
+                coordinates = coordinate_by_command_hash[canonical_sha256(original)]
+                cell_input_hash = canonical_sha256(
+                    {
+                        "protocol": protocol["hashes"]["semantic_sha256"],
+                        "phase": phase,
+                        "coordinates": coordinates,
+                        "command": original,
+                        "active_formal_bundle_sha256": active_bundle[
+                            "active_formal_bundle_sha256"
+                        ],
+                        "formal_nullable_metric_aggregation_contract_semantic_sha256": protocol[
+                            "formal_nullable_metric_aggregation_contract"
+                        ]["semantic_sha256"],
+                        "generated_checkpoint_registry_canonical_sha256": (
+                            generated_registry_audit["registry_canonical_sha256"]
+                            if generated_registry_audit is not None else None
+                        ),
+                    }
+                )
+                output_flag = (
+                    "--output_root" if "--output_root" in original else "--output-root"
+                )
+                if output_flag not in original:
+                    raise FormalExecutionError(
+                        f"transactional {phase} command lacks an output-root flag"
+                    )
+                final_output_root = Path(original[original.index(output_flag) + 1])
+                if phase == "train":
+                    if "--run_id" not in original or "--agent_name" not in original:
+                        raise FormalExecutionError(
+                            "transactional train command lacks identity flags"
+                        )
+                    run_id = original[original.index("--run_id") + 1]
+                    agent = original[original.index("--agent_name") + 1]
+                    final_path = final_output_root / agent / run_id
+
+                    def build(staging, _cell_id):
+                        staged = list(original)
+                        staged[staged.index(output_flag) + 1] = str(staging)
+                        return staged
+
+                    def resolve(staging, _cell_id, _completed):
+                        return (
+                            staging / agent / run_id,
+                            ["train_summary.json"],
+                            staging,
+                        )
+                else:
+                    cell_id = stable_cell_id(phase, coordinates)
+                    if phase == "formal_cache_policy":
+                        final_path = final_output_root / str(coordinates["capacity_label"])
+                    elif phase == "formal_controller":
+                        final_path = final_output_root / cell_id
+                    else:
+                        setting_key = (
+                            "ablation_setting_id"
+                            if phase == "formal_ablation"
+                            else "support_setting_id"
+                            if phase == "formal_support"
+                            else "scalability_setting_id"
+                        )
+                        final_path = final_output_root / str(coordinates[setting_key])
+
+                    def build(staging, actual_cell_id):
+                        staged = list(original)
+                        if phase == "formal_cache_policy":
+                            artifact = staging / "artifact"
+                            staged[staged.index(output_flag) + 1] = str(
+                                artifact / "benchmark"
+                            )
+                            replay_flag = "--request-replay-path"
+                            if replay_flag not in staged:
+                                raise FormalExecutionError(
+                                    "cache-policy transaction lacks request replay path"
+                                )
+                            staged[staged.index(replay_flag) + 1] = str(
+                                artifact / "request_replay.json"
+                            )
+                        elif phase == "formal_controller":
+                            staged[staged.index(output_flag) + 1] = str(
+                                staging / "child_output"
+                            )
+                        else:
+                            child = staging / "child_output"
+                            staged[staged.index(output_flag) + 1] = str(child)
+                            staged.extend(
+                                [
+                                    "--cell-id", actual_cell_id,
+                                    "--cell-phase", phase,
+                                    "--cell-output-descriptor-path",
+                                    str(child / "cell_child_output.json"),
+                                ]
+                            )
+                        return staged
+
+                    def resolve(staging, actual_cell_id, _completed):
+                        if phase == "formal_cache_policy":
+                            artifact = staging / "artifact"
+                            benchmark = single_child_directory(artifact / "benchmark")
+                            if not (benchmark / "aggregate_summary.json").is_file():
+                                raise CellTransactionError(
+                                    "cache-policy benchmark aggregate is missing"
+                                )
+                            return artifact, ["request_replay.json"], artifact / "benchmark"
+                        if phase == "formal_controller":
+                            child = staging / "child_output"
+                            return (
+                                single_child_directory(child),
+                                ["aggregate_summary.json", "benchmark_rows.csv"],
+                                child,
+                            )
+                        child = staging / "child_output"
+                        artifact, descriptor = resolve_child_output_descriptor(
+                            child / "cell_child_output.json",
+                            output_root=child,
+                            expected_cell_id=actual_cell_id,
+                            expected_phase=phase,
+                            expected_setting_id=final_path.name,
+                        )
+                        provenance = json.loads(
+                            (artifact / "support_provenance.json").read_text(
+                                encoding="utf-8"
+                            )
+                        )
+                        if provenance.get("setting_id") != final_path.name:
+                            raise CellTransactionError(
+                                "support provenance setting identity mismatch"
+                            )
+                        return artifact, descriptor["required_payload"], child
+
+                transaction = execute_cell_artifact_transaction(
+                    cell_ledger,
+                    phase=phase,
+                    coordinates=coordinates,
+                    command=original,
+                    input_hash=cell_input_hash,
+                    committed_path=final_path,
+                    command_builder=build,
+                    artifact_resolver=resolve,
+                    environment=environment_resolution.child_environment,
+                    cwd=ROOT,
+                    command_failure_classification=(
+                        "training_cell_failure"
+                        if phase == "train" else "formal_cell_failure"
+                    ),
+                )
+                return PhaseCommandResult(
+                    int(transaction.get("return_code", 0)),
+                    str(transaction.get("stdout", "")),
+                    str(transaction.get("stderr", "")),
+                )
             if phase == "train" and cell_ledger is not None:
                 original = list(argv)
                 coordinates = coordinate_by_command_hash[canonical_sha256(original)]
@@ -827,6 +1038,7 @@ def main() -> None:
                     ],
                     monotonic_started_ns=started_ns,
                     artifact_subpath=Path(agent) / run_id,
+                    child_output_path=staging,
                 )
                 return PhaseCommandResult(0, completed.stdout, completed.stderr)
             if phase in cell_transaction_phases and cell_ledger is not None:
@@ -899,13 +1111,23 @@ def main() -> None:
                     )
                     artifact_subpath = Path("artifact")
                 elif phase == "formal_controller":
-                    artifact_root = staging / "artifact"
-                    staged[staged.index(output_flag) + 1] = str(artifact_root)
-                    artifact_subpath = Path("artifact")
+                    child_output_root = staging / "child_output"
+                    staged[staged.index(output_flag) + 1] = str(child_output_root)
+                    artifact_root = None
+                    artifact_subpath = Path(".")
                 else:
-                    staged[staged.index(output_flag) + 1] = str(staging)
-                    artifact_root = staging / final_path.name
-                    artifact_subpath = Path(final_path.name)
+                    child_output_root = staging / "child_output"
+                    descriptor_path = child_output_root / "cell_child_output.json"
+                    staged[staged.index(output_flag) + 1] = str(child_output_root)
+                    staged.extend(
+                        [
+                            "--cell-id", cell_id,
+                            "--cell-phase", phase,
+                            "--cell-output-descriptor-path", str(descriptor_path),
+                        ]
+                    )
+                    artifact_root = None
+                    artifact_subpath = Path(".")
                 started_ns = time.monotonic_ns()
                 completed = subprocess.run(
                     staged,
@@ -915,14 +1137,13 @@ def main() -> None:
                     capture_output=True,
                     check=False,
                 )
-                artifact_root.mkdir(parents=True, exist_ok=True)
-                (artifact_root / "cell_stdout.log").write_text(
-                    completed.stdout, encoding="utf-8"
-                )
-                (artifact_root / "cell_stderr.log").write_text(
-                    completed.stderr, encoding="utf-8"
-                )
                 if completed.returncode != 0:
+                    (staging / "cell_stdout.log").write_text(
+                        completed.stdout, encoding="utf-8"
+                    )
+                    (staging / "cell_stderr.log").write_text(
+                        completed.stderr, encoding="utf-8"
+                    )
                     cell_ledger.fail_cell(
                         begun["cell_id"],
                         return_code=completed.returncode,
@@ -936,24 +1157,67 @@ def main() -> None:
                     return PhaseCommandResult(
                         completed.returncode, completed.stdout, completed.stderr
                     )
-                if phase == "formal_cache_policy":
-                    if not (artifact_root / "request_replay.json").is_file():
-                        raise FormalExecutionError("cache-policy replay was not staged")
-                    required_name = "aggregate_summary.json"
-                elif phase == "formal_controller":
-                    required_name = "aggregate_summary.json"
-                else:
-                    required_name = "support_provenance.json"
-                if not any(artifact_root.rglob(required_name)):
-                    raise FormalExecutionError(
-                        f"transactional {phase} artifact lacks {required_name}"
+                try:
+                    if phase == "formal_cache_policy":
+                        if not (artifact_root / "request_replay.json").is_file():
+                            raise CellTransactionError("cache-policy replay was not staged")
+                        benchmark_root = single_child_directory(
+                            artifact_root / "benchmark"
+                        )
+                        if not (benchmark_root / "aggregate_summary.json").is_file():
+                            raise CellTransactionError(
+                                "cache-policy benchmark aggregate is missing"
+                            )
+                        required_paths = ["request_replay.json"]
+                        child_output_path = artifact_root / "benchmark"
+                    elif phase == "formal_controller":
+                        artifact_root = single_child_directory(child_output_root)
+                        required_paths = ["aggregate_summary.json", "benchmark_rows.csv"]
+                        child_output_path = child_output_root
+                    else:
+                        artifact_root, descriptor = resolve_child_output_descriptor(
+                            descriptor_path,
+                            output_root=child_output_root,
+                            expected_cell_id=cell_id,
+                            expected_phase=phase,
+                            expected_setting_id=final_path.name,
+                        )
+                        provenance = json.loads(
+                            (artifact_root / "support_provenance.json").read_text(
+                                encoding="utf-8"
+                            )
+                        )
+                        if provenance.get("setting_id") != final_path.name:
+                            raise CellTransactionError(
+                                "support provenance setting identity mismatch"
+                            )
+                        required_paths = list(descriptor["required_payload"])
+                        child_output_path = child_output_root
+                    artifact_root.mkdir(parents=True, exist_ok=True)
+                    (artifact_root / "cell_stdout.log").write_text(
+                        completed.stdout, encoding="utf-8"
                     )
-                cell_ledger.commit_cell(
-                    begun["cell_id"],
-                    required_paths=["cell_stdout.log", "cell_stderr.log"],
-                    monotonic_started_ns=started_ns,
-                    artifact_subpath=artifact_subpath,
-                )
+                    (artifact_root / "cell_stderr.log").write_text(
+                        completed.stderr, encoding="utf-8"
+                    )
+                    cell_ledger.commit_cell(
+                        begun["cell_id"],
+                        required_paths=[
+                            *required_paths, "cell_stdout.log", "cell_stderr.log"
+                        ],
+                        monotonic_started_ns=started_ns,
+                        artifact_subpath=artifact_subpath,
+                        validated_artifact_root=artifact_root,
+                        child_output_path=child_output_path,
+                    )
+                except Exception:
+                    cell_ledger.fail_cell(
+                        begun["cell_id"],
+                        return_code=0,
+                        classification="cell_artifact_publication_validation_failure",
+                        retryable=False,
+                    )
+                    raise
                 return PhaseCommandResult(0, completed.stdout, completed.stderr)
             completed = subprocess.run(
                 list(argv),
@@ -994,7 +1258,12 @@ def main() -> None:
         if (
             phase == "checkpoint_freeze"
             and capabilities.generated_checkpoint_resource_required
-            and result.get("status") in {"completed", "skipped_completed_hash_match"}
+            and result.get("status") in {
+                "completed",
+                "skipped_completed",
+                "skipped_completed_hash_match",
+                "already_finalized",
+            }
         ):
             static_registry = load_registry(context["resource_registry_path"])
             registry = build_generated_checkpoint_registry(
@@ -1004,7 +1273,29 @@ def main() -> None:
                 resolved_execution_context=resolved_context_payload,
                 execution_binding=execution_binding,
             )
-            publication = atomic_create_registry(generated_registry_path, registry)
+            publication = publish_or_validate_generated_checkpoint_registry(
+                generated_registry_path,
+                registry,
+                run_root=Path(args.output_root).resolve(),
+                expected_run_id=Path(args.output_root).resolve().name,
+                static_registry_semantic_sha256=static_registry["hashes"][
+                    "semantic_sha256"
+                ],
+                protocol_semantic_sha256=protocol["hashes"]["semantic_sha256"],
+                protocol_full_sha256=protocol["hashes"]["full_sha256"],
+                active_formal_bundle_sha256=active_bundle[
+                    "active_formal_bundle_sha256"
+                ],
+                execution_commit=environment_resolution.runtime_audit[
+                    "observed_execution_commit"
+                ],
+                resolved_execution_context_sha256=resolved_context_payload[
+                    "context_sha256"
+                ],
+                formal_training_execution_binding_sha256=execution_binding[
+                    "binding_full_sha256"
+                ],
+            )
             result = {**result, "generated_checkpoint_registry": publication}
     else:
         if args.finalize_phase_only or args.resume_from_cell_ledger:

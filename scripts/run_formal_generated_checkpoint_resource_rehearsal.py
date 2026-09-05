@@ -26,15 +26,24 @@ from src.evaluators.formal_phase_transaction import (
     TransactionalPhaseRunner,
     validate_phase_ledger_v3,
 )
+from src.evaluators.formal_cell_transaction import (
+    CellExecutionIdentity,
+    FormalCellLedger,
+    execute_cell_artifact_transaction,
+    resolve_child_output_descriptor,
+    single_child_directory,
+    stable_cell_id,
+    validate_cell_ledger,
+)
 from src.evaluators.typed_model_cache_formal_execution import (
     PHASE_ORDER,
     support_setting_by_id,
 )
 from src.evaluators.typed_model_cache_formal_protocol import canonical_sha256
 from src.runtime.generated_checkpoint_resources import (
-    atomic_create_registry,
     build_generated_checkpoint_registry,
     load_generated_checkpoint_registry,
+    publish_or_validate_generated_checkpoint_registry,
     sha256_file,
 )
 from src.runtime.portable_resource_identity import (
@@ -94,7 +103,26 @@ def resource_identity(
     )
 
 
-def prepare_static_registry(run_root: Path) -> tuple[Path, dict[str, Path], dict[str, str]]:
+def _rehash_fairness(payload: dict[str, Any]) -> dict[str, Any]:
+    payload.pop("hashes", None)
+    payload["identity"]["manifest_id"] = "pending"
+    digest = semantic_protocol_sha256(payload)
+    payload["identity"]["manifest_id"] = f"cbfm-{digest[:16]}"
+    payload["hashes"] = {
+        "semantic_protocol_sha256": digest,
+        "full_manifest_sha256": full_manifest_sha256(payload),
+        "semantic_hash_excludes": [
+            "identity.manifest_id", "identity.created_at", "artifact_plan",
+            "dataset normalized_absolute_path", "baseline config normalized_absolute_path",
+            "hashes", "validation",
+        ],
+    }
+    return payload
+
+
+def prepare_static_registry(
+    run_root: Path, protocol: dict[str, Any]
+) -> tuple[Path, dict[str, Path], dict[str, str]]:
     fairness_paths = {
         label: ROOT / PROTOCOL_DIR / f"nonformal_rehearsal_fairness_{label}.json"
         for label in CAPACITIES
@@ -103,19 +131,7 @@ def prepare_static_registry(run_root: Path) -> tuple[Path, dict[str, Path], dict
     selection = no_prediction["dataset_provenance"]["selection_filter_parameters"]
     selection["prediction_confidence_scale"] = 0.0
     selection["drop_handoff_prediction_prob"] = 1.0
-    no_prediction.pop("hashes", None)
-    no_prediction["identity"]["manifest_id"] = "pending"
-    semantic = semantic_protocol_sha256(no_prediction)
-    no_prediction["identity"]["manifest_id"] = f"cbfm-{semantic[:16]}"
-    no_prediction["hashes"] = {
-        "semantic_protocol_sha256": semantic,
-        "full_manifest_sha256": full_manifest_sha256(no_prediction),
-        "semantic_hash_excludes": [
-            "identity.manifest_id", "identity.created_at", "artifact_plan",
-            "dataset normalized_absolute_path", "baseline config normalized_absolute_path",
-            "hashes", "validation",
-        ],
-    }
+    _rehash_fairness(no_prediction)
     no_prediction_path = run_root / "inputs/fairness/ablation_no_prediction.json"
     write_json(no_prediction_path, no_prediction, create_only=True)
     fairness_paths["ablation_no_prediction"] = no_prediction_path
@@ -123,6 +139,33 @@ def prepare_static_registry(run_root: Path) -> tuple[Path, dict[str, Path], dict
         label: f"fairness_manifest.rehearsal.{label}" for label in CAPACITIES
     }
     fairness_ids["ablation_no_prediction"] = "fairness_manifest.rehearsal.ablation_no_prediction"
+    for row in protocol["execution_contract"]["command_templates"]["formal_support"]["matrix_contexts"]:
+        setting = support_setting_by_id(protocol, row["support_setting_id"])
+        if setting.get("parameter") == "capacity_mb":
+            continue
+        payload = deepcopy(read_json(fairness_paths["medium_576mb"]))
+        selection = payload["dataset_provenance"]["selection_filter_parameters"]
+        parameter = setting.get("parameter")
+        value = setting.get("value", setting.get("baseline"))
+        if parameter == "handoff_pressure":
+            selection["primary_vehicle_selection"] = value
+        elif parameter == "prediction_condition":
+            selection.update(
+                {
+                    "baseline": {},
+                    "no_prediction": {"prediction_confidence_scale": 0.0, "drop_handoff_prediction_prob": 1.0},
+                    "noise_0.2": {"prediction_noise_std": 0.2},
+                    "confidence_0.7": {"prediction_confidence_scale": 0.7},
+                    "delay_2": {"prediction_delay_steps": 2},
+                    "drop_0.3": {"drop_handoff_prediction_prob": 0.3},
+                }[str(value)]
+            )
+        _rehash_fairness(payload)
+        key = str(row["support_setting_id"])
+        path = run_root / "inputs/fairness" / f"{key}.json"
+        write_json(path, payload, create_only=True)
+        fairness_paths[key] = path
+        fairness_ids[key] = f"fairness_manifest.rehearsal.{key}"
     base = read_json(ROOT / BASE_REGISTRY)
     resources = list(base["resources"])
     resources.append(
@@ -228,10 +271,102 @@ def run_phase(
     phase: str,
     commands: Iterable[list[str]],
     expected: list[str],
+    cell_ledger: FormalCellLedger | None = None,
 ) -> None:
     command_list = list(commands)
 
     def execute(argv: list[str]) -> PhaseCommandResult:
+        if cell_ledger is not None and phase in {
+            "train", "formal_cache_policy", "formal_controller",
+            "formal_ablation", "formal_support", "formal_scalability",
+        }:
+            original = list(argv)
+            if phase == "train":
+                agent = original[original.index("--agent_name") + 1]
+                run_id = original[original.index("--run_id") + 1]
+                capacity = next(label for label in CAPACITIES if label in run_id)
+                coordinates = {"agent": agent, "seed": 7, "capacity_label": capacity}
+                output_flag = "--output_root"
+                final = Path(original[original.index(output_flag) + 1]) / agent / run_id
+
+                def builder(staging, _cell_id):
+                    staged = list(original)
+                    staged[staged.index(output_flag) + 1] = str(staging)
+                    return staged
+
+                def resolver(staging, _cell_id, _completed):
+                    return staging / agent / run_id, ["train_summary.json"], staging
+            else:
+                output_flag = "--output_root" if "--output_root" in original else "--output-root"
+                final = Path(original[original.index(output_flag) + 1])
+                capacity = next((label for label in CAPACITIES if label in str(final)), "medium_576mb")
+                if phase == "formal_cache_policy":
+                    coordinates = {"capacity_label": capacity}
+                elif phase == "formal_controller":
+                    coordinates = {"capacity_label": capacity}
+                else:
+                    setting = original[original.index("--setting-id") + 1]
+                    key = (
+                        "ablation_setting_id" if phase == "formal_ablation"
+                        else "support_setting_id" if phase == "formal_support"
+                        else "scalability_setting_id"
+                    )
+                    coordinates = {key: setting, "capacity_label": capacity}
+
+                def builder(staging, actual_cell_id):
+                    staged = list(original)
+                    if phase == "formal_cache_policy":
+                        artifact = staging / "artifact"
+                        staged[staged.index(output_flag) + 1] = str(artifact / "benchmark")
+                        replay_flag = "--request-replay-path"
+                        staged[staged.index(replay_flag) + 1] = str(artifact / "request_replay.json")
+                    elif phase == "formal_controller":
+                        staged[staged.index(output_flag) + 1] = str(staging / "child_output")
+                    else:
+                        child = staging / "child_output"
+                        staged[staged.index(output_flag) + 1] = str(child)
+                        staged += [
+                            "--cell-id", actual_cell_id,
+                            "--cell-phase", phase,
+                            "--cell-output-descriptor-path", str(child / "cell_child_output.json"),
+                        ]
+                    return staged
+
+                def resolver(staging, actual_cell_id, _completed):
+                    if phase == "formal_cache_policy":
+                        artifact = staging / "artifact"
+                        benchmark = single_child_directory(artifact / "benchmark")
+                        if not (benchmark / "aggregate_summary.json").is_file():
+                            raise ValueError("cache aggregate missing")
+                        return artifact, ["request_replay.json"], artifact / "benchmark"
+                    if phase == "formal_controller":
+                        child = staging / "child_output"
+                        return single_child_directory(child), ["aggregate_summary.json", "benchmark_rows.csv"], child
+                    child = staging / "child_output"
+                    artifact, descriptor = resolve_child_output_descriptor(
+                        child / "cell_child_output.json",
+                        output_root=child,
+                        expected_cell_id=actual_cell_id,
+                        expected_phase=phase,
+                        expected_setting_id=original[original.index("--setting-id") + 1],
+                    )
+                    return artifact, descriptor["required_payload"], child
+            result = execute_cell_artifact_transaction(
+                cell_ledger,
+                phase=phase,
+                coordinates=coordinates,
+                command=original,
+                input_hash=canonical_sha256({"phase": phase, "coordinates": coordinates, "command": original}),
+                committed_path=final,
+                command_builder=builder,
+                artifact_resolver=resolver,
+                cwd=ROOT,
+            )
+            return PhaseCommandResult(
+                int(result.get("return_code", 0)),
+                str(result.get("stdout", "")),
+                str(result.get("stderr", "")),
+            )
         completed = subprocess.run(argv, cwd=ROOT, text=True, capture_output=True, check=False)
         return PhaseCommandResult(completed.returncode, completed.stdout, completed.stderr)
 
@@ -284,6 +419,9 @@ def support_command(
     capacity: str, setting_id: str, fairness_label: str, output_root: Path,
     agents: list[str], request_replay: Path | None = None,
 ) -> list[str]:
+    selection = read_json(fairness_paths[fairness_label])[
+        "dataset_provenance"
+    ]["selection_filter_parameters"]
     command = [
         str(python), str(ROOT / "scripts/run_typed_model_cache_formal_support.py"),
         "--protocol-path", str(ROOT / PROTOCOL_PATH), "--setting-id", setting_id,
@@ -295,7 +433,7 @@ def support_command(
         "--workflow-csv-path", str(data_root / WORKFLOW_RELATIVE),
         "--max-mobility-rows", "1500", "--window-selector", "ordered",
         "--window-length", "24", "--rsu-layout", "auto_dominant_tight",
-        "--primary-vehicle-selection", "handoff_pressure",
+        "--primary-vehicle-selection", str(selection["primary_vehicle_selection"]),
         "--agents", *agents, "--seeds", "7", "--output-root", str(output_root),
         "--non-formal-rehearsal",
         "--resolved-execution-context-path", str(run_root / "resolved_execution_context.json"),
@@ -361,7 +499,7 @@ def main() -> None:
     completed = subprocess.run(preflight, cwd=ROOT, text=True, capture_output=True, check=False)
     if completed.returncode != 0:
         raise RuntimeError(completed.stderr or completed.stdout)
-    registry, fairness_paths, fairness_ids = prepare_static_registry(run_root)
+    registry, fairness_paths, fairness_ids = prepare_static_registry(run_root, protocol)
     marker = {
         "execution_mode": "non_formal_rehearsal", "formal": False,
         "performance_evidence": False, "holdout_capability": False,
@@ -371,13 +509,39 @@ def main() -> None:
             "selections": 30, "frozen_checkpoints": 30,
             "frozen_checkpoints_by_capacity": {label: 10 for label in CAPACITIES},
             "cache_policy_cells": 3, "controller_cells": 3,
-            "ablation_settings": 2, "support_settings": 3,
+            "ablation_settings": 2, "support_settings": 11,
             "scalability_settings": 3, "primary_comparison_rows": 6,
             "formal_outer_window_clusters": 1,
         },
     }
     write_json(run_root / "non_formal_rehearsal.json", marker, create_only=True)
     runner = phase_runner(run_root, protocol)
+    context = read_json(run_root / "resolved_execution_context.json")
+    binding = read_json(run_root / "formal_training_execution_binding.json")
+    static = read_json(registry)
+    scientific = context["scientific_identity"]
+    profile = read_json(
+        ROOT / PROTOCOL_DIR / "nonformal_cell_transaction_rehearsal_profile.json"
+    )
+    cell_ledger = FormalCellLedger(
+        run_root=run_root,
+        identity=CellExecutionIdentity(
+            run_id=run_root.name,
+            execution_commit=scientific["execution_commit"],
+            protocol_semantic_sha256=protocol["hashes"]["semantic_sha256"],
+            resource_registry_semantic_sha256=static["hashes"]["semantic_sha256"],
+            environment_fingerprint=scientific["environment_fingerprint"],
+            split_semantic_sha256=protocol["identity"]["split_semantic_sha256"],
+            window_contract_semantic_sha256=protocol["execution_contract"]["window_consumption_contract"]["semantic_sha256"],
+            catalog_fingerprint=protocol["identity"]["catalog_fingerprint"],
+            runtime_identity=canonical_sha256(protocol["identity"]["typed_runtime_contract_hashes_by_capacity"]),
+            command_matrix_sha256=canonical_sha256({
+                "formal_templates": protocol["execution_contract"]["command_templates"],
+                "nonformal_profile": profile["semantic_sha256"],
+                "shared_executor": "execute_cell_artifact_transaction",
+            }),
+        ),
+    )
     run_phase(
         runner, "tests",
         [[str(python), "-m", "pytest", str(ROOT / "tests/test_generated_checkpoint_resource_identity_v25.py"), "-q", "--junitxml", str(run_root / "test_reports/generated_resource.xml")]],
@@ -409,7 +573,7 @@ def main() -> None:
                 "--run_id", run_id, "--non-formal-rehearsal",
                 *static_flags(registry, data_root, run_root, capacity),
             ])
-    run_phase(runner, "train", train_commands, ["training/**/train_summary.json"])
+    run_phase(runner, "train", train_commands, ["training/**/train_summary.json"], cell_ledger)
     dev = [
         str(python), str(ROOT / "scripts/run_typed_model_cache_formal_dev_selection.py"),
         "--protocol-path", str(ROOT / PROTOCOL_PATH), "--training-root", str(run_root / "training"),
@@ -437,14 +601,23 @@ def main() -> None:
         "--input-root", str(run_root), "--output-path", str(run_root / "checkpoint_freeze.json"),
     ]
     run_phase(runner, "checkpoint_freeze", [freeze], ["checkpoint_freeze.json", "checkpoint_manifests/**/*.json"])
-    context = read_json(run_root / "resolved_execution_context.json")
-    binding = read_json(run_root / "formal_training_execution_binding.json")
-    static = read_json(registry)
     generated = build_generated_checkpoint_registry(
         run_root=run_root, protocol=protocol, static_registry=static,
         resolved_execution_context=context, execution_binding=binding,
     )
-    publication = atomic_create_registry(run_root / "generated_checkpoint_resource_registry.json", generated)
+    publication = publish_or_validate_generated_checkpoint_registry(
+        run_root / "generated_checkpoint_resource_registry.json",
+        generated,
+        run_root=run_root,
+        expected_run_id=run_root.name,
+        static_registry_semantic_sha256=static["hashes"]["semantic_sha256"],
+        protocol_semantic_sha256=protocol["hashes"]["semantic_sha256"],
+        protocol_full_sha256=protocol["hashes"]["full_sha256"],
+        active_formal_bundle_sha256=context["scientific_identity"]["active_formal_bundle_sha256"],
+        execution_commit=context["scientific_identity"]["execution_commit"],
+        resolved_execution_context_sha256=context["context_sha256"],
+        formal_training_execution_binding_sha256=binding["binding_full_sha256"],
+    )
     evaluation_units = {
         label: read_json(path)["window_workload_plan"]["evaluation_units"][0]["evaluation_unit_id"]
         for label, path in fairness_paths.items() if label in CAPACITIES
@@ -473,8 +646,8 @@ def main() -> None:
             python, run_root, data_root, registry, fairness_paths, fairness_ids,
             capacity, run_root / "formal_controller" / capacity, agents,
         ))
-    run_phase(runner, "formal_cache_policy", cache_commands, ["formal_cache_policy/**/aggregate_summary.json", "cache_policy_replay/*.json"])
-    run_phase(runner, "formal_controller", controller_commands, ["formal_controller/**/aggregate_summary.json", "formal_controller/**/benchmark_rows.csv"])
+    run_phase(runner, "formal_cache_policy", cache_commands, ["formal_cache_policy/**/aggregate_summary.json", "formal_cache_policy/*/request_replay.json"], cell_ledger)
+    run_phase(runner, "formal_controller", controller_commands, ["formal_controller/**/aggregate_summary.json", "formal_controller/**/benchmark_rows.csv"], cell_ledger)
     ablation_commands = [
         support_command(
             python, protocol, run_root, data_root, registry, fairness_paths, fairness_ids,
@@ -483,17 +656,21 @@ def main() -> None:
         )
         for value, label in (("typed_full", "medium_576mb"), ("no_prediction", "ablation_no_prediction"))
     ]
-    run_phase(runner, "formal_ablation", ablation_commands, ["formal_ablation/**/support_provenance.json"])
-    support_commands = [
-        support_command(
-            python, protocol, run_root, data_root, registry, fairness_paths, fairness_ids,
-            capacity, setting_id(protocol, "capacity_mb", mb), capacity,
-            run_root / "formal_support" / setting_id(protocol, "capacity_mb", mb), agents,
+    run_phase(runner, "formal_ablation", ablation_commands, ["formal_ablation/**/support_provenance.json"], cell_ledger)
+    support_commands = []
+    for row in protocol["execution_contract"]["command_templates"]["formal_support"]["matrix_contexts"]:
+        setting = str(row["support_setting_id"])
+        capacity = str(row["capacity_label"])
+        fairness_label = capacity if setting.startswith("capacity-") else setting
+        support_commands.append(
+            support_command(
+                python, protocol, run_root, data_root, registry, fairness_paths, fairness_ids,
+                capacity, setting, fairness_label,
+                run_root / "formal_support" / setting, agents,
+            )
         )
-        for capacity, mb in CAPACITIES.items()
-    ]
-    run_phase(runner, "formal_support", support_commands, ["formal_support/**/support_provenance.json"])
-    replay = run_root / "cache_policy_replay/medium_576mb.json"
+    run_phase(runner, "formal_support", support_commands, ["formal_support/**/support_provenance.json"], cell_ledger)
+    replay = run_root / "formal_cache_policy/medium_576mb/request_replay.json"
     scalability_commands = [
         support_command(
             python, protocol, run_root, data_root, registry, fairness_paths, fairness_ids,
@@ -502,7 +679,7 @@ def main() -> None:
         )
         for limit in (1000, 10000, 100000)
     ]
-    run_phase(runner, "formal_scalability", scalability_commands, ["formal_scalability/**/support_provenance.json"])
+    run_phase(runner, "formal_scalability", scalability_commands, ["formal_scalability/**/support_provenance.json"], cell_ledger)
     statistics = [
         str(python), str(ROOT / "scripts/run_typed_model_cache_formal_statistics.py"),
         "--protocol-path", str(ROOT / PROTOCOL_PATH), "--input-root", str(run_root),
@@ -530,6 +707,8 @@ def main() -> None:
     run_phase(runner, "complete_without_holdout", [], [])
     ledger_rows = [json.loads(line) for line in (run_root / "phase_state.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
     validate_phase_ledger_v3(ledger_rows)
+    cell_rows = [json.loads(line) for line in (run_root / "cell_state.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+    cell_audit = validate_cell_ledger(cell_rows)
     ledger_audit = {
         "status": "pass",
         "schema_version": "3.0.0",
@@ -564,6 +743,8 @@ def main() -> None:
         "completed_phase_order": [row["phase"] for row in ledger_rows if row.get("status") == "completed"],
         "completed_phase_terminal_count": sum(row.get("status") == "completed" for row in ledger_rows),
         "phase_ledger_validation": ledger_audit,
+        "cell_ledger_validation": cell_audit,
+        "shared_cell_executor": "src.evaluators.formal_cell_transaction.execute_cell_artifact_transaction",
         "training_cell_count": len(summaries),
         "checkpoint_opened_by_dev_selection_count": 30,
         "seed_manifest_parsed_by_consumer": True,
@@ -575,7 +756,8 @@ def main() -> None:
         "capacity_labels": list(CAPACITIES),
         "cache_policy_outer_and_nested_executed": True,
         "controller_capacity_count": 3, "capacity_support_count": 3,
-        "ablation_setting_count": 2, "scalability_setting_count": 3,
+        "ablation_setting_count": 2, "support_setting_count": 11,
+        "scalability_setting_count": 3,
         "statistics_row_count": 6, "exact_nonformal_gate": gate_payload,
         "formal_training_count": 0, "formal_checkpoint_count": 0,
         "formal_performance_count": 0, "g14c_v14_created": False,

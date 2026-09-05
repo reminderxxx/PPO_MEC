@@ -19,8 +19,8 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 
-FORMAL_GENERATED_CHECKPOINT_RESOURCE_IDENTITY_CONTRACT_VERSION = "1.0.0"
-GENERATED_CHECKPOINT_REGISTRY_SCHEMA_VERSION = "1.0.0"
+FORMAL_GENERATED_CHECKPOINT_RESOURCE_IDENTITY_CONTRACT_VERSION = "1.1.0"
+GENERATED_CHECKPOINT_REGISTRY_SCHEMA_VERSION = "1.1.0"
 CAPACITY_MB = {
     "constrained_288mb": 288,
     "medium_576mb": 576,
@@ -124,7 +124,7 @@ def _safe_run_relative(run_root: Path, relative: Any, label: str) -> Path:
     return resolved
 
 
-def _terminal_checkpoint_freeze_record(run_root: Path) -> tuple[dict[str, Any], str]:
+def _terminal_checkpoint_freeze_record(run_root: Path) -> dict[str, Any]:
     ledger_path = run_root / "phase_state.jsonl"
     if not ledger_path.is_file() or ledger_path.is_symlink():
         raise GeneratedCheckpointResourceError(
@@ -151,10 +151,14 @@ def _terminal_checkpoint_freeze_record(run_root: Path) -> tuple[dict[str, Any], 
             "checkpoint_freeze must have exactly one committed terminal record"
         )
     record = matches[0]
-    record_hash = record.get("current_hash") or record.get("record_sha256")
+    record_hash = (
+        record.get("current_record_hash")
+        or record.get("current_hash")
+        or record.get("record_sha256")
+    )
     if not isinstance(record_hash, str) or len(record_hash) != 64:
         record_hash = canonical_sha256(record)
-    return record, sha256_file(ledger_path)
+    return record
 
 
 def _checkpoint_coverage(
@@ -260,7 +264,7 @@ def build_generated_checkpoint_registry(
 ) -> dict[str, Any]:
     root = Path(run_root).resolve()
     freeze = _strict_json_object(root / "checkpoint_freeze.json", "checkpoint freeze")
-    terminal, ledger_sha256 = _terminal_checkpoint_freeze_record(root)
+    terminal = _terminal_checkpoint_freeze_record(root)
     run_id = root.name
     static_ids = {
         str(row.get("logical_resource_id"))
@@ -335,10 +339,10 @@ def build_generated_checkpoint_registry(
         "checkpoint_freeze_sha256": freeze.get("freeze_sha256"),
         "source_phase": "checkpoint_freeze",
         "source_phase_committed_ledger_identity": {
-            "terminal_record_sha256": terminal.get("current_hash")
+            "terminal_record_sha256": terminal.get("current_record_hash")
+            or terminal.get("current_hash")
             or terminal.get("record_sha256")
             or canonical_sha256(terminal),
-            "phase_ledger_file_sha256_at_publication": ledger_sha256,
             "terminal_status": terminal.get("status"),
         },
         "resources": entries,
@@ -488,11 +492,16 @@ def validate_generated_checkpoint_registry(
     if ids != expected_ids:
         raise GeneratedCheckpointResourceError("generated registry resource membership drift")
     if require_committed_phase:
-        terminal, _ = _terminal_checkpoint_freeze_record(root)
+        terminal = _terminal_checkpoint_freeze_record(root)
         observed = registry.get("source_phase_committed_ledger_identity", {}).get(
             "terminal_record_sha256"
         )
-        actual = terminal.get("current_hash") or terminal.get("record_sha256") or canonical_sha256(terminal)
+        actual = (
+            terminal.get("current_record_hash")
+            or terminal.get("current_hash")
+            or terminal.get("record_sha256")
+            or canonical_sha256(terminal)
+        )
         if observed != actual:
             raise GeneratedCheckpointResourceError("checkpoint-freeze ledger identity drift")
     return {
@@ -511,6 +520,31 @@ def load_generated_checkpoint_registry(
     return registry, validate_generated_checkpoint_registry(
         registry, registry_path=target, **validation
     )
+
+
+def publish_or_validate_generated_checkpoint_registry(
+    path: str | Path,
+    registry: Mapping[str, Any],
+    **validation: Any,
+) -> dict[str, Any]:
+    """Create once, or prove that an interrupted/repeated publication is identical."""
+
+    target = Path(path)
+    if not target.exists() and not target.is_symlink():
+        return atomic_create_registry(target, registry)
+    observed, audit = load_generated_checkpoint_registry(target, **validation)
+    if observed.get("registry_canonical_sha256") != registry.get(
+        "registry_canonical_sha256"
+    ) or canonical_json_bytes(observed) != canonical_json_bytes(registry):
+        raise GeneratedCheckpointResourceError(
+            "existing generated checkpoint registry differs from legal freeze reconstruction"
+        )
+    return {
+        "status": "already_published_identity_match",
+        "path": str(target.resolve()),
+        "file_sha256": sha256_file(target),
+        "registry_canonical_sha256": audit["registry_canonical_sha256"],
+    }
 
 
 def resolve_generated_checkpoint_resource(
@@ -680,6 +714,7 @@ __all__ = [
     "build_generated_checkpoint_registry",
     "canonical_sha256",
     "load_generated_checkpoint_registry",
+    "publish_or_validate_generated_checkpoint_registry",
     "resolve_generated_checkpoint_arguments",
     "resolve_generated_checkpoint_resource",
     "sha256_file",

@@ -24,6 +24,7 @@ from scripts.manage_typed_model_cache_formal_artifacts import formal_gate
 
 ROOT = Path(__file__).resolve().parents[1]
 V25 = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_5_20260905/protocol_v2_5_manifest.json"
+V26 = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905/protocol_v2_6_manifest.json"
 
 
 def write_json(path: Path, value: object) -> None:
@@ -280,9 +281,9 @@ def test_outer_nested_flags_are_exact_and_not_accepted_unused() -> None:
 
 
 def test_protocol_v25_capacity_generator_and_consumer_closure() -> None:
-    protocol = json.loads(V25.read_text(encoding="utf-8-sig"))
+    protocol = json.loads(V26.read_text(encoding="utf-8-sig"))
     assert validate_protocol_v1_1(protocol)["status"] == "pass"
-    assert get_protocol_capabilities("2.5.0").generated_checkpoint_resource_required
+    assert get_protocol_capabilities("2.6.0").generated_checkpoint_resource_required
     templates = protocol["execution_contract"]["command_templates"]
     capacity_rows = [
         row for row in templates["formal_support"]["matrix_contexts"]
@@ -310,7 +311,7 @@ def test_protocol_v25_capacity_generator_and_consumer_closure() -> None:
 
 
 def test_static_registry_does_not_predeclare_run_generated_checkpoint_hashes() -> None:
-    protocol = json.loads(V25.read_text(encoding="utf-8-sig"))
+    protocol = json.loads(V26.read_text(encoding="utf-8-sig"))
     registry_path = ROOT / protocol["execution_contract"]["default_expansion_context"]["resource_registry_path"]
     registry = json.loads(registry_path.read_text(encoding="utf-8-sig"))
     ids = {row["logical_resource_id"] for row in registry["resources"]}
@@ -390,8 +391,8 @@ def test_exact_gate_rehearsal_counts_and_claim_states(tmp_path: Path) -> None:
         {"hashes": {"semantic_sha256": "1" * 64}},
         generated_registry_audit={"status": "pass", "registry_canonical_sha256": "2" * 64},
     )
-    assert gate["passed"] is True
-    assert gate["exact_count_status"] == "pass"
+    assert gate["passed"] is False
+    assert gate["cell_ledger_validation_status"] == "fail"
     assert gate["claim_evidence_map"][0]["status"] == "mixed"
     assert gate["paper_claims_permitted"] is False
     write_json(root / "checkpoint_candidates.json", [])

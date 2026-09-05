@@ -33,6 +33,11 @@ from src.runtime.formal_invalid_run_registry import (
     reject_permanently_invalid_formal_references,
 )
 from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
+from src.evaluators.formal_cell_transaction import (
+    CellTransactionError,
+    artifact_inventory,
+    validate_cell_ledger,
+)
 
 
 INVALID_G14C_V3_RUN_ROOT = Path(
@@ -713,10 +718,35 @@ def formal_gate(
             )
     cell_rows = _jsonl_rows(input_root / "cell_state.jsonl")
     committed_by_phase: dict[str, int] = {}
-    for row in cell_rows:
-        if row.get("status") == "committed":
+    cell_ledger_error = None
+    try:
+        validate_cell_ledger(cell_rows)
+        for row in cell_rows:
+            if row.get("status") != "committed":
+                continue
+            committed_path = Path(str(row.get("committed_path") or ""))
+            if (
+                not path_is_within(committed_path, input_root)
+                or ".staging" in committed_path.parts
+                or committed_path.is_symlink()
+            ):
+                raise CellTransactionError("committed cell path is not durable")
+            marker_path = committed_path / "committed_marker.json"
+            if marker_path.is_symlink() or not marker_path.is_file():
+                raise CellTransactionError("committed cell marker is missing")
+            marker = read_json(marker_path)
+            inventory_hash = canonical_sha256(artifact_inventory(committed_path))
+            if (
+                inventory_hash != row.get("artifact_inventory_sha256")
+                or inventory_hash != marker.get("artifact_inventory_sha256")
+                or marker.get("cell_id") != row.get("cell_id")
+            ):
+                raise CellTransactionError("committed cell payload/marker drift")
             phase = str(row.get("phase"))
             committed_by_phase[phase] = committed_by_phase.get(phase, 0) + 1
+    except (CellTransactionError, OSError, ValueError) as exc:
+        committed_by_phase = {}
+        cell_ledger_error = str(exc)
     candidates = (
         read_json(input_root / "checkpoint_candidates.json")
         if (input_root / "checkpoint_candidates.json").is_file() else []
@@ -743,10 +773,6 @@ def formal_gate(
     observed_counts = {
         "committed_training_cells": (
             committed_by_phase.get("train", 0)
-            or (
-                len(list(input_root.glob("training/**/train_summary.json")))
-                if non_formal_rehearsal else 0
-            )
         ),
         "candidate_checkpoints": len(candidates) if isinstance(candidates, list) else 0,
         "latest_checkpoints": len(list(input_root.glob("training/**/checkpoints/latest.pt"))),
@@ -754,26 +780,11 @@ def formal_gate(
         "selections": len(selection.get("selected", [])),
         "frozen_checkpoints": int(freeze.get("frozen_checkpoint_count", 0)),
         "frozen_checkpoints_by_capacity": frozen_capacity_counts,
-        "cache_policy_cells": committed_by_phase.get("formal_cache_policy", 0) or (
-            len(list(input_root.glob("formal_cache_policy/**/aggregate_summary.json")))
-            if non_formal_rehearsal else 0
-        ),
-        "controller_cells": committed_by_phase.get("formal_controller", 0) or (
-            len(list(input_root.glob("formal_controller/**/aggregate_summary.json")))
-            if non_formal_rehearsal else 0
-        ),
-        "ablation_settings": committed_by_phase.get("formal_ablation", 0) or (
-            len(list(input_root.glob("formal_ablation/**/support_provenance.json")))
-            if non_formal_rehearsal else 0
-        ),
-        "support_settings": committed_by_phase.get("formal_support", 0) or (
-            len(list(input_root.glob("formal_support/**/support_provenance.json")))
-            if non_formal_rehearsal else 0
-        ),
-        "scalability_settings": committed_by_phase.get("formal_scalability", 0) or (
-            len(list(input_root.glob("formal_scalability/**/support_provenance.json")))
-            if non_formal_rehearsal else 0
-        ),
+        "cache_policy_cells": committed_by_phase.get("formal_cache_policy", 0),
+        "controller_cells": committed_by_phase.get("formal_controller", 0),
+        "ablation_settings": committed_by_phase.get("formal_ablation", 0),
+        "support_settings": committed_by_phase.get("formal_support", 0),
+        "scalability_settings": committed_by_phase.get("formal_scalability", 0),
         "primary_comparison_rows": len(statistics_payload.get("rows", [])),
         "formal_outer_window_clusters": len(controller_windows),
     }
@@ -811,7 +822,12 @@ def formal_gate(
     return {
         "formal_execution_gate_version": "2.0.0",
         "protocol_semantic_sha256": protocol["hashes"]["semantic_sha256"],
-        "passed": not missing and not exact_count_mismatches and generated_ok,
+        "passed": (
+            not missing
+            and not exact_count_mismatches
+            and generated_ok
+            and cell_ledger_error is None
+        ),
         "missing_outputs": missing,
         "performance_threshold_used": False,
         "holdout_opened": False,
@@ -825,6 +841,10 @@ def formal_gate(
         "expected_counts": expected_counts,
         "exact_count_mismatches": exact_count_mismatches,
         "exact_count_status": "pass" if not exact_count_mismatches else "fail",
+        "cell_ledger_validation_status": (
+            "pass" if cell_ledger_error is None else "fail"
+        ),
+        "cell_ledger_validation_error": cell_ledger_error,
         "claim_evidence_map": _claim_evidence_rows(statistics_payload),
         "claim_evidence_status_enum": [
             "supported", "mixed", "unsupported", "contradicted", "unavailable"
@@ -933,6 +953,10 @@ def main() -> None:
         )
     write_create_only(output_path, payload)
     print(json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False))
+    if args.action in {"formal_gate", "integrity_and_formal_gate"} and not payload.get(
+        "passed"
+    ):
+        raise SystemExit(2)
 
 
 if __name__ == "__main__":
