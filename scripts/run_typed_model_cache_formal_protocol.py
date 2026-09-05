@@ -303,6 +303,7 @@ def main() -> None:
                     args.execution_environment_manifest or None
                 ),
                 require_ready=not bool(args.non_formal_rehearsal_profile),
+                require_origin_main_match=not bool(args.non_formal_rehearsal_profile),
             )
         except ActiveFormalBundleError as exc:
             raise FormalExecutionError(f"active formal bundle gate failed: {exc}") from exc
@@ -353,6 +354,7 @@ def main() -> None:
                     args.execution_environment_manifest or None
                 ),
                 require_ready=not bool(args.non_formal_rehearsal_profile),
+                require_origin_main_match=not bool(args.non_formal_rehearsal_profile),
             )
         except ActiveFormalBundleError as exc:
             raise FormalExecutionError(f"active formal bundle gate failed: {exc}") from exc
