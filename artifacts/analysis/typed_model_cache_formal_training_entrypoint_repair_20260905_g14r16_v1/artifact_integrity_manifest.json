@@ -1,0 +1,72 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_training_entrypoint_repair_20260905_g14r16_v1",
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "file_count": 11,
+  "files": [
+    {
+      "path": "acceptance_evidence_manifest.json",
+      "sha256": "e650a9f4aff6e91b1d1b9033a6e465d746eb19f4732ba6ad0de0c9bc1111dfed",
+      "size_bytes": 2187
+    },
+    {
+      "path": "formal_training_entrypoint_acceptance.json",
+      "sha256": "9a398fa41513643347254ad5b4e7fa695f7a29af5eb71f13a78e2e944ba5f5fd",
+      "size_bytes": 1000423
+    },
+    {
+      "path": "g14c_v14_failure_reference.json",
+      "sha256": "e45e93309b73e5d3db01114406ff436a2218f146ac77e2631e7a86726930b0ab",
+      "size_bytes": 1803
+    },
+    {
+      "path": "original_failure_combination.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0
+    },
+    {
+      "path": "original_failure_combination.stdout.log",
+      "sha256": "2506f90082d19943dfe62e4828564d9e776bd8fd0f09d82db25ef95a3c7dd891",
+      "size_bytes": 3280
+    },
+    {
+      "path": "protected_user_files_audit.json",
+      "sha256": "74ba18beff6e5c97be8266ae773efc8a89e935e46170f3c5b74b5cc4654070e6",
+      "size_bytes": 2513
+    },
+    {
+      "path": "protocol_scientific_diff.json",
+      "sha256": "e9ebcda67ff82c55a8c57ad41cbf12b0a73def85456f21f504c62a1b9005a4e4",
+      "size_bytes": 1387
+    },
+    {
+      "path": "readiness_review_v19.json",
+      "sha256": "c1ee812dd27468206a09a8149ad914caa722623453865d2a71d56e7b5c43394f",
+      "size_bytes": 1463
+    },
+    {
+      "path": "root_cause_and_test_gap.json",
+      "sha256": "12a1d0bf8e0f086e4a10e62f2160b7a482fae8405e0084f1ef8c8df9a20f5b9e",
+      "size_bytes": 1303
+    },
+    {
+      "path": "validation_results.json",
+      "sha256": "e6c799abceff86baeb7f9128da6ac7e283d648a47d58a93af199801445205f97",
+      "size_bytes": 996
+    },
+    {
+      "path": "artifact_inventory.json",
+      "sha256": "ab0211ca8948f9292e57e1b40cc2a2bc61f3d903db3810bc1d3de79bb28ff132",
+      "size_bytes": 2275
+    }
+  ],
+  "formal": false,
+  "git_commit": "161b6d799ef39ac0eea86c6c5e35c0e1d00d5df7",
+  "holdout_capability": false,
+  "inventory_sha256": "1b6ee1e599e5fc43a342f4e5e1bd14b3416cafd4cb1dd5c6dd4f07480100b8e9",
+  "literature_cutoff": "2026-09-05",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05T23:30:00+08:00",
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
+}

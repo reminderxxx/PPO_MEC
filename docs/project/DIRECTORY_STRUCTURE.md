@@ -1,6 +1,16 @@
 ﻿# Directory Structure
 
-G14R15：active Protocol 2.6、Cell Artifact Publication Contract 1.0.0、Generated Checkpoint Resource Contract
+G14R16：唯一 active Protocol 2.7、ready index 与 Readiness v19 位于
+`configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905/`；resolver 位于
+`src/runtime/formal_training_contract.py`，正式 outer gate 位于
+`scripts/run_typed_model_cache_formal_protocol.py`，150-cell 生产入口验收复用
+`scripts/run_typed_model_cache_formal_training_binding_acceptance.py`。Protocol/artifact 构建入口为
+`scripts/repair_formal_training_entrypoint_contract.py` 与
+`scripts/build_formal_training_entrypoint_repair_artifacts.py`；机器证据位于
+`artifacts/analysis/typed_model_cache_formal_training_entrypoint_repair_20260905_g14r16_v1/`，不含正式
+episode、checkpoint 或 performance result。Protocol 2.6 目录保留为 historical/audit-only。
+
+G14R15（historical/audit-only）：Protocol 2.6、Cell Artifact Publication Contract 1.0.0、Generated Checkpoint Resource Contract
 1.1.0、ready index 与 Readiness v18 位于
 `configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905/`；共享 cell transaction 在
 `src/evaluators/formal_cell_transaction.py`，协议/证据构建入口在

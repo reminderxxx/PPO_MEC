@@ -1,0 +1,48 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_training_entrypoint_repair_20260905_g14r16_v1",
+  "cell_publication_state": "failed_terminal",
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "execution_counts": {
+    "candidate_checkpoints_committed": 0,
+    "dev_candidate_evaluations": 0,
+    "dev_selections": 0,
+    "environment_interactions_committed": 0,
+    "episodes_committed": 0,
+    "formal_performance_rows": 0,
+    "frozen_checkpoints": 0,
+    "generated_registry_resources": 0,
+    "latest_checkpoints_committed": 0,
+    "primary_comparison_rows": 0,
+    "training_cells_committed": 0,
+    "training_cells_failed_terminal": 1,
+    "training_cells_planned": 150,
+    "updates_committed": 0
+  },
+  "failed_cell": {
+    "agent": "sa_ghmappo",
+    "capacity_label": "constrained_288mb",
+    "seed": 7
+  },
+  "failure_audit_path": "artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260905_185105_g14c_v14/audit/failure_audit.json",
+  "failure_audit_sha256": "d323c122230795585bbadb16f8650f5e395716b145935a4a41cf5fafe21e2608",
+  "formal": false,
+  "git_commit": "161b6d799ef39ac0eea86c6c5e35c0e1d00d5df7",
+  "holdout": {
+    "capability": false,
+    "consumed_permanently": false,
+    "opened": false,
+    "performance_executed": false,
+    "sealed": true
+  },
+  "holdout_capability": false,
+  "literature_cutoff": "2026-09-05",
+  "old_artifacts_modified": false,
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "retry_allowed": false,
+  "return_code": 1,
+  "reviewed_at": "2026-09-05T23:30:00+08:00",
+  "status": "INVALID_PROTOCOL_OR_IMPLEMENTATION",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "terminal_boundary": "invalid_during_first_training_cell_before_episode_zero"
+}

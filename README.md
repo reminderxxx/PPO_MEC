@@ -1,6 +1,14 @@
 # PPO_MEC
 
-G14R15 已冻结唯一 live Formal Protocol `2.6.0`、Cell Artifact Publication Contract `1.0.0`、Cell Ledger
+G14R16 已修复 Formal Protocol 2.6 首个训练 cell 在 nullable identity 校验分支触发的确定性 `NameError`，
+并冻结唯一 live Protocol `2.7.0` 与 Readiness v19=`READY_FOR_G14C_V15_CLEAN_TRAIN_AND_FORMAL`。clean
+detached candidate 使用生产入口完成真实 full-data public preflight 与 150/150（10 agents × 5 seeds × 3
+capacities）零 episode 初始化验收；episode/interaction/update/checkpoint/performance 均为 0。G14C v14 永久
+登记为 invalid，禁止 resume/retry/finalize/salvage/reuse；Protocol 2.6 及更早版本仅供 historical/audit。
+本轮未启动 G14C v15、formal、holdout、G14D 或 G15。详见
+`docs/project/formal_training_entrypoint_acceptance_contract.md`。
+
+G14R15（现为 historical/audit-only）曾冻结 Formal Protocol `2.6.0`、Cell Artifact Publication Contract `1.0.0`、Cell Ledger
 `2.0.0`、Generated Checkpoint Resource Identity Contract `1.1.0` 与 Readiness v18=
 `READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL`。formal runner 与 non-formal rehearsal 共用真实 cell transaction
 executor；benchmark/oracle support 以结构化 child-output descriptor 解析并在完整验证后原子发布，registry

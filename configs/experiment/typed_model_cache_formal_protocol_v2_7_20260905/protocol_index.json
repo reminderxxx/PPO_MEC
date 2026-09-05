@@ -381,10 +381,18 @@
       "shared_reason": "content-addressed resource is unchanged by G14R7A; its role and exact content hash are frozen in the v1.8 active index",
       "size_bytes": 273401,
       "version_scope": "shared_historical_stable"
+    },
+    {
+      "content_sha256": "9b876622c4983b8c11e57818dade2ea68155f98dc9ada0b6f49093e9ec97b5b3",
+      "logical_id": "readiness_companion",
+      "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905/readiness_v19.json",
+      "role": "Readiness v19 evidence companion",
+      "size_bytes": 646,
+      "version_scope": "current_protocol_version"
     }
   ],
   "active_formal_bundle_contract_version": "1.1.0",
-  "active_formal_bundle_sha256": "5b46dec7b96d6f42262f2fe5da7941d2abe390f1754387d7e7b2dc5308ad033e",
+  "active_formal_bundle_sha256": "6691c6a02e048a7a739548e66c91e42686a9b80d24eddcab19443a8a8a97f740",
   "command_matrix_identity": {
     "command_templates_sha256": "771a481009e24231f0e15acecf65c28e2e417844e2804fa8ff4ab88a1422b576",
     "outer_nested_expansion_equality_required": true
@@ -414,5 +422,9 @@
     "protocol_version": "2.7.0"
   },
   "protocol_index_version": "2.7.0",
-  "status": "NOT_READY_PENDING_G14R16_ACCEPTANCE"
+  "readiness_companion": {
+    "content_sha256": "9b876622c4983b8c11e57818dade2ea68155f98dc9ada0b6f49093e9ec97b5b3",
+    "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905/readiness_v19.json"
+  },
+  "status": "READY_FOR_G14C_V15_CLEAN_TRAIN_AND_FORMAL"
 }

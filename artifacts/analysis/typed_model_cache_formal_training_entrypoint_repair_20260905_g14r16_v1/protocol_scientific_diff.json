@@ -1,0 +1,37 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_training_entrypoint_repair_20260905_g14r16_v1",
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "execution_changes": [
+    "formal resolver variable correction",
+    "150-cell active training-entrypoint acceptance requirement",
+    "Readiness v19 consumes that acceptance"
+  ],
+  "formal": false,
+  "from_semantic_sha256": "97dfbfd975b504b6015e84ddb781754a819d394eea7a127bf51681c1dd790cb3",
+  "from_version": "2.6.0",
+  "git_commit": "161b6d799ef39ac0eea86c6c5e35c0e1d00d5df7",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-09-05",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05T23:30:00+08:00",
+  "scientific_fields_unchanged": {
+    "ablation_and_support": true,
+    "agent_matrix": true,
+    "claim_evidence_map": true,
+    "comparisons": true,
+    "endpoints": true,
+    "formal_command_templates": true,
+    "holdout_execution_contract": true,
+    "nullable_contract": true,
+    "seed_plan": true,
+    "statistics": true,
+    "training_budget": true,
+    "typed_catalog_and_capacity": true,
+    "workload": true
+  },
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "to_semantic_sha256": "3de3d39fb0ba4a4e90ec135f8745bd52e82bbd2a37e3d1fc4aad25924f69d8f8",
+  "to_version": "2.7.0"
+}

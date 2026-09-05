@@ -1,0 +1,25 @@
+{
+  "adjacent_undefined_reference_review": "pass",
+  "artifact_run_id": "typed_model_cache_formal_training_entrypoint_repair_20260905_g14r16_v1",
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "formal": false,
+  "git_commit": "161b6d799ef39ac0eea86c6c5e35c0e1d00d5df7",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-09-05",
+  "minimal_fix": "read the frozen nullable identity from formal_protocol",
+  "new_coverage": [
+    "active Protocol resolver success and serialization",
+    "nullable hash missing and drift rejection",
+    "scientific/binding/context mismatch rejection",
+    "formal budget override rejection",
+    "non-formal and historical fixture exclusion",
+    "static unresolved protocol-name regression check"
+  ],
+  "old_test_gap": "historical v1.6 fixtures never entered nullable_metric_contract_required=true; compile/import cannot execute the affected branch",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05T23:30:00+08:00",
+  "root_cause": "resolve_training_contract(formal_protocol=...) referenced undefined protocol in the active nullable identity branch",
+  "status": "fixed_and_regression_covered",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
+}

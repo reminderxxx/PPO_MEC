@@ -1,5 +1,16 @@
 ﻿# Bugs And Risks
 
+## 2026-09-05: active nullable training resolver NameError（RESOLVED；G14C v14 永久 invalid）
+
+- 根因：`resolve_training_contract(formal_protocol=...)` 的 active nullable 分支读取未定义 `protocol`；历史 v1.6
+  测试未进入 `nullable_metric_contract_required=true`，而 compile/import 不执行该运行时路径。
+- 修复与门禁：读取已验证的 `formal_protocol`，并要求 Readiness v19 消费 commit/bundle/nullable-bound 的
+  150/150 production training-entrypoint 初始化证据；缺失、旧版本、跨 commit/bundle 或未进入 nullable 分支均拒绝。
+- 历史边界：G14C v14 在 episode 0 前失败，所有有效训练与性能计数为0，不得 resume/retry/finalize/salvage/
+  checkpoint reuse。Protocol 2.6 降为 historical/audit-only；唯一 live 版本为 Protocol 2.7。
+- 剩余风险：G14R16 只验证训练初始化。完整正式训练、checkpoint、formal performance 与算法优势仍未执行；
+  Readiness v19 不是 TMC-ready 或 paper-ready 证据，holdout 保持 sealed/unopened/unconsumed。
+
 ## 2026-09-05: formal cell publication/recovery/completion gaps（RESOLVED）
 
 - G14R15 已关闭 formal support producer/outer consumer 路径分叉、freeze 后 registry 发布恢复，以及 gate=false

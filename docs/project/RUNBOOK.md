@@ -1,11 +1,34 @@
 # Runbook
 
-## Protocol 2.6 cell publication 与未来 G14C v14
+## Protocol 2.7 与未来 G14C v15
 
 唯一 live index：
-`configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905/protocol_index.json`。Protocol 2.5 及更早
-版本仅供 historical/audit，不得用于新 run。Readiness v18 只授权另立任务从最终 pushed clean commit 创建
-G14C v14；本条目不授权当前任务启动训练、formal performance 或 holdout。
+`configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905/protocol_index.json`。Protocol 2.6 及更早版本
+仅供 historical/audit；G14C v14 run 永久 invalid，禁止 resume/retry/finalize/salvage 或复用任何 binding、context、
+ledger、checkpoint。Readiness v19 只授权未来另立任务在 pushed、Git-clean、`HEAD == origin/main` 的新 detached
+worktree 创建 G14C v15；本条目不授权当前任务启动训练、formal performance 或 holdout。
+
+G14R16 的 pre-readiness 验收模式只允许 fresh `--preflight`，用于闭合 Readiness 先验循环，不接受 resume、
+finalize 或 non-formal rehearsal profile。验收脚本从 active command expansion 派生全部 150 条命令，并只追加
+`--formal_contract_preflight_only`；不得删减正式参数或改为 smoke/低预算。未来正式 G14C v15 不得携带该标志。
+
+```bash
+<shared-absolute-python> scripts/run_typed_model_cache_formal_training_binding_acceptance.py \
+  --clean-worktree-root <clean-detached-worktree> \
+  --python-executable <shared-absolute-python> \
+  --output-root <new-acceptance-output>/execution \
+  --summary-path <new-acceptance-output>/formal_training_entrypoint_acceptance.json
+```
+
+合法验收必须报告 150/150、10 agents、5 seeds、3 capacities、nullable branch=true，并通过实际文件扫描确认
+episode/interaction/update/checkpoint/performance 均为0。该产物不能进入 checkpoint selection、formal benchmark
+或论文性能表。
+
+## Protocol 2.6 cell publication（historical/audit-only）
+
+历史 index：`configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905/protocol_index.json`。Protocol 2.6
+及更早版本不得用于新 run；Readiness v18 已被 v19 supersede。G14C v14 失败 run 永久 invalid，本节只保留
+cell publication/recovery 操作的审计说明。
 
 正式执行的每个事务 cell 都必须经共享 executor 完成 `dispatch → staging → structured output resolution →
 payload/inventory validation → atomic publication → committed marker → cell terminal`。只允许 committed destination

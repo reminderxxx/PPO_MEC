@@ -1,0 +1,20 @@
+{
+  "active_positive_skipped": false,
+  "artifact_run_id": "typed_model_cache_formal_training_entrypoint_repair_20260905_g14r16_v1",
+  "compile_import": "pass",
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "formal": false,
+  "full_tests": "1234 passed, 16 readiness-gated skips on candidate",
+  "git_commit": "161b6d799ef39ac0eea86c6c5e35c0e1d00d5df7",
+  "git_diff_check": "pass",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-09-05",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05T23:30:00+08:00",
+  "skipped_scope": "Only existing platform/evidence-gated cases may skip; the active resolver and 150-cell entrypoint acceptance were executed.",
+  "smoke": "pass",
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "targeted_tests": "candidate pending: 135 passed, 16 readiness-gated skips; finalized readiness: 149 passed, 2 platform skips"
+}

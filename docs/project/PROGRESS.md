@@ -1,5 +1,25 @@
 ﻿# Progress
 
+## 2026-09-05: G14R16 formal training resolver 与 active entrypoint acceptance closure
+
+- G14C v14 `typed_model_cache_formal_20260905_185105_g14c_v14` 在首个 `sa_ghmappo / seed 7 /
+  constrained_288mb` cell、episode 0 前因 `resolve_training_contract()` nullable 分支读取未定义 `protocol`
+  失败；failure audit SHA-256=`d323c122230795585bbadb16f8650f5e395716b145935a4a41cf5fafe21e2608`。
+  该 run 的 episode/interaction/update/checkpoint/performance 全为0，永久禁止 resume/retry/finalize/salvage/reuse。
+- 最小修复仅将该读取改为已验证参数 `formal_protocol`；新增 active nullable 正例及 nullable/scientific/binding/
+  context/budget 负例和未定义名称静态回归。历史 v1.6 fixture 与 non-formal 早返回不计 active 验收。
+- clean detached candidate commit `161b6d799ef39ac0eea86c6c5e35c0e1d00d5df7`、无本地 `.venv`，使用共享绝对
+  Python 完成真实 11,850,526-row/73,871-frame/60-window public preflight，并从正式 command expansion 执行
+  150/150 production entrypoint preflight。每条均经过资源/context/binding/nullable/window/workflow/catalog/agent
+  初始化，在 episode 0 前退出；实际 episode/interaction/update/checkpoint/performance 文件计数均为0。
+- 冻结 Protocol 2.7：semantic/full SHA-256=`3de3d39fb0ba4a4e90ec135f8745bd52e82bbd2a37e3d1fc4aad25924f69d8f8`/
+  `cca2be3833de0ec3afaac1bf02090c6dfdf54985d2f71d1dae051fa79e2157f6`，bundle core/final=
+  `f141b8606cd93ad4aa361f7eb0ffcd557c3ccb21ef95a8c069f381e91e9bc342`/
+  `6691c6a02e048a7a739548e66c91e42686a9b80d24eddcab19443a8a8a97f740`。Readiness v19 只证明
+  G14R15 事务/下游闭环与 G14R16 正式训练初始化；不证明完整训练、算法性能或 paper readiness。
+- candidate 专项 `135 passed, 16 skipped`、全仓 `1234 passed, 16 skipped`、smoke、compile/import、diff-check
+  均通过；active 正例与 150-cell 验收均未 skip。holdout sealed/unopened/unconsumed，未启动 G14C v15/G14D/G15。
+
 ## 2026-09-05: G14R15 formal cell publication/recovery/completion closure
 
 - 最小非正式案例复现 benchmark support 实际写入 `main_results_<mode>_<timestamp>/`，而旧 outer consumer

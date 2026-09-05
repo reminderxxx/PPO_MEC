@@ -1,0 +1,71 @@
+{
+  "formal_training_contract_preflight_version": "1.0.0",
+  "formal": false,
+  "training": false,
+  "performance_evidence": false,
+  "checkpoint_created": false,
+  "episode_count": 0,
+  "agent_name": "sa_ghmappo",
+  "seed": 7,
+  "resolved_agent_config": {
+    "auxiliary_coef": 0.06,
+    "entropy_coef": 0.004,
+    "learning_rate": 0.0001,
+    "value_coef": 0.7
+  },
+  "formal_training_contract": {
+    "formal_training_contract_version": "2.0.0",
+    "formal_protocol_version": "2.7.0",
+    "formal_protocol_semantic_sha256": "3de3d39fb0ba4a4e90ec135f8745bd52e82bbd2a37e3d1fc4aad25924f69d8f8",
+    "episodes": 256,
+    "update_every": 8,
+    "batch_size": 64,
+    "max_steps": 22,
+    "checkpoint_every_updates": 4,
+    "expected_update_count": 32,
+    "agent_config": {
+      "auxiliary_coef": 0.06,
+      "entropy_coef": 0.004,
+      "learning_rate": 0.0001,
+      "value_coef": 0.7
+    },
+    "agent_scientific_config_semantic_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+    "formal_training_execution_binding_sha256": "0870e23bb7ce76e1a55cdf5bf5e91725040741b8ae4e19382b1e95b80eef58a4",
+    "execution_commit": "161b6d799ef39ac0eea86c6c5e35c0e1d00d5df7",
+    "resolved_execution_context_sha256": "b2d7eede4aa1169ed5d16eb1176bc0264e39bf198e71509c6a9555af35455502",
+    "environment_fingerprint": "ed6630bd191a12a9ff58b3b26106ebe1e4015f1c9167f401ac10d3a973ee3b5a",
+    "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+    "environment_identity_projection_contract_version": "1.1.0",
+    "full_normalized_environment_projection": {
+      "formal_execution_environment_contract_version": "1.2.0",
+      "python_implementation": "CPython",
+      "python_version": "3.9.6",
+      "platform_system": "Darwin",
+      "architecture": "arm64",
+      "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+      "installed_package_count": 31,
+      "torch_version": "2.8.0",
+      "critical_package_versions": {
+        "PyYAML": "6.0.3",
+        "numpy": "2.0.2",
+        "pandas": "2.3.3",
+        "pytest": "8.4.2",
+        "torch": "2.8.0"
+      },
+      "execution_commit": "observed_clean_40_hex_HEAD_equal_main_equal_origin_main_bound_at_execution",
+      "source_root_identity": {
+        "project_package": "src",
+        "source_tree_identity_rule": "observed_tracked_src_and_scripts_tree_sha256_bound_at_execution"
+      },
+      "identity_rule": "full_projection_v1_excludes_host_paths_and_binds_observed_commit_and_tree_out_of_band",
+      "formal_endpoint_metrics_contract_version": "2.0.0",
+      "formal_exogenous_request_execution_contract_version": "1.1.0",
+      "formal_request_exposure_trace_version": "2.0.0",
+      "formal_request_subject_lifecycle_contract_version": "1.0.0",
+      "environment_fingerprint": "ed6630bd191a12a9ff58b3b26106ebe1e4015f1c9167f401ac10d3a973ee3b5a"
+    },
+    "formal_agent_order_contract_semantic_sha256": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0",
+    "active_formal_bundle_sha256": "5b46dec7b96d6f42262f2fe5da7941d2abe390f1754387d7e7b2dc5308ad033e",
+    "formal_nullable_metric_aggregation_contract_semantic_sha256": "50a9983d21afdc06ec9df309c29f75f5009e062013990bb491ed58c442470889"
+  }
+}

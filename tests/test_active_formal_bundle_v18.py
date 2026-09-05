@@ -13,7 +13,7 @@ from src.evaluators.typed_model_cache_formal_execution import FormalExecutionErr
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ACTIVE_ROOT = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901"
+ACTIVE_ROOT = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905"
 INDEX = ACTIVE_ROOT / "protocol_index.json"
 V17_INDEX = (
     ROOT
@@ -43,6 +43,13 @@ def bundle_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     paths = [row["logical_path"] for row in index["active_bundle_resources"]]
     readiness = load(ROOT / index["readiness_companion"]["logical_path"])
     paths.append(readiness["evidence_manifest_path"])
+    evidence = load(ROOT / readiness["evidence_manifest_path"])
+    paths.extend(
+        [
+            evidence["real_downstream_consumer_rehearsal_path"],
+            evidence["formal_training_entrypoint_acceptance_path"],
+        ]
+    )
     for relative in paths:
         source = ROOT / relative
         target = tmp_path / relative
@@ -152,7 +159,7 @@ def test_old_environment_path_rejected_even_with_correct_cli_environment(
     )
     refresh_ready_hash(bundle_root, index)
     correct_cli = bundle_root / (
-        "configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901/"
+        "configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905/"
         "execution_environment_manifest.json"
     )
     with pytest.raises(active.ActiveFormalBundleError, match="outside the active Protocol|does not equal"):
@@ -187,9 +194,9 @@ def test_active_resource_content_or_identity_drift_is_rejected(
 def test_protocol_path_hash_drift_and_same_name_different_hash_are_rejected(
     bundle_root: Path,
 ) -> None:
-    different = bundle_root / "elsewhere/protocol_v2_2_manifest.json"
+    different = bundle_root / "elsewhere/protocol_v2_7_manifest.json"
     different.parent.mkdir(parents=True)
-    different.write_bytes((ACTIVE_ROOT / "protocol_v2_2_manifest.json").read_bytes() + b"\n")
+    different.write_bytes((ACTIVE_ROOT / "protocol_v2_7_manifest.json").read_bytes() + b"\n")
     with pytest.raises(active.ActiveFormalBundleError, match="does not equal"):
         validate(bundle_root, protocol_path=different)
 
@@ -261,11 +268,11 @@ def test_symlink_cwd_guessing_and_alternate_index_are_rejected(
     alias = bundle_root / "protocol_alias"
     alias.symlink_to(
         bundle_root
-        / "configs/experiment/typed_model_cache_formal_protocol_v2_2_20260901",
+        / "configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905",
         target_is_directory=True,
     )
     with pytest.raises(active.ActiveFormalBundleError, match="symlink"):
-        validate(bundle_root, protocol_path=alias / "protocol_v2_2_manifest.json")
+        validate(bundle_root, protocol_path=alias / "protocol_v2_7_manifest.json")
 
 
 def test_outer_runner_source_gates_dry_run_before_output_writes() -> None:
@@ -274,11 +281,12 @@ def test_outer_runner_source_gates_dry_run_before_output_writes() -> None:
     dry = source.index("if args.dry_run:")
     binding_write = source.index("atomic_create_execution_binding(", dry)
     assert gate < dry < binding_write
-    assert "formal Protocol v1.0-v2.1 is audit-only" in source
+    assert "require_live_execution_protocol(protocol_version)" in source
+    assert "--training-entrypoint-acceptance is restricted to a fresh --preflight" in source
 
 
 def test_all_registered_invalid_roots_including_v11_remain_rejected() -> None:
-    protocol = load(ACTIVE_ROOT / "protocol_v2_2_manifest.json")
+    protocol = load(ACTIVE_ROOT / "protocol_v2_7_manifest.json")
     assert any(item["run_id"].endswith("g14c_v11") for item in protocol["supersession"]["invalid_execution_runs"])
     for item in protocol["supersession"]["invalid_execution_runs"]:
         root = ROOT / "artifacts/experiments/typed_model_cache_formal" / item["run_id"]
