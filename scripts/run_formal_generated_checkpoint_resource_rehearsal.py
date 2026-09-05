@@ -52,8 +52,8 @@ from src.runtime.portable_resource_identity import (
 )
 
 
-PROTOCOL_DIR = Path("configs/experiment/typed_model_cache_formal_protocol_v2_5_20260905")
-PROTOCOL_PATH = PROTOCOL_DIR / "protocol_v2_5_manifest.json"
+PROTOCOL_DIR = Path("configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905")
+PROTOCOL_PATH = PROTOCOL_DIR / "protocol_v2_6_manifest.json"
 INDEX_PATH = PROTOCOL_DIR / "protocol_index.json"
 ORDER_PATH = PROTOCOL_DIR / "formal_agent_order_contract.json"
 PLAN_PATH = PROTOCOL_DIR / "nonformal_rehearsal_window_plan.json"
