@@ -389,7 +389,11 @@ def main() -> None:
                 "--window_length", "24", "--rsu_layout", "auto_dominant_tight",
                 "--primary_vehicle_selection", "handoff_pressure", "--window_mode", "mixed_informative",
                 "--model_cache_runtime_config", str(ROOT / RUNTIME_DIR / f"runtime_{capacity}.yaml"),
-                "--agent_config_path", str(ROOT / PROTOCOL_DIR / "agent_training_scientific_config.json"),
+                "--agent_config_path", str(
+                    ROOT
+                    / "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821"
+                    / "agent_training_configs.json"
+                ),
                 "--checkpoint_every_updates", "4", "--reward_positive_offset", "0",
                 "--random_seed", "7", "--output_root", str(run_root / "training"),
                 "--run_id", run_id, "--non-formal-rehearsal",
