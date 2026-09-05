@@ -230,6 +230,7 @@ def main() -> None:
                 protocol_path=protocol_path,
                 require_clean_git=False,
                 require_origin_main_match=False,
+                require_ready=not args.non_formal_rehearsal,
             )
             expected_bundle = resolved_context["scientific_identity"].get(
                 "active_formal_bundle_sha256"

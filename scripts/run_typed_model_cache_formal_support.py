@@ -244,6 +244,7 @@ def main() -> None:
                 protocol_path=args.protocol_path,
                 require_clean_git=False,
                 require_origin_main_match=False,
+                require_ready=not args.non_formal_rehearsal,
             )
             if bundle["active_formal_bundle_sha256"] != resolved_context[
                 "scientific_identity"
