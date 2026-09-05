@@ -479,7 +479,9 @@ def resolve_training_contract(
                 "resolved context active formal bundle identity mismatch"
             )
         if capabilities.nullable_metric_contract_required:
-            expected_nullable_hash = protocol["formal_nullable_metric_aggregation_contract"][
+            expected_nullable_hash = formal_protocol[
+                "formal_nullable_metric_aggregation_contract"
+            ][
                 "semantic_sha256"
             ]
             identity_values[

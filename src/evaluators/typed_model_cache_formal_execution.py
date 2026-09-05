@@ -65,6 +65,8 @@ FORMAL_EXECUTION_PROTOCOL_V2_5_VERSION = "2.5.0"
 FORMAL_EXECUTION_PROTOCOL_V2_5_ID = "typed_model_cache_formal_protocol_v2_5"
 FORMAL_EXECUTION_PROTOCOL_V2_6_VERSION = "2.6.0"
 FORMAL_EXECUTION_PROTOCOL_V2_6_ID = "typed_model_cache_formal_protocol_v2_6"
+FORMAL_EXECUTION_PROTOCOL_V2_7_VERSION = "2.7.0"
+FORMAL_EXECUTION_PROTOCOL_V2_7_ID = "typed_model_cache_formal_protocol_v2_7"
 FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
 FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
 LEGACY_PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
@@ -580,10 +582,82 @@ def validate_command_templates(
 def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
     _reject_non_finite(protocol)
     version = protocol.get("typed_model_cache_formal_protocol_version")
+    if version == FORMAL_EXECUTION_PROTOCOL_V2_7_VERSION:
+        if protocol.get("protocol_id") != FORMAL_EXECUTION_PROTOCOL_V2_7_ID:
+            raise FormalExecutionError("formal execution protocol v2.7 ID mismatch")
+        capabilities = require_live_execution_protocol(version)
+        supersession = protocol.get("supersession", {})
+        authorization = supersession.get("g14r16_authorization_boundary", {})
+        invalid = next(
+            (
+                row
+                for row in supersession.get("invalid_execution_runs", [])
+                if isinstance(row, Mapping)
+                and row.get("run_id")
+                == "typed_model_cache_formal_20260905_185105_g14c_v14"
+            ),
+            None,
+        )
+        if (
+            supersession.get("supersedes_version") != "2.6.0"
+            or supersession.get("old_protocol_status")
+            != "historical_audit_only_after_training_contract_name_error"
+            or authorization.get("status") != "EXECUTION_CONTRACT_REPAIR_ONLY"
+            or authorization.get("g14c_v15_created") is not False
+            or authorization.get("formal_training_count") != 0
+            or authorization.get("formal_checkpoint_count") != 0
+            or authorization.get("formal_performance_count") != 0
+            or authorization.get("holdout_opened") is not False
+        ):
+            raise FormalExecutionError("Protocol v2.7 authorization boundary is incomplete")
+        if not isinstance(invalid, Mapping) or any(
+            (
+                invalid.get("failure_boundary")
+                != "invalid_during_first_training_cell_before_episode_zero",
+                invalid.get("failure_audit_sha256")
+                != "d323c122230795585bbadb16f8650f5e395716b145935a4a41cf5fafe21e2608",
+                invalid.get("training_cells_executed") != 0,
+                invalid.get("episode_count") != 0,
+                invalid.get("environment_interaction_count") != 0,
+                invalid.get("update_count") != 0,
+                invalid.get("candidate_checkpoint_count") != 0,
+                invalid.get("dev_performance_count") != 0,
+                invalid.get("formal_performance_count") != 0,
+                invalid.get("resume_allowed") is not False,
+                invalid.get("retry_allowed") is not False,
+                invalid.get("salvage_allowed") is not False,
+                invalid.get("checkpoint_reuse_allowed") is not False,
+            )
+        ):
+            raise FormalExecutionError("G14C v14 permanent invalidation is incomplete")
+        if not all(
+            (
+                capabilities.nullable_metric_contract_required,
+                capabilities.generated_checkpoint_resource_required,
+                capabilities.cell_artifact_publication_required,
+                not capabilities.holdout_capability,
+            )
+        ):
+            raise FormalExecutionError("Protocol v2.7 execution capabilities are missing")
+        expected = canonical_sha256(
+            semantic_projection(
+                {key: value for key, value in protocol.items() if key != "hashes"}
+            )
+        )
+        if protocol.get("hashes", {}).get("semantic_sha256") != expected:
+            raise FormalExecutionError("formal protocol v2.7 semantic hash mismatch")
+        return {
+            "status": "pass",
+            "protocol_version": version,
+            "semantic_sha256": expected,
+            "split_semantic_sha256": SPLIT_SEMANTIC_SHA256,
+            "primary_endpoint_count": len(PRIMARY_ENDPOINTS),
+            "phase_count": len(PHASE_ORDER),
+        }
     if version == FORMAL_EXECUTION_PROTOCOL_V2_6_VERSION:
         if protocol.get("protocol_id") != FORMAL_EXECUTION_PROTOCOL_V2_6_ID:
             raise FormalExecutionError("formal execution protocol v2.6 ID mismatch")
-        capabilities = require_live_execution_protocol(version)
+        capabilities = get_protocol_capabilities(version)
         supersession = protocol.get("supersession", {})
         authorization = supersession.get("g14r15_authorization_boundary", {})
         if (
@@ -2264,6 +2338,8 @@ __all__ = [
     "FORMAL_EXECUTION_PROTOCOL_V2_3_VERSION",
     "FORMAL_EXECUTION_PROTOCOL_V2_6_ID",
     "FORMAL_EXECUTION_PROTOCOL_V2_6_VERSION",
+    "FORMAL_EXECUTION_PROTOCOL_V2_7_ID",
+    "FORMAL_EXECUTION_PROTOCOL_V2_7_VERSION",
     "FORMAL_PHASE_LEDGER_SCHEMA_VERSION",
     "FORMAL_PHASE_RUNNER_VERSION",
     "FAILURE_CLASSIFICATIONS",

@@ -1,0 +1,17 @@
+{
+  "historical_invalid_run_recovery_allowed": false,
+  "publication": {
+    "create_only_or_exact_identity_match": true,
+    "rebuild_from_legal_freeze_only": true,
+    "source": "one immutable checkpoint_freeze completed terminal",
+    "whole_growing_phase_ledger_hash_is_identity": false
+  },
+  "recovery": {
+    "cross_run_or_missing_freeze": "reject",
+    "freeze_completed_registry_missing": "build_and_create_once",
+    "registry_already_published": "validate_exact_and_idempotently_succeed",
+    "same_name_different_content": "reject"
+  },
+  "semantic_sha256": "7580fcf886e19f8f0aa4999714e948b557653db86adf228c3217529f00592936",
+  "version": "1.1.0"
+}

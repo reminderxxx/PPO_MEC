@@ -1,0 +1,33 @@
+{
+  "formal": false,
+  "formal_profile_override_allowed": false,
+  "future_formal_checkpoint_reuse_allowed": false,
+  "holdout_capability": false,
+  "matrix": {
+    "ablation_settings": 2,
+    "cache_policy_cells": 3,
+    "capacities": 3,
+    "controller_cells": 3,
+    "learned_agents": 10,
+    "oracle_scalability_settings": 3,
+    "phases": 13,
+    "support_settings": 11,
+    "train_cells": 30
+  },
+  "performance_evidence": false,
+  "profile_id": "g14r15_cell_transaction_nonformal_v1",
+  "semantic_sha256": "117819d34c8a9464c455311ccf8f4ea01ff3a0d86906c807e99cfd43280c5edf",
+  "training": {
+    "checkpoint_cadence": 4,
+    "episodes": 4,
+    "max_mobility_rows": 1500,
+    "max_steps": 1,
+    "max_workflows": 1,
+    "seeds": [
+      7
+    ],
+    "updates": 4
+  },
+  "uses_formal_cell_executor": true,
+  "version": "1.0.0"
+}

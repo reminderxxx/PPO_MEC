@@ -34,12 +34,12 @@ from src.runtime.formal_protocol_capabilities import (
 
 ACTIVE_FORMAL_BUNDLE_CONTRACT_VERSION = "1.1.0"
 ACTIVE_BUNDLE_RESOURCE_RESOLUTION_CONTRACT_VERSION = "1.0.0"
-ACTIVE_PROTOCOL_VERSION = "2.6.0"
-ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v2_6"
-READY_STATUS = "READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL"
-READINESS_VERSION = "18.0.0"
+ACTIVE_PROTOCOL_VERSION = "2.7.0"
+ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v2_7"
+READY_STATUS = "READY_FOR_G14C_V15_CLEAN_TRAIN_AND_FORMAL"
+READINESS_VERSION = "19.0.0"
 DEFAULT_ACTIVE_INDEX_RELATIVE = (
-    "configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905/"
+    "configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905/"
     "protocol_index.json"
 )
 CAPACITY_ORDER = (
@@ -492,7 +492,7 @@ def validate_active_formal_bundle(
         readiness_row = resources["readiness_companion"]
         readiness = _strict_object(
             _resolve_registered_path(root, readiness_row["logical_path"], "readiness"),
-            "Readiness v17 companion",
+            "Readiness v19 companion",
         )
         if readiness.get("readiness_review_version") != READINESS_VERSION:
             raise ActiveFormalBundleError("Readiness companion version mismatch")
@@ -535,6 +535,47 @@ def validate_active_formal_bundle(
         ):
             raise ActiveFormalBundleError(
                 "real downstream consumer rehearsal is missing or incomplete"
+            )
+        entrypoint_path = _resolve_registered_path(
+            root,
+            evidence.get("formal_training_entrypoint_acceptance_path"),
+            "formal training entrypoint acceptance",
+        )
+        if sha256_file(entrypoint_path) != evidence.get(
+            "formal_training_entrypoint_acceptance_sha256"
+        ):
+            raise ActiveFormalBundleError(
+                "formal training entrypoint acceptance drift"
+            )
+        entrypoint = _strict_object(
+            entrypoint_path, "formal training entrypoint acceptance"
+        )
+        nullable_hash = protocol[
+            "formal_nullable_metric_aggregation_contract"
+        ]["semantic_sha256"]
+        if not all(
+            (
+                evidence.get("formal_training_entrypoint_acceptance_status") == "pass",
+                entrypoint.get("status") == "pass",
+                entrypoint.get("clean_detached_candidate") is True,
+                entrypoint.get("formal") is False,
+                entrypoint.get("training") is False,
+                entrypoint.get("performance_evidence") is False,
+                entrypoint.get("training_command_count") == 150,
+                entrypoint.get("passed_command_count") == 150,
+                entrypoint.get("episode_count") == 0,
+                entrypoint.get("environment_interaction_count") == 0,
+                entrypoint.get("update_count") == 0,
+                entrypoint.get("checkpoint_file_count") == 0,
+                entrypoint.get("performance_result_count") == 0,
+                entrypoint.get("nullable_metric_contract_required") is True,
+                entrypoint.get("nullable_metric_contract_semantic_sha256")
+                == nullable_hash,
+                entrypoint.get("active_bundle_core_sha256") == expected_core,
+            )
+        ):
+            raise ActiveFormalBundleError(
+                "formal training entrypoint acceptance is missing or incomplete"
             )
 
     if require_ready:

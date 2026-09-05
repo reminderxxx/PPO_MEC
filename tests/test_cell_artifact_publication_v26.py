@@ -26,6 +26,7 @@ from src.runtime.formal_protocol_capabilities import (
 
 ROOT = Path(__file__).resolve().parents[1]
 V26 = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905/protocol_v2_6_manifest.json"
+V27 = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905/protocol_v2_7_manifest.json"
 
 
 def identity(run_id: str = "run") -> CellExecutionIdentity:
@@ -79,12 +80,14 @@ def prepare_support_payload(
     return begun, child, descriptor
 
 
-def test_protocol_v26_is_unique_active_and_v25_is_historical() -> None:
-    protocol = json.loads(V26.read_text(encoding="utf-8-sig"))
-    assert ACTIVE_EXECUTION_PROTOCOL_VERSION == "2.6.0"
-    assert protocol["typed_model_cache_formal_protocol_version"] == "2.6.0"
+def test_protocol_v27_is_unique_active_and_v26_is_historical() -> None:
+    protocol = json.loads(V27.read_text(encoding="utf-8-sig"))
+    assert ACTIVE_EXECUTION_PROTOCOL_VERSION == "2.7.0"
+    assert protocol["typed_model_cache_formal_protocol_version"] == "2.7.0"
+    assert get_protocol_capabilities("2.7.0").cell_artifact_publication_required
+    assert get_protocol_capabilities("2.7.0").live_execution_allowed
     assert get_protocol_capabilities("2.6.0").cell_artifact_publication_required
-    assert get_protocol_capabilities("2.6.0").live_execution_allowed
+    assert not get_protocol_capabilities("2.6.0").live_execution_allowed
     assert not get_protocol_capabilities("2.5.0").live_execution_allowed
 
 

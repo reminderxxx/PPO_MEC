@@ -11,7 +11,7 @@ from typing import Final
 
 
 FORMAL_PROTOCOL_CAPABILITY_ROUTING_CONTRACT_VERSION: Final = "1.0.0"
-ACTIVE_EXECUTION_PROTOCOL_VERSION: Final = "2.6.0"
+ACTIVE_EXECUTION_PROTOCOL_VERSION: Final = "2.7.0"
 
 
 class FormalProtocolCapabilityError(ValueError):
@@ -130,7 +130,13 @@ _REGISTRY: Final[dict[str, FormalProtocolCapabilities]] = {
         generated_checkpoints=True,
     ),
     "2.6.0": _capabilities(
-        "2.6.0", status="active_execution", context=True, environment=True,
+        "2.6.0", context=True, environment=True,
+        binding=True, order=True, bundle=True, bundle_resources=True,
+        exogenous=True, projection=True, lifecycle=True, nullable=True,
+        generated_checkpoints=True, cell_publication=True,
+    ),
+    "2.7.0": _capabilities(
+        "2.7.0", status="active_execution", context=True, environment=True,
         binding=True, order=True, bundle=True, bundle_resources=True,
         exogenous=True, projection=True, lifecycle=True, nullable=True,
         generated_checkpoints=True, cell_publication=True,
