@@ -6,11 +6,13 @@
 
 ## 项目状态
 
-- 当前唯一 live typed model-cache contract 为 Protocol 2.5.0 + Generated Checkpoint Resource Identity Contract
-  1.0.0；active index 为 `configs/experiment/typed_model_cache_formal_protocol_v2_5_20260905/protocol_index.json`，
-  Protocol 2.4 已降为 historical/audit-only。static/generated 双层 registry 禁止预声明未来 checkpoint，所有
-  downstream consumer 在 checkpoint read 前验证 current-run manifest/provenance。Readiness v17 只授权未来
-  独立 G14C v14；G14R14 formal training/checkpoint/performance=0，holdout sealed/unopened/unconsumed。
+- 当前唯一 live typed model-cache contract 为 Protocol 2.6.0 + Cell Artifact Publication Contract 1.0.0 +
+  Generated Checkpoint Resource Identity Contract 1.1.0；active index 为
+  `configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905/protocol_index.json`。Protocol 2.5 及更早
+  版本均为 historical/audit-only，未知版本 fail-closed。正式入口与 rehearsal 共用 cell transaction executor，
+  committed payload 是 selection/statistics/gate 唯一可消费内容；registry 恢复绑定不可变 freeze terminal，合法
+  gate 才能完成。Readiness v18 只授权未来独立 G14C v14；G14R15 formal training/checkpoint/performance=0，
+  holdout sealed/unopened/unconsumed。
 
 - 当前唯一 live typed model-cache execution contract 是 Protocol 2.4.0 + Formal Protocol Capability Routing
   Contract 1.0.0；active index 位于

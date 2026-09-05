@@ -1,6 +1,15 @@
 # PPO_MEC
 
-G14R14 已冻结 Formal Protocol `2.5.0`、Generated Checkpoint Resource Identity Contract `1.0.0` 与
+G14R15 已冻结唯一 live Formal Protocol `2.6.0`、Cell Artifact Publication Contract `1.0.0`、Cell Ledger
+`2.0.0`、Generated Checkpoint Resource Identity Contract `1.1.0` 与 Readiness v18=
+`READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL`。formal runner 与 non-formal rehearsal 共用真实 cell transaction
+executor；benchmark/oracle support 以结构化 child-output descriptor 解析并在完整验证后原子发布，registry
+恢复绑定不可变 checkpoint-freeze terminal，gate `passed=false` 与缺少合法 gate 均阻止完成。clean detached
+非正式链已完成 13/13 phases、52 unique committed cells；formal training/checkpoint/performance 均为 0，holdout
+sealed/unopened/unconsumed，未创建或消费 G14C v14。详见
+`docs/project/formal_cell_artifact_publication_contract.md`。
+
+G14R14（historical/audit-only）冻结了 Formal Protocol `2.5.0`、Generated Checkpoint Resource Identity Contract `1.0.0` 与
 Readiness v17=`READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL`。static registry 只登记 pre-run immutable inputs；
 当前 run 的 checkpoint manifest/provenance 由 committed `checkpoint_freeze` 原子发布到独立、create-only 的
 generated registry。cache outer/child、controller、ablation、support、scalability、statistics/integrity/gate

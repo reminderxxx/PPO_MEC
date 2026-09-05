@@ -1,5 +1,13 @@
 ﻿# Bugs And Risks
 
+## 2026-09-05: formal cell publication/recovery/completion gaps（RESOLVED）
+
+- G14R15 已关闭 formal support producer/outer consumer 路径分叉、freeze 后 registry 发布恢复，以及 gate=false
+  仍可能被 phase 标记成功的执行合同缺口。Protocol 2.6 是唯一 live 版本；Protocol 2.5 保留为历史审计，不能
+  resume/finalize 为新正式结果。
+- Readiness v18 只证明非正式执行合同闭环，不是 formal performance、算法优势、TMC-ready 或 paper-ready
+  证据；完整 G14C v14 训练矩阵、formal performance 和 sealed holdout 仍未执行。
+
 ## 2026-09-05: generated checkpoint downstream identity gap（RESOLVED）
 
 - 根因：pre-run static registry 无法合法包含未来 checkpoint；cache wrapper 未消费/透传同一资源参数；support

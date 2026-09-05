@@ -1,0 +1,38 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_cell_publication_repair_20260905_g14r15_v1",
+  "evidence_level": "E2_ARTIFACT_AUDITED_NONFORMAL_EXECUTION_CONTRACT",
+  "execution_changes": [
+    "cell publication",
+    "registry recovery",
+    "gate completion"
+  ],
+  "formal": false,
+  "from_semantic_sha256": "001465ad91d95383e5bde7863fe1a967a4a86cd57a477b993deb0945a1a22e7a",
+  "from_version": "2.5.0",
+  "git_commit": "5c1d2ee79bbfe1a15cd6b872b58be5a0c34d9b73",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-06-21",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05T16:48:00+08:00",
+  "scientific_fields_unchanged": {
+    "ablation_and_support": true,
+    "agent_matrix": true,
+    "catalog_fingerprint": true,
+    "claim_evidence_map": true,
+    "comparisons": true,
+    "endpoints": true,
+    "formal_command_templates": true,
+    "holdout_contract": true,
+    "seed_plan": true,
+    "split_semantic_sha256": true,
+    "statistics": true,
+    "training_budget": true,
+    "typed_catalog_and_capacity": true,
+    "workload": true
+  },
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "to_semantic_sha256": "97dfbfd975b504b6015e84ddb781754a819d394eea7a127bf51681c1dd790cb3",
+  "to_version": "2.6.0"
+}

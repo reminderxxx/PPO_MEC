@@ -1,0 +1,500 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_cell_publication_repair_20260905_g14r15_v1",
+  "cell_ledger": {
+    "committed_cell_count": 52,
+    "last_ledger_hash": "d17d4a37e78c544a6082b0271716db9b5b5a2ad59fd72ae4ff0688c127644779",
+    "record_count": 104,
+    "status": "pass"
+  },
+  "evidence_level": "E2_ARTIFACT_AUDITED_NONFORMAL_EXECUTION_CONTRACT",
+  "expected_committed_cells": 52,
+  "file_count_fallback_used": false,
+  "formal": false,
+  "git_commit": "5c1d2ee79bbfe1a15cd6b872b58be5a0c34d9b73",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-06-21",
+  "observed_committed_cells": 52,
+  "performance_evidence": false,
+  "phase_ledger": {
+    "completion_candidate_count": 13,
+    "last_record_hash": "de6ba05ba05ab32b0734514f4f2d2d8fd9e804383ffc7e172f89ebb8e3b2520d",
+    "record_count": 39,
+    "resolved_execution_context_sha256": "09af131456098e8f1597e969c367938956c5ce342c18e136637f8ba5dab3114d",
+    "status": "pass",
+    "terminal_phase_count": 13
+  },
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05T16:48:00+08:00",
+  "rows": [
+    {
+      "cell_id": "train-198af051e561da8623ede2fe",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/sa_ghmappo/rehearsal_constrained_288mb_sa_ghmappo_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "fa2d115d9fe9e57db4deedce26cb44aed35aba79969fddb490858442732bfbf7",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-009538aac279b58efb634b13",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/ppo/rehearsal_constrained_288mb_ppo_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "8574c90b5b923ded981e76e4a9c07ffc8b9787de5ec5954d35cb392cb396c6fd",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-358d7e77ca0ecbaafc690709",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/mappo/rehearsal_constrained_288mb_mappo_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "b96237a99220f1ed8f13ab0d9e059038c040c1d9e0dc9802a62b6003a9713b3d",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-09f5ba996519b14bb53e069d",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/dqn/rehearsal_constrained_288mb_dqn_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "91dffb7e3faaca39581c07bf129b9669fb1f016318877be10c7d32f51e305216",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-bfe2eddc7682422e8fad4c79",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/dueling_dqn/rehearsal_constrained_288mb_dueling_dqn_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "f830c58962dc277ae970e52bf55455445c3f873679252540b9e5cee3026de1bc",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-447706a00e92e318393c6302",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/qmix/rehearsal_constrained_288mb_qmix_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "a97bc55517e2bc3e585b8859db436e0b21b5dc23451a4e4787d8238f9f3396e9",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-7a0891ac9a9bc9846481578d",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/controller_mat/rehearsal_constrained_288mb_controller_mat_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "fd7454cc91bed41daadf30472c862b954483c2c12b38dd12ff553f742bb704c1",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-391faca2d6078ec40d752d63",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/dag_offload_drl/rehearsal_constrained_288mb_dag_offload_drl_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "5e1242a1d7d5b4fee82ae963e7a9e472ff04ee119731fb0072cd38f4c3cd8572",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-fe2fc09ffec040ef21e80bd9",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/cache_offload_drl/rehearsal_constrained_288mb_cache_offload_drl_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "2bd549b9fb35ae8e2874fdc5b33cf843d0f59034b30e4c401eef9628d35733bd",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-f12c22170953e755fffa5748",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/dt_handoff_drl/rehearsal_constrained_288mb_dt_handoff_drl_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "5613cff6f404490808a51f5d89cf674d9fb1e0eee3bf1c8fd67b5be8b69eac5c",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-f207bef2710d93086db5ecbd",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/sa_ghmappo/rehearsal_medium_576mb_sa_ghmappo_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "329d7043f73bbc66731ea902ae38d52d857af28b3a07332abf21af5b03069cb7",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-31d5e37424e47d82f19dd858",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/ppo/rehearsal_medium_576mb_ppo_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "9c0a5076489b21778ff3acd32f92515c57176d355edff4eab1b3d96818cd343f",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-f1112059461e9f02af2508e9",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/mappo/rehearsal_medium_576mb_mappo_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "7b44f475f5dd6a60aa78956dce92015989102d97a7763d9a67e0c4b9f6fe6500",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-b4bd2e45331b4b6e65aee359",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/dqn/rehearsal_medium_576mb_dqn_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "676957730786725535c51b53b086cc85642713679772a6046cf7030ef9d5aed2",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-96283dabca389a97cf14aec0",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/dueling_dqn/rehearsal_medium_576mb_dueling_dqn_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "0bf80c39fececb23fe44b8d7d6bbd5e8e9499edbcfe310035608b2b15c2729e5",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-8d585af83fce827363300715",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/qmix/rehearsal_medium_576mb_qmix_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "68698d219e8f0f50481faee71b7e6686e3d31ed3e0c1ea05bc7099536b6718f3",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-a5885c51c52b7c2ee8d9a065",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/controller_mat/rehearsal_medium_576mb_controller_mat_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "8f0029655dab971db5f2ab24fc169807daf0f688d322ae86fe3f73eff75b14f8",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-ce94a3d10224d672fcba7237",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/dag_offload_drl/rehearsal_medium_576mb_dag_offload_drl_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "dd51289bb13ec333e82288ff95f6304c001201f2c9c8f13b3a18645ad4a08a2a",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-e624c634229ee0a1959ad845",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/cache_offload_drl/rehearsal_medium_576mb_cache_offload_drl_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "efb73126953e393cbe963ee68496f234ce17ee9e5dc20e44eb3e27b33a7f7055",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-d2fdaa59a64da62612b4e10d",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/dt_handoff_drl/rehearsal_medium_576mb_dt_handoff_drl_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "94fc4012bcbf0d3e75e89ff931c82555cceb16965cf974cc4ba8943f73123885",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-2f48dc48b77652bf2c7cc199",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/sa_ghmappo/rehearsal_relaxed_864mb_sa_ghmappo_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "e59444d4100879b4fa5975a53135f09f979f102e8a6574d368020df0f4f43045",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-45ca5d1ed8954d8e1f3d4341",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/ppo/rehearsal_relaxed_864mb_ppo_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "bc6a381090075a838613f1c996a65538860bc6f3f733f86a9cf7bef60831c8ef",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-9607575457da168d9b2cbce6",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/mappo/rehearsal_relaxed_864mb_mappo_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "9622b5597de4ebc7399cf220a01d2b1d585ab52cd84c332b06d176476538ca54",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-28b5fe9f499df39e716c1f57",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/dqn/rehearsal_relaxed_864mb_dqn_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "78bf932a32d88bd42241a41a28964d76e0c8fa77fbf50e8703f52344ebc0e55b",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-ea55639e10c0d3145714a5de",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/dueling_dqn/rehearsal_relaxed_864mb_dueling_dqn_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "cf500696a6d10910b11bd45c0db1bc74a9d13f1a247ca2d4799dcdf1693adedc",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-be1dfe5a2602477100eb154b",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/qmix/rehearsal_relaxed_864mb_qmix_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "cad8dc654da165cbbaceec3f07f9c80ffb4ac774d7b6a3e6e0296f1cecc72759",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-e637680ef90c51686206aede",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/controller_mat/rehearsal_relaxed_864mb_controller_mat_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "e485adcdc34d35f9a73081db03dd28da2300adc1f269e5245f286b3ee6ba4721",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-18422076068c403fa16d5485",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/dag_offload_drl/rehearsal_relaxed_864mb_dag_offload_drl_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "fb03d911f965cb85c78e59901e004c3c0e30187fc3e6d7af62a9ab843a56c896",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-19879eb75196490395d9cab9",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/cache_offload_drl/rehearsal_relaxed_864mb_cache_offload_drl_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "b50b2ec3cb0d18a50b63365ec97547d90f4ac57f5be7e80eaac5e04d5c86383a",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "train-0f1c2e0bb2d7e2e8be55483c",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/training/dt_handoff_drl/rehearsal_relaxed_864mb_dt_handoff_drl_seed7",
+      "consumer_eligible": true,
+      "inventory_sha256": "f674098ce032e63d667cca2336267480b29a0fdd89ec53766bec34f59b401d6d",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "train"
+    },
+    {
+      "cell_id": "formal_cache_policy-6ca1231a609922791a82495b",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_cache_policy/constrained_288mb",
+      "consumer_eligible": true,
+      "inventory_sha256": "7ea5350b3a911108c55b8cb7bfd93f7174bae459d5d833905781b18d5cf2bf39",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_cache_policy"
+    },
+    {
+      "cell_id": "formal_cache_policy-8b87a3a493b265ffee89b186",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_cache_policy/medium_576mb",
+      "consumer_eligible": true,
+      "inventory_sha256": "0ffef40c699f3d626b826de3be34788fad5ff5af2ac925b406c94e2a4631fdb8",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_cache_policy"
+    },
+    {
+      "cell_id": "formal_cache_policy-dda2ff9391af5efd26fab07b",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_cache_policy/relaxed_864mb",
+      "consumer_eligible": true,
+      "inventory_sha256": "c18ca52456aa102b1637a485b3568708fd9e05b4a667c84586967726becc14ac",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_cache_policy"
+    },
+    {
+      "cell_id": "formal_controller-a06794498159a89f4f3177eb",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_controller/constrained_288mb",
+      "consumer_eligible": true,
+      "inventory_sha256": "cbe4bea31ff79f6cf05741674b2ce3c5a16688c515c2a0449746a9e467b13ebc",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_controller"
+    },
+    {
+      "cell_id": "formal_controller-3f1ac8ae8f51b0ebd5c16d98",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_controller/medium_576mb",
+      "consumer_eligible": true,
+      "inventory_sha256": "3ec0100ac0d998677b1808cd95dcc6c5efb78f83d0d7e98a4c28130d2f1318bd",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_controller"
+    },
+    {
+      "cell_id": "formal_controller-65d3ee84fa3fb193d89ac1d2",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_controller/relaxed_864mb",
+      "consumer_eligible": true,
+      "inventory_sha256": "0849550aecfb3ed1483663b0a4a94a4b3426f297dcabd1c6c8d48fae4dd29c69",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_controller"
+    },
+    {
+      "cell_id": "formal_ablation-d285062fc05de7898770fdc1",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_ablation/ablation-f09814754dc92882",
+      "consumer_eligible": true,
+      "inventory_sha256": "1e1234c3cf1de1dd52b7a73b3b3bf86335be5327a066ed6e80d3520c12f1a9eb",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_ablation"
+    },
+    {
+      "cell_id": "formal_ablation-deec0af44bd2a82b6416a5f1",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_ablation/ablation-8aa367acf3bdf7a9",
+      "consumer_eligible": true,
+      "inventory_sha256": "a6453f37fc48cd748de68d7088b709954ecf62037c5e579a49f3f87520d29002",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_ablation"
+    },
+    {
+      "cell_id": "formal_support-f6d78d0c2c63d6bf5ea6dfce",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_support/capacity-cbd9b8a225730814",
+      "consumer_eligible": true,
+      "inventory_sha256": "dedfac912d2fa58a870eb13769783afe71018e2a0f4ad6e726392e0d6be97a17",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_support"
+    },
+    {
+      "cell_id": "formal_support-47f174443e022483e242276f",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_support/capacity-00977fcec03ac209",
+      "consumer_eligible": true,
+      "inventory_sha256": "839aaf9cd84557e2f8febea244d4d00c0bf814c596883e48284e8b5746666ade",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_support"
+    },
+    {
+      "cell_id": "formal_support-6f3d73ed4cdce4d533cd8226",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_support/capacity-c2f32db65e656f8f",
+      "consumer_eligible": true,
+      "inventory_sha256": "d46765ce9d24fcd90b07c0b7dea2c8e1af750c55d34a19aab35f3f50fadb6fca",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_support"
+    },
+    {
+      "cell_id": "formal_support-471a7ada34b388d9a799d4a7",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_support/sensitivity-27d16b068076937b",
+      "consumer_eligible": true,
+      "inventory_sha256": "7e1f03a21ba2ed3e68141044a90733431fcd508a20fb71a0ca6e189bd03000ba",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_support"
+    },
+    {
+      "cell_id": "formal_support-97b9d942978b4f82f345d162",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_support/sensitivity-7c7c3a1659c6e221",
+      "consumer_eligible": true,
+      "inventory_sha256": "20b154770b381897d054d233afb61f828635a6fdd4c57cfa36a133bd5eed14d7",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_support"
+    },
+    {
+      "cell_id": "formal_support-a06cebc865950088b7889274",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_support/prediction_boundary-5faa585ad5330f05",
+      "consumer_eligible": true,
+      "inventory_sha256": "bc098f30359f7d3ca9f371f6b7a0ef912274dc8a933d7c82f55fa25cd2d288d4",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_support"
+    },
+    {
+      "cell_id": "formal_support-549e1db6159041d2c6ce2bd9",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_support/prediction_boundary-95fb72521455c776",
+      "consumer_eligible": true,
+      "inventory_sha256": "a40b03d6d5c10f3f4667047a05eac5dd28bf85f63b2d0c55e5b8fca7f480f791",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_support"
+    },
+    {
+      "cell_id": "formal_support-aa345e5042d09c027b332cb8",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_support/prediction_boundary-efa09ee2409d3d87",
+      "consumer_eligible": true,
+      "inventory_sha256": "761256f7aa8d6fc2af305455745a42a892e2f84296ef9c522fc6ed3704072d23",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_support"
+    },
+    {
+      "cell_id": "formal_support-d96b1891c37a87cb6c65750f",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_support/prediction_boundary-a3a5789695404fae",
+      "consumer_eligible": true,
+      "inventory_sha256": "7dd4feea1b164103d07a490c70d5e5d2fe6dcec6cfe673b8f1341c1de823d3a0",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_support"
+    },
+    {
+      "cell_id": "formal_support-a2bc25510d17379f125d4d02",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_support/prediction_boundary-ce96dbd5ea956212",
+      "consumer_eligible": true,
+      "inventory_sha256": "8ec9baf616b44398e50be3f2080deec0254da881b36db1ef683ef40ec3c89deb",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_support"
+    },
+    {
+      "cell_id": "formal_support-c46fa51b992e5c46d5059e7a",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_support/prediction_boundary-df3bc5ade8c57014",
+      "consumer_eligible": true,
+      "inventory_sha256": "ab2c3babd170a1b36966cce0b086498f3a22eee5f0cd03645004c1ff9111ee6c",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_support"
+    },
+    {
+      "cell_id": "formal_scalability-9f264144ed91e5aec01c7da7",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_scalability/scalability-b05d0a8a8684c1f0",
+      "consumer_eligible": true,
+      "inventory_sha256": "13ab04b85c7dbe76c574bb51b4bfcd0680e4b462e825fb9c5dcab7b1959b5a97",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_scalability"
+    },
+    {
+      "cell_id": "formal_scalability-25312db51624fc535eeb9f61",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_scalability/scalability-d04bf61f3d213610",
+      "consumer_eligible": true,
+      "inventory_sha256": "6613d1a7f5d4d3f2eb4fb97c657a6c859a94339bd1cf3922c7c20bbda10746c4",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_scalability"
+    },
+    {
+      "cell_id": "formal_scalability-8fc008671a59d6a96fb40e3f",
+      "committed_path": "/private/tmp/g14r15_real_cell_transaction_acceptance_v4/execution/formal_scalability/scalability-a6f0899cff90e905",
+      "consumer_eligible": true,
+      "inventory_sha256": "d662f31aab00281cdf88f3faf656de8c16f806a6d31ed0b46243b44284017045",
+      "ledger_match": true,
+      "marker_match": true,
+      "phase": "formal_scalability"
+    }
+  ],
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
+}

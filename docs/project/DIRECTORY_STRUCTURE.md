@@ -1,6 +1,14 @@
 ﻿# Directory Structure
 
-G14R14：active Protocol 2.5、Generated Checkpoint Resource Contract 1.0.0、ready index 与 Readiness v17 位于
+G14R15：active Protocol 2.6、Cell Artifact Publication Contract 1.0.0、Generated Checkpoint Resource Contract
+1.1.0、ready index 与 Readiness v18 位于
+`configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905/`；共享 cell transaction 在
+`src/evaluators/formal_cell_transaction.py`，协议/证据构建入口在
+`scripts/repair_formal_cell_artifact_publication.py` 与
+`scripts/build_formal_cell_artifact_publication_artifacts.py`，非正式验收证据位于
+`artifacts/analysis/typed_model_cache_formal_cell_publication_repair_20260905_g14r15_v1/`。
+
+G14R14（historical/audit-only）：Protocol 2.5、Generated Checkpoint Resource Contract 1.0.0、ready index 与 Readiness v17 位于
 `configs/experiment/typed_model_cache_formal_protocol_v2_5_20260905/`；共享 generated registry builder/resolver
 位于 `src/runtime/generated_checkpoint_resources.py`；Protocol generator、真实 consumer rehearsal、artifact
 builder 分别为 `scripts/repair_formal_generated_checkpoint_resources.py`、

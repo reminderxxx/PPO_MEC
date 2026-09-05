@@ -14,6 +14,7 @@ from src.runtime.generated_checkpoint_resources import (
     audit_forwarded_resource_arguments,
     build_generated_checkpoint_registry,
     canonical_sha256,
+    publish_or_validate_generated_checkpoint_registry,
     resolve_generated_checkpoint_resource,
     validate_generated_checkpoint_registry,
 )
@@ -130,6 +131,50 @@ def test_generated_registry_positive_and_create_only(tmp_path: Path) -> None:
     assert validate(run, protocol, static, context, binding, registry)["resource_count"] == 6
     with pytest.raises(FileExistsError, match="create-only"):
         atomic_create_registry(run / "generated_checkpoint_resource_registry.json", registry)
+
+
+def test_registry_publication_recovers_missing_and_is_idempotent(tmp_path: Path) -> None:
+    run, protocol, static, context, binding, registry = fixture(tmp_path)
+    path = run / "generated_checkpoint_resource_registry.json"
+    path.unlink()
+    validation = {
+        "run_root": run,
+        "expected_run_id": run.name,
+        "static_registry_semantic_sha256": static["hashes"]["semantic_sha256"],
+        "protocol_semantic_sha256": protocol["hashes"]["semantic_sha256"],
+        "protocol_full_sha256": protocol["hashes"]["full_sha256"],
+        "active_formal_bundle_sha256": context["scientific_identity"]["active_formal_bundle_sha256"],
+        "execution_commit": context["scientific_identity"]["execution_commit"],
+        "resolved_execution_context_sha256": context["context_sha256"],
+        "formal_training_execution_binding_sha256": binding["binding_full_sha256"],
+    }
+    assert publish_or_validate_generated_checkpoint_registry(
+        path, registry, **validation
+    )["status"] == "published_create_only"
+    assert publish_or_validate_generated_checkpoint_registry(
+        path, registry, **validation
+    )["status"] == "already_published_identity_match"
+    mismatched = deepcopy(registry)
+    mismatched["registry_id"] = "same-path-different-content"
+    rehash(mismatched)
+    with pytest.raises(GeneratedCheckpointResourceError, match="differs"):
+        publish_or_validate_generated_checkpoint_registry(path, mismatched, **validation)
+
+
+def test_registry_freeze_identity_is_stable_when_phase_ledger_grows(tmp_path: Path) -> None:
+    run, protocol, static, context, binding, registry = fixture(tmp_path)
+    before = registry["source_phase_committed_ledger_identity"]
+    with (run / "phase_state.jsonl").open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps({"phase": "formal_cache_policy", "status": "completed"}) + "\n")
+    rebuilt = build_generated_checkpoint_registry(
+        run_root=run,
+        protocol=protocol,
+        static_registry=static,
+        resolved_execution_context=context,
+        execution_binding=binding,
+    )
+    assert rebuilt["source_phase_committed_ledger_identity"] == before
+    assert rebuilt["registry_canonical_sha256"] == registry["registry_canonical_sha256"]
 
 
 @pytest.mark.parametrize(

@@ -1,0 +1,33 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_cell_publication_repair_20260905_g14r15_v1",
+  "checks": {
+    "cell_ledger_52_unique_committed": "pass",
+    "formal_holdout_not_executed": "pass",
+    "gate_and_completion_semantics": "pass",
+    "generated_registry_six_resources_and_recovery": "pass",
+    "phase_ledger_13_of_13": "pass",
+    "protected_files_unchanged": "pass",
+    "root_cause_reproduced": "pass",
+    "scientific_fields_unchanged": "pass",
+    "shared_real_cell_executor": "pass",
+    "support_11_and_scalability_3": "pass"
+  },
+  "evidence_level": "E2_ARTIFACT_AUDITED_NONFORMAL_EXECUTION_CONTRACT",
+  "formal": false,
+  "git_commit": "5c1d2ee79bbfe1a15cd6b872b58be5a0c34d9b73",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-06-21",
+  "not_claimed": [
+    "formal completion",
+    "algorithm benefit",
+    "paper readiness",
+    "holdout evidence"
+  ],
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05T16:48:00+08:00",
+  "scope": "execution readiness only",
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "verdict": "READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL"
+}

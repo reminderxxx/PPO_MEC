@@ -1,0 +1,32 @@
+{
+  "active_bundle_core_sha256": "50d25ca464405f6035007759c2c7527b5a427b4e10930f152d46a4857f7b5be0",
+  "artifact_run_id": "typed_model_cache_formal_cell_publication_repair_20260905_g14r15_v1",
+  "candidate_commit": "5c1d2ee79bbfe1a15cd6b872b58be5a0c34d9b73",
+  "candidate_to_final_expected_difference": "evidence, readiness, and documentation only",
+  "checks": {
+    "cell_ledger_52_unique_committed": "pass",
+    "formal_holdout_not_executed": "pass",
+    "gate_and_completion_semantics": "pass",
+    "generated_registry_six_resources_and_recovery": "pass",
+    "phase_ledger_13_of_13": "pass",
+    "protected_files_unchanged": "pass",
+    "root_cause_reproduced": "pass",
+    "scientific_fields_unchanged": "pass",
+    "shared_real_cell_executor": "pass",
+    "support_11_and_scalability_3": "pass"
+  },
+  "evidence_level": "E2_ARTIFACT_AUDITED_NONFORMAL_EXECUTION_CONTRACT",
+  "formal": false,
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "git_commit": "5c1d2ee79bbfe1a15cd6b872b58be5a0c34d9b73",
+  "holdout_capability": false,
+  "holdout_sealed_unopened_unconsumed": true,
+  "literature_cutoff": "2026-06-21",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05T16:48:00+08:00",
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
+}

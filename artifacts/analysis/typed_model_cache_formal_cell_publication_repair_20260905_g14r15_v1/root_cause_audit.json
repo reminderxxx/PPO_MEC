@@ -1,0 +1,22 @@
+{
+  "actual_path": "/private/tmp/g14r15_root_cause_repro/staging/main_results_mixed_informative_20260905_164326_227472/support_provenance.json",
+  "artifact_run_id": "typed_model_cache_formal_cell_publication_repair_20260905_g14r15_v1",
+  "authorization": "PRE-EXECUTION AUTHORIZATION WITHHELD / CELL_ARTIFACT_PUBLICATION_CONTRACT_MISMATCH",
+  "child_return_code": 0,
+  "consumer": "scripts/run_typed_model_cache_formal_protocol.py formal_ablation/formal_support cell executor",
+  "error": "transactional formal_support artifact lacks support_provenance.json",
+  "evidence_level": "E2_ARTIFACT_AUDITED_NONFORMAL_EXECUTION_CONTRACT",
+  "expected_path": "/private/tmp/g14r15_root_cause_repro/staging/capacity-cbd9b8a225730814/support_provenance.json",
+  "expected_path_exists": false,
+  "formal": false,
+  "g14r14_limitation": "independent phase executor bypassed formal cell staging/path/commit",
+  "git_commit": "5c1d2ee79bbfe1a15cd6b872b58be5a0c34d9b73",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-06-21",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "producer": "scripts/run_typed_model_cache_formal_support.py non-oracle benchmark branch",
+  "reviewed_at": "2026-09-05T16:48:00+08:00",
+  "status": "reproduced_and_fixed",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
+}

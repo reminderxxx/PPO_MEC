@@ -1,0 +1,45 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_cell_publication_repair_20260905_g14r15_v1",
+  "evidence_level": "E2_ARTIFACT_AUDITED_NONFORMAL_EXECUTION_CONTRACT",
+  "formal": false,
+  "git_commit": "5c1d2ee79bbfe1a15cd6b872b58be5a0c34d9b73",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-06-21",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05T16:48:00+08:00",
+  "rows": [
+    {
+      "phase": "train",
+      "producer": "training runner",
+      "publication": "atomic",
+      "resolution": "exact agent/run_id"
+    },
+    {
+      "phase": "formal_cache_policy",
+      "producer": "outer wrapper plus nested benchmark",
+      "publication": "atomic",
+      "resolution": "one immediate benchmark directory plus exact replay"
+    },
+    {
+      "phase": "formal_controller",
+      "producer": "benchmark",
+      "publication": "atomic",
+      "resolution": "one immediate child directory"
+    },
+    {
+      "phase": "formal_ablation/formal_support",
+      "producer": "benchmark support",
+      "publication": "atomic",
+      "resolution": "structured descriptor"
+    },
+    {
+      "phase": "formal_scalability",
+      "producer": "oracle support",
+      "publication": "atomic",
+      "resolution": "structured descriptor"
+    }
+  ],
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
+}

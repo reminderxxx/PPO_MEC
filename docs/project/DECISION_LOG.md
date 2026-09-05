@@ -1,5 +1,18 @@
 ﻿# Decision Log
 
+## 2026-09-05: G14R15 makes committed cell artifacts the only consumable truth
+
+- 决定：formal runner 与 non-formal rehearsal 共用同一 cell transaction executor；child 以绑定 run/cell/setting
+  的结构化 descriptor 声明唯一 artifact root，不使用 mtime、模糊 glob 或扩大 rglob 猜测归属。
+- 决定：payload 与 inventory 完整验证后才 atomic publish；committed marker 先落入已发布目录，再 append committed
+  terminal。publish 后 terminal append 中断可由 marker/inventory 恢复，staging/failed attempt 永不进入下游。
+- 决定：generated registry 身份绑定不可变 checkpoint-freeze terminal，而非继续增长的 whole-ledger hash；missing
+  registry 只可由合法 freeze create-only 构建，exact match 已存在 registry 幂等成功，任意身份/内容漂移拒绝。
+- 决定：完整性 gate 不使用 performance 高低，但 `passed=false` 必须非零退出；无合法 passed gate 不得
+  `complete_without_holdout`。合法 nullable metric 继续为 unavailable。
+- 决定：Protocol 2.6 是唯一 live version，2.5 及更早版本 historical/audit-only，未知版本 fail-closed。
+  Readiness v18 只授权未来独立 G14C v14；G14R15 不启动 formal training/performance/holdout/G14D/G15。
+
 ## 2026-09-05: G14R14 separates static and run-generated checkpoint identity
 
 - 决定：static registry 只拥有 run 前 immutable inputs；checkpoint manifest/provenance 只能在当前 run 的

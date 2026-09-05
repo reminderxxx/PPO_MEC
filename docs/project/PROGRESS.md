@@ -1,5 +1,25 @@
 ﻿# Progress
 
+## 2026-09-05: G14R15 formal cell publication/recovery/completion closure
+
+- 最小非正式案例复现 benchmark support 实际写入 `main_results_<mode>_<timestamp>/`，而旧 outer consumer
+  错误读取 `staging/<setting_id>/support_provenance.json`；child exit 0 后稳定触发
+  `transactional formal_support artifact lacks support_provenance.json`。
+- 正式入口与 rehearsal 现共用 `execute_cell_artifact_transaction`：显式 cell identity、attempt staging、
+  structured child-output descriptor、payload/inventory 验证、atomic publication、marker/ledger 顺序及恢复语义；
+  symlink、path escape、cross-cell/run、重复/冲突输出与 hash drift 均 fail-closed。
+- generated registry contract 1.1.0 绑定 immutable checkpoint-freeze terminal；missing registry 可从合法 committed
+  freeze create-only 重建，完全一致的已发布 registry 幂等成功，内容/身份漂移拒绝。Gate `passed=false` 返回非零，
+  `complete_without_holdout` 必须验证合法 gate。
+- clean detached non-formal actual-consumer rehearsal 完成 13/13 phase terminals、52 unique committed cells
+  （104 ledger records）、30 train/dev/freeze、6 generated resources、3 cache outer+nested、3 controller、2 ablation、
+  11 support、3 scalability、statistics/gate/completion；phase/cell hash chain、marker/inventory/provenance 均通过。
+- 冻结 Protocol 2.6：semantic/full SHA-256=`97dfbfd975b504b6015e84ddb781754a819d394eea7a127bf51681c1dd790cb3`/
+  `d01ccd4aaa669ebe57504350ec683885ea2b7d9f4cf67cbf250ad444cfa1e853`，bundle core/final=
+  `50d25ca464405f6035007759c2c7527b5a427b4e10930f152d46a4857f7b5be0`/
+  `98c0f5ebd38ce7a9f9eadebe8ff69095cc28ff1830ca9cf3e8ae8c66557702b0`。Readiness v18 仅为执行就绪；
+  formal training/checkpoint/performance=0，holdout sealed/unopened/unconsumed，未创建或消费 G14C v14。
+
 ## 2026-09-05: G14R14 generated checkpoint resource identity closure
 
 - 复现 static registry 缺少 run-generated checkpoint IDs、cache outer/child 校验旁路、288/864 support 回落

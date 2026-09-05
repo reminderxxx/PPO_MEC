@@ -1,0 +1,127 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_cell_publication_repair_20260905_g14r15_v1",
+  "evidence_level": "E2_ARTIFACT_AUDITED_NONFORMAL_EXECUTION_CONTRACT",
+  "formal": false,
+  "git_commit": "5c1d2ee79bbfe1a15cd6b872b58be5a0c34d9b73",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-06-21",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05T16:48:00+08:00",
+  "rows": [
+    {
+      "actual_status": "failed_terminal",
+      "case": "child_success_missing_support_provenance",
+      "command_rerun": false,
+      "downstream_consumption_allowed": false,
+      "duplicate_commit": false,
+      "trigger": "before payload validation"
+    },
+    {
+      "actual_status": "rejected",
+      "case": "wrong_setting_directory",
+      "command_rerun": false,
+      "downstream_consumption_allowed": false,
+      "duplicate_commit": false,
+      "trigger": "descriptor identity"
+    },
+    {
+      "actual_status": "rejected",
+      "case": "multiple_child_outputs",
+      "command_rerun": false,
+      "downstream_consumption_allowed": false,
+      "duplicate_commit": false,
+      "trigger": "descriptor output-root inventory"
+    },
+    {
+      "actual_status": "rejected",
+      "case": "required_payload_missing_or_hash_drift",
+      "command_rerun": false,
+      "downstream_consumption_allowed": false,
+      "duplicate_commit": false,
+      "trigger": "descriptor/commit inventory"
+    },
+    {
+      "actual_status": "rejected",
+      "case": "cross_cell_cross_run_symlink_path_escape",
+      "command_rerun": false,
+      "downstream_consumption_allowed": false,
+      "duplicate_commit": false,
+      "trigger": "identity/path resolver"
+    },
+    {
+      "actual_status": "incomplete_then_new_attempt",
+      "case": "generated_before_publish_interruption",
+      "command_rerun": true,
+      "downstream_consumption_allowed": false,
+      "duplicate_commit": false,
+      "trigger": "running attempt"
+    },
+    {
+      "actual_status": "recovered_committed",
+      "case": "published_before_terminal_interruption",
+      "command_rerun": false,
+      "downstream_consumption_allowed": true,
+      "duplicate_commit": false,
+      "trigger": "atomic rename complete"
+    },
+    {
+      "actual_status": "verified_and_skipped",
+      "case": "committed_cell_resume",
+      "command_rerun": false,
+      "downstream_consumption_allowed": true,
+      "duplicate_commit": false,
+      "trigger": "begin_cell"
+    },
+    {
+      "actual_status": "create_only_published",
+      "case": "freeze_completed_registry_missing",
+      "command_rerun": false,
+      "downstream_consumption_allowed": true,
+      "duplicate_commit": false,
+      "trigger": "registry publication"
+    },
+    {
+      "actual_status": "identity_match_idempotent",
+      "case": "registry_already_published",
+      "command_rerun": false,
+      "downstream_consumption_allowed": true,
+      "duplicate_commit": false,
+      "trigger": "registry publication"
+    },
+    {
+      "actual_status": "rejected",
+      "case": "registry_same_name_different_hash",
+      "command_rerun": false,
+      "downstream_consumption_allowed": false,
+      "duplicate_commit": false,
+      "trigger": "registry publication"
+    },
+    {
+      "actual_status": "exit_2_rejected",
+      "case": "gate_false_child_exit_zero",
+      "command_rerun": false,
+      "downstream_consumption_allowed": false,
+      "duplicate_commit": false,
+      "trigger": "management exit"
+    },
+    {
+      "actual_status": "rejected",
+      "case": "complete_without_legal_gate",
+      "command_rerun": false,
+      "downstream_consumption_allowed": false,
+      "duplicate_commit": false,
+      "trigger": "completion authorization"
+    },
+    {
+      "actual_status": "rejected",
+      "case": "old_invalid_or_non75_terminal_resume",
+      "command_rerun": false,
+      "downstream_consumption_allowed": false,
+      "duplicate_commit": false,
+      "trigger": "resume authorization"
+    }
+  ],
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
+}

@@ -1,6 +1,22 @@
 # Code Module Map
 
-## G14R14 generated checkpoint resource identity
+## G14R15 formal cell publication/recovery/completion
+
+- `src/evaluators/formal_cell_transaction.py`：正式与 rehearsal 共用的 cell identity、attempt staging、descriptor
+  resolution、payload/inventory validation、atomic publication、marker/ledger terminal 与 crash recovery。
+- `scripts/run_typed_model_cache_formal_protocol.py`：Protocol 2.6 phase orchestration；所有事务 cell 走共享 executor，
+  freeze 后 registry 恢复与 gate completion 均 fail-closed。
+- `scripts/run_typed_model_cache_formal_support.py`：benchmark/oracle support 生产结构化 child-output descriptor。
+- `src/runtime/generated_checkpoint_resources.py`：generated registry 1.1 create-only/idempotent publisher，身份绑定
+  immutable checkpoint-freeze terminal。
+- `scripts/manage_typed_model_cache_formal_artifacts.py`：从 cell ledger + committed marker/inventory 做 exact gate，
+  `passed=false` 返回非零。
+- `scripts/run_formal_generated_checkpoint_resource_rehearsal.py`：使用冻结 non-formal profile 调用同一事务 executor，
+  不维护旁路 staging/commit 实现。
+- `scripts/repair_formal_cell_artifact_publication.py`：生成 Protocol 2.6、capability/index/readiness；
+  `scripts/build_formal_cell_artifact_publication_artifacts.py` 构建机器可复算的 G14R15 非正式证据。
+
+## G14R14 generated checkpoint resource identity（historical）
 
 - `src/runtime/generated_checkpoint_resources.py`：current-run 6-resource registry、atomic create-only publication、
   checkpoint coverage、strict JSON/path/hash/capacity/current-run resolver 与 outer/child forwarding audit。

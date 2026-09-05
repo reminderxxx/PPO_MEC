@@ -4,6 +4,9 @@
 
 ## Live 文档
 
+- `formal_cell_artifact_publication_contract.md`：G14R15 统一 cell identity/staging/descriptor/payload validation/
+  atomic publication/marker-ledger recovery，并冻结 Protocol 2.6、registry recovery、gate completion 与 Readiness v18
+
 - `formal_generated_checkpoint_resource_identity_contract.md`：G14R14 static/generated 双层资源、create-only
   freeze publication、downstream consumer closure、capacity mapping、exact gate 与 Readiness v17
 

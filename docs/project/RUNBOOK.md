@@ -1,6 +1,32 @@
 # Runbook
 
-## Protocol 2.5 generated checkpoint registry 与未来 G14C v14
+## Protocol 2.6 cell publication 与未来 G14C v14
+
+唯一 live index：
+`configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905/protocol_index.json`。Protocol 2.5 及更早
+版本仅供 historical/audit，不得用于新 run。Readiness v18 只授权另立任务从最终 pushed clean commit 创建
+G14C v14；本条目不授权当前任务启动训练、formal performance 或 holdout。
+
+正式执行的每个事务 cell 都必须经共享 executor 完成 `dispatch → staging → structured output resolution →
+payload/inventory validation → atomic publication → committed marker → cell terminal`。只允许 committed destination
+进入 selection、statistics 和 gate；staging、failed attempt、mtime“最新目录”或递归模糊搜索均不可消费。
+benchmark support 与 oracle support 都必须返回绑定 run/cell/setting 的 descriptor。
+
+非正式事务闭环入口（产物不得进入未来正式 run 或论文表）：
+
+```bash
+<shared-absolute-python> scripts/run_formal_generated_checkpoint_resource_rehearsal.py \
+  --output-root <new-nonformal-rehearsal-root>/execution \
+  --data-root <external-data-root> \
+  --python-executable <shared-absolute-python> \
+  --execution-environment-manifest \
+    configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905/execution_environment_manifest.json
+```
+
+Registry 恢复只能从同 run 的合法 committed checkpoint-freeze terminal 重建；已存在 registry 必须 exact identity/
+content match 才幂等成功。Gate JSON `passed=false` 必须返回非零；`complete_without_holdout` 必须先验证合法 gate。
+
+## Protocol 2.5 generated checkpoint registry（historical/audit-only）
 
 唯一 active index 为
 `configs/experiment/typed_model_cache_formal_protocol_v2_5_20260905/protocol_index.json`。Protocol 2.4 及更早

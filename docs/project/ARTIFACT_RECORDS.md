@@ -1,5 +1,21 @@
 # Artifact Records
 
+## 2026-09-05 G14R15 formal cell artifact publication closure
+
+- path：`artifacts/analysis/typed_model_cache_formal_cell_publication_repair_20260905_g14r15_v1/`；active config：
+  `configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905/`。
+- `root_cause_audit.json` 保留旧 outer expected setting path 与 benchmark actual timestamped child path、exit 0 后
+  missing provenance 报错；`producer_consumer_path_matrix.json` 与 `formal_rehearsal_executor_parity.json` 记录统一
+  publication contract/call chain。
+- `real_cell_transaction_rehearsal.json`、`cell_commit_and_payload_reconciliation.json` 记录 clean detached 非正式
+  13 phases、52 unique committed cells、104 ledger records、6 generated resources、11 support 与3 scalability，并
+  交叉校验 committed marker/inventory/provenance；没有 file-count fallback。
+- `registry_publication_recovery_audit.json`、`gate_completion_semantics_audit.json` 与
+  `failure_injection_results.json` 覆盖 idempotent/create-only recovery、gate failure propagation 与要求的负例。
+- `protocol_diff.json` 证明 v2.5→v2.6 科学字段、split/catalog/预算/命令模板/holdout 语义不变；Readiness v18
+  evidence level=`E2_ARTIFACT_AUDITED_NONFORMAL_EXECUTION_CONTRACT`。formal training/checkpoint/performance=0，
+  holdout sealed/unopened/unconsumed；这些产物不是算法表现或 paper-ready 证据。
+
 ## 2026-09-05 G14R14 generated checkpoint resource closure
 
 - path：`artifacts/analysis/typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1/`；config：
