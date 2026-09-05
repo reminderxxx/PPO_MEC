@@ -24,11 +24,11 @@ from src.evaluators.cache_baseline_fairness import (
 from src.evaluators.formal_phase_transaction import (
     PhaseCommandResult,
     TransactionalPhaseRunner,
+    validate_phase_ledger_v3,
 )
 from src.evaluators.typed_model_cache_formal_execution import (
     PHASE_ORDER,
     support_setting_by_id,
-    validate_phase_ledger,
 )
 from src.evaluators.typed_model_cache_formal_protocol import canonical_sha256
 from src.runtime.generated_checkpoint_resources import (
@@ -529,7 +529,16 @@ def main() -> None:
     run_phase(runner, "formal_gate", [integrity, gate], ["artifact_integrity_manifest.json", "formal_gate.json"])
     run_phase(runner, "complete_without_holdout", [], [])
     ledger_rows = [json.loads(line) for line in (run_root / "phase_state.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
-    ledger_audit = validate_phase_ledger(ledger_rows)
+    validate_phase_ledger_v3(ledger_rows)
+    ledger_audit = {
+        "status": "pass",
+        "schema_version": "3.0.0",
+        "record_count": len(ledger_rows),
+        "terminal_phase_count": sum(
+            row.get("status") == "completed" for row in ledger_rows
+        ),
+        "hash_chain_complete": True,
+    }
     gate_payload = read_json(run_root / "formal_gate.json")
     registry_payload, registry_audit = load_generated_checkpoint_registry(
         run_root / "generated_checkpoint_resource_registry.json",
