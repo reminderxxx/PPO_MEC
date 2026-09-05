@@ -1,0 +1,35 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1",
+  "candidate_commit": "0223726cb81c3505fab8e54404c22f60d85df824",
+  "evidence_level": "E2 execution-contract plus real non-formal consumer rehearsal",
+  "layers": [
+    {
+      "checkpoint_hashes_allowed": false,
+      "layer": "static",
+      "owns": [
+        "dataset",
+        "catalog",
+        "window plans",
+        "runtime configs",
+        "fairness manifests"
+      ],
+      "publication": "before run"
+    },
+    {
+      "layer": "generated_checkpoint",
+      "owns": [
+        "seed checkpoint manifests",
+        "checkpoint provenance manifests"
+      ],
+      "publication": "after committed checkpoint_freeze",
+      "resource_count": 6,
+      "static_registry_mutation_allowed": false
+    }
+  ],
+  "literature_cutoff": "2026-09-05",
+  "logical_id_collision_count": 0,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05",
+  "status": "pass",
+  "target_venue": "IEEE TMC"
+}

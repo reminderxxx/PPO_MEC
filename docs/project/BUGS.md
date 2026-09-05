@@ -1,5 +1,15 @@
 ﻿# Bugs And Risks
 
+## 2026-09-05: generated checkpoint downstream identity gap（RESOLVED）
+
+- 根因：pre-run static registry 无法合法包含未来 checkpoint；cache wrapper 未消费/透传同一资源参数；support
+  generator 缺少 capacity label 时回落 medium。三者均为执行合同问题，不是算法或数据结果问题。
+- 修复：checkpoint-freeze committed terminal 后原子 create-only 发布 6-resource generated registry；所有真实
+  downstream consumer 先验证 current-run/protocol/bundle/context/binding/path/hash/size/role/schema/capacity；
+  capacity mapping 从生成器按 label 派生，outer/child 参数逐项相等。
+- 剩余风险：仅完成 tiny non-formal rehearsal，不能替代 150 training/1,200 candidates/84 rows/12 clusters 的
+  正式执行；Readiness v17 不是算法优势、formal gate、TMC-ready 或 paper-ready 证据。
+
 ## 2026-09-05: Protocol 2.3 nested preflight capability dispatch omission（RESOLVED）
 
 - 根因：nested restart validator 的本地 resolved-context 版本集合停在 2.2，导致 active 2.3 即使收到 persisted

@@ -4,6 +4,9 @@
 
 ## Live 文档
 
+- `formal_generated_checkpoint_resource_identity_contract.md`：G14R14 static/generated 双层资源、create-only
+  freeze publication、downstream consumer closure、capacity mapping、exact gate 与 Readiness v17
+
 - `formal_protocol_capability_routing_contract.md`：G14R13 fail-closed capability registry、Protocol 2.4、
   persisted context outer/nested identity、G14C v13 pre-execution boundary 与 Readiness v16
 

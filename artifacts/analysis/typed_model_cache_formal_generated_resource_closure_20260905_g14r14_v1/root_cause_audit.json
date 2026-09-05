@@ -1,0 +1,31 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1",
+  "candidate_commit": "0223726cb81c3505fab8e54404c22f60d85df824",
+  "evidence_level": "E2 execution-contract plus real non-formal consumer rehearsal",
+  "literature_cutoff": "2026-09-05",
+  "outcome_blind": true,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05",
+  "root_causes": [
+    {
+      "failure": "unknown logical checkpoint resource ID",
+      "id": "static_registry_precedes_generated_checkpoint",
+      "repair": "separate current-run generated registry after committed freeze",
+      "reproduced": true
+    },
+    {
+      "failure": "outer accepted but child did not receive identical identity flags",
+      "id": "cache_outer_child_validation_bypass",
+      "repair": "outer resolves and audits exact child forwarding before execution",
+      "reproduced": true
+    },
+    {
+      "failure": "288/864 commands inherited medium IDs",
+      "id": "support_capacity_context_fallback",
+      "repair": "capacity_label-derived generator mapping",
+      "reproduced": true
+    }
+  ],
+  "status": "resolved",
+  "target_venue": "IEEE TMC"
+}

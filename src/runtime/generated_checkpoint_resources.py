@@ -201,14 +201,19 @@ def _checkpoint_coverage(
             if path.is_symlink():
                 raise GeneratedCheckpointResourceError("checkpoint symlink is forbidden")
             resolved = path.resolve(strict=False)
-            if re.search(r"g14c_v(?:[1-9]|1[0-3])(?:\D|$)", resolved.as_posix(), re.IGNORECASE):
-                raise GeneratedCheckpointResourceError(
-                    "G14C v1-v13 checkpoint reference is permanently forbidden"
-                )
             try:
                 relative = resolved.relative_to(run_root.resolve()).as_posix()
             except ValueError as exc:
                 raise GeneratedCheckpointResourceError("checkpoint escapes current run root") from exc
+            historical_pattern = r"g14c_v(?:[1-9]|1[0-3])(?:\D|$)"
+            if re.search(
+                historical_pattern,
+                f"{run_root.name}/{relative}",
+                re.IGNORECASE,
+            ):
+                raise GeneratedCheckpointResourceError(
+                    "G14C v1-v13 checkpoint reference is permanently forbidden"
+                )
             if not resolved.is_file():
                 raise GeneratedCheckpointResourceError("frozen checkpoint is missing")
             identity = entry.get("checkpoint_identity")
@@ -435,6 +440,15 @@ def validate_generated_checkpoint_registry(
     for field, expected in expected_identity.items():
         if expected is not None and registry.get(field) != expected:
             raise GeneratedCheckpointResourceError(f"generated registry identity drift: {field}")
+    freeze = _strict_json_object(root / "checkpoint_freeze.json", "checkpoint freeze")
+    if registry.get("dev_selection_sha256") != freeze.get("selection_sha256"):
+        raise GeneratedCheckpointResourceError(
+            "generated registry stale dev selection identity"
+        )
+    if registry.get("checkpoint_freeze_sha256") != freeze.get("freeze_sha256"):
+        raise GeneratedCheckpointResourceError(
+            "generated registry stale checkpoint freeze identity"
+        )
     resources = registry.get("resources")
     if not isinstance(resources, list) or len(resources) != 6:
         raise GeneratedCheckpointResourceError("generated registry must contain six resources")

@@ -1,5 +1,20 @@
 # Code Module Map
 
+## G14R14 generated checkpoint resource identity
+
+- `src/runtime/generated_checkpoint_resources.py`：current-run 6-resource registry、atomic create-only publication、
+  checkpoint coverage、strict JSON/path/hash/capacity/current-run resolver 与 outer/child forwarding audit。
+- `scripts/run_typed_model_cache_formal_protocol.py`：checkpoint-freeze committed 后发布 registry，并把 canonical
+  hash绑定到后续 phase/cell input identity。
+- `scripts/benchmark_main_results.py`、`run_typed_model_cache_formal_cache_policy.py`、
+  `run_typed_model_cache_formal_support.py`、`run_typed_model_cache_formal_statistics.py`、
+  `manage_typed_model_cache_formal_artifacts.py`：真实 downstream consumer 与 exact-count/claim-evidence gate。
+- `scripts/repair_formal_generated_checkpoint_resources.py`：Protocol 2.5/capacity command generator；
+  `run_formal_generated_checkpoint_resource_rehearsal.py` 与
+  `build_formal_generated_checkpoint_resource_artifacts.py`：真实 non-formal closure 和机器审计包。
+- `tests/test_generated_checkpoint_resource_identity_v25.py`：positive/create-only、capacity/forwarding/gate 与
+  missing/duplicate/collision/drift/escape/cross-run/uncommitted/historical 等 fail-closed 负例。
+
 ## G14R13 formal Protocol capability routing
 
 - `src/runtime/formal_protocol_capabilities.py`：显式 per-version capability registry、唯一 active 2.4、historical

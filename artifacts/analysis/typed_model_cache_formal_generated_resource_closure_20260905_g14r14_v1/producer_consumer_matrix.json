@@ -1,0 +1,74 @@
+{
+  "accepted_but_unused_argument_count": 0,
+  "artifact_run_id": "typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1",
+  "candidate_commit": "0223726cb81c3505fab8e54404c22f60d85df824",
+  "consumers": [
+    {
+      "consumer": "formal_cache_policy outer",
+      "generated_registry_required": true,
+      "validated_before_checkpoint_read": true
+    },
+    {
+      "consumer": "cache-policy nested benchmark_main_results.py",
+      "generated_registry_required": true,
+      "validated_before_checkpoint_read": true
+    },
+    {
+      "consumer": "formal_controller",
+      "generated_registry_required": true,
+      "validated_before_checkpoint_read": true
+    },
+    {
+      "consumer": "formal_ablation",
+      "generated_registry_required": true,
+      "validated_before_checkpoint_read": true
+    },
+    {
+      "consumer": "formal_support",
+      "generated_registry_required": true,
+      "validated_before_checkpoint_read": true
+    },
+    {
+      "consumer": "formal_scalability",
+      "generated_registry_required": true,
+      "validated_before_checkpoint_read": true
+    },
+    {
+      "consumer": "statistics",
+      "generated_registry_required": true,
+      "validated_before_checkpoint_read": true
+    },
+    {
+      "consumer": "integrity",
+      "generated_registry_required": true,
+      "validated_before_checkpoint_read": true
+    },
+    {
+      "consumer": "formal_gate",
+      "generated_registry_required": true,
+      "validated_before_checkpoint_read": true
+    },
+    {
+      "consumer": "checkpoint provenance",
+      "generated_registry_required": true,
+      "validated_before_checkpoint_read": true
+    },
+    {
+      "consumer": "artifact inventory",
+      "generated_registry_required": true,
+      "validated_before_checkpoint_read": true
+    },
+    {
+      "consumer": "claim evidence",
+      "generated_registry_required": true,
+      "validated_before_checkpoint_read": true
+    }
+  ],
+  "evidence_level": "E2 execution-contract plus real non-formal consumer rehearsal",
+  "literature_cutoff": "2026-09-05",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "producer": "checkpoint_freeze committed terminal",
+  "reviewed_at": "2026-09-05",
+  "status": "pass",
+  "target_venue": "IEEE TMC"
+}

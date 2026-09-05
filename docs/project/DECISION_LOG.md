@@ -1,5 +1,17 @@
 ﻿# Decision Log
 
+## 2026-09-05: G14R14 separates static and run-generated checkpoint identity
+
+- 决定：static registry 只拥有 run 前 immutable inputs；checkpoint manifest/provenance 只能在当前 run 的
+  `checkpoint_freeze` committed terminal 后由独立 generated registry 原子、create-only 发布。
+- 决定：generated registry 绑定 Protocol semantic/full、bundle、execution commit、resolved context、scientific
+  config、training binding、selection/freeze 与 phase-ledger identity；symlink、escape、cross-run、staging、旧
+  G14C v1–v13、hash/size/role/schema/capacity drift 全部 fail-closed。
+- 决定：cache outer 与 child 必须逐项共享 static/generated registry 和 logical IDs；所有 checkpoint consumer
+  在文件读取前解析 manifest/provenance。capacity label 是 288/576/864 path/ID/metadata 的生成权威。
+- 决定：Protocol 2.5 是唯一 live version，2.4 historical/audit-only；Readiness v17 只授权未来独立 G14C v14。
+  G14R14 的 tiny rehearsal 不构成 formal performance、算法优势、TMC-ready 或 paper-ready 证据。
+
 ## 2026-09-05: G14R13 makes Protocol capabilities explicit and fail-closed
 
 - 决定：`src/runtime/formal_protocol_capabilities.py` 是版本能力唯一权威；每个已知版本显式登记，不允许 major/

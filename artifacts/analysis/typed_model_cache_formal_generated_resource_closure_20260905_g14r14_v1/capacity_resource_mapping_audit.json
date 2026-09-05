@@ -1,0 +1,43 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1",
+  "candidate_commit": "0223726cb81c3505fab8e54404c22f60d85df824",
+  "capacities": [
+    {
+      "capacity_label": "constrained_288mb",
+      "capacity_mb": 288,
+      "checkpoint_manifest_id": "checkpoint_manifest.constrained_288mb",
+      "checkpoint_provenance_id": "checkpoint_provenance.constrained_288mb",
+      "fairness_manifest_id": "fairness_manifest.formal.constrained_288mb",
+      "rehearsal_checkpoint_count": 10,
+      "runtime_config_id": "runtime_config.constrained_288mb"
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "capacity_mb": 576,
+      "checkpoint_manifest_id": "checkpoint_manifest.medium_576mb",
+      "checkpoint_provenance_id": "checkpoint_provenance.medium_576mb",
+      "fairness_manifest_id": "fairness_manifest.formal.medium_576mb",
+      "rehearsal_checkpoint_count": 10,
+      "runtime_config_id": "runtime_config.medium_576mb"
+    },
+    {
+      "capacity_label": "relaxed_864mb",
+      "capacity_mb": 864,
+      "checkpoint_manifest_id": "checkpoint_manifest.relaxed_864mb",
+      "checkpoint_provenance_id": "checkpoint_provenance.relaxed_864mb",
+      "fairness_manifest_id": "fairness_manifest.formal.relaxed_864mb",
+      "rehearsal_checkpoint_count": 10,
+      "runtime_config_id": "runtime_config.relaxed_864mb"
+    }
+  ],
+  "command_matrix_sha256": "d94df06cc3e17b4c64166cc2b015c22bf244ff31a6548ab6e05fc71bd391d5a5",
+  "evidence_level": "E2 execution-contract plus real non-formal consumer rehearsal",
+  "expanded_command_count": 186,
+  "expanded_template_phase_count": 15,
+  "literature_cutoff": "2026-09-05",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05",
+  "status": "pass",
+  "target_venue": "IEEE TMC",
+  "training_command_count": 150
+}

@@ -1,0 +1,96 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1",
+  "candidate_commit": "0223726cb81c3505fab8e54404c22f60d85df824",
+  "evidence_level": "E2 execution-contract plus real non-formal consumer rehearsal",
+  "file_count": 16,
+  "files": [
+    {
+      "path": "acceptance_evidence_manifest.json",
+      "sha256": "c23d947bc3e6d559f5cc68f517fd53d13475632fe67f0c24194223403399879d",
+      "size_bytes": 843
+    },
+    {
+      "path": "capacity_resource_mapping_audit.json",
+      "sha256": "a270e2e7e1f380bb81034a3a7ff4319f48d66c2642f6359e6bc0349d2306c30a",
+      "size_bytes": 1833
+    },
+    {
+      "path": "checkpoint_load_and_provenance_audit.json",
+      "sha256": "71b2c4fc4fc9177b62cad154cad815deca87e33d0a3aedd35462521bff705bf6",
+      "size_bytes": 791
+    },
+    {
+      "path": "clean_candidate_validation.json",
+      "sha256": "ab24c69e6aa8b9f5dbf5b651d226344eb4d7e7fea2c440cb1b40c601ed6c4c91",
+      "size_bytes": 1230
+    },
+    {
+      "path": "exact_formal_gate_audit.json",
+      "sha256": "87c42826c13f68175ca66872c7c02756fd8045bb8bedd02bd0b1d7b934f2e271",
+      "size_bytes": 3063
+    },
+    {
+      "path": "generated_checkpoint_resource_contract.json",
+      "sha256": "9f9210127312af735ec9f6599d582f06eb7012897ab7e5fcf431bf296506b834",
+      "size_bytes": 1848
+    },
+    {
+      "path": "negative_validation.json",
+      "sha256": "9f05a02ce0993d0ba423fbc98ae36e41749a57e9d18fb74e051978229f9e444a",
+      "size_bytes": 2192
+    },
+    {
+      "path": "pre_execution_authorization_withheld.json",
+      "sha256": "22767b4f13ace2b578636184e82e2ae670237bd6a36e88f3c7fbabe13377490e",
+      "size_bytes": 878
+    },
+    {
+      "path": "producer_consumer_matrix.json",
+      "sha256": "e3f048bd2e163ba8a83ff8f08eb544f472d866bccc39389a673c61f7b3c79206",
+      "size_bytes": 2255
+    },
+    {
+      "path": "protected_user_file_hashes.json",
+      "sha256": "e66aa420bbbaf6c0e6efeff28583f46ae006b70e1bb338055fc5956c6fd5e128",
+      "size_bytes": 2322
+    },
+    {
+      "path": "protocol_diff.json",
+      "sha256": "21b58b45aba6f18e1065a4a7a0ba926149b745d53752fffa5062a9caffd93e1c",
+      "size_bytes": 1427
+    },
+    {
+      "path": "readiness_review_v17.json",
+      "sha256": "cc54f48d3dc697d481f6fce87f7105bb1af5769866a1afbdd7f88ba27d8993a8",
+      "size_bytes": 1191
+    },
+    {
+      "path": "real_downstream_consumer_rehearsal.json",
+      "sha256": "53631b48031f3835b6f98f7695c6009b8de1bbd0570ebfa30e2ba3c3d85ad387",
+      "size_bytes": 8772
+    },
+    {
+      "path": "root_cause_audit.json",
+      "sha256": "141434c67b74b695dc269921856f9d02b20f30ad4cef7ce54db0e78201bf6f9e",
+      "size_bytes": 1177
+    },
+    {
+      "path": "static_dynamic_resource_matrix.json",
+      "sha256": "556ef2095e2d7449271846af90696402567778f2abb18d5f9ca48061210759f5",
+      "size_bytes": 1019
+    },
+    {
+      "path": "artifact_inventory.json",
+      "sha256": "5019ead9efbc4aa50ab446a6de73d0d7340e35ba57bad2ed3ccf50b9572b4bcc",
+      "size_bytes": 3094
+    }
+  ],
+  "integrity_sha256": "619712be1d3788600a35fa228c3275080ad99dbf990aff73bb299759fefb450b",
+  "literature_cutoff": "2026-09-05",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "recalculation_status": "pass",
+  "reviewed_at": "2026-09-05",
+  "self_excluded": true,
+  "status": "pass",
+  "target_venue": "IEEE TMC"
+}

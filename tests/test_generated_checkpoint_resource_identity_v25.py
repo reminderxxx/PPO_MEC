@@ -154,6 +154,29 @@ def test_generated_registry_negative_mutations(tmp_path: Path, mutation, message
         validate(run, protocol, static, context, binding, mutated)
 
 
+@pytest.mark.parametrize(
+    ("field", "message"),
+    [
+        ("protocol_full_sha256", "identity drift"),
+        ("active_formal_bundle_sha256", "identity drift"),
+        ("execution_commit", "identity drift"),
+        ("resolved_execution_context_sha256", "identity drift"),
+        ("formal_training_execution_binding_sha256", "identity drift"),
+        ("dev_selection_sha256", "stale dev selection"),
+        ("checkpoint_freeze_sha256", "stale checkpoint freeze"),
+    ],
+)
+def test_stale_protocol_bundle_context_binding_selection_and_freeze_rejected(
+    tmp_path: Path, field: str, message: str
+) -> None:
+    run, protocol, static, context, binding, registry = fixture(tmp_path)
+    changed = deepcopy(registry)
+    changed[field] = "f" * len(str(changed[field]))
+    rehash(changed)
+    with pytest.raises(GeneratedCheckpointResourceError, match=message):
+        validate(run, protocol, static, context, binding, changed)
+
+
 def test_wrong_path_capacity_symlink_and_escape_rejected(tmp_path: Path) -> None:
     run, protocol, static, context, binding, registry = fixture(tmp_path)
     validate(run, protocol, static, context, binding, registry)
@@ -189,6 +212,35 @@ def test_static_collision_and_uncommitted_freeze_rejected(tmp_path: Path) -> Non
             run_root=run, protocol=protocol, static_registry=static,
             resolved_execution_context=context, execution_binding=binding,
         )
+
+
+def test_historical_g14c_v1_v13_checkpoint_reference_rejected(tmp_path: Path) -> None:
+    run, protocol, static, context, binding, _ = fixture(tmp_path)
+    (run / "generated_checkpoint_resource_registry.json").unlink()
+    capacity = "constrained_288mb"
+    manifest_path = run / "checkpoint_manifests" / capacity / "seed_checkpoint_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    old_path = run / "training/g14c_v13/ppo/seed7/checkpoints/latest.pt"
+    old_path.parent.mkdir(parents=True)
+    source = Path(manifest["ppo"]["7"])
+    old_path.write_bytes(source.read_bytes())
+    manifest["ppo"]["7"] = str(old_path)
+    write_json(manifest_path, manifest)
+    with pytest.raises(GeneratedCheckpointResourceError, match="G14C v1-v13"):
+        build_generated_checkpoint_registry(
+            run_root=run, protocol=protocol, static_registry=static,
+            resolved_execution_context=context, execution_binding=binding,
+        )
+
+
+def test_generated_registry_post_publication_rewrite_is_detected(tmp_path: Path) -> None:
+    run, protocol, static, context, binding, registry = fixture(tmp_path)
+    path = run / "generated_checkpoint_resource_registry.json"
+    rewritten = deepcopy(registry)
+    rewritten["registry_id"] = "rewritten"
+    write_json(path, rewritten)
+    with pytest.raises(GeneratedCheckpointResourceError, match="canonical hash"):
+        validate(run, protocol, static, context, binding, rewritten)
     (run / "phase_state.jsonl").write_text(
         json.dumps({"phase": "checkpoint_freeze", "status": "failed"}) + "\n",
         encoding="utf-8",

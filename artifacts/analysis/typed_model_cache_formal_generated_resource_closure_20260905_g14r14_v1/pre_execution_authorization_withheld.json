@@ -1,0 +1,25 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1",
+  "candidate_commit": "0223726cb81c3505fab8e54404c22f60d85df824",
+  "evidence_level": "E2 execution-contract plus real non-formal consumer rehearsal",
+  "formal_checkpoint_count": 0,
+  "formal_dev_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "g14c_v14_created": false,
+  "g14c_v14_executed": false,
+  "g14c_v14_number_consumed": false,
+  "g14d_started": false,
+  "g15_started": false,
+  "holdout": {
+    "capability": false,
+    "consumed_permanently": false,
+    "opened": false,
+    "sealed": true
+  },
+  "literature_cutoff": "2026-09-05",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05",
+  "status": "PRE-EXECUTION AUTHORIZATION WITHHELD / DOWNSTREAM_RESOURCE_BINDING_NOT_CLOSED",
+  "target_venue": "IEEE TMC"
+}

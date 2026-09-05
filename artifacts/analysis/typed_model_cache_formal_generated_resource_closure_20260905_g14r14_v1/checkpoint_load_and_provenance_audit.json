@@ -1,0 +1,17 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1",
+  "candidate_commit": "0223726cb81c3505fab8e54404c22f60d85df824",
+  "checkpoint_files_opened": 30,
+  "evidence_level": "E2 execution-contract plus real non-formal consumer rehearsal",
+  "historical_g14c_v1_v13_reused": false,
+  "literature_cutoff": "2026-09-05",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "provenance_parsed": true,
+  "registry_canonical_sha256": "028fb1d742d8553d1a9d1faf4870e91709f667a8798b17de5d270b1be184e578",
+  "registry_file_sha256": "90c24a456bc6f0202be0e9045249395dae7d47c364cb23b07153a04f8aedbeef",
+  "registry_validated_before_read": true,
+  "reviewed_at": "2026-09-05",
+  "seed_manifest_parsed": true,
+  "status": "pass",
+  "target_venue": "IEEE TMC"
+}

@@ -1,5 +1,28 @@
 # Runbook
 
+## Protocol 2.5 generated checkpoint registry 与未来 G14C v14
+
+唯一 active index 为
+`configs/experiment/typed_model_cache_formal_protocol_v2_5_20260905/protocol_index.json`。Protocol 2.4 及更早
+版本只允许 historical audit。未来获独立授权的 G14C v14 必须从 pushed、Git-clean、detached candidate 启动；
+`checkpoint_freeze` committed 后 runner 才会在 run root 原子创建
+`generated_checkpoint_resource_registry.json`。任何 downstream phase 都必须同时传 static registry、generated
+registry、`checkpoint_manifest.<capacity>` 与 `checkpoint_provenance.<capacity>`，禁止只传 checkpoint path。
+
+G14R14 非正式真实 consumer 验收入口（不得将输出用于论文表）：
+
+```bash
+<shared-absolute-python> scripts/run_formal_generated_checkpoint_resource_rehearsal.py \
+  --output-root <new-nonformal-rehearsal-root>/execution \
+  --data-root <external-data-root> \
+  --python-executable <shared-absolute-python> \
+  --execution-environment-manifest \
+  configs/experiment/typed_model_cache_formal_protocol_v2_5_20260905/execution_environment_manifest.json
+```
+
+候选目录不得有本地 `.venv`；输出必须显示 `formal=false`、`performance_evidence=false`、13/13 terminal、
+exact non-formal gate pass 与 holdout capability=false。
+
 ## Protocol 2.4 与未来 G14C v14 入口
 
 唯一 active index：

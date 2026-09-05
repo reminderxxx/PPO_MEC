@@ -1,0 +1,36 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1",
+  "candidate_commit": "0223726cb81c3505fab8e54404c22f60d85df824",
+  "clean_candidate_full_pytest": {
+    "passed": 1198,
+    "skipped": 16,
+    "status": "pass"
+  },
+  "command_count": 186,
+  "command_matrix_sha256": "d94df06cc3e17b4c64166cc2b015c22bf244ff31a6548ab6e05fc71bd391d5a5",
+  "compile_and_clean_import": "pass",
+  "detached": true,
+  "evidence_level": "E2 execution-contract plus real non-formal consumer rehearsal",
+  "git_clean_at_start": true,
+  "git_diff_check": "pass",
+  "holdout_metadata_only": true,
+  "json_jsonl_xml_finite_roundtrip": "pass",
+  "latest_workspace_full_pytest": {
+    "passed": 1209,
+    "skipped": 18,
+    "status": "pass"
+  },
+  "literature_cutoff": "2026-09-05",
+  "local_venv_present": false,
+  "ngsim_source_rows": 11850526,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "provider_frame_count": 73871,
+  "reviewed_at": "2026-09-05",
+  "shared_absolute_python": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "smoke_test": "pass",
+  "status": "pass",
+  "target_venue": "IEEE TMC",
+  "template_phase_count": 15,
+  "training_command_count": 150,
+  "window_reachability": "60/60"
+}

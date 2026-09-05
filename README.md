@@ -1,5 +1,13 @@
 # PPO_MEC
 
+G14R14 已冻结 Formal Protocol `2.5.0`、Generated Checkpoint Resource Identity Contract `1.0.0` 与
+Readiness v17=`READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL`。static registry 只登记 pre-run immutable inputs；
+当前 run 的 checkpoint manifest/provenance 由 committed `checkpoint_freeze` 原子发布到独立、create-only 的
+generated registry。cache outer/child、controller、ablation、support、scalability、statistics/integrity/gate
+统一先验 identity。clean detached non-formal rehearsal 已真实完成 13/13 phases、30 checkpoint loads 与三档
+consumer closure，但 formal training/checkpoint/performance 均为 0，未启动 G14C v14、G14D、G15 或 holdout。
+详见 `docs/project/formal_generated_checkpoint_resource_identity_contract.md`。
+
 G14R13 已修复 active preflight 的 Protocol capability routing 漏配，冻结 Formal Protocol `2.4.0`、
 Capability Routing Contract `1.0.0` 与 Readiness v16=`READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL`。唯一
 active index 为 `configs/experiment/typed_model_cache_formal_protocol_v2_4_20260905/protocol_index.json`；

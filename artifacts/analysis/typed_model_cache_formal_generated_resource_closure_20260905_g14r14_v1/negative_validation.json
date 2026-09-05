@@ -1,0 +1,98 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1",
+  "candidate_commit": "0223726cb81c3505fab8e54404c22f60d85df824",
+  "cases": [
+    {
+      "case": "missing_or_unknown_generated_id",
+      "result": "rejected"
+    },
+    {
+      "case": "duplicate_id",
+      "result": "rejected"
+    },
+    {
+      "case": "static_generated_collision",
+      "result": "rejected"
+    },
+    {
+      "case": "wrong_role",
+      "result": "rejected"
+    },
+    {
+      "case": "wrong_schema",
+      "result": "rejected"
+    },
+    {
+      "case": "wrong_capacity",
+      "result": "rejected"
+    },
+    {
+      "case": "hash_drift",
+      "result": "rejected"
+    },
+    {
+      "case": "size_drift",
+      "result": "rejected"
+    },
+    {
+      "case": "wrong_checkpoint_path",
+      "result": "rejected"
+    },
+    {
+      "case": "symlink",
+      "result": "rejected"
+    },
+    {
+      "case": "path_escape",
+      "result": "rejected"
+    },
+    {
+      "case": "cross_run_registry",
+      "result": "rejected"
+    },
+    {
+      "case": "staging_or_uncommitted_freeze",
+      "result": "rejected"
+    },
+    {
+      "case": "failed_or_terminal_invalid_phase",
+      "result": "rejected"
+    },
+    {
+      "case": "stale_selection_freeze_context_bundle",
+      "result": "rejected"
+    },
+    {
+      "case": "288_or_864_with_medium_id",
+      "result": "rejected"
+    },
+    {
+      "case": "wrapper_child_bypass",
+      "result": "rejected"
+    },
+    {
+      "case": "accepted_but_unused_cli",
+      "result": "rejected"
+    },
+    {
+      "case": "explicit_path_id_conflict",
+      "result": "rejected"
+    },
+    {
+      "case": "g14c_v1_v13_reference",
+      "result": "rejected"
+    },
+    {
+      "case": "post_publication_rewrite",
+      "result": "rejected"
+    }
+  ],
+  "evidence_level": "E2 execution-contract plus real non-formal consumer rehearsal",
+  "fail_closed_case_count": 21,
+  "literature_cutoff": "2026-09-05",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-05",
+  "specialized_test_file": "tests/test_generated_checkpoint_resource_identity_v25.py",
+  "status": "pass",
+  "target_venue": "IEEE TMC"
+}

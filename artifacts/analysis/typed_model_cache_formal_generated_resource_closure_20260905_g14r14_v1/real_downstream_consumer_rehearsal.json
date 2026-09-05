@@ -1,0 +1,265 @@
+{
+  "ablation_setting_count": 2,
+  "artifact_run_id": "typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1",
+  "cache_policy_outer_and_nested_executed": true,
+  "candidate_commit": "0223726cb81c3505fab8e54404c22f60d85df824",
+  "candidate_has_local_venv": false,
+  "capacity_labels": [
+    "constrained_288mb",
+    "medium_576mb",
+    "relaxed_864mb"
+  ],
+  "capacity_support_count": 3,
+  "checkpoint_opened_by_dev_selection_count": 30,
+  "checkpoint_provenance_parsed_by_consumer": true,
+  "clean_detached_candidate": true,
+  "completed_phase_order": [
+    "preflight",
+    "tests",
+    "train",
+    "dev_select",
+    "checkpoint_freeze",
+    "formal_cache_policy",
+    "formal_controller",
+    "formal_ablation",
+    "formal_support",
+    "formal_scalability",
+    "formal_statistics",
+    "formal_gate",
+    "complete_without_holdout"
+  ],
+  "completed_phase_terminal_count": 13,
+  "controller_capacity_count": 3,
+  "evidence_level": "E2 execution-contract plus real non-formal consumer rehearsal",
+  "exact_nonformal_gate": {
+    "claim_evidence_map": [
+      {
+        "available_paired_count": 3,
+        "baseline_agent": "reactive_lru",
+        "candidate_agent": "sa_ghmappo",
+        "metric": "full_service_ready_byte_hit_rate",
+        "status": "mixed"
+      },
+      {
+        "available_paired_count": 3,
+        "baseline_agent": "reactive_lru",
+        "candidate_agent": "sa_ghmappo",
+        "metric": "joint_base_adapter_hit_rate",
+        "status": "mixed"
+      },
+      {
+        "available_paired_count": 3,
+        "baseline_agent": "reactive_lru",
+        "candidate_agent": "sa_ghmappo",
+        "metric": "full_service_ready_request_rate",
+        "status": "mixed"
+      },
+      {
+        "available_paired_count": 3,
+        "baseline_agent": "reactive_lru",
+        "candidate_agent": "sa_ghmappo",
+        "metric": "transfer_mb_per_request",
+        "status": "mixed"
+      },
+      {
+        "available_paired_count": 3,
+        "baseline_agent": "reactive_lru",
+        "candidate_agent": "sa_ghmappo",
+        "metric": "workflow_continuity_rate",
+        "status": "mixed"
+      },
+      {
+        "available_paired_count": 3,
+        "baseline_agent": "reactive_lru",
+        "candidate_agent": "sa_ghmappo",
+        "metric": "end_to_end_workflow_delay",
+        "status": "mixed"
+      }
+    ],
+    "claim_evidence_status_enum": [
+      "supported",
+      "mixed",
+      "unsupported",
+      "contradicted",
+      "unavailable"
+    ],
+    "claim_map_availability": [
+      {
+        "available_paired_count": 3,
+        "baseline_agent": "reactive_lru",
+        "candidate_agent": "sa_ghmappo",
+        "claim_interpretation": "eligible_for_statistical_interpretation",
+        "metric": "full_service_ready_byte_hit_rate",
+        "status": "AVAILABLE"
+      },
+      {
+        "available_paired_count": 3,
+        "baseline_agent": "reactive_lru",
+        "candidate_agent": "sa_ghmappo",
+        "claim_interpretation": "eligible_for_statistical_interpretation",
+        "metric": "joint_base_adapter_hit_rate",
+        "status": "AVAILABLE"
+      },
+      {
+        "available_paired_count": 3,
+        "baseline_agent": "reactive_lru",
+        "candidate_agent": "sa_ghmappo",
+        "claim_interpretation": "eligible_for_statistical_interpretation",
+        "metric": "full_service_ready_request_rate",
+        "status": "AVAILABLE"
+      },
+      {
+        "available_paired_count": 3,
+        "baseline_agent": "reactive_lru",
+        "candidate_agent": "sa_ghmappo",
+        "claim_interpretation": "eligible_for_statistical_interpretation",
+        "metric": "transfer_mb_per_request",
+        "status": "AVAILABLE"
+      },
+      {
+        "available_paired_count": 3,
+        "baseline_agent": "reactive_lru",
+        "candidate_agent": "sa_ghmappo",
+        "claim_interpretation": "eligible_for_statistical_interpretation",
+        "metric": "workflow_continuity_rate",
+        "status": "AVAILABLE"
+      },
+      {
+        "available_paired_count": 3,
+        "baseline_agent": "reactive_lru",
+        "candidate_agent": "sa_ghmappo",
+        "claim_interpretation": "eligible_for_statistical_interpretation",
+        "metric": "end_to_end_workflow_delay",
+        "status": "AVAILABLE"
+      }
+    ],
+    "completeness_only": true,
+    "endpoint_availability": {
+      "end_to_end_workflow_delay": "AVAILABLE",
+      "full_service_ready_byte_hit_rate": "AVAILABLE",
+      "full_service_ready_request_rate": "AVAILABLE",
+      "joint_base_adapter_hit_rate": "AVAILABLE",
+      "transfer_mb_per_request": "AVAILABLE",
+      "workflow_continuity_rate": "AVAILABLE"
+    },
+    "exact_count_mismatches": {},
+    "exact_count_status": "pass",
+    "execution_mode": "non_formal_rehearsal",
+    "expected_counts": {
+      "ablation_settings": 2,
+      "cache_policy_cells": 3,
+      "candidate_checkpoints": 30,
+      "committed_training_cells": 30,
+      "controller_cells": 3,
+      "dev_candidate_evaluations": 30,
+      "formal_outer_window_clusters": 1,
+      "frozen_checkpoints": 30,
+      "frozen_checkpoints_by_capacity": {
+        "constrained_288mb": 10,
+        "medium_576mb": 10,
+        "relaxed_864mb": 10
+      },
+      "latest_checkpoints": 30,
+      "primary_comparison_rows": 6,
+      "scalability_settings": 3,
+      "selections": 30,
+      "support_settings": 3
+    },
+    "formal_execution_gate_version": "2.0.0",
+    "formal_execution_started": false,
+    "generated_checkpoint_registry_audit": {
+      "current_run_id": "execution",
+      "registry_canonical_sha256": "028fb1d742d8553d1a9d1faf4870e91709f667a8798b17de5d270b1be184e578",
+      "resource_count": 6,
+      "status": "pass"
+    },
+    "generated_checkpoint_registry_required": true,
+    "holdout_opened": false,
+    "missing_outputs": [],
+    "observed_counts": {
+      "ablation_settings": 2,
+      "cache_policy_cells": 3,
+      "candidate_checkpoints": 30,
+      "committed_training_cells": 30,
+      "controller_cells": 3,
+      "dev_candidate_evaluations": 30,
+      "formal_outer_window_clusters": 1,
+      "frozen_checkpoints": 30,
+      "frozen_checkpoints_by_capacity": {
+        "constrained_288mb": 10,
+        "medium_576mb": 10,
+        "relaxed_864mb": 10
+      },
+      "latest_checkpoints": 30,
+      "primary_comparison_rows": 6,
+      "scalability_settings": 3,
+      "selections": 30,
+      "support_settings": 3
+    },
+    "outcome_blind_gate": true,
+    "paper_claims_permitted": false,
+    "passed": true,
+    "performance_threshold_used": false,
+    "protocol_semantic_sha256": "001465ad91d95383e5bde7863fe1a967a4a86cd57a477b993deb0945a1a22e7a",
+    "zero_pair_rule": "UNAVAILABLE_not_tie_pass_or_fail"
+  },
+  "execution_mode": "non_formal_rehearsal",
+  "formal": false,
+  "formal_checkpoint_count": 0,
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "g14c_v14_created": false,
+  "generated_registry_audit": {
+    "current_run_id": "execution",
+    "registry_canonical_sha256": "028fb1d742d8553d1a9d1faf4870e91709f667a8798b17de5d270b1be184e578",
+    "resource_count": 6,
+    "status": "pass"
+  },
+  "generated_registry_publication": {
+    "file_sha256": "90c24a456bc6f0202be0e9045249395dae7d47c364cb23b07153a04f8aedbeef",
+    "path": "/private/tmp/g14r14_real_consumer_acceptance_v5/execution/generated_checkpoint_resource_registry.json",
+    "registry_canonical_sha256": "028fb1d742d8553d1a9d1faf4870e91709f667a8798b17de5d270b1be184e578",
+    "status": "published_create_only"
+  },
+  "generated_registry_resource_count": 6,
+  "generated_registry_validated_before_checkpoint_consumption": true,
+  "hidden_data_used": false,
+  "historical_g14c_v1_v13_reused": false,
+  "holdout_capability": false,
+  "holdout_opened": false,
+  "literature_cutoff": "2026-09-05",
+  "performance_evidence": false,
+  "phase_ledger_validation": {
+    "hash_chain_complete": true,
+    "record_count": 39,
+    "schema_version": "3.0.0",
+    "status": "pass",
+    "terminal_phase_count": 13
+  },
+  "phase_order": [
+    "preflight",
+    "tests",
+    "train",
+    "dev_select",
+    "checkpoint_freeze",
+    "formal_cache_policy",
+    "formal_controller",
+    "formal_ablation",
+    "formal_support",
+    "formal_scalability",
+    "formal_statistics",
+    "formal_gate",
+    "complete_without_holdout"
+  ],
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "real_generated_checkpoint_consumer_rehearsal_version": "1.0.0",
+  "rehearsal_root": "/private/tmp/g14r14_real_consumer_acceptance_v5/execution",
+  "reviewed_at": "2026-09-05",
+  "scalability_setting_count": 3,
+  "seed_manifest_parsed_by_consumer": true,
+  "shared_absolute_python": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "statistics_row_count": 6,
+  "status": "pass",
+  "target_venue": "IEEE TMC",
+  "training_cell_count": 30
+}

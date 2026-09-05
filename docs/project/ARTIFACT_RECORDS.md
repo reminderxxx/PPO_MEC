@@ -1,5 +1,17 @@
 # Artifact Records
 
+## 2026-09-05 G14R14 generated checkpoint resource closure
+
+- path：`artifacts/analysis/typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1/`；config：
+  `configs/experiment/typed_model_cache_formal_protocol_v2_5_20260905/`。
+- 证据包含三项根因、双层 registry/producer-consumer/capacity matrix、21 类 fail-closed 负例、Protocol diff、
+  checkpoint load/provenance、exact non-formal gate、保护文件 hash、clean candidate 与完整性 inventory。
+- clean rehearsal 真实完成 13/13 phases、30 checkpoint opens、三档 cache/controller/support、2 ablation、3
+  scalability；generated registry canonical/file SHA-256=`028fb1d7...e578`/`90c24a45...eef`。
+- Protocol semantic/full、generated contract semantic、bundle final SHA-256=`001465ad...2e7a`/
+  `763b47b5...413b`、`04f9874c...b352`、`82612aea...981`。正式 training/checkpoint/performance=0，
+  holdout sealed/unopened/unconsumed；未启动 G14C v14/G14D/G15，不构成 formal 或 paper claim。
+
 ## 2026-09-05 G14R13 formal preflight capability-routing repair
 
 - path：`artifacts/analysis/typed_model_cache_formal_preflight_validator_dispatch_repair_20260905_g14r13_v1/`；

@@ -1,5 +1,19 @@
 ﻿# Progress
 
+## 2026-09-05: G14R14 generated checkpoint resource identity closure
+
+- 复现 static registry 缺少 run-generated checkpoint IDs、cache outer/child 校验旁路、288/864 support 回落
+  medium IDs 三个一阶问题；修复位于 generated registry、consumer resolver/forwarding 和 capacity generator。
+- 冻结 Protocol 2.5、Generated Contract 1.0.0 与 Readiness v17。Protocol semantic/full SHA-256 为
+  `001465ad91d95383e5bde7863fe1a967a4a86cd57a477b993deb0945a1a22e7a`/
+  `763b47b5b180137ed9b3c8424529592ba4ed7ff92fda9ae8c5586de2f500413b`；bundle final SHA-256 为
+  `82612aea25f0bf12d6a47848d3c6cd9524d20d8a846bd2c67bd29fae2feeb981`。
+- clean detached、无本地 `.venv` 的真实 non-formal rehearsal 完成 13/13 terminal、30 train/dev/freeze、
+  三档 cache outer+nested/controller/support、2 ablation、3 scalability、statistics 与 exact gate；generated
+  registry canonical SHA-256=`028fb1d742d8553d1a9d1faf4870e91709f667a8798b17de5d270b1be184e578`。
+- 同一 preflight 实扫 11,850,526 rows、73,871 frames、60/60 windows，并验证 15 templates/186 commands/
+  150 training commands。所有结果均 `formal=false`、`performance_evidence=false`；未启动 G14C v14/G14D/G15。
+
 ## 2026-09-05: G14R13 Protocol capability routing closure
 
 - 精确复现 Protocol 2.3 outer runner 已传 `--resolved-execution-context-path`，nested validator 却因版本集合漏配

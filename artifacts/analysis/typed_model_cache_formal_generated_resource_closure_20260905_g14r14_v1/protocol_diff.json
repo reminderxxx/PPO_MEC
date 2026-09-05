@@ -1,0 +1,38 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_generated_resource_closure_20260905_g14r14_v1",
+  "candidate_commit": "0223726cb81c3505fab8e54404c22f60d85df824",
+  "evidence_level": "E2 execution-contract plus real non-formal consumer rehearsal",
+  "execution_contract_changes": [
+    "generated registry",
+    "consumer forwarding",
+    "capacity mapping",
+    "exact-count gate"
+  ],
+  "from_full_sha256": "6e21a7ec5e529fb9c4d7a889945c63d039deb2d58a7409d852a46e5998d5c924",
+  "from_semantic_sha256": "37604b03b9ce5da3a5b0341d46e5c14f2b897a1b4578987c87d2634cb477159b",
+  "from_version": "2.4.0",
+  "literature_cutoff": "2026-09-05",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "protocol_2_4_status": "historical/audit-only",
+  "reviewed_at": "2026-09-05",
+  "scientific_fields_changed": false,
+  "status": "pass",
+  "target_venue": "IEEE TMC",
+  "to_full_sha256": "763b47b5b180137ed9b3c8424529592ba4ed7ff92fda9ae8c5586de2f500413b",
+  "to_semantic_sha256": "001465ad91d95383e5bde7863fe1a967a4a86cd57a477b993deb0945a1a22e7a",
+  "to_version": "2.5.0",
+  "verified_unchanged": [
+    "split/window",
+    "NGSIM/Alibaba/catalog",
+    "agent matrix/order",
+    "seeds",
+    "256 episodes/32 updates",
+    "checkpoint cadence",
+    "288/576/864 MB",
+    "reward/action/observation",
+    "primary/secondary endpoints",
+    "support/scalability settings",
+    "bootstrap/sign-test/Holm",
+    "holdout seal/capability"
+  ]
+}
