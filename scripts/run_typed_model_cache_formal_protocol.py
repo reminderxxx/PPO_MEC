@@ -197,6 +197,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--python-executable", default="")
     parser.add_argument("--execution-environment-manifest", default="")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--non-formal-rehearsal-profile", default="")
     args = parser.parse_args()
     if args.preflight == bool(args.phase):
         parser.error("select exactly one of --preflight or --phase")
@@ -301,6 +302,7 @@ def main() -> None:
                 execution_environment_manifest_path=(
                     args.execution_environment_manifest or None
                 ),
+                require_ready=not bool(args.non_formal_rehearsal_profile),
             )
         except ActiveFormalBundleError as exc:
             raise FormalExecutionError(f"active formal bundle gate failed: {exc}") from exc
@@ -314,6 +316,33 @@ def main() -> None:
         capabilities = get_protocol_capabilities(protocol_version)
     except FormalProtocolCapabilityError as exc:
         raise FormalExecutionError(str(exc)) from exc
+    if args.non_formal_rehearsal_profile:
+        profile_path = Path(args.non_formal_rehearsal_profile)
+        expected_profile = ROOT / protocol.get("execution_contract", {}).get(
+            "nonformal_rehearsal_profile", {}
+        ).get("path", "")
+        if (
+            not args.preflight
+            or not profile_path.is_absolute()
+            or profile_path.is_symlink()
+            or profile_path.resolve() != expected_profile.resolve()
+        ):
+            raise FormalExecutionError("non-formal rehearsal profile identity mismatch")
+        profile = json.loads(profile_path.read_text(encoding="utf-8-sig"))
+        if (
+            profile.get("semantic_sha256")
+            != protocol["execution_contract"]["nonformal_rehearsal_profile"][
+                "semantic_sha256"
+            ]
+            or canonical_sha256(
+                {key: value for key, value in profile.items() if key != "semantic_sha256"}
+            )
+            != profile.get("semantic_sha256")
+            or profile.get("formal") is not False
+            or profile.get("performance_evidence") is not False
+            or profile.get("holdout_capability") is not False
+        ):
+            raise FormalExecutionError("non-formal rehearsal profile contract mismatch")
     if capabilities.live_execution_allowed and active_bundle is None:
         try:
             active_bundle = validate_active_formal_bundle(
@@ -323,6 +352,7 @@ def main() -> None:
                 execution_environment_manifest_path=(
                     args.execution_environment_manifest or None
                 ),
+                require_ready=not bool(args.non_formal_rehearsal_profile),
             )
         except ActiveFormalBundleError as exc:
             raise FormalExecutionError(f"active formal bundle gate failed: {exc}") from exc

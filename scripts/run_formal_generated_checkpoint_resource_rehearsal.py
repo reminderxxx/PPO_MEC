@@ -495,6 +495,9 @@ def main() -> None:
         "--preflight", "--output-root", str(run_root),
         "--python-executable", str(python),
         "--execution-environment-manifest", str(Path(args.execution_environment_manifest).resolve()),
+        "--non-formal-rehearsal-profile", str(
+            ROOT / PROTOCOL_DIR / "nonformal_cell_transaction_rehearsal_profile.json"
+        ),
     ]
     completed = subprocess.run(preflight, cwd=ROOT, text=True, capture_output=True, check=False)
     if completed.returncode != 0:
