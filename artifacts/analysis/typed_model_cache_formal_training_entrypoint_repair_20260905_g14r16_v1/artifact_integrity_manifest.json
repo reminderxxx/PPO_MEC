@@ -1,12 +1,17 @@
 {
   "artifact_run_id": "typed_model_cache_formal_training_entrypoint_repair_20260905_g14r16_v1",
   "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
-  "file_count": 11,
+  "file_count": 12,
   "files": [
     {
       "path": "acceptance_evidence_manifest.json",
       "sha256": "e650a9f4aff6e91b1d1b9033a6e465d746eb19f4732ba6ad0de0c9bc1111dfed",
       "size_bytes": 2187
+    },
+    {
+      "path": "final_execution_commit_revalidation.json",
+      "sha256": "53ada899f13e2bd310ece51898c8937c7ab415ddaaed18e8e727d4d3e3af6f63",
+      "size_bytes": 1040711
     },
     {
       "path": "formal_training_entrypoint_acceptance.json",
@@ -50,19 +55,19 @@
     },
     {
       "path": "validation_results.json",
-      "sha256": "e6c799abceff86baeb7f9128da6ac7e283d648a47d58a93af199801445205f97",
-      "size_bytes": 996
+      "sha256": "a9361346ff86ae5d83e7147afb528c24774122f0bc93dafa67825efdff2830bd",
+      "size_bytes": 1269
     },
     {
       "path": "artifact_inventory.json",
-      "sha256": "ab0211ca8948f9292e57e1b40cc2a2bc61f3d903db3810bc1d3de79bb28ff132",
-      "size_bytes": 2275
+      "sha256": "fe23d028359e19900c5ef74452a2273d0470e8ce86fe44b71752f71e74cac114",
+      "size_bytes": 2459
     }
   ],
   "formal": false,
   "git_commit": "161b6d799ef39ac0eea86c6c5e35c0e1d00d5df7",
   "holdout_capability": false,
-  "inventory_sha256": "1b6ee1e599e5fc43a342f4e5e1bd14b3416cafd4cb1dd5c6dd4f07480100b8e9",
+  "inventory_sha256": "77bf942154b0b9cb4825248c05c8eb67ba9f7f0b0bbd0d492bbb3cc3cf1eed97",
   "literature_cutoff": "2026-09-05",
   "performance_evidence": false,
   "policy_version": "tmc_review_policy_v3_20260621",

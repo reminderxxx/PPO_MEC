@@ -19,6 +19,12 @@
   G14R15 事务/下游闭环与 G14R16 正式训练初始化；不证明完整训练、算法性能或 paper readiness。
 - candidate 专项 `135 passed, 16 skipped`、全仓 `1234 passed, 16 skipped`、smoke、compile/import、diff-check
   均通过；active 正例与 150-cell 验收均未 skip。holdout sealed/unopened/unconsumed，未启动 G14C v15/G14D/G15。
+- readiness/evidence 冻结后的最终 execution commit `4a73234f02fb0f7522f20144ae9662a946e8a575` 再次完成
+  clean public preflight 与 150/150 入口验收；final bundle/binding/context SHA-256 分别为
+  `6691c6a02e048a7a739548e66c91e42686a9b80d24eddcab19443a8a8a97f740`/
+  `bb8afb8bcc233db0391c18fa26a7f44494504cfdbfc66e8979695b4be28ae462`/
+  `6f06fcabb302a870d9f908412f533ab72f6d5fcc78c4414a4edffc91c68d4944`；最终专项 `151 passed`、
+  全仓 `1250 passed`，均 0 skipped。
 
 ## 2026-09-05: G14R15 formal cell publication/recovery/completion closure
 

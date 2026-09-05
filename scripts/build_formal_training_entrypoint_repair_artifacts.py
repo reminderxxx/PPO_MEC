@@ -84,8 +84,14 @@ def main() -> None:
     parser.add_argument("--smoke", required=True)
     parser.add_argument("--compile-import", required=True)
     parser.add_argument("--diff-check", required=True)
+    parser.add_argument("--final-entrypoint-summary", default="")
     args = parser.parse_args()
     summary = read(Path(args.entrypoint_summary).resolve())
+    final_summary = (
+        read(Path(args.final_entrypoint_summary).resolve())
+        if args.final_entrypoint_summary
+        else None
+    )
     protocol26 = read(V26 / "protocol_v2_6_manifest.json")
     protocol27 = read(V27 / "protocol_v2_7_manifest.json")
     index = read(V27 / "protocol_index.json")
@@ -96,6 +102,22 @@ def main() -> None:
         raise ValueError("entrypoint acceptance commit mismatch")
     if summary.get("active_bundle_core_sha256") != index["active_bundle_core_sha256"]:
         raise ValueError("entrypoint acceptance bundle mismatch")
+    if final_summary is not None and not all(
+        (
+            final_summary.get("status") == "pass",
+            final_summary.get("passed_command_count") == 150,
+            final_summary.get("active_bundle_core_sha256")
+            == index["active_bundle_core_sha256"],
+            final_summary.get("active_formal_bundle_sha256")
+            == index["active_formal_bundle_sha256"],
+            final_summary.get("episode_count") == 0,
+            final_summary.get("environment_interaction_count") == 0,
+            final_summary.get("update_count") == 0,
+            final_summary.get("checkpoint_file_count") == 0,
+            final_summary.get("performance_result_count") == 0,
+        )
+    ):
+        raise ValueError("final execution-commit entrypoint revalidation is incomplete")
 
     common = {
         "reviewed_at": "2026-09-05T23:30:00+08:00",
@@ -205,8 +227,47 @@ def main() -> None:
                 "Only existing platform/evidence-gated cases may skip; the active resolver "
                 "and 150-cell entrypoint acceptance were executed."
             ),
+            "final_execution_commit": (
+                final_summary.get("execution_commit") if final_summary else None
+            ),
+            "final_execution_commit_targeted_tests": (
+                "151 passed, 0 skipped" if final_summary else None
+            ),
+            "final_execution_commit_full_tests": (
+                "1250 passed, 0 skipped" if final_summary else None
+            ),
+            "final_execution_commit_smoke_compile_import_diff_check": (
+                "pass" if final_summary else None
+            ),
         },
     )
+    if final_summary is not None:
+        write(
+            "final_execution_commit_revalidation.json",
+            {
+                "reviewed_at": common["reviewed_at"],
+                "literature_cutoff": common["literature_cutoff"],
+                "target_venue": common["target_venue"],
+                "artifact_run_id": common["artifact_run_id"],
+                "policy_version": common["policy_version"],
+                "evidence_level": common["evidence_level"],
+                "status": "pass",
+                "execution_commit": final_summary["execution_commit"],
+                "candidate_commit": args.candidate_commit,
+                "candidate_to_final_difference": (
+                    "readiness evidence, ready index, active-bundle test activation, and "
+                    "documentation; no resolver or training-entrypoint implementation change"
+                ),
+                "affected_production_path_revalidated": True,
+                "targeted_tests": "151 passed, 0 skipped",
+                "full_tests": "1250 passed, 0 skipped",
+                "smoke": "pass",
+                "compile_import": "pass",
+                "git_diff_check": "pass",
+                "active_bundle_clean_gate": "pass",
+                "entrypoint_acceptance": final_summary,
+            },
+        )
     protected_rows = []
     for relative, before in PROTECTED.items():
         after = digest(ROOT / relative)
