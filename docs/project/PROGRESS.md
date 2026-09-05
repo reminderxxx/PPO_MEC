@@ -17,7 +17,7 @@
 - 冻结 Protocol 2.6：semantic/full SHA-256=`97dfbfd975b504b6015e84ddb781754a819d394eea7a127bf51681c1dd790cb3`/
   `d01ccd4aaa669ebe57504350ec683885ea2b7d9f4cf67cbf250ad444cfa1e853`，bundle core/final=
   `50d25ca464405f6035007759c2c7527b5a427b4e10930f152d46a4857f7b5be0`/
-  `98c0f5ebd38ce7a9f9eadebe8ff69095cc28ff1830ca9cf3e8ae8c66557702b0`。Readiness v18 仅为执行就绪；
+  `28b1b66b5bcde9f4e3586aa0a6ee11eb7f476fce6e01e0eeceefd6a91e5f385b`。Readiness v18 仅为执行就绪；
   formal training/checkpoint/performance=0，holdout sealed/unopened/unconsumed，未创建或消费 G14C v14。
 
 ## 2026-09-05: G14R14 generated checkpoint resource identity closure

@@ -5,8 +5,8 @@
   "files": [
     {
       "path": "acceptance_evidence_manifest.json",
-      "sha256": "c2d428ab944461fb4b5b59f70b776e1937aeda2e4d54d38fea0ffc594c5937a4",
-      "size_bytes": 1385
+      "sha256": "ba0ffec2de467f9f9952463e76b036eba208f1893a604419624587c09fce196a",
+      "size_bytes": 1754
     },
     {
       "path": "cell_artifact_publication_contract.json",
@@ -70,14 +70,14 @@
     },
     {
       "path": "artifact_inventory.json",
-      "sha256": "ef125445775d93ae94fcc37b2e961ff24e6c79989eb3c93ed3d9cad3558c5125",
+      "sha256": "7561652832b8004d06f2d7db59c5e2f4381bb4ca960eb5ab2964be3be18262bb",
       "size_bytes": 2791
     }
   ],
   "formal": false,
   "git_commit": "5c1d2ee79bbfe1a15cd6b872b58be5a0c34d9b73",
   "holdout_capability": false,
-  "inventory_sha256": "34ef9d0c0cc99fe9ae62e52a60e550a3de7b5ff7201238d3f7a7a272f76129fb",
+  "inventory_sha256": "a89fc1a818c213a6a3ce35e5a60e4c3e57feed4964e4eaa76f1bddd761f68be3",
   "literature_cutoff": "2026-06-21",
   "performance_evidence": false,
   "policy_version": "tmc_review_policy_v3_20260621",

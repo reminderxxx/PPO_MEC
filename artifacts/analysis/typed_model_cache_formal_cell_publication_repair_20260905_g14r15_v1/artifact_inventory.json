@@ -4,8 +4,8 @@
   "files": [
     {
       "path": "acceptance_evidence_manifest.json",
-      "sha256": "c2d428ab944461fb4b5b59f70b776e1937aeda2e4d54d38fea0ffc594c5937a4",
-      "size_bytes": 1385
+      "sha256": "ba0ffec2de467f9f9952463e76b036eba208f1893a604419624587c09fce196a",
+      "size_bytes": 1754
     },
     {
       "path": "cell_artifact_publication_contract.json",

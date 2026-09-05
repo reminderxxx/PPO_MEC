@@ -15,6 +15,7 @@
     "shared_real_cell_executor": "pass",
     "support_11_and_scalability_3": "pass"
   },
+  "clean_candidate": true,
   "evidence_level": "E2_ARTIFACT_AUDITED_NONFORMAL_EXECUTION_CONTRACT",
   "formal": false,
   "formal_checkpoint_count": 0,
@@ -26,6 +27,9 @@
   "literature_cutoff": "2026-06-21",
   "performance_evidence": false,
   "policy_version": "tmc_review_policy_v3_20260621",
+  "real_downstream_consumer_rehearsal_path": "artifacts/analysis/typed_model_cache_formal_cell_publication_repair_20260905_g14r15_v1/real_cell_transaction_rehearsal.json",
+  "real_downstream_consumer_rehearsal_sha256": "4c842af6230d38dab76ae31a9a731fee3e756e3b3a7df49aee0bd6a7989f16e8",
+  "real_downstream_consumer_rehearsal_status": "pass",
   "reviewed_at": "2026-09-05T16:48:00+08:00",
   "status": "pass",
   "target_venue": "IEEE Transactions on Mobile Computing (TMC)"

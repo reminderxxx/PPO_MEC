@@ -383,7 +383,7 @@
       "version_scope": "shared_historical_stable"
     },
     {
-      "content_sha256": "f7370bd132363f4fe50323e32dfe7dbd2559d291da0f04efc3a5aefc0dd4b1a8",
+      "content_sha256": "b0e92813c60bdcfa3ab7c837b8afa27d9c619eecec1f5b0da15ce02dee0119ee",
       "logical_id": "readiness_companion",
       "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905/readiness_v18.json",
       "role": "Readiness v18 evidence companion",
@@ -392,7 +392,7 @@
     }
   ],
   "active_formal_bundle_contract_version": "1.1.0",
-  "active_formal_bundle_sha256": "98c0f5ebd38ce7a9f9eadebe8ff69095cc28ff1830ca9cf3e8ae8c66557702b0",
+  "active_formal_bundle_sha256": "28b1b66b5bcde9f4e3586aa0a6ee11eb7f476fce6e01e0eeceefd6a91e5f385b",
   "command_matrix_identity": {
     "command_templates_sha256": "771a481009e24231f0e15acecf65c28e2e417844e2804fa8ff4ab88a1422b576",
     "outer_nested_expansion_equality_required": true
@@ -423,7 +423,7 @@
   },
   "protocol_index_version": "2.6.0",
   "readiness_companion": {
-    "content_sha256": "f7370bd132363f4fe50323e32dfe7dbd2559d291da0f04efc3a5aefc0dd4b1a8",
+    "content_sha256": "b0e92813c60bdcfa3ab7c837b8afa27d9c619eecec1f5b0da15ce02dee0119ee",
     "logical_path": "configs/experiment/typed_model_cache_formal_protocol_v2_6_20260905/readiness_v18.json"
   },
   "status": "READY_FOR_G14C_V14_CLEAN_TRAIN_AND_FORMAL"

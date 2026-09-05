@@ -231,6 +231,14 @@ def main() -> None:
         **common,
         "status": "pass" if all(value == "pass" for value in checks.values()) else "fail",
         "active_bundle_core_sha256": index["active_bundle_core_sha256"],
+        "clean_candidate": rehearsal.get("clean_detached_candidate") is True,
+        "real_downstream_consumer_rehearsal_path": (
+            ARTIFACT / "real_cell_transaction_rehearsal.json"
+        ).relative_to(ROOT).as_posix(),
+        "real_downstream_consumer_rehearsal_sha256": digest(
+            ARTIFACT / "real_cell_transaction_rehearsal.json"
+        ),
+        "real_downstream_consumer_rehearsal_status": rehearsal.get("status"),
         "checks": checks,
         "formal_training_count": 0,
         "formal_checkpoint_count": 0,
