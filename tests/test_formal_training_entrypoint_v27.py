@@ -247,3 +247,12 @@ def test_protocol_27_science_is_identical_to_26() -> None:
         current["execution_contract"]["command_templates"]
         == previous["execution_contract"]["command_templates"]
     )
+
+
+def test_pre_readiness_acceptance_mode_is_preflight_only() -> None:
+    from scripts.run_typed_model_cache_formal_protocol import parse_args
+
+    source = inspect.getsource(parse_args)
+    assert "--training-entrypoint-acceptance" in source
+    assert "restricted to a fresh --preflight" in source
+    assert "args.non_formal_rehearsal_profile" in source

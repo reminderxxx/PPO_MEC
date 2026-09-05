@@ -197,12 +197,29 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--python-executable", default="")
     parser.add_argument("--execution-environment-manifest", default="")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--training-entrypoint-acceptance",
+        action="store_true",
+        help=(
+            "Pre-readiness active-bundle acceptance; restricted to --preflight and "
+            "does not authorize training or formal performance."
+        ),
+    )
     parser.add_argument("--non-formal-rehearsal-profile", default="")
     args = parser.parse_args()
     if args.preflight == bool(args.phase):
         parser.error("select exactly one of --preflight or --phase")
     if args.resume_from_cell_ledger and not args.resume:
         parser.error("--resume-from-cell-ledger requires --resume")
+    if args.training_entrypoint_acceptance and (
+        not args.preflight
+        or args.resume
+        or args.finalize_phase_only
+        or args.non_formal_rehearsal_profile
+    ):
+        parser.error(
+            "--training-entrypoint-acceptance is restricted to a fresh --preflight"
+        )
     return args
 
 
@@ -302,7 +319,10 @@ def main() -> None:
                 execution_environment_manifest_path=(
                     args.execution_environment_manifest or None
                 ),
-                require_ready=not bool(args.non_formal_rehearsal_profile),
+                require_ready=not bool(
+                    args.non_formal_rehearsal_profile
+                    or args.training_entrypoint_acceptance
+                ),
                 require_origin_main_match=not bool(args.non_formal_rehearsal_profile),
             )
         except ActiveFormalBundleError as exc:
@@ -353,7 +373,10 @@ def main() -> None:
                 execution_environment_manifest_path=(
                     args.execution_environment_manifest or None
                 ),
-                require_ready=not bool(args.non_formal_rehearsal_profile),
+                require_ready=not bool(
+                    args.non_formal_rehearsal_profile
+                    or args.training_entrypoint_acceptance
+                ),
                 require_origin_main_match=not bool(args.non_formal_rehearsal_profile),
             )
         except ActiveFormalBundleError as exc:

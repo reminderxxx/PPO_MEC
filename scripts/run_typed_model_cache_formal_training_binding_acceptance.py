@@ -85,7 +85,7 @@ def main() -> None:
     active_bundle = validate_active_formal_bundle(
         repository_root=clean_root,
         index_path=clean_root / DEFAULT_ACTIVE_INDEX_RELATIVE,
-        require_ready=True,
+        require_ready=False,
         require_clean_git=True,
         require_origin_main_match=True,
     )
@@ -149,6 +149,7 @@ def main() -> None:
         "--output-root", str(output_root),
         "--python-executable", python,
         "--execution-environment-manifest", str(environment_path),
+        "--training-entrypoint-acceptance",
     ]
     dry_run = run([*common, "--preflight", "--dry-run"], cwd=clean_root)
     dry_payload = json.loads(dry_run.stdout)
