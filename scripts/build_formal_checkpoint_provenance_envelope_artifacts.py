@@ -31,15 +31,16 @@ PROTECTED = {
 }
 BASELINE_COMMIT = "c219c88552a26d229e11410331650d51aee5ebfb"
 SCIENCE_FIELDS = (
-    "data_contract",
-    "split_contract",
+    "workload",
+    "agent_matrix",
+    "seed_plan",
     "training_budget",
-    "cache_capacity_strata",
-    "typed_catalog_contract",
-    "primary_endpoints",
-    "supporting_outputs",
-    "dev_selection_contract",
-    "formal_statistics_contract",
+    "typed_catalog_and_capacity",
+    "endpoints",
+    "ablation_and_support",
+    "statistics",
+    "claim_evidence_map",
+    "comparisons",
     "holdout_execution_contract",
 )
 REQUIRED_TESTS = {
