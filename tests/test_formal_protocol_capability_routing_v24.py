@@ -14,7 +14,11 @@ from src.evaluators.typed_model_cache_formal_execution import (
     validate_command_templates,
     validate_protocol_v1_1,
 )
-from src.runtime.active_formal_bundle import READY_STATUS, validate_active_formal_bundle
+from src.runtime.active_formal_bundle import (
+    DEFAULT_ACTIVE_INDEX_RELATIVE,
+    READY_STATUS,
+    validate_active_formal_bundle,
+)
 from src.runtime.formal_protocol_capabilities import (
     ACTIVE_EXECUTION_PROTOCOL_VERSION,
     FORMAL_PROTOCOL_CAPABILITY_ROUTING_CONTRACT_VERSION,
@@ -61,6 +65,11 @@ def git_clean() -> bool:
         check=False,
     )
     return result.returncode == 0 and not result.stdout.strip()
+
+
+def active_bundle_ready() -> bool:
+    index = load(ROOT / DEFAULT_ACTIVE_INDEX_RELATIVE)
+    return index.get("status") == READY_STATUS
 
 
 def build_persisted_context(tmp_path: Path) -> tuple[dict, dict, Path]:
@@ -166,8 +175,8 @@ def test_v24_protocol_contract_and_command_matrix_identity() -> None:
 
 
 def test_v24_real_nested_wrapper_consumes_persisted_context(tmp_path: Path) -> None:
-    if not git_clean():
-        pytest.skip("requires the final Git-clean candidate")
+    if not git_clean() or not active_bundle_ready():
+        pytest.skip("requires the finalized Git-clean active bundle")
     payload, outer, context_path = build_persisted_context(tmp_path)
     output = tmp_path / "nested-preflight.json"
     result = subprocess.run(
@@ -230,8 +239,8 @@ def test_v24_nested_wrapper_missing_context_rejected_by_real_subprocess(
 def test_v24_context_tamper_cross_protocol_and_relative_python_rejected(
     tmp_path: Path,
 ) -> None:
-    if not git_clean():
-        pytest.skip("requires the final Git-clean candidate")
+    if not git_clean() or not active_bundle_ready():
+        pytest.skip("requires the finalized Git-clean active bundle")
     payload, _, _ = build_persisted_context(tmp_path)
     sha_tamper = deepcopy(payload)
     sha_tamper["context_sha256"] = "0" * 64
