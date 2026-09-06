@@ -13,7 +13,7 @@ from src.evaluators.typed_model_cache_formal_execution import FormalExecutionErr
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ACTIVE_ROOT = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905"
+ACTIVE_ROOT = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_8_20260906"
 INDEX = ACTIVE_ROOT / "protocol_index.json"
 V17_INDEX = (
     ROOT
@@ -44,12 +44,7 @@ def bundle_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     readiness = load(ROOT / index["readiness_companion"]["logical_path"])
     paths.append(readiness["evidence_manifest_path"])
     evidence = load(ROOT / readiness["evidence_manifest_path"])
-    paths.extend(
-        [
-            evidence["real_downstream_consumer_rehearsal_path"],
-            evidence["formal_training_entrypoint_acceptance_path"],
-        ]
-    )
+    paths.append(evidence["checkpoint_identity_acceptance_path"])
     for relative in paths:
         source = ROOT / relative
         target = tmp_path / relative
@@ -194,9 +189,11 @@ def test_active_resource_content_or_identity_drift_is_rejected(
 def test_protocol_path_hash_drift_and_same_name_different_hash_are_rejected(
     bundle_root: Path,
 ) -> None:
-    different = bundle_root / "elsewhere/protocol_v2_7_manifest.json"
+    different = bundle_root / "elsewhere/protocol_v2_8_manifest.json"
     different.parent.mkdir(parents=True)
-    different.write_bytes((ACTIVE_ROOT / "protocol_v2_7_manifest.json").read_bytes() + b"\n")
+    different.write_bytes(
+        (ACTIVE_ROOT / "protocol_v2_8_manifest.json").read_bytes() + b"\n"
+    )
     with pytest.raises(active.ActiveFormalBundleError, match="does not equal"):
         validate(bundle_root, protocol_path=different)
 
@@ -258,6 +255,37 @@ def test_missing_readiness_evidence_and_status_without_evidence_hash_are_rejecte
         validate(bundle_root)
 
 
+def test_checkpoint_identity_acceptance_drift_is_rejected(
+    bundle_root: Path,
+) -> None:
+    index = load(bundle_root / active.DEFAULT_ACTIVE_INDEX_RELATIVE)
+    readiness = load(bundle_root / index["readiness_companion"]["logical_path"])
+    evidence_path = bundle_root / readiness["evidence_manifest_path"]
+    evidence = load(evidence_path)
+    acceptance_path = bundle_root / evidence["checkpoint_identity_acceptance_path"]
+    acceptance = load(acceptance_path)
+    acceptance["metadata_projection_count"] = 1199
+    dump(acceptance_path, acceptance)
+    evidence["checkpoint_identity_acceptance_sha256"] = active.sha256_file(
+        acceptance_path
+    )
+    dump(evidence_path, evidence)
+    readiness["evidence_manifest_sha256"] = active.sha256_file(evidence_path)
+    readiness_path = bundle_root / index["readiness_companion"]["logical_path"]
+    dump(readiness_path, readiness)
+    readiness_row = next(
+        row
+        for row in index["active_bundle_resources"]
+        if row["logical_id"] == "readiness_companion"
+    )
+    readiness_row["content_sha256"] = active.sha256_file(readiness_path)
+    readiness_row["size_bytes"] = readiness_path.stat().st_size
+    index["readiness_companion"]["content_sha256"] = readiness_row["content_sha256"]
+    refresh_ready_hash(bundle_root, index)
+    with pytest.raises(active.ActiveFormalBundleError, match="missing or incomplete"):
+        validate(bundle_root)
+
+
 def test_symlink_cwd_guessing_and_alternate_index_are_rejected(
     bundle_root: Path,
 ) -> None:
@@ -268,11 +296,11 @@ def test_symlink_cwd_guessing_and_alternate_index_are_rejected(
     alias = bundle_root / "protocol_alias"
     alias.symlink_to(
         bundle_root
-        / "configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905",
+        / "configs/experiment/typed_model_cache_formal_protocol_v2_8_20260906",
         target_is_directory=True,
     )
     with pytest.raises(active.ActiveFormalBundleError, match="symlink"):
-        validate(bundle_root, protocol_path=alias / "protocol_v2_7_manifest.json")
+        validate(bundle_root, protocol_path=alias / "protocol_v2_8_manifest.json")
 
 
 def test_outer_runner_source_gates_dry_run_before_output_writes() -> None:
@@ -286,7 +314,7 @@ def test_outer_runner_source_gates_dry_run_before_output_writes() -> None:
 
 
 def test_all_registered_invalid_roots_including_v11_remain_rejected() -> None:
-    protocol = load(ACTIVE_ROOT / "protocol_v2_7_manifest.json")
+    protocol = load(ACTIVE_ROOT / "protocol_v2_8_manifest.json")
     assert any(item["run_id"].endswith("g14c_v11") for item in protocol["supersession"]["invalid_execution_runs"])
     for item in protocol["supersession"]["invalid_execution_runs"]:
         root = ROOT / "artifacts/experiments/typed_model_cache_formal" / item["run_id"]

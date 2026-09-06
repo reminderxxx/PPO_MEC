@@ -492,7 +492,7 @@ def validate_active_formal_bundle(
         readiness_row = resources["readiness_companion"]
         readiness = _strict_object(
             _resolve_registered_path(root, readiness_row["logical_path"], "readiness"),
-            "Readiness v19 companion",
+            "active Readiness companion",
         )
         if readiness.get("readiness_review_version") != READINESS_VERSION:
             raise ActiveFormalBundleError("Readiness companion version mismatch")
@@ -506,76 +506,103 @@ def validate_active_formal_bundle(
         if sha256_file(evidence_path) != readiness.get("evidence_manifest_sha256"):
             raise ActiveFormalBundleError("Readiness acceptance evidence drift")
         evidence = _strict_object(evidence_path, "Readiness acceptance evidence")
-        if evidence.get("status") != "pass" or not evidence.get("clean_candidate"):
+        if evidence.get("status") != "pass":
             raise ActiveFormalBundleError("Readiness acceptance evidence is missing or incomplete")
         if evidence.get("active_bundle_core_sha256") != expected_core:
             raise ActiveFormalBundleError("acceptance evidence bundle identity drift")
-        rehearsal_path = _resolve_registered_path(
+        checkpoint_acceptance_path = _resolve_registered_path(
             root,
-            evidence.get("real_downstream_consumer_rehearsal_path"),
-            "real downstream consumer rehearsal",
+            evidence.get("checkpoint_identity_acceptance_path"),
+            "checkpoint identity acceptance",
         )
-        if sha256_file(rehearsal_path) != evidence.get(
-            "real_downstream_consumer_rehearsal_sha256"
+        if sha256_file(checkpoint_acceptance_path) != evidence.get(
+            "checkpoint_identity_acceptance_sha256"
         ):
-            raise ActiveFormalBundleError("real downstream consumer rehearsal drift")
-        rehearsal = _strict_object(
-            rehearsal_path, "real downstream consumer rehearsal"
+            raise ActiveFormalBundleError("checkpoint identity acceptance drift")
+        checkpoint_acceptance = _strict_object(
+            checkpoint_acceptance_path, "checkpoint identity acceptance"
         )
+        checks = evidence.get("checks")
+        required_checks = {
+            "candidate_and_latest_artifacts_covered",
+            "g14c_v15_failure_boundary_audited",
+            "holdout_sealed_unopened_unconsumed",
+            "metadata_matrix_1200_roundtrips",
+            "negative_matrix_complete",
+            "no_g14c_v16_formal_g14d_or_g15",
+            "old_run_permanently_non_reusable",
+            "prebenchmark_zero_child_negative",
+            "producer_consumer_projection_shared",
+            "protected_files_unchanged",
+            "scientific_and_nullable_semantics_unchanged",
+            "selection_freeze_actual_checkpoint_revalidation",
+            "ten_agent_actual_save_readback",
+            "three_capacity_runtime_identity_covered",
+            "typed_provenance_strict_consumption",
+        }
+        candidate_commit = evidence.get("candidate_commit")
+        identity_cases = checkpoint_acceptance.get("identity_test_cases")
+        targeted_tests = checkpoint_acceptance.get("targeted_tests")
         if not all(
             (
-                evidence.get("real_downstream_consumer_rehearsal_status") == "pass",
-                rehearsal.get("status") == "pass",
-                rehearsal.get("clean_detached_candidate") is True,
-                rehearsal.get("completed_phase_terminal_count") == 13,
-                rehearsal.get("formal") is False,
-                rehearsal.get("performance_evidence") is False,
-                rehearsal.get("holdout_capability") is False,
+                evidence.get("checkpoint_identity_acceptance_status") == "pass",
+                isinstance(checks, Mapping),
+                required_checks.issubset(checks)
+                if isinstance(checks, Mapping)
+                else False,
+                all(checks.get(key) == "pass" for key in required_checks)
+                if isinstance(checks, Mapping)
+                else False,
+                evidence.get("formal") is False,
+                evidence.get("formal_training_count") == 0,
+                evidence.get("formal_performance_count") == 0,
+                evidence.get("performance_evidence") is False,
+                evidence.get("holdout_capability") is False,
+                evidence.get("holdout_sealed_unopened_unconsumed") is True,
+                candidate_commit == evidence.get("git_commit"),
+                isinstance(candidate_commit, str),
+                len(candidate_commit) == 40
+                if isinstance(candidate_commit, str)
+                else False,
+                all(
+                    character in "0123456789abcdef"
+                    for character in candidate_commit
+                )
+                if isinstance(candidate_commit, str)
+                else False,
+                checkpoint_acceptance.get("status") == "pass",
+                checkpoint_acceptance.get("formal") is False,
+                checkpoint_acceptance.get("performance_evidence") is False,
+                checkpoint_acceptance.get("formal_training_or_performance_evidence")
+                is False,
+                checkpoint_acceptance.get("holdout_capability") is False,
+                checkpoint_acceptance.get("test_artifacts_only") is True,
+                checkpoint_acceptance.get("metadata_projection_count") == 1200,
+                checkpoint_acceptance.get("matrix_coordinates") == 150,
+                checkpoint_acceptance.get("strict_selected_checkpoint_count") == 150,
+                checkpoint_acceptance.get("actual_agent_serialization_paths") == 10,
+                checkpoint_acceptance.get("identity_test_case_count") == 19,
+                isinstance(identity_cases, list),
+                len(identity_cases) == 19
+                if isinstance(identity_cases, list)
+                else False,
+                all(
+                    isinstance(row, Mapping) and row.get("status") == "passed"
+                    for row in identity_cases
+                )
+                if isinstance(identity_cases, list)
+                else False,
+                isinstance(targeted_tests, Mapping),
+                targeted_tests.get("failures") == 0
+                if isinstance(targeted_tests, Mapping)
+                else False,
+                targeted_tests.get("errors") == 0
+                if isinstance(targeted_tests, Mapping)
+                else False,
             )
         ):
             raise ActiveFormalBundleError(
-                "real downstream consumer rehearsal is missing or incomplete"
-            )
-        entrypoint_path = _resolve_registered_path(
-            root,
-            evidence.get("formal_training_entrypoint_acceptance_path"),
-            "formal training entrypoint acceptance",
-        )
-        if sha256_file(entrypoint_path) != evidence.get(
-            "formal_training_entrypoint_acceptance_sha256"
-        ):
-            raise ActiveFormalBundleError(
-                "formal training entrypoint acceptance drift"
-            )
-        entrypoint = _strict_object(
-            entrypoint_path, "formal training entrypoint acceptance"
-        )
-        nullable_hash = protocol[
-            "formal_nullable_metric_aggregation_contract"
-        ]["semantic_sha256"]
-        if not all(
-            (
-                evidence.get("formal_training_entrypoint_acceptance_status") == "pass",
-                entrypoint.get("status") == "pass",
-                entrypoint.get("clean_detached_candidate") is True,
-                entrypoint.get("formal") is False,
-                entrypoint.get("training") is False,
-                entrypoint.get("performance_evidence") is False,
-                entrypoint.get("training_command_count") == 150,
-                entrypoint.get("passed_command_count") == 150,
-                entrypoint.get("episode_count") == 0,
-                entrypoint.get("environment_interaction_count") == 0,
-                entrypoint.get("update_count") == 0,
-                entrypoint.get("checkpoint_file_count") == 0,
-                entrypoint.get("performance_result_count") == 0,
-                entrypoint.get("nullable_metric_contract_required") is True,
-                entrypoint.get("nullable_metric_contract_semantic_sha256")
-                == nullable_hash,
-                entrypoint.get("active_bundle_core_sha256") == expected_core,
-            )
-        ):
-            raise ActiveFormalBundleError(
-                "formal training entrypoint acceptance is missing or incomplete"
+                "checkpoint identity acceptance is missing or incomplete"
             )
 
     if require_ready:
