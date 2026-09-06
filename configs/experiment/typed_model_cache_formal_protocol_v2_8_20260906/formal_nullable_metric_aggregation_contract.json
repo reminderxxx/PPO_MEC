@@ -1,0 +1,104 @@
+{
+  "aggregation": {
+    "availability_companion_fields": [
+      "total_count",
+      "available_count",
+      "unavailable_count",
+      "availability_status"
+    ],
+    "available_values_only": true,
+    "denominator_is_available_count": true,
+    "examples": [
+      {
+        "available_count": 0,
+        "input": [
+          null
+        ],
+        "mean": null,
+        "unavailable_count": 1
+      },
+      {
+        "available_count": 1,
+        "input": [
+          0.0
+        ],
+        "mean": 0.0,
+        "unavailable_count": 0
+      },
+      {
+        "available_count": 1,
+        "input": [
+          null,
+          6.0
+        ],
+        "mean": 6.0,
+        "unavailable_count": 1
+      },
+      {
+        "availability_status": "unavailable_no_rows",
+        "available_count": 0,
+        "input": [],
+        "mean": null,
+        "unavailable_count": 0
+      }
+    ],
+    "mean_metrics_compatibility": "top-level metric remains float_or_null"
+  },
+  "dev_selection": {
+    "all_candidates_unavailable": "dimension_not_used_and_recorded",
+    "both_unavailable": "skip_to_next_dimension",
+    "finite_before_unavailable_per_metric": true,
+    "forbidden_null_sentinels": [
+      0,
+      "Infinity",
+      "-Infinity",
+      "reward"
+    ],
+    "frozen_metric_order_unchanged": true
+  },
+  "endpoint_consistency": {
+    "available_completed_workflow": "finite end_to_end_workflow_delay",
+    "failed_incomplete_or_right_censored_workflow": "null end_to_end_workflow_delay"
+  },
+  "producer_consumer_scope": [
+    "train",
+    "eval",
+    "dev_checkpoint_selection",
+    "checkpoint_freeze",
+    "formal_benchmark",
+    "formal_statistics",
+    "formal_gate_and_claim_map"
+  ],
+  "pure_reducer": "src.metrics.formal_nullable_metrics",
+  "semantic_sha256": "50a9983d21afdc06ec9df309c29f75f5009e062013990bb491ed58c442470889",
+  "serialization": {
+    "canonical_serialization": "UTF-8 sorted-key compact JSON",
+    "csv_empty_cell": "round_trips_as_unavailable_not_zero",
+    "json_allow_nan": false
+  },
+  "statistics": {
+    "holm_inputs": "available_finite_p_values_only",
+    "lower_is_better": [
+      "transfer_mb_per_request",
+      "end_to_end_workflow_delay"
+    ],
+    "paired_availability": "candidate_and_baseline_both_finite",
+    "zero_available_pairs": "all_effect_CI_and_p_values_null",
+    "zero_pair_gate_and_claim_status": "UNAVAILABLE_not_tie_pass_or_fail"
+  },
+  "value_semantics": {
+    "available": "finite int or float; true zero is available",
+    "explicit_null": "preserve_and_count_unavailable",
+    "invalid": [
+      "bool",
+      "unparseable_string",
+      "NaN",
+      "positive_Infinity",
+      "negative_Infinity"
+    ],
+    "invalid_action": "fail_fast",
+    "required_field_missing": "fail_fast_on_active_formal_path",
+    "unavailable": "explicit JSON null; never imputed as zero"
+  },
+  "version": "1.0.0"
+}

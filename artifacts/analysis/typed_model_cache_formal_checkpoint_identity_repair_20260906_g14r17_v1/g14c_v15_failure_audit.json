@@ -1,0 +1,46 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_20260905_213344_g14c_v15",
+  "audit_scope": "read_only_terminal_failure_boundary_and_identity_structure",
+  "candidate_checkpoint_count": 1200,
+  "cell_ledger": {
+    "committed_dev_cells": 24,
+    "committed_training_cells": 150,
+    "path": "artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260905_213344_g14c_v15/cell_state.jsonl",
+    "sha256": "a70b9e80e4024eb622b6766704a644a7290e79a3238db13ad5e9e8f45ca095b9"
+  },
+  "checkpoint_candidates": {
+    "nested_nullable_hash": "50a9983d21afdc06ec9df309c29f75f5009e062013990bb491ed58c442470889",
+    "path": "artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260905_213344_g14c_v15/checkpoint_candidates.json",
+    "sha256": "fe309ba793ace56a9c9ae9ae41b804fb311618ab1222c850d03f138ce10448a3",
+    "top_level_nullable_hash": null
+  },
+  "dev_selection_published": false,
+  "failure_classification": "child_command_failure",
+  "failure_phase": "dev_select",
+  "formal_gate_published": false,
+  "formal_performance_count": 0,
+  "holdout": {
+    "capability": false,
+    "consumed": false,
+    "opened": false,
+    "sealed": true
+  },
+  "immutable_old_run": true,
+  "phase_ledger": {
+    "dev_select_return_code": 1,
+    "path": "artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260905_213344_g14c_v15/phase_state.jsonl",
+    "sha256": "7630c3ec3ef71cc306eeef806f0697f68fd13080124711d43b7dec02ade7b3ab"
+  },
+  "prohibited_actions": [
+    "resume",
+    "retry",
+    "finalize",
+    "salvage",
+    "checkpoint reuse",
+    "candidate reuse",
+    "partial dev reuse"
+  ],
+  "reviewed_at": "2026-09-06T12:00:00+08:00",
+  "status": "INVALID_PROTOCOL_OR_IMPLEMENTATION",
+  "terminal_boundary": "after 150 committed training cells and 24 committed dev evaluation cells, before dev selection publication"
+}

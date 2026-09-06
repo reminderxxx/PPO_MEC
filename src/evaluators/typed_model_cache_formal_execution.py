@@ -67,6 +67,8 @@ FORMAL_EXECUTION_PROTOCOL_V2_6_VERSION = "2.6.0"
 FORMAL_EXECUTION_PROTOCOL_V2_6_ID = "typed_model_cache_formal_protocol_v2_6"
 FORMAL_EXECUTION_PROTOCOL_V2_7_VERSION = "2.7.0"
 FORMAL_EXECUTION_PROTOCOL_V2_7_ID = "typed_model_cache_formal_protocol_v2_7"
+FORMAL_EXECUTION_PROTOCOL_V2_8_VERSION = "2.8.0"
+FORMAL_EXECUTION_PROTOCOL_V2_8_ID = "typed_model_cache_formal_protocol_v2_8"
 FORMAL_PHASE_RUNNER_VERSION = "2.0.0"
 FORMAL_PHASE_LEDGER_SCHEMA_VERSION = "2.0.0"
 LEGACY_PRIMARY_ENDPOINT_SCHEMA_VERSION = "1.0.0"
@@ -582,10 +584,82 @@ def validate_command_templates(
 def validate_protocol_v1_1(protocol: Mapping[str, Any]) -> dict[str, Any]:
     _reject_non_finite(protocol)
     version = protocol.get("typed_model_cache_formal_protocol_version")
+    if version == FORMAL_EXECUTION_PROTOCOL_V2_8_VERSION:
+        if protocol.get("protocol_id") != FORMAL_EXECUTION_PROTOCOL_V2_8_ID:
+            raise FormalExecutionError("formal execution protocol v2.8 ID mismatch")
+        capabilities = require_live_execution_protocol(version)
+        supersession = protocol.get("supersession", {})
+        authorization = supersession.get("g14r17_authorization_boundary", {})
+        invalid = next(
+            (
+                row
+                for row in supersession.get("invalid_execution_runs", [])
+                if isinstance(row, Mapping)
+                and row.get("run_id")
+                == "typed_model_cache_formal_20260905_213344_g14c_v15"
+            ),
+            None,
+        )
+        if (
+            supersession.get("supersedes_version") != "2.7.0"
+            or supersession.get("old_protocol_status")
+            != "historical_audit_only_after_checkpoint_nullable_identity_failure"
+            or authorization.get("status") != "EXECUTION_CONTRACT_REPAIR_ONLY"
+            or authorization.get("g14c_v16_created") is not False
+            or authorization.get("formal_training_count") != 0
+            or authorization.get("formal_performance_count") != 0
+            or authorization.get("holdout_opened") is not False
+        ):
+            raise FormalExecutionError("Protocol v2.8 authorization boundary is incomplete")
+        if not isinstance(invalid, Mapping) or any(
+            (
+                invalid.get("failure_boundary")
+                != "invalid_after_training_and_dev_evaluation_before_selection_publication",
+                invalid.get("phase_ledger_sha256")
+                != "7630c3ec3ef71cc306eeef806f0697f68fd13080124711d43b7dec02ade7b3ab",
+                invalid.get("cell_ledger_sha256")
+                != "a70b9e80e4024eb622b6766704a644a7290e79a3238db13ad5e9e8f45ca095b9",
+                invalid.get("checkpoint_candidates_sha256")
+                != "fe309ba793ace56a9c9ae9ae41b804fb311618ab1222c850d03f138ce10448a3",
+                invalid.get("training_cells_committed") != 150,
+                invalid.get("dev_cells_committed") != 24,
+                invalid.get("candidate_checkpoint_count") != 1200,
+                invalid.get("dev_selection_published") is not False,
+                invalid.get("checkpoint_reuse_allowed") is not False,
+                invalid.get("resume_allowed") is not False,
+                invalid.get("retry_allowed") is not False,
+                invalid.get("salvage_allowed") is not False,
+            )
+        ):
+            raise FormalExecutionError("G14C v15 permanent invalidation is incomplete")
+        if not all(
+            (
+                capabilities.nullable_metric_contract_required,
+                capabilities.generated_checkpoint_resource_required,
+                capabilities.cell_artifact_publication_required,
+                not capabilities.holdout_capability,
+            )
+        ):
+            raise FormalExecutionError("Protocol v2.8 execution capabilities are missing")
+        expected = canonical_sha256(
+            semantic_projection(
+                {key: value for key, value in protocol.items() if key != "hashes"}
+            )
+        )
+        if protocol.get("hashes", {}).get("semantic_sha256") != expected:
+            raise FormalExecutionError("formal protocol v2.8 semantic hash mismatch")
+        return {
+            "status": "pass",
+            "protocol_version": version,
+            "semantic_sha256": expected,
+            "split_semantic_sha256": SPLIT_SEMANTIC_SHA256,
+            "primary_endpoint_count": len(PRIMARY_ENDPOINTS),
+            "phase_count": len(PHASE_ORDER),
+        }
     if version == FORMAL_EXECUTION_PROTOCOL_V2_7_VERSION:
         if protocol.get("protocol_id") != FORMAL_EXECUTION_PROTOCOL_V2_7_ID:
             raise FormalExecutionError("formal execution protocol v2.7 ID mismatch")
-        capabilities = require_live_execution_protocol(version)
+        capabilities = get_protocol_capabilities(version)
         supersession = protocol.get("supersession", {})
         authorization = supersession.get("g14r16_authorization_boundary", {})
         invalid = next(
@@ -2340,6 +2414,8 @@ __all__ = [
     "FORMAL_EXECUTION_PROTOCOL_V2_6_VERSION",
     "FORMAL_EXECUTION_PROTOCOL_V2_7_ID",
     "FORMAL_EXECUTION_PROTOCOL_V2_7_VERSION",
+    "FORMAL_EXECUTION_PROTOCOL_V2_8_ID",
+    "FORMAL_EXECUTION_PROTOCOL_V2_8_VERSION",
     "FORMAL_PHASE_LEDGER_SCHEMA_VERSION",
     "FORMAL_PHASE_RUNNER_VERSION",
     "FAILURE_CLASSIFICATIONS",

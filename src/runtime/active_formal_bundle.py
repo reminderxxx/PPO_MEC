@@ -34,12 +34,12 @@ from src.runtime.formal_protocol_capabilities import (
 
 ACTIVE_FORMAL_BUNDLE_CONTRACT_VERSION = "1.1.0"
 ACTIVE_BUNDLE_RESOURCE_RESOLUTION_CONTRACT_VERSION = "1.0.0"
-ACTIVE_PROTOCOL_VERSION = "2.7.0"
-ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v2_7"
-READY_STATUS = "READY_FOR_G14C_V15_CLEAN_TRAIN_AND_FORMAL"
-READINESS_VERSION = "19.0.0"
+ACTIVE_PROTOCOL_VERSION = "2.8.0"
+ACTIVE_PROTOCOL_ID = "typed_model_cache_formal_protocol_v2_8"
+READY_STATUS = "READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL"
+READINESS_VERSION = "20.0.0"
 DEFAULT_ACTIVE_INDEX_RELATIVE = (
-    "configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905/"
+    "configs/experiment/typed_model_cache_formal_protocol_v2_8_20260906/"
     "protocol_index.json"
 )
 CAPACITY_ORDER = (

@@ -1,0 +1,35 @@
+{
+  "attempt_staging_root": ".staging/<phase>/<cell_id>/attempt_<n>",
+  "cell_ledger_version": "2.0.0",
+  "child_output_descriptor_version": "1.0.0",
+  "child_output_location": "attempt staging child_output or typed producer root",
+  "committed_destination": "durable phase/cell logical path",
+  "fail_closed": [
+    "missing_or_duplicate_child_output",
+    "wrong_setting_or_cross_cell",
+    "path_escape_or_symlink",
+    "payload_missing_or_hash_drift",
+    "staging_or_failed_attempt_consumption",
+    "duplicate_commit"
+  ],
+  "logical_cell_identity": "phase plus frozen matrix coordinates",
+  "publication_order": [
+    "child_return_zero",
+    "resolve_exact_child_output",
+    "validate_identity_required_payload_inventory_and_no_symlink",
+    "rebase_internal_paths_to_committed_destination",
+    "write_committed_marker_in_staging",
+    "atomic_rename",
+    "append_committed_cell_terminal",
+    "phase_completion_candidate_then_terminal"
+  ],
+  "recovery": {
+    "after_publish_before_terminal": "revalidate marker and payload then append terminal",
+    "already_committed": "revalidate and skip without rerun",
+    "before_publish": "new bounded attempt; prior attempt remains non-consumable"
+  },
+  "required_payload": "phase-specific exact files plus complete inventory",
+  "semantic_sha256": "729581e2df55b1d830fc0c631ec961266be94a435522b47113df0528ffe9ba7c",
+  "validated_artifact_root": "exact structured descriptor or one immediate child",
+  "version": "1.0.0"
+}
