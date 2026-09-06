@@ -1,0 +1,32 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1",
+  "budget_seed_window_capacity_selection_statistics_holdout_changed": false,
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "formal": false,
+  "from_version": "2.8.0",
+  "git_commit": "b642d27ee4426c9a7fc55bf49823c70568de8058",
+  "holdout_capability": false,
+  "implementation_change": "17-field provenance envelope and 8-field shared identity are validated at separate interface layers",
+  "literature_cutoff": "2026-09-06",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-06T14:49:26+08:00",
+  "scientific_fields_unchanged": {
+    "ablation_and_support": true,
+    "agent_matrix": true,
+    "claim_evidence_map": true,
+    "command_templates": true,
+    "comparisons": true,
+    "endpoints": true,
+    "holdout_execution_contract": true,
+    "nullable_contract": true,
+    "seed_plan": true,
+    "statistics": true,
+    "training_budget": true,
+    "typed_catalog_and_capacity": true,
+    "workload": true
+  },
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "to_version": "2.9.0"
+}

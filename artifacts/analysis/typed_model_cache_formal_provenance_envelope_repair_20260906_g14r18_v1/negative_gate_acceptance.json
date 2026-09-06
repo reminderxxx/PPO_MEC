@@ -1,0 +1,28 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1",
+  "covered": [
+    "required shared identity missing",
+    "uniform wrong nullable hash",
+    "top-level/nested conflict",
+    "cross Protocol/bundle/binding/context",
+    "checkpoint SHA-256",
+    "execution Git",
+    "train window",
+    "runtime/capacity",
+    "agent/seed",
+    "checkpoint self-reported Protocol downgrade",
+    "missing formal binding cannot disable active strict gate"
+  ],
+  "environment_rollout_call_count": 0,
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "formal": false,
+  "gate_precedes_run_real_episode_source_assertion": true,
+  "git_commit": "b642d27ee4426c9a7fc55bf49823c70568de8058",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-09-06",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-06T14:49:26+08:00",
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
+}

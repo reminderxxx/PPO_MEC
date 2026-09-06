@@ -44,7 +44,7 @@ def bundle_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     readiness = load(ROOT / index["readiness_companion"]["logical_path"])
     paths.append(readiness["evidence_manifest_path"])
     evidence = load(ROOT / readiness["evidence_manifest_path"])
-    paths.append(evidence["checkpoint_identity_acceptance_path"])
+    paths.append(evidence["real_companion_benchmark_gate_path"])
     for relative in paths:
         source = ROOT / relative
         target = tmp_path / relative
@@ -262,11 +262,11 @@ def test_checkpoint_identity_acceptance_drift_is_rejected(
     readiness = load(bundle_root / index["readiness_companion"]["logical_path"])
     evidence_path = bundle_root / readiness["evidence_manifest_path"]
     evidence = load(evidence_path)
-    acceptance_path = bundle_root / evidence["checkpoint_identity_acceptance_path"]
+    acceptance_path = bundle_root / evidence["real_companion_benchmark_gate_path"]
     acceptance = load(acceptance_path)
-    acceptance["metadata_projection_count"] = 1199
+    acceptance["checkpoint_gate_compatible_count"] = 149
     dump(acceptance_path, acceptance)
-    evidence["checkpoint_identity_acceptance_sha256"] = active.sha256_file(
+    evidence["real_companion_benchmark_gate_sha256"] = active.sha256_file(
         acceptance_path
     )
     dump(evidence_path, evidence)

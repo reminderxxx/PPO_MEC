@@ -1,0 +1,68 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1",
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "file_count": 10,
+  "files": [
+    {
+      "path": "acceptance_evidence_manifest.json",
+      "sha256": "f26d367a2966421c1db4f06f1effbf5135a8a2af3a5f0d64267c296667d6fd9b",
+      "size_bytes": 1779
+    },
+    {
+      "path": "baseline_and_protected_files_audit.json",
+      "sha256": "498bd7e4f06bd7c5717dba17027a21bc55f77d44a3febd94d9a2d8131c199af7",
+      "size_bytes": 2852
+    },
+    {
+      "path": "candidate_full_tests.junit.xml",
+      "sha256": "ee0eab63fa2da7f5d8058f4be9565babc96027653120a157486ed6ed15a100e2",
+      "size_bytes": 200823
+    },
+    {
+      "path": "candidate_targeted_tests.junit.xml",
+      "sha256": "bbacfa415c9c8a5c774682412a66745574a0e49b789ae69528c3da7043623f00",
+      "size_bytes": 24524
+    },
+    {
+      "path": "g14c_v16_authorization_deferral.json",
+      "sha256": "7afc65c750b0130c21b64aae0b0f147b26cad23fd432bda6ec497fbd5c090c61",
+      "size_bytes": 887
+    },
+    {
+      "path": "negative_gate_acceptance.json",
+      "sha256": "df5c5c89da1175edcaa36e9461d323acb4d5525054df2e65eeac87097f2821d0",
+      "size_bytes": 1033
+    },
+    {
+      "path": "protocol_scientific_diff.json",
+      "sha256": "8c52ea197b86d9c364cfac1cf59336befca959ee674e470d90d0a57e7eec866e",
+      "size_bytes": 1217
+    },
+    {
+      "path": "readiness_review_v21.json",
+      "sha256": "2eaa368430ce9ea9bc21d02c83faf3980ba1fdc15bcfb6af4c1f45506feee7a8",
+      "size_bytes": 994
+    },
+    {
+      "path": "real_companion_benchmark_gate_acceptance.json",
+      "sha256": "2f39555bc4fe52e60f931323d23e690df80391cab9c013f6c6cd4107d9ef8aad",
+      "size_bytes": 1231
+    },
+    {
+      "path": "root_cause_and_schema_mapping.json",
+      "sha256": "483be364aaf5ec91c92084a45997f2866b2520b2ee4002e06a7ec02ae420222c",
+      "size_bytes": 1423
+    }
+  ],
+  "formal": false,
+  "git_commit": "b642d27ee4426c9a7fc55bf49823c70568de8058",
+  "holdout_capability": false,
+  "inventory_excluded": true,
+  "literature_cutoff": "2026-09-06",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-06T14:49:26+08:00",
+  "self_excluded": true,
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
+}

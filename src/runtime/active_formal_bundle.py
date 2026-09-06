@@ -510,20 +510,40 @@ def validate_active_formal_bundle(
             raise ActiveFormalBundleError("Readiness acceptance evidence is missing or incomplete")
         if evidence.get("active_bundle_core_sha256") != expected_core:
             raise ActiveFormalBundleError("acceptance evidence bundle identity drift")
+        g14r18 = protocol.get("typed_model_cache_formal_protocol_version") == "2.9.0"
+        acceptance_path_field = (
+            "real_companion_benchmark_gate_path"
+            if g14r18
+            else "checkpoint_identity_acceptance_path"
+        )
+        acceptance_sha_field = (
+            "real_companion_benchmark_gate_sha256"
+            if g14r18
+            else "checkpoint_identity_acceptance_sha256"
+        )
         checkpoint_acceptance_path = _resolve_registered_path(
             root,
-            evidence.get("checkpoint_identity_acceptance_path"),
+            evidence.get(acceptance_path_field),
             "checkpoint identity acceptance",
         )
-        if sha256_file(checkpoint_acceptance_path) != evidence.get(
-            "checkpoint_identity_acceptance_sha256"
-        ):
+        if sha256_file(checkpoint_acceptance_path) != evidence.get(acceptance_sha_field):
             raise ActiveFormalBundleError("checkpoint identity acceptance drift")
         checkpoint_acceptance = _strict_object(
             checkpoint_acceptance_path, "checkpoint identity acceptance"
         )
         checks = evidence.get("checks")
         required_checks = {
+            "root_cause_17_to_8_mapping",
+            "real_companion_produced_loaded_and_gated",
+            "ten_agents_three_capacities",
+            "candidate_latest_selection_freeze_regression",
+            "negative_matrix_rollout_zero",
+            "trusted_protocol_context_binding_expected_identity",
+            "scientific_invariants_unchanged",
+            "g14c_v16_launch_deferred_without_invalid_run",
+            "protected_files_unchanged",
+            "holdout_sealed_unopened_unconsumed",
+        } if g14r18 else {
             "candidate_and_latest_artifacts_covered",
             "g14c_v15_failure_boundary_audited",
             "holdout_sealed_unopened_unconsumed",
@@ -543,7 +563,51 @@ def validate_active_formal_bundle(
         candidate_commit = evidence.get("candidate_commit")
         identity_cases = checkpoint_acceptance.get("identity_test_cases")
         targeted_tests = checkpoint_acceptance.get("targeted_tests")
-        if not all(
+        if g14r18 and not all(
+            (
+                evidence.get("real_companion_benchmark_gate_status") == "pass",
+                isinstance(checks, Mapping),
+                required_checks.issubset(checks)
+                if isinstance(checks, Mapping)
+                else False,
+                all(checks.get(key) == "pass" for key in required_checks)
+                if isinstance(checks, Mapping)
+                else False,
+                evidence.get("formal") is False,
+                evidence.get("formal_training_count") == 0,
+                evidence.get("formal_performance_count") == 0,
+                evidence.get("performance_evidence") is False,
+                evidence.get("holdout_capability") is False,
+                evidence.get("holdout_sealed_unopened_unconsumed") is True,
+                evidence.get("g14c_v16_created") is False,
+                candidate_commit == evidence.get("git_commit"),
+                isinstance(candidate_commit, str),
+                len(candidate_commit) == 40
+                if isinstance(candidate_commit, str)
+                else False,
+                all(character in "0123456789abcdef" for character in candidate_commit)
+                if isinstance(candidate_commit, str)
+                else False,
+                checkpoint_acceptance.get("status") == "pass",
+                checkpoint_acceptance.get("formal") is False,
+                checkpoint_acceptance.get("performance_evidence") is False,
+                checkpoint_acceptance.get("holdout_capability") is False,
+                checkpoint_acceptance.get("test_only_checkpoints") is True,
+                checkpoint_acceptance.get("full_formal_evaluation_executed") is False,
+                checkpoint_acceptance.get("complete_envelope_field_count") == 17,
+                checkpoint_acceptance.get("shared_identity_field_count") == 8,
+                checkpoint_acceptance.get("checkpoint_gate_compatible_count") == 150,
+                checkpoint_acceptance.get("agent_count") == 10,
+                checkpoint_acceptance.get("seed_count") == 5,
+                checkpoint_acceptance.get("capacity_count") == 3,
+                checkpoint_acceptance.get("environment_rollout_call_count") == 0,
+                checkpoint_acceptance.get("junit_case_count", 0) >= 20,
+            )
+        ):
+            raise ActiveFormalBundleError(
+                "real companion benchmark-gate acceptance is missing or incomplete"
+            )
+        if not g14r18 and not all(
             (
                 evidence.get("checkpoint_identity_acceptance_status") == "pass",
                 isinstance(checks, Mapping),

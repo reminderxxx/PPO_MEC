@@ -1,0 +1,25 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1",
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "evidence_manifest_sha256": "f26d367a2966421c1db4f06f1effbf5135a8a2af3a5f0d64267c296667d6fd9b",
+  "formal": false,
+  "g14c_v16_launch_authorization_deferred": true,
+  "git_commit": "b642d27ee4426c9a7fc55bf49823c70568de8058",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-09-06",
+  "not_claimed": [
+    "G14C v16 execution",
+    "complete formal training",
+    "algorithm performance",
+    "formal result",
+    "holdout evidence",
+    "paper readiness"
+  ],
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-06T14:49:26+08:00",
+  "scope": "checkpoint companion provenance interface readiness only",
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "verdict": "READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL"
+}

@@ -1,0 +1,30 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1",
+  "coverage_gap": "G14R17 tests passed a pre-projected 8-field identity directly and did not load write_checkpoint_companions output through the benchmark gate",
+  "envelope_only_fields": [
+    "checkpoint_sha256",
+    "execution_git_commit",
+    "train_window_plan_identity",
+    "runtime_contract_sha256",
+    "resolved_agent_config",
+    "checkpoint_schedule",
+    "selection_sha256",
+    "checkpoint_identity",
+    "artifact_location"
+  ],
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "formal": false,
+  "git_commit": "b642d27ee4426c9a7fc55bf49823c70568de8058",
+  "holdout_capability": false,
+  "identity_fields_from_shared_capability_parser": true,
+  "literature_cutoff": "2026-09-06",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "provenance_envelope_field_count": 17,
+  "reviewed_at": "2026-09-06T14:49:26+08:00",
+  "root_cause": "benchmark_main_results passed the complete companion binding to expected_formal_training_identity; validate_checkpoint_provenance projected 8 observed fields then compared against all 17 fields",
+  "shared_training_identity_field_count": 8,
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "trusted_expected_source": "validated active Protocol/context/execution binding"
+}

@@ -1,0 +1,28 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1",
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "file_count_excluding_inventory_and_integrity": 10,
+  "files": [
+    "acceptance_evidence_manifest.json",
+    "baseline_and_protected_files_audit.json",
+    "candidate_full_tests.junit.xml",
+    "candidate_targeted_tests.junit.xml",
+    "g14c_v16_authorization_deferral.json",
+    "negative_gate_acceptance.json",
+    "protocol_scientific_diff.json",
+    "readiness_review_v21.json",
+    "real_companion_benchmark_gate_acceptance.json",
+    "root_cause_and_schema_mapping.json"
+  ],
+  "formal": false,
+  "git_commit": "b642d27ee4426c9a7fc55bf49823c70568de8058",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-09-06",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "real_data_included": false,
+  "reviewed_at": "2026-09-06T14:49:26+08:00",
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "test_checkpoint_included": false
+}
