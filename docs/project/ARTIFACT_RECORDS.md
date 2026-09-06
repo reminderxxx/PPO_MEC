@@ -9,6 +9,9 @@
 - `checkpoint_identity_acceptance.json`、JUnit 与 negative audit 记录 1,200-coordinate builder round-trip、10-agent
   actual save/read-back、candidate/latest、三容量、150-row selection/freeze/typed provenance，以及零 child 调用和
   no-publication 负例。验收 checkpoint 为临时 test-only，未提交且不属于性能证据。
+- `final_execution_commit_revalidation.json` 与 `final_execution_*_tests.junit.xml` 独立绑定最终 execution commit
+  `c1f2a56f25cac67c45a2b191ee77e9a7598c1c98`：clean `HEAD == origin/main`、public preflight、G14R16 150/150
+  零 episode 入口、158 项定向和 1,270 项全仓测试全部通过且 0 skipped；不覆盖或冒充原候选 commit 记录。
 - Protocol 2.8 semantic/full=`63309a07...05ea`/`9d91f74f...9988`，bundle final=`667199f2...cd10`；Readiness
   v20 只授权未来独立 G14C v16，holdout sealed/unopened，本轮未启动 formal/G14D/G15。
 

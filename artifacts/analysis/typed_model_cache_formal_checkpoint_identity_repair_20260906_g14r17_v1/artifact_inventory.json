@@ -13,6 +13,21 @@
       "size_bytes": 5338
     },
     {
+      "path": "final_execution_commit_revalidation.json",
+      "sha256": "d3538c14c013390671e6b2b0af3558cd6852dec277e667b4ea5b14758f0890f1",
+      "size_bytes": 2473
+    },
+    {
+      "path": "final_execution_full_tests.junit.xml",
+      "sha256": "7506f458693c0898175d906d995f0f59c327aacf614a101ebc7c78ea45bf3fe5",
+      "size_bytes": 192326
+    },
+    {
+      "path": "final_execution_targeted_tests.junit.xml",
+      "sha256": "8e57a937ed872d79e5369fa1c00d0a6a65adde6d71d837f74d2ee5b3dbe5aff9",
+      "size_bytes": 25165
+    },
+    {
       "path": "full_tests.junit.xml",
       "sha256": "5a4983e6fc6b325e0777c0f646e32970d085eb03c797916f8597d97a0b6ffdd3",
       "size_bytes": 197525
@@ -64,7 +79,7 @@
   "literature_cutoff": "2026-09-06",
   "performance_evidence": false,
   "policy_version": "tmc_review_policy_v3_20260621",
-  "reviewed_at": "2026-09-06T12:45:00+08:00",
+  "reviewed_at": "2026-09-06T13:10:00+08:00",
   "status": "pass",
   "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
 }

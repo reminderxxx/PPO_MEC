@@ -1,7 +1,7 @@
 {
   "artifact_run_id": "typed_model_cache_formal_checkpoint_identity_repair_20260906_g14r17_v1",
   "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
-  "file_count": 12,
+  "file_count": 15,
   "files": [
     {
       "path": "acceptance_evidence_manifest.json",
@@ -12,6 +12,21 @@
       "path": "checkpoint_identity_acceptance.json",
       "sha256": "8438b27a573ba28169f9865009fbf1021df78cb93392dd030c731a72182d5d2e",
       "size_bytes": 5338
+    },
+    {
+      "path": "final_execution_commit_revalidation.json",
+      "sha256": "d3538c14c013390671e6b2b0af3558cd6852dec277e667b4ea5b14758f0890f1",
+      "size_bytes": 2473
+    },
+    {
+      "path": "final_execution_full_tests.junit.xml",
+      "sha256": "7506f458693c0898175d906d995f0f59c327aacf614a101ebc7c78ea45bf3fe5",
+      "size_bytes": 192326
+    },
+    {
+      "path": "final_execution_targeted_tests.junit.xml",
+      "sha256": "8e57a937ed872d79e5369fa1c00d0a6a65adde6d71d837f74d2ee5b3dbe5aff9",
+      "size_bytes": 25165
     },
     {
       "path": "full_tests.junit.xml",
@@ -60,18 +75,18 @@
     },
     {
       "path": "artifact_inventory.json",
-      "sha256": "c1de6ed40a590b7086e1a3bdf14d23773125b8d240790cbb3e3a871aad644d7e",
-      "size_bytes": 2413
+      "sha256": "7d9ad4fa4f604614b58d555d2f78e582157e2beb27c233b9a8cc0869bc765bbf",
+      "size_bytes": 2952
     }
   ],
   "formal": false,
   "git_commit": "57e5f106383f1abe581ee8f6e89bdf7459334cc7",
   "holdout_capability": false,
-  "inventory_sha256": "ae37e04842bcac89a4baabc343d7766face8936d0134f94742fab4bea9490985",
+  "inventory_sha256": "4a5cebaca9e4ac1909fa2a3471c1887e358e8cd7cad7c0e0238c019225d7b299",
   "literature_cutoff": "2026-09-06",
   "performance_evidence": false,
   "policy_version": "tmc_review_policy_v3_20260621",
-  "reviewed_at": "2026-09-06T12:45:00+08:00",
+  "reviewed_at": "2026-09-06T13:10:00+08:00",
   "status": "pass",
   "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
 }

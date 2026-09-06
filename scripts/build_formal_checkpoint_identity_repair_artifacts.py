@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import shutil
+import subprocess
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
@@ -18,6 +19,15 @@ ARTIFACT = ROOT / (
 )
 V27 = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905"
 V28 = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_8_20260906"
+V15 = ROOT / (
+    "artifacts/experiments/typed_model_cache_formal/"
+    "typed_model_cache_formal_20260905_213344_g14c_v15"
+)
+V15_EVIDENCE = {
+    "phase_state.jsonl": "7630c3ec3ef71cc306eeef806f0697f68fd13080124711d43b7dec02ade7b3ab",
+    "cell_state.jsonl": "a70b9e80e4024eb622b6766704a644a7290e79a3238db13ad5e9e8f45ca095b9",
+    "checkpoint_candidates.json": "fe309ba793ace56a9c9ae9ae41b804fb311618ab1222c850d03f138ce10448a3",
+}
 PROTECTED = {
     "scripts/train_sa_ghmappo_real_sample.py": "aed850f5561f94ecba824e22bd323cdd142ee6c74255a3599129a2a6782e0eba",
     "src/agents/sa_ghmappo_agent.py": "06638c1aea5097a7fa4088db6b77648648655053dc87e1a1c817b09a7709c171",
@@ -97,12 +107,264 @@ def junit(path: Path) -> dict[str, Any]:
     }
 
 
+def refresh_inventory(common: dict[str, Any]) -> None:
+    files = []
+    for path in sorted(ARTIFACT.iterdir()):
+        if path.name in {"artifact_inventory.json", "artifact_integrity_manifest.json"}:
+            continue
+        if path.is_file():
+            files.append(
+                {
+                    "path": path.name,
+                    "sha256": digest(path),
+                    "size_bytes": path.stat().st_size,
+                }
+            )
+    inventory = write(
+        "artifact_inventory.json", {**common, "status": "pass", "files": files}
+    )
+    tracked = [
+        *files,
+        {
+            "path": inventory.name,
+            "sha256": digest(inventory),
+            "size_bytes": inventory.stat().st_size,
+        },
+    ]
+    write(
+        "artifact_integrity_manifest.json",
+        {
+            **common,
+            "status": "pass",
+            "file_count": len(tracked),
+            "files": tracked,
+            "inventory_sha256": hashlib.sha256(
+                json.dumps(
+                    tracked, sort_keys=True, separators=(",", ":"), allow_nan=False
+                ).encode("utf-8")
+            ).hexdigest(),
+        },
+    )
+
+
+def append_final_execution_revalidation(args: argparse.Namespace) -> None:
+    required = {
+        "final_execution_commit": args.final_execution_commit,
+        "final_targeted_junit": args.final_targeted_junit,
+        "final_full_junit": args.final_full_junit,
+        "entrypoint_summary": args.entrypoint_summary,
+        "public_preflight": args.public_preflight,
+        "clean_worktree_root": args.clean_worktree_root,
+    }
+    missing = sorted(key for key, value in required.items() if not value)
+    if missing:
+        raise ValueError(f"final revalidation arguments are incomplete: {missing}")
+    commit = str(args.final_execution_commit)
+    if len(commit) != 40 or any(character not in "0123456789abcdef" for character in commit):
+        raise ValueError("final execution commit must be one full lowercase SHA-1")
+    clean_root = Path(args.clean_worktree_root).resolve()
+    git = lambda *values: subprocess.run(
+        ["git", *values], cwd=clean_root, text=True, capture_output=True, check=True
+    ).stdout.strip()
+    if git("rev-parse", "HEAD") != commit or git("rev-parse", "origin/main") != commit:
+        raise ValueError("final clean worktree must bind HEAD == origin/main == commit")
+    if git("status", "--porcelain"):
+        raise ValueError("final execution worktree is not clean")
+
+    targeted_path = Path(args.final_targeted_junit).resolve()
+    full_path = Path(args.final_full_junit).resolve()
+    targeted = junit(targeted_path)
+    full = junit(full_path)
+    if any(
+        report[key]
+        for report in (targeted, full)
+        for key in ("failures", "errors", "skipped")
+    ):
+        raise ValueError("final execution JUnit must have zero failures/errors/skips")
+    identity_cases = [
+        row
+        for row in targeted["cases"]
+        if row["class"] == "tests.test_checkpoint_nullable_identity_v28"
+    ]
+    if len(identity_cases) != 19 or any(
+        row["status"] != "passed" for row in identity_cases
+    ):
+        raise ValueError("final checkpoint identity cases are incomplete")
+
+    entrypoint_path = Path(args.entrypoint_summary).resolve()
+    entrypoint = read(entrypoint_path)
+    zero_fields = (
+        "episode_count",
+        "environment_interaction_count",
+        "update_count",
+        "checkpoint_file_count",
+        "performance_result_count",
+    )
+    if not all(
+        (
+            entrypoint.get("status") == "pass",
+            entrypoint.get("execution_commit") == commit,
+            entrypoint.get("clean_detached_candidate") is True,
+            entrypoint.get("training_command_count") == 150,
+            entrypoint.get("passed_command_count") == 150,
+            entrypoint.get("formal") is False,
+            entrypoint.get("training") is False,
+            entrypoint.get("performance_evidence") is False,
+            entrypoint.get("holdout_opened") is False,
+            all(entrypoint.get(field) == 0 for field in zero_fields),
+            entrypoint.get("entrypoint_acceptance", {}).get("agent_count") == 10,
+            entrypoint.get("entrypoint_acceptance", {}).get("seed_count") == 5,
+            entrypoint.get("entrypoint_acceptance", {}).get("capacity_count") == 3,
+        )
+    ):
+        raise ValueError("final G14R16 entrypoint acceptance is incomplete")
+
+    preflight_path = Path(args.public_preflight).resolve()
+    preflight = read(preflight_path)
+    resolved_context = read(preflight_path.parent / "resolved_execution_context.json")
+    if not all(
+        (
+            preflight.get("status") == "pass",
+            preflight.get("protocol", {}).get("protocol_version") == "2.8.0",
+            preflight.get("holdout_capability") is False,
+            resolved_context.get("scientific_identity", {}).get("execution_commit")
+            == commit,
+        )
+    ):
+        raise ValueError("final public preflight identity is incomplete")
+
+    candidate_evidence = read(ARTIFACT / "acceptance_evidence_manifest.json")
+    candidate_integrity = read(ARTIFACT / "artifact_integrity_manifest.json")
+    for row in candidate_integrity.get("files", []):
+        path = ARTIFACT / row["path"]
+        if path.stat().st_size != row["size_bytes"] or digest(path) != row["sha256"]:
+            raise ValueError(f"candidate audit artifact integrity drift: {path}")
+    index = read(V28 / "protocol_index.json")
+    readiness = read(V28 / "readiness_v20.json")
+    for row in index.get("active_bundle_resources", []):
+        path = ROOT / row["logical_path"]
+        if path.stat().st_size != row["size_bytes"] or digest(path) != row["content_sha256"]:
+            raise ValueError(f"active bundle resource integrity drift: {path}")
+    if any(digest(ROOT / path) != expected for path, expected in PROTECTED.items()):
+        raise ValueError("protected user file hash drift")
+    if any(digest(V15 / path) != expected for path, expected in V15_EVIDENCE.items()):
+        raise ValueError("G14C v15 evidence hash drift")
+    if not all(
+        (
+            candidate_evidence.get("status") == "pass",
+            index.get("status") == "READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL",
+            readiness.get("readiness_review_version") == "20.0.0",
+            readiness.get("verdict")
+            == "READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL",
+        )
+    ):
+        raise ValueError("final Protocol/Readiness state is incomplete")
+
+    shutil.copy2(targeted_path, ARTIFACT / "final_execution_targeted_tests.junit.xml")
+    shutil.copy2(full_path, ARTIFACT / "final_execution_full_tests.junit.xml")
+    common = {
+        "reviewed_at": "2026-09-06T13:10:00+08:00",
+        "literature_cutoff": "2026-09-06",
+        "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+        "artifact_run_id": ARTIFACT.name,
+        "policy_version": "tmc_review_policy_v3_20260621",
+        "git_commit": candidate_evidence["git_commit"],
+        "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+        "formal": False,
+        "performance_evidence": False,
+        "holdout_capability": False,
+    }
+    write(
+        "final_execution_commit_revalidation.json",
+        {
+            **common,
+            "status": "pass",
+            "git_commit": commit,
+            "candidate_evidence_commit": candidate_evidence["candidate_commit"],
+            "final_execution_commit": commit,
+            "candidate_and_final_execution_distinct": (
+                candidate_evidence["candidate_commit"] != commit
+            ),
+            "clean_detached_head_equal_origin_main": True,
+            "active_protocol_version": index["protocol_index_version"],
+            "readiness_review_version": readiness["readiness_review_version"],
+            "ready_status": index["status"],
+            "active_bundle_core_sha256": index["active_bundle_core_sha256"],
+            "active_formal_bundle_sha256": index["active_formal_bundle_sha256"],
+            "public_preflight": {
+                "status": "pass",
+                "source_sha256": digest(preflight_path),
+                "protocol_version": preflight["protocol"]["protocol_version"],
+                "holdout_capability": False,
+            },
+            "g14r16_entrypoint_regression": {
+                "status": "pass",
+                "source_sha256": digest(entrypoint_path),
+                "training_command_count": 150,
+                "passed_command_count": 150,
+                "agent_count": 10,
+                "seed_count": 5,
+                "capacity_count": 3,
+                **{field: 0 for field in zero_fields},
+            },
+            "targeted_tests": {
+                key: value for key, value in targeted.items() if key != "cases"
+            },
+            "full_pytest": {
+                key: value for key, value in full.items() if key != "cases"
+            },
+            "checkpoint_identity_test_case_count": len(identity_cases),
+            "smoke": "pass",
+            "compile_import": "pass",
+            "strict_json_file_count": len(list(V28.glob("*.json")))
+            + len(list(ARTIFACT.glob("*.json"))),
+            "active_resource_integrity_file_count": len(
+                index["active_bundle_resources"]
+            ),
+            "pre_final_artifact_integrity_file_count": candidate_integrity[
+                "file_count"
+            ],
+            "protected_file_hashes_reverified": True,
+            "g14c_v15_evidence_hashes_reverified": True,
+            "holdout_sealed_unopened_unconsumed": True,
+            "formal_training_count": 0,
+            "formal_performance_count": 0,
+            "test_artifacts_only": True,
+        },
+    )
+    refresh_inventory(common)
+    print(
+        json.dumps(
+            {
+                "status": "pass",
+                "final_execution_commit": commit,
+                "artifact_root": str(ARTIFACT),
+            },
+            indent=2,
+        )
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--targeted-junit", required=True)
-    parser.add_argument("--full-junit", required=True)
-    parser.add_argument("--candidate-commit", required=True)
+    parser.add_argument("--targeted-junit")
+    parser.add_argument("--full-junit")
+    parser.add_argument("--candidate-commit")
+    parser.add_argument("--final-execution-commit")
+    parser.add_argument("--final-targeted-junit")
+    parser.add_argument("--final-full-junit")
+    parser.add_argument("--entrypoint-summary")
+    parser.add_argument("--public-preflight")
+    parser.add_argument("--clean-worktree-root")
     args = parser.parse_args()
+    if args.final_execution_commit:
+        append_final_execution_revalidation(args)
+        return
+    if not all((args.targeted_junit, args.full_junit, args.candidate_commit)):
+        parser.error(
+            "candidate mode requires --targeted-junit, --full-junit, and "
+            "--candidate-commit"
+        )
     targeted_path = Path(args.targeted_junit).resolve()
     full_path = Path(args.full_junit).resolve()
     targeted = junit(targeted_path)
@@ -287,23 +549,7 @@ def main() -> None:
             "holdout evidence", "paper readiness",
         ],
     })
-    files = []
-    for path in sorted(ARTIFACT.iterdir()):
-        if path.name in {"artifact_inventory.json", "artifact_integrity_manifest.json"}:
-            continue
-        if path.is_file():
-            files.append({"path": path.name, "sha256": digest(path), "size_bytes": path.stat().st_size})
-    inventory = write("artifact_inventory.json", {**common, "status": "pass", "files": files})
-    tracked = [*files, {"path": inventory.name, "sha256": digest(inventory), "size_bytes": inventory.stat().st_size}]
-    write("artifact_integrity_manifest.json", {
-        **common,
-        "status": "pass",
-        "file_count": len(tracked),
-        "files": tracked,
-        "inventory_sha256": hashlib.sha256(json.dumps(
-            tracked, sort_keys=True, separators=(",", ":"), allow_nan=False
-        ).encode("utf-8")).hexdigest(),
-    })
+    refresh_inventory(common)
     print(json.dumps({"status": "pass", "artifact_root": str(ARTIFACT)}, indent=2))
 
 

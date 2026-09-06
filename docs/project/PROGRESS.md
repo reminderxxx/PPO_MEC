@@ -17,6 +17,10 @@
   `9d91f74ff46c995261ccab9f543d90d876a9dbca8bffabc02ad1522b2c339988`，bundle core/final=`2798343d...c1b1`/
   `667199f2...cd10`，Readiness v20 仅为未来 G14C v16 执行就绪。科学设置与 nullable 数值语义不变；本轮没有
   正式训练或性能证据，未启动 G14C v16/formal/holdout/G14D/G15。
+- readiness 冻结后的最终 execution commit `c1f2a56f25cac67c45a2b191ee77e9a7598c1c98` 在 clean detached、
+  `HEAD == origin/main` 副本中通过 active bundle 与 public preflight；G14R16 入口回归为 150/150、10 agents、
+  5 seeds、3 capacities，episode/interaction/update/checkpoint/performance 全为 0。最终定向/全仓分别为
+  `158 passed`/`1270 passed`，均 0 skipped；审计包用独立 final-execution 记录与候选 commit 证据区分。
 
 ## 2026-09-05: G14R16 formal training resolver 与 active entrypoint acceptance closure
 
