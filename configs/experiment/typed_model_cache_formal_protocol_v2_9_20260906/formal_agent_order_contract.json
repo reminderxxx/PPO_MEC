@@ -1,0 +1,119 @@
+{
+  "checkpoint_free_report_only_agent_roles": [
+    {
+      "agent": "popularity_cache_heuristic",
+      "role": "matched_report_only_heuristic"
+    },
+    {
+      "agent": "exact_oracle_h1",
+      "role": "exact_oracle_cell"
+    },
+    {
+      "agent": "exact_oracle_h3",
+      "role": "exact_oracle_cell"
+    },
+    {
+      "agent": "exact_oracle_h6",
+      "role": "exact_oracle_cell"
+    },
+    {
+      "agent": "exact_oracle_h12",
+      "role": "exact_oracle_cell"
+    }
+  ],
+  "formal_agent_order_contract_version": "1.0.0",
+  "identity_rules": {
+    "alphabetical_order_inference_forbidden": true,
+    "json_object_insertion_order_is_identity_forbidden": true,
+    "same_set_different_order_rejected": true,
+    "single_resolver_required": true
+  },
+  "learned_agent_order": [
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "main_benchmark_agent_order": [
+    "reactive_lru",
+    "reactive_fifo",
+    "reactive_lfu",
+    "reactive_aging_lfu",
+    "reactive_random",
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "pairwise_statistics_identity": {
+    "baseline_agent_order": [
+      "reactive_lru",
+      "reactive_fifo",
+      "reactive_lfu",
+      "reactive_aging_lfu",
+      "reactive_random",
+      "ppo",
+      "mappo",
+      "dqn",
+      "dueling_dqn",
+      "qmix",
+      "controller_mat",
+      "dag_offload_drl",
+      "cache_offload_drl",
+      "dt_handoff_drl"
+    ],
+    "candidate_agent": "sa_ghmappo",
+    "comparison_key_order": [
+      "candidate_agent",
+      "baseline_agent",
+      "metric"
+    ]
+  },
+  "permanently_rejected_run_ids": [
+    "typed_model_cache_formal_20260820_g14c_351fdb8_v1",
+    "typed_model_cache_formal_20260820_164251_g14c_v2",
+    "typed_model_cache_formal_20260820_203430_g14c_v3",
+    "typed_model_cache_formal_20260824_110016_g14c_v4",
+    "typed_model_cache_formal_20260824_235839_g14c_v4",
+    "typed_model_cache_formal_20260825_111625_g14c_v5",
+    "typed_model_cache_formal_20260825_135122_g14c_v6",
+    "typed_model_cache_formal_20260826_233222_g14c_v7"
+  ],
+  "reactive_agent_order": [
+    "reactive_lru",
+    "reactive_fifo",
+    "reactive_lfu",
+    "reactive_aging_lfu",
+    "reactive_random"
+  ],
+  "row_display_order": [
+    "reactive_lru",
+    "reactive_fifo",
+    "reactive_lfu",
+    "reactive_aging_lfu",
+    "reactive_random",
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "dqn",
+    "dueling_dqn",
+    "qmix",
+    "controller_mat",
+    "dag_offload_drl",
+    "cache_offload_drl",
+    "dt_handoff_drl"
+  ],
+  "semantic_sha256": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0"
+}

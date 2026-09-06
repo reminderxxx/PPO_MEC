@@ -1,0 +1,51 @@
+{
+  "environment_fingerprint_field": "environment_fingerprint",
+  "execution_commit_identity_rule": "observed_clean_40_hex_HEAD_equal_main_equal_origin_main_bound_at_execution",
+  "fingerprint_rule": "SHA-256(UTF-8 sorted-key compact canonical JSON of the normalized full scientific identity excluding only environment_fingerprint)",
+  "formal_execution_environment_contract_version": "1.2.0",
+  "host_fields_excluded": [
+    "python_absolute_path",
+    "clean_worktree_absolute_path",
+    "cwd",
+    "site_packages_paths",
+    "sys_path",
+    "virtual_environment_root"
+  ],
+  "identity_rule": "full_projection_v1_excludes_host_paths_and_binds_observed_commit_and_tree_out_of_band",
+  "producer": "src.runtime.formal_execution_environment.build_environment_identity_projection",
+  "protocol_bound_scientific_extension_fields": [
+    "formal_endpoint_metrics_contract_version",
+    "formal_exogenous_request_execution_contract_version",
+    "formal_request_exposure_trace_version",
+    "formal_request_subject_lifecycle_contract_version"
+  ],
+  "reject": [
+    "missing_fields",
+    "unknown_fields",
+    "duplicate_or_alias_fields",
+    "wrong_types",
+    "unsupported_contract_major",
+    "NaN_or_Infinity",
+    "protocol_extension_version_drift"
+  ],
+  "runtime_observable_fields": [
+    "formal_execution_environment_contract_version",
+    "python_implementation",
+    "python_version",
+    "platform_system",
+    "architecture",
+    "dependency_fingerprint",
+    "installed_package_count",
+    "torch_version",
+    "critical_package_versions",
+    "execution_commit",
+    "source_root_identity",
+    "identity_rule"
+  ],
+  "semantic_sha256": "60a641a367fd6870990da6cf1f9fd6bf59e81dae3ae73dac78619522a7e528c9",
+  "source_root_identity_rule": {
+    "project_package": "src",
+    "source_tree_identity_rule": "observed_tracked_src_and_scripts_tree_sha256_bound_at_execution"
+  },
+  "version": "1.1.0"
+}

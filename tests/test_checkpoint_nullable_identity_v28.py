@@ -51,8 +51,8 @@ from src.runtime.typed_model_cache_runtime import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PROTOCOL_ROOT = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_8_20260906"
-PROTOCOL_PATH = PROTOCOL_ROOT / "protocol_v2_8_manifest.json"
+PROTOCOL_ROOT = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906"
+PROTOCOL_PATH = PROTOCOL_ROOT / "protocol_v2_9_manifest.json"
 SCIENTIFIC_PATH = PROTOCOL_ROOT / "agent_training_scientific_config.json"
 
 
