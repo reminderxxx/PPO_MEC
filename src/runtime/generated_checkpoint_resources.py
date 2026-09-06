@@ -209,14 +209,14 @@ def _checkpoint_coverage(
                 relative = resolved.relative_to(run_root.resolve()).as_posix()
             except ValueError as exc:
                 raise GeneratedCheckpointResourceError("checkpoint escapes current run root") from exc
-            historical_pattern = r"g14c_v(?:[1-9]|1[0-3])(?:\D|$)"
+            historical_pattern = r"g14c_v(?:[1-9]|1[0-5])(?:\D|$)"
             if re.search(
                 historical_pattern,
                 f"{run_root.name}/{relative}",
                 re.IGNORECASE,
             ):
                 raise GeneratedCheckpointResourceError(
-                    "G14C v1-v13 checkpoint reference is permanently forbidden"
+                    "G14C v1-v13 and v14-v15 checkpoint reference is permanently forbidden"
                 )
             if not resolved.is_file():
                 raise GeneratedCheckpointResourceError("frozen checkpoint is missing")

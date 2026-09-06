@@ -18,6 +18,10 @@ from typing import Any, Mapping
 import yaml
 
 from src.agents.registry import get_algo_spec
+from src.runtime.formal_training_identity import (
+    FormalTrainingIdentityError,
+    checkpoint_training_identity_projection,
+)
 from src.data.model_catalog.adapter_catalog import (
     LEGACY_MODEL_CACHE_PROFILE_ID,
     TYPED_MODEL_CACHE_CONTRACT_VERSION,
@@ -562,16 +566,21 @@ def validate_checkpoint_provenance(
     if expected_checkpoint_sha256 is not None and file_hash != expected_checkpoint_sha256:
         errors.append("checkpoint SHA-256 mismatch")
     if expected_formal_training_identity is not None:
-        for field in (
-            "agent_scientific_config_semantic_sha256",
-            "formal_training_execution_binding_sha256",
-            "formal_protocol_semantic_sha256",
-            "execution_commit",
-            "resolved_execution_context_sha256",
-        ):
-            expected = expected_formal_training_identity.get(field)
-            if not expected or metadata.get(field) != expected:
-                errors.append(f"formal training identity mismatch: {field}")
+        nested = metadata.get("formal_training_contract")
+        protocol_version = (
+            nested.get("formal_protocol_version") if isinstance(nested, Mapping) else None
+        )
+        try:
+            observed_identity = checkpoint_training_identity_projection(
+                metadata,
+                protocol_version=str(protocol_version or ""),
+                require_nested_contract=True,
+            )
+        except FormalTrainingIdentityError as exc:
+            errors.append(str(exc))
+        else:
+            if observed_identity != dict(expected_formal_training_identity):
+                errors.append("formal training identity differs from trusted expected identity")
     return {
         "status": "compatible" if not errors else "incompatible",
         "checkpoint_path": path.as_posix(),

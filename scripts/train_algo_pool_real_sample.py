@@ -60,6 +60,7 @@ from src.runtime.formal_training_contract import (
 )
 from src.runtime.formal_training_identity import (
     FormalTrainingIdentityError,
+    build_checkpoint_training_identity,
     load_strict_json_mapping,
     validate_checkpoint_training_identity,
 )
@@ -374,6 +375,60 @@ def load_checkpoint_training_metadata(path: str | Path) -> dict[str, Any]:
     return dict(metadata)
 
 
+def build_training_identity_metadata(resolved_training: Any) -> dict[str, Any]:
+    """Build the checkpoint/summary identity envelope from the verified resolver."""
+
+    contract = resolved_training.to_dict()
+    return {
+        "formal_training_contract": contract,
+        **build_checkpoint_training_identity(contract),
+    }
+
+
+def validate_serialized_formal_checkpoint(
+    path: str | Path,
+    *,
+    resolved_training: Any,
+    agent_name: str,
+    seed: int,
+    runtime_contract_sha256: str,
+) -> dict[str, Any]:
+    """Read a just-written checkpoint back and enforce its complete active identity."""
+
+    metadata = load_checkpoint_training_metadata(path)
+    if not resolved_training.formal_protocol_version:
+        return metadata
+    validate_checkpoint_training_identity(
+        metadata,
+        scientific_config_sha256=str(
+            resolved_training.agent_scientific_config_semantic_sha256
+        ),
+        binding_sha256=str(
+            resolved_training.formal_training_execution_binding_sha256
+        ),
+        protocol_semantic_sha256=str(
+            resolved_training.formal_protocol_semantic_sha256
+        ),
+        execution_commit=str(resolved_training.execution_commit),
+        resolved_context_sha256=str(
+            resolved_training.resolved_execution_context_sha256
+        ),
+        formal_agent_order_contract_semantic_sha256=(
+            resolved_training.formal_agent_order_contract_semantic_sha256
+        ),
+        active_formal_bundle_sha256=resolved_training.active_formal_bundle_sha256,
+        formal_nullable_metric_aggregation_contract_semantic_sha256=(
+            resolved_training.formal_nullable_metric_aggregation_contract_semantic_sha256
+        ),
+        protocol_version=str(resolved_training.formal_protocol_version),
+        require_nested_contract=True,
+        expected_agent_name=agent_name,
+        expected_seed=seed,
+        expected_runtime_contract_sha256=runtime_contract_sha256,
+    )
+    return metadata
+
+
 def main() -> None:
     args = parse_args()
     reject_permanently_invalid_formal_references(
@@ -665,6 +720,16 @@ def main() -> None:
                     active_formal_bundle_sha256=(
                         resolved_training.active_formal_bundle_sha256
                     ),
+                    formal_nullable_metric_aggregation_contract_semantic_sha256=(
+                        resolved_training.formal_nullable_metric_aggregation_contract_semantic_sha256
+                    ),
+                    protocol_version=str(resolved_training.formal_protocol_version),
+                    require_nested_contract=True,
+                    expected_agent_name=args.agent_name,
+                    expected_seed=args.random_seed,
+                    expected_runtime_contract_sha256=runtime_contract[
+                        "runtime_contract_sha256"
+                    ],
                 )
             except FormalTrainingIdentityError as exc:
                 raise FormalTrainingContractError(str(exc)) from exc
@@ -882,6 +947,7 @@ def main() -> None:
                 "active_formal_bundle_sha256": (
                     resolved_training.active_formal_bundle_sha256
                 ),
+                **build_training_identity_metadata(resolved_training),
                 "formal_exogenous_request_execution_contract_version": (
                     FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION
                     if args.formal_exogenous_request_execution
@@ -914,9 +980,23 @@ def main() -> None:
                 ),
             }
             annotate_checkpoint(latest_path, checkpoint_metadata)
+            validate_serialized_formal_checkpoint(
+                latest_path,
+                resolved_training=resolved_training,
+                agent_name=args.agent_name,
+                seed=args.random_seed,
+                runtime_contract_sha256=runtime_contract["runtime_contract_sha256"],
+            )
             if should_save_checkpoint(update_index, args.checkpoint_every_updates):
                 agent.save(str(checkpoint_path))
                 annotate_checkpoint(checkpoint_path, checkpoint_metadata)
+                validate_serialized_formal_checkpoint(
+                    checkpoint_path,
+                    resolved_training=resolved_training,
+                    agent_name=args.agent_name,
+                    seed=args.random_seed,
+                    runtime_contract_sha256=runtime_contract["runtime_contract_sha256"],
+                )
                 checkpoint_paths.append(str(checkpoint_path))
                 saved_checkpoint_update_indices.append(update_index)
             update_logs.append({"episode_index": episode_index, **learn_info})
@@ -1008,6 +1088,7 @@ def main() -> None:
         "active_formal_bundle_sha256": (
             resolved_training.active_formal_bundle_sha256
         ),
+        **build_training_identity_metadata(resolved_training),
         "formal_exogenous_request_execution_contract_version": (
             FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION
             if args.formal_exogenous_request_execution

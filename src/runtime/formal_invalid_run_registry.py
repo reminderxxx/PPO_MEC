@@ -19,8 +19,10 @@ PERMANENTLY_INVALID_FORMAL_RUN_IDS = (
     "typed_model_cache_formal_20260830_113339_g14c_v9",
     "typed_model_cache_formal_20260901_155201_g14c_v11",
     "typed_model_cache_formal_20260902_162203_g14c_v12",
+    "typed_model_cache_formal_20260905_185105_g14c_v14",
+    "typed_model_cache_formal_20260905_213344_g14c_v15",
 )
-G14C_V12_RUN_ID = PERMANENTLY_INVALID_FORMAL_RUN_IDS[-1]
+G14C_V12_RUN_ID = "typed_model_cache_formal_20260902_162203_g14c_v12"
 G14C_V12_RUN_ROOT = (
     "artifacts/experiments/typed_model_cache_formal/" + G14C_V12_RUN_ID
 )

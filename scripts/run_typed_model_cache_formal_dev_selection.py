@@ -39,9 +39,11 @@ from src.evaluators.formal_cell_transaction import (
 from src.runtime.formal_training_contract import checkpoint_snapshot_indices
 from src.runtime.formal_training_identity import (
     FormalTrainingIdentityError,
+    expected_checkpoint_training_identity,
     learned_agent_rows,
     validate_checkpoint_training_identity,
 )
+from src.runtime.typed_model_cache_runtime import resolve_model_cache_runtime
 from src.runtime.formal_agent_order import (
     FormalAgentOrderError,
     reject_permanently_invalid_run_references,
@@ -145,6 +147,51 @@ def nullable_mean(
     return means[field], availability[field]
 
 
+def validate_dev_checkpoint_identity(
+    metadata: dict,
+    *,
+    expected_training_identity: dict[str, str],
+    protocol_version: str,
+    agent_name: str,
+    seed: int,
+    runtime_contract_sha256: str,
+) -> dict:
+    """Fail before the expensive benchmark child is allowed to start."""
+
+    return validate_checkpoint_training_identity(
+        metadata,
+        scientific_config_sha256=expected_training_identity[
+            "agent_scientific_config_semantic_sha256"
+        ],
+        binding_sha256=expected_training_identity[
+            "formal_training_execution_binding_sha256"
+        ],
+        protocol_semantic_sha256=expected_training_identity[
+            "formal_protocol_semantic_sha256"
+        ],
+        execution_commit=expected_training_identity["execution_commit"],
+        resolved_context_sha256=expected_training_identity[
+            "resolved_execution_context_sha256"
+        ],
+        formal_agent_order_contract_semantic_sha256=expected_training_identity.get(
+            "formal_agent_order_contract_semantic_sha256"
+        ),
+        active_formal_bundle_sha256=expected_training_identity.get(
+            "active_formal_bundle_sha256"
+        ),
+        formal_nullable_metric_aggregation_contract_semantic_sha256=(
+            expected_training_identity.get(
+                "formal_nullable_metric_aggregation_contract_semantic_sha256"
+            )
+        ),
+        protocol_version=protocol_version,
+        require_nested_contract=True,
+        expected_agent_name=agent_name,
+        expected_seed=seed,
+        expected_runtime_contract_sha256=runtime_contract_sha256,
+    )
+
+
 def main() -> None:
     args = parse_args()
     try:
@@ -184,6 +231,14 @@ def main() -> None:
         nested_python = resolved_python_for_nested_consumer(
             resolved_context, observed_sys_executable=sys.executable
         )
+    expected_training_identity = (
+        expected_checkpoint_training_identity(
+            protocol=protocol,
+            resolved_execution_context=resolved_context,
+        )
+        if not args.non_formal_rehearsal and capabilities.execution_binding_required
+        else None
+    )
     if args.non_formal_rehearsal:
         if args.formal_window_consumption_contract_path:
             raise FormalExecutionError(
@@ -362,6 +417,7 @@ def main() -> None:
             "Protocol v1.0-v1.8 dev execution is audit-only; active resource resolver required"
         )
     for capacity_label, (runtime_path, fairness_path) in capacity_inputs.items():
+        expected_runtime = resolve_model_cache_runtime(runtime_path, root=ROOT)
         fairness, report = load_and_validate_manifest(fairness_path, root=ROOT, check_files=True)
         if report.get("status") != "pass":
             raise FormalExecutionError(f"dev fairness validation failed: {capacity_label}")
@@ -418,44 +474,16 @@ def main() -> None:
                         not args.non_formal_rehearsal
                         and capabilities.execution_binding_required
                     ):
-                        scientific_identity = resolved_context["scientific_identity"]
                         try:
-                            validate_checkpoint_training_identity(
+                            validate_dev_checkpoint_identity(
                                 metadata,
-                                scientific_config_sha256=str(
-                                    scientific_identity[
-                                        "agent_scientific_config_semantic_sha256"
-                                    ]
-                                ),
-                                binding_sha256=str(
-                                    scientific_identity[
-                                        "formal_training_execution_binding_sha256"
-                                    ]
-                                ),
-                                protocol_semantic_sha256=protocol["hashes"][
-                                    "semantic_sha256"
+                                expected_training_identity=expected_training_identity,
+                                protocol_version=protocol_version,
+                                agent_name=agent,
+                                seed=seed,
+                                runtime_contract_sha256=expected_runtime[
+                                    "runtime_contract_sha256"
                                 ],
-                                execution_commit=str(
-                                    scientific_identity["execution_commit"]
-                                ),
-                                resolved_context_sha256=str(
-                                    resolved_context["context_sha256"]
-                                ),
-                                formal_agent_order_contract_semantic_sha256=(
-                                    order_audit["semantic_sha256"]
-                                    if order_audit is not None
-                                    else None
-                                ),
-                                active_formal_bundle_sha256=(
-                                    str(
-                                        scientific_identity.get(
-                                            "active_formal_bundle_sha256"
-                                        )
-                                        or ""
-                                    )
-                                    if capabilities.active_bundle_required
-                                    else None
-                                ),
                             )
                         except FormalTrainingIdentityError as exc:
                             raise FormalExecutionError(str(exc)) from exc
@@ -674,7 +702,9 @@ def main() -> None:
                                 "resolved_execution_context_sha256"
                             ),
                             "formal_agent_order_contract_semantic_sha256": (
-                                order_audit["semantic_sha256"] if order_audit else None
+                                metadata.get(
+                                    "formal_agent_order_contract_semantic_sha256"
+                                )
                             ),
                             "active_formal_bundle_sha256": metadata.get(
                                 "active_formal_bundle_sha256"
@@ -714,7 +744,11 @@ def main() -> None:
         )
     candidates_path = output_root / "checkpoint_candidates.json"
     write_create_only_or_verify(candidates_path, candidates)
-    selection_payload = dev_select(output_root, protocol)
+    selection_payload = dev_select(
+        output_root,
+        protocol,
+        expected_training_identity=expected_training_identity,
+    )
     selection_payload["non_formal_rehearsal"] = bool(args.non_formal_rehearsal)
     write_create_only_or_verify(Path(args.output_path), selection_payload)
     print(json.dumps(selection_payload, ensure_ascii=False, indent=2, allow_nan=False))

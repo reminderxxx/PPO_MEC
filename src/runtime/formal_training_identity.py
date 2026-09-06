@@ -23,9 +23,151 @@ SCIENTIFIC_FIELDS = (
     "auxiliary_coef",
 )
 
+BASE_CHECKPOINT_TRAINING_IDENTITY_FIELDS = (
+    "agent_scientific_config_semantic_sha256",
+    "formal_training_execution_binding_sha256",
+    "formal_protocol_semantic_sha256",
+    "execution_commit",
+    "resolved_execution_context_sha256",
+)
+
 
 class FormalTrainingIdentityError(ValueError):
     """Raised when either layer of the formal training identity drifts."""
+
+
+def checkpoint_training_identity_fields(protocol_version: str) -> tuple[str, ...]:
+    """Return the exact checkpoint identity fields required by one Protocol capability set."""
+
+    capabilities = get_protocol_capabilities(protocol_version)
+    fields = BASE_CHECKPOINT_TRAINING_IDENTITY_FIELDS
+    if capabilities.agent_order_contract_required:
+        fields = (*fields, "formal_agent_order_contract_semantic_sha256")
+    if capabilities.active_bundle_required:
+        fields = (*fields, "active_formal_bundle_sha256")
+    if capabilities.nullable_metric_contract_required:
+        fields = (
+            *fields,
+            "formal_nullable_metric_aggregation_contract_semantic_sha256",
+        )
+    return fields
+
+
+def checkpoint_training_identity_projection(
+    metadata: Mapping[str, Any],
+    *,
+    protocol_version: str,
+    require_nested_contract: bool,
+) -> dict[str, str]:
+    """Project the identity actually serialized in checkpoint metadata.
+
+    Active consumers require both top-level fields and the nested resolved training
+    contract. Missing legacy top-level fields are intentionally not backfilled.
+    """
+
+    projected: dict[str, str] = {}
+    for field in checkpoint_training_identity_fields(protocol_version):
+        if field not in metadata:
+            raise FormalTrainingIdentityError(
+                f"checkpoint provenance identity missing: {field}"
+            )
+        value = metadata[field]
+        if not isinstance(value, str) or not value:
+            raise FormalTrainingIdentityError(
+                f"checkpoint provenance identity invalid: {field}"
+            )
+        projected[field] = value
+    if require_nested_contract:
+        nested = metadata.get("formal_training_contract")
+        if not isinstance(nested, Mapping):
+            raise FormalTrainingIdentityError(
+                "checkpoint formal_training_contract is missing"
+            )
+        if nested.get("formal_protocol_version") != protocol_version:
+            raise FormalTrainingIdentityError(
+                "checkpoint formal_training_contract Protocol version mismatch"
+            )
+        for field, value in projected.items():
+            if field not in nested:
+                raise FormalTrainingIdentityError(
+                    f"checkpoint nested training identity missing: {field}"
+                )
+            if nested[field] != value:
+                raise FormalTrainingIdentityError(
+                    f"checkpoint top-level/nested training identity mismatch: {field}"
+                )
+    return projected
+
+
+def build_checkpoint_training_identity(
+    resolved_training_contract: Mapping[str, Any],
+) -> dict[str, str]:
+    """Build producer metadata only from the already resolved training contract."""
+
+    protocol_version = resolved_training_contract.get("formal_protocol_version")
+    if not isinstance(protocol_version, str) or not protocol_version:
+        return {}
+    envelope = {
+        "formal_training_contract": deepcopy(dict(resolved_training_contract)),
+        **{
+            field: resolved_training_contract.get(field)
+            for field in checkpoint_training_identity_fields(protocol_version)
+        },
+    }
+    return checkpoint_training_identity_projection(
+        envelope,
+        protocol_version=protocol_version,
+        require_nested_contract=True,
+    )
+
+
+def expected_checkpoint_training_identity(
+    *,
+    protocol: Mapping[str, Any],
+    resolved_execution_context: Mapping[str, Any],
+) -> dict[str, str]:
+    """Derive the trusted active-run identity from validated Protocol/context inputs."""
+
+    protocol_version = str(protocol.get("typed_model_cache_formal_protocol_version") or "")
+    scientific = resolved_execution_context.get("scientific_identity")
+    if not isinstance(scientific, Mapping):
+        raise FormalTrainingIdentityError(
+            "resolved execution context scientific identity is missing"
+        )
+    expected: dict[str, Any] = {
+        "agent_scientific_config_semantic_sha256": scientific.get(
+            "agent_scientific_config_semantic_sha256"
+        ),
+        "formal_training_execution_binding_sha256": scientific.get(
+            "formal_training_execution_binding_sha256"
+        ),
+        "formal_protocol_semantic_sha256": protocol.get("hashes", {}).get(
+            "semantic_sha256"
+        ),
+        "execution_commit": scientific.get("execution_commit"),
+        "resolved_execution_context_sha256": resolved_execution_context.get(
+            "context_sha256"
+        ),
+        "formal_agent_order_contract_semantic_sha256": protocol.get(
+            "formal_agent_order_contract", {}
+        ).get("semantic_sha256"),
+        "active_formal_bundle_sha256": scientific.get(
+            "active_formal_bundle_sha256"
+        ),
+        "formal_nullable_metric_aggregation_contract_semantic_sha256": protocol.get(
+            "formal_nullable_metric_aggregation_contract", {}
+        ).get("semantic_sha256"),
+    }
+    fields = checkpoint_training_identity_fields(protocol_version)
+    result: dict[str, str] = {}
+    for field in fields:
+        value = expected.get(field)
+        if not isinstance(value, str) or not value:
+            raise FormalTrainingIdentityError(
+                f"trusted expected checkpoint identity is incomplete: {field}"
+            )
+        result[field] = value
+    return result
 
 
 def _reject_non_finite(value: Any, path: str = "$") -> None:
@@ -495,6 +637,12 @@ def validate_checkpoint_training_identity(
     protocol_semantic_sha256: str, execution_commit: str, resolved_context_sha256: str,
     formal_agent_order_contract_semantic_sha256: str | None = None,
     active_formal_bundle_sha256: str | None = None,
+    formal_nullable_metric_aggregation_contract_semantic_sha256: str | None = None,
+    protocol_version: str | None = None,
+    require_nested_contract: bool = False,
+    expected_agent_name: str | None = None,
+    expected_seed: int | None = None,
+    expected_runtime_contract_sha256: str | None = None,
 ) -> dict[str, Any]:
     expected = {
         "agent_scientific_config_semantic_sha256": scientific_config_sha256,
@@ -509,21 +657,57 @@ def validate_checkpoint_training_identity(
         )
     if active_formal_bundle_sha256 is not None:
         expected["active_formal_bundle_sha256"] = active_formal_bundle_sha256
+    if formal_nullable_metric_aggregation_contract_semantic_sha256 is not None:
+        expected[
+            "formal_nullable_metric_aggregation_contract_semantic_sha256"
+        ] = formal_nullable_metric_aggregation_contract_semantic_sha256
+    if protocol_version is not None:
+        observed = checkpoint_training_identity_projection(
+            metadata,
+            protocol_version=protocol_version,
+            require_nested_contract=require_nested_contract,
+        )
+        if set(observed) != set(expected):
+            raise FormalTrainingIdentityError(
+                "checkpoint expected identity fields do not match Protocol capabilities"
+            )
     for field, value in expected.items():
-        if metadata.get(field) != value:
+        if field not in metadata or metadata[field] != value:
             raise FormalTrainingIdentityError(f"checkpoint provenance identity mismatch: {field}")
+    provenance = metadata.get("typed_runtime_provenance")
+    if any(
+        value is not None
+        for value in (expected_agent_name, expected_seed, expected_runtime_contract_sha256)
+    ):
+        if not isinstance(provenance, Mapping):
+            raise FormalTrainingIdentityError("checkpoint typed runtime provenance is missing")
+        per_cell_expected = {
+            "agent_identity": expected_agent_name,
+            "training_seed": int(expected_seed) if expected_seed is not None else None,
+            "runtime_contract_sha256": expected_runtime_contract_sha256,
+        }
+        for field, value in per_cell_expected.items():
+            if value is not None and provenance.get(field) != value:
+                raise FormalTrainingIdentityError(
+                    f"checkpoint per-cell identity mismatch: {field}"
+                )
     return {"status": "pass", **expected}
 
 
 __all__ = [
     "AGENT_TRAINING_SCIENTIFIC_CONFIG_CONTRACT_VERSION",
+    "BASE_CHECKPOINT_TRAINING_IDENTITY_FIELDS",
     "FORMAL_TRAINING_EXECUTION_BINDING_VERSION",
     "FormalTrainingIdentityError",
     "agent_matrix_identity",
     "atomic_create_execution_binding",
     "binding_projection",
+    "build_checkpoint_training_identity",
     "build_execution_binding",
     "canonical_sha256",
+    "checkpoint_training_identity_fields",
+    "checkpoint_training_identity_projection",
+    "expected_checkpoint_training_identity",
     "learned_agent_rows",
     "load_strict_json_mapping",
     "resolved_agent_hyperparameters",

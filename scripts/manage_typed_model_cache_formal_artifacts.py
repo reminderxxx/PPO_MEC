@@ -10,6 +10,8 @@ import sys
 from pathlib import Path
 from typing import Any, Mapping
 
+import torch
+
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -33,6 +35,12 @@ from src.runtime.formal_invalid_run_registry import (
     reject_permanently_invalid_formal_references,
 )
 from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
+from src.runtime.formal_training_identity import (
+    FormalTrainingIdentityError,
+    checkpoint_training_identity_projection,
+    expected_checkpoint_training_identity,
+    validate_checkpoint_training_identity,
+)
 from src.evaluators.formal_cell_transaction import (
     CellTransactionError,
     artifact_inventory,
@@ -186,7 +194,12 @@ def scientific_candidate_projection(row: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def dev_select(input_root: Path, protocol: dict) -> dict:
+def dev_select(
+    input_root: Path,
+    protocol: dict,
+    *,
+    expected_training_identity: Mapping[str, Any] | None = None,
+) -> dict:
     capabilities = get_protocol_capabilities(
         protocol["typed_model_cache_formal_protocol_version"]
     )
@@ -203,6 +216,31 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
         if isinstance(row, dict)
     )
     selected = []
+    protocol_version = protocol["typed_model_cache_formal_protocol_version"]
+    strict_candidate_identities: list[dict[str, str]] = []
+    if not non_formal_rehearsal and capabilities.live_execution_allowed:
+        if not isinstance(expected_training_identity, Mapping):
+            context_path = input_root / "resolved_execution_context.json"
+            if not context_path.is_file():
+                raise ValueError("dev selection lacks trusted expected training identity")
+            expected_training_identity = expected_checkpoint_training_identity(
+                protocol=protocol,
+                resolved_execution_context=read_json(context_path),
+            )
+        for row in candidates:
+            if not isinstance(row, Mapping):
+                raise ValueError("checkpoint candidate must be an object")
+            try:
+                observed = checkpoint_training_identity_projection(
+                    row,
+                    protocol_version=protocol_version,
+                    require_nested_contract=True,
+                )
+            except FormalTrainingIdentityError as exc:
+                raise ValueError(str(exc)) from exc
+            if observed != dict(expected_training_identity):
+                raise ValueError("dev candidate identity differs from trusted expected identity")
+            strict_candidate_identities.append(observed)
     order_audit = None
     if capabilities.agent_order_contract_required:
         try:
@@ -280,32 +318,34 @@ def dev_select(input_root: Path, protocol: dict) -> dict:
         ranked = sorted(rows, key=cmp_to_key(_compare_candidates))
         winner = dict(ranked[0])
         selected.append(winner)
-    training_identity_fields = (
-        "agent_scientific_config_semantic_sha256",
-        "formal_training_execution_binding_sha256",
-        "formal_protocol_semantic_sha256",
-        "execution_commit",
-        "resolved_execution_context_sha256",
-    )
-    if capabilities.active_bundle_required:
-        training_identity_fields = (*training_identity_fields, "active_formal_bundle_sha256")
-    if capabilities.nullable_metric_contract_required:
-        training_identity_fields = (
-            *training_identity_fields,
-            "formal_nullable_metric_aggregation_contract_semantic_sha256",
-        )
     training_identity = None
     if (
         not non_formal_rehearsal
         and capabilities.execution_binding_required
     ):
-        identities = {
-            tuple(row.get(field) for field in training_identity_fields)
-            for row in candidates
-        }
-        if len(identities) != 1 or any(value in {None, ""} for value in next(iter(identities))):
+        if capabilities.live_execution_allowed:
+            identities = {
+                tuple(sorted(identity.items())) for identity in strict_candidate_identities
+            }
+        else:
+            legacy_fields = (
+                "agent_scientific_config_semantic_sha256",
+                "formal_training_execution_binding_sha256",
+                "formal_protocol_semantic_sha256",
+                "execution_commit",
+                "resolved_execution_context_sha256",
+            )
+            if capabilities.active_bundle_required:
+                legacy_fields = (*legacy_fields, "active_formal_bundle_sha256")
+            identities = {
+                tuple((field, row.get(field)) for field in legacy_fields)
+                for row in candidates
+            }
+        if len(identities) != 1:
             raise ValueError("dev candidates do not share one complete training identity")
-        training_identity = dict(zip(training_identity_fields, next(iter(identities))))
+        training_identity = dict(next(iter(identities)))
+        if any(value in {None, ""} for value in training_identity.values()):
+            raise ValueError("dev candidates do not share one complete training identity")
         if training_identity["formal_protocol_semantic_sha256"] != protocol["hashes"]["semantic_sha256"]:
             raise ValueError("dev candidate active Protocol identity mismatch")
     metric_candidate_availability = {
@@ -367,6 +407,18 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
     if selection.get("protocol_semantic_sha256") != protocol["hashes"]["semantic_sha256"]:
         raise ValueError("dev selection protocol hash mismatch")
     formal_training_identity = selection.get("formal_training_identity")
+    expected_training_identity = None
+    if (
+        not bool(selection.get("non_formal_rehearsal"))
+        and capabilities.live_execution_allowed
+    ):
+        context_path = input_root / "resolved_execution_context.json"
+        if not context_path.is_file():
+            raise ValueError("checkpoint freeze lacks resolved execution context")
+        expected_training_identity = expected_checkpoint_training_identity(
+            protocol=protocol,
+            resolved_execution_context=read_json(context_path),
+        )
     order_audit = None
     if capabilities.agent_order_contract_required:
         try:
@@ -427,6 +479,57 @@ def checkpoint_freeze(input_root: Path, protocol: dict) -> dict:
         if digest != row.get("checkpoint_sha256"):
             raise ValueError(f"checkpoint hash mismatch: {path}")
         typed = row.get("typed_runtime_provenance") or {}
+        if expected_training_identity is not None:
+            payload = torch.load(path, map_location="cpu")
+            metadata = (
+                payload.get("training_metadata") or payload.get("checkpoint_metadata")
+                if isinstance(payload, dict)
+                else None
+            )
+            if not isinstance(metadata, Mapping):
+                raise ValueError(f"checkpoint metadata is missing: {path}")
+            capacity_key = str(row["capacity_label"]).split("_", 1)[0]
+            expected_runtime_hash = protocol["identity"][
+                "typed_runtime_contract_hashes_by_capacity"
+            ].get(capacity_key)
+            try:
+                validate_checkpoint_training_identity(
+                    metadata,
+                    scientific_config_sha256=expected_training_identity[
+                        "agent_scientific_config_semantic_sha256"
+                    ],
+                    binding_sha256=expected_training_identity[
+                        "formal_training_execution_binding_sha256"
+                    ],
+                    protocol_semantic_sha256=expected_training_identity[
+                        "formal_protocol_semantic_sha256"
+                    ],
+                    execution_commit=expected_training_identity["execution_commit"],
+                    resolved_context_sha256=expected_training_identity[
+                        "resolved_execution_context_sha256"
+                    ],
+                    formal_agent_order_contract_semantic_sha256=expected_training_identity.get(
+                        "formal_agent_order_contract_semantic_sha256"
+                    ),
+                    active_formal_bundle_sha256=expected_training_identity.get(
+                        "active_formal_bundle_sha256"
+                    ),
+                    formal_nullable_metric_aggregation_contract_semantic_sha256=expected_training_identity.get(
+                        "formal_nullable_metric_aggregation_contract_semantic_sha256"
+                    ),
+                    protocol_version=protocol["typed_model_cache_formal_protocol_version"],
+                    require_nested_contract=True,
+                    expected_agent_name=str(row["agent_name"]),
+                    expected_seed=int(row["seed"]),
+                    expected_runtime_contract_sha256=expected_runtime_hash,
+                )
+            except FormalTrainingIdentityError as exc:
+                raise ValueError(str(exc)) from exc
+            for field, expected in expected_training_identity.items():
+                if row.get(field) != expected or metadata.get(field) != expected:
+                    raise ValueError(
+                        f"selected row/checkpoint training identity mismatch: {field}"
+                    )
         if formal_training_identity is not None:
             for field, expected in formal_training_identity.items():
                 if row.get(field) != expected:
