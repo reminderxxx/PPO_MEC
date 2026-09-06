@@ -1,0 +1,38 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_checkpoint_identity_repair_20260906_g14r17_v1",
+  "consumers": [
+    "validate_serialized_formal_checkpoint before checkpoint commit",
+    "validate_dev_checkpoint_identity before benchmark subprocess",
+    "dev_select before ranking",
+    "checkpoint_freeze actual checkpoint read-back",
+    "validate_checkpoint_provenance typed consumer"
+  ],
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "formal": false,
+  "git_commit": "57e5f106383f1abe581ee8f6e89bdf7459334cc7",
+  "holdout_capability": false,
+  "legacy_rule": "missing top-level fields are never backfilled from nested metadata",
+  "literature_cutoff": "2026-09-06",
+  "per_cell_identity": [
+    "agent_identity",
+    "training_seed",
+    "runtime_contract_sha256"
+  ],
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "producer": "scripts.train_algo_pool_real_sample.build_training_identity_metadata",
+  "reviewed_at": "2026-09-06T12:45:00+08:00",
+  "serialization": "agent.save -> annotate_checkpoint -> torch.load read-back",
+  "shared_identity_fields": [
+    "agent_scientific_config_semantic_sha256",
+    "formal_training_execution_binding_sha256",
+    "formal_protocol_semantic_sha256",
+    "execution_commit",
+    "resolved_execution_context_sha256",
+    "formal_agent_order_contract_semantic_sha256",
+    "active_formal_bundle_sha256",
+    "formal_nullable_metric_aggregation_contract_semantic_sha256"
+  ],
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
+}

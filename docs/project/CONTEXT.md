@@ -1,10 +1,17 @@
 ﻿# Context
 
-更新日期：2026-09-05
+更新日期：2026-09-06
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
 ## 项目状态
+
+- 当前唯一 live typed model-cache execution contract 为 Protocol 2.8.0；active index 位于
+  `configs/experiment/typed_model_cache_formal_protocol_v2_8_20260906/protocol_index.json`，Readiness v20=
+  `READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL`。checkpoint shared identity 由 resolved contract 经统一 projection
+  生产，top-level/nested/trusted expected 与 agent/seed/runtime per-cell identity 在 read-back、pre-dev、pre-sort、
+  freeze 和 typed provenance 严格校验。G14C v15 永久 invalid 于 150 train + 24 dev cells、1,200 candidates 后、
+  selection 发布前；Protocol 2.7 及更早版本 audit-only。当前没有 G14C v16/formal/holdout 性能证据。
 
 - 当前唯一 live typed model-cache contract 为 Protocol 2.6.0 + Cell Artifact Publication Contract 1.0.0 +
   Generated Checkpoint Resource Identity Contract 1.1.0；active index 为

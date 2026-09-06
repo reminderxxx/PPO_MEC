@@ -1,0 +1,32 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_checkpoint_identity_repair_20260906_g14r17_v1",
+  "covered": [
+    "top-level nullable missing",
+    "nested nullable missing",
+    "top-level/nested conflict",
+    "all candidates share wrong nullable hash",
+    "single-candidate drift",
+    "cross Protocol",
+    "cross binding",
+    "cross context",
+    "cross active bundle",
+    "wrong agent",
+    "wrong seed",
+    "wrong capacity runtime",
+    "post-serialization field loss",
+    "G14C v15 reference rejection"
+  ],
+  "error_string_only_assertion": false,
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "formal": false,
+  "git_commit": "57e5f106383f1abe581ee8f6e89bdf7459334cc7",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-09-06",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "prebenchmark_negative_child_invocations": 0,
+  "reviewed_at": "2026-09-06T12:45:00+08:00",
+  "selection_or_freeze_published_on_negative": false,
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
+}

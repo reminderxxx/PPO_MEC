@@ -1,7 +1,15 @@
 # PPO_MEC
 
+G14R17 已修复 G14C v15 checkpoint nullable identity 顶层序列化遗漏，并冻结唯一 live Protocol `2.8.0` 与
+Readiness v20=`READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL`。共享 capability-aware projection 统一 producer、
+read-back、pre-dev、pre-sort、freeze 与 typed provenance 校验；1,200-coordinate 结构矩阵及 10-agent/
+candidate+latest/三容量实际保存读回链通过。G14C v15 永久 invalid 于 150 train cells、24 dev cells、1,200
+candidates 之后且 selection 发布之前，禁止 resume/retry/finalize/salvage/reuse；Protocol 2.7 仅供 audit。
+本轮未启动 G14C v16、正式训练、formal、holdout、G14D 或 G15。详见
+`docs/project/formal_checkpoint_nullable_identity_contract.md`。
+
 G14R16 已修复 Formal Protocol 2.6 首个训练 cell 在 nullable identity 校验分支触发的确定性 `NameError`，
-并冻结唯一 live Protocol `2.7.0` 与 Readiness v19=`READY_FOR_G14C_V15_CLEAN_TRAIN_AND_FORMAL`。clean
+并曾冻结（现为 historical/audit-only）Protocol `2.7.0` 与 Readiness v19=`READY_FOR_G14C_V15_CLEAN_TRAIN_AND_FORMAL`。clean
 detached candidate 使用生产入口完成真实 full-data public preflight 与 150/150（10 agents × 5 seeds × 3
 capacities）零 episode 初始化验收；episode/interaction/update/checkpoint/performance 均为 0。G14C v14 永久
 登记为 invalid，禁止 resume/retry/finalize/salvage/reuse；Protocol 2.6 及更早版本仅供 historical/audit。

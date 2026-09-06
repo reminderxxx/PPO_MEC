@@ -1,0 +1,33 @@
+{
+  "artifact_run_id": "typed_model_cache_formal_checkpoint_identity_repair_20260906_g14r17_v1",
+  "compile_import": "pass",
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "formal": false,
+  "full_pytest": {
+    "errors": 0,
+    "failures": 0,
+    "skipped": 18,
+    "tests": 1273,
+    "time_seconds": 153.662
+  },
+  "full_pytest_passed": 1255,
+  "full_skips": "pre-existing platform/evidence/Git-clean conditional cases",
+  "git_commit": "57e5f106383f1abe581ee8f6e89bdf7459334cc7",
+  "git_diff_check": "pass",
+  "holdout_capability": false,
+  "literature_cutoff": "2026-09-06",
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-06T12:45:00+08:00",
+  "smoke": "pass",
+  "status": "pass",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "targeted": {
+    "errors": 0,
+    "failures": 0,
+    "skipped": 2,
+    "tests": 141,
+    "time_seconds": 54.016
+  },
+  "targeted_skips": "two pre-existing Git-clean-only capability tests; identity acceptance has zero skips"
+}

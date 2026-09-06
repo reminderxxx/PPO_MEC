@@ -1,6 +1,16 @@
 ﻿# Directory Structure
 
-G14R16：唯一 active Protocol 2.7、ready index 与 Readiness v19 位于
+G14R17：唯一 active Protocol 2.8、ready index 与 Readiness v20 位于
+`configs/experiment/typed_model_cache_formal_protocol_v2_8_20260906/`；共享 checkpoint identity projection 位于
+`src/runtime/formal_training_identity.py`，producer/read-back 位于 `scripts/train_algo_pool_real_sample.py`，严格
+dev/freeze consumers 位于 `scripts/run_typed_model_cache_formal_dev_selection.py` 与
+`scripts/manage_typed_model_cache_formal_artifacts.py`。Protocol/artifact 构建入口为
+`scripts/repair_formal_checkpoint_nullable_identity_contract.py` 与
+`scripts/build_formal_checkpoint_identity_repair_artifacts.py`；机器证据位于
+`artifacts/analysis/typed_model_cache_formal_checkpoint_identity_repair_20260906_g14r17_v1/`。测试 checkpoint 不保留，
+Protocol 2.7 目录与 G14C v15 run 均为 historical/audit-only。
+
+G14R16（historical/audit-only）：Protocol 2.7、ready index 与 Readiness v19 位于
 `configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905/`；resolver 位于
 `src/runtime/formal_training_contract.py`，正式 outer gate 位于
 `scripts/run_typed_model_cache_formal_protocol.py`，150-cell 生产入口验收复用

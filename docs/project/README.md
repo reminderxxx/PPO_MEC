@@ -4,6 +4,9 @@
 
 ## Live 文档
 
+- `formal_checkpoint_nullable_identity_contract.md`：G14R17 checkpoint identity producer/read-back/pre-dev/pre-sort/
+  freeze/provenance closure、G14C v15 永久失败边界、Protocol 2.8 与 Readiness v20
+
 - `formal_cell_artifact_publication_contract.md`：G14R15 统一 cell identity/staging/descriptor/payload validation/
   atomic publication/marker-ledger recovery，并冻结 Protocol 2.6、registry recovery、gate completion 与 Readiness v18
 

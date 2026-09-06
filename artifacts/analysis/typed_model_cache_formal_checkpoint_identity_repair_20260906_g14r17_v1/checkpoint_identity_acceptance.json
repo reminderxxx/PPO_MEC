@@ -1,0 +1,153 @@
+{
+  "actual_agent_serialization_paths": 10,
+  "artifact_run_id": "typed_model_cache_formal_checkpoint_identity_repair_20260906_g14r17_v1",
+  "candidate_update_indices_per_coordinate": 8,
+  "capacity_labels": [
+    "constrained_288mb",
+    "medium_576mb",
+    "relaxed_864mb"
+  ],
+  "checkpoint_artifact_kinds": [
+    "latest.pt",
+    "update_0004.pt"
+  ],
+  "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
+  "formal": false,
+  "formal_training_or_performance_evidence": false,
+  "git_commit": "57e5f106383f1abe581ee8f6e89bdf7459334cc7",
+  "holdout_capability": false,
+  "identity_test_case_count": 19,
+  "identity_test_cases": [
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_1200_coordinate_producer_projection_and_json_roundtrip",
+      "status": "passed",
+      "time_seconds": 0.071
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_ten_agent_actual_save_annotate_readback_candidate_and_latest",
+      "status": "passed",
+      "time_seconds": 0.874
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_strict_selection_freeze_and_typed_provenance_chain",
+      "status": "passed",
+      "time_seconds": 4.33
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_freeze_rechecks_actual_checkpoint_not_only_selected_wrapper",
+      "status": "passed",
+      "time_seconds": 4.267
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_candidate_identity_negatives_publish_nothing[<lambda>-False-missing]",
+      "status": "passed",
+      "time_seconds": 4.269
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_candidate_identity_negatives_publish_nothing[<lambda>-False-nested]",
+      "status": "passed",
+      "time_seconds": 4.229
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_candidate_identity_negatives_publish_nothing[<lambda>-False-top-level/nested]",
+      "status": "passed",
+      "time_seconds": 4.228
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_candidate_identity_negatives_publish_nothing[<lambda>-True-trusted expected0]",
+      "status": "passed",
+      "time_seconds": 4.271
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_candidate_identity_negatives_publish_nothing[<lambda>-False-trusted expected]",
+      "status": "passed",
+      "time_seconds": 4.314
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_candidate_identity_negatives_publish_nothing[<lambda>-True-trusted expected1]",
+      "status": "passed",
+      "time_seconds": 4.368
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_candidate_identity_negatives_publish_nothing[<lambda>-True-trusted expected2]",
+      "status": "passed",
+      "time_seconds": 4.421
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_candidate_identity_negatives_publish_nothing[<lambda>-True-trusted expected3]",
+      "status": "passed",
+      "time_seconds": 4.244
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_candidate_identity_negatives_publish_nothing[<lambda>-True-trusted expected4]",
+      "status": "passed",
+      "time_seconds": 4.406
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_prebenchmark_rejection_has_zero_child_calls",
+      "status": "passed",
+      "time_seconds": 0.031
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_wrong_agent_seed_or_capacity_runtime_is_rejected[mappo-7-None]",
+      "status": "passed",
+      "time_seconds": 0.03
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_wrong_agent_seed_or_capacity_runtime_is_rejected[ppo-13-None]",
+      "status": "passed",
+      "time_seconds": 0.03
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_wrong_agent_seed_or_capacity_runtime_is_rejected[ppo-7-0000000000000000000000000000000000000000000000000000000000000000]",
+      "status": "passed",
+      "time_seconds": 0.03
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_json_serialization_field_loss_is_rejected",
+      "status": "passed",
+      "time_seconds": 0.0
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_g14c_v15_checkpoint_reference_is_permanently_rejected",
+      "status": "passed",
+      "time_seconds": 0.0
+    }
+  ],
+  "literature_cutoff": "2026-09-06",
+  "matrix_coordinates": 150,
+  "metadata_projection_count": 1200,
+  "performance_evidence": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-06T12:45:00+08:00",
+  "status": "pass",
+  "strict_selected_checkpoint_count": 150,
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "targeted_tests": {
+    "errors": 0,
+    "failures": 0,
+    "skipped": 2,
+    "tests": 141,
+    "time_seconds": 54.016
+  },
+  "test_artifacts_only": true
+}

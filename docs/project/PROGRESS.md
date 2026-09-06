@@ -1,5 +1,23 @@
 ﻿# Progress
 
+## 2026-09-06: G14R17 checkpoint nullable identity serialization/consumer closure
+
+- G14C v15 在 150 committed training cells、24 committed dev cells、1,200 candidates 后且 dev selection 发布前
+  失败；phase/cell/candidate SHA-256 分别为 `7630c3ec...b3ab`、`a70b9e80...95b9`、`fe309ba7...8a3`。
+  candidate 顶层 nullable hash 为 `null`，nested contract 为冻结 hash；selection/freeze/formal/completion 未形成，
+  holdout sealed/unopened。旧 run 及 checkpoint/candidate/partial dev 永久不可复用。
+- 新增共享 capability-aware checkpoint identity projection。trainer 从 resolved contract 生产顶层+nested identity，
+  annotate 后 read-back；dev benchmark 前、selection 排序前、freeze 实际 checkpoint 和 typed provenance 均与可信
+  Protocol/context identity 校验，并独立检查 agent/seed/runtime capacity。
+- 候选 commit `57e5f106383f1abe581ee8f6e89bdf7459334cc7` 上，1,200-coordinate builder/JSON round-trip、10-agent
+  actual save/annotate/read-back、candidate/latest、三容量、150-row selection/freeze/provenance 与完整负例通过。
+  targeted `139 passed, 2 skipped`（本轮 identity cases 19/19、0 skipped），全仓 `1255 passed, 18 skipped`；smoke、
+  compile/import、diff-check 均通过。
+- 冻结 Protocol 2.8 semantic/full SHA-256=`63309a077cc9da8bb5723f17c65e3beb5bd62810577a7e8520364f6a7de305ea`/
+  `9d91f74ff46c995261ccab9f543d90d876a9dbca8bffabc02ad1522b2c339988`，bundle core/final=`2798343d...c1b1`/
+  `667199f2...cd10`，Readiness v20 仅为未来 G14C v16 执行就绪。科学设置与 nullable 数值语义不变；本轮没有
+  正式训练或性能证据，未启动 G14C v16/formal/holdout/G14D/G15。
+
 ## 2026-09-05: G14R16 formal training resolver 与 active entrypoint acceptance closure
 
 - G14C v14 `typed_model_cache_formal_20260905_185105_g14c_v14` 在首个 `sa_ghmappo / seed 7 /

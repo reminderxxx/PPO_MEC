@@ -1,5 +1,17 @@
 ﻿# Decision Log
 
+## 2026-09-06: active checkpoint identity must be produced once and consumed strictly
+
+- 决定：正式 checkpoint shared identity 由已验证 `ResolvedTrainingContract` 经 capability-aware projection 生成；
+  producer 与 consumer 不再分别手抄字段，也不新增平行 bundle/registry/ledger。
+- 决定：active formal 资格要求顶层与 nested 字段均真实存在、类型正确且一致，并等于可信 Protocol/context expected
+  identity；旧 checkpoint 不得由 nested/default/Protocol fallback 回填缺失顶层字段。
+- 决定：agent/seed/runtime capacity 属于 per-cell identity，不要求跨 cell 相等；selection 共享 run identity 必须一致，
+  但“所有 candidate 一致”不足以通过，仍须匹配可信 expected identity。
+- 决定：提交前 read-back、dev benchmark 前、selection 排序前、freeze actual checkpoint 与 typed provenance 是固定
+  fail-closed 位置。Protocol 2.8 为唯一 live version，Readiness v20 只授权未来独立 G14C v16。
+- 边界：G14C v15 永久停在 selection 发布前；本轮 test-only checkpoint 不是正式训练或性能证据，holdout 未开启。
+
 ## 2026-09-05: G14R15 makes committed cell artifacts the only consumable truth
 
 - 决定：formal runner 与 non-formal rehearsal 共用同一 cell transaction executor；child 以绑定 run/cell/setting

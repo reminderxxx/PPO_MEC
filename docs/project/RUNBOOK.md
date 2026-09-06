@@ -1,6 +1,17 @@
 # Runbook
 
-## Protocol 2.7 与未来 G14C v15
+## Protocol 2.8 与未来 G14C v16
+
+唯一 live index：`configs/experiment/typed_model_cache_formal_protocol_v2_8_20260906/protocol_index.json`。
+Protocol 2.7 及更早版本仅供 historical/audit。G14C v15 永久 invalid 于 training/dev evaluation 后、selection
+发布前；不得 resume/retry/finalize/salvage，亦不得复用其 checkpoint、candidate 或 partial dev。
+
+Readiness v20 绑定 G14R17 的 1,200-coordinate metadata round-trip、10-agent candidate/latest 实际保存读回、
+三容量、strict selection/freeze/provenance 和负例证据。验收产物为 test-only，不能放入正式 checkpoint manifest
+或论文表。未来 G14C v16 只能由独立任务从 pushed、Git-clean、`HEAD == origin/main` 的新 detached worktree 启动；
+本条目不授权当前修复任务启动训练、formal performance 或 holdout。
+
+## Protocol 2.7 与未来 G14C v15（historical/audit-only）
 
 唯一 live index：
 `configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905/protocol_index.json`。Protocol 2.6 及更早版本

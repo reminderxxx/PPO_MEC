@@ -1,6 +1,6 @@
 # Formal Training Entrypoint Acceptance Contract
 
-状态：Protocol `2.7.0`，Readiness `19.0.0`。唯一 active index 为
+状态：historical/audit-only；Protocol `2.7.0`，Readiness `19.0.0`。历史 index 为
 `configs/experiment/typed_model_cache_formal_protocol_v2_7_20260905/protocol_index.json`。
 
 ## 根因与失效边界

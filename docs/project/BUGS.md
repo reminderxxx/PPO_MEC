@@ -1,5 +1,16 @@
 ﻿# Bugs And Risks
 
+## 2026-09-06: checkpoint nullable identity top-level omission（RESOLVED；G14C v15 永久 invalid）
+
+- 根因：nullable hash 已进入 resolved/nested formal training contract，但 checkpoint 顶层 metadata 与 summary
+  没有使用共享 projection；dev 前置 validator 未要求 nullable 字段，导致昂贵 dev 全部完成后才在 selection 拒绝。
+- 修复：producer/read-back/pre-benchmark/pre-sort/freeze/typed provenance 共用 capability-aware identity 字段；active
+  路径要求 top-level+nested+trusted expected 一致，旧缺字段 checkpoint 不回填、不获得 formal 资格。
+- 历史边界：v15 为“training 和 dev evaluation 后、selection 发布前”失败，不得误写为 before-dev 或零执行；其
+  150 train cells、24 dev cells、1,200 candidates 仅供审计，禁止 resume/retry/finalize/salvage/reuse。
+- 剩余风险：验收使用 test-only checkpoint 与确定性合成 dev 输入，未执行 G14C v16 的 256-episode 正式训练或
+  formal performance；Readiness v20 不是算法优势、TMC-ready 或 paper-ready 证据，holdout 仍 sealed/unopened。
+
 ## 2026-09-05: active nullable training resolver NameError（RESOLVED；G14C v14 永久 invalid）
 
 - 根因：`resolve_training_contract(formal_protocol=...)` 的 active nullable 分支读取未定义 `protocol`；历史 v1.6

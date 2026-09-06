@@ -1,5 +1,17 @@
 # Artifact Records
 
+## 2026-09-06 G14R17 checkpoint nullable identity closure
+
+- path：`artifacts/analysis/typed_model_cache_formal_checkpoint_identity_repair_20260906_g14r17_v1/`；active config：
+  `configs/experiment/typed_model_cache_formal_protocol_v2_8_20260906/`。
+- `g14c_v15_failure_audit.json` 绑定 phase/cell/candidate 三个旧文件的完整 SHA-256，并记录 150 train cells、24 dev
+  cells、1,200 candidates 与 selection 前失败边界；不修改或补造旧 run。
+- `checkpoint_identity_acceptance.json`、JUnit 与 negative audit 记录 1,200-coordinate builder round-trip、10-agent
+  actual save/read-back、candidate/latest、三容量、150-row selection/freeze/typed provenance，以及零 child 调用和
+  no-publication 负例。验收 checkpoint 为临时 test-only，未提交且不属于性能证据。
+- Protocol 2.8 semantic/full=`63309a07...05ea`/`9d91f74f...9988`，bundle final=`667199f2...cd10`；Readiness
+  v20 只授权未来独立 G14C v16，holdout sealed/unopened，本轮未启动 formal/G14D/G15。
+
 ## 2026-09-05 G14R15 formal cell artifact publication closure
 
 - path：`artifacts/analysis/typed_model_cache_formal_cell_publication_repair_20260905_g14r15_v1/`；active config：

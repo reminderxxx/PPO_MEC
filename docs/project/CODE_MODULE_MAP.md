@@ -1,5 +1,18 @@
 # Code Module Map
 
+## G14R17 checkpoint nullable identity closure
+
+- `src/runtime/formal_training_identity.py`：capability-aware 共享字段、producer projection、可信 expected projection、
+  top-level/nested 一致性及 shared/per-cell strict validator。
+- `scripts/train_algo_pool_real_sample.py`：checkpoint/summary identity builder；candidate 与 latest annotate 后 read-back。
+- `scripts/run_typed_model_cache_formal_dev_selection.py`：昂贵 benchmark child 前校验 actual checkpoint，并将实际
+  metadata 投影到 candidate。
+- `scripts/manage_typed_model_cache_formal_artifacts.py`：排序前 candidate-vs-trusted 校验；freeze 重新读取 selected
+  checkpoint，不能只信 selection wrapper。
+- `src/runtime/typed_model_cache_runtime.py`：typed provenance consumer 校验完整 active top-level/nested identity。
+- `tests/test_checkpoint_nullable_identity_v28.py`：1,200 坐标、10-agent 保存读回、selection/freeze/provenance 与
+  missing/conflict/drift/cross-identity/per-cell/legacy 引用负例。
+
 ## G14R15 formal cell publication/recovery/completion
 
 - `src/evaluators/formal_cell_transaction.py`：正式与 rehearsal 共用的 cell identity、attempt staging、descriptor
