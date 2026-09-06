@@ -8,7 +8,16 @@ from pathlib import Path
 import pytest
 import torch
 
-from scripts.manage_typed_model_cache_formal_artifacts import checkpoint_freeze, dev_select
+from scripts.benchmark_main_results import (
+    CHECKPOINT_PROVENANCE_ENVELOPE_FIELDS,
+    load_checkpoint_provenance_manifest,
+    validate_benchmark_checkpoint_gate,
+)
+from scripts.manage_typed_model_cache_formal_artifacts import (
+    checkpoint_freeze,
+    dev_select,
+    write_checkpoint_companions,
+)
 from scripts.run_typed_model_cache_formal_dev_selection import (
     validate_dev_checkpoint_identity,
 )
@@ -30,6 +39,7 @@ from src.runtime.formal_training_identity import (
     FormalTrainingIdentityError,
     build_execution_binding,
     checkpoint_training_identity_projection,
+    checkpoint_training_identity_fields,
     expected_checkpoint_training_identity,
     validate_checkpoint_training_identity,
 )
@@ -230,7 +240,9 @@ def test_ten_agent_actual_save_annotate_readback_candidate_and_latest(
     assert observed_capacities == set(capacities)
 
 
-def build_strict_candidates(identity_bundle, tmp_path: Path) -> tuple[list[dict], dict]:
+def build_strict_candidates(
+    identity_bundle, tmp_path: Path, *, production_roundtrip: bool = False
+) -> tuple[list[dict], dict]:
     protocol, _, _, context, resolved_by_agent, expected = identity_bundle
     runtime_paths = capacity_runtime_paths(protocol)
     window_identity = {"test_only": True, "split": "train"}
@@ -251,7 +263,19 @@ def build_strict_candidates(identity_bundle, tmp_path: Path) -> tuple[list[dict]
         )
         path = tmp_path / "training" / capacity / agent / f"seed_{seed}.pt"
         path.parent.mkdir(parents=True, exist_ok=True)
-        torch.save({"test_state": True, "training_metadata": metadata}, path)
+        if production_roundtrip:
+            torch.save({"test_state": True}, path)
+            annotate_checkpoint(path, metadata)
+            read_back = validate_serialized_formal_checkpoint(
+                path,
+                resolved_training=resolved_by_agent[agent],
+                agent_name=agent,
+                seed=seed,
+                runtime_contract_sha256=runtime["runtime_contract_sha256"],
+            )
+            assert read_back == load_checkpoint_training_metadata(path)
+        else:
+            torch.save({"test_state": True, "training_metadata": metadata}, path)
         availability = {
             metric: {"available_count": 1, "unavailable_count": 0, "total_count": 1}
             for metric in (
@@ -288,23 +312,55 @@ def build_strict_candidates(identity_bundle, tmp_path: Path) -> tuple[list[dict]
     return candidates, expected
 
 
-def test_strict_selection_freeze_and_typed_provenance_chain(
-    identity_bundle, tmp_path: Path
-) -> None:
-    protocol, _, _, _, _, expected = identity_bundle
-    candidates, _ = build_strict_candidates(identity_bundle, tmp_path)
-    (tmp_path / "checkpoint_candidates.json").write_text(
+@pytest.fixture(scope="module")
+def full_companion_chain(identity_bundle, tmp_path_factory):
+    root = tmp_path_factory.mktemp("full_companion_chain")
+    protocol, _, binding, context, _, expected = identity_bundle
+    candidates, _ = build_strict_candidates(
+        identity_bundle, root, production_roundtrip=True
+    )
+    (root / "checkpoint_candidates.json").write_text(
         json.dumps(candidates), encoding="utf-8"
     )
-    selection = dev_select(
-        tmp_path, protocol, expected_training_identity=expected
-    )
-    assert len(selection["selected"]) == 150
-    assert selection["formal_training_identity"] == expected
-    (tmp_path / "dev_selection.json").write_text(
+    selection = dev_select(root, protocol, expected_training_identity=expected)
+    (root / "dev_selection.json").write_text(
         json.dumps(selection), encoding="utf-8"
     )
-    freeze = checkpoint_freeze(tmp_path, protocol)
+    freeze = checkpoint_freeze(root, protocol)
+    return {
+        "root": root,
+        "protocol": protocol,
+        "context": context,
+        "binding": binding,
+        "expected": expected,
+        "freeze": freeze,
+        "companions": write_checkpoint_companions(root, freeze),
+    }
+
+
+def first_full_companion(chain) -> tuple[dict, dict, dict, str, int, str]:
+    protocol = chain["protocol"]
+    companion = chain["companions"][0]
+    capacity = companion["capacity_label"]
+    loaded = load_checkpoint_provenance_manifest(
+        companion["checkpoint_provenance_manifest_path"]
+    )
+    agent = next(iter(loaded))
+    seed_text = next(iter(loaded[agent]))
+    runtime = resolve_model_cache_runtime(
+        capacity_runtime_paths(protocol)[capacity], root=ROOT
+    )
+    return loaded[agent][seed_text], runtime, protocol, agent, int(seed_text), capacity
+
+
+def test_strict_selection_freeze_and_typed_provenance_chain(
+    identity_bundle, full_companion_chain
+) -> None:
+    protocol, _, _, _, _, expected = identity_bundle
+    selection = load(full_companion_chain["root"] / "dev_selection.json")
+    assert len(selection["selected"]) == 150
+    assert selection["formal_training_identity"] == expected
+    freeze = full_companion_chain["freeze"]
     assert freeze["frozen_checkpoint_count"] == 150
     selected = freeze["frozen_checkpoints"][0]
     runtime = resolve_model_cache_runtime(
@@ -320,8 +376,218 @@ def test_strict_selection_freeze_and_typed_provenance_chain(
         expected_checkpoint_sha256=selected["checkpoint_sha256"],
         require_git_commit=expected["execution_commit"],
         expected_formal_training_identity=expected,
+        expected_formal_protocol_version=protocol[
+            "typed_model_cache_formal_protocol_version"
+        ],
     )
     assert report["status"] == "compatible"
+
+
+def test_full_companion_envelope_real_benchmark_gate_chain(
+    full_companion_chain,
+) -> None:
+    protocol = full_companion_chain["protocol"]
+    expected_fields = {
+        *CHECKPOINT_PROVENANCE_ENVELOPE_FIELDS,
+        *checkpoint_training_identity_fields(
+            protocol["typed_model_cache_formal_protocol_version"]
+        ),
+    }
+    observed_agents, observed_capacities = set(), set()
+    gate_count = 0
+    rollout_calls = []
+    for companion in full_companion_chain["companions"]:
+        capacity = companion["capacity_label"]
+        runtime = resolve_model_cache_runtime(
+            capacity_runtime_paths(protocol)[capacity], root=ROOT
+        )
+        loaded = load_checkpoint_provenance_manifest(
+            companion["checkpoint_provenance_manifest_path"]
+        )
+        for agent, by_seed in loaded.items():
+            for seed_text, envelope in by_seed.items():
+                assert len(envelope) == 17
+                assert set(envelope) == expected_fields
+                path = envelope["artifact_location"]["resolved_location"]
+                report = validate_benchmark_checkpoint_gate(
+                    path,
+                    expected_agent_name=agent,
+                    expected_seed=int(seed_text),
+                    expected_runtime_contract=runtime,
+                    expected_reward_positive_offset=0.0,
+                    provenance_envelope=envelope,
+                    protocol=protocol,
+                    resolved_execution_context=full_companion_chain["context"],
+                    execution_binding=full_companion_chain["binding"],
+                    expected_capacity_label=capacity,
+                )
+                assert report["status"] == "compatible"
+                observed_agents.add(agent)
+                observed_capacities.add(capacity)
+                gate_count += 1
+    assert observed_agents == set(protocol["training_budget"]["learned_agent_order"])
+    assert observed_capacities == set(capacity_runtime_paths(protocol))
+    assert gate_count == 150
+    assert rollout_calls == []
+
+
+@pytest.mark.parametrize(
+    ("field", "mode"),
+    [
+        ("formal_training_execution_binding_sha256", "missing"),
+        ("formal_nullable_metric_aggregation_contract_semantic_sha256", "missing"),
+        ("formal_nullable_metric_aggregation_contract_semantic_sha256", "wrong"),
+        ("formal_protocol_semantic_sha256", "wrong"),
+        ("formal_training_execution_binding_sha256", "wrong"),
+        ("resolved_execution_context_sha256", "wrong"),
+        ("active_formal_bundle_sha256", "wrong"),
+    ],
+)
+def test_full_envelope_shared_identity_negatives_precede_rollout(
+    full_companion_chain, field: str, mode: str
+) -> None:
+    envelope, runtime, protocol, agent, seed, capacity = first_full_companion(
+        full_companion_chain
+    )
+    envelope.pop(field) if mode == "missing" else envelope.__setitem__(field, "0" * 64)
+    rollout_calls = []
+    with pytest.raises(ValueError, match="field mismatch|trusted Protocol/context"):
+        validate_benchmark_checkpoint_gate(
+            envelope["artifact_location"]["resolved_location"],
+            expected_agent_name=agent,
+            expected_seed=seed,
+            expected_runtime_contract=runtime,
+            expected_reward_positive_offset=0.0,
+            provenance_envelope=envelope,
+            protocol=protocol,
+            resolved_execution_context=full_companion_chain["context"],
+            execution_binding=full_companion_chain["binding"],
+            expected_capacity_label=capacity,
+        )
+        rollout_calls.append("called")
+    assert rollout_calls == []
+
+
+def test_active_execution_binding_drift_precedes_rollout(full_companion_chain) -> None:
+    envelope, runtime, protocol, agent, seed, capacity = first_full_companion(
+        full_companion_chain
+    )
+    binding = deepcopy(full_companion_chain["binding"])
+    binding["binding_full_sha256"] = "0" * 64
+    rollout_calls = []
+    with pytest.raises(ValueError, match="execution binding"):
+        validate_benchmark_checkpoint_gate(
+            envelope["artifact_location"]["resolved_location"],
+            expected_agent_name=agent,
+            expected_seed=seed,
+            expected_runtime_contract=runtime,
+            expected_reward_positive_offset=0.0,
+            provenance_envelope=envelope,
+            protocol=protocol,
+            resolved_execution_context=full_companion_chain["context"],
+            execution_binding=binding,
+            expected_capacity_label=capacity,
+        )
+        rollout_calls.append("called")
+    assert rollout_calls == []
+
+
+@pytest.mark.parametrize("case", ["sha", "git", "window", "runtime", "agent", "seed", "capacity"])
+def test_full_envelope_runtime_negatives_precede_rollout(
+    full_companion_chain, case: str
+) -> None:
+    envelope, runtime, protocol, agent, seed, capacity = first_full_companion(
+        full_companion_chain
+    )
+    expected_agent, expected_seed, expected_capacity = agent, seed, capacity
+    if case == "sha":
+        envelope["checkpoint_sha256"] = "0" * 64
+        envelope["checkpoint_identity"]["checkpoint_sha256"] = "0" * 64
+    elif case == "git":
+        envelope["execution_git_commit"] = "0" * 40
+    elif case == "window":
+        envelope["train_window_plan_identity"] = {"test_only": True, "split": "wrong"}
+    elif case == "runtime":
+        envelope["runtime_contract_sha256"] = "0" * 64
+    elif case == "agent":
+        expected_agent = "ppo" if agent != "ppo" else "mappo"
+    elif case == "seed":
+        expected_seed += 1
+    else:
+        expected_capacity = next(
+            label for label in capacity_runtime_paths(protocol) if label != capacity
+        )
+        runtime = resolve_model_cache_runtime(
+            capacity_runtime_paths(protocol)[expected_capacity], root=ROOT
+        )
+    rollout_calls = []
+    try:
+        report = validate_benchmark_checkpoint_gate(
+            envelope["artifact_location"]["resolved_location"],
+            expected_agent_name=expected_agent,
+            expected_seed=expected_seed,
+            expected_runtime_contract=runtime,
+            expected_reward_positive_offset=0.0,
+            provenance_envelope=envelope,
+            protocol=protocol,
+            resolved_execution_context=full_companion_chain["context"],
+            execution_binding=full_companion_chain["binding"],
+            expected_capacity_label=expected_capacity,
+        )
+    except ValueError:
+        pass
+    else:
+        assert report["status"] == "incompatible"
+        assert report["errors"]
+    assert rollout_calls == []
+
+
+def test_checkpoint_top_nested_conflict_and_protocol_downgrade_precede_rollout(
+    full_companion_chain, tmp_path: Path
+) -> None:
+    envelope, runtime, protocol, agent, seed, capacity = first_full_companion(
+        full_companion_chain
+    )
+    source = Path(envelope["artifact_location"]["resolved_location"])
+    rollout_calls = []
+    for mode in ("top_nested_conflict", "protocol_downgrade"):
+        payload = torch.load(source, map_location="cpu")
+        metadata = payload["training_metadata"]
+        if mode == "top_nested_conflict":
+            metadata["active_formal_bundle_sha256"] = "0" * 64
+        else:
+            metadata["formal_training_contract"]["formal_protocol_version"] = "2.7.0"
+        target = tmp_path / f"{mode}.pt"
+        torch.save(payload, target)
+        mutated = deepcopy(envelope)
+        mutated["checkpoint_sha256"] = sha256_file(target)
+        mutated["checkpoint_identity"]["checkpoint_sha256"] = mutated["checkpoint_sha256"]
+        report = validate_benchmark_checkpoint_gate(
+            target,
+            expected_agent_name=agent,
+            expected_seed=seed,
+            expected_runtime_contract=runtime,
+            expected_reward_positive_offset=0.0,
+            provenance_envelope=mutated,
+            protocol=protocol,
+            resolved_execution_context=full_companion_chain["context"],
+            execution_binding=full_companion_chain["binding"],
+            expected_capacity_label=capacity,
+        )
+        assert report["status"] == "incompatible"
+        assert any(
+            "top-level/nested" in error or "Protocol version mismatch" in error
+            for error in report["errors"]
+        )
+    assert rollout_calls == []
+
+
+def test_benchmark_main_calls_strict_envelope_gate_before_rollout() -> None:
+    source = (ROOT / "scripts/benchmark_main_results.py").read_text(encoding="utf-8")
+    gate = source.index("checkpoint_gate = validate_benchmark_checkpoint_gate(")
+    rollout = source.index("summary = run_real_episode(", gate)
+    assert gate < rollout
+    assert "binding.get(\n                                    \"formal_training_execution_binding_sha256\"" not in source
 
 
 def test_freeze_rechecks_actual_checkpoint_not_only_selected_wrapper(

@@ -501,6 +501,7 @@ def validate_checkpoint_provenance(
     expected_checkpoint_sha256: str | None = None,
     require_git_commit: str | None = None,
     expected_formal_training_identity: Mapping[str, Any] | None = None,
+    expected_formal_protocol_version: str | None = None,
 ) -> dict[str, Any]:
     """Return the three-state typed checkpoint provenance gate result."""
 
@@ -566,20 +567,31 @@ def validate_checkpoint_provenance(
     if expected_checkpoint_sha256 is not None and file_hash != expected_checkpoint_sha256:
         errors.append("checkpoint SHA-256 mismatch")
     if expected_formal_training_identity is not None:
-        nested = metadata.get("formal_training_contract")
-        protocol_version = (
-            nested.get("formal_protocol_version") if isinstance(nested, Mapping) else None
-        )
+        if not isinstance(expected_formal_protocol_version, str) or not (
+            expected_formal_protocol_version
+        ):
+            errors.append("trusted expected formal Protocol version missing")
+            expected_identity = None
+        else:
+            try:
+                expected_identity = checkpoint_training_identity_projection(
+                    expected_formal_training_identity,
+                    protocol_version=expected_formal_protocol_version,
+                    require_nested_contract=False,
+                )
+            except FormalTrainingIdentityError as exc:
+                errors.append(f"trusted expected formal training identity invalid: {exc}")
+                expected_identity = None
         try:
             observed_identity = checkpoint_training_identity_projection(
                 metadata,
-                protocol_version=str(protocol_version or ""),
+                protocol_version=str(expected_formal_protocol_version or ""),
                 require_nested_contract=True,
             )
         except FormalTrainingIdentityError as exc:
             errors.append(str(exc))
         else:
-            if observed_identity != dict(expected_formal_training_identity):
+            if expected_identity is not None and observed_identity != expected_identity:
                 errors.append("formal training identity differs from trusted expected identity")
     return {
         "status": "compatible" if not errors else "incompatible",

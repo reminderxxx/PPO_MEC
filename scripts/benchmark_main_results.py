@@ -56,6 +56,13 @@ from src.runtime.typed_model_cache_runtime import (
     resolve_model_cache_runtime,
     validate_checkpoint_provenance,
 )
+from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
+from src.runtime.formal_training_identity import (
+    FormalTrainingIdentityError,
+    checkpoint_training_identity_fields,
+    checkpoint_training_identity_projection,
+    expected_checkpoint_training_identity,
+)
 from src.runtime.formal_exogenous_request_execution import (
     FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION,
     FORMAL_REQUEST_SUBJECT_LIFECYCLE_CONTRACT_VERSION,
@@ -92,6 +99,18 @@ LOWER_IS_BETTER_FOR_ADVANTAGE = {
     "backhaul_traffic_cost",
     "adapter_state_migration_overhead",
 }
+
+CHECKPOINT_PROVENANCE_ENVELOPE_FIELDS = (
+    "checkpoint_sha256",
+    "execution_git_commit",
+    "train_window_plan_identity",
+    "runtime_contract_sha256",
+    "resolved_agent_config",
+    "checkpoint_schedule",
+    "selection_sha256",
+    "checkpoint_identity",
+    "artifact_location",
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -256,6 +275,122 @@ def load_checkpoint_provenance_manifest(path: str) -> dict[str, dict[str, dict[s
             if isinstance(binding, dict)
         }
     return normalized
+
+
+def validate_benchmark_checkpoint_gate(
+    checkpoint_path: str | Path,
+    *,
+    expected_agent_name: str,
+    expected_seed: int,
+    expected_runtime_contract: dict[str, Any],
+    expected_reward_positive_offset: float,
+    provenance_envelope: dict[str, Any],
+    protocol: dict[str, Any],
+    resolved_execution_context: dict[str, Any],
+    execution_binding: dict[str, Any],
+    expected_capacity_label: str | None = None,
+) -> dict[str, Any]:
+    """Validate one active formal companion envelope and its checkpoint."""
+
+    protocol_version = str(
+        protocol.get("typed_model_cache_formal_protocol_version") or ""
+    )
+    capabilities = get_protocol_capabilities(protocol_version)
+    if not capabilities.live_execution_allowed:
+        raise ValueError("benchmark formal checkpoint gate requires the active Protocol")
+    trusted_identity = expected_checkpoint_training_identity(
+        protocol=protocol,
+        resolved_execution_context=resolved_execution_context,
+    )
+    if execution_binding.get("binding_full_sha256") != trusted_identity[
+        "formal_training_execution_binding_sha256"
+    ]:
+        raise ValueError("active formal execution binding differs from trusted context")
+    identity_fields = checkpoint_training_identity_fields(protocol_version)
+    expected_fields = {*CHECKPOINT_PROVENANCE_ENVELOPE_FIELDS, *identity_fields}
+    observed_fields = set(provenance_envelope)
+    if observed_fields != expected_fields:
+        missing = sorted(expected_fields - observed_fields)
+        unknown = sorted(observed_fields - expected_fields)
+        raise ValueError(
+            "checkpoint provenance envelope field mismatch: "
+            f"missing={missing}, unknown={unknown}"
+        )
+    try:
+        companion_identity = checkpoint_training_identity_projection(
+            provenance_envelope,
+            protocol_version=protocol_version,
+            require_nested_contract=False,
+        )
+    except FormalTrainingIdentityError as exc:
+        raise ValueError(str(exc)) from exc
+    if companion_identity != trusted_identity:
+        raise ValueError(
+            "checkpoint provenance companion identity differs from trusted "
+            "Protocol/context identity"
+        )
+
+    def require_hash(field: str, length: int = 64) -> str:
+        value = provenance_envelope.get(field)
+        if (
+            not isinstance(value, str)
+            or len(value) != length
+            or any(character not in "0123456789abcdef" for character in value)
+        ):
+            raise ValueError(f"checkpoint provenance envelope invalid: {field}")
+        return value
+
+    checkpoint_sha256 = require_hash("checkpoint_sha256")
+    execution_git_commit = require_hash("execution_git_commit", 40)
+    runtime_contract_sha256 = require_hash("runtime_contract_sha256")
+    require_hash("selection_sha256")
+    for field in (
+        "train_window_plan_identity",
+        "resolved_agent_config",
+        "checkpoint_schedule",
+        "checkpoint_identity",
+        "artifact_location",
+    ):
+        if not isinstance(provenance_envelope.get(field), dict):
+            raise ValueError(f"checkpoint provenance envelope invalid: {field}")
+    if execution_git_commit != trusted_identity["execution_commit"]:
+        raise ValueError("checkpoint provenance envelope Git identity mismatch")
+    if runtime_contract_sha256 != expected_runtime_contract.get(
+        "runtime_contract_sha256"
+    ):
+        raise ValueError("checkpoint provenance envelope runtime identity mismatch")
+    checkpoint_identity = provenance_envelope["checkpoint_identity"]
+    envelope_checks = {
+        "checkpoint_sha256": checkpoint_sha256,
+        "agent": expected_agent_name,
+        "seed": int(expected_seed),
+        "execution_commit": trusted_identity["execution_commit"],
+        "training_protocol": trusted_identity["formal_protocol_semantic_sha256"],
+        "runtime_identity": runtime_contract_sha256,
+        "window_identity": provenance_envelope["train_window_plan_identity"],
+    }
+    if expected_capacity_label is not None:
+        envelope_checks["capacity"] = expected_capacity_label
+    for field, expected in envelope_checks.items():
+        if checkpoint_identity.get(field) != expected:
+            raise ValueError(
+                f"checkpoint provenance envelope checkpoint_identity mismatch: {field}"
+            )
+
+    return validate_checkpoint_provenance(
+        checkpoint_path,
+        expected_agent_name=expected_agent_name,
+        expected_seed=expected_seed,
+        expected_runtime_contract=expected_runtime_contract,
+        expected_reward_positive_offset=expected_reward_positive_offset,
+        expected_window_plan_identity=provenance_envelope[
+            "train_window_plan_identity"
+        ],
+        expected_checkpoint_sha256=checkpoint_sha256,
+        require_git_commit=trusted_identity["execution_commit"],
+        expected_formal_training_identity=trusted_identity,
+        expected_formal_protocol_version=protocol_version,
+    )
 
 
 def expand_checkpoint_aliases(checkpoint_map: dict[str, str]) -> dict[str, str]:
@@ -562,6 +697,9 @@ def main() -> None:
         ]
         resolve_argument_resources(args, bindings=bindings)
     generated_checkpoint_resource_audit = None
+    protocol: dict[str, Any] | None = None
+    resolved_context: dict[str, Any] | None = None
+    execution_binding: dict[str, Any] | None = None
     if args.generated_checkpoint_registry_path:
         protocol = (
             json.loads(Path(args.protocol_path).read_text(encoding="utf-8-sig"))
@@ -833,26 +971,49 @@ def main() -> None:
                                 "typed learned benchmark requires an external checkpoint provenance "
                                 f"binding for agent={agent_name}, seed={seed}"
                             )
-                        checkpoint_gate = validate_checkpoint_provenance(
-                            checkpoint_path,
-                            expected_agent_name=agent_name,
-                            expected_seed=seed,
-                            expected_runtime_contract=runtime_contract,
-                            expected_reward_positive_offset=args.reward_positive_offset,
-                            expected_window_plan_identity=binding.get(
-                                "train_window_plan_identity"
-                            )
-                            or {},
-                            expected_checkpoint_sha256=binding.get("checkpoint_sha256"),
-                            require_git_commit=binding.get("execution_git_commit"),
-                            expected_formal_training_identity=(
-                                binding
-                                if binding.get(
-                                    "formal_training_execution_binding_sha256"
+                        if protocol is not None:
+                            if resolved_context is None:
+                                raise ValueError(
+                                    "active formal benchmark lacks resolved execution context"
                                 )
-                                else None
-                            ),
-                        )
+                            if execution_binding is None:
+                                raise ValueError(
+                                    "active formal benchmark lacks execution binding"
+                                )
+                            checkpoint_gate = validate_benchmark_checkpoint_gate(
+                                checkpoint_path,
+                                expected_agent_name=agent_name,
+                                expected_seed=seed,
+                                expected_runtime_contract=runtime_contract,
+                                expected_reward_positive_offset=args.reward_positive_offset,
+                                provenance_envelope=binding,
+                                protocol=protocol,
+                                resolved_execution_context=resolved_context,
+                                execution_binding=execution_binding,
+                                expected_capacity_label=(
+                                    str(args.runtime_config_resource_id).split(".", 1)[1]
+                                    if "." in str(args.runtime_config_resource_id)
+                                    else None
+                                ),
+                            )
+                        else:
+                            checkpoint_gate = validate_checkpoint_provenance(
+                                checkpoint_path,
+                                expected_agent_name=agent_name,
+                                expected_seed=seed,
+                                expected_runtime_contract=runtime_contract,
+                                expected_reward_positive_offset=args.reward_positive_offset,
+                                expected_window_plan_identity=binding.get(
+                                    "train_window_plan_identity"
+                                )
+                                or {},
+                                expected_checkpoint_sha256=binding.get(
+                                    "checkpoint_sha256"
+                                ),
+                                require_git_commit=binding.get(
+                                    "execution_git_commit"
+                                ),
+                            )
                         if checkpoint_gate["status"] != "compatible":
                             raise ValueError(
                                 f"typed checkpoint provenance gate failed: {checkpoint_gate}"
