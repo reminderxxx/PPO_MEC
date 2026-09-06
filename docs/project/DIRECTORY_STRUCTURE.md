@@ -1,6 +1,16 @@
 ﻿# Directory Structure
 
-G14R17：唯一 active Protocol 2.8、ready index 与 Readiness v20 位于
+G14R18：唯一 active Protocol 2.9、ready index 与 Readiness v21 位于
+`configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/`；共享 8-field parser 位于
+`src/runtime/formal_training_identity.py`，17-field envelope 的 producer 位于
+`scripts/manage_typed_model_cache_formal_artifacts.py`，真实 loader/gate 位于 `scripts/benchmark_main_results.py`，
+typed checkpoint consumer 位于 `src/runtime/typed_model_cache_runtime.py`。freeze 与审计构建入口为
+`scripts/repair_formal_checkpoint_provenance_envelope_contract.py` 和
+`scripts/build_formal_checkpoint_provenance_envelope_artifacts.py`；机器证据位于
+`artifacts/analysis/typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1/`。test-only checkpoint
+未提交；Protocol 2.8 目录 historical/audit-only，G14C v16 尚未创建。
+
+G14R17（historical/audit-only）：Protocol 2.8、旧 ready index 与 Readiness v20 位于
 `configs/experiment/typed_model_cache_formal_protocol_v2_8_20260906/`；共享 checkpoint identity projection 位于
 `src/runtime/formal_training_identity.py`，producer/read-back 位于 `scripts/train_algo_pool_real_sample.py`，严格
 dev/freeze consumers 位于 `scripts/run_typed_model_cache_formal_dev_selection.py` 与

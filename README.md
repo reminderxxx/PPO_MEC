@@ -1,5 +1,14 @@
 # PPO_MEC
 
+G14R18 已关闭正式 checkpoint provenance envelope 与共享 training identity projection 的接口错配，并冻结唯一
+live Protocol `2.9.0` 与 Readiness v21=`READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL`。完整 companion 保留
+17 字段；其中 8 个共享 identity 字段由 capability-aware 解析器在 benchmark 边界提取，并与已验证
+Protocol/context/binding 推导的可信 expected identity、checkpoint top-level/nested identity 严格比较。真实
+producer→save/annotate/read-back→selection/freeze→companion file→benchmark loader/gate 链覆盖 150 checkpoints、
+10 agents、5 seeds、3 capacities，正负例的环境 rollout 调用均为 0。G14C v16 仍是启动授权暂缓：未创建、
+未消耗、未执行，不存在本轮 v16 run root、ledger、checkpoint 或 invalid-run denylist 条目；Protocol 2.8 仅供
+historical/audit。详见 `docs/project/formal_checkpoint_provenance_envelope_contract.md`。
+
 G14R17 已修复 G14C v15 checkpoint nullable identity 顶层序列化遗漏，并冻结唯一 live Protocol `2.8.0` 与
 Readiness v20=`READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL`。共享 capability-aware projection 统一 producer、
 read-back、pre-dev、pre-sort、freeze 与 typed provenance 校验；1,200-coordinate 结构矩阵及 10-agent/

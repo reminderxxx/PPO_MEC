@@ -1,5 +1,19 @@
 # Code Module Map
 
+## G14R18 provenance envelope / shared identity boundary
+
+- `scripts/manage_typed_model_cache_formal_artifacts.py`：`write_checkpoint_companions` 保持完整 17 字段 provenance
+  envelope；selection/freeze 仍重新读取并严格验证实际 checkpoint。
+- `scripts/benchmark_main_results.py`：真实 companion loader 和 benchmark checkpoint gate；先验证完整 envelope，
+  再调用共享 parser 投影 expected 8-field identity，并从 active Protocol/context/binding 建立信任根。
+- `src/runtime/formal_training_identity.py`：唯一 capability-aware shared identity 字段解析器，避免 consumer 重抄字段。
+- `src/runtime/typed_model_cache_runtime.py`：以可信 expected Protocol version 选择能力，不接受 checkpoint 自报降级；
+  严格比较 checkpoint top-level/nested/expected identity 及 per-cell/file provenance。
+- `tests/test_checkpoint_nullable_identity_v28.py`：G14R18 实际 producer→save/read-back→selection/freeze→companion
+  file→benchmark gate 集成链，150 checkpoints / 10 agents / 5 seeds / 3 capacities 和 rollout=0 正负验收。
+- `scripts/repair_formal_checkpoint_provenance_envelope_contract.py` 与
+  `scripts/build_formal_checkpoint_provenance_envelope_artifacts.py`：Protocol 2.9 / Readiness v21 冻结和机器证据。
+
 ## G14R17 checkpoint nullable identity closure
 
 - `src/runtime/formal_training_identity.py`：capability-aware 共享字段、producer projection、可信 expected projection、

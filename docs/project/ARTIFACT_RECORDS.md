@@ -1,5 +1,23 @@
 # Artifact Records
 
+## 2026-09-06 G14R18 checkpoint provenance envelope closure
+
+- path：`artifacts/analysis/typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1/`；active config：
+  `configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/`。
+- `root_cause_and_schema_mapping.json` 记录 17-field envelope、共享 parser 的 8-field identity、9 个 envelope-only
+  字段及 G14R17 coverage gap；`protocol_scientific_diff.json` 证明科学字段与预算/seed/window/capacity/selection/
+  statistics/holdout 未变。
+- `real_companion_benchmark_gate_acceptance.json` 记录 150 个 test-only checkpoint 经过 production builder、实际
+  save/read-back、strict selection/freeze、companion writer/file loader、benchmark gate 和 typed validator；覆盖
+  10 agents、5 seeds、3 capacities、candidate/latest，rollout call=0。`negative_gate_acceptance.json` 记录要求的
+  identity/envelope/per-cell 漂移在 rollout 前 fail-closed。
+- `final_execution_commit_revalidation.json` 与 final JUnit 独立绑定冻结代码 commit
+  `834603a266bf06d30a070588a6e1f633eacf70e3`：public preflight、150/150 零执行入口、170 项定向与 1,288 项
+  全仓测试均通过且 0 skipped；记录发布 commit 为 `3a88303`，与被验收 commit 明确分离。
+- 审查元数据：reviewed_at=`2026-09-06T15:11:27+08:00`、literature_cutoff=`2026-09-06`、target venue=`IEEE
+  Transactions on Mobile Computing (TMC)`、policy=`tmc_review_policy_v3_20260621`、evidence level=
+  `E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE`。G14C v16 未启动，holdout 未开启。
+
 ## 2026-09-06 G14R17 checkpoint nullable identity closure
 
 - path：`artifacts/analysis/typed_model_cache_formal_checkpoint_identity_repair_20260906_g14r17_v1/`；active config：

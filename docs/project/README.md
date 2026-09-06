@@ -4,6 +4,9 @@
 
 ## Live 文档
 
+- `formal_checkpoint_provenance_envelope_contract.md`：G14R18 17-field provenance envelope / 8-field shared identity
+  边界、真实 companion→benchmark gate 验收、Protocol 2.9、Readiness v21 与 G14C v16 启动授权暂缓
+
 - `formal_checkpoint_nullable_identity_contract.md`：G14R17 checkpoint identity producer/read-back/pre-dev/pre-sort/
   freeze/provenance closure、G14C v15 永久失败边界、Protocol 2.8 与 Readiness v20
 

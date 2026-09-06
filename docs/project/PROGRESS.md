@@ -1,5 +1,28 @@
 ﻿# Progress
 
+## 2026-09-06: G14R18 checkpoint provenance envelope / shared identity boundary closure
+
+- 根因是 `write_checkpoint_companions` 合法生产 17 字段完整 envelope，而 benchmark 将整份 binding 作为
+  `expected_formal_training_identity`；typed validator 只把 observed checkpoint 投影为 8 字段后与 17 字段字典
+  比较。G14R17 单测直接传入预投影的 8 字段，未覆盖真实 companion 文件加载和 benchmark gate。
+- 最小修复在 benchmark 边界使用共享 capability-aware parser 提取 expected 8 字段，并保留 envelope 的 9 个
+  专属字段及其合同校验；可信 expected 来自已验证 active Protocol/context/binding，不信任 checkpoint 自报版本，
+  不回填缺失顶层字段，不放松 SHA-256/Git/window/runtime/capacity/agent/seed/path/registry 检查。
+- test-only 真实链覆盖 production metadata builder、save/annotate/read-back、strict selection/freeze、
+  `write_checkpoint_companions`、实际文件 loader、benchmark gate 与 typed validator：150/150 checkpoints，
+  10 agents、5 seeds、3 capacities，candidate/latest 通过。缺字段、统一错误 nullable、top/nested 冲突、跨
+  Protocol/bundle/binding/context 及 SHA/Git/window/runtime/capacity/agent/seed 等负例均在 rollout 前拒绝；
+  正负例实际 rollout 调用数为 0。
+- 冻结 Protocol 2.9 semantic=`c059ae03...a968`、bundle core/final=`b87eb993...765`/
+  `26e5b4fa...aba8` 与 Readiness v21。科学配置、nullable 数值语义、agent/order、seed、预算、split/window、
+  lifecycle/exogenous、catalog/capacity、selection/statistics/holdout 均未改变；Protocol 2.8 降为 audit-only。
+- 最终 execution commit `834603a266bf06d30a070588a6e1f633eacf70e3` 在 clean `HEAD == main == origin/main`
+  副本通过 public preflight、G14R16 入口 150/150（全部执行计数为 0）、定向 `170 passed`、全仓
+  `1288 passed`，均 0 skipped；smoke、compile/import、diff-check 及 44 个 active resources size/SHA-256
+  通过。最终验收记录由独立提交 `3a88303` 发布。
+- G14C v16 仍为 launch authorization deferred：未创建、未消耗、未执行，没有本轮 v16 run root、ledger、
+  checkpoint 或 invalid-run denylist；未运行 formal/holdout/G14D/G15，也没有算法性能或 paper-ready 结论。
+
 ## 2026-09-06: G14R17 checkpoint nullable identity serialization/consumer closure
 
 - G14C v15 在 150 committed training cells、24 committed dev cells、1,200 candidates 后且 dev selection 发布前

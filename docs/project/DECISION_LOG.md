@@ -1,5 +1,19 @@
 ﻿# Decision Log
 
+## 2026-09-06: provenance envelope and shared training identity are separate schemas
+
+- 决定：正式 companion 保持 17 字段完整 provenance envelope；共享 training identity 是其中由
+  `checkpoint_training_identity_fields()` / projection parser 定义的 capability-aware 8 字段，不删除 envelope 的
+  9 个专属字段，也不在 benchmark 重抄 identity 列表。
+- 决定：benchmark 边界先验证 active Protocol、resolved context、execution binding 和完整 envelope，再把 expected
+  identity 投影为 8 字段交给 typed validator；信任根来自已验证外部链，不以 checkpoint/companion 互相相等替代。
+- 决定：checkpoint top-level 与 nested 必须各自完整、类型正确、一致且匹配 trusted expected；不得从 nested
+  回填旧顶层字段，不得用 checkpoint 自报 Protocol 降低 active capability，不得让缺 binding 进入跳过分支。
+- 决定：Protocol 2.9 是唯一 live version，2.8 及更早 historical/audit-only；Readiness v21 继续面向尚未启动的
+  G14C v16，不改为 v17。科学配置、预算、seed、window、capacity、selection/statistics/holdout 不变。
+- 边界：G14R18 验收只使用 test-only checkpoint 并在环境 rollout 前退出；G14C v16 状态为启动授权暂缓，非运行
+  失败，不创建 run/ledger/checkpoint/denylist，也不产生 formal performance 或 paper claim。
+
 ## 2026-09-06: active checkpoint identity must be produced once and consumed strictly
 
 - 决定：正式 checkpoint shared identity 由已验证 `ResolvedTrainingContract` 经 capability-aware projection 生成；

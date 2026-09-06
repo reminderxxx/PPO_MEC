@@ -1,8 +1,19 @@
 # Runbook
 
-## Protocol 2.8 与未来 G14C v16
+## Protocol 2.9 与未来 G14C v16
 
-唯一 live index：`configs/experiment/typed_model_cache_formal_protocol_v2_8_20260906/protocol_index.json`。
+唯一 live index：`configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_index.json`。
+Protocol 2.8 及更早版本仅供 historical/audit。Readiness v21 绑定 G14R18 的真实 17-field companion 生产、实际
+文件加载、150-checkpoint benchmark gate 与 rollout-before-reject 负例；不得用纯 8 字段直接 validator 单测替代。
+
+未来 G14C v16 只能由独立授权任务在 pushed、Git-clean、`HEAD == origin/main` 的新 detached worktree 启动，
+并消费完整 active Protocol/context/binding 链。当前状态是 `G14C_V16_LAUNCH_AUTHORIZATION_DEFERRED`：没有创建、
+消耗或执行 v16，也不得补造 run root、ledger、checkpoint 或 invalid-run denylist。test-only checkpoint 和验收
+输出不得进入正式 manifest、selection 或论文结果。本条目不授权训练、formal performance、holdout、G14D/G15。
+
+## Protocol 2.8 checkpoint nullable identity（historical/audit-only）
+
+历史 index：`configs/experiment/typed_model_cache_formal_protocol_v2_8_20260906/protocol_index.json`。
 Protocol 2.7 及更早版本仅供 historical/audit。G14C v15 永久 invalid 于 training/dev evaluation 后、selection
 发布前；不得 resume/retry/finalize/salvage，亦不得复用其 checkpoint、candidate 或 partial dev。
 

@@ -1,5 +1,17 @@
 ﻿# Bugs And Risks
 
+## 2026-09-06: provenance envelope 被误当作 shared identity（RESOLVED）
+
+- 根因：producer 正确写入 17 字段 companion，但 benchmark 将完整 envelope 直接传给只应比较 8 字段 shared
+  identity 的 typed validator，导致身份完全正确的正式 checkpoint 也被确定性拒绝。既有测试只传纯 8 字段，
+  没有覆盖真实 producer→file loader→benchmark gate。
+- 修复：完整 envelope 与 capability-aware identity projection 分层验证；expected identity 只从已验证 active
+  Protocol/context/binding 链推导。保留 top-level/nested、nullable、bundle/order/Protocol/commit、context/binding、
+  checkpoint SHA-256、Git、window、runtime/capacity、agent/seed、path/registry 的 fail-closed 检查。
+- 剩余风险：本轮使用 test-only checkpoint 和受控输入，在环境 rollout 前终止；未执行 G14C v16 的正式训练或
+  性能实验。Readiness v21 不是算法优势、TMC-ready 或 paper-ready 证据，holdout 仍 sealed/unopened/unconsumed。
+  G14C v15 及更早 invalid 状态不变，G14C v16 只是启动授权暂缓而非运行失败。
+
 ## 2026-09-06: checkpoint nullable identity top-level omission（RESOLVED；G14C v15 永久 invalid）
 
 - 根因：nullable hash 已进入 resolved/nested formal training contract，但 checkpoint 顶层 metadata 与 summary

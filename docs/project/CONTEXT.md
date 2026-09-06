@@ -6,7 +6,16 @@
 
 ## 项目状态
 
-- 当前唯一 live typed model-cache execution contract 为 Protocol 2.8.0；active index 位于
+- 当前唯一 live typed model-cache execution contract 为 Protocol 2.9.0；active index 位于
+  `configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_index.json`，Readiness v21=
+  `READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL`。checkpoint companion 是 17 字段 provenance envelope，shared
+  training identity 是其中经 capability-aware parser 投影的 8 字段；benchmark 必须从已验证 active
+  Protocol/context/execution binding 推导可信 expected identity，再检查完整 envelope、checkpoint 顶层/nested、
+  文件 SHA-256、Git、window、runtime/capacity、agent/seed。Protocol 2.8 及更早版本 audit-only。
+  G14C v16 启动授权仍暂缓，未创建/消耗/执行，没有 v16 run root、ledger、checkpoint 或 invalid-run denylist；
+  当前没有正式训练、formal performance 或 holdout 证据。
+
+- G14R17 historical/audit baseline 为 Protocol 2.8.0；旧 index 位于
   `configs/experiment/typed_model_cache_formal_protocol_v2_8_20260906/protocol_index.json`，Readiness v20=
   `READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL`。checkpoint shared identity 由 resolved contract 经统一 projection
   生产，top-level/nested/trusted expected 与 agent/seed/runtime per-cell identity 在 read-back、pre-dev、pre-sort、
