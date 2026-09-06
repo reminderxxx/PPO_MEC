@@ -1,7 +1,7 @@
 {
   "artifact_run_id": "typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1",
   "evidence_level": "E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE",
-  "file_count": 10,
+  "file_count": 13,
   "files": [
     {
       "path": "acceptance_evidence_manifest.json",
@@ -22,6 +22,21 @@
       "path": "candidate_targeted_tests.junit.xml",
       "sha256": "bbacfa415c9c8a5c774682412a66745574a0e49b789ae69528c3da7043623f00",
       "size_bytes": 24524
+    },
+    {
+      "path": "final_execution_commit_revalidation.json",
+      "sha256": "a0ea8fb8dc5b3b1ec7700f435cf6e31bab86ff19dde5517892729527193333ec",
+      "size_bytes": 2120
+    },
+    {
+      "path": "final_full_tests.junit.xml",
+      "sha256": "9f4da074b486451e4a07af307d2701d0105f1db38e6b3bc777e5d82b4b693e1b",
+      "size_bytes": 195352
+    },
+    {
+      "path": "final_targeted_tests.junit.xml",
+      "sha256": "90c5067548bef00ece84298dccf2ba7de43ce4193b47ce67c2208f28ac54e7d1",
+      "size_bytes": 26623
     },
     {
       "path": "g14c_v16_authorization_deferral.json",
@@ -55,13 +70,13 @@
     }
   ],
   "formal": false,
-  "git_commit": "b642d27ee4426c9a7fc55bf49823c70568de8058",
+  "git_commit": "834603a266bf06d30a070588a6e1f633eacf70e3",
   "holdout_capability": false,
   "inventory_excluded": true,
   "literature_cutoff": "2026-09-06",
   "performance_evidence": false,
   "policy_version": "tmc_review_policy_v3_20260621",
-  "reviewed_at": "2026-09-06T14:49:26+08:00",
+  "reviewed_at": "2026-09-06T15:11:27+08:00",
   "self_excluded": true,
   "status": "pass",
   "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
