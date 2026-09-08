@@ -1,0 +1,235 @@
+{
+  "artifact_run_id": "typed_model_cache_provenance_main_gate_revalidation_20260908_g14r18",
+  "cases": [
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[valid]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.432
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[missing_binding]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.457
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[missing_nullable]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.407
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[uniform_nullable]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.41
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[top_nested]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.423
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[protocol]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.408
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[bundle]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.412
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[binding]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.407
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[context]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.407
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[sha]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.418
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[git]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.413
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[window]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.42
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[runtime]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.412
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[agent]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.41
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[seed]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.411
+    },
+    {
+      "class": "tests.test_checkpoint_nullable_identity_v28",
+      "name": "test_benchmark_main_executes_full_envelope_gate[capacity]",
+      "properties": {
+        "actual_benchmark_gate_call_count": "1",
+        "actual_provenance_file_loader_call_count": "1",
+        "actual_run_real_episode_call_count": "0"
+      },
+      "status": "passed",
+      "time_seconds": 0.458
+    }
+  ],
+  "earlier_invalid_run_reuse": false,
+  "environment_rollout_call_count": 0,
+  "evidence_level": "E3_REPRODUCED",
+  "evidence_scope": "test-only provenance interface and pre-execution contracts; no scientific performance claim",
+  "fixture_scope": "new test-only checkpoints; no trained algorithm weights or formal performance",
+  "formal_performance_count": 0,
+  "formal_training_count": 0,
+  "full_envelope_fields": 17,
+  "g14c_v16_consumed": false,
+  "g14c_v16_created": false,
+  "g14c_v16_executed": false,
+  "g14c_v16_status": "G14C_V16_LAUNCH_AUTHORIZATION_DEFERRED",
+  "git_commit": "4beacd315281cd93a6e1aa345710021b9221ba85",
+  "holdout_consumed": false,
+  "literature_cutoff": "2026-09-06",
+  "negative_stop": "ValueError raised by actual gate/main, not trace stop",
+  "new_literature_review_performed": false,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "producer_chain": [
+    "production metadata builder",
+    "torch.save",
+    "annotate",
+    "read-back",
+    "strict selection",
+    "freeze",
+    "write_checkpoint_companions",
+    "generated registry resolution",
+    "benchmark.main",
+    "provenance file loader",
+    "benchmark gate",
+    "typed provenance validator"
+  ],
+  "real_components": [
+    "companion producer",
+    "generated registry builder/resolver",
+    "manifest file loaders",
+    "checkpoint reads",
+    "both identity gates"
+  ],
+  "reviewed_at": "2026-09-08T09:54:17+08:00",
+  "shared_identity_fields": 8,
+  "status": "pass",
+  "substitutions": [
+    "static dataset argument resolution",
+    "fairness setup",
+    "workflow/mobility preparation"
+  ],
+  "success_stop": "line trace immediately before actual run_real_episode call",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "test_registry_resource_hashes_rebound_after_negative_mutation": true,
+  "v16_checkpoint_created": false,
+  "v16_invalid_run_denylist_created": false,
+  "v16_ledger_created": false,
+  "v16_run_root_created": false
+}

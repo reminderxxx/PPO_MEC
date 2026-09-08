@@ -1810,3 +1810,7 @@ quick run 结果边界：
 执行证明的做法。保留原 150-checkpoint/10-agent/三容量 producer→helper gate 证据；新增 16 个 main 用例
 输出实际 loader/gate/rollout 计数，Readiness evidence builder 缺计数即拒绝。协议及科学身份不变；
 最终验收见独立 `typed_model_cache_provenance_main_gate_revalidation_20260908_g14r18` 包。v16 启动仍暂缓。
+
+最终补充验收已落于 clean commit `4beacd315281cd93a6e1aa345710021b9221ba85`：全仓 1304 passed、
+0 skipped；16 个 actual main 用例记录 loader/gate/rollout=1/1/0，public preflight 60/60 可达，smoke、
+compile/import 通过。后续记录提交仅发布独立补充包及文档；没有进一步代码变更或启动 v16。

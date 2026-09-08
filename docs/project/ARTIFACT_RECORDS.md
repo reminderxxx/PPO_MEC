@@ -1478,3 +1478,22 @@ Run `g14a_rehearsal_20260819_230456_872949`使用`controlled_non_hidden`窗口�
   request exposure/CacheEvent=`2644/2644`；checkpoint 仅为 non-formal repair evidence。
 - Evidence boundary：execution-contract only；formal training/checkpoint/performance=`0/0/0`，holdout sealed/unopened，
   未启动 G14C v13/G14D/G15，不支持算法优势、formal gate、G14/TMC/paper-ready 结论。
+
+## 2026-09-08 G14R18 最终补充验收
+
+补充代码/验收提交：`4beacd315281cd93a6e1aa345710021b9221ba85`，已先 push，再在独立 clean worktree
+以 HEAD/main/origin/main 一致的状态验证。全仓 `python -m pytest tests -q -o junit_family=legacy` 为
+`1304 passed, 0 skipped`；其中 16 个真实 benchmark.main 正负情形在 XML 中记录 loader=1、gate=1、
+实际 run_real_episode=0。旧 150-checkpoint/10-agent/5-seed/三容量、candidate/latest、selection/freeze、
+G14R16 entrypoint、active bundle/capability 和 generated registry 回归均由此次全仓测试重新执行。
+
+同一提交的真实 public preflight 通过，60/60 windows 可达、原始 source identity 重算通过，holdout 仅
+metadata-only，未读取性能字段；smoke、compile/import、git diff --check 均通过。独立补充包为
+`artifacts/analysis/typed_model_cache_provenance_main_gate_revalidation_20260908_g14r18/`，包含原始全仓 XML、
+日志、public preflight/context/binding/phase 记录、真实 main 计数、Readiness v21 再验及完整性清单。
+记录该包的后续提交只有文档/审计产物，不是另一个代码验收提交。此前 `834603a` / `3a88303` 分别为原始
+冻结验收与记录提交，保持历史身份。
+
+七个用户修改文件 SHA-256 未变且未纳入任何提交。Protocol 2.9、Readiness v21、科学配置及旧 invalid-run
+限制均未改变。v16 仍未创建、未消耗、未执行；这是启动授权暂缓，不是运行失败。main 测试使用受控数据
+准备，public preflight 不等于完整正式评估；无正式训练、formal performance、holdout、G14D/G15 或论文结论。

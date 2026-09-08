@@ -1,0 +1,108 @@
+{
+  "active_formal_bundle_sha256": "26e5b4fa8d5d33cec0257fbbcdd15ac8dfbace15fa7c22e18e2ce3c32c93aba8",
+  "agent_matrix_identity": "1245ecc1489e374d8a300d3fca815718e438138da28f05206158ad6bdf9077e0",
+  "agent_scientific_config_semantic_sha256": "f83587cd13c126a0d8a6bdc26402e34ac1391bd6fc8ef504736458872d649bc8",
+  "binding_full_sha256": "0c8aa80e65da9ab7a3e482445e4c304bf8ec475aedf7f93c1266ebaabdf772e9",
+  "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected",
+  "command_matrix_sha256": "3574384c9cc1d90c9922b105686daf54438c149b393a2e789ca6947b13581516",
+  "data_and_runtime_identity": {
+    "catalog_fingerprint": "89c548980b63df733553d748e8db3ca622965b63abcd08ebd4c231790b40a9d6",
+    "formal_agent_order_contract_semantic_sha256": "82e562755dadd4341c950bf71efc488d3527b7f45b7f02512f8064d189b655e0",
+    "formal_exogenous_request_execution": {
+      "action_before_lookup": true,
+      "actor_or_controller_may_observe_oracle_future_topology": false,
+      "actor_or_controller_may_observe_subject_selection_evidence": false,
+      "cache_event_alignment": "exactly_one_request_level_CacheEvent_per_exposure",
+      "default_enabled": false,
+      "execution_entrypoint": "src.envs.core.vec_workflow_core_env.VecWorkflowCoreEnv",
+      "fail_fast": [
+        "missing_replay",
+        "duplicate_missing_extra_or_out_of_order_request",
+        "cross_agent_or_capacity_fingerprint_drift",
+        "request_event_identity_drift",
+        "catalog_dependency_size_or_evaluation_unit_drift",
+        "subject_missing_or_nonphysical",
+        "subject_candidate_count_or_fingerprint_drift",
+        "subject_or_rsu_runtime_drift",
+        "outcome_pollution",
+        "endogenous_fallback",
+        "future_topology_leakage",
+        "historical_bundle_v9_or_v11_reference"
+      ],
+      "formal_explicit_enable_required": true,
+      "g08_replay_role": "outcome_blind_analytical_replay_reuses_formal_lifecycle_producer",
+      "g09_opportunity_role": "outcome_blind_analysis_bound_to_exposure_provenance",
+      "phase_modes": {
+        "dev": "replay_driven_exogenous_request_exposure",
+        "formal": "replay_driven_exogenous_request_exposure",
+        "legacy_nonformal": "legacy_endogenous_progression",
+        "train": "replay_driven_exogenous_request_exposure"
+      },
+      "producer_entrypoint": "src.evaluators.main_results_support.build_episode_formal_request_exposure",
+      "producer_identity": "formal_request_exposure_producer_v2.0.0",
+      "request_exposure_trace_version": "2.0.0",
+      "request_fingerprint_excludes_execution_specific_provenance": true,
+      "request_fingerprint_is_outcome_fingerprint": false,
+      "request_subject_lifecycle_contract_semantic_sha256": "e5cbc6cdbd03052ce01d601500762231655b90b056d3b8c55f27d82ee39b457d",
+      "request_subject_lifecycle_contract_version": "1.0.0",
+      "semantic_sha256": "1c6e5459433e450cfe80517e41b4affca57ebb87a01c3db48056316eedcce556",
+      "service_failure_changes_future_exposure": false,
+      "version": "1.1.0"
+    },
+    "formal_nullable_metric_aggregation_contract_semantic_sha256": "50a9983d21afdc06ec9df309c29f75f5009e062013990bb491ed58c442470889",
+    "split_semantic_sha256": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+    "typed_runtime_identities": {
+      "constrained": "82ef8858c101aed0f702fa118a11c03db9f5689c3c2776214ef95c70265a689f",
+      "medium": "8e3de284b1e839fc05076826308b506c81c419607d5b673d22ba09871d63de85",
+      "relaxed": "e314785d4fe14a106322687ee7a4e0e1e1d6739e8fd74f11a08a2ff1c71be3e0"
+    },
+    "window_contract_semantic_sha256": "ec475799b3fba4a3af3e4372e7c25781c6565a88ec814322b4cd4d447fef2771"
+  },
+  "environment_identity": {
+    "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+    "environment_fingerprint": "ed6630bd191a12a9ff58b3b26106ebe1e4015f1c9167f401ac10d3a973ee3b5a",
+    "full_normalized_projection": {
+      "architecture": "arm64",
+      "critical_package_versions": {
+        "PyYAML": "6.0.3",
+        "numpy": "2.0.2",
+        "pandas": "2.3.3",
+        "pytest": "8.4.2",
+        "torch": "2.8.0"
+      },
+      "dependency_fingerprint": "88963f6107e2042298da7c6920a5d0a2d50429c92634f3873a03d0ad8f4e2d00",
+      "environment_fingerprint": "ed6630bd191a12a9ff58b3b26106ebe1e4015f1c9167f401ac10d3a973ee3b5a",
+      "execution_commit": "observed_clean_40_hex_HEAD_equal_main_equal_origin_main_bound_at_execution",
+      "formal_endpoint_metrics_contract_version": "2.0.0",
+      "formal_execution_environment_contract_version": "1.2.0",
+      "formal_exogenous_request_execution_contract_version": "1.1.0",
+      "formal_request_exposure_trace_version": "2.0.0",
+      "formal_request_subject_lifecycle_contract_version": "1.0.0",
+      "identity_rule": "full_projection_v1_excludes_host_paths_and_binds_observed_commit_and_tree_out_of_band",
+      "installed_package_count": 31,
+      "platform_system": "Darwin",
+      "python_implementation": "CPython",
+      "python_version": "3.9.6",
+      "source_root_identity": {
+        "project_package": "src",
+        "source_tree_identity_rule": "observed_tracked_src_and_scripts_tree_sha256_bound_at_execution"
+      },
+      "torch_version": "2.8.0"
+    },
+    "projection_contract_version": "1.1.0"
+  },
+  "execution_commit": "4beacd315281cd93a6e1aa345710021b9221ba85",
+  "formal_training_execution_binding_version": "1.0.0",
+  "portable_resource_identity": {
+    "content_identical_path_relocation_allowed": true,
+    "host_path_is_scientific_identity": false,
+    "resource_registry_semantic_sha256": "810f0fa987202da0e018f309509a286d811bfe867ab62acdf1f476a987c086d7"
+  },
+  "protocol_identity": {
+    "protocol_id": "typed_model_cache_formal_protocol_v2_9",
+    "protocol_semantic_sha256": "c059ae03eb93323d14c6768c6867156c0f6c030307a80bfcb88eda8d6169a968",
+    "protocol_version": "2.9.0"
+  },
+  "resolved_execution_context_contract_version": "2.0.0",
+  "training_budget_identity": "5f8b9b759da169812a01347d73248fce2c17b5154352b369d30bd687684b5a9a"
+}
