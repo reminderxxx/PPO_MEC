@@ -1,0 +1,152 @@
+{
+  "implementation_commit": "6bab4281e19b9798fa78c17ad2628d47b7df1d4c",
+  "scope": "Definitive exact-commit acceptance commands; intermediate development runs are separate evidence, not final acceptance",
+  "commands": [
+    {
+      "id": "full",
+      "cwd": "/private/tmp/ppo_mec_g14r20_b_20260908",
+      "argv": [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "-o",
+        "junit_family=xunit1",
+        "--basetemp=/private/tmp/g14r20_full_6bab428_acceptance_01",
+        "--junitxml=/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/full_6bab428.junit.xml"
+      ],
+      "combined_output": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/full_6bab428.log",
+      "status": "completed",
+      "session": 20567,
+      "exit_code": 1
+    },
+    {
+      "id": "targeted",
+      "cwd": "/private/tmp/ppo_mec_g14r20_b_20260908",
+      "argv": [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "-B",
+        "-m",
+        "pytest",
+        "tests/test_continuation_executor_security.py",
+        "tests/test_continuation_fixture_authorization.py",
+        "tests/test_continuation_source_isolation.py",
+        "tests/test_continuation_production_cli.py",
+        "tests/test_continuation_qualification.py",
+        "tests/test_continuation_legacy_projection.py",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "-o",
+        "junit_family=xunit1",
+        "--basetemp=/private/tmp/g14r20_targeted_6bab428_acceptance_01",
+        "--junitxml=/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/targeted_6bab428.junit.xml"
+      ],
+      "combined_output": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/targeted_6bab428.log",
+      "exit_code": 0
+    },
+    {
+      "id": "smoke",
+      "cwd": "/private/tmp/ppo_mec_g14r20_b_20260908",
+      "argv": [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "-B",
+        "scripts/smoke_test.py"
+      ],
+      "combined_output": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/smoke_6bab428.log",
+      "exit_code": 0
+    },
+    {
+      "id": "readonly",
+      "cwd": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+      "argv": [
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1)(allow default)(deny network*)(deny file-write*)(allow file-write* (literal \"/dev/null\"))",
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "-I",
+        "-B",
+        "/private/tmp/ppo_mec_g14r20_b_20260908/scripts/inspect_fixed_commit_continuation.py",
+        "--proposal",
+        "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/v16_continuation_proposal.json",
+        "--contract",
+        "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/readonly_qualification_candidate_contract.json"
+      ],
+      "environment_overrides": {
+        "PYTHONPATH": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONNOUSERSITE": "1",
+        "GIT_OPTIONAL_LOCKS": "0",
+        "TORCH_FORCE_WEIGHTS_ONLY_LOAD": "1"
+      },
+      "script_sha256": "23fa0b845eebeb499d580cac6da94a46be0dab9d016fbdc2405748ac3c00745f",
+      "stdout": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/real_v16_b_6bab428_readonly.json",
+      "exit_code": 0,
+      "boundary": "Parent writes stdout/stderr only to B evidence directory; child OS sandbox denies network and file writes except /dev/null"
+    },
+    {
+      "id": "refresh",
+      "cwd": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+      "argv": [
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1)(allow default)(deny network*)(deny file-write*)(allow file-write* (literal \"/dev/null\"))",
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "-I",
+        "-B",
+        "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/verify_refresh_readonly.py"
+      ],
+      "environment_overrides": {
+        "PYTHONPATH": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONNOUSERSITE": "1",
+        "GIT_OPTIONAL_LOCKS": "0",
+        "TORCH_FORCE_WEIGHTS_ONLY_LOAD": "1"
+      },
+      "script_sha256": "0e793d427ccb87f7e093be81ba18b214e643f7517c330298f5bc77c89626110c",
+      "stdout": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/refresh_6bab428_readonly.json",
+      "exit_code": 0,
+      "boundary": "Parent writes stdout/stderr only to B evidence directory; child OS sandbox denies network and file writes except /dev/null"
+    },
+    {
+      "id": "nested",
+      "cwd": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+      "argv": [
+        "/usr/bin/sandbox-exec",
+        "-p",
+        "(version 1)(allow default)(deny network*)(deny file-write*)(allow file-write* (literal \"/dev/null\"))",
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "-I",
+        "-B",
+        "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/verify_nested_commands_readonly.py"
+      ],
+      "environment_overrides": {
+        "PYTHONPATH": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONNOUSERSITE": "1",
+        "GIT_OPTIONAL_LOCKS": "0"
+      },
+      "script_sha256": "6589d385223ad2e635d3d94fd3eea6c5222077b5886bcaf587d109c0f91d1e8b",
+      "stdout": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/nested_commands_6bab428_readonly.json",
+      "exit_code": 0,
+      "boundary": "Parent writes stdout/stderr only to B evidence directory; child OS sandbox denies network and file writes except /dev/null"
+    },
+    {
+      "id": "compile_import_diff",
+      "cwd": "/private/tmp/ppo_mec_g14r20_b_20260908",
+      "result": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/compile_import_6bab428.json",
+      "operation": "Compile every *.py recursively in src/scripts/tests using built-in compile(bytes,path,exec), without pyc; import five listed external core modules by absolute file location; git diff --check and git status --porcelain",
+      "exit_code": 0,
+      "argv": [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "-B",
+        "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/verify_compile_import.py"
+      ],
+      "script_sha256": "db60432062adc734359e4d7ab2c5227dd4a1d1bc973564f3bfed4192fa9ca8c2"
+    }
+  ]
+}

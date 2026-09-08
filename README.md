@@ -1,4 +1,4 @@
-> **2026-09-08 G14R20-B 实现中**：已新增独立执行器与隔离合成验收，尚未完成精确 clean 实现提交上的最终验收。真实 v16 未恢复，独立批准未签发，`execution_authorized=false`。下方 A 状态为历史记录；当前边界见 [B 合同](docs/project/continuation_executor_contract_v1.md)。
+> **2026-09-08 G14R20-B 验收未关闭**：实现 `6bab4281` 已提交；精确提交的 B 新增测试 73 项通过，定向 61 项通过，全仓 1431 passed / 2 failed / 0 skipped。两个既有 v2.4 发布门禁测试要求 `HEAD == origin/main`；未改门禁或新增 skip。旧科学树临时新增文件的历史偏差继续披露。真实 v16 未恢复，批准未签发，`execution_authorized=false`。见 [B 验收证据](docs/project/continuation_executor_acceptance_matrix.md)。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；

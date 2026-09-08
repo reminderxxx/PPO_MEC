@@ -1,0 +1,330 @@
+{
+  "status": "pass",
+  "implementation_commit": "6bab4281e19b9798fa78c17ad2628d47b7df1d4c",
+  "checked_at": "2026-09-08T10:57:20.941989+00:00",
+  "scope": "All immutable B evidence files; strict JSON/XML; successful full-chain two JSONL ledgers. Mutable progress, previous interim index, self excluded. Intentionally malformed negative-test inputs are not deliverables. Integrity success does not mean all tests passed.",
+  "files": [
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/acceptance_report.md",
+      "size_bytes": 7935,
+      "sha256": "d22063720430e43d3a6e44225d1afa73272398ac2690ae1d330473fad985defc"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/approval_request_6bab428_unsigned.json",
+      "size_bytes": 1635,
+      "sha256": "4671943207e9aa764b6a79a3693bc0238acd4961f06a6dc158f9bf3c363b08a3"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/benchmark_6bab428_report.json",
+      "size_bytes": 3087761,
+      "sha256": "f3771fbacb8d00e32750011e1dae0e847454af2ce6643ba5c4266a6ea42775d5"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/compile_import_6bab428.json",
+      "size_bytes": 660,
+      "sha256": "dca553859b5cd71dd6adb7873419c6f8e580ad1068d321cfa40bedb8646df392"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/exact_commit_report_copies.json",
+      "size_bytes": 4400,
+      "sha256": "1092ac189e47cc7d66e05cc2cbd452b77b448a215e0c79cdb507b8f46a98fc36"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/execution_contract_6bab428_unsigned.json",
+      "size_bytes": 2703,
+      "sha256": "c73b6c207ce588c66276b1aed7de7e232ae297424e42d2d1336cb01885870d9e"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/executor_identity_6bab428.json",
+      "size_bytes": 3386,
+      "sha256": "724126f0b02cd5fdd7a74525c8771ed33bf195c423f6eddb007dcb3d14f11200"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/executor_identity_6bab428_verification.json",
+      "size_bytes": 148,
+      "sha256": "b6ad23b35da8d97c7591ab1db3b5330a241bc162b955467dbcaae12a2a41e707"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/full_6bab428.junit.xml",
+      "size_bytes": 357105,
+      "sha256": "43c510f42204a7f9528d92ef9769ec7f5b049ab45fa37cf65f5699d4a173b2b1"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/full_6bab428.log",
+      "size_bytes": 48822,
+      "sha256": "5c76427d57b12eed8e48d4fe16decca5676c9003a4a1c195f5351361569663ae"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/full_6bab428_case_audit.json",
+      "size_bytes": 49007,
+      "sha256": "2eb9b8ad4671f560f49e12380101a749ec4ce08e368ff68473212aed2dc41950"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/full_chain_6bab428_report.json",
+      "size_bytes": 275675,
+      "sha256": "5aa7471c62c7018859453799f6d2ae143a0ee91a43d269787747eea040dfd6ef"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_admission_and_isolation.junit.xml",
+      "size_bytes": 14788,
+      "sha256": "51889483c1a4c4a939654236b5da1790627fe9576eef5d4b4cd7eb10aed3b944"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_aggregate_chain.junit.xml",
+      "size_bytes": 759,
+      "sha256": "eea0d3917958c4c9512a6c5aa6e4e6d3763dd5df321f06d87a05a8d1dfc1080a"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_aggregate_chain_report.json",
+      "size_bytes": 276270,
+      "sha256": "0accee67e8dc019b15b0e582d7962775c463fa4d94e73a931e15ed3c1a16a870"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_authorized_chain.junit.xml",
+      "size_bytes": 5420,
+      "sha256": "bf5e50f6dcaf509c6a6fc1b0171e751bcfe1c766a6fb6b7ad28a392fdac35a16"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_authorized_chain_report.json",
+      "size_bytes": 172758,
+      "sha256": "7d2b17c5abca54e548bebc49ca5a7ab255dadae3e39564f9869417d98649e8e6"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_before_checkpoint.junit.xml",
+      "size_bytes": 16190,
+      "sha256": "4a64ec4206c785eae58c1065307106d06bcc94736f9d2a94a8492fd5095290a9"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_benchmark_30_cases_report.json",
+      "size_bytes": 3089024,
+      "sha256": "04244db86b3ef94fd8ae44c7cd5873ec42efcc56cbf256ab5fb88dba83292793"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_benchmark_entry.junit.xml",
+      "size_bytes": 464,
+      "sha256": "371f963787e5ee40e0a8e6a496e622899b590d38a998b21c9f6ebcdc83d385c6"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_benchmark_inputs_report.json",
+      "size_bytes": 163468,
+      "sha256": "e49adf10196132b402867e4a8d4a65aed7c0f04ef8cc5b2753b2154bde2fb7a0"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_benchmark_main_report.json",
+      "size_bytes": 85231,
+      "sha256": "c390cc7232cd781858c46cb698ea8d77e56287cd33fc4a6f5edddcbe2694a9da"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_chain_and_faults.junit.xml",
+      "size_bytes": 4243,
+      "sha256": "93dac881bd7b6500cc11aed87718abec3cf5001714bc32a16ba546458a5c05a9"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_full_chain_report.json",
+      "size_bytes": 177921,
+      "sha256": "139e1e6d69fde1bea05519c884f8c8a313fba39fdb79185aa92813b366f5f824"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_phase_lease.junit.xml",
+      "size_bytes": 670,
+      "sha256": "31f9cacaa5ef434b5301c1f30df011b6f3d83cd209c4fc0eef967f00d02c8a4a"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_phase_lease_0.json",
+      "size_bytes": 86412,
+      "sha256": "85970f33be8c9006640964bf41032dd1319029c648912f4a8979765321efbc54"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_phase_lease_1.json",
+      "size_bytes": 86393,
+      "sha256": "51417e6fa3668c7fd3a9112af636fcd15008fdf96619a477edeb43a6c871c148"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_production_cli.junit.xml",
+      "size_bytes": 4962,
+      "sha256": "4306138ef5adae2101ac52a836cc7d7c45c7a8ca097b3a2ea53f46762cc0f978"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_recovery.junit.xml",
+      "size_bytes": 10888,
+      "sha256": "bc2e2d21dd9550dcf1bb87668315743e579b01d2a48a60ce06d373fced4437f1"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/intermediate_targeted.junit.xml",
+      "size_bytes": 7195,
+      "sha256": "745b123de2a635c72ec96aa7e033ae431e51d43d0d5abd58c4f028c12dbb9028"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/lease_expire_6bab428_report.json",
+      "size_bytes": 86450,
+      "sha256": "e5732177d21967f833ed0a74e4240fd17cb3ea02e3cf784d16ff09cc8a370320"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/lease_revoke_6bab428_report.json",
+      "size_bytes": 86427,
+      "sha256": "674f069ca1ada83a47e700635a57127586913bc3d8c0d3f1f86a72beb57c4ebc"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/nested_commands_6bab428_readonly.json",
+      "size_bytes": 283593,
+      "sha256": "35d65a7ece29febb582fc6d7346f674435db6ca1cdf0241fe6cb5284c2be7d7d"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/nested_commands_6bab428_readonly.stderr.log",
+      "size_bytes": 64,
+      "sha256": "cac246557f41f69633f58d838e666821f128a69865a37bdf25e835258563db64"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/protection_6bab428_interim.json",
+      "size_bytes": 2943,
+      "sha256": "0d667b55ec3bc8ca85240fd0a88367e5ef4c4b2b2cb7d5eb1be92ced4e0d0bd0"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/readonly_qualification_candidate_contract.json",
+      "size_bytes": 2703,
+      "sha256": "e890029bfd1975b921046bdadcd06f8356e2a0122800565a67e069ec885aea41"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/real_v16_b_6bab428_readonly.json",
+      "size_bytes": 2832282,
+      "sha256": "a64b73172a8264b7b6e07b704b80d551d407a43f519a3efbd82f43667e810317"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/real_v16_b_6bab428_readonly.stderr.log",
+      "size_bytes": 64,
+      "sha256": "cac246557f41f69633f58d838e666821f128a69865a37bdf25e835258563db64"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/real_v16_b_qualification_stderr.log",
+      "size_bytes": 64,
+      "sha256": "cac246557f41f69633f58d838e666821f128a69865a37bdf25e835258563db64"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/real_v16_b_qualification_stdout.json",
+      "size_bytes": 2831542,
+      "sha256": "fcf7c18cd7f88145ea8990146644a5778eacd429f38467079ac4d93fa62f6f78"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/real_v16_initial_readonly.json",
+      "size_bytes": 2999417,
+      "sha256": "af94b2f5f5ccb3b276758719c3e374a52299c9aeed0df302100dd094fec4b087"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/real_v16_initial_readonly.stderr",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/refresh_6bab428_readonly.json",
+      "size_bytes": 9719,
+      "sha256": "d518b034cbf65ab2ce5642b54afd1e4a296d4fb957f698f32d7bdb8eefcfd48a"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/refresh_6bab428_readonly.stderr.log",
+      "size_bytes": 64,
+      "sha256": "cac246557f41f69633f58d838e666821f128a69865a37bdf25e835258563db64"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/smoke_6bab428.log",
+      "size_bytes": 623,
+      "sha256": "f6bc0466c63cce2471e6bebd7f37323b68d2b66b718afc9683e4d47542831990"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/source_write_incident.json",
+      "size_bytes": 1165,
+      "sha256": "927473441690b2b47b778fd182202ef2b9e6fe0eb3e10316fc8f3a76867f7167"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/targeted_6bab428.junit.xml",
+      "size_bytes": 16189,
+      "sha256": "871c1d9f659df507078ec12f86f257cb411559f363e8ed1675f5fc26f8af3fa1"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/targeted_6bab428.log",
+      "size_bytes": 230,
+      "sha256": "97f09c1963138631677bf4135ded57b4df6850d870ae370a5003ce1d8ce37340"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/transaction_synthetic_descriptor_6bab428_report.json",
+      "size_bytes": 30517,
+      "sha256": "640c381846c1f8ea02ba69e86cafc86d74ffb44b6fa33fe6767321d2491dd61e"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/transaction_synthetic_exit75_6bab428_report.json",
+      "size_bytes": 35978,
+      "sha256": "5bd91c9768207bc3901aed16a17c476722a8df4e4894012f041fc24a2ab7a477"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/transaction_synthetic_exit7_6bab428_report.json",
+      "size_bytes": 30382,
+      "sha256": "6f5ade0a7519e9b921d86c3dcaf5dec15acb4148a55447efcdf31bd075a1eb1f"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/transaction_synthetic_finalize_only_6bab428_report.json",
+      "size_bytes": 34673,
+      "sha256": "368271bfc7954773dd6273b5ff675dfd4985ec1b3df658227d89d6cc6e050d32"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/transaction_synthetic_missing_6bab428_report.json",
+      "size_bytes": 30493,
+      "sha256": "618043b77631ece3f37085f535400c553d997dcce2bc9435d05d4379707df964"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/transaction_synthetic_none_6bab428_report.json",
+      "size_bytes": 36418,
+      "sha256": "6c95e2868af700cf49e89a48ce4ca56af0da0f5f4db3ab195c3a4eb4a6fdf7cc"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/transaction_synthetic_provenance_6bab428_report.json",
+      "size_bytes": 30521,
+      "sha256": "f78b5cc224c7408b0795a2844460f55037f69014027fdf8e02eabdb37abf9708"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/transaction_synthetic_publication_crash_6bab428_report.json",
+      "size_bytes": 34888,
+      "sha256": "7eb107ae09213ffdd8938fed0e00e6de41faf703d5f92a39c2ee809d247a69f3"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/user_files_before.json",
+      "size_bytes": 1312,
+      "sha256": "b02e6942308fa8a797e2937d0139b2a3dd807b37a28e7ab03dbbc4002bf982b3"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/user_files_intermediate_verified.json",
+      "size_bytes": 1429,
+      "sha256": "bf4dd3b97ba4410e95ae408af4ff7f9b0f1c6e53a25414b63f0ea6a64d407ad6"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/verification_commands_6bab428.json",
+      "size_bytes": 6834,
+      "sha256": "39626cec2aae11eeac3067f55dece7397a3ac1ca374bb3706f9370abc7ab0e05"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/verify_compile_import.py",
+      "size_bytes": 977,
+      "sha256": "db60432062adc734359e4d7ab2c5227dd4a1d1bc973564f3bfed4192fa9ca8c2"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/verify_nested_commands_readonly.py",
+      "size_bytes": 6338,
+      "sha256": "6589d385223ad2e635d3d94fd3eea6c5222077b5886bcaf587d109c0f91d1e8b"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/verify_refresh_readonly.py",
+      "size_bytes": 1842,
+      "sha256": "0e793d427ccb87f7e093be81ba18b214e643f7517c330298f5bc77c89626110c"
+    }
+  ],
+  "strict_jsonl": [
+    {
+      "path": "/private/tmp/g14r20_full_6bab428_acceptance_01/test_actual_eight_phase_chain0/synthetic_full_chain/synthetic_run/cell_state.jsonl",
+      "records": 344,
+      "sha256": "4671fe2d72b76bf17435d9c99566d9a781d574e81372e28244b35e0b305a7a44"
+    },
+    {
+      "path": "/private/tmp/g14r20_full_6bab428_acceptance_01/test_actual_eight_phase_chain0/synthetic_full_chain/synthetic_run/phase_state.jsonl",
+      "records": 39,
+      "sha256": "a7c7d658b2e1d2871b98e6244d56a596e78fdb4c4ce457643f03c0122d19a16b"
+    }
+  ]
+}
