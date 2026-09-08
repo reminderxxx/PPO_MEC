@@ -1,4 +1,6 @@
-﻿# Directory Structure
+> G14R20-B（实现验证中）：`scripts/execute_fixed_commit_continuation.py` 为独立生产边界入口，`scripts/run_fixed_commit_continuation_acceptance.py` 为合成验收入口，共享代码在 `scripts/continuation_executor/`。合同见 `continuation_executor_contract.md`；证据根目录为 `artifacts/analysis/g14r20_b_continuation_20260908/`，合成 checkpoint 不提交。
+
+# Directory Structure
 
 G14R18：唯一 active Protocol 2.9、ready index 与 Readiness v21 位于
 `configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/`；共享 8-field parser 位于

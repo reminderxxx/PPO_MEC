@@ -1,3 +1,5 @@
+> G14R20-B 实现合同（验证中）：[continuation_executor_contract.md](continuation_executor_contract.md)。真实执行批准仍为 false。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。

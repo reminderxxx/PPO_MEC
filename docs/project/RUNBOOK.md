@@ -1,3 +1,5 @@
+> G14R20-B（实现验证中）：新增 `scripts/execute_fixed_commit_continuation.py`，默认 qualification；缺独立批准会在任何锁/写入/dispatch 前拒绝。`--check compatibility` 只读。合成验收独立入口为 `scripts/run_fixed_commit_continuation_acceptance.py`，要求精确 clean executor identity、新建 synthetic fixture、原 checkout cwd 和原 Python。详见 `continuation_executor_contract.md`；目前不得将开发验证称为最终验收。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。

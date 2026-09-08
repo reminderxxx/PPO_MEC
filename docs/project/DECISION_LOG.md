@@ -1085,3 +1085,7 @@ claim map 必须报告 `UNAVAILABLE`。
 ## 2026-09-08 G14R20-A
 
 固定提交 continuation 被定义为独立待批准的新规则；新 run 发布门禁不变。proposal/结构/资格/批准/执行分离，本轮真实执行权限恒为 false。保护快照是验收基线而非原始授权凭据。 详见 `fixed_commit_continuation_contract.md`。
+
+## 2026-09-08 G14R20-B 实现边界（验收中）
+
+独立 executor 固定自己的提交；原科学执行身份不改写。生产信任表保持为空。原 public 新 run 发布门禁不变，A 仍只接收未授权 proposal。单写者锁位于合同明确绑定的 run 外 coordination 目录，避免可变 owner 状态破坏原 artifact integrity。具体规则与待验收项见 `continuation_executor_contract.md`。
