@@ -1436,3 +1436,11 @@ bool、invalid string、NaN/Infinity fail-fast。不得用 CLI 指向旧 Protoco
 resume、retry、finalize-only、salvage、复制或消费。G14R12 audit 和 `rehearsal_runtime/` 仅是 non-formal repair
 evidence。未来 G14C v13 只能从 pushed、Git-clean、`HEAD == main == origin/main` 的全新 worktree 运行；当前任务
 不启动 v13，holdout capability 必须保持 false。
+
+## G14R18 main gate 补充验收（test-only）
+
+`.venv/bin/python -m pytest tests/test_checkpoint_nullable_identity_v28.py -q -o junit_family=legacy --junitxml=<test-output>/main_gate.xml`
+
+XML 必须包含 `test_benchmark_main_executes_full_envelope_gate` 的全部 16 个正负情形及真实 loader/gate/rollout
+计数 1/1/0。`build_formal_checkpoint_provenance_envelope_artifacts.validate_main_gate_evidence` 验证这些计数；
+不能以旧源码断言替代。该命令仅产生临时 test-only checkpoint，不执行正式训练或 rollout，不授权启动 v16。

@@ -729,3 +729,175 @@ def test_g14c_v15_checkpoint_reference_is_permanently_rejected() -> None:
                 / "training/ppo/checkpoints/update_0004.pt"
             ]
         )
+
+
+@pytest.mark.parametrize("case", [
+    "valid", "missing_binding", "missing_nullable", "uniform_nullable", "top_nested",
+    "protocol", "bundle", "binding", "context", "sha", "git", "window", "runtime",
+    "agent", "seed", "capacity",
+])
+def test_benchmark_main_executes_full_envelope_gate(
+    full_companion_chain, monkeypatch, tmp_path, case, record_property,
+):
+    """Execute main; only dataset/fairness setup is synthetic, never checkpoint IO/gates.
+
+    A line trace stops *before* run_real_episode on success. A spy on that actual
+    symbol counts any unexpected invocation. Generated registry production and
+    resolution remain real; all files are fresh test-only copies.
+    """
+    import inspect
+    import shutil
+    import sys
+    from types import SimpleNamespace
+    from unittest.mock import Mock
+    import scripts.benchmark_main_results as benchmark
+    from src.runtime.generated_checkpoint_resources import (
+        build_generated_checkpoint_registry, atomic_create_registry,
+    )
+
+    chain = full_companion_chain
+    root = tmp_path / "test_only_main_gate"
+    shutil.copytree(chain["root"], root, ignore=shutil.ignore_patterns("checkpoint_manifests"))
+    # Repeat strict selection/freeze after relocating only test-only checkpoint files.
+    candidates = load(root / "checkpoint_candidates.json")
+    for row in candidates:
+        row["checkpoint_path"] = str(root / Path(row["checkpoint_path"]).relative_to(chain["root"]))
+    (root / "checkpoint_candidates.json").write_text(json.dumps(candidates))
+    selection = dev_select(root, chain["protocol"], expected_training_identity=chain["expected"])
+    (root / "dev_selection.json").write_text(json.dumps(selection))
+    freeze = checkpoint_freeze(root, chain["protocol"])
+    (root / "checkpoint_freeze.json").write_text(json.dumps(freeze))
+    companions = write_checkpoint_companions(root, freeze)
+    (root / "phase_state.jsonl").write_text(json.dumps({
+        "phase": "checkpoint_freeze", "status": "completed", "test_only": True,
+    }) + "\n")
+    static = {"hashes": {"semantic_sha256": "e" * 64}, "resources": []}
+    static_path = root / "static.json"
+    static_path.write_text(json.dumps(static))
+    binding_path = root / "binding.json"
+    binding_path.write_text(json.dumps(chain["binding"]))
+    registry = build_generated_checkpoint_registry(
+        run_root=root, protocol=chain["protocol"], static_registry=static,
+        resolved_execution_context=chain["context"], execution_binding=chain["binding"],
+    )
+    registry_path = root / "generated.json"
+    atomic_create_registry(registry_path, registry)
+    companion = companions[0]
+    capacity = companion["capacity_label"]
+    provenance_path = Path(companion["checkpoint_provenance_manifest_path"])
+    payload = load(provenance_path)
+    agent = next(iter(payload))
+    seed = int(next(iter(payload[agent])))
+    envelope = payload[agent][str(seed)]
+    assert len(envelope) == 17
+    fields = {
+        "missing_binding": "formal_training_execution_binding_sha256",
+        "missing_nullable": "formal_nullable_metric_aggregation_contract_semantic_sha256",
+        "protocol": "formal_protocol_semantic_sha256",
+        "bundle": "active_formal_bundle_sha256",
+        "binding": "formal_training_execution_binding_sha256",
+        "context": "resolved_execution_context_sha256",
+        "git": "execution_git_commit", "runtime": "runtime_contract_sha256",
+    }
+    if case.startswith("missing_"):
+        envelope.pop(fields[case])
+    elif case in fields:
+        envelope[fields[case]] = "0" * (40 if case == "git" else 64)
+    elif case in {"uniform_nullable", "top_nested"}:
+        path = Path(envelope["artifact_location"]["resolved_location"])
+        saved = torch.load(path, map_location="cpu")
+        metadata = saved["training_metadata"]
+        field = "formal_nullable_metric_aggregation_contract_semantic_sha256"
+        metadata[field] = "0" * 64
+        if case == "uniform_nullable":
+            metadata["formal_training_contract"][field] = "0" * 64
+            envelope[field] = "0" * 64
+        torch.save(saved, path)
+        envelope["checkpoint_sha256"] = sha256_file(path)
+        envelope["checkpoint_identity"]["checkpoint_sha256"] = sha256_file(path)
+    elif case == "sha":
+        envelope["checkpoint_sha256"] = "0" * 64
+        envelope["checkpoint_identity"]["checkpoint_sha256"] = "0" * 64
+    elif case == "window":
+        envelope["train_window_plan_identity"] = {"test_only": True, "split": "wrong"}
+        envelope["checkpoint_identity"]["window_identity"] = envelope["train_window_plan_identity"]
+    elif case in {"agent", "seed", "capacity"}:
+        envelope["checkpoint_identity"][case] = "wrong" if case != "seed" else seed + 1
+    provenance_path.write_text(json.dumps(payload))
+    if case in {"uniform_nullable", "top_nested"}:
+        seed_path = Path(companion["seed_checkpoint_manifest_path"])
+        seed_payload = load(seed_path)
+        for entry in seed_payload["_portable_checkpoint_manifest"]["entries"]:
+            if entry["agent"] == agent and int(entry["seed"]) == seed:
+                entry["checkpoint_identity"]["checkpoint_sha256"] = envelope["checkpoint_sha256"]
+        seed_path.write_text(json.dumps(seed_payload))
+    # Rebind the test registry's companion bytes so mutations reach the identity
+    # gate, rather than stopping at the earlier resource hash check.
+    from src.runtime.generated_checkpoint_resources import canonical_sha256
+    for resource in registry["resources"]:
+        resource_path = root / resource["durable_run_root_relative_path"]
+        resource["size_bytes"] = resource_path.stat().st_size
+        resource["content_sha256"] = sha256_file(resource_path)
+    registry["registry_canonical_sha256"] = canonical_sha256({
+        key: value for key, value in registry.items() if key != "registry_canonical_sha256"
+    })
+    registry_path.write_text(json.dumps(registry))
+    monkeypatch.setattr(sys, "argv", ["benchmark_main_results.py"])
+    args = benchmark.parse_args()
+    args.agents, args.seeds = [agent], [seed]
+    args.protocol_path = str(PROTOCOL_PATH)
+    args.resolved_execution_context_path = str(root / "resolved_execution_context.json")
+    args.formal_training_execution_binding_path = str(binding_path)
+    args.generated_checkpoint_registry_path = str(registry_path)
+    args.resource_registry_path = str(static_path)
+    args.checkpoint_manifest_id = f"checkpoint_manifest.{capacity}"
+    args.checkpoint_provenance_id = f"checkpoint_provenance.{capacity}"
+    args.seed_checkpoint_manifest_path = companion["seed_checkpoint_manifest_path"]
+    args.checkpoint_provenance_manifest_path = str(provenance_path)
+    args.runtime_config_resource_id = f"runtime_config.{capacity}"
+    args.model_cache_runtime_config = str(capacity_runtime_paths(chain["protocol"])[capacity])
+    args.cache_baseline_fairness_manifest_path = "test_only_fairness"
+    args.output_root = str(root / "benchmark_output")
+    args.formal_exogenous_request_execution = False
+    args.window_plan_path = ""
+    args.audit_runtime = False
+    monkeypatch.setattr(benchmark, "parse_args", lambda: args)
+    # Only unrelated static dataset/fairness setup is replaced. In particular,
+    # resolve_generated_checkpoint_arguments, both manifest loaders, checkpoint
+    # readers, metadata producer, freeze, and both identity gates stay real.
+    monkeypatch.setattr(benchmark, "resolve_argument_resources", lambda *a, **k: None)
+    monkeypatch.setattr(benchmark, "load_and_validate_manifest", lambda *a, **k: (None, None))
+    monkeypatch.setattr(benchmark, "enforce_benchmark_args", lambda *a, **k: None)
+    monkeypatch.setattr(benchmark, "resolve_window_candidates", lambda **k: ("test_only", {
+        "selected_windows": [{"window_id": "test_only", "frame_offset": 0, "window_length": 1}],
+    }))
+    monkeypatch.setattr(benchmark, "build_selected_workflow_states", lambda **k: [SimpleNamespace(workflow_id="test_only")])
+    monkeypatch.setattr(benchmark, "load_window_bundle", lambda **k: SimpleNamespace(rsu_metadata={}))
+    rollout = Mock(side_effect=AssertionError("environment rollout must never execute"))
+    monkeypatch.setattr(benchmark, "run_real_episode", rollout)
+    loader = Mock(wraps=benchmark.load_checkpoint_provenance_manifest)
+    gate = Mock(wraps=benchmark.validate_benchmark_checkpoint_gate)
+    monkeypatch.setattr(benchmark, "load_checkpoint_provenance_manifest", loader)
+    monkeypatch.setattr(benchmark, "validate_benchmark_checkpoint_gate", gate)
+    source, first_line = inspect.getsourcelines(benchmark.main)
+    stop_line = first_line + next(i for i, line in enumerate(source) if "summary = run_real_episode(" in line)
+    class BeforeRollout(Exception):
+        pass
+    def trace(frame, event, arg):
+        if frame.f_code is benchmark.main.__code__ and event == "line" and frame.f_lineno == stop_line:
+            raise BeforeRollout
+        return trace
+    previous_trace = sys.gettrace()
+    try:
+        sys.settrace(trace)
+        with pytest.raises(BeforeRollout if case == "valid" else ValueError):
+            benchmark.main()
+    finally:
+        sys.settrace(previous_trace)
+    assert loader.call_count == 1
+    assert gate.call_count == 1
+    assert rollout.call_count == 0
+    assert len(gate.call_args.kwargs["provenance_envelope"]) == (16 if case.startswith("missing_") else 17)
+    record_property("actual_run_real_episode_call_count", rollout.call_count)
+    record_property("actual_benchmark_gate_call_count", gate.call_count)
+    record_property("actual_provenance_file_loader_call_count", loader.call_count)

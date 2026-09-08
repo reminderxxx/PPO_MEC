@@ -564,3 +564,9 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - 修复：Protocol 2.3 统一严格 nullable reducer、availability counts、Dev finite-first ordering、paired availability、
   finite-only Holm 与 zero-pair `UNAVAILABLE` gate/claim semantics；共享 denylist覆盖完整 active command graph。
 - 剩余风险：长时 G14C v13 尚未执行；non-formal exact/phase-chain 验收不构成 performance 或 paper-ready 证据。
+
+## 2026-09-08 G14R18 入口证明边界
+
+既有 main 源码顺序断言不等价于实际入口执行，空 rollout 列表也不构成调用计数。补充的 main 正负
+用例保留真实 generated registry、companion loader、checkpoint read 和 strict gate，并监测实际 rollout
+符号。数据准备/fairness 使用 test-only 替身，因此仍不构成完整正式 benchmark 或性能证据。

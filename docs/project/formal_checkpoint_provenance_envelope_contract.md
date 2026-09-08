@@ -1,6 +1,6 @@
 # Formal Checkpoint Provenance Envelope Contract
 
-更新日期：2026-09-06
+更新日期：2026-09-08
 
 ## 状态
 
@@ -75,3 +75,23 @@ G14C v16 状态是 `G14C_V16_LAUNCH_AUTHORIZATION_DEFERRED`：未创建、未消
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `git_commit`: `834603a266bf06d30a070588a6e1f633eacf70e3`
 - `evidence_level`: `E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE`
+
+## 2026-09-08 入口执行验收补充
+
+复核起点为 `a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d`，HEAD/main/origin/main 一致，
+不是重新从 c219c88 实现。此前 150-checkpoint 测试真实调用了 gate helper，但 main 仅有源码顺序断言，
+空列表不能证明实际 rollout 调用数。本次补充 `test_benchmark_main_executes_full_envelope_gate`：
+真实运行 main，16 个正负情形均经过实际 provenance loader 和 strict gate，实际 rollout spy 为 0。
+正常例由 line trace 在调用 rollout 前停止；负例必须抛出 ValueError，不能以提前停止代替拒绝。
+
+test-only checkpoint 使用既有 metadata/save/annotate/read-back 链，重新 strict selection/freeze 并生产
+完整 companion；generated registry 的构建、文件校验和解析同样真实执行。负例重绑 test-only registry 的
+资源 hash，使错误抵达目标身份 gate；这不是正式 registry 修改或 invalid-run 恢复。仅静态数据资源解析、
+fairness 和 workflow/mobility 准备使用替身；不替代 companion 生产、checkpoint IO 或任一身份 gate。
+本测试不证明完整 active 数据链或正式评估；public preflight 与既有 bundle/capability 回归分别验证其边界。
+
+Readiness evidence builder 现在要求这 16 个实际 main 用例及 XML 中 loader=1、gate=1、rollout=0 的计数；
+缺少用例或计数则拒绝生成候选/最终证据。Protocol 2.9、Readiness v21 及所有科学合同保持既有冻结身份。
+最终 clean commit 验收与后续记录提交分别记录于独立补充审计包
+`artifacts/analysis/typed_model_cache_provenance_main_gate_revalidation_20260908_g14r18/`。
+G14C v16 仍未创建、未消耗、未执行，启动授权暂缓。

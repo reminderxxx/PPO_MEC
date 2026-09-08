@@ -1803,3 +1803,10 @@ quick run 结果边界：
   `complete_without_holdout`，186 commands、placeholder/sentinel 0，formal training/checkpoint/performance=`0/0/0`。
 - Readiness 只表示未来全新 G14C v13 执行合同可用，不是 formal/G14/TMC/paper-ready；holdout 仍 sealed/unopened，
   未启动 G14C v13、G14D 或 G15。
+
+## 2026-09-08 G14R18 main 入口验收补充
+
+复核已有 G14R18 实现后，补充真实 `benchmark.main()` 正负执行，替代将源码顺序断言和空列表当作入口
+执行证明的做法。保留原 150-checkpoint/10-agent/三容量 producer→helper gate 证据；新增 16 个 main 用例
+输出实际 loader/gate/rollout 计数，Readiness evidence builder 缺计数即拒绝。协议及科学身份不变；
+最终验收见独立 `typed_model_cache_provenance_main_gate_revalidation_20260908_g14r18` 包。v16 启动仍暂缓。

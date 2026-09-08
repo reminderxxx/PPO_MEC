@@ -50,6 +50,7 @@ REQUIRED_TESTS = {
     "test_full_envelope_runtime_negatives_precede_rollout",
     "test_checkpoint_top_nested_conflict_and_protocol_downgrade_precede_rollout",
     "test_benchmark_main_calls_strict_envelope_gate_before_rollout",
+    "test_benchmark_main_executes_full_envelope_gate",
 }
 
 
@@ -98,6 +99,10 @@ def junit(path: Path) -> dict[str, Any]:
                     "name": case.get("name"),
                     "status": status,
                     "time_seconds": float(case.get("time", "0")),
+                    "properties": {
+                        item.get("name"): item.get("value")
+                        for item in case.findall("properties/property")
+                    },
                 }
             )
     return {
@@ -108,6 +113,27 @@ def junit(path: Path) -> dict[str, Any]:
         "time_seconds": round(sum(row["time_seconds"] for row in cases), 3),
         "cases": cases,
     }
+
+
+def validate_main_gate_evidence(report: dict[str, Any]) -> dict[str, Any]:
+    cases = [row for row in report["cases"]
+             if row["name"].startswith("test_benchmark_main_executes_full_envelope_gate[")]
+    expected_cases = {
+        "valid", "missing_binding", "missing_nullable", "uniform_nullable", "top_nested",
+        "protocol", "bundle", "binding", "context", "sha", "git", "window", "runtime",
+        "agent", "seed", "capacity",
+    }
+    if {row["name"].split("[")[1].rstrip("]") for row in cases} != expected_cases:
+        raise ValueError("actual benchmark.main gate acceptance cases are incomplete")
+    for row in cases:
+        properties = row["properties"]
+        if row["status"] != "passed" or any(properties.get(key) != value for key, value in {
+            "actual_run_real_episode_call_count": "0",
+            "actual_benchmark_gate_call_count": "1",
+            "actual_provenance_file_loader_call_count": "1",
+        }.items()):
+            raise ValueError("actual benchmark.main gate counters are missing or failed")
+    return {"status": "pass", "cases": cases, "environment_rollout_call_count": 0}
 
 
 def common(commit: str) -> dict[str, Any]:
@@ -168,6 +194,7 @@ def build_candidate(args: argparse.Namespace) -> None:
     targeted_path = Path(args.targeted_junit).resolve()
     full_path = Path(args.full_junit).resolve()
     targeted, full = junit(targeted_path), junit(full_path)
+    validate_main_gate_evidence(targeted)
     if any(report[key] for report in (targeted, full) for key in ("failures", "errors")):
         raise ValueError("candidate test evidence contains failures or errors")
     envelope_cases = [
@@ -393,6 +420,7 @@ def append_final(args: argparse.Namespace) -> None:
         raise ValueError("final execution worktree must be clean")
     targeted = junit(Path(args.final_targeted_junit).resolve())
     full = junit(Path(args.final_full_junit).resolve())
+    validate_main_gate_evidence(targeted)
     if any(report[key] for report in (targeted, full) for key in ("failures", "errors", "skipped")):
         raise ValueError("final JUnit must have zero failures/errors/skips")
     preflight_path = Path(args.public_preflight).resolve()
