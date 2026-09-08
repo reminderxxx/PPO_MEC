@@ -38,8 +38,10 @@ def main(argv=None):
             report = {"status": "read_only_compatible", "execution_authorized": False,
                       "executor": verified_identity, "reconciliation": qualified.reconciliation,
                       "plans": qualified.plans, "origins": qualified.origins,
+                      "active_resource_count":len(qualified.bundle["resource_ids"]),
                       "registry_audit": qualified.registry_audit, "checkpoint_audit": qualified.checkpoints,
                       "environment": qualified.environment.runtime_audit,
+                      "actual_parent_environment": qualified.native["process_environment"],
                       "origin_evidence": proposal["origin_evidence"]}
             print(json.dumps(report, ensure_ascii=False, allow_nan=False))
             return 0

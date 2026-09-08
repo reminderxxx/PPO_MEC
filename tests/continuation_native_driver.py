@@ -59,6 +59,8 @@ prior = log.read_text().splitlines() if log.exists() else []
 with log.open("a") as stream:stream.write(json.dumps(sys.argv)+"\\n")
 if phase == "formal_cache_policy" and mode == "exit75" and not prior:sys.exit(75)
 if phase == "formal_cache_policy" and mode == "terminal":sys.exit(9)
+if mode in {"revoke_during_phase","expire_during_phase"} and phase=="formal_cache_policy":
+    Path(__file__).with_name("revoke.json").write_text("{}")
 flag = "--output-root"
 out = Path(sys.argv[sys.argv.index(flag)+1]); artifact = out/"benchmark_fixture"
 artifact.mkdir(parents=True)
@@ -73,6 +75,7 @@ elif phase not in {"formal_controller"}:
         output_root=out, artifact_root=artifact, producer_kind="test_only",
         required_payload=["aggregate_summary.json","benchmark_rows.csv","support_provenance.json"])
 if mode == "missing" and phase == "formal_cache_policy":(artifact/"aggregate_summary.json").unlink()
+if mode == "corrupt" and phase == "formal_cache_policy":(artifact/"aggregate_summary.json").write_text("{")
 ''')
     protocol = {"hashes": {"semantic_sha256":"b"*64}, "formal_nullable_metric_aggregation_contract":{"semantic_sha256":"n"*64}}
     context = {"scientific_identity":{"active_formal_bundle_sha256":"bundle"}}
@@ -89,7 +92,7 @@ if mode == "missing" and phase == "formal_cache_policy":(artifact/"aggregate_sum
     executor_identity = {"test_only": True, "implementation_file": file_hash(EXECUTOR/"scripts/continuation_executor/execution.py")}
     contract = dict(version="1.0.0", domain="synthetic", proposal_sha256=digest(proposal), proposal_file_sha256="test",
         executor_identity_sha256=digest(executor_identity), run_id=run.name, run_root=str(run), phases=list(PHASES),
-        holdout_capability=False, prefixes=prefixes, immutable_files=[], fixture_root=str(fixture),
+        holdout_capability=False, prefixes=prefixes, immutable_files=[dict(path=str(child),sha256=file_hash(child),size_bytes=child.stat().st_size)], fixture_root=str(fixture),
         expires_at=(datetime.now(timezone.utc)+timedelta(hours=1)).isoformat(), revocation_id="fixture",
         command_plan_sha256=digest(plans),recovery_owner_sha256=None, recovery_quiescence=None, coordination_root=str(fixture/".continuation_locks"))
     validate_contract(contract, proposal, executor_identity)
@@ -110,7 +113,12 @@ if mode == "missing" and phase == "formal_cache_policy":(artifact/"aggregate_sum
     sys.addaudithook(audit)
     results=[]
     error=None
-    authorize=lambda:verify_approval(contract,approval,fixture_authority=authority)
+    def authorize():
+        now=None
+        if (fixture/"revoke.json").exists():
+            if mode=="revoke_during_phase":authority["revoked_ids"]=[contract["revocation_id"]]
+            else:now=datetime.now(timezone.utc)+timedelta(hours=2)
+        return verify_approval(contract,approval,fixture_authority=authority,now=now)
     scope=FixtureScope(str(fixture),str(run),str(old),sys.executable)
     if mode in {"truncation", "fork", "out_of_order", "cross_ledger", "immutable_payload"}:
         if mode=="truncation":
@@ -138,6 +146,21 @@ if mode == "missing" and phase == "formal_cache_policy":(artifact/"aggregate_sum
         assert before=={str(p):file_hash(p) for p in fixture.rglob("*") if p.is_file()}
         print(json.dumps(dict(status="pass",case=mode,error=error,synthetic_child_dispatch_count=0,rejected_before_write=True)))
         return
+    if mode in {"revoke_during_phase","expire_during_phase"}:
+        result=execute_phase(subject,PHASES[0],authorize,executor_identity,scope=scope)
+        assert result["phase"]==PHASES[0]
+        before={str(p):file_hash(p) for p in fixture.rglob("*") if p.is_file()}
+        try:execute_phase(subject,PHASES[1],authorize,executor_identity,scope=scope)
+        except Exception as exc:error=str(exc)
+        else:raise AssertionError("revoked/expired grant admitted next phase")
+        assert before=={str(p):file_hash(p) for p in fixture.rglob("*") if p.is_file()}
+        assert len(dispatches)==1
+        print(json.dumps(dict(status="pass",case=mode,error=error,synthetic_child_dispatch_count=1,
+            prefix_unchanged=all(hashlib.sha256(Path(a["path"]).read_bytes()[:a["byte_count"]]).hexdigest()==a["prefix_sha256"] for a in prefixes),admitted_phase_completed=True)))
+        return
+    if mode=="utc_adjustment":
+        ticks=iter([datetime(2030,1,1,tzinfo=timezone.utc),datetime(2020,1,1,tzinfo=timezone.utc)])
+        phase._utc_clock=lambda:next(ticks,datetime(2020,1,1,tzinfo=timezone.utc))
     start=0
     if mode in {"publication_crash", "candidate_crash"}:
         pid=os.fork()
@@ -176,7 +199,7 @@ if mode == "missing" and phase == "formal_cache_policy":(artifact/"aggregate_sum
         try:
             results.append(execute_phase(subject,name,authorize,executor_identity,scope=scope))
         except Exception as exc:
-            if mode not in {"terminal","missing","descriptor","provenance"}:raise
+            if mode not in {"terminal","missing","corrupt","descriptor","provenance"}:raise
             error=str(exc)
             count=len(dispatches)
             try:execute_phase(subject,name,authorize,executor_identity,scope=scope)
@@ -184,7 +207,7 @@ if mode == "missing" and phase == "formal_cache_policy":(artifact/"aggregate_sum
             else:raise AssertionError("terminal failure was resumed")
             assert len(dispatches)==count
             break
-    if mode in {"terminal","missing","descriptor","provenance"}:assert error
+    if mode in {"terminal","missing","corrupt","descriptor","provenance"}:assert error
     else:
         count=len(dispatches)
         execute_phase(subject,PHASES[4],authorize,executor_identity,scope=scope)
@@ -196,6 +219,9 @@ if mode == "missing" and phase == "formal_cache_policy":(artifact/"aggregate_sum
             assert len(failed)==1
             retries=[r for r in records if r.get("cell_id")==failed[0]["cell_id"]]
             assert len({r["command_hash"] for r in retries})==1
+    if mode=="utc_adjustment":
+        terminal=[r for r in phase.records() if r["phase"]==PHASES[0] and r["status"]=="completed"][0]
+        assert terminal["duration_authority"]=="monotonic_clock" and terminal["wall_clock_adjustment_seconds"]<0
     if mode=="duplicate_committed":
         rows=cells.records();row=dict([r for r in rows if r["status"]=="committed"][-1])
         row.update(sequence_number=len(rows)+1,previous_ledger_hash=rows[-1]["current_ledger_hash"])

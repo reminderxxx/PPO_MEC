@@ -79,6 +79,9 @@ def build_persisted_context(tmp_path: Path) -> tuple[dict, dict, Path]:
     bundle = validate_active_formal_bundle(
         repository_root=ROOT,
         require_ready=index.get("status") == READY_STATUS,
+        # This builds a temporary context fixture, not a new-run release.
+        # Keep native bundle validation without requiring this test branch to be main.
+        require_origin_main_match=False,
     )
     output_root = tmp_path / "durable-run"
     expansion = resolved_expansion_context(

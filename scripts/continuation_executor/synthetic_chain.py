@@ -147,5 +147,5 @@ def run_chain(fixture, native, executor_identity, *, prepared=False):
     if combined["denied"] or any(child["denied"] for child in children):
         raise ValueError("accepted chain contains denied access")
     return dict(status="pass",approval_contract_sha256=digest(contract),inputs=inputs_report,consumer_cases=consumer_reports,checkpoint_audit=checkpoint_report,phase_results=results,command_mapping=mapping,
-        gate=gate,monitor=combined,origins=loaded_origins(core["source"]),
+        gate=gate,monitor=combined,actual_parent_environment=native["process_environment"],origins=loaded_origins(core["source"]),
         prefix_unchanged=all(hashlib.sha256(Path(a["path"]).read_bytes()[:a["byte_count"]]).hexdigest()==a["prefix_sha256"] for a in prefixes))

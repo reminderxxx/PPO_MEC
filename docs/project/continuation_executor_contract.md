@@ -12,7 +12,9 @@ The executor identity is external to its source checkout, with `version`, exact
 SHA-256. It covers both B CLIs, all `scripts/continuation_executor/*.py`, and the
 unchanged A schema validator. Verification requires the exact clean commit/tree,
 file equality and no additional source changes. Branch observation is diagnostic;
-no moving `origin/main` equality is imposed on an already fixed executor.
+no moving `origin/main` equality is imposed on an already fixed executor. The full
+identity is rechecked at each phase admission and before each child dispatch; the
+old scientific source must still have its exact clean HEAD.
 
 The independent execution contract binds the A proposal canonical digest and byte
 SHA-256, executor identity digest, original run ID/root, both ledger prefix anchors,
@@ -107,7 +109,10 @@ explicitly recorded as a test environment difference. Probe `-I/-B` arguments ar
 not added to frozen scientific argv. Fixture path inspection covers nested argv,
 resource references, checkpoint metadata, descriptors and all writes; original
 source and installed interpreter/dependency metadata are read-only exceptions.
-Synthetic tables/checkpoints/results are never formal scientific evidence.
+Synthetic tables/checkpoints/results are never formal scientific evidence. The
+fairness builder records a separate fixture data-repository commit; this is not
+the scientific execution commit. Its copied input configs/catalog are test data,
+while all executed scientific modules remain from the old checkout.
 
 Final evidence must bind the clean implementation commit and later separate
 record commit, command logs/JUnit/strict-format and hash checks, all fault cases,

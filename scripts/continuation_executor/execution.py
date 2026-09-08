@@ -5,7 +5,8 @@ import subprocess
 
 from . import PHASES
 from .cells import cell_layout
-from .identity import ContinuationError, digest
+from .identity import ContinuationError, digest, verify_executor, git
+from pathlib import Path
 from .locking import SingleWriter
 from .planning import cell_input_hash
 from .reconciliation import reconcile
@@ -24,6 +25,16 @@ def execute_phase(run, phase, authorize, executor_identity, *, finalize_only=Fal
         raise ContinuationError("synthetic scope/production domain mismatch")
     if run.contract["command_plan_sha256"] != digest(run.plans):
         raise ContinuationError("approved command plan drift")
+    def fixed_sources():
+        # Public CLIs always supply the complete fixed-commit identity. Small
+        # internal fault fixtures bind their test producer file separately.
+        if "commit" in executor_identity:
+            verify_executor(executor_identity,Path(__file__).resolve().parents[2])
+        elif grant["domain"]=="production":
+            raise ContinuationError("production requires a complete fixed executor identity")
+        if git(run.root,"rev-parse","HEAD")!="a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d" or git(run.root,"status","--porcelain","--untracked-files=all"):
+            raise ContinuationError("scientific source changed before dispatch")
+    fixed_sources()
     n, plan = run.native, run.plans[phase]
     if scope:
         scope.tree()
@@ -38,6 +49,7 @@ def execute_phase(run, phase, authorize, executor_identity, *, finalize_only=Fal
         coordinates = dict(zip(plan["command_hashes"], plan["matrix_contexts"]))
 
         def execute(argv):
+            fixed_sources()
             original = list(argv)
             if phase in PHASES[:5]:
                 coord = coordinates[digest(original)]

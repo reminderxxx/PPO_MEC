@@ -42,6 +42,8 @@ def load_native(root, commit):
             raise ContinuationError("external/current-main src on sys.path")
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
+    from .process_environment import verify_process_environment
+    process_environment=verify_process_environment(root)
     modules = {
         "cell": "src.evaluators.formal_cell_transaction",
         "phase": "src.evaluators.formal_phase_transaction",
@@ -57,6 +59,7 @@ def load_native(root, commit):
     }
     result = {key: importlib.import_module(name) for key, name in modules.items()}
     loaded_origins(root)
+    result["process_environment"]=process_environment
     return result
 
 

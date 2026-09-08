@@ -185,6 +185,33 @@ def test_planner_projections_equal_frozen_original_main_expressions():
                     {**local, "input_hash": base, "generated_registry_audit": {"registry_canonical_sha256": "registry"}})
         assert plan["input_hash"] == original_phase
 
+    # Evaluate only the frozen original staging builder and identity expression;
+    # no public main, transaction, child or file operation is invoked here.
+    from scripts.continuation_executor.cells import cell_layout
+    from scripts.continuation_executor.planning import cell_input_hash
+    import src.evaluators.formal_cell_transaction as cell_native
+    build_node=next(n for n in ast.walk(tree) if isinstance(n,ast.FunctionDef) and n.name=="build"
+        and any(isinstance(c,ast.Constant) and c.value=="formal_cache_policy" for c in ast.walk(n)))
+    training_branch=next(n for n in ast.walk(tree) if isinstance(n,ast.If)
+        and any(child is build_node for child in n.orelse))
+    selector=training_branch.orelse[:next(i for i,n in enumerate(training_branch.orelse) if n is build_node)]
+    original_input=expr("cell_input_hash")[0]
+    for phase in PHASES[:5]:
+        plan=phase_plan(phase,protocol,context,binding,"context-file","registry",expand_command_plan)
+        for original,coordinates in zip(plan["commands"],plan["matrix_contexts"]):
+            flag="--output_root" if "--output_root" in original else "--output-root"
+            env=dict(local,phase=phase,original=original,coordinates=coordinates,output_flag=flag,
+                final_output_root=Path(original[original.index(flag)+1]),stable_cell_id=cell_native.stable_cell_id,
+                generated_registry_audit={"registry_canonical_sha256":"registry"},FormalExecutionError=ValueError)
+            exec(compile(ast.Module(body=[*selector,build_node],type_ignores=[]),str(source),"exec"),env)
+            final,build,_=cell_layout(phase,coordinates,original,cell_native)
+            cell_id=cell_native.stable_cell_id(phase,coordinates)
+            staging=Path("/fixture/staging")/phase/cell_id
+            assert final==env["final_path"]
+            assert build(staging,cell_id)==env["build"](staging,cell_id)
+            expected=eval(compile(ast.Expression(original_input),str(source),"eval"),env)
+            assert cell_input_hash(phase,coordinates,original,protocol,context,"registry")==expected
+
 
 def test_real_process_crash_requires_approved_recovery(fixture):
     p, _, _, _ = fixture
@@ -253,7 +280,7 @@ with SingleWriter(sys.argv[1], 'test', lambda: None):
             first.kill();first.wait()
 
 
-@pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false"])
+@pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
 def test_native_faults_and_restarts(tmp_path, case):
     old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
     result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
@@ -296,3 +323,32 @@ def test_actual_cli_identity_drift_has_no_fixture_writes(tmp_path, fixture, entr
     assert result.returncode==2 and "fixed commit/tree drift" in result.stdout
     assert not target.exists()
     assert before=={str(f):file_hash(f) for f in tmp_path.rglob("*") if f.is_file()}
+
+
+
+def test_actual_foreign_interpreter_rejected_before_scientific_imports(tmp_path):
+    old="/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+    code="import sys;sys.path.insert(0,"+repr(str(ROOT/"scripts"))+");from continuation_executor.scientific import load_native;load_native("+repr(old)+",'a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d')"
+    result=subprocess.run(["/usr/bin/python3","-I","-B","-c",code],cwd=old,
+        env=dict(os.environ,PYTHONPATH=old,PYTHONNOUSERSITE="1",PYTHONDONTWRITEBYTECODE="1"),capture_output=True,text=True)
+    assert result.returncode!=0 and "actual interpreter differs" in result.stderr
+    assert not list(tmp_path.iterdir())
+
+
+
+@pytest.mark.parametrize("kind", ["external_src", "critical_package"])
+def test_actual_external_import_pollution_rejected(tmp_path, kind):
+    old="/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+    if kind=="external_src":
+        (tmp_path/"src").mkdir();(tmp_path/"src/__init__.py").write_text("")
+        setup="sys.path.insert(0,"+repr(str(tmp_path))+")"
+        expected="external/current-main src"
+    else:
+        setup="import types;m=types.ModuleType('torch');m.__version__='2.8.0';m.__file__="+repr(str(tmp_path/"shadow.py"))+";sys.modules['torch']=m"
+        expected="critical dependency shadow import"
+    before={str(p):file_hash(p) for p in tmp_path.rglob("*") if p.is_file()}
+    code="import sys;sys.path.insert(0,"+repr(str(ROOT/"scripts"))+");"+setup+";from continuation_executor.scientific import load_native;load_native("+repr(old)+",'a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d')"
+    result=subprocess.run([sys.executable,"-I","-B","-c",code],cwd=old,
+        env=dict(os.environ,PYTHONPATH=old,PYTHONNOUSERSITE="1",PYTHONDONTWRITEBYTECODE="1"),capture_output=True,text=True)
+    assert result.returncode!=0 and expected in result.stderr
+    assert before=={str(p):file_hash(p) for p in tmp_path.rglob("*") if p.is_file()}

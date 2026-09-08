@@ -83,7 +83,9 @@ class Monitor:
             path = Path(os.fsdecode(value)).absolute()
             if str(path) == os.devnull:
                 continue  # OS sink, not a persistent artifact write.
-            if self.real_run and (path == self.real_run or self.real_run in path.parents):
+            if self.real_run and (path == self.real_run or self.real_run in path.parents
+                    or path == self.real_run.parent/".continuation_locks"
+                    or self.real_run.parent/".continuation_locks" in path.parents):
                 self.real_v16_write_count += 1
                 raise ContinuationError("real v16 write forbidden during acceptance")
             if self.fixture and path != self.fixture and self.fixture not in path.parents:

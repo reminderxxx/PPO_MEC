@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import sys
 
-from .identity import ContinuationError, absolute_path, read_json, within
+from .identity import ContinuationError, absolute_path, read_json, within, strict_json
 
 _PATH_KEY = re.compile(r"(^|_)(path|paths|root|directory|file|files|checkpoint|manifest|descriptor|registry|resource)(_|$)")
 
@@ -102,7 +102,7 @@ class FixtureScope:
             from .identity import canonical
             import json
             for line in p.read_text().splitlines():
-                item = json.loads(line)
+                item = strict_json(line)
                 canonical(item)  # rejects non-finite values
                 self.value(item)
         elif p.suffix in {".yaml", ".yml"}:
