@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "checked_at": "2026-09-08T07:38:43.045097+00:00",
+  "mode": "structure",
+  "execution_authorized": false,
+  "holdout_capability": false,
+  "dispatch_count": {
+    "train": 0,
+    "dev": 0,
+    "formal": 0,
+    "holdout": 0
+  },
+  "checks": [
+    {
+      "name": "structure",
+      "status": "pass",
+      "detail": {
+        "status": "pass",
+        "scope": "proposal structure only; no evidence or approval implied"
+      }
+    }
+  ],
+  "pending": [
+    "independent_continuation_approval",
+    "external_executor_G14R20_B"
+  ],
+  "uncovered": [
+    "actual phase dispatch and publication compatibility",
+    "user authorization authenticity",
+    "formal and holdout evaluation"
+  ],
+  "proposal_sha256": "7ab3b78e176fcc45089220c20f84d741fee332634cca42b907c731228eef99d2",
+  "qualification": "structure_only"
+}

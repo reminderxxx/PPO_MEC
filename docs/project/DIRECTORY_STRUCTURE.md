@@ -289,3 +289,7 @@ v1.0–v1.9 Protocol 目录仅保留 historical audit，不再是 live active pa
   availability规范。
 
 Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 v2.3 唯一 active index。
+
+## 2026-09-08 G14R20-A
+
+`src/runtime/fixed_commit_continuation.py`、`scripts/preflight_fixed_commit_continuation.py` 与 `scripts/probe_fixed_commit_continuation.py` 为独立只读合同/入口；schema 位于 `configs/experiment/fixed_commit_continuation_v1/`，新增验收位于 `artifacts/analysis/g14r20_a_continuation_20260908/`。 详见 `fixed_commit_continuation_contract.md`。

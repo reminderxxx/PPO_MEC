@@ -1,0 +1,94 @@
+{
+  "task": "G14R20-A",
+  "status": "implementation_and_read_only_acceptance_complete",
+  "checked_at": "2026-09-08T07:44:14.126657+00:00",
+  "development_baseline": "c8e67bafaba6a6cfd50f8cebde6c1fbdcd3c7952",
+  "validation_git_head": "c8e67bafaba6a6cfd50f8cebde6c1fbdcd3c7952",
+  "working_tree_includes_task_changes": true,
+  "execution_authorized": false,
+  "executor_implemented": false,
+  "independent_approval_issued": false,
+  "tests": {
+    "full": {
+      "tests": 1364,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 2,
+      "passed": 1362,
+      "skipped_cases": [
+        {
+          "name": "test_v24_real_nested_wrapper_consumes_persisted_context",
+          "reason": "requires the finalized Git-clean active bundle"
+        },
+        {
+          "name": "test_v24_context_tamper_cross_protocol_and_relative_python_rejected",
+          "reason": "requires the finalized Git-clean active bundle"
+        }
+      ]
+    },
+    "targeted": {
+      "tests": 125,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 125,
+      "skipped_cases": []
+    },
+    "continuation_final": {
+      "tests": 56,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 56,
+      "skipped_cases": []
+    }
+  },
+  "protected_inventory": {
+    "status": "pass",
+    "inventory_sha256": "b69434cc2e5bacdf633a0b3f6d2244569a1b0b19f222aea266709d2b914e544c",
+    "verified_entries": 107320,
+    "verified_bytes": 38300782534,
+    "scope": "all recorded protected files; additions checked in listed immutable roots",
+    "immutable_roots": [
+      "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16",
+      "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+    ]
+  },
+  "committed_payloads": {
+    "status": "pass",
+    "committed_cells": 174,
+    "cell_inventory_entries": 105588,
+    "phase_output_entries": 185,
+    "scope": "original ledger + marker + freshly hashed files"
+  },
+  "checkpoints_verified": 150,
+  "active_bundle_resources_verified": 44,
+  "generated_resources_verified": 6,
+  "dispatch_count": {
+    "train": 0,
+    "dev": 0,
+    "formal": 0,
+    "holdout": 0
+  },
+  "call_monitor": {
+    "scientific_function_calls": 666748
+  },
+  "qualification": "unavailable",
+  "missing_evidence": [
+    "original authenticated launch approval",
+    "original release attestation"
+  ],
+  "pending": [
+    "G14R20-B external executor and eight-phase entrypoint compatibility",
+    "independent continuation approval"
+  ],
+  "not_covered": [
+    "new formal evaluation",
+    "holdout",
+    "real dispatch/locking/recovery/cross-ledger scheduling",
+    "original authorization authenticity"
+  ],
+  "schema_validation": "strict JSON and programmatic semantic validator; external JSON Schema engine unavailable",
+  "run_invalidated": false,
+  "retraining_required": false
+}

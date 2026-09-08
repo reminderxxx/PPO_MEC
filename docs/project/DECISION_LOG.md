@@ -1081,3 +1081,7 @@ claim map 必须报告 `UNAVAILABLE`。
 原因：G14C v12 的 215 个 delay null 是 Endpoint 2.0 对 failed/incomplete/right-censored workflow 的正确表达，
 旧聚合器的 `float(None)` 是 consumer 类别错误。将 null 改为零、删除 episode 或复用 staging checkpoint 都会
 改变 estimand 或污染正式证据。
+
+## 2026-09-08 G14R20-A
+
+固定提交 continuation 被定义为独立待批准的新规则；新 run 发布门禁不变。proposal/结构/资格/批准/执行分离，本轮真实执行权限恒为 false。保护快照是验收基线而非原始授权凭据。 详见 `fixed_commit_continuation_contract.md`。

@@ -1,0 +1,7 @@
+{
+  "outer_expansion_sha256": "ec5310f5a915c162b5ade61b9279f9ce201f6880974fea73aebccc778db2a419",
+  "resolved_command_matrix_sha256": "ec5310f5a915c162b5ade61b9279f9ce201f6880974fea73aebccc778db2a419",
+  "phase_count": 15,
+  "command_count": 186,
+  "canonical_serialization": "UTF-8 sorted-key compact JSON; NaN/Infinity rejected"
+}

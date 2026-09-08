@@ -679,3 +679,7 @@
   self-excluding integrity evidence producer。
 - `tests/test_formal_nullable_metric_contract.py`：pure reducer、producer compatibility、selection、statistics、
   strict serialization 与 v12 rejection regressions。
+
+## 2026-09-08 G14R20-A
+
+独立 continuation validator 只用标准库，不依赖当前科学模块；CLI 通过原 Python/旧 cwd 加载新只读 helper，helper 只消费旧 validator。原 public runner 无修改，未新增 executor。 详见 `fixed_commit_continuation_contract.md`。

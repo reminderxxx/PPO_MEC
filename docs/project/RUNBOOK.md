@@ -1,3 +1,8 @@
+> **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
+> 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
+> 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。
+> 独立合同、原声明/hash 及证据指针见 [fixed_commit_continuation_contract.md](fixed_commit_continuation_contract.md)。执行器未实现、独立批准未签发，`execution_authorized=false`。
+
 # Runbook
 
 ## Protocol 2.9 与未来 G14C v16

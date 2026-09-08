@@ -1,0 +1,3 @@
+usage: preflight_fixed_commit_continuation.py [-h] --proposal PROPOSAL
+                                              [--check {structure,evidence,authorization}]
+preflight_fixed_commit_continuation.py: error: unrecognized arguments: --execute

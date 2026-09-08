@@ -1,0 +1,32 @@
+{
+  "checked_at": "2026-09-08T07:38:42.705678+00:00",
+  "searched_scope": [
+    "artifacts/analysis file names including ignored files for v16/G14R18 authorization/launch/release/execution/audit",
+    "existing v16 run root top-level artifacts"
+  ],
+  "candidates": [
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1/g14c_v16_authorization_deferral.json",
+      "sha256": "7afc65c750b0130c21b64aae0b0f147b26cad23fd432bda6ec497fbd5c090c61",
+      "boundary": "G14R18 repair/revalidation or deferral; not original v16 launch approval"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1/final_execution_commit_revalidation.json",
+      "sha256": "a0ea8fb8dc5b3b1ec7700f435cf6e31bab86ff19dde5517892729527193333ec",
+      "boundary": "G14R18 repair/revalidation or deferral; not original v16 launch approval"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_provenance_main_gate_revalidation_20260908_g14r18/final_execution_commit_acceptance.json",
+      "sha256": "894163740d52787b2e31eb84813a55c6553728e0a9667b215f2a89ba1e4a16d5",
+      "boundary": "G14R18 repair/revalidation or deferral; not original v16 launch approval"
+    }
+  ],
+  "launch_approval": "unavailable",
+  "release_attestation": "unavailable",
+  "limitations": [
+    "No independent authenticated user approval or original release attestation identified in searched artifacts",
+    "Not a claim that original approval never existed",
+    "Current readiness, ancestor relation and implementation statements excluded as substitutes"
+  ],
+  "execution_authorized": false
+}

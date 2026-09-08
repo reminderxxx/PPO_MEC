@@ -1,0 +1,397 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "state",
+    "execution_authorized",
+    "holdout_capability",
+    "run_id",
+    "run_root",
+    "worktree_root",
+    "execution_commit",
+    "source_tree",
+    "evidence",
+    "ledgers",
+    "allowed_phases",
+    "write_scope",
+    "origin_evidence",
+    "executor",
+    "approval",
+    "revocation_rules"
+  ],
+  "properties": {
+    "version": {
+      "const": "1.0.0"
+    },
+    "state": {
+      "const": "proposal"
+    },
+    "execution_authorized": {
+      "const": false
+    },
+    "holdout_capability": {
+      "const": false
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "run_root": {
+      "type": "string",
+      "pattern": "^/"
+    },
+    "worktree_root": {
+      "type": "string",
+      "pattern": "^/"
+    },
+    "execution_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "source_tree": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "git_tree",
+        "tracked_sources_sha256"
+      ],
+      "properties": {
+        "git_tree": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "tracked_sources_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256",
+          "size_bytes",
+          "role"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "size_bytes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "role": {
+            "enum": [
+              "protocol",
+              "bundle",
+              "environment",
+              "binding",
+              "context",
+              "command_matrix",
+              "candidate",
+              "selection",
+              "freeze",
+              "registry",
+              "checkpoint",
+              "resource",
+              "committed_output"
+            ]
+          }
+        }
+      },
+      "minItems": 13,
+      "allOf": [
+        {
+          "contains": {
+            "properties": {
+              "role": {
+                "const": "protocol"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "role": {
+                "const": "bundle"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "role": {
+                "const": "environment"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "role": {
+                "const": "binding"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "role": {
+                "const": "context"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "role": {
+                "const": "command_matrix"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "role": {
+                "const": "candidate"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "role": {
+                "const": "selection"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "role": {
+                "const": "freeze"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "role": {
+                "const": "registry"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "role": {
+                "const": "checkpoint"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "role": {
+                "const": "resource"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        },
+        {
+          "contains": {
+            "properties": {
+              "role": {
+                "const": "committed_output"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          }
+        }
+      ]
+    },
+    "ledgers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "kind",
+          "record_count",
+          "byte_count",
+          "prefix_sha256",
+          "terminal_hash",
+          "run_identity_fingerprint"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "phase",
+              "cell"
+            ]
+          },
+          "record_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "byte_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "prefix_sha256": {
+            "type": "string"
+          },
+          "terminal_hash": {
+            "type": "string"
+          },
+          "run_identity_fingerprint": {
+            "type": "string"
+          }
+        }
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "allowed_phases": {
+      "const": [
+        "formal_cache_policy",
+        "formal_controller",
+        "formal_ablation",
+        "formal_support",
+        "formal_scalability",
+        "formal_statistics",
+        "formal_gate",
+        "complete_without_holdout"
+      ]
+    },
+    "write_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root",
+        "mode",
+        "immutable_prefix",
+        "currently_writable"
+      ],
+      "properties": {
+        "root": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "immutable_prefix": {
+          "const": true
+        },
+        "currently_writable": {
+          "const": false
+        }
+      }
+    },
+    "origin_evidence": {
+      "const": {
+        "launch_approval": {
+          "status": "unavailable",
+          "path": null,
+          "sha256": null,
+          "boundary": "not independently verified"
+        },
+        "release_attestation": {
+          "status": "unavailable",
+          "path": null,
+          "sha256": null,
+          "boundary": "not independently verified"
+        }
+      }
+    },
+    "executor": {
+      "const": {
+        "state": "pending",
+        "commit": null,
+        "files": []
+      }
+    },
+    "approval": {
+      "const": {
+        "state": "pending",
+        "source": null,
+        "scope": "implementation_and_read_only_acceptance_only"
+      }
+    },
+    "revocation_rules": {
+      "const": [
+        "expired",
+        "revoked",
+        "identity_drift",
+        "failed_terminal",
+        "prefix_changed",
+        "unauthorized_successor"
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ppo-mec:fixed-commit-continuation:1.0.0",
+  "title": "Read-only fixed commit continuation proposal; no execution authority"
+}

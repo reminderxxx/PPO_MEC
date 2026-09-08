@@ -1,0 +1,10 @@
+........................................................................ [ 57%]
+.....................................................                    [100%]
+=============================== warnings summary ===============================
+tests/test_checkpoint_nullable_identity_v28.py: 16 warnings
+  tests/test_checkpoint_nullable_identity_v28.py:734: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @pytest.mark.parametrize("case", [
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/targeted.junit.xml -
+125 passed, 16 warnings in 112.41s (0:01:52)

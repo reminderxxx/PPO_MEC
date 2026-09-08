@@ -1,3 +1,8 @@
+> **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
+> 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
+> 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。
+> 独立合同、原声明/hash 及证据指针见 [fixed_commit_continuation_contract.md](fixed_commit_continuation_contract.md)。执行器未实现、独立批准未签发，`execution_authorized=false`。
+
 ﻿# Progress
 
 ## 2026-09-06: G14R18 checkpoint provenance envelope / shared identity boundary closure
@@ -1814,3 +1819,7 @@ quick run 结果边界：
 最终补充验收已落于 clean commit `4beacd315281cd93a6e1aa345710021b9221ba85`：全仓 1304 passed、
 0 skipped；16 个 actual main 用例记录 loader/gate/rollout=1/1/0，public preflight 60/60 可达，smoke、
 compile/import 通过。后续记录提交仅发布独立补充包及文档；没有进一步代码变更或启动 v16。
+
+## 2026-09-08 G14R20-A 实现与只读验收
+
+独立合同/schema/validator/CLI、追加勘误及 B 接口已实现。全仓 1362 passed、2 skipped；真实 150 checkpoint / 44 active resources / 6 generated resources 通过只读检查。原始授权证据仍 unavailable，executor/独立批准 pending，v16-B 不获执行许可。详见 `fixed_commit_continuation_acceptance.md`。

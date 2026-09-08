@@ -1,0 +1,234 @@
+{
+  "created_at": "2026-09-08T07:44:14.126657+00:00",
+  "self_excluded": true,
+  "files": [
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/acceptance_summary.json",
+      "sha256": "83306eb494726f66e0993bb8b43178fc325cffdd63342d5dde5d06300f70090a",
+      "size_bytes": 2902,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/command_log.json",
+      "sha256": "f36cf409d9594b8f1633a304f1141310957f74f14fde8a194071ac3143357d24",
+      "size_bytes": 2289,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/compile_import.json",
+      "sha256": "2bcaf45719df8c3b430f78f4f216ca3544b1caca32119921dc5b4e843e75965a",
+      "size_bytes": 839,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/continuation_final.junit.xml",
+      "sha256": "c8256148aea56e42cab3b71012636ef0c39f8b6491d8605e11437e121801a8f2",
+      "size_bytes": 6924,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/continuation_final.log",
+      "sha256": "d6e434d28c2767bf3262de8d093bb88ab13436ece059289af2b924188b64eec3",
+      "size_bytes": 233,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/correction_record.json",
+      "sha256": "93cbe8abe64d0754d22149eacfe46f7107c38d990086c72aa4b9b88a317c5618",
+      "size_bytes": 40164,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/full.junit.xml",
+      "sha256": "ae232fd4836ba9c80af4d69602ab9abd9c9bf1bd12d4d6166799fd073db4d37f",
+      "size_bytes": 209137,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/full.log",
+      "sha256": "74597c9a6d28440fcd6febc8b0e7abb4e38fbdfde716d52ceb7adb0c882ec9a6",
+      "size_bytes": 2104,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/origin_evidence_search.json",
+      "sha256": "93657fd59bcdb4471eba3c1f0ac503100e64d38bab000c16534312ee27b41015",
+      "size_bytes": 1769,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/original_command_matrix.json",
+      "sha256": "bae4e464b3e3702a16dbf5d1d588610a4634e3b2632205436df1767c9e2cdbad",
+      "size_bytes": 333,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/protected_before.json.gz",
+      "sha256": "b69434cc2e5bacdf633a0b3f6d2244569a1b0b19f222aea266709d2b914e544c",
+      "size_bytes": 4915679,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/real_authorization_check.json",
+      "sha256": "9ee183da0b66dd2dd310355d5313ba9e4ab5caf7877d99f85c0a9f24017408d8",
+      "size_bytes": 2999413,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/real_read_only_preflight.json",
+      "sha256": "24e296c25130d787be8fd99de1ef5fb297a7d3afdcbca26f2d51be8ff844ec72",
+      "size_bytes": 2999408,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/smoke.log",
+      "sha256": "f6bc0466c63cce2471e6bebd7f37323b68d2b66b718afc9683e4d47542831990",
+      "size_bytes": 623,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/structure_check.json",
+      "sha256": "0bc91e3cb0e123fd7a8755cff210591ee3703a175e6e122ca199048cfc5e7cd9",
+      "size_bytes": 841,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/targeted.junit.xml",
+      "sha256": "6ba94cabfd9365f15a571a828126d936007eca8eece4f45c574c025448dcfc07",
+      "size_bytes": 21571,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/targeted.log",
+      "sha256": "8b6eb94417c8c35c6dbe81a4d8ff2e4e4f63b17f76493760de0f396dea2f7623",
+      "size_bytes": 736,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/unsupported_execute.stderr.log",
+      "sha256": "95a2c12fb99585f6602ce0a856b06b481180e632154068b630773260530b9b0a",
+      "size_bytes": 243,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/unsupported_execute.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size_bytes": 0,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/user_file_protection.json",
+      "sha256": "47f9150db7ece84074bdb64512704951246a060e24f8c478939e668f5096f3c2",
+      "size_bytes": 1857,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/v16_continuation_proposal.json",
+      "sha256": "65f6fbe04fc717b1c74c8b06dee9ba0ea412ac0cd5c6b0888a9e104cc9c13cc8",
+      "size_bytes": 65896,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/src/runtime/fixed_commit_continuation.py",
+      "sha256": "bcd5b964174efb39896c2178f51aa873dd6f82fe28d163679df8d992bdfdd5d3",
+      "size_bytes": 18813,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/scripts/preflight_fixed_commit_continuation.py",
+      "sha256": "75c512412d5e8de281601c87d1c8d76e51bd3664a6e686cb8937e3ee102ff314",
+      "size_bytes": 4088,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/scripts/probe_fixed_commit_continuation.py",
+      "sha256": "10443106602afd9fc3e224e79efef3cf94835a76d0136dd3715f6662bb3224ca",
+      "size_bytes": 10779,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/tests/test_fixed_commit_continuation.py",
+      "sha256": "543b51438977c13a487520e161902406d5296f80486b1e49264178a3eb60ae2e",
+      "size_bytes": 12977,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/configs/experiment/fixed_commit_continuation_v1/continuation_schema.json",
+      "sha256": "5e192f68ec3375734e41f2e7b5c2af1ba05d21f3b148d126d32caac43ed527c5",
+      "size_bytes": 8327,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/docs/project/fixed_commit_continuation_contract.md",
+      "sha256": "e5b04432f0fd4aa14abdc4651e08b4dafd05ca71fd54e49add8897be65a6c474",
+      "size_bytes": 10903,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/docs/project/fixed_commit_continuation_acceptance.md",
+      "sha256": "09707430bf4fd5ed4a397958d3d82d690c570ed37e4c11c2e6ca9b539be8129c",
+      "size_bytes": 1842,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/README.md",
+      "sha256": "fc8bdce4cb56f6be9ae9789021b93c9e5307ceec3e2e1375a3e02896b24d05a8",
+      "size_bytes": 50811,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/docs/project/CONTEXT.md",
+      "sha256": "aabdc5398f93f684cde892612fb1b757dff138ff83d5a8a9d0be5dd63ea57fa1",
+      "size_bytes": 14247,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/docs/project/PROGRESS.md",
+      "sha256": "c45e8ee0d1f4389c5c6eeeac4cc8b15004ac33f0652ed839aef20306e4e2dff7",
+      "size_bytes": 234887,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/docs/project/BUGS.md",
+      "sha256": "361eb4feabe80456f13e380e233407aa01e847582f23715e4505eed3c80fcd9f",
+      "size_bytes": 83579,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/docs/project/ARTIFACT_RECORDS.md",
+      "sha256": "72629a30a8ed6549f3dfcea8097243df6d8964dd6c2324eba428e5d8890b3118",
+      "size_bytes": 142652,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/docs/project/RUNBOOK.md",
+      "sha256": "0e9d90ae81c9b82227761136c6082836727e4626b9615cec37cf68a850383240",
+      "size_bytes": 98253,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/docs/project/README.md",
+      "sha256": "038cdbf9356810e0d45bfd547812936487d5bf4733c2235b684b994405c47336",
+      "size_bytes": 12718,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/docs/project/DIRECTORY_STRUCTURE.md",
+      "sha256": "5faabfdaa4840767900b89def0441327ab3ffddd28428d44e1747acfcf25435e",
+      "size_bytes": 29612,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/docs/project/CODE_MODULE_MAP.md",
+      "sha256": "425cac06d41778fb9e2ab1ebfc0d5263839f665738d695252efd5d5f670816e8",
+      "size_bytes": 74270,
+      "role": "resource"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/docs/project/DECISION_LOG.md",
+      "sha256": "dbc02e817af61cccd424d1ade6eec04a157b65be123bb183b5ae9ff038eb4352",
+      "size_bytes": 112438,
+      "role": "resource"
+    }
+  ]
+}
