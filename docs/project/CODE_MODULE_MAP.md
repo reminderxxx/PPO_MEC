@@ -683,3 +683,13 @@
 ## 2026-09-08 G14R20-A
 
 独立 continuation validator 只用标准库，不依赖当前科学模块；CLI 通过原 Python/旧 cwd 加载新只读 helper，helper 只消费旧 validator。原 public runner 无修改，未新增 executor。 详见 `fixed_commit_continuation_contract.md`。
+
+## 2026-09-08 G14R20-B（实现中）
+
+`continuation_executor_security` 检查外部版本、身份、独立信任、授权范围与单写者；
+`continuation_signature_backend` 使用固定 hash 的外部 Node/OpenSSL，不改变科学 Python 依赖。
+`continuation_qualification` 在原环境内调用原 bundle/environment/context/binding/registry/checkpoint
+validator；`continuation_ledger_validation` 核对不可变前缀、合法后继与原 payload。
+`continuation_legacy_adapter` 从原 runner 投影下游事务分支，仍由原 phase/cell writer 完成发布，
+不调用或 monkeypatch 原 public main。生产入口按 admission → qualification → lock → 锁内复核 →
+原事务的顺序调用；当前无真实批准。fixture 工具单独负责 test-only 输入、授权和内核隔离。

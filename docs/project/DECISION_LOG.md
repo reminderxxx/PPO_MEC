@@ -1085,3 +1085,12 @@ claim map 必须报告 `UNAVAILABLE`。
 ## 2026-09-08 G14R20-A
 
 固定提交 continuation 被定义为独立待批准的新规则；新 run 发布门禁不变。proposal/结构/资格/批准/执行分离，本轮真实执行权限恒为 false。保护快照是验收基线而非原始授权凭据。 详见 `fixed_commit_continuation_contract.md`。
+
+## 2026-09-08 G14R20-B 实现决策（待最终验收）
+
+保留 A 未授权 proposal 和原 public runner；外部执行器用自身固定代码身份引用原执行身份。
+仅对既有 run 的移动 origin/main 条件设计独立批准替代，不改变原新 run 门禁。采用原事务
+可达分支的 AST 投影，输出 source/AST 身份以供等价审查；不能凭单测通过宣称科学等价。
+锁使用不删除的 kernel flock inode，锁字节保持稳定以兼容 integrity。生产信任与三种原始证据
+角色分开；冻结 Python 缺少密码学包，因此使用独立 hash 固定的本地 Node/OpenSSL 后端。
+测试密钥仅用于 fixture，不安装生产信任，不生成真实批准。

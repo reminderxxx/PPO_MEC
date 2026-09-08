@@ -293,3 +293,13 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 ## 2026-09-08 G14R20-A
 
 `src/runtime/fixed_commit_continuation.py`、`scripts/preflight_fixed_commit_continuation.py` 与 `scripts/probe_fixed_commit_continuation.py` 为独立只读合同/入口；schema 位于 `configs/experiment/fixed_commit_continuation_v1/`，新增验收位于 `artifacts/analysis/g14r20_a_continuation_20260908/`。 详见 `fixed_commit_continuation_contract.md`。
+
+## 2026-09-08 G14R20-B（实现中）
+
+独立生产入口为 `scripts/run_fixed_commit_continuation.py`，只读入口为
+`scripts/inspect_fixed_commit_continuation.py`。外部 security、qualification、legacy adapter、
+ledger validation 与签名后端均以 `scripts/continuation_*.py` 承载，不复制进旧科学 worktree。
+`continuation_fixture_*` 和 `validate_continuation_*` 为明确 test-only 的合成工具。
+验收测试集中在 `tests/test_continuation_*.py`；合同和矩阵分别为
+`docs/project/continuation_executor_contract_v1.md`、`docs/project/continuation_executor_acceptance_matrix.md`。
+独立证据根目录为 `artifacts/analysis/g14r20_b_continuation_20260908/`，不移动旧 run 或 checkpoint。

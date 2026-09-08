@@ -1,3 +1,5 @@
+> **2026-09-08 G14R20-B 实现中**：已新增独立执行器与隔离合成验收，尚未完成精确 clean 实现提交上的最终验收。真实 v16 未恢复，独立批准未签发，`execution_authorized=false`。下方 A 状态为历史记录；当前边界见 [B 合同](continuation_executor_contract_v1.md)。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。
@@ -575,3 +577,11 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 既有 main 源码顺序断言不等价于实际入口执行，空 rollout 列表也不构成调用计数。补充的 main 正负
 用例保留真实 generated registry、companion loader、checkpoint read 和 strict gate，并监测实际 rollout
 符号。数据准备/fairness 使用 test-only 替身，因此仍不构成完整正式 benchmark 或性能证据。
+
+## 2026-09-08 G14R20-B 未关闭项
+
+- 最终固定提交验收、环境/租约覆盖和八阶段逐项兼容报告未完成，不能宣布 B 验收完成。
+- 原始 launch/release 证据状态独立保留；测试通过、Readiness 和自算 hash 均不能替代批准。
+- 旧 worktree 曾短暂出现两份误写的新 helper，随后移回开发树，旧文件未改、真实 run 未写入。
+  事件见 B 证据目录 `source_write_incident.json`；不能以当前 clean 覆盖历史偏差。
+- 生产签名验证依赖外部 hash 固定后端；后端缺失或变化必须拒绝，不得向冻结 Python 自动安装包。

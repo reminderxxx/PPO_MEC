@@ -1,3 +1,5 @@
+> **2026-09-08 G14R20-B 实现中**：已新增独立执行器与隔离合成验收，尚未完成精确 clean 实现提交上的最终验收。真实 v16 未恢复，独立批准未签发，`execution_authorized=false`。下方 A 状态为历史记录；当前边界见 [B 合同](continuation_executor_contract_v1.md)。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。
@@ -1449,3 +1451,20 @@ evidence。未来 G14C v13 只能从 pushed、Git-clean、`HEAD == main == origi
 XML 必须包含 `test_benchmark_main_executes_full_envelope_gate` 的全部 16 个正负情形及真实 loader/gate/rollout
 计数 1/1/0。`build_formal_checkpoint_provenance_envelope_artifacts.validate_main_gate_evidence` 验证这些计数；
 不能以旧源码断言替代。该命令仅产生临时 test-only checkpoint，不执行正式训练或 rollout，不授权启动 v16。
+
+## G14R20-B 实现与验收边界（尚未放行）
+
+先读 `continuation_executor_contract_v1.md` 和 `continuation_executor_acceptance_matrix.md`。
+真实 v16 只运行独立只读 inspector，stdout/stderr 由父进程保存到 B 证据目录；使用原 context
+指定 Python、旧 cwd、精确 PYTHONPATH、禁用 bytecode/user-site，并用只读内核 sandbox 禁止写入。
+不要在真实 run 创建锁、staging 或 continuation ledger 记录，也不要在旧 worktree 创建 helper。
+
+合成入口仅接受独立 temporary `synthetic_*` fixture，拒绝 Git worktree 内位置。实际子任务
+需要 fixture dispatch scope，全部进程继承内核写入边界。macOS 外层 sandbox 不能嵌套建立
+Seatbelt 时，验收命令需获准在外层运行，再由工具建立更严格的 child sandbox；不得 skip。
+最终 pytest 使用独立 `--basetemp` 保留 fixture，JUnit 保存 B 证据目录。中间通过不能替代
+精确 clean 实现 commit 的定向、全仓、smoke 和 integrity 验收。
+
+生产执行入口必须消费精确实现身份、独立 execution contract、原 proposal 及独立批准。
+当前这些真实资格材料未齐全，本任务不提供或执行恢复真实 v16 的命令。实现提交与后续证据
+提交分别记录完整 hash；最终按 AGENTS.md 仅提交本任务文件并 push。
