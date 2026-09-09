@@ -153,6 +153,15 @@ def run_public_startup_acceptance(root, identity, entry):
     custody = verify_handoff_for_custody(trust.pin, prior, challenge,
                                          terminal["handoff_material"])
 
+    # Missing fixed receipt is a failure-only probe; it never creates success.
+    Path(trust.pin["startup_receipt_path"]).unlink()
+    missing, missing_events, missing_challenge = start_and_challenge(
+        entry, paths, check="qualification", wait=.15)
+    missing_code, missing_events, missing_stderr = finish(missing, missing_events)
+    if (missing_challenge is None or missing_code != 124 or missing_stderr
+            or missing_events[1].get("status") != "receipt_pending"):
+        raise RuntimeError("missing receipt did not time out fail-closed")
+
     negative_receipts = {}
     for case in ("schema", "signature", "authority", "checkpoint", "nonce", "pid", "expired"):
         candidate, candidate_events, candidate_challenge = start_and_challenge(
@@ -221,14 +230,15 @@ def run_public_startup_acceptance(root, identity, entry):
         raise RuntimeError("fresh post-release startup failed")
     custody3 = verify_handoff_for_custody(trust.pin, custody2["state"], third_challenge,
                                           third_events[-1]["handoff_material"])
-    requests = [challenge, stale_challenge, interrupted_challenge, crashed_challenge,
+    requests = [challenge, missing_challenge, stale_challenge, interrupted_challenge, crashed_challenge,
                 first_challenge, third_challenge]
     if len({row["session_nonce"] for row in requests}) != len(requests):
         raise RuntimeError("startup nonce reused")
     return {"status": "pass", "public_parser_main": True,
         "host_pid": challenge["process_id"], "custodian_pid": custodian_pid,
         "roles_are_separate_processes": challenge["process_id"] != custodian_pid,
-        "positive_events": events, "old_receipt_events": stale_events,
+        "positive_events": events, "missing_receipt_events": missing_events,
+        "old_receipt_events": stale_events,
         "invalid_receipt_events": negative_receipts,
         "interrupted_events": interrupted_events, "crashed_events": crashed_events,
         "crash_exit_code": crashed_code,
