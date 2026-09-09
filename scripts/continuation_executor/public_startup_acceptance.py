@@ -13,8 +13,8 @@ import sys
 from . import PHASES
 from .authorization import validate_contract
 from .identity import canonical, digest, file_hash, git
-from .startup import verify_handoff_for_custody
-from .test_trust_fixture import TestTrustFixture, write
+from .startup import atomic_publish_receipt, verify_handoff_for_custody
+from .test_trust_fixture import TestTrustFixture, signed, write
 
 
 ROLES = ('protocol', 'bundle', 'environment', 'binding', 'context',
@@ -153,6 +153,31 @@ def run_public_startup_acceptance(root, identity, entry):
     custody = verify_handoff_for_custody(trust.pin, prior, challenge,
                                          terminal["handoff_material"])
 
+    negative_receipts = {}
+    for case in ("schema", "signature", "authority", "checkpoint", "nonce", "pid", "expired"):
+        candidate, candidate_events, candidate_challenge = start_and_challenge(
+            entry, paths, check="qualification")
+        message = {**candidate_challenge, "authority": "revoker",
+            "checkpoint_sha256": custody["checkpoint_sha256"],
+            "issued_at": trust.now.isoformat(),
+            "expires_at": (trust.now+timedelta(hours=1)).isoformat()}
+        if case == "schema": message["extra"] = True
+        if case == "authority": message["authority"] = "other"
+        if case == "checkpoint": message["checkpoint_sha256"] = "0"*64
+        if case == "nonce": message["session_nonce"] = "wrong"
+        if case == "pid": message["process_id"] += 1
+        if case == "expired": message["expires_at"] = trust.now.isoformat()
+        receipt = signed(message, "revoker", trust.keys["revoker"])
+        if case == "signature": receipt["signature"] = "00"*64
+        before_state = Path(trust.pin["continuity_path"]).read_bytes()
+        atomic_publish_receipt(trust.pin["startup_receipt_path"], receipt)
+        candidate_code, candidate_events, candidate_stderr = finish(candidate, candidate_events)
+        if (candidate_code != 2 or candidate_stderr
+                or candidate_events[-1].get("status") != "rejected"
+                or Path(trust.pin["continuity_path"]).read_bytes() != before_state):
+            raise RuntimeError("public invalid receipt case failed closed: " + case)
+        negative_receipts[case] = candidate_events
+
     # A new process cannot consume the old receipt: it waits on a new challenge.
     stale, stale_events, stale_challenge = start_and_challenge(entry, paths, check="qualification", wait=.15)
     stale_code, stale_events, stale_stderr = finish(stale, stale_events)
@@ -204,6 +229,7 @@ def run_public_startup_acceptance(root, identity, entry):
         "host_pid": challenge["process_id"], "custodian_pid": custodian_pid,
         "roles_are_separate_processes": challenge["process_id"] != custodian_pid,
         "positive_events": events, "old_receipt_events": stale_events,
+        "invalid_receipt_events": negative_receipts,
         "interrupted_events": interrupted_events, "crashed_events": crashed_events,
         "crash_exit_code": crashed_code,
         "concurrent_second_events": second_events, "concurrent_first_events": first_events,
