@@ -1,0 +1,55 @@
+{
+  "reviewed_at": "2026-09-09T16:53:18+08:00",
+  "commands": [
+    {
+      "name": "production_trust_initial_sandboxed",
+      "command": "PYTHONPATH=/private/tmp/g14r20_d_dependencies /Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_continuation_production_trust.py --junitxml=artifacts/analysis/g14r20_e_review_20260909/production_trust.junit.xml",
+      "cwd": "/private/tmp/ppo_mec_g14r20_e_review",
+      "exit_code": 1,
+      "result": "89 tests: 73 passed, 16 failed; all failures were native subprocess cases caused by sandbox denial of ps/process identity"
+    },
+    {
+      "name": "production_trust_native_retry",
+      "command": "PYTHONPATH=/private/tmp/g14r20_d_dependencies /Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_continuation_production_trust.py -k v2_native_transactions_and_restart --junitxml=artifacts/analysis/g14r20_e_review_20260909/production_trust_native_retry.junit.xml",
+      "cwd": "/private/tmp/ppo_mec_g14r20_e_review",
+      "execution_condition": "isolated review environment with native ps/process identity access",
+      "exit_code": 0,
+      "result": "21 passed, 68 deselected"
+    },
+    {
+      "name": "executor_boundaries",
+      "command": "PYTHONPATH=/private/tmp/g14r20_d_dependencies /Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_continuation_executor_boundaries.py --junitxml=artifacts/analysis/g14r20_e_review_20260909/executor_boundaries.junit.xml",
+      "cwd": "/private/tmp/ppo_mec_g14r20_e_review",
+      "execution_condition": "isolated review environment with native ps/process identity access",
+      "exit_code": 0,
+      "result": "71 passed"
+    },
+    {
+      "name": "identity_protection_startup_probe",
+      "command": "PYTHONPATH=/private/tmp/g14r20_d_dependencies /Users/howen/Projects/PPO_MEC/.venv/bin/python -B artifacts/analysis/g14r20_e_review_20260909/review_checks.py",
+      "cwd": "/private/tmp/ppo_mec_g14r20_e_review",
+      "exit_code": 0,
+      "result": "identity_evidence=true, protection=true, startup=true"
+    },
+    {
+      "name": "origin_launch_source_hash",
+      "command": "sha256sum /Users/howen/.codex/attachments/1b4faf5e-c59f-4c11-b0ba-f42ea9139616/pasted-text.txt",
+      "cwd": "/private/tmp/ppo_mec_g14r20_e_review",
+      "exit_code": 0,
+      "result": "23e4f6680763668548f569a58be153c1b3227371ac642ef48da0d15d2d38e1bc"
+    },
+    {
+      "name": "original_ledger_state_read_only",
+      "command": "parse phase_state.jsonl and cell_state.jsonl using Python json",
+      "cwd": "/private/tmp/ppo_mec_g14r20_e_review",
+      "exit_code": 0,
+      "result": "phase 15 records ending checkpoint_freeze/completed; cell 348 records, 174 committed"
+    }
+  ],
+  "prohibited_counts": {
+    "scientific_rollout": 0,
+    "real_v16_dispatch": 0,
+    "real_v16_write": 0,
+    "holdout_consumption": 0
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "files": [
+    {
+      "path": "command_log.json",
+      "sha256": "360b7fae741e703e1026236ef6ba650b75190485a622e162d565961c9e0f2419",
+      "size_bytes": 2872
+    },
+    {
+      "path": "current_dated_release_verification_proposal.md",
+      "sha256": "e594f1b81452fcbc120c80aeca78fb9c35e9fc31720398db8c78c120a00eb211",
+      "size_bytes": 3189
+    },
+    {
+      "path": "executor_boundaries.junit.xml",
+      "sha256": "c9eadc1165709cd3fbbc700d12361eb7fe6cd0f8b39ed0cfdbb57dd2e396376a",
+      "size_bytes": 10519
+    },
+    {
+      "path": "identity_and_evidence_review.md",
+      "sha256": "ff0d991ec9ab5807b13184a4de9082b6cef70b1b944f3970accc0b7b3dde5a7b",
+      "size_bytes": 3954
+    },
+    {
+      "path": "identity_evidence_recomputed.json",
+      "sha256": "a8edfd0b10e4594b0ef10927180536fdf765ac4bbb24636bd113ad3b5453bddb",
+      "size_bytes": 2354
+    },
+    {
+      "path": "independent_validation_matrix.md",
+      "sha256": "c933056b9f8b57906b5d305ac675ba5d298d96b3eb7d87436b0c793a0e55bfb6",
+      "size_bytes": 3413
+    },
+    {
+      "path": "owner_decision_packet.md",
+      "sha256": "cd607b770b71028ac1584d9ec81879093b6adf84211467d83556a45d2f2a3920",
+      "size_bytes": 4450
+    },
+    {
+      "path": "production_trust.junit.xml",
+      "sha256": "976cc1abd49174c770673e551fbd132012b315ca8e8b3fffefd5f65133f67ca3",
+      "size_bytes": 81165
+    },
+    {
+      "path": "production_trust_native_retry.junit.xml",
+      "sha256": "538768c9ba572e504728d80f4306e914da505f0af008a0d17d3e5bd421afb9e2",
+      "size_bytes": 3193
+    },
+    {
+      "path": "protection_recomputed.json",
+      "sha256": "171c29820940302eba079aa5908a13d7d24cd3147630fbbe3587d7307ce38448",
+      "size_bytes": 1667
+    },
+    {
+      "path": "review_checks.py",
+      "sha256": "cd746cb8f7942b946a3b4fed433a9e403a330f352c6247333cb5155cc5aa5f66",
+      "size_bytes": 15773
+    },
+    {
+      "path": "review_summary.json",
+      "sha256": "13c858cc5097e4f395a098d8d3e7e53f8946fce8b373d3a0088f3de5b69684d0",
+      "size_bytes": 2414
+    },
+    {
+      "path": "review_validation.json",
+      "sha256": "af71cea6b97a28356b473447f0d95442b8f78bbbc8b1a1254fbb76e1eceba0b0",
+      "size_bytes": 223
+    },
+    {
+      "path": "startup_handoff_operability_review.md",
+      "sha256": "1174eba7fd552f81238d8b292b25d56164829a048305c3b5b3aa40ecf6eef9c0",
+      "size_bytes": 3713
+    },
+    {
+      "path": "startup_operability_probe.json",
+      "sha256": "d5fb3a5924acba9966a37c82a2fa9878553decb25ff70abdc9486ec1257f4570",
+      "size_bytes": 1603
+    },
+    {
+      "path": "validate_review.py",
+      "sha256": "44ffbfc99f56fb12832f8249eb558d661173c490e13ef4c199a69f9fb6461eba",
+      "size_bytes": 1894
+    }
+  ],
+  "version": "1.0.0"
+}

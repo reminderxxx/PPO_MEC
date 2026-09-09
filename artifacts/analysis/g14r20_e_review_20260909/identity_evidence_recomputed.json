@@ -1,0 +1,69 @@
+{
+  "c_review_evidence": {
+    "manifest_entries": 25,
+    "manifest_mismatches": [],
+    "origin_launch_source_sha256": "23e4f6680763668548f569a58be153c1b3227371ac642ef48da0d15d2d38e1bc"
+  },
+  "d_junit": {
+    "errors": 0,
+    "failures": 0,
+    "path": "/private/tmp/ppo_mec_g14r20_d_delivery/artifacts/analysis/g14r20_d_production_trust_20260909/full_pytest.xml",
+    "skipped": 0,
+    "tests": 1520
+  },
+  "evidence": {
+    "commit": "35bec6320c211b4762ec7bee85e83d780424d3eb",
+    "manifest_entries": 61,
+    "manifest_mismatches": [],
+    "manifest_version": "1.0.0",
+    "parent": "876c369a1fa8cc33b19d782ab1ba230f021965a7",
+    "tree": "2b14c4d6e3d09a792ad36489b99dfb32bf7cec54"
+  },
+  "executor_identity": {
+    "declared_commit": "876c369a1fa8cc33b19d782ab1ba230f021965a7",
+    "declared_tree": "00f4c3e65811aad32b2fb0c1bdd16820262cc1b7",
+    "file_count": 22,
+    "file_mismatches": [],
+    "sha256": "8d64e52982e58a56f27ec0348fd7c456acc25fc196c00374290e2f872679e2dd"
+  },
+  "implementation": {
+    "commit": "876c369a1fa8cc33b19d782ab1ba230f021965a7",
+    "review_checkout_head": "876c369a1fa8cc33b19d782ab1ba230f021965a7",
+    "review_checkout_status": "",
+    "review_checkout_tree": "00f4c3e65811aad32b2fb0c1bdd16820262cc1b7",
+    "tree": "00f4c3e65811aad32b2fb0c1bdd16820262cc1b7"
+  },
+  "origin_release_git_chain": [
+    {
+      "commit": "834603a266bf06d30a070588a6e1f633eacf70e3",
+      "parent": "b642d27ee4426c9a7fc55bf49823c70568de8058",
+      "tree": "bb27526d4c394c5b3c9cace46adf2852a98968e2"
+    },
+    {
+      "commit": "3a8830328394fe114caadec02cb34696149d9fd8",
+      "parent": "834603a266bf06d30a070588a6e1f633eacf70e3",
+      "tree": "9ddb2bb513a2ad741a2991e0c3176f6f9f3182c2"
+    },
+    {
+      "commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+      "parent": "3a8830328394fe114caadec02cb34696149d9fd8",
+      "tree": "eb8e83c6e4532bc45c22fb7a816388e576753e30"
+    }
+  ],
+  "pass": true,
+  "protected_evidence_before_after_equal_except_time": {
+    "additions": true,
+    "count": true,
+    "ledgers": true,
+    "main": true,
+    "mismatches": true,
+    "proposal_sha256": true,
+    "user_files": true
+  },
+  "recomputed_at": "2026-09-09T16:53:14.340264+08:00",
+  "scientific": {
+    "commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+    "status": "",
+    "tree": "eb8e83c6e4532bc45c22fb7a816388e576753e30"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "metadata": {
+    "reviewed_at": "2026-09-09T16:53:18+08:00",
+    "literature_cutoff": "2026-09-06 (inherited; not refreshed)",
+    "target_venue": "IEEE Transactions on Mobile Computing (TMC); administrative release/trust review only",
+    "policy_version": "tmc_review_policy_v3_20260621",
+    "artifact_run_id": "typed_model_cache_formal_20260906_152847_g14c_v16",
+    "scientific_commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+    "implementation_commit": "876c369a1fa8cc33b19d782ab1ba230f021965a7",
+    "implementation_tree": "00f4c3e65811aad32b2fb0c1bdd16820262cc1b7",
+    "executor_identity_sha256": "8d64e52982e58a56f27ec0348fd7c456acc25fc196c00374290e2f872679e2dd",
+    "evidence_commit": "35bec6320c211b4762ec7bee85e83d780424d3eb",
+    "evidence_tree": "2b14c4d6e3d09a792ad36489b99dfb32bf7cec54",
+    "evidence_level": "E3_REPRODUCED for identity/protection/targeted boundaries and operability probe; E2_ARTIFACT_AUDITED for D full suite/full synthetic/read-only science; N/S science"
+  },
+  "verdict": {
+    "technical_acceptance": "fail",
+    "technical_acceptance_scope": "D production startup handoff and public operational path; shared core/transaction boundaries pass in isolated synthetic scope",
+    "startup_handoff_operability": "unsupported",
+    "origin_launch_evidence": "verified historical task evidence through checkpoint_freeze only",
+    "origin_release_evidence": "historical independent release attestation unavailable; historical release facts verified",
+    "proposed_release_qualification_path": "UNAPPROVED current-dated independent verification of historical release facts",
+    "production_trust_installation": "not_installed",
+    "continuation_approval": "not_issued",
+    "real_execution_authorized": false,
+    "scientific_performance_and_tmc_paper_ready": "not_evaluated"
+  },
+  "independent_validation": {
+    "distinct_test_cases": 160,
+    "production_trust_cases": 89,
+    "executor_boundary_cases": 71,
+    "all_cases_eventually_passed_with_native_process_access": true,
+    "d_full_suite": "1520 pass audited, not rerun",
+    "d_full_synthetic": "8 phases / 25 child dispatch audited, not rerun",
+    "protected_inventory_entries_recomputed": 107320,
+    "protected_mismatches": 0,
+    "protected_additions": 0
+  },
+  "execution_counts": {
+    "scientific_rollout": 0,
+    "real_v16_dispatch": 0,
+    "real_v16_write": 0,
+    "holdout_consumption": 0
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "direct_same_context": {
+    "approval_verified": true,
+    "domain": "synthetic",
+    "real_execution_authorized": false,
+    "request": {
+      "installation_id": "synthetic-installation",
+      "process_id": 81499,
+      "scope_sha256": "c206f788a1d680f7c7e86b44748db816ded4871a1693968d5ca02f6947a81d60",
+      "session_nonce": "d3dc85ca10c8402d9415cf45387a7c7c",
+      "version": "2.0.0"
+    }
+  },
+  "fixture_root": "/private/tmp/g14r20_e_startup_probe_37cnh6b_",
+  "missing_receipt": "[Errno 2] No such file or directory: '/private/tmp/g14r20_e_startup_probe_37cnh6b_/.continuation_locks/startup_receipt_test_only.json'",
+  "pass": true,
+  "probed_at": "2026-09-09T16:53:14.676459+08:00",
+  "public_cli": {
+    "has_startup_request_reference": false,
+    "qualification_calls_verify_before_identity_and_science": true,
+    "startup_mode_exit": 2,
+    "startup_mode_rejected_by_parser": true,
+    "supported_check_modes": [
+      "compatibility",
+      "qualification",
+      "execute"
+    ]
+  },
+  "stale_receipt": "startup receipt stale",
+  "two_independent_commands": {
+    "challenge_command_exit": 0,
+    "challenge_request": {
+      "installation_id": "synthetic-installation",
+      "process_id": 81518,
+      "scope_sha256": "c206f788a1d680f7c7e86b44748db816ded4871a1693968d5ca02f6947a81d60",
+      "session_nonce": "497fd9eb625d4eec84dd4c3bd69bf31e",
+      "version": "2.0.0"
+    },
+    "old_process_exited_before_verification": true,
+    "verification_command_exit": 2,
+    "verification_result": {
+      "reason": "startup challenge mismatch",
+      "status": "rejected"
+    }
+  }
+}
