@@ -37,7 +37,7 @@ class TestTrustFixture:
         self.state = self.coord / 'trust_continuity_test_only.json'
         self.initial = dict(installation_id=contract['trust_installation_id'], scope_sha256=digest(scope_for(contract)),
             sequence=-1, content_sha256=None, issued_at=(self.now-timedelta(seconds=10)).isoformat(),
-            observed_at=(self.now-timedelta(seconds=10)).isoformat())
+            observed_at=(self.now-timedelta(seconds=10)).isoformat(), revoked_ids=[], untrusted_signers=[])
         write(self.state, self.initial)
         Path(str(self.state)+'.lock').touch(exist_ok=False)
         record = self.root/'trust_installation_record_test_only.json'

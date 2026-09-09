@@ -229,3 +229,12 @@ def test_installation_boundary(trust, case):
     if case == 'startup_missing': trust.state.unlink()
     if case == 'wrong_pin': trust.context.pin['revocation']['public_key'] = '00'*32
     with pytest.raises((ContinuationError, OSError)): trust.verify()
+
+
+@pytest.mark.parametrize('field,value', [('revoked_ids', 'test-approval'), ('untrusted_signers', 'approver'), ('untrusted_signers', 'revoker')])
+def test_higher_sequence_cannot_erase_known_revocation(trust, field, value):
+    trust.publish(sequence=1, **{field: [value]})
+    with pytest.raises(ContinuationError): trust.verify()
+    trust.context = TrustContext(trust.checkpoint_for_restart(), test_only=True)
+    trust.publish(sequence=2)
+    with pytest.raises(ContinuationError, match='set rollback'): trust.verify()

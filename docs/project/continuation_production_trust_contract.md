@@ -20,6 +20,7 @@
 撤销 producer 发布签名 envelope，内容身份为 canonical message SHA-256。message 包含 version、
 installation_id、authority、source_id、scope、sequence、issued_at、expires_at、revoked_ids、untrusted_signers。
 序号必须非负整数；同序号不同内容、时间倒退、未来签发、过期、超过新鲜度均拒绝。
+撤销集合累积；更高序号也不得移除已知撤销 ID 或不可信 signer，恢复身份必须另走受审安装。
 未知/缺失/不可读/签名错误/主体及范围不符均拒绝。撤销所有证据核验 signer 与批准 signer 均检查。
 
 continuity 文件只能位于 coordination_root；初次安装由 trust owner 显式准备 checkpoint，验证器不自动初始化。

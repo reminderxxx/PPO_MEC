@@ -192,7 +192,7 @@ class TrustContext:
                 previous = read_json(self.state_path)
                 require(digest(previous) == self.expected, 'continuity missing, changed or restart checkpoint mismatch')
                 require(set(previous) == {'installation_id', 'scope_sha256', 'sequence', 'content_sha256',
-                        'issued_at', 'observed_at'} and previous['installation_id'] == p['installation_id']
+                        'issued_at', 'observed_at', 'revoked_ids', 'untrusted_signers'} and previous['installation_id'] == p['installation_id']
                         and previous['scope_sha256'] == digest(p['scope']), 'continuity schema/scope')
                 require(type(previous['sequence']) is int and previous['sequence'] >= -1,
                         'continuity sequence')
@@ -201,8 +201,12 @@ class TrustContext:
                 require(message['sequence'] >= previous['sequence'] and
                         (message['sequence'] != previous['sequence'] or content == previous['content_sha256']),
                         'revocation rollback or equivocation')
+                for field in ('revoked_ids', 'untrusted_signers'):
+                    require(isinstance(previous[field], list) and all(text(x) for x in previous[field])
+                            and set(previous[field]) <= set(message[field]), 'known revocation set rollback')
                 current = dict(installation_id=p['installation_id'], scope_sha256=digest(p['scope']),
-                    sequence=message['sequence'], content_sha256=content, issued_at=message['issued_at'], observed_at=now.isoformat())
+                    sequence=message['sequence'], content_sha256=content, issued_at=message['issued_at'], observed_at=now.isoformat(),
+                    revoked_ids=message['revoked_ids'], untrusted_signers=message['untrusted_signers'])
                 temp = self.state_path.with_name(self.state_path.name + '.' + uuid.uuid4().hex)
                 try:
                     with temp.open('xb') as stream:
