@@ -1,0 +1,61 @@
+{
+  "checks": [
+    {
+      "argv": [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "-I",
+        "-B",
+        "/private/tmp/g14r20_compile_import_e6a7335.py"
+      ],
+      "cwd": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+      "env": {
+        "PYTHONPATH": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+        "PYTHONNOUSERSITE": "1",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "exit_code": 0,
+      "evidence": "compile_import_report.json",
+      "execution_record": "Tool output observed; no separately captured stdout file."
+    },
+    {
+      "argv": [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "-I",
+        "-B",
+        "/private/tmp/g14r20_staging_refusal_e6a7335.py"
+      ],
+      "cwd": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+      "env": {
+        "PYTHONPATH": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+        "PYTHONNOUSERSITE": "1",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "exit_code": 0,
+      "evidence": "synthetic_staging_negative/report.json",
+      "execution_record": "Tool output observed; no separately captured stdout file."
+    },
+    {
+      "argv": [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "-I",
+        "-B",
+        "/private/tmp/g14r20_cli_trust_refusal_e6a7335.py"
+      ],
+      "cwd": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+      "env": {
+        "PYTHONPATH": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+        "PYTHONNOUSERSITE": "1",
+        "PYTHONDONTWRITEBYTECODE": "1"
+      },
+      "exit_code": 0,
+      "evidence": "cli_trust_refusal_report.json",
+      "execution_record": "Tool output observed; no separately captured stdout file."
+    }
+  ],
+  "collector_attempts": [
+    {
+      "helper": "g14r20_compatibility_details_e6a7335.py",
+      "reason": "Started before readonly report completed; input was still empty. Retried only after its producer completed; not an executor failure."
+    }
+  ]
+}

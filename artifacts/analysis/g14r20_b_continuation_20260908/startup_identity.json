@@ -1,0 +1,42 @@
+{
+  "checked_at": "2026-09-08T12:31:15.108014+00:00",
+  "development_commit": "62f432c68b05b8dcd148fde454dd71d1d9621d68",
+  "executor_worktree": "/private/tmp/ppo_mec_g14r20_b_62f432c",
+  "execution_commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+  "proposal_canonical_sha256": "7ab3b78e176fcc45089220c20f84d741fee332634cca42b907c731228eef99d2",
+  "proposal_file_sha256": "65f6fbe04fc717b1c74c8b06dee9ba0ea412ac0cd5c6b0888a9e104cc9c13cc8",
+  "protected_inventory_file_sha256": "b69434cc2e5bacdf633a0b3f6d2244569a1b0b19f222aea266709d2b914e544c",
+  "user_files": [
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/scripts/train_sa_ghmappo_real_sample.py",
+      "before_sha256": "aed850f5561f94ecba824e22bd323cdd142ee6c74255a3599129a2a6782e0eba"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/src/agents/sa_ghmappo_agent.py",
+      "before_sha256": "06638c1aea5097a7fa4088db6b77648648655053dc87e1a1c817b09a7709c171"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/src/agents/sa_ghmappo_core.py",
+      "before_sha256": "9951badce0ce78e608e690d6bed8d07a59d19dfef1e82f94a89d88403ac0d6b9"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/src/encoders/fusion_encoder.py",
+      "before_sha256": "cde948c13f487790cf255389bc26b7af191ecc66449a7e939b217c638327954d"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/src/evaluators/real_eval_support.py",
+      "before_sha256": "0a092cc15224b9b1be6a3476555c6e8eb8293573b3e27acf3fa91630db948cb6"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/tests/test_algo_pool_contract.py",
+      "before_sha256": "41f2ca2f6920940bc11cd16bbc4c96104452c5653812a2b69c0e1a8e6794e75b"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/tests/test_checkpoint_compat.py",
+      "before_sha256": "6b09b63b4a5cd9b527e7f3a146962ee37b9b1c9f8da78893d213b40bc6dc2cbf"
+    }
+  ],
+  "execution_authorized": false,
+  "state": "implementation_in_progress",
+  "note": "Baseline inspection only; full immutable inventory and acceptance not yet run."
+}

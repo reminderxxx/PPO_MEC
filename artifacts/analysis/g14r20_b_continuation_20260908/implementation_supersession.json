@@ -1,0 +1,1 @@
+{"previous_implementation": "0d25796a56e1cc9d48fe74093877e429e2da432e", "reason": "Synthetic proposal byte hash did not include the serialized trailing newline; real v16 was not modified.", "replacement_implementation": "e6a73357d08220d34ddc2d6537d140131c60520f", "replacement_verification": "technical_acceptance_pass", "status": "superseded_not_final_delivery"}

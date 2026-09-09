@@ -1,4 +1,4 @@
-> G14R20-B 实现合同（验证中）：[continuation_executor_contract.md](continuation_executor_contract.md)。真实执行批准仍为 false。
+> G14R20-B 实现合同（2026-09-09 技术验收通过）：[continuation_executor_contract.md](continuation_executor_contract.md)。真实执行批准仍为 false。 [验收报告](../../artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/acceptance_report.md)。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；

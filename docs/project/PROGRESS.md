@@ -1,4 +1,4 @@
-> 2026-09-08 G14R20-B：独立 executor 已进入开发验证，最终三层验收、真实只读复核及固定提交证据尚未闭合。真实 v16 未恢复，独立批准未签发；不得以开发测试通过替代最终验收。
+> 2026-09-09 G14R20-B：独立 executor 实现及隔离合成验收完成；真实 v16 未恢复，独立批准未签发，原始启动/发布证据仍 unavailable，v16-B 尚未获执行许可。 固定实现 `e6a73357d08220d34ddc2d6537d140131c60520f`；全仓 1431、定向 71 项通过，均 0 skipped。八阶段合成 child 25 次，科学 rollout、真实 dispatch/write 均 0；真实只读核验 150 checkpoints / 44 active / 6 generated。证据见 [验收报告](../../artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/acceptance_report.md)。下方 G14R20-A 的“执行器未实现”为当时历史状态。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；

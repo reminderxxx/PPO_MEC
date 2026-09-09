@@ -1,0 +1,13 @@
+{
+  "name": "full_pytest",
+  "argv": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "-m",
+    "pytest",
+    "tests",
+    "-q",
+    "--junitxml=/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/full_pytest.xml"
+  ],
+  "cwd": "/private/tmp/ppo_mec_g14r20_b_62f432c",
+  "executor_root": "/private/tmp/ppo_mec_g14r20_b_62f432c"
+}

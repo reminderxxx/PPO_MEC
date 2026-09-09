@@ -1,3 +1,5 @@
+> 2026-09-09 G14R20-B：独立 executor 实现及隔离合成验收完成；真实 v16 未恢复，独立批准未签发，原始启动/发布证据仍 unavailable，v16-B 尚未获执行许可。 技术通过不替代原始授权凭据和生产信任配置；当前 production signer map 为空。若后续配置改变源代码身份，需重新验收精确实现提交。合成结果不证明算法性能。证据见 [验收报告](../../artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/acceptance_report.md)；下方 A 状态为历史记录。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。

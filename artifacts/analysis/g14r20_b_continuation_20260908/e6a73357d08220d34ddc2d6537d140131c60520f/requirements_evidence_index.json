@@ -1,0 +1,96 @@
+{
+  "coverage": [
+    {
+      "evidence": [
+        "executor_identity.json",
+        "protected_final.json",
+        "../startup_identity.json"
+      ],
+      "requirement": "1_baseline_immutability"
+    },
+    {
+      "evidence": [
+        "unsigned_execution_contract.json",
+        "approval_request.json",
+        "cli_trust_refusal_report.json",
+        "serialized_test_only/contract_test_only.json"
+      ],
+      "requirement": "2_independent_objects_authorization"
+    },
+    {
+      "evidence": [
+        "compile_import_report.json",
+        "executor_verification.json",
+        "compatibility_details.json"
+      ],
+      "requirement": "3_fixed_executor_original_science"
+    },
+    {
+      "evidence": [
+        "compatibility_details.json",
+        "frozen_command_plans.json",
+        "synthetic_acceptance_report.json"
+      ],
+      "requirement": "4_eight_phase_commands_identities"
+    },
+    {
+      "evidence": [
+        "synthetic_acceptance_report.json",
+        "fault_and_boundary_cases.json",
+        "cli_trust_refusal_report.json"
+      ],
+      "requirement": "5_isolation_actual_counters"
+    },
+    {
+      "evidence": [
+        "targeted_pytest.xml",
+        "synthetic_acceptance_report.json",
+        "staging_refusal_report.json"
+      ],
+      "requirement": "6_three_layers"
+    },
+    {
+      "evidence": [
+        "fault_and_boundary_cases.json",
+        "targeted_pytest.xml",
+        "acceptance_summary.json"
+      ],
+      "requirement": "7_recovery_single_writer"
+    },
+    {
+      "evidence": [
+        "compile_import_report.json",
+        "compatibility_details.json",
+        "synthetic_acceptance_report.json",
+        "targeted_pytest.xml"
+      ],
+      "requirement": "8_environment_source"
+    },
+    {
+      "evidence": [
+        "readonly_compatibility.json",
+        "readonly_monitor.json",
+        "protected_final.json",
+        "approval_request.json"
+      ],
+      "requirement": "9_real_read_only"
+    },
+    {
+      "evidence": [
+        "full_pytest.xml",
+        "targeted_pytest.xml",
+        "smoke_command_result.json",
+        "artifact_integrity.json",
+        "versioned_evidence_manifest.json"
+      ],
+      "requirement": "10_validation_delivery"
+    }
+  ],
+  "implementation_commit": "e6a73357d08220d34ddc2d6537d140131c60520f",
+  "notes": [
+    "Git identities and remote synchronization are recorded in delivery_record.json after the separate evidence commit.",
+    "Synthetic authorization files contain test-only trust scoped to the isolated fixture, not production approval."
+  ],
+  "production_execution_authorized": false,
+  "status": "technical_acceptance_pass"
+}

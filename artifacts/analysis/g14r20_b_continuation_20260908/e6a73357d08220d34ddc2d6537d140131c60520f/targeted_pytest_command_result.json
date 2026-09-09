@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_continuation_executor_boundaries.py",
+    "-q",
+    "--junitxml=/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/targeted_pytest.xml"
+  ],
+  "cwd": "/private/tmp/ppo_mec_g14r20_b_62f432c",
+  "duration_seconds": 133.369055292,
+  "ended_at": "2026-09-09T02:37:55.426102+00:00",
+  "executor_commit_after": "e6a73357d08220d34ddc2d6537d140131c60520f",
+  "executor_commit_before": "e6a73357d08220d34ddc2d6537d140131c60520f",
+  "executor_root": "/private/tmp/ppo_mec_g14r20_b_62f432c",
+  "executor_status_after": "",
+  "executor_status_before": "",
+  "exit_code": 0,
+  "name": "targeted_pytest",
+  "started_at": "2026-09-09T02:35:42.059291+00:00"
+}

@@ -1,0 +1,69 @@
+{
+  "baseline": "62f432c68b05b8dcd148fde454dd71d1d9621d68",
+  "changed_files": [
+    "README.md",
+    "docs/project/CODE_MODULE_MAP.md",
+    "docs/project/DECISION_LOG.md",
+    "docs/project/DIRECTORY_STRUCTURE.md",
+    "docs/project/PROGRESS.md",
+    "docs/project/README.md",
+    "docs/project/RUNBOOK.md",
+    "docs/project/continuation_executor_contract.md",
+    "scripts/continuation_executor/__init__.py",
+    "scripts/continuation_executor/authorization.py",
+    "scripts/continuation_executor/cells.py",
+    "scripts/continuation_executor/checkpoints.py",
+    "scripts/continuation_executor/consumer_entry.py",
+    "scripts/continuation_executor/execution.py",
+    "scripts/continuation_executor/fixture_inputs.py",
+    "scripts/continuation_executor/identity.py",
+    "scripts/continuation_executor/isolation.py",
+    "scripts/continuation_executor/locking.py",
+    "scripts/continuation_executor/monitoring.py",
+    "scripts/continuation_executor/planning.py",
+    "scripts/continuation_executor/process_environment.py",
+    "scripts/continuation_executor/reconciliation.py",
+    "scripts/continuation_executor/scientific.py",
+    "scripts/continuation_executor/synthetic_chain.py",
+    "scripts/continuation_executor/synthetic_payload.py",
+    "scripts/execute_fixed_commit_continuation.py",
+    "scripts/run_fixed_commit_continuation_acceptance.py",
+    "tests/continuation_native_driver.py",
+    "tests/test_continuation_executor_boundaries.py",
+    "tests/test_formal_protocol_capability_routing_v24.py"
+  ],
+  "diff_check_command": [
+    "git",
+    "diff",
+    "--check",
+    "62f432c68b05b8dcd148fde454dd71d1d9621d68",
+    "HEAD"
+  ],
+  "diff_check_exit_code": 0,
+  "git_status": "",
+  "implementation_commit": "e6a73357d08220d34ddc2d6537d140131c60520f",
+  "src_changed": false,
+  "status": "pass",
+  "unchanged_boundaries": [
+    {
+      "path": "src/runtime/fixed_commit_continuation.py",
+      "sha256": "bcd5b964174efb39896c2178f51aa873dd6f82fe28d163679df8d992bdfdd5d3"
+    },
+    {
+      "path": "scripts/preflight_fixed_commit_continuation.py",
+      "sha256": "75c512412d5e8de281601c87d1c8d76e51bd3664a6e686cb8937e3ee102ff314"
+    },
+    {
+      "path": "scripts/probe_fixed_commit_continuation.py",
+      "sha256": "10443106602afd9fc3e224e79efef3cf94835a76d0136dd3715f6662bb3224ca"
+    },
+    {
+      "path": "scripts/run_typed_model_cache_formal_protocol.py",
+      "sha256": "010d87edc216d06762bd9a254370279a8aee5f642eb9a50ea9e56307e949666f"
+    },
+    {
+      "path": "docs/project/fixed_commit_continuation_contract.md",
+      "sha256": "e5b04432f0fd4aa14abdc4651e08b4dafd05ca71fd54e49add8897be65a6c474"
+    }
+  ]
+}

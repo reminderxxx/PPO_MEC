@@ -1,8 +1,8 @@
 # G14R20-B Continuation Execution Contract 1.0.0
 
-Status: implementation under validation; no production signer installed. Acceptance
-completion and exact commit identities must be supplied by the separate evidence
-record. This contract does not authorize v16 continuation or checkpoint evaluation.
+Status: isolated technical acceptance completed on 2026-09-09 for implementation
+`e6a73357d08220d34ddc2d6537d140131c60520f`; no production signer installed. Exact
+identities and validation results are in the separate [evidence report](../../artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/acceptance_report.md). This contract does not authorize v16 continuation or checkpoint evaluation.
 The A proposal schema and read-only entry remain unchanged.
 
 ## Objects and identities
@@ -122,5 +122,5 @@ Final evidence must bind the clean implementation commit and later separate
 record commit, command logs/JUnit/strict-format and hash checks, all fault cases,
 150 real checkpoint checks, 44 active and six generated resource checks, existing
 ledger/payload/environment validation, protected inventory and seven user-file
-start/end SHA-256. Missing coverage must remain explicitly unverified. This
-implementation draft is not the final acceptance report.
+start/end SHA-256. Missing coverage must remain explicitly unverified. The separate evidence report records the completed technical acceptance; this
+contract does not establish independent production authorization.

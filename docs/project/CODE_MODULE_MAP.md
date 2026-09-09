@@ -1,4 +1,4 @@
-> G14R20-B（实现验证中）：`scripts/continuation_executor/` 接管固定身份、独立授权、单写者和八阶段编排；科学 `src/` 与事务模块从原 `a6d1fd8` checkout 只读加载。原 public main 和 A schema/CLI 不变。职责与差异见 `continuation_executor_contract.md`。
+> G14R20-B（2026-09-09 技术验收通过）：`scripts/continuation_executor/` 接管固定身份、独立授权、单写者和八阶段编排；科学 `src/` 与事务模块从原 `a6d1fd8` checkout 只读加载。原 public main 和 A schema/CLI 不变。职责与差异见 `continuation_executor_contract.md`。 [验收报告](../../artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/acceptance_report.md)。
 
 # Code Module Map
 

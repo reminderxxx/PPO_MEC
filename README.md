@@ -1,4 +1,4 @@
-> G14R20-B：独立 continuation executor 正在隔离验证，合同与授权边界见 [continuation_executor_contract.md](docs/project/continuation_executor_contract.md)。真实 v16 未恢复，生产批准不可用；本条不代表验收完成。
+> 2026-09-09 G14R20-B：独立 executor 实现及隔离合成验收完成；真实 v16 未恢复，独立批准未签发，原始启动/发布证据仍 unavailable，v16-B 尚未获执行许可。 固定实现 `e6a73357d08220d34ddc2d6537d140131c60520f`；[验收报告](artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/acceptance_report.md)，[合同](docs/project/continuation_executor_contract.md)。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；

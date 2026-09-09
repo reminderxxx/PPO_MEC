@@ -1,4 +1,4 @@
-> G14R20-B（实现验证中）：`scripts/execute_fixed_commit_continuation.py` 为独立生产边界入口，`scripts/run_fixed_commit_continuation_acceptance.py` 为合成验收入口，共享代码在 `scripts/continuation_executor/`。合同见 `continuation_executor_contract.md`；证据根目录为 `artifacts/analysis/g14r20_b_continuation_20260908/`，合成 checkpoint 不提交。
+> G14R20-B（2026-09-09 技术验收通过）：`scripts/execute_fixed_commit_continuation.py` 为独立生产边界入口，`scripts/run_fixed_commit_continuation_acceptance.py` 为合成验收入口，共享代码在 `scripts/continuation_executor/`。合同见 `continuation_executor_contract.md`；证据根目录为 `artifacts/analysis/g14r20_b_continuation_20260908/`，合成 checkpoint 不提交。 [验收报告](../../artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/acceptance_report.md)。
 
 # Directory Structure
 

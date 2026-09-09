@@ -1,0 +1,19 @@
+{
+  "name": "synthetic",
+  "argv": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "-B",
+    "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/run_fixed_commit_continuation_acceptance.py",
+    "--executor-identity",
+    "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/executor_identity.json",
+    "--fixture-root",
+    "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/synthetic_acceptance_01"
+  ],
+  "cwd": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+  "env": {
+    "PYTHONPATH": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+    "PYTHONNOUSERSITE": "1",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "executor_root": "/private/tmp/ppo_mec_g14r20_b_62f432c"
+}

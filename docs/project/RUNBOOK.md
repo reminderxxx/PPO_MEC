@@ -1,4 +1,4 @@
-> G14R20-B（实现验证中）：新增 `scripts/execute_fixed_commit_continuation.py`，默认 qualification；缺独立批准会在任何锁/写入/dispatch 前拒绝。`--check compatibility` 只读。合成验收独立入口为 `scripts/run_fixed_commit_continuation_acceptance.py`，要求精确 clean executor identity、新建 synthetic fixture、原 checkout cwd 和原 Python。详见 `continuation_executor_contract.md`；目前不得将开发验证称为最终验收。
+> G14R20-B（2026-09-09 技术验收通过）：新增 `scripts/execute_fixed_commit_continuation.py`，默认 qualification；缺独立批准会在任何锁/写入/dispatch 前拒绝。`--check compatibility` 只读。合成验收独立入口为 `scripts/run_fixed_commit_continuation_acceptance.py`，要求精确 clean executor identity、新建 synthetic fixture、原 checkout cwd 和原 Python。详见 `continuation_executor_contract.md`；精确实现提交为 `e6a73357d08220d34ddc2d6537d140131c60520f`，真实执行批准仍不可用。 [验收报告](../../artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/acceptance_report.md)。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；

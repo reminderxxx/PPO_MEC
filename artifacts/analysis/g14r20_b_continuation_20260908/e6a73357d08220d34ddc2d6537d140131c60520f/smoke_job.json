@@ -1,0 +1,9 @@
+{
+  "name": "smoke",
+  "argv": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "scripts/smoke_test.py"
+  ],
+  "cwd": "/private/tmp/ppo_mec_g14r20_b_62f432c",
+  "executor_root": "/private/tmp/ppo_mec_g14r20_b_62f432c"
+}

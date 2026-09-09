@@ -1089,3 +1089,7 @@ claim map 必须报告 `UNAVAILABLE`。
 ## 2026-09-08 G14R20-B 实现边界（验收中）
 
 独立 executor 固定自己的提交；原科学执行身份不改写。生产信任表保持为空。原 public 新 run 发布门禁不变，A 仍只接收未授权 proposal。单写者锁位于合同明确绑定的 run 外 coordination 目录，避免可变 owner 状态破坏原 artifact integrity。具体规则与待验收项见 `continuation_executor_contract.md`。
+
+## 2026-09-09 G14R20-B 固定实现验收闭合
+
+实现固定为 `e6a73357d08220d34ddc2d6537d140131c60520f`，证据独立提交。最终验收使用落盘后重新读取的 synthetic proposal/contract/approval/command plan，并核对原始字节 hash；此前 `0d25796a56e1cc9d48fe74093877e429e2da432e` 的合成 proposal 换行字节问题已修复，其证据不作为最终交付。科学来源仍为原 a6d1fd8，未改写原 run、context/binding 或 A proposal；当前生产 signer map 为空，不签发真实批准。完整三层及恢复证据见 [验收报告](../../artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/acceptance_report.md)。

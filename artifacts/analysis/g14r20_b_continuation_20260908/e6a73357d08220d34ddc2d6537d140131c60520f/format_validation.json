@@ -1,0 +1,1 @@
+{"checked_at":"2026-09-09T03:05:18.477870+00:00","counts":{"json":538,"jsonl":3,"jsonl_records":432,"xml":2},"duplicate_keys_forbidden":true,"nonfinite_json_forbidden":true,"scope":"all JSON/JSONL/XML in the acceptance directory; Git internals excluded; format report additionally round-tripped","status":"pass"}
