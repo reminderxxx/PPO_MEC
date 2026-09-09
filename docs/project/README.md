@@ -1,4 +1,5 @@
-> G14R20-F 公共启动合同（实现验收中）：[continuation_startup_handoff_contract.md](continuation_startup_handoff_contract.md)。生产信任未安装，真实执行批准仍为 false。
+> G14R20-F1 修复 challenge 后快速 receipt 被误判为 legacy 的竞态；公共启动合同见
+> [continuation_startup_handoff_contract.md](continuation_startup_handoff_contract.md)。生产信任未安装，真实执行批准仍为 false。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；

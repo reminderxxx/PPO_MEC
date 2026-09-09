@@ -6,7 +6,9 @@ every production root/domain.
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
+import stat
 import sys
 import uuid
 
@@ -15,6 +17,9 @@ from .identity import ContinuationError, canonical, within
 
 class ProductionStartupBinding:
     domain = "production"
+
+    def after_startup_event(self, row):
+        del row
 
     def context(self, contract):
         if contract["domain"] != "production" or contract["fixture_root"] is not None:
@@ -59,6 +64,21 @@ class SyntheticAcceptanceBinding:
         from .production_trust import TrustContext
         self._context = TrustContext(self.pin, test_only=True)
         return self._context
+
+    def after_startup_event(self, row):
+        """Optional FIFO barrier owned solely by the synthetic acceptance driver."""
+        if row.get("event") != "challenge":
+            return
+        barrier = self.fixture / "challenge_release_test_only.fifo"
+        try:
+            mode = os.stat(barrier, follow_symlinks=False).st_mode
+        except FileNotFoundError:
+            return
+        if not stat.S_ISFIFO(mode):
+            raise ContinuationError("synthetic challenge barrier is not a FIFO")
+        with barrier.open("rb", buffering=0) as stream:
+            if stream.read(1) != b"1":
+                raise ContinuationError("synthetic challenge barrier was not released")
 
     def verify(self, contract, approval, context, now):
         from .authorization import verify_approval

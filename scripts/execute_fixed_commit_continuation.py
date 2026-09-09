@@ -70,6 +70,10 @@ def main(argv=None, *, _startup_binding=None):
         wait_seconds = validate_wait_seconds(args.startup_wait_seconds)
         context = binding.context(contract)
 
+        def emit_startup_event(row):
+            _emit(row)
+            binding.after_startup_event(row)
+
         def verify(now):
             nonlocal final_authorization
             final_authorization = binding.verify(contract, approval, context, now)
@@ -88,7 +92,8 @@ def main(argv=None, *, _startup_binding=None):
             return report
 
         authorization, report, material = run_startup_operation(
-            context, verify, operate, timeout_seconds=wait_seconds, emit=_emit)
+            context, verify, operate, timeout_seconds=wait_seconds,
+            emit=emit_startup_event)
         _emit(event("terminal", "completed" if args.check == "execute" else "qualified",
                     result=report, handoff_material=material,
                     execution_authorized=authorization["real_execution_authorized"]))

@@ -694,9 +694,12 @@
 ## 2026-09-09 G14R20-F
 
 - `execute_fixed_commit_continuation.py`：静态输入后创建单一 startup context，并驱动 JSONL 公共宿主。
-- `continuation_executor/startup.py`：不导入科学模块；负责固定锁、有界 receipt 等待、终结事件和独立 custody 复核。
-- `continuation_executor/startup_binding.py`：production 绑定只能使用源码安装；synthetic 绑定只允许测试根且零科学能力。
-- `continuation_executor/public_startup_acceptance.py`：以两个真实 PID 驱动公共 parser/main 与 test custodian。
+- `continuation_executor/startup.py`：不导入科学模块；负责锁内 challenge 前 receipt 基线、固定锁、有界等待、终结事件
+  和独立 custody 复核。
+- `continuation_executor/startup_binding.py`：production 绑定只能使用源码安装；synthetic 绑定只允许测试根且零科学能力，
+  并提供验收专用 challenge FIFO barrier。
+- `continuation_executor/public_startup_acceptance.py`：以两个真实 PID 驱动公共 parser/main 与 test custodian，覆盖
+  challenge 后、waiting 前的确定性立即签发。
 - `production_trust.py`：installation schema 增加预置 `startup_lock_path`；continuity 短锁和签名验证语义不变。
 
 依赖方向保持 `public CLI → startup/binding → authorization/production_trust`；科学 `QualifiedRun/execution` 只在

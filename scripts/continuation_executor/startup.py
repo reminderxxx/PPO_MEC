@@ -110,16 +110,15 @@ def interrupt_boundary():
         signal.signal(signal.SIGTERM, previous)
 
 
-def wait_for_new_receipt(context, *, timeout_seconds, emit):
+def wait_for_new_receipt(context, *, baseline, timeout_seconds, emit):
     timeout_seconds = validate_wait_seconds(timeout_seconds)
-    before = receipt_identity(str(context.receipt_path))
-    emit(event("waiting", "legacy_receipt_ignored" if before["state"] == "present" else "receipt_pending",
-               receipt_path=str(context.receipt_path), initial_receipt=before,
+    emit(event("waiting", "legacy_receipt_ignored" if baseline["state"] == "present" else "receipt_pending",
+               receipt_path=str(context.receipt_path), initial_receipt=baseline,
                timeout_seconds=timeout_seconds, clock="monotonic"))
     deadline = time.monotonic() + timeout_seconds
     while True:
         current = receipt_identity(str(context.receipt_path))
-        if current != before:
+        if current != baseline:
             if current["state"] != "present":
                 raise ContinuationError("new startup receipt is not a regular file")
             return current
@@ -141,9 +140,11 @@ def run_startup_operation(context, verify, operate, *, timeout_seconds=DEFAULT_W
                           emit=lambda value: None):
     request = context.startup_request()
     with StartupCoordinator(context), interrupt_boundary():
+        receipt_baseline = receipt_identity(str(context.receipt_path))
         emit(event("challenge", "published", request=request,
                    receipt_path=str(context.receipt_path)))
-        wait_for_new_receipt(context, timeout_seconds=timeout_seconds, emit=emit)
+        wait_for_new_receipt(context, baseline=receipt_baseline,
+                             timeout_seconds=timeout_seconds, emit=emit)
         authorization = verify(datetime.now(timezone.utc))
         emit(event("qualification", "accepted", request=request,
                    authorization=authorization))

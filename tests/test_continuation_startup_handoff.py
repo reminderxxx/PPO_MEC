@@ -1,6 +1,7 @@
 """Startup host/custodian boundaries; all trust is synthetic and test-only."""
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
+import multiprocessing
 import os
 from pathlib import Path
 
@@ -79,6 +80,48 @@ def test_missing_receipt_times_out_without_continuity_write(trust):
                               timeout_seconds=.05)
     assert Path(trust.pin["continuity_path"]).read_bytes() == before
     assert context.expected is None
+
+
+@pytest.mark.parametrize("initial_receipt", ["missing", "legacy"])
+def test_receipt_published_before_wait_initialization_is_accepted(trust, initial_receipt):
+    """A custodian may answer the flushed challenge without waiting for waiting."""
+    if initial_receipt == "missing":
+        Path(trust.pin["startup_receipt_path"]).unlink()
+    context = TrustContext(trust.pin, test_only=True)
+    process_context = multiprocessing.get_context("fork")
+    host_end, custodian_end = process_context.Pipe()
+
+    def custodian():
+        request = custodian_end.recv()
+        trust.publish_receipt(request, digest(trust.initial))
+        custodian_end.send("published")
+
+    signer = process_context.Process(target=custodian)
+    signer.start()
+
+    def emit(row):
+        if row["event"] == "challenge":
+            host_end.send(row["request"])
+            assert host_end.poll(2), "custodian did not cross the publication barrier"
+            assert host_end.recv() == "published"
+
+    try:
+        authorization, _, _ = run_startup_operation(
+            context,
+            lambda now: verify_approval(
+                trust.contract, trust.approval, test_trust_context=context, now=now
+            ),
+            lambda grant: None,
+            timeout_seconds=.15,
+            emit=emit,
+        )
+    finally:
+        signer.join(2)
+        if signer.is_alive():
+            signer.kill()
+            signer.join()
+    assert signer.exitcode == 0
+    assert authorization["approval_verified"]
 
 
 @pytest.mark.parametrize("case", ["schema", "signature", "authority", "expired",

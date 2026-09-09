@@ -1839,3 +1839,15 @@ G14R20-D 正在独立 B 基线分支实现 continuation 授权 2.0.0。真实 la
   独立 continuity custody 复核。qualification/execute 全部 authorization callback 绑定同一 context。
 - production installation 保持空；synthetic-only binding 只能在测试根执行显式 synthetic dispatch。最终精确
   commit/identity、公共正负例、全仓与保护计数须由后续独立证据提交填写；本段不提前宣称验收完成。
+
+## 2026-09-09 G14R20-F1 fast receipt race
+
+- synthetic 根因复现以独立 custodian 进程和显式进程 barrier 固定交错：custodian 在 challenge 回调内完成真实
+  Ed25519 签名和原子发布，旧代码在随后初始化 receipt 基线，将新 receipt 误作 legacy；missing/legacy 两种
+  初态均确定性超时。
+- 最小修复只调整 startup 时序：宿主持有 fixed-inode startup lock 后先读取固定 receipt 基线，再发布并 flush
+  challenge；等待函数必须消费该既定基线。context、nonce、PID、验签、authority/scope/checkpoint/time 校验、
+  有界单调等待和 JSONL 合同不变。
+- 公共 synthetic 验收绑定增加测试专用 FIFO barrier，用于证明独立 custodian 不等待 `waiting` 也能安全签发；
+  production binding 不建立 barrier 或信任。精确 executor commit/identity、全仓与保护结果由独立证据提交记录。
+  production trust 仍未安装，continuation approval 未签发，`real_execution_authorized=false`。

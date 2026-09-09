@@ -1,4 +1,4 @@
-# G14R20-F Public Startup Handoff Contract 1.0.0
+# G14R20-F Public Startup Handoff Contract 1.0.1
 
 日期：2026-09-09。状态：实现与 synthetic-only 隔离验收；不是生产安装或真实 continuation 批准。
 
@@ -6,8 +6,9 @@
 
 `scripts/execute_fixed_commit_continuation.py` 的 `qualification`/`execute` 在同一进程内固定执行：静态
 proposal/contract/executor identity 与源码内 installation 身份校验；创建一个 `TrustContext`；取得安装预置
-`startup_lock_path` 的 fixed-inode 非阻塞独占锁；输出并 flush challenge；以单调时钟有界等待固定
-`startup_receipt_path` 的一次新发布；按等待结束时的可信 UTC 调用真实 `verify_approval`；再 qualification；本次
+`startup_lock_path` 的 fixed-inode 非阻塞独占锁；在持锁状态读取固定 `startup_receipt_path` 基线；输出并 flush
+challenge；相对于该既定基线以单调时钟有界等待一次新发布；按等待结束时的可信 UTC 调用真实
+`verify_approval`；再 qualification；本次
 请求为 `execute` 时继续执行。首次资格校验、锁前/后及执行器内的全部 authorization callback 复用该 context。
 
 `compatibility` 保持既有只读行为，不建立生产信任。两条独立命令会创建不同 nonce/PID/context；前一命令回执
@@ -21,8 +22,10 @@ proposal/contract/executor identity 与源码内 installation 身份校验；创
 `continuity_path + '.lock'` 分离。第二宿主以 `STARTUP_HOST_BUSY` fail-closed，不发布 challenge、不改 receipt、
 continuity、原 run 或第一宿主。authority 原子发布 receipt 不获取 startup host 锁。
 
-宿主不删除 fixed-position 旧 receipt。challenge 输出后先记录旧文件 identity；只接受随后一次 create/replace/
-content change。新候选一旦出现即只验证一次；schema、签名、authority、checkpoint、nonce、PID、时间或 scope
+宿主不删除 fixed-position 旧 receipt。宿主在持有 startup lock 时、challenge 输出前记录旧文件 identity；等待函数
+必须消费该既定基线，不得在 challenge flush 后重新初始化基线。只接受 challenge 后相对于基线的一次 create/
+replace/content change；custodian 可在收到 challenge 后立即签发，无须等待 `waiting` 状态。新候选一旦出现即只验证
+一次；schema、签名、authority、checkpoint、nonce、PID、时间或 scope
 错误均终结本 context，不换 nonce、不重试。timeout/SIGINT/SIGTERM 在准入前不写 continuity 或原 run；进程
 崩溃由 kernel 释放 startup lock，下一宿主仍须新 challenge/receipt。
 
@@ -65,7 +68,9 @@ challenge 和 handoff material；函数从固定 installation 重新读取 conti
 `run_fixed_commit_continuation_acceptance.py` 内置源码受控的 `SyntheticAcceptanceBinding`，只能用于新建
 `synthetic_*` fixture/run；它通过同一公共 parser/main/startup/`verify_approval` 路径执行一个明确计数的
 synthetic dispatch，且固定报告 real v16/scientific rollout/holdout 为 0。绑定不是生产 CLI 参数，不能从 env、
-proposal 或 approval 建立 production trust。公共宿主与 test custodian 为不同真实 PID；custodian 从输出和固定
+proposal 或 approval 建立 production trust。验收专用 FIFO barrier 可确定性地暂停 synthetic host 于已 flush
+challenge 与等待提示之间，使独立 custodian 完成真实签名和原子发布；它不进入 production binding。公共宿主与
+test custodian 为不同真实 PID；custodian 从输出和固定
 文件复算 checkpoint，不读取 `context.expected`。该绑定和验收入口均进入完整 executor identity。
 
 生产状态保持：`PRODUCTION_INSTALLATION=None`、release unavailable、continuation not issued、

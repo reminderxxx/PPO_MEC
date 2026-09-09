@@ -12,7 +12,7 @@ import sys
 
 from . import PHASES
 from .authorization import validate_contract
-from .identity import canonical, digest, file_hash, git
+from .identity import canonical, digest, file_hash, git, read_json
 from .startup import atomic_publish_receipt, verify_handoff_for_custody
 from .test_trust_fixture import TestTrustFixture, signed, write
 
@@ -131,6 +131,32 @@ def start_and_challenge(entry, paths, *, check="execute", wait=5.0):
             return process, events, None
 
 
+def start_and_publish_before_wait(entry, paths, publish, *, check="execute", wait=5.0):
+    """Release a synthetic FIFO only after the custodian atomically publishes."""
+    fixture = Path(read_json(paths["installation"])["fixture_root"])
+    barrier = fixture / "challenge_release_test_only.fifo"
+    os.mkfifo(barrier)
+    process = subprocess.Popen(_command(entry, paths, check=check, wait=wait), cwd=Path.cwd(),
+        env=_host_environment(), text=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    events = []
+    try:
+        challenge = _next_event(process)
+        events.append(challenge)
+        if challenge.get("event") != "challenge":
+            raise RuntimeError("public host did not publish challenge before barrier")
+        publish(challenge["request"])
+        with barrier.open("wb", buffering=0) as stream:
+            stream.write(b"1")
+        waiting = _next_event(process)
+        events.append(waiting)
+        if waiting.get("event") != "waiting":
+            raise RuntimeError("public host did not emit waiting after barrier")
+        return process, events, challenge["request"]
+    finally:
+        barrier.unlink(missing_ok=True)
+
+
 def finish(process, events):
     for line in process.stdout:
         events.append(json.loads(line))
@@ -144,14 +170,31 @@ def run_public_startup_acceptance(root, identity, entry):
     prior = trust.initial
     custodian_pid = os.getpid()
 
-    host, events, challenge = start_and_challenge(entry, paths)
-    trust.publish_receipt(challenge, digest(prior))
+    # The fixture starts with a legacy receipt.  The independent custodian replaces it
+    # after challenge but before waiting, using an explicit cross-process FIFO barrier.
+    host, events, challenge = start_and_publish_before_wait(
+        entry, paths, lambda request: trust.publish_receipt(request, digest(prior)))
     code, events, stderr = finish(host, events)
     if code or stderr or events[-1].get("status") != "completed":
         raise RuntimeError("public startup positive failed: " + stderr + repr(events[-1:]))
     terminal = events[-1]
     custody = verify_handoff_for_custody(trust.pin, prior, challenge,
                                          terminal["handoff_material"])
+
+    # The same pre-wait publication path also accepts creation at a missing location.
+    Path(trust.pin["startup_receipt_path"]).unlink()
+    fast_missing, fast_missing_events, fast_missing_challenge = start_and_publish_before_wait(
+        entry, paths,
+        lambda request: trust.publish_receipt(request, custody["checkpoint_sha256"]),
+        check="qualification")
+    fast_missing_code, fast_missing_events, fast_missing_stderr = finish(
+        fast_missing, fast_missing_events)
+    if (fast_missing_code or fast_missing_stderr
+            or fast_missing_events[-1].get("status") != "qualified"):
+        raise RuntimeError("fast receipt creation at missing location failed")
+    fast_missing_custody = verify_handoff_for_custody(
+        trust.pin, custody["state"], fast_missing_challenge,
+        fast_missing_events[-1]["handoff_material"])
 
     # Missing fixed receipt is a failure-only probe; it never creates success.
     Path(trust.pin["startup_receipt_path"]).unlink()
@@ -164,22 +207,24 @@ def run_public_startup_acceptance(root, identity, entry):
 
     negative_receipts = {}
     for case in ("schema", "signature", "authority", "checkpoint", "nonce", "pid", "expired"):
-        candidate, candidate_events, candidate_challenge = start_and_challenge(
-            entry, paths, check="qualification")
-        message = {**candidate_challenge, "authority": "revoker",
-            "checkpoint_sha256": custody["checkpoint_sha256"],
-            "issued_at": trust.now.isoformat(),
-            "expires_at": (trust.now+timedelta(hours=1)).isoformat()}
-        if case == "schema": message["extra"] = True
-        if case == "authority": message["authority"] = "other"
-        if case == "checkpoint": message["checkpoint_sha256"] = "0"*64
-        if case == "nonce": message["session_nonce"] = "wrong"
-        if case == "pid": message["process_id"] += 1
-        if case == "expired": message["expires_at"] = trust.now.isoformat()
-        receipt = signed(message, "revoker", trust.keys["revoker"])
-        if case == "signature": receipt["signature"] = "00"*64
+        def publish_invalid(request, receipt_case=case):
+            message = {**request, "authority": "revoker",
+                "checkpoint_sha256": fast_missing_custody["checkpoint_sha256"],
+                "issued_at": trust.now.isoformat(),
+                "expires_at": (trust.now+timedelta(hours=1)).isoformat()}
+            if receipt_case == "schema": message["extra"] = True
+            if receipt_case == "authority": message["authority"] = "other"
+            if receipt_case == "checkpoint": message["checkpoint_sha256"] = "0"*64
+            if receipt_case == "nonce": message["session_nonce"] = "wrong"
+            if receipt_case == "pid": message["process_id"] += 1
+            if receipt_case == "expired": message["expires_at"] = trust.now.isoformat()
+            receipt = signed(message, "revoker", trust.keys["revoker"])
+            if receipt_case == "signature": receipt["signature"] = "00"*64
+            atomic_publish_receipt(trust.pin["startup_receipt_path"], receipt)
+
         before_state = Path(trust.pin["continuity_path"]).read_bytes()
-        atomic_publish_receipt(trust.pin["startup_receipt_path"], receipt)
+        candidate, candidate_events, candidate_challenge = start_and_publish_before_wait(
+            entry, paths, publish_invalid, check="qualification")
         candidate_code, candidate_events, candidate_stderr = finish(candidate, candidate_events)
         if (candidate_code != 2 or candidate_stderr
                 or candidate_events[-1].get("status") != "rejected"
@@ -215,11 +260,11 @@ def run_public_startup_acceptance(root, identity, entry):
     second_events = [json.loads(line) for line in second.stdout.splitlines()]
     if second.returncode != 2 or second_events[-1].get("reason_code") != "STARTUP_HOST_BUSY":
         raise RuntimeError("concurrent startup host did not fail closed")
-    trust.publish_receipt(first_challenge, custody["checkpoint_sha256"])
+    trust.publish_receipt(first_challenge, fast_missing_custody["checkpoint_sha256"])
     first_code, first_events, first_stderr = finish(first, first_events)
     if first_code or first_stderr:
         raise RuntimeError("first concurrent host was disturbed")
-    custody2 = verify_handoff_for_custody(trust.pin, custody["state"], first_challenge,
+    custody2 = verify_handoff_for_custody(trust.pin, fast_missing_custody["state"], first_challenge,
                                           first_events[-1]["handoff_material"])
 
     # After release, a third fresh process gets a fresh receipt and succeeds.
@@ -230,21 +275,24 @@ def run_public_startup_acceptance(root, identity, entry):
         raise RuntimeError("fresh post-release startup failed")
     custody3 = verify_handoff_for_custody(trust.pin, custody2["state"], third_challenge,
                                           third_events[-1]["handoff_material"])
-    requests = [challenge, missing_challenge, stale_challenge, interrupted_challenge, crashed_challenge,
-                first_challenge, third_challenge]
+    requests = [challenge, fast_missing_challenge, missing_challenge, stale_challenge,
+                interrupted_challenge, crashed_challenge, first_challenge, third_challenge]
     if len({row["session_nonce"] for row in requests}) != len(requests):
         raise RuntimeError("startup nonce reused")
     return {"status": "pass", "public_parser_main": True,
         "host_pid": challenge["process_id"], "custodian_pid": custodian_pid,
         "roles_are_separate_processes": challenge["process_id"] != custodian_pid,
-        "positive_events": events, "missing_receipt_events": missing_events,
+        "positive_events": events, "fast_legacy_replacement_events": events,
+        "fast_missing_creation_events": fast_missing_events,
+        "delayed_receipt_events": first_events,
+        "missing_receipt_events": missing_events,
         "old_receipt_events": stale_events,
         "invalid_receipt_events": negative_receipts,
         "interrupted_events": interrupted_events, "crashed_events": crashed_events,
         "crash_exit_code": crashed_code,
         "concurrent_second_events": second_events, "concurrent_first_events": first_events,
         "post_release_events": third_events,
-        "custody_checkpoints": [custody, custody2, custody3],
+        "custody_checkpoints": [custody, fast_missing_custody, custody2, custody3],
         "synthetic_dispatch_count": 1, "scientific_rollout_count": 0,
         "real_v16_dispatch_count": 0, "real_v16_write_count": 0,
         "holdout_consumption_count": 0}

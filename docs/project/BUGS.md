@@ -583,6 +583,9 @@ G14R20-D 明确剩余人工边界：签名不能证明原件来源/语义、host
 
 ## 2026-09-09 G14R20-F startup handoff
 
+- `RESOLVED IN G14R20-F1 / fast receipt race`：旧实现先 flush challenge、后读取 receipt 基线；challenge 后立即
+  原子发布的合法 receipt 会被误作 legacy 并超时。现由持有 startup lock 的宿主在 challenge 前固定基线，等待
+  函数只消费该基线；`waiting` 不再是 custodian 的签发同步条件。
 - `RESOLVED IN IMPLEMENTATION / public operability`：公共入口现能在同一进程输出 challenge、有界等 receipt、真实
   验签并继续 qualification/execute；两条独立命令不再被误作一次 handoff。
 - `RESOLVED IN IMPLEMENTATION / concurrent startup`：独立预置 startup lock 防止第二宿主覆盖第一宿主 receipt/
