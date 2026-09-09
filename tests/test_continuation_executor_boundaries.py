@@ -352,3 +352,29 @@ def test_actual_external_import_pollution_rejected(tmp_path, kind):
         env=dict(os.environ,PYTHONPATH=old,PYTHONNOUSERSITE="1",PYTHONDONTWRITEBYTECODE="1"),capture_output=True,text=True)
     assert result.returncode!=0 and expected in result.stderr
     assert before=={str(p):file_hash(p) for p in tmp_path.rglob("*") if p.is_file()}
+
+
+@pytest.mark.parametrize("mutation", ["none", "proposal_bytes", "command_plan", "approval_signature"])
+def test_serialized_fixture_authorization_roundtrip(fixture, tmp_path, mutation):
+    from scripts.continuation_executor.authorization import load_fixture_authorization
+    p, identity, contract, authority = fixture
+    proposal_path=tmp_path/"proposal_test_only.json"
+    proposal_path.write_bytes(canonical(p)+b"\n")
+    contract["proposal_file_sha256"]=file_hash(proposal_path)
+    approval=sign(contract,authority)
+    for name,value in (("contract_test_only.json",contract),("approval_test_only.json",approval),
+                       ("authority_test_only.json",authority),("executor_identity.json",identity),
+                       ("command_plan_test_only.json",{})):
+        (tmp_path/name).write_bytes(canonical(value)+b"\n")
+    if mutation=="proposal_bytes":
+        proposal_path.write_bytes(proposal_path.read_bytes()+b"\n")
+    elif mutation=="command_plan":
+        (tmp_path/"command_plan_test_only.json").write_bytes(canonical({"changed":True}))
+    elif mutation=="approval_signature":
+        approval["signature"]="0"*64
+        (tmp_path/"approval_test_only.json").write_bytes(canonical(approval))
+    if mutation=="none":
+        loaded=load_fixture_authorization(tmp_path,identity)
+        assert loaded["proposal"]==p and loaded["plans"]=={}
+    else:
+        with pytest.raises(ContinuationError):load_fixture_authorization(tmp_path,identity)

@@ -9,7 +9,7 @@ import sys
 from types import SimpleNamespace
 
 from . import PHASES
-from .authorization import approval_message, validate_contract, verify_approval
+from .authorization import approval_message, validate_contract, verify_approval, load_fixture_authorization
 from .execution import execute_phase
 from .fixture_inputs import build_core, build_checkpoints, load_prepared_core, write
 from .identity import canonical, digest, file_hash, read_json
@@ -96,7 +96,7 @@ def run_chain(fixture, native, executor_identity, *, prepared=False):
         prefixes.append(dict(path=str(path),kind=kind,record_count=len(rows),byte_count=len(data),
             prefix_sha256=hashlib.sha256(data).hexdigest(),terminal_hash=rows[-1][key],run_identity_fingerprint=rows[0]["run_identity_fingerprint"]))
     proposal=dict(run_id=root.name,run_root=str(root),ledgers=prefixes)
-    contract=dict(version="1.0.0",domain="synthetic",proposal_sha256=digest(proposal),proposal_file_sha256=digest(proposal),
+    contract=dict(version="1.0.0",domain="synthetic",proposal_sha256=digest(proposal),proposal_file_sha256=hashlib.sha256(canonical(proposal)+b"\n").hexdigest(),
         executor_identity_sha256=digest(executor_identity),run_id=root.name,run_root=str(root),phases=list(PHASES),
         holdout_capability=False,prefixes=prefixes,immutable_files=[dict(path=str(path),sha256=file_hash(path),size_bytes=path.stat().st_size)
             for path in (launcher,hooks/"sitecustomize.py",root/"generated_checkpoint_resource_registry.json",
@@ -109,8 +109,10 @@ def run_chain(fixture, native, executor_identity, *, prepared=False):
     message=approval_message(contract,evidence)
     approval=dict(message=message,signer_id="fixture-only",signature=hmac.new(bytes.fromhex(authority["key_hex"]),canonical(message),hashlib.sha256).hexdigest())
     for filename,payload in (("proposal_test_only.json",proposal),("contract_test_only.json",contract),
-            ("approval_test_only.json",approval),("authority_test_only.json",authority),("executor_identity.json",executor_identity)):
+            ("approval_test_only.json",approval),("authority_test_only.json",authority),("executor_identity.json",executor_identity),("command_plan_test_only.json",plans)):
         write(fixture/filename,payload)
+    stored=load_fixture_authorization(fixture,executor_identity)
+    contract,approval,authority,plans=(stored[key] for key in ("contract","approval","authority","plans"))
     subject=SimpleNamespace(root=core["source"],run_root=root,native=native,contract=contract,plans=plans,
         protocol=protocol,context=context,registry_sha256=registry_sha,cell_ledger=core["cells"],phase_runner=core["phase_runner"],
         environment=SimpleNamespace(child_environment=dict(os.environ, PYTHONPATH=str(hooks)+os.pathsep+str(core["source"]))))
@@ -146,6 +148,6 @@ def run_chain(fixture, native, executor_identity, *, prepared=False):
         raise ValueError("synthetic acceptance execution boundary violated")
     if combined["denied"] or any(child["denied"] for child in children):
         raise ValueError("accepted chain contains denied access")
-    return dict(status="pass",approval_contract_sha256=digest(contract),inputs=inputs_report,consumer_cases=consumer_reports,checkpoint_audit=checkpoint_report,phase_results=results,command_mapping=mapping,
+    return dict(status="pass",serialized_authorization_verified=True,synthetic_proposal_file_sha256=file_hash(fixture/"proposal_test_only.json"),approval_contract_sha256=digest(contract),inputs=inputs_report,consumer_cases=consumer_reports,checkpoint_audit=checkpoint_report,phase_results=results,command_mapping=mapping,
         gate=gate,monitor=combined,actual_parent_environment=native["process_environment"],origins=loaded_origins(core["source"]),
         prefix_unchanged=all(hashlib.sha256(Path(a["path"]).read_bytes()[:a["byte_count"]]).hexdigest()==a["prefix_sha256"] for a in prefixes))

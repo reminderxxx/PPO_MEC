@@ -129,3 +129,26 @@ def verify_approval(contract, approval, *, fixture_authority=None, now=None):
     return {"approval_verified": True, "domain": contract["domain"],
             "real_execution_authorized": contract["domain"] == "production",
             "contract_sha256": digest(contract)}
+
+
+def load_fixture_authorization(fixture_root, expected_executor_identity):
+    """Consume the serialized test evidence, including the proposal byte hash."""
+    from .identity import file_hash
+    root = absolute_path(str(fixture_root))
+    filenames = dict(proposal="proposal_test_only.json", contract="contract_test_only.json",
+                     approval="approval_test_only.json", authority="authority_test_only.json",
+                     identity="executor_identity.json", plans="command_plan_test_only.json")
+    paths = {key: within(str(root / name), root) for key, name in filenames.items()}
+    values = {key: read_json(path) for key, path in paths.items()}
+    contract = values["contract"]
+    if contract["domain"] != "synthetic" or contract["fixture_root"] != str(root):
+        raise ContinuationError("serialized fixture domain/root mismatch")
+    if values["identity"] != expected_executor_identity:
+        raise ContinuationError("serialized executor identity drift")
+    validate_contract(contract, values["proposal"], values["identity"])
+    if file_hash(paths["proposal"]) != contract["proposal_file_sha256"]:
+        raise ContinuationError("serialized proposal byte identity drift")
+    if digest(values["plans"]) != contract["command_plan_sha256"]:
+        raise ContinuationError("serialized command plan drift")
+    verify_approval(contract, values["approval"], fixture_authority=values["authority"])
+    return values

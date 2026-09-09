@@ -31,6 +31,10 @@ self-calculated hashes cannot populate it. An independent future reviewed trust
 installation and independently verified evidence are prerequisites to production
 qualification. Missing original evidence stays unavailable/pending, not invalid.
 
+Synthetic acceptance persists and reads back its proposal, contract, approval,
+authority, identity and command plan before admission. The proposal byte hash
+includes its actual trailing newline; even whitespace-only file drift is rejected.
+
 Synthetic HMAC authority is limited to its exact fixture root and synthetic run,
 contract/executor/commands, allowed phases, deterministic output/coordination
 scope and expiry/revocation. It is refused by the production CLI. Test authority
