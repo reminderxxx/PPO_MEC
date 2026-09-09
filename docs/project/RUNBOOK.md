@@ -1451,3 +1451,8 @@ evidence。未来 G14C v13 只能从 pushed、Git-clean、`HEAD == main == origi
 XML 必须包含 `test_benchmark_main_executes_full_envelope_gate` 的全部 16 个正负情形及真实 loader/gate/rollout
 计数 1/1/0。`build_formal_checkpoint_provenance_envelope_artifacts.validate_main_gate_evidence` 验证这些计数；
 不能以旧源码断言替代。该命令仅产生临时 test-only checkpoint，不执行正式训练或 rollout，不授权启动 v16。
+
+
+## 2026-09-09 G14R20-D
+
+G14R20-D 仅合成验收：使用冻结科学解释器，授权依赖 `requirements_continuation.txt` 安装到独立临时目录，不更新原科学 venv。测试用 PYTHONPATH 引入该目录；pytest 的 -I 子进程显式接收已加载 cryptography 的依赖目录。完整八阶段使用 `run_fixed_commit_continuation_acceptance.py` 的新 synthetic fixture 与外部精确 executor identity；cwd 必须是原科学 checkout。生产 CLI 不接受测试 trust 或安装参数。未来 installation/restart checkpoint 必须走独立评审、精确代码验收和新批准；本轮不提供真实执行命令。

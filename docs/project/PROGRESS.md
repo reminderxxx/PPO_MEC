@@ -1825,3 +1825,8 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 ## 2026-09-08 G14R20-A 实现与只读验收
 
 独立合同/schema/validator/CLI、追加勘误及 B 接口已实现。全仓 1362 passed、2 skipped；真实 150 checkpoint / 44 active resources / 6 generated resources 通过只读检查。原始授权证据仍 unavailable，executor/独立批准 pending，v16-B 不获执行许可。详见 `fixed_commit_continuation_acceptance.md`。
+
+
+## 2026-09-09 G14R20-D
+
+G14R20-D 正在独立 B 基线分支实现 continuation 授权 2.0.0。真实 launch 已核验且仅至 checkpoint_freeze；独立 release 仍 unavailable，生产 installation 未安装，continuation 未签发，real_execution_authorized=false。精确实现及验收结果由后续独立证据提交记录；不将开发测试通过视作生产批准。

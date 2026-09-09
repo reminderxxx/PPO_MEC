@@ -502,3 +502,8 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 `docs/project/formal_request_subject_lifecycle_contract.md`、
 `docs/project/formal_exogenous_request_execution_contract.md` 与
 `docs/project/formal_environment_identity_projection_contract.md`。
+
+
+## 2026-09-09 G14R20-D
+
+G14R20-D continuation 授权接口 2.0.0：生产共用 Ed25519 原件认证及撤销校验、coordination continuity 与 test-only 隔离验收，见 `docs/project/continuation_production_trust_contract.md`。生产信任未安装；release unavailable，continuation 未签发，真实执行仍禁止。

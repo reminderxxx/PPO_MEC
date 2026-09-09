@@ -295,3 +295,8 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 ## 2026-09-08 G14R20-A
 
 `src/runtime/fixed_commit_continuation.py`、`scripts/preflight_fixed_commit_continuation.py` 与 `scripts/probe_fixed_commit_continuation.py` 为独立只读合同/入口；schema 位于 `configs/experiment/fixed_commit_continuation_v1/`，新增验收位于 `artifacts/analysis/g14r20_a_continuation_20260908/`。 详见 `fixed_commit_continuation_contract.md`。
+
+
+## 2026-09-09 G14R20-D
+
+`scripts/continuation_executor/production_trust.py` 为生产/隔离共用信任核心；`test_trust_fixture.py` 只生成 synthetic fixture。`requirements_continuation.txt` 为独立授权依赖。新增可变状态仅在合同明确的 `.continuation_locks`，本轮只写临时合成目录。

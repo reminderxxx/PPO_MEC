@@ -22,6 +22,10 @@ from continuation_executor.execution import execute_phase
 def main():
     fixture = Path(sys.argv[1])
     mode = sys.argv[2] if len(sys.argv)>2 else "valid"
+    v2 = len(sys.argv) > 3
+    if v2:
+        # Explicit test dependency path passed by the isolated test launcher.
+        sys.path.append(sys.argv[3])
     old = Path.cwd()
     native = load_native(str(old), "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d")
     run = fixture / "synthetic_transaction"
@@ -59,8 +63,11 @@ prior = log.read_text().splitlines() if log.exists() else []
 with log.open("a") as stream:stream.write(json.dumps(sys.argv)+"\\n")
 if phase == "formal_cache_policy" and mode == "exit75" and not prior:sys.exit(75)
 if phase == "formal_cache_policy" and mode == "terminal":sys.exit(9)
-if mode in {"revoke_during_phase","expire_during_phase"} and phase=="formal_cache_policy":
+if mode in {"revoke_during_phase","revoke_retry","expire_during_phase"} and phase=="formal_cache_policy":
     Path(__file__).with_name("revoke.json").write_text("{}")
+    prepared=Path(__file__).with_name("revoked_prepared_test_only.json")
+    if prepared.exists():Path(__file__).with_name("revocation_test_only.json").write_bytes(prepared.read_bytes())
+    if mode=="revoke_retry" and not prior:sys.exit(75)
 flag = "--output-root"
 out = Path(sys.argv[sys.argv.index(flag)+1]); artifact = out/"benchmark_fixture"
 artifact.mkdir(parents=True)
@@ -100,6 +107,15 @@ if mode == "corrupt" and phase == "formal_cache_policy":(artifact/"aggregate_sum
     evidence = {k:dict(state="test_only",reference_sha256=digest("test")) for k in ("launch_approval","release_attestation","continuation_approval")}
     message = approval_message(contract, evidence)
     approval = dict(message=message, signer_id="test", signature=hmac.new(bytes.fromhex(authority["key_hex"]),canonical(message),hashlib.sha256).hexdigest())
+    if v2:
+        from continuation_executor.test_trust_fixture import TestTrustFixture, write
+        from continuation_executor.production_trust import TrustContext
+        trust = TestTrustFixture(contract)
+        approval = trust.approval
+        if mode in {'revoke_during_phase','revoke_retry'}:
+            trust.publish(sequence=1,revoked_ids=[contract['revocation_id']])
+            (fixture/'revoked_prepared_test_only.json').write_bytes(Path(trust.pin['revocation']['path']).read_bytes())
+            trust.publish(sequence=0)
     subject = SimpleNamespace(root=old,run_root=run,native=native,contract=contract,plans=plans,protocol=protocol,context=context,
          registry_sha256="registry",cell_ledger=cells,phase_runner=phase,
          environment=SimpleNamespace(child_environment=dict(os.environ)))
@@ -116,8 +132,11 @@ if mode == "corrupt" and phase == "formal_cache_policy":(artifact/"aggregate_sum
     def authorize():
         now=None
         if (fixture/"revoke.json").exists():
-            if mode=="revoke_during_phase":authority["revoked_ids"]=[contract["revocation_id"]]
+            if mode in {"revoke_during_phase","revoke_retry"}:
+                if not v2: authority["revoked_ids"]=[contract["revocation_id"]]
             else:now=datetime.now(timezone.utc)+timedelta(hours=2)
+        if v2:
+            return verify_approval(contract,approval,test_trust_context=trust.context,now=now)
         return verify_approval(contract,approval,fixture_authority=authority,now=now)
     scope=FixtureScope(str(fixture),str(run),str(old),sys.executable)
     if mode in {"truncation", "fork", "out_of_order", "cross_ledger", "immutable_payload"}:
@@ -138,40 +157,43 @@ if mode == "corrupt" and phase == "formal_cache_policy":(artifact/"aggregate_sum
             row.update(phase=target,sequence_number=len(rows)+1,previous_ledger_hash=rows[-1]["current_ledger_hash"])
             row["current_ledger_hash"]=native["cell"]._record_hash(row)
             with (run/"cell_state.jsonl").open("a") as stream:stream.write(json.dumps(row)+"\n")
-        before={str(p):file_hash(p) for p in fixture.rglob("*") if p.is_file()}
+        before={str(p):file_hash(p) for p in (run if v2 else fixture).rglob("*") if p.is_file()}
         try:execute_phase(subject,PHASES[0],authorize,executor_identity,scope=scope)
         except Exception as exc:error=str(exc)
         else:raise AssertionError("ledger/payload corruption accepted")
         assert not dispatches
-        assert before=={str(p):file_hash(p) for p in fixture.rglob("*") if p.is_file()}
+        assert before=={str(p):file_hash(p) for p in (run if v2 else fixture).rglob("*") if p.is_file()}
         print(json.dumps(dict(status="pass",case=mode,error=error,synthetic_child_dispatch_count=0,rejected_before_write=True)))
         return
-    if mode in {"revoke_during_phase","expire_during_phase"}:
+    if mode in {"revoke_during_phase","revoke_retry","expire_during_phase"}:
         result=execute_phase(subject,PHASES[0],authorize,executor_identity,scope=scope)
         assert result["phase"]==PHASES[0]
-        before={str(p):file_hash(p) for p in fixture.rglob("*") if p.is_file()}
+        before={str(p):file_hash(p) for p in (run if v2 else fixture).rglob("*") if p.is_file()}
         try:execute_phase(subject,PHASES[1],authorize,executor_identity,scope=scope)
         except Exception as exc:error=str(exc)
         else:raise AssertionError("revoked/expired grant admitted next phase")
-        assert before=={str(p):file_hash(p) for p in fixture.rglob("*") if p.is_file()}
-        assert len(dispatches)==1
-        print(json.dumps(dict(status="pass",case=mode,error=error,synthetic_child_dispatch_count=1,
+        assert before=={str(p):file_hash(p) for p in (run if v2 else fixture).rglob("*") if p.is_file()}
+        assert len(dispatches)==(2 if mode=="revoke_retry" else 1)
+        print(json.dumps(dict(status="pass",case=mode,error=error,synthetic_child_dispatch_count=len(dispatches),
             prefix_unchanged=all(hashlib.sha256(Path(a["path"]).read_bytes()[:a["byte_count"]]).hexdigest()==a["prefix_sha256"] for a in prefixes),admitted_phase_completed=True)))
         return
     if mode=="utc_adjustment":
         ticks=iter([datetime(2030,1,1,tzinfo=timezone.utc),datetime(2020,1,1,tzinfo=timezone.utc)])
         phase._utc_clock=lambda:next(ticks,datetime(2020,1,1,tzinfo=timezone.utc))
     start=0
-    if mode in {"publication_crash", "candidate_crash"}:
+    if mode in {"publication_crash", "candidate_crash", "candidate_crash_revoked"}:
+        if v2: checkpoint_read, checkpoint_write = os.pipe()
         pid=os.fork()
         if pid==0:
             target=cells if mode=="publication_crash" else phase
             original_append=target._append
             def crash_at_boundary(row):
                 if mode=="publication_crash" and row["status"]=="committed":
+                    if v2: os.write(checkpoint_write, trust.context.expected.encode())
                     os._exit(17)
                 result=original_append(row)
-                if mode=="candidate_crash" and row["status"]=="completion_candidate":
+                if mode in {"candidate_crash","candidate_crash_revoked"} and row["status"]=="completion_candidate":
+                    if v2: os.write(checkpoint_write, trust.context.expected.encode())
                     os._exit(17)
                 return result
             target._append=crash_at_boundary
@@ -179,17 +201,42 @@ if mode == "corrupt" and phase == "formal_cache_policy":(artifact/"aggregate_sum
             os._exit(99)
         _, status=os.waitpid(pid,0)
         assert os.WIFEXITED(status) and os.WEXITSTATUS(status)==17
+        if v2:
+            os.close(checkpoint_write)
+            trusted_checkpoint = os.read(checkpoint_read, 64).decode()
+            os.close(checkpoint_read)
+            assert len(trusted_checkpoint) == 64
+            # Test supervisor obtains checkpoint over an independent process pipe.
+            trust.pin['startup_checkpoint_sha256'] = trusted_checkpoint
+            trust.context = TrustContext(trust.pin, test_only=True)
         from continuation_executor.locking import writer_lock_path
         lock=writer_lock_path(run)
         inode=lock.stat().st_ino
         previous=json.loads(lock.read_text())
         owner_hash=digest(previous)
         contract["recovery_owner_sha256"]=owner_hash
-        contract["recovery_quiescence"]={"owner_sha256":owner_hash,"state":"test_only",
-            "no_live_descendants":True,"reference_sha256":digest({"waitpid":pid,"status":status})}
+        if v2:
+            source=fixture/'quiescence_test_only.json'
+            write(source,dict(owner=previous,host=previous['process']['host'],namespace='test process namespace',
+                observed_at=trust.now.isoformat(),no_live_descendants=True,basis='waitpid observed exact test child exit'))
+            contract['recovery_quiescence']=trust.certify('recovery_quiescence',source)
+            approval=trust.approve()
+        else:
+            contract["recovery_quiescence"]={"owner_sha256":owner_hash,"state":"test_only",
+                "no_live_descendants":True,"reference_sha256":digest({"waitpid":pid,"status":status})}
+            message=approval_message(contract,evidence)
+            approval.update(message=message,signature=hmac.new(bytes.fromhex(authority["key_hex"]),canonical(message),hashlib.sha256).hexdigest())
         validate_contract(contract,proposal,executor_identity)
-        message=approval_message(contract,evidence)
-        approval.update(message=message,signature=hmac.new(bytes.fromhex(authority["key_hex"]),canonical(message),hashlib.sha256).hexdigest())
+        if v2 and mode=='candidate_crash_revoked':
+            trust.publish(sequence=1,revoked_ids=[contract['revocation_id']])
+            before={str(p):file_hash(p) for p in run.rglob('*') if p.is_file()}
+            try:execute_phase(subject,PHASES[0],authorize,executor_identity,scope=scope,finalize_only=True)
+            except Exception as exc:error=str(exc)
+            else:raise AssertionError('revoked cold finalize admitted')
+            assert 'revoked' in error
+            assert before=={str(p):file_hash(p) for p in run.rglob('*') if p.is_file()}
+            print(json.dumps(dict(status='pass',case=mode,error=error,synthetic_child_dispatch_count=1,prefix_unchanged=True,cold_finalize_rejected=True)))
+            return
         results.append(execute_phase(subject,PHASES[0],authorize,executor_identity,scope=scope,
             finalize_only=mode=="candidate_crash"))
         assert lock.stat().st_ino==inode

@@ -1,4 +1,4 @@
-"""Detached approval verification. No production signer is installed by B.
+"""Detached approval routing. Production installation remains unavailable.
 
 Test authority is meaningful only inside its independently bounded fixture root.
 The public CLI cannot supply or install production trust.
@@ -10,14 +10,9 @@ import hashlib
 import hmac
 import re
 from pathlib import Path
-from types import MappingProxyType
 
 from . import PHASES
 from .identity import ContinuationError, absolute_path, canonical, digest, read_json, within
-
-# Future installation requires independent review of a new exact implementation.
-# Never populated from CLI input, environment, proposal, approval, or fixture key.
-PRODUCTION_SIGNERS = MappingProxyType({})
 
 
 def validate_contract(contract, proposal, executor_identity):
@@ -25,8 +20,15 @@ def validate_contract(contract, proposal, executor_identity):
               "executor_identity_sha256", "run_id", "run_root", "phases", "holdout_capability",
               "prefixes", "immutable_files", "fixture_root", "expires_at", "revocation_id",
               "recovery_owner_sha256", "recovery_quiescence", "coordination_root", "command_plan_sha256"}
-    if set(contract) != fields or contract["version"] != "1.0.0":
+    if contract.get("version") == "2.0.0":
+        fields |= {"scientific_commit", "release_identity", "trust_installation_id"}
+    if set(contract) != fields or contract["version"] not in {"1.0.0", "2.0.0"}:
         raise ContinuationError("execution contract schema")
+    if contract["version"] == "2.0.0":
+        if (contract["scientific_commit"] != "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d"
+                or not isinstance(contract["release_identity"], str) or not contract["release_identity"].strip()
+                or not isinstance(contract["trust_installation_id"], str) or not contract["trust_installation_id"].strip()):
+            raise ContinuationError("continuation trust scope identity required")
     if contract["domain"] not in {"production", "synthetic"}:
         raise ContinuationError("unknown approval domain")
     if contract["proposal_sha256"] != digest(proposal) or contract["executor_identity_sha256"] != digest(executor_identity):
@@ -53,6 +55,9 @@ def validate_contract(contract, proposal, executor_identity):
     if contract["recovery_owner_sha256"] is None:
         if recovery is not None:
             raise ContinuationError("quiescence evidence without recovery owner")
+    elif contract["version"] == "2.0.0":
+        if not isinstance(recovery, dict) or not re.fullmatch("[0-9a-f]{64}", str(contract["recovery_owner_sha256"])):
+            raise ContinuationError("certified recovery evidence required")
     elif (not isinstance(recovery, dict) or set(recovery) != {
             "owner_sha256", "state", "no_live_descendants", "reference_sha256"}
           or recovery["owner_sha256"] != contract["recovery_owner_sha256"]
@@ -76,12 +81,25 @@ def timestamp(text):
 
 
 def approval_message(contract, evidence):
-    return {"version": "1.0.0", "domain": contract["domain"],
+    return {"version": contract["version"], "domain": contract["domain"],
             "contract_sha256": digest(contract), "evidence": evidence}
 
 
-def verify_approval(contract, approval, *, fixture_authority=None, now=None):
-    """Only verifies evidence; does not manufacture approval or write anything."""
+def verify_approval(contract, approval, *, fixture_authority=None, test_trust_context=None, now=None):
+    """Verify qualification; v2 persists only installed coordination continuity."""
+    if contract["domain"] == "production":
+        if fixture_authority is not None or test_trust_context is not None:
+            raise ContinuationError("test approval cannot become production trust")
+        from .production_trust import production_context
+        return production_context().verify(contract, approval, now)
+    if contract.get("version") == "2.0.0":
+        if fixture_authority is not None or test_trust_context is None:
+            raise ContinuationError("isolated Ed25519 trust context required")
+        if test_trust_context.pin["domain"] != "synthetic":
+            raise ContinuationError("test context required")
+        return test_trust_context.verify(contract, approval, now)
+    if test_trust_context is not None:
+        raise ContinuationError("legacy fixture cannot use v2 trust")
     now = now or datetime.now(timezone.utc)
     if now >= timestamp(contract["expires_at"]):
         raise ContinuationError("approval expired")
@@ -95,35 +113,20 @@ def verify_approval(contract, approval, *, fixture_authority=None, now=None):
     evidence = message["evidence"]
     if set(evidence) != {"launch_approval", "release_attestation", "continuation_approval"}:
         raise ContinuationError("three separate evidence states required")
-    if contract["domain"] == "production":
-        if fixture_authority is not None:
-            raise ContinuationError("test approval cannot become production trust")
-        public_key = PRODUCTION_SIGNERS.get(approval["signer_id"])
-        if public_key is None:
-            raise ContinuationError("independent production trust unavailable")
-        # Deliberately unreachable in B with an empty pinned signer set.
-        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
-        try:
-            Ed25519PublicKey.from_public_bytes(public_key).verify(
-                bytes.fromhex(approval["signature"]), canonical(message))
-        except Exception as exc:
-            raise ContinuationError("invalid independent approval signature") from exc
-        required_state = "independently_verified"
-    else:
-        if fixture_authority is None:
-            raise ContinuationError("independent fixture authority required")
-        if set(fixture_authority) != {"domain", "fixture_root", "signer_id", "key_hex", "revoked_ids"}:
-            raise ContinuationError("fixture authority schema")
-        if fixture_authority["domain"] != "synthetic" or fixture_authority["fixture_root"] != contract["fixture_root"]:
-            raise ContinuationError("cross-fixture authority")
-        if approval["signer_id"] != fixture_authority["signer_id"]:
-            raise ContinuationError("fixture signer mismatch")
-        if contract["revocation_id"] in fixture_authority["revoked_ids"]:
-            raise ContinuationError("approval revoked")
-        signature = hmac.new(bytes.fromhex(fixture_authority["key_hex"]), canonical(message), hashlib.sha256).hexdigest()
-        if not hmac.compare_digest(signature, approval["signature"]):
-            raise ContinuationError("invalid fixture approval signature")
-        required_state = "test_only"
+    if fixture_authority is None:
+        raise ContinuationError("independent fixture authority required")
+    if set(fixture_authority) != {"domain", "fixture_root", "signer_id", "key_hex", "revoked_ids"}:
+        raise ContinuationError("fixture authority schema")
+    if fixture_authority["domain"] != "synthetic" or fixture_authority["fixture_root"] != contract["fixture_root"]:
+        raise ContinuationError("cross-fixture authority")
+    if approval["signer_id"] != fixture_authority["signer_id"]:
+        raise ContinuationError("fixture signer mismatch")
+    if contract["revocation_id"] in fixture_authority["revoked_ids"]:
+        raise ContinuationError("approval revoked")
+    signature = hmac.new(bytes.fromhex(fixture_authority["key_hex"]), canonical(message), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(signature, approval["signature"]):
+        raise ContinuationError("invalid fixture approval signature")
+    required_state = "test_only"
     if any(not isinstance(row, dict) or row.get("state") != required_state or not re.fullmatch("[0-9a-f]{64}", str(row.get("reference_sha256"))) for row in evidence.values()):
         raise ContinuationError("independent qualification evidence missing")
     return {"approval_verified": True, "domain": contract["domain"],

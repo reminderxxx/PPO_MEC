@@ -1,0 +1,3 @@
+# Optional continuation authorization dependency; install in executor environment.
+# Do not modify the frozen scientific environment or Protocol 2.9 manifest.
+cryptography==46.0.5

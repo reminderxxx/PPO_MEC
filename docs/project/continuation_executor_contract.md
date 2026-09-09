@@ -1,3 +1,8 @@
+> 2026-09-09 G14R20-D：生产授权与隔离 Ed25519 接口由
+> [continuation_production_trust_contract.md](continuation_production_trust_contract.md) 2.0.0 取代下文 B 的
+> state/hash 与空 signer 草案。1.0.0 HMAC 仅保留历史合成回归，不能进入生产。
+> 八阶段正式隔离验收使用 2.0.0 共用签名、原件认证与撤销核心。生产 installation 仍为 None。
+
 # G14R20-B Continuation Execution Contract 1.0.0
 
 Status: implementation under validation; no production signer installed. Acceptance

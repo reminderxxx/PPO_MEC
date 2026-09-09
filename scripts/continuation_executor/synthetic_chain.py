@@ -2,14 +2,13 @@
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 import hashlib
-import hmac
 import os
 from pathlib import Path
 import sys
 from types import SimpleNamespace
 
 from . import PHASES
-from .authorization import approval_message, validate_contract, verify_approval, load_fixture_authorization
+from .authorization import validate_contract, verify_approval
 from .execution import execute_phase
 from .fixture_inputs import build_core, build_checkpoints, load_prepared_core, write
 from .identity import canonical, digest, file_hash, read_json
@@ -103,16 +102,20 @@ def run_chain(fixture, native, executor_identity, *, prepared=False):
                 root/"checkpoint_freeze.json",root/"dev_selection.json",root/"resolved_execution_context.json",root/"formal_training_execution_binding.json")],fixture_root=str(fixture),
         expires_at=(datetime.now(timezone.utc)+timedelta(hours=2)).isoformat(),revocation_id="synthetic-chain",
         command_plan_sha256=digest(plans),recovery_owner_sha256=None,recovery_quiescence=None,coordination_root=str(fixture/".continuation_locks"))
+    from .test_trust_fixture import TestTrustFixture
+    trust = TestTrustFixture(contract)
+    approval = trust.approval
     validate_contract(contract,proposal,executor_identity)
-    authority=dict(domain="synthetic",fixture_root=str(fixture),signer_id="fixture-only",key_hex=os.urandom(32).hex(),revoked_ids=[])
-    evidence={key:dict(state="test_only",reference_sha256=digest(key)) for key in ("launch_approval","release_attestation","continuation_approval")}
-    message=approval_message(contract,evidence)
-    approval=dict(message=message,signer_id="fixture-only",signature=hmac.new(bytes.fromhex(authority["key_hex"]),canonical(message),hashlib.sha256).hexdigest())
     for filename,payload in (("proposal_test_only.json",proposal),("contract_test_only.json",contract),
-            ("approval_test_only.json",approval),("authority_test_only.json",authority),("executor_identity.json",executor_identity),("command_plan_test_only.json",plans)):
+            ("approval_test_only.json",approval),("executor_identity.json",executor_identity),("command_plan_test_only.json",plans)):
         write(fixture/filename,payload)
-    stored=load_fixture_authorization(fixture,executor_identity)
-    contract,approval,authority,plans=(stored[key] for key in ("contract","approval","authority","plans"))
+    # Re-read serialized bytes and validate actual Ed25519 certificates before dispatch.
+    contract=read_json(fixture/"contract_test_only.json")
+    approval=read_json(fixture/"approval_test_only.json")
+    validate_contract(contract,read_json(fixture/"proposal_test_only.json"),executor_identity)
+    if file_hash(fixture/"proposal_test_only.json") != contract["proposal_file_sha256"] or digest(read_json(fixture/"command_plan_test_only.json")) != contract["command_plan_sha256"]:
+        raise ValueError("serialized fixture input identity drift")
+    verify_approval(contract,approval,test_trust_context=trust.context)
     subject=SimpleNamespace(root=core["source"],run_root=root,native=native,contract=contract,plans=plans,
         protocol=protocol,context=context,registry_sha256=registry_sha,cell_ledger=core["cells"],phase_runner=core["phase_runner"],
         environment=SimpleNamespace(child_environment=dict(os.environ, PYTHONPATH=str(hooks)+os.pathsep+str(core["source"]))))
@@ -130,7 +133,7 @@ def run_chain(fixture, native, executor_identity, *, prepared=False):
     scope=FixtureScope(str(fixture),str(root),str(core["source"]),sys.executable)
     for phase in PHASES:
         print("synthetic: " + phase, file=sys.stderr, flush=True)
-        results.append(execute_phase(subject,phase,lambda:verify_approval(contract,approval,fixture_authority=authority),executor_identity,
+        results.append(execute_phase(subject,phase,lambda:verify_approval(contract,approval,test_trust_context=trust.context),executor_identity,
             scope=scope))
     gate=read_json(root/"formal_gate.json")
     if gate["passed"] is not True: raise ValueError("synthetic gate did not pass")
@@ -148,6 +151,6 @@ def run_chain(fixture, native, executor_identity, *, prepared=False):
         raise ValueError("synthetic acceptance execution boundary violated")
     if combined["denied"] or any(child["denied"] for child in children):
         raise ValueError("accepted chain contains denied access")
-    return dict(status="pass",serialized_authorization_verified=True,synthetic_proposal_file_sha256=file_hash(fixture/"proposal_test_only.json"),approval_contract_sha256=digest(contract),inputs=inputs_report,consumer_cases=consumer_reports,checkpoint_audit=checkpoint_report,phase_results=results,command_mapping=mapping,
+    return dict(status="pass",authorization_core="Ed25519 production-shared v2",serialized_authorization_verified=True,synthetic_proposal_file_sha256=file_hash(fixture/"proposal_test_only.json"),approval_contract_sha256=digest(contract),inputs=inputs_report,consumer_cases=consumer_reports,checkpoint_audit=checkpoint_report,phase_results=results,command_mapping=mapping,
         gate=gate,monitor=combined,actual_parent_environment=native["process_environment"],origins=loaded_origins(core["source"]),
         prefix_unchanged=all(hashlib.sha256(Path(a["path"]).read_bytes()[:a["byte_count"]]).hexdigest()==a["prefix_sha256"] for a in prefixes))

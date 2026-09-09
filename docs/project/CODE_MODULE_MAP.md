@@ -685,3 +685,8 @@
 ## 2026-09-08 G14R20-A
 
 独立 continuation validator 只用标准库，不依赖当前科学模块；CLI 通过原 Python/旧 cwd 加载新只读 helper，helper 只消费旧 validator。原 public runner 无修改，未新增 executor。 详见 `fixed_commit_continuation_contract.md`。
+
+
+## 2026-09-09 G14R20-D
+
+`authorization.py` 将 production 全部分派至 `production_trust.py` 的固定 installation；v2 synthetic 显式传入受限 test context。共用核心负责 Ed25519、认证原件、固定撤销源和 continuity；`test_trust_fixture.py` 是仅合成 producer。科学模块及依赖方向不变。

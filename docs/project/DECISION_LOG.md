@@ -1089,3 +1089,8 @@ claim map 必须报告 `UNAVAILABLE`。
 ## 2026-09-08 G14R20-B 实现边界（验收中）
 
 独立 executor 固定自己的提交；原科学执行身份不改写。生产信任表保持为空。原 public 新 run 发布门禁不变，A 仍只接收未授权 proposal。单写者锁位于合同明确绑定的 run 外 coordination 目录，避免可变 owner 状态破坏原 artifact integrity。具体规则与待验收项见 `continuation_executor_contract.md`。
+
+
+## 2026-09-09 G14R20-D
+
+G14R20-D 保留 phase-level 撤销租约；为防重启静默丢失防回滚依据，首次和每次重启均要求独立保管的精确 continuity checkpoint。验证器不从本地文件自举或推定全球最新；状态变化后的重启可能需 trust owner 重新核验，接受这一可用性代价。

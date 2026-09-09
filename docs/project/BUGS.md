@@ -575,3 +575,8 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 既有 main 源码顺序断言不等价于实际入口执行，空 rollout 列表也不构成调用计数。补充的 main 正负
 用例保留真实 generated registry、companion loader、checkpoint read 和 strict gate，并监测实际 rollout
 符号。数据准备/fairness 使用 test-only 替身，因此仍不构成完整正式 benchmark 或性能证据。
+
+
+## 2026-09-09 G14R20-D
+
+G14R20-D 明确剩余人工边界：签名不能证明原件来源/语义、host namespace 无 live descendants 或尚未取得的撤销；须由独立核验者、运维和信任 owner 承担。可信时钟或外部 continuity checkpoint 被共同回滚超出软件保证。生产 trust/release/continuation 资格仍缺失，真实执行禁止。
