@@ -275,3 +275,11 @@ def test_missing_startup_receipt_never_bootstraps(trust):
     Path(trust.pin['startup_receipt_path']).unlink()
     with pytest.raises(OSError): trust.verify()
     assert read_json(trust.state) == trust.initial
+
+
+@pytest.mark.parametrize('invalid', [None, '', '   ', 3, False])
+def test_signed_approval_requires_revokeable_identifier(trust, invalid):
+    trust.contract['revocation_id'] = invalid
+    trust.approve()
+    with pytest.raises(ContinuationError, match='revocation identifier'):
+        trust.verify()

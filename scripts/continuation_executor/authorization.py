@@ -25,7 +25,8 @@ def validate_contract(contract, proposal, executor_identity):
     if set(contract) != fields or contract["version"] not in {"1.0.0", "2.0.0"}:
         raise ContinuationError("execution contract schema")
     if contract["version"] == "2.0.0":
-        if (contract["scientific_commit"] != "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d"
+        if (not isinstance(contract["revocation_id"], str) or not contract["revocation_id"].strip()
+                or contract["scientific_commit"] != "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d"
                 or not isinstance(contract["release_identity"], str) or not contract["release_identity"].strip()
                 or not isinstance(contract["trust_installation_id"], str) or not contract["trust_installation_id"].strip()):
             raise ContinuationError("continuation trust scope identity required")

@@ -145,6 +145,7 @@ class TrustContext:
         self.expected = m['checkpoint_sha256']
 
     def _scope(self, contract):
+        require(text(contract['revocation_id']), 'revocation identifier required')
         require(contract['holdout_capability'] is False and contract['phases'] == list(PHASES), 'unauthorized phase/holdout')
         require(contract['version'] == '2.0.0', 'production trust requires contract 2.0.0')
         require(contract['domain'] == self.pin['domain'] and

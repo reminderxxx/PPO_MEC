@@ -21,7 +21,7 @@
 installation_id、authority、source_id、scope、sequence、issued_at、expires_at、revoked_ids、untrusted_signers。
 序号必须非负整数；同序号不同内容、时间倒退、未来签发、过期、超过新鲜度均拒绝。
 撤销集合累积；更高序号也不得移除已知撤销 ID 或不可信 signer，恢复身份必须另走受审安装。
-未知/缺失/不可读/签名错误/主体及范围不符均拒绝。撤销所有证据核验 signer 与批准 signer 均检查。
+未知/缺失/不可读/签名错误/主体及范围不符均拒绝。撤销所有证据核验 signer 与批准 signer 均检查。批准必须携带非空字符串撤销 ID；null、空白或非字符串均拒绝。
 
 continuity 文件和 startup receipt 只能位于 coordination_root；初次安装由 trust owner 显式准备 checkpoint，验证器不自动初始化。
 `TrustContext.startup_request()` 只读输出每次 context 独有的随机 nonce、PID、installation_id 和 scope 摘要。
