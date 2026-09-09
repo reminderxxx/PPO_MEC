@@ -1,5 +1,8 @@
 # Continuation production trust contract 2.0.0 — G14R20-D
 
+> G14R20-F 公共宿主、固定 startup lock、有界等待、JSONL 输出及独立 checkpoint custody 见
+> [continuation_startup_handoff_contract.md](continuation_startup_handoff_contract.md)。生产 installation 仍为空。
+
 日期：2026-09-09。仅版本化 continuation 授权接口；不是科学 Protocol 2.9 的修改或真实批准。
 
 | C 项 | 软件验证器 | 独立核验者 / 签发者 | 不能由代码证明及真实状态 |
@@ -14,6 +17,7 @@
 生产安装仅允许由受审源码内固定 installation 对象建立；CLI、环境、proposal、approval 均不能建立根。
 对象包含 installation_id/record identity、信任 owner、按职责固定主体与 Ed25519 公钥、精确 scope、
 撤销 authority/key/source_id/固定绝对文件位置、max_age_seconds、coordination 状态位置及固定启动回执来源。
+另含预置的固定 inode `startup_lock_path`；宿主不创建、删除或复用 continuity/SingleWriter 锁。
 安装记录由 trust owner 独立保管、核验并纳入新源码 identity；每次变更必须重新冻结及验收 executor。
 本轮仅 test-only fixture 生成临时 Ed25519 key；生产对象为 None，不保存生产私钥。
 

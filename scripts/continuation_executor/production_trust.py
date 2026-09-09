@@ -78,7 +78,8 @@ class TrustContext:
         p = self.pin
         require(set(p) == {'version', 'domain', 'fixture_root', 'installation_id',
             'trust_owner', 'installation_record', 'scope', 'approval_signers',
-            'verifiers', 'revocation', 'continuity_path', 'startup_receipt_path'},
+            'verifiers', 'revocation', 'continuity_path', 'startup_receipt_path',
+            'startup_lock_path'},
             'trust installation schema')
         require(p['version'] == '2.0.0' and text(p['installation_id']) and text(p['trust_owner']),
                 'trust installation identity')
@@ -115,6 +116,10 @@ class TrustContext:
         self.receipt_path = within(p['startup_receipt_path'], self.state_path.parent)
         require(self.receipt_path.parent == self.state_path.parent and self.receipt_path != self.state_path
                 and self.receipt_path.suffix == '.json', 'startup receipt location')
+        self.startup_lock_path = within(p['startup_lock_path'], self.state_path.parent)
+        require(self.startup_lock_path.parent == self.state_path.parent
+                and self.startup_lock_path not in {self.state_path, self.receipt_path}
+                and self.startup_lock_path.is_file(), 'startup lock installation')
         self.expected = None
         self.session_nonce = uuid.uuid4().hex
         self.process_id = os.getpid()
@@ -291,3 +296,9 @@ def production_context():
     if _PRODUCTION_CONTEXT is None:
         _PRODUCTION_CONTEXT = TrustContext(PRODUCTION_INSTALLATION)
     return _PRODUCTION_CONTEXT
+
+
+def new_production_context():
+    """Create one fresh public-host context from the source-installed identity."""
+    require(PRODUCTION_INSTALLATION is not None, 'independent production trust unavailable')
+    return TrustContext(PRODUCTION_INSTALLATION)

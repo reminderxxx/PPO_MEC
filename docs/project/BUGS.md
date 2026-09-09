@@ -580,3 +580,14 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 ## 2026-09-09 G14R20-D
 
 G14R20-D 明确剩余人工边界：签名不能证明原件来源/语义、host namespace 无 live descendants 或尚未取得的撤销；须由独立核验者、运维和信任 owner 承担。可信时钟或外部 continuity checkpoint 被共同回滚超出软件保证。生产 trust/release/continuation 资格仍缺失，真实执行禁止。
+
+## 2026-09-09 G14R20-F startup handoff
+
+- `RESOLVED IN IMPLEMENTATION / public operability`：公共入口现能在同一进程输出 challenge、有界等 receipt、真实
+  验签并继续 qualification/execute；两条独立命令不再被误作一次 handoff。
+- `RESOLVED IN IMPLEMENTATION / concurrent startup`：独立预置 startup lock 防止第二宿主覆盖第一宿主 receipt/
+  continuity 生命周期；不复用 SingleWriter，不删除锁。
+- `RESOLVED IN IMPLEMENTATION / checkpoint handoff`：主机报告不能直接成为可信 checkpoint；custodian 从上一
+  state 与签名 revocation 独立复算后才可为新宿主签 receipt。
+- 残余外部边界：release 资格方案未采纳，production trust 未安装，真实 owner/verifier/issuer 未指定，真实
+  continuation 未签发。实现通过也不能消除这些 pending 状态，不能据此恢复 v16 或运行 G14D/G15。

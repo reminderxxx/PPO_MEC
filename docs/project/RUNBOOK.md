@@ -1,4 +1,6 @@
-> G14R20-B（实现验证中）：新增 `scripts/execute_fixed_commit_continuation.py`，默认 qualification；缺独立批准会在任何锁/写入/dispatch 前拒绝。`--check compatibility` 只读。合成验收独立入口为 `scripts/run_fixed_commit_continuation_acceptance.py`，要求精确 clean executor identity、新建 synthetic fixture、原 checkout cwd 和原 Python。详见 `continuation_executor_contract.md`；目前不得将开发验证称为最终验收。
+> G14R20-F（实现验收中）：`scripts/execute_fixed_commit_continuation.py` 的 qualification/execute 使用公共同进程
+> startup handoff；`--check compatibility` 保持只读。合成验收要求精确 clean executor identity、新建 synthetic
+> fixture、原 checkout cwd 和原 Python。详见 `continuation_startup_handoff_contract.md`；生产 trust 仍未安装。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
@@ -1458,3 +1460,44 @@ XML 必须包含 `test_benchmark_main_executes_full_envelope_gate` 的全部 16 
 G14R20-D 仅合成验收：使用冻结科学解释器，授权依赖 `requirements_continuation.txt` 安装到独立临时目录，不更新原科学 venv。测试用 PYTHONPATH 引入该目录；pytest 的 -I 子进程显式接收已加载 cryptography 的依赖目录。完整八阶段使用 `run_fixed_commit_continuation_acceptance.py` 的新 synthetic fixture 与外部精确 executor identity；cwd 必须是原科学 checkout。生产 CLI 不接受测试 trust 或安装参数。未来 installation/restart checkpoint 必须走独立评审、精确代码验收和新批准；本轮不提供真实执行命令。
 
 启动交接接口：未来已受审安装可调用 `production_context().startup_request()` 取得只读挑战；固定 continuity authority 使用独立保管的最新 checkpoint 签署回执至安装固定的 coordination 路径。没有新回执不得启动；本轮生产安装为空。
+
+## 2026-09-09 G14R20-F 公共 startup handoff
+
+未来 production installation 经独立源码审查和新 executor identity 冻结后，公共命令形态保持：
+
+```bash
+<frozen-python> -B scripts/execute_fixed_commit_continuation.py \
+  --proposal <fixed-proposal.json> \
+  --contract <independently-issued-contract.json> \
+  --executor-identity <exact-executor-identity.json> \
+  --approval <independently-issued-approval.json> \
+  --phase <allowed-phase> \
+  --check qualification \
+  --startup-wait-seconds 30
+```
+
+命令先输出一行 `challenge/published`，再输出 `waiting/*`。custodian 必须从该行读取新 nonce/PID/scope，使用
+自己保管的上一完整 continuity state/checkpoint 签 receipt，并以原子 replace 发布到 installation 固定路径；
+不得复制主机 handoff hash、删除旧 receipt/state 或等待/获取 startup host lock。宿主随后输出 qualification、
+handoff 和唯一 terminal 行。execute 同一命令只把 `--check` 改为 `execute`；不得先跑 qualification 命令再把
+其回执交给另一次 execute。
+
+宿主结束后，custodian 用 `continuation_executor.startup.verify_handoff_for_custody` 对上一 state、公共 challenge、
+handoff material、固定 continuity 和签名 revocation 独立复算；只有返回 `custody_verified` 才保管新完整 state
+并为下一阶段/新进程/cold finalize 的新 challenge 签 receipt。崩溃无 terminal 时也不能从本地 state 自举；
+无法完成核验即停止签发。
+
+隔离验收仍使用：
+
+```bash
+cd /private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847
+PYTHONPATH=<reviewed-continuation-dependencies> <frozen-python> -B \
+  <f-executor>/scripts/run_fixed_commit_continuation_acceptance.py \
+  --executor-identity <exact-f-identity.json> \
+  --fixture-root /private/tmp/synthetic_g14r20_f_<unique>
+```
+
+入口会先运行真实公共 parser/main 的 host/custodian 正例、旧回执、timeout、SIGTERM、crash、并发和新宿主
+交接，再运行既有八阶段 synthetic chain。所有私钥、receipt、continuity、startup lock、marker 和 synthetic
+checkpoint 只在新 fixture；production CLI 不接受 installation/test binding 参数。必须分别报告
+`synthetic_dispatch_count` 与 science/real-v16/write/holdout 四个零计数。

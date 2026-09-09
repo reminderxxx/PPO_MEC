@@ -1096,3 +1096,18 @@ claim map 必须报告 `UNAVAILABLE`。
 G14R20-D 保留 phase-level 撤销租约；为防重启静默丢失防回滚依据，首次和每次重启均要求独立保管的精确 continuity checkpoint。验证器不从本地文件自举或推定全球最新；状态变化后的重启可能需 trust owner 重新核验，接受这一可用性代价。
 
 G14R20-D 启动依据补强：静态 bootstrap pin 不能抵御本地状态整体回退。每次 context/进程启动必须由固定 authority 对新 nonce/PID/scope 和独立保管的当前 checkpoint 签署回执；旧回执与 fork 继承 context 均拒绝。只新增离线认证接口。
+
+## 2026-09-09 G14R20-F 公共宿主与 custody
+
+决定：`qualification/execute` 是单次长生命周期公共操作，不能拆成 challenge 命令和 execute 命令。一个
+`TrustContext` 覆盖所有授权回调；独立预置 fixed-inode startup lock 覆盖宿主生命周期，并与 continuity 短锁及
+原 `SingleWriter` 分离。第二宿主立即 fail-closed，authority 发布 receipt 不获取该锁。
+
+决定：固定位置旧 receipt 不删除；宿主输出 challenge 后只等待一次新的原子发布，错误候选立即终结，不换
+nonce/context。等待只用单调 deadline，凭据时间按真实验证时 UTC 判断。
+
+决定：宿主 checkpoint hash 永远是待核验材料。custodian 必须从独立保管的上一完整 state、安装固定签名
+revocation 和 continuity bytes 复算新 checkpoint；丢失上一 state 即停止签发。此可用性代价用于保留防回滚边界。
+
+决定：synthetic 正例可由源码受控 binding 进入同一 parser/main，但该 binding 没有科学能力且不能从 CLI/env/
+proposal/approval 注入 production trust。production installation 仍为 `None`。

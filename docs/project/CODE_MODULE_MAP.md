@@ -690,3 +690,14 @@
 ## 2026-09-09 G14R20-D
 
 `authorization.py` 将 production 全部分派至 `production_trust.py` 的固定 installation；v2 synthetic 显式传入受限 test context。共用核心负责 Ed25519、认证原件、固定撤销源和 continuity；`test_trust_fixture.py` 是仅合成 producer。科学模块及依赖方向不变。
+
+## 2026-09-09 G14R20-F
+
+- `execute_fixed_commit_continuation.py`：静态输入后创建单一 startup context，并驱动 JSONL 公共宿主。
+- `continuation_executor/startup.py`：不导入科学模块；负责固定锁、有界 receipt 等待、终结事件和独立 custody 复核。
+- `continuation_executor/startup_binding.py`：production 绑定只能使用源码安装；synthetic 绑定只允许测试根且零科学能力。
+- `continuation_executor/public_startup_acceptance.py`：以两个真实 PID 驱动公共 parser/main 与 test custodian。
+- `production_trust.py`：installation schema 增加预置 `startup_lock_path`；continuity 短锁和签名验证语义不变。
+
+依赖方向保持 `public CLI → startup/binding → authorization/production_trust`；科学 `QualifiedRun/execution` 只在
+成功准入后由 production binding 延迟导入。

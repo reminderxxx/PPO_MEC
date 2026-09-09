@@ -1830,3 +1830,12 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 ## 2026-09-09 G14R20-D
 
 G14R20-D 正在独立 B 基线分支实现 continuation 授权 2.0.0。真实 launch 已核验且仅至 checkpoint_freeze；独立 release 仍 unavailable，生产 installation 未安装，continuation 未签发，real_execution_authorized=false。精确实现及验收结果由后续独立证据提交记录；不将开发测试通过视作生产批准。
+
+## 2026-09-09 G14R20-F
+
+- E 已复现的 `startup_handoff_operability=unsupported` 根因是公共 CLI 在首次 `verify_approval` 内才创建 context，
+  没有公开 challenge、有限等待或同对象继续执行的宿主；test fixture 直接持有对象不构成公共入口证据。
+- 独立 F 分支新增单 context 公共宿主、预置 fixed-inode startup lock、单调有限等待、strict JSONL 终结状态及
+  独立 continuity custody 复核。qualification/execute 全部 authorization callback 绑定同一 context。
+- production installation 保持空；synthetic-only binding 只能在测试根执行显式 synthetic dispatch。最终精确
+  commit/identity、公共正负例、全仓与保护计数须由后续独立证据提交填写；本段不提前宣称验收完成。

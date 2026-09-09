@@ -300,3 +300,10 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 ## 2026-09-09 G14R20-D
 
 `scripts/continuation_executor/production_trust.py` 为生产/隔离共用信任核心；`test_trust_fixture.py` 只生成 synthetic fixture。`requirements_continuation.txt` 为独立授权依赖。新增可变状态仅在合同明确的 `.continuation_locks`，本轮只写临时合成目录。
+
+## 2026-09-09 G14R20-F
+
+`scripts/continuation_executor/startup.py` 提供有界等待、独立 startup host 锁、handoff material 与 custodian
+复核；`startup_binding.py` 固定生产绑定及源码受控 synthetic-only 绑定；`public_startup_acceptance.py` 驱动
+真实宿主/独立 custodian 进程验收。公共入口仍为 `scripts/execute_fixed_commit_continuation.py`，验收入口仍为
+`scripts/run_fixed_commit_continuation_acceptance.py`。不新增生产配置、私钥、真实 coordination 文件或 run。

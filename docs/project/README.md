@@ -1,4 +1,4 @@
-> G14R20-B 实现合同（验证中）：[continuation_executor_contract.md](continuation_executor_contract.md)。真实执行批准仍为 false。
+> G14R20-F 公共启动合同（实现验收中）：[continuation_startup_handoff_contract.md](continuation_startup_handoff_contract.md)。生产信任未安装，真实执行批准仍为 false。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
@@ -10,6 +10,9 @@
 这是 PPO_MEC 的项目化维护文档入口，用来把通用 AI 协作规范落到当前仓库。
 
 ## Live 文档
+
+- `continuation_startup_handoff_contract.md`：G14R20-F 公共同进程 challenge/receipt、有限等待、startup
+  fixed-inode 锁、JSONL 输出与独立 checkpoint custody 合同；仅 synthetic 隔离验收，不是生产批准
 
 - `formal_checkpoint_provenance_envelope_contract.md`：G14R18 17-field provenance envelope / 8-field shared identity
   边界、真实 companion→benchmark gate 验收、Protocol 2.9、Readiness v21 与 G14C v16 启动授权暂缓

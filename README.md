@@ -1,4 +1,6 @@
-> G14R20-B：独立 continuation executor 正在隔离验证，合同与授权边界见 [continuation_executor_contract.md](docs/project/continuation_executor_contract.md)。真实 v16 未恢复，生产批准不可用；本条不代表验收完成。
+> G14R20-F：公共同进程 startup handoff、有限等待、并发隔离与 checkpoint custody 正在独立分支实现验收，
+> 合同见 [continuation_startup_handoff_contract.md](docs/project/continuation_startup_handoff_contract.md)。
+> 生产 installation 仍为空，真实 v16 未恢复，continuation 未批准。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
@@ -507,3 +509,10 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 ## 2026-09-09 G14R20-D
 
 G14R20-D continuation 授权接口 2.0.0：生产共用 Ed25519 原件认证及撤销校验、coordination continuity 与 test-only 隔离验收，见 `docs/project/continuation_production_trust_contract.md`。生产信任未安装；release unavailable，continuation 未签发，真实执行仍禁止。
+
+## 2026-09-09 G14R20-F
+
+公共 `qualification/execute` 入口新增同进程 challenge→有限等待→真实 `verify_approval`→qualification→execute
+宿主；独立 fixed-inode startup lock 防止并发宿主干扰，宿主结束只输出待 custodian 独立核验的 checkpoint
+材料。synthetic-only 绑定进入同一 parser/main 路径且不能建立生产 trust。实现/验收不改变 Protocol 2.9、原
+v16 或生产批准状态；精确 commit、identity 和测试计数由独立证据提交记录。

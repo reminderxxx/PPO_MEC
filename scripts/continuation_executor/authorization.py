@@ -86,13 +86,18 @@ def approval_message(contract, evidence):
             "contract_sha256": digest(contract), "evidence": evidence}
 
 
-def verify_approval(contract, approval, *, fixture_authority=None, test_trust_context=None, now=None):
+def verify_approval(contract, approval, *, fixture_authority=None, test_trust_context=None,
+                    now=None, _production_context=None):
     """Verify qualification; v2 persists only installed coordination continuity."""
     if contract["domain"] == "production":
         if fixture_authority is not None or test_trust_context is not None:
             raise ContinuationError("test approval cannot become production trust")
-        from .production_trust import production_context
-        return production_context().verify(contract, approval, now)
+        from .production_trust import PRODUCTION_INSTALLATION, production_context
+        context = _production_context or production_context()
+        if (_production_context is not None and
+                (PRODUCTION_INSTALLATION is None or context.pin != PRODUCTION_INSTALLATION)):
+            raise ContinuationError("production context is not source-installed")
+        return context.verify(contract, approval, now)
     if contract.get("version") == "2.0.0":
         if fixture_authority is not None or test_trust_context is None:
             raise ContinuationError("isolated Ed25519 trust context required")

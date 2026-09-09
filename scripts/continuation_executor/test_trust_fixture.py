@@ -5,6 +5,7 @@ from pathlib import Path
 
 from .identity import canonical, digest, file_hash, within, ContinuationError
 from .production_trust import ROLES, TrustContext, scope_for
+from .startup import atomic_publish_receipt
 
 
 def write(path, value):
@@ -40,6 +41,8 @@ class TestTrustFixture:
             observed_at=(self.now-timedelta(seconds=10)).isoformat(), revoked_ids=[], untrusted_signers=[])
         write(self.state, self.initial)
         Path(str(self.state)+'.lock').touch(exist_ok=False)
+        self.startup_lock = self.coord / 'startup_host_test_only.lock'
+        self.startup_lock.touch(exist_ok=False)
         record = self.root/'trust_installation_record_test_only.json'
         write(record, dict(test_only=True, trust_owner='fixture operator', custody='isolated test process',
             scope=scope_for(contract), public_keys=keys))
@@ -50,7 +53,8 @@ class TestTrustFixture:
             verifiers={'reviewer':dict(public_key=keys['reviewer'], author='synthetic author', roles=list(ROLES)+['recovery_quiescence'])},
             revocation=dict(authority='revoker', public_key=keys['revoker'], source_id='test-only-source',
                 path=str(self.root/'revocation_test_only.json'), max_age_seconds=7200),
-            continuity_path=str(self.state), startup_receipt_path=str(self.coord/'startup_receipt_test_only.json'))
+            continuity_path=str(self.state), startup_receipt_path=str(self.coord/'startup_receipt_test_only.json'),
+            startup_lock_path=str(self.startup_lock))
         self.publish()
         self.initial_checkpoint = digest(self.initial)
         self.restart(self.initial_checkpoint)
@@ -100,5 +104,13 @@ class TestTrustFixture:
         request = self.context.startup_request()
         message = dict(request, authority='revoker', checkpoint_sha256=checkpoint,
             issued_at=self.now.isoformat(), expires_at=(self.now+timedelta(hours=2)).isoformat())
-        write(self.pin['startup_receipt_path'], signed(message, 'revoker', self.keys['revoker']))
+        atomic_publish_receipt(self.pin['startup_receipt_path'], signed(message, 'revoker', self.keys['revoker']))
         return self.context
+
+    def publish_receipt(self, request, checkpoint):
+        """Test custodian publication; request comes from the public host output."""
+        message = dict(request, authority='revoker', checkpoint_sha256=checkpoint,
+            issued_at=self.now.isoformat(), expires_at=(self.now+timedelta(hours=2)).isoformat())
+        receipt = signed(message, 'revoker', self.keys['revoker'])
+        atomic_publish_receipt(self.pin['startup_receipt_path'], receipt)
+        return receipt
