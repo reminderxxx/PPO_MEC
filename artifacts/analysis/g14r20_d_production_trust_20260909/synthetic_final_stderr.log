@@ -1,0 +1,24 @@
+synthetic: preparing core
+synthetic: checkpoint/registry inputs ready
+synthetic consumer: valid
+synthetic consumer: missing_binding
+synthetic consumer: missing_nullable
+synthetic consumer: protocol
+synthetic consumer: bundle
+synthetic consumer: binding
+synthetic consumer: context
+synthetic consumer: git
+synthetic consumer: runtime
+synthetic consumer: sha
+synthetic consumer: window
+synthetic consumer: agent
+synthetic consumer: seed
+synthetic consumer: capacity
+synthetic: formal_cache_policy
+synthetic: formal_controller
+synthetic: formal_ablation
+synthetic: formal_support
+synthetic: formal_scalability
+synthetic: formal_statistics
+synthetic: formal_gate
+synthetic: complete_without_holdout

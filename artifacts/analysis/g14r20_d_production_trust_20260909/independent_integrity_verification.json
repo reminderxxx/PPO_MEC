@@ -1,0 +1,27 @@
+{
+  "verified_at": "2026-09-09T07:21:43.881097+00:00",
+  "command": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "-B",
+    "/private/tmp/ppo_mec_g14r20_d_delivery/artifacts/analysis/g14r20_d_production_trust_20260909/verify_delivery.py",
+    "/private/tmp/ppo_mec_g14r20_d_delivery/artifacts/analysis/g14r20_d_production_trust_20260909",
+    "--repository",
+    "/private/tmp/ppo_mec_g14r20_d_production_trust",
+    "--synthetic"
+  ],
+  "exit_code": 0,
+  "result": {
+    "status": "pass",
+    "executor_commit": "876c369a1fa8cc33b19d782ab1ba230f021965a7",
+    "executor_files": 22,
+    "evidence_files": 60,
+    "strict_formats": {
+      "json": 37,
+      "jsonl": 0,
+      "jsonl_records": 0,
+      "xml": 1
+    },
+    "synthetic_files_checked": 1927,
+    "real_execution_authorized": false
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "checked_at": "2026-09-09T06:42:13.607171+00:00",
+  "executor_commit": "876c369a1fa8cc33b19d782ab1ba230f021965a7",
+  "executor_tree": "00f4c3e65811aad32b2fb0c1bdd16820262cc1b7",
+  "status": "pass",
+  "changed_files": [
+    "README.md",
+    "docs/project/BUGS.md",
+    "docs/project/CODE_MODULE_MAP.md",
+    "docs/project/DECISION_LOG.md",
+    "docs/project/DIRECTORY_STRUCTURE.md",
+    "docs/project/PROGRESS.md",
+    "docs/project/README.md",
+    "docs/project/RUNBOOK.md",
+    "docs/project/continuation_executor_contract.md",
+    "docs/project/continuation_production_trust_contract.md",
+    "requirements_continuation.txt",
+    "scripts/continuation_executor/authorization.py",
+    "scripts/continuation_executor/production_trust.py",
+    "scripts/continuation_executor/synthetic_chain.py",
+    "scripts/continuation_executor/test_trust_fixture.py",
+    "tests/continuation_native_driver.py",
+    "tests/test_continuation_production_trust.py"
+  ],
+  "git_diff_check_exit_code": 0,
+  "stdout": "",
+  "stderr": "",
+  "scientific_protocol_config_src_changes": [],
+  "a_proposal_modified": false,
+  "generated_registry_modified": false
+}

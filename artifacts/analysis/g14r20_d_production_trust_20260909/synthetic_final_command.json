@@ -1,0 +1,23 @@
+{
+  "name": "synthetic_final",
+  "command": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "-B",
+    "-c",
+    "import sys,runpy;sys.path.append(\"/private/tmp/g14r20_d_dependencies\");sys.path.insert(0,\"/private/tmp/ppo_mec_g14r20_d_production_trust/scripts\");sys.argv=[\"/private/tmp/ppo_mec_g14r20_d_production_trust/scripts/run_fixed_commit_continuation_acceptance.py\",*sys.argv[1:]];runpy.run_path(sys.argv[0],run_name=\"__main__\")",
+    "--executor-identity",
+    "/private/tmp/g14r20_d_evidence/executor_identity.json",
+    "--fixture-root",
+    "/private/tmp/synthetic_g14r20_d_exact_876c369"
+  ],
+  "cwd": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONNOUSERSITE": "1",
+    "PYTHONPATH": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+  },
+  "started_at": "2026-09-09T06:31:59.851519+00:00",
+  "executor_commit_before": "876c369a1fa8cc33b19d782ab1ba230f021965a7",
+  "executor_tree": "00f4c3e65811aad32b2fb0c1bdd16820262cc1b7",
+  "executor_status_before": ""
+}

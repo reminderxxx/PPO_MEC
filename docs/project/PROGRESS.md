@@ -1829,4 +1829,4 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 
 ## 2026-09-09 G14R20-D
 
-G14R20-D 正在独立 B 基线分支实现 continuation 授权 2.0.0。真实 launch 已核验且仅至 checkpoint_freeze；独立 release 仍 unavailable，生产 installation 未安装，continuation 未签发，real_execution_authorized=false。精确实现及验收结果由后续独立证据提交记录；不将开发测试通过视作生产批准。
+G14R20-D 已在独立 B 基线分支完成 continuation 授权 2.0.0 接口及隔离验收。最终实现为 `876c369a1fa8cc33b19d782ab1ba230f021965a7`，精确 clean 提交上全仓 1520 passed（89 项新增及 71 项相邻边界）、smoke、311 文件 compile/import 均通过；八阶段合成链完成且 gate 通过，synthetic dispatch=25，scientific rollout / real v16 dispatch / real v16 write 均为 0。107320 项原保护清单、七个用户文件、原账本、A proposal 和 main 未变。独立证据包为 `artifacts/analysis/g14r20_d_production_trust_20260909/`，包含命令、原始日志、完整身份、职责矩阵和独立完整性核验器。真实 launch 已核验且仅至 checkpoint_freeze；独立 release 仍 unavailable，生产 installation 未安装，continuation 未签发，real_execution_authorized=false；这些人工资格事项未被隔离验收替代。

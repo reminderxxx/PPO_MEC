@@ -1,0 +1,23 @@
+{
+  "name": "full_pytest",
+  "command": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "-B",
+    "-m",
+    "pytest",
+    "tests",
+    "-q",
+    "--tb=short",
+    "--junitxml=/private/tmp/g14r20_d_evidence/full_pytest.xml"
+  ],
+  "cwd": "/private/tmp/ppo_mec_g14r20_d_production_trust",
+  "environment": {
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONNOUSERSITE": "1",
+    "PYTHONPATH": "/private/tmp/g14r20_d_dependencies"
+  },
+  "started_at": "2026-09-09T06:32:03.534944+00:00",
+  "executor_commit_before": "876c369a1fa8cc33b19d782ab1ba230f021965a7",
+  "executor_tree": "00f4c3e65811aad32b2fb0c1bdd16820262cc1b7",
+  "executor_status_before": ""
+}

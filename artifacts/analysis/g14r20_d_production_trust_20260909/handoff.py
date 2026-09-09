@@ -1,0 +1,29 @@
+import pathlib,sys,datetime,subprocess
+R=pathlib.Path('/private/tmp/ppo_mec_g14r20_d_production_trust');O=pathlib.Path('/private/tmp/g14r20_d_evidence');sys.path.insert(0,str(R/'scripts'))
+from continuation_executor.identity import read_json,canonical,digest,file_hash,git
+I=read_json(O/'executor_identity.json');C=read_json(O/'unsigned_execution_contract.json')
+review=pathlib.Path('/private/tmp/ppo_mec_g14r20_c_review/artifacts/analysis/g14r20_c_review_20260909')
+d=dict(status='UNSIGNED_NOT_ISSUED',execution_authorized=False,prepared_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+ origin_launch_evidence=dict(status='verified_per_C',scope_end='checkpoint_freeze',scope_expanded=False,review_source=str(review/'origin_authorization_evidence_review.md'),sha256=file_hash(review/'origin_authorization_evidence_review.md')),
+ origin_release_evidence='unavailable',production_trust_installation='not_installed',continuation_approval='not_issued',
+ executor_identity_sha256=digest(I),executor_commit=I['commit'],executor_git_tree=I['git_tree'],
+ unsigned_contract_sha256=digest(C),command_plan_sha256=C['command_plan_sha256'],
+ trust_installation=None,production_private_key_generated=False,production_approval_signed=False,
+ required_owners=[
+ dict(owner='project trust owner',action='Authenticate approval/revocation authorities and evidence verifiers; fix public keys, precise scopes, original source custody, revocation source identity/location, freshness, trusted UTC, installation record and externally held continuity checkpoint. No CLI/environment/proposal/approval trust bootstrap.'),
+ dict(owner='independent evidence verifier',action='Read/authenticate launch, release and continuation originals; sign record identity, exact bytes, original subject/time/source, verifier/time/basis, scope and coverage. Existing launch ends at checkpoint_freeze; do not infer continuation.'),
+ dict(owner='release authority plus independent reviewer',action='Resolve unavailable release qualification. May separately consider a current-dated verification of historical release facts, with original and current dates distinct. This unapproved option is not adopted here.'),
+ dict(owner='independent operator plus verifier',action='If recovery is needed, establish namespace/host/process-tree quiescence and exact owner original; sign the evidence. Kernel-lock availability alone does not prove no live descendants.'),
+ dict(owner='independent acceptance authority',action='Review complete new executor identity, dependency record, test/transaction/gate evidence. Any real installation changes the exact code identity and requires fresh acceptance.'),
+ dict(owner='independent continuation approval authority',action='Only after all qualifications are resolved decide whether to issue a fresh bounded grant tied to the new accepted executor, contract, plan, source, scope, expiry and revocation ID. This implementation agent does not decide.')],
+ restart_rule='Every context/process startup requires a fresh Ed25519 authority receipt bound to its random nonce, PID, installation and scope. The independent custodian supplies its retained current checkpoint; never adopt a hash computed solely from the local state. Missing/stale/replayed receipts, missing/changed continuity, and higher-sequence erasure of known revocations all reject.',
+ limitations=['Authenticated fresh snapshot is not proof of global latest state.','Real-world source truth, semantic review, operator quiescence and trusted clock custody are independent responsibilities.','Phase admission lease permits admitted native transactions, one legal same-command rc=75 retry and finalization; next phase and cold finalize must re-admit.','A trusted custodian falsely signing an obsolete checkpoint, compromised trusted clock or runtime is outside software guarantees.'],
+ prohibited=['No real signer installation','No production private key or production approval','No historical release attestation creation or retroactive approval','No original run write, training, selection, freeze, formal, holdout, G14D/G15 or second formal run','No main merge'])
+d['installation_identity_order'] = ['UNAPPROVED PLAN: fix trust-owner/key/revocation-source pins and a non-self-referential installation record in reviewed source.', 'Do not embed the final executor commit/tree/digest literally inside the source or pre-commit installation record whose hash it includes.', 'The future reviewed installation initializer must derive the exact runtime executor scope from its verified physical checkout identity; this identity computation does not establish a trust root. Approval/evidence/CLI content must never choose keys or source pins.', 'After committing the installation change, freeze the external complete executor identity and issue new scope-bound certification/startup receipts/approval only through the independent authorities. Repeat exact-code acceptance for that changed executor.']
+(O/'unsigned_handoff.json').write_bytes(canonical(d)+b'\n')
+inputs=dict(B_implementation='e6a73357d08220d34ddc2d6537d140131c60520f',B_evidence='33bc736650baf89c26a7a9e4185b8834f90cb3c9',C_review='f3ec444cd8b8f8ec2d4e775eadea9cbc80c36a59',scientific_commit='a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d',executor_commit=I['commit'],executor_tree=I['git_tree'],review_package_files=[dict(path=str(p),sha256=file_hash(p),size_bytes=p.stat().st_size) for p in sorted(review.iterdir()) if p.is_file()])
+inputs['B_is_ancestor']=subprocess.run(['git','-C',str(R),'merge-base','--is-ancestor',inputs['B_implementation'],I['commit']]).returncode==0
+inputs['C_is_ancestor']=subprocess.run(['git','-C',str(R),'merge-base','--is-ancestor',inputs['C_review'],I['commit']]).returncode==0
+assert inputs['B_is_ancestor'] and not inputs['C_is_ancestor']
+(O/'fixed_input_provenance.json').write_bytes(canonical(inputs)+b'\n')
+print('unissued handoff and fixed input provenance recorded')

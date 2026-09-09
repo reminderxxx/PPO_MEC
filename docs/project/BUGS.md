@@ -580,3 +580,5 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 ## 2026-09-09 G14R20-D
 
 G14R20-D 明确剩余人工边界：签名不能证明原件来源/语义、host namespace 无 live descendants 或尚未取得的撤销；须由独立核验者、运维和信任 owner 承担。可信时钟或外部 continuity checkpoint 被共同回滚超出软件保证。生产 trust/release/continuation 资格仍缺失，真实执行禁止。
+
+实现 `876c369a1fa8cc33b19d782ab1ba230f021965a7` 的隔离验收已完成。认证撤销源、累计防回滚、重启挑战回执和原件认证接口的正负例通过；不将这些软件检查表述为权威全局最新状态或语义真实性证明。后续真实安装须另由信任 owner 与独立核验/批准主体决定，并冻结新安装后的 executor 身份重新验收；当前未批准交接方案见 `artifacts/analysis/g14r20_d_production_trust_20260909/unsigned_handoff.json`。
