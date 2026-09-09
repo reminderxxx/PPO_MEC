@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "goal": "G14R20-F public same-process startup handoff",
+  "status": "PASS_ISOLATED_IMPLEMENTATION_ONLY",
+  "implementation_commit": "abe92a11d8d5bbd0a3313cbffbf6077f29c14cef",
+  "implementation_tree": "7511dddbcc4df846c442469f355b8dab5d7a048c",
+  "branch": "codex/g14r20-f-startup-handoff",
+  "executor_identity_sha256": "1c4be453fe6d1dbe14c7cc57c1bc4e7a88685d39f68b6bd13c91d46f3529769d",
+  "executor_file_count": 25,
+  "public_acceptance": {
+    "status": "pass",
+    "public_parser_main": true,
+    "roles_are_separate_processes": true,
+    "invalid_new_receipt_cases": 7,
+    "missing_receipt_timeout": true,
+    "legacy_receipt_timeout": true,
+    "sigterm_fail_closed": true,
+    "sigkill_new_challenge": true,
+    "concurrent_second_host_fail_closed": true,
+    "post_release_new_host_passed": true,
+    "custody_checkpoint_count": 3
+  },
+  "tests": {
+    "targeted": {"passed": 174, "failed": 0, "skipped": 0, "seconds": 184.339},
+    "full_repository": {"passed": 1534, "failed": 0, "skipped": 0, "seconds": 324.876},
+    "smoke": "pass",
+    "compile": "pass",
+    "imports": "pass",
+    "git_diff_check": "pass"
+  },
+  "execution_counts": {
+    "synthetic_dispatch": 1,
+    "scientific_rollout": 0,
+    "real_v16_dispatch": 0,
+    "real_v16_write": 0,
+    "holdout_consumption": 0
+  },
+  "protection": {
+    "original_inventory_count": 107320,
+    "mismatches": 0,
+    "additions": 0,
+    "original_scientific_commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+    "original_scientific_tree": "eb8e83c6e4532bc45c22fb7a816388e576753e30",
+    "phase_state_rows": 15,
+    "phase_completed_rows": 5,
+    "terminal_phase": "checkpoint_freeze",
+    "cell_state_rows": 348,
+    "cell_committed_rows": 174
+  },
+  "production_state": {
+    "origin_launch": "authorized_only_through_checkpoint_freeze",
+    "historical_independent_release_attestation": "unavailable",
+    "current_release_qualification_scheme": "not_adopted",
+    "production_trust": "not_installed",
+    "continuation_approval": "not_issued",
+    "real_execution_authorized": false
+  },
+  "evidence_level": "isolated public control-flow and execution-contract validation; no scientific or production authorization claim"
+}

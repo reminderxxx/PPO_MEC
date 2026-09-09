@@ -1,0 +1,83 @@
+{
+  "artifact_integrity_manifest_version": "1.0.0",
+  "artifact_run_id": "g14r20_f_startup_handoff_20260909",
+  "file_count": 14,
+  "files": [
+    {
+      "path": "acceptance_report.md",
+      "sha256": "d687b2911d9fb7869557b2be7c90b3b63ab2b412156c9aa2c9ae3c3cea5b237b",
+      "size_bytes": 5833
+    },
+    {
+      "path": "acceptance_summary.json",
+      "sha256": "0b90bd31c2b55a51375d134a0ab43522d6a9a71435d5de7ff3e2bdb2aa5efdf9",
+      "size_bytes": 2219
+    },
+    {
+      "path": "build_integrity_manifest.py",
+      "sha256": "d1a4a8f229f5e5020d6f367485061a487e694cd6636ae92e342dc5f443b332d6",
+      "size_bytes": 1186
+    },
+    {
+      "path": "command_log.json",
+      "sha256": "b245fab03c539076fa2d2b5ccfe3e1813d84e4156436b05c8a475a06765987fe",
+      "size_bytes": 3043
+    },
+    {
+      "path": "executor_identity.json",
+      "sha256": "7ce31fc56d7bc8cb145075c10fd77588b0000b0151fa5a4116d0bdebfb591f7d",
+      "size_bytes": 3469
+    },
+    {
+      "path": "executor_verification.json",
+      "sha256": "deb6e84e6db6af5923490c0dc1730d2946b96dbc339ed9d787f829a8e339f579",
+      "size_bytes": 232
+    },
+    {
+      "path": "fixed_input_provenance.json",
+      "sha256": "146e987595e7004d3ca7a7c5de5ebfcc77c9d2aeda526c68c1a1d4100a12bc43",
+      "size_bytes": 741
+    },
+    {
+      "path": "full_pytest.xml",
+      "sha256": "cba799a24e138ce123c8bbc59b3f966930db9e0780200985850f683f4a93a71e",
+      "size_bytes": 232401
+    },
+    {
+      "path": "protection_recomputed.json",
+      "sha256": "8f6fb14fbc922ebb1f4181737b9c3c95df05f871fc58264374133c948fcd0b3b",
+      "size_bytes": 1609
+    },
+    {
+      "path": "public_startup_acceptance.json",
+      "sha256": "992b3b225b5cad640b217a3700424a97c3fec6e8e4810139e2f3cf89567e3648",
+      "size_bytes": 34907
+    },
+    {
+      "path": "requirement_evidence_matrix.md",
+      "sha256": "540f5fe5f998c1b490b628b2c0c8de272d9db3b27e2427d5bc24714cfeb97047",
+      "size_bytes": 2311
+    },
+    {
+      "path": "scope_and_protection.json",
+      "sha256": "5787edec7af53f023538031bdf01f0722e2a627bc020f9c39d7c8e981de67153",
+      "size_bytes": 1201
+    },
+    {
+      "path": "targeted_pytest.xml",
+      "sha256": "c2a65ddf9bb59fea8f52589003d229eea099b48817e8992bf2d441cdb519d21d",
+      "size_bytes": 24639
+    },
+    {
+      "path": "unapproved_next_steps.md",
+      "sha256": "823c77f77676d819450892e3a7bd7a7a6578255f286e7e34b6407c9eaaba7ece",
+      "size_bytes": 988
+    }
+  ],
+  "formal_checkpoint_count": 0,
+  "formal_episode_count": 0,
+  "formal_performance_result_count": 0,
+  "holdout_result_count": 0,
+  "integrity_status": "pass",
+  "manifest_self_excluded": true
+}

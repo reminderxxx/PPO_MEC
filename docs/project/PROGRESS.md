@@ -1837,5 +1837,8 @@ G14R20-D 正在独立 B 基线分支实现 continuation 授权 2.0.0。真实 la
   没有公开 challenge、有限等待或同对象继续执行的宿主；test fixture 直接持有对象不构成公共入口证据。
 - 独立 F 分支新增单 context 公共宿主、预置 fixed-inode startup lock、单调有限等待、strict JSONL 终结状态及
   独立 continuity custody 复核。qualification/execute 全部 authorization callback 绑定同一 context。
-- production installation 保持空；synthetic-only binding 只能在测试根执行显式 synthetic dispatch。最终精确
-  commit/identity、公共正负例、全仓与保护计数须由后续独立证据提交填写；本段不提前宣称验收完成。
+- production installation 保持空；synthetic-only binding 只能在测试根执行显式 synthetic dispatch。精确实现
+  commit=`abe92a11d8d5bbd0a3313cbffbf6077f29c14cef`，25-file executor identity=
+  `1c4be453fe6d1dbe14c7cc57c1bc4e7a88685d39f68b6bd13c91d46f3529769d`。公共双进程正负例通过，
+  targeted 174 passed、全仓 1534 passed，原 run 107,320-object 保护复算零 mismatch/零 addition。证据包：
+  `artifacts/analysis/g14r20_f_startup_handoff_20260909/`。这仅关闭隔离实现 Goal，不是生产批准。

@@ -591,3 +591,6 @@ G14R20-D 明确剩余人工边界：签名不能证明原件来源/语义、host
   state 与签名 revocation 独立复算后才可为新宿主签 receipt。
 - 残余外部边界：release 资格方案未采纳，production trust 未安装，真实 owner/verifier/issuer 未指定，真实
   continuation 未签发。实现通过也不能消除这些 pending 状态，不能据此恢复 v16 或运行 G14D/G15。
+- 精确实现验收：commit `abe92a11d8d5bbd0a3313cbffbf6077f29c14cef`，公共双进程验收 pass，targeted
+  174 passed、全仓 1534 passed；证据根 `artifacts/analysis/g14r20_f_startup_handoff_20260909/`。原 run
+  107,320-object 保护复算无 mismatch/addition，真实 dispatch/write/holdout 均为 0。

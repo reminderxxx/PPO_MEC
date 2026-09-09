@@ -1499,6 +1499,20 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 记录该包的后续提交只有文档/审计产物，不是另一个代码验收提交。此前 `834603a` / `3a88303` 分别为原始
 冻结验收与记录提交，保持历史身份。
 
+## 2026-09-09 G14R20-F public startup handoff
+
+- Root：`artifacts/analysis/g14r20_f_startup_handoff_20260909/`
+- 精确实现 commit/tree：`abe92a11d8d5bbd0a3313cbffbf6077f29c14cef` /
+  `7511dddbcc4df846c442469f355b8dab5d7a048c`
+- Executor identity：25 files，`1c4be453fe6d1dbe14c7cc57c1bc4e7a88685d39f68b6bd13c91d46f3529769d`
+- 公共入口：两个真实进程完成 challenge、receipt 发布、真实验签、qualification 和一次 synthetic execute；
+  missing/legacy、7 类错误 receipt、SIGTERM/SIGKILL、并发宿主、锁释放后新宿主与 3 次 custody 均有原始事件。
+- 回归：targeted `174 passed`；全仓 `1534 passed`；smoke、compile/import、diff check 均通过。
+- 保护：原 run 107,320 个对象零 mismatch/零 addition；synthetic dispatch=1，scientific rollout、real v16
+  dispatch/write、holdout consumption 均为 0。
+- Evidence boundary：public execution-contract isolated validation only。production trust 未安装、continuation
+  approval 未签发、`real_execution_authorized=false`；不支持恢复 v16、G14D/G15、holdout 或论文结论。
+
 七个用户修改文件 SHA-256 未变且未纳入任何提交。Protocol 2.9、Readiness v21、科学配置及旧 invalid-run
 限制均未改变。v16 仍未创建、未消耗、未执行；这是启动授权暂缓，不是运行失败。main 测试使用受控数据
 准备，public preflight 不等于完整正式评估；无正式训练、formal performance、holdout、G14D/G15 或论文结论。

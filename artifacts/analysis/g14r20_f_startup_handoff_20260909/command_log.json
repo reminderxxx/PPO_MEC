@@ -1,0 +1,56 @@
+{
+  "version": "1.0.0",
+  "implementation_commit": "abe92a11d8d5bbd0a3313cbffbf6077f29c14cef",
+  "commands": [
+    {
+      "purpose": "public two-role process acceptance",
+      "command": "run_public_startup_acceptance(/private/tmp/synthetic_g14r20_f_public_abe92a1, executor_identity, scripts/run_fixed_commit_continuation_acceptance.py)",
+      "result": "pass; host and custodian separate PIDs; 1 synthetic dispatch; all scientific/real/holdout counts zero",
+      "evidence": "public_startup_acceptance.json"
+    },
+    {
+      "purpose": "targeted startup and adjacent authorization regression",
+      "command": "PYTHONPATH=/private/tmp/g14r20_d_dependencies python -m pytest tests/test_continuation_startup_handoff.py tests/test_continuation_production_trust.py tests/test_continuation_executor_boundaries.py -q --junitxml=/private/tmp/g14r20_f_evidence/targeted.xml",
+      "result": "174 passed in 184.35s",
+      "evidence": "targeted_pytest.xml"
+    },
+    {
+      "purpose": "full repository regression",
+      "command": "PYTHONPATH=/private/tmp/g14r20_d_dependencies python -m pytest tests -q --junitxml=/private/tmp/g14r20_f_evidence/full_pytest.xml",
+      "result": "1534 passed, 16 warnings in 324.90s; warnings are existing xunit2 record_property compatibility notices",
+      "evidence": "full_pytest.xml"
+    },
+    {
+      "purpose": "smoke",
+      "command": "PYTHONPATH=/private/tmp/g14r20_d_dependencies /Users/howen/Projects/PPO_MEC/.venv/bin/python -B scripts/smoke_test.py",
+      "result": "pass; six-step toy workflow terminated normally"
+    },
+    {
+      "purpose": "compile and imports",
+      "command": "rg --files -g '*.py' -0 | xargs -0 env PYTHONPYCACHEPREFIX=/private/tmp/g14r20_f_compile_cache PYTHONPATH=/private/tmp/g14r20_d_dependencies /Users/howen/Projects/PPO_MEC/.venv/bin/python -m py_compile; then import startup/startup_binding/public CLI with scripts on PYTHONPATH",
+      "result": "pass; cryptography 46.0.5"
+    },
+    {
+      "purpose": "format and whitespace",
+      "command": "git diff --check 876c369a1fa8cc33b19d782ab1ba230f021965a7..abe92a11d8d5bbd0a3313cbffbf6077f29c14cef",
+      "result": "pass"
+    },
+    {
+      "purpose": "original run and seven-file protection",
+      "command": "/Users/howen/Projects/PPO_MEC/.venv/bin/python -B /private/tmp/ppo_mec_g14r20_d_delivery/artifacts/analysis/g14r20_d_production_trust_20260909/protect.py f_final",
+      "result": "107320 protected objects; zero mismatches; zero additions",
+      "evidence": "protection_recomputed.json"
+    }
+  ],
+  "not_rerun": [
+    {
+      "item": "D full eight-phase synthetic chain",
+      "reason": "unaffected expensive evidence; F reran affected native paths and public synthetic dispatch",
+      "reused_source": "D evidence commit 35bec6320c211b4762ec7bee85e83d780424d3eb and E audit f53f5f017e7ab20287e69a3d52ad35d931fa305c"
+    },
+    {
+      "item": "real train/dev/freeze/formal and holdout",
+      "reason": "explicitly prohibited and not required for execution-contract repair"
+    }
+  ]
+}

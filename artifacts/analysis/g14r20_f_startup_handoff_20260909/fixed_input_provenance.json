@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "implementation_base": "876c369a1fa8cc33b19d782ab1ba230f021965a7",
+  "d_evidence_commit": "35bec6320c211b4762ec7bee85e83d780424d3eb",
+  "e_review_commit": "f53f5f017e7ab20287e69a3d52ad35d931fa305c",
+  "e_review_package": "/private/tmp/ppo_mec_g14r20_e_review/artifacts/analysis/g14r20_e_review_20260909",
+  "original_scientific_commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+  "original_scientific_worktree": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+  "original_run": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16",
+  "baseline_rule": "D implementation only; E is read-only review input; main was not merged"
+}
