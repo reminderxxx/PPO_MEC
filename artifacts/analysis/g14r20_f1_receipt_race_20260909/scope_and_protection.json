@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "implementation_base": "abe92a11d8d5bbd0a3313cbffbf6077f29c14cef",
+  "implementation_commit": "b35fbe779d6019efda7ddbcb230377cd2259aef6",
+  "changed_file_count": 10,
+  "scientific_protocol_changed": false,
+  "scientific_config_changed": false,
+  "production_trust_installed": false,
+  "production_receipt_issued": false,
+  "continuation_approval_issued": false,
+  "real_execution_authorized": false,
+  "original_run_protection": {
+    "inventory_count": 107320,
+    "start_mismatches": [],
+    "end_mismatches": [],
+    "start_additions": [],
+    "end_additions": [],
+    "phase_state_sha256": "aa90b53b8655d8d782f780b9d77d785c4500c9c73a3d8b58a0b32300afa86cc9",
+    "cell_state_sha256": "509fcb075c2fb59b78ac32e0117fc1cd4b4cc77aecca5705407b0c1f1fc19e4e",
+    "proposal_sha256": "65f6fbe04fc717b1c74c8b06dee9ba0ea412ac0cd5c6b0888a9e104cc9c13cc8",
+    "seven_user_files_unchanged_start_to_end": true,
+    "original_scientific_worktree_commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+    "original_scientific_worktree_tree": "eb8e83c6e4532bc45c22fb7a816388e576753e30",
+    "original_scientific_worktree_clean": true
+  }
+}

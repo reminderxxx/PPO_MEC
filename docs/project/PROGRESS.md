@@ -1849,5 +1849,9 @@ G14R20-D 正在独立 B 基线分支实现 continuation 授权 2.0.0。真实 la
   challenge；等待函数必须消费该既定基线。context、nonce、PID、验签、authority/scope/checkpoint/time 校验、
   有界单调等待和 JSONL 合同不变。
 - 公共 synthetic 验收绑定增加测试专用 FIFO barrier，用于证明独立 custodian 不等待 `waiting` 也能安全签发；
-  production binding 不建立 barrier 或信任。精确 executor commit/identity、全仓与保护结果由独立证据提交记录。
-  production trust 仍未安装，continuation approval 未签发，`real_execution_authorized=false`。
+  production binding 不建立 barrier 或信任。实现提交 `b35fbe779d6019efda7ddbcb230377cd2259aef6` 的新
+  executor identity 覆盖 25 文件，digest=`b534cca7...664dc`；公共正例完成 1 次 synthetic dispatch，scientific
+  rollout/real v16 dispatch/real v16 write/holdout consumption 均为 0。
+- 精确 clean 实现提交上，定向回归 `176 passed`、全仓 `1536 passed`，均 0 failed/0 skipped；smoke、全 Python
+  compile/import、strict JSON/zero-counter、diff-check 与 107,320 对象起止保护均通过。production trust 仍未安装，
+  continuation approval 未签发，`real_execution_authorized=false`。

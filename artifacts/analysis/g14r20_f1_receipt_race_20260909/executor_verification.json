@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "status": "pass",
+  "commit": "b35fbe779d6019efda7ddbcb230377cd2259aef6",
+  "git_tree": "016b1fd129ed0f59c6b27972ac41e6e1612eba07",
+  "executor_identity_sha256": "b534cca7e923f55d500b9f657c4a80ed49d04bdd8aa871016aed563b217664dc",
+  "file_count": 25,
+  "clean_at_verification": true,
+  "branch_observation": "codex/g14r20-f1-receipt-race",
+  "verified_by": "continuation_executor.identity.verify_executor"
+}

@@ -5,6 +5,20 @@
 
 # Artifact Records
 
+## 2026-09-10 G14R20-F1 fast startup receipt race repair
+
+- path：`artifacts/analysis/g14r20_f1_receipt_race_20260909/`；实现 commit/tree=
+  `b35fbe779d6019efda7ddbcb230377cd2259aef6` / `016b1fd129ed0f59c6b27972ac41e6e1612eba07`。
+- `old_code_failure.xml` 是 synthetic 确定性根因复现：独立 custodian 进程经显式 barrier 在 challenge 与等待初始化间
+  完成真实签名和原子发布，F 旧代码 missing/legacy 两初态均超时；同一新回归在修复后 2/2 通过。
+- `public_startup_acceptance.json` 由独立 host/custodian PID 经同一公共 parser/main/startup、真实 Ed25519 与
+  `verify_approval` 闭合快速 missing/create、legacy/replace、waiting 后延迟、坏 receipt、有限超时、并发锁释放和
+  custody。synthetic dispatch=1；scientific rollout/real v16 dispatch/real v16 write/holdout consumption=0。
+- 定向 `176 passed`、全仓 `1536 passed`，均 0 failed/0 skipped；smoke、compile/import、strict JSON、diff-check
+  通过。起止保护 107,320 对象零 mismatch/addition，原科学 worktree/run、proposal、ledgers 和 7 个用户文件不变。
+- production trust=`not_installed`、continuation approval=`not_issued`、release 资格方案未采纳、
+  `real_execution_authorized=false`；未运行真实 formal/holdout/G14D/G15，也未重跑 D 八阶段链。
+
 ## 2026-09-06 G14R18 checkpoint provenance envelope closure
 
 - path：`artifacts/analysis/typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1/`；active config：

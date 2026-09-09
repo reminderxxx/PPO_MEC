@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "f_implementation": "abe92a11d8d5bbd0a3313cbffbf6077f29c14cef",
+  "f_evidence_commit": "3d1f72df340e868d2c774df82743006a88c033fa",
+  "f_delivery_package": "/private/tmp/ppo_mec_g14r20_f_startup_handoff/artifacts/analysis/g14r20_f_startup_handoff_20260909",
+  "original_scientific_commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+  "original_scientific_tree": "eb8e83c6e4532bc45c22fb7a816388e576753e30",
+  "implementation_branch": "codex/g14r20-f1-receipt-race",
+  "implementation_worktree": "/private/tmp/ppo_mec_g14r20_f1_receipt_race",
+  "baseline_rule": "F delivered implementation is the code base; F evidence is reused background and is not labeled as F1 revalidation"
+}

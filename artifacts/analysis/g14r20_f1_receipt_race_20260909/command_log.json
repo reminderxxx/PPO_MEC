@@ -1,0 +1,57 @@
+{
+  "version": "1.0.0",
+  "implementation_commit": "b35fbe779d6019efda7ddbcb230377cd2259aef6",
+  "commands": [
+    {
+      "purpose": "deterministic old-code reproduction",
+      "command": "pytest test_receipt_published_before_wait_initialization_is_accepted on abe92a1 implementation plus regression test",
+      "result": "2 failed by StartupTimeout in 0.453s",
+      "evidence": "old_code_failure.xml",
+      "classification": "synthetic only"
+    },
+    {
+      "purpose": "new deterministic regression",
+      "command": "pytest test_receipt_published_before_wait_initialization_is_accepted on repaired code",
+      "result": "2 passed in 0.107s",
+      "evidence": "new_code_regression.xml"
+    },
+    {
+      "purpose": "public parser/main/startup acceptance",
+      "command": "run_public_startup_acceptance with exact executor identity and independent synthetic custodian",
+      "result": "pass; fast missing/create, fast legacy/replace, delayed receipt, invalid matrix, timeout, concurrency and custody covered",
+      "evidence": "public_startup_acceptance.json"
+    },
+    {
+      "purpose": "targeted and adjacent regression",
+      "command": "python -m pytest -q tests/test_continuation_startup_handoff.py tests/test_continuation_production_trust.py tests/test_continuation_executor_boundaries.py",
+      "result": "176 passed, 0 failed, 0 skipped in 179.569s",
+      "evidence": "targeted_pytest.xml"
+    },
+    {
+      "purpose": "full repository regression",
+      "command": "python -m pytest tests -q",
+      "result": "1536 passed, 0 failed, 0 skipped in 314.001s",
+      "evidence": "full_pytest.xml"
+    },
+    {
+      "purpose": "smoke",
+      "command": "python -B scripts/smoke_test.py",
+      "result": "pass; six-step toy workflow terminated normally"
+    },
+    {
+      "purpose": "compile/import/format checks",
+      "command": "all tracked Python py_compile; affected imports; strict JSON zero-counter assertion; git diff --check abe92a1..b35fbe7",
+      "result": "pass"
+    },
+    {
+      "purpose": "start/end original protection",
+      "command": "G14R20-D protect.py f1_start and f1_end plus scientific worktree git identity",
+      "result": "107320 protected objects; zero mismatches/additions; seven user files, proposal and ledgers unchanged; original scientific worktree clean",
+      "evidence": "protection_start.json, protection_end.json"
+    }
+  ],
+  "not_rerun": [
+    {"item": "D expensive eight-stage chain", "reason": "unaffected; F1 reran public and adjacent startup paths"},
+    {"item": "real checkpoint semantic load and scientific execution", "reason": "outside authorization and unnecessary for the startup race"}
+  ]
+}

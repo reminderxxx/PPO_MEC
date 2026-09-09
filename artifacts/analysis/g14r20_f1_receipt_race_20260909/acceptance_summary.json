@@ -1,0 +1,76 @@
+{
+  "version": "1.0.0",
+  "status": "PASS_ISOLATED_RACE_REPAIR_ONLY",
+  "implementation_commit": "b35fbe779d6019efda7ddbcb230377cd2259aef6",
+  "implementation_tree": "016b1fd129ed0f59c6b27972ac41e6e1612eba07",
+  "executor_identity_sha256": "b534cca7e923f55d500b9f657c4a80ed49d04bdd8aa871016aed563b217664dc",
+  "executor_file_count": 25,
+  "old_code_reproduction": {
+    "classification": "synthetic_deterministic_reproduction",
+    "implementation_under_test": "abe92a11d8d5bbd0a3313cbffbf6077f29c14cef",
+    "barrier": "independent forked custodian process publishes and acknowledges over a process pipe before host enters wait initialization",
+    "tests": 2,
+    "failures": 2,
+    "failure": "STARTUP_RECEIPT_TIMEOUT",
+    "initial_receipt_states": ["missing", "legacy"],
+    "evidence": "old_code_failure.xml"
+  },
+  "new_code_regression": {
+    "tests": 2,
+    "passed": 2,
+    "evidence": "new_code_regression.xml"
+  },
+  "public_startup_acceptance": {
+    "status": "pass",
+    "public_parser_main_startup_path": true,
+    "independent_custodian_process": true,
+    "real_signature_and_verify_approval": true,
+    "fast_missing_creation": "accepted",
+    "fast_legacy_replacement": "accepted",
+    "delayed_after_waiting": "accepted",
+    "missing_only": "bounded_timeout_zero_admission",
+    "legacy_only": "bounded_timeout_zero_admission",
+    "fast_invalid_cases_rejected": ["schema", "signature", "authority", "checkpoint", "nonce", "pid", "expired"],
+    "concurrent_host": "second_rejected_first_undisturbed",
+    "post_release_fresh_host": "accepted_with_new_challenge",
+    "custody_verification_count": 4,
+    "evidence": "public_startup_acceptance.json"
+  },
+  "execution_counts": {
+    "synthetic_dispatch": 1,
+    "scientific_rollout": 0,
+    "real_v16_dispatch": 0,
+    "real_v16_write": 0,
+    "holdout_consumption": 0
+  },
+  "tests": {
+    "targeted": {"passed": 176, "failed": 0, "skipped": 0, "seconds": 179.569},
+    "full_repository": {"passed": 1536, "failed": 0, "skipped": 0, "seconds": 314.001},
+    "smoke": "pass",
+    "compile_all_python": "pass",
+    "affected_imports": "pass",
+    "strict_json_and_zero_counter_check": "pass",
+    "git_diff_check": "pass"
+  },
+  "protection": {
+    "protected_object_count": 107320,
+    "start_mismatch_count": 0,
+    "end_mismatch_count": 0,
+    "start_addition_count": 0,
+    "end_addition_count": 0,
+    "seven_user_files_unchanged_start_to_end": true,
+    "proposal_and_ledgers_unchanged_start_to_end": true,
+    "original_scientific_worktree_clean": true
+  },
+  "real_state": {
+    "production_trust": "not_installed",
+    "continuation_approval": "not_issued",
+    "current_release_qualification_proposal": "not_adopted",
+    "real_execution_authorized": false
+  },
+  "not_rerun": [
+    "D expensive eight-stage synthetic chain",
+    "real checkpoint semantic loading",
+    "training, selection, freeze, formal, holdout, G14D, G15"
+  ]
+}
