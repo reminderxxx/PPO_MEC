@@ -1,0 +1,36 @@
+{
+  "metadata": {
+    "reviewed_at": "2026-09-09T11:23:09.246226+08:00",
+    "literature_cutoff": "2026-09-06 (inherited metadata; literature not refreshed)",
+    "target_venue": "IEEE Transactions on Mobile Computing (TMC); administrative review only, N/S",
+    "policy_version": "tmc_review_policy_v3_20260621",
+    "artifact_run_id": "typed_model_cache_formal_20260906_152847_g14c_v16",
+    "scientific_commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+    "executor_commit": "e6a73357d08220d34ddc2d6537d140131c60520f",
+    "evidence_commit": "33bc736650baf89c26a7a9e4185b8834f90cb3c9",
+    "main_commit": "62f432c68b05b8dcd148fde454dd71d1d9621d68",
+    "review_base_commit": "62f432c68b05b8dcd148fde454dd71d1d9621d68",
+    "evidence_level": "E2_ARTIFACT_AUDITED overall; E3_REPRODUCED for independent boundary/gate probes only; no scientific performance evidence"
+  },
+  "verdict": {
+    "technical_acceptance": "pass",
+    "technical_acceptance_scope": "B declared isolated synthetic contract/transaction acceptance only",
+    "origin_launch_evidence": "verified",
+    "origin_release_evidence": "unavailable",
+    "production_trust_readiness": "not_ready",
+    "continuation_approval": "not_issued",
+    "real_execution_authorized": false
+  },
+  "counts": {
+    "real_v16_dispatch": 0,
+    "real_v16_write": 0,
+    "scientific_rollout": 0,
+    "holdout_consumption": 0
+  },
+  "limitations": [
+    "No full 1836-second synthetic chain rerun; existing local complete evidence audited",
+    "No full 1431-test suite rerun",
+    "No real 150-checkpoint semantic loader rerun; bytes independently rehashed",
+    "No production signer, approval, revocation service, or deployment exercised"
+  ]
+}

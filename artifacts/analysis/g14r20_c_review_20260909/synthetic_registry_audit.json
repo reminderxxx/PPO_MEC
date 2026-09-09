@@ -1,0 +1,18 @@
+{
+  "reviewed_at": "2026-09-09T03:23:48.852997+00:00",
+  "scope": "read-only existing B synthetic fixture; expectations cross-referenced to audited B artifact, not independent production trust",
+  "registry_audit": {
+    "status": "pass",
+    "registry_canonical_sha256": "18b413d7e9fa40216498d02e7e2a2e816028b026ec879e4f48651c246b189760",
+    "current_run_id": "synthetic_continuation",
+    "resource_count": 6
+  },
+  "phase_records": 39,
+  "anchor": "bd9b84b23dfe050cd5d40e8301162f15c8784a8cea63816f889f2c086842c5bf",
+  "tip": "ae589e8411e8891b3751765ae5b0f9e0eb12ae7c3219f0ef03e57bc617a78350",
+  "anchor_matches_freeze_not_tip": true,
+  "source_file": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847/src/runtime/generated_checkpoint_resources.py",
+  "scientific_rollout_count": 0,
+  "real_v16_dispatch_count": 0,
+  "real_v16_write_count": 0
+}

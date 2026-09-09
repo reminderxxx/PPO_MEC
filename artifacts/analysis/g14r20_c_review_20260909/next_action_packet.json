@@ -1,0 +1,261 @@
+{
+  "status": "unsigned_not_issued",
+  "execution_authorized": false,
+  "continuation_approval": "not_issued",
+  "owner": "future independent authorization authority; not this review agent",
+  "current_review": {
+    "technical_acceptance": "pass",
+    "technical_acceptance_scope": "B declared isolated synthetic contract/transaction acceptance only",
+    "origin_launch_evidence": "verified",
+    "origin_release_evidence": "unavailable",
+    "production_trust_readiness": "not_ready",
+    "continuation_approval": "not_issued",
+    "real_execution_authorized": false
+  },
+  "exact_binding": {
+    "scientific_commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+    "scientific_tree": {
+      "git_tree": "eb8e83c6e4532bc45c22fb7a816388e576753e30",
+      "tracked_sources_sha256": "4895e1cc2fadd71e110d1bcf451f973e50e9e99229d16610a8d0e593bda53526"
+    },
+    "scientific_worktree": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+    "run_id": "typed_model_cache_formal_20260906_152847_g14c_v16",
+    "run_root": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16",
+    "proposal_byte_sha256": "65f6fbe04fc717b1c74c8b06dee9ba0ea412ac0cd5c6b0888a9e104cc9c13cc8",
+    "proposal_canonical_sha256": "7ab3b78e176fcc45089220c20f84d741fee332634cca42b907c731228eef99d2",
+    "reviewed_executor_identity": {
+      "commit": "e6a73357d08220d34ddc2d6537d140131c60520f",
+      "files": [
+        {
+          "path": "scripts/continuation_executor/__init__.py",
+          "sha256": "4a4c284db5938fd80facff0570041593850969edcb8c6e5de323c6623e4be921"
+        },
+        {
+          "path": "scripts/continuation_executor/authorization.py",
+          "sha256": "3fbabae3af621b6fe2858bd06519a03b682cf5cc0fb75d428f207d35fdefbe3a"
+        },
+        {
+          "path": "scripts/continuation_executor/cells.py",
+          "sha256": "1ee42ec25b10347d380eed5e159a45b7f4528fb12331a7f3459dbeb1b24d78f0"
+        },
+        {
+          "path": "scripts/continuation_executor/checkpoints.py",
+          "sha256": "05aa8fe9f9cd9424b5af9aeb29eaf628490ae70728eb7010246823bfb1266969"
+        },
+        {
+          "path": "scripts/continuation_executor/consumer_entry.py",
+          "sha256": "406a1fe32ba79349ace767f90a6fd532eb0eeb7ec1d8ec70735f36bbed36b8e8"
+        },
+        {
+          "path": "scripts/continuation_executor/execution.py",
+          "sha256": "090385b8afd3643c8a7fa70fd44b47d92e4f8261acdb21eff9f452c5b715616b"
+        },
+        {
+          "path": "scripts/continuation_executor/fixture_inputs.py",
+          "sha256": "52ee5b4b667aeada30abf868ee1c5e6e573e5fd5050eb3eac770167708704d37"
+        },
+        {
+          "path": "scripts/continuation_executor/identity.py",
+          "sha256": "05864549f827227e3c8eca93428cccd795c3492c83f5bb56cb791e61fe69f4b7"
+        },
+        {
+          "path": "scripts/continuation_executor/isolation.py",
+          "sha256": "a5019fa1357a813af4ddf0f2710bb05761fac6462cd478e711afbb25f1c6790b"
+        },
+        {
+          "path": "scripts/continuation_executor/locking.py",
+          "sha256": "0571758ee46d03ac8e727bcca40cd4d0a1de761a363e702753bc949c80d16e7b"
+        },
+        {
+          "path": "scripts/continuation_executor/monitoring.py",
+          "sha256": "16f276e7dc2acf29794f9085c3fe2eeff3dfcb67a46ff8cbdc7e34acfe994d7f"
+        },
+        {
+          "path": "scripts/continuation_executor/planning.py",
+          "sha256": "ae28e38181f8eb874b1fa12841b775a96fc8b0bf80d82816990b846f122b7ffb"
+        },
+        {
+          "path": "scripts/continuation_executor/process_environment.py",
+          "sha256": "fb9e0f1e96b9d3af66c372cbc2df1596ba26e75249c983652b7d98e633b15297"
+        },
+        {
+          "path": "scripts/continuation_executor/reconciliation.py",
+          "sha256": "b1b1f57849dc939a093c7e27731d9e6aed8b8d3eecfd08dd22dd21aa3f5da387"
+        },
+        {
+          "path": "scripts/continuation_executor/scientific.py",
+          "sha256": "77f4232e13978b11d29b7fe12afa9e0096f2930d1a69508e05f860b439345491"
+        },
+        {
+          "path": "scripts/continuation_executor/synthetic_chain.py",
+          "sha256": "b080e241c573d85a853d69534e012c3de0db487b3ee9515485bbf5b361fe7e41"
+        },
+        {
+          "path": "scripts/continuation_executor/synthetic_payload.py",
+          "sha256": "be555f15e590dedd880fd93b41c17d533dfb417e9bad417b01d34f5b5480b189"
+        },
+        {
+          "path": "scripts/execute_fixed_commit_continuation.py",
+          "sha256": "edad1ee3ee7108fdec4e90edd83be14345613aceebe4bee0ad63de1986c6292a"
+        },
+        {
+          "path": "scripts/run_fixed_commit_continuation_acceptance.py",
+          "sha256": "07d16b2e81c92e03a9999de4ea83421eebb938b59a36993ea8febe412bb22941"
+        },
+        {
+          "path": "src/runtime/fixed_commit_continuation.py",
+          "sha256": "bcd5b964174efb39896c2178f51aa873dd6f82fe28d163679df8d992bdfdd5d3"
+        }
+      ],
+      "git_tree": "059a9464597b96805b3d6d0eaaca474826b2df31",
+      "version": "1.0.0"
+    },
+    "reviewed_executor_identity_sha256": "c5ed4aa235494c8875ef8e29abce1a6d0db1d9222a2d3b700830cfa361471427",
+    "evidence_commit": "33bc736650baf89c26a7a9e4185b8834f90cb3c9",
+    "prefixes": [
+      {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/phase_state.jsonl",
+        "kind": "phase",
+        "record_count": 15,
+        "byte_count": 1867526,
+        "prefix_sha256": "aa90b53b8655d8d782f780b9d77d785c4500c9c73a3d8b58a0b32300afa86cc9",
+        "terminal_hash": "902d0edf5cc8464890df4e63970527beeb41a80063e1ba7b3584bbd0a936806e",
+        "run_identity_fingerprint": "e5f1f65d7e74d6a4ad140ce1d7d57a1d45b78fe2a3c3eb45d0ec52bd8b621398"
+      },
+      {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/cell_state.jsonl",
+        "kind": "cell",
+        "record_count": 348,
+        "byte_count": 25278634,
+        "prefix_sha256": "509fcb075c2fb59b78ac32e0117fc1cd4b4cc77aecca5705407b0c1f1fc19e4e",
+        "terminal_hash": "0a9779b4a39d396d76ea0b481547ee655e0a4d0bea90177b5623a67d5e75be65",
+        "run_identity_fingerprint": "4ffb7b8dbe4aeaf3c5cc2f2e120e3f96f4e6024d09b039fbe1ddb13739fd5a15"
+      }
+    ],
+    "allowed_phases": [
+      "formal_cache_policy",
+      "formal_controller",
+      "formal_ablation",
+      "formal_support",
+      "formal_scalability",
+      "formal_statistics",
+      "formal_gate",
+      "complete_without_holdout"
+    ],
+    "holdout_capability": false,
+    "evidence_identities": [
+      {
+        "path": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847/configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_v2_9_manifest.json",
+        "sha256": "a73cf09a02234db791d5bad404c5fccf567fadc11b5116c13a0ee1976489e109",
+        "size_bytes": 369866,
+        "role": "protocol"
+      },
+      {
+        "path": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847/configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_index.json",
+        "sha256": "83e3a93b6003c394124d7e51ee12a42c60f8a9df9bb52a6a9c887bffb006636a",
+        "size_bytes": 25342,
+        "role": "bundle"
+      },
+      {
+        "path": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847/configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/execution_environment_manifest.json",
+        "sha256": "8790e20a9bf941aae9d3643e9227714922527d5e52b0700ee9ef2f14b83bab47",
+        "size_bytes": 1730,
+        "role": "environment"
+      },
+      {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/formal_training_execution_binding.json",
+        "sha256": "358c238b503642274d5115975ff057ad3607a364e7b3c456d0172a7851159dff",
+        "size_bytes": 6044,
+        "role": "binding"
+      },
+      {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/resolved_execution_context.json",
+        "sha256": "45f723e324cac999c54a17e66a7f8ef4c01779c8cfbdcf8d0cdc316d185c84c3",
+        "size_bytes": 16734,
+        "role": "context"
+      },
+      {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_candidates.json",
+        "sha256": "86564317b5d5613e283530e282381d31855d17a22e1548b3ce29270ca93182ee",
+        "size_bytes": 9516966,
+        "role": "candidate"
+      },
+      {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/dev_selection.json",
+        "sha256": "4f0abdd700f1fd4c06cca28462b9d2e5bb9edf7f15096e664a832fa0505b7a71",
+        "size_bytes": 1240862,
+        "role": "selection"
+      },
+      {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_freeze.json",
+        "sha256": "c9ae2523a05f5c61c4e954605b34ae846337c433e71a7284586aa02f08479fe7",
+        "size_bytes": 1828747,
+        "role": "freeze"
+      },
+      {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/generated_checkpoint_resource_registry.json",
+        "sha256": "f5e6c8dae0526b5ce955c380ffc11e07d08ae387c47be26663633fa466c908d8",
+        "size_bytes": 137016,
+        "role": "registry"
+      },
+      {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/protected_before.json.gz",
+        "sha256": "b69434cc2e5bacdf633a0b3f6d2244569a1b0b19f222aea266709d2b914e544c",
+        "size_bytes": 4915679,
+        "role": "committed_output"
+      },
+      {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/original_command_matrix.json",
+        "sha256": "bae4e464b3e3702a16dbf5d1d588610a4634e3b2632205436df1767c9e2cdbad",
+        "size_bytes": 333,
+        "role": "command_matrix"
+      }
+    ],
+    "unsigned_b_contract_sha256": "5ab0b3a75dde166aeff663acd67a996d76979794fd0d98332119b11f74a1b349",
+    "command_plan_sha256": "e68340af18c5195a1c07aa5ef30532ff796ed13f4f4f7e774f2a172960dc9bad",
+    "coordination_root": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/.continuation_locks"
+  },
+  "minimum_actions": [
+    {
+      "id": "A1",
+      "owner": "project release authority + independent evidence reviewer",
+      "action": "Resolve historical release attestation qualification or propose explicitly new-dated policy, without retroactive approval",
+      "evidence": "authenticated source, author, original time, precise release/validated-code identities"
+    },
+    {
+      "id": "A2",
+      "owner": "implementation agent in a separate task",
+      "action": "Implement reviewed production revocation source and unavailable-source fail-closed; formalize evidence certification responsibilities",
+      "evidence": "new exact commit/tree/file manifest; negative tests and authenticated trust-install procedure"
+    },
+    {
+      "id": "A3",
+      "owner": "independent acceptance agent",
+      "action": "Accept new exact executor including trust installation effects and recovery evidence bindings",
+      "evidence": "CLI rejection and qualified-path controls, revoked/expired/unavailable admission, phase completion semantics, gates, old-source/zero-real-write protection"
+    },
+    {
+      "id": "A4",
+      "owner": "independent continuation authority",
+      "action": "Only after A1-A3 decide whether to issue a fresh bounded grant",
+      "evidence": "all identities above recomputed for new executor; expiry, revocation ID, immutable inventory, command plan, allowed writes and coordination root; three independently qualified references"
+    },
+    {
+      "id": "A5_if_recovery",
+      "owner": "independent operator + approving authority",
+      "action": "Establish quiescence before approved owner takeover",
+      "evidence": "exact prior owner digest, host/PID/start/nonce, no live descendants evidence, obtainable same inode lock, newly bound grant"
+    }
+  ],
+  "stop_conditions": [
+    "Any source/executor/proposal/binding/context/command/resource drift",
+    "Any prefix mutation, illegal successor or failed terminal",
+    "Missing or unqualified release/continuation evidence",
+    "Empty/untrusted signer or expired/revoked grant",
+    "Revocation source unavailable/stale/unverifiable at admission",
+    "Recovery owner or independent quiescence mismatch",
+    "Missing/false formal gate",
+    "Any holdout capability or write outside approved successor/coordination scope"
+  ],
+  "binding_warning": "e6a7335 is the reviewed historical executor, NOT a usable production identity. Trust fixes require a new accepted identity. No real execute command is supplied."
+}

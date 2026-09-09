@@ -1,0 +1,10 @@
+import sys,json,pathlib,datetime,hashlib
+old=pathlib.Path('/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847');sys.path.insert(0,str(old))
+from src.runtime.generated_checkpoint_resources import load_generated_checkpoint_registry
+from src.evaluators.formal_phase_transaction import validate_phase_ledger_v3
+b=pathlib.Path('/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f');root=b/'synthetic_acceptance_01/synthetic_continuation';reg=json.loads((root/'generated_checkpoint_resource_registry.json').read_text());rows=[json.loads(x) for x in (root/'phase_state.jsonl').read_text().splitlines()]
+validate_phase_ledger_v3(rows)
+_,audit=load_generated_checkpoint_registry(root/'generated_checkpoint_resource_registry.json',run_root=root,expected_run_id=reg['current_run_id'],static_registry_semantic_sha256=reg['static_registry_semantic_sha256'],protocol_semantic_sha256=reg['protocol_semantic_sha256'],protocol_full_sha256=reg['protocol_full_sha256'],active_formal_bundle_sha256=reg['active_formal_bundle_sha256'],execution_commit=reg['execution_commit'],resolved_execution_context_sha256=reg['resolved_execution_context_sha256'],formal_training_execution_binding_sha256=reg['formal_training_execution_binding_sha256'])
+anchor=reg['source_phase_committed_ledger_identity']['terminal_record_sha256'];freeze=next(x for x in rows if x['phase']=='checkpoint_freeze' and x['status']=='completed');assert anchor==freeze['current_record_hash'] and anchor!=rows[-1]['current_record_hash']
+report=dict(reviewed_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),scope='read-only existing B synthetic fixture; expectations cross-referenced to audited B artifact, not independent production trust',registry_audit=audit,phase_records=len(rows),anchor=anchor,tip=rows[-1]['current_record_hash'],anchor_matches_freeze_not_tip=True,source_file=load_generated_checkpoint_registry.__code__.co_filename,scientific_rollout_count=0,real_v16_dispatch_count=0,real_v16_write_count=0)
+pathlib.Path(__file__).with_name('synthetic_registry_audit.json').write_text(json.dumps(report,indent=2)+'\n');print('pass')

@@ -1,0 +1,615 @@
+{
+  "checked_at": "2026-09-09T03:24:09.615633+00:00",
+  "versioned_evidence_manifest.json": {
+    "count": 72,
+    "bytes": 4550020,
+    "mismatches": []
+  },
+  "artifact_integrity.json": {
+    "count": 2004,
+    "bytes": 31220335,
+    "mismatches": []
+  },
+  "executor_tree": "059a9464597b96805b3d6d0eaaca474826b2df31",
+  "executor_files": [
+    {
+      "path": "scripts/continuation_executor/__init__.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/authorization.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/cells.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/checkpoints.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/consumer_entry.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/execution.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/fixture_inputs.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/identity.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/isolation.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/locking.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/monitoring.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/planning.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/process_environment.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/reconciliation.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/scientific.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/synthetic_chain.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/continuation_executor/synthetic_payload.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/execute_fixed_commit_continuation.py",
+      "matches": true
+    },
+    {
+      "path": "scripts/run_fixed_commit_continuation_acceptance.py",
+      "matches": true
+    },
+    {
+      "path": "src/runtime/fixed_commit_continuation.py",
+      "matches": true
+    }
+  ],
+  "evidence_parent": "e6a73357d08220d34ddc2d6537d140131c60520f",
+  "main": "62f432c68b05b8dcd148fde454dd71d1d9621d68",
+  "evidence_diff": [
+    "README.md",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/acceptance_report.md",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/acceptance_summary.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/ancillary_checks.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/approval_request.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/artifact_integrity.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/cli_trust_refusal_report.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/compatibility_details.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/compatibility_details_command_result.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/compatibility_details_job.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/compatibility_details_stderr.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/compatibility_details_stdout.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/compile_import_report.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/executor_identity.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/executor_verification.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/fault_and_boundary_cases.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/format_validation.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/frozen_command_plans.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/full_pytest.xml",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/full_pytest_command_result.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/full_pytest_job.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/full_pytest_stderr.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/full_pytest_stdout.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/protected_final.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/protected_inventory_verified.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/protection_command_result.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/protection_job.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/protection_stderr.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/protection_stdout.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/readonly_cli_command.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/readonly_command_result.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/readonly_compatibility.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/readonly_job.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/readonly_monitor.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/readonly_stderr.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/readonly_stdout.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/requirements_evidence_index.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/serialized_test_only/approval_test_only.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/serialized_test_only/authority_test_only.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/serialized_test_only/command_plan_test_only.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/serialized_test_only/contract_test_only.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/serialized_test_only/executor_identity.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/serialized_test_only/proposal_test_only.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/smoke_command_result.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/smoke_job.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/smoke_stderr.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/smoke_stdout.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/source_boundary_report.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/staging_refusal_report.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/synthetic_acceptance_report.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/synthetic_command_result.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/synthetic_job.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/synthetic_stderr.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/synthetic_stdout.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/targeted_pytest.xml",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/targeted_pytest_command_result.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/targeted_pytest_job.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/targeted_pytest_stderr.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/targeted_pytest_stdout.log",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/unsigned_execution_contract.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/validation_helpers/g14r20_build_report_e6a7335.py",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/validation_helpers/g14r20_cli_trust_refusal_e6a7335.py",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/validation_helpers/g14r20_compatibility_details_e6a7335.py",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/validation_helpers/g14r20_compile_import_e6a7335.py",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/validation_helpers/g14r20_export_evidence.py",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/validation_helpers/g14r20_final_protection_e6a7335.py",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/validation_helpers/g14r20_finalize_docs.py",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/validation_helpers/g14r20_finish_evidence.py",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/validation_helpers/g14r20_staging_refusal_e6a7335.py",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/validation_helpers/g14r20_validate_artifacts_e6a7335.py",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/validation_helpers/prepare_g14r20_b_readonly_final_e6a7335.py",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/validation_helpers/run_g14r20_b_readonly_cli_final_e6a7335.py",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/validation_helpers/run_g14r20_recorded.py",
+    "artifacts/analysis/g14r20_b_continuation_20260908/e6a73357d08220d34ddc2d6537d140131c60520f/versioned_evidence_manifest.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/implementation_supersession.json",
+    "artifacts/analysis/g14r20_b_continuation_20260908/startup_identity.json",
+    "docs/project/BUGS.md",
+    "docs/project/CODE_MODULE_MAP.md",
+    "docs/project/DECISION_LOG.md",
+    "docs/project/DIRECTORY_STRUCTURE.md",
+    "docs/project/PROGRESS.md",
+    "docs/project/README.md",
+    "docs/project/RUNBOOK.md",
+    "docs/project/continuation_executor_contract.md"
+  ],
+  "versioned_commit_comparison": [
+    {
+      "path": "acceptance_report.md",
+      "matches": true
+    },
+    {
+      "path": "acceptance_summary.json",
+      "matches": true
+    },
+    {
+      "path": "ancillary_checks.json",
+      "matches": true
+    },
+    {
+      "path": "approval_request.json",
+      "matches": true
+    },
+    {
+      "path": "artifact_integrity.json",
+      "matches": true
+    },
+    {
+      "path": "cli_trust_refusal_report.json",
+      "matches": true
+    },
+    {
+      "path": "compatibility_details.json",
+      "matches": true
+    },
+    {
+      "path": "compatibility_details_command_result.json",
+      "matches": true
+    },
+    {
+      "path": "compatibility_details_job.json",
+      "matches": true
+    },
+    {
+      "path": "compatibility_details_stderr.log",
+      "matches": true
+    },
+    {
+      "path": "compatibility_details_stdout.log",
+      "matches": true
+    },
+    {
+      "path": "compile_import_report.json",
+      "matches": true
+    },
+    {
+      "path": "executor_identity.json",
+      "matches": true
+    },
+    {
+      "path": "executor_verification.json",
+      "matches": true
+    },
+    {
+      "path": "fault_and_boundary_cases.json",
+      "matches": true
+    },
+    {
+      "path": "format_validation.json",
+      "matches": true
+    },
+    {
+      "path": "frozen_command_plans.json",
+      "matches": true
+    },
+    {
+      "path": "full_pytest.xml",
+      "matches": true
+    },
+    {
+      "path": "full_pytest_command_result.json",
+      "matches": true
+    },
+    {
+      "path": "full_pytest_job.json",
+      "matches": true
+    },
+    {
+      "path": "full_pytest_stderr.log",
+      "matches": true
+    },
+    {
+      "path": "full_pytest_stdout.log",
+      "matches": true
+    },
+    {
+      "path": "protected_final.json",
+      "matches": true
+    },
+    {
+      "path": "protected_inventory_verified.json",
+      "matches": true
+    },
+    {
+      "path": "protection_command_result.json",
+      "matches": true
+    },
+    {
+      "path": "protection_job.json",
+      "matches": true
+    },
+    {
+      "path": "protection_stderr.log",
+      "matches": true
+    },
+    {
+      "path": "protection_stdout.log",
+      "matches": true
+    },
+    {
+      "path": "readonly_cli_command.json",
+      "matches": true
+    },
+    {
+      "path": "readonly_command_result.json",
+      "matches": true
+    },
+    {
+      "path": "readonly_compatibility.json",
+      "matches": true
+    },
+    {
+      "path": "readonly_job.json",
+      "matches": true
+    },
+    {
+      "path": "readonly_monitor.json",
+      "matches": true
+    },
+    {
+      "path": "readonly_stderr.log",
+      "matches": true
+    },
+    {
+      "path": "readonly_stdout.log",
+      "matches": true
+    },
+    {
+      "path": "requirements_evidence_index.json",
+      "matches": true
+    },
+    {
+      "path": "serialized_test_only/approval_test_only.json",
+      "matches": true
+    },
+    {
+      "path": "serialized_test_only/authority_test_only.json",
+      "matches": true
+    },
+    {
+      "path": "serialized_test_only/command_plan_test_only.json",
+      "matches": true
+    },
+    {
+      "path": "serialized_test_only/contract_test_only.json",
+      "matches": true
+    },
+    {
+      "path": "serialized_test_only/executor_identity.json",
+      "matches": true
+    },
+    {
+      "path": "serialized_test_only/proposal_test_only.json",
+      "matches": true
+    },
+    {
+      "path": "smoke_command_result.json",
+      "matches": true
+    },
+    {
+      "path": "smoke_job.json",
+      "matches": true
+    },
+    {
+      "path": "smoke_stderr.log",
+      "matches": true
+    },
+    {
+      "path": "smoke_stdout.log",
+      "matches": true
+    },
+    {
+      "path": "source_boundary_report.json",
+      "matches": true
+    },
+    {
+      "path": "staging_refusal_report.json",
+      "matches": true
+    },
+    {
+      "path": "synthetic_acceptance_report.json",
+      "matches": true
+    },
+    {
+      "path": "synthetic_command_result.json",
+      "matches": true
+    },
+    {
+      "path": "synthetic_job.json",
+      "matches": true
+    },
+    {
+      "path": "synthetic_stderr.log",
+      "matches": true
+    },
+    {
+      "path": "synthetic_stdout.log",
+      "matches": true
+    },
+    {
+      "path": "targeted_pytest.xml",
+      "matches": true
+    },
+    {
+      "path": "targeted_pytest_command_result.json",
+      "matches": true
+    },
+    {
+      "path": "targeted_pytest_job.json",
+      "matches": true
+    },
+    {
+      "path": "targeted_pytest_stderr.log",
+      "matches": true
+    },
+    {
+      "path": "targeted_pytest_stdout.log",
+      "matches": true
+    },
+    {
+      "path": "unsigned_execution_contract.json",
+      "matches": true
+    },
+    {
+      "path": "validation_helpers/g14r20_build_report_e6a7335.py",
+      "matches": true
+    },
+    {
+      "path": "validation_helpers/g14r20_cli_trust_refusal_e6a7335.py",
+      "matches": true
+    },
+    {
+      "path": "validation_helpers/g14r20_compatibility_details_e6a7335.py",
+      "matches": true
+    },
+    {
+      "path": "validation_helpers/g14r20_compile_import_e6a7335.py",
+      "matches": true
+    },
+    {
+      "path": "validation_helpers/g14r20_export_evidence.py",
+      "matches": true
+    },
+    {
+      "path": "validation_helpers/g14r20_final_protection_e6a7335.py",
+      "matches": true
+    },
+    {
+      "path": "validation_helpers/g14r20_finalize_docs.py",
+      "matches": true
+    },
+    {
+      "path": "validation_helpers/g14r20_finish_evidence.py",
+      "matches": true
+    },
+    {
+      "path": "validation_helpers/g14r20_staging_refusal_e6a7335.py",
+      "matches": true
+    },
+    {
+      "path": "validation_helpers/g14r20_validate_artifacts_e6a7335.py",
+      "matches": true
+    },
+    {
+      "path": "validation_helpers/prepare_g14r20_b_readonly_final_e6a7335.py",
+      "matches": true
+    },
+    {
+      "path": "validation_helpers/run_g14r20_b_readonly_cli_final_e6a7335.py",
+      "matches": true
+    },
+    {
+      "path": "validation_helpers/run_g14r20_recorded.py",
+      "matches": true
+    }
+  ],
+  "proposal_keys": [
+    "version",
+    "state",
+    "execution_authorized",
+    "holdout_capability",
+    "run_id",
+    "run_root",
+    "worktree_root",
+    "execution_commit",
+    "source_tree",
+    "evidence",
+    "ledgers",
+    "allowed_phases",
+    "write_scope",
+    "origin_evidence",
+    "executor",
+    "approval",
+    "revocation_rules"
+  ],
+  "ledger_checks": [
+    {
+      "kind": "phase",
+      "records": 15,
+      "bytes": 1867526,
+      "prefix_matches": true,
+      "no_successors": true,
+      "states": [
+        {
+          "phase": "preflight",
+          "status": "running"
+        },
+        {
+          "phase": "preflight",
+          "status": "completion_candidate"
+        },
+        {
+          "phase": "preflight",
+          "status": "completed"
+        },
+        {
+          "phase": "tests",
+          "status": "running"
+        },
+        {
+          "phase": "tests",
+          "status": "completion_candidate"
+        },
+        {
+          "phase": "tests",
+          "status": "completed"
+        },
+        {
+          "phase": "train",
+          "status": "running"
+        },
+        {
+          "phase": "train",
+          "status": "completion_candidate"
+        },
+        {
+          "phase": "train",
+          "status": "completed"
+        },
+        {
+          "phase": "dev_select",
+          "status": "running"
+        },
+        {
+          "phase": "dev_select",
+          "status": "completion_candidate"
+        },
+        {
+          "phase": "dev_select",
+          "status": "completed"
+        },
+        {
+          "phase": "checkpoint_freeze",
+          "status": "running"
+        },
+        {
+          "phase": "checkpoint_freeze",
+          "status": "completion_candidate"
+        },
+        {
+          "phase": "checkpoint_freeze",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "kind": "cell",
+      "records": 348,
+      "bytes": 25278634,
+      "prefix_matches": true,
+      "no_successors": true,
+      "states": null
+    }
+  ],
+  "user_files": {
+    "/Users/howen/Projects/PPO_MEC/scripts/train_sa_ghmappo_real_sample.py": "aed850f5561f94ecba824e22bd323cdd142ee6c74255a3599129a2a6782e0eba",
+    "/Users/howen/Projects/PPO_MEC/src/agents/sa_ghmappo_agent.py": "06638c1aea5097a7fa4088db6b77648648655053dc87e1a1c817b09a7709c171",
+    "/Users/howen/Projects/PPO_MEC/src/agents/sa_ghmappo_core.py": "9951badce0ce78e608e690d6bed8d07a59d19dfef1e82f94a89d88403ac0d6b9",
+    "/Users/howen/Projects/PPO_MEC/src/encoders/fusion_encoder.py": "cde948c13f487790cf255389bc26b7af191ecc66449a7e939b217c638327954d",
+    "/Users/howen/Projects/PPO_MEC/src/evaluators/real_eval_support.py": "0a092cc15224b9b1be6a3476555c6e8eb8293573b3e27acf3fa91630db948cb6",
+    "/Users/howen/Projects/PPO_MEC/tests/test_algo_pool_contract.py": "41f2ca2f6920940bc11cd16bbc4c96104452c5653812a2b69c0e1a8e6794e75b",
+    "/Users/howen/Projects/PPO_MEC/tests/test_checkpoint_compat.py": "6b09b63b4a5cd9b527e7f3a146962ee37b9b1c9f8da78893d213b40bc6dc2cbf"
+  },
+  "user_files_match_b": true,
+  "full_pytest.xml": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "1431",
+      "time": "311.149",
+      "timestamp": "2026-09-09T10:34:09.694618+08:00",
+      "hostname": "feiwendeMacBook-Air.local"
+    }
+  ],
+  "targeted_pytest.xml": [
+    {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "71",
+      "time": "131.606",
+      "timestamp": "2026-09-09T10:35:42.187944+08:00",
+      "hostname": "feiwendeMacBook-Air.local"
+    }
+  ],
+  "protected_inventory": {
+    "count": 107320,
+    "bytes": 38300782534,
+    "mismatches": []
+  },
+  "additions": {
+    "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16": [],
+    "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847": []
+  }
+}

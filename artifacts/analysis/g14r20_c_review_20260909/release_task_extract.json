@@ -1,0 +1,217 @@
+{
+  "thread": {
+    "id": "01a07557-a437-7281-a735-891fd8cf9d72",
+    "kind": "codex",
+    "hostId": "local",
+    "title": "修复checkpoint身份投影验收",
+    "status": {
+      "type": "notLoaded"
+    },
+    "cwd": "/Users/howen/Projects/PPO_MEC",
+    "createdAt": 1788675073,
+    "updatedAt": 1788679039
+  },
+  "page": {
+    "order": "newest_first",
+    "limit": 1,
+    "nextCursor": null,
+    "hasMore": false
+  },
+  "records": [
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-4a13daa3-1db4-46b6-b3d6-ab9f1bc19491",
+      "command": "/bin/zsh -lc 'git commit -m \"fix formal checkpoint provenance projection\"'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-64084ad3-5075-440e-8cb9-db71a06bdf4f",
+      "command": "/bin/zsh -lc 'git push origin main'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 2898
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-504d9d2e-e23f-4dd8-ab7f-cb10bfc15bf2",
+      "command": "/bin/zsh -lc 'git commit -m \"prepare protocol 2.9 provenance gate candidate\"'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-bb5b3170-8e6c-4253-9716-30806bf0f8c6",
+      "command": "/bin/zsh -lc 'git push origin main'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 3006
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-302187d6-51bd-477a-bef4-98b83cae303b",
+      "command": "/bin/zsh -lc 'git commit -m \"gate clean capability tests on finalized bundle\"'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-15d59f24-7de7-487a-b462-973b035cbef5",
+      "command": "/bin/zsh -lc 'git push origin main'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 2830
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-2f3ff777-c849-4fe3-a6a6-0b237d9230b1",
+      "command": "/bin/zsh -lc 'git commit -m \"fix g14r18 scientific diff audit fields\"'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-49c38563-6b24-47e8-9502-09d4cfb073f3",
+      "command": "/bin/zsh -lc 'git push origin main'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 3185
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-6d01b5c0-2acc-4348-8c62-8de127ad045d",
+      "command": "/bin/zsh -lc 'git commit -m \"freeze protocol 2.9 provenance readiness\"'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-4d43264e-7f9e-4901-ac83-3f5076f6c6e2",
+      "command": "/bin/zsh -lc 'git push origin main'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 2647
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-550561a4-ed8c-4665-bddc-5d35b95e206a",
+      "command": "/bin/zsh -lc 'git commit -m \"record final G14R18 execution validation\"'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-3c45cdc1-8b0f-4e6b-abaf-65a19cb14d91",
+      "command": "/bin/zsh -lc 'git push origin main'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 3137
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-9e52c9b2-0f88-47e3-9920-9bc21f688329",
+      "command": "/bin/zsh -lc 'git commit -m \"document G14R18 provenance readiness\"'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 0
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "commandExecution",
+      "id": "exec-edae9cd3-4107-42c2-9e98-4906839a9384",
+      "command": "/bin/zsh -lc 'git push origin main'",
+      "cwd": "/Users/howen/Projects/PPO_MEC",
+      "status": "completed",
+      "exitCode": 0,
+      "durationMs": 2980
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "agentMessage",
+      "id": "msg_06d80164c3df355e016a9d13260c6c87d08a37162e084d7041",
+      "text": "后续文档提交 `a6d1fd8` 已推送；它只改文档，没有代码变化，因此不会用旧测试掩盖新的代码变更。现在进行最终仓库/远端一致性、审计包完整性、暂存区和七文件保护复核。",
+      "phase": "commentary"
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "agentMessage",
+      "id": "msg_06d80164c3df355e016a9d136a0e9c87d09123a099071ffd2f",
+      "text": "最终复核完成：`HEAD=main=origin/main=a6d1fd8`，暂存区为空；主工作区仅剩原有七个用户修改文件，七个 SHA-256 全部未变。Protocol 2.9 / Readiness v21、44 个 active resources 和 13-file 审计包完整性均通过，且没有启动 G14C v16。",
+      "phase": "commentary"
+    },
+    {
+      "turn": "01a07557-a612-71d3-870c-d5d92834ffb5",
+      "startedAt": 1788675073,
+      "completedAt": 1788679039,
+      "type": "agentMessage",
+      "id": "msg_06d80164c3df355e016a9d13750a7087d0a26c86794704bb72",
+      "text": "G14R18 已完成并同步至 `origin/main`，当前 `HEAD=main=origin/main=a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d`。\n\n核心结果：\n\n- 修复 17 字段 provenance envelope 与 8 字段 shared identity 的错误比较边界。\n- 完整 envelope 仍保留并严格验证；expected identity 从已验证的 active Protocol/context/binding 投影。\n- checkpoint 顶层/nested、nullable、bundle/order/Protocol/commit、SHA-256、Git、window、runtime/capacity、agent/seed 等检查均保留。\n- 真实 producer→save/read-back→selection/freeze→companion file→benchmark loader/gate→validator 链通过：\n  - 150/150 checkpoints\n  - 10 agents × 5 seeds × 3 capacities\n  - candidate/latest 与三容量覆盖\n  - 正负例 rollout 调用数均为 0\n- Protocol 2.9.0、Readiness v21 已冻结；Protocol 2.8 降为 historical/audit-only。\n\n验证结果：\n\n- 公开 preflight：通过，holdout capability=false\n- 正式入口解析：150/150；episode/interaction/update/checkpoint/performance 全为 0\n- 定向回归：170 passed，0 skipped\n- 全仓 pytest：1288 passed，0 skipped\n- `scripts/smoke_test.py`：通过\n- compile/import、`git diff --check`：通过\n- 32 个 JSON、两份 JUnit：解析通过\n- 44 个 active resources：size/SHA-256 全部一致\n- 13-file 审计包：完整性通过\n\n提交已明确分离：\n\n- `9f19ef7`：接口修复\n- `834603a`：Protocol 2.9 / Readiness v21 冻结及最终被验收代码\n- `3a88303`：独立最终验收记录\n- `a6d1fd8`：独立后续长期文档记录\n\n关键文件：\n\n- [benchmark gate](/Users/howen/Projects/PPO_MEC/scripts/benchmark_main_results.py)\n- [typed provenance validator](/Users/howen/Projects/PPO_MEC/src/runtime/typed_model_cache_runtime.py)\n- [真实链集成测试](/Users/howen/Projects/PPO_MEC/tests/test_checkpoint_nullable_identity_v28.py)\n- [Protocol 2.9 active index](/Users/howen/Projects/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_index.json)\n- [长期合同说明](/Users/howen/Projects/PPO_MEC/docs/project/formal_checkpoint_provenance_envelope_contract.md)\n- [最终验收记录](/Users/howen/Projects/PPO_MEC/artifacts/analysis/typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1/final_execution_commit_revalidation.json)\n\n七个用户修改文件未被修改、暂存或提交，最终 SHA-256 与启动记录完全一致；暂存区为空。\n\nG14C v16 保持 `G14C_V16_LAUNCH_AUTHORIZATION_DEFERRED`：未创建、未消耗、未执行，没有虚构 run root、ledger、checkpoint 或 denylist。本轮未运行正式训练、性能实验、holdout、G14D 或 G15；证据等级仍为 `E2_EXECUTION_CONTRACT_VALIDATED_NO_FORMAL_PERFORMANCE`。",
+      "phase": "final_answer"
+    }
+  ]
+}

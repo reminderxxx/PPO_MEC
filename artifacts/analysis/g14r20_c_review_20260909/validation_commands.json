@@ -1,0 +1,142 @@
+[
+  {
+    "argv": [
+      "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/test_continuation_executor_boundaries.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp=/private/tmp/synthetic_g14r20_c_pytest_20260909",
+      "--junitxml=/private/tmp/ppo_mec_g14r20_c_review/artifacts/analysis/g14r20_c_review_20260909/independent_pytest.xml"
+    ],
+    "cwd": "/private/tmp/ppo_mec_g14r20_b_62f432c",
+    "env": {
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "exit_code": 1,
+    "junit": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "19",
+      "skipped": "0",
+      "tests": "71",
+      "time": "44.055",
+      "timestamp": "2026-09-09T11:17:18.632262+08:00",
+      "hostname": "feiwendeMacBook-Air.local"
+    },
+    "environment": "sandboxed ps denied",
+    "log": "independent_pytest.log"
+  },
+  {
+    "argv": [
+      "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "-B",
+      "-m",
+      "pytest",
+      "tests/test_continuation_executor_boundaries.py",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "--basetemp=/private/tmp/synthetic_g14r20_c_pytest_retry_20260909",
+      "--junitxml=/private/tmp/ppo_mec_g14r20_c_review/artifacts/analysis/g14r20_c_review_20260909/independent_pytest_retry.xml"
+    ],
+    "cwd": "/private/tmp/ppo_mec_g14r20_b_62f432c",
+    "env": {
+      "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "exit_code": 0,
+    "junit": {
+      "name": "pytest",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "tests": "71",
+      "time": "106.799",
+      "timestamp": "2026-09-09T11:18:45.105765+08:00",
+      "hostname": "feiwendeMacBook-Air.local"
+    },
+    "environment": "approved ps-capable environment; unchanged test/source",
+    "log": "independent_pytest_retry.log"
+  },
+  {
+    "argv": [
+      "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "/private/tmp/ppo_mec_g14r20_c_review/artifacts/analysis/g14r20_c_review_20260909/recompute_integrity.py"
+    ],
+    "exit_code": 0,
+    "cwd": "/Users/howen/Projects/PPO_MEC",
+    "note": "review-only helper; see script and output for scope"
+  },
+  {
+    "argv": [
+      "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "-B",
+      "/private/tmp/ppo_mec_g14r20_c_review/artifacts/analysis/g14r20_c_review_20260909/review_probes.py"
+    ],
+    "exit_code": 0,
+    "cwd": "/Users/howen/Projects/PPO_MEC",
+    "note": "review-only helper; see script and output for scope"
+  },
+  {
+    "argv": [
+      "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "-I",
+      "-B",
+      "/private/tmp/ppo_mec_g14r20_c_review/artifacts/analysis/g14r20_c_review_20260909/audit_synthetic_registry.py"
+    ],
+    "exit_code": 0,
+    "cwd": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+    "note": "review-only helper; see script and output for scope"
+  },
+  {
+    "argv": [
+      "git",
+      "ls-remote",
+      "origin",
+      "refs/heads/main",
+      "refs/heads/codex/g14r20-b-continuation"
+    ],
+    "exit_code": 0,
+    "result": {
+      "refs/heads/main": "62f432c68b05b8dcd148fde454dd71d1d9621d68",
+      "refs/heads/codex/g14r20-b-continuation": "33bc736650baf89c26a7a9e4185b8834f90cb3c9"
+    },
+    "initial_attempt": "rc128 DNS restricted; retry approved succeeded"
+  },
+  {
+    "argv": [
+      "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "/private/tmp/ppo_mec_g14r20_c_review/artifacts/analysis/g14r20_c_review_20260909/recompute_integrity.py"
+    ],
+    "exit_code": 1,
+    "note": "initial review-helper attempt only: Python3.9 lacks hashlib.file_digest; fixed review helper to streamed hashlib, not executor"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--cached",
+      "--check"
+    ],
+    "exit_code": 2,
+    "scope": "Initial full staged whitespace check",
+    "reason": "Untouched raw failing pytest traceback log/XML contain trailing whitespace; retain byte-exact evidence."
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--cached",
+      "--check",
+      "--",
+      ".",
+      ":(exclude)artifacts/analysis/g14r20_c_review_20260909/independent_pytest.log",
+      ":(exclude)artifacts/analysis/g14r20_c_review_20260909/independent_pytest.xml"
+    ],
+    "exit_code": 0,
+    "scope": "All authored reports/scripts/docs and other outputs; only two raw traceback artifacts excluded from whitespace lint."
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "observed_at": "2026-09-09T11:23:09.246226+08:00",
+  "source_path": "/Users/howen/.codex/attachments/1b4faf5e-c59f-4c11-b0ba-f42ea9139616/pasted-text.txt",
+  "sha256": "23e4f6680763668548f569a58be153c1b3227371ac642ef48da0d15d2d38e1bc",
+  "task_id": "01a0759d-3398-7f50-855b-aad162b1c21b",
+  "user_item": "01a0759d-4368-7e53-9e1e-f543ac03f07e",
+  "original_turn_started_at": "2026-09-06T15:27:12+08:00",
+  "principal": "original task user; no legal identity authentication claimed",
+  "quote": "你是 PPO_MEC 的冻结协议执行 agent。本任务是 G14C v16-A：\n在 Protocol 2.9.0 下，从全新 clean detached worktree 和全新 durable run root，\n完成 preflight → tests → train → dev_select → checkpoint_freeze，\n交付合法冻结的 checkpoint 与后续阶段交接证据。\n\n这是 G14C v16 的第一执行子 Goal，不是修复任务。\n本消息授权上述阶段的正式执行；不授权 formal evaluation、holdout、G14D 或 G15。\n\n",
+  "scope": "preflight/tests/train/dev_select/checkpoint_freeze only",
+  "new_hash_is_not_approval": true
+}

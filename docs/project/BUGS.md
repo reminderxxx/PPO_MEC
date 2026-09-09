@@ -575,3 +575,8 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 既有 main 源码顺序断言不等价于实际入口执行，空 rollout 列表也不构成调用计数。补充的 main 正负
 用例保留真实 generated registry、companion loader、checkpoint read 和 strict gate，并监测实际 rollout
 符号。数据准备/fairness 使用 test-only 替身，因此仍不构成完整正式 benchmark 或性能证据。
+
+
+## 2026-09-09 G14R20-C 独立审查（不授权执行）
+
+生产signer为空，现状fail-closed；生产分支未实现revocation来源检查，不能靠安装key开放执行。三项reference_sha256及恢复quiescence原件的独立核验责任尚待冻结，新增trust代码必须对新精确executor重新验收。发现项只立独立修复任务，未修改实现或恢复v16。 详见 [G14R20-C独立报告](../../artifacts/analysis/g14r20_c_review_20260909/review_report.md)。

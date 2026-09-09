@@ -1,0 +1,954 @@
+..................................FF.FF...FFFFFFFFFFFFFFF..............  [100%]
+=================================== FAILURES ===================================
+___________________ test_lock_competition_and_repeated_start ___________________
+
+fixture = ({'ledgers': [], 'run_id': 'synthetic_b', 'run_root': '/private/tmp/synthetic_g14r20_c_pytest_20260909/test_lock_compe...ion_and_repe0', 'key_hex': '98dea037d6a1db70957d2b7150a500145c7dd27ee9acd20b1a2fc81f1170ef00', 'revoked_ids': [], ...})
+
+    def test_lock_competition_and_repeated_start(fixture):
+        p, _, _, _ = fixture
+>       with SingleWriter(p["run_root"], "x", lambda: None):
+
+tests/test_continuation_executor_boundaries.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/continuation_executor/locking.py:63: in __enter__
+    "process": process_identity(os.getpid()), "executor_sha256": self.executor_sha256}
+scripts/continuation_executor/locking.py:16: in process_identity
+    result = subprocess.run(["ps", "-p", str(pid), "-o", "lstart="], text=True,
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py:505: in run
+    with Popen(*popenargs, **kwargs) as process:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py:951: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: 255 args: ['ps', '-p', '49247', '-o', 'lstart=']>
+args = ['ps', '-p', '49247', '-o', 'lstart='], executable = b'ps'
+preexec_fn = None, close_fds = True, pass_fds = (), cwd = None, env = None
+startupinfo = None, creationflags = 0, shell = False, p2cread = -1
+p2cwrite = -1, c2pread = 13, c2pwrite = 14, errread = 15, errwrite = 16
+restore_signals = True, gid = None, gids = None, uid = None, umask = -1
+start_new_session = False
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       restore_signals,
+                       gid, gids, uid, umask,
+                       start_new_session):
+        """Execute program (POSIX version)"""
+    
+        if isinstance(args, (str, bytes)):
+            args = [args]
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = [args]
+        else:
+            args = list(args)
+    
+        if shell:
+            # On Android the default shell is at '/system/bin/sh'.
+            unix_shell = ('/system/bin/sh' if
+                      hasattr(sys, 'getandroidapilevel') else '/bin/sh')
+            args = [unix_shell, "-c"] + args
+            if executable:
+                args[0] = executable
+    
+        if executable is None:
+            executable = args[0]
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        if (_USE_POSIX_SPAWN
+                and os.path.dirname(executable)
+                and preexec_fn is None
+                and not close_fds
+                and not pass_fds
+                and cwd is None
+                and (p2cread == -1 or p2cread > 2)
+                and (c2pwrite == -1 or c2pwrite > 2)
+                and (errwrite == -1 or errwrite > 2)
+                and not start_new_session
+                and gid is None
+                and gids is None
+                and uid is None
+                and umask < 0):
+            self._posix_spawn(args, executable, env, restore_signals,
+                              p2cread, p2cwrite,
+                              c2pread, c2pwrite,
+                              errread, errwrite)
+            return
+    
+        orig_executable = executable
+    
+        # For transferring possible exec failure from child to parent.
+        # Data format: "exception name:hex errno:description"
+        # Pickle is not used; it is complex and involves memory allocation.
+        errpipe_read, errpipe_write = os.pipe()
+        # errpipe_write must not be in the standard io 0, 1, or 2 fd range.
+        low_fds_to_close = []
+        while errpipe_write < 3:
+            low_fds_to_close.append(errpipe_write)
+            errpipe_write = os.dup(errpipe_write)
+        for low_fd in low_fds_to_close:
+            os.close(low_fd)
+        try:
+            try:
+                # We must avoid complex work that could involve
+                # malloc or free in the child process to avoid
+                # potential deadlocks, thus we do all this here.
+                # and pass it to fork_exec()
+    
+                if env is not None:
+                    env_list = []
+                    for k, v in env.items():
+                        k = os.fsencode(k)
+                        if b'=' in k:
+                            raise ValueError("illegal environment variable name")
+                        env_list.append(k + b'=' + os.fsencode(v))
+                else:
+                    env_list = None  # Use execv instead of execve.
+                executable = os.fsencode(executable)
+                if os.path.dirname(executable):
+                    executable_list = (executable,)
+                else:
+                    # This matches the behavior of os._execvpe().
+                    executable_list = tuple(
+                        os.path.join(os.fsencode(dir), executable)
+                        for dir in os.get_exec_path(env))
+                fds_to_keep = set(pass_fds)
+                fds_to_keep.add(errpipe_write)
+                self.pid = _posixsubprocess.fork_exec(
+                        args, executable_list,
+                        close_fds, tuple(sorted(map(int, fds_to_keep))),
+                        cwd, env_list,
+                        p2cread, p2cwrite, c2pread, c2pwrite,
+                        errread, errwrite,
+                        errpipe_read, errpipe_write,
+                        restore_signals, start_new_session,
+                        gid, gids, uid, umask,
+                        preexec_fn)
+                self._child_created = True
+            finally:
+                # be sure the FD is closed no matter what
+                os.close(errpipe_write)
+    
+            self._close_pipe_fds(p2cread, p2cwrite,
+                                 c2pread, c2pwrite,
+                                 errread, errwrite)
+    
+            # Wait for exec to fail or succeed; possibly raising an
+            # exception (limited in size)
+            errpipe_data = bytearray()
+            while True:
+                part = os.read(errpipe_read, 50000)
+                errpipe_data += part
+                if not part or len(errpipe_data) > 50000:
+                    break
+        finally:
+            # be sure the FD is closed no matter what
+            os.close(errpipe_read)
+    
+        if errpipe_data:
+            try:
+                pid, sts = os.waitpid(self.pid, 0)
+                if pid == self.pid:
+                    self._handle_exitstatus(sts)
+                else:
+                    self.returncode = sys.maxsize
+            except ChildProcessError:
+                pass
+    
+            try:
+                exception_name, hex_errno, err_msg = (
+                        errpipe_data.split(b':', 2))
+                # The encoding here should match the encoding
+                # written in by the subprocess implementations
+                # like _posixsubprocess
+                err_msg = err_msg.decode()
+            except ValueError:
+                exception_name = b'SubprocessError'
+                hex_errno = b'0'
+                err_msg = 'Bad exception data from child: {!r}'.format(
+                              bytes(errpipe_data))
+            child_exception_type = getattr(
+                    builtins, exception_name.decode('ascii'),
+                    SubprocessError)
+            if issubclass(child_exception_type, OSError) and hex_errno:
+                errno_num = int(hex_errno, 16)
+                child_exec_never_called = (err_msg == "noexec")
+                if child_exec_never_called:
+                    err_msg = ""
+                    # The error must be from chdir(cwd).
+                    err_filename = cwd
+                else:
+                    err_filename = orig_executable
+                if errno_num != 0:
+                    err_msg = os.strerror(errno_num)
+>               raise child_exception_type(errno_num, err_msg, err_filename)
+E               PermissionError: [Errno 1] Operation not permitted: 'ps'
+
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py:1821: PermissionError
+________________ test_crash_record_cannot_be_blindly_reclaimed _________________
+
+fixture = ({'ledgers': [], 'run_id': 'synthetic_b', 'run_root': '/private/tmp/synthetic_g14r20_c_pytest_20260909/test_crash_reco...cannot_be_bl0', 'key_hex': '378b3bd691c87d22a71921c6cbe50b9aa96c7027c9d759a512e5a9a159c32f99', 'revoked_ids': [], ...})
+
+    def test_crash_record_cannot_be_blindly_reclaimed(fixture):
+        p, _, _, _ = fixture
+        with pytest.raises(RuntimeError):
+>           with SingleWriter(p["run_root"], "x", lambda: None): raise RuntimeError("crash")
+
+tests/test_continuation_executor_boundaries.py:139: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/continuation_executor/locking.py:63: in __enter__
+    "process": process_identity(os.getpid()), "executor_sha256": self.executor_sha256}
+scripts/continuation_executor/locking.py:16: in process_identity
+    result = subprocess.run(["ps", "-p", str(pid), "-o", "lstart="], text=True,
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py:505: in run
+    with Popen(*popenargs, **kwargs) as process:
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py:951: in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: 255 args: ['ps', '-p', '49247', '-o', 'lstart=']>
+args = ['ps', '-p', '49247', '-o', 'lstart='], executable = b'ps'
+preexec_fn = None, close_fds = True, pass_fds = (), cwd = None, env = None
+startupinfo = None, creationflags = 0, shell = False, p2cread = -1
+p2cwrite = -1, c2pread = 13, c2pwrite = 14, errread = 15, errwrite = 16
+restore_signals = True, gid = None, gids = None, uid = None, umask = -1
+start_new_session = False
+
+    def _execute_child(self, args, executable, preexec_fn, close_fds,
+                       pass_fds, cwd, env,
+                       startupinfo, creationflags, shell,
+                       p2cread, p2cwrite,
+                       c2pread, c2pwrite,
+                       errread, errwrite,
+                       restore_signals,
+                       gid, gids, uid, umask,
+                       start_new_session):
+        """Execute program (POSIX version)"""
+    
+        if isinstance(args, (str, bytes)):
+            args = [args]
+        elif isinstance(args, os.PathLike):
+            if shell:
+                raise TypeError('path-like args is not allowed when '
+                                'shell is true')
+            args = [args]
+        else:
+            args = list(args)
+    
+        if shell:
+            # On Android the default shell is at '/system/bin/sh'.
+            unix_shell = ('/system/bin/sh' if
+                      hasattr(sys, 'getandroidapilevel') else '/bin/sh')
+            args = [unix_shell, "-c"] + args
+            if executable:
+                args[0] = executable
+    
+        if executable is None:
+            executable = args[0]
+    
+        sys.audit("subprocess.Popen", executable, args, cwd, env)
+    
+        if (_USE_POSIX_SPAWN
+                and os.path.dirname(executable)
+                and preexec_fn is None
+                and not close_fds
+                and not pass_fds
+                and cwd is None
+                and (p2cread == -1 or p2cread > 2)
+                and (c2pwrite == -1 or c2pwrite > 2)
+                and (errwrite == -1 or errwrite > 2)
+                and not start_new_session
+                and gid is None
+                and gids is None
+                and uid is None
+                and umask < 0):
+            self._posix_spawn(args, executable, env, restore_signals,
+                              p2cread, p2cwrite,
+                              c2pread, c2pwrite,
+                              errread, errwrite)
+            return
+    
+        orig_executable = executable
+    
+        # For transferring possible exec failure from child to parent.
+        # Data format: "exception name:hex errno:description"
+        # Pickle is not used; it is complex and involves memory allocation.
+        errpipe_read, errpipe_write = os.pipe()
+        # errpipe_write must not be in the standard io 0, 1, or 2 fd range.
+        low_fds_to_close = []
+        while errpipe_write < 3:
+            low_fds_to_close.append(errpipe_write)
+            errpipe_write = os.dup(errpipe_write)
+        for low_fd in low_fds_to_close:
+            os.close(low_fd)
+        try:
+            try:
+                # We must avoid complex work that could involve
+                # malloc or free in the child process to avoid
+                # potential deadlocks, thus we do all this here.
+                # and pass it to fork_exec()
+    
+                if env is not None:
+                    env_list = []
+                    for k, v in env.items():
+                        k = os.fsencode(k)
+                        if b'=' in k:
+                            raise ValueError("illegal environment variable name")
+                        env_list.append(k + b'=' + os.fsencode(v))
+                else:
+                    env_list = None  # Use execv instead of execve.
+                executable = os.fsencode(executable)
+                if os.path.dirname(executable):
+                    executable_list = (executable,)
+                else:
+                    # This matches the behavior of os._execvpe().
+                    executable_list = tuple(
+                        os.path.join(os.fsencode(dir), executable)
+                        for dir in os.get_exec_path(env))
+                fds_to_keep = set(pass_fds)
+                fds_to_keep.add(errpipe_write)
+                self.pid = _posixsubprocess.fork_exec(
+                        args, executable_list,
+                        close_fds, tuple(sorted(map(int, fds_to_keep))),
+                        cwd, env_list,
+                        p2cread, p2cwrite, c2pread, c2pwrite,
+                        errread, errwrite,
+                        errpipe_read, errpipe_write,
+                        restore_signals, start_new_session,
+                        gid, gids, uid, umask,
+                        preexec_fn)
+                self._child_created = True
+            finally:
+                # be sure the FD is closed no matter what
+                os.close(errpipe_write)
+    
+            self._close_pipe_fds(p2cread, p2cwrite,
+                                 c2pread, c2pwrite,
+                                 errread, errwrite)
+    
+            # Wait for exec to fail or succeed; possibly raising an
+            # exception (limited in size)
+            errpipe_data = bytearray()
+            while True:
+                part = os.read(errpipe_read, 50000)
+                errpipe_data += part
+                if not part or len(errpipe_data) > 50000:
+                    break
+        finally:
+            # be sure the FD is closed no matter what
+            os.close(errpipe_read)
+    
+        if errpipe_data:
+            try:
+                pid, sts = os.waitpid(self.pid, 0)
+                if pid == self.pid:
+                    self._handle_exitstatus(sts)
+                else:
+                    self.returncode = sys.maxsize
+            except ChildProcessError:
+                pass
+    
+            try:
+                exception_name, hex_errno, err_msg = (
+                        errpipe_data.split(b':', 2))
+                # The encoding here should match the encoding
+                # written in by the subprocess implementations
+                # like _posixsubprocess
+                err_msg = err_msg.decode()
+            except ValueError:
+                exception_name = b'SubprocessError'
+                hex_errno = b'0'
+                err_msg = 'Bad exception data from child: {!r}'.format(
+                              bytes(errpipe_data))
+            child_exception_type = getattr(
+                    builtins, exception_name.decode('ascii'),
+                    SubprocessError)
+            if issubclass(child_exception_type, OSError) and hex_errno:
+                errno_num = int(hex_errno, 16)
+                child_exec_never_called = (err_msg == "noexec")
+                if child_exec_never_called:
+                    err_msg = ""
+                    # The error must be from chdir(cwd).
+                    err_filename = cwd
+                else:
+                    err_filename = orig_executable
+                if errno_num != 0:
+                    err_msg = os.strerror(errno_num)
+>               raise child_exception_type(errno_num, err_msg, err_filename)
+E               PermissionError: [Errno 1] Operation not permitted: 'ps'
+
+/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py:1821: PermissionError
+______________ test_real_process_crash_requires_approved_recovery ______________
+
+fixture = ({'ledgers': [], 'run_id': 'synthetic_b', 'run_root': '/private/tmp/synthetic_g14r20_c_pytest_20260909/test_real_proce...crash_requir0', 'key_hex': '942abe3221c7826a59383ae6de2d6be48c245e9b102bf6f7b59894e9f2a43bdd', 'revoked_ids': [], ...})
+
+    def test_real_process_crash_requires_approved_recovery(fixture):
+        p, _, _, _ = fixture
+        code = '''
+    import os, sys
+    from scripts.continuation_executor.locking import SingleWriter, writer_lock_path
+    with SingleWriter(sys.argv[1], "executor", lambda: None):
+        print("acquired", flush=True)
+        os._exit(17)
+    '''
+        child = subprocess.run([sys.executable, "-B", "-c", code, p["run_root"]], cwd=ROOT,
+                               capture_output=True, text=True)
+>       assert child.returncode == 17 and child.stdout.strip() == "acquired"
+E       AssertionError: assert (1 == 17)
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-B', '-c', '\nimport os, sys\nfrom scripts.c... child_exception_type(errno_num, err_msg, err_filename)\nPermissionError: [Errno 1] Operation not permitted: \'ps\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:227: AssertionError
+_________________ test_five_cells_use_old_native_transactions __________________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_five_cells_use_old_native0')
+
+    def test_five_cells_use_old_native_transactions(tmp_path):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path)],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True,text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 200, in main
+E             results.append(execute_phase(subject,name,authorize,executor_identity,scope=scope))
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/execution.py", line 44, in execute_phase
+E             with SingleWriter(str(run.run_root), digest(executor_identity), authorize,
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 63, in __enter__
+E             "process": process_identity(os.getpid()), "executor_sha256": self.executor_sha256}
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 16, in process_identity
+E             result = subprocess.run(["ps", "-p", str(pid), "-o", "lstart="], text=True,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 505, in run
+E             with Popen(*popenargs, **kwargs) as process:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 951, in __init__
+E             self._execute_child(args, executable, preexec_fn, close_fds,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1821, in _execute_child
+E             raise child_exception_type(errno_num, err_msg, err_filename)
+E         PermissionError: [Errno 1] Operation not permitted: 'ps'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62... child_exception_type(errno_num, err_msg, err_filename)\nPermissionError: [Errno 1] Operation not permitted: \'ps\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:241: AssertionError
+___________________ test_two_real_processes_only_one_writer ____________________
+
+fixture = ({'ledgers': [], 'run_id': 'synthetic_b', 'run_root': '/private/tmp/synthetic_g14r20_c_pytest_20260909/test_two_real_p...esses_only_o0', 'key_hex': '92a40a2eed56d972de4f30725efb2625dd400799e3dcfda7de5a381cd587fa74', 'revoked_ids': [], ...})
+
+    def test_two_real_processes_only_one_writer(fixture):
+        p,_,_,_=fixture
+        code="""import sys
+    from scripts.continuation_executor.locking import SingleWriter
+    with SingleWriter(sys.argv[1], 'test', lambda: None):
+        print('locked',flush=True)
+        sys.stdin.readline()
+    """
+        first=subprocess.Popen([sys.executable,"-B","-c",code,p["run_root"]],cwd=ROOT,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+        try:
+>           assert first.stdout.readline().strip()=="locked"
+E           AssertionError: assert '' == 'locked'
+E             
+E             - locked
+
+tests/test_continuation_executor_boundaries.py:273: AssertionError
+___________________ test_native_faults_and_restarts[exit75] ____________________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart0')
+case = 'exit75'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 200, in main
+E             results.append(execute_phase(subject,name,authorize,executor_identity,scope=scope))
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/execution.py", line 44, in execute_phase
+E             with SingleWriter(str(run.run_root), digest(executor_identity), authorize,
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 63, in __enter__
+E             "process": process_identity(os.getpid()), "executor_sha256": self.executor_sha256}
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 16, in process_identity
+E             result = subprocess.run(["ps", "-p", str(pid), "-o", "lstart="], text=True,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 505, in run
+E             with Popen(*popenargs, **kwargs) as process:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 951, in __init__
+E             self._execute_child(args, executable, preexec_fn, close_fds,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1821, in _execute_child
+E             raise child_exception_type(errno_num, err_msg, err_filename)
+E         PermissionError: [Errno 1] Operation not permitted: 'ps'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62... child_exception_type(errno_num, err_msg, err_filename)\nPermissionError: [Errno 1] Operation not permitted: \'ps\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+__________________ test_native_faults_and_restarts[terminal] ___________________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart1')
+case = 'terminal'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 245, in main
+E             print(json.dumps(dict(status="pass",case=mode,error=error,synthetic_child_dispatch_count=len((fixture/"invocations.jsonl").read_text().splitlines()),prefix_unchanged=all(after),
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1256, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1242, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1110, in _opener
+E             return self._accessor.open(self, flags, mode)
+E         FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart1/invocations.jsonl'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62...or directory: \'/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart1/invocations.jsonl\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+___________________ test_native_faults_and_restarts[missing] ___________________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart2')
+case = 'missing'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 245, in main
+E             print(json.dumps(dict(status="pass",case=mode,error=error,synthetic_child_dispatch_count=len((fixture/"invocations.jsonl").read_text().splitlines()),prefix_unchanged=all(after),
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1256, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1242, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1110, in _opener
+E             return self._accessor.open(self, flags, mode)
+E         FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart2/invocations.jsonl'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62...or directory: \'/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart2/invocations.jsonl\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+___________________ test_native_faults_and_restarts[corrupt] ___________________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart3')
+case = 'corrupt'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 245, in main
+E             print(json.dumps(dict(status="pass",case=mode,error=error,synthetic_child_dispatch_count=len((fixture/"invocations.jsonl").read_text().splitlines()),prefix_unchanged=all(after),
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1256, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1242, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1110, in _opener
+E             return self._accessor.open(self, flags, mode)
+E         FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart3/invocations.jsonl'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62...or directory: \'/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart3/invocations.jsonl\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+_________________ test_native_faults_and_restarts[descriptor] __________________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart4')
+case = 'descriptor'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 245, in main
+E             print(json.dumps(dict(status="pass",case=mode,error=error,synthetic_child_dispatch_count=len((fixture/"invocations.jsonl").read_text().splitlines()),prefix_unchanged=all(after),
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1256, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1242, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1110, in _opener
+E             return self._accessor.open(self, flags, mode)
+E         FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart4/invocations.jsonl'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62...or directory: \'/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart4/invocations.jsonl\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+_________________ test_native_faults_and_restarts[provenance] __________________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart5')
+case = 'provenance'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 245, in main
+E             print(json.dumps(dict(status="pass",case=mode,error=error,synthetic_child_dispatch_count=len((fixture/"invocations.jsonl").read_text().splitlines()),prefix_unchanged=all(after),
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1256, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1242, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/pathlib.py", line 1110, in _opener
+E             return self._accessor.open(self, flags, mode)
+E         FileNotFoundError: [Errno 2] No such file or directory: '/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart5/invocations.jsonl'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62...or directory: \'/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart5/invocations.jsonl\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+______________ test_native_faults_and_restarts[publication_crash] ______________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart6')
+case = 'publication_crash'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 178, in main
+E             execute_phase(subject,PHASES[0],authorize,executor_identity,scope=scope)
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/execution.py", line 44, in execute_phase
+E             with SingleWriter(str(run.run_root), digest(executor_identity), authorize,
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 63, in __enter__
+E             "process": process_identity(os.getpid()), "executor_sha256": self.executor_sha256}
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 16, in process_identity
+E             result = subprocess.run(["ps", "-p", str(pid), "-o", "lstart="], text=True,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 505, in run
+E             with Popen(*popenargs, **kwargs) as process:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 951, in __init__
+E             self._execute_child(args, executable, preexec_fn, close_fds,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1821, in _execute_child
+E             raise child_exception_type(errno_num, err_msg, err_filename)
+E         PermissionError: [Errno 1] Operation not permitted: 'ps'
+E         Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 181, in main
+E             assert os.WIFEXITED(status) and os.WEXITSTATUS(status)==17
+E         AssertionError
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62...ative_driver.py", line 181, in main\n    assert os.WIFEXITED(status) and os.WEXITSTATUS(status)==17\nAssertionError\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+_______________ test_native_faults_and_restarts[candidate_crash] _______________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart7')
+case = 'candidate_crash'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 178, in main
+E             execute_phase(subject,PHASES[0],authorize,executor_identity,scope=scope)
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/execution.py", line 44, in execute_phase
+E             with SingleWriter(str(run.run_root), digest(executor_identity), authorize,
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 63, in __enter__
+E             "process": process_identity(os.getpid()), "executor_sha256": self.executor_sha256}
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 16, in process_identity
+E             result = subprocess.run(["ps", "-p", str(pid), "-o", "lstart="], text=True,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 505, in run
+E             with Popen(*popenargs, **kwargs) as process:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 951, in __init__
+E             self._execute_child(args, executable, preexec_fn, close_fds,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1821, in _execute_child
+E             raise child_exception_type(errno_num, err_msg, err_filename)
+E         PermissionError: [Errno 1] Operation not permitted: 'ps'
+E         Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 181, in main
+E             assert os.WIFEXITED(status) and os.WEXITSTATUS(status)==17
+E         AssertionError
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62...ative_driver.py", line 181, in main\n    assert os.WIFEXITED(status) and os.WEXITSTATUS(status)==17\nAssertionError\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+_____________ test_native_faults_and_restarts[duplicate_committed] _____________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart8')
+case = 'duplicate_committed'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 200, in main
+E             results.append(execute_phase(subject,name,authorize,executor_identity,scope=scope))
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/execution.py", line 44, in execute_phase
+E             with SingleWriter(str(run.run_root), digest(executor_identity), authorize,
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 63, in __enter__
+E             "process": process_identity(os.getpid()), "executor_sha256": self.executor_sha256}
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 16, in process_identity
+E             result = subprocess.run(["ps", "-p", str(pid), "-o", "lstart="], text=True,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 505, in run
+E             with Popen(*popenargs, **kwargs) as process:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 951, in __init__
+E             self._execute_child(args, executable, preexec_fn, close_fds,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1821, in _execute_child
+E             raise child_exception_type(errno_num, err_msg, err_filename)
+E         PermissionError: [Errno 1] Operation not permitted: 'ps'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62... child_exception_type(errno_num, err_msg, err_filename)\nPermissionError: [Errno 1] Operation not permitted: \'ps\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+________________ test_native_faults_and_restarts[gate_missing] _________________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart9')
+case = 'gate_missing'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 200, in main
+E             results.append(execute_phase(subject,name,authorize,executor_identity,scope=scope))
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/execution.py", line 44, in execute_phase
+E             with SingleWriter(str(run.run_root), digest(executor_identity), authorize,
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 63, in __enter__
+E             "process": process_identity(os.getpid()), "executor_sha256": self.executor_sha256}
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 16, in process_identity
+E             result = subprocess.run(["ps", "-p", str(pid), "-o", "lstart="], text=True,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 505, in run
+E             with Popen(*popenargs, **kwargs) as process:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 951, in __init__
+E             self._execute_child(args, executable, preexec_fn, close_fds,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1821, in _execute_child
+E             raise child_exception_type(errno_num, err_msg, err_filename)
+E         PermissionError: [Errno 1] Operation not permitted: 'ps'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62... child_exception_type(errno_num, err_msg, err_filename)\nPermissionError: [Errno 1] Operation not permitted: \'ps\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+_________________ test_native_faults_and_restarts[gate_false] __________________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart10')
+case = 'gate_false'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 200, in main
+E             results.append(execute_phase(subject,name,authorize,executor_identity,scope=scope))
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/execution.py", line 44, in execute_phase
+E             with SingleWriter(str(run.run_root), digest(executor_identity), authorize,
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 63, in __enter__
+E             "process": process_identity(os.getpid()), "executor_sha256": self.executor_sha256}
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 16, in process_identity
+E             result = subprocess.run(["ps", "-p", str(pid), "-o", "lstart="], text=True,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 505, in run
+E             with Popen(*popenargs, **kwargs) as process:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 951, in __init__
+E             self._execute_child(args, executable, preexec_fn, close_fds,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1821, in _execute_child
+E             raise child_exception_type(errno_num, err_msg, err_filename)
+E         PermissionError: [Errno 1] Operation not permitted: 'ps'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62... child_exception_type(errno_num, err_msg, err_filename)\nPermissionError: [Errno 1] Operation not permitted: \'ps\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+_____________ test_native_faults_and_restarts[revoke_during_phase] _____________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart11')
+case = 'revoke_during_phase'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 150, in main
+E             result=execute_phase(subject,PHASES[0],authorize,executor_identity,scope=scope)
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/execution.py", line 44, in execute_phase
+E             with SingleWriter(str(run.run_root), digest(executor_identity), authorize,
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 63, in __enter__
+E             "process": process_identity(os.getpid()), "executor_sha256": self.executor_sha256}
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 16, in process_identity
+E             result = subprocess.run(["ps", "-p", str(pid), "-o", "lstart="], text=True,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 505, in run
+E             with Popen(*popenargs, **kwargs) as process:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 951, in __init__
+E             self._execute_child(args, executable, preexec_fn, close_fds,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1821, in _execute_child
+E             raise child_exception_type(errno_num, err_msg, err_filename)
+E         PermissionError: [Errno 1] Operation not permitted: 'ps'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62... child_exception_type(errno_num, err_msg, err_filename)\nPermissionError: [Errno 1] Operation not permitted: \'ps\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+_____________ test_native_faults_and_restarts[expire_during_phase] _____________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart12')
+case = 'expire_during_phase'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 150, in main
+E             result=execute_phase(subject,PHASES[0],authorize,executor_identity,scope=scope)
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/execution.py", line 44, in execute_phase
+E             with SingleWriter(str(run.run_root), digest(executor_identity), authorize,
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 63, in __enter__
+E             "process": process_identity(os.getpid()), "executor_sha256": self.executor_sha256}
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 16, in process_identity
+E             result = subprocess.run(["ps", "-p", str(pid), "-o", "lstart="], text=True,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 505, in run
+E             with Popen(*popenargs, **kwargs) as process:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 951, in __init__
+E             self._execute_child(args, executable, preexec_fn, close_fds,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1821, in _execute_child
+E             raise child_exception_type(errno_num, err_msg, err_filename)
+E         PermissionError: [Errno 1] Operation not permitted: 'ps'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62... child_exception_type(errno_num, err_msg, err_filename)\nPermissionError: [Errno 1] Operation not permitted: \'ps\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+_______________ test_native_faults_and_restarts[utc_adjustment] ________________
+
+tmp_path = PosixPath('/private/tmp/synthetic_g14r20_c_pytest_20260909/test_native_faults_and_restart13')
+case = 'utc_adjustment'
+
+    @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
+    def test_native_faults_and_restarts(tmp_path, case):
+        old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+        result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+            cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
+            capture_output=True, text=True)
+>       assert result.returncode == 0, result.stderr
+E       AssertionError: Traceback (most recent call last):
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 249, in <module>
+E             if __name__ == "__main__": main()
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/tests/continuation_native_driver.py", line 200, in main
+E             results.append(execute_phase(subject,name,authorize,executor_identity,scope=scope))
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/execution.py", line 44, in execute_phase
+E             with SingleWriter(str(run.run_root), digest(executor_identity), authorize,
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 63, in __enter__
+E             "process": process_identity(os.getpid()), "executor_sha256": self.executor_sha256}
+E           File "/private/tmp/ppo_mec_g14r20_b_62f432c/scripts/continuation_executor/locking.py", line 16, in process_identity
+E             result = subprocess.run(["ps", "-p", str(pid), "-o", "lstart="], text=True,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 505, in run
+E             with Popen(*popenargs, **kwargs) as process:
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 951, in __init__
+E             self._execute_child(args, executable, preexec_fn, close_fds,
+E           File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 1821, in _execute_child
+E             raise child_exception_type(errno_num, err_msg, err_filename)
+E         PermissionError: [Errno 1] Operation not permitted: 'ps'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/Users/howen/Projects/PPO_MEC/.venv/bin/python', '-I', '-B', '/private/tmp/ppo_mec_g14r20_b_62... child_exception_type(errno_num, err_msg, err_filename)\nPermissionError: [Errno 1] Operation not permitted: \'ps\'\n').returncode
+
+tests/test_continuation_executor_boundaries.py:289: AssertionError
+- generated xml file: /private/tmp/ppo_mec_g14r20_c_review/artifacts/analysis/g14r20_c_review_20260909/independent_pytest.xml -
+=========================== short test summary info ============================
+FAILED tests/test_continuation_executor_boundaries.py::test_lock_competition_and_repeated_start
+FAILED tests/test_continuation_executor_boundaries.py::test_crash_record_cannot_be_blindly_reclaimed
+FAILED tests/test_continuation_executor_boundaries.py::test_real_process_crash_requires_approved_recovery
+FAILED tests/test_continuation_executor_boundaries.py::test_five_cells_use_old_native_transactions
+FAILED tests/test_continuation_executor_boundaries.py::test_two_real_processes_only_one_writer
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[exit75]
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[terminal]
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[missing]
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[corrupt]
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[descriptor]
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[provenance]
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[publication_crash]
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[candidate_crash]
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[duplicate_committed]
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[gate_missing]
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[gate_false]
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[revoke_during_phase]
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[expire_during_phase]
+FAILED tests/test_continuation_executor_boundaries.py::test_native_faults_and_restarts[utc_adjustment]
+19 failed, 52 passed in 44.06s

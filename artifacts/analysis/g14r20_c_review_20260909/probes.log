@@ -1,0 +1,128 @@
+{
+  "reviewed_at": "2026-09-09T03:20:22.647399+00:00",
+  "executor": {
+    "executor_identity_sha256": "c5ed4aa235494c8875ef8e29abce1a6d0db1d9222a2d3b700830cfa361471427",
+    "fixed_commit": "e6a73357d08220d34ddc2d6537d140131c60520f",
+    "file_count": 20,
+    "current_branch_observation": "HEAD"
+  },
+  "production_signers": 0,
+  "empty_production_trust_refusal": "independent production trust unavailable",
+  "b_monitor_recomputed": {
+    "children": 25,
+    "reported_dispatch_count": 25,
+    "all_zero": true,
+    "dispatch_entry_bijection": true
+  },
+  "b_origins_recomputed": {
+    "observations": 1529,
+    "mismatches": []
+  },
+  "b_phase_statuses": [
+    {
+      "phase": "formal_cache_policy",
+      "status": "completed",
+      "return_code": 0
+    },
+    {
+      "phase": "formal_controller",
+      "status": "completed",
+      "return_code": 0
+    },
+    {
+      "phase": "formal_ablation",
+      "status": "completed",
+      "return_code": 0
+    },
+    {
+      "phase": "formal_support",
+      "status": "completed",
+      "return_code": 0
+    },
+    {
+      "phase": "formal_scalability",
+      "status": "completed",
+      "return_code": 0
+    },
+    {
+      "phase": "formal_statistics",
+      "status": "completed",
+      "return_code": 0
+    },
+    {
+      "phase": "formal_gate",
+      "status": "completed",
+      "return_code": 0
+    },
+    {
+      "phase": "complete_without_holdout",
+      "status": "completed",
+      "return_code": 0
+    }
+  ],
+  "command_log_consistency": [
+    {
+      "name": "synthetic_job.json",
+      "argv_equal": true,
+      "cwd_equal": true,
+      "exit_code": 0,
+      "duration_seconds": 1836.059692167,
+      "fixed_commit_before": "e6a73357d08220d34ddc2d6537d140131c60520f",
+      "fixed_commit_after": "e6a73357d08220d34ddc2d6537d140131c60520f"
+    },
+    {
+      "name": "protection_job.json",
+      "argv_equal": true,
+      "cwd_equal": true,
+      "exit_code": 0,
+      "duration_seconds": 39.582758999999996,
+      "fixed_commit_before": "e6a73357d08220d34ddc2d6537d140131c60520f",
+      "fixed_commit_after": "e6a73357d08220d34ddc2d6537d140131c60520f"
+    },
+    {
+      "name": "full_pytest_job.json",
+      "argv_equal": true,
+      "cwd_equal": true,
+      "exit_code": 0,
+      "duration_seconds": 311.71559483299995,
+      "fixed_commit_before": "e6a73357d08220d34ddc2d6537d140131c60520f",
+      "fixed_commit_after": "e6a73357d08220d34ddc2d6537d140131c60520f"
+    },
+    {
+      "name": "targeted_pytest_job.json",
+      "argv_equal": true,
+      "cwd_equal": true,
+      "exit_code": 0,
+      "duration_seconds": 133.369055292,
+      "fixed_commit_before": "e6a73357d08220d34ddc2d6537d140131c60520f",
+      "fixed_commit_after": "e6a73357d08220d34ddc2d6537d140131c60520f"
+    },
+    {
+      "name": "compatibility_details_job.json",
+      "argv_equal": true,
+      "cwd_equal": true,
+      "exit_code": 0,
+      "duration_seconds": 2.986174792,
+      "fixed_commit_before": "e6a73357d08220d34ddc2d6537d140131c60520f",
+      "fixed_commit_after": "e6a73357d08220d34ddc2d6537d140131c60520f"
+    },
+    {
+      "name": "readonly_job.json",
+      "argv_equal": true,
+      "cwd_equal": true,
+      "exit_code": 0,
+      "duration_seconds": 554.5767,
+      "fixed_commit_before": "e6a73357d08220d34ddc2d6537d140131c60520f",
+      "fixed_commit_after": "e6a73357d08220d34ddc2d6537d140131c60520f"
+    },
+    {
+      "name": "smoke_job.json",
+      "argv_equal": true,
+      "cwd_equal": true,
+      "exit_code": 0,
+      "duration_seconds": 0.9641542080000001,
+      "fixed_commit_before": "e6a73357d08220d34ddc2d6537d140131c60520f",
+      "fixed_commit_after": "e6a73357d08220d34ddc2d6537d140131c60520f"
+    }
+  ]
+}
