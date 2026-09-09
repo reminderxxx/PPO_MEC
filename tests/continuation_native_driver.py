@@ -185,6 +185,7 @@ if mode == "corrupt" and phase == "formal_cache_policy":(artifact/"aggregate_sum
         if v2: checkpoint_read, checkpoint_write = os.pipe()
         pid=os.fork()
         if pid==0:
+            if v2: trust.restart(trust.initial_checkpoint)
             target=cells if mode=="publication_crash" else phase
             original_append=target._append
             def crash_at_boundary(row):
@@ -207,8 +208,7 @@ if mode == "corrupt" and phase == "formal_cache_policy":(artifact/"aggregate_sum
             os.close(checkpoint_read)
             assert len(trusted_checkpoint) == 64
             # Test supervisor obtains checkpoint over an independent process pipe.
-            trust.pin['startup_checkpoint_sha256'] = trusted_checkpoint
-            trust.context = TrustContext(trust.pin, test_only=True)
+            trust.restart(trusted_checkpoint)
         from continuation_executor.locking import writer_lock_path
         lock=writer_lock_path(run)
         inode=lock.stat().st_ino

@@ -13,7 +13,7 @@
 
 生产安装仅允许由受审源码内固定 installation 对象建立；CLI、环境、proposal、approval 均不能建立根。
 对象包含 installation_id/record identity、信任 owner、按职责固定主体与 Ed25519 公钥、精确 scope、
-撤销 authority/key/source_id/固定绝对文件位置、max_age_seconds、coordination 状态位置及启动 checkpoint。
+撤销 authority/key/source_id/固定绝对文件位置、max_age_seconds、coordination 状态位置及固定启动回执来源。
 安装记录由 trust owner 独立保管、核验并纳入新源码 identity；每次变更必须重新冻结及验收 executor。
 本轮仅 test-only fixture 生成临时 Ed25519 key；生产对象为 None，不保存生产私钥。
 
@@ -23,12 +23,18 @@ installation_id、authority、source_id、scope、sequence、issued_at、expires
 撤销集合累积；更高序号也不得移除已知撤销 ID 或不可信 signer，恢复身份必须另走受审安装。
 未知/缺失/不可读/签名错误/主体及范围不符均拒绝。撤销所有证据核验 signer 与批准 signer 均检查。
 
-continuity 文件只能位于 coordination_root；初次安装由 trust owner 显式准备 checkpoint，验证器不自动初始化。
+continuity 文件和 startup receipt 只能位于 coordination_root；初次安装由 trust owner 显式准备 checkpoint，验证器不自动初始化。
+`TrustContext.startup_request()` 只读输出每次 context 独有的随机 nonce、PID、installation_id 和 scope 摘要。
+固定撤销/continuity authority 在独立保管的当前 checkpoint 基础上签署 startup receipt，另含 authority、
+checkpoint_sha256、issued_at、expires_at；由固定路径读取并用固定公钥认证。旧进程回执不能匹配新挑战，
+fork 继承的 context 也拒绝。测试 producer 只为 synthetic scope 签署回执；生产接口是
+`production_context().startup_request()`，未安装时仍拒绝，不能通过回执建立新根。
 每次成功读取持久化序号、内容摘要、可信时间，文件 fsync + replace + directory fsync；同 inode 单独锁串行。
 运行中保留预期 checkpoint 摘要，文件丢失/修改即拒绝。重启要求独立保管的精确启动 checkpoint 摘要，
-不能从当前本地文件自举。若进程推进状态后重启仍只有旧安装 checkpoint，拒绝并要求 trust owner 核验新的
-continuity checkpoint；不自动接受本地较新值。本轮用测试侧独立保管的 checkpoint 模拟交接。
-攻击者同时回滚本地文件和外部可信 checkpoint、可信时钟/管理员被攻破超出保证；必须人工停用并重新核验。
+不能从当前本地文件自举。每次重启都必须取得绑定新 nonce 的独立签名回执；仅保留旧回执时，即使本地
+状态完整回滚到 bootstrap，也拒绝。可信 authority 必须保管已知最高 checkpoint，不能照抄主机提交的摘要；
+若失去该依据则不签发回执。新回执绑定 checkpoint 后，本地较新或较旧内容均拒绝。本轮用测试侧独立保管的 checkpoint 和经 Ed25519 认证的新挑战回执模拟交接。
+可信 authority 错误认证回退后的外部 checkpoint、可信时钟/管理员被攻破超出保证；必须人工停用并重新核验。
 绝不把格式正确的本地文件称为权威最新状态。可信 UTC 由受管主机提供；倒退拒绝，前跳导致过期拒绝。
 
 证据 producer 提供认证记录 envelope：record_id、verifier_id、verified_at、basis、original（path/sha256/

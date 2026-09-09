@@ -78,13 +78,12 @@ class TrustContext:
         p = self.pin
         require(set(p) == {'version', 'domain', 'fixture_root', 'installation_id',
             'trust_owner', 'installation_record', 'scope', 'approval_signers',
-            'verifiers', 'revocation', 'continuity_path', 'startup_checkpoint_sha256'},
+            'verifiers', 'revocation', 'continuity_path', 'startup_receipt_path'},
             'trust installation schema')
         require(p['version'] == '2.0.0' and text(p['installation_id']) and text(p['trust_owner']),
                 'trust installation identity')
         require(p['domain'] == ('synthetic' if test_only else 'production'), 'test trust domain')
         require(test_only or p['fixture_root'] is None, 'production fixture forbidden')
-        require(sha(p['startup_checkpoint_sha256']), 'external startup checkpoint required')
         verify_file(p['installation_record'])
         require(isinstance(p['approval_signers'], dict) and p['approval_signers'], 'approval pins missing')
         require(isinstance(p['verifiers'], dict) and p['verifiers'], 'verifier pins missing')
@@ -113,8 +112,37 @@ class TrustContext:
             require(root != fixture and root.name.startswith('synthetic_'), 'test run required')
             for path in (str(root), r['path'], str(self.state_path), p['installation_record']['path']):
                 within(path, fixture)
-        self.expected = p['startup_checkpoint_sha256']
+        self.receipt_path = within(p['startup_receipt_path'], self.state_path.parent)
+        require(self.receipt_path.parent == self.state_path.parent and self.receipt_path != self.state_path
+                and self.receipt_path.suffix == '.json', 'startup receipt location')
+        self.expected = None
+        self.session_nonce = uuid.uuid4().hex
+        self.process_id = os.getpid()
         self.mutex = threading.Lock()
+
+    def startup_request(self):
+        """Read-only challenge for the independent checkpoint custodian to sign.
+
+        The custodian supplies its own known-current checkpoint hash, not a hash
+        copied uncritically from this host's potentially rolled-back state.
+        """
+        return dict(version='2.0.0', installation_id=self.pin['installation_id'],
+                    scope_sha256=digest(self.pin['scope']), session_nonce=self.session_nonce,
+                    process_id=self.process_id)
+
+    def _startup(self, now):
+        require(os.getpid() == self.process_id, 'forked process requires fresh startup receipt')
+        if self.expected is not None:
+            return
+        r = self.pin['revocation']
+        m = verify_signature(read_json(absolute_path(str(self.receipt_path))), {r['authority']: r['public_key']})
+        require(isinstance(m, dict) and set(m) == set(self.startup_request()) | {
+            'authority', 'checkpoint_sha256', 'issued_at', 'expires_at'}, 'startup receipt schema')
+        require(all(m[k] == v for k, v in self.startup_request().items())
+                and m['authority'] == r['authority'] and sha(m['checkpoint_sha256']), 'startup challenge mismatch')
+        require(utc(m['issued_at']) <= now < utc(m['expires_at'])
+                and (now-utc(m['issued_at'])).total_seconds() <= r['max_age_seconds'], 'startup receipt stale')
+        self.expected = m['checkpoint_sha256']
 
     def _scope(self, contract):
         require(contract['holdout_capability'] is False and contract['phases'] == list(PHASES), 'unauthorized phase/holdout')
@@ -183,6 +211,7 @@ class TrustContext:
         # a revoked high sequence could be followed by an older permissive one.
         content = digest(message)
         with self.mutex:
+            self._startup(now)
             lock = absolute_path(str(self.state_path) + '.lock')
             # The installation prepares both files. Missing lock/state is not bootstrap.
             fd = os.open(lock, os.O_RDWR | os.O_NOFOLLOW)

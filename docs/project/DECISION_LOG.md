@@ -1094,3 +1094,5 @@ claim map 必须报告 `UNAVAILABLE`。
 ## 2026-09-09 G14R20-D
 
 G14R20-D 保留 phase-level 撤销租约；为防重启静默丢失防回滚依据，首次和每次重启均要求独立保管的精确 continuity checkpoint。验证器不从本地文件自举或推定全球最新；状态变化后的重启可能需 trust owner 重新核验，接受这一可用性代价。
+
+G14R20-D 启动依据补强：静态 bootstrap pin 不能抵御本地状态整体回退。每次 context/进程启动必须由固定 authority 对新 nonce/PID/scope 和独立保管的当前 checkpoint 签署回执；旧回执与 fork 继承 context 均拒绝。只新增离线认证接口。

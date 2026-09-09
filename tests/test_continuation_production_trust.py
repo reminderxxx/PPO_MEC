@@ -102,8 +102,7 @@ def test_revoked_state_cannot_roll_back_to_allowed(trust):
     trust.verify()
     trust.publish(sequence=2, revoked_ids=[trust.contract['revocation_id']])
     with pytest.raises(ContinuationError, match='revoked'): trust.verify()
-    restart_pin = trust.checkpoint_for_restart()
-    trust.context = TrustContext(restart_pin, test_only=True)
+    trust.restart()
     trust.publish(sequence=0)
     with pytest.raises(ContinuationError, match='rollback'): trust.verify()
 
@@ -117,11 +116,10 @@ def test_same_sequence_equivocation(trust):
 def test_restart_requires_external_checkpoint(trust):
     initial_pin = deepcopy(trust.pin)
     trust.verify()
-    pin = trust.checkpoint_for_restart()
-    trust.context = TrustContext(pin, test_only=True)
+    trust.restart()
     assert trust.verify()['approval_verified']
     trust.context = TrustContext(initial_pin, test_only=True)
-    with pytest.raises(ContinuationError, match='checkpoint mismatch'): trust.verify()
+    with pytest.raises(ContinuationError, match='challenge mismatch'): trust.verify()
 
 
 @pytest.mark.parametrize('case', ['missing', 'reset', 'clock_backward', 'clock_forward', 'lock_missing'])
@@ -235,6 +233,45 @@ def test_installation_boundary(trust, case):
 def test_higher_sequence_cannot_erase_known_revocation(trust, field, value):
     trust.publish(sequence=1, **{field: [value]})
     with pytest.raises(ContinuationError): trust.verify()
-    trust.context = TrustContext(trust.checkpoint_for_restart(), test_only=True)
+    trust.restart()
     trust.publish(sequence=2)
     with pytest.raises(ContinuationError, match='set rollback'): trust.verify()
+
+
+@pytest.mark.parametrize('case', ['rollback_to_bootstrap', 'old_receipt', 'bad_signature', 'stale_receipt'])
+def test_startup_challenge_blocks_replayed_checkpoint(trust, case):
+    old_receipt = read_json(trust.pin['startup_receipt_path'])
+    trust.verify()
+    trust.publish(sequence=2, revoked_ids=[trust.contract['revocation_id']])
+    with pytest.raises(ContinuationError, match='revoked'): trust.verify()
+    current_checkpoint = trust.context.expected
+    trust.context = TrustContext(trust.pin, test_only=True)
+    if case == 'rollback_to_bootstrap':
+        write(trust.state, trust.initial)
+        trust.publish(sequence=0)
+        write(trust.pin['startup_receipt_path'], old_receipt)
+    elif case == 'old_receipt': write(trust.pin['startup_receipt_path'], old_receipt)
+    else:
+        message = dict(trust.context.startup_request(), authority='revoker', checkpoint_sha256=current_checkpoint,
+            issued_at=trust.now.isoformat(), expires_at=(trust.now+timedelta(hours=1)).isoformat())
+        if case == 'stale_receipt': message['expires_at'] = trust.now.isoformat()
+        receipt = signed(message, 'revoker', trust.keys['revoker'])
+        if case == 'bad_signature': receipt['signature'] = '00'*64
+        write(trust.pin['startup_receipt_path'], receipt)
+    with pytest.raises(ContinuationError): trust.verify()
+
+
+def test_fresh_custodian_receipt_detects_local_bootstrap_rollback(trust):
+    trust.verify()
+    trust.publish(sequence=2, revoked_ids=[trust.contract['revocation_id']])
+    with pytest.raises(ContinuationError): trust.verify()
+    trust.restart()  # Independent custodian retained the sequence-2 checkpoint.
+    write(trust.state, trust.initial)
+    trust.publish(sequence=0)
+    with pytest.raises(ContinuationError, match='checkpoint mismatch'): trust.verify()
+
+
+def test_missing_startup_receipt_never_bootstraps(trust):
+    Path(trust.pin['startup_receipt_path']).unlink()
+    with pytest.raises(OSError): trust.verify()
+    assert read_json(trust.state) == trust.initial

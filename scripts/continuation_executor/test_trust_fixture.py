@@ -50,9 +50,10 @@ class TestTrustFixture:
             verifiers={'reviewer':dict(public_key=keys['reviewer'], author='synthetic author', roles=list(ROLES)+['recovery_quiescence'])},
             revocation=dict(authority='revoker', public_key=keys['revoker'], source_id='test-only-source',
                 path=str(self.root/'revocation_test_only.json'), max_age_seconds=7200),
-            continuity_path=str(self.state), startup_checkpoint_sha256=digest(self.initial))
+            continuity_path=str(self.state), startup_receipt_path=str(self.coord/'startup_receipt_test_only.json'))
         self.publish()
-        self.context = TrustContext(self.pin, test_only=True)
+        self.initial_checkpoint = digest(self.initial)
+        self.restart(self.initial_checkpoint)
         self.original = self.root/'original_test_only.json'
         write(self.original, dict(test_only=True, author='synthetic author', responsibilities=list(ROLES),
             run_id=contract['run_id'], scientific_commit=contract['scientific_commit']))
@@ -91,7 +92,13 @@ class TestTrustFixture:
         from .authorization import verify_approval
         return verify_approval(self.contract, self.approval, test_trust_context=self.context, now=now)
 
-    def checkpoint_for_restart(self):
-        # Test operator's independent checkpoint, never inferred by the consumer.
-        self.pin['startup_checkpoint_sha256'] = self.context.expected
-        return deepcopy(self.pin)
+    def restart(self, checkpoint=None):
+        # Test-side independent custodian explicitly retains the trusted checkpoint.
+        # The consumer never derives its startup authority from local state bytes.
+        checkpoint = checkpoint or self.context.expected
+        self.context = TrustContext(self.pin, test_only=True)
+        request = self.context.startup_request()
+        message = dict(request, authority='revoker', checkpoint_sha256=checkpoint,
+            issued_at=self.now.isoformat(), expires_at=(self.now+timedelta(hours=2)).isoformat())
+        write(self.pin['startup_receipt_path'], signed(message, 'revoker', self.keys['revoker']))
+        return self.context
