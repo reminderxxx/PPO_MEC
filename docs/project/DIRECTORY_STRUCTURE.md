@@ -1,3 +1,16 @@
+## 2026-09-10 G14R20-G 一次性 project 授权
+
+- `scripts/continuation_executor/project_authorization.py`：精确 v16 本地授权、review/grant、expiry/stop 与
+  cold recovery 排除检查；不安装 production crypto trust。
+- `scripts/execute_fixed_commit_continuation.py`：复用公共入口，显式 `--project-authorization` 分支；原 crypto
+  入口保留，不允许互相 fallback。
+- `docs/project/project_continuation_authorization_contract.md`：当前 owner 决定、有限范围及信任取舍。
+- 独立分支内的 `artifacts/analysis/g14r20_g_project_authorization_20260910/`：executor identity、project contract、
+  review、grant 与验收记录；不得写入带七个用户改动的 main worktree，也不把这些新身份放回旧
+  Protocol/context/binding 或 checkpoint。
+- 原 v16 run root 不移动，科学源保持原 clean `a6d1fd8`；只允许其获准的后继输出。coordination 位置由
+  合同绑定，停止文件为其中固定 run 派生路径；不允许任意输出路径或重建原科学目录。
+
 > G14R20-B（实现验证中）：`scripts/execute_fixed_commit_continuation.py` 为独立生产边界入口，`scripts/run_fixed_commit_continuation_acceptance.py` 为合成验收入口，共享代码在 `scripts/continuation_executor/`。合同见 `continuation_executor_contract.md`；证据根目录为 `artifacts/analysis/g14r20_b_continuation_20260908/`，合成 checkpoint 不提交。
 
 # Directory Structure

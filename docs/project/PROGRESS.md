@@ -1,3 +1,14 @@
+## 2026-09-10: G14R20-G 一次性项目授权收敛（实施与独立验收待核验）
+
+- 用户先要求“先闭环实验”，在获知一次性项目授权的含义和局限后明确答复“允许”。这是当前项目 owner
+  的授权方式决定，不是历史 release attestation、法定身份认证或科学结果批准。
+- 范围只有原合法 `typed_model_cache_formal_20260906_152847_g14c_v16`、科学 commit `a6d1fd8`、150 个
+  frozen checkpoints 以及八个未执行阶段；不重训、不重选、不修改科学协议、不得开启 holdout/G14D/G15。
+- 新 project 入口须绑定独立技术 review 与最终 executor identity，使用有效期/停止文件和原单写者/事务
+  校验；旧 crypto 入口不降级、不删除。本次默认不授权异常进程后的 cold recovery。
+- 本记录不预写技术验收、dispatch、formal gate 或完成状态。现时发布事实核验与历史批准缺口分别报告。
+  合同：`docs/project/project_continuation_authorization_contract.md`。
+
 > 2026-09-08 G14R20-B：独立 executor 已进入开发验证，最终三层验收、真实只读复核及固定提交证据尚未闭合。真实 v16 未恢复，独立批准未签发；不得以开发测试通过替代最终验收。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。

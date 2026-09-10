@@ -1,5 +1,17 @@
 ﻿# Decision Log
 
+## 2026-09-10: G14R20-G 单次研究接续采用显式本地项目授权
+
+- 决定依据：用户要求先闭环实验，理解简化方案后明确答复“允许”。为精确既有 v16 引入显式 project 路径，
+  采用 owner 范围批准、独立技术 review、固定科学输入和原始追加账本，不要求 production key/receipt 服务。
+- 取舍：本地 owner 是项目责任信任，不是密码学来源、法律身份或权威全局最新状态证明。历史 release
+  attestation 缺失仍保留，不追认为历史批准；本次核验按当前日期记录。
+- 不变项：原科学 `a6d1fd8`、Protocol/context/binding、150 个冻结模型、数据/窗口/预算/agent/统计和
+  failure gates 不重绑定；旧 crypto 入口和新 run 发布门禁不被绕过或静默降级。
+- 限制：精确 executor 与 review 必须进入 grant；每 phase 准入及获锁后复验 expiry/stop，已准入原事务
+  允许结束。默认不授权冷恢复，不重训、不重选、不开放 holdout/G14D/G15；独立验收后才能实际 dispatch。
+- 实施、验收和正式结果分别记录，不把此设计决定写成 paper-ready 证据。
+
 ## 2026-09-06: provenance envelope and shared training identity are separate schemas
 
 - 决定：正式 companion 保持 17 字段完整 provenance envelope；共享 training identity 是其中由

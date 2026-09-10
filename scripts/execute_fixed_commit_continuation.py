@@ -28,6 +28,7 @@ def main(argv=None, *, _startup_binding=None):
     parser.add_argument("--contract", required=True)
     parser.add_argument("--executor-identity", required=True)
     parser.add_argument("--approval")
+    parser.add_argument("--project-authorization", help="explicit one-run owner authorization; not a production signature")
     parser.add_argument("--phase", required=True, choices=PHASES)
     parser.add_argument("--check", choices=("compatibility", "qualification", "execute"), default="qualification")
     parser.add_argument("--finalize-phase-only", action="store_true")
@@ -36,6 +37,8 @@ def main(argv=None, *, _startup_binding=None):
     context = None
     final_authorization = None
     try:
+        if args.project_authorization and (args.approval or _startup_binding is not None):
+            raise ContinuationError("project authorization cannot mix with signature/test binding")
         proposal, contract, identity = (read_json(p) for p in (
             args.proposal, args.contract, args.executor_identity))
         validate_contract(contract, proposal, identity)
@@ -58,6 +61,11 @@ def main(argv=None, *, _startup_binding=None):
                       "origin_evidence": proposal["origin_evidence"]}
             _emit(report)
             return 0
+        if args.project_authorization:
+            verify_executor(identity, Path(__file__).resolve().parents[1])
+            validate_a_proposal(proposal)
+            from continuation_executor.project_authorization import run_project_operation
+            return run_project_operation(args, proposal, contract, identity, emit=_emit)
         if not args.approval:
             raise ContinuationError("independent continuation approval unavailable")
         approval = read_json(args.approval)

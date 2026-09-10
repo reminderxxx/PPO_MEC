@@ -1,3 +1,14 @@
+## 2026-09-10: G14R20-G 项目授权信任与执行边界（OPEN / 待独立验收）
+
+- 用户已允许本次采用轻量项目授权，缺少 production crypto installation 不再是显式 project 路径的前置条件；
+  旧 crypto 路径仍按原合同 fail-closed。禁止自动 fallback 或把本地 grant 当成历史/密码学批准。
+- 本地 owner 模式不证明法律身份、抗恶意本地管理员篡改或全局最新撤销。expiry/stop 只阻止新 phase，
+  已准入原事务仍可结束；cold recovery 默认不在本次范围。不得隐瞒这些可用性和信任取舍。
+- 实现/独立 review/grant/dispatch 是不同状态；缺少匹配 review、输入或前缀漂移、停止文件、过期和永久
+  terminal failure 均不得绕过。现有 150 个冻结模型不是新的实验结果，formal 结论仍待实际执行。
+- 不因月底论文期限减少冻结矩阵、吞掉 null、打开 holdout、追胜重选或重写旧账本。
+  详见 `project_continuation_authorization_contract.md`；本条未宣称风险已由测试或真实运行关闭。
+
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。

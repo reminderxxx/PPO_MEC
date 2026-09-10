@@ -1,3 +1,35 @@
+## 2026-09-10 G14R20-G：一次性 project 接续操作边界
+
+用户已允许为既有 v16 收敛授权方式；这是独立于旧 crypto 的显式路径，不自动绕过其门禁。科学 worktree
+保持 `/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847` 和原 `a6d1fd8` 身份，原 Python/命令/输入不变。
+本条不预写实现或验收成功；先完成最终 executor 的独立技术 review，再 create-only 保存绑定 review 的 grant。
+证据根为被验收独立分支 worktree 内的
+`artifacts/analysis/g14r20_g_project_authorization_20260910/`，不写入带七个用户改动的 main worktree、
+原科学源或旧账本前缀。后续证据 commit 不改变外部 executor identity；实际命令必须使用停在被验收代码
+commit 的 clean detached worktree。
+
+grant 已独立核验后，单阶段资格检查的形态为：
+
+```bash
+<frozen-absolute-python> -B <reviewed-executor>/scripts/execute_fixed_commit_continuation.py \
+  --proposal <original-proposal.json> \
+  --contract <exact-project-contract.json> \
+  --executor-identity <final-reviewed-executor-identity.json> \
+  --project-authorization <review-bound-project-grant.json> \
+  --phase formal_cache_policy --check qualification
+```
+
+实际 `execute` 是另一次完整准入，不能因为 qualification 成功就跳过 review/grant、源身份和锁检查；只在
+独立验收通过后对同一精确输入使用 `--check execute`。每次仅执行一个阶段，按
+`formal_cache_policy → formal_controller → formal_ablation → formal_support → formal_scalability →
+formal_statistics → formal_gate → complete_without_holdout` 继续；不重跑 train/dev/freeze。
+
+`--project-authorization` 与 `--approval`/synthetic startup binding 互斥；project 路径不用 key、challenge
+或 receipt。grant 不能晚于 2026-09-30 23:59:59+08 失效，指定停止文件在 phase 准入及获锁后复核；取消
+阻止下一阶段，已准入事务按原规则终结。不得删除停止文件或锁来继续，不允许 `--finalize-phase-only`、
+崩溃冷恢复、第二 run、holdout/G14D/G15；恢复须另立批准。详细约束见
+`project_continuation_authorization_contract.md`。以下旧 crypto 操作说明仅适用于其原授权模式。
+
 > G14R20-F（实现验收中）：`scripts/execute_fixed_commit_continuation.py` 的 qualification/execute 使用公共同进程
 > startup handoff；`--check compatibility` 保持只读。合成验收要求精确 clean executor identity、新建 synthetic
 > fixture、原 checkout cwd 和原 Python。详见 `continuation_startup_handoff_contract.md`；生产 trust 仍未安装。

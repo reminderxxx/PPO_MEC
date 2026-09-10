@@ -1,3 +1,13 @@
+## 2026-09-10 G14R20-G project 授权依赖边界
+
+- `execute_fixed_commit_continuation.py`：显式 project/crypto 入口互斥；禁止 crypto 失败后自动选择 project。
+- `continuation_executor/project_authorization.py`：只接受精确 v16 范围，核验 owner 决定、独立 review、最终
+  executor identity、有限 grant、expiry 和 stop；不负责科学指标或策略实现。
+- project grant 准入后复用原 `scientific.QualifiedRun` 与 `execution.execute_phase`，继续使用原资源、
+  checkpoint、prefix/successor、single-writer、cell transaction 和 gate 验证；不替代为 success mock。
+- 科学模块仍从原 `a6d1fd8` checkout 加载；`production_trust/startup` 保留旧 crypto 语义，不由 project
+  grant 安装密钥或填充 trust。异常进程 cold recovery 不在 project 路径授权范围。
+
 > G14R20-B（实现验证中）：`scripts/continuation_executor/` 接管固定身份、独立授权、单写者和八阶段编排；科学 `src/` 与事务模块从原 `a6d1fd8` checkout 只读加载。原 public main 和 A schema/CLI 不变。职责与差异见 `continuation_executor_contract.md`。
 
 # Code Module Map

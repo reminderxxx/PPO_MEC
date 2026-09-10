@@ -1,3 +1,7 @@
+> **2026-09-10 G14R20-G**：当前用户已允许一次性 project 授权，作用于既有 v16 的固定模型和剩余八阶段；
+> 合同见 [project_continuation_authorization_contract.md](project_continuation_authorization_contract.md)。独立技术
+> 验收与真实执行结果不能由授权决定替代；旧 crypto 入口保持原约束，holdout 不在范围内。
+
 > G14R20-F1 修复 challenge 后快速 receipt 被误判为 legacy 的竞态；公共启动合同见
 > [continuation_startup_handoff_contract.md](continuation_startup_handoff_contract.md)。生产信任未安装，真实执行批准仍为 false。
 
@@ -11,6 +15,9 @@
 这是 PPO_MEC 的项目化维护文档入口，用来把通用 AI 协作规范落到当前仓库。
 
 ## Live 文档
+
+- `project_continuation_authorization_contract.md`：G14R20-G 一次性本地 owner 授权、独立 review/grant、
+  固定科学源与输入、expiry/stop 和 cold recovery 排除边界；不追认历史批准，不自动开启正式执行
 
 - `continuation_startup_handoff_contract.md`：G14R20-F 公共同进程 challenge/receipt、有限等待、startup
   fixed-inode 锁、JSONL 输出与独立 checkpoint custody 合同；仅 synthetic 隔离验收，不是生产批准
