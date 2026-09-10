@@ -1,0 +1,171 @@
+{
+  "version": "1.0.0",
+  "reviewed_at": "2026-09-10T16:08:11+08:00",
+  "review_scope": "G14R20-G one-run project continuation authorization compatibility and evidence review only; no algorithm-result or paper-readiness verdict",
+  "reviewer_id": "/root/independent_review",
+  "implementation_agent_id": "/root",
+  "artifact_run_id": "typed_model_cache_formal_20260906_152847_g14c_v16",
+  "target_venue": "authorization_only_not_scientific_venue_review",
+  "literature_cutoff": null,
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "evidence_level": "E2_ARTIFACT_AUDITED_FOR_AUTHORIZATION_ONLY",
+  "verdict": "pass",
+  "executor": {
+    "worktree": "/private/tmp/ppo_mec_g14r20_g_executor_cc32e6e_20260910",
+    "commit": "cc32e6e4113366ba4c8af8076d20db8d98dfd7fe",
+    "git_tree": "d344d2fe436c76ced823878311a7c1ca54fba91b",
+    "canonical_sha256": "a154e5a002de5297e88f3182e6a6b38c6ada830153b4564cdd040c01d2ea9b75",
+    "status": "clean",
+    "remote_commit": "cc32e6e4113366ba4c8af8076d20db8d98dfd7fe"
+  },
+  "scientific_source": {
+    "worktree": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+    "commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+    "git_tree": "eb8e83c6e4532bc45c22fb7a816388e576753e30",
+    "status": "clean",
+    "scientific_modules_changed_by_implementation": false
+  },
+  "canonical_bindings": {
+    "execution_contract_canonical_sha256": "7cad88f3d1cc044accb94d14bb15cdeb75dda22618ed14025e84de40ea1be9cb",
+    "owner_decision_canonical_sha256": "67f8115d30acfb447cd360127a357f81110e87e04fb76138843f4f8c3edc07d5",
+    "proposal_canonical_sha256": "7ab3b78e176fcc45089220c20f84d741fee332634cca42b907c731228eef99d2",
+    "proposal_file_sha256": "65f6fbe04fc717b1c74c8b06dee9ba0ea412ac0cd5c6b0888a9e104cc9c13cc8",
+    "command_plan_canonical_sha256": "e68340af18c5195a1c07aa5ef30532ff796ed13f4f4f7e774f2a172960dc9bad",
+    "command_hashes_recomputed": 24,
+    "command_hash_mismatches": 0
+  },
+  "checks": {
+    "code_and_tests": true,
+    "current_dated_source_verification": true,
+    "immutable_input_protection": true,
+    "real_read_only_qualification": true,
+    "frozen_commands": true,
+    "no_holdout": true,
+    "no_scientific_changes": true
+  },
+  "findings": [
+    {
+      "check": "authorization_mode_separation",
+      "status": "pass",
+      "detail": "The public project branch is explicit and rejects simultaneous --approval or startup binding; the production-crypto path remains separate and has no fallback to project mode."
+    },
+    {
+      "check": "exact_scope_and_order",
+      "status": "pass",
+      "detail": "The contract fixes the exact v16 run, a6d1fd8 scientific worktree/commit, original ledger prefixes, eight ordered phases, holdout_capability=false, and null recovery owner/quiescence."
+    },
+    {
+      "check": "proposal_dual_identity",
+      "status": "pass",
+      "detail": "Both proposal file-byte SHA-256 and canonical object SHA-256 were independently recomputed and match the execution contract."
+    },
+    {
+      "check": "frozen_command_plan",
+      "status": "pass",
+      "detail": "All 24 command hashes were recomputed from canonical argv and match; all commands use the frozen Python, expand from the original scientific source, and contain no holdout argument/token."
+    },
+    {
+      "check": "native_validation_and_transactions",
+      "status": "pass",
+      "detail": "QualifiedRun calls the original source/environment/context/binding/resource/checkpoint/denylist validators; reconcile verifies prefixes, successors, committed payloads, and immutable files; execution retains original cell/phase transactions and requires the original passed completion gate."
+    },
+    {
+      "check": "single_writer_and_reauthorization",
+      "status": "pass",
+      "detail": "Authorization is checked before phase admission, before lock open, and again after acquiring the persistent-inode flock; stop, expiry, grant-byte drift, and dirty scientific source fail closed."
+    },
+    {
+      "check": "cold_recovery_exclusion",
+      "status": "pass",
+      "detail": "finalize-only, unfinished running/completion_candidate/failed phase recovery, repeated completion, and phase skipping are rejected under project authorization."
+    },
+    {
+      "check": "real_read_only_state",
+      "status": "pass",
+      "detail": "Qualification evidence records 150/150 compatible checkpoints, 44 active resources, 6 generated resources, 15 phase and 348 cell records, 174 committed payloads, and 167 immutable evidence files."
+    },
+    {
+      "check": "no_real_execution",
+      "status": "pass",
+      "detail": "The qualification monitor records 0 real-v16 dispatches, 0 real-v16 writes, 0 scientific rollouts, 0 observed writes, empty dispatches, and empty denied events. The original freeze artifacts state formal_or_holdout_used=false, and the 15-record phase prefix contains no later formal/holdout execution."
+    },
+    {
+      "check": "protection_and_main_state",
+      "status": "pass",
+      "detail": "The protection snapshot verifies 107320 paths with 0 mismatches and 0 additions; main remains 62f432c and shows exactly the seven pre-existing user-modified files recorded by takeover_inventory.json."
+    }
+  ],
+  "real_counts": {
+    "protected_paths": 107320,
+    "protection_mismatches": 0,
+    "protection_additions": 0,
+    "phase_records": 15,
+    "cell_records": 348,
+    "committed_payloads_verified": 174,
+    "immutable_files_verified": 167,
+    "checkpoint_attempts": 150,
+    "checkpoint_passes": 150,
+    "active_resources": 44,
+    "generated_resources": 6,
+    "planned_commands": 24,
+    "real_v16_dispatches": 0,
+    "real_v16_writes": 0,
+    "scientific_rollouts": 0,
+    "observed_writes_during_qualification": 0,
+    "holdout_execution_or_consumption_records": 0
+  },
+  "tests": [
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 /Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_project_continuation_authorization.py",
+      "result": "70 passed in 0.23s",
+      "environment": "reviewer sandbox",
+      "status": "pass"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 /Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_continuation_executor_boundaries.py",
+      "result": "52 passed, 19 failed in 43.58s; every failure was PermissionError: [Errno 1] Operation not permitted: ps",
+      "environment": "reviewer sandbox",
+      "status": "environment_permission_failure_not_code_failure"
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 /Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_continuation_executor_boundaries.py",
+      "result": "71 passed in 91.38s",
+      "environment": "approved non-sandbox rerun permitting ps",
+      "status": "pass"
+    },
+    {
+      "command": "compile(source_bytes, path, exec) for the public CLI, project_authorization.py, and project_packet.py",
+      "result": "3 source files compile",
+      "environment": "reviewer sandbox; no bytecode write",
+      "status": "pass"
+    }
+  ],
+  "main_user_files_observed": [
+    {"path": "/Users/howen/Projects/PPO_MEC/scripts/train_sa_ghmappo_real_sample.py", "sha256": "aed850f5561f94ecba824e22bd323cdd142ee6c74255a3599129a2a6782e0eba", "size_bytes": 518091},
+    {"path": "/Users/howen/Projects/PPO_MEC/src/agents/sa_ghmappo_agent.py", "sha256": "06638c1aea5097a7fa4088db6b77648648655053dc87e1a1c817b09a7709c171", "size_bytes": 26004},
+    {"path": "/Users/howen/Projects/PPO_MEC/src/agents/sa_ghmappo_core.py", "sha256": "9951badce0ce78e608e690d6bed8d07a59d19dfef1e82f94a89d88403ac0d6b9", "size_bytes": 819944},
+    {"path": "/Users/howen/Projects/PPO_MEC/src/encoders/fusion_encoder.py", "sha256": "cde948c13f487790cf255389bc26b7af191ecc66449a7e939b217c638327954d", "size_bytes": 39019},
+    {"path": "/Users/howen/Projects/PPO_MEC/src/evaluators/real_eval_support.py", "sha256": "0a092cc15224b9b1be6a3476555c6e8eb8293573b3e27acf3fa91630db948cb6", "size_bytes": 27060},
+    {"path": "/Users/howen/Projects/PPO_MEC/tests/test_algo_pool_contract.py", "sha256": "41f2ca2f6920940bc11cd16bbc4c96104452c5653812a2b69c0e1a8e6794e75b", "size_bytes": 327933},
+    {"path": "/Users/howen/Projects/PPO_MEC/tests/test_checkpoint_compat.py", "sha256": "6b09b63b4a5cd9b527e7f3a146962ee37b9b1c9f8da78893d213b40bc6dc2cbf", "size_bytes": 36081}
+  ],
+  "bound_files": [
+    {"path": "/private/tmp/ppo_mec_g14r20_g_project_authorization/artifacts/analysis/g14r20_g_project_authorization_20260910/packet_cc32e6e_20260910/executor_identity.json", "sha256": "478b90fbb7d002325b34888888a4466d8157b6d872dcf706aa4c5a5b8bb4dcfd", "size_bytes": 3746},
+    {"path": "/private/tmp/ppo_mec_g14r20_g_project_authorization/artifacts/analysis/g14r20_g_project_authorization_20260910/packet_cc32e6e_20260910/execution_contract.json", "sha256": "c498422f9373accf0e6fb04906936cd0b6531729f9b287141355a55d1a2b1644", "size_bytes": 54726},
+    {"path": "/private/tmp/ppo_mec_g14r20_g_project_authorization/artifacts/analysis/g14r20_g_project_authorization_20260910/packet_cc32e6e_20260910/owner_decision.json", "sha256": "9d025d9ebd6e26e98031c5573bc6bfdb2648218a101c998380aa81bf1444579d", "size_bytes": 767},
+    {"path": "/private/tmp/ppo_mec_g14r20_g_project_authorization/artifacts/analysis/g14r20_g_project_authorization_20260910/packet_cc32e6e_20260910/command_plans.json", "sha256": "398d12e6a568993d76cb3d4c2d438b1f1dfa7aed7e40450975929e25bedcebd9", "size_bytes": 136143},
+    {"path": "/private/tmp/ppo_mec_g14r20_g_project_authorization/artifacts/analysis/g14r20_g_project_authorization_20260910/packet_cc32e6e_20260910/real_read_only_qualification.json", "sha256": "ab3fdf68872edc16b771f3c2662724a8250dad45f1f9cb2527249ee5b7cca5a1", "size_bytes": 104345},
+    {"path": "/private/tmp/ppo_mec_g14r20_g_project_authorization/artifacts/analysis/g14r20_g_project_authorization_20260910/packet_cc32e6e_20260910/protection_snapshot.json", "sha256": "eae81fe26146d003ca0755f14f5efd313674e03459224d4169b0f3f86e098f60", "size_bytes": 284},
+    {"path": "/private/tmp/ppo_mec_g14r20_g_project_authorization/artifacts/analysis/g14r20_g_project_authorization_20260910/packet_cc32e6e_20260910/takeover_inventory.json", "sha256": "08095418935f77e0be746a159a270f05f9fe8e5dad1761b5b7aba5c3ad135080", "size_bytes": 2046},
+    {"path": "/private/tmp/ppo_mec_g14r20_g_project_authorization/artifacts/analysis/g14r20_g_project_authorization_20260910/packet_cc32e6e_20260910/project_tests_junit.xml", "sha256": "f2eb6ef993aec8273a96e35b75ca9dc63ee3c2f607e9210d37c22aa34bb319ef", "size_bytes": 11048},
+    {"path": "/private/tmp/ppo_mec_g14r20_g_executor_cc32e6e_20260910/docs/project/project_continuation_authorization_contract.md", "sha256": "12b6907e0195942df138388da6b466424b75df0cb1c763359f467200aeb1712e", "size_bytes": 6768},
+    {"path": "/Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/v16_continuation_proposal.json", "sha256": "65f6fbe04fc717b1c74c8b06dee9ba0ea412ac0cd5c6b0888a9e104cc9c13cc8", "size_bytes": 65896}
+  ],
+  "limitations": [
+    "This review authorizes compatibility and bounded continuation only; it does not inspect or predict algorithm performance, formal outcomes, paper readiness, or venue acceptance.",
+    "No formal, holdout, hidden, G14D, G15, training, selection, checkpoint replacement, grant generation, or dispatch was performed.",
+    "The reviewer started a second full monitored qualification but interrupted it after several minutes because native reconciliation repeatedly reparses the 348-record ledger under profiling; the completed dated qualification artifact was instead byte-bound and its validator paths, counts, monitor zeros, and protected inputs were independently inspected. This is not an E3 reproduction claim.",
+    "The monitor has no dedicated holdout_consumption_count field; zero holdout consumption is established from holdout_capability=false, no holdout token in the frozen commands, formal_or_holdout_used=false in the frozen artifacts, the original 15-record ledger prefix, and zero protected additions/writes—not from a separate holdout counter.",
+    "The reviewer did not rerun the full repository suite. The implementation-side 70-test JUnit artifact was parsed and bound, while the reviewer independently ran the 70 project tests and 71 executor-boundary tests."
+  ]
+}

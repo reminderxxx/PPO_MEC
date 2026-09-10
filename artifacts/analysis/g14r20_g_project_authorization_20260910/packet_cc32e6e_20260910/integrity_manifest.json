@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "created_at": "2026-09-10T16:20:00+08:00",
+  "implementation_commit": "cc32e6e4113366ba4c8af8076d20db8d98dfd7fe",
+  "executor_identity_sha256": "a154e5a002de5297e88f3182e6a6b38c6ada830153b4564cdd040c01d2ea9b75",
+  "execution_contract_sha256": "7cad88f3d1cc044accb94d14bb15cdeb75dda22618ed14025e84de40ea1be9cb",
+  "owner_decision_sha256": "67f8115d30acfb447cd360127a357f81110e87e04fb76138843f4f8c3edc07d5",
+  "project_grant_sha256": "c81dbc964fd1531ac97d1ad54ec2f481caf954401256e8cd8412d5c84176c684",
+  "files": [
+    {"path": "command_plans.json", "sha256": "398d12e6a568993d76cb3d4c2d438b1f1dfa7aed7e40450975929e25bedcebd9", "size_bytes": 136143},
+    {"path": "execution_contract.json", "sha256": "c498422f9373accf0e6fb04906936cd0b6531729f9b287141355a55d1a2b1644", "size_bytes": 54726},
+    {"path": "executor_identity.json", "sha256": "478b90fbb7d002325b34888888a4466d8157b6d872dcf706aa4c5a5b8bb4dcfd", "size_bytes": 3746},
+    {"path": "independent_review.json", "sha256": "39e0091bfcf7933fa8119336281646953a4be35550ff626999d7bdbe4f971cce", "size_bytes": 3936},
+    {"path": "independent_review_evidence.json", "sha256": "5706243a598826549603d5ca06a52691671a07fa3f55281bfd65f8c29bb3a6a0", "size_bytes": 12317},
+    {"path": "owner_decision.json", "sha256": "9d025d9ebd6e26e98031c5573bc6bfdb2648218a101c998380aa81bf1444579d", "size_bytes": 767},
+    {"path": "project_grant.json", "sha256": "c81dbc964fd1531ac97d1ad54ec2f481caf954401256e8cd8412d5c84176c684", "size_bytes": 900},
+    {"path": "project_tests_junit.xml", "sha256": "f2eb6ef993aec8273a96e35b75ca9dc63ee3c2f607e9210d37c22aa34bb319ef", "size_bytes": 11048},
+    {"path": "protection_after_public_qualification.json", "sha256": "eabebf3c59a968c5e56d76e1af4a5cc1386af7f2fe4ae30702cc6009841d3647", "size_bytes": 284},
+    {"path": "protection_snapshot.json", "sha256": "eae81fe26146d003ca0755f14f5efd313674e03459224d4169b0f3f86e098f60", "size_bytes": 284},
+    {"path": "public_qualification_record.json", "sha256": "6e40e23fd1013bc1a0455c4a347f01ddb5c8837519d7cf76dbc04f87096c8f5b", "size_bytes": 1061},
+    {"path": "real_read_only_qualification.json", "sha256": "ab3fdf68872edc16b771f3c2662724a8250dad45f1f9cb2527249ee5b7cca5a1", "size_bytes": 104345},
+    {"path": "takeover_inventory.json", "sha256": "08095418935f77e0be746a159a270f05f9fe8e5dad1761b5b7aba5c3ad135080", "size_bytes": 2046},
+    {"path": "v16_b_commands.md", "sha256": "146c77a2ea12fff7be7e608e3c4cc317525d6e0d5b149cf75072f5f137ba4d25", "size_bytes": 2035}
+  ],
+  "states": {
+    "implementation_accepted": true,
+    "independent_review_passed": true,
+    "project_grant_ready": true,
+    "real_execution_started": false,
+    "holdout_opened": false
+  }
+}

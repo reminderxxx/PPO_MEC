@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "checked_at": "2026-09-10T16:17:00+08:00",
+  "executor_commit": "cc32e6e4113366ba4c8af8076d20db8d98dfd7fe",
+  "phase": "formal_cache_policy",
+  "operation": "qualification",
+  "exit_code": 0,
+  "status": "qualified",
+  "approval_verified": true,
+  "authorization_mode": "one_run_local_project_authorization_v1",
+  "real_execution_authorized_capability": true,
+  "real_execution_started": false,
+  "holdout_capability": false,
+  "phase_records": 15,
+  "cell_records": 348,
+  "checkpoint_attempt_count": 150,
+  "checkpoint_pass_count": 150,
+  "precheck_failure": {
+    "command_difference": "Python -I was used instead of the contracted -B entry",
+    "exit_code": 1,
+    "reason": "ModuleNotFoundError: continuation_executor before proposal/run access",
+    "real_execution_started": false
+  },
+  "post_qualification_protection": {
+    "count": 107320,
+    "mismatch_count": 0,
+    "addition_count": 0,
+    "main_head": "62f432c68b05b8dcd148fde454dd71d1d9621d68",
+    "scientific_head": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d"
+  }
+}

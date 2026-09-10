@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "mode": "one_run_local_project_authorization_v1",
+  "decision_sha256": "67f8115d30acfb447cd360127a357f81110e87e04fb76138843f4f8c3edc07d5",
+  "contract_sha256": "7cad88f3d1cc044accb94d14bb15cdeb75dda22618ed14025e84de40ea1be9cb",
+  "executor_identity_sha256": "a154e5a002de5297e88f3182e6a6b38c6ada830153b4564cdd040c01d2ea9b75",
+  "independent_review": {
+    "path": "/private/tmp/ppo_mec_g14r20_g_project_authorization/artifacts/analysis/g14r20_g_project_authorization_20260910/packet_cc32e6e_20260910/independent_review.json",
+    "sha256": "39e0091bfcf7933fa8119336281646953a4be35550ff626999d7bdbe4f971cce",
+    "size_bytes": 3936
+  },
+  "stop_file": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/.continuation_locks/01523d80955bf4b2c19d19306eaef41da4fc9e6b4841f80564b884e6d9674c92.project_stop",
+  "issued_at": "2026-09-10T16:14:01+08:00"
+}

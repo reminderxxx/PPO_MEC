@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "recorded_at": "2026-09-10T15:54:38+08:00",
+  "scope": "G14R20-G pre-existing uncommitted draft takeover",
+  "main": {
+    "head": "62f432c68b05b8dcd148fde454dd71d1d9621d68",
+    "origin_main": "62f432c68b05b8dcd148fde454dd71d1d9621d68",
+    "user_modified_files": [
+      "scripts/train_sa_ghmappo_real_sample.py",
+      "src/agents/sa_ghmappo_agent.py",
+      "src/agents/sa_ghmappo_core.py",
+      "src/encoders/fusion_encoder.py",
+      "src/evaluators/real_eval_support.py",
+      "tests/test_algo_pool_contract.py",
+      "tests/test_checkpoint_compat.py"
+    ],
+    "other_status_entries": []
+  },
+  "draft": {
+    "worktree": "/private/tmp/ppo_mec_g14r20_g_project_authorization",
+    "branch": "codex/g14r20-g-project-authorization",
+    "starting_head": "f99cd8af12c6df2feb1d5e1b495cb86c07684d79",
+    "tracked_diff_stat": "10 files changed, 111 insertions(+), 1 deletion(-)",
+    "tracked_modified_files": [
+      "README.md",
+      "docs/project/BUGS.md",
+      "docs/project/CODE_MODULE_MAP.md",
+      "docs/project/CONTEXT.md",
+      "docs/project/DECISION_LOG.md",
+      "docs/project/DIRECTORY_STRUCTURE.md",
+      "docs/project/PROGRESS.md",
+      "docs/project/README.md",
+      "docs/project/RUNBOOK.md",
+      "scripts/execute_fixed_commit_continuation.py"
+    ],
+    "untracked_files": [
+      "docs/project/project_continuation_authorization_contract.md",
+      "scripts/continuation_executor/project_authorization.py",
+      "scripts/continuation_executor/project_packet.py",
+      "tests/test_project_continuation_authorization.py"
+    ],
+    "unrelated_entries": []
+  },
+  "takeover_result": {
+    "implementation_commit": "cc32e6e4113366ba4c8af8076d20db8d98dfd7fe",
+    "minimal_revision": "Moved the new evidence root from the user-modified main worktree to the independent branch worktree and documented that later evidence commits do not change the reviewed executor identity.",
+    "scientific_modules_changed": false,
+    "real_execution_started": false,
+    "holdout_opened": false
+  }
+}

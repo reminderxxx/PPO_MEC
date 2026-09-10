@@ -3,7 +3,8 @@
 - `project_continuation_authorization_contract_version`: `1.0.0`
 - 记录日期：`2026-09-10`（本机时间核验；Asia/Shanghai）。
 - 范围：G14R20-G 的本地项目执行授权；不是科学 Protocol 升级，也不是论文结果审查。
-- 当前状态：用户已允许收敛授权方式；实现、独立技术验收及具体 grant 的准入须分别核验。本文不预报真实 dispatch 或 formal gate 成功。
+- 当前状态：实现 `cc32e6e` 已验收，独立技术 review 已通过，精确 grant 已生成并通过 public qualification；
+  真实 dispatch、formal phase 和 holdout 均未启动，本文不预报 formal gate 成功。
 
 ## 当前用户决定与信任边界
 

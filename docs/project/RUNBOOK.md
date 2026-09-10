@@ -2,20 +2,25 @@
 
 用户已允许为既有 v16 收敛授权方式；这是独立于旧 crypto 的显式路径，不自动绕过其门禁。科学 worktree
 保持 `/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847` 和原 `a6d1fd8` 身份，原 Python/命令/输入不变。
-本条不预写实现或验收成功；先完成最终 executor 的独立技术 review，再 create-only 保存绑定 review 的 grant。
+最终 executor `cc32e6e4113366ba4c8af8076d20db8d98dfd7fe` 的独立技术 review 已通过，绑定 review 的 grant 已 create-only 保存。
 证据根为被验收独立分支 worktree 内的
 `artifacts/analysis/g14r20_g_project_authorization_20260910/`，不写入带七个用户改动的 main worktree、
 原科学源或旧账本前缀。后续证据 commit 不改变外部 executor identity；实际命令必须使用停在被验收代码
 commit 的 clean detached worktree。
 
-grant 已独立核验后，单阶段资格检查的形态为：
+固定工作目录为 `/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847`；完整命令见资格包中的
+`v16_b_commands.md`。首阶段启动命令使用 clean detached executor
+`/private/tmp/ppo_mec_g14r20_g_executor_cc32e6e_20260910`，形态为：
 
 ```bash
-<frozen-absolute-python> -B <reviewed-executor>/scripts/execute_fixed_commit_continuation.py \
-  --proposal <original-proposal.json> \
-  --contract <exact-project-contract.json> \
-  --executor-identity <final-reviewed-executor-identity.json> \
-  --project-authorization <review-bound-project-grant.json> \
+env PYTHONPATH=/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847 \
+  PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 \
+  /Users/howen/Projects/PPO_MEC/.venv/bin/python -B \
+  /private/tmp/ppo_mec_g14r20_g_executor_cc32e6e_20260910/scripts/execute_fixed_commit_continuation.py \
+  --proposal /Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_a_continuation_20260908/v16_continuation_proposal.json \
+  --contract /private/tmp/ppo_mec_g14r20_g_project_authorization/artifacts/analysis/g14r20_g_project_authorization_20260910/packet_cc32e6e_20260910/execution_contract.json \
+  --executor-identity /private/tmp/ppo_mec_g14r20_g_project_authorization/artifacts/analysis/g14r20_g_project_authorization_20260910/packet_cc32e6e_20260910/executor_identity.json \
+  --project-authorization /private/tmp/ppo_mec_g14r20_g_project_authorization/artifacts/analysis/g14r20_g_project_authorization_20260910/packet_cc32e6e_20260910/project_grant.json \
   --phase formal_cache_policy --check qualification
 ```
 

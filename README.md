@@ -1,7 +1,7 @@
 > **2026-09-10 G14R20-G：一次性项目授权。** 用户已明确允许将接续管理收敛为“owner 批准范围＋独立技术核验＋固定输入＋追加记录”。
-> 仅面向既有合法 v16、原科学 `a6d1fd8` 与已冻结的 150 个模型，待独立验收和精确 grant 准入后执行剩余八阶段；
+> 仅面向既有合法 v16、原科学 `a6d1fd8` 与已冻结的 150 个模型；独立验收已通过且精确 grant 已生成，可在后续 G14C v16-B 明确启动剩余八阶段；
 > 不重训、不修改科学 Protocol、不打开 holdout。新 project 入口不要求签名服务，旧 crypto 入口不变。
-> 本条仅记录授权方式变更，不宣称已 dispatch 或已取得正式结果。见 [一次性授权合同](docs/project/project_continuation_authorization_contract.md)。
+> 本轮没有 dispatch，也没有新的正式结果。见 [一次性授权合同](docs/project/project_continuation_authorization_contract.md)。
 
 > G14R20-F：公共同进程 startup handoff、有限等待、并发隔离与 checkpoint custody 正在独立分支实现验收，
 > 合同见 [continuation_startup_handoff_contract.md](docs/project/continuation_startup_handoff_contract.md)。
