@@ -633,13 +633,33 @@ def evaluation_model_source_scope(
     if registry != Path(reference["source_generated_registry_path"]).resolve():
         raise GeneratedCheckpointResourceError("evaluation source registry path drift")
     for attribute, field in (
-        ("resolved_execution_context_path", "source_context_path"),
         ("formal_training_execution_binding_path", "source_binding_path"),
     ):
         supplied = str(getattr(args, attribute, "") or "")
         if supplied and Path(supplied).resolve() != Path(reference[field]).resolve():
             raise GeneratedCheckpointResourceError(
                 f"evaluation source identity path drift: {attribute}"
+            )
+    evaluation_context_path = str(
+        getattr(args, "resolved_execution_context_path", "") or ""
+    )
+    if evaluation_context_path:
+        evaluation_context = _strict_json_object(
+            Path(evaluation_context_path), "evaluation execution context"
+        )
+        execution_identity = evaluation_context.get("evaluation_execution_identity")
+        if (
+            not isinstance(execution_identity, Mapping)
+            or execution_identity.get("model_source_reference_sha256")
+            != reference["source_reference_sha256"]
+            or execution_identity.get("source_run_id") != SOURCE_RUN_ID
+            or execution_identity.get("source_context_identity_sha256")
+            != reference["source_context_identity_sha256"]
+            or Path(evaluation_context_path).resolve().parent
+            != Path(reference_path).resolve().parent
+        ):
+            raise GeneratedCheckpointResourceError(
+                "evaluation execution context/source identity drift"
             )
     root = Path(reference["source_run_root"]).resolve()
     return {
@@ -670,6 +690,16 @@ def resolve_generated_checkpoint_arguments(
         protocol=protocol,
     )
     run_root = Path(scope["run_root"])
+    identity_context = resolved_execution_context or {}
+    identity_binding = execution_binding or {}
+    if scope["evaluation_only"]:
+        reference = scope["reference"]
+        identity_context = _strict_json_object(
+            Path(reference["source_context_path"]), "source execution context"
+        )
+        identity_binding = _strict_json_object(
+            Path(reference["source_binding_path"]), "source execution binding"
+        )
     static_registry_path = str(getattr(args, "resource_registry_path", "") or "")
     if not static_registry_path:
         raise GeneratedCheckpointResourceError("static resource registry is required")
@@ -681,10 +711,10 @@ def resolve_generated_checkpoint_arguments(
         static_registry_semantic_sha256=str(static.get("hashes", {}).get("semantic_sha256") or ""),
         protocol_semantic_sha256=(protocol or {}).get("hashes", {}).get("semantic_sha256"),
         protocol_full_sha256=(protocol or {}).get("hashes", {}).get("full_sha256"),
-        active_formal_bundle_sha256=(resolved_execution_context or {}).get("scientific_identity", {}).get("active_formal_bundle_sha256"),
-        execution_commit=(resolved_execution_context or {}).get("scientific_identity", {}).get("execution_commit"),
-        resolved_execution_context_sha256=(resolved_execution_context or {}).get("context_sha256"),
-        formal_training_execution_binding_sha256=(execution_binding or {}).get("binding_full_sha256"),
+        active_formal_bundle_sha256=identity_context.get("scientific_identity", {}).get("active_formal_bundle_sha256"),
+        execution_commit=identity_context.get("scientific_identity", {}).get("execution_commit"),
+        resolved_execution_context_sha256=identity_context.get("context_sha256"),
+        formal_training_execution_binding_sha256=identity_binding.get("binding_full_sha256"),
     )
     manifest_id = str(getattr(args, "checkpoint_manifest_id", "") or "")
     provenance_id = str(getattr(args, "checkpoint_provenance_id", "") or "")

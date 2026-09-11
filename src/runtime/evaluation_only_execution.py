@@ -12,6 +12,7 @@ import os
 import subprocess
 import sys
 from copy import deepcopy
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -22,7 +23,24 @@ from src.runtime.generated_checkpoint_resources import load_generated_checkpoint
 EVALUATION_ONLY_SOURCE_CONTRACT_VERSION = "1.0.0"
 EVALUATION_ONLY_EXECUTION_CONTRACT_VERSION = "1.0.0"
 SOURCE_SCIENTIFIC_COMMIT = "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d"
+SOURCE_SCIENTIFIC_TREE = "eb8e83c6e4532bc45c22fb7a816388e576753e30"
 SOURCE_RUN_ID = "typed_model_cache_formal_20260906_152847_g14c_v16"
+SOURCE_RUN_ROOT = Path(
+    "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/"
+    "typed_model_cache_formal_20260906_152847_g14c_v16"
+)
+DISPOSITION_ELIGIBILITY_PATH = Path(
+    "/Users/howen/Projects/PPO_MEC/artifacts/analysis/"
+    "g14r20_h_v16_failed_run_disposition_20260911/"
+    "checkpoint_and_partial_result_eligibility.json"
+)
+DISPOSITION_ELIGIBILITY_SHA256 = (
+    "de39608762c86074b8c7e0528d2e3b0262150e2f8ac7929e18bda42cb45d0d34"
+)
+DISPOSITION_INTEGRITY_MANIFEST_PATH = DISPOSITION_ELIGIBILITY_PATH.parent / "integrity_manifest.json"
+DISPOSITION_INTEGRITY_MANIFEST_SHA256 = (
+    "89b4f3f62a768e06fd0d8c662f9b7a38ad0ad7142c0b63b6f751dacb42fe67e1"
+)
 PHASES = (
     "formal_cache_policy",
     "formal_controller",
@@ -47,7 +65,6 @@ SOURCE_ONLY_EXPANSION_KEYS = {
     "generated_checkpoint_registry_path",
     "seed_checkpoint_manifest_path",
     "checkpoint_provenance_manifest_path",
-    "resolved_execution_context_path",
     "formal_training_execution_binding_path",
     "training_output_root",
     "dev_input_root",
@@ -131,10 +148,24 @@ def build_model_source_reference(
     """Build a strict reference without changing any source run artifact."""
 
     eligibility_path = Path(disposition_eligibility_path).resolve()
+    if (
+        Path(disposition_eligibility_path).is_symlink()
+        or eligibility_path != DISPOSITION_ELIGIBILITY_PATH
+        or file_sha256(eligibility_path) != DISPOSITION_ELIGIBILITY_SHA256
+        or DISPOSITION_INTEGRITY_MANIFEST_PATH.is_symlink()
+        or file_sha256(DISPOSITION_INTEGRITY_MANIFEST_PATH)
+        != DISPOSITION_INTEGRITY_MANIFEST_SHA256
+    ):
+        raise EvaluationOnlyError("H disposition trust root drift")
     eligibility = _read_object(eligibility_path)
     source = Path(source_run_root).resolve()
     scientific = Path(scientific_checkout).resolve()
-    if source.name != SOURCE_RUN_ID or eligibility.get("artifact_run_id") != SOURCE_RUN_ID:
+    if (
+        Path(source_run_root).is_symlink()
+        or source != SOURCE_RUN_ROOT
+        or source.name != SOURCE_RUN_ID
+        or eligibility.get("artifact_run_id") != SOURCE_RUN_ID
+    ):
         raise EvaluationOnlyError("unreviewed model source run")
     if eligibility.get("formal_execution_authorized") is not False:
         raise EvaluationOnlyError("disposition authorization boundary drift")
@@ -147,6 +178,8 @@ def build_model_source_reference(
         raise EvaluationOnlyError("scientific checkout commit drift")
     _require_clean_code(scientific)
     scientific_tree = _git(scientific, "rev-parse", "HEAD^{tree}")
+    if scientific_tree != SOURCE_SCIENTIFIC_TREE:
+        raise EvaluationOnlyError("scientific checkout tree drift")
     context_path = source / "resolved_execution_context.json"
     binding_path = source / "formal_training_execution_binding.json"
     context = _read_object(context_path)
@@ -220,6 +253,8 @@ def build_model_source_reference(
         coordinate = (row["agent_name"], int(row["seed"]), row["capacity_label"])
         reviewed = reviewed_by_coordinate.get(coordinate)
         path = Path(row["checkpoint_path"])
+        if path.is_symlink() or not path.is_file() or not _within(path, source):
+            raise EvaluationOnlyError(f"reviewed frozen model path drift: {coordinate}")
         digest = file_sha256(path)
         if (
             reviewed is None
@@ -242,6 +277,10 @@ def build_model_source_reference(
         "evaluation_only_model_source_contract_version": EVALUATION_ONLY_SOURCE_CONTRACT_VERSION,
         "disposition_eligibility_path": str(eligibility_path),
         "disposition_eligibility_sha256": file_sha256(eligibility_path),
+        "disposition_integrity_manifest_path": str(DISPOSITION_INTEGRITY_MANIFEST_PATH),
+        "disposition_integrity_manifest_sha256": file_sha256(
+            DISPOSITION_INTEGRITY_MANIFEST_PATH
+        ),
         "source_run_id": SOURCE_RUN_ID,
         "source_run_root": str(source),
         "scientific_commit": SOURCE_SCIENTIFIC_COMMIT,
@@ -325,11 +364,16 @@ def build_evaluation_execution_contract(
     if _git(executor, "rev-parse", "HEAD") != executor_commit:
         raise EvaluationOnlyError("executor checkout commit drift")
     _require_clean_code(executor)
-    python = Path(python_executable).resolve()
-    if not python.is_file():
+    python = Path(python_executable)
+    if not python.is_absolute() or not python.is_file() or not os.access(python, os.X_OK):
         raise EvaluationOnlyError("absolute evaluation interpreter is missing")
     protocol = _read_object(source["protocol_path"])
     source_context = _read_object(source["source_context_path"])
+    static_registry_path = (
+        Path(source["scientific_checkout"])
+        / "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821"
+        / "portable_resource_registry.json"
+    )
     old_scientific = Path(
         source_context["resolved_expansion_context"]["clean_worktree_root"]
     )
@@ -352,7 +396,7 @@ def build_evaluation_execution_contract(
         protocol_path=source["protocol_path"],
         python_executable=str(python),
         output_root=str(run_root),
-        resolved_execution_context_path=source["source_context_path"],
+        resolved_execution_context_path=str(run_root / "resolved_execution_context.json"),
         formal_training_execution_binding_path=source["source_binding_path"],
         generated_checkpoint_registry_path=source["source_generated_registry_path"],
         checkpoint_root=str(source_root),
@@ -411,11 +455,85 @@ def build_evaluation_execution_contract(
         "checkpoint_freeze_commands": 0,
         "holdout_commands": 0,
     }
+    evaluation_context = deepcopy(source_context)
+    evaluation_context["created_at_utc"] = datetime.now(timezone.utc).isoformat()
+    evaluation_context["created_for_run_identity"] = canonical_sha256(
+        {
+            "evaluation_run_id": evaluation_run_id,
+            "executor_commit": executor_commit,
+            "model_source_reference_sha256": source_hash,
+            "command_plan_sha256": contract["command_plan_sha256"],
+        }
+    )
+    evaluation_context["scientific_identity"]["execution_commit"] = executor_commit
+    evaluation_context["runtime_location"].update(
+        resolved_python_absolute_path=str(python),
+        python_resolution_source="explicit_evaluation_only_python_executable",
+        clean_worktree_root=str(executor),
+        durable_run_root=str(run_root),
+        protocol_path=source["protocol_path"],
+        repository_root=str(executor),
+        data_root=str(Path(source["scientific_checkout"]).parents[2] / "data"),
+        checkpoint_root=str(source_root),
+        protocol_artifact_root=str(
+            Path(source["scientific_checkout"])
+            / "configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821"
+        ),
+        resource_registry_path=str(static_registry_path),
+        execution_environment_manifest_path=str(
+            Path(source["scientific_checkout"])
+            / "configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906"
+            / "execution_environment_manifest.json"
+        ),
+        resolved_execution_context_path=str(run_root / "resolved_execution_context.json"),
+        formal_training_execution_binding_path=source["source_binding_path"],
+    )
+    evaluation_context["runtime_location"]["execution_environment_manifest_sha256"] = (
+        file_sha256(evaluation_context["runtime_location"]["execution_environment_manifest_path"])
+    )
+    evaluation_context["command_expansion"].update(
+        outer_expansion_sha256=contract["command_plan_sha256"],
+        resolved_command_matrix_sha256=contract["command_plan_sha256"],
+        phase_count=len(PHASES),
+        command_count=sum(len(plan["commands"]) for plan in plans.values()),
+    )
+    evaluation_context["resolved_expansion_context"] = expansion
+    evaluation_context["evaluation_execution_identity"] = {
+        "evaluation_run_id": evaluation_run_id,
+        "executor_commit": executor_commit,
+        "executor_git_tree": contract["executor_git_tree"],
+        "model_source_reference_sha256": source_hash,
+        "source_run_id": source["source_run_id"],
+        "source_context_identity_sha256": source["source_context_identity_sha256"],
+        "source_context_file_sha256": source["source_context_sha256"],
+        "source_binding_identity_sha256": source["source_binding_identity_sha256"],
+        "host_paths_are_scientific_identity": False,
+    }
+    evaluation_context["context_sha256"] = canonical_sha256(
+        {key: item for key, item in evaluation_context.items() if key != "context_sha256"}
+    )
+    from src.runtime.resolved_formal_execution_context import (
+        validate_resolved_formal_execution_context,
+    )
+
+    validate_resolved_formal_execution_context(
+        evaluation_context,
+        protocol=protocol,
+        clean_worktree_root=executor,
+        durable_run_root=run_root,
+        check_git=True,
+    )
+    contract["evaluation_execution_context"] = evaluation_context
+    contract["evaluation_execution_context_sha256"] = evaluation_context["context_sha256"]
     contract["execution_contract_sha256"] = canonical_sha256(contract)
     return contract
 
 
-def validate_execution_contract(contract: Mapping[str, Any]) -> dict[str, Any]:
+def validate_execution_contract(
+    contract: Mapping[str, Any],
+    *,
+    model_source_reference: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     value = dict(contract)
     digest = value.pop("execution_contract_sha256", None)
     if digest != canonical_sha256(value):
@@ -434,6 +552,55 @@ def validate_execution_contract(contract: Mapping[str, Any]) -> dict[str, Any]:
         raise EvaluationOnlyError("unsigned preparation cannot claim execution authority")
     if set(value.get("command_plans", {})) != set(PHASES):
         raise EvaluationOnlyError("evaluation command matrix membership drift")
+    plans = value["command_plans"]
+    if value.get("command_plan_sha256") != canonical_sha256(plans):
+        raise EvaluationOnlyError("evaluation command plan hash mismatch")
+    expected_counts = {
+        "formal_cache_policy": 3,
+        "formal_controller": 3,
+        "formal_ablation": 2,
+        "formal_support": 11,
+        "formal_scalability": 3,
+        "formal_statistics": 1,
+        "formal_gate": 1,
+        "complete_without_holdout": 0,
+    }
+    for phase, expected_count in expected_counts.items():
+        plan = plans[phase]
+        commands = plan.get("commands")
+        contexts = plan.get("matrix_contexts")
+        if not isinstance(commands, list) or len(commands) != expected_count:
+            raise EvaluationOnlyError(f"evaluation command count drift: {phase}")
+        if not isinstance(contexts, list) or len(contexts) != expected_count:
+            raise EvaluationOnlyError(f"evaluation matrix context count drift: {phase}")
+        if plan.get("matrix_cell_count", expected_count) != expected_count:
+            raise EvaluationOnlyError(f"evaluation matrix cell count drift: {phase}")
+    if model_source_reference is not None:
+        source = dict(model_source_reference)
+        source_digest = source.get("source_reference_sha256")
+        if source_digest != canonical_sha256(
+            {key: item for key, item in source.items() if key != "source_reference_sha256"}
+        ):
+            raise EvaluationOnlyError("model source reference hash mismatch")
+        if value.get("model_source_reference_sha256") != source_digest:
+            raise EvaluationOnlyError("execution/model-source reference mismatch")
+        if value.get("model_source_run_id") != source.get("source_run_id"):
+            raise EvaluationOnlyError("execution/model-source run mismatch")
+        if value.get("legacy_result_exclusions") != source.get("legacy_result_exclusions"):
+            raise EvaluationOnlyError("execution/model-source legacy exclusion mismatch")
+    context = value.get("evaluation_execution_context")
+    if not isinstance(context, Mapping) or value.get(
+        "evaluation_execution_context_sha256"
+    ) != context.get("context_sha256"):
+        raise EvaluationOnlyError("evaluation execution context binding is missing")
+    if context.get("evaluation_execution_identity", {}).get(
+        "model_source_reference_sha256"
+    ) != value.get("model_source_reference_sha256"):
+        raise EvaluationOnlyError("evaluation context/model-source binding drift")
+    if context.get("evaluation_execution_identity", {}).get(
+        "evaluation_run_id"
+    ) != value.get("evaluation_run_id"):
+        raise EvaluationOnlyError("evaluation context/run binding drift")
     return {
         "status": "pass",
         "phase_count": len(PHASES),
@@ -444,24 +611,32 @@ def validate_execution_contract(contract: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def validate_command_matrix_parsers(contract: Mapping[str, Any]) -> dict[str, Any]:
+def validate_command_matrix_parsers(
+    contract: Mapping[str, Any],
+    *,
+    model_source_reference: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     """Exercise the actual phase parsers, including cache-policy's nested benchmark."""
 
-    validate_execution_contract(contract)
+    validate_execution_contract(
+        contract, model_source_reference=model_source_reference
+    )
     from scripts import benchmark_main_results
     from scripts import manage_typed_model_cache_formal_artifacts
     from scripts import run_typed_model_cache_formal_cache_policy
     from scripts import run_typed_model_cache_formal_statistics
     from scripts import run_typed_model_cache_formal_support
 
-    parsers = {
-        "formal_cache_policy": run_typed_model_cache_formal_cache_policy.build_parser,
-        "formal_controller": lambda: _parser_from_parse_args(benchmark_main_results.parse_args),
-        "formal_ablation": lambda: _parser_from_parse_args(run_typed_model_cache_formal_support.parse_args),
-        "formal_support": lambda: _parser_from_parse_args(run_typed_model_cache_formal_support.parse_args),
-        "formal_scalability": lambda: _parser_from_parse_args(run_typed_model_cache_formal_support.parse_args),
-        "formal_statistics": lambda: _parser_from_parse_args(run_typed_model_cache_formal_statistics.parse_args),
-        "formal_gate": lambda: _parser_from_parse_args(manage_typed_model_cache_formal_artifacts.parse_args),
+    executor = Path(contract["executor_checkout"]).resolve()
+    python = str(Path(contract["python_executable"]))
+    scripts = {
+        "formal_cache_policy": executor / "scripts/run_typed_model_cache_formal_cache_policy.py",
+        "formal_controller": executor / "scripts/benchmark_main_results.py",
+        "formal_ablation": executor / "scripts/run_typed_model_cache_formal_support.py",
+        "formal_support": executor / "scripts/run_typed_model_cache_formal_support.py",
+        "formal_scalability": executor / "scripts/run_typed_model_cache_formal_support.py",
+        "formal_statistics": executor / "scripts/run_typed_model_cache_formal_statistics.py",
+        "formal_gate": executor / "scripts/manage_typed_model_cache_formal_artifacts.py",
     }
     parsed = 0
     nested = 0
@@ -471,12 +646,22 @@ def validate_command_matrix_parsers(contract: Mapping[str, Any]) -> dict[str, An
                 raise EvaluationOnlyError("completion phase unexpectedly contains a command")
             continue
         for command in plan["commands"]:
-            parser_factory = parsers[phase]
+            if len(command) < 2 or command[0] != python or command[1] != str(scripts[phase]):
+                raise EvaluationOnlyError(f"evaluation command entrypoint drift: {phase}")
             if phase == "formal_cache_policy":
-                args = parser_factory().parse_args(command[2:])
+                args = run_typed_model_cache_formal_cache_policy.build_parser().parse_args(
+                    command[2:]
+                )
                 nested_command = list(args.command)
                 if nested_command and nested_command[0] == "--":
                     nested_command = nested_command[1:]
+                expected_nested = str(executor / "scripts/benchmark_main_results.py")
+                if (
+                    len(nested_command) < 2
+                    or nested_command[0] != python
+                    or nested_command[1] != expected_nested
+                ):
+                    raise EvaluationOnlyError("nested benchmark entrypoint drift")
                 _parse_with_existing_parse_args(
                     benchmark_main_results.parse_args, nested_command[2:]
                 )
@@ -506,12 +691,6 @@ def _parse_with_existing_parse_args(parse_args: Any, argv: Sequence[str]) -> Any
         raise EvaluationOnlyError(f"actual command parser rejected matrix: {argv}") from exc
     finally:
         sys.argv = previous
-
-
-def _parser_from_parse_args(parse_args: Any) -> Any:
-    # Kept only as a type-compatible factory marker; parsing uses the function
-    # directly so each producer's real parser remains the authority.
-    return parse_args
 
 
 def reject_legacy_result_path(path: str | Path, contract: Mapping[str, Any]) -> None:

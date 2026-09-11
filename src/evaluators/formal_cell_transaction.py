@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import math
 import os
 import subprocess
 import time
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -119,7 +121,15 @@ def _producer_inventory(manifest_path: Path) -> list[dict[str, Any]]:
     for path in sorted(root.rglob("*")):
         if path.is_symlink():
             raise CellTransactionError(f"producer artifact symlink is forbidden: {path}")
-        if not path.is_file() or path == manifest_path:
+        if (
+            not path.is_file()
+            or path == manifest_path
+            or path.name in {
+                "cell_stdout.log",
+                "cell_stderr.log",
+                "committed_marker.json",
+            }
+        ):
             continue
         rows.append(
             {
@@ -194,6 +204,8 @@ def validate_producer_integrity_manifest(
         if relocation.get("changed_file_count") != len(changes):
             raise CellTransactionError("producer publication change count mismatch")
         change_paths: set[str] = set()
+        before_root = str(mapping.get("before", "")).encode("utf-8")
+        after_root = str(mapping.get("after", "")).encode("utf-8")
         for change in changes:
             if not isinstance(change, Mapping):
                 raise CellTransactionError("producer publication change row is invalid")
@@ -205,18 +217,76 @@ def validate_producer_integrity_manifest(
             target = path.parent / relative
             if target.is_symlink() or not target.is_file():
                 raise CellTransactionError("producer publication changed file is missing")
-            if _file_sha256(target) != change.get("after_sha256"):
+            after_bytes = target.read_bytes()
+            if hashlib.sha256(after_bytes).hexdigest() != change.get("after_sha256"):
                 raise CellTransactionError("producer publication changed file hash drift")
+            if not after_root or after_root not in after_bytes:
+                raise CellTransactionError("producer publication final lacks destination root")
+            before_bytes = after_bytes.replace(after_root, before_root)
+            if hashlib.sha256(before_bytes).hexdigest() != change.get("before_sha256"):
+                raise CellTransactionError("producer publication preimage hash drift")
+            if not before_root or before_root not in before_bytes:
+                raise CellTransactionError("producer publication preimage lacks source root")
+            if before_bytes.replace(before_root, after_root) != after_bytes:
+                raise CellTransactionError("producer publication is not path-only relocation")
+            if _normalized_path_sha256(
+                before_bytes, before_root, after_root
+            ) != change.get("non_path_semantic_sha256_before"):
+                raise CellTransactionError("producer publication preimage semantic hash drift")
+            if _normalized_path_sha256(
+                after_bytes, before_root, after_root
+            ) != change.get("non_path_semantic_sha256_after"):
+                raise CellTransactionError("producer publication final semantic hash drift")
             if change.get("non_path_semantic_sha256_before") != change.get(
                 "non_path_semantic_sha256_after"
             ):
                 raise CellTransactionError("producer publication changed non-path semantics")
+        before_payload = relocation.get("producer_manifest_payload_before")
+        if not isinstance(before_payload, Mapping) or relocation.get(
+            "producer_manifest_canonical_sha256_before"
+        ) != _canonical_sha256(before_payload):
+            raise CellTransactionError("producer manifest logical preimage drift")
+        try:
+            before_manifest_bytes = base64.b64decode(
+                str(relocation.get("producer_manifest_bytes_base64_before", "")),
+                validate=True,
+            )
+            decoded_before_manifest = json.loads(before_manifest_bytes.decode("utf-8"))
+        except (ValueError, TypeError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise CellTransactionError("producer manifest byte preimage is invalid") from exc
+        if (
+            hashlib.sha256(before_manifest_bytes).hexdigest()
+            != relocation.get("producer_manifest_sha256_before")
+            or decoded_before_manifest != before_payload
+        ):
+            raise CellTransactionError("producer manifest byte preimage drift")
+        before_files = before_payload.get("files")
+        if not isinstance(before_files, list) or relocation.get(
+            "producer_files_sha256_before"
+        ) != _canonical_sha256(before_files):
+            raise CellTransactionError("producer manifest inventory preimage drift")
+        before_by_path = {
+            str(row.get("path")): row
+            for row in before_files
+            if isinstance(row, Mapping)
+        }
+        for change in changes:
+            before_row = before_by_path.get(str(change.get("path")))
+            if not isinstance(before_row, Mapping) or before_row.get(
+                "sha256"
+            ) != change.get("before_sha256"):
+                raise CellTransactionError(
+                    "producer relocation preimage is not bound to original manifest"
+                )
     return {
         "status": "pass",
         "path": str(path.resolve()),
         "file_count": len(declared),
         "manifest_sha256": _file_sha256(path),
+        "files": declared,
+        "files_sha256": _canonical_sha256(declared),
         "publication_relocation_verified": relocation is not None,
+        "publication_relocation": dict(relocation) if relocation is not None else None,
     }
 
 
@@ -229,10 +299,11 @@ def validate_producer_integrity_manifests(
     manifests = _producer_manifest_paths(base)
     if require_manifest and not manifests:
         raise CellTransactionError("published producer integrity manifest is required")
-    audits = [
-        validate_producer_integrity_manifest(path, committed_root=base)
-        for path in manifests
-    ]
+    audits = []
+    for path in manifests:
+        audit = validate_producer_integrity_manifest(path, committed_root=base)
+        audit["relative_manifest_path"] = path.relative_to(base).as_posix()
+        audits.append(audit)
     return {
         "status": "pass",
         "manifest_count": len(audits),
@@ -415,6 +486,10 @@ def _rewrite_declared_internal_paths(source: Path, destination: Path) -> dict[st
         before = path.read_bytes()
         if old not in before:
             continue
+        if new in before:
+            raise CellTransactionError(
+                f"destination root already present before relocation: {path}"
+            )
         try:
             decoded = before.decode("utf-8")
         except UnicodeDecodeError as exc:
@@ -485,12 +560,24 @@ def _rebuild_producer_manifests(
             except ValueError:
                 continue
             producer_changes.append({**change, "path": producer_relative})
-        payload = json.loads(manifest.read_text(encoding="utf-8"))
+        manifest_bytes_before = manifest.read_bytes()
+        payload = json.loads(manifest_bytes_before.decode("utf-8"))
+        payload_before = deepcopy(payload)
         payload["files"] = _producer_inventory(manifest)
         payload["publication_relocation"] = {
             "version": PRODUCER_PUBLICATION_INTEGRITY_VERSION,
             "root_mapping": dict(relocation["root_mapping"]),
             "producer_manifest_sha256_before": before_hashes[relative_manifest],
+            "producer_manifest_bytes_base64_before": base64.b64encode(
+                manifest_bytes_before
+            ).decode("ascii"),
+            "producer_manifest_payload_before": payload_before,
+            "producer_manifest_canonical_sha256_before": _canonical_sha256(
+                payload_before
+            ),
+            "producer_files_sha256_before": _canonical_sha256(
+                payload_before["files"]
+            ),
             "changed_file_count": len(producer_changes),
             "changed_files": producer_changes,
             "non_path_data_preserved": True,
@@ -503,6 +590,7 @@ def _rebuild_producer_manifests(
             manifest, committed_root=destination
         )
         report["path"] = str((destination / Path(relative_manifest)).resolve(strict=False))
+        report["relative_manifest_path"] = relative_manifest
         reports.append(report)
     return reports
 
@@ -1037,6 +1125,9 @@ class FormalCellLedger:
             audit = validate_producer_integrity_manifest(manifest_path)
             if audit["publication_relocation_verified"]:
                 raise CellTransactionError("producer manifest was already publication-rebased")
+            audit["relative_manifest_path"] = manifest_path.relative_to(
+                artifact_root
+            ).as_posix()
             producer_before.append(audit)
             producer_before_hashes[
                 manifest_path.relative_to(artifact_root).as_posix()
@@ -1197,6 +1288,40 @@ class FormalCellLedger:
                 f"extra={sorted(committed - expected)}"
             )
         return {"status": "pass", "committed_cell_count": len(committed)}
+
+
+def verify_persisted_committed_phase(
+    run_root: str | Path,
+    *,
+    phase: str,
+    expected_identity_fields: Mapping[str, Any] | None = None,
+) -> list[dict[str, Any]]:
+    """Reload one phase through the normal ledger and two-layer integrity checks."""
+
+    root = Path(run_root)
+    identity_path = root / "cell_ledger_identity.json"
+    if identity_path.is_symlink() or not identity_path.is_file():
+        raise CellTransactionError("persisted cell identity is missing")
+    try:
+        payload = json.loads(identity_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise CellTransactionError("persisted cell identity is invalid") from exc
+    raw_identity = payload.get("identity") if isinstance(payload, Mapping) else None
+    if not isinstance(raw_identity, Mapping):
+        raise CellTransactionError("persisted cell identity payload is incomplete")
+    if expected_identity_fields is not None and any(
+        raw_identity.get(key) != value
+        for key, value in expected_identity_fields.items()
+    ):
+        raise CellTransactionError("persisted cell identity differs from evaluation contract")
+    try:
+        identity = CellExecutionIdentity(**dict(raw_identity))
+    except TypeError as exc:
+        raise CellTransactionError("persisted cell identity schema drift") from exc
+    if payload.get("run_identity_fingerprint") != identity.fingerprint:
+        raise CellTransactionError("persisted cell identity fingerprint drift")
+    ledger = FormalCellLedger(run_root=root, identity=identity, resume=True)
+    return ledger.committed_records(phase=phase)
 
 
 def run_transactional_cell(
@@ -1374,5 +1499,6 @@ __all__ = [
     "validate_cell_ledger",
     "validate_producer_integrity_manifest",
     "validate_producer_integrity_manifests",
+    "verify_persisted_committed_phase",
     "write_child_output_descriptor",
 ]

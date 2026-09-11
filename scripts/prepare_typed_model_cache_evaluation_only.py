@@ -73,8 +73,14 @@ def main() -> None:
     if args.action == "validate":
         package = json.loads(output.read_text(encoding="utf-8-sig"))
         source_audit = validate_model_source_reference(package["model_source_reference"])
-        execution_audit = validate_execution_contract(package["evaluation_execution_contract"])
-        parser_audit = validate_command_matrix_parsers(package["evaluation_execution_contract"])
+        execution_audit = validate_execution_contract(
+            package["evaluation_execution_contract"],
+            model_source_reference=package["model_source_reference"],
+        )
+        parser_audit = validate_command_matrix_parsers(
+            package["evaluation_execution_contract"],
+            model_source_reference=package["model_source_reference"],
+        )
         if package.get("authorization_request_sha256") != canonical_sha256(
             {key: value for key, value in package.items() if key != "authorization_request_sha256"}
         ):

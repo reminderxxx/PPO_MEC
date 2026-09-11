@@ -11,13 +11,29 @@ from src.runtime.evaluation_only_execution import (
     EvaluationOnlyError,
     canonical_sha256,
     reject_legacy_result_path,
+    validate_command_matrix_parsers,
     validate_execution_contract,
 )
 
 
 def _contract(tmp_path: Path) -> dict:
+    counts = {
+        "formal_cache_policy": 3,
+        "formal_controller": 3,
+        "formal_ablation": 2,
+        "formal_support": 11,
+        "formal_scalability": 3,
+        "formal_statistics": 1,
+        "formal_gate": 1,
+        "complete_without_holdout": 0,
+    }
     plans = {
-        phase: {"commands": [], "expected_outputs": [], "matrix_contexts": []}
+        phase: {
+            "commands": [["/absolute/python", f"/executor/{phase}.py"]] * counts[phase],
+            "expected_outputs": [],
+            "matrix_contexts": [{} for _ in range(counts[phase])],
+            "matrix_cell_count": counts[phase],
+        }
         for phase in PHASES
     }
     value = {
@@ -47,6 +63,14 @@ def _contract(tmp_path: Path) -> dict:
         "dev_selection_commands": 0,
         "checkpoint_freeze_commands": 0,
         "holdout_commands": 0,
+        "evaluation_execution_context": {
+            "context_sha256": "c" * 64,
+            "evaluation_execution_identity": {
+                "model_source_reference_sha256": "s" * 64,
+                "evaluation_run_id": "typed_model_cache_evaluation_only_fixture",
+            },
+        },
+        "evaluation_execution_context_sha256": "c" * 64,
     }
     value["execution_contract_sha256"] = canonical_sha256(value)
     return value
@@ -80,6 +104,62 @@ def test_command_phase_membership_and_run_identity_are_hash_bound(tmp_path: Path
     changed["evaluation_run_id"] = "wrong-run"
     with pytest.raises(EvaluationOnlyError, match="hash mismatch"):
         validate_execution_contract(changed)
+
+
+def test_command_plan_digest_is_recomputed(tmp_path: Path) -> None:
+    contract = _contract(tmp_path)
+    contract["command_plans"]["formal_controller"]["commands"] = [
+        ["/bin/echo", "/tmp/not_the_benchmark.py"]
+    ] * 3
+    contract["command_plans"]["formal_controller"]["matrix_contexts"] = [{}, {}, {}]
+    contract["command_plans"]["formal_controller"]["matrix_cell_count"] = 3
+    contract["execution_contract_sha256"] = canonical_sha256(
+        {key: item for key, item in contract.items() if key != "execution_contract_sha256"}
+    )
+    with pytest.raises(EvaluationOnlyError, match="command plan hash"):
+        validate_execution_contract(contract)
+
+
+def test_execution_contract_is_cross_bound_to_model_source(tmp_path: Path) -> None:
+    contract = _contract(tmp_path)
+    source = {
+        "source_run_id": contract["model_source_run_id"],
+        "legacy_result_exclusions": contract["legacy_result_exclusions"],
+    }
+    source["source_reference_sha256"] = canonical_sha256(source)
+    contract["model_source_reference_sha256"] = source["source_reference_sha256"]
+    contract["evaluation_execution_context"]["evaluation_execution_identity"][
+        "model_source_reference_sha256"
+    ] = source["source_reference_sha256"]
+    contract["execution_contract_sha256"] = canonical_sha256(
+        {key: item for key, item in contract.items() if key != "execution_contract_sha256"}
+    )
+    assert validate_execution_contract(
+        contract, model_source_reference=source
+    )["phase_count"] == 8
+    changed = deepcopy(contract)
+    changed["model_source_run_id"] = "wrong-run"
+    changed["execution_contract_sha256"] = canonical_sha256(
+        {key: item for key, item in changed.items() if key != "execution_contract_sha256"}
+    )
+    with pytest.raises(EvaluationOnlyError, match="model-source run"):
+        validate_execution_contract(changed, model_source_reference=source)
+
+
+def test_command_parser_rejects_interpreter_and_entrypoint_drift(tmp_path: Path) -> None:
+    contract = _contract(tmp_path)
+    contract["executor_checkout"] = str(tmp_path)
+    contract["python_executable"] = "/bin/echo"
+    plan = contract["command_plans"]["formal_controller"]
+    plan["commands"] = [["/bin/echo", "/tmp/not_the_benchmark.py"]] * 3
+    plan["matrix_contexts"] = [{}, {}, {}]
+    plan["matrix_cell_count"] = 3
+    contract["command_plan_sha256"] = canonical_sha256(contract["command_plans"])
+    contract["execution_contract_sha256"] = canonical_sha256(
+        {key: item for key, item in contract.items() if key != "execution_contract_sha256"}
+    )
+    with pytest.raises(EvaluationOnlyError, match="entrypoint drift"):
+        validate_command_matrix_parsers(contract)
     changed = deepcopy(contract)
     changed["phases"] = [*PHASES, "sealed_holdout"]
     changed["execution_contract_sha256"] = canonical_sha256(

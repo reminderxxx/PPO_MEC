@@ -16,6 +16,10 @@ from src.evaluators.typed_model_cache_formal_execution import (
     FormalExecutionError,
     validate_protocol_v1_1,
 )
+from src.evaluators.formal_cell_transaction import (
+    CellTransactionError,
+    verify_persisted_committed_phase,
+)
 from src.runtime.portable_resource_identity import add_portable_resource_arguments, load_registry
 from src.runtime.generated_checkpoint_resources import (
     add_generated_checkpoint_resource_arguments,
@@ -76,15 +80,25 @@ def main() -> None:
             resolved_context, observed_sys_executable=sys.executable
         )
     generated_checkpoint_resource_audit = None
+    source_scope = None
     if capabilities.generated_checkpoint_resource_required:
         static_registry = load_registry(args.resource_registry_path)
-        binding_path = resolved_context["resolved_expansion_context"][
-            "formal_training_execution_binding_path"
-        ]
-        binding = json.loads(Path(binding_path).read_text(encoding="utf-8-sig"))
         source_scope = evaluation_model_source_scope(
             args, default_run_root=Path(args.input_root).resolve(), protocol=protocol
         )
+        reference = source_scope.get("reference") or {}
+        binding_path = reference.get(
+            "source_binding_path",
+            resolved_context["resolved_expansion_context"][
+                "formal_training_execution_binding_path"
+            ],
+        )
+        binding = json.loads(Path(binding_path).read_text(encoding="utf-8-sig"))
+        registry_context = resolved_context
+        if source_scope["evaluation_only"]:
+            registry_context = json.loads(
+                Path(reference["source_context_path"]).read_text(encoding="utf-8-sig")
+            )
         _, generated_checkpoint_resource_audit = load_generated_checkpoint_registry(
             args.generated_checkpoint_registry_path,
             run_root=source_scope["run_root"],
@@ -92,9 +106,9 @@ def main() -> None:
             static_registry_semantic_sha256=static_registry["hashes"]["semantic_sha256"],
             protocol_semantic_sha256=protocol["hashes"]["semantic_sha256"],
             protocol_full_sha256=protocol["hashes"]["full_sha256"],
-            active_formal_bundle_sha256=resolved_context["scientific_identity"]["active_formal_bundle_sha256"],
-            execution_commit=resolved_context["scientific_identity"]["execution_commit"],
-            resolved_execution_context_sha256=resolved_context["context_sha256"],
+            active_formal_bundle_sha256=registry_context["scientific_identity"]["active_formal_bundle_sha256"],
+            execution_commit=registry_context["scientific_identity"]["execution_commit"],
+            resolved_execution_context_sha256=registry_context["context_sha256"],
             formal_training_execution_binding_sha256=binding["binding_full_sha256"],
         )
         generated_checkpoint_resource_audit["evaluation_model_source"] = source_scope
@@ -110,7 +124,51 @@ def main() -> None:
         except FormalAgentOrderError as exc:
             raise FormalExecutionError(str(exc)) from exc
     input_root = Path(args.input_root)
-    rows = sorted(input_root.glob("formal_controller/**/benchmark_rows.csv"))
+    rows: list[Path]
+    if source_scope is not None and source_scope["evaluation_only"]:
+        from src.runtime.evaluation_only_execution import validate_execution_contract
+
+        run_source = json.loads(
+            (input_root / "evaluation_model_source_reference.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+        if run_source != source_scope["reference"]:
+            raise FormalExecutionError("evaluation run/source reference drift")
+        execution = json.loads(
+            (input_root / "evaluation_execution_contract.json").read_text(
+                encoding="utf-8-sig"
+            )
+        )
+        validate_execution_contract(execution, model_source_reference=run_source)
+        try:
+            committed = verify_persisted_committed_phase(
+                input_root,
+                phase="formal_controller",
+                expected_identity_fields={
+                    "run_id": execution["evaluation_run_id"],
+                    "execution_commit": execution["executor_commit"],
+                    "protocol_semantic_sha256": run_source["protocol_semantic_sha256"],
+                    "command_matrix_sha256": execution["command_plan_sha256"],
+                },
+            )
+        except CellTransactionError as exc:
+            raise FormalExecutionError(str(exc)) from exc
+        if len(committed) != len(
+            execution["command_plans"]["formal_controller"]["commands"]
+        ):
+            raise FormalExecutionError("formal controller committed cell matrix is incomplete")
+        rows = []
+        for record in committed:
+            matches = list(Path(record["committed_path"]).rglob("benchmark_rows.csv"))
+            if len(matches) != 1:
+                raise FormalExecutionError(
+                    "committed formal controller cell must contain exactly one rows artifact"
+                )
+            rows.append(matches[0])
+        rows.sort()
+    else:
+        rows = sorted(input_root.glob("formal_controller/**/benchmark_rows.csv"))
     if not rows:
         raise FormalExecutionError("formal controller rows are missing")
     command = [

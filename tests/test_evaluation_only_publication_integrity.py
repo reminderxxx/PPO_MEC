@@ -146,6 +146,71 @@ def test_transaction_inventory_cannot_mask_stale_producer_manifest(tmp_path: Pat
         validate_producer_integrity_manifests(root, require_manifest=True)
 
 
+def test_controller_layout_allows_transaction_owned_logs_but_still_inventories_them(
+    tmp_path: Path,
+) -> None:
+    run_root = tmp_path / "evaluation_run"
+    ledger = _ledger(run_root)
+    begun = ledger.begin_cell(
+        phase="formal_controller",
+        coordinates={"capacity_label": "constrained_288mb"},
+        command=["evaluate"],
+        input_hash="i" * 64,
+        committed_path=run_root / "formal_controller" / "constrained_288mb",
+    )
+    producer = Path(begun["record"]["staging_path"]) / "benchmark_run"
+    _write_json(producer / "benchmark_rows.csv.json", {"metric": 1.0})
+    payload_path = producer / "benchmark_rows.csv.json"
+    _write_json(
+        producer / "artifact_integrity_manifest.json",
+        {
+            "integrity_manifest_version": "1.0.0",
+            "files": [{
+                "path": payload_path.name,
+                "size_bytes": payload_path.stat().st_size,
+                "sha256": _sha(payload_path),
+            }],
+        },
+    )
+    (producer / "cell_stdout.log").write_text("ok", encoding="utf-8")
+    (producer / "cell_stderr.log").write_text("", encoding="utf-8")
+    event = ledger.commit_cell(
+        begun["cell_id"],
+        validated_artifact_root=producer,
+        required_paths=[
+            "benchmark_rows.csv.json",
+            "cell_stdout.log",
+            "cell_stderr.log",
+        ],
+    )
+    inventory_paths = {row["path"] for row in event["artifact_inventory"]}
+    assert {"cell_stdout.log", "cell_stderr.log"} <= inventory_paths
+    ledger.verify_committed(begun["cell_id"])
+
+
+def test_relocation_preimage_is_revalidated_from_final_manifest(tmp_path: Path) -> None:
+    run_root = tmp_path / "evaluation_run"
+    ledger = _ledger(run_root)
+    begun = ledger.begin_cell(
+        phase="formal_cache_policy",
+        coordinates={"capacity_label": "constrained_288mb"},
+        command=["evaluate"],
+        input_hash="i" * 64,
+        committed_path=run_root / "formal_cache_policy" / "constrained_288mb",
+    )
+    staging = Path(begun["record"]["staging_path"])
+    artifact = _producer(staging, Path(begun["record"]["committed_path"]))
+    event = ledger.commit_cell(begun["cell_id"], validated_artifact_root=artifact)
+    manifest_path = next(
+        Path(event["committed_path"]).glob("benchmark/*/artifact_integrity_manifest.json")
+    )
+    manifest = json.loads(manifest_path.read_text())
+    manifest["publication_relocation"]["changed_files"][0]["before_sha256"] = "0" * 64
+    _write_json(manifest_path, manifest)
+    with pytest.raises(CellTransactionError, match="preimage"):
+        validate_producer_integrity_manifests(Path(event["committed_path"]))
+
+
 @pytest.mark.parametrize(
     "mutation",
     [

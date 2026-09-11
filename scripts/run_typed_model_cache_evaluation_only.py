@@ -153,6 +153,7 @@ def _initialize_run(package: dict[str, Any]) -> tuple[Path, FormalCellLedger, Tr
     for name, payload in (
         ("evaluation_model_source_reference.json", source),
         ("evaluation_execution_contract.json", execution),
+        ("resolved_execution_context.json", execution["evaluation_execution_context"]),
         (
             "evaluation_only_state.json",
             {
@@ -207,8 +208,12 @@ def _initialize_run(package: dict[str, Any]) -> tuple[Path, FormalCellLedger, Tr
         ),
         phase_order=PHASES,
         resume=False,
-        resolved_execution_context_sha256=source["source_context_identity_sha256"],
-        resolved_execution_context_file_sha256=source["source_context_sha256"],
+        resolved_execution_context_sha256=execution[
+            "evaluation_execution_context_sha256"
+        ],
+        resolved_execution_context_file_sha256=file_sha256(
+            root / "resolved_execution_context.json"
+        ),
     )
     return root, cells, runner
 
@@ -223,6 +228,10 @@ def _load_run(package: dict[str, Any]) -> tuple[Path, FormalCellLedger, Transact
         raise EvaluationOnlyError("evaluation run source reference drift")
     if _read(root / "evaluation_execution_contract.json") != execution:
         raise EvaluationOnlyError("evaluation run execution contract drift")
+    if _read(root / "resolved_execution_context.json") != execution[
+        "evaluation_execution_context"
+    ]:
+        raise EvaluationOnlyError("evaluation run context drift")
     protocol = _read(source["protocol_path"])
     identity = CellExecutionIdentity(
         run_id=execution["evaluation_run_id"], execution_commit=execution["executor_commit"],
@@ -240,8 +249,12 @@ def _load_run(package: dict[str, Any]) -> tuple[Path, FormalCellLedger, Transact
         output_root=root,
         run_identity_fingerprint=canonical_sha256({"evaluation_execution_contract": execution["execution_contract_sha256"], "model_source_reference": source["source_reference_sha256"]}),
         phase_order=PHASES, resume=True,
-        resolved_execution_context_sha256=source["source_context_identity_sha256"],
-        resolved_execution_context_file_sha256=source["source_context_sha256"],
+        resolved_execution_context_sha256=execution[
+            "evaluation_execution_context_sha256"
+        ],
+        resolved_execution_context_file_sha256=file_sha256(
+            root / "resolved_execution_context.json"
+        ),
     )
     return root, cells, runner
 
@@ -341,8 +354,14 @@ def main() -> None:
     ):
         raise EvaluationOnlyError("authorization request hash mismatch")
     validate_model_source_reference(package["model_source_reference"])
-    validate_execution_contract(package["evaluation_execution_contract"])
-    validate_command_matrix_parsers(package["evaluation_execution_contract"])
+    validate_execution_contract(
+        package["evaluation_execution_contract"],
+        model_source_reference=package["model_source_reference"],
+    )
+    validate_command_matrix_parsers(
+        package["evaluation_execution_contract"],
+        model_source_reference=package["model_source_reference"],
+    )
     grant = _read(args.project_grant_path)
     authorization = verify_project_grant(package, grant)
     if args.check == "qualify":
