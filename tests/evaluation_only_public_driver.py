@@ -112,11 +112,22 @@ def host(scope, fault, argv):
     from scripts import run_typed_model_cache_evaluation_only as public
     scope = Path(scope).resolve()
     run = scope / "synthetic_evaluation_run"
-    if fault != "none":
+    if fault != "none" or (scope / "pause_before_initialize").exists():
         def trace(frame, event, arg):
+            if (event == "call" and frame.f_code.co_name == "_initialize_run"
+                    and frame.f_code.co_filename == public.__file__
+                    and (scope / "pause_before_initialize").exists()):
+                (scope / "initializer_ready").touch()
+                deadline = time.monotonic() + 60
+                while not (scope / "release_initializer").exists():
+                    if time.monotonic() > deadline:
+                        raise RuntimeError("test-only initialization barrier timeout")
+                    time.sleep(.02)
             # Inject OS-like failure after an actual boundary; do not replace
             # initializer, loader, lock, ledger, publication or identity checks.
-            if event == "line" and frame.f_code.co_filename == public.__file__:
+            if (fault != "none" and event == "line"
+                    and frame.f_code.co_filename in {public.__file__,
+                        str(ROOT / "src/evaluators/formal_cell_transaction.py")}):
                 reached = run.is_dir() if fault == "root_created" else (run / fault).exists()
                 if reached:
                     sys.settrace(None)

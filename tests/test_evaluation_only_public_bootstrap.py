@@ -100,10 +100,12 @@ def invoke(fixture, phase=PHASES[0], fault="none", label="execute"):
 def reject(fixture, **kwargs):
     scope, run, _ = fixture
     count = len(rows(scope / "dispatch.jsonl")); before = inventory(run)
+    directories = sorted(str(p.relative_to(run)) for p in run.rglob("*") if p.is_dir())
     result = invoke(fixture, **kwargs)
     assert result.returncode != 0
     assert len(rows(scope / "dispatch.jsonl")) == count
     assert inventory(run) == before
+    assert directories == sorted(str(p.relative_to(run)) for p in run.rglob("*") if p.is_dir())
     return result
 
 
@@ -133,11 +135,11 @@ def test_public_first_and_second_process(fixture):
          "formal_execution_authorized": False, "formal_execution_started": False, "holdout_opened": False})
 
 
-@pytest.mark.parametrize("kind", ["unknown_nonempty", "empty_existing", "missing_marker", "context_bytes", "identity", "missing_cell_ledger", "duplicate", "jump", "tampered_payload", "invalid_grant", "expired_grant", "held_lock", "permission"])
+@pytest.mark.parametrize("kind", ["unknown_nonempty", "empty_existing", "missing_marker", "context_bytes", "identity", "missing_cell_ledger", "directory_identity", "phase_context", "duplicate", "jump", "tampered_payload", "invalid_grant", "expired_grant", "held_lock", "permission"])
 def test_public_rejections(fixture, kind):
     scope, run, package = fixture
     phase = PHASES[0]
-    if kind in {"missing_marker", "context_bytes", "identity", "missing_cell_ledger", "duplicate", "jump", "tampered_payload"}:
+    if kind in {"missing_marker", "context_bytes", "identity", "missing_cell_ledger", "directory_identity", "phase_context", "duplicate", "jump", "tampered_payload"}:
         result = invoke(fixture, label="setup"); assert result.returncode == 0, result.stderr
         phase = PHASES[1]
     if kind == "unknown_nonempty": run.mkdir(); (run / "unknown").write_text("preserve")
@@ -150,6 +152,20 @@ def test_public_rejections(fixture, kind):
         value = json.loads((run / "evaluation_execution_contract.json").read_text()); value["evaluation_run_id"] = "other"
         dump(run / "evaluation_execution_contract.json", value)
     if kind == "tampered_payload": next((run / PHASES[0]).rglob("aggregate_summary.json")).write_text("{}")
+    if kind == "directory_identity":
+        value = json.loads((run / "evaluation_initialization_complete.json").read_text())
+        value["run_root"] = str(scope / "other")
+        dump(run / "evaluation_initialization_complete.json", value)
+    if kind == "phase_context":
+        from src.evaluators.formal_phase_transaction import _record_hash
+        ledger = rows(run / "phase_state.jsonl")
+        previous = None
+        for row in ledger:
+            row["resolved_execution_context_file_sha256"] = "0" * 64
+            row["previous_record_hash"] = previous
+            row["current_record_hash"] = _record_hash(row)
+            previous = row["current_record_hash"]
+        (run / "phase_state.jsonl").write_text("".join(json.dumps(row)+"\n" for row in ledger))
     if kind == "duplicate": phase = PHASES[0]
     if kind == "jump": phase = PHASES[2]
     if kind in {"invalid_grant", "expired_grant"}:
@@ -186,6 +202,7 @@ def test_public_initialization_faults(fixture, boundary):
     assert result.returncode != 0 and "test-only initialization write fault" in result.stderr
     assert not rows(scope / "dispatch.jsonl")
     assert run.exists()
+    if boundary == "cell_ledger_identity.json": assert not (run / "cell_state.jsonl").exists()
     assert json.loads(writer_lock_path(run).read_text())["state"] == "held"
     reject(fixture, label="retry_rejected")
 
@@ -201,23 +218,26 @@ def test_public_child_failure_cannot_resume(fixture):
     reject(fixture, phase=PHASES[1], label="next_rejected")
 
 
-def test_public_concurrent_first_start(fixture):
+@pytest.mark.parametrize("boundary", ["before_initialization", "during_child"])
+def test_public_concurrent_first_start(fixture, boundary):
     scope, run, _ = fixture
-    (scope / "pause_child").touch()
+    (scope / ("pause_before_initialize" if boundary == "before_initialization" else "pause_child")).touch()
     argv = command(scope)
     with (scope / "winner.stdout").open("w") as stdout, (scope / "winner.stderr").open("w") as stderr:
         winner = subprocess.Popen(argv, cwd=ROOT, env=environment(), stdout=stdout, stderr=stderr)
         try:
             deadline = time.monotonic() + 30
-            while not (scope / "child_ready").exists():
+            ready = scope / ("initializer_ready" if boundary == "before_initialization" else "child_ready")
+            while not ready.exists():
                 assert winner.poll() is None
                 assert time.monotonic() < deadline
                 time.sleep(.05)
+            if boundary == "before_initialization": assert not run.exists()
             before = inventory(run); lock_before = writer_lock_path(run).read_bytes()
             reject(fixture, label="loser")
             assert inventory(run) == before
             assert writer_lock_path(run).read_bytes() == lock_before
-            (scope / "release_child").touch()
+            (scope / ("release_initializer" if boundary == "before_initialization" else "release_child")).touch()
             assert winner.wait(timeout=30) == 0
         finally:
             if winner.poll() is None: winner.terminate(); winner.wait(timeout=10)

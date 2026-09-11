@@ -326,3 +326,10 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 复核；`startup_binding.py` 固定生产绑定及源码受控 synthetic-only 绑定；`public_startup_acceptance.py` 驱动
 真实宿主/独立 custodian 进程验收。公共入口仍为 `scripts/execute_fixed_commit_continuation.py`，验收入口仍为
 `scripts/run_fixed_commit_continuation_acceptance.py`。不新增生产配置、私钥、真实 coordination 文件或 run。
+
+## G14R20-I2 隔离执行器与验收
+
+`artifacts/execution_checkouts/g14r20_i2_executor_work` 为独立 codex 分支持久实现 checkout；
+`g14r20_i2_executor_release` 为最终验收 commit 的新 clean checkout。
+`artifacts/analysis/g14r20_i2_bootstrap_acceptance_20260911/` 保存原始公共入口/环境/JUnit/保护证据与新 unsigned
+申请。正式新 run root 仅登记，不由 prepare 创建。原 I1 release、G14E01 与旧 v16 均保留。

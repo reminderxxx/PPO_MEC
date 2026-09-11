@@ -729,3 +729,10 @@
 
 依赖方向保持 `public CLI → startup/binding → authorization/production_trust`；科学 `QualifiedRun/execution` 只在
 成功准入后由 production binding 延迟导入。
+
+## G14R20-I2 初始化职责
+
+`run_typed_model_cache_evaluation_only.py` 在共享 SingleWriter 内独占创建新 run、写完整初始化 marker、
+重新校验 context 与两类 ledger、核验既有产物并执行唯一下一阶段。`locking.py` 仅增加显式允许 missing root
+的协调能力，continuation 默认拒绝新建 run。科学 child 的测试适配器位于 `tests/evaluation_only_public_driver.py`，
+仅供真实 main 的隔离验收；生产 CLI 无测试开关。原 phase/cell 事务及 scientific consumer 职责不变。

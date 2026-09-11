@@ -529,3 +529,10 @@ G14R20-D continuation 授权接口 2.0.0：生产共用 Ed25519 原件认证及�
 宿主；独立 fixed-inode startup lock 防止并发宿主干扰，宿主结束只输出待 custodian 独立核验的 checkpoint
 材料。synthetic-only 绑定进入同一 parser/main 路径且不能建立生产 trust。实现/验收不改变 Protocol 2.9、原
 v16 或生产批准状态；精确 commit、identity 和测试计数由独立证据提交记录。
+
+## 2026-09-11 G14R20-I2 启动修复
+
+G14E01 首次初始化失败且科学 dispatch 为 0，原六文件现场及 grant 保留、当前不可执行。独立 I2 修复
+evaluation-only 首次锁/初始化/下一 phase 载入；不授权恢复旧 run 或正式评估。合同与验收边界见
+[bootstrap/handoff](docs/project/evaluation_only_bootstrap_handoff_contract.md)。最终 clean 验收与新 unsigned
+申请指针见独立 `artifacts/analysis/g14r20_i2_bootstrap_acceptance_20260911/`。

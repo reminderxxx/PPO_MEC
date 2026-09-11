@@ -1559,3 +1559,13 @@ PYTHONPATH=<reviewed-continuation-dependencies> <frozen-python> -B \
 交接，再运行既有八阶段 synthetic chain。所有私钥、receipt、continuity、startup lock、marker 和 synthetic
 checkpoint 只在新 fixture；production CLI 不接受 installation/test binding 参数。必须分别报告
 `synthetic_dispatch_count` 与 science/real-v16/write/holdout 四个零计数。
+
+## G14R20-I2 evaluation-only 启动与申请
+
+参见 [bootstrap/handoff 合同](evaluation_only_bootstrap_handoff_contract.md)。先用最终 clean checkout 的
+`prepare_typed_model_cache_evaluation_only.py --action prepare` 创建全新 unsigned 请求，再以同入口
+`--action validate` 验证；实际冻结 argv 在 I2 验收目录的 `future_commands.json`，不是执行授权。
+run 父目录须预先存在、可写，Python/宿主 process identity 权限须与 I1 环境一致。锁在初始化前取得，完整 marker
+最后写入；缺件/held lock/failed phase 不得恢复或清理。G14E01 包与 grant 当前不可执行，不得重试或改 run 名。
+公共非正式测试入口为 `python -B -m pytest tests/test_evaluation_only_public_bootstrap.py`；真实科学 child
+不继承测试 overlay。两阶段合成验收不等于八阶段正式实跑。

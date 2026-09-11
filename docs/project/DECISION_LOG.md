@@ -1137,3 +1137,10 @@ revocation 和 continuity bytes 复算新 checkpoint；丢失上一 state 即停
 
 决定：synthetic 正例可由源码受控 binding 进入同一 parser/main，但该 binding 没有科学能力且不能从 CLI/env/
 proposal/approval 注入 production trust。production installation 仍为 `None`。
+
+## 2026-09-11 G14R20-I2 单一 bootstrap 责任
+
+选择复用 run 外固定 inode 的 SingleWriter，并显式允许 evaluation-only 在根不存在时取得锁；不全局取消
+非空目录拒绝，不以默认 resume=True 接管残留。持锁 initializer 先建立空 phase runner/ledger，后写身份/context
+和 cell ledger，最后写完整 marker。残留初始化与失败 phase 都 fail-closed；本决定不授权 cold recovery。
+初始化 state 为快照，真实科学活动与阶段完成必须由原始 dispatch/ledger/payload 区分。

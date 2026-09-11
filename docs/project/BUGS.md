@@ -624,3 +624,11 @@ G14R20-D 明确剩余人工边界：签名不能证明原件来源/语义、host
   hash，重建最终 producer manifest 后再生成 transaction inventory；最终目录、重复消费、recovery 和 gate
   统一双层检查。
 - 旧 288 MB 内部 manifest 不会被回写修复，仍保留为历史 stale 证据；576 MB staging 不升级为结果。
+
+## 2026-09-11 G14E01 bootstrap 冲突 / G14R20-I2
+
+根因已定位并最小修复：旧 initializer 与 phase runner 空目录要求冲突，且初始化/load/order 位于锁外。
+I2 以外部单写者覆盖完整启动和衔接、最后写完整 marker、context 字节绑定及既有 phase/cell 复验消除组合问题。
+最终是否通过以 I2 clean checkout 原始验收记录为准；不能以本段或旧 I1 JUnit 代替公共入口证明。
+G14E01 六文件残留不是合法 initialized run，没有原生 failed terminal，不能恢复/清锁/重试；旧状态 flag
+不是科学 dispatch 证据。残余风险包括长时正式科学计算、实际 OS/磁盘故障和未实跑后六阶段；I2 不授权这些活动。

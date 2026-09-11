@@ -51,3 +51,9 @@ transaction 两层清单。旧 marker 若含 producer manifest 但没有新绑�
 需要另一任务的一次性授权。
 
 本合同只说明执行链已准备，不是正式实验、性能结果、paper-ready 或 holdout 授权。
+
+## 2026-09-11 I2 启动补充
+
+首次 bootstrap 与阶段衔接以 [I2 合同](evaluation_only_bootstrap_handoff_contract.md) 为准。G14E01 已有失败
+现场，旧申请/grant 当前不可执行；本文件历史 readiness 描述不构成重试授权。新初始化 marker 和完整锁覆盖
+只作用于全新批准 run；本轮只生成新的 unsigned 申请并 validate。

@@ -212,6 +212,7 @@ def _initial_files(package: dict[str, Any]) -> dict[str, Any]:
             "model_source_reference_sha256": execution["model_source_reference_sha256"],
             "executor_commit": execution["executor_commit"],
             "initialization_status": "initialized",
+            "state_scope": "initialization_snapshot",
             "formal_execution_authorized": True,
             "formal_execution_started": False,
             "scientific_dispatch_evidence": "phase_state.jsonl and cell_state.jsonl",

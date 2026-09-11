@@ -1894,3 +1894,12 @@ G14R20-D 正在独立 B 基线分支实现 continuation 授权 2.0.0。真实 la
   transaction inventory/marker，并在发布后、重复消费、recovery 与 gate 统一复验两层。
 - 当前仅准备独立审查和未签发授权申请；正式 rollout/training/update/performance 均为 0，未创建正式 run ledger，
   `formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。
+
+## 2026-09-11 G14R20-I2 bootstrap/handoff 修复
+
+已核对 G14E01 原始 stderr 与六文件清单：初始化先写身份/cell ledger，再调用空目录 phase runner，导致
+`phase output root conflict`，科学 dispatch=0；无原生 failed terminal，旧 grant 不得继续使用。
+独立分支实现锁内唯一初始化、完整 marker 和下一 phase 校验；验收严格保留真实公共 main、来源/身份校验、
+两类 ledger、descriptor 与双层 publication，仅科学 child 为 test-only。最终 commit/clean checkout、实际命令、
+JUnit 和未签发新申请由独立 I2 验收记录绑定。本记录不提前将开发验收当终版结果，不作论文结论。
+`formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。
