@@ -72,6 +72,11 @@ def _contract(tmp_path: Path) -> dict:
         },
         "evaluation_execution_context_sha256": "c" * 64,
     }
+    context = value["evaluation_execution_context"]
+    context["context_sha256"] = canonical_sha256(
+        {key: item for key, item in context.items() if key != "context_sha256"}
+    )
+    value["evaluation_execution_context_sha256"] = context["context_sha256"]
     value["execution_contract_sha256"] = canonical_sha256(value)
     return value
 
@@ -94,16 +99,16 @@ def test_unsigned_contract_rejects_scope_expansion(
         {key: item for key, item in contract.items() if key != "execution_contract_sha256"}
     )
     with pytest.raises(EvaluationOnlyError):
-        validate_execution_contract(contract)
+        validate_execution_contract(contract, check_live=False)
 
 
 def test_command_phase_membership_and_run_identity_are_hash_bound(tmp_path: Path) -> None:
     contract = _contract(tmp_path)
-    assert validate_execution_contract(contract)["phase_count"] == 8
+    assert validate_execution_contract(contract, check_live=False)["phase_count"] == 8
     changed = deepcopy(contract)
     changed["evaluation_run_id"] = "wrong-run"
     with pytest.raises(EvaluationOnlyError, match="hash mismatch"):
-        validate_execution_contract(changed)
+        validate_execution_contract(changed, check_live=False)
 
 
 def test_command_plan_digest_is_recomputed(tmp_path: Path) -> None:
@@ -117,7 +122,7 @@ def test_command_plan_digest_is_recomputed(tmp_path: Path) -> None:
         {key: item for key, item in contract.items() if key != "execution_contract_sha256"}
     )
     with pytest.raises(EvaluationOnlyError, match="command plan hash"):
-        validate_execution_contract(contract)
+        validate_execution_contract(contract, check_live=False)
 
 
 def test_execution_contract_is_cross_bound_to_model_source(tmp_path: Path) -> None:
@@ -131,11 +136,16 @@ def test_execution_contract_is_cross_bound_to_model_source(tmp_path: Path) -> No
     contract["evaluation_execution_context"]["evaluation_execution_identity"][
         "model_source_reference_sha256"
     ] = source["source_reference_sha256"]
+    context = contract["evaluation_execution_context"]
+    context["context_sha256"] = canonical_sha256(
+        {key: item for key, item in context.items() if key != "context_sha256"}
+    )
+    contract["evaluation_execution_context_sha256"] = context["context_sha256"]
     contract["execution_contract_sha256"] = canonical_sha256(
         {key: item for key, item in contract.items() if key != "execution_contract_sha256"}
     )
     assert validate_execution_contract(
-        contract, model_source_reference=source
+        contract, model_source_reference=source, check_live=False
     )["phase_count"] == 8
     changed = deepcopy(contract)
     changed["model_source_run_id"] = "wrong-run"
@@ -143,7 +153,7 @@ def test_execution_contract_is_cross_bound_to_model_source(tmp_path: Path) -> No
         {key: item for key, item in changed.items() if key != "execution_contract_sha256"}
     )
     with pytest.raises(EvaluationOnlyError, match="model-source run"):
-        validate_execution_contract(changed, model_source_reference=source)
+        validate_execution_contract(changed, model_source_reference=source, check_live=False)
 
 
 def test_command_parser_rejects_interpreter_and_entrypoint_drift(tmp_path: Path) -> None:
@@ -159,14 +169,14 @@ def test_command_parser_rejects_interpreter_and_entrypoint_drift(tmp_path: Path)
         {key: item for key, item in contract.items() if key != "execution_contract_sha256"}
     )
     with pytest.raises(EvaluationOnlyError, match="entrypoint drift"):
-        validate_command_matrix_parsers(contract)
+        validate_command_matrix_parsers(contract, check_live=False)
     changed = deepcopy(contract)
     changed["phases"] = [*PHASES, "sealed_holdout"]
     changed["execution_contract_sha256"] = canonical_sha256(
         {key: item for key, item in changed.items() if key != "execution_contract_sha256"}
     )
     with pytest.raises(EvaluationOnlyError, match="phase authority"):
-        validate_execution_contract(changed)
+        validate_execution_contract(changed, check_live=False)
 
 
 @pytest.mark.parametrize("name", ["old288/result.csv", "old576/staging.json"])

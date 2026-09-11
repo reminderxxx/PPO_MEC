@@ -11,6 +11,7 @@ from src.evaluators.formal_cell_transaction import (
     CellTransactionError,
     FormalCellLedger,
     validate_producer_integrity_manifests,
+    verify_persisted_committed_phase,
 )
 
 
@@ -209,6 +210,35 @@ def test_relocation_preimage_is_revalidated_from_final_manifest(tmp_path: Path) 
     _write_json(manifest_path, manifest)
     with pytest.raises(CellTransactionError, match="preimage"):
         validate_producer_integrity_manifests(Path(event["committed_path"]))
+
+
+def test_repeated_statistics_style_consumption_rechecks_both_integrity_layers(
+    tmp_path: Path,
+) -> None:
+    run_root = tmp_path / "evaluation_run"
+    ledger = _ledger(run_root)
+    begun = ledger.begin_cell(
+        phase="formal_controller",
+        coordinates={"capacity_label": "constrained_288mb"},
+        command=["evaluate"],
+        input_hash="i" * 64,
+        committed_path=run_root / "formal_controller" / "constrained_288mb",
+    )
+    staging = Path(begun["record"]["staging_path"])
+    artifact = _producer(staging, Path(begun["record"]["committed_path"]))
+    event = ledger.commit_cell(begun["cell_id"], validated_artifact_root=artifact)
+    assert len(
+        verify_persisted_committed_phase(run_root, phase="formal_controller")
+    ) == 1
+    assert len(
+        verify_persisted_committed_phase(run_root, phase="formal_controller")
+    ) == 1
+    summary = next(Path(event["committed_path"]).glob("benchmark/*/episodes/*.summary.json"))
+    payload = json.loads(summary.read_text())
+    payload["metric"] = 999
+    _write_json(summary, payload)
+    with pytest.raises(CellTransactionError):
+        verify_persisted_committed_phase(run_root, phase="formal_controller")
 
 
 @pytest.mark.parametrize(

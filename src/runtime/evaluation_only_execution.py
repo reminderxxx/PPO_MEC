@@ -533,6 +533,7 @@ def validate_execution_contract(
     contract: Mapping[str, Any],
     *,
     model_source_reference: Mapping[str, Any] | None = None,
+    check_live: bool = True,
 ) -> dict[str, Any]:
     value = dict(contract)
     digest = value.pop("execution_contract_sha256", None)
@@ -601,6 +602,44 @@ def validate_execution_contract(
         "evaluation_run_id"
     ) != value.get("evaluation_run_id"):
         raise EvaluationOnlyError("evaluation context/run binding drift")
+    if context.get("context_sha256") != canonical_sha256(
+        {key: item for key, item in context.items() if key != "context_sha256"}
+    ):
+        raise EvaluationOnlyError("evaluation execution context hash mismatch")
+    if check_live:
+        executor = Path(str(value.get("executor_checkout", "")))
+        python = Path(str(value.get("python_executable", "")))
+        if (
+            not executor.is_absolute()
+            or executor.is_symlink()
+            or not executor.is_dir()
+            or _git(executor, "rev-parse", "HEAD") != value.get("executor_commit")
+            or _git(executor, "rev-parse", "HEAD^{tree}")
+            != value.get("executor_git_tree")
+        ):
+            raise EvaluationOnlyError("live executor checkout identity drift")
+        _require_clean_code(executor)
+        if not python.is_absolute() or not python.is_file() or not os.access(python, os.X_OK):
+            raise EvaluationOnlyError("live evaluation interpreter drift")
+        if context.get("runtime_location", {}).get(
+            "resolved_python_absolute_path"
+        ) != str(python):
+            raise EvaluationOnlyError("evaluation context/interpreter drift")
+        protocol_path = (model_source_reference or {}).get(
+            "protocol_path"
+        ) or context.get("runtime_location", {}).get("protocol_path")
+        protocol = _read_object(protocol_path)
+        from src.runtime.resolved_formal_execution_context import (
+            validate_resolved_formal_execution_context,
+        )
+
+        validate_resolved_formal_execution_context(
+            context,
+            protocol=protocol,
+            clean_worktree_root=executor,
+            durable_run_root=value["evaluation_run_root"],
+            check_git=True,
+        )
     return {
         "status": "pass",
         "phase_count": len(PHASES),
@@ -615,11 +654,14 @@ def validate_command_matrix_parsers(
     contract: Mapping[str, Any],
     *,
     model_source_reference: Mapping[str, Any] | None = None,
+    check_live: bool = True,
 ) -> dict[str, Any]:
     """Exercise the actual phase parsers, including cache-policy's nested benchmark."""
 
     validate_execution_contract(
-        contract, model_source_reference=model_source_reference
+        contract,
+        model_source_reference=model_source_reference,
+        check_live=check_live,
     )
     from scripts import benchmark_main_results
     from scripts import manage_typed_model_cache_formal_artifacts
