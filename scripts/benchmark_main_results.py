@@ -700,6 +700,8 @@ def main() -> None:
     protocol: dict[str, Any] | None = None
     resolved_context: dict[str, Any] | None = None
     execution_binding: dict[str, Any] | None = None
+    checkpoint_source_context: dict[str, Any] | None = None
+    checkpoint_source_binding: dict[str, Any] | None = None
     if args.generated_checkpoint_registry_path:
         protocol = (
             json.loads(Path(args.protocol_path).read_text(encoding="utf-8-sig"))
@@ -723,6 +725,24 @@ def main() -> None:
             resolved_execution_context=resolved_context,
             execution_binding=execution_binding,
         )
+        source_scope = generated_checkpoint_resource_audit.get(
+            "evaluation_model_source", {}
+        )
+        source_reference = source_scope.get("reference")
+        if isinstance(source_reference, dict):
+            checkpoint_source_context = json.loads(
+                Path(source_reference["source_context_path"]).read_text(
+                    encoding="utf-8-sig"
+                )
+            )
+            checkpoint_source_binding = json.loads(
+                Path(source_reference["source_binding_path"]).read_text(
+                    encoding="utf-8-sig"
+                )
+            )
+        else:
+            checkpoint_source_context = resolved_context
+            checkpoint_source_binding = execution_binding
     window_consumption_contract: dict[str, Any] | None = None
     window_consumption_binding: dict[str, Any] | None = None
     if args.formal_window_consumption_contract_path:
@@ -972,11 +992,11 @@ def main() -> None:
                                 f"binding for agent={agent_name}, seed={seed}"
                             )
                         if protocol is not None:
-                            if resolved_context is None:
+                            if checkpoint_source_context is None:
                                 raise ValueError(
                                     "active formal benchmark lacks resolved execution context"
                                 )
-                            if execution_binding is None:
+                            if checkpoint_source_binding is None:
                                 raise ValueError(
                                     "active formal benchmark lacks execution binding"
                                 )
@@ -988,8 +1008,8 @@ def main() -> None:
                                 expected_reward_positive_offset=args.reward_positive_offset,
                                 provenance_envelope=binding,
                                 protocol=protocol,
-                                resolved_execution_context=resolved_context,
-                                execution_binding=execution_binding,
+                                resolved_execution_context=checkpoint_source_context,
+                                execution_binding=checkpoint_source_binding,
                                 expected_capacity_label=(
                                     str(args.runtime_config_resource_id).split(".", 1)[1]
                                     if "." in str(args.runtime_config_resource_id)
