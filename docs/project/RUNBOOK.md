@@ -1,4 +1,11 @@
-## 2026-09-10 G14R20-G：一次性 project 接续操作边界
+## 2026-09-11 G14R20-G：停止使用旧启动命令
+
+9 月 10 日 grant 已被实际用于 `formal_cache_policy`，该 phase 以 rc=1 失败且存在不可重试
+`failed_terminal` cell；固定科学 worktree 当前缺 `.git` 和必要文件，public qualification 也失败。下方命令
+仅保留为历史签发记录，**不得再次执行**。旧 grant 不授权 cold recovery；不得删除锁、重试失败 cell 或跳到
+下一 phase。后续必须先另立 recovery/failed-run disposition 审查。
+
+## 2026-09-10 G14R20-G：一次性 project 接续操作边界（历史签发记录）
 
 用户已允许为既有 v16 收敛授权方式；这是独立于旧 crypto 的显式路径，不自动绕过其门禁。科学 worktree
 保持 `/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847` 和原 `a6d1fd8` 身份，原 Python/命令/输入不变。

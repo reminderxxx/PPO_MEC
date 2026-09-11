@@ -1,4 +1,15 @@
-## 2026-09-10: G14R20-G 项目授权信任与执行边界（验收通过 / 执行未启动）
+## 2026-09-11: v16 formal_cache_policy 已失败且固定科学 worktree 不完整（OPEN BLOCKER）
+
+- 9 月 10 日 grant 签发后，真实 `formal_cache_policy` 已启动。phase ledger 末条为 `failed`、rc=1；cell
+  ledger 的第二个新 cell 为 `failed_terminal`、`retry_allowed=false`，因此旧 grant 不允许重试或继续。
+- 失败 stderr 指向缺失 `formal_window_consumption_contract.json`；当前固定科学 worktree 同时缺 `.git` 和大量
+  所需源码。public qualification 在 `load_native()` 的 Git 身份检查失败，固定命令当前不可执行。
+- 相对 G14R20-A 保护清单，当前为 546 mismatch、3,840 addition；旧 0-addition review/grant 证据已过时，
+  不能用静态 hash 绑定覆盖真实进度变化。
+- 不得删除遗留锁、重跑 failed terminal、重建账本前缀或把现有 grant扩展为 recovery。最小解决动作是另立
+  recovery/failed-run disposition 审查，先判定失败 run 的科学可用性和允许的处置；holdout 未见开启。
+
+## 2026-09-10: G14R20-G 项目授权信任与执行边界（历史签发快照）
 
 - 用户已允许本次采用轻量项目授权，缺少 production crypto installation 不再是显式 project 路径的前置条件；
   旧 crypto 路径仍按原合同 fail-closed。禁止自动 fallback 或把本地 grant 当成历史/密码学批准。

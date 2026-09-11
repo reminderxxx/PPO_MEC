@@ -1,7 +1,10 @@
-> **2026-09-10 G14R20-G：一次性项目授权。** 用户已明确允许将接续管理收敛为“owner 批准范围＋独立技术核验＋固定输入＋追加记录”。
-> 仅面向既有合法 v16、原科学 `a6d1fd8` 与已冻结的 150 个模型；独立验收已通过且精确 grant 已生成，可在后续 G14C v16-B 明确启动剩余八阶段；
-> 不重训、不修改科学 Protocol、不打开 holdout。新 project 入口不要求签名服务，旧 crypto 入口不变。
-> 本轮没有 dispatch，也没有新的正式结果。见 [一次性授权合同](docs/project/project_continuation_authorization_contract.md)。
+> **2026-09-11 G14R20-G 现状复核：BLOCKED。** 9 月 10 日的实现/review/grant 静态绑定仍可复核，
+> 但其“尚未 dispatch”的快照已经失效：真实 v16 后续启动过 `formal_cache_policy`，phase/cell ledger 已从
+> `15/348` 变为 `17/352`，该 phase 以 `return_code=1` 失败，第二个 cell 为不可重试 `failed_terminal`。
+> 原科学临时 worktree 还缺少 `.git` 和所需源文件，当前 public qualification 失败。旧 grant 不授权
+> cold recovery 或 failed-run rescue，故不得继续、重试、删锁或报告 READY；holdout 未见开启。
+> 独立复核见 `artifacts/analysis/g14r20_g_project_authorization_20260911/current_state_reaudit.json`，合同边界见
+> [一次性授权合同](docs/project/project_continuation_authorization_contract.md)。
 
 > G14R20-F：公共同进程 startup handoff、有限等待、并发隔离与 checkpoint custody 正在独立分支实现验收，
 > 合同见 [continuation_startup_handoff_contract.md](docs/project/continuation_startup_handoff_contract.md)。

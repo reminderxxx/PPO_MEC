@@ -1,7 +1,8 @@
-> **2026-09-10 当前接续授权（G14R20-G）**：用户已允许为既有 v16 采用一次性本地项目授权，保留原科学源、
-> 150 个冻结模型和科学规则；只允许独立技术验收后执行八个剩余阶段。历史“没有 v16”及“只能安装 crypto
-> trust 才能申请任何接续”的描述不能作为本次现状。新入口不追认历史批准，也不授权 holdout 或冷恢复。
-> 当前技术验收和真实执行状态须看独立证据；不能由本文推定成功。见 [合同](project_continuation_authorization_contract.md)。
+> **2026-09-11 当前接续状态（G14R20-G）**：9 月 10 日的一次性本地 grant 已被实际使用，
+> `formal_cache_policy` 随后失败，phase/cell ledger 为 `17/352`；固定科学 worktree 当前缺 `.git` 和运行所需
+> 文件，public qualification 失败。旧 grant 不授权 cold recovery、failed terminal 重试或删锁恢复，现为
+> `BLOCKED`，不得报告 `real_execution_started=false` 或 READY。holdout 未见开启。见
+> [合同](project_continuation_authorization_contract.md)及 2026-09-11 独立复核证据。
 
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
@@ -10,7 +11,7 @@
 
 ﻿# Context
 
-更新日期：2026-09-10
+更新日期：2026-09-11
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 

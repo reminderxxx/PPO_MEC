@@ -1,4 +1,19 @@
-## 2026-09-10: G14R20-G 一次性项目授权闭环（READY / 未启动）
+## 2026-09-11: G14R20-G 当前状态复核（BLOCKED / 已启动后失败）
+
+- 9 月 10 日的 executor `cc32e6e`、独立 review 与 grant 静态绑定仍完整，但其零执行证据仅代表当时快照；
+  当前真实 run 已出现 `formal_cache_policy` 执行，不能继续报告 `real_execution_started=false`。
+- phase/cell ledger 当前为 `17/352`。`formal_cache_policy` 末态为 `failed`、`return_code=1`、
+  `child_command_failure`；其首个 cell committed，第二个 cell 为 `failed_terminal`、`retry_allowed=false`。
+- 保护基线当前为 107,320 项中 546 mismatch、3,840 addition；原科学 worktree 缺 `.git` 与运行所需文件，
+  按固定命令重跑 public qualification 以 `git rev-parse: not a git repository` 退出 1。
+- 旧 project grant 明确不包含 recovery owner/quiescence，也拒绝 unfinished/failed phase cold recovery。
+  当前状态为 `implementation_accepted=true`、`independent_review_passed_at_issuance=true`、
+  `project_grant_ready=false`、`real_execution_started=true`、`holdout_opened=false_observed`。
+- 本轮只读复核没有启动执行或修改 run。下一步只能另立 recovery/failed-run disposition 审查；不得删除锁、
+  重试不可重试 cell 或沿用旧 READY 结论。证据：
+  `artifacts/analysis/g14r20_g_project_authorization_20260911/current_state_reaudit.json`。
+
+## 2026-09-10: G14R20-G 一次性项目授权闭环（历史签发快照；已被 2026-09-11 状态取代）
 
 - 用户先要求“先闭环实验”，在获知一次性项目授权的含义和局限后明确答复“允许”。这是当前项目 owner
   的授权方式决定，不是历史 release attestation、法定身份认证或科学结果批准。

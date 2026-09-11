@@ -3,8 +3,13 @@
 - `project_continuation_authorization_contract_version`: `1.0.0`
 - 记录日期：`2026-09-10`（本机时间核验；Asia/Shanghai）。
 - 范围：G14R20-G 的本地项目执行授权；不是科学 Protocol 升级，也不是论文结果审查。
-- 当前状态：实现 `cc32e6e` 已验收，独立技术 review 已通过，精确 grant 已生成并通过 public qualification；
-  真实 dispatch、formal phase 和 holdout 均未启动，本文不预报 formal gate 成功。
+- 当前状态（2026-09-11 复核）：实现 `cc32e6e`、签发时 review 与 grant 的静态绑定仍可核对，但该 grant
+  随后已被用于真实 `formal_cache_policy`；phase 失败且出现不可重试 failed cell。固定科学 worktree 当前不完整，
+  public qualification 失败。旧 grant 不授权 recovery，现为 `BLOCKED`；holdout 未见开启。
+
+> 本合同后文描述的是 2026-09-10 签发边界，不是当前可执行性声明。2026-09-11 独立复核记录位于
+> `artifacts/analysis/g14r20_g_project_authorization_20260911/current_state_reaudit.json`。不得继续使用旧
+> `real_execution_started=false` 或 `project_grant_ready=true` 状态。
 
 ## 当前用户决定与信任边界
 

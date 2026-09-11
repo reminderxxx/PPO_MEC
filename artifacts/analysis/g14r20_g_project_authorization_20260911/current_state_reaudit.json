@@ -1,0 +1,80 @@
+{
+  "version": "1.0.0",
+  "reviewed_at": "2026-09-11T10:14:12+08:00",
+  "literature_cutoff": null,
+  "target_venue": "authorization_only_not_scientific_venue_review",
+  "artifact_run_id": "typed_model_cache_formal_20260906_152847_g14c_v16",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_repository_commit": "29d086d260ecea0d3a817adda01475cb0a5e5e3c",
+  "reviewed_executor_commit": "cc32e6e4113366ba4c8af8076d20db8d98dfd7fe",
+  "reviewed_executor_git_tree": "d344d2fe436c76ced823878311a7c1ca54fba91b",
+  "evidence_level": "E2_ARTIFACT_AUDITED_FOR_CURRENT_AUTHORIZATION_STATE_ONLY",
+  "status": "blocked",
+  "verdict": "BLOCKED",
+  "real_execution_started": true,
+  "holdout_opened": false,
+  "holdout_evidence": "No holdout/hidden execution or consumption record was found in the current run root; the grant remains holdout_capability=false.",
+  "current_ledger_state": {
+    "phase_record_count": 17,
+    "cell_record_count": 352,
+    "latest_phase": {
+      "phase": "formal_cache_policy",
+      "status": "failed",
+      "started_at_utc": "2026-09-10T09:42:05.317508+00:00",
+      "completed_at_utc": "2026-09-10T16:00:25.948362+00:00",
+      "return_code": 1,
+      "failure_classification": "child_command_failure"
+    },
+    "formal_cache_policy_cells": {
+      "record_count": 4,
+      "running_records": 2,
+      "committed_records": 1,
+      "failed_terminal_records": 1,
+      "committed_capacity": "constrained_288mb",
+      "failed_terminal_capacity": "medium_576mb",
+      "failed_terminal_return_code": 1,
+      "failed_terminal_failure_classification": "formal_cell_failure"
+    }
+  },
+  "current_protection_recheck": {
+    "protected_baseline_count": 107320,
+    "mismatch_count": 546,
+    "addition_count": 3840,
+    "baseline_phase_record_count": 15,
+    "baseline_cell_record_count": 348
+  },
+  "current_public_qualification": {
+    "operation": "qualification",
+    "phase_argument": "formal_cache_policy",
+    "exit_code": 1,
+    "status": "failed_before_qualification",
+    "error": "git rev-parse HEAD failed because the fixed scientific worktree is no longer a Git repository"
+  },
+  "scientific_source_current_state": {
+    "worktree": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847",
+    "expected_commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+    "git_metadata_present": false,
+    "missing_git_path": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847/.git",
+    "missing_source_contract": "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847/configs/experiment/typed_model_cache_formal_protocol_v1_3_20260821/formal_window_consumption_contract.json",
+    "failure_observation": "The medium_576mb formal cell stderr records FileNotFoundError for the fixed formal window consumption contract. The worktree's scripts and src trees are also materially incomplete in the current filesystem state."
+  },
+  "existing_authorization_binding_recheck": {
+    "static_verification_status": "pass_but_stale_for_current_run_state",
+    "executor_identity_canonical_sha256": "a154e5a002de5297e88f3182e6a6b38c6ada830153b4564cdd040c01d2ea9b75",
+    "execution_contract_canonical_sha256": "7cad88f3d1cc044accb94d14bb15cdeb75dda22618ed14025e84de40ea1be9cb",
+    "owner_decision_canonical_sha256": "67f8115d30acfb447cd360127a357f81110e87e04fb76138843f4f8c3edc07d5",
+    "independent_review_file_sha256": "39e0091bfcf7933fa8119336281646953a4be35550ff626999d7bdbe4f971cce",
+    "independent_review_evidence_file_sha256": "5706243a598826549603d5ca06a52691671a07fa3f55281bfd65f8c29bb3a6a0",
+    "owner_decision_response": "允许",
+    "note": "The 2026-09-10 review correctly binds executor cc32e6e, its evidence bytes, and the recorded owner decision, but its zero-dispatch, 15/348-ledger, and zero-addition observations no longer describe current state."
+  },
+  "blocking_reasons": [
+    "The required terminal condition real_execution_started=false is false: formal_cache_policy was dispatched after the prior review and grant.",
+    "The first formal_cache_policy cell committed and the second ended failed_terminal with non-75 return code 1; the current project grant forbids retry, rescue, cold recovery, and finalize-only handling.",
+    "The fixed scientific worktree no longer has its .git identity and is missing required source/config files, so the documented public command is not executable and current qualification exits 1.",
+    "The prior 107320-path protection evidence is stale relative to current state: 546 mismatches and 3840 additions are now observed."
+  ],
+  "minimum_required_action": "另立 recovery/failed-run disposition 审查。该审查必须先保全当前 failed terminal、committed cell、staging、ledger 和 lock owner record，查明科学 worktree 丢失原因，并决定此 run 的处置；不得删除锁或 owner record，不得用当前 grant 重试、救援或继续后续 phase。",
+  "ready_marker_allowed": false,
+  "prohibited_status": "READY_FOR_V16_B_UNDER_PROJECT_AUTHORIZATION"
+}
