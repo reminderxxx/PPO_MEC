@@ -632,3 +632,9 @@ I2 以外部单写者覆盖完整启动和衔接、最后写完整 marker、cont
 最终是否通过以 I2 clean checkout 原始验收记录为准；不能以本段或旧 I1 JUnit 代替公共入口证明。
 G14E01 六文件残留不是合法 initialized run，没有原生 failed terminal，不能恢复/清锁/重试；旧状态 flag
 不是科学 dispatch 证据。残余风险包括长时正式科学计算、实际 OS/磁盘故障和未实跑后六阶段；I2 不授权这些活动。
+
+## 2026-09-12 G14R20-I2 终版验收
+
+G14E01 bootstrap 组合冲突已在 I2 最终 clean commit `879b449` 的真实公共入口验收关闭。首次全仓曾因新 checkout 的三个 LFS 指针出现 22 failed/49 errors，已用本地冻结对象展开并完成 96/1689 通过；不改代码或原始数据，失败证据保留。G14E01 仍禁止恢复/重试/清锁；后六阶段完整科学执行及真实断电行为未验证。
+详见 [终版验收记录](evaluation_only_bootstrap_handoff_acceptance.md)。
+`formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。

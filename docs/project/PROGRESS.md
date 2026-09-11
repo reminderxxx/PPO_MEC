@@ -1903,3 +1903,9 @@ G14R20-D 正在独立 B 基线分支实现 continuation 授权 2.0.0。真实 la
 两类 ledger、descriptor 与双层 publication，仅科学 child 为 test-only。最终 commit/clean checkout、实际命令、
 JUnit 和未签发新申请由独立 I2 验收记录绑定。本记录不提前将开发验收当终版结果，不作论文结论。
 `formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。
+
+## 2026-09-12 G14R20-I2 终版验收
+
+最终 clean executor `879b449e817f05d0f1af9483b4abf449a924c015` 验收完成：公共入口 30、相邻 132、全仓 1689 全通过，另有 96 项 LFS 输入补齐回归通过；smoke、330 文件 compile/import、冻结环境和原件保护通过。真实 prepare/validate 已生成新 unsigned 申请，新 run/真实 grant 不存在。
+详见 [终版验收记录](evaluation_only_bootstrap_handoff_acceptance.md)。
+`formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。
