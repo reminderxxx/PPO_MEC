@@ -6,6 +6,8 @@
 - holdout_opened: `false`
 - reviewed_at: `2026-09-11` (Asia/Shanghai)
 - executor_code_commit: `fcf36f986261587a1daa70805569cfbf25920332`
+- evidence commits: separate from the executor code commit; the final evidence
+  commit is reported with the handoff
 - scientific_commit: `a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d`
 - source_review: `g14r20_h_v16_failed_run_disposition_20260911`
 
@@ -14,8 +16,9 @@
 The scientific checkout is the persistent directory
 `artifacts/execution_checkouts/g14r20_i_scientific_a6d1fd8`, fixed to the
 scientific commit above. The executor checkout is
-`artifacts/execution_checkouts/g14r20_i_executor_8c0d7e8`, fixed to the
-executor code commit above. The source contract accepts only the reviewed v16
+`artifacts/execution_checkouts/g14r20_i_executor_8c0d7e8`; its executable
+code is the commit `fcf36f9` above; later checkout HEADs contain only evidence/
+documentation commits and must not be substituted as the executor identity. The source contract accepts only the reviewed v16
 run, the reviewed disposition eligibility digest, the reviewed generated
 registry and the 150 verified checkpoint coordinates (10 agents × 5 seeds × 3
 capacities). It rejects source-run, checkpoint, hash, coordinate, context,
