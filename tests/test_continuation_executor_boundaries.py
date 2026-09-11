@@ -144,13 +144,13 @@ def test_crash_record_cannot_be_blindly_reclaimed(fixture):
         with SingleWriter(p["run_root"], "x", lambda: None, digest(json.loads(path.read_text()))): pass
 
 
-def test_planner_projections_equal_frozen_original_main_expressions():
+def test_planner_projections_equal_frozen_original_main_expressions(continuation_science):
     """Only expression equivalence, explicitly not a producer/consumer test."""
     import ast
     from scripts.continuation_executor.planning import run_identity, cell_identity_fields, phase_plan
     from src.evaluators.typed_model_cache_formal_execution import expand_command_plan
     from src.evaluators.formal_cell_transaction import CellExecutionIdentity
-    frozen = Path("/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847")
+    frozen = Path(continuation_science[0])
     source = frozen/"scripts/run_typed_model_cache_formal_protocol.py"
     expected = subprocess.check_output(["git", "-C", str(frozen), "show",
         "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d:scripts/run_typed_model_cache_formal_protocol.py"])
@@ -233,9 +233,9 @@ with SingleWriter(sys.argv[1], "executor", lambda: None):
     assert json.loads(path.read_text())["state"] == "released"
 
 
-def test_five_cells_use_old_native_transactions(tmp_path):
-    old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
-    result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path)],
+def test_five_cells_use_old_native_transactions(continuation_science, tmp_path):
+    old, scientific_python = continuation_science
+    result = subprocess.run([scientific_python, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path)],
         cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
         capture_output=True,text=True)
     assert result.returncode == 0, result.stderr
@@ -247,20 +247,20 @@ def test_five_cells_use_old_native_transactions(tmp_path):
 
 
 @pytest.mark.parametrize("mutation", ["pythonpath", "cwd", "shadow"])
-def test_old_science_loader_rejects_process_pollution(tmp_path, mutation):
-    old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+def test_old_science_loader_rejects_process_pollution(continuation_science, tmp_path, mutation):
+    old, scientific_python = continuation_science
     setup = ""
     if mutation == "shadow":
         setup = "sys.path.insert(0,"+repr(str(ROOT))+");import src;sys.path.pop(0)\n"
     code = "import sys\nsys.path.insert(0,"+repr(str(ROOT/"scripts"))+")\n"+setup+"from continuation_executor.scientific import load_native\nload_native("+repr(old)+",'a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d')\n"
     env = dict(os.environ,PYTHONPATH=str(tmp_path) if mutation=="pythonpath" else old,PYTHONNOUSERSITE="1",PYTHONDONTWRITEBYTECODE="1")
-    result=subprocess.run([sys.executable,"-I","-B","-c",code],cwd=str(tmp_path) if mutation=="cwd" else old,env=env,capture_output=True,text=True)
+    result=subprocess.run([scientific_python,"-I","-B","-c",code],cwd=str(tmp_path) if mutation=="cwd" else old,env=env,capture_output=True,text=True)
     assert result.returncode != 0
     assert "drift" in result.stderr or "shadow scientific" in result.stderr
     assert not list(tmp_path.iterdir())
 
 
-def test_two_real_processes_only_one_writer(fixture):
+def test_two_real_processes_only_one_writer(fixture, record_property):
     p,_,_,_=fixture
     code="""import sys
 from scripts.continuation_executor.locking import SingleWriter
@@ -268,22 +268,37 @@ with SingleWriter(sys.argv[1], 'test', lambda: None):
     print('locked',flush=True)
     sys.stdin.readline()
 """
-    first=subprocess.Popen([sys.executable,"-B","-c",code,p["run_root"]],cwd=ROOT,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+    command = [sys.executable, "-B", "-c", code, p["run_root"]]
+    record_property("command", json.dumps(command))
+    record_property("cwd", str(ROOT))
+    record_property("child_environment", json.dumps({k: os.environ.get(k) for k in
+        ("PATH", "PYTHONPATH", "PYTHONNOUSERSITE", "PYTHONDONTWRITEBYTECODE")}))
+    first=subprocess.Popen(command,cwd=ROOT,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+    greeting = ""
     try:
-        assert first.stdout.readline().strip()=="locked"
-        second=subprocess.run([sys.executable,"-B","-c",code,p["run_root"]],cwd=ROOT,input="\n",capture_output=True,text=True)
-        assert second.returncode != 0 and "BlockingIOError" in second.stderr
-        first.communicate("\n",timeout=10)
-        assert first.returncode == 0
+        greeting = first.stdout.readline()
+        if greeting.strip() != "locked":
+            stdout, stderr = first.communicate(timeout=10)
+            record_property("first_stdout", greeting + stdout)
+            record_property("first_stderr", stderr)
+            pytest.fail(f"writer failed before lock: returncode={first.returncode}; stdout={greeting + stdout!r}; stderr={stderr!r}; command={command!r}; cwd={ROOT}")
+        second=subprocess.run(command,cwd=ROOT,input="\n",capture_output=True,text=True)
+        record_property("second_stdout", second.stdout)
+        record_property("second_stderr", second.stderr)
+        assert second.returncode != 0 and "BlockingIOError" in second.stderr, second
+        stdout, stderr = first.communicate("\n",timeout=10)
+        record_property("first_stdout", greeting + stdout)
+        record_property("first_stderr", stderr)
+        assert first.returncode == 0, stderr
     finally:
         if first.poll() is None:
-            first.kill();first.wait()
+            first.kill();first.communicate()
 
 
 @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
-def test_native_faults_and_restarts(tmp_path, case):
-    old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
-    result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+def test_native_faults_and_restarts(continuation_science, tmp_path, case):
+    old, scientific_python = continuation_science
+    result = subprocess.run([scientific_python, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
         cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
         capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
@@ -293,9 +308,9 @@ def test_native_faults_and_restarts(tmp_path, case):
 
 
 @pytest.mark.parametrize("case", ["truncation", "fork", "out_of_order", "cross_ledger", "immutable_payload"])
-def test_native_progress_corruption_rejects_before_write(tmp_path, case):
-    old = "/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
-    result = subprocess.run([sys.executable, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
+def test_native_progress_corruption_rejects_before_write(continuation_science, tmp_path, case):
+    old, scientific_python = continuation_science
+    result = subprocess.run([scientific_python, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
         cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
         capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
@@ -326,8 +341,8 @@ def test_actual_cli_identity_drift_has_no_fixture_writes(tmp_path, fixture, entr
 
 
 
-def test_actual_foreign_interpreter_rejected_before_scientific_imports(tmp_path):
-    old="/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+def test_actual_foreign_interpreter_rejected_before_scientific_imports(continuation_science, tmp_path):
+    old, scientific_python = continuation_science
     code="import sys;sys.path.insert(0,"+repr(str(ROOT/"scripts"))+");from continuation_executor.scientific import load_native;load_native("+repr(old)+",'a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d')"
     result=subprocess.run(["/usr/bin/python3","-I","-B","-c",code],cwd=old,
         env=dict(os.environ,PYTHONPATH=old,PYTHONNOUSERSITE="1",PYTHONDONTWRITEBYTECODE="1"),capture_output=True,text=True)
@@ -337,8 +352,8 @@ def test_actual_foreign_interpreter_rejected_before_scientific_imports(tmp_path)
 
 
 @pytest.mark.parametrize("kind", ["external_src", "critical_package"])
-def test_actual_external_import_pollution_rejected(tmp_path, kind):
-    old="/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847"
+def test_actual_external_import_pollution_rejected(continuation_science, tmp_path, kind):
+    old, scientific_python = continuation_science
     if kind=="external_src":
         (tmp_path/"src").mkdir();(tmp_path/"src/__init__.py").write_text("")
         setup="sys.path.insert(0,"+repr(str(tmp_path))+")"
@@ -348,7 +363,7 @@ def test_actual_external_import_pollution_rejected(tmp_path, kind):
         expected="critical dependency shadow import"
     before={str(p):file_hash(p) for p in tmp_path.rglob("*") if p.is_file()}
     code="import sys;sys.path.insert(0,"+repr(str(ROOT/"scripts"))+");"+setup+";from continuation_executor.scientific import load_native;load_native("+repr(old)+",'a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d')"
-    result=subprocess.run([sys.executable,"-I","-B","-c",code],cwd=old,
+    result=subprocess.run([scientific_python,"-I","-B","-c",code],cwd=old,
         env=dict(os.environ,PYTHONPATH=old,PYTHONNOUSERSITE="1",PYTHONDONTWRITEBYTECODE="1"),capture_output=True,text=True)
     assert result.returncode!=0 and expected in result.stderr
     assert before=={str(p):file_hash(p) for p in tmp_path.rglob("*") if p.is_file()}

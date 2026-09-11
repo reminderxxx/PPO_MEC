@@ -570,7 +570,12 @@ def resolve_execution_environment(
         and inferred_project_root != Path(clean_worktree_root).resolve()
         and (inferred_project_root / "src/__init__.py").is_file()
     ):
-        effective_forbidden.append(inferred_project_root)
+        # A persistent detached checkout may live below the shared environment's
+        # repository. Reject that repository's actual source packages, not all
+        # descendants (which would also reject the qualified clean checkout).
+        effective_forbidden.extend(
+            inferred_project_root / package for package in ("src", "scripts")
+        )
     origin_report = validate_import_origins(
         probe,
         clean_worktree_root=clean_worktree_root,

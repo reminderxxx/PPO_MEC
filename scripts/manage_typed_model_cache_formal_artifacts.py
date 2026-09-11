@@ -1042,6 +1042,9 @@ def main() -> None:
     }:
         registry_path = Path(args.generated_checkpoint_registry_path)
         static_registry = load_registry(args.resource_registry_path)
+        if args.evaluation_model_source_reference_path:
+            # This consumer's explicit input root owns its evaluation context.
+            args.resolved_execution_context_path = str(input_root / "resolved_execution_context.json")
         source_scope = evaluation_model_source_scope(
             args, default_run_root=input_root, protocol=protocol
         )

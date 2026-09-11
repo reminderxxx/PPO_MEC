@@ -618,6 +618,7 @@ def evaluation_model_source_scope(
         }
     from src.runtime.evaluation_only_execution import (
         SOURCE_RUN_ID,
+        validate_execution_contract,
         validate_model_source_reference,
     )
 
@@ -643,24 +644,25 @@ def evaluation_model_source_scope(
     evaluation_context_path = str(
         getattr(args, "resolved_execution_context_path", "") or ""
     )
-    if evaluation_context_path:
-        evaluation_context = _strict_json_object(
-            Path(evaluation_context_path), "evaluation execution context"
-        )
-        execution_identity = evaluation_context.get("evaluation_execution_identity")
-        if (
-            not isinstance(execution_identity, Mapping)
-            or execution_identity.get("model_source_reference_sha256")
-            != reference["source_reference_sha256"]
-            or execution_identity.get("source_run_id") != SOURCE_RUN_ID
-            or execution_identity.get("source_context_identity_sha256")
-            != reference["source_context_identity_sha256"]
-            or Path(evaluation_context_path).resolve().parent
-            != Path(reference_path).resolve().parent
-        ):
-            raise GeneratedCheckpointResourceError(
-                "evaluation execution context/source identity drift"
-            )
+    if not evaluation_context_path:
+        raise GeneratedCheckpointResourceError("evaluation execution context is required")
+    context_path = Path(evaluation_context_path)
+    evaluation_context = _strict_json_object(context_path, "evaluation execution context")
+    contract_path = context_path.parent / "evaluation_execution_contract.json"
+    contract = _strict_json_object(contract_path, "evaluation execution contract")
+    # Both identities must be verified: source training provenance cannot stand
+    # in for the new evaluation's commit, context, and durable output root.
+    validate_execution_contract(contract, model_source_reference=reference)
+    execution_identity = evaluation_context.get("evaluation_execution_identity")
+    if (
+        evaluation_context != contract["evaluation_execution_context"]
+        or context_path.resolve() != Path(contract["evaluation_run_root"]).resolve() / "resolved_execution_context.json"
+        or not isinstance(execution_identity, Mapping)
+        or execution_identity.get("source_run_id") != SOURCE_RUN_ID
+        or execution_identity.get("source_context_identity_sha256") != reference["source_context_identity_sha256"]
+        or context_path.resolve().parent != Path(reference_path).resolve().parent
+    ):
+        raise GeneratedCheckpointResourceError("evaluation execution context/source identity drift")
     root = Path(reference["source_run_root"]).resolve()
     return {
         "evaluation_only": True,

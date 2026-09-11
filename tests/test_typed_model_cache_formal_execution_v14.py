@@ -773,3 +773,19 @@ def test_51_phase_absolute_sanity_bound_is_enforced() -> None:
             monotonic_completed_ns=4 * 24 * 3600 * 1_000_000_000,
             child_wall_clock_seconds=1,
         )
+
+
+def test_nested_persistent_checkout_with_shared_python(tmp_path):
+    """Shared venv must reject parent source, while accepting detached descendants."""
+    nested = tmp_path / "project" / "artifacts" / "executor"
+    nested.mkdir(parents=True)
+    parent = tmp_path / "project"
+    valid = {"imports": {"src": {"file": str(nested / "src/__init__.py")}}}
+    forbidden = [parent / "src", parent / "scripts"]
+    assert validate_import_origins(valid, clean_worktree_root=nested,
+                                   forbidden_source_roots=forbidden)["status"] == "pass"
+    for package in ("src", "scripts"):
+        polluted = {"imports": {package: {"file": str(parent / package / "__init__.py")}}}
+        with pytest.raises(ExecutionEnvironmentError, match="clean worktree"):
+            validate_import_origins(polluted, clean_worktree_root=nested,
+                                    forbidden_source_roots=forbidden)

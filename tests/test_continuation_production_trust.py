@@ -203,11 +203,11 @@ def test_public_cli_refuses_test_trust(trust, domain, mode):
     'publication_crash', 'candidate_crash', 'duplicate_committed', 'gate_missing', 'gate_false',
     'revoke_during_phase', 'revoke_retry', 'candidate_crash_revoked', 'expire_during_phase', 'utc_adjustment',
     'truncation', 'fork', 'out_of_order', 'cross_ledger', 'immutable_payload'])
-def test_v2_native_transactions_and_restart(tmp_path, case):
+def test_v2_native_transactions_and_restart(continuation_science, tmp_path, case):
     import cryptography
     dependencies = str(Path(cryptography.__file__).resolve().parent.parent)
-    old = '/private/tmp/ppo_mec_g14c_v16_a6d1fd8_20260906_152847'
-    result = subprocess.run([sys.executable, '-I', '-B', str(ROOT/'tests/continuation_native_driver.py'),
+    old, scientific_python = continuation_science
+    result = subprocess.run([scientific_python, '-I', '-B', str(ROOT/'tests/continuation_native_driver.py'),
         str(tmp_path), case, dependencies], cwd=old,
         env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE='1', PYTHONDONTWRITEBYTECODE='1'),
         capture_output=True, text=True)
