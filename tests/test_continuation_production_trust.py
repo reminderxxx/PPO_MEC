@@ -203,7 +203,7 @@ def test_public_cli_refuses_test_trust(trust, domain, mode):
     'publication_crash', 'candidate_crash', 'duplicate_committed', 'gate_missing', 'gate_false',
     'revoke_during_phase', 'revoke_retry', 'candidate_crash_revoked', 'expire_during_phase', 'utc_adjustment',
     'truncation', 'fork', 'out_of_order', 'cross_ledger', 'immutable_payload'])
-def test_v2_native_transactions_and_restart(continuation_science, tmp_path, case):
+def test_v2_native_transactions_and_restart(continuation_science, tmp_path, case, record_property):
     import cryptography
     dependencies = str(Path(cryptography.__file__).resolve().parent.parent)
     old, scientific_python = continuation_science
@@ -211,6 +211,11 @@ def test_v2_native_transactions_and_restart(continuation_science, tmp_path, case
         str(tmp_path), case, dependencies], cwd=old,
         env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE='1', PYTHONDONTWRITEBYTECODE='1'),
         capture_output=True, text=True)
+    record_property("child_command", json.dumps(result.args))
+    record_property("child_cwd", old)
+    record_property("child_stdout", result.stdout)
+    record_property("child_stderr", result.stderr)
+    record_property("child_returncode", result.returncode)
     assert result.returncode == 0, result.stderr
     report = json.loads(result.stdout)
     assert report['status'] == 'pass'

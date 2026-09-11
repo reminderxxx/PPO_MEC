@@ -70,6 +70,7 @@ def test_real_outer_nested_loaders_three_capacities(consumer, phase):
         args = parse(command)
         result = resolve_generated_checkpoint_arguments(args, protocol=protocol)
         assert result['evaluation_model_source']['evaluation_only']
+        assert json.loads(json.dumps(result)) == result
         assert result['manifest']['checkpoint_count'] == 50
         assert result['provenance']['checkpoint_count'] == 50
         observed.add(result['capacity_label'])
@@ -109,3 +110,9 @@ def test_real_statistics_and_gate_reject_missing_evaluation_identity(consumer, p
     assert 'evaluation_execution_contract.json' in result.stderr, result.stderr
     assert not (root/'formal_gate.json').exists()
     assert not (root/'phase_state.jsonl').exists()
+
+
+def test_default_source_scope_is_json_serializable(tmp_path):
+    from argparse import Namespace
+    scope = evaluation_model_source_scope(Namespace(), default_run_root=tmp_path)
+    assert json.loads(json.dumps(scope)) == scope

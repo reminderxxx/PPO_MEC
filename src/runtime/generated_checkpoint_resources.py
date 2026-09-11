@@ -612,7 +612,7 @@ def evaluation_model_source_scope(
         root = Path(default_run_root).resolve()
         return {
             "evaluation_only": False,
-            "run_root": root,
+            "run_root": str(root),
             "run_id": root.name,
             "reference": None,
         }
@@ -666,7 +666,7 @@ def evaluation_model_source_scope(
     root = Path(reference["source_run_root"]).resolve()
     return {
         "evaluation_only": True,
-        "run_root": root,
+        "run_root": str(root),
         "run_id": SOURCE_RUN_ID,
         "reference": reference,
         "source_reference_sha256": reference["source_reference_sha256"],

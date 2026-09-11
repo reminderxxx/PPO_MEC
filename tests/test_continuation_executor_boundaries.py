@@ -233,11 +233,16 @@ with SingleWriter(sys.argv[1], "executor", lambda: None):
     assert json.loads(path.read_text())["state"] == "released"
 
 
-def test_five_cells_use_old_native_transactions(continuation_science, tmp_path):
+def test_five_cells_use_old_native_transactions(continuation_science, tmp_path, record_property):
     old, scientific_python = continuation_science
     result = subprocess.run([scientific_python, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path)],
         cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
         capture_output=True,text=True)
+    record_property("child_command", json.dumps(result.args))
+    record_property("child_cwd", old)
+    record_property("child_stdout", result.stdout)
+    record_property("child_stderr", result.stderr)
+    record_property("child_returncode", result.returncode)
     assert result.returncode == 0, result.stderr
     report=json.loads(result.stdout)
     assert report["synthetic_child_dispatch_count"] == 5
@@ -247,7 +252,7 @@ def test_five_cells_use_old_native_transactions(continuation_science, tmp_path):
 
 
 @pytest.mark.parametrize("mutation", ["pythonpath", "cwd", "shadow"])
-def test_old_science_loader_rejects_process_pollution(continuation_science, tmp_path, mutation):
+def test_old_science_loader_rejects_process_pollution(continuation_science, tmp_path, mutation, record_property):
     old, scientific_python = continuation_science
     setup = ""
     if mutation == "shadow":
@@ -255,6 +260,11 @@ def test_old_science_loader_rejects_process_pollution(continuation_science, tmp_
     code = "import sys\nsys.path.insert(0,"+repr(str(ROOT/"scripts"))+")\n"+setup+"from continuation_executor.scientific import load_native\nload_native("+repr(old)+",'a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d')\n"
     env = dict(os.environ,PYTHONPATH=str(tmp_path) if mutation=="pythonpath" else old,PYTHONNOUSERSITE="1",PYTHONDONTWRITEBYTECODE="1")
     result=subprocess.run([scientific_python,"-I","-B","-c",code],cwd=str(tmp_path) if mutation=="cwd" else old,env=env,capture_output=True,text=True)
+    record_property("child_command", json.dumps(result.args))
+    record_property("child_cwd", old)
+    record_property("child_stdout", result.stdout)
+    record_property("child_stderr", result.stderr)
+    record_property("child_returncode", result.returncode)
     assert result.returncode != 0
     assert "drift" in result.stderr or "shadow scientific" in result.stderr
     assert not list(tmp_path.iterdir())
@@ -296,11 +306,16 @@ with SingleWriter(sys.argv[1], 'test', lambda: None):
 
 
 @pytest.mark.parametrize("case", ["exit75", "terminal", "missing", "corrupt", "descriptor", "provenance", "publication_crash", "candidate_crash", "duplicate_committed", "gate_missing", "gate_false", "revoke_during_phase", "expire_during_phase", "utc_adjustment"])
-def test_native_faults_and_restarts(continuation_science, tmp_path, case):
+def test_native_faults_and_restarts(continuation_science, tmp_path, case, record_property):
     old, scientific_python = continuation_science
     result = subprocess.run([scientific_python, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
         cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
         capture_output=True, text=True)
+    record_property("child_command", json.dumps(result.args))
+    record_property("child_cwd", old)
+    record_property("child_stdout", result.stdout)
+    record_property("child_stderr", result.stderr)
+    record_property("child_returncode", result.returncode)
     assert result.returncode == 0, result.stderr
     report = json.loads(result.stdout)
     assert report["status"] == "pass" and report["prefix_unchanged"]
@@ -308,11 +323,16 @@ def test_native_faults_and_restarts(continuation_science, tmp_path, case):
 
 
 @pytest.mark.parametrize("case", ["truncation", "fork", "out_of_order", "cross_ledger", "immutable_payload"])
-def test_native_progress_corruption_rejects_before_write(continuation_science, tmp_path, case):
+def test_native_progress_corruption_rejects_before_write(continuation_science, tmp_path, case, record_property):
     old, scientific_python = continuation_science
     result = subprocess.run([scientific_python, "-I", "-B", str(ROOT/"tests/continuation_native_driver.py"), str(tmp_path), case],
         cwd=old, env=dict(os.environ, PYTHONPATH=old, PYTHONNOUSERSITE="1", PYTHONDONTWRITEBYTECODE="1"),
         capture_output=True, text=True)
+    record_property("child_command", json.dumps(result.args))
+    record_property("child_cwd", old)
+    record_property("child_stdout", result.stdout)
+    record_property("child_stderr", result.stderr)
+    record_property("child_returncode", result.returncode)
     assert result.returncode == 0, result.stderr
     report=json.loads(result.stdout)
     assert report["status"]=="pass" and report["rejected_before_write"]
@@ -341,18 +361,23 @@ def test_actual_cli_identity_drift_has_no_fixture_writes(tmp_path, fixture, entr
 
 
 
-def test_actual_foreign_interpreter_rejected_before_scientific_imports(continuation_science, tmp_path):
+def test_actual_foreign_interpreter_rejected_before_scientific_imports(continuation_science, tmp_path, record_property):
     old, scientific_python = continuation_science
     code="import sys;sys.path.insert(0,"+repr(str(ROOT/"scripts"))+");from continuation_executor.scientific import load_native;load_native("+repr(old)+",'a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d')"
     result=subprocess.run(["/usr/bin/python3","-I","-B","-c",code],cwd=old,
         env=dict(os.environ,PYTHONPATH=old,PYTHONNOUSERSITE="1",PYTHONDONTWRITEBYTECODE="1"),capture_output=True,text=True)
+    record_property("child_command", json.dumps(result.args))
+    record_property("child_cwd", old)
+    record_property("child_stdout", result.stdout)
+    record_property("child_stderr", result.stderr)
+    record_property("child_returncode", result.returncode)
     assert result.returncode!=0 and "actual interpreter differs" in result.stderr
     assert not list(tmp_path.iterdir())
 
 
 
 @pytest.mark.parametrize("kind", ["external_src", "critical_package"])
-def test_actual_external_import_pollution_rejected(continuation_science, tmp_path, kind):
+def test_actual_external_import_pollution_rejected(continuation_science, tmp_path, kind, record_property):
     old, scientific_python = continuation_science
     if kind=="external_src":
         (tmp_path/"src").mkdir();(tmp_path/"src/__init__.py").write_text("")
@@ -365,6 +390,11 @@ def test_actual_external_import_pollution_rejected(continuation_science, tmp_pat
     code="import sys;sys.path.insert(0,"+repr(str(ROOT/"scripts"))+");"+setup+";from continuation_executor.scientific import load_native;load_native("+repr(old)+",'a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d')"
     result=subprocess.run([scientific_python,"-I","-B","-c",code],cwd=old,
         env=dict(os.environ,PYTHONPATH=old,PYTHONNOUSERSITE="1",PYTHONDONTWRITEBYTECODE="1"),capture_output=True,text=True)
+    record_property("child_command", json.dumps(result.args))
+    record_property("child_cwd", old)
+    record_property("child_stdout", result.stdout)
+    record_property("child_stderr", result.stderr)
+    record_property("child_returncode", result.returncode)
     assert result.returncode!=0 and expected in result.stderr
     assert before=={str(p):file_hash(p) for p in tmp_path.rglob("*") if p.is_file()}
 
