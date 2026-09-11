@@ -31,18 +31,26 @@ class SingleWriter:
     its full hash plus externally established quiescence. The kernel lock must be
     obtainable and the exact previous owner must be gone. Inode is never removed.
     """
-    def __init__(self, run_root, executor_sha256, authorize, recovery_owner_sha256=None):
+    def __init__(self, run_root, executor_sha256, authorize, recovery_owner_sha256=None, *, allow_missing_root=False):
         self.root = Path(run_root)
         self.executor_sha256 = executor_sha256
         self.authorize = authorize
         self.recovery_owner_sha256 = recovery_owner_sha256
         self.fd = None
+        self.allow_missing_root = allow_missing_root
 
     def __enter__(self):
         self.authorize()
         path = absolute_path(str(writer_lock_path(self.root)))
-        if not self.root.is_dir():
+        if not self.root.is_dir() and not self.allow_missing_root:
             raise ContinuationError("continuation may not create a second run")
+        if self.allow_missing_root:
+            # Evaluation bootstrap requires an existing, writable parent and a
+            # usable host identity before creating any coordination/run state.
+            if not self.root.parent.is_dir() or not os.access(self.root.parent, os.W_OK | os.X_OK):
+                raise ContinuationError("evaluation parent is not writable")
+            if not process_identity(os.getpid())["started"]:
+                raise ContinuationError("evaluation process identity permission unavailable")
         path.parent.mkdir(exist_ok=True)
         self.fd = os.open(path, os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW, 0o600)
         try:

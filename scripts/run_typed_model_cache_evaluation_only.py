@@ -145,35 +145,21 @@ def verify_project_grant(
     }
 
 
-def _initialize_run(package: dict[str, Any]) -> tuple[Path, FormalCellLedger, TransactionalPhaseRunner]:
+def _encoded(payload: Any) -> bytes:
+    return (json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n").encode("utf-8")
+
+
+def _create_file(path: Path, data: bytes) -> None:
+    with path.open("xb") as stream:
+        stream.write(data)
+        stream.flush()
+        os.fsync(stream.fileno())
+
+
+def _cell_identity(package: dict[str, Any]) -> CellExecutionIdentity:
     execution = package["evaluation_execution_contract"]
     source = package["model_source_reference"]
-    root = Path(execution["evaluation_run_root"])
-    root.mkdir(parents=True, exist_ok=False)
-    for name, payload in (
-        ("evaluation_model_source_reference.json", source),
-        ("evaluation_execution_contract.json", execution),
-        ("resolved_execution_context.json", execution["evaluation_execution_context"]),
-        (
-            "evaluation_only_state.json",
-            {
-                "evaluation_run_id": execution["evaluation_run_id"],
-                "model_source_reference_sha256": source["source_reference_sha256"],
-                "executor_commit": execution["executor_commit"],
-                "formal_execution_authorized": True,
-                "formal_execution_started": True,
-                "holdout_opened": False,
-                "training_executed": False,
-                "dev_selection_executed": False,
-                "checkpoint_freeze_executed": False,
-            },
-        ),
-    ):
-        (root / name).write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
-            encoding="utf-8",
-        )
-    identity = CellExecutionIdentity(
+    return CellExecutionIdentity(
         run_id=execution["evaluation_run_id"],
         execution_commit=execution["executor_commit"],
         protocol_semantic_sha256=source["protocol_semantic_sha256"],
@@ -197,135 +183,183 @@ def _initialize_run(package: dict[str, Any]) -> tuple[Path, FormalCellLedger, Tr
         ),
         command_matrix_sha256=execution["command_plan_sha256"],
     )
-    cells = FormalCellLedger(run_root=root, identity=identity)
-    runner = TransactionalPhaseRunner(
-        output_root=root,
-        run_identity_fingerprint=canonical_sha256(
-            {
-                "evaluation_execution_contract": execution["execution_contract_sha256"],
-                "model_source_reference": source["source_reference_sha256"],
-            }
-        ),
-        phase_order=PHASES,
-        resume=False,
-        resolved_execution_context_sha256=execution[
-            "evaluation_execution_context_sha256"
-        ],
-        resolved_execution_context_file_sha256=file_sha256(
-            root / "resolved_execution_context.json"
-        ),
+
+
+def _phase_runner(package: dict[str, Any], *, resume: bool) -> TransactionalPhaseRunner:
+    execution = package["evaluation_execution_contract"]
+    return TransactionalPhaseRunner(
+        output_root=execution["evaluation_run_root"],
+        run_identity_fingerprint=canonical_sha256({
+            "evaluation_execution_contract": execution["execution_contract_sha256"],
+            "model_source_reference": package["model_source_reference"]["source_reference_sha256"],
+        }),
+        phase_order=PHASES, resume=resume,
+        resolved_execution_context_sha256=execution["evaluation_execution_context_sha256"],
+        resolved_execution_context_file_sha256=hashlib.sha256(
+            _encoded(execution["evaluation_execution_context"])
+        ).hexdigest(),
     )
+
+
+def _initial_files(package: dict[str, Any]) -> dict[str, Any]:
+    execution = package["evaluation_execution_contract"]
+    return {
+        "evaluation_model_source_reference.json": package["model_source_reference"],
+        "evaluation_execution_contract.json": execution,
+        "resolved_execution_context.json": execution["evaluation_execution_context"],
+        "evaluation_only_state.json": {
+            "evaluation_run_id": execution["evaluation_run_id"],
+            "model_source_reference_sha256": execution["model_source_reference_sha256"],
+            "executor_commit": execution["executor_commit"],
+            "initialization_status": "initialized",
+            "formal_execution_authorized": True,
+            "formal_execution_started": False,
+            "scientific_dispatch_evidence": "phase_state.jsonl and cell_state.jsonl",
+            "holdout_opened": False,
+            "training_executed": False,
+            "dev_selection_executed": False,
+            "checkpoint_freeze_executed": False,
+        },
+    }
+
+
+def _initialize_run(package: dict[str, Any]) -> tuple[Path, FormalCellLedger, TransactionalPhaseRunner]:
+    # Called only while holding the external writer lock. No recovery of remnants.
+    root = Path(package["evaluation_execution_contract"]["evaluation_run_root"])
+    root.mkdir(exist_ok=False)
+    runner = _phase_runner(package, resume=False)  # still requires an empty root
+    _create_file(root / "phase_state.jsonl", b"")
+    for name, payload in _initial_files(package).items():
+        _create_file(root / name, _encoded(payload))
+    cells = FormalCellLedger(run_root=root, identity=_cell_identity(package))
+    marker = {
+        "version": "1.0.0",
+        "run_root": str(root),
+        "files": {name: file_sha256(root / name) for name in
+                  [*_initial_files(package), "cell_ledger_identity.json"]},
+        "initial_phase_ledger_sha256": file_sha256(root / "phase_state.jsonl"),
+        "initial_cell_ledger_sha256": file_sha256(root / "cell_state.jsonl"),
+    }
+    _create_file(root / "evaluation_initialization_complete.json", _encoded(marker))
     return root, cells, runner
 
 
 def _load_run(package: dict[str, Any]) -> tuple[Path, FormalCellLedger, TransactionalPhaseRunner]:
-    execution = package["evaluation_execution_contract"]
-    source = package["model_source_reference"]
-    root = Path(execution["evaluation_run_root"])
-    if not root.is_dir():
+    root = Path(package["evaluation_execution_contract"]["evaluation_run_root"])
+    if not root.exists():
         return _initialize_run(package)
-    if _read(root / "evaluation_model_source_reference.json") != source:
-        raise EvaluationOnlyError("evaluation run source reference drift")
-    if _read(root / "evaluation_execution_contract.json") != execution:
-        raise EvaluationOnlyError("evaluation run execution contract drift")
-    if _read(root / "resolved_execution_context.json") != execution[
-        "evaluation_execution_context"
-    ]:
-        raise EvaluationOnlyError("evaluation run context drift")
-    protocol = _read(source["protocol_path"])
-    identity = CellExecutionIdentity(
-        run_id=execution["evaluation_run_id"], execution_commit=execution["executor_commit"],
-        protocol_semantic_sha256=source["protocol_semantic_sha256"],
-        resource_registry_semantic_sha256=protocol["portable_resource_identity_contract"]["resource_registry_semantic_sha256"],
-        environment_fingerprint=hashlib.sha256(execution["python_executable"].encode()).hexdigest(),
-        split_semantic_sha256=protocol["identity"]["split_semantic_sha256"],
-        window_contract_semantic_sha256=protocol["execution_contract"]["window_consumption_contract"]["semantic_sha256"],
-        catalog_fingerprint=protocol["identity"]["catalog_fingerprint"],
-        runtime_identity=canonical_sha256(protocol["identity"]["typed_runtime_contract_hashes_by_capacity"]),
-        command_matrix_sha256=execution["command_plan_sha256"],
-    )
-    cells = FormalCellLedger(run_root=root, identity=identity, resume=True)
-    runner = TransactionalPhaseRunner(
-        output_root=root,
-        run_identity_fingerprint=canonical_sha256({"evaluation_execution_contract": execution["execution_contract_sha256"], "model_source_reference": source["source_reference_sha256"]}),
-        phase_order=PHASES, resume=True,
-        resolved_execution_context_sha256=execution[
-            "evaluation_execution_context_sha256"
-        ],
-        resolved_execution_context_file_sha256=file_sha256(
-            root / "resolved_execution_context.json"
-        ),
-    )
-    return root, cells, runner
+    marker = _read(root / "evaluation_initialization_complete.json")
+    names = [*_initial_files(package), "cell_ledger_identity.json"]
+    if (marker.get("version") != "1.0.0" or marker.get("run_root") != str(root)
+            or set(marker.get("files", {})) != set(names)
+            or any(marker["files"][name] != file_sha256(root / name) for name in names)
+            or any(marker.get(key) != hashlib.sha256(b"").hexdigest() for key in
+                   ("initial_phase_ledger_sha256", "initial_cell_ledger_sha256"))):
+        raise EvaluationOnlyError("evaluation initialization identity/hash drift")
+    for name, payload in _initial_files(package).items():
+        if (root / name).is_symlink() or (root / name).read_bytes() != _encoded(payload):
+            raise EvaluationOnlyError("evaluation run identity/context bytes drift: " + name)
+    for name in ("phase_state.jsonl", "cell_state.jsonl", "cell_ledger_identity.json"):
+        if (root / name).is_symlink() or not (root / name).is_file():
+            raise EvaluationOnlyError("evaluation initialization is incomplete")
+    cells = FormalCellLedger(run_root=root, identity=_cell_identity(package), resume=True)
+    return root, cells, _phase_runner(package, resume=True)
 
 
-def execute_phase(package: dict[str, Any], grant: dict[str, Any], phase: str) -> Any:
+def execute_phase(package: dict[str, Any], grant: dict[str, Any], phase: str, *,
+                  scientific_child_adapter=None) -> Any:
     authorization = verify_project_grant(package, grant)
     execution = package["evaluation_execution_contract"]
-    root, cells, runner = _load_run(package)
-    plan = execution["command_plans"][phase]
-    completed_phases = {
-        row["phase"] for row in runner.records() if row.get("status") == "completed"
-    }
-    remaining = [name for name in PHASES if name not in completed_phases]
-    if not remaining or phase != remaining[0]:
-        raise EvaluationOnlyError("phase must be the next unstarted evaluation-only phase")
-    command_coordinates = {
-        canonical_sha256(command): coordinates
-        for command, coordinates in zip(plan["commands"], plan["matrix_contexts"])
-    }
+    root = Path(execution["evaluation_run_root"])
+    if phase not in PHASES:
+        raise EvaluationOnlyError("unknown evaluation phase")
+    with SingleWriter(root, canonical_sha256(execution),
+                      lambda: verify_project_grant(package, grant), allow_missing_root=True):
+        if not root.exists() and phase != PHASES[0]:
+            raise EvaluationOnlyError("first initialization requires first phase")
+        root, cells, runner = _load_run(package)
+        plan = execution["command_plans"][phase]
+        records = runner.records()
+        expected_context_file_hash = hashlib.sha256(_encoded(execution["evaluation_execution_context"])).hexdigest()
+        if any(row.get("resolved_execution_context_sha256") != execution["evaluation_execution_context_sha256"]
+               or row.get("resolved_execution_context_file_sha256") != expected_context_file_hash
+               for row in records):
+            raise EvaluationOnlyError("phase ledger context binding drift")
+        if any(row.get("status") == "failed" for row in records):
+            raise EvaluationOnlyError("failed evaluation phase is terminal")
+        completed_phases = {
+            row["phase"] for row in runner.records() if row.get("status") == "completed"
+        }
+        remaining = [name for name in PHASES if name not in completed_phases]
+        if not remaining or phase != remaining[0]:
+            raise EvaluationOnlyError("phase must be the next unstarted evaluation-only phase")
+        if any(row["phase"] not in completed_phases for row in records):
+            raise EvaluationOnlyError("interrupted evaluation phase cannot be resumed")
+        for previous in completed_phases:
+            prior = execution["command_plans"][previous]
+            runner.run_phase(previous, commands=prior["commands"],
+                             input_hash=canonical_sha256({"phase": previous, "contract": execution["execution_contract_sha256"]}),
+                             expected_outputs=prior["expected_outputs"])
+            if previous in PHASES[:5]:
+                cells.assert_complete_matrix(phase=previous, expected_cell_ids=[
+                    stable_cell_id(previous, row) for row in prior["matrix_contexts"]])
+        command_coordinates = {
+            canonical_sha256(command): coordinates
+            for command, coordinates in zip(plan["commands"], plan["matrix_contexts"])
+        }
 
-    def authorize() -> dict[str, Any]:
-        return verify_project_grant(package, grant)
-
-    def dispatch(command: list[str]) -> PhaseCommandResult:
-        if phase in PHASES[:5]:
-            coordinates = command_coordinates[canonical_sha256(command)]
-            final, builder, resolver = cell_layout(
-                phase,
-                coordinates,
+        def dispatch(command: list[str]) -> PhaseCommandResult:
+            verify_project_grant(package, grant)
+            if phase in PHASES[:5]:
+                coordinates = command_coordinates[canonical_sha256(command)]
+                final, builder, resolver = cell_layout(
+                    phase,
+                    coordinates,
+                    command,
+                    SimpleNamespace(
+                        stable_cell_id=stable_cell_id,
+                        single_child_directory=__import__(
+                            "src.evaluators.formal_cell_transaction", fromlist=["single_child_directory"]
+                        ).single_child_directory,
+                        resolve_child_output_descriptor=__import__(
+                            "src.evaluators.formal_cell_transaction", fromlist=["resolve_child_output_descriptor"]
+                        ).resolve_child_output_descriptor,
+                    ),
+                )
+                if scientific_child_adapter is not None:
+                    builder, resolver = scientific_child_adapter.adapt(
+                        package, phase, builder, resolver
+                    )
+                result = execute_cell_artifact_transaction(
+                    cells,
+                    phase=phase,
+                    coordinates=coordinates,
+                    command=command,
+                    input_hash=canonical_sha256(
+                        {"command": command, "source": execution["model_source_reference_sha256"]}
+                    ),
+                    committed_path=final,
+                    command_builder=builder,
+                    artifact_resolver=resolver,
+                    environment=dict(os.environ, PYTHONPATH=str(ROOT), PYTHONNOUSERSITE="1"),
+                    cwd=ROOT,
+                    command_failure_classification="evaluation_only_cell_failure",
+                )
+                return PhaseCommandResult(
+                    int(result.get("return_code", 0)),
+                    str(result.get("stdout", "")),
+                    str(result.get("stderr", "")),
+                )
+            completed = subprocess.run(
                 command,
-                SimpleNamespace(
-                    stable_cell_id=stable_cell_id,
-                    single_child_directory=__import__(
-                        "src.evaluators.formal_cell_transaction", fromlist=["single_child_directory"]
-                    ).single_child_directory,
-                    resolve_child_output_descriptor=__import__(
-                        "src.evaluators.formal_cell_transaction", fromlist=["resolve_child_output_descriptor"]
-                    ).resolve_child_output_descriptor,
-                ),
-            )
-            result = execute_cell_artifact_transaction(
-                cells,
-                phase=phase,
-                coordinates=coordinates,
-                command=command,
-                input_hash=canonical_sha256(
-                    {"command": command, "source": execution["model_source_reference_sha256"]}
-                ),
-                committed_path=final,
-                command_builder=builder,
-                artifact_resolver=resolver,
-                environment=dict(os.environ, PYTHONPATH=str(ROOT), PYTHONNOUSERSITE="1"),
                 cwd=ROOT,
-                command_failure_classification="evaluation_only_cell_failure",
+                env=dict(os.environ, PYTHONPATH=str(ROOT), PYTHONNOUSERSITE="1"),
+                text=True,
+                capture_output=True,
+                check=False,
             )
-            return PhaseCommandResult(
-                int(result.get("return_code", 0)),
-                str(result.get("stdout", "")),
-                str(result.get("stderr", "")),
-            )
-        completed = subprocess.run(
-            command,
-            cwd=ROOT,
-            env=dict(os.environ, PYTHONPATH=str(ROOT), PYTHONNOUSERSITE="1"),
-            text=True,
-            capture_output=True,
-            check=False,
-        )
-        return PhaseCommandResult(completed.returncode, completed.stdout, completed.stderr)
+            return PhaseCommandResult(completed.returncode, completed.stdout, completed.stderr)
 
-    with SingleWriter(root, canonical_sha256(execution), authorize):
         if phase == "complete_without_holdout":
             validate_complete_without_holdout_gate(root, _read(package["model_source_reference"]["protocol_path"]))
         result = runner.run_phase(
@@ -346,7 +380,7 @@ def execute_phase(package: dict[str, Any], grant: dict[str, Any], phase: str) ->
     return {"authorization": authorization, "result": result}
 
 
-def main() -> None:
+def main(*, scientific_child_adapter=None) -> None:
     args = build_parser().parse_args()
     package = _read(args.authorization_request_path)
     if package.get("authorization_request_sha256") != canonical_sha256(
@@ -362,12 +396,20 @@ def main() -> None:
         package["evaluation_execution_contract"],
         model_source_reference=package["model_source_reference"],
     )
+    if scientific_child_adapter is not None:
+        # No CLI/env/package switch enables this. The isolated acceptance driver
+        # supplies a source-controlled adapter for scientific child work only.
+        from tests.evaluation_only_public_driver import SyntheticScientificChild
+        if type(scientific_child_adapter) is not SyntheticScientificChild:
+            raise EvaluationOnlyError("unknown scientific acceptance adapter")
+        scientific_child_adapter.validate(package)
     grant = _read(args.project_grant_path)
     authorization = verify_project_grant(package, grant)
     if args.check == "qualify":
         print(json.dumps({"status": "qualified", "authorization": authorization}, indent=2))
         return
-    result = execute_phase(package, grant, args.phase)
+    result = execute_phase(package, grant, args.phase,
+                           scientific_child_adapter=scientific_child_adapter)
     print(json.dumps({"status": "completed", "phase": args.phase, **result}, default=str, indent=2))
 
 
