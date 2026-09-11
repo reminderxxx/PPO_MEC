@@ -407,8 +407,26 @@ def build_evaluation_execution_contract(
         if phase == "complete_without_holdout":
             plan = {"commands": [], "expected_outputs": [], "matrix_contexts": []}
         else:
+            command_spec = deepcopy(
+                protocol["execution_contract"]["command_templates"][phase]
+            )
+            # The frozen Protocol matrix uses FORMAL_OUTPUT_ROOT as a portable
+            # location sentinel for checkpoint companion files.  In an
+            # evaluation-only run those files remain owned by the reviewed
+            # source run; only evaluation outputs move to the new run root.
+            # Rewrite only the two enumerated source fields before the generic
+            # command expander resolves the sentinel.
+            for matrix_context in command_spec.get("matrix_contexts", []):
+                for key in (
+                    "seed_checkpoint_manifest_path",
+                    "checkpoint_provenance_manifest_path",
+                ):
+                    value = matrix_context.get(key)
+                    sentinel = "/ABSOLUTE/FORMAL_OUTPUT_ROOT"
+                    if isinstance(value, str) and value.startswith(sentinel):
+                        matrix_context[key] = str(source_root) + value[len(sentinel) :]
             plan = expand_command_plan(
-                protocol["execution_contract"]["command_templates"][phase], expansion
+                command_spec, expansion
             )
         commands = plan["commands"]
         reference_flag = [

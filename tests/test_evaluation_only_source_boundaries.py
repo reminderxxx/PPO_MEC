@@ -11,6 +11,7 @@ from src.runtime.evaluation_only_execution import (
     SOURCE_RUN_ROOT,
     EvaluationOnlyError,
     _require_clean_code,
+    build_evaluation_execution_contract,
     build_model_source_reference,
     canonical_sha256,
     validate_execution_contract,
@@ -140,3 +141,46 @@ def test_execution_context_executor_cross_binding_is_recomputed() -> None:
             model_source_reference=request["model_source_reference"],
             check_live=False,
         )
+
+
+def test_evaluation_commands_keep_checkpoint_companions_at_source_run(
+    source_reference: dict,
+) -> None:
+    head = subprocess.run(
+        ["git", "-C", str(ROOT), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    contract = build_evaluation_execution_contract(
+        source_reference=source_reference,
+        evaluation_run_id="typed_model_cache_evaluation_only_test_pending",
+        evaluation_run_root=(
+            ROOT.parents[2]
+            / "artifacts/experiments/typed_model_cache_evaluation_only"
+            / "typed_model_cache_evaluation_only_test_pending"
+        ),
+        executor_checkout=ROOT,
+        executor_commit=head,
+        python_executable=ROOT.parents[2] / ".venv/bin/python",
+    )
+    observed = set()
+    for phase in ("formal_cache_policy", "formal_controller"):
+        for outer in contract["command_plans"][phase]["commands"]:
+            command = outer[outer.index("--command") + 1 :] if "--command" in outer else outer
+            for flag in (
+                "--seed_checkpoint_manifest_path",
+                "--checkpoint_provenance_manifest_path",
+            ):
+                path = Path(command[command.index(flag) + 1])
+                assert path.is_relative_to(SOURCE_RUN_ROOT)
+                assert path.is_file()
+                observed.add((flag, path.parent.name))
+    assert observed == {
+        (flag, capacity)
+        for flag in (
+            "--seed_checkpoint_manifest_path",
+            "--checkpoint_provenance_manifest_path",
+        )
+        for capacity in ("constrained_288mb", "medium_576mb", "relaxed_864mb")
+    }
