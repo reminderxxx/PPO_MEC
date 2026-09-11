@@ -44,15 +44,16 @@ def fixture(tmp_path, request):
     parent = Path(evidence) if evidence else tmp_path.resolve()
     scope = parent / ("synthetic_" + request.node.name.replace("[", "_").replace("]", "").replace("/", "_"))
     scope.mkdir(parents=True, exist_ok=False)
+    executor = PROJECT / "artifacts/execution_checkouts/g14r20_i1_executor_release" if request.node.name == "test_old_public_initialization_conflict" else ROOT
     original = json.loads(SOURCE_REQUEST.read_text())
     source = original["model_source_reference"]
     run = scope / "synthetic_evaluation_run"
     package_path = scope / "request.json"
-    command = [PYTHON, str(ROOT / "scripts/prepare_typed_model_cache_evaluation_only.py"),
+    command = [PYTHON, str(executor / "scripts/prepare_typed_model_cache_evaluation_only.py"),
                "--action", "prepare", "--disposition-eligibility-path", source["disposition_eligibility_path"],
                "--source-run-root", source["source_run_root"], "--scientific-checkout", source["scientific_checkout"],
-               "--executor-checkout", str(ROOT), "--executor-commit",
-               subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
+               "--executor-checkout", str(executor), "--executor-commit",
+               subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=executor, text=True).strip(),
                "--python-executable", PYTHON, "--evaluation-run-id", run.name,
                "--evaluation-run-root", str(run), "--output-path", str(package_path)]
     result = subprocess.run(command, cwd=ROOT, env=environment(), text=True, capture_output=True)
@@ -160,11 +161,20 @@ def test_public_rejections(fixture, kind):
         path = writer_lock_path(run); path.parent.mkdir(exist_ok=True)
         dump(path, {"state": "held", "process": {"pid": 99999999}, "test_only": True})
         before = path.read_bytes()
-    if kind == "permission": scope.chmod(0o500)
-    try:
+    if kind == "permission":
+        scope.chmod(0o500)
+        argv = command(scope, phase)
+        try:
+            result = subprocess.run(argv, cwd=ROOT, env=environment(), text=True, capture_output=True)
+        finally:
+            scope.chmod(0o700)
+        (scope / "permission.stderr").write_text(result.stderr)
+        (scope / "permission.stdout").write_text(result.stdout)
+        dump(scope / "permission.command.json", {"argv": argv, "cwd": str(ROOT), "returncode": result.returncode})
+        assert result.returncode != 0 and "parent is not writable" in result.stderr
+        assert not rows(scope / "dispatch.jsonl")
+    else:
         reject(fixture, phase=phase, label="rejected")
-    finally:
-        if kind == "permission": scope.chmod(0o700)
     if kind == "held_lock": assert path.read_bytes() == before
     if kind in {"invalid_grant", "expired_grant", "held_lock", "permission"}: assert not run.exists()
 
@@ -220,3 +230,21 @@ def test_continuation_default_still_rejects_missing_root(tmp_path):
     with pytest.raises(ValueError, match="may not create"):
         with SingleWriter(root, "test", lambda: None): pass
     assert not root.exists()
+
+
+def test_old_public_initialization_conflict(fixture):
+    scope, run, package = fixture
+    release = Path(package["evaluation_execution_contract"]["executor_checkout"])
+    argv = [PYTHON, str(release / "scripts/run_typed_model_cache_evaluation_only.py"),
+            *command(scope)[5:]]
+    result = subprocess.run(argv, cwd=release, env=dict(environment(), PYTHONPATH=str(release)),
+                            capture_output=True, text=True)
+    dump(scope / "old.command.json", {"argv": argv, "cwd": str(release), "returncode": result.returncode})
+    (scope / "old.stderr").write_text(result.stderr); (scope / "old.stdout").write_text(result.stdout)
+    assert result.returncode != 0 and "phase output root conflict" in result.stderr
+    assert set(inventory(run)) == {"evaluation_model_source_reference.json", "evaluation_execution_contract.json",
+                                  "resolved_execution_context.json", "evaluation_only_state.json",
+                                  "cell_ledger_identity.json", "cell_state.jsonl"}
+    assert (run / "cell_state.jsonl").stat().st_size == 0
+    assert not writer_lock_path(run).exists()
+    assert not rows(scope / "dispatch.jsonl")

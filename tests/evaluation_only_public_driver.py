@@ -50,7 +50,7 @@ class SyntheticScientificChild:
             # Exercise the production staging command builder unchanged, but run
             # a tiny, explicitly test-only child instead of the scientific CLI.
             staged = builder(staging, cell_id)
-            write_json(staging / "synthetic_original_staged_argv.json", staged)
+            write_json(self.scope / (cell_id + "_synthetic_original_staged_argv.json"), staged)
             return [package["evaluation_execution_contract"]["python_executable"],
                     str(ROOT / "tests/evaluation_only_public_driver.py"), "child",
                     str(self.scope), phase, str(staging), cell_id]
@@ -123,10 +123,13 @@ def host(scope, fault, argv):
                     raise OSError("test-only initialization write fault: " + fault)
             return trace
         sys.settrace(trace)
-    write_json(scope / ("host_%s.json" % os.getpid()), {
+    audit = {
         "pid": os.getpid(), "argv": argv, "cwd": os.getcwd(),
         "import_origin": public.__file__, "python": sys.executable,
-        "pythonpath": os.environ.get("PYTHONPATH"), "test_only": True})
+        "pythonpath": os.environ.get("PYTHONPATH"), "test_only": True}
+    print(json.dumps({"host_audit": audit}), flush=True)
+    if os.access(scope, os.W_OK):
+        write_json(scope / ("host_%s.json" % os.getpid()), audit)
     sys.argv = [public.__file__, *argv]
     public.main(scientific_child_adapter=SyntheticScientificChild(scope))
 
