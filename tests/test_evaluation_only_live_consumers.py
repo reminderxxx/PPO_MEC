@@ -35,6 +35,8 @@ def consumer(tmp_path, source_reference):
         evaluation_run_root=root, executor_checkout=ROOT, executor_commit=commit,
         python_executable=sys.executable,
     )
+    from scripts.continuation_executor.locking import writer_lock_path
+    assert contract["lock_root"] == str(writer_lock_path(root).parent)
     root.mkdir()
     for name, payload in (
         ('evaluation_model_source_reference.json', source_reference),
@@ -116,3 +118,14 @@ def test_default_source_scope_is_json_serializable(tmp_path):
     from argparse import Namespace
     scope = evaluation_model_source_scope(Namespace(), default_run_root=tmp_path)
     assert json.loads(json.dumps(scope)) == scope
+
+
+def test_live_contract_rejects_wrong_shared_lock_path(consumer):
+    from src.runtime.evaluation_only_execution import canonical_sha256, validate_execution_contract
+    root, source, contract = consumer
+    changed = deepcopy(contract)
+    changed['lock_root'] = str(root.parent / '.wrong_lock_directory')
+    changed['execution_contract_sha256'] = canonical_sha256(
+        {key: value for key, value in changed.items() if key != 'execution_contract_sha256'})
+    with pytest.raises(EvaluationOnlyError, match='lock root'):
+        validate_execution_contract(changed, model_source_reference=source)

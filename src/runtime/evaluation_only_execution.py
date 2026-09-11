@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from scripts.continuation_executor.locking import writer_lock_path
 from src.evaluators.typed_model_cache_formal_execution import expand_command_plan
 from src.runtime.generated_checkpoint_resources import load_generated_checkpoint_registry
 
@@ -460,7 +461,7 @@ def build_evaluation_execution_contract(
         "command_plan_sha256": canonical_sha256(plans),
         "ledger_path": str(run_root / "phase_state.jsonl"),
         "cell_ledger_path": str(run_root / "cell_state.jsonl"),
-        "lock_root": str(run_root.parent / ".evaluation_only_locks"),
+        "lock_root": str(writer_lock_path(run_root).parent),
         "staging_root": str(run_root / ".staging"),
         "legacy_result_exclusions": list(source["legacy_result_exclusions"]),
         "legacy_results_enter_new_statistics": False,
@@ -631,6 +632,8 @@ def validate_execution_contract(
     ):
         raise EvaluationOnlyError("evaluation execution context hash mismatch")
     if check_live:
+        if value.get("lock_root") != str(writer_lock_path(value["evaluation_run_root"]).parent):
+            raise EvaluationOnlyError("evaluation lock root differs from shared single-writer path")
         executor = Path(str(value.get("executor_checkout", "")))
         python = Path(str(value.get("python_executable", "")))
         if (
