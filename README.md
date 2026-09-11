@@ -529,3 +529,13 @@ G14R20-D continuation 授权接口 2.0.0：生产共用 Ed25519 原件认证及�
 宿主；独立 fixed-inode startup lock 防止并发宿主干扰，宿主结束只输出待 custodian 独立核验的 checkpoint
 材料。synthetic-only 绑定进入同一 parser/main 路径且不能建立生产 trust。实现/验收不改变 Protocol 2.9、原
 v16 或生产批准状态；精确 commit、identity 和测试计数由独立证据提交记录。
+
+
+## 2026-09-11 G14R20-I1 终版实物验收
+
+[验收与本地证据锚点](docs/project/g14r20_i1_final_executor_acceptance.md)：executor 固定为 `9d9f2aee`，与后续证据提交分离。
+完整回归 **1659 passed**，必经目标 **54 passed**，独立单写者 **2 passed**；均无 failure/error/skip。
+原 145 项异常逐项闭环。唯一终版为 `g14r20_i1_final_acceptance_20260911/authorization_request_release.json`；
+原 I 包及本轮失败候选保留作审计。状态仅为 `READY_FOR_EVALUATION_ONLY_AUTHORIZATION`，
+`formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。
+真实模型、原 selection/freeze/provenance、科学参数、旧 run 和七个用户文件均保持不变。

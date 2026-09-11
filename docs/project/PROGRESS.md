@@ -1894,3 +1894,13 @@ G14R20-D 正在独立 B 基线分支实现 continuation 授权 2.0.0。真实 la
   transaction inventory/marker，并在发布后、重复消费、recovery 与 gate 统一复验两层。
 - 当前仅准备独立审查和未签发授权申请；正式 rollout/training/update/performance 均为 0，未创建正式 run ledger，
   `formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。
+
+
+## 2026-09-11 G14R20-I1 终版实物验收
+
+[验收与本地证据锚点](g14r20_i1_final_executor_acceptance.md)：executor 固定为 `9d9f2aee`，与后续证据提交分离。
+完整回归 **1659 passed**，必经目标 **54 passed**，独立单写者 **2 passed**；均无 failure/error/skip。
+原 145 项异常逐项闭环。唯一终版为 `g14r20_i1_final_acceptance_20260911/authorization_request_release.json`；
+原 I 包及本轮失败候选保留作审计。状态仅为 `READY_FOR_EVALUATION_ONLY_AUTHORIZATION`，
+`formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。
+真实模型、原 selection/freeze/provenance、科学参数、旧 run 和七个用户文件均保持不变。

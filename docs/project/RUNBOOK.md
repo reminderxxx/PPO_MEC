@@ -1559,3 +1559,26 @@ PYTHONPATH=<reviewed-continuation-dependencies> <frozen-python> -B \
 交接，再运行既有八阶段 synthetic chain。所有私钥、receipt、continuity、startup lock、marker 和 synthetic
 checkpoint 只在新 fixture；production CLI 不接受 installation/test binding 参数。必须分别报告
 `synthetic_dispatch_count` 与 science/real-v16/write/holdout 四个零计数。
+
+
+## 2026-09-11 G14R20-I1 终版实物验收
+
+[验收与本地证据锚点](g14r20_i1_final_executor_acceptance.md)：executor 固定为 `9d9f2aee`，与后续证据提交分离。
+完整回归 **1659 passed**，必经目标 **54 passed**，独立单写者 **2 passed**；均无 failure/error/skip。
+原 145 项异常逐项闭环。唯一终版为 `g14r20_i1_final_acceptance_20260911/authorization_request_release.json`；
+原 I 包及本轮失败候选保留作审计。状态仅为 `READY_FOR_EVALUATION_ONLY_AUTHORIZATION`，
+`formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。
+真实模型、原 selection/freeze/provenance、科学参数、旧 run 和七个用户文件均保持不变。
+
+完整回归复现（需要主机 ps 权限；只运行测试）：
+
+```bash
+cd /Users/howen/Projects/PPO_MEC/artifacts/execution_checkouts/g14r20_i1_executor_release
+PYTHONPATH="/Users/howen/Projects/PPO_MEC/artifacts/execution_checkouts/g14r20_i1_executor_release:/Users/howen/Projects/PPO_MEC/artifacts/execution_checkouts/g14r20_i1_acceptance_env/lib/python3.9/site-packages" PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 /Users/howen/Projects/PPO_MEC/.venv/bin/python -B -m pytest tests
+```
+
+未来 evaluation 继续使用原 `.venv/bin/python`，不携带上面的测试工具 overlay。
+真实科学子进程由 `child_environment` 固定 clean `PYTHONPATH`。
+终版只读 validate 的准确命令在 `validate_release.command.json`；未来命令指针在
+`future_commands_release.json`，其中 execute 模板仅在另行独立 review/grant 后使用。
+本轮没有运行正式 execute。

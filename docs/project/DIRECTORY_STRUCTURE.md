@@ -326,3 +326,19 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 复核；`startup_binding.py` 固定生产绑定及源码受控 synthetic-only 绑定；`public_startup_acceptance.py` 驱动
 真实宿主/独立 custodian 进程验收。公共入口仍为 `scripts/execute_fixed_commit_continuation.py`，验收入口仍为
 `scripts/run_fixed_commit_continuation_acceptance.py`。不新增生产配置、私钥、真实 coordination 文件或 run。
+
+
+## 2026-09-11 G14R20-I1 终版实物验收
+
+[验收与本地证据锚点](g14r20_i1_final_executor_acceptance.md)：executor 固定为 `9d9f2aee`，与后续证据提交分离。
+完整回归 **1659 passed**，必经目标 **54 passed**，独立单写者 **2 passed**；均无 failure/error/skip。
+原 145 项异常逐项闭环。唯一终版为 `g14r20_i1_final_acceptance_20260911/authorization_request_release.json`；
+原 I 包及本轮失败候选保留作审计。状态仅为 `READY_FOR_EVALUATION_ONLY_AUTHORIZATION`，
+`formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。
+真实模型、原 selection/freeze/provenance、科学参数、旧 run 和七个用户文件均保持不变。
+
+- 持久 executor：`artifacts/execution_checkouts/g14r20_i1_executor_release`（clean detached）。
+- 证据交付 worktree：`artifacts/execution_checkouts/g14r20_i1_delivery`。
+- 仅验收工具依赖：`artifacts/execution_checkouts/g14r20_i1_acceptance_env`；不是科学运行环境。
+- 本地证据：`artifacts/analysis/g14r20_i1_final_acceptance_20260911`（Git-ignored）。
+- 未来正式 output root 由终版申请包绑定，目前不存在，不由验收任务创建。

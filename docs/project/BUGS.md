@@ -624,3 +624,18 @@ G14R20-D 明确剩余人工边界：签名不能证明原件来源/语义、host
   hash，重建最终 producer manifest 后再生成 transaction inventory；最终目录、重复消费、recovery 和 gate
   统一双层检查。
 - 旧 288 MB 内部 manifest 不会被回写修复，仍保留为历史 stale 证据；576 MB staging 不升级为结果。
+
+
+## 2026-09-11 G14R20-I1 终版实物验收
+
+[验收与本地证据锚点](g14r20_i1_final_executor_acceptance.md)：executor 固定为 `9d9f2aee`，与后续证据提交分离。
+完整回归 **1659 passed**，必经目标 **54 passed**，独立单写者 **2 passed**；均无 failure/error/skip。
+原 145 项异常逐项闭环。唯一终版为 `g14r20_i1_final_acceptance_20260911/authorization_request_release.json`；
+原 I 包及本轮失败候选保留作审计。状态仅为 `READY_FOR_EVALUATION_ONLY_AUTHORIZATION`，
+`formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。
+真实模型、原 selection/freeze/provenance、科学参数、旧 run 和七个用户文件均保持不变。
+
+已复现并最小修复：evaluation context 缺失/错误被接受、来源审计 Path 导致真实 statistics JSON
+发布失败、申请包锁目录与实际 SingleWriter 不一致、嵌套 clean checkout 被来源推断误拒绝。
+历史失效科学目录测试现使用独立 fixture；cryptography 只供隔离验收工具使用。
+未来执行仍要求原科学 Python 与 ps 权限；没有正式科学结果或已签发授权。
