@@ -68,6 +68,8 @@ def _contract(tmp_path: Path) -> dict:
             "evaluation_execution_identity": {
                 "model_source_reference_sha256": "s" * 64,
                 "evaluation_run_id": "typed_model_cache_evaluation_only_fixture",
+                "executor_commit": "e" * 40,
+                "executor_git_tree": "t" * 40,
             },
         },
         "evaluation_execution_context_sha256": "c" * 64,

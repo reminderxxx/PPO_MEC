@@ -602,6 +602,12 @@ def validate_execution_contract(
         "evaluation_run_id"
     ) != value.get("evaluation_run_id"):
         raise EvaluationOnlyError("evaluation context/run binding drift")
+    if context.get("evaluation_execution_identity", {}).get(
+        "executor_commit"
+    ) != value.get("executor_commit") or context.get(
+        "evaluation_execution_identity", {}
+    ).get("executor_git_tree") != value.get("executor_git_tree"):
+        raise EvaluationOnlyError("evaluation context/executor binding drift")
     if context.get("context_sha256") != canonical_sha256(
         {key: item for key, item in context.items() if key != "context_sha256"}
     ):
