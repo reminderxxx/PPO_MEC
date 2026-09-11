@@ -1,3 +1,6 @@
+> **2026-09-11 G14R20-I**：新 evaluation-only 来源/执行身份与双层 publication integrity 合同见
+> [evaluation_only_execution_contract.md](evaluation_only_execution_contract.md)。当前仅为未签发授权申请，未执行。
+>
 > **2026-09-10 G14R20-G**：当前用户已允许一次性 project 授权，作用于既有 v16 的固定模型和剩余八阶段；
 > 合同见 [project_continuation_authorization_contract.md](project_continuation_authorization_contract.md)。独立技术
 > 验收与真实执行结果不能由授权决定替代；旧 crypto 入口保持原约束，holdout 不在范围内。
@@ -15,6 +18,9 @@
 这是 PPO_MEC 的项目化维护文档入口，用来把通用 AI 协作规范落到当前仓库。
 
 ## Live 文档
+
+- `evaluation_only_execution_contract.md`：G14R20-I 的 v16 冻结模型来源、新 evaluation identity、八阶段入口、
+  双层 publication integrity、旧 partial/staging 排除和未授权边界
 
 - `project_continuation_authorization_contract.md`：G14R20-G 一次性本地 owner 授权、独立 review/grant、
   固定科学源与输入、expiry/stop 和 cold recovery 排除边界；不追认历史批准，不自动开启正式执行

@@ -21,6 +21,7 @@ from src.evaluators.typed_model_cache_formal_protocol import canonical_sha256, s
 from src.runtime.portable_resource_identity import add_portable_resource_arguments, load_registry
 from src.runtime.generated_checkpoint_resources import (
     add_generated_checkpoint_resource_arguments,
+    evaluation_model_source_scope,
     load_generated_checkpoint_registry,
     resolve_generated_checkpoint_arguments,
 )
@@ -45,6 +46,7 @@ from src.evaluators.formal_cell_transaction import (
     CellTransactionError,
     artifact_inventory,
     validate_cell_ledger,
+    validate_producer_integrity_manifests,
 )
 
 
@@ -770,11 +772,13 @@ def formal_gate(
     protocol: dict,
     *,
     generated_registry_audit: Mapping[str, Any] | None = None,
+    model_source_reference: Mapping[str, Any] | None = None,
 ) -> dict:
     rehearsal_marker = input_root / "non_formal_rehearsal.json"
     non_formal_rehearsal = rehearsal_marker.is_file()
+    evaluation_only = isinstance(model_source_reference, Mapping)
     required = [
-        "checkpoint_freeze.json",
+        "evaluation_model_source_reference.json" if evaluation_only else "checkpoint_freeze.json",
         "formal_cache_policy/**/aggregate_summary.json",
         "formal_controller/**/aggregate_summary.json",
         "formal_ablation/**/support_provenance.json",
@@ -839,10 +843,20 @@ def formal_gate(
                 raise CellTransactionError("committed cell marker is missing")
             marker = read_json(marker_path)
             inventory_hash = canonical_sha256(artifact_inventory(committed_path))
+            producer_audit = validate_producer_integrity_manifests(committed_path)
             if (
                 inventory_hash != row.get("artifact_inventory_sha256")
                 or inventory_hash != marker.get("artifact_inventory_sha256")
                 or marker.get("cell_id") != row.get("cell_id")
+                or (
+                    producer_audit["manifest_count"] > 0
+                    and (
+                        marker.get("producer_integrity_manifest_count")
+                        != producer_audit["manifest_count"]
+                        or marker.get("producer_integrity_manifests")
+                        != producer_audit["manifests"]
+                    )
+                )
             ):
                 raise CellTransactionError("committed cell payload/marker drift")
             phase = str(row.get("phase"))
@@ -850,17 +864,21 @@ def formal_gate(
     except (CellTransactionError, OSError, ValueError) as exc:
         committed_by_phase = {}
         cell_ledger_error = str(exc)
+    source_root = (
+        Path(str(model_source_reference["source_run_root"]))
+        if evaluation_only else input_root
+    )
     candidates = (
-        read_json(input_root / "checkpoint_candidates.json")
-        if (input_root / "checkpoint_candidates.json").is_file() else []
+        read_json(source_root / "checkpoint_candidates.json")
+        if (source_root / "checkpoint_candidates.json").is_file() else []
     )
     selection = (
-        read_json(input_root / "dev_selection.json")
-        if (input_root / "dev_selection.json").is_file() else {}
+        read_json(source_root / "dev_selection.json")
+        if (source_root / "dev_selection.json").is_file() else {}
     )
     freeze = (
-        read_json(input_root / "checkpoint_freeze.json")
-        if (input_root / "checkpoint_freeze.json").is_file() else {}
+        read_json(source_root / "checkpoint_freeze.json")
+        if (source_root / "checkpoint_freeze.json").is_file() else {}
     )
     frozen_capacity_counts = {
         capacity: sum(
@@ -875,12 +893,12 @@ def formal_gate(
     )
     observed_counts = {
         "committed_training_cells": (
-            committed_by_phase.get("train", 0)
+            0 if evaluation_only else committed_by_phase.get("train", 0)
         ),
-        "candidate_checkpoints": len(candidates) if isinstance(candidates, list) else 0,
-        "latest_checkpoints": len(list(input_root.glob("training/**/checkpoints/latest.pt"))),
-        "dev_candidate_evaluations": len(candidates) if isinstance(candidates, list) else 0,
-        "selections": len(selection.get("selected", [])),
+        "candidate_checkpoints": 0 if evaluation_only else len(candidates) if isinstance(candidates, list) else 0,
+        "latest_checkpoints": 0 if evaluation_only else len(list(input_root.glob("training/**/checkpoints/latest.pt"))),
+        "dev_candidate_evaluations": 0 if evaluation_only else len(candidates) if isinstance(candidates, list) else 0,
+        "selections": 0 if evaluation_only else len(selection.get("selected", [])),
         "frozen_checkpoints": int(freeze.get("frozen_checkpoint_count", 0)),
         "frozen_checkpoints_by_capacity": frozen_capacity_counts,
         "cache_policy_cells": committed_by_phase.get("formal_cache_policy", 0),
@@ -892,11 +910,11 @@ def formal_gate(
         "formal_outer_window_clusters": len(controller_windows),
     }
     formal_expected = {
-        "committed_training_cells": 150,
-        "candidate_checkpoints": 1200,
-        "latest_checkpoints": 150,
-        "dev_candidate_evaluations": 1200,
-        "selections": 150,
+        "committed_training_cells": 0 if evaluation_only else 150,
+        "candidate_checkpoints": 0 if evaluation_only else 1200,
+        "latest_checkpoints": 0 if evaluation_only else 150,
+        "dev_candidate_evaluations": 0 if evaluation_only else 1200,
+        "selections": 0 if evaluation_only else 150,
         "frozen_checkpoints": 150,
         "frozen_checkpoints_by_capacity": {
             "constrained_288mb": 50, "medium_576mb": 50, "relaxed_864mb": 50,
@@ -940,6 +958,12 @@ def formal_gate(
         "zero_pair_rule": "UNAVAILABLE_not_tie_pass_or_fail",
         "generated_checkpoint_registry_audit": dict(generated_registry_audit or {}),
         "generated_checkpoint_registry_required": True,
+        "evaluation_only": evaluation_only,
+        "model_source_reference_sha256": (
+            model_source_reference.get("source_reference_sha256")
+            if evaluation_only else None
+        ),
+        "training_dev_selection_checkpoint_freeze_owned_by_source_run": evaluation_only,
         "observed_counts": observed_counts,
         "expected_counts": expected_counts,
         "exact_count_mismatches": exact_count_mismatches,
@@ -1018,12 +1042,20 @@ def main() -> None:
     }:
         registry_path = Path(args.generated_checkpoint_registry_path)
         static_registry = load_registry(args.resource_registry_path)
-        context = read_json(input_root / "resolved_execution_context.json")
-        binding = read_json(input_root / "formal_training_execution_binding.json")
+        source_scope = evaluation_model_source_scope(
+            args, default_run_root=input_root, protocol=protocol
+        )
+        source_reference = source_scope.get("reference") or {}
+        context = read_json(
+            Path(source_reference.get("source_context_path", input_root / "resolved_execution_context.json"))
+        )
+        binding = read_json(
+            Path(source_reference.get("source_binding_path", input_root / "formal_training_execution_binding.json"))
+        )
         _, generated_registry_audit = load_generated_checkpoint_registry(
             registry_path,
-            run_root=input_root,
-            expected_run_id=input_root.resolve().name,
+            run_root=source_scope["run_root"],
+            expected_run_id=source_scope["run_id"],
             static_registry_semantic_sha256=static_registry["hashes"]["semantic_sha256"],
             protocol_semantic_sha256=protocol["hashes"]["semantic_sha256"],
             protocol_full_sha256=protocol["hashes"]["full_sha256"],
@@ -1032,6 +1064,7 @@ def main() -> None:
             resolved_execution_context_sha256=context["context_sha256"],
             formal_training_execution_binding_sha256=binding["binding_full_sha256"],
         )
+        generated_registry_audit["evaluation_model_source"] = source_scope
     if args.action == "dev_select":
         payload = dev_select(input_root, protocol)
     elif args.action == "checkpoint_freeze":
@@ -1048,11 +1081,17 @@ def main() -> None:
             artifact_integrity(input_root, protocol, integrity_path),
         )
         payload = formal_gate(
-            input_root, protocol, generated_registry_audit=generated_registry_audit
+            input_root,
+            protocol,
+            generated_registry_audit=generated_registry_audit,
+            model_source_reference=(source_scope.get("reference") if generated_registry_audit else None),
         )
     else:
         payload = formal_gate(
-            input_root, protocol, generated_registry_audit=generated_registry_audit
+            input_root,
+            protocol,
+            generated_registry_audit=generated_registry_audit,
+            model_source_reference=(source_scope.get("reference") if generated_registry_audit else None),
         )
     write_create_only(output_path, payload)
     print(json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False))

@@ -1,5 +1,19 @@
 ﻿# Decision Log
 
+## 2026-09-11 — D-G14R20-I 模型来源与 evaluation 执行身份永久分离
+
+决定：H 审查确认的旧 v16 150 个 checkpoint 只能通过精确 source reference 被新 evaluation-only run 只读消费。
+checkpoint expected identity 继续绑定原 scientific commit/context/binding/selection/freeze/registry；新 run 单独绑定
+executor、command、ledger/lock/staging/output，且不得声称 training/dev/freeze。普通跨 run registry 仍禁止。
+
+决定：cell publication 的 producer manifest 是 transaction inventory 之内的强制完整性层。路径变换只能发生在
+列举字段，非路径语义必须前后相等；最终 producer manifest 必须先重建/验证，再生成 transaction inventory 和
+marker，并在最终目录重读两层。不能通过重算全部 hash 掩盖 metric/null/request/row/model identity 篡改。
+
+原因：旧 288 MB 证明 transaction 层可以完整保存“已经让 producer manifest 失效”的当前字节；两层口径都必须
+成立才能进入 statistics/gate。
+
+
 ## 2026-09-10: G14R20-G 单次研究接续采用显式本地项目授权
 
 - 决定依据：用户要求先闭环实验，理解简化方案后明确答复“允许”。为精确既有 v16 引入显式 project 路径，

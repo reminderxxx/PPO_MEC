@@ -15,6 +15,12 @@
 
 # Directory Structure
 
+G14R20-I：模型来源/执行身份合同位于 `src/runtime/evaluation_only_execution.py`；prepare 与受授权执行入口分别为
+`scripts/prepare_typed_model_cache_evaluation_only.py`、`scripts/run_typed_model_cache_evaluation_only.py`。双层
+producer/transaction publication 验证位于 `src/evaluators/formal_cell_transaction.py`，真实 gate 消费位于
+`scripts/manage_typed_model_cache_formal_artifacts.py`。持久、Git ignored checkout 位于
+`artifacts/execution_checkouts/`；验收/未签发申请位于 `artifacts/analysis/g14r20_i_*`，不得提交模型或真实数据。
+
 G14R18：唯一 active Protocol 2.9、ready index 与 Readiness v21 位于
 `configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/`；共享 8-field parser 位于
 `src/runtime/formal_training_identity.py`，17-field envelope 的 producer 位于

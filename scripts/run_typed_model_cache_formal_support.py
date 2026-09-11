@@ -477,6 +477,7 @@ def main() -> None:
         "--generated-checkpoint-registry-path", args.generated_checkpoint_registry_path,
         "--checkpoint-manifest-id", args.checkpoint_manifest_id,
         "--checkpoint-provenance-id", args.checkpoint_provenance_id,
+        "--evaluation-model-source-reference-path", args.evaluation_model_source_reference_path,
         "--protocol-path", args.protocol_path,
         "--resolved-execution-context-path", args.resolved_execution_context_path,
         "--formal-training-execution-binding-path", (

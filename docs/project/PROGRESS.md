@@ -1883,3 +1883,14 @@ G14R20-D 正在独立 B 基线分支实现 continuation 授权 2.0.0。真实 la
 - 精确 clean 实现提交上，定向回归 `176 passed`、全仓 `1536 passed`，均 0 failed/0 skipped；smoke、全 Python
   compile/import、strict JSON/zero-counter、diff-check 与 107,320 对象起止保护均通过。production trust 仍未安装，
   continuation approval 未签发，`real_execution_authorized=false`。
+## 2026-09-11: G14R20-I evaluation-only chain preparation
+
+- 基于 H disposition 将旧 v16 冻结为失败记录，只复用 150/150 verified checkpoint；科学 checkout 持久固定为
+  `a6d1fd8`，新 executor/新 run 身份独立登记。
+- 新增 evaluation-only prepare/execute 边界和精确八阶段 command contract；新 run 的 train/dev/freeze 计数为 0，
+  checkpoint 来源检查仍绑定旧 Protocol/context/binding/selection/freeze/registry。旧 288 partial 与 576 staging
+  均排除于新统计。
+- publication 改为 producer 原清单验证、枚举路径重定位、非路径语义证明、最终 producer 清单重建后再形成
+  transaction inventory/marker，并在发布后、重复消费、recovery 与 gate 统一复验两层。
+- 当前仅准备独立审查和未签发授权申请；正式 rollout/training/update/performance 均为 0，未创建正式 run ledger，
+  `formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。

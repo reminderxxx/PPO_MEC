@@ -10,6 +10,11 @@
 > 合同见 [continuation_startup_handoff_contract.md](docs/project/continuation_startup_handoff_contract.md)。
 > 生产 installation 仍为空，真实 v16 未恢复，continuation 未批准。
 
+> **2026-09-11 G14R20-I**：旧 v16 已冻结为失败记录；H 审查验证的 150 个 checkpoint 只允许作为新
+> evaluation-only run 的不可变模型来源。新入口显式拆分 model-source 与 evaluation-execution identity，并修复
+> producer manifest 在 publication relocation 后失效而 transaction inventory 仍通过的问题。当前仅准备未签发
+> 授权申请；`formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。
+>
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。

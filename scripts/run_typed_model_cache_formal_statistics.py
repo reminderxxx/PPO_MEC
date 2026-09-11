@@ -19,6 +19,7 @@ from src.evaluators.typed_model_cache_formal_execution import (
 from src.runtime.portable_resource_identity import add_portable_resource_arguments, load_registry
 from src.runtime.generated_checkpoint_resources import (
     add_generated_checkpoint_resource_arguments,
+    evaluation_model_source_scope,
     load_generated_checkpoint_registry,
 )
 from src.runtime.resolved_formal_execution_context import (
@@ -81,10 +82,13 @@ def main() -> None:
             "formal_training_execution_binding_path"
         ]
         binding = json.loads(Path(binding_path).read_text(encoding="utf-8-sig"))
+        source_scope = evaluation_model_source_scope(
+            args, default_run_root=Path(args.input_root).resolve(), protocol=protocol
+        )
         _, generated_checkpoint_resource_audit = load_generated_checkpoint_registry(
             args.generated_checkpoint_registry_path,
-            run_root=Path(args.input_root).resolve(),
-            expected_run_id=Path(args.input_root).resolve().name,
+            run_root=source_scope["run_root"],
+            expected_run_id=source_scope["run_id"],
             static_registry_semantic_sha256=static_registry["hashes"]["semantic_sha256"],
             protocol_semantic_sha256=protocol["hashes"]["semantic_sha256"],
             protocol_full_sha256=protocol["hashes"]["full_sha256"],
@@ -93,6 +97,7 @@ def main() -> None:
             resolved_execution_context_sha256=resolved_context["context_sha256"],
             formal_training_execution_binding_sha256=binding["binding_full_sha256"],
         )
+        generated_checkpoint_resource_audit["evaluation_model_source"] = source_scope
     order_audit = None
     if capabilities.agent_order_contract_required:
         if not args.formal_agent_order_contract_path:

@@ -1,4 +1,10 @@
-> **2026-09-11 当前接续状态（G14R20-G）**：9 月 10 日的一次性本地 grant 已被实际使用，
+> **2026-09-11 当前准备状态（G14R20-I）**：旧 v16 维持失败终态，不恢复。H 审查验证的 150 个冻结模型
+> 可作为未来新 evaluation-only run 的来源；新来源/执行双身份与 publication 双层完整性入口已进入验收。
+> 当前不签发 grant、不创建正式 run ledger、不启动评估，`formal_execution_authorized=false`、
+> `formal_execution_started=false`、`holdout_opened=false`。详见
+> [evaluation-only 合同](evaluation_only_execution_contract.md)。
+>
+> **2026-09-11 原接续状态（G14R20-G）**：9 月 10 日的一次性本地 grant 已被实际使用，
 > `formal_cache_policy` 随后失败，phase/cell ledger 为 `17/352`；固定科学 worktree 当前缺 `.git` 和运行所需
 > 文件，public qualification 失败。旧 grant 不授权 cold recovery、failed terminal 重试或删锁恢复，现为
 > `BLOCKED`，不得报告 `real_execution_started=false` 或 READY。holdout 未见开启。见

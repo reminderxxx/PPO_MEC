@@ -18,6 +18,7 @@ FORMAL_CELL_LEDGER_VERSION = "2.0.0"
 CELL_IDENTITY_VERSION = "1.1.0"
 CELL_ARTIFACT_PUBLICATION_CONTRACT_VERSION = "1.0.0"
 CELL_CHILD_OUTPUT_DESCRIPTOR_VERSION = "1.0.0"
+PRODUCER_PUBLICATION_INTEGRITY_VERSION = "1.0.0"
 CELL_STATUSES = {
     "running",
     "incomplete",
@@ -87,6 +88,156 @@ def artifact_inventory(root: str | Path) -> list[dict[str, Any]]:
     if not rows:
         raise CellTransactionError("cell artifact inventory is empty")
     return rows
+
+
+_ALLOWED_JSON_PATH_SUFFIXES = {
+    ("run_info", "summary_path"),
+    ("output_paths", "aggregate"),
+    ("output_paths", "command_log"),
+    ("output_paths", "episodes"),
+    ("output_paths", "rows"),
+    ("request_replay_path",),
+    ("output",),
+}
+_ALLOWED_TEXT_RELOCATION_NAMES = {"resolved_command.txt"}
+
+
+def _producer_manifest_paths(root: Path) -> list[Path]:
+    return sorted(
+        (
+            path
+            for path in root.rglob("artifact_integrity_manifest.json")
+            if path.is_file() and not path.is_symlink()
+        ),
+        key=lambda path: (-len(path.parts), path.as_posix()),
+    )
+
+
+def _producer_inventory(manifest_path: Path) -> list[dict[str, Any]]:
+    root = manifest_path.parent
+    rows: list[dict[str, Any]] = []
+    for path in sorted(root.rglob("*")):
+        if path.is_symlink():
+            raise CellTransactionError(f"producer artifact symlink is forbidden: {path}")
+        if not path.is_file() or path == manifest_path:
+            continue
+        rows.append(
+            {
+                "path": path.relative_to(root).as_posix(),
+                "size_bytes": path.stat().st_size,
+                "sha256": _file_sha256(path),
+            }
+        )
+    if not rows:
+        raise CellTransactionError("producer artifact inventory is empty")
+    return rows
+
+
+def validate_producer_integrity_manifest(
+    manifest_path: str | Path,
+    *,
+    committed_root: str | Path | None = None,
+) -> dict[str, Any]:
+    """Validate a producer-owned manifest and exact payload membership."""
+
+    path = Path(manifest_path)
+    if path.is_symlink() or not path.is_file():
+        raise CellTransactionError("producer integrity manifest is missing or a symlink")
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise CellTransactionError("producer integrity manifest is invalid JSON") from exc
+    if not isinstance(payload, Mapping) or not isinstance(payload.get("files"), list):
+        raise CellTransactionError("producer integrity manifest has invalid schema")
+    declared: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for raw in payload["files"]:
+        if not isinstance(raw, Mapping):
+            raise CellTransactionError("producer integrity row must be an object")
+        relative = _safe_relative_path(raw.get("path"), "producer integrity path")
+        key = relative.as_posix()
+        if key in seen:
+            raise CellTransactionError("producer integrity manifest has duplicate path")
+        seen.add(key)
+        target = path.parent / relative
+        try:
+            target.resolve().relative_to(path.parent.resolve())
+        except ValueError as exc:
+            raise CellTransactionError("producer integrity path escapes producer root") from exc
+        if target.is_symlink() or not target.is_file():
+            raise CellTransactionError(f"producer integrity file is missing: {key}")
+        row = {
+            "path": key,
+            "size_bytes": target.stat().st_size,
+            "sha256": _file_sha256(target),
+        }
+        if dict(raw) != row:
+            raise CellTransactionError(f"producer integrity payload drift: {key}")
+        declared.append(row)
+    observed = _producer_inventory(path)
+    if sorted(declared, key=lambda row: row["path"]) != observed:
+        raise CellTransactionError("producer integrity manifest membership drift")
+    relocation = payload.get("publication_relocation")
+    if relocation is not None:
+        if not isinstance(relocation, Mapping) or relocation.get("version") != (
+            PRODUCER_PUBLICATION_INTEGRITY_VERSION
+        ):
+            raise CellTransactionError("producer publication relocation schema mismatch")
+        mapping = relocation.get("root_mapping")
+        changes = relocation.get("changed_files")
+        if not isinstance(mapping, Mapping) or not isinstance(changes, list):
+            raise CellTransactionError("producer publication relocation evidence is incomplete")
+        if committed_root is not None and mapping.get("after") != str(
+            Path(committed_root).resolve()
+        ):
+            raise CellTransactionError("producer publication destination identity mismatch")
+        if relocation.get("changed_file_count") != len(changes):
+            raise CellTransactionError("producer publication change count mismatch")
+        change_paths: set[str] = set()
+        for change in changes:
+            if not isinstance(change, Mapping):
+                raise CellTransactionError("producer publication change row is invalid")
+            relative = _safe_relative_path(change.get("path"), "producer changed path")
+            key = relative.as_posix()
+            if key in change_paths:
+                raise CellTransactionError("producer publication change path is duplicated")
+            change_paths.add(key)
+            target = path.parent / relative
+            if target.is_symlink() or not target.is_file():
+                raise CellTransactionError("producer publication changed file is missing")
+            if _file_sha256(target) != change.get("after_sha256"):
+                raise CellTransactionError("producer publication changed file hash drift")
+            if change.get("non_path_semantic_sha256_before") != change.get(
+                "non_path_semantic_sha256_after"
+            ):
+                raise CellTransactionError("producer publication changed non-path semantics")
+    return {
+        "status": "pass",
+        "path": str(path.resolve()),
+        "file_count": len(declared),
+        "manifest_sha256": _file_sha256(path),
+        "publication_relocation_verified": relocation is not None,
+    }
+
+
+def validate_producer_integrity_manifests(
+    root: str | Path,
+    *,
+    require_manifest: bool = False,
+) -> dict[str, Any]:
+    base = Path(root)
+    manifests = _producer_manifest_paths(base)
+    if require_manifest and not manifests:
+        raise CellTransactionError("published producer integrity manifest is required")
+    audits = [
+        validate_producer_integrity_manifest(path, committed_root=base)
+        for path in manifests
+    ]
+    return {
+        "status": "pass",
+        "manifest_count": len(audits),
+        "manifests": audits,
+    }
 
 
 def _safe_relative_path(value: Any, label: str) -> Path:
@@ -217,29 +368,143 @@ def single_child_directory(root: str | Path) -> Path:
     return children[0]
 
 
-def _rebase_internal_paths(source: Path, destination: Path) -> int:
-    """Rebase UTF-8 path fields before atomic publication from staging to durable root."""
+def _json_string_locations(value: Any, needle: str) -> list[tuple[str, ...]]:
+    result: list[tuple[str, ...]] = []
 
-    old = str(source.resolve()).encode("utf-8")
-    new = str(destination.resolve(strict=False)).encode("utf-8")
-    changed = 0
+    def visit(item: Any, location: tuple[str, ...]) -> None:
+        if isinstance(item, Mapping):
+            for key, child in item.items():
+                visit(child, (*location, str(key)))
+        elif isinstance(item, list):
+            for child in item:
+                visit(child, (*location, "*"))
+        elif isinstance(item, str) and needle in item:
+            result.append(location)
+
+    visit(value, ())
+    return result
+
+
+def _path_location_allowed(location: tuple[str, ...]) -> bool:
+    compact = tuple(part for part in location if part != "*")
+    return any(compact[-len(suffix):] == suffix for suffix in _ALLOWED_JSON_PATH_SUFFIXES)
+
+
+def _normalized_path_sha256(data: bytes, source: bytes, destination: bytes) -> str:
+    placeholder = b"<CELL_PUBLICATION_ROOT>"
+    return hashlib.sha256(
+        data.replace(source, placeholder).replace(destination, placeholder)
+    ).hexdigest()
+
+
+def _rewrite_declared_internal_paths(source: Path, destination: Path) -> dict[str, Any]:
+    """Rewrite only enumerated path fields and prove all other bytes are unchanged."""
+
+    old_text = str(source.resolve())
+    new_text = str(destination.resolve(strict=False))
+    old = old_text.encode("utf-8")
+    new = new_text.encode("utf-8")
+    changes: list[dict[str, Any]] = []
     for path in sorted(source.rglob("*")):
         if path.is_symlink():
             raise CellTransactionError(f"cell artifact symlink is forbidden: {path}")
-        if not path.is_file() or path.name in {"cell_stdout.log", "cell_stderr.log"}:
+        if not path.is_file() or path.name in {
+            "cell_stdout.log", "cell_stderr.log", "artifact_integrity_manifest.json"
+        }:
             continue
-        data = path.read_bytes()
-        if old not in data:
+        before = path.read_bytes()
+        if old not in before:
             continue
         try:
-            data.decode("utf-8")
+            decoded = before.decode("utf-8")
         except UnicodeDecodeError as exc:
             raise CellTransactionError(
                 f"binary artifact embeds staging path and cannot be relocated: {path}"
             ) from exc
-        path.write_bytes(data.replace(old, new))
-        changed += 1
-    return changed
+        locations: list[str]
+        if path.suffix == ".json":
+            try:
+                parsed = json.loads(decoded)
+            except json.JSONDecodeError as exc:
+                raise CellTransactionError(
+                    f"JSON artifact with staging path is invalid: {path}"
+                ) from exc
+            raw_locations = _json_string_locations(parsed, old_text)
+            if not raw_locations or any(
+                not _path_location_allowed(location) for location in raw_locations
+            ):
+                raise CellTransactionError(
+                    f"undeclared JSON path relocation field: {path} {raw_locations}"
+                )
+            locations = ["$." + ".".join(location) for location in raw_locations]
+        elif path.name in _ALLOWED_TEXT_RELOCATION_NAMES:
+            locations = ["$text:absolute_command_path"]
+        else:
+            raise CellTransactionError(f"undeclared text path relocation file: {path}")
+        after = before.replace(old, new)
+        before_semantic = _normalized_path_sha256(before, old, new)
+        after_semantic = _normalized_path_sha256(after, old, new)
+        if before_semantic != after_semantic:
+            raise CellTransactionError("publication changed non-path payload bytes")
+        path.write_bytes(after)
+        changes.append(
+            {
+                "path": path.relative_to(source).as_posix(),
+                "allowed_locations": locations,
+                "before_sha256": hashlib.sha256(before).hexdigest(),
+                "after_sha256": hashlib.sha256(after).hexdigest(),
+                "non_path_semantic_sha256_before": before_semantic,
+                "non_path_semantic_sha256_after": after_semantic,
+            }
+        )
+    return {
+        "version": PRODUCER_PUBLICATION_INTEGRITY_VERSION,
+        "root_mapping": {"before": old_text, "after": new_text},
+        "changed_file_count": len(changes),
+        "changed_files": changes,
+    }
+
+
+def _rebuild_producer_manifests(
+    source: Path,
+    destination: Path,
+    manifests: Sequence[Path],
+    relocation: Mapping[str, Any],
+    before_hashes: Mapping[str, str],
+) -> list[dict[str, Any]]:
+    reports: list[dict[str, Any]] = []
+    changes = list(relocation["changed_files"])
+    for manifest in manifests:
+        relative_manifest = manifest.relative_to(source).as_posix()
+        producer_prefix = manifest.parent.relative_to(source)
+        producer_changes = []
+        for change in changes:
+            changed_path = Path(str(change["path"]))
+            try:
+                producer_relative = changed_path.relative_to(producer_prefix).as_posix()
+            except ValueError:
+                continue
+            producer_changes.append({**change, "path": producer_relative})
+        payload = json.loads(manifest.read_text(encoding="utf-8"))
+        payload["files"] = _producer_inventory(manifest)
+        payload["publication_relocation"] = {
+            "version": PRODUCER_PUBLICATION_INTEGRITY_VERSION,
+            "root_mapping": dict(relocation["root_mapping"]),
+            "producer_manifest_sha256_before": before_hashes[relative_manifest],
+            "changed_file_count": len(producer_changes),
+            "changed_files": producer_changes,
+            "non_path_data_preserved": True,
+        }
+        manifest.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
+            encoding="utf-8",
+        )
+        report = validate_producer_integrity_manifest(
+            manifest, committed_root=destination
+        )
+        report["path"] = str((destination / Path(relative_manifest)).resolve(strict=False))
+        reports.append(report)
+    return reports
 
 
 def stable_cell_id(phase: str, coordinates: Mapping[str, Any]) -> str:
@@ -578,6 +843,18 @@ class FormalCellLedger:
             CELL_ARTIFACT_PUBLICATION_CONTRACT_VERSION
         ):
             raise CellTransactionError("committed marker publication contract mismatch")
+        producer_audit = validate_producer_integrity_manifests(path)
+        producer_binding_required = bool(producer_audit["manifest_count"]) or (
+            "producer_integrity_manifest_count" in marker
+        )
+        if producer_binding_required and marker.get(
+            "producer_integrity_manifest_count"
+        ) != producer_audit["manifest_count"]:
+            raise CellTransactionError("committed marker producer manifest count mismatch")
+        if producer_binding_required and marker.get(
+            "producer_integrity_manifests"
+        ) != producer_audit["manifests"]:
+            raise CellTransactionError("committed marker producer integrity audit drift")
         return record
 
     def _recover_published_cell(self, cell_id: str) -> dict[str, Any] | None:
@@ -607,6 +884,11 @@ class FormalCellLedger:
         inventory_hash = _canonical_sha256(inventory)
         if marker.get("artifact_inventory_sha256") != inventory_hash:
             raise CellTransactionError("published cell marker output hash mismatch")
+        producer_audit = validate_producer_integrity_manifests(target)
+        if (producer_audit["manifest_count"] or "producer_integrity_manifests" in marker) and marker.get(
+            "producer_integrity_manifests"
+        ) != producer_audit["manifests"]:
+            raise CellTransactionError("published cell producer integrity drift")
         return self._append(
             self._base(
                 cell_id=cell_id,
@@ -748,10 +1030,38 @@ class FormalCellLedger:
             required_path = artifact_root / required
             if required_path.is_symlink() or not required_path.is_file():
                 raise CellTransactionError(f"cell required artifact is missing: {relative}")
-        relocated_file_count = (
-            _rebase_internal_paths(artifact_root, target)
-            if rebase_internal_paths else 0
+        producer_manifests = _producer_manifest_paths(artifact_root)
+        producer_before = []
+        producer_before_hashes: dict[str, str] = {}
+        for manifest_path in producer_manifests:
+            audit = validate_producer_integrity_manifest(manifest_path)
+            if audit["publication_relocation_verified"]:
+                raise CellTransactionError("producer manifest was already publication-rebased")
+            producer_before.append(audit)
+            producer_before_hashes[
+                manifest_path.relative_to(artifact_root).as_posix()
+            ] = audit["manifest_sha256"]
+        relocation = (
+            _rewrite_declared_internal_paths(artifact_root, target)
+            if rebase_internal_paths
+            else {
+                "version": PRODUCER_PUBLICATION_INTEGRITY_VERSION,
+                "root_mapping": {
+                    "before": str(artifact_root.resolve()),
+                    "after": str(target.resolve(strict=False)),
+                },
+                "changed_file_count": 0,
+                "changed_files": [],
+            }
         )
+        producer_after = _rebuild_producer_manifests(
+            artifact_root,
+            target,
+            producer_manifests,
+            relocation,
+            producer_before_hashes,
+        )
+        relocated_file_count = int(relocation["changed_file_count"])
         inventory = artifact_inventory(artifact_root)
         inventory_hash = _canonical_sha256(inventory)
         marker = {
@@ -767,10 +1077,19 @@ class FormalCellLedger:
             "validated_payload_path_before_publication": str(artifact_root),
             "committed_destination": str(target),
             "internal_path_relocation_file_count": relocated_file_count,
+            "producer_integrity_manifest_count": len(producer_after),
+            "producer_integrity_manifests": producer_after,
+            "producer_integrity_manifests_before_publication": producer_before,
+            "publication_relocation": relocation,
             "publication_order": [
-                "validate_complete_payload",
+                "validate_original_producer_manifest_and_payload",
+                "apply_enumerated_path_relocation_only",
+                "prove_non_path_semantics_unchanged",
+                "rebuild_and_validate_final_producer_manifest",
+                "build_transaction_inventory_including_producer_manifest",
                 "write_committed_marker_in_staging",
                 "atomic_rename_to_committed_destination",
+                "reread_final_producer_and_transaction_integrity",
                 "append_committed_ledger_terminal",
             ],
         }
@@ -1039,6 +1358,7 @@ __all__ = [
     "CELL_CHILD_OUTPUT_DESCRIPTOR_VERSION",
     "CELL_IDENTITY_VERSION",
     "CELL_STATUSES",
+    "PRODUCER_PUBLICATION_INTEGRITY_VERSION",
     "CellExecutionIdentity",
     "CellTransactionError",
     "FORMAL_CELL_LEDGER_VERSION",
@@ -1052,5 +1372,7 @@ __all__ = [
     "stable_cell_id",
     "stable_episode_id",
     "validate_cell_ledger",
+    "validate_producer_integrity_manifest",
+    "validate_producer_integrity_manifests",
     "write_child_output_descriptor",
 ]

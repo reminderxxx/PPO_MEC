@@ -594,6 +594,61 @@ def resolve_generated_checkpoint_resource(
 def add_generated_checkpoint_resource_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--generated-checkpoint-registry-path", default="")
     parser.add_argument("--checkpoint-provenance-id", default="")
+    parser.add_argument("--evaluation-model-source-reference-path", default="")
+
+
+def evaluation_model_source_scope(
+    args: argparse.Namespace,
+    *,
+    default_run_root: str | Path,
+    protocol: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Resolve an explicitly reviewed cross-run source; never infer reuse from paths."""
+
+    reference_path = str(
+        getattr(args, "evaluation_model_source_reference_path", "") or ""
+    )
+    if not reference_path:
+        root = Path(default_run_root).resolve()
+        return {
+            "evaluation_only": False,
+            "run_root": root,
+            "run_id": root.name,
+            "reference": None,
+        }
+    from src.runtime.evaluation_only_execution import (
+        SOURCE_RUN_ID,
+        validate_model_source_reference,
+    )
+
+    reference = _strict_json_object(Path(reference_path), "evaluation model source reference")
+    validate_model_source_reference(reference)
+    if reference.get("source_run_id") != SOURCE_RUN_ID:
+        raise GeneratedCheckpointResourceError("unreviewed evaluation model source")
+    if protocol is not None and reference.get("protocol_semantic_sha256") != protocol.get(
+        "hashes", {}
+    ).get("semantic_sha256"):
+        raise GeneratedCheckpointResourceError("evaluation source Protocol identity drift")
+    registry = Path(str(getattr(args, "generated_checkpoint_registry_path", "") or "")).resolve()
+    if registry != Path(reference["source_generated_registry_path"]).resolve():
+        raise GeneratedCheckpointResourceError("evaluation source registry path drift")
+    for attribute, field in (
+        ("resolved_execution_context_path", "source_context_path"),
+        ("formal_training_execution_binding_path", "source_binding_path"),
+    ):
+        supplied = str(getattr(args, attribute, "") or "")
+        if supplied and Path(supplied).resolve() != Path(reference[field]).resolve():
+            raise GeneratedCheckpointResourceError(
+                f"evaluation source identity path drift: {attribute}"
+            )
+    root = Path(reference["source_run_root"]).resolve()
+    return {
+        "evaluation_only": True,
+        "run_root": root,
+        "run_id": SOURCE_RUN_ID,
+        "reference": reference,
+        "source_reference_sha256": reference["source_reference_sha256"],
+    }
 
 
 def resolve_generated_checkpoint_arguments(
@@ -609,7 +664,12 @@ def resolve_generated_checkpoint_arguments(
         raise GeneratedCheckpointResourceError(
             "generated checkpoint registry is required before checkpoint access"
         )
-    run_root = Path(registry_path).resolve().parent
+    scope = evaluation_model_source_scope(
+        args,
+        default_run_root=Path(registry_path).resolve().parent,
+        protocol=protocol,
+    )
+    run_root = Path(scope["run_root"])
     static_registry_path = str(getattr(args, "resource_registry_path", "") or "")
     if not static_registry_path:
         raise GeneratedCheckpointResourceError("static resource registry is required")
@@ -617,7 +677,7 @@ def resolve_generated_checkpoint_arguments(
     registry, validation = load_generated_checkpoint_registry(
         registry_path,
         run_root=run_root,
-        expected_run_id=run_root.name,
+        expected_run_id=scope["run_id"],
         static_registry_semantic_sha256=str(static.get("hashes", {}).get("semantic_sha256") or ""),
         protocol_semantic_sha256=(protocol or {}).get("hashes", {}).get("semantic_sha256"),
         protocol_full_sha256=(protocol or {}).get("hashes", {}).get("full_sha256"),
@@ -656,13 +716,14 @@ def resolve_generated_checkpoint_arguments(
         "manifest": manifest,
         "provenance": provenance,
         "capacity_label": manifest["capacity_label"],
+        "evaluation_model_source": scope,
     }
     setattr(args, "_generated_checkpoint_resource_resolution", audit)
     return audit
 
 
-def required_forwarded_flags() -> tuple[str, ...]:
-    return (
+def required_forwarded_flags(args: argparse.Namespace | None = None) -> tuple[str, ...]:
+    flags = (
         "--resource-registry-path",
         "--repository-root",
         "--data-root",
@@ -677,6 +738,9 @@ def required_forwarded_flags() -> tuple[str, ...]:
         "--checkpoint-manifest-id",
         "--checkpoint-provenance-id",
     )
+    if args is not None and getattr(args, "evaluation_model_source_reference_path", ""):
+        flags = (*flags, "--evaluation-model-source-reference-path")
+    return flags
 
 
 def audit_forwarded_resource_arguments(
@@ -684,7 +748,7 @@ def audit_forwarded_resource_arguments(
 ) -> dict[str, Any]:
     command_list = list(command)
     values: dict[str, str] = {}
-    for flag in required_forwarded_flags():
+    for flag in required_forwarded_flags(args):
         if command_list.count(flag) != 1:
             raise GeneratedCheckpointResourceError(
                 f"nested consumer must consume exactly one {flag}"
@@ -713,6 +777,7 @@ __all__ = [
     "audit_forwarded_resource_arguments",
     "build_generated_checkpoint_registry",
     "canonical_sha256",
+    "evaluation_model_source_scope",
     "load_generated_checkpoint_registry",
     "publish_or_validate_generated_checkpoint_registry",
     "resolve_generated_checkpoint_arguments",

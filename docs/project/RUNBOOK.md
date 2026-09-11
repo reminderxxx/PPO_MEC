@@ -53,6 +53,20 @@ formal_statistics → formal_gate → complete_without_holdout` 继续；不重�
 
 # Runbook
 
+## G14R20-I evaluation-only（当前仅申请，禁止 execute）
+
+科学 checkout 必须为持久目录 `artifacts/execution_checkouts/g14r20_i_scientific_a6d1fd8` 且精确固定
+`a6d1fd8`；executor 使用独立 `codex/g14r20-i-evaluation-only` 的最终代码 commit。准备命令只允许运行
+`prepare_typed_model_cache_evaluation_only.py --action prepare`，输出到新的 analysis 目录；要求目标 evaluation
+run root 不存在。随后用 `--action validate` 重读 150 source、command matrix 和实际 phase parsers。
+
+prepare 不得创建 grant、run ledger、lock 或 staging。只有后续独立任务取得绑定最终 commit/source reference/
+review 的 project grant，才可调用 `run_typed_model_cache_evaluation_only.py --check execute`；当前 Goal 不得调用。
+允许阶段只有 cache-policy、controller、ablation、support、scalability、statistics、gate 和
+complete_without_holdout。旧 v16 的 288 MB 结果与 576 MB staging 永远不能作为 `--input-root` 或统计 rows。
+
+完整操作合同见 `evaluation_only_execution_contract.md`。
+
 ## Protocol 2.9 与未来 G14C v16
 
 唯一 live index：`configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_index.json`。

@@ -616,3 +616,11 @@ G14R20-D 明确剩余人工边界：签名不能证明原件来源/语义、host
   state 与签名 revocation 独立复算后才可为新宿主签 receipt。
 - 残余外部边界：release 资格方案未采纳，production trust 未安装，真实 owner/verifier/issuer 未指定，真实
   continuation 未签发。实现通过也不能消除这些 pending 状态，不能据此恢复 v16 或运行 G14D/G15。
+## 2026-09-11 G14R20-I 已关闭：producer manifest 被 publication relocation 失效
+
+- 已复现旧 288 MB cell 的 transaction inventory 全通过但 producer manifest 2,702 项失效；原因是清单生成后
+  执行了未受字段约束的 UTF-8 路径替换。
+- 新 publisher 在任何改写前验证 producer payload，只允许合同列举的路径字段，记录 before/after 与非路径语义
+  hash，重建最终 producer manifest 后再生成 transaction inventory；最终目录、重复消费、recovery 和 gate
+  统一双层检查。
+- 旧 288 MB 内部 manifest 不会被回写修复，仍保留为历史 stale 证据；576 MB staging 不升级为结果。

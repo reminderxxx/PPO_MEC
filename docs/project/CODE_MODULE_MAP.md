@@ -12,6 +12,21 @@
 
 # Code Module Map
 
+## G14R20-I evaluation-only identity / publication closure
+
+- `src/runtime/evaluation_only_execution.py`：固定 H 审查、旧 v16/科学 commit、150 坐标/hash，生成来源引用与新
+  run command contract，并拒绝旧 288/576 路径、训练/选模/freeze/holdout 扩权。
+- `src/runtime/generated_checkpoint_resources.py`：普通 same-run 规则不变；仅显式 source reference 分支允许固定
+  来源 registry/companion，并向 outer/nested consumer 传递同一 reference。
+- `src/evaluators/formal_cell_transaction.py`：producer 原清单验证、字段白名单 relocation、非路径语义证明、最终
+  producer 清单重建、transaction inventory/marker、发布后及 recovery 双层复验。
+- `scripts/manage_typed_model_cache_formal_artifacts.py`：evaluation-only gate 将来源 150 模型与新 run 0 个
+  train/dev/freeze 分开计数，并对每个 committed cell 执行同一双层完整性检查。
+- `scripts/prepare_typed_model_cache_evaluation_only.py` / `run_typed_model_cache_evaluation_only.py`：未签发申请与
+  exact project-grant 执行边界；没有 holdout/recovery action。
+- `tests/test_evaluation_only_identity_contract.py` / `test_evaluation_only_publication_integrity.py`：身份、权限、旧
+  结果排除、manifest/path/symlink、non-path tamper 与原子发布回归。
+
 ## G14R18 provenance envelope / shared identity boundary
 
 - `scripts/manage_typed_model_cache_formal_artifacts.py`：`write_checkpoint_companions` 保持完整 17 字段 provenance
