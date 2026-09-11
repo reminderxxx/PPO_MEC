@@ -66,9 +66,13 @@ or result. The generated request is retained outside Git at
 ## Verification boundary
 
 The repository contains the targeted negative/consumer tests and the recorded
-147-test targeted acceptance XML under the readiness artifact directory. A
-fresh test rerun on this host was not possible because the available Python
-environment has neither `pytest` nor `yaml`; full formal rollout, training,
-real-data evaluation and holdout were not run (zero by design). Static
-source/import compilation must therefore be rerun in the project's configured
-dependency environment before authorization.
+147-test targeted acceptance XML under the readiness artifact directory. The
+recorded full regression is 1,642 tests with 84 errors and 61 failures; these
+are environment/dependency failures in the broader continuation suite, not a
+passing full-regression claim. A fresh target rerun on this host was not
+possible because no compatible `pytest` runner is installed and the available
+Python environment lacks runtime dependencies such as `yaml`. The six changed
+entry points pass Python AST/bytecode compilation. Full formal rollout,
+training, real-data evaluation and holdout were not run (zero by design).
+Static source/import compilation and the full regression must be rerun in the
+project's configured dependency environment before authorization.
