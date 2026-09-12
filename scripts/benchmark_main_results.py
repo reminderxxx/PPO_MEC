@@ -1368,7 +1368,14 @@ def main() -> None:
             "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
         }
         fairness_audit_path.write_text(json.dumps(fairness_audit, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
-    integrity_files = [aggregate_path, rows_path, run_manifest_path, command_log_path]
+    integrity_files = [
+        aggregate_path,
+        rows_path,
+        comparison_path,
+        diagnosis_path,
+        run_manifest_path,
+        command_log_path,
+    ]
     integrity_files.extend(sorted(episode_root.rglob("*.summary.json")))
     if fairness_manifest is not None:
         integrity_files.extend([resolved_manifest_path, fairness_audit_path])
