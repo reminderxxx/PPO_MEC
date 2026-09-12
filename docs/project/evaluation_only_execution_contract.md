@@ -7,6 +7,26 @@
 - `formal_execution_started`: `false`
 - `holdout_opened`: `false`
 
+## 2026-09-13 I3 producer integrity 修复
+
+G14E02 `typed_model_cache_evaluation_only_20260912_g14r20_i2_pending` 已在首个
+`formal_cache_policy` cell 以 `failed_terminal` 终止：科学 child rc=0，但 producer manifest 声明 2,706
+项、实际 payload 2,708 项，遗漏 `comparison_against_popularity.json` 与
+`sa_advantage_diagnosis.json`。0 cell committed，旧 staging、ledger、held lock、grant 和原始证据必须原样
+保留；该 run、I2 申请和 grant 均不可恢复、重试、改写或复用。I2 的 bootstrap/handoff 工程验收只保留为
+当前回归依据，不再构成执行授权。
+
+I3 仅将 benchmark producer 已写出的两个诊断文件加入其原始 `integrity_files`。producer validator、精确成员
+校验、路径白名单重定位、非路径语义证明、transaction inventory 和原子发布均保持不变。真实小型
+`benchmark_main_results.py` 非正式验收覆盖 fairness manifest 有/无、发布前及重定位后校验、descriptor→cell
+transaction→原子发布→双层重复回读，以及漏成员、缺文件、hash/size 漂移、额外文件、重复成员五类拒绝。
+这些执行是受控 non-formal rollout，不是 formal performance；本修复没有训练、选模、freeze、正式评估或
+holdout。
+
+新的 unsigned request 必须在最终 executor commit 的持久 clean checkout 上 create-only 生成，使用全新 run ID
+和不存在的 run root，并通过真实 `--action validate`。prepare/validate 不签 grant、不创建 run/ledger/lock/
+staging，也不启动 G14E03。
+
 ## 两条身份链
 
 模型来源固定为旧 run `typed_model_cache_formal_20260906_152847_g14c_v16`、科学 commit

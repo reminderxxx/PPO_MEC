@@ -1,3 +1,23 @@
+## 2026-09-13: G14R20-I3 benchmark producer membership closure
+
+- G14E02 在首个 `formal_cache_policy` cell 的原子发布前终止；科学 child rc=0，producer manifest 为
+  2,706 declared / 2,708 observed，唯一遗漏是 `comparison_against_popularity.json` 与
+  `sa_advantage_diagnosis.json`。0 committed、1 failed-terminal，其余 cell/阶段未启动；E02、旧 grant、
+  ledger、staging、held lock 和原始证据不恢复、不重试、不改写。
+- first-order 修复只把两个已写盘诊断文件加入 `scripts/benchmark_main_results.py` 的 `integrity_files`；共享
+  validator、精确成员校验、双层完整性、消费者和 phase 逻辑均未放宽或复制。
+- 真实小型 `reactive_lru` producer 在 fairness 有/无分支均通过精确成员、size、SHA-256 校验；实际
+  descriptor→transaction→路径重定位→原子发布→producer/transaction 双层重复回读通过。漏诊断成员、缺文件、
+  内容/hash/size 漂移、额外文件、重复成员均为 `failed_terminal` 且无 committed marker。
+- clean 实现提交 `51607da` 上 I3+I2/publication 专项 `99 passed`；补充 RUNBOOK 固定的独立临时
+  `cryptography==46.0.5` 依赖后，全仓 `1697 passed`。smoke、全 Python compileall 和目标 import 通过。首次
+  全仓运行因冻结 `.venv` 未内置该可选依赖而为 `1592 passed, 21 failed, 84 errors`，未隐藏或跳过。
+- I2 原申请已失去 create-only 启动条件；I2 工程验收仅保留为历史回归证据。最终 executor、持久 clean
+  checkout、新 unsigned request/全新 run ID、真实 validate 和独立证据审查由 I3 最终交付绑定。
+- 本轮只有受控 non-formal rollout；没有 formal performance、训练、更新、选模、freeze、grant、正式 run、
+  G14E03 或 holdout。`formal_execution_authorized=false`、`formal_execution_started=false`、
+  `holdout_opened=false`。
+
 ## 2026-09-11: G14R20-G 当前状态复核（BLOCKED / 已启动后失败）
 
 - 9 月 10 日的 executor `cc32e6e`、独立 review 与 grant 静态绑定仍完整，但其零执行证据仅代表当时快照；

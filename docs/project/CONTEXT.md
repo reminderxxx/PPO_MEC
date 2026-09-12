@@ -1,7 +1,8 @@
-> **2026-09-11 当前准备状态（G14R20-I）**：旧 v16 维持失败终态，不恢复。H 审查验证的 150 个冻结模型
-> 可作为未来新 evaluation-only run 的来源；新来源/执行双身份与 publication 双层完整性入口已进入验收。
-> 当前不签发 grant、不创建正式 run ledger、不启动评估，`formal_execution_authorized=false`、
-> `formal_execution_started=false`、`holdout_opened=false`。详见
+> **2026-09-13 G14R20-I3**：G14E02 因 benchmark producer 漏登两个诊断 JSON 在首 cell 发布前永久
+> failed-terminal，0 committed；不恢复、不重试、不复用其申请/grant/run。I3 只修复共享 producer membership，
+> 并以真实小型 non-formal benchmark、原子发布和双层回读验收；I2 历史工程验收不再构成当前授权。
+> 新 I3 unsigned request 必须绑定最终 clean executor 与全新不存在的 run root；当前不签 grant、不启动 G14E03，
+> `formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。详见
 > [evaluation-only 合同](evaluation_only_execution_contract.md)。
 >
 > **2026-09-11 原接续状态（G14R20-G）**：9 月 10 日的一次性本地 grant 已被实际使用，
@@ -17,7 +18,7 @@
 
 ﻿# Context
 
-更新日期：2026-09-11
+更新日期：2026-09-13
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 

@@ -15,6 +15,13 @@
 > producer manifest 在 publication relocation 后失效而 transaction inventory 仍通过的问题。当前仅准备未签发
 > 授权申请；`formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。
 >
+> **2026-09-13 G14R20-I3**：G14E02 因 benchmark producer 漏登
+> `comparison_against_popularity.json` 与 `sa_advantage_diagnosis.json` 在首 cell 发布前永久
+> failed-terminal，0 committed。I3 仅补齐共享 producer manifest membership，保留精确 validator 和双层
+> publication integrity；真实小型验收均为 non-formal，不是 formal performance。E02 与 I2 申请/grant 不复用，
+> 当前不签 grant、不启动 G14E03，holdout 未开启。详见
+> [docs/project/evaluation_only_execution_contract.md](docs/project/evaluation_only_execution_contract.md)。
+>
 > **2026-09-08 追加勘误（G14R20-A）**：G14R18 补验任务新增正式执行为零，不表示既有 v16 未创建。
 > 既有 v16 已完成 150 train cells、24 dev cells、1,200 candidates、150 selected/frozen checkpoints 与 6 个 generated resources；
 > 无 failed terminal，尚无后续 formal 阶段。恢复门禁受阻不等于 run 失效。下文历史正文保留；涉及项目当前状态时以本勘误为准。

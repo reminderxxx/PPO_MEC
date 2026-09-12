@@ -1,3 +1,17 @@
+## G14R20-I3 producer integrity 与新申请（仅 prepare/validate）
+
+G14E02、其申请/grant/run root/ledger/staging/held lock 均为不可复用失败现场。I3 先在最终提交的持久 clean
+executor checkout 上运行 `tests/test_benchmark_producer_integrity.py` 和 I2/publication 回归；真实小型 benchmark
+必须明确标为 non-formal。全仓 continuation 测试若冻结 `.venv` 缺 `cryptography`，按本文件既有 G14R20-D
+规则将 `requirements_continuation.txt` 安装到独立临时目录并显式加入 `PYTHONPATH`，不得修改冻结 `.venv` 或
+skip 失败。
+
+完成最终 clean 验收后，使用 `scripts/prepare_typed_model_cache_evaluation_only.py --action prepare` 生成全新
+create-only unsigned request，绑定最终 executor commit/tree/checkout、原 v16 150 模型来源、科学 commit
+`a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d`、全新 run ID 和尚不存在的 run root；再用相同入口
+`--action validate` 只读验证 150 source 与 8/24/3 command/parser。不得创建 grant、正式 run、ledger、lock、
+staging，不得调用 `run_typed_model_cache_evaluation_only.py --check execute`，不得启动 G14E03 或 holdout。
+
 ## 2026-09-11 G14R20-G：停止使用旧启动命令
 
 9 月 10 日 grant 已被实际用于 `formal_cache_policy`，该 phase 以 rc=1 失败且存在不可重试

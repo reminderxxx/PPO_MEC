@@ -1,3 +1,16 @@
+## 2026-09-13: benchmark producer 诊断文件漏登（RESOLVED；G14E02 永久 terminal）
+
+- 根因：`benchmark_main_results.py` 写出 `comparison_against_popularity.json` 和
+  `sa_advantage_diagnosis.json`，但构造 producer `integrity_files` 时没有加入对应路径。E02 科学 child 成功
+  不等于 publication 成功；真实 validator 正确拒绝 2,706 declared / 2,708 observed 的成员漂移。
+- 修复：只把两项加入共享 producer 清单；没有删除诊断文件、设置消费者忽略、发布期静默补登记、吞异常或
+  改写 E02。fairness 有/无的真实 producer、原子发布/重定位/双层回读和五类负例均有回归。
+- 历史边界：E02 为 0 committed / 1 failed-terminal，禁止恢复、重试、清锁、改 staging/ledger/manifest 或
+  复用旧申请/grant。I2 验收仍证明其历史 bootstrap/handoff 工程边界，但不再是当前授权依据。
+- 剩余风险：I3 验收只运行小型 reactive-agent non-formal rollout，不提供 150 模型的 formal performance、
+  statistics、gate 或 paper-ready 证据。新 unsigned request 仍须绑定最终 clean executor 并独立 review；
+  grant 和 G14E03 均未签发/启动，holdout 保持 sealed/unopened。
+
 ## 2026-09-11: v16 formal_cache_policy 已失败且固定科学 worktree 不完整（OPEN BLOCKER）
 
 - 9 月 10 日 grant 签发后，真实 `formal_cache_policy` 已启动。phase ledger 末条为 `failed`、rc=1；cell

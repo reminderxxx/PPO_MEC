@@ -1,5 +1,8 @@
-> **2026-09-11 G14R20-I**：新 evaluation-only 来源/执行身份与双层 publication integrity 合同见
-> [evaluation_only_execution_contract.md](evaluation_only_execution_contract.md)。当前仅为未签发授权申请，未执行。
+> **2026-09-13 G14R20-I3**：G14E02 因 benchmark producer 漏登两个诊断文件在首 cell 发布前永久
+> failed-terminal；I3 仅修复共享 producer membership，并保留精确 validator 与双层 publication integrity。
+> 新 evaluation-only 身份和未授权边界见
+> [evaluation_only_execution_contract.md](evaluation_only_execution_contract.md)。当前不复用 I2 申请、不签 grant、
+> 不启动 G14E03。
 >
 > **2026-09-10 G14R20-G**：当前用户已允许一次性 project 授权，作用于既有 v16 的固定模型和剩余八阶段；
 > 合同见 [project_continuation_authorization_contract.md](project_continuation_authorization_contract.md)。独立技术
