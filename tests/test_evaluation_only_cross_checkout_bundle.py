@@ -72,7 +72,9 @@ def test_scientific_bundle_root_is_distinct_from_executor(
     assert context["runtime_location"]["repository_root"] == str(ROOT.resolve())
 
 
-@pytest.mark.parametrize("phase", ["formal_ablation", "formal_support"])
+@pytest.mark.parametrize(
+    "phase", ["formal_ablation", "formal_support", "formal_scalability"]
+)
 def test_actual_public_support_consumer_accepts_real_cross_checkout_dry_run(
     cross_checkout_contract: tuple[Path, dict], phase: str
 ) -> None:
