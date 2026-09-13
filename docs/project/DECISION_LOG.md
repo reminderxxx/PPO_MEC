@@ -1144,3 +1144,15 @@ proposal/approval 注入 production trust。production installation 仍为 `None
 非空目录拒绝，不以默认 resume=True 接管残留。持锁 initializer 先建立空 phase runner/ledger，后写身份/context
 和 cell ledger，最后写完整 marker。残留初始化与失败 phase 都 fail-closed；本决定不授权 cold recovery。
 初始化 state 为快照，真实科学活动与阶段完成必须由原始 dispatch/ledger/payload 区分。
+
+## 2026-09-14 G14R20-I4 executor/scientific root 与恢复边界
+
+- 决策：evaluation-only executor root 只提供运行代码与 host/runtime identity；active Protocol/bundle root 只从
+  已重验的 source reference/context 和 scientific commit/tree 解析。不能全局改写 `repository_root`。
+- 决策：frozen command 指向 executor-local科学资源时，只允许与 active bundle 相同 relative logical path、role、
+  content SHA-256 和 size 的无 symlink mirror；任意路径或 content-identical 但 logical path 不同的文件仍拒绝。
+- 决策：I3 failed phase/cell terminal 与 held lock 永久保留。现有合同不支持新 executor 直接续写；普通 grant
+  不能覆盖 code/command/ledger identity mismatch。
+- 决策：若未来批准恢复，先建立独立 bounded recovery identity，六个 committed cell 只按 external immutable
+  references 消费；失败 cell 作为 recovery attempt 2，未启动 cell 作为首次 attempt，完成 ablation 后停止并重新授权
+  后续阶段。该 primitive 本轮不实现、不签发、不执行。

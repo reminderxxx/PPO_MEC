@@ -1,0 +1,75 @@
+{
+  "draft_version": "g14r20_i4_recovery_authorization_draft_v1.0.0",
+  "status": "UNSIGNED_NOT_ISSUED_NOT_EXECUTABLE",
+  "issuable_under_current_contract": false,
+  "recovery_grant_issued": false,
+  "real_recovery_started": false,
+  "holdout_opened": false,
+  "authorization_kind": "restricted_formal_ablation_recovery_only",
+  "original_run_id": "typed_model_cache_evaluation_only_20260913_g14r20_i3_pending",
+  "original_executor_commit": "a028ea291941a484ae9cd2e316d1b52adde3d1f2",
+  "scientific_commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+  "scientific_git_tree": "eb8e83c6e4532bc45c22fb7a816388e576753e30",
+  "source_reference_sha256": "0ba289caa663d38dd35f61feafa509a3f8dc2eb4269b3220f18d383be81c3ea3",
+  "immutable_prefixes": {
+    "phase": {
+      "byte_count": 168899,
+      "record_count": 8,
+      "prefix_sha256": "a12731365111da83422ad4062ab482b08f3ee30c967084f6a32f4369bbce9adb",
+      "terminal_hash": "bfd7f4071b58d3a6f9cb61355dcfb6785c39ab490bfa4e90ebe34ac1807bb362"
+    },
+    "cell": {
+      "byte_count": 4090388,
+      "record_count": 14,
+      "prefix_sha256": "574ca9084db9ce377507edf7d210854dd69f575eed7135f4d567a35895310016",
+      "terminal_hash": "012ba1af0174f723352cf1ff7fb5aad262f80c2c6be0371cb34efee4050d149a"
+    }
+  },
+  "retained_committed_cell_count": 6,
+  "retained_cells_must_not_be_rerun_or_rewritten": true,
+  "failed_cell": {
+    "cell_id": "formal_ablation-3e9322fac172fcae01f2cc58",
+    "source_attempt": 1,
+    "source_status": "failed_terminal",
+    "proposed_recovery_attempt": 2,
+    "new_staging_required": true,
+    "old_terminal_and_staging_immutable": true
+  },
+  "unstarted_cell": {
+    "cell_id": "formal_ablation-e40a9c86c8fdbf3b7962a689",
+    "source_attempt_count": 0,
+    "proposed_attempt": 1,
+    "dispatch_after_failed_cell_recovery_commits": true
+  },
+  "required_new_executor": {
+    "minimum_reviewed_code_commit": "c1abc4ba96319bda19db7d05a2e106cf4230a38e",
+    "minimum_reviewed_code_tree": "a44f9582e8110e747f9c478ffdbe7415b69f7962",
+    "issued_grant_must_bind_final_clean_commit_and_tree": true,
+    "final_commit": null,
+    "final_tree": null
+  },
+  "required_recovery_owner_sha256": "0cfeecba26816805d6445b9513263f183a3db651c5bdbbb9e204431b9872d11f",
+  "required_quiescence": {
+    "state": "independently_verified",
+    "no_live_owner": true,
+    "no_live_descendants": true,
+    "kernel_lock_obtainable": true,
+    "lock_inode_deleted": false
+  },
+  "authorized_phase_if_later_issued": "formal_ablation",
+  "later_phases_authorized": false,
+  "training_authorized": false,
+  "dev_selection_authorized": false,
+  "checkpoint_freeze_authorized": false,
+  "holdout_capability": false,
+  "grant_signature": null,
+  "issuer": null,
+  "issued_at": null,
+  "expires_at": null,
+  "blocking_preconditions": [
+    "implement and independently accept a bounded recovery identity/ledger and external committed-cell consumer",
+    "bind the final clean executor commit/tree and acceptance evidence",
+    "repeat exact prefix, six-cell dual-integrity, source-model, lock-owner and quiescence checks",
+    "obtain a separate project-owner approval for the exact recovery scope"
+  ]
+}

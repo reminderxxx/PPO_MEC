@@ -645,3 +645,13 @@ I2 以外部单写者覆盖完整启动和衔接、最后写完整 marker、cont
 最终是否通过以 I2 clean checkout 原始验收记录为准；不能以本段或旧 I1 JUnit 代替公共入口证明。
 G14E01 六文件残留不是合法 initialized run，没有原生 failed terminal，不能恢复/清锁/重试；旧状态 flag
 不是科学 dispatch 证据。残余风险包括长时正式科学计算、实际 OS/磁盘故障和未实跑后六阶段；I2 不授权这些活动。
+## 2026-09-14 G14R20-I4：bundle-root 已修复，failed-terminal recovery primitive 仍缺失（OPEN）
+
+- `RESOLVED / consumer root role`：support consumer 不再把 executor root 当 scientific bundle root；唯一 index、
+  bundle hash、resource role/logical path/hash/size 与 executor commit/tree 继续 fail closed。
+- `OPEN / recovery contract`：原 I3 phase 为 `failed`、cell 为 `failed_terminal`；现有 reconciliation、phase v3、
+  cell v2 和 project grant 均禁止在该 terminal 后用新 executor 续写。普通新 grant、改旧 context、清锁或替换
+  manifest 都不能消除此 blocker。
+- 6 个 committed cell 与 150 个 source models 当前完整，但这只支持“保留资格”，不自动授权或实现 recovery。
+  后续必须先实现独立 recovery identity 与只读 external-cell reference consumer，再做同等双层验收并由负责人审批。
+- 当前未签 recovery grant、未启动真实恢复、未打开 holdout；正式矩阵不完整，论文结论仍为 `Unverifiable`。

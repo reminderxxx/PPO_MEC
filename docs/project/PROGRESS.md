@@ -1923,3 +1923,19 @@ G14R20-D 正在独立 B 基线分支实现 continuation 授权 2.0.0。真实 la
 两类 ledger、descriptor 与双层 publication，仅科学 child 为 test-only。最终 commit/clean checkout、实际命令、
 JUnit 和未签发新申请由独立 I2 验收记录绑定。本记录不提前将开发验收当终版结果，不作论文结论。
 `formal_execution_authorized=false`、`formal_execution_started=false`、`holdout_opened=false`。
+## 2026-09-14 G14R20-I4：跨-checkout bundle-root 已修复；恢复合同仍待批准
+
+- 根因：公共 support consumer 用 executor `ROOT` 校验 scientific checkout 的唯一 active
+  `protocol_index`；修复从已全量验证的 source reference/context 解析 scientific root，同时独立重验 executor
+  HEAD/tree/clean scope。executor-local runtime/fairness mirror 只在 logical path、role、hash、size 与 scientific
+  bundle 全相等时接受。
+- `formal_ablation`、`formal_support`、`formal_scalability` 共用入口的真实双-checkout dry-run 与
+  source/commit/hash/role/index/path 负例均纳入专项测试；不训练、不选模、不运行正式矩阵。
+- I3 原 run 的 phase/cell ledger 完整前缀通过原生 validator；6 个 committed cell 的 producer/transaction
+  双层完整性和 relocation preimage 全通过，均按身份/完整性保留，不重跑、不重写。150 个模型来源链全量复算通过。
+- 现有 reconciliation、cell ledger 与 phase ledger 均把 failed/failed-terminal 设为不可恢复 terminal；原
+  grant 又固定旧 executor/command matrix 且不含 recovery，因此新 grant 本身不足以恢复。方案要求另行实现并验收
+  bounded recovery identity/external-cell reference，原 terminal 永久只读。
+- 当前状态：工程修复已验收；恢复方案待批准。`recovery_grant_issued=false`、
+  `real_recovery_started=false`、`holdout_opened=false`。详见
+  `docs/project/g14r20_i4_restricted_recovery_plan.md`。

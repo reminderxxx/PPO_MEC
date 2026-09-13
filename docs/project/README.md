@@ -1,3 +1,9 @@
+> **2026-09-14 G14R20-I4**：evaluation-only support consumer 的 executor/scientific bundle-root
+> 角色混淆已最小修复并以真实双 checkout dry-run 验收。I3 原 run 的 6 个 committed cell 双层完整性通过，
+> 但现有 phase/cell/reconciliation 合同禁止 failed-terminal 后使用新 executor 原地续写；受限恢复方案与未签发
+> draft 见 [g14r20_i4_restricted_recovery_plan.md](g14r20_i4_restricted_recovery_plan.md)。未启动恢复、未清锁、
+> 未签 grant、未打开 holdout。
+>
 > **2026-09-13 G14R20-I3**：G14E02 因 benchmark producer 漏登两个诊断文件在首 cell 发布前永久
 > failed-terminal；I3 仅修复共享 producer membership，并保留精确 validator 与双层 publication integrity。
 > 新 evaluation-only 身份和未授权边界见
