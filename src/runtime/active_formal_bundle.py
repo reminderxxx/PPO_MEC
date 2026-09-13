@@ -857,6 +857,64 @@ def validate_registered_resource_path(
     return dict(resource)
 
 
+def validate_checkout_mirror_resource_path(
+    resource: Mapping[str, Any],
+    supplied_path: str | Path,
+    *,
+    mirror_root: str | Path,
+) -> dict[str, Any]:
+    """Validate an indexed resource at the same path in a verified executor."""
+
+    if resource.get("validation_status") != "validated":
+        raise ActiveFormalBundleError("resource path validation requires indexed resource")
+    root_path = Path(mirror_root)
+    supplied = Path(supplied_path)
+    if (
+        not root_path.is_absolute()
+        or root_path.is_symlink()
+        or not root_path.is_dir()
+        or not supplied.is_absolute()
+        or supplied.is_symlink()
+        or not supplied.is_file()
+    ):
+        raise ActiveFormalBundleError("executor mirror resource path is invalid")
+    root = root_path.resolve()
+    try:
+        relative = supplied.relative_to(root)
+    except ValueError as exc:
+        raise ActiveFormalBundleError(
+            "executor mirror resource escapes the validated checkout"
+        ) from exc
+    if (
+        any(part in {"", ".", ".."} for part in relative.parts)
+        or relative.as_posix() != resource.get("logical_path")
+    ):
+        raise ActiveFormalBundleError(
+            "executor mirror resource path differs from indexed logical path"
+        )
+    current = root
+    for part in relative.parts:
+        current = current / part
+        if current.is_symlink():
+            raise ActiveFormalBundleError(
+                "executor mirror resource must not traverse a symlink"
+            )
+    if (
+        sha256_file(supplied) != resource.get("content_sha256")
+        or supplied.stat().st_size != resource.get("size_bytes")
+    ):
+        raise ActiveFormalBundleError(
+            "executor mirror resource content differs from active bundle"
+        )
+    return {
+        "status": "pass",
+        "logical_id": resource["logical_id"],
+        "logical_path": relative.as_posix(),
+        "mirror_root": str(root),
+        "content_sha256": resource["content_sha256"],
+    }
+
+
 def build_active_bundle_resource_resolution_audit(
     bundle: Mapping[str, Any]
 ) -> dict[str, Any]:
@@ -913,6 +971,7 @@ __all__ = [
     "resolve_active_bundle_group",
     "resolve_capacity_resource_pairs",
     "resolve_support_resource",
+    "validate_checkout_mirror_resource_path",
     "validate_registered_resource_path",
     "build_active_bundle_resource_resolution_audit",
 ]

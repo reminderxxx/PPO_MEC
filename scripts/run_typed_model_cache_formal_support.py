@@ -48,6 +48,7 @@ from src.runtime.active_formal_bundle import (
     resolve_active_bundle_group,
     resolve_support_resource,
     validate_active_formal_bundle,
+    validate_checkout_mirror_resource_path,
     validate_registered_resource_path,
 )
 from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
@@ -267,19 +268,42 @@ def main() -> None:
                     "support active bundle differs from resolved context"
                 )
             supplied_runtime = Path(args.model_cache_runtime_config).resolve()
-            runtime_matches = [
-                row
-                for row in resolve_active_bundle_group(
-                    bundle, "runtime_configs", expected_role="typed runtime config"
-                )
-                if Path(row["resolved_absolute_path"]) == supplied_runtime
-            ]
+            runtime_resources = resolve_active_bundle_group(
+                bundle, "runtime_configs", expected_role="typed runtime config"
+            )
+            if evaluation_source.get("evaluation_only"):
+                try:
+                    supplied_runtime_relative = supplied_runtime.relative_to(
+                        ROOT.resolve()
+                    ).as_posix()
+                except ValueError as exc:
+                    raise ActiveFormalBundleError(
+                        "support runtime path escapes the executor checkout"
+                    ) from exc
+                runtime_matches = [
+                    row
+                    for row in runtime_resources
+                    if row["logical_path"] == supplied_runtime_relative
+                ]
+            else:
+                runtime_matches = [
+                    row
+                    for row in runtime_resources
+                    if Path(row["resolved_absolute_path"]) == supplied_runtime
+                ]
             if len(runtime_matches) != 1:
                 raise ActiveFormalBundleError(
                     "support runtime path is not one registered capacity resource"
                 )
             runtime_resource = runtime_matches[0]
-            validate_registered_resource_path(runtime_resource, supplied_runtime)
+            if evaluation_source.get("evaluation_only"):
+                runtime_input_validation = validate_checkout_mirror_resource_path(
+                    runtime_resource, supplied_runtime, mirror_root=ROOT
+                )
+            else:
+                runtime_input_validation = validate_registered_resource_path(
+                    runtime_resource, supplied_runtime
+                )
             setting = support_setting_by_id(protocol, args.setting_id)
             if args.non_formal_rehearsal:
                 fairness_resource = next(
@@ -303,21 +327,31 @@ def main() -> None:
                     f"fairness_manifests.{label}",
                     expected_role="formal fairness manifest",
                 )
-                validate_registered_resource_path(
-                    fairness_resource,
-                    Path(args.cache_baseline_fairness_manifest_path).resolve(),
-                )
             else:
                 fairness_resource = resolve_support_resource(bundle, args.setting_id)
-                validate_registered_resource_path(
-                    fairness_resource,
-                    Path(args.cache_baseline_fairness_manifest_path).resolve(),
-                )
+            if not args.non_formal_rehearsal:
+                supplied_fairness = Path(
+                    args.cache_baseline_fairness_manifest_path
+                ).resolve()
+                if evaluation_source.get("evaluation_only"):
+                    fairness_input_validation = validate_checkout_mirror_resource_path(
+                        fairness_resource, supplied_fairness, mirror_root=ROOT
+                    )
+                else:
+                    fairness_input_validation = validate_registered_resource_path(
+                        fairness_resource, supplied_fairness
+                    )
             resource_resolution_audit = {
                 "active_bundle_resource_resolution_contract_version": "1.0.0",
                 "active_bundle_sha256": bundle["active_formal_bundle_sha256"],
                 "runtime": runtime_resource,
                 "fairness": fairness_resource,
+                "runtime_input_validation": runtime_input_validation,
+                "fairness_input_validation": (
+                    fairness_input_validation
+                    if not args.non_formal_rehearsal
+                    else {"status": "validated_by_static_registry"}
+                ),
                 "validation_status": "validated",
             }
         except (ActiveFormalBundleError, EvaluationOnlyError, KeyError) as exc:
