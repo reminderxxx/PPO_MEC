@@ -51,6 +51,10 @@ from src.runtime.active_formal_bundle import (
     validate_registered_resource_path,
 )
 from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
+from src.runtime.evaluation_only_execution import (
+    EvaluationOnlyError,
+    resolve_scientific_bundle_root,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -236,8 +240,18 @@ def main() -> None:
     resource_resolution_audit = None
     if capabilities.active_bundle_resource_resolution_required:
         try:
+            bundle_root = ROOT
+            evaluation_source = (
+                generated_checkpoint_resource_audit or {}
+            ).get("evaluation_model_source", {})
+            if evaluation_source.get("evaluation_only"):
+                bundle_root = resolve_scientific_bundle_root(
+                    source_reference=evaluation_source["reference"],
+                    evaluation_context=resolved_context,
+                    executor_checkout=ROOT,
+                )
             bundle = validate_active_formal_bundle(
-                repository_root=ROOT,
+                repository_root=bundle_root,
                 index_path=resolved_context["resolved_expansion_context"][
                     "active_protocol_index_path"
                 ],
@@ -306,7 +320,7 @@ def main() -> None:
                 "fairness": fairness_resource,
                 "validation_status": "validated",
             }
-        except (ActiveFormalBundleError, KeyError) as exc:
+        except (ActiveFormalBundleError, EvaluationOnlyError, KeyError) as exc:
             raise FormalExecutionError(
                 f"support active bundle resource resolution failed: {exc}"
             ) from exc

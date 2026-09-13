@@ -336,6 +336,103 @@ def validate_model_source_reference(reference: Mapping[str, Any]) -> dict[str, A
     return {"status": "pass", "model_count": 150, "source_reference_sha256": digest}
 
 
+def resolve_scientific_bundle_root(
+    *,
+    source_reference: Mapping[str, Any],
+    evaluation_context: Mapping[str, Any],
+    executor_checkout: str | Path,
+) -> Path:
+    """Resolve the frozen scientific bundle without weakening executor identity."""
+
+    validate_model_source_reference(source_reference)
+    reference = dict(source_reference)
+    executor_path = Path(executor_checkout)
+    if (
+        not executor_path.is_absolute()
+        or executor_path.is_symlink()
+        or not executor_path.is_dir()
+    ):
+        raise EvaluationOnlyError("evaluation executor checkout identity drift")
+    executor = executor_path.resolve()
+    runtime = evaluation_context.get("runtime_location")
+    execution_identity = evaluation_context.get("evaluation_execution_identity")
+    if not isinstance(runtime, Mapping) or not isinstance(execution_identity, Mapping):
+        raise EvaluationOnlyError("evaluation executor context identity is missing")
+    executor_commit = _git(executor, "rev-parse", "HEAD")
+    executor_tree = _git(executor, "rev-parse", "HEAD^{tree}")
+    if (
+        runtime.get("clean_worktree_root") != str(executor)
+        or runtime.get("repository_root") != str(executor)
+        or execution_identity.get("executor_commit") != executor_commit
+        or execution_identity.get("executor_git_tree") != executor_tree
+    ):
+        raise EvaluationOnlyError("evaluation executor context identity drift")
+    _require_clean_code(executor)
+
+    source_identity = execution_identity.get("source_context_identity_sha256")
+    if (
+        execution_identity.get("source_run_id") != reference.get("source_run_id")
+        or execution_identity.get("model_source_reference_sha256")
+        != reference.get("source_reference_sha256")
+        or source_identity != reference.get("source_context_identity_sha256")
+    ):
+        raise EvaluationOnlyError("evaluation/scientific source identity drift")
+    source_context = _read_object(reference["source_context_path"])
+    if (
+        file_sha256(reference["source_context_path"])
+        != reference.get("source_context_sha256")
+        or source_context.get("context_sha256") != source_identity
+        or source_context.get("scientific_identity", {}).get(
+            "active_formal_bundle_sha256"
+        )
+        != evaluation_context.get("scientific_identity", {}).get(
+            "active_formal_bundle_sha256"
+        )
+    ):
+        raise EvaluationOnlyError("scientific source context identity drift")
+
+    scientific_path = Path(str(reference.get("scientific_checkout", "")))
+    if (
+        not scientific_path.is_absolute()
+        or scientific_path.is_symlink()
+        or not scientific_path.is_dir()
+    ):
+        raise EvaluationOnlyError("scientific checkout path identity drift")
+    scientific = scientific_path.resolve()
+    if (
+        _git(scientific, "rev-parse", "HEAD") != reference.get("scientific_commit")
+        or _git(scientific, "rev-parse", "HEAD^{tree}")
+        != reference.get("scientific_git_tree")
+    ):
+        raise EvaluationOnlyError("scientific checkout Git identity drift")
+    _require_clean_code(scientific)
+
+    from src.runtime.active_formal_bundle import DEFAULT_ACTIVE_INDEX_RELATIVE
+
+    protocol_path = Path(str(reference.get("protocol_path", "")))
+    index_path = Path(
+        str(
+            evaluation_context.get("resolved_expansion_context", {}).get(
+                "active_protocol_index_path", ""
+            )
+        )
+    )
+    bundle_relative = Path(DEFAULT_ACTIVE_INDEX_RELATIVE).parent
+    expected_protocol = scientific / bundle_relative / "protocol_v2_9_manifest.json"
+    expected_index = scientific / DEFAULT_ACTIVE_INDEX_RELATIVE
+    for path, expected, label in (
+        (protocol_path, expected_protocol, "Protocol"),
+        (index_path, expected_index, "active protocol index"),
+    ):
+        if (
+            not path.is_absolute()
+            or path.is_symlink()
+            or path.resolve() != expected.resolve()
+        ):
+            raise EvaluationOnlyError(f"scientific {label} path identity drift")
+    return scientific
+
+
 def build_evaluation_execution_contract(
     *,
     source_reference: Mapping[str, Any],
@@ -780,6 +877,7 @@ __all__ = [
     "build_model_source_reference",
     "canonical_sha256",
     "reject_legacy_result_path",
+    "resolve_scientific_bundle_root",
     "validate_execution_contract",
     "validate_command_matrix_parsers",
     "validate_model_source_reference",
