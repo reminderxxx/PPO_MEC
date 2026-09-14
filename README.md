@@ -5,6 +5,10 @@
 
 # PPO_MEC
 
+论文写作工作区位于 [`paper/`](paper/README.md)。其中 v0.1 主稿、证据总账、claim–evidence matrix 和写作交接
+均以冻结 scientific code/model/protocol 及原始 artifact 为边界；`paper/` 不是训练、评测、holdout 或 canonical
+晋级入口，当前结果状态为 `Unverifiable`。
+
 G14R18 已关闭正式 checkpoint provenance envelope 与共享 training identity projection 的接口错配，并冻结唯一
 live Protocol `2.9.0` 与 Readiness v21=`READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL`。完整 companion 保留
 17 字段；其中 8 个共享 identity 字段由 capability-aware 解析器在 benchmark 边界提取，并与已验证

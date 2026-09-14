@@ -158,6 +158,7 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
   execution-neutral scientific config、binding schema、environment manifest与index；runtime binding不写入该目录
 - `data/`：原始数据与处理后数据；通过 Git LFS 版本化，完整克隆后需执行 `git lfs pull`
 - `docs/`：长期维护文档，`docs/project/` 为事实来源，`docs/project/DATASET_SOURCES.md` 记录数据源声明，`docs/project/literature_reference_table.md` 记录顶刊/顶会 related-work 参考表，`docs/benchmark_plan_or_baseline_plan.md`、`docs/baseline_formalization_round1.md`、`docs/experiment_status_round1.md`、`docs/mechanism_activation_check_round1.md` 和 `docs/experiment_runbook_round1.md` 记录 baseline 计划、round1 状态、机制诊断与复跑命令
+- `paper/`：独立论文写作区，包含英文 manuscript、证据总账、claim–evidence matrix 和写作交接；只消费冻结代码/协议与只读 artifact，不是 scientific artifact、实验执行、holdout 或 canonical 晋级入口
 - `scripts/`：数据检查、dry-run、训练、评估和 benchmark 入口
 - `scripts/run_top_journal_final_submission_loop.py`：最终交稿 learned-primary 自循环入口，编排 learned baseline 重训、formal/holdout gate、cluster bootstrap statistics 和 support suites
 - `scripts/build_top_journal_comparison_report.py`：最终交稿 comparison package 生成入口，汇总 baseline protocol matrix、reward margins、mechanism paired statistics、support statistics、paper-ready LaTeX 表格和作者自审报告

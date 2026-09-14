@@ -5,6 +5,13 @@
 
 # Runbook
 
+## 论文写作区（非执行入口）
+
+`paper/README.md` 是独立论文写作入口。写作端只允许读取冻结 scientific code/model/protocol 和已有 artifact，
+并以 `paper/evidence_ledger_p01.md` 的 claim 边界为准；不得从该目录启动训练、评测、recovery、lock cleanup、
+holdout 或 canonical 晋级。正式统计与 gate 完成前，比较性、显著性、泛化与 paper-ready 结论保持
+`UNVERIFIED`/`UNAVAILABLE`。
+
 ## Protocol 2.9 与未来 G14C v16
 
 唯一 live index：`configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_index.json`。
