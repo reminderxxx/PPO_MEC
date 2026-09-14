@@ -146,3 +146,9 @@
 - `artifacts/training/` 只保留被保留 benchmark 引用的 checkpoint run。
 - `docs/project/` 是唯一长期文档目录。
 - `maintainable_engineering_docs(1)/` 和旧 `docs/*.md` 阶段文档不再作为事实来源。
+## 2026-09-14 G14R20-I5 受限恢复边界
+
+I3 原 evaluation-only run 的 failed-terminal 不在旧 ledger 上续写。I5 使用新 recovery identity，仅允许
+`formal_ablation` 的两个固定 cell 按 recovery attempt 2 → first attempt 1 顺序执行；6 个旧 committed cell 保持
+外部只读 reference。当前只有 synthetic/non-formal 工程验收和 unsigned request，后续阶段、真实恢复与 holdout
+均未授权。长期合同见 `g14r20_i5_restricted_recovery_contract.md`。

@@ -1,3 +1,8 @@
+> **2026-09-14 G14R20-I5**：最小受限恢复合同只允许新 recovery identity 下的两个有序
+> `formal_ablation` cell；6 个旧 committed cell 以外部双层完整性 reference 消费，原 terminal/ledger/staging/lock
+> 永久只读。当前仅 synthetic/non-formal 验收与 unsigned request，未签 grant、未真实恢复、未开放后续阶段或
+> holdout。见 [g14r20_i5_restricted_recovery_contract.md](g14r20_i5_restricted_recovery_contract.md)。
+>
 > **2026-09-14 G14R20-I4**：evaluation-only support consumer 的 executor/scientific bundle-root
 > 角色混淆已最小修复并以真实双 checkout dry-run 验收。I3 原 run 的 6 个 committed cell 双层完整性通过，
 > 但现有 phase/cell/reconciliation 合同禁止 failed-terminal 后使用新 executor 原地续写；受限恢复方案与未签发
@@ -27,6 +32,9 @@
 这是 PPO_MEC 的项目化维护文档入口，用来把通用 AI 协作规范落到当前仓库。
 
 ## Live 文档
+
+- `g14r20_i5_restricted_recovery_contract.md`：I3 failed-terminal 后的新 recovery identity、6 个 external committed
+  reference、两个 ablation cell 的 attempt/order、synthetic 公共入口验收、去重 handoff 与后续阶段未授权边界
 
 - `evaluation_only_execution_contract.md`：G14R20-I 的 v16 冻结模型来源、新 evaluation identity、八阶段入口、
   双层 publication integrity、旧 partial/staging 排除和未授权边界

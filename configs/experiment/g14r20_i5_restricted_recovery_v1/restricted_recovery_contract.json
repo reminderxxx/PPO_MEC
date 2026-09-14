@@ -1,0 +1,50 @@
+{
+  "restricted_recovery_contract_version": "1.0.0",
+  "goal": "G14R20-I5",
+  "scope_kind": "one_original_run_one_phase_two_ordered_cells",
+  "original_run_id": "typed_model_cache_evaluation_only_20260913_g14r20_i3_pending",
+  "allowed_phase": "formal_ablation",
+  "allowed_cells": [
+    {
+      "cell_id": "formal_ablation-3e9322fac172fcae01f2cc58",
+      "source_attempt": 1,
+      "recovery_attempt": 2,
+      "execution_kind": "recovery_attempt",
+      "must_commit_before_next_cell": true
+    },
+    {
+      "cell_id": "formal_ablation-e40a9c86c8fdbf3b7962a689",
+      "source_attempt_count": 0,
+      "recovery_attempt": 1,
+      "execution_kind": "first_execution",
+      "dispatch_after_cell_id": "formal_ablation-3e9322fac172fcae01f2cc58"
+    }
+  ],
+  "immutable_original_prefixes": {
+    "phase": {
+      "byte_count": 168899,
+      "record_count": 8,
+      "prefix_sha256": "a12731365111da83422ad4062ab482b08f3ee30c967084f6a32f4369bbce9adb",
+      "terminal_hash": "bfd7f4071b58d3a6f9cb61355dcfb6785c39ab490bfa4e90ebe34ac1807bb362",
+      "terminal_status": "failed"
+    },
+    "cell": {
+      "byte_count": 4090388,
+      "record_count": 14,
+      "prefix_sha256": "574ca9084db9ce377507edf7d210854dd69f575eed7135f4d567a35895310016",
+      "terminal_hash": "012ba1af0174f723352cf1ff7fb5aad262f80c2c6be0371cb34efee4050d149a",
+      "terminal_status": "failed_terminal"
+    }
+  },
+  "external_committed_cell_count": 6,
+  "source_model_count": 150,
+  "source_reference_sha256": "0ba289caa663d38dd35f61feafa509a3f8dc2eb4269b3220f18d383be81c3ea3",
+  "automatic_retry_count": 0,
+  "external_results_copied": false,
+  "later_phases_authorized": false,
+  "training_authorized": false,
+  "dev_selection_authorized": false,
+  "checkpoint_freeze_authorized": false,
+  "holdout_capability": false,
+  "terminal_status_ceiling": "READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION"
+}

@@ -15,6 +15,13 @@
 
 # Directory Structure
 
+G14R20-I5：版本化合同位于 `configs/experiment/g14r20_i5_restricted_recovery_v1/`，实现位于
+`src/runtime/restricted_recovery.py`，公共 unsigned prepare/validate 与受 grant execute 入口分别为
+`scripts/prepare_typed_model_cache_restricted_recovery.py`、`scripts/run_typed_model_cache_restricted_recovery.py`。
+synthetic driver/test 位于 `tests/restricted_recovery_public_driver.py` 与 `tests/test_restricted_recovery.py`；验收包写入
+ignored `artifacts/analysis/g14r20_i5_restricted_recovery_acceptance_20260914/`。原 I3 run、staging、lock、6 个 cell 和
+v16 checkpoint 不移动、不复制、不链接。
+
 G14R20-I：模型来源/执行身份合同位于 `src/runtime/evaluation_only_execution.py`；prepare 与受授权执行入口分别为
 `scripts/prepare_typed_model_cache_evaluation_only.py`、`scripts/run_typed_model_cache_evaluation_only.py`。双层
 producer/transaction publication 验证位于 `src/evaluators/formal_cell_transaction.py`，真实 gate 消费位于

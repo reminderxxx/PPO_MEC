@@ -1,3 +1,31 @@
+## G14R20-I5 最小受限恢复（仅 prepare/validate；真实 execute 未授权）
+
+唯一合同为 `configs/experiment/g14r20_i5_restricted_recovery_v1/restricted_recovery_contract.json`，说明见
+`docs/project/g14r20_i5_restricted_recovery_contract.md`。必须从最终 clean executor commit/tree 使用公共 prepare
+入口，直接复核 I3 原 request/grant/run、两份完整 ledger prefix、6 个 committed cell 的 producer/transaction
+双层完整性、150 个 source models、失败 staging 和 held-lock owner，然后 create-only 生成 unsigned request：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/prepare_typed_model_cache_restricted_recovery.py \
+  --action prepare \
+  --original-request-path /Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_i3_producer_integrity_20260913/authorization_request_unsigned.json \
+  --original-project-grant-path /Users/howen/Projects/PPO_MEC/artifacts/analysis/g14e03_authorization_audit_20260913/project_grant.json \
+  --original-run-root /Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending \
+  --recovery-execution-id <new_recovery_id> \
+  --recovery-root <new_nonexistent_absolute_root>/<new_recovery_id> \
+  --executor-checkout <final_clean_i5_checkout> \
+  --executor-commit <final_i5_commit> \
+  --python-executable /Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  --output-path <new_acceptance_root>/authorization_request_unsigned.json
+```
+
+同入口 `--action validate --output-path ...` 只读重验。当前不得调用
+`run_typed_model_cache_restricted_recovery.py --check execute`：尚无 recovery grant，旧 evaluation grant schema 不匹配；
+不得创建真实 recovery root、清理 held lock、重跑 6 个旧 cell，或启动 support/scalability/statistics/gate/completion。
+synthetic 公共入口验收须显式设置测试环境并运行 `tests/test_restricted_recovery.py`；测试 adapter 不可由生产 CLI/
+env/request 开启。
+
 ## G14R20-I3 producer integrity 与新申请（仅 prepare/validate）
 
 G14E02、其申请/grant/run root/ledger/staging/held lock 均为不可复用失败现场。I3 先在最终提交的持久 clean

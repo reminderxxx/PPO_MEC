@@ -1,3 +1,10 @@
+> **2026-09-14 G14R20-I5**：新增只识别 I3 原 run、`formal_ablation` 和两个固定 cell 的受限恢复原语。
+> 原 request/grant/source、两份 ledger 完整前缀、6 个 committed cell、失败 attempt/staging、held lock 与 150 个
+> 模型保持只读；新 recovery identity、ledger、staging/output 与旧 run 分离。当前仅完成 synthetic/non-formal
+> 工程验收和 unsigned request 准备，状态上限为 `READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION`；未签 recovery
+> grant、未启动真实恢复、未清旧锁、未打开 holdout。合同见
+> [docs/project/g14r20_i5_restricted_recovery_contract.md](docs/project/g14r20_i5_restricted_recovery_contract.md)。
+>
 > **2026-09-11 G14R20-G 现状复核：BLOCKED。** 9 月 10 日的实现/review/grant 静态绑定仍可复核，
 > 但其“尚未 dispatch”的快照已经失效：真实 v16 后续启动过 `formal_cache_policy`，phase/cell ledger 已从
 > `15/348` 变为 `17/352`，该 phase 以 `return_code=1` 失败，第二个 cell 为不可重试 `failed_terminal`。

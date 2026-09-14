@@ -1,3 +1,17 @@
+## 2026-09-14: G14R20-I5 最小受限恢复执行器与隔离验收
+
+- 新增 task-specific recovery contract/runtime/public prepare+execute 边界，只识别 I3 原 run、`formal_ablation` 和
+  两个固定 cell；未修改通用 phase/cell resume 合同，也没有授权真实恢复。
+- 原 phase/cell ledger 完整 prefix、6 个 committed cell 双层完整性、150-model source、失败 attempt/staging 与
+  held-lock owner 在每次 dispatch 前只读复算；原 request/grant/source 和旧 executor 与新 recovery
+  commit/tree/context 分开绑定。
+- 新 ledger 固定失败 cell 为 recovery attempt 2，成功后才允许未启动 cell 的首次 attempt 1；任何新失败 terminal，
+  自动 retry 为 0。完成后只输出 6+2 去重 handoff 和 unsigned follow-up，不启动后续阶段。
+- 公共 CLI 的 synthetic child 只由源码测试 driver 注入；验收统计和最终 commit/tree 记录在独立
+  `artifacts/analysis/g14r20_i5_restricted_recovery_acceptance_20260914/`。该 evidence 不含真实模型 rollout 或性能结论。
+- 当前状态上限 `READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION`；`recovery_grant_issued=false`、
+  `real_recovery_started=false`、`holdout_opened=false`。
+
 ## 2026-09-13: G14R20-I3 benchmark producer membership closure
 
 - G14E02 在首个 `formal_cache_policy` cell 的原子发布前终止；科学 child rc=0，producer manifest 为

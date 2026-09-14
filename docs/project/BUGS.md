@@ -655,3 +655,14 @@ G14E01 六文件残留不是合法 initialized run，没有原生 failed termina
 - 6 个 committed cell 与 150 个 source models 当前完整，但这只支持“保留资格”，不自动授权或实现 recovery。
   后续必须先实现独立 recovery identity 与只读 external-cell reference consumer，再做同等双层验收并由负责人审批。
 - 当前未签 recovery grant、未启动真实恢复、未打开 holdout；正式矩阵不完整，论文结论仍为 `Unverifiable`。
+
+## 2026-09-14 G14R20-I5：bounded recovery primitive 已实现，真实授权仍待签发（EXTERNAL BLOCKER）
+
+- `RESOLVED IN IMPLEMENTATION`：新 recovery identity/ledger、6-cell external reference consumer、失败 cell attempt 2、
+  后续未启动 cell attempt 1、强制顺序、零自动 retry、6+2 去重 handoff 和 unsigned follow-up 已形成独立合同。
+- `RESOLVED IN ACCEPTANCE SCOPE`：公共 main 的 synthetic 两进程交接、producer/transaction/marker/ledger 一致性与
+  source/request/prefix/payload/executor/scope/path/symlink/model/order/grant/holdout 负例检查实际 dispatch/write 计数。
+- `INPUT GAP`：I4 文档声明的 `g14r20_i4_bundle_root_recovery_20260914/` 目录在 I5 文件系统中缺失；I5 未补造旧包，
+  改为直接复算所有底层原件并在新验收包记录缺口。
+- `EXTERNAL BLOCKER`：真实 recovery grant、独立 quiescence/kernel-lock 证明和项目 owner 决定均未提供；不得真实
+  execute、删旧锁或启动 support/scalability/statistics/gate/completion。正式矩阵与论文结论仍 `Unverifiable`。

@@ -1,5 +1,17 @@
 ﻿# Decision Log
 
+## 2026-09-14 — D-G14R20-I5 failed-terminal 恢复使用新 identity 与外部结果引用
+
+决定：不放宽原 phase/cell ledger 的 immutable terminal。I3 原 ledger、failed attempt/staging 和 held lock 永久只读；
+新 task-specific recovery identity 绑定其完整 prefix、6 个 committed cell 双层完整性、150-model source、新
+executor/context 和唯一两 cell scope。失败 cell 在新 ledger 中明确为 attempt 2，另一 cell 仍是首次 attempt 1。
+
+决定：旧 6 cell 只通过 hash-bound external reference 进入 6+2 handoff，不复制/重发、不重复计数、不按性能选择。
+消融完成只生成机器 handoff 和 unsigned next-stage request；statistics 等后续 consumer 必须另行授权。
+
+原因：把新 executor 冒充旧身份、改写 failed terminal 或签普通 grant 都会破坏 provenance；通用 recovery 平台又超出
+当前 first-order 问题。固定 run/phase/cell 的最小 primitive 可保持 fail-closed，同时不给真实恢复或 holdout 扩权。
+
 ## 2026-09-11 — D-G14R20-I 模型来源与 evaluation 执行身份永久分离
 
 决定：H 审查确认的旧 v16 150 个 checkpoint 只能通过精确 source reference 被新 evaluation-only run 只读消费。

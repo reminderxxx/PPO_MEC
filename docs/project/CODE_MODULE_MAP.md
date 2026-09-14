@@ -12,6 +12,17 @@
 
 # Code Module Map
 
+## G14R20-I5 restricted recovery boundary
+
+- `src/runtime/restricted_recovery.py`：唯一 I3 source 的完整 prefix/6-cell/150-model/lock 只读审计，新 executor/context
+  身份与科学参数投影，attempt 2→1 ledger、外部来源映射、去重 handoff 和 statistics rows 显式 resolver。
+- `scripts/prepare_typed_model_cache_restricted_recovery.py`：create-only unsigned request 与 live validate；不创建 run、
+  grant、ledger、lock、staging 或结果。
+- `scripts/run_typed_model_cache_restricted_recovery.py`：exact recovery grant 后的一次一 cell 公共入口；不含 issuer、
+  old-lock cleanup、通用 retry/resume、later phase 或 holdout action。
+- `tests/restricted_recovery_public_driver.py` / `tests/test_restricted_recovery.py`：真实 parser/main/初始化/锁/transaction
+  路径，仅 scientific child 为 synthetic；记录实际 dispatch/write 与原对象 byte-protection。
+
 ## G14R20-I evaluation-only identity / publication closure
 
 - `src/runtime/evaluation_only_execution.py`：固定 H 审查、旧 v16/科学 commit、150 坐标/hash，生成来源引用与新
