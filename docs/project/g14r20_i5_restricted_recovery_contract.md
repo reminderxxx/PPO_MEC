@@ -40,6 +40,10 @@ root。symlink、路径逃逸、同名异内容、原 root/staging 目标、cont
 handoff 或进程中断失败都会使新 recovery terminal；`automatic_retry_count=0`，不提供 finalize/retry/resume。
 已 committed cell 不能再次 dispatch。
 
+新 recovery 使用独立、持久 inode 的单写锁：正常进程结束将同一 owner 记录改为 `released`，供第二个有序进程获取；
+异常结束保留 `held`，后续获取一律 fail-closed。该锁不调用 PID liveness 探针，也没有 crash takeover、旧 owner 接管或
+删除入口，因此受限环境缺少 `ps` 权限不会被误解释为 quiescence，更不会影响原 run 的 held lock。
+
 ## 外部结果与交接
 
 6 个旧 cell 不复制、不 symlink、不重新发布，只以 `origin=external_original_run` 的 hash-bound reference 消费；2 个

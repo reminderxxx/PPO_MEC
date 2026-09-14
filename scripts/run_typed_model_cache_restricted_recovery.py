@@ -9,18 +9,21 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import fcntl
 import hashlib
 import json
 import os
 from pathlib import Path
+import socket
 import sys
 from typing import Any, Mapping
+import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.continuation_executor.locking import SingleWriter
+from scripts.continuation_executor.locking import writer_lock_path
 from src.evaluators.formal_cell_transaction import execute_cell_artifact_transaction
 from src.runtime.evaluation_only_execution import canonical_sha256, file_sha256
 from src.runtime.restricted_recovery import (
@@ -64,6 +67,90 @@ def _read(path: str | Path) -> dict[str, Any]:
 
 def _encoded(payload: Any) -> bytes:
     return (json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n").encode("utf-8")
+
+
+class RestrictedRecoverySingleWriter:
+    """Create-only recovery lock with no PID liveness or crash takeover path.
+
+    The old continuation lock deliberately requires host ``ps`` evidence for
+    crash recovery.  I5 never recovers a held lock: a retained ``held`` owner
+    freezes this new recovery execution, while a normally ``released`` owner
+    permits the second, ordered process to acquire the same inode.
+    """
+
+    def __init__(self, run_root: Path, executor_sha256: str, authorize) -> None:
+        self.root = run_root
+        self.executor_sha256 = executor_sha256
+        self.authorize = authorize
+        self.fd: int | None = None
+        self.owner: dict[str, Any] | None = None
+
+    def _write(self, value: Mapping[str, Any]) -> None:
+        if self.fd is None:
+            raise RestrictedRecoveryError("recovery writer lock is not open")
+        os.lseek(self.fd, 0, os.SEEK_SET)
+        data = _encoded(value)
+        if os.write(self.fd, data) != len(data):
+            raise RestrictedRecoveryError("short recovery lock record write")
+        os.ftruncate(self.fd, len(data))
+        os.fsync(self.fd)
+
+    def __enter__(self):
+        self.authorize()
+        if self.root.is_symlink() or (self.root.exists() and not self.root.is_dir()):
+            raise RestrictedRecoveryError("recovery root must be absent or a real directory")
+        parent = self.root.parent
+        if parent.is_symlink() or not parent.is_dir() or not os.access(parent, os.W_OK | os.X_OK):
+            raise RestrictedRecoveryError("recovery parent is not a writable real directory")
+        path = writer_lock_path(self.root)
+        lock_parent = path.parent
+        if lock_parent.exists() and (lock_parent.is_symlink() or not lock_parent.is_dir()):
+            raise RestrictedRecoveryError("recovery lock parent must be a real directory")
+        lock_parent.mkdir(mode=0o700, exist_ok=True)
+        if lock_parent.is_symlink():
+            raise RestrictedRecoveryError("recovery lock parent changed to a symlink")
+        flags = os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW
+        self.fd = os.open(path, flags, 0o600)
+        try:
+            fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            self.authorize()
+            os.lseek(self.fd, 0, os.SEEK_SET)
+            previous_bytes = os.read(self.fd, 65537)
+            if len(previous_bytes) > 65536:
+                raise RestrictedRecoveryError("recovery lock owner record oversized")
+            if previous_bytes:
+                previous = json.loads(previous_bytes)
+                if previous.get("state") != "released":
+                    raise RestrictedRecoveryError(
+                        "held recovery lock freezes execution; automatic takeover is forbidden"
+                    )
+            self.owner = {
+                "version": "1.0.0",
+                "state": "held",
+                "nonce": uuid.uuid4().hex,
+                "process": {
+                    "host": socket.gethostname(),
+                    "pid": os.getpid(),
+                    "started": None,
+                    "identity_method": "pid_without_liveness_inference",
+                },
+                "executor_sha256": self.executor_sha256,
+            }
+            self._write(self.owner)
+            return self
+        except BaseException:
+            os.close(self.fd)
+            self.fd = None
+            raise
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        try:
+            if exc_type is None and self.owner is not None:
+                self._write({**self.owner, "state": "released"})
+        finally:
+            if self.fd is not None:
+                os.close(self.fd)
+                self.fd = None
 
 
 def _create_file(path: Path, data: bytes) -> None:
@@ -369,7 +456,7 @@ def execute_recovery_cell(
         raise RestrictedRecoveryError("immutable recovery source/request binding drift")
     if len(audit["external_committed_cells"]) != 6:
         raise RestrictedRecoveryError("external committed source count drift")
-    with SingleWriter(
+    with RestrictedRecoverySingleWriter(
         root,
         execution["recovery_execution_identity_sha256"],
         lambda: verify_recovery_grant(
@@ -377,7 +464,6 @@ def execute_recovery_cell(
             grant,
             synthetic_only=synthetic_only,
         ),
-        allow_missing_root=True,
     ):
         root, cells, phase = _load(request)
         _assert_next(root, cells, phase, cell_id)

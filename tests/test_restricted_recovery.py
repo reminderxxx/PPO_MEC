@@ -11,7 +11,10 @@ import subprocess
 
 import pytest
 
-from scripts.run_typed_model_cache_restricted_recovery import verify_recovery_grant
+from scripts.run_typed_model_cache_restricted_recovery import (
+    RestrictedRecoverySingleWriter,
+    verify_recovery_grant,
+)
 from scripts.continuation_executor.locking import writer_lock_path
 from src.evaluators.formal_cell_transaction import CellExecutionIdentity, CellTransactionError
 from src.runtime.evaluation_only_execution import canonical_sha256, file_sha256
@@ -272,6 +275,20 @@ def test_grant_is_distinct_and_holdout_false(tmp_path: Path) -> None:
     old_grant = json.loads(ORIGINAL_PROJECT_GRANT_PATH.read_text())
     with pytest.raises(RestrictedRecoveryError):
         verify_recovery_grant(request, old_grant, synthetic_only=True)
+
+
+def test_recovery_writer_retains_held_state_and_forbids_takeover(tmp_path: Path) -> None:
+    root = tmp_path / "new_recovery"
+    with pytest.raises(RuntimeError, match="synthetic interruption"):
+        with RestrictedRecoverySingleWriter(root, "executor-identity", lambda: None):
+            raise RuntimeError("synthetic interruption")
+    lock = writer_lock_path(root)
+    retained = json.loads(lock.read_text())
+    assert retained["state"] == "held"
+    assert retained["process"]["identity_method"] == "pid_without_liveness_inference"
+    with pytest.raises(RestrictedRecoveryError, match="automatic takeover is forbidden"):
+        with RestrictedRecoverySingleWriter(root, "executor-identity", lambda: None):
+            pass
 
 
 PUBLIC = os.environ.get("G14R20_I5_PUBLIC_ACCEPTANCE") == "1"
