@@ -14,6 +14,13 @@
 
 ## G14R20-I5 restricted recovery boundary
 
+- `scripts/capture_restricted_recovery_protected_snapshot.py`：采集可追溯、create-only 的七文件起点快照；不内嵌 hash。
+- `scripts/run_restricted_recovery_acceptance_tests.py`：在 final clean commit 上运行 pytest 并写 commit/tree/JUnit-bound
+  receipt；临时测试依赖仅由调用环境注入。
+- `scripts/run_restricted_recovery_validation_checks.py`：在同一 final commit 上记录 smoke、compile/import、diff、
+  clean scope 与七文件 branch-diff 检查，生成构包器强制消费的 receipt。
+- `scripts/build_restricted_recovery_acceptance_artifacts.py`：先验验证 start/end 保护、四类 JUnit receipt、skip review、
+  I4 绝对路径完整性和旧 146+1 逐项处置，再生成 READY；任一失败不生成 READY。
 - `src/runtime/restricted_recovery.py`：唯一 I3 source 的完整 prefix/6-cell/150-model/lock 只读审计，新 executor/context
   身份与科学参数投影，attempt 2→1 ledger、外部来源映射、去重 handoff 和 statistics rows 显式 resolver。
 - `scripts/prepare_typed_model_cache_restricted_recovery.py`：create-only unsigned request 与 live validate；不创建 run、

@@ -1,3 +1,10 @@
+> **2026-09-14 G14R20-I5-A 勘误**：原 I5 验收脚本把两份 held-lock SHA-256 错写为两个用户文件的
+> task-start hash，且只汇总 JUnit、未拒绝 failure/error。I5-A 改为消费显式 start snapshot、采集独立 end
+> snapshot，并以 commit-bound receipt 拒绝失败、错误、空集、身份/报告不匹配、缺件和未闭合 skip。旧
+> `qualification_stop` 原样保留；I4 绝对路径原件当前完整，但 post-stop 补件不倒推为旧时点证据。详见
+> [验收勘误](docs/project/g14r20_i5_a_acceptance_correction.md)。未找到可靠 task-start 七文件快照，历史保护仍为
+> `UNVERIFIED` 并交中央判断；状态上限不变，未签 grant、未恢复、未开 holdout。
+>
 > **2026-09-14 G14R20-I5**：新增只识别 I3 原 run、`formal_ablation` 和两个固定 cell 的受限恢复原语。
 > 原 request/grant/source、两份 ledger 完整前缀、6 个 committed cell、失败 attempt/staging、held lock 与 150 个
 > 模型保持只读；新 recovery identity、ledger、staging/output 与旧 run 分离。当前仅完成 synthetic/non-formal

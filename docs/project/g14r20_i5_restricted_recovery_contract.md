@@ -15,8 +15,15 @@ staging、held-lock inode/owner、150 个冻结模型及其 selection/freeze/pro
 前重新执行原生 ledger、producer manifest、transaction inventory、marker、150-model source validator；失败只停止，
 不改写或修复原件。PID 可见性只记录为观察值，不能据此证明 quiescence 或删除旧锁。
 
-I4 声明的 `artifacts/analysis/g14r20_i4_bundle_root_recovery_20260914/` 在 I5 开始时未出现在文件系统；I5 不创建、
-补写或冒充该旧包，而是直接复算底层原件，并在新的验收包中保留这一输入缺口。
+I5 原检查只解析 main/I5 worktree 下的相对 `artifacts/analysis/g14r20_i4_bundle_root_recovery_20260914/`，因此其
+“文件系统不存在”表述不能覆盖独立 I4 worktree。I5-A 按用户给定绝对路径复核：工程 review 在旧 stop 前存在；
+independent rerun 与当前 manifest 更新在 stop 后完成。当前三文件完整性可闭合，但不得倒推 post-stop 文件在旧时点
+已经存在。旧失败包和 `qualification_stop` 不改写，只在新包追加勘误。
+
+I5-A 保护门禁不再内嵌散列常量。独立 capture 工具 create-only 记录七文件绝对路径、采集来源、时间、inode、mtime、
+size 与 SHA-256；构包器消费显式 start snapshot、实时采集 end snapshot，并对任何内容漂移 fail-closed。原 I5 会话
+中的历史观察单独保存，不与本轮 snapshot 混写。最早历史观察晚于 task start 约 8 分钟，因此
+`historical_start_evidence=unavailable`、历史保护 `UNVERIFIED`，不得用本轮 start/end 追认 I5 历史。
 
 ## 新 recovery identity
 
@@ -70,3 +77,10 @@ exposure context、nullable metric contract 和未改变统计规则。不得依
 
 `formal_support`、`formal_scalability`、`formal_statistics`、`formal_gate`、completion、training、selection、freeze、
 holdout/hidden 均不在本合同权限内。消融交接不自动启动下一阶段，也不构成性能或论文结论。
+
+## I5-A 验收证据门禁
+
+JUnit 必须由 clean final commit 上的 runner 生成 receipt，精确绑定 checkout、commit、tree、命令、返回码、报告绝对
+路径、报告 hash 与逐 testcase 汇总。failure、error、空测试集、错误提交身份、报告不匹配或缺失证据均不能产生
+READY。skip 保留在汇总中，并须逐项说明原因与同范围替代证据。旧 full JUnit 的 62 failures、84 errors 和 1 skip
+逐 nodeid 对应到本轮通过结果；测试依赖覆盖只位于临时目录，不进入未来正式命令。

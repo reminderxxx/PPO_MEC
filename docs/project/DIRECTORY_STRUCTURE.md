@@ -1,3 +1,14 @@
+## 2026-09-14 G14R20-I5-A 验收证据
+
+- 保护快照、commit-bound pytest receipt 与 fail-closed 构包器分别位于
+  `scripts/capture_restricted_recovery_protected_snapshot.py`、
+  `scripts/run_restricted_recovery_acceptance_tests.py`、
+  `scripts/build_restricted_recovery_acceptance_artifacts.py`。
+- `scripts/run_restricted_recovery_validation_checks.py` 生成 commit-bound smoke/compile/import/diff receipt；隔离测试
+  virtualenv 与 dependency overlay 仅位于临时目录，不属于项目或未来正式命令。
+- 勘误位于 `docs/project/g14r20_i5_a_acceptance_correction.md`；正式新证据只写入新的
+  `artifacts/analysis/` 子目录，不覆盖旧失败包。
+
 ## 2026-09-10 G14R20-G 一次性 project 授权
 
 - `scripts/continuation_executor/project_authorization.py`：精确 v16 本地授权、review/grant、expiry/stop 与

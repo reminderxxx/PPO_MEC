@@ -215,3 +215,7 @@
 ## 2026-09-09 G14R20-D
 
 新增 `continuation_production_trust_contract.md`：G14R20-D PT1–PT6 producer/consumer 职责、撤销来源、重启 checkpoint、原件认证与未批准交接。
+> **2026-09-14 G14R20-I5-A**：验收基线勘误、I4 绝对路径复核、JUnit fail-closed 与逐项回归处置见
+> [g14r20_i5_a_acceptance_correction.md](g14r20_i5_a_acceptance_correction.md)。旧失败包不改写，状态上限仍为
+> `READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION`；未签 recovery grant、未恢复、未开 holdout。
+>

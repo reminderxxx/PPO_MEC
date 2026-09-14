@@ -1,3 +1,11 @@
+## G14R20-I5-A 验收补验（不授权真实 execute）
+
+先用 `capture_restricted_recovery_protected_snapshot.py` 对主工作区七文件生成 create-only start snapshot；四类 pytest
+scope 必须通过 `run_restricted_recovery_acceptance_tests.py` 生成 JUnit+receipt。构包器要求 final commit 已 push，
+并消费 `run_restricted_recovery_validation_checks.py` 的 smoke/compile/import/diff receipt、历史勘误、旧 full JUnit、
+I4 原件绝对路径与 skip review。临时 dependency overlay 只用于测试进程，不得写入
+`complete_command_plan.json` 或未来正式命令。任何 failure/error/empty/mismatch/missing/unclosed skip 均停止。
+
 ## G14R20-I5 最小受限恢复（仅 prepare/validate；真实 execute 未授权）
 
 唯一合同为 `configs/experiment/g14r20_i5_restricted_recovery_v1/restricted_recovery_contract.json`，说明见

@@ -1,5 +1,18 @@
 ﻿# Decision Log
 
+## 2026-09-14 — D-G14R20-I5-A 验收事实必须来自显式 snapshot 与 commit-bound receipt
+
+决定：保护门禁不再接受源码内手工散列常量；历史观察、当前重验 start、end 三层证据分离。JUnit 的 testcase 状态、
+返回码、commit/tree、报告路径/hash/summary 与 skip substitute 必须同时闭合。旧 I5 stop 不覆盖，只新增勘误。
+
+决定：最早七文件实测晚于原任务开始约 8 分钟，不视为历史 task-start 原件；记录
+`historical_start_evidence=unavailable` 与 `historical_protection_verdict=UNVERIFIED`，交中央窗口判断影响。
+
+原因：两个 lock hash 被误当文件 hash，且旧 parser 对 146 个 failure/error 未 fail-closed。相对路径还跨错 worktree，
+无法证明 I4 绝对路径原件缺失。显式 provenance 可恢复验收可信度而不改变 recovery/scientific execution。
+
+边界：I4 post-stop 补充只证明当前完整；本决定不签 grant、不清锁、不启动 recovery/formal/holdout。
+
 ## 2026-09-14 — D-G14R20-I5 failed-terminal 恢复使用新 identity 与外部结果引用
 
 决定：不放宽原 phase/cell ledger 的 immutable terminal。I3 原 ledger、failed attempt/staging 和 held lock 永久只读；

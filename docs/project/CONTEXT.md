@@ -18,11 +18,15 @@
 
 ﻿# Context
 
-更新日期：2026-09-13
+更新日期：2026-09-14
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
 ## 项目状态
+
+- G14R20-I5-A 仅纠正验收证据：原两个所谓 task-start hash 实为 held-lock hash；没有可靠 task-start 七文件快照，
+  历史保护为 `UNVERIFIED`。原 I5 会话日志仅证明后续观察区间一致；新验收消费独立显式保护快照和 commit-bound
+  JUnit receipt。旧 stop/锁/ledger/产物不改，真实恢复与 grant 均未发生，holdout 未开。
 
 - 当前唯一 live typed model-cache execution contract 为 Protocol 2.9.0；active index 位于
   `configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_index.json`，Readiness v21=

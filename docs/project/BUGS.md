@@ -1,3 +1,15 @@
+## 2026-09-14: I5 acceptance task-start/JUnit fail-open（RESOLVED；旧 stop 保留）
+
+- 根因 1：两个 held-lock hash 被人工放入用户文件 task-start 常量；原会话已有正确七文件 `stat + shasum` 输出但未被
+  验收器消费，但最早输出晚于 task start 约 8 分钟，不能补作历史起点。根因 2：JUnit 解析只做汇总，未对
+  failure/error/empty/identity/report match 执行拒绝。
+- 修复：显式、带来源和时间的 create-only snapshot；start/end 分离比较；commit-bound test receipt；skip 精确审查；
+  旧 146 异常与 1 skip 逐 nodeid 重验闭合。任何真实内容漂移继续 fail-closed。
+- I4 勘误：旧检查搜索错 worktree；当前绝对路径完整，但 post-stop independent rerun/manifest 不追认旧时点完整性。
+- 历史边界：`historical_start_evidence=unavailable`，旧 stop 保留，11:43—12:38 仅为观察区间证据。
+- 边界：旧失败包、ledger、staging、held lock、6 committed cells、150 模型和七文件均不改写；不授权恢复、grant、
+  清锁、正式 rollout 或 holdout。
+
 ## 2026-09-13: benchmark producer 诊断文件漏登（RESOLVED；G14E02 永久 terminal）
 
 - 根因：`benchmark_main_results.py` 写出 `comparison_against_popularity.json` 和
