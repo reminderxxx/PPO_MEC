@@ -8,6 +8,8 @@
 - I4 勘误：旧检查搜索错 worktree；当前绝对路径完整，但 post-stop independent rerun/manifest 不追认旧时点完整性。
 - 历史边界：`historical_start_evidence=unavailable`，旧 stop 保留，11:43—12:38 仅为观察区间证据。
 - 补验发现并修复：receipt runner 不再 `resolve()` venv 的 `python` symlink；否则会误用系统 Python、丢失隔离依赖。
+- 补充 import 门禁发现并修复：保护快照脚本使用 package-qualified sibling import，并显式加入仓库根，兼容直接执行与
+  `scripts.*` 模块导入；原实现只支持直接执行入口。
 - 边界：旧失败包、ledger、staging、held lock、6 committed cells、150 模型和七文件均不改写；不授权恢复、grant、
   清锁、正式 rollout 或 holdout。
 
