@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -11,11 +12,117 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+
+def _pure_file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _pure_canonical_sha256(value: object) -> str:
+    return hashlib.sha256(
+        json.dumps(
+            value,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode("utf-8")
+    ).hexdigest()
+
+
+def _pure_write_json(path: Path, value: object) -> None:
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def _pure_child(scope: str, staging: str, cell_id: str, setting_id: str) -> None:
+    """Publish a synthetic descriptor without importing the training stack."""
+
+    scope_path = Path(scope)
+    staging_path = Path(staging)
+    assert scope_path.name.startswith("synthetic_") and scope_path in staging_path.parents
+    assert os.environ.get("PYTHONPATH") == str(ROOT)
+    with (scope_path / "dispatch.jsonl").open("a", encoding="utf-8") as stream:
+        stream.write(
+            json.dumps(
+                {
+                    "pid": os.getpid(),
+                    "cell_id": cell_id,
+                    "setting_id": setting_id,
+                    "test_only": True,
+                    "real_model_open_count": 0,
+                    "scientific_rollout_count": 0,
+                }
+            )
+            + "\n"
+        )
+    if (scope_path / "fail_child").exists():
+        raise RuntimeError("synthetic restricted recovery child failure")
+    child_root = staging_path / "child_output"
+    artifact = child_root / setting_id
+    artifact.mkdir(parents=True)
+    _pure_write_json(
+        artifact / "support_provenance.json",
+        {"setting_id": setting_id, "test_only": True},
+    )
+    _pure_write_json(
+        artifact / "aggregate_summary.json",
+        {"test_only": True, "metric": 1.0},
+    )
+    (artifact / "benchmark_rows.csv").write_text(
+        "test_only,metric\ntrue,1.0\n", encoding="utf-8"
+    )
+    producer_files = [
+        {
+            "path": path.name,
+            "size_bytes": path.stat().st_size,
+            "sha256": _pure_file_sha256(path),
+        }
+        for path in sorted(artifact.iterdir())
+    ]
+    _pure_write_json(
+        artifact / "artifact_integrity_manifest.json",
+        {"integrity_manifest_version": "1.0.0", "files": producer_files},
+    )
+    descriptor_inventory = [
+        {
+            "path": path.name,
+            "size_bytes": path.stat().st_size,
+            "sha256": _pure_file_sha256(path),
+        }
+        for path in sorted(artifact.iterdir())
+    ]
+    descriptor = {
+        "cell_child_output_descriptor_version": "1.0.0",
+        "cell_artifact_publication_contract_version": "1.0.0",
+        "cell_id": cell_id,
+        "phase": "formal_ablation",
+        "logical_setting_id": setting_id,
+        "producer_kind": "synthetic_restricted_recovery_only",
+        "artifact_root_relative_path": setting_id,
+        "required_payload": [
+            "support_provenance.json",
+            "aggregate_summary.json",
+            "benchmark_rows.csv",
+        ],
+        "artifact_inventory": descriptor_inventory,
+        "artifact_inventory_sha256": _pure_canonical_sha256(descriptor_inventory),
+    }
+    _pure_write_json(child_root / "cell_child_output.json", descriptor)
+
+
+# The transaction child must remain import-isolated: in particular it must not
+# import src.evaluators.__init__, agents, torch, or any real model loader.
+if len(sys.argv) > 1 and sys.argv[1] == "child":
+    _pure_child(*sys.argv[2:])
+    raise SystemExit(0)
+
+
 from src.evaluators.formal_cell_transaction import (
     resolve_child_output_descriptor,
-    write_child_output_descriptor,
 )
-from src.runtime.evaluation_only_execution import file_sha256
 from src.runtime.restricted_recovery import ALLOWED_CELL_IDS, PHASE
 
 
@@ -87,57 +194,6 @@ class SyntheticRecoveryChild:
         return build, resolve
 
 
-def child(scope: str, staging: str, cell_id: str, setting_id: str) -> None:
-    scope_path = Path(scope)
-    staging_path = Path(staging)
-    assert scope_path.name.startswith("synthetic_") and scope_path in staging_path.parents
-    assert os.environ.get("PYTHONPATH") == str(ROOT)
-    with (scope_path / "dispatch.jsonl").open("a", encoding="utf-8") as stream:
-        stream.write(
-            json.dumps(
-                {
-                    "pid": os.getpid(),
-                    "cell_id": cell_id,
-                    "setting_id": setting_id,
-                    "test_only": True,
-                    "real_model_open_count": 0,
-                    "scientific_rollout_count": 0,
-                }
-            )
-            + "\n"
-        )
-    if (scope_path / "fail_child").exists():
-        raise RuntimeError("synthetic restricted recovery child failure")
-    child_root = staging_path / "child_output"
-    artifact = child_root / setting_id
-    artifact.mkdir(parents=True)
-    write_json(artifact / "support_provenance.json", {"setting_id": setting_id, "test_only": True})
-    write_json(artifact / "aggregate_summary.json", {"test_only": True, "metric": 1.0})
-    (artifact / "benchmark_rows.csv").write_text("test_only,metric\ntrue,1.0\n", encoding="utf-8")
-    files = [
-        {"path": path.name, "size_bytes": path.stat().st_size, "sha256": file_sha256(path)}
-        for path in sorted(artifact.iterdir())
-    ]
-    write_json(
-        artifact / "artifact_integrity_manifest.json",
-        {"integrity_manifest_version": "1.0.0", "files": files},
-    )
-    write_child_output_descriptor(
-        child_root / "cell_child_output.json",
-        cell_id=cell_id,
-        phase=PHASE,
-        logical_setting_id=setting_id,
-        output_root=child_root,
-        artifact_root=artifact,
-        producer_kind="synthetic_restricted_recovery_only",
-        required_payload=[
-            "support_provenance.json",
-            "aggregate_summary.json",
-            "benchmark_rows.csv",
-        ],
-    )
-
-
 def host(scope: str, argv: list[str]) -> None:
     from scripts import run_typed_model_cache_restricted_recovery as public
 
@@ -157,9 +213,6 @@ def host(scope: str, argv: list[str]) -> None:
 
 
 if __name__ == "__main__":
-    if sys.argv[1] == "child":
-        child(*sys.argv[2:])
-    else:
-        from tests.restricted_recovery_public_driver import host
+    from tests.restricted_recovery_public_driver import host
 
-        host(sys.argv[2], sys.argv[3:])
+    host(sys.argv[2], sys.argv[3:])
