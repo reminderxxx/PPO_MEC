@@ -320,7 +320,7 @@ def main() -> None:
                     raise ActiveFormalBundleError(
                         "non-formal support fairness lacks static registry audit"
                     )
-            elif setting.get("family") == "capacity":
+            elif setting.get("family") in {"capacity", "scalability"}:
                 label = runtime_resource["logical_id"].split(".", 1)[1]
                 fairness_resource = resolve_active_bundle_resource(
                     bundle,

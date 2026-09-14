@@ -31,7 +31,9 @@ executor `ROOT` 传给 scientific `protocol_index` 的 active-bundle validator�
 3. frozen command 中 executor-local runtime/fairness path 只能作为同 relative logical path 的 checkout mirror；
    mirror 必须位于已验证 executor 内、无 symlink，并与 scientific bundle 登记的 hash/size 完全一致。
 4. 不改变全局 `repository_root`，不复制或链接 scientific 文件，不改变参数、模型、窗口、统计或原请求。
-5. `formal_ablation`、`formal_support`、`formal_scalability` 共用同一 public support consumer，均受同一修复覆盖。
+5. `formal_ablation`、`formal_support`、`formal_scalability` 共用同一 public support consumer，均受同一修复覆盖；
+   scalability 的 frozen `fairness_manifest.formal.medium_576mb` 按容量 logical ID 校验，不再误查不存在的
+   setting-specific support fairness。
 
 ## I3 只读保全结论
 
