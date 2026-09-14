@@ -62,7 +62,10 @@ def main() -> None:
     args = parser.parse_args()
 
     checkout = Path(args.executor_checkout).resolve(strict=True)
-    python = str(Path(args.python_executable).resolve(strict=True))
+    python_path = Path(args.python_executable).absolute()
+    if not python_path.is_file():
+        raise ValueError("python executable is missing")
+    python = str(python_path)
     receipt_path = Path(args.receipt_path).resolve()
     if receipt_path.exists():
         raise ValueError("receipt path must be create-only")

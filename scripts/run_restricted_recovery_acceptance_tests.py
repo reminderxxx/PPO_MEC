@@ -75,8 +75,11 @@ def main() -> None:
         pytest_args = pytest_args[1:]
     if not pytest_args:
         raise ValueError("pytest selector arguments are required")
+    python_executable = Path(args.python_executable).absolute()
+    if not python_executable.is_file():
+        raise ValueError("python executable is missing")
     command = [
-        str(Path(args.python_executable).resolve(strict=True)),
+        str(python_executable),
         "-B",
         "-m",
         "pytest",

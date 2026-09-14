@@ -7,6 +7,7 @@
   independent rerun/当前 manifest 为 post-stop，时间边界不混淆。
 - 验收改为显式 start/end snapshot 与 commit-bound JUnit receipt。失败、错误、空集、错误 commit/tree、报告不匹配、
   缺件和无同范围替代证据的 skip 均拒绝 READY；旧 146 异常与 1 skip 逐项映射到隔离重验。
+- commit-bound runner 保留显式 venv 可执行路径，不展开到系统 Python，确保临时依赖覆盖层确实用于测试且不进入正式命令。
 - 不修改恢复执行机制和科学参数；`recovery_grant_issued=false`、`real_recovery_started=false`、
   `holdout_opened=false`，状态上限仍为 `READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION`。
 
