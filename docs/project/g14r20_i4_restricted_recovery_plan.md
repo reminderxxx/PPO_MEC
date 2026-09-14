@@ -6,8 +6,8 @@
 - `target_venue`: `IEEE TMC`
 - `artifact_run_id`: `typed_model_cache_evaluation_only_20260913_g14r20_i3_pending`
 - `policy_version`: `tmc_review_policy_v3_20260621`
-- `reviewed_executor_code_commit`: `c1abc4ba96319bda19db7d05a2e106cf4230a38e`
-- `reviewed_executor_code_tree`: `a44f9582e8110e747f9c478ffdbe7415b69f7962`
+- `minimum_reviewed_executor_code_commit`: `c1abc4ba96319bda19db7d05a2e106cf4230a38e`
+- `minimum_reviewed_executor_code_tree`: `a44f9582e8110e747f9c478ffdbe7415b69f7962`
 - `evidence_level`: `E2_ARTIFACT_AUDITED_FOR_RECOVERY_SCOPE`
 - `paper_verdict`: `Unverifiable`（正式矩阵未完成，本轮没有性能审查）
 - `recovery_grant_issued`: `false`
