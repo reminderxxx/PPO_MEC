@@ -1,5 +1,17 @@
 ﻿# Decision Log
 
+## 2026-09-16 — D-G14R20-I5-B venv symlink target 不是 launch identity
+
+决定：restricted recovery 的 Python 身份拆为不可替换的 absolute `launch_path` 与仅审计的 binary realpath；
+request、context、command plan、cell builder、support child 和 nested benchmark 必须共享前者。生产 prepare/dispatch
+复用冻结正式环境合同，以真实子进程验证 environment/dependency/import/commit/tree，不以安装系统 Torch 补洞。
+
+原因：对 `.venv/bin/python` 调用 `resolve()` 会绕过 venv 的 `pyvenv.cfg` 选择语义；底层二进制相同不表示启动环境
+相同。只修测试 runner 或手改已生成命令不能重建 request/context/hash identity。
+
+边界：旧 I5/I5-A request/evidence 不改写，只追加不可执行原因；历史保护仍 `UNVERIFIED`。本决定不授权 grant、
+真实恢复、清锁、模型加载、rollout 或 holdout。
+
 ## 2026-09-14 — D-G14R20-I5-A 验收事实必须来自显式 snapshot 与 commit-bound receipt
 
 决定：保护门禁不再接受源码内手工散列常量；历史观察、当前重验 start、end 三层证据分离。JUnit 的 testcase 状态、

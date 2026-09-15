@@ -5,6 +5,17 @@
 
 # Artifact Records
 
+## 2026-09-16 G14R20-I5-B recovery interpreter binding
+
+- path：`artifacts/analysis/g14r20_i5_b_python_binding_20260916/`；由 final clean commit 上
+  `scripts/run_restricted_recovery_interpreter_acceptance.py` create-only 生成。
+- `unsigned_recovery_request.json` 来自 production prepare builder；`command_package.json` 记录 request、context、
+  两条正式命令与 cell builder 保留的 venv launch path，binary realpath 仅作审计。
+- `interpreter_acceptance.json` 记录真实 child `sys.executable/prefix/base_prefix`、完整 dependency inventory/
+  fingerprint、环境身份、项目 import origin、support/nested `--help` 和 nested resolver；rollout/model load 为 0。
+- `negative_cases.json` 记录 system Python、错误 venv、依赖漂移与 context/child mismatch 在 recovery 写入前拒绝；
+  `artifact_integrity.json` 覆盖新包。旧 I5/I5-A 包原样保留，历史保护仍 `UNVERIFIED`，未来 recovery root 不存在。
+
 ## 2026-09-10 G14R20-F1 fast startup receipt race repair
 
 - path：`artifacts/analysis/g14r20_f1_receipt_race_20260909/`；实现 commit/tree=

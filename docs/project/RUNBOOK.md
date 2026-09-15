@@ -6,6 +6,26 @@ scope 必须通过 `run_restricted_recovery_acceptance_tests.py` 生成 JUnit+re
 I4 原件绝对路径与 skip review。临时 dependency overlay 只用于测试进程，不得写入
 `complete_command_plan.json` 或未来正式命令。任何 failure/error/empty/mismatch/missing/unclosed skip 均停止。
 
+## G14R20-I5-B 虚拟环境启动路径验收（不授权真实 execute）
+
+必须在 final clean executor commit 上运行新 I5-B runner。它通过 production prepare 生成全新 request，并从实际
+command plan 取得解释器；不得把正确解释器另行注入探针。`--recovery-root` 必须是不存在的新绝对路径，执行结束后
+仍不存在：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/run_restricted_recovery_interpreter_acceptance.py \
+  --python-executable /Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  --output-root /Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_i5_b_python_binding_20260916 \
+  --recovery-execution-id typed_model_cache_restricted_recovery_20260916_g14r20_i5b_pending \
+  --recovery-root /Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_restricted_recovery/typed_model_cache_restricted_recovery_20260916_g14r20_i5b_pending
+```
+
+runner 会执行真实 venv identity/import probe、support 与 nested benchmark `--help`，并验证系统 Python、错误 venv、
+dependency/environment drift、context/child mismatch 的 pre-write 拒绝。不得安装依赖到系统 Python；不得把旧 I5/I5-A
+request 或生成后手改命令当作新证据。该 runner 不签 grant、不调用 recovery execute、不建 ledger/lock/staging，
+也不运行 model load、rollout、statistics、gate 或 holdout。
+
 ## G14R20-I5 最小受限恢复（仅 prepare/validate；真实 execute 未授权）
 
 唯一合同为 `configs/experiment/g14r20_i5_restricted_recovery_v1/restricted_recovery_contract.json`，说明见

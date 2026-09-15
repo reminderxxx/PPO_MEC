@@ -14,6 +14,9 @@
 
 ## G14R20-I5 restricted recovery boundary
 
+- `scripts/run_restricted_recovery_interpreter_acceptance.py`：从 final production prepare 生成新 unsigned request，
+  只从实际命令取得 launch interpreter；执行真实 environment/import/nested resolver 与 support/benchmark `--help`，
+  生成独立 I5-B acceptance/command/integrity 包，且不创建 recovery root。
 - `scripts/capture_restricted_recovery_protected_snapshot.py`：采集可追溯、create-only 的七文件起点快照；不内嵌 hash。
 - `scripts/run_restricted_recovery_acceptance_tests.py`：在 final clean commit 上运行 pytest 并写 commit/tree/JUnit-bound
   receipt；临时测试依赖仅由调用环境注入。
@@ -22,7 +25,8 @@
 - `scripts/build_restricted_recovery_acceptance_artifacts.py`：先验验证 start/end 保护、四类 JUnit receipt、skip review、
   I4 绝对路径完整性和旧 146+1 逐项处置，再生成 READY；任一失败不生成 READY。
 - `src/runtime/restricted_recovery.py`：唯一 I3 source 的完整 prefix/6-cell/150-model/lock 只读审计，新 executor/context
-  身份与科学参数投影，attempt 2→1 ledger、外部来源映射、去重 handoff 和 statistics rows 显式 resolver。
+  身份与科学参数投影；显式 venv launch path、audit-only binary realpath、真实 environment/import identity 与
+  command/cell-builder/nested parity；attempt 2→1 ledger、外部来源映射、去重 handoff 和 statistics rows resolver。
 - `scripts/prepare_typed_model_cache_restricted_recovery.py`：create-only unsigned request 与 live validate；不创建 run、
   grant、ledger、lock、staging 或结果。
 - `scripts/run_typed_model_cache_restricted_recovery.py`：exact recovery grant 后的一次一 cell 公共入口；不含 issuer、

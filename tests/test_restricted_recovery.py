@@ -29,6 +29,7 @@ from src.runtime.restricted_recovery import (
     RestrictedRecoveryError,
     UNSTARTED_CELL_ID,
     audit_original_recovery_source,
+    restricted_cell_layout,
     validate_restricted_recovery_request,
 )
 
@@ -94,11 +95,39 @@ def minimal_request(tmp_path: Path) -> dict:
         for _ in range(2)
     ]
     plan = {"commands": commands, "matrix_contexts": deepcopy(CONTEXTS), "expected_outputs": []}
+    environment_identity = {
+        "dependency_fingerprint": "d" * 64,
+        "environment_fingerprint": "n" * 64,
+    }
+    python_binding = {
+        "restricted_recovery_python_binding_version": "1.0.0",
+        "launch_path": "/absolute/python",
+        "binary_realpath_audit_only": "/system/python",
+        "observed_sys_executable": "/absolute/python",
+        "observed_sys_prefix": "/absolute",
+        "observed_sys_base_prefix": "/system",
+        "virtual_environment_active": True,
+        "environment_identity": environment_identity,
+        "runtime_audit": {"resolved_python_absolute_path": "/absolute/python"},
+    }
+    python_binding["binding_sha256"] = canonical_sha256(python_binding)
     context = {
         "context_sha256": "",
+        "runtime_location": {
+            "resolved_python_absolute_path": "/absolute/python",
+            "python_binary_realpath_audit_only": "/system/python",
+            "python_environment_binding_sha256": python_binding["binding_sha256"],
+        },
+        "resolved_expansion_context": {"python_executable": "/absolute/python"},
+        "scientific_identity": {
+            "dependency_fingerprint": "d" * 64,
+            "environment_fingerprint": "n" * 64,
+            "full_normalized_environment_projection": deepcopy(environment_identity),
+        },
         "evaluation_execution_identity": {
             "executor_commit": "e" * 40,
             "executor_git_tree": "f" * 40,
+            "python_environment_binding_sha256": python_binding["binding_sha256"],
         },
     }
     context["context_sha256"] = canonical_sha256(
@@ -113,6 +142,7 @@ def minimal_request(tmp_path: Path) -> dict:
         "executor_commit": "e" * 40,
         "executor_git_tree": "f" * 40,
         "python_executable": "/absolute/python",
+        "python_environment_binding": python_binding,
         "model_source_reference_sha256": "s" * 64,
         "allowed_phase": PHASE,
         "allowed_cell_ids": list(ALLOWED_CELL_IDS),
@@ -165,6 +195,34 @@ def minimal_request(tmp_path: Path) -> dict:
     return request
 
 
+def rehash_python_request(request: dict) -> None:
+    execution = request["recovery_execution"]
+    binding = execution["python_environment_binding"]
+    binding["binding_sha256"] = canonical_sha256(
+        {key: value for key, value in binding.items() if key != "binding_sha256"}
+    )
+    context = execution["resolved_execution_context"]
+    context["context_sha256"] = canonical_sha256(
+        {key: value for key, value in context.items() if key != "context_sha256"}
+    )
+    execution["resolved_execution_context_sha256"] = context["context_sha256"]
+    execution["command_plan_sha256"] = canonical_sha256(execution["command_plan"])
+    execution["recovery_execution_identity_sha256"] = canonical_sha256(
+        {
+            key: value
+            for key, value in execution.items()
+            if key != "recovery_execution_identity_sha256"
+        }
+    )
+    request["authorization_request_sha256"] = canonical_sha256(
+        {
+            key: value
+            for key, value in request.items()
+            if key != "authorization_request_sha256"
+        }
+    )
+
+
 @pytest.mark.parametrize(
     ("mutation", "message"),
     [
@@ -182,6 +240,56 @@ def test_request_scope_mutations_fail_closed(tmp_path: Path, mutation, message: 
     )
     with pytest.raises(RestrictedRecoveryError, match=message):
         validate_restricted_recovery_request(request, check_live=False)
+
+
+def test_cell_builder_preserves_request_launch_path(tmp_path: Path) -> None:
+    request = minimal_request(tmp_path)
+    for cell_id in ALLOWED_CELL_IDS:
+        command, _, _, builder, _ = restricted_cell_layout(request, cell_id)
+        staged = builder(tmp_path / "not-created", cell_id)
+        assert command[0] == "/absolute/python"
+        assert staged[0] == command[0]
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    [
+        (
+            lambda execution: execution["command_plan"]["commands"][0].__setitem__(
+                0, "/system/python"
+            ),
+            "command Python launch path drift",
+        ),
+        (
+            lambda execution: execution["resolved_execution_context"][
+                "runtime_location"
+            ].update(resolved_python_absolute_path="/system/python"),
+            "request/context/child Python identity drift",
+        ),
+        (
+            lambda execution: execution["python_environment_binding"][
+                "environment_identity"
+            ].update(dependency_fingerprint="x" * 64),
+            "request/context/child Python identity drift",
+        ),
+        (
+            lambda execution: execution["python_environment_binding"].update(
+                observed_sys_prefix="/system"
+            ),
+            "request/context/child Python identity drift",
+        ),
+    ],
+)
+def test_python_binding_drift_is_rejected_before_recovery_write(
+    tmp_path: Path, mutation, message: str
+) -> None:
+    request = minimal_request(tmp_path)
+    recovery_root = Path(request["recovery_execution"]["recovery_root"])
+    mutation(request["recovery_execution"])
+    rehash_python_request(request)
+    with pytest.raises(RestrictedRecoveryError, match=message):
+        validate_restricted_recovery_request(request, check_live=False)
+    assert not recovery_root.exists()
 
 
 def test_recovery_ledger_uses_attempt_two_then_first_attempt(tmp_path: Path) -> None:

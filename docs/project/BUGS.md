@@ -1,3 +1,12 @@
+## 2026-09-16: restricted recovery production Python symlink 被展开（RESOLVED；旧申请不可执行）
+
+- 根因：I5 production request builder 在已检查 `.venv/bin/python` 后调用 `Path.resolve()`，把系统二进制 realpath
+  当作 launch path；I5-A receipt runner 的局部修复没有覆盖 request/context/scientific child 链。
+- 修复：launch path 与 binary realpath 分字段；真实环境探针、冻结依赖身份、import origin、context/command/cell
+  builder/nested parity 在任何 recovery 写入前 fail-closed。不得向系统 Python 安装 Torch 或手改生成命令。
+- 历史边界：旧 I5/I5-A 包不改写，历史 task-start 仍 unavailable、保护结论仍 `UNVERIFIED`。本修复不授权 grant、
+  真实恢复、清锁、模型加载、正式 rollout 或 holdout；未来 recovery root 保持不存在。
+
 ## 2026-09-14: I5 acceptance task-start/JUnit fail-open（RESOLVED；旧 stop 保留）
 
 - 根因 1：两个 held-lock hash 被人工放入用户文件 task-start 常量；原会话已有正确七文件 `stat + shasum` 输出但未被

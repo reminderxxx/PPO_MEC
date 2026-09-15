@@ -7,6 +7,25 @@
 - `real_recovery_started`: `false`
 - `holdout_opened`: `false`
 
+## I5-B 虚拟环境启动身份勘误
+
+I5/I5-A 生成的旧 unsigned request 不可执行：`build_restricted_recovery_request()` 曾对显式
+`.venv/bin/python` 调用 `resolve()`，把 symlink target 的系统 Python 写入 request、resolved context 和两条
+科学命令。I5-A 只修复 commit-bound pytest runner 的相同症状，没有修复生产 recovery builder；旧包保持原样，
+不得现场替换命令首项或回填身份。
+
+I5-B 将虚拟环境入口定义为独立的 `launch_path`，仅用 `absolute()` 规范化并逐字贯穿 request → context → command
+plan → cell staging builder → support child → nested benchmark。`binary_realpath_audit_only` 单独记录底层二进制，
+不得作为启动入口。生产 prepare 与每次 live dispatch 均用 launch path 启动真实环境探针，核对
+`sys.executable`、`sys.prefix != sys.base_prefix`、完整 dependency/environment fingerprint、critical package
+versions、项目 import 来源、clean executor commit/tree；任一漂移在 recovery root、ledger、lock、staging 或 cell
+dispatch 前拒绝。系统 Python、错误 venv、依赖身份漂移和 context/child 分叉均为硬失败。
+
+I5-B acceptance 必须从最终 production builder 生成全新 unsigned request，再从生成的两条命令取得解释器；真实
+support 与 nested benchmark 仅运行 `--help`，另以真实子进程核对 nested resolver，不运行 rollout 或加载模型。
+原 two-cell synthetic transaction 验收继续保留，但不作为解释器边界的替代证据。未来 recovery root 在验收结束后
+仍必须不存在。
+
 ## 固定身份与只读边界
 
 实现只识别原 run `typed_model_cache_evaluation_only_20260913_g14r20_i3_pending`。原 request、project grant、

@@ -36,6 +36,11 @@ from src.runtime.evaluation_only_execution import (
     file_sha256,
     validate_model_source_reference,
 )
+from src.runtime.formal_execution_environment import (
+    ExecutionEnvironmentError,
+    probe_python_environment,
+    resolve_execution_environment,
+)
 from src.runtime.resolved_formal_execution_context import (
     validate_resolved_formal_execution_context,
 )
@@ -45,6 +50,7 @@ RESTRICTED_RECOVERY_CONTRACT_VERSION = "1.0.0"
 RESTRICTED_RECOVERY_REQUEST_VERSION = "1.0.0"
 RESTRICTED_RECOVERY_PHASE_LEDGER_VERSION = "1.0.0"
 RESTRICTED_RECOVERY_HANDOFF_VERSION = "1.0.0"
+RESTRICTED_RECOVERY_PYTHON_BINDING_VERSION = "1.0.0"
 ORIGINAL_RUN_ID = "typed_model_cache_evaluation_only_20260913_g14r20_i3_pending"
 ORIGINAL_PROJECT_ROOT = Path("/Users/howen/Projects/PPO_MEC")
 ORIGINAL_RUN_ROOT = (
@@ -509,6 +515,135 @@ def _command_scientific_projection(
     return {"projection": projected, "sha256": canonical_sha256(projected)}
 
 
+def _build_recovery_python_binding(
+    *,
+    python_executable: Path,
+    executor_checkout: Path,
+    executor_commit: str,
+    source_reference: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Probe one venv launch path without replacing it with its symlink target."""
+
+    launch = python_executable.absolute()
+    if not launch.is_absolute() or not launch.is_file() or not os.access(launch, os.X_OK):
+        raise RestrictedRecoveryError("recovery Python launch path is missing")
+    source_context = _read_json(source_reference["source_context_path"])
+    expected_identity = source_context.get("scientific_identity", {}).get(
+        "full_normalized_environment_projection"
+    )
+    if not isinstance(expected_identity, Mapping):
+        raise RestrictedRecoveryError("recovery source lacks frozen environment identity")
+    try:
+        probe = probe_python_environment(
+            launch,
+            clean_worktree_root=executor_checkout,
+        )
+        resolution = resolve_execution_environment(
+            clean_worktree_root=executor_checkout,
+            execution_commit=executor_commit,
+            python_executable=launch,
+            expected_identity=expected_identity,
+            require_clean_git_worktree=True,
+        )
+    except ExecutionEnvironmentError as exc:
+        raise RestrictedRecoveryError(
+            f"recovery Python environment identity mismatch: {exc}"
+        ) from exc
+    observed_executable = str(Path(str(probe.get("sys_executable", ""))).absolute())
+    sys_prefix = str(Path(str(probe.get("sys_prefix", ""))).absolute())
+    base_prefix = str(Path(str(probe.get("base_prefix", ""))).absolute())
+    if observed_executable != str(launch):
+        raise RestrictedRecoveryError(
+            "recovery Python launch path differs from child sys.executable"
+        )
+    if not sys_prefix or not base_prefix or sys_prefix == base_prefix:
+        raise RestrictedRecoveryError("recovery Python is not an isolated virtual environment")
+    try:
+        launch.relative_to(Path(sys_prefix))
+    except ValueError as exc:
+        raise RestrictedRecoveryError(
+            "recovery Python launch path is outside the observed virtual environment"
+        ) from exc
+    binding: dict[str, Any] = {
+        "restricted_recovery_python_binding_version": (
+            RESTRICTED_RECOVERY_PYTHON_BINDING_VERSION
+        ),
+        "launch_path": str(launch),
+        "binary_realpath_audit_only": str(launch.resolve(strict=True)),
+        "observed_sys_executable": observed_executable,
+        "observed_sys_prefix": sys_prefix,
+        "observed_sys_base_prefix": base_prefix,
+        "virtual_environment_active": True,
+        "environment_identity": resolution.environment_identity,
+        "runtime_audit": resolution.runtime_audit,
+    }
+    binding["binding_sha256"] = canonical_sha256(binding)
+    return binding
+
+
+def _validate_recovery_python_binding(
+    execution: Mapping[str, Any], *, check_live: bool
+) -> dict[str, Any]:
+    binding = execution.get("python_environment_binding")
+    context = execution.get("resolved_execution_context")
+    if not isinstance(binding, Mapping) or not isinstance(context, Mapping):
+        raise RestrictedRecoveryError("recovery Python environment binding is missing")
+    binding_value = dict(binding)
+    supplied_hash = binding_value.pop("binding_sha256", None)
+    if (
+        binding.get("restricted_recovery_python_binding_version")
+        != RESTRICTED_RECOVERY_PYTHON_BINDING_VERSION
+        or supplied_hash != canonical_sha256(binding_value)
+        or binding.get("virtual_environment_active") is not True
+    ):
+        raise RestrictedRecoveryError("recovery Python environment binding drift")
+    launch = str(execution.get("python_executable", ""))
+    runtime = context.get("runtime_location", {})
+    expansion = context.get("resolved_expansion_context", {})
+    identity = binding.get("environment_identity", {})
+    audit = binding.get("runtime_audit", {})
+    scientific = context.get("scientific_identity", {})
+    evaluation_identity = context.get("evaluation_execution_identity", {})
+    if (
+        not Path(launch).is_absolute()
+        or binding.get("launch_path") != launch
+        or binding.get("observed_sys_executable") != launch
+        or binding.get("observed_sys_prefix") == binding.get("observed_sys_base_prefix")
+        or runtime.get("resolved_python_absolute_path") != launch
+        or runtime.get("python_binary_realpath_audit_only")
+        != binding.get("binary_realpath_audit_only")
+        or runtime.get("python_environment_binding_sha256") != supplied_hash
+        or expansion.get("python_executable") != launch
+        or evaluation_identity.get("python_environment_binding_sha256") != supplied_hash
+        or audit.get("resolved_python_absolute_path") != launch
+        or scientific.get("full_normalized_environment_projection") != identity
+        or scientific.get("environment_fingerprint")
+        != identity.get("environment_fingerprint")
+        or scientific.get("dependency_fingerprint")
+        != identity.get("dependency_fingerprint")
+    ):
+        raise RestrictedRecoveryError("recovery request/context/child Python identity drift")
+    commands = execution.get("command_plan", {}).get("commands", [])
+    if len(commands) != 2 or any(not command or command[0] != launch for command in commands):
+        raise RestrictedRecoveryError("recovery command Python launch path drift")
+    if check_live:
+        observed = _build_recovery_python_binding(
+            python_executable=Path(launch),
+            executor_checkout=Path(str(execution["executor_checkout"])),
+            executor_commit=str(execution["executor_commit"]),
+            source_reference=_read_json(
+                ORIGINAL_RUN_ROOT / "evaluation_model_source_reference.json"
+            ),
+        )
+        if dict(binding) != observed:
+            raise RestrictedRecoveryError("live recovery Python environment drift")
+        if binding.get("binary_realpath_audit_only") != str(
+            Path(launch).resolve(strict=True)
+        ):
+            raise RestrictedRecoveryError("live recovery Python binary realpath drift")
+    return dict(binding)
+
+
 def _build_recovery_execution(
     *,
     source_reference: Mapping[str, Any],
@@ -518,6 +653,7 @@ def _build_recovery_execution(
     executor_checkout: Path,
     executor_commit: str,
     python_executable: Path,
+    python_environment_binding: Mapping[str, Any],
     created_at_utc: str,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     base = build_evaluation_execution_contract(
@@ -534,6 +670,7 @@ def _build_recovery_execution(
         raise RestrictedRecoveryError("frozen ablation cell membership/order drift")
     context = deepcopy(base["evaluation_execution_context"])
     plan_sha = canonical_sha256(plan)
+    python_binding_sha256 = str(python_environment_binding["binding_sha256"])
     context["created_at_utc"] = created_at_utc
     context["created_for_run_identity"] = canonical_sha256(
         {
@@ -560,6 +697,17 @@ def _build_recovery_execution(
         original_run_id=ORIGINAL_RUN_ID,
         allowed_phase=PHASE,
         allowed_cell_ids=list(ALLOWED_CELL_IDS),
+        python_environment_binding_sha256=python_binding_sha256,
+    )
+    context["runtime_location"].update(
+        resolved_python_absolute_path=str(python_executable),
+        python_binary_realpath_audit_only=python_environment_binding[
+            "binary_realpath_audit_only"
+        ],
+        python_environment_binding_sha256=python_binding_sha256,
+    )
+    context["resolved_expansion_context"]["python_executable"] = str(
+        python_executable
     )
     context["context_sha256"] = canonical_sha256(
         {key: value for key, value in context.items() if key != "context_sha256"}
@@ -620,6 +768,7 @@ def _build_recovery_execution(
         "executor_commit": executor_commit,
         "executor_git_tree": base["executor_git_tree"],
         "python_executable": str(python_executable),
+        "python_environment_binding": dict(python_environment_binding),
         "model_source_reference_sha256": source_reference["source_reference_sha256"],
         "allowed_phase": PHASE,
         "allowed_cell_ids": list(ALLOWED_CELL_IDS),
@@ -672,11 +821,6 @@ def build_restricted_recovery_request(
     created_at_utc: str | None = None,
     allow_existing_recovery_root: bool = False,
 ) -> dict[str, Any]:
-    source_audit = audit_original_recovery_source(
-        original_request_path=original_request_path,
-        original_project_grant_path=original_project_grant_path,
-        original_run_root=original_run_root,
-    )
     root = Path(recovery_root)
     _assert_disjoint_recovery_root(root, recovery_execution_id)
     if root.exists() and not allow_existing_recovery_root:
@@ -710,11 +854,22 @@ def build_restricted_recovery_request(
     )
     if status.returncode or status.stdout.strip():
         raise RestrictedRecoveryError("recovery executor code/config/documentation is not clean")
-    python = Path(python_executable)
+    python = Path(python_executable).absolute()
     if not python.is_absolute() or not python.is_file() or not os.access(python, os.X_OK):
         raise RestrictedRecoveryError("recovery Python executable is missing")
     source = _read_json(ORIGINAL_RUN_ROOT / "evaluation_model_source_reference.json")
     original_execution = _read_json(ORIGINAL_RUN_ROOT / "evaluation_execution_contract.json")
+    python_environment_binding = _build_recovery_python_binding(
+        python_executable=python,
+        executor_checkout=executor.resolve(),
+        executor_commit=executor_commit,
+        source_reference=source,
+    )
+    source_audit = audit_original_recovery_source(
+        original_request_path=original_request_path,
+        original_project_grant_path=original_project_grant_path,
+        original_run_root=original_run_root,
+    )
     created = created_at_utc or datetime.now(timezone.utc).isoformat()
     execution, invariance = _build_recovery_execution(
         source_reference=source,
@@ -723,7 +878,8 @@ def build_restricted_recovery_request(
         recovery_root=root,
         executor_checkout=executor.resolve(),
         executor_commit=executor_commit,
-        python_executable=python.resolve(),
+        python_executable=python,
+        python_environment_binding=python_environment_binding,
         created_at_utc=created,
     )
     request: dict[str, Any] = {
@@ -858,6 +1014,7 @@ def validate_restricted_recovery_request(
         != canonical_sha256({key: item for key, item in context.items() if key != "context_sha256"})
     ):
         raise RestrictedRecoveryError("recovery resolved context drift")
+    _validate_recovery_python_binding(execution, check_live=False)
     if value.get("scientific_invariance", {}).get("scientific_parameters_unchanged") is not True:
         raise RestrictedRecoveryError("scientific invariance evidence is missing")
     mapping = value.get("source_mapping_and_deduplication", {})
@@ -939,11 +1096,14 @@ def validate_recovery_executor_live(request: Mapping[str, Any]) -> dict[str, Any
         raise RestrictedRecoveryError("live recovery Python executable drift")
     source = _read_json(ORIGINAL_RUN_ROOT / "evaluation_model_source_reference.json")
     protocol = _read_json(source["protocol_path"])
+    python_binding = _validate_recovery_python_binding(execution, check_live=True)
     validate_resolved_formal_execution_context(
         execution["resolved_execution_context"],
         protocol=protocol,
         clean_worktree_root=executor,
         durable_run_root=execution["recovery_root"],
+        environment_identity=python_binding["environment_identity"],
+        runtime_audit=python_binding["runtime_audit"],
         check_git=True,
     )
     from scripts import run_typed_model_cache_formal_support
@@ -959,6 +1119,18 @@ def validate_recovery_executor_live(request: Mapping[str, Any]) -> dict[str, Any
             raise RestrictedRecoveryError("live recovery command entrypoint drift")
         run_typed_model_cache_formal_support.build_parser().parse_args(command[2:])
         projections.append(_command_scientific_projection(command, executor_root=executor))
+        cell_id = execution["allowed_cell_ids"][len(projections) - 1]
+        _, _, _, builder, _ = restricted_cell_layout(request, cell_id)
+        staged = list(
+            builder(
+                Path(execution["recovery_root"]) / ".pre_dispatch_validation",
+                cell_id,
+            )
+        )
+        if not staged or staged[0] != str(python):
+            raise RestrictedRecoveryError(
+                "recovery cell command builder replaced the Python launch path"
+            )
     if projections != request["scientific_invariance"]["normalized_recovery_commands"]:
         raise RestrictedRecoveryError("live recovery scientific projection drift")
     return {
@@ -966,6 +1138,16 @@ def validate_recovery_executor_live(request: Mapping[str, Any]) -> dict[str, Any
         "executor_commit": execution["executor_commit"],
         "executor_git_tree": execution["executor_git_tree"],
         "parsed_command_count": 2,
+        "python_launch_path": str(python),
+        "python_binary_realpath_audit_only": python_binding[
+            "binary_realpath_audit_only"
+        ],
+        "environment_fingerprint": python_binding["environment_identity"][
+            "environment_fingerprint"
+        ],
+        "dependency_fingerprint": python_binding["environment_identity"][
+            "dependency_fingerprint"
+        ],
     }
 
 
@@ -980,9 +1162,9 @@ def recovery_cell_identity(request: Mapping[str, Any]) -> CellExecutionIdentity:
         resource_registry_semantic_sha256=original_identity[
             "resource_registry_semantic_sha256"
         ],
-        environment_fingerprint=hashlib.sha256(
-            execution["python_executable"].encode("utf-8")
-        ).hexdigest(),
+        environment_fingerprint=execution["python_environment_binding"][
+            "environment_identity"
+        ]["environment_fingerprint"],
         split_semantic_sha256=original_identity["split_semantic_sha256"],
         window_contract_semantic_sha256=original_identity[
             "window_contract_semantic_sha256"
@@ -1259,7 +1441,17 @@ def restricted_cell_layout(request: Mapping[str, Any], cell_id: str):
         },
     )
     final, builder, resolver = cell_layout(PHASE, coordinates, command, native)
-    return command, coordinates, final, builder, resolver
+    expected_python = str(execution["python_executable"])
+
+    def launch_bound_builder(staging: Path, actual_cell_id: str) -> list[str]:
+        staged = list(builder(staging, actual_cell_id))
+        if not staged or staged[0] != expected_python:
+            raise RestrictedRecoveryError(
+                "recovery cell command builder replaced the Python launch path"
+            )
+        return staged
+
+    return command, coordinates, final, launch_bound_builder, resolver
 
 
 __all__ = [
@@ -1272,6 +1464,7 @@ __all__ = [
     "ORIGINAL_RUN_ROOT",
     "PHASE",
     "RESTRICTED_RECOVERY_CONTRACT_VERSION",
+    "RESTRICTED_RECOVERY_PYTHON_BINDING_VERSION",
     "RestrictedRecoveryCellLedger",
     "RestrictedRecoveryError",
     "RestrictedRecoveryPhaseLedger",

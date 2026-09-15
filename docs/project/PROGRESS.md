@@ -1,3 +1,15 @@
+## 2026-09-16: G14R20-I5-B restricted recovery venv launch binding 修复
+
+- 根因：生产 `build_restricted_recovery_request()` 对显式 `.venv/bin/python` 使用 `resolve()`，使 request、context、
+  formal-ablation command 与后续 support/nested benchmark 实际绑定系统 Python；I5-A 只修复测试 receipt runner。
+- 修复：保留 absolute venv launch path，binary realpath 仅作审计；生产 prepare 和 dispatch 前真实核对
+  `sys.executable/prefix/base_prefix`、冻结 dependency/environment identity、critical versions、项目 import origin、
+  commit/tree，并要求 command plan 与 cell builder 不替换入口。
+- I5/I5-A 包原样保留并标为不可执行，不回填旧申请；I5-B 重新生成完整 unsigned request、command、acceptance 与
+  integrity 包。system Python、错误 venv、依赖漂移和 context/child 不一致均须在 recovery 写入前拒绝。
+- 历史 task-start 仍 unavailable，`historical_protection_verdict=UNVERIFIED`；不签 grant、不创建 recovery root、
+  不清锁、不加载模型、不运行 rollout 或 holdout。
+
 ## 2026-09-14: G14R20-I5-A 验收基线与 JUnit 门禁纠错
 
 - 原 I5 两个硬编码 task-start hash 已溯源为旧 E02 与 I3 held-lock hash；未找到可靠 task-start 七文件快照，故

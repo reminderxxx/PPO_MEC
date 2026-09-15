@@ -1,3 +1,10 @@
+> **2026-09-16 G14R20-I5-B**：修复 restricted recovery production builder 将 `.venv/bin/python` symlink
+> 展开为系统 Python 的问题。launch path 现逐字绑定 request、context、cell command、support child 和 nested
+> benchmark；binary realpath 仅作审计，正式环境/依赖/import/commit/tree 在写入前真实复核。旧 I5/I5-A 包保持
+> 不变并不可执行，历史保护仍 `UNVERIFIED`。本轮不签 grant、不创建 recovery root、不清锁、不加载模型、不运行
+> 正式 rollout 或 holdout。合同见
+> [docs/project/g14r20_i5_restricted_recovery_contract.md](docs/project/g14r20_i5_restricted_recovery_contract.md)。
+>
 > **2026-09-14 G14R20-I5-A 勘误**：原 I5 验收脚本把两份 held-lock SHA-256 错写为两个用户文件的
 > task-start hash，且只汇总 JUnit、未拒绝 failure/error。I5-A 改为消费显式 start snapshot、采集独立 end
 > snapshot，并以 commit-bound receipt 拒绝失败、错误、空集、身份/报告不匹配、缺件和未闭合 skip。旧
