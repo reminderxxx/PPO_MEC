@@ -1,11 +1,32 @@
 # G14R20-I5 最小受限恢复合同
 
-- `contract_version`: `1.0.0`
+- `contract_version`: `1.1.0`
 - `scope`: `one original run / formal_ablation / two ordered cells`
 - `status_ceiling`: `READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION`
 - `recovery_grant_issued`: `false`
 - `real_recovery_started`: `false`
 - `holdout_opened`: `false`
+
+## I5-C 父目录冷启动合同
+
+I5-B 的 request、grant 与 `execute_cell_1.log` 原样冻结。首次 execute 的 rc=1，分类固定为
+`PRE_TRANSACTION_BOOTSTRAP_FAILURE / RECOVERY_PARENT_CONTRACT_NOT_CLOSED`；失败发生在 run root、专用锁、ledger、
+staging 与科学 dispatch 之前，与模型、数据、算法、超参数或性能无关。I5-B 永久禁止 retry/resume/salvage/re-execute。
+
+唯一 production parent 是
+`/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_restricted_recovery`。request 必须冻结 parent、
+已存在祖父的 device/inode、current effective owner、0700 mode、单层 `dir_fd` create-only producer 与禁止递归/symlink/
+路径逃逸字段。prepare、live validator 与 qualify 只读接受“parent 缺失”或“同一合法真实目录”；不得创建目录。
+
+只有 exact grant 之后的 execute 可作为唯一 producer：先通过祖父 fd 复核 identity/access，再对一个固定 basename 执行
+create-only `mkdir`，并以 `O_DIRECTORY|O_NOFOLLOW` 打开和复核 parent。并发首建只有一个 creator；其余进程只在同一
+inode/type/owner/mode 复核后继续。parent 为 symlink、文件、不可写、owner/mode 错误或验证后被替换时，在 recovery
+root、锁、ledger 和 dispatch 前拒绝。不得 `parents=True`、不得调用方预建、不得替代路径。
+
+parent 创建后、run root 创建前终止只留下空的 0700 parent，是可解释且可重复核验的 benign bootstrap state；不写
+run marker、ledger、lock，也不声明 recovery 已开始。原 run root 仍 create-only；既存 root 缺少
+`restricted_recovery_initialization_complete.json` 时只读拒绝。held-lock、single-writer、grant、解释器和 producer/
+transaction 双层完整性规则保持不变。
 
 ## I5-B 虚拟环境启动身份勘误
 

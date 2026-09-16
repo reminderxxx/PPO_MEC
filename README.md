@@ -1,3 +1,11 @@
+> **2026-09-16 G14R20-I5-C**：I5-B 首次真实 execute 在事务初始化前因 recovery parent 不存在而退出，分类固定为
+> `PRE_TRANSACTION_BOOTSTRAP_FAILURE / RECOVERY_PARENT_CONTRACT_NOT_CLOSED`，return code=`1`。I5-B request/grant/
+> log 永久只读且禁止 retry/resume/salvage/re-execute。Contract 1.1 现把唯一父目录、祖父 identity、owner/mode、
+> 单层 `dir_fd` create-only 与 benign parent-only state 纳入 request；只有 execute 是 producer，validator/qualify
+> 只读共享同一合同。新申请上限仍为 `READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION`，未签 grant、未启动真实
+> recovery、未运行模型或打开 holdout。合同见
+> [docs/project/g14r20_i5_restricted_recovery_contract.md](docs/project/g14r20_i5_restricted_recovery_contract.md)。
+>
 > **2026-09-16 G14R20-I5-B**：修复 restricted recovery production builder 将 `.venv/bin/python` symlink
 > 展开为系统 Python 的问题。launch path 现逐字绑定 request、context、cell command、support child 和 nested
 > benchmark；binary realpath 仅作审计，正式环境/依赖/import/commit/tree 在写入前真实复核。旧 I5/I5-A 包保持

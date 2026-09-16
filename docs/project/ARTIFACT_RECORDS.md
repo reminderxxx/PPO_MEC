@@ -5,6 +5,17 @@
 
 # Artifact Records
 
+## 2026-09-16 G14R20-I5-C restricted recovery parent bootstrap closure
+
+- path：`artifacts/analysis/g14r20_i5_c_parent_bootstrap_20260916/`；`root_cause_audit.json` 固定 I5-B rc=1、
+  `PRE_TRANSACTION_BOOTSTRAP_FAILURE / RECOVERY_PARENT_CONTRACT_NOT_CLOSED` 与零 root/lock/ledger/staging/dispatch。
+- `unsigned_recovery_request.json` 使用全新 I5-C execution ID/root/hash 与 final executor commit/tree；
+  `command_package.json` 保留唯一 `.venv/bin/python` 科学启动链。新 run root 在验收结束时不存在。
+- `parent_bootstrap_acceptance.json` 汇总缺失 parent、顺序 `[2,1]`、并发 create-only、合法既存、symlink/file/
+  不可写/mode/owner/替换/缺 marker/故障负例及 validator/qualify/execute 一致性；科学 dispatch/model load/performance=0。
+- `final_artifact_integrity.json` 覆盖最终申请、命令、JUnit/receipt、七文件 start/end、根因和验收。历史起点仍
+  unavailable/UNVERIFIED；状态上限 READY，grant/recovery/holdout=false。本记录不是性能或 paper-ready evidence。
+
 ## 2026-09-16 G14R20-I5-B recovery interpreter binding
 
 - path：`artifacts/analysis/g14r20_i5_b_python_binding_20260916/`；由 final clean commit 上

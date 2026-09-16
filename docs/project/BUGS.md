@@ -1,3 +1,14 @@
+## 2026-09-16: restricted recovery 缺失父目录冷启动合同未闭合（RESOLVED；I5-B 永久冻结）
+
+- 事实：I5-B execute 在 `RestrictedRecoverySingleWriter.__enter__` 因固定 recovery parent 不存在而 rc=1；发生于
+  run root、专用锁、ledger、staging 和科学 dispatch 之前，与模型、数据、算法、超参数和性能无关。
+- 根因：builder、live validator、qualify 允许缺失父目录，execute 却要求已存在；public synthetic fixture 预建 scope。
+- 修复：Contract 1.1 request-bound 精确 parent 与祖父 inode/device；只允许 execute 通过单层 `dir_fd`、`O_NOFOLLOW`
+  create-only 创建 0700/current-owner parent，并在每次 root/lock 使用前复核 inode/type/owner/mode。并发 loser 只可在
+  相同真实目录复核后继续；symlink、文件、不可写祖父、owner/mode 漂移和替换全部 fail-closed。
+- 边界：I5-B request/grant/log 不改写、不重试；旧 6 cells、150 models、run/ledgers/lock/staging 只读。新申请未签 grant，
+  新 run root 不存在，真实 recovery/model/performance/holdout 均未启动。
+
 ## 2026-09-16: restricted recovery production Python symlink 被展开（RESOLVED；旧申请不可执行）
 
 - 根因：I5 production request builder 在已检查 `.venv/bin/python` 后调用 `Path.resolve()`，把系统二进制 realpath

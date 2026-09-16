@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import stat
 import subprocess
 from typing import Any, Mapping, Sequence
 
@@ -46,8 +47,10 @@ from src.runtime.resolved_formal_execution_context import (
 )
 
 
-RESTRICTED_RECOVERY_CONTRACT_VERSION = "1.0.0"
-RESTRICTED_RECOVERY_REQUEST_VERSION = "1.0.0"
+RESTRICTED_RECOVERY_CONTRACT_VERSION = "1.1.0"
+RESTRICTED_RECOVERY_REQUEST_VERSION = "1.1.0"
+RESTRICTED_RECOVERY_PARENT_BOOTSTRAP_VERSION = "1.0.0"
+RESTRICTED_RECOVERY_PARENT_MODE = 0o700
 RESTRICTED_RECOVERY_PHASE_LEDGER_VERSION = "1.0.0"
 RESTRICTED_RECOVERY_HANDOFF_VERSION = "1.0.0"
 RESTRICTED_RECOVERY_PYTHON_BINDING_VERSION = "1.0.0"
@@ -57,6 +60,10 @@ ORIGINAL_RUN_ROOT = (
     ORIGINAL_PROJECT_ROOT
     / "artifacts/experiments/typed_model_cache_evaluation_only"
     / ORIGINAL_RUN_ID
+)
+RESTRICTED_RECOVERY_PARENT = (
+    ORIGINAL_PROJECT_ROOT
+    / "artifacts/experiments/typed_model_cache_restricted_recovery"
 )
 ORIGINAL_REQUEST_PATH = (
     ORIGINAL_PROJECT_ROOT
@@ -116,6 +123,145 @@ EXPECTED_ORIGINAL_EXECUTOR_COMMIT = "a028ea291941a484ae9cd2e316d1b52adde3d1f2"
 
 class RestrictedRecoveryError(ValueError):
     """A bounded recovery identity, source, scope, or ordering check failed."""
+
+
+def _permission_allows_write_execute(row: os.stat_result) -> bool:
+    mode = stat.S_IMODE(row.st_mode)
+    uid = os.geteuid()
+    if uid == row.st_uid:
+        required = stat.S_IWUSR | stat.S_IXUSR
+    elif row.st_gid == os.getegid() or row.st_gid in os.getgroups():
+        required = stat.S_IWGRP | stat.S_IXGRP
+    else:
+        required = stat.S_IWOTH | stat.S_IXOTH
+    return mode & required == required
+
+
+def build_restricted_recovery_parent_contract(parent: Path) -> dict[str, Any]:
+    """Freeze the one-component, create-only parent bootstrap identity."""
+
+    if not parent.is_absolute() or ".." in parent.parts:
+        raise RestrictedRecoveryError("restricted recovery parent must be absolute")
+    grandparent = parent.parent
+    try:
+        row = grandparent.lstat()
+    except FileNotFoundError as exc:
+        raise RestrictedRecoveryError(
+            "restricted recovery parent grandparent must already exist"
+        ) from exc
+    if (
+        stat.S_ISLNK(row.st_mode)
+        or not stat.S_ISDIR(row.st_mode)
+        or not _permission_allows_write_execute(row)
+    ):
+        raise RestrictedRecoveryError(
+            "restricted recovery parent grandparent must be a writable real directory"
+        )
+    return {
+        "restricted_recovery_parent_bootstrap_version": (
+            RESTRICTED_RECOVERY_PARENT_BOOTSTRAP_VERSION
+        ),
+        "parent_path": str(parent),
+        "grandparent_path": str(grandparent),
+        "grandparent_device": row.st_dev,
+        "grandparent_inode": row.st_ino,
+        "required_parent_owner_uid": os.geteuid(),
+        "required_parent_mode": RESTRICTED_RECOVERY_PARENT_MODE,
+        "creation": "single_component_create_only_dir_fd",
+        "recursive_parent_creation_allowed": False,
+        "symlink_allowed": False,
+        "producer": "restricted_recovery_execute_parent_bootstrap",
+        "run_root_creation": "separate_create_only_after_parent_bootstrap",
+        "parent_only_state_is_benign": True,
+    }
+
+
+def validate_restricted_recovery_parent_contract(
+    execution: Mapping[str, Any],
+    *,
+    expected_parent: Path = RESTRICTED_RECOVERY_PARENT,
+    check_live: bool,
+) -> dict[str, Any]:
+    """Validate one shared parent contract without creating any path."""
+
+    contract = execution.get("parent_bootstrap_contract")
+    if not isinstance(contract, Mapping):
+        raise RestrictedRecoveryError("restricted recovery parent contract is missing")
+    parent = Path(str(contract.get("parent_path", "")))
+    root = Path(str(execution.get("recovery_root", "")))
+    expected_keys = {
+        "restricted_recovery_parent_bootstrap_version",
+        "parent_path",
+        "grandparent_path",
+        "grandparent_device",
+        "grandparent_inode",
+        "required_parent_owner_uid",
+        "required_parent_mode",
+        "creation",
+        "recursive_parent_creation_allowed",
+        "symlink_allowed",
+        "producer",
+        "run_root_creation",
+        "parent_only_state_is_benign",
+    }
+    if (
+        set(contract) != expected_keys
+        or contract.get("restricted_recovery_parent_bootstrap_version")
+        != RESTRICTED_RECOVERY_PARENT_BOOTSTRAP_VERSION
+        or parent != expected_parent
+        or root.parent != parent
+        or contract.get("grandparent_path") != str(parent.parent)
+        or contract.get("required_parent_owner_uid") != os.geteuid()
+        or contract.get("required_parent_mode") != RESTRICTED_RECOVERY_PARENT_MODE
+        or contract.get("creation") != "single_component_create_only_dir_fd"
+        or contract.get("recursive_parent_creation_allowed") is not False
+        or contract.get("symlink_allowed") is not False
+        or contract.get("producer")
+        != "restricted_recovery_execute_parent_bootstrap"
+        or contract.get("run_root_creation")
+        != "separate_create_only_after_parent_bootstrap"
+        or contract.get("parent_only_state_is_benign") is not True
+    ):
+        raise RestrictedRecoveryError("restricted recovery parent contract drift")
+    if not check_live:
+        return {"status": "pass", "parent_path": str(parent), "state": "not_checked"}
+    try:
+        grandparent_row = parent.parent.lstat()
+    except FileNotFoundError as exc:
+        raise RestrictedRecoveryError(
+            "restricted recovery parent grandparent must already exist"
+        ) from exc
+    if (
+        stat.S_ISLNK(grandparent_row.st_mode)
+        or not stat.S_ISDIR(grandparent_row.st_mode)
+        or not _permission_allows_write_execute(grandparent_row)
+        or grandparent_row.st_dev != contract.get("grandparent_device")
+        or grandparent_row.st_ino != contract.get("grandparent_inode")
+    ):
+        raise RestrictedRecoveryError(
+            "restricted recovery parent grandparent identity/access drift"
+        )
+    try:
+        parent_row = parent.lstat()
+    except FileNotFoundError:
+        return {"status": "pass", "parent_path": str(parent), "state": "absent"}
+    if (
+        stat.S_ISLNK(parent_row.st_mode)
+        or not stat.S_ISDIR(parent_row.st_mode)
+        or parent_row.st_uid != contract["required_parent_owner_uid"]
+        or stat.S_IMODE(parent_row.st_mode) != contract["required_parent_mode"]
+        or not _permission_allows_write_execute(parent_row)
+    ):
+        raise RestrictedRecoveryError(
+            "restricted recovery parent owner/mode/type is invalid"
+        )
+    return {
+        "status": "pass",
+        "parent_path": str(parent),
+        "state": "existing_valid",
+        "device": parent_row.st_dev,
+        "inode": parent_row.st_ino,
+    }
 
 
 def _read_json(path: str | Path) -> dict[str, Any]:
@@ -215,6 +361,17 @@ def _validate_contract_document() -> dict[str, Any]:
         or contract.get("source_reference_sha256")
         != EXPECTED_SOURCE_REFERENCE_SHA256
         or contract.get("automatic_retry_count") != 0
+        or contract.get("parent_bootstrap_contract")
+        != {
+            "version": RESTRICTED_RECOVERY_PARENT_BOOTSTRAP_VERSION,
+            "parent_path": str(RESTRICTED_RECOVERY_PARENT),
+            "required_parent_mode": RESTRICTED_RECOVERY_PARENT_MODE,
+            "creation": "single_component_create_only_dir_fd",
+            "recursive_parent_creation_allowed": False,
+            "symlink_allowed": False,
+            "producer": "restricted_recovery_execute_parent_bootstrap",
+            "parent_only_state_is_benign": True,
+        }
         or any(
             contract.get(field) is not False
             for field in (
@@ -654,6 +811,7 @@ def _build_recovery_execution(
     executor_commit: str,
     python_executable: Path,
     python_environment_binding: Mapping[str, Any],
+    parent_bootstrap_contract: Mapping[str, Any],
     created_at_utc: str,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     base = build_evaluation_execution_contract(
@@ -769,6 +927,7 @@ def _build_recovery_execution(
         "executor_git_tree": base["executor_git_tree"],
         "python_executable": str(python_executable),
         "python_environment_binding": dict(python_environment_binding),
+        "parent_bootstrap_contract": dict(parent_bootstrap_contract),
         "model_source_reference_sha256": source_reference["source_reference_sha256"],
         "allowed_phase": PHASE,
         "allowed_cell_ids": list(ALLOWED_CELL_IDS),
@@ -820,9 +979,22 @@ def build_restricted_recovery_request(
     python_executable: str | Path,
     created_at_utc: str | None = None,
     allow_existing_recovery_root: bool = False,
+    _test_recovery_parent: str | Path | None = None,
 ) -> dict[str, Any]:
     root = Path(recovery_root)
     _assert_disjoint_recovery_root(root, recovery_execution_id)
+    expected_parent = (
+        Path(_test_recovery_parent)
+        if _test_recovery_parent is not None
+        else RESTRICTED_RECOVERY_PARENT
+    )
+    if root.parent != expected_parent:
+        raise RestrictedRecoveryError(
+            "recovery root must use the contract-frozen parent"
+        )
+    parent_bootstrap_contract = build_restricted_recovery_parent_contract(
+        expected_parent
+    )
     if root.exists() and not allow_existing_recovery_root:
         raise RestrictedRecoveryError("unsigned recovery request requires a new output root")
     executor = Path(executor_checkout)
@@ -880,6 +1052,7 @@ def build_restricted_recovery_request(
         executor_commit=executor_commit,
         python_executable=python,
         python_environment_binding=python_environment_binding,
+        parent_bootstrap_contract=parent_bootstrap_contract,
         created_at_utc=created,
     )
     request: dict[str, Any] = {
@@ -937,7 +1110,8 @@ def build_restricted_recovery_request(
 
 
 def validate_restricted_recovery_request(
-    request: Mapping[str, Any], *, check_live: bool = True
+    request: Mapping[str, Any], *, check_live: bool = True,
+    _test_recovery_parent: str | Path | None = None,
 ) -> dict[str, Any]:
     _validate_contract_document()
     value = dict(request)
@@ -987,6 +1161,16 @@ def validate_restricted_recovery_request(
         raise RestrictedRecoveryError("recovery attempt/order identity drift")
     root = Path(str(execution.get("recovery_root", "")))
     _assert_disjoint_recovery_root(root, str(execution.get("recovery_execution_id", "")))
+    expected_parent = (
+        Path(_test_recovery_parent)
+        if _test_recovery_parent is not None
+        else RESTRICTED_RECOVERY_PARENT
+    )
+    parent_result = validate_restricted_recovery_parent_contract(
+        execution,
+        expected_parent=expected_parent,
+        check_live=check_live,
+    )
     plan = execution.get("command_plan")
     if not isinstance(plan, Mapping) or execution.get("command_plan_sha256") != canonical_sha256(plan):
         raise RestrictedRecoveryError("recovery command plan drift")
@@ -1040,6 +1224,9 @@ def validate_restricted_recovery_request(
             python_executable=execution["python_executable"],
             created_at_utc=value["created_at_utc"],
             allow_existing_recovery_root=True,
+            _test_recovery_parent=(
+                expected_parent if _test_recovery_parent is not None else None
+            ),
         )
         if dict(request) != rebuilt:
             raise RestrictedRecoveryError("recovery request differs from live immutable sources")
@@ -1049,13 +1236,20 @@ def validate_restricted_recovery_request(
         "external_committed_cell_count": 6,
         "source_model_count": 150,
         "allowed_cell_count": 2,
+        "recovery_parent": parent_result,
     }
 
 
-def validate_recovery_executor_live(request: Mapping[str, Any]) -> dict[str, Any]:
+def validate_recovery_executor_live(
+    request: Mapping[str, Any], *, _test_recovery_parent: str | Path | None = None
+) -> dict[str, Any]:
     """Recheck the new executor/context/command side without consuming sources."""
 
-    validate_restricted_recovery_request(request, check_live=False)
+    validate_restricted_recovery_request(
+        request,
+        check_live=True,
+        _test_recovery_parent=_test_recovery_parent,
+    )
     execution = request["recovery_execution"]
     executor = Path(execution["executor_checkout"])
     if not executor.is_absolute() or executor.is_symlink() or not executor.is_dir():
@@ -1464,18 +1658,23 @@ __all__ = [
     "ORIGINAL_RUN_ROOT",
     "PHASE",
     "RESTRICTED_RECOVERY_CONTRACT_VERSION",
+    "RESTRICTED_RECOVERY_PARENT",
+    "RESTRICTED_RECOVERY_PARENT_BOOTSTRAP_VERSION",
+    "RESTRICTED_RECOVERY_PARENT_MODE",
     "RESTRICTED_RECOVERY_PYTHON_BINDING_VERSION",
     "RestrictedRecoveryCellLedger",
     "RestrictedRecoveryError",
     "RestrictedRecoveryPhaseLedger",
     "UNSTARTED_CELL_ID",
     "audit_original_recovery_source",
+    "build_restricted_recovery_parent_contract",
     "build_recovery_handoff_manifest",
     "build_restricted_recovery_request",
     "recovery_cell_identity",
     "restricted_cell_layout",
     "stable_source_audit_projection",
     "validate_recovery_handoff_manifest",
+    "validate_restricted_recovery_parent_contract",
     "validate_recovery_executor_live",
     "validate_restricted_recovery_request",
 ]

@@ -1,3 +1,26 @@
+## G14R20-I5-C restricted recovery parent bootstrap（仅 prepare/validate）
+
+I5-B request/grant/命令永久禁止 retry、resume、salvage 或重新执行。I5-C production prepare 只接受固定 parent：
+`/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_restricted_recovery`；调用方不得预先 `mkdir`，
+不得传替代 parent。prepare/validate/qualify 只读；只有未来持有全新 exact grant 的 execute 可 create-only 初始化 parent。
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -B scripts/prepare_typed_model_cache_restricted_recovery.py \
+  --action prepare \
+  --original-request-path /Users/howen/Projects/PPO_MEC/artifacts/analysis/g14r20_i3_producer_integrity_20260913/authorization_request_unsigned.json \
+  --original-project-grant-path /Users/howen/Projects/PPO_MEC/artifacts/analysis/g14e03_authorization_audit_20260913/project_grant.json \
+  --original-run-root /Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending \
+  --recovery-execution-id typed_model_cache_restricted_recovery_20260916_g14r20_i5c_pending \
+  --recovery-root /Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_restricted_recovery/typed_model_cache_restricted_recovery_20260916_g14r20_i5c_pending \
+  --executor-checkout <final-clean-i5c-checkout> \
+  --executor-commit <final-i5c-commit> \
+  --python-executable /Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  --output-path <new-i5c-artifact-root>/unsigned_recovery_request.json
+```
+
+验收结束时新 run root 必须仍不存在，状态最多为 `READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION`，且
+`recovery_grant_issued=false`、`real_recovery_started=false`、`holdout_opened=false`。本节不授权 execute。
+
 ## G14R20-I5-A 验收补验（不授权真实 execute）
 
 先用 `capture_restricted_recovery_protected_snapshot.py` 对主工作区七文件生成 create-only start snapshot；四类 pytest

@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import sys
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -123,7 +124,12 @@ if len(sys.argv) > 1 and sys.argv[1] == "child":
 from src.evaluators.formal_cell_transaction import (
     resolve_child_output_descriptor,
 )
-from src.runtime.restricted_recovery import ALLOWED_CELL_IDS, PHASE
+from src.runtime.restricted_recovery import (
+    ALLOWED_CELL_IDS,
+    PHASE,
+    build_restricted_recovery_request,
+    validate_restricted_recovery_request,
+)
 
 
 def write_json(path: Path, value: object) -> None:
@@ -133,13 +139,17 @@ def write_json(path: Path, value: object) -> None:
 class SyntheticRecoveryChild:
     def __init__(self, scope: str | Path):
         self.scope = Path(scope).resolve()
+        self.expected_recovery_parent = (
+            self.scope / "typed_model_cache_restricted_recovery"
+        )
 
     def validate(self, request):
         binding = json.loads((self.scope / "synthetic_binding.json").read_text())
         execution = request["recovery_execution"]
         if (
             not self.scope.name.startswith("synthetic_")
-            or Path(execution["recovery_root"]) != self.scope / "synthetic_recovery_run"
+            or Path(execution["recovery_root"])
+            != self.expected_recovery_parent / "synthetic_recovery_run"
             or binding
             != {
                 "test_only": True,
@@ -212,7 +222,72 @@ def host(scope: str, argv: list[str]) -> None:
     public.main(scientific_child_adapter=SyntheticRecoveryChild(scope_path))
 
 
-if __name__ == "__main__":
-    from tests.restricted_recovery_public_driver import host
+def prepare(scope: str, argv: list[str]) -> None:
+    """Call the production builder with a source-only synthetic parent injection."""
 
-    host(sys.argv[2], sys.argv[3:])
+    from scripts.prepare_typed_model_cache_restricted_recovery import build_parser
+
+    args = build_parser().parse_args(argv)
+    scope_path = Path(scope).resolve()
+    expected_parent = scope_path / "typed_model_cache_restricted_recovery"
+    request = build_restricted_recovery_request(
+        original_request_path=args.original_request_path,
+        original_project_grant_path=args.original_project_grant_path,
+        original_run_root=args.original_run_root,
+        recovery_execution_id=args.recovery_execution_id,
+        recovery_root=args.recovery_root,
+        executor_checkout=args.executor_checkout,
+        executor_commit=args.executor_commit,
+        python_executable=args.python_executable,
+        _test_recovery_parent=expected_parent,
+    )
+    validate_restricted_recovery_request(
+        request,
+        check_live=True,
+        _test_recovery_parent=expected_parent,
+    )
+    output = Path(args.output_path)
+    with output.open("x", encoding="utf-8") as stream:
+        json.dump(request, stream, ensure_ascii=False, indent=2)
+        stream.write("\n")
+    print(json.dumps({"status": request["status"]}, indent=2))
+
+
+def bootstrap(scope: str, request_path: str, ready: str, release: str) -> None:
+    """Synchronize two real processes immediately before create-only mkdir."""
+
+    from scripts.run_typed_model_cache_restricted_recovery import (
+        RestrictedRecoveryParentBootstrap,
+    )
+
+    scope_path = Path(scope).resolve()
+    request = json.loads(Path(request_path).read_text(encoding="utf-8"))
+    ready_path = Path(ready)
+    release_path = Path(release)
+
+    def before_create(_guard):
+        ready_path.touch(exist_ok=False)
+        deadline = time.monotonic() + 15
+        while not release_path.exists():
+            if time.monotonic() >= deadline:
+                raise RuntimeError("bootstrap concurrency barrier timeout")
+            time.sleep(0.01)
+
+    with RestrictedRecoveryParentBootstrap(
+        request,
+        expected_parent=scope_path / "typed_model_cache_restricted_recovery",
+        before_create_hook=before_create,
+    ) as guard:
+        guard.verify()
+        print(json.dumps({"status": "pass", "created": guard.created}))
+
+
+if __name__ == "__main__":
+    from tests.restricted_recovery_public_driver import host, prepare
+
+    if sys.argv[1] == "prepare":
+        prepare(sys.argv[2], sys.argv[3:])
+    elif sys.argv[1] == "bootstrap":
+        bootstrap(*sys.argv[2:])
+    else:
+        host(sys.argv[2], sys.argv[3:])

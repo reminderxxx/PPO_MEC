@@ -96,6 +96,7 @@ def main() -> None:
                 "-c",
                 (
                     "import scripts.build_restricted_recovery_acceptance_artifacts; "
+                    "import scripts.build_restricted_recovery_parent_bootstrap_artifacts; "
                     "import scripts.capture_restricted_recovery_protected_snapshot; "
                     "import scripts.run_restricted_recovery_acceptance_tests; "
                     "import src.runtime.restricted_recovery"

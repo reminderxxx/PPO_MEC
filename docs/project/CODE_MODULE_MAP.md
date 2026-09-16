@@ -14,6 +14,14 @@
 
 ## G14R20-I5 restricted recovery boundary
 
+- `src/runtime/restricted_recovery.py` 的 Contract 1.1 parent contract：固定 production parent、祖父 inode/device、
+  current-owner/0700、禁止 symlink/递归/逃逸；builder、live validator、qualify 和 execute 共享同一语义。
+- `scripts/run_typed_model_cache_restricted_recovery.py` 的唯一 bootstrap producer：祖父/父 `dir_fd` + `O_NOFOLLOW`、
+  并发 create-only、使用前 inode 复核；parent-only state 不表示 run 已开始，run root 仍独立 create-only。
+- `tests/test_restricted_recovery_parent_bootstrap.py`：真实缺失父目录、双进程并发、非法类型/权限/替换、缺 marker、
+  bootstrap 故障和路径/owner 负例；public test 从缺失 parent 完成 synthetic attempt `[2,1]`。
+- `scripts/build_restricted_recovery_parent_bootstrap_artifacts.py`：冻结 I5-B 失败事实、四组 JUnit/validation receipt、
+  七文件、旧 source 与新 request 的最终 evidence/integrity；不执行 recovery。
 - `scripts/run_restricted_recovery_interpreter_acceptance.py`：从 final production prepare 生成新 unsigned request，
   只从实际命令取得 launch interpreter；执行真实 environment/import/nested resolver 与 support/benchmark `--help`，
   生成独立 I5-B acceptance/command/integrity 包，且不创建 recovery root。

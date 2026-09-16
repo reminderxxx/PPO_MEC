@@ -15,6 +15,7 @@ import json
 import os
 from pathlib import Path
 import socket
+import stat
 import sys
 from typing import Any, Mapping
 import uuid
@@ -31,6 +32,8 @@ from src.runtime.restricted_recovery import (
     FAILED_CELL_ID,
     ORIGINAL_RUN_ROOT,
     PHASE,
+    RESTRICTED_RECOVERY_PARENT,
+    RESTRICTED_RECOVERY_PARENT_MODE,
     RestrictedRecoveryCellLedger,
     RestrictedRecoveryError,
     RestrictedRecoveryPhaseLedger,
@@ -40,6 +43,7 @@ from src.runtime.restricted_recovery import (
     recovery_cell_identity,
     restricted_cell_layout,
     stable_source_audit_projection,
+    validate_restricted_recovery_parent_contract,
     validate_recovery_handoff_manifest,
     validate_recovery_executor_live,
     validate_restricted_recovery_request,
@@ -69,6 +73,160 @@ def _encoded(payload: Any) -> bytes:
     return (json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n").encode("utf-8")
 
 
+class RestrictedRecoveryParentBootstrap:
+    """Create/open the frozen parent through one verified grandparent fd."""
+
+    def __init__(
+        self,
+        request: Mapping[str, Any],
+        *,
+        expected_parent: Path = RESTRICTED_RECOVERY_PARENT,
+        before_create_hook=None,
+        after_create_hook=None,
+        before_use_hook=None,
+    ) -> None:
+        self.request = request
+        self.expected_parent = expected_parent
+        self.before_create_hook = before_create_hook
+        self.after_create_hook = after_create_hook
+        self.before_use_hook = before_use_hook
+        self.grandparent_fd: int | None = None
+        self.parent_fd: int | None = None
+        self.created = False
+        self.parent_identity: tuple[int, int] | None = None
+
+    @property
+    def parent(self) -> Path:
+        return self.expected_parent
+
+    def _open_flags(self) -> int:
+        return os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+
+    def verify(self) -> None:
+        if self.grandparent_fd is None or self.parent_fd is None:
+            raise RestrictedRecoveryError("restricted recovery parent guard is not open")
+        contract = self.request["recovery_execution"]["parent_bootstrap_contract"]
+        grandparent = os.fstat(self.grandparent_fd)
+        parent = os.fstat(self.parent_fd)
+        try:
+            path_parent = os.stat(
+                self.parent.name,
+                dir_fd=self.grandparent_fd,
+                follow_symlinks=False,
+            )
+        except FileNotFoundError as exc:
+            raise RestrictedRecoveryError(
+                "restricted recovery parent was replaced after validation"
+            ) from exc
+        if (
+            not stat.S_ISDIR(grandparent.st_mode)
+            or (grandparent.st_dev, grandparent.st_ino)
+            != (contract["grandparent_device"], contract["grandparent_inode"])
+            or not stat.S_ISDIR(parent.st_mode)
+            or stat.S_ISLNK(path_parent.st_mode)
+            or not stat.S_ISDIR(path_parent.st_mode)
+            or (parent.st_dev, parent.st_ino)
+            != (path_parent.st_dev, path_parent.st_ino)
+            or parent.st_uid != contract["required_parent_owner_uid"]
+            or stat.S_IMODE(parent.st_mode) != contract["required_parent_mode"]
+        ):
+            raise RestrictedRecoveryError(
+                "restricted recovery parent was replaced or changed after validation"
+            )
+
+    def __enter__(self):
+        execution = self.request["recovery_execution"]
+        validate_restricted_recovery_parent_contract(
+            execution,
+            expected_parent=self.expected_parent,
+            check_live=True,
+        )
+        contract = execution["parent_bootstrap_contract"]
+        self.grandparent_fd = os.open(self.parent.parent, self._open_flags())
+        try:
+            grandparent = os.fstat(self.grandparent_fd)
+            if (grandparent.st_dev, grandparent.st_ino) != (
+                contract["grandparent_device"],
+                contract["grandparent_inode"],
+            ):
+                raise RestrictedRecoveryError(
+                    "restricted recovery parent grandparent changed during bootstrap"
+                )
+            if self.before_create_hook is not None:
+                self.before_create_hook(self)
+            try:
+                os.mkdir(
+                    self.parent.name,
+                    RESTRICTED_RECOVERY_PARENT_MODE,
+                    dir_fd=self.grandparent_fd,
+                )
+                self.created = True
+            except FileExistsError:
+                self.created = False
+            self.parent_fd = os.open(
+                self.parent.name,
+                self._open_flags(),
+                dir_fd=self.grandparent_fd,
+            )
+            if self.created:
+                os.fchmod(self.parent_fd, RESTRICTED_RECOVERY_PARENT_MODE)
+            self.verify()
+            if self.created and self.after_create_hook is not None:
+                self.after_create_hook(self)
+            if self.before_use_hook is not None:
+                self.before_use_hook(self)
+            self.verify()
+            parent = os.fstat(self.parent_fd)
+            self.parent_identity = (parent.st_dev, parent.st_ino)
+            return self
+        except BaseException:
+            self.__exit__(*sys.exc_info())
+            raise
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        if self.parent_fd is not None:
+            os.close(self.parent_fd)
+            self.parent_fd = None
+        if self.grandparent_fd is not None:
+            os.close(self.grandparent_fd)
+            self.grandparent_fd = None
+
+    def root_exists(self, root: Path) -> bool:
+        self.verify()
+        if root.parent != self.parent or self.parent_fd is None:
+            raise RestrictedRecoveryError("recovery root escaped the parent guard")
+        try:
+            row = os.stat(root.name, dir_fd=self.parent_fd, follow_symlinks=False)
+        except FileNotFoundError:
+            return False
+        if stat.S_ISLNK(row.st_mode) or not stat.S_ISDIR(row.st_mode):
+            raise RestrictedRecoveryError("recovery root must be absent or a real directory")
+        return True
+
+    def create_root(self, root: Path) -> None:
+        self.verify()
+        if root.parent != self.parent or self.parent_fd is None:
+            raise RestrictedRecoveryError("recovery root escaped the parent guard")
+        try:
+            os.mkdir(root.name, RESTRICTED_RECOVERY_PARENT_MODE, dir_fd=self.parent_fd)
+        except FileExistsError as exc:
+            raise RestrictedRecoveryError("recovery root create-only conflict") from exc
+        root_fd = os.open(root.name, self._open_flags(), dir_fd=self.parent_fd)
+        try:
+            os.fchmod(root_fd, RESTRICTED_RECOVERY_PARENT_MODE)
+            row = os.fstat(root_fd)
+            path_row = os.stat(root.name, dir_fd=self.parent_fd, follow_symlinks=False)
+            if (
+                row.st_uid != os.geteuid()
+                or stat.S_IMODE(row.st_mode) != RESTRICTED_RECOVERY_PARENT_MODE
+                or (row.st_dev, row.st_ino) != (path_row.st_dev, path_row.st_ino)
+            ):
+                raise RestrictedRecoveryError("recovery root create-only identity drift")
+        finally:
+            os.close(root_fd)
+        self.verify()
+
+
 class RestrictedRecoverySingleWriter:
     """Create-only recovery lock with no PID liveness or crash takeover path.
 
@@ -78,10 +236,18 @@ class RestrictedRecoverySingleWriter:
     permits the second, ordered process to acquire the same inode.
     """
 
-    def __init__(self, run_root: Path, executor_sha256: str, authorize) -> None:
+    def __init__(
+        self,
+        run_root: Path,
+        executor_sha256: str,
+        authorize,
+        *,
+        parent_guard: RestrictedRecoveryParentBootstrap,
+    ) -> None:
         self.root = run_root
         self.executor_sha256 = executor_sha256
         self.authorize = authorize
+        self.parent_guard = parent_guard
         self.fd: int | None = None
         self.owner: dict[str, Any] | None = None
 
@@ -97,22 +263,40 @@ class RestrictedRecoverySingleWriter:
 
     def __enter__(self):
         self.authorize()
-        if self.root.is_symlink() or (self.root.exists() and not self.root.is_dir()):
+        self.parent_guard.verify()
+        if self.parent_guard.root_exists(self.root) and (
+            self.root.is_symlink() or not self.root.is_dir()
+        ):
             raise RestrictedRecoveryError("recovery root must be absent or a real directory")
-        parent = self.root.parent
-        if parent.is_symlink() or not parent.is_dir() or not os.access(parent, os.W_OK | os.X_OK):
-            raise RestrictedRecoveryError("recovery parent is not a writable real directory")
         path = writer_lock_path(self.root)
-        lock_parent = path.parent
-        if lock_parent.exists() and (lock_parent.is_symlink() or not lock_parent.is_dir()):
-            raise RestrictedRecoveryError("recovery lock parent must be a real directory")
-        lock_parent.mkdir(mode=0o700, exist_ok=True)
-        if lock_parent.is_symlink():
-            raise RestrictedRecoveryError("recovery lock parent changed to a symlink")
+        if path.parent.parent != self.parent_guard.parent or self.parent_guard.parent_fd is None:
+            raise RestrictedRecoveryError("recovery lock path escaped the parent guard")
+        try:
+            os.mkdir(".continuation_locks", 0o700, dir_fd=self.parent_guard.parent_fd)
+        except FileExistsError:
+            pass
+        lock_parent_fd = os.open(
+            ".continuation_locks",
+            os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW,
+            dir_fd=self.parent_guard.parent_fd,
+        )
         flags = os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW
-        self.fd = os.open(path, flags, 0o600)
+        try:
+            lock_parent_row = os.fstat(lock_parent_fd)
+            if (
+                lock_parent_row.st_uid != os.geteuid()
+                or stat.S_IMODE(lock_parent_row.st_mode) != 0o700
+            ):
+                raise RestrictedRecoveryError(
+                    "recovery lock parent owner/mode is invalid"
+                )
+            self.parent_guard.verify()
+            self.fd = os.open(path.name, flags, 0o600, dir_fd=lock_parent_fd)
+        finally:
+            os.close(lock_parent_fd)
         try:
             fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            self.parent_guard.verify()
             self.authorize()
             os.lseek(self.fd, 0, os.SEEK_SET)
             previous_bytes = os.read(self.fd, 65537)
@@ -279,10 +463,11 @@ def _initial_files(request: Mapping[str, Any]) -> dict[str, Any]:
 
 def _initialize(
     request: Mapping[str, Any],
+    parent_guard: RestrictedRecoveryParentBootstrap,
 ) -> tuple[Path, RestrictedRecoveryCellLedger, RestrictedRecoveryPhaseLedger]:
     execution = request["recovery_execution"]
     root = Path(execution["recovery_root"])
-    root.mkdir(exist_ok=False)
+    parent_guard.create_root(root)
     _create_file(root / "recovery_phase_state.jsonl", b"")
     for name, payload in _initial_files(request).items():
         _create_file(root / name, _encoded(payload))
@@ -314,11 +499,16 @@ def _initialize(
 
 def _load(
     request: Mapping[str, Any],
+    parent_guard: RestrictedRecoveryParentBootstrap | None = None,
 ) -> tuple[Path, RestrictedRecoveryCellLedger, RestrictedRecoveryPhaseLedger]:
     execution = request["recovery_execution"]
     root = Path(execution["recovery_root"])
     if not root.exists():
-        return _initialize(request)
+        if parent_guard is None:
+            raise RestrictedRecoveryError(
+                "missing recovery root requires the parent bootstrap producer"
+            )
+        return _initialize(request, parent_guard)
     marker = _read(root / "restricted_recovery_initialization_complete.json")
     names = [*_initial_files(request), "cell_ledger_identity.json"]
     if (
@@ -415,6 +605,11 @@ def execute_recovery_cell(
     scientific_child_adapter=None,
 ) -> dict[str, Any]:
     synthetic_only = scientific_child_adapter is not None
+    expected_parent = (
+        scientific_child_adapter.expected_recovery_parent
+        if scientific_child_adapter is not None
+        else RESTRICTED_RECOVERY_PARENT
+    )
     authorization = verify_recovery_grant(
         request,
         grant,
@@ -422,6 +617,11 @@ def execute_recovery_cell(
     )
     execution = request["recovery_execution"]
     root = Path(execution["recovery_root"])
+    validate_restricted_recovery_parent_contract(
+        execution,
+        expected_parent=expected_parent,
+        check_live=True,
+    )
     if cell_id not in ALLOWED_CELL_IDS:
         raise RestrictedRecoveryError("cell is outside restricted recovery scope")
     if not root.exists() and cell_id != FAILED_CELL_ID:
@@ -436,7 +636,10 @@ def execute_recovery_cell(
         )
     # Every process revalidates the full immutable source before opening the new
     # writer lock. Rejection here produces neither dispatch nor recovery write.
-    validate_recovery_executor_live(request)
+    validate_recovery_executor_live(
+        request,
+        _test_recovery_parent=(expected_parent if synthetic_only else None),
+    )
     audit = audit_original_recovery_source()
     source = _read(ORIGINAL_RUN_ROOT / "evaluation_model_source_reference.json")
     original = request["original_identity"]
@@ -456,7 +659,10 @@ def execute_recovery_cell(
         raise RestrictedRecoveryError("immutable recovery source/request binding drift")
     if len(audit["external_committed_cells"]) != 6:
         raise RestrictedRecoveryError("external committed source count drift")
-    with RestrictedRecoverySingleWriter(
+    with RestrictedRecoveryParentBootstrap(
+        request,
+        expected_parent=expected_parent,
+    ) as parent_guard, RestrictedRecoverySingleWriter(
         root,
         execution["recovery_execution_identity_sha256"],
         lambda: verify_recovery_grant(
@@ -464,8 +670,9 @@ def execute_recovery_cell(
             grant,
             synthetic_only=synthetic_only,
         ),
+        parent_guard=parent_guard,
     ):
-        root, cells, phase = _load(request)
+        root, cells, phase = _load(request, parent_guard)
         _assert_next(root, cells, phase, cell_id)
         command, coordinates, final, builder, resolver = restricted_cell_layout(
             request, cell_id
@@ -571,8 +778,15 @@ def execute_recovery_cell(
 def main(*, scientific_child_adapter=None) -> None:
     args = build_parser().parse_args()
     request = _read(args.authorization_request_path)
+    test_parent = (
+        scientific_child_adapter.expected_recovery_parent
+        if scientific_child_adapter is not None
+        else None
+    )
     validate_restricted_recovery_request(
-        request, check_live=args.check == "qualify"
+        request,
+        check_live=args.check == "qualify",
+        _test_recovery_parent=test_parent,
     )
     if scientific_child_adapter is not None:
         from tests.restricted_recovery_public_driver import SyntheticRecoveryChild

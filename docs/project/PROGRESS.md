@@ -1,3 +1,16 @@
+## 2026-09-16: G14R20-I5-C restricted recovery parent cold-start closure
+
+- I5-B 首次真实 execute 保留为 `PRE_TRANSACTION_BOOTSTRAP_FAILURE / RECOVERY_PARENT_CONTRACT_NOT_CLOSED`、rc=1；
+  recovery root、专用锁、ledger、staging、科学 child 均未创建，旧 request/grant 永久禁止重用或重试。
+- 根因是 single writer 要求既存可写真实父目录，而 builder/live validator/qualify 未闭合；旧 public synthetic test
+  预建 scope，未覆盖真正缺失父目录。
+- Contract 1.1 将唯一固定 parent、既存祖父 identity、owner/mode、禁止 symlink/递归/逃逸、并发 create-only 与
+  parent-only benign state 纳入 request。execute 是唯一 producer，run root 仍 create-only；授权、解释器、双层完整性、
+  held-lock 和 single-writer 规则未放宽。
+- 新 I5-C identity/request 与 I5-B 完全分离；验收只运行 synthetic transaction 和只读核验，不加载模型、不产生性能、
+  不运行真实两个 ablation cells。状态上限 `READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION`，grant/recovery/holdout=false。
+- 历史 task-start 仍为 `historical_start_evidence=unavailable`、`historical_protection_verdict=UNVERIFIED`。
+
 ## 2026-09-16: G14R20-I5-B restricted recovery venv launch binding 修复
 
 - 根因：生产 `build_restricted_recovery_request()` 对显式 `.venv/bin/python` 使用 `resolve()`，使 request、context、

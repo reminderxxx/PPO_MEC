@@ -1,6 +1,6 @@
 {
-  "restricted_recovery_contract_version": "1.0.0",
-  "goal": "G14R20-I5",
+  "restricted_recovery_contract_version": "1.1.0",
+  "goal": "G14R20-I5-C",
   "scope_kind": "one_original_run_one_phase_two_ordered_cells",
   "original_run_id": "typed_model_cache_evaluation_only_20260913_g14r20_i3_pending",
   "allowed_phase": "formal_ablation",
@@ -39,6 +39,16 @@
   "external_committed_cell_count": 6,
   "source_model_count": 150,
   "source_reference_sha256": "0ba289caa663d38dd35f61feafa509a3f8dc2eb4269b3220f18d383be81c3ea3",
+  "parent_bootstrap_contract": {
+    "version": "1.0.0",
+    "parent_path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_restricted_recovery",
+    "required_parent_mode": 448,
+    "creation": "single_component_create_only_dir_fd",
+    "recursive_parent_creation_allowed": false,
+    "symlink_allowed": false,
+    "producer": "restricted_recovery_execute_parent_bootstrap",
+    "parent_only_state_is_benign": true
+  },
   "automatic_retry_count": 0,
   "external_results_copied": false,
   "later_phases_authorized": false,

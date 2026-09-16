@@ -1,5 +1,20 @@
 ﻿# Decision Log
 
+## 2026-09-16 — D-G14R20-I5-C parent bootstrap 是 request-bound execute primitive
+
+决定：restricted recovery 只允许一个固定 production parent；request 冻结其祖父 inode/device、current-owner/0700、
+单层 `dir_fd` create-only 和禁止 symlink/递归/逃逸语义。prepare/validator/qualify 只读；execute 是唯一 parent producer，
+run root 仍在授权、source audit、single-writer 后独立 create-only。
+
+决定：父目录创建后、run root 前停止是 benign bootstrap state，不生成 ledger/lock/run marker 或“已开始”声明；并发首建
+允许一个进程创建，其他进程必须复核相同真实目录。验证与使用间的 inode/type/owner/mode 替换 fail-closed。
+
+原因：I5-B 在任何事务/锁/科学 dispatch 前因未显式闭合父目录前提而退出，旧 synthetic fixture 的预建 scope 掩盖了
+真实冷启动。调用方手工 mkdir 既不可审计也会分裂 producer 语义。
+
+边界：不修改或重试 I5-B，不放宽 grant/held-lock/single-writer/interpreter/双层完整性；不运行真实 recovery、模型、
+statistics/gate/holdout，也不形成性能或论文结论。
+
 ## 2026-09-16 — D-G14R20-I5-B venv symlink target 不是 launch identity
 
 决定：restricted recovery 的 Python 身份拆为不可替换的 absolute `launch_path` 与仅审计的 binary realpath；

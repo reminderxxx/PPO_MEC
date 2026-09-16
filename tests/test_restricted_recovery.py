@@ -12,6 +12,7 @@ import subprocess
 import pytest
 
 from scripts.run_typed_model_cache_restricted_recovery import (
+    RestrictedRecoveryParentBootstrap,
     RestrictedRecoverySingleWriter,
     verify_recovery_grant,
 )
@@ -29,12 +30,13 @@ from src.runtime.restricted_recovery import (
     RestrictedRecoveryError,
     UNSTARTED_CELL_ID,
     audit_original_recovery_source,
+    build_restricted_recovery_parent_contract,
     restricted_cell_layout,
     validate_restricted_recovery_request,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-PROJECT = ROOT.parents[2] if ROOT.parent.name == "execution_checkouts" else ROOT
+PROJECT = Path("/Users/howen/Projects/PPO_MEC")
 PYTHON = str(PROJECT / ".venv/bin/python")
 PREPARE = ROOT / "scripts/prepare_typed_model_cache_restricted_recovery.py"
 DRIVER = ROOT / "tests/restricted_recovery_public_driver.py"
@@ -82,7 +84,8 @@ def inventory(root: Path) -> dict[str, str]:
 
 
 def minimal_request(tmp_path: Path) -> dict:
-    root = tmp_path / "synthetic_recovery_run"
+    parent = tmp_path / "typed_model_cache_restricted_recovery"
+    root = parent / "synthetic_recovery_run"
     commands = [
         [
             "/absolute/python",
@@ -134,7 +137,7 @@ def minimal_request(tmp_path: Path) -> dict:
         {key: value for key, value in context.items() if key != "context_sha256"}
     )
     execution = {
-        "restricted_recovery_contract_version": "1.0.0",
+        "restricted_recovery_contract_version": "1.1.0",
         "recovery_execution_id": root.name,
         "recovery_root": str(root),
         "original_run_id": "typed_model_cache_evaluation_only_20260913_g14r20_i3_pending",
@@ -143,6 +146,7 @@ def minimal_request(tmp_path: Path) -> dict:
         "executor_git_tree": "f" * 40,
         "python_executable": "/absolute/python",
         "python_environment_binding": python_binding,
+        "parent_bootstrap_contract": build_restricted_recovery_parent_contract(parent),
         "model_source_reference_sha256": "s" * 64,
         "allowed_phase": PHASE,
         "allowed_cell_ids": list(ALLOWED_CELL_IDS),
@@ -168,7 +172,7 @@ def minimal_request(tmp_path: Path) -> dict:
     }
     execution["recovery_execution_identity_sha256"] = canonical_sha256(execution)
     request = {
-        "restricted_recovery_authorization_request_version": "1.0.0",
+        "restricted_recovery_authorization_request_version": "1.1.0",
         "status": "READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION",
         "authorization_kind": "restricted_formal_ablation_recovery_only",
         "created_at_utc": "2026-09-14T00:00:00+08:00",
@@ -239,7 +243,13 @@ def test_request_scope_mutations_fail_closed(tmp_path: Path, mutation, message: 
         {key: value for key, value in request.items() if key != "authorization_request_sha256"}
     )
     with pytest.raises(RestrictedRecoveryError, match=message):
-        validate_restricted_recovery_request(request, check_live=False)
+        validate_restricted_recovery_request(
+            request,
+            check_live=False,
+            _test_recovery_parent=Path(
+                request["recovery_execution"]["recovery_root"]
+            ).parent,
+        )
 
 
 def test_cell_builder_preserves_request_launch_path(tmp_path: Path) -> None:
@@ -288,7 +298,11 @@ def test_python_binding_drift_is_rejected_before_recovery_write(
     mutation(request["recovery_execution"])
     rehash_python_request(request)
     with pytest.raises(RestrictedRecoveryError, match=message):
-        validate_restricted_recovery_request(request, check_live=False)
+        validate_restricted_recovery_request(
+            request,
+            check_live=False,
+            _test_recovery_parent=recovery_root.parent,
+        )
     assert not recovery_root.exists()
 
 
@@ -386,16 +400,33 @@ def test_grant_is_distinct_and_holdout_false(tmp_path: Path) -> None:
 
 
 def test_recovery_writer_retains_held_state_and_forbids_takeover(tmp_path: Path) -> None:
-    root = tmp_path / "new_recovery"
-    with pytest.raises(RuntimeError, match="synthetic interruption"):
-        with RestrictedRecoverySingleWriter(root, "executor-identity", lambda: None):
+    request = minimal_request(tmp_path)
+    root = Path(request["recovery_execution"]["recovery_root"])
+    with RestrictedRecoveryParentBootstrap(
+        request, expected_parent=root.parent
+    ) as parent_guard, pytest.raises(RuntimeError, match="synthetic interruption"):
+        with RestrictedRecoverySingleWriter(
+            root,
+            "executor-identity",
+            lambda: None,
+            parent_guard=parent_guard,
+        ):
             raise RuntimeError("synthetic interruption")
     lock = writer_lock_path(root)
     retained = json.loads(lock.read_text())
     assert retained["state"] == "held"
     assert retained["process"]["identity_method"] == "pid_without_liveness_inference"
-    with pytest.raises(RestrictedRecoveryError, match="automatic takeover is forbidden"):
-        with RestrictedRecoverySingleWriter(root, "executor-identity", lambda: None):
+    with RestrictedRecoveryParentBootstrap(
+        request, expected_parent=root.parent
+    ) as parent_guard, pytest.raises(
+        RestrictedRecoveryError, match="automatic takeover is forbidden"
+    ):
+        with RestrictedRecoverySingleWriter(
+            root,
+            "executor-identity",
+            lambda: None,
+            parent_guard=parent_guard,
+        ):
             pass
 
 
@@ -406,12 +437,16 @@ PUBLIC = os.environ.get("G14R20_I5_PUBLIC_ACCEPTANCE") == "1"
 def test_public_two_process_handoff_and_zero_write_rejections(tmp_path: Path) -> None:
     scope = tmp_path / "synthetic_restricted_recovery_public"
     scope.mkdir()
-    recovery_root = scope / "synthetic_recovery_run"
+    recovery_parent = scope / "typed_model_cache_restricted_recovery"
+    recovery_root = recovery_parent / "synthetic_recovery_run"
+    assert not recovery_parent.exists()
     request_path = scope / "request.json"
     head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     prepare = [
         PYTHON,
-        str(PREPARE),
+        str(DRIVER),
+        "prepare",
+        str(scope),
         "--action",
         "prepare",
         "--original-request-path",
@@ -442,6 +477,7 @@ def test_public_two_process_handoff_and_zero_write_rejections(tmp_path: Path) ->
     prepared = subprocess.run(prepare, cwd=ROOT, env=environment, text=True, capture_output=True)
     assert prepared.returncode == 0, prepared.stderr
     request = json.loads(request_path.read_text())
+    assert not recovery_parent.exists()
     dump(
         scope / "synthetic_binding.json",
         {"test_only": True, "scope": str(scope), "request_sha256": request["authorization_request_sha256"]},
@@ -498,6 +534,16 @@ def test_public_two_process_handoff_and_zero_write_rejections(tmp_path: Path) ->
             "--check",
             "execute",
         ]
+
+    qualified = subprocess.run(
+        [*command(FAILED_CELL_ID)[:-1], "qualify"],
+        cwd=ROOT,
+        env=environment,
+        text=True,
+        capture_output=True,
+    )
+    assert qualified.returncode == 0, qualified.stderr
+    assert not recovery_parent.exists()
 
     def authorization_for(changed_request: dict, label: str) -> Path:
         changed_execution = changed_request["recovery_execution"]
@@ -638,6 +684,8 @@ def test_public_two_process_handoff_and_zero_write_rejections(tmp_path: Path) ->
 
     first = subprocess.run(command(FAILED_CELL_ID), cwd=ROOT, env=environment, text=True, capture_output=True)
     assert first.returncode == 0, first.stderr
+    assert recovery_parent.is_dir()
+    assert recovery_parent.stat().st_mode & 0o777 == 0o700
     first_inventory = inventory(recovery_root)
     assert len(rows(scope / "dispatch.jsonl")) == 1
     assert [row["attempt"] for row in rows(recovery_root / "cell_state.jsonl") if row["status"] == "committed"] == [2]

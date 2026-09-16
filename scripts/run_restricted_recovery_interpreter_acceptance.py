@@ -183,8 +183,8 @@ def main() -> None:
     before = audit_original_recovery_source()
     protection_start = build_protected_snapshot(
         ORIGINAL_PROJECT_ROOT,
-        snapshot_id="g14r20_i5_b_start",
-        capture_kind="g14r20_i5_b_interpreter_acceptance_start",
+        snapshot_id="g14r20_i5_c_start",
+        capture_kind="g14r20_i5_c_parent_bootstrap_acceptance_start",
         capture_source="run_restricted_recovery_interpreter_acceptance.py",
     )
     write_create_only(output_root / "protection_start.json", protection_start)
@@ -412,8 +412,8 @@ print(json.dumps({
     after = audit_original_recovery_source()
     protection_end = build_protected_snapshot(
         ORIGINAL_PROJECT_ROOT,
-        snapshot_id="g14r20_i5_b_end",
-        capture_kind="g14r20_i5_b_interpreter_acceptance_end",
+        snapshot_id="g14r20_i5_c_end",
+        capture_kind="g14r20_i5_c_parent_bootstrap_acceptance_end",
         capture_source="run_restricted_recovery_interpreter_acceptance.py",
     )
     write_create_only(output_root / "protection_end.json", protection_end)
@@ -425,8 +425,8 @@ print(json.dumps({
         raise RestrictedRecoveryError("protected source changed during acceptance")
     summary = {
         "version": "1.0.0",
-        "goal": "G14R20-I5-B",
-        "status": "READY_FOR_CENTRAL_REVIEW_NOT_AUTHORIZED_FOR_RECOVERY",
+        "goal": "G14R20-I5-C",
+        "status": "READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION",
         "executor_commit": head,
         "executor_git_tree": tree,
         "authorization_request_sha256": request["authorization_request_sha256"],
@@ -438,8 +438,11 @@ print(json.dumps({
         "historical_start_evidence": "unavailable",
         "historical_protection_verdict": "UNVERIFIED",
         "old_i5_i5_a_packages_modified": False,
+        "old_i5_b_package_modified": False,
         "old_i5_non_executable_reason": "production request resolved the venv launcher symlink to system Python",
         "old_i5_a_non_executable_reason": "acceptance runner preserved its venv, but production recovery request still resolved the launcher symlink",
+        "old_i5_b_non_executable_reason": "PRE_TRANSACTION_BOOTSTRAP_FAILURE / RECOVERY_PARENT_CONTRACT_NOT_CLOSED",
+        "parent_bootstrap_contract": execution["parent_bootstrap_contract"],
         "future_recovery_root": str(recovery_root),
         "future_recovery_root_exists": recovery_root.exists(),
         "recovery_grant_issued": False,
@@ -448,7 +451,7 @@ print(json.dumps({
     }
     write_create_only(output_root / "acceptance_summary.json", summary)
     report = (
-        "# G14R20-I5-B interpreter acceptance\n\n"
+        "# G14R20-I5-C parent-bootstrap and interpreter acceptance\n\n"
         f"- status: `{summary['status']}`\n"
         f"- executor commit/tree: `{head}` / `{tree}`\n"
         f"- launch path: `{command_python}`\n"
@@ -458,6 +461,7 @@ print(json.dumps({
         "- production request/context/cell builder/support/nested interpreter chain: pass\n"
         "- real support and nested benchmark `--help`: pass; rollout/model load: 0/0\n"
         "- system Python, wrong venv, dependency drift, context/child mismatch: rejected before recovery write\n"
+        "- parent bootstrap: request-bound exact parent; execute-only create-only producer\n"
         "- historical protection: `UNVERIFIED` because task-start evidence remains unavailable\n"
         "- recovery grant/real recovery/holdout: false/false/false\n"
     )
