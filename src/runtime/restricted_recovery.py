@@ -1521,9 +1521,16 @@ class RestrictedRecoveryPhaseLedger:
 
 
 def build_recovery_handoff_manifest(
-    request: Mapping[str, Any], ledger: RestrictedRecoveryCellLedger
+    request: Mapping[str, Any],
+    ledger: RestrictedRecoveryCellLedger,
+    *,
+    _test_recovery_parent: str | Path | None = None,
 ) -> dict[str, Any]:
-    validate_restricted_recovery_request(request, check_live=False)
+    validate_restricted_recovery_request(
+        request,
+        check_live=False,
+        _test_recovery_parent=_test_recovery_parent,
+    )
     recovered = ledger.committed_records(phase=PHASE)
     if [row["cell_id"] for row in recovered] != list(ALLOWED_CELL_IDS):
         raise RestrictedRecoveryError("recovery handoff requires both ordered ablation commits")

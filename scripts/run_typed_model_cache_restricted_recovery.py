@@ -570,8 +570,18 @@ def _assert_next(
     raise RestrictedRecoveryError("interrupted restricted recovery cannot resume")
 
 
-def _write_handoff(root: Path, request: Mapping[str, Any], cells: RestrictedRecoveryCellLedger) -> dict[str, Any]:
-    handoff = build_recovery_handoff_manifest(request, cells)
+def _write_handoff(
+    root: Path,
+    request: Mapping[str, Any],
+    cells: RestrictedRecoveryCellLedger,
+    *,
+    test_recovery_parent: Path | None = None,
+) -> dict[str, Any]:
+    handoff = build_recovery_handoff_manifest(
+        request,
+        cells,
+        _test_recovery_parent=test_recovery_parent,
+    )
     validate_recovery_handoff_manifest(handoff)
     _create_file(root / "ablation_recovery_handoff.json", _encoded(handoff))
     followup: dict[str, Any] = {
@@ -741,7 +751,12 @@ def execute_recovery_cell(
                     "next_stage_authorized": False,
                     "holdout_opened": False,
                 }
-            handoff = _write_handoff(root, request, cells)
+            handoff = _write_handoff(
+                root,
+                request,
+                cells,
+                test_recovery_parent=(expected_parent if synthetic_only else None),
+            )
             phase.append(
                 "completed",
                 cell_id=cell_id,
