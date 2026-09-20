@@ -563,6 +563,8 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 
 G14R20-D continuation 授权接口 2.0.0：生产共用 Ed25519 原件认证及撤销校验、coordination continuity 与 test-only 隔离验收，见 `docs/project/continuation_production_trust_contract.md`。生产信任未安装；release unavailable，continuation 未签发，真实执行仍禁止。
 
+> **2026-09-21 G14R20-I6**：G14E06 八个 committed cell 的只读 handoff 已接入独立后续 evaluation identity；冻结剩余 live 矩阵为 support 11、scalability 3、statistics 1、gate 1、completion 0 child。隔离 non-formal 真实五阶段链通过，正式申请仍 unsigned，G14E07 未授权、未启动，holdout 未打开。执行合同见 [G14R20-I6 后续评估衔接](docs/project/g14r20_i6_post_ablation_contract.md)。
+
 ## 2026-09-09 G14R20-F
 
 公共 `qualification/execute` 入口新增同进程 challenge→有限等待→真实 `verify_approval`→qualification→execute

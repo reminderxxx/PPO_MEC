@@ -37,6 +37,8 @@
 
 ## Live 文档
 
+- `g14r20_i6_post_ablation_contract.md`：G14E06 八-cell 只读 handoff、剩余五阶段依赖、真实 non-formal 消费者验收和 G14E07 unsigned 授权边界。
+
 - `g14r20_i5_restricted_recovery_contract.md`：I3 failed-terminal 后的新 recovery identity、6 个 external committed
   reference、两个 ablation cell 的 attempt/order、synthetic 公共入口验收、去重 handoff 与后续阶段未授权边界
 

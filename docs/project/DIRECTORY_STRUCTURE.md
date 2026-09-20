@@ -28,6 +28,9 @@ G14R20-I5-D：新增 pre-grant 只读入口 `scripts/qualify_typed_model_cache_r
 
 # Directory Structure
 
+G14R20-I6：八-cell 外部 handoff 校验位于 `src/runtime/post_ablation_execution.py`；unsigned request 与剩余阶段受授权执行入口分别为 `scripts/prepare_typed_model_cache_post_ablation.py`、`scripts/run_typed_model_cache_post_ablation.py`。`src/runtime/evaluation_only_execution.py` 继续生成冻结命令；statistics/gate 通过显式 handoff 读旧结果。未签发申请、真实 non-formal 链和日志位于 ignored `artifacts/analysis/g14r20_i6_post_ablation_20260921/`；预定正式 root 当前不存在。
+
+
 G14R20-I5：版本化合同位于 `configs/experiment/g14r20_i5_restricted_recovery_v1/`，实现位于
 `src/runtime/restricted_recovery.py`，公共 unsigned prepare/validate 与受 grant execute 入口分别为
 `scripts/prepare_typed_model_cache_restricted_recovery.py`、`scripts/run_typed_model_cache_restricted_recovery.py`。

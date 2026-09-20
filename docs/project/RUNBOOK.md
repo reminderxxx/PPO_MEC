@@ -1,3 +1,7 @@
+## G14R20-I6 八-cell 后续评估申请（不授权正式执行）
+
+从干净的 I6 executor commit 运行 `scripts/prepare_typed_model_cache_post_ablation.py --action prepare` 生成新 unsigned request，再以 `--action validate` 只读复核。完整、无占位符的参数与五阶段 `run_typed_model_cache_post_ablation.py --check execute` 命令见 `artifacts/analysis/g14r20_i6_post_ablation_20260921/command_package.json`。中央窗口签发匹配 request hash、commit/tree、handoff hash 的独立 G14E07 grant 以前，只可 prepare/validate，不得执行正式命令。新 root 必须保持不存在且仅由获授权的首次 execute create-only 创建。八个旧 cell 均只读外部引用，不在新 root 复制或重跑；详见 `g14r20_i6_post_ablation_contract.md`。
+
 ## G14R20-I5-E unsigned restricted recovery handoff（不执行正式 recovery）
 
 当前仅交中央窗口复核 `artifacts/analysis/g14r20_i5_e_recovery_consumer_20260920/authorization_request_unsigned.json` 和同目录命令包。未来必须重新生成短期资格证据，并由独立 review 与新 grant 绑定 exact request、executor commit/tree、原始来源与 G14E05 attempt 2 失败证据；不得使用 I5-D/G14E05 request、review、grant 或失败 root 续跑。第一个正式 cell 的新 ledger attempt 为 3，第二个为首次 attempt 1。隔离验收 root `nonformal_i5e_consumer_acceptance_20260920_f` 仅供工程证据，不进入正式结果。详见 `g14r20_i5_e_recovery_consumer_contract.md`。

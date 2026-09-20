@@ -57,6 +57,14 @@
 - `tests/restricted_recovery_public_driver.py` / `tests/test_restricted_recovery.py`：真实 parser/main/初始化/锁/transaction
   路径，仅 scientific child 为 synthetic；记录实际 dispatch/write 与原对象 byte-protection。
 
+## G14R20-I6 post-ablation continuation
+
+- `src/runtime/post_ablation_execution.py`：固定 G14E06 handoff、原/恢复来源 ledger、marker、producer/transaction 双层完整性及三份 controller row 路径，供后续消费者只读使用。
+- `src/runtime/evaluation_only_execution.py`：在已有冻结命令生成器中绑定外部 medium replay、statistics/gate handoff 和非正式最小验收 profile；生产 11/3 矩阵不变。
+- `scripts/prepare_typed_model_cache_post_ablation.py` / `scripts/run_typed_model_cache_post_ablation.py`：新 unsigned request/context、exact grant、隔离 create-only root、五阶段事务与完成判定。
+- `scripts/run_typed_model_cache_formal_statistics.py` / `scripts/manage_typed_model_cache_formal_artifacts.py`：显式八-cell 输入、外部完整性重读与 exact gate 消费。
+- `scripts/run_typed_model_cache_formal_support.py` / `src/evaluators/formal_cell_transaction.py`：oracle provenance 入最终 producer manifest，发布时仅重定位已登记的 command log argv/path 字段。
+
 ## G14R20-I evaluation-only identity / publication closure
 
 - `src/runtime/evaluation_only_execution.py`：固定 H 审查、旧 v16/科学 commit、150 坐标/hash，生成来源引用与新
