@@ -13,10 +13,10 @@ import time
 import pytest
 
 from scripts.continuation_executor.locking import SingleWriter, writer_lock_path
-from src.runtime.evaluation_only_execution import PHASES, canonical_sha256, file_sha256
+from src.runtime.evaluation_only_execution import PHASES, SOURCE_RUN_ROOT, canonical_sha256, file_sha256
 
 ROOT = Path(__file__).resolve().parents[1]
-PROJECT = ROOT.parents[2] if ROOT.parent.name == "execution_checkouts" else ROOT
+PROJECT = SOURCE_RUN_ROOT.parents[3]
 SOURCE_REQUEST = PROJECT / "artifacts/analysis/g14r20_i1_final_acceptance_20260911/authorization_request_release.json"
 PYTHON = str(PROJECT / ".venv/bin/python")
 DRIVER = ROOT / "tests/evaluation_only_public_driver.py"
