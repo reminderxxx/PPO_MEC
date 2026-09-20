@@ -684,7 +684,10 @@ def main() -> None:
             )
         except FormalAgentOrderError as exc:
             raise FairnessManifestError(str(exc)) from exc
-        if list(args.agents) != order_audit["main_benchmark_agent_order"]:
+        expected_order = order_audit["main_benchmark_agent_order"]
+        if args.non_formal_rehearsal:
+            expected_order = [name for name in expected_order if name in set(args.agents)]
+        if list(args.agents) != expected_order:
             raise FairnessManifestError(
                 "benchmark agents differ from the formal main benchmark order"
             )
