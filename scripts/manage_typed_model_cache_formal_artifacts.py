@@ -873,6 +873,8 @@ def formal_gate(
         for phase in external_phases:
             if phase in committed_by_phase:
                 raise CellTransactionError("external phase unexpectedly committed in new root")
+            if (input_root / phase).exists() or (input_root / phase).is_symlink():
+                raise CellTransactionError("external cell outputs unexpectedly exist in new root")
             committed_by_phase[phase] = sum(
                 row["phase"] == phase for row in external_handoff["cells"]
             )
@@ -1100,10 +1102,12 @@ def main() -> None:
         payload = artifact_integrity(input_root, protocol, output_path)
     elif args.action == "integrity_and_formal_gate":
         integrity_path = input_root / "artifact_integrity_manifest.json"
-        write_create_only(
-            integrity_path,
-            artifact_integrity(input_root, protocol, integrity_path),
-        )
+        integrity = artifact_integrity(input_root, protocol, integrity_path)
+        if external_handoff:
+            integrity["external_cell_handoff_sha256"] = external_handoff["handoff_sha256"]
+            integrity["external_cell_count"] = len(external_handoff["cells"])
+            integrity["external_cells_are_read_only_references"] = True
+        write_create_only(integrity_path, integrity)
         payload = formal_gate(
             input_root,
             protocol,

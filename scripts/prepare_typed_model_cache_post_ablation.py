@@ -55,7 +55,6 @@ def validate_package(package: dict, *, live: bool = True, require_absent_root: b
     if handoff != execution.get("post_ablation_handoff_reference"):
         raise ValueError("request/contract handoff mismatch")
     if live:
-        audit_handoff(handoff["path"], expected_sha256=handoff["sha256"])
         validate_model_source_reference(source)
     validate_execution_contract(execution, model_source_reference=source, check_live=live)
     validate_command_matrix_parsers(execution, model_source_reference=source, check_live=live)

@@ -125,6 +125,10 @@ def main() -> None:
         except FormalAgentOrderError as exc:
             raise FormalExecutionError(str(exc)) from exc
     input_root = Path(args.input_root)
+    if args.external_cell_handoff_path and not (
+        source_scope is not None and source_scope["evaluation_only"]
+    ):
+        raise FormalExecutionError("external handoff requires evaluation-only source scope")
     rows: list[Path]
     if source_scope is not None and source_scope["evaluation_only"]:
         from src.runtime.evaluation_only_execution import validate_execution_contract

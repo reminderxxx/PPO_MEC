@@ -502,6 +502,20 @@ def build_evaluation_execution_contract(
         checkpoint_freeze_output_path=str(source_root / "checkpoint_freeze.json"),
     )
     plans: dict[str, Any] = {}
+    external_replay = None
+    if post_ablation_handoff_reference is not None:
+        from src.runtime.post_ablation_execution import audit_handoff
+
+        handoff_audit = audit_handoff(
+            post_ablation_handoff_reference["path"],
+            expected_sha256=post_ablation_handoff_reference["sha256"],
+        )
+        replay_cells = [row for row in handoff_audit["cells"]
+                        if row["phase"] == "formal_cache_policy"
+                        and row["coordinates"].get("capacity_label") == "medium_576mb"]
+        if len(replay_cells) != 1:
+            raise EvaluationOnlyError("external medium cache replay cell is missing")
+        external_replay = str(Path(replay_cells[0]["committed_path"]) / "request_replay.json")
     for phase in PHASES:
         if phase == "complete_without_holdout":
             plan = {"commands": [], "expected_outputs": [], "matrix_contexts": []}
@@ -533,6 +547,10 @@ def build_evaluation_execution_contract(
             str(run_root / "evaluation_model_source_reference.json"),
         ]
         for command in commands:
+            if phase == "formal_scalability" and external_replay is not None:
+                if command.count("--request-replay-path") != 1:
+                    raise EvaluationOnlyError("scalability replay input flag drift")
+                command[command.index("--request-replay-path") + 1] = external_replay
             if "--command" in command:
                 boundary = command.index("--command")
                 command[boundary:boundary] = reference_flag
@@ -696,8 +714,19 @@ def validate_execution_contract(
             raise EvaluationOnlyError("post-ablation handoff reference schema drift")
         if handoff["path"] != str(HANDOFF_PATH):
             raise EvaluationOnlyError("post-ablation handoff path drift")
+        handoff_audit = None
         if check_live:
-            audit_handoff(handoff["path"], expected_sha256=handoff["sha256"])
+            handoff_audit = audit_handoff(handoff["path"], expected_sha256=handoff["sha256"])
+            replay_cells = [row for row in handoff_audit["cells"]
+                            if row["phase"] == "formal_cache_policy"
+                            and row["coordinates"].get("capacity_label") == "medium_576mb"]
+            if len(replay_cells) != 1:
+                raise EvaluationOnlyError("external medium cache replay cell is missing")
+            replay = str(Path(replay_cells[0]["committed_path"]) / "request_replay.json")
+            for command in plans["formal_scalability"]["commands"]:
+                if (command.count("--request-replay-path") != 1
+                        or command[command.index("--request-replay-path") + 1] != replay):
+                    raise EvaluationOnlyError("scalability external replay argv drift")
         for phase in ("formal_statistics", "formal_gate"):
             for command in plans[phase]["commands"]:
                 if command.count("--external-cell-handoff-path") != 1 or command[
@@ -724,6 +753,9 @@ def validate_execution_contract(
             raise EvaluationOnlyError(f"evaluation matrix context count drift: {phase}")
         if plan.get("matrix_cell_count", expected_count) != expected_count:
             raise EvaluationOnlyError(f"evaluation matrix cell count drift: {phase}")
+        for command in commands:
+            if any("/ABSOLUTE/" in token or "{" in token or "}" in token for token in command):
+                raise EvaluationOnlyError(f"unresolved execution argv placeholder: {phase}")
     if model_source_reference is not None:
         source = dict(model_source_reference)
         source_digest = source.get("source_reference_sha256")

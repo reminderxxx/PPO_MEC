@@ -78,10 +78,15 @@ def audit_handoff(path: str | Path = HANDOFF_PATH, *, expected_sha256: str | Non
     for phase, count in expected.items():
         if sum(row["phase"] == phase for row in payload["cells"]) != count:
             raise PostAblationError("external phase cell count drift")
-    controller_paths = sorted(
-        str(next(Path(row["committed_path"]).rglob("benchmark_rows.csv")).resolve())
-        for row in payload["cells"] if row["phase"] == "formal_controller"
-    )
+    controller_paths = []
+    for row in payload["cells"]:
+        if row["phase"] != "formal_controller":
+            continue
+        matches = list(Path(row["committed_path"]).rglob("benchmark_rows.csv"))
+        if len(matches) != 1 or matches[0].is_symlink():
+            raise PostAblationError("external controller cell rows membership drift")
+        controller_paths.append(str(matches[0].resolve()))
+    controller_paths.sort()
     compatibility = payload["statistics_consumer_compatibility"]
     if (compatibility.get("formal_controller_row_paths") != controller_paths
             or compatibility.get("formal_controller_row_count") != 3):
