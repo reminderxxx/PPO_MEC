@@ -1308,6 +1308,7 @@ def enforce_benchmark_args(
     manifest: dict[str, Any],
     *,
     allow_nonformal_agent_subset: bool = False,
+    allow_nonformal_seed_subset: bool = False,
 ) -> None:
     typed_binding = manifest.get("cache_contract", {}).get("typed_model_cache")
     expected_agents = list(BASELINE_NAMES) + list(
@@ -1325,7 +1326,12 @@ def enforce_benchmark_args(
     elif observed_agents != expected_agents:
         raise FairnessManifestError(f"agents must exactly match manifest order {expected_agents}")
     seeds = manifest["seed_plan"]["benchmark_run_seeds"]
-    if list(args.seeds) != seeds:
+    observed_seeds = list(args.seeds)
+    seed_subset_is_ordered = observed_seeds == [seed for seed in seeds if seed in set(observed_seeds)]
+    if allow_nonformal_seed_subset:
+        if not observed_seeds or not seed_subset_is_ordered:
+            raise FairnessManifestError("non-formal rehearsal seeds must be a non-empty ordered manifest subset")
+    elif observed_seeds != seeds:
         raise FairnessManifestError(f"CLI seeds override frozen manifest: {args.seeds} != {seeds}")
     selection = manifest["dataset_provenance"]["selection_filter_parameters"]
     checks = {

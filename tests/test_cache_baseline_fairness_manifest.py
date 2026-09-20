@@ -258,6 +258,20 @@ def test_cli_override_frozen_field_fails(manifest: dict) -> None:
         enforce_benchmark_args(args, manifest)
 
 
+def test_nonformal_seed_subset_is_ordered_and_formal_remains_exact(manifest: dict) -> None:
+    manifest = deepcopy(manifest)
+    manifest["seed_plan"]["benchmark_run_seeds"] = [7, 13]
+    args = _args(manifest)
+    seeds = manifest["seed_plan"]["benchmark_run_seeds"]
+    args.seeds = seeds[:1]
+    with pytest.raises(FairnessManifestError, match="CLI seeds override"):
+        enforce_benchmark_args(args, manifest)
+    enforce_benchmark_args(args, manifest, allow_nonformal_seed_subset=True)
+    args.seeds = seeds[::-1]
+    with pytest.raises(FairnessManifestError, match="ordered manifest subset"):
+        enforce_benchmark_args(args, manifest, allow_nonformal_seed_subset=True)
+
+
 def test_observed_fingerprint_mismatch_fails(manifest: dict) -> None:
     unit = manifest["window_workload_plan"]["evaluation_units"][0]["evaluation_unit_id"]
     matrix = {unit: {name: "same" for name in BASELINE_NAMES}}

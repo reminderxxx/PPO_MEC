@@ -793,6 +793,7 @@ def main() -> None:
             args,
             fairness_manifest,
             allow_nonformal_agent_subset=bool(args.non_formal_rehearsal),
+            allow_nonformal_seed_subset=bool(args.non_formal_rehearsal),
         )
         if order_audit is not None:
             try:
