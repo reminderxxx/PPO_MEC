@@ -1309,7 +1309,8 @@ def main() -> None:
         "mechanism_diagnosis": build_mechanism_diagnosis(
             rows,
             agent_order=(
-                order_audit["main_benchmark_agent_order"] if order_audit else None
+                (list(args.agents) if args.non_formal_rehearsal else order_audit["main_benchmark_agent_order"])
+                if order_audit else None
             ),
         ),
         "win_tie_loss_summary": win_tie_loss_summary,
