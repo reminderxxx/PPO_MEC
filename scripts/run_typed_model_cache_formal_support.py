@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import subprocess
 import sys
@@ -24,7 +25,10 @@ from src.evaluators.formal_window_consumption import (
     load_contract as load_window_consumption_contract,
     validate_window_plan_binding,
 )
-from src.evaluators.formal_cell_transaction import write_child_output_descriptor
+from src.evaluators.formal_cell_transaction import (
+    validate_producer_integrity_manifest,
+    write_child_output_descriptor,
+)
 from src.runtime.typed_model_cache_runtime import resolve_model_cache_runtime
 from src.runtime.portable_resource_identity import (
     add_portable_resource_arguments,
@@ -174,6 +178,25 @@ def stamp_outputs(run_root: Path, provenance: dict) -> None:
         json.dumps(provenance, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
         encoding="utf-8",
     )
+    # Support is the final producer of the stamped payload. Rebuild the nested
+    # benchmark manifest from its exact final bytes before transaction publish.
+    manifest_path = run_root / "artifact_integrity_manifest.json"
+    manifest = load_json(manifest_path, "benchmark producer integrity manifest")
+    if set(manifest) != {"integrity_manifest_version", "files"} or manifest["integrity_manifest_version"] != "1.0.0":
+        raise FormalExecutionError("benchmark producer manifest schema drift")
+    files = []
+    for path in sorted(run_root.rglob("*")):
+        if path.is_symlink():
+            raise FormalExecutionError("support producer output symlink is forbidden")
+        if path.is_file() and path != manifest_path:
+            files.append({
+                "path": path.relative_to(run_root).as_posix(),
+                "size_bytes": path.stat().st_size,
+                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            })
+    manifest["files"] = files
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    validate_producer_integrity_manifest(manifest_path)
 
 
 def main() -> None:

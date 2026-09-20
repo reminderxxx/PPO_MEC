@@ -13,6 +13,7 @@ import tempfile
 import pytest
 
 from src.evaluators.cache_baseline_fairness import build_manifest
+from scripts.run_typed_model_cache_formal_support import stamp_outputs
 from src.evaluators.formal_cell_transaction import (
     CellExecutionIdentity,
     CellTransactionError,
@@ -42,6 +43,23 @@ CORE_PAYLOAD = {
 
 def _sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def test_support_stamp_rebuilds_final_nested_producer_manifest(tmp_path: Path) -> None:
+    run = tmp_path / "benchmark"
+    episode = run / "episodes/window/workflow/ppo/seed_7.summary.json"
+    episode.parent.mkdir(parents=True)
+    _write_json(episode, {"run_info": {"summary_path": str(episode)}})
+    _write_json(run / "aggregate_summary.json", {"episode_count": 1})
+    (run / "benchmark_rows.csv").write_text("agent_name,seed\nppo,7\n")
+    _write_json(run / "artifact_integrity_manifest.json", {
+        "integrity_manifest_version": "1.0.0",
+        "files": [{"path": path.relative_to(run).as_posix(), "size_bytes": path.stat().st_size, "sha256": _sha(path)}
+                  for path in sorted(run.rglob("*")) if path.is_file()],
+    })
+    stamp_outputs(run, {"support_family": "ablation", "setting_id": "nonformal", "support_setting_sha256": "s" * 64, "protocol_semantic_sha256": "p" * 64, "split_semantic_sha256": "w" * 64})
+    audit = validate_producer_integrity_manifest(run / "artifact_integrity_manifest.json")
+    assert audit["file_count"] == 4
 
 
 def _write_json(path: Path, value: object) -> None:
