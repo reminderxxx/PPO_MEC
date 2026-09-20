@@ -187,12 +187,15 @@ def _cell_identity(package: dict[str, Any]) -> CellExecutionIdentity:
 
 def _phase_runner(package: dict[str, Any], *, resume: bool) -> TransactionalPhaseRunner:
     execution = package["evaluation_execution_contract"]
+    identity = {
+        "evaluation_execution_contract": execution["execution_contract_sha256"],
+        "model_source_reference": package["model_source_reference"]["source_reference_sha256"],
+    }
+    if "post_ablation_handoff_reference" in execution:
+        identity["external_handoff"] = execution["post_ablation_handoff_reference"]["sha256"]
     return TransactionalPhaseRunner(
         output_root=execution["evaluation_run_root"],
-        run_identity_fingerprint=canonical_sha256({
-            "evaluation_execution_contract": execution["execution_contract_sha256"],
-            "model_source_reference": package["model_source_reference"]["source_reference_sha256"],
-        }),
+        run_identity_fingerprint=canonical_sha256(identity),
         phase_order=PHASES, resume=resume,
         resolved_execution_context_sha256=execution["evaluation_execution_context_sha256"],
         resolved_execution_context_file_sha256=hashlib.sha256(
@@ -203,7 +206,7 @@ def _phase_runner(package: dict[str, Any], *, resume: bool) -> TransactionalPhas
 
 def _initial_files(package: dict[str, Any]) -> dict[str, Any]:
     execution = package["evaluation_execution_contract"]
-    return {
+    files = {
         "evaluation_model_source_reference.json": package["model_source_reference"],
         "evaluation_execution_contract.json": execution,
         "resolved_execution_context.json": execution["evaluation_execution_context"],
@@ -222,6 +225,11 @@ def _initial_files(package: dict[str, Any]) -> dict[str, Any]:
             "checkpoint_freeze_executed": False,
         },
     }
+    if "post_ablation_handoff_reference" in execution:
+        files["post_ablation_handoff_reference.json"] = execution[
+            "post_ablation_handoff_reference"
+        ]
+    return files
 
 
 def _initialize_run(package: dict[str, Any]) -> tuple[Path, FormalCellLedger, TransactionalPhaseRunner]:
@@ -384,6 +392,8 @@ def execute_phase(package: dict[str, Any], grant: dict[str, Any], phase: str, *,
 def main(*, scientific_child_adapter=None) -> None:
     args = build_parser().parse_args()
     package = _read(args.authorization_request_path)
+    if "post_ablation_handoff_reference" in package.get("evaluation_execution_contract", {}):
+        raise EvaluationOnlyError("post-ablation request requires the restricted continuation entrypoint")
     if package.get("authorization_request_sha256") != canonical_sha256(
         {key: value for key, value in package.items() if key != "authorization_request_sha256"}
     ):

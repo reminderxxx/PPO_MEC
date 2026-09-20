@@ -441,6 +441,7 @@ def build_evaluation_execution_contract(
     executor_checkout: str | Path,
     executor_commit: str,
     python_executable: str | Path,
+    post_ablation_handoff_reference: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build the new execution identity and exact eight-phase command matrix."""
 
@@ -538,6 +539,11 @@ def build_evaluation_execution_contract(
                 command.extend(reference_flag)
             else:
                 command.extend(reference_flag)
+            if post_ablation_handoff_reference is not None and phase in (
+                "formal_statistics", "formal_gate"
+            ):
+                command.extend(["--external-cell-handoff-path",
+                                str(post_ablation_handoff_reference["path"])])
         serialized = "\n".join("\0".join(command) for command in commands).lower()
         forbidden = ("checkpoint_freeze", "dev_select", "/train_", "sealed_holdout", "--holdout")
         if any(token in serialized for token in forbidden):
@@ -571,6 +577,8 @@ def build_evaluation_execution_contract(
         "checkpoint_freeze_commands": 0,
         "holdout_commands": 0,
     }
+    if post_ablation_handoff_reference is not None:
+        contract["post_ablation_handoff_reference"] = dict(post_ablation_handoff_reference)
     evaluation_context = deepcopy(source_context)
     evaluation_context["created_at_utc"] = datetime.now(timezone.utc).isoformat()
     evaluation_context["created_for_run_identity"] = canonical_sha256(
@@ -579,6 +587,10 @@ def build_evaluation_execution_contract(
             "executor_commit": executor_commit,
             "model_source_reference_sha256": source_hash,
             "command_plan_sha256": contract["command_plan_sha256"],
+            "post_ablation_handoff_sha256": (
+                post_ablation_handoff_reference["sha256"]
+                if post_ablation_handoff_reference else None
+            ),
         }
     )
     evaluation_context["scientific_identity"]["execution_commit"] = executor_commit
@@ -625,6 +637,10 @@ def build_evaluation_execution_contract(
         "source_binding_identity_sha256": source["source_binding_identity_sha256"],
         "host_paths_are_scientific_identity": False,
     }
+    if post_ablation_handoff_reference is not None:
+        evaluation_context["evaluation_execution_identity"][
+            "post_ablation_handoff_sha256"
+        ] = post_ablation_handoff_reference["sha256"]
     evaluation_context["context_sha256"] = canonical_sha256(
         {key: item for key, item in evaluation_context.items() if key != "context_sha256"}
     )
@@ -672,6 +688,22 @@ def validate_execution_contract(
     plans = value["command_plans"]
     if value.get("command_plan_sha256") != canonical_sha256(plans):
         raise EvaluationOnlyError("evaluation command plan hash mismatch")
+    handoff = value.get("post_ablation_handoff_reference")
+    if handoff is not None:
+        from src.runtime.post_ablation_execution import HANDOFF_PATH, audit_handoff
+
+        if not isinstance(handoff, Mapping) or set(handoff) != {"path", "sha256"}:
+            raise EvaluationOnlyError("post-ablation handoff reference schema drift")
+        if handoff["path"] != str(HANDOFF_PATH):
+            raise EvaluationOnlyError("post-ablation handoff path drift")
+        if check_live:
+            audit_handoff(handoff["path"], expected_sha256=handoff["sha256"])
+        for phase in ("formal_statistics", "formal_gate"):
+            for command in plans[phase]["commands"]:
+                if command.count("--external-cell-handoff-path") != 1 or command[
+                    command.index("--external-cell-handoff-path") + 1
+                ] != handoff["path"]:
+                    raise EvaluationOnlyError("external handoff consumer argv drift")
     expected_counts = {
         "formal_cache_policy": 3,
         "formal_controller": 3,
@@ -718,6 +750,10 @@ def validate_execution_contract(
         "evaluation_run_id"
     ) != value.get("evaluation_run_id"):
         raise EvaluationOnlyError("evaluation context/run binding drift")
+    if handoff is not None and context.get("evaluation_execution_identity", {}).get(
+        "post_ablation_handoff_sha256"
+    ) != handoff["sha256"]:
+        raise EvaluationOnlyError("evaluation context/handoff binding drift")
     if context.get("evaluation_execution_identity", {}).get(
         "executor_commit"
     ) != value.get("executor_commit") or context.get(

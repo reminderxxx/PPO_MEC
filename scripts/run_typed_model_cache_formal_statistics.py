@@ -49,6 +49,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--formal-agent-order-contract-path", default="")
     parser.add_argument("--non-formal-rehearsal", action="store_true")
     parser.add_argument("--rehearsal-baseline-agent", action="append", default=[])
+    parser.add_argument("--external-cell-handoff-path", default="")
     add_portable_resource_arguments(parser)
     add_generated_checkpoint_resource_arguments(parser)
     return parser.parse_args()
@@ -141,32 +142,38 @@ def main() -> None:
             )
         )
         validate_execution_contract(execution, model_source_reference=run_source)
-        try:
-            committed = verify_persisted_committed_phase(
-                input_root,
-                phase="formal_controller",
-                expected_identity_fields={
-                    "run_id": execution["evaluation_run_id"],
-                    "execution_commit": execution["executor_commit"],
-                    "protocol_semantic_sha256": run_source["protocol_semantic_sha256"],
-                    "command_matrix_sha256": execution["command_plan_sha256"],
-                },
-            )
-        except CellTransactionError as exc:
-            raise FormalExecutionError(str(exc)) from exc
-        if len(committed) != len(
-            execution["command_plans"]["formal_controller"]["commands"]
-        ):
-            raise FormalExecutionError("formal controller committed cell matrix is incomplete")
-        rows = []
-        for record in committed:
-            matches = list(Path(record["committed_path"]).rglob("benchmark_rows.csv"))
-            if len(matches) != 1:
-                raise FormalExecutionError(
-                    "committed formal controller cell must contain exactly one rows artifact"
+        if args.external_cell_handoff_path:
+            from src.runtime.post_ablation_execution import require_bound_handoff
+
+            handoff = require_bound_handoff(input_root, args.external_cell_handoff_path)
+            rows = [Path(path) for path in handoff["controller_rows"]]
+        else:
+            try:
+                committed = verify_persisted_committed_phase(
+                    input_root,
+                    phase="formal_controller",
+                    expected_identity_fields={
+                        "run_id": execution["evaluation_run_id"],
+                        "execution_commit": execution["executor_commit"],
+                        "protocol_semantic_sha256": run_source["protocol_semantic_sha256"],
+                        "command_matrix_sha256": execution["command_plan_sha256"],
+                    },
                 )
-            rows.append(matches[0])
-        rows.sort()
+            except CellTransactionError as exc:
+                raise FormalExecutionError(str(exc)) from exc
+            if len(committed) != len(
+                execution["command_plans"]["formal_controller"]["commands"]
+            ):
+                raise FormalExecutionError("formal controller committed cell matrix is incomplete")
+            rows = []
+            for record in committed:
+                matches = list(Path(record["committed_path"]).rglob("benchmark_rows.csv"))
+                if len(matches) != 1:
+                    raise FormalExecutionError(
+                        "committed formal controller cell must contain exactly one rows artifact"
+                    )
+                rows.append(matches[0])
+            rows.sort()
     else:
         rows = sorted(input_root.glob("formal_controller/**/benchmark_rows.csv"))
     if not rows:

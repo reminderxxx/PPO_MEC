@@ -131,6 +131,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--protocol-path", required=True)
     parser.add_argument("--input-root", required=True)
     parser.add_argument("--output-path", required=True)
+    parser.add_argument("--external-cell-handoff-path", default="")
     add_portable_resource_arguments(parser)
     add_generated_checkpoint_resource_arguments(parser)
     return parser.parse_args()
@@ -773,6 +774,7 @@ def formal_gate(
     *,
     generated_registry_audit: Mapping[str, Any] | None = None,
     model_source_reference: Mapping[str, Any] | None = None,
+    external_handoff: Mapping[str, Any] | None = None,
 ) -> dict:
     rehearsal_marker = input_root / "non_formal_rehearsal.json"
     non_formal_rehearsal = rehearsal_marker.is_file()
@@ -787,7 +789,10 @@ def formal_gate(
         "statistics/paired_statistics.json",
         "artifact_integrity_manifest.json",
     ]
-    missing = [pattern for pattern in required if not any(input_root.glob(pattern))]
+    external_phases = {"formal_cache_policy", "formal_controller", "formal_ablation"}
+    missing = [pattern for pattern in required if not (
+        external_handoff and pattern.split("/", 1)[0] in external_phases
+    ) and not any(input_root.glob(pattern))]
     endpoint_availability: dict[str, str] = {}
     comparison_availability: list[dict[str, Any]] = []
     statistics_path = input_root / "statistics" / "paired_statistics.json"
@@ -864,6 +869,13 @@ def formal_gate(
     except (CellTransactionError, OSError, ValueError) as exc:
         committed_by_phase = {}
         cell_ledger_error = str(exc)
+    if external_handoff:
+        for phase in external_phases:
+            if phase in committed_by_phase:
+                raise CellTransactionError("external phase unexpectedly committed in new root")
+            committed_by_phase[phase] = sum(
+                row["phase"] == phase for row in external_handoff["cells"]
+            )
     source_root = (
         Path(str(model_source_reference["source_run_root"]))
         if evaluation_only else input_root
@@ -889,7 +901,8 @@ def formal_gate(
         for capacity in ("constrained_288mb", "medium_576mb", "relaxed_864mb")
     }
     _, controller_windows = _csv_count(
-        sorted(input_root.glob("formal_controller/**/benchmark_rows.csv"))
+        [Path(path) for path in external_handoff["controller_rows"]]
+        if external_handoff else sorted(input_root.glob("formal_controller/**/benchmark_rows.csv"))
     )
     observed_counts = {
         "committed_training_cells": (
@@ -963,6 +976,9 @@ def formal_gate(
             model_source_reference.get("source_reference_sha256")
             if evaluation_only else None
         ),
+        "external_cell_handoff_sha256": (
+            external_handoff["handoff_sha256"] if external_handoff else None
+        ),
         "training_dev_selection_checkpoint_freeze_owned_by_source_run": evaluation_only,
         "observed_counts": observed_counts,
         "expected_counts": expected_counts,
@@ -1033,6 +1049,11 @@ def main() -> None:
     validate_protocol_v1_1(protocol)
     input_root = Path(args.input_root)
     output_path = Path(args.output_path)
+    external_handoff = None
+    if args.external_cell_handoff_path:
+        from src.runtime.post_ablation_execution import require_bound_handoff
+
+        external_handoff = require_bound_handoff(input_root, args.external_cell_handoff_path)
     generated_registry_audit = None
     capabilities = get_protocol_capabilities(
         protocol["typed_model_cache_formal_protocol_version"]
@@ -1088,6 +1109,7 @@ def main() -> None:
             protocol,
             generated_registry_audit=generated_registry_audit,
             model_source_reference=(source_scope.get("reference") if generated_registry_audit else None),
+            external_handoff=external_handoff,
         )
     else:
         payload = formal_gate(
@@ -1095,6 +1117,7 @@ def main() -> None:
             protocol,
             generated_registry_audit=generated_registry_audit,
             model_source_reference=(source_scope.get("reference") if generated_registry_audit else None),
+            external_handoff=external_handoff,
         )
     write_create_only(output_path, payload)
     print(json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False))
