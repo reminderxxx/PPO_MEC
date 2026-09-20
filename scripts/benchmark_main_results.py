@@ -1346,6 +1346,8 @@ def main() -> None:
             args.formal_exogenous_request_execution
         ),
         "non_formal_rehearsal": bool(args.non_formal_rehearsal),
+        "non_formal_episode_limit": args.non_formal_episode_limit,
+        "observed_episode_count": len(rows),
         "formal_performance_evidence": False if args.non_formal_rehearsal else None,
         "formal_exogenous_request_execution_contract_version": (
             FORMAL_EXOGENOUS_REQUEST_EXECUTION_CONTRACT_VERSION
@@ -1377,7 +1379,7 @@ def main() -> None:
             "validation_report": fairness_validation_report,
             "observed_request_fingerprints": observed_request_fingerprints,
             "request_exposure_fingerprints": request_exposure_fingerprints,
-            "all_manifest_agents_per_unit": True,
+            "all_manifest_agents_per_unit": not args.non_formal_rehearsal,
             "five_reactive_baselines_only_policy_difference": True,
             "observed_request_streams_identical_per_unit": True,
             "request_exposure_streams_identical_per_unit": bool(
