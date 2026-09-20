@@ -229,6 +229,20 @@ def _initial_files(package: dict[str, Any]) -> dict[str, Any]:
         files["post_ablation_handoff_reference.json"] = execution[
             "post_ablation_handoff_reference"
         ]
+    if execution.get("nonformal_acceptance_only"):
+        files["non_formal_rehearsal.json"] = {
+            "non_formal_rehearsal": True,
+            "formal_performance_evidence": False,
+            "paper_claims_permitted": False,
+            "profile": execution["nonformal_acceptance_only"],
+            "expected_counts": {
+                "cache_policy_cells": 3, "controller_cells": 3,
+                "ablation_settings": 2, "support_settings": 1,
+                "scalability_settings": 1,
+                "primary_comparison_rows": 6,
+                "formal_outer_window_clusters": 12,
+            },
+        }
     return files
 
 

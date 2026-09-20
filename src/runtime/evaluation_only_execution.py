@@ -743,6 +743,31 @@ def validate_execution_contract(
         "formal_gate": 1,
         "complete_without_holdout": 0,
     }
+    nonformal_profile = value.get("nonformal_acceptance_only")
+    if nonformal_profile is not None:
+        from src.runtime.post_ablation_execution import NONFORMAL_PROFILE
+
+        root = Path(str(value.get("evaluation_run_root", "")))
+        if (nonformal_profile != NONFORMAL_PROFILE
+                or root.parent != Path("/private/tmp")
+                or not root.name.startswith("g14r20_i6_nonformal_")):
+            raise EvaluationOnlyError("non-formal acceptance profile scope drift")
+        expected_counts["formal_support"] = 1
+        expected_counts["formal_scalability"] = 1
+        support_contexts = plans["formal_support"]["matrix_contexts"]
+        scale_contexts = plans["formal_scalability"]["matrix_contexts"]
+        if (len(support_contexts) != 1
+                or support_contexts[0].get("support_setting_id") != "capacity-cbd9b8a225730814"
+                or len(scale_contexts) != 1
+                or scale_contexts[0].get("scalability_setting_id") != "scalability-b05d0a8a8684c1f0"):
+            raise EvaluationOnlyError("non-formal setting subset drift")
+        for command in plans["formal_support"]["commands"] + plans["formal_scalability"]["commands"]:
+            if ("--non-formal-rehearsal" not in command
+                    or "--non-formal-episode-limit" not in command
+                    or "--formal-window-consumption-contract-path" in command):
+                raise EvaluationOnlyError("non-formal science child argv drift")
+        if "--non-formal-rehearsal" not in plans["formal_statistics"]["commands"][0]:
+            raise EvaluationOnlyError("non-formal statistics argv drift")
     for phase, expected_count in expected_counts.items():
         plan = plans[phase]
         commands = plan.get("commands")

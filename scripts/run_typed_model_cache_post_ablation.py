@@ -53,8 +53,10 @@ def verify_grant(package: dict, grant: dict, *, now: datetime | None = None) -> 
     } or grant.get("version") != "1.0.0":
         raise ValueError("post-ablation project grant schema drift")
     execution = package["evaluation_execution_contract"]
+    nonformal = bool(execution.get("nonformal_acceptance_only"))
     expected = {
-        "status": "AUTHORIZED_FOR_POST_ABLATION_EVALUATION",
+        "status": ("AUTHORIZED_FOR_NONFORMAL_POST_ABLATION_ACCEPTANCE" if nonformal
+                   else "AUTHORIZED_FOR_POST_ABLATION_EVALUATION"),
         "authorization_request_sha256": package["authorization_request_sha256"],
         "evaluation_run_id": execution["evaluation_run_id"],
         "model_source_reference_sha256": execution["model_source_reference_sha256"],
@@ -84,6 +86,8 @@ def verify_grant(package: dict, grant: dict, *, now: datetime | None = None) -> 
             or review.get("handoff_sha256") != expected["external_handoff_sha256"]
             or review.get("holdout_capability") is not False):
         raise ValueError("independent post-ablation review is incomplete")
+    if nonformal and review.get("non_formal_acceptance_only") is not True:
+        raise ValueError("non-formal acceptance review marker is missing")
     return {"status": "pass", "grant_sha256": canonical_sha256(grant)}
 
 

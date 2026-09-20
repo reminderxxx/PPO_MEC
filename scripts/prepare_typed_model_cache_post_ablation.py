@@ -41,7 +41,12 @@ def validate_package(package: dict, *, live: bool = True, require_absent_root: b
         key: item for key, item in package.items() if key != "authorization_request_sha256"
     }):
         raise ValueError("post-ablation request hash mismatch")
-    if (package.get("status") != "READY_FOR_POST_ABLATION_EVALUATION_AUTHORIZATION"
+    nonformal = execution.get("nonformal_acceptance_only") if isinstance(
+        execution := package.get("evaluation_execution_contract"), dict
+    ) else None
+    expected_status = ("NONFORMAL_POST_ABLATION_ACCEPTANCE_ONLY" if nonformal
+                       else "READY_FOR_POST_ABLATION_EVALUATION_AUTHORIZATION")
+    if (package.get("status") != expected_status
             or package.get("requested_authority") != list(POST_PHASES)
             or any(package.get(key) is not False for key in (
                 "formal_grant_issued", "formal_execution_started", "holdout_opened",

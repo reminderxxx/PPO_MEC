@@ -25,6 +25,10 @@ HANDOFF_PATH = Path(
     "typed_model_cache_restricted_recovery_20260920_g14r20_i5e_pending/"
     "ablation_recovery_handoff.json"
 )
+ACCEPTED_HANDOFF_SHA256 = "43792b96592619d18b097ef8969dcfcdd4155dc73e277d25c44f9d44d2d8e3ab"
+ACCEPTED_RECOVERY_REQUEST_SHA256 = "1ed01af7d578c8516a302fb83720cd1f5309a9b2a75d5fbe2a0b2d2d8f34195f"
+ACCEPTED_RECOVERY_IDENTITY_SHA256 = "ed9589b3a84254ecb8efcd9a1ff801d0720a87a1e2635aeb8a74bad70c5e569f"
+NONFORMAL_PROFILE = "g14r20_i6_real_one_cell_per_phase_v1"
 POST_PHASES = (
     "formal_support", "formal_scalability", "formal_statistics",
     "formal_gate", "complete_without_holdout",
@@ -43,6 +47,11 @@ def audit_handoff(path: str | Path = HANDOFF_PATH, *, expected_sha256: str | Non
         raise PostAblationError("unreviewed or missing G14E06 handoff")
     payload = json.loads(target.read_text(encoding="utf-8"))
     validate_recovery_handoff_manifest(payload)
+    if (payload.get("handoff_sha256") != ACCEPTED_HANDOFF_SHA256
+            or payload.get("authorization_request_sha256") != ACCEPTED_RECOVERY_REQUEST_SHA256
+            or payload.get("recovery_execution_identity_sha256") != ACCEPTED_RECOVERY_IDENTITY_SHA256
+            or payload.get("status") != "ABLATION_HANDOFF_READY_REQUIRES_SEPARATE_AUTHORIZATION"):
+        raise PostAblationError("G14E06 accepted handoff identity drift")
     if expected_sha256 is not None and payload["handoff_sha256"] != expected_sha256:
         raise PostAblationError("handoff request hash drift")
     original = audit_original_recovery_source()["external_committed_cells"]
