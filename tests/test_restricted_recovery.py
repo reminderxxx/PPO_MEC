@@ -30,6 +30,7 @@ from src.runtime.restricted_recovery import (
     RestrictedRecoveryError,
     UNSTARTED_CELL_ID,
     audit_original_recovery_source,
+    audit_failed_recovery_attempt,
     build_restricted_recovery_parent_contract,
     restricted_cell_layout,
     validate_restricted_recovery_request,
@@ -137,7 +138,7 @@ def minimal_request(tmp_path: Path) -> dict:
         {key: value for key, value in context.items() if key != "context_sha256"}
     )
     execution = {
-        "restricted_recovery_contract_version": "1.2.0",
+        "restricted_recovery_contract_version": "1.3.0",
         "recovery_execution_id": root.name,
         "recovery_root": str(root),
         "original_run_id": "typed_model_cache_evaluation_only_20260913_g14r20_i3_pending",
@@ -151,7 +152,7 @@ def minimal_request(tmp_path: Path) -> dict:
         "allowed_phase": PHASE,
         "allowed_cell_ids": list(ALLOWED_CELL_IDS),
         "cell_specs": [
-            {"cell_id": FAILED_CELL_ID, "source_attempt": 1, "recovery_attempt": 2, "execution_kind": "recovery_attempt", "must_commit_before_next_cell": True},
+            {"cell_id": FAILED_CELL_ID, "source_attempt": 1, "previous_recovery_attempt": 2, "recovery_attempt": 3, "execution_kind": "recovery_attempt", "must_commit_before_next_cell": True},
             {"cell_id": UNSTARTED_CELL_ID, "source_attempt_count": 0, "recovery_attempt": 1, "execution_kind": "first_execution", "dispatch_after_cell_id": FAILED_CELL_ID},
         ],
         "command_plan": plan,
@@ -172,12 +173,13 @@ def minimal_request(tmp_path: Path) -> dict:
     }
     execution["recovery_execution_identity_sha256"] = canonical_sha256(execution)
     request = {
-        "restricted_recovery_authorization_request_version": "1.2.0",
+        "restricted_recovery_authorization_request_version": "1.3.0",
         "status": "READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION",
         "authorization_kind": "restricted_formal_ablation_recovery_only",
         "created_at_utc": "2026-09-14T00:00:00+08:00",
         "original_identity": {"request": {"path": str(ORIGINAL_REQUEST_PATH)}, "project_grant": {"path": str(ORIGINAL_PROJECT_GRANT_PATH)}},
         "immutable_source_audit": {},
+        "previous_recovery_failure": audit_failed_recovery_attempt(),
         "external_committed_cells": [{"cell_id": f"external-{index}"} for index in range(6)],
         "source_models": [{"agent": f"model-{index}"} for index in range(150)],
         "recovery_execution": execution,
@@ -306,7 +308,7 @@ def test_python_binding_drift_is_rejected_before_recovery_write(
     assert not recovery_root.exists()
 
 
-def test_recovery_ledger_uses_attempt_two_then_first_attempt(tmp_path: Path) -> None:
+def test_recovery_ledger_uses_attempt_three_then_first_attempt(tmp_path: Path) -> None:
     identity = CellExecutionIdentity(
         run_id="synthetic_recovery_run",
         execution_commit="e" * 40,
@@ -336,7 +338,7 @@ def test_recovery_ledger_uses_attempt_two_then_first_attempt(tmp_path: Path) -> 
         input_hash="input",
         committed_path=root / PHASE / "first",
     )
-    assert first["record"]["attempt"] == 2
+    assert first["record"]["attempt"] == 3
     staging = Path(first["record"]["staging_path"])
     (staging / "payload.json").write_text("{}\n")
     ledger.commit_cell(first["cell_id"], required_paths=["payload.json"])
@@ -688,13 +690,13 @@ def test_public_two_process_handoff_and_zero_write_rejections(tmp_path: Path) ->
     assert recovery_parent.stat().st_mode & 0o777 == 0o700
     first_inventory = inventory(recovery_root)
     assert len(rows(scope / "dispatch.jsonl")) == 1
-    assert [row["attempt"] for row in rows(recovery_root / "cell_state.jsonl") if row["status"] == "committed"] == [2]
+    assert [row["attempt"] for row in rows(recovery_root / "cell_state.jsonl") if row["status"] == "committed"] == [3]
     second = subprocess.run(command(UNSTARTED_CELL_ID), cwd=ROOT, env=environment, text=True, capture_output=True)
     assert second.returncode == 0, second.stderr
     assert len(rows(scope / "dispatch.jsonl")) == 2
     committed = [row for row in rows(recovery_root / "cell_state.jsonl") if row["status"] == "committed"]
     assert [(row["cell_id"], row["attempt"]) for row in committed] == [
-        (FAILED_CELL_ID, 2),
+        (FAILED_CELL_ID, 3),
         (UNSTARTED_CELL_ID, 1),
     ]
     assert all(path in inventory(recovery_root) for path in first_inventory)
@@ -730,7 +732,7 @@ def test_public_two_process_handoff_and_zero_write_rejections(tmp_path: Path) ->
                 "synthetic_dispatch_count": len(rows(scope / "dispatch.jsonl")),
                 "real_model_open_count": 0,
                 "scientific_rollout_count": 0,
-                "recovery_committed_attempts": [2, 1],
+                "recovery_committed_attempts": [3, 1],
                 "negative_case_count": 17,
                 "negative_dispatch_count": 0,
                 "negative_recovery_write_count": 0,

@@ -137,6 +137,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Allow a reduced manifest-ordered agent set and mark outputs non-formal.",
     )
+    parser.add_argument("--non-formal-episode-limit", type=int, default=0)
     parser.add_argument(
         "--model_cache_runtime_config",
         type=str,
@@ -878,6 +879,16 @@ def main() -> None:
         ]
         if not selected_window_plan or {window["window_id"] for window in selected_window_plan} != allowed_window_ids:
             raise FairnessManifestError("runtime window plan does not resolve every manifest window")
+    if args.non_formal_episode_limit:
+        if (
+            not args.non_formal_rehearsal
+            or args.non_formal_episode_limit != 1
+            or len(args.seeds) != 1
+            or len(args.agents) != 1
+            or fairness_manifest is None
+        ):
+            raise ValueError("one-episode limit requires isolated non-formal one-agent/one-seed rehearsal")
+        selected_window_plan = selected_window_plan[:1]
     observed_request_fingerprints: dict[str, dict[str, str]] = {}
     request_exposure_fingerprints: dict[str, dict[str, str]] = {}
     checkpoint_provenance_validation: dict[str, dict[str, dict[str, Any]]] = {}
@@ -893,6 +904,8 @@ def main() -> None:
             max_tasks=args.max_tasks,
             random_seed=seed,
         )
+        if args.non_formal_episode_limit:
+            workflow_states = workflow_states[:1]
         selected_workflow_ids_by_seed[str(seed)] = [workflow_state.workflow_id for workflow_state in workflow_states]
         seed_checkpoint_map = checkpoint_map_for_seed(
             base_checkpoint_map=base_checkpoint_map,

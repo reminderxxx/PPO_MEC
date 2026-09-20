@@ -48,8 +48,8 @@ from src.runtime.resolved_formal_execution_context import (
 )
 
 
-RESTRICTED_RECOVERY_CONTRACT_VERSION = "1.2.0"
-RESTRICTED_RECOVERY_REQUEST_VERSION = "1.2.0"
+RESTRICTED_RECOVERY_CONTRACT_VERSION = "1.3.0"
+RESTRICTED_RECOVERY_REQUEST_VERSION = "1.3.0"
 RESTRICTED_RECOVERY_PARENT_BOOTSTRAP_VERSION = "1.0.0"
 RESTRICTED_RECOVERY_PARENT_MODE = 0o700
 RESTRICTED_RECOVERY_PHASE_LEDGER_VERSION = "1.0.0"
@@ -120,6 +120,21 @@ EXPECTED_SOURCE_REFERENCE_SHA256 = "0ba289caa663d38dd35f61feafa509a3f8dc2eb4269b
 EXPECTED_LOCK_OWNER_SHA256 = "0cfeecba26816805d6445b9513263f183a3db651c5bdbbb9e204431b9872d11f"
 EXPECTED_FAILED_STDERR_SHA256 = "51b2569c1b7c98c950ba2f509122613f66606a2821368b0756007b828e3db414"
 EXPECTED_ORIGINAL_EXECUTOR_COMMIT = "a028ea291941a484ae9cd2e316d1b52adde3d1f2"
+FAILED_RECOVERY_ROOT = RESTRICTED_RECOVERY_PARENT / "typed_model_cache_restricted_recovery_20260920_g14r20_i5d_final_pending"
+FAILED_RECOVERY_FILE_HASHES = {
+    ".staging/formal_ablation/formal_ablation-3e9322fac172fcae01f2cc58/attempt_02/cell_stderr.log": "46ff6f6c8448e97203cba068cbcd47f3864682d758075f7930d40031522507ba",
+    ".staging/formal_ablation/formal_ablation-3e9322fac172fcae01f2cc58/attempt_02/cell_stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "cell_ledger_identity.json": "539b4d85255b22df7559dcdace8ea7af3313d986047d16c677172cc9fe65b39f",
+    "cell_state.jsonl": "332e5ecec05a0a795e859e07004f0c5b3284c80ab2a3c0e6c26df92b7df9ce5e",
+    "evaluation_model_source_reference.json": "463945b505fc490f690c4e68019d1114ae1b6f820a3a942dd759b031ba33d8d8",
+    "recovery_phase_state.jsonl": "7c90595fb0b833feb6cc500bf3a122a0bf3f68ae856864b7ff79842639f0a16d",
+    "resolved_execution_context.json": "9cb04c7cfd5a7286d44fb37b4a2203e75958f5877ab9ad4e45cd090515c006dc",
+    "restricted_recovery_execution_contract.json": "f87242d449c6c314191f2c0ffc2aea8b312a6f6aef59d69f80ea48be2866034a",
+    "restricted_recovery_initialization_complete.json": "eccd04e9bf737a73fee27d5f803003bcc400a105fbc33e6fe9c105945e3d09c6",
+    "restricted_recovery_request.json": "ca066b334edc93a62e6b5c52ade6f1285f74e928ae37bb34bb94086679025b6d",
+    "restricted_recovery_state.json": "e92df7434a7d3c7a67eee8ace33c2c5cf352f2fba0f6c1b68dca39998a4003db",
+}
+FAILED_RECOVERY_LOCK_SHA256 = "998f09d82ce41fefd3e9704566af4be7165242b5fff3d50fe944c7ca3c4480c2"
 
 
 class RestrictedRecoveryError(ValueError):
@@ -352,6 +367,8 @@ def _validate_contract_document() -> dict[str, Any]:
         or contract.get("allowed_phase") != PHASE
         or [row.get("cell_id") for row in contract.get("allowed_cells", [])]
         != list(ALLOWED_CELL_IDS)
+        or contract.get("allowed_cells", [{}])[0].get("recovery_attempt") != 3
+        or contract.get("allowed_cells", [{}])[0].get("previous_recovery_attempt") != 2
         or contract.get("immutable_original_prefixes")
         != {
             kind: {key: value for key, value in expected.items() if key != "filename"}
@@ -422,6 +439,68 @@ def _old_cell_ledger(root: Path) -> FormalCellLedger:
     except (KeyError, TypeError) as exc:
         raise RestrictedRecoveryError("original cell ledger identity drift") from exc
     return FormalCellLedger(run_root=root, identity=identity, resume=True)
+
+
+def audit_failed_recovery_attempt() -> dict[str, Any]:
+    """Bind the failed I5-D attempt 2 without changing its root or held lock."""
+    root = FAILED_RECOVERY_ROOT
+    if root.is_symlink() or not root.is_dir():
+        raise RestrictedRecoveryError("failed recovery root is missing or symlinked")
+    paths = {p.relative_to(root).as_posix(): p for p in root.rglob("*") if p.is_file() or p.is_symlink()}
+    if set(paths) != set(FAILED_RECOVERY_FILE_HASHES):
+        raise RestrictedRecoveryError("failed recovery file inventory drift")
+    files = []
+    for relative, expected_hash in sorted(FAILED_RECOVERY_FILE_HASHES.items()):
+        path = paths[relative]
+        if path.is_symlink() or file_sha256(path) != expected_hash:
+            raise RestrictedRecoveryError("failed recovery file identity drift: " + relative)
+        files.append({"path": str(path), "relative_path": relative, "size_bytes": path.stat().st_size, "sha256": expected_hash})
+    request = _read_json(root / "restricted_recovery_request.json")
+    execution = _read_json(root / "restricted_recovery_execution_contract.json")
+    marker = _read_json(root / "restricted_recovery_initialization_complete.json")
+    if (
+        request.get("authorization_request_sha256") != "806d22926dfca0c546d4b49b14fbf9b8c13c328ece00b1340844ce697629d6fa"
+        or request.get("recovery_execution") != execution
+        or execution.get("recovery_root") != str(root)
+        or marker.get("authorization_request_sha256") != request["authorization_request_sha256"]
+    ):
+        raise RestrictedRecoveryError("failed recovery request/initialization identity drift")
+    cells = _jsonl(root / "cell_state.jsonl")
+    phases = _jsonl(root / "recovery_phase_state.jsonl")
+    if (
+        [(row.get("cell_id"), row.get("status"), row.get("attempt")) for row in cells]
+        != [(FAILED_CELL_ID, "running", 2), (FAILED_CELL_ID, "failed_terminal", 2)]
+        or [row.get("event") for row in phases] != ["started", "failed"]
+        or (root / "evaluation_execution_contract.json").exists()
+    ):
+        raise RestrictedRecoveryError("failed recovery attempt 2 terminal drift")
+    lock = Path(execution["lock_path"])
+    if lock.is_symlink() or not lock.is_file() or file_sha256(lock) != FAILED_RECOVERY_LOCK_SHA256:
+        raise RestrictedRecoveryError("failed recovery held lock drift")
+    lock_payload = _read_json(lock)
+    if lock_payload.get("state") != "held":
+        raise RestrictedRecoveryError("failed recovery lock is no longer held")
+    analysis = ORIGINAL_PROJECT_ROOT / "artifacts/analysis/g14e05_i5d_ablation_recovery_20260920"
+    references = {}
+    for name in ("protection_start.json", "independent_review_cell1.json", "qualification_cell1_20260920_0615.json", "recovery_grant_cell1.json"):
+        path = analysis / name
+        _read_json(path)
+        references[name] = {"path": str(path), "size_bytes": path.stat().st_size, "sha256": file_sha256(path)}
+    return {
+        "status": "failed_terminal_read_only",
+        "recovery_root": str(root),
+        "authorization_request_sha256": request["authorization_request_sha256"],
+        "recovery_execution_identity_sha256": execution["recovery_execution_identity_sha256"],
+        "failed_cell_id": FAILED_CELL_ID,
+        "failed_attempt": 2,
+        "cell_terminal_hash": cells[-1]["current_ledger_hash"],
+        "phase_terminal_hash": phases[-1]["current_record_hash"],
+        "files": files,
+        "held_lock": {"path": str(lock), "size_bytes": lock.stat().st_size, "sha256": FAILED_RECOVERY_LOCK_SHA256, "device": lock.stat().st_dev, "inode": lock.stat().st_ino},
+        "review_grant_references": references,
+        "resumable": False,
+        "finalizable": False,
+    }
 
 
 def audit_original_recovery_source(
@@ -1100,7 +1179,8 @@ def _build_recovery_execution(
             {
                 "cell_id": FAILED_CELL_ID,
                 "source_attempt": 1,
-                "recovery_attempt": 2,
+                "previous_recovery_attempt": 2,
+                "recovery_attempt": 3,
                 "execution_kind": "recovery_attempt",
                 "must_commit_before_next_cell": True,
             },
@@ -1207,6 +1287,7 @@ def build_restricted_recovery_request(
         original_project_grant_path=original_project_grant_path,
         original_run_root=original_run_root,
     )
+    failed_recovery_audit = audit_failed_recovery_attempt()
     created = created_at_utc or datetime.now(timezone.utc).isoformat()
     execution, invariance = _build_recovery_execution(
         source_reference=source,
@@ -1237,6 +1318,7 @@ def build_restricted_recovery_request(
             "source_executor_commit": EXPECTED_ORIGINAL_EXECUTOR_COMMIT,
         },
         "immutable_source_audit": source_audit,
+        "previous_recovery_failure": failed_recovery_audit,
         "external_committed_cells": source_audit["external_committed_cells"],
         "source_models": deepcopy(source["models"]),
         "recovery_execution": execution,
@@ -1319,7 +1401,8 @@ def validate_restricted_recovery_request(
     if (
         specs[0].get("cell_id") != FAILED_CELL_ID
         or specs[0].get("source_attempt") != 1
-        or specs[0].get("recovery_attempt") != 2
+        or specs[0].get("previous_recovery_attempt") != 2
+        or specs[0].get("recovery_attempt") != 3
         or specs[1].get("cell_id") != UNSTARTED_CELL_ID
         or specs[1].get("source_attempt_count") != 0
         or specs[1].get("recovery_attempt") != 1
@@ -1379,6 +1462,17 @@ def validate_restricted_recovery_request(
         raise RestrictedRecoveryError("source mapping/deduplication policy drift")
     if len(value.get("external_committed_cells", [])) != 6 or len(value.get("source_models", [])) != 150:
         raise RestrictedRecoveryError("external cell/model membership drift")
+    failure = value.get("previous_recovery_failure", {})
+    if (
+        failure.get("recovery_root") != str(FAILED_RECOVERY_ROOT)
+        or failure.get("failed_cell_id") != FAILED_CELL_ID
+        or failure.get("failed_attempt") != 2
+        or failure.get("resumable") is not False
+        or failure.get("finalizable") is not False
+    ):
+        raise RestrictedRecoveryError("previous recovery failure lineage drift")
+    if check_live and failure != audit_failed_recovery_attempt():
+        raise RestrictedRecoveryError("previous recovery failure bytes drift")
     if check_live:
         rebuilt = build_restricted_recovery_request(
             original_request_path=value["original_identity"]["request"]["path"],
@@ -1537,7 +1631,7 @@ def recovery_cell_identity(request: Mapping[str, Any]) -> CellExecutionIdentity:
 
 
 class RestrictedRecoveryCellLedger(FormalCellLedger):
-    """The normal transaction ledger with exactly attempts 2 then 1."""
+    """The normal transaction ledger with exactly attempts 3 then 1."""
 
     def begin_cell(
         self,
@@ -1569,7 +1663,7 @@ class RestrictedRecoveryCellLedger(FormalCellLedger):
                 raise CellTransactionError("failed source cell must commit before the unstarted cell")
         elif any(row["cell_id"] == UNSTARTED_CELL_ID for row in records):
             raise CellTransactionError("recovery cell order drift")
-        attempt = 2 if cell_id == FAILED_CELL_ID else 1
+        attempt = 3 if cell_id == FAILED_CELL_ID else 1
         command_hash = canonical_sha256(list(command))
         target = Path(committed_path) if committed_path else (
             self.run_root / "cells" / phase / cell_id

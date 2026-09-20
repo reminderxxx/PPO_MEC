@@ -20,7 +20,7 @@ from src.runtime.evaluation_only_execution import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCIENCE = ROOT.parent / "g14r20_i_scientific_a6d1fd8"
+SCIENCE = Path("/Users/howen/Projects/PPO_MEC/artifacts/execution_checkouts/g14r20_i_scientific_a6d1fd8")
 
 
 @pytest.fixture(scope="module")

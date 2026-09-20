@@ -1,6 +1,6 @@
 {
-  "restricted_recovery_contract_version": "1.2.0",
-  "goal": "G14R20-I5-D",
+  "restricted_recovery_contract_version": "1.3.0",
+  "goal": "G14R20-I5-E",
   "scope_kind": "one_original_run_one_phase_two_ordered_cells",
   "original_run_id": "typed_model_cache_evaluation_only_20260913_g14r20_i3_pending",
   "allowed_phase": "formal_ablation",
@@ -8,7 +8,8 @@
     {
       "cell_id": "formal_ablation-3e9322fac172fcae01f2cc58",
       "source_attempt": 1,
-      "recovery_attempt": 2,
+      "previous_recovery_attempt": 2,
+      "recovery_attempt": 3,
       "execution_kind": "recovery_attempt",
       "must_commit_before_next_cell": true
     },

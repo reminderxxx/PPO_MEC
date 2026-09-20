@@ -85,6 +85,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-root", required=True)
     parser.add_argument("--request-replay-path", default="")
     parser.add_argument("--non-formal-rehearsal", action="store_true")
+    parser.add_argument("--non-formal-episode-limit", type=int, default=0)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--resolved-execution-context-path", default="")
     parser.add_argument("--formal-agent-order-contract-path", default="")
@@ -417,7 +418,13 @@ def main() -> None:
             raise FormalExecutionError(
                 "non-formal support rehearsal must not bind the formal window contract"
             )
+        if args.non_formal_episode_limit not in (0, 1):
+            raise FormalExecutionError("non-formal episode limit must be zero or one")
+        if args.non_formal_episode_limit and (len(args.agents) != 1 or len(args.seeds) != 1):
+            raise FormalExecutionError("one-episode rehearsal requires one agent and one seed")
     else:
+        if args.non_formal_episode_limit:
+            raise FormalExecutionError("episode limit is restricted to non-formal rehearsal")
         if not args.formal_window_consumption_contract_path:
             raise FormalExecutionError("formal support requires the window contract")
         window_contract = load_window_consumption_contract(
@@ -578,6 +585,10 @@ def main() -> None:
                 "formal",
             ]
         )
+    else:
+        command.append("--non-formal-rehearsal")
+        if args.non_formal_episode_limit:
+            command.extend(["--non-formal-episode-limit", str(args.non_formal_episode_limit)])
     command.extend(setting_flags)
     if args.resource_registry_path:
         command.extend(

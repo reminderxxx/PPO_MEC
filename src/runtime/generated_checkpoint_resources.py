@@ -70,6 +70,8 @@ def sha256_file(path: str | Path) -> str:
 
 
 def _strict_json_object(path: Path, label: str) -> dict[str, Any]:
+    if path.is_symlink():
+        raise GeneratedCheckpointResourceError(f"symlink is forbidden: {label}")
     def hook(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
         result: dict[str, Any] = {}
         for key, value in pairs:
@@ -648,15 +650,48 @@ def evaluation_model_source_scope(
         raise GeneratedCheckpointResourceError("evaluation execution context is required")
     context_path = Path(evaluation_context_path)
     evaluation_context = _strict_json_object(context_path, "evaluation execution context")
-    contract_path = context_path.parent / "evaluation_execution_contract.json"
-    contract = _strict_json_object(contract_path, "evaluation execution contract")
-    # Both identities must be verified: source training provenance cannot stand
-    # in for the new evaluation's commit, context, and durable output root.
-    validate_execution_contract(contract, model_source_reference=reference)
+    evaluation_path = context_path.parent / "evaluation_execution_contract.json"
+    recovery_path = context_path.parent / "restricted_recovery_execution_contract.json"
+    if evaluation_path.exists() and recovery_path.exists():
+        raise GeneratedCheckpointResourceError("conflicting evaluation and recovery contracts")
+    if recovery_path.exists() or recovery_path.is_symlink():
+        from src.runtime.restricted_recovery import (
+            ALLOWED_CELL_IDS, PHASE, validate_restricted_recovery_request,
+        )
+
+        request_path = context_path.parent / "restricted_recovery_request.json"
+        request = _strict_json_object(request_path, "restricted recovery request")
+        contract = _strict_json_object(recovery_path, "restricted recovery execution contract")
+        validate_restricted_recovery_request(request, check_live=False)
+        execution = request["recovery_execution"]
+        identity = evaluation_context.get("evaluation_execution_identity", {})
+        if (
+            contract != execution
+            or _strict_json_object(Path(reference_path), "evaluation model source reference") != reference
+            or request.get("source_models") != reference.get("models")
+            or execution.get("model_source_reference_sha256") != reference.get("source_reference_sha256")
+            or execution.get("resolved_execution_context") != evaluation_context
+            or execution.get("recovery_root") != str(context_path.parent)
+            or execution.get("recovery_execution_id") != context_path.parent.name
+            or execution.get("allowed_phase") != PHASE
+            or execution.get("allowed_cell_ids") != list(ALLOWED_CELL_IDS)
+            or identity.get("evaluation_run_id") != execution.get("recovery_execution_id")
+            or identity.get("executor_commit") != execution.get("executor_commit")
+            or identity.get("executor_git_tree") != execution.get("executor_git_tree")
+            or identity.get("source_run_id") != SOURCE_RUN_ID
+            or identity.get("source_context_identity_sha256") != reference.get("source_context_identity_sha256")
+            or context_path != context_path.parent / "resolved_execution_context.json"
+            or Path(reference_path) != context_path.parent / "evaluation_model_source_reference.json"
+        ):
+            raise GeneratedCheckpointResourceError("restricted recovery request/context/source identity drift")
+    else:
+        contract = _strict_json_object(evaluation_path, "evaluation execution contract")
+        # Source training provenance and current execution identity are distinct.
+        validate_execution_contract(contract, model_source_reference=reference)
     execution_identity = evaluation_context.get("evaluation_execution_identity")
     if (
-        evaluation_context != contract["evaluation_execution_context"]
-        or context_path.resolve() != Path(contract["evaluation_run_root"]).resolve() / "resolved_execution_context.json"
+        (not recovery_path.exists() and evaluation_context != contract["evaluation_execution_context"])
+        or (not recovery_path.exists() and context_path.resolve() != Path(contract["evaluation_run_root"]).resolve() / "resolved_execution_context.json")
         or not isinstance(execution_identity, Mapping)
         or execution_identity.get("source_run_id") != SOURCE_RUN_ID
         or execution_identity.get("source_context_identity_sha256") != reference["source_context_identity_sha256"]

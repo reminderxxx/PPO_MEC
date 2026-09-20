@@ -489,6 +489,48 @@ def _initial_files(request: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def preflight_recovery_scientific_inputs(
+    request: Mapping[str, Any], command: list[str], cell_id: str
+) -> dict[str, Any]:
+    """Reject deterministic child input failures before starting a cell transaction."""
+    from scripts.run_typed_model_cache_formal_support import build_parser
+    from src.runtime.generated_checkpoint_resources import resolve_generated_checkpoint_arguments
+
+    execution = request["recovery_execution"]
+    if command not in execution["command_plan"]["commands"]:
+        raise RestrictedRecoveryError("scientific command is outside the reviewed plan")
+    if command[:2] != [execution["python_executable"], str(Path(execution["executor_checkout"]) / "scripts/run_typed_model_cache_formal_support.py")]:
+        raise RestrictedRecoveryError("scientific support entrypoint/executor drift")
+    args = build_parser().parse_args(command[2:])
+    required = (
+        "protocol_path", "model_cache_runtime_config", "cache_baseline_fairness_manifest_path",
+        "seed_checkpoint_manifest_path", "checkpoint_provenance_manifest_path",
+        "window_plan_path", "formal_window_consumption_contract_path", "mobility_csv_path",
+        "workflow_csv_path", "resolved_execution_context_path",
+        "evaluation_model_source_reference_path", "generated_checkpoint_registry_path",
+        "resource_registry_path", "formal_agent_order_contract_path",
+    )
+    for name in required:
+        raw = str(getattr(args, name, "") or "")
+        path = Path(raw)
+        if not raw or path.is_symlink() or not path.is_file():
+            raise RestrictedRecoveryError(f"scientific child required file missing or symlink: {name}: {raw}")
+    root = Path(execution["recovery_root"])
+    if Path(args.resolved_execution_context_path) != root / "resolved_execution_context.json":
+        raise RestrictedRecoveryError("scientific child context path drift")
+    if Path(args.evaluation_model_source_reference_path) != root / "evaluation_model_source_reference.json":
+        raise RestrictedRecoveryError("scientific child source path drift")
+    if cell_id not in ALLOWED_CELL_IDS or command != execution["command_plan"]["commands"][list(ALLOWED_CELL_IDS).index(cell_id)]:
+        raise RestrictedRecoveryError("scientific child phase/cell drift")
+    protocol = _read(args.protocol_path)
+    audit = resolve_generated_checkpoint_arguments(
+        args, expected_capacity_label="medium_576mb", protocol=protocol,
+    )
+    if audit["evaluation_model_source"]["source_reference_sha256"] != execution["model_source_reference_sha256"]:
+        raise RestrictedRecoveryError("scientific child model source drift")
+    return {"status": "pass", "required_file_count": len(required), "capacity_label": audit["capacity_label"]}
+
+
 def _initialize(
     request: Mapping[str, Any],
     parent_guard: RestrictedRecoveryParentBootstrap,
@@ -717,6 +759,8 @@ def execute_recovery_cell(
         command, coordinates, final, builder, resolver = restricted_cell_layout(
             request, cell_id
         )
+        if scientific_child_adapter is None:
+            preflight_recovery_scientific_inputs(request, command, cell_id)
         if scientific_child_adapter is not None:
             builder, resolver = scientific_child_adapter.adapt(
                 request, cell_id, builder, resolver
@@ -727,7 +771,7 @@ def execute_recovery_cell(
                 cell_id=cell_id,
                 detail={
                     "source_attempt": 1,
-                    "recovery_attempt": 2,
+                    "recovery_attempt": 3,
                     "external_committed_cell_count": 6,
                 },
             )
@@ -763,20 +807,20 @@ def execute_recovery_cell(
                 )
                 raise RestrictedRecoveryError("restricted recovery cell failed terminally")
             record = result["record"]
-            expected_attempt = 2 if cell_id == FAILED_CELL_ID else 1
+            expected_attempt = 3 if cell_id == FAILED_CELL_ID else 1
             if int(record["attempt"]) != expected_attempt:
                 raise RestrictedRecoveryError("restricted recovery attempt number drift")
             if cell_id == FAILED_CELL_ID:
                 phase.append(
                     "prerequisite_committed",
                     cell_id=cell_id,
-                    detail={"recovery_attempt": 2, "next_cell": UNSTARTED_CELL_ID},
+                    detail={"recovery_attempt": 3, "next_cell": UNSTARTED_CELL_ID},
                 )
                 return {
                     "authorization": authorization,
                     "status": "prerequisite_committed",
                     "cell_id": cell_id,
-                    "recovery_attempt": 2,
+                    "recovery_attempt": 3,
                     "next_cell_id": UNSTARTED_CELL_ID,
                     "next_stage_authorized": False,
                     "holdout_opened": False,
