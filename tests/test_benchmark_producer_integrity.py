@@ -13,7 +13,10 @@ import tempfile
 import pytest
 
 from src.evaluators.cache_baseline_fairness import build_manifest
-from scripts.run_typed_model_cache_formal_support import stamp_outputs
+from scripts.run_typed_model_cache_formal_support import (
+    refresh_oracle_producer_manifest,
+    stamp_outputs,
+)
 from src.evaluators.formal_cell_transaction import (
     CellExecutionIdentity,
     CellTransactionError,
@@ -60,6 +63,27 @@ def test_support_stamp_rebuilds_final_nested_producer_manifest(tmp_path: Path) -
     stamp_outputs(run, {"support_family": "ablation", "setting_id": "nonformal", "support_setting_sha256": "s" * 64, "protocol_semantic_sha256": "p" * 64, "split_semantic_sha256": "w" * 64})
     audit = validate_producer_integrity_manifest(run / "artifact_integrity_manifest.json")
     assert audit["file_count"] == 4
+
+
+def test_oracle_support_provenance_is_in_final_producer_manifest(tmp_path: Path) -> None:
+    run = tmp_path / "oracle"
+    run.mkdir()
+    _write_json(run / "oracle_results.json", {"horizons": [1, 3]})
+    _write_json(run / "artifact_integrity_manifest.json", {
+        "artifact_integrity_manifest_version": "1.0.0",
+        "manifest_validation_status": "pass",
+        "request_replay_validation_status": "pass",
+        "files": [{"path": "oracle_results.json", "size_bytes": (run / "oracle_results.json").stat().st_size,
+                   "sha256": _sha(run / "oracle_results.json")}],
+    })
+    _write_json(run / "support_provenance.json", {"setting_id": "scalability-b05d0a8a8684c1f0"})
+    with pytest.raises(CellTransactionError, match="membership drift"):
+        validate_producer_integrity_manifest(run / "artifact_integrity_manifest.json")
+    refresh_oracle_producer_manifest(run)
+    audit = validate_producer_integrity_manifest(run / "artifact_integrity_manifest.json")
+    assert {row["path"] for row in audit["files"]} == {
+        "oracle_results.json", "support_provenance.json"
+    }
 
 
 def _write_json(path: Path, value: object) -> None:

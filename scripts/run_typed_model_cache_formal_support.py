@@ -188,7 +188,9 @@ def stamp_outputs(run_root: Path, provenance: dict) -> None:
     for path in sorted(run_root.rglob("*")):
         if path.is_symlink():
             raise FormalExecutionError("support producer output symlink is forbidden")
-        if path.is_file() and path != manifest_path:
+        if path.is_file() and path != manifest_path and path.name not in {
+            "cell_stdout.log", "cell_stderr.log", "committed_marker.json"
+        }:
             files.append({
                 "path": path.relative_to(run_root).as_posix(),
                 "size_bytes": path.stat().st_size,
@@ -196,6 +198,36 @@ def stamp_outputs(run_root: Path, provenance: dict) -> None:
             })
     manifest["files"] = files
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    validate_producer_integrity_manifest(manifest_path)
+
+
+def refresh_oracle_producer_manifest(run_root: Path) -> None:
+    """Register support provenance after the oracle child writes its manifest."""
+
+    manifest_path = run_root / "artifact_integrity_manifest.json"
+    manifest = load_json(manifest_path, "oracle producer integrity manifest")
+    if (set(manifest) != {
+        "artifact_integrity_manifest_version", "manifest_validation_status",
+        "request_replay_validation_status", "files"
+    } or manifest["artifact_integrity_manifest_version"] != "1.0.0"):
+        raise FormalExecutionError("oracle producer manifest schema drift")
+    files = []
+    for path in sorted(run_root.rglob("*")):
+        if path.is_symlink():
+            raise FormalExecutionError("oracle producer output symlink is forbidden")
+        if path.is_file() and path != manifest_path and path.name not in {
+            "cell_stdout.log", "cell_stderr.log", "committed_marker.json"
+        }:
+            files.append({
+                "path": path.relative_to(run_root).as_posix(),
+                "size_bytes": path.stat().st_size,
+                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            })
+    manifest["files"] = files
+    manifest_path.write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
+        encoding="utf-8",
+    )
     validate_producer_integrity_manifest(manifest_path)
 
 
@@ -525,6 +557,7 @@ def main() -> None:
             json.dumps(provenance, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
             encoding="utf-8",
         )
+        refresh_oracle_producer_manifest(run_root)
         if args.cell_output_descriptor_path:
             write_child_output_descriptor(
                 args.cell_output_descriptor_path,
