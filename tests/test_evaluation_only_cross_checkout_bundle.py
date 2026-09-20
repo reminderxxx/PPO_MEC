@@ -26,11 +26,10 @@ from src.runtime.evaluation_only_execution import (
     canonical_sha256,
     resolve_scientific_bundle_root,
 )
-from tests.test_evaluation_only_source_boundaries import source_reference
+from tests.test_evaluation_only_source_boundaries import SCIENCE, source_reference
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCIENCE = ROOT.parent / "g14r20_i_scientific_a6d1fd8"
 
 
 @pytest.fixture

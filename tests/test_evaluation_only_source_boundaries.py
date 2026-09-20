@@ -156,13 +156,13 @@ def test_evaluation_commands_keep_checkpoint_companions_at_source_run(
         source_reference=source_reference,
         evaluation_run_id="typed_model_cache_evaluation_only_test_pending",
         evaluation_run_root=(
-            ROOT.parents[2]
+            SOURCE_RUN_ROOT.parents[3]
             / "artifacts/experiments/typed_model_cache_evaluation_only"
             / "typed_model_cache_evaluation_only_test_pending"
         ),
         executor_checkout=ROOT,
         executor_commit=head,
-        python_executable=ROOT.parents[2] / ".venv/bin/python",
+        python_executable=SOURCE_RUN_ROOT.parents[3] / ".venv/bin/python",
     )
     observed = set()
     for phase in ("formal_cache_policy", "formal_controller"):
