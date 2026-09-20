@@ -1,3 +1,7 @@
+## 2026-09-20: G14E05 restricted recovery 合同消费者错配（RESOLVED；旧 run 永久失败）
+
+Recovery producer 写 `restricted_recovery_execution_contract.json`，generated checkpoint 资源消费者固定读取 `evaluation_execution_contract.json`，故 G14E05 attempt 2 在 rollout 前确定性失败。I5-E Contract 1.3.0 显式验证 recovery request/合同、来源与 executor/context；support、nested benchmark、producer、transaction 的 non-formal 两进程链已闭合。旧失败 root、held lock、attempt 2 staging 不修复或重试。未来正式 attempt 3 仍需新的中央 review、限时资格证据和 grant；当前结论仅工程授权就绪，历史七文件 task-start 仍 `UNVERIFIED`。
+
 ## 2026-09-20: G14R20-I5-D 当前阻塞边界
 
 G14E04 环境敏感 public validator 漂移已定位到旧 request 内嵌 `held_lock.pid_observation`；新 Contract 1.2.0 将其移出 immutable identity。G14E04 verdict 不变；新独立 quiescence 观测、中央复核与单独 grant 仍是未来前置条件。历史起点保护为 `UNVERIFIED`；旧 I5-B/I5-C/G14E04 包禁止复用。

@@ -1,3 +1,5 @@
+> **2026-09-20 G14R20-I5-E**：`g14r20_i5_e_recovery_consumer_contract.md` 记录 G14E05 缺失合同根因、Contract 1.3.0、attempt 3/1 谱系、真实 non-formal 两进程消费与发布验收。新申请仍 unsigned，grant/正式 recovery/holdout 未开启。
+
 > **2026-09-20 G14R20-I5-D**：`g14r20_i5_d_stable_request_contract.md` 记录共享 stable projection、五分钟 quiescence evidence、G14E04 audit-only 边界与新 unsigned request 约束。
 
 > **2026-09-14 G14R20-I5**：最小受限恢复合同只允许新 recovery identity 下的两个有序

@@ -1,3 +1,7 @@
+## G14R20-I5-E unsigned restricted recovery handoff（不执行正式 recovery）
+
+当前仅交中央窗口复核 `artifacts/analysis/g14r20_i5_e_recovery_consumer_20260920/authorization_request_unsigned.json` 和同目录命令包。未来必须重新生成短期资格证据，并由独立 review 与新 grant 绑定 exact request、executor commit/tree、原始来源与 G14E05 attempt 2 失败证据；不得使用 I5-D/G14E05 request、review、grant 或失败 root 续跑。第一个正式 cell 的新 ledger attempt 为 3，第二个为首次 attempt 1。隔离验收 root `nonformal_i5e_consumer_acceptance_20260920_f` 仅供工程证据，不进入正式结果。详见 `g14r20_i5_e_recovery_consumer_contract.md`。
+
 ## G14R20-I5-D public pre-grant workflow（不授权 recovery）
 
 仅在新的干净 executor commit 上生成全新 unsigned request；参数沿用下方 I5-C prepare 示例，但使用新的 execution ID、root、checkout、commit 和 artifact 路径。先运行 `prepare_typed_model_cache_restricted_recovery.py --action validate --output-path <new-request>`；通过后运行 `qualify_typed_model_cache_restricted_recovery.py --authorization-request-path <new-request> --output-path <new-create-only-evidence>`。后者只读原 lock 并可能明确 fail；五分钟过期即重新观察。I5-C 旧示例和旧 request 仅供历史审计，不得执行。不得签 grant 或运行 execute。

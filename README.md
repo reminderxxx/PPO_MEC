@@ -1,3 +1,5 @@
+> **2026-09-20 G14R20-I5-E**：restricted recovery 科学消费者现在显式验证 Contract 1.3.0；G14E05 attempt 2 失败 root 永久只读。隔离真实 support→benchmark→transaction 两设置验收通过，下一正式 attempt 3 仅有全新 unsigned request，尚无 grant 或正式恢复。见 [消费者合同](docs/project/g14r20_i5_e_recovery_consumer_contract.md)。
+
 > **2026-09-20 G14R20-I5-D**：Contract 1.2.0 分离完整 frozen request hash、共享 stable live identity 与独立限时 pre-grant quiescence evidence。G14E04 永久 `FAIL_STOP_NO_GRANT`；旧 I5-B/I5-C/G14E04 包只供审计，新申请仍 unsigned。见 `docs/project/g14r20_i5_d_stable_request_contract.md`。
 
 > **2026-09-16 G14R20-I5-C**：I5-B 首次真实 execute 在事务初始化前因 recovery parent 不存在而退出，分类固定为

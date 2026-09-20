@@ -1,3 +1,7 @@
+## 2026-09-20 — D-G14R20-I5-E 选择显式 restricted recovery 消费者合同
+
+决定：generated checkpoint resolver 接受当前 root 唯一的 `restricted_recovery_execution_contract.json`，先完整验证同 root 的 unsigned request、source reference、executor/tree、context 与固定 phase/cell；`evaluation_execution_contract.json` 同时出现即拒绝。不得复制历史 evaluation 合同或缺字段回退。G14E05 attempt 2 永久失败，下一独立执行身份记录 attempt 3；第二 cell 为首次 attempt 1。non-formal 一 episode 预算只可在隔离验收中显式使用，正式 command plan 不变。详见 `g14r20_i5_e_recovery_consumer_contract.md`。
+
 ## 2026-09-20 — D-G14R20-I5-D request 身份与实时资格分层
 
 决定：restricted recovery 合同升至 1.2.0。完整 frozen request canonical hash 必须先验证；live 科学身份只排除显式非权威 `immutable_source_audit.held_lock.pid_observation`，未知字段继续严格比较。PID/ps/kernel-lock 进入独立五分钟 pre-grant evidence，review 与 grant 绑定 path/size/SHA-256；grant 校验时重新观察。旧 I5-B/I5-C/G14E04 仅审计，不可复用。详见 `g14r20_i5_d_stable_request_contract.md`。

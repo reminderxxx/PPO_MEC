@@ -70,7 +70,8 @@ def sha256_file(path: str | Path) -> str:
 
 
 def _strict_json_object(path: Path, label: str) -> dict[str, Any]:
-    if path.is_symlink():
+    lexical = path.absolute()
+    if any(component.is_symlink() for component in (lexical, *lexical.parents)):
         raise GeneratedCheckpointResourceError(f"symlink is forbidden: {label}")
     def hook(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
         result: dict[str, Any] = {}

@@ -513,7 +513,7 @@ def preflight_recovery_scientific_inputs(
     for name in required:
         raw = str(getattr(args, name, "") or "")
         path = Path(raw)
-        if not raw or path.is_symlink() or not path.is_file():
+        if not raw or any(component.is_symlink() for component in (path, *path.parents)) or not path.is_file():
             raise RestrictedRecoveryError(f"scientific child required file missing or symlink: {name}: {raw}")
     root = Path(execution["recovery_root"])
     if Path(args.resolved_execution_context_path) != root / "resolved_execution_context.json":

@@ -1,3 +1,7 @@
+## 2026-09-20: G14R20-I5-E 科学消费者接口闭合
+
+G14E05 的真实 recovery attempt 2 在首个 support 子进程中因缺少 `evaluation_execution_contract.json` 失败，旧 root/lock/账本保持只读。Contract 1.3.0 让 generated checkpoint resolver 显式验证 restricted recovery request/contract/context/source，未来失败 cell 登记 attempt 3，第二 cell 仍为首次 attempt 1。隔离 non-formal 真链已由两个进程完成两种 ablation 各 1 episode、9 CacheEvents、合法 PPO checkpoint 加载、producer manifest 与 transaction 发布；handoff 为 6 external + 2 new。三容量各 50 模型映射通过。新申请仅 unsigned，状态上限 `READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION`；正式 recovery、grant、holdout、训练与统计未执行。工程证据见 `g14r20_i5_e_recovery_consumer_contract.md`。
+
 ## 2026-09-20: G14R20-I5-D 工程门禁修复
 
 G14E04 独立 review 固定为 `FAIL_STOP_NO_GRANT`（SHA-256 `f1e24409af350d849212e080537d80c29886a20d14853fca8a079dd04628663c`），无 grant 或 recovery 副作用。I5-D Contract 1.2.0 分离完整 request hash / stable live identity 与短期 pre-grant quiescence evidence。新申请仍 unsigned；正式 recovery、科学 dispatch、holdout 与历史起点保护继续未验证/未授权。工程合同见 `g14r20_i5_d_stable_request_contract.md`。

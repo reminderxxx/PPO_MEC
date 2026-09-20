@@ -1,3 +1,12 @@
+## 2026-09-20 G14R20-I5-E
+
+- `src/runtime/restricted_recovery.py`：Contract 1.3.0、G14E05 只读失败证据与 attempt 3/1 谱系。
+- `src/runtime/generated_checkpoint_resources.py`：按当前 root 的唯一合同类型解析，restricted recovery 显式绑定 request/source/context/executor，拒绝冲突、缺失和 symlink。
+- `scripts/run_typed_model_cache_restricted_recovery.py`：科学子进程前 14 项文件及三层模型资源预检。
+- `scripts/run_typed_model_cache_formal_support.py`、`scripts/benchmark_main_results.py`：真实 support/nested 链；non-formal one-episode 子集严格显式；support stamp 后重建并验证最终 producer manifest。
+- `src/evaluators/cache_baseline_fairness.py`：只有显式 non-formal 调用可使用原顺序 seed 子集；正式 seed 精确匹配不变。
+- `tests/test_restricted_recovery_consumer.py`：保留的真实 non-formal 双进程发布读回与 rollout 前拒绝矩阵。
+
 ## 2026-09-20 G14R20-I5-D
 
 - `src/runtime/restricted_recovery.py`：完整 canonical hash 优先、唯一 stable request projection、独立五分钟 ps/kernel-lock quiescence evidence 与严格校验。
