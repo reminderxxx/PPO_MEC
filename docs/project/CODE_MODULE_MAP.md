@@ -1,3 +1,9 @@
+## 2026-09-20 G14R20-I5-D
+
+- `src/runtime/restricted_recovery.py`：完整 canonical hash 优先、唯一 stable request projection、独立五分钟 ps/kernel-lock quiescence evidence 与严格校验。
+- `scripts/prepare_typed_model_cache_restricted_recovery.py`：新 unsigned builder/public validator；`scripts/qualify_typed_model_cache_restricted_recovery.py`：只读 pre-grant 观测、create-only evidence；`scripts/run_typed_model_cache_restricted_recovery.py`：review/grant evidence binding 与执行前重观测。
+- `tests/test_restricted_recovery_quiescence.py`：身份漂移与 ps 权限、PID、kernel lock、evidence TTL 的正负边界。
+
 ## 2026-09-10 G14R20-G project 授权依赖边界
 
 - `execute_fixed_commit_continuation.py`：显式 project/crypto 入口互斥；禁止 crypto 失败后自动选择 project。

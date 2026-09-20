@@ -1,3 +1,7 @@
+## 2026-09-20: G14R20-I5-D 工程门禁修复
+
+G14E04 独立 review 固定为 `FAIL_STOP_NO_GRANT`（SHA-256 `f1e24409af350d849212e080537d80c29886a20d14853fca8a079dd04628663c`），无 grant 或 recovery 副作用。I5-D Contract 1.2.0 分离完整 request hash / stable live identity 与短期 pre-grant quiescence evidence。新申请仍 unsigned；正式 recovery、科学 dispatch、holdout 与历史起点保护继续未验证/未授权。工程合同见 `g14r20_i5_d_stable_request_contract.md`。
+
 ## 2026-09-16: G14R20-I5-C restricted recovery parent cold-start closure
 
 - I5-B 首次真实 execute 保留为 `PRE_TRANSACTION_BOOTSTRAP_FAILURE / RECOVERY_PARENT_CONTRACT_NOT_CLOSED`、rc=1；

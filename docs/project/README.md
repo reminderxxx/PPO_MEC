@@ -1,3 +1,5 @@
+> **2026-09-20 G14R20-I5-D**：`g14r20_i5_d_stable_request_contract.md` 记录共享 stable projection、五分钟 quiescence evidence、G14E04 audit-only 边界与新 unsigned request 约束。
+
 > **2026-09-14 G14R20-I5**：最小受限恢复合同只允许新 recovery identity 下的两个有序
 > `formal_ablation` cell；6 个旧 committed cell 以外部双层完整性 reference 消费，原 terminal/ledger/staging/lock
 > 永久只读。当前仅 synthetic/non-formal 验收与 unsigned request，未签 grant、未真实恢复、未开放后续阶段或

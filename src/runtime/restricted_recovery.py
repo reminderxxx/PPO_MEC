@@ -9,7 +9,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+import fcntl
 import hashlib
 import json
 import os
@@ -47,8 +48,8 @@ from src.runtime.resolved_formal_execution_context import (
 )
 
 
-RESTRICTED_RECOVERY_CONTRACT_VERSION = "1.1.0"
-RESTRICTED_RECOVERY_REQUEST_VERSION = "1.1.0"
+RESTRICTED_RECOVERY_CONTRACT_VERSION = "1.2.0"
+RESTRICTED_RECOVERY_REQUEST_VERSION = "1.2.0"
 RESTRICTED_RECOVERY_PARENT_BOOTSTRAP_VERSION = "1.0.0"
 RESTRICTED_RECOVERY_PARENT_MODE = 0o700
 RESTRICTED_RECOVERY_PHASE_LEDGER_VERSION = "1.0.0"
@@ -533,23 +534,6 @@ def audit_original_recovery_source(
     lock = _read_json(lock_path)
     if lock.get("state") != "held" or continuation_digest(lock) != EXPECTED_LOCK_OWNER_SHA256:
         raise RestrictedRecoveryError("original held-lock owner drift")
-    process = lock.get("process", {})
-    try:
-        process_probe = subprocess.run(
-            ["ps", "-p", str(process.get("pid", "")), "-o", "lstart="],
-            text=True,
-            capture_output=True,
-            check=False,
-        )
-        process_return_code: int | None = process_probe.returncode
-        process_start = process_probe.stdout.strip() or None
-        process_error = process_probe.stderr.strip() or None
-    except OSError as exc:
-        # Process visibility is an external authorization precondition.  Its
-        # absence must not weaken source integrity or imply quiescence.
-        process_return_code = None
-        process_start = None
-        process_error = f"{type(exc).__name__}: {exc}"
     return {
         "status": "pass",
         "qualification_scope": "retention_integrity_only_no_performance_claim",
@@ -579,16 +563,9 @@ def audit_original_recovery_source(
         },
         "held_lock": {
             **_file_row(lock_path),
+            "device": lock_path.stat().st_dev,
             "owner_canonical_sha256": continuation_digest(lock),
             "owner_state": lock["state"],
-            "pid_observation": {
-                "pid": process.get("pid"),
-                "ps_return_code": process_return_code,
-                "live_start_time": process_start,
-                "probe_error": process_error,
-                "quiescence_proven": False,
-                "lock_cleanup_authorized": False,
-            },
         },
         "i4_review_inputs": {
             "plan": _file_row(I4_PLAN_PATH),
@@ -607,13 +584,201 @@ def audit_original_recovery_source(
 
 
 def stable_source_audit_projection(audit: Mapping[str, Any]) -> dict[str, Any]:
-    """Remove only the explicitly non-authoritative live PID observation."""
+    """Remove exactly the two contracted non-authoritative live observations."""
 
     value = deepcopy(dict(audit))
     held = value.get("held_lock")
     if isinstance(held, dict):
         held.pop("pid_observation", None)
+    review = value.get("i4_review_inputs")
+    if isinstance(review, dict):
+        bundle = review.get("declared_audit_bundle")
+        if isinstance(bundle, dict):
+            bundle.pop("present", None)
     return value
+
+
+def stable_recovery_request_projection(request: Mapping[str, Any]) -> dict[str, Any]:
+    """Science identity, excluding only contracted non-authoritative observations.
+
+    The caller must verify the *complete* frozen request canonical hash first.
+    Unknown fields stay in the projection and therefore cause drift.
+    """
+
+    value = deepcopy(dict(request))
+    value.pop("authorization_request_sha256", None)
+    audit = value.get("immutable_source_audit")
+    if isinstance(audit, dict):
+        value["immutable_source_audit"] = stable_source_audit_projection(audit)
+    return value
+
+
+QUIESCENCE_EVIDENCE_VERSION = "1.0.0"
+QUIESCENCE_EVIDENCE_TTL_SECONDS = 300
+
+
+def _lock_bytes_observation(path: Path) -> dict[str, Any]:
+    if path.is_symlink() or not path.is_file():
+        raise RestrictedRecoveryError("quiescence original held lock is missing or symlinked")
+    row = path.stat()
+    return {
+        "path": str(path), "device": row.st_dev, "inode": row.st_ino,
+        "size_bytes": row.st_size, "sha256": file_sha256(path),
+    }
+
+
+def _nonblocking_kernel_lock_probe(path: Path) -> dict[str, Any]:
+    """Probe the existing inode read-only; never truncate or replace it."""
+
+    fd = None
+    try:
+        fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW)
+        row = os.fstat(fd)
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return {"result": "occupied", "device": row.st_dev, "inode": row.st_ino, "error": None}
+        finally:
+            # Closing releases a successfully acquired lock.  No inode write.
+            pass
+        return {"result": "acquired", "device": row.st_dev, "inode": row.st_ino, "error": None}
+    except OSError as exc:
+        return {"result": "unverifiable", "device": None, "inode": None,
+                "error": f"{type(exc).__name__}: {exc}"}
+    finally:
+        if fd is not None:
+            os.close(fd)
+
+
+def observe_restricted_recovery_quiescence(
+    request: Mapping[str, Any], *, now: datetime | None = None,
+    process_probe=None, kernel_probe=None,
+) -> dict[str, Any]:
+    """Produce a short-lived, independent pre-grant observation, without writes.
+
+    Test probes may simulate host permission and kernel-lock boundaries.  They
+    do not alter the production CLI, which always uses the real probes.
+    """
+
+    held = request["immutable_source_audit"]["held_lock"]
+    path = Path(held["path"])
+    observed_at = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    before = _lock_bytes_observation(path)
+    expected = {key: held[key] for key in ("path", "device", "inode", "size_bytes", "sha256")}
+    owner = _read_json(path)
+    pid = owner.get("process", {}).get("pid")
+    started = owner.get("process", {}).get("started")
+    probe = process_probe or (lambda p: subprocess.run(
+        ["ps", "-p", str(p), "-o", "lstart="], text=True,
+        capture_output=True, check=False,
+    ))
+    try:
+        result = probe(pid)
+        rc = result.returncode
+        live_start = result.stdout.strip() or None
+        error = result.stderr.strip() or None
+    except OSError as exc:
+        rc, live_start, error = None, None, f"{type(exc).__name__}: {exc}"
+    ps_available = (rc == 0 and live_start is not None and error is None) or (
+        rc == 1 and live_start is None and error is None
+    )
+    identity = (
+        "same_owner_active" if rc == 0 and live_start == started else
+        "pid_reused" if rc == 0 and ps_available else
+        "pid_absent" if rc == 1 and ps_available else "unverifiable"
+    )
+    kernel = (kernel_probe or _nonblocking_kernel_lock_probe)(path)
+    after = _lock_bytes_observation(path)
+    unchanged = before == after == expected and (
+        kernel.get("device"), kernel.get("inode")
+    ) == (held["device"], held["inode"])
+    owner_matches = continuation_digest(owner) == held["owner_canonical_sha256"]
+    failures = []
+    if not unchanged or not owner_matches:
+        failures.append("immutable_lock_changed")
+    if not ps_available:
+        failures.append("process_permission_failure")
+    elif identity == "same_owner_active":
+        failures.append("quiescence_failure_active_holder")
+    if kernel.get("result") != "acquired":
+        failures.append("kernel_lock_failure")
+    return {
+        "quiescence_evidence_version": QUIESCENCE_EVIDENCE_VERSION,
+        "authorization_request_sha256": request["authorization_request_sha256"],
+        "observed_at": observed_at.isoformat(),
+        "expires_at": (observed_at + timedelta(seconds=QUIESCENCE_EVIDENCE_TTL_SECONDS)).isoformat(),
+        "status": "pass" if not failures else "fail",
+        "failure_codes": failures,
+        "original_held_lock": expected,
+        "owner_payload_identity": {
+            "canonical_sha256": continuation_digest(owner),
+            "state": owner.get("state"), "process": owner.get("process"),
+        },
+        "process_identity_probe": {
+            "pid": pid, "owner_start_time": started, "live_start_time": live_start,
+            "ps_return_code": rc, "probe_error": error,
+            "ps_permission_available": bool(ps_available), "identity_result": identity,
+        },
+        "kernel_lock_probe": kernel,
+        "lock_before": before, "lock_after": after,
+        "lock_bytes_unchanged": unchanged,
+        "quiescence_proven": not failures,
+        "lock_cleanup_authorized": False,
+        "holdout_capability": False,
+    }
+
+
+def validate_restricted_recovery_quiescence_evidence(
+    evidence: Mapping[str, Any], request: Mapping[str, Any], *,
+    now: datetime | None = None,
+) -> None:
+    try:
+        observed = datetime.fromisoformat(str(evidence.get("observed_at", "")))
+        expires = datetime.fromisoformat(str(evidence.get("expires_at", "")))
+    except ValueError as exc:
+        raise RestrictedRecoveryError("pre-grant quiescence evidence timestamp invalid") from exc
+    current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    expected_keys = {
+        "quiescence_evidence_version", "authorization_request_sha256", "observed_at",
+        "expires_at", "status", "failure_codes", "original_held_lock",
+        "owner_payload_identity", "process_identity_probe", "kernel_lock_probe",
+        "lock_before", "lock_after", "lock_bytes_unchanged", "quiescence_proven",
+        "lock_cleanup_authorized", "holdout_capability",
+    }
+    held = request["immutable_source_audit"]["held_lock"]
+    if (
+        set(evidence) != expected_keys
+        or not isinstance(evidence.get("original_held_lock"), Mapping)
+        or not isinstance(evidence.get("process_identity_probe"), Mapping)
+        or not isinstance(evidence.get("kernel_lock_probe"), Mapping)
+        or not isinstance(evidence.get("owner_payload_identity"), Mapping)
+        or evidence.get("quiescence_evidence_version") != QUIESCENCE_EVIDENCE_VERSION
+        or evidence.get("authorization_request_sha256") != request["authorization_request_sha256"]
+        or evidence.get("status") != "pass"
+        or evidence.get("failure_codes") != []
+        or evidence.get("quiescence_proven") is not True
+        or evidence.get("lock_bytes_unchanged") is not True
+        or evidence.get("lock_cleanup_authorized") is not False
+        or evidence.get("holdout_capability") is not False
+        or evidence.get("process_identity_probe", {}).get("ps_permission_available") is not True
+        or evidence.get("process_identity_probe", {}).get("identity_result") not in ("pid_absent", "pid_reused")
+        or evidence.get("kernel_lock_probe", {}).get("result") != "acquired"
+        or evidence.get("kernel_lock_probe", {}).get("device") != held.get("device")
+        or evidence.get("kernel_lock_probe", {}).get("inode") != held.get("inode")
+        or evidence.get("owner_payload_identity", {}).get("canonical_sha256") != held.get("owner_canonical_sha256")
+        or evidence.get("owner_payload_identity", {}).get("state") != "held"
+        or evidence.get("process_identity_probe", {}).get("pid") != evidence.get("owner_payload_identity", {}).get("process", {}).get("pid")
+        or observed.tzinfo is None or expires.tzinfo is None
+        or expires - observed != timedelta(seconds=QUIESCENCE_EVIDENCE_TTL_SECONDS)
+        or not observed <= current < expires
+        or evidence.get("original_held_lock") != evidence.get("lock_before")
+        or evidence.get("lock_before") != evidence.get("lock_after")
+        or any(
+            evidence["original_held_lock"].get(key) != held.get(key)
+            for key in ("path", "device", "inode", "size_bytes", "sha256")
+        )
+    ):
+        raise RestrictedRecoveryError("pre-grant quiescence evidence failed or expired")
 
 
 ALLOWED_ORIGINAL_COMMITTED_CELL_IDS = (
@@ -1105,6 +1270,8 @@ def build_restricted_recovery_request(
         "real_recovery_started": False,
         "holdout_opened": False,
     }
+    # Builder and every consumer share the same explicit identity projection.
+    stable_recovery_request_projection(request)
     request["authorization_request_sha256"] = canonical_sha256(request)
     return request
 
@@ -1228,7 +1395,7 @@ def validate_restricted_recovery_request(
                 expected_parent if _test_recovery_parent is not None else None
             ),
         )
-        if dict(request) != rebuilt:
+        if stable_recovery_request_projection(request) != stable_recovery_request_projection(rebuilt):
             raise RestrictedRecoveryError("recovery request differs from live immutable sources")
     return {
         "status": "pass",
@@ -1680,6 +1847,7 @@ __all__ = [
     "recovery_cell_identity",
     "restricted_cell_layout",
     "stable_source_audit_projection",
+    "stable_recovery_request_projection",
     "validate_recovery_handoff_manifest",
     "validate_restricted_recovery_parent_contract",
     "validate_recovery_executor_live",

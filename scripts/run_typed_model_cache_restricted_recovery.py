@@ -40,11 +40,13 @@ from src.runtime.restricted_recovery import (
     UNSTARTED_CELL_ID,
     audit_original_recovery_source,
     build_recovery_handoff_manifest,
+    observe_restricted_recovery_quiescence,
     recovery_cell_identity,
     restricted_cell_layout,
-    stable_source_audit_projection,
+    stable_recovery_request_projection,
     validate_restricted_recovery_parent_contract,
     validate_recovery_handoff_manifest,
+    validate_restricted_recovery_quiescence_evidence,
     validate_recovery_executor_live,
     validate_restricted_recovery_request,
 )
@@ -377,6 +379,8 @@ def verify_recovery_grant(
         "issued_at",
         "expires_at",
     }
+    if not synthetic_only:
+        expected_fields.add("pregrant_qualification")
     if set(grant) != expected_fields or grant.get("version") != "1.0.0":
         raise RestrictedRecoveryError("restricted recovery grant schema mismatch")
     expected_status = (
@@ -425,6 +429,30 @@ def verify_recovery_grant(
         or bool(review.get("synthetic_only", False)) != synthetic_only
     ):
         raise RestrictedRecoveryError("restricted recovery independent review is incomplete")
+    if not synthetic_only:
+        qualification_row = grant["pregrant_qualification"]
+        if (
+            not isinstance(qualification_row, dict)
+            or set(qualification_row) != {"path", "sha256", "size_bytes"}
+            or review.get("pregrant_qualification") != qualification_row
+        ):
+            raise RestrictedRecoveryError("independent review/grant quiescence evidence binding drift")
+        qualification_path = Path(str(qualification_row["path"]))
+        if (
+            qualification_path.is_symlink()
+            or not qualification_path.is_file()
+            or qualification_path.stat().st_size != qualification_row["size_bytes"]
+            or file_sha256(qualification_path) != qualification_row["sha256"]
+        ):
+            raise RestrictedRecoveryError("pre-grant quiescence evidence bytes drift")
+        evidence = _read(qualification_path)
+        validate_restricted_recovery_quiescence_evidence(evidence, request, now=current)
+        current_observation = observe_restricted_recovery_quiescence(request, now=current)
+        if current_observation["status"] != "pass":
+            raise RestrictedRecoveryError(
+                "pre-grant quiescence no longer holds: "
+                + ", ".join(current_observation["failure_codes"])
+            )
     return {
         "approval_verified": True,
         "authorization_mode": (
@@ -653,9 +681,11 @@ def execute_recovery_cell(
     audit = audit_original_recovery_source()
     source = _read(ORIGINAL_RUN_ROOT / "evaluation_model_source_reference.json")
     original = request["original_identity"]
+    live_source_request = dict(request)
+    live_source_request["immutable_source_audit"] = audit
     if (
-        stable_source_audit_projection(audit)
-        != stable_source_audit_projection(request["immutable_source_audit"])
+        stable_recovery_request_projection(live_source_request)
+        != stable_recovery_request_projection(request)
         or audit["external_committed_cells"] != request["external_committed_cells"]
         or source["models"] != request["source_models"]
         or original.get("run_id") != execution["original_run_id"]

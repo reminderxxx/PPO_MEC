@@ -1,6 +1,6 @@
 {
-  "restricted_recovery_contract_version": "1.1.0",
-  "goal": "G14R20-I5-C",
+  "restricted_recovery_contract_version": "1.2.0",
+  "goal": "G14R20-I5-D",
   "scope_kind": "one_original_run_one_phase_two_ordered_cells",
   "original_run_id": "typed_model_cache_evaluation_only_20260913_g14r20_i3_pending",
   "allowed_phase": "formal_ablation",

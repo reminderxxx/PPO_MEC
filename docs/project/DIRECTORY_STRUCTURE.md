@@ -1,3 +1,5 @@
+G14R20-I5-D：新增 pre-grant 只读入口 `scripts/qualify_typed_model_cache_restricted_recovery.py`；共享 request projection 与实时锁观测位于 `src/runtime/restricted_recovery.py`，测试位于 `tests/test_restricted_recovery_quiescence.py`。新 unsigned request 与证据只写入新的 ignored `artifacts/analysis/g14r20_i5_d_*` 目录；旧 I5-B/I5-C/G14E04 包不改写。
+
 ## 2026-09-14 G14R20-I5-A 验收证据
 
 - 保护快照、commit-bound pytest receipt 与 fail-closed 构包器分别位于

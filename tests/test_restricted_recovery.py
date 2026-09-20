@@ -137,7 +137,7 @@ def minimal_request(tmp_path: Path) -> dict:
         {key: value for key, value in context.items() if key != "context_sha256"}
     )
     execution = {
-        "restricted_recovery_contract_version": "1.1.0",
+        "restricted_recovery_contract_version": "1.2.0",
         "recovery_execution_id": root.name,
         "recovery_root": str(root),
         "original_run_id": "typed_model_cache_evaluation_only_20260913_g14r20_i3_pending",
@@ -172,7 +172,7 @@ def minimal_request(tmp_path: Path) -> dict:
     }
     execution["recovery_execution_identity_sha256"] = canonical_sha256(execution)
     request = {
-        "restricted_recovery_authorization_request_version": "1.1.0",
+        "restricted_recovery_authorization_request_version": "1.2.0",
         "status": "READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION",
         "authorization_kind": "restricted_formal_ablation_recovery_only",
         "created_at_utc": "2026-09-14T00:00:00+08:00",

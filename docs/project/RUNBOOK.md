@@ -1,3 +1,7 @@
+## G14R20-I5-D public pre-grant workflow（不授权 recovery）
+
+仅在新的干净 executor commit 上生成全新 unsigned request；参数沿用下方 I5-C prepare 示例，但使用新的 execution ID、root、checkout、commit 和 artifact 路径。先运行 `prepare_typed_model_cache_restricted_recovery.py --action validate --output-path <new-request>`；通过后运行 `qualify_typed_model_cache_restricted_recovery.py --authorization-request-path <new-request> --output-path <new-create-only-evidence>`。后者只读原 lock 并可能明确 fail；五分钟过期即重新观察。I5-C 旧示例和旧 request 仅供历史审计，不得执行。不得签 grant 或运行 execute。
+
 ## G14R20-I5-C restricted recovery parent bootstrap（仅 prepare/validate）
 
 I5-B request/grant/命令永久禁止 retry、resume、salvage 或重新执行。I5-C production prepare 只接受固定 parent：

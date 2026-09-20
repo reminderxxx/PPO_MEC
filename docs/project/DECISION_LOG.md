@@ -1,4 +1,8 @@
-﻿# Decision Log
+## 2026-09-20 — D-G14R20-I5-D request 身份与实时资格分层
+
+决定：restricted recovery 合同升至 1.2.0。完整 frozen request canonical hash 必须先验证；live 科学身份只排除显式非权威 `immutable_source_audit.held_lock.pid_observation`，未知字段继续严格比较。PID/ps/kernel-lock 进入独立五分钟 pre-grant evidence，review 与 grant 绑定 path/size/SHA-256；grant 校验时重新观察。旧 I5-B/I5-C/G14E04 仅审计，不可复用。详见 `g14r20_i5_d_stable_request_contract.md`。
+
+# Decision Log
 
 ## 2026-09-16 — D-G14R20-I5-C parent bootstrap 是 request-bound execute primitive
 

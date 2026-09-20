@@ -1,5 +1,9 @@
 # G14R20-I5 最小受限恢复合同
 
+> 2026-09-20：以下 1.1.0/I5-C 文字保留为历史审计。新请求使用 1.2.0/I5-D，
+> 共享 stable request projection 与独立 quiescence evidence 见
+> `g14r20_i5_d_stable_request_contract.md`。旧 I5-B/I5-C/G14E04 request、review、grant、log 不得复用。
+
 - `contract_version`: `1.1.0`
 - `scope`: `one original run / formal_ablation / two ordered cells`
 - `status_ceiling`: `READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION`

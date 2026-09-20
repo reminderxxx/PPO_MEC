@@ -1,3 +1,7 @@
+## 2026-09-20: G14R20-I5-D 当前阻塞边界
+
+G14E04 环境敏感 public validator 漂移已定位到旧 request 内嵌 `held_lock.pid_observation`；新 Contract 1.2.0 将其移出 immutable identity。G14E04 verdict 不变；新独立 quiescence 观测、中央复核与单独 grant 仍是未来前置条件。历史起点保护为 `UNVERIFIED`；旧 I5-B/I5-C/G14E04 包禁止复用。
+
 ## 2026-09-16: restricted recovery 缺失父目录冷启动合同未闭合（RESOLVED；I5-B 永久冻结）
 
 - 事实：I5-B execute 在 `RestrictedRecoverySingleWriter.__enter__` 因固定 recovery parent 不存在而 rc=1；发生于
