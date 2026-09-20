@@ -456,8 +456,10 @@ def _json_string_locations(value: Any, needle: str) -> list[tuple[str, ...]]:
     return result
 
 
-def _path_location_allowed(location: tuple[str, ...]) -> bool:
+def _path_location_allowed(location: tuple[str, ...], *, filename: str) -> bool:
     compact = tuple(part for part in location if part != "*")
+    if filename == "command_log.json" and compact in {("argv",), ("shell_command",)}:
+        return True
     return any(compact[-len(suffix):] == suffix for suffix in _ALLOWED_JSON_PATH_SUFFIXES)
 
 
@@ -506,7 +508,8 @@ def _rewrite_declared_internal_paths(source: Path, destination: Path) -> dict[st
                 ) from exc
             raw_locations = _json_string_locations(parsed, old_text)
             if not raw_locations or any(
-                not _path_location_allowed(location) for location in raw_locations
+                not _path_location_allowed(location, filename=path.name)
+                for location in raw_locations
             ):
                 raise CellTransactionError(
                     f"undeclared JSON path relocation field: {path} {raw_locations}"

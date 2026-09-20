@@ -18,6 +18,7 @@ from scripts.run_typed_model_cache_formal_support import (
     stamp_outputs,
 )
 from src.evaluators.formal_cell_transaction import (
+    _rewrite_declared_internal_paths,
     CellExecutionIdentity,
     CellTransactionError,
     FormalCellLedger,
@@ -84,6 +85,29 @@ def test_oracle_support_provenance_is_in_final_producer_manifest(tmp_path: Path)
     assert {row["path"] for row in audit["files"]} == {
         "oracle_results.json", "support_provenance.json"
     }
+
+
+def test_oracle_command_log_relocation_is_exact(tmp_path: Path) -> None:
+    staged = tmp_path / "staged"
+    staged.mkdir()
+    target = tmp_path / "published"
+    _write_json(staged / "command_log.json", {
+        "argv": ["python", "--output_dir", str(staged)],
+        "shell_command": f"python --output_dir {staged}",
+        "formal_benchmark_executed": False,
+    })
+    report = _rewrite_declared_internal_paths(staged, target)
+    assert report["changed_file_count"] == 1
+    assert report["changed_files"][0]["non_path_semantic_sha256_before"] == (
+        report["changed_files"][0]["non_path_semantic_sha256_after"]
+    )
+    log = json.loads((staged / "command_log.json").read_text())
+    assert log["argv"][-1] == str(target)
+    assert str(target) in log["shell_command"]
+    assert log["formal_benchmark_executed"] is False
+    _write_json(staged / "unexpected.json", {"unreviewed_field": str(staged)})
+    with pytest.raises(CellTransactionError, match="undeclared JSON path relocation field"):
+        _rewrite_declared_internal_paths(staged, target)
 
 
 def _write_json(path: Path, value: object) -> None:
