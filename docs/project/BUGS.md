@@ -5,6 +5,24 @@
 
 ﻿# Bugs And Risks
 
+## 2026-09-21: G14E07 formal 统计解释与 holdout readiness blockers（OPEN）
+
+- `formal_gate.json` 的 claim map 对已经统一为“正数有利 candidate”的 signed CI 又按 lower-is-better 二次
+  翻转，把 12 个 transfer 劣势错误标为 `supported`。原 artifact 不覆盖；修复必须另立实现任务并生成带
+  provenance 的纠正统计附录。
+- `analyze_top_journal_statistics.py` 的 hierarchical CI 按 window outer cluster 计算，但 sign test 仍按 540 个
+  paired rows 计 wins/losses，导致伪重复；Holm 也继承该错误 p-value。G14A01 窗口级复算后没有 84-family
+  Holm 显著项。
+- delay 只在完整且全部 request 成功的 workflow 上 finite：每个 agent 为 `220/540`，59.26% unavailable，
+  共同 finite pair 全部零差。它是 survivor-conditioned、当前无策略区分力的 endpoint。
+- ready/continuity gain 只出现在 2/12 窗口；transfer/backhaul 代价覆盖 9/12 窗口。576/864 primary outcomes
+  完全相同；五个 reactive policies 的 primary outcomes 也完全相同，capacity/eviction discrimination 有限。
+- typed-semantics 仅 `typed_full` 与 `no_prediction` 可执行；4 个机制消融 unavailable。G12 supervised predictor
+  disabled；oracle baseline gap unavailable，实际 visited states 仅 20–63。
+- 当前 G14E07 contract 无 holdout capability、无 holdout command。Holdout 前必须先冻结并批准独立 opening/
+  execution contract、候选 hash、window-level statistics、signed claim rule 与一次性消费记录。详见
+  `docs/project/g14a01_formal_results_independent_review_20260921.md`。
+
 ## 2026-09-06: provenance envelope 被误当作 shared identity（RESOLVED）
 
 - 根因：producer 正确写入 17 字段 companion，但 benchmark 将完整 envelope 直接传给只应比较 8 字段 shared

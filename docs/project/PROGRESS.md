@@ -5,6 +5,27 @@
 
 ﻿# Progress
 
+## 2026-09-21: G14A01 formal-only 结果独立复核与 claim freeze 完成
+
+- G14E07 `typed_model_cache_post_ablation_20260921_g14e07_pending` 已完成
+  `complete_without_holdout / completed / return_code=0`；`formal_gate.passed=true` 只表示 completeness-only
+  执行闭环通过，不是性能 gate。Holdout 仍 sealed/unopened，当前 execution contract 明确
+  `holdout_capability=false`、`holdout_commands=0`。
+- 独立核对确认统计已统一为 `signed_positive_favors_candidate=true`，但 gate claim-map 对 lower-is-better
+  指标二次翻转。原 `12 supported / 72 mixed` 应按 signed CI 解释为 `12 contradicted / 72 mixed`；12 项均为
+  transfer 的候选不利结果。
+- BCa CI 使用 12 个 window outer clusters；现有 sign test 却在 540 行级 delta 上计 wins/losses。按窗口均值
+  复算后，ready/continuity 对 LRU 为 `2/10/0, p=0.5`，transfer 为 `0/3/9, p=0.003906`，84 项 Holm 后
+  `p=0.328125`；当前没有 window-level Holm 显著项。
+- delay 仅 `220/540` finite、覆盖 9/12 窗口，15 个 agent availability mask 完全相同且共同 finite pair
+  全为零差；必须写成 completed-workflow conditional endpoint，不能声称降低端到端延迟。
+- 288 MB 的 ready/continuity gain 与 transfer cost 都较小；576/864 的六 primary endpoints 在全部对应行完全
+  相同。typed-full vs no-prediction 只支持稀疏 readiness/handoff gain 与 transfer/backhaul cost 的 trade-off，
+  不支持 dominance；4 个预注册 typed-semantics ablations 仍 unavailable。
+- Oracle 只在 9-request replay、20–63 visited states 上达到具体 cell 的 `optimal`；baseline-oracle gap 全部
+  unavailable。完整结论、禁止表述和 holdout 冻结规则见
+  `docs/project/g14a01_formal_results_independent_review_20260921.md`。Paper-ready 仍为 `Unverifiable`。
+
 ## 2026-09-06: G14R18 checkpoint provenance envelope / shared identity boundary closure
 
 - 根因是 `write_checkpoint_companions` 合法生产 17 字段完整 envelope，而 benchmark 将整份 binding 作为

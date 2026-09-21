@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `g14a01_formal_results_independent_review_20260921.md`：G14E07 formal-only 原始统计方向、window-level
+  统计单位、延迟缺失、三容量、消融/support、oracle 边界与 holdout 前 claim freeze 的独立复核
+
 - `formal_checkpoint_provenance_envelope_contract.md`：G14R18 17-field provenance envelope / 8-field shared identity
   边界、真实 companion→benchmark gate 验收、Protocol 2.9、Readiness v21 与 G14C v16 启动授权暂缓
 

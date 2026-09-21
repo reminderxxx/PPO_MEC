@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-08-19
+更新日期：2026-09-21
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -184,6 +184,15 @@
 | twin maintenance + VEC tasks | [Resource Allocation for Twin Maintenance and Task Processing in Vehicular Edge Computing Network](https://doi.org/10.1109/JIOT.2025.3576582) | IEEE Internet of Things Journal, 2025 | 显式建模 vehicle twin maintenance 与 vehicular task processing 对有限 server compute 的竞争，并用 MADRL 协同调度。 | 说明 `DT + VEC + MADRL` 已不是空白；PPO_MEC 的差异必须落到 continuous DAG、plan/adapter state、handoff migration 和可校准同步误差。 | A-Adjacent 最近邻；novelty-risk matrix。 |
 | large-model VEC offloading | [Federated Reinforcement Learning-Empowered Task Offloading for Large Models in Vehicular Edge Computing](https://doi.org/10.1109/TVT.2024.3481876) | IEEE TVT, 2025 | 使用 auxiliary vehicles、federated learning 与 MARL 做 large-model vehicular task offloading/resource allocation。 | “大模型 + VEC + MARL”不能作为单点创新；PPO_MEC 需区分 adapter cache、跨 RSU workflow continuity 和真实 runtime cost。 | Related Work / baseline rationale。 |
 | latency-aware DT belief control | [Digital Twin-Assisted Belief-State Reinforcement Learning for Latency-Robust ISAC in 6G Networks](https://doi.org/10.1109/INFOCOM59046.2026.11571214) | IEEE INFOCOM, 2026 | 用 EKF 从延迟 telemetry 重构同步 belief state，再由 PPO 联合控制；显式评估最高 100 ms telemetry delay。 | 非 VEC workflow/cache，但直接压缩“DT + PPO”创新空间；PPO_MEC 可守方向是 calibrated stale-state verifier 与 plan/adapter validity，不是泛称 DT-assisted RL。 | Method nearest neighbor；DT calibration/telemetry-delay protocol。 |
+
+## 2026-09-21 增量近邻
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---:|---|---|---|
+| dynamic resource-aware VEC offloading | [DRIVE: Dynamic Resource-aware Intelligent Task Offloading in Vehicular Edge Computing](https://doi.org/10.1109/TMC.2026.3710011) | IEEE TMC, 2026 early access | 以 cloud-edge-end 动态资源感知、TD3 和多维通信/计算资源状态优化 VEC offloading；使用北京/上海通信基站与出租车轨迹数据评估。 | 进一步压缩“真实轨迹 + resource-aware DRL offloading”作为创新的空间。PPO_MEC 必须把差异落到跨 RSU 连续 DAG、typed adapter/cache state、handoff continuity 与冻结 request-level endpoint，不能泛称动态资源感知。 | A-Core 最近邻；Introduction / novelty-risk matrix。 |
+| hierarchical VEC offloading/resource allocation | [Hierarchical Joint Optimization of Task Offloading and Resource Allocation in Vehicular Edge Computing](https://doi.org/10.1109/JIOT.2026.3709636) | IEEE Internet of Things Journal, 2026 early access | 用 MATD3 + SCA 分层联合优化多 RSU offloading、计算资源与 interference-aware power control。 | 说明“hierarchical + multi-agent continuous-control + multi-RSU resource allocation”已拥挤；PPO_MEC 的层级贡献必须由 cache/execution/handoff 三尺度和机制消融支撑，而不是层级结构本身。 | A-Adjacent；Related Work / baseline rationale。 |
+| mobility-aware proactive migration | [Mobility-Aware Assisted Deep Reinforcement Learning for Collaborative Task Migration and Resource Allocation in Vehicular Edge Computing](https://doi.org/10.1109/TVT.2026.3660321) | IEEE TVT, 2026 | Mamba trajectory prediction + SAC 联合驱动 RSU 间 task migration 与 resource allocation，并在 Cologne 真实车辆轨迹上评估。 | 直接压缩“trajectory prediction + DRL + proactive VEC migration”的创新空间。PPO_MEC 只能以 continuous DAG state、adapter warm-cache、request-level continuity/transfer trade-off 和 causal calibration 形成区别。 | B-Supporting / strong migration neighbor；Related Work 与 predictor boundary。 |
+| DT-assisted dependent task offloading | [Decentralized Task Offloading in Collaborative Edge Computing: A Digital Twin Assisted Multi-Agent Reinforcement Learning Approach](https://doi.org/10.1109/TMC.2025.3628502) | IEEE TMC, 2026 | 面向 dependent tasks 与 bandwidth allocation 的 reliability-aware decentralized offloading；以 DT 估计完成时间与 edge failure rate，并用 MARL 优化 task success。 | 说明 `DT + dependent tasks + MARL + reliability` 已有 TMC 近邻。PPO_MEC 的可守差异需同时落实 VEC mobility、跨 RSU continuous workflow、typed adapter cache/handoff migration 和真实机制 endpoint。 | A-Core 最近邻；novelty matrix / claim boundary。 |
 
 ## 写作 Claim 模板
 
