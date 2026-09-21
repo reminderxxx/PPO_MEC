@@ -46,7 +46,8 @@ DEFAULT_PAIR_KEYS = [
     "scalability_setting_id",
     "ablation_label",
 ]
-STATISTICS_PROTOCOL_VERSION = "hierarchical_window_bootstrap_v1_20260621"
+STATISTICS_PROTOCOL_VERSION = "hierarchical_window_bootstrap_v2_20260922"
+SIGN_TEST_TIE_TOLERANCE = 1e-9
 
 
 def parse_args() -> argparse.Namespace:
@@ -220,6 +221,16 @@ def hierarchical_outer_means(
     return outer_means
 
 
+def cluster_means(
+    deltas: list[float],
+    clusters: list[tuple[str, ...]],
+) -> list[float]:
+    by_cluster: dict[tuple[str, ...], list[float]] = {}
+    for delta, cluster in zip(deltas, clusters):
+        by_cluster.setdefault(cluster, []).append(delta)
+    return [fmean(values) for values in by_cluster.values()]
+
+
 def bootstrap_hierarchical_means(
     deltas: list[float],
     outer_clusters: list[tuple[str, ...]],
@@ -355,10 +366,22 @@ def summarize_deltas(
             "wins": 0,
             "ties": 0,
             "losses": 0,
+            "paired_row_wins": 0,
+            "paired_row_ties": 0,
+            "paired_row_losses": 0,
+            "sign_test_unit": (
+                "outer_cluster_mean"
+                if outer_clusters
+                else ("cluster_mean" if clusters else "paired_row")
+            ),
+            "sign_test_sample_count": 0,
+            "sign_test_tie_tolerance": SIGN_TEST_TIE_TOLERANCE,
             "sign_test_pvalue": None,
         }
     std_delta = stdev(deltas) if len(deltas) > 1 else 0.0
     outer_cluster_means: list[float] = []
+    sign_test_values: list[float]
+    sign_test_unit: str
     inner_cluster_count = 0
     if outer_clusters is not None and len(outer_clusters) == len(deltas):
         inner_payload = inner_clusters if inner_clusters is not None and len(inner_clusters) == len(deltas) else None
@@ -376,6 +399,8 @@ def summarize_deltas(
         cluster_count = len(set(outer_clusters))
         outer_cluster_count = cluster_count
         inner_cluster_count = len(set(zip(outer_clusters, inner_payload))) if inner_payload is not None else len(deltas)
+        sign_test_values = outer_cluster_means
+        sign_test_unit = "outer_cluster_mean"
     elif clusters is not None and len(clusters) == len(deltas):
         mean_delta = fmean(deltas)
         bootstrap_means = bootstrap_cluster_means(deltas, clusters, bootstrap_samples, rng)
@@ -383,6 +408,8 @@ def summarize_deltas(
         bootstrap_unit = "cluster"
         cluster_count = len(set(clusters))
         outer_cluster_count = cluster_count
+        sign_test_values = cluster_means(deltas, clusters)
+        sign_test_unit = "cluster_mean"
     else:
         mean_delta = fmean(deltas)
         bootstrap_means = bootstrap_pair_means(deltas, bootstrap_samples, rng)
@@ -390,6 +417,8 @@ def summarize_deltas(
         bootstrap_unit = "pair"
         cluster_count = len(deltas)
         outer_cluster_count = 0
+        sign_test_values = deltas
+        sign_test_unit = "paired_row"
     percentile_low = percentile(bootstrap_means, 0.025)
     percentile_high = percentile(bootstrap_means, 0.975)
     bca_low, bca_high, bca_available = bca_interval(
@@ -402,9 +431,12 @@ def summarize_deltas(
     else:
         primary_low, primary_high, primary_method = percentile_low, percentile_high, "percentile"
     outer_cluster_std = stdev(outer_cluster_means) if len(outer_cluster_means) > 1 else 0.0
-    wins = sum(1 for value in deltas if value > 1e-9)
-    losses = sum(1 for value in deltas if value < -1e-9)
-    ties = len(deltas) - wins - losses
+    paired_row_wins = sum(1 for value in deltas if value > SIGN_TEST_TIE_TOLERANCE)
+    paired_row_losses = sum(1 for value in deltas if value < -SIGN_TEST_TIE_TOLERANCE)
+    paired_row_ties = len(deltas) - paired_row_wins - paired_row_losses
+    wins = sum(1 for value in sign_test_values if value > SIGN_TEST_TIE_TOLERANCE)
+    losses = sum(1 for value in sign_test_values if value < -SIGN_TEST_TIE_TOLERANCE)
+    ties = len(sign_test_values) - wins - losses
     return {
         "paired_count": len(deltas),
         "bootstrap_unit": bootstrap_unit,
@@ -427,7 +459,16 @@ def summarize_deltas(
         "wins": wins,
         "ties": ties,
         "losses": losses,
-        "sign_test_pvalue": round(exact_sign_test_pvalue(wins, losses), 6),
+        "paired_row_wins": paired_row_wins,
+        "paired_row_ties": paired_row_ties,
+        "paired_row_losses": paired_row_losses,
+        "sign_test_unit": sign_test_unit,
+        "sign_test_sample_count": len(sign_test_values),
+        "sign_test_tie_tolerance": SIGN_TEST_TIE_TOLERANCE,
+        # Keep the exact binomial probability for multiplicity adjustment.
+        # Rounding before Holm changes adjusted values (for example,
+        # 0.00390625 * 84 becomes 0.328104 instead of 0.328125).
+        "sign_test_pvalue": exact_sign_test_pvalue(wins, losses),
     }
 
 
@@ -603,6 +644,11 @@ def main() -> None:
                 "inner_cluster_keys": args.inner_cluster_keys,
                 "requested_ci_method": args.ci_method,
                 "bootstrap_samples": args.bootstrap_samples,
+                "sign_test_unit_rule": (
+                    "outer-cluster means when outer_cluster_keys are configured; "
+                    "cluster means when cluster_keys are configured; paired rows otherwise"
+                ),
+                "sign_test_tie_tolerance": SIGN_TEST_TIE_TOLERANCE,
                 "rows": output_rows,
                 "source_rows_path": args.rows_path,
                 "formal_agent_order_contract_semantic_sha256": (

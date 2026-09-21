@@ -33,6 +33,26 @@ def test_hierarchical_bootstrap_uses_window_as_outer_cluster() -> None:
     assert summary["inner_cluster_count"] == 24
     assert summary["bca_available"] is True
     assert summary["ci95_method"] == "bca"
+    assert summary["sign_test_unit"] == "outer_cluster_mean"
+    assert summary["sign_test_sample_count"] == 4
+
+
+def test_hierarchical_sign_test_uses_outer_means_not_paired_rows() -> None:
+    deltas = [1.0] * 100 + [-2.0]
+    outer = [("window_id=w0",)] * 100 + [("window_id=w1",)]
+    inner = [(f"replicate={index}",) for index in range(101)]
+
+    summary = summarize_deltas(
+        deltas,
+        bootstrap_samples=200,
+        rng=random.Random(7),
+        outer_clusters=outer,
+        inner_clusters=inner,
+    )
+
+    assert (summary["paired_row_wins"], summary["paired_row_losses"]) == (100, 1)
+    assert (summary["wins"], summary["ties"], summary["losses"]) == (1, 0, 1)
+    assert summary["sign_test_pvalue"] == 1.0
 
 
 def test_hierarchical_interval_is_wider_for_correlated_window_rows() -> None:

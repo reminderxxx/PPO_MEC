@@ -20,7 +20,10 @@ from src.runtime.generated_checkpoint_resources import (
 )
 from src.evaluators.typed_model_cache_formal_execution import validate_protocol_v1_1
 from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
-from scripts.manage_typed_model_cache_formal_artifacts import formal_gate
+from scripts.manage_typed_model_cache_formal_artifacts import (
+    _claim_evidence_rows,
+    formal_gate,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -406,6 +409,7 @@ def test_exact_gate_rehearsal_counts_and_claim_states(tmp_path: Path) -> None:
                 {
                     "candidate_agent": "sa_ghmappo", "baseline_agent": "ppo",
                     "metric": "workflow_continuity_rate", "available_paired_count": 1,
+                    "signed_positive_favors_candidate": True,
                     "ci95_low": -0.1, "ci95_high": 0.2,
                 }
             ]
@@ -448,3 +452,23 @@ def test_exact_gate_rehearsal_counts_and_claim_states(tmp_path: Path) -> None:
     )
     assert failed["passed"] is False
     assert "candidate_checkpoints" in failed["exact_count_mismatches"]
+
+
+def test_claim_evidence_consumes_signed_direction_without_metric_reversal() -> None:
+    rows = _claim_evidence_rows(
+        {
+            "rows": [
+                {
+                    "candidate_agent": "sa_ghmappo",
+                    "baseline_agent": "reactive_lru",
+                    "metric": "transfer_mb_per_request",
+                    "available_paired_count": 540,
+                    "signed_positive_favors_candidate": True,
+                    "ci95_low": -4.95,
+                    "ci95_high": -1.30,
+                }
+            ]
+        }
+    )
+
+    assert rows[0]["status"] == "contradicted"

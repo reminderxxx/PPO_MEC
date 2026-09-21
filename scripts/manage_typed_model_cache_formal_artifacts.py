@@ -728,11 +728,6 @@ def _csv_count(paths: list[Path]) -> tuple[int, set[str]]:
 
 
 def _claim_evidence_rows(statistics_payload: Mapping[str, Any]) -> list[dict[str, Any]]:
-    lower_is_better = {
-        "transfer_mb_per_request", "end_to_end_workflow_delay",
-        "handoff_failure_rate", "backhaul_traffic_cost",
-        "adapter_state_migration_overhead",
-    }
     result = []
     for row in statistics_payload.get("rows", []):
         if not isinstance(row, Mapping):
@@ -740,17 +735,23 @@ def _claim_evidence_rows(statistics_payload: Mapping[str, Any]) -> list[dict[str
         available = int(row.get("available_paired_count", row.get("paired_count", 0)))
         low = row.get("ci95_low", row.get("bootstrap_ci_low"))
         high = row.get("ci95_high", row.get("bootstrap_ci_high"))
+        signed_direction = row.get("signed_positive_favors_candidate")
         status = "unsupported"
+        reason = None
         if available <= 0:
             status = "unavailable"
+            reason = "no_available_pairs"
         elif not isinstance(low, (int, float)) or not isinstance(high, (int, float)):
             status = "unsupported"
+            reason = "missing_numeric_signed_ci"
+        elif signed_direction is not True:
+            status = "unsupported"
+            reason = "missing_or_invalid_signed_direction_contract"
         else:
-            desired_positive = str(row.get("metric")) not in lower_is_better
             if low > 0:
-                status = "supported" if desired_positive else "contradicted"
+                status = "supported"
             elif high < 0:
-                status = "contradicted" if desired_positive else "supported"
+                status = "contradicted"
             else:
                 status = "mixed"
         result.append(
@@ -759,6 +760,8 @@ def _claim_evidence_rows(statistics_payload: Mapping[str, Any]) -> list[dict[str
                 "baseline_agent": row.get("baseline_agent"),
                 "metric": row.get("metric"),
                 "status": status,
+                "classification_reason": reason,
+                "signed_positive_favors_candidate": signed_direction,
                 "available_paired_count": available,
             }
         )
