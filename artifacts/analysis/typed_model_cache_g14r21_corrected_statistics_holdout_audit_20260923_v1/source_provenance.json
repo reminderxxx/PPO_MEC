@@ -57,8 +57,8 @@
     {
       "path": "/Users/howen/Projects/PPO_MEC_g14r21/scripts/analyze_top_journal_statistics.py",
       "exists": true,
-      "size_bytes": 28640,
-      "sha256": "6a82902a7e15a85258108d284ac514241344a891800989013551244a36010010"
+      "size_bytes": 28661,
+      "sha256": "e40523caeac9fccc73c325b158fa2d9f0e48900972cba12cf88489a069934b71"
     },
     {
       "path": "/Users/howen/Projects/PPO_MEC_g14r21/scripts/manage_typed_model_cache_formal_artifacts.py",
@@ -87,8 +87,8 @@
   ],
   "repository": {
     "checkout": "/Users/howen/Projects/PPO_MEC_g14r21",
-    "git_commit": "4510aabb93df652f12c5f6a10e9f40f302dfb0e1",
-    "git_tree": "1eef41f199a5403b97b58ed3c3c994294d7d787e",
+    "git_commit": "8fb40515f4587320ae7985d058393b7b7aae817e",
+    "git_tree": "7e8bf0f578e629d55e6fae1c88ee9cffe82e9009",
     "branch": "codex/g14r21-statistics-holdout-audit"
   },
   "environment": {

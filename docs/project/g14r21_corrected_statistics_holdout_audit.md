@@ -6,7 +6,7 @@
 - `artifact_run_id`: `typed_model_cache_post_ablation_20260921_g14e07_pending`
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `engineering_baseline_commit`: `1770401ccc2f4ce15b5d5adcabdecb386fd90a05`
-- `implementation_commit`: `4510aabb93df652f12c5f6a10e9f40f302dfb0e1`
+- `implementation_commit`: `8fb40515f4587320ae7985d058393b7b7aae817e`
 - `evidence_level`: `E3_TARGETED_REPRODUCED` 仅适用于冻结 formal 原始行上的 mean、nullable coverage、window sign test
   与 fixed-family Holm；bootstrap CI/effect size 经 old/new 全项一致性核验，但未由第二实现独立重算。完整 paper-ready
   证据因 holdout 未开启仍为 `Unverifiable`

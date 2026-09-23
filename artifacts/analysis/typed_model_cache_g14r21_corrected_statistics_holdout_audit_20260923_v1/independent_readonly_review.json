@@ -14,7 +14,7 @@
     "holdout_opened": false
   },
   "findings_and_disposition": [
-    {"finding": "final implementation identity was not bound", "disposition": "resolved; source_provenance binds implementation commit 4510aabb93df652f12c5f6a10e9f40f302dfb0e1 and tree 1eef41f199a5403b97b58ed3c3c994294d7d787e"},
+    {"finding": "final implementation identity was not bound", "disposition": "resolved; source_provenance binds implementation commit 8fb40515f4587320ae7985d058393b7b7aae817e and tree 7e8bf0f578e629d55e6fae1c88ee9cffe82e9009"},
     {"finding": "seal-to-plan/split identities were not cross-validated", "disposition": "resolved; expected/observed/pass checks added to holdout_application_unsigned.json"},
     {"finding": "fixed 84-item Holm family shrank when p-values were unavailable", "disposition": "resolved in implementation commit 4510aabb93df652f12c5f6a10e9f40f302dfb0e1 with nullable regressions"},
     {"finding": "old-to-new diff hid the original formal-gate status", "disposition": "resolved; old_gate_claim_status and 12 supported-to-contradicted transitions are explicit"},

@@ -5,7 +5,7 @@
     {
       "path": "analysis_summary.json",
       "size_bytes": 2057,
-      "sha256": "bed4cacf0324ce129acb17200a657d3119fe6461421573464ee15853b06a78e9"
+      "sha256": "3117e277b9c74823c710bd9d4c3c8e8822cf5e6f855a734341e21fc09da69358"
     },
     {
       "path": "command_environment.json",
@@ -19,8 +19,8 @@
     },
     {
       "path": "corrected_statistics/paired_statistics.csv",
-      "size_bytes": 32463,
-      "sha256": "b5408ddb8466ece54746712371023e5a81431b464764db814c18474e45dc2433"
+      "size_bytes": 32378,
+      "sha256": "95c29d436e15fead8e72ce6a12e26a1112ba6af63cffa09f9a0333b4a89e3eff"
     },
     {
       "path": "corrected_statistics/paired_statistics.json",
@@ -40,7 +40,7 @@
     {
       "path": "independent_readonly_review.json",
       "size_bytes": 2121,
-      "sha256": "02038b5060874455848bf3c4c81cf28661b48d39de1496319dc6e93c978aab2a"
+      "sha256": "84e263624aa186f47648016ddc0281fdf87744f90482749fdf0340a6ab94b1c6"
     },
     {
       "path": "independent_recalculation.json",
@@ -84,8 +84,8 @@
     },
     {
       "path": "paper_primary_comparisons.csv",
-      "size_bytes": 9594,
-      "sha256": "58684f36974a230c29e047bb02da730f3838999474658201f9bacde447040681"
+      "size_bytes": 9509,
+      "sha256": "d577c3e0b7140bffbb252071df234edac231d500a3f14884e87da9a22e57b2f2"
     },
     {
       "path": "paper_primary_comparisons.md",
@@ -110,7 +110,7 @@
     {
       "path": "source_provenance.json",
       "size_bytes": 5094,
-      "sha256": "4b0e2912076ee0f1ba47722405a0d2f321439b8d98addde1776f8bc121aa6454"
+      "sha256": "4eb8235ba4b52e1d6e1ada60aff350a11f4c62523609bfddf461b05fa6ab1fdc"
     }
   ]
 }
