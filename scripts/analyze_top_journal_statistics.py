@@ -456,15 +456,17 @@ def summarize_deltas(
     }
 
 
-def holm_adjust(pvalues: list[float]) -> list[float]:
+def holm_adjust(pvalues: list[float], *, family_size: int | None = None) -> list[float]:
     if not pvalues:
         return []
+    effective_family_size = len(pvalues) if family_size is None else family_size
+    if effective_family_size < len(pvalues):
+        raise ValueError("Holm family size cannot be smaller than the finite p-value count")
     ordered = sorted(enumerate(pvalues), key=lambda item: item[1])
     adjusted = [1.0] * len(pvalues)
     running_max = 0.0
-    family_size = len(pvalues)
     for rank, (original_index, pvalue) in enumerate(ordered):
-        candidate = min(1.0, (family_size - rank) * pvalue)
+        candidate = min(1.0, (effective_family_size - rank) * pvalue)
         running_max = max(running_max, candidate)
         adjusted[original_index] = running_max
     return adjusted
@@ -619,7 +621,10 @@ def main() -> None:
         for index, row in enumerate(output_rows)
         if row["sign_test_pvalue_exact"] is not None
     ]
-    adjusted_sign_tests = holm_adjust([item[1] for item in available_pvalue_rows])
+    adjusted_sign_tests = holm_adjust(
+        [item[1] for item in available_pvalue_rows],
+        family_size=len(output_rows),
+    )
     adjusted_by_index = {
         row_index: round(adjusted, 6)
         for (row_index, _), adjusted in zip(available_pvalue_rows, adjusted_sign_tests)

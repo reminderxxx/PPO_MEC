@@ -7,6 +7,9 @@ import argparse
 import csv
 import json
 import math
+import platform
+import sys
+import hashlib
 from collections import defaultdict
 from pathlib import Path
 from statistics import fmean
@@ -24,12 +27,12 @@ def exact_sign_p(wins: int, losses: int) -> float:
     return min(1.0, 2.0 * sum(math.comb(n, k) for k in range(tail + 1)) / (2**n))
 
 
-def holm(values: list[float]) -> list[float]:
+def holm(values: list[float], family_size: int) -> list[float]:
     order = sorted(range(len(values)), key=values.__getitem__)
     result = [1.0] * len(values)
     running = 0.0
     for rank, index in enumerate(order):
-        running = max(running, min(1.0, (len(values) - rank) * values[index]))
+        running = max(running, min(1.0, (family_size - rank) * values[index]))
         result[index] = running
     return result
 
@@ -113,7 +116,10 @@ def main() -> int:
                     "sign_test_pvalue_exact": exact_sign_p(wins, losses) if window_values else None,
                 }
             )
-    adjusted = holm([row["sign_test_pvalue_exact"] for row in recomputed if row["sign_test_pvalue_exact"] is not None])
+    adjusted = holm(
+        [row["sign_test_pvalue_exact"] for row in recomputed if row["sign_test_pvalue_exact"] is not None],
+        family_size=len(recomputed),
+    )
     cursor = 0
     for row in recomputed:
         if row["sign_test_pvalue_exact"] is None:
@@ -148,6 +154,22 @@ def main() -> int:
     report = {
         "independent_recalculation_version": "g14r21_raw_rows_v1",
         "implementation_independence": "does not import the production statistics or claim helper",
+        "evidence_scope": {
+            "independently_recomputed": [
+                "nullable pair coverage", "raw and signed means", "outer-window W/T/L",
+                "exact sign p", "fixed-family Holm",
+            ],
+            "not_independently_recomputed": ["bootstrap percentile/BCa CI", "effect sizes"],
+            "claim_counts_basis": "classification of corrected production CI; not an independent bootstrap CI computation",
+        },
+        "audit_identity": {
+            "command": [sys.executable, *sys.argv],
+            "cwd": str(Path.cwd()),
+            "python": sys.version,
+            "platform": platform.platform(),
+            "script_path": str(Path(__file__).resolve()),
+            "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        },
         "source_rows_path": corrected["source_rows_path"],
         "family_size": len(recomputed),
         "claim_counts": dict(sorted(claim_counts.items())),

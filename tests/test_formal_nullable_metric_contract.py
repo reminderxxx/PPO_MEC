@@ -258,6 +258,37 @@ def test_statistics_reports_nullable_pair_coverage_and_lower_direction(tmp_path:
     assert row["signed_delta_definition"] == "positive_favors_candidate"
 
 
+def test_unavailable_comparison_keeps_preregistered_holm_family_slot(tmp_path: Path) -> None:
+    rows_path = tmp_path / "rows.csv"
+    with rows_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["agent_name", "seed", "window_id", "workflow_id", "end_to_end_workflow_delay"])
+        writer.writeheader()
+        writer.writerows(
+            [
+                {"agent_name": "candidate", "seed": 7, "window_id": "w0", "workflow_id": "x", "end_to_end_workflow_delay": ""},
+                {"agent_name": "baseline_a", "seed": 7, "window_id": "w0", "workflow_id": "x", "end_to_end_workflow_delay": ""},
+                {"agent_name": "baseline_b", "seed": 7, "window_id": "w0", "workflow_id": "x", "end_to_end_workflow_delay": 5},
+            ]
+        )
+    output = tmp_path / "statistics"
+    result = subprocess.run(
+        [
+            sys.executable, str(ROOT / "scripts/analyze_top_journal_statistics.py"),
+            "--rows_path", str(rows_path), "--candidate_agent", "candidate",
+            "--baseline_agents", "baseline_a", "baseline_b", "--metrics", "end_to_end_workflow_delay",
+            "--pair_keys", "seed", "window_id", "workflow_id", "--bootstrap_samples", "20",
+            "--output_root", str(output),
+        ],
+        cwd=ROOT, text=True, capture_output=True, check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    rows = json.loads((output / "paired_statistics.json").read_text(encoding="utf-8"))["rows"]
+    assert all(row["holm_preregistered_family_size"] == 2 for row in rows)
+    assert all(row["holm_available_family_size"] == 0 for row in rows)
+    assert all(row["holm_unavailable_family_count"] == 2 for row in rows)
+    assert all(row["holm_sign_test_pvalue"] is None for row in rows)
+
+
 def test_v12_run_and_staging_checkpoint_references_are_rejected() -> None:
     with pytest.raises(PermanentlyInvalidFormalReferenceError, match="g14c_v12"):
         reject_permanently_invalid_formal_references(

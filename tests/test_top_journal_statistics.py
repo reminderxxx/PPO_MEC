@@ -108,6 +108,17 @@ def test_holm_adjust_preserves_preregistered_84_comparison_family() -> None:
     assert adjusted[1:] == [1.0] * 83
 
 
+def test_holm_missing_comparisons_still_occupy_fixed_family() -> None:
+    assert holm_adjust([0.01], family_size=84) == [0.84]
+
+
+def test_holm_rejects_family_smaller_than_available_values() -> None:
+    import pytest
+
+    with pytest.raises(ValueError, match="family size"):
+        holm_adjust([0.01, 0.02], family_size=1)
+
+
 def test_claim_classification_consumes_signed_direction_exactly_once() -> None:
     rows = _claim_evidence_rows(
         {

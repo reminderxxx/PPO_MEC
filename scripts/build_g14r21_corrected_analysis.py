@@ -25,6 +25,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.manage_typed_model_cache_formal_artifacts import _claim_evidence_rows
+from src.evaluators.typed_model_cache_formal_protocol import (
+    canonical_sha256,
+    semantic_projection,
+)
 from src.runtime.formal_protocol_capabilities import get_protocol_capabilities
 
 
@@ -82,13 +86,22 @@ def row_identity(row: Mapping[str, Any]) -> tuple[str, str]:
     return str(row["baseline_agent"]), str(row["metric"])
 
 
-def build_claim_and_diff(old: Mapping[str, Any], new: Mapping[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+def build_claim_and_diff(
+    old: Mapping[str, Any],
+    new: Mapping[str, Any],
+    old_gate: Mapping[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
     old_claims = {row_identity(row): row for row in _claim_evidence_rows(old)}
     new_claims = {row_identity(row): row for row in _claim_evidence_rows(new)}
     old_rows = {row_identity(row): row for row in old["rows"]}
     new_rows = {row_identity(row): row for row in new["rows"]}
+    old_gate_claims = {
+        row_identity(row): row for row in old_gate["claim_evidence_map"]
+    }
     if set(old_rows) != set(new_rows) or len(new_rows) != 84:
         raise ValueError("the preregistered 84-comparison family is incomplete")
+    if set(old_gate_claims) != set(new_rows):
+        raise ValueError("old formal-gate claim map does not cover the 84-comparison family")
     differences = []
     for identity in sorted(new_rows):
         before, after = old_rows[identity], new_rows[identity]
@@ -105,13 +118,20 @@ def build_claim_and_diff(old: Mapping[str, Any], new: Mapping[str, Any]) -> tupl
                 "new_window_sign_test_pvalue": after["sign_test_pvalue"],
                 "old_holm_sign_test_pvalue": before["holm_sign_test_pvalue"],
                 "new_holm_sign_test_pvalue": after["holm_sign_test_pvalue"],
+                "old_gate_claim_status": old_gate_claims[identity]["status"],
                 "old_claim_status_with_correct_signed_reading": old_claims[identity]["status"],
                 "new_claim_status": new_claims[identity]["status"],
+                "gate_to_corrected_claim_transition": (
+                    f"{old_gate_claims[identity]['status']}->{new_claims[identity]['status']}"
+                ),
                 "ci_unchanged": [before["ci95_low"], before["ci95_high"]]
                 == [after["ci95_low"], after["ci95_high"]],
             }
         )
     counts = Counter(row["status"] for row in new_claims.values())
+    transition_counts = Counter(
+        row["gate_to_corrected_claim_transition"] for row in differences
+    )
     return (
         {
             "claim_map_version": "g14r21_signed_ci_once_v1",
@@ -126,6 +146,11 @@ def build_claim_and_diff(old: Mapping[str, Any], new: Mapping[str, Any]) -> tupl
                 "old sign test counted seed/workflow/capacity paired rows instead of outer-window means",
                 "old formal-gate claim helper applied metric direction after statistics had already signed every CI",
             ],
+            "old_formal_gate_claim_counts": dict(
+                sorted(Counter(row["status"] for row in old_gate_claims.values()).items())
+            ),
+            "new_corrected_claim_counts": dict(sorted(counts.items())),
+            "gate_to_corrected_claim_transition_counts": dict(sorted(transition_counts.items())),
             "unchanged_rules": {
                 "bootstrap_replicates": new["bootstrap_samples"],
                 "bootstrap_seed": 1401,
@@ -235,7 +260,44 @@ def build_holdout_application(formal_root: Path, interval_audit: Mapping[str, An
     source_ref_path = formal_root / "evaluation_model_source_reference.json"
     source_ref = load_json(source_ref_path)
     capabilities = get_protocol_capabilities(protocol["typed_model_cache_formal_protocol_version"])
+    split_manifest_path = ROOT / "artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/split_manifest.json"
+    split_manifest = load_json(split_manifest_path)
+    holdout_plan_path, holdout_plan_rows = load_plan("sealed_holdout")
+    holdout_plan = load_json(holdout_plan_path)
+    expected_manifest_identity = seal["holdout_manifest_identity"]
+    observed_plan_sha256 = canonical_sha256(holdout_plan_rows)
+    observed_split_semantic_sha256 = canonical_sha256(semantic_projection(split_manifest))
+    seal_binding_checks = {
+        "outer_window_plan_sha256": {
+            "expected": expected_manifest_identity["outer_window_plan_sha256"],
+            "observed": observed_plan_sha256,
+            "passed": observed_plan_sha256 == expected_manifest_identity["outer_window_plan_sha256"],
+        },
+        "outer_window_count": {
+            "expected": expected_manifest_identity["outer_window_count"],
+            "observed": len(holdout_plan_rows),
+            "passed": len(holdout_plan_rows) == expected_manifest_identity["outer_window_count"],
+        },
+        "split_protocol_semantic_sha256": {
+            "expected": expected_manifest_identity["split_protocol_semantic_sha256"],
+            "observed": observed_split_semantic_sha256,
+            "plan_declared": holdout_plan["split_manifest_semantic_sha256"],
+            "manifest_declared": split_manifest["hashes"]["semantic_sha256"],
+            "passed": len({
+                expected_manifest_identity["split_protocol_semantic_sha256"],
+                observed_split_semantic_sha256,
+                holdout_plan["split_manifest_semantic_sha256"],
+                split_manifest["hashes"]["semantic_sha256"],
+            }) == 1,
+        },
+    }
     checkpoint_manifests = {}
+    manifest_binding_errors: list[str] = []
+    source_models = {
+        (row["capacity_label"], row["agent"], str(row["seed"])): row
+        for row in source_ref["models"]
+    }
+    manifest_model_bindings_checked = 0
     source_run = Path(source_ref["source_run_root"])
     for capacity in ("constrained_288mb", "medium_576mb", "relaxed_864mb"):
         for kind in ("seed_checkpoint_manifest", "checkpoint_provenance_manifest"):
@@ -244,12 +306,68 @@ def build_holdout_application(formal_root: Path, interval_audit: Mapping[str, An
                 "path": str(path), "exists": path.is_file(),
                 "sha256": sha256_file(path) if path.is_file() else None,
             }
+        seed_path = source_run / "checkpoint_manifests" / capacity / "seed_checkpoint_manifest.json"
+        provenance_path = source_run / "checkpoint_manifests" / capacity / "checkpoint_provenance_manifest.json"
+        if not seed_path.is_file() or not provenance_path.is_file():
+            manifest_binding_errors.append(f"{capacity}: checkpoint manifest missing")
+            continue
+        seed_manifest = load_json(seed_path)
+        provenance_manifest = load_json(provenance_path)
+        portable = seed_manifest.get("_portable_checkpoint_manifest", {})
+        if portable.get("protocol_semantic_sha256") != source_ref["protocol_semantic_sha256"]:
+            manifest_binding_errors.append(f"{capacity}: seed manifest protocol identity mismatch")
+        for entry in portable.get("entries", []):
+            identity = entry["checkpoint_identity"]
+            key = (capacity, str(entry["agent"]), str(entry["seed"]))
+            expected_model = source_models.get(key)
+            provenance = provenance_manifest.get(str(entry["agent"]), {}).get(str(entry["seed"]))
+            manifest_model_bindings_checked += 1
+            if expected_model is None:
+                manifest_binding_errors.append(f"{key}: source reference model missing")
+                continue
+            if identity.get("checkpoint_sha256") != expected_model.get("checkpoint_sha256"):
+                manifest_binding_errors.append(f"{key}: seed/source checkpoint hash mismatch")
+            if provenance is None or provenance.get("checkpoint_sha256") != expected_model.get("checkpoint_sha256"):
+                manifest_binding_errors.append(f"{key}: provenance/source checkpoint hash mismatch")
+            if identity.get("execution_commit") != source_ref["scientific_commit"]:
+                manifest_binding_errors.append(f"{key}: scientific commit mismatch")
+            if identity.get("training_protocol") != source_ref["protocol_semantic_sha256"]:
+                manifest_binding_errors.append(f"{key}: training protocol mismatch")
+    immutable_source_checks = []
+    for row in source_ref["immutable_source_files"]:
+        path = Path(row["path"])
+        observed_sha256 = sha256_file(path) if path.is_file() else None
+        observed_size = path.stat().st_size if path.is_file() else None
+        immutable_source_checks.append(
+            {
+                "path": str(path),
+                "expected_sha256": row["sha256"],
+                "observed_sha256": observed_sha256,
+                "expected_size_bytes": row["size_bytes"],
+                "observed_size_bytes": observed_size,
+                "passed": observed_sha256 == row["sha256"] and observed_size == row["size_bytes"],
+            }
+        )
+    checkpoint_binding_validation = {
+        "manifest_model_bindings_expected": source_ref["model_count"],
+        "manifest_model_bindings_checked": manifest_model_bindings_checked,
+        "manifest_errors": manifest_binding_errors,
+        "immutable_source_files": immutable_source_checks,
+        "checkpoint_bytes_rehashed": False,
+        "checkpoint_byte_validation_required_at_opening": True,
+        "passed_at_manifest_level": (
+            manifest_model_bindings_checked == source_ref["model_count"]
+            and not manifest_binding_errors
+            and all(row["passed"] for row in immutable_source_checks)
+        ),
+    }
     blockers = [
         "one-time execution token is not issued",
         "Protocol 2.9 capability registry explicitly exposes holdout_capability=false",
         "no dedicated end-to-end public holdout runner/command plan is frozen",
         "exact output root, append-only opening ledger, completion receipt, and integrity consumer are not frozen as one transaction",
         "exact run quantity and tested wall-clock upper bound are not frozen",
+        "checkpoint bytes were not rehashed under this metadata-only pre-open review; opening-time byte validation remains required",
     ]
     return {
         "holdout_application_version": "g14r21_unsigned_v1",
@@ -266,6 +384,12 @@ def build_holdout_application(formal_root: Path, interval_audit: Mapping[str, An
             "consumed_permanently": seal["consumed_permanently"],
             "token_status": seal["one_time_execution_token_status"],
         },
+        "seal_to_split_binding_validation": {
+            "split_manifest_path": str(split_manifest_path),
+            "holdout_plan_path": str(holdout_plan_path),
+            "checks": seal_binding_checks,
+            "passed": all(row["passed"] for row in seal_binding_checks.values()),
+        },
         "interval_isolation": dict(interval_audit),
         "frozen_bindings": {
             "candidate_source_reference": {"path": str(source_ref_path), "sha256": sha256_file(source_ref_path)},
@@ -275,10 +399,12 @@ def build_holdout_application(formal_root: Path, interval_audit: Mapping[str, An
             "generated_checkpoint_registry_file_sha256": source_ref["source_generated_registry_file_sha256"],
             "models_declared": source_ref["model_count"],
             "checkpoint_manifests": checkpoint_manifests,
+            "checkpoint_binding_validation": checkpoint_binding_validation,
             "capacity_labels": [row["stratum"] for row in protocol["typed_catalog_and_capacity"]["capacity_strata"]],
             "catalog_fingerprint": protocol["typed_catalog_and_capacity"]["catalog_fingerprint"],
             "training_budget": protocol["training_budget"],
             "statistics_and_claim_rule": "corrected G14R21 package must be committed and hash-bound before any opening",
+            "statistics_and_claim_rule_currently_hash_bound": False,
         },
         "engineering_findings": {
             "current_protocol_holdout_capability": capabilities.holdout_capability,
@@ -301,6 +427,11 @@ def build_holdout_application(formal_root: Path, interval_audit: Mapping[str, An
             "calendar_promise": None,
         },
         "blockers": blockers,
+        "unchecked_conditions": [
+            "opening-time checkpoint byte hashes",
+            "final committed G14R21 statistics/claim package hash in the future grant",
+            "tested wall-clock upper bound and exact run quantity",
+        ],
         "application_eligible": False,
         "ready": False,
     }
@@ -449,7 +580,8 @@ def main() -> int:
     formal_root = args.formal_root.resolve()
     corrected = load_json(corrected_path)
     old = load_json(formal_root / "statistics/paired_statistics.json")
-    claim_map, difference = build_claim_and_diff(old, corrected)
+    old_gate = load_json(formal_root / "formal_gate.json")
+    claim_map, difference = build_claim_and_diff(old, corrected, old_gate)
     write_json(output_root / "corrected_claim_map.json", claim_map)
     write_json(output_root / "old_to_new_difference.json", difference)
     write_paper_table(output_root, corrected)
@@ -469,7 +601,7 @@ def main() -> int:
         "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
         "artifact_run_id": formal_root.name,
         "policy_version": "tmc_review_policy_v3_20260621",
-        "evidence_level": "E3_REPRODUCED_FOR_CORRECTED_FORMAL_STATISTICS_ONLY; holdout absent",
+        "evidence_level": "E3_TARGETED_REPRODUCED_FOR_MEANS_WINDOW_SIGN_AND_HOLM; frozen bootstrap CI/effects cross-checked unchanged; holdout absent",
         "verdict": "formal statistics correction accepted if integrity/tests pass; paper-ready remains Unverifiable",
         "claim_counts": claim_map["counts"],
         "holm_significant_count_alpha_0_05": sum(float(row["holm_sign_test_pvalue"]) < 0.05 for row in corrected["rows"]),
