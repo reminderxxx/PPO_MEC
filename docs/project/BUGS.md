@@ -1,3 +1,19 @@
+## 2026-09-23: G14R21 统计错误已修复；holdout 仍 BLOCKED
+
+- `RESOLVED / statistics direction`：统一 signed CI 只解释一次；lower-is-better 不再由 claim consumer 二次翻转。
+- `RESOLVED / sign-test unit`：exact sign test 使用 outer-window mean；seed/workflow/capacity 行仅是窗口内重复，另存
+  row-level diagnostics。ties、有效窗口、denominator、nullable drops、低窗口数与 84 项 family 均显式输出。
+- `RESOLVED / Holm precision/family`：Holm 消费未舍入 exact p；展示 p 才取 6 位。preregistered family 固定 84，
+  unavailable 项自身为 null 但仍占位。冻结文本对此有歧义，本轮采用保守、非结果驱动解释；84 项无显著比较。
+- `OPEN SCIENTIFIC LIMITATION`：delay 是 completed-workflow conditional endpoint，只有 220/540、9/12 windows，
+  所有 pair effect 为 0；不显著不得解释为等效。
+- `OPEN SCIENTIFIC LIMITATION`：576/864 primary+reward 完全相同；12/14 transfer CI candidate-adverse；4/6 typed
+  semantics ablations 不可执行。不得声称容量扩展收益、Pareto dominance 或完整机制闭合。
+- `BLOCKED / holdout`：虽然 raw frame/time metadata 隔离通过，但 one-time token 未签、Protocol 2.9 无 holdout
+  capability、dedicated runner 与 opening/output/ledger/receipt/integrity transaction、精确运行量和测试上界均未冻结，
+  且 checkpoint bytes 仍需 opening-time hash validation。
+  unsigned application=`NOT_ISSUED_BLOCKED`；不得宣称 READY，不得签 grant 或开启 holdout。
+
 ## 2026-09-20: G14E05 restricted recovery 合同消费者错配（RESOLVED；旧 run 永久失败）
 
 Recovery producer 写 `restricted_recovery_execution_contract.json`，generated checkpoint 资源消费者固定读取 `evaluation_execution_contract.json`，故 G14E05 attempt 2 在 rollout 前确定性失败。I5-E Contract 1.3.0 显式验证 recovery request/合同、来源与 executor/context；support、nested benchmark、producer、transaction 的 non-formal 两进程链已闭合。旧失败 root、held lock、attempt 2 staging 不修复或重试。未来正式 attempt 3 仍需新的中央 review、限时资格证据和 grant；当前结论仅工程授权就绪，历史七文件 task-start 仍 `UNVERIFIED`。

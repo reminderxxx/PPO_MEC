@@ -1,3 +1,21 @@
+## 2026-09-23: G14R21 formal 统计纠错与 holdout 未签发审查
+
+- 修复 signed CI 被 claim consumer 二次按 metric direction 翻转、sign test 将 540 paired rows 当独立样本、exact p
+  先舍入再进入 Holm 三项问题；bootstrap=10,000、seed=1401、window-outer/seed-workflow-inner、BCa/percentile CI
+  和 effect-size 规则保持冻结。
+- 同三份冻结 controller CSV 复算 84 项：`0 supported / 72 mixed / 12 contradicted`，Holm `<0.05` 为 0；LRU
+  transfer raw/signed=`+2.440697/-2.440697`，BCa CI=`[-4.951683,-1.307530]`，window W/T/L=`0/3/9`，
+  exact/Holm=`0.00390625/0.328125`。独立 raw-row 实现复算 mean/coverage/window sign/Holm，`mismatch_count=0`；
+  bootstrap CI/effect size 保持 old/new 全项一致，但未由第二实现独立重算。旧 gate 的 12 supported 已逐项更正为 contradicted。
+- 保留限制：delay `220/540` 且仅 9/12 windows；576/864 的 primary+reward 2,700 对全同；12/14 transfer CI
+  candidate-adverse；4/6 typed-semantics levels unavailable。完整性 gate 与 scientific classification 已分离。
+- holdout metadata 审计确认 seal-to-plan/split hash、四 split interval 与 150 模型 manifest binding 通过，但未重散列
+  checkpoint bytes；token 未签、Protocol 2.9 无 capability、dedicated runner/transaction/run quantity/测试上界
+  未冻结，故申请为 `NOT_ISSUED_BLOCKED`。未训练、选模、formal rollout、
+  holdout policy run 或读取 holdout performance label。
+- 合同与结论：`g14r21_corrected_statistics_holdout_audit.md`；机器证据：
+  `artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/`。
+
 ## 2026-09-21: G14R20-I6 八-cell 后续阶段工程验收
 
 150 个冻结模型与 G14E06 八个 committed cell 的来源、账本、marker、producer/transaction 双层完整性已只读复核。剩余冻结 live 矩阵为 support 11、scalability 3、statistics 1、gate 1、completion 0 child；预注册 unavailable 项继续 unavailable。新入口只读引用八个旧结果，隔离 non-formal 根以真实公共入口和独立进程跑通 support→scalability→statistics→gate→completion，`formal_performance_evidence=false`。正式 unsigned request、日志、JUnit、完整性与命令包见 `artifacts/analysis/g14r20_i6_post_ablation_20260921/`；`formal_grant_issued=false`、`formal_execution_started=false`、`holdout_opened=false`。历史起点证据仍 unavailable，保护 verdict 仍 UNVERIFIED。状态上限 `READY_FOR_POST_ABLATION_EVALUATION_AUTHORIZATION`，不作 paper-ready 判断。合同见 `g14r20_i6_post_ablation_contract.md`。

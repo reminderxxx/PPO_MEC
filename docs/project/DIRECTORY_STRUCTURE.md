@@ -356,3 +356,8 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 `g14r20_i2_executor_release` 为最终验收 commit 的新 clean checkout。
 `artifacts/analysis/g14r20_i2_bootstrap_acceptance_20260911/` 保存原始公共入口/环境/JUnit/保护证据与新 unsigned
 申请。正式新 run root 仅登记，不由 prepare 创建。原 I1 release、G14E01 与旧 v16 均保留。
+G14R21：正式原件保持在原 evaluation-only root；纠正版统计、claim map、独立复算、论文表、provenance、完整性和
+unsigned holdout 审查写入 ignored
+`artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/`。任务脚本为
+`scripts/run_g14r21_corrected_statistics.py`、`scripts/audit_g14r21_corrected_statistics.py` 和
+`scripts/build_g14r21_corrected_analysis.py`，不提供 holdout execute 入口。

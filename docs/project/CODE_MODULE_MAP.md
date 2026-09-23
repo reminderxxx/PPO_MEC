@@ -789,3 +789,12 @@
 重新校验 context 与两类 ledger、核验既有产物并执行唯一下一阶段。`locking.py` 仅增加显式允许 missing root
 的协调能力，continuation 默认拒绝新建 run。科学 child 的测试适配器位于 `tests/evaluation_only_public_driver.py`，
 仅供真实 main 的隔离验收；生产 CLI 无测试开关。原 phase/cell 事务及 scientific consumer 职责不变。
+## 2026-09-23 G14R21 statistics correction
+
+- `scripts/analyze_top_journal_statistics.py`：sign test 与 CI 共用 outer-window 科学单位；保留 row-level
+  diagnostics，明确 raw/signed delta、ties/denominator/nullable/family size，并以未舍入 exact p 做 Holm。
+- `scripts/manage_typed_model_cache_formal_artifacts.py`：claim map 对已 signed CI 只解释一次；formal gate 继续是
+  outcome-blind completeness gate，不承担科学优势判定。
+- `scripts/run_g14r21_corrected_statistics.py`、`audit_g14r21_corrected_statistics.py`、
+  `build_g14r21_corrected_analysis.py`：固定 formal source 的 receipt runner、独立 raw-row 复算器与只读勘误/
+  unsigned holdout 审查包生成器；均无训练、选模、rollout 或 holdout capability。

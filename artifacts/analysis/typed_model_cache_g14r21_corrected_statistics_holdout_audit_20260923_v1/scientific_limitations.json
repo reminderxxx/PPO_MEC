@@ -1,0 +1,54 @@
+{
+  "scientific_limitations_audit_version": "g14r21_v1",
+  "delay": {
+    "estimand": "conditional_on_completed_workflows",
+    "candidate_available_pairs": 220,
+    "candidate_total_pairs": 540,
+    "candidate_available_outer_windows": 9,
+    "all_15_agents_share_identical_availability_mask": true,
+    "all_14_pairwise_delay_effects_exactly_zero": true,
+    "null_imputed_as_zero": false
+  },
+  "capacity": {
+    "medium_relaxed_pair_identity_equal": true,
+    "paired_row_count": 2700,
+    "differences_by_primary_reward_metric": {
+      "full_service_ready_byte_hit_rate": 0,
+      "joint_base_adapter_hit_rate": 0,
+      "full_service_ready_request_rate": 0,
+      "transfer_mb_per_request": 0,
+      "workflow_continuity_rate": 0,
+      "end_to_end_workflow_delay": 0,
+      "total_reward": 0
+    },
+    "non_discriminating_576mb_vs_864mb": true
+  },
+  "tradeoff": {
+    "transfer_candidate_adverse_ci_count": 12,
+    "transfer_mixed_ci_count": 2,
+    "service_and_continuity_claims_are_mixed": true,
+    "interpretation": "sparse local service/readiness gain with transfer/backhaul cost; no Pareto dominance"
+  },
+  "typed_semantics_ablation": {
+    "preregistered_levels": [
+      "typed_full",
+      "legacy_adapter_only",
+      "no_base_sharing",
+      "no_workflow_state_migration",
+      "fixed_no_eviction",
+      "no_prediction"
+    ],
+    "executable_levels": [
+      "typed_full",
+      "no_prediction"
+    ],
+    "unavailable_pre_execution_levels": [
+      "legacy_adapter_only",
+      "no_base_sharing",
+      "no_workflow_state_migration",
+      "fixed_no_eviction"
+    ],
+    "unavailable_count": 4
+  },
+  "non_significance_is_equivalence": false
+}

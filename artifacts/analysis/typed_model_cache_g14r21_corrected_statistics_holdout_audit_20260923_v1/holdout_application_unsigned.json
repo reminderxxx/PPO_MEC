@@ -1,0 +1,357 @@
+{
+  "holdout_application_version": "g14r21_unsigned_v1",
+  "status": "NOT_ISSUED_BLOCKED",
+  "grant_signed": false,
+  "execution_authorized": false,
+  "holdout_opened": false,
+  "holdout_consumed_permanently": false,
+  "review_scope": "seal/split metadata and code only; no performance labels",
+  "seal": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r21/artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/holdout_seal_record.json",
+    "sha256": "0ebee649f58eea3dac90977a67a9b175f20e6fcc3b05e019cb2da6e70404b5dd",
+    "semantic_sha256": "3d9bcbe36d0e8749941067d3c134fee4733bc4c8614762af0ddc0f70bdb9de5f",
+    "sealed": true,
+    "opened": false,
+    "consumed_permanently": false,
+    "token_status": "not_issued_in_G14B"
+  },
+  "seal_to_split_binding_validation": {
+    "split_manifest_path": "/Users/howen/Projects/PPO_MEC_g14r21/artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/split_manifest.json",
+    "holdout_plan_path": "/Users/howen/Projects/PPO_MEC_g14r21/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/sealed_holdout_window_plan.json",
+    "checks": {
+      "outer_window_plan_sha256": {
+        "expected": "3570b5ab95ed1acd63ee0aea8d9b7714688e94f832f690a9584811dcba53bdfa",
+        "observed": "3570b5ab95ed1acd63ee0aea8d9b7714688e94f832f690a9584811dcba53bdfa",
+        "passed": true
+      },
+      "outer_window_count": {
+        "expected": 12,
+        "observed": 12,
+        "passed": true
+      },
+      "split_protocol_semantic_sha256": {
+        "expected": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+        "observed": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+        "plan_declared": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+        "manifest_declared": "aa9a7400da2b424d0b1bcd6f1cbfc0a9dd6cfa10e02e847523245afa6608d76a",
+        "passed": true
+      }
+    },
+    "passed": true
+  },
+  "interval_isolation": {
+    "interval_audit_version": "g14r21_preopen_metadata_only_v1",
+    "performance_fields_read": false,
+    "policy_or_outcome_consumer_invoked": false,
+    "split_counts": {
+      "train": 24,
+      "dev": 12,
+      "formal": 12,
+      "sealed_holdout": 12
+    },
+    "plan_files": {
+      "train": {
+        "path": "/Users/howen/Projects/PPO_MEC_g14r21/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/train_window_plan.json",
+        "sha256": "9e892783c661b9ab94c5247f784941c6f5701c270d490efacc85130290f1bcb2"
+      },
+      "dev": {
+        "path": "/Users/howen/Projects/PPO_MEC_g14r21/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/dev_window_plan.json",
+        "sha256": "736a56b3a8d475ed62c11fecae3942c82d9a2227ab4044dd4b17b1c48e30dd93"
+      },
+      "formal": {
+        "path": "/Users/howen/Projects/PPO_MEC_g14r21/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/formal_window_plan.json",
+        "sha256": "14945cf60a9f3b973145ec2a304e37235a43c465b0ff35391f46c15e30bd3332"
+      },
+      "sealed_holdout": {
+        "path": "/Users/howen/Projects/PPO_MEC_g14r21/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/sealed_holdout_window_plan.json",
+        "sha256": "8e560ae6b84604184f3a54f70d9d931c411c7dbf6f887b3ab6d2e2cec1135c06"
+      }
+    },
+    "checked_identity": "source_segment_run_id",
+    "checked_intervals": [
+      "raw_frame_start/raw_frame_end",
+      "raw_time_start/raw_time_end"
+    ],
+    "conflicts": [],
+    "minimum_nonoverlap_gaps": {
+      "raw_frame": 24,
+      "raw_time": 2499
+    },
+    "passed": true
+  },
+  "frozen_bindings": {
+    "candidate_source_reference": {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending/evaluation_model_source_reference.json",
+      "sha256": "463945b505fc490f690c4e68019d1114ae1b6f820a3a942dd759b031ba33d8d8"
+    },
+    "scientific_commit": "a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d",
+    "protocol": {
+      "path": "/Users/howen/Projects/PPO_MEC_g14r21/configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_v2_9_manifest.json",
+      "sha256": "a73cf09a02234db791d5bad404c5fccf567fadc11b5116c13a0ee1976489e109",
+      "semantic_sha256": "c059ae03eb93323d14c6768c6867156c0f6c030307a80bfcb88eda8d6169a968"
+    },
+    "checkpoint_freeze_sha256": "336f40bcfb494760d44891a5e15100ae3e5b8fd385d0fd7dcfd5dd1f9c7c3e97",
+    "generated_checkpoint_registry_file_sha256": "f5e6c8dae0526b5ce955c380ffc11e07d08ae387c47be26663633fa466c908d8",
+    "models_declared": 150,
+    "checkpoint_manifests": {
+      "constrained_288mb.seed_checkpoint_manifest": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+        "exists": true,
+        "sha256": "8262cecd74a70db179a9eb2bc503d4b8462b93169952baa19c86b98a971d1812"
+      },
+      "constrained_288mb.checkpoint_provenance_manifest": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+        "exists": true,
+        "sha256": "5c3df4a90b5d5a9549cccfce1f3edd0c3656e15a7a6b755975691221d2830eb9"
+      },
+      "medium_576mb.seed_checkpoint_manifest": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+        "exists": true,
+        "sha256": "4b909b8acd24315b91e6cca700e954496cf546737ed8e6f7d2668e45d2ed78a0"
+      },
+      "medium_576mb.checkpoint_provenance_manifest": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+        "exists": true,
+        "sha256": "7d6d4dbbbea809f96711c4a077aa8f999ccdd7d02907292c331628d7e7fb8676"
+      },
+      "relaxed_864mb.seed_checkpoint_manifest": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+        "exists": true,
+        "sha256": "5547e6250f4ffe2b534f4c1c5ec965e97c5eb08ac8e2615e5d16d60b96b668c4"
+      },
+      "relaxed_864mb.checkpoint_provenance_manifest": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+        "exists": true,
+        "sha256": "daf773136ef3f4197d2358ba1640b0aed752624f788d20a997ff8be58ffa6fa2"
+      }
+    },
+    "checkpoint_binding_validation": {
+      "manifest_model_bindings_expected": 150,
+      "manifest_model_bindings_checked": 150,
+      "manifest_errors": [],
+      "immutable_source_files": [
+        {
+          "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_candidates.json",
+          "expected_sha256": "86564317b5d5613e283530e282381d31855d17a22e1548b3ce29270ca93182ee",
+          "observed_sha256": "86564317b5d5613e283530e282381d31855d17a22e1548b3ce29270ca93182ee",
+          "expected_size_bytes": 9516966,
+          "observed_size_bytes": 9516966,
+          "passed": true
+        },
+        {
+          "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/dev_selection.json",
+          "expected_sha256": "4f0abdd700f1fd4c06cca28462b9d2e5bb9edf7f15096e664a832fa0505b7a71",
+          "observed_sha256": "4f0abdd700f1fd4c06cca28462b9d2e5bb9edf7f15096e664a832fa0505b7a71",
+          "expected_size_bytes": 1240862,
+          "observed_size_bytes": 1240862,
+          "passed": true
+        },
+        {
+          "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_freeze.json",
+          "expected_sha256": "c9ae2523a05f5c61c4e954605b34ae846337c433e71a7284586aa02f08479fe7",
+          "observed_sha256": "c9ae2523a05f5c61c4e954605b34ae846337c433e71a7284586aa02f08479fe7",
+          "expected_size_bytes": 1828747,
+          "observed_size_bytes": 1828747,
+          "passed": true
+        },
+        {
+          "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/generated_checkpoint_resource_registry.json",
+          "expected_sha256": "f5e6c8dae0526b5ce955c380ffc11e07d08ae387c47be26663633fa466c908d8",
+          "observed_sha256": "f5e6c8dae0526b5ce955c380ffc11e07d08ae387c47be26663633fa466c908d8",
+          "expected_size_bytes": 137016,
+          "observed_size_bytes": 137016,
+          "passed": true
+        },
+        {
+          "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/resolved_execution_context.json",
+          "expected_sha256": "45f723e324cac999c54a17e66a7f8ef4c01779c8cfbdcf8d0cdc316d185c84c3",
+          "observed_sha256": "45f723e324cac999c54a17e66a7f8ef4c01779c8cfbdcf8d0cdc316d185c84c3",
+          "expected_size_bytes": 16734,
+          "observed_size_bytes": 16734,
+          "passed": true
+        },
+        {
+          "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/formal_training_execution_binding.json",
+          "expected_sha256": "358c238b503642274d5115975ff057ad3607a364e7b3c456d0172a7851159dff",
+          "observed_sha256": "358c238b503642274d5115975ff057ad3607a364e7b3c456d0172a7851159dff",
+          "expected_size_bytes": 6044,
+          "observed_size_bytes": 6044,
+          "passed": true
+        }
+      ],
+      "checkpoint_bytes_rehashed": false,
+      "checkpoint_byte_validation_required_at_opening": true,
+      "passed_at_manifest_level": true
+    },
+    "capacity_labels": [
+      "constrained",
+      "medium",
+      "relaxed"
+    ],
+    "catalog_fingerprint": "89c548980b63df733553d748e8db3ca622965b63abcd08ebd4c231790b40a9d6",
+    "training_budget": {
+      "agent_configs": {
+        "cache_offload_drl": {
+          "entropy_coef": 0.01,
+          "learning_rate": 0.0003,
+          "value_coef": 0.5
+        },
+        "controller_mat": {
+          "entropy_coef": 0.01,
+          "learning_rate": 0.0003,
+          "value_coef": 0.5
+        },
+        "dag_offload_drl": {
+          "entropy_coef": 0.01,
+          "learning_rate": 0.0003,
+          "value_coef": 0.5
+        },
+        "dqn": {
+          "learning_rate": 0.0003
+        },
+        "dt_handoff_drl": {
+          "entropy_coef": 0.01,
+          "learning_rate": 0.0003,
+          "value_coef": 0.5
+        },
+        "dueling_dqn": {
+          "learning_rate": 0.0003
+        },
+        "mappo": {
+          "entropy_coef": 0.015,
+          "learning_rate": 0.0002,
+          "value_coef": 0.65
+        },
+        "ppo": {
+          "entropy_coef": 0.01,
+          "learning_rate": 0.0003,
+          "value_coef": 0.5
+        },
+        "qmix": {
+          "learning_rate": 0.0003
+        },
+        "sa_ghmappo": {
+          "auxiliary_coef": 0.06,
+          "entropy_coef": 0.004,
+          "learning_rate": 0.0001,
+          "value_coef": 0.7
+        }
+      },
+      "algorithm_intrinsic_differences": [
+        "on-policy vs replay-based update mechanics",
+        "controller-level CTDE/value decomposition vs flat controller",
+        "network architecture and optimizer state size"
+      ],
+      "batch_size": 64,
+      "budget_version": "typed_model_cache_equal_interaction_budget_v1.0.0",
+      "checkpoint_frequency_updates": 4,
+      "checkpoint_selection": {
+        "formal_or_holdout_selection_forbidden": true,
+        "metric_rule": [
+          "maximize full_service_ready_byte_hit_rate",
+          "maximize workflow_continuity_rate",
+          "minimize transfer_mb_per_request",
+          "minimize end_to_end_workflow_delay",
+          "earlier update then lexical checkpoint hash tie-break"
+        ],
+        "nullable_ordering": "finite before unavailable at each metric; both unavailable skips dimension; no numeric or reward sentinel",
+        "per_metric_candidate_availability_counts_required": true,
+        "split": "dev"
+      },
+      "device": "cpu",
+      "early_stop": "disabled; fixed interaction budget",
+      "entropy_and_value_coefficients": {
+        "mappo": {
+          "entropy_coef": 0.015,
+          "value_coef": 0.65
+        },
+        "other_on_policy": {
+          "entropy_coef": 0.01,
+          "value_coef": 0.5
+        },
+        "sa_ghmappo": {
+          "auxiliary_coef": 0.06,
+          "entropy_coef": 0.004,
+          "value_coef": 0.7
+        },
+        "value_based": {
+          "entropy_coef": "not_applicable",
+          "value_coef": 1.0
+        }
+      },
+      "episodes_per_learned_agent_seed_capacity": 256,
+      "equal_budget_rule": "all learned agents receive identical maximum environment interactions per seed/capacity; intrinsic update/replay differences are retained and reported",
+      "expected_update_count": 32,
+      "learned_agent_order": [
+        "sa_ghmappo",
+        "ppo",
+        "mappo",
+        "dqn",
+        "dueling_dqn",
+        "qmix",
+        "controller_mat",
+        "dag_offload_drl",
+        "cache_offload_drl",
+        "dt_handoff_drl"
+      ],
+      "learning_rates": {
+        "cache_offload_drl": 0.0003,
+        "controller_mat": 0.0003,
+        "dag_offload_drl": 0.0003,
+        "dqn": 0.0003,
+        "dt_handoff_drl": 0.0003,
+        "dueling_dqn": 0.0003,
+        "mappo": 0.0002,
+        "ppo": 0.0003,
+        "qmix": 0.0003,
+        "sa_ghmappo": 0.0001
+      },
+      "max_steps_per_episode": 22,
+      "maximum_environment_interactions_per_learned_agent_seed_capacity": 5632,
+      "maximum_total_compute_budget_cpu_hours": 2500,
+      "maximum_wall_clock_per_learned_agent_seed_capacity_hours": 12,
+      "optimizer": "Adam (algorithm-native implementation; no optimizer substitution after freeze)",
+      "retry": "one identical-command infrastructure retry; no reseed or post-result replacement",
+      "train_window_count": 24,
+      "update_interval_episodes": 8,
+      "workflow_count": 3
+    },
+    "statistics_and_claim_rule": "corrected G14R21 package must be committed and hash-bound before any opening",
+    "statistics_and_claim_rule_currently_hash_bound": false
+  },
+  "engineering_findings": {
+    "current_protocol_holdout_capability": false,
+    "ordinary_formal_runner_rejects_holdout": true,
+    "metadata_level_append_only_record_primitive_exists": true,
+    "cross_checkout_absolute_paths_present": true,
+    "dedicated_public_holdout_orchestrator_exists": false
+  },
+  "authorization_scope_required": {
+    "one_time_only": true,
+    "fixed_candidate_checkpoint_capacity_budget_family": true,
+    "no_training_selection_tuning_or_window_choice": true,
+    "stop_on_nonzero_without_automatic_retry": true,
+    "infrastructure_retry_only_under_existing_seal_conditions": true
+  },
+  "runtime_estimate": {
+    "historical_formal_cache_policy_plus_controller_lower_bound": "5h12m",
+    "statistics_and_gate_additional_lower_bound": "15m",
+    "tested_upper_bound": null,
+    "calendar_promise": null
+  },
+  "blockers": [
+    "one-time execution token is not issued",
+    "Protocol 2.9 capability registry explicitly exposes holdout_capability=false",
+    "no dedicated end-to-end public holdout runner/command plan is frozen",
+    "exact output root, append-only opening ledger, completion receipt, and integrity consumer are not frozen as one transaction",
+    "exact run quantity and tested wall-clock upper bound are not frozen",
+    "checkpoint bytes were not rehashed under this metadata-only pre-open review; opening-time byte validation remains required"
+  ],
+  "unchecked_conditions": [
+    "opening-time checkpoint byte hashes",
+    "final committed G14R21 statistics/claim package hash in the future grant",
+    "tested wall-clock upper bound and exact run quantity"
+  ],
+  "application_eligible": false,
+  "ready": false
+}

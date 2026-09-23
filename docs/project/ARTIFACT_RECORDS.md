@@ -5,6 +5,21 @@
 
 # Artifact Records
 
+## 2026-09-23 G14R21 corrected formal statistics / unsigned holdout review
+
+- path：`artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/`；source root
+  `typed_model_cache_post_ablation_20260921_g14e07_pending` 永久只读。
+- `corrected_statistics/paired_statistics.json` 保持冻结 bootstrap/CI/effect-size，改用 window mean exact sign test、
+  未舍入 p 的 84 项 Holm，并分别输出 raw candidate-minus-baseline 与 positive-favors-candidate signed delta。
+- `corrected_claim_map.json`=`0 supported / 72 mixed / 12 contradicted`；`independent_recalculation.json` 从三份原始
+  CSV 独立复算 mean/coverage/window sign/Holm 84 项且 mismatch=0、Holm 显著数=0；CI/effect size 只作冻结
+  old/new 一致性核验。旧统计/gate 未改写，逐项 diff 显示 12 个 `supported→contradicted`。
+- `scientific_limitations.json` 记录 delay 220/540、9/12 windows、576/864 non-discrimination、12/14 transfer
+  adverse CI 和 4/6 typed levels unavailable；`paper_primary_comparisons.*` 是勘误后论文表候选，不是 paper-ready。
+- `holdout_application_unsigned.json`=`NOT_ISSUED_BLOCKED`；seal-to-plan/split 与 150 模型 manifest binding 通过，但
+  未重散列 checkpoint bytes；interval metadata pass 不能替代 token、capability、dedicated runner/transaction/
+  run量/上界。grant/holdout/training/selection/formal rollout 均为 0。
+
 ## 2026-09-16 G14R20-I5-C restricted recovery parent bootstrap closure
 
 - path：`artifacts/analysis/g14r20_i5_c_parent_bootstrap_20260916/`；`root_cause_audit.json` 固定 I5-B rc=1、

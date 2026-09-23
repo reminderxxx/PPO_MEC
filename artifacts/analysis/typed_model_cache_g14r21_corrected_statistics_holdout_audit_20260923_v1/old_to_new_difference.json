@@ -1,0 +1,2386 @@
+{
+  "difference_report_version": "g14r21_old_to_new_v1",
+  "root_causes": [
+    "old sign test counted seed/workflow/capacity paired rows instead of outer-window means",
+    "old formal-gate claim helper applied metric direction after statistics had already signed every CI"
+  ],
+  "old_formal_gate_claim_counts": {
+    "mixed": 72,
+    "supported": 12
+  },
+  "new_corrected_claim_counts": {
+    "contradicted": 12,
+    "mixed": 72
+  },
+  "gate_to_corrected_claim_transition_counts": {
+    "mixed->mixed": 72,
+    "supported->contradicted": 12
+  },
+  "unchanged_rules": {
+    "bootstrap_replicates": 10000,
+    "bootstrap_seed": 1401,
+    "ci": [
+      "percentile_95",
+      "BCa_95"
+    ],
+    "effect_sizes": [
+      "paired Cohen dz",
+      "outer-window standardized mean delta"
+    ],
+    "holm_family_size": 84
+  },
+  "rows": [
+    {
+      "baseline_agent": "cache_offload_drl",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "cache_offload_drl",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "old_sign_test_pvalue": 0.001831,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.076902,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "cache_offload_drl",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "old_sign_test_pvalue": 0.001831,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.076902,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "cache_offload_drl",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        12,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "cache_offload_drl",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        3,
+        437,
+        100
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        3,
+        9
+      ],
+      "new_paired_row_wins_ties_losses": [
+        3,
+        437,
+        100
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.003906,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 0.328125,
+      "old_gate_claim_status": "supported",
+      "old_claim_status_with_correct_signed_reading": "contradicted",
+      "new_claim_status": "contradicted",
+      "gate_to_corrected_claim_transition": "supported->contradicted",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "cache_offload_drl",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "old_sign_test_pvalue": 0.001831,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.076902,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "controller_mat",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "controller_mat",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "controller_mat",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "controller_mat",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        12,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "controller_mat",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        3,
+        9
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.003906,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 0.328125,
+      "old_gate_claim_status": "supported",
+      "old_claim_status_with_correct_signed_reading": "contradicted",
+      "new_claim_status": "contradicted",
+      "gate_to_corrected_claim_transition": "supported->contradicted",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "controller_mat",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dag_offload_drl",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dag_offload_drl",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dag_offload_drl",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dag_offload_drl",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        12,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dag_offload_drl",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        3,
+        9
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.003906,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 0.328125,
+      "old_gate_claim_status": "supported",
+      "old_claim_status_with_correct_signed_reading": "contradicted",
+      "new_claim_status": "contradicted",
+      "gate_to_corrected_claim_transition": "supported->contradicted",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dag_offload_drl",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dqn",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dqn",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "old_sign_test_pvalue": 0.001831,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.076902,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dqn",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "old_sign_test_pvalue": 0.001831,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.076902,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dqn",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        12,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dqn",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        15,
+        425,
+        100
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        3,
+        9
+      ],
+      "new_paired_row_wins_ties_losses": [
+        15,
+        425,
+        100
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.003906,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 0.328125,
+      "old_gate_claim_status": "supported",
+      "old_claim_status_with_correct_signed_reading": "contradicted",
+      "new_claim_status": "contradicted",
+      "gate_to_corrected_claim_transition": "supported->contradicted",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dqn",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "old_sign_test_pvalue": 0.001831,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.076902,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dt_handoff_drl",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dt_handoff_drl",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "old_sign_test_pvalue": 0.001831,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.076902,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dt_handoff_drl",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "old_sign_test_pvalue": 0.001831,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.076902,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dt_handoff_drl",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        12,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dt_handoff_drl",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        7,
+        433,
+        100
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        3,
+        9
+      ],
+      "new_paired_row_wins_ties_losses": [
+        7,
+        433,
+        100
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.003906,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 0.328125,
+      "old_gate_claim_status": "supported",
+      "old_claim_status_with_correct_signed_reading": "contradicted",
+      "new_claim_status": "contradicted",
+      "gate_to_corrected_claim_transition": "supported->contradicted",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dt_handoff_drl",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "old_sign_test_pvalue": 0.001831,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.076902,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dueling_dqn",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dueling_dqn",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        524,
+        3
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        524,
+        3
+      ],
+      "old_sign_test_pvalue": 0.021271,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.553046,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dueling_dqn",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        524,
+        3
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        524,
+        3
+      ],
+      "old_sign_test_pvalue": 0.021271,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.553046,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dueling_dqn",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        12,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dueling_dqn",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        58,
+        382,
+        100
+      ],
+      "new_window_level_wins_ties_losses": [
+        5,
+        3,
+        4
+      ],
+      "new_paired_row_wins_ties_losses": [
+        58,
+        382,
+        100
+      ],
+      "old_sign_test_pvalue": 0.001043,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 0.044849,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "dueling_dqn",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        524,
+        3
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        524,
+        3
+      ],
+      "old_sign_test_pvalue": 0.021271,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.553046,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "mappo",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "mappo",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "mappo",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "mappo",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        12,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "mappo",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        3,
+        9
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.003906,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 0.328125,
+      "old_gate_claim_status": "supported",
+      "old_claim_status_with_correct_signed_reading": "contradicted",
+      "new_claim_status": "contradicted",
+      "gate_to_corrected_claim_transition": "supported->contradicted",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "mappo",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "ppo",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "ppo",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        8,
+        532,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        8,
+        532,
+        0
+      ],
+      "old_sign_test_pvalue": 0.007812,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.23436,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "ppo",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        8,
+        532,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        8,
+        532,
+        0
+      ],
+      "old_sign_test_pvalue": 0.007812,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.23436,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "ppo",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        12,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "ppo",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        56,
+        398,
+        86
+      ],
+      "new_window_level_wins_ties_losses": [
+        3,
+        3,
+        6
+      ],
+      "new_paired_row_wins_ties_losses": [
+        56,
+        398,
+        86
+      ],
+      "old_sign_test_pvalue": 0.014657,
+      "new_window_sign_test_pvalue": 0.507812,
+      "old_holm_sign_test_pvalue": 0.395739,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "ppo",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        8,
+        532,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        8,
+        532,
+        0
+      ],
+      "old_sign_test_pvalue": 0.007812,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.23436,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "qmix",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "qmix",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "old_sign_test_pvalue": 0.001831,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.076902,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "qmix",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "old_sign_test_pvalue": 0.001831,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.076902,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "qmix",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        12,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        540,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "qmix",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        20,
+        420,
+        100
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        3,
+        9
+      ],
+      "new_paired_row_wins_ties_losses": [
+        20,
+        420,
+        100
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.003906,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 0.328125,
+      "old_gate_claim_status": "supported",
+      "old_claim_status_with_correct_signed_reading": "contradicted",
+      "new_claim_status": "contradicted",
+      "gate_to_corrected_claim_transition": "supported->contradicted",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "qmix",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        526,
+        1
+      ],
+      "old_sign_test_pvalue": 0.001831,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.076902,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_aging_lfu",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_aging_lfu",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_aging_lfu",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_aging_lfu",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        25,
+        515,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        25,
+        515,
+        0
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_aging_lfu",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        3,
+        9
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.003906,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 0.328125,
+      "old_gate_claim_status": "supported",
+      "old_claim_status_with_correct_signed_reading": "contradicted",
+      "new_claim_status": "contradicted",
+      "gate_to_corrected_claim_transition": "supported->contradicted",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_aging_lfu",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_fifo",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_fifo",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_fifo",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_fifo",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        25,
+        515,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        25,
+        515,
+        0
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_fifo",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        3,
+        9
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.003906,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 0.328125,
+      "old_gate_claim_status": "supported",
+      "old_claim_status_with_correct_signed_reading": "contradicted",
+      "new_claim_status": "contradicted",
+      "gate_to_corrected_claim_transition": "supported->contradicted",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_fifo",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_lfu",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_lfu",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_lfu",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_lfu",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        25,
+        515,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        25,
+        515,
+        0
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_lfu",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        3,
+        9
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.003906,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 0.328125,
+      "old_gate_claim_status": "supported",
+      "old_claim_status_with_correct_signed_reading": "contradicted",
+      "new_claim_status": "contradicted",
+      "gate_to_corrected_claim_transition": "supported->contradicted",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_lfu",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_lru",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_lru",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_lru",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_lru",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        25,
+        515,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        25,
+        515,
+        0
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_lru",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        3,
+        9
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.003906,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 0.328125,
+      "old_gate_claim_status": "supported",
+      "old_claim_status_with_correct_signed_reading": "contradicted",
+      "new_claim_status": "contradicted",
+      "gate_to_corrected_claim_transition": "supported->contradicted",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_lru",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_random",
+      "metric": "end_to_end_workflow_delay",
+      "old_row_level_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        9,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        220,
+        0
+      ],
+      "old_sign_test_pvalue": 1.0,
+      "new_window_sign_test_pvalue": 1.0,
+      "old_holm_sign_test_pvalue": 1.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_random",
+      "metric": "full_service_ready_byte_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_random",
+      "metric": "full_service_ready_request_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_random",
+      "metric": "joint_base_adapter_hit_rate",
+      "old_row_level_wins_ties_losses": [
+        25,
+        515,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        25,
+        515,
+        0
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_random",
+      "metric": "transfer_mb_per_request",
+      "old_row_level_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "new_window_level_wins_ties_losses": [
+        0,
+        3,
+        9
+      ],
+      "new_paired_row_wins_ties_losses": [
+        0,
+        440,
+        100
+      ],
+      "old_sign_test_pvalue": 0.0,
+      "new_window_sign_test_pvalue": 0.003906,
+      "old_holm_sign_test_pvalue": 0.0,
+      "new_holm_sign_test_pvalue": 0.328125,
+      "old_gate_claim_status": "supported",
+      "old_claim_status_with_correct_signed_reading": "contradicted",
+      "new_claim_status": "contradicted",
+      "gate_to_corrected_claim_transition": "supported->contradicted",
+      "ci_unchanged": true
+    },
+    {
+      "baseline_agent": "reactive_random",
+      "metric": "workflow_continuity_rate",
+      "old_row_level_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "new_window_level_wins_ties_losses": [
+        2,
+        10,
+        0
+      ],
+      "new_paired_row_wins_ties_losses": [
+        13,
+        527,
+        0
+      ],
+      "old_sign_test_pvalue": 0.000244,
+      "new_window_sign_test_pvalue": 0.5,
+      "old_holm_sign_test_pvalue": 0.016348,
+      "new_holm_sign_test_pvalue": 1.0,
+      "old_gate_claim_status": "mixed",
+      "old_claim_status_with_correct_signed_reading": "mixed",
+      "new_claim_status": "mixed",
+      "gate_to_corrected_claim_transition": "mixed->mixed",
+      "ci_unchanged": true
+    }
+  ]
+}

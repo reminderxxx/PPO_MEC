@@ -1,0 +1,40 @@
+{
+  "interval_audit_version": "g14r21_preopen_metadata_only_v1",
+  "performance_fields_read": false,
+  "policy_or_outcome_consumer_invoked": false,
+  "split_counts": {
+    "train": 24,
+    "dev": 12,
+    "formal": 12,
+    "sealed_holdout": 12
+  },
+  "plan_files": {
+    "train": {
+      "path": "/Users/howen/Projects/PPO_MEC_g14r21/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/train_window_plan.json",
+      "sha256": "9e892783c661b9ab94c5247f784941c6f5701c270d490efacc85130290f1bcb2"
+    },
+    "dev": {
+      "path": "/Users/howen/Projects/PPO_MEC_g14r21/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/dev_window_plan.json",
+      "sha256": "736a56b3a8d475ed62c11fecae3942c82d9a2227ab4044dd4b17b1c48e30dd93"
+    },
+    "formal": {
+      "path": "/Users/howen/Projects/PPO_MEC_g14r21/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/formal_window_plan.json",
+      "sha256": "14945cf60a9f3b973145ec2a304e37235a43c465b0ff35391f46c15e30bd3332"
+    },
+    "sealed_holdout": {
+      "path": "/Users/howen/Projects/PPO_MEC_g14r21/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/sealed_holdout_window_plan.json",
+      "sha256": "8e560ae6b84604184f3a54f70d9d931c411c7dbf6f887b3ab6d2e2cec1135c06"
+    }
+  },
+  "checked_identity": "source_segment_run_id",
+  "checked_intervals": [
+    "raw_frame_start/raw_frame_end",
+    "raw_time_start/raw_time_end"
+  ],
+  "conflicts": [],
+  "minimum_nonoverlap_gaps": {
+    "raw_frame": 24,
+    "raw_time": 2499
+  },
+  "passed": true
+}

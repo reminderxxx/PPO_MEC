@@ -1,0 +1,26 @@
+{
+  "review_contract": "g14r21_independent_readonly_subagent_v1",
+  "reviewed_at": "2026-09-23",
+  "reviewer": "/root/g14r21_readonly_review",
+  "review_mode": "strictly read-only",
+  "reviewed_head": "c64f5985cd2cdcbe4955d02ba8ca99f0caaef9b8",
+  "initial_verdict": "statistics numerical correction provisional pass; artifact/provenance and holdout contract major revision",
+  "confirmed_results": {
+    "family_size": 84,
+    "claim_counts": {"supported": 0, "mixed": 72, "contradicted": 12},
+    "holm_significant_count_alpha_0_05": 0,
+    "direction_transform_consistent_count": 84,
+    "old_new_ci_effect_size_unchanged_count": 84,
+    "holdout_opened": false
+  },
+  "findings_and_disposition": [
+    {"finding": "final implementation identity was not bound", "disposition": "resolved; source_provenance binds implementation commit 4510aabb93df652f12c5f6a10e9f40f302dfb0e1 and tree 1eef41f199a5403b97b58ed3c3c994294d7d787e"},
+    {"finding": "seal-to-plan/split identities were not cross-validated", "disposition": "resolved; expected/observed/pass checks added to holdout_application_unsigned.json"},
+    {"finding": "fixed 84-item Holm family shrank when p-values were unavailable", "disposition": "resolved in implementation commit 4510aabb93df652f12c5f6a10e9f40f302dfb0e1 with nullable regressions"},
+    {"finding": "old-to-new diff hid the original formal-gate status", "disposition": "resolved; old_gate_claim_status and 12 supported-to-contradicted transitions are explicit"},
+    {"finding": "independent recalculation scope was overstated", "disposition": "resolved by narrowing evidence scope; CI/effect size are described as old/new cross-checks, not independent bootstrap recalculation"},
+    {"finding": "no machine-readable end-state protection receipt", "disposition": "resolved by protected_inputs_verification.json"},
+    {"finding": "independent audit command/environment/script hash absent", "disposition": "resolved in independent_recalculation.json"}
+  ],
+  "remaining_holdout_boundary": "NOT_ISSUED_BLOCKED; checkpoint bytes and future grant/package hash remain unchecked opening conditions"
+}

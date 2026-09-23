@@ -1,0 +1,24 @@
+{
+  "verification_contract": "g14r21_read_only_end_state_v1",
+  "verified_at": "2026-09-23",
+  "baseline_path": "protected_inputs_baseline.json",
+  "formal_root": {
+    "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending",
+    "file_count_before": 29912,
+    "file_count_after": 29912,
+    "path_size_mtime_sha256_before": "743afb0c19c8d2f6bc6f37b85b91fb098287c7e1ef4203c14040b142382aa58e",
+    "path_size_mtime_sha256_after": "743afb0c19c8d2f6bc6f37b85b91fb098287c7e1ef4203c14040b142382aa58e",
+    "unchanged": true,
+    "digest_definition": "sorted relative path NUL size NUL mtime_ns newline"
+  },
+  "user_files": {
+    "scripts/train_sa_ghmappo_real_sample.py": {"before": "aed850f5561f94ecba824e22bd323cdd142ee6c74255a3599129a2a6782e0eba", "after": "aed850f5561f94ecba824e22bd323cdd142ee6c74255a3599129a2a6782e0eba", "unchanged": true},
+    "src/agents/sa_ghmappo_agent.py": {"before": "06638c1aea5097a7fa4088db6b77648648655053dc87e1a1c817b09a7709c171", "after": "06638c1aea5097a7fa4088db6b77648648655053dc87e1a1c817b09a7709c171", "unchanged": true},
+    "src/agents/sa_ghmappo_core.py": {"before": "9951badce0ce78e608e690d6bed8d07a59d19dfef1e82f94a89d88403ac0d6b9", "after": "9951badce0ce78e608e690d6bed8d07a59d19dfef1e82f94a89d88403ac0d6b9", "unchanged": true},
+    "src/encoders/fusion_encoder.py": {"before": "cde948c13f487790cf255389bc26b7af191ecc66449a7e939b217c638327954d", "after": "cde948c13f487790cf255389bc26b7af191ecc66449a7e939b217c638327954d", "unchanged": true},
+    "src/evaluators/real_eval_support.py": {"before": "0a092cc15224b9b1be6a3476555c6e8eb8293573b3e27acf3fa91630db948cb6", "after": "0a092cc15224b9b1be6a3476555c6e8eb8293573b3e27acf3fa91630db948cb6", "unchanged": true},
+    "tests/test_algo_pool_contract.py": {"before": "41f2ca2f6920940bc11cd16bbc4c96104452c5653812a2b69c0e1a8e6794e75b", "after": "41f2ca2f6920940bc11cd16bbc4c96104452c5653812a2b69c0e1a8e6794e75b", "unchanged": true},
+    "tests/test_checkpoint_compat.py": {"before": "6b09b63b4a5cd9b527e7f3a146962ee37b9b1c9f8da78893d213b40bc6dc2cbf", "after": "6b09b63b4a5cd9b527e7f3a146962ee37b9b1c9f8da78893d213b40bc6dc2cbf", "unchanged": true}
+  },
+  "all_unchanged": true
+}

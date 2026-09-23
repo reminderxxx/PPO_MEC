@@ -1,0 +1,45 @@
+{
+  "analysis_contract_version": "g14r21_v1",
+  "created_at": "2026-09-23T03:25:43.108798+00:00",
+  "reviewed_at": "2026-09-23",
+  "literature_cutoff": "2026-09-21",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "artifact_run_id": "typed_model_cache_post_ablation_20260921_g14e07_pending",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "evidence_level": "E3_TARGETED_REPRODUCED_FOR_MEANS_WINDOW_SIGN_AND_HOLM; frozen bootstrap CI/effects cross-checked unchanged; holdout absent",
+  "verdict": "formal statistics correction accepted if integrity/tests pass; paper-ready remains Unverifiable",
+  "claim_counts": {
+    "contradicted": 12,
+    "mixed": 72
+  },
+  "holm_significant_count_alpha_0_05": 0,
+  "holm_family_size": 84,
+  "execution_gate": {
+    "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending/formal_gate.json",
+    "meaning": "completeness only; no performance threshold"
+  },
+  "scientific_claim_classification": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r21/artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/corrected_claim_map.json",
+    "meaning": "signed CI classification; separate from execution gate"
+  },
+  "limitations_preserved": [
+    "delay is conditional on completed workflows; null is never zero-imputed",
+    "delay has 9/12 effective outer windows in the frozen formal result",
+    "576 MB and 864 MB primary outcomes are non-discriminating in the frozen formal result",
+    "local readiness/handoff gains trade against transfer/backhaul cost",
+    "four of six typed-semantics ablations were unavailable before execution",
+    "non-significance is not equivalence"
+  ],
+  "holdout_application": {
+    "status": "NOT_ISSUED_BLOCKED",
+    "ready": false,
+    "blocker_count": 6
+  },
+  "prohibited_work": {
+    "training": 0,
+    "model_selection": 0,
+    "formal_rollout": 0,
+    "holdout_policy_runs": 0,
+    "holdout_performance_labels_read": 0
+  }
+}

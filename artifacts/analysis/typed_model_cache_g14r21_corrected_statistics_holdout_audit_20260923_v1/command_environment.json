@@ -1,0 +1,20 @@
+{
+  "command": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "scripts/build_g14r21_corrected_analysis.py",
+    "--formal-root",
+    "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending",
+    "--corrected-statistics",
+    "/Users/howen/Projects/PPO_MEC_g14r21/artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/corrected_statistics/paired_statistics.json",
+    "--output-root",
+    "/Users/howen/Projects/PPO_MEC_g14r21/artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1",
+    "--g14a01-review",
+    "/Users/howen/Projects/PPO_MEC/docs/project/g14a01_formal_results_independent_review_20260921.md"
+  ],
+  "cwd": "/Users/howen/Projects/PPO_MEC_g14r21",
+  "started_and_completed_in_process": true,
+  "exit_code": 0,
+  "python": "3.9.6 (default, May 22 2026, 11:13:45) \n[Clang 21.0.0 (clang-2100.1.1.101)]",
+  "executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "platform": "macOS-26.6.2-arm64-arm-64bit"
+}

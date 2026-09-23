@@ -1,3 +1,9 @@
+> **2026-09-23 G14R21**：已修正 formal statistics 的 signed-direction 二次翻转、row-level sign-test
+> pseudoreplication 与舍入后再 Holm；同一冻结 G14E07 controller rows 独立复算为 `0 supported / 72 mixed /
+> 12 contradicted`，84 项 fixed-family Holm 均不显著。完整性 gate 继续只表示执行完整。Holdout 只完成 metadata/code 审查，
+> unsigned application 为 `NOT_ISSUED_BLOCKED`，未签 grant、未打开 holdout。详见
+> [G14R21 审查](docs/project/g14r21_corrected_statistics_holdout_audit.md)。
+
 > **2026-09-20 G14R20-I5-E**：restricted recovery 科学消费者现在显式验证 Contract 1.3.0；G14E05 attempt 2 失败 root 永久只读。隔离真实 support→benchmark→transaction 两设置验收通过，下一正式 attempt 3 仅有全新 unsigned request，尚无 grant 或正式恢复。见 [消费者合同](docs/project/g14r20_i5_e_recovery_consumer_contract.md)。
 
 > **2026-09-20 G14R20-I5-D**：Contract 1.2.0 分离完整 frozen request hash、共享 stable live identity 与独立限时 pre-grant quiescence evidence。G14E04 永久 `FAIL_STOP_NO_GRANT`；旧 I5-B/I5-C/G14E04 包只供审计，新申请仍 unsigned。见 `docs/project/g14r20_i5_d_stable_request_contract.md`。

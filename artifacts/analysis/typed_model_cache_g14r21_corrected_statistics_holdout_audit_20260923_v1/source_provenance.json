@@ -1,0 +1,99 @@
+{
+  "sources": [
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending/statistics/paired_statistics.json",
+      "exists": true,
+      "size_bytes": 203822,
+      "sha256": "0fbba996b27e3a18121a9a7c0f3b22cc4b896bb9c0909ddfc3eccae00cdaa0f7"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending/formal_gate.json",
+      "exists": true,
+      "size_bytes": 126011,
+      "sha256": "20a688c4cf5b3a0e269cfbae86bf65d3f6b6cbf6cc1c6f8dacfbe1d33e0cf36a"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending/artifact_integrity_manifest.json",
+      "exists": true,
+      "size_bytes": 8734779,
+      "sha256": "37d5b6a6874d4a4cdccf5d196e3b538c1a6acb1225021f496700612603353e8d"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending/phase_state.jsonl",
+      "exists": true,
+      "size_bytes": 248956,
+      "sha256": "48a293f951b1bfb3dd21b10e53133afec120c3837f7f30b2ccb1508c19cbfbff"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending/cell_state.jsonl",
+      "exists": true,
+      "size_bytes": 6556961,
+      "sha256": "e896293fd78ac5e4c8665719a701eba7dee991d5671f9b7dec0d9063b69601c1"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending/evaluation_model_source_reference.json",
+      "exists": true,
+      "size_bytes": 75136,
+      "sha256": "463945b505fc490f690c4e68019d1114ae1b6f820a3a942dd759b031ba33d8d8"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending/resolved_execution_context.json",
+      "exists": true,
+      "size_bytes": 18258,
+      "sha256": "86624acc2f28b0711f67d2a16e57251034f161cf981d6784e8df2ae354485f3e"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC_g14r21/artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/corrected_statistics/paired_statistics.json",
+      "exists": true,
+      "size_bytes": 161015,
+      "sha256": "a8e51948d106af0822bb0d38d6a3e3a69ef50db193f31a9bdcb1380028cd2a51"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/docs/project/g14a01_formal_results_independent_review_20260921.md",
+      "exists": true,
+      "size_bytes": 14814,
+      "sha256": "f389f126f76d9a8827708c77c83914a7fdcafaa310d7cd97e1dcdc18b9ee873b"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC_g14r21/scripts/analyze_top_journal_statistics.py",
+      "exists": true,
+      "size_bytes": 28640,
+      "sha256": "6a82902a7e15a85258108d284ac514241344a891800989013551244a36010010"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC_g14r21/scripts/manage_typed_model_cache_formal_artifacts.py",
+      "exists": true,
+      "size_bytes": 50161,
+      "sha256": "95fca080649bf000e69981eca8e4eec78ac25faff92964de36367ad7bb7c821c"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-4931a055d167dfcf76cf6ded/benchmark_rows.csv",
+      "exists": true,
+      "size_bytes": 4924781,
+      "sha256": "3f73b499770b81d77f89ef6f05e7d2389198beb23b87e3768ab7182e5b7ad1f2"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-ca75f4fd6cba10d56d8210cb/benchmark_rows.csv",
+      "exists": true,
+      "size_bytes": 4866167,
+      "sha256": "5cd14c5992c9a5826d21e8bcbe7779470439a2b5979a69d1e12ab0d69463797b"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-d81f46ce6883684144cfe40d/benchmark_rows.csv",
+      "exists": true,
+      "size_bytes": 4926989,
+      "sha256": "528e3c47f8bf0124940f3bf6f57f88b132627f7ce69e62b408b08bbd05b08626"
+    }
+  ],
+  "repository": {
+    "checkout": "/Users/howen/Projects/PPO_MEC_g14r21",
+    "git_commit": "4510aabb93df652f12c5f6a10e9f40f302dfb0e1",
+    "git_tree": "1eef41f199a5403b97b58ed3c3c994294d7d787e",
+    "branch": "codex/g14r21-statistics-holdout-audit"
+  },
+  "environment": {
+    "python": "3.9.6 (default, May 22 2026, 11:13:45) \n[Clang 21.0.0 (clang-2100.1.1.101)]",
+    "executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "platform": "macOS-26.6.2-arm64-arm-64bit"
+  }
+}

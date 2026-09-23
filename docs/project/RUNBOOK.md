@@ -1,3 +1,27 @@
+## G14R21 纠正版统计复算（只读 formal source；不含 holdout）
+
+固定 source root 和新 analysis root 后，使用本机 receipt runner 复算；它只写 `corrected_statistics/` 与
+`local_job/`，非零或产物校验失败即停止，自动重试为 0：
+
+```bash
+.venv/bin/python scripts/run_g14r21_corrected_statistics.py \
+  --formal-root artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending \
+  --output-root artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/corrected_statistics
+```
+
+完成后用不导入生产统计 helper 的 raw-row checker 独立复算 mean/nullable coverage/window sign test/fixed-family
+Holm；bootstrap CI/effect size 只作 old/new 一致性核验。随后构建勘误与 unsigned holdout 审查包。第二步只读
+seal/split/checkpoint manifest metadata，不调用 holdout policy：
+
+```bash
+.venv/bin/python scripts/audit_g14r21_corrected_statistics.py \
+  --corrected-statistics artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/corrected_statistics/paired_statistics.json \
+  --output artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/independent_recalculation.json
+```
+
+`holdout_application_unsigned.json` 不是 grant 或执行入口；状态非 `READY` 时禁止自行补 token、调用 policy 或读取
+performance label。
+
 ## G14R20-I6 八-cell 后续评估申请（不授权正式执行）
 
 从干净的 I6 executor commit 运行 `scripts/prepare_typed_model_cache_post_ablation.py --action prepare` 生成新 unsigned request，再以 `--action validate` 只读复核。完整、无占位符的参数与五阶段 `run_typed_model_cache_post_ablation.py --check execute` 命令见 `artifacts/analysis/g14r20_i6_post_ablation_20260921/command_package.json`。中央窗口签发匹配 request hash、commit/tree、handoff hash 的独立 G14E07 grant 以前，只可 prepare/validate，不得执行正式命令。新 root 必须保持不存在且仅由获授权的首次 execute create-only 创建。八个旧 cell 均只读外部引用，不在新 root 复制或重跑；详见 `g14r20_i6_post_ablation_contract.md`。
