@@ -12,7 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.evaluators.cache_baseline_fairness import load_and_validate_manifest
+from src.evaluators.cache_baseline_fairness import (
+    load_and_validate_manifest,
+    portable_dataset_resolutions_by_role,
+)
 from src.evaluators.typed_model_cache_formal_execution import (
     FormalExecutionError,
     validate_no_holdout_capability,
@@ -60,22 +63,43 @@ def main() -> None:
         protocol.get("typed_model_cache_formal_protocol_version")
     )
     fairness_audit = None
+    portable_dataset_audit = None
     generated_audit = None
     if capabilities.generated_checkpoint_resource_required:
         static_registry = load_registry(args.resource_registry_path)
+        static_roots = {
+            "worktree_root": args.repository_root or ROOT,
+            "data_root": args.data_root or None,
+            "protocol_artifact_root": args.protocol_artifact_root or None,
+            "checkpoint_root": args.checkpoint_root or None,
+        }
         fairness_audit = resolve_resource(
             static_registry,
             args.fairness_manifest_resource_id,
             expected_role="fairness_manifest",
             explicit_paths=[args.fairness_manifest_path],
-            roots={
-                "worktree_root": args.repository_root or ROOT,
-                "data_root": args.data_root or None,
-                "protocol_artifact_root": args.protocol_artifact_root or None,
-                "checkpoint_root": args.checkpoint_root or None,
-            },
+            roots=static_roots,
             manifest_path=args.resource_registry_path,
         )
+        portable_dataset_audit = {
+            "status": "pass",
+            "resolutions": [
+                resolve_resource(
+                    static_registry,
+                    args.mobility_resource_id,
+                    expected_role="mobility_dataset",
+                    roots=static_roots,
+                    manifest_path=args.resource_registry_path,
+                ),
+                resolve_resource(
+                    static_registry,
+                    args.workflow_resource_id,
+                    expected_role="workflow_dataset",
+                    roots=static_roots,
+                    manifest_path=args.resource_registry_path,
+                ),
+            ],
+        }
         resolved_context = json.loads(
             Path(args.resolved_execution_context_path).read_text(encoding="utf-8-sig")
         )
@@ -93,7 +117,12 @@ def main() -> None:
             execution_binding=execution_binding,
         )
     manifest, report = load_and_validate_manifest(
-        args.fairness_manifest_path, root=ROOT, check_files=True
+        args.fairness_manifest_path,
+        root=ROOT,
+        check_files=True,
+        portable_dataset_resolutions=portable_dataset_resolutions_by_role(
+            portable_dataset_audit
+        ),
     )
     if report.get("status") != "pass":
         raise FormalExecutionError("cache-policy fairness manifest validation failed")

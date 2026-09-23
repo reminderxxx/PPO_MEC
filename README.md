@@ -1,3 +1,10 @@
+> **2026-09-23 G14R22-C**：已定位 G14R22-B 的 NGSIM/Alibaba 冲突候选为真实 external dataset 与 executor
+> checkout 内 Git LFS pointer 被 fairness validator 同时纳入；benchmark 现只把 portable registry 允许并重新验证的
+> dataset candidates 交给 fairness，内容/role 冲突继续拒绝。后台 host v2 分离 venv launch path、actual executable、
+> process start 与 argv identity，UNKNOWN 不作失败/成功且不自动重启。实现与真实资源 preflight 已通过；新的 public
+> non-holdout 单次后台长验收尚未读回，当前不是 READY，未签 grant/token、未打开 holdout。详见
+> [G14R22-C 修复记录](docs/project/g14r22c_data_background_repair.md)。
+
 > **2026-09-23 G14R22**：dedicated one-time holdout runner、完整 3-capacity command package、150-checkpoint
 > opening hash、atomic opening/ledger/receipt/publication/integrity 与永久 consumed 失败边界已冻结；non-holdout
 > 公共入口完成 3 scientific children、84-row corrected statistics 和 integrity 闭环。unsigned request 状态为
@@ -604,3 +611,7 @@ evaluation-only 首次锁/初始化/下一 phase 载入；不授权恢复旧 run
 > （73 个 bound cells）的 CI 边界发生修正。长链真实 non-holdout 验收将由单次后台宿主从 clean executor 启动；
 > 不签 grant/token，
 > `holdout_opened=false`。见 [G14R22-B 合同](docs/project/g14r22b_capacity_background_acceptance.md)。
+
+> **G14R22-B 终态勘误**：上述唯一后台 job 已在首容量 pre-rollout fairness validation 失败并永久消费；没有生成
+> benchmark rows、statistics 或 integrity pass，且不得 retry/resume/reopen。G14R22-C 只在新 commit/package/root
+> 上启动独立验收，不改变旧失败证据。

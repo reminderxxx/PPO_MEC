@@ -1,4 +1,30 @@
-## G14R22-B 容量身份复算与单次后台验收（不含 holdout）
+## G14R22-C 单次 public non-holdout 后台验收（不含 holdout）
+
+G14R22-B 失败 root 已永久消费，下面 B 的旧 launch 说明只供历史审计，禁止执行。C 必须从最终 clean executor
+commit 生成全新 package/scientific/job roots；builder 文件名为兼容仍保留 `g14r22b`：
+
+```bash
+<frozen-venv-python> scripts/build_g14r22b_background_acceptance.py \
+  --executor-checkout <clean-detached-g14r22c-executor> \
+  --executor-commit <g14r22c-executor-commit> \
+  --python-executable <frozen-venv-python> \
+  --package-root <new-g14r22c-root>/package \
+  --scientific-work-root <new-g14r22c-root>/real_non_holdout \
+  --job-root <new-g14r22c-root>/background_job
+```
+
+构包后只执行 `freeze_receipt.json.launch_command` 一次。状态只读命令仍为：
+
+```bash
+<frozen-venv-python> <clean-detached-g14r22c-executor>/scripts/run_g14r22b_background_job.py inspect \
+  --job-root <new-g14r22c-root>/background_job
+```
+
+host v2 同时验证 process start、actual executable 和 argv identity；PID-only 或证据不足为
+`INTERRUPTED_OR_UNKNOWN`。本轮 launch 后不得轮询、监控、自动修复或重试；用户后续回来后再集中读 terminal receipt、
+三容量 CSV、capacity-aware statistics 与 integrity。`SUCCEEDED` 前一律不是 READY。
+
+## G14R22-B 容量身份复算与单次后台验收（historical/audit-only；禁止重启）
 
 只读既有 G14R21 formal source，用 hash-verified handoff、producer manifest、runtime MB 与 window plan 在新的
 `analysis_inputs/` 显式补充 `capacity_label` / `source_segment_run_id`。不得修改原 CSV，也不得从效果或目录名推断：
@@ -12,8 +38,7 @@
 inner=`seed,workflow_id,capacity_label`；保持 10,000 bootstrap、seed 1401、BCa 与 84 项 Holm family，并运行独立
 raw-row mean/effect/window-sign/Holm 审计。
 
-真实 public non-holdout 长验收只能先用 `build_g14r22b_background_acceptance.py` 在 clean executor commit 上生成
-create-only request/scientific package/job package，再严格执行 `freeze_receipt.json` 中的唯一 launch command。检查状态只用：
+以下命令形态仅解释旧证据，不得对 B package/root retry/resume/reopen：
 
 ```bash
 <frozen-python> <frozen-executor>/scripts/run_g14r22b_background_job.py inspect --job-root <frozen-job-root>

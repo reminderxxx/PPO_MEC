@@ -16,6 +16,7 @@ from scripts.run_g14r22b_background_job import (
     file_sha256,
     inspect,
     launch,
+    same_process,
 )
 from scripts.build_g14r22b_background_acceptance import freeze_python_executable
 
@@ -206,6 +207,73 @@ def test_launcher_exit_does_not_stop_successful_job(frozen_executor: dict[str, o
     assert receipt["scientific_completion"]["integrity"]["status"] == "passed"
 
 
+def test_running_identity_keeps_launch_actual_start_and_command_separate(
+    frozen_executor: dict[str, object],
+) -> None:
+    package, job_root, _ = build_package(frozen_executor, "sleep", "running_identity")
+    state = launch(package, job_root)
+    result = inspect(job_root)
+    assert result["observed_status"] == "RUNNING", result
+    identity = state["supervisor_process_identity"]
+    assert identity["process_start_time"] == identity["process_start_token"]
+    assert identity["actual_process_executable"]["reported_path"]
+    command = identity["command_identity"]
+    assert command["launch_executable_path"] == str(Path(sys.executable).absolute())
+    assert command["resolved_launch_executable_path"] == str(
+        Path(sys.executable).resolve()
+    )
+    assert command["actual_process_executable"] == identity[
+        "actual_process_executable"
+    ]
+    os.kill(identity["pid"], signal.SIGTERM)
+    wait_terminal(job_root)
+
+
+def test_resolved_python_argv0_is_not_a_false_negative(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    actual = {
+        "reported_path": "/framework/Python",
+        "absolute_path": "/framework/Python",
+        "resolved_path": "/framework/Python",
+    }
+    expected = {
+        "pid": 123,
+        "process_start_time": "start",
+        "process_start_token": "start",
+        "actual_process_executable": actual,
+        "command_identity": {
+            "launch_executable_path": "/venv/bin/python",
+            "resolved_launch_executable_path": "/framework/bin/python3",
+            "actual_process_executable": actual,
+            "permitted_live_argv0_paths": [
+                "/venv/bin/python",
+                "/framework/bin/python3",
+                "/framework/Python",
+            ],
+            "argv_tail_sha256": canonical_sha256(["worker.py", "--frozen", "x"]),
+            "launch_command_sha256": canonical_sha256(
+                ["/venv/bin/python", "worker.py", "--frozen", "x"]
+            ),
+        },
+    }
+    monkeypatch.setattr(
+        "scripts.run_g14r22b_background_job.process_identity",
+        lambda _pid: {
+            "pid": 123,
+            "process_start_time": "start",
+            "process_start_token": "start",
+            "actual_process_executable": actual,
+            "live_argv0": "/framework/Python",
+            "live_argv_tail_sha256": canonical_sha256(
+                ["worker.py", "--frozen", "x"]
+            ),
+        },
+    )
+    matches, _ = same_process(expected)
+    assert matches is True
+
+
 def test_child_nonzero_is_failed(frozen_executor: dict[str, object]) -> None:
     package, job_root, _ = build_package(frozen_executor, "fail", "child_nonzero")
     launch(package, job_root)
@@ -273,6 +341,67 @@ def test_pid_reuse_guard_checks_start_token_and_command_hash(
             "live_command_sha256": expected["live_command_sha256"],
             "live_command": expected["live_command"],
         },
+    )
+    assert inspect(job_root)["observed_status"] == "INTERRUPTED_OR_UNKNOWN"
+    os.kill(expected["pid"], signal.SIGTERM)
+    wait_terminal(job_root)
+
+
+def test_insufficient_live_identity_is_unknown_and_does_not_restart(
+    frozen_executor: dict[str, object], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    package, job_root, _ = build_package(frozen_executor, "sleep", "insufficient_identity")
+    state = launch(package, job_root)
+    claim_before = (job_root / "supervisor_claim.json").read_bytes()
+    state_before = (job_root / "state.json").read_bytes()
+    child_pid = state["child_process_identity"]["pid"]
+    monkeypatch.setattr(
+        "scripts.run_g14r22b_background_job.process_identity", lambda _pid: None
+    )
+    result = inspect(job_root)
+    assert result["observed_status"] == "INTERRUPTED_OR_UNKNOWN"
+    assert result["terminal_receipt"] is None
+    assert (job_root / "supervisor_claim.json").read_bytes() == claim_before
+    assert (job_root / "state.json").read_bytes() == state_before
+    assert json.loads(state_before)["child_process_identity"]["pid"] == child_pid
+    os.kill(state["supervisor_process_identity"]["pid"], signal.SIGTERM)
+    wait_terminal(job_root)
+
+
+def test_command_identity_mismatch_is_unknown(
+    frozen_executor: dict[str, object], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    package, job_root, _ = build_package(frozen_executor, "sleep", "command_mismatch")
+    state = launch(package, job_root)
+    expected = state["supervisor_process_identity"]
+    observed = json.loads(json.dumps(expected))
+    observed["live_argv_tail_sha256"] = "0" * 64
+    observed.pop("command_identity", None)
+    monkeypatch.setattr(
+        "scripts.run_g14r22b_background_job.process_identity", lambda _pid: observed
+    )
+    assert inspect(job_root)["observed_status"] == "INTERRUPTED_OR_UNKNOWN"
+    os.kill(expected["pid"], signal.SIGTERM)
+    wait_terminal(job_root)
+
+
+def test_same_birth_but_actual_executable_mismatch_is_unknown(
+    frozen_executor: dict[str, object], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    package, job_root, _ = build_package(
+        frozen_executor, "sleep", "actual_executable_mismatch"
+    )
+    state = launch(package, job_root)
+    expected = state["supervisor_process_identity"]
+    observed = json.loads(json.dumps(expected))
+    observed.pop("command_identity", None)
+    observed["actual_process_executable"] = {
+        "reported_path": "/different/Python",
+        "absolute_path": "/different/Python",
+        "resolved_path": "/different/Python",
+    }
+    monkeypatch.setattr(
+        "scripts.run_g14r22b_background_job.process_identity", lambda _pid: observed
     )
     assert inspect(job_root)["observed_status"] == "INTERRUPTED_OR_UNKNOWN"
     os.kill(expected["pid"], signal.SIGTERM)

@@ -20,6 +20,7 @@ from scripts.manage_typed_model_cache_formal_artifacts import dev_select
 from src.evaluators.cache_baseline_fairness import (
     BASELINE_NAMES,
     load_and_validate_manifest,
+    portable_dataset_resolutions_by_role,
 )
 from src.evaluators.typed_model_cache_formal_execution import (
     FormalExecutionError,
@@ -418,7 +419,14 @@ def main() -> None:
         )
     for capacity_label, (runtime_path, fairness_path) in capacity_inputs.items():
         expected_runtime = resolve_model_cache_runtime(runtime_path, root=ROOT)
-        fairness, report = load_and_validate_manifest(fairness_path, root=ROOT, check_files=True)
+        fairness, report = load_and_validate_manifest(
+            fairness_path,
+            root=ROOT,
+            check_files=True,
+            portable_dataset_resolutions=portable_dataset_resolutions_by_role(
+                getattr(args, "_portable_resource_resolution", None)
+            ),
+        )
         if report.get("status") != "pass":
             raise FormalExecutionError(f"dev fairness validation failed: {capacity_label}")
         if order_audit is not None:

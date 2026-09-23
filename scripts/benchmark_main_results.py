@@ -23,6 +23,7 @@ from src.evaluators.cache_baseline_fairness import (
     enforce_benchmark_args,
     expected_unit,
     load_and_validate_manifest,
+    portable_dataset_resolutions_by_role,
     sha256_file,
     stamp_summary_provenance,
     validate_observed_fingerprint_matrix,
@@ -882,10 +883,14 @@ def main() -> None:
     fairness_manifest: dict[str, Any] | None = None
     fairness_validation_report: dict[str, Any] | None = None
     if args.cache_baseline_fairness_manifest_path:
+        portable_dataset_resolutions = portable_dataset_resolutions_by_role(
+            portable_resource_audit
+        )
         fairness_manifest, fairness_validation_report = load_and_validate_manifest(
             args.cache_baseline_fairness_manifest_path,
             root=ROOT_DIR,
             check_files=True,
+            portable_dataset_resolutions=portable_dataset_resolutions,
         )
         args._fairness_root = ROOT_DIR
         args._resolved_model_cache_runtime = runtime_contract

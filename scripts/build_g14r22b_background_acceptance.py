@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Freeze one unsigned G14R22-B public non-holdout background acceptance job."""
+"""Freeze one unsigned G14R22-C public non-holdout background acceptance job."""
 
 from __future__ import annotations
 
@@ -72,7 +72,7 @@ def main() -> int:
     package_root.mkdir(parents=True, exist_ok=False)
     created_at = datetime.now(timezone.utc).isoformat()
     request: dict[str, Any] = {
-        "request_version": "g14r22b_public_non_holdout_background_acceptance_v1",
+        "request_version": "g14r22c_public_non_holdout_background_acceptance_v1",
         "created_at": created_at,
         "status": "UNSIGNED_TEST_ONLY",
         "grant_signed": False,
@@ -133,7 +133,7 @@ def main() -> int:
     }
     job_package: dict[str, Any] = {
         "host_version": HOST_VERSION,
-        "job_id": "g14r22b_real_non_holdout_capacity_identity_v1",
+        "job_id": "g14r22c_real_non_holdout_capacity_identity_v1",
         "executor_checkout": str(checkout),
         "executor_commit": args.executor_commit,
         "executor_git_tree": tree,
@@ -169,7 +169,7 @@ def main() -> int:
     job_package_path = package_root / "background_job_package.json"
     write_json(job_package_path, job_package)
     receipt = {
-        "freeze_version": "g14r22b_background_acceptance_freeze_v1",
+        "freeze_version": "g14r22c_background_acceptance_freeze_v1",
         "created_at": created_at,
         "request": {"path": str(request_path), "sha256": file_sha256(request_path)},
         "scientific_command_package": {

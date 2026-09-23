@@ -375,6 +375,7 @@ def resolve_resource(
             "portable_resource_resolution_version": RESOURCE_RESOLVER_VERSION,
             "logical_resource_id": logical_resource_id,
             "resource_role": identity["resource_role"],
+            "portable_identity": scientific_identity_projection(identity),
             "semantic_identity_fingerprint": identity[
                 "semantic_identity_fingerprint"
             ],
@@ -387,6 +388,7 @@ def resolve_resource(
         "portable_resource_resolution_version": RESOURCE_RESOLVER_VERSION,
         "logical_resource_id": logical_resource_id,
         "resource_role": identity["resource_role"],
+        "portable_identity": scientific_identity_projection(identity),
         "semantic_identity_fingerprint": identity["semantic_identity_fingerprint"],
         "status": "compatible",
         "portability_status": (
@@ -398,6 +400,10 @@ def resolve_resource(
         "resolved_path": chosen["resolved_absolute_path"],
         "resolution_root": chosen["resolution_root"],
         "resolution_method": chosen["resolution_method"],
+        "candidate_precedence": [
+            item["resolution_method"] for item in observations
+        ],
+        "selected_candidate_index": observations.index(chosen),
         "observed_sha256": chosen["observed_sha256"],
         "observed_size_bytes": chosen["observed_size_bytes"],
         "symlink_audit": {

@@ -213,6 +213,29 @@ def test_content_identical_explicit_relocation(tmp_path: Path) -> None:
     )
     assert report["status"] == "compatible"
     assert report["resolved_path"] == str(relocated.resolve())
+    assert report["portable_identity"]["logical_resource_id"] == "resource.test"
+    assert report["semantic_identity_fingerprint"] == scientific_identity_fingerprint(
+        report["portable_identity"]
+    )
+    assert report["candidate_precedence"] == ["explicit_path"]
+    assert report["selected_candidate_index"] == 0
+
+
+def test_identical_explicit_path_precedes_identical_allowed_root(tmp_path: Path) -> None:
+    explicit = write(tmp_path / "explicit.txt", "same")
+    data_root = tmp_path / "data"
+    rooted = write(data_root / "inputs/value.txt", "same")
+    item = identity(rooted, allowed_resolvers=("explicit_path", "data_root"))
+    report = resolve_resource(
+        registry(item),
+        "resource.test",
+        explicit_paths=[explicit],
+        roots={"data_root": data_root},
+    )
+    assert report["resolved_path"] == str(explicit.resolve())
+    assert report["resolution_method"] == "explicit_path"
+    assert report["candidate_precedence"] == ["explicit_path", "data_root"]
+    assert report["selected_candidate_index"] == 0
 
 
 @pytest.mark.parametrize(

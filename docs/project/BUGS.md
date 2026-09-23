@@ -1,3 +1,16 @@
+## 2026-09-23: G14R22-C dataset candidate / live process identity（RESOLVED IN CODE；REAL CHAIN PENDING）
+
+- `RESOLVED / candidate qualification`：G14R22-B 的冲突不是两份相同数据；完整 NGSIM/Alibaba 与 detached
+  checkout 的 Git LFS pointer 内容不同。pointer 由 fairness 的无条件 worktree fallback 引入，但 portable registry
+  对 dataset 只允许 `explicit_path/data_root`。新 consumer 只接收 registry eligible observations 并独立复核
+  role/size/hash/selection；eligible 内容/角色冲突仍 fail-closed。
+- `RESOLVED / live identity`：host v2 不再以 raw `ps command` hash 等同 frozen venv argv0；launch path、resolved path、
+  actual executable、start token、argv tail 分开保存并复合比较。PID-only 或证据不足仍为 UNKNOWN，不会自动重启。
+- `PROTECTED`：G14R22-B job 已永久 `FAILED` 且不得 retry/resume/reopen；旧统计、CSV、失败 root 和 receipt 不改写。
+  grant/token 未签，holdout unopened。
+- `OPEN / real chain`：实现、真实资源 preflight 与回归通过不等于真实 producer→CSV→statistics→integrity 成功。
+  新单次后台 job 的 terminal receipt 与逐文件产物须后续只读审查；读回前不得宣称 READY。
+
 ## 2026-09-23: G14R21 holdout 执行合同缺口（RESOLVED；授权仍未签发）
 
 - 已补 dedicated runner、完整命令、150-checkpoint opening hash、atomic opening/ledger/receipt/publication/integrity

@@ -1,3 +1,21 @@
+## 2026-09-23 — D-G14R22-C dataset 候选资格服从 portable identity，进程状态服从复合 identity
+
+决定：外部 NGSIM/Alibaba 的候选资格由 registry `allowed_resolvers`、logical role、content SHA-256 与 size 共同
+确定。explicit compatible candidate 先于 allowed root；同内容重复定位可消歧，eligible 内容/角色冲突必须拒绝。
+repository checkout 内 Git LFS pointer 不因与数据集同名就自动成为 dataset candidate。fairness 必须重新验证 registry
+audit，不得跳过或自行 fallback。
+
+决定：后台 live identity 分离 frozen launch path、resolved launch path、actual process executable、process start token
+与 argv tail。RUNNING 要求复合身份全部匹配；仅 PID 存在、证据缺失或任何 identity mismatch 均为
+`INTERRUPTED_OR_UNKNOWN`。只有 terminal receipt 可给出 SUCCEEDED/FAILED，UNKNOWN 不触发自动重启。
+
+原因：G14R22-B 的两个 worktree 同名对象实际是内容不同的 LFS pointer；旧 fairness candidate rule 混淆了 logical
+location 与 resource role。macOS Python 又可能在启动后把 venv argv0 展示为 framework executable，raw command hash
+不是稳定的同进程 identity。
+
+边界：不修改/重开 G14R22-B 失败 root，不删除数据或 pointer，不放宽 fairness，不签 grant/token，不运行 holdout、
+训练、选模或正式矩阵。G14R22-C 单次 public non-holdout 验收读回前不得声明 READY。
+
 ## 2026-09-23 — D-G14R22 atomic opening 后无 retry/resume/reopen
 
 决定：dedicated holdout 在 grant/token、冻结输入、clean executor 和 150 checkpoint bytes 全部通过后，才以同父目录

@@ -95,6 +95,13 @@
   acceptance；只验收公共事务，不是模型加载或科学 rollout 证据。
 - `scripts/run_g14r22a_real_non_holdout_acceptance.py`：真实 `benchmark_main_results.py`、generated-resource、
   checkpoint loader、learned/reactive rollout、producer integrity、corrected statistics 与 receipt 的三容量测试链。
+- `src/runtime/portable_resource_identity.py` → `scripts/benchmark_main_results.py` →
+  `src/evaluators/cache_baseline_fairness.py`：G14R22-C dataset resolution 消费链；registry 先限定 eligible resolver/
+  role/content identity，benchmark 按 role 传递 audit，fairness 重新核验候选与 selected path。worktree Git LFS pointer
+  不因同名 logical path 自动取得 dataset role。
+- `scripts/build_g14r22b_background_acceptance.py` / `run_g14r22b_background_job.py`：文件名保留兼容，当前产出
+  G14R22-C host v2 身份；冻结单次 package，并以 launch/resolved Python、actual executable、process start、argv
+  identity 和 terminal receipt 区分 RUNNING/SUCCEEDED/FAILED/UNKNOWN。没有 retry/resume/reopen/monitor primitive。
 
 ## G14R18 provenance envelope / shared identity boundary
 

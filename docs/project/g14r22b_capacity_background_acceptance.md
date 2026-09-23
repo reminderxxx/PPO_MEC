@@ -1,5 +1,9 @@
 # G14R22-B 容量身份闭环与低额度后台执行验收
 
+> **Historical / audit-only**：唯一 G14R22-B job 已永久失败并消费，禁止 retry/resume/reopen。数据候选资格与
+> live process identity 的后续定向修复见 `g14r22c_data_background_repair.md`；它只能在新 commit/package/root
+> 启动独立验收，不改变本页失败证据。
+
 - `reviewed_at`: `2026-09-23`
 - `literature_cutoff`: `2026-09-21`（本轮不评价 novelty）
 - `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`

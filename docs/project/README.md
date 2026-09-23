@@ -41,6 +41,9 @@
 
 ## Live 文档
 
+- `g14r22c_data_background_repair.md`：G14R22-B NGSIM/Alibaba candidate 来源、portable→fairness 消歧、
+  venv/actual executable 复合后台身份、定向回归、历史统计保护和新单次 public non-holdout 验收边界。
+
 - `g14r22b_capacity_background_acceptance.md`：容量字段 runtime→CSV→pair/cluster 闭环、G14R21 独立复算影响、
   fail-closed 统计和单次固定后台宿主的状态/故障边界。
 

@@ -1,3 +1,20 @@
+## 2026-09-23 G14R22-C：数据候选资格与后台 live identity 定向修复
+
+- 完整解析 `33d8aa8` 与 G14R22-B child stderr/frozen command/resource registry/fairness manifest。NGSIM、Alibaba
+  的第二候选分别是 135/134-byte Git LFS pointer，不是真实数据副本；真实文件 SHA-256 分别为 `ddacb7a...d10c`、
+  `6346b072...70bc`，pointer 文件 SHA-256 分别为 `48c89cba...054`、`14d63f5b...a3f`。
+- 根因是 portable registry 已按 `explicit_path/data_root` 选中完整数据后，fairness validator 又把 executor
+  `ROOT_DIR/logical_path` 无条件加入候选。benchmark 现传递已验证 dataset resolution，fairness 按 registry eligible
+  observations 重验 role/size/hash/selected path；合法同内容定位按 explicit-first precedence 消歧，内容或角色冲突仍拒绝。
+- background host v2 分离 launch/resolved Python path、actual process executable、start token 与 argv-tail identity；
+  venv argv0 合法解析不再造成 false-negative。PID-only、birth/executable/command mismatch 和证据不足均保持
+  `INTERRUPTED_OR_UNKNOWN`，不会自动重启。
+- 定向 resolver/background/capacity/producer-integrity 122 tests、publication/statistics/environment 33 tests 与 smoke 通过；独立只读复审另有定向 111 tests 和 generated-resource/formal-execution/integrity 98 tests 通过；真实 G14R22-B command 的只读数据解析
+  preflight 通过。旧失败 root/receipt 未修改，holdout unopened，训练/选模/正式矩阵均为 0。
+- 新单次 public non-holdout 后台验收须在 final clean executor 与全新 package/root 上启动。本轮启动后即停止 AI
+  轮次，不轮询、不监控、不重试；未读回 terminal receipt 前 verdict 固定为 `NOT READY`。详见
+  `g14r22c_data_background_repair.md`。
+
 ## 2026-09-23: G14R22 one-time holdout 执行合同与非正式验收
 
 - 冻结 dedicated public runner、完整 3-capacity science + corrected statistics 命令、唯一输出 root 和

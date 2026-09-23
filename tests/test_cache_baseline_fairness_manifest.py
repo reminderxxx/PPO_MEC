@@ -22,6 +22,7 @@ from src.evaluators.cache_baseline_fairness import (
     validate_observed_fingerprint_matrix,
 )
 from src.evaluators.main_results_support import summary_to_row
+from src.runtime.portable_resource_identity import scientific_identity_fingerprint
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -68,8 +69,208 @@ def report(payload: dict, *, files: bool = False) -> dict:
     return validate_manifest(payload, root=ROOT, check_files=files)
 
 
+def portable_dataset_resolutions(payload: dict) -> dict[str, dict]:
+    identities = {
+        "ngsim_vehicle_trajectories": {
+            "logical_resource_id": "dataset.mobility.ngsim.vehicle_trajectories",
+            "resource_role": "mobility_dataset",
+            "schema_version": "NGSIMProvider/v1",
+            "revision": "ngsim_20260329",
+            "expected_logical_relative_path": (
+                "raw/mobility/ngsim/"
+                "Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv"
+            ),
+        },
+        "alibaba_cluster_trace_2018_batch_task": {
+            "logical_resource_id": "dataset.workflow.alibaba2018.batch_task",
+            "resource_role": "workflow_dataset",
+            "schema_version": "AlibabaDAGParser/legacy_batch_type",
+            "revision": "alibaba_cluster_trace_2018",
+            "expected_logical_relative_path": "raw/workflow/alibaba2018/batch_task.csv",
+        },
+    }
+    resolutions: dict[str, dict] = {}
+    for item in payload["dataset_provenance"]["inputs"]:
+        frozen = identities.get(item["logical_dataset_id"])
+        if frozen is None:
+            continue
+        path = Path(item["normalized_absolute_path"]).resolve()
+        portable_identity = {
+            **frozen,
+            "content_sha256": item["sha256"],
+            "size_bytes": item["size_bytes"],
+            "required": True,
+            "allowed_resolvers": ["explicit_path", "data_root"],
+            "provenance": "fixture",
+            "path_relocation_allowed": True,
+        }
+        role = frozen["resource_role"]
+        resolutions[role] = {
+            "status": "compatible",
+            "logical_resource_id": frozen["logical_resource_id"],
+            "resource_role": role,
+            "portable_identity": portable_identity,
+            "semantic_identity_fingerprint": scientific_identity_fingerprint(
+                portable_identity
+            ),
+            "resolution_method": "explicit_path",
+            "resolved_path": str(path),
+            "observed_size_bytes": item["size_bytes"],
+            "observed_sha256": item["sha256"],
+            "observations": [
+                {
+                    "candidate_path": str(path),
+                    "resolution_method": "explicit_path",
+                }
+            ],
+        }
+    return resolutions
+
+
 def test_valid_five_baseline_manifest(manifest: dict) -> None:
     assert report(manifest, files=True)["status"] == "pass"
+
+
+def test_portable_dataset_identity_excludes_ineligible_lfs_like_worktree_candidates(
+    manifest: dict, tmp_path: Path
+) -> None:
+    try:
+        (tmp_path / "configs").symlink_to(ROOT / "configs", target_is_directory=True)
+    except OSError:
+        pytest.skip("directory symlinks unavailable")
+    for item in manifest["dataset_provenance"]["inputs"]:
+        if item["logical_dataset_id"] not in {
+            "ngsim_vehicle_trajectories",
+            "alibaba_cluster_trace_2018_batch_task",
+        }:
+            continue
+        pointer = tmp_path / item["logical_path"]
+        pointer.parent.mkdir(parents=True, exist_ok=True)
+        pointer.write_text(
+            f"version https://git-lfs.github.com/spec/v1\n"
+            f"oid sha256:{item['sha256']}\nsize {item['size_bytes']}\n",
+            encoding="utf-8",
+        )
+    result = validate_manifest(
+        manifest,
+        root=tmp_path,
+        check_files=True,
+        portable_dataset_resolutions=portable_dataset_resolutions(manifest),
+    )
+    assert result["status"] == "pass", result["errors"]
+    assert len(result["dataset_resolution_audit"]) == 2
+    assert {
+        row["resolution_method"] for row in result["dataset_resolution_audit"]
+    } == {"explicit_path"}
+
+
+def test_legacy_consumers_classify_matching_lfs_pointer_as_metadata(
+    manifest: dict, tmp_path: Path
+) -> None:
+    try:
+        (tmp_path / "configs").symlink_to(ROOT / "configs", target_is_directory=True)
+    except OSError:
+        pytest.skip("directory symlinks unavailable")
+    for item in manifest["dataset_provenance"]["inputs"]:
+        if item["logical_dataset_id"] not in {
+            "ngsim_vehicle_trajectories",
+            "alibaba_cluster_trace_2018_batch_task",
+        }:
+            continue
+        pointer = tmp_path / item["logical_path"]
+        pointer.parent.mkdir(parents=True, exist_ok=True)
+        pointer.write_text(
+            "version https://git-lfs.github.com/spec/v1\n"
+            f"oid sha256:{item['sha256']}\nsize {item['size_bytes']}\n",
+            encoding="utf-8",
+        )
+    result = validate_manifest(manifest, root=tmp_path, check_files=True)
+    assert result["status"] == "pass", result["errors"]
+    pointer_audits = [
+        row for row in result["dataset_resolution_audit"]
+        if row.get("ineligible_metadata_candidates")
+    ]
+    assert len(pointer_audits) == 2
+    assert all(row["status"] == "pass" for row in pointer_audits)
+
+
+def test_portable_dataset_content_conflict_remains_fail_closed(
+    manifest: dict, tmp_path: Path
+) -> None:
+    resolutions = portable_dataset_resolutions(manifest)
+    conflict = tmp_path / "conflict.csv"
+    conflict.write_text("different dataset content\n", encoding="utf-8")
+    resolutions["mobility_dataset"]["observations"].append(
+        {"candidate_path": str(conflict), "resolution_method": "data_root"}
+    )
+    result = validate_manifest(
+        manifest,
+        root=ROOT,
+        check_files=True,
+        portable_dataset_resolutions=resolutions,
+    )
+    assert result["status"] == "fail"
+    assert any(
+        "conflicting portable dataset candidates" in error
+        for error in result["errors"]
+    )
+
+
+def test_portable_dataset_role_conflict_remains_fail_closed(manifest: dict) -> None:
+    resolutions = portable_dataset_resolutions(manifest)
+    resolutions["mobility_dataset"]["resource_role"] = "workflow_dataset"
+    result = validate_manifest(
+        manifest,
+        root=ROOT,
+        check_files=True,
+        portable_dataset_resolutions=resolutions,
+    )
+    assert result["status"] == "fail"
+    assert any("portable dataset role mismatch" in error for error in result["errors"])
+
+
+def test_portable_dataset_logical_identity_swap_remains_fail_closed(
+    manifest: dict,
+) -> None:
+    resolutions = portable_dataset_resolutions(manifest)
+    resolutions["mobility_dataset"]["logical_resource_id"] = (
+        "dataset.mobility.some_other_frozen_identity"
+    )
+    result = validate_manifest(
+        manifest,
+        root=ROOT,
+        check_files=True,
+        portable_dataset_resolutions=resolutions,
+    )
+    assert result["status"] == "fail"
+    assert any(
+        "portable dataset logical resource ID mismatch" in error
+        for error in result["errors"]
+    )
+
+
+@pytest.mark.parametrize("field", ["schema_version", "revision"])
+def test_portable_dataset_schema_or_revision_swap_remains_fail_closed(
+    manifest: dict, field: str
+) -> None:
+    resolutions = portable_dataset_resolutions(manifest)
+    resolutions["mobility_dataset"]["portable_identity"][field] = "other"
+    resolutions["mobility_dataset"]["semantic_identity_fingerprint"] = (
+        scientific_identity_fingerprint(
+            resolutions["mobility_dataset"]["portable_identity"]
+        )
+    )
+    result = validate_manifest(
+        manifest,
+        root=ROOT,
+        check_files=True,
+        portable_dataset_resolutions=resolutions,
+    )
+    assert result["status"] == "fail"
+    assert any(
+        f"portable dataset frozen identity mismatch for {field}" in error
+        for error in result["errors"]
+    )
 
 
 @pytest.mark.parametrize("mode", ["missing", "duplicate", "unknown"])

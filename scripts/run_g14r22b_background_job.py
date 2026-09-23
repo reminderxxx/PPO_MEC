@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import json
 import os
+import shlex
 import signal
 import subprocess
 import sys
@@ -20,7 +21,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 
-HOST_VERSION = "g14r22b_fixed_background_host_v1"
+HOST_VERSION = "g14r22c_fixed_background_host_v2"
 TERMINAL_STATES = {"SUCCEEDED", "FAILED", "INTERRUPTED_OR_UNKNOWN"}
 
 
@@ -69,41 +70,110 @@ def command_identity(command: list[str]) -> str:
     return canonical_sha256(command)
 
 
-def process_identity(pid: int) -> dict[str, Any] | None:
-    if pid <= 0:
-        return None
+def _ps_value(pid: int, field: str) -> str | None:
     try:
         completed = subprocess.run(
-            ["ps", "-o", "lstart=", "-o", "command=", "-p", str(pid)],
+            ["ps", "-o", f"{field}=", "-p", str(pid)],
             check=False,
             capture_output=True,
             text=True,
         )
     except OSError:
         return None
-    if completed.returncode != 0 or not completed.stdout.strip():
+    value = completed.stdout.strip()
+    if completed.returncode != 0 or not value:
         return None
-    line = completed.stdout.strip()
-    # Darwin's lstart is five whitespace-delimited tokens.  Preserve it as a
-    # process-birth token and separately hash the live command line.
-    pieces = line.split(None, 5)
-    if len(pieces) < 6:
-        return None
+    return value
+
+
+def _path_identity(value: str) -> dict[str, Any]:
+    path = Path(value)
     return {
-        "pid": pid,
-        "process_start_token": " ".join(pieces[:5]),
-        "live_command_sha256": hashlib.sha256(pieces[5].encode("utf-8")).hexdigest(),
-        "live_command": pieces[5],
+        "reported_path": value,
+        "absolute_path": str(Path(os.path.abspath(value))) if path.is_absolute() else None,
+        "resolved_path": str(path.resolve(strict=False)) if path.is_absolute() else None,
     }
+
+
+def _command_evidence(command: list[str], actual_executable: Mapping[str, Any]) -> dict[str, Any]:
+    launch = Path(os.path.abspath(command[0]))
+    permitted = {
+        str(launch),
+        str(launch.resolve(strict=False)),
+    }
+    for field in ("reported_path", "absolute_path", "resolved_path"):
+        value = actual_executable.get(field)
+        if isinstance(value, str) and value:
+            permitted.add(value)
+    return {
+        "launch_executable_path": str(launch),
+        "resolved_launch_executable_path": str(launch.resolve(strict=False)),
+        "actual_process_executable": dict(actual_executable),
+        "permitted_live_argv0_paths": sorted(permitted),
+        "argv_tail_sha256": canonical_sha256(command[1:]),
+        "launch_command_sha256": command_identity(command),
+    }
+
+
+def process_identity(
+    pid: int, *, launch_command: list[str] | None = None
+) -> dict[str, Any] | None:
+    if pid <= 0:
+        return None
+    started = _ps_value(pid, "lstart")
+    live_command = _ps_value(pid, "command")
+    executable = _ps_value(pid, "comm")
+    if started is None or live_command is None or executable is None:
+        return None
+    try:
+        live_argv = shlex.split(live_command)
+    except ValueError:
+        live_argv = []
+    if not live_argv:
+        return None
+    actual_executable = _path_identity(executable)
+    identity = {
+        "pid": pid,
+        "process_start_time": started,
+        "process_start_token": started,
+        "actual_process_executable": actual_executable,
+        "live_command_sha256": hashlib.sha256(live_command.encode("utf-8")).hexdigest(),
+        "live_command": live_command,
+        "live_argv0": live_argv[0],
+        "live_argv_tail_sha256": canonical_sha256(live_argv[1:]),
+    }
+    if launch_command is not None:
+        identity["command_identity"] = _command_evidence(
+            launch_command, actual_executable
+        )
+    return identity
 
 
 def same_process(expected: Mapping[str, Any]) -> tuple[bool, dict[str, Any] | None]:
     observed = process_identity(int(expected.get("pid", -1)))
     if observed is None:
         return False, None
+    command = expected.get("command_identity")
+    if not isinstance(command, Mapping):
+        return False, observed
+    expected_actual = command.get("actual_process_executable")
+    observed_actual = observed.get("actual_process_executable")
+    if not isinstance(expected_actual, Mapping) or not isinstance(observed_actual, Mapping):
+        return False, observed
+    actual_matches = all(
+        observed_actual.get(field) == expected_actual.get(field)
+        for field in ("reported_path", "resolved_path")
+    )
+    live_argv0 = str(observed.get("live_argv0") or "")
+    live_argv0_paths = {live_argv0}
+    if Path(live_argv0).is_absolute():
+        live_argv0_paths.add(str(Path(live_argv0).resolve(strict=False)))
+    permitted = set(command.get("permitted_live_argv0_paths") or [])
     return (
         observed.get("process_start_token") == expected.get("process_start_token")
-        and observed.get("live_command_sha256") == expected.get("live_command_sha256"),
+        and actual_matches
+        and bool(live_argv0_paths & permitted)
+        and observed.get("live_argv_tail_sha256") == command.get("argv_tail_sha256"),
         observed,
     )
 
@@ -349,7 +419,7 @@ def supervise(package_path: Path, job_root: Path) -> int:
         )
         child_identity = None
         for _ in range(50):
-            child_identity = process_identity(child.pid)
+            child_identity = process_identity(child.pid, launch_command=package["command"])
             if child_identity is not None:
                 break
             time.sleep(0.02)
@@ -438,7 +508,7 @@ def launch(package_path: Path, job_root: Path) -> dict[str, Any]:
     )
     identity = None
     for _ in range(100):
-        identity = process_identity(supervisor.pid)
+        identity = process_identity(supervisor.pid, launch_command=command)
         if identity is not None:
             break
         time.sleep(0.02)
@@ -461,6 +531,7 @@ def launch(package_path: Path, job_root: Path) -> dict[str, Any]:
         "executor_commit": package["executor_commit"],
         "executor_git_tree": package["executor_git_tree"],
         "python_executable": package["python_executable"],
+        "python_resolved_executable": package["python_resolved_executable"],
         "cwd": package["cwd"],
         "automatic_retry_count": 0,
         "holdout_opened": False,

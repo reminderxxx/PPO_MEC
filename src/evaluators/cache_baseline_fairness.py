@@ -10,7 +10,7 @@ import subprocess
 from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
 
 import yaml
 
@@ -85,6 +85,30 @@ PAIRWISE_ALLOWED_PREFIXES = (
 
 class FairnessManifestError(ValueError):
     """Raised when a fairness invariant is violated."""
+
+
+def portable_dataset_resolutions_by_role(
+    portable_resource_audit: Mapping[str, Any] | None,
+) -> dict[str, dict[str, Any]] | None:
+    """Index verified dataset resolutions and reject ambiguous logical roles."""
+
+    if not isinstance(portable_resource_audit, Mapping) or portable_resource_audit.get(
+        "status"
+    ) != "pass":
+        return None
+    indexed: dict[str, dict[str, Any]] = {}
+    for resolution in portable_resource_audit.get("resolutions", []):
+        if not isinstance(resolution, dict):
+            continue
+        role = resolution.get("resource_role")
+        if role not in {"mobility_dataset", "workflow_dataset"}:
+            continue
+        if role in indexed:
+            raise FairnessManifestError(
+                f"duplicate portable dataset resolution role: {role}"
+            )
+        indexed[str(role)] = resolution
+    return indexed
 
 
 def utc_now() -> str:
@@ -927,7 +951,213 @@ def _require(mapping: dict[str, Any], key: str, errors: list[str], path: str) ->
     return mapping[key]
 
 
-def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files: bool = True) -> dict[str, Any]:
+PORTABLE_DATASET_IDENTITY_BY_LOGICAL_ID = {
+    "ngsim_vehicle_trajectories": {
+        "logical_resource_id": "dataset.mobility.ngsim.vehicle_trajectories",
+        "resource_role": "mobility_dataset",
+        "schema_version": "NGSIMProvider/v1",
+        "revision": "ngsim_20260329",
+        "expected_logical_relative_path": (
+            "raw/mobility/ngsim/"
+            "Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv"
+        ),
+        "allowed_resolvers": ["explicit_path", "data_root"],
+    },
+    "alibaba_cluster_trace_2018_batch_task": {
+        "logical_resource_id": "dataset.workflow.alibaba2018.batch_task",
+        "resource_role": "workflow_dataset",
+        "schema_version": "AlibabaDAGParser/legacy_batch_type",
+        "revision": "alibaba_cluster_trace_2018",
+        "expected_logical_relative_path": "raw/workflow/alibaba2018/batch_task.csv",
+        "allowed_resolvers": ["explicit_path", "data_root"],
+    },
+}
+
+
+def _validate_portable_dataset_resolution(
+    item: Mapping[str, Any],
+    resolution: Mapping[str, Any],
+    *,
+    expected_role: str,
+    errors: list[str],
+) -> tuple[Path | None, dict[str, Any]]:
+    """Revalidate a registry-selected dataset without admitting worktree fallbacks.
+
+    Dataset registries deliberately allow ``explicit_path`` and ``data_root`` for
+    the two external datasets.  A repository checkout may contain a Git LFS
+    pointer at the same logical relative path; that pointer is repository
+    metadata, not another dataset candidate.  The portable resolver remains the
+    authority for eligible candidates and this validator independently rechecks
+    every candidate that authority considered.
+    """
+
+    logical_path = str(item.get("logical_path") or "")
+    expectation = PORTABLE_DATASET_IDENTITY_BY_LOGICAL_ID.get(
+        str(item.get("logical_dataset_id") or "")
+    )
+    if expectation is None:
+        errors.append(f"portable dataset identity expectation missing: {logical_path}")
+        return None, {"status": "fail", "logical_path": logical_path}
+    audit: dict[str, Any] = {
+        "logical_dataset_id": item.get("logical_dataset_id"),
+        "expected_role": expected_role,
+        "portable_logical_resource_id": resolution.get("logical_resource_id"),
+        "resolution_method": resolution.get("resolution_method"),
+        "resolved_path": resolution.get("resolved_path"),
+        "eligible_candidate_count": 0,
+        "compatible_candidate_count": 0,
+        "status": "fail",
+    }
+    if resolution.get("status") != "compatible":
+        errors.append(f"portable dataset resolution is not compatible: {logical_path}")
+        return None, audit
+    if resolution.get("logical_resource_id") != expectation["logical_resource_id"]:
+        errors.append(f"portable dataset logical resource ID mismatch: {logical_path}")
+        return None, audit
+    if (
+        resolution.get("resource_role") != expected_role
+        or expected_role != expectation["resource_role"]
+    ):
+        errors.append(f"portable dataset role mismatch: {logical_path}")
+        return None, audit
+    portable_identity = resolution.get("portable_identity")
+    if not isinstance(portable_identity, Mapping):
+        errors.append(f"portable dataset frozen identity missing: {logical_path}")
+        return None, audit
+    identity_expectations = {
+        **expectation,
+        "content_sha256": item.get("sha256"),
+        "size_bytes": item.get("size_bytes"),
+        "required": True,
+        "path_relocation_allowed": True,
+    }
+    for field, expected in identity_expectations.items():
+        if portable_identity.get(field) != expected:
+            errors.append(f"portable dataset frozen identity mismatch for {field}: {logical_path}")
+            return None, audit
+    if resolution.get("semantic_identity_fingerprint") != scientific_identity_fingerprint(
+        portable_identity
+    ):
+        errors.append(f"portable dataset semantic fingerprint mismatch: {logical_path}")
+        return None, audit
+    observations = resolution.get("observations")
+    if not isinstance(observations, list) or not observations:
+        errors.append(f"portable dataset resolution observations missing: {logical_path}")
+        return None, audit
+
+    existing_identities: set[tuple[int, str]] = set()
+    compatible_paths: set[Path] = set()
+    compatible_candidates: list[tuple[Path, Any]] = []
+    rechecked: list[dict[str, Any]] = []
+    for raw in observations:
+        if not isinstance(raw, Mapping):
+            errors.append(f"portable dataset resolution observation invalid: {logical_path}")
+            continue
+        candidate_text = raw.get("candidate_path")
+        if not isinstance(candidate_text, str) or not candidate_text:
+            errors.append(f"portable dataset candidate path invalid: {logical_path}")
+            continue
+        candidate = Path(candidate_text)
+        exists = candidate.is_file()
+        row: dict[str, Any] = {
+            "candidate_path": str(candidate.absolute()),
+            "resolution_method": raw.get("resolution_method"),
+            "exists": exists,
+            "observed_size_bytes": None,
+            "observed_sha256": None,
+            "compatible": False,
+        }
+        if raw.get("resolution_method") not in expectation["allowed_resolvers"]:
+            errors.append(f"portable dataset resolver method is not allowed: {logical_path}")
+            rechecked.append(row)
+            continue
+        if exists:
+            resolved = candidate.resolve()
+            size = resolved.stat().st_size
+            digest = sha256_file(resolved)
+            identity = (size, digest)
+            existing_identities.add(identity)
+            row.update(
+                resolved_absolute_path=str(resolved),
+                observed_size_bytes=size,
+                observed_sha256=digest,
+                compatible=(
+                    size == item.get("size_bytes") and digest == item.get("sha256")
+                ),
+            )
+            if row["compatible"]:
+                compatible_paths.add(resolved)
+                compatible_candidates.append((resolved, raw.get("resolution_method")))
+        rechecked.append(row)
+    audit["eligible_candidate_count"] = len(rechecked)
+    audit["compatible_candidate_count"] = len(compatible_paths)
+    audit["rechecked_candidates"] = rechecked
+    if len(existing_identities) > 1:
+        errors.append(f"conflicting portable dataset candidates: {logical_path}")
+        return None, audit
+    if not compatible_paths:
+        errors.append(f"portable dataset hash/size mismatch: {logical_path}")
+        return None, audit
+
+    selected_text = resolution.get("resolved_path")
+    if not isinstance(selected_text, str) or not selected_text:
+        errors.append(f"portable dataset resolved path missing: {logical_path}")
+        return None, audit
+    selected = Path(selected_text).resolve()
+    if selected not in compatible_paths:
+        errors.append(f"portable dataset selected path was not a compatible candidate: {logical_path}")
+        return None, audit
+    first_compatible_path, first_compatible_method = compatible_candidates[0]
+    if (
+        selected != first_compatible_path
+        or resolution.get("resolution_method") != first_compatible_method
+    ):
+        errors.append(f"portable dataset resolver precedence mismatch: {logical_path}")
+        return None, audit
+    if (
+        resolution.get("observed_size_bytes") != item.get("size_bytes")
+        or resolution.get("observed_sha256") != item.get("sha256")
+    ):
+        errors.append(f"portable dataset resolution audit drift: {logical_path}")
+        return None, audit
+    audit["status"] = "pass"
+    audit["selection_rule"] = (
+        "portable_registry_eligible_candidates; explicit_path precedes allowed roots; "
+        "content/role conflict rejected"
+    )
+    return selected, audit
+
+
+def _git_lfs_pointer_identity(path: Path) -> dict[str, Any] | None:
+    """Return locator metadata for a small canonical Git LFS pointer file."""
+
+    if not path.is_file() or path.stat().st_size > 1024:
+        return None
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeDecodeError):
+        return None
+    if len(lines) != 3 or lines[0] != "version https://git-lfs.github.com/spec/v1":
+        return None
+    if not lines[1].startswith("oid sha256:") or not lines[2].startswith("size "):
+        return None
+    digest = lines[1].split(":", 1)[1]
+    try:
+        size = int(lines[2].split(" ", 1)[1])
+    except ValueError:
+        return None
+    if len(digest) != 64 or any(character not in "0123456789abcdef" for character in digest):
+        return None
+    return {"content_sha256": digest, "size_bytes": size}
+
+
+def validate_manifest(
+    manifest: dict[str, Any],
+    *,
+    root: str | Path,
+    check_files: bool = True,
+    portable_dataset_resolutions: Mapping[str, Mapping[str, Any]] | None = None,
+) -> dict[str, Any]:
     errors: list[str] = []
     warnings: list[str] = []
     checked: list[str] = []
@@ -952,10 +1182,37 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
         errors.append("G07 dataset sources must be ngsim + alibaba2018")
     if dataset.get("download_policy", "").split(";", 1)[0] != "forbidden":
         errors.append("automatic dataset download must be forbidden")
+    dataset_resolution_audit: list[dict[str, Any]] = []
     if check_files:
         resolved_inputs: dict[str, Path] = {}
         for item in dataset.get("inputs", []):
             logical_path = item.get("logical_path")
+            logical_dataset_id = str(item.get("logical_dataset_id") or "")
+            portable_expectation = PORTABLE_DATASET_IDENTITY_BY_LOGICAL_ID.get(
+                logical_dataset_id
+            )
+            expected_portable_role = (
+                portable_expectation.get("resource_role")
+                if portable_expectation is not None
+                else None
+            )
+            if expected_portable_role and portable_dataset_resolutions is not None:
+                resolution = portable_dataset_resolutions.get(expected_portable_role)
+                if not isinstance(resolution, Mapping):
+                    errors.append(
+                        f"portable dataset resolution missing for role: {expected_portable_role}"
+                    )
+                    continue
+                candidate, resolution_audit = _validate_portable_dataset_resolution(
+                    item,
+                    resolution,
+                    expected_role=expected_portable_role,
+                    errors=errors,
+                )
+                dataset_resolution_audit.append(resolution_audit)
+                if candidate is not None:
+                    resolved_inputs[logical_dataset_id] = candidate
+                continue
             candidates = []
             for candidate in (
                 Path(item.get("normalized_absolute_path") or ""),
@@ -963,7 +1220,42 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
             ):
                 if str(candidate) and candidate not in candidates:
                     candidates.append(candidate)
-            existing = [candidate for candidate in candidates if candidate.is_file()]
+            existing: list[Path] = []
+            pointer_rows: list[dict[str, Any]] = []
+            for candidate in candidates:
+                if not candidate.is_file():
+                    continue
+                pointer = _git_lfs_pointer_identity(candidate)
+                if pointer is None:
+                    existing.append(candidate)
+                    continue
+                pointer_matches = (
+                    pointer.get("content_sha256") == item.get("sha256")
+                    and pointer.get("size_bytes") == item.get("size_bytes")
+                )
+                pointer_rows.append(
+                    {
+                        "candidate_path": str(candidate.absolute()),
+                        "logical_role": "git_lfs_pointer_metadata",
+                        "pointer_content_sha256": pointer.get("content_sha256"),
+                        "pointer_size_bytes": pointer.get("size_bytes"),
+                        "matches_frozen_dataset_identity": pointer_matches,
+                        "eligible_as_dataset_content": False,
+                    }
+                )
+                if not pointer_matches:
+                    errors.append(f"dataset Git LFS pointer identity mismatch: {logical_path}")
+            if pointer_rows:
+                dataset_resolution_audit.append(
+                    {
+                        "logical_dataset_id": logical_dataset_id,
+                        "status": "pass" if all(
+                            row["matches_frozen_dataset_identity"] for row in pointer_rows
+                        ) else "fail",
+                        "selection_rule": "Git LFS pointer is locator metadata, not dataset content",
+                        "ineligible_metadata_candidates": pointer_rows,
+                    }
+                )
             compatible = [
                 candidate
                 for candidate in existing
@@ -1273,16 +1565,28 @@ def validate_manifest(manifest: dict[str, Any], *, root: str | Path, check_files
         "manifest_id": identity.get("manifest_id"),
         "manifest_hash": actual_full,
         "semantic_protocol_hash": actual_semantic,
+        "dataset_resolution_audit": dataset_resolution_audit,
         "pairwise_protocol_diff": pairwise,
         "validated_at": utc_now(),
     }
 
 
-def load_and_validate_manifest(path: str | Path, *, root: str | Path, check_files: bool = True) -> tuple[dict[str, Any], dict[str, Any]]:
+def load_and_validate_manifest(
+    path: str | Path,
+    *,
+    root: str | Path,
+    check_files: bool = True,
+    portable_dataset_resolutions: Mapping[str, Mapping[str, Any]] | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     manifest = json.loads(Path(path).read_text(encoding="utf-8-sig"))
     if not isinstance(manifest, dict):
         raise FairnessManifestError("fairness manifest must be a JSON object")
-    report = validate_manifest(manifest, root=root, check_files=check_files)
+    report = validate_manifest(
+        manifest,
+        root=root,
+        check_files=check_files,
+        portable_dataset_resolutions=portable_dataset_resolutions,
+    )
     if report["status"] != "pass":
         raise FairnessManifestError("; ".join(report["errors"]))
     return manifest, report

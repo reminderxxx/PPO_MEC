@@ -14,7 +14,10 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.evaluators.cache_baseline_fairness import load_and_validate_manifest
+from src.evaluators.cache_baseline_fairness import (
+    load_and_validate_manifest,
+    portable_dataset_resolutions_by_role,
+)
 from src.evaluators.typed_model_cache_formal_execution import (
     FormalExecutionError,
     support_setting_by_id,
@@ -417,7 +420,12 @@ def main() -> None:
     setting = support_setting_by_id(protocol, args.setting_id)
     runtime = resolve_model_cache_runtime(args.model_cache_runtime_config, root=ROOT)
     fairness, fairness_report = load_and_validate_manifest(
-        args.cache_baseline_fairness_manifest_path, root=ROOT, check_files=True
+        args.cache_baseline_fairness_manifest_path,
+        root=ROOT,
+        check_files=True,
+        portable_dataset_resolutions=portable_dataset_resolutions_by_role(
+            getattr(args, "_portable_resource_resolution", None)
+        ),
     )
     if fairness_report.get("status") != "pass":
         raise FormalExecutionError("fairness manifest validation failed")

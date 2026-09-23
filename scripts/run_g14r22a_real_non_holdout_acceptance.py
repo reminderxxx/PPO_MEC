@@ -145,7 +145,7 @@ def build_package(
         "output_root": str(output_root),
         "phases": ["scientific", "statistics", "publication", "integrity"],
         "scientific_matrix": {
-            "profile": "g14r22a_real_non_holdout_test_only",
+            "profile": "g14r22c_real_non_holdout_test_only",
             "agents": list(TEST_AGENTS),
             "seeds": [TEST_SEED],
             "capacities": list(CAPACITIES),
@@ -164,7 +164,7 @@ def build_package(
         "automatic_retry_count": 0,
         "acceptance_non_holdout": True,
         "acceptance_request_sha256": canonical_sha256({
-            "profile": "g14r22a_real_non_holdout_test_only",
+            "profile": "g14r22c_real_non_holdout_test_only",
             "executor_commit": executor_commit,
             "output_root": str(output_root),
         }),
@@ -302,7 +302,7 @@ def main() -> int:
             validation_failure = f"{type(exc).__name__}: {exc}"
     passed = completed.returncode == 0 and validation_failure is None
     receipt = {
-        "acceptance_version": "g14r22a_real_non_holdout_benchmark_v1",
+        "acceptance_version": "g14r22c_real_non_holdout_benchmark_v1",
         "test_only": True,
         "formal_statistics_eligible": False,
         "holdout_opened": False,
