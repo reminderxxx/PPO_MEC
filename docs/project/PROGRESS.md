@@ -9,7 +9,7 @@
 - background host v2 分离 launch/resolved Python path、actual process executable、start token 与 argv-tail identity；
   venv argv0 合法解析不再造成 false-negative。PID-only、birth/executable/command mismatch 和证据不足均保持
   `INTERRUPTED_OR_UNKNOWN`，不会自动重启。
-- 定向 resolver/background/capacity/producer-integrity 122 tests、publication/statistics/environment 33 tests 与 smoke 通过；独立只读复审另有定向 111 tests 和 generated-resource/formal-execution/integrity 98 tests 通过；真实 G14R22-B command 的只读数据解析
+- 定向 resolver/background/capacity/producer-integrity 122 tests、publication/statistics/environment 33 tests 与 smoke 通过；独立只读复审另有定向 111 tests 和 generated-resource/formal-execution/integrity 98 tests 通过；最终 `cc6edfc` clean detached executor 的含 live-consumer 合并回归 136 tests 通过；真实 G14R22-B command 的只读数据解析
   preflight 通过。旧失败 root/receipt 未修改，holdout unopened，训练/选模/正式矩阵均为 0。
 - 新单次 public non-holdout 后台验收须在 final clean executor 与全新 package/root 上启动。本轮启动后即停止 AI
   轮次，不轮询、不监控、不重试；未读回 terminal receipt 前 verdict 固定为 `NOT READY`。详见

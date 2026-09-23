@@ -1,0 +1,41 @@
+{
+  "checklist_version": "g14r22c_prelaunch_protection_and_integrity_v1",
+  "recorded_at": "2026-09-23T09:22:40Z",
+  "status": "prelaunch_pass",
+  "executor": {
+    "checkout": "/Users/howen/Projects/PPO_MEC_g14r22_c_executor",
+    "commit": "cc6edfc43f826dd252443897cffe01d9e7508fa1",
+    "git_tree": "aa45e7fed6faf5981e0791b8264172bd3a458cb5",
+    "clean": true,
+    "clean_checkout_regression": "136 passed"
+  },
+  "old_failed_root": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1",
+    "file_count": 23,
+    "retry_resume_reopen_allowed": false,
+    "terminal_receipt_sha256": "068e8b86e6cc7fb0972b2bbde19cb9ec4ece547aca90214b8b4a3e7f3a877a1c",
+    "scientific_receipt_sha256": "0a25defd5db1b271cd3c83d79a3bba0fbd2d4c07c1885f799ffacb4b1069b668",
+    "failure_stderr_sha256": "46265db4007c760095cacbda2345542d5ad727693f7455972a89fd900e3ceabd"
+  },
+  "new_identity": {
+    "request_sha256": "307397b24d99a96b980c78539f96a76931809230767b48c6a029f67c4117ddd2",
+    "scientific_command_package_sha256": "8e590f8473b7657c090adb72a05bf371e248b183b32afb042e28194aaddaa73c",
+    "background_job_package_sha256": "a5ee5b189889128bf9f09530eeaed3067e3fe05df0e9f69f8fdacf18130e3bc5",
+    "background_job_canonical_sha256": "a9e532a4761494e946a53eb52398cfdad9f1d58faa6a84b7792c7d2750d83e74",
+    "automatic_retry_count": 0,
+    "grant_signed": false,
+    "token_issued": false,
+    "holdout_opened": false
+  },
+  "post_run_readback_required": [
+    "terminal receipt is SUCCEEDED and identity-bound",
+    "scientific receipt is complete and identity-bound",
+    "checkpoint loading and real rollout counts are present",
+    "all three capacity CSV files physically exist",
+    "capacity_label is present and populated in actual CSV rows",
+    "capacity-aware pairing and grouping consume the CSV label",
+    "corrected statistics preserve the observed 59/84 CI-high changes without hard-coded conclusions",
+    "publication integrity manifest hashes every required published artifact"
+  ],
+  "current_verdict": "REAL_CHAIN_UNVERIFIED_NOT_READY"
+}

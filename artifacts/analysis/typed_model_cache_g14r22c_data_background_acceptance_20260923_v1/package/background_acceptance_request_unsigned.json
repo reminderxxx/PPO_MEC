@@ -1,0 +1,38 @@
+{
+  "request_version": "g14r22c_public_non_holdout_background_acceptance_v1",
+  "created_at": "2026-09-23T09:22:10.161996+00:00",
+  "status": "UNSIGNED_TEST_ONLY",
+  "grant_signed": false,
+  "token_issued": false,
+  "holdout_opened": false,
+  "training_allowed": false,
+  "model_selection_allowed": false,
+  "formal_rollout_rerun_allowed": false,
+  "automatic_retry_count": 0,
+  "acceptance_scope": {
+    "split": "formal_public_non_holdout",
+    "agents": [
+      "reactive_lru",
+      "sa_ghmappo"
+    ],
+    "seeds": [
+      7
+    ],
+    "capacities": [
+      "constrained_288mb",
+      "medium_576mb",
+      "relaxed_864mb"
+    ],
+    "expected_benchmark_rows": 216,
+    "expected_statistics_rows": 6,
+    "purpose": "capacity identity producer/CSV/statistics closure only"
+  },
+  "executor": {
+    "checkout": "/Users/howen/Projects/PPO_MEC_g14r22_c_executor",
+    "commit": "cc6edfc43f826dd252443897cffe01d9e7508fa1",
+    "git_tree": "aa45e7fed6faf5981e0791b8264172bd3a458cb5",
+    "python_executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "python_resolved_executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9"
+  },
+  "request_canonical_sha256": "771dfe8972fa7b906d3cce99434ad053ed57a00248d26cbc9dd13edefe95294a"
+}

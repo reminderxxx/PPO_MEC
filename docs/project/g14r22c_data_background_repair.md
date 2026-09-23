@@ -6,7 +6,8 @@
 - `artifact_run_id`: `typed_model_cache_g14r22c_data_background_acceptance_20260923_v1`
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `base_git_commit`: `33d8aa8fba2361e4b0598fe193dda7ceae4816f5`
-- `executor_git_commit`: `PENDING_FINAL_EXECUTOR_COMMIT`
+- `executor_git_commit`: `cc6edfc43f826dd252443897cffe01d9e7508fa1`
+- `executor_git_tree`: `aa45e7fed6faf5981e0791b8264172bd3a458cb5`
 - `evidence_level`: `E2_TARGETED_IMPLEMENTATION_AND_REAL_RESOURCE_PREFLIGHT; REAL_PUBLIC_CHAIN_PENDING_SINGLE_BACKGROUND_LAUNCH`
 - `grant_signed`: `false`
 - `token_issued`: `false`
@@ -66,6 +67,8 @@ resume、reopen 或第二次 launch。
 - 定向 resolver/background/capacity/producer-integrity 回归：`122 passed`。
 - 独立只读复审另行执行的定向组合为 `111 passed`，相关 generated-resource/formal-execution/integrity
   为 `98 passed`；复审 verdict 为 `GO_AFTER_FINAL_COMMIT_AND_CLEAN-CHECKOUT_REGRESSION`，不等于 scientific READY。
+- 最终 commit 的 clean detached executor 合并回归（含原先由 dirty-checkout 保护拒绝的 13 个 live-consumer 用例）：
+  `136 passed`。
 - dedicated publication/statistics/environment 回归：`33 passed`。
 - toy smoke：通过。
 - G14R22-B 失败 root 未修改；旧 opening/execution/terminal receipts 继续声明永久消费，禁止 retry/resume/reopen。
@@ -87,3 +90,7 @@ capacity-aware statistics、publication integrity 与 terminal receipt。
 当前 provisional verdict：`IMPLEMENTATION_AND_PREFLIGHT_PASS / REAL_CHAIN_NOT_YET_VERIFIED / NOT READY`。
 只有新 job 的 terminal receipt 为 `SUCCEEDED`，且科学 receipt、三容量 CSV、statistics 和完整性逐文件复核均通过，
 才可在后续独立审查中升级；否则准确保留失败或 UNKNOWN，绝不宣称 READY。
+
+冻结身份：request SHA-256 为 `307397b24d99a96b980c78539f96a76931809230767b48c6a029f67c4117ddd2`，
+scientific package SHA-256 为 `8e590f8473b7657c090adb72a05bf371e248b183b32afb042e28194aaddaa73c`，
+background job canonical SHA-256 为 `a9e532a4761494e946a53eb52398cfdad9f1d58faa6a84b7792c7d2750d83e74`。

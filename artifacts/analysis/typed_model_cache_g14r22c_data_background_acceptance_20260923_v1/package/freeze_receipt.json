@@ -1,0 +1,30 @@
+{
+  "freeze_version": "g14r22c_background_acceptance_freeze_v1",
+  "created_at": "2026-09-23T09:22:10.161996+00:00",
+  "request": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/package/background_acceptance_request_unsigned.json",
+    "sha256": "307397b24d99a96b980c78539f96a76931809230767b48c6a029f67c4117ddd2"
+  },
+  "scientific_command_package": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/package/scientific_command_package.json",
+    "sha256": "8e590f8473b7657c090adb72a05bf371e248b183b32afb042e28194aaddaa73c"
+  },
+  "background_job_package": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/package/background_job_package.json",
+    "sha256": "a5ee5b189889128bf9f09530eeaed3067e3fe05df0e9f69f8fdacf18130e3bc5",
+    "canonical_sha256": "a9e532a4761494e946a53eb52398cfdad9f1d58faa6a84b7792c7d2750d83e74"
+  },
+  "executor_commit": "cc6edfc43f826dd252443897cffe01d9e7508fa1",
+  "executor_git_tree": "aa45e7fed6faf5981e0791b8264172bd3a458cb5",
+  "automatic_retry_count": 0,
+  "holdout_opened": false,
+  "launch_command": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "/Users/howen/Projects/PPO_MEC_g14r22_c_executor/scripts/run_g14r22b_background_job.py",
+    "launch",
+    "--job-package",
+    "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/package/background_job_package.json",
+    "--job-root",
+    "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/background_job"
+  ]
+}

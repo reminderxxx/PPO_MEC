@@ -1,0 +1,53 @@
+{
+  "preflight_version": "g14r22c_real_resource_preflight_v1",
+  "recorded_at": "2026-09-23T09:22:40Z",
+  "base_commit": "33d8aa8fba2361e4b0598fe193dda7ceae4816f5",
+  "executor_commit": "cc6edfc43f826dd252443897cffe01d9e7508fa1",
+  "status": "pass",
+  "portable_resolution_status": "pass",
+  "fairness_validation_status": "pass",
+  "datasets": [
+    {
+      "logical_resource_id": "dataset.mobility.ngsim.vehicle_trajectories",
+      "logical_role": "mobility_dataset",
+      "schema_version": "NGSIMProvider/v1",
+      "revision": "ngsim_20260329",
+      "selected_resolution_method": "explicit_path",
+      "selected_candidate_index": 0,
+      "selected_path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+      "content_sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+      "size_bytes": 2118175938,
+      "executor_locator_path": "/Users/howen/.codex/worktrees/g14r22b-executor/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+      "executor_locator_role": "git_lfs_pointer_metadata",
+      "executor_locator_sha256": "48c89cbaccd30352e25d7f29e2f2029cd91e95d84aa0821ba1399fdc00e0d054",
+      "executor_locator_size_bytes": 135,
+      "why_previously_in_candidate_set": "legacy fairness validation independently joined executor ROOT_DIR with the manifest logical path after portable resolution",
+      "eligible_as_dataset_content": false
+    },
+    {
+      "logical_resource_id": "dataset.workflow.alibaba2018.batch_task",
+      "logical_role": "workflow_dataset",
+      "schema_version": "AlibabaDAGParser/legacy_batch_type",
+      "revision": "alibaba_cluster_trace_2018",
+      "selected_resolution_method": "explicit_path",
+      "selected_candidate_index": 0,
+      "selected_path": "/Users/howen/Projects/PPO_MEC/data/raw/workflow/alibaba2018/batch_task.csv",
+      "content_sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc",
+      "size_bytes": 802261444,
+      "executor_locator_path": "/Users/howen/.codex/worktrees/g14r22b-executor/PPO_MEC/data/raw/workflow/alibaba2018/batch_task.csv",
+      "executor_locator_role": "git_lfs_pointer_metadata",
+      "executor_locator_sha256": "14d63f5b68fcba83931563b8bff35d6e22df043b470604e233b1811c04027a3f",
+      "executor_locator_size_bytes": 134,
+      "why_previously_in_candidate_set": "legacy fairness validation independently joined executor ROOT_DIR with the manifest logical path after portable resolution",
+      "eligible_as_dataset_content": false
+    }
+  ],
+  "guardrails": {
+    "conflicting_content_rejected": true,
+    "conflicting_role_rejected": true,
+    "logical_identity_schema_revision_verified": true,
+    "explicit_path_precedes_data_root_when_both_are_compatible": true,
+    "fallback_used": false,
+    "real_data_deleted_or_modified": false
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "host_version": "g14r22c_fixed_background_host_v2",
+  "job_id": "g14r22c_real_non_holdout_capacity_identity_v1",
+  "executor_checkout": "/Users/howen/Projects/PPO_MEC_g14r22_c_executor",
+  "executor_commit": "cc6edfc43f826dd252443897cffe01d9e7508fa1",
+  "executor_git_tree": "aa45e7fed6faf5981e0791b8264172bd3a458cb5",
+  "cwd": "/Users/howen/Projects/PPO_MEC_g14r22_c_executor",
+  "python_executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "python_resolved_executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9",
+  "environment": {
+    "PATH": "/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/opt/homebrew/bin:/Users/howen/.codex/tmp/arg0/codex-arg0WM5XKl:/Users/howen/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/howen/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources",
+    "LANG": "en_US.UTF-8",
+    "LC_ALL": "en_US.UTF-8",
+    "PYTHONHASHSEED": "0",
+    "PYTHONNOUSERSITE": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1",
+    "PYTHONPATH": "/Users/howen/Projects/PPO_MEC_g14r22_c_executor",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "TOKENIZERS_PARALLELISM": "false"
+  },
+  "command": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "/Users/howen/Projects/PPO_MEC_g14r22_c_executor/scripts/run_g14r22a_real_non_holdout_acceptance.py",
+    "--executor-checkout",
+    "/Users/howen/Projects/PPO_MEC_g14r22_c_executor",
+    "--executor-commit",
+    "cc6edfc43f826dd252443897cffe01d9e7508fa1",
+    "--work-root",
+    "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/real_non_holdout",
+    "--prepared-command-package-path",
+    "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/package/scientific_command_package.json",
+    "--background-request-path",
+    "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/package/background_acceptance_request_unsigned.json"
+  ],
+  "request": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/package/background_acceptance_request_unsigned.json",
+    "sha256": "307397b24d99a96b980c78539f96a76931809230767b48c6a029f67c4117ddd2"
+  },
+  "scientific_command_package": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/package/scientific_command_package.json",
+    "sha256": "8e590f8473b7657c090adb72a05bf371e248b183b32afb042e28194aaddaa73c"
+  },
+  "terminal_contract": {
+    "scientific_receipt_path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/real_non_holdout/acceptance_receipt.json",
+    "integrity_manifest_path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/real_non_holdout/public_entry_output/artifact_integrity_manifest.json",
+    "integrity_root": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/real_non_holdout/public_entry_output/published",
+    "expected_receipt_bindings": {
+      "executor_commit": "cc6edfc43f826dd252443897cffe01d9e7508fa1",
+      "executor_git_tree": "aa45e7fed6faf5981e0791b8264172bd3a458cb5",
+      "command_package_sha256": "8e590f8473b7657c090adb72a05bf371e248b183b32afb042e28194aaddaa73c",
+      "background_request_sha256": "307397b24d99a96b980c78539f96a76931809230767b48c6a029f67c4117ddd2"
+    }
+  },
+  "scientific_work_root": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/real_non_holdout",
+  "job_root": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/background_job",
+  "automatic_retry_count": 0,
+  "holdout_opened": false,
+  "job_package_sha256": "a9e532a4761494e946a53eb52398cfdad9f1d58faa6a84b7792c7d2750d83e74"
+}

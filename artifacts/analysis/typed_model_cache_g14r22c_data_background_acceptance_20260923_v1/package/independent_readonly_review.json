@@ -1,0 +1,28 @@
+{
+  "review_version": "g14r22c_independent_readonly_review_v1",
+  "reviewed_at": "2026-09-23",
+  "literature_cutoff": "2026-09-21",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "base_commit": "33d8aa8fba2361e4b0598fe193dda7ceae4816f5",
+  "reviewed_executor_commit": "cc6edfc43f826dd252443897cffe01d9e7508fa1",
+  "artifact_run_id": "typed_model_cache_g14r22c_data_background_acceptance_20260923_v1",
+  "evidence_level": "E2_TARGETED_IMPLEMENTATION_AND_REAL_RESOURCE_PREFLIGHT",
+  "verdict": "GO_AFTER_FINAL_COMMIT_AND_CLEAN-CHECKOUT_REGRESSION",
+  "scientific_ready": false,
+  "code_level_launch_blockers": [],
+  "closed_major_findings": [
+    "portable dataset audit now binds logical resource ID, role, schema, revision, expected path, allowed resolvers, content identity and semantic fingerprint",
+    "benchmark, formal support, dev selection and cache-policy consumers forward or reconstruct the verified dataset audit; no-registry consumers classify only exact canonical Git LFS pointers as ineligible locator metadata"
+  ],
+  "reviewer_validation": {
+    "targeted_tests": "111 passed",
+    "generated_resource_formal_execution_integrity_tests": "98 passed",
+    "changed_file_syntax_check": "pass",
+    "real_old_pointer_portable_and_legacy_integration": "pass"
+  },
+  "post_review_clean_executor_validation": "136 passed",
+  "remaining_boundary": "real public chain remains UNVERIFIED until a later read-only audit of terminal receipt and actual artifacts",
+  "reviewer_modified_files": false,
+  "reviewer_launched_or_monitored_job": false
+}
