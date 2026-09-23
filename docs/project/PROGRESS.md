@@ -2044,3 +2044,5 @@ JUnit 和未签发新申请由独立 I2 验收记录绑定。本记录不提前�
 - 新真实测试链固定三容量、`reactive_lru + sa_ghmappo`、seed 7、1 workflow、1 step、12 public formal windows，
   明确 `test_only` / `formal_statistics_eligible=false`。长验收只可在最终 clean executor commit 后启动。
 - 未签 grant/token，未读取或运行 sealed holdout，`holdout_opened=false`。
+- executor code commit=`ce5e9e0`、tree=`389076e1` 已通过 59 项目标回归；绑定该身份的 v2 unsigned request/
+  command package 已重生成并通过 qualify，旧 v1 包保留为 superseded，仍未授权。

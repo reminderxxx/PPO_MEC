@@ -1,0 +1,16 @@
+{
+  "artifact_run_id": "typed_model_cache_g14r22_holdout_execution_contract_20260923_v2",
+  "status": "READY_FOR_AUTHORIZATION_REVIEW",
+  "purpose": "superseding unsigned request after G14R22-A producer/consumer repair",
+  "executor_commit": "ce5e9e02c92e9e3a723a8bf45bead531518dfe4c",
+  "executor_git_tree": "389076e110194d21e80f857cf6d3400cd9409bc3",
+  "request_sha256": "91f9568b93a590eb975afb0a2a281e5c3334d95ec9fadb18a3474ad348499069",
+  "command_package_sha256": "e4b924282274d9aa8ec75374ae44bfea5404355900134bfa84a6333b93c2fdf3",
+  "evaluation_execution_contract_sha256": "d8b57bee16ace296cdd9754cdb5ec1684f6b4b836ecc30d45e0751cb74175957",
+  "grant_signed": false,
+  "execution_authorized": false,
+  "holdout_opened": false,
+  "holdout_consumed_permanently": false,
+  "formal_or_holdout_policy_runs": 0,
+  "note": "This package is unsigned and unissued. It does not authorize execution."
+}

@@ -1,0 +1,16 @@
+{
+  "supersession_version": "g14r22a_supersession_v1",
+  "superseded_root": "artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v1",
+  "superseded_request_sha256": "6383eb01e497b04a75474cfadaada637bb1f88e3a891a91515901443abca61ed",
+  "superseded_command_package_sha256": "81271e69257e4187c4a159ca2cfe05cce20f8b36cfb9840fbfb424225764e5c8",
+  "superseded_executor_commit": "3d34f2b967ac7f9e2111744665cfe6a5bf0c7b42",
+  "reason": "G14R22-A found that the old command package omitted evaluation_execution_contract.json required by the real checkpoint consumer.",
+  "retention": "retained read-only for audit; must not be signed or executed",
+  "replacement_root": "artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v2",
+  "replacement_request_sha256": "91f9568b93a590eb975afb0a2a281e5c3334d95ec9fadb18a3474ad348499069",
+  "replacement_command_package_sha256": "e4b924282274d9aa8ec75374ae44bfea5404355900134bfa84a6333b93c2fdf3",
+  "replacement_executor_commit": "ce5e9e02c92e9e3a723a8bf45bead531518dfe4c",
+  "grant_signed": false,
+  "execution_authorized": false,
+  "holdout_opened": false
+}

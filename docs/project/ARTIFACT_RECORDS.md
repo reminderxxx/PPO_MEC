@@ -1565,3 +1565,13 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 七个用户修改文件 SHA-256 未变且未纳入任何提交。Protocol 2.9、Readiness v21、科学配置及旧 invalid-run
 限制均未改变。v16 仍未创建、未消耗、未执行；这是启动授权暂缓，不是运行失败。main 测试使用受控数据
 准备，public preflight 不等于完整正式评估；无正式训练、formal performance、holdout、G14D/G15 或论文结论。
+## 2026-09-23 G14R22-A unsigned request v2（未授权；holdout unopened）
+
+- root：`artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v2/`
+- executor：commit `ce5e9e02c92e9e3a723a8bf45bead531518dfe4c`，tree
+  `389076e110194d21e80f857cf6d3400cd9409bc3`
+- request canonical SHA-256：`91f9568b93a590eb975afb0a2a281e5c3334d95ec9fadb18a3474ad348499069`
+- command package canonical SHA-256：`e4b924282274d9aa8ec75374ae44bfea5404355900134bfa84a6333b93c2fdf3`
+- 内容：完整 evaluation contract/context/source identity bundle、150-checkpoint pre-open byte audit、integrity checklist、
+  artifact manifest 与 v1 superseded record。`qualify` pass 只表示 unsigned 包完整，不是 grant。
+- 状态：`grant_signed=false`、`execution_authorized=false`、`holdout_opened=false`；没有 holdout policy run。

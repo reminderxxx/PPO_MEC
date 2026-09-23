@@ -4,6 +4,8 @@
 - `literature_cutoff`: `2026-09-21`（本轮不评价 novelty）
 - `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`
 - `artifact_run_id`: `typed_model_cache_g14r22a_real_non_holdout_acceptance_20260923_v1`
+- `executor_commit`: `ce5e9e02c92e9e3a723a8bf45bead531518dfe4c`
+- `executor_git_tree`: `389076e110194d21e80f857cf6d3400cd9409bc3`
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `evidence_level`: `E1_IMPLEMENTED_PENDING_REAL_LOCAL_COMPLETION`
 - `holdout_opened`: `false`
@@ -41,3 +43,9 @@ G14R22 的 `scripts/g14r22_non_holdout_scientific_child.py` 直接按公式生�
 长验收只能从最终 clean executor commit 启动。完成回执由
 `scripts/run_g14r22a_real_non_holdout_acceptance.py` 写入独立 artifact root；本合同不签 grant/token，不提供 holdout
 capability，也不读取 sealed holdout performance。
+
+基于该 executor 重新生成的 unsigned holdout request 位于
+`artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v2/`：request SHA-256=
+`91f9568b93a590eb975afb0a2a281e5c3334d95ec9fadb18a3474ad348499069`，command package canonical SHA-256=
+`e4b924282274d9aa8ec75374ae44bfea5404355900134bfa84a6333b93c2fdf3`。v1 原包保留并显式 superseded；v2 仍
+`grant_signed=false`、`execution_authorized=false`、`holdout_opened=false`。
