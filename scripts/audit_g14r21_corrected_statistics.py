@@ -12,7 +12,7 @@ import sys
 import hashlib
 from collections import defaultdict
 from pathlib import Path
-from statistics import fmean
+from statistics import fmean, stdev
 from typing import Any
 
 LOWER_IS_BETTER = {"transfer_mb_per_request", "end_to_end_workflow_delay"}
@@ -48,6 +48,8 @@ def main() -> int:
     args = parser.parse_args()
     corrected = json.loads(args.corrected_statistics.read_text(encoding="utf-8"))
     pair_fields = corrected["pair_keys"]
+    outer_fields = corrected["outer_cluster_keys"]
+    inner_fields = corrected["inner_cluster_keys"]
     candidate = corrected["pairwise_comparison_identity"]["candidate_agent"]
     baselines = corrected["pairwise_comparison_identity"]["baseline_agent_order"]
     metrics = list(dict.fromkeys(row["metric"] for row in corrected["rows"]))
@@ -56,7 +58,10 @@ def main() -> int:
         path = Path(path_text)
         with path.open("r", encoding="utf-8-sig", newline="") as handle:
             for row in csv.DictReader(handle):
-                key = (str(path), *(f"{field}={row.get(field, '')}" for field in pair_fields if row.get(field, "") != ""))
+                missing = [field for field in (*pair_fields, *outer_fields, *inner_fields) if not row.get(field)]
+                if missing:
+                    raise ValueError(f"independent audit missing identity fields: {missing}")
+                key = tuple(f"{field}={row[field]}" for field in pair_fields)
                 agents = paired.setdefault(key, {})
                 if row["agent_name"] in agents:
                     raise ValueError("duplicate independent-audit pair row")
@@ -69,7 +74,7 @@ def main() -> int:
             total = available = candidate_only = baseline_only = both_missing = 0
             for agents in paired.values():
                 if candidate not in agents or baseline not in agents:
-                    continue
+                    raise ValueError("independent audit found incomplete pair matrix")
                 total += 1
                 candidate_row, baseline_row = agents[candidate], agents[baseline]
                 left, right = number(candidate_row[metric]), number(baseline_row[metric])
@@ -86,14 +91,23 @@ def main() -> int:
                 raw = left - right
                 signed = -raw if metric in LOWER_IS_BETTER else raw
                 raw_values.append(raw)
-                outer = tuple(
-                    candidate_row[field]
-                    for field in ("source_segment_run_id", "window_id")
-                    if candidate_row.get(field, "") != ""
-                )
-                inner = (candidate_row["seed"], candidate_row["workflow_id"])
+                outer = tuple(candidate_row[field] for field in outer_fields)
+                inner = tuple(candidate_row[field] for field in inner_fields)
+                if outer != tuple(baseline_row[field] for field in outer_fields):
+                    raise ValueError("independent audit found conflicting outer identity")
+                if inner != tuple(baseline_row[field] for field in inner_fields):
+                    raise ValueError("independent audit found conflicting inner identity")
                 nested[outer][inner].append(signed)
             window_values = [fmean([fmean(values) for values in inner.values()]) for inner in nested.values()]
+            signed_values = [
+                value
+                for inner_groups in nested.values()
+                for values in inner_groups.values()
+                for value in values
+            ]
+            signed_std = stdev(signed_values) if len(signed_values) > 1 else 0.0
+            outer_std = stdev(window_values) if len(window_values) > 1 else 0.0
+            signed_mean = fmean(window_values) if window_values else None
             wins = sum(value > TOLERANCE for value in window_values)
             losses = sum(value < -TOLERANCE for value in window_values)
             ties = len(window_values) - wins - losses
@@ -109,6 +123,15 @@ def main() -> int:
                     "raw_mean_delta_candidate_minus_baseline": fmean(raw_values) if raw_values else None,
                     "signed_outer_window_mean": fmean(window_values) if window_values else None,
                     "outer_window_count": len(window_values),
+                    "inner_cluster_count": sum(len(inner) for inner in nested.values()),
+                    "cohen_dz": (
+                        signed_mean / signed_std
+                        if signed_mean is not None and signed_std > 1e-12 else 0.0
+                    ),
+                    "outer_cluster_cohen_d": (
+                        signed_mean / outer_std
+                        if signed_mean is not None and outer_std > 1e-12 else 0.0
+                    ),
                     "wins": wins,
                     "ties": ties,
                     "losses": losses,
@@ -135,6 +158,7 @@ def main() -> int:
             "total_pair_count", "available_paired_count", "candidate_only_available_drop_count",
             "baseline_only_available_drop_count", "both_unavailable_drop_count", "wins", "ties", "losses",
             "sign_test_denominator", "sign_test_pvalue_exact", "holm_sign_test_pvalue",
+            "inner_cluster_count",
         ):
             if observed[field] != row[field]:
                 mismatches.append({"baseline_agent": row["baseline_agent"], "metric": row["metric"], "field": field, "corrected": observed[field], "independent": row[field]})
@@ -142,6 +166,9 @@ def main() -> int:
             mismatches.append({"baseline_agent": row["baseline_agent"], "metric": row["metric"], "field": "raw_mean_delta_candidate_minus_baseline"})
         if abs(observed["mean_delta"] - row["signed_outer_window_mean"]) > 5e-7:
             mismatches.append({"baseline_agent": row["baseline_agent"], "metric": row["metric"], "field": "mean_delta"})
+        for field in ("cohen_dz", "outer_cluster_cohen_d"):
+            if abs(float(observed[field]) - float(row[field])) > 5e-6:
+                mismatches.append({"baseline_agent": row["baseline_agent"], "metric": row["metric"], "field": field})
     claim_counts: dict[str, int] = defaultdict(int)
     for row in corrected["rows"]:
         if row["ci95_low"] > 0:
@@ -157,9 +184,9 @@ def main() -> int:
         "evidence_scope": {
             "independently_recomputed": [
                 "nullable pair coverage", "raw and signed means", "outer-window W/T/L",
-                "exact sign p", "fixed-family Holm",
+                "exact sign p", "fixed-family Holm", "effect sizes",
             ],
-            "not_independently_recomputed": ["bootstrap percentile/BCa CI", "effect sizes"],
+            "not_independently_recomputed": ["bootstrap percentile/BCa CI"],
             "claim_counts_basis": "classification of corrected production CI; not an independent bootstrap CI computation",
         },
         "audit_identity": {

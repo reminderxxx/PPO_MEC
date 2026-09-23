@@ -744,3 +744,18 @@ G14E01 六文件残留不是合法 initialized run，没有原生 failed termina
   不高于实现/单元验证。holdout 保持 unopened。
 - 2026-09-23 首次真实验收在 `enforce_benchmark_args` 因 `max_workflows=1 != 3` 失败；同时确认 `max_steps`
   必须等于冻结值 `22`。测试配置已修正为冻结科学负载，原失败 root/ledger/日志保留。完整正例仍待新 root 完成。
+
+## 2026-09-23: G14H01 capacity identity / background completion（CODE+RECALC RESOLVED；REAL CHAIN PENDING）
+
+- `RESOLVED / statistics identity`：旧 consumer 静默跳过缺失 pair/cluster key，并用 source path 隐式分开容量，导致
+  输出声称 capacity inner key、实际却折叠。新 consumer 对所有声明字段和完整 agent matrix fail-closed，source path
+  不再属于 pair identity。
+- `RESOLVED / immutable legacy mapping`：旧正式 CSV 仅在独立 analysis input 中按 canonical handoff identity、producer
+  manifest、runtime MB 和 window plan 补标；原件 hash 未变，不使用效果推断或目录名推断。
+- `RESOLVED / impact`：新 84 项复算 inner cluster 全部改变、CI low 14 行/high 59 行改变；mean/effect/window sign/
+  Holm/claim 未变。旧 G14R21 包保留 audit-only，不能再证明 capacity-aware clustering。
+- `RESOLVED IN TESTS / host semantics`：固定单次宿主具备外层日志/退出码/进程 birth identity/terminal receipt，且
+  `SUCCEEDED` 依赖科学 receipt 与 integrity；失败不重试。SIGKILL/断电可能无即时 terminal receipt，只能后续只读
+  判 `INTERRUPTED_OR_UNKNOWN`。
+- `PENDING`：必须在 clean frozen executor 上完成一次真实 public non-holdout producer→CSV→statistics 长验收，才可
+  形成新 unsigned 申请并提交独立授权审查。v3 继续 audit-only；grant/token 未签，holdout unopened。

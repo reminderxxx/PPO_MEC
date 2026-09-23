@@ -1962,8 +1962,16 @@ def summary_to_row(summary: dict[str, Any]) -> dict[str, Any]:
         )
     compute_audit = summary.get("compute_audit", {})
     predictor_snapshot_provenance = dict(summary.get("predictor_snapshot_provenance", {}))
+    rsu_metadata = run_info.get("rsu_metadata", {})
+    if not isinstance(rsu_metadata, dict):
+        rsu_metadata = {}
     return {
         "window_id": run_info.get("window_id"),
+        "source_segment_run_id": run_info.get(
+            "source_segment_run_id", rsu_metadata.get("source_segment_run_id")
+        ),
+        "capacity_label": run_info.get("capacity_label"),
+        "runtime_config_resource_id": run_info.get("runtime_config_resource_id"),
         "scenario_id": run_info.get("scenario_id", run_info.get("window_id")),
         "mode": run_info.get("window_mode", run_info.get("mode", "unknown")),
         "window_rank": run_info.get("window_rank"),

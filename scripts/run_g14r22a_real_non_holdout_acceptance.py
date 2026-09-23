@@ -8,6 +8,7 @@ loads real frozen checkpoints, and never names or opens the sealed holdout.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import subprocess
 import sys
@@ -180,20 +181,104 @@ def build_package(
     return package
 
 
+def validate_capacity_identity_outputs(work_root: Path) -> dict[str, Any]:
+    published = work_root / "public_entry_output" / "published"
+    scientific = published / "scientific"
+    csv_audit: list[dict[str, Any]] = []
+    for capacity in CAPACITIES:
+        path = scientific / capacity / "benchmark_rows.csv"
+        with path.open("r", encoding="utf-8-sig", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+        if len(rows) != 72:
+            raise ValueError(f"unexpected row count for {capacity}: {len(rows)}")
+        if {row.get("capacity_label") for row in rows} != {capacity}:
+            raise ValueError(f"capacity_label did not reach final CSV for {capacity}")
+        if {row.get("runtime_config_resource_id") for row in rows} != {
+            f"runtime_config.{capacity}"
+        }:
+            raise ValueError(f"runtime resource identity did not reach final CSV for {capacity}")
+        if any(not row.get("source_segment_run_id") for row in rows):
+            raise ValueError(f"source_segment_run_id missing in final CSV for {capacity}")
+        csv_audit.append(
+            {
+                "capacity_label": capacity,
+                "path": str(path),
+                "sha256": file_sha256(path),
+                "row_count": len(rows),
+                "source_segment_run_ids": sorted(
+                    {str(row["source_segment_run_id"]) for row in rows}
+                ),
+            }
+        )
+    statistics_path = published / "statistics" / "paired_statistics.json"
+    statistics = read_json(statistics_path)
+    if statistics.get("identity_validation", {}).get("status") != "passed_fail_closed":
+        raise ValueError("statistics capacity identity validation did not pass")
+    if statistics.get("pair_keys") != ["seed", "window_id", "workflow_id", "capacity_label"]:
+        raise ValueError("statistics pair key identity drift")
+    if statistics.get("outer_cluster_keys") != ["source_segment_run_id", "window_id"]:
+        raise ValueError("statistics outer key identity drift")
+    if statistics.get("inner_cluster_keys") != ["seed", "workflow_id", "capacity_label"]:
+        raise ValueError("statistics inner key identity drift")
+    rows = statistics.get("rows", [])
+    if len(rows) != 6:
+        raise ValueError("acceptance statistics family must contain six rows")
+    for row in rows:
+        if row.get("total_pair_count") != 108:
+            raise ValueError("acceptance statistics lost a capacity pair coordinate")
+        if row.get("inner_cluster_count") != row.get("available_paired_count"):
+            raise ValueError("acceptance statistics merged capacity inner clusters")
+    return {
+        "status": "passed",
+        "fixture_capacity_injection_used": False,
+        "producer_csv_audit": csv_audit,
+        "statistics_path": str(statistics_path),
+        "statistics_sha256": file_sha256(statistics_path),
+        "validated_pair_coordinate_count": statistics["identity_validation"][
+            "validated_pair_coordinate_count"
+        ],
+        "inner_cluster_counts": [row["inner_cluster_count"] for row in rows],
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--executor-checkout", type=Path, required=True)
     parser.add_argument("--executor-commit", required=True)
     parser.add_argument("--work-root", type=Path, required=True)
+    parser.add_argument("--prepared-command-package-path", type=Path)
+    parser.add_argument("--background-request-path", type=Path)
     args = parser.parse_args()
     args.work_root.mkdir(parents=True, exist_ok=False)
-    package = build_package(
-        executor_checkout=args.executor_checkout.resolve(),
-        executor_commit=args.executor_commit,
-        work_root=args.work_root.resolve(),
-    )
     package_path = args.work_root / "real_non_holdout_command_package.json"
-    write_json(package_path, package)
+    if args.prepared_command_package_path is not None:
+        prepared_path = args.prepared_command_package_path.resolve()
+        package = read_json(prepared_path)
+        validate_command_package(package, acceptance=True)
+        if (
+            Path(package["executor_checkout"]).resolve()
+            != args.executor_checkout.resolve()
+            or package["executor_commit"] != args.executor_commit
+            or Path(package["output_root"]).resolve()
+            != (args.work_root.resolve() / "public_entry_output")
+        ):
+            raise ValueError("prepared non-holdout package execution identity mismatch")
+        package_path.write_bytes(prepared_path.read_bytes())
+    else:
+        package = build_package(
+            executor_checkout=args.executor_checkout.resolve(),
+            executor_commit=args.executor_commit,
+            work_root=args.work_root.resolve(),
+        )
+        write_json(package_path, package)
+    background_request_path = (
+        args.background_request_path.resolve()
+        if args.background_request_path is not None else None
+    )
+    background_request_sha256 = (
+        file_sha256(background_request_path)
+        if background_request_path is not None else None
+    )
     command = [
         sys.executable,
         str(args.executor_checkout.resolve() / "scripts/run_dedicated_public_holdout.py"),
@@ -208,6 +293,14 @@ def main() -> int:
         capture_output=True,
         check=False,
     )
+    capacity_identity_validation: dict[str, Any] | None = None
+    validation_failure: str | None = None
+    if completed.returncode == 0:
+        try:
+            capacity_identity_validation = validate_capacity_identity_outputs(args.work_root)
+        except Exception as exc:
+            validation_failure = f"{type(exc).__name__}: {exc}"
+    passed = completed.returncode == 0 and validation_failure is None
     receipt = {
         "acceptance_version": "g14r22a_real_non_holdout_benchmark_v1",
         "test_only": True,
@@ -218,10 +311,16 @@ def main() -> int:
         "executor_git_tree": package["executor_git_tree"],
         "command_package_path": str(package_path),
         "command_package_sha256": file_sha256(package_path),
+        "background_request_path": (
+            str(background_request_path) if background_request_path is not None else None
+        ),
+        "background_request_sha256": background_request_sha256,
         "started_at": started_at,
         "completed_at": datetime.now(timezone.utc).isoformat(),
         "return_code": completed.returncode,
-        "passed": completed.returncode == 0,
+        "passed": passed,
+        "capacity_identity_validation": capacity_identity_validation,
+        "validation_failure": validation_failure,
         "stdout": completed.stdout,
         "stderr": completed.stderr,
         "coverage": {
@@ -238,7 +337,7 @@ def main() -> int:
     }
     write_json(args.work_root / "acceptance_receipt.json", receipt)
     print(json.dumps(receipt, ensure_ascii=False, indent=2))
-    return completed.returncode
+    return 0 if passed else (completed.returncode or 2)
 
 
 if __name__ == "__main__":

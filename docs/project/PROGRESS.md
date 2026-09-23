@@ -2051,3 +2051,20 @@ JUnit 和未签发新申请由独立 I2 验收记录绑定。本记录不提前�
   只缩减 agent/seed，目标为 216 test-only rows；需要新 clean executor commit 和新 unsigned 包。
 - 新 executor commit=`4b0af75e`、tree=`d6145071` 已通过干净 checkout 59 项目标回归及真实测试 package 结构检查；
   v3 unsigned request/package 已绑定该身份并通过 qualify，v1/v2 保留为 superseded。真实 v2 test-only 长验收待启动。
+
+## 2026-09-23 G14R22-B：容量统计身份与固定后台宿主
+
+- producer 只接受 `runtime_config.<capacity_label>` portable resource，并校验 typed runtime 实际 MB；验证后的
+  `capacity_label` / `runtime_config_resource_id` 经 episode summary 写入最终 CSV，`source_segment_run_id` 从 producer
+  window metadata 写入同一行。
+- 统计不再把 source path 隐式加入 pair，也不再跳过缺失 key；missing/null/blank/type、重复 coordinate、缺 agent
+  pair 与跨 agent cluster 冲突均 fail-closed。冻结分组为 window outer、seed/workflow/capacity inner。
+- 对旧 8,100 行通过规范化 handoff identity、producer manifest、runtime MB 与 selected window plan 构建独立
+  analysis input；三份原 CSV SHA-256 前后不变。新复算 540 pair coordinates，inner cluster 从一般 endpoint
+  180→540、delay 85→220；mean/effect/window sign/Holm/coverage/claim 均不变，59/84 行至少一个 CI bound 改变
+  （共 73 个 bound cells），
+  claim 由数据导出仍为 mixed 72、contradicted 12、Holm<0.05 为 0。
+- 单次后台宿主已覆盖 launcher 会话退出、正常完成、child 非零、可捕获 signal、SIGKILL 后只读 unknown 和 PID
+  reuse 防护；只有科学 terminal receipt + 完整性通过才判 `SUCCEEDED`，无 retry/resume/AI/API/监控代理。
+- 当前 executor commit/tree 与真实长验收 request/package/hash 尚待本分支首次提交后冻结；grant/token 未签，
+  training/formal rerun/model selection/holdout policy 均为 0，`holdout_opened=false`。

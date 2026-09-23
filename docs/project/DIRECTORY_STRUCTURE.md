@@ -28,6 +28,14 @@ G14R20-I5-D：新增 pre-grant 只读入口 `scripts/qualify_typed_model_cache_r
 
 # Directory Structure
 
+G14R22-B：未来 benchmark 容量身份由 `scripts/benchmark_main_results.py` 校验并经
+`src/evaluators/main_results_support.py` 写入 CSV；严格统计入口仍为
+`scripts/analyze_top_journal_statistics.py`。旧正式行的独立补标/复算由
+`scripts/build_g14r22b_capacity_statistics.py` 完成，产物位于
+`artifacts/analysis/typed_model_cache_g14r22b_capacity_statistics_20260923_v1/`，原 CSV 不改写。单次后台冻结与宿主
+分别为 `scripts/build_g14r22b_background_acceptance.py` 和 `scripts/run_g14r22b_background_job.py`；它们不是通用
+调度器，不提供 retry/resume/清锁/第二 run。
+
 G14R20-I6：八-cell 外部 handoff 校验位于 `src/runtime/post_ablation_execution.py`；unsigned request 与剩余阶段受授权执行入口分别为 `scripts/prepare_typed_model_cache_post_ablation.py`、`scripts/run_typed_model_cache_post_ablation.py`。`src/runtime/evaluation_only_execution.py` 继续生成冻结命令；statistics/gate 通过显式 handoff 读旧结果。未签发申请、真实 non-formal 链和日志位于 ignored `artifacts/analysis/g14r20_i6_post_ablation_20260921/`；预定正式 root 当前不存在。
 
 

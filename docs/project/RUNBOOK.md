@@ -1,4 +1,29 @@
-## G14R21 纠正版统计复算（只读 formal source；不含 holdout）
+## G14R22-B 容量身份复算与单次后台验收（不含 holdout）
+
+只读既有 G14R21 formal source，用 hash-verified handoff、producer manifest、runtime MB 与 window plan 在新的
+`analysis_inputs/` 显式补充 `capacity_label` / `source_segment_run_id`。不得修改原 CSV，也不得从效果或目录名推断：
+
+```bash
+.venv/bin/python scripts/build_g14r22b_capacity_statistics.py \
+  --output-root artifacts/analysis/typed_model_cache_g14r22b_capacity_statistics_20260923_v1
+```
+
+该入口固定 pair=`seed,window_id,workflow_id,capacity_label`，outer=`source_segment_run_id,window_id`，
+inner=`seed,workflow_id,capacity_label`；保持 10,000 bootstrap、seed 1401、BCa 与 84 项 Holm family，并运行独立
+raw-row mean/effect/window-sign/Holm 审计。
+
+真实 public non-holdout 长验收只能先用 `build_g14r22b_background_acceptance.py` 在 clean executor commit 上生成
+create-only request/scientific package/job package，再严格执行 `freeze_receipt.json` 中的唯一 launch command。检查状态只用：
+
+```bash
+<frozen-python> <frozen-executor>/scripts/run_g14r22b_background_job.py inspect --job-root <frozen-job-root>
+```
+
+`SUCCEEDED` 只在 child rc=0、科学 `acceptance_receipt.json` 明确 passed 且 published integrity manifest 逐文件通过时
+成立。失败不 retry/resume；SIGKILL/断电只允许后续只读检查推导 `INTERRUPTED_OR_UNKNOWN`，不能承诺即时 terminal
+receipt。PID、进程 birth token 和 live command hash 必须共同匹配。该宿主不调用 AI/API，不运行常驻监控代理。
+
+## G14R21 纠正版统计复算（historical/audit-only；不含 holdout）
 
 固定 source root 和新 analysis root 后，使用本机 receipt runner 复算；它只写 `corrected_statistics/` 与
 `local_job/`，非零或产物校验失败即停止，自动重试为 0：

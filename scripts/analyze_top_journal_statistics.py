@@ -46,7 +46,7 @@ DEFAULT_PAIR_KEYS = [
     "scalability_setting_id",
     "ablation_label",
 ]
-STATISTICS_PROTOCOL_VERSION = "hierarchical_window_bootstrap_v1_20260621"
+STATISTICS_PROTOCOL_VERSION = "hierarchical_window_bootstrap_v2_capacity_identity_20260923"
 
 
 def parse_args() -> argparse.Namespace:
@@ -122,22 +122,49 @@ def float_value(row: dict[str, str], field_name: str) -> float | None:
     return result
 
 
-def pair_key(row: dict[str, str], key_fields: list[str]) -> tuple[str, ...]:
-    values = [row.get("source_rows_path", "")]
-    for field_name in key_fields:
-        if field_name in row and row.get(field_name, "") != "":
-            values.append(f"{field_name}={row.get(field_name, '')}")
-    return tuple(values)
+def required_identity_value(
+    row: dict[str, Any], field_name: str, *, identity_kind: str
+) -> str:
+    if field_name not in row:
+        raise ValueError(f"{identity_kind} field missing: {field_name}")
+    value = row[field_name]
+    if value is None:
+        raise ValueError(f"{identity_kind} field null: {field_name}")
+    if isinstance(value, bool) or not isinstance(value, (str, int, float)):
+        raise ValueError(
+            f"{identity_kind} field has invalid type: {field_name}="
+            f"{type(value).__name__}"
+        )
+    if isinstance(value, float) and not math.isfinite(value):
+        raise ValueError(f"{identity_kind} field is non-finite: {field_name}")
+    normalized = str(value).strip()
+    if not normalized:
+        raise ValueError(f"{identity_kind} field blank: {field_name}")
+    if normalized.lower() in {"null", "none"}:
+        raise ValueError(f"{identity_kind} field null sentinel: {field_name}")
+    return normalized
 
 
-def cluster_key(row: dict[str, str], key_fields: list[str], fallback: tuple[str, ...]) -> tuple[str, ...]:
+def pair_key(row: dict[str, Any], key_fields: list[str]) -> tuple[str, ...]:
+    return tuple(
+        f"{field_name}={required_identity_value(row, field_name, identity_kind='pair key')}"
+        for field_name in key_fields
+    )
+
+
+def cluster_key(
+    row: dict[str, Any],
+    key_fields: list[str],
+    fallback: tuple[str, ...],
+    *,
+    identity_kind: str = "cluster key",
+) -> tuple[str, ...]:
     if not key_fields:
         return fallback
-    values = []
-    for field_name in key_fields:
-        if field_name in row and row.get(field_name, "") != "":
-            values.append(f"{field_name}={row.get(field_name, '')}")
-    return tuple(values) if values else fallback
+    return tuple(
+        f"{field_name}={required_identity_value(row, field_name, identity_kind=identity_kind)}"
+        for field_name in key_fields
+    )
 
 
 def percentile(values: list[float], q: float) -> float:
@@ -487,6 +514,16 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
 
 def main() -> None:
     args = parse_args()
+    for label, fields in (
+        ("pair_keys", args.pair_keys),
+        ("cluster_keys", args.cluster_keys),
+        ("outer_cluster_keys", args.outer_cluster_keys),
+        ("inner_cluster_keys", args.inner_cluster_keys),
+    ):
+        if len(fields) != len(set(fields)):
+            raise ValueError(f"duplicate configured {label}")
+    if not args.pair_keys:
+        raise ValueError("pair_keys must not be empty")
     order_audit = None
     if args.formal_agent_order_contract_path:
         try:
@@ -501,14 +538,75 @@ def main() -> None:
             raise ValueError("statistics baseline agent order identity drift")
     rng = random.Random(args.random_seed)
     rows = load_rows(args.rows_path)
+    if not rows:
+        raise ValueError("statistics input has no rows")
     by_key_and_agent: dict[tuple[str, ...], dict[str, dict[str, str]]] = {}
     for row in rows:
         key = pair_key(row, args.pair_keys)
-        agent_name = row.get("agent_name", "")
+        agent_name = required_identity_value(
+            row, "agent_name", identity_kind="agent identity"
+        )
         bucket = by_key_and_agent.setdefault(key, {})
         if agent_name in bucket:
             raise ValueError(f"duplicate statistics pair row: key={key}, agent={agent_name}")
         bucket[agent_name] = row
+        cluster_key(row, args.cluster_keys, key, identity_kind="cluster key")
+        cluster_key(
+            row, args.outer_cluster_keys, key, identity_kind="outer cluster key"
+        )
+        cluster_key(
+            row, args.inner_cluster_keys, key, identity_kind="inner cluster key"
+        )
+    required_agents = [args.candidate_agent, *args.baseline_agents]
+    if len(required_agents) != len(set(required_agents)):
+        raise ValueError("candidate/baseline agent identities are not unique")
+    for key, bucket in by_key_and_agent.items():
+        missing_agents = [agent for agent in required_agents if agent not in bucket]
+        if missing_agents:
+            raise ValueError(
+                f"incomplete statistics pair matrix: key={key}, "
+                f"missing_agents={missing_agents}"
+            )
+        candidate_row = bucket[args.candidate_agent]
+        expected_cluster = cluster_key(candidate_row, args.cluster_keys, key)
+        expected_outer = cluster_key(
+            candidate_row,
+            args.outer_cluster_keys,
+            key,
+            identity_kind="outer cluster key",
+        )
+        expected_inner = cluster_key(
+            candidate_row,
+            args.inner_cluster_keys,
+            key,
+            identity_kind="inner cluster key",
+        )
+        for baseline_agent in args.baseline_agents:
+            baseline_row = bucket[baseline_agent]
+            observed_cluster = cluster_key(baseline_row, args.cluster_keys, key)
+            observed_outer = cluster_key(
+                baseline_row,
+                args.outer_cluster_keys,
+                key,
+                identity_kind="outer cluster key",
+            )
+            observed_inner = cluster_key(
+                baseline_row,
+                args.inner_cluster_keys,
+                key,
+                identity_kind="inner cluster key",
+            )
+            if (
+                observed_cluster != expected_cluster
+                or observed_outer != expected_outer
+                or observed_inner != expected_inner
+            ):
+                raise ValueError(
+                    f"conflicting cluster identity within pair: key={key}, "
+                    f"candidate={(expected_cluster, expected_outer, expected_inner)}, "
+                    f"baseline_agent={baseline_agent}, "
+                    f"baseline={(observed_cluster, observed_outer, observed_inner)}"
+                )
     if order_audit is not None:
         expected = set(order_audit["main_benchmark_agent_order"])
         for key, bucket in by_key_and_agent.items():
@@ -532,7 +630,7 @@ def main() -> None:
                 candidate_row = agents_by_key.get(args.candidate_agent)
                 baseline_row = agents_by_key.get(baseline_agent)
                 if candidate_row is None or baseline_row is None:
-                    continue
+                    raise AssertionError("pair matrix was not validated fail-closed")
                 total_pair_count += 1
                 candidate_value = float_value(candidate_row, metric)
                 baseline_value = float_value(baseline_row, metric)
@@ -549,9 +647,50 @@ def main() -> None:
                 raw_delta = candidate_value - baseline_value
                 raw_deltas.append(raw_delta)
                 signed_deltas.append(-raw_delta if metric in LOWER_IS_BETTER else raw_delta)
-                delta_clusters.append(cluster_key(candidate_row, args.cluster_keys, key))
-                delta_outer_clusters.append(cluster_key(candidate_row, args.outer_cluster_keys, key))
-                delta_inner_clusters.append(cluster_key(candidate_row, args.inner_cluster_keys, key))
+                candidate_cluster = cluster_key(candidate_row, args.cluster_keys, key)
+                baseline_cluster = cluster_key(baseline_row, args.cluster_keys, key)
+                candidate_outer = cluster_key(
+                    candidate_row,
+                    args.outer_cluster_keys,
+                    key,
+                    identity_kind="outer cluster key",
+                )
+                baseline_outer = cluster_key(
+                    baseline_row,
+                    args.outer_cluster_keys,
+                    key,
+                    identity_kind="outer cluster key",
+                )
+                candidate_inner = cluster_key(
+                    candidate_row,
+                    args.inner_cluster_keys,
+                    key,
+                    identity_kind="inner cluster key",
+                )
+                baseline_inner = cluster_key(
+                    baseline_row,
+                    args.inner_cluster_keys,
+                    key,
+                    identity_kind="inner cluster key",
+                )
+                if candidate_cluster != baseline_cluster:
+                    raise ValueError(
+                        f"conflicting cluster identity within pair: key={key}, "
+                        f"candidate={candidate_cluster}, baseline={baseline_cluster}"
+                    )
+                if candidate_outer != baseline_outer:
+                    raise ValueError(
+                        f"conflicting outer cluster identity within pair: key={key}, "
+                        f"candidate={candidate_outer}, baseline={baseline_outer}"
+                    )
+                if candidate_inner != baseline_inner:
+                    raise ValueError(
+                        f"conflicting inner cluster identity within pair: key={key}, "
+                        f"candidate={candidate_inner}, baseline={baseline_inner}"
+                    )
+                delta_clusters.append(candidate_cluster)
+                delta_outer_clusters.append(candidate_outer)
+                delta_inner_clusters.append(candidate_inner)
             cluster_payload = delta_clusters if args.cluster_keys else None
             outer_payload = delta_outer_clusters if args.outer_cluster_keys else None
             inner_payload = delta_inner_clusters if args.inner_cluster_keys else None
@@ -645,6 +784,17 @@ def main() -> None:
         json.dumps(
             {
                 "statistics_protocol_version": STATISTICS_PROTOCOL_VERSION,
+                "identity_validation": {
+                    "status": "passed_fail_closed",
+                    "source_path_excluded_from_pair_identity": True,
+                    "configured_fields_required_on_every_row": True,
+                    "missing_null_blank_type_distinguished": True,
+                    "duplicate_pair_rows_rejected": True,
+                    "complete_candidate_baseline_matrix_required": True,
+                    "cross_agent_cluster_identity_required": True,
+                    "validated_input_row_count": len(rows),
+                    "validated_pair_coordinate_count": len(by_key_and_agent),
+                },
                 "pair_keys": args.pair_keys,
                 "legacy_cluster_keys": args.cluster_keys,
                 "outer_cluster_keys": args.outer_cluster_keys,

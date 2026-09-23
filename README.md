@@ -596,3 +596,11 @@ evaluation-only 首次锁/初始化/下一 phase 载入；不授权恢复旧 run
 > `reactive_lru + sa_ghmappo` 真实 benchmark/checkpoint/rollout 测试链。长验收须从最终 clean executor commit
 > 独立启动；结果为 test-only，不进入正式统计。未签 grant/token，`holdout_opened=false`。详见
 > [G14R22-A 合同](docs/project/g14r22a_non_holdout_benchmark_acceptance.md)。
+
+> **2026-09-23 G14R22-B**：统计容量身份已改为 portable runtime resource 与实际 MB 双重校验后写入
+> episode/CSV；统计 pair/outer/inner keys 全部 fail-closed。既有 8,100 行只在独立 analysis input 中按
+> hash-verified handoff/producer manifest 补标，原 CSV 未改。容量感知复算保持 10,000 bootstrap、seed 1401、
+> 84 项 Holm family，claim 仍为 72 mixed / 12 contradicted；全部 84 项 inner cluster 和 59/84 行
+> （73 个 bound cells）的 CI 边界发生修正。长链真实 non-holdout 验收将由单次后台宿主从 clean executor 启动；
+> 不签 grant/token，
+> `holdout_opened=false`。见 [G14R22-B 合同](docs/project/g14r22b_capacity_background_acceptance.md)。

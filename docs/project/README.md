@@ -41,6 +41,9 @@
 
 ## Live 文档
 
+- `g14r22b_capacity_background_acceptance.md`：容量字段 runtime→CSV→pair/cluster 闭环、G14R21 独立复算影响、
+  fail-closed 统计和单次固定后台宿主的状态/故障边界。
+
 - `g14r22a_non_holdout_benchmark_acceptance.md`：真实 non-holdout consumer 缺口、三文件 identity bundle、
   producer integrity 及三容量 learned/reactive 长验收范围。
 

@@ -72,6 +72,7 @@ from src.runtime.portable_resource_identity import (
     resolve_argument_resources,
 )
 from src.runtime.generated_checkpoint_resources import (
+    CAPACITY_MB,
     add_generated_checkpoint_resource_arguments,
     resolve_generated_checkpoint_arguments,
 )
@@ -111,6 +112,80 @@ CHECKPOINT_PROVENANCE_ENVELOPE_FIELDS = (
     "checkpoint_identity",
     "artifact_location",
 )
+
+
+def resolve_verified_capacity_identity(
+    *,
+    runtime_contract: dict[str, Any],
+    runtime_config_resource_id: str,
+    portable_resource_audit: dict[str, Any],
+    resolved_runtime_config_path: str,
+) -> dict[str, Any] | None:
+    """Bind a typed runtime to its exact portable capacity resource identity."""
+    if runtime_contract.get("model_cache_profile") != "typed_base_adapter_state_v1":
+        return None
+    resource_id = str(runtime_config_resource_id or "")
+    prefix = "runtime_config."
+    if not resource_id.startswith(prefix):
+        raise ValueError(
+            "typed benchmark capacity identity requires a verified "
+            "runtime_config.<capacity_label> portable resource"
+        )
+    capacity_label = resource_id[len(prefix):]
+    if capacity_label not in CAPACITY_MB:
+        raise ValueError(f"unknown typed capacity resource identity: {resource_id}")
+    capacity = runtime_contract.get("cache_capacity_profile")
+    if not isinstance(capacity, dict):
+        raise ValueError("typed runtime lacks cache_capacity_profile")
+    if capacity.get("enabled") is not True or capacity.get("unit") != "mb":
+        raise ValueError("typed capacity identity requires enabled MB capacity")
+    try:
+        capacity_mb = float(capacity.get("capacity_mb"))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("typed capacity identity has invalid capacity_mb") from exc
+    expected_mb = float(CAPACITY_MB[capacity_label])
+    if abs(capacity_mb - expected_mb) > 1e-9:
+        raise ValueError(
+            f"capacity resource/runtime mismatch: {resource_id} declares "
+            f"{expected_mb:g} MB but runtime resolves {capacity_mb:g} MB"
+        )
+    if portable_resource_audit.get("status") != "pass":
+        raise ValueError(
+            "typed benchmark capacity identity requires successful portable resource resolution"
+        )
+    matches = [
+        row
+        for row in portable_resource_audit.get("resolutions", [])
+        if isinstance(row, dict) and row.get("logical_resource_id") == resource_id
+    ]
+    if len(matches) != 1:
+        raise ValueError("typed runtime resource resolution audit is missing or duplicated")
+    resolution = matches[0]
+    runtime_path = Path(resolved_runtime_config_path).resolve()
+    if (
+        resolution.get("status") != "compatible"
+        or resolution.get("resource_role") != "runtime_config"
+        or Path(str(resolution.get("resolved_path", ""))).resolve() != runtime_path
+        or resolution.get("observed_sha256") != sha256_file(runtime_path)
+        or int(resolution.get("observed_size_bytes", -1)) != runtime_path.stat().st_size
+    ):
+        raise ValueError("typed runtime portable resource resolution identity mismatch")
+    return {
+        "capacity_label": capacity_label,
+        "capacity_mb": capacity_mb,
+        "capacity_unit": "mb",
+        "runtime_config_resource_id": resource_id,
+        "runtime_contract_sha256": runtime_contract.get("runtime_contract_sha256"),
+        "identity_status": "verified_portable_resource_and_runtime_contract",
+        "portable_resource_registry_semantic_sha256": portable_resource_audit.get(
+            "resource_registry_semantic_sha256"
+        ),
+        "portable_resource_semantic_identity_fingerprint": resolution.get(
+            "semantic_identity_fingerprint"
+        ),
+        "runtime_config_observed_sha256": resolution.get("observed_sha256"),
+        "runtime_config_observed_size_bytes": resolution.get("observed_size_bytes"),
+    }
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -694,6 +769,10 @@ def main() -> None:
             raise FairnessManifestError(
                 "benchmark agents differ from the formal main benchmark order"
             )
+    portable_resource_audit = {
+        "status": "legacy_no_resource_registry",
+        "resolutions": [],
+    }
     if args.resource_registry_path:
         bindings = [
             ("mobility_resource_id", "mobility_csv_path", "mobility_dataset"),
@@ -702,7 +781,7 @@ def main() -> None:
             ("runtime_config_resource_id", "model_cache_runtime_config", "runtime_config"),
             ("fairness_manifest_resource_id", "cache_baseline_fairness_manifest_path", "fairness_manifest"),
         ]
-        resolve_argument_resources(args, bindings=bindings)
+        portable_resource_audit = resolve_argument_resources(args, bindings=bindings)
     generated_checkpoint_resource_audit = None
     protocol: dict[str, Any] | None = None
     resolved_context: dict[str, Any] | None = None
@@ -787,6 +866,12 @@ def main() -> None:
     runtime_contract = resolve_model_cache_runtime(
         args.model_cache_runtime_config or None,
         root=ROOT_DIR,
+    )
+    capacity_identity = resolve_verified_capacity_identity(
+        runtime_contract=runtime_contract,
+        runtime_config_resource_id=args.runtime_config_resource_id,
+        portable_resource_audit=portable_resource_audit,
+        resolved_runtime_config_path=args.model_cache_runtime_config,
     )
     runtime_catalog = load_runtime_catalog(runtime_contract, root=ROOT_DIR)
     typed_runtime = runtime_contract["model_cache_profile"] == "typed_base_adapter_state_v1"
@@ -1096,6 +1181,12 @@ def main() -> None:
                         run_metadata={
                             "script": "scripts/benchmark_main_results.py",
                             "benchmark_run_id": benchmark_run_id,
+                            "capacity_label": (
+                                capacity_identity["capacity_label"]
+                                if capacity_identity is not None else None
+                            ),
+                            "capacity_identity": capacity_identity,
+                            "runtime_config_resource_id": args.runtime_config_resource_id,
                             "mainline": mainline_label,
                             "reward_positive_offset": args.reward_positive_offset,
                             "mobility_source_path": mobility_source_path,
@@ -1236,6 +1327,8 @@ def main() -> None:
         "fairness_manifest_hash": fairness_manifest["hashes"]["full_manifest_sha256"] if fairness_manifest else None,
         "fairness_semantic_protocol_hash": fairness_manifest["hashes"]["semantic_protocol_sha256"] if fairness_manifest else None,
         "resolved_model_cache_runtime": runtime_contract,
+        "portable_resource_resolution": portable_resource_audit,
+        "capacity_identity": capacity_identity,
         "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
         "checkpoint_provenance_validation": checkpoint_provenance_validation,
         "generated_checkpoint_resource_audit": generated_checkpoint_resource_audit,
@@ -1355,6 +1448,8 @@ def main() -> None:
         "fairness_manifest_hash": fairness_manifest["hashes"]["full_manifest_sha256"] if fairness_manifest else None,
         "fairness_semantic_protocol_hash": fairness_manifest["hashes"]["semantic_protocol_sha256"] if fairness_manifest else None,
         "runtime_contract_sha256": runtime_contract["runtime_contract_sha256"],
+        "capacity_identity": capacity_identity,
+        "portable_resource_resolution": portable_resource_audit,
         "model_cache_profile": runtime_contract["model_cache_profile"],
         "typed_catalog_fingerprint": runtime_contract["typed_catalog_fingerprint"],
         "formal_exogenous_request_execution_enabled": bool(
