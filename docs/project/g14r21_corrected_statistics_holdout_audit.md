@@ -84,7 +84,8 @@ unchecked opening conditions，这些正向条件不消除上述 blocker。历�
   allowed write roots 见 `local_job/completion_receipt.json`。
 - 独立 raw-row 关键纠错复算：84 项、`mismatch_count=0`、`0/72/12`、Holm 显著数 0；命令、环境与 audit
   script SHA-256 写入 `independent_recalculation.json`。
-- 定向测试：62 passed；compile/import 与 `scripts/smoke_test.py` 通过。
+- 定向统计回归 62 passed；加入 live statistics consumer 与 env contract 后最终 scoped suite 为 77 passed；
+  compile/import 与 `scripts/smoke_test.py` 通过。
 - 主要机器证据：`corrected_statistics/`、`corrected_claim_map.json`、`old_to_new_difference.json`、
   `independent_recalculation.json`、`scientific_limitations.json`、`holdout_interval_audit.json`、
   `holdout_application_unsigned.json`、`source_provenance.json`、`artifact_integrity_manifest.json`。
