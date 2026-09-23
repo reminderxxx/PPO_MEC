@@ -1,0 +1,47 @@
+{
+  "analysis_contract_version": "g14r22b_capacity_identity_closure_v1",
+  "created_at": "2026-09-23T07:45:52.809178+00:00",
+  "reviewed_at": "2026-09-23",
+  "literature_cutoff": "2026-09-21",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "artifact_run_id": "typed_model_cache_post_ablation_20260921_g14e07_pending",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "evidence_level": "E3_TARGETED_REPRODUCED_WITH_VERIFIED_CAPACITY_IDENTITY; bootstrap CI generated deterministically and means/effects/window sign/Holm independently recalculated",
+  "git_commit": "d6c53b4154f84dcb398ceb0f88ace642142c0f23",
+  "git_tree": "1068b70d642484c9cadadf9380ec2245b640b4e1",
+  "generator_repository": {
+    "checkout": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC",
+    "git_commit": "d6c53b4154f84dcb398ceb0f88ace642142c0f23",
+    "git_tree": "1068b70d642484c9cadadf9380ec2245b640b4e1",
+    "branch": "codex/g14r22-b-capacity-background",
+    "clean": true
+  },
+  "pair_keys": [
+    "seed",
+    "window_id",
+    "workflow_id",
+    "capacity_label"
+  ],
+  "outer_cluster_keys": [
+    "source_segment_run_id",
+    "window_id"
+  ],
+  "inner_cluster_keys": [
+    "seed",
+    "workflow_id",
+    "capacity_label"
+  ],
+  "family_size": 84,
+  "claim_counts": {
+    "contradicted": 12,
+    "mixed": 72
+  },
+  "claim_changed_count": 0,
+  "holdout_opened": false,
+  "grant_signed": false,
+  "token_issued": false,
+  "training_runs": 0,
+  "formal_rollout_runs": 0,
+  "model_selection_runs": 0,
+  "old_package_retained_audit_only": true
+}

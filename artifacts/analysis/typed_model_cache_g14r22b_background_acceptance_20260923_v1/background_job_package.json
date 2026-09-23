@@ -1,0 +1,61 @@
+{
+  "host_version": "g14r22b_fixed_background_host_v1",
+  "job_id": "g14r22b_real_non_holdout_capacity_identity_v1",
+  "executor_checkout": "/Users/howen/.codex/worktrees/g14r22b-executor/PPO_MEC",
+  "executor_commit": "d6c53b4154f84dcb398ceb0f88ace642142c0f23",
+  "executor_git_tree": "1068b70d642484c9cadadf9380ec2245b640b4e1",
+  "cwd": "/Users/howen/.codex/worktrees/g14r22b-executor/PPO_MEC",
+  "python_executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "python_resolved_executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9",
+  "environment": {
+    "PATH": "/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/opt/homebrew/bin:/Users/howen/.codex/tmp/arg0/codex-arg0WM5XKl:/Users/howen/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/howen/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources",
+    "LANG": "en_US.UTF-8",
+    "LC_ALL": "en_US.UTF-8",
+    "PYTHONHASHSEED": "0",
+    "PYTHONNOUSERSITE": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1",
+    "PYTHONPATH": "/Users/howen/.codex/worktrees/g14r22b-executor/PPO_MEC",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "TOKENIZERS_PARALLELISM": "false"
+  },
+  "command": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "/Users/howen/.codex/worktrees/g14r22b-executor/PPO_MEC/scripts/run_g14r22a_real_non_holdout_acceptance.py",
+    "--executor-checkout",
+    "/Users/howen/.codex/worktrees/g14r22b-executor/PPO_MEC",
+    "--executor-commit",
+    "d6c53b4154f84dcb398ceb0f88ace642142c0f23",
+    "--work-root",
+    "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/real_non_holdout",
+    "--prepared-command-package-path",
+    "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/scientific_command_package.json",
+    "--background-request-path",
+    "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/background_acceptance_request_unsigned.json"
+  ],
+  "request": {
+    "path": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/background_acceptance_request_unsigned.json",
+    "sha256": "398e0c386104f1e8513a93d671ef419b5265eda20c0ee2b26b8f6f96d5926331"
+  },
+  "scientific_command_package": {
+    "path": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/scientific_command_package.json",
+    "sha256": "cd859dc4af0634fe746dc4c87739604976ac01903a6eddc3061ce7a29b243bcd"
+  },
+  "terminal_contract": {
+    "scientific_receipt_path": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/real_non_holdout/acceptance_receipt.json",
+    "integrity_manifest_path": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/real_non_holdout/public_entry_output/artifact_integrity_manifest.json",
+    "integrity_root": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/real_non_holdout/public_entry_output/published",
+    "expected_receipt_bindings": {
+      "executor_commit": "d6c53b4154f84dcb398ceb0f88ace642142c0f23",
+      "executor_git_tree": "1068b70d642484c9cadadf9380ec2245b640b4e1",
+      "command_package_sha256": "cd859dc4af0634fe746dc4c87739604976ac01903a6eddc3061ce7a29b243bcd",
+      "background_request_sha256": "398e0c386104f1e8513a93d671ef419b5265eda20c0ee2b26b8f6f96d5926331"
+    }
+  },
+  "scientific_work_root": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/real_non_holdout",
+  "job_root": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/background_job",
+  "automatic_retry_count": 0,
+  "holdout_opened": false,
+  "job_package_sha256": "1f0965eecc34865421858093581a68a65c9ca90eab2bcb1f8cc06bc59bfe63d6"
+}

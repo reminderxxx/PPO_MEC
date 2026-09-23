@@ -1,0 +1,178 @@
+{
+  "provenance_version": "g14r22b_verified_legacy_augmentation_v1",
+  "inference_from_outcomes": false,
+  "inference_from_directory_names": false,
+  "original_csv_modified": false,
+  "sources": [
+    {
+      "capacity_label": "constrained_288mb",
+      "runtime_config_resource_id": "runtime_config.constrained_288mb",
+      "committed_path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-ca75f4fd6cba10d56d8210cb",
+      "rows": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-ca75f4fd6cba10d56d8210cb/benchmark_rows.csv",
+        "sha256": "5cd14c5992c9a5826d21e8bcbe7779470439a2b5979a69d1e12ab0d69463797b",
+        "size_bytes": 4866167,
+        "producer_manifest_path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-ca75f4fd6cba10d56d8210cb/artifact_integrity_manifest.json",
+        "producer_manifest_sha256": "d722eda73b91939e75165896ce3997d2f6d94be38156de32fb0a206432dfc0d0"
+      },
+      "aggregate": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-ca75f4fd6cba10d56d8210cb/aggregate_summary.json",
+        "sha256": "710dec3324959aa4e60a46bfe9e4ff3e8869d926f994f70abfa2c38f1bd1d5c7",
+        "size_bytes": 63159761,
+        "producer_manifest_path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-ca75f4fd6cba10d56d8210cb/artifact_integrity_manifest.json",
+        "producer_manifest_sha256": "d722eda73b91939e75165896ce3997d2f6d94be38156de32fb0a206432dfc0d0"
+      },
+      "run_manifest": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-ca75f4fd6cba10d56d8210cb/run_manifest.json",
+        "sha256": "ba99c1e557c4100140ba49cdfbb578c65f1e31a9c4dc4237dbf5a2d5b1dceab6",
+        "size_bytes": 468120,
+        "producer_manifest_path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-ca75f4fd6cba10d56d8210cb/artifact_integrity_manifest.json",
+        "producer_manifest_sha256": "d722eda73b91939e75165896ce3997d2f6d94be38156de32fb0a206432dfc0d0"
+      },
+      "window_to_source_segment_run_id": {
+        "g14b_i_80_run_001_f6972_6995_t1113433832100_1113433834400": "i_80_run_001",
+        "g14b_i_80_run_001_f5100_5123_t1113433644900_1113433647200": "i_80_run_001",
+        "g14b_i_80_run_003_f10933_10956_t1113438658200_1113438660500": "i_80_run_003",
+        "g14b_i_80_run_002_f75_98_t1113436774400_1113436776700": "i_80_run_002",
+        "g14b_i_80_run_001_f7596_7619_t1113433894500_1113433896800": "i_80_run_001",
+        "g14b_i_80_run_001_f8028_8051_t1113433937700_1113433940000": "i_80_run_001",
+        "g14b_i_80_run_003_f4837_4860_t1113438048600_1113438050900": "i_80_run_003",
+        "g14b_i_80_run_001_f5676_5699_t1113433702500_1113433704800": "i_80_run_001",
+        "g14b_i_80_run_001_f3804_3827_t1113433515300_1113433517600": "i_80_run_001",
+        "g14b_i_80_run_003_f4597_4620_t1113438024600_1113438026900": "i_80_run_003",
+        "g14b_i_80_run_001_f3516_3539_t1113433486500_1113433488800": "i_80_run_001",
+        "g14b_i_80_run_003_f4549_4572_t1113438019800_1113438022100": "i_80_run_003"
+      },
+      "capacity_mb": 288,
+      "identity_source": "hash_verified_post_ablation_handoff.coordinates + producer_manifest + runtime contract"
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "runtime_config_resource_id": "runtime_config.medium_576mb",
+      "committed_path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-4931a055d167dfcf76cf6ded",
+      "rows": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-4931a055d167dfcf76cf6ded/benchmark_rows.csv",
+        "sha256": "3f73b499770b81d77f89ef6f05e7d2389198beb23b87e3768ab7182e5b7ad1f2",
+        "size_bytes": 4924781,
+        "producer_manifest_path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-4931a055d167dfcf76cf6ded/artifact_integrity_manifest.json",
+        "producer_manifest_sha256": "1e8619d697b8e94bc208157603f3305a7849b6f64223dc4ee3bd7446f1005964"
+      },
+      "aggregate": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-4931a055d167dfcf76cf6ded/aggregate_summary.json",
+        "sha256": "57f344c03d4a6afc3550efd0cfe6885a2c52c94bcec2070f39a466178d5c8caf",
+        "size_bytes": 63289799,
+        "producer_manifest_path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-4931a055d167dfcf76cf6ded/artifact_integrity_manifest.json",
+        "producer_manifest_sha256": "1e8619d697b8e94bc208157603f3305a7849b6f64223dc4ee3bd7446f1005964"
+      },
+      "run_manifest": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-4931a055d167dfcf76cf6ded/run_manifest.json",
+        "sha256": "f7952d80f78c0efdd3b2538df5eb6676ce6ac9ce6ba12d98c19aee85ea95ee8d",
+        "size_bytes": 467835,
+        "producer_manifest_path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-4931a055d167dfcf76cf6ded/artifact_integrity_manifest.json",
+        "producer_manifest_sha256": "1e8619d697b8e94bc208157603f3305a7849b6f64223dc4ee3bd7446f1005964"
+      },
+      "window_to_source_segment_run_id": {
+        "g14b_i_80_run_001_f6972_6995_t1113433832100_1113433834400": "i_80_run_001",
+        "g14b_i_80_run_001_f5100_5123_t1113433644900_1113433647200": "i_80_run_001",
+        "g14b_i_80_run_003_f10933_10956_t1113438658200_1113438660500": "i_80_run_003",
+        "g14b_i_80_run_002_f75_98_t1113436774400_1113436776700": "i_80_run_002",
+        "g14b_i_80_run_001_f7596_7619_t1113433894500_1113433896800": "i_80_run_001",
+        "g14b_i_80_run_001_f8028_8051_t1113433937700_1113433940000": "i_80_run_001",
+        "g14b_i_80_run_003_f4837_4860_t1113438048600_1113438050900": "i_80_run_003",
+        "g14b_i_80_run_001_f5676_5699_t1113433702500_1113433704800": "i_80_run_001",
+        "g14b_i_80_run_001_f3804_3827_t1113433515300_1113433517600": "i_80_run_001",
+        "g14b_i_80_run_003_f4597_4620_t1113438024600_1113438026900": "i_80_run_003",
+        "g14b_i_80_run_001_f3516_3539_t1113433486500_1113433488800": "i_80_run_001",
+        "g14b_i_80_run_003_f4549_4572_t1113438019800_1113438022100": "i_80_run_003"
+      },
+      "capacity_mb": 576,
+      "identity_source": "hash_verified_post_ablation_handoff.coordinates + producer_manifest + runtime contract"
+    },
+    {
+      "capacity_label": "relaxed_864mb",
+      "runtime_config_resource_id": "runtime_config.relaxed_864mb",
+      "committed_path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-d81f46ce6883684144cfe40d",
+      "rows": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-d81f46ce6883684144cfe40d/benchmark_rows.csv",
+        "sha256": "528e3c47f8bf0124940f3bf6f57f88b132627f7ce69e62b408b08bbd05b08626",
+        "size_bytes": 4926989,
+        "producer_manifest_path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-d81f46ce6883684144cfe40d/artifact_integrity_manifest.json",
+        "producer_manifest_sha256": "f2b75a306b8a3cd5ff9f1c2f371d6cc0c48b0f063cb22f77f2f86719a0cc6c26"
+      },
+      "aggregate": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-d81f46ce6883684144cfe40d/aggregate_summary.json",
+        "sha256": "6bf0f3b63e415e628a56af33e74a7ccb14e3b6cb281dfec219ce381e08282113",
+        "size_bytes": 63292368,
+        "producer_manifest_path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-d81f46ce6883684144cfe40d/artifact_integrity_manifest.json",
+        "producer_manifest_sha256": "f2b75a306b8a3cd5ff9f1c2f371d6cc0c48b0f063cb22f77f2f86719a0cc6c26"
+      },
+      "run_manifest": {
+        "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-d81f46ce6883684144cfe40d/run_manifest.json",
+        "sha256": "0bc2ee46461c435a7587192782350da01f9f6b2eb315240da9636ed79af4bc0f",
+        "size_bytes": 467892,
+        "producer_manifest_path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-d81f46ce6883684144cfe40d/artifact_integrity_manifest.json",
+        "producer_manifest_sha256": "f2b75a306b8a3cd5ff9f1c2f371d6cc0c48b0f063cb22f77f2f86719a0cc6c26"
+      },
+      "window_to_source_segment_run_id": {
+        "g14b_i_80_run_001_f6972_6995_t1113433832100_1113433834400": "i_80_run_001",
+        "g14b_i_80_run_001_f5100_5123_t1113433644900_1113433647200": "i_80_run_001",
+        "g14b_i_80_run_003_f10933_10956_t1113438658200_1113438660500": "i_80_run_003",
+        "g14b_i_80_run_002_f75_98_t1113436774400_1113436776700": "i_80_run_002",
+        "g14b_i_80_run_001_f7596_7619_t1113433894500_1113433896800": "i_80_run_001",
+        "g14b_i_80_run_001_f8028_8051_t1113433937700_1113433940000": "i_80_run_001",
+        "g14b_i_80_run_003_f4837_4860_t1113438048600_1113438050900": "i_80_run_003",
+        "g14b_i_80_run_001_f5676_5699_t1113433702500_1113433704800": "i_80_run_001",
+        "g14b_i_80_run_001_f3804_3827_t1113433515300_1113433517600": "i_80_run_001",
+        "g14b_i_80_run_003_f4597_4620_t1113438024600_1113438026900": "i_80_run_003",
+        "g14b_i_80_run_001_f3516_3539_t1113433486500_1113433488800": "i_80_run_001",
+        "g14b_i_80_run_003_f4549_4572_t1113438019800_1113438022100": "i_80_run_003"
+      },
+      "capacity_mb": 864,
+      "identity_source": "hash_verified_post_ablation_handoff.coordinates + producer_manifest + runtime contract"
+    }
+  ],
+  "augmented_inputs": [
+    {
+      "path": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_capacity_statistics_20260923_v1/analysis_inputs/constrained_288mb.benchmark_rows.csv",
+      "sha256": "a3921350248a90b531978eb9f8c1e0e0e72b01c45fbb8f626036e1beb8dba782",
+      "size_bytes": 5271255
+    },
+    {
+      "path": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_capacity_statistics_20260923_v1/analysis_inputs/medium_576mb.benchmark_rows.csv",
+      "sha256": "e24b473fbe2f1bcbb5268cef4d8b77982922fadde7ca40c7f37d4dc6e5b35174",
+      "size_bytes": 5302869
+    },
+    {
+      "path": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_capacity_statistics_20260923_v1/analysis_inputs/relaxed_864mb.benchmark_rows.csv",
+      "sha256": "f8853b344519697268410888983396b7a055a55efb0810928df3c300b8edf4e4",
+      "size_bytes": 5310477
+    }
+  ],
+  "original_protection_verification": [
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-ca75f4fd6cba10d56d8210cb/benchmark_rows.csv",
+      "expected_sha256": "5cd14c5992c9a5826d21e8bcbe7779470439a2b5979a69d1e12ab0d69463797b",
+      "observed_sha256": "5cd14c5992c9a5826d21e8bcbe7779470439a2b5979a69d1e12ab0d69463797b",
+      "unchanged": true
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-4931a055d167dfcf76cf6ded/benchmark_rows.csv",
+      "expected_sha256": "3f73b499770b81d77f89ef6f05e7d2389198beb23b87e3768ab7182e5b7ad1f2",
+      "observed_sha256": "3f73b499770b81d77f89ef6f05e7d2389198beb23b87e3768ab7182e5b7ad1f2",
+      "unchanged": true
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_evaluation_only_20260913_g14r20_i3_pending/formal_controller/formal_controller-d81f46ce6883684144cfe40d/benchmark_rows.csv",
+      "expected_sha256": "528e3c47f8bf0124940f3bf6f57f88b132627f7ce69e62b408b08bbd05b08626",
+      "observed_sha256": "528e3c47f8bf0124940f3bf6f57f88b132627f7ce69e62b408b08bbd05b08626",
+      "unchanged": true
+    }
+  ],
+  "generator_repository": {
+    "checkout": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC",
+    "git_commit": "d6c53b4154f84dcb398ceb0f88ace642142c0f23",
+    "git_tree": "1068b70d642484c9cadadf9380ec2245b640b4e1",
+    "branch": "codex/g14r22-b-capacity-background",
+    "clean": true
+  }
+}

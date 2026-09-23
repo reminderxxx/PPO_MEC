@@ -2066,5 +2066,11 @@ JUnit 和未签发新申请由独立 I2 验收记录绑定。本记录不提前�
   claim 由数据导出仍为 mixed 72、contradicted 12、Holm<0.05 为 0。
 - 单次后台宿主已覆盖 launcher 会话退出、正常完成、child 非零、可捕获 signal、SIGKILL 后只读 unknown 和 PID
   reuse 防护；只有科学 terminal receipt + 完整性通过才判 `SUCCEEDED`，无 retry/resume/AI/API/监控代理。
-- 当前 executor commit/tree 与真实长验收 request/package/hash 尚待本分支首次提交后冻结；grant/token 未签，
-  training/formal rerun/model selection/holdout policy 均为 0，`holdout_opened=false`。
+- 最终 clean executor commit=`d6c53b4154f84dcb398ceb0f88ace642142c0f23`、tree=
+  `1068b70d642484c9cadadf9380ec2245b640b4e1`。真实长验收已生成 create-only unsigned request、scientific package 与
+  job package；request SHA-256=`398e0c386104f1e8513a93d671ef419b5265eda20c0ee2b26b8f6f96d5926331`，scientific
+  package SHA-256=`cd859dc4af0634fe746dc4c87739604976ac01903a6eddc3061ce7a29b243bcd`，job canonical
+  SHA-256=`1f0965eecc34865421858093581a68a65c9ca90eab2bcb1f8cc06bc59bfe63d6`。解释器调用路径固定为项目
+  `.venv/bin/python`，解析目标另行 hash-bound；科学 root/job root 在 launch 前均不存在。此前错误解析 symlink 的包从未
+  启动，移入 `/tmp` audit-only，不计为 retry。grant/token 未签，training/formal rerun/model selection/holdout policy
+  均为 0，`holdout_opened=false`。

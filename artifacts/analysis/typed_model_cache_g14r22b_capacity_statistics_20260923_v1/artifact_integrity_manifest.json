@@ -1,0 +1,56 @@
+{
+  "integrity_manifest_version": "g14r22b_capacity_statistics_v1",
+  "file_count": 10,
+  "files": [
+    {
+      "path": "analysis_inputs/constrained_288mb.benchmark_rows.csv",
+      "size_bytes": 5271255,
+      "sha256": "a3921350248a90b531978eb9f8c1e0e0e72b01c45fbb8f626036e1beb8dba782"
+    },
+    {
+      "path": "analysis_inputs/medium_576mb.benchmark_rows.csv",
+      "size_bytes": 5302869,
+      "sha256": "e24b473fbe2f1bcbb5268cef4d8b77982922fadde7ca40c7f37d4dc6e5b35174"
+    },
+    {
+      "path": "analysis_inputs/relaxed_864mb.benchmark_rows.csv",
+      "size_bytes": 5310477,
+      "sha256": "f8853b344519697268410888983396b7a055a55efb0810928df3c300b8edf4e4"
+    },
+    {
+      "path": "analysis_summary.json",
+      "size_bytes": 1565,
+      "sha256": "f2dd9abb108cfc098351aeef418509f98cf4884c533654c761e865eef8be20dd"
+    },
+    {
+      "path": "capacity_aware_statistics/paired_statistics.csv",
+      "size_bytes": 32407,
+      "sha256": "315127afe753f105ab21c5049121ed291edc815f1ce8601dbabc6d7b93778018"
+    },
+    {
+      "path": "capacity_aware_statistics/paired_statistics.json",
+      "size_bytes": 161351,
+      "sha256": "030c7f76e95f3daa10dcda10c9a649c724f523378e63599e8a115b0810470297"
+    },
+    {
+      "path": "capacity_identity_provenance.json",
+      "size_bytes": 14663,
+      "sha256": "86f9746c47f194fc10e01232d3caf6b684d4545c9a9afc8470febb994d7388cb"
+    },
+    {
+      "path": "g14r21_old_new_capacity_comparison.json",
+      "size_bytes": 144502,
+      "sha256": "c78a96d4ffc1e53c54b4730343773e2c1ef1cd485e89c8d4e44c3bd6ffe5debd"
+    },
+    {
+      "path": "independent_recalculation.json",
+      "size_bytes": 63794,
+      "sha256": "09eb6030a5f0db34938a0819c57c68fe6e51ca8f8026f6e979c5dba1d2953f8b"
+    },
+    {
+      "path": "statistics_command_receipt.json",
+      "size_bytes": 2687,
+      "sha256": "f67ea752bd4cd2b18f8a10eb8dc7015223d338564ff2003ce0c4912f2627d87b"
+    }
+  ]
+}

@@ -5,7 +5,7 @@
 - `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`
 - `artifact_run_id`: `typed_model_cache_g14r22b_capacity_statistics_20260923_v1`
 - `policy_version`: `tmc_review_policy_v3_20260621`
-- `evidence_level`: `E3_TARGETED_REPRODUCED_WITH_VERIFIED_CAPACITY_IDENTITY; REAL_PUBLIC_CHAIN_PENDING`
+- `evidence_level`: `E3_TARGETED_REPRODUCED_WITH_VERIFIED_CAPACITY_IDENTITY; REAL_PUBLIC_CHAIN_FROZEN_PRELAUNCH`
 - `grant_signed`: `false`
 - `token_issued`: `false`
 - `holdout_opened`: `false`
@@ -35,7 +35,8 @@ runtime MB 和 aggregate selected-window plan 在独立 `analysis_inputs/` 补�
 
 ## C. 后台宿主保证与限制
 
-宿主只执行一个冻结命令。package 固定 cwd、Python、环境、request/scientific package/commit/tree/hash；记录外层
+宿主只执行一个冻结命令。package 固定 cwd、Python 调用路径及解析目标、环境、request/scientific
+package/commit/tree/hash；记录外层
 stdout/stderr、child rc、supervisor/child PID + process birth token + live command hash、起止时间和 terminal receipt。
 状态仅为 `RUNNING/SUCCEEDED/FAILED/INTERRUPTED_OR_UNKNOWN`。child rc=0 不足以成功；科学 receipt 必须
 `passed=true`、`return_code=0`、`holdout_opened=false`，published integrity manifest 还必须逐文件通过。
@@ -47,7 +48,12 @@ stdout/stderr、child rc、supervisor/child PID + process birth token + live com
 
 ## D. 申请边界
 
-容量感知历史复算和宿主专项测试已通过；真实 public non-holdout producer→CSV→statistics 长链必须在首次 clean
-executor commit 冻结后由宿主启动。只有该链完成并经独立只读审查，才生成替代 v3 的新 unsigned 申请并判断是否可
-提交授权审查。v3 永久 audit-only，不覆盖旧申请或原件。本任务不签 grant/token、不创建正式 holdout root、不训练、
-不选模、不重跑既有正式 rollout。
+容量感知历史复算和宿主专项测试已通过。真实 public non-holdout producer→CSV→statistics 长链已冻结在 clean
+executor commit `d6c53b4154f84dcb398ceb0f88ace642142c0f23`、tree
+`1068b70d642484c9cadadf9380ec2245b640b4e1`；request SHA-256=
+`398e0c386104f1e8513a93d671ef419b5265eda20c0ee2b26b8f6f96d5926331`，scientific package SHA-256=
+`cd859dc4af0634fe746dc4c87739604976ac01903a6eddc3061ce7a29b243bcd`，job canonical SHA-256=
+`1f0965eecc34865421858093581a68a65c9ca90eab2bcb1f8cc06bc59bfe63d6`。前一份错误解析 venv symlink 的包从未启动，
+仅留在 `/tmp` 作本机审计，不构成 retry。只有该链完成并经独立只读审查，才生成替代 v3 的新 unsigned 申请并判断
+是否可提交授权审查。v3 永久 audit-only，不覆盖旧申请或原件。本任务不签 grant/token、不创建正式 holdout root、
+不训练、不选模、不重跑既有正式 rollout。

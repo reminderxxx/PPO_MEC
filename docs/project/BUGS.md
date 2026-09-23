@@ -756,6 +756,7 @@ G14E01 六文件残留不是合法 initialized run，没有原生 failed termina
   Holm/claim 未变。旧 G14R21 包保留 audit-only，不能再证明 capacity-aware clustering。
 - `RESOLVED IN TESTS / host semantics`：固定单次宿主具备外层日志/退出码/进程 birth identity/terminal receipt，且
   `SUCCEEDED` 依赖科学 receipt 与 integrity；失败不重试。SIGKILL/断电可能无即时 terminal receipt，只能后续只读
-  判 `INTERRUPTED_OR_UNKNOWN`。
-- `PENDING`：必须在 clean frozen executor 上完成一次真实 public non-holdout producer→CSV→statistics 长验收，才可
+  判 `INTERRUPTED_OR_UNKNOWN`。解释器身份同时冻结 venv 调用路径与解析后的二进制目标，任一被替换即拒绝。
+- `PENDING / FROZEN PRELAUNCH`：clean executor `d6c53b4` / tree `1068b70d`、unsigned request 与单次 job package 已
+  hash-bound；必须完成一次真实 public non-holdout producer→CSV→statistics 长验收，才可
   形成新 unsigned 申请并提交独立授权审查。v3 继续 audit-only；grant/token 未签，holdout unopened。
