@@ -1,3 +1,22 @@
+## 2026-09-23 G14R22-C 最终只读验收与 holdout unsigned v4 封包
+
+- 单次后台任务终态 `SUCCEEDED`、child rc=0，UTC `09:23:57–09:32:39`（北京时间
+  `17:23:57–17:32:39`）；科学 receipt、dedicated execution receipt 与 publication integrity manifest 的
+  SHA-256 均和 terminal receipt 一致。重新逐文件核对 published root 为 `247/247`、exact inventory match，
+  files-canonical SHA-256=`2c7c78e5...0242`。
+- 三容量 CSV 均为 72 行，`capacity_label`/runtime resource 与容量逐行一致；216 行形成 108 个完整
+  `(seed, window_id, workflow_id, capacity_label)` candidate/baseline 坐标。真实 SA checkpoint 三份逐字节匹配，
+  108 条 learned rollout row 均为 `checkpoint_provenance_status=compatible`；另有 108 条 reactive row。
+- 六项统计的 inner clusters 为 `108/108/108/108/108/44`。delay 的 44 对来自双方同时 finite 的样本，按
+  288/576/864 MB 为 `10/17/17`、覆盖 9 个 outer windows；其余 64 对双方均 unavailable，不是跨容量合并。
+- 新唯一申请根为 `artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4/`，绑定 clean
+  executor `c3a88bd0ac3e3ffae16854abf695431a725fa0de`。request/科学 command/background task canonical SHA-256
+  分别为 `1fa58018...8478` / `7280f78f...0aaf` / `59df6dac...fa14e`；150 checkpoint、105,464,376 bytes
+  的 pre-open 重散列通过，生产 `qualify` 通过。
+- v1–v3 保留 audit-only，禁止签发或执行。v4 仍为 unsigned：`grant_signed=false`、`token_issued=false`、
+  `execution_authorized=false`、正式 output root 不存在、holdout sealed/unopened。后台任务包含未解析 grant/token
+  占位符且 `launch_allowed=false`；本轮没有 launch、holdout policy 或正式 performance 访问。
+
 ## 2026-09-23 G14R22-C：数据候选资格与后台 live identity 定向修复
 
 - 完整解析 `33d8aa8` 与 G14R22-B child stderr/frozen command/resource registry/fairness manifest。NGSIM、Alibaba
@@ -11,9 +30,8 @@
   `INTERRUPTED_OR_UNKNOWN`，不会自动重启。
 - 定向 resolver/background/capacity/producer-integrity 122 tests、publication/statistics/environment 33 tests 与 smoke 通过；独立只读复审另有定向 111 tests 和 generated-resource/formal-execution/integrity 98 tests 通过；最终 `cc6edfc` clean detached executor 的含 live-consumer 合并回归 136 tests 通过；真实 G14R22-B command 的只读数据解析
   preflight 通过。旧失败 root/receipt 未修改，holdout unopened，训练/选模/正式矩阵均为 0。
-- 新单次 public non-holdout 后台验收须在 final clean executor 与全新 package/root 上启动。本轮启动后即停止 AI
-  轮次，不轮询、不监控、不重试；未读回 terminal receipt 前 verdict 固定为 `NOT READY`。详见
-  `g14r22c_data_background_repair.md`。
+- 新单次 public non-holdout 后台验收随后已在 final clean executor 与全新 package/root 上一次完成；本段保留实现轮
+  边界，最终只读结果与 unsigned v4 以本文件上一节为准。详见 `g14r22c_data_background_repair.md`。
 
 ## 2026-09-23: G14R22 one-time holdout 执行合同与非正式验收
 

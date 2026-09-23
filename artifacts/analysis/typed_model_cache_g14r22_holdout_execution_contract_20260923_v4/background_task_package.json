@@ -1,0 +1,57 @@
+{
+  "background_task_package_version": "g14r22_holdout_pre_authorization_v1",
+  "created_at": "2026-09-23T11:21:30.385066+00:00",
+  "status": "FROZEN_UNSIGNED_AWAITING_GRANT_AND_TOKEN",
+  "launch_allowed": false,
+  "executor_checkout": "/Users/howen/Projects/PPO_MEC_g14r22_final_executor",
+  "executor_commit": "c3a88bd0ac3e3ffae16854abf695431a725fa0de",
+  "executor_git_tree": "2c2cc7ee2b120190ae0a87ae7bf6bd236734a162",
+  "python_executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "cwd": "/Users/howen/Projects/PPO_MEC_g14r22_final_executor",
+  "request": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4/holdout_request_unsigned.json",
+    "size_bytes": 10980,
+    "sha256": "1be5cdae22d566145a090de1dac36ca84200147cf0510a09cddb3282a2888321",
+    "canonical_sha256": "1fa580182452004176f1f9dc12d2d961a9950ef0adf550af1a371645fd758478"
+  },
+  "scientific_command_package": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4/scientific_command_package.json",
+    "size_bytes": 324135,
+    "sha256": "95b1d9760cfbc50dabe015b418460ea06a42318c0096124c4306f35dbf85162e",
+    "canonical_sha256": "7280f78f10bba2d128b1222e9fdb1e5dd326c212f38ff7e5a81b57c865af0aaf"
+  },
+  "independent_readonly_review": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4/independent_readonly_review.json",
+    "size_bytes": 3231,
+    "sha256": "a8e55602842f66e54d10577c9384d7bedac7db7b0d1562bb82a1db2f3d104401"
+  },
+  "protection_snapshot": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4/protection_snapshot.json",
+    "size_bytes": 1564,
+    "sha256": "62622103bce5373be60c6a1d54f7708bbc753faddd829a9b957f9eba20532dcf"
+  },
+  "future_authorized_command_template": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "/Users/howen/Projects/PPO_MEC_g14r22_final_executor/scripts/run_dedicated_public_holdout.py",
+    "--request-path",
+    "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4/holdout_request_unsigned.json",
+    "--command-package-path",
+    "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4/scientific_command_package.json",
+    "--grant-path",
+    "{G14R22_SIGNED_GRANT_PATH}",
+    "--one-time-token-file",
+    "{G14R22_ONE_TIME_TOKEN_PATH}",
+    "--check",
+    "execute"
+  ],
+  "unresolved_authorization_placeholders": [
+    "{G14R22_SIGNED_GRANT_PATH}",
+    "{G14R22_ONE_TIME_TOKEN_PATH}"
+  ],
+  "automatic_retry_count": 0,
+  "grant_signed": false,
+  "token_issued": false,
+  "execution_authorized": false,
+  "holdout_opened": false,
+  "background_task_package_sha256": "59df6dac639b626003d2e71a0e5b1b7394f6c25a1bf6890fe165aa5f7b5fa14e"
+}

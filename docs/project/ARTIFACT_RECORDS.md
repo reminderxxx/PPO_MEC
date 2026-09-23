@@ -5,6 +5,23 @@
 
 # Artifact Records
 
+## 2026-09-23 G14R22-C final readback / unsigned holdout request v4
+
+- 唯一申请 path：`artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4/`；最终 clean
+  executor commit=`c3a88bd0ac3e3ffae16854abf695431a725fa0de`。v1–v3 保留 audit-only，不得签发或执行。
+- canonical request / scientific command package / background task package SHA-256 为
+  `1fa580182452004176f1f9dc12d2d961a9950ef0adf550af1a371645fd758478` /
+  `7280f78f10bba2d128b1222e9fdb1e5dd326c212f38ff7e5a81b57c865af0aaf` /
+  `59df6dac639b626003d2e71a0e5b1b7394f6c25a1bf6890fe165aa5f7b5fa14e`。
+- `publication_integrity_recalculation.json` 重算 G14R22-C 成功 published root：247/247 exact inventory，三容量各
+  72 行；108 完整 capacity-aware pairs，inner clusters=`108/108/108/108/108/44`。delay 44 finite pairs 按
+  容量为 `10/17/17`，64 对双方均 unavailable。
+- `checkpoint_byte_audit_preopen.json` 重散列正式 150 checkpoints / 105,464,376 bytes；成功验收真实使用的三份
+  SA checkpoint 另在发布复算中逐字节核对并各支持 36 条 compatible learned rollout rows。
+- `independent_readonly_review.json` verdict=`READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION`；生产 qualify pass，
+  但 background package 为 `FROZEN_UNSIGNED_AWAITING_GRANT_AND_TOKEN` / `launch_allowed=false`。grant/token、正式
+  execute、holdout opening 和 performance claim 均为 0。
+
 ## 2026-09-23 G14R22 one-time holdout execution request
 
 - path：`artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v1/`；executor 是持久 clean

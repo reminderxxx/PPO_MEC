@@ -1,0 +1,146 @@
+{
+  "recalculation_version": "g14r22_final_publication_integrity_v1",
+  "reviewed_at": "2026-09-23T11:21:30.384080+00:00",
+  "status": "passed",
+  "source_manifest": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/real_non_holdout/public_entry_output/artifact_integrity_manifest.json",
+    "size_bytes": 64674,
+    "sha256": "d50cd263e4d4428cb3d8e5003e6207d648d550c09ab7b5034f3672397d526f36"
+  },
+  "checked_file_count": 247,
+  "files_canonical_sha256": "2c7c78e5c90f9c53fabd8ad77dfde89ee7dc14ecef03a1682e052730a03b0242",
+  "exact_inventory_match": true,
+  "csv_audit": [
+    {
+      "capacity_label": "constrained_288mb",
+      "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/real_non_holdout/public_entry_output/published/scientific/constrained_288mb/benchmark_rows.csv",
+      "size_bytes": 138227,
+      "sha256": "08d026af5f577b04c4b2b7b4e9cb498c3b251b828b649ce31241a4e3f81c9def",
+      "row_count": 72,
+      "learned_rollout_rows": 36,
+      "reactive_rollout_rows": 36,
+      "window_count": 12,
+      "workflow_count": 3,
+      "source_segment_run_ids": [
+        "i_80_run_001",
+        "i_80_run_002",
+        "i_80_run_003"
+      ]
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/real_non_holdout/public_entry_output/published/scientific/medium_576mb/benchmark_rows.csv",
+      "size_bytes": 139044,
+      "sha256": "04bf42c4215be4cc18ea2f69d271e64957bc5ee5fd81a26470f3a8e4eef10abd",
+      "row_count": 72,
+      "learned_rollout_rows": 36,
+      "reactive_rollout_rows": 36,
+      "window_count": 12,
+      "workflow_count": 3,
+      "source_segment_run_ids": [
+        "i_80_run_001",
+        "i_80_run_002",
+        "i_80_run_003"
+      ]
+    },
+    {
+      "capacity_label": "relaxed_864mb",
+      "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/real_non_holdout/public_entry_output/published/scientific/relaxed_864mb/benchmark_rows.csv",
+      "size_bytes": 139239,
+      "sha256": "849c437efd7e35df757a611f01ca433b40999c2575d5590722fa4140864c9685",
+      "row_count": 72,
+      "learned_rollout_rows": 36,
+      "reactive_rollout_rows": 36,
+      "window_count": 12,
+      "workflow_count": 3,
+      "source_segment_run_ids": [
+        "i_80_run_001",
+        "i_80_run_002",
+        "i_80_run_003"
+      ]
+    }
+  ],
+  "statistics": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/real_non_holdout/public_entry_output/published/statistics/paired_statistics.json",
+    "sha256": "bc2f7c1f35fcf45a1792af3d0c2473462109a747024e0244d5794a0e683c2295",
+    "comparison_count": 6,
+    "pair_keys": [
+      "seed",
+      "window_id",
+      "workflow_id",
+      "capacity_label"
+    ],
+    "outer_cluster_keys": [
+      "source_segment_run_id",
+      "window_id"
+    ],
+    "inner_cluster_keys": [
+      "seed",
+      "workflow_id",
+      "capacity_label"
+    ],
+    "validated_pair_coordinate_count": 108,
+    "inner_cluster_counts": [
+      108,
+      108,
+      108,
+      108,
+      108,
+      44
+    ],
+    "delay_both_unavailable_pair_count": 64,
+    "delay_finite_pair_count": 44,
+    "delay_finite_by_capacity": {
+      "constrained_288mb": 10,
+      "medium_576mb": 17,
+      "relaxed_864mb": 17
+    },
+    "delay_finite_outer_window_count": 9,
+    "delay_finite_by_window": {
+      "g14b_i_80_run_001_f3516_3539_t1113433486500_1113433488800": 6,
+      "g14b_i_80_run_001_f5100_5123_t1113433644900_1113433647200": 6,
+      "g14b_i_80_run_001_f5676_5699_t1113433702500_1113433704800": 6,
+      "g14b_i_80_run_001_f8028_8051_t1113433937700_1113433940000": 9,
+      "g14b_i_80_run_003_f4549_4572_t1113438019800_1113438022100": 3,
+      "g14b_i_80_run_001_f7596_7619_t1113433894500_1113433896800": 2,
+      "g14b_i_80_run_002_f75_98_t1113436774400_1113436776700": 6,
+      "g14b_i_80_run_003_f4597_4620_t1113438024600_1113438026900": 2,
+      "g14b_i_80_run_003_f4837_4860_t1113438048600_1113438050900": 4
+    },
+    "delay_finite_by_workflow": {
+      "j_15": 23,
+      "j_3": 16,
+      "j_8": 5
+    }
+  },
+  "actual_checkpoint_audit": [
+    {
+      "capacity_label": "constrained_288mb",
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/training/sa_ghmappo/formal_constrained_288mb_sa_ghmappo_seed7/checkpoints/update_0012.pt",
+      "size_bytes": 2093751,
+      "sha256": "440dd4ae5496da152f0b95c173e8023536a00d63e0b1ca15dea1129ef03ae18b",
+      "compatible_rollout_rows": 36
+    },
+    {
+      "capacity_label": "medium_576mb",
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/training/sa_ghmappo/formal_medium_576mb_sa_ghmappo_seed7/checkpoints/update_0008.pt",
+      "size_bytes": 2093751,
+      "sha256": "eb685a9df20a976ada984d30c262059817a785be118c15f4675ec3efd0596d85",
+      "compatible_rollout_rows": 36
+    },
+    {
+      "capacity_label": "relaxed_864mb",
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/training/sa_ghmappo/formal_relaxed_864mb_sa_ghmappo_seed7/checkpoints/update_0008.pt",
+      "size_bytes": 2093751,
+      "sha256": "226ee56492a56cae3150dd8da3e34f5531bfcc4094cf4fe94450f1728afc38bd",
+      "compatible_rollout_rows": 36
+    }
+  ],
+  "rollout_evidence": {
+    "total_rows": 216,
+    "learned_policy_rollout_rows": 108,
+    "reactive_rollout_rows": 108,
+    "complete_capacity_aware_pair_coordinates": 108
+  },
+  "holdout_opened": false
+}

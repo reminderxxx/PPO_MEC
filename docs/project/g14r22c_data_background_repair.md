@@ -8,7 +8,7 @@
 - `base_git_commit`: `33d8aa8fba2361e4b0598fe193dda7ceae4816f5`
 - `executor_git_commit`: `cc6edfc43f826dd252443897cffe01d9e7508fa1`
 - `executor_git_tree`: `aa45e7fed6faf5981e0791b8264172bd3a458cb5`
-- `evidence_level`: `E2_TARGETED_IMPLEMENTATION_AND_REAL_RESOURCE_PREFLIGHT; REAL_PUBLIC_CHAIN_PENDING_SINGLE_BACKGROUND_LAUNCH`
+- `evidence_level`: `E2_ARTIFACT_AUDITED_NON_HOLDOUT_ACCEPTANCE_AND_PREOPEN_ONLY`
 - `grant_signed`: `false`
 - `token_issued`: `false`
 - `holdout_opened`: `false`
@@ -79,17 +79,24 @@ resume、reopen 或第二次 launch。
   nullable coverage、W/T/L、exact sign p、fixed-family Holm 和 effect，明确不独立复算 bootstrap CI。因此只能说
   非 CI 复算字段与 production 输出一致，不能把 bootstrap CI 描述为独立双实现复算。
 
-## 5. 单次真实验收与当前 verdict
+## 5. 单次真实验收与最终授权前 verdict
 
-新 root 必须是
-`artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/`，由最终 clean executor
-commit 生成 create-only request/scientific/job package。只允许执行 `freeze_receipt.json` 的一次 launch；启动后本轮
-不轮询、不创建监控任务、不修复或重试。用户后续回来后再只读集中核对三容量真实 CSV、checkpoint/rollout counts、
-capacity-aware statistics、publication integrity 与 terminal receipt。
+新 root
+`artifacts/analysis/typed_model_cache_g14r22c_data_background_acceptance_20260923_v1/` 已由 clean executor
+`cc6edfc43f826dd252443897cffe01d9e7508fa1` 单次执行完成。terminal=`SUCCEEDED`、child rc=0；北京时间
+`17:23:57–17:32:39`。科学 receipt、dedicated receipt 与 integrity manifest 的 hash 均与 terminal receipt 相等，
+published root 逐文件复算为 247/247 exact match，canonical SHA-256=`2c7c78e5...0242`。
 
-当前 provisional verdict：`IMPLEMENTATION_AND_PREFLIGHT_PASS / REAL_CHAIN_NOT_YET_VERIFIED / NOT READY`。
-只有新 job 的 terminal receipt 为 `SUCCEEDED`，且科学 receipt、三容量 CSV、statistics 和完整性逐文件复核均通过，
-才可在后续独立审查中升级；否则准确保留失败或 UNKNOWN，绝不宣称 READY。
+三容量各 72 行；真实 CSV 的 `capacity_label` 与 runtime resource 正确。三份 SA checkpoint 实际字节/hash 与 manifest
+一致，108 条 learned rollout row 均为 compatible，另有 108 条 reactive row。统计使用
+`seed,window_id,workflow_id,capacity_label` 配对，形成 108 个坐标；六项 inner cluster 为
+`108/108/108/108/108/44`。delay 的 44 对由双方同时 finite 产生，288/576/864 MB 为 `10/17/17`、覆盖 9 个
+outer windows；64 对双方均 unavailable。
+
+最终 verdict：`REAL_PUBLIC_CHAIN_PASS / READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION`。唯一申请根为
+`artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4/`，绑定 final clean executor
+`c3a88bd0ac3e3ffae16854abf695431a725fa0de`。该 verdict 不是授权：grant/token 未签，background task
+`launch_allowed=false`，正式 output root 不存在，holdout sealed/unopened，未产生正式 performance claim。
 
 冻结身份：request SHA-256 为 `307397b24d99a96b980c78539f96a76931809230767b48c6a029f67c4117ddd2`，
 scientific package SHA-256 为 `8e590f8473b7657c090adb72a05bf371e248b183b32afb042e28194aaddaa73c`，

@@ -1,0 +1,35 @@
+{
+  "protection_snapshot_version": "g14r22_final_pre_authorization_v1",
+  "recorded_at": "2026-09-23T11:21:30.384588+00:00",
+  "status": "pass",
+  "executor": {
+    "checkout": "/Users/howen/Projects/PPO_MEC_g14r22_final_executor",
+    "commit": "c3a88bd0ac3e3ffae16854abf695431a725fa0de",
+    "git_tree": "2c2cc7ee2b120190ae0a87ae7bf6bd236734a162",
+    "clean": true
+  },
+  "successful_acceptance": {
+    "terminal_status": "SUCCEEDED",
+    "child_return_code": 0,
+    "holdout_opened": false,
+    "publication_file_count": 247,
+    "publication_files_canonical_sha256": "2c7c78e5c90f9c53fabd8ad77dfde89ee7dc14ecef03a1682e052730a03b0242"
+  },
+  "holdout_seal": {
+    "path": "/Users/howen/Projects/PPO_MEC_g14r22_final_executor/artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/holdout_seal_record.json",
+    "size_bytes": 2346,
+    "sha256": "0ebee649f58eea3dac90977a67a9b175f20e6fcc3b05e019cb2da6e70404b5dd",
+    "sealed": true,
+    "opened": false,
+    "consumed_permanently": false,
+    "one_time_execution_token_status": "not_issued_in_G14B"
+  },
+  "formal_output_root": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_holdout/typed_model_cache_holdout_20260923_g14r22_once",
+  "formal_output_root_absent": true,
+  "request_sha256": "1fa580182452004176f1f9dc12d2d961a9950ef0adf550af1a371645fd758478",
+  "command_package_sha256": "7280f78f10bba2d128b1222e9fdb1e5dd326c212f38ff7e5a81b57c865af0aaf",
+  "grant_signed": false,
+  "token_issued": false,
+  "execution_authorized": false,
+  "holdout_opened": false
+}

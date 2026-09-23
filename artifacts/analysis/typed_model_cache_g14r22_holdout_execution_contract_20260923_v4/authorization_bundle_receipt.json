@@ -1,0 +1,64 @@
+{
+  "receipt_version": "g14r22_final_authorization_bundle_v1",
+  "created_at": "2026-09-23T11:21:30.392314+00:00",
+  "status": "READY_FOR_AUTHORIZATION_REVIEW",
+  "root": "/Users/howen/Projects/PPO_MEC_g14r22_c/artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4",
+  "request_sha256": "1fa580182452004176f1f9dc12d2d961a9950ef0adf550af1a371645fd758478",
+  "request_file_sha256": "1be5cdae22d566145a090de1dac36ca84200147cf0510a09cddb3282a2888321",
+  "command_package_sha256": "7280f78f10bba2d128b1222e9fdb1e5dd326c212f38ff7e5a81b57c865af0aaf",
+  "command_package_file_sha256": "95b1d9760cfbc50dabe015b418460ea06a42318c0096124c4306f35dbf85162e",
+  "background_task_package_sha256": "59df6dac639b626003d2e71a0e5b1b7394f6c25a1bf6890fe165aa5f7b5fa14e",
+  "background_task_package_file_sha256": "39df5053fcf45ae6ab5ce92404997d71043090142aa3ea6375f95642d1856827",
+  "files": [
+    {
+      "path": "background_task_package.json",
+      "size_bytes": 3050,
+      "sha256": "39df5053fcf45ae6ab5ce92404997d71043090142aa3ea6375f95642d1856827"
+    },
+    {
+      "path": "checkpoint_byte_audit_preopen.json",
+      "size_bytes": 67190,
+      "sha256": "9d08134f6109dff4099b92aa7b30d620178f487d00c3b5f5c451887fb1a4b1d9"
+    },
+    {
+      "path": "holdout_request_unsigned.json",
+      "size_bytes": 10980,
+      "sha256": "1be5cdae22d566145a090de1dac36ca84200147cf0510a09cddb3282a2888321"
+    },
+    {
+      "path": "independent_readonly_review.json",
+      "size_bytes": 3231,
+      "sha256": "a8e55602842f66e54d10577c9384d7bedac7db7b0d1562bb82a1db2f3d104401"
+    },
+    {
+      "path": "integrity_checklist.json",
+      "size_bytes": 1047,
+      "sha256": "c7dfc3a3f5434069c40a2133c1c7ba56deba1926e7da055a2b212e8cc4b4be6f"
+    },
+    {
+      "path": "protection_snapshot.json",
+      "size_bytes": 1564,
+      "sha256": "62622103bce5373be60c6a1d54f7708bbc753faddd829a9b957f9eba20532dcf"
+    },
+    {
+      "path": "publication_integrity_recalculation.json",
+      "size_bytes": 5956,
+      "sha256": "896c16d2e36fcf1d24d72e41d8738c0619b92286d2a5f9a18ca12199f5daf57b"
+    },
+    {
+      "path": "scientific_command_package.json",
+      "size_bytes": 324135,
+      "sha256": "95b1d9760cfbc50dabe015b418460ea06a42318c0096124c4306f35dbf85162e"
+    },
+    {
+      "path": "superseded_request_record.json",
+      "size_bytes": 3820,
+      "sha256": "5e61b2a0a3bb48b589c98f4ea87117503f8baa7abc1ab4ca2a051fd66befd076"
+    }
+  ],
+  "files_canonical_sha256": "8d8db19e1e06deceea7966d57465e631004bbf8858fda7b0e2b671fa52d816a5",
+  "grant_signed": false,
+  "token_issued": false,
+  "execution_authorized": false,
+  "holdout_opened": false
+}

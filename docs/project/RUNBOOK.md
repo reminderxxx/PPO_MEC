@@ -1,3 +1,23 @@
+## G14R22-C 最终 unsigned v4（只读 qualify；禁止 execute）
+
+成功后台证据已集中读回，不得重启或复制 G14R22-C job。唯一新申请根为
+`artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4/`；v1–v3 audit-only。
+final executor 必须保持在 `c3a88bd0ac3e3ffae16854abf695431a725fa0de` 的 clean detached worktree。
+
+只允许下面的无开启校验；它不接收 grant/token，不创建正式 output root：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  /Users/howen/Projects/PPO_MEC_g14r22_final_executor/scripts/run_dedicated_public_holdout.py \
+  --request-path artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4/holdout_request_unsigned.json \
+  --command-package-path artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4/scientific_command_package.json \
+  --check qualify
+```
+
+`background_task_package.json` 当前固定为 `launch_allowed=false`，并保留 grant/token 两个未解析占位符；不得直接
+执行其中的 future command template。只有 owner 后续对 exact request/package/review 单独签发 grant 与一次性 token
+后，才能另立执行任务；本 RUNBOOK 不提供或暗示该授权。
+
 ## G14R22-C 单次 public non-holdout 后台验收（不含 holdout）
 
 G14R22-B 失败 root 已永久消费，下面 B 的旧 launch 说明只供历史审计，禁止执行。C 必须从最终 clean executor
@@ -21,8 +41,8 @@ commit 生成全新 package/scientific/job roots；builder 文件名为兼容仍
 ```
 
 host v2 同时验证 process start、actual executable 和 argv identity；PID-only 或证据不足为
-`INTERRUPTED_OR_UNKNOWN`。本轮 launch 后不得轮询、监控、自动修复或重试；用户后续回来后再集中读 terminal receipt、
-三容量 CSV、capacity-aware statistics 与 integrity。`SUCCEEDED` 前一律不是 READY。
+`INTERRUPTED_OR_UNKNOWN`。该单次 job 已完成并集中读回，禁止再次 launch、retry、resume 或 reopen；历史构包/inspect
+说明只用于复核其状态与来源。
 
 ## G14R22-B 容量身份复算与单次后台验收（historical/audit-only；禁止重启）
 

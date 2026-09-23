@@ -1,0 +1,87 @@
+{
+  "review_version": "g14r22_final_independent_readonly_review_v1",
+  "reviewed_at": "2026-09-23T11:21:30.384848+00:00",
+  "literature_cutoff": "2026-09-21",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "artifact_run_id": "typed_model_cache_g14r22_holdout_execution_contract_20260923_v4",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "git_commit": "c3a88bd0ac3e3ffae16854abf695431a725fa0de",
+  "evidence_level": "E2_ARTIFACT_AUDITED_NON_HOLDOUT_ACCEPTANCE_AND_PREOPEN_ONLY",
+  "status": "pass",
+  "verdict": "READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION",
+  "request_sha256": "1fa580182452004176f1f9dc12d2d961a9950ef0adf550af1a371645fd758478",
+  "command_package_sha256": "7280f78f10bba2d128b1222e9fdb1e5dd326c212f38ff7e5a81b57c865af0aaf",
+  "acceptance_findings": {
+    "terminal_succeeded": true,
+    "publication_inventory_exact": true,
+    "publication_file_count": 247,
+    "csv_rows_by_capacity": {
+      "constrained_288mb": 72,
+      "medium_576mb": 72,
+      "relaxed_864mb": 72
+    },
+    "actual_checkpoint_count": 3,
+    "learned_policy_rollout_rows": 108,
+    "capacity_aware_pair_coordinates": 108,
+    "statistics_comparisons": 6,
+    "inner_cluster_counts": [
+      108,
+      108,
+      108,
+      108,
+      108,
+      44
+    ],
+    "delay_finite_pair_source": {
+      "finite": 44,
+      "both_unavailable": 64,
+      "by_capacity": {
+        "constrained_288mb": 10,
+        "medium_576mb": 17,
+        "relaxed_864mb": 17
+      },
+      "outer_windows": 9
+    },
+    "runtime_equivalence": {
+      "status": "pass",
+      "acceptance_executor_commit": "cc6edfc43f826dd252443897cffe01d9e7508fa1",
+      "final_executor_commit": "c3a88bd0ac3e3ffae16854abf695431a725fa0de",
+      "critical_runtime_diff_empty": true,
+      "files": [
+        {
+          "path": "scripts/analyze_top_journal_statistics.py",
+          "sha256": "5dedd5984d8aac49a04068a918bb0e44bd955349a45144c425a9e7d9f2629b45"
+        },
+        {
+          "path": "scripts/benchmark_main_results.py",
+          "sha256": "423aa5693fbdb417e06f27b050fcb4944d1110c3edb7c7e9fbad412623cfc242"
+        },
+        {
+          "path": "scripts/run_dedicated_public_holdout.py",
+          "sha256": "ba72e7c42361229d1dd331035eab75113eefcd2c5452aa8ad62fc09ffe6d0b5d"
+        },
+        {
+          "path": "scripts/run_g14r22a_real_non_holdout_acceptance.py",
+          "sha256": "8b45f2572cf5287faf9f2ea2f37e3bb966902af1c8b31e8931ae6e42c31c44ed"
+        },
+        {
+          "path": "src/evaluators/dedicated_holdout_execution.py",
+          "sha256": "cd5fe0dc4bcb81e00410a838e9321611b4455468e369ec955069eaa3955acf6b"
+        },
+        {
+          "path": "src/runtime/evaluation_only_execution.py",
+          "sha256": "542c34d85677c33e9f9094d70092291428eacfa172abff4d5d6e4c777f88628a"
+        }
+      ],
+      "files_canonical_sha256": "59db37f6b8d15c6739e23f625e3dabf9b750d5ec8856bd815010b6450f5e2d7f"
+    }
+  },
+  "authorization_boundary": {
+    "grant_signed": false,
+    "token_issued": false,
+    "execution_authorized": false,
+    "holdout_opened": false,
+    "formal_statistics_or_performance_claim": false
+  },
+  "remaining_required_action": "independent owner review and exact grant/token issuance"
+}

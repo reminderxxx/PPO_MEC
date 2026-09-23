@@ -1,4 +1,4 @@
-## 2026-09-23: G14R22-C dataset candidate / live process identity（RESOLVED IN CODE；REAL CHAIN PENDING）
+## 2026-09-23: G14R22-C dataset candidate / live process identity（RESOLVED；REAL CHAIN PASSED）
 
 - `RESOLVED / candidate qualification`：G14R22-B 的冲突不是两份相同数据；完整 NGSIM/Alibaba 与 detached
   checkout 的 Git LFS pointer 内容不同。pointer 由 fairness 的无条件 worktree fallback 引入，但 portable registry
@@ -8,8 +8,11 @@
   actual executable、start token、argv tail 分开保存并复合比较。PID-only 或证据不足仍为 UNKNOWN，不会自动重启。
 - `PROTECTED`：G14R22-B job 已永久 `FAILED` 且不得 retry/resume/reopen；旧统计、CSV、失败 root 和 receipt 不改写。
   grant/token 未签，holdout unopened。
-- `OPEN / real chain`：实现、真实资源 preflight 与回归通过不等于真实 producer→CSV→statistics→integrity 成功。
-  新单次后台 job 的 terminal receipt 与逐文件产物须后续只读审查；读回前不得宣称 READY。
+- `RESOLVED / real chain`：新单次后台 job 为 `SUCCEEDED`/rc=0；三容量 72 行 CSV、三份真实 checkpoint、216
+  rollout rows、108 个 capacity-aware pair、六项统计和 247 文件 exact publication inventory 已集中只读复核。
+  delay 仅 44 对可用的原因是双方同时 finite，64 对双方均 unavailable；不是容量身份合并。
+- `AUTHORIZATION BOUNDARY`：该成功只把 v4 提升为 `READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION`。
+  grant/token 仍未签，正式 output root 不存在，holdout sealed/unopened；v1–v3 禁止签发或执行。
 
 ## 2026-09-23: G14R21 holdout 执行合同缺口（RESOLVED；授权仍未签发）
 
