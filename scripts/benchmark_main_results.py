@@ -177,6 +177,9 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["train", "dev", "formal", "sealed_holdout"],
         default="",
     )
+    parser.add_argument("--dedicated-holdout-opening-receipt", type=str, default="")
+    parser.add_argument("--dedicated-holdout-request-sha256", type=str, default="")
+    parser.add_argument("--dedicated-holdout-command-package-sha256", type=str, default="")
     parser.add_argument(
         "--window_consumption_mode",
         choices=["formal", "rehearsal"],
@@ -753,7 +756,19 @@ def main() -> None:
         if not args.window_plan_path or not args.formal_window_split:
             raise ValueError("frozen-window consumption requires window plan and split")
         if args.formal_window_split == "sealed_holdout":
-            raise ValueError("sealed holdout cannot be executed by benchmark_main_results")
+            from src.evaluators.dedicated_holdout_execution import validate_opening_receipt
+
+            if not (
+                args.dedicated_holdout_opening_receipt
+                and args.dedicated_holdout_request_sha256
+                and args.dedicated_holdout_command_package_sha256
+            ):
+                raise ValueError("sealed holdout requires the dedicated one-time opening receipt")
+            validate_opening_receipt(
+                args.dedicated_holdout_opening_receipt,
+                request_sha256=args.dedicated_holdout_request_sha256,
+                command_package_sha256=args.dedicated_holdout_command_package_sha256,
+            )
         window_consumption_contract = load_window_consumption_contract(
             args.formal_window_consumption_contract_path
         )

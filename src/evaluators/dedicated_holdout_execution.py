@@ -1,0 +1,517 @@
+"""Fail-closed transaction primitives for the one-time public holdout runner.
+
+The production entry point is intentionally separate from the ordinary formal
+runner.  Authorization is verified before any durable opening.  Once the
+opening directory is atomically published, every outcome (success, child
+failure, interruption, or partial staging output) is permanently consumed and
+cannot be resumed or reopened.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import math
+import os
+import shutil
+import subprocess
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Mapping, Sequence
+
+
+HOLDOUT_REQUEST_VERSION = "g14r22_unsigned_holdout_request_v1"
+HOLDOUT_COMMAND_PACKAGE_VERSION = "g14r22_holdout_command_package_v1"
+HOLDOUT_LEDGER_VERSION = "g14r22_one_time_opening_ledger_v1"
+HOLDOUT_RECEIPT_VERSION = "g14r22_holdout_execution_receipt_v1"
+HOLDOUT_INTEGRITY_VERSION = "g14r22_holdout_integrity_v1"
+LEARNED_AGENTS = (
+    "sa_ghmappo", "ppo", "mappo", "dqn", "dueling_dqn", "qmix",
+    "controller_mat", "dag_offload_drl", "cache_offload_drl", "dt_handoff_drl",
+)
+ALL_AGENTS = (
+    "reactive_lru", "reactive_fifo", "reactive_lfu", "reactive_aging_lfu",
+    "reactive_random", *LEARNED_AGENTS,
+)
+SEEDS = (7, 13, 29, 43, 71)
+CAPACITIES = ("constrained_288mb", "medium_576mb", "relaxed_864mb")
+PRIMARY_METRICS = (
+    "full_service_ready_byte_hit_rate",
+    "joint_base_adapter_hit_rate",
+    "full_service_ready_request_rate",
+    "transfer_mb_per_request",
+    "workflow_continuity_rate",
+    "end_to_end_workflow_delay",
+)
+
+
+class HoldoutExecutionError(ValueError):
+    """Raised before or after opening when the one-time contract is violated."""
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def canonical_sha256(value: Any) -> str:
+    def reject(item: Any) -> None:
+        if isinstance(item, float) and not math.isfinite(item):
+            raise HoldoutExecutionError("non-finite contract value")
+        if isinstance(item, Mapping):
+            for key, child in item.items():
+                if not isinstance(key, str):
+                    raise HoldoutExecutionError("contract keys must be strings")
+                reject(child)
+        elif isinstance(item, (list, tuple)):
+            for child in item:
+                reject(child)
+
+    reject(value)
+    return hashlib.sha256(
+        json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+                   allow_nan=False).encode("utf-8")
+    ).hexdigest()
+
+
+def file_sha256(path: str | Path) -> str:
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def read_json(path: str | Path) -> dict[str, Any]:
+    target = Path(path)
+    if target.is_symlink() or not target.is_file():
+        raise HoldoutExecutionError(f"required object is missing or a symlink: {target}")
+    try:
+        value = json.loads(target.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise HoldoutExecutionError(f"invalid JSON object: {target}") from exc
+    if not isinstance(value, dict):
+        raise HoldoutExecutionError(f"required object must be a mapping: {target}")
+    return value
+
+
+def _encoded(value: Any) -> bytes:
+    return (json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n").encode("utf-8")
+
+
+def create_json(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("xb") as handle:
+        handle.write(_encoded(value))
+        handle.flush()
+        os.fsync(handle.fileno())
+
+
+def _hash_bound(value: Mapping[str, Any], field: str) -> bool:
+    payload = dict(value)
+    observed = payload.pop(field, None)
+    return isinstance(observed, str) and observed == canonical_sha256(payload)
+
+
+def validate_command_package(package: Mapping[str, Any], *, acceptance: bool = False) -> dict[str, Any]:
+    if package.get("command_package_version") != HOLDOUT_COMMAND_PACKAGE_VERSION:
+        raise HoldoutExecutionError("holdout command package version mismatch")
+    if not _hash_bound(package, "command_package_sha256"):
+        raise HoldoutExecutionError("holdout command package hash mismatch")
+    matrix = package.get("scientific_matrix")
+    if not isinstance(matrix, Mapping):
+        raise HoldoutExecutionError("scientific matrix is missing")
+    expected = {
+        "agents": list(ALL_AGENTS),
+        "learned_agents": list(LEARNED_AGENTS),
+        "seeds": list(SEEDS),
+        "capacities": list(CAPACITIES),
+        "outer_windows": 12,
+        "workflows": 3,
+        "scientific_child_count": 3,
+        "rows_per_child": 2700,
+        "total_expected_rows": 8100,
+        "checkpoint_count": 150,
+        "primary_metrics": list(PRIMARY_METRICS),
+        "holm_family_size": 84,
+    }
+    if not acceptance and dict(matrix) != expected:
+        raise HoldoutExecutionError("production scientific matrix drift")
+    if acceptance:
+        if package.get("acceptance_non_holdout") is not True:
+            raise HoldoutExecutionError("acceptance package must be explicitly non-holdout")
+        serialized = json.dumps(package, sort_keys=True).lower()
+        if "sealed_holdout" in serialized or "holdout_policy" in serialized:
+            raise HoldoutExecutionError("acceptance package contains a holdout reference")
+    phases = package.get("phases")
+    expected_phases = ["scientific", "statistics", "publication", "integrity"]
+    if phases != expected_phases:
+        raise HoldoutExecutionError("holdout phase order drift")
+    commands = package.get("commands")
+    if not isinstance(commands, Mapping):
+        raise HoldoutExecutionError("command mapping is missing")
+    scientific = commands.get("scientific")
+    if not isinstance(scientific, list) or len(scientific) != 3:
+        raise HoldoutExecutionError("exactly three capacity-scoped scientific commands are required")
+    if not all(isinstance(command, list) and command for command in scientific):
+        raise HoldoutExecutionError("scientific command schema mismatch")
+    if not isinstance(commands.get("statistics"), list) or not commands["statistics"]:
+        raise HoldoutExecutionError("statistics command is missing")
+    if package.get("automatic_retry_count") != 0:
+        raise HoldoutExecutionError("automatic retry must remain zero")
+    return {"status": "pass", "command_count": 4, "acceptance": acceptance}
+
+
+def validate_unsigned_request(
+    request: Mapping[str, Any], package: Mapping[str, Any], *, check_files: bool = True
+) -> dict[str, Any]:
+    if request.get("request_version") != HOLDOUT_REQUEST_VERSION:
+        raise HoldoutExecutionError("unsigned request version mismatch")
+    if not _hash_bound(request, "request_sha256"):
+        raise HoldoutExecutionError("unsigned request hash mismatch")
+    if request.get("status") != "READY_FOR_AUTHORIZATION_REVIEW":
+        raise HoldoutExecutionError("unsigned request is not review-ready")
+    for field in ("grant_signed", "execution_authorized", "holdout_opened", "holdout_consumed_permanently"):
+        if request.get(field) is not False:
+            raise HoldoutExecutionError(f"unsigned request falsely asserts {field}")
+    if request.get("command_package_sha256") != package.get("command_package_sha256"):
+        raise HoldoutExecutionError("request/command package binding mismatch")
+    validate_command_package(package)
+    if request.get("failure_boundary") != {
+        "before_atomic_open": "not_consumed; no scientific child may start",
+        "at_or_after_atomic_open": "permanently_consumed",
+        "child_failure": "terminal_failure_no_retry_no_resume_no_reopen",
+        "partial_output": "retained_in_staging_and_permanently_consumed",
+        "success": "permanently_consumed",
+    }:
+        raise HoldoutExecutionError("one-time failure boundary drift")
+    if check_files:
+        for row in request.get("frozen_inputs", []):
+            target = Path(str(row.get("path", "")))
+            if target.is_symlink() or not target.is_file():
+                raise HoldoutExecutionError(f"frozen input missing: {target}")
+            if target.stat().st_size != row.get("size_bytes") or file_sha256(target) != row.get("sha256"):
+                raise HoldoutExecutionError(f"frozen input bytes drift: {target}")
+    return {"status": "pass", "request_sha256": request["request_sha256"]}
+
+
+def verify_checkpoint_bytes(source_reference_path: str | Path) -> dict[str, Any]:
+    source = read_json(source_reference_path)
+    models = source.get("models")
+    if not isinstance(models, list) or len(models) != 150:
+        raise HoldoutExecutionError("checkpoint source must contain exactly 150 models")
+    expected_coordinates = {
+        (capacity, agent, seed)
+        for capacity in CAPACITIES for agent in LEARNED_AGENTS for seed in SEEDS
+    }
+    observed_coordinates: set[tuple[str, str, int]] = set()
+    rows = []
+    total_bytes = 0
+    started = datetime.now(timezone.utc)
+    for model in models:
+        coordinate = (str(model.get("capacity_label")), str(model.get("agent")), int(model.get("seed")))
+        if coordinate in observed_coordinates:
+            raise HoldoutExecutionError(f"duplicate checkpoint coordinate: {coordinate}")
+        observed_coordinates.add(coordinate)
+        target = Path(str(model.get("checkpoint_path", "")))
+        if target.is_symlink() or not target.is_file():
+            raise HoldoutExecutionError(f"checkpoint is missing or a symlink: {target}")
+        observed_size = target.stat().st_size
+        observed_hash = file_sha256(target)
+        if observed_size != model.get("size_bytes") or observed_hash != model.get("checkpoint_sha256"):
+            raise HoldoutExecutionError(f"checkpoint byte identity drift: {target}")
+        total_bytes += observed_size
+        rows.append({
+            "capacity_label": coordinate[0], "agent": coordinate[1], "seed": coordinate[2],
+            "path": str(target), "size_bytes": observed_size, "sha256": observed_hash,
+        })
+    if observed_coordinates != expected_coordinates:
+        raise HoldoutExecutionError("checkpoint coordinate scope drift")
+    completed = datetime.now(timezone.utc)
+    return {
+        "checkpoint_byte_audit_version": "g14r22_opening_checkpoint_bytes_v1",
+        "status": "pass",
+        "started_at": started.isoformat(),
+        "completed_at": completed.isoformat(),
+        "elapsed_seconds": (completed - started).total_seconds(),
+        "actual_scope": {
+            "models": 150, "learned_agents": list(LEARNED_AGENTS), "seeds": list(SEEDS),
+            "capacities": list(CAPACITIES), "total_bytes": total_bytes,
+        },
+        "models": rows,
+        "models_canonical_sha256": canonical_sha256(rows),
+    }
+
+
+def verify_grant(
+    request: Mapping[str, Any], package: Mapping[str, Any], grant: Mapping[str, Any], token: bytes
+) -> dict[str, Any]:
+    required = {
+        "grant_version", "status", "grant_signed", "request_sha256",
+        "command_package_sha256", "executor_commit", "output_root",
+        "one_time_token_sha256", "independent_review", "issued_at", "expires_at",
+    }
+    if set(grant) != required or grant.get("grant_version") != "g14r22_holdout_grant_v1":
+        raise HoldoutExecutionError("holdout grant schema mismatch")
+    if grant.get("status") != "AUTHORIZED_ONE_TIME_HOLDOUT" or grant.get("grant_signed") is not True:
+        raise HoldoutExecutionError("holdout grant is not signed/authorized")
+    expected = {
+        "request_sha256": request["request_sha256"],
+        "command_package_sha256": package["command_package_sha256"],
+        "executor_commit": package["executor_commit"],
+        "output_root": package["output_root"],
+        "one_time_token_sha256": hashlib.sha256(token).hexdigest(),
+    }
+    if any(grant.get(key) != value for key, value in expected.items()):
+        raise HoldoutExecutionError("holdout grant identity/scope drift")
+    now = datetime.now(timezone.utc)
+    try:
+        issued = datetime.fromisoformat(str(grant["issued_at"])).astimezone(timezone.utc)
+        expires = datetime.fromisoformat(str(grant["expires_at"])).astimezone(timezone.utc)
+    except ValueError as exc:
+        raise HoldoutExecutionError("holdout grant timestamp invalid") from exc
+    if not issued <= now < expires:
+        raise HoldoutExecutionError("holdout grant is future or expired")
+    review = grant["independent_review"]
+    if not isinstance(review, Mapping) or set(review) != {"path", "sha256", "size_bytes"}:
+        raise HoldoutExecutionError("independent review reference invalid")
+    review_path = Path(str(review["path"]))
+    if (review_path.is_symlink() or not review_path.is_file()
+            or review_path.stat().st_size != review["size_bytes"]
+            or file_sha256(review_path) != review["sha256"]):
+        raise HoldoutExecutionError("independent review bytes drift")
+    review_payload = read_json(review_path)
+    if (review_payload.get("status") != "pass"
+            or review_payload.get("request_sha256") != request["request_sha256"]
+            or review_payload.get("command_package_sha256") != package["command_package_sha256"]):
+        raise HoldoutExecutionError("independent review does not approve the exact package")
+    return {"status": "pass", "grant_sha256": canonical_sha256(grant)}
+
+
+def validate_opening_receipt(
+    receipt_path: str | Path, *, request_sha256: str, command_package_sha256: str
+) -> dict[str, Any]:
+    receipt = read_json(receipt_path)
+    if (receipt.get("ledger_version") != HOLDOUT_LEDGER_VERSION
+            or receipt.get("event") != "opened"
+            or receipt.get("consumed_permanently") is not True
+            or receipt.get("request_sha256") != request_sha256
+            or receipt.get("command_package_sha256") != command_package_sha256
+            or receipt.get("checkpoint_byte_validation", {}).get("models") != 150
+            or receipt.get("checkpoint_byte_validation", {}).get("status") != "pass"):
+        raise HoldoutExecutionError("dedicated holdout opening receipt is invalid")
+    return receipt
+
+
+def _append_ledger(path: Path, event: Mapping[str, Any]) -> dict[str, Any]:
+    previous = None
+    sequence = 1
+    if path.exists():
+        lines = [line for line in path.read_text(encoding="utf-8").splitlines() if line]
+        if lines:
+            last = json.loads(lines[-1])
+            previous = last.get("record_sha256")
+            sequence = int(last.get("sequence", 0)) + 1
+    record = {
+        "ledger_version": HOLDOUT_LEDGER_VERSION,
+        "sequence": sequence,
+        "recorded_at": utc_now(),
+        "previous_record_sha256": previous,
+        **dict(event),
+    }
+    record["record_sha256"] = canonical_sha256(record)
+    with path.open("ab") as handle:
+        handle.write((json.dumps(record, ensure_ascii=False, sort_keys=True, allow_nan=False) + "\n").encode("utf-8"))
+        handle.flush()
+        os.fsync(handle.fileno())
+    return record
+
+
+def _replace_tokens(command: Sequence[str], replacements: Mapping[str, str]) -> list[str]:
+    resolved = []
+    for item in command:
+        value = str(item)
+        for token, replacement in replacements.items():
+            value = value.replace(token, replacement)
+        if "{G14R22_" in value:
+            raise HoldoutExecutionError(f"unresolved command token: {value}")
+        resolved.append(value)
+    return resolved
+
+
+def _inventory(root: Path) -> list[dict[str, Any]]:
+    rows = []
+    for target in sorted(root.rglob("*")):
+        if target.is_symlink():
+            raise HoldoutExecutionError(f"artifact symlink forbidden: {target}")
+        if target.is_file():
+            rows.append({
+                "path": target.relative_to(root).as_posix(),
+                "size_bytes": target.stat().st_size,
+                "sha256": file_sha256(target),
+            })
+    return rows
+
+
+def _run(command: Sequence[str], *, cwd: Path, stdout_path: Path, stderr_path: Path) -> int:
+    with stdout_path.open("xb") as stdout, stderr_path.open("xb") as stderr:
+        completed = subprocess.run(
+            list(command), cwd=cwd,
+            env=dict(os.environ, PYTHONPATH=str(cwd), PYTHONNOUSERSITE="1"),
+            stdout=stdout, stderr=stderr, check=False,
+        )
+    return int(completed.returncode)
+
+
+def execute_package(
+    request: Mapping[str, Any], package: Mapping[str, Any], grant: Mapping[str, Any] | None,
+    token: bytes | None, *, acceptance: bool = False,
+) -> dict[str, Any]:
+    validate_command_package(package, acceptance=acceptance)
+    if not acceptance:
+        validate_unsigned_request(request, package)
+        if grant is None or token is None:
+            raise HoldoutExecutionError("signed grant and one-time token are required")
+        grant_audit = verify_grant(request, package, grant, token)
+        checkpoint_audit = verify_checkpoint_bytes(request["checkpoint_source_reference"]["path"])
+    else:
+        grant_audit = {"status": "acceptance_non_holdout_no_grant"}
+        checkpoint_audit = dict(package["acceptance_checkpoint_audit"])
+    output_root = Path(str(package["output_root"]))
+    if output_root.exists() or output_root.is_symlink():
+        raise HoldoutExecutionError("one-time output root already exists; reopen/resume is forbidden")
+    output_root.parent.mkdir(parents=True, exist_ok=True)
+    temporary = Path(tempfile.mkdtemp(prefix=f".{output_root.name}.opening-", dir=output_root.parent))
+    opening = {
+        "ledger_version": HOLDOUT_LEDGER_VERSION,
+        "event": "opened",
+        "opened_at": utc_now(),
+        "request_sha256": request.get("request_sha256", package.get("acceptance_request_sha256")),
+        "command_package_sha256": package["command_package_sha256"],
+        "executor_commit": package["executor_commit"],
+        "output_root": str(output_root),
+        "grant_validation": grant_audit,
+        "checkpoint_byte_validation": {
+            "status": checkpoint_audit["status"],
+            "models": checkpoint_audit["actual_scope"]["models"],
+            "total_bytes": checkpoint_audit["actual_scope"]["total_bytes"],
+            "models_canonical_sha256": checkpoint_audit["models_canonical_sha256"],
+        },
+        "consumed_permanently": True,
+        "retry_allowed": False,
+        "resume_allowed": False,
+        "reopen_allowed": False,
+    }
+    create_json(temporary / "opening_receipt.json", opening)
+    create_json(temporary / "checkpoint_byte_audit.json", checkpoint_audit)
+    create_json(temporary / "request_snapshot.json", dict(request))
+    create_json(temporary / "command_package_snapshot.json", dict(package))
+    if isinstance(package.get("resolved_execution_context"), Mapping):
+        create_json(temporary / "resolved_execution_context.json", package["resolved_execution_context"])
+    if isinstance(package.get("model_source_reference"), Mapping):
+        create_json(temporary / "evaluation_model_source_reference.json", package["model_source_reference"])
+    _append_ledger(temporary / "opening_ledger.jsonl", opening)
+    os.replace(temporary, output_root)
+    ledger = output_root / "opening_ledger.jsonl"
+    published = output_root / "published"
+    staging = output_root / "staging"
+    published.mkdir()
+    staging.mkdir()
+    science_rows: list[str] = []
+    terminal_status = "failed_permanently_consumed"
+    failure: str | None = None
+    try:
+        for index, command in enumerate(package["commands"]["scientific"]):
+            capacity = CAPACITIES[index]
+            cell = staging / f"scientific_{capacity}"
+            cell.mkdir()
+            replacements = {
+                "{G14R22_CELL_OUTPUT_ROOT}": str(cell),
+                "{G14R22_OPENING_RECEIPT}": str(output_root / "opening_receipt.json"),
+                "{G14R22_REQUEST_SHA256}": opening["request_sha256"],
+                "{G14R22_COMMAND_PACKAGE_SHA256}": package["command_package_sha256"],
+            }
+            resolved = _replace_tokens(command, replacements)
+            rc = _run(resolved, cwd=Path(package["executor_checkout"]),
+                      stdout_path=cell / "child_stdout.log", stderr_path=cell / "child_stderr.log")
+            _append_ledger(ledger, {"event": "scientific_child_terminal", "capacity": capacity,
+                                    "return_code": rc, "command_sha256": canonical_sha256(resolved),
+                                    "consumed_permanently": True, "retry_allowed": False})
+            if rc != 0:
+                raise HoldoutExecutionError(f"scientific child failed permanently: {capacity} rc={rc}")
+            candidates = [path for path in cell.iterdir() if path.is_dir()]
+            if len(candidates) != 1:
+                raise HoldoutExecutionError(f"scientific child output is ambiguous: {capacity}")
+            artifact = candidates[0]
+            rows_path = artifact / "benchmark_rows.csv"
+            producer_manifest = artifact / "artifact_integrity_manifest.json"
+            if not rows_path.is_file() or not producer_manifest.is_file():
+                raise HoldoutExecutionError(f"scientific child payload incomplete: {capacity}")
+            destination = published / "scientific" / capacity
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            os.replace(artifact, destination)
+            science_rows.append(str(destination / "benchmark_rows.csv"))
+        stats_stage = staging / "statistics"
+        stats_stage.mkdir()
+        replacements = {"{G14R22_STATISTICS_OUTPUT_ROOT}": str(stats_stage)}
+        for index, rows_path in enumerate(science_rows):
+            replacements[f"{{G14R22_ROWS_{index}}}"] = rows_path
+        stats_command = _replace_tokens(package["commands"]["statistics"], replacements)
+        stats_rc = _run(stats_command, cwd=Path(package["executor_checkout"]),
+                        stdout_path=stats_stage / "statistics_stdout.log",
+                        stderr_path=stats_stage / "statistics_stderr.log")
+        _append_ledger(ledger, {"event": "statistics_terminal", "return_code": stats_rc,
+                                "command_sha256": canonical_sha256(stats_command),
+                                "consumed_permanently": True, "retry_allowed": False})
+        if stats_rc != 0:
+            raise HoldoutExecutionError(f"statistics child failed permanently: rc={stats_rc}")
+        stats_payload = read_json(stats_stage / "paired_statistics.json")
+        rows = stats_payload.get("rows")
+        if not isinstance(rows, list) or len(rows) != 84:
+            raise HoldoutExecutionError("statistics output must contain exactly 84 Holm-family rows")
+        if any(row.get("holm_preregistered_family_size") != 84 for row in rows):
+            raise HoldoutExecutionError("statistics Holm family identity drift")
+        stats_destination = published / "statistics"
+        os.replace(stats_stage, stats_destination)
+        _append_ledger(ledger, {"event": "publication_completed", "scientific_children": 3,
+                                "statistics_rows": 84, "consumed_permanently": True})
+        inventory = _inventory(published)
+        integrity = {
+            "integrity_version": HOLDOUT_INTEGRITY_VERSION,
+            "status": "pass", "file_count": len(inventory), "files": inventory,
+            "files_canonical_sha256": canonical_sha256(inventory),
+            "request_sha256": opening["request_sha256"],
+            "command_package_sha256": package["command_package_sha256"],
+            "consumed_permanently": True,
+        }
+        create_json(output_root / "artifact_integrity_manifest.json", integrity)
+        _append_ledger(ledger, {"event": "integrity_completed",
+                                "files_canonical_sha256": integrity["files_canonical_sha256"],
+                                "consumed_permanently": True})
+        terminal_status = "completed_permanently_consumed"
+    except Exception as exc:
+        failure = str(exc)
+        _append_ledger(ledger, {"event": "terminal_failure", "failure": failure,
+                                "consumed_permanently": True, "retry_allowed": False,
+                                "resume_allowed": False, "reopen_allowed": False})
+    receipt = {
+        "receipt_version": HOLDOUT_RECEIPT_VERSION,
+        "status": terminal_status,
+        "completed_at": utc_now(),
+        "request_sha256": opening["request_sha256"],
+        "command_package_sha256": package["command_package_sha256"],
+        "output_root": str(output_root),
+        "failure": failure,
+        "partial_output_retained": failure is not None,
+        "consumed_permanently": True,
+        "retry_allowed": False,
+        "resume_allowed": False,
+        "reopen_allowed": False,
+    }
+    create_json(output_root / "execution_receipt.json", receipt)
+    _append_ledger(ledger, {"event": "execution_receipt_published", "status": terminal_status,
+                            "receipt_sha256": file_sha256(output_root / "execution_receipt.json"),
+                            "consumed_permanently": True})
+    if failure is not None:
+        raise HoldoutExecutionError(failure)
+    return receipt
