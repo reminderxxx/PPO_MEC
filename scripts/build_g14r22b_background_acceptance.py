@@ -31,6 +31,19 @@ def git(checkout: Path, *arguments: str) -> str:
     return subprocess.check_output(["git", *arguments], cwd=checkout, text=True).strip()
 
 
+def freeze_python_executable(path: Path) -> tuple[Path, Path]:
+    """Preserve the invoked venv path while also freezing its resolved target."""
+    if not path.is_absolute():
+        raise ValueError("frozen Python executable path must be absolute")
+    lexical = Path(os.path.abspath(str(path)))
+    invoked = Path(os.path.abspath(sys.executable))
+    if invoked != lexical:
+        raise ValueError("builder interpreter must exactly equal the frozen Python executable")
+    if not lexical.is_file():
+        raise ValueError("frozen Python executable does not exist")
+    return lexical, lexical.resolve(strict=True)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--executor-checkout", type=Path, required=True)
@@ -45,16 +58,14 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     checkout = args.executor_checkout.resolve()
-    python = args.python_executable.resolve()
+    python, resolved_python = freeze_python_executable(args.python_executable)
     package_root = args.package_root.resolve()
     work_root = args.scientific_work_root.resolve()
     job_root = args.job_root.resolve()
     if package_root.exists() or work_root.exists() or job_root.exists():
         raise ValueError("package, scientific work, and job roots must all be absent")
-    if Path(sys.executable).resolve() != python:
-        raise ValueError("builder interpreter must equal the frozen Python executable")
-    if not python.is_file() or git(checkout, "rev-parse", "HEAD") != args.executor_commit:
-        raise ValueError("executor interpreter/commit mismatch")
+    if git(checkout, "rev-parse", "HEAD") != args.executor_commit:
+        raise ValueError("executor commit mismatch")
     if git(checkout, "status", "--porcelain"):
         raise ValueError("executor checkout must be clean")
     tree = git(checkout, "rev-parse", "HEAD^{tree}")
@@ -85,6 +96,7 @@ def main() -> int:
             "commit": args.executor_commit,
             "git_tree": tree,
             "python_executable": str(python),
+            "python_resolved_executable": str(resolved_python),
         },
     }
     request["request_canonical_sha256"] = canonical_sha256(request)
@@ -127,6 +139,7 @@ def main() -> int:
         "executor_git_tree": tree,
         "cwd": str(checkout),
         "python_executable": str(python),
+        "python_resolved_executable": str(resolved_python),
         "environment": environment,
         "command": command,
         "request": {"path": str(request_path), "sha256": file_sha256(request_path)},

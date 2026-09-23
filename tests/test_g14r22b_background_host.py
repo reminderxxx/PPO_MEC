@@ -17,6 +17,7 @@ from scripts.run_g14r22b_background_job import (
     inspect,
     launch,
 )
+from scripts.build_g14r22b_background_acceptance import freeze_python_executable
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -104,6 +105,7 @@ def build_package(fixture: dict[str, object], mode: str, job_name: str) -> tuple
         "executor_git_tree": fixture["tree"],
         "cwd": str(checkout),
         "python_executable": sys.executable,
+        "python_resolved_executable": str(Path(sys.executable).resolve()),
         "environment": {
             "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
             "LANG": "C.UTF-8",
@@ -146,6 +148,26 @@ def build_package(fixture: dict[str, object], mode: str, job_name: str) -> tuple
     package_path = tmp / f"{job_name}_package.json"
     package_path.write_text(json.dumps(package) + "\n", encoding="utf-8")
     return package_path, job_root, output
+
+
+def test_freeze_python_executable_preserves_invoked_venv_path() -> None:
+    lexical, resolved = freeze_python_executable(Path(sys.executable))
+    assert lexical == Path(os.path.abspath(sys.executable))
+    assert resolved == lexical.resolve(strict=True)
+
+
+def test_host_rejects_resolved_target_substituted_for_invoked_interpreter(
+    frozen_executor: dict[str, object],
+) -> None:
+    package_path, job_root, _ = build_package(frozen_executor, "success", "python_identity")
+    package = json.loads(package_path.read_text())
+    package["python_executable"] = package["python_resolved_executable"]
+    package["job_package_sha256"] = canonical_sha256(
+        {key: value for key, value in package.items() if key != "job_package_sha256"}
+    )
+    package_path.write_text(json.dumps(package) + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="frozen interpreter"):
+        launch(package_path, job_root)
 
 
 def wait_terminal(job_root: Path, timeout: float = 8.0) -> dict[str, object]:

@@ -144,10 +144,20 @@ def validate_job_package(path: Path, *, require_clean_checkout: bool) -> dict[st
         raise ValueError("background command must be a non-empty string list")
     checkout = Path(str(package.get("executor_checkout", ""))).resolve()
     cwd = Path(str(package.get("cwd", ""))).resolve()
-    python = Path(str(package.get("python_executable", ""))).resolve()
+    python_text = package.get("python_executable")
+    resolved_python_text = package.get("python_resolved_executable")
+    if not isinstance(python_text, str) or not Path(python_text).is_absolute():
+        raise ValueError("frozen interpreter path must be an absolute string")
+    python = Path(os.path.abspath(python_text))
+    if (
+        not isinstance(resolved_python_text, str)
+        or not Path(resolved_python_text).is_absolute()
+        or python.resolve() != Path(resolved_python_text)
+    ):
+        raise ValueError("frozen interpreter resolved identity mismatch")
     if cwd != checkout or not checkout.is_dir() or not python.is_file():
         raise ValueError("executor checkout/cwd/python binding is invalid")
-    if Path(command[0]).resolve() != python:
+    if Path(os.path.abspath(command[0])) != python:
         raise ValueError("background command must use the frozen interpreter")
     if git_value(checkout, "rev-parse", "HEAD") != package.get("executor_commit"):
         raise ValueError("executor commit mismatch")
