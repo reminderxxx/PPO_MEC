@@ -5,7 +5,7 @@
 - `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`
 - `artifact_run_id`: `typed_model_cache_g14r22b_capacity_statistics_20260923_v1`
 - `policy_version`: `tmc_review_policy_v3_20260621`
-- `evidence_level`: `E3_TARGETED_REPRODUCED_WITH_VERIFIED_CAPACITY_IDENTITY; REAL_PUBLIC_CHAIN_FROZEN_PRELAUNCH`
+- `evidence_level`: `E3_TARGETED_REPRODUCED_WITH_VERIFIED_CAPACITY_IDENTITY; REAL_PUBLIC_CHAIN_FAILED_PRE_ROLLOUT`
 - `grant_signed`: `false`
 - `token_issued`: `false`
 - `holdout_opened`: `false`
@@ -54,6 +54,18 @@ executor commit `d6c53b4154f84dcb398ceb0f88ace642142c0f23`、tree
 `398e0c386104f1e8513a93d671ef419b5265eda20c0ee2b26b8f6f96d5926331`，scientific package SHA-256=
 `cd859dc4af0634fe746dc4c87739604976ac01903a6eddc3061ce7a29b243bcd`，job canonical SHA-256=
 `1f0965eecc34865421858093581a68a65c9ca90eab2bcb1f8cc06bc59bfe63d6`。前一份错误解析 venv symlink 的包从未启动，
-仅留在 `/tmp` 作本机审计，不构成 retry。只有该链完成并经独立只读审查，才生成替代 v3 的新 unsigned 申请并判断
+仅留在 `/tmp` 作本机审计，不构成 retry。该唯一 job 于 `2026-09-23T07:47:50Z` 以 `FAILED` 终止：首个
+`constrained_288mb` child 在 benchmark manifest 验证阶段因 NGSIM/Alibaba 均出现 `conflicting dataset candidates`
+而 rc=1，尚未 rollout，也未生成 benchmark rows、统计或 integrity pass。opening ledger 与 execution receipt 明确
+`failed_permanently_consumed`、`retry_allowed=false`、`resume_allowed=false`、`reopen_allowed=false`。
+
+启动后的首次只读 inspect 还暴露宿主活跃身份的 false-negative：启动快照记录 venv 调用路径，macOS `ps` 随后显示
+解析后的 Python binary，birth token 相同但 command hash 不同，因此运行中被 fail-closed 推导为
+`INTERRUPTED_OR_UNKNOWN`；最终 terminal receipt 仍正确覆盖为 `FAILED`。该限制须在后续独立实现任务处理，不能修改或
+重开本次已消费 job。只有新的、另行授权的 public non-holdout 验收完成并经独立只读审查，才生成替代 v3 的新
+unsigned 申请并判断
 是否可提交授权审查。v3 永久 audit-only，不覆盖旧申请或原件。本任务不签 grant/token、不创建正式 holdout root、
 不训练、不选模、不重跑既有正式 rollout。
+
+独立只读复核 verdict：`FAILED_PERMANENTLY_CONSUMED / NOT READY FOR NEW UNSIGNED AUTHORIZATION REVIEW`。
+本次失败证据只证明 fail-closed 与单次消费语义，不能证明真实 producer→CSV→statistics 容量链已通过。

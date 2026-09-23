@@ -1,0 +1,39 @@
+{
+  "acceptance_version": "g14r22a_real_non_holdout_benchmark_v1",
+  "test_only": true,
+  "formal_statistics_eligible": false,
+  "holdout_opened": false,
+  "holdout_policy_runs": 0,
+  "executor_commit": "d6c53b4154f84dcb398ceb0f88ace642142c0f23",
+  "executor_git_tree": "1068b70d642484c9cadadf9380ec2245b640b4e1",
+  "command_package_path": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/real_non_holdout/real_non_holdout_command_package.json",
+  "command_package_sha256": "cd859dc4af0634fe746dc4c87739604976ac01903a6eddc3061ce7a29b243bcd",
+  "background_request_path": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/background_acceptance_request_unsigned.json",
+  "background_request_sha256": "398e0c386104f1e8513a93d671ef419b5265eda20c0ee2b26b8f6f96d5926331",
+  "started_at": "2026-09-23T07:47:39.182181+00:00",
+  "completed_at": "2026-09-23T07:47:50.138953+00:00",
+  "return_code": 1,
+  "passed": false,
+  "capacity_identity_validation": null,
+  "validation_failure": null,
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/Users/howen/.codex/worktrees/g14r22b-executor/PPO_MEC/scripts/run_dedicated_public_holdout.py\", line 60, in <module>\n    raise SystemExit(main())\n  File \"/Users/howen/.codex/worktrees/g14r22b-executor/PPO_MEC/scripts/run_dedicated_public_holdout.py\", line 39, in main\n    receipt = execute_package(request, package, None, None, acceptance=True)\n  File \"/Users/howen/.codex/worktrees/g14r22b-executor/PPO_MEC/src/evaluators/dedicated_holdout_execution.py\", line 685, in execute_package\n    raise HoldoutExecutionError(failure)\nsrc.evaluators.dedicated_holdout_execution.HoldoutExecutionError: scientific child failed permanently: constrained_288mb rc=1\n",
+  "coverage": {
+    "benchmark_entry": "scripts/benchmark_main_results.py",
+    "agents": [
+      "reactive_lru",
+      "sa_ghmappo"
+    ],
+    "capacities": [
+      "constrained_288mb",
+      "medium_576mb",
+      "relaxed_864mb"
+    ],
+    "unique_real_checkpoints_expected": 3,
+    "real_checkpoint_validations_expected": 108,
+    "real_policy_rollouts_expected": 108,
+    "reactive_rollouts_expected": 108,
+    "benchmark_rows_expected": 216,
+    "corrected_statistics_rows_expected": 6
+  }
+}

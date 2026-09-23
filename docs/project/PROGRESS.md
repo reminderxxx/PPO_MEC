@@ -2074,3 +2074,10 @@ JUnit 和未签发新申请由独立 I2 验收记录绑定。本记录不提前�
   `.venv/bin/python`，解析目标另行 hash-bound；科学 root/job root 在 launch 前均不存在。此前错误解析 symlink 的包从未
   启动，移入 `/tmp` audit-only，不计为 retry。grant/token 未签，training/formal rerun/model selection/holdout policy
   均为 0，`holdout_opened=false`。
+- 唯一 job 已于 `2026-09-23T07:47:50Z` 写出 `FAILED` terminal receipt：首个 `constrained_288mb` child 在
+  `benchmark_main_results.py` 的 fairness manifest 验证阶段因 NGSIM/Alibaba `conflicting dataset candidates` rc=1。
+  失败发生在 rollout 前；published 目录为空，无 benchmark rows、corrected statistics 或 integrity manifest。
+  execution receipt=`failed_permanently_consumed`，retry/resume/reopen 均为 false；本轮未启动第二个 run。
+- 活跃期 inspect 另发现 identity false-negative：启动快照的 venv 路径与 macOS `ps` 显示的解析 binary 使 command
+  hash 不同，birth token 虽一致仍按 fail-closed 返回 unknown；terminal receipt 最终正确提供 FAILED 终态。该问题和
+  dataset candidate 歧义均须另立实现任务，本审查轮不自动修复或重开已消费 job。

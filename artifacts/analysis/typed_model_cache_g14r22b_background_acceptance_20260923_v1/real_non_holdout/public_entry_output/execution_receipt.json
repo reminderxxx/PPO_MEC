@@ -1,0 +1,16 @@
+{
+  "receipt_version": "g14r22_holdout_execution_receipt_v1",
+  "status": "failed_permanently_consumed",
+  "completed_at": "2026-09-23T07:47:49.988650+00:00",
+  "request_sha256": "289a7b12d5dbbdedb38a2a3976238e71ab75b55e44632ad165292b3f71c0ba92",
+  "command_package_sha256": "ec156a76e2c4bd9c49129fadec80e84e2830447354df85bb5009b9dcfa1fe90e",
+  "output_root": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/real_non_holdout/public_entry_output",
+  "failure": "scientific child failed permanently: constrained_288mb rc=1",
+  "partial_output_retained": true,
+  "consumed_permanently": true,
+  "retry_allowed": false,
+  "resume_allowed": false,
+  "reopen_allowed": false,
+  "acceptance_non_holdout": true,
+  "holdout_opened": false
+}

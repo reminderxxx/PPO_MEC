@@ -1,0 +1,22 @@
+{
+  "ledger_version": "g14r22_one_time_opening_ledger_v1",
+  "event": "opened",
+  "opened_at": "2026-09-23T07:47:42.265260+00:00",
+  "request_sha256": "289a7b12d5dbbdedb38a2a3976238e71ab75b55e44632ad165292b3f71c0ba92",
+  "command_package_sha256": "ec156a76e2c4bd9c49129fadec80e84e2830447354df85bb5009b9dcfa1fe90e",
+  "executor_commit": "d6c53b4154f84dcb398ceb0f88ace642142c0f23",
+  "output_root": "/Users/howen/.codex/worktrees/g14r22b-capacity-background/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22b_background_acceptance_20260923_v1/real_non_holdout/public_entry_output",
+  "grant_validation": {
+    "status": "acceptance_non_holdout_no_grant"
+  },
+  "checkpoint_byte_validation": {
+    "status": "pass",
+    "models": 3,
+    "total_bytes": 0,
+    "models_canonical_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "consumed_permanently": true,
+  "retry_allowed": false,
+  "resume_allowed": false,
+  "reopen_allowed": false
+}

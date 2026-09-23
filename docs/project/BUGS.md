@@ -757,6 +757,12 @@ G14E01 六文件残留不是合法 initialized run，没有原生 failed termina
 - `RESOLVED IN TESTS / host semantics`：固定单次宿主具备外层日志/退出码/进程 birth identity/terminal receipt，且
   `SUCCEEDED` 依赖科学 receipt 与 integrity；失败不重试。SIGKILL/断电可能无即时 terminal receipt，只能后续只读
   判 `INTERRUPTED_OR_UNKNOWN`。解释器身份同时冻结 venv 调用路径与解析后的二进制目标，任一被替换即拒绝。
-- `PENDING / FROZEN PRELAUNCH`：clean executor `d6c53b4` / tree `1068b70d`、unsigned request 与单次 job package 已
-  hash-bound；必须完成一次真实 public non-holdout producer→CSV→statistics 长验收，才可
+- `BLOCKER / real public chain`：clean executor `d6c53b4` / tree `1068b70d` 的唯一 job 已 terminal `FAILED`；首个
+  capacity 在 pre-rollout fairness manifest 验证因 NGSIM/Alibaba `conflicting dataset candidates` 被拒绝。root 已永久
+  消费且 retry/resume/reopen=false；没有 benchmark rows、统计或 integrity pass。必须另立实现与新授权任务解决
+  dataset candidate 唯一性后，才可完成真实 public non-holdout producer→CSV→statistics 长验收并
   形成新 unsigned 申请并提交独立授权审查。v3 继续 audit-only；grant/token 未签，holdout unopened。
+- `OPEN / live process identity false-negative`：macOS `ps` 把 venv invocation 展示为解析后的 Python binary，导致启动
+  快照和活跃检查 command hash 不同；现有 fail-closed inspect 会把仍存在且 birth token 相同的进程判 unknown。
+  terminal receipt 不受影响，但运行中状态保证不完整；后续需冻结规范化后的可执行目标及 argv identity，并保持 PID
+  + birth token + command identity 的复合防复用检查。
