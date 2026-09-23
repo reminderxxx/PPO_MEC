@@ -25,6 +25,28 @@ from src.evaluators.dedicated_holdout_execution import (
 
 
 def package() -> dict:
+    scientific = []
+    for capacity in CAPACITIES:
+        scientific.append([
+            "python", "benchmark_main_results.py", "--agents", *ALL_AGENTS,
+            "--seeds", *[str(seed) for seed in SEEDS],
+            "--seed_checkpoint_manifest_path", f"{capacity}.json",
+            "--formal_window_split", "sealed_holdout",
+            "--window-plan-resource-id", "window_plan.typed_model_cache.sealed_holdout",
+            "--window_plan_path", "/frozen/sealed_holdout_window_plan.json",
+            "--output_root", "{G14R22_CELL_OUTPUT_ROOT}",
+            "--runtime-config-resource-id", f"runtime_config.{capacity}",
+            "--checkpoint-manifest-id", f"checkpoint_manifest.{capacity}",
+            "--checkpoint-provenance-id", f"checkpoint_provenance.{capacity}",
+            "--dedicated-holdout-opening-receipt", "{G14R22_OPENING_RECEIPT}",
+            "--dedicated-holdout-request-sha256", "{G14R22_REQUEST_SHA256}",
+            "--dedicated-holdout-command-package-sha256", "{G14R22_COMMAND_PACKAGE_SHA256}",
+        ])
+    statistics = [
+        "python", "analyze_top_journal_statistics.py", "--candidate_agent", "sa_ghmappo",
+        "--baseline_agents", *[agent for agent in ALL_AGENTS if agent != "sa_ghmappo"],
+        "--metrics", *PRIMARY_METRICS, "--pair_keys", "seed", "--bootstrap_samples", "10000",
+    ]
     value = {
         "command_package_version": HOLDOUT_COMMAND_PACKAGE_VERSION,
         "executor_checkout": "/tmp/executor",
@@ -38,7 +60,7 @@ def package() -> dict:
             "total_expected_rows": 8100, "checkpoint_count": 150,
             "primary_metrics": list(PRIMARY_METRICS), "holm_family_size": 84,
         },
-        "commands": {"scientific": [["child", str(i)] for i in range(3)], "statistics": ["stats"]},
+        "commands": {"scientific": scientific, "statistics": statistics},
         "automatic_retry_count": 0,
     }
     value["command_package_sha256"] = canonical_sha256(value)

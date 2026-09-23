@@ -157,6 +157,44 @@ def validate_command_package(package: Mapping[str, Any], *, acceptance: bool = F
         raise HoldoutExecutionError("scientific command schema mismatch")
     if not isinstance(commands.get("statistics"), list) or not commands["statistics"]:
         raise HoldoutExecutionError("statistics command is missing")
+    if not acceptance:
+        for index, command in enumerate(scientific):
+            if command[command.index("--agents") + 1:command.index("--seeds")] != list(ALL_AGENTS):
+                raise HoldoutExecutionError("scientific command agent order drift")
+            seeds = command[command.index("--seeds") + 1:command.index("--seed_checkpoint_manifest_path")]
+            if seeds != [str(seed) for seed in SEEDS]:
+                raise HoldoutExecutionError("scientific command seed order drift")
+            required_pairs = {
+                "--formal_window_split": "sealed_holdout",
+                "--window-plan-resource-id": "window_plan.typed_model_cache.sealed_holdout",
+                "--output_root": "{G14R22_CELL_OUTPUT_ROOT}",
+                "--dedicated-holdout-opening-receipt": "{G14R22_OPENING_RECEIPT}",
+                "--dedicated-holdout-request-sha256": "{G14R22_REQUEST_SHA256}",
+                "--dedicated-holdout-command-package-sha256": "{G14R22_COMMAND_PACKAGE_SHA256}",
+                "--runtime-config-resource-id": f"runtime_config.{CAPACITIES[index]}",
+                "--checkpoint-manifest-id": f"checkpoint_manifest.{CAPACITIES[index]}",
+                "--checkpoint-provenance-id": f"checkpoint_provenance.{CAPACITIES[index]}",
+            }
+            for flag, expected_value in required_pairs.items():
+                if command.count(flag) != 1 or command[command.index(flag) + 1] != expected_value:
+                    raise HoldoutExecutionError(f"scientific command binding drift: {flag}")
+            plan = command[command.index("--window_plan_path") + 1]
+            if Path(plan).name != "sealed_holdout_window_plan.json":
+                raise HoldoutExecutionError("scientific command window plan drift")
+            lowered = " ".join(command).lower()
+            if any(token in lowered for token in ("checkpoint_freeze", "dev_select", "train_agent")):
+                raise HoldoutExecutionError("scientific command contains forbidden selection/training action")
+        statistics = commands["statistics"]
+        if statistics[statistics.index("--candidate_agent") + 1] != "sa_ghmappo":
+            raise HoldoutExecutionError("statistics candidate drift")
+        baselines = statistics[statistics.index("--baseline_agents") + 1:statistics.index("--metrics")]
+        if baselines != [agent for agent in ALL_AGENTS if agent != "sa_ghmappo"]:
+            raise HoldoutExecutionError("statistics baseline family drift")
+        metrics = statistics[statistics.index("--metrics") + 1:statistics.index("--pair_keys")]
+        if metrics != list(PRIMARY_METRICS):
+            raise HoldoutExecutionError("statistics metric family drift")
+        if statistics[statistics.index("--bootstrap_samples") + 1] != "10000":
+            raise HoldoutExecutionError("statistics bootstrap budget drift")
     if package.get("automatic_retry_count") != 0:
         raise HoldoutExecutionError("automatic retry must remain zero")
     return {"status": "pass", "command_count": 4, "acceptance": acceptance}
@@ -363,12 +401,30 @@ def _run(command: Sequence[str], *, cwd: Path, stdout_path: Path, stderr_path: P
     return int(completed.returncode)
 
 
+def _verify_executor_checkout(package: Mapping[str, Any]) -> None:
+    checkout = Path(str(package.get("executor_checkout", "")))
+    if checkout.is_symlink() or not (checkout / ".git").exists():
+        raise HoldoutExecutionError("executor checkout is missing or not a Git worktree")
+    try:
+        head = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=checkout, text=True, stderr=subprocess.STDOUT
+        ).strip()
+        status = subprocess.check_output(
+            ["git", "status", "--porcelain"], cwd=checkout, text=True, stderr=subprocess.STDOUT
+        )
+    except subprocess.CalledProcessError as exc:
+        raise HoldoutExecutionError("executor Git identity check failed") from exc
+    if head != package.get("executor_commit") or status:
+        raise HoldoutExecutionError("executor checkout commit/cleanliness drift")
+
+
 def execute_package(
     request: Mapping[str, Any], package: Mapping[str, Any], grant: Mapping[str, Any] | None,
     token: bytes | None, *, acceptance: bool = False,
 ) -> dict[str, Any]:
     validate_command_package(package, acceptance=acceptance)
     if not acceptance:
+        _verify_executor_checkout(package)
         validate_unsigned_request(request, package)
         if grant is None or token is None:
             raise HoldoutExecutionError("signed grant and one-time token are required")
