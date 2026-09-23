@@ -174,7 +174,7 @@ def write_paper_table(output_root: Path, payload: Mapping[str, Any]) -> None:
     rows = payload["rows"]
     csv_path = output_root / "paper_primary_comparisons.csv"
     with csv_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         writer.writerows({field: row.get(field) for field in fields} for row in rows)
     lines = [
