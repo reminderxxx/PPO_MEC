@@ -3,6 +3,7 @@ from __future__ import annotations
 import random
 
 from scripts.analyze_top_journal_statistics import holm_adjust, summarize_deltas
+from scripts.manage_typed_model_cache_formal_artifacts import _claim_evidence_rows
 from scripts.train_sa_ghmappo_real_sample import compute_pareto_safe_checkpoint_score
 
 
@@ -33,6 +34,12 @@ def test_hierarchical_bootstrap_uses_window_as_outer_cluster() -> None:
     assert summary["inner_cluster_count"] == 24
     assert summary["bca_available"] is True
     assert summary["ci95_method"] == "bca"
+    assert summary["sign_test_unit"] == "outer_cluster_mean"
+    assert summary["sign_test_effective_count"] == 4
+    assert summary["sign_test_denominator"] == 4
+    assert summary["paired_row_wins"] + summary["paired_row_ties"] + summary["paired_row_losses"] == 24
+    assert summary["wins"] + summary["ties"] + summary["losses"] == 4
+    assert summary["low_outer_cluster_count"] is True
 
 
 def test_hierarchical_interval_is_wider_for_correlated_window_rows() -> None:
@@ -92,6 +99,85 @@ def test_holm_adjust_controls_the_full_family() -> None:
     adjusted = holm_adjust([0.01, 0.04, 0.03, 0.20])
 
     assert adjusted == [0.04, 0.09, 0.09, 0.20]
+
+
+def test_holm_adjust_preserves_preregistered_84_comparison_family() -> None:
+    adjusted = holm_adjust([0.01] + [1.0] * 83)
+    assert len(adjusted) == 84
+    assert adjusted[0] == 0.84
+    assert adjusted[1:] == [1.0] * 83
+
+
+def test_claim_classification_consumes_signed_direction_exactly_once() -> None:
+    rows = _claim_evidence_rows(
+        {
+            "rows": [
+                {
+                    "candidate_agent": "candidate",
+                    "baseline_agent": "baseline",
+                    "metric": "transfer_mb_per_request",
+                    "available_paired_count": 12,
+                    "signed_positive_favors_candidate": True,
+                    "ci95_low": -4.0,
+                    "ci95_high": -1.0,
+                },
+                {
+                    "candidate_agent": "candidate",
+                    "baseline_agent": "baseline",
+                    "metric": "workflow_continuity_rate",
+                    "available_paired_count": 12,
+                    "signed_positive_favors_candidate": True,
+                    "ci95_low": 0.01,
+                    "ci95_high": 0.02,
+                },
+            ]
+        }
+    )
+    assert [row["status"] for row in rows] == ["contradicted", "supported"]
+    assert all(
+        row["classification_basis"] == "signed_ci_positive_favors_candidate_once"
+        for row in rows
+    )
+
+
+def test_sign_test_collapses_repeated_rows_inside_outer_window() -> None:
+    deltas = [1.0] * 20 + [-1.0] * 20
+    outer = [("window_id=positive",)] * 20 + [("window_id=negative",)] * 20
+    summary = summarize_deltas(
+        deltas,
+        bootstrap_samples=100,
+        rng=random.Random(7),
+        outer_clusters=outer,
+    )
+    assert (summary["paired_row_wins"], summary["paired_row_ties"], summary["paired_row_losses"]) == (20, 0, 20)
+    assert (summary["wins"], summary["ties"], summary["losses"]) == (1, 0, 1)
+    assert summary["sign_test_denominator"] == 2
+    assert summary["sign_test_pvalue"] == 1.0
+
+
+def test_sign_test_drops_outer_window_ties_and_all_zero_is_explicit() -> None:
+    summary = summarize_deltas(
+        [0.0, 0.0, 0.0, 0.0],
+        bootstrap_samples=100,
+        rng=random.Random(7),
+        outer_clusters=[("window_id=w0",)] * 2 + [("window_id=w1",)] * 2,
+    )
+    assert (summary["wins"], summary["ties"], summary["losses"]) == (0, 2, 0)
+    assert summary["sign_test_effective_count"] == 2
+    assert summary["sign_test_denominator"] == 0
+    assert summary["sign_test_pvalue_exact"] == 1.0
+    assert summary["sign_test_pvalue"] == 1.0
+
+
+def test_negative_outer_window_effect_remains_candidate_adverse() -> None:
+    summary = summarize_deltas(
+        [-3.0, -3.0, -1.0, -1.0],
+        bootstrap_samples=100,
+        rng=random.Random(7),
+        outer_clusters=[("window_id=w0",)] * 2 + [("window_id=w1",)] * 2,
+    )
+    assert summary["mean_delta"] == -2.0
+    assert (summary["wins"], summary["ties"], summary["losses"]) == (0, 0, 2)
 
 
 def test_pareto_safe_score_penalizes_failure_and_backhaul_regressions() -> None:

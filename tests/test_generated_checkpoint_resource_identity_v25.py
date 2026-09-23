@@ -407,6 +407,7 @@ def test_exact_gate_rehearsal_counts_and_claim_states(tmp_path: Path) -> None:
                     "candidate_agent": "sa_ghmappo", "baseline_agent": "ppo",
                     "metric": "workflow_continuity_rate", "available_paired_count": 1,
                     "ci95_low": -0.1, "ci95_high": 0.2,
+                    "signed_positive_favors_candidate": True,
                 }
             ]
         },

@@ -355,6 +355,14 @@ def summarize_deltas(
             "wins": 0,
             "ties": 0,
             "losses": 0,
+            "paired_row_wins": 0,
+            "paired_row_ties": 0,
+            "paired_row_losses": 0,
+            "sign_test_unit": "outer_cluster_mean" if outer_clusters else "paired_delta",
+            "sign_test_effective_count": 0,
+            "sign_test_denominator": 0,
+            "low_outer_cluster_count": bool(outer_clusters),
+            "sign_test_pvalue_exact": None,
             "sign_test_pvalue": None,
         }
     std_delta = stdev(deltas) if len(deltas) > 1 else 0.0
@@ -402,9 +410,18 @@ def summarize_deltas(
     else:
         primary_low, primary_high, primary_method = percentile_low, percentile_high, "percentile"
     outer_cluster_std = stdev(outer_cluster_means) if len(outer_cluster_means) > 1 else 0.0
-    wins = sum(1 for value in deltas if value > 1e-9)
-    losses = sum(1 for value in deltas if value < -1e-9)
-    ties = len(deltas) - wins - losses
+    paired_row_wins = sum(1 for value in deltas if value > 1e-9)
+    paired_row_losses = sum(1 for value in deltas if value < -1e-9)
+    paired_row_ties = len(deltas) - paired_row_wins - paired_row_losses
+    # The frozen protocol defines the raw-time mobility window as the outer
+    # independent unit.  Repeated seed/workflow/capacity rows are therefore
+    # reduced inside each window before the exact sign test.  They remain
+    # available as row-level diagnostics, but never inflate the test n.
+    sign_test_values = outer_cluster_means if outer_clusters is not None else deltas
+    wins = sum(1 for value in sign_test_values if value > 1e-9)
+    losses = sum(1 for value in sign_test_values if value < -1e-9)
+    ties = len(sign_test_values) - wins - losses
+    sign_test_pvalue_exact = exact_sign_test_pvalue(wins, losses)
     return {
         "paired_count": len(deltas),
         "bootstrap_unit": bootstrap_unit,
@@ -427,7 +444,15 @@ def summarize_deltas(
         "wins": wins,
         "ties": ties,
         "losses": losses,
-        "sign_test_pvalue": round(exact_sign_test_pvalue(wins, losses), 6),
+        "paired_row_wins": paired_row_wins,
+        "paired_row_ties": paired_row_ties,
+        "paired_row_losses": paired_row_losses,
+        "sign_test_unit": "outer_cluster_mean" if outer_clusters is not None else "paired_delta",
+        "sign_test_effective_count": len(sign_test_values),
+        "sign_test_denominator": wins + losses,
+        "low_outer_cluster_count": bool(outer_clusters is not None and len(sign_test_values) < 12),
+        "sign_test_pvalue_exact": sign_test_pvalue_exact,
+        "sign_test_pvalue": round(sign_test_pvalue_exact, 6),
     }
 
 
@@ -567,16 +592,32 @@ def main() -> None:
                         "AVAILABLE" if signed_deltas else "UNAVAILABLE"
                     ),
                     **summary,
-                    "raw_mean_delta_candidate_minus_baseline": raw_summary["mean_delta"],
-                    "raw_ci95_low": raw_summary["ci95_low"],
-                    "raw_ci95_high": raw_summary["ci95_high"],
+                    # The candidate-minus-baseline scale is a deterministic
+                    # transform of the signed scale.  The second summary call
+                    # is retained only to preserve the frozen RNG stream used
+                    # by later comparisons; its independently sampled bounds
+                    # must not introduce a second, slightly different result.
+                    "raw_mean_delta_candidate_minus_baseline": (
+                        -summary["mean_delta"] if metric in LOWER_IS_BETTER and summary["mean_delta"] is not None
+                        else summary["mean_delta"]
+                    ),
+                    "raw_ci95_low": (
+                        -summary["ci95_high"] if metric in LOWER_IS_BETTER and summary["ci95_high"] is not None
+                        else summary["ci95_low"]
+                    ),
+                    "raw_ci95_high": (
+                        -summary["ci95_low"] if metric in LOWER_IS_BETTER and summary["ci95_low"] is not None
+                        else summary["ci95_high"]
+                    ),
+                    "raw_delta_definition": "candidate_minus_baseline",
+                    "signed_delta_definition": "positive_favors_candidate",
                 }
             )
 
     available_pvalue_rows = [
-        (index, float(row["sign_test_pvalue"]))
+        (index, float(row["sign_test_pvalue_exact"]))
         for index, row in enumerate(output_rows)
-        if row["sign_test_pvalue"] is not None
+        if row["sign_test_pvalue_exact"] is not None
     ]
     adjusted_sign_tests = holm_adjust([item[1] for item in available_pvalue_rows])
     adjusted_by_index = {
@@ -587,6 +628,8 @@ def main() -> None:
         row["holm_sign_test_pvalue"] = adjusted_by_index.get(index)
         row["holm_family"] = "all_baseline_metric_comparisons"
         row["holm_available_family_size"] = len(available_pvalue_rows)
+        row["holm_preregistered_family_size"] = len(output_rows)
+        row["holm_unavailable_family_count"] = len(output_rows) - len(available_pvalue_rows)
 
     output_root = Path(args.output_root)
     output_root.mkdir(parents=True, exist_ok=True)

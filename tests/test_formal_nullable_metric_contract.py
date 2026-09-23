@@ -243,6 +243,8 @@ def test_statistics_reports_nullable_pair_coverage_and_lower_direction(tmp_path:
     row = payload["rows"][0]
     assert row["higher_is_better"] is False
     assert row["raw_mean_delta_candidate_minus_baseline"] == -2.0
+    assert row["raw_ci95_low"] == -2.0
+    assert row["raw_ci95_high"] == -2.0
     assert row["mean_delta"] == 2.0
     assert row["total_pair_count"] == 4
     assert row["available_paired_count"] == 1
@@ -250,6 +252,10 @@ def test_statistics_reports_nullable_pair_coverage_and_lower_direction(tmp_path:
     assert row["baseline_only_available_drop_count"] == 1
     assert row["both_unavailable_drop_count"] == 1
     assert row["holm_available_family_size"] == 1
+    assert row["holm_preregistered_family_size"] == 1
+    assert row["holm_unavailable_family_count"] == 0
+    assert row["raw_delta_definition"] == "candidate_minus_baseline"
+    assert row["signed_delta_definition"] == "positive_favors_candidate"
 
 
 def test_v12_run_and_staging_checkpoint_references_are_rejected() -> None:

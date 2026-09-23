@@ -731,11 +731,6 @@ def _csv_count(paths: list[Path]) -> tuple[int, set[str]]:
 
 
 def _claim_evidence_rows(statistics_payload: Mapping[str, Any]) -> list[dict[str, Any]]:
-    lower_is_better = {
-        "transfer_mb_per_request", "end_to_end_workflow_delay",
-        "handoff_failure_rate", "backhaul_traffic_cost",
-        "adapter_state_migration_overhead",
-    }
     result = []
     for row in statistics_payload.get("rows", []):
         if not isinstance(row, Mapping):
@@ -746,14 +741,15 @@ def _claim_evidence_rows(statistics_payload: Mapping[str, Any]) -> list[dict[str
         status = "unsupported"
         if available <= 0:
             status = "unavailable"
+        elif row.get("signed_positive_favors_candidate") is not True:
+            status = "unsupported"
         elif not isinstance(low, (int, float)) or not isinstance(high, (int, float)):
             status = "unsupported"
         else:
-            desired_positive = str(row.get("metric")) not in lower_is_better
             if low > 0:
-                status = "supported" if desired_positive else "contradicted"
+                status = "supported"
             elif high < 0:
-                status = "contradicted" if desired_positive else "supported"
+                status = "contradicted"
             else:
                 status = "mixed"
         result.append(
@@ -763,6 +759,7 @@ def _claim_evidence_rows(statistics_payload: Mapping[str, Any]) -> list[dict[str
                 "metric": row.get("metric"),
                 "status": status,
                 "available_paired_count": available,
+                "classification_basis": "signed_ci_positive_favors_candidate_once",
             }
         )
     return result
