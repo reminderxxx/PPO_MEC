@@ -10,6 +10,8 @@
 *.yaml text eol=lf
 *.yml text eol=lf
 *.csv text eol=lf
+# G14R22 producer-integrity fixtures retain the exact CSV bytes emitted during acceptance.
+artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v1/non_holdout_acceptance/public_entry_output/published/scientific/**/benchmark_rows.csv -text
 *.tex text eol=lf
 
 *.bat text eol=crlf
