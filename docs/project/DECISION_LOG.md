@@ -1228,3 +1228,11 @@ proposal/approval 注入 production trust。production installation 仍为 `None
 - 决策：若未来批准恢复，先建立独立 bounded recovery identity，六个 committed cell 只按 external immutable
   references 消费；失败 cell 作为 recovery attempt 2，未启动 cell 作为首次 attempt，完成 ablation 后停止并重新授权
   后续阶段。该 primitive 本轮不实现、不签发、不执行。
+## 2026-09-23 — G14R22-A dedicated runner 必须发布完整 evaluation identity bundle
+
+- 决定：只要 dedicated package 使用 cross-run generated checkpoint resource，就必须同时携带并原子发布
+  `evaluation_execution_contract.json`、`resolved_execution_context.json` 与
+  `evaluation_model_source_reference.json`；缺失、hash/path/commit/tree 不一致均在科学 child 前拒绝。
+- 理由：真实 benchmark loader 明确消费三者，原 synthetic fixture 未进入该边界，不能代表真实 checkpoint 路径。
+- 边界：旧公式 fixture 保留为 synthetic transaction acceptance；真实补验只使用 public/formal non-holdout split，
+  显式 test-only，不签 grant/token，不访问 sealed holdout。

@@ -9,6 +9,7 @@ cannot be resumed or reopened.
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 import math
@@ -113,6 +114,38 @@ def _hash_bound(value: Mapping[str, Any], field: str) -> bool:
     return isinstance(observed, str) and observed == canonical_sha256(payload)
 
 
+def _validate_identity_bundle(package: Mapping[str, Any], *, required: bool) -> None:
+    """Bind the three sibling files consumed by the real checkpoint loader."""
+
+    contract = package.get("evaluation_execution_contract")
+    context = package.get("resolved_execution_context")
+    reference = package.get("model_source_reference")
+    present = [isinstance(value, Mapping) for value in (contract, context, reference)]
+    if not any(present):
+        if required:
+            raise HoldoutExecutionError("evaluation execution identity bundle is missing")
+        return
+    if not all(present):
+        raise HoldoutExecutionError("evaluation execution identity bundle is incomplete")
+    if contract.get("evaluation_execution_context") != context:
+        raise HoldoutExecutionError("evaluation execution context/contract drift")
+    if contract.get("evaluation_run_root") != package.get("output_root"):
+        raise HoldoutExecutionError("evaluation execution contract output-root drift")
+    if (contract.get("executor_checkout") != package.get("executor_checkout")
+            or contract.get("executor_commit") != package.get("executor_commit")):
+        raise HoldoutExecutionError("evaluation execution contract executor drift")
+    if contract.get("model_source_reference_sha256") != reference.get(
+        "source_reference_sha256"
+    ):
+        raise HoldoutExecutionError("evaluation execution contract source drift")
+    if not _hash_bound(contract, "execution_contract_sha256"):
+        raise HoldoutExecutionError("evaluation execution contract hash mismatch")
+    if not _hash_bound(context, "context_sha256"):
+        raise HoldoutExecutionError("resolved execution context hash mismatch")
+    if not _hash_bound(reference, "source_reference_sha256"):
+        raise HoldoutExecutionError("evaluation model source reference hash mismatch")
+
+
 def validate_command_package(package: Mapping[str, Any], *, acceptance: bool = False) -> dict[str, Any]:
     if package.get("command_package_version") != HOLDOUT_COMMAND_PACKAGE_VERSION:
         raise HoldoutExecutionError("holdout command package version mismatch")
@@ -197,6 +230,7 @@ def validate_command_package(package: Mapping[str, Any], *, acceptance: bool = F
             raise HoldoutExecutionError("statistics bootstrap budget drift")
     if package.get("automatic_retry_count") != 0:
         raise HoldoutExecutionError("automatic retry must remain zero")
+    _validate_identity_bundle(package, required=not acceptance)
     return {"status": "pass", "command_count": 4, "acceptance": acceptance}
 
 
@@ -391,6 +425,48 @@ def _inventory(root: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def _verify_producer_manifest(artifact: Path) -> dict[str, Any]:
+    manifest = read_json(artifact / "artifact_integrity_manifest.json")
+    rows = manifest.get("files")
+    if not isinstance(rows, list) or not rows:
+        raise HoldoutExecutionError("scientific producer integrity manifest is empty")
+    observed: list[dict[str, Any]] = []
+    for row in rows:
+        if not isinstance(row, Mapping) or set(row) != {"path", "size_bytes", "sha256"}:
+            raise HoldoutExecutionError("scientific producer integrity row schema mismatch")
+        relative = Path(str(row["path"]))
+        if relative.is_absolute() or ".." in relative.parts:
+            raise HoldoutExecutionError("scientific producer integrity path escapes artifact")
+        target = artifact / relative
+        if target.is_symlink() or not target.is_file():
+            raise HoldoutExecutionError("scientific producer integrity file is missing")
+        actual = {
+            "path": relative.as_posix(),
+            "size_bytes": target.stat().st_size,
+            "sha256": file_sha256(target),
+        }
+        if actual != dict(row):
+            raise HoldoutExecutionError("scientific producer integrity mismatch")
+        observed.append(actual)
+    if "benchmark_rows.csv" not in {row["path"] for row in observed}:
+        raise HoldoutExecutionError("scientific producer manifest omits benchmark rows")
+    return {
+        "status": "pass",
+        "file_count": len(observed),
+        "files_canonical_sha256": canonical_sha256(observed),
+    }
+
+
+def _csv_data_rows(path: Path) -> int:
+    with path.open("r", encoding="utf-8-sig", newline="") as handle:
+        reader = csv.reader(handle)
+        try:
+            next(reader)
+        except StopIteration:
+            return 0
+        return sum(1 for _ in reader)
+
+
 def _run(command: Sequence[str], *, cwd: Path, stdout_path: Path, stderr_path: Path) -> int:
     with stdout_path.open("xb") as stdout, stderr_path.open("xb") as stderr:
         completed = subprocess.run(
@@ -423,6 +499,15 @@ def execute_package(
     token: bytes | None, *, acceptance: bool = False,
 ) -> dict[str, Any]:
     validate_command_package(package, acceptance=acceptance)
+    if any(isinstance(package.get(field), Mapping) for field in (
+        "evaluation_execution_contract", "resolved_execution_context", "model_source_reference"
+    )):
+        from src.runtime.evaluation_only_execution import validate_execution_contract
+
+        validate_execution_contract(
+            package["evaluation_execution_contract"],
+            model_source_reference=package["model_source_reference"],
+        )
     if not acceptance:
         _verify_executor_checkout(package)
         validate_unsigned_request(request, package)
@@ -466,6 +551,11 @@ def execute_package(
         create_json(temporary / "resolved_execution_context.json", package["resolved_execution_context"])
     if isinstance(package.get("model_source_reference"), Mapping):
         create_json(temporary / "evaluation_model_source_reference.json", package["model_source_reference"])
+    if isinstance(package.get("evaluation_execution_contract"), Mapping):
+        create_json(
+            temporary / "evaluation_execution_contract.json",
+            package["evaluation_execution_contract"],
+        )
     _append_ledger(temporary / "opening_ledger.jsonl", opening)
     os.replace(temporary, output_root)
     ledger = output_root / "opening_ledger.jsonl"
@@ -503,6 +593,23 @@ def execute_package(
             producer_manifest = artifact / "artifact_integrity_manifest.json"
             if not rows_path.is_file() or not producer_manifest.is_file():
                 raise HoldoutExecutionError(f"scientific child payload incomplete: {capacity}")
+            producer_audit = _verify_producer_manifest(artifact)
+            expected_rows = package.get("scientific_matrix", {}).get("rows_per_child")
+            actual_rows = _csv_data_rows(rows_path)
+            if expected_rows is not None and actual_rows != int(expected_rows):
+                raise HoldoutExecutionError(
+                    f"scientific child row count mismatch: {capacity} {actual_rows} != {expected_rows}"
+                )
+            _append_ledger(
+                ledger,
+                {
+                    "event": "scientific_producer_integrity_verified",
+                    "capacity": capacity,
+                    "row_count": actual_rows,
+                    **producer_audit,
+                    "consumed_permanently": True,
+                },
+            )
             destination = published / "scientific" / capacity
             destination.parent.mkdir(parents=True, exist_ok=True)
             os.replace(artifact, destination)
@@ -523,14 +630,18 @@ def execute_package(
             raise HoldoutExecutionError(f"statistics child failed permanently: rc={stats_rc}")
         stats_payload = read_json(stats_stage / "paired_statistics.json")
         rows = stats_payload.get("rows")
-        if not isinstance(rows, list) or len(rows) != 84:
-            raise HoldoutExecutionError("statistics output must contain exactly 84 Holm-family rows")
-        if any(row.get("holm_preregistered_family_size") != 84 for row in rows):
+        expected_statistics_rows = int(package.get("scientific_matrix", {}).get("holm_family_size", 84))
+        if not isinstance(rows, list) or len(rows) != expected_statistics_rows:
+            raise HoldoutExecutionError(
+                f"statistics output must contain exactly {expected_statistics_rows} Holm-family rows"
+            )
+        if any(row.get("holm_preregistered_family_size") != expected_statistics_rows for row in rows):
             raise HoldoutExecutionError("statistics Holm family identity drift")
         stats_destination = published / "statistics"
         os.replace(stats_stage, stats_destination)
         _append_ledger(ledger, {"event": "publication_completed", "scientific_children": 3,
-                                "statistics_rows": 84, "consumed_permanently": True})
+                                "statistics_rows": expected_statistics_rows,
+                                "consumed_permanently": True})
         inventory = _inventory(published)
         integrity = {
             "integrity_version": HOLDOUT_INTEGRITY_VERSION,
@@ -563,6 +674,8 @@ def execute_package(
         "retry_allowed": False,
         "resume_allowed": False,
         "reopen_allowed": False,
+        "acceptance_non_holdout": bool(acceptance),
+        "holdout_opened": False if acceptance else True,
     }
     create_json(output_root / "execution_receipt.json", receipt)
     _append_ledger(ledger, {"event": "execution_receipt_published", "status": terminal_status,

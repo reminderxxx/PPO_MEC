@@ -590,3 +590,9 @@ G14E01 首次初始化失败且科学 dispatch 为 0，原六文件现场及 gra
 evaluation-only 首次锁/初始化/下一 phase 载入；不授权恢复旧 run 或正式评估。合同与验收边界见
 [bootstrap/handoff](docs/project/evaluation_only_bootstrap_handoff_contract.md)。最终 clean 验收与新 unsigned
 申请指针见独立 `artifacts/analysis/g14r20_i2_bootstrap_acceptance_20260911/`。
+> **2026-09-23 G14R22-A**：原 non-holdout child 已确认是公式生成 CSV，只保留为 synthetic transaction
+> acceptance。真实 generated-resource consumer 要求同目录 `evaluation_execution_contract.json`，原 dedicated
+> runner 未生产该文件；现已最小补齐 package/runner 身份闭环及 producer 逐文件完整性，并新增三容量
+> `reactive_lru + sa_ghmappo` 真实 benchmark/checkpoint/rollout 测试链。长验收须从最终 clean executor commit
+> 独立启动；结果为 test-only，不进入正式统计。未签 grant/token，`holdout_opened=false`。详见
+> [G14R22-A 合同](docs/project/g14r22a_non_holdout_benchmark_acceptance.md)。

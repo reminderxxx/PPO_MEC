@@ -83,15 +83,18 @@
 ## G14R22 dedicated one-time holdout
 
 - `src/evaluators/dedicated_holdout_execution.py`：unsigned request/command/grant 校验、150-checkpoint byte gate、
-  atomic opening、append-only ledger、科学/统计 child、原子发布、integrity 与 permanent-consumed receipt。
+  atomic opening、完整 evaluation contract/context/source 三文件发布、append-only ledger、producer 逐文件完整性、
+  科学/统计 child、原子发布、integrity 与 permanent-consumed receipt。
 - `scripts/run_dedicated_public_holdout.py`：唯一 public qualify/execute/strict non-holdout acceptance CLI；生产 execute
   必须提供 exact signed grant 与 token file。
 - `scripts/benchmark_main_results.py`：ordinary runner 对 sealed split 仍 fail-closed；dedicated child 只消费已发布的
   opening receipt 及 request/package hash。
 - `scripts/build_g14r22_holdout_request.py`：绑定 executor commit、G14R21 corrected package、150 model source、
   frozen windows/agents/seeds/capacities/metrics/84-family 并生成 unsigned 包，不生成 grant/token。
-- `scripts/run_g14r22_non_holdout_acceptance.py` / `g14r22_non_holdout_scientific_child.py`：以真实公共入口验收
-  science→statistics→publication→integrity，不允许出现 sealed split 或 holdout policy。
+- `scripts/run_g14r22_non_holdout_acceptance.py` / `g14r22_non_holdout_scientific_child.py`：synthetic transaction
+  acceptance；只验收公共事务，不是模型加载或科学 rollout 证据。
+- `scripts/run_g14r22a_real_non_holdout_acceptance.py`：真实 `benchmark_main_results.py`、generated-resource、
+  checkpoint loader、learned/reactive rollout、producer integrity、corrected statistics 与 receipt 的三容量测试链。
 
 ## G14R18 provenance envelope / shared identity boundary
 

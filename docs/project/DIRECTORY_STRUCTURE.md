@@ -367,3 +367,7 @@ G14R22 dedicated one-time holdout 合同入口为 `scripts/run_dedicated_public_
 command package，`scripts/run_g14r22_non_holdout_acceptance.py` 仅走 non-holdout fixture。机器申请包位于
 `artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v1/`。正式输出 root 固定在
 `artifacts/experiments/typed_model_cache_holdout/typed_model_cache_holdout_20260923_g14r22_once/`，未签 grant 前必须不存在。
+
+G14R22-A 真实 non-holdout 消费链入口为 `scripts/run_g14r22a_real_non_holdout_acceptance.py`；它在独立 analysis
+root 写 command package、真实 benchmark staging/published payload、corrected statistics 与 completion receipt。
+旧 `g14r22_non_holdout_scientific_child.py` 只属于 synthetic transaction fixture，不是科学数据 producer。

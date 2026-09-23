@@ -2036,3 +2036,11 @@ JUnit 和未签发新申请由独立 I2 验收记录绑定。本记录不提前�
 - 当前状态：工程修复已验收；恢复方案待批准。`recovery_grant_issued=false`、
   `real_recovery_started=false`、`holdout_opened=false`。详见
   `docs/project/g14r20_i4_restricted_recovery_plan.md`。
+## 2026-09-23 G14R22-A：真实 non-holdout 消费链补验（实现完成，长验收待 final commit 启动）
+
+- 确认原 `g14r22_non_holdout_scientific_child.py` 为公式生成 CSV；保留原事务验收并更正为 synthetic，不作真实科学正例。
+- 定位 production gap：dedicated runner 未发布真实 generated-resource consumer 强制要求的
+  `evaluation_execution_contract.json`。已最小修复 package/runner 三文件完整绑定及 producer manifest 逐文件复验。
+- 新真实测试链固定三容量、`reactive_lru + sa_ghmappo`、seed 7、1 workflow、1 step、12 public formal windows，
+  明确 `test_only` / `formal_statistics_eligible=false`。长验收只可在最终 clean executor commit 后启动。
+- 未签 grant/token，未读取或运行 sealed holdout，`holdout_opened=false`。

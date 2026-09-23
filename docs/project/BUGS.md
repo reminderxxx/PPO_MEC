@@ -733,3 +733,12 @@ G14E01 六文件残留不是合法 initialized run，没有原生 failed termina
   改为直接复算所有底层原件并在新验收包记录缺口。
 - `EXTERNAL BLOCKER`：真实 recovery grant、独立 quiescence/kernel-lock 证明和项目 owner 决定均未提供；不得真实
   execute、删旧锁或启动 support/scalability/statistics/gate/completion。正式矩阵与论文结论仍 `Unverifiable`。
+## 2026-09-23: G14R22 dedicated runner 缺失 evaluation contract（RESOLVED IN CODE；REAL ACCEPTANCE PENDING）
+
+- 原 runner 仅发布 `resolved_execution_context.json` 与 `evaluation_model_source_reference.json`，但真实
+  `generated_checkpoint_resources.evaluation_model_source_scope` 强制读取同目录 `evaluation_execution_contract.json`。
+- 原 synthetic child 不进入该 consumer，因而旧正例未暴露缺口；旧验收保留但只能标为 synthetic transaction evidence。
+- 最小修复要求 package 内嵌并 hash-bind 完整 contract/context/source，runner 原子 opening 前落盘并 live 复验；
+  producer manifest 同时逐文件复算。禁止空合同、复制旧合同或 fallback。
+- 剩余风险：真实三容量长验收尚须在最终 clean executor commit 独立启动并以 completion receipt 关闭；此前证据等级
+  不高于实现/单元验证。holdout 保持 unopened。

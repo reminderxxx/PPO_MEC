@@ -64,6 +64,28 @@ def package() -> dict:
         "commands": {"scientific": scientific, "statistics": statistics},
         "automatic_retry_count": 0,
     }
+    reference = {"source_run_id": "source"}
+    reference["source_reference_sha256"] = canonical_sha256(reference)
+    context = {
+        "evaluation_execution_identity": {
+            "evaluation_run_id": "output",
+            "model_source_reference_sha256": reference["source_reference_sha256"],
+        }
+    }
+    context["context_sha256"] = canonical_sha256(context)
+    contract = {
+        "evaluation_run_root": value["output_root"],
+        "executor_checkout": value["executor_checkout"],
+        "executor_commit": value["executor_commit"],
+        "model_source_reference_sha256": reference["source_reference_sha256"],
+        "evaluation_execution_context": context,
+    }
+    contract["execution_contract_sha256"] = canonical_sha256(contract)
+    value.update({
+        "evaluation_execution_contract": contract,
+        "resolved_execution_context": context,
+        "model_source_reference": reference,
+    })
     value["command_package_sha256"] = canonical_sha256(value)
     return value
 
@@ -163,8 +185,35 @@ def test_acceptance_package_cannot_name_sealed_split() -> None:
         validate_command_package(value, acceptance=True)
 
 
+def test_identity_bundle_is_complete_and_hash_bound() -> None:
+    value = package()
+    value.pop("evaluation_execution_contract")
+    value["command_package_sha256"] = canonical_sha256(
+        {key: item for key, item in value.items() if key != "command_package_sha256"}
+    )
+    with pytest.raises(HoldoutExecutionError, match="identity bundle is incomplete"):
+        validate_command_package(value)
+
+    value = package()
+    value["evaluation_execution_contract"]["evaluation_run_root"] = "/wrong"
+    value["evaluation_execution_contract"]["execution_contract_sha256"] = canonical_sha256(
+        {
+            key: item
+            for key, item in value["evaluation_execution_contract"].items()
+            if key != "execution_contract_sha256"
+        }
+    )
+    value["command_package_sha256"] = canonical_sha256(
+        {key: item for key, item in value.items() if key != "command_package_sha256"}
+    )
+    with pytest.raises(HoldoutExecutionError, match="output-root drift"):
+        validate_command_package(value)
+
+
 def test_failure_after_open_is_permanent_and_cannot_reopen(tmp_path: Path) -> None:
     value = package()
+    for field in ("evaluation_execution_contract", "resolved_execution_context", "model_source_reference"):
+        value.pop(field)
     value["executor_checkout"] = str(tmp_path)
     value["executor_commit"] = "non_holdout_acceptance"
     value["output_root"] = str(tmp_path / "terminal_output")

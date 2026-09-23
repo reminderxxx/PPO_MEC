@@ -1718,3 +1718,18 @@ run 父目录须预先存在、可写，Python/宿主 process identity 权限须
 
 non-holdout 工程回归可用全新临时 root 调用 `scripts/run_g14r22_non_holdout_acceptance.py --work-root <new-path>`；
 该入口明确拒绝 `sealed_holdout` 与 holdout policy，只验证同一 science/statistics/publication/integrity 消费链。
+## G14R22-A 真实 non-holdout dedicated consumer 验收
+
+该命令只允许在最终 clean executor checkout 上运行；`--work-root` 必须不存在。它使用 public/formal 非 holdout
+冻结窗口与冻结 checkpoint，输出始终是 test-only，不得汇入正式统计：
+
+```bash
+<shared-absolute-python> scripts/run_g14r22a_real_non_holdout_acceptance.py \
+  --executor-checkout <final-clean-executor-checkout> \
+  --executor-commit <final-executor-commit> \
+  --work-root <new-g14r22a-analysis-root>/real_non_holdout_acceptance
+```
+
+覆盖三容量、`reactive_lru` 与 `sa_ghmappo`、真实 checkpoint loader、最小 rollout、raw summary/event、producer
+integrity、publication、corrected statistics 和 receipt。不得把原公式 child 作为真实正例；不得把 split 改为
+`sealed_holdout`，也不得提供 grant/token。

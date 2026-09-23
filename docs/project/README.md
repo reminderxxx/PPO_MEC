@@ -41,6 +41,9 @@
 
 ## Live 文档
 
+- `g14r22a_non_holdout_benchmark_acceptance.md`：真实 non-holdout consumer 缺口、三文件 identity bundle、
+  producer integrity 及三容量 learned/reactive 长验收范围。
+
 - `g14r22_holdout_execution_contract.md`：G14R21 blocker 的 dedicated runner、one-time consumed 状态机、150-model
   byte gate、固定 8,100-row/84-family workload、非 holdout 公共入口验收与 unsigned 授权申请边界。
 
@@ -235,3 +238,6 @@
 > [g14r20_i5_a_acceptance_correction.md](g14r20_i5_a_acceptance_correction.md)。旧失败包不改写，状态上限仍为
 > `READY_FOR_RESTRICTED_RECOVERY_AUTHORIZATION`；未签 recovery grant、未恢复、未开 holdout。
 >
+> **2026-09-23 G14R22-A**：`g14r22a_non_holdout_benchmark_acceptance.md` 更正旧 non-holdout fixture 为
+> synthetic transaction evidence，记录 dedicated runner 缺失 `evaluation_execution_contract.json` 的接口根因、
+> 最小修复和真实三容量 benchmark/checkpoint/rollout 验收边界。结果 test-only，holdout 未开启。

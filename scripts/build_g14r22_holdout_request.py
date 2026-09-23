@@ -137,6 +137,7 @@ def build(executor_commit: str, executor_checkout: Path) -> tuple[dict[str, Any]
         "phases": ["scientific", "statistics", "publication", "integrity"],
         "scientific_matrix": matrix,
         "commands": {"scientific": commands, "statistics": statistics},
+        "evaluation_execution_contract": evaluation,
         "resolved_execution_context": evaluation["evaluation_execution_context"],
         "model_source_reference": source,
         "automatic_retry_count": 0,
