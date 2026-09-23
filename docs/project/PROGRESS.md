@@ -1,3 +1,17 @@
+## 2026-09-23: G14R22 one-time holdout 执行合同与非正式验收
+
+- 冻结 dedicated public runner、完整 3-capacity science + corrected statistics 命令、唯一输出 root 和
+  `12 windows × 15 agents × 5 seeds × 3 workflows × 3 capacities = 8,100` 行工作量；模型范围固定为
+  150 checkpoints，primary 6 metrics 与 84 项 Holm family 不变。
+- one-time atomic opening 即写 `consumed_permanently=true`；opening 后 child/statistics/publication/integrity 的失败、
+  中断或部分输出均永久 terminal，自动 retry/resume/reopen 为 0，不允许换模型、窗口或第二 root。
+- 150/150 checkpoint bytes（105,464,376 bytes）重散列通过；future opening 必须再次复核。public non-holdout
+  acceptance 真实完成 3 children→publication→84 statistics→integrity→receipt，holdout policy/label access=0。
+- unsigned request=`6383eb01...61ed`，command package=`81271e69...e5c8`，executor commit=`3d34f2b...7b42`；
+  状态为 `READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION`，不是 grant 或 paper-ready。完整运行上界仍 unknown。
+- 合同：`g14r22_holdout_execution_contract.md`；机器证据：
+  `artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v1/`。
+
 ## 2026-09-23: G14R21 formal 统计纠错与 holdout 未签发审查
 
 - 修复 signed CI 被 claim consumer 二次按 metric direction 翻转、sign test 将 540 paired rows 当独立样本、exact p

@@ -1,3 +1,11 @@
+## 2026-09-23: G14R21 holdout 执行合同缺口（RESOLVED；授权仍未签发）
+
+- 已补 dedicated runner、完整命令、150-checkpoint opening hash、atomic opening/ledger/receipt/publication/integrity
+  和永久 consumed 失败边界；非 holdout 公共入口闭环通过。
+- 仍未签 grant/token，正式 output root 不存在，holdout 未开启。下一步只能独立只读审查 exact request/package 后
+  单独申请授权；不得把 `READY_TO_REQUEST...` 解释为已授权。
+- 完整 holdout 经过测试的耗时上界仍为未知；历史 5h12m + 15m 只作下界依据，不是完成保证。
+
 ## 2026-09-23: G14R21 统计错误已修复；holdout 仍 BLOCKED
 
 - `RESOLVED / statistics direction`：统一 signed CI 只解释一次；lower-is-better 不再由 claim consumer 二次翻转。

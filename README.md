@@ -1,3 +1,9 @@
+> **2026-09-23 G14R22**：dedicated one-time holdout runner、完整 3-capacity command package、150-checkpoint
+> opening hash、atomic opening/ledger/receipt/publication/integrity 与永久 consumed 失败边界已冻结；non-holdout
+> 公共入口完成 3 scientific children、84-row corrected statistics 和 integrity 闭环。unsigned request 状态为
+> `READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION`，不是 grant；完整运行上界仍 unknown，holdout 未开启。
+> 详见 [G14R22 合同](docs/project/g14r22_holdout_execution_contract.md)。
+
 > **2026-09-23 G14R21**：已修正 formal statistics 的 signed-direction 二次翻转、row-level sign-test
 > pseudoreplication 与舍入后再 Holm；同一冻结 G14E07 controller rows 独立复算为 `0 supported / 72 mixed /
 > 12 contradicted`，84 项 fixed-family Holm 均不显著。完整性 gate 继续只表示执行完整。Holdout 只完成 metadata/code 审查，

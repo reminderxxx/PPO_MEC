@@ -80,6 +80,19 @@
 - `tests/test_evaluation_only_identity_contract.py` / `test_evaluation_only_publication_integrity.py`：身份、权限、旧
   结果排除、manifest/path/symlink、non-path tamper 与原子发布回归。
 
+## G14R22 dedicated one-time holdout
+
+- `src/evaluators/dedicated_holdout_execution.py`：unsigned request/command/grant 校验、150-checkpoint byte gate、
+  atomic opening、append-only ledger、科学/统计 child、原子发布、integrity 与 permanent-consumed receipt。
+- `scripts/run_dedicated_public_holdout.py`：唯一 public qualify/execute/strict non-holdout acceptance CLI；生产 execute
+  必须提供 exact signed grant 与 token file。
+- `scripts/benchmark_main_results.py`：ordinary runner 对 sealed split 仍 fail-closed；dedicated child 只消费已发布的
+  opening receipt 及 request/package hash。
+- `scripts/build_g14r22_holdout_request.py`：绑定 executor commit、G14R21 corrected package、150 model source、
+  frozen windows/agents/seeds/capacities/metrics/84-family 并生成 unsigned 包，不生成 grant/token。
+- `scripts/run_g14r22_non_holdout_acceptance.py` / `g14r22_non_holdout_scientific_child.py`：以真实公共入口验收
+  science→statistics→publication→integrity，不允许出现 sealed split 或 holdout policy。
+
 ## G14R18 provenance envelope / shared identity boundary
 
 - `scripts/manage_typed_model_cache_formal_artifacts.py`：`write_checkpoint_companions` 保持完整 17 字段 provenance

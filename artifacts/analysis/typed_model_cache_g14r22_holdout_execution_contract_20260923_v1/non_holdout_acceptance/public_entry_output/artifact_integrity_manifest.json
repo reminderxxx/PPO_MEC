@@ -1,0 +1,61 @@
+{
+  "integrity_version": "g14r22_holdout_integrity_v1",
+  "status": "pass",
+  "file_count": 10,
+  "files": [
+    {
+      "path": "scientific/constrained_288mb/artifact_integrity_manifest.json",
+      "size_bytes": 216,
+      "sha256": "e9a45cdd9fe20c88191099149a7726706819c7118c99a5b274c5ead1a28458cc"
+    },
+    {
+      "path": "scientific/constrained_288mb/benchmark_rows.csv",
+      "size_bytes": 3916,
+      "sha256": "737fce080815bd81c79945993097ec7a2b0db8b0fc35552f06ddcfd96b88f6e2"
+    },
+    {
+      "path": "scientific/medium_576mb/artifact_integrity_manifest.json",
+      "size_bytes": 216,
+      "sha256": "a54e84d03b9cfd7b69e3ed23c2444d64f431442457d717365e648d1e5780a2c7"
+    },
+    {
+      "path": "scientific/medium_576mb/benchmark_rows.csv",
+      "size_bytes": 3766,
+      "sha256": "ccbf54b58d506419ad6f2de56177a1cd5da04df0f675411fde3e741aec2c6ff4"
+    },
+    {
+      "path": "scientific/relaxed_864mb/artifact_integrity_manifest.json",
+      "size_bytes": 216,
+      "sha256": "30841dcffcf45d503fffbbf051a4548dfe83a77cc1bfd4f0f22dc895e393ee53"
+    },
+    {
+      "path": "scientific/relaxed_864mb/benchmark_rows.csv",
+      "size_bytes": 3796,
+      "sha256": "607bfc066409ae67f8c2455b855f90443427a3e3488fbbace729883b92d1c3c9"
+    },
+    {
+      "path": "statistics/paired_statistics.csv",
+      "size_bytes": 30254,
+      "sha256": "e5d88ba76551f78007b645d922372b1d46f4f50d515d8ee2084e1713122e2636"
+    },
+    {
+      "path": "statistics/paired_statistics.json",
+      "size_bytes": 158870,
+      "sha256": "3429cfe429231b07620ace4e6dfe2aa287a899834fdcf9ad7531de3f05960e32"
+    },
+    {
+      "path": "statistics/statistics_stderr.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "statistics/statistics_stdout.log",
+      "size_bytes": 538,
+      "sha256": "6d35633d9aee62e253fbc6f164b8fe0b5104aa5171c842c9cb2267c103c3abe3"
+    }
+  ],
+  "files_canonical_sha256": "5739999986fe99d47e8e3c6791eccda7a706869ccf09cfe2b9e47634f706875f",
+  "request_sha256": "27c6a36fa2df21e9f304ed8c33e3c8bbe216dcb15147ae7cf18fcc158ad850d6",
+  "command_package_sha256": "b67d7e421f33b1dd7bb5d4e25b962dce320c73d392a98b242a7406bda3f58d4a",
+  "consumed_permanently": true
+}

@@ -1,0 +1,18 @@
+{
+  "analysis_summary_version": "g14r22_v1",
+  "verdict": "READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION",
+  "request_sha256": "6383eb01e497b04a75474cfadaada637bb1f88e3a891a91515901443abca61ed",
+  "command_package_sha256": "81271e69257e4187c4a159ca2cfe05cce20f8b36cfb9840fbfb424225764e5c8",
+  "executor_commit": "3d34f2b967ac7f9e2111744665cfe6a5bf0c7b42",
+  "checkpoint_models_rehashed": 150,
+  "checkpoint_bytes_rehashed": 105464376,
+  "non_holdout_public_acceptance_passed": true,
+  "non_holdout_scientific_children": 3,
+  "statistics_rows": 84,
+  "test_summary": "24 targeted passed; 13 benchmark/holdout passed; smoke passed; public non-holdout acceptance passed",
+  "grant_signed": false,
+  "execution_authorized": false,
+  "holdout_opened": false,
+  "holdout_policy_runs": 0,
+  "tested_full_run_upper_bound_seconds": null
+}

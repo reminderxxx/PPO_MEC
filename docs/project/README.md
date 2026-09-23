@@ -1,3 +1,7 @@
+> **2026-09-23 G14R22**：`g14r22_holdout_execution_contract.md` 冻结 dedicated one-time runner、完整 command
+> package、150-checkpoint opening hash、atomic opening/ledger/receipt/publication/integrity 与永久 consumed 边界。
+> 当前只到 `READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION`；grant/token 未签、正式 root 不存在、holdout 未开启。
+
 > **2026-09-20 G14R20-I5-E**：`g14r20_i5_e_recovery_consumer_contract.md` 记录 G14E05 缺失合同根因、Contract 1.3.0、attempt 3/1 谱系、真实 non-formal 两进程消费与发布验收。新申请仍 unsigned，grant/正式 recovery/holdout 未开启。
 
 > **2026-09-20 G14R20-I5-D**：`g14r20_i5_d_stable_request_contract.md` 记录共享 stable projection、五分钟 quiescence evidence、G14E04 audit-only 边界与新 unsigned request 约束。
@@ -36,6 +40,9 @@
 这是 PPO_MEC 的项目化维护文档入口，用来把通用 AI 协作规范落到当前仓库。
 
 ## Live 文档
+
+- `g14r22_holdout_execution_contract.md`：G14R21 blocker 的 dedicated runner、one-time consumed 状态机、150-model
+  byte gate、固定 8,100-row/84-family workload、非 holdout 公共入口验收与 unsigned 授权申请边界。
 
 - `g14r21_corrected_statistics_holdout_audit.md`：G14E07 原始行的 signed direction/window sign test/Holm 勘误、
   corrected claim freeze、限制项复核，以及不读取 performance label 的 holdout unsigned/blocker 审查。

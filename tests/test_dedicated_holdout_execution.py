@@ -20,6 +20,7 @@ from src.evaluators.dedicated_holdout_execution import (
     validate_command_package,
     validate_opening_receipt,
     validate_unsigned_request,
+    execute_package,
     verify_checkpoint_bytes,
 )
 
@@ -160,3 +161,32 @@ def test_acceptance_package_cannot_name_sealed_split() -> None:
     )
     with pytest.raises(HoldoutExecutionError, match="holdout reference"):
         validate_command_package(value, acceptance=True)
+
+
+def test_failure_after_open_is_permanent_and_cannot_reopen(tmp_path: Path) -> None:
+    value = package()
+    value["executor_checkout"] = str(tmp_path)
+    value["executor_commit"] = "non_holdout_acceptance"
+    value["output_root"] = str(tmp_path / "terminal_output")
+    value["scientific_matrix"] = {"profile": "tiny"}
+    value["commands"] = {
+        "scientific": [["/usr/bin/false"], ["/usr/bin/true"], ["/usr/bin/true"]],
+        "statistics": ["/usr/bin/true"],
+    }
+    value["acceptance_non_holdout"] = True
+    value["acceptance_request_sha256"] = "r"
+    value["acceptance_checkpoint_audit"] = {
+        "status": "pass", "actual_scope": {"models": 0, "total_bytes": 0},
+        "models_canonical_sha256": canonical_sha256([]), "models": [],
+    }
+    value["command_package_sha256"] = canonical_sha256(
+        {key: item for key, item in value.items() if key != "command_package_sha256"}
+    )
+    with pytest.raises(HoldoutExecutionError, match="scientific child failed permanently"):
+        execute_package({"request_sha256": "r"}, value, None, None, acceptance=True)
+    receipt = json.loads((tmp_path / "terminal_output/execution_receipt.json").read_text())
+    assert receipt["status"] == "failed_permanently_consumed"
+    assert receipt["consumed_permanently"] is True
+    assert receipt["retry_allowed"] is False
+    with pytest.raises(HoldoutExecutionError, match="already exists"):
+        execute_package({"request_sha256": "r"}, value, None, None, acceptance=True)

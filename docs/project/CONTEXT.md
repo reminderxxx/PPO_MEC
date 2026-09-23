@@ -18,7 +18,7 @@
 
 ﻿# Context
 
-更新日期：2026-09-14
+更新日期：2026-09-23
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
@@ -156,3 +156,9 @@ I3 原 evaluation-only run 的 failed-terminal 不在旧 ledger 上续写。I5 �
 `formal_ablation` 的两个固定 cell 按 recovery attempt 2 → first attempt 1 顺序执行；6 个旧 committed cell 保持
 外部只读 reference。当前只有 synthetic/non-formal 工程验收和 unsigned request，后续阶段、真实恢复与 holdout
 均未授权。长期合同见 `g14r20_i5_restricted_recovery_contract.md`。
+## 2026-09-23 G14R22 当前边界
+
+G14R21 的 holdout 工程 blocker 已由 dedicated one-time runner、exact command package、150-checkpoint byte gate、
+atomic opening/append-only ledger/publication/integrity/receipt 和 no-retry permanent-consumed 语义关闭。public non-holdout
+验收通过。当前上限仅为 `READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION`；request 仍 unsigned，grant/token 未签，
+正式 output root 不存在，holdout 未开启。完整运行耗时上界未知，不得自行 execute 或推导 paper-ready。

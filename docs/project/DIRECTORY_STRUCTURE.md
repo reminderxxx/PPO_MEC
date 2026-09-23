@@ -361,3 +361,9 @@ unsigned holdout 审查写入 ignored
 `artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/`。任务脚本为
 `scripts/run_g14r21_corrected_statistics.py`、`scripts/audit_g14r21_corrected_statistics.py` 和
 `scripts/build_g14r21_corrected_analysis.py`，不提供 holdout execute 入口。
+
+G14R22 dedicated one-time holdout 合同入口为 `scripts/run_dedicated_public_holdout.py`，核心状态机位于
+`src/evaluators/dedicated_holdout_execution.py`；`scripts/build_g14r22_holdout_request.py` 只生成 unsigned request/
+command package，`scripts/run_g14r22_non_holdout_acceptance.py` 仅走 non-holdout fixture。机器申请包位于
+`artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v1/`。正式输出 root 固定在
+`artifacts/experiments/typed_model_cache_holdout/typed_model_cache_holdout_20260923_g14r22_once/`，未签 grant 前必须不存在。

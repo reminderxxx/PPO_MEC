@@ -5,6 +5,18 @@
 
 # Artifact Records
 
+## 2026-09-23 G14R22 one-time holdout execution request
+
+- path：`artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v1/`；executor 是持久 clean
+  checkout commit `3d34f2b967ac7f9e2111744665cfe6a5bf0c7b42`。
+- `holdout_request_unsigned.json` / `command_package.json` SHA-256 身份为 `6383eb01...61ed` / `81271e69...e5c8`；
+  固定 150 checkpoints、3 capacity children、8,100 expected rows、6 endpoints、84 Holm family 和 corrected package。
+- `checkpoint_byte_audit_preopen.json` 实际重散列 150/150、105,464,376 bytes；future atomic opening 前仍会再次
+  全量核验。`non_holdout_acceptance/` 通过真实 public runner 完成 child/statistics/publication/integrity/receipt，
+  holdout policy/label access=0。
+- verdict=`READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION`；grant/token 未签、正式输出 root 不存在、holdout
+  sealed/unopened/unconsumed。完整 wall-clock tested upper bound 为 null，不是 performance 或 paper-ready evidence。
+
 ## 2026-09-23 G14R21 corrected formal statistics / unsigned holdout review
 
 - path：`artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/`；source root

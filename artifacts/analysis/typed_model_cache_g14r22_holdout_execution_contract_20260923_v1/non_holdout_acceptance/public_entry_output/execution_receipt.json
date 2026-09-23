@@ -1,0 +1,14 @@
+{
+  "receipt_version": "g14r22_holdout_execution_receipt_v1",
+  "status": "completed_permanently_consumed",
+  "completed_at": "2026-09-23T04:07:34.916248+00:00",
+  "request_sha256": "27c6a36fa2df21e9f304ed8c33e3c8bbe216dcb15147ae7cf18fcc158ad850d6",
+  "command_package_sha256": "b67d7e421f33b1dd7bb5d4e25b962dce320c73d392a98b242a7406bda3f58d4a",
+  "output_root": "/Users/howen/.codex/worktrees/g14r22-holdout-contract/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v1/non_holdout_acceptance/public_entry_output",
+  "failure": null,
+  "partial_output_retained": false,
+  "consumed_permanently": true,
+  "retry_allowed": false,
+  "resume_allowed": false,
+  "reopen_allowed": false
+}

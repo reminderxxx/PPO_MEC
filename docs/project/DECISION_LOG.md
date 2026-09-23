@@ -1,3 +1,15 @@
+## 2026-09-23 — D-G14R22 atomic opening 后无 retry/resume/reopen
+
+决定：dedicated holdout 在 grant/token、冻结输入、clean executor 和 150 checkpoint bytes 全部通过后，才以同父目录
+atomic rename 发布 opening root；该时点立即 `consumed_permanently=true`。此后任何 child failure、partial output、
+statistics/publication/integrity failure 或成功都永久 consumed，自动 retry/resume/reopen 为 0。
+
+原因：旧 seal 的基础 primitive 允许极窄 infrastructure retry，但未闭合 partial output、selection drift 和第二次开启
+边界。对唯一最终 holdout，保守的一次性语义比事后判断故障是否“与 outcome 无关”更可审计。
+
+边界：opening 前失败不消费且不得启动 science；申请包本身不授权执行。未来只可由独立 review + exact grant/token 开启，
+不得修改 frozen model/window/agent/seed/capacity/metric/84-family。完整运行上界仍 unknown。
+
 ## 2026-09-20 — D-G14R20-I5-E 选择显式 restricted recovery 消费者合同
 
 决定：generated checkpoint resolver 接受当前 root 唯一的 `restricted_recovery_execution_contract.json`，先完整验证同 root 的 unsigned request、source reference、executor/tree、context 与固定 phase/cell；`evaluation_execution_contract.json` 同时出现即拒绝。不得复制历史 evaluation 合同或缺字段回退。G14E05 attempt 2 永久失败，下一独立执行身份记录 attempt 3；第二 cell 为首次 attempt 1。non-formal 一 episode 预算只可在隔离验收中显式使用，正式 command plan 不变。详见 `g14r20_i5_e_recovery_consumer_contract.md`。

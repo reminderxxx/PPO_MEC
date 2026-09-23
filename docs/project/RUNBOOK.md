@@ -1698,3 +1698,23 @@ run 父目录须预先存在、可写，Python/宿主 process identity 权限须
 最后写入；缺件/held lock/failed phase 不得恢复或清理。G14E01 包与 grant 当前不可执行，不得重试或改 run 名。
 公共非正式测试入口为 `python -B -m pytest tests/test_evaluation_only_public_bootstrap.py`；真实科学 child
 不继承测试 overlay。两阶段合成验收不等于八阶段正式实跑。
+
+## G14R22 holdout 授权申请（不得在本任务 execute）
+
+只读资格检查：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  /Users/howen/.codex/worktrees/g14r22-holdout-executor/PPO_MEC/scripts/run_dedicated_public_holdout.py \
+  --request-path artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v1/holdout_request_unsigned.json \
+  --command-package-path artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v1/command_package.json \
+  --check qualify
+```
+
+预期只返回 `status=pass` 与 `execution_authorized=false`。完整 future execute argv 已冻结在 command package；必须先由
+独立 reviewer 对 request SHA-256=`6383eb01...61ed`、package SHA-256=`81271e69...e5c8` 和 executor commit
+`3d34f2b...7b42` 出具 exact pass，再由 owner 单独签 grant/token。未同时具备二者时禁止把 `--check` 改为
+`execute`。正式输出 root 已存在、executor dirty/commit drift、任一 checkpoint hash 漂移均必须 fail-closed。
+
+non-holdout 工程回归可用全新临时 root 调用 `scripts/run_g14r22_non_holdout_acceptance.py --work-root <new-path>`；
+该入口明确拒绝 `sealed_holdout` 与 holdout policy，只验证同一 science/statistics/publication/integrity 消费链。

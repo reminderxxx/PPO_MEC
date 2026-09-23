@@ -1,0 +1,3 @@
+top journal statistics complete
+paired_statistics_csv: /Users/howen/.codex/worktrees/g14r22-holdout-contract/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v1/non_holdout_acceptance/public_entry_output/staging/statistics/paired_statistics.csv
+paired_statistics_json: /Users/howen/.codex/worktrees/g14r22-holdout-contract/PPO_MEC/artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v1/non_holdout_acceptance/public_entry_output/staging/statistics/paired_statistics.json

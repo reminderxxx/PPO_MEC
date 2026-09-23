@@ -1,0 +1,10 @@
+{
+  "version": "g14r22_non_holdout_v1",
+  "files": [
+    {
+      "path": "benchmark_rows.csv",
+      "size_bytes": 3916,
+      "sha256": "737fce080815bd81c79945993097ec7a2b0db8b0fc35552f06ddcfd96b88f6e2"
+    }
+  ]
+}
