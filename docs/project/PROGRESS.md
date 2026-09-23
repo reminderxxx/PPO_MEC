@@ -2049,3 +2049,5 @@ JUnit 和未签发新申请由独立 I2 验收记录绑定。本记录不提前�
 - 首次真实验收失败于首容量 benchmark 参数校验：测试 `max_workflows=1` 与冻结 fairness manifest 的 `3` 不符，
   `max_steps=1` 也与冻结 `22` 不符。失败 root 保留不可重试；未加载 checkpoint、未 rollout。测试配置现恢复冻结值，
   只缩减 agent/seed，目标为 216 test-only rows；需要新 clean executor commit 和新 unsigned 包。
+- 新 executor commit=`4b0af75e`、tree=`d6145071` 已通过干净 checkout 59 项目标回归及真实测试 package 结构检查；
+  v3 unsigned request/package 已绑定该身份并通过 qualify，v1/v2 保留为 superseded。真实 v2 test-only 长验收待启动。

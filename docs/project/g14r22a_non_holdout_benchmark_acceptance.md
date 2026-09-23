@@ -7,6 +7,8 @@
 - `failed_executor_commit`: `ce5e9e02c92e9e3a723a8bf45bead531518dfe4c`
 - `failed_executor_git_tree`: `389076e110194d21e80f857cf6d3400cd9409bc3`
 - `next_artifact_run_id`: `typed_model_cache_g14r22a_real_non_holdout_acceptance_20260923_v2`
+- `next_executor_commit`: `4b0af75e1decc471930e3f427542634471c48229`
+- `next_executor_git_tree`: `d6145071f5144b2216440a6ac4390209a8b0d17b`
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `evidence_level`: `E1_IMPLEMENTED_PENDING_REAL_LOCAL_COMPLETION`
 - `holdout_opened`: `false`
@@ -46,12 +48,10 @@ G14R22 的 `scripts/g14r22_non_holdout_scientific_child.py` 直接按公式生�
 `scripts/run_g14r22a_real_non_holdout_acceptance.py` 写入独立 artifact root；本合同不签 grant/token，不提供 holdout
 capability，也不读取 sealed holdout performance。
 
-基于首次 executor 生成、现已因后续配置修复而 superseded 的 unsigned holdout request 位于
-`artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v2/`：request SHA-256=
-`91f9568b93a590eb975afb0a2a281e5c3334d95ec9fadb18a3474ad348499069`，command package canonical SHA-256=
-`e4b924282274d9aa8ec75374ae44bfea5404355900134bfa84a6333b93c2fdf3`。v1 原包保留并显式 superseded；v2 仍
-`grant_signed=false`、`execution_authorized=false`、`holdout_opened=false`。下一份 unsigned 包必须绑定修复后的
-新 executor commit/tree，不沿用 v2 hash。
+新 unsigned request 位于 `artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v3/`，
+request SHA-256=`40775596d5a7b25daa86520172f70950be1c71006e3509cf7e80a8515a579ca6`，command package canonical
+SHA-256=`d7382690d9e48ab9cfaf2fdb69312d9bf1fdc8fb52ee4b108ad8fd8af943689f`。v1/v2 原包保留并显式
+superseded；v3 `grant_signed=false`、`execution_authorized=false`、`holdout_opened=false`。
 
 首次真实验收 root `typed_model_cache_g14r22a_real_non_holdout_acceptance_20260923_v1` 在第一容量科学 child 前
 因测试命令 `max_workflows=1` 与冻结 fairness manifest 的 `3` 不符而失败，`return_code=1`；`max_steps=1`

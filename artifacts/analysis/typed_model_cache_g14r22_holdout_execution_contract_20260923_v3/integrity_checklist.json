@@ -1,0 +1,23 @@
+{
+  "integrity_checklist_version": "g14r22_v1",
+  "request_sha256": "40775596d5a7b25daa86520172f70950be1c71006e3509cf7e80a8515a579ca6",
+  "command_package_sha256": "d7382690d9e48ab9cfaf2fdb69312d9bf1fdc8fb52ee4b108ad8fd8af943689f",
+  "pre_open": [
+    "verify signed exact grant and independent review",
+    "verify one-time token hash",
+    "verify frozen input bytes",
+    "rehash exactly 150 checkpoint files",
+    "verify output root absent",
+    "atomically publish opening receipt and ledger"
+  ],
+  "post_open": [
+    "run exactly three serial capacity children without retry",
+    "publish only complete child payloads",
+    "generate exactly 84 corrected statistics rows",
+    "publish integrity manifest and terminal receipt"
+  ],
+  "permanent_consumption": "opening, failure, partial output, and success all preserve consumed=true after atomic open",
+  "verdict": "READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION",
+  "grant_signed": false,
+  "execution_authorized": false
+}

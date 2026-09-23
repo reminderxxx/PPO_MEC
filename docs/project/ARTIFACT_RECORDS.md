@@ -1575,3 +1575,13 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 - 内容：完整 evaluation contract/context/source identity bundle、150-checkpoint pre-open byte audit、integrity checklist、
   artifact manifest 与 v1 superseded record。`qualify` pass 只表示 unsigned 包完整，不是 grant。
 - 状态：`grant_signed=false`、`execution_authorized=false`、`holdout_opened=false`；没有 holdout policy run。
+## 2026-09-23 G14R22-A unsigned request v3（未授权；holdout unopened）
+
+- root：`artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v3/`
+- executor：commit `4b0af75e1decc471930e3f427542634471c48229`，tree
+  `d6145071f5144b2216440a6ac4390209a8b0d17b`
+- request canonical SHA-256：`40775596d5a7b25daa86520172f70950be1c71006e3509cf7e80a8515a579ca6`
+- command package canonical SHA-256：`d7382690d9e48ab9cfaf2fdb69312d9bf1fdc8fb52ee4b108ad8fd8af943689f`
+- 内容：完整 evaluation contract/context/source bundle、150-checkpoint pre-open byte audit、integrity checklist、
+  v2 superseded record 与首轮真实 non-holdout 失败文件 hash。`qualify` pass 只表示 unsigned 包完整。
+- 状态：`grant_signed=false`、`execution_authorized=false`、`holdout_opened=false`；未调用 holdout policy。

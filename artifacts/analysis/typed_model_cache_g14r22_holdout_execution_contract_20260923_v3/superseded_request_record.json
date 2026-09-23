@@ -1,0 +1,16 @@
+{
+  "supersession_version": "g14r22a_supersession_v2",
+  "superseded_root": "artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v2",
+  "superseded_request_sha256": "91f9568b93a590eb975afb0a2a281e5c3334d95ec9fadb18a3474ad348499069",
+  "superseded_command_package_sha256": "e4b924282274d9aa8ec75374ae44bfea5404355900134bfa84a6333b93c2fdf3",
+  "superseded_executor_commit": "ce5e9e02c92e9e3a723a8bf45bead531518dfe4c",
+  "reason": "The first real non-holdout child failed the frozen fairness workload check; the test runner was corrected and executor code changed.",
+  "retention": "v1 and v2 retained for audit; neither may be signed or executed",
+  "replacement_root": "artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v3",
+  "replacement_request_sha256": "40775596d5a7b25daa86520172f70950be1c71006e3509cf7e80a8515a579ca6",
+  "replacement_command_package_sha256": "d7382690d9e48ab9cfaf2fdb69312d9bf1fdc8fb52ee4b108ad8fd8af943689f",
+  "replacement_executor_commit": "4b0af75e1decc471930e3f427542634471c48229",
+  "grant_signed": false,
+  "execution_authorized": false,
+  "holdout_opened": false
+}

@@ -1,0 +1,16 @@
+{
+  "artifact_run_id": "typed_model_cache_g14r22_holdout_execution_contract_20260923_v3",
+  "status": "READY_FOR_AUTHORIZATION_REVIEW",
+  "purpose": "unsigned request after G14R22-A frozen fairness workload correction",
+  "executor_commit": "4b0af75e1decc471930e3f427542634471c48229",
+  "executor_git_tree": "d6145071f5144b2216440a6ac4390209a8b0d17b",
+  "request_sha256": "40775596d5a7b25daa86520172f70950be1c71006e3509cf7e80a8515a579ca6",
+  "command_package_sha256": "d7382690d9e48ab9cfaf2fdb69312d9bf1fdc8fb52ee4b108ad8fd8af943689f",
+  "evaluation_execution_contract_sha256": "c01434ec5e45391ab0e8b343b2c9ab5af1588655e1ce58cd3d40dedc3f67c349",
+  "grant_signed": false,
+  "execution_authorized": false,
+  "holdout_opened": false,
+  "holdout_consumed_permanently": false,
+  "formal_or_holdout_policy_runs": 0,
+  "note": "Unsigned and unissued; the test-only real non-holdout acceptance has a separate root."
+}
