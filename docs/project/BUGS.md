@@ -742,3 +742,5 @@ G14E01 六文件残留不是合法 initialized run，没有原生 failed termina
   producer manifest 同时逐文件复算。禁止空合同、复制旧合同或 fallback。
 - 剩余风险：真实三容量长验收尚须在最终 clean executor commit 独立启动并以 completion receipt 关闭；此前证据等级
   不高于实现/单元验证。holdout 保持 unopened。
+- 2026-09-23 首次真实验收在 `enforce_benchmark_args` 因 `max_workflows=1 != 3` 失败；同时确认 `max_steps`
+  必须等于冻结值 `22`。测试配置已修正为冻结科学负载，原失败 root/ledger/日志保留。完整正例仍待新 root 完成。

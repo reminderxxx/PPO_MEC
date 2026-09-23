@@ -107,8 +107,6 @@ def build_package(
     for capacity, command in zip(CAPACITIES, commands):
         replace_slice(command, "--agents", "--seeds", list(TEST_AGENTS))
         replace_slice(command, "--seeds", "--seed_checkpoint_manifest_path", [str(TEST_SEED)])
-        replace_scalar(command, "--max_workflows", "1")
-        replace_scalar(command, "--max_steps", "1")
         replace_scalar(
             command,
             "--output_root",
@@ -133,8 +131,6 @@ def build_package(
         "--outer_cluster_keys", "source_segment_run_id", "window_id",
         "--inner_cluster_keys", "seed", "workflow_id", "capacity_label",
         "--ci_method", "bca", "--bootstrap_samples", "20", "--random_seed", "1401",
-        "--formal-agent-order-contract-path",
-        str(executor_checkout / "configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/formal_agent_order_contract.json"),
         "--output_root", "{G14R22_STATISTICS_OUTPUT_ROOT}",
     ]
     package: dict[str, Any] = {
@@ -154,9 +150,9 @@ def build_package(
             "capacities": list(CAPACITIES),
             "split": "formal_public_non_holdout",
             "windows": 12,
-            "workflows": 1,
-            "rows_per_child": 24,
-            "total_expected_rows": 72,
+            "workflows": 3,
+            "rows_per_child": 72,
+            "total_expected_rows": 216,
             "holm_family_size": 6,
             "formal_statistics_eligible": False,
         },
@@ -232,10 +228,11 @@ def main() -> int:
             "benchmark_entry": "scripts/benchmark_main_results.py",
             "agents": list(TEST_AGENTS),
             "capacities": list(CAPACITIES),
-            "real_checkpoint_loads_expected": 3,
-            "real_policy_rollouts_expected": 36,
-            "reactive_rollouts_expected": 36,
-            "benchmark_rows_expected": 72,
+            "unique_real_checkpoints_expected": 3,
+            "real_checkpoint_validations_expected": 108,
+            "real_policy_rollouts_expected": 108,
+            "reactive_rollouts_expected": 108,
+            "benchmark_rows_expected": 216,
             "corrected_statistics_rows_expected": 6,
         },
     }

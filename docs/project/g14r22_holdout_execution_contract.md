@@ -1,5 +1,9 @@
 # G14R22 最小 holdout 执行合同与非正式验收
 
+> 2026-09-23 G14R22-A 勘误：本文件所述 non-holdout scientific child 是公式生成 fixture，原 v1 unsigned
+> request/package 已 superseded，不能用作真实 benchmark/checkpoint/rollout 验收或后续签发依据。真实消费链缺口与
+> 修复见 `g14r22a_non_holdout_benchmark_acceptance.md`；本文件保留历史记录。
+
 - `reviewed_at`: `2026-09-23`
 - `literature_cutoff`: `2026-09-21`（沿用 G14A01；本轮不评价 novelty）
 - `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`
