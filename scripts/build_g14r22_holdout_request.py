@@ -80,6 +80,7 @@ def replace_flag(command: list[str], flag: str, value: str) -> None:
 
 
 def build(executor_commit: str, executor_checkout: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
+    executor_g14r21 = executor_checkout / G14R21.relative_to(ROOT)
     source = read(SOURCE_REFERENCE)
     reference_hash = source.pop("source_reference_sha256")
     if reference_hash != canonical_sha256(source):
@@ -147,16 +148,16 @@ def build(executor_commit: str, executor_checkout: Path) -> tuple[dict[str, Any]
         "tested_wall_clock_upper_bound_seconds": None,
     }
     package["command_package_sha256"] = canonical_sha256(package)
-    integrity = read(G14R21 / "artifact_integrity_manifest.json")
+    integrity = read(executor_g14r21 / "artifact_integrity_manifest.json")
     corrected_package_sha256 = canonical_sha256(integrity["files"])
-    seal = ROOT / "artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/holdout_seal_record.json"
-    split = ROOT / "artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/split_manifest.json"
-    protocol = ROOT / "configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_v2_9_manifest.json"
+    seal = executor_checkout / "artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/holdout_seal_record.json"
+    split = executor_checkout / "artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/split_manifest.json"
+    protocol = executor_checkout / "configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_v2_9_manifest.json"
     fixed_inputs = [
-        ROOT / "docs/project/g14r21_corrected_statistics_holdout_audit.md",
-        G14R21 / "artifact_integrity_manifest.json",
-        G14R21 / "corrected_statistics/paired_statistics.json",
-        G14R21 / "corrected_claim_map.json",
+        executor_checkout / "docs/project/g14r21_corrected_statistics_holdout_audit.md",
+        executor_g14r21 / "artifact_integrity_manifest.json",
+        executor_g14r21 / "corrected_statistics/paired_statistics.json",
+        executor_g14r21 / "corrected_claim_map.json",
         seal, split, holdout_plan, protocol, SOURCE_REFERENCE,
         SOURCE_RUN / "generated_checkpoint_resource_registry.json",
     ]
@@ -187,9 +188,9 @@ def build(executor_commit: str, executor_checkout: Path) -> tuple[dict[str, Any]
             "actual_use_scope": "all 150 learned-agent checkpoints; no replacement or subset",
         },
         "corrected_statistics_package": {
-            "root": str(G14R21), "files_canonical_sha256": corrected_package_sha256,
-            "paired_statistics_sha256": file_sha256(G14R21 / "corrected_statistics/paired_statistics.json"),
-            "claim_map_sha256": file_sha256(G14R21 / "corrected_claim_map.json"),
+            "root": str(executor_g14r21), "files_canonical_sha256": corrected_package_sha256,
+            "paired_statistics_sha256": file_sha256(executor_g14r21 / "corrected_statistics/paired_statistics.json"),
+            "claim_map_sha256": file_sha256(executor_g14r21 / "corrected_claim_map.json"),
             "generator": str(executor_checkout / "scripts/analyze_top_journal_statistics.py"),
             "holm_family_size": 84,
         },

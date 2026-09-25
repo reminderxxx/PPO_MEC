@@ -74,7 +74,7 @@ def make_executor(tmp_path: Path) -> tuple[Path, str, str]:
 
 def build_fixture(tmp_path: Path, *, fail_first_child: bool = False) -> dict[str, Path | str]:
     checkout, commit, tree = make_executor(tmp_path)
-    python = Path(sys.executable).resolve()
+    python = Path(os.path.abspath(sys.executable))
     output = tmp_path / "formal_fixture_output"
     child_code = (
         "import csv,hashlib,json,sys;from pathlib import Path;"
