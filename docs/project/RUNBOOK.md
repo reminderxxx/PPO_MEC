@@ -1,3 +1,22 @@
+## G14R22-D v5 中央窗口移交（当前只读；禁止 execute）
+
+v5 位于 `artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260926_v5/`，绑定 executor
+`77935c5fa7fa66f9a86afc940b201bf418ce4c11`。v4 保持 audit-only，任何旧批准不得迁移。当前只能执行：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  /Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/scripts/run_dedicated_public_holdout.py \
+  --request-path artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260926_v5/holdout_request_unsigned.json \
+  --command-package-path artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260926_v5/command_package.json \
+  --check qualify
+```
+
+预期为 `status=pass` 且 `execution_authorized=false`。负责人未来若对 exact v5 新签 grant/token，必须使用带时区的真实
+`issued_at/expires_at`，有效期不超过 72 小时。随后由中央窗口按 `background_derivation_contract.json` 的模板，在新的
+create-only derived root/job root 调用 `derive_g14r22_holdout_background_job.py`，再把派生的 job package 交给公共
+`run_g14r22b_background_job.py launch`。不得把 token 内容写入命令日志、artifact 或 Git；不得手改 unsigned 原件，
+不得自动 retry/resume/reopen/清锁。atomic open 后 TTL 到期不得杀死已启动科学进程。
+
 ## G14R22-C 最终 unsigned v4（只读 qualify；禁止 execute）
 
 成功后台证据已集中读回，不得重启或复制 G14R22-C job。唯一新申请根为

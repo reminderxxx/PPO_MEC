@@ -1,0 +1,9 @@
+{
+  "host_version": "g14r22d_fixed_background_host_v3",
+  "job_id": "g14r22d-71f4479ab8f9549f",
+  "job_package_sha256": "ef70c4e24bc68ee295ae34cfa4aaf537e03fa759efcdb9c7d99001452570b536",
+  "supervisor_pid": 92038,
+  "claimed_at": "2026-09-25T18:48:45.044897+00:00",
+  "single_shot": true,
+  "never_clear_or_reuse": true
+}

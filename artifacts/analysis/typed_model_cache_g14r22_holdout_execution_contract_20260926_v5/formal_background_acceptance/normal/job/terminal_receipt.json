@@ -1,0 +1,53 @@
+{
+  "host_version": "g14r22d_fixed_background_host_v3",
+  "job_id": "g14r22d-7ea232f1675e1d0b",
+  "status": "SUCCEEDED",
+  "started_at": "2026-09-25T18:48:38.984251+00:00",
+  "completed_at": "2026-09-25T18:48:41.008158+00:00",
+  "child_return_code": 0,
+  "captured_signal": null,
+  "failure_category": null,
+  "failure": null,
+  "scientific_completion": {
+    "execution_mode": "formal_holdout_fixture",
+    "scientific_receipt_path": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/formal_fixture_output/execution_receipt.json",
+    "scientific_receipt_sha256": "4d545fd95a3e2f5a6c589f962b92770422a392d03e9edd351129b294e5714c03",
+    "opening_receipt_path": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/formal_fixture_output/opening_receipt.json",
+    "opening_receipt_sha256": "87406f476d30c9d58a8cce4903b7f252fdd4bdec0356d5c2486e31d0f4647917",
+    "integrity_manifest_path": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/formal_fixture_output/artifact_integrity_manifest.json",
+    "integrity_manifest_sha256": "a59997c245204cb384337f81c16d83e307591bb73850325800da3ffc34f31f6c",
+    "dedicated_execution_receipt_path": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/formal_fixture_output/execution_receipt.json",
+    "dedicated_execution_receipt_sha256": "4d545fd95a3e2f5a6c589f962b92770422a392d03e9edd351129b294e5714c03",
+    "integrity": {
+      "status": "passed",
+      "checked_file_count": 10,
+      "files_canonical_sha256": "8f1ac15983badd83b57ba8602852ff7cd97f288a7d39b9d0e34137f5c041d0f2",
+      "exact_inventory_match": true
+    }
+  },
+  "scientific_failure_receipt": null,
+  "outer_stdout_path": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/job/outer.stdout.log",
+  "outer_stderr_path": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/job/outer.stderr.log",
+  "request": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/request.json",
+    "size_bytes": 2011,
+    "sha256": "44fe81517ba6449cf48a3fbbfa87e3dbd0d9681b7959b4156fbc6a90f8204449",
+    "canonical_sha256": "59ce1f09fffc2e8733b230743b49e5a55a68d92cd935fd1f2774e40bce57761d"
+  },
+  "scientific_command_package": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/scientific_package.json",
+    "size_bytes": 3520,
+    "sha256": "fe6d38dd00e3e57e7e41d66328bb8c4a413932ca08cc7800a80790d0eb00c956",
+    "canonical_sha256": "e0561087115f89d0c226605d2244fa92c2fe687fe4d44c3f0db8b46c6922dd79"
+  },
+  "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+  "executor_git_tree": "13cc5dd2253a8a5523306f07abd8387d5adb8eeb",
+  "job_package_sha256": "8f5b0808edf7faec845f294bfd088dac8d3fd8551e02a09d872d1f4a5ee471ad",
+  "execution_mode": "formal_holdout_fixture",
+  "automatic_retry_count": 0,
+  "retry_allowed": false,
+  "resume_allowed": false,
+  "reopen_allowed": false,
+  "automatic_lock_cleanup_allowed": false,
+  "holdout_opened": true
+}

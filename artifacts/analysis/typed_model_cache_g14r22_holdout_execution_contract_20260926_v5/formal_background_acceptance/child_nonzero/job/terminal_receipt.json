@@ -1,0 +1,43 @@
+{
+  "host_version": "g14r22d_fixed_background_host_v3",
+  "job_id": "g14r22d-71f4479ab8f9549f",
+  "status": "FAILED",
+  "started_at": "2026-09-25T18:48:45.045185+00:00",
+  "completed_at": "2026-09-25T18:48:46.845486+00:00",
+  "child_return_code": 1,
+  "captured_signal": null,
+  "failure_category": "SCIENTIFIC_FAILED_PARTIAL_OUTPUT",
+  "failure": "child exited nonzero: 1",
+  "scientific_completion": null,
+  "scientific_failure_receipt": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/formal_fixture_output/execution_receipt.json",
+    "sha256": "8d7688964900ddbd3d9132f89a77c149aea8a9ff0bc3a792b70b97256d23fc93",
+    "status": "failed_permanently_consumed",
+    "partial_output_retained": true,
+    "consumed_permanently": true
+  },
+  "outer_stdout_path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/job/outer.stdout.log",
+  "outer_stderr_path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/job/outer.stderr.log",
+  "request": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/request.json",
+    "size_bytes": 2011,
+    "sha256": "b4787104c012f7e5f2b96ab76d57f60dfcc3a0f11c4453a6ce3380e56c2a3cd4",
+    "canonical_sha256": "310957257ff9b08596d6901efe28d250f49a84577a4fe28308adfb649fcbabd0"
+  },
+  "scientific_command_package": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/scientific_package.json",
+    "size_bytes": 2851,
+    "sha256": "bd915391348c07fce74713b35742daa753641da8d82e5208d6429c085817cb20",
+    "canonical_sha256": "7a670398a7344431e890b050369d15e410b91ce6247310c971bed72b42669ca9"
+  },
+  "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+  "executor_git_tree": "13cc5dd2253a8a5523306f07abd8387d5adb8eeb",
+  "job_package_sha256": "ef70c4e24bc68ee295ae34cfa4aaf537e03fa759efcdb9c7d99001452570b536",
+  "execution_mode": "formal_holdout_fixture",
+  "automatic_retry_count": 0,
+  "retry_allowed": false,
+  "resume_allowed": false,
+  "reopen_allowed": false,
+  "automatic_lock_cleanup_allowed": false,
+  "holdout_opened": true
+}

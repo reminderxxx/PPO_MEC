@@ -1,0 +1,36 @@
+{
+  "command_log_version": "g14r22d_command_log_v2",
+  "recorded_at": "2026-09-25T18:50:29+00:00",
+  "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+  "executor_git_tree": "13cc5dd2253a8a5523306f07abd8387d5adb8eeb",
+  "commands": [
+    {
+      "purpose": "risk-matched authorization, public-host, producer-integrity, and capacity-identity regression",
+      "command": "/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest tests/test_dedicated_holdout_execution.py tests/test_g14r22b_background_host.py tests/test_g14r22d_formal_background_contract.py tests/test_g14r22b_capacity_identity.py tests/test_benchmark_producer_integrity.py -q",
+      "result": "51 passed"
+    },
+    {
+      "purpose": "minimum repository smoke",
+      "command": "/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/smoke_test.py",
+      "result": "passed"
+    },
+    {
+      "purpose": "actual public derivation and detached launch acceptance from the clean fixed executor",
+      "command": "G14R22D_ACCEPTANCE_EXECUTOR=/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC /Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest tests/test_g14r22d_formal_background_contract.py -q --basetemp=/private/tmp/g14r22d_acceptance_77935c5 --junitxml=artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260926_v5/formal_background_acceptance.junit.xml",
+      "result": "5 passed in 12.07s"
+    },
+    {
+      "purpose": "public qualification of the unsigned v5 request/package",
+      "command": "/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_dedicated_public_holdout.py --request-path artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260926_v5/holdout_request_unsigned.json --command-package-path artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260926_v5/command_package.json --check qualify",
+      "result": "passed; execution_authorized=false"
+    }
+  ],
+  "negative_assertions": {
+    "formal_grant_or_token_created": false,
+    "real_holdout_policy_called": false,
+    "real_holdout_performance_read": false,
+    "formal_output_root_created": false,
+    "full_8100_row_evaluation_run": false
+  },
+  "redaction": "Fixture tokens are generated at runtime. Synthetic token contents and temporary credential source files are intentionally absent; committed evidence contains only allowed binding hashes and public fixture results."
+}

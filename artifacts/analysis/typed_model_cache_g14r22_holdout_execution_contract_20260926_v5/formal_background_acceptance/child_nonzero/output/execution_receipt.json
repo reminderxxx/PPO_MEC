@@ -1,0 +1,19 @@
+{
+  "receipt_version": "g14r22_holdout_execution_receipt_v1",
+  "status": "failed_permanently_consumed",
+  "completed_at": "2026-09-25T18:48:46.739817+00:00",
+  "request_sha256": "71f4479ab8f9549f895ef57ca0bc6f0470c04ba11175babee6608c9000e24add",
+  "command_package_sha256": "bace860248508a606362829d48cefb19f72c937bc92554c1840660f3a1030dae",
+  "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+  "output_root": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/formal_fixture_output",
+  "failure": "scientific child failed permanently: constrained_288mb rc=1",
+  "partial_output_retained": true,
+  "consumed_permanently": true,
+  "retry_allowed": false,
+  "resume_allowed": false,
+  "reopen_allowed": false,
+  "acceptance_non_holdout": false,
+  "holdout_opened": true,
+  "isolated_fixture_non_scientific": true,
+  "fixture_holdout_policy_runs": 0
+}

@@ -1,3 +1,15 @@
+## 2026-09-26 — D-G14R22-D grant TTL 只约束 atomic open，后台终态按身份分型
+
+决定：owner 新 grant 的最长有效期固定为真实签发后 72 小时，并在 authorization、derivation、launch、supervisor 与
+atomic rename 前检查；atomic open 后不再用 TTL 杀死或改变长 child。公共宿主不删除旧
+`acceptance_non_holdout/holdout_opened=false` 检查，而是新增独立 formal route，只有 outer rc、opening receipt、
+execution receipt 与 exact integrity 同时成功才记 `SUCCEEDED`。
+
+原因：G14H02 证明 v4 无法确定授权有效期，且现有 host 无法合法承载 formal terminal。统一放宽布尔值会破坏
+non-holdout 身份隔离；在 child 中途按 TTL 杀进程则会擅自改变冻结科学预算。
+
+边界：v4 audit-only、旧批准不迁移；v5 仍 unsigned/unopened。无自动重签、延期、retry、resume、reopen 或清锁。
+
 ## 2026-09-23 — D-G14R22-C dataset 候选资格服从 portable identity，进程状态服从复合 identity
 
 决定：外部 NGSIM/Alibaba 的候选资格由 registry `allowed_resolvers`、logical role、content SHA-256 与 size 共同

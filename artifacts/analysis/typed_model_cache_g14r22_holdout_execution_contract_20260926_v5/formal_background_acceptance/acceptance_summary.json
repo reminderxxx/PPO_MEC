@@ -1,0 +1,72 @@
+{
+  "acceptance_version": "g14r22d_formal_background_fixture_acceptance_v2",
+  "recorded_at": "2026-09-25T18:50:29+00:00",
+  "scope": "isolated state-machine fixture through real derivation CLI, public background launch, and fixed dedicated runner",
+  "scientific_scope": {
+    "real_holdout_policy_called": false,
+    "real_holdout_performance_read": false,
+    "formal_grant_or_token_issued": false,
+    "fixture_holdout_policy_runs": 0
+  },
+  "executor": {
+    "commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+    "git_tree": "13cc5dd2253a8a5523306f07abd8387d5adb8eeb",
+    "clean_checkout": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC"
+  },
+  "public_flow": [
+    "runtime-generated synthetic unsigned request and exact synthetic grant/token references",
+    "scripts/derive_g14r22_holdout_background_job.py",
+    "scripts/run_g14r22b_background_job.py launch",
+    "scripts/run_dedicated_public_holdout.py --check fixture-execute",
+    "opening/execution/integrity receipt validation"
+  ],
+  "preserved_evidence": {
+    "normal_derived_package_and_receipt": true,
+    "normal_job_snapshot_logs_and_terminal": true,
+    "normal_opening_execution_and_integrity_receipts": true,
+    "child_nonzero_job_snapshot_logs_and_terminal": true,
+    "child_nonzero_opening_and_execution_receipts": true,
+    "credential_content_preserved": false,
+    "note": "Preserved snapshots retain temporary path references for provenance; token bytes and grant/token source files are excluded."
+  },
+  "normal_completion": {
+    "status": "SUCCEEDED",
+    "child_return_code": 0,
+    "execution_mode": "formal_holdout_fixture",
+    "holdout_opened_state_machine_marker": true,
+    "exact_published_inventory": true,
+    "published_file_count": 10,
+    "published_files_canonical_sha256": "8f1ac15983badd83b57ba8602852ff7cd97f288a7d39b9d0e34137f5c041d0f2"
+  },
+  "child_nonzero": {
+    "status": "FAILED",
+    "failure_category": "SCIENTIFIC_FAILED_PARTIAL_OUTPUT",
+    "consumed_permanently": true,
+    "retry_allowed": false,
+    "resume_allowed": false,
+    "reopen_allowed": false
+  },
+  "covered_boundaries": [
+    "timezone-aware TTL exact 72-hour upper bound and expiry boundary",
+    "expiry recheck immediately before atomic open with no consumption on pre-open rejection",
+    "formal/non-holdout identity swaps rejected in both directions",
+    "missing and wrong formal receipt rejected",
+    "launcher exit does not stop the detached supervisor/child",
+    "catchable signal and host identity loss map to INTERRUPTED_OR_UNKNOWN",
+    "token content absent from derived material, logs, source, and committed evidence"
+  ],
+  "pytest": {
+    "selected_test_file": "tests/test_g14r22d_formal_background_contract.py",
+    "passed": 5,
+    "failed": 0,
+    "duration_seconds": 12.07,
+    "junit_sha256": "024bcfeabf32c500c7d760a44c854968b178fc9c9ecfda2aa1773cb5b383adcb"
+  },
+  "token_leak_scan": {
+    "status": "pass",
+    "runtime_fixture_secret_match_count": 0,
+    "token_content_serialized": false,
+    "token_reference_hash_only": true
+  },
+  "verdict": "FORMAL_BACKGROUND_STATE_MACHINE_ACCEPTED_ON_ISOLATED_FIXTURE_ONLY"
+}

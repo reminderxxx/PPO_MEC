@@ -1,0 +1,63 @@
+{
+  "derivation_version": "g14r22d_authorized_background_derivation_v1",
+  "status": "AUTHORIZED_DERIVED_MATERIAL_READY_FOR_SINGLE_LAUNCH",
+  "execution_mode": "formal_holdout_fixture",
+  "source_request": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/request.json",
+    "size_bytes": 2011,
+    "sha256": "44fe81517ba6449cf48a3fbbfa87e3dbd0d9681b7959b4156fbc6a90f8204449",
+    "canonical_sha256": "59ce1f09fffc2e8733b230743b49e5a55a68d92cd935fd1f2774e40bce57761d"
+  },
+  "source_scientific_command_package": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/scientific_package.json",
+    "size_bytes": 3520,
+    "sha256": "fe6d38dd00e3e57e7e41d66328bb8c4a413932ca08cc7800a80790d0eb00c956",
+    "canonical_sha256": "e0561087115f89d0c226605d2244fa92c2fe687fe4d44c3f0db8b46c6922dd79"
+  },
+  "grant_reference": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/grant.json",
+    "size_bytes": 1545,
+    "sha256": "caecfc326271ba3ca3c809ab6ae8ab239efae91eb6b28559b5406c427f26a0cf",
+    "canonical_sha256": "e4ff7812535f4e52e8a0e564ce9a217cb6e1512f04af90b2213f6c86a7a66ffc"
+  },
+  "one_time_token_reference": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/token.secret",
+    "size_bytes": 64,
+    "sha256": "4d3870e0cf66585cc194d7288495bb09a553edbe5f55c8d5cbb691ffc9fa8eaf"
+  },
+  "token_content_serialized": false,
+  "authorization_validation": {
+    "status": "pass",
+    "grant_sha256": "e4ff7812535f4e52e8a0e564ce9a217cb6e1512f04af90b2213f6c86a7a66ffc",
+    "validity": {
+      "status": "pass",
+      "boundary": "background_derivation",
+      "checked_at": "2026-09-25T18:48:36.337141+00:00",
+      "issued_at": "2026-09-25T18:48:30.756863+00:00",
+      "expires_at": "2026-09-28T18:48:30.756863+00:00",
+      "validity_seconds": 259200,
+      "maximum_validity_seconds": 259200
+    }
+  },
+  "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+  "executor_git_tree": "13cc5dd2253a8a5523306f07abd8387d5adb8eeb",
+  "formal_output_root": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/formal_fixture_output",
+  "unique_job_root": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/job",
+  "background_job_package": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/derived/background_job_package.json",
+    "size_bytes": 5582,
+    "sha256": "41b3d83d03dea5df0302916e528a07e9266b8a079e10ca555a1ea9ce24c55368",
+    "canonical_sha256": "b1f57a82bbdf80d1eb0e6ffed44d76a02a150098beddfd088a3332a8f8f04649"
+  },
+  "unsigned_sources_unchanged": true,
+  "automatic_retry_count": 0,
+  "launch_command": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/scripts/run_g14r22b_background_job.py",
+    "launch",
+    "--job-package",
+    "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/derived/background_job_package.json",
+    "--job-root",
+    "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/job"
+  ]
+}

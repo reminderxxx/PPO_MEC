@@ -1,0 +1,96 @@
+{
+  "host_version": "g14r22d_fixed_background_host_v3",
+  "job_id": "g14r22d-71f4479ab8f9549f",
+  "execution_mode": "formal_holdout_fixture",
+  "isolated_fixture_non_scientific": true,
+  "executor_checkout": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC",
+  "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+  "executor_git_tree": "13cc5dd2253a8a5523306f07abd8387d5adb8eeb",
+  "cwd": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC",
+  "python_executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "python_resolved_executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9",
+  "environment": {
+    "PATH": "/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/opt/homebrew/bin:/Users/howen/.codex/tmp/arg0/codex-arg0WM5XKl:/Users/howen/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/howen/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources",
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "PYTHONHASHSEED": "0",
+    "PYTHONNOUSERSITE": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTHONUNBUFFERED": "1",
+    "PYTHONPATH": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "TOKENIZERS_PARALLELISM": "false"
+  },
+  "command": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/scripts/run_dedicated_public_holdout.py",
+    "--request-path",
+    "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/request.json",
+    "--command-package-path",
+    "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/scientific_package.json",
+    "--grant-path",
+    "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/grant.json",
+    "--one-time-token-file",
+    "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/token.secret",
+    "--check",
+    "fixture-execute"
+  ],
+  "request": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/request.json",
+    "size_bytes": 2011,
+    "sha256": "b4787104c012f7e5f2b96ab76d57f60dfcc3a0f11c4453a6ce3380e56c2a3cd4",
+    "canonical_sha256": "310957257ff9b08596d6901efe28d250f49a84577a4fe28308adfb649fcbabd0"
+  },
+  "scientific_command_package": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/scientific_package.json",
+    "size_bytes": 2851,
+    "sha256": "bd915391348c07fce74713b35742daa753641da8d82e5208d6429c085817cb20",
+    "canonical_sha256": "7a670398a7344431e890b050369d15e410b91ce6247310c971bed72b42669ca9"
+  },
+  "grant": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/grant.json",
+    "size_bytes": 1545,
+    "sha256": "446689af63f2cdc87a03f1fd4a8b262fb17358a1256136b1b5488dade9ff096c",
+    "canonical_sha256": "5729e9c8e137736acf8a1a1138e299e9ba25cc56f80463da4477b4f512753594"
+  },
+  "one_time_token": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/token.secret",
+    "size_bytes": 64,
+    "sha256": "6656abb9be8039b520c9551ce5a1df3f845283a9e5fb033e10a426a3f6874625"
+  },
+  "authorization_validation": {
+    "status": "pass",
+    "grant_sha256": "5729e9c8e137736acf8a1a1138e299e9ba25cc56f80463da4477b4f512753594",
+    "validity": {
+      "status": "pass",
+      "boundary": "background_derivation",
+      "checked_at": "2026-09-25T18:48:42.579410+00:00",
+      "issued_at": "2026-09-25T18:48:37.000176+00:00",
+      "expires_at": "2026-09-28T18:48:37.000176+00:00",
+      "validity_seconds": 259200,
+      "maximum_validity_seconds": 259200
+    }
+  },
+  "terminal_contract": {
+    "scientific_receipt_path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/formal_fixture_output/execution_receipt.json",
+    "opening_receipt_path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/formal_fixture_output/opening_receipt.json",
+    "integrity_manifest_path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/formal_fixture_output/artifact_integrity_manifest.json",
+    "integrity_root": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/formal_fixture_output/published",
+    "expected_receipt_bindings": {
+      "request_sha256": "71f4479ab8f9549f895ef57ca0bc6f0470c04ba11175babee6608c9000e24add",
+      "command_package_sha256": "bace860248508a606362829d48cefb19f72c937bc92554c1840660f3a1030dae",
+      "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+      "output_root": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/formal_fixture_output"
+    }
+  },
+  "formal_output_root": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/formal_fixture_output",
+  "job_root": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/job",
+  "automatic_retry_count": 0,
+  "retry_allowed": false,
+  "resume_allowed": false,
+  "reopen_allowed": false,
+  "automatic_lock_cleanup_allowed": false,
+  "holdout_opened": false,
+  "job_package_sha256": "ef70c4e24bc68ee295ae34cfa4aaf537e03fa759efcdb9c7d99001452570b536"
+}

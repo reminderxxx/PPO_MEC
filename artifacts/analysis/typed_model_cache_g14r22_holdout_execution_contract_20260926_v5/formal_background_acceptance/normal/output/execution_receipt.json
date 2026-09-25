@@ -1,0 +1,19 @@
+{
+  "receipt_version": "g14r22_holdout_execution_receipt_v1",
+  "status": "completed_permanently_consumed",
+  "completed_at": "2026-09-25T18:48:40.901020+00:00",
+  "request_sha256": "7ea232f1675e1d0b34f37c576b917c71af7312481969147a7306fd8a63e206ca",
+  "command_package_sha256": "a567c3574cd680d2bdadc3704292386c79600eadfafc0a07d32d5ada8e2473e9",
+  "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+  "output_root": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/formal_fixture_output",
+  "failure": null,
+  "partial_output_retained": false,
+  "consumed_permanently": true,
+  "retry_allowed": false,
+  "resume_allowed": false,
+  "reopen_allowed": false,
+  "acceptance_non_holdout": false,
+  "holdout_opened": true,
+  "isolated_fixture_non_scientific": true,
+  "fixture_holdout_policy_runs": 0
+}

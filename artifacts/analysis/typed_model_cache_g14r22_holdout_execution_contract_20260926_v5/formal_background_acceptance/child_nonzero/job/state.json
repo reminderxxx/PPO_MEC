@@ -1,0 +1,98 @@
+{
+  "host_version": "g14r22d_fixed_background_host_v3",
+  "job_id": "g14r22d-71f4479ab8f9549f",
+  "status": "FAILED",
+  "execution_mode": "formal_holdout_fixture",
+  "launched_at": "2026-09-25T18:48:43.387725+00:00",
+  "launcher_pid": 92034,
+  "supervisor_process_identity": {
+    "pid": 92038,
+    "process_start_time": "Sat Sep 26 02:48:43 2026",
+    "process_start_token": "Sat Sep 26 02:48:43 2026",
+    "actual_process_executable": {
+      "reported_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python",
+      "absolute_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python",
+      "resolved_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    "live_command_sha256": "e1803198a24d37d30c77f9df90c99b9b5f5397de9bc590888f5a792cb5d090fd",
+    "live_command": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/scripts/run_g14r22b_background_job.py supervise --job-package /private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/job/job_package_snapshot.json --job-root /private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/job",
+    "live_argv0": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python",
+    "live_argv_tail_sha256": "b348c43842ff75733d3821034f51268b90a773d0ed5f33e37f94dda67ddb6896",
+    "command_identity": {
+      "launch_executable_path": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "resolved_launch_executable_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9",
+      "actual_process_executable": {
+        "reported_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python",
+        "absolute_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python",
+        "resolved_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+      },
+      "permitted_live_argv0_paths": [
+        "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python",
+        "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9",
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python"
+      ],
+      "argv_tail_sha256": "b348c43842ff75733d3821034f51268b90a773d0ed5f33e37f94dda67ddb6896",
+      "launch_command_sha256": "7c5ea66af5046875e1a500f4601aa1d089a3889164bfe93dbb545e3b6575307b"
+    }
+  },
+  "supervisor_command_sha256": "7c5ea66af5046875e1a500f4601aa1d089a3889164bfe93dbb545e3b6575307b",
+  "child_process_identity": {
+    "pid": 92044,
+    "process_start_time": "Sat Sep 26 02:48:45 2026",
+    "process_start_token": "Sat Sep 26 02:48:45 2026",
+    "actual_process_executable": {
+      "reported_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python",
+      "absolute_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python",
+      "resolved_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+    },
+    "live_command_sha256": "ceea296cf10bafce541403ce5bfbd87f24d5277b2bd1c3a9fa64022855125ec1",
+    "live_command": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python /Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/scripts/run_dedicated_public_holdout.py --request-path /private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/request.json --command-package-path /private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/scientific_package.json --grant-path /private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/grant.json --one-time-token-file /private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/token.secret --check fixture-execute",
+    "live_argv0": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python",
+    "live_argv_tail_sha256": "695c71b79265a7d6dd6992f46890e73214a4c87ef90eed00cd5b3498e9f7d8ba",
+    "command_identity": {
+      "launch_executable_path": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "resolved_launch_executable_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9",
+      "actual_process_executable": {
+        "reported_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python",
+        "absolute_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python",
+        "resolved_path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+      },
+      "permitted_live_argv0_paths": [
+        "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python",
+        "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9",
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python"
+      ],
+      "argv_tail_sha256": "695c71b79265a7d6dd6992f46890e73214a4c87ef90eed00cd5b3498e9f7d8ba",
+      "launch_command_sha256": "8807f91ce38da4cdfce592c908100cfd3d22948d304527368b6e960e67900845"
+    }
+  },
+  "job_package_path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/job/job_package_snapshot.json",
+  "job_package_sha256": "ef70c4e24bc68ee295ae34cfa4aaf537e03fa759efcdb9c7d99001452570b536",
+  "request": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/request.json",
+    "size_bytes": 2011,
+    "sha256": "b4787104c012f7e5f2b96ab76d57f60dfcc3a0f11c4453a6ce3380e56c2a3cd4",
+    "canonical_sha256": "310957257ff9b08596d6901efe28d250f49a84577a4fe28308adfb649fcbabd0"
+  },
+  "scientific_command_package": {
+    "path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/scientific_package.json",
+    "size_bytes": 2851,
+    "sha256": "bd915391348c07fce74713b35742daa753641da8d82e5208d6429c085817cb20",
+    "canonical_sha256": "7a670398a7344431e890b050369d15e410b91ce6247310c971bed72b42669ca9"
+  },
+  "executor_checkout": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC",
+  "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+  "executor_git_tree": "13cc5dd2253a8a5523306f07abd8387d5adb8eeb",
+  "python_executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "python_resolved_executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9",
+  "cwd": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC",
+  "automatic_retry_count": 0,
+  "retry_allowed": false,
+  "resume_allowed": false,
+  "reopen_allowed": false,
+  "automatic_lock_cleanup_allowed": false,
+  "holdout_opened": false,
+  "child_command_sha256": "8807f91ce38da4cdfce592c908100cfd3d22948d304527368b6e960e67900845",
+  "child_started_at": "2026-09-25T18:48:45.045185+00:00",
+  "terminal_receipt_path": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/job/terminal_receipt.json"
+}

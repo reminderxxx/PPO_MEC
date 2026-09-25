@@ -1,0 +1,36 @@
+{
+  "verification_version": "g14r22d_protection_verification_v2",
+  "verified_at": "2026-09-25T18:50:29+00:00",
+  "baseline_reference": "G14H02 protected-state snapshot supplied to G14R22-D",
+  "formal_output_root": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_holdout/typed_model_cache_holdout_20260926_g14r22d_once",
+  "formal_output_root_absent": true,
+  "grant_created": false,
+  "token_created": false,
+  "holdout_opened": false,
+  "holdout_consumed_permanently": false,
+  "real_holdout_policy_runs": 0,
+  "protected_user_files": {
+    "status": "unchanged_from_g14h02_snapshot",
+    "root": "/Users/howen/Projects/PPO_MEC",
+    "files": [
+      {"path": "scripts/train_sa_ghmappo_real_sample.py", "size_bytes": 518091, "sha256": "aed850f5561f94ecba824e22bd323cdd142ee6c74255a3599129a2a6782e0eba"},
+      {"path": "src/agents/sa_ghmappo_agent.py", "size_bytes": 26004, "sha256": "06638c1aea5097a7fa4088db6b77648648655053dc87e1a1c817b09a7709c171"},
+      {"path": "src/agents/sa_ghmappo_core.py", "size_bytes": 819944, "sha256": "9951badce0ce78e608e690d6bed8d07a59d19dfef1e82f94a89d88403ac0d6b9"},
+      {"path": "src/encoders/fusion_encoder.py", "size_bytes": 39019, "sha256": "cde948c13f487790cf255389bc26b7af191ecc66449a7e939b217c638327954d"},
+      {"path": "src/evaluators/real_eval_support.py", "size_bytes": 27060, "sha256": "0a092cc15224b9b1be6a3476555c6e8eb8293573b3e27acf3fa91630db948cb6"},
+      {"path": "tests/test_algo_pool_contract.py", "size_bytes": 327933, "sha256": "41f2ca2f6920940bc11cd16bbc4c96104452c5653812a2b69c0e1a8e6794e75b"},
+      {"path": "tests/test_checkpoint_compat.py", "size_bytes": 36081, "sha256": "6b09b63b4a5cd9b527e7f3a146962ee37b9b1c9f8da78893d213b40bc6dc2cbf"}
+    ]
+  },
+  "protected_lock_files": {
+    "status": "unchanged_from_g14h02_snapshot",
+    "files": [
+      {"path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/.continuation_locks/01523d80955bf4b2c19d19306eaef41da4fc9e6b4841f80564b884e6d9674c92.lock", "size_bytes": 259, "sha256": "5f4fd37dc7d119672b14bd78f50d8d7eda32ceb6e6f5698c67bc4327718c647c"},
+      {"path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/.continuation_locks/555063eed09d0280181a2aad7117f7ca51a80e96cef901ff34ba1a75fa049dd2.lock", "size_bytes": 259, "sha256": "4381aa5bdddb56e321dd2a72d8c51c12e9aba57d28f83afae72e9985ff13a992"},
+      {"path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/.continuation_locks/8df8d5846820ad57655a12bcc4ecb7536f2d1145fc505dc5c8f7b466638f1c56.lock", "size_bytes": 263, "sha256": "aa7c52c73736d1ebf7ec832e959f2542b474c23ee5beccdb558229fc4ba21fe3"},
+      {"path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/.continuation_locks/bec0848bbe8f0e03e2b6174c322e7075a9b43008bc1764dc8ca6ef5a5c86f11f.lock", "size_bytes": 259, "sha256": "31abd07c544e9eef94349483cff5335e763750670ab570e860e0a6545ae743be"}
+    ]
+  },
+  "automatic_lock_cleanup_performed": false,
+  "existing_model_data_result_or_ledger_modified": false
+}

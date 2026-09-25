@@ -1,0 +1,73 @@
+{
+  "review_version": "g14r22d_independent_readonly_review_v1",
+  "reviewed_at": "2026-09-26T02:54:47+08:00",
+  "literature_cutoff": "2026-09-21",
+  "literature_scope": "inherited cutoff; novelty was not reviewed in this engineering closure",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "artifact_run_id": "typed_model_cache_g14r22_holdout_execution_contract_20260926_v5",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "review_mode": "independent_readonly_subagent",
+  "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+  "executor_git_tree": "13cc5dd2253a8a5523306f07abd8387d5adb8eeb",
+  "evidence_level": "E2_ARTIFACT_AUDITED_ENGINEERING_FIXTURE_ONLY",
+  "verdict": "CONDITIONAL_PASS_IMPLEMENTATION; READY_TO_REQUEST_NEW_EXACT_V5_AUTHORIZATION_ONLY_AFTER_ARTIFACT_AND_REVIEW_COMMIT_AND_PUSH; NOT_AUTHORIZED; HOLDOUT_UNOPENED",
+  "verified": {
+    "risk_matched_tests": "51/51 passed",
+    "final_fixed_executor_public_flow": "5/5 passed",
+    "public_qualification": "pass; execution_authorized=false",
+    "checkpoint_byte_audit": "150 checkpoints; 105464376 bytes; independently rehashed and canonical binding matched",
+    "normal_flow": "derived package self-hash, derived/snapshot byte identity, terminal/opening/execution/integrity bindings passed",
+    "child_nonzero": "FAILED/SCIENTIFIC_FAILED_PARTIAL_OUTPUT; consumed; retry/resume/reopen forbidden",
+    "token_non_disclosure": "runtime token content absent; committed references contain path/size/hash only",
+    "protected_user_files": "7/7 path/size/hash independently matched G14H02 snapshot",
+    "protected_locks": "4/4 path/size/hash independently matched G14H02 snapshot",
+    "formal_output_root": "absent",
+    "v4_bytes": "unchanged from 4ea4b21 through reviewed executor commit"
+  },
+  "ttl_review": {
+    "status": "pass_with_authority_trust_assumption",
+    "verified_rules": [
+      "timezone-aware issued_at and expires_at required",
+      "issued_at must not predate request created_at",
+      "issued_at <= checked_at < expires_at",
+      "maximum duration 72 hours",
+      "rechecked at derivation, launch, supervisor/pre-child authorization, atomic-open preparation, and immediately before atomic rename",
+      "post-open expiry does not kill or alter the scientific process or budget"
+    ],
+    "trust_assumption": "The actual human issuance time ultimately depends on the authorized issuer and trusted system clock; code cannot distinguish a request-postdating manual backfill from an honest timestamp."
+  },
+  "findings": [
+    {
+      "id": "B1",
+      "severity": "blocker_at_review_time",
+      "status": "requires_delivery_closure",
+      "finding": "The exact v5 artifact, this review, and long-term documentation must be explicitly added despite /artifacts ignore, committed, and pushed before delivery can be called complete."
+    },
+    {
+      "id": "M1",
+      "severity": "major_evidence_gap",
+      "status": "required_before_commit",
+      "finding": "integrity_checklist.json is an opening checklist, not a top-level v5 file inventory. A separate artifact_integrity_manifest.json must cover the review, JUnit, command log, and preserved success/failure evidence."
+    },
+    {
+      "id": "M2",
+      "severity": "major_limitation",
+      "status": "accepted_fixture_evidence_limit",
+      "finding": "The preserved evidence stores the manifest and full job/receipt chain but not the ten synthetic published files, so that nested exact inventory cannot be recomputed from the committed artifact alone. JUnit plus an independent fixed-executor rerun establish engineering reproducibility; this is not formal performance evidence."
+    }
+  ],
+  "key_hashes": {
+    "request_canonical_sha256": "a3154ffa735fea670bab02dffa6f7b92cca0f15c6fea63d1356d357a0139e717",
+    "request_file_sha256": "ee047e244677ba6bedc18f8668c6db5b824c612aca0102bc507ba8584094e86f",
+    "command_package_canonical_sha256": "ec7410d0a03c8d73847ec9d73d612ca1f1612b097b227235e7e0a00baf0fffcc",
+    "command_package_file_sha256": "e6a4f25d1839efcd4b920bdb173bd2a5f9377c061e990c9c8c3dd6fafeccab11",
+    "background_derivation_contract_canonical_sha256": "4b2c19119e841dabccc13ebfb1da3b61cb14ce1cb0640b19eb53013eda896528",
+    "background_derivation_contract_file_sha256": "6da389ad6c105a8cbeffe733fc60d38b75295b5c9f10012c33b0b053158d5450",
+    "junit_sha256": "024bcfeabf32c500c7d760a44c854968b178fc9c9ecfda2aa1773cb5b383adcb",
+    "acceptance_summary_sha256": "92c42ed73e8224b310897dbdb23952690137ddcc91396c18043ea5df5b257d8d",
+    "command_log_sha256": "75e5567bb2d625fea7fb30b9e0a27464c45dec5533c869c7dc69956812f2f5c9",
+    "protection_verification_sha256": "48940736d3b47a12fe9f57dd31cddb39c9190aed568fe889f456cc4ff24734a6",
+    "public_qualification_receipt_sha256": "9a11e0716e2bbb951005bb4f96765ca078b7df1e8b8f0bd4ab091c0834f8783d"
+  },
+  "claim_boundary": "Only the v5 engineering contract and isolated public background state machine are accepted. No grant/token was signed, execution is not authorized, real holdout is unopened and unconsumed, no formal performance was read, no 8100-row formal run occurred, and no paper/TMC-readiness claim is supported."
+}

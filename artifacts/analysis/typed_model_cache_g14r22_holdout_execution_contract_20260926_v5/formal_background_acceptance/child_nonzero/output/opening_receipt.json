@@ -1,0 +1,47 @@
+{
+  "ledger_version": "g14r22_one_time_opening_ledger_v1",
+  "event": "opened",
+  "opened_at": "2026-09-25T18:48:46.733331+00:00",
+  "request_sha256": "71f4479ab8f9549f895ef57ca0bc6f0470c04ba11175babee6608c9000e24add",
+  "command_package_sha256": "bace860248508a606362829d48cefb19f72c937bc92554c1840660f3a1030dae",
+  "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+  "output_root": "/private/tmp/g14r22d_acceptance_77935c5/test_formal_child_nonzero_is_t0/formal_fixture_output",
+  "grant_validation_at_authorization": {
+    "status": "pass",
+    "grant_sha256": "5729e9c8e137736acf8a1a1138e299e9ba25cc56f80463da4477b4f512753594",
+    "validity": {
+      "status": "pass",
+      "boundary": "authorization_check",
+      "checked_at": "2026-09-25T18:48:46.727340+00:00",
+      "issued_at": "2026-09-25T18:48:37.000176+00:00",
+      "expires_at": "2026-09-28T18:48:37.000176+00:00",
+      "validity_seconds": 259200,
+      "maximum_validity_seconds": 259200
+    }
+  },
+  "grant_validation_at_atomic_open": {
+    "status": "pass",
+    "grant_sha256": "5729e9c8e137736acf8a1a1138e299e9ba25cc56f80463da4477b4f512753594",
+    "validity": {
+      "status": "pass",
+      "boundary": "atomic_open",
+      "checked_at": "2026-09-25T18:48:46.733248+00:00",
+      "issued_at": "2026-09-25T18:48:37.000176+00:00",
+      "expires_at": "2026-09-28T18:48:37.000176+00:00",
+      "validity_seconds": 259200,
+      "maximum_validity_seconds": 259200
+    }
+  },
+  "grant_expiry_after_open_policy": "does_not_cancel_or_change_an_already_started_scientific_process; the opening remains permanently consumed",
+  "checkpoint_byte_validation": {
+    "status": "pass",
+    "models": 150,
+    "total_bytes": 4110,
+    "models_canonical_sha256": "66189d04a6a6277d390dc427337b3dc165adbcb3382a08ca13b995a7681c3cb6"
+  },
+  "isolated_fixture_non_scientific": true,
+  "consumed_permanently": true,
+  "retry_allowed": false,
+  "resume_allowed": false,
+  "reopen_allowed": false
+}

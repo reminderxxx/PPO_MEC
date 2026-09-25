@@ -80,6 +80,17 @@
 - `tests/test_evaluation_only_identity_contract.py` / `test_evaluation_only_publication_integrity.py`：身份、权限、旧
   结果排除、manifest/path/symlink、non-path tamper 与原子发布回归。
 
+## G14R22-D authorization TTL 与 formal background host
+
+- `src/evaluators/dedicated_holdout_execution.py`：v2 request/package、72h/时区 grant validity、authorization/atomic-open
+  双检查、opening 后 TTL 冻结语义及 formal/fixture receipts。
+- `scripts/derive_g14r22_holdout_background_job.py`：只读 exact unsigned request/package/grant/token references，生成
+  create-only formal job package；token 仅做内存 hash，不复制内容。
+- `scripts/run_g14r22b_background_job.py`：host v3 execution-mode 路由；non-holdout 原检查保持，formal 成功同时消费
+  opening/execution/integrity receipts，并区分 child、partial、missing/invalid receipt、signal 与 host-loss terminal。
+- `tests/test_g14r22d_formal_background_contract.py`：隔离 fixture 通过真实 derivation CLI、public launcher 与 fixed
+  dedicated runner，覆盖 TTL、双向身份拒绝、正常/失败/receipt/token/独立后台边界。
+
 ## G14R22 dedicated one-time holdout
 
 - `src/evaluators/dedicated_holdout_execution.py`：unsigned request/command/grant 校验、150-checkpoint byte gate、

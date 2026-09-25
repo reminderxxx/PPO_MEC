@@ -1,3 +1,6 @@
+> **2026-09-26 G14R22-D**：`g14r22d_holdout_authorization_closure.md` 冻结 72h grant TTL、atomic-open 前到期
+> 边界、atomic-open 后长 child 语义、formal/non-holdout 双身份宿主、v5 unsigned 包与隔离公共启动验收；未授权、未开 holdout。
+
 > **2026-09-23 G14R22**：`g14r22_holdout_execution_contract.md` 冻结 dedicated one-time runner、完整 command
 > package、150-checkpoint opening hash、atomic opening/ledger/receipt/publication/integrity 与永久 consumed 边界。
 > 当前只到 `READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION`；grant/token 未签、正式 root 不存在、holdout 未开启。
@@ -41,6 +44,8 @@
 
 ## Live 文档
 
+- `g14r22d_holdout_authorization_closure.md`：G14H02 两个停止 blocker 的最小修复、v5 grant validity、正式后台 terminal、
+  fixture 验收与中央窗口移交边界。
 - `g14r22c_data_background_repair.md`：G14R22-B NGSIM/Alibaba candidate 来源、portable→fairness 消歧、
   venv/actual executable 复合后台身份、定向回归、历史统计保护和新单次 public non-holdout 验收边界。
 

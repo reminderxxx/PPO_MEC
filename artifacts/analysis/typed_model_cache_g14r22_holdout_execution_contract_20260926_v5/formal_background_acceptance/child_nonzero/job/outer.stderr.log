@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/scripts/run_dedicated_public_holdout.py", line 73, in <module>
+    raise SystemExit(main())
+  File "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/scripts/run_dedicated_public_holdout.py", line 61, in main
+    receipt = execute_package(
+  File "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/src/evaluators/dedicated_holdout_execution.py", line 806, in execute_package
+    raise HoldoutExecutionError(failure)
+src.evaluators.dedicated_holdout_execution.HoldoutExecutionError: scientific child failed permanently: constrained_288mb rc=1

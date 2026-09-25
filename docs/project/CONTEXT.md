@@ -156,6 +156,13 @@ I3 原 evaluation-only run 的 failed-terminal 不在旧 ledger 上续写。I5 �
 `formal_ablation` 的两个固定 cell 按 recovery attempt 2 → first attempt 1 顺序执行；6 个旧 committed cell 保持
 外部只读 reference。当前只有 synthetic/non-formal 工程验收和 unsigned request，后续阶段、真实恢复与 holdout
 均未授权。长期合同见 `g14r20_i5_restricted_recovery_contract.md`。
+## 2026-09-26 G14R22-D 当前边界
+
+- 唯一待新授权对象为 v5 unsigned request/package，绑定 executor `77935c5` 和新 one-time output root；v4 仅审计，旧批准不迁移。
+- grant 最大有效期 72h，必须带时区并在 atomic rename 前仍有效；打开后到期不杀 child、不改科学预算。
+- 正式后台状态机已用不含真实 holdout policy 的隔离 fixture 经真实公共入口验收；这不是正式 opening 或性能证据。
+- 当前 `grant_signed=false`、`execution_authorized=false`、正式 `holdout_opened=false`，不得 execute。
+
 ## 2026-09-23 G14R22 当前边界
 
 G14R21 的 holdout 工程 blocker 已由 dedicated one-time runner、exact command package、150-checkpoint byte gate、

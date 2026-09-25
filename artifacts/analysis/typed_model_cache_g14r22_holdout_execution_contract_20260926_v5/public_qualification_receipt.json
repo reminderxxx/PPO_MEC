@@ -1,0 +1,11 @@
+{
+  "status": "pass",
+  "execution_authorized": false,
+  "request_sha256": "a3154ffa735fea670bab02dffa6f7b92cca0f15c6fea63d1356d357a0139e717",
+  "command_package_sha256": "ec7410d0a03c8d73847ec9d73d612ca1f1612b097b227235e7e0a00baf0fffcc",
+  "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+  "check": "qualify",
+  "grant_supplied": false,
+  "token_supplied": false,
+  "holdout_opened": false
+}

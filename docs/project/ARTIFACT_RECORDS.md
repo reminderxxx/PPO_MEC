@@ -5,6 +5,17 @@
 
 # Artifact Records
 
+## 2026-09-26 G14R22-D v5 authorization/background closure
+
+- path：`artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260926_v5/`；executor commit/tree=
+  `77935c5fa7fa66f9a86afc940b201bf418ce4c11`/`13cc5dd2253a8a5523306f07abd8387d5adb8eeb`。
+- request/package canonical SHA-256=`a3154ffa735fea670bab02dffa6f7b92cca0f15c6fea63d1356d357a0139e717`/
+  `ec7410d0a03c8d73847ec9d73d612ca1f1612b097b227235e7e0a00baf0fffcc`；public qualify pass 且 unauthorized。
+- fixture public chain 实际完成 derivation→background launch→dedicated runner；normal=`SUCCEEDED`/10-file exact inventory，
+  child nonzero=`FAILED/SCIENTIFIC_FAILED_PARTIAL_OUTPUT`。JUnit 5/5，token secret scan 0 match。
+- boundary：只验证授权/后台/transaction contract；正式 grant/token=0，正式 root absent，真实 holdout policy/performance=0。
+  v4 原件 audit-only，旧批准不得迁移。
+
 ## 2026-09-23 G14R22-C final readback / unsigned holdout request v4
 
 - 唯一申请 path：`artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260923_v4/`；最终 clean

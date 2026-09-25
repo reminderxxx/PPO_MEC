@@ -1,0 +1,56 @@
+{
+  "command_package_version": "g14r22_holdout_command_package_v2",
+  "execution_mode": "formal_holdout_fixture",
+  "isolated_fixture_non_scientific": true,
+  "fixture_holdout_policy_runs": 0,
+  "executor_checkout": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC",
+  "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+  "executor_git_tree": "13cc5dd2253a8a5523306f07abd8387d5adb8eeb",
+  "output_root": "/private/tmp/g14r22d_acceptance_77935c5/test_public_derivation_launch_0/formal_fixture_output",
+  "phases": [
+    "scientific",
+    "statistics",
+    "publication",
+    "integrity"
+  ],
+  "scientific_matrix": {
+    "rows_per_child": 2,
+    "holm_family_size": 1
+  },
+  "commands": {
+    "scientific": [
+      [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "-c",
+        "import csv,hashlib,json,sys;from pathlib import Path;root=Path(sys.argv[1]);capacity=sys.argv[2];artifact=root/'payload';artifact.mkdir(parents=True);rows=artifact/'benchmark_rows.csv';h=rows.open('w',newline='');w=csv.writer(h);w.writerow(['capacity_label','value']);w.writerow([capacity,1]);w.writerow([capacity,2]);h.close();data=rows.read_bytes();files=[{'path':'benchmark_rows.csv','size_bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}];(artifact/'artifact_integrity_manifest.json').write_text(json.dumps({'files':files})+'\\n')",
+        "{G14R22_CELL_OUTPUT_ROOT}",
+        "constrained_288mb"
+      ],
+      [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "-c",
+        "import csv,hashlib,json,sys;from pathlib import Path;root=Path(sys.argv[1]);capacity=sys.argv[2];artifact=root/'payload';artifact.mkdir(parents=True);rows=artifact/'benchmark_rows.csv';h=rows.open('w',newline='');w=csv.writer(h);w.writerow(['capacity_label','value']);w.writerow([capacity,1]);w.writerow([capacity,2]);h.close();data=rows.read_bytes();files=[{'path':'benchmark_rows.csv','size_bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}];(artifact/'artifact_integrity_manifest.json').write_text(json.dumps({'files':files})+'\\n')",
+        "{G14R22_CELL_OUTPUT_ROOT}",
+        "medium_576mb"
+      ],
+      [
+        "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+        "-c",
+        "import csv,hashlib,json,sys;from pathlib import Path;root=Path(sys.argv[1]);capacity=sys.argv[2];artifact=root/'payload';artifact.mkdir(parents=True);rows=artifact/'benchmark_rows.csv';h=rows.open('w',newline='');w=csv.writer(h);w.writerow(['capacity_label','value']);w.writerow([capacity,1]);w.writerow([capacity,2]);h.close();data=rows.read_bytes();files=[{'path':'benchmark_rows.csv','size_bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}];(artifact/'artifact_integrity_manifest.json').write_text(json.dumps({'files':files})+'\\n')",
+        "{G14R22_CELL_OUTPUT_ROOT}",
+        "relaxed_864mb"
+      ]
+    ],
+    "statistics": [
+      "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "-c",
+      "import json,sys;from pathlib import Path;root=Path(sys.argv[1]);root.mkdir(parents=True,exist_ok=True);row={'holm_preregistered_family_size':1};(root/'paired_statistics.json').write_text(json.dumps({'rows':[row]})+'\\n');(root/'paired_statistics.csv').write_text('holm_preregistered_family_size\\n1\\n')",
+      "{G14R22_STATISTICS_OUTPUT_ROOT}",
+      "{G14R22_ROWS_0}",
+      "{G14R22_ROWS_1}",
+      "{G14R22_ROWS_2}"
+    ]
+  },
+  "automatic_retry_count": 0,
+  "command_package_sha256": "a567c3574cd680d2bdadc3704292386c79600eadfafc0a07d32d5ada8e2473e9"
+}

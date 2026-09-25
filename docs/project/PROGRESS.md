@@ -1,3 +1,17 @@
+## 2026-09-26 G14R22-D：正式后台宿主与 72h grant TTL 闭环
+
+- G14H02 的两个 pre-open blocker 已定向修复：grant 必须使用时区时间、`0 < expires-issued <= 72h`，且在授权、派生、
+  launch、supervisor pre-child 与 atomic rename 前 fail-closed；atomic open 后到期不杀 child、不改科学预算，仍永久 consumed。
+- background host v3 将 `acceptance_non_holdout` 与 `formal_holdout` 分成严格身份；正式成功必须 outer rc=0、合法 opening/
+  execution receipt 与 published exact integrity 同时通过。child 非零、partial、receipt 缺失/错误、信号与宿主失联分别记账。
+- fixed executor commit/tree=`77935c5fa7fa66f9a86afc940b201bf418ce4c11`/
+  `13cc5dd2253a8a5523306f07abd8387d5adb8eeb`。v5 request/package canonical SHA-256=
+  `a3154ffa...9e717`/`ec7410d0...fffcc`；真实 public qualify pass 但 `execution_authorized=false`。
+- 隔离 fixture 实际完成 derivation→public launch→dedicated runner：正常 `SUCCEEDED`，child 非零为永久
+  `FAILED/SCIENTIFIC_FAILED_PARTIAL_OUTPUT`；5 项正式后台验收通过，真实 holdout policy/performance 均为 0。
+- 正式 grant/token 未签，正式 output root absent，v4 audit-only 且任何旧批准不迁移。详见
+  `g14r22d_holdout_authorization_closure.md` 与 v5 artifact root。
+
 ## 2026-09-23 G14R22-C 最终只读验收与 holdout unsigned v4 封包
 
 - 单次后台任务终态 `SUCCEEDED`、child rc=0，UTC `09:23:57–09:32:39`（北京时间

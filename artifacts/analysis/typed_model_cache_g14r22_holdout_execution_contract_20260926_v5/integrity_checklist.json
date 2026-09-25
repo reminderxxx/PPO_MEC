@@ -1,0 +1,26 @@
+{
+  "integrity_checklist_version": "g14r22d_v2",
+  "request_sha256": "a3154ffa735fea670bab02dffa6f7b92cca0f15c6fea63d1356d357a0139e717",
+  "command_package_sha256": "ec7410d0a03c8d73847ec9d73d612ca1f1612b097b227235e7e0a00baf0fffcc",
+  "pre_open": [
+    "verify signed exact grant and independent review",
+    "verify one-time token hash",
+    "verify timezone-aware grant validity is at most 72 hours",
+    "recheck grant expiry immediately before atomic rename",
+    "verify frozen input bytes",
+    "rehash exactly 150 checkpoint files",
+    "verify output root absent",
+    "atomically publish opening receipt and ledger"
+  ],
+  "post_open": [
+    "run exactly three serial capacity children without retry",
+    "publish only complete child payloads",
+    "generate exactly 84 corrected statistics rows",
+    "publish integrity manifest and terminal receipt"
+  ],
+  "permanent_consumption": "opening, failure, partial output, and success all preserve consumed=true after atomic open",
+  "long_running_expiry": "expiry after atomic open never kills or changes the scientific process; consumption stays permanent",
+  "verdict": "READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION",
+  "grant_signed": false,
+  "execution_authorized": false
+}

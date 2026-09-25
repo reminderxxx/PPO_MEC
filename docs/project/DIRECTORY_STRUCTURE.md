@@ -28,6 +28,11 @@ G14R20-I5-D：新增 pre-grant 只读入口 `scripts/qualify_typed_model_cache_r
 
 # Directory Structure
 
+G14R22-D 在 `scripts/derive_g14r22_holdout_background_job.py` 增加授权后 create-only 派生；公共后台入口仍为
+`scripts/run_g14r22b_background_job.py`，但 host v3 以 explicit execution mode 隔离 non-holdout 与 formal terminal。
+v5 unsigned 根为 `artifacts/analysis/typed_model_cache_g14r22_holdout_execution_contract_20260926_v5/`；正式输出根是新的
+`artifacts/experiments/typed_model_cache_holdout/typed_model_cache_holdout_20260926_g14r22d_once/`，新 grant 前必须不存在。
+
 G14R22-B：未来 benchmark 容量身份由 `scripts/benchmark_main_results.py` 校验并经
 `src/evaluators/main_results_support.py` 写入 CSV；严格统计入口仍为
 `scripts/analyze_top_journal_statistics.py`。旧正式行的独立补标/复算由

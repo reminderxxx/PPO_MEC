@@ -1,0 +1,61 @@
+{
+  "integrity_version": "g14r22_holdout_integrity_v1",
+  "status": "pass",
+  "file_count": 10,
+  "files": [
+    {
+      "path": "scientific/constrained_288mb/artifact_integrity_manifest.json",
+      "size_bytes": 140,
+      "sha256": "f32a5d9c1291b51defbc6849608ea9fd7846dd54bf90587f14d1c9d8493617fa"
+    },
+    {
+      "path": "scientific/constrained_288mb/benchmark_rows.csv",
+      "size_bytes": 64,
+      "sha256": "f83a7ac5a8ae874f6cc62ee9788238cccf11246e5187d5a39bae96f837a47786"
+    },
+    {
+      "path": "scientific/medium_576mb/artifact_integrity_manifest.json",
+      "size_bytes": 140,
+      "sha256": "c153ab92348745a801bc2988aeacfea8ba4010b18a554800d3671e5a590c88a3"
+    },
+    {
+      "path": "scientific/medium_576mb/benchmark_rows.csv",
+      "size_bytes": 54,
+      "sha256": "83f875194ca25ab9940b70c74418da4d80e4e945afcbc36656ce78894a8ec77d"
+    },
+    {
+      "path": "scientific/relaxed_864mb/artifact_integrity_manifest.json",
+      "size_bytes": 140,
+      "sha256": "347f9c1160961a7e07bc53e06c0e2ac5c78b88f6f8193d5d520b825f1402a11c"
+    },
+    {
+      "path": "scientific/relaxed_864mb/benchmark_rows.csv",
+      "size_bytes": 56,
+      "sha256": "bf66b985e8a42012eb0c5bfc45bf99b702d52c6b57bef165b45ebc72367b7a64"
+    },
+    {
+      "path": "statistics/paired_statistics.csv",
+      "size_bytes": 33,
+      "sha256": "eb94ce5d84dc7900b330d8a970b42fa7243ca61ffe1d876a428c26d6479887f8"
+    },
+    {
+      "path": "statistics/paired_statistics.json",
+      "size_bytes": 50,
+      "sha256": "0a3815a478094a3f5ab61313089166c81215312f07c05b32b4b7d9e33758fe17"
+    },
+    {
+      "path": "statistics/statistics_stderr.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "statistics/statistics_stdout.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "files_canonical_sha256": "8f1ac15983badd83b57ba8602852ff7cd97f288a7d39b9d0e34137f5c041d0f2",
+  "request_sha256": "7ea232f1675e1d0b34f37c576b917c71af7312481969147a7306fd8a63e206ca",
+  "command_package_sha256": "a567c3574cd680d2bdadc3704292386c79600eadfafc0a07d32d5ada8e2473e9",
+  "consumed_permanently": true
+}

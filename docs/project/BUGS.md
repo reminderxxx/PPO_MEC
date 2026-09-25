@@ -1,3 +1,13 @@
+## 2026-09-26: G14H02 grant TTL / formal background terminal（RESOLVED IN V5 CONTRACT；UNAUTHORIZED）
+
+- `RESOLVED / validity`：时区 aware `issued_at/expires_at`、最大 72h、request-created lower bound、到期边界与 atomic rename
+  recheck 已实现；禁止倒填、静默延期和自动重签。atomic open 后 TTL 不再终止或改变已启动 child。
+- `RESOLVED / host`：保留 non-holdout `holdout_opened=false` 强校验，同时新增 formal opening/execution/integrity terminal
+  合同；身份互换 fail-closed，缺 receipt 不成功。
+- `PROTECTED`：v4 原件与旧批准不可迁移；v5 仍 `grant_signed=false / execution_authorized=false / holdout_opened=false`。
+  隔离验收的 `holdout_opened=true` 仅为 state-machine fixture marker，真实 policy runs=0。
+- `REMAINING OWNER ACTION`：中央窗口只读审查 exact v5 后，由负责人决定是否新签不超过 72h 的 grant/token。
+
 ## 2026-09-23: G14R22-C dataset candidate / live process identity（RESOLVED；REAL CHAIN PASSED）
 
 - `RESOLVED / candidate qualification`：G14R22-B 的冲突不是两份相同数据；完整 NGSIM/Alibaba 与 detached

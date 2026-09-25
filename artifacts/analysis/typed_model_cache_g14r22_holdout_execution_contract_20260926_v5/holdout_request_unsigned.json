@@ -1,0 +1,223 @@
+{
+  "request_version": "g14r22_unsigned_holdout_request_v2",
+  "created_at": "2026-09-25T18:48:23.509075+00:00",
+  "status": "READY_FOR_AUTHORIZATION_REVIEW",
+  "grant_signed": false,
+  "execution_authorized": false,
+  "holdout_opened": false,
+  "holdout_consumed_permanently": false,
+  "requested_authority": "one exact one-time holdout execution only",
+  "prior_package": {
+    "identity": "G14R22 v4",
+    "status": "audit_only",
+    "approval_migrates": false
+  },
+  "grant_validity_contract": {
+    "contract_version": "g14r22_grant_validity_v1",
+    "maximum_validity_seconds": 259200,
+    "timezone_aware_timestamps_required": true,
+    "issued_at_must_be_actual_issuance_time": true,
+    "backdating_allowed": false,
+    "silent_extension_allowed": false,
+    "automatic_resign_allowed": false,
+    "authorization_check_rule": "issued_at <= checked_at < expires_at",
+    "atomic_open_rule": "grant must still be valid immediately before atomic rename",
+    "post_open_expiry_rule": "does_not_cancel_or_change_an_already_started_scientific_process; the opening remains permanently consumed"
+  },
+  "command_package_sha256": "ec7410d0a03c8d73847ec9d73d612ca1f1612b097b227235e7e0a00baf0fffcc",
+  "executor_commit": "77935c5fa7fa66f9a86afc940b201bf418ce4c11",
+  "output_root": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_holdout/typed_model_cache_holdout_20260926_g14r22d_once",
+  "checkpoint_source_reference": {
+    "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending/evaluation_model_source_reference.json",
+    "size_bytes": 75136,
+    "sha256": "463945b505fc490f690c4e68019d1114ae1b6f820a3a942dd759b031ba33d8d8"
+  },
+  "checkpoint_opening_requirement": {
+    "byte_rehash_required": true,
+    "exact_model_count": 150,
+    "actual_use_scope": "all 150 learned-agent checkpoints; no replacement or subset"
+  },
+  "corrected_statistics_package": {
+    "root": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1",
+    "files_canonical_sha256": "5efee8e5f0991edaa210fc46994994f2b444a2dd01c58862c3d3636cc8f09414",
+    "paired_statistics_sha256": "a8e51948d106af0822bb0d38d6a3e3a69ef50db193f31a9bdcb1380028cd2a51",
+    "claim_map_sha256": "e656586f7006142fb8e4eaf07ff345bfef91c02fb1248415b1c9104e3033ab91",
+    "generator": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/scripts/analyze_top_journal_statistics.py",
+    "holm_family_size": 84
+  },
+  "frozen_science": {
+    "agents": [
+      "reactive_lru",
+      "reactive_fifo",
+      "reactive_lfu",
+      "reactive_aging_lfu",
+      "reactive_random",
+      "sa_ghmappo",
+      "ppo",
+      "mappo",
+      "dqn",
+      "dueling_dqn",
+      "qmix",
+      "controller_mat",
+      "dag_offload_drl",
+      "cache_offload_drl",
+      "dt_handoff_drl"
+    ],
+    "learned_agents": [
+      "sa_ghmappo",
+      "ppo",
+      "mappo",
+      "dqn",
+      "dueling_dqn",
+      "qmix",
+      "controller_mat",
+      "dag_offload_drl",
+      "cache_offload_drl",
+      "dt_handoff_drl"
+    ],
+    "seeds": [
+      7,
+      13,
+      29,
+      43,
+      71
+    ],
+    "capacities": [
+      "constrained_288mb",
+      "medium_576mb",
+      "relaxed_864mb"
+    ],
+    "outer_windows": 12,
+    "workflows": 3,
+    "scientific_child_count": 3,
+    "rows_per_child": 2700,
+    "total_expected_rows": 8100,
+    "checkpoint_count": 150,
+    "primary_metrics": [
+      "full_service_ready_byte_hit_rate",
+      "joint_base_adapter_hit_rate",
+      "full_service_ready_request_rate",
+      "transfer_mb_per_request",
+      "workflow_continuity_rate",
+      "end_to_end_workflow_delay"
+    ],
+    "holm_family_size": 84
+  },
+  "frozen_inputs": [
+    {
+      "path": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/docs/project/g14r21_corrected_statistics_holdout_audit.md",
+      "size_bytes": 7807,
+      "sha256": "a0bcb80fc64722d28e4167103b8e283780bc5ebd0ab4c16d962c7d8fd06beaaa"
+    },
+    {
+      "path": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/artifact_integrity_manifest.json",
+      "size_bytes": 3790,
+      "sha256": "5d2503ba15b27fc3241c7c48c4e603747cb6dc61c78aa40a6c2272527506bb13"
+    },
+    {
+      "path": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/corrected_statistics/paired_statistics.json",
+      "size_bytes": 161015,
+      "sha256": "a8e51948d106af0822bb0d38d6a3e3a69ef50db193f31a9bdcb1380028cd2a51"
+    },
+    {
+      "path": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/artifacts/analysis/typed_model_cache_g14r21_corrected_statistics_holdout_audit_20260923_v1/corrected_claim_map.json",
+      "size_bytes": 23334,
+      "sha256": "e656586f7006142fb8e4eaf07ff345bfef91c02fb1248415b1c9104e3033ab91"
+    },
+    {
+      "path": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/holdout_seal_record.json",
+      "size_bytes": 2346,
+      "sha256": "0ebee649f58eea3dac90977a67a9b175f20e6fcc3b05e019cb2da6e70404b5dd"
+    },
+    {
+      "path": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/split_manifest.json",
+      "size_bytes": 81804,
+      "sha256": "b3f31dec5b161860ebcc13b00896ab7a1ff8f89c0ea6d24d9a87dcf7ccb24c29"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/execution_checkouts/g14r20_i_scientific_a6d1fd8/configs/experiment/typed_model_cache_formal_protocol_v1_20260820/sealed_holdout_window_plan.json",
+      "size_bytes": 13751,
+      "sha256": "8e560ae6b84604184f3a54f70d9d931c411c7dbf6f887b3ab6d2e2cec1135c06"
+    },
+    {
+      "path": "/Users/howen/.codex/worktrees/g14r22-d-executor-77935c5/PPO_MEC/configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_v2_9_manifest.json",
+      "size_bytes": 369866,
+      "sha256": "a73cf09a02234db791d5bad404c5fccf567fadc11b5116c13a0ee1976489e109"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_evaluation_only/typed_model_cache_post_ablation_20260921_g14e07_pending/evaluation_model_source_reference.json",
+      "size_bytes": 75136,
+      "sha256": "463945b505fc490f690c4e68019d1114ae1b6f820a3a942dd759b031ba33d8d8"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/generated_checkpoint_resource_registry.json",
+      "size_bytes": 137016,
+      "sha256": "f5e6c8dae0526b5ce955c380ffc11e07d08ae387c47be26663633fa466c908d8"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_manifests/constrained_288mb/seed_checkpoint_manifest.json",
+      "size_bytes": 220155,
+      "sha256": "8262cecd74a70db179a9eb2bc503d4b8462b93169952baa19c86b98a971d1812"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_manifests/constrained_288mb/checkpoint_provenance_manifest.json",
+      "size_bytes": 312977,
+      "sha256": "5c3df4a90b5d5a9549cccfce1f3edd0c3656e15a7a6b755975691221d2830eb9"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_manifests/medium_576mb/seed_checkpoint_manifest.json",
+      "size_bytes": 219282,
+      "sha256": "4b909b8acd24315b91e6cca700e954496cf546737ed8e6f7d2668e45d2ed78a0"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_manifests/medium_576mb/checkpoint_provenance_manifest.json",
+      "size_bytes": 312359,
+      "sha256": "7d6d4dbbbea809f96711c4a077aa8f999ccdd7d02907292c331628d7e7fb8676"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_manifests/relaxed_864mb/seed_checkpoint_manifest.json",
+      "size_bytes": 219483,
+      "sha256": "5547e6250f4ffe2b534f4c1c5ec965e97c5eb08ac8e2615e5d16d60b96b668c4"
+    },
+    {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_formal/typed_model_cache_formal_20260906_152847_g14c_v16/checkpoint_manifests/relaxed_864mb/checkpoint_provenance_manifest.json",
+      "size_bytes": 312509,
+      "sha256": "daf773136ef3f4197d2358ba1640b0aed752624f788d20a997ff8be58ffa6fa2"
+    }
+  ],
+  "failure_boundary": {
+    "before_atomic_open": "not_consumed; no scientific child may start",
+    "at_or_after_atomic_open": "permanently_consumed",
+    "child_failure": "terminal_failure_no_retry_no_resume_no_reopen",
+    "partial_output": "retained_in_staging_and_permanently_consumed",
+    "success": "permanently_consumed"
+  },
+  "prohibited_changes": [
+    "model/checkpoint replacement",
+    "window replacement",
+    "agent/seed/capacity reduction",
+    "metric or Holm-family change",
+    "training",
+    "formal rerun",
+    "automatic retry"
+  ],
+  "workload_and_timing": {
+    "scientific_children": 3,
+    "expected_rows": 8100,
+    "statistics_comparisons": 84,
+    "checkpoint_byte_rehash_models": 150,
+    "checkpoint_byte_rehash_bytes": 105464376,
+    "measured_checkpoint_rehash_seconds": 3,
+    "historical_formal_science_lower_bound": "5h12m",
+    "historical_statistics_integrity_lower_bound": "15m",
+    "tested_full_run_upper_bound": null,
+    "calendar_guarantee": null,
+    "resource_limits": {
+      "device": "cpu",
+      "parallel_scientific_children": 1,
+      "automatic_retries": 0,
+      "maximum_total_compute_cpu_hours": 2500
+    }
+  },
+  "request_sha256": "a3154ffa735fea670bab02dffa6f7b92cca0f15c6fea63d1356d357a0139e717"
+}

@@ -1,3 +1,9 @@
+> **2026-09-26 G14R22-D**：已补齐 grant 最长 72 小时、时区时间、授权/atomic-open 双重到期检查与
+> atomic-open 后不杀长 child 的明确合同；公共后台宿主以显式双身份分别校验 non-holdout 和正式 holdout terminal。
+> v5 unsigned request/package 绑定 executor `77935c5`，隔离 fixture 通过真实 derivation→public launch→dedicated runner，
+> 但未签正式 grant/token、未创建正式 root、未调用 holdout policy。v4 永久 audit-only，既有批准不迁移。详见
+> [G14R22-D 合同](docs/project/g14r22d_holdout_authorization_closure.md)。
+
 > **2026-09-23 G14R22-C**：已定位 G14R22-B 的 NGSIM/Alibaba 冲突候选为真实 external dataset 与 executor
 > checkout 内 Git LFS pointer 被 fairness validator 同时纳入；benchmark 现只把 portable registry 允许并重新验证的
 > dataset candidates 交给 fairness，内容/role 冲突继续拒绝。后台 host v2 分离 venv launch path、actual executable、
