@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -8,6 +9,7 @@ import pytest
 from src.evaluators.dedicated_holdout_execution import (
     ALL_AGENTS,
     CAPACITIES,
+    GRANT_VALIDITY_CONTRACT,
     HOLDOUT_COMMAND_PACKAGE_VERSION,
     HOLDOUT_LEDGER_VERSION,
     HOLDOUT_REQUEST_VERSION,
@@ -19,6 +21,7 @@ from src.evaluators.dedicated_holdout_execution import (
     file_sha256,
     validate_command_package,
     validate_opening_receipt,
+    validate_grant_validity,
     validate_unsigned_request,
     execute_package,
     verify_checkpoint_bytes,
@@ -95,10 +98,12 @@ def request(tmp_path: Path, command_package: dict) -> dict:
     frozen.write_text("{}\n")
     value = {
         "request_version": HOLDOUT_REQUEST_VERSION,
+        "created_at": "2026-09-26T00:00:00+00:00",
         "status": "READY_FOR_AUTHORIZATION_REVIEW",
         "grant_signed": False, "execution_authorized": False,
         "holdout_opened": False, "holdout_consumed_permanently": False,
         "command_package_sha256": command_package["command_package_sha256"],
+        "grant_validity_contract": GRANT_VALIDITY_CONTRACT,
         "frozen_inputs": [{"path": str(frozen), "size_bytes": frozen.stat().st_size,
                            "sha256": file_sha256(frozen)}],
         "failure_boundary": {
@@ -115,7 +120,12 @@ def request(tmp_path: Path, command_package: dict) -> dict:
 
 def test_exact_scientific_matrix_and_zero_retry() -> None:
     audit = validate_command_package(package())
-    assert audit == {"status": "pass", "command_count": 4, "acceptance": False}
+    assert audit == {
+        "status": "pass",
+        "command_count": 4,
+        "acceptance": False,
+        "isolated_fixture": False,
+    }
     bad = package()
     bad["scientific_matrix"]["holm_family_size"] = 83
     bad["command_package_sha256"] = canonical_sha256(
@@ -155,6 +165,49 @@ def test_checkpoint_byte_audit_covers_exact_150_coordinates(tmp_path: Path) -> N
     assert audit["status"] == "pass"
     assert audit["actual_scope"]["models"] == 150
     assert audit["actual_scope"]["learned_agents"] == list(LEARNED_AGENTS)
+
+
+def test_grant_validity_requires_timezone_and_at_most_72_hours(tmp_path: Path) -> None:
+    command_package = package()
+    unsigned = request(tmp_path, command_package)
+    base = {
+        "issued_at": "2026-09-26T01:00:00+00:00",
+        "expires_at": "2026-09-29T01:00:00+00:00",
+    }
+    checked = datetime(2026, 9, 29, 0, 59, 59, tzinfo=timezone.utc)
+    audit = validate_grant_validity(
+        base, request=unsigned, checked_at=checked, boundary="test"
+    )
+    assert audit["validity_seconds"] == 72 * 60 * 60
+    with pytest.raises(HoldoutExecutionError, match="future or expired"):
+        validate_grant_validity(
+            base,
+            request=unsigned,
+            checked_at=datetime(2026, 9, 29, 1, 0, 0, tzinfo=timezone.utc),
+            boundary="test",
+        )
+    too_long = dict(base, expires_at="2026-09-29T01:00:01+00:00")
+    with pytest.raises(HoldoutExecutionError, match="72-hour"):
+        validate_grant_validity(
+            too_long, request=unsigned, checked_at=checked, boundary="test"
+        )
+    naive = dict(base, issued_at="2026-09-26T01:00:00")
+    with pytest.raises(HoldoutExecutionError, match="timezone"):
+        validate_grant_validity(
+            naive, request=unsigned, checked_at=checked, boundary="test"
+        )
+    backdated = dict(
+        base,
+        issued_at="2026-09-25T23:59:59+00:00",
+        expires_at="2026-09-28T23:59:59+00:00",
+    )
+    with pytest.raises(HoldoutExecutionError, match="predates"):
+        validate_grant_validity(
+            backdated,
+            request=unsigned,
+            checked_at=datetime(2026, 9, 26, 1, 0, tzinfo=timezone.utc),
+            boundary="test",
+        )
 
 
 def test_opening_receipt_is_already_permanently_consumed(tmp_path: Path) -> None:

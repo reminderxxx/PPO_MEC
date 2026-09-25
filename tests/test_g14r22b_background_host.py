@@ -70,6 +70,7 @@ if mode in {'success', 'sleep_success', 'success_extra', 'success_status_fail', 
         json.dumps(
             {
                 "automatic_retry_count": 0,
+                "acceptance_non_holdout": True,
                 "acceptance_request_sha256": "r" * 64,
                 "command_package_sha256": "p" * 64,
             }
@@ -101,6 +102,7 @@ def build_package(fixture: dict[str, object], mode: str, job_name: str) -> tuple
     package = {
         "host_version": HOST_VERSION,
         "job_id": job_name,
+        "execution_mode": "acceptance_non_holdout",
         "executor_checkout": str(checkout),
         "executor_commit": fixture["commit"],
         "executor_git_tree": fixture["tree"],
@@ -168,6 +170,22 @@ def test_host_rejects_resolved_target_substituted_for_invoked_interpreter(
     )
     package_path.write_text(json.dumps(package) + "\n", encoding="utf-8")
     with pytest.raises(ValueError, match="frozen interpreter"):
+        launch(package_path, job_root)
+
+
+def test_non_holdout_package_cannot_be_relabelled_formal(
+    frozen_executor: dict[str, object],
+) -> None:
+    package_path, job_root, _ = build_package(
+        frozen_executor, "success", "non_holdout_relabelled_formal"
+    )
+    package = json.loads(package_path.read_text())
+    package["execution_mode"] = "formal_holdout"
+    package["job_package_sha256"] = canonical_sha256(
+        {key: value for key, value in package.items() if key != "job_package_sha256"}
+    )
+    package_path.write_text(json.dumps(package) + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="rejects non-holdout scientific identity"):
         launch(package_path, job_root)
 
 

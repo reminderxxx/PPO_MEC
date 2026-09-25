@@ -134,6 +134,7 @@ def main() -> int:
     job_package: dict[str, Any] = {
         "host_version": HOST_VERSION,
         "job_id": "g14r22c_real_non_holdout_capacity_identity_v1",
+        "execution_mode": "acceptance_non_holdout",
         "executor_checkout": str(checkout),
         "executor_commit": args.executor_commit,
         "executor_git_tree": tree,

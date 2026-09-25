@@ -12,6 +12,7 @@ import json
 import subprocess
 import sys
 from copy import deepcopy
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,7 @@ if str(ROOT) not in sys.path:
 from src.evaluators.dedicated_holdout_execution import (
     ALL_AGENTS,
     CAPACITIES,
+    GRANT_VALIDITY_CONTRACT,
     HOLDOUT_COMMAND_PACKAGE_VERSION,
     HOLDOUT_REQUEST_VERSION,
     LEARNED_AGENTS,
@@ -48,7 +50,7 @@ SOURCE_RUN = Path(
 SCIENTIFIC = Path("/Users/howen/Projects/PPO_MEC/artifacts/execution_checkouts/g14r20_i_scientific_a6d1fd8")
 OUTPUT_ROOT = Path(
     "/Users/howen/Projects/PPO_MEC/artifacts/experiments/typed_model_cache_holdout/"
-    "typed_model_cache_holdout_20260923_g14r22_once"
+    "typed_model_cache_holdout_20260926_g14r22d_once"
 )
 
 
@@ -165,10 +167,17 @@ def build(executor_commit: str, executor_checkout: Path) -> tuple[dict[str, Any]
         ])
     request: dict[str, Any] = {
         "request_version": HOLDOUT_REQUEST_VERSION,
+        "created_at": datetime.now(timezone.utc).isoformat(),
         "status": "READY_FOR_AUTHORIZATION_REVIEW",
         "grant_signed": False, "execution_authorized": False,
         "holdout_opened": False, "holdout_consumed_permanently": False,
         "requested_authority": "one exact one-time holdout execution only",
+        "prior_package": {
+            "identity": "G14R22 v4",
+            "status": "audit_only",
+            "approval_migrates": False,
+        },
+        "grant_validity_contract": GRANT_VALIDITY_CONTRACT,
         "command_package_sha256": package["command_package_sha256"],
         "executor_commit": executor_commit,
         "output_root": str(OUTPUT_ROOT),
@@ -213,11 +222,13 @@ def build(executor_commit: str, executor_checkout: Path) -> tuple[dict[str, Any]
     }
     request["request_sha256"] = canonical_sha256(request)
     checklist = {
-        "integrity_checklist_version": "g14r22_v1",
+        "integrity_checklist_version": "g14r22d_v2",
         "request_sha256": request["request_sha256"],
         "command_package_sha256": package["command_package_sha256"],
         "pre_open": [
             "verify signed exact grant and independent review", "verify one-time token hash",
+            "verify timezone-aware grant validity is at most 72 hours",
+            "recheck grant expiry immediately before atomic rename",
             "verify frozen input bytes", "rehash exactly 150 checkpoint files",
             "verify output root absent", "atomically publish opening receipt and ledger",
         ],
@@ -226,6 +237,10 @@ def build(executor_commit: str, executor_checkout: Path) -> tuple[dict[str, Any]
             "generate exactly 84 corrected statistics rows", "publish integrity manifest and terminal receipt",
         ],
         "permanent_consumption": "opening, failure, partial output, and success all preserve consumed=true after atomic open",
+        "long_running_expiry": (
+            "expiry after atomic open never kills or changes the scientific process; "
+            "consumption stays permanent"
+        ),
         "verdict": "READY_TO_REQUEST_HOLDOUT_EXECUTION_AUTHORIZATION",
         "grant_signed": False, "execution_authorized": False,
     }
@@ -233,6 +248,47 @@ def build(executor_commit: str, executor_checkout: Path) -> tuple[dict[str, Any]
     validate_unsigned_request(request, package)
     checkpoint_audit = verify_checkpoint_bytes(SOURCE_REFERENCE)
     return request, package, checklist, checkpoint_audit
+
+
+def build_background_derivation_contract(
+    request: dict[str, Any], package: dict[str, Any], *, executor_checkout: Path,
+    executor_commit: str,
+) -> dict[str, Any]:
+    value: dict[str, Any] = {
+        "background_derivation_contract_version": "g14r22d_formal_background_derivation_v1",
+        "status": "UNSIGNED_AWAITING_NEW_EXACT_GRANT_AND_TOKEN",
+        "launch_allowed": False,
+        "execution_mode": "formal_holdout",
+        "executor_checkout": str(executor_checkout),
+        "executor_commit": executor_commit,
+        "executor_git_tree": git("rev-parse", f"{executor_commit}^{{tree}}"),
+        "request_sha256": request["request_sha256"],
+        "command_package_sha256": package["command_package_sha256"],
+        "output_root": package["output_root"],
+        "grant_validity_contract": GRANT_VALIDITY_CONTRACT,
+        "derivation_command_template": [
+            package["python_executable"],
+            str(executor_checkout / "scripts/derive_g14r22_holdout_background_job.py"),
+            "--request-path", "{G14R22D_UNSIGNED_REQUEST_PATH}",
+            "--command-package-path", "{G14R22D_SCIENTIFIC_PACKAGE_PATH}",
+            "--grant-path", "{G14R22D_NEW_SIGNED_GRANT_PATH}",
+            "--one-time-token-file", "{G14R22D_NEW_TOKEN_PATH}",
+            "--executor-checkout", str(executor_checkout),
+            "--python-executable", package["python_executable"],
+            "--derived-root", "{G14R22D_DERIVED_ROOT}",
+            "--job-root", "{G14R22D_UNIQUE_JOB_ROOT}",
+        ],
+        "required_new_owner_action": (
+            "issue a new exact grant/token for this v2 request; v4 approval is not transferable"
+        ),
+        "automatic_retry_count": 0,
+        "retry_allowed": False,
+        "resume_allowed": False,
+        "reopen_allowed": False,
+        "automatic_lock_cleanup_allowed": False,
+    }
+    value["background_derivation_contract_sha256"] = canonical_sha256(value)
+    return value
 
 
 def main() -> int:
@@ -247,6 +303,15 @@ def main() -> int:
     write(args.output_root / "command_package.json", package)
     write(args.output_root / "integrity_checklist.json", checklist)
     write(args.output_root / "checkpoint_byte_audit_preopen.json", checkpoint_audit)
+    write(
+        args.output_root / "background_derivation_contract.json",
+        build_background_derivation_contract(
+            request,
+            package,
+            executor_checkout=args.executor_checkout.resolve(),
+            executor_commit=args.executor_commit,
+        ),
+    )
     print(json.dumps({"status": "pass", "request_sha256": request["request_sha256"],
                       "command_package_sha256": package["command_package_sha256"]}, indent=2))
     return 0

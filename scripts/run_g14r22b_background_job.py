@@ -21,8 +21,18 @@ from pathlib import Path
 from typing import Any, Mapping
 
 
-HOST_VERSION = "g14r22c_fixed_background_host_v2"
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+
+HOST_VERSION = "g14r22d_fixed_background_host_v3"
 TERMINAL_STATES = {"SUCCEEDED", "FAILED", "INTERRUPTED_OR_UNKNOWN"}
+EXECUTION_MODES = {
+    "acceptance_non_holdout",
+    "formal_holdout",
+    "formal_holdout_fixture",
+}
 
 
 def canonical_sha256(value: Any) -> str:
@@ -192,10 +202,15 @@ def validate_frozen_file(binding: Mapping[str, Any], label: str) -> Path:
     observed = file_sha256(path)
     if observed != expected:
         raise ValueError(f"frozen {label} hash mismatch: {observed} != {expected}")
+    if "size_bytes" in binding and path.stat().st_size != binding.get("size_bytes"):
+        raise ValueError(f"frozen {label} size mismatch")
     return path
 
 
-def validate_job_package(path: Path, *, require_clean_checkout: bool) -> dict[str, Any]:
+def validate_job_package(
+    path: Path, *, require_clean_checkout: bool,
+    authorization_boundary: str = "background_launch",
+) -> dict[str, Any]:
     package = read_json(path)
     declared = package.get("job_package_sha256")
     projection = {key: value for key, value in package.items() if key != "job_package_sha256"}
@@ -205,8 +220,11 @@ def validate_job_package(path: Path, *, require_clean_checkout: bool) -> dict[st
         raise ValueError("background host version mismatch")
     if package.get("automatic_retry_count") != 0:
         raise ValueError("background host forbids retry")
+    mode = package.get("execution_mode")
+    if mode not in EXECUTION_MODES:
+        raise ValueError("background execution mode is missing or unsupported")
     if package.get("holdout_opened") is not False:
-        raise ValueError("G14R22-B background acceptance must keep holdout_opened=false")
+        raise ValueError("background package must be derived before any holdout opening")
     command = package.get("command")
     if not isinstance(command, list) or not command or not all(
         isinstance(item, str) and item for item in command
@@ -235,8 +253,59 @@ def validate_job_package(path: Path, *, require_clean_checkout: bool) -> dict[st
         raise ValueError("executor tree mismatch")
     if require_clean_checkout and git_value(checkout, "status", "--porcelain"):
         raise ValueError("executor checkout must be clean at launch")
-    validate_frozen_file(package.get("request", {}), "request")
-    validate_frozen_file(package.get("scientific_command_package", {}), "scientific command package")
+    request_path = validate_frozen_file(package.get("request", {}), "request")
+    scientific_path = validate_frozen_file(
+        package.get("scientific_command_package", {}), "scientific command package"
+    )
+    request = read_json(request_path)
+    scientific = read_json(scientific_path)
+    if mode == "acceptance_non_holdout":
+        if scientific.get("acceptance_non_holdout") is not True:
+            raise ValueError("non-holdout host requires acceptance_non_holdout=true")
+        if any(field in package for field in ("grant", "one_time_token")):
+            raise ValueError("non-holdout host must not carry formal authorization references")
+    else:
+        isolated_fixture = mode == "formal_holdout_fixture"
+        if bool(package.get("isolated_fixture_non_scientific")) != isolated_fixture:
+            raise ValueError("formal host fixture identity mismatch")
+        if scientific.get("acceptance_non_holdout") is True:
+            raise ValueError("formal holdout host rejects non-holdout scientific identity")
+        grant_path = validate_frozen_file(package.get("grant", {}), "grant")
+        token_path = validate_frozen_file(package.get("one_time_token", {}), "one-time token")
+        if set(package.get("one_time_token", {})) - {
+            "path", "size_bytes", "sha256"
+        }:
+            raise ValueError("one-time token reference contains forbidden serialized fields")
+        from src.evaluators.dedicated_holdout_execution import (
+            validate_command_package,
+            validate_unsigned_request,
+            verify_grant,
+        )
+
+        validate_command_package(scientific, isolated_fixture=isolated_fixture)
+        validate_unsigned_request(
+            request, scientific, isolated_fixture=isolated_fixture
+        )
+        verify_grant(
+            request,
+            scientific,
+            read_json(grant_path),
+            token_path.read_bytes(),
+            boundary=authorization_boundary,
+        )
+        expected_command = [
+            str(python),
+            str(checkout / "scripts/run_dedicated_public_holdout.py"),
+            "--request-path", str(request_path),
+            "--command-package-path", str(scientific_path),
+            "--grant-path", str(grant_path),
+            "--one-time-token-file", str(token_path),
+            "--check", "fixture-execute" if isolated_fixture else "execute",
+        ]
+        if command != expected_command:
+            raise ValueError("formal background command is not the fixed dedicated runner")
+        if package.get("formal_output_root") != scientific.get("output_root"):
+            raise ValueError("formal background output-root binding mismatch")
     environment = package.get("environment")
     if not isinstance(environment, dict) or not all(
         isinstance(key, str) and isinstance(value, str)
@@ -312,18 +381,21 @@ def scientific_completion(package: Mapping[str, Any], child_return_code: int) ->
     receipt = read_json(receipt_path)
     if child_return_code != 0:
         raise ValueError(f"child return code is nonzero: {child_return_code}")
-    if receipt.get("passed") is not True or int(receipt.get("return_code", -1)) != 0:
-        raise ValueError("scientific terminal receipt does not declare passed=true/return_code=0")
-    if receipt.get("holdout_opened") is not False:
-        raise ValueError("scientific terminal receipt violates holdout_opened=false")
+    mode = package.get("execution_mode")
     expected_bindings = contract.get("expected_receipt_bindings")
     if not isinstance(expected_bindings, dict) or any(
         receipt.get(field) != expected
         for field, expected in expected_bindings.items()
     ):
         raise ValueError("scientific terminal receipt does not match frozen identities")
-    if receipt.get("capacity_identity_validation", {}).get("status") != "passed":
-        raise ValueError("scientific terminal receipt lacks capacity identity closure")
+    if mode != "acceptance_non_holdout" and (
+        receipt.get("status") != "completed_permanently_consumed"
+        or receipt.get("acceptance_non_holdout") is not False
+        or receipt.get("holdout_opened") is not True
+        or receipt.get("consumed_permanently") is not True
+        or receipt.get("failure") is not None
+    ):
+        raise ValueError("formal holdout execution receipt is not a legal completion")
     frozen_scientific_path = validate_frozen_file(
         package.get("scientific_command_package", {}), "scientific command package"
     )
@@ -331,28 +403,81 @@ def scientific_completion(package: Mapping[str, Any], child_return_code: int) ->
     manifest_path = Path(str(contract.get("integrity_manifest_path", ""))).resolve()
     integrity_root = Path(str(contract.get("integrity_root", ""))).resolve()
     manifest = read_json(manifest_path)
-    if (
-        manifest.get("request_sha256")
-        != frozen_scientific.get("acceptance_request_sha256")
-        or manifest.get("command_package_sha256")
-        != frozen_scientific.get("command_package_sha256")
-    ):
-        raise ValueError("published integrity identity differs from frozen scientific package")
     execution_receipt_path = manifest_path.parent / "execution_receipt.json"
     execution_receipt = read_json(execution_receipt_path)
+    if mode == "acceptance_non_holdout":
+        if receipt.get("passed") is not True or int(receipt.get("return_code", -1)) != 0:
+            raise ValueError(
+                "non-holdout receipt does not declare passed=true/return_code=0"
+            )
+        if receipt.get("holdout_opened") is not False:
+            raise ValueError("non-holdout receipt violates holdout_opened=false")
+        if receipt.get("capacity_identity_validation", {}).get("status") != "passed":
+            raise ValueError("non-holdout receipt lacks capacity identity closure")
+        if (
+            manifest.get("request_sha256")
+            != frozen_scientific.get("acceptance_request_sha256")
+            or manifest.get("command_package_sha256")
+            != frozen_scientific.get("command_package_sha256")
+        ):
+            raise ValueError("published integrity identity differs from frozen scientific package")
+        if (
+            execution_receipt.get("status") != "completed_permanently_consumed"
+            or execution_receipt.get("acceptance_non_holdout") is not True
+            or execution_receipt.get("holdout_opened") is not False
+        ):
+            raise ValueError("non-holdout dedicated execution receipt identity/status mismatch")
+        opening_receipt_path = None
+        opening_receipt_sha256 = None
+    else:
+        if (
+            receipt.get("status") != "completed_permanently_consumed"
+            or receipt.get("acceptance_non_holdout") is not False
+            or receipt.get("holdout_opened") is not True
+            or receipt.get("consumed_permanently") is not True
+            or receipt.get("failure") is not None
+        ):
+            raise ValueError("formal holdout execution receipt is not a legal completion")
+        if manifest.get("status") != "pass" or manifest.get(
+            "consumed_permanently"
+        ) is not True:
+            raise ValueError("formal holdout integrity manifest is not a legal completion")
+        if (
+            manifest.get("request_sha256") != receipt.get("request_sha256")
+            or manifest.get("command_package_sha256")
+            != receipt.get("command_package_sha256")
+        ):
+            raise ValueError("formal holdout receipt/integrity identity mismatch")
+        opening_receipt_path = Path(
+            str(contract.get("opening_receipt_path", ""))
+        ).resolve()
+        opening = read_json(opening_receipt_path)
+        if (
+            opening.get("event") != "opened"
+            or opening.get("consumed_permanently") is not True
+            or opening.get("request_sha256") != receipt.get("request_sha256")
+            or opening.get("command_package_sha256")
+            != receipt.get("command_package_sha256")
+            or opening.get("grant_validation_at_atomic_open", {}).get("status")
+            != "pass"
+        ):
+            raise ValueError("formal holdout opening receipt is invalid")
+        opening_receipt_sha256 = file_sha256(opening_receipt_path)
     if (
-        execution_receipt.get("status") != "completed_permanently_consumed"
-        or execution_receipt.get("acceptance_non_holdout") is not True
-        or execution_receipt.get("holdout_opened") is not False
-        or execution_receipt.get("request_sha256") != manifest.get("request_sha256")
+        execution_receipt.get("request_sha256") != manifest.get("request_sha256")
         or execution_receipt.get("command_package_sha256")
         != manifest.get("command_package_sha256")
     ):
         raise ValueError("dedicated execution receipt identity/status mismatch")
     integrity = validate_integrity(manifest_path, integrity_root)
     return {
+        "execution_mode": mode,
         "scientific_receipt_path": str(receipt_path),
         "scientific_receipt_sha256": file_sha256(receipt_path),
+        "opening_receipt_path": (
+            str(opening_receipt_path) if opening_receipt_path is not None else None
+        ),
+        "opening_receipt_sha256": opening_receipt_sha256,
         "integrity_manifest_path": str(manifest_path),
         "integrity_manifest_sha256": file_sha256(manifest_path),
         "dedicated_execution_receipt_path": str(execution_receipt_path),
@@ -362,7 +487,11 @@ def scientific_completion(package: Mapping[str, Any], child_return_code: int) ->
 
 
 def supervise(package_path: Path, job_root: Path) -> int:
-    package = validate_job_package(package_path, require_clean_checkout=False)
+    package = validate_job_package(
+        package_path,
+        require_clean_checkout=False,
+        authorization_boundary="background_supervisor_prechild",
+    )
     if Path(str(package.get("job_root", ""))).resolve() != job_root.resolve():
         raise ValueError("job root differs from frozen package binding")
     state_path = job_root / "state.json"
@@ -440,18 +569,59 @@ def supervise(package_path: Path, job_root: Path) -> int:
         child_return_code = child.wait()
     status = "FAILED"
     completion: dict[str, Any] | None = None
+    scientific_failure_receipt: dict[str, Any] | None = None
     failure: str | None = None
+    failure_category: str | None = None
     if interrupted["signal"] is not None:
         status = "INTERRUPTED_OR_UNKNOWN"
+        failure_category = "SUPERVISOR_SIGNAL"
         failure = f"supervisor captured signal {interrupted['signal']}"
     elif child_return_code != 0:
+        receipt_text = package.get("terminal_contract", {}).get(
+            "scientific_receipt_path"
+        )
+        receipt_path = Path(receipt_text).resolve() if isinstance(receipt_text, str) else None
+        if (
+            package.get("execution_mode") != "acceptance_non_holdout"
+            and receipt_path is not None
+            and receipt_path.is_file()
+        ):
+            failed_receipt = read_json(receipt_path)
+            scientific_failure_receipt = {
+                "path": str(receipt_path),
+                "sha256": file_sha256(receipt_path),
+                "status": failed_receipt.get("status"),
+                "partial_output_retained": failed_receipt.get(
+                    "partial_output_retained"
+                ),
+                "consumed_permanently": failed_receipt.get(
+                    "consumed_permanently"
+                ),
+            }
+            failure_category = (
+                "SCIENTIFIC_FAILED_PARTIAL_OUTPUT"
+                if failed_receipt.get("partial_output_retained") is True
+                else "SCIENTIFIC_FAILED"
+            )
+        else:
+            failure_category = "CHILD_NONZERO_NO_SCIENTIFIC_RECEIPT"
         failure = f"child exited nonzero: {child_return_code}"
     else:
         try:
             completion = scientific_completion(package, child_return_code)
             status = "SUCCEEDED"
-        except Exception as exc:  # terminal validation is intentionally fail-closed
+        except FileNotFoundError as exc:
+            failure_category = "SCIENTIFIC_RECEIPT_MISSING"
             failure = f"terminal validation failed: {type(exc).__name__}: {exc}"
+        except Exception as exc:  # terminal validation is intentionally fail-closed
+            failure_category = "SCIENTIFIC_RECEIPT_OR_INTEGRITY_INVALID"
+            failure = f"terminal validation failed: {type(exc).__name__}: {exc}"
+    opening_path = package.get("terminal_contract", {}).get("opening_receipt_path")
+    holdout_opened = bool(
+        package.get("execution_mode") != "acceptance_non_holdout"
+        and isinstance(opening_path, str)
+        and Path(opening_path).is_file()
+    )
     terminal = {
         "host_version": HOST_VERSION,
         "job_id": package["job_id"],
@@ -460,8 +630,10 @@ def supervise(package_path: Path, job_root: Path) -> int:
         "completed_at": utc_now(),
         "child_return_code": child_return_code,
         "captured_signal": interrupted["signal"],
+        "failure_category": failure_category,
         "failure": failure,
         "scientific_completion": completion,
+        "scientific_failure_receipt": scientific_failure_receipt,
         "outer_stdout_path": str(stdout_path),
         "outer_stderr_path": str(stderr_path),
         "request": package["request"],
@@ -469,8 +641,13 @@ def supervise(package_path: Path, job_root: Path) -> int:
         "executor_commit": package["executor_commit"],
         "executor_git_tree": package["executor_git_tree"],
         "job_package_sha256": package["job_package_sha256"],
+        "execution_mode": package["execution_mode"],
         "automatic_retry_count": 0,
-        "holdout_opened": False,
+        "retry_allowed": False,
+        "resume_allowed": False,
+        "reopen_allowed": False,
+        "automatic_lock_cleanup_allowed": False,
+        "holdout_opened": holdout_opened,
     }
     atomic_json(terminal_path, terminal)
     running = read_json(state_path)
@@ -480,7 +657,11 @@ def supervise(package_path: Path, job_root: Path) -> int:
 
 
 def launch(package_path: Path, job_root: Path) -> dict[str, Any]:
-    package = validate_job_package(package_path, require_clean_checkout=True)
+    package = validate_job_package(
+        package_path,
+        require_clean_checkout=True,
+        authorization_boundary="background_launch",
+    )
     if Path(str(package.get("job_root", ""))).resolve() != job_root.resolve():
         raise ValueError("job root differs from frozen package binding")
     if job_root.exists():
@@ -518,6 +699,7 @@ def launch(package_path: Path, job_root: Path) -> dict[str, Any]:
         "host_version": HOST_VERSION,
         "job_id": package["job_id"],
         "status": "RUNNING",
+        "execution_mode": package["execution_mode"],
         "launched_at": utc_now(),
         "launcher_pid": os.getpid(),
         "supervisor_process_identity": identity,
@@ -534,6 +716,10 @@ def launch(package_path: Path, job_root: Path) -> dict[str, Any]:
         "python_resolved_executable": package["python_resolved_executable"],
         "cwd": package["cwd"],
         "automatic_retry_count": 0,
+        "retry_allowed": False,
+        "resume_allowed": False,
+        "reopen_allowed": False,
+        "automatic_lock_cleanup_allowed": False,
         "holdout_opened": False,
     }
     state_path = job_root / "state.json"

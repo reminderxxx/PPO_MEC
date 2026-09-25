@@ -17,16 +17,34 @@ import os
 import shutil
 import subprocess
 import tempfile
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 
-HOLDOUT_REQUEST_VERSION = "g14r22_unsigned_holdout_request_v1"
-HOLDOUT_COMMAND_PACKAGE_VERSION = "g14r22_holdout_command_package_v1"
+HOLDOUT_REQUEST_VERSION = "g14r22_unsigned_holdout_request_v2"
+HOLDOUT_COMMAND_PACKAGE_VERSION = "g14r22_holdout_command_package_v2"
 HOLDOUT_LEDGER_VERSION = "g14r22_one_time_opening_ledger_v1"
 HOLDOUT_RECEIPT_VERSION = "g14r22_holdout_execution_receipt_v1"
 HOLDOUT_INTEGRITY_VERSION = "g14r22_holdout_integrity_v1"
+HOLDOUT_GRANT_VERSION = "g14r22_holdout_grant_v2"
+GRANT_VALIDITY_CONTRACT_VERSION = "g14r22_grant_validity_v1"
+MAX_GRANT_VALIDITY = timedelta(hours=72)
+GRANT_VALIDITY_CONTRACT = {
+    "contract_version": GRANT_VALIDITY_CONTRACT_VERSION,
+    "maximum_validity_seconds": int(MAX_GRANT_VALIDITY.total_seconds()),
+    "timezone_aware_timestamps_required": True,
+    "issued_at_must_be_actual_issuance_time": True,
+    "backdating_allowed": False,
+    "silent_extension_allowed": False,
+    "automatic_resign_allowed": False,
+    "authorization_check_rule": "issued_at <= checked_at < expires_at",
+    "atomic_open_rule": "grant must still be valid immediately before atomic rename",
+    "post_open_expiry_rule": (
+        "does_not_cancel_or_change_an_already_started_scientific_process; "
+        "the opening remains permanently consumed"
+    ),
+}
 LEARNED_AGENTS = (
     "sa_ghmappo", "ppo", "mappo", "dqn", "dueling_dqn", "qmix",
     "controller_mat", "dag_offload_drl", "cache_offload_drl", "dt_handoff_drl",
@@ -52,7 +70,53 @@ class HoldoutExecutionError(ValueError):
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return _utc_now_datetime().isoformat()
+
+
+def _utc_now_datetime() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _aware_timestamp(value: Any, field: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(str(value))
+    except ValueError as exc:
+        raise HoldoutExecutionError(f"holdout grant {field} is not valid ISO-8601") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise HoldoutExecutionError(f"holdout grant {field} must include a timezone offset")
+    return parsed.astimezone(timezone.utc)
+
+
+def validate_grant_validity(
+    grant: Mapping[str, Any], *, request: Mapping[str, Any], checked_at: datetime | None = None,
+    boundary: str,
+) -> dict[str, Any]:
+    """Validate the fixed 72-hour authorization window at a named boundary."""
+
+    now = checked_at if checked_at is not None else _utc_now_datetime()
+    if now.tzinfo is None or now.utcoffset() is None:
+        raise HoldoutExecutionError("grant validity check time must be timezone-aware")
+    now = now.astimezone(timezone.utc)
+    issued = _aware_timestamp(grant.get("issued_at"), "issued_at")
+    expires = _aware_timestamp(grant.get("expires_at"), "expires_at")
+    if expires <= issued:
+        raise HoldoutExecutionError("holdout grant expires_at must be after issued_at")
+    if expires - issued > MAX_GRANT_VALIDITY:
+        raise HoldoutExecutionError("holdout grant validity exceeds the 72-hour maximum")
+    requested_at = _aware_timestamp(request.get("created_at"), "request.created_at")
+    if issued < requested_at:
+        raise HoldoutExecutionError("holdout grant issued_at predates the exact unsigned request")
+    if not issued <= now < expires:
+        raise HoldoutExecutionError(f"holdout grant is future or expired at {boundary}")
+    return {
+        "status": "pass",
+        "boundary": boundary,
+        "checked_at": now.isoformat(),
+        "issued_at": issued.isoformat(),
+        "expires_at": expires.isoformat(),
+        "validity_seconds": int((expires - issued).total_seconds()),
+        "maximum_validity_seconds": int(MAX_GRANT_VALIDITY.total_seconds()),
+    }
 
 
 def canonical_sha256(value: Any) -> str:
@@ -146,7 +210,9 @@ def _validate_identity_bundle(package: Mapping[str, Any], *, required: bool) -> 
         raise HoldoutExecutionError("evaluation model source reference hash mismatch")
 
 
-def validate_command_package(package: Mapping[str, Any], *, acceptance: bool = False) -> dict[str, Any]:
+def validate_command_package(
+    package: Mapping[str, Any], *, acceptance: bool = False, isolated_fixture: bool = False
+) -> dict[str, Any]:
     if package.get("command_package_version") != HOLDOUT_COMMAND_PACKAGE_VERSION:
         raise HoldoutExecutionError("holdout command package version mismatch")
     if not _hash_bound(package, "command_package_sha256"):
@@ -168,7 +234,20 @@ def validate_command_package(package: Mapping[str, Any], *, acceptance: bool = F
         "primary_metrics": list(PRIMARY_METRICS),
         "holm_family_size": 84,
     }
-    if not acceptance and dict(matrix) != expected:
+    if isolated_fixture:
+        if package.get("isolated_fixture_non_scientific") is not True:
+            raise HoldoutExecutionError("isolated fixture marker is missing")
+        if package.get("fixture_holdout_policy_runs") != 0:
+            raise HoldoutExecutionError("isolated fixture must execute zero holdout policies")
+        if package.get("execution_mode") != "formal_holdout_fixture":
+            raise HoldoutExecutionError("isolated fixture execution mode mismatch")
+        output = Path(str(package.get("output_root", "")))
+        if not output.is_absolute() or "artifacts/experiments/typed_model_cache_holdout" in str(output):
+            raise HoldoutExecutionError("isolated fixture output must not use the formal holdout root")
+        serialized = json.dumps(package.get("commands"), sort_keys=True).lower()
+        if "sealed_holdout" in serialized or "holdout_policy" in serialized:
+            raise HoldoutExecutionError("isolated fixture contains a real holdout reference")
+    elif not acceptance and dict(matrix) != expected:
         raise HoldoutExecutionError("production scientific matrix drift")
     if acceptance:
         if package.get("acceptance_non_holdout") is not True:
@@ -190,7 +269,7 @@ def validate_command_package(package: Mapping[str, Any], *, acceptance: bool = F
         raise HoldoutExecutionError("scientific command schema mismatch")
     if not isinstance(commands.get("statistics"), list) or not commands["statistics"]:
         raise HoldoutExecutionError("statistics command is missing")
-    if not acceptance:
+    if not acceptance and not isolated_fixture:
         for index, command in enumerate(scientific):
             if command[command.index("--agents") + 1:command.index("--seeds")] != list(ALL_AGENTS):
                 raise HoldoutExecutionError("scientific command agent order drift")
@@ -230,12 +309,18 @@ def validate_command_package(package: Mapping[str, Any], *, acceptance: bool = F
             raise HoldoutExecutionError("statistics bootstrap budget drift")
     if package.get("automatic_retry_count") != 0:
         raise HoldoutExecutionError("automatic retry must remain zero")
-    _validate_identity_bundle(package, required=not acceptance)
-    return {"status": "pass", "command_count": 4, "acceptance": acceptance}
+    _validate_identity_bundle(package, required=not acceptance and not isolated_fixture)
+    return {
+        "status": "pass",
+        "command_count": 4,
+        "acceptance": acceptance,
+        "isolated_fixture": isolated_fixture,
+    }
 
 
 def validate_unsigned_request(
-    request: Mapping[str, Any], package: Mapping[str, Any], *, check_files: bool = True
+    request: Mapping[str, Any], package: Mapping[str, Any], *, check_files: bool = True,
+    isolated_fixture: bool = False,
 ) -> dict[str, Any]:
     if request.get("request_version") != HOLDOUT_REQUEST_VERSION:
         raise HoldoutExecutionError("unsigned request version mismatch")
@@ -248,7 +333,10 @@ def validate_unsigned_request(
             raise HoldoutExecutionError(f"unsigned request falsely asserts {field}")
     if request.get("command_package_sha256") != package.get("command_package_sha256"):
         raise HoldoutExecutionError("request/command package binding mismatch")
-    validate_command_package(package)
+    validate_command_package(package, isolated_fixture=isolated_fixture)
+    if request.get("grant_validity_contract") != GRANT_VALIDITY_CONTRACT:
+        raise HoldoutExecutionError("unsigned request grant-validity contract drift")
+    _aware_timestamp(request.get("created_at"), "request.created_at")
     if request.get("failure_boundary") != {
         "before_atomic_open": "not_consumed; no scientific child may start",
         "at_or_after_atomic_open": "permanently_consumed",
@@ -316,14 +404,16 @@ def verify_checkpoint_bytes(source_reference_path: str | Path) -> dict[str, Any]
 
 
 def verify_grant(
-    request: Mapping[str, Any], package: Mapping[str, Any], grant: Mapping[str, Any], token: bytes
+    request: Mapping[str, Any], package: Mapping[str, Any], grant: Mapping[str, Any], token: bytes,
+    *, checked_at: datetime | None = None, boundary: str = "authorization_check",
 ) -> dict[str, Any]:
     required = {
         "grant_version", "status", "grant_signed", "request_sha256",
         "command_package_sha256", "executor_commit", "output_root",
         "one_time_token_sha256", "independent_review", "issued_at", "expires_at",
+        "grant_validity_contract",
     }
-    if set(grant) != required or grant.get("grant_version") != "g14r22_holdout_grant_v1":
+    if set(grant) != required or grant.get("grant_version") != HOLDOUT_GRANT_VERSION:
         raise HoldoutExecutionError("holdout grant schema mismatch")
     if grant.get("status") != "AUTHORIZED_ONE_TIME_HOLDOUT" or grant.get("grant_signed") is not True:
         raise HoldoutExecutionError("holdout grant is not signed/authorized")
@@ -336,14 +426,11 @@ def verify_grant(
     }
     if any(grant.get(key) != value for key, value in expected.items()):
         raise HoldoutExecutionError("holdout grant identity/scope drift")
-    now = datetime.now(timezone.utc)
-    try:
-        issued = datetime.fromisoformat(str(grant["issued_at"])).astimezone(timezone.utc)
-        expires = datetime.fromisoformat(str(grant["expires_at"])).astimezone(timezone.utc)
-    except ValueError as exc:
-        raise HoldoutExecutionError("holdout grant timestamp invalid") from exc
-    if not issued <= now < expires:
-        raise HoldoutExecutionError("holdout grant is future or expired")
+    if grant.get("grant_validity_contract") != GRANT_VALIDITY_CONTRACT:
+        raise HoldoutExecutionError("holdout grant validity contract drift")
+    validity = validate_grant_validity(
+        grant, request=request, checked_at=checked_at, boundary=boundary
+    )
     review = grant["independent_review"]
     if not isinstance(review, Mapping) or set(review) != {"path", "sha256", "size_bytes"}:
         raise HoldoutExecutionError("independent review reference invalid")
@@ -357,7 +444,11 @@ def verify_grant(
             or review_payload.get("request_sha256") != request["request_sha256"]
             or review_payload.get("command_package_sha256") != package["command_package_sha256"]):
         raise HoldoutExecutionError("independent review does not approve the exact package")
-    return {"status": "pass", "grant_sha256": canonical_sha256(grant)}
+    return {
+        "status": "pass",
+        "grant_sha256": canonical_sha256(grant),
+        "validity": validity,
+    }
 
 
 def validate_opening_receipt(
@@ -496,10 +587,14 @@ def _verify_executor_checkout(package: Mapping[str, Any]) -> None:
 
 def execute_package(
     request: Mapping[str, Any], package: Mapping[str, Any], grant: Mapping[str, Any] | None,
-    token: bytes | None, *, acceptance: bool = False,
+    token: bytes | None, *, acceptance: bool = False, isolated_fixture: bool = False,
 ) -> dict[str, Any]:
-    validate_command_package(package, acceptance=acceptance)
-    if any(isinstance(package.get(field), Mapping) for field in (
+    if acceptance and isolated_fixture:
+        raise HoldoutExecutionError("acceptance and isolated fixture modes are mutually exclusive")
+    validate_command_package(
+        package, acceptance=acceptance, isolated_fixture=isolated_fixture
+    )
+    if not isolated_fixture and any(isinstance(package.get(field), Mapping) for field in (
         "evaluation_execution_contract", "resolved_execution_context", "model_source_reference"
     )):
         from src.runtime.evaluation_only_execution import validate_execution_contract
@@ -510,10 +605,12 @@ def execute_package(
         )
     if not acceptance:
         _verify_executor_checkout(package)
-        validate_unsigned_request(request, package)
+        validate_unsigned_request(request, package, isolated_fixture=isolated_fixture)
         if grant is None or token is None:
             raise HoldoutExecutionError("signed grant and one-time token are required")
-        grant_audit = verify_grant(request, package, grant, token)
+        grant_audit = verify_grant(
+            request, package, grant, token, boundary="authorization_check"
+        )
         checkpoint_audit = verify_checkpoint_bytes(request["checkpoint_source_reference"]["path"])
     else:
         grant_audit = {"status": "acceptance_non_holdout_no_grant"}
@@ -523,41 +620,62 @@ def execute_package(
         raise HoldoutExecutionError("one-time output root already exists; reopen/resume is forbidden")
     output_root.parent.mkdir(parents=True, exist_ok=True)
     temporary = Path(tempfile.mkdtemp(prefix=f".{output_root.name}.opening-", dir=output_root.parent))
-    opening = {
-        "ledger_version": HOLDOUT_LEDGER_VERSION,
-        "event": "opened",
-        "opened_at": utc_now(),
-        "request_sha256": request.get("request_sha256", package.get("acceptance_request_sha256")),
-        "command_package_sha256": package["command_package_sha256"],
-        "executor_commit": package["executor_commit"],
-        "output_root": str(output_root),
-        "grant_validation": grant_audit,
-        "checkpoint_byte_validation": {
-            "status": checkpoint_audit["status"],
-            "models": checkpoint_audit["actual_scope"]["models"],
-            "total_bytes": checkpoint_audit["actual_scope"]["total_bytes"],
-            "models_canonical_sha256": checkpoint_audit["models_canonical_sha256"],
-        },
-        "consumed_permanently": True,
-        "retry_allowed": False,
-        "resume_allowed": False,
-        "reopen_allowed": False,
-    }
-    create_json(temporary / "opening_receipt.json", opening)
-    create_json(temporary / "checkpoint_byte_audit.json", checkpoint_audit)
-    create_json(temporary / "request_snapshot.json", dict(request))
-    create_json(temporary / "command_package_snapshot.json", dict(package))
-    if isinstance(package.get("resolved_execution_context"), Mapping):
-        create_json(temporary / "resolved_execution_context.json", package["resolved_execution_context"])
-    if isinstance(package.get("model_source_reference"), Mapping):
-        create_json(temporary / "evaluation_model_source_reference.json", package["model_source_reference"])
-    if isinstance(package.get("evaluation_execution_contract"), Mapping):
-        create_json(
-            temporary / "evaluation_execution_contract.json",
-            package["evaluation_execution_contract"],
-        )
-    _append_ledger(temporary / "opening_ledger.jsonl", opening)
-    os.replace(temporary, output_root)
+    try:
+        create_json(temporary / "checkpoint_byte_audit.json", checkpoint_audit)
+        create_json(temporary / "request_snapshot.json", dict(request))
+        create_json(temporary / "command_package_snapshot.json", dict(package))
+        if isinstance(package.get("resolved_execution_context"), Mapping):
+            create_json(temporary / "resolved_execution_context.json", package["resolved_execution_context"])
+        if isinstance(package.get("model_source_reference"), Mapping):
+            create_json(temporary / "evaluation_model_source_reference.json", package["model_source_reference"])
+        if isinstance(package.get("evaluation_execution_contract"), Mapping):
+            create_json(
+                temporary / "evaluation_execution_contract.json",
+                package["evaluation_execution_contract"],
+            )
+        atomic_open_grant_audit = grant_audit
+        if not acceptance:
+            assert grant is not None and token is not None
+            atomic_open_grant_audit = verify_grant(
+                request, package, grant, token, boundary="atomic_open"
+            )
+        opening = {
+            "ledger_version": HOLDOUT_LEDGER_VERSION,
+            "event": "opened",
+            "opened_at": utc_now(),
+            "request_sha256": request.get("request_sha256", package.get("acceptance_request_sha256")),
+            "command_package_sha256": package["command_package_sha256"],
+            "executor_commit": package["executor_commit"],
+            "output_root": str(output_root),
+            "grant_validation_at_authorization": grant_audit,
+            "grant_validation_at_atomic_open": atomic_open_grant_audit,
+            "grant_expiry_after_open_policy": GRANT_VALIDITY_CONTRACT["post_open_expiry_rule"],
+            "checkpoint_byte_validation": {
+                "status": checkpoint_audit["status"],
+                "models": checkpoint_audit["actual_scope"]["models"],
+                "total_bytes": checkpoint_audit["actual_scope"]["total_bytes"],
+                "models_canonical_sha256": checkpoint_audit["models_canonical_sha256"],
+            },
+            "isolated_fixture_non_scientific": bool(isolated_fixture),
+            "consumed_permanently": True,
+            "retry_allowed": False,
+            "resume_allowed": False,
+            "reopen_allowed": False,
+        }
+        create_json(temporary / "opening_receipt.json", opening)
+        _append_ledger(temporary / "opening_ledger.jsonl", opening)
+        # This is the final expiry guard.  Once rename succeeds, TTL no longer
+        # controls the lifetime of the already-started one-time execution.
+        if not acceptance:
+            assert grant is not None
+            validate_grant_validity(
+                grant, request=request, boundary="atomic_rename_guard"
+            )
+        os.replace(temporary, output_root)
+    except Exception:
+        if temporary.exists():
+            shutil.rmtree(temporary)
+        raise
     ledger = output_root / "opening_ledger.jsonl"
     published = output_root / "published"
     staging = output_root / "staging"
@@ -667,6 +785,7 @@ def execute_package(
         "completed_at": utc_now(),
         "request_sha256": opening["request_sha256"],
         "command_package_sha256": package["command_package_sha256"],
+        "executor_commit": package["executor_commit"],
         "output_root": str(output_root),
         "failure": failure,
         "partial_output_retained": failure is not None,
@@ -676,6 +795,8 @@ def execute_package(
         "reopen_allowed": False,
         "acceptance_non_holdout": bool(acceptance),
         "holdout_opened": False if acceptance else True,
+        "isolated_fixture_non_scientific": bool(isolated_fixture),
+        "fixture_holdout_policy_runs": 0 if isolated_fixture else None,
     }
     create_json(output_root / "execution_receipt.json", receipt)
     _append_ledger(ledger, {"event": "execution_receipt_published", "status": terminal_status,

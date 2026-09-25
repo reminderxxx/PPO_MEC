@@ -27,7 +27,11 @@ def parser() -> argparse.ArgumentParser:
     value.add_argument("--command-package-path", type=Path, required=True)
     value.add_argument("--grant-path", type=Path)
     value.add_argument("--one-time-token-file", type=Path)
-    value.add_argument("--check", choices=("qualify", "execute", "acceptance"), required=True)
+    value.add_argument(
+        "--check",
+        choices=("qualify", "execute", "acceptance", "fixture-execute"),
+        required=True,
+    )
     return value
 
 
@@ -42,7 +46,10 @@ def main() -> int:
     if args.request_path is None:
         raise HoldoutExecutionError("--request-path is required")
     request = read_json(args.request_path)
-    audit = validate_unsigned_request(request, package)
+    isolated_fixture = args.check == "fixture-execute"
+    audit = validate_unsigned_request(
+        request, package, isolated_fixture=isolated_fixture
+    )
     if args.check == "qualify":
         print(json.dumps({"status": "pass", "execution_authorized": False, **audit}, indent=2))
         return 0
@@ -51,7 +58,13 @@ def main() -> int:
     grant = read_json(args.grant_path)
     if args.one_time_token_file.is_symlink() or not args.one_time_token_file.is_file():
         raise HoldoutExecutionError("one-time token file is missing or a symlink")
-    receipt = execute_package(request, package, grant, args.one_time_token_file.read_bytes())
+    receipt = execute_package(
+        request,
+        package,
+        grant,
+        args.one_time_token_file.read_bytes(),
+        isolated_fixture=isolated_fixture,
+    )
     print(json.dumps(receipt, ensure_ascii=False, indent=2))
     return 0
 
