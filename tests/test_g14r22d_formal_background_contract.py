@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -38,6 +39,15 @@ def git(checkout: Path, *args: str) -> str:
 
 
 def make_executor(tmp_path: Path) -> tuple[Path, str, str]:
+    frozen = os.environ.get("G14R22D_ACCEPTANCE_EXECUTOR")
+    if frozen:
+        checkout = Path(frozen).resolve()
+        assert git(checkout, "status", "--porcelain") == ""
+        return (
+            checkout,
+            git(checkout, "rev-parse", "HEAD"),
+            git(checkout, "rev-parse", "HEAD^{tree}"),
+        )
     checkout = tmp_path / "executor"
     for relative in (
         "scripts/run_dedicated_public_holdout.py",
@@ -52,26 +62,6 @@ def make_executor(tmp_path: Path) -> tuple[Path, str, str]:
         target = checkout / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text("", encoding="utf-8")
-    (checkout / "fixture_child.py").write_text(
-        "import csv, hashlib, json, sys\n"
-        "from pathlib import Path\n"
-        "root=Path(sys.argv[1]); capacity=sys.argv[2]; artifact=root/'payload'; artifact.mkdir(parents=True)\n"
-        "rows=artifact/'benchmark_rows.csv'\n"
-        "with rows.open('w',newline='') as h:\n"
-        " w=csv.writer(h); w.writerow(['capacity_label','value']); w.writerow([capacity,1]); w.writerow([capacity,2])\n"
-        "data=rows.read_bytes(); files=[{'path':'benchmark_rows.csv','size_bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()}]\n"
-        "(artifact/'artifact_integrity_manifest.json').write_text(json.dumps({'files':files})+'\\n')\n",
-        encoding="utf-8",
-    )
-    (checkout / "fixture_stats.py").write_text(
-        "import json, sys\n"
-        "from pathlib import Path\n"
-        "root=Path(sys.argv[1]); root.mkdir(parents=True, exist_ok=True)\n"
-        "row={'holm_preregistered_family_size':1}\n"
-        "(root/'paired_statistics.json').write_text(json.dumps({'rows':[row]})+'\\n')\n"
-        "(root/'paired_statistics.csv').write_text('holm_preregistered_family_size\\n1\\n')\n",
-        encoding="utf-8",
-    )
     subprocess.run(["git", "init"], cwd=checkout, check=True, capture_output=True)
     subprocess.run(
         ["git", "config", "user.email", "fixture@example.invalid"], cwd=checkout, check=True
@@ -86,12 +76,32 @@ def build_fixture(tmp_path: Path, *, fail_first_child: bool = False) -> dict[str
     checkout, commit, tree = make_executor(tmp_path)
     python = Path(sys.executable).resolve()
     output = tmp_path / "formal_fixture_output"
+    child_code = (
+        "import csv,hashlib,json,sys;from pathlib import Path;"
+        "root=Path(sys.argv[1]);capacity=sys.argv[2];artifact=root/'payload';"
+        "artifact.mkdir(parents=True);rows=artifact/'benchmark_rows.csv';"
+        "h=rows.open('w',newline='');w=csv.writer(h);"
+        "w.writerow(['capacity_label','value']);w.writerow([capacity,1]);"
+        "w.writerow([capacity,2]);h.close();data=rows.read_bytes();"
+        "files=[{'path':'benchmark_rows.csv','size_bytes':len(data),"
+        "'sha256':hashlib.sha256(data).hexdigest()}];"
+        "(artifact/'artifact_integrity_manifest.json').write_text("
+        "json.dumps({'files':files})+'\\n')"
+    )
     scientific_commands = [
-        [str(python), str(checkout / "fixture_child.py"), "{G14R22_CELL_OUTPUT_ROOT}", capacity]
+        [str(python), "-c", child_code, "{G14R22_CELL_OUTPUT_ROOT}", capacity]
         for capacity in CAPACITIES
     ]
     if fail_first_child:
         scientific_commands[0] = ["/usr/bin/false"]
+    stats_code = (
+        "import json,sys;from pathlib import Path;root=Path(sys.argv[1]);"
+        "root.mkdir(parents=True,exist_ok=True);"
+        "row={'holm_preregistered_family_size':1};"
+        "(root/'paired_statistics.json').write_text(json.dumps({'rows':[row]})+'\\n');"
+        "(root/'paired_statistics.csv').write_text("
+        "'holm_preregistered_family_size\\n1\\n')"
+    )
     package = {
         "command_package_version": HOLDOUT_COMMAND_PACKAGE_VERSION,
         "execution_mode": "formal_holdout_fixture",
@@ -107,7 +117,8 @@ def build_fixture(tmp_path: Path, *, fail_first_child: bool = False) -> dict[str
             "scientific": scientific_commands,
             "statistics": [
                 str(python),
-                str(checkout / "fixture_stats.py"),
+                "-c",
+                stats_code,
                 "{G14R22_STATISTICS_OUTPUT_ROOT}",
                 "{G14R22_ROWS_0}",
                 "{G14R22_ROWS_1}",
