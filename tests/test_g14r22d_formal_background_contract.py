@@ -192,7 +192,7 @@ def build_fixture(tmp_path: Path, *, fail_first_child: bool = False) -> dict[str
     }
     review_path = tmp_path / "review.json"
     write_json(review_path, review)
-    token_bytes = b"fixture-token-secret-never-log-7f0f9a"
+    token_bytes = hashlib.sha256(os.urandom(32)).hexdigest().encode("ascii")
     token_path = tmp_path / "token.secret"
     token_path.write_bytes(token_bytes)
     issued = datetime.now(timezone.utc) - timedelta(seconds=5)
