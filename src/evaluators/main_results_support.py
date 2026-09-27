@@ -2413,6 +2413,9 @@ def load_window_bundle(
     formal_window_consumption_contract_path: str = "",
     formal_window_split: str = "",
     expected_window_id: str = "",
+    window_consumption_mode: str = "formal",
+    holdout_execution_authorization_path: str = "",
+    holdout_opening_record_path: str = "",
 ) -> Any:
     if formal_window_consumption_contract_path:
         if mobility_source != "ngsim":
@@ -2430,6 +2433,9 @@ def load_window_bundle(
             split=formal_window_split,
             window_id=expected_window_id,
             rsu_layout=rsu_layout,
+            window_consumption_mode=window_consumption_mode,
+            holdout_execution_authorization_path=holdout_execution_authorization_path,
+            holdout_opening_record_path=holdout_opening_record_path,
         )
     return load_real_mobility_bundle(
         root_dir=root_dir,

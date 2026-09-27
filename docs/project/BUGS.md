@@ -5,6 +5,20 @@
 
 ﻿# Bugs And Risks
 
+## 2026-09-27: dedicated opening/window consumption 冲突（RESOLVED）；新测试独立性限制（OPEN）
+
+- `RESOLVED`：真实 sealed execution 不再借用 `identity_only`；只有 hash-bound issued authorization + 原 append-only
+  opening record 才能进入 `dedicated_holdout_execution`。普通 benchmark 与 window consumer 的 sealed guard 保留，
+  无授权、身份漂移、重复 opening、output overwrite 均 fail-closed。
+- `OPEN / approval`：本任务只形成 metadata-only 新测试 proposal，不签 grant、不建 executable seal、不发 token、
+  不运行新测试。任何后续执行必须另立批准任务，并绑定现有 immutable candidate/checkpoint、corrected statistics 与
+  exact command/output identity。
+- `OPEN / scientific independence`：即使存在未使用且零观察车辆复现的候选区间，它们仍来自同一 NGSIM I-80
+  source/road segment，可能共享 capture session/segment-run，且 Alibaba workflow 与 controlled catalog 不变。
+  因而最多称 prospective internal temporal test，不得写成 pristine external holdout 或完全独立数据集。
+- G14E07 的 delay survivor conditioning、4/6 typed ablation unavailable、capacity/eviction discrimination 和
+  external generalization blocker 均未由本接口修复消除；paper-ready 仍为 `Unverifiable`。
+
 ## 2026-09-21: G14E07 formal 统计解释与 holdout readiness blockers（OPEN）
 
 - `formal_gate.json` 的 claim map 对已经统一为“正数有利 candidate”的 signed CI 又按 lower-is-better 二次

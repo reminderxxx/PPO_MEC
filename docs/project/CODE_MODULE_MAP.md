@@ -1,5 +1,20 @@
 # Code Module Map
 
+## G14R23 dedicated holdout execution boundary
+
+- `src/evaluators/dedicated_holdout_execution.py`：issued authorization、exact command、opening record、window
+  contract/plan 与 output identity 的共享 fail-closed validator；不拥有 token issuance 或性能逻辑。
+- `scripts/run_dedicated_holdout_benchmark.py`：唯一 production command builder/launcher；调用既有 append-only seal
+  guard 后启动 exact authorized benchmark，child failure 不恢复 seal。
+- `scripts/benchmark_main_results.py`：实际 parser/preflight 接受独立 `dedicated_holdout_execution` mode；普通 runner、
+  非 holdout split、缺 authorization/opening、命令漂移与 output overwrite 拒绝。
+- `src/evaluators/formal_window_consumption.py` 与 `src/evaluators/main_results_support.py`：window binding 和最终 bundle
+  consumer 重验 capability；`identity_only` 保持 metadata-only。
+- `scripts/audit_new_independent_test_feasibility.py`：只读 selected-window metadata 与车辆 identity，生成 unsigned、
+  unsealed、unexecuted 的 prospective temporal-test proposal。
+- `tests/test_dedicated_holdout_execution.py`：synthetic 组合链正例、未授权、identity conflict、post-open failure 与
+  second-open rejection；不读取真实 sealed holdout。
+
 ## G14R18 provenance envelope / shared identity boundary
 
 - `scripts/manage_typed_model_cache_formal_artifacts.py`：`write_checkpoint_companions` 保持完整 17 字段 provenance

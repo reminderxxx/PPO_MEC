@@ -5,6 +5,15 @@
 
 # PPO_MEC
 
+G14R23 修复了 dedicated holdout opening 与 frozen-window consumer 的执行合同冲突：真实执行使用独立
+`dedicated_holdout_execution` mode，不再伪装成 `identity_only`；普通 benchmark、缺少 issued authorization、
+opening record 或任一 command/plan/contract identity 漂移仍 fail-closed。一次性 seal 继续由原 append-only
+opening guard 消费，opening 后的科学入口失败也不得二次开启。修复仅在 synthetic sealed split 上完成最终
+production command → parser/preflight → capability → window consumer → actual benchmark episode 组合验证；真实
+sealed holdout 未读取、未执行、未签 grant。新独立测试可行性只基于 metadata 与全历史使用记录审查，结论及
+待批准方案见 `docs/project/g14r23_holdout_interface_and_independent_test_review.md`；本任务不训练、不调参、不换
+checkpoint、不修改旧结果，也不声明 paper-ready。
+
 G14R18 已关闭正式 checkpoint provenance envelope 与共享 training identity projection 的接口错配，并冻结唯一
 live Protocol `2.9.0` 与 Readiness v21=`READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL`。完整 companion 保留
 17 字段；其中 8 个共享 identity 字段由 capability-aware 解析器在 benchmark 边界提取，并与已验证

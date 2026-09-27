@@ -5,6 +5,34 @@
 
 # Runbook
 
+## G14R23 dedicated holdout interface（当前未授权真实执行）
+
+真实 sealed execution 的唯一入口为 `scripts/run_dedicated_holdout_benchmark.py`，但只有独立批准流程签发
+`state=issued`、`execution_authorized=true` 的 authorization 和一次性 token 后才可调用。本仓库当前不包含真实
+authorization/token；不得手工制作、复制 synthetic test 文件或把 `identity_only` 改名后运行真实窗口。
+
+授权必须绑定 seal、Git commit、exact benchmark argv、window consumption contract、window plan、immutable
+candidate checkpoint manifest、corrected statistics contract、opening record path 与 deterministic output root/run ID。
+launcher 在科学 child 前调用原 create-only opening guard；benchmark parser/preflight 与 window consumer 各自重验。
+opening 后任何错误均永久 consumed，不允许以换 token、换路径、删 record 或改 run ID 重试。
+
+接口专项验证只创建 pytest 临时 synthetic NGSIM/Alibaba metadata，不读取真实 sealed holdout：
+
+```bash
+<python> -m pytest -q tests/test_dedicated_holdout_execution.py
+```
+
+新独立测试可行性审计只读全历史 selected-window metadata 和 NGSIM 的 `Vehicle_ID/Location/Global_Time`：
+
+```bash
+<python> scripts/audit_new_independent_test_feasibility.py \
+  --history-root <full-project-root> \
+  --source-path <ngsim-csv> \
+  --output-root artifacts/analysis/g14r23_holdout_interface_and_independent_test_20260927
+```
+
+输出只是 `pending_independent_approval` proposal；不得据此签 grant、生成 executable seal 或运行新测试。
+
 ## Protocol 2.9 与未来 G14C v16
 
 唯一 live index：`configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_index.json`。

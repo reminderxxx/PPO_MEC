@@ -5,6 +5,24 @@
 
 ﻿# Progress
 
+## 2026-09-27: G14R23 dedicated holdout interface repair 与新独立测试 metadata 审查
+
+- 一阶冲突已关闭：benchmark parser 曾无条件拒绝 `sealed_holdout`，window binding 又只允许
+  `identity_only`，bundle consumer 还会再次无条件拒绝；因此不存在“已合法 opening 后执行真实科学入口”的组合路径。
+- 新增独立 `dedicated_holdout_execution` capability。唯一 production launcher 必须先校验 issued authorization、
+  seal/token、Git commit、完整 command identity、window contract/plan、checkpoint/statistics binding 和确定性 output
+  identity，再由原 `append_holdout_execution_record()` create-only 消费 seal；benchmark parser/preflight 与每个
+  window consumer 都重新验证 authorization/opening identity。普通 formal/rehearsal、缺授权、`identity_only` 执行、
+  command/plan/contract 漂移、重复 opening 和输出覆盖继续拒绝。
+- synthetic sealed split 上真实运行最终 production command，覆盖 actual parser/preflight、12-window consumer 和
+  actual benchmark episode；同时覆盖未 opening 拒绝、身份冲突、opening 后 child failure 仍永久 consumed 且二次
+  opening 拒绝。真实 sealed holdout、真实 token/checkpoint/performance 均未读取或执行。
+- 全历史可行性审计仅读取 selected-window identity metadata 与 NGSIM `Vehicle_ID/Location/Global_Time`，不解析
+  performance，不运行 agent；待批准 proposal 固定结果无关选择、new split/seal、现有 immutable checkpoint 和
+  corrected window-level statistics 的绑定。`execution_authorized=false`、`grant_signed=false`、`seal_created=false`。
+- 结论边界：这不是 holdout 执行、算法优势、canonical 晋级或 paper-ready 证据。完整审查见
+  `docs/project/g14r23_holdout_interface_and_independent_test_review.md`。
+
 ## 2026-09-21: G14A01 formal-only 结果独立复核与 claim freeze 完成
 
 - G14E07 `typed_model_cache_post_ablation_20260921_g14e07_pending` 已完成

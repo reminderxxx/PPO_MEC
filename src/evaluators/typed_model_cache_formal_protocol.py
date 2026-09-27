@@ -1958,6 +1958,8 @@ def append_holdout_execution_record(
     command: Sequence[str],
     output_run_id: str,
     opened_at: str | None = None,
+    authorization_semantic_sha256: str | None = None,
+    command_semantic_sha256: str | None = None,
 ) -> dict[str, Any]:
     validate_split_access(
         "sealed_holdout",
@@ -1985,6 +1987,12 @@ def append_holdout_execution_record(
         "infrastructure_retry_conditions": seal_record["infrastructure_retry_conditions"],
         "consumed_permanently": True,
     }
+    if authorization_semantic_sha256 is not None:
+        record["authorization_semantic_sha256"] = str(
+            authorization_semantic_sha256
+        )
+    if command_semantic_sha256 is not None:
+        record["command_semantic_sha256"] = str(command_semantic_sha256)
     encoded = json.dumps(record, ensure_ascii=False, sort_keys=True, allow_nan=False) + "\n"
     try:
         with target.open("x", encoding="utf-8") as handle:

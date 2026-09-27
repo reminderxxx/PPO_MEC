@@ -1,5 +1,19 @@
 ﻿# Decision Log
 
+## 2026-09-27: dedicated holdout execution is a separate capability, not identity-only validation
+
+- 决定：`identity_only` 永久只用于 sealed metadata/interval revalidation；真实 policy/episode execution 必须使用独立
+  `dedicated_holdout_execution` mode，不能通过改名或复用 identity-only 绕过科学执行语义。
+- 决定：原 `validate_split_access()` 与 `append_holdout_execution_record()` seal guard 保留。dedicated launcher 在
+  child 启动前 create-only 写入 consumed record；child 随后失败也保持 consumed，只有 opening 前失败不消费。
+- 决定：authorization 冻结 exact benchmark argv、Git commit、window contract/plan、candidate checkpoint manifest、
+  corrected statistics contract、opening path 与 output root/run ID；parser/preflight 和 window consumer 均 fail-closed
+  重验，不只信任 outer launcher。
+- 决定：新独立测试候选只能以 result-blind metadata rule 提案；本任务 `execution_authorized=false`、不签 grant、
+  不建新 executable seal、不运行算法。时间不重叠与零车辆复现仍不等于 external/pristine independence。
+- 边界：接口能力存在不等于现有 G14E07 或 Protocol 2.9 自动获得 holdout authorization；旧 consumed/invalid run、
+  ledger、窗口与失败证据不修改，普通 formal runner 的 `holdout_capability=false` 不变。
+
 ## 2026-09-06: provenance envelope and shared training identity are separate schemas
 
 - 决定：正式 companion 保持 17 字段完整 provenance envelope；共享 training identity 是其中由

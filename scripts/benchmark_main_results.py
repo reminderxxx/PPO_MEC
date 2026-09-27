@@ -51,6 +51,10 @@ from src.evaluators.formal_window_consumption import (
     load_contract as load_window_consumption_contract,
     validate_window_plan_binding,
 )
+from src.evaluators.dedicated_holdout_execution import (
+    DEDICATED_HOLDOUT_EXECUTION_MODE,
+    validate_benchmark_capability,
+)
 from src.runtime.typed_model_cache_runtime import (
     load_runtime_catalog,
     resolve_model_cache_runtime,
@@ -178,9 +182,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--window_consumption_mode",
-        choices=["formal", "rehearsal"],
+        choices=["formal", "rehearsal", DEDICATED_HOLDOUT_EXECUTION_MODE],
         default="formal",
     )
+    parser.add_argument("--holdout-execution-authorization-path", default="")
+    parser.add_argument("--holdout-opening-record-path", default="")
     parser.add_argument("--exclude_window_plan_path", action="append", default=[])
     parser.add_argument("--predictor_kind", type=str, default="baseline", choices=["baseline", "oracle", "learned_or_calibrated", "supervised"])
     parser.add_argument("--predictor_checkpoint_path", type=str, default="")
@@ -207,6 +213,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min_tasks", type=int, default=5)
     parser.add_argument("--max_tasks", type=int, default=20)
     parser.add_argument("--output_root", type=str, default=str(ROOT_DIR / "artifacts" / "benchmarks" / "main_results"))
+    parser.add_argument("--benchmark-run-id", default="")
     parser.add_argument(
         "--audit_runtime",
         action="store_true",
@@ -725,14 +732,42 @@ def main() -> None:
         )
     window_consumption_contract: dict[str, Any] | None = None
     window_consumption_binding: dict[str, Any] | None = None
+    holdout_capability_validation: dict[str, Any] | None = None
     if args.formal_window_consumption_contract_path:
         if not args.window_plan_path or not args.formal_window_split:
             raise ValueError("frozen-window consumption requires window plan and split")
-        if args.formal_window_split == "sealed_holdout":
-            raise ValueError("sealed holdout cannot be executed by benchmark_main_results")
         window_consumption_contract = load_window_consumption_contract(
             args.formal_window_consumption_contract_path
         )
+        if args.formal_window_split == "sealed_holdout":
+            if args.window_consumption_mode != DEDICATED_HOLDOUT_EXECUTION_MODE:
+                raise ValueError(
+                    "sealed holdout requires dedicated_holdout_execution mode"
+                )
+            if (
+                not args.holdout_execution_authorization_path
+                or not args.holdout_opening_record_path
+            ):
+                raise ValueError(
+                    "sealed holdout requires authorization and append-only opening record"
+                )
+            holdout_capability_validation = validate_benchmark_capability(
+                authorization_path=args.holdout_execution_authorization_path,
+                opening_record_path=args.holdout_opening_record_path,
+                actual_benchmark_argv=sys.argv[1:],
+                contract_semantic_sha256=window_consumption_contract["hashes"][
+                    "semantic_sha256"
+                ],
+                plan_path=args.window_plan_path,
+            )
+        elif (
+            args.window_consumption_mode == DEDICATED_HOLDOUT_EXECUTION_MODE
+            or args.holdout_execution_authorization_path
+            or args.holdout_opening_record_path
+        ):
+            raise ValueError(
+                "dedicated holdout capability is reserved for sealed_holdout"
+            )
         window_consumption_binding = validate_window_plan_binding(
             contract=window_consumption_contract,
             plan_path=args.window_plan_path,
@@ -744,6 +779,15 @@ def main() -> None:
             rsu_layout=args.rsu_layout,
             primary_vehicle_selection=args.primary_vehicle_selection,
             mode=args.window_consumption_mode,
+            holdout_authorization_validation=holdout_capability_validation,
+        )
+    elif (
+        args.window_consumption_mode == DEDICATED_HOLDOUT_EXECUTION_MODE
+        or args.holdout_execution_authorization_path
+        or args.holdout_opening_record_path
+    ):
+        raise ValueError(
+            "dedicated holdout capability requires the frozen window contract"
         )
     runtime_contract = resolve_model_cache_runtime(
         args.model_cache_runtime_config or None,
@@ -842,8 +886,17 @@ def main() -> None:
     checkpoint_audit = checkpoint_audit_bundle["checkpoint_audit"]
     smoke_warnings = checkpoint_audit_bundle["warnings"]
 
-    benchmark_run_id = datetime.now().strftime(f"main_results_{args.window_mode}_%Y%m%d_%H%M%S_%f")
+    benchmark_run_id = args.benchmark_run_id or datetime.now().strftime(
+        f"main_results_{args.window_mode}_%Y%m%d_%H%M%S_%f"
+    )
     output_root = Path(args.output_root) / benchmark_run_id
+    if (
+        args.window_consumption_mode == DEDICATED_HOLDOUT_EXECUTION_MODE
+        and output_root.exists()
+    ):
+        raise FileExistsError(
+            f"dedicated holdout output already exists and cannot be overwritten: {output_root}"
+        )
     episode_root = output_root / "episodes"
     rows: list[dict[str, Any]] = []
     selected_workflow_ids_by_seed: dict[str, list[str]] = {}
@@ -893,6 +946,11 @@ def main() -> None:
                 formal_window_consumption_contract_path=args.formal_window_consumption_contract_path,
                 formal_window_split=args.formal_window_split,
                 expected_window_id=str(window_candidate["window_id"]),
+                window_consumption_mode=args.window_consumption_mode,
+                holdout_execution_authorization_path=(
+                    args.holdout_execution_authorization_path
+                ),
+                holdout_opening_record_path=args.holdout_opening_record_path,
             )
             mobility_bundle.rsu_metadata["window_rank"] = window_candidate.get("window_rank")
             mobility_bundle.rsu_metadata["window_class"] = window_candidate.get("window_class")
@@ -1203,6 +1261,7 @@ def main() -> None:
             if window_consumption_contract is not None
             else None
         ),
+        "dedicated_holdout_capability_validation": holdout_capability_validation,
         "outcome_blind_window_selection": window_payload.get("outcome_blind_selection", False),
         "exclude_window_plan_paths": list(args.exclude_window_plan_path),
         "excluded_window_intervals": [list(interval) for interval in excluded_window_intervals],

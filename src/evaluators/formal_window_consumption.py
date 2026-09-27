@@ -29,6 +29,10 @@ from src.evaluators.typed_model_cache_formal_protocol import (
     canonical_sha256,
     semantic_projection,
 )
+from src.evaluators.dedicated_holdout_execution import (
+    DEDICATED_HOLDOUT_EXECUTION_MODE,
+    validate_consumer_capability,
+)
 
 
 FORMAL_WINDOW_CONSUMPTION_CONTRACT_VERSION = "1.0.0"
@@ -260,15 +264,36 @@ def validate_window_plan_binding(
     rsu_layout: str,
     primary_vehicle_selection: str,
     mode: str = "formal",
+    holdout_authorization_validation: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Validate CLI/source/plan fields before any episode or checkpoint write."""
 
-    if mode not in {"formal", "rehearsal", "identity_only"}:
+    if mode not in {
+        "formal",
+        "rehearsal",
+        "identity_only",
+        DEDICATED_HOLDOUT_EXECUTION_MODE,
+    }:
         raise FormalWindowConsumptionError(f"unsupported window consumption mode: {mode}")
-    if split == "sealed_holdout" and mode != "identity_only":
-        raise FormalWindowConsumptionError("sealed holdout permits identity-only validation")
-    if split != "sealed_holdout" and mode == "identity_only":
-        raise FormalWindowConsumptionError("identity-only mode is reserved for sealed holdout")
+    if split == "sealed_holdout":
+        if mode not in {"identity_only", DEDICATED_HOLDOUT_EXECUTION_MODE}:
+            raise FormalWindowConsumptionError(
+                "sealed holdout permits identity-only validation or authorized dedicated execution"
+            )
+        if mode == DEDICATED_HOLDOUT_EXECUTION_MODE and (
+            not isinstance(holdout_authorization_validation, Mapping)
+            or holdout_authorization_validation.get("status") != "pass"
+            or holdout_authorization_validation.get("split") != "sealed_holdout"
+            or holdout_authorization_validation.get("mode")
+            != DEDICATED_HOLDOUT_EXECUTION_MODE
+        ):
+            raise FormalWindowConsumptionError(
+                "sealed holdout dedicated execution capability is missing or invalid"
+            )
+    elif mode in {"identity_only", DEDICATED_HOLDOUT_EXECUTION_MODE}:
+        raise FormalWindowConsumptionError(
+            "identity-only and dedicated holdout modes are reserved for sealed holdout"
+        )
     source = contract["source"]
     resolved = contract["resolved_source_range"]
     if int(max_mobility_rows) != int(resolved["end_row_exclusive"]):
@@ -328,14 +353,16 @@ def validate_window_plan_binding(
             raise FormalWindowConsumptionError(
                 f"window plan identity mismatch: {window['window_id']}"
             )
-    if mode == "formal" and set(expected_by_id) != {
+    if mode in {"formal", DEDICATED_HOLDOUT_EXECUTION_MODE} and set(expected_by_id) != {
         str(window["window_id"]) for window in windows
     }:
-        raise FormalWindowConsumptionError("formal command must consume the complete frozen split plan")
+        raise FormalWindowConsumptionError(
+            "scientific execution command must consume the complete frozen split plan"
+        )
     plan_sha256 = file_sha256(Path(plan_path))
     expected_plan_hash = contract["window_plans"][split]["file_sha256"]
-    if mode == "formal" and plan_sha256 != expected_plan_hash:
-        raise FormalWindowConsumptionError("formal window plan file hash mismatch")
+    if mode in {"formal", DEDICATED_HOLDOUT_EXECUTION_MODE} and plan_sha256 != expected_plan_hash:
+        raise FormalWindowConsumptionError("scientific window plan file hash mismatch")
     return {
         "status": "pass",
         "mode": mode,
@@ -584,13 +611,32 @@ def load_window_bundle_from_contract(
     split: str,
     window_id: str,
     rsu_layout: str,
+    window_consumption_mode: str = "formal",
+    holdout_execution_authorization_path: str | Path = "",
+    holdout_opening_record_path: str | Path = "",
 ) -> RealMobilityBundle:
-    if split == "sealed_holdout":
-        raise FormalWindowConsumptionError(
-            "sealed holdout cannot be loaded by a training/evaluation bundle consumer"
-        )
     contract_path_resolved = str(Path(contract_path).resolve())
     contract = load_contract(contract_path_resolved)
+    if split == "sealed_holdout":
+        if window_consumption_mode != DEDICATED_HOLDOUT_EXECUTION_MODE:
+            raise FormalWindowConsumptionError(
+                "sealed holdout cannot be loaded without dedicated execution capability"
+            )
+        if not holdout_execution_authorization_path or not holdout_opening_record_path:
+            raise FormalWindowConsumptionError(
+                "sealed holdout consumer requires authorization and opening record"
+            )
+        plan_path = contract["window_plans"][split]["path"]
+        validate_consumer_capability(
+            authorization_path=holdout_execution_authorization_path,
+            opening_record_path=holdout_opening_record_path,
+            contract_semantic_sha256=contract["hashes"]["semantic_sha256"],
+            plan_path=plan_path,
+        )
+    elif window_consumption_mode == DEDICATED_HOLDOUT_EXECUTION_MODE:
+        raise FormalWindowConsumptionError(
+            "dedicated holdout capability cannot consume a non-holdout split"
+        )
     unit = next(
         (
             item
