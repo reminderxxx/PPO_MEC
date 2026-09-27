@@ -1,5 +1,21 @@
 ﻿# Decision Log
 
+## 2026-09-28: scientific claims require mechanism opportunity before algorithm comparison
+
+- 决定：当前最多保留两项候选贡献——typed base/adapter sharing × workflow-state migration 联合机制，以及
+  controller-level graph/hierarchical prediction-aware 三头控制；在新证据完成前均标为 `UNVERIFIED`，不使用
+  first/unique、总体优越或 full-MARL 表述。
+- 决定：不得重开已永久消费且无性能结果的 G14R22D holdout。新的 confirmatory test 必须来自可证明未参与开发的
+  原始 interval/run，检查 vehicle recurrence，并先满足多 adapter/base、handoff 和未完成 workflow frontier 的
+  机制机会；不按算法 outcome 筛窗。
+- 决定：最小补证顺序固定为 Stage 0 workload-only 资格审计 → base-sharing × state-migration 2×2 factorial →
+  仅在机制贡献成立后做 controller architecture × prediction 的 matched 2×2。四臂分别同预算训练，不用评估期
+  开关替代训练期消融。
+- 决定：容量档按 reachable working-set 分布预注册，必须覆盖绑定、转折和非绑定区；576/864 MB 当前同属
+  非绑定区，不能作为 scalability 证据。统计以独立 run/window 为 outer clusters，成本与 failure/transfer 同报。
+- 边界：这是后续实验设计和 claim freeze，不授权本轮训练、评估、调参或新增机制。证据与停止规则见
+  `g14s01_innovation_algorithm_diagnosis_20260928.md`。
+
 ## 2026-09-06: provenance envelope and shared training identity are separate schemas
 
 - 决定：正式 companion 保持 17 字段完整 provenance envelope；共享 training identity 是其中由

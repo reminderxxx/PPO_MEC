@@ -5,6 +5,23 @@
 
 ﻿# Bugs And Risks
 
+## 2026-09-28: 核心机制机会、因果消融与独立测试缺口（OPEN）
+
+- formal workload 的 1,860 个 SA request 全部只请求 `adapter_batch_type_1 + veh_base_v1`，没有多 adapter
+  共享 base 的机会；因此 base-sharing 代码虽已启用，当前不能提供其收益证据。
+- `no_base_sharing`、`no_workflow_state_migration`、`fixed_no_eviction` 等预注册 typed-semantics 消融不可用；
+  handoff/migration 事件稀疏。核心机制属于“已实现但不可公平归因”，不能写成已证明贡献。
+- G12 supervised predictor 在正式路径关闭，predictor availability mask 与 causal accepted snapshot 均为 0；
+  若未来加入，应视为新机制并重新训练/评估，不能回溯归入旧 formal 方法。
+- 576/864 MB 均高于 observed reachable working-set peak 472 MB，eviction 为 0，primary outcomes/action 序列
+  相同；当前容量设计只能识别 288 MB 绑定与 ≥576 MB 非绑定，不能支持饱和曲线或 scalability claim。
+- G14R22D holdout 已永久消费，在第一档 rollout 前因 sealed-window validation interface 失败，没有性能结果，
+  永久禁止 retry/resume/reopen。G14R23 修复接口后仍未找到跨多 run 的可靠 unused range；当前没有有效独立
+  测试，paper-ready 继续为 `Unverifiable`。
+- 当前成本统计存在宿主/批次混杂，缺统一训练 wall-clock、CPU/GPU-hours、峰值 RSS 与能耗；SA inference 的
+  描述性额外开销不能升级为效率结论。修复路线与预注册实验见
+  `docs/project/g14s01_innovation_algorithm_diagnosis_20260928.md`。
+
 ## 2026-09-21: G14E07 formal 统计解释与 holdout readiness blockers（OPEN）
 
 - `formal_gate.json` 的 claim map 对已经统一为“正数有利 candidate”的 signed CI 又按 lower-is-better 二次

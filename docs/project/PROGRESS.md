@@ -5,6 +5,27 @@
 
 ﻿# Progress
 
+## 2026-09-28: G14S01 创新定位、算法有效性与最小补证设计完成
+
+- 按 `tmc_review_policy_v3_20260621` 完成只读科学审查；目标期刊仅知 B 类／B 区、目录未指定，因此不设置
+  通用录用阈值，也不作达标判断。formal、capacity-aware 纠正统计、G14R22D 已消费 holdout 与 G14R23
+  feasibility 原件已交叉核验。
+- 当前最多保留两项候选贡献：跨 RSU 连续 DAG 的 typed base/adapter cache × workflow-state migration 联合机制，
+  以及 controller-level graph/hierarchical prediction-aware 三头控制。两项均为 `UNVERIFIED`；当前实现不是
+  vehicle/RSU-level full MARL。
+- 现有正式证据仍为 `0 supported / 72 mixed / 12 contradicted`，84 项 window-level Holm 校正后无显著比较；
+  12 contradicted 不等于 12 项显著劣势。capacity-aware 统计使 14/84 个 CI lower bound、59/84 个 upper
+  bound 改变，旧 CI 不再可用。
+- 576/864 MB 重复的 first-order 根因不是容量参数失效：两档 cache-used 峰值均为 472 MB、eviction 为 0，
+  因而都处于非绑定区；288 MB 发生 81 次 SA eviction。全部 1,860 个 SA request 仅访问同一 adapter/base
+  对，正式 workload 没有 base-sharing 机会，且 handoff/migration 事件稀疏。
+- G12 supervised predictor 正式路径未启用，causal accepted snapshot 为 0；base sharing、state migration 与
+  eviction-benefit 均缺公平机制消融。旧 G14R22D holdout 已永久消费且在 rollout 前失败，无性能结果；G14R23
+  未建立新的可靠 unused range，禁止重开旧 holdout。
+- 最小补证顺序冻结为：先建立新独立数据与机制机会，再做 base-sharing × state-migration 2×2 factorial；只有
+  机制贡献成立后，才做 controller architecture × prediction 的结构匹配 2×2。完整证据、claim boundary 与
+  停止规则见 `docs/project/g14s01_innovation_algorithm_diagnosis_20260928.md`。
+
 ## 2026-09-21: G14A01 formal-only 结果独立复核与 claim freeze 完成
 
 - G14E07 `typed_model_cache_post_ablation_20260921_g14e07_pending` 已完成
