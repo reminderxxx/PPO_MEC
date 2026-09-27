@@ -9,7 +9,7 @@
 | `target_venue` | 用户暂定 B 类／B 区期刊，目录未指定；本报告不定义通用门槛，也不作“已达标”判断 |
 | `policy_version` | `tmc_review_policy_v3_20260621`（按项目规则作为更严格的内部审查框架，不等同于目标期刊） |
 | `artifact_run_id` | G14E07 formal：`typed_model_cache_post_ablation_20260921_g14e07_pending`；容量统计：`typed_model_cache_g14r22b_capacity_statistics_20260923_v1`；已消费 holdout：`typed_model_cache_holdout_20260926_g14r22d_once`；G14R23：`g14r23_holdout_interface_and_independent_test_20260927` |
-| Git | 当前主线 `ea96d286daa3af6b6e81f818b9feeaa4bdab2f80`；formal scientific `a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d` / executor `1770401ccc2f4ce15b5d5adcabdecb386fd90a05`；容量统计 artifact `d6c53b4154f84dcb398ceb0f88ace642142c0f23`、报告分支 `33d8aa8fba2361e4b0598fe193dda7ceae4816f5`；G14R23 最终报告 `5173234666ddbbb53df977a2d3a95a04f7166300` |
+| Git | 审查输入主线 `ea96d286daa3af6b6e81f818b9feeaa4bdab2f80`；formal scientific `a6d1fd822d7d0cb93f7aeadb6b621f0279d95a4d` / executor `1770401ccc2f4ce15b5d5adcabdecb386fd90a05`；容量统计 artifact `d6c53b4154f84dcb398ceb0f88ace642142c0f23`、报告分支 `33d8aa8fba2361e4b0598fe193dda7ceae4816f5`；G14R23 最终报告 `5173234666ddbbb53df977a2d3a95a04f7166300` |
 | Evidence level | formal 结果为有 provenance 的 E2 级部分证据；容量修正统计为针对性 E3；没有有效独立 holdout 性能结果，因此论文级算法/创新 claim 为 `UNVERIFIED` |
 | Verdict | **Unverifiable / Not ready for scientific performance claims**。工程闭环较完整，但当前证据不能证明候选创新带来可重复净收益，也不能证明 B 类／B 区期刊已达标。 |
 
