@@ -28,6 +28,17 @@ class DedicatedHoldoutExecutionError(ValueError):
     """Raised when a dedicated holdout capability is missing or inconsistent."""
 
 
+def _require_hex_digest(value: Any, *, field: str, length: int) -> str:
+    normalized = str(value or "").lower()
+    if len(normalized) != length or any(
+        character not in "0123456789abcdef" for character in normalized
+    ):
+        raise DedicatedHoldoutExecutionError(
+            f"dedicated holdout {field} must be a {length}-character hex digest"
+        )
+    return normalized
+
+
 def file_sha256(path: str | Path) -> str:
     import hashlib
 
@@ -118,6 +129,15 @@ def validate_authorization(
         raise DedicatedHoldoutExecutionError(
             f"dedicated holdout bindings are incomplete: {missing}"
         )
+    for field in (
+        "seal_semantic_sha256",
+        "window_consumption_contract_semantic_sha256",
+        "window_plan_file_sha256",
+        "candidate_checkpoint_manifest_sha256",
+        "statistics_contract_sha256",
+    ):
+        _require_hex_digest(bindings[field], field=field, length=64)
+    _require_hex_digest(bindings["execution_commit"], field="execution_commit", length=40)
     expected_hash = canonical_sha256(semantic_projection(authorization))
     if authorization.get("hashes", {}).get("semantic_sha256") != expected_hash:
         raise DedicatedHoldoutExecutionError("dedicated holdout authorization hash mismatch")

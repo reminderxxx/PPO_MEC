@@ -17,6 +17,7 @@ from src.evaluators.dedicated_holdout_execution import (
     DedicatedHoldoutExecutionError,
     command_semantic_sha256,
     file_sha256,
+    load_authorization,
     validate_benchmark_capability,
 )
 from src.evaluators.formal_window_consumption import (
@@ -227,8 +228,12 @@ def _authorization(
             "opening_record_path": str(opening_path),
             "output_run_id": run_id,
             "output_root": str(output_root),
-            "candidate_checkpoint_manifest_sha256": "checkpoint-free-synthetic-test",
-            "statistics_contract_sha256": "synthetic-statistics-contract",
+            "candidate_checkpoint_manifest_sha256": hashlib.sha256(
+                b"checkpoint-free-synthetic-test"
+            ).hexdigest(),
+            "statistics_contract_sha256": hashlib.sha256(
+                b"synthetic-statistics-contract"
+            ).hexdigest(),
         },
     }
     authorization = attach_hashes(authorization)
@@ -288,6 +293,23 @@ def test_actual_benchmark_preflight_rejects_unopened_authorization(
     assert completed.returncode != 0
     assert "unable to load holdout opening record" in completed.stderr
     assert not Path(authorization["bindings"]["output_root"]).exists()
+
+
+def test_checkpoint_and_statistics_bindings_require_real_sha256(
+    tmp_path: Path,
+) -> None:
+    bundle = _synthetic_bundle(tmp_path)
+    authorization_path, _, _ = _authorization(
+        tmp_path, bundle, run_id="synthetic-invalid-binding-hash"
+    )
+    authorization = json.loads(authorization_path.read_text(encoding="utf-8"))
+    authorization["bindings"]["statistics_contract_sha256"] = "not-a-hash"
+    authorization = attach_hashes(
+        {key: value for key, value in authorization.items() if key != "hashes"}
+    )
+    _write_json(authorization_path, authorization)
+    with pytest.raises(DedicatedHoldoutExecutionError, match="64-character"):
+        load_authorization(authorization_path)
 
 
 def test_authorized_production_command_runs_actual_scientific_entrypoint(
