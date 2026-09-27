@@ -3,7 +3,7 @@
 - `reviewed_at`: `2026-09-28`
 - `literature_cutoff`: `2026-09-28`
 - `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`
-- `artifact_run_id`: `N/A — literature/structure review; G14C v16 formal run not started`
+- `artifact_run_id`: `N/A — literature/structure review; G14C v16 training/dev artifacts exist, but the formal phase has not started`
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `git_commit`: `ea96d286daa3af6b6e81f818b9feeaa4bdab2f80`（审查开始时）
 - `evidence_level`: 外部论文三篇为公开全文阅读；其余为官方出版页/摘要核验。PPO_MEC 当前 paper-readiness 只到 `E1_DOCUMENTED`，因为最新 typed-cache 主线尚无正式 checkpoint、formal/holdout/support 原始结果。
