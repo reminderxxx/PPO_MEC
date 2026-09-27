@@ -610,3 +610,14 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 既有 main 源码顺序断言不等价于实际入口执行，空 rollout 列表也不构成调用计数。补充的 main 正负
 用例保留真实 generated registry、companion loader、checkpoint read 和 strict gate，并监测实际 rollout
 符号。数据准备/fairness 使用 test-only 替身，因此仍不构成完整正式 benchmark 或性能证据。
+
+## 2026-09-28 Open: 顶刊 novelty 压缩与 manuscript/evidence 闭环缺口
+
+- 最新近邻已分别覆盖 `DAG/dependent task + VEC`、`service/content cache + offloading`、`DT + prediction`、
+  `trajectory-aware migration`、`mixed/dual-timescale control`、`MARL` 以及 `agentic DAG + model loading`；上述任一
+  单点均不能继续作为 PPO_MEC 的核心 novelty。
+- 当前可守边界是“跨 RSU 连续 DAG + typed base/adapter/workflow-state cache + handoff prepare/state migration +
+  可审计三时间尺度控制”的交集，但尚缺 formal/independent holdout/support、机制 endpoint、完整 manuscript 与
+  claim-to-artifact 映射，故 TMC-ready 只能判为 `Unverifiable`。
+- 后续必须保持 controller-level MARL、`semantic_discrete_5`、受控 adapter mapping、policy guard 和 learned predictor
+  的归因边界；不得把 `NGSIM + Alibaba` 写成真实 adapter request trace，或把 readiness/checkpoint inventory 写成性能证据。

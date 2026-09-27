@@ -1865,3 +1865,10 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 ## 2026-09-08 G14R20-A 实现与只读验收
 
 独立合同/schema/validator/CLI、追加勘误及 B 接口已实现。全仓 1362 passed、2 skipped；真实 150 checkpoint / 44 active resources / 6 generated resources 通过只读检查。原始授权证据仍 unavailable，executor/独立批准 pending，v16-B 不获执行许可。详见 `fixed_commit_continuation_acceptance.md`。
+
+## 2026-09-28 顶刊论文结构与缺口审查
+
+- 按 `tmc_review_policy_v3_20260621` 完成公开文献检索与三篇全文结构审查，覆盖 TMC/IoTJ 的 VEC AI task、DT resource competition 和 mobility-aware cooperative caching，并以 AWTO 补充 agentic DAG + edge model-loading 最近邻。
+- `docs/project/literature_reference_table.md` 新增 10 篇相关近邻，包含 TMC delay-reliability/cache-assisted offloading、TITS multi-edge/multi-vehicle orchestration、IoTJ DAG meta-RL、FGCS DT dual-timescale cache/offload、JSA agentic workflow scheduling 等；查重审计为 119 entries、title/DOI/URL duplicate 均为 0。
+- 新增 `docs/project/top_journal_paper_structure_gap_review_20260928.md`，逐段拆解 Introduction、全文论证链、可模仿写法和 PPO_MEC 缺口，并给出 9 段 Introduction 模板。
+- 当前 TMC-ready verdict 仍为 `Unverifiable / E1_DOCUMENTED`：G14C v16 formal/holdout/support 未闭环，仓库未发现 integrated manuscript；本轮没有修改算法、配置或实验结果。
