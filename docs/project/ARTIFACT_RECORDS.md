@@ -9,12 +9,13 @@
 
 - path：`artifacts/analysis/g14r23_holdout_interface_and_independent_test_20260927/`；代码分支：
   `codex/g14r23-holdout-interface-review`。
-- `interface_integration_junit.xml` 覆盖 production launcher → actual benchmark parser/preflight → authorized
+- `targeted_tests_junit.xml` 与 `full_tests_junit.xml` 覆盖 production launcher → actual benchmark parser/preflight → authorized
   `dedicated_holdout_execution` → window consumer → actual episode，以及未 opening、identity drift、post-open failure/
-  second-open rejection。全部数据为 pytest 临时 synthetic fixture，真实 sealed holdout execution count=0。
+  second-open rejection；定向测试 `209 passed`，全量测试 `1366 passed, 2 skipped`。全部执行数据为 pytest 临时
+  synthetic fixture，真实 sealed holdout execution count=0。
 - `new_independent_test_feasibility.json` 与 `completion_receipt.json` 只消费 metadata/历史窗口 identity 和车辆 ID；
-  不解析 performance，不运行 agent。proposal 保持 unsigned/unsealed/unexecuted，并显式记录 same-source/segment/
-  workflow correlation 边界。
+  不解析 performance，不运行 agent。结论为 `NO_RELIABLE_UNUSED_RANGE_ESTABLISHED`，proposal status=`not_created`，
+  并显式记录 same-source/segment/workflow correlation 边界。
 - evidence level=`E2_METADATA_AND_SYNTHETIC_EXECUTION_CONTRACT_VALIDATED_NO_REAL_HOLDOUT_PERFORMANCE`；不构成
   algorithm ranking、holdout result、canonical 晋级或 paper-ready 证据。
 

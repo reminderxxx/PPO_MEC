@@ -6,7 +6,7 @@ G14R23：dedicated one-time holdout authorization/consumer validator 位于
 `src/evaluators/formal_window_consumption.py` 分别执行 parser/preflight 与 per-window revalidation。
 metadata-only 新测试审计入口为 `scripts/audit_new_independent_test_feasibility.py`，证据根为
 `artifacts/analysis/g14r23_holdout_interface_and_independent_test_20260927/`。仓库不保存真实 authorization/token，
-proposal 不可执行。
+当前 proposal status=`not_created`，未生成新 split/seal。
 
 G14R18：唯一 active Protocol 2.9、ready index 与 Readiness v21 位于
 `configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/`；共享 8-field parser 位于

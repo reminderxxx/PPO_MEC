@@ -10,7 +10,8 @@
   corrected statistics contract、opening path 与 output root/run ID；parser/preflight 和 window consumer 均 fail-closed
   重验，不只信任 outer launcher。
 - 决定：新独立测试候选只能以 result-blind metadata rule 提案；本任务 `execution_authorized=false`、不签 grant、
-  不建新 executable seal、不运行算法。时间不重叠与零车辆复现仍不等于 external/pristine independence。
+  不建新 executable seal、不运行算法。当前数据未满足 12-window/至少3-run 条件，proposal status=`not_created`。
+  时间不重叠与零车辆复现仍不等于 external/pristine independence。
 - 边界：接口能力存在不等于现有 G14E07 或 Protocol 2.9 自动获得 holdout authorization；旧 consumed/invalid run、
   ledger、窗口与失败证据不修改，普通 formal runner 的 `holdout_capability=false` 不变。
 

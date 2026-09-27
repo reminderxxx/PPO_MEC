@@ -1,0 +1,9 @@
+{
+  "execution_authorized": false,
+  "new_test_run_executed": false,
+  "proposed_window_count": 0,
+  "report_path": "/Users/howen/Projects/PPO_MEC_g14r23/artifacts/analysis/g14r23_holdout_interface_and_independent_test_20260927/new_independent_test_feasibility.json",
+  "report_semantic_sha256": "57fd1aa8d5606b2876be2e655222e84b916e6cda7090bcba502092e506944e11",
+  "status": "completed",
+  "verdict": "NO_RELIABLE_UNUSED_RANGE_ESTABLISHED"
+}

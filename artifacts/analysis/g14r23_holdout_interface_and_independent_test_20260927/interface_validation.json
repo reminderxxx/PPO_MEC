@@ -1,0 +1,70 @@
+{
+  "artifact_run_id": "g14r23_holdout_interface_and_independent_test_20260927",
+  "reviewed_at": "2026-09-27",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "implementation_git_commit": "78bc38486616b65ee0c13f49ebea24d965ded436",
+  "evidence_level": "E2_METADATA_AND_SYNTHETIC_EXECUTION_CONTRACT_VALIDATED_NO_REAL_HOLDOUT_PERFORMANCE",
+  "status": "pass_interface_repair",
+  "root_cause": [
+    "benchmark_main_results preflight unconditionally rejected sealed_holdout",
+    "window binding allowed sealed_holdout only through identity_only",
+    "the final bundle consumer unconditionally rejected sealed_holdout",
+    "prior tests did not execute the composed production command through the scientific episode entrypoint"
+  ],
+  "repaired_chain": [
+    "scripts/run_dedicated_holdout_benchmark.py production command builder and one-time launcher",
+    "scripts/benchmark_main_results.py actual argparse and preflight",
+    "issued hash-bound dedicated_holdout_execution authorization plus append-only opening record",
+    "validate_window_plan_binding complete sealed split binding",
+    "load_window_bundle_from_contract per-window capability revalidation",
+    "run_real_episode actual scientific execution entrypoint"
+  ],
+  "guard_invariants": {
+    "identity_only_is_metadata_only": true,
+    "ordinary_formal_or_rehearsal_cannot_execute_sealed_holdout": true,
+    "existing_validate_split_access_retained": true,
+    "existing_append_only_opening_guard_retained": true,
+    "opening_precedes_child_execution": true,
+    "post_open_child_failure_remains_consumed": true,
+    "second_open_rejected": true,
+    "dedicated_output_overwrite_rejected": true
+  },
+  "integration_cases": {
+    "legal_dedicated_opening": "passed_actual_12_window_benchmark_episode_chain",
+    "unopened_or_unauthorized": "rejected_by_actual_benchmark_preflight_before_output",
+    "ordinary_or_missing_capability": "rejected_by_window_binding",
+    "window_plan_identity_conflict": "rejected_by_actual_benchmark_preflight_before_episode",
+    "post_open_child_error": "failed_with_append_only_consumed_record_retained",
+    "second_open": "rejected_record_already_exists"
+  },
+  "validation": {
+    "targeted_test_count": 209,
+    "targeted_failures": 0,
+    "targeted_skipped": 0,
+    "junit_path": "artifacts/analysis/g14r23_holdout_interface_and_independent_test_20260927/targeted_tests_junit.xml",
+    "junit_sha256": "317514ee719080c5517b07f14ca7a4b3ae62e430e06c8014d7e59dd0c9b4b43c",
+    "full_test_count": 1368,
+    "full_passed": 1366,
+    "full_failures": 0,
+    "full_skipped": 2,
+    "full_junit_path": "artifacts/analysis/g14r23_holdout_interface_and_independent_test_20260927/full_tests_junit.xml",
+    "full_junit_sha256": "0c47b6009c0f1bd3dfe1a1624cea2def87dd1afdd163164d84618b001c195dd2",
+    "smoke_test": "pass",
+    "compile_import_check": "pass",
+    "git_diff_check": "pass"
+  },
+  "execution_boundary": {
+    "fixture": "pytest temporary synthetic NGSIM and Alibaba metadata",
+    "real_sealed_holdout_read": false,
+    "real_sealed_holdout_executed": false,
+    "real_grant_signed": false,
+    "real_token_issued": false,
+    "training_executed": false,
+    "tuning_executed": false,
+    "checkpoint_changed": false,
+    "original_result_changed": false,
+    "performance_claims": [],
+    "paper_ready": false
+  }
+}

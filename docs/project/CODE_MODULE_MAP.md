@@ -10,8 +10,8 @@
   非 holdout split、缺 authorization/opening、命令漂移与 output overwrite 拒绝。
 - `src/evaluators/formal_window_consumption.py` 与 `src/evaluators/main_results_support.py`：window binding 和最终 bundle
   consumer 重验 capability；`identity_only` 保持 metadata-only。
-- `scripts/audit_new_independent_test_feasibility.py`：只读 selected-window metadata 与车辆 identity，生成 unsigned、
-  unsealed、unexecuted 的 prospective temporal-test proposal。
+- `scripts/audit_new_independent_test_feasibility.py`：只读 selected-window metadata 与车辆 identity，输出可行性报告；
+  当前相关性 gate 未通过，因此 proposal status=`not_created`，不生成 split/seal/grant。
 - `tests/test_dedicated_holdout_execution.py`：synthetic 组合链正例、未授权、identity conflict、post-open failure 与
   second-open rejection；不读取真实 sealed holdout。
 

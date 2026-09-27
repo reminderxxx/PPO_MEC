@@ -10,12 +10,12 @@
 - `RESOLVED`：真实 sealed execution 不再借用 `identity_only`；只有 hash-bound issued authorization + 原 append-only
   opening record 才能进入 `dedicated_holdout_execution`。普通 benchmark 与 window consumer 的 sealed guard 保留，
   无授权、身份漂移、重复 opening、output overwrite 均 fail-closed。
-- `OPEN / approval`：本任务只形成 metadata-only 新测试 proposal，不签 grant、不建 executable seal、不发 token、
-  不运行新测试。任何后续执行必须另立批准任务，并绑定现有 immutable candidate/checkpoint、corrected statistics 与
-  exact command/output identity。
-- `OPEN / scientific independence`：即使存在未使用且零观察车辆复现的候选区间，它们仍来自同一 NGSIM I-80
-  source/road segment，可能共享 capture session/segment-run，且 Alibaba workflow 与 controlled catalog 不变。
-  因而最多称 prospective internal temporal test，不得写成 pristine external holdout 或完全独立数据集。
+- `OPEN / approval`：现有范围未通过相关性 gate，本任务不形成新 split/seal proposal、不签 grant、不建 executable
+  seal、不发 token、不运行新测试。若未来新增数据解除 blocker，必须另立批准任务，并绑定现有 immutable
+  candidate/checkpoint、corrected statistics 与 exact command/output identity。
+- `OPEN / scientific independence`：metadata 审计发现的 14 个历史车辆零复现候选全部来自同一
+  `i_80_run_001` capture session；候选间车辆复现过滤后仅 2 个，无法满足 12-window/至少3-run 的预冻结条件。
+  当前结论为 `NO_RELIABLE_UNUSED_RANGE_ESTABLISHED`，不得虚构 pristine 状态或用放宽相关性规则补造 split。
 - G14E07 的 delay survivor conditioning、4/6 typed ablation unavailable、capacity/eviction discrimination 和
   external generalization blocker 均未由本接口修复消除；paper-ready 仍为 `Unverifiable`。
 

@@ -31,7 +31,8 @@ opening 后任何错误均永久 consumed，不允许以换 token、换路径、
   --output-root artifacts/analysis/g14r23_holdout_interface_and_independent_test_20260927
 ```
 
-输出只是 `pending_independent_approval` proposal；不得据此签 grant、生成 executable seal 或运行新测试。
+当前输出为 `NO_RELIABLE_UNUSED_RANGE_ESTABLISHED` 可行性报告，proposal status=`not_created`；不得据此签 grant、
+生成 executable seal 或运行新测试。若未来新数据满足冻结条件，必须另立任务形成待批准方案。
 
 ## Protocol 2.9 与未来 G14C v16
 

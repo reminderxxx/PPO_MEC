@@ -17,9 +17,11 @@
 - synthetic sealed split 上真实运行最终 production command，覆盖 actual parser/preflight、12-window consumer 和
   actual benchmark episode；同时覆盖未 opening 拒绝、身份冲突、opening 后 child failure 仍永久 consumed 且二次
   opening 拒绝。真实 sealed holdout、真实 token/checkpoint/performance 均未读取或执行。
-- 全历史可行性审计仅读取 selected-window identity metadata 与 NGSIM `Vehicle_ID/Location/Global_Time`，不解析
-  performance，不运行 agent；待批准 proposal 固定结果无关选择、new split/seal、现有 immutable checkpoint 和
-  corrected window-level statistics 的绑定。`execution_authorized=false`、`grant_signed=false`、`seal_created=false`。
+- 全历史可行性审计仅读取 3,957 个 selected-window metadata 文件/90,640 个引用及 NGSIM
+  `Vehicle_ID/Location/Global_Time`，不解析 performance、不运行 agent。60 个后续 I-80 intervals 排除后有 519 个
+  非重叠候选，历史车辆复现过滤剩 14 个，但全部集中于同一 `i_80_run_001`；候选间车辆复现过滤后只有 2 个，
+  未满足冻结的 12-window/至少3-run 条件。结论为 `NO_RELIABLE_UNUSED_RANGE_ESTABLISHED`；不创建新 split/seal
+  proposal，`execution_authorized=false`、`grant_signed=false`、`seal_created=false`。
 - 结论边界：这不是 holdout 执行、算法优势、canonical 晋级或 paper-ready 证据。完整审查见
   `docs/project/g14r23_holdout_interface_and_independent_test_review.md`。
 
