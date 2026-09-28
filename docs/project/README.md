@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `research_problem_and_evidence_plan_20260928.md`：主问题/三个子问题、近邻文献边界、设计实现差距、失败成本独立复算与有停止规则的补证路线
+
 - `g14s01_innovation_algorithm_diagnosis_20260928.md`：相对最近邻的创新边界、formal/capacity/holdout 原件复核、
   controller-level 算法身份、核心机制调用证据、576/864 MB 非绑定根因，以及两阶段最小补证实验与 claim freeze
 

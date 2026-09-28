@@ -1,5 +1,12 @@
 ﻿# Decision Log
 
+## 2026-09-28: 问题驱动补证，而非预设算法赢家
+
+- 研究目标是受资源约束的跨RSU workflow完成与成本，不是让SA名称保留或综合分数获胜。
+- 数学正确性诊断优先于扩训练；修复实验、物理机制消融、适应后策略消融与确认性泛化分开报告。
+- 新增成本比率保留全部失败成本，只作事后诊断，不回写冻结正式指标或按结果改权重。
+- 下一阶段详细设计见 `research_problem_and_evidence_plan_20260928.md`；本记录不授权开启holdout或无限调参。
+
 ## 2026-09-28: scientific claims require mechanism opportunity before algorithm comparison
 
 - 决定：当前最多保留两项候选贡献——typed base/adapter sharing × workflow-state migration 联合机制，以及

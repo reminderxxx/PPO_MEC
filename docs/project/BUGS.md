@@ -5,6 +5,15 @@
 
 ﻿# Bugs And Risks
 
+## 2026-09-28: 开发矩阵的效率解释与设计实现差距（OPEN）
+
+- CRDCM开发矩阵只有3个outer windows；SA 18/36与PPO 27/36不能支持SA总体优势。
+- 保留失败成本后MB/完成workflow为SA412.889、PPO378.667；按成功request归一化方向不同，禁择分母。
+- 当前五动作实现不能选择任意future critical object，不得用对象级联合优化的设计文字代替实际方法。
+- 机制任务的首因诊断报告behavior/update distribution缺口，性能归因待数学复核及新匹配修复实验；
+  中央本轮只独立复算成本与完成数，未重跑梯度审计。不得因缺陷存在即断言修复后必优于PPO。
+- 详见 `research_problem_and_evidence_plan_20260928.md`。
+
 ## 2026-09-28: 核心机制机会、因果消融与独立测试缺口（OPEN）
 
 - formal workload 的 1,860 个 SA request 全部只请求 `adapter_batch_type_1 + veh_base_v1`，没有多 adapter
