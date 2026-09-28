@@ -1,0 +1,28 @@
+{
+  "evaluation_version": "crdcm_paired_development_evaluation_v2",
+  "status": "SUCCEEDED",
+  "smoke": true,
+  "episode_count": 5,
+  "environment_step_cap": 100,
+  "checkpoint_manifest_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/checkpoint_manifest.json",
+  "checkpoint_manifest_sha256": "f23db10964535e8cf8edd9d40355008e46575a2d3e672f3a556031deabfb51aa",
+  "checkpoint_hashes_before": {
+    "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke/checkpoints/latest.pt": "cd22d50661c9cf6252a055623aeeb1c5b4c4d419b65e52f2b4e3b22827359084",
+    "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke/checkpoints/latest.pt": "0a70f895d3fa1fd561398ac0eb60e195d93840c67d41509818e7b635fc3cd736",
+    "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_mappo/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke/checkpoints/latest.pt": "8f501639ecf68225fe62da300d8c7369511edb4084ebbb0206372acb496ca96b",
+    "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_ppo/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke/checkpoints/latest.pt": "bf2dbbb7660fe7694b919cccaf11e1060a26345f00fef6313c34bdfab05e48e0"
+  },
+  "checkpoint_hashes_after": {
+    "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke/checkpoints/latest.pt": "cd22d50661c9cf6252a055623aeeb1c5b4c4d419b65e52f2b4e3b22827359084",
+    "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke/checkpoints/latest.pt": "0a70f895d3fa1fd561398ac0eb60e195d93840c67d41509818e7b635fc3cd736",
+    "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_mappo/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke/checkpoints/latest.pt": "8f501639ecf68225fe62da300d8c7369511edb4084ebbb0206372acb496ca96b",
+    "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_ppo/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke/checkpoints/latest.pt": "bf2dbbb7660fe7694b919cccaf11e1060a26345f00fef6313c34bdfab05e48e0"
+  },
+  "config_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/configs/experiment/crdcm_performance_matrix_v2.yaml",
+  "config_sha256": "fb26d5cdbe7e5bedea70b36153f533f55cbbbd9977aac41e5cf7d7ccac64634c",
+  "data_role": "historically_observed_paired_development_resubstitution_not_formal_not_holdout",
+  "formal": false,
+  "holdout": false,
+  "claim_boundary": "This is a frozen observed-data development falsification matrix. It does not use or reopen a consumed holdout, and it cannot support novelty, independent generalization, formal superiority, convergence, or paper-ready claims. CRDCM novelty remains UNVERIFIED. Full training and the paired development evaluation require a separate execution authorization after implementation review.",
+  "elapsed_seconds": 1.613
+}

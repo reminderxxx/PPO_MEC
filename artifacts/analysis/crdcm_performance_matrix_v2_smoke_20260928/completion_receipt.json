@@ -1,0 +1,76 @@
+{
+  "runner_version": "crdcm_performance_matrix_runner_v2",
+  "status": "SUCCEEDED",
+  "started_at": "2026-09-28T05:43:48.576765+00:00",
+  "completed_at": "2026-09-28T05:43:56.922640+00:00",
+  "return_code": 0,
+  "failure": null,
+  "command_manifest_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/command_manifest.json",
+  "command_manifest_sha256": "41517875f9dbb0e07653d2d80dee2f683f84c8546c4918a1383b775fa2662155",
+  "child_receipts": [
+    {
+      "condition_id": "crdcm_full_sa",
+      "seed": 1401,
+      "run_id": "crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke",
+      "started_at": "2026-09-28T05:43:48.577250+00:00",
+      "completed_at": "2026-09-28T05:43:50.319971+00:00",
+      "return_code": 0,
+      "stdout_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/logs/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke.stdout.log",
+      "stderr_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/logs/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke.stderr.log"
+    },
+    {
+      "condition_id": "crdcm_signal_off_sa",
+      "seed": 1401,
+      "run_id": "crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke",
+      "started_at": "2026-09-28T05:43:50.321424+00:00",
+      "completed_at": "2026-09-28T05:43:51.923728+00:00",
+      "return_code": 0,
+      "stdout_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/logs/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke.stdout.log",
+      "stderr_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/logs/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke.stderr.log"
+    },
+    {
+      "condition_id": "crdcm_full_mappo",
+      "seed": 1401,
+      "run_id": "crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke",
+      "started_at": "2026-09-28T05:43:51.925156+00:00",
+      "completed_at": "2026-09-28T05:43:53.291933+00:00",
+      "return_code": 0,
+      "stdout_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/logs/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke.stdout.log",
+      "stderr_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/logs/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke.stderr.log"
+    },
+    {
+      "condition_id": "crdcm_full_ppo",
+      "seed": 1401,
+      "run_id": "crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke",
+      "started_at": "2026-09-28T05:43:53.292709+00:00",
+      "completed_at": "2026-09-28T05:43:54.592284+00:00",
+      "return_code": 0,
+      "stdout_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/logs/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke.stdout.log",
+      "stderr_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/logs/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke.stderr.log"
+    }
+  ],
+  "expected_child_count": 4,
+  "completed_child_count": 4,
+  "evaluation_receipt": {
+    "command": [
+      "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "/Users/howen/.codex/worktrees/1aed/PPO_MEC/scripts/evaluate_crdcm_frozen_checkpoints.py",
+      "--config",
+      "/Users/howen/.codex/worktrees/1aed/PPO_MEC/configs/experiment/crdcm_performance_matrix_v2.yaml",
+      "--data-root",
+      "/Users/howen/Projects/PPO_MEC",
+      "--checkpoint-manifest",
+      "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/checkpoint_manifest.json",
+      "--output-dir",
+      "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/evaluation",
+      "--smoke"
+    ],
+    "return_code": 0,
+    "stdout_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/logs/evaluation.stdout.log",
+    "stderr_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/logs/evaluation.stderr.log",
+    "result_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/evaluation/evaluation_receipt.json"
+  },
+  "automatic_retry_count": 0,
+  "performance_result_eligible": false,
+  "algorithm_superiority_claim_allowed": false
+}

@@ -1,0 +1,122 @@
+{
+  "checkpoint_manifest_version": "crdcm_checkpoint_manifest_v2",
+  "study_version": "crdcm_performance_matrix_v2",
+  "execution_scope": "implementation_smoke",
+  "created_at": "2026-09-28T05:43:54.592967+00:00",
+  "fixed_endpoint": "latest.pt after implementation smoke",
+  "metric_based_selection": false,
+  "entries": [
+    {
+      "condition_id": "crdcm_full_sa",
+      "agent_name": "crdcm_sa_ghmappo",
+      "crdcm_feature_mode": "full",
+      "seed": 1401,
+      "episodes": 2,
+      "update_count": 1,
+      "checkpoint_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke/checkpoints/latest.pt",
+      "checkpoint_size_bytes": 2118329,
+      "checkpoint_sha256": "cd22d50661c9cf6252a055623aeeb1c5b4c4d419b65e52f2b4e3b22827359084",
+      "parameter_identity": {
+        "before_training": {
+          "sha256": "6d3c5af8130695f7767c93b25baf4f3aa59209b9b116701f928d8944fde47a7c",
+          "tensor_count": 64,
+          "parameter_count": 167696,
+          "all_finite": true
+        },
+        "after_training": {
+          "sha256": "f49071670e98fa23b5bdb2033f53d920e8ace451a61bee31f8786544c60ab536",
+          "tensor_count": 64,
+          "parameter_count": 167696,
+          "all_finite": true
+        },
+        "changed": true
+      },
+      "train_summary_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke/train_summary.json",
+      "train_summary_sha256": "b0ae1ddd8b235cd9a65f9e991275d84327724d954326d64d1278ddbecbeeb551"
+    },
+    {
+      "condition_id": "crdcm_signal_off_sa",
+      "agent_name": "crdcm_sa_ghmappo",
+      "crdcm_feature_mode": "signal_off",
+      "seed": 1401,
+      "episodes": 2,
+      "update_count": 1,
+      "checkpoint_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke/checkpoints/latest.pt",
+      "checkpoint_size_bytes": 2096093,
+      "checkpoint_sha256": "0a70f895d3fa1fd561398ac0eb60e195d93840c67d41509818e7b635fc3cd736",
+      "parameter_identity": {
+        "before_training": {
+          "sha256": "6d3c5af8130695f7767c93b25baf4f3aa59209b9b116701f928d8944fde47a7c",
+          "tensor_count": 64,
+          "parameter_count": 167696,
+          "all_finite": true
+        },
+        "after_training": {
+          "sha256": "3ff80448e277941c21a5ade54d12d5deb126f6a0ab3ce19f1c3f5d0dd2fe20c6",
+          "tensor_count": 64,
+          "parameter_count": 167696,
+          "all_finite": true
+        },
+        "changed": true
+      },
+      "train_summary_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke/train_summary.json",
+      "train_summary_sha256": "dea0d744390e1287219ca9099a6b380b9bce8d8807437f984152e17910d1edce"
+    },
+    {
+      "condition_id": "crdcm_full_mappo",
+      "agent_name": "crdcm_mappo",
+      "crdcm_feature_mode": "full",
+      "seed": 1401,
+      "episodes": 2,
+      "update_count": 1,
+      "checkpoint_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_mappo/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke/checkpoints/latest.pt",
+      "checkpoint_size_bytes": 566713,
+      "checkpoint_sha256": "8f501639ecf68225fe62da300d8c7369511edb4084ebbb0206372acb496ca96b",
+      "parameter_identity": {
+        "before_training": {
+          "sha256": "e852af6a04b4aec01d7c8075eaa17990b9d2c1f99dd5c95b72d60aecdbb45b29",
+          "tensor_count": 32,
+          "parameter_count": 41552,
+          "all_finite": true
+        },
+        "after_training": {
+          "sha256": "56bc2f8afeed5b936acc7fcb140c8866a98efb66766c513e7b113fc976515d43",
+          "tensor_count": 32,
+          "parameter_count": 41552,
+          "all_finite": true
+        },
+        "changed": true
+      },
+      "train_summary_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_mappo/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke/train_summary.json",
+      "train_summary_sha256": "a485200b9d56441dba5a82a217fc4606888a2aceca1fc7ae1017bfd6846a26e6"
+    },
+    {
+      "condition_id": "crdcm_full_ppo",
+      "agent_name": "crdcm_ppo",
+      "crdcm_feature_mode": "full",
+      "seed": 1401,
+      "episodes": 2,
+      "update_count": 1,
+      "checkpoint_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_ppo/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke/checkpoints/latest.pt",
+      "checkpoint_size_bytes": 350429,
+      "checkpoint_sha256": "bf2dbbb7660fe7694b919cccaf11e1060a26345f00fef6313c34bdfab05e48e0",
+      "parameter_identity": {
+        "before_training": {
+          "sha256": "4f5c5b96d1ec9ff0c82fec12b2a5aeed3982dbcdec0ef0cee18b2a31c9e5b245",
+          "tensor_count": 20,
+          "parameter_count": 24652,
+          "all_finite": true
+        },
+        "after_training": {
+          "sha256": "d5fce0f3d6c0871a3329756e4d5602e905bd4228bc7d0a0f33b6727a2bd712f1",
+          "tensor_count": 20,
+          "parameter_count": 24652,
+          "all_finite": true
+        },
+        "changed": true
+      },
+      "train_summary_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/runs/crdcm_ppo/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke/train_summary.json",
+      "train_summary_sha256": "dc5549436566651dd542258be449579730a19fd9a67a17105404d43050886bd7"
+    }
+  ]
+}

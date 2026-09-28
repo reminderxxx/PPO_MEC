@@ -6,6 +6,7 @@
 - `artifact_run_id`: `crdcm_performance_matrix_v2_smoke_20260928`
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `implementation_base_commit`: `df6048c0bbcbe83ee95aab6057b6e64f09af0a87`
+- `implementation_commit`: `ada35e6587e256cb2c7920d6255dfd4457c13fa3`
 - `evidence_level`: `E2_ARTIFACT_AUDITED`，仅限实现链路 smoke；性能与 novelty 仍为 `UNVERIFIED`
 - `verdict`: `PASS for executable matrix plumbing / UNVERIFIED for CRDCM advantage and novelty`
 
@@ -114,12 +115,17 @@ checkpoint 记录 observation/action/credit/feature-mode 版本和独立 residua
 
 Smoke artifact：`artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/`。四个 child return code 均为 0，
 stderr 均为空；completion/evaluation receipt 为 `SUCCEEDED`，无 retry。checkpoint 大小分别约 2.12/2.10/0.57/0.35 MB；
-artifact 总计约 12 MB，自排除 integrity manifest 覆盖 48 个文件。
+artifact 总计约 12 MB，自排除 integrity manifest 覆盖 49 个文件。
 
 本机 smoke wall-clock 约 8.35 秒，但它只包含 149 actual steps，不能线性保证 full 时间。按 18,480-step cap、12 次
 training process 初始化和 156 次评价保守估计 CPU wall-clock 约 12–30 分钟；未实测峰值 RSS/GPU-hours/能耗。
 按 smoke episode JSON 均值约 0.64 MB 外推，full root 预计约 0.6–1.0 GB；这些是 capacity planning estimate，
 不是完成 receipt。
+
+Smoke 在 implementation commit 创建前执行，manifest 因而记录 base HEAD `df6048c`。随后只增加 integrity emission、
+避免 final digest 重算以及测试/文档，没有改变科学条件、训练/评价 argv 或预算，也没有追加 episode；提交后的代码对
+四个 checkpoint 做了 no-step load 验证。`implementation_source_audit.json` 显式记录该 post-hoc binding。它不能替代
+正式性能 provenance，进一步支持本 artifact 只能作为 implementation smoke 的边界。
 
 ## 禁止表述与后续停点
 

@@ -1,0 +1,23 @@
+{
+  "status": "pass_with_explicit_execution_commit_boundary",
+  "smoke_manifest_recorded_head": "df6048c0bbcbe83ee95aab6057b6e64f09af0a87",
+  "implementation_commit": "ada35e6587e256cb2c7920d6255dfd4457c13fa3",
+  "implementation_commit_pushed": true,
+  "post_smoke_changes_before_implementation_commit": [
+    "runner added self-excluding artifact integrity emission",
+    "training summary reuses one computed final parameter digest instead of computing it twice",
+    "tests and documentation were completed"
+  ],
+  "post_smoke_scientific_or_budget_change": false,
+  "post_smoke_additional_episode_count": 0,
+  "post_smoke_validation": "all four smoke checkpoints loaded with the committed agent code; no-step only",
+  "source_files": {
+    "configs/experiment/crdcm_performance_matrix_v2.yaml": "fb26d5cdbe7e5bedea70b36153f533f55cbbbd9977aac41e5cf7d7ccac64634c",
+    "scripts/run_crdcm_performance_matrix.py": "460fbf7f1979dd487b8ceb1c3be0f3fd485bb035cabff7df48bf9640eda88d1f",
+    "scripts/evaluate_crdcm_frozen_checkpoints.py": "c67aeb04426ab87c710c10662bda3e40ffa4011ee3741e529b5cb31ac0e173c6",
+    "scripts/train_algo_pool_real_sample.py": "696ead7092125917387b7627800469be6641d29c5a1f1b4ef2d03f76bc508856",
+    "src/agents/crdcm_agent.py": "b67d2e081b7e6259f22c7a26151a448e5aa2375d0bf9bd1d557132602eb474b7",
+    "tests/test_crdcm_performance_matrix.py": "ab7136aaa9a9d339b685703e01a8885e9a0126fcf56215c0a266c9a167be4087"
+  },
+  "claim_boundary": "The smoke was executed before the implementation commit was created. The exact config hash is recorded, and committed code loads all checkpoints, but this post-hoc source binding is not a performance provenance substitute. The smoke remains implementation-only."
+}

@@ -1591,6 +1591,9 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 - Scope：四个 unique learned conditions 各 2 training episodes，合计 104 actual training steps；四个 restored
   checkpoints + 一个 matched heuristic unit，5 evaluation episodes / 45 actual steps；总计 13 episodes / 149 steps。
 - Evidence：完整 command manifest、source/venv/interval audit、四 child receipts、parameter before/after finite digests、
-  checkpoint manifest、restore evaluation、checkpoint before/after hashes、terminal receipt 和 48-file integrity manifest。
+  checkpoint manifest、restore evaluation、checkpoint before/after hashes、terminal receipt 和 49-file integrity manifest。
 - Boundary：implementation-only smoke，`performance_result_eligible=false`；完整 768-training + 156-evaluation matrix
   未启动，full root 不存在。不是 formal/holdout、algorithm advantage、novelty、convergence 或 paper-ready evidence。
+- Identity：implementation commit=`ada35e6587e256cb2c7920d6255dfd4457c13fa3`（已 push）；smoke manifest 记录执行前
+  base HEAD=`df6048c0bbcbe83ee95aab6057b6e64f09af0a87`，post-hoc source boundary 和 no-step committed-code load 见
+  `implementation_source_audit.json`，不得把它升级为 performance provenance。

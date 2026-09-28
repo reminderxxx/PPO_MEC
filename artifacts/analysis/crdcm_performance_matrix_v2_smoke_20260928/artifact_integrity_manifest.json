@@ -1,0 +1,253 @@
+{
+  "artifact_integrity_manifest_version": "1.0.0",
+  "self_excluding": true,
+  "status": "pass",
+  "file_count": 49,
+  "files": [
+    {
+      "path": "checkpoint_manifest.json",
+      "size_bytes": 6059,
+      "sha256": "f23db10964535e8cf8edd9d40355008e46575a2d3e672f3a556031deabfb51aa"
+    },
+    {
+      "path": "command_manifest.json",
+      "size_bytes": 19986,
+      "sha256": "41517875f9dbb0e07653d2d80dee2f683f84c8546c4918a1383b775fa2662155"
+    },
+    {
+      "path": "completion_receipt.json",
+      "size_bytes": 4878,
+      "sha256": "a4bb21e739305632c86867a2469b9f6a8b176e157123708603d2d6883daf6d63"
+    },
+    {
+      "path": "evaluation/aggregate.json",
+      "size_bytes": 2668,
+      "sha256": "9f9fb8a013d5f90680e767d0c3a839da10665188e861a2b595a15abb170df1b0"
+    },
+    {
+      "path": "evaluation/episodes/crdcm_critical_path_heuristic/capacity_competition_0.json",
+      "size_bytes": 427303,
+      "sha256": "ea7566657296ecde0c86dab1d9fa6b7c98709237c135dce5b16e9f68cbba11e6"
+    },
+    {
+      "path": "evaluation/episodes/crdcm_full_mappo/seed_1401/capacity_competition_0.json",
+      "size_bytes": 459219,
+      "sha256": "5294cb3a94e3d8db541eb01650a1a9bc44655c28f832822a30323ac8251ed996"
+    },
+    {
+      "path": "evaluation/episodes/crdcm_full_ppo/seed_1401/capacity_competition_0.json",
+      "size_bytes": 456492,
+      "sha256": "8ab463b20905482143d1ae14d8c37a69dd3d0d63f175eafb8f66d26f5d77a117"
+    },
+    {
+      "path": "evaluation/episodes/crdcm_full_sa/seed_1401/capacity_competition_0.json",
+      "size_bytes": 459264,
+      "sha256": "5fc488440a2f0ba24099f1c2dfe9a2f5dffb7c7b98a1c17dc3bd3ac5e2704454"
+    },
+    {
+      "path": "evaluation/episodes/crdcm_signal_off_sa/seed_1401/capacity_competition_0.json",
+      "size_bytes": 459270,
+      "sha256": "5180176df96dcbc5bb971f0e2005e02954ff48fc5bcddcbf7f33ffad5a21d708"
+    },
+    {
+      "path": "evaluation/evaluation_receipt.json",
+      "size_bytes": 3635,
+      "sha256": "82d6970b078b78e65238b98681b1a037e8870ec56d2ac8d93ef746733a1b3b60"
+    },
+    {
+      "path": "evaluation/paired_episode_rows.csv",
+      "size_bytes": 1808,
+      "sha256": "2c14aa9f70cd86a76e9753f12a8354ed21c9744dc9a86e0e1917415145d25bc4"
+    },
+    {
+      "path": "implementation_source_audit.json",
+      "size_bytes": 1720,
+      "sha256": "bced48c7cf1ccaba9cf1a3254b860722c4b153a3e12b5dffbe7bafb5454f5076"
+    },
+    {
+      "path": "logs/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke.stderr.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke.stdout.log",
+      "size_bytes": 1010,
+      "sha256": "614f1f9f6aee5e7bfd43079072e47e5d3f314713736872df18960024e0ddd93f"
+    },
+    {
+      "path": "logs/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke.stderr.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke.stdout.log",
+      "size_bytes": 992,
+      "sha256": "14a55fba34bc4192e8e82084b267640241df6d68202e86e664af904b8de74475"
+    },
+    {
+      "path": "logs/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke.stderr.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke.stdout.log",
+      "size_bytes": 1015,
+      "sha256": "df6028b8a6f74a39967a734f791cf42b49107dd35d8b9da7bd0b90a8574ef899"
+    },
+    {
+      "path": "logs/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke.stderr.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke.stdout.log",
+      "size_bytes": 1045,
+      "sha256": "70c1a74c644374e143dc8c4231b090273f2626e9c3a626bea0b12538ebb52104"
+    },
+    {
+      "path": "logs/evaluation.stderr.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/evaluation.stdout.log",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "protected_user_files_audit.json",
+      "size_bytes": 908,
+      "sha256": "b8d9cbab01a0017f3bdd67ffebf7ceb9eb70376bea2a899fc4bc132c5e4d55ba"
+    },
+    {
+      "path": "runs/crdcm_mappo/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke/checkpoints/latest.pt",
+      "size_bytes": 566713,
+      "sha256": "8f501639ecf68225fe62da300d8c7369511edb4084ebbb0206372acb496ca96b"
+    },
+    {
+      "path": "runs/crdcm_mappo/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke/episodes/episode_0001.summary.json",
+      "size_bytes": 438991,
+      "sha256": "02bbd65f8d34d879d3b342260a1943f87aaf12f249585cf8720fe4669aa7d062"
+    },
+    {
+      "path": "runs/crdcm_mappo/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke/episodes/episode_0002.summary.json",
+      "size_bytes": 837393,
+      "sha256": "85213082bb8545f4fec349bb543dc60a1a4359f11663709403f49118209b5b98"
+    },
+    {
+      "path": "runs/crdcm_mappo/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke/summary.json",
+      "size_bytes": 53353,
+      "sha256": "a485200b9d56441dba5a82a217fc4606888a2aceca1fc7ae1017bfd6846a26e6"
+    },
+    {
+      "path": "runs/crdcm_mappo/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke/train.csv",
+      "size_bytes": 1460,
+      "sha256": "3ddfaf81bb853c0534d81232e6dbd0f03d8a02453e597026b55187ab5344ff35"
+    },
+    {
+      "path": "runs/crdcm_mappo/crdcm_performance_matrix_v2_crdcm_full_mappo_seed1401_implementation_smoke/train_summary.json",
+      "size_bytes": 53353,
+      "sha256": "a485200b9d56441dba5a82a217fc4606888a2aceca1fc7ae1017bfd6846a26e6"
+    },
+    {
+      "path": "runs/crdcm_ppo/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke/checkpoints/latest.pt",
+      "size_bytes": 350429,
+      "sha256": "bf2dbbb7660fe7694b919cccaf11e1060a26345f00fef6313c34bdfab05e48e0"
+    },
+    {
+      "path": "runs/crdcm_ppo/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke/episodes/episode_0001.summary.json",
+      "size_bytes": 457071,
+      "sha256": "57e4326757bc74093d6a690b4dc688a85de72902a4c5e49cdcd36f1e11cffe14"
+    },
+    {
+      "path": "runs/crdcm_ppo/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke/episodes/episode_0002.summary.json",
+      "size_bytes": 829542,
+      "sha256": "0725c722e9944a229bc9810721a0e6893acf92491b5898ea20b1e37c3f3500cb"
+    },
+    {
+      "path": "runs/crdcm_ppo/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke/summary.json",
+      "size_bytes": 51583,
+      "sha256": "dc5549436566651dd542258be449579730a19fd9a67a17105404d43050886bd7"
+    },
+    {
+      "path": "runs/crdcm_ppo/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke/train.csv",
+      "size_bytes": 1450,
+      "sha256": "5f3552a7e2bfb045e2a6bc818f41f31f01f0159c248ae50815fdecc5c0474a5b"
+    },
+    {
+      "path": "runs/crdcm_ppo/crdcm_performance_matrix_v2_crdcm_full_ppo_seed1401_implementation_smoke/train_summary.json",
+      "size_bytes": 51583,
+      "sha256": "dc5549436566651dd542258be449579730a19fd9a67a17105404d43050886bd7"
+    },
+    {
+      "path": "runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke/checkpoints/latest.pt",
+      "size_bytes": 2118329,
+      "sha256": "cd22d50661c9cf6252a055623aeeb1c5b4c4d419b65e52f2b4e3b22827359084"
+    },
+    {
+      "path": "runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke/episodes/episode_0001.summary.json",
+      "size_bytes": 440631,
+      "sha256": "d80896935e410d54b84b4fa100c4bb804a691299184dd8d07af242c14d34f553"
+    },
+    {
+      "path": "runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke/episodes/episode_0002.summary.json",
+      "size_bytes": 825121,
+      "sha256": "596e953c1e245cc40250b2235565b5a47f4559400fc947cb64126578091a3205"
+    },
+    {
+      "path": "runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke/summary.json",
+      "size_bytes": 51716,
+      "sha256": "b0ae1ddd8b235cd9a65f9e991275d84327724d954326d64d1278ddbecbeeb551"
+    },
+    {
+      "path": "runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke/train.csv",
+      "size_bytes": 1466,
+      "sha256": "fce78202657eb1ad83b28db9ee159c4f5e6a0c143cb07acf944af137dc6a5bfe"
+    },
+    {
+      "path": "runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_full_sa_seed1401_implementation_smoke/train_summary.json",
+      "size_bytes": 51716,
+      "sha256": "b0ae1ddd8b235cd9a65f9e991275d84327724d954326d64d1278ddbecbeeb551"
+    },
+    {
+      "path": "runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke/checkpoints/latest.pt",
+      "size_bytes": 2096093,
+      "sha256": "0a70f895d3fa1fd561398ac0eb60e195d93840c67d41509818e7b635fc3cd736"
+    },
+    {
+      "path": "runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke/episodes/episode_0001.summary.json",
+      "size_bytes": 449388,
+      "sha256": "030262f83a616ae8736414ad1d3d34d228229f7f907aece30d37075541f64d28"
+    },
+    {
+      "path": "runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke/episodes/episode_0002.summary.json",
+      "size_bytes": 825149,
+      "sha256": "82a3c8f635372b59b46b83ad138a60e31c7a035ca5bb084e0e42b6a80fd55bf6"
+    },
+    {
+      "path": "runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke/summary.json",
+      "size_bytes": 51755,
+      "sha256": "dea0d744390e1287219ca9099a6b380b9bce8d8807437f984152e17910d1edce"
+    },
+    {
+      "path": "runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke/train.csv",
+      "size_bytes": 1468,
+      "sha256": "439e05882cd6cb12e47be3e2a8c4b3708b533a7d30949e2a8051f50d428c54d9"
+    },
+    {
+      "path": "runs/crdcm_sa_ghmappo/crdcm_performance_matrix_v2_crdcm_signal_off_sa_seed1401_implementation_smoke/train_summary.json",
+      "size_bytes": 51755,
+      "sha256": "dea0d744390e1287219ca9099a6b380b9bce8d8807437f984152e17910d1edce"
+    },
+    {
+      "path": "smoke_launch_receipt.json",
+      "size_bytes": 447,
+      "sha256": "a7a34c1fd6c2d57d68c58402e42ac9931716188105d0e815acdba3e1ccc6aa55"
+    },
+    {
+      "path": "state.json",
+      "size_bytes": 4878,
+      "sha256": "a4bb21e739305632c86867a2469b9f6a8b176e157123708603d2d6883daf6d63"
+    }
+  ]
+}

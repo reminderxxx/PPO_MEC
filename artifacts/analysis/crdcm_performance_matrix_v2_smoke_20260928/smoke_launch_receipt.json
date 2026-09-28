@@ -1,0 +1,8 @@
+{
+  "runner_version": "crdcm_performance_matrix_runner_v2",
+  "status": "RUNNING_FOREGROUND_SMOKE",
+  "started_at": "2026-09-28T05:43:48.576308+00:00",
+  "command_manifest_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/command_manifest.json",
+  "command_manifest_sha256": "41517875f9dbb0e07653d2d80dee2f683f84c8546c4918a1383b775fa2662155",
+  "performance_result_eligible": false
+}
