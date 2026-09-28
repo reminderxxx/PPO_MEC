@@ -5,7 +5,7 @@
 
 ﻿# Bugs And Risks
 
-## 2026-09-28: 层级五动作 behavior / per-head PPO credit 错配（OPEN）
+## 2026-09-28: 层级五动作 behavior / per-head PPO credit 错配（OPEN；E0 已确认）
 
 - SA/MAPPO 在有合法 action mask 时从精确五动作 aggregated categorical 采样，再把实际动作反映射成 canonical
   slow/fast/event targets；actor update 却按三个 head 各自 ratio/clip。action 4 的 slow/fast 与 action 0/1 的 fast
@@ -19,6 +19,10 @@
 - 修复必须发布新 behavior/credit contract，先补 factorization-consistency gradient/ratio test，再执行一次预注册 matched
   retraining。未验证前不得声称该缺口因果解释全部 gap，也不得用延长训练、加 seed、调 temperature 或择 checkpoint
   规避。完整证据见 `docs/project/crdcm_sa_first_order_diagnosis_20260928.md`。
+- E0 已穷举 31 masks×全部合法动作×4 logits probes×正负 advantage：legacy surrogate `640/640` 与 exact
+  masked-action PPO objective/gradient 不同；只屏蔽 exact zero-gradient heads 仍 `610/640` mismatch，单合法动作
+  exact/legacy gradient 为 `0 / nonzero` 的反例 `40/40`。因此 head-weight patch 明确禁止作为完成标准；详见
+  `docs/project/hierarchical_credit_consistency_e0_20260928.md`。
 
 ## 2026-09-28: policy provenance、状态充分性与 override credit 风险（OPEN）
 

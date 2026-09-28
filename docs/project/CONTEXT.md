@@ -26,6 +26,11 @@
   matched retraining，不能靠延长训练、加 seed 或调 temperature 追认。入口见
   `crdcm_sa_first_order_diagnosis_20260928.md`。
 
+- 后续 E0 数学审计已在 31 个非空 action masks、全部合法动作、4 个固定 logits probes 和正负 advantage 上确认
+  legacy per-head surrogate `640/640` 不等于 exact masked environment-action PPO；仅屏蔽 zero-gradient heads 仍
+  `610/640` mismatch。下一实现只能使用同一 masked categorical 的训练精度 old log-prob、单一 ratio/clip/entropy
+  并提升 strict credit/checkpoint contract；E1 仍未授权。入口见 `hierarchical_credit_consistency_e0_20260928.md`。
+
 - 当前唯一 live typed model-cache execution contract 为 Protocol 2.9.0；active index 位于
   `configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_index.json`，Readiness v21=
   `READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL`。checkpoint companion 是 17 字段 provenance envelope，shared

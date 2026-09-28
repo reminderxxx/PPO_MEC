@@ -1,0 +1,268 @@
+{
+  "audit_version": "hierarchical_credit_consistency_e0_v1",
+  "reviewed_at": "2026-09-28T19:08:17+08:00",
+  "literature_cutoff": "2026-09-28_no_new_web_search",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "artifact_run_id": "hierarchical_credit_consistency_e0_20260928",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "git_commit": "c4cdf85a368170160197ac41bee35f973068063d",
+  "evidence_level": "E2_IMPLEMENTATION_MATH_AUDITED_PLUS_CHECKPOINT_READBACK",
+  "scope": "mathematical_validation_only_no_environment_no_training",
+  "environment_steps_executed": 0,
+  "training_updates_executed": 0,
+  "clip_ratio": 0.2,
+  "gradient_tolerance": 1e-10,
+  "legacy_reference_contract": {
+    "algorithm_slice": "full_sa_head_credit_disabled_equal_weight_core",
+    "head_weights": {
+      "slow": 1.0,
+      "fast": 1.0,
+      "event": 1.0
+    },
+    "base_and_event_advantage": "equal_fixed_sign",
+    "event_reliability_modifier": "neutral",
+    "boundary": "This is a valid controlled slice of the SA actor core. Universal PPO consistency must hold on this slice; MAPPO-specific weights and extra auxiliary modifiers are not separately performance-tested by E0."
+  },
+  "fixed_logit_probes": [
+    {
+      "probe_id": "balanced",
+      "old": {
+        "slow": [
+          0.2,
+          -0.4,
+          0.7
+        ],
+        "fast": [
+          -0.3,
+          0.5
+        ],
+        "event": [
+          0.25,
+          -0.35
+        ]
+      },
+      "delta": {
+        "slow": [
+          0.18,
+          -0.12,
+          0.05
+        ],
+        "fast": [
+          -0.16,
+          0.21
+        ],
+        "event": [
+          -0.14,
+          0.19
+        ]
+      }
+    },
+    {
+      "probe_id": "prepare_leaning",
+      "old": {
+        "slow": [
+          -0.65,
+          0.85,
+          0.1
+        ],
+        "fast": [
+          0.6,
+          -0.25
+        ],
+        "event": [
+          -0.55,
+          0.75
+        ]
+      },
+      "delta": {
+        "slow": [
+          0.11,
+          0.24,
+          -0.27
+        ],
+        "fast": [
+          0.17,
+          -0.22
+        ],
+        "event": [
+          0.28,
+          -0.31
+        ]
+      }
+    },
+    {
+      "probe_id": "fallback_leaning",
+      "old": {
+        "slow": [
+          0.9,
+          -0.15,
+          -0.55
+        ],
+        "fast": [
+          -0.7,
+          0.8
+        ],
+        "event": [
+          0.65,
+          -0.45
+        ]
+      },
+      "delta": {
+        "slow": [
+          -0.26,
+          0.13,
+          0.19
+        ],
+        "fast": [
+          0.29,
+          -0.18
+        ],
+        "event": [
+          -0.21,
+          0.26
+        ]
+      }
+    },
+    {
+      "probe_id": "cache_fill_leaning",
+      "old": {
+        "slow": [
+          -0.25,
+          0.95,
+          -0.35
+        ],
+        "fast": [
+          0.35,
+          -0.45
+        ],
+        "event": [
+          0.4,
+          -0.2
+        ]
+      },
+      "delta": {
+        "slow": [
+          0.23,
+          -0.19,
+          0.08
+        ],
+        "fast": [
+          -0.24,
+          0.27
+        ],
+        "event": [
+          0.16,
+          -0.2
+        ]
+      }
+    }
+  ],
+  "math_summary": {
+    "mask_count": 31,
+    "probe_count": 4,
+    "mask_action_pairs_per_probe": 80,
+    "advantage_signs": [
+      1.0,
+      -1.0
+    ],
+    "case_count": 640,
+    "probability_normalization_max_error": 2.220446049250313e-16,
+    "invalid_padded_probability_max": 0.0,
+    "old_new_ratio_identity_max_error": 4.440892098500626e-16,
+    "six_decimal_old_log_prob_identity_ratio_max_error": 4.999128278004861e-07,
+    "single_legal_action_case_count": 40,
+    "single_legal_action_exact_gradient_max": 0.0,
+    "single_legal_action_legacy_nonzero_gradient_count": 40,
+    "zero_exact_gradient_head_but_legacy_credited_case_count": 410,
+    "legacy_surrogate_mismatch_case_count": 640,
+    "legacy_surrogate_mismatch_rate": 1.0,
+    "zero_gradient_head_mask_repair_mismatch_case_count": 610,
+    "zero_gradient_head_mask_repair_mismatch_rate": 0.953125,
+    "exact_ratio_outside_clip_range_case_count": 250,
+    "override_zero_actor_gradient_max_abs": 0.0,
+    "verdict": "LEGACY_PER_HEAD_SURROGATE_NOT_EQUIVALENT_TO_MASKED_ENV_ACTION_PPO",
+    "head_mask_only_repair_verdict": "INSUFFICIENT"
+  },
+  "checkpoint_readback": {
+    "status": "pass",
+    "checkpoint_count": 48,
+    "before_after_sha256_equal": true,
+    "legacy_credit_contract": "mask_external_override_actor_credit_v1",
+    "compatibility_boundary": "Any corrected actor-credit implementation must publish a new strict credit/checkpoint contract; these v1 checkpoints remain historical."
+  },
+  "minimal_repair_specification": {
+    "scope": "future_separate_implementation_task_not_applied_by_e0",
+    "new_credit_contract_required": "exact_masked_env_action_ppo_v2",
+    "requirements": [
+      "Persist the sampled masked five-action behavior log-probability at training precision; rounding is logging-only.",
+      "Recompute the same masked five-action categorical from current logits and the original action mask during update.",
+      "Use one environment-action PPO ratio and one clip operation as the primary actor objective.",
+      "Compute policy entropy from the same masked five-action categorical.",
+      "Keep externally overridden transitions at actor weight zero; critic learning must have an explicit shared-parameter policy.",
+      "Do not treat canonical latent head labels as observed behavior actions; optional head losses require separate auxiliary contracts.",
+      "Bump and strictly validate checkpoint/credit contract versions; do not reinterpret v1 checkpoints as corrected policies."
+    ],
+    "acceptance": [
+      "All 31 nonempty masks and every legal action match direct probability ratios, PPO objectives, and gradients.",
+      "Every single-legal-action mask has exact zero policy gradient.",
+      "Invalid padded actions have zero probability and cannot enter actor loss.",
+      "actor_credit_weight=0 produces zero actor gradient.",
+      "The legacy per-head mismatch is retained as a regression fixture rather than erased from history."
+    ],
+    "explicit_non_fix": "Masking only heads with zero exact gradient is insufficient because conditional mask normalization and independent per-head clipping still do not reproduce the single masked environment-action PPO objective."
+  },
+  "matched_experiment_freeze_draft": {
+    "status": "draft_not_execution_authorization",
+    "prerequisite": "E0 corrected-contract tests pass in a separate implementation task",
+    "conditions": [
+      "legacy_crdcm_sa_historical_contract_v1",
+      "corrected_crdcm_sa_exact_masked_env_ppo_v2",
+      "corrected_crdcm_mappo_exact_masked_env_ppo_v2",
+      "unchanged_crdcm_ppo_control"
+    ],
+    "seeds": [
+      1401,
+      1402,
+      1403
+    ],
+    "episodes_per_cell": 64,
+    "max_steps": 20,
+    "fixed_checkpoint_update": 16,
+    "training_episode_upper_bound": 768,
+    "learned_evaluation_episode_count": 144,
+    "heuristic_evaluation_episode_count": 12,
+    "total_episode_upper_bound": 924,
+    "environment_step_upper_bound": 18480,
+    "frozen_equalities": [
+      "reward",
+      "temperature schedules",
+      "model sizes",
+      "seeds",
+      "windows",
+      "workflows",
+      "action schema and masks",
+      "training budget",
+      "checkpoint selection rule"
+    ],
+    "readouts": [
+      "workflow completion and request failures",
+      "all-episode transfer/backhaul/migration cost including failures",
+      "cost per completed workflow and successful request with denominators shown",
+      "per-seed actions and failure transitions",
+      "optimizer consistency metrics",
+      "training/inference wall-clock and peak memory"
+    ],
+    "stop_rules": [
+      "Do not train if the corrected contract fails E0.",
+      "Do not add seeds, budget, reward changes, temperature changes, or checkpoint selection after observing E1.",
+      "If correctness passes but performance does not improve reliably, stop expanding the SA superiority claim.",
+      "A correctness benefit is not evidence for base-sharing/migration mechanism novelty or architecture necessity."
+    ]
+  },
+  "scientific_boundary": {
+    "implementation_defect": "The legacy canonical per-head surrogate is not the PPO objective of the masked five-action behavior distribution.",
+    "performance_causality": "UNVERIFIED",
+    "mechanism_effect": "UNVERIFIED_AND_SEPARATE_FROM_E0_E1",
+    "architecture_necessity": "UNVERIFIED_AND_SEPARATE_FROM_E0_E1_E2"
+  }
+}

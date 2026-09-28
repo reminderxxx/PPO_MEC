@@ -7,6 +7,18 @@
 
 ## 2026-09-28 policy decision diagnosis and CRDCM design
 
+## 2026-09-28 — Hierarchical credit consistency E0
+
+- Root：`artifacts/analysis/hierarchical_credit_consistency_e0_20260928/`；数学审计 31 个非空 masks、80
+  mask-action pairs/probe、4 fixed logits probes、正负 advantage，共 640 cases；environment step/training update=`0/0`。
+- Exact checks：probability normalization max error=`2.22e-16`，invalid padded probability=`0`，log-ratio/direct
+  ratio max error=`4.44e-16`，override-zero actor gradient=`0`。
+- Counterexample：legacy per-head surrogate mismatch=`640/640`；单合法动作 exact gradient=`0` 而 legacy 非零=
+  `40/40`；只屏蔽 zero-gradient heads 仍 mismatch=`610/640`，所以 head-weight-only repair 不充分。
+- 48 个 stage v1 checkpoints 的 version/update/state/hash readback 全部通过且前后 SHA-256 相同。新修复必须发布
+  `exact_masked_env_action_ppo_v2` 类新 contract；v1 checkpoint 不重新解释。
+- 报告：`hierarchical_credit_consistency_e0_20260928.md`；E1 只有 matched freeze draft，未启动训练。
+
 ## 2026-09-28 — CRDCM SA first-order failure diagnosis
 
 - Root：`artifacts/analysis/crdcm_sa_first_order_diagnosis_20260928/`；只读消费 completed v2 matrix，执行

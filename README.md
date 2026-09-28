@@ -22,6 +22,11 @@ behavior-gradient 为零的 head 非零 actor credit，flat PPO 为 0。该 impl
 优先修复对象，但 performance causality 仍为 `UNVERIFIED`；报告见
 `docs/project/crdcm_sa_first_order_diagnosis_20260928.md`。
 
+随后 E0 零环境/零训练数学审计穷举 31 个 action masks、全部合法动作和固定 logits：legacy per-head surrogate
+`640/640` 与 exact masked five-action PPO objective/gradient 不一致；只屏蔽 zero-gradient heads 仍有 `610/640`
+mismatch。最小修复必须改为同一 masked categorical 的单一 ratio/clip/entropy 并发布新 strict contract；当前只完成
+规格和未授权 matched experiment 草案，见 `docs/project/hierarchical_credit_consistency_e0_20260928.md`。
+
 2026-09-28 已将 mechanism retraining v2 的 SA-GHMAPPO/MAPPO 共同固定预算终点 `update_0016.pt` 做 create-only
 冻结；冻结规则在查看训练统计后确定，非预注册。一次同训练窗口/workflow 的 resubstitution 多目标评价显示 MAPPO
 completion/continuity 较高但 transfer/backhaul 更高，frozen SA 没有全面优势。128 个训练 episode 的事件归因显示

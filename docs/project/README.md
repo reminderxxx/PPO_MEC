@@ -19,6 +19,10 @@
   bifurcation、masked five-action behavior 与 per-head PPO credit 错配、stage checkpoint no-step replay、效率重解释与
   唯一优先修复/停止规则
 
+- `hierarchical_credit_consistency_e0_20260928.md`：31 个非空 masks 的 exact environment-action PPO 与 legacy
+  per-head surrogate 穷举 objective/ratio/gradient 审计、单动作反例、head-mask-only 非修复证明、最小 v2 contract
+  规格与未授权 E1 matched freeze draft
+
 - `g14s01_innovation_algorithm_diagnosis_20260928.md`：相对最近邻的创新边界、formal/capacity/holdout 原件复核、
   controller-level 算法身份、核心机制调用证据、576/864 MB 非绑定根因，以及两阶段最小补证实验与 claim freeze
 

@@ -5,6 +5,21 @@
 
 ﻿# Progress
 
+## 2026-09-28: 层级五动作 PPO credit consistency E0 数学审计
+
+- E0 在零 environment step、零 training update 下穷举 31 个非空五动作 mask、每个合法动作、4 组预固定
+  non-degenerate logits perturbations 和正/负 advantage，共 640 cases；probability sum、padding、direct ratio 与
+  override-zero-gradient reference 全部通过。
+- legacy canonical per-head surrogate 在 `640/640` cases 的 PPO objective 或 gradient 与 exact masked
+  environment-action PPO 不一致；40 个单合法动作 case 的 exact gradient 全为 0，而 legacy 全部非零。
+- 仅按 exact zero-gradient heads 调 `head_credit_weights` 仍有 `610/640=95.31%` mismatch，确认“只屏蔽 latent
+  heads”不是充分修复。最小修复必须使用同一 masked five-action categorical 的训练精度 old log-prob、单一 ratio/
+  clip 和 entropy，并发布新 credit/checkpoint contract。
+- 48 个 update 4/8/12/16 v1 checkpoints 只读 contract/hash readback 通过且前后 SHA 不变；历史 v1 checkpoint
+  不得重新解释为 corrected policy。E1 matched experiment 仅形成冻结草案，未授权训练。
+- 报告见 `hierarchical_credit_consistency_e0_20260928.md`；修复效果、base-sharing×migration 机制效果与 SA
+  architecture necessity 保持三个独立 `UNVERIFIED` 问题。
+
 ## 2026-09-28: CRDCM SA vs PPO 一阶失败诊断
 
 - 对 completed v2 matrix 做了只读诊断：未执行环境 step、训练、调参、新 seed/window/capacity；48 个

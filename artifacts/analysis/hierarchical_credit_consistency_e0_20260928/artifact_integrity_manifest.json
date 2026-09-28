@@ -1,0 +1,21 @@
+{
+  "manifest_version": "artifact_integrity_manifest_v1",
+  "generated_at": "2026-09-28T19:08:17+08:00",
+  "files": [
+    {
+      "path": "artifacts/analysis/hierarchical_credit_consistency_e0_20260928/case_results.csv",
+      "size": 394710,
+      "sha256": "2a802fb83e72559a710b63b32bd1510a4a528c076c4cfe9a3f65f60e8bc69202"
+    },
+    {
+      "path": "artifacts/analysis/hierarchical_credit_consistency_e0_20260928/checkpoint_readback.csv",
+      "size": 19956,
+      "sha256": "7df188bbefa5a0376e9e67f8e725243057549a1c0c78d071f785ff29a1c86dc4"
+    },
+    {
+      "path": "artifacts/analysis/hierarchical_credit_consistency_e0_20260928/summary.json",
+      "size": 8577,
+      "sha256": "6f343a5400f3342467f2fb4eb001ce1a5219bbf47f0ff61ddea90ff8324183e3"
+    }
+  ]
+}
