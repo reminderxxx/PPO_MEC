@@ -2,6 +2,9 @@
 
 ## 数据候选只读结构审计
 
+- 同一工具的 `build_preview` 仅派生引用模板；`build_stage_input` 隔离参考A并检查前驱输入，不调用模型。
+- `tests/test_drivelm_workflow_preview.py`覆盖派生标签、来源漂移、空/未来输出及答案隔离。
+
 - `scripts/audit_drivelm_workflow_sample.py`：独立只读 JSON 资格工具，源字节身份、QA计数、关系字段覆盖；不进入训练/runtime。
 - `tests/test_drivelm_workflow_sample_audit.py`：缺失/null、重复key、非法结构及字节身份回归。
 

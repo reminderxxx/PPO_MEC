@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `drivelm_workflow_preview_20260929.md`：9个驾驶工作流派生预览及参考答案隔离，接口通过但未执行模型
+
 - `drivelm_sample_qualification_20260929.md`：官方 demo 字节/结构核验；790 QA 关系字段为空，区分驾驶语义与派生执行 DAG
 
 - `vec_ai_public_resource_recovery_20260928.md`：找回旧19-source登记，DriveLM/V2X-Seq与请求/cache数据复核；复用优先，不从零编造语义

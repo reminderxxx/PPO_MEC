@@ -7,6 +7,9 @@
 
 ## DriveLM 标注只读资格检查（2026-09-29）
 
+可追加 `--preview` 输出派生工作流引用（不含原问答）。默认审计不变，模型/图像仍不加载。
+源字节hash、派生边与输入组装限制见 `drivelm_workflow_preview_20260929.md`；不能直接送正式runtime。
+
 对已合法取得的小型 JSON 执行 `.venv/bin/python -B scripts/audit_drivelm_workflow_sample.py --input <sample.json>`。
 默认上限2 MB；可用 `--input -` 接收stdin。工具不下载、不保存原标注、不推断DAG、不调用模型。
 复核与限制见 `drivelm_sample_qualification_20260929.md`；非空关系字段仍需语义审计。

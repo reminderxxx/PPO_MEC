@@ -7,6 +7,7 @@
 
 驾驶 AI 数据候选的最新小样本核验见 [DriveLM qualification](docs/project/drivelm_sample_qualification_20260929.md)；
 只读入口 `scripts/audit_drivelm_workflow_sample.py` 不生成训练数据或执行实验。
+追加 `--preview` 可生成明确标为派生的工作流引用；[接口与防泄漏边界](docs/project/drivelm_workflow_preview_20260929.md)。
 
 G14R18 已关闭正式 checkpoint provenance envelope 与共享 training identity projection 的接口错配，并冻结唯一
 live Protocol `2.9.0` 与 Readiness v21=`READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL`。完整 companion 保留

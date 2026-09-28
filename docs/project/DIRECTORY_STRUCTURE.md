@@ -1,6 +1,7 @@
 ﻿# Directory Structure
 
 新增数据资格工具：`scripts/audit_drivelm_workflow_sample.py`，测试位于
+`tests/test_drivelm_workflow_preview.py`（派生预览与输入组装）及
 `tests/test_drivelm_workflow_sample_audit.py`，证据说明位于
 `docs/project/drivelm_sample_qualification_20260929.md`；不保存原始标注或模型。
 
