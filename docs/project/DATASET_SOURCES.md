@@ -15,6 +15,10 @@
 
 `NGSIM + Alibaba` 仍是唯一正式数据主线；G11 没有改变 benchmark 默认数据、split 或算法语义。
 
+2026-09-28设计增补：候选 `vec_ai_workload_v0_1` 为车辆关联AI工作流/缓存的经校准合成工作负载，
+尚未生成、校准、发布或接入正式benchmark，不替代上述历史主线。提出过程、D01–D12证据池、
+模型/adapter/数据/状态边界及许可要求见 `vec_ai_workload_dataset_design_20260928.md`。
+
 ## G11 public model-cache dataset registry
 
 统一 registry：`configs/data/model_cache_dataset_registry.json`，版本 `1.0.0`。截至 `2026-08-19` 核验 19 个来源；完整证据、字段矩阵、分数与拒绝理由见 `docs/project/model_cache_dataset_discovery_audit_20260819.md`。

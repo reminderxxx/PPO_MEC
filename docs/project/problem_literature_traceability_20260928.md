@@ -39,6 +39,14 @@ POLAR以本轮可验证的arXiv页为依据；作者页accepted不代替正式�
 
 ## 问题—机制—实验对应
 
+2026-09-28补充：数据集提出依据、D01–D12来源池、对象边界、校准与验收设计统一见
+`vec_ai_workload_dataset_design_20260928.md`。新数据贡献为候选，未生成/发布。
+
+| 新增ID | 论文/持久入口 | 出处与核验 | 用途与限制 |
+|---|---|---|---|
+| L09 | [Intelligent Cooperative Computation Offloading and Resource Allocation for Dual-Dependency Tasks in Edge Computing](https://doi.org/10.1109/TSC.2026.3709905) | TSC 19(4):2843–2856,2026；官方摘要/出版信息已核验 | 双依赖联合优化直接近邻；全文差异待核，不作为新生成数据真实性证明 |
+| L10 | [WfCommons: A framework for enabling scientific workflow research and development](https://doi.org/10.1016/j.future.2021.09.043)；[官方项目](https://wfcommons.org/publications) | FGCS 128:16–27,2022；出版社/官方项目；不标A会或顶刊 | 真实实例与合成生成器方法参考；不提供车载AI联合分布 |
+
 | 问题ID | 已找到的问题 | 文献 | 待证明的区别 | 补证与失败判据 |
 |---|---|---|---|---|
 | P01 | cache hit不保证依赖workflow完成 | L01、L08 | typed共享依赖与执行状态如何共同影响剩余DAG | 共享×迁移四臂；报告completion及failure cost，只有hit增长不成立 |
@@ -47,6 +55,7 @@ POLAR以本轮可验证的arXiv页为依据；作者页accepted不代替正式�
 | P04 | 多头行为采样与更新可能不对应 | L03只支持强基线动机 | 正确性修复不是创新 | 31种非空mask及合法动作的概率/ratio/gradient；本地源码证明，不能借文献背书 |
 | P05 | 五动作尚不能任意选择后续依赖bundle | L01、L06 | 说明是准备时机控制还是对象级优化 | 状态—动作—执行表，对照相同权限，不用设计文字替代实现 |
 | P06 | 总传输低可能因失败多；3窗口复用不足泛化 | L03支持公平对照；事实来自本地数据 | 保留失败成本和独立评价 | 成本/完成/coverage同报；独立数据不足只能称development |
+| P07 | 批处理DAG上的AI标签及资源映射尚未校准 | L04/L05兼容共享、L08应用近邻、L10生成方法；D01–D12来源池 | 车联网AI工作负载的语义与测量校准，不冒充联合实测 | 数据集质量独立于算法胜负；校准验证、负对照、来源祖先与许可审查 |
 
 ## 本地原件
 

@@ -5,6 +5,15 @@
 
 ﻿# Progress
 
+## 2026-09-28: 车联网AI工作负载数据集贡献候选与证据池
+
+- 新增 `vec_ai_workload_dataset_design_20260928.md`：提出过程、四类缓存对象、校准/生成方案、
+  D01–D12证据池及验收条件；范围限定车辆关联AI workflow，不扩写为通用云端或真实自动驾驶部署。
+- 论文工作稿加入独立C-D数据贡献候选；问题索引增加P07及L09/L10，保留C-M机制与C-A算法各自证据要求。
+- 当前仅DESIGN_SPECIFICATION，未生成/发布新数据、未profiling、未训练或rollout。
+  包格式/AI标签已有不等于语义真实；数据质量必须独立于算法胜负评价。
+- 新合成测试不能重开旧consumed holdout或增加复用移动窗口的独立cluster数。
+
 ## 2026-09-28: 系统机制论文工作稿与E0交接
 
 - 完成英文正文工作稿 `system_mechanism_manuscript_working_draft.md`：摘要、引言、相关工作、系统模型、

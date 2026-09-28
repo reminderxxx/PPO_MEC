@@ -20,6 +20,8 @@ We organize the investigation around three questions. First, how does shared dep
 
 The current study provides an executable typed-resource abstraction and a development diagnosis. Its remaining contribution claims require matched mechanism and controller experiments. We distinguish the system mechanism, the correctness of its learning implementation, and the eventual performance of a proposed algorithm throughout the paper.
 
+A further contribution under development is a calibrated workload dataset and generator for vehicle-associated AI workflows and typed caching. Rather than treating task labels on a batch DAG as observed AI behavior, this resource is intended to separate measured mobility, workflow structure, compatible model families, reusable data, and transferable execution state, with explicit provenance for each constructed relationship. Its contribution will depend on calibration, validation and reuse, not on whether a particular controller wins. The dataset has not yet been released or validated.
+
 ## 2. Related Work
 
 ### 2.1 Dependency-aware caching and workflow execution
@@ -33,6 +35,10 @@ SLoRA and Punica support multiple adapters using shared base-model resources [R2
 ### 2.3 Learning and delayed preparation benefits
 
 Preparation decisions can incur cost before their service benefit becomes observable. Return decomposition is an established approach to delayed reward attribution [R7], while PPO-based cooperative controllers can be strong baselines without specialized architectures [R8]. These observations motivate two safeguards: the update must correspond to the policy that actually generated actions, and any proposed attribution mechanism must be compared against the same system controlled by a strong simpler method. The present implementation does not implement RUDDER or inherit its theoretical guarantees.
+
+### 2.4 Workload construction and data contribution boundary
+
+WfCommons connects workflow execution instances, synthetic generation and evaluation [R9], providing a methodological precedent rather than a vehicular AI dataset. Dual-dependency cooperative edge computing also has direct antecedents [R10]. Our proposed resource must therefore justify application semantics, model compatibility, state costs and mobility coupling; a new file format or a larger number of generated DAGs is not sufficient evidence of novelty. Neither a literature-supported marginal distribution nor a measured traffic trace establishes their joint distribution with AI requests.
 
 ## 3. System Model and Research Objective
 
@@ -94,6 +100,8 @@ Algorithmic complexity claims are deferred until the final decision interface an
 
 The prototype combines NGSIM mobility traces and Alibaba workflow DAGs with a controlled mapping to model requirements. This is a trace-driven simulation, not a joint measurement of vehicles running the specified AI workflows. The catalog, model mapping, transfer assumptions, and state semantics require explicit reporting and sensitivity analysis. Development windows reused for training or design are not an independent test set.
 
+The proposed dataset upgrade distinguishes model weights, compatible adapters, reusable inputs/intermediates, and workflow state. It will document whether each field is measured, literature-supported, derived or assumed. A small executable application template and local resource profiling are required before expanding synthetic scenarios. Calibration-aligned cases, explicit stress cases and negative controls will be reported separately. New random seeds drawn from a development-tuned generator are not a substitute for unused real traces, and generated repeats of a mobility window do not create independent mobility clusters. These are prospective requirements; no new dataset results are reported here.
+
 ### 5.2 Mechanism and controller comparisons
 
 The planned mechanism study crosses shared-base representation and execution-state migration. A common fixed controller first isolates the physical interventions; separately trained matched arms then measure adaptation to those interventions. Independent, sequential, and coordinated preparation policies are needed to distinguish joint decision value from the sum of two useful modules. Merely enabling both modules is not evidence of coordination.
@@ -138,6 +146,8 @@ The present conclusion is therefore limited: typed dependencies and execution st
 - [R6] [AWTO: A latency-optimized task offloading scheme for LLM-driven agentic workflows on heterogeneous edge](https://doi.org/10.1016/j.future.2026.108415). FGCS, 2026.
 - [R7] [RUDDER: Return Decomposition for Delayed Rewards](https://papers.neurips.cc/paper_files/paper/2019/hash/16105fb9cc614fc29e1bda00dab60d41-Abstract.html). NeurIPS, 2019.
 - [R8] [The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games](https://proceedings.neurips.cc/paper_files/paper/2022/hash/9c1535a02f0ce079433344e14d910597-Abstract.html). NeurIPS Datasets and Benchmarks Track, 2022.
+- [R9] [WfCommons: A framework for enabling scientific workflow research and development](https://doi.org/10.1016/j.future.2021.09.043). FGCS, 128:16–27, 2022.
+- [R10] [Intelligent Cooperative Computation Offloading and Resource Allocation for Dual-Dependency Tasks in Edge Computing](https://doi.org/10.1109/TSC.2026.3709905). IEEE TSC, 19(4):2843–2856, 2026.
 
 ---
 
@@ -154,3 +164,4 @@ The present conclusion is therefore limited: typed dependencies and execution st
 - Older formal results are a separate method/workload lineage: see `g14a01_formal_results_independent_review_20260921.md` and subsequent corrected statistics. Do not merge their 8,100 rows with this development matrix.
 - Do not claim first/unique, full vehicle-level MARL, a corrected controller's superiority, an enforced transfer budget, or a real deployed LoRA service.
 - Before submission: freeze the actual new mechanism/algorithm; complete matched evidence and independent evaluation; replace the abstract and contribution paragraph with supported findings; complete exact bibliography and full-text nearest-neighbor comparison.
+- Dataset candidate addition (2026-09-28): `vec_ai_workload_dataset_design_20260928.md`, P07/L09/L10/D01–D12. Status is design only; no release, measured calibration or new performance claim. Data contribution must pass its own validation independently of algorithm ranking.

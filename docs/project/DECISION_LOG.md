@@ -1,5 +1,14 @@
 ﻿# Decision Log
 
+## 2026-09-28: 增加经校准的车联网AI工作负载数据贡献候选
+
+- 用户确认研究对象为车联网AI workflow或AI数据cache；候选数据集保持移动RSU语境，
+  区分model/adapter、输入/中间数据和执行状态，不把任意任务统一成共享base。
+- 新增C-D数据贡献，与C-M机制、C-A算法分别验收；当前只是设计，不把新数据或收益写成已交付。
+- 优先一个可执行应用模板及小规模profile，再做生成器与数据验证；不先跑大训练找赢家。
+- 采用 measured/literature_supported/derived/assumed 字段来源分类；许可、统计祖先、负对照必须保留。
+- 统一文献/本地证据池见 `vec_ai_workload_dataset_design_20260928.md`；不改变历史正式协议和holdout。
+
 ## 2026-09-28: 问题驱动补证，而非预设算法赢家
 
 - 研究目标是受资源约束的跨RSU workflow完成与成本，不是让SA名称保留或综合分数获胜。
