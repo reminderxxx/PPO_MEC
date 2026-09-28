@@ -983,6 +983,7 @@ class 分层PPO基类(BaseAgent):
         backhaul_guard_enabled: bool = False,
         backhaul_guard_max_reactive_fills_per_adapter: int = 1,
         cache_warm_start_guard_enabled: bool = False,
+        cache_warm_start_guard_current_only: bool = False,
         cache_warm_start_guard_min_countdown: float = 1.5,
         cache_warm_start_guard_max_prefetch_countdown: float = 0.0,
         predictive_prefetch_admission_guard_enabled: bool = False,
@@ -1975,6 +1976,9 @@ class 分层PPO基类(BaseAgent):
             0,
         )
         self._cache_warm_start_guard_enabled = bool(cache_warm_start_guard_enabled)
+        self._cache_warm_start_guard_current_only = bool(
+            cache_warm_start_guard_current_only
+        )
         self._cache_warm_start_guard_min_countdown = max(
             float(cache_warm_start_guard_min_countdown),
             0.0,
@@ -13776,6 +13780,16 @@ class 分层PPO基类(BaseAgent):
                 "guarded_actions": dict(selected_actions),
             }
 
+        if self._cache_warm_start_guard_current_only:
+            return {
+                "enabled": True,
+                "guarded": False,
+                "reason": "current_adapter_ready_current_only",
+                "required_adapter": required_adapter,
+                "current_rsu_id": current_rsu_id,
+                "current_cache_ready": True,
+            }
+
         predictions = semantic_state.get("predictions", {})
         vehicle_id = str(primary_vehicle.get("vehicle_id", ""))
         predicted_target = None
@@ -15638,6 +15652,7 @@ class 分层PPO基类(BaseAgent):
             "backhaul_guard_enabled": self._backhaul_guard_enabled,
             "backhaul_guard_max_reactive_fills_per_adapter": self._backhaul_guard_max_reactive_fills_per_adapter,
             "cache_warm_start_guard_enabled": self._cache_warm_start_guard_enabled,
+            "cache_warm_start_guard_current_only": self._cache_warm_start_guard_current_only,
             "cache_warm_start_guard_min_countdown": self._cache_warm_start_guard_min_countdown,
             "cache_warm_start_guard_max_prefetch_countdown": self._cache_warm_start_guard_max_prefetch_countdown,
             "predictive_prefetch_admission_guard_enabled": self._predictive_prefetch_admission_guard_enabled,

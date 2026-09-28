@@ -38,6 +38,12 @@ class MAPPOAgent(PPOBaseAgent):
         event_logit_temperature = float(kwargs.pop("event_logit_temperature", 1.0))
         event_logit_temperature_final = float(kwargs.pop("event_logit_temperature_final", 1.0))
         event_temperature_decay_updates = int(kwargs.pop("event_temperature_decay_updates", 0))
+        cache_warm_start_guard_enabled = bool(
+            kwargs.pop("cache_warm_start_guard_enabled", False)
+        )
+        cache_warm_start_guard_current_only = bool(
+            kwargs.pop("cache_warm_start_guard_current_only", False)
+        )
         super().__init__(
             agent_name="mappo",
             policy_type="mappo_policy",
@@ -83,7 +89,8 @@ class MAPPOAgent(PPOBaseAgent):
             mechanism_aux_coef=0.0,
             mechanism_entropy_coef=0.0,
             backhaul_guard_enabled=False,
-            cache_warm_start_guard_enabled=False,
+            cache_warm_start_guard_enabled=cache_warm_start_guard_enabled,
+            cache_warm_start_guard_current_only=cache_warm_start_guard_current_only,
             **kwargs,
         )
         self.baseline_config = {
@@ -113,6 +120,10 @@ class MAPPOAgent(PPOBaseAgent):
                 "event": event_entropy_coef_scale,
             },
             "event_advantage_blend": event_advantage_blend,
+            "shared_service_readiness_guard": cache_warm_start_guard_enabled,
+            "shared_service_readiness_guard_current_only": (
+                cache_warm_start_guard_current_only
+            ),
             "action_mix_audit_target": "avoid_controller_head_collapse_without_sa_graph_surrogate_guard_mechanisms",
             "surrogate_enhanced_head": False,
             "centralized_critic": True,
@@ -130,6 +141,10 @@ class MAPPOAgent(PPOBaseAgent):
                 "heuristic_imitation",
                 "continuity_guard",
                 "backhaul_guard",
-                "cache_warm_start_guard",
+                *(
+                    []
+                    if cache_warm_start_guard_enabled
+                    else ["cache_warm_start_guard"]
+                ),
             ],
         }

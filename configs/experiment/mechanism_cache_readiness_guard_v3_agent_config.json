@@ -1,0 +1,29 @@
+{
+  "agent_training_config_contract_version": "1.0.0",
+  "profile_id": "mechanism_cache_readiness_guard_current_only_v1",
+  "diagnostic_basis": {
+    "artifact": "artifacts/analysis/mechanism_training_failure_diagnosis_v1_20260928/completion_receipt.json",
+    "sa_adapter_miss_failures": 216,
+    "mappo_adapter_miss_failures": 272,
+    "capacity_rejection_failures": 0,
+    "invalid_action_failures": 0
+  },
+  "agents": {
+    "sa_ghmappo": {
+      "cache_warm_start_guard_enabled": true,
+      "cache_warm_start_guard_current_only": true
+    },
+    "mappo": {
+      "cache_warm_start_guard_enabled": true,
+      "cache_warm_start_guard_current_only": true
+    }
+  },
+  "fairness": {
+    "symmetric_across_agents": true,
+    "information_added": false,
+    "reward_changed": false,
+    "environment_changed": false,
+    "baseline_weakened": false,
+    "effect": "When the current associated RSU lacks the required adapter, select current-RSU cache fill before execution or migration. No target-prefetch or future-trace rule is added."
+  }
+}

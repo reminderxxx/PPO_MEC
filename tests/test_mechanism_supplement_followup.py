@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from scripts.analyze_mechanism_failure_causes import classify_episode
 from scripts.evaluate_mechanism_frozen_checkpoints import evaluation_unit_id
+from src.agents.mappo_agent import MAPPOAgent
 
 
 def _episode(*, service_success: bool, adapter_hit: bool = True) -> dict:
@@ -63,3 +64,42 @@ def test_evaluation_unit_identity_is_controller_neutral() -> None:
     assert evaluation_unit_id("window_1", "workflow_1") == (
         "mechanism_frozen_checkpoint_evaluation_v1/window_1/workflow_1"
     )
+
+
+def test_symmetric_current_service_readiness_guard_is_configurable_for_mappo() -> None:
+    agent = MAPPOAgent(
+        cache_warm_start_guard_enabled=True,
+        cache_warm_start_guard_current_only=True,
+    )
+    semantic_state = {
+        "primary_vehicle_id": "vehicle_0",
+        "vehicles": [
+            {"vehicle_id": "vehicle_0", "associated_rsu_id": "rsu_0"}
+        ],
+        "current_workflow_node": {"required_adapter": "adapter_a"},
+        "predictions": {
+            "predicted_first_handoff_rsu_by_vehicle": {"vehicle_0": "rsu_1"}
+        },
+        "rsus": [
+            {"rsu_id": "rsu_0", "cached_adapter_ids": []},
+            {"rsu_id": "rsu_1", "cached_adapter_ids": []},
+        ],
+    }
+    selected = {"slow": 0, "fast": 1, "event": 1}
+    result = agent._apply_cache_warm_start_guard_to_actions(
+        semantic_state=semantic_state,
+        selected_actions=selected,
+    )
+    assert result["guarded"] is True
+    assert selected["slow"] == 1
+    assert selected["event"] == 0
+
+    semantic_state["rsus"][0]["cached_adapter_ids"] = ["adapter_a"]
+    selected = {"slow": 0, "fast": 1, "event": 1}
+    result = agent._apply_cache_warm_start_guard_to_actions(
+        semantic_state=semantic_state,
+        selected_actions=selected,
+    )
+    assert result["guarded"] is False
+    assert result["reason"] == "current_adapter_ready_current_only"
+    assert selected == {"slow": 0, "fast": 1, "event": 1}

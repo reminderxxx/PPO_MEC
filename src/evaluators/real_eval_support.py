@@ -388,6 +388,7 @@ def _filter_checkpoint_config(agent_name: str, checkpoint_config: dict[str, Any]
         "backhaul_guard_enabled",
         "backhaul_guard_max_reactive_fills_per_adapter",
         "cache_warm_start_guard_enabled",
+        "cache_warm_start_guard_current_only",
         "cache_warm_start_guard_min_countdown",
         "cache_warm_start_guard_max_prefetch_countdown",
         "predictive_prefetch_admission_guard_enabled",

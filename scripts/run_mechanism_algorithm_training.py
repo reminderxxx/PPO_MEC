@@ -158,7 +158,16 @@ def _build_manifest(config_path: Path, data_root: Path, output_root: Path) -> di
     }
     runtime_config = (ROOT_DIR / str(config["runtime_config"])).resolve()
     window_plan = (ROOT_DIR / str(config["window_plan"])).resolve()
-    for path in (runtime_config, window_plan):
+    agent_config_value = config.get("agent_config_path")
+    agent_config = (
+        (ROOT_DIR / str(agent_config_value)).resolve()
+        if agent_config_value
+        else None
+    )
+    required_paths = [runtime_config, window_plan]
+    if agent_config is not None:
+        required_paths.append(agent_config)
+    for path in required_paths:
         if not path.is_file():
             raise FileNotFoundError(path)
 
@@ -231,6 +240,8 @@ def _build_manifest(config_path: Path, data_root: Path, output_root: Path) -> di
             "--run_id",
             run_id,
         ]
+        if agent_config is not None:
+            command.extend(["--agent_config_path", str(agent_config)])
         commands.append(
             {
                 "agent_name": str(agent_name),
@@ -256,6 +267,11 @@ def _build_manifest(config_path: Path, data_root: Path, output_root: Path) -> di
         "config_sha256": _file_sha256(config_path),
         "runtime_config": {"path": str(runtime_config), "sha256": _file_sha256(runtime_config)},
         "window_plan": {"path": str(window_plan), "sha256": _file_sha256(window_plan)},
+        "agent_config": (
+            {"path": str(agent_config), "sha256": _file_sha256(agent_config)}
+            if agent_config is not None
+            else None
+        ),
         "sources": sources,
         "budget": budget,
         "agents": list(config["agents"]),
