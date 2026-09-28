@@ -1,12 +1,19 @@
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
 import yaml
 
-from scripts.run_mechanism_algorithm_training import _build_manifest, _sha256_bytes
+from scripts.run_mechanism_algorithm_training import (
+    _build_manifest,
+    _file_sha256,
+    _sha256_bytes,
+    run,
+)
 from scripts.run_mechanism_factorial_pilot import build_factorial_catalog
+from src.agents.handoff_first_feasibility_agent import HandoffFirstFeasibilityAgent
 from src.data.model_catalog.adapter_catalog import AdapterCatalog
 from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv
 from src.envs.specs import ControlAction
@@ -154,7 +161,7 @@ def test_background_manifest_freezes_matched_algorithm_budget(tmp_path: Path) ->
     workflow.write_bytes(b"workflow\n")
     config = {
         "study_version": "manifest_test",
-        "python_executable": str(Path(sys.executable).resolve()),
+        "python_executable": str(Path(sys.executable)),
         "runtime_config": "configs/experiment/mechanism_factorial_shared_360mb_runtime_v1.yaml",
         "window_plan": "configs/experiment/mechanism_algorithm_training_windows_v1.json",
         "agents": ["sa_ghmappo", "mappo"],
@@ -194,12 +201,76 @@ def test_background_manifest_freezes_matched_algorithm_budget(tmp_path: Path) ->
 
     assert manifest["agents"] == ["sa_ghmappo", "mappo"]
     assert manifest["algorithm_superiority_claim_allowed"] is False
+    assert manifest["python_executable"] == str(Path(sys.executable))
+    assert manifest["python_identity"]["status"] == "passed"
     assert len(manifest["commands"]) == 2
     commands = [row["command"] for row in manifest["commands"]]
     for command in commands:
         assert command[command.index("--episodes") + 1] == "4"
+        assert command[command.index("--max_steps") + 1] == "6"
         assert command[command.index("--random_seed") + 1] == "1401"
         assert command[command.index("--mechanism_factorial_arm") + 1] == (
             "sharing_on_migration_on"
         )
         assert "--formal-exogenous-request-execution" in command
+
+
+def test_background_run_writes_failure_receipt_for_nonzero_child(tmp_path: Path) -> None:
+    output_root = tmp_path / "failed_run"
+    output_root.mkdir()
+    manifest = {
+        "output_root": str(output_root),
+        "cwd": str(ROOT_DIR),
+        "python_identity": {"observed_sys_prefix": sys.prefix},
+        "evidence_scope": "unit_test",
+        "commands": [
+            {
+                "agent_name": "intentional_failure",
+                "run_id": "intentional_failure",
+                "command": [sys.executable, "-c", "raise SystemExit(7)"],
+                "stdout_path": str(output_root / "child.stdout.log"),
+                "stderr_path": str(output_root / "child.stderr.log"),
+            }
+        ],
+    }
+    manifest_path = output_root / "command_manifest.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    manifest_sha256 = _file_sha256(manifest_path)
+
+    assert run(manifest_path, manifest_sha256) == 7
+    receipt = json.loads(
+        (output_root / "completion_receipt.json").read_text(encoding="utf-8")
+    )
+    assert receipt["status"] == "FAILED"
+    assert receipt["return_code"] == 7
+    assert receipt["completed_child_count"] == 1
+    assert receipt["failure"] == "child intentional_failure exited nonzero"
+
+
+def test_handoff_first_feasibility_rule_prefetches_then_prepares_state() -> None:
+    agent = HandoffFirstFeasibilityAgent()
+    semantic_state = {
+        "primary_vehicle_id": "vehicle_0",
+        "vehicles": [
+            {"vehicle_id": "vehicle_0", "associated_rsu_id": "rsu_0"}
+        ],
+        "current_workflow_node": {"required_adapter": "adapter_a"},
+        "predictions": {
+            "predicted_next_rsu_by_vehicle": {"vehicle_0": "rsu_1"},
+            "predicted_first_handoff_rsu_by_vehicle": {"vehicle_0": "rsu_1"},
+        },
+        "rsus": [
+            {"rsu_id": "rsu_0", "cached_adapter_ids": ["adapter_a"]},
+            {"rsu_id": "rsu_1", "cached_adapter_ids": []},
+        ],
+    }
+    info = {"semantic_state": semantic_state, "action_mask": [True] * 5}
+
+    action, details = agent.act(None, info)
+    assert action == 1
+    assert details["heuristic_reason"] == "handoff_target_adapter_first"
+
+    semantic_state["rsus"][1]["cached_adapter_ids"] = ["adapter_a"]
+    action, details = agent.act(None, info)
+    assert action == 4
+    assert details["heuristic_reason"] == "handoff_state_prepare_after_target_ready"

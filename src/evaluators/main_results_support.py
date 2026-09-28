@@ -1472,6 +1472,7 @@ def run_real_episode(
     model_cache_runtime_contract: dict[str, Any] | None = None,
     formal_request_exposure_trace: dict[str, Any] | None = None,
     mechanism_profile: dict[str, Any] | None = None,
+    agent_override: Any | None = None,
 ) -> dict[str, Any]:
     cache_capacity_profile = validate_agent_eviction_binding(
         agent_name, cache_capacity_profile, run_seed=seed
@@ -1516,13 +1517,15 @@ def run_real_episode(
         run_metadata=run_metadata,
         base_overrides=agent_config_overrides,
     )
-    agent = build_inference_agent(
-        agent_name=agent_name,
-        random_seed=seed,
-        checkpoint_path=checkpoint_path,
-        deterministic_action=True,
-        agent_config_overrides=runtime_agent_config_overrides,
-    )
+    agent = agent_override
+    if agent is None:
+        agent = build_inference_agent(
+            agent_name=agent_name,
+            random_seed=seed,
+            checkpoint_path=checkpoint_path,
+            deterministic_action=True,
+            agent_config_overrides=runtime_agent_config_overrides,
+        )
     trainer = MARLOnPolicyTrainer(env=env, agent=agent, recorder=recorder, max_steps=max_steps)
     summary = trainer.run_episode(
         run_metadata={

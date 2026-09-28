@@ -279,6 +279,7 @@ def _augment_row(
     row: dict[str, Any],
     summary: dict[str, Any],
     *,
+    study_version: str,
     arm_id: str,
     base_sharing_enabled: bool,
     migration_enabled: bool,
@@ -299,7 +300,7 @@ def _augment_row(
     )
     augmented = dict(row)
     augmented.update(
-        study_version=STUDY_VERSION,
+        study_version=study_version,
         evidence_scope="observed_data_controlled_supplement_not_holdout",
         arm_id=arm_id,
         controller="popularity_cache_heuristic_fixed_rule",
@@ -387,6 +388,7 @@ def _aggregate(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def main() -> None:
     args = parse_args()
     config = _load_yaml(args.config)
+    study_version = str(config.get("study_version") or STUDY_VERSION)
     data = dict(config["data"])
     output_dir = args.output_dir or Path(config["output_dir"])
     if output_dir.exists() and any(output_dir.iterdir()):
@@ -444,22 +446,32 @@ def main() -> None:
         "telemetry_enabled": True,
     }
 
-    _, window_payload = resolve_window_candidates(
-        root_dir=ROOT_DIR,
-        mobility_source="ngsim",
-        mobility_csv_path=str(mobility_path),
-        lust_scenario_root="",
-        max_mobility_rows=int(data["max_mobility_rows"]),
-        rsu_layout=str(data["rsu_layout"]),
-        frame_offset=int(data.get("frame_offset", 0)),
-        window_length=int(data["window_length"]),
-        window_selector="max_handoff_candidate",
-        window_count=int(data["window_count"]),
-        window_scan_stride=int(data["window_scan_stride"]),
-        random_seed=int(config["seed"]),
-        window_mode="activating_only",
-        enforce_non_overlapping_selection=True,
-    )
+    window_plan_value = data.get("window_plan_path")
+    if window_plan_value:
+        window_plan_path = Path(str(window_plan_value)).expanduser()
+        if not window_plan_path.is_absolute():
+            window_plan_path = ROOT_DIR / window_plan_path
+        window_payload = json.loads(window_plan_path.read_text(encoding="utf-8"))
+        window_payload["selected_windows"] = list(
+            window_payload.get("selected_window_plan") or []
+        )
+    else:
+        _, window_payload = resolve_window_candidates(
+            root_dir=ROOT_DIR,
+            mobility_source="ngsim",
+            mobility_csv_path=str(mobility_path),
+            lust_scenario_root="",
+            max_mobility_rows=int(data["max_mobility_rows"]),
+            rsu_layout=str(data["rsu_layout"]),
+            frame_offset=int(data.get("frame_offset", 0)),
+            window_length=int(data["window_length"]),
+            window_selector="max_handoff_candidate",
+            window_count=int(data["window_count"]),
+            window_scan_stride=int(data["window_scan_stride"]),
+            random_seed=int(config["seed"]),
+            window_mode="activating_only",
+            enforce_non_overlapping_selection=True,
+        )
     selected_windows = list(window_payload["selected_windows"])
     if len(selected_windows) != int(data["window_count"]):
         raise RuntimeError("requested activating window count is unavailable")
@@ -509,7 +521,7 @@ def main() -> None:
             bundle.rsu_metadata["window_class"] = window["window_class"]
             for workflow in workflows:
                 bound_workflow = bind_workflow_to_catalog(workflow, catalog)
-                unit_id = f"{STUDY_VERSION}/{window['window_id']}/{workflow.workflow_id}/{arm_id}"
+                unit_id = f"{study_version}/{window['window_id']}/{workflow.workflow_id}/{arm_id}"
                 exposure = build_episode_formal_request_exposure(
                     workflow_state=bound_workflow,
                     mobility_bundle=bundle,
@@ -524,7 +536,7 @@ def main() -> None:
                         "window_id": window["window_id"],
                     },
                     source_provenance={
-                        "study_version": STUDY_VERSION,
+                        "study_version": study_version,
                         "evidence_scope": "observed_data_controlled_supplement_not_holdout",
                         "mobility_sha256": source_rows["mobility"]["sha256"],
                         "workflow_sha256": source_rows["workflow"]["sha256"],
@@ -545,7 +557,7 @@ def main() -> None:
                     reward_positive_offset=0.0,
                     run_metadata={
                         "script": "scripts/run_mechanism_factorial_pilot.py",
-                        "study_version": STUDY_VERSION,
+                        "study_version": study_version,
                         "mode": "controlled_mechanism_factorial_pilot",
                         "window_mode": "joint_mechanism_opportunity",
                         "window_rank": window["window_rank"],
@@ -580,6 +592,7 @@ def main() -> None:
                 row = _augment_row(
                     summary_to_row(summary),
                     summary,
+                    study_version=study_version,
                     arm_id=arm_id,
                     base_sharing_enabled=sharing,
                     migration_enabled=migration,
@@ -628,7 +641,7 @@ def main() -> None:
         "transfer_accounting_observed": any(float(row["total_transfer_mb"]) > 0 for row in rows),
     }
     completion = {
-        "study_version": STUDY_VERSION,
+        "study_version": study_version,
         "status": "completed" if all(event_checks.values()) else "completed_with_failed_event_check",
         "evidence_scope": "observed_data_controlled_supplement_not_holdout",
         "git_commit": _git_commit(),

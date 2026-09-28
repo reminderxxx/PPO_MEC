@@ -1,0 +1,23 @@
+diagnostic_version: mechanism_completion_feasibility_v1
+seed: 1401
+max_steps_values: [12, 20]
+
+data:
+  mobility_csv_path: data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv
+  workflow_csv_path: data/raw/workflow/alibaba2018/batch_task.csv
+  max_mobility_rows: 2500
+  window_plan_path: configs/experiment/mechanism_algorithm_training_windows_v1.json
+  workflow_ids: [j_3, j_8, j_15, j_34]
+
+expected_sources:
+  mobility:
+    size_bytes: 2118175938
+    sha256: ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c
+  workflow:
+    size_bytes: 802261444
+    sha256: 6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc
+
+claim_boundary: >-
+  Observed-data completion feasibility diagnostic only. The handoff-first controller
+  is a fixed, non-learning reference using the same visible semantic state and action
+  mask. It is not a paper baseline and receives no future trace or outcome access.

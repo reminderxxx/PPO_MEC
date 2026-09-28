@@ -1,0 +1,44 @@
+study_version: controlled_mechanism_factorial_pilot_v2
+output_dir: artifacts/analysis/mechanism_factorial_pilot_v2
+verify_source_sha256: true
+
+data:
+  mobility_csv_path: data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv
+  workflow_csv_path: data/raw/workflow/alibaba2018/batch_task.csv
+  max_mobility_rows: 2500
+  rsu_layout: auto_dominant_tight
+  frame_offset: 0
+  window_length: 24
+  window_count: 3
+  window_scan_stride: 2
+  window_plan_path: configs/experiment/mechanism_algorithm_training_windows_v1.json
+  workflow_ids: [j_3, j_8, j_15, j_34]
+  min_tasks: 5
+  max_tasks: 20
+  max_steps: 20
+
+expected_sources:
+  mobility:
+    size_bytes: 2118175938
+    sha256: ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c
+  workflow:
+    size_bytes: 802261444
+    sha256: 6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc
+
+seed: 1401
+capacity_mb: 360.0
+eviction_policy: lru
+initial_adapter_id: adapter_perception
+
+claim_boundary:
+  independent_test: false
+  formal_run: false
+  holdout: false
+  purpose: completion feasibility and mechanism-effect replication under a horizon matched to max_tasks
+  horizon_rationale: max_steps equals the frozen max_tasks=20 and remains below the 24-frame mobility window
+  controlled_factors:
+    - semantic_ai_service adapter labels over real Alibaba DAG structure
+    - typed object sizes from the controlled repository catalog
+    - 360 MB per-RSU capacity pressure
+    - adapter-specific physical base replicas when sharing is disabled
+    - one-request cold restart when workflow-state migration is disabled
