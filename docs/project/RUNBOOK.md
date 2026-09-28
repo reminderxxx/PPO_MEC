@@ -1552,3 +1552,37 @@ XML 必须包含 `test_benchmark_main_executes_full_envelope_gate` 的全部 16 
 
 输出目录 create-only；配置硬拒绝超过 48 episodes 或 960 steps。该命令不训练、不加载旧 checkpoint、不访问
 holdout；重复执行必须使用新目录并先比较 compact rows，不得根据首轮结果修改 scenario/阈值。
+
+## CRDCM performance matrix v2（完整执行未授权）
+
+只读 preflight 会展开全部 12 个 training cells，验证项目 venv、NGSIM/Alibaba size+SHA、LFS pointer 拒绝、
+三个 raw frame/time interval 非重叠、预算恒等式和两个入口 import；不会创建 full run root：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_crdcm_performance_matrix.py preflight \
+  --config configs/experiment/crdcm_performance_matrix_v2.yaml \
+  --data-root /Users/howen/Projects/PPO_MEC
+```
+
+实现 smoke 已在固定 create-only root 运行一次，不得原地重跑或用于性能选择：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_crdcm_performance_matrix.py smoke \
+  --config configs/experiment/crdcm_performance_matrix_v2.yaml \
+  --data-root /Users/howen/Projects/PPO_MEC \
+  --output-root artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928
+```
+
+未来只有在中央明确批准完整执行后才允许单次调用：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_crdcm_performance_matrix.py launch \
+  --config configs/experiment/crdcm_performance_matrix_v2.yaml \
+  --data-root /Users/howen/Projects/PPO_MEC \
+  --output-root artifacts/training/crdcm_performance_matrix_v2_20260928
+```
+
+`launch_receipt.status=RUNNING`、`startup_confirmed=true` 只表示后台进程真实启动；完整结果还必须同时满足
+`completion_receipt.status=SUCCEEDED`、12 个 child、12 个 fixed checkpoints、156-episode evaluation receipt 和
+integrity pass。禁止自动 retry、加 seed、换窗口、按指标选 checkpoint、访问旧 holdout 或把 observed-data paired
+evaluation 写成 formal/independent evidence。

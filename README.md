@@ -5,6 +5,14 @@
 
 # PPO_MEC
 
+2026-09-28 已把 CRDCM 后续实验从旧的 960-episode 条件性预算 proposal 收口为首次完整可执行 v2 矩阵：
+`full-SA / signal-off-SA / full-MAPPO / full-PPO` × seeds `1401/1402/1403` × 64 episodes，共 768 training
+episodes；固定 paired observed-data development evaluation 另计 156 episodes，合计上限 924 episodes / 18,480
+steps。实现 smoke 共 13 episodes、149 actual steps，四个 learned condition 均真实更新、保存、恢复，checkpoint
+评价前后 hash 不变；完整训练未启动，novelty/advantage/formal/holdout 均为 `UNVERIFIED`。入口为
+`scripts/run_crdcm_performance_matrix.py`，合同见
+`docs/project/crdcm_performance_matrix_v2_freeze_20260928.md`。
+
 2026-09-28 已将 mechanism retraining v2 的 SA-GHMAPPO/MAPPO 共同固定预算终点 `update_0016.pt` 做 create-only
 冻结；冻结规则在查看训练统计后确定，非预注册。一次同训练窗口/workflow 的 resubstitution 多目标评价显示 MAPPO
 completion/continuity 较高但 transfer/backhaul 更高，frozen SA 没有全面优势。128 个训练 episode 的事件归因显示

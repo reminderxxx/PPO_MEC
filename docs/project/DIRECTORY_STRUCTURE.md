@@ -329,3 +329,14 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 - `scripts/run_crdcm_decision_diagnostic.py`：真实 NGSIM+Alibaba 单次诊断 producer。
 - `tests/test_crdcm_decision_contract.py`：state/encoder/action/trace/credit/checkpoint/scenario tests。
 - `artifacts/analysis/crdcm_decision_diagnostic_v1_20260928/`：tables、trace summaries、receipt、command 与 integrity evidence。
+
+## CRDCM performance matrix v2
+
+- `configs/experiment/crdcm_performance_matrix_v2.yaml`：四个 unique learned conditions、三个 seed、训练/评价/smoke
+  预算、资源 identity、paired scenarios 和 claim boundary。
+- `scripts/run_crdcm_performance_matrix.py`：preflight、foreground smoke 与未来单次 background launch；create-only、
+  LFS pointer 拒绝、完整 receipts、no retry。
+- `scripts/evaluate_crdcm_frozen_checkpoints.py`：固定 checkpoint 的 observed-data paired development evaluator。
+- `tests/test_crdcm_performance_matrix.py`：矩阵恒等式、signal-off、actor/critic credit、checkpoint、LFS 和失败 receipt。
+- `artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/`：实现 smoke；不得作为性能结果。
+- `artifacts/training/crdcm_performance_matrix_v2_20260928/`：未来完整执行 root；当前不存在、未授权创建。

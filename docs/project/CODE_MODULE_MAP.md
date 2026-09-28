@@ -726,3 +726,15 @@
 - `src/trainers/marl_on_policy_trainer.py`：executed action credit reconciliation 与 `policy_decision_trace_v2` producer。
 - `src/evaluators/main_results_support.py`：显式 in-memory diagnostic agent 可跳过 checkpoint resolution；正常路径不变。
 - `scripts/run_crdcm_decision_diagnostic.py`：固定真实小 rollout、metric/failure/divergence 与 integrity producer。
+
+# CRDCM performance-matrix v2 modules
+
+- `src/agents/crdcm_agent.py`：`full/signal_off` contribution switch、versioned checkpoint 和 actor-mask/
+  executed-trajectory critic-only update。
+- `scripts/train_algo_pool_real_sample.py`：CRDCM condition/feature-mode producer，真实参数 before/after finite digest。
+- `configs/experiment/crdcm_performance_matrix_v2.yaml`：condition/seed/hyperparameter/training/evaluation/smoke 唯一合同。
+- `scripts/run_crdcm_performance_matrix.py`：source/LFS/venv/interval/budget preflight，create-only matrix orchestration、
+  fixed checkpoint manifest、background state/receipts 和 integrity producer。
+- `scripts/evaluate_crdcm_frozen_checkpoints.py`：四 scenario × 三 paired observed units 的 checkpoint consumer；
+  评价前后 checkpoint hash invariant。
+- `tests/test_crdcm_performance_matrix.py`：condition/budget、signal-off、actor/critic、checkpoint mode、LFS 和失败 receipt。

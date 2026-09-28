@@ -5,6 +5,20 @@
 
 ﻿# Progress
 
+## 2026-09-28: CRDCM performance matrix v2 实现与冻结（未启动完整训练）
+
+- 纠正旧 `5×3×64=960` 只是预算 proposal，不曾构成完整执行 freeze。v2 去掉无实现差异的重复命名，冻结四个
+  unique learned conditions：full-SA、signal-off-SA、full-MAPPO、full-PPO；seeds=`1401/1402/1403`，训练
+  768 episodes / 15,360-step cap，paired observed-data development evaluation 156 episodes / 3,120-step cap，
+  合计 924 / 18,480。
+- signal-off 使用同 CRDCM wrapper/credit/runtime 并精确置零新增 residual，保留物理 cache/migration 和合理服务；
+  full SA vs off 是机制信号消融，full SA/MAPPO/PPO 是同信息架构比较。
+- 新 runner 保留项目 venv 入口，显式验证外部 NGSIM/Alibaba size+SHA，拒绝 checkout LFS pointer，create-only、
+  no-retry，并保存 argv/manifest/state/logs/checkpoint/evaluation/completion/failure receipt。HF metadata 不在依赖图。
+- 实现 smoke 为 8 training episodes / 104 actual steps + 5 restore/heuristic evaluation episodes / 45 steps；四条件均
+  parameter digest 改变且 finite，checkpoint load 成功、评价前后 hash 不变。完整矩阵没有启动，结果/novelty/正式
+  claim 仍为 `UNVERIFIED`。证据见 `crdcm_performance_matrix_v2_freeze_20260928.md`。
+
 ## 2026-09-28: v3 策略决策能力诊断与 CRDCM 单一候选设计
 
 - 12 个 matched units、123 步逐动作核对确认：SA/MAPPO 在 guard-on 和 guard-off 下分别 123/123 完全相同；

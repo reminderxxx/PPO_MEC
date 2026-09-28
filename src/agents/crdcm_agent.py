@@ -22,6 +22,7 @@ from src.encoders.crdcm_observation import (
 
 CRDCM_CHECKPOINT_FORMAT_VERSION = "crdcm_checkpoint_v1"
 CRDCM_CREDIT_CONTRACT_VERSION = "mask_external_override_actor_credit_v1"
+CRDCM_FEATURE_MODES = ("full", "signal_off")
 
 
 def _tensor_values(value: Any) -> list[float]:
@@ -53,6 +54,7 @@ class _CRDCMPolicyMixin:
         *,
         crdcm_residual_scale: float = 0.35,
         crdcm_hidden_dim: int = 64,
+        crdcm_feature_mode: str = "full",
         **kwargs: Any,
     ) -> None:
         random_seed = int(kwargs.get("random_seed", 7))
@@ -61,6 +63,11 @@ class _CRDCMPolicyMixin:
         self.policy_type = self.crdcm_policy_type
         self._crdcm_residual_scale = max(float(crdcm_residual_scale), 0.0)
         self._crdcm_hidden_dim = max(int(crdcm_hidden_dim), 8)
+        self._crdcm_feature_mode = str(crdcm_feature_mode)
+        if self._crdcm_feature_mode not in CRDCM_FEATURE_MODES:
+            raise ValueError(
+                f"unsupported CRDCM feature mode: {self._crdcm_feature_mode}"
+            )
         output_dim = 6 if not self._use_hierarchy else 8
         with torch.random.fork_rng(devices=[]):
             torch.manual_seed(random_seed + 17041)
@@ -88,7 +95,12 @@ class _CRDCMPolicyMixin:
             device=self._device,
             dtype=next(self._crdcm_residual.parameters()).dtype,
         )
-        residual = self._crdcm_residual(features) * self._crdcm_residual_scale
+        learned_residual = self._crdcm_residual(features) * self._crdcm_residual_scale
+        residual = (
+            learned_residual
+            if self._crdcm_feature_mode == "full"
+            else torch.zeros_like(learned_residual)
+        )
         pre_logits: dict[str, list[float]] = {}
         post_logits: dict[str, list[float]] = {}
         post_probabilities: dict[str, list[float]] = {}
@@ -117,6 +129,7 @@ class _CRDCMPolicyMixin:
             "post_crdcm_head_logits": post_logits,
             "post_crdcm_head_probabilities": post_probabilities,
             "residual": _tensor_values(residual),
+            "feature_mode": self._crdcm_feature_mode,
         }
         return output
 
@@ -192,32 +205,94 @@ class _CRDCMPolicyMixin:
             }
         return action, action_info
 
-    def learn(self, rollout: list[dict[str, Any]]) -> dict[str, Any]:
-        eligible = [
-            row
+    def _critic_only_update(self, rollout: list[dict[str, Any]]) -> dict[str, Any]:
+        """Train value prediction on executed transitions without actor credit.
+
+        The protected PPO core does not expose independent actor/critic sample weights.
+        CRDCM therefore sends eligible raw-policy samples through the normal PPO update
+        and applies a separate value-only update to externally overridden samples. This
+        keeps the critic on the complete executed trajectory while never treating an
+        override as an on-policy actor sample.
+        """
+
+        if not rollout:
+            return {
+                "critic_update_skipped": True,
+                "critic_only_sample_count": 0,
+                "critic_only_value_loss": 0.0,
+            }
+        semantic_states = [
+            self._extract_semantic_state(row.get("decision_info")) for row in rollout
+        ]
+        run_metadata = [
+            dict(row.get("decision_info", {}).get("run_metadata", {}) or {})
             for row in rollout
-            if float(
+        ]
+        returns = torch.as_tensor(
+            [float(row.get("return", row.get("reward", 0.0))) for row in rollout],
+            dtype=torch.float32,
+            device=self._device,
+        )
+        predictions = torch.stack(
+            [
+                self._forward_policy(state, run_metadata=metadata)["value"]
+                for state, metadata in zip(semantic_states, run_metadata)
+            ],
+            dim=0,
+        )
+        value_loss = torch.mean((returns - predictions) ** 2)
+        self._optimizer.zero_grad()
+        (self._value_coef * value_loss).backward()
+        parameters = [
+            parameter
+            for group in self._optimizer.param_groups
+            for parameter in group["params"]
+            if parameter.grad is not None
+        ]
+        nn.utils.clip_grad_norm_(parameters, max_norm=self._max_grad_norm)
+        self._optimizer.step()
+        return {
+            "critic_update_skipped": False,
+            "critic_only_sample_count": len(rollout),
+            "critic_only_value_loss": round(float(value_loss.detach().item()), 6),
+        }
+
+    def learn(self, rollout: list[dict[str, Any]]) -> dict[str, Any]:
+        eligible: list[dict[str, Any]] = []
+        masked: list[dict[str, Any]] = []
+        for row in rollout:
+            actor_weight = float(
                 row.get("action_info", {})
                 .get("crdcm_decision_contract", {})
                 .get("actor_credit_weight", 1.0)
             )
-            > 0.0
-        ]
-        masked_count = len(rollout) - len(eligible)
+            (eligible if actor_weight > 0.0 else masked).append(row)
+        masked_count = len(masked)
         if not eligible:
+            critic_stats = self._critic_only_update(masked)
+            if masked:
+                self._update_count += 1
             return {
                 "agent_name": self.agent_name,
                 "policy_type": self.policy_type,
-                "policy_update_skipped": True,
+                "policy_update_skipped": False,
+                "actor_update_skipped": True,
                 "reason": "all_actions_externally_overridden",
                 "credit_contract_version": CRDCM_CREDIT_CONTRACT_VERSION,
                 "external_override_masked_count": masked_count,
+                "actor_credit_eligible_count": 0,
+                "critic_credit_sample_count": len(masked),
                 "update_count": self._update_count,
+                **critic_stats,
             }
         stats = dict(super().learn(eligible))
+        critic_stats = self._critic_only_update(masked)
         stats["credit_contract_version"] = CRDCM_CREDIT_CONTRACT_VERSION
         stats["external_override_masked_count"] = masked_count
         stats["actor_credit_eligible_count"] = len(eligible)
+        stats["critic_credit_sample_count"] = len(rollout)
+        stats["actor_update_skipped"] = False
+        stats.update(critic_stats)
         return stats
 
     def _checkpoint_config(self) -> dict[str, Any]:
@@ -232,6 +307,7 @@ class _CRDCMPolicyMixin:
                 "crdcm_credit_contract_version": CRDCM_CREDIT_CONTRACT_VERSION,
                 "crdcm_residual_scale": self._crdcm_residual_scale,
                 "crdcm_hidden_dim": self._crdcm_hidden_dim,
+                "crdcm_feature_mode": self._crdcm_feature_mode,
             }
         )
         return config
@@ -267,6 +343,12 @@ class _CRDCMPolicyMixin:
             )
         if config.get("crdcm_decision_contract_version") != CRDCM_DECISION_CONTRACT_VERSION:
             raise ValueError("CRDCM decision contract mismatch")
+        if config.get("crdcm_feature_mode") != self._crdcm_feature_mode:
+            raise ValueError(
+                "CRDCM feature mode mismatch: "
+                f"checkpoint={config.get('crdcm_feature_mode')} "
+                f"runtime={self._crdcm_feature_mode}"
+            )
         self._network.load_state_dict(checkpoint["network_state_dict"], strict=True)
         self._crdcm_residual.load_state_dict(
             checkpoint["crdcm_residual_state_dict"], strict=True
@@ -297,6 +379,7 @@ class CRDCMSAGHMAPPOAgent(_CRDCMPolicyMixin, SAGHMAPPOAgent):
 __all__ = [
     "CRDCM_CHECKPOINT_FORMAT_VERSION",
     "CRDCM_CREDIT_CONTRACT_VERSION",
+    "CRDCM_FEATURE_MODES",
     "CRDCMMAPPOAgent",
     "CRDCMPPOAgent",
     "CRDCMSAGHMAPPOAgent",

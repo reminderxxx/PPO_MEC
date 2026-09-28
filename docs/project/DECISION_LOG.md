@@ -1162,3 +1162,18 @@ typed bundle/capacity/migration/reuse 合同。直接扩展 object-level factori
 
 约束：真实 48-episode rollout 只用于 plumbing/sensitivity/interpretability；未来 960-episode performance matrix、
 新训练、formal/holdout 和 promotion 必须另行批准。
+
+## 2026-09-28 — D-CRDCM-v2 去重科学条件并冻结完整可执行 development matrix
+
+决定：将旧 `5×3×64=960` 明确保留为未完整定义的预算 proposal。首次执行 freeze 使用四个 unique learned
+conditions：full-SA、signal-off-SA、full-MAPPO、full-PPO；三个 seed `1401/1402/1403`；训练 768 episodes，
+fixed paired evaluation 156 episodes，合计 cap 924 episodes / 18,480 steps。signal-off 与 full-SA 共用 wrapper、
+physical runtime、credit 和训练预算，只把新增 CRDCM residual 精确置零；不另立改名的 matched-SA cell。
+
+原因：当前所谓 CRDCM full 的可训练增量是共享 28 维 causal residual，而不是独立于 SA 的另一架构。重复训练
+“CRDCM”和“matched SA”会浪费预算并制造伪条件。full SA/MAPPO/PPO 比较 encoder/actor structure；full/off SA
+比较新增 CRDCM signal contribution。
+
+约束：数据是历史已观察 development resubstitution；3 windows 是 outer units，3 seeds/workflows 不扩张独立样本量。
+完整 training/evaluation 未授权；本轮 13-episode implementation smoke 永久排除出性能结果。旧 consumed holdout 不读，
+novelty/advantage/formal/paper-ready 继续 `UNVERIFIED`。

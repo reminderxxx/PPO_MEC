@@ -675,3 +675,8 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - `OPEN / structure realization`：48-episode fresh/untrained diagnostic 中 CRDCM SA-GHMAPPO 与 MAPPO 为 0/124 action disagreement。当前只证明相同状态已到达不同 encoder，尚未证明图结构形成不同或更优行为。
 - `OPEN / performance evidence`：没有新训练 checkpoint、多 seed、disjoint formal/holdout 或统计；任何 advantage/generalization claim 均为 `UNVERIFIED`。
 - `CLOSED / silent forced-action credit`：新 CRDCM wrapper/trainer 对 executed action 偏离 aggregated policy action 的样本显式标记并屏蔽 actor credit；legacy agent 行为不改。
+- `CLOSED / overridden critic omission`：v2 不再把 override 样本从整个 update 删除；raw actor credit 仍为 0，但
+  executed trajectory 进入独立 value-only update。定向测试验证 actor-specific residual output row 不变、value row
+  改变且参数 finite。
+- `OPEN / low-power observed development`：v2 只有 3 seeds、3 个历史已观察 windows 和 NGSIM+Alibaba 单一组合；
+  paired evaluation 是 resubstitution development，不是 formal/holdout。即使结果正向也不能据此晋级 paper claim。

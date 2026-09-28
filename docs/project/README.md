@@ -82,6 +82,7 @@
 - `CODE_MODULE_MAP.md`：代码模块职责和主要依赖方向
 - `RUNBOOK.md`：常用运行、验证、训练和 benchmark 命令
 - `DECISION_LOG.md`：长期有效的设计和流程决策
+- `crdcm_performance_matrix_v2_freeze_20260928.md`：CRDCM 四条件/三 seed 完整执行合同、实现 smoke、资源与 claim 边界
 - `STATUS_TAGS.md`：文档状态标签约定
 - `ALGO_POOL.md`：方向匹配型强化学习对照算法池状态和运行入口
 - `../benchmark_plan_or_baseline_plan.md`：baseline 盘点、对照矩阵和统一训练评估协议

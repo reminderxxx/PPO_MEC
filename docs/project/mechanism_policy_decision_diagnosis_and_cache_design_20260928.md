@@ -182,6 +182,11 @@ contention，但不是 VEC handoff 下的跨 RSU state migration。S-LoRA 只为
 SA、MAPPO、PPO）× 3 seeds × 每 condition/seed 64 episodes，则为 960 episodes，上限 19,200 environment steps；
 heuristic 不训练。该预算必须在新数据 split、状态/动作合同、停止规则冻结后另行批准，不能复用 v3 继续训练。
 
+> 2026-09-28 后续标注：上述 `5×3×64=960` 是条件性预算 proposal，不是已经完整冻结的执行矩阵；它没有给出
+> condition→实现映射、seed 值、consumer argv 或评价预算。首次完整可执行 freeze 是后续
+> `crdcm_performance_matrix_v2`，其去掉重复命名条件后为 768 training + 156 paired development evaluation，详见
+> `crdcm_performance_matrix_v2_freeze_20260928.md`。本段历史设计原文保留，不改写为既有授权或既有结果。
+
 ## 最小可证伪实验
 
 ### 比较与 estimand

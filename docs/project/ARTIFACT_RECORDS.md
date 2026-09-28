@@ -1584,3 +1584,13 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 - Evidence：48 episode summaries、diagnostic rows/aggregate、124-cell action divergence、pairwise disagreement、completion receipt、command log、plan snapshot 与 self-excluding integrity manifest。
 - Identity：base commit `19200c5e9fec1dddd9375834ada3ac1798bf119e`；implementation/artifact execution commit=`47f10523d6da036dcd14c91fed5d6201903aa457`。
 - Boundary：no training、no legacy checkpoint adaptation、no holdout；仅支持 decision-contract plumbing、sensitivity 和 mechanism interpretability，不支持 advantage/generalization/paper-ready claim。
+
+## 2026-09-28 — CRDCM performance matrix v2 implementation smoke
+
+- Artifact root：`artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928/`。
+- Scope：四个 unique learned conditions 各 2 training episodes，合计 104 actual training steps；四个 restored
+  checkpoints + 一个 matched heuristic unit，5 evaluation episodes / 45 actual steps；总计 13 episodes / 149 steps。
+- Evidence：完整 command manifest、source/venv/interval audit、四 child receipts、parameter before/after finite digests、
+  checkpoint manifest、restore evaluation、checkpoint before/after hashes、terminal receipt 和 48-file integrity manifest。
+- Boundary：implementation-only smoke，`performance_result_eligible=false`；完整 768-training + 156-evaluation matrix
+  未启动，full root 不存在。不是 formal/holdout、algorithm advantage、novelty、convergence 或 paper-ready evidence。

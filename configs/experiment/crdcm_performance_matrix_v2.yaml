@@ -1,0 +1,143 @@
+study_version: crdcm_performance_matrix_v2
+status: frozen_implementation_complete_execution_not_authorized
+python_executable: /Users/howen/Projects/PPO_MEC/.venv/bin/python
+runtime_config: configs/experiment/mechanism_factorial_shared_360mb_runtime_v1.yaml
+training_window_plan: configs/experiment/mechanism_algorithm_training_windows_v1.json
+
+seed_rule:
+  description: consecutive offsets 0/1/2 from the pre-existing CRDCM diagnostic seed 1401; selected before any CRDCM training outcome
+  base_seed: 1401
+  offsets: [0, 1, 2]
+seeds: [1401, 1402, 1403]
+
+conditions:
+  - condition_id: crdcm_full_sa
+    agent_name: crdcm_sa_ghmappo
+    crdcm_feature_mode: full
+    scientific_role: candidate_full_graph_hierarchical
+  - condition_id: crdcm_signal_off_sa
+    agent_name: crdcm_sa_ghmappo
+    crdcm_feature_mode: signal_off
+    scientific_role: contribution_ablation_same_wrapper_credit_runtime_zero_new_residual
+  - condition_id: crdcm_full_mappo
+    agent_name: crdcm_mappo
+    crdcm_feature_mode: full
+    scientific_role: architecture_comparison_flat_ctde_same_crdcm_signal
+  - condition_id: crdcm_full_ppo
+    agent_name: crdcm_ppo
+    crdcm_feature_mode: full
+    scientific_role: architecture_comparison_flat_ppo_same_crdcm_signal
+
+hyperparameters:
+  episodes_per_condition_seed: 64
+  max_steps: 20
+  update_every: 4
+  batch_size: 32
+  checkpoint_every_updates: 4
+  learning_rate: 0.0003
+  clip_ratio: 0.2
+  entropy_coef: 0.01
+  value_coef: 0.5
+  gamma: 0.99
+  gae_lambda: 0.95
+  reward_positive_offset: 0.0
+  prediction_horizon: 3
+  deterministic_training_action: false
+  fixed_checkpoint_rule: latest.pt after episode 64 / update 16; no metric-based selection
+
+budget:
+  learned_condition_count: 4
+  seed_count: 3
+  training_episodes: 768
+  training_environment_step_cap: 15360
+  learned_checkpoint_count: 12
+  paired_evaluation_units_per_checkpoint: 12
+  learned_evaluation_episodes: 144
+  heuristic_evaluation_episodes: 12
+  evaluation_episodes: 156
+  evaluation_environment_step_cap: 3120
+  full_execution_episode_cap: 924
+  full_execution_environment_step_cap: 18480
+  prior_proposal_training_episode_upper_bound: 960
+  prior_proposal_training_environment_step_upper_bound: 19200
+
+training_data:
+  mobility_csv_path: data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv
+  workflow_csv_path: data/raw/workflow/alibaba2018/batch_task.csv
+  max_mobility_rows: 2500
+  max_workflows: 4
+  min_tasks: 5
+  max_tasks: 20
+  workflow_selector: ordered
+  adapter_assignment_profile: semantic_ai_service
+  mechanism_factorial_arm: sharing_on_migration_on
+  primary_vehicle_selection: handoff_pressure
+  exposure_schedule: 12 window-workflow pairs repeated five complete cycles plus the first four pairs; identical order for every condition and seed
+  role: historically_observed_development_training_not_holdout
+
+evaluation:
+  controller: deterministic_checkpoint_policy
+  checkpoint_rule: fixed latest.pt from update 16 only
+  paired_outer_unit: original NGSIM raw frame/time interval
+  data_role: historically_observed_paired_development_resubstitution_not_formal_not_holdout
+  strong_heuristic: crdcm_critical_path_heuristic
+  max_steps: 20
+  pairs:
+    - {window_index: 0, workflow_id: j_3}
+    - {window_index: 1, workflow_id: j_8}
+    - {window_index: 2, workflow_id: j_15}
+  scenarios:
+    - scenario_id: capacity_competition
+      capacity_mb: 280.0
+      migration_enabled: true
+      workflow_binding: repeated_reuse
+      initial_adapter_id: adapter_perception
+    - scenario_id: shared_adapter_reuse_prepare
+      capacity_mb: 360.0
+      migration_enabled: true
+      workflow_binding: repeated_reuse
+      initial_adapter_id: adapter_perception
+    - scenario_id: low_reuse_no_migration_negative
+      capacity_mb: 360.0
+      migration_enabled: false
+      workflow_binding: round_robin_low_reuse
+      initial_adapter_id: adapter_perception
+    - scenario_id: ample_resource_negative
+      capacity_mb: 1024.0
+      migration_enabled: true
+      workflow_binding: round_robin_low_reuse
+      initial_adapter_id: adapter_perception
+  reporting: paired metric vector and Pareto trade-offs only; no post-hoc weighted score
+
+smoke_budget:
+  execution_scope: implementation_only_excluded_from_performance_results
+  seed: 1401
+  training_episodes_per_condition: 2
+  training_environment_step_cap: 160
+  restore_evaluation_episodes_per_condition: 1
+  restore_evaluation_environment_step_cap: 80
+  heuristic_evaluation_episodes: 1
+  heuristic_evaluation_environment_step_cap: 20
+  total_episode_cap: 13
+  total_environment_step_cap: 260
+
+expected_sources:
+  mobility:
+    size_bytes: 2118175938
+    sha256: ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c
+  workflow:
+    size_bytes: 802261444
+    sha256: 6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc
+
+output_policy:
+  future_full_root: artifacts/training/crdcm_performance_matrix_v2_20260928
+  smoke_root: artifacts/analysis/crdcm_performance_matrix_v2_smoke_20260928
+  create_only: true
+  automatic_retry_count: 0
+
+claim_boundary: >-
+  This is a frozen observed-data development falsification matrix. It does not use or
+  reopen a consumed holdout, and it cannot support novelty, independent generalization,
+  formal superiority, convergence, or paper-ready claims. CRDCM novelty remains
+  UNVERIFIED. Full training and the paired development evaluation require a separate
+  execution authorization after implementation review.

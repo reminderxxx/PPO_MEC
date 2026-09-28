@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import sys
 from datetime import datetime
@@ -88,7 +89,12 @@ from src.runtime.formal_exogenous_request_execution import compute_formal_endpoi
 from src.trainers.marl_on_policy_trainer import MARLOnPolicyTrainer
 
 
-TRAINABLE_BASELINES = list_trainable_agents()
+CRDCM_TRAINABLE_CANDIDATES = [
+    "crdcm_sa_ghmappo",
+    "crdcm_mappo",
+    "crdcm_ppo",
+]
+TRAINABLE_BASELINES = list_trainable_agents() + CRDCM_TRAINABLE_CANDIDATES
 REPLAY_BASELINES = {"dqn", "ddqn", "dueling_dqn", "dueling_ddqn", "qmix"}
 PROFILE_DEFAULTS = {
     "smoke": {"episodes": 2, "update_every": 1, "max_steps": 6, "batch_size": 8},
@@ -117,6 +123,35 @@ SUMMARY_METRICS = [
     "handoff_total_count",
     "mechanism_realization_rate",
 ]
+
+
+def agent_parameter_identity(agent: Any) -> dict[str, Any]:
+    digest = hashlib.sha256()
+    tensor_count = 0
+    parameter_count = 0
+    all_finite = True
+    modules = [("network", getattr(agent, "_network", None))]
+    residual = getattr(agent, "_crdcm_residual", None)
+    if residual is not None:
+        modules.append(("crdcm_residual", residual))
+    for module_name, module in modules:
+        if module is None:
+            continue
+        for name, tensor in sorted(module.state_dict().items()):
+            value = tensor.detach().cpu().contiguous()
+            digest.update(f"{module_name}.{name}".encode("utf-8"))
+            digest.update(str(value.dtype).encode("utf-8"))
+            digest.update(str(tuple(value.shape)).encode("utf-8"))
+            digest.update(value.numpy().tobytes())
+            tensor_count += 1
+            parameter_count += int(value.numel())
+            all_finite = all_finite and bool(torch.isfinite(value).all().item())
+    return {
+        "sha256": digest.hexdigest(),
+        "tensor_count": tensor_count,
+        "parameter_count": parameter_count,
+        "all_finite": all_finite,
+    }
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -212,6 +247,22 @@ def build_parser() -> argparse.ArgumentParser:
             "Opt-in controlled supplement profile. It is deliberately limited to "
             "the shared-base, migration-enabled arm used for matched algorithm retraining."
         ),
+    )
+    parser.add_argument(
+        "--crdcm_feature_mode",
+        choices=["", "full", "signal_off"],
+        default="",
+        help=(
+            "CRDCM v2 contribution switch. full enables the causal 28-feature "
+            "residual; signal_off keeps the same wrapper/credit/runtime but zeros "
+            "that residual. Required for CRDCM agents and forbidden otherwise."
+        ),
+    )
+    parser.add_argument(
+        "--crdcm_condition_id",
+        type=str,
+        default="",
+        help="Frozen CRDCM matrix condition identity recorded in every producer output.",
     )
     parser.add_argument("--reward_positive_offset", type=float, default=5.0)
     parser.add_argument("--workflow_selector", type=str, default="ordered")
@@ -543,6 +594,19 @@ def main() -> None:
     args.batch_size = resolved_training.batch_size
     args.max_steps = resolved_training.max_steps
     args.checkpoint_every_updates = resolved_training.checkpoint_every_updates
+    is_crdcm_agent = args.agent_name in CRDCM_TRAINABLE_CANDIDATES
+    if is_crdcm_agent and args.crdcm_feature_mode not in {"full", "signal_off"}:
+        raise FormalTrainingContractError(
+            "CRDCM agents require --crdcm_feature_mode=full|signal_off"
+        )
+    if is_crdcm_agent and not args.crdcm_condition_id:
+        raise FormalTrainingContractError(
+            "CRDCM agents require a frozen --crdcm_condition_id"
+        )
+    if not is_crdcm_agent and (args.crdcm_feature_mode or args.crdcm_condition_id):
+        raise FormalTrainingContractError(
+            "CRDCM feature/condition options are forbidden for non-CRDCM agents"
+        )
     runtime_contract = resolve_model_cache_runtime(
         args.model_cache_runtime_config or None,
         root=ROOT_DIR,
@@ -649,6 +713,10 @@ def main() -> None:
             "base_sharing_enabled": True,
             "workflow_state_migration_enabled": True,
             "migration_disabled_fallback": "cold_restart_one_request",
+            "crdcm_observation_enabled": bool(is_crdcm_agent),
+            "crdcm_observation_contract_version": (
+                "crdcm_observation_v1" if is_crdcm_agent else None
+            ),
         }
         for workflow_state in workflow_states:
             for node in workflow_state.nodes:
@@ -681,6 +749,8 @@ def main() -> None:
         "batch_size": args.batch_size,
         "deterministic_action": False,
     }
+    if is_crdcm_agent:
+        agent_kwargs["crdcm_feature_mode"] = args.crdcm_feature_mode
     if args.auxiliary_coef is not None:
         if args.agent_name != "sa_ghmappo":
             raise FormalTrainingContractError(
@@ -699,6 +769,7 @@ def main() -> None:
         smoke_rollout_capacity = max(int(args.max_steps) * max(int(args.update_every), 1), 1)
         agent_kwargs["min_replay_size"] = max(1, min(int(args.batch_size), smoke_rollout_capacity))
     agent = build_agent(args.agent_name, **agent_kwargs)
+    initial_parameter_identity = agent_parameter_identity(agent)
     resolved_agent_config = audited_agent_config(
         agent, resolved_training.agent_config
     )
@@ -891,6 +962,8 @@ def main() -> None:
                 ],
                 "adapter_assignment_profile": args.adapter_assignment_profile,
                 "mechanism_factorial_arm": args.mechanism_factorial_arm or None,
+                "crdcm_condition_id": args.crdcm_condition_id or None,
+                "crdcm_feature_mode": args.crdcm_feature_mode or None,
                 "evaluation_unit_id": (
                     formal_request_exposure_trace["evaluation_unit"]["evaluation_unit_id"]
                     if formal_request_exposure_trace is not None
@@ -1015,6 +1088,8 @@ def main() -> None:
                 ),
                 "is_smoke_checkpoint": args.profile == "smoke",
                 "script": "scripts/train_algo_pool_real_sample.py",
+                "crdcm_condition_id": args.crdcm_condition_id or None,
+                "crdcm_feature_mode": args.crdcm_feature_mode or None,
                 "typed_runtime_provenance": build_checkpoint_provenance(
                     root=ROOT_DIR,
                     agent_name=args.agent_name,
@@ -1064,6 +1139,7 @@ def main() -> None:
     mean_metrics, mean_metric_availability = reduce_nullable_metric_rows(
         rows, SUMMARY_METRICS
     )
+    final_parameter_identity = agent_parameter_identity(agent)
     summary_payload = {
         "run_id": run_id,
         "non_formal_rehearsal": bool(args.non_formal_rehearsal),
@@ -1090,6 +1166,8 @@ def main() -> None:
         "adapter_assignment_profile": args.adapter_assignment_profile,
         "mechanism_factorial_arm": args.mechanism_factorial_arm or None,
         "mechanism_profile": mechanism_profile,
+        "crdcm_condition_id": args.crdcm_condition_id or None,
+        "crdcm_feature_mode": args.crdcm_feature_mode or None,
         "selected_window_plan": selected_window_plan,
         "frozen_window_plan_path": window_payload.get("frozen_window_plan_path", ""),
         "frozen_window_plan_protocol_version": window_payload.get("frozen_window_plan_protocol_version", ""),
@@ -1176,6 +1254,14 @@ def main() -> None:
         "mean_metric_availability": mean_metric_availability,
         "rows": rows,
         "update_logs": update_logs,
+        "parameter_identity": {
+            "before_training": initial_parameter_identity,
+            "after_training": final_parameter_identity,
+            "changed": (
+                initial_parameter_identity["sha256"]
+                != final_parameter_identity["sha256"]
+            ),
+        },
     }
     serialized_summary = json.dumps(
         summary_payload, ensure_ascii=False, indent=2, allow_nan=False
