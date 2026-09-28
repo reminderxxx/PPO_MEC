@@ -213,6 +213,15 @@
 | deadline/reliability-aware agentic workflow scheduling | [DARCS: Deadline- and Reliability-Constrained Scheduling for LLM-Based Agentic Workflows on Heterogeneous Edge Infrastructure](https://doi.org/10.1016/j.sysarc.2026.104019) | Journal of Systems Architecture, 2026 online / Dec. issue | 面向并发到达的 LLM agentic DAG workflows，在 heterogeneous edge/cloud 上联合 server assignment、start time、deadline 与 hardware reliability constraint。 | 该文不是 VEC handoff 场景，但进一步收紧“LLM agentic DAG + heterogeneous edge + deadline/reliability”边界。PPO_MEC 需要真实 mobility、RSU adapter warm state、handoff continuity 与 backhaul/migration 指标，不能只把 Alibaba DAG 重命名为 agentic workflow。 | C-Context / strong problem neighbor；Workload definition / claim boundary。 |
 | threat-aware offloading and spatiotemporal caching | [Threat Aware Task Offloading and Caching for Secure UAV Assisted Vehicular Consumer Electronics](https://arxiv.org/abs/2608.17794) | arXiv, 2026；正式 venue 待核验 | 将 UAV-assisted VEC、security-aware uplink、PPO offloading 与 Frank-Wolfe caching update 联合起来，面向 information leakage 与异常通信风险。 | 可作为安全扩展和 UAV/RSU cooperative cache 的最新背景；目前不能作为正式顶刊近邻或 paper-grade baseline，PPO_MEC 也没有对应攻击模型与安全实验。 | Unverified / C-Context；Discussion / future security extension。 |
 
+## 2026-09-28 背景与问题依据补充
+
+以下依据出版社摘要及官方项目书目核验，不代表全文 novelty 排除完成。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+| --- | --- | --- | --- | --- | --- |
+| dual-dependency cooperative MEC | [Intelligent Cooperative Computation Offloading and Resource Allocation for Dual-Dependency Tasks in Edge Computing](https://doi.org/10.1109/TSC.2026.3709905) | IEEE Transactions on Services Computing, 19(4):2843–2856, 2026；出版社页面核验 | 同时考虑执行依赖与服务依赖，在有限服务和计算资源下以 recurrent MARL 联合卸载与资源分配；训练通信、执行分布式决策。 | 依赖感知联合优化本身已有直接近邻。本项目候选区别必须落在移动交接时 base/adapter 与执行状态的共同准备及其可测决策收益，尚未证明；不能用 controller heads 冒充该文的用户级 agents。 | Problem motivation / nearest-neighbor boundary；全文算法与假设比较待补。 |
+| workflow workload realism | [WfCommons: A framework for enabling scientific workflow research and development](https://doi.org/10.1016/j.future.2021.09.043) | Future Generation Computer Systems, 128:16–27, 2022；出版社与项目书目核验 | 从真实 workflow 实例分析并构建合成 workload，评价结构及模拟执行的真实性。 | 提供工作负载校准方法参考，不提供车载 adapter 请求证据。NGSIM 与 Alibaba 的组合须明确为 trace-driven simulation；模型映射、状态大小及迁移代价仍需独立校准，不能由两种真实 trace 自动推出联合工作负载真实。 | Evaluation methodology / limitations；方法参考，不标为顶刊或 A 会核心贡献依据。 |
+
 ## 写作 Claim 模板
 
 可采用的谨慎表述：
