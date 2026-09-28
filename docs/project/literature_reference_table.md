@@ -13,6 +13,9 @@
 
 ## 维护规范
 
+问题与文献固定ID、发表等级核验和实验对应见 `problem_literature_traceability_20260928.md`。
+内部 `A-Core` 不等于 CCF A；MLSys、TVT、FGCS、预印本不得混称顶刊/A会。直接近邻不能因级别不同而删除。
+
 每次文献检索或网页浏览时，如果发现与 PPO_MEC 方向相关、且本表尚未记录的论文，必须把它追加进本表。相关方向包括 VEC/MEC task offloading、DAG/dependency-aware workflow、service/model/adapter/KV cache、handoff/migration、multi-timescale control、MARL/DRL baseline、AI serving systems。
 
 新增论文时按以下规范处理：
@@ -49,6 +52,7 @@
 
 | 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
 |---|---|---:|---|---|---|
+| delayed preparation credit | [RUDDER: Return Decomposition for Delayed Rewards](https://papers.neurips.cc/paper_files/paper/2019/hash/16105fb9cc614fc29e1bda00dab60d41-Abstract.html) | NeurIPS, 2019；正式发表已核验 | 以return decomposition和reward redistribution处理延迟奖励，为准备成本先发生、收益后兑现提供算法基础。 | 不是本项目已实现机制。若研究预取/迁移归因，须证明跨RSU typed依赖与workflow-state的特定难点；不能把通用回报重分配当原创，或无证明沿用策略不变性。 | Method foundation / P03；全文公式与实现适配待核验。 |
 | cooperative edge caching + CTDE MADRL | [Cooperative Edge Caching for Profit Maximization Based on Multi-agent Deep Reinforcement Learning](https://doi.org/10.1109/TMC.2026.3710512) | IEEE TMC, 2026 early access | 联合 cache configuration、pricing 和 request scheduling；使用 CTDE MADRL 处理 edge-node cooperation/competition，并报告 edge testbed 结果。 | 该文不是 VEC、DAG workflow 或 adapter warm-state migration；它进一步压缩“cooperative caching + CTDE MARL”作为创新的空间。PPO_MEC 的可守差异必须是跨 RSU 连续 workflow、adapter/service state、causal handoff prediction 与机制兑现，而不是仅声称 cooperative cache MARL。 | Related Work / novelty-risk matrix；审稿回复中明确区分一般 edge cache profit game 与 mobility-driven VEC workflow control。 |
 | multi-agent counterfactual credit | [Counterfactual Multi-Agent Policy Gradients](https://arxiv.org/abs/1705.08926) | AAAI, 2018 | 提出 COMA counterfactual baseline，用 centralized critic 估计个体动作相对其他可行动作的边际贡献，缓解 cooperative MARL credit assignment。 | PPO_MEC v18 只把 selected-vs-expected legal option utility 作为 controller-level option gate 的部分 credit；不是完整 COMA critic，也不是 vehicle/RSU-agent full MARL。v18 full-dev 未晋级，论文中只能作为失败探索或 future work，不可当作主结果依据。 | Method motivation / Negative-result discussion；解释为何尝试 counterfactual option credit，以及为何当前不作为主 claim。 |
 | temporal abstraction / options | [The Option-Critic Architecture](https://arxiv.org/abs/1609.05140) | AAAI, 2017 | 提供端到端学习 intra-option policies 与 termination functions 的 option framework，支撑把高层 option selection/termination 作为 RL 学习对象。 | PPO_MEC v12-v18 的 option gate 是面向 VEC cache/execution/handoff-event 的 domain-specific option layer；当前仍在 `semantic_discrete_5` contract 内学习 option selection/termination，不声称复现完整 Option-Critic 架构。 | Method motivation；支撑 learned option gate / DAG-aware termination 的算法背景和 claim 边界。 |

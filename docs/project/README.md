@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `problem_literature_traceability_20260928.md`：P01–P06问题、L01–L08论文、官方出处/等级边界、补证与失败判据的固定追溯索引
+
 - `research_problem_and_evidence_plan_20260928.md`：主问题/三个子问题、近邻文献边界、设计实现差距、失败成本独立复算与有停止规则的补证路线
 
 - `g14s01_innovation_algorithm_diagnosis_20260928.md`：相对最近邻的创新边界、formal/capacity/holdout 原件复核、
