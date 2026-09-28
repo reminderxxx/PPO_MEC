@@ -1,0 +1,65 @@
+evaluation_version: mechanism_frozen_checkpoint_evaluation_v1
+execution_policy: single_execution_no_checkpoint_selection
+seed: 1401
+max_steps: 20
+
+freeze_manifest_path: artifacts/analysis/mechanism_algorithm_retraining_v2_freeze_20260928/freeze_manifest.json
+freeze_manifest_sha256: 0b5babad01e8be10c161e8cb22a983ff68936f5bf5e34343e4bb1dde2e94ab84
+
+controllers:
+  - sa_ghmappo
+  - mappo
+  - popularity_cache_heuristic
+  - reactive_greedy
+  - handoff_first_feasibility
+
+controller_roles:
+  sa_ghmappo: frozen_learned_candidate
+  mappo: frozen_controller_level_ctde_baseline
+  popularity_cache_heuristic: fixed_rule_baseline
+  reactive_greedy: fixed_rule_baseline
+  handoff_first_feasibility: fixed_rule_completion_diagnostic_not_paper_baseline
+
+data:
+  mobility_csv_path: data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv
+  workflow_csv_path: data/raw/workflow/alibaba2018/batch_task.csv
+  max_mobility_rows: 2500
+  window_plan_path: configs/experiment/mechanism_algorithm_training_windows_v1.json
+  workflow_ids: [j_3, j_8, j_15, j_34]
+
+expected_sources:
+  mobility:
+    size_bytes: 2118175938
+    sha256: ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c
+  workflow:
+    size_bytes: 802261444
+    sha256: 6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc
+
+data_relationship: >-
+  Resubstitution pilot on the same three observed NGSIM windows and four Alibaba
+  workflows used during training. This is not a development/test separation,
+  independent evaluation, or holdout. Results cannot support generalization.
+
+metric_vector:
+  - workflow_completed_under_exogenous_execution
+  - workflow_continuity_rate
+  - handoff_failure_rate
+  - full_service_ready_request_rate
+  - transfer_mb_per_request
+  - backhaul_traffic_cost
+  - adapter_state_migration_overhead
+  - end_to_end_workflow_delay_with_coverage
+
+metric_policy: >-
+  Preserve the vector and its trade-offs. Do not select a post-hoc weighted score,
+  tolerance, or duplicated metric count. Delay is conditional on completed workflows
+  and must always be reported with coverage.
+
+decision_policy: >-
+  Evaluation results may describe the frozen v2 policies but must not be used to
+  choose a different v2 checkpoint. Any follow-up correction must be justified by
+  request/event-level training traces and reported as an observed-data pilot.
+
+claim_boundary: >-
+  One fixed observed-data resubstitution evaluation. Not formal, independent,
+  holdout, statistical significance, convergence evidence, or algorithm superiority.
