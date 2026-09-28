@@ -7,6 +7,9 @@
 - status: DESIGN_SPECIFICATION；dataset_release=false；novelty=UNVERIFIED
 - 内部候选名称：`vec_ai_workload_v0_1`。不是已经发布的数据集、live schema 或正式评估版本。
 
+第一阶段启动记录：`vec_ai_workload_stage_one_20260928.md`。本地资格核查已完成，模型校准待输入；
+新数据集尚未生成，D11/D12状态不因设计文档完成而晋级。
+
 ## 1. 范围与提出过程
 
 范围固定为车辆关联的 AI workflow 在 RSU 间连续执行，以及模型/adapter、输入或中间数据、执行状态的

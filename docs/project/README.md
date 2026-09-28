@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `vec_ai_workload_stage_one_20260928.md`：数据集首阶段本地资源核查、最小车载应用模板、旧新字段映射及有界测量草案；模型输入待确认
+
 - `vec_ai_workload_dataset_design_20260928.md`：车联网AI工作流/缓存数据集贡献候选，提出依据、校准生成方案、D01–D12证据池和验收边界；尚未生成或发布
 
 - `system_mechanism_manuscript_working_draft.md`：系统机制主线英文工作稿，含问题、模型、方法正确性边界、开发结果、限制与独立证据映射；不是投稿终稿

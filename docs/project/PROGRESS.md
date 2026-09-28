@@ -5,6 +5,13 @@
 
 ﻿# Progress
 
+## 2026-09-28: 数据集第一阶段已启动，本地资格核查完成
+
+- `vec_ai_workload_stage_one_20260928.md`保存DAG接口、模型metadata、限定目录及解释器检查结果。
+- 冻结venv有Torch，无transformers/peft/safetensors；检查范围内未找到应用模型权重，不作全机不存在结论。
+- 提出非安全关键车载事件信息服务四节点模板，明确prompt不能冒充adapter、会话状态不能冒充KV。
+- 实际模型与文本输入未确定，profiling及生成小样待输入；本轮无下载/安装/训练/rollout/后台任务。
+
 ## 2026-09-28: 车联网AI工作负载数据集贡献候选与证据池
 
 - 新增 `vec_ai_workload_dataset_design_20260928.md`：提出过程、四类缓存对象、校准/生成方案、
