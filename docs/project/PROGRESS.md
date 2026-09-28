@@ -5,6 +5,20 @@
 
 ﻿# Progress
 
+## 2026-09-28: base sharing × workflow-state migration 四臂补充与 matched retraining 冻结
+
+- 新增 opt-in `controlled_mechanism_factorial_v1`，历史环境无 profile 时语义不变。四臂使用真实 NGSIM mobility、
+  Alibaba DAG 结构、`semantic_ai_service` 多 adapter、相同 220 MB 初始逻辑服务和 360 MB 容量。
+- 首轮发现非共享 base 继承 `pinned` 会人为锁死 exclusive pair，已标记 artifact 无效；修复为仅非共享新 profile
+  使用 adapter+exclusive-base 原子淘汰，44 项相关回归通过后重跑。
+- 修正版 8 episodes：sharing 主效应对 ready/continuity 为 0，对 transfer 为 `-48.888889 MB/request`、backhaul
+  为 `-480`、eviction 为 `-5/episode`；migration 主效应对 ready/continuity 为 `+0.041666`，代价为
+  `+0.833333 MB/request`。completion 全为 0，端到端收益仍 `UNVERIFIED`。
+- 因机制确有资源/就绪效应，冻结一次非正式 matched retraining：SA-GHMAPPO 与 MAPPO 各 64 episodes、seed 1401、
+  3 个预选非重叠窗口、4 workflows、最多总计 1,536 steps；旧 checkpoint 不复用。后台权威状态由
+  `artifacts/training/mechanism_algorithm_retraining_v1_20260928/` 的 receipt 给出。
+- 详细协议、四臂小表、最近邻和禁止 claim 见 `mechanism_factorial_supplement_20260928.md`。
+
 ## 2026-09-28: G14S01 创新定位、算法有效性与最小补证设计完成
 
 - 按 `tmc_review_policy_v3_20260621` 完成只读科学审查；目标期刊仅知 B 类／B 区、目录未指定，因此不设置

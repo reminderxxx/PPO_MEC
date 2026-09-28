@@ -1,5 +1,20 @@
 # Code Module Map
 
+## Controlled mechanism factorial supplement
+
+- `src/envs/core/vec_workflow_core_env.py`：opt-in mechanism profile；只在 migration-off 时压制 state action，只在
+  no-sharing profile 中把 exclusive adapter/base 展开为原子 dependency-safe eviction victims。无 profile 时
+  历史语义不变。
+- `src/evaluators/main_results_support.py`：向受控 episode 透传 mechanism profile，并记录四臂身份；workflow
+  builder 可显式选择 `semantic_ai_service`。
+- `scripts/run_mechanism_factorial_pilot.py`：构造 matched catalogs、冻结 policy-neutral request exposure，输出
+  raw episode 与四臂小表。
+- `scripts/train_algo_pool_real_sample.py`：非正式 opt-in ON/ON retraining；拒绝与 formal protocol 混用。
+- `scripts/run_mechanism_algorithm_training.py`：create-only 后台 launcher/supervisor，冻结双算法 argv、日志、PID、
+  source hashes 和 exit receipt；不调参、不重试。
+- `tests/test_mechanism_factorial_pilot.py`：catalog 等容量、migration suppression、legacy no-op、原子成组淘汰、
+  runtime 初态与 matched command manifest 回归。
+
 ## G14R18 provenance envelope / shared identity boundary
 
 - `scripts/manage_typed_model_cache_formal_artifacts.py`：`write_checkpoint_companions` 保持完整 17 字段 provenance

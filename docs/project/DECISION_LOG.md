@@ -1,5 +1,17 @@
 ﻿# Decision Log
 
+## 2026-09-28: controlled factorial 可进入受限 matched retraining，但不晋级 claim
+
+- 决定：四臂因子只改变 base physical sharing 与 workflow-state migration；初始逻辑服务、对象大小、容量、窗口、
+  workflow、controller、request exposure 和 eviction policy 固定。非共享臂的 exclusive adapter/base 作为一个
+  dependency-safe 原子淘汰单元；历史/shared 路径不改变。
+- 决定：pilot 的 sharing 资源成本主效应和 migration readiness 主效应达到“机制实际生效”的继续条件；但
+  completion 为 0，因此只授权 ON/ON arm 上 SA-GHMAPPO 与 MAPPO 的单 seed、同预算重新训练筛查。
+- 决定：训练固定为各 64 episodes、12 steps、seed 1401、3 窗口、4 workflows、latest checkpoint，不根据结果
+  改 seed/窗口/预算或选择 checkpoint；所有进程使用固定命令、分离日志、PID 与 exit receipt，无自动重试。
+- 边界：该授权不包括旧 checkpoint 复用、formal/holdout、算法优越性评价、结构 2×2、supervised predictor 或
+  paper-ready 晋级。后续 evaluation 需要另立任务和新的独立数据合同。
+
 ## 2026-09-28: scientific claims require mechanism opportunity before algorithm comparison
 
 - 决定：当前最多保留两项候选贡献——typed base/adapter sharing × workflow-state migration 联合机制，以及

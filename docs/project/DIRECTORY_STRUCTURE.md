@@ -1,5 +1,19 @@
 ﻿# Directory Structure
 
+## 2026-09-28 controlled mechanism supplement
+
+- `scripts/run_mechanism_factorial_pilot.py` + `configs/experiment/mechanism_factorial_pilot_v1.yaml`：四臂
+  base-sharing × state-migration observed-data pilot。
+- `configs/data/mechanism_factorial_shared_catalog_v1.json` +
+  `configs/experiment/mechanism_factorial_shared_360mb_runtime_v1.yaml`：三 RSU 相同 220 MB 初态和 360 MB
+  shared-base retraining runtime。
+- `configs/experiment/mechanism_algorithm_training_windows_v1.json`：learned outcome 前冻结的 3 个非重叠
+  mechanism-activating 训练窗口。
+- `scripts/run_mechanism_algorithm_training.py` +
+  `configs/experiment/mechanism_algorithm_retraining_v1.yaml`：固定双算法预算与后台 command/log/PID/receipt。
+- `artifacts/analysis/mechanism_factorial_pilot_v1_20260928_v2/` 与
+  `artifacts/training/mechanism_algorithm_retraining_v1_20260928/`：本轮非正式产物；均不是 holdout/formal。
+
 G14R18：唯一 active Protocol 2.9、ready index 与 Readiness v21 位于
 `configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/`；共享 8-field parser 位于
 `src/runtime/formal_training_identity.py`，17-field envelope 的 producer 位于

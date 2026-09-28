@@ -5,6 +5,17 @@
 
 ﻿# Bugs And Risks
 
+## 2026-09-28: 受控机制补充的外部有效性与 completion 缺口（OPEN）
+
+- 四臂 pilot 只覆盖 1 个 observed-data window、2 个 workflow；不是独立 outer-cluster 统计，也未做显著性检验。
+- 8 个 episode completion 全为 0，当前只能解释 full-service-ready/continuity 与 transfer/backhaul trade-off，不能
+  宣称端到端 workflow 改善。
+- adapter/base 大小、semantic service labels、360 MB 容量和 20 MB state payload 是受控参数，不是真实 LoRA
+  paging/runtime trace。NGSIM+Alibaba 来源真实不等于机制参数具有外部有效性。
+- matched retraining 只有 seed 1401，属于学习链路筛查；不得做算法优越性、generalization 或 paper-ready claim。
+  新独立数据未建立，旧已消费 holdout 仍禁止重开。
+- 已解决的工程风险：非共享 base 不再继承不可淘汰语义；首轮受影响 artifact 已显式 invalid，不得引用数值。
+
 ## 2026-09-28: 核心机制机会、因果消融与独立测试缺口（OPEN）
 
 - formal workload 的 1,860 个 SA request 全部只请求 `adapter_batch_type_1 + veh_base_v1`，没有多 adapter

@@ -5,6 +5,20 @@
 
 # Artifact Records
 
+## 2026-09-28 mechanism factorial controlled supplement
+
+- valid pilot：`artifacts/analysis/mechanism_factorial_pilot_v1_20260928_v2/`，含 8 个 raw episode、
+  `episode_results.csv`、`four_arm_performance.csv`、selected windows 与 completion receipt；scope 为
+  `observed_data_controlled_supplement_not_holdout`。
+- invalid pilot：`artifacts/analysis/mechanism_factorial_pilot_v1_20260928/`；`invalidity_receipt.json` 记录非共享
+  exclusive base 继承 pinned 导致的工程无效，目录内性能值禁止使用。
+- background retraining：`artifacts/training/mechanism_algorithm_retraining_v1_20260928/`；启动后应包含
+  `command_manifest.json`、`launch_receipt.json`、`state.json`、outer/agent stdout/stderr 与最终
+  `completion_receipt.json`。receipt 是运行状态权威，不从日志尾部猜测完成。
+- review metadata：reviewed_at=`2026-09-28T08:00:17+08:00`，literature_cutoff=`2026-09-28`，target venue=
+  `IEEE TMC`，policy=`tmc_review_policy_v3_20260621`，implementation commit=`97e24a6`，evidence level=
+  `E1_CONTROLLED_OBSERVED_DATA_PILOT_NOT_HOLDOUT`。
+
 ## 2026-09-06 G14R18 checkpoint provenance envelope closure
 
 - path：`artifacts/analysis/typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1/`；active config：
