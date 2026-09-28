@@ -1,5 +1,10 @@
 # Top-Journal Paper Structure and Gap Review
 
+> **2026-09-28 中央勘误**：下文关于“formal尚未执行/无正式checkpoint”的项目状态描述已过时，
+> 不得作为当前事实引用。G14A01已核验不含holdout的正式执行完成；后续纠正版统计未建立算法优势。
+> 最新CRDCM是另一条开发实验线，不能与旧formal混合。当前正文草稿见
+> `system_mechanism_manuscript_working_draft.md`；原结构拆解保留供写作参考，不替代原始证据审查。
+
 - `reviewed_at`: `2026-09-28`
 - `literature_cutoff`: `2026-09-28`
 - `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`

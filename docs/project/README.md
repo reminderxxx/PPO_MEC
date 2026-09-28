@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `system_mechanism_manuscript_working_draft.md`：系统机制主线英文工作稿，含问题、模型、方法正确性边界、开发结果、限制与独立证据映射；不是投稿终稿
+
 - `problem_literature_traceability_20260928.md`：P01–P06问题、L01–L08论文、官方出处/等级边界、补证与失败判据的固定追溯索引
 
 - `research_problem_and_evidence_plan_20260928.md`：主问题/三个子问题、近邻文献边界、设计实现差距、失败成本独立复算与有停止规则的补证路线
