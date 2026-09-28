@@ -33,6 +33,18 @@ class CheckpointCompatTestCase(unittest.TestCase):
     def test_missing_prediction_projection_returns_none(self) -> None:
         self.assertIsNone(_infer_prediction_feature_dim_from_payload({"network_state_dict": {}}))
 
+    def test_mappo_checkpoint_config_preserves_shared_readiness_guard(self) -> None:
+        filtered = _filter_checkpoint_config(
+            "mappo",
+            {
+                "cache_warm_start_guard_enabled": True,
+                "cache_warm_start_guard_current_only": True,
+            },
+        )
+
+        self.assertTrue(filtered["cache_warm_start_guard_enabled"])
+        self.assertTrue(filtered["cache_warm_start_guard_current_only"])
+
     def test_sa_ucc_checkpoint_config_preserves_model_planner_fields(self) -> None:
         filtered = _filter_checkpoint_config(
             "sa_ghmappo",

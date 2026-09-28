@@ -125,6 +125,8 @@ def _filter_checkpoint_config(agent_name: str, checkpoint_config: dict[str, Any]
             "event_logit_temperature",
             "event_logit_temperature_final",
             "event_temperature_decay_updates",
+            "cache_warm_start_guard_enabled",
+            "cache_warm_start_guard_current_only",
         }
         return {
             key: value
