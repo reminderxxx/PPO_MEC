@@ -1482,10 +1482,14 @@ def run_real_episode(
     rsu_states = [clone_rsu_state(rsu_state) for rsu_state in (rsu_states_override or mobility_bundle.rsu_states)]
     workflow_state_runtime = clone_workflow_state(workflow_state_override or workflow_state)
     trajectory_frames = clone_frames(mobility_frames_override or mobility_bundle.frames)
-    checkpoint_path = resolve_agent_checkpoint(agent_name, checkpoint_map)
+    checkpoint_path = (
+        "" if agent_override is not None else resolve_agent_checkpoint(agent_name, checkpoint_map)
+    )
     checkpoint_metadata = load_checkpoint_metadata(checkpoint_path) if checkpoint_path else {
         "checkpoint_path": "",
-        "config_profile": "non_checkpoint_agent",
+        "config_profile": (
+            "in_memory_agent_override" if agent_override is not None else "non_checkpoint_agent"
+        ),
         "run_id": agent_name,
         "episodes": 0,
         "update_count": 0,

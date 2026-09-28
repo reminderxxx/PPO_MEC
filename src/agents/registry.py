@@ -6,6 +6,8 @@ from typing import Any
 
 from src.agents.base_agent import BaseAgent
 from src.agents.cache_offload_agent import CacheOffloadDRLAgent
+from src.agents.crdcm_agent import CRDCMMAPPOAgent, CRDCMPPOAgent, CRDCMSAGHMAPPOAgent
+from src.agents.crdcm_heuristic_agent import CRDCMCriticalPathHeuristicAgent
 from src.agents.classical_cache_agent import (
     BASELINE_SCOPE,
     CONTROL_POLICY,
@@ -29,6 +31,46 @@ from src.agents.sa_ghmappo_agent import SAGHMAPPOAgent
 
 
 ALGO_REGISTRY: dict[str, dict[str, Any]] = {
+    "crdcm_sa_ghmappo": {
+        "class": CRDCMSAGHMAPPOAgent,
+        "support_level": "diagnostic_trainable",
+        "priority_tier": "candidate_method",
+        "checkpoint_required": True,
+        "observation_contract": CRDCMSAGHMAPPOAgent.observation_contract,
+        "action_contract": CRDCMSAGHMAPPOAgent.action_contract,
+        "notes": "Version-separated CRDCM residual over the protected SA-GHMAPPO core.",
+        "experimental": True,
+    },
+    "crdcm_mappo": {
+        "class": CRDCMMAPPOAgent,
+        "support_level": "diagnostic_trainable",
+        "priority_tier": "candidate_baseline",
+        "checkpoint_required": True,
+        "observation_contract": CRDCMMAPPOAgent.observation_contract,
+        "action_contract": CRDCMMAPPOAgent.action_contract,
+        "notes": "MAPPO with the same CRDCM actor-visible vector and execution mechanism.",
+        "experimental": True,
+    },
+    "crdcm_ppo": {
+        "class": CRDCMPPOAgent,
+        "support_level": "diagnostic_trainable",
+        "priority_tier": "candidate_baseline",
+        "checkpoint_required": True,
+        "observation_contract": CRDCMPPOAgent.observation_contract,
+        "action_contract": CRDCMPPOAgent.action_contract,
+        "notes": "PPO with the same CRDCM actor-visible vector and execution mechanism.",
+        "experimental": True,
+    },
+    "crdcm_critical_path_heuristic": {
+        "class": CRDCMCriticalPathHeuristicAgent,
+        "support_level": "heuristic",
+        "priority_tier": "strong_heuristic",
+        "checkpoint_required": False,
+        "observation_contract": CRDCMCriticalPathHeuristicAgent.observation_contract,
+        "action_contract": CRDCMCriticalPathHeuristicAgent.action_contract,
+        "notes": "Strong dependency, critical-path, reuse, capacity, and migration heuristic.",
+        "experimental": True,
+    },
     "sa_ghmappo": {
         "class": SAGHMAPPOAgent,
         "support_level": "trainable",
@@ -253,7 +295,11 @@ def build_agent(agent_name: str, **kwargs: Any) -> BaseAgent:
 
 def list_registered_agents() -> list[str]:
     """Return all registered live agent names."""
-    return sorted(ALGO_REGISTRY.keys())
+    return sorted(
+        agent_name
+        for agent_name, spec in ALGO_REGISTRY.items()
+        if not bool(spec.get("experimental", False))
+    )
 
 
 def list_trainable_agents() -> list[str]:
@@ -262,6 +308,7 @@ def list_trainable_agents() -> list[str]:
         agent_name
         for agent_name, spec in ALGO_REGISTRY.items()
         if spec.get("support_level") == "trainable"
+        and not bool(spec.get("experimental", False))
     )
 
 
@@ -272,6 +319,7 @@ def list_evaluable_agents() -> list[str]:
         agent_name
         for agent_name, spec in ALGO_REGISTRY.items()
         if spec.get("support_level") in runnable_levels
+        and not bool(spec.get("experimental", False))
     )
 
 
@@ -281,6 +329,7 @@ def checkpoint_required_agents() -> set[str]:
         agent_name
         for agent_name, spec in ALGO_REGISTRY.items()
         if bool(spec.get("checkpoint_required", False))
+        and not bool(spec.get("experimental", False))
     }
 
 

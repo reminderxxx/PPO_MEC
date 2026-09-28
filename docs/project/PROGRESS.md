@@ -1931,3 +1931,11 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - `docs/project/literature_reference_table.md` 新增 10 篇相关近邻，包含 TMC delay-reliability/cache-assisted offloading、TITS multi-edge/multi-vehicle orchestration、IoTJ DAG meta-RL、FGCS DT dual-timescale cache/offload、JSA agentic workflow scheduling 等；查重审计为 119 entries、title/DOI/URL duplicate 均为 0。
 - 新增 `docs/project/top_journal_paper_structure_gap_review_20260928.md`，逐段拆解 Introduction、全文论证链、可模仿写法和 PPO_MEC 缺口，并给出 9 段 Introduction 模板。
 - 当前 TMC-ready verdict 仍为 `Unverifiable / E1_DOCUMENTED`：G14C v16 formal/holdout/support 未闭环，仓库未发现 integrated manuscript；本轮没有修改算法、配置或实验结果。
+
+## 2026-09-28 CRDCM 最小决策合同与真实诊断
+
+- 新增严格 opt-in 的 `crdcm_observation_v1`：28 维 actor-visible vector 覆盖 typed request bundle、实时 RSU 容量、remaining DAG/critical path/reuse、causal handoff prediction 和 migration readiness；明确 no oracle/no outcome。
+- 新增与旧 checkpoint 分离的 `crdcm_sa_ghmappo` / `crdcm_mappo` / `crdcm_ppo` residual wrapper，以及同信息强对照 `crdcm_critical_path_heuristic`。历史七个受保护用户文件未修改。
+- `policy_decision_trace_v2` 冻结 logits/prob、mask、raw/aggregated/override/executed action、log-prob/credit、reward components 与 mechanism event。forced action 使用 `mask_external_override_actor_credit_v1`。
+- 受控测试 13 passed；真实 fixed diagnostic 为 48 episodes、496/960 steps、0 training、0 legacy checkpoint、0 holdout。124 matched cells 中 107 存在动作分歧；SA/MAPPO fresh action disagreement 为 0，不能解释为结构收益。
+- Artifact：`artifacts/analysis/crdcm_decision_diagnostic_v1_20260928/`。算法优势、收敛、泛化和未来 960-episode performance matrix 均未验证/未授权。

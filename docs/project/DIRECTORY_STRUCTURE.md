@@ -319,3 +319,13 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 ## 2026-09-08 G14R20-A
 
 `src/runtime/fixed_commit_continuation.py`、`scripts/preflight_fixed_commit_continuation.py` 与 `scripts/probe_fixed_commit_continuation.py` 为独立只读合同/入口；schema 位于 `configs/experiment/fixed_commit_continuation_v1/`，新增验收位于 `artifacts/analysis/g14r20_a_continuation_20260908/`。 详见 `fixed_commit_continuation_contract.md`。
+
+## CRDCM decision diagnostic
+
+- `src/encoders/crdcm_observation.py`：冻结 observation/feature validation。
+- `src/agents/crdcm_agent.py`：版本分离的 SA/MAPPO/PPO residual 与 checkpoint/credit contract。
+- `src/agents/crdcm_heuristic_agent.py`：critical-path/reuse/capacity/migration 强启发式。
+- `configs/experiment/crdcm_decision_diagnostic_v1.yaml`：48-episode/960-step fixed plan。
+- `scripts/run_crdcm_decision_diagnostic.py`：真实 NGSIM+Alibaba 单次诊断 producer。
+- `tests/test_crdcm_decision_contract.py`：state/encoder/action/trace/credit/checkpoint/scenario tests。
+- `artifacts/analysis/crdcm_decision_diagnostic_v1_20260928/`：tables、trace summaries、receipt、command 与 integrity evidence。

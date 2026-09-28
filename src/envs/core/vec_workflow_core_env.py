@@ -7,6 +7,11 @@ import math
 from pathlib import Path
 from typing import Any
 
+from src.encoders.crdcm_observation import (
+    CRDCM_OBSERVATION_CONTRACT_VERSION,
+    finalize_crdcm_observation,
+)
+
 from src.data.mobility.handoff_builder import HandoffBuilder
 from src.data.mobility.replay_provider import ReplayProvider
 from src.data.mobility.rsu_mapper import RSUMapper
@@ -805,6 +810,13 @@ class VecWorkflowCoreEnv:
             "predictions": deepcopy(predictions),
             "handoff_events": handoff_events,
         }
+        if bool((self._mechanism_profile or {}).get("crdcm_observation_enabled", False)):
+            state["crdcm_observation"] = self._build_crdcm_observation(
+                current_node=current_node,
+                vehicles=ordered_vehicles,
+                associations=associations,
+                predictions=predictions,
+            )
         if self._formal_request_exposure_trace is not None:
             state["formal_request_exposure"] = {
                 "contract_version": "2.0.0",
@@ -1016,7 +1028,215 @@ class VecWorkflowCoreEnv:
                 "migration_disabled_fallback must be cold_restart_one_request"
             )
         normalized["migration_disabled_fallback"] = fallback
+        normalized["crdcm_observation_enabled"] = bool(
+            normalized.get("crdcm_observation_enabled", False)
+        )
+        if normalized["crdcm_observation_enabled"]:
+            contract_version = str(
+                normalized.get("crdcm_observation_contract_version")
+                or CRDCM_OBSERVATION_CONTRACT_VERSION
+            )
+            if contract_version != CRDCM_OBSERVATION_CONTRACT_VERSION:
+                raise ValueError(
+                    f"unsupported CRDCM observation contract: {contract_version}"
+                )
+            if self._catalog_template.model_cache_profile_id != TYPED_MODEL_CACHE_PROFILE_ID:
+                raise ValueError("CRDCM observation requires typed model-cache mode")
+            normalized["crdcm_observation_contract_version"] = contract_version
         return normalized
+
+    def _build_crdcm_observation(
+        self,
+        *,
+        current_node: Any,
+        vehicles: list[VehicleState],
+        associations: dict[str, str | None],
+        predictions: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Build pre-action CRDCM state from causal runtime state only."""
+
+        primary_vehicle = next(
+            (item for item in vehicles if item.vehicle_id == self._primary_vehicle_id),
+            None,
+        )
+        current_rsu_id = (
+            associations.get(primary_vehicle.vehicle_id) if primary_vehicle is not None else None
+        )
+        prediction = self._extract_prediction_snapshot(
+            {"predictions": predictions},
+            primary_vehicle.vehicle_id if primary_vehicle is not None else None,
+        )
+        predicted_target_rsu_id = (
+            prediction.get("predicted_handoff_target_rsu_id")
+            or prediction.get("predicted_next_rsu_id")
+        )
+        if predicted_target_rsu_id == current_rsu_id:
+            predicted_target_rsu_id = None
+
+        current_adapter = getattr(current_node, "required_adapter", None)
+        current_base = getattr(current_node, "required_base_model", None)
+
+        def rsu_payload(rsu_id: str | None) -> dict[str, Any]:
+            capacity = self._cache_capacity_snapshot(rsu_id)
+            residents = set(self._typed_resident_object_ids.get(str(rsu_id), []))
+            if current_adapter is None or current_base is None or rsu_id is None:
+                bundle = {
+                    "base_object_id": None,
+                    "adapter_object_id": None,
+                    "base_ready": False,
+                    "adapter_ready": False,
+                    "missing_object_ids": [],
+                    "missing_resident_mb": 0.0,
+                    "missing_transfer_mb": 0.0,
+                    "eviction_shortfall_mb": 0.0,
+                }
+            else:
+                base = self.adapter_catalog.get_typed_base(str(current_base))
+                adapter = self.adapter_catalog.get_typed_adapter(str(current_adapter))
+                placement = self.adapter_catalog.resolve_typed_placement_plan(
+                    adapter_id=str(current_adapter),
+                    resident_object_ids=sorted(residents),
+                )
+                missing_resident_mb = sum(
+                    float(self.adapter_catalog.get_typed_object(item).resident_size_mb)
+                    for item in placement.missing_object_ids
+                )
+                missing_transfer_mb = sum(
+                    float(self.adapter_catalog.get_typed_object(item).transfer_size_mb)
+                    for item in placement.missing_object_ids
+                )
+                remaining = float(capacity.get("cache_remaining_size") or 0.0)
+                bundle = {
+                    "base_object_id": base.object_id,
+                    "adapter_object_id": adapter.object_id,
+                    "base_ready": base.object_id in residents,
+                    "adapter_ready": adapter.object_id in residents,
+                    "missing_object_ids": list(placement.missing_object_ids),
+                    "missing_resident_mb": round(missing_resident_mb, 6),
+                    "missing_transfer_mb": round(missing_transfer_mb, 6),
+                    "eviction_shortfall_mb": round(
+                        max(missing_resident_mb - remaining, 0.0), 6
+                    ),
+                }
+            return {
+                "rsu_id": rsu_id,
+                "capacity": capacity.get("cache_capacity"),
+                "capacity_used": capacity.get("cache_used_size"),
+                "capacity_remaining": capacity.get("cache_remaining_size"),
+                "occupancy_rate": capacity.get("cache_occupancy_rate"),
+                "capacity_unit": capacity.get("cache_capacity_unit"),
+                "used_mb_by_object_type": capacity.get("cache_used_mb_by_object_type"),
+                "required_bundle": bundle,
+            }
+
+        current_payload = rsu_payload(current_rsu_id)
+        target_payload = rsu_payload(predicted_target_rsu_id)
+        dag = self._build_dag_evidence_metrics(current_node)
+        completed_count = len(self.workflow_state.completed_node_ids)
+        total_count = len(self.workflow_state.nodes)
+        remaining_nodes = [
+            node
+            for node in self.workflow_state.nodes
+            if str(node.node_id) not in {str(item) for item in self.workflow_state.completed_node_ids}
+        ]
+        reuse_count = sum(
+            1
+            for node in remaining_nodes
+            if current_adapter is not None and node.required_adapter == current_adapter
+        )
+        next_sequence = list(prediction.get("next_rsu_sequence", []) or [])
+        eta_steps = next(
+            (
+                index + 1
+                for index, rsu_id in enumerate(next_sequence)
+                if rsu_id is not None and rsu_id != current_rsu_id
+            ),
+            None,
+        )
+        confidence = float(prediction.get("prediction_confidence", 0.0) or 0.0)
+        uncertainty = max(0.0, min(1.0, 1.0 - confidence))
+        state_object = self.adapter_catalog.resolve_workflow_state_object()
+        state_required = bool(predicted_target_rsu_id and predicted_target_rsu_id != current_rsu_id)
+        state_ready = bool(
+            not state_required
+            or (
+                state_object is not None
+                and state_object.object_id
+                in self._typed_workflow_state_ready.get(str(predicted_target_rsu_id), set())
+            )
+        )
+        target_shortfall = float(
+            target_payload.get("required_bundle", {}).get("eviction_shortfall_mb", 0.0)
+            or 0.0
+        )
+        return finalize_crdcm_observation(
+            {
+                "observed_at_time_index": self._mobility_provider.get_time(),
+                "update_phase": "pre_action_after_causal_prediction",
+                "units": {
+                    "cache_capacity": "mb",
+                    "object_size": "mb",
+                    "time": "mobility_step",
+                    "probability": "unit_interval",
+                },
+                "sources": {
+                    "required_bundle": "current_workflow_node_and_typed_catalog",
+                    "capacity": "current_rsu_runtime_residency",
+                    "remaining_dag": "known_submitted_workflow_dag_and_completed_nodes",
+                    "handoff_prediction": "causal_predictor_snapshot",
+                    "migration_readiness": "current_runtime_state_residency",
+                },
+                "required_request": {
+                    "node_id": getattr(current_node, "node_id", None),
+                    "required_base_model_id": current_base,
+                    "required_adapter_id": current_adapter,
+                },
+                "current_rsu": current_payload,
+                "predicted_target_rsu": target_payload,
+                "remaining_dag": {
+                    "remaining_nodes": int(dag["dag_remaining_nodes"]),
+                    "remaining_ratio": float(dag["dag_remaining_nodes_ratio"]),
+                    "frontier_size": int(dag["dag_frontier_size"]),
+                    "critical_path_length": int(dag["dag_critical_path_length"]),
+                    "critical_path_pressure": float(dag["dag_critical_path_pressure"]),
+                    "current_adapter_remaining_reuse_count": reuse_count,
+                    "current_adapter_remaining_reuse_ratio": round(
+                        float(reuse_count) / float(max(len(remaining_nodes), 1)), 6
+                    ),
+                    "completed_ratio": round(
+                        float(completed_count) / float(max(total_count, 1)), 6
+                    ),
+                },
+                "handoff_prediction": {
+                    "target_rsu_id": predicted_target_rsu_id,
+                    "target_available": predicted_target_rsu_id is not None,
+                    "target_differs_from_current": bool(
+                        predicted_target_rsu_id is not None
+                        and predicted_target_rsu_id != current_rsu_id
+                    ),
+                    "confidence": round(confidence, 6),
+                    "uncertainty": round(uncertainty, 6),
+                    "eta_steps": eta_steps,
+                    "causal_snapshot_id": prediction.get("causal_snapshot_id"),
+                    "snapshot_age_steps": prediction.get("causal_snapshot_age_steps"),
+                },
+                "migration": {
+                    "enabled": bool(
+                        (self._mechanism_profile or {}).get(
+                            "workflow_state_migration_enabled", True
+                        )
+                    ),
+                    "state_required": state_required,
+                    "state_object_id": state_object.object_id if state_object else None,
+                    "state_ready": state_ready,
+                    "capacity_conflict": target_shortfall > 0.0,
+                    "risk": round(
+                        max(uncertainty, 1.0 if state_required and not state_ready else 0.0),
+                        6,
+                    ),
+                },
+            }
+        )
 
     def _apply_mechanism_profile(self, control: ControlAction) -> ControlAction:
         """Apply the frozen environment-side migration intervention.

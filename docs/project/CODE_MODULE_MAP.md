@@ -716,3 +716,13 @@
 ## 2026-09-08 G14R20-A
 
 独立 continuation validator 只用标准库，不依赖当前科学模块；CLI 通过原 Python/旧 cwd 加载新只读 helper，helper 只消费旧 validator。原 public runner 无修改，未新增 executor。 详见 `fixed_commit_continuation_contract.md`。
+
+# CRDCM decision-contract modules
+
+- `src/envs/core/vec_workflow_core_env.py`：显式 profile 下生产 pre-action `crdcm_observation_v1`；旧 profile 不变。
+- `src/encoders/crdcm_observation.py`：28 维字段顺序、归一化、no-oracle/no-outcome validation 与 tensor consumer。
+- `src/agents/crdcm_agent.py`：不修改旧核心，为 SA/MAPPO/PPO 添加共享 CRDCM residual、独立 checkpoint 与 override credit mask。
+- `src/agents/crdcm_heuristic_agent.py`：只消费同一 observation/mask 的固定强启发式。
+- `src/trainers/marl_on_policy_trainer.py`：executed action credit reconciliation 与 `policy_decision_trace_v2` producer。
+- `src/evaluators/main_results_support.py`：显式 in-memory diagnostic agent 可跳过 checkpoint resolution；正常路径不变。
+- `scripts/run_crdcm_decision_diagnostic.py`：固定真实小 rollout、metric/failure/divergence 与 integrity producer。

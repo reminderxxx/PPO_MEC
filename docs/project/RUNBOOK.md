@@ -1540,3 +1540,15 @@ evidence。未来 G14C v13 只能从 pushed、Git-clean、`HEAD == main == origi
 XML 必须包含 `test_benchmark_main_executes_full_envelope_gate` 的全部 16 个正负情形及真实 loader/gate/rollout
 计数 1/1/0。`build_formal_checkpoint_provenance_envelope_artifacts.validate_main_gate_evidence` 验证这些计数；
 不能以旧源码断言替代。该命令仅产生临时 test-only checkpoint，不执行正式训练或 rollout，不授权启动 v16。
+
+## CRDCM 非训练 decision diagnostic
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_crdcm_decision_diagnostic.py \
+  --config configs/experiment/crdcm_decision_diagnostic_v1.yaml \
+  --data-root /Users/howen/Projects/PPO_MEC \
+  --output-dir artifacts/analysis/crdcm_decision_diagnostic_v1_20260928
+```
+
+输出目录 create-only；配置硬拒绝超过 48 episodes 或 960 steps。该命令不训练、不加载旧 checkpoint、不访问
+holdout；重复执行必须使用新目录并先比较 compact rows，不得根据首轮结果修改 scenario/阈值。

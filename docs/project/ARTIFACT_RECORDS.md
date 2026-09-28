@@ -1576,3 +1576,11 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 七个用户修改文件 SHA-256 未变且未纳入任何提交。Protocol 2.9、Readiness v21、科学配置及旧 invalid-run
 限制均未改变。v16 仍未创建、未消耗、未执行；这是启动授权暂缓，不是运行失败。main 测试使用受控数据
 准备，public preflight 不等于完整正式评估；无正式训练、formal performance、holdout、G14D/G15 或论文结论。
+
+## 2026-09-28 — CRDCM decision diagnostic v1
+
+- Artifact root：`artifacts/analysis/crdcm_decision_diagnostic_v1_20260928/`。
+- Scope：4 controllers × 4 scenarios × 3 observed NGSIM/Alibaba units；48 episodes、496 actual steps，cap 为 960。
+- Evidence：48 episode summaries、diagnostic rows/aggregate、124-cell action divergence、pairwise disagreement、completion receipt、command log、plan snapshot 与 self-excluding integrity manifest。
+- Identity：base commit `19200c5e9fec1dddd9375834ada3ac1798bf119e`；实现提交与 artifact 执行提交在最终 receipt/记录提交中绑定。
+- Boundary：no training、no legacy checkpoint adaptation、no holdout；仅支持 decision-contract plumbing、sensitivity 和 mechanism interpretability，不支持 advantage/generalization/paper-ready claim。

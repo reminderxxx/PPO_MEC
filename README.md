@@ -519,3 +519,19 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 `docs/project/formal_request_subject_lifecycle_contract.md`、
 `docs/project/formal_exogenous_request_execution_contract.md` 与
 `docs/project/formal_environment_identity_projection_contract.md`。
+
+## CRDCM decision-contract diagnostic
+
+`crdcm_observation_v1` 和 `crdcm_decision_v1` 是与旧 checkpoint 分离的候选诊断合同。新 agent
+`crdcm_sa_ghmappo`、`crdcm_mappo`、`crdcm_ppo` 与 `crdcm_critical_path_heuristic` 共享 typed bundle、实时容量、
+remaining DAG/critical path/reuse 和 migration readiness，并保留逐步 action/override/credit/mechanism trace。
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_crdcm_decision_diagnostic.py \
+  --config configs/experiment/crdcm_decision_diagnostic_v1.yaml \
+  --data-root /Users/howen/Projects/PPO_MEC \
+  --output-dir artifacts/analysis/crdcm_decision_diagnostic_v1_20260928
+```
+
+该入口固定为 48 episodes、960-step cap，不训练、不访问 holdout，不允许算法优势或泛化结论。完整边界见
+`docs/project/crdcm_decision_contract_and_diagnostic_20260928.md`。

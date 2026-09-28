@@ -1149,3 +1149,16 @@ claim map 必须报告 `UNAVAILABLE`。
 ## 2026-09-08 G14R20-A
 
 固定提交 continuation 被定义为独立待批准的新规则；新 run 发布门禁不变。proposal/结构/资格/批准/执行分离，本轮真实执行权限恒为 false。保护快照是验收基线而非原始授权凭据。 详见 `fixed_commit_continuation_contract.md`。
+
+## 2026-09-28 — D-CRDCM-v1 以新 wrapper 冻结最小可观测决策合同
+
+决定：不修改七个历史受保护用户文件，不适配旧 checkpoint；在显式 opt-in profile 下生产
+`crdcm_observation_v1`，由新 SA/MAPPO/PPO residual 和强启发式共享。动作暂时保持五动作合同，任何 forced
+external action 必须在 trace 中显式标记并屏蔽 actor credit。
+
+原因：first-order diagnosis 已证明旧策略参数身份不同但 deterministic actions 可相同，且旧 state 不含完整
+typed bundle/capacity/migration/reuse 合同。直接扩展 object-level factorized action 会同时改变 observation、action、
+执行和训练估计量，超出最小诊断范围。
+
+约束：真实 48-episode rollout 只用于 plumbing/sensitivity/interpretability；未来 960-episode performance matrix、
+新训练、formal/holdout 和 promotion 必须另行批准。

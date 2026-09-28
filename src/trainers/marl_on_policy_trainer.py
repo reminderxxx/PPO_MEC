@@ -176,6 +176,10 @@ class MARLOnPolicyTrainer(BaseTrainer):
                     counterfactual_model_rollout
                 )
                 action_info["option_gate"] = option_gate_info
+            action_info = self._finalize_crdcm_action_credit(
+                action_info=action_info,
+                executed_action=int(action),
+            )
             next_observation, reward, terminated, truncated, next_info = self._env.step(int(action))
             estimated_value = float(action_info.get("value", self._estimate_value(observation, policy_info)))
             next_estimated_value = (
@@ -216,6 +220,9 @@ class MARLOnPolicyTrainer(BaseTrainer):
         rollout = buffer.to_training_rows()
         summary = self._recorder.build_summary()
         summary["agent_action_diagnostics"] = self._summarize_agent_action_diagnostics(rollout)
+        crdcm_trace = self._build_crdcm_policy_decision_trace(rollout)
+        if crdcm_trace:
+            summary["policy_decision_trace_v2"] = crdcm_trace
         counterfactual_model_query_count = sum(
             int(
                 row.get("action_info", {})
@@ -261,6 +268,119 @@ class MARLOnPolicyTrainer(BaseTrainer):
             ),
         }
         return summary, rollout
+
+    @staticmethod
+    def _finalize_crdcm_action_credit(
+        *,
+        action_info: dict[str, Any],
+        executed_action: int,
+    ) -> dict[str, Any]:
+        result = dict(action_info)
+        contract = dict(result.get("crdcm_decision_contract", {}) or {})
+        if contract.get("contract_version") != "crdcm_decision_v1":
+            return result
+        policy_action = int(contract.get("aggregated_policy_action", executed_action))
+        prior_action = int(contract.get("post_override_action", policy_action))
+        external_override = executed_action != policy_action
+        reasons = list(contract.get("override_reasons", []) or [])
+        if external_override and "trainer_or_planner:executed_action_delta" not in reasons:
+            reasons.append("trainer_or_planner:executed_action_delta")
+        contract.update(
+            {
+                "post_override_action": int(executed_action),
+                "actual_executed_action": int(executed_action),
+                "override_applied": bool(
+                    contract.get("override_applied", False) or external_override
+                ),
+                "override_reasons": reasons,
+                "actor_credit_weight": 0.0 if external_override else float(
+                    contract.get("actor_credit_weight", 1.0)
+                ),
+                "actor_credit_source": (
+                    "external_override_masked"
+                    if external_override
+                    else contract.get("actor_credit_source", "raw_policy_sample")
+                ),
+                "sampled_from_raw_policy_distribution": bool(
+                    not external_override
+                    and contract.get("sampled_from_raw_policy_distribution", False)
+                ),
+                "pre_trainer_override_action": prior_action,
+            }
+        )
+        result["crdcm_decision_contract"] = contract
+        if external_override and isinstance(result.get("head_credit_weights"), dict):
+            result["head_credit_weights"] = {
+                key: 0.0 for key in result["head_credit_weights"]
+            }
+        return result
+
+    @staticmethod
+    def _build_crdcm_policy_decision_trace(
+        rollout: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        trace: list[dict[str, Any]] = []
+        for step_index, row in enumerate(rollout):
+            action_info = dict(row.get("action_info", {}) or {})
+            contract = dict(action_info.get("crdcm_decision_contract", {}) or {})
+            if contract.get("contract_version") != "crdcm_decision_v1":
+                continue
+            env_info = dict(row.get("env_info", {}) or {})
+            decision_info = dict(row.get("decision_info", {}) or {})
+            semantic_state = dict(decision_info.get("semantic_state", {}) or {})
+            crdcm_observation = dict(semantic_state.get("crdcm_observation", {}) or {})
+            actual_action = int(row.get("action", contract.get("actual_executed_action", 0)))
+            if actual_action != int(contract.get("actual_executed_action", actual_action)):
+                raise RuntimeError("CRDCM trace executed action mismatch")
+            trace.append(
+                {
+                    "trace_contract_version": "policy_decision_trace_v2",
+                    "step_index": step_index,
+                    "time_index": crdcm_observation.get("observed_at_time_index"),
+                    "request": dict(crdcm_observation.get("required_request", {}) or {}),
+                    "feature_vector": list(contract.get("feature_vector", []) or []),
+                    "pre_crdcm_head_logits": dict(
+                        contract.get("pre_crdcm_head_logits", {}) or {}
+                    ),
+                    "post_crdcm_head_logits": dict(
+                        contract.get("post_crdcm_head_logits", {}) or {}
+                    ),
+                    "post_crdcm_head_probabilities": dict(
+                        contract.get("post_crdcm_head_probabilities", {}) or {}
+                    ),
+                    "action_mask": action_info.get("action_mask"),
+                    "raw_selected_action": contract.get("raw_selected_action"),
+                    "aggregated_policy_action": contract.get("aggregated_policy_action"),
+                    "pre_override_action": contract.get("pre_override_action"),
+                    "post_override_action": contract.get("post_override_action"),
+                    "actual_executed_action": actual_action,
+                    "override_applied": bool(contract.get("override_applied", False)),
+                    "override_reasons": list(contract.get("override_reasons", []) or []),
+                    "raw_policy_log_prob": contract.get("raw_policy_log_prob"),
+                    "executed_action_log_prob_under_policy": contract.get(
+                        "executed_action_log_prob_under_policy"
+                    ),
+                    "credit_provenance": {
+                        "contract_version": contract.get("credit_contract_version"),
+                        "actor_credit_weight": contract.get("actor_credit_weight"),
+                        "actor_credit_source": contract.get("actor_credit_source"),
+                        "sampled_from_raw_policy_distribution": contract.get(
+                            "sampled_from_raw_policy_distribution"
+                        ),
+                    },
+                    "reward": float(row.get("reward", 0.0)),
+                    "reward_components": dict(
+                        env_info.get(
+                            "reward_breakdown",
+                            env_info.get("reward_dict", env_info.get("reward", {})),
+                        )
+                        or {}
+                    ),
+                    "mechanism_event": dict(env_info.get("metrics_protocol", {}) or {}),
+                    "cache_event": dict(env_info.get("cache_event", {}) or {}),
+                }
+            )
+        return trace
 
     def _collect_env_action_counterfactual_targets(
         self,

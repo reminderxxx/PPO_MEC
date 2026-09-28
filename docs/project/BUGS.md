@@ -668,3 +668,10 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
   claim-to-artifact 映射，故 TMC-ready 只能判为 `Unverifiable`。
 - 后续必须保持 controller-level MARL、`semantic_discrete_5`、受控 adapter mapping、policy guard 和 learned predictor
   的归因边界；不得把 `NGSIM + Alibaba` 写成真实 adapter request trace，或把 readiness/checkpoint inventory 写成性能证据。
+
+## 2026-09-28 CRDCM 已知限制
+
+- `OPEN / action expressiveness`：`crdcm_decision_v1` 仍复用五动作合同，不能直接选择任意 future critical-node object bundle 或多个候选 RSU；扩展需要新 action schema/执行事务/credit derivation。
+- `OPEN / structure realization`：48-episode fresh/untrained diagnostic 中 CRDCM SA-GHMAPPO 与 MAPPO 为 0/124 action disagreement。当前只证明相同状态已到达不同 encoder，尚未证明图结构形成不同或更优行为。
+- `OPEN / performance evidence`：没有新训练 checkpoint、多 seed、disjoint formal/holdout 或统计；任何 advantage/generalization claim 均为 `UNVERIFIED`。
+- `CLOSED / silent forced-action credit`：新 CRDCM wrapper/trainer 对 executed action 偏离 aggregated policy action 的样本显式标记并屏蔽 actor credit；legacy agent 行为不改。
