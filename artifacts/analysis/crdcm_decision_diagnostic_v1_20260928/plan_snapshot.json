@@ -1,0 +1,90 @@
+{
+  "study_version": "crdcm_decision_diagnostic_v1",
+  "execution_policy": "fixed_single_pass_no_training_no_result_selection",
+  "seed": 1401,
+  "max_steps": 20,
+  "episode_cap": 48,
+  "environment_step_cap": 960,
+  "controllers": [
+    "crdcm_sa_ghmappo",
+    "crdcm_mappo",
+    "crdcm_ppo",
+    "crdcm_critical_path_heuristic"
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "capacity_competition",
+      "capacity_mb": 280.0,
+      "migration_enabled": true,
+      "workflow_binding": "repeated_reuse",
+      "initial_adapter_id": "adapter_perception"
+    },
+    {
+      "scenario_id": "shared_adapter_reuse_prepare",
+      "capacity_mb": 360.0,
+      "migration_enabled": true,
+      "workflow_binding": "repeated_reuse",
+      "initial_adapter_id": "adapter_perception"
+    },
+    {
+      "scenario_id": "low_reuse_no_migration_negative",
+      "capacity_mb": 360.0,
+      "migration_enabled": false,
+      "workflow_binding": "round_robin_low_reuse",
+      "initial_adapter_id": "adapter_perception"
+    },
+    {
+      "scenario_id": "ample_resource_negative",
+      "capacity_mb": 1024.0,
+      "migration_enabled": true,
+      "workflow_binding": "round_robin_low_reuse",
+      "initial_adapter_id": "adapter_perception"
+    }
+  ],
+  "data": {
+    "mobility_csv_path": "data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+    "workflow_csv_path": "data/raw/workflow/alibaba2018/batch_task.csv",
+    "max_mobility_rows": 2500,
+    "window_plan_path": "configs/experiment/mechanism_algorithm_training_windows_v1.json",
+    "evaluation_pairs": [
+      {
+        "window_index": 0,
+        "workflow_id": "j_3"
+      },
+      {
+        "window_index": 1,
+        "workflow_id": "j_8"
+      },
+      {
+        "window_index": 2,
+        "workflow_id": "j_15"
+      }
+    ]
+  },
+  "expected_sources": {
+    "mobility": {
+      "size_bytes": 2118175938,
+      "sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c"
+    },
+    "workflow": {
+      "size_bytes": 802261444,
+      "sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc"
+    }
+  },
+  "data_relationship": "Fixed diagnostic reuse of three previously observed NGSIM windows and three Alibaba workflows. This is not independent evaluation, formal evidence, or holdout access.",
+  "claim_boundary": "Untrained/fresh decision-contract diagnostic only. Outputs may establish plumbing, sensitivity, action disagreement, and mechanism-event interpretability; they may not support advantage, convergence, statistical significance, or generalization claims.",
+  "future_training_plan": {
+    "status": "frozen_not_authorized",
+    "unit_matrix": "same controller-visible state, action mechanism, scenario matrix, and seeds",
+    "agents": [
+      "crdcm_sa_ghmappo",
+      "crdcm_mappo",
+      "crdcm_ppo",
+      "crdcm_critical_path_heuristic"
+    ],
+    "minimum_seeds": 5,
+    "checkpoint_policy": "new CRDCM checkpoints only; no legacy adaptation",
+    "evaluation_policy": "new disjoint development/formal windows must be approved separately",
+    "forbidden_now": "960-episode performance matrix"
+  }
+}

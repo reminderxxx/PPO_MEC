@@ -1,0 +1,17 @@
+controller,scenario_id,episode_count,completed_count,completion_rate,continuity_rate_mean,handoff_failure_rate_mean,request_failure_count,failure_categories,transfer_mb_per_request_mean,migration_cost_mean,delay_available_count,delay_coverage_rate,conditional_delay_mean,override_rate
+crdcm_critical_path_heuristic,ample_resource_negative,3,1,0.333333,0.896296,0.666667,2,completed:1|handoff_unprepared:2,40.081046,0.666667,1,0.333333,1601.0,0.0
+crdcm_critical_path_heuristic,capacity_competition,3,2,0.666667,0.962963,0.333333,1,completed:2|handoff_unprepared:1,12.230065,0.393333,2,0.666667,1001.0,0.0
+crdcm_critical_path_heuristic,low_reuse_no_migration_negative,3,1,0.333333,0.896296,0.666667,2,completed:1|handoff_unprepared:2,54.355556,0.666667,1,0.333333,1601.0,0.0
+crdcm_critical_path_heuristic,shared_adapter_reuse_prepare,3,2,0.666667,0.962963,0.333333,1,completed:2|handoff_unprepared:1,12.230065,0.393333,2,0.666667,1001.0,0.0
+crdcm_mappo,ample_resource_negative,3,2,0.666667,0.933333,0.0,1,cache_dependency_miss:1|completed:2,43.488453,0.12,2,0.666667,1201.0,0.0
+crdcm_mappo,capacity_competition,3,3,1.0,1.0,0.0,0,completed:3,14.304139,0.12,3,1.0,934.333333,0.0
+crdcm_mappo,low_reuse_no_migration_negative,3,1,0.333333,0.82963,0.666667,3,completed:1|handoff_unprepared:2,54.355556,0.666667,1,0.333333,1601.0,0.0
+crdcm_mappo,shared_adapter_reuse_prepare,3,3,1.0,1.0,0.0,0,completed:3,14.304139,0.12,3,1.0,934.333333,0.0
+crdcm_ppo,ample_resource_negative,3,0,0.0,0.35512,0.666667,20,cache_dependency_miss:1|handoff_unprepared:2,16.222222,0.666667,0,0.0,,0.0
+crdcm_ppo,capacity_competition,3,0,0.0,0.519826,0.666667,14,cache_dependency_miss:1|handoff_unprepared:2,3.555556,0.666667,0,0.0,,0.0
+crdcm_ppo,low_reuse_no_migration_negative,3,0,0.0,0.35512,0.666667,20,cache_dependency_miss:1|handoff_unprepared:2,17.555556,0.666667,0,0.0,,0.0
+crdcm_ppo,shared_adapter_reuse_prepare,3,0,0.0,0.519826,0.666667,14,cache_dependency_miss:1|handoff_unprepared:2,3.555556,0.666667,0,0.0,,0.0
+crdcm_sa_ghmappo,ample_resource_negative,3,2,0.666667,0.933333,0.0,1,cache_dependency_miss:1|completed:2,43.488453,0.12,2,0.666667,1201.0,0.0
+crdcm_sa_ghmappo,capacity_competition,3,3,1.0,1.0,0.0,0,completed:3,14.304139,0.12,3,1.0,934.333333,0.0
+crdcm_sa_ghmappo,low_reuse_no_migration_negative,3,1,0.333333,0.82963,0.666667,3,completed:1|handoff_unprepared:2,54.355556,0.666667,1,0.333333,1601.0,0.0
+crdcm_sa_ghmappo,shared_adapter_reuse_prepare,3,3,1.0,1.0,0.0,0,completed:3,14.304139,0.12,3,1.0,934.333333,0.0

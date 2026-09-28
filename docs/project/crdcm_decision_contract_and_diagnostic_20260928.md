@@ -8,7 +8,7 @@
 - `artifact_run_id`: `crdcm_decision_diagnostic_v1_20260928`
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `base_git_commit`: `19200c5e9fec1dddd9375834ada3ac1798bf119e`
-- `implementation_git_commit`: 首次实现提交后由 artifact 记录补齐
+- `implementation_git_commit`: `47f10523d6da036dcd14c91fed5d6201903aa457`
 - `evidence_level`: `E2_ARTIFACT_AUDITED`，仅限非正式 decision-contract diagnostic；不等于 formal performance evidence
 - `verdict`: `UNVERIFIED for algorithm advantage / PASS for minimum decision-contract plumbing`
 
@@ -69,7 +69,7 @@
 
 Artifact root：`artifacts/analysis/crdcm_decision_diagnostic_v1_20260928/`。
 
-关键文件：`completion_receipt.json`、`command_log.json`、`artifact_integrity_manifest.json`、`diagnostic_rows.csv`、`diagnostic_aggregate.csv`、`decision_divergence.json`、`pairwise_action_disagreement.json`、`plan_snapshot.json` 和 48 个 episode summary。
+关键文件：`completion_receipt.json`、`command_log.json`、`artifact_integrity_manifest.json`、`protected_user_files_audit.json`、`diagnostic_rows.csv`、`diagnostic_aggregate.csv`、`decision_divergence.json`、`pairwise_action_disagreement.json`、`plan_snapshot.json` 和 48 个本地 episode summary。
 
 本轮结论只允许表述为“新状态到达决策、动作/credit 可追溯、强控制可运行、真实小样本机制行为可解释”。不得表述为 CRDCM 优于既有算法、具备泛化、收敛或 paper-ready 性能。
 

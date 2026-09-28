@@ -1,0 +1,44 @@
+[
+  {
+    "controller_a": "crdcm_sa_ghmappo",
+    "controller_b": "crdcm_mappo",
+    "matched_decision_count": 124,
+    "disagreement_count": 0,
+    "disagreement_rate": 0.0
+  },
+  {
+    "controller_a": "crdcm_sa_ghmappo",
+    "controller_b": "crdcm_ppo",
+    "matched_decision_count": 124,
+    "disagreement_count": 86,
+    "disagreement_rate": 0.693548
+  },
+  {
+    "controller_a": "crdcm_sa_ghmappo",
+    "controller_b": "crdcm_critical_path_heuristic",
+    "matched_decision_count": 124,
+    "disagreement_count": 76,
+    "disagreement_rate": 0.612903
+  },
+  {
+    "controller_a": "crdcm_mappo",
+    "controller_b": "crdcm_ppo",
+    "matched_decision_count": 124,
+    "disagreement_count": 86,
+    "disagreement_rate": 0.693548
+  },
+  {
+    "controller_a": "crdcm_mappo",
+    "controller_b": "crdcm_critical_path_heuristic",
+    "matched_decision_count": 124,
+    "disagreement_count": 76,
+    "disagreement_rate": 0.612903
+  },
+  {
+    "controller_a": "crdcm_ppo",
+    "controller_b": "crdcm_critical_path_heuristic",
+    "matched_decision_count": 124,
+    "disagreement_count": 62,
+    "disagreement_rate": 0.5
+  }
+]

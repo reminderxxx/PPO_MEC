@@ -1,0 +1,282 @@
+{
+  "status": "pass",
+  "self_excluding": true,
+  "file_count": 55,
+  "files": [
+    {
+      "path": "command_log.json",
+      "size_bytes": 755,
+      "sha256": "c1beb8ba1d4bfdd003954d3a55fab486573356947c5aa8f01cf2e245e59df6be"
+    },
+    {
+      "path": "completion_receipt.json",
+      "size_bytes": 2767,
+      "sha256": "1ee3a5ff20dd3e6bde7452a5f455f14c337e93438c6e52ba41b123d07e172fd9"
+    },
+    {
+      "path": "decision_divergence.json",
+      "size_bytes": 51052,
+      "sha256": "e7f2c72dcc4d0b0220c13d410f5194836cd7a8cf8f231960ed3f65b09329a600"
+    },
+    {
+      "path": "diagnostic_aggregate.csv",
+      "size_bytes": 2520,
+      "sha256": "99532678754be9c1cedf845d94c4dafedee8b96665dd27f78cca964fe4ba1950"
+    },
+    {
+      "path": "diagnostic_rows.csv",
+      "size_bytes": 10875,
+      "sha256": "5faf0ca2c38ea2414976f82b625a6718f840a3c46d31eabfb37cc330a20ba3e8"
+    },
+    {
+      "path": "episodes/crdcm_critical_path_heuristic/ample_resource_negative_0.json",
+      "size_bytes": 455936,
+      "sha256": "d3efc167fe23098f0635ac02c9c087dc0054c8109c9a96a08fb2d99ca2929328"
+    },
+    {
+      "path": "episodes/crdcm_critical_path_heuristic/ample_resource_negative_1.json",
+      "size_bytes": 787823,
+      "sha256": "88dc390bf4c0d29c2823476fea35fc51df0929067646bb323ac59c4abbf63a2b"
+    },
+    {
+      "path": "episodes/crdcm_critical_path_heuristic/ample_resource_negative_2.json",
+      "size_bytes": 266748,
+      "sha256": "f3b4090ada4d6c30d9e293761e489cce4b929b1695401db105499b2c4bec5288"
+    },
+    {
+      "path": "episodes/crdcm_critical_path_heuristic/capacity_competition_0.json",
+      "size_bytes": 427055,
+      "sha256": "e6cabd12303617e4cf83d9a4d60558c9361befb3f27bcb577884fc20e17e535f"
+    },
+    {
+      "path": "episodes/crdcm_critical_path_heuristic/capacity_competition_1.json",
+      "size_bytes": 764820,
+      "sha256": "84a711fe6a230d80a209939338b67a75fd6fd49a42be07335096ac0da41dfe07"
+    },
+    {
+      "path": "episodes/crdcm_critical_path_heuristic/capacity_competition_2.json",
+      "size_bytes": 255513,
+      "sha256": "683b1bd675133c51affa7a590315cf5291b4df25eb9f1ef61451f82de41c101d"
+    },
+    {
+      "path": "episodes/crdcm_critical_path_heuristic/low_reuse_no_migration_negative_0.json",
+      "size_bytes": 471318,
+      "sha256": "54e11dd7f9cb3de4b19de7a408b3abb90401f194c252e5762fcf6097b1996af1"
+    },
+    {
+      "path": "episodes/crdcm_critical_path_heuristic/low_reuse_no_migration_negative_1.json",
+      "size_bytes": 884690,
+      "sha256": "ef3b1690f780b6d096df7b17a75a31069098e38d6f0ac213c95175bccd50523c"
+    },
+    {
+      "path": "episodes/crdcm_critical_path_heuristic/low_reuse_no_migration_negative_2.json",
+      "size_bytes": 271126,
+      "sha256": "7c682740c1a21ea6b8d9589e5315a5781dfda3cb947b444d5381e9dc2b66b791"
+    },
+    {
+      "path": "episodes/crdcm_critical_path_heuristic/shared_adapter_reuse_prepare_0.json",
+      "size_bytes": 427771,
+      "sha256": "c8a93727f3a217bab2adafc9e908d323438151007c2a861850ceaa6bd9650ba3"
+    },
+    {
+      "path": "episodes/crdcm_critical_path_heuristic/shared_adapter_reuse_prepare_1.json",
+      "size_bytes": 766094,
+      "sha256": "22b04063c211c63e94e7863b35144597313f1556e2b1270cd13bf2bb62bbd69e"
+    },
+    {
+      "path": "episodes/crdcm_critical_path_heuristic/shared_adapter_reuse_prepare_2.json",
+      "size_bytes": 255941,
+      "sha256": "bf01442069a56b627184b50775ad76f1e43b8bf09d1c3e2e191cd7b20a9b93c9"
+    },
+    {
+      "path": "episodes/crdcm_mappo/ample_resource_negative_0.json",
+      "size_bytes": 472556,
+      "sha256": "ee0244bbd5fb63ce36ddb327d21c87e383721170fccc6d9598b1fb270043f8ae"
+    },
+    {
+      "path": "episodes/crdcm_mappo/ample_resource_negative_1.json",
+      "size_bytes": 844801,
+      "sha256": "b89d628754b9f718d592e974b877c4ecb1e3707f6e88b57ec3991c646e681192"
+    },
+    {
+      "path": "episodes/crdcm_mappo/ample_resource_negative_2.json",
+      "size_bytes": 276547,
+      "sha256": "9581f114b287ad6a0f7424d85c60c8d268f90720500d9a06a35f8b84675bfd90"
+    },
+    {
+      "path": "episodes/crdcm_mappo/capacity_competition_0.json",
+      "size_bytes": 458985,
+      "sha256": "b6a01ea77e84ecde4816bd4c75e2ac3a47a402aa17ff24c3bb4666b57b5694c4"
+    },
+    {
+      "path": "episodes/crdcm_mappo/capacity_competition_1.json",
+      "size_bytes": 833700,
+      "sha256": "820973df52043a40dc98948cd55a4529b88ee194d7912830a5c8ade1a35d5c53"
+    },
+    {
+      "path": "episodes/crdcm_mappo/capacity_competition_2.json",
+      "size_bytes": 270912,
+      "sha256": "dc39d12a0b3f0f04f6c9fb7d52952af11381e06ccf89cabe83f1902e7b585e08"
+    },
+    {
+      "path": "episodes/crdcm_mappo/low_reuse_no_migration_negative_0.json",
+      "size_bytes": 485029,
+      "sha256": "86714c2dccd0769d7c56f13fc9eff41ace058fedc64e4998418d96d1dea4085b"
+    },
+    {
+      "path": "episodes/crdcm_mappo/low_reuse_no_migration_negative_1.json",
+      "size_bytes": 907364,
+      "sha256": "4ae1dad5fb4f04c26178310db24958d75132f3f6428e66b853a84bb252af9cc8"
+    },
+    {
+      "path": "episodes/crdcm_mappo/low_reuse_no_migration_negative_2.json",
+      "size_bytes": 283021,
+      "sha256": "6841820eab0f4cea69bb32e273ad5e0e85c41b92026874596eb55dbb5995a23f"
+    },
+    {
+      "path": "episodes/crdcm_mappo/shared_adapter_reuse_prepare_0.json",
+      "size_bytes": 459822,
+      "sha256": "e2df107052c946046970f0953eb00cc5b1f52e786b029b76a13442c155186e43"
+    },
+    {
+      "path": "episodes/crdcm_mappo/shared_adapter_reuse_prepare_1.json",
+      "size_bytes": 835256,
+      "sha256": "981248368e1295b7bbd54365e56cad982f9e2dd75d8519145ad30f3c2497dbb9"
+    },
+    {
+      "path": "episodes/crdcm_mappo/shared_adapter_reuse_prepare_2.json",
+      "size_bytes": 271398,
+      "sha256": "a9aca693cf0a3ef6c8087cde22625b270e435e4c019d208712410d0bcb944ab2"
+    },
+    {
+      "path": "episodes/crdcm_ppo/ample_resource_negative_0.json",
+      "size_bytes": 469781,
+      "sha256": "91cda98232f8a866722e291f020dd06427f4ce989cac3fb9fb1eda25f52564b0"
+    },
+    {
+      "path": "episodes/crdcm_ppo/ample_resource_negative_1.json",
+      "size_bytes": 785586,
+      "sha256": "672f3e0bf39ee058b51fbdfef84a743ef8dfcf229f964c2f4c9fe67985699d1d"
+    },
+    {
+      "path": "episodes/crdcm_ppo/ample_resource_negative_2.json",
+      "size_bytes": 248551,
+      "sha256": "ab51233a63a5b8f26e2ff39cbb581b9414855776005c62e06cb1917456df983a"
+    },
+    {
+      "path": "episodes/crdcm_ppo/capacity_competition_0.json",
+      "size_bytes": 456247,
+      "sha256": "a2b7ef3f5ac3b437835e0118244c93933fcf357cb75720ebe57811d9756b1df4"
+    },
+    {
+      "path": "episodes/crdcm_ppo/capacity_competition_1.json",
+      "size_bytes": 778560,
+      "sha256": "3584f4bd37ea496beb38dd83c074b793f653f14c29bc36bcc8db3c2e41e5d630"
+    },
+    {
+      "path": "episodes/crdcm_ppo/capacity_competition_2.json",
+      "size_bytes": 248519,
+      "sha256": "00853c12c61d6c6d3c50809f020281fdc1e9906871e88631bd24cd32a62eb5e3"
+    },
+    {
+      "path": "episodes/crdcm_ppo/low_reuse_no_migration_negative_0.json",
+      "size_bytes": 482049,
+      "sha256": "74b4e3b3693f144fc08860ee6ca2fdd92e6fe25660150c047c6a1df3551b1ba8"
+    },
+    {
+      "path": "episodes/crdcm_ppo/low_reuse_no_migration_negative_1.json",
+      "size_bytes": 777243,
+      "sha256": "e55fbc8764901cc84497381386f2c5485268033351baf9cf3556db22d5661c9a"
+    },
+    {
+      "path": "episodes/crdcm_ppo/low_reuse_no_migration_negative_2.json",
+      "size_bytes": 248849,
+      "sha256": "946cd45104430faafee8e8df53fd9798f140fc1856cb65d98eb1e22f61bba925"
+    },
+    {
+      "path": "episodes/crdcm_ppo/shared_adapter_reuse_prepare_0.json",
+      "size_bytes": 457089,
+      "sha256": "7f251b70069cfa479d4bbf21aa0a3adb7375d408d97789b5fa49fdd30b60b40e"
+    },
+    {
+      "path": "episodes/crdcm_ppo/shared_adapter_reuse_prepare_1.json",
+      "size_bytes": 782947,
+      "sha256": "fc57ba4b337a5e56f24f9a60040d0a209f2144675446ab467777f56487753f8b"
+    },
+    {
+      "path": "episodes/crdcm_ppo/shared_adapter_reuse_prepare_2.json",
+      "size_bytes": 248909,
+      "sha256": "03b1e455bee054401206fd404c270f921337881103b9131671f749a36138c3e0"
+    },
+    {
+      "path": "episodes/crdcm_sa_ghmappo/ample_resource_negative_0.json",
+      "size_bytes": 472564,
+      "sha256": "fa1c1da653c1703042438ee1257af09036fecd738d277af90155fc10b0abf14c"
+    },
+    {
+      "path": "episodes/crdcm_sa_ghmappo/ample_resource_negative_1.json",
+      "size_bytes": 844738,
+      "sha256": "09b21b327ca04c0077ee65758b0484754ca33da3d8a1dc769ed7c567bc765f14"
+    },
+    {
+      "path": "episodes/crdcm_sa_ghmappo/ample_resource_negative_2.json",
+      "size_bytes": 276595,
+      "sha256": "41a8096a3c479717fa8cef58be97f2de0ae7d3e56dc4e4965aeb3fd8ac88cc96"
+    },
+    {
+      "path": "episodes/crdcm_sa_ghmappo/capacity_competition_0.json",
+      "size_bytes": 459000,
+      "sha256": "8d5503c3108a3b5413d14bf3ea23c39b2ac9407f7a54f8902d383e73881d5a8a"
+    },
+    {
+      "path": "episodes/crdcm_sa_ghmappo/capacity_competition_1.json",
+      "size_bytes": 833620,
+      "sha256": "9defc65278cadd0b72d3f010d82c63dbe6cdd9cc77be2f5ff930bdef304403ff"
+    },
+    {
+      "path": "episodes/crdcm_sa_ghmappo/capacity_competition_2.json",
+      "size_bytes": 270947,
+      "sha256": "d037af48fab35f17c11f9ad4d76b71e95d49532ca2533820928b17e17fac6ffa"
+    },
+    {
+      "path": "episodes/crdcm_sa_ghmappo/low_reuse_no_migration_negative_0.json",
+      "size_bytes": 485056,
+      "sha256": "e8444ef18e9145213dd78d0afcc3846950707bf60bf6258b868e5b82fa40fb1b"
+    },
+    {
+      "path": "episodes/crdcm_sa_ghmappo/low_reuse_no_migration_negative_1.json",
+      "size_bytes": 907301,
+      "sha256": "e9eafe9773f52ba55840f56861d007775922478a7189f07db3e9c97245a54adb"
+    },
+    {
+      "path": "episodes/crdcm_sa_ghmappo/low_reuse_no_migration_negative_2.json",
+      "size_bytes": 283048,
+      "sha256": "d15cd5640ee27b64b7d65a47a218555dcbf9b8f00c20d4e7d0aed04eaab188b0"
+    },
+    {
+      "path": "episodes/crdcm_sa_ghmappo/shared_adapter_reuse_prepare_0.json",
+      "size_bytes": 459836,
+      "sha256": "884782dc8e7e14803291c7c108bc8de62c6c9f0810994390463166eb3168c0c4"
+    },
+    {
+      "path": "episodes/crdcm_sa_ghmappo/shared_adapter_reuse_prepare_1.json",
+      "size_bytes": 835182,
+      "sha256": "e917b982260e190c7f74cd2510efdd506b754e1fb6b8246a49aec047f1b23755"
+    },
+    {
+      "path": "episodes/crdcm_sa_ghmappo/shared_adapter_reuse_prepare_2.json",
+      "size_bytes": 271428,
+      "sha256": "4581b97cc350bf42308d07638fdcd7580b29962598c054b45e2f4fbba9829f25"
+    },
+    {
+      "path": "pairwise_action_disagreement.json",
+      "size_bytes": 1123,
+      "sha256": "e901ca8bff3ad9e09dcddfad59d7cd1a21f0ffe997c72b0e1c6dc46764538a81"
+    },
+    {
+      "path": "plan_snapshot.json",
+      "size_bytes": 3170,
+      "sha256": "92b398c18b65cd216a8ecd54c651c79362897be635efe5d0338216e7a4ffe89d"
+    }
+  ]
+}

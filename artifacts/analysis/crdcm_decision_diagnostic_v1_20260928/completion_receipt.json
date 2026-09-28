@@ -1,0 +1,77 @@
+{
+  "study_version": "crdcm_decision_diagnostic_v1",
+  "status": "completed",
+  "git_commit_at_execution": "47f10523d6da036dcd14c91fed5d6201903aa457",
+  "config_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/configs/experiment/crdcm_decision_diagnostic_v1.yaml",
+  "config_sha256": "77359fc6421f0603f9d860d722d677cb1c39d51cea6647775615996305ac7079",
+  "episode_count": 48,
+  "actual_environment_steps": 496,
+  "episode_cap": 48,
+  "environment_step_cap": 960,
+  "decision_cell_count": 124,
+  "decision_disagreement_count": 107,
+  "decision_disagreement_rate": 0.862903,
+  "pairwise_action_disagreement": [
+    {
+      "controller_a": "crdcm_sa_ghmappo",
+      "controller_b": "crdcm_mappo",
+      "matched_decision_count": 124,
+      "disagreement_count": 0,
+      "disagreement_rate": 0.0
+    },
+    {
+      "controller_a": "crdcm_sa_ghmappo",
+      "controller_b": "crdcm_ppo",
+      "matched_decision_count": 124,
+      "disagreement_count": 86,
+      "disagreement_rate": 0.693548
+    },
+    {
+      "controller_a": "crdcm_sa_ghmappo",
+      "controller_b": "crdcm_critical_path_heuristic",
+      "matched_decision_count": 124,
+      "disagreement_count": 76,
+      "disagreement_rate": 0.612903
+    },
+    {
+      "controller_a": "crdcm_mappo",
+      "controller_b": "crdcm_ppo",
+      "matched_decision_count": 124,
+      "disagreement_count": 86,
+      "disagreement_rate": 0.693548
+    },
+    {
+      "controller_a": "crdcm_mappo",
+      "controller_b": "crdcm_critical_path_heuristic",
+      "matched_decision_count": 124,
+      "disagreement_count": 76,
+      "disagreement_rate": 0.612903
+    },
+    {
+      "controller_a": "crdcm_ppo",
+      "controller_b": "crdcm_critical_path_heuristic",
+      "matched_decision_count": 124,
+      "disagreement_count": 62,
+      "disagreement_rate": 0.5
+    }
+  ],
+  "training_performed": false,
+  "legacy_checkpoint_loaded": false,
+  "holdout_accessed": false,
+  "claim_boundary": "Untrained/fresh decision-contract diagnostic only. Outputs may establish plumbing, sensitivity, action disagreement, and mechanism-event interpretability; they may not support advantage, convergence, statistical significance, or generalization claims.",
+  "future_training_plan": {
+    "status": "frozen_not_authorized",
+    "unit_matrix": "same controller-visible state, action mechanism, scenario matrix, and seeds",
+    "agents": [
+      "crdcm_sa_ghmappo",
+      "crdcm_mappo",
+      "crdcm_ppo",
+      "crdcm_critical_path_heuristic"
+    ],
+    "minimum_seeds": 5,
+    "checkpoint_policy": "new CRDCM checkpoints only; no legacy adaptation",
+    "evaluation_policy": "new disjoint development/formal windows must be approved separately",
+    "forbidden_now": "960-episode performance matrix"
+  },
+  "elapsed_seconds": 3.856
+}

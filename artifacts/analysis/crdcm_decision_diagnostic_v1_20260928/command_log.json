@@ -1,0 +1,25 @@
+{
+  "status": "completed",
+  "argv": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "scripts/run_crdcm_decision_diagnostic.py",
+    "--config",
+    "configs/experiment/crdcm_decision_diagnostic_v1.yaml",
+    "--data-root",
+    "/Users/howen/Projects/PPO_MEC",
+    "--output-dir",
+    "artifacts/analysis/crdcm_decision_diagnostic_v1_20260928"
+  ],
+  "exit_code": 0,
+  "working_directory": "/Users/howen/.codex/worktrees/1aed/PPO_MEC",
+  "source_identity": {
+    "mobility": {
+      "size_bytes": 2118175938,
+      "sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c"
+    },
+    "workflow": {
+      "size_bytes": 802261444,
+      "sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc"
+    }
+  }
+}

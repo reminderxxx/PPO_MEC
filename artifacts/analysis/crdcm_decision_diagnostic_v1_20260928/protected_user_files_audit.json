@@ -1,0 +1,16 @@
+{
+  "status": "pass",
+  "base_git_commit": "19200c5e9fec1dddd9375834ada3ac1798bf119e",
+  "implementation_git_commit": "47f10523d6da036dcd14c91fed5d6201903aa457",
+  "comparison": "working tree SHA-256 equals base commit blob SHA-256",
+  "protected_file_count": 7,
+  "files": {
+    "scripts/train_sa_ghmappo_real_sample.py": "4681b4b75f942acc9015b6b1f5f23b287dde4b443fc545518521d8eaab7b9f97",
+    "src/agents/sa_ghmappo_agent.py": "99da9ec0a95c02c7727b58f39db2fe99212fd0e6ab772c8d734678e8b043a180",
+    "src/agents/sa_ghmappo_core.py": "d686f88de6eda346402b301182fde0b0d80a0414485dde5f0c90babc7199d49d",
+    "src/encoders/fusion_encoder.py": "d158dfbc8f853c116e6acacc8ce4e1589313d2f69ac99ee62e91d5f5ba8fec10",
+    "src/evaluators/real_eval_support.py": "a8cd73c32ac0676bf0acd20105c6b54c72dbe15b8f93ea4f3a5f5e5ff9256a7d",
+    "tests/test_algo_pool_contract.py": "a29944e043903fdd25732989b006ece41d61779397000c7ccd3236ccd4aff140",
+    "tests/test_checkpoint_compat.py": "a38b6af306f6ea7e8bb3a6ce9dcab600973c3d1addb25f803d657b5ba4b92808"
+  }
+}
