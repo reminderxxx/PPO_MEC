@@ -19,7 +19,10 @@ if str(ROOT_DIR) not in sys.path:
 from src.agents.registry import build_agent, get_algo_spec, list_trainable_agents
 from src.data.mobility.replay_provider import ReplayProvider
 from src.envs.core.predictor_manager import PredictorManager
-from src.envs.core.vec_workflow_core_env import VecWorkflowCoreEnv
+from src.envs.core.vec_workflow_core_env import (
+    MECHANISM_FACTORIAL_PROFILE_VERSION,
+    VecWorkflowCoreEnv,
+)
 from src.envs.wrappers.gym_vec_env import GymVecEnv
 from src.evaluators.main_results_support import (
     apply_frozen_window_plan,
@@ -196,6 +199,20 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--workflow_csv_path", type=str, default=str(ROOT_DIR / "data" / "raw" / "workflow" / "alibaba2018" / "batch_task.csv"))
     parser.add_argument("--max_mobility_rows", type=int, default=1500)
     parser.add_argument("--max_workflows", type=int, default=2)
+    parser.add_argument(
+        "--adapter_assignment_profile",
+        choices=["legacy_batch_type", "semantic_ai_service"],
+        default="legacy_batch_type",
+    )
+    parser.add_argument(
+        "--mechanism_factorial_arm",
+        choices=["", "sharing_on_migration_on"],
+        default="",
+        help=(
+            "Opt-in controlled supplement profile. It is deliberately limited to "
+            "the shared-base, migration-enabled arm used for matched algorithm retraining."
+        ),
+    )
     parser.add_argument("--reward_positive_offset", type=float, default=5.0)
     parser.add_argument("--workflow_selector", type=str, default="ordered")
     parser.add_argument("--rsu_layout", type=str, default="auto_dominant_tight")
@@ -454,6 +471,10 @@ def main() -> None:
         else None
     )
     if formal_protocol is not None:
+        if args.mechanism_factorial_arm:
+            raise FormalTrainingContractError(
+                "mechanism-factorial retraining is non-formal and cannot consume a formal protocol"
+            )
         formal_version = str(
             formal_protocol.get("typed_model_cache_formal_protocol_version", "")
         )
@@ -583,6 +604,7 @@ def main() -> None:
         min_tasks=args.min_tasks,
         max_tasks=args.max_tasks,
         random_seed=args.random_seed,
+        adapter_assignment_profile=args.adapter_assignment_profile,
     )
     if args.window_plan_path:
         # A frozen protocol plan is already outcome-blind; avoid rescanning the raw trace.
@@ -615,6 +637,26 @@ def main() -> None:
             }
         ]
     adapter_catalog = load_runtime_catalog(runtime_contract, root=ROOT_DIR)
+    mechanism_profile = None
+    if args.mechanism_factorial_arm:
+        if args.adapter_assignment_profile != "semantic_ai_service":
+            raise FormalTrainingContractError(
+                "mechanism-factorial retraining requires semantic_ai_service workflows"
+            )
+        mechanism_profile = {
+            "mechanism_factorial_profile_version": MECHANISM_FACTORIAL_PROFILE_VERSION,
+            "profile_id": args.mechanism_factorial_arm,
+            "base_sharing_enabled": True,
+            "workflow_state_migration_enabled": True,
+            "migration_disabled_fallback": "cold_restart_one_request",
+        }
+        for workflow_state in workflow_states:
+            for node in workflow_state.nodes:
+                node.required_base_model = str(
+                    adapter_catalog.get_typed_adapter(
+                        str(node.required_adapter)
+                    ).required_base_model_id
+                )
     cache_capacity_profile = dict(runtime_contract["cache_capacity_profile"])
     if not cache_capacity_profile.get("enabled"):
         cache_capacity_profile = None
@@ -817,6 +859,7 @@ def main() -> None:
             reward_positive_offset=args.reward_positive_offset,
             cache_capacity_profile=cache_capacity_profile,
             formal_request_exposure_trace=formal_request_exposure_trace,
+            mechanism_profile=mechanism_profile,
         )
         env = GymVecEnv(core_env=core_env, recorder=recorder)
         trainer = MARLOnPolicyTrainer(
@@ -846,6 +889,8 @@ def main() -> None:
                 "cache_efficiency_metrics_contract_version": runtime_contract[
                     "cache_efficiency_metrics_contract_version"
                 ],
+                "adapter_assignment_profile": args.adapter_assignment_profile,
+                "mechanism_factorial_arm": args.mechanism_factorial_arm or None,
                 "evaluation_unit_id": (
                     formal_request_exposure_trace["evaluation_unit"]["evaluation_unit_id"]
                     if formal_request_exposure_trace is not None
@@ -1042,6 +1087,9 @@ def main() -> None:
         "train_csv_path": str(train_csv_path),
         "summary_json_path": str(summary_path),
         "workflow_ids": [workflow_state.workflow_id for workflow_state in workflow_states],
+        "adapter_assignment_profile": args.adapter_assignment_profile,
+        "mechanism_factorial_arm": args.mechanism_factorial_arm or None,
+        "mechanism_profile": mechanism_profile,
         "selected_window_plan": selected_window_plan,
         "frozen_window_plan_path": window_payload.get("frozen_window_plan_path", ""),
         "frozen_window_plan_protocol_version": window_payload.get("frozen_window_plan_protocol_version", ""),

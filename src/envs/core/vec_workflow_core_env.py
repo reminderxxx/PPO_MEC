@@ -42,6 +42,7 @@ PRIMARY_VEHICLE_SELECTION_CHOICES = {"stable_first", "handoff_pressure"}
 CACHE_CAPACITY_UNITS = {"adapter_slots", "mb"}
 CACHE_CAPACITY_EPSILON = 1.0e-9
 TYPED_MAX_DEPENDENCY_BUNDLE_OBJECTS = 2
+MECHANISM_FACTORIAL_PROFILE_VERSION = "controlled_mechanism_factorial_v1"
 
 
 class VecWorkflowCoreEnv:
@@ -61,6 +62,7 @@ class VecWorkflowCoreEnv:
         cache_capacity_profile: dict[str, Any] | None = None,
         primary_vehicle_selection: str = "stable_first",
         formal_request_exposure_trace: dict[str, Any] | None = None,
+        mechanism_profile: dict[str, Any] | None = None,
     ) -> None:
         self._mobility_provider = mobility_provider or ReplayProvider()
         self._mobility_source = str(mobility_source or "ngsim").strip().lower()
@@ -80,6 +82,7 @@ class VecWorkflowCoreEnv:
         self._handoff_prepare_window = max(1, int(handoff_prepare_window))
         self._reward_positive_offset = max(float(reward_positive_offset), 0.0)
         self._cache_capacity_profile = self._normalize_cache_capacity_profile(cache_capacity_profile)
+        self._mechanism_profile = self._normalize_mechanism_profile(mechanism_profile)
         self._formal_request_exposure_trace = (
             deepcopy(formal_request_exposure_trace)
             if formal_request_exposure_trace is not None
@@ -254,6 +257,7 @@ class VecWorkflowCoreEnv:
         control: ControlAction,
     ) -> tuple[dict[str, Any], RewardBreakdown, bool, bool, dict[str, Any]]:
         """推进环境一个时间步。"""
+        control = self._apply_mechanism_profile(control)
         self._episode_steps += 1
         self._prune_prepare_history()
 
@@ -979,6 +983,83 @@ class VecWorkflowCoreEnv:
                 merged["count_base_model_separately"] = True
         return merged
 
+    def _normalize_mechanism_profile(
+        self, profile: dict[str, Any] | None
+    ) -> dict[str, Any] | None:
+        """Validate the opt-in controlled factorial mechanism profile."""
+
+        if profile is None:
+            return None
+        normalized = dict(profile)
+        version = str(
+            normalized.get("mechanism_factorial_profile_version")
+            or MECHANISM_FACTORIAL_PROFILE_VERSION
+        )
+        if version != MECHANISM_FACTORIAL_PROFILE_VERSION:
+            raise ValueError(f"unsupported mechanism factorial profile: {version}")
+        normalized["mechanism_factorial_profile_version"] = version
+        normalized["profile_id"] = str(
+            normalized.get("profile_id") or "controlled_factorial_unspecified"
+        )
+        normalized["base_sharing_enabled"] = bool(
+            normalized.get("base_sharing_enabled", True)
+        )
+        normalized["workflow_state_migration_enabled"] = bool(
+            normalized.get("workflow_state_migration_enabled", True)
+        )
+        fallback = str(
+            normalized.get("migration_disabled_fallback")
+            or "cold_restart_one_request"
+        )
+        if fallback != "cold_restart_one_request":
+            raise ValueError(
+                "migration_disabled_fallback must be cold_restart_one_request"
+            )
+        normalized["migration_disabled_fallback"] = fallback
+        return normalized
+
+    def _apply_mechanism_profile(self, control: ControlAction) -> ControlAction:
+        """Apply the frozen environment-side migration intervention.
+
+        The controller action and its cache/offload parts remain unchanged.  When
+        migration is disabled, state transfer is replaced by the existing keep
+        behavior: a handoff request may cold-start and later requests remain
+        executable, instead of injecting a permanent failure.
+        """
+
+        profile = self._mechanism_profile
+        if profile is None:
+            return control
+        effective = deepcopy(control)
+        requested_mode = str(effective.migration_action.get("mode", "keep"))
+        migration_enabled = bool(profile["workflow_state_migration_enabled"])
+        suppressed = bool(
+            not migration_enabled and requested_mode in {"prepare", "migrate"}
+        )
+        if suppressed:
+            effective.migration_action = {
+                "mode": "keep",
+                "strategy": "cold_restart_one_request",
+            }
+        effective.metadata = {
+            **dict(effective.metadata),
+            "mechanism_factorial_profile_version": profile[
+                "mechanism_factorial_profile_version"
+            ],
+            "mechanism_profile_id": profile["profile_id"],
+            "base_sharing_enabled": bool(profile["base_sharing_enabled"]),
+            "workflow_state_migration_enabled": migration_enabled,
+            "requested_migration_mode": requested_mode,
+            "effective_migration_mode": str(
+                effective.migration_action.get("mode", "keep")
+            ),
+            "migration_suppressed": suppressed,
+            "migration_disabled_fallback": profile[
+                "migration_disabled_fallback"
+            ],
+        }
+        return effective
+
     def _typed_mode_enabled(self) -> bool:
         return (
             self.adapter_catalog.model_cache_profile_id == TYPED_MODEL_CACHE_PROFILE_ID
@@ -1377,6 +1458,105 @@ class VecWorkflowCoreEnv:
             result.append(object_id)
         return result
 
+    def _plan_factorial_replica_eviction(
+        self,
+        *,
+        rsu: RSUState,
+        required_free_capacity: float,
+    ) -> EvictionPlan:
+        """Plan atomic eviction of adapter-specific base replicas.
+
+        The legacy typed planner protects a base while any resident adapter
+        depends on it.  In the no-sharing arm that would make a one-adapter/base
+        pair impossible to replace even though evicting the pair atomically is
+        dependency safe.  This opt-in planner exposes each exclusive pair as one
+        policy unit, then expands the selected units back to real object victims.
+        Shared-base and historical runs never enter this path.
+        """
+
+        residents = list(self._typed_resident_object_ids.get(rsu.rsu_id, []))
+        resident_set = set(residents)
+        dependent_adapters: dict[str, list[str]] = {}
+        for object_id in residents:
+            item = self.adapter_catalog.get_typed_object(object_id)
+            if item.object_type != "adapter":
+                continue
+            for dependency_id in item.dependency_ids:
+                if dependency_id in resident_set:
+                    dependent_adapters.setdefault(dependency_id, []).append(object_id)
+
+        units: dict[str, list[str]] = {}
+        assigned: set[str] = set()
+        for base_id, adapter_ids in sorted(dependent_adapters.items()):
+            if len(adapter_ids) != 1:
+                continue
+            adapter_id = adapter_ids[0]
+            base = self.adapter_catalog.get_typed_object(base_id)
+            adapter = self.adapter_catalog.get_typed_object(adapter_id)
+            if base.evictability != "evictable" or adapter.evictability != "evictable":
+                continue
+            units[adapter_id] = [adapter_id, base_id]
+            assigned.update({adapter_id, base_id})
+
+        for object_id in residents:
+            if object_id in assigned:
+                continue
+            item = self.adapter_catalog.get_typed_object(object_id)
+            if item.evictability != "evictable":
+                continue
+            if item.object_type == "base_model" and dependent_adapters.get(object_id):
+                continue
+            units[object_id] = [object_id]
+
+        resident_sizes = self._resident_sizes_for_policy(rsu)
+        unit_sizes = {
+            representative: sum(resident_sizes[item] for item in members)
+            for representative, members in units.items()
+        }
+        unit_plan = self._eviction_policy.plan_victims(
+            rsu_id=rsu.rsu_id,
+            resident_ids=list(units),
+            resident_sizes=unit_sizes,
+            required_free_capacity=required_free_capacity,
+            protected_object_id=None,
+            capacity_unit="mb",
+            current_step=self._episode_steps,
+        )
+        expanded_victims = [
+            member
+            for representative in unit_plan.ordered_victim_ids
+            for member in units[representative]
+        ]
+        expanded_candidates = [
+            member
+            for representative in unit_plan.ordered_candidates
+            for member in units[representative]
+        ]
+        expanded_sizes = [resident_sizes[item] for item in expanded_victims]
+        evidence = []
+        for row in unit_plan.candidate_recency:
+            enriched = dict(row)
+            enriched["eviction_unit_members"] = list(
+                units[str(row["object_id"])]
+            )
+            evidence.append(enriched)
+        return EvictionPlan(
+            rsu_id=unit_plan.rsu_id,
+            ordered_victim_ids=expanded_victims,
+            victim_sizes=expanded_sizes,
+            cumulative_freed_capacity=sum(expanded_sizes),
+            required_free_capacity=unit_plan.required_free_capacity,
+            capacity_unit=unit_plan.capacity_unit,
+            policy_name=unit_plan.policy_name,
+            policy_version=unit_plan.policy_version,
+            ordered_candidates=expanded_candidates,
+            candidate_recency=evidence,
+            sufficient=unit_plan.sufficient,
+            selection_reason=(
+                "adapter_specific_dependency_unit_" + unit_plan.selection_reason
+            ),
+        )
+
     @staticmethod
     def _typed_rows_by_type(rows: list[dict[str, Any]]) -> dict[str, float]:
         totals: dict[str, float] = {}
@@ -1473,16 +1653,25 @@ class VecWorkflowCoreEnv:
         eviction_plan: EvictionPlan | None = None
         victim_ids: list[str] = []
         if rejection_reason is None and required_free > CACHE_CAPACITY_EPSILON:
-            eligible = self._typed_evictable_residents(rsu.rsu_id)
-            eviction_plan = self._eviction_policy.plan_victims(
-                rsu_id=rsu.rsu_id,
-                resident_ids=eligible,
-                resident_sizes=self._resident_sizes_for_policy(rsu),
-                required_free_capacity=required_free,
-                protected_object_id=None,
-                capacity_unit="mb",
-                current_step=self._episode_steps,
-            )
+            if (
+                self._mechanism_profile is not None
+                and not self._mechanism_profile["base_sharing_enabled"]
+            ):
+                eviction_plan = self._plan_factorial_replica_eviction(
+                    rsu=rsu,
+                    required_free_capacity=required_free,
+                )
+            else:
+                eligible = self._typed_evictable_residents(rsu.rsu_id)
+                eviction_plan = self._eviction_policy.plan_victims(
+                    rsu_id=rsu.rsu_id,
+                    resident_ids=eligible,
+                    resident_sizes=self._resident_sizes_for_policy(rsu),
+                    required_free_capacity=required_free,
+                    protected_object_id=None,
+                    capacity_unit="mb",
+                    current_step=self._episode_steps,
+                )
             self._validate_eviction_plan(
                 plan=eviction_plan,
                 rsu=rsu,
@@ -2073,6 +2262,26 @@ class VecWorkflowCoreEnv:
 
         metrics_protocol = {
             "time_index": self._mobility_provider.get_time(),
+            "mechanism_factorial_profile_version": control_metadata.get(
+                "mechanism_factorial_profile_version"
+            ),
+            "mechanism_profile_id": control_metadata.get("mechanism_profile_id"),
+            "base_sharing_enabled": control_metadata.get("base_sharing_enabled"),
+            "workflow_state_migration_enabled": control_metadata.get(
+                "workflow_state_migration_enabled"
+            ),
+            "requested_migration_mode": control_metadata.get(
+                "requested_migration_mode", migration_mode
+            ),
+            "effective_migration_mode": control_metadata.get(
+                "effective_migration_mode", migration_mode
+            ),
+            "migration_suppressed": bool(
+                control_metadata.get("migration_suppressed", False)
+            ),
+            "migration_disabled_fallback": control_metadata.get(
+                "migration_disabled_fallback"
+            ),
             "required_adapter": current_node.required_adapter if current_node else None,
             "required_base_model": current_node.required_base_model if current_node else None,
             "current_node_id": current_node.node_id if current_node else None,

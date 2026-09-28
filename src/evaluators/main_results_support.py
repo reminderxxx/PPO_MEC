@@ -397,6 +397,7 @@ def build_selected_workflow_states(
     min_tasks: int,
     max_tasks: int,
     random_seed: int,
+    adapter_assignment_profile: str = "legacy_batch_type",
 ) -> list[Any]:
     workflow_csv_path = Path(workflow_csv_path)
     if not workflow_csv_path.exists():
@@ -411,6 +412,7 @@ def build_selected_workflow_states(
         min_tasks=min_tasks,
         max_tasks=max_tasks,
         random_seed=random_seed,
+        adapter_assignment_profile=adapter_assignment_profile,
     )
 
 
@@ -1469,6 +1471,7 @@ def run_real_episode(
     cache_capacity_profile: dict[str, Any] | None = None,
     model_cache_runtime_contract: dict[str, Any] | None = None,
     formal_request_exposure_trace: dict[str, Any] | None = None,
+    mechanism_profile: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     cache_capacity_profile = validate_agent_eviction_binding(
         agent_name, cache_capacity_profile, run_seed=seed
@@ -1504,6 +1507,7 @@ def run_real_episode(
         reward_positive_offset=reward_positive_offset,
         cache_capacity_profile=cache_capacity_profile,
         formal_request_exposure_trace=formal_request_exposure_trace,
+        mechanism_profile=mechanism_profile,
     )
     env = GymVecEnv(core_env=core_env, recorder=recorder)
     runtime_agent_config_overrides = build_window_context_agent_overrides(
@@ -1579,6 +1583,24 @@ def run_real_episode(
             "request_exposure_fingerprint": (
                 formal_request_exposure_trace.get("request_exposure_fingerprint")
                 if formal_request_exposure_trace is not None
+                else None
+            ),
+            "mechanism_factorial_profile_version": (
+                mechanism_profile.get("mechanism_factorial_profile_version")
+                if mechanism_profile
+                else None
+            ),
+            "mechanism_profile_id": (
+                mechanism_profile.get("profile_id") if mechanism_profile else None
+            ),
+            "base_sharing_enabled": (
+                bool(mechanism_profile.get("base_sharing_enabled"))
+                if mechanism_profile
+                else None
+            ),
+            "workflow_state_migration_enabled": (
+                bool(mechanism_profile.get("workflow_state_migration_enabled"))
+                if mechanism_profile
                 else None
             ),
         },

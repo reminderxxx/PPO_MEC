@@ -1,0 +1,30 @@
+profile_id: mechanism_factorial_shared_360mb_v1
+claim_boundary: controlled observed-data supplement; non-formal and not holdout
+model_cache_profile: typed_base_adapter_state_v1
+typed_model_cache_contract_version: 1.0.0
+typed_cache_transaction_contract_version: typed_cache_transaction_contract_v1.0.0
+catalog_path: configs/data/mechanism_factorial_shared_catalog_v1.json
+typed_catalog_path: configs/data/mechanism_factorial_shared_catalog_v1.json
+typed_catalog_fingerprint: 59beab40753255fe5f5a2a627a4ea07f2392618590a5239573bf290f1a51f90e
+typed_initial_state_fingerprint: 3cec02f97953b031309613c782fed1734470f8293e430143394a9517a81083e2
+typed_dependency_fingerprint: 0f8fcd018635426d67eb78af567456d3f7b31a6bac48ac876baee751d09ddcb9
+typed_pinned_evictability_fingerprint: 220f27d6a38d28852e43f1e65e0af8b5aa8399ad6bd785a89246a3de7cd270c7
+cache_event_schema_version: 1.3.0
+cache_efficiency_metrics_contract_version: 1.2.0
+cache_capacity_profile:
+  model_cache_profile_id: typed_base_adapter_state_v1
+  enabled: true
+  unit: mb
+  capacity_mb: 360.0
+  count_base_model_separately: true
+  eviction_policy: lru
+  eviction_policy_seed: 1401
+  telemetry_enabled: true
+transaction_contract:
+  max_logical_cache_actions_per_step: 1
+  max_dependency_bundle_objects: 2
+  admission_order: [base_model, adapter]
+  transfer_order: [base_model, adapter, workflow_state]
+  partial_admission: false
+  atomic_rollback: true
+  dependency_safe_base_eviction: prohibit_while_resident_adapter_depends

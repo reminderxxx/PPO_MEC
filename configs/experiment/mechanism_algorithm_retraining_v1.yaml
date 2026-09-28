@@ -1,0 +1,38 @@
+study_version: mechanism_algorithm_retraining_v1
+python_executable: /Users/howen/Projects/PPO_MEC/.venv/bin/python
+runtime_config: configs/experiment/mechanism_factorial_shared_360mb_runtime_v1.yaml
+window_plan: configs/experiment/mechanism_algorithm_training_windows_v1.json
+
+agents: [sa_ghmappo, mappo]
+
+budget:
+  seed: 1401
+  episodes_per_agent: 64
+  max_steps: 12
+  update_every: 4
+  batch_size: 32
+  checkpoint_every_updates: 4
+  total_training_episodes: 128
+  total_environment_step_cap: 1536
+
+data:
+  mobility_csv_path: data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv
+  workflow_csv_path: data/raw/workflow/alibaba2018/batch_task.csv
+  max_mobility_rows: 2500
+  max_workflows: 4
+  min_tasks: 5
+  max_tasks: 20
+
+expected_sources:
+  mobility:
+    size_bytes: 2118175938
+    sha256: ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c
+  workflow:
+    size_bytes: 802261444
+    sha256: 6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc
+
+claim_boundary: >-
+  Observed-data controlled retraining supplement only. The run uses one seed,
+  three preselected non-overlapping NGSIM windows, four Alibaba DAGs, the shared-base
+  plus migration-enabled arm, and matched budgets. It cannot support algorithm
+  superiority, independent-test, holdout, or paper-ready claims.
