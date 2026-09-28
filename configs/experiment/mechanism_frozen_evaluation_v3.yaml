@@ -1,0 +1,99 @@
+evaluation_version: mechanism_frozen_checkpoint_evaluation_v1
+execution_policy: single_execution_no_checkpoint_selection
+seed: 1401
+max_steps: 20
+
+freeze_manifest_path: artifacts/analysis/mechanism_algorithm_retraining_v3_freeze_20260928/freeze_manifest.json
+freeze_manifest_sha256: 8c06a75a85030672923aa7fa775a77c214fbbdf9aff60d5ffd900d5e0e7b04ee
+
+settings:
+  - setting_id: sa_ghmappo_guard_on
+    agent_name: sa_ghmappo
+    controller_role: frozen_learned_candidate_shared_guard
+    guard_mode: enabled_current_only
+    agent_config_overrides: {}
+  - setting_id: sa_ghmappo_guard_off
+    agent_name: sa_ghmappo
+    controller_role: frozen_learned_candidate_guard_attribution
+    guard_mode: disabled_at_inference
+    agent_config_overrides:
+      cache_warm_start_guard_enabled: false
+      cache_warm_start_guard_current_only: false
+  - setting_id: mappo_guard_on
+    agent_name: mappo
+    controller_role: frozen_controller_level_ctde_baseline_shared_guard
+    guard_mode: enabled_current_only
+    agent_config_overrides: {}
+  - setting_id: mappo_guard_off
+    agent_name: mappo
+    controller_role: frozen_controller_level_ctde_baseline_guard_attribution
+    guard_mode: disabled_at_inference
+    agent_config_overrides:
+      cache_warm_start_guard_enabled: false
+      cache_warm_start_guard_current_only: false
+  - setting_id: popularity_cache_heuristic
+    agent_name: popularity_cache_heuristic
+    controller_role: fixed_rule_baseline
+    guard_mode: not_applicable
+    agent_config_overrides: {}
+  - setting_id: reactive_greedy
+    agent_name: reactive_greedy
+    controller_role: fixed_rule_baseline
+    guard_mode: not_applicable
+    agent_config_overrides: {}
+  - setting_id: handoff_first_feasibility
+    agent_name: handoff_first_feasibility
+    controller_role: fixed_rule_completion_diagnostic_not_paper_baseline
+    guard_mode: not_applicable
+    agent_config_overrides: {}
+
+data:
+  mobility_csv_path: data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv
+  workflow_csv_path: data/raw/workflow/alibaba2018/batch_task.csv
+  max_mobility_rows: 2500
+  window_plan_path: configs/experiment/mechanism_algorithm_training_windows_v1.json
+  workflow_ids: [j_3, j_8, j_15, j_34]
+
+expected_sources:
+  mobility:
+    size_bytes: 2118175938
+    sha256: ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c
+  workflow:
+    size_bytes: 802261444
+    sha256: 6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc
+
+data_relationship: >-
+  Resubstitution pilot on the same three observed NGSIM windows and four Alibaba
+  workflows used during training. This is not a development/test separation,
+  independent evaluation, or holdout. Results cannot support generalization.
+
+metric_vector:
+  - workflow_completed_under_exogenous_execution
+  - workflow_continuity_rate
+  - handoff_failure_rate
+  - full_service_ready_request_rate
+  - transfer_mb_per_request
+  - backhaul_traffic_cost
+  - adapter_state_migration_overhead
+  - end_to_end_workflow_delay_with_coverage
+
+metric_policy: >-
+  Preserve the vector and its trade-offs. Do not select a post-hoc weighted score,
+  tolerance, or duplicated metric count. Delay is conditional on completed workflows
+  and must always be reported with coverage.
+
+decision_policy: >-
+  Run each of the seven planned settings exactly once on the fixed 12-unit matrix.
+  Do not modify checkpoints, settings, metrics, denominators, or the matrix after
+  reading output. The guard-off learned settings are attribution diagnostics only.
+
+attribution_policy: >-
+  Guard-on versus guard-off with the same v3 checkpoint isolates the inference-time
+  current-readiness override on this observed matrix. V2 versus v3 guard-on is a
+  combined retraining-plus-guard delta and is not a pure guard causal effect. The
+  SA-GHMAPPO versus MAPPO comparison under guard-on is the residual algorithm gap.
+
+claim_boundary: >-
+  One fixed single-seed observed-data resubstitution evaluation. Not formal,
+  independent, holdout, statistical significance, convergence evidence, causal
+  training attribution, generalization, or algorithm superiority.

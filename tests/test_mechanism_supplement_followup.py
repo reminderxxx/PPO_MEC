@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 from scripts.analyze_mechanism_failure_causes import classify_episode
-from scripts.evaluate_mechanism_frozen_checkpoints import evaluation_unit_id
+from scripts.evaluate_mechanism_frozen_checkpoints import (
+    _aggregate,
+    _normalise_settings,
+    evaluation_unit_id,
+)
 from src.agents.mappo_agent import MAPPOAgent
 
 
@@ -64,6 +68,53 @@ def test_evaluation_unit_identity_is_controller_neutral() -> None:
     assert evaluation_unit_id("window_1", "workflow_1") == (
         "mechanism_frozen_checkpoint_evaluation_v1/window_1/workflow_1"
     )
+
+
+def test_frozen_evaluation_settings_keep_alias_and_guard_mode() -> None:
+    settings = _normalise_settings(
+        {
+            "settings": [
+                {
+                    "setting_id": "candidate_guard_off",
+                    "agent_name": "sa_ghmappo",
+                    "controller_role": "attribution",
+                    "guard_mode": "disabled_at_inference",
+                    "agent_config_overrides": {
+                        "cache_warm_start_guard_enabled": False,
+                    },
+                }
+            ]
+        }
+    )
+    assert settings[0]["setting_id"] == "candidate_guard_off"
+    assert settings[0]["agent_name"] == "sa_ghmappo"
+    assert settings[0]["guard_mode"] == "disabled_at_inference"
+
+
+def test_frozen_evaluation_aggregate_reports_guard_action_share() -> None:
+    row = {
+        "controller": "sa_ghmappo",
+        "controller_role": "candidate",
+        "guard_mode": "enabled_current_only",
+        "total_steps": 5,
+        "cache_warm_start_guard_count": 3,
+        "guard_action_delta_count": 2,
+        "final_action_counts": {"0": 3, "2": 2},
+        "workflow_completed": True,
+        "workflow_continuity_rate": 0.8,
+        "handoff_failure_rate": 0.0,
+        "full_service_ready_request_rate": 0.8,
+        "transfer_mb_per_request": 2.0,
+        "backhaul_traffic_cost": 10.0,
+        "adapter_state_migration_overhead": 1.0,
+        "request_failure_count": 1,
+        "right_censored": False,
+        "end_to_end_workflow_delay": 5.0,
+    }
+    aggregate = _aggregate("candidate_guard_on", [row])
+    assert aggregate["cache_warm_start_guard_rate"] == 0.6
+    assert aggregate["effective_policy_action_share"] == 0.4
+    assert aggregate["final_action_counts"] == {"0": 3, "2": 2}
 
 
 def test_symmetric_current_service_readiness_guard_is_configurable_for_mappo() -> None:

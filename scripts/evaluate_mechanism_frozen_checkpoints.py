@@ -14,6 +14,7 @@ from statistics import fmean
 from typing import Any
 
 import yaml
+from torch import load as torch_load
 
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -35,6 +36,7 @@ from src.evaluators.main_results_support import (
     run_real_episode,
     summary_to_row,
 )
+from src.evaluators.real_eval_support import build_inference_agent
 
 
 def _file_sha256(path: Path) -> str:
@@ -89,16 +91,33 @@ def _write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writerows(rows)
 
 
-def _aggregate(controller: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
+def _aggregate(setting_id: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
     delay_values = [
         float(row["end_to_end_workflow_delay"])
         for row in rows
         if row["end_to_end_workflow_delay"] is not None
     ]
+    total_steps = sum(int(row["total_steps"]) for row in rows)
+    guard_count = sum(int(row["cache_warm_start_guard_count"]) for row in rows)
+    action_delta_count = sum(int(row["guard_action_delta_count"]) for row in rows)
+    final_action_counts: dict[str, int] = {}
+    for row in rows:
+        for action_id, count in dict(row["final_action_counts"]).items():
+            final_action_counts[str(action_id)] = (
+                final_action_counts.get(str(action_id), 0) + int(count)
+            )
     return {
-        "controller": controller,
+        "setting_id": setting_id,
+        "controller": rows[0]["controller"],
         "controller_role": rows[0]["controller_role"],
+        "guard_mode": rows[0]["guard_mode"],
         "evaluation_unit_count": len(rows),
+        "total_steps": total_steps,
+        "cache_warm_start_guard_count": guard_count,
+        "cache_warm_start_guard_rate": round(guard_count / total_steps, 6),
+        "guard_action_delta_count": action_delta_count,
+        "effective_policy_action_share": round(action_delta_count / total_steps, 6),
+        "final_action_counts": final_action_counts,
         "completed_count": sum(bool(row["workflow_completed"]) for row in rows),
         "completed_rate": round(
             fmean(float(bool(row["workflow_completed"])) for row in rows), 6
@@ -132,6 +151,98 @@ def _aggregate(controller: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _normalise_settings(plan: dict[str, Any]) -> list[dict[str, Any]]:
+    if "settings" in plan:
+        settings = [dict(item) for item in plan["settings"]]
+    else:
+        roles = dict(plan["controller_roles"])
+        settings = [
+            {
+                "setting_id": str(controller),
+                "agent_name": str(controller),
+                "controller_role": roles[str(controller)],
+                "guard_mode": "not_applicable",
+                "agent_config_overrides": {},
+            }
+            for controller in plan["controllers"]
+        ]
+    setting_ids = [str(item["setting_id"]) for item in settings]
+    if len(setting_ids) != len(set(setting_ids)):
+        raise ValueError("evaluation setting_id values must be unique")
+    for item in settings:
+        item.setdefault("agent_config_overrides", {})
+        item.setdefault("guard_mode", "not_applicable")
+        if item["guard_mode"] not in {
+            "enabled_current_only",
+            "disabled_at_inference",
+            "not_applicable",
+        }:
+            raise ValueError(f"invalid guard_mode: {item['guard_mode']}")
+    return settings
+
+
+def _verify_learned_setting(
+    *, setting: dict[str, Any], checkpoint_path: str, seed: int
+) -> dict[str, Any]:
+    payload = torch_load(checkpoint_path, map_location="cpu", weights_only=False)
+    checkpoint_config = dict(payload.get("config", {}))
+    checkpoint_guard = {
+        "cache_warm_start_guard_enabled": bool(
+            checkpoint_config.get("cache_warm_start_guard_enabled", False)
+        ),
+        "cache_warm_start_guard_current_only": bool(
+            checkpoint_config.get("cache_warm_start_guard_current_only", False)
+        ),
+    }
+    if checkpoint_guard != {
+        "cache_warm_start_guard_enabled": True,
+        "cache_warm_start_guard_current_only": True,
+    }:
+        raise ValueError(
+            f"v3 checkpoint lacks the frozen current-only guard: {checkpoint_path}"
+        )
+    overrides = dict(setting["agent_config_overrides"])
+    agent = build_inference_agent(
+        agent_name=str(setting["agent_name"]),
+        random_seed=seed,
+        checkpoint_path=checkpoint_path,
+        deterministic_action=True,
+        agent_config_overrides=overrides,
+    )
+    effective_guard = {
+        "cache_warm_start_guard_enabled": bool(
+            getattr(agent, "_cache_warm_start_guard_enabled", False)
+        ),
+        "cache_warm_start_guard_current_only": bool(
+            getattr(agent, "_cache_warm_start_guard_current_only", False)
+        ),
+    }
+    expected = (
+        {
+            "cache_warm_start_guard_enabled": True,
+            "cache_warm_start_guard_current_only": True,
+        }
+        if setting["guard_mode"] == "enabled_current_only"
+        else {
+            "cache_warm_start_guard_enabled": False,
+            "cache_warm_start_guard_current_only": False,
+        }
+    )
+    if effective_guard != expected:
+        raise ValueError(
+            f"effective guard mismatch for {setting['setting_id']}: "
+            f"expected={expected}, observed={effective_guard}"
+        )
+    return {
+        "setting_id": setting["setting_id"],
+        "agent_name": setting["agent_name"],
+        "checkpoint_guard": checkpoint_guard,
+        "agent_config_overrides": overrides,
+        "effective_guard": effective_guard,
+        "status": "passed",
+    }
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--plan", type=Path, required=True)
@@ -157,11 +268,32 @@ def main() -> None:
         raise ValueError("freeze manifest SHA-256 mismatch")
     freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
     checkpoint_map: dict[str, str] = {}
+    checkpoint_sha256_before: dict[str, str] = {}
     for row in freeze["checkpoints"]:
         path = Path(str(row["checkpoint_path"])).resolve()
         if _file_sha256(path) != str(row["checkpoint_sha256"]):
             raise ValueError(f"checkpoint SHA-256 mismatch: {path}")
         checkpoint_map[str(row["agent_name"])] = str(path)
+        checkpoint_sha256_before[str(row["agent_name"])] = str(
+            row["checkpoint_sha256"]
+        )
+
+    settings = _normalise_settings(plan)
+    guard_verification: list[dict[str, Any]] = []
+    for setting in settings:
+        agent_name = str(setting["agent_name"])
+        if agent_name in checkpoint_map:
+            guard_verification.append(
+                _verify_learned_setting(
+                    setting=setting,
+                    checkpoint_path=checkpoint_map[agent_name],
+                    seed=int(plan["seed"]),
+                )
+            )
+        elif setting["guard_mode"] != "not_applicable":
+            raise ValueError(
+                f"non-checkpoint setting cannot declare guard mode: {setting}"
+            )
 
     data_root = args.data_root.resolve()
     data = dict(plan["data"])
@@ -217,11 +349,11 @@ def main() -> None:
         "cache_event_schema_version": "1.3.0",
         "cache_efficiency_metrics_contract_version": "1.1.0",
     }
-    controllers = [str(item) for item in plan["controllers"]]
-    roles = dict(plan["controller_roles"])
     rows: list[dict[str, Any]] = []
     exposure_by_unit: dict[tuple[str, str], str] = {}
-    for controller in controllers:
+    for setting in settings:
+        setting_id = str(setting["setting_id"])
+        controller = str(setting["agent_name"])
         for window in windows:
             bundle = load_window_bundle(
                 root_dir=ROOT_DIR,
@@ -288,7 +420,13 @@ def main() -> None:
                         "window_id": window["window_id"],
                         "window_class": window["window_class"],
                         "evaluation_unit_id": unit_id,
+                        "evaluation_setting_id": setting_id,
+                        "guard_mode": setting["guard_mode"],
+                        "agent_config_overrides": dict(
+                            setting["agent_config_overrides"]
+                        ),
                     },
+                    agent_config_overrides=dict(setting["agent_config_overrides"]),
                     adapter_catalog_override=catalog,
                     workflow_state_override=bound,
                     cache_capacity_profile=capacity_profile,
@@ -300,7 +438,7 @@ def main() -> None:
                 episode_path = (
                     output_dir
                     / "episodes"
-                    / controller
+                    / setting_id
                     / str(window["window_id"])
                     / f"{bound.workflow_id}.summary.json"
                 )
@@ -308,10 +446,31 @@ def main() -> None:
                 endpoint = dict(summary["formal_request_execution_audit"])
                 summary_row = summary_to_row(summary)
                 failure = classify_episode(summary)
+                diagnostics = dict(summary.get("agent_action_diagnostics", {}))
+                final_action_counts: dict[str, int] = {}
+                for trace_row in summary.get("policy_trace_brief", []):
+                    action_id = str(trace_row.get("action_id"))
+                    final_action_counts[action_id] = (
+                        final_action_counts.get(action_id, 0) + 1
+                    )
+                guard_count = int(
+                    diagnostics.get("cache_warm_start_guard_count", 0) or 0
+                )
+                action_delta_count = int(
+                    diagnostics.get("guard_action_delta_count", 0) or 0
+                )
+                if setting["guard_mode"] == "disabled_at_inference" and (
+                    guard_count or action_delta_count
+                ):
+                    raise RuntimeError(
+                        f"disabled guard emitted overrides for {setting_id}"
+                    )
                 rows.append(
                     {
+                        "setting_id": setting_id,
                         "controller": controller,
-                        "controller_role": roles[controller],
+                        "controller_role": setting["controller_role"],
+                        "guard_mode": setting["guard_mode"],
                         "window_id": window["window_id"],
                         "workflow_id": bound.workflow_id,
                         "request_exposure_fingerprint": fingerprint,
@@ -344,16 +503,39 @@ def main() -> None:
                         "primary_failure_category": failure[
                             "primary_failure_category"
                         ],
+                        "total_steps": int(summary["run_info"]["total_steps"]),
+                        "cache_warm_start_guard_count": guard_count,
+                        "guard_action_delta_count": action_delta_count,
+                        "final_action_counts": final_action_counts,
                         "episode_path": str(episode_path),
                     }
                 )
     aggregates = [
         _aggregate(
-            controller,
-            [row for row in rows if row["controller"] == controller],
+            str(setting["setting_id"]),
+            [
+                row
+                for row in rows
+                if row["setting_id"] == str(setting["setting_id"])
+            ],
         )
-        for controller in controllers
+        for setting in settings
     ]
+    checkpoint_integrity = []
+    for agent_name, checkpoint_path in checkpoint_map.items():
+        after_sha256 = _file_sha256(Path(checkpoint_path))
+        before_sha256 = checkpoint_sha256_before[agent_name]
+        checkpoint_integrity.append(
+            {
+                "agent_name": agent_name,
+                "checkpoint_path": checkpoint_path,
+                "sha256_before": before_sha256,
+                "sha256_after": after_sha256,
+                "unchanged": before_sha256 == after_sha256,
+            }
+        )
+        if before_sha256 != after_sha256:
+            raise RuntimeError(f"checkpoint changed during evaluation: {agent_name}")
     _write_csv(output_dir / "evaluation_rows.csv", rows)
     _write_csv(output_dir / "evaluation_aggregate.csv", aggregates)
     receipt = {
@@ -367,7 +549,10 @@ def main() -> None:
         "freeze_manifest_sha256": _file_sha256(freeze_path),
         "data_relationship": plan["data_relationship"],
         "matched_request_exposure_across_controllers": True,
-        "evaluation_unit_count_per_controller": len(windows) * len(workflows),
+        "evaluation_unit_count_per_setting": len(windows) * len(workflows),
+        "setting_count": len(settings),
+        "guard_verification": guard_verification,
+        "checkpoint_integrity": checkpoint_integrity,
         "aggregate": aggregates,
         "metrics_are_a_vector_not_a_weighted_score": True,
         "claim_boundary": plan["claim_boundary"],
