@@ -57,6 +57,12 @@ def _canonical_sha256(value: Any) -> str:
     ).hexdigest()
 
 
+def evaluation_unit_id(window_id: str, workflow_id: str) -> str:
+    """Return the controller-neutral identity for one matched evaluation unit."""
+
+    return f"{EVALUATION_VERSION}/{window_id}/{workflow_id}"
+
+
 def _git_value(*arguments: str) -> str:
     return subprocess.check_output(
         ["git", *arguments], cwd=ROOT_DIR, text=True
@@ -233,9 +239,8 @@ def main() -> None:
             for workflow in workflows:
                 bound = bind_workflow_to_catalog(workflow, catalog)
                 unit_key = (str(window["window_id"]), str(bound.workflow_id))
-                unit_id = (
-                    f"{EVALUATION_VERSION}/{window['window_id']}/"
-                    f"{bound.workflow_id}/{controller}"
+                unit_id = evaluation_unit_id(
+                    str(window["window_id"]), str(bound.workflow_id)
                 )
                 exposure = build_episode_formal_request_exposure(
                     workflow_state=bound,

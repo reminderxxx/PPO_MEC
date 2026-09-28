@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from scripts.analyze_mechanism_failure_causes import classify_episode
+from scripts.evaluate_mechanism_frozen_checkpoints import evaluation_unit_id
 
 
 def _episode(*, service_success: bool, adapter_hit: bool = True) -> dict:
@@ -56,3 +57,9 @@ def test_failure_classifier_keeps_conditional_delay_semantics() -> None:
     failed = classify_episode(_episode(service_success=False, adapter_hit=False))
     assert completed["end_to_end_workflow_delay_available"] is True
     assert failed["end_to_end_workflow_delay_available"] is False
+
+
+def test_evaluation_unit_identity_is_controller_neutral() -> None:
+    assert evaluation_unit_id("window_1", "workflow_1") == (
+        "mechanism_frozen_checkpoint_evaluation_v1/window_1/workflow_1"
+    )
