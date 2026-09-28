@@ -224,6 +224,19 @@
 
 ## 写作 Claim 模板
 
+### 2026-09-28 车联网AI数据复用检索增补
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| driving graph QA | [DriveLM: Driving with Graph Visual Question Answering](https://www.ecva.net/papers/eccv_2024/papers_ECCV/papers/06870.pdf)；[代码/数据](https://github.com/OpenDriveLab/DriveLM) | ECCV 2024，官方论文核验；目录等级另核 | 驾驶感知、预测、规划等任务的图结构QA及数据 | 可替代任意AI标签作为语义候选；逻辑图到执行DAG须验证，RSU/cache/state成本需另测；不得声称原创其数据 | Dataset motivation / semantic validation |
+| vehicle-infrastructure sequential data | [V2X-Seq: A Large-Scale Sequential Dataset for Vehicle-Infrastructure Cooperative Perception and Forecasting](https://openaccess.thecvf.com/content/CVPR2023/html/Yu_V2X-Seq_A_Large-Scale_Sequential_Dataset_for_Vehicle-Infrastructure_Cooperative_Perception_and_CVPR_2023_paper.html) | CVPR 2023,5486–5495，官方核验 | 车路协同感知/预测的真实序列、轨迹和场景 | 可作为车路AI输入候选，不含本项目模型缓存/adapter迁移日志；数据许可逐文件核验 | Dataset alternative / VEC grounding |
+| agent trace characterization | [TraceLab: Characterizing Coding Agent Workloads for LLM Serving](https://arxiv.org/abs/2606.30560)；[作者仓库](https://github.com/uw-syfi/TraceLab) | 2026预印本；正式venue未核 | agent trace收集与分析的公开工具/数据线索 | coding场景非车辆；仅作复用/长链请求特征参考，未审计payload | Supporting methods，非核心驾驶证据 |
+| agent DAG evaluation | [AgentEval: DAG-Structured Step-Level Evaluation for Agentic Workflows with Error Propagation Tracking](https://arxiv.org/abs/2604.23581) | 2026预印本；正式venue未核 | DAG步骤与错误传播评价线索，未全文复现 | 可参考节点失败如何传播，不能替代车辆数据或缓存物理模型 | 待核近邻 / evaluation methods |
+| VEC content cache | [Content Caching-Assisted Vehicular Edge Computing Using Multi-Agent Graph Attention Reinforcement Learning](https://arxiv.org/abs/2410.10071) | 2024预印本入口；正式venue/开源数据待核 | content caching与VEC图注意力RL近邻线索 | 内容缓存不等于模型/adapter/状态；不得忽略已有组合研究，未核算法细节 | 待核近邻，不能作可下载数据结论 |
+
+以上新候选及旧19-source登记的复核、字段/许可边界与复用顺序见
+`vec_ai_public_resource_recovery_20260928.md`。检索线索不等于正式数据资格。
+
 可采用的谨慎表述：
 
 - Existing VEC studies have investigated service caching, task offloading, migration, and mixed-timescale decisions, but they usually optimize these dimensions separately or for single-shot task/service abstractions.

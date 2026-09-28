@@ -1,5 +1,12 @@
 ﻿# Decision Log
 
+## 2026-09-28: 先复用公开驾驶AI语义，再补系统测量缺口
+
+- 找回G11既有19项来源；优先DriveLM公开标注资格，V2X-Seq备选，文本自拟链仅fallback。
+- BurstGPT/Mooncake/Qwen-Bailian用于独立请求/cache支持，不虚构与驾驶scene/NGSIM车辆的共同身份。
+- 派生包明确引用原数据；新增贡献是转换、系统测量和验证，不将他人数据重新命名为原创。
+- 详见 `vec_ai_public_resource_recovery_20260928.md`；未改变live数据或历史实验合同。
+
 ## 2026-09-28: 增加经校准的车联网AI工作负载数据贡献候选
 
 - 用户确认研究对象为车联网AI workflow或AI数据cache；候选数据集保持移动RSU语境，

@@ -5,6 +5,14 @@
 
 ﻿# Progress
 
+## 2026-09-28: 找回旧19项数据登记，优先复用驾驶AI开源数据
+
+- 纠正阶段一遗漏：G11已找到BurstGPT/Mooncake/Qwen-Bailian等，但无raw importer/payload接入，
+  不等于“无可用外部候选”。本地缺权重不代表无可复用工作负载。
+- 官方核验DriveLM（ECCV 2024）、V2X-Seq（CVPR 2023）及旧请求/cache来源。
+- 优先DriveLM小型标注资格检查；自拟文本模板降为fallback。公开逻辑QA图不自动等于执行DAG。
+- 更新文献与证据池；本轮只读检索，不下载/安装/训练/生成；详细见 `vec_ai_public_resource_recovery_20260928.md`。
+
 ## 2026-09-28: 数据集第一阶段已启动，本地资格核查完成
 
 - `vec_ai_workload_stage_one_20260928.md`保存DAG接口、模型metadata、限定目录及解释器检查结果。

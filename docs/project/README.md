@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `vec_ai_public_resource_recovery_20260928.md`：找回旧19-source登记，DriveLM/V2X-Seq与请求/cache数据复核；复用优先，不从零编造语义
+
 - `vec_ai_workload_stage_one_20260928.md`：数据集首阶段本地资源核查、最小车载应用模板、旧新字段映射及有界测量草案；模型输入待确认
 
 - `vec_ai_workload_dataset_design_20260928.md`：车联网AI工作流/缓存数据集贡献候选，提出依据、校准生成方案、D01–D12证据池和验收边界；尚未生成或发布

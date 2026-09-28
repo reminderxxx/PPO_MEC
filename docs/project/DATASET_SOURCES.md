@@ -1,6 +1,6 @@
 # Dataset Sources
 
-更新日期：2026-08-19
+更新日期：2026-09-28（新增复用候选；历史G11登记未改写）
 
 用途：统一记录项目使用、保留或 metadata-only 接入的数据源。数据源声明不会自动下载或覆盖原始数据。
 
@@ -20,6 +20,11 @@
 模型/adapter/数据/状态边界及许可要求见 `vec_ai_workload_dataset_design_20260928.md`。
 
 ## G11 public model-cache dataset registry
+
+2026-09-28找回及在线复核：旧19项确为metadata-only，不能误读为已经下载或不存在候选。
+新增DriveLM（ECCV 2024）与V2X-Seq（CVPR 2023）作为驾驶AI语义/车路数据候选；
+BurstGPT/Mooncake/Qwen-Bailian仍有请求或复用profile价值。逐项入口、许可边界及计划见
+`vec_ai_public_resource_recovery_20260928.md`。本轮未下载或启用任何新源。
 
 统一 registry：`configs/data/model_cache_dataset_registry.json`，版本 `1.0.0`。截至 `2026-08-19` 核验 19 个来源；完整证据、字段矩阵、分数与拒绝理由见 `docs/project/model_cache_dataset_discovery_audit_20260819.md`。
 
