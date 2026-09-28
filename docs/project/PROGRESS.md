@@ -7,6 +7,14 @@
 
 ## 2026-09-28: v2 固定终点冻结、训练内评价与 service-readiness guard v3
 
+- v3 已完成且按共同 `update_0016.pt` create-only 冻结：两算法各 64 episodes、16 updates、656 steps；唯一有效
+  评价为 7 settings × 12 matched units，checkpoint 评价前后 SHA 不变，未继续训练或择优。
+- SA/MAPPO guard-on 均为 completion `8/12`、continuity `0.879630`，guard-off 均为 `0/12`、`0.372876`；
+  两边 residual algorithm gap 为 0。guard 改写 `38/123=30.9%` 评价动作，收益由共享系统层明显主导，同时
+  transfer/backhaul 相对 guard-off 增加 `11.653050/147.5`，不存在全面支配。
+- guard-off deterministic policy 均只覆盖 action 3/4；log-prob 缺失计数为 0，guard 后会重算执行动作概率。
+  结论保持动作覆盖/可辨识性诊断，不在本轮调参。v3 训练 adapter-miss failures 为 SA/MAPPO `85/97`。
+
 - v2 两算法共同冻结 fixed-budget `update_0016.pt`，不按已观察表现选择 candidate；规则是在训练统计已查看后采用，
   明确非预注册。freeze manifest 绑定 checkpoint SHA/size/tensor digest、训练 commit/config/budget/data/window/exposure，
   只读加载前后文件 SHA 不变。

@@ -21,9 +21,17 @@
 - v3 integration smoke：`artifacts/training/mechanism_algorithm_retraining_v3_integration_smoke_20260928/`；两算法各
   2 episodes、20 steps、相同 guard config，均完成并写 checkpoint。
 - v3 training root：`artifacts/training/mechanism_algorithm_retraining_v3_20260928/`；固定相同 seed/budget/data，
-  启动与终态只看 receipts，不自动 retry。
-- review metadata：reviewed_at=`2026-09-28T11:14:07+08:00`，literature_cutoff=`2026-09-28`，target venue=
-  `IEEE TMC`，policy=`tmc_review_policy_v3_20260621`，implementation commit=`0d461be`，evidence level=
+  completion=`SUCCEEDED`；两算法各 64 episodes/16 updates/656 steps，不自动 retry。
+- v3 freeze：`artifacts/analysis/mechanism_algorithm_retraining_v3_freeze_20260928/`；manifest SHA-256=
+  `8c06a75a85030672923aa7fa775a77c214fbbdf9aff60d5ffd900d5e0e7b04ee`，共同固定 `update_0016.pt`。
+- v3 canonical evaluation：`artifacts/analysis/mechanism_frozen_evaluation_v3_20260928/`；plan SHA-256=
+  `1582dc7359f4ec9c648e778f5006f79ab8ad9fb186dd8f29492af8f20c144151`，7 settings × 12 units，raw episodes、
+  aggregate、guard state verification 和 checkpoint before/after hashes 完整。0-episode preflight failure 保存在
+  `mechanism_frozen_evaluation_v3_20260928_startup_failure/`，不用于结果。
+- v3 failure diagnosis：`artifacts/analysis/mechanism_training_failure_diagnosis_v3_20260928/`；SA/MAPPO request
+  failures=`95/103`、adapter miss=`85/97`、denominator mismatch=`0/0`。
+- review metadata：reviewed_at=`2026-09-28T11:28:08+08:00`，literature_cutoff=`2026-09-28`，target venue=
+  `IEEE TMC`，policy=`tmc_review_policy_v3_20260621`，implementation commits=`0d461be/4221903/702f606`，evidence level=
   `E2_ARTIFACT_AUDITED_OBSERVED_DATA_PILOT_NOT_HOLDOUT`。
 
 ## 2026-09-28 mechanism factorial completion and launch repair

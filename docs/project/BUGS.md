@@ -7,14 +7,21 @@
 
 ## 2026-09-28: v2/v3 仍是训练内单 seed pilot（OPEN）
 
+- v3 唯一有效评价已完成，但 SA/MAPPO 在 guard-on 和 guard-off 下均逐项相同；共享 guard 改写 30.9% 评价动作，
+  learned residual 不可辨识。guard-off 只输出 action 3/4，存在 deterministic action-coverage collapse 风险。
+- v3 guard-on completion 8/12 伴随 transfer/backhaul 增加，handoff failure 也非零；不能用 completion 单指标声称
+  dominance。v2→v3 同时改变训练行为和推理 guard，只能报告总变化，不能作纯 guard 训练因果归因。
+- MAPPO 推理 allowlist 漏恢复 guard 字段曾导致 0-episode preflight failure；已由 `702f606` 修复并用实例级
+  on/off 核验覆盖。失败根保留，不进入结果。旧 checkpoint/训练结果未修改。
+
 - frozen v2 评价复用训练的 3 个窗口与 4 个 workflows；没有 train/dev/test 分离，不能称独立评价、泛化或 holdout。
 - 每 controller 只有 12 个评价单元、3 个 outer windows，且 delay coverage 只有 2–5/12；没有统计推断资格。
 - continuity 与 full-service-ready request rate 在本次表中完全重合，不能重复计为两个独立优势；没有外部成本偏好，
   禁止事后调 weighted score 或容忍阈值。
 - MAPPO 在 completion/continuity/handoff failure 上优于 frozen SA，但 transfer/backhaul 更高；任何单指标胜出都不能
   写成全方位优势。handoff-first 仍只是 diagnostic rule，不是 paper baseline。
-- adapter miss 是当前一阶失败来源，但 v3 guard 的端到端收益尚未完成；固定 64-episode budget 不是收敛证据。
-  v3 完成后不得因结果不理想追加 seed、调参或重开旧 holdout。
+- adapter miss 仍是 v3 一阶失败来源；固定 64-episode budget 不是收敛证据。本轮已停止，不得因结果追加 seed、
+  调参或重开旧 holdout。
 - 评价入口曾有 0-episode import failure 和 12-episode identity-check partial root；两者均保留为 invalid negative
   artifacts，不能进入结果表。
 

@@ -9,7 +9,10 @@
 冻结；冻结规则在查看训练统计后确定，非预注册。一次同训练窗口/workflow 的 resubstitution 多目标评价显示 MAPPO
 completion/continuity 较高但 transfer/backhaul 更高，frozen SA 没有全面优势。128 个训练 episode 的事件归因显示
 request failure 主要来自当前 required adapter/dependency 未就绪，而非容量拒绝或非法动作。据此只定义一个对两算法
-对称、current-only 的 service-readiness guard v3 候选；不改 reward、环境、baseline 预算或信息集。详情见
+对称、current-only 的 service-readiness guard v3 候选；不改 reward、环境、baseline 预算或信息集。v3 已按共同
+`update_0016.pt` 冻结并完成唯一一次 7×12 训练内评价：guard-on 的两个 learned controller 都为 8/12 completion，
+guard-off 都为 0/12，且两算法输出不可分辨；guard 改写约 31% 动作并增加 transfer/backhaul，因此这是共享系统
+guard 的 observed-data trade-off，不是 learned algorithm superiority。详情见
 `docs/project/mechanism_frozen_evaluation_and_readiness_guard_20260928.md`。
 
 2026-09-28 新增 base sharing × workflow-state migration 的 2×2 受控补充与 completion 诊断入口：

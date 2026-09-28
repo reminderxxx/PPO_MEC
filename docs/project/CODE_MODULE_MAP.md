@@ -5,7 +5,8 @@
 - `scripts/freeze_mechanism_supplement_baseline.py`：验证 v2 completion/manifest/exposure，固定 update 16，读取
   checkpoint/tensor hashes 并证明加载不改文件。
 - `scripts/evaluate_mechanism_frozen_checkpoints.py`：以 controller-neutral `(window, workflow)` 单元运行 frozen
-  checkpoints 与规则控制器，输出多目标向量和 delay coverage，不做综合打分。
+  checkpoints 与规则控制器；支持 setting alias、guard on/off 实例核验、override/action-share 统计与 checkpoint
+  前后 SHA 审计，输出多目标向量和 delay coverage，不做综合打分。
 - `scripts/analyze_mechanism_failure_causes.py`：从 request/event trace 区分 censoring、handoff、dependency/cache、
   state、capacity、invalid/stall，并核验 external denominator 和 post-failure exposure。
 - `src/agents/sa_ghmappo_core.py`：新增 opt-in `cache_warm_start_guard_current_only`，只在当前 adapter 未就绪时
@@ -16,6 +17,8 @@
   历史语义不变。
 - `src/evaluators/main_results_support.py`：向受控 episode 透传 mechanism profile，并记录四臂身份；workflow
   builder 可显式选择 `semantic_ai_service`。
+- `src/evaluators/real_eval_support.py`：从 frozen SA/MAPPO checkpoint 恢复允许的推理配置；MAPPO 明确保留共享
+  current-only readiness guard 两字段，并允许评估计划以显式 override 构造 guard-off 归因设置。
 - `scripts/run_mechanism_factorial_pilot.py`：构造 matched catalogs、冻结 policy-neutral request exposure，输出
   raw episode 与四臂小表；可读取冻结 window plan，study version 来自配置。
 - `scripts/run_mechanism_completion_diagnostic.py`：在同一冻结 workload 上对比 12/20-step horizon，分别记录

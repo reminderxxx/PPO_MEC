@@ -4,12 +4,12 @@
 
 | 字段 | 值 |
 |---|---|
-| `reviewed_at` | `2026-09-28T11:14:07+08:00` |
+| `reviewed_at` | `2026-09-28T11:28:08+08:00` |
 | `literature_cutoff` | `2026-09-28` |
 | `target_venue` | `IEEE Transactions on Mobile Computing (TMC)`；实际投稿目录未指定 |
-| `artifact_run_id` | `mechanism_algorithm_retraining_v2_freeze_20260928`；`mechanism_frozen_evaluation_v1_20260928_v2`；`mechanism_training_failure_diagnosis_v1_20260928`；v3 训练根为 `mechanism_algorithm_retraining_v3_20260928` |
+| `artifact_run_id` | v2 freeze/evaluation/diagnosis；`mechanism_algorithm_retraining_v3_20260928`；`mechanism_algorithm_retraining_v3_freeze_20260928`；`mechanism_frozen_evaluation_v3_20260928`；`mechanism_training_failure_diagnosis_v3_20260928` |
 | `policy_version` | `tmc_review_policy_v3_20260621` |
-| `implementation_git_commit` | `0d461befb3f2175bcc20da7bae27c4ec0143f77a` |
+| `implementation_git_commit` | guard=`0d461befb3f2175bcc20da7bae27c4ec0143f77a`；frozen plan=`4221903`；MAPPO inference restore=`702f606` |
 | `evidence_level` | `E2_ARTIFACT_AUDITED_OBSERVED_DATA_PILOT_NOT_HOLDOUT` |
 
 ## v2 冻结基准
@@ -92,10 +92,69 @@ transfer/backhaul；reactive greedy 成本最低但 completion 低。`continuity
 证明配置被对称消费。v3 只能作为 observed-data paired development experiment；即使结果变好，也不是独立泛化、
 算法优越或 paper-ready 证据。
 
+## v3 完成、冻结与唯一一次有效评价
+
+v3 completion receipt 为 `SUCCEEDED`，两算法各完成 64 episodes、16 updates、656 个实际环境步；总计正好
+128 episodes。每个算法保存 updates `4/8/12/16`，按事先固定的共同终点冻结 `update_0016.pt`，没有按性能择点。
+freeze manifest SHA-256 为
+`8c06a75a85030672923aa7fa775a77c214fbbdf9aff60d5ffd900d5e0e7b04ee`。
+
+| agent | checkpoint size | file SHA-256 | tensor-state SHA-256 |
+|---|---:|---|---|
+| SA-GHMAPPO | 2,091,191 | `67c9c940fffb4c189ab57bc6541cef632831ff18055c73337723fbb40d31ffeb` | `c23b853dbf56f53e833dbb4eb31429a246b2d4df17ff01bcf9a133bbdfabe1bf` |
+| MAPPO | 537,783 | `a8d3a9dd2f26a5f3ed9a7eadccb0084d112855c1498d803678b1725ebc82d627` | `2eb4c22bf6dced61b2198fec5e74d8b98d3ed997e614231503cd1f33f5d2497d` |
+
+评价计划先以 commit `4221903` 冻结，保持同一 3 windows × 4 workflows、同一 exposure、指标和分母。计划含
+SA/MAPPO guard-on、同 checkpoint guard-off 归因设置及 3 个固定规则，共 7×12=84 episodes。第一次启动在
+0 episode 的 guard preflight 阻断：MAPPO 推理 allowlist 漏恢复两个 checkpoint guard 字段。失败根单独保存，
+没有读取 performance；`702f606` 只修复推理配置恢复，不改模型参数、计划或数据。随后唯一一次有效执行完成，
+四个 learned 设置的实际 guard on/off 状态均通过实例级核验，评价前后 checkpoint SHA 完全相同。
+该 guard 位于两个 learned controller 共享的 agent core，并非环境全局系统层；因此对 SA/MAPPO 对称启用，
+固定规则保持其原生确定性策略，不额外包裹 learned-controller guard。三类规则与 v2 逐项复现，公平口径未漂移。
+
+| setting | completion | continuity / ready | handoff failure | MB/request | backhaul | migration | delay coverage | conditional delay |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| SA guard-on | 8/12 | 0.879630 | 0.083333 | 38.397930 | 324.500000 | 0.293333 | 8/12 | 1076.0 |
+| SA guard-off | 0/12 | 0.372876 | 0.000000 | 26.744880 | 177.000000 | 0.225000 | 0/12 | unavailable |
+| MAPPO guard-on | 8/12 | 0.879630 | 0.083333 | 38.397930 | 324.500000 | 0.293333 | 8/12 | 1076.0 |
+| MAPPO guard-off | 0/12 | 0.372876 | 0.000000 | 26.744880 | 177.000000 | 0.225000 | 0/12 | unavailable |
+| popularity | 4/12 | 0.778431 | 0.625000 | 33.133224 | 294.166667 | 0.840000 | 4/12 | 1251.0 |
+| reactive greedy | 2/12 | 0.748529 | 0.833333 | 26.006645 | 235.833333 | 1.250000 | 2/12 | 1601.0 |
+| handoff-first | 3/12 | 0.683987 | 0.458333 | 34.032353 | 293.833333 | 0.635000 | 3/12 | 1367.666667 |
+
+三个固定规则与 v2 数值逐项相同，支持本次协议/环境口径未漂移。guard-on 相对同 checkpoint guard-off 的共同
+描述性差值为 completion `+8/12`、continuity `+0.506754`、request failures `-67`，代价是
+`+11.653050 MB/request`、backhaul `+147.5`，handoff failure 也从 `0` 升至 `0.083333`；不存在全面支配。
+guard-off 没有完成 workflow，因此 conditional delay 无共同可比样本。
+
+## v2→v3 分解与动作/信用诊断
+
+- v2→v3 guard-on 是“重新训练 + guard”的总变化，不是纯 guard 因果效应。SA completion/continuity 分别
+  `+0.500000/+0.131101`，transfer/backhaul `+7.018300/+43.666667`；MAPPO 分别
+  `+0.250000/+0.091013`，transfer/backhaul `-3.343573/-0.333333`。delay 的完成者集合改变，差值只作描述。
+- 同一 v3 checkpoint 的 guard-on/off 是本矩阵内较直接的推理期 override 归因。两算法 guard-on 都触发并改变
+  `38/123=30.8943%` 的最终动作；训练期均触发 `204/656=31.0976%`，SA/MAPPO 实际改变
+  `182/656=27.7439%`、`183/656=27.8963%`。收益明显由共享系统 guard 主导。
+- SA 与 MAPPO 在 guard-on 的全部聚合指标、失败数和最终动作计数完全相同，guard-off 也完全相同；所以本矩阵的
+  residual algorithm gap 为 0，不支持 SA 优于 MAPPO，也不支持两者机制相同的一般结论。
+- guard-off 时两个 deterministic policy 都只输出 action 3/4，计数均为 `86/37`，5-action support 仅覆盖
+  2 类，且 action projection、其他 guard 与 final guard delta 均为 0，因此这直接反映其 deterministic policy
+  输出；这是动作覆盖塌缩的诊断信号。训练期仍有更广动作覆盖，SA/MAPPO 最终动作分别为
+  `0/1/2/3/4=256/3/39/251/107` 与 `252/0/49/230/125`。
+- guard 改写后代码会重新计算所执行 head actions 的 log-prob；16 个 update 均有记录，累计
+  `env_action_log_prob_missing_count=0`。现有证据不显示 log-prob 缺失/错配，但 SA 的 head-credit disabled、
+  MAPPO enabled 仍未产生可分辨 deterministic policy；该现象只诊断，不在本轮修复或调参。
+
+v3 训练失败对账仍以 cache dependency 为主：SA/MAPPO request failures=`95/103`，其中 adapter miss=`85/97`、
+base miss=`46/48`、handoff-unprepared=`11/6`、capacity/invalid=`0/0`，denominator mismatch=`0/0`。guard 缓解但
+未消除 readiness 失败；首次失败后的外生请求继续属于同一 workflow 分母。
+
 ## Claim boundary
 
-安全表述：v2 已按共同 fixed-budget endpoint 冻结；一次训练内评价显示明显多目标 trade-off；训练事件把低 completion
-的一阶根因定位为 adapter/dependency readiness；据此定义了一个对称、current-only 的最小 guard 候选。
+安全表述：v2/v3 都按共同 fixed-budget endpoint 冻结；训练内评价显示 current-only guard 在固定矩阵上显著改变
+约 31% 动作并改善 completion/continuity，同时增加 transfer/backhaul，且两个 learned controller 结果不可分辨。
+训练事件把剩余失败继续定位到 adapter/dependency readiness。
 
-禁止表述：v2 或 v3 优于全部 baseline、独立 test/holdout、统计显著、收敛、全方位优势、delay 普遍改善，或把
-resubstitution 结果扩展到其他 mobility/workflow/seed。v3 完成后必须完整报告正负结果，不因表现不佳追加调参。
+禁止表述：把 v2→v3 总变化称为纯 guard 因果效应，把 guard-on 结果称为 learned algorithm 优势，或宣称独立
+test/holdout、统计显著、收敛、全方位优势、delay 普遍改善或跨 mobility/workflow/seed 泛化。本轮到此停止，
+不追加训练、调参、seed、窗口或 holdout。

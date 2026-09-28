@@ -2,6 +2,11 @@
 
 ## 2026-09-28: frozen v2 不择优，v3 只允许一个对称 readiness 修正
 
+- 收口决定：v3 共同固定 `update_0016.pt`；有效评价只执行预冻结的 7×12 矩阵一次。guard-on/off 同 checkpoint
+  对比仅归因推理期 override，v2→v3 明确是 retraining+guard 总差；不再追加训练、调参、seed 或 holdout。
+- 收口决定：SA/MAPPO 在 on/off 下均不可分辨，且 guard 改写约 31% 动作，因此结果归于共享 readiness guard，
+  不归于 SA 算法。guard-off action 3/4 塌缩与 head-credit 可辨识性只登记为风险，不在同轮修复。
+
 - 决定：v2 两算法共同冻结 `update_0016.pt`，因为它是固定预算终点；不比较 update 4/8/12/16 的表现选点。
   该规则在训练统计已查看后确定，因此必须标注非预注册。
 - 决定：评价 plan 先冻结，保留 completion、continuity、handoff failure、transfer、backhaul、migration cost 和

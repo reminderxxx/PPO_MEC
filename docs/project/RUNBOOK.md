@@ -48,6 +48,22 @@ v2 固定预算终点冻结（create-only，不复制或覆盖 checkpoint）：
 v3 与 v2 使用相同 seed/budget/window/workflow/runtime，只对两算法对称启用 current-only readiness guard。不得在
 v3 之后继续调参、加 seed 或按 candidate checkpoint 表现择优。
 
+v3 完成后的冻结与单次归因评价使用：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/freeze_mechanism_supplement_baseline.py \
+  --training-root artifacts/training/mechanism_algorithm_retraining_v3_20260928 \
+  --output-dir artifacts/analysis/<new_v3_freeze_run_id>
+
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/evaluate_mechanism_frozen_checkpoints.py \
+  --plan configs/experiment/mechanism_frozen_evaluation_v3.yaml \
+  --data-root /Users/howen/Projects/PPO_MEC \
+  --output-dir artifacts/analysis/<new_v3_evaluation_run_id>
+```
+
+计划包含 learned guard-on/off 与三种固定规则。guard-off 只是同 checkpoint 归因诊断；已有 canonical root 不得
+覆盖或重复执行，0-episode preflight failure 必须单独保留。
+
 20-step 四臂小表（拒绝覆盖已有目录）：
 
 ```bash

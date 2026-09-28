@@ -4,8 +4,9 @@
 
 - `scripts/freeze_mechanism_supplement_baseline.py`：create-only 冻结共同 fixed-budget checkpoint，记录 file/tensor
   hashes、完整训练 provenance 和只读加载不变性。
-- `scripts/evaluate_mechanism_frozen_checkpoints.py` + `configs/experiment/mechanism_frozen_evaluation_v1.yaml`：
-  frozen learned + fixed rules 的单次 matched 多目标 resubstitution evaluation。
+- `scripts/evaluate_mechanism_frozen_checkpoints.py` + `configs/experiment/mechanism_frozen_evaluation_v1.yaml` /
+  `mechanism_frozen_evaluation_v3.yaml`：frozen learned + fixed rules 的单次 matched 多目标 resubstitution evaluation；
+  v3 支持 setting alias、同 checkpoint guard on/off、有效 guard 实例核验与 checkpoint 前后哈希审计。
 - `scripts/analyze_mechanism_failure_causes.py`：request/event-level failure category、分母与失败后 exposure 审计。
 - `configs/experiment/mechanism_cache_readiness_guard_v3_agent_config.json` +
   `configs/experiment/mechanism_algorithm_retraining_v3.yaml`：唯一对称 current-only readiness guard 候选与固定预算。
