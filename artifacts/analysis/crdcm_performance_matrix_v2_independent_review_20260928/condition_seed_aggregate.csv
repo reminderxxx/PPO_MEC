@@ -1,0 +1,14 @@
+condition_id,seed,episode_count,completed_count,completion_rate,continuity_episode_mean,continuity_request_weighted,handoff_failure_episode_mean,request_count,request_failure_count,dependency_miss_count,handoff_unprepared_count,capacity_rejection_count,transfer_mb_per_request_episode_mean,transfer_mb_per_request_request_weighted,migration_overhead_episode_mean,migration_overhead_per_request,delay_available_count,delay_coverage_rate,conditional_delay_mean,failure_categories,override_rate
+crdcm_critical_path_heuristic,,12,6,0.5,0.92963,0.951613,0.5,124,6,0,6,0,29.724183,26.354839,0.53,0.05129,6,0.5,1201.0,completed:6|handoff_unprepared:6,0.0
+crdcm_full_mappo,1401,12,9,0.75,0.940741,0.967742,0.166667,124,4,2,2,0,31.613072,27.0,0.256667,0.024839,9,0.75,1067.666667,cache_dependency_miss:1|completed:9|handoff_unprepared:2,0.0
+crdcm_full_mappo,1402,12,9,0.75,0.940741,0.967742,0.166667,124,4,2,2,0,31.613072,27.0,0.256667,0.024839,9,0.75,1067.666667,cache_dependency_miss:1|completed:9|handoff_unprepared:2,0.0
+crdcm_full_mappo,1403,12,0,0.0,0.111111,0.064516,0.166667,124,116,114,2,0,8.962963,4.483871,0.256667,0.024839,0,0.0,,cache_dependency_miss:10|handoff_unprepared:2,0.0
+crdcm_full_ppo,1401,12,9,0.75,0.940741,0.967742,0.166667,124,4,2,2,0,31.613072,27.0,0.256667,0.024839,9,0.75,1067.666667,cache_dependency_miss:1|completed:9|handoff_unprepared:2,0.0
+crdcm_full_ppo,1402,12,9,0.75,0.940741,0.967742,0.166667,124,4,2,2,0,31.613072,27.0,0.256667,0.024839,9,0.75,1067.666667,cache_dependency_miss:1|completed:9|handoff_unprepared:2,0.0
+crdcm_full_ppo,1403,12,9,0.75,0.940741,0.967742,0.166667,124,4,2,2,0,31.613072,27.0,0.256667,0.024839,9,0.75,1067.666667,cache_dependency_miss:1|completed:9|handoff_unprepared:2,0.0
+crdcm_full_sa,1401,12,9,0.75,0.940741,0.967742,0.166667,124,4,2,2,0,31.613072,27.0,0.256667,0.024839,9,0.75,1067.666667,cache_dependency_miss:1|completed:9|handoff_unprepared:2,0.0
+crdcm_full_sa,1402,12,9,0.75,0.940741,0.967742,0.166667,124,4,2,2,0,31.613072,27.0,0.256667,0.024839,9,0.75,1067.666667,cache_dependency_miss:1|completed:9|handoff_unprepared:2,0.0
+crdcm_full_sa,1403,12,0,0.0,0.411547,0.370968,0.166667,124,78,76,2,0,8.962963,4.483871,0.256667,0.024839,0,0.0,,cache_dependency_miss:10|handoff_unprepared:2,0.0
+crdcm_signal_off_sa,1401,12,4,0.333333,0.896296,0.935484,0.666667,124,8,0,8,0,29.057516,26.032258,0.666667,0.064516,4,0.333333,1601.0,completed:4|handoff_unprepared:8,0.0
+crdcm_signal_off_sa,1402,12,1,0.083333,0.70098,0.669355,0.166667,124,41,39,2,0,26.957516,21.887097,0.256667,0.024839,1,0.083333,801.0,cache_dependency_miss:9|completed:1|handoff_unprepared:2,0.0
+crdcm_signal_off_sa,1403,12,9,0.75,0.940741,0.967742,0.166667,124,4,2,2,0,31.613072,27.0,0.256667,0.024839,9,0.75,1067.666667,cache_dependency_miss:1|completed:9|handoff_unprepared:2,0.0

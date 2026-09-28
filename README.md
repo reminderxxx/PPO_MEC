@@ -5,12 +5,14 @@
 
 # PPO_MEC
 
-2026-09-28 已把 CRDCM 后续实验从旧的 960-episode 条件性预算 proposal 收口为首次完整可执行 v2 矩阵：
-`full-SA / signal-off-SA / full-MAPPO / full-PPO` × seeds `1401/1402/1403` × 64 episodes，共 768 training
-episodes；固定 paired observed-data development evaluation 另计 156 episodes，合计上限 924 episodes / 18,480
-steps。实现 smoke 共 13 episodes、149 actual steps，四个 learned condition 均真实更新、保存、恢复，checkpoint
-评价前后 hash 不变；完整训练未启动，novelty/advantage/formal/holdout 均为 `UNVERIFIED`。入口为
-`scripts/run_crdcm_performance_matrix.py`，合同见
+2026-09-28 CRDCM v2 完整 observed-data development matrix 已完成：`full-SA / signal-off-SA / full-MAPPO /
+full-PPO` × seeds `1401/1402/1403` × 64 episodes，共 768 training episodes、7,872 actual training steps、192
+updates；固定 paired evaluation 为 156 episodes、1,612 actual steps。独立从 raw episode 复算 producer CSV/aggregate
+均为 0 mismatch。描述性结果为 full-SA `18/36`、signal-off-SA `14/36`、full-MAPPO `18/36`、full-PPO
+`27/36` completion；full-SA 相对 signal-off 的 completion 增加但 continuity 降低，且 seed 交互强。容量
+`280/360 MB` 两场景 39/39 配对动作与主指标完全相同、0 capacity rejection/eviction，不能作为两组独立容量证据。
+当前仍没有 formal/holdout，novelty/稳定优势/独立泛化/paper-ready 均为 `UNVERIFIED`；完整审查见
+`docs/project/crdcm_performance_matrix_v2_independent_review_20260928.md`，执行合同见
 `docs/project/crdcm_performance_matrix_v2_freeze_20260928.md`。
 
 2026-09-28 已将 mechanism retraining v2 的 SA-GHMAPPO/MAPPO 共同固定预算终点 `update_0016.pt` 做 create-only

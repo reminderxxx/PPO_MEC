@@ -5,11 +5,19 @@
 
 ﻿# Context
 
-更新日期：2026-09-06
+更新日期：2026-09-28
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
 ## 项目状态
+
+- CRDCM v2 的唯一完整 observed-data development matrix 已完成并独立派生复算：12 training cells、768
+  training episodes、156 evaluation episodes；producer CSV/aggregate 均 0 mismatch。full-SA/signal-off-SA/
+  full-MAPPO/full-PPO completion 为 `18/14/18/27`（各 36），但 full-SA 相对 signal-off continuity 更低，且
+  seed completion 分别为 full-SA/MAPPO=`9,9,0`、signal-off=`4,1,9`。280/360 MB 容量场景的 39/39 配对
+  动作与主指标相同且无 rejection/eviction。只有 3 个 raw outer windows，没有 formal/holdout；证据等级仅为
+  `E3_REPRODUCED_OBSERVED_DATA_DEVELOPMENT_PILOT_NOT_HOLDOUT`，novelty、稳定优势、独立泛化和 paper-ready
+  仍为 `UNVERIFIED`。入口见 `crdcm_performance_matrix_v2_independent_review_20260928.md`。
 
 - 当前唯一 live typed model-cache execution contract 为 Protocol 2.9.0；active index 位于
   `configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_index.json`，Readiness v21=

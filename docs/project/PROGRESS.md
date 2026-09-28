@@ -5,7 +5,30 @@
 
 ﻿# Progress
 
-## 2026-09-28: CRDCM performance matrix v2 实现与冻结（未启动完整训练）
+## 2026-09-28: CRDCM performance matrix v2 完成与独立派生审查
+
+- 唯一完整 run `artifacts/training/crdcm_performance_matrix_v2_20260928/` 已 `SUCCEEDED`：12/12 training cells、
+  768 episodes、7,872 actual steps、192 updates；156 个 paired development evaluation episodes、1,612 steps；
+  automatic retry=0，14 个 stderr 均为空。
+- 独立审查从 156 个 raw JSON 重建 CSV 和 aggregate，两个 mismatch count 均为 0；原 artifact integrity manifest 的
+  1,056 个文件、NGSIM/Alibaba 实体 SHA、config/runtime/window-plan SHA、12 个 checkpoint 评价前后 SHA 全部复核。
+- 12/12 `latest.pt` 与 `update_0016.pt` byte identity 不同但加载 payload 递归相等且 update count=16；实际评价 identity
+  以 checkpoint manifest 的 latest SHA 为准。144 个 learned raw JSON 的 embedded checkpoint metadata 是空 path/0
+  episode/0 update placeholder，当前经 CSV+manifest 间接闭合，仍是 self-contained provenance major concern。
+- 描述性 completion：full-SA=`18/36`、signal-off-SA=`14/36`、full-MAPPO=`18/36`、full-PPO=`27/36`、
+  heuristic=`6/12`。full-SA 相对 signal-off completion `+11.11` 个百分点但 continuity 从 `0.846006` 降至
+  `0.764343`，不能只报正向 completion。
+- seed completion：full-SA/MAPPO=`9,9,0`，PPO=`9,9,9`，signal-off-SA=`4,1,9`；seed 1403 的 full-SA/
+  MAPPO/PPO deterministic 主动作分别为 `3/2/0`，但 update logs 和 parameter identity 不能证明训练不足或收敛失败。
+- `capacity_competition` 与 `shared_adapter_reuse_prepare` 配置容量为 280/360 MB，最大 occupancy 不同，但 39/39
+  normalized request schedules、动作与主指标相同，且 rejection/eviction 均为 0；该对比不能作为独立容量 robustness。
+- `low_reuse_no_migration_negative` 的 26 个非零 overhead step 均为 failed handoff+cold start；实际迁移字节和 realized
+  migration 为 0，字段应解释为环境 reward penalty。
+- evidence level=`E3_REPRODUCED_OBSERVED_DATA_DEVELOPMENT_PILOT_NOT_HOLDOUT`；verdict=`Not TMC-ready`。只有 3 个
+  raw outer windows，没有 formal/holdout，不进行显著性晋级或择 seed/checkpoint。报告见
+  `crdcm_performance_matrix_v2_independent_review_20260928.md`。
+
+## 2026-09-28: CRDCM performance matrix v2 实现与冻结（historical pre-execution）
 
 - 纠正旧 `5×3×64=960` 只是预算 proposal，不曾构成完整执行 freeze。v2 去掉无实现差异的重复命名，冻结四个
   unique learned conditions：full-SA、signal-off-SA、full-MAPPO、full-PPO；seeds=`1401/1402/1403`，训练

@@ -1,0 +1,918 @@
+{
+  "audit_version": "crdcm_performance_matrix_independent_audit_v1",
+  "reviewed_at": "2026-09-28T17:52:48.665343+08:00",
+  "literature_cutoff": "2026-09-28",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "artifact_run_id": "crdcm_performance_matrix_v2_20260928",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "source_execution_git_commit": "4dc5adb6f6e436983745a0cf485f5221ba4caf0a",
+  "source_execution_git_tree": "2ecb51d8d075d671e3a4d3bed3eb042aad262c08",
+  "review_git_commit_before_artifact_commit": "4dc5adb6f6e436983745a0cf485f5221ba4caf0a",
+  "auditor_identity": {
+    "path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/scripts/audit_crdcm_performance_matrix.py",
+    "sha256": "11f7d571784ce418ab2f3c441aa810161a149d1b5c13eb3b6e94d272e24b4bd0",
+    "python_executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9",
+    "torch_version": "2.8.0"
+  },
+  "evidence_level": "E3_REPRODUCED_OBSERVED_DATA_DEVELOPMENT_PILOT_NOT_HOLDOUT",
+  "verdict": "Not TMC-ready",
+  "source_identity": {
+    "source_root": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/training/crdcm_performance_matrix_v2_20260928",
+    "command_manifest_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/training/crdcm_performance_matrix_v2_20260928/command_manifest.json",
+    "command_manifest_sha256": "4e3faad1adcda29635916a41a8f89f43ae6f61b14250a39a37a3cf023d77399e",
+    "checkpoint_manifest_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/training/crdcm_performance_matrix_v2_20260928/checkpoint_manifest.json",
+    "checkpoint_manifest_sha256": "71d0b706b9deb5ef680f74b32fd254b551be4b90f1a6443adf981c64d1c6a924",
+    "evaluation_receipt_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/training/crdcm_performance_matrix_v2_20260928/evaluation/evaluation_receipt.json",
+    "evaluation_receipt_sha256": "3a91d2357e3b1ba3aaa3963e204070791c7fa0f679d974903b95d60b19372a60",
+    "checks": {
+      "completion_succeeded": true,
+      "state_succeeded": true,
+      "evaluation_succeeded": true,
+      "manifest_sha_bound": true,
+      "child_count": true,
+      "all_child_return_codes_zero": true,
+      "automatic_retry_zero": true,
+      "observed_data_not_formal_holdout": true,
+      "algorithm_superiority_disallowed": true,
+      "evaluation_episode_count": true
+    }
+  },
+  "integrity": {
+    "manifest_path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/training/crdcm_performance_matrix_v2_20260928/artifact_integrity_manifest.json",
+    "manifest_sha256": "f845ab5d23000701bedfc7cfb96730edf337f6e81f22011e5b18035e5bba3636",
+    "declared_file_count": 1056,
+    "observed_file_count_excluding_manifest": 1056,
+    "failure_count": 0,
+    "failures": [],
+    "extra_paths": [],
+    "missing_paths": [],
+    "status": "pass"
+  },
+  "protocol_audit": {
+    "study_version": "crdcm_performance_matrix_v2",
+    "execution_scope": "full_observed_development_matrix",
+    "condition_count": 4,
+    "seed_count": 3,
+    "command_count": 12,
+    "unique_command_identity_count": 12,
+    "fixed_endpoint": "latest.pt after episode 64 / update 16",
+    "metric_based_selection": false,
+    "source_data_identity": {
+      "mobility": {
+        "path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv",
+        "expected_size_bytes": 2118175938,
+        "observed_size_bytes": 2118175938,
+        "expected_sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+        "observed_sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+        "status": true
+      },
+      "workflow": {
+        "path": "/Users/howen/Projects/PPO_MEC/data/raw/workflow/alibaba2018/batch_task.csv",
+        "expected_size_bytes": 802261444,
+        "observed_size_bytes": 802261444,
+        "expected_sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc",
+        "observed_sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc",
+        "status": true
+      }
+    },
+    "bound_file_identity": {
+      "config": {
+        "path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/configs/experiment/crdcm_performance_matrix_v2.yaml",
+        "expected_sha256": "fb26d5cdbe7e5bedea70b36153f533f55cbbbd9977aac41e5cf7d7ccac64634c",
+        "observed_sha256": "fb26d5cdbe7e5bedea70b36153f533f55cbbbd9977aac41e5cf7d7ccac64634c",
+        "status": true
+      },
+      "runtime_config": {
+        "path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/configs/experiment/mechanism_factorial_shared_360mb_runtime_v1.yaml",
+        "expected_sha256": "6d21b66b94300bdbc691000313163e289aeb2dd881b5ad860f92ef3b06980869",
+        "observed_sha256": "6d21b66b94300bdbc691000313163e289aeb2dd881b5ad860f92ef3b06980869",
+        "status": true
+      },
+      "window_plan": {
+        "path": "/Users/howen/.codex/worktrees/1aed/PPO_MEC/configs/experiment/mechanism_algorithm_training_windows_v1.json",
+        "expected_sha256": "184261994552a0266f67276b77b99fa1d8c1c5023a337fab1e56f14c64e37537",
+        "observed_sha256": "184261994552a0266f67276b77b99fa1d8c1c5023a337fab1e56f14c64e37537",
+        "status": true
+      }
+    },
+    "log_audit": {
+      "stderr_file_count": 14,
+      "empty_stderr_file_count": 14,
+      "nonempty_stderr_paths": [],
+      "status": true
+    },
+    "status": true
+  },
+  "budget": {
+    "manifest_training_episode_cap": 768,
+    "observed_training_episodes": 768,
+    "manifest_training_step_cap": 15360,
+    "observed_training_steps": 7872,
+    "observed_training_updates": 192,
+    "manifest_evaluation_episodes": 156,
+    "observed_evaluation_episodes": 156,
+    "manifest_evaluation_step_cap": 3120,
+    "observed_evaluation_steps": 1612,
+    "manifest_full_episode_cap": 924,
+    "observed_full_episode_count": 924,
+    "manifest_full_step_cap": 18480,
+    "observed_full_steps": 9484,
+    "within_all_caps": true
+  },
+  "training_checkpoint_summary": {
+    "command_identity_count": 12,
+    "checkpoint_identity_count": 12,
+    "training_episodes": 768,
+    "actual_training_steps": 7872,
+    "training_updates": 192,
+    "latest_endpoint_byte_identical_count": 0,
+    "latest_endpoint_logically_equal_count": 12,
+    "failure_count": 0,
+    "failures": [],
+    "status": "pass"
+  },
+  "trace_checkpoint_reconciliation": {
+    "learned_raw_episode_count": 144,
+    "raw_episode_self_contained_checkpoint_identity_count": 0,
+    "indirectly_reconciled_count": 144,
+    "indirect_reconciliation_chain": "raw condition_id+seed -> paired CSV checkpoint_sha256 -> checkpoint manifest latest.pt -> evaluation before/after SHA-256",
+    "limitation": "raw episode run_info.checkpoint_metadata is the in-memory override placeholder (empty path, episodes=0, update_count=0), so individual raw JSON files are not self-contained checkpoint provenance envelopes"
+  },
+  "denominator_and_delay_audit": {
+    "episode_count": 156,
+    "consistent_episode_count": 156,
+    "total_external_requests": 1612,
+    "completed_episode_count": 83,
+    "delay_available_count": 83,
+    "status": true
+  },
+  "producer_csv_reconciliation": {
+    "source_row_count": 156,
+    "derived_row_count": 156,
+    "identity_count": 156,
+    "mismatch_count": 0,
+    "mismatches": [],
+    "status": "pass"
+  },
+  "producer_aggregate_reconciliation": {
+    "source_group_count": 52,
+    "derived_group_count": 52,
+    "mismatch_count": 0,
+    "mismatches": [],
+    "status": "pass"
+  },
+  "pairing": {
+    "crdcm_full_sa": {
+      "observed_count": 36,
+      "expected_count": 36,
+      "missing": [],
+      "extra": [],
+      "status": "pass"
+    },
+    "crdcm_signal_off_sa": {
+      "observed_count": 36,
+      "expected_count": 36,
+      "missing": [],
+      "extra": [],
+      "status": "pass"
+    },
+    "crdcm_full_mappo": {
+      "observed_count": 36,
+      "expected_count": 36,
+      "missing": [],
+      "extra": [],
+      "status": "pass"
+    },
+    "crdcm_full_ppo": {
+      "observed_count": 36,
+      "expected_count": 36,
+      "missing": [],
+      "extra": [],
+      "status": "pass"
+    }
+  },
+  "exposure_pairing": {
+    "ample_resource_negative/j_15": {
+      "unique_fingerprint_count": 1,
+      "fingerprints": [
+        "a07cd99144bc63df15f30d2ff6e918b6f27309613e28aa57f8bd218b96de978c"
+      ]
+    },
+    "ample_resource_negative/j_3": {
+      "unique_fingerprint_count": 1,
+      "fingerprints": [
+        "a506bc091a8049bae0a39c1e6d18df4b21878f30bebff5acf7d17d0691e04d04"
+      ]
+    },
+    "ample_resource_negative/j_8": {
+      "unique_fingerprint_count": 1,
+      "fingerprints": [
+        "347efc6318bd8c7fce06ddb8b81938b42e53384721c01ca52868ef88cd4cccbe"
+      ]
+    },
+    "capacity_competition/j_15": {
+      "unique_fingerprint_count": 1,
+      "fingerprints": [
+        "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4"
+      ]
+    },
+    "capacity_competition/j_3": {
+      "unique_fingerprint_count": 1,
+      "fingerprints": [
+        "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776"
+      ]
+    },
+    "capacity_competition/j_8": {
+      "unique_fingerprint_count": 1,
+      "fingerprints": [
+        "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab"
+      ]
+    },
+    "low_reuse_no_migration_negative/j_15": {
+      "unique_fingerprint_count": 1,
+      "fingerprints": [
+        "1535789dc57e1e6601a855b5cb43e7fffe7e13c3da101577fcd18c59ed7ac938"
+      ]
+    },
+    "low_reuse_no_migration_negative/j_3": {
+      "unique_fingerprint_count": 1,
+      "fingerprints": [
+        "614caa155c6b0ead19ea954f3b0779e90eaba4704d91a7c2add1b6c3a0ca5d3a"
+      ]
+    },
+    "low_reuse_no_migration_negative/j_8": {
+      "unique_fingerprint_count": 1,
+      "fingerprints": [
+        "6685a67159a8cffb629c6ff3da0b3ab814d7f6b179ee689341f6c00156e064b7"
+      ]
+    },
+    "shared_adapter_reuse_prepare/j_15": {
+      "unique_fingerprint_count": 1,
+      "fingerprints": [
+        "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      ]
+    },
+    "shared_adapter_reuse_prepare/j_3": {
+      "unique_fingerprint_count": 1,
+      "fingerprints": [
+        "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      ]
+    },
+    "shared_adapter_reuse_prepare/j_8": {
+      "unique_fingerprint_count": 1,
+      "fingerprints": [
+        "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      ]
+    }
+  },
+  "raw_window_independence": {
+    "outer_independent_window_count": 3,
+    "manifest_interval_audit": {
+      "window_count": 3,
+      "pair_count": 3,
+      "all_pairwise_nonoverlap": true,
+      "comparisons": [
+        {
+          "left": "window_peachtree_off244_len24_t1163059400_1163061700",
+          "right": "window_peachtree_off298_len24_t1163064800_1163067100",
+          "frame_overlap": false,
+          "time_overlap": false,
+          "safe": true
+        },
+        {
+          "left": "window_peachtree_off244_len24_t1163059400_1163061700",
+          "right": "window_peachtree_off1578_len24_t1163637300_1163639600",
+          "frame_overlap": false,
+          "time_overlap": false,
+          "safe": true
+        },
+        {
+          "left": "window_peachtree_off298_len24_t1163064800_1163067100",
+          "right": "window_peachtree_off1578_len24_t1163637300_1163639600",
+          "frame_overlap": false,
+          "time_overlap": false,
+          "safe": true
+        }
+      ]
+    },
+    "seed_role": "within-window repeated training/evaluation, not an independent raw mobility cluster",
+    "scenario_role": "paired treatment on the same three raw windows, not an independent raw mobility cluster",
+    "workflow_role": "one workflow is bound to each raw window and reused by all controllers",
+    "statistical_boundary": "no row-level or seed-level independence claim; three outer windows imply very low power"
+  },
+  "pairwise_trace_audit": {
+    "sa_vs_mappo": {
+      "pair_count": 36,
+      "action_sequence_equal_count": 24,
+      "field_difference_counts": {
+        "action_sequence": 12,
+        "request_failure_count": 12,
+        "workflow_continuity_rate": 12
+      },
+      "all_differences_confined_to_seed_1403": true,
+      "difference_rows": [
+        {
+          "seed": 1403,
+          "scenario_id": "ample_resource_negative",
+          "workflow_id": "j_3",
+          "changed_fields": [
+            "workflow_continuity_rate",
+            "request_failure_count",
+            "action_sequence"
+          ],
+          "sa_actions": "3|3|3|4|3|3|3|3|3",
+          "mappo_actions": "2|2|2|4|2|2|2|2|2",
+          "sa_failure": "cache_dependency_miss",
+          "mappo_failure": "cache_dependency_miss",
+          "sa_request_failures": 6,
+          "mappo_request_failures": 8
+        },
+        {
+          "seed": 1403,
+          "scenario_id": "ample_resource_negative",
+          "workflow_id": "j_8",
+          "changed_fields": [
+            "workflow_continuity_rate",
+            "request_failure_count",
+            "action_sequence"
+          ],
+          "sa_actions": "3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3",
+          "mappo_actions": "2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2",
+          "sa_failure": "cache_dependency_miss",
+          "mappo_failure": "cache_dependency_miss",
+          "sa_request_failures": 14,
+          "mappo_request_failures": 17
+        },
+        {
+          "seed": 1403,
+          "scenario_id": "ample_resource_negative",
+          "workflow_id": "j_15",
+          "changed_fields": [
+            "workflow_continuity_rate",
+            "request_failure_count",
+            "action_sequence"
+          ],
+          "sa_actions": "3|4|4|3|3",
+          "mappo_actions": "2|4|4|2|2",
+          "sa_failure": "cache_dependency_miss",
+          "mappo_failure": "cache_dependency_miss",
+          "sa_request_failures": 3,
+          "mappo_request_failures": 4
+        },
+        {
+          "seed": 1403,
+          "scenario_id": "capacity_competition",
+          "workflow_id": "j_3",
+          "changed_fields": [
+            "workflow_continuity_rate",
+            "request_failure_count",
+            "action_sequence"
+          ],
+          "sa_actions": "3|3|3|4|3|3|3|3|3",
+          "mappo_actions": "2|2|2|4|2|2|2|2|2",
+          "sa_failure": "cache_dependency_miss",
+          "mappo_failure": "cache_dependency_miss",
+          "sa_request_failures": 5,
+          "mappo_request_failures": 8
+        },
+        {
+          "seed": 1403,
+          "scenario_id": "capacity_competition",
+          "workflow_id": "j_8",
+          "changed_fields": [
+            "workflow_continuity_rate",
+            "request_failure_count",
+            "action_sequence"
+          ],
+          "sa_actions": "3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3",
+          "mappo_actions": "2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2",
+          "sa_failure": "cache_dependency_miss",
+          "mappo_failure": "cache_dependency_miss",
+          "sa_request_failures": 9,
+          "mappo_request_failures": 17
+        },
+        {
+          "seed": 1403,
+          "scenario_id": "capacity_competition",
+          "workflow_id": "j_15",
+          "changed_fields": [
+            "workflow_continuity_rate",
+            "request_failure_count",
+            "action_sequence"
+          ],
+          "sa_actions": "3|4|4|3|3",
+          "mappo_actions": "2|4|4|2|2",
+          "sa_failure": "cache_dependency_miss",
+          "mappo_failure": "cache_dependency_miss",
+          "sa_request_failures": 1,
+          "mappo_request_failures": 3
+        },
+        {
+          "seed": 1403,
+          "scenario_id": "low_reuse_no_migration_negative",
+          "workflow_id": "j_3",
+          "changed_fields": [
+            "workflow_continuity_rate",
+            "request_failure_count",
+            "action_sequence"
+          ],
+          "sa_actions": "3|3|3|4|3|3|3|3|3",
+          "mappo_actions": "2|2|2|4|2|2|2|2|2",
+          "sa_failure": "handoff_unprepared",
+          "mappo_failure": "handoff_unprepared",
+          "sa_request_failures": 7,
+          "mappo_request_failures": 9
+        },
+        {
+          "seed": 1403,
+          "scenario_id": "low_reuse_no_migration_negative",
+          "workflow_id": "j_8",
+          "changed_fields": [
+            "workflow_continuity_rate",
+            "request_failure_count",
+            "action_sequence"
+          ],
+          "sa_actions": "3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3",
+          "mappo_actions": "2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2",
+          "sa_failure": "cache_dependency_miss",
+          "mappo_failure": "cache_dependency_miss",
+          "sa_request_failures": 14,
+          "mappo_request_failures": 17
+        },
+        {
+          "seed": 1403,
+          "scenario_id": "low_reuse_no_migration_negative",
+          "workflow_id": "j_15",
+          "changed_fields": [
+            "workflow_continuity_rate",
+            "request_failure_count",
+            "action_sequence"
+          ],
+          "sa_actions": "3|4|4|3|3",
+          "mappo_actions": "2|4|4|2|2",
+          "sa_failure": "handoff_unprepared",
+          "mappo_failure": "handoff_unprepared",
+          "sa_request_failures": 4,
+          "mappo_request_failures": 5
+        },
+        {
+          "seed": 1403,
+          "scenario_id": "shared_adapter_reuse_prepare",
+          "workflow_id": "j_3",
+          "changed_fields": [
+            "workflow_continuity_rate",
+            "request_failure_count",
+            "action_sequence"
+          ],
+          "sa_actions": "3|3|3|4|3|3|3|3|3",
+          "mappo_actions": "2|2|2|4|2|2|2|2|2",
+          "sa_failure": "cache_dependency_miss",
+          "mappo_failure": "cache_dependency_miss",
+          "sa_request_failures": 5,
+          "mappo_request_failures": 8
+        },
+        {
+          "seed": 1403,
+          "scenario_id": "shared_adapter_reuse_prepare",
+          "workflow_id": "j_8",
+          "changed_fields": [
+            "workflow_continuity_rate",
+            "request_failure_count",
+            "action_sequence"
+          ],
+          "sa_actions": "3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3",
+          "mappo_actions": "2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2",
+          "sa_failure": "cache_dependency_miss",
+          "mappo_failure": "cache_dependency_miss",
+          "sa_request_failures": 9,
+          "mappo_request_failures": 17
+        },
+        {
+          "seed": 1403,
+          "scenario_id": "shared_adapter_reuse_prepare",
+          "workflow_id": "j_15",
+          "changed_fields": [
+            "workflow_continuity_rate",
+            "request_failure_count",
+            "action_sequence"
+          ],
+          "sa_actions": "3|4|4|3|3",
+          "mappo_actions": "2|4|4|2|2",
+          "sa_failure": "cache_dependency_miss",
+          "mappo_failure": "cache_dependency_miss",
+          "sa_request_failures": 1,
+          "mappo_request_failures": 3
+        }
+      ]
+    },
+    "capacity_vs_shared": {
+      "pair_count": 39,
+      "normalized_request_schedule_equal_count": 39,
+      "exact_metric_and_action_row_count": 39,
+      "capacity_rejection_count_across_both_scenarios": 0,
+      "capacity_competition_eviction_count": 0,
+      "shared_adapter_reuse_prepare_eviction_count": 0,
+      "capacity_competition_max_occupancy_rate": 0.985714,
+      "shared_adapter_reuse_prepare_max_occupancy_rate": 0.766667,
+      "config_difference": "capacity_mb=280 versus 360; migration and repeated_reuse binding are identical",
+      "scientific_interpretation": "paired capacity treatment whose observed contrast collapsed; not extra independent support",
+      "pairs": [
+        {
+          "controller": "crdcm_critical_path_heuristic",
+          "workflow_id": "j_3",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+          "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+        },
+        {
+          "controller": "crdcm_critical_path_heuristic",
+          "workflow_id": "j_8",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+          "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+        },
+        {
+          "controller": "crdcm_critical_path_heuristic",
+          "workflow_id": "j_15",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+          "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+        },
+        {
+          "controller": "crdcm_full_mappo/seed_1401",
+          "workflow_id": "j_3",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+          "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+        },
+        {
+          "controller": "crdcm_full_mappo/seed_1401",
+          "workflow_id": "j_8",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+          "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+        },
+        {
+          "controller": "crdcm_full_mappo/seed_1401",
+          "workflow_id": "j_15",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+          "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+        },
+        {
+          "controller": "crdcm_full_mappo/seed_1402",
+          "workflow_id": "j_3",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+          "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+        },
+        {
+          "controller": "crdcm_full_mappo/seed_1402",
+          "workflow_id": "j_8",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+          "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+        },
+        {
+          "controller": "crdcm_full_mappo/seed_1402",
+          "workflow_id": "j_15",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+          "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+        },
+        {
+          "controller": "crdcm_full_mappo/seed_1403",
+          "workflow_id": "j_3",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+          "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+        },
+        {
+          "controller": "crdcm_full_mappo/seed_1403",
+          "workflow_id": "j_8",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+          "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+        },
+        {
+          "controller": "crdcm_full_mappo/seed_1403",
+          "workflow_id": "j_15",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+          "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+        },
+        {
+          "controller": "crdcm_full_ppo/seed_1401",
+          "workflow_id": "j_3",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+          "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+        },
+        {
+          "controller": "crdcm_full_ppo/seed_1401",
+          "workflow_id": "j_8",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+          "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+        },
+        {
+          "controller": "crdcm_full_ppo/seed_1401",
+          "workflow_id": "j_15",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+          "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+        },
+        {
+          "controller": "crdcm_full_ppo/seed_1402",
+          "workflow_id": "j_3",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+          "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+        },
+        {
+          "controller": "crdcm_full_ppo/seed_1402",
+          "workflow_id": "j_8",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+          "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+        },
+        {
+          "controller": "crdcm_full_ppo/seed_1402",
+          "workflow_id": "j_15",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+          "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+        },
+        {
+          "controller": "crdcm_full_ppo/seed_1403",
+          "workflow_id": "j_3",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+          "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+        },
+        {
+          "controller": "crdcm_full_ppo/seed_1403",
+          "workflow_id": "j_8",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+          "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+        },
+        {
+          "controller": "crdcm_full_ppo/seed_1403",
+          "workflow_id": "j_15",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+          "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+        },
+        {
+          "controller": "crdcm_full_sa/seed_1401",
+          "workflow_id": "j_3",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+          "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+        },
+        {
+          "controller": "crdcm_full_sa/seed_1401",
+          "workflow_id": "j_8",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+          "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+        },
+        {
+          "controller": "crdcm_full_sa/seed_1401",
+          "workflow_id": "j_15",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+          "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+        },
+        {
+          "controller": "crdcm_full_sa/seed_1402",
+          "workflow_id": "j_3",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+          "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+        },
+        {
+          "controller": "crdcm_full_sa/seed_1402",
+          "workflow_id": "j_8",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+          "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+        },
+        {
+          "controller": "crdcm_full_sa/seed_1402",
+          "workflow_id": "j_15",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+          "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+        },
+        {
+          "controller": "crdcm_full_sa/seed_1403",
+          "workflow_id": "j_3",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+          "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+        },
+        {
+          "controller": "crdcm_full_sa/seed_1403",
+          "workflow_id": "j_8",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+          "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+        },
+        {
+          "controller": "crdcm_full_sa/seed_1403",
+          "workflow_id": "j_15",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+          "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+        },
+        {
+          "controller": "crdcm_signal_off_sa/seed_1401",
+          "workflow_id": "j_3",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+          "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+        },
+        {
+          "controller": "crdcm_signal_off_sa/seed_1401",
+          "workflow_id": "j_8",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+          "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+        },
+        {
+          "controller": "crdcm_signal_off_sa/seed_1401",
+          "workflow_id": "j_15",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+          "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+        },
+        {
+          "controller": "crdcm_signal_off_sa/seed_1402",
+          "workflow_id": "j_3",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+          "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+        },
+        {
+          "controller": "crdcm_signal_off_sa/seed_1402",
+          "workflow_id": "j_8",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+          "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+        },
+        {
+          "controller": "crdcm_signal_off_sa/seed_1402",
+          "workflow_id": "j_15",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+          "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+        },
+        {
+          "controller": "crdcm_signal_off_sa/seed_1403",
+          "workflow_id": "j_3",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+          "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+        },
+        {
+          "controller": "crdcm_signal_off_sa/seed_1403",
+          "workflow_id": "j_8",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+          "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+        },
+        {
+          "controller": "crdcm_signal_off_sa/seed_1403",
+          "workflow_id": "j_15",
+          "normalized_request_schedule_equal": true,
+          "metric_action_changed_fields": [],
+          "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+          "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+        }
+      ]
+    },
+    "low_reuse_no_migration": {
+      "episode_count": 39,
+      "positive_migration_overhead_step_count": 26,
+      "actual_state_migration_size_mb": 0.0,
+      "realized_migration_step_count": 0,
+      "suppressed_prepare_step_count": 22,
+      "failed_handoff_cold_start_step_count": 26,
+      "interpretation": "the nonzero field is the environment migration-overhead penalty for cross-RSU transfer without effective prepare/migrate, not realized workflow-state migration bytes"
+    }
+  },
+  "pareto": {
+    "metric_direction": {
+      "completion_rate": "maximize",
+      "continuity_episode_mean": "maximize",
+      "handoff_failure_episode_mean": "minimize",
+      "transfer_mb_per_request_episode_mean": "minimize",
+      "migration_overhead_episode_mean": "minimize"
+    },
+    "learned_condition_frontier": [
+      "crdcm_full_ppo",
+      "crdcm_full_sa",
+      "crdcm_signal_off_sa"
+    ],
+    "dominated_by": {
+      "crdcm_full_mappo": [
+        "crdcm_full_sa"
+      ],
+      "crdcm_full_ppo": [],
+      "crdcm_full_sa": [],
+      "crdcm_signal_off_sa": []
+    },
+    "post_hoc_weighted_score_used": false,
+    "heuristic_in_frontier": false,
+    "heuristic_exclusion_reason": "one fixed heuristic has 12 episodes rather than 36 seed-replicated learned episodes and is not an independent 36-episode sample"
+  },
+  "claim_boundary": "This is a frozen observed-data development falsification matrix. It does not use or reopen a consumed holdout, and it cannot support novelty, independent generalization, formal superiority, convergence, or paper-ready claims. CRDCM novelty remains UNVERIFIED. Full training and the paired development evaluation require a separate execution authorization after implementation review.",
+  "safe_claims": [
+    "The frozen observed-data development matrix completed and its 156 raw evaluation episodes reproduce the producer CSV and aggregate without mismatch.",
+    "On the fixed episode-mean summary, full PPO completed 27/36 episodes versus 18/36 for full SA, while full SA used less transfer per request (24.063036 versus 31.613072 MB); this is a descriptive Pareto trade-off, not superiority.",
+    "The added CRDCM signal changed SA outcomes, but the direction was seed-dependent: full SA completed 18/36 versus 14/36 for signal-off while its continuity mean was lower (0.764343 versus 0.846006).",
+    "Full SA weakly dominates full MAPPO on the recorded learned-condition episode-mean vector because completion/cost metrics match while SA continuity is higher; this remains an observed-data development result."
+  ],
+  "prohibited_claims": [
+    "CRDCM, SA-GHMAPPO, MAPPO, or PPO has formal or independently generalizable superiority.",
+    "The signal-on versus signal-off contrast establishes a stable causal benefit.",
+    "The capacity_competition scenario provides independent capacity-stress evidence distinct from shared_adapter_reuse_prepare.",
+    "Seed 1403 failures prove insufficient training, convergence failure, or an architecture defect.",
+    "The 12 heuristic episodes are 36 independent comparisons or are directly interchangeable with the three-seed learned totals.",
+    "The no-migration scenario has zero migration-overhead penalty or that its nonzero penalty represents realized state-migration bytes."
+  ],
+  "hard_blockers": [
+    "No formal or hidden holdout evaluation exists; all evaluation is observed-data development resubstitution.",
+    "Only three raw mobility windows are outer independent units; seeds, scenarios, and workflows are not additional independent clusters.",
+    "The intended capacity contrast collapsed: capacity_competition and shared_adapter_reuse_prepare have identical normalized request schedules and identical metric/action rows for all 39 paired controllers, with zero capacity rejection.",
+    "Strong seed interaction remains: full SA and full MAPPO are 9/12, 9/12, 0/12 across seeds, while signal-off SA is 4/12, 1/12, 9/12."
+  ],
+  "major_concerns": [
+    "All 144 learned raw episode JSON files require indirect checkpoint linkage through condition/seed, the paired CSV, and checkpoint manifest because their embedded checkpoint metadata is an in-memory override placeholder.",
+    "The strong heuristic has only 12 fixed episodes; it cannot be presented as 36 independent observations or pooled as though it had three seed replicates.",
+    "Delay is defined only for completed workflows: 83/156 episodes have delay values, so delay comparisons must report coverage and remain conditional on completion.",
+    "Latest checkpoints and update_0016 checkpoints are not byte-identical separate serializations, although all 12 loaded payloads are recursively equal and carry update_count=16; citations must use the exact manifest SHA of latest.pt."
+  ],
+  "minor_concerns": [
+    "The scenario name low_reuse_no_migration_negative is easy to misread: migration is disabled, but the environment still records a nonzero migration-overhead reward penalty for failed cross-RSU continuity without effective preparation.",
+    "Episode-mean and request-weighted continuity/transfer differ because workflows have unequal request counts; tables must label the aggregation unit explicitly."
+  ],
+  "scorecard": {
+    "Novelty and nearest literature": "N/S — this audit does not establish novelty and CRDCM novelty remains UNVERIFIED",
+    "Technical correctness and modeling": "N/S — trace semantics were audited, but this is not a complete method/model review",
+    "Baseline fairness and independence": "N/S — only observed-data resubstitution and three outer windows are available",
+    "Experimental design, statistics, holdout": "N/S — no formal/holdout stage and no defensible independent-cluster inference",
+    "Mechanism realization": "N/S — several mechanism traces exist, but the capacity contrast did not realize an outcome difference",
+    "Robustness, generalization, scalability": "N/S — not present in this matrix",
+    "Reproducibility and claim completeness": "N/S for TMC score — the matrix itself reached E3 independent re-aggregation, but paper-level evidence is incomplete"
+  },
+  "evidence_inventory": {
+    "source_artifact_file_count_excluding_integrity_manifest": 1056,
+    "raw_training_episode_count": 768,
+    "raw_evaluation_episode_count": 156,
+    "checkpoint_count": 12,
+    "paired_csv_recomputed_without_mismatch": true,
+    "aggregate_recomputed_without_mismatch": true
+  },
+  "first_order_next_step": "Before any new algorithm tuning, redesign and freeze one outcome-blind capacity-stress evaluation whose trace actually activates capacity rejection or eviction pressure, then evaluate the already frozen checkpoints on additional nonoverlapping outer windows; do not reopen the present results for seed or checkpoint selection."
+}

@@ -15,7 +15,7 @@
   identity 在 readiness 不变时不可辨识。
 - current-only guard 在训练/评价后处理 raw action，并用强制 canonical head action 重算 log-prob。数值 log-prob
   非缺失，但 raw policy 与 override 的 causal credit 混合；不得据此声称 learned policy 学会 readiness。
-- CRDCM 目前只是 `UNVERIFIED` 设计。任何 state/action/log-prob contract 变化都必须发布新版本、matched retraining
+- CRDCM 目前只是 `UNVERIFIED` observed-data development candidate。任何 state/action/log-prob contract 变化都必须发布新版本、matched retraining
   并使用新 split；不得修改或续训 v3、不得重开 consumed holdout。
 
 ## 2026-09-28: v2/v3 仍是训练内单 seed pilot（OPEN）
@@ -671,6 +671,18 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 
 ## 2026-09-28 CRDCM 已知限制
 
+- `OPEN / no formal or holdout evidence`：v2 完整矩阵虽已完成并独立复算，但评价仍为历史 observed-data
+  development/resubstitution，只有 3 个 raw outer windows；不得把 seed/scenario/workflow 行当独立 cluster。
+- `OPEN / strong seed interaction`：full-SA/MAPPO completion 按 seed 为 `9,9,0`，signal-off-SA 为 `4,1,9`；
+  aggregate signal-on completion 更高但 continuity 更低，不能宣称稳定因果 benefit 或择优 seed。
+- `OPEN / collapsed capacity contrast`：`capacity_competition`(280 MB) 与 `shared_adapter_reuse_prepare`(360 MB) 的
+  39/39 配对动作与主指标完全一致，且 capacity rejection/eviction 均为 0；场景名不能冒充已兑现的容量压力证据。
+- `OPEN / raw checkpoint self-containment`：144 个 learned raw episode 的 embedded checkpoint metadata 是
+  in-memory override placeholder；当前可由 condition/seed→CSV SHA→checkpoint manifest→evaluation before/after hash
+  间接闭合，但单个 raw JSON 不能脱离包自证 checkpoint identity。
+- `OPEN / metric naming ambiguity`：`low_reuse_no_migration_negative` 中非零
+  `adapter_state_migration_overhead` 是无有效 prepare/migrate 时跨 RSU cold restart 的 reward penalty，实际 state
+  migration bytes/realized migration 为 0；论文表必须标注语义。
 - `OPEN / action expressiveness`：`crdcm_decision_v1` 仍复用五动作合同，不能直接选择任意 future critical-node object bundle 或多个候选 RSU；扩展需要新 action schema/执行事务/credit derivation。
 - `OPEN / structure realization`：48-episode fresh/untrained diagnostic 中 CRDCM SA-GHMAPPO 与 MAPPO 为 0/124 action disagreement。当前只证明相同状态已到达不同 encoder，尚未证明图结构形成不同或更优行为。
 - `OPEN / performance evidence`：没有新训练 checkpoint、多 seed、disjoint formal/holdout 或统计；任何 advantage/generalization claim 均为 `UNVERIFIED`。

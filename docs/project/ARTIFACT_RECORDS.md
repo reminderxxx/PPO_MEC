@@ -7,6 +7,27 @@
 
 ## 2026-09-28 policy decision diagnosis and CRDCM design
 
+## 2026-09-28 — CRDCM performance matrix v2 full run and independent review
+
+- Source run root：`artifacts/training/crdcm_performance_matrix_v2_20260928/`；status=`SUCCEEDED`，command manifest
+  SHA-256=`4e3faad1adcda29635916a41a8f89f43ae6f61b14250a39a37a3cf023d77399e`，source commit=
+  `4dc5adb6f6e436983745a0cf485f5221ba4caf0a`。
+- Source counts：12 train cells、768 episodes、7,872 actual training steps、192 updates、12 fixed endpoint
+  checkpoints；evaluation 156 raw episodes、1,612 actual steps、1,612 requests。总计 924 episodes、9,484 steps。
+- Independent review root：`artifacts/analysis/crdcm_performance_matrix_v2_independent_review_20260928/`；156 raw
+  episodes→CSV→aggregate 独立复算，producer row/aggregate mismatch 均为 0；source 1,056-file integrity、data/config/
+  runtime/window/checkpoint identity 全部通过。
+- Main descriptive completion：full-SA=`18/36`、signal-off-SA=`14/36`、full-MAPPO=`18/36`、full-PPO=
+  `27/36`、heuristic=`6/12`。full-SA 相对 signal-off completion 更高但 continuity 更低；不支持单向优势 claim。
+- Trace boundaries：full-SA/MAPPO seed completion=`9,9,0`，signal-off=`4,1,9`；280/360 MB capacity/shared
+  场景 39/39 配对动作与主指标相同，0 rejection/eviction；no-migration 非零 overhead 是 cold-start penalty，实际迁移
+  bytes=0。
+- Checkpoint：12/12 latest exact SHA 在评价前后不变；latest/update_0016 byte 不同但加载 payload 递归相等且
+  update_count=16。144 learned raw episodes 不含 self-contained checkpoint identity，当前通过 CSV/manifest 间接闭合。
+- Review metadata：reviewed_at=`2026-09-28T17:52:48.665343+08:00`，literature_cutoff=`2026-09-28`，target
+  venue=`IEEE Transactions on Mobile Computing (TMC)`，policy=`tmc_review_policy_v3_20260621`，evidence level=
+  `E3_REPRODUCED_OBSERVED_DATA_DEVELOPMENT_PILOT_NOT_HOLDOUT`，verdict=`Not TMC-ready`。
+
 - root：`artifacts/analysis/mechanism_policy_decision_diagnosis_v1_20260928/`；结构化摘要记录 12-unit/123-step
   action stream、mask、guard delta、v3 checkpoint path/SHA/load/update diff 与 fixed-input no-environment-step probe。
 - action stream：guard-on SA/MAPPO SHA=`7a7a135fea9d70397ae90a80846a4356f0d3350d215b1b920d0f4417dc81bcd9`；

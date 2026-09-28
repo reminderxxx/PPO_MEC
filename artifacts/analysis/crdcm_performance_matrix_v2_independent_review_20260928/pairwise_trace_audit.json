@@ -1,0 +1,541 @@
+{
+  "sa_vs_mappo": {
+    "pair_count": 36,
+    "action_sequence_equal_count": 24,
+    "field_difference_counts": {
+      "action_sequence": 12,
+      "request_failure_count": 12,
+      "workflow_continuity_rate": 12
+    },
+    "all_differences_confined_to_seed_1403": true,
+    "difference_rows": [
+      {
+        "seed": 1403,
+        "scenario_id": "ample_resource_negative",
+        "workflow_id": "j_3",
+        "changed_fields": [
+          "workflow_continuity_rate",
+          "request_failure_count",
+          "action_sequence"
+        ],
+        "sa_actions": "3|3|3|4|3|3|3|3|3",
+        "mappo_actions": "2|2|2|4|2|2|2|2|2",
+        "sa_failure": "cache_dependency_miss",
+        "mappo_failure": "cache_dependency_miss",
+        "sa_request_failures": 6,
+        "mappo_request_failures": 8
+      },
+      {
+        "seed": 1403,
+        "scenario_id": "ample_resource_negative",
+        "workflow_id": "j_8",
+        "changed_fields": [
+          "workflow_continuity_rate",
+          "request_failure_count",
+          "action_sequence"
+        ],
+        "sa_actions": "3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3",
+        "mappo_actions": "2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2",
+        "sa_failure": "cache_dependency_miss",
+        "mappo_failure": "cache_dependency_miss",
+        "sa_request_failures": 14,
+        "mappo_request_failures": 17
+      },
+      {
+        "seed": 1403,
+        "scenario_id": "ample_resource_negative",
+        "workflow_id": "j_15",
+        "changed_fields": [
+          "workflow_continuity_rate",
+          "request_failure_count",
+          "action_sequence"
+        ],
+        "sa_actions": "3|4|4|3|3",
+        "mappo_actions": "2|4|4|2|2",
+        "sa_failure": "cache_dependency_miss",
+        "mappo_failure": "cache_dependency_miss",
+        "sa_request_failures": 3,
+        "mappo_request_failures": 4
+      },
+      {
+        "seed": 1403,
+        "scenario_id": "capacity_competition",
+        "workflow_id": "j_3",
+        "changed_fields": [
+          "workflow_continuity_rate",
+          "request_failure_count",
+          "action_sequence"
+        ],
+        "sa_actions": "3|3|3|4|3|3|3|3|3",
+        "mappo_actions": "2|2|2|4|2|2|2|2|2",
+        "sa_failure": "cache_dependency_miss",
+        "mappo_failure": "cache_dependency_miss",
+        "sa_request_failures": 5,
+        "mappo_request_failures": 8
+      },
+      {
+        "seed": 1403,
+        "scenario_id": "capacity_competition",
+        "workflow_id": "j_8",
+        "changed_fields": [
+          "workflow_continuity_rate",
+          "request_failure_count",
+          "action_sequence"
+        ],
+        "sa_actions": "3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3",
+        "mappo_actions": "2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2",
+        "sa_failure": "cache_dependency_miss",
+        "mappo_failure": "cache_dependency_miss",
+        "sa_request_failures": 9,
+        "mappo_request_failures": 17
+      },
+      {
+        "seed": 1403,
+        "scenario_id": "capacity_competition",
+        "workflow_id": "j_15",
+        "changed_fields": [
+          "workflow_continuity_rate",
+          "request_failure_count",
+          "action_sequence"
+        ],
+        "sa_actions": "3|4|4|3|3",
+        "mappo_actions": "2|4|4|2|2",
+        "sa_failure": "cache_dependency_miss",
+        "mappo_failure": "cache_dependency_miss",
+        "sa_request_failures": 1,
+        "mappo_request_failures": 3
+      },
+      {
+        "seed": 1403,
+        "scenario_id": "low_reuse_no_migration_negative",
+        "workflow_id": "j_3",
+        "changed_fields": [
+          "workflow_continuity_rate",
+          "request_failure_count",
+          "action_sequence"
+        ],
+        "sa_actions": "3|3|3|4|3|3|3|3|3",
+        "mappo_actions": "2|2|2|4|2|2|2|2|2",
+        "sa_failure": "handoff_unprepared",
+        "mappo_failure": "handoff_unprepared",
+        "sa_request_failures": 7,
+        "mappo_request_failures": 9
+      },
+      {
+        "seed": 1403,
+        "scenario_id": "low_reuse_no_migration_negative",
+        "workflow_id": "j_8",
+        "changed_fields": [
+          "workflow_continuity_rate",
+          "request_failure_count",
+          "action_sequence"
+        ],
+        "sa_actions": "3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3",
+        "mappo_actions": "2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2",
+        "sa_failure": "cache_dependency_miss",
+        "mappo_failure": "cache_dependency_miss",
+        "sa_request_failures": 14,
+        "mappo_request_failures": 17
+      },
+      {
+        "seed": 1403,
+        "scenario_id": "low_reuse_no_migration_negative",
+        "workflow_id": "j_15",
+        "changed_fields": [
+          "workflow_continuity_rate",
+          "request_failure_count",
+          "action_sequence"
+        ],
+        "sa_actions": "3|4|4|3|3",
+        "mappo_actions": "2|4|4|2|2",
+        "sa_failure": "handoff_unprepared",
+        "mappo_failure": "handoff_unprepared",
+        "sa_request_failures": 4,
+        "mappo_request_failures": 5
+      },
+      {
+        "seed": 1403,
+        "scenario_id": "shared_adapter_reuse_prepare",
+        "workflow_id": "j_3",
+        "changed_fields": [
+          "workflow_continuity_rate",
+          "request_failure_count",
+          "action_sequence"
+        ],
+        "sa_actions": "3|3|3|4|3|3|3|3|3",
+        "mappo_actions": "2|2|2|4|2|2|2|2|2",
+        "sa_failure": "cache_dependency_miss",
+        "mappo_failure": "cache_dependency_miss",
+        "sa_request_failures": 5,
+        "mappo_request_failures": 8
+      },
+      {
+        "seed": 1403,
+        "scenario_id": "shared_adapter_reuse_prepare",
+        "workflow_id": "j_8",
+        "changed_fields": [
+          "workflow_continuity_rate",
+          "request_failure_count",
+          "action_sequence"
+        ],
+        "sa_actions": "3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3|3",
+        "mappo_actions": "2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2|2",
+        "sa_failure": "cache_dependency_miss",
+        "mappo_failure": "cache_dependency_miss",
+        "sa_request_failures": 9,
+        "mappo_request_failures": 17
+      },
+      {
+        "seed": 1403,
+        "scenario_id": "shared_adapter_reuse_prepare",
+        "workflow_id": "j_15",
+        "changed_fields": [
+          "workflow_continuity_rate",
+          "request_failure_count",
+          "action_sequence"
+        ],
+        "sa_actions": "3|4|4|3|3",
+        "mappo_actions": "2|4|4|2|2",
+        "sa_failure": "cache_dependency_miss",
+        "mappo_failure": "cache_dependency_miss",
+        "sa_request_failures": 1,
+        "mappo_request_failures": 3
+      }
+    ]
+  },
+  "capacity_vs_shared": {
+    "pair_count": 39,
+    "normalized_request_schedule_equal_count": 39,
+    "exact_metric_and_action_row_count": 39,
+    "capacity_rejection_count_across_both_scenarios": 0,
+    "capacity_competition_eviction_count": 0,
+    "shared_adapter_reuse_prepare_eviction_count": 0,
+    "capacity_competition_max_occupancy_rate": 0.985714,
+    "shared_adapter_reuse_prepare_max_occupancy_rate": 0.766667,
+    "config_difference": "capacity_mb=280 versus 360; migration and repeated_reuse binding are identical",
+    "scientific_interpretation": "paired capacity treatment whose observed contrast collapsed; not extra independent support",
+    "pairs": [
+      {
+        "controller": "crdcm_critical_path_heuristic",
+        "workflow_id": "j_3",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+        "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      },
+      {
+        "controller": "crdcm_critical_path_heuristic",
+        "workflow_id": "j_8",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+        "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      },
+      {
+        "controller": "crdcm_critical_path_heuristic",
+        "workflow_id": "j_15",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+        "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      },
+      {
+        "controller": "crdcm_full_mappo/seed_1401",
+        "workflow_id": "j_3",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+        "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      },
+      {
+        "controller": "crdcm_full_mappo/seed_1401",
+        "workflow_id": "j_8",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+        "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      },
+      {
+        "controller": "crdcm_full_mappo/seed_1401",
+        "workflow_id": "j_15",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+        "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      },
+      {
+        "controller": "crdcm_full_mappo/seed_1402",
+        "workflow_id": "j_3",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+        "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      },
+      {
+        "controller": "crdcm_full_mappo/seed_1402",
+        "workflow_id": "j_8",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+        "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      },
+      {
+        "controller": "crdcm_full_mappo/seed_1402",
+        "workflow_id": "j_15",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+        "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      },
+      {
+        "controller": "crdcm_full_mappo/seed_1403",
+        "workflow_id": "j_3",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+        "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      },
+      {
+        "controller": "crdcm_full_mappo/seed_1403",
+        "workflow_id": "j_8",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+        "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      },
+      {
+        "controller": "crdcm_full_mappo/seed_1403",
+        "workflow_id": "j_15",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+        "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      },
+      {
+        "controller": "crdcm_full_ppo/seed_1401",
+        "workflow_id": "j_3",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+        "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      },
+      {
+        "controller": "crdcm_full_ppo/seed_1401",
+        "workflow_id": "j_8",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+        "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      },
+      {
+        "controller": "crdcm_full_ppo/seed_1401",
+        "workflow_id": "j_15",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+        "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      },
+      {
+        "controller": "crdcm_full_ppo/seed_1402",
+        "workflow_id": "j_3",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+        "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      },
+      {
+        "controller": "crdcm_full_ppo/seed_1402",
+        "workflow_id": "j_8",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+        "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      },
+      {
+        "controller": "crdcm_full_ppo/seed_1402",
+        "workflow_id": "j_15",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+        "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      },
+      {
+        "controller": "crdcm_full_ppo/seed_1403",
+        "workflow_id": "j_3",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+        "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      },
+      {
+        "controller": "crdcm_full_ppo/seed_1403",
+        "workflow_id": "j_8",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+        "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      },
+      {
+        "controller": "crdcm_full_ppo/seed_1403",
+        "workflow_id": "j_15",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+        "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      },
+      {
+        "controller": "crdcm_full_sa/seed_1401",
+        "workflow_id": "j_3",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+        "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      },
+      {
+        "controller": "crdcm_full_sa/seed_1401",
+        "workflow_id": "j_8",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+        "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      },
+      {
+        "controller": "crdcm_full_sa/seed_1401",
+        "workflow_id": "j_15",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+        "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      },
+      {
+        "controller": "crdcm_full_sa/seed_1402",
+        "workflow_id": "j_3",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+        "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      },
+      {
+        "controller": "crdcm_full_sa/seed_1402",
+        "workflow_id": "j_8",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+        "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      },
+      {
+        "controller": "crdcm_full_sa/seed_1402",
+        "workflow_id": "j_15",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+        "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      },
+      {
+        "controller": "crdcm_full_sa/seed_1403",
+        "workflow_id": "j_3",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+        "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      },
+      {
+        "controller": "crdcm_full_sa/seed_1403",
+        "workflow_id": "j_8",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+        "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      },
+      {
+        "controller": "crdcm_full_sa/seed_1403",
+        "workflow_id": "j_15",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+        "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      },
+      {
+        "controller": "crdcm_signal_off_sa/seed_1401",
+        "workflow_id": "j_3",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+        "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      },
+      {
+        "controller": "crdcm_signal_off_sa/seed_1401",
+        "workflow_id": "j_8",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+        "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      },
+      {
+        "controller": "crdcm_signal_off_sa/seed_1401",
+        "workflow_id": "j_15",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+        "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      },
+      {
+        "controller": "crdcm_signal_off_sa/seed_1402",
+        "workflow_id": "j_3",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+        "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      },
+      {
+        "controller": "crdcm_signal_off_sa/seed_1402",
+        "workflow_id": "j_8",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+        "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      },
+      {
+        "controller": "crdcm_signal_off_sa/seed_1402",
+        "workflow_id": "j_15",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+        "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      },
+      {
+        "controller": "crdcm_signal_off_sa/seed_1403",
+        "workflow_id": "j_3",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "4a941a95fbc05b864c50a7ac94f014e02de4b2972efa1aebd94e89c858fd8776",
+        "shared_exposure_fingerprint": "3979b030cf733c9753930a80bd3b9e10fc78e1372a14cee07008001311f2006c"
+      },
+      {
+        "controller": "crdcm_signal_off_sa/seed_1403",
+        "workflow_id": "j_8",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "86f23c70988f110d0f5749b8a6039c71807127fd84bc421f3cc1290be73862ab",
+        "shared_exposure_fingerprint": "734dfd2ffe51ec5e71510e68d41facfa63bf34cb351a146d90acb75f1e5e0491"
+      },
+      {
+        "controller": "crdcm_signal_off_sa/seed_1403",
+        "workflow_id": "j_15",
+        "normalized_request_schedule_equal": true,
+        "metric_action_changed_fields": [],
+        "capacity_exposure_fingerprint": "46b3f989b924cdbcbbb3d823fa0645f0e8c5e35e9d6edb44d3284acc124f27f4",
+        "shared_exposure_fingerprint": "20d889a0541a65bd0d5f685cefa25792ffa424fe362b1026c56707154266f2be"
+      }
+    ]
+  },
+  "low_reuse_no_migration": {
+    "episode_count": 39,
+    "positive_migration_overhead_step_count": 26,
+    "actual_state_migration_size_mb": 0.0,
+    "realized_migration_step_count": 0,
+    "suppressed_prepare_step_count": 22,
+    "failed_handoff_cold_start_step_count": 26,
+    "interpretation": "the nonzero field is the environment migration-overhead penalty for cross-RSU transfer without effective prepare/migrate, not realized workflow-state migration bytes"
+  }
+}

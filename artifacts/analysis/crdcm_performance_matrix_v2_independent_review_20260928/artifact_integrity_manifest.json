@@ -1,0 +1,48 @@
+{
+  "artifact_integrity_manifest_version": "1.0.0",
+  "self_excluding": true,
+  "status": "pass",
+  "file_count": 8,
+  "files": [
+    {
+      "path": "action_failure_summary.csv",
+      "size_bytes": 1368,
+      "sha256": "34c7ebc776417a7e5b3de0afcdd267b74692983ffe5d13bd310cd53362d80a1d"
+    },
+    {
+      "path": "condition_aggregate.csv",
+      "size_bytes": 1396,
+      "sha256": "e1c4baaf14c6dff66ea967aacf4611692223a2edafdbe238850d9eb996bdadea"
+    },
+    {
+      "path": "condition_scenario_aggregate.csv",
+      "size_bytes": 4326,
+      "sha256": "0381466ca29b40ef72b7a78886c1c5e8117b8a088107bb8ee1167b98c8c75e8c"
+    },
+    {
+      "path": "condition_seed_aggregate.csv",
+      "size_bytes": 2806,
+      "sha256": "e2d63261603b2f18d589b291c85a441dd2abeb284bd1529df3c542f3735b95e1"
+    },
+    {
+      "path": "independent_episode_rows.csv",
+      "size_bytes": 111774,
+      "sha256": "75b44ce5b36716974148e6644544ebf335fcd22bbe7a0f1ebdf3affb43e8aff8"
+    },
+    {
+      "path": "independent_review.json",
+      "size_bytes": 43030,
+      "sha256": "efd1afefe028c57b10c80b9edfac16ee62eacb8c159cf108057dc6ed288e6d3c"
+    },
+    {
+      "path": "pairwise_trace_audit.json",
+      "size_bytes": 23691,
+      "sha256": "366ef3af2c355b7a0346d664de317d2dd28b3b7cca249da8ddc8bb2ed1c75e7b"
+    },
+    {
+      "path": "training_checkpoint_audit.csv",
+      "size_bytes": 11315,
+      "sha256": "fc26a87ceefde9be12c29fc513cd601631166a41078dc3fbae3bbb2cfb04c6cf"
+    }
+  ]
+}

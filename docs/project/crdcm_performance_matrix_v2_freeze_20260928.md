@@ -1,5 +1,11 @@
 # CRDCM performance matrix v2：科学条件、执行合同与实现 smoke
 
+> **2026-09-28 execution addendum**：中央后续已独立授权并完成唯一一次 full observed-data development run；
+> `artifacts/training/crdcm_performance_matrix_v2_20260928/` 为 `SUCCEEDED`，共 768 training episodes、156
+> evaluation episodes。下文“未授权/未执行”仅描述本文件最初冻结与 smoke 时点。独立复算、负结果、Pareto 与 claim
+> 边界以 `docs/project/crdcm_performance_matrix_v2_independent_review_20260928.md` 为准；当前仍非 formal/holdout，
+> novelty、稳定优势、独立泛化和 paper-ready 仍为 `UNVERIFIED`。
+
 - `reviewed_at`: `2026-09-28`
 - `literature_cutoff`: `2026-09-28`（本轮没有新增网页检索）
 - `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`
