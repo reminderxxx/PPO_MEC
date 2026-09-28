@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `driving_workflow_pilot_readiness_20260929.md`：模型/12图资源定位、16调用计划和实验前缺口；不宣称真实推理已完成
+
 - `drivelm_workflow_preview_20260929.md`：9个驾驶工作流派生预览及参考答案隔离，接口通过但未执行模型
 
 - `drivelm_sample_qualification_20260929.md`：官方 demo 字节/结构核验；790 QA 关系字段为空，区分驾驶语义与派生执行 DAG

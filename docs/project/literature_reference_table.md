@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-09-28
+更新日期：2026-09-29
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -223,6 +223,13 @@
 | workflow workload realism | [WfCommons: A framework for enabling scientific workflow research and development](https://doi.org/10.1016/j.future.2021.09.043) | Future Generation Computer Systems, 128:16–27, 2022；出版社与项目书目核验 | 从真实 workflow 实例分析并构建合成 workload，评价结构及模拟执行的真实性。 | 提供工作负载校准方法参考，不提供车载 adapter 请求证据。NGSIM 与 Alibaba 的组合须明确为 trace-driven simulation；模型映射、状态大小及迁移代价仍需独立校准，不能由两种真实 trace 自动推出联合工作负载真实。 | Evaluation methodology / limitations；方法参考，不标为顶刊或 A 会核心贡献依据。 |
 
 ## 写作 Claim 模板
+
+### 2026-09-29 多模态小实验模型依据
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| 轻量视觉语言模型 | [SmolVLM: Redefining small and efficient multimodal models](https://arxiv.org/abs/2504.05299) | 2025 arXiv；正式venue待核验 | 小模型、视觉token与内存效率的公开模型依据 | 仅为离线驾驶任务候选，未证明驾驶质量、RSU开销或adapter收益，不作为本项目创新 | 应用模型/实验设置 |
+| 多模态基础模型 | [Qwen2.5-VL Technical Report](https://arxiv.org/abs/2502.13923) | 2025 arXiv；正式venue待核验 | 多模态理解、动态分辨率与定位能力及多规模模型线索 | 保留后备，不将通用模型能力等同车辆工作流实测或系统贡献；未下载运行 | 后备模型/方法边界 |
 
 ### 2026-09-28 车联网AI数据复用检索增补
 

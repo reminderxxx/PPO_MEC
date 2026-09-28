@@ -2,6 +2,9 @@
 
 ## 数据候选只读结构审计
 
+- `scripts/prepare_drivelm_pilot.py`：复用标注审计，生成匹配两臂元数据计划与隔离前驱payload；不进入旧runtime。
+- `tests/test_drivelm_pilot_plan.py`：预算、六摄像头、来源/plan/task漂移、跨臂/帧及参考答案隔离。
+
 - 同一工具的 `build_preview` 仅派生引用模板；`build_stage_input` 隔离参考A并检查前驱输入，不调用模型。
 - `tests/test_drivelm_workflow_preview.py`覆盖派生标签、来源漂移、空/未来输出及答案隔离。
 

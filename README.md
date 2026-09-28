@@ -5,6 +5,9 @@
 
 # PPO_MEC
 
+驾驶AI小实验准备入口：`scripts/prepare_drivelm_pilot.py`，
+[资源、预算与未闭环项](docs/project/driving_workflow_pilot_readiness_20260929.md)；仅生成计划，不启动模型。
+
 驾驶 AI 数据候选的最新小样本核验见 [DriveLM qualification](docs/project/drivelm_sample_qualification_20260929.md)；
 只读入口 `scripts/audit_drivelm_workflow_sample.py` 不生成训练数据或执行实验。
 追加 `--preview` 可生成明确标为派生的工作流引用；[接口与防泄漏边界](docs/project/drivelm_workflow_preview_20260929.md)。

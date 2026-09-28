@@ -7,6 +7,10 @@
 
 ## DriveLM 标注只读资格检查（2026-09-29）
 
+小实验计划：`.venv/bin/python -B scripts/prepare_drivelm_pilot.py --input <sample.json> --expected-sha256 <source_sha>`，
+或stdin `--input -`。只输出元数据，最多16个任务，不下载/推理；资源说明见
+`driving_workflow_pilot_readiness_20260929.md`及`configs/experiment/drivelm_pilot_resources.json`。
+
 可追加 `--preview` 输出派生工作流引用（不含原问答）。默认审计不变，模型/图像仍不加载。
 源字节hash、派生边与输入组装限制见 `drivelm_workflow_preview_20260929.md`；不能直接送正式runtime。
 

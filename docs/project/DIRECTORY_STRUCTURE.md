@@ -1,6 +1,8 @@
 ﻿# Directory Structure
 
-新增数据资格工具：`scripts/audit_drivelm_workflow_sample.py`，测试位于
+小实验计划见`scripts/prepare_drivelm_pilot.py`、`tests/test_drivelm_pilot_plan.py`，
+公开资源元数据为`configs/experiment/drivelm_pilot_resources.json`。
+数据资格工具：`scripts/audit_drivelm_workflow_sample.py`，测试为
 `tests/test_drivelm_workflow_preview.py`（派生预览与输入组装）及
 `tests/test_drivelm_workflow_sample_audit.py`，证据说明位于
 `docs/project/drivelm_sample_qualification_20260929.md`；不保存原始标注或模型。

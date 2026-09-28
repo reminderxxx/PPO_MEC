@@ -7,6 +7,10 @@
 
 ## 2026-09-29: DriveLM 真实 demo 标注资格核验
 
+实验准备追加：`driving_workflow_pilot_readiness_20260929.md`，已定位两帧12图（1,287,809 bytes），
+无需大图像包；16调用计划工具及48项测试通过。SmolVLM约1GB候选、隔离环境/许可待确认，
+未下载图像/模型、未真实推理。状态为PLAN_VALIDATED_RESOURCE_SETUP_PENDING，不是实验已就绪。
+
 后续实现：`--preview`生成9个四阶段模板、36节点、54条明确标注的研究者派生边，保留790问题引用。
 36次下游输入组装通过；测试输出不冒充模型推理，参考A不进入payload；19项回归通过。
 详见 `drivelm_workflow_preview_20260929.md`。真实模型/图像、质量与成本未闭环，runtime仍禁用。

@@ -1,0 +1,35 @@
+{
+  "status": "METADATA_ONLY_NOT_DOWNLOAD_AUTHORIZATION",
+  "source_repository": "OpenDriveLab/DriveLM",
+  "source_revision": "1de72a74b257e5373400fa68239e99bd5d20580a",
+  "image_prefix": "challenge/llama_adapter_v2_multimodal7b/data/nuscenes/samples/",
+  "annotation_path": "challenge/data/train_sample.json",
+  "annotation_bytes": 402384,
+  "annotation_sha256": "fc306fb911516275513d34c5c4b0dca308b7edea30906b1278a598a7e319658e",
+  "selected_image_bytes": 1287809,
+  "image_content_sha256_status": "pending_download_not_inferred_from_git_blob_sha1",
+  "image_license_status": "nuscenes_terms_owner_confirmation_pending",
+  "model_weight_metadata": {
+    "repository": "HuggingFaceTB/SmolVLM-500M-Instruct",
+    "revision": "a7da5b986cb59b408707209984f360a5f4ad7e47",
+    "path": "model.safetensors",
+    "bytes": 1015025832,
+    "sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+    "evidence": "pinned_revision_lfs_pointer_only_payload_not_downloaded",
+    "minimum_runtime_file_total_bytes": null
+  },
+  "images": [
+    {"path":"CAM_FRONT/n015-2018-08-03-15-00-36+0800__CAM_FRONT__1533280036162460.jpg","bytes":118080,"git_blob_sha1":"d2a6d82078389c747cfe637b45d9660569b8adbd"},
+    {"path":"CAM_FRONT_LEFT/n015-2018-08-03-15-00-36+0800__CAM_FRONT_LEFT__1533280036154844.jpg","bytes":137524,"git_blob_sha1":"db2f183d9590937b2dde6dd877a9691e95e1f623"},
+    {"path":"CAM_FRONT_RIGHT/n015-2018-08-03-15-00-36+0800__CAM_FRONT_RIGHT__1533280036170339.jpg","bytes":96651,"git_blob_sha1":"b77cddb9504794e7292c5a471cec2e6ab760a403"},
+    {"path":"CAM_BACK/n015-2018-08-03-15-00-36+0800__CAM_BACK__1533280036187525.jpg","bytes":103085,"git_blob_sha1":"6f5c60f903e9cbfc89ea7137f52688d665a7b80d"},
+    {"path":"CAM_BACK_LEFT/n015-2018-08-03-15-00-36+0800__CAM_BACK_LEFT__1533280036197423.jpg","bytes":162410,"git_blob_sha1":"3f4caae61bdeb2e8db2d68329f182e2e3f460369"},
+    {"path":"CAM_BACK_RIGHT/n015-2018-08-03-15-00-36+0800__CAM_BACK_RIGHT__1533280036177893.jpg","bytes":106441,"git_blob_sha1":"b2b5244f125adb3cecd7eecb577c21663a7a92e4"},
+    {"path":"CAM_FRONT/n008-2018-09-18-13-10-39-0400__CAM_FRONT__1537291010612404.jpg","bytes":79161,"git_blob_sha1":"9152824c2a966f9b64e32fcfdacb0ea88f9092c8"},
+    {"path":"CAM_FRONT_LEFT/n008-2018-09-18-13-10-39-0400__CAM_FRONT_LEFT__1537291010604799.jpg","bytes":81158,"git_blob_sha1":"28f2ca13e0239105a8fe72c564f34c7a389fd8bb"},
+    {"path":"CAM_FRONT_RIGHT/n008-2018-09-18-13-10-39-0400__CAM_FRONT_RIGHT__1537291010620482.jpg","bytes":82907,"git_blob_sha1":"8809818b4cfbb5f89f38ffcc60e703b489446873"},
+    {"path":"CAM_BACK/n008-2018-09-18-13-10-39-0400__CAM_BACK__1537291010637558.jpg","bytes":119964,"git_blob_sha1":"2b6aeeb609cffac1d40df7dfa96f203690c6835d"},
+    {"path":"CAM_BACK_LEFT/n008-2018-09-18-13-10-39-0400__CAM_BACK_LEFT__1537291010647405.jpg","bytes":91120,"git_blob_sha1":"fa4562b12957ccd310ba1b98a4ed6347a4fd1a38"},
+    {"path":"CAM_BACK_RIGHT/n008-2018-09-18-13-10-39-0400__CAM_BACK_RIGHT__1537291010628113.jpg","bytes":109308,"git_blob_sha1":"132da55befb298446f6140bb99c180635c20ce60"}
+  ]
+}
