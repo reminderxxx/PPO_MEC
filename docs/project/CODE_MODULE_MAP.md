@@ -8,10 +8,16 @@
 - `src/evaluators/main_results_support.py`：向受控 episode 透传 mechanism profile，并记录四臂身份；workflow
   builder 可显式选择 `semantic_ai_service`。
 - `scripts/run_mechanism_factorial_pilot.py`：构造 matched catalogs、冻结 policy-neutral request exposure，输出
-  raw episode 与四臂小表。
+  raw episode 与四臂小表；可读取冻结 window plan，study version 来自配置。
+- `scripts/run_mechanism_completion_diagnostic.py`：在同一冻结 workload 上对比 12/20-step horizon，分别记录
+  right-censored、noncensored failure 与 request failure；输出 Git/config/source/window provenance。
+- `src/agents/handoff_first_feasibility_agent.py`：只用于 completion feasibility 的无学习固定规则；读取相同 semantic
+  state/action mask，优先准备 handoff target adapter 再迁移状态，不注册为 live/paper baseline。
+- `src/evaluators/main_results_support.py`：`agent_override` 允许诊断入口注入固定规则而不污染 live registry。
 - `scripts/train_algo_pool_real_sample.py`：非正式 opt-in ON/ON retraining；拒绝与 formal protocol 混用。
-- `scripts/run_mechanism_algorithm_training.py`：create-only 后台 launcher/supervisor，冻结双算法 argv、日志、PID、
-  source hashes 和 exit receipt；不调参、不重试。
+- `scripts/run_mechanism_algorithm_training.py`：create-only 后台 launcher/supervisor，保留精确 venv 入口并执行
+  dependency/identity preflight；实际 RUNNING state 握手后才报告启动成功，冻结双算法 argv、预算、日志、PID、
+  source hashes 和终态 receipt；不调参、不重试。
 - `tests/test_mechanism_factorial_pilot.py`：catalog 等容量、migration suppression、legacy no-op、原子成组淘汰、
   runtime 初态与 matched command manifest 回归。
 

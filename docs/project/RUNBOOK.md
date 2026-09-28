@@ -7,27 +7,37 @@
 
 ## Controlled mechanism factorial supplement
 
-四臂小表（拒绝覆盖已有目录）：
+20-step 四臂小表（拒绝覆盖已有目录）：
 
 ```bash
 /Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_mechanism_factorial_pilot.py \
-  --config configs/experiment/mechanism_factorial_pilot_v1.yaml \
+  --config configs/experiment/mechanism_factorial_pilot_v2.yaml \
   --data_root /Users/howen/Projects/PPO_MEC \
   --output_dir artifacts/analysis/<new_mechanism_pilot_run_id>
 ```
 
-冻结双算法后台训练（launcher 返回后不轮询；只在后续任务一次性读取 receipt）：
+12/20-step completion 诊断（handoff-first 仅为 feasibility rule，不是 baseline）：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_mechanism_completion_diagnostic.py \
+  --config configs/experiment/mechanism_completion_diagnostic_v1.yaml \
+  --data-root /Users/howen/Projects/PPO_MEC \
+  --output-dir artifacts/analysis/<new_completion_diagnostic_run_id>
+```
+
+冻结双算法后台训练 v2（launcher 只有在 venv preflight 和实际 RUNNING state 均通过后才返回 0；返回后不轮询）：
 
 ```bash
 /Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_mechanism_algorithm_training.py launch \
-  --config configs/experiment/mechanism_algorithm_retraining_v1.yaml \
+  --config configs/experiment/mechanism_algorithm_retraining_v2.yaml \
   --data-root /Users/howen/Projects/PPO_MEC \
   --output-root artifacts/training/<new_mechanism_training_run_id>
 ```
 
-只有 `completion_receipt.json.status=SUCCEEDED`、`return_code=0` 且两个 child 都完成，才可称训练执行完成。即使
-如此，该单 seed、observed-data supplement 也不构成算法优越性或 paper-ready 证据。禁止重用首轮 invalid pilot、
-旧 checkpoint 或已消费 holdout。
+只有 `launch_receipt.json.status=RUNNING` 且 `startup_confirmed=true` 才可称启动成功；只有后续
+`completion_receipt.json.status=SUCCEEDED`、`return_code=0` 且两个 child 都完成，才可称训练执行完成。即使如此，
+该单 seed、observed-data supplement 也不构成算法优越性或 paper-ready 证据。禁止重用首轮 invalid pilot、旧
+checkpoint 或已消费 holdout。`mechanism_algorithm_retraining_v1_20260928` 已确认在训练前启动失败，不得原地 retry。
 
 ## Protocol 2.9 与未来 G14C v16
 

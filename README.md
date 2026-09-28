@@ -5,13 +5,14 @@
 
 # PPO_MEC
 
-2026-09-28 新增 base sharing × workflow-state migration 的 2×2 受控补充入口：
+2026-09-28 新增 base sharing × workflow-state migration 的 2×2 受控补充与 completion 诊断入口：
 `scripts/run_mechanism_factorial_pilot.py` 在真实 NGSIM mobility 与 Alibaba DAG 结构上构造多 adapter、共享/复制
-base 和 360 MB 绑定容量；`scripts/run_mechanism_algorithm_training.py` 以固定命令、日志、PID 和 exit receipt
-启动 SA-GHMAPPO/MAPPO 的 matched 非正式重训练。修正版小表观察到 base sharing 的大幅传输节省和 migration 的
-小幅 readiness/continuity 增益，但所有 8 个 episode completion 为 0，不能支持算法优越、独立泛化或 paper-ready
-结论。合同、结果与 claim boundary 见
-`docs/project/mechanism_factorial_supplement_20260928.md`。
+base 和 360 MB 绑定容量；20-step、3-window/4-workflow 复制观察到 base sharing 的大幅传输节省，以及 migration
+的描述性 completion/readiness 增益和成本 trade-off。诊断确认旧 12-step 结果含 17-node DAG 的结构性右截断，
+但 20-step 下仍有真实请求失败。旧 retraining v1 因 venv symlink 被解析为系统 Python 而在训练前失败；runner v2
+加入精确解释器 preflight、实际 state 握手和失败 receipt，并冻结 SA-GHMAPPO/MAPPO 各 64 episodes、总计最多
+2,560 steps 的单次非正式训练。以上均不能支持算法优越、独立泛化或 paper-ready 结论。合同、结果与 claim
+boundary 见 `docs/project/mechanism_factorial_completion_and_launch_repair_20260928.md`。
 
 G14R18 已关闭正式 checkpoint provenance envelope 与共享 training identity projection 的接口错配，并冻结唯一
 live Protocol `2.9.0` 与 Readiness v21=`READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL`。完整 companion 保留

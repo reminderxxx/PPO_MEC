@@ -7,14 +7,17 @@
 
 ## 2026-09-28: 受控机制补充的外部有效性与 completion 缺口（OPEN）
 
-- 四臂 pilot 只覆盖 1 个 observed-data window、2 个 workflow；不是独立 outer-cluster 统计，也未做显著性检验。
-- 8 个 episode completion 全为 0，当前只能解释 full-service-ready/continuity 与 transfer/backhaul trade-off，不能
-  宣称端到端 workflow 改善。
+- canonical 四臂 pilot 只覆盖 3 个预选 observed-data windows、4 个 workflows；不是独立 test，也只有 3 个 outer
+  clusters，未做层级 CI 或 Holm 检验。
+- 12-step pilot 的 completion=0 部分来自 17-node DAG 的结构性右截断。20-step 诊断消除右截断且出现非零完成，
+  但 popularity 仍有 8/12 noncensored failures；不能把失败全归因于 horizon，也不能宣称统计显著的端到端改善。
 - adapter/base 大小、semantic service labels、360 MB 容量和 20 MB state payload 是受控参数，不是真实 LoRA
   paging/runtime trace。NGSIM+Alibaba 来源真实不等于机制参数具有外部有效性。
 - matched retraining 只有 seed 1401，属于学习链路筛查；不得做算法优越性、generalization 或 paper-ready claim。
   新独立数据未建立，旧已消费 holdout 仍禁止重开。
 - 已解决的工程风险：非共享 base 不再继承不可淘汰语义；首轮受影响 artifact 已显式 invalid，不得引用数值。
+- 已解决的启动风险：v1 launcher 把 venv symlink 解引用为系统 Python 并在 `import yaml` 失败；v1 训练为 0。
+  runner v2 保留精确 venv 入口、执行 dependency/identity preflight，并只在实际 state 握手后报告 `RUNNING`。
 
 ## 2026-09-28: 核心机制机会、因果消融与独立测试缺口（OPEN）
 

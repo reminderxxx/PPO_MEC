@@ -5,16 +5,33 @@
 
 # Artifact Records
 
-## 2026-09-28 mechanism factorial controlled supplement
+## 2026-09-28 mechanism factorial completion and launch repair
+
+- canonical 20-step pilot：`artifacts/analysis/mechanism_factorial_pilot_v2_20260928_v2/`，含 48 个 raw episodes、
+  `episode_results.csv`、`four_arm_performance.csv` 和 `completion_receipt.json`；3 个冻结窗口、4 workflows、4 臂，
+  Git commit=`da001e7553bdb35403cc5bce894af6e9fdc007d8`，scope 不是 holdout/formal。
+- completion diagnostic：`artifacts/analysis/mechanism_completion_diagnostic_v1_20260928_v2/`，含 48 个 raw episodes、
+  `diagnostic_rows.csv`、`diagnostic_aggregate.csv` 和带 Git/config/source/window provenance 的 receipt。20-step 下
+  right-censored 为 0，popularity 完成 4/12，但 noncensored failed 仍为 8/12。
+- v1 background failure：`artifacts/training/mechanism_algorithm_retraining_v1_20260928/`；原 PID `24188` 已退出，
+  `outer.stderr.log` 为 `ModuleNotFoundError: No module named 'yaml'`，0 episode/update/checkpoint。新增
+  `startup_failure_audit.json` 后旧目录封存，不得原地 retry 或引用为 running/completed。
+- v2 background root：`artifacts/training/mechanism_algorithm_retraining_v2_20260928/`；启动和最终状态只看
+  `launch_receipt.json`、`state.json`、`completion_receipt.json`。固定预算为两个算法各 64 episodes、max_steps=20、
+  seed 1401、总上限 2,560 steps；不自动 retry。
+- review metadata：reviewed_at=`2026-09-28T08:20:11+08:00`，literature_cutoff=`2026-09-28`，target venue=
+  `IEEE TMC`，policy=`tmc_review_policy_v3_20260621`，implementation commit=`da001e7`，evidence level=
+  `E1_CONTROLLED_OBSERVED_DATA_DIAGNOSTIC_NOT_HOLDOUT`。
+
+## 2026-09-28 mechanism factorial controlled supplement（historical v1）
 
 - valid pilot：`artifacts/analysis/mechanism_factorial_pilot_v1_20260928_v2/`，含 8 个 raw episode、
   `episode_results.csv`、`four_arm_performance.csv`、selected windows 与 completion receipt；scope 为
   `observed_data_controlled_supplement_not_holdout`。
 - invalid pilot：`artifacts/analysis/mechanism_factorial_pilot_v1_20260928/`；`invalidity_receipt.json` 记录非共享
   exclusive base 继承 pinned 导致的工程无效，目录内性能值禁止使用。
-- background retraining：`artifacts/training/mechanism_algorithm_retraining_v1_20260928/`；启动后应包含
-  `command_manifest.json`、`launch_receipt.json`、`state.json`、outer/agent stdout/stderr 与最终
-  `completion_receipt.json`。receipt 是运行状态权威，不从日志尾部猜测完成。
+- background retraining：`artifacts/training/mechanism_algorithm_retraining_v1_20260928/`；后续审计已确认启动失败，
+  以新增 `startup_failure_audit.json` 为权威；该条历史计划不再表示任务处于运行状态。
 - review metadata：reviewed_at=`2026-09-28T08:00:17+08:00`，literature_cutoff=`2026-09-28`，target venue=
   `IEEE TMC`，policy=`tmc_review_policy_v3_20260621`，implementation commit=`97e24a6`，evidence level=
   `E1_CONTROLLED_OBSERVED_DATA_PILOT_NOT_HOLDOUT`。

@@ -5,19 +5,25 @@
 
 ﻿# Progress
 
-## 2026-09-28: base sharing × workflow-state migration 四臂补充与 matched retraining 冻结
+## 2026-09-28: completion 诊断、20-step 四臂复制与 matched retraining v2 启动资格
 
 - 新增 opt-in `controlled_mechanism_factorial_v1`，历史环境无 profile 时语义不变。四臂使用真实 NGSIM mobility、
   Alibaba DAG 结构、`semantic_ai_service` 多 adapter、相同 220 MB 初始逻辑服务和 360 MB 容量。
 - 首轮发现非共享 base 继承 `pinned` 会人为锁死 exclusive pair，已标记 artifact 无效；修复为仅非共享新 profile
   使用 adapter+exclusive-base 原子淘汰，44 项相关回归通过后重跑。
-- 修正版 8 episodes：sharing 主效应对 ready/continuity 为 0，对 transfer 为 `-48.888889 MB/request`、backhaul
-  为 `-480`、eviction 为 `-5/episode`；migration 主效应对 ready/continuity 为 `+0.041666`，代价为
-  `+0.833333 MB/request`。completion 全为 0，端到端收益仍 `UNVERIFIED`。
-- 因机制确有资源/就绪效应，冻结一次非正式 matched retraining：SA-GHMAPPO 与 MAPPO 各 64 episodes、seed 1401、
-  3 个预选非重叠窗口、4 workflows、最多总计 1,536 steps；旧 checkpoint 不复用。后台权威状态由
-  `artifacts/training/mechanism_algorithm_retraining_v1_20260928/` 的 receipt 给出。
-- 详细协议、四臂小表、最近邻和禁止 claim 见 `mechanism_factorial_supplement_20260928.md`。
+- 历史 12-step、8-episode pilot 的 completion 全为 0；后续 DAG-size 审计发现 `j_8` 有 17 个节点。冻结的
+  3-window/4-workflow 诊断中，20 steps 把 right-censored 从 3/12 降到 0/12，popularity completion 从 2/12
+  升到 4/12，但仍有 8/12 noncensored failures，故 horizon 只解释部分缺口。
+- canonical 20-step 四臂复制共 48 episodes。sharing 主效应对 completion/ready 为 0，对 transfer 为
+  `-69.307190 MB/request`、backhaul 为 `-626.666666`、eviction 为 `-6/episode`；migration 描述性主效应对
+  completion 为 `+0.166666`、ready/continuity 为 `+0.029902`，代价为 `+1.801743 MB/request` 和 `+10` backhaul。
+- v1 后台训练从未启动：venv symlink 被解析为系统 Python，`import yaml` 立即失败，0 episode/update/checkpoint；
+  旧目录由 `startup_failure_audit.json` 封存。runner v2 增加精确 venv dependency/identity preflight、实际 RUNNING
+  state 握手、终态失败 receipt 与预算恒等式校验。
+- 获批 v2 合同为 SA-GHMAPPO/MAPPO 各 64 episodes、seed 1401、3 个冻结窗口、4 workflows、每 episode 最多
+  20 steps，总上限 128 episodes / 2,560 steps；两算法 2-episode 真实链路回归已通过。后台权威状态只看
+  `artifacts/training/mechanism_algorithm_retraining_v2_20260928/` 的 receipts。
+- 详细协议、结果、失效根因和禁止 claim 见 `mechanism_factorial_completion_and_launch_repair_20260928.md`。
 
 ## 2026-09-28: G14S01 创新定位、算法有效性与最小补证设计完成
 

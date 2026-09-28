@@ -2,17 +2,21 @@
 
 ## 2026-09-28 controlled mechanism supplement
 
-- `scripts/run_mechanism_factorial_pilot.py` + `configs/experiment/mechanism_factorial_pilot_v1.yaml`：四臂
-  base-sharing × state-migration observed-data pilot。
+- `scripts/run_mechanism_factorial_pilot.py` + `configs/experiment/mechanism_factorial_pilot_v1.yaml` / `_v2.yaml`：
+  12-step 历史 pilot 与 20-step、3-window/4-workflow 四臂 observed-data 复制。
+- `scripts/run_mechanism_completion_diagnostic.py` + `configs/experiment/mechanism_completion_diagnostic_v1.yaml` +
+  `src/agents/handoff_first_feasibility_agent.py`：12/20-step 截断与真实失败诊断；固定规则不进入 live registry。
 - `configs/data/mechanism_factorial_shared_catalog_v1.json` +
   `configs/experiment/mechanism_factorial_shared_360mb_runtime_v1.yaml`：三 RSU 相同 220 MB 初态和 360 MB
   shared-base retraining runtime。
 - `configs/experiment/mechanism_algorithm_training_windows_v1.json`：learned outcome 前冻结的 3 个非重叠
   mechanism-activating 训练窗口。
-- `scripts/run_mechanism_algorithm_training.py` +
-  `configs/experiment/mechanism_algorithm_retraining_v1.yaml`：固定双算法预算与后台 command/log/PID/receipt。
-- `artifacts/analysis/mechanism_factorial_pilot_v1_20260928_v2/` 与
-  `artifacts/training/mechanism_algorithm_retraining_v1_20260928/`：本轮非正式产物；均不是 holdout/formal。
+- `scripts/run_mechanism_algorithm_training.py` + `configs/experiment/mechanism_algorithm_retraining_v2.yaml`：精确
+  venv preflight、实际 RUNNING state 握手、固定 128-episode/2,560-step 双算法预算与后台 command/log/PID/receipt。
+- `artifacts/analysis/mechanism_factorial_pilot_v2_20260928_v2/`、
+  `artifacts/analysis/mechanism_completion_diagnostic_v1_20260928_v2/` 与
+  `artifacts/training/mechanism_algorithm_retraining_v2_20260928/`：本轮非正式产物；均不是 holdout/formal。
+  旧 `mechanism_algorithm_retraining_v1_20260928` 为启动失败封存目录，训练执行计数为 0。
 
 G14R18：唯一 active Protocol 2.9、ready index 与 Readiness v21 位于
 `configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/`；共享 8-field parser 位于

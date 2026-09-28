@@ -1,14 +1,18 @@
 ﻿# Decision Log
 
-## 2026-09-28: controlled factorial 可进入受限 matched retraining，但不晋级 claim
+## 2026-09-28: 20-step completion 门槛允许一次受限 matched retraining v2，但不晋级 claim
 
 - 决定：四臂因子只改变 base physical sharing 与 workflow-state migration；初始逻辑服务、对象大小、容量、窗口、
   workflow、controller、request exposure 和 eviction policy 固定。非共享臂的 exclusive adapter/base 作为一个
   dependency-safe 原子淘汰单元；历史/shared 路径不改变。
-- 决定：pilot 的 sharing 资源成本主效应和 migration readiness 主效应达到“机制实际生效”的继续条件；但
-  completion 为 0，因此只授权 ON/ON arm 上 SA-GHMAPPO 与 MAPPO 的单 seed、同预算重新训练筛查。
-- 决定：训练固定为各 64 episodes、12 steps、seed 1401、3 窗口、4 workflows、latest checkpoint，不根据结果
-  改 seed/窗口/预算或选择 checkpoint；所有进程使用固定命令、分离日志、PID 与 exit receipt，无自动重试。
+- 决定：历史 12-step completion=0 含 17-node DAG 的结构性截断。使用预先存在的 `max_tasks=20` 作为 horizon，
+  且保持小于 24-frame window；20-step 诊断需同时满足 right-censored=0 和至少一个真实 completion 才能继续。
+- 决定：canonical 20-step 四臂的 sharing 资源成本主效应和 migration completion/readiness 描述性主效应达到
+  “机制实际生效”的继续条件，因此只授权 ON/ON arm 上 SA-GHMAPPO 与 MAPPO 的单 seed、同预算重新训练筛查。
+- 决定：训练固定为各 64 episodes、20 steps、seed 1401、3 窗口、4 workflows、latest checkpoint，不根据结果
+  改 seed/窗口/预算或选择 checkpoint；总上限 128 episodes / 2,560 steps，无自动重试。
+- 决定：v1 因错误解引用 venv symlink 而在训练前失败，0 episode/update/checkpoint，旧根永久封存。v2 launcher
+  必须使用精确 venv 做 dependency/identity preflight，并在实际进程写入 RUNNING state 后才报告启动成功。
 - 边界：该授权不包括旧 checkpoint 复用、formal/holdout、算法优越性评价、结构 2×2、supervised predictor 或
   paper-ready 晋级。后续 evaluation 需要另立任务和新的独立数据合同。
 

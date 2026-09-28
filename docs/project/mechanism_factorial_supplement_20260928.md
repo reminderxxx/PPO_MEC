@@ -4,13 +4,13 @@
 
 | 字段 | 值 |
 |---|---|
-| `reviewed_at` | `2026-09-28T08:00:17+08:00` |
+| `reviewed_at` | `2026-09-28T08:20:11+08:00` |
 | `literature_cutoff` | `2026-09-28` |
 | `target_venue` | `IEEE Transactions on Mobile Computing (TMC)`；实际投稿目录未指定 |
-| `artifact_run_id` | `mechanism_factorial_pilot_v1_20260928_v2`；后台训练为 `mechanism_algorithm_retraining_v1_20260928` |
+| `artifact_run_id` | 历史 pilot `mechanism_factorial_pilot_v1_20260928_v2`；canonical 20-step pilot `mechanism_factorial_pilot_v2_20260928_v2`；训练根 `mechanism_algorithm_retraining_v2_20260928` |
 | `policy_version` | `tmc_review_policy_v3_20260621` |
-| `implementation_git_commit` | `97e24a6d6d2541a0a5fde54cdbc69a789d4dfde0` |
-| `evidence_level` | `E1_CONTROLLED_OBSERVED_DATA_PILOT_NOT_HOLDOUT` |
+| `implementation_git_commit` | `da001e7553bdb35403cc5bce894af6e9fdc007d8` |
+| `evidence_level` | `E1_CONTROLLED_OBSERVED_DATA_DIAGNOSTIC_NOT_HOLDOUT` |
 
 ## 结论
 
@@ -23,8 +23,10 @@
 修正版小表显示两条机制均真正进入执行路径：base sharing 保持 readiness/continuity 不变，同时把平均
 `transfer_mb_per_request` 从 `67.972223` 降至 `19.083334`，主效应为 `-48.888889 MB/request`；migration 使
 ready/continuity 从 `0.902778` 升至 `0.944444`，主效应为 `+0.041666`，同时增加 `0.833333 MB/request` 和
-每 episode 平均 `10 MB` workflow-state transfer。8 个 episode 的 completion 全为 0，因此机制的端到端完成收益
-仍为 `UNVERIFIED`，当前证据只能支持“机制可激活且存在 readiness/cost trade-off”。
+每 episode 平均 `10 MB` workflow-state transfer。8 个 episode 的 completion 全为 0，因此该历史 12-step pilot
+的端到端完成收益为 `UNVERIFIED`。后续诊断确认 17-node `j_8` 受 12-step horizon 结构性截断；20-step、
+3-window/4-workflow 复制已出现非零 completion，但仍有真实请求失败。更新后的 canonical 结果和 v1 launcher
+失效勘误见 `mechanism_factorial_completion_and_launch_repair_20260928.md`。
 
 ## 四臂小表
 
@@ -42,7 +44,7 @@ catalog 继承了 `pinned`，导致 exclusive adapter/base 无法成组淘汰并
 `base_sharing_enabled=false` 的新 profile 中把 exclusive pair 当作原子 eviction unit；历史路径不变。修正版
 事件审计确认每次切换按 `adapter + exclusive base` 成组提交，容量拒绝为 0。
 
-## 冻结训练筛查
+## 冻结训练筛查与启动勘误
 
 由于机制产生实质资源效应，允许启动一个受限、非正式、重新训练的算法筛查；旧 checkpoint 不可复用。冻结合同：
 
@@ -50,12 +52,13 @@ catalog 继承了 `pinned`，导致 exclusive adapter/base 无法成组淘汰并
 - mechanism arm：仅 `sharing_on_migration_on`；360 MB、LRU、相同初始 220 MB residency；
 - workload：预先冻结的 3 个互不重叠 NGSIM mechanism-activating windows、4 个 Alibaba DAG、
   `semantic_ai_service`；窗口在 learned outcome 前按 mobility covariates 选定；
-- budget：seed `1401`，每算法 64 episodes、每 episode 最多 12 steps、每 4 episodes 更新、batch 32；总上限
-  128 episodes / 1,536 environment steps；
+- budget：seed `1401`，每算法 64 episodes、每 episode 最多 20 steps、每 4 episodes 更新、batch 32；总上限
+  128 episodes / 2,560 environment steps；20 步等于预先存在的 `max_tasks=20` 且小于 24-frame window；
 - request exposure：训练前冻结、policy-neutral replay；reward positive offset 为 0；
 - selection：只报告 fixed budget 的 `latest.pt` 与完整训练轨迹，不按训练结果换 seed、窗口、预算或 checkpoint；
-- status：后台启动状态、固定 argv、stdout/stderr、PID 与 exit receipt 以
-  `artifacts/training/mechanism_algorithm_retraining_v1_20260928/` 为唯一权威。
+- status：v1 因 interpreter symlink 解引用而在 `import yaml` 时启动失败，训练 episode/update/checkpoint 均为 0；
+  `startup_failure_audit.json` 是该旧目录权威。修复后的 v2 状态、固定 argv、stdout/stderr、PID 与 exit receipt 以
+  `artifacts/training/mechanism_algorithm_retraining_v2_20260928/` 为唯一权威。
 
 该筛查只有一个 seed，没有独立 test split，也没有 algorithm evaluation；即使成功完成，也不能形成算法优越性或
 论文主结果。后续只有在新增的、与本轮开发数据独立的 window/run 可证明可用后，才能冻结多 seed 训练和 matched
@@ -76,8 +79,8 @@ evaluation。旧 G14R22D holdout 不得重开。
 
 ## Claim boundary
 
-允许表述：实现了可执行的 base-sharing × workflow-state-migration 2×2 受控合同；在一个 observed-data
-mechanism-activating window 中观察到显著量级的传输节省和小幅 readiness trade-off。
+允许表述：实现了可执行的 base-sharing × workflow-state-migration 2×2 受控合同；在 3 个预选 observed-data
+mechanism-activating windows 中观察到大幅传输节省、迁移的 completion/readiness 描述性增益和成本 trade-off。
 
-禁止表述：算法优越、端到端 completion 改善、独立泛化、正式 holdout、真实 LoRA paging 性能、统计显著或
-paper-ready。单窗口/两 workflow 不是独立 cluster 统计，未运行 Holm 检验。
+禁止表述：算法优越、因果/统计显著的端到端 completion 改善、独立泛化、正式 holdout、真实 LoRA paging 性能
+或 paper-ready。3 个窗口不足以支持层级推断，未运行 Holm 检验。
