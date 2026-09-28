@@ -5,6 +5,22 @@
 
 ﻿# Progress
 
+## 2026-09-28: v3 策略决策能力诊断与 CRDCM 单一候选设计
+
+- 12 个 matched units、123 步逐动作核对确认：SA/MAPPO 在 guard-on 和 guard-off 下分别 123/123 完全相同；
+  但固定输入 no-step probe 的 raw 概率和随机采样明显不同，因此不能由 deterministic action 相同反推策略等价。
+- checkpoint 串线、同权重和未更新已排除：SA/MAPPO 分别为 165,320/39,176 参数，update 4→16 改变
+  60/60、26/28 个 tensors，加载 digest 与各自冻结 checkpoint 一致，探针前后文件 SHA 不变。
+- 一阶原因收口为五动作聚合的确定性边界、共同 readiness guard 的 38/123 override、typed cache/migration actor
+  状态不足和 guard 后 credit 不可辨识；每步至少 3 个合法动作，mask 单动作强迫已排除。
+- 历史 summary 未保存 raw logits/head/prob/override 前后链，不能无环境重跑地精确恢复真实请求的 raw policy；该项
+  作为 instrumentation blocker 保留。受控 perturbation 仅为输入敏感性，不作性能因果解释。
+- 唯一后续候选冻结为 Critical-path Reuse-aware Dependency Cache and Migration（CRDCM）：以 remaining-DAG
+  critical path/reuse、typed base+adapter readiness、cache slack 和 causal handoff risk 联合 dependency bundle
+  admission 与 workflow-state prepare。当前只完成设计，不实现、不训练、不重开旧 holdout。
+- 完整证据、authority/info matrix、最近邻差异、预算估计和负控停止规则见
+  `mechanism_policy_decision_diagnosis_and_cache_design_20260928.md`。
+
 ## 2026-09-28: v2 固定终点冻结、训练内评价与 service-readiness guard v3
 
 - v3 已完成且按共同 `update_0016.pt` create-only 冻结：两算法各 64 episodes、16 updates、656 steps；唯一有效

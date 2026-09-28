@@ -5,6 +5,19 @@
 
 ﻿# Bugs And Risks
 
+## 2026-09-28: policy provenance、状态充分性与 override credit 风险（OPEN）
+
+- v3 episode summary 只保存最终 action/mask，缺 raw logits、head actions/probs、aggregation/projection/guard 前后链；
+  现有 123 步无法在不重跑环境时做 exact raw-policy reconstruction。后续 contract 必须补齐 create-time trace，不能
+  用聚合计数代替逐步 attribution。
+- SA/MAPPO actor 都看不到 required base readiness、dependency bundle bytes、workflow-state migration readiness 和
+  capacity slack；MAPPO actor 还看不到 adapter readiness。SA 的 graph encoder 有 topology，但 remaining typed reuse
+  identity 在 readiness 不变时不可辨识。
+- current-only guard 在训练/评价后处理 raw action，并用强制 canonical head action 重算 log-prob。数值 log-prob
+  非缺失，但 raw policy 与 override 的 causal credit 混合；不得据此声称 learned policy 学会 readiness。
+- CRDCM 目前只是 `UNVERIFIED` 设计。任何 state/action/log-prob contract 变化都必须发布新版本、matched retraining
+  并使用新 split；不得修改或续训 v3、不得重开 consumed holdout。
+
 ## 2026-09-28: v2/v3 仍是训练内单 seed pilot（OPEN）
 
 - v3 唯一有效评价已完成，但 SA/MAPPO 在 guard-on 和 guard-off 下均逐项相同；共享 guard 改写 30.9% 评价动作，

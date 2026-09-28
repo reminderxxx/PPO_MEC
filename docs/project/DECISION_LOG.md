@@ -1,5 +1,20 @@
 ﻿# Decision Log
 
+## 2026-09-28: 后续只保留 CRDCM 单一候选，先冻结 contract 再训练
+
+- 决定：v3 相同 deterministic action 的一阶诊断为 action aggregation + shared guard + state insufficiency +
+  override credit 混合；不采用无证据的“只需增加训练”解释，也不把不同 raw 概率误写为策略等价。
+- 决定：物理 action mask、typed base→adapter 原子 admission、容量/淘汰和迁移约束继续由 runtime 强制；后续机制
+  不得通过删除约束制造算法差异。
+- 决定：唯一候选为 CRDCM，将 remaining-DAG critical-path/reuse、typed dependency bundle 和 workflow-state
+  migration 作为同一个跨 RSU 机制。输入只允许已知 workflow DAG 与 causal predictor snapshot，不得使用 actual future。
+- 决定：若修改 observation/action/log-prob contract，必须新建版本并让 SA/MAPPO/PPO/strong heuristic 获得 matched
+  authority；v3 checkpoint 不修改、不续训、不当 warm start。guard/shield 的 raw 与 executed credit 必须显式分离。
+- 决定：先做 contract、trace、unit/no-step probe；实现审查通过后才可另行批准新 split、matched retraining 和
+  falsification。主效应、policy gain、capacity/reuse/migration 负控与 Pareto 成本必须同时报告。
+- 边界：本决定不授权实现、训练、formal rollout、调参或 holdout；详细方案见
+  `mechanism_policy_decision_diagnosis_and_cache_design_20260928.md`。
+
 ## 2026-09-28: frozen v2 不择优，v3 只允许一个对称 readiness 修正
 
 - 收口决定：v3 共同固定 `update_0016.pt`；有效评价只执行预冻结的 7×12 矩阵一次。guard-on/off 同 checkpoint

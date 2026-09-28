@@ -5,6 +5,20 @@
 
 # Artifact Records
 
+## 2026-09-28 policy decision diagnosis and CRDCM design
+
+- root：`artifacts/analysis/mechanism_policy_decision_diagnosis_v1_20260928/`；结构化摘要记录 12-unit/123-step
+  action stream、mask、guard delta、v3 checkpoint path/SHA/load/update diff 与 fixed-input no-environment-step probe。
+- action stream：guard-on SA/MAPPO SHA=`7a7a135fea9d70397ae90a80846a4356f0d3350d215b1b920d0f4417dc81bcd9`；
+  guard-off SHA=`525c7ebb915b74c2e86cd1ae43f795d0feeb7d5a6440e21ab5104b140d6cb6cc`；两组均逐步
+  123/123 相同。guard delta=38，全部为 on 的 action 0。
+- v3 checkpoint read-only probe：SA/MAPPO update16 SHA=`67c9c940...d31ffeb` / `a8d3a9dd...c82d627`，
+  探针前后不变；加载 tensor digest 各自 exact match。没有环境 step、training update 或旧 artifact 改写。
+- evidence boundary：`E2_ARTIFACT_AUDITED_PLUS_READ_ONLY_NO_STEP_PROBE`；controlled perturbation 只支持信息敏感性，
+  不支持性能因果、算法优势、formal/holdout 或 paper-ready claim。
+- review metadata：reviewed_at=`2026-09-28T11:42:02+08:00`，literature_cutoff=`2026-09-28`，target venue=
+  `IEEE TMC`，policy=`tmc_review_policy_v3_20260621`，audited commit=`2de39b9`。
+
 ## 2026-09-28 frozen v2 evaluation and readiness-guard v3
 
 - freeze：`artifacts/analysis/mechanism_algorithm_retraining_v2_freeze_20260928/`；manifest SHA-256=

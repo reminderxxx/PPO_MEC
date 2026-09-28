@@ -1,0 +1,100 @@
+{
+  "artifact_run_id": "mechanism_policy_decision_diagnosis_v1_20260928",
+  "reviewed_at": "2026-09-28T11:42:02+08:00",
+  "probe_kind": "read_only_frozen_checkpoint_audit_and_no_environment_step_controlled_input_probe",
+  "source_evaluation_artifact": "artifacts/analysis/mechanism_frozen_evaluation_v3_20260928",
+  "source_training_artifact": "artifacts/training/mechanism_algorithm_retraining_v3_20260928",
+  "environment_steps_executed": 0,
+  "training_updates_executed": 0,
+  "seed": 1401,
+  "evidence_boundary": "diagnostic_only_not_performance_causality_not_holdout",
+  "retrospective_trace_limit": "Saved v3 episode summaries contain final actions and masks but not raw logits, raw head outputs, head actions, or action probabilities. Exact historical raw-policy reconstruction is therefore unavailable without an environment replay, which this audit did not perform.",
+  "stepwise_action_audit": {
+    "matched_unit_count": 12,
+    "total_steps": 123,
+    "sa_mappo_guard_on_exact_step_match_count": 123,
+    "sa_mappo_guard_off_exact_step_match_count": 123,
+    "guard_on_action_stream_sha256": "7a7a135fea9d70397ae90a80846a4356f0d3350d215b1b920d0f4417dc81bcd9",
+    "guard_off_action_stream_sha256": "525c7ebb915b74c2e86cd1ae43f795d0feeb7d5a6440e21ab5104b140d6cb6cc",
+    "guard_on_final_action_counts": {"0": 38, "3": 60, "4": 25},
+    "guard_off_final_action_counts": {"3": 86, "4": 37},
+    "guard_on_off_delta_count_per_agent": 38,
+    "all_guard_deltas_are_guard_on_action_zero": true,
+    "guard_delta_pairs": {"0_to_3": 26, "0_to_4": 12},
+    "single_valid_action_step_count": 0,
+    "eligible_action_sets_guard_on": {
+      "0,2,3": 86,
+      "0,1,2,3,4": 26,
+      "0,2,3,4": 11
+    },
+    "per_unit_sequences": [
+      {"unit": "window_peachtree_off1578_len24_t1163637300_1163639600/j_15", "guard_on": "30400", "guard_off": "34433", "delta_count": 3},
+      {"unit": "window_peachtree_off1578_len24_t1163637300_1163639600/j_3", "guard_on": "304330403", "guard_off": "344334433", "delta_count": 3},
+      {"unit": "window_peachtree_off1578_len24_t1163637300_1163639600/j_34", "guard_on": "3443040030", "guard_off": "3443344334", "delta_count": 4},
+      {"unit": "window_peachtree_off1578_len24_t1163637300_1163639600/j_8", "guard_on": "33333033333030330", "guard_off": "33333333333333333", "delta_count": 4},
+      {"unit": "window_peachtree_off244_len24_t1163059400_1163061700/j_15", "guard_on": "30300", "guard_off": "33343", "delta_count": 3},
+      {"unit": "window_peachtree_off244_len24_t1163059400_1163061700/j_3", "guard_on": "303430303", "guard_off": "333433333", "delta_count": 3},
+      {"unit": "window_peachtree_off244_len24_t1163059400_1163061700/j_34", "guard_on": "3334030030", "guard_off": "3334333333", "delta_count": 4},
+      {"unit": "window_peachtree_off244_len24_t1163059400_1163061700/j_8", "guard_on": "33343033333040330", "guard_off": "33343333333443333", "delta_count": 4},
+      {"unit": "window_peachtree_off298_len24_t1163064800_1163067100/j_15", "guard_on": "34400", "guard_off": "34444", "delta_count": 2},
+      {"unit": "window_peachtree_off298_len24_t1163064800_1163067100/j_3", "guard_on": "344440444", "guard_off": "344444444", "delta_count": 1},
+      {"unit": "window_peachtree_off298_len24_t1163064800_1163067100/j_34", "guard_on": "3444040440", "guard_off": "3444444443", "delta_count": 3},
+      {"unit": "window_peachtree_off298_len24_t1163064800_1163067100/j_8", "guard_on": "33333033333030330", "guard_off": "33333333333333333", "delta_count": 4}
+    ]
+  },
+  "checkpoint_audit": {
+    "checkpoint_hashes_unchanged": true,
+    "sa_ghmappo": {
+      "checkpoint_sha256_update_0004": "e774d7a2696f3b41257e36e3b9f4f96a0eb0724775bef1a747ced4517ab94aaa",
+      "checkpoint_sha256_update_0016": "67c9c940fffb4c189ab57bc6541cef632831ff18055c73337723fbb40d31ffeb",
+      "class": "SAGHMAPPOAgent",
+      "encoder_class": "SurrogateFusionEncoder",
+      "parameter_count": 165320,
+      "state_tensor_count": 60,
+      "changed_tensors_update_0004_to_0016": 60,
+      "relative_l2_delta": 0.11241656024750683,
+      "loaded_state_digest_matches_checkpoint": true,
+      "loaded_update_count": 16
+    },
+    "mappo": {
+      "checkpoint_sha256_update_0004": "b67a2ac1abd42d8ad1ce2ec8a072b63e093a2ab958108d393e8fee9ed32d0f9e",
+      "checkpoint_sha256_update_0016": "a8d3a9dd2f26a5f3ed9a7eadccb0084d112855c1498d803678b1725ebc82d627",
+      "class": "MAPPOAgent",
+      "encoder_class": "FlatSemanticEncoder",
+      "parameter_count": 39176,
+      "state_tensor_count": 28,
+      "changed_tensors_update_0004_to_0016": 26,
+      "relative_l2_delta": 0.18502403767046977,
+      "loaded_state_digest_matches_checkpoint": true,
+      "loaded_update_count": 16
+    }
+  },
+  "controlled_input_probe": {
+    "baseline_all_valid_deterministic": {
+      "sa_ghmappo": {"action": 4, "env_action_probs": [0.001172, 0.010478, 0.034728, 0.456826, 0.496796]},
+      "mappo": {"action": 4, "env_action_probs": [0.085467, 0.113903, 0.083093, 0.083787, 0.633751]}
+    },
+    "counterfactual_sensitivity": {
+      "current_adapter_present": {"sa_ghmappo_action_changed": true, "sa_ghmappo_max_env_score_delta": 0.06308752, "mappo_max_env_score_delta": 0.0},
+      "predicted_handoff": {"sa_ghmappo_max_env_score_delta": 0.74874926, "mappo_max_env_score_delta": 0.5428698},
+      "near_completion": {"sa_ghmappo_max_env_score_delta": 0.44326782, "mappo_max_env_score_delta": 0.19340444},
+      "parallel_remaining_dag": {"sa_ghmappo_max_env_score_delta": 0.00452351, "mappo_max_env_score_delta": 0.28535939},
+      "base_model_missing": {"sa_ghmappo_max_env_score_delta": 0.0, "mappo_max_env_score_delta": 0.0},
+      "dependency_bundle_large": {"sa_ghmappo_max_env_score_delta": 0.0, "mappo_max_env_score_delta": 0.0},
+      "migration_state_ready": {"sa_ghmappo_max_env_score_delta": 0.0, "mappo_max_env_score_delta": 0.0},
+      "cache_capacity_only": {"sa_ghmappo_max_env_score_delta": 0.0, "mappo_max_env_score_delta": 0.0},
+      "remaining_adapter_reuse_without_readiness_change": {"sa_ghmappo_max_env_score_delta": 0.0, "mappo_max_env_score_delta": 0.0}
+    },
+    "fixed_seed_stochastic_private_sampler_200_draws": {
+      "all_valid": {
+        "sa_ghmappo": {"0": 0, "1": 3, "2": 8, "3": 84, "4": 105},
+        "mappo": {"0": 14, "1": 23, "2": 21, "3": 14, "4": 128}
+      },
+      "observed_common_mask_0_2_3": {
+        "sa_ghmappo": {"0": 0, "2": 15, "3": 185},
+        "mappo": {"0": 67, "2": 76, "3": 57}
+      }
+    },
+    "interpretation": "The frozen policies have materially different probabilities and stochastic behavior, but their deterministic argmax falls on the same environment actions for the audited evaluation states. Counterfactual probes establish input sensitivity only; they are not performance or causal evidence."
+  }
+}

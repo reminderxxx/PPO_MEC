@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `mechanism_policy_decision_diagnosis_and_cache_design_20260928.md`：v3 SA/MAPPO 逐步动作、checkpoint/参数、
+  action aggregation、guard/credit 与 actor 信息充分性诊断，以及唯一 CRDCM 候选机制和可证伪实验设计
+
 - `g14s01_innovation_algorithm_diagnosis_20260928.md`：相对最近邻的创新边界、formal/capacity/holdout 原件复核、
   controller-level 算法身份、核心机制调用证据、576/864 MB 非绑定根因，以及两阶段最小补证实验与 claim freeze
 
