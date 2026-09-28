@@ -2,6 +2,13 @@
 
 ## 2026-09-28 controlled mechanism supplement
 
+- `scripts/freeze_mechanism_supplement_baseline.py`：create-only 冻结共同 fixed-budget checkpoint，记录 file/tensor
+  hashes、完整训练 provenance 和只读加载不变性。
+- `scripts/evaluate_mechanism_frozen_checkpoints.py` + `configs/experiment/mechanism_frozen_evaluation_v1.yaml`：
+  frozen learned + fixed rules 的单次 matched 多目标 resubstitution evaluation。
+- `scripts/analyze_mechanism_failure_causes.py`：request/event-level failure category、分母与失败后 exposure 审计。
+- `configs/experiment/mechanism_cache_readiness_guard_v3_agent_config.json` +
+  `configs/experiment/mechanism_algorithm_retraining_v3.yaml`：唯一对称 current-only readiness guard 候选与固定预算。
 - `scripts/run_mechanism_factorial_pilot.py` + `configs/experiment/mechanism_factorial_pilot_v1.yaml` / `_v2.yaml`：
   12-step 历史 pilot 与 20-step、3-window/4-workflow 四臂 observed-data 复制。
 - `scripts/run_mechanism_completion_diagnostic.py` + `configs/experiment/mechanism_completion_diagnostic_v1.yaml` +

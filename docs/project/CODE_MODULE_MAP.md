@@ -2,6 +2,15 @@
 
 ## Controlled mechanism factorial supplement
 
+- `scripts/freeze_mechanism_supplement_baseline.py`：验证 v2 completion/manifest/exposure，固定 update 16，读取
+  checkpoint/tensor hashes 并证明加载不改文件。
+- `scripts/evaluate_mechanism_frozen_checkpoints.py`：以 controller-neutral `(window, workflow)` 单元运行 frozen
+  checkpoints 与规则控制器，输出多目标向量和 delay coverage，不做综合打分。
+- `scripts/analyze_mechanism_failure_causes.py`：从 request/event trace 区分 censoring、handoff、dependency/cache、
+  state、capacity、invalid/stall，并核验 external denominator 和 post-failure exposure。
+- `src/agents/sa_ghmappo_core.py`：新增 opt-in `cache_warm_start_guard_current_only`，只在当前 adapter 未就绪时
+  cache-first；默认 false，历史行为不变。
+- `src/agents/mappo_agent.py`：允许同一 current-only guard 对称配置；默认仍关闭，不弱化 canonical MAPPO。
 - `src/envs/core/vec_workflow_core_env.py`：opt-in mechanism profile；只在 migration-off 时压制 state action，只在
   no-sharing profile 中把 exclusive adapter/base 展开为原子 dependency-safe eviction victims。无 profile 时
   历史语义不变。

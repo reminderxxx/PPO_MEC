@@ -5,6 +5,27 @@
 
 # Artifact Records
 
+## 2026-09-28 frozen v2 evaluation and readiness-guard v3
+
+- freeze：`artifacts/analysis/mechanism_algorithm_retraining_v2_freeze_20260928/`；manifest SHA-256=
+  `0b5babad01e8be10c161e8cb22a983ff68936f5bf5e34343e4bb1dde2e94ab84`。固定消费 SA/MAPPO 的
+  `update_0016.pt`，记录完整 file/tensor hashes、训练 provenance 和只读加载不变性；规则非预注册。
+- canonical frozen evaluation：`artifacts/analysis/mechanism_frozen_evaluation_v1_20260928_v2/`；5 controllers ×
+  12 matched units，request exposure 一致，scope 为训练内 resubstitution pilot。计划 SHA-256=
+  `39afa78f729eb63015b14b93ad8afd81f284e7d33fbecd1d72a74f64d981486d`。
+- invalid evaluation attempts：`mechanism_frozen_evaluation_v1_20260928_startup_failure/` 为 import 前 0-episode failure；
+  `mechanism_frozen_evaluation_v1_20260928/` 为完成 SA 12 episodes 后触发 identity-bearing fingerprint 误比较的
+  partial root。两者结果禁止进入表或选模。
+- failure diagnosis：`artifacts/analysis/mechanism_training_failure_diagnosis_v1_20260928/`，读取 v2 的 128 个 raw
+  episode；SA/MAPPO adapter-miss failures=`216/272`，denominator mismatch=`0/0`。
+- v3 integration smoke：`artifacts/training/mechanism_algorithm_retraining_v3_integration_smoke_20260928/`；两算法各
+  2 episodes、20 steps、相同 guard config，均完成并写 checkpoint。
+- v3 training root：`artifacts/training/mechanism_algorithm_retraining_v3_20260928/`；固定相同 seed/budget/data，
+  启动与终态只看 receipts，不自动 retry。
+- review metadata：reviewed_at=`2026-09-28T11:14:07+08:00`，literature_cutoff=`2026-09-28`，target venue=
+  `IEEE TMC`，policy=`tmc_review_policy_v3_20260621`，implementation commit=`0d461be`，evidence level=
+  `E2_ARTIFACT_AUDITED_OBSERVED_DATA_PILOT_NOT_HOLDOUT`。
+
 ## 2026-09-28 mechanism factorial completion and launch repair
 
 - canonical 20-step pilot：`artifacts/analysis/mechanism_factorial_pilot_v2_20260928_v2/`，含 48 个 raw episodes、

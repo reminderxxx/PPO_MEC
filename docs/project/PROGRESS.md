@@ -5,6 +5,21 @@
 
 ﻿# Progress
 
+## 2026-09-28: v2 固定终点冻结、训练内评价与 service-readiness guard v3
+
+- v2 两算法共同冻结 fixed-budget `update_0016.pt`，不按已观察表现选择 candidate；规则是在训练统计已查看后采用，
+  明确非预注册。freeze manifest 绑定 checkpoint SHA/size/tensor digest、训练 commit/config/budget/data/window/exposure，
+  只读加载前后文件 SHA 不变。
+- 固定评价先冻结 plan，再在相同 3 个训练窗口 × 4 workflows 上执行一次 resubstitution pilot。MAPPO completion
+  `5/12`、continuity `0.788617`、handoff failure `0`，但 transfer/backhaul 为 `41.741503/324.833333`；SA 为
+  `2/12`、`0.748529`、`0.833333` 和 `31.379630/280.833333`。没有全面优势，也不是独立评价。
+- 训练事件归因：SA/MAPPO 分别有 `225/273` 个失败 request，其中 adapter miss 为 `216/272`；capacity rejection、
+  invalid/precondition 均为 0。分母全一致，首次失败后继续暴露请求仍属于同一外生 workflow replay。
+- 唯一 v3 候选对两算法对称启用 current-only cache readiness guard：当前 RSU 缺 required adapter 时先 cache fill；
+  不增加 future 信息，不修改 reward/env/action schema/budget。两算法各 2-episode smoke 已通过且 guard 对称触发。
+- 详细冻结、评价表、失败原因与 claim boundary 见
+  `mechanism_frozen_evaluation_and_readiness_guard_20260928.md`。
+
 ## 2026-09-28: completion 诊断、20-step 四臂复制与 matched retraining v2 启动资格
 
 - 新增 opt-in `controlled_mechanism_factorial_v1`，历史环境无 profile 时语义不变。四臂使用真实 NGSIM mobility、

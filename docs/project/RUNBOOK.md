@@ -7,6 +7,47 @@
 
 ## Controlled mechanism factorial supplement
 
+v2 固定预算终点冻结（create-only，不复制或覆盖 checkpoint）：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/freeze_mechanism_supplement_baseline.py \
+  --training-root artifacts/training/mechanism_algorithm_retraining_v2_20260928 \
+  --output-dir artifacts/analysis/<new_v2_freeze_run_id>
+```
+
+训练 episode 失败归因：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/analyze_mechanism_failure_causes.py \
+  --episode-source sa_ghmappo=artifacts/training/mechanism_algorithm_retraining_v2_20260928/runs/sa_ghmappo \
+  --episode-source mappo=artifacts/training/mechanism_algorithm_retraining_v2_20260928/runs/mappo \
+  --output-dir artifacts/analysis/<new_failure_diagnosis_run_id>
+```
+
+冻结 checkpoint 的单次训练内评价：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/evaluate_mechanism_frozen_checkpoints.py \
+  --plan configs/experiment/mechanism_frozen_evaluation_v1.yaml \
+  --data-root /Users/howen/Projects/PPO_MEC \
+  --output-dir artifacts/analysis/<new_frozen_evaluation_run_id>
+```
+
+该评价复用训练窗口/workflow，不是独立 test。`handoff_first_feasibility` 不是 paper baseline；delay 必须与 coverage
+同报，continuity/ready 重合时不得重复计分。
+
+唯一 v3 readiness-guard paired development training（一次启动、不轮询、不自动 retry）：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_mechanism_algorithm_training.py launch \
+  --config configs/experiment/mechanism_algorithm_retraining_v3.yaml \
+  --data-root /Users/howen/Projects/PPO_MEC \
+  --output-root artifacts/training/<new_mechanism_v3_training_run_id>
+```
+
+v3 与 v2 使用相同 seed/budget/window/workflow/runtime，只对两算法对称启用 current-only readiness guard。不得在
+v3 之后继续调参、加 seed 或按 candidate checkpoint 表现择优。
+
 20-step 四臂小表（拒绝覆盖已有目录）：
 
 ```bash

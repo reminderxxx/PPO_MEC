@@ -5,6 +5,19 @@
 
 ﻿# Bugs And Risks
 
+## 2026-09-28: v2/v3 仍是训练内单 seed pilot（OPEN）
+
+- frozen v2 评价复用训练的 3 个窗口与 4 个 workflows；没有 train/dev/test 分离，不能称独立评价、泛化或 holdout。
+- 每 controller 只有 12 个评价单元、3 个 outer windows，且 delay coverage 只有 2–5/12；没有统计推断资格。
+- continuity 与 full-service-ready request rate 在本次表中完全重合，不能重复计为两个独立优势；没有外部成本偏好，
+  禁止事后调 weighted score 或容忍阈值。
+- MAPPO 在 completion/continuity/handoff failure 上优于 frozen SA，但 transfer/backhaul 更高；任何单指标胜出都不能
+  写成全方位优势。handoff-first 仍只是 diagnostic rule，不是 paper baseline。
+- adapter miss 是当前一阶失败来源，但 v3 guard 的端到端收益尚未完成；固定 64-episode budget 不是收敛证据。
+  v3 完成后不得因结果不理想追加 seed、调参或重开旧 holdout。
+- 评价入口曾有 0-episode import failure 和 12-episode identity-check partial root；两者均保留为 invalid negative
+  artifacts，不能进入结果表。
+
 ## 2026-09-28: 受控机制补充的外部有效性与 completion 缺口（OPEN）
 
 - canonical 四臂 pilot 只覆盖 3 个预选 observed-data windows、4 个 workflows；不是独立 test，也只有 3 个 outer

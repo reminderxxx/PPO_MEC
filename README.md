@@ -5,6 +5,13 @@
 
 # PPO_MEC
 
+2026-09-28 已将 mechanism retraining v2 的 SA-GHMAPPO/MAPPO 共同固定预算终点 `update_0016.pt` 做 create-only
+冻结；冻结规则在查看训练统计后确定，非预注册。一次同训练窗口/workflow 的 resubstitution 多目标评价显示 MAPPO
+completion/continuity 较高但 transfer/backhaul 更高，frozen SA 没有全面优势。128 个训练 episode 的事件归因显示
+request failure 主要来自当前 required adapter/dependency 未就绪，而非容量拒绝或非法动作。据此只定义一个对两算法
+对称、current-only 的 service-readiness guard v3 候选；不改 reward、环境、baseline 预算或信息集。详情见
+`docs/project/mechanism_frozen_evaluation_and_readiness_guard_20260928.md`。
+
 2026-09-28 新增 base sharing × workflow-state migration 的 2×2 受控补充与 completion 诊断入口：
 `scripts/run_mechanism_factorial_pilot.py` 在真实 NGSIM mobility 与 Alibaba DAG 结构上构造多 adapter、共享/复制
 base 和 360 MB 绑定容量；20-step、3-window/4-workflow 复制观察到 base sharing 的大幅传输节省，以及 migration

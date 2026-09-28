@@ -1,5 +1,17 @@
 ﻿# Decision Log
 
+## 2026-09-28: frozen v2 不择优，v3 只允许一个对称 readiness 修正
+
+- 决定：v2 两算法共同冻结 `update_0016.pt`，因为它是固定预算终点；不比较 update 4/8/12/16 的表现选点。
+  该规则在训练统计已查看后确定，因此必须标注非预注册。
+- 决定：评价 plan 先冻结，保留 completion、continuity、handoff failure、transfer、backhaul、migration cost 和
+  conditional delay+coverage 的向量；没有外部成本偏好，不生成事后综合分。评价复用训练数据，只能称 pilot。
+- 决定：训练 trace 中 adapter miss 占 SA/MAPPO request failures 的 `216/225`、`272/273`，支持唯一修正为当前
+  service readiness guard。对两算法完全对称、current-only，不启用 target prefetch，不改 reward/env/budget。
+- 决定：v3 只允许 seed 1401、各 64 episodes、max_steps 20、总 cap 2,560 的一次 paired development training；
+  不根据结果追加 seed、窗口、checkpoint selection 或第二个修正。
+- 边界：frozen v2 与 v3 均不是 independent/formal/holdout 或 superiority evidence；旧 consumed holdout 不动。
+
 ## 2026-09-28: 20-step completion 门槛允许一次受限 matched retraining v2，但不晋级 claim
 
 - 决定：四臂因子只改变 base physical sharing 与 workflow-state migration；初始逻辑服务、对象大小、容量、窗口、
