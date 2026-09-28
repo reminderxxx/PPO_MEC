@@ -6,6 +6,7 @@ import argparse
 import csv
 import hashlib
 import json
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -56,6 +57,12 @@ def _file_sha256(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def _git_value(*arguments: str) -> str:
+    return subprocess.check_output(
+        ["git", *arguments], cwd=ROOT_DIR, text=True
+    ).strip()
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -402,6 +409,26 @@ def main() -> None:
         "diagnostic_version": DIAGNOSTIC_VERSION,
         "status": "completed",
         "evidence_scope": "observed_data_completion_feasibility_not_holdout",
+        "git_commit": _git_value("rev-parse", "HEAD"),
+        "git_tree": _git_value("rev-parse", "HEAD^{tree}"),
+        "config_path": str(args.config.resolve()),
+        "config_sha256": _file_sha256(args.config.resolve()),
+        "source_provenance": {
+            "mobility": {
+                "path": str(mobility_path),
+                "size_bytes": mobility_path.stat().st_size,
+                "sha256": str(expected["mobility"]["sha256"]),
+            },
+            "workflow": {
+                "path": str(workflow_path),
+                "size_bytes": workflow_path.stat().st_size,
+                "sha256": str(expected["workflow"]["sha256"]),
+            },
+        },
+        "window_plan_path": str(window_plan_path),
+        "window_plan_sha256": _file_sha256(window_plan_path),
+        "selected_window_ids": [str(window["window_id"]) for window in windows],
+        "workflow_ids": [str(workflow.workflow_id) for workflow in workflows],
         "controller_role": "fixed_rule_feasibility_reference_not_algorithm_baseline",
         "row_count": len(rows),
         "aggregate": aggregate,
