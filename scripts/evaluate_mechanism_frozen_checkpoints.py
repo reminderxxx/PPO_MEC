@@ -8,6 +8,7 @@ import csv
 import hashlib
 import json
 import subprocess
+import sys
 from pathlib import Path
 from statistics import fmean
 from typing import Any
@@ -17,6 +18,8 @@ import yaml
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 EVALUATION_VERSION = "mechanism_frozen_checkpoint_evaluation_v1"
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 from scripts.analyze_mechanism_failure_causes import classify_episode
 from scripts.run_mechanism_completion_diagnostic import _load_workflows
