@@ -5,6 +5,12 @@
 
 # Runbook
 
+## DriveLM 标注只读资格检查（2026-09-29）
+
+对已合法取得的小型 JSON 执行 `.venv/bin/python -B scripts/audit_drivelm_workflow_sample.py --input <sample.json>`。
+默认上限2 MB；可用 `--input -` 接收stdin。工具不下载、不保存原标注、不推断DAG、不调用模型。
+复核与限制见 `drivelm_sample_qualification_20260929.md`；非空关系字段仍需语义审计。
+
 ## Protocol 2.9 与未来 G14C v16
 
 唯一 live index：`configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_index.json`。

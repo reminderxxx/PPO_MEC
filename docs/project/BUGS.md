@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-09-29: DriveLM demo 不提供可直接使用的依赖边（OPEN）
+
+- 实读790 QA的五个关系字段均null，不能把任务类别排序当成原始执行DAG。
+- 下一步须显式派生模板并验证数据依赖；不能外推完整语料或宣称已形成新数据贡献。
+- 证据：`drivelm_sample_qualification_20260929.md`。
+
 ## 2026-09-28: AI工作负载融合真实性与数据贡献（OPEN）
 
 - Alibaba DAG拓扑/任务类型到adapter的映射是受控标签；统一base及CPU/memory到I/O尺寸转换尚非AI测量。

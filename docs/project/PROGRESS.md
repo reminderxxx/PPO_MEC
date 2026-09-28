@@ -5,6 +5,13 @@
 
 ﻿# Progress
 
+## 2026-09-29: DriveLM 真实 demo 标注资格核验
+
+- 两次有界内存读取 SHA 一致：402384 bytes、2 scenes、9 frames、790 QA。
+- 五个关系字段全部 null；可复用驾驶语义，但未建立观测执行 DAG，不外推全语料。
+- 新只读审计工具及8项测试通过，smoke 6/6；无图像/权重下载、原问答落盘、训练或 rollout。
+- 证据及派生依赖边界见 `drivelm_sample_qualification_20260929.md`。数据贡献仍为候选。
+
 ## 2026-09-28: 找回旧19项数据登记，优先复用驾驶AI开源数据
 
 - 纠正阶段一遗漏：G11已找到BurstGPT/Mooncake/Qwen-Bailian等，但无raw importer/payload接入，

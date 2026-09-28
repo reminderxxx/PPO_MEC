@@ -1,5 +1,9 @@
 ﻿# Directory Structure
 
+新增数据资格工具：`scripts/audit_drivelm_workflow_sample.py`，测试位于
+`tests/test_drivelm_workflow_sample_audit.py`，证据说明位于
+`docs/project/drivelm_sample_qualification_20260929.md`；不保存原始标注或模型。
+
 G14R18：唯一 active Protocol 2.9、ready index 与 Readiness v21 位于
 `configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/`；共享 8-field parser 位于
 `src/runtime/formal_training_identity.py`，17-field envelope 的 producer 位于

@@ -5,6 +5,9 @@
 
 # PPO_MEC
 
+驾驶 AI 数据候选的最新小样本核验见 [DriveLM qualification](docs/project/drivelm_sample_qualification_20260929.md)；
+只读入口 `scripts/audit_drivelm_workflow_sample.py` 不生成训练数据或执行实验。
+
 G14R18 已关闭正式 checkpoint provenance envelope 与共享 training identity projection 的接口错配，并冻结唯一
 live Protocol `2.9.0` 与 Readiness v21=`READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL`。完整 companion 保留
 17 字段；其中 8 个共享 identity 字段由 capability-aware 解析器在 benchmark 边界提取，并与已验证

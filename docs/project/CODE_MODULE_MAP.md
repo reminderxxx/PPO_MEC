@@ -1,5 +1,10 @@
 # Code Module Map
 
+## 数据候选只读结构审计
+
+- `scripts/audit_drivelm_workflow_sample.py`：独立只读 JSON 资格工具，源字节身份、QA计数、关系字段覆盖；不进入训练/runtime。
+- `tests/test_drivelm_workflow_sample_audit.py`：缺失/null、重复key、非法结构及字节身份回归。
+
 ## G14R18 provenance envelope / shared identity boundary
 
 - `scripts/manage_typed_model_cache_formal_artifacts.py`：`write_checkpoint_companions` 保持完整 17 字段 provenance

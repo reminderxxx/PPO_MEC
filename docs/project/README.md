@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `drivelm_sample_qualification_20260929.md`：官方 demo 字节/结构核验；790 QA 关系字段为空，区分驾驶语义与派生执行 DAG
+
 - `vec_ai_public_resource_recovery_20260928.md`：找回旧19-source登记，DriveLM/V2X-Seq与请求/cache数据复核；复用优先，不从零编造语义
 
 - `vec_ai_workload_stage_one_20260928.md`：数据集首阶段本地资源核查、最小车载应用模板、旧新字段映射及有界测量草案；模型输入待确认
