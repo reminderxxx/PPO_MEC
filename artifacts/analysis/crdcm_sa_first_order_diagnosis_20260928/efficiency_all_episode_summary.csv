@@ -1,0 +1,5 @@
+condition_id,episodes,completed_workflows,completion_rate,requests,successful_requests,failed_requests,successful_request_rate,total_transfer_mb,total_backhaul_cost,total_migration_overhead,transfer_mb_per_successful_request_including_failure_cost,backhaul_per_successful_request_including_failure_cost,transfer_mb_per_completed_workflow_including_failure_cost,backhaul_per_completed_workflow_including_failure_cost
+crdcm_full_mappo,36,18,0.5,372,248,124,0.6666666666666666,7432.0,7252.0,9.239999999999998,29.967741935483872,29.241935483870968,412.8888888888889,402.8888888888889
+crdcm_full_ppo,36,27,0.75,372,360,12,0.967741935483871,10224.0,10044.0,9.239999999999998,28.4,27.9,378.6666666666667,372.0
+crdcm_full_sa,36,18,0.5,372,286,86,0.7688172043010753,7432.0,7252.0,9.239999999999998,25.986013986013987,25.356643356643357,412.8888888888889,402.8888888888889
+crdcm_signal_off_sa,36,14,0.3888888888888889,372,319,53,0.8575268817204301,9410.0,9290.0,14.159999999999997,29.49843260188088,29.122257053291538,672.1428571428571,663.5714285714286

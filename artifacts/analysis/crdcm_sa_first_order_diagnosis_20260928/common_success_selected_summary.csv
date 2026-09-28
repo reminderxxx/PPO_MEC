@@ -1,0 +1,7 @@
+left_condition,right_condition,seed,common_success_units,left_transfer_mb_total,right_transfer_mb_total,left_backhaul_total,right_backhaul_total,selection_warning
+crdcm_full_sa,crdcm_full_ppo,1401,9,2370.0,2370.0,2330.0,2330.0,post_outcome_selected_survivor_conditioned_not_causal
+crdcm_full_mappo,crdcm_full_ppo,1401,9,2370.0,2370.0,2330.0,2330.0,post_outcome_selected_survivor_conditioned_not_causal
+crdcm_full_sa,crdcm_full_ppo,1402,9,2370.0,2370.0,2330.0,2330.0,post_outcome_selected_survivor_conditioned_not_causal
+crdcm_full_mappo,crdcm_full_ppo,1402,9,2370.0,2370.0,2330.0,2330.0,post_outcome_selected_survivor_conditioned_not_causal
+crdcm_full_sa,crdcm_full_ppo,1403,0,0,0,0,0,post_outcome_selected_survivor_conditioned_not_causal
+crdcm_full_mappo,crdcm_full_ppo,1403,0,0,0,0,0,post_outcome_selected_survivor_conditioned_not_causal

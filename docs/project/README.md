@@ -15,6 +15,10 @@
 - `crdcm_performance_matrix_v2_independent_review_20260928.md`：CRDCM v2 完整 observed-data development matrix
   的 raw episode 独立复算、checkpoint/manifest/trace 对账、seed 交互、场景语义、Pareto 与 claim freeze
 
+- `crdcm_sa_first_order_diagnosis_20260928.md`：解释 PPO `27/36` vs full-SA `18/36` 的 same-exposure seed
+  bifurcation、masked five-action behavior 与 per-head PPO credit 错配、stage checkpoint no-step replay、效率重解释与
+  唯一优先修复/停止规则
+
 - `g14s01_innovation_algorithm_diagnosis_20260928.md`：相对最近邻的创新边界、formal/capacity/holdout 原件复核、
   controller-level 算法身份、核心机制调用证据、576/864 MB 非绑定根因，以及两阶段最小补证实验与 claim freeze
 

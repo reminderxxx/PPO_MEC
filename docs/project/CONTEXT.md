@@ -19,6 +19,13 @@
   `E3_REPRODUCED_OBSERVED_DATA_DEVELOPMENT_PILOT_NOT_HOLDOUT`，novelty、稳定优势、独立泛化和 paper-ready
   仍为 `UNVERIFIED`。入口见 `crdcm_performance_matrix_v2_independent_review_20260928.md`。
 
+- v2 的只读一阶诊断确认：PPO/full-SA gap 全来自 seed 1403 的 112-request cache-fill vs steady-offload bifurcation；
+  seed 1401/1402 的动作/reward/outcome 逐项相同。层级策略从 masked five-action distribution 采样，却按 canonical
+  per-head ratios 更新；full-SA `1919/1968=97.51%` 训练 steps 给 exact behavior-gradient 为零的 head 非零 actor
+  credit，flat PPO 为 0。它是优先级最高的 implementation contract defect，但 performance causality 仍需新 contract
+  matched retraining，不能靠延长训练、加 seed 或调 temperature 追认。入口见
+  `crdcm_sa_first_order_diagnosis_20260928.md`。
+
 - 当前唯一 live typed model-cache execution contract 为 Protocol 2.9.0；active index 位于
   `configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_index.json`，Readiness v21=
   `READY_FOR_G14C_V16_CLEAN_TRAIN_AND_FORMAL`。checkpoint companion 是 17 字段 provenance envelope，shared

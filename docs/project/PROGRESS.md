@@ -5,6 +5,25 @@
 
 ﻿# Progress
 
+## 2026-09-28: CRDCM SA vs PPO 一阶失败诊断
+
+- 对 completed v2 matrix 做了只读诊断：未执行环境 step、训练、调参、新 seed/window/capacity；48 个
+  `update_0004/0008/0012/0016.pt` 与 7 个受保护文件在 replay 前后 SHA-256 全部相同。
+- PPO `27/36` vs full-SA `18/36` 的 completion gap 全部来自 seed 1403；seed 1401/1402 的 248 个 paired requests
+  动作、reward、成败逐项相同。seed 1403 的 112 个差异请求中，SA 全为 steady offload、PPO 全为 current-RSU
+  cache fill，产生 74 个 PPO-only request success、0 个 SA-only success。
+- 确认层级 actor 的 behavior/update distribution contract 缺口：行为从精确五动作聚合分布采样，但 PPO loss
+  对 canonical 三头标签分别计算 ratio/clip。逐步 autograd 发现 full-SA 训练 `1919/1968=97.51%` steps 给 exact
+  masked behavior-gradient 为零的 head 非零 actor credit；flat PPO 为 0。该实现缺口是最可信的一阶修复对象，但对 completion gap 的性能因果仍为
+  `UNVERIFIED`，禁止写成已证明的单一原因。
+- 固定 synthetic causal observations 的 no-env-step checkpoint replay 覆盖 4 条件×3 seeds×4 updates×3 probes；
+  seed 1403 full-SA 的 prepare probability 在 cold probe 从 `0.635→0.865`，PPO 从 `0.247→0.307`。这只证明
+  sensitivity/sharpness，不是历史状态 exact replay，也不授权事后调 temperature/择 checkpoint。
+- 全 episode 保留 failure cost 后，full-SA/PPO successful requests=`286/360`、failed=`86/12`；transfer per completed
+  workflow=`412.889/378.667 MB`。SA 的低 total transfer 与较低完成量混合，不构成无条件效率优势。
+- 唯一建议是先做 factorization-consistency gradient/ratio validation，再另立新 contract 的一次预注册 matched
+  retraining；当前暂停 capacity-stress 和性能扩展。报告见 `crdcm_sa_first_order_diagnosis_20260928.md`。
+
 ## 2026-09-28: CRDCM performance matrix v2 完成与独立派生审查
 
 - 唯一完整 run `artifacts/training/crdcm_performance_matrix_v2_20260928/` 已 `SUCCEEDED`：12/12 training cells、

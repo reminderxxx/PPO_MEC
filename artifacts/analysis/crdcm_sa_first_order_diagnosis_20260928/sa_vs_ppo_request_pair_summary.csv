@@ -1,0 +1,4 @@
+seed,paired_requests,same_action_count,different_action_count,both_success,sa_only_success,ppo_only_success,both_fail,mean_reward_delta_sa_minus_ppo
+1401,124,124,0,120,0,0,4,0.0
+1402,124,124,0,120,0,0,4,0.0
+1403,124,12,112,46,0,74,4,-2.383064516129033

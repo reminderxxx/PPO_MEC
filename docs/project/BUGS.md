@@ -5,6 +5,21 @@
 
 ﻿# Bugs And Risks
 
+## 2026-09-28: 层级五动作 behavior / per-head PPO credit 错配（OPEN）
+
+- SA/MAPPO 在有合法 action mask 时从精确五动作 aggregated categorical 采样，再把实际动作反映射成 canonical
+  slow/fast/event targets；actor update 却按三个 head 各自 ratio/clip。action 4 的 slow/fast 与 action 0/1 的 fast
+  是未被实际 behavior 观察的 latent choice；真实 mask 归一化还会约掉更多共同 head 因子。逐步 autograd 确认这些
+  exact masked behavior-gradient 为零的 head 仍收到非零 actor credit。
+- v2 full-SA 训练有 `1919/1968=97.51%` steps 命中该错配，full-MAPPO 为 `1940/1968=98.58%`，flat PPO 为 0。
+  五动作 aggregation 本身可由 trace 精确重建，最大 log-prob 误差 `<3.1e-6`；问题位于 update objective，不是
+  action mask、checkpoint restore 或 log-prob 缺失。
+- external override 的 critic-only backward 会通过共享 encoder/residual hidden layer 间接改变 actor output，因而
+  “actor loss masked”不等于 actor 参数完全不受影响；但 v2 训练/评价 override 均为 0，该路径不是本 run active cause。
+- 修复必须发布新 behavior/credit contract，先补 factorization-consistency gradient/ratio test，再执行一次预注册 matched
+  retraining。未验证前不得声称该缺口因果解释全部 gap，也不得用延长训练、加 seed、调 temperature 或择 checkpoint
+  规避。完整证据见 `docs/project/crdcm_sa_first_order_diagnosis_20260928.md`。
+
 ## 2026-09-28: policy provenance、状态充分性与 override credit 风险（OPEN）
 
 - v3 episode summary 只保存最终 action/mask，缺 raw logits、head actions/probs、aggregation/projection/guard 前后链；

@@ -7,6 +7,24 @@
 
 ## 2026-09-28 policy decision diagnosis and CRDCM design
 
+## 2026-09-28 — CRDCM SA first-order failure diagnosis
+
+- Root：`artifacts/analysis/crdcm_sa_first_order_diagnosis_20260928/`；只读消费 completed v2 matrix，执行
+  environment steps=`0`、training updates=`0`；48 个 stage checkpoints 与 7 个受保护文件在 probe 前后 SHA-256
+  全部相同。
+- Same-exposure result：seed 1401/1402 的 SA/PPO 248 个请求动作/reward/outcome 逐项相同；seed 1403 的 112 个
+  差异请求是 SA steady offload vs PPO current-RSU cache fill，产生 74 个 PPO-only success、0 个 SA-only success。
+- Credit audit：masked five-action behavior distribution 可由 trace 重建，最大 log-prob 误差 `<3.1e-6`；逐步 autograd
+  发现 full-SA `1919/1968=97.51%` 训练 steps 给 exact masked behavior-gradient 为零的 head 非零 actor credit，
+  full-MAPPO=`1940/1968=98.58%`，flat PPO=`0/1968`。这是 implementation contract defect；performance causality
+  仍为 `UNVERIFIED`。
+- Efficiency boundary：full-SA/PPO successful requests=`286/360`、failed=`86/12`，transfer per completed workflow=
+  `412.889/378.667 MB`；SA 的低总 transfer 与较低服务量混合，不支持无条件效率优势。
+- Review metadata：reviewed_at=`2026-09-28T18:47:26+08:00`，literature_cutoff=`2026-09-28`，target venue=
+  `IEEE TMC`，policy=`tmc_review_policy_v3_20260621`，evidence level=
+  `E3_REPRODUCED_OBSERVED_DATA_DEVELOPMENT_PILOT_NOT_HOLDOUT`。详细报告见
+  `crdcm_sa_first_order_diagnosis_20260928.md`。
+
 ## 2026-09-28 — CRDCM performance matrix v2 full run and independent review
 
 - Source run root：`artifacts/training/crdcm_performance_matrix_v2_20260928/`；status=`SUCCEEDED`，command manifest

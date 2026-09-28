@@ -15,6 +15,13 @@ updates；固定 paired evaluation 为 156 episodes、1,612 actual steps。独�
 `docs/project/crdcm_performance_matrix_v2_independent_review_20260928.md`，执行合同见
 `docs/project/crdcm_performance_matrix_v2_freeze_20260928.md`。
 
+同日只读一阶诊断进一步确认：PPO/full-SA gap 全来自 seed 1403 的 112-request cache-fill vs steady-offload
+bifurcation；seed 1401/1402 的 paired request 动作/reward/outcome 完全相同。层级 agent 从 masked five-action
+distribution 采样，却按 canonical per-head ratios 更新；full-SA `1919/1968=97.51%` 训练 steps 给 exact
+behavior-gradient 为零的 head 非零 actor credit，flat PPO 为 0。该 implementation contract defect 是下一步唯一
+优先修复对象，但 performance causality 仍为 `UNVERIFIED`；报告见
+`docs/project/crdcm_sa_first_order_diagnosis_20260928.md`。
+
 2026-09-28 已将 mechanism retraining v2 的 SA-GHMAPPO/MAPPO 共同固定预算终点 `update_0016.pt` 做 create-only
 冻结；冻结规则在查看训练统计后确定，非预注册。一次同训练窗口/workflow 的 resubstitution 多目标评价显示 MAPPO
 completion/continuity 较高但 transfer/backhaul 更高，frozen SA 没有全面优势。128 个训练 episode 的事件归因显示
