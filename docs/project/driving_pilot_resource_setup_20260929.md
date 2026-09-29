@@ -2,6 +2,9 @@
 
 2026-09-29，用户明确允许下载。基线commit为3040a5f；本轮无科学推理或训练。
 
+后续只读读回：下载终态`complete`；13文件合计1,019,893,574 bytes，逐项SHA256/size复算0 mismatch。
+以下运行中记录保留为历史；模型未实载推理，图像条款接受仍待确认。
+
 ## 模型与隔离环境
 
 `scripts/download_driving_pilot_model.py`按固定revision与13个根目录文件allowlist下载，

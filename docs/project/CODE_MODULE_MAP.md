@@ -2,6 +2,8 @@
 
 ## 数据候选只读结构审计
 
+- `scripts/build_driving_workflow_package.py`：复用pilot producer/consumer，生成单场景引用包和exact inventory；无推理。
+- `tests/test_driving_workflow_package.py`：引用包读回、漂移、场景和成员集合回归。
 - `scripts/download_driving_pilot_model.py`：独立固定模型allowlist下载、大小/hash验证与完成回执；不执行模型、不下载图像。
 
 - `scripts/prepare_drivelm_pilot.py`：复用标注审计，生成匹配两臂元数据计划与隔离前驱payload；不进入旧runtime。

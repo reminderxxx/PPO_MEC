@@ -5,6 +5,9 @@
 
 # PPO_MEC
 
+首个驾驶工作流引用包：`scripts/build_driving_workflow_package.py`；
+[检索、数据卡与八调用边界](docs/project/driving_workflow_minipackage_20260929.md)。已生成引用包，尚无真实推理结果。
+
 已授权资源准备的状态与回执位置见 [pilot resource setup](docs/project/driving_pilot_resource_setup_20260929.md)；
 `scripts/download_driving_pilot_model.py`仅下载固定模型，不启动训练或评估。
 

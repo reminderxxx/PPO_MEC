@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `driving_workflow_minipackage_20260929.md`：公开来源检索、单场景引用包及成功后扩展条件；不是已运行数据集
+
 - `driving_pilot_resource_setup_20260929.md`：已授权模型下载与隔离安装交接，图像条款待确认；非完成回执
 
 - `driving_workflow_pilot_readiness_20260929.md`：模型/12图资源定位、16调用计划和实验前缺口；不宣称真实推理已完成

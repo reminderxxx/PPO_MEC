@@ -5,6 +5,12 @@
 
 # Runbook
 
+## 单场景驾驶工作流引用包
+
+`.venv/bin/python -B scripts/build_driving_workflow_package.py --fetch-official-sample --output <new_package_dir>`
+固定官方标注仅内存读取；也可用`--input <licensed_sample.json>`。只写引用、数据卡与synthetic接口证据，
+不下载图像或执行模型。新路径create-only；见`driving_workflow_minipackage_20260929.md`。
+
 ## DriveLM 标注只读资格检查（2026-09-29）
 
 批准后的固定模型下载：`scripts/download_driving_pilot_model.py --output <new_local_root>`。

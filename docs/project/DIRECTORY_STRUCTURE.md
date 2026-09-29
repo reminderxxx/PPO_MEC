@@ -1,5 +1,6 @@
 ﻿# Directory Structure
 
+单场景引用包入口`scripts/build_driving_workflow_package.py`，产物根`artifacts/datasets/`；不含原图/QA。
 小实验计划见`scripts/prepare_drivelm_pilot.py`、`tests/test_drivelm_pilot_plan.py`，
 模型下载入口为`scripts/download_driving_pilot_model.py`，本地payload位于被忽略的`data/raw/ai_workflow_pilot/`；
 独立venv位于`artifacts/environments/`，都不进入Git。

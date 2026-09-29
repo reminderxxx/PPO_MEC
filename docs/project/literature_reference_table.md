@@ -244,6 +244,22 @@
 以上新候选及旧19-source登记的复核、字段/许可边界与复用顺序见
 `vec_ai_public_resource_recovery_20260928.md`。检索线索不等于正式数据资格。
 
+### 2026-09-29 驾驶工作流最小包复用检索增补
+
+以下为来源资格与近邻线索，不是逐篇全文复现；未下载这些新候选的原图/标签。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| 驾驶多阶段推理 | [DriveVLM: The Convergence of Autonomous Driving and Large Vision-Language Models](https://tsinghua-mars-lab.github.io/DriveVLM/) | CoRL 2024，作者页核验；目录等级另核 | 场景描述、分析、层级规划与SUP-AD线索 | 作为执行语义近邻，不能称驾驶多阶段推理为原创；本项目额外缓存/迁移需实测 | 工作流动机/近邻 |
+| 驾驶模型可靠性 | [Are VLMs Ready for Autonomous Driving? An Empirical Study from the Reliability, Data, and Metric Perspectives](https://drive-bench.github.io/) | 年份/正式venue本轮待核，官方项目提供论文/工具/数据 | DriveBench视觉依据、文本线索和评价偏差 | 必须验证真实图像依赖，不能以非空生成或语言相似性当驾驶正确性 | 数据验证/限制 |
+| 车路多视角QA | [V2X-QA: Comprehensive Reasoning Dataset and Benchmark for Multimodal Large Language Models in Autonomous Driving Across Ego, Infrastructure, and Cooperative Views](https://github.com/junwei0001/V2X-QA) | 作者仓库；年份/正式venue待核 | 车端/基础设施/协同视角问答，原图需另按V2X-Seq许可取得 | 更贴车路语义的备选，未核payload、执行DAG或模型状态成本，不据仓库存在判可直接复用 | 候选数据来源 |
+| 协同序列与规划 | [V2XPnP: Vehicle-to-Everything Spatio-Temporal Fusion](https://mobility-lab.seas.ucla.edu/v2xpnp/) | 作者机构页检索线索；完整题名/venue/年份待核 | 多协同模式的时空数据候选 | 未核原件/许可，不替代本机缓存迁移trace；页面直接读取异常保留待核 | 候选数据来源 |
+| 多路口车路感知 | [UrbanIng-V2X: A Large-Scale Multi-Vehicle, Multi-Infrastructure Dataset Across Multiple Intersections for Cooperative Perception](https://arxiv.org/abs/2510.23478) | 2025 arXiv；正式venue待核 | 多车/多路侧/多路口数据来源线索 | 候选空间与协同基础，不是现成AI workflow执行成本；本轮未下载 | 后续数据扩展 |
+| 车路协同导航 | [UrbanV2X: A Multisensory Vehicle-Infrastructure Dataset for Cooperative Navigation in Urban Areas](https://arxiv.org/abs/2512.20224) | 2025 arXiv；正式venue待核 | 多传感器车辆基础设施导航数据线索 | 用途不同，需先核是否适配工作流，不能合并为已验收来源 | 后续数据扩展 |
+| 大范围车路感知 | [V2XScenes: A Multiple Challenging Traffic Conditions Dataset for Large-Range Vehicle-Infrastructure Collaborative Perception](https://www.openaccess.thecvf.com/content/ICCV2025/papers/Wang_V2XScenes_A_Multiple_Challenging_Traffic_Conditions_Dataset_for_Large-Range_Vehicle-Infrastructure_ICCV_2025_paper.pdf) | ICCV 2025官方PDF检索结果；本轮未全文复核 | 多条件、大范围协同感知数据 | 只列来源候选，缓存/状态/计算成本仍需独立测量 | 后续数据扩展 |
+| VLM辅助驾驶RL | [DriveVLM-RL](https://github.com/zilin-huang/DriveVLM-RL) | 作者仓库线索；完整论文题名/年份/venue待核 | VLM与驾驶RL、异步推理链路线索 | 非本次部署目标，未复现，不宣称其提供RSU缓存工作负载 | 待核近邻 |
+| 驾驶行为规划 | [DriveMLM: Aligning Multi-Modal Large Language Models with Behavioral Planning States for Autonomous Driving](https://github.com/OpenGVLab/DriveMLM) | 检索线索；原站正文、正式venue/年份待核 | 行为状态与解释标注线索 | 非本轮已取得数据；不能把行为规划状态等同跨RSU执行状态 | 待核近邻 |
+
 可采用的谨慎表述：
 
 - Existing VEC studies have investigated service caching, task offloading, migration, and mixed-timescale decisions, but they usually optimize these dimensions separately or for single-shot task/service abstractions.
