@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `driving_pilot_resource_setup_20260929.md`：已授权模型下载与隔离安装交接，图像条款待确认；非完成回执
+
 - `driving_workflow_pilot_readiness_20260929.md`：模型/12图资源定位、16调用计划和实验前缺口；不宣称真实推理已完成
 
 - `drivelm_workflow_preview_20260929.md`：9个驾驶工作流派生预览及参考答案隔离，接口通过但未执行模型

@@ -1,6 +1,8 @@
 ﻿# Directory Structure
 
 小实验计划见`scripts/prepare_drivelm_pilot.py`、`tests/test_drivelm_pilot_plan.py`，
+模型下载入口为`scripts/download_driving_pilot_model.py`，本地payload位于被忽略的`data/raw/ai_workflow_pilot/`；
+独立venv位于`artifacts/environments/`，都不进入Git。
 公开资源元数据为`configs/experiment/drivelm_pilot_resources.json`。
 数据资格工具：`scripts/audit_drivelm_workflow_sample.py`，测试为
 `tests/test_drivelm_workflow_preview.py`（派生预览与输入组装）及

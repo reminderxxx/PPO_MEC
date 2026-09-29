@@ -2,6 +2,8 @@
 
 ## 数据候选只读结构审计
 
+- `scripts/download_driving_pilot_model.py`：独立固定模型allowlist下载、大小/hash验证与完成回执；不执行模型、不下载图像。
+
 - `scripts/prepare_drivelm_pilot.py`：复用标注审计，生成匹配两臂元数据计划与隔离前驱payload；不进入旧runtime。
 - `tests/test_drivelm_pilot_plan.py`：预算、六摄像头、来源/plan/task漂移、跨臂/帧及参考答案隔离。
 

@@ -7,6 +7,10 @@
 
 ## 2026-09-29: DriveLM 真实 demo 标注资格核验
 
+资源准备：用户允许下载，已启动固定SmolVLM及独立venv安装；原图等待nuScenes完整条款确认。
+当时下载/安装未完成，真实模型调用为0。终态以 `driving_pilot_resource_setup_20260929.md` 指针读回。
+同轮后续：独立环境安装/pip check/offline processor读取通过；权重仍下载，未模型实载。
+
 实验准备追加：`driving_workflow_pilot_readiness_20260929.md`，已定位两帧12图（1,287,809 bytes），
 无需大图像包；16调用计划工具及48项测试通过。SmolVLM约1GB候选、隔离环境/许可待确认，
 未下载图像/模型、未真实推理。状态为PLAN_VALIDATED_RESOURCE_SETUP_PENDING，不是实验已就绪。

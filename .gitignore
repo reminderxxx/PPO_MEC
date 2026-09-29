@@ -1,5 +1,6 @@
 # Runtime data and experiment outputs
 /artifacts/
+/data/raw/ai_workflow_pilot/
 
 # Python caches and test output
 __pycache__/

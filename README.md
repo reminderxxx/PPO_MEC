@@ -5,6 +5,9 @@
 
 # PPO_MEC
 
+已授权资源准备的状态与回执位置见 [pilot resource setup](docs/project/driving_pilot_resource_setup_20260929.md)；
+`scripts/download_driving_pilot_model.py`仅下载固定模型，不启动训练或评估。
+
 驾驶AI小实验准备入口：`scripts/prepare_drivelm_pilot.py`，
 [资源、预算与未闭环项](docs/project/driving_workflow_pilot_readiness_20260929.md)；仅生成计划，不启动模型。
 

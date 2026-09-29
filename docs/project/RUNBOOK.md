@@ -7,6 +7,10 @@
 
 ## DriveLM 标注只读资格检查（2026-09-29）
 
+批准后的固定模型下载：`scripts/download_driving_pilot_model.py --output <new_local_root>`。
+仅allowlist模型文件，拒绝已有root；下载回执不是推理验收。图像仍独立受许可确认约束。
+依赖只安装到独立venv：`configs/experiment/driving_pilot_requirements.txt`，不得用于旧冻结环境。
+
 小实验计划：`.venv/bin/python -B scripts/prepare_drivelm_pilot.py --input <sample.json> --expected-sha256 <source_sha>`，
 或stdin `--input -`。只输出元数据，最多16个任务，不下载/推理；资源说明见
 `driving_workflow_pilot_readiness_20260929.md`及`configs/experiment/drivelm_pilot_resources.json`。
