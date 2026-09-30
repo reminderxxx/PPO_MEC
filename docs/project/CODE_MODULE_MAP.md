@@ -1,5 +1,14 @@
 # Code Module Map
 
+## Adapter 与独立进程状态 calibration
+
+- `scripts/calibrate_workflow_state_recovery.py`：固定 base、两节点 base-only calibration；orchestrator 分别启动 continuous、
+  source 和 source 退出后的 target 进程，严格验证状态身份/hash/DAG，MPS 同步计时，create-only 输出。不是通用迁移平台。
+- `scripts/synthesize_adapter_state_recovery_calibration.py`：hash 绑定上一轮 paired witness，原样复算 action 0/4
+  长尾账本并生成预冻结 network-only 敏感性；失败状态不回填原生账本。
+- `tests/test_workflow_state_recovery_calibration.py`：状态完整性/漂移拒绝、action 4 账本、104 MiB 与敏感性边界回归；
+  不加载模型、不下载资源。
+
 ## Typed-cache 顺序依赖重算 LRU 候选
 
 - `src/envs/core/cache_eviction.py`：冻结 candidate/static 语义标识；原生LRU排序与metadata生命周期本身不改。

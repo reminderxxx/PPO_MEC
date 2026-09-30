@@ -1,5 +1,11 @@
 ﻿# Directory Structure
 
+2026-09-30 adapter/state calibration：`scripts/calibrate_workflow_state_recovery.py` 只实现明确的两节点 base-only
+calibration 状态边界，`scripts/synthesize_adapter_state_recovery_calibration.py` 只读复算上一轮冻结长尾账本与有限
+敏感性区间，专项测试为 `tests/test_workflow_state_recovery_calibration.py`。报告位于
+`docs/project/adapter_state_recovery_calibration_20260930.md`，机器证据位于
+`artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/`；不修改 production action codec 或冻结实验。
+
 2026-09-30 typed-cache 顺序依赖重算候选：显式配置位于
 `configs/benchmark/typed_model_cache_controlled_lru_sequential_recompute.yaml`，验收入口为
 `scripts/validate_typed_cache_sequential_replacement.py`，专项测试为

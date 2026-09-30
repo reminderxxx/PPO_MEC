@@ -5,6 +5,19 @@
 
 ﻿# Progress
 
+## 2026-09-30: 真实 adapter 与工作流恢复校准停止于预注册门禁
+
+- 固定上一轮最终提交 `e6fffb5` 建立隔离 checkout；主工作区七个用户修改的起止文件/hash 单独保护，未改 main、
+  历史 checkpoint、锁、失败记录或 consumed holdout。
+- 本地只有固定 SmolVLM base，没有真实 adapter。公开 ALPR/Helmet LoRA 均声明同一 base，固定 revision 的权重合计
+  164,065,376 bytes；因本轮无新增下载/依赖授权，下载、adapter 加载和调用均为 0，工程兼容性 unavailable。
+- 窄两节点 calibration 在一次预热中由 source 保存 3,085-byte 声明状态；新 target 进程在加载模型前因 base 输出
+  `lanestatus` 不等于冻结标准 `clear` 而 fail-closed。正式测量 0，不能称恢复成功或完整迁移状态成本。
+- action 4 只准备当前 adapter 并记录 handoff prepare，不执行状态序列化/导入；原两长尾实例各少 104 MiB 合成模型
+  字节且完成/失败相同的账本不变，真实净收益仍 `UNVERIFIED`，不具备小规模方法比较条件。报告与机器证据见
+  `adapter_state_recovery_calibration_20260930.md` 和
+  `artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/`。
+
 ## 2026-09-30: 剩余工作流信息决策价值审计完成
 
 - 上一轮13个 plumbing setup error 定位为隔离 checkout 的 Alibaba/NGSIM Git LFS pointer；主工作区真实文件

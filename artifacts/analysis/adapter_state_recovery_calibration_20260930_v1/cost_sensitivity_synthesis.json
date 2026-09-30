@@ -1,0 +1,257 @@
+{
+  "action4_semantics": {
+    "calibration_success_does_not_imply_native_support": true,
+    "changes": "prefetches the current workflow node adapter to the predicted handoff target and emits migration mode=prepare",
+    "contract": "semantic_discrete_5",
+    "does_not_change": [
+      "current workflow node identity",
+      "future-node adapter identity",
+      "application state serialization/import",
+      "production action codec"
+    ],
+    "native_zero_state_bytes_meaning": "no workflow-state payload/object bytes were emitted; this is missing state evidence, not measured zero cost"
+  },
+  "adapter_compatibility": {
+    "blockers": [
+      "new adapter weights were not authorized",
+      "PEFT/accelerate are absent from the frozen environment",
+      "both shortlisted task-relevant adapter configs declare task_type=null and require compatibility review"
+    ],
+    "candidate_weight_bytes": 164065376,
+    "compatibility_claim": false,
+    "downloaded_weight_bytes": 0,
+    "executed_adapters": 0,
+    "local_adapter_count": 0,
+    "status": "unavailable",
+    "task_quality_claim": false
+  },
+  "artifact_run_id": "adapter_state_recovery_calibration_20260930_v1",
+  "calibration_and_sensitivity": {
+    "byte_only_condition": "true_validated_state_bytes < 109051904",
+    "finite_assumption_grid": [
+      {
+        "avoided_synthetic_model_transfer_ms": 87241.5232,
+        "condition": "true_state_bytes must be below this threshold before adding save, restore, target rebuild, model load, queue, retransmission, or adapter-switch costs",
+        "fixed_state_transport_overhead_ms_assumption": 0.0,
+        "link_mbps_assumption": 10.0,
+        "network_only_break_even_state_bytes": 109051904.0,
+        "network_only_break_even_state_mib": 104.0,
+        "wireless_measurement": false
+      },
+      {
+        "avoided_synthetic_model_transfer_ms": 87241.5232,
+        "condition": "true_state_bytes must be below this threshold before adding save, restore, target rebuild, model load, queue, retransmission, or adapter-switch costs",
+        "fixed_state_transport_overhead_ms_assumption": 5.0,
+        "link_mbps_assumption": 10.0,
+        "network_only_break_even_state_bytes": 109045654.0,
+        "network_only_break_even_state_mib": 103.99403953552246,
+        "wireless_measurement": false
+      },
+      {
+        "avoided_synthetic_model_transfer_ms": 87241.5232,
+        "condition": "true_state_bytes must be below this threshold before adding save, restore, target rebuild, model load, queue, retransmission, or adapter-switch costs",
+        "fixed_state_transport_overhead_ms_assumption": 20.0,
+        "link_mbps_assumption": 10.0,
+        "network_only_break_even_state_bytes": 109026904.0,
+        "network_only_break_even_state_mib": 103.97615814208984,
+        "wireless_measurement": false
+      },
+      {
+        "avoided_synthetic_model_transfer_ms": 8724.15232,
+        "condition": "true_state_bytes must be below this threshold before adding save, restore, target rebuild, model load, queue, retransmission, or adapter-switch costs",
+        "fixed_state_transport_overhead_ms_assumption": 0.0,
+        "link_mbps_assumption": 100.0,
+        "network_only_break_even_state_bytes": 109051904.0,
+        "network_only_break_even_state_mib": 104.0,
+        "wireless_measurement": false
+      },
+      {
+        "avoided_synthetic_model_transfer_ms": 8724.15232,
+        "condition": "true_state_bytes must be below this threshold before adding save, restore, target rebuild, model load, queue, retransmission, or adapter-switch costs",
+        "fixed_state_transport_overhead_ms_assumption": 5.0,
+        "link_mbps_assumption": 100.0,
+        "network_only_break_even_state_bytes": 108989404.0,
+        "network_only_break_even_state_mib": 103.94039535522461,
+        "wireless_measurement": false
+      },
+      {
+        "avoided_synthetic_model_transfer_ms": 8724.15232,
+        "condition": "true_state_bytes must be below this threshold before adding save, restore, target rebuild, model load, queue, retransmission, or adapter-switch costs",
+        "fixed_state_transport_overhead_ms_assumption": 20.0,
+        "link_mbps_assumption": 100.0,
+        "network_only_break_even_state_bytes": 108801904.0,
+        "network_only_break_even_state_mib": 103.76158142089844,
+        "wireless_measurement": false
+      },
+      {
+        "avoided_synthetic_model_transfer_ms": 872.4152320000001,
+        "condition": "true_state_bytes must be below this threshold before adding save, restore, target rebuild, model load, queue, retransmission, or adapter-switch costs",
+        "fixed_state_transport_overhead_ms_assumption": 0.0,
+        "link_mbps_assumption": 1000.0,
+        "network_only_break_even_state_bytes": 109051904.0,
+        "network_only_break_even_state_mib": 104.0,
+        "wireless_measurement": false
+      },
+      {
+        "avoided_synthetic_model_transfer_ms": 872.4152320000001,
+        "condition": "true_state_bytes must be below this threshold before adding save, restore, target rebuild, model load, queue, retransmission, or adapter-switch costs",
+        "fixed_state_transport_overhead_ms_assumption": 5.0,
+        "link_mbps_assumption": 1000.0,
+        "network_only_break_even_state_bytes": 108426904.0,
+        "network_only_break_even_state_mib": 103.4039535522461,
+        "wireless_measurement": false
+      },
+      {
+        "avoided_synthetic_model_transfer_ms": 872.4152320000001,
+        "condition": "true_state_bytes must be below this threshold before adding save, restore, target rebuild, model load, queue, retransmission, or adapter-switch costs",
+        "fixed_state_transport_overhead_ms_assumption": 20.0,
+        "link_mbps_assumption": 1000.0,
+        "network_only_break_even_state_bytes": 106551904.0,
+        "network_only_break_even_state_mib": 101.61581420898438,
+        "wireless_measurement": false
+      }
+    ],
+    "grid_scope": "network-only algebra on the original synthetic 104 MiB avoided bytes; it excludes all unavailable measured costs and is not a deployment result",
+    "measured_adapter_switch_ns": null,
+    "measured_network_time_ns": null,
+    "measured_restore_ns": null,
+    "measured_save_ns": null,
+    "measured_target_model_load_ns": null,
+    "measured_target_rebuild_ns": null,
+    "real_model_byte_substitution_performed": false,
+    "time_condition": "state_save + state_transfer + state_restore + target_rebuild + target_model_load + adapter_switch + waiting < avoided_model_transfer + avoided_model_load + avoided_switch",
+    "validated_state_bytes": null
+  },
+  "decision_effect": {
+    "after_calibration": "unverifiable because neither a validated recoverable state nor real adapter load/switch/network costs are available",
+    "algorithm_superiority": "not evaluated",
+    "blocking_conditions": [
+      "authorized and reviewed real adapter pair",
+      "actual A→B→A load/switch/execute witness",
+      "pre-frozen workflow whose continuous and restored paths both satisfy task correctness",
+      "three valid save/restore/load measurements",
+      "explicit network assumption or measurement kept separate from local disk timing"
+    ],
+    "native_witness": "unchanged: action 4 retains equal completion/failures and 104 MiB fewer synthetic model bytes in both long-tail instances",
+    "next_small_scale_method_comparison_ready": false,
+    "support_or_weaken": "the native mechanism witness remains intact, but the failed recovery and unavailable adapters weaken readiness for a real-workload benefit claim"
+  },
+  "evidence_type": "layered_native_ledger_and_failed_calibration_sensitivity",
+  "inputs": {
+    "adapter_inventory": {
+      "path": "artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/adapter_resource_inventory.json",
+      "sha256": "f46415d2e80abdfad3a25bdf83e822e548c75915ae04f3c0f11343fbc9d367e8"
+    },
+    "measurement": {
+      "path": "artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/workflow_state_recovery_measurements.json",
+      "sha256": "0ed50b05e780c1f2eeefbeef9ed4f40bbdefdce6f5ed185af61a3f01d97b3b54"
+    },
+    "measurement_plan": {
+      "path": "artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/measurement_plan.json",
+      "sha256": "893660e826cd82cc3e05622a1b7855498e387a0ce4eec7ec94cbc8cc77920aa3"
+    },
+    "previous_paired_witness": {
+      "path": "artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/paired_witness_results.json",
+      "sha256": "041402eda14c3d85635342022c9027e3c57fd9b966f07646a169b16c5d1713db"
+    }
+  },
+  "native_synthetic_ledger_unchanged": [
+    {
+      "ablated_first_action": 0,
+      "ablated_model_transfer_bytes": 218103808,
+      "avoided_synthetic_model_transfer_bytes": 109051904,
+      "equal_completion": true,
+      "equal_failures": true,
+      "instance_id": "tail_length__long",
+      "native_migration_realized_step_count": 1,
+      "native_state_bytes_interpretation": "unavailable_missing_workflow_state_object_or_payload_accounting_not_zero_cost",
+      "native_state_bytes_raw": 0,
+      "node_completion": {
+        "ablated": 3,
+        "node_total": 3,
+        "prepare": 3
+      },
+      "prepare_action_semantics": {
+        "cache_action": {
+          "adapter_id": "b0.a0",
+          "operation": "cache",
+          "prediction_driven": true,
+          "prediction_source": "predicted_first_handoff_rsu",
+          "rsu_id": "rsu_b",
+          "strategy": "handoff_prepare_prefetch"
+        },
+        "changes_location_or_state": "places the current-node adapter at the predicted handoff target and records a prepare history entry; it does not serialize, transfer, or import an application/runtime state object",
+        "migration_action": {
+          "expected_target_rsu_id": "rsu_b",
+          "mode": "prepare",
+          "strategy": "handoff_migration_prepare"
+        }
+      },
+      "prepare_first_action": 4,
+      "prepare_model_transfer_bytes": 109051904,
+      "service_failure_count": {
+        "ablated": 1,
+        "prepare": 1
+      }
+    },
+    {
+      "ablated_first_action": 0,
+      "ablated_model_transfer_bytes": 360710144,
+      "avoided_synthetic_model_transfer_bytes": 109051904,
+      "equal_completion": true,
+      "equal_failures": true,
+      "instance_id": "tail_adapter_structure__long",
+      "native_migration_realized_step_count": 1,
+      "native_state_bytes_interpretation": "unavailable_missing_workflow_state_object_or_payload_accounting_not_zero_cost",
+      "native_state_bytes_raw": 0,
+      "node_completion": {
+        "ablated": 3,
+        "node_total": 3,
+        "prepare": 3
+      },
+      "prepare_action_semantics": {
+        "cache_action": {
+          "adapter_id": "b0.a0",
+          "operation": "cache",
+          "prediction_driven": true,
+          "prediction_source": "predicted_first_handoff_rsu",
+          "rsu_id": "rsu_b",
+          "strategy": "handoff_prepare_prefetch"
+        },
+        "changes_location_or_state": "places the current-node adapter at the predicted handoff target and records a prepare history entry; it does not serialize, transfer, or import an application/runtime state object",
+        "migration_action": {
+          "expected_target_rsu_id": "rsu_b",
+          "mode": "prepare",
+          "strategy": "handoff_migration_prepare"
+        }
+      },
+      "prepare_first_action": 4,
+      "prepare_model_transfer_bytes": 251658240,
+      "service_failure_count": {
+        "ablated": 1,
+        "prepare": 1
+      }
+    }
+  ],
+  "workflow_state_recovery": {
+    "diagnostic_state_is_complete_validated_migration_state": false,
+    "distinct_processes": true,
+    "failure_reason": "the fixed base generated 'lane status.' rather than the pre-frozen expected normalized value 'clear'; target validation rejected the state before model load or downstream execution",
+    "final_output_equivalence": "unavailable",
+    "formal_measurement_count": 0,
+    "independent_process_restore_witness": false,
+    "save_restore_load_cost_calibration": "unavailable",
+    "source_pid": 79355,
+    "source_process_saved_state": true,
+    "source_state_bytes_diagnostic_only": 3085,
+    "source_state_durable_save_ns_warmup_only": 394459,
+    "source_state_serialization_ns_warmup_only": 66416,
+    "source_state_sha256_diagnostic_only": "6200a8b76b7d702268e1af5bc9a6a2ebbfa1ba3daf31ba51587026b88eecdbc6",
+    "status": "failed_warmup_before_formal_measurements",
+    "target_failure": {
+      "error": "upstream normalized output failed frozen correctness criterion",
+      "error_type": "ValueError"
+    },
+    "target_pid": 79356
+  }
+}

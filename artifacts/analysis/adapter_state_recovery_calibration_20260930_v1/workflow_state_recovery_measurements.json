@@ -1,0 +1,206 @@
+{
+  "adapter_execution": {
+    "adapter_model_calls": 0,
+    "adapter_processes": 0,
+    "downloaded_weight_bytes": 0,
+    "reason": "unavailable_no_local_pair_and_new_weight_download_not_authorized",
+    "status": "unavailable"
+  },
+  "all_measurements_pass": false,
+  "artifact_run_id": "adapter_state_recovery_calibration_20260930_v1",
+  "base_weight_identity": {
+    "bytes": 1015025832,
+    "match": true,
+    "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/model_a7da5b9_20260929/model.safetensors",
+    "sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2"
+  },
+  "claim_boundary": "complete for this declared two-node application workflow, not a complete generic model runtime or arbitrary workflow migration state",
+  "evidence_type": "same_host_independent_process_recovery_witness",
+  "execution_counts": {
+    "maximum_model_calls": 20,
+    "maximum_model_processes": 15,
+    "measurement_pairs": 0,
+    "model_calls": 3,
+    "model_processes": 3,
+    "warmup_pairs": 1
+  },
+  "failure_records": [
+    {
+      "error": "upstream normalized output failed frozen correctness criterion",
+      "error_type": "ValueError",
+      "measurement_index": -1,
+      "mode": "target",
+      "phase": "warmup",
+      "returncode": 1,
+      "status": "failed",
+      "stderr": ""
+    }
+  ],
+  "host": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python_orchestrator": "3.9.6 (default, May 22 2026, 11:13:45) \n[Clang 21.0.0 (clang-2100.1.1.101)]"
+  },
+  "independence_boundary": {
+    "cross_rsu_measured": false,
+    "source_exits_before_target_spawn": true,
+    "target_declared_inputs": [
+      "retained state.json",
+      "frozen measurement_plan.json",
+      "pinned local model/processor files",
+      "calibration runner source"
+    ],
+    "transport_measured": false,
+    "undeclared_source_memory_or_files_used": false
+  },
+  "measured_at_unix_ns": 1790763182845684000,
+  "measurement_count": 0,
+  "measurements": [],
+  "plan_path": "/Users/howen/.codex/worktrees/adapter-state-calibration/PPO_MEC/artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/measurement_plan.json",
+  "plan_sha256": "893660e826cd82cc3e05622a1b7855498e387a0ce4eec7ec94cbc8cc77920aa3",
+  "runner_path": "/Users/howen/.codex/worktrees/adapter-state-calibration/PPO_MEC/scripts/calibrate_workflow_state_recovery.py",
+  "runner_sha256": "3418b1b063afaa0ce08ee3acf0fb75e0d347eeea6e0aeecd0c5ccc680e3e03e9",
+  "summary": null,
+  "warmup": {
+    "correctness": {
+      "all_children_pass": false,
+      "pair_pass": false
+    },
+    "measurement_index": -1,
+    "rows": {
+      "continuous": {
+        "command": [
+          "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python",
+          "/Users/howen/.codex/worktrees/adapter-state-calibration/PPO_MEC/scripts/calibrate_workflow_state_recovery.py",
+          "--plan",
+          "/Users/howen/.codex/worktrees/adapter-state-calibration/PPO_MEC/artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/measurement_plan.json",
+          "--child-mode",
+          "continuous",
+          "--measurement-index",
+          "-1"
+        ],
+        "finished_unix_ns": 1790763180848364000,
+        "memory": {
+          "mps_current_allocated_bytes": 1014973184,
+          "mps_driver_allocated_bytes": 1345110016,
+          "process_max_rss_bytes": 2379005952
+        },
+        "mode": "continuous",
+        "model_load_ns": 695008583,
+        "pid": 79354,
+        "process_wall_ns": 2260727333,
+        "returncode": 0,
+        "stage1": {
+          "decoded_text": " lane status.",
+          "generated_token_count": 3,
+          "generated_token_ids": [
+            24289,
+            3559,
+            30
+          ],
+          "inference_ns": 210802167,
+          "normalized_status": "lanestatus",
+          "prompt_sha256": "ce85f50adc7c37891ab7827fe95a8ee9d659591bfb56167468184d2763a9f79b",
+          "prompt_token_count": 31,
+          "render_ns": 4863375,
+          "tokenize_and_device_transfer_ns": 1167375
+        },
+        "stage2": {
+          "decoded_text": " The upstream lane",
+          "generated_token_count": 3,
+          "generated_token_ids": [
+            378,
+            22302,
+            24289
+          ],
+          "inference_ns": 103680459,
+          "normalized_status": "theupstreamlane",
+          "prompt_sha256": "bad8d3f6c020ec65266532539262a466ec510c3625cc6a76dd3a19ee6924541f",
+          "prompt_token_count": 29,
+          "render_ns": 49208,
+          "tokenize_and_device_transfer_ns": 576833
+        },
+        "stage2_prompt_rebuild_ns": 3042,
+        "started_unix_ns": 1790763178587622000,
+        "status": "pass",
+        "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+        "workflow_total_ns": 2058570792
+      },
+      "source": {
+        "command": [
+          "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python",
+          "/Users/howen/.codex/worktrees/adapter-state-calibration/PPO_MEC/scripts/calibrate_workflow_state_recovery.py",
+          "--plan",
+          "/Users/howen/.codex/worktrees/adapter-state-calibration/PPO_MEC/artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/measurement_plan.json",
+          "--child-mode",
+          "source",
+          "--state",
+          "/var/folders/mt/23vgm0kx7msgvzjyg7lxk0dh0000gn/T/ppo_mec_state_recovery_warmup_l244kaqb/state.json",
+          "--measurement-index",
+          "-1"
+        ],
+        "finished_unix_ns": 1790763182811143000,
+        "memory": {
+          "mps_current_allocated_bytes": 1014973184,
+          "mps_driver_allocated_bytes": 1345093632,
+          "process_max_rss_bytes": 2378760192
+        },
+        "mode": "source",
+        "model_load_ns": 566100792,
+        "pid": 79355,
+        "process_wall_ns": 1962690958,
+        "returncode": 0,
+        "stage1": {
+          "decoded_text": " lane status.",
+          "generated_token_count": 3,
+          "generated_token_ids": [
+            24289,
+            3559,
+            30
+          ],
+          "inference_ns": 153125916,
+          "normalized_status": "lanestatus",
+          "prompt_sha256": "ce85f50adc7c37891ab7827fe95a8ee9d659591bfb56167468184d2763a9f79b",
+          "prompt_token_count": 31,
+          "render_ns": 2210959,
+          "tokenize_and_device_transfer_ns": 987208
+        },
+        "started_unix_ns": 1790763180848440000,
+        "state": {
+          "bytes": 3085,
+          "durable_write_ns": 394459,
+          "path": "/var/folders/mt/23vgm0kx7msgvzjyg7lxk0dh0000gn/T/ppo_mec_state_recovery_warmup_l244kaqb/state.json",
+          "serialization_ns": 66416,
+          "sha256": "6200a8b76b7d702268e1af5bc9a6a2ebbfa1ba3daf31ba51587026b88eecdbc6"
+        },
+        "status": "pass",
+        "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+        "workflow_total_ns": 1772454458
+      },
+      "target": {
+        "command": [
+          "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python",
+          "/Users/howen/.codex/worktrees/adapter-state-calibration/PPO_MEC/scripts/calibrate_workflow_state_recovery.py",
+          "--plan",
+          "/Users/howen/.codex/worktrees/adapter-state-calibration/PPO_MEC/artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/measurement_plan.json",
+          "--child-mode",
+          "target",
+          "--state",
+          "/var/folders/mt/23vgm0kx7msgvzjyg7lxk0dh0000gn/T/ppo_mec_state_recovery_warmup_l244kaqb/state.json",
+          "--measurement-index",
+          "-1"
+        ],
+        "error": "upstream normalized output failed frozen correctness criterion",
+        "error_type": "ValueError",
+        "finished_unix_ns": 1790763182845422000,
+        "mode": "target",
+        "pid": 79356,
+        "process_wall_ns": 34223708,
+        "returncode": 1,
+        "started_unix_ns": 1790763182811198000,
+        "status": "failed",
+        "stderr": ""
+      }
+    }
+  }
+}

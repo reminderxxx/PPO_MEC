@@ -1,5 +1,16 @@
 ﻿# Decision Log
 
+## 2026-09-30: adapter 与状态恢复按 fail-closed 门禁，不由合成字节收益反推
+
+- 决定：没有两个真实 adapter 的 A→B→A load/switch/execute 和 active identity 证据时，工程兼容性保持
+  `unavailable`；公开模型卡声明、prompt 或配置文件不替代真实加载。
+- 决定：只有独立 target 进程通过状态合同、任务正确性和最终输出等价，状态字节与 save/restore/load 时间才可进入
+  校准。失败预热的 3,085 bytes 不称完整迁移状态，不为得到成功结果改 prompt 或重试同一方案。
+- 决定：action 4 的 native prepare 与 calibration adapter 分开；原 104 MiB 合成模型账本不覆盖，0 state bytes 按
+  payload 缺失解释。真实净收益只能在完整成本齐备后条件判断，不由综合分数或算法排名替代。
+- 边界：本轮停止于新增资源授权和状态正确性门禁，不训练、不扩 production action、不支持方法比较；详见
+  `adapter_state_recovery_calibration_20260930.md`。
+
 ## 2026-09-30: typed-cache 跨底座替换采用显式顺序重算候选
 
 - 决定：`static_dependency_safe_v1` 继续作为默认语义，既有 profile、正式合同与历史产物身份不变；跨底座替换只通过显式

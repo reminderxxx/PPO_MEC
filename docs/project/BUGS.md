@@ -5,6 +5,17 @@
 
 ﻿# Bugs And Risks
 
+## 2026-09-30: 真实 adapter 和独立进程状态恢复仍不可用（OPEN BLOCKER）
+
+- 本地没有与固定 SmolVLM base 配套的真实 adapter；公开 ALPR/Helmet LoRA 共需 164,065,376 bytes 新权重，固定
+  环境也没有 PEFT/accelerate。本轮未授权下载或安装，故没有 A→B→A load/switch/execute 或任务质量证据。
+- 两节点状态 calibration 的 source 写出 3,085-byte 声明状态，但冻结 base 输出为 `lanestatus` 而非 `clear`；
+  target 独立进程在模型加载前按正确性合同拒绝。正式测量为 0，该字节数和预热 save 时间不得作为完整迁移成本。
+- action 4 的 `migration_realized` 只兑现当前 adapter prepare；原账本 0 state bytes 表示缺 payload/object 记账，
+  不是零成本。真实状态、adapter switch、target load/rebuild、waiting 和网络成本未知，104 MiB 合成字节收益仍 conditional。
+- 下一轮需中央复核新增资源授权，并另立预冻结的状态任务；不得在本轮失败后换 prompt 重试或直接进入方法比较。
+  详见 `adapter_state_recovery_calibration_20260930.md`。
+
 ## 2026-09-30: 剩余信息见证受状态账本与动作可达性限制（OPEN）
 
 - `semantic_discrete_5` 只能为当前节点adapter做current/next/handoff-target placement；不能直接准备future adapter，

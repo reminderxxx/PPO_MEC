@@ -5,6 +5,11 @@
 
 # PPO_MEC
 
+真实 adapter / 状态恢复校准见
+[`docs/project/adapter_state_recovery_calibration_20260930.md`](docs/project/adapter_state_recovery_calibration_20260930.md)：
+本地没有真实 adapter，新增 156.465 MiB 权重未获授权；固定两节点状态链在预热正确性门禁失败，正式测量为 0。
+原生 action 4 的 104 MiB 合成字节见证保留，但完整真实负载净收益仍为 `UNVERIFIED`。
+
 原生 typed-cache 的显式顺序依赖重算 LRU 候选、固定四配置回归与两节点 `env.step()` 见证见
 [`docs/project/native_typed_cache_replacement_witness_20260930.md`](docs/project/native_typed_cache_replacement_witness_20260930.md)。
 该候选为 non-formal diagnostic；旧 transaction v1.0 默认、正式 Protocol、训练与论文结论不变。

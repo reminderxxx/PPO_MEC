@@ -1,0 +1,20 @@
+{
+  "artifact_run_id": "adapter_state_recovery_calibration_20260930_v1",
+  "attempt_id": "workflow_state_recovery_v1_1_failed",
+  "command": "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python scripts/calibrate_workflow_state_recovery.py --plan artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/measurement_plan.json --output artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/workflow_state_recovery_measurements.json --state-root artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/workflow_states",
+  "exit_code": 1,
+  "wall_seconds": 6.461206583,
+  "error_type": "NameError",
+  "error": "name 'false' is not defined",
+  "error_location": "scripts/calibrate_workflow_state_recovery.py output finalizer independence_boundary",
+  "output_file_created": false,
+  "state_root_created": false,
+  "formal_measurement_pairs_started": 0,
+  "warmup_child_process_count": "unavailable_between_1_and_3_due_finalizer_loss",
+  "warmup_model_call_count": "unavailable_at_most_4_due_finalizer_loss",
+  "warmup_correctness_details": "unavailable_due_finalizer_loss",
+  "timing_results_usable": false,
+  "scientific_result_usable": false,
+  "disposition": "retained configuration failure; one-character Python boolean correction only; plan upgraded to 1.2.0 without changing model, input, workflow, repetition count, timing boundaries, or correctness criteria",
+  "retry_reason": "configuration correction permitted by the pre-frozen failure policy; not performance-result chasing"
+}

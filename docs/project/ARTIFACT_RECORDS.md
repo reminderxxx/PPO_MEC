@@ -5,6 +5,20 @@
 
 # Artifact Records
 
+## 2026-09-30 adapter/state recovery calibration
+
+- run：`adapter_state_recovery_calibration_20260930_v1`
+- path：`artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/`
+- fixed execution baseline：`e6fffb5099563f66641a33a3ff0b70a33c852859`；runner content SHA-256=
+  `3418b1b063afaa0ce08ee3acf0fb75e0d347eeea6e0aeecd0c5ccc680e3e03e9`
+- resource result：本地 adapter 0；两个同 base 公开候选需 164,065,376 bytes 新权重，未获授权，下载/加载/调用 0。
+- recovery result：一次预热的 source 保存 3,085-byte 状态，target 独立进程因冻结任务正确性失败而在模型加载前拒绝；
+  正式测量 0，independent-process recovery witness=false。
+- decision result：原生两个长尾实例各少 104 MiB 合成模型字节且完成/失败相同的账本不变；没有 validated state、
+  adapter switch/load 或网络成本，真实净收益 `UNVERIFIED`，小规模方法比较 not ready。
+- boundary：`E1_BOUNDED_FAILED_CALIBRATION_WITH_NATIVE_LEDGER_REUSE`；不是 adapter 工程兼容性、任务质量、跨 RSU
+  实测、机制收益或算法优势。报告：`docs/project/adapter_state_recovery_calibration_20260930.md`。
+
 ## 2026-09-30 remaining-workflow decision-value audit
 
 - run：`remaining_workflow_decision_value_audit_20260930_v1`

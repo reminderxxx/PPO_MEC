@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `adapter_state_recovery_calibration_20260930.md`：同 base 两个公开 adapter 的固定资源清单与授权门槛、
+  独立进程状态恢复失败见证、action 4 语义及原生/敏感性分层；adapter 兼容性和真实净收益均未验证
+
 - `remaining_workflow_decision_value_audit_20260930.md`：原生四配置账本、本机base/应用状态最小实测、动作可达性与
   16-episode有界配对见证；真实adapter/完整状态/网络成本仍缺，不支持算法晋级
 

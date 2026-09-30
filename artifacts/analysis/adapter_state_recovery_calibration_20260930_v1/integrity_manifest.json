@@ -1,0 +1,78 @@
+{
+  "artifact_run_id": "adapter_state_recovery_calibration_20260930_v1",
+  "schema": "adapter_state_calibration_integrity_v1",
+  "fixed_execution_commit": "e6fffb5099563f66641a33a3ff0b70a33c852859",
+  "result_commit": "PENDING_DELIVERY_COMMIT",
+  "records": [
+    {
+      "path": "adapter_resource_inventory.json",
+      "bytes": 5003,
+      "sha256": "f46415d2e80abdfad3a25bdf83e822e548c75915ae04f3c0f11343fbc9d367e8"
+    },
+    {
+      "path": "measurement_plan.json",
+      "bytes": 10025,
+      "sha256": "893660e826cd82cc3e05622a1b7855498e387a0ce4eec7ec94cbc8cc77920aa3"
+    },
+    {
+      "path": "failed_attempt_v1_1.json",
+      "bytes": 1550,
+      "sha256": "609274bffcd43196afd3c6b513e177671222a1a91f774d3b3d0f2b806e95a45f"
+    },
+    {
+      "path": "workflow_state_recovery_measurements.json",
+      "bytes": 8564,
+      "sha256": "0ed50b05e780c1f2eeefbeef9ed4f40bbdefdce6f5ed185af61a3f01d97b3b54"
+    },
+    {
+      "path": "cost_sensitivity_synthesis.json",
+      "bytes": 12636,
+      "sha256": "ddb018747d75fcc129055838b3c5fd3bc4d0c359435bcf7021f03220b64ee968"
+    },
+    {
+      "path": "workspace_protection_snapshot.json",
+      "bytes": 2511,
+      "sha256": "eb298407d035f4f3d75e66c0fb6154fef5160f177ca63dd7bb4b571a59ea2549"
+    },
+    {
+      "path": "../../../scripts/calibrate_workflow_state_recovery.py",
+      "bytes": 34142,
+      "sha256": "3418b1b063afaa0ce08ee3acf0fb75e0d347eeea6e0aeecd0c5ccc680e3e03e9"
+    },
+    {
+      "path": "../../../scripts/synthesize_adapter_state_recovery_calibration.py",
+      "bytes": 13383,
+      "sha256": "01549b13749bc2a26f0b4470739e78607264af1b59fcb6adffaa4b3a24801db5"
+    },
+    {
+      "path": "../../../tests/test_workflow_state_recovery_calibration.py",
+      "bytes": 6597,
+      "sha256": "a0e32fc91c7946a2d2ca157468c91ffb403a4970e3d0d7ff4f14e0d05bc4bd3f"
+    },
+    {
+      "path": "../remaining_workflow_decision_value_audit_20260930_v1/paired_witness_results.json",
+      "bytes": null,
+      "sha256": "041402eda14c3d85635342022c9027e3c57fd9b966f07646a169b16c5d1713db",
+      "role": "read_only_frozen_input"
+    }
+  ],
+  "execution_counts": {
+    "training_runs": 0,
+    "formal_runs": 0,
+    "holdout_runs": 0,
+    "adapter_download_bytes": 0,
+    "adapter_processes": 0,
+    "adapter_calls": 0,
+    "state_warmup_pairs": 1,
+    "state_measurement_pairs": 0,
+    "model_processes_in_v1_2": 3,
+    "successful_generate_calls_in_v1_2": 3
+  },
+  "terminal_status": "stopped_pending_resource_authorization_and_failed_state_correctness_gate",
+  "claims": {
+    "adapter_engineering_compatibility": false,
+    "workflow_state_recovery": false,
+    "real_workload_net_benefit": false,
+    "algorithm_superiority": false
+  }
+}

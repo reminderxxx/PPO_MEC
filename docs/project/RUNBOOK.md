@@ -5,6 +5,28 @@
 
 # Runbook
 
+## 真实 adapter / 状态恢复校准（2026-09-30）
+
+本轮 artifact 已到失败终态，以下命令用于复算测试和原账本合成，不授权重复模型执行或下载 adapter。状态 runner
+create-only；若以后中央复核授权新任务，必须使用新 artifact root 和新冻结 plan，不能覆盖本轮。
+
+```bash
+/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python -m pytest \
+  tests/test_workflow_state_recovery_calibration.py
+
+/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python \
+  scripts/synthesize_adapter_state_recovery_calibration.py \
+  --previous-paired artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/paired_witness_results.json \
+  --measurement artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/workflow_state_recovery_measurements.json \
+  --inventory artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/adapter_resource_inventory.json \
+  --plan artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/measurement_plan.json \
+  --output <new_output.json>
+```
+
+真实 adapter 后续最小资源预算是两个固定 revision 权重合计 164,065,376 bytes，另需隔离 PEFT/accelerate 环境和
+固定许可输入；未获显式授权前不得下载。状态执行原命令和两次版本化失败见机器证据；禁止为改变结果自动重试。
+报告：`adapter_state_recovery_calibration_20260930.md`。
+
 ## 原生 typed-cache 顺序重算 LRU 候选见证（2026-09-30）
 
 该入口只运行固定 probe 的两请求/边界例、四配置 old/new 回归和两步 synthetic `env.step()`；不训练、不打开
