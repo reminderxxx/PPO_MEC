@@ -1536,6 +1536,18 @@ def run_real_episode(
                 if cache_capacity_profile
                 else None
             ),
+            "typed_eviction_semantics": (
+                cache_capacity_profile.get("typed_eviction_semantics")
+                if cache_capacity_profile
+                else None
+            ),
+            "typed_cache_transaction_contract_version": (
+                model_cache_runtime_contract.get(
+                    "typed_cache_transaction_contract_version"
+                )
+                if model_cache_runtime_contract
+                else None
+            ),
             "seed": seed,
             "window_id": mobility_bundle.rsu_metadata.get("window_id"),
             "rsu_layout": mobility_bundle.rsu_metadata.get("effective_rsu_layout"),

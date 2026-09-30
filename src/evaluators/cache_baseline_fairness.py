@@ -24,8 +24,13 @@ from src.runtime.typed_model_cache_runtime import (
     REQUEST_REPLAY_TYPED_CONTRACT_VERSION,
     RUNTIME_CONTRACT_VERSION,
     TYPED_CACHE_TRANSACTION_CONTRACT_VERSION,
+    TYPED_CACHE_TRANSACTION_CANDIDATE_CONTRACT_VERSION,
     RuntimeContractError,
     resolve_model_cache_runtime,
+)
+from src.envs.core.cache_eviction import (
+    TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU,
+    TYPED_EVICTION_SEMANTICS_STATIC,
 )
 from src.runtime.portable_resource_identity import scientific_identity_fingerprint
 from src.runtime.formal_agent_order import (
@@ -379,7 +384,10 @@ def build_typed_cache_fairness_binding(
         "initial_typed_state_fingerprint": runtime_contract[
             "typed_initial_state_fingerprint"
         ],
-        "transaction_contract_version": TYPED_CACHE_TRANSACTION_CONTRACT_VERSION,
+        "transaction_contract_version": runtime_contract.get(
+            "typed_cache_transaction_contract_version",
+            TYPED_CACHE_TRANSACTION_CONTRACT_VERSION,
+        ),
         "transaction_contract": runtime_contract["transaction_contract"],
         "cache_event_schema_version": CACHE_EVENT_SCHEMA_VERSION,
         "type_aware_metric_version": CACHE_EFFICIENCY_METRICS_CONTRACT_VERSION,
@@ -478,11 +486,25 @@ def validate_typed_cache_fairness_binding(
         errors.append("typed transaction action/bundle budget mismatch")
     if transaction.get("partial_admission") is not False or transaction.get("atomic_rollback") is not True:
         errors.append("typed transaction must be atomic without partial admission")
-    if payload.get("transaction_contract_version") != TYPED_CACHE_TRANSACTION_CONTRACT_VERSION:
+    transaction_version = payload.get("transaction_contract_version")
+    eviction_semantics = transaction.get("eviction_semantics") or TYPED_EVICTION_SEMANTICS_STATIC
+    allowed_transaction_pair = (
+        transaction_version == TYPED_CACHE_TRANSACTION_CONTRACT_VERSION
+        and eviction_semantics == TYPED_EVICTION_SEMANTICS_STATIC
+    ) or (
+        transaction_version == TYPED_CACHE_TRANSACTION_CANDIDATE_CONTRACT_VERSION
+        and eviction_semantics == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU
+    )
+    if not allowed_transaction_pair:
         errors.append("typed transaction contract version mismatch")
     if transaction.get("action_before_lookup") is not True:
         errors.append("typed action-before-lookup contract missing")
-    if transaction.get("dependency_safe_base_eviction") != "prohibit_while_resident_adapter_depends":
+    expected_dependency_semantics = (
+        "sequential_shadow_recompute_after_each_planned_removal"
+        if eviction_semantics == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU
+        else "prohibit_while_resident_adapter_depends"
+    )
+    if transaction.get("dependency_safe_base_eviction") != expected_dependency_semantics:
         errors.append("typed dependency-safe eviction contract mismatch")
     if payload.get("cache_event_schema_version") != CACHE_EVENT_SCHEMA_VERSION:
         errors.append("typed CacheEvent version mismatch")

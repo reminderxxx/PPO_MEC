@@ -229,6 +229,9 @@ class CacheEvent:
     typed_capacity_snapshot: dict[str, Any] | None = None
     atomic_transaction_status: str | None = None
     orphan_count: int | None = None
+    typed_cache_transaction_contract_version: str | None = None
+    typed_eviction_semantics: str | None = None
+    eviction_planning_trace: dict[str, Any] | None = None
 
     def __post_init__(self) -> None:
         if str(self.event_schema_version).split(".", 1)[0] != "1":
@@ -347,6 +350,9 @@ CacheEvent.OPTIONAL_FIELDS = (
     "typed_capacity_snapshot",
     "atomic_transaction_status",
     "orphan_count",
+    "typed_cache_transaction_contract_version",
+    "typed_eviction_semantics",
+    "eviction_planning_trace",
 )
 CacheEvent.REQUIRED_FIELDS = tuple(
     item.name for item in fields(CacheEvent) if item.name not in CacheEvent.OPTIONAL_FIELDS
