@@ -1,0 +1,22 @@
+{
+  "artifact_run_id": "native_typed_cache_replacement_20260930_v1",
+  "evidence_level": "E2_BOUNDED_NATIVE_IMPLEMENTATION_DIAGNOSTIC",
+  "git_commit": "ffa10e598feddac99c2557d994ba094692ede99a",
+  "literature_cutoff": "2026-09-30 (no literature search; bounded implementation diagnostic)",
+  "not_proved": [
+    "Algorithm advantage, latency improvement, throughput improvement, formal or holdout validity, canonical promotion, or paper readiness.",
+    "Equivalence to the external reference ordering or numerical results.",
+    "Support for sequential recomputation under FIFO, LFU, Aging-LFU, or Random eviction.",
+    "Real model loading or real joint VEC adapter traces."
+  ],
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "proved": [
+    "The normal typed cache-fill action reaches the opt-in candidate for every agent using the shared five-action codec.",
+    "The frozen b0.a0 to b1.a0 swap can atomically evict the old adapter and then its newly unneeded base under native LRU ordering.",
+    "Pinned, non-evictable, oversized, and retained-dependency cases reject without real resident or policy-state mutation.",
+    "A two-node synthetic workflow progresses and completes through reset plus two legal Gym env.step(action=0) calls under the candidate."
+  ],
+  "reviewed_at": "2026-09-30T08:46:17.689937+00:00",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "verdict": "Candidate mechanism feasible on frozen synthetic microtraces; paper readiness and algorithm advantage unverifiable"
+}

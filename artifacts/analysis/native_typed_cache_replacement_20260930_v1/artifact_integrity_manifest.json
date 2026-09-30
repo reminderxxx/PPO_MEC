@@ -1,0 +1,48 @@
+{
+  "artifact_run_id": "native_typed_cache_replacement_20260930_v1",
+  "file_count_excluding_manifest": 8,
+  "files": [
+    {
+      "path": "commands_environment_input_integrity.json",
+      "sha256": "73b2046084d28f8563d3bca5a9e68174443fb948079e32863b60d818b68100bb",
+      "size_bytes": 11851
+    },
+    {
+      "path": "env_step_workflow_witness.json",
+      "sha256": "69e5d1f878ba68a0659d86fc0143f5df0d6e556f9de36e04ca71e8d64abdfbb1",
+      "size_bytes": 57404
+    },
+    {
+      "path": "four_config_candidate_request_log.jsonl",
+      "sha256": "0dcfd91231d14a0bd34d66db0edf6d2bfaf3ac95bf63cf37c72d4b7e36f9b230",
+      "size_bytes": 4272212
+    },
+    {
+      "path": "four_config_old_candidate_summary.json",
+      "sha256": "205ba34b390fa8652883f26cacfb5d14927f9be8f39896f32b4648cf1db3c490",
+      "size_bytes": 8159
+    },
+    {
+      "path": "four_config_old_request_log.jsonl",
+      "sha256": "afbec9f57909bc2cafb72e8bc2210010174eae9c4f387ebee2f4da391b56fe2d",
+      "size_bytes": 2850733
+    },
+    {
+      "path": "main_workspace_seven_file_protection.json",
+      "sha256": "f24da8c93ca707c18d9810f900918a4ffe5a7610319aceb45f9807462a1f6c94",
+      "size_bytes": 4862
+    },
+    {
+      "path": "research_claim_boundary.json",
+      "sha256": "71b4bd777af8dba3a3e9b479da68015b1255e953a51f4c905c772c9f0fcf4ce0",
+      "size_bytes": 1529
+    },
+    {
+      "path": "two_request_and_boundary_cases.json",
+      "sha256": "85219d5d02708bfb6268f01e387dbb6e02eb6e5f6f849dfe22d87020734987e7",
+      "size_bytes": 55725
+    }
+  ],
+  "generated_at_utc": "2026-09-30T08:46:17.689937+00:00",
+  "status": "pass"
+}

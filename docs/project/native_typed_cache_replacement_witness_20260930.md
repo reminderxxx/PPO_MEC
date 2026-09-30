@@ -5,7 +5,7 @@
 - `target_venue`: `IEEE Transactions on Mobile Computing (TMC)`
 - `artifact_run_id`: `native_typed_cache_replacement_20260930_v1`
 - `policy_version`: `tmc_review_policy_v3_20260621`
-- `execution_git_commit`: `602f5af374726485f5c2c3759cd6540d2e2e9f2b`
+- `execution_git_commit`: `ffa10e598feddac99c2557d994ba094692ede99a`
 - `delivered_audit_commit`: `371159dabbacdc0d82acbc63efd588508338d289`
 - `audited_native_parent`: `73051ab264aa868e83f2e011b5ced26968eef74b`
 - `evidence_level`: `E2_BOUNDED_NATIVE_IMPLEMENTATION_DIAGNOSTIC`
@@ -119,7 +119,7 @@ v1.0 transaction，不能静默切换。
   --output-root artifacts/analysis/native_typed_cache_replacement_20260930_v1
 ```
 
-执行时 branch=`codex/typed-cache-replacement`、HEAD=`602f5af...`、status为空、worktree diff SHA-256为空内容 hash
+执行时 branch=`codex/typed-cache-replacement`、HEAD=`ffa10e5...`、status为空、worktree diff SHA-256为空内容 hash
 `e3b0c442...b855`。输入 ZIP 大小351,734 bytes、SHA-256=`c0b332...bbe`，CRC与38个 manifest member hash通过；
 已交付审计的9个 manifest 文件 hash/size再次通过。
 
