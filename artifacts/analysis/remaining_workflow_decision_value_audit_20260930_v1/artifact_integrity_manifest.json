@@ -1,0 +1,52 @@
+{
+  "artifact_run_id": "remaining_workflow_decision_value_audit_20260930_v1",
+  "file_count": 9,
+  "files": [
+    {
+      "path": "commands_environment_failures.json",
+      "sha256": "eea43698d0e6b023f8b93af25bb770e01c8519948e7f2cddeb3dbccaed7d7909",
+      "size_bytes": 4190
+    },
+    {
+      "path": "evidence_synthesis.json",
+      "sha256": "6326cd95fb2f9aa973c3fd7bb005f28b60f8b28365de6731b24e1a6364ad8887",
+      "size_bytes": 11713
+    },
+    {
+      "path": "local_model_state_measurements.json",
+      "sha256": "d2164ca06e8717649ae04961a486e9aeb9150a9f053425b4fea346d7ea0c6b3b",
+      "size_bytes": 8802
+    },
+    {
+      "path": "main_workspace_protection.json",
+      "sha256": "7f0568243911299f3815a8c927b563e263698aa9f5e65f6c7194f766c57a9612",
+      "size_bytes": 2411
+    },
+    {
+      "path": "measurement_plan.json",
+      "sha256": "5836c30c0446d4c1fdd19c0c50511d99f6128cb4be04107b38e68010b9289336",
+      "size_bytes": 3036
+    },
+    {
+      "path": "native_action_reachability.json",
+      "sha256": "218ab91cb8c9ffa2e0f747c4937bd6b2f514b25eb650b670df0bef5e4fae7a84",
+      "size_bytes": 8000
+    },
+    {
+      "path": "native_four_config_ledger.json",
+      "sha256": "7218312c1f2ccd072cdb315d80d42ee5a349475810ece3ca11bf59d640362eae",
+      "size_bytes": 18257
+    },
+    {
+      "path": "paired_witness_design.json",
+      "sha256": "73c07fdc4ae1bacc0fcecddca299dc29286d2356d995a4ebead565563a5cdd03",
+      "size_bytes": 4206
+    },
+    {
+      "path": "paired_witness_results.json",
+      "sha256": "041402eda14c3d85635342022c9027e3c57fd9b966f07646a169b16c5d1713db",
+      "size_bytes": 720800
+    }
+  ],
+  "status": "pass"
+}

@@ -5,6 +5,19 @@
 
 # Artifact Records
 
+## 2026-09-30 remaining-workflow decision-value audit
+
+- run：`remaining_workflow_decision_value_audit_20260930_v1`
+- path：`artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/`
+- fixed base：`58c3a8900152f03e0d655194e1a02afb50f1f727`；上一轮execution commit=`ffa10e5`
+- inputs：上一轮old/candidate四配置各288 request rows；本机SmolVLM
+  `a7da5b986cb59b408707209984f360a5f4ad7e47`；预注册2 pair×4 rules=16 episodes
+- result：candidate equal-completion下blocked+sharing on 3,264 MiB、其余8,640 MiB；SmolVLM process-first load
+  中位445.778 ms、minimal inference中位27.709 ms；732-byte显式状态3/3恢复正确；action4长尾同完成/失败少
+  104 MiB模型字节但真实状态payload unavailable；两步与full-tail 4/4首动作相同。
+- boundary：原生仿真、本机测量、符号敏感性严格分开；无真实adapter/network/complete state，无训练、formal/holdout、
+  algorithm advantage或paper-ready结论。报告：`docs/project/remaining_workflow_decision_value_audit_20260930.md`。
+
 ## 2026-09-30 native typed-cache sequential replacement witness
 
 - run：`native_typed_cache_replacement_20260930_v1`

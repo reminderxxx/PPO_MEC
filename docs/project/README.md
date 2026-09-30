@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `remaining_workflow_decision_value_audit_20260930.md`：原生四配置账本、本机base/应用状态最小实测、动作可达性与
+  16-episode有界配对见证；真实adapter/完整状态/网络成本仍缺，不支持算法晋级
+
 - `native_typed_cache_request_audit_20260930.md`：固定四配置、288请求的原生 typed-cache 逐请求对账、首个
   dependency-safe feasible-set 差异、LRU 决策空间与 claim boundary；不是机制修复或训练结果
 

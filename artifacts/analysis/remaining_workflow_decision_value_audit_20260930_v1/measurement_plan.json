@@ -1,0 +1,74 @@
+{
+  "artifact_run_id": "remaining_workflow_decision_value_audit_20260930_v1",
+  "frozen_before_execution": true,
+  "frozen_at": "2026-09-30T17:20:00+08:00",
+  "scope": "bounded local base-model and explicit application-state cost measurement",
+  "model": {
+    "repository": "HuggingFaceTB/SmolVLM-500M-Instruct",
+    "revision": "a7da5b986cb59b408707209984f360a5f4ad7e47",
+    "local_path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/model_a7da5b9_20260929",
+    "verified_total_bytes": 1019893574,
+    "weight_file": "model.safetensors",
+    "weight_bytes": 1015025832,
+    "weight_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+    "adapter": null,
+    "adapter_status": "unavailable_no_locally_identified_compatible_adapter",
+    "adapter_guard": "prompt variants and synthetic typed-cache objects are not adapters"
+  },
+  "runtime": {
+    "python": "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python",
+    "torch": "2.8.0",
+    "transformers": "4.49.0",
+    "device": "mps",
+    "dtype": "float16",
+    "offline_only": true,
+    "host": "Apple M5 MacBook Air, 24 GB unified memory",
+    "deployment_boundary": "not an RSU, vehicle computer, GPU server, or wireless-network measurement"
+  },
+  "fixed_input": {
+    "kind": "text_only_minimal_generation",
+    "text": "Answer with one word: clear",
+    "max_new_tokens": 2,
+    "do_sample": false
+  },
+  "conditions": {
+    "load_label": "process_first_load_with_unspecified_OS_page_cache_state",
+    "load_warmups": 1,
+    "load_measurements": 3,
+    "inference_warmups_per_measured_process": 1,
+    "inference_measurements_per_measured_process": 1,
+    "timeout_seconds_per_process": 120,
+    "cache_actions_forbidden": [
+      "OS_cache_flush",
+      "system_cache_clear",
+      "global_runtime_reconfiguration"
+    ]
+  },
+  "state_measurement": {
+    "schema": "explicit_application_workflow_state_v1",
+    "contents": [
+      "workflow identity and version",
+      "completed node ids",
+      "current node id",
+      "application outputs needed by remaining nodes",
+      "conversation summary",
+      "model identity"
+    ],
+    "excluded_claims": [
+      "model KV cache",
+      "runtime object dump",
+      "complete migratable execution context"
+    ],
+    "warmups": 1,
+    "measurements": 3,
+    "method": "canonical JSON write, fsync, read, parse, exact canonical equality and next-node-key equality",
+    "timeout_seconds": 30
+  },
+  "success_criteria": {
+    "base_load": "local-only model construction completes and weight identity remains unchanged",
+    "inference": "generation completes and returns at least one generated token",
+    "state_restore": "canonical payload and deterministic next-node key match before and after restore",
+    "adapter": "remains unavailable unless a real compatible adapter with identity evidence is present before execution"
+  },
+  "repetition_guard": "no repetitions beyond the frozen one warmup and three measurements to improve reported numbers"
+}

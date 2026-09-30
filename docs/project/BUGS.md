@@ -5,6 +5,17 @@
 
 ﻿# Bugs And Risks
 
+## 2026-09-30: 剩余信息见证受状态账本与动作可达性限制（OPEN）
+
+- `semantic_discrete_5` 只能为当前节点adapter做current/next/handoff-target placement；不能直接准备future adapter，
+  ActionAdapter不输出`migrate`，也没有继续旧RSU执行并转发结果的动作。
+- bounded action4 prepare在两个长尾case同完成/失败下少104 MiB synthetic模型传输，但
+  `migration_prepare_realized=true`时`state_migration_size_mb=0`；这是payload未记账，不是零成本迁移。
+- 本机已测SmolVLM base和732-byte显式应用状态，但无真实兼容adapter，且应用payload不是完整runtime/KV state；不得
+  回填native ledger或外推RSU/车辆/无线网络。
+- 两步前瞻在全部预注册实例与full-tail首动作一致；在出现预注册两步不足case、冻结扩展动作合同和完整state成本前，
+  不支持更强oracle或算法修改。详见`remaining_workflow_decision_value_audit_20260930.md`。
+
 ## 2026-09-30: native typed 跨底座替换已有 opt-in LRU 候选，正式扩展仍受限（PARTIAL CLOSURE）
 
 - `sequential_dependency_recompute_lru_v1` 已在 shadow state 上逐 victim 重算依赖，固定 microtrace 的合法 action、

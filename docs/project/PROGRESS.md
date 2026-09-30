@@ -5,6 +5,20 @@
 
 ﻿# Progress
 
+## 2026-09-30: 剩余工作流信息决策价值审计完成
+
+- 上一轮13个 plumbing setup error 定位为隔离 checkout 的 Alibaba/NGSIM Git LFS pointer；主工作区真实文件
+  size/SHA与pointer oid完全匹配，临时symlink绑定后 `test_typed_runtime_plumbing.py` 34/34通过并已恢复pointer。
+- 不重跑四配置矩阵，直接核算old/candidate各288行原生请求账本。candidate同为72成功时，blocked+sharing on
+  为3,264 MiB，其他三格8,640 MiB；旧语义低传输伴随36/60失败，不作节省解释。
+- 固定SmolVLM base在Apple M5/MPS上3次process-first load中位445.778 ms，最小推理3/3成功；显式732-byte应用
+  状态3/3保存恢复正确。真实兼容adapter、完整迁移状态和网络成本仍unavailable。
+- 动作审计确认future-adapter直接准备、explicit migrate、old-RSU执行后转发均不可达。预注册16 episodes中剩余信息
+  产生6次首动作变化；action4在两个长尾case同完成/失败下少104 MiB模型字节，但状态payload未记账。两步与full-tail
+  在4/4实例首动作相同，不支持算法修改。报告与机器证据见
+  `remaining_workflow_decision_value_audit_20260930.md` 和
+  `artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/`。
+
 ## 2026-09-30: 原生 typed-cache 顺序依赖重算 LRU 候选与 `env.step()` 见证完成
 
 - 审计提交 `371159d` 的父提交确认为 audited native `73051ab`；从审计提交建立隔离

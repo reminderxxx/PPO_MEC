@@ -1,0 +1,94 @@
+{
+  "artifact_run_id": "remaining_workflow_decision_value_audit_20260930_v1",
+  "design_version": "1.1.0",
+  "frozen_before_execution": true,
+  "frozen_at": "2026-09-30T17:20:00+08:00",
+  "objective": "test whether remaining-workflow structure changes a legal native preparation decision without claiming an algorithm advantage",
+  "native_action_audit": {
+    "allowed_ids": [0, 1, 2, 3, 4],
+    "candidate_actions": {
+      "0": "current_rsu_cache_fill",
+      "1": "predictive_next_rsu_prefetch for the current node adapter",
+      "3": "current_rsu_steady_offload",
+      "4": "handoff_migration_prepare for the current node adapter/state abstraction"
+    },
+    "future_adapter_direct_prepare": "not_reachable",
+    "explicit_migration_mode_migrate": "not_reachable_from_ActionAdapter",
+    "continue_old_RSU_and_forward_result": "not_reachable",
+    "manual_cache_or_state_mutation": "forbidden"
+  },
+  "fixed_current_state": {
+    "current_request": "b0.a0",
+    "current_base": "b0",
+    "current_rsu": "rsu_a",
+    "predicted_next_rsu": "rsu_b",
+    "cache_capacity_mib": 136,
+    "eviction_policy": "lru",
+    "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+    "initial_cache": "empty at both RSUs",
+    "random_seed": 7
+  },
+  "paired_instances": [
+    {
+      "pair_id": "tail_length",
+      "short": "one current node only",
+      "long": "current node followed by two nodes that reuse b0.a0",
+      "changed_information": "remaining same-adapter reuse count"
+    },
+    {
+      "pair_id": "tail_adapter_structure",
+      "short": "current node followed by b1.a0",
+      "long": "current node followed by b0.a0 then b1.a0",
+      "changed_information": "whether current adapter is reused before the later base switch"
+    }
+  ],
+  "rules": [
+    {
+      "rule_id": "remaining_reuse_information_ablated",
+      "information": "current node and current RSU only; the same reuse test receives no remaining-tail sequence",
+      "decision": "action 0 because no tail reuse is observable"
+    },
+    {
+      "rule_id": "native_two_step_lookahead",
+      "information": "current plus next node adapter and native mobility prediction",
+      "decision": "action 1 only when next node reuses current adapter at predicted RSU, else action 0"
+    },
+    {
+      "rule_id": "remaining_workflow_reuse",
+      "information": "remaining adapter sequence but no future stochastic outcomes",
+      "decision": "action 1 when the current adapter is reused after the predicted handoff, else action 0"
+    },
+    {
+      "rule_id": "remaining_workflow_handoff_prepare",
+      "information": "the same remaining adapter sequence and native mobility prediction as remaining_workflow_reuse",
+      "decision": "action 4 when the current adapter is reused after the predicted handoff, else action 0"
+    }
+  ],
+  "budget": {
+    "maximum_pairs": 3,
+    "maximum_rules_per_instance": 4,
+    "maximum_episodes": 24,
+    "planned_pairs": 2,
+    "planned_rules": 4,
+    "planned_episodes": 16,
+    "maximum_steps_per_episode": 4
+  },
+  "metrics": [
+    "node and workflow completion/failure",
+    "step completion time proxy only as native step count",
+    "base/adapter transfer bytes",
+    "workflow-state transfer bytes when natively emitted",
+    "evicted bytes",
+    "unused preparation",
+    "duplicate loads",
+    "decision changed and information responsible"
+  ],
+  "cost_sources": {
+    "simulation": "native CacheEvent and transaction ledger only",
+    "local_measurement": "measurement_plan.json outputs only",
+    "network_time": "not measured; no latency conversion will be claimed",
+    "sensitivity": "algebraic break-even thresholds with assumptions shown explicitly"
+  },
+  "failure_policy": "if a rule cannot be expressed by a normal ActionAdapter output accepted by the environment, record unreachable and stop that witness; do not strengthen it into an oracle",
+  "pre_execution_revision_note": "v1.1 adds the legal action-4 prepare rule so preparation and prepare-migration can be compared under the same full remaining-workflow information. Capacity, initial cache, DAG pairs, movement, metrics and stopping limits are unchanged; no episode had been executed under v1.0."
+}
