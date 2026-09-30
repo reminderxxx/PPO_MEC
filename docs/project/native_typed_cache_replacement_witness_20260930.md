@@ -129,3 +129,38 @@ v1.0 transaction，不能静默切换。
 
 机器证据：`artifacts/analysis/native_typed_cache_replacement_20260930_v1/`；integrity manifest 为 pass，含8个
 被校验文件。旧审计与历史 artifact 未覆盖。
+
+## 验证命令与结果
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q \
+  tests/test_typed_cache_sequential_recompute.py \
+  tests/test_typed_model_cache.py \
+  tests/test_typed_model_cache_runtime.py \
+  tests/test_cache_event_contract.py \
+  tests/test_cache_capacity_mb.py \
+  tests/test_cache_eviction_policy.py
+# 61 passed
+
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_env_contract.py
+# 14 passed
+
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/smoke_test.py
+# pass，6个 toy 节点完成，terminated=True
+
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m compileall -q \
+  src/envs/core src/envs/specs src/runtime/typed_model_cache_runtime.py \
+  src/evaluators/cache_baseline_fairness.py \
+  src/evaluators/main_results_support.py \
+  scripts/validate_typed_cache_sequential_replacement.py \
+  tests/test_typed_cache_sequential_recompute.py
+# pass
+
+git diff --check
+# pass
+```
+
+额外扩大到 `tests/test_typed_runtime_plumbing.py` 的数据依赖运行仍有13个 setup error：隔离 checkout 中
+`data/raw/workflow/alibaba2018/batch_task.csv` 的首行少于9列，符合未拉取完整 LFS 数据的表现；未自动下载或覆盖原始数据。
+该限制不影响上述 controlled runtime、CacheEvent、capacity、eviction、env contract 与真实 `env.step()` 见证，
+但完整 Alibaba plumbing 链仍是本轮未覆盖风险。
