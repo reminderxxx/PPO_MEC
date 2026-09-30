@@ -9,7 +9,7 @@
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `fixed_execution_commit`: `e6fffb5099563f66641a33a3ff0b70a33c852859`
 - `runner_sha256`: `3418b1b063afaa0ce08ee3acf0fb75e0d347eeea6e0aeecd0c5ccc680e3e03e9`
-- `result_commit`: `PENDING_DELIVERY_COMMIT`
+- `result_commit`: `0b1c4eb55a3dd00a231671f0d3a5d418122e8d43`
 - `evidence_level`: `E1_BOUNDED_FAILED_CALIBRATION_WITH_NATIVE_LEDGER_REUSE`
 - `verdict`: `UNVERIFIED / STOPPED`
 

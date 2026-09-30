@@ -2,7 +2,7 @@
   "artifact_run_id": "adapter_state_recovery_calibration_20260930_v1",
   "schema": "adapter_state_calibration_integrity_v1",
   "fixed_execution_commit": "e6fffb5099563f66641a33a3ff0b70a33c852859",
-  "result_commit": "PENDING_DELIVERY_COMMIT",
+  "result_commit": "0b1c4eb55a3dd00a231671f0d3a5d418122e8d43",
   "records": [
     {
       "path": "adapter_resource_inventory.json",

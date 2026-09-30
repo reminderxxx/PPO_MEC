@@ -11,6 +11,7 @@
 - path：`artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/`
 - fixed execution baseline：`e6fffb5099563f66641a33a3ff0b70a33c852859`；runner content SHA-256=
   `3418b1b063afaa0ce08ee3acf0fb75e0d347eeea6e0aeecd0c5ccc680e3e03e9`
+- result commit：`0b1c4eb55a3dd00a231671f0d3a5d418122e8d43`
 - resource result：本地 adapter 0；两个同 base 公开候选需 164,065,376 bytes 新权重，未获授权，下载/加载/调用 0。
 - recovery result：一次预热的 source 保存 3,085-byte 状态，target 独立进程因冻结任务正确性失败而在模型加载前拒绝；
   正式测量 0，independent-process recovery witness=false。
