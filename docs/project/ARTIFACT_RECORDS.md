@@ -10,6 +10,7 @@
 - run：`remaining_workflow_decision_value_audit_20260930_v1`
 - path：`artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/`
 - fixed base：`58c3a8900152f03e0d655194e1a02afb50f1f727`；上一轮execution commit=`ffa10e5`
+- result commit：`addd1c5828648e2e3f373f6098f139479cee1849`
 - inputs：上一轮old/candidate四配置各288 request rows；本机SmolVLM
   `a7da5b986cb59b408707209984f360a5f4ad7e47`；预注册2 pair×4 rules=16 episodes
 - result：candidate equal-completion下blocked+sharing on 3,264 MiB、其余8,640 MiB；SmolVLM process-first load

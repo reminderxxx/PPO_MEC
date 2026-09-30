@@ -7,6 +7,7 @@
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `audited_candidate_git_commit`: `58c3a8900152f03e0d655194e1a02afb50f1f727`
 - `candidate_execution_commit`: `ffa10e598feddac99c2557d994ba094692ede99a`
+- `delivery_result_commit`: `addd1c5828648e2e3f373f6098f139479cee1849`
 - `evidence_level`: `E2_BOUNDED_NATIVE_LEDGER_AND_LOCAL_HOST_MEASUREMENT`
 - `verdict`: 剩余信息在有界长尾实例中改变合法准备决策；原生 action-4 见证在相同完成量下少传模型字节，但真实完整状态、adapter 与网络成本仍不可验证，当前不支持算法修改或 paper-ready 结论
 
