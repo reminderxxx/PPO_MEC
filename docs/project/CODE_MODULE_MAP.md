@@ -1,5 +1,18 @@
 # Code Module Map
 
+## Typed-cache 顺序依赖重算 LRU 候选
+
+- `src/envs/core/cache_eviction.py`：冻结 candidate/static 语义标识；原生LRU排序与metadata生命周期本身不改。
+- `src/envs/core/vec_workflow_core_env.py`：candidate-only shadow resident规划、逐victim依赖重算、完整计划后提交及失败
+  rollback观测边界；共享五动作入口，不含算法专属分支。
+- `src/runtime/typed_model_cache_runtime.py`：显式transaction v1.1解析、typed+LRU组合校验、旧v1.0 hash兼容。
+- `src/envs/specs/semantic_objects.py`：CacheEvent optional version/semantics/planning-trace字段。
+- `src/evaluators/cache_baseline_fairness.py`、`main_results_support.py`：fairness binding与episode summary消费候选身份；
+  不把candidate静默投影成旧v1.0。
+- `scripts/validate_typed_cache_sequential_replacement.py`：固定probe完整性、边界例、四配置逐请求与真实`env.step()`诊断；
+  不训练、不改历史artifact。
+- `tests/test_typed_cache_sequential_recompute.py`：合法动作、原子正负例、旧语义/hash和producer-consumer回归。
+
 ## 数据候选只读结构审计
 
 - `scripts/build_driving_workflow_package.py`：复用pilot producer/consumer，生成单场景引用包和exact inventory；无推理。

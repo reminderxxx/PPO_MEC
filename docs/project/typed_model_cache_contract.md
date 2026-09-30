@@ -84,3 +84,20 @@ G13 artifact只证明合同、事务、兼容和最小真实链路可运行，�
 ## G14A runtime plumbing
 
 G14A新增`typed_model_cache_runtime_contract_v1.0.0`作为config/training/checkpoint/benchmark/fairness的唯一resolved入口。每个typed request即便没有cache admission动作，也必须记录确定性的`[base_model, adapter]` dependency bundle和per-object lookup；dependency对象不增加request denominator。详见`typed_model_cache_runtime_contract.md`。G14A的tiny training/benchmark只验证管线，不能覆盖本节G13 claim boundary或代替G14B正式protocol。
+
+## 2026-09-30 显式顺序重算 LRU 候选（不改写 G13 v1.0 身份）
+
+G13 `typed_cache_transaction_contract_v1.0.0` 与缺省静态候选语义继续冻结，旧配置、runtime hash和历史产物解释
+不变。新的 non-formal 候选必须同时显式声明
+`typed_cache_transaction_contract_v1.1.0` 与
+`typed_eviction_semantics=sequential_dependency_recompute_lru_v1`。
+
+候选只支持 typed MB + 原生 LRU；其他 eviction policy 组合 fail-fast。它不增加动作 ID，所有算法仍通过共享
+`semantic_discrete_5` cache-fill 动作进入同一环境事务。规划在 shadow residents 上每选一个 victim 后重算依赖与
+eligible set；pinned/non-evictable、当前请求 dependency bundle、仍被保留 adapter 依赖的 base 均受保护。规划不触碰
+真实 policy state；完整计划成功后一次提交，失败时真实 resident、policy state、传输和准入均不变。命中更新在
+候选事务 plan 确认后提交。CacheEvent 可选字段记录 transaction version、eviction semantics 与逐轮 planning trace。
+
+该候选不是正式 Protocol 2.9 的静默升级；未冻结 candidate oracle/replay 或非 LRU contract，不支持算法优势、
+formal/holdout、canonical 或 paper-ready 结论。实现与见证见
+`native_typed_cache_replacement_witness_20260930.md`。

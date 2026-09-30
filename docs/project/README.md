@@ -127,6 +127,7 @@
 - 验证报告：`typed_model_cache_validation_report.md`
 - 机器证据：`../../artifacts/analysis/typed_model_cache_validation_20260819_g13_v1/`
 - 默认继续使用 legacy adapter-only profile；typed profile 必须显式启用。
+- 顺序重算LRU候选：`native_typed_cache_replacement_witness_20260930.md`；仅显式non-formal candidate，旧v1.0默认不变。
 
 ## G14A typed MB runtime plumbing
 

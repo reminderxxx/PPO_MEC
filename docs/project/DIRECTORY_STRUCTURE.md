@@ -1,5 +1,12 @@
 ﻿# Directory Structure
 
+2026-09-30 typed-cache 顺序依赖重算候选：显式配置位于
+`configs/benchmark/typed_model_cache_controlled_lru_sequential_recompute.yaml`，验收入口为
+`scripts/validate_typed_cache_sequential_replacement.py`，专项测试为
+`tests/test_typed_cache_sequential_recompute.py`。审查报告位于
+`docs/project/native_typed_cache_replacement_witness_20260930.md`，机器证据位于
+`artifacts/analysis/native_typed_cache_replacement_20260930_v1/`；该候选不替换默认静态语义或历史正式产物。
+
 单场景引用包入口`scripts/build_driving_workflow_package.py`，产物根`artifacts/datasets/`；不含原图/QA。
 小实验计划见`scripts/prepare_drivelm_pilot.py`、`tests/test_drivelm_pilot_plan.py`，
 模型下载入口为`scripts/download_driving_pilot_model.py`，本地payload位于被忽略的`data/raw/ai_workflow_pilot/`；

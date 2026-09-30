@@ -5,6 +5,22 @@
 
 # Artifact Records
 
+## 2026-09-30 native typed-cache sequential replacement witness
+
+- run：`native_typed_cache_replacement_20260930_v1`
+- path：`artifacts/analysis/native_typed_cache_replacement_20260930_v1/`
+- execution commit：`602f5af374726485f5c2c3759cd6540d2e2e9f2b`，clean
+  `codex/typed-cache-replacement`；审计提交/父提交=`371159d`/`73051ab`
+- input：`vec_mechanism_probe_v0_2.zip`，351,734 bytes，SHA-256=`c0b332...bbe`；CRC、38 member hash和旧审计
+  artifact hash/size均通过
+- scope：显式 transaction v1.1、`sequential_dependency_recompute_lru_v1`、原生LRU；两请求/正负例、固定四配置
+  old/new各288请求、同规则两步synthetic `env.step()`；无训练、formal/holdout或矩阵扩张
+- result：`b0.a0→b1.a0`按adapter→base影子顺序释放104 MiB并原子准入；所有保护负例无修改拒绝；old四配置与
+  已交付审计匹配；candidate四配置服务72/72。old低传输来自拒绝，非收益。
+- workflow witness：old在固定step cap=2时未完成；candidate经两个合法action0完成两节点workflow；无cloud回源。
+- boundary：`E2_BOUNDED_NATIVE_IMPLEMENTATION_DIAGNOSTIC`，不是算法优势、reference等价、真实模型、formal或
+  paper-ready证据。报告：`native_typed_cache_replacement_witness_20260930.md`。
+
 ## 2026-09-30 native typed-cache per-request consistency audit
 
 - run：`native_typed_cache_request_audit_20260930_v1`

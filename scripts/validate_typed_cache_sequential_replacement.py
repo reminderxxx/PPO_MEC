@@ -580,6 +580,16 @@ def _protected_snapshot() -> dict[str, Any]:
         cwd=PROTECTED_MAIN_ROOT,
     )
     status = _git("status", "--short", cwd=PROTECTED_MAIN_ROOT).splitlines()
+    status_paths = [
+        line.split(maxsplit=1)[1]
+        for line in status
+        if len(line.split(maxsplit=1)) == 2
+    ]
+    exactly_seven = (
+        len(status) == len(PROTECTED_FILES)
+        and all(line.lstrip().startswith("M ") for line in status)
+        and sorted(status_paths) == sorted(PROTECTED_FILES)
+    )
     return {
         "protected_workspace": str(PROTECTED_MAIN_ROOT),
         "expected_file_sha256": PROTECTED_FILES,
@@ -589,8 +599,7 @@ def _protected_snapshot() -> dict[str, Any]:
         "actual_combined_binary_diff_sha256": _sha256_bytes(diff),
         "combined_diff_matches_start": _sha256_bytes(diff) == PROTECTED_DIFF_SHA256,
         "git_status_short": status,
-        "exactly_seven_protected_modified_files": sorted(status)
-        == sorted(f" M {path}" for path in PROTECTED_FILES),
+        "exactly_seven_protected_modified_files": exactly_seven,
         "protection_pass": actual == PROTECTED_FILES
         and _sha256_bytes(diff) == PROTECTED_DIFF_SHA256,
     }

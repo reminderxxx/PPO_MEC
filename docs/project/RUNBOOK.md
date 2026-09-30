@@ -5,6 +5,22 @@
 
 # Runbook
 
+## 原生 typed-cache 顺序重算 LRU 候选见证（2026-09-30）
+
+该入口只运行固定 probe 的两请求/边界例、四配置 old/new 回归和两步 synthetic `env.step()`；不训练、不打开
+formal/holdout、不覆盖旧审计目录。输出目录必须不存在。
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/validate_typed_cache_sequential_replacement.py \
+  --input-zip /Users/howen/Downloads/vec_mechanism_probe_v0_2.zip \
+  --output-root artifacts/analysis/native_typed_cache_replacement_20260930_v1
+```
+
+候选配置为 `configs/benchmark/typed_model_cache_controlled_lru_sequential_recompute.yaml`。只有显式 transaction v1.1 +
+`sequential_dependency_recompute_lru_v1` 才启用；非 LRU fail-fast，旧配置继续使用v1.0静态语义。报告见
+`native_typed_cache_replacement_witness_20260930.md`。
+
 ## 原生 typed-cache 逐请求审计（2026-09-30）
 
 该入口只消费固定 probe ZIP 的 blocked/interleaved × sharing on/off、LRU、136 MiB、空 cache 请求；不训练，

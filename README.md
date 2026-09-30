@@ -5,6 +5,10 @@
 
 # PPO_MEC
 
+原生 typed-cache 的显式顺序依赖重算 LRU 候选、固定四配置回归与两节点 `env.step()` 见证见
+[`docs/project/native_typed_cache_replacement_witness_20260930.md`](docs/project/native_typed_cache_replacement_witness_20260930.md)。
+该候选为 non-formal diagnostic；旧 transaction v1.0 默认、正式 Protocol、训练与论文结论不变。
+
 首个驾驶工作流引用包：`scripts/build_driving_workflow_package.py`；
 [检索、数据卡与八调用边界](docs/project/driving_workflow_minipackage_20260929.md)。已生成引用包，尚无真实推理结果。
 

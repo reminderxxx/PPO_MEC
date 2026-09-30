@@ -5,6 +5,19 @@
 
 ﻿# Progress
 
+## 2026-09-30: 原生 typed-cache 顺序依赖重算 LRU 候选与 `env.step()` 见证完成
+
+- 审计提交 `371159d` 的父提交确认为 audited native `73051ab`；从审计提交建立隔离
+  `codex/typed-cache-replacement`，实现提交 `602f5af` 已推送。主工作区七个用户修改的逐文件与整体diff hash起止一致。
+- 现有五动作没有逐对象删除动作，旧静态 dependency-safe set 不能合法跨底座替换。新增显式
+  `sequential_dependency_recompute_lru_v1` / transaction v1.1候选；旧v1.0配置结构及冻结runtime hash不变。
+- 136 MiB、空cache的 `b0.a0→b1.a0` 可按原生LRU影子规划 adapter→base 并原子准入；pinned adapter/base、
+  non-evictable、超容量及保留adapter依赖均无修改拒绝，多adapter解除正例通过。
+- 四配置old各72请求与已交付审计完全匹配；candidate四配置均72/72服务成功并保留逐请求日志。低传输拒绝不作收益解释。
+- 同一 synthetic diagnostic 真实 reset + action0 + `env.step()`：old在step2拒绝且达到固定cap未完成；candidate在
+  step2完成替换、节点与workflow。无cloud fallback、训练、formal/holdout或算法优势结论。报告与机器证据见
+  `native_typed_cache_replacement_witness_20260930.md`、`artifacts/analysis/native_typed_cache_replacement_20260930_v1/`。
+
 ## 2026-09-30: 原生 typed-cache 逐请求一致性与决策空间审计完成
 
 - 在固定 commit `73051ab264aa868e83f2e011b5ced26968eef74b` 的隔离 clean checkout 中，核验原包

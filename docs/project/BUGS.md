@@ -5,6 +5,16 @@
 
 ﻿# Bugs And Risks
 
+## 2026-09-30: native typed 跨底座替换已有 opt-in LRU 候选，正式扩展仍受限（PARTIAL CLOSURE）
+
+- `sequential_dependency_recompute_lru_v1` 已在 shadow state 上逐 victim 重算依赖，固定 microtrace 的合法 action、
+  保护负例、四配置和两节点 `env.step()` 见证通过；旧 `static_dependency_safe_v1` 默认与历史 hash 不变。
+- 候选仅定义原生 LRU；FIFO/LFU/Aging-LFU/Random 显式拒绝。它对所有共享 action/runtime 的算法可用，不是 SA
+  专属能力，但尚未形成五policy公平性合同。
+- 正式 Protocol 2.9、oracle/replay仍使用v1.0静态语义；不得把candidate诊断产物混入formal/canonical或历史解释。
+- callback异常恢复、复杂度/scalability、真实模型I/O与真实联合trace仍未验证。报告见
+  `native_typed_cache_replacement_witness_20260930.md`。
+
 ## 2026-09-30: native typed dependency-safe feasible set 与 closure eviction 不同（OPEN DESIGN ISSUE）
 
 - 固定四配置的288请求原生审计确认：当 `b0` base 仍被 resident adapter 依赖时，原生
@@ -14,9 +24,8 @@
   `insufficient_dependency_safe_evictable_capacity`；reference 可用 dependency-closure eviction 删除 adapter+base。
 - 当前规则保持原子拒绝、无 orphan、容量与状态不变量，但使可执行 placement/action space 小于 reference；固定
   microtrace 中 sharing-on 有36/72服务失败，sharing-off有60/72服务失败。
-- 本轮只读机制审计没有修改规则。后续若决定支持 closure eviction 或顺序 eligibility recomputation，必须另立实现
-  任务并同步检查 transaction contract、五policy、公平性、oracle/replay、CacheEvent与全部消费者；不得把本轮低传输
-  误写为效率收益。
+- 原审计轮只读且没有修改规则；后续独立任务已实现显式、LRU-only顺序重算候选，但旧规则仍是默认，五policy与
+  oracle/replay正式扩展仍未冻结。不得把旧语义的低传输误写为效率收益。
 
 ## 2026-09-29: DriveLM demo 不提供可直接使用的依赖边（OPEN）
 

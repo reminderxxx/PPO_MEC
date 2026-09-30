@@ -1,5 +1,16 @@
 ﻿# Decision Log
 
+## 2026-09-30: typed-cache 跨底座替换采用显式顺序重算候选
+
+- 决定：`static_dependency_safe_v1` 继续作为默认语义，既有 profile、正式合同与历史产物身份不变；跨底座替换只通过显式
+  `sequential_dependency_recompute_lru_v1` opt-in 启用，并记录 transaction contract `1.1.0`。
+- 决定：候选只支持 typed cache + 原生 LRU。事务在影子 resident 上每选择一个 victim 后重新计算依赖安全集合，完整计划
+  可行后才一次性提交；失败不得更新 resident、LRU 元数据、访问计数或准入状态。
+- 决定：新语义位于共享环境/runtime，而非特定 agent 分支，因此同一合法动作合同下对所有比较算法可用；FIFO、LFU、
+  aging-LFU、random 等未冻结组合显式拒绝，不扩展策略矩阵。
+- 边界：本轮证据是 synthetic diagnostic 和固定 4 配置机制回归，不是算法优势、正式性能或 paper-ready 证据；不升级
+  已冻结 formal protocol、checkpoint 或历史产物。详见 `native_typed_cache_replacement_witness_20260930.md`。
+
 ## 2026-09-29: 驾驶工作流派生与参考答案隔离
 
 - 公开demo关系字段为空，阶段连边明确标为研究者模板，不宣称恢复原始执行DAG。
