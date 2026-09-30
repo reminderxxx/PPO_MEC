@@ -5,6 +5,19 @@
 
 ﻿# Bugs And Risks
 
+## 2026-09-30: native typed dependency-safe feasible set 与 closure eviction 不同（OPEN DESIGN ISSUE）
+
+- 固定四配置的288请求原生审计确认：当 `b0` base 仍被 resident adapter 依赖时，原生
+  `_typed_evictable_residents()` 把 base 排除在单次静态 victim set 外；选中 adapter 后不会在同一原子事务中重算
+  base eligibility。
+- sharing-on/interleaved 请求1 `b1.a0` 需要释放104 MiB，但原生唯一 eligible victim 只有8 MiB adapter，因而
+  `insufficient_dependency_safe_evictable_capacity`；reference 可用 dependency-closure eviction 删除 adapter+base。
+- 当前规则保持原子拒绝、无 orphan、容量与状态不变量，但使可执行 placement/action space 小于 reference；固定
+  microtrace 中 sharing-on 有36/72服务失败，sharing-off有60/72服务失败。
+- 本轮只读机制审计没有修改规则。后续若决定支持 closure eviction 或顺序 eligibility recomputation，必须另立实现
+  任务并同步检查 transaction contract、五policy、公平性、oracle/replay、CacheEvent与全部消费者；不得把本轮低传输
+  误写为效率收益。
+
 ## 2026-09-29: DriveLM demo 不提供可直接使用的依赖边（OPEN）
 
 - 单场景引用包已生成但仍无真实推理；DriveBench公开研究提示Q中文字/坐标可能形成猜测线索，

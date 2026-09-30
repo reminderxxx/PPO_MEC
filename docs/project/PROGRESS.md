@@ -5,6 +5,20 @@
 
 ﻿# Progress
 
+## 2026-09-30: 原生 typed-cache 逐请求一致性与决策空间审计完成
+
+- 在固定 commit `73051ab264aa868e83f2e011b5ced26968eef74b` 的隔离 clean checkout 中，核验原包
+  `vec_mechanism_probe_v0_2.zip` SHA-256=`c0b3325874e7427629af8ed36720ed75db5b292c9658d7f3defd39a9deb44bbe`、
+  ZIP CRC 与 38 个 manifest member hash；partial audit ZIP 未作为启动依赖。
+- 通过原生 `VecWorkflowCoreEnv._apply_typed_cache_action`、LRU、readiness 与 CacheEvent producer 完成固定
+  blocked/interleaved × sharing on/off、136 MiB、空 cache 共 288 请求；未训练、未改 eviction、未扩大矩阵。
+- 首个实测差异位于 sharing-on/interleaved 请求1 `b1.a0`：reference closure eviction 可驱逐
+  `[b0.a0,b0]`，原生静态 dependency-safe feasible set 只有8 MiB adapter，无法释放所需104 MiB，事务原子拒绝。
+  拒绝前后 resident/policy 相同，容量、依赖、字节守恒全通过。
+- 原生 sharing-on 两种次序均为36成功/36失败、120 MiB传输；sharing-off均为12成功/60失败、104 MiB传输。
+  低传输来自准入拒绝，不是cache收益。报告见 `native_typed_cache_request_audit_20260930.md`，机器证据见
+  `artifacts/analysis/native_typed_cache_request_audit_20260930_v1/`。
+
 ## 2026-09-29: 首个驾驶工作流引用包生成
 
 - 公开来源复核后继续复用DriveLM，不宣称没有现成驾驶数据；新增DriveVLM/DriveBench等来源索引。

@@ -1,0 +1,205 @@
+{
+  "checked_files": [
+    {
+      "path": "README_先读.md",
+      "sha256": "362a313dcb5796a236efc8b51c04d524dcd6d0582c330120dbe44bf3ded15b93",
+      "size_bytes": 3169
+    },
+    {
+      "path": "docs/下一轮代码执行单.md",
+      "sha256": "a7923fd8d3398bb88762ab72d2cc77c7029ba571c853a29365cc16d03c107562",
+      "size_bytes": 5257
+    },
+    {
+      "path": "docs/模型假设与证据边界.md",
+      "sha256": "de8adb92b5206e7694809bc88414f62aa8eea67bb97277052e62cf8a994c4b26",
+      "size_bytes": 5078
+    },
+    {
+      "path": "docs/首轮结果与判断.md",
+      "sha256": "59ea768d80bd94789757662d9d79e7429665c1e44bbf88728a8be7811c5fff45",
+      "size_bytes": 4984
+    },
+    {
+      "path": "reference/previous_sources_NOT_REVERIFIED.json",
+      "sha256": "392b41702650c980001d169e3cfc897aea458edd26d5882ffcd4d208d5698b2a",
+      "size_bytes": 7065
+    },
+    {
+      "path": "reference/probe_v0_2_0.py",
+      "sha256": "e7331696cae97eeea14f1f971c2c2dc59154e34107689f893ca4bad64ca39f17",
+      "size_bytes": 33595
+    },
+    {
+      "path": "reference/workload_tools_v0_1.py",
+      "sha256": "b912e6cf973e9f71e4b12d7659d27afde6f5c4fc92c122fbe33c76c1f9c6245c",
+      "size_bytes": 15629
+    },
+    {
+      "path": "results/execution_boundary.json",
+      "sha256": "b8363fc9715ac714afa3632bd01f22cef2493bb5c0c07e2ef7e5b12cdde6374d",
+      "size_bytes": 1207
+    },
+    {
+      "path": "results/post_run_analysis.json",
+      "sha256": "623c0d7ec9dd28635015f5c3764623a5236e4509e4fb1e2a143fb0eecfbf59af",
+      "size_bytes": 2758
+    },
+    {
+      "path": "results/reproducibility_check.json",
+      "sha256": "43c1f3008e48318d9e76d2bb6bc7e82da8d4811b9e78af91f1af44a4dd80e963",
+      "size_bytes": 369
+    },
+    {
+      "path": "results/run_001/cache_event_ledger.jsonl",
+      "sha256": "ac573d80a39d4c12d30562cd496c026a2674d481dc6c37f8e818e53ce35126be",
+      "size_bytes": 3300956
+    },
+    {
+      "path": "results/run_001/cache_results.jsonl",
+      "sha256": "a76127fe9019358839637852c5190faa0ea31a1a927766f3c96521f525f2e22d",
+      "size_bytes": 54644
+    },
+    {
+      "path": "results/run_001/cache_workloads.jsonl",
+      "sha256": "ebe1e6686a121b63495b34a2e9e1b86e3d34b9e6d3b91ffe62fd8c589de2a56f",
+      "size_bytes": 6200
+    },
+    {
+      "path": "results/run_001/catalog.json",
+      "sha256": "fa1126318f5150c42c9f9ccb775f470c58e103ee5b592af572908466a5c7fa9b",
+      "size_bytes": 623
+    },
+    {
+      "path": "results/run_001/design_config.json",
+      "sha256": "0f373227a9d9c342fe39df54772074f65921d0cb4050bdd57370e070b8e1463e",
+      "size_bytes": 1580
+    },
+    {
+      "path": "results/run_001/design_freeze.json",
+      "sha256": "495573bb00427ce11409f6ab11e82ae9a4cc7a633eaa0a68ac7b26ea2d8025f3",
+      "size_bytes": 452
+    },
+    {
+      "path": "results/run_001/file_manifest.json",
+      "sha256": "eaf5707201836a0d861365db22ef41afd21b77308dfbd3c1698643c3081ff388",
+      "size_bytes": 899
+    },
+    {
+      "path": "results/run_001/mechanism_coverage.jsonl",
+      "sha256": "03559dcfe29acff2270c23bc2bdbf5a7eff0418f17ccbdbec045aca1719a51f0",
+      "size_bytes": 3449
+    },
+    {
+      "path": "results/run_001/suffix_policy_results.jsonl",
+      "sha256": "c37bd722be8b217ff34900df2a6ab0c4c185045b27211650e4862791779f14a9",
+      "size_bytes": 3201974
+    },
+    {
+      "path": "results/run_001/suffix_snapshots.jsonl",
+      "sha256": "ff2479d022bdbb7292d0d0be9165f44dc97d192b2cede64ac0209c7daba6faa4",
+      "size_bytes": 430528
+    },
+    {
+      "path": "results/run_001/summary.json",
+      "sha256": "c8df29e5de829af0a87ba215331ebb46a652b41885b01cb44f501c74ebbbfd9f",
+      "size_bytes": 18879
+    },
+    {
+      "path": "results/run_002/cache_event_ledger.jsonl",
+      "sha256": "ac573d80a39d4c12d30562cd496c026a2674d481dc6c37f8e818e53ce35126be",
+      "size_bytes": 3300956
+    },
+    {
+      "path": "results/run_002/cache_results.jsonl",
+      "sha256": "a76127fe9019358839637852c5190faa0ea31a1a927766f3c96521f525f2e22d",
+      "size_bytes": 54644
+    },
+    {
+      "path": "results/run_002/cache_workloads.jsonl",
+      "sha256": "ebe1e6686a121b63495b34a2e9e1b86e3d34b9e6d3b91ffe62fd8c589de2a56f",
+      "size_bytes": 6200
+    },
+    {
+      "path": "results/run_002/catalog.json",
+      "sha256": "fa1126318f5150c42c9f9ccb775f470c58e103ee5b592af572908466a5c7fa9b",
+      "size_bytes": 623
+    },
+    {
+      "path": "results/run_002/design_config.json",
+      "sha256": "db1edfb8be7cf3de2a46e356782f1bfac22059991b78858c8bcae8053b8a4aff",
+      "size_bytes": 1580
+    },
+    {
+      "path": "results/run_002/design_freeze.json",
+      "sha256": "a40afe33c56ec7866b20696a8f06e89d7ccf6f80a038e0955d7d743d948e4fb8",
+      "size_bytes": 452
+    },
+    {
+      "path": "results/run_002/file_manifest.json",
+      "sha256": "3befa00e4eb16f5bf1060a6bfb08465283697a2660a7b1f65db76a16f7615bda",
+      "size_bytes": 899
+    },
+    {
+      "path": "results/run_002/mechanism_coverage.jsonl",
+      "sha256": "03559dcfe29acff2270c23bc2bdbf5a7eff0418f17ccbdbec045aca1719a51f0",
+      "size_bytes": 3449
+    },
+    {
+      "path": "results/run_002/suffix_policy_results.jsonl",
+      "sha256": "9aed5a7a76968cc638840a5bee723a0d4151cd8a97fad7159e35e6f7cfb04c52",
+      "size_bytes": 3840336
+    },
+    {
+      "path": "results/run_002/suffix_snapshots.jsonl",
+      "sha256": "ff2479d022bdbb7292d0d0be9165f44dc97d192b2cede64ac0209c7daba6faa4",
+      "size_bytes": 430528
+    },
+    {
+      "path": "results/run_002/summary.json",
+      "sha256": "a95f774b5f46d8c71b328b6c8c05c311b8b75034e764d6c54b5cf1106e767b05",
+      "size_bytes": 19155
+    },
+    {
+      "path": "results/run_002_console.json",
+      "sha256": "a9b81913f3112d3172458bb504917251f8ab0a8fd09abfc935e7f06870d50ac7",
+      "size_bytes": 6812
+    },
+    {
+      "path": "results/unit_tests.txt",
+      "sha256": "1c803572d5858204b0efee557537316280f74c6bde63610b6a7fd51bdd4e3b2d",
+      "size_bytes": 4327
+    },
+    {
+      "path": "scripts/analyze_results.py",
+      "sha256": "d70702ae68052dff76c6ecc0a3b0d2dcbdca02510619317937efd690a4958986",
+      "size_bytes": 3466
+    },
+    {
+      "path": "scripts/probe.py",
+      "sha256": "747bf86afdd88008f1e1cb2e5c7354a366e72c8525546c6a305913d5a45d407c",
+      "size_bytes": 34922
+    },
+    {
+      "path": "scripts/verify_package.py",
+      "sha256": "e6b1edaef9aa951ffa0735d8ceced90b8fcb7383c886c57fa4d4b48dcc44ecde",
+      "size_bytes": 706
+    },
+    {
+      "path": "tests/test_probe.py",
+      "sha256": "67ee1c26ee9fd3cf61ef2d17bb975ba831531ac802fd57f2ec7a84ddcdd0b466",
+      "size_bytes": 12124
+    }
+  ],
+  "expected_zip_sha256": "c0b3325874e7427629af8ed36720ed75db5b292c9658d7f3defd39a9deb44bbe",
+  "input_zip_path": "/Users/howen/Downloads/vec_mechanism_probe_v0_2.zip",
+  "input_zip_sha256": "c0b3325874e7427629af8ed36720ed75db5b292c9658d7f3defd39a9deb44bbe",
+  "input_zip_size_bytes": 351734,
+  "package_manifest_checked_file_count": 38,
+  "package_manifest_code_version": "0.2.1",
+  "package_manifest_member_hash_status": "pass",
+  "partial_audit_zip": null,
+  "partial_audit_zip_required": false,
+  "zip_crc_status": "pass",
+  "zip_file_count": 39
+}

@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `native_typed_cache_request_audit_20260930.md`：固定四配置、288请求的原生 typed-cache 逐请求对账、首个
+  dependency-safe feasible-set 差异、LRU 决策空间与 claim boundary；不是机制修复或训练结果
+
 - `driving_workflow_minipackage_20260929.md`：公开来源检索、单场景引用包及成功后扩展条件；不是已运行数据集
 
 - `driving_pilot_resource_setup_20260929.md`：已授权模型下载与隔离安装交接，图像条款待确认；非完成回执

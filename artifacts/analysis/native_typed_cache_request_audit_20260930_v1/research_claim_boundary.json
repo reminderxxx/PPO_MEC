@@ -1,0 +1,22 @@
+{
+  "artifact_run_id": "native_typed_cache_request_audit_20260930_v1",
+  "evidence_level": "E2_ARTIFACT_AUDITED_FOR_BOUNDED_NATIVE_MICROTRACE_ONLY",
+  "git_commit": "73051ab264aa868e83f2e011b5ced26968eef74b",
+  "literature_cutoff": "2026-09-30 (no new literature search; bounded mechanism audit)",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-09-30T07:19:33.521035+00:00",
+  "safe_claims": [
+    "All four frozen LRU/136-MiB/empty-cache configurations were consumed by the native typed-cache transaction path for 72 requests each.",
+    "The native one-shot dependency-safe victim set rejects the observed b1.a0 family swap at request index 1 under the explicit 136-MiB-to-native-mb mapping.",
+    "The observed rejection leaves resident and LRU policy state unchanged and preserves capacity, dependency, and resident-byte conservation invariants."
+  ],
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "unsupported_claims": [
+    "Native and reference cache semantics are equivalent.",
+    "The native mb field is intrinsically SI MB or MiB without the explicit mapping contract.",
+    "Admission rejection is the same as service failure or origin execution.",
+    "The audit establishes latency, throughput, algorithm advantage, training behavior, formal/holdout validity, or paper readiness.",
+    "The synthetic b0/b1 adapters are real model artifacts or measured deployment sizes."
+  ],
+  "verdict": "Unverifiable for paper readiness; verified bounded native transaction semantics"
+}

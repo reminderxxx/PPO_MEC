@@ -5,6 +5,21 @@
 
 # Artifact Records
 
+## 2026-09-30 native typed-cache per-request consistency audit
+
+- run：`native_typed_cache_request_audit_20260930_v1`
+- path：`artifacts/analysis/native_typed_cache_request_audit_20260930_v1/`
+- input：`vec_mechanism_probe_v0_2.zip`，SHA-256
+  `c0b3325874e7427629af8ed36720ed75db5b292c9658d7f3defd39a9deb44bbe`；39 files CRC pass，38 manifest hashes pass
+- scope：固定 LRU / 136 MiB / 空 cache 的 blocked/interleaved × sharing on/off，各72请求，共288；无训练、无
+  formal/holdout、无 eviction rule 修改
+- result：首个差异为 sharing-on/interleaved `b1.a0`；reference closure eviction 可切换 family，原生单次静态
+  dependency-safe set 不可释放足够容量并原子拒绝。全部请求 capacity/dependency/byte invariants通过，所有拒绝保持
+  resident/policy不变。
+- evidence boundary：`E2_ARTIFACT_AUDITED_FOR_BOUNDED_NATIVE_MICROTRACE_ONLY`；不是低传输收益、算法排名、真实模型
+  测量、formal 或 paper-ready 证据。
+- report：`docs/project/native_typed_cache_request_audit_20260930.md`
+
 ## 2026-09-06 G14R18 checkpoint provenance envelope closure
 
 - path：`artifacts/analysis/typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1/`；active config：

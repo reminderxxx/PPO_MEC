@@ -1,0 +1,18 @@
+{
+  "audited_native_commit": "73051ab264aa868e83f2e011b5ced26968eef74b",
+  "command": "/Users/howen/Projects/PPO_MEC/.venv/bin/python /Users/howen/.codex/worktrees/native-typed-cache-audit/PPO_MEC/scripts/audit_native_typed_cache_probe.py --input-zip /Users/howen/Downloads/vec_mechanism_probe_v0_2.zip --output-root /Users/howen/.codex/worktrees/native-typed-cache-audit/PPO_MEC/artifacts/analysis/native_typed_cache_request_audit_20260930_v1 --phase full",
+  "cwd": "/Users/howen/.codex/worktrees/native-typed-cache-audit/PPO_MEC",
+  "executed_at_utc": "2026-09-30T07:19:33.521035+00:00",
+  "git_branch_at_execution": "codex/native-typed-cache-audit",
+  "git_head_at_execution": "73051ab264aa868e83f2e011b5ced26968eef74b",
+  "git_status_porcelain_at_execution": [
+    "?? scripts/audit_native_typed_cache_probe.py",
+    "?? tests/test_native_typed_cache_audit.py"
+  ],
+  "machine": "arm64",
+  "native_request_execution_count": 288,
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "python_executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "python_version": "3.9.6 (default, May 22 2026, 11:13:45) \n[Clang 21.0.0 (clang-2100.1.1.101)]",
+  "training_execution_count": 0
+}

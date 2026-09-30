@@ -5,6 +5,21 @@
 
 # Runbook
 
+## 原生 typed-cache 逐请求审计（2026-09-30）
+
+该入口只消费固定 probe ZIP 的 blocked/interleaved × sharing on/off、LRU、136 MiB、空 cache 请求；不训练，
+不修改 eviction，不扩大矩阵。输出目录必须不存在，脚本拒绝覆盖。
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/audit_native_typed_cache_probe.py \
+  --input-zip /Users/howen/Downloads/vec_mechanism_probe_v0_2.zip \
+  --output-root artifacts/analysis/native_typed_cache_request_audit_20260930_v1 \
+  --phase full
+```
+
+需要先独立保全 sharing-on/interleaved 前两请求时，使用新临时输出目录并指定 `--phase first-two`。报告见
+`native_typed_cache_request_audit_20260930.md`。原包 hash 或固定 commit 不匹配时 fail-fast。
+
 ## 单场景驾驶工作流引用包
 
 `.venv/bin/python -B scripts/build_driving_workflow_package.py --fetch-official-sample --output <new_package_dir>`
