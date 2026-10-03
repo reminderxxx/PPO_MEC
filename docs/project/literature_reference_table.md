@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-09-29
+更新日期：2026-10-04
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -12,6 +12,17 @@
 - PPO_MEC 的数值 claim 仍只来自 `artifacts/` 下 paper-grade artifact；本表只说明研究空缺和设计定位。
 
 ## 维护规范
+
+### 2026-10-04：任务数据源检索补充
+
+以下为数据来源背景，不是算法 novelty 或性能证据；本轮未下载图像或调用模型。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---|---|---|---|
+| 头盔任务数据 | [HelmetML: A dataset of helmet images for machine learning applications](https://www.sciencedirect.com/science/article/pii/S2352340924007558) | Data in Brief, 2024；本轮未核验卷页；不是顶刊/A会 | [作者数据页](https://data.mendeley.com/datasets/tm72fkfxd5/1)公开说明 6,036 张手机拍摄图像、Version 1、CC BY 4.0，提供 Download All；实际文件大小、标注格式和人员/场景分组待核验。 | 仅作为 Helmet adapter 任务正确性候选，不能把摩托车头盔与施工安全帽自动视为同域，也不证明与 adapter 训练数据独立。 | 数据来源及限制，未选为 live 数据。 |
+| 车牌数据背景 | [Global License Plate Dataset](https://arxiv.org/abs/2405.10949) | arXiv, 2024；正式 venue 未核验 | 摘要声称覆盖 74 国、超过 500 万图像及多种车牌/车辆标注；本轮未核验可下载数据、许可、体量或标签质量。 | 不作为已获得的数据或当前轻量验收首选，不能仅凭论文规模声明工程可用。 | 数据候选背景，UNVERIFIED。 |
+
+本轮更轻量的候选为发布方 [UniqueData/license_plates](https://huggingface.co/datasets/UniqueData/license_plates) 的公开示例（非新增论文）：Hub 文件列表显示 100 张图像、104 个文件合计 18,945,986 bytes；TSV 有 100 行，filename/model/plate_text/tag/country 均非空。页面声明 CC BY-NC-ND 4.0；是商业完整数据的示例，不是公开的百万级完整库。缺少 vehicle/video/scene 分组，原始图片来自不同网页；目前仅适合作为待核验的技术任务小样本，不能声称独立泛化。仅读取列表与标签结构，未下载图片；不运行仓库 dataset script。固定 revision、文件对应、许可适用范围和近重复仍须在实际准备前核验。
 
 问题与文献固定ID、发表等级核验和实验对应见 `problem_literature_traceability_20260928.md`。
 内部 `A-Core` 不等于 CCF A；MLSys、TVT、FGCS、预印本不得混称顶刊/A会。直接近邻不能因级别不同而删除。
