@@ -41,3 +41,16 @@
 - `tests/test_public_alpr_pilot.py tests/test_env_contract.py`：17 passed；smoke：6 nodes completed；AST syntax 和 diff-check 通过。独立推理环境首次尝试 pytest 因未安装 pytest 退出；随后使用已有主 `.venv` 跑测试通过，未安装新依赖。
 - 终态唯一入口：主仓库 `artifacts/analysis/alpr_public_sample_20261004_v1/completion_receipt.json`；成功后分数为 `task_results_redacted.json`。原始预测和标签只保留本地。
 - 首次 `git push -u origin codex/alpr-task-pilot` 因 GitHub 443 连接失败；本地提交完整，运行不依赖 GitHub。
+
+## 2026-10-04 完成读回与下一步
+
+原轮次正常完成，child rc=0，耗时 146.3395 秒，12/12 generate、无 token limit 截断。development：0/4 exact、CER 5/28；locked_check：4/8 exact、CER 13/53。七文件保护通过，原始完整性清单重新逐字节核验。低正确率不能归因为程序失败；不为结果改提示词或换样本。
+
+下一步是原始 base vs ALPR adapter 的固定 12 图配对诊断，不是新的独立测试。原 adapter 结果只读复用；新 base-only 进程仅加载同一 base，不挂 adapter；prompt、processor、CPU float32、seed、32-token 上限与样本顺序不变。新增最多 12 generate，1800 秒上限，不训练、下载、重新选图或自动重试。比较是看到 adapter 结果后决定开展的探索性分析，不进行显著性/泛化宣传。
+
+准备入口：`scripts/run_public_alpr_pilot.py prepare_base --base-comparison`。
+一次后台启动：`scripts/run_public_alpr_pilot.py launch --base-comparison`。
+独立本机输出：`artifacts/analysis/alpr_public_base_comparison_20261004_v1/`。
+消费 `paired_comparison_redacted.json` 的 both-correct、adapter-only-correct、base-only-correct、both-wrong 计数；保留所有输赢，不选胜例进入后续证据。
+
+审查元数据：reviewed_at=2026-10-04；literature_cutoff=2026-10-04（本轮不评价 novelty）；target_venue=IEEE TMC（研究目标，不是就绪结论）；artifact_run_id=alpr_public_sample_20261004_v1；policy_version=tmc_review_policy_v3_20260621；原科学 commit=b3e825c0f4fc75801e095ae5d7824c829152d9da；证据范围=局部任务原件核验，不晋级完整论文 E2，也不形成缓存/迁移/算法 claim。

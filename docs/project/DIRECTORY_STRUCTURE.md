@@ -2,6 +2,8 @@
 
 公开 ALPR 示例工具：`scripts/run_public_alpr_pilot.py`；原图/标签在本机排除的 `data/raw/ai_task_acceptance/unique_data_license_plates_5c1678c_20261004/`，计划/预测/回执在被忽略的 `artifacts/analysis/alpr_public_sample_20261004_v1/`；说明见 `public_alpr_sample_pilot_20261004.md`。不得提交原始图片或明文车牌。
 
+ALPR base-only 配对诊断单独输出到被忽略的 `artifacts/analysis/alpr_public_base_comparison_20261004_v1/`，不覆盖原 adapter root。
+
 单场景引用包入口`scripts/build_driving_workflow_package.py`，产物根`artifacts/datasets/`；不含原图/QA。
 小实验计划见`scripts/prepare_drivelm_pilot.py`、`tests/test_drivelm_pilot_plan.py`，
 模型下载入口为`scripts/download_driving_pilot_model.py`，本地payload位于被忽略的`data/raw/ai_workflow_pilot/`；

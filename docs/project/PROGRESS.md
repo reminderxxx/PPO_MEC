@@ -5,6 +5,10 @@
 
 ﻿# Progress
 
+## 2026-10-04：ALPR 小样本完成，追加 base-only 配对诊断
+
+原 12 张识别正常完成（146.34s）：development 0/4 exact，locked_check 4/8 exact、CER=13/53，无截断。原包完整性与七文件保护通过。用户要求继续后，固定同一 12 图、提示词与推理预算，准备独立 base-only 配对诊断；不修改原结果、不调参，也不称为新独立测试。入口/终态指针见 [说明](public_alpr_sample_pilot_20261004.md)。
+
 ## 2026-10-04：公开 ALPR 样本已收集，小样本正确性测试启动
 
 用户授权后收集固定 UniqueData revision 的 100 图 + TSV/README，共 18,939,410 bytes；源 hash/size、解码、标签绑定通过。按预固定分组/排序选择 4+8，现有 ALPR adapter 离线测试已独立后台启动，最多 12 generate，无调参或重试。此处不宣称识别成功；终态/分数以本机 `artifacts/analysis/alpr_public_sample_20261004_v1/` 回执为准。

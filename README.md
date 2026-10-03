@@ -6,7 +6,7 @@
 # PPO_MEC
 
 公开 ALPR 小样本数据与离线任务检查（非 formal/holdout）：
-[固定规则与运行入口](docs/project/public_alpr_sample_pilot_20261004.md)。
+[固定规则与运行入口](docs/project/public_alpr_sample_pilot_20261004.md)，含只读复用 adapter 结果的 base-only 配对诊断。
 
 首个驾驶工作流引用包：`scripts/build_driving_workflow_package.py`；
 [检索、数据卡与八调用边界](docs/project/driving_workflow_minipackage_20260929.md)。已生成引用包，尚无真实推理结果。

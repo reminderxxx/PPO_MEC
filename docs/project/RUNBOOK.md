@@ -760,6 +760,8 @@ python -m pytest tests/test_env_contract.py
 独立一次性入口 `scripts/run_public_alpr_pilot.py` 的 `prepare`/`supervise` 操作及固定本机路径见
 `docs/project/public_alpr_sample_pilot_20261004.md`。仅为授权后的公开示例与离线任务检查，
 不属于 formal/holdout；原件和明文标签不得提交。已有输出目录不可复用。
+新增 `prepare_base --base-comparison` 与 `launch --base-comparison` 仅在原 adapter 完成且完整性通过后，
+复用同一 12 图进行新 root 的 base-only 配对诊断；不重跑 adapter，不视为新独立测试。
 
 ## 数据准备检查
 

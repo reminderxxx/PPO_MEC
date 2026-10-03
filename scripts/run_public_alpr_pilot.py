@@ -16,6 +16,8 @@ from concurrent.futures import ThreadPoolExecutor
 PROJECT = Path('/Users/howen/Projects/PPO_MEC')
 DATA = PROJECT / 'data/raw/ai_task_acceptance/unique_data_license_plates_5c1678c_20261004'
 OUT = PROJECT / 'artifacts/analysis/alpr_public_sample_20261004_v1'
+ORIGINAL_OUT = OUT
+BASE_ONLY = False
 REV = '5c1678c7350bdc7f9d674156bb1926567c6f9a30'
 REPO = 'UniqueData/license_plates'
 PYTHON = PROJECT / 'artifacts/environments/adapter_state_acceptance_py39_v1/bin/python'
@@ -49,6 +51,49 @@ def save(path, value):
 
 def snapshot():
     return {name: sha(PROJECT / name) for name in PROTECTED}
+
+
+def verify_original():
+    inventory = json.loads((ORIGINAL_OUT / 'artifact_integrity.json').read_text())
+    for row in inventory:
+        path = ORIGINAL_OUT / row['path']
+        assert path.stat().st_size == row['bytes'] and sha(path) == row['sha256'], row['path']
+    assert json.loads((ORIGINAL_OUT / 'completion_receipt.json').read_text())['status'] == 'COMPLETED'
+    return sha(ORIGINAL_OUT / 'artifact_integrity.json')
+
+
+def prepare_base_comparison():
+    assert BASE_ONLY
+    source_hash = verify_original()
+    OUT.mkdir(parents=True, exist_ok=False)
+    save(OUT / 'protection_start.json', snapshot())
+    for name in ['model_inputs.json', 'private_labels_and_selection.json', 'data_acceptance.json']:
+        with (OUT / name).open('xb') as f:
+            f.write((ORIGINAL_OUT / name).read_bytes())
+    plan = json.loads((ORIGINAL_OUT / 'design.json').read_text())
+    plan.update(model_mode='base_only', comparison_type='exploratory_paired_after_adapter_results',
+                original_inventory_sha256=source_hash,
+                original_root=str(ORIGINAL_OUT), new_independent_test=False,
+                decision='all original 12 samples; no prompt or preprocessing changes; no selection or tuning')
+    save(OUT / 'design.json', plan)
+    print('BASE_COMPARISON_PREPARED: same 12 inputs, no adapter loading')
+
+
+def paired_summary(adapter_rows, base_rows):
+    a = {r['sample_id']: r for r in adapter_rows}
+    b = {r['sample_id']: r for r in base_rows}
+    assert len(a) == len(adapter_rows) and len(b) == len(base_rows) and set(a) == set(b)
+    result = {}
+    for split in ['development', 'locked_check']:
+        keys = [k for k in a if a[k]['split'] == split]
+        assert all(a[k]['split'] == b[k]['split'] and a[k]['reference_characters'] == b[k]['reference_characters'] for k in keys)
+        result[split] = {
+            'n': len(keys),
+            'both_correct': sum(a[k]['exact_match'] and b[k]['exact_match'] for k in keys),
+            'adapter_only_correct': sum(a[k]['exact_match'] and not b[k]['exact_match'] for k in keys),
+            'base_only_correct': sum(not a[k]['exact_match'] and b[k]['exact_match'] for k in keys),
+            'both_wrong': sum(not a[k]['exact_match'] and not b[k]['exact_match'] for k in keys)}
+    return result
 
 
 def normalize(text):
@@ -194,8 +239,12 @@ def infer():
     assert len(rows) == 12
     processor = AutoProcessor.from_pretrained(BASE, local_files_only=True, trust_remote_code=False)
     base = AutoModelForVision2Seq.from_pretrained(BASE, torch_dtype=torch.float32, local_files_only=True, trust_remote_code=False)
-    model = PeftModel.from_pretrained(base, ADAPTER, adapter_name='alpr', is_trainable=False, local_files_only=True)
-    model.set_adapter('alpr')
+    assert plan.get('model_mode', 'adapter') == ('base_only' if BASE_ONLY else 'adapter')
+    if BASE_ONLY:
+        model = base
+    else:
+        model = PeftModel.from_pretrained(base, ADAPTER, adapter_name='alpr', is_trainable=False, local_files_only=True)
+        model.set_adapter('alpr')
     model.eval()
     with (OUT / 'predictions.jsonl').open('x') as f:
         for row in rows:
@@ -239,11 +288,21 @@ def score():
                           'micro_cer': sum(r['edit_distance'] for r in group)/sum(r['reference_characters'] for r in group)}
     save(OUT / 'task_results_redacted.json', {'summary': summary, 'rows': rows,
          'claim_scope': 'small public sample task check; not formal, holdout, algorithm or mechanism evidence'})
+    if BASE_ONLY:
+        plan = json.loads((OUT / 'design.json').read_text())
+        assert verify_original() == plan['original_inventory_sha256']
+        original = json.loads((ORIGINAL_OUT / 'task_results_redacted.json').read_text())
+        save(OUT / 'paired_comparison_redacted.json', {
+            'adapter': original['summary'], 'base': summary,
+            'paired_counts': paired_summary(original['rows'], rows),
+            'exploratory': True, 'new_independent_test': False,
+            'mechanism_or_algorithm_advantage': 'NOT_ESTABLISHED'})
 
 
 def supervise():
     import importlib.metadata
     save(OUT / 'execution_identity.json', {'argv': sys.argv, 'python': sys.executable,
+         'model_mode': 'base_only' if BASE_ONLY else 'adapter',
          'prefix': sys.prefix, 'base_prefix': sys.base_prefix,
          'versions': {name: importlib.metadata.version(name) for name in
                       ['torch', 'transformers', 'peft', 'accelerate', 'safetensors', 'Pillow']},
@@ -256,7 +315,7 @@ def supervise():
     rc, error = None, None
     try:
         with (OUT / 'child.stdout.log').open('x') as stdout, (OUT / 'child.stderr.log').open('x') as stderr:
-            rc = subprocess.run([str(PYTHON), '-B', str(Path(__file__).resolve()), 'infer'],
+            rc = subprocess.run([str(PYTHON), '-B', str(Path(__file__).resolve()), 'infer'] + (['--base-comparison'] if BASE_ONLY else []),
                                 stdout=stdout, stderr=stderr, timeout=1800).returncode
         if rc == 0:
             score()
@@ -280,7 +339,7 @@ def launch():
         env = dict(os.environ)
         env.pop('PYTHONPATH', None)
         env['PYTHONUNBUFFERED'] = '1'
-        child = subprocess.Popen([str(PYTHON), '-B', str(Path(__file__).resolve()), 'supervise'],
+        child = subprocess.Popen([str(PYTHON), '-B', str(Path(__file__).resolve()), 'supervise'] + (['--base-comparison'] if BASE_ONLY else []),
                                  stdout=log, stderr=subprocess.STDOUT, env=env,
                                  start_new_session=True, stdin=subprocess.DEVNULL)
     save(OUT / 'launch_receipt.json', {'pid': child.pid, 'started_unix': time.time(),
@@ -290,10 +349,15 @@ def launch():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('action', choices=['prepare', 'infer', 'supervise', 'launch'])
+    parser.add_argument('action', choices=['prepare', 'prepare_base', 'infer', 'supervise', 'launch'])
+    parser.add_argument('--base-comparison', action='store_true')
     args = parser.parse_args()
+    BASE_ONLY = args.base_comparison
+    if BASE_ONLY:
+        assert args.action != 'prepare'
+        OUT = PROJECT / 'artifacts/analysis/alpr_public_base_comparison_20261004_v1'
     try:
-        {'prepare': prepare, 'infer': infer, 'supervise': supervise, 'launch': launch}[args.action]()
+        {'prepare': prepare, 'prepare_base': prepare_base_comparison, 'infer': infer, 'supervise': supervise, 'launch': launch}[args.action]()
     except Exception as exc:
         # Preserve a startup failure as well as failures after the scientific child.
         if args.action == 'supervise' and not (OUT / 'completion_receipt.json').exists():
