@@ -720,3 +720,13 @@
 ## 2026-09-08 G14R20-A
 
 独立 continuation validator 只用标准库，不依赖当前科学模块；CLI 通过原 Python/旧 cwd 加载新只读 helper，helper 只消费旧 validator。原 public runner 无修改，未新增 executor。 详见 `fixed_commit_continuation_contract.md`。
+
+## 2026-10-03 两节点工作流后缀恢复验收
+
+- `src/runtime/workflow_suffix_recovery.py`：动态状态 canonical hash、schema/identity/DAG fail-closed 校验、
+  `n1` 输入构造、状态包读写，以及 PEFT `available_adapters` 汇总合同。
+- `scripts/run_two_node_workflow_suffix_recovery.py`：continuous/source/target 三个独立科学进程与一次性 supervisor；
+  target 只从声明状态构造 `n1`，不进入 production environment/action codec。
+- `configs/acceptance/two_node_workflow_suffix_recovery_v1.json`：DAG、prompt、模型资源 hash、生成参数、判据、
+  目标读取白名单与 4-generate 预算。
+- `tests/test_workflow_suffix_recovery.py`：状态依赖、篡改/冲突拒绝、旧 PEFT 回执字段与汇总负例。

@@ -1525,3 +1525,23 @@ evidence。未来 G14C v13 只能从 pushed、Git-clean、`HEAD == main == origi
 XML 必须包含 `test_benchmark_main_executes_full_envelope_gate` 的全部 16 个正负情形及真实 loader/gate/rollout
 计数 1/1/0。`build_formal_checkpoint_provenance_envelope_artifacts.validate_main_gate_evidence` 验证这些计数；
 不能以旧源码断言替代。该命令仅产生临时 test-only checkpoint，不执行正式训练或 rollout，不授权启动 v16。
+
+## 两节点工作流前缀保存 / 后缀恢复验收
+
+先在项目测试环境运行纯状态合同测试，再从已提交、clean 的隔离 worktree 使用已验收 Python。`<commit>` 必须是
+该 worktree 的实际 `HEAD`，`<new-run-root>` 必须不存在：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest tests/test_workflow_suffix_recovery.py -q
+
+/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python \
+  scripts/run_two_node_workflow_suffix_recovery.py \
+  --role supervisor \
+  --plan configs/acceptance/two_node_workflow_suffix_recovery_v1.json \
+  --run-root <new-run-root> \
+  --expected-commit <commit>
+```
+
+supervisor 固定启动 continuous、source、target 三个进程，计划 4 次 generate、每进程 300 秒、累计 900 秒，
+不自动重试。该入口仅用于 technical workflow calibration；不得用于训练、formal/holdout、算法比较或 action 4
+真实迁移声明。

@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `two_node_workflow_suffix_recovery_plan_20261003.md`：真实两节点 technical workflow 的前缀保存、独立进程
+  后缀恢复、负例、目标端读取边界和 4-generate 一次性验收方案；不代表任务正确性或 production action 4
+
 - `adapter_state_recovery_calibration_20260930.md`：同 base 两个公开 adapter 的固定资源清单与授权门槛、
   独立进程状态恢复失败见证、action 4 语义及原生/敏感性分层；adapter 兼容性和真实净收益均未验证
 
