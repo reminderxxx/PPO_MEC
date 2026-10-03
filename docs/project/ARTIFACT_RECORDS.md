@@ -5,6 +5,22 @@
 
 # Artifact Records
 
+## 2026-10-03 two-node workflow suffix recovery acceptance
+
+- run：`two_node_workflow_suffix_recovery_20261003_v3`
+- path：`artifacts/analysis/two_node_workflow_suffix_recovery_20261003_v3/`
+- execution commit：`01c9d972243cff0c58d1d597f8d029fc4cc76707`；plan SHA-256=`74b42838…208c`
+- scope：continuous `n0,n1`；source `n0`+save+exit；target validate+`n1`，共 3 个 PID、4/4 generate
+- result：target n0 call=0、n1 call=1、image access=0；continuous/source n0 完全一致，continuous/target n1 实际
+  prompt/rendered/input IDs/hash/token IDs 完全一致；6 项负例/数据依赖检查通过
+- state/cost：payload 1,090 B，state file 1,703 B，manifest 337 B，package 2,040 B；target child wall
+  6.864620 s，三进程总墙钟 41.606533 s；仅为单次同机见证
+- integrity：11 files / 33,290 B 独立复算通过；companion review 保存两次 0-generate preflight failure、main 七文件
+  起止保护与旧证据 hash
+- boundary：`E2_ARTIFACT_AUDITED` technical calibration only；任务正确性 unavailable，不是 production action 4、
+  跨 RSU/无线、训练、算法优势、formal/holdout 或论文净收益证据。报告：
+  `docs/project/two_node_workflow_suffix_recovery_acceptance_20261003.md`
+
 ## 2026-09-30 adapter/state recovery calibration
 
 - run：`adapter_state_recovery_calibration_20260930_v1`

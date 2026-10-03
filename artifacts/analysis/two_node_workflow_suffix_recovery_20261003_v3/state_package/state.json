@@ -1,0 +1,66 @@
+{
+  "payload": {
+    "completed_nodes": [
+      "n0"
+    ],
+    "edges": [
+      [
+        "n0",
+        "n1"
+      ]
+    ],
+    "generation": {
+      "n0": {
+        "do_sample": false,
+        "max_new_tokens": 8,
+        "num_beams": 1,
+        "use_cache": true
+      },
+      "n1": {
+        "do_sample": false,
+        "max_new_tokens": 8,
+        "num_beams": 1,
+        "use_cache": true
+      }
+    },
+    "identity": {
+      "adapter_name": "adapter_a",
+      "adapter_weight_sha256": "95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83",
+      "base_weight_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+      "processor_sha256": "c829b783c70c179f828dfe65d35546fea55cc5c0efd699abeb0e187f0bbb7ee9"
+    },
+    "n0_output": {
+      "raw_text": " The image is a line graph depicting the",
+      "token_ids": [
+        378,
+        2443,
+        314,
+        253,
+        1761,
+        3670,
+        17691,
+        260
+      ]
+    },
+    "next_node": "n1",
+    "nodes": [
+      "n0",
+      "n1"
+    ],
+    "remaining_nodes": [
+      "n1"
+    ],
+    "rng_state": {
+      "reason": "do_sample=false for both nodes; n1 starts from explicit text rather than RNG continuation",
+      "required": false
+    },
+    "suffix_input_material": " The image is a line graph depicting the",
+    "tensor_state": {
+      "reason": "the application-node boundary passes explicit text; no KV cache or tensor is consumed by n1",
+      "required": false
+    },
+    "workflow_id": "technical_vision_description_suffix_v1"
+  },
+  "payload_sha256": "6abd23d47807f3be97833f1a611660c5d86506127286ddd8c2eeef1346f8d22f",
+  "schema_version": "ppo_mec.two_node_workflow_state.v1"
+}

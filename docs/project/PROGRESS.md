@@ -5,6 +5,19 @@
 
 ﻿# Progress
 
+## 2026-10-03: 真实两节点 technical workflow 后缀恢复通过
+
+- 固定配置 SHA-256=`74b42838…208c`，从已 push 的 clean commit `01c9d97…` 执行 continuous/source/target 三个
+  独立进程；节点调用为 `1/1`、`1/0`、`0/1`，计划 4/4 generate，无科学重试。
+- source 退出后 target 校验 1,090-byte payload / 2,040-byte 状态包，只由保存的 `n0` 文本构造 `n1`；target
+  图片访问 0。continuous/恢复的 `n1` prompt、rendered prompt、input IDs/hash 与输出 token IDs 全部严格一致。
+- 6 项模型加载前负例/数据依赖检查通过；旧 supervisor `loaded_adapters` 汇总缺陷以既有回执和字段缺失/冲突负例回归，
+  不改写旧顶层 FAIL 或旧审计附件。
+- 仅证明本技术工作流的后缀恢复保真性；输出语义不佳且没有标签，任务正确性仍 `unavailable`。没有训练、formal/
+  holdout、production action 4 扩展、无线传输或算法比较。报告与证据见
+  `two_node_workflow_suffix_recovery_acceptance_20261003.md`、
+  `artifacts/analysis/two_node_workflow_suffix_recovery_20261003_v3/`。
+
 ## 2026-09-30: 真实 adapter 与工作流恢复校准停止于预注册门禁
 
 - 固定上一轮最终提交 `e6fffb5` 建立隔离 checkout；主工作区七个用户修改的起止文件/hash 单独保护，未改 main、

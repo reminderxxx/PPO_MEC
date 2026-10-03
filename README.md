@@ -5,6 +5,11 @@
 
 # PPO_MEC
 
+真实两节点 technical workflow 的前缀保存与独立进程后缀恢复已在固定 commit、4 次 generate 下通过：target
+只执行 `n1`，其输入实际包含 source 保存的 `n0` 文本，并与 continuous 路径逐 input/token 对齐。任务正确性仍为
+`unavailable`，不代表 production action 4、跨 RSU/无线迁移或算法收益。见
+[`docs/project/two_node_workflow_suffix_recovery_acceptance_20261003.md`](docs/project/two_node_workflow_suffix_recovery_acceptance_20261003.md)。
+
 真实 adapter / 状态恢复校准见
 [`docs/project/adapter_state_recovery_calibration_20260930.md`](docs/project/adapter_state_recovery_calibration_20260930.md)：
 本地没有真实 adapter，新增 156.465 MiB 权重未获授权；固定两节点状态链在预热正确性门禁失败，正式测量为 0。

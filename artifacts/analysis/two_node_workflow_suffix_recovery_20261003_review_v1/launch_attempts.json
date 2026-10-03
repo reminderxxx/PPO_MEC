@@ -1,0 +1,37 @@
+{
+  "schema_version": "ppo_mec.pre_execution_launch_attempts.v1",
+  "scientific_run_id": "two_node_workflow_suffix_recovery_20261003_v3",
+  "attempts": [
+    {
+      "attempt_id": "pre_execution_attempt_v1",
+      "run_root_requested": "artifacts/analysis/two_node_workflow_suffix_recovery_20261003_v1",
+      "fixed_execution_commit_requested": "1f809cfb1f10d953ca4b72dbad54b23d9c445d47",
+      "exit_code": 1,
+      "failure_stage": "python import before supervisor preflight",
+      "error_type": "ModuleNotFoundError",
+      "error": "No module named 'src'",
+      "run_root_created": false,
+      "model_loaded": false,
+      "generate_calls": 0,
+      "automatic_retry": false,
+      "disposition": "chain stopped; entrypoint bootstrap fixed in a new committed executor"
+    },
+    {
+      "attempt_id": "pre_execution_attempt_v2",
+      "run_root_requested": "artifacts/analysis/two_node_workflow_suffix_recovery_20261003_v2",
+      "fixed_execution_commit_requested": "01c9d97d2e0c61f92cf75141c48fe7389184d817",
+      "actual_head": "01c9d972243cff0c58d1d597f8d029fc4cc76707",
+      "exit_code": 1,
+      "failure_stage": "fixed execution commit preflight",
+      "error_type": "RuntimeError",
+      "error": "execution commit mismatch",
+      "run_root_created": false,
+      "model_loaded": false,
+      "generate_calls": 0,
+      "automatic_retry": false,
+      "disposition": "chain stopped; no code, plan, input, prompt, criterion, or budget change"
+    }
+  ],
+  "scientific_budget_consumed_by_launch_attempts": 0,
+  "scientific_run_started_once": true
+}

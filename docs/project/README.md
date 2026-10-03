@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `two_node_workflow_suffix_recovery_acceptance_20261003.md`：固定 4-generate 三进程见证、状态/输入/token 对照、
+  负例、单次成本分层与严格 claim boundary；任务正确性 unavailable
+
 - `two_node_workflow_suffix_recovery_plan_20261003.md`：真实两节点 technical workflow 的前缀保存、独立进程
   后缀恢复、负例、目标端读取边界和 4-generate 一次性验收方案；不代表任务正确性或 production action 4
 

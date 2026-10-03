@@ -5,6 +5,16 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-03: 两节点显式文本状态恢复已技术闭环，production/VEC 语义仍开放（PARTIAL CLOSURE）
+
+- 新 artifact 已证明独立 target 消费 source 的 `n0` 文本并只执行 `n1`；因此“本技术链没有 workflow-state
+  recovery witness”的缺口关闭。历史 9/30 失败校准和 10/3 旧顶层 FAIL 均不改写。
+- 输出 ` 2010 - 2` 没有 ALPR/Helmet 标签且语义质量不佳；任务正确性仍 unavailable。单次同机 CPU 成本不能外推
+  RSU、无线链路、排队、稳态均值或净收益。
+- 状态边界是显式应用文本，不包含 KV/tensor；production action 4 仍未序列化/传输/导入该状态。多 adapter DAG、
+  真实车联网输入、故障恢复和统计重复仍是下一阶段缺口。
+- 详见 `two_node_workflow_suffix_recovery_acceptance_20261003.md`；不得据此晋级算法或论文结论。
+
 ## 2026-09-30: 真实 adapter 和独立进程状态恢复仍不可用（OPEN BLOCKER）
 
 - 本地没有与固定 SmolVLM base 配套的真实 adapter；公开 ALPR/Helmet LoRA 共需 164,065,376 bytes 新权重，固定

@@ -1,0 +1,53 @@
+{
+  "checks": [
+    {
+      "error": "n0_output is required",
+      "name": "missing_intermediate",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "error": "payload_sha256 mismatch: expected '3e7e4fc733ff12be3de1caf99e0057635301b6d1570fe1172e4a8c54438ca7a5', got '8dacb54bfc22a6e59e209ffa4e419a90864ddfe5d0c2e3e676bc5289fe3f7170'",
+      "name": "tampered_content_stale_hash",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "error": "next_node mismatch: expected 'n1', got 'n0'",
+      "name": "next_node_conflict",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "error": "completed_nodes mismatch: expected ['n0'], got []",
+      "name": "completed_nodes_conflict",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "error": "identity mismatch: expected {'base_weight_sha256': 'd05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2', 'adapter_name': 'adapter_a', 'adapter_weight_sha256': '95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83', 'processor_sha256': 'c829b783c70c179f828dfe65d35546fea55cc5c0efd699abeb0e187f0bbb7ee9'}, got {'base_weight_sha256': 'conflicting-base', 'adapter_name': 'adapter_a', 'adapter_weight_sha256': '95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83', 'processor_sha256': 'c829b783c70c179f828dfe65d35546fea55cc5c0efd699abeb0e187f0bbb7ee9'}",
+      "name": "model_identity_conflict",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "inputs": [
+        {
+          "description": "a line graph",
+          "prompt": "Upstream visual description: a line graph\nSummarize only that description in one short phrase.",
+          "sha256": "a6750a637d16c7e12d47c223d90c0717a7fbe885c0da8efe3e7a2019ad7b1216"
+        },
+        {
+          "description": "a road intersection",
+          "prompt": "Upstream visual description: a road intersection\nSummarize only that description in one short phrase.",
+          "sha256": "866e6268609a74b8a0469969286f3637e153bed026727719c87216698f68fd43"
+        }
+      ],
+      "name": "two_valid_intermediates_change_n1_input",
+      "status": "PASS"
+    }
+  ],
+  "generate_calls": 0,
+  "model_loaded": false,
+  "status": "PASS"
+}

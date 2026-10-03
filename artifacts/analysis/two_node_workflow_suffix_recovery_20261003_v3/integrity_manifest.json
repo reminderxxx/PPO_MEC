@@ -1,0 +1,63 @@
+{
+  "file_count": 11,
+  "files": [
+    {
+      "bytes": 1219,
+      "path": "continuous_process.json",
+      "sha256": "582259be3d81ffae6eda3f3759dc11bf2bf0950d4d682f69c218df37fae2faed"
+    },
+    {
+      "bytes": 5081,
+      "path": "continuous_receipt.json",
+      "sha256": "f789ba8663495692bac2193c45677430e3ca6ebd89396ffd658d4a29c4b4abee"
+    },
+    {
+      "bytes": 1068,
+      "path": "execution_started.json",
+      "sha256": "c295ea5f98abc1e4f74759634a6c8f72721098f94a007cf00c218a9a079e6d0a"
+    },
+    {
+      "bytes": 2226,
+      "path": "preflight_negative_checks.json",
+      "sha256": "820e9785dae8db5f7d7dd2206aebcc624bd3ba25bcbf214c6a7fc7405b0675bd"
+    },
+    {
+      "bytes": 1218,
+      "path": "source_process.json",
+      "sha256": "30774eaf279a1d47b24aa6de8be7d04ae0d5129b322f245cc6480862368ee0fd"
+    },
+    {
+      "bytes": 4511,
+      "path": "source_receipt.json",
+      "sha256": "e8f646b62ebea43627fafb8d9faaf90b205dca91c975217580baa850730a4d45"
+    },
+    {
+      "bytes": 337,
+      "path": "state_package/manifest.json",
+      "sha256": "362123e41c78f9fe53cd7b36faf8337d18133caf3e9040175d4e1f520dd14839"
+    },
+    {
+      "bytes": 1703,
+      "path": "state_package/state.json",
+      "sha256": "53c4f94fa8b50025a2ae4e532d31e211996e49eb302859f37561ef93e66409c9"
+    },
+    {
+      "bytes": 1219,
+      "path": "target_process.json",
+      "sha256": "7dd2d8770cde87517b8c737797f665124360c6134022c14e70fc7f0c48df9db4"
+    },
+    {
+      "bytes": 5607,
+      "path": "target_receipt.json",
+      "sha256": "48f56179f78f0f3a97b7666a64ff82138e9438e80ce8e80bef88ea2b04e93a81"
+    },
+    {
+      "bytes": 9101,
+      "path": "terminal_receipt.json",
+      "sha256": "32f3e95fabdc4cf53b2bcc0778fea7a8c06d43ac23408ab9015486c726a87283"
+    }
+  ],
+  "run_root": "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/artifacts/analysis/two_node_workflow_suffix_recovery_20261003_v3",
+  "schema_version": "ppo_mec.artifact_integrity.v1",
+  "total_bytes_excluding_manifest": 33290
+}

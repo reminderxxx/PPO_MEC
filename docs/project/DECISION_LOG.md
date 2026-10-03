@@ -1,5 +1,16 @@
 ﻿# Decision Log
 
+## 2026-10-03: workflow 动态状态与静态模型资源分层，恢复判据绑定实际后缀输入
+
+- 决定：节点边界状态只封装 `n0` 显式输出、DAG/control/generation/identity 和完整性 hash；base/adapter/processor
+  是 target 预存静态资源，不再把 adapter 权重打入每 workflow 状态包。
+- 决定：恢复成功必须证明 target 的 `n0=0,n1=1`，由保存内容构造的实际 prompt/rendered/input IDs/hash 与
+  continuous 路径一致，并比较 `n1` token IDs；最终只比较输出或把预存最终答案返回均不合格。
+- 决定：应用节点间的显式文本边界不保存 RNG continuation、KV 或 tensor；未来若节点 contract 改为 token/tensor
+  continuation，必须另冻 schema、兼容性和成本，不能沿用本轮 2,040-byte 结果。
+- 边界：technical calibration 与 production action 4、真实 RSU/无线迁移及任务正确性分开；详见
+  `two_node_workflow_suffix_recovery_acceptance_20261003.md`。
+
 ## 2026-09-30: adapter 与状态恢复按 fail-closed 门禁，不由合成字节收益反推
 
 - 决定：没有两个真实 adapter 的 A→B→A load/switch/execute 和 active identity 证据时，工程兼容性保持

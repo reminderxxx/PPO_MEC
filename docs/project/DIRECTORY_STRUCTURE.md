@@ -322,5 +322,7 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 - `configs/acceptance/two_node_workflow_suffix_recovery_v1.json`：一次性两节点恢复验收的冻结机器方案。
 - `src/runtime/workflow_suffix_recovery.py`：与模型加载解耦的状态封装、校验和后缀输入合同。
 - `scripts/run_two_node_workflow_suffix_recovery.py`：三进程科学执行与 supervisor 入口。
-- `artifacts/analysis/two_node_workflow_suffix_recovery_20261003_v1/`：计划中的单次机器证据目录；旧 adapter
-  验收目录和原始 FAIL 回执不覆盖、不改写。
+- `artifacts/analysis/two_node_workflow_suffix_recovery_20261003_v3/`：一次科学执行的机器证据；v1/v2 均在
+  run-root 创建和模型加载前失败并记录于 companion review，旧 adapter 验收目录和原始 FAIL 回执不覆盖、不改写。
+- `artifacts/analysis/two_node_workflow_suffix_recovery_20261003_review_v1/`：pre-execution 失败、main 七文件保护、
+  旧证据 hash 和独立完整性复算。
