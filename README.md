@@ -5,6 +5,11 @@
 
 # PPO_MEC
 
+ALPR 真实任务验收数据的最新来源资格、许可边界与冻结组级取样方案见
+[`docs/project/alpr_task_acceptance_data_source_review_20261004.md`](docs/project/alpr_task_acceptance_data_source_review_20261004.md)：
+首选 UFPR-ALPR v1.0 已核验为有车牌文本标签和 vehicle/video 分组的匹配来源，但须由用户本人接受条款并取得作者链接；
+本轮结论为 B（等待精确条款/下载授权），没有下载数据或调用模型。
+
 最小有用任务输入门禁见
 [`docs/project/minimal_useful_task_acceptance_20261004.md`](docs/project/minimal_useful_task_acceptance_20261004.md)：
 本机 base、ALPR/Helmet adapter 与隔离环境完整性通过，但没有同时具备任务匹配标签、许可和本地图像的输入集；

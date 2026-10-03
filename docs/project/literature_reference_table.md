@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-09-29
+更新日期：2026-10-04
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -221,6 +221,16 @@
 | --- | --- | --- | --- | --- | --- |
 | dual-dependency cooperative MEC | [Intelligent Cooperative Computation Offloading and Resource Allocation for Dual-Dependency Tasks in Edge Computing](https://doi.org/10.1109/TSC.2026.3709905) | IEEE Transactions on Services Computing, 19(4):2843–2856, 2026；出版社页面核验 | 同时考虑执行依赖与服务依赖，在有限服务和计算资源下以 recurrent MARL 联合卸载与资源分配；训练通信、执行分布式决策。 | 依赖感知联合优化本身已有直接近邻。本项目候选区别必须落在移动交接时 base/adapter 与执行状态的共同准备及其可测决策收益，尚未证明；不能用 controller heads 冒充该文的用户级 agents。 | Problem motivation / nearest-neighbor boundary；全文算法与假设比较待补。 |
 | workflow workload realism | [WfCommons: A framework for enabling scientific workflow research and development](https://doi.org/10.1016/j.future.2021.09.043) | Future Generation Computer Systems, 128:16–27, 2022；出版社与项目书目核验 | 从真实 workflow 实例分析并构建合成 workload，评价结构及模拟执行的真实性。 | 提供工作负载校准方法参考，不提供车载 adapter 请求证据。NGSIM 与 Alibaba 的组合须明确为 trace-driven simulation；模型映射、状态大小及迁移代价仍需独立校准，不能由两种真实 trace 自动推出联合工作负载真实。 | Evaluation methodology / limitations；方法参考，不标为顶刊或 A 会核心贡献依据。 |
+
+## 2026-10-04 ALPR 验收数据来源增补
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---:|---|---|---|
+| 分组可追溯的真实 ALPR | [A Robust Real-Time Automatic License Plate Recognition Based on the YOLO Detector](https://web.inf.ufpr.br/vri/wp-content/uploads/sites/7/2019/08/laroca2018robust.pdf)；[官方数据页](https://web.inf.ufpr.br/vri/databases/ufpr-alpr/) | IJCNN 2018；作者机构原文与数据页核验 | UFPR-ALPR 提供 4,500 张完整图、plate text/box/character 标注和 150 个 vehicle/video 组，可支持先按组隔离再取帧的裁剪外识别验收。 | 本轮只把它作为真实任务正确性输入候选；它不提供跨 RSU DAG、adapter cache、handoff state 或算法收益证据。许可需本人接受且禁止未经许可再分发/修改，adapter 训练重叠未知。 | Evaluation dataset / task contract / limitations；不是 novelty 证据。 |
+| 大规模端到端车牌数据 | [Towards End-to-End License Plate Detection and Recognition: A Large Dataset and Baseline](https://openaccess.thecvf.com/content_ECCV_2018/html/Zhenbo_Xu_Towards_End-to-End_License_ECCV_2018_paper.html)；[作者数据仓库](https://github.com/detectRecog/CCPD) | ECCV 2018；会议开放论文与作者仓库核验 | CCPD 提供大规模完整车辆图，文件名编码 plate text、box、顶点、姿态和图像属性，可作为检测/识别数据及规模化 baseline 来源。 | 官方字段未提供 video/track/physical-vehicle ID，最小 archive 很大；plate-text hash 只能作 proxy group，因此仅为 UFPR 无法取得时的备选，不能声称物理车辆级独立。 | Dataset alternative / grouping limitation / baseline context。 |
+
+以上来源资格、许可证据、下载边界和冻结取样规则见
+`alpr_task_acceptance_data_source_review_20261004.md`；数据集网页与论文只支持数据设计，不支持 PPO_MEC 机制结论。
 
 ## 写作 Claim 模板
 

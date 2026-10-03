@@ -211,6 +211,8 @@ G08：`src/oracles/` 放置纯request replay/oracle solver；`scripts/build_cach
 - `data/raw/mobility/highD/`：highD 原始 CSV
 - `data/raw/workflow/alibaba2018/`：Alibaba batch task 数据
 - `data/raw/model_cache/`：外部 model-cache 数据源审计 manifest；默认不自动下载模型文件
+- `data/raw/ai_task_acceptance/`：未来经精确授权取得的 ALPR/其他真实任务原始 payload；目录整体 Git ignored，
+  使用 timestamp create-only 子目录，不保存到仓库或上传外部 AI 服务
 - `data/processed/mobility/lust/`：LuST FCD 导出 CSV
 - `data/processed/sampled_vec_dags/`：采样后的 workflow DAG JSONL
 

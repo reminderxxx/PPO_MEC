@@ -5,6 +5,19 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-04: ALPR 匹配来源已确认，数据所有者许可与 adapter 训练重叠仍开放（OPEN BLOCKER）
+
+- UFPR-ALPR v1.0 同时满足真实 plate text 和 vehicle/video 分组要求，但获取需要用户本人接受官方条款并由作者发放
+  专属链接；archive 文件名、真实字节、hash 与目录 schema 在获批前不可验证，当前约 10.8 GB 仅为规划估计。
+- CCPD2019 虽公开且带文本标签，但没有官方 video/track/physical-vehicle ID；salted plate-text hash 只能作为
+  proxy group。不能因下载更直接就把它写成车辆级独立检查集。
+- 9 月 29 日历史记录实际授权 DriveLM 首个 frame 的 6 张相机图，而非全部 54 图；旧文档“条款待确认”描述的是
+  当时阶段状态。该授权样本只有一个 scene/group 且无 ALPR 真值，不能关闭当前 blocker，也未在本轮下载。
+- 本地 ALPR adapter 模型卡的 training dataset 仍为 unknown。即使未来数据包内部没有跨组泄漏，也必须记录
+  `adapter_training_overlap=UNKNOWN`，不得称独立于 adapter training/pretraining。
+- 许可与精确下载范围见 `alpr_task_acceptance_data_source_review_20261004.md`；获授权前禁止下载、模型调用或以
+  `locked_check` 冒充 formal holdout/外部泛化测试。
+
 ## 2026-10-04: 任务匹配的本地标注图像缺口阻止正确性与机制收益试验（OPEN BLOCKER）
 
 - ALPR/Helmet adapter 已有本地权重和技术兼容性见证，但没有本地、许可可追溯且独立标注的车牌/头盔图像；

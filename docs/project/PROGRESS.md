@@ -5,6 +5,22 @@
 
 ﻿# Progress
 
+## 2026-10-04: ALPR 任务验收数据来源已收敛，等待有限授权
+
+- 在固定基线 `62e1eeb42758d760684e949deb24727407d40266` 的隔离 checkout 中核验最多 3 个来源；上一轮 2 个未推送提交已
+  成功同步至远程，主工作区七个用户修改未纳入本任务。
+- 首选 UFPR-ALPR v1.0：4,500 张有 plate text 的图像来自 150 个 vehicle/video 组，适配约 4 组 development +
+  8 组 locked check；但官方要求用户本人由学校邮箱接受非商业、不再分发等条款并等待作者提供链接。本轮未代签、
+  未发信、未下载。
+- 备选 CCPD2019 有识别标签和 MIT 声明，但最小单元约 13.2 GB，且无官方 video/track/vehicle ID；plate-text hash
+  只能标为较弱 proxy group，不能声称物理车辆级独立。
+- 历史授权已追溯为 DriveLM 首个 frame 的精确 6 张相机图（724,191 B），不是“从未授权”，也不覆盖其余 48 图；
+  六图同属一个 scene/group 且不是 ALPR 标签，故本轮不下载、不扩权、不改做驾驶 VQA。
+- 已在任何取样前冻结 UFPR test split、vehicle/video 组级 SHA-256 排序、每组一帧、4+8 分配、排除项、重复检查和
+  exact/CER 合同。终态为 `B_SOURCE_IDENTIFIED_AWAITING_DATASET_OWNER_AND_DOWNLOAD_AUTHORIZATION`；模型加载、
+  generate、训练、formal/holdout 和机制比较均为 0。见 `alpr_task_acceptance_data_source_review_20261004.md` 与
+  `../../configs/acceptance/alpr_task_acceptance_data_plan_v1.json`。
+
 ## 2026-10-04: 最小有用任务验收停止于输入资格门禁
 
 - 从已同步的 workflow suffix 结果 `01d0617` 建立隔离分支，并先以提交 `140a2b1` 冻结最多 32 次 generate 的方案；

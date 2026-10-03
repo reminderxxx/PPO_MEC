@@ -1,0 +1,152 @@
+{
+  "schema_version": "ppo_mec.alpr_task_acceptance_data_plan.v1",
+  "frozen_at": "2026-10-04T01:56:27+08:00",
+  "fixed_git_base": "62e1eeb42758d760684e949deb24727407d40266",
+  "objective": "Prepare a small, license-traceable, labeled, group-isolated ALPR correctness-evaluation package without invoking any model.",
+  "terminal_state": "B_SOURCE_IDENTIFIED_AWAITING_DATASET_OWNER_AND_DOWNLOAD_AUTHORIZATION",
+  "execution_boundaries": {
+    "model_loads": 0,
+    "generate_calls": 0,
+    "training_runs": 0,
+    "mechanism_comparisons": 0,
+    "formal_runs": 0,
+    "holdout_runs": 0,
+    "new_dataset_downloads": 0,
+    "selection_may_use_model_outputs": false
+  },
+  "selected_task": {
+    "task_id": "ufpr_alpr_full_image_plate_text_recognition_v1",
+    "input": "One original full-resolution UFPR-ALPR image. Ground-truth vehicle, plate, and character boxes are retained as metadata but are not provided to the model.",
+    "output": "The single visible Brazilian license-plate text only.",
+    "scope_label": "full-image plate-text recognition with implicit localization; not a scored plate-box detector",
+    "ground_truth_crop_allowed": false,
+    "expected_label_pattern": "^[A-Z]{3}[0-9]{4}$",
+    "normalization": [
+      "Unicode NFKC",
+      "uppercase ASCII letters",
+      "remove all characters other than A-Z and 0-9"
+    ],
+    "prediction_parsing": "Apply the same normalization to the entire raw model response; do not select a favorable substring or edit a response after seeing the label.",
+    "exact_match": "normalized_prediction == normalized_label",
+    "character_error_rate": "Levenshtein(normalized_prediction, normalized_label) / len(normalized_label); do not clip values above 1.0",
+    "uncertain_policy": "Preserve the sample and raw label with uncertain=true when the official label is missing, contains an illegible marker, or cannot be reconciled with the source annotation. Exclude it from the primary exact-match/CER denominator, but report its count and reason.",
+    "label_provenance": "Official UFPR-ALPR per-image annotation only; no label may be generated or corrected by the evaluated model."
+  },
+  "sampling_plan": {
+    "seed": "ppo_mec_alpr_acceptance_v1_20261004",
+    "target_group_count": 12,
+    "development_group_count": 4,
+    "locked_check_group_count": 8,
+    "group_key": "The official UFPR-ALPR vehicle/video identity. Verify the archive representation before selection; do not infer a weaker image-level group if it is unavailable.",
+    "eligible_pool": "Official UFPR-ALPR test split only, after verifying that all 30 frames from each vehicle/video remain in one official split.",
+    "group_order": "Sort eligible group IDs by SHA-256(seed + ':' + group_id), ascending hexadecimal digest.",
+    "frame_order": "Within each selected group, sort relative image paths by SHA-256(seed + ':frame:' + relative_path), ascending hexadecimal digest, and choose the first decodable frame with a present official label matching the frozen task definition.",
+    "split_assignment": "First 4 selected groups become development; next 8 become locked_check.",
+    "fallback_when_fewer_groups": "Use every eligible group without duplication. Assign up to the first 4 groups to development and all remaining groups to locked_check; if fewer than 2 groups exist, stop because group isolation cannot be formed.",
+    "forbidden": [
+      "copying, cropping, augmenting, or selecting adjacent frames to inflate independent sample count",
+      "moving frames from one vehicle/video across development and locked_check",
+      "selection based on model output, expected difficulty, or expected algorithm advantage"
+    ],
+    "allowed_exclusions": [
+      "file missing or undecodable",
+      "official label missing or structurally invalid for the frozen task",
+      "license scope mismatch",
+      "source group identity unavailable or inconsistent"
+    ],
+    "exclusion_log_required": true
+  },
+  "integrity_plan": {
+    "source_archive_sha256_required": true,
+    "per_file_bytes_and_sha256_required": true,
+    "image_decode_required": true,
+    "label_image_binding_required": true,
+    "exact_duplicate_check": "SHA-256 over original image bytes",
+    "near_duplicate_aid": "64-bit perceptual hash; flag cross-group Hamming distance <= 6 for local human review",
+    "near_duplicate_boundary": "Perceptual hash is an aid only. Source vehicle/video identity is primary and semantic independence must be reviewed locally.",
+    "cross_split_group_intersection_must_be_empty": true,
+    "raw_images_must_remain_git_ignored": true,
+    "external_ai_upload_forbidden": true
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "dataset": "UFPR-ALPR",
+      "version": "v1.0 (2018)",
+      "source_type": "official university laboratory dataset site and original paper",
+      "source_urls": [
+        "https://web.inf.ufpr.br/vri/databases/ufpr-alpr/",
+        "https://web.inf.ufpr.br/vri/databases/ufpr-alpr/license-agreement/",
+        "https://web.inf.ufpr.br/vri/wp-content/uploads/sites/7/2019/08/laroca2018robust.pdf"
+      ],
+      "license": "Custom UFPR-ALPR academic-research-only terms",
+      "access": "Manual e-mail request from a valid university account; the requester must accept the official terms; author states a link is generally issued in 1-3 workdays.",
+      "registration_or_click_acceptance": "Human acceptance and author approval required; Codex must not accept or send the application on the user's behalf without a new explicit instruction.",
+      "payload": "4,500 PNG images at 1920x1080 plus per-image text annotations; 150 one-second, 30-FPS vehicle videos/groups, 30 frames per vehicle.",
+      "labels": "Plate identity/text, plate position, character positions, camera, and vehicle metadata.",
+      "group_identity": "Official vehicle/video identity; strong fit for group isolation.",
+      "minimum_download_unit": "The author-issued archive; no official public per-vehicle download unit is documented.",
+      "official_archive_url": null,
+      "official_archive_bytes": null,
+      "planning_size_estimate": "About 10.8 GB decimal from 4,500 images times a published secondary estimate of 2.4 MB per PNG; not an official archive size. Stop if the author-issued payload exceeds the separately approved cap.",
+      "planning_size_evidence": "https://thesai.org/Downloads/Volume13No12/Paper_45-Deep_Neural_Network_Training_and_Testing_Datasets.pdf",
+      "privacy_and_redistribution": "Contains identifiable license plates. Non-commercial academic research only; redistribution, modification, and commercial use require express VRI permission; publication/presentation demonstration is allowed under the stated privacy condition.",
+      "adapter_training_overlap": "UNKNOWN: the local ALPR adapter model card says it was trained on an unknown dataset.",
+      "qualification": "preferred_waiting_for_human_terms_and_author_link"
+    },
+    {
+      "rank": 2,
+      "dataset": "CCPD2019",
+      "version": "2019 update at repository commit 02aaea15137c4d2fe662e57d257c6822356e9304",
+      "source_type": "original paper authors' public repository",
+      "source_urls": [
+        "https://github.com/detectRecog/CCPD/tree/02aaea15137c4d2fe662e57d257c6822356e9304",
+        "https://drive.google.com/open?id=1rdEsCUcIUaYOVRkx5IMTRNA7PcGMmSgc"
+      ],
+      "license": "MIT as explicitly stated for the dataset by the original repository",
+      "access": "Public Google Drive or Baidu archive; no author registration is documented. A large-file confirmation page may appear; do not log in or use credentials.",
+      "registration_or_click_acceptance": "No separate dataset terms acceptance documented by the original repository.",
+      "payload": "CCPD2019.tar.xz with more than 300,000 JPEG images and labels embedded in filenames.",
+      "labels": "Plate text, plate box, four plate vertices, area, tilt, brightness, and blurriness encoded in each filename.",
+      "group_identity": "No independent vehicle/video field is documented. A salted hash of normalized plate text can serve only as a vehicle proxy group and must be labeled as such.",
+      "minimum_download_unit": "One full CCPD2019.tar.xz archive from the original repository link.",
+      "archive_bytes": 13164924944,
+      "archive_sha256_from_archival_metadata": "e4fd23c9f289c9e5404d9b25da6b2453714150c71b8804c7e96b9d94debcb44e",
+      "archive_metadata_evidence": "https://huggingface.co/datasets/soikit/green_plates/commit/980f71e776e8ff810b90a903c3a3b1d0d86a26e4",
+      "size_evidence_boundary": "Size and SHA-256 were exposed by an archival host, not by the original Google Drive page; both must be verified after any authorized download.",
+      "privacy_and_redistribution": "MIT permits redistribution, but plate text is potentially identifying; project policy still keeps raw images and unhashed labels out of public Git and external AI services.",
+      "adapter_training_overlap": "UNKNOWN: the local ALPR adapter model card says it was trained on an unknown dataset.",
+      "qualification": "backup_requires_new_download_authorization_and_acceptance_of_proxy_group_limit"
+    },
+    {
+      "rank": 3,
+      "dataset": "DriveLM official demo on nuScenes",
+      "version": "repository revision 1de72a74b257e5373400fa68239e99bd5d20580a",
+      "source_type": "original authors' repository plus nuScenes upstream terms",
+      "source_urls": [
+        "https://github.com/OpenDriveLab/DriveLM/tree/1de72a74b257e5373400fa68239e99bd5d20580a/challenge",
+        "https://www.nuscenes.org/terms-of-use"
+      ],
+      "license": "DriveLM language data CC BY-NC-SA 4.0; nuScenes images remain under nuScenes terms and additional conditions.",
+      "access": "The six previously authorized images are public repository files and need no login; authorization does not extend to the other 48 demo images.",
+      "existing_authorization": "On 2026-09-29, after being shown the nuScenes terms link, the user confirmed non-commercial research download of exactly the first reference workflow's six camera images for scene 54cdaaae372d421fa4734d66f51a8c48, frame 0dd14c14cea14dc1b0c0c9b0c9c7c4c3.",
+      "authorized_image_count": 6,
+      "authorized_image_bytes": 724191,
+      "labels": "DriveLM human-authored QA and object metadata; not an ALPR plate-text dataset.",
+      "group_identity": "All six images are cameras from one frame in one scene, so they form one group, not six independent samples.",
+      "minimum_download_unit": "The six exact GitHub paths recorded in configs/experiment/drivelm_pilot_resources.json.",
+      "privacy_and_redistribution": "Do not redistribute raw images; do not upload them to external AI services.",
+      "adapter_training_overlap": "Not applicable to the ALPR adapter task; SmolVLM pretraining overlap remains unknown.",
+      "qualification": "authorized_but_rejected_for_this_package_due_to_one_group_and_task_mismatch"
+    }
+  ],
+  "future_package_required_files": [
+    "source_manifest.json",
+    "samples.jsonl",
+    "split_manifest.json",
+    "task_contract.json",
+    "data_card.md",
+    "exclusions.jsonl",
+    "integrity_manifest.json"
+  ]
+}

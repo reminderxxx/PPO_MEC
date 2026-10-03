@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `alpr_task_acceptance_data_source_review_20261004.md`：UFPR-ALPR、CCPD2019 与既有 DriveLM 授权的限定核验，
+  冻结 ALPR 标签合同和 vehicle/video 组级确定性取样；结论 B，等待用户本人接受 UFPR 条款并取得作者链接
+
 - `minimal_useful_task_acceptance_20261004.md`：任务输入/许可资格门禁、0-generate 终态、空逐样本结果与未执行机制表；
   结论为数据或接口不足，不能解释为任务、机制或算法负结果
 
