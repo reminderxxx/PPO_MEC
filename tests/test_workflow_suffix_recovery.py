@@ -3,6 +3,8 @@ from __future__ import annotations
 import copy
 import json
 from pathlib import Path
+import subprocess
+import sys
 
 import pytest
 
@@ -126,3 +128,15 @@ def test_fixture_matches_existing_preserved_receipt() -> None:
     assert sha256_file(OLD_RECEIPT) == fixture["source_receipt_sha256"]
     assert actual["primary"]["loaded_status"]["available_adapters"] == fixture["expected"]
     assert "loaded_adapters" not in actual["primary"]["loaded_status"]
+
+
+def test_direct_script_entrypoint_imports_project() -> None:
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "scripts/run_two_node_workflow_suffix_recovery.py"), "--help"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert "--role" in completed.stdout

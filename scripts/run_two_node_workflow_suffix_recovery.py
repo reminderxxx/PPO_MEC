@@ -12,6 +12,10 @@ import time
 import traceback
 from typing import Any
 
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from src.runtime.workflow_suffix_recovery import (
     EXPECTED_EDGES,
     EXPECTED_NODES,
@@ -30,9 +34,6 @@ from src.runtime.workflow_suffix_recovery import (
     validate_state_envelope,
     write_state_package,
 )
-
-
-ROOT = Path(__file__).resolve().parents[1]
 
 
 def jsonable(value: Any) -> Any:
