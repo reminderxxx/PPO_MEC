@@ -755,6 +755,12 @@ python scripts/smoke_test.py
 python -m pytest tests/test_env_contract.py
 ```
 
+## 公开 ALPR 示例小样本检查
+
+独立一次性入口 `scripts/run_public_alpr_pilot.py` 的 `prepare`/`supervise` 操作及固定本机路径见
+`docs/project/public_alpr_sample_pilot_20261004.md`。仅为授权后的公开示例与离线任务检查，
+不属于 formal/holdout；原件和明文标签不得提交。已有输出目录不可复用。
+
 ## 数据准备检查
 
 ```bash
