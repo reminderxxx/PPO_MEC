@@ -5,6 +5,10 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-04：公开 ALPR 示例的独立性与来源边界（OPEN）
+
+UniqueData 100 图示例没有官方 vehicle/video IDs；本轮使用相同标签和图片哈希/近重复启发式分组，不能证明物理车辆独立或与 ALPR adapter 训练集无交叠。CC-BY-NC-ND-4.0 是发布者声明，底层 Web 图片权利未独立认证；原图/标签/预测不得再分发或进入 Git。小样本识别只能作为本地任务可用性检查，不支持缓存、迁移或算法收益。见 [范围说明](public_alpr_sample_pilot_20261004.md)。
+
 ## 2026-09-29: DriveLM demo 不提供可直接使用的依赖边（OPEN）
 
 - 单场景引用包已生成但仍无真实推理；DriveBench公开研究提示Q中文字/坐标可能形成猜测线索，

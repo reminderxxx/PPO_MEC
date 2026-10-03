@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-04：公开 ALPR 样本已收集，小样本正确性测试启动
+
+用户授权后收集固定 UniqueData revision 的 100 图 + TSV/README，共 18,939,410 bytes；源 hash/size、解码、标签绑定通过。按预固定分组/排序选择 4+8，现有 ALPR adapter 离线测试已独立后台启动，最多 12 generate，无调参或重试。此处不宣称识别成功；终态/分数以本机 `artifacts/analysis/alpr_public_sample_20261004_v1/` 回执为准。
+详见 [任务范围与入口](public_alpr_sample_pilot_20261004.md)。不属于正式/holdout/算法比较；不把公开商业示例称为新独立数据集贡献。
+
 ## 2026-09-29: 首个驾驶工作流引用包生成
 
 - 公开来源复核后继续复用DriveLM，不宣称没有现成驾驶数据；新增DriveVLM/DriveBench等来源索引。

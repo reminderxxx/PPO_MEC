@@ -32,3 +32,12 @@
 ## 结论边界
 
 本轮只回答“现有真实 ALPR adapter 在带标签公开小样本上是否能输出正确车牌”。不回答缓存收益、迁移收益、算法优越、跨 RSU 部署或论文就绪。即使正确率低也原样保留，不强行构造 DAG。任务完成后记录实际结果。
+
+## 收集与启动回执
+
+- 102 个下载文件：100 JPG + 原始 TSV + README，合计 18,939,410 bytes；所有源哈希、大小通过。
+- Bahrain/Ireland/Norway/USA 各 25 张；100/100 解码、标签绑定通过。当前重复规则 0 edges、100 components；不声称彻底排除未知近重复。
+- 已固定 4 development + 8 locked_check，并一次启动后台 supervisor PID 1096；科学执行代码提交 `b3e825c0f4fc75801e095ae5d7824c829152d9da`。此条是启动记录，不是成功完成或准确率声明。
+- `tests/test_public_alpr_pilot.py tests/test_env_contract.py`：17 passed；smoke：6 nodes completed；AST syntax 和 diff-check 通过。独立推理环境首次尝试 pytest 因未安装 pytest 退出；随后使用已有主 `.venv` 跑测试通过，未安装新依赖。
+- 终态唯一入口：主仓库 `artifacts/analysis/alpr_public_sample_20261004_v1/completion_receipt.json`；成功后分数为 `task_results_redacted.json`。原始预测和标签只保留本地。
+- 首次 `git push -u origin codex/alpr-task-pilot` 因 GitHub 443 连接失败；本地提交完整，运行不依赖 GitHub。
