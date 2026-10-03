@@ -5,6 +5,18 @@
 
 ﻿# Progress
 
+## 2026-10-04: 最小有用任务验收停止于输入资格门禁
+
+- 从已同步的 workflow suffix 结果 `01d0617` 建立隔离分支，并先以提交 `140a2b1` 冻结最多 32 次 generate 的方案；
+  无合格输入即 0 次停止是先验条件。
+- 本机 base、ALPR/Helmet adapter 权重 size/SHA-256 和既有隔离环境通过读回；项目数据只有 LuST 两张地图与一张
+  TrafficDemands 折线图，均无任务标签。常用用户目录的有界文件名/数据集标记筛查未发现可审计标注集。
+- DriveLM demo 图像仍未在本机，nuScenes 附加条款接受未解决；9 帧也不足 4+8 无重复划分。没有下载、模型进程、
+  generate、训练、formal/holdout 或旧实验重跑，机制 A/B 均未执行。
+- 最终选择为 `DATA_OR_INTERFACE_INSUFFICIENT_CANNOT_JUDGE`；不是零准确率、零机制收益、算法劣势或 paper-ready 判断。
+  报告与证据见 `minimal_useful_task_acceptance_20261004.md` 和
+  `artifacts/analysis/minimal_useful_task_acceptance_20261004_v1/`。
+
 ## 2026-10-03: 真实两节点 technical workflow 后缀恢复通过
 
 - 固定配置 SHA-256=`74b42838…208c`，从已 push 的 clean commit `01c9d97…` 执行 continuous/source/target 三个

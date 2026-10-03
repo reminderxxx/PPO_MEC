@@ -5,6 +5,11 @@
 
 # PPO_MEC
 
+最小有用任务输入门禁见
+[`docs/project/minimal_useful_task_acceptance_20261004.md`](docs/project/minimal_useful_task_acceptance_20261004.md)：
+本机 base、ALPR/Helmet adapter 与隔离环境完整性通过，但没有同时具备任务匹配标签、许可和本地图像的输入集；
+按冻结方案 0 次 generate 停止，机制 A/B 均未执行。结论为“数据或接口不足，无法判断”，不是模型或算法负结果。
+
 真实两节点 technical workflow 的前缀保存与独立进程后缀恢复已在固定 commit、4 次 generate 下通过：target
 只执行 `n1`，其输入实际包含 source 保存的 `n0` 文本，并与 continuous 路径逐 input/token 对齐。任务正确性仍为
 `unavailable`，不代表 production action 4、跨 RSU/无线迁移或算法收益。见

@@ -1,0 +1,33 @@
+{
+  "schema_version": "ppo_mec.minimal_useful_task_mechanism_cost.v1",
+  "artifact_run_id": "minimal_useful_task_acceptance_20261004_v1",
+  "selected_mechanism": null,
+  "status": "NOT_RUN_TASK_CORRECTNESS_GATE_NOT_ESTABLISHED",
+  "arms": [],
+  "actual_current_run": {
+    "correct_completions": 0,
+    "incorrect": 0,
+    "failed": 0,
+    "model_loads": 0,
+    "adapter_loads": 0,
+    "prefix_recomputations": 0,
+    "generate_attempted": 0,
+    "dynamic_state_bytes": null,
+    "static_model_bytes_transferred": null,
+    "wall_clock_seconds": null
+  },
+  "inventory_only_static_bytes": {
+    "base_directory_bytes": 1019895869,
+    "alpr_adapter_directory_bytes": 154428630,
+    "helmet_adapter_directory_bytes": 9650522,
+    "interpretation": "Local static resource inventory only; no bytes were transferred in this run."
+  },
+  "prior_reused_context": {
+    "artifact_run_id": "two_node_workflow_suffix_recovery_20261003_v3",
+    "dynamic_package_bytes": 2040,
+    "target_preexisting_base_directory_bytes": 1019895869,
+    "target_preexisting_single_adapter_directory_bytes": 154428630,
+    "task_correctness": "unavailable",
+    "interpretation": "Confirms suffix-consumption fidelity only. It is not imported as a task-valid mechanism comparison or net-benefit result."
+  }
+}

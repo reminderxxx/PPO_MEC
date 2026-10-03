@@ -1,0 +1,15 @@
+{
+  "schema_version": "ppo_mec.minimal_useful_task_sample_results.v1",
+  "artifact_run_id": "minimal_useful_task_acceptance_20261004_v1",
+  "task": null,
+  "label_rules_frozen": true,
+  "development_results": [],
+  "locked_check_results": [],
+  "generate_attempted": 0,
+  "generate_completed": 0,
+  "correct": 0,
+  "incorrect": 0,
+  "uncertain": 0,
+  "failed": 0,
+  "interpretation": "Counts are zero because no sample entered inference, not because accuracy or failure rate was zero."
+}

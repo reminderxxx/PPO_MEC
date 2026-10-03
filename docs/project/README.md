@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `minimal_useful_task_acceptance_20261004.md`：任务输入/许可资格门禁、0-generate 终态、空逐样本结果与未执行机制表；
+  结论为数据或接口不足，不能解释为任务、机制或算法负结果
+
 - `two_node_workflow_suffix_recovery_acceptance_20261003.md`：固定 4-generate 三进程见证、状态/输入/token 对照、
   负例、单次成本分层与严格 claim boundary；任务正确性 unavailable
 

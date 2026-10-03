@@ -5,6 +5,15 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-04: 任务匹配的本地标注图像缺口阻止正确性与机制收益试验（OPEN BLOCKER）
+
+- ALPR/Helmet adapter 已有本地权重和技术兼容性见证，但没有本地、许可可追溯且独立标注的车牌/头盔图像；
+  加载成功或非空输出不能替代任务正确性。
+- DriveLM demo 已知 9 帧/54 图、总 payload 6,516,453 B，但图像未下载且 nuScenes 附加条款接受未解决；即使取得，
+  也只能缩减为 4+5 而非 4+8 无重复场景划分。
+- 在任务正确性成立前，禁止将后缀恢复 fidelity、adapter 切换一致性或 LuST 文档图输出解释为机制收益；本轮 A/B
+  对照均未执行。详见 `minimal_useful_task_acceptance_20261004.md`。
+
 ## 2026-10-03: 两节点显式文本状态恢复已技术闭环，production/VEC 语义仍开放（PARTIAL CLOSURE）
 
 - 新 artifact 已证明独立 target 消费 source 的 `n0` 文本并只执行 `n1`；因此“本技术链没有 workflow-state

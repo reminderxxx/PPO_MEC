@@ -1,0 +1,31 @@
+{
+  "schema_version": "ppo_mec.minimal_useful_task_terminal_receipt.v1",
+  "artifact_run_id": "minimal_useful_task_acceptance_20261004_v1",
+  "status": "STOPPED_NO_QUALIFIED_INPUT",
+  "final_choice": "DATA_OR_INTERFACE_INSUFFICIENT_CANNOT_JUDGE",
+  "scientific_base_commit": "01d0617d7fb66793329b3c482f794750fb101063",
+  "plan_commit": "140a2b162411040014c774be7d97fa66d002e151",
+  "plan_sha256": "f5303b20062848ca5e7c78d2849fe16005eb817cff133576571341133f67c79f",
+  "input_audit": {
+    "qualified_task_count": 0,
+    "selected_task": null,
+    "development_sample_count": 0,
+    "locked_check_sample_count": 0
+  },
+  "execution": {
+    "generate_ceiling": 32,
+    "generate_attempted": 0,
+    "generate_completed": 0,
+    "model_processes_started": 0,
+    "scientific_wall_clock_seconds": 0,
+    "inventory_audit_wall_clock_seconds": 6.37807625,
+    "automatic_retry": false,
+    "training": false,
+    "formal_or_holdout": false,
+    "historical_scientific_rerun": false,
+    "download": false
+  },
+  "task_correctness": "UNAVAILABLE",
+  "mechanism_comparison": "NOT_RUN_TASK_CORRECTNESS_GATE_NOT_ESTABLISHED",
+  "claim_boundary": "No task accuracy, mechanism gain, algorithm advantage, or paper-ready claim is supported."
+}

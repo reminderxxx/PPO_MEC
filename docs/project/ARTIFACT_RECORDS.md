@@ -5,6 +5,19 @@
 
 # Artifact Records
 
+## 2026-10-04 minimal useful task acceptance input gate
+
+- run：`minimal_useful_task_acceptance_20261004_v1`
+- path：`artifacts/analysis/minimal_useful_task_acceptance_20261004_v1/`
+- scientific base：`01d0617d7fb66793329b3c482f794750fb101063`；frozen plan commit=`140a2b162411040014c774be7d97fa66d002e151`
+- scope：一个主任务的输入/许可资格门禁；预注册最多开发8、锁定检查8、单机制16，共32 generate
+- result：项目只有3张无任务标签的LuST文档图；有界常用目录筛查没有可审计标注集；DriveLM图像不在本机且
+  nuScenes条款接受未解决。实际generate/model process/download/training/formal/holdout均为0。
+- resources：base/ALPR/Helmet权重size/SHA-256与隔离环境读回通过；first-order blocker为输入数据资格，不是加载接口。
+- boundary：`E1_BOUNDED_INPUT_AUDIT_NO_TASK_EXECUTION`；最终选择
+  `DATA_OR_INTERFACE_INSUFFICIENT_CANNOT_JUDGE`，不形成任务准确率、机制收益、算法优势或paper-ready结论。
+- report：`docs/project/minimal_useful_task_acceptance_20261004.md`
+
 ## 2026-10-03 two-node workflow suffix recovery acceptance
 
 - run：`two_node_workflow_suffix_recovery_20261003_v3`

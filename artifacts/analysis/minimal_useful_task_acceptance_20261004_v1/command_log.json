@@ -1,0 +1,37 @@
+{
+  "schema_version": "ppo_mec.minimal_useful_task_command_log.v1",
+  "artifact_run_id": "minimal_useful_task_acceptance_20261004_v1",
+  "commands": [
+    {
+      "purpose": "verify scientific and result commits plus remote synchronization",
+      "result": "1f809cf and 01d0617 resolved locally; origin/codex/workflow-suffix-recovery resolved to 01d0617 after one successful push"
+    },
+    {
+      "purpose": "bounded filename and local image inventory",
+      "result": "three project documentation images, zero project dataset images, and zero plausible labeled task dataset markers outside vendor/archived-work paths"
+    },
+    {
+      "purpose": "visual classification of the three project images",
+      "result": "two maps and one traffic-demand line chart; none is a task-aligned labeled vehicle scene"
+    },
+    {
+      "purpose": "verify local base and adapter weight identities",
+      "result": "all three sizes and SHA-256 values matched the frozen plan"
+    },
+    {
+      "purpose": "verify isolated runtime without installation",
+      "result": "pip check passed; torch 2.8.0, transformers 4.49.0, peft 0.14.0 imported"
+    },
+    {
+      "purpose": "targeted workflow suffix recovery regression",
+      "first_attempt": "adapter_state_acceptance_py39_v1 had no pytest module; no test was collected or executed",
+      "final_attempt": "existing repository .venv pytest 8.4.2 executed tests/test_workflow_suffix_recovery.py: 9 passed in 2.05 seconds",
+      "scientific_effect": "none; both attempts used zero model generate calls"
+    }
+  ],
+  "model_generate_commands": [],
+  "training_commands": [],
+  "formal_or_holdout_commands": [],
+  "download_commands": [],
+  "automatic_retries": 0
+}

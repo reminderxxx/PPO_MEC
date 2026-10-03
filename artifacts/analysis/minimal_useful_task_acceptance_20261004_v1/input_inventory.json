@@ -1,0 +1,122 @@
+{
+  "schema_version": "ppo_mec.minimal_useful_task_input_inventory.v1",
+  "audit_started_at_utc": "2026-10-03T16:37:46Z",
+  "audit_finished_at_utc": "2026-10-03T16:37:52Z",
+  "plan_commit": "140a2b162411040014c774be7d97fa66d002e151",
+  "plan_sha256": "f5303b20062848ca5e7c78d2849fe16005eb817cff133576571341133f67c79f",
+  "scan_scope": {
+    "project_data": {
+      "root": "/Users/howen/Projects/PPO_MEC/data",
+      "image_count": 3,
+      "qualified_task_dataset_count": 0
+    },
+    "project_dataset_artifacts": {
+      "root": "/Users/howen/Projects/PPO_MEC/artifacts/datasets",
+      "image_count": 0,
+      "qualified_task_dataset_count": 0
+    },
+    "common_user_roots": {
+      "roots": [
+        "/Users/howen/Downloads",
+        "/Users/howen/Documents",
+        "/Users/howen/Pictures",
+        "/Users/howen/Desktop"
+      ],
+      "image_count": 601,
+      "candidate_dataset_marker_count_after_vendor_and_archived_work_exclusion": 0,
+      "privacy_boundary": "Only filenames and dataset-marker names were screened. Personal image contents were not opened or treated as research data."
+    },
+    "exhaustiveness": "Bounded to the repository and common user data roots; not a whole-filesystem proof of absence."
+  },
+  "local_project_images": [
+    {
+      "path": "data/raw/mobility/LuSTScenario/LuSTScenario-master/docs/img/LuST_Polygons.png",
+      "bytes": 1507510,
+      "sha256": "b71023481ec8b23d0bd43384526e55033224c69ebfbc41f8ea21c3b0cc5d08a5",
+      "visual_class": "documentation_map",
+      "task_label": null,
+      "eligible": false
+    },
+    {
+      "path": "data/raw/mobility/LuSTScenario/LuSTScenario-master/docs/img/LuST_busCoverage.png",
+      "bytes": 1155590,
+      "sha256": "4394f951239481c8e998cde69f5a91f42356b3cd4dd3ae861bf0fd364519301f",
+      "visual_class": "documentation_map",
+      "task_label": null,
+      "eligible": false
+    },
+    {
+      "path": "data/raw/mobility/LuSTScenario/LuSTScenario-master/docs/img/TrafficDemands.png",
+      "bytes": 192757,
+      "sha256": "83af09665cd23c87a1d831e6cb47a88bc8d509849712c551b0a9a7965e95c307",
+      "visual_class": "documentation_line_chart",
+      "task_label": null,
+      "eligible": false,
+      "exclusion_reason": "Not a vehicle-scene ALPR, helmet, or driving-question input; explicitly prohibited as a substitute task image."
+    }
+  ],
+  "fixed_model_resources": {
+    "base": {
+      "repository": "HuggingFaceTB/SmolVLM-500M-Instruct",
+      "revision": "a7da5b986cb59b408707209984f360a5f4ad7e47",
+      "directory_file_count": 14,
+      "directory_bytes": 1019895869,
+      "weight_bytes": 1015025832,
+      "weight_sha256_verified": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+      "declared_license": "apache-2.0"
+    },
+    "alpr_adapter": {
+      "repository": "Hirai-Labs/FT-SmolVLM-500M-Instruct-ALPR",
+      "revision": "edccd0e7ae5cbded1f35c21ea108988e1e32b239",
+      "directory_file_count": 5,
+      "directory_bytes": 154428630,
+      "weight_bytes": 154423432,
+      "weight_sha256_verified": "95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83",
+      "declared_license": "apache-2.0",
+      "matching_labeled_input_count": 0
+    },
+    "helmet_adapter": {
+      "repository": "revitotan/FT-SmolVLM-500M-Instruct-Helmet",
+      "revision": "96794cb1fd9abf1636b8f1541095f6f9229e4387",
+      "directory_file_count": 5,
+      "directory_bytes": 9650522,
+      "weight_bytes": 9641944,
+      "weight_sha256_verified": "e899c9c13b53bf80bcfc86048f5678a727e8c1838dc824156b521d5cdaafdd2d",
+      "declared_license": "apache-2.0",
+      "matching_labeled_input_count": 0
+    },
+    "runtime": {
+      "path": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1",
+      "pip_check": "pass",
+      "torch": "2.8.0",
+      "transformers": "4.49.0",
+      "peft": "0.14.0"
+    }
+  },
+  "known_nonlocal_candidate": {
+    "name": "DriveLM public demo",
+    "repository": "OpenDriveLab/DriveLM",
+    "revision": "1de72a74b257e5373400fa68239e99bd5d20580a",
+    "annotation_bytes": 402384,
+    "annotation_sha256": "fc306fb911516275513d34c5c4b0dca308b7edea30906b1278a598a7e319658e",
+    "frames": 9,
+    "images": 54,
+    "image_bytes": 6114069,
+    "total_payload_bytes": 6516453,
+    "local_image_payload": false,
+    "license_blocker": "nuScenes additional terms acceptance remains unresolved",
+    "twelve_sample_limit": "Only nine distinct frames are available in the demo, so a non-duplicated 4+8 split is impossible even after authorized acquisition."
+  },
+  "qualification_result": {
+    "qualified_task_count": 0,
+    "selected_task": null,
+    "development_samples": [],
+    "locked_check_samples": [],
+    "reason": "No local task-aligned image set had both independent labels and traceable usable licensing.",
+    "next_minimum_data": {
+      "preferred": "One task-aligned set of 12 non-duplicate images with labels fixed independently of model output, scene-group identifiers for a leakage-safe 4+8 split, source revision, license/terms record, byte sizes and SHA-256 values.",
+      "known_reduced_option": "After explicit nuScenes terms acceptance and authorized download, the DriveLM demo would require 6,516,453 bytes for nine frames/54 images plus annotations and could support only a reduced 4+5 frame split.",
+      "alpr_or_helmet_size": "unknown until a specific licensed labeled source is selected; no download estimate is invented"
+    }
+  }
+}
