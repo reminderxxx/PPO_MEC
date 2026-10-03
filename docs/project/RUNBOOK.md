@@ -762,6 +762,7 @@ python -m pytest tests/test_env_contract.py
 不属于 formal/holdout；原件和明文标签不得提交。已有输出目录不可复用。
 新增 `prepare_base --base-comparison` 与 `launch --base-comparison` 仅在原 adapter 完成且完整性通过后，
 复用同一 12 图进行新 root 的 base-only 配对诊断；不重跑 adapter，不视为新独立测试。
+`scripts/audit_public_alpr_pair.py` 只读验证已完成两轮并独立重算评分，写入一次性 review root，不调用模型。
 
 ## 数据准备检查
 

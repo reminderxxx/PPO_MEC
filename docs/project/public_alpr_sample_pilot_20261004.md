@@ -54,3 +54,20 @@
 消费 `paired_comparison_redacted.json` 的 both-correct、adapter-only-correct、base-only-correct、both-wrong 计数；保留所有输赢，不选胜例进入后续证据。
 
 审查元数据：reviewed_at=2026-10-04；literature_cutoff=2026-10-04（本轮不评价 novelty）；target_venue=IEEE TMC（研究目标，不是就绪结论）；artifact_run_id=alpr_public_sample_20261004_v1；policy_version=tmc_review_policy_v3_20260621；原科学 commit=b3e825c0f4fc75801e095ae5d7824c829152d9da；证据范围=局部任务原件核验，不晋级完整论文 E2，也不形成缓存/迁移/算法 claim。
+
+## 配对完成与筛选决定
+
+base-only 科学执行 commit `2a35f96`，child rc=0，85.916 秒，12/12 完成；原 adapter 为 146.340 秒。两轮都无 token-limit 截断。只读审计工具 `scripts/audit_public_alpr_pair.py` 用单独的二维编辑距离实现逐项复算，24 行评分 mismatch=0；两份完整性清单、输入 hash、模型目录清单、环境版本及生成设置一致。
+
+| split | adapter exact | base exact | adapter CER | base CER |
+|---|---:|---:|---:|---:|
+| development | 0/4 | 3/4 | 5/28 | 1/28 |
+| locked_check | 4/8 | 4/8 | 13/53 | 13/53 |
+
+检查集是同样四图双方正确、同样四图双方错误；开发集三图仅 base 正确、一图双方错误。12 图中六个规范化输出相同，不能将汇总相同误写为所有输出相同。已消除大小写、空格和标点差异，剩余错误不是仅靠这一格式规范化可消除。没有独立重标图像，不能断定所有来源标签绝对正确。
+
+观察到单次生成中位耗时 adapter=11.669 秒、base=6.803 秒；顺序运行、未随机化和重复测量，不作为稳健时延比较或因果开销结论。ALPR 模型卡明确说 unknown dataset，任务域和训练输入格式不明；这可能影响适配性，但根因尚未确证。本次缺少独立 active-tensor fingerprint，不把输出变化单独当成全面加载正确性的证明。
+
+**决定：不将此 ALPR adapter+全图样本组合晋级为缓存收益实验的任务。** 保留其技术兼容和负向任务证据；不重新挑图、调提示词、重开所谓 holdout 或启动 RL。下一候选应先提供清楚的任务域/训练说明及可追溯标签，并通过同信息输入的任务正确性与 base 对照，再做缓存/迁移的匹配实验。当前 base 也仅 4/8 检查图正确，不认定为可靠部署模型。
+
+新只读报告：主仓库 `artifacts/analysis/alpr_public_pair_review_20261004_v1/review_redacted.json` 与 `integrity.json`。本轮模型调用新增 0，未下载新数据或模型。评分与配对工具测试 7 passed；无训练、formal 或旧 holdout 操作。总体论文机制/算法优势仍未由此证据建立。
