@@ -5,6 +5,7 @@
   "final_choice": "DATA_OR_INTERFACE_INSUFFICIENT_CANNOT_JUDGE",
   "scientific_base_commit": "01d0617d7fb66793329b3c482f794750fb101063",
   "plan_commit": "140a2b162411040014c774be7d97fa66d002e151",
+  "result_artifact_commit": "3fd279b9e2029fc2dfb02971e3b200a3689d3814",
   "plan_sha256": "f5303b20062848ca5e7c78d2849fe16005eb817cff133576571341133f67c79f",
   "input_audit": {
     "qualified_task_count": 0,

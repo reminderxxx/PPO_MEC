@@ -8,9 +8,9 @@
     {"path": "input_inventory.json", "bytes": 5446, "sha256": "152805309d554dec64d0cdcfc3a0d89e8723172b1fcad8a6d4916f9a291bf3e6"},
     {"path": "mechanism_cost_table.json", "bytes": 1284, "sha256": "d3adba3717e9e81dd1867897aa23a47550ef3da3aade8dee75b9468656c86f73"},
     {"path": "sample_results.json", "bytes": 488, "sha256": "58af6c2e5667c076569f2ef0be8316b6046868cfe6bb9165720062539c4290cf"},
-    {"path": "terminal_receipt.json", "bytes": 1228, "sha256": "cb8d337324d8b216c4794929f524fee1237e6f90d677b84b3d89a414b2649330"},
+    {"path": "terminal_receipt.json", "bytes": 1300, "sha256": "4783d00a4576e24beab8d68193e16f9249a369a457ca09888fe09803c7f82b69"},
     {"path": "workspace_protection.json", "bytes": 1857, "sha256": "a2ed864e8195e7d3025fd1ba27a7ba9d1053fc5ffd1fb54c93d99844798d717a"}
   ],
   "file_count": 6,
-  "total_bytes": 12017
+  "total_bytes": 12089
 }

@@ -10,6 +10,7 @@
 - run：`minimal_useful_task_acceptance_20261004_v1`
 - path：`artifacts/analysis/minimal_useful_task_acceptance_20261004_v1/`
 - scientific base：`01d0617d7fb66793329b3c482f794750fb101063`；frozen plan commit=`140a2b162411040014c774be7d97fa66d002e151`
+- result artifact commit：`3fd279b9e2029fc2dfb02971e3b200a3689d3814`
 - scope：一个主任务的输入/许可资格门禁；预注册最多开发8、锁定检查8、单机制16，共32 generate
 - result：项目只有3张无任务标签的LuST文档图；有界常用目录筛查没有可审计标注集；DriveLM图像不在本机且
   nuScenes条款接受未解决。实际generate/model process/download/training/formal/holdout均为0。

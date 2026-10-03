@@ -9,6 +9,7 @@
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `scientific_base_commit`: `01d0617d7fb66793329b3c482f794750fb101063`
 - `frozen_plan_commit`: `140a2b162411040014c774be7d97fa66d002e151`
+- `result_artifact_commit`: `3fd279b9e2029fc2dfb02971e3b200a3689d3814`
 - `evidence_level`: `E1_BOUNDED_INPUT_AUDIT_NO_TASK_EXECUTION`
 - `verdict`: `DATA_OR_INTERFACE_INSUFFICIENT_CANNOT_JUDGE`
 
