@@ -1,0 +1,68 @@
+{
+  "file_count": 12,
+  "files": [
+    {
+      "bytes": 1243,
+      "path": "continuous_process.json",
+      "sha256": "8beb5d836503593bc7aef66a677044b45606d8bc1807b2c40c925958d190815f"
+    },
+    {
+      "bytes": 5090,
+      "path": "continuous_receipt.json",
+      "sha256": "c58b230558de3ce03149f235f46cbb157f456533c048966696ff39022d1ad1a8"
+    },
+    {
+      "bytes": 2226,
+      "path": "preflight_negative_checks.json",
+      "sha256": "820e9785dae8db5f7d7dd2206aebcc624bd3ba25bcbf214c6a7fc7405b0675bd"
+    },
+    {
+      "bytes": 1233,
+      "path": "restart_process.json",
+      "sha256": "4a617ac65814f54797f75e0e41a172c10d666bf8cc4178ac1fe4e89f180ecd2d"
+    },
+    {
+      "bytes": 5344,
+      "path": "restart_receipt.json",
+      "sha256": "8738a141e02ac6311162ec20c2952d88132ff1293f3046e57dad26db34905747"
+    },
+    {
+      "bytes": 1241,
+      "path": "source_process.json",
+      "sha256": "bebd8850c8bbc8cff571eb32d81564d5ceeff6e656d2e84036d03ca759b7a23b"
+    },
+    {
+      "bytes": 4518,
+      "path": "source_receipt.json",
+      "sha256": "5a007d182c637a333f7ad0d6f9ea5cb515d1a5bb05125adba818aea3383a63d7"
+    },
+    {
+      "bytes": 337,
+      "path": "state_package/manifest.json",
+      "sha256": "362123e41c78f9fe53cd7b36faf8337d18133caf3e9040175d4e1f520dd14839"
+    },
+    {
+      "bytes": 1703,
+      "path": "state_package/state.json",
+      "sha256": "53c4f94fa8b50025a2ae4e532d31e211996e49eb302859f37561ef93e66409c9"
+    },
+    {
+      "bytes": 1240,
+      "path": "target_process.json",
+      "sha256": "28cc429954f026e120343a983599b91edcddc104616775c1100e4f1a7142396a"
+    },
+    {
+      "bytes": 5620,
+      "path": "target_receipt.json",
+      "sha256": "b3c9a95648ca6f1935e7d9b4e5edfdcefded5cc6e3cc77525cb3b475835a9d6a"
+    },
+    {
+      "bytes": 15650,
+      "path": "terminal_receipt.json",
+      "sha256": "dd0bd0aa2f51349266764c75a1183f47a880b6c9d7a5f18bc475e4816853c548"
+    }
+  ],
+  "run_root": "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/artifacts/analysis/two_node_workflow_reexecution_comparison_20261005_v1",
+  "schema_version": "ppo_mec.artifact_integrity.v1",
+  "total_bytes_excluding_manifest": 45445
+}

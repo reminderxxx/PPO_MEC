@@ -9,6 +9,10 @@
 
 ## Live 文档
 
+- `mechanism_evidence_closure_results_20261005.md`：共享缓存公平成本、两节点重跑/恢复和 12 场景决策空间结果；
+  明确 Pareto 边界、ALPR 负结果和不启动 RL 的结论
+- `mechanism_evidence_closure_plan_20261005.md`：本轮命令、调用、墙钟、12 格与状态成本的事前冻结方案
+
 - `two_node_workflow_suffix_recovery_acceptance_20261003.md`：固定 4-generate 三进程见证、状态/输入/token 对照、
   负例、单次成本分层与严格 claim boundary；任务正确性 unavailable
 

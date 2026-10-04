@@ -5,6 +5,14 @@
 
 # Runbook
 
+## 最小机制证据闭环（2026-10-05）
+
+冻结方案与结果分别见 `mechanism_evidence_closure_plan_20261005.md` 和
+`mechanism_evidence_closure_results_20261005.md`。A/C 入口为
+`scripts/run_mechanism_evidence_closure.py`，B 入口为
+`scripts/run_two_node_workflow_reexecution_comparison.py`；两者都要求 clean worktree、固定 commit 和 create-only
+output root。已交付 run 不得覆盖或重跑冒充独立样本。production action 4 尚未接入状态 export/import。
+
 ## 真实 adapter / 状态恢复校准（2026-09-30）
 
 本轮 artifact 已到失败终态，以下命令用于复算测试和原账本合成，不授权重复模型执行或下载 adapter。状态 runner

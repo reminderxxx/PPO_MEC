@@ -1,5 +1,14 @@
 ﻿# Directory Structure
 
+## 2026-10-05 最小机制证据闭环
+
+- `configs/experiment/mechanism_evidence_closure_v1.json`：A/C 冻结矩阵、成本模型、预算和命令。
+- `configs/acceptance/two_node_workflow_reexecution_comparison_v1.json`：B 的模型、输入、三臂、保真判据和预算。
+- `scripts/run_mechanism_evidence_closure.py`：消费既有四配置账本并执行 12 个 bounded native design points。
+- `scripts/run_two_node_workflow_reexecution_comparison.py`：复用两节点执行器，比较 continuous/restart/recovery。
+- `artifacts/analysis/mechanism_evidence_closure_20261005_v1/`：A/C 原始 JSON、CSV、回执和完整性清单。
+- `artifacts/analysis/two_node_workflow_reexecution_comparison_20261005_v1/`：B 四进程 receipt、状态包和终态回执。
+
 2026-09-30 adapter/state calibration：`scripts/calibrate_workflow_state_recovery.py` 只实现明确的两节点 base-only
 calibration 状态边界，`scripts/synthesize_adapter_state_recovery_calibration.py` 只读复算上一轮冻结长尾账本与有限
 敏感性区间，专项测试为 `tests/test_workflow_state_recovery_calibration.py`。报告位于

@@ -5,6 +5,10 @@
 
 # PPO_MEC
 
+最小机制证据闭环（共享缓存四配置、连续/重跑/后缀恢复、12 个有界决策场景）见
+[results](docs/project/mechanism_evidence_closure_results_20261005.md)；结论是 bounded diagnostic，非 formal、holdout、
+算法优势或 paper-ready 证据。
+
 真实两节点 technical workflow 的前缀保存与独立进程后缀恢复已在固定 commit、4 次 generate 下通过：target
 只执行 `n1`，其输入实际包含 source 保存的 `n0` 文本，并与 continuous 路径逐 input/token 对齐。任务正确性仍为
 `unavailable`，不代表 production action 4、跨 RSU/无线迁移或算法收益。见

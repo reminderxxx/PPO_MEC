@@ -1,0 +1,13 @@
+{
+  "artifact_run_id": "mechanism_evidence_closure_20261005_v1",
+  "formal_runs": 0,
+  "git_commit": "f323fa2c4a098a6e73b054ed7fc6b4946bec2147",
+  "holdout_runs": 0,
+  "plan_path": "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/configs/experiment/mechanism_evidence_closure_v1.json",
+  "plan_sha256": "4bfda88583af6b67c99e00fcb69f44be180383ab0808e62660487ad9ff473e21",
+  "real_model_generate_calls": 0,
+  "status": "PASS",
+  "training_runs": 0,
+  "wall_limit_seconds": 120,
+  "wall_seconds": 34.192718958
+}

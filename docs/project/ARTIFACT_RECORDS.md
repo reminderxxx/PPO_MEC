@@ -5,6 +5,15 @@
 
 # Artifact Records
 
+## 2026-10-05 minimal mechanism evidence closure
+
+- `artifacts/analysis/mechanism_evidence_closure_20261005_v1/`：固定 commit `f323fa2...`，A/C wall 34.193 s，
+  真实模型调用0；A 复算576行账本，C 保留12场景×3方法=36行与每场景625条枚举计数。
+- `artifacts/analysis/two_node_workflow_reexecution_comparison_20261005_v1/`：固定 commit `f323fa2...`，B wall
+  59.168 s、generate 6/6、四进程独立且有序，continuous/restart/recovery 保真检查全部通过。
+- 两个 integrity manifest 独立复算通过。证据仅为 bounded native/technical workflow；非 formal/holdout、算法优势、
+  任务正确性、真实 RSU 网络或 paper-ready 结果。
+
 ## 2026-10-03 two-node workflow suffix recovery acceptance
 
 - run：`two_node_workflow_suffix_recovery_20261003_v3`

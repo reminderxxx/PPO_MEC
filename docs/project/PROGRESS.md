@@ -5,6 +5,18 @@
 
 ﻿# Progress
 
+## 2026-10-05：最小机制证据闭环完成
+
+- A：复用 576 行原生四配置账本；candidate 四臂均完成 72 请求。blocked+sharing-on 相比
+  interleaved+sharing-on 少 5,376 MiB base 传输；旧语义的低字节伴随 36/60 次拒绝，不计优势。
+- B：continuous/restart/recovery 的固定两节点输入与 token 输出严格一致；6/6 generate，恢复 target 只执行 n1。
+  单次同机 child wall 为 19.465/32.504/21.370 秒；任务正确性与真实网络仍 unavailable，action 4 未接线。
+- C：12 个冻结 design points 全部完成。完整枚举不提高 completion，只用 action 4 将一次服务失败换成 2,040 B
+  或 160 MiB 状态成本；sharing/capacity 在该矩阵未激活。当前不启动 RL。
+- 证据：`artifacts/analysis/mechanism_evidence_closure_20261005_v1/`、
+  `artifacts/analysis/two_node_workflow_reexecution_comparison_20261005_v1/`；完整结果与 claim 边界见
+  `mechanism_evidence_closure_results_20261005.md`。
+
 ## 2026-10-03: 真实两节点 technical workflow 后缀恢复通过
 
 - 固定配置 SHA-256=`74b42838…208c`，从已 push 的 clean commit `01c9d97…` 执行 continuous/source/target 三个

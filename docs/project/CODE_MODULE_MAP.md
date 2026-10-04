@@ -1,5 +1,13 @@
 # Code Module Map
 
+## 2026-10-05 bounded mechanism evidence
+
+- `scripts/run_mechanism_evidence_closure.py`：只读复用 native request ledgers，构建 A 的公平成本表；通过正常
+  `GymVecEnv.step()` 执行 C 的 current/two-step/full-suffix bounded comparison，不修改 agent registry。
+- `scripts/run_two_node_workflow_reexecution_comparison.py`：复用 `run_two_node_workflow_suffix_recovery.py` 的
+  continuous/source/target 与 `src/runtime/workflow_suffix_recovery.py` 的状态合同，新增独立 restart 对照；不接线
+  production action codec。
+
 ## Adapter 与独立进程状态 calibration
 
 - `scripts/calibrate_workflow_state_recovery.py`：固定 base、两节点 base-only calibration；orchestrator 分别启动 continuous、

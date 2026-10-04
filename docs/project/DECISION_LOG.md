@@ -1,5 +1,12 @@
 ﻿# Decision Log
 
+## 2026-10-05：机制证据优先，不晋级 RL
+
+- 决定：保留原生 typed-cache candidate 作为 opt-in bounded mechanism，正式协议不静默切换。
+- 决定：把完整后缀枚举视为有界参考，不视为可部署算法；其 12 格收益是少一次服务失败、代价为状态字节。
+- 决定：在 production action 4 接入真实状态且完成独立验证前，不启动 RL、不扩大网络、不更新 canonical claim。
+- 理由：旧配对两步与完整首动作一致；新矩阵差距来自确定性 action-4 coverage，而非已证明的长程信息需求。
+
 ## 2026-10-03: workflow 动态状态与静态模型资源分层，恢复判据绑定实际后缀输入
 
 - 决定：节点边界状态只封装 `n0` 显式输出、DAG/control/generation/identity 和完整性 hash；base/adapter/processor

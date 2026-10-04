@@ -5,6 +5,18 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-05：机制闭环后的有效边界
+
+- `OPEN / production action 4`：native action 4 只做 prepare/history，未调用已验证 state export/import；独立恢复脚本
+  不能记为 production migration 已实现。
+- `OPEN / state cost identity`：2,040 B 是固定 technical package，160 MiB 是 synthetic stress point；均不是完整
+  production runtime/KV state。没有真实无线传输测量。
+- `OPEN / decision matrix activation`：12 格中 sharing 和 136/320 MiB 没有改变结果，说明该工作流/动作轨迹未激活
+  两个轴，而不是证明它们普遍无效。
+- `NEGATIVE / ALPR adapter`：旧 12 样本 locked-check 与 base 持平，development 更差；不得晋级或重命名为独立测试。
+- `BOUNDARY / algorithm`：完整枚举只在失败数与状态字节间形成 Pareto 交换；差距可由局部 action-4 规则表达，
+  不授权 RL 或扩大模型搜索。
+
 ## 2026-10-03: 两节点显式文本状态恢复已技术闭环，production/VEC 语义仍开放（PARTIAL CLOSURE）
 
 - 新 artifact 已证明独立 target 消费 source 的 `n0` 文本并只执行 `n1`；因此“本技术链没有 workflow-state

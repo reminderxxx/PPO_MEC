@@ -427,7 +427,10 @@ def build_experiment_c(plan: dict[str, Any]) -> dict[str, Any]:
             "scenario_id": scenario["scenario_id"],
             "current_only_first_action": current_only["actions_executed"][0],
             "full_suffix_first_action": full["actions_executed"][0],
-            "decision_changed": current_only["actions_executed"][0] != full["actions_executed"][0],
+            "first_action_changed": current_only["actions_executed"][0] != full["actions_executed"][0],
+            "any_executed_action_changed": current_only["actions_executed"] != full["actions_executed"],
+            "current_only_actions": current_only["actions_executed"],
+            "full_suffix_actions": full["actions_executed"],
             "current_only_summary": current_only["summary"],
             "full_suffix_summary": full["summary"],
         })
@@ -438,6 +441,17 @@ def build_experiment_c(plan: dict[str, Any]) -> dict[str, Any]:
         current = by[(sid, "current_request_rule")]
         two = by[(sid, "existing_two_step_lookahead")]
         full = by[(sid, "bounded_full_suffix_enumeration")]
+        completion_delta = full["node_completion_count"] - two["node_completion_count"]
+        failure_delta = full["service_failure_count"] - two["service_failure_count"]
+        transfer_delta = full["effective_transfer_bytes_total"] - two["effective_transfer_bytes_total"]
+        if completion_delta == 0 and failure_delta < 0 and transfer_delta > 0:
+            pareto_relation = "failure_benefit_for_higher_transfer_cost"
+        elif completion_delta >= 0 and failure_delta <= 0 and transfer_delta <= 0:
+            pareto_relation = "full_weakly_dominates_two_step"
+        elif completion_delta <= 0 and failure_delta >= 0 and transfer_delta >= 0:
+            pareto_relation = "two_step_weakly_dominates_full"
+        else:
+            pareto_relation = "mixed_tradeoff"
         boundaries.append({
             "scenario_id": sid,
             "two_step_matches_full_first_action": two["first_action"] == full["first_action"],
@@ -447,10 +461,10 @@ def build_experiment_c(plan: dict[str, Any]) -> dict[str, Any]:
             ),
             "full_completion_delta_vs_current": full["node_completion_count"] - current["node_completion_count"],
             "full_effective_transfer_delta_vs_current": full["effective_transfer_bytes_total"] - current["effective_transfer_bytes_total"],
-            "full_is_no_better_than_two_step": (
-                full["node_completion_count"] <= two["node_completion_count"]
-                and full["effective_transfer_bytes_total"] >= two["effective_transfer_bytes_total"]
-            ),
+            "full_completion_delta_vs_two_step": completion_delta,
+            "full_service_failure_delta_vs_two_step": failure_delta,
+            "full_effective_transfer_delta_vs_two_step": transfer_delta,
+            "full_pareto_relation_vs_two_step": pareto_relation,
         })
     return {
         "classification": spec["classification"],

@@ -1,0 +1,26 @@
+{
+  "file_count": 4,
+  "files": [
+    {
+      "bytes": 524,
+      "path": "completion_receipt.json",
+      "sha256": "7d660dcd4a8e1db9f8b52ec0e9c78abd5adb71da5c738bdef67065ecdfaf288b"
+    },
+    {
+      "bytes": 25478,
+      "path": "experiment_a_shared_cache_cost.json",
+      "sha256": "291d18193fc7fb077da8c5567d307eef792bb6ebd54c8d9ca8041aec7559220a"
+    },
+    {
+      "bytes": 5060,
+      "path": "experiment_c_all_scenarios.csv",
+      "sha256": "462981066ce0a8b4383d840a96c2be230b21cae62f80496072553ec0d3e3a180"
+    },
+    {
+      "bytes": 1367033,
+      "path": "experiment_c_decision_space.json",
+      "sha256": "c76bd831d0fc8569d8efbe2778aae22212e0528bcc6186d3df0aef9a130c0c5f"
+    }
+  ],
+  "status": "PASS"
+}
