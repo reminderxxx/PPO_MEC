@@ -107,7 +107,7 @@
     }
   },
   "commands": {
-    "a_and_c": "/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_mechanism_evidence_closure.py --plan configs/experiment/mechanism_evidence_closure_v1.json --output-root artifacts/analysis/mechanism_evidence_closure_20261005_v1",
+    "a_and_c": "/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_mechanism_evidence_closure.py --plan configs/experiment/mechanism_evidence_closure_v1.json --output-root artifacts/analysis/mechanism_evidence_closure_20261005_v1 --expected-commit <fixed-implementation-commit>",
     "b": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python scripts/run_two_node_workflow_reexecution_comparison.py --role supervisor --plan configs/acceptance/two_node_workflow_reexecution_comparison_v1.json --run-root artifacts/analysis/two_node_workflow_reexecution_comparison_20261005_v1 --expected-commit <fixed-implementation-commit>"
   },
   "wall_limits_seconds": {

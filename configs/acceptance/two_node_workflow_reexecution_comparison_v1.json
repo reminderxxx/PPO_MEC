@@ -72,7 +72,7 @@
     "prestaged_model": "measured local execution path; base, processor, and adapter already present",
     "missing_model": "byte inventory and formula only; no real transfer measurement"
   },
-  "recovery_target_read_allowlist": {
+  "target_read_allowlist": {
     "static_directories": ["base", "adapter"],
     "dynamic_files": ["state.json", "manifest.json"],
     "control_files": ["frozen plan", "versioned executor"],
