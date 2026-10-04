@@ -5,8 +5,8 @@
 - `target_venue`: `IEEE TMC`（长期研究目标，不表示本轮 paper-ready）
 - `artifact_run_id`: `adapter_task_suitability_audit_20261005_v1`
 - `policy_version`: `tmc_review_policy_v3_20260621`
-- `review_base_git_commit`: `22f0b77`（隔离分支中已保留的 ALPR 负结果）
-- `report_git_commit`: `PENDING_BIND_AFTER_REVIEW_COMMIT`
+- `review_base_git_commit`: `22f0b77769f96f14882373f09603cd9e14b3f828`（隔离分支中已保留的 ALPR 负结果）
+- `report_git_commit`: `183ac899a29c4858b01c9dd85f9a99e665e584bc`
 - `evidence_level`: `E1_DOCUMENTED + local metadata audited`；没有新的模型调用或结果 artifact
 - `verdict`: `NO_SUITABLE_VERIFIABLE_CANDIDATE`
 
