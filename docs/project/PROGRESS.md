@@ -5,6 +5,13 @@
 
 ﻿# Progress
 
+## 2026-10-05：车联网任务—adapter 适配性筛选完成，未晋级调用
+
+- 只读审查本地 ALPR/Helmet 与一个同底座 parking adapter；三项均为技术兼容但任务/数据/评估证据不足的 `B`，没有 `C`。
+- 唯一优先补证对象为 Helmet：任务输出和车联网用途清楚，但模型 revision 未绑定 exact dataset/split，数据只有 train split且上游图像许可不明，无法构造可信未观察检查集。
+- 冻结了证据补齐后才允许的 12 图、双臂、最多 24 次 generate 条件式协议；本轮下载、模型调用、训练、RL、formal/holdout 均为 0。
+- 终态为 `NO_SUITABLE_VERIFIABLE_CANDIDATE`；不以名称、加载成功或训练 loss 猜测适配。详见 [适配性审计](adapter_task_suitability_audit_20261005.md)。
+
 ## 2026-10-04：ALPR 小样本完成，追加 base-only 配对诊断
 
 完成追加：base-only 12/12、85.916 秒；开发集 base 3/4 对 adapter 0/4，检查集双方均同样 4/8 正确。独立评分实现复算 24 行 mismatch=0，完整性/输入/版本一致。决定暂不以当前 adapter 组合开展缓存收益研究，不为正结果换图或调参。原始与新回执不改写；详见下述说明末节。当前两轮均完成，没有新后台任务。

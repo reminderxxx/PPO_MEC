@@ -5,6 +5,14 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-05：公开 adapter 的任务 provenance 与独立标签缺口（OPEN）
+
+- ALPR、Helmet 与 PKLot-named parking adapter 都声明兼容 `SmolVLM-500M-Instruct`，但公开模型卡没有冻结训练 dataset revision、输入预处理、原始 prompt 和任务评估结果；`task_type=null`，成功加载不构成任务适配证据。
+- Helmet 虽有同作者 2,190 行 train-only 数据与可见计数 prompt，但模型卡未绑定该 dataset revision，且顶层 MIT 标签没有解释上游图像来源/权利；重新切 4+8 不能把可能已训练图像变成未观察检查集。
+- ALPR demo 是整车图五字段 JSON，没有证据表明必须裁剪；demo 的 256M processor 与模型声明的 500M base 不一致。不得回头改旧 12 图提示词/裁剪/评分或重称未观察测试。
+- parking 候选只有仓库名暗示 PKLot，卡片未给输入/output contract；PKLot 官方包约 4.6 GB，不得在 model-to-data 绑定缺失时先下载。
+- 详见 `adapter_task_suitability_audit_20261005.md`。在训练 manifest、图像许可和独立检查集闭合前，终态保持 `NO_SUITABLE_VERIFIABLE_CANDIDATE`。
+
 ## 2026-10-04：公开 ALPR 示例的独立性与来源边界（OPEN）
 
 实跑新增限制：ALPR adapter 在锁定的 8 图仅 4 图整串正确，开发 4 图全部错误；12 次均正常完成且未截断。不能据此宣称任务准确可靠。拟议 base-only 比较使用同一已观察样本，属于探索性配对诊断，不是新的泛化证据。

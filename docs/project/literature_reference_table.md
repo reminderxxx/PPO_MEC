@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-09-29
+更新日期：2026-10-05
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -230,6 +230,13 @@
 |---|---|---|---|---|---|
 | 轻量视觉语言模型 | [SmolVLM: Redefining small and efficient multimodal models](https://arxiv.org/abs/2504.05299) | 2025 arXiv；正式venue待核验 | 小模型、视觉token与内存效率的公开模型依据 | 仅为离线驾驶任务候选，未证明驾驶质量、RSU开销或adapter收益，不作为本项目创新 | 应用模型/实验设置 |
 | 多模态基础模型 | [Qwen2.5-VL Technical Report](https://arxiv.org/abs/2502.13923) | 2025 arXiv；正式venue待核验 | 多模态理解、动态分辨率与定位能力及多规模模型线索 | 保留后备，不将通用模型能力等同车辆工作流实测或系统贡献；未下载运行 | 后备模型/方法边界 |
+
+### 2026-10-05 车联网视觉任务候选依据
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---:|---|---|---|
+| 停车位占用数据 | [PKLot — A robust dataset for parking lot classification](https://doi.org/10.1016/j.eswa.2015.02.009)；[作者数据页](https://web.inf.ufpr.br/luizoliveira/research-interests/pklot/) | Expert Systems with Applications, 42(11):4937–4949, 2015；作者页/论文原件核验 | 提供多停车场、天气条件、XML 车位坐标与 occupied/vacant 标签，可作为固定路侧相机任务及按 capture/date 分组的依据 | 数据集本身不证明任意 SmolVLM adapter 用它训练，也不提供跨 RSU adapter cache/迁移 trace；必须另行绑定模型 revision、输入合同与运行成本 | 应用任务/数据来源；不作为 adapter 增益或系统创新证据 |
+| 摩托车头盔 VLM 评估 | [Evaluating Vision-Language Models for Zero-Shot Detection, Classification, and Association of Motorcycles, Passengers, and Helmets](https://arxiv.org/abs/2408.02244) | arXiv 2024；正式 venue 待核验 | 基于扩展 AI City Challenge 数据评估 OWLv2 级联检测/分类/关联，报告 helmet detection AP 并讨论低分辨率与可见性限制 | 说明头盔合规具有真实交通安全语义，也说明非空 VLM 输出不足以证明能力；该文不是本地 Helmet LoRA 的训练/评估证据，不能替代 base/adapter 配对验证 | C-Context；任务动机、指标选择与限制 |
 
 ### 2026-09-28 车联网AI数据复用检索增补
 

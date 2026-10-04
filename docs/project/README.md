@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `adapter_task_suitability_audit_20261005.md`：ALPR/Helmet/parking 三候选的模型—任务—数据—许可适配审计、Helmet 条件式 24 调用协议与停止门禁；当前终态为 `NO_SUITABLE_VERIFIABLE_CANDIDATE`
+
 - `driving_workflow_minipackage_20260929.md`：公开来源检索、单场景引用包及成功后扩展条件；不是已运行数据集
 
 - `driving_pilot_resource_setup_20260929.md`：已授权模型下载与隔离安装交接，图像条款待确认；非完成回执
