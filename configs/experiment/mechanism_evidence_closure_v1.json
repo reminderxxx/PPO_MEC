@@ -1,0 +1,117 @@
+{
+  "schema_version": "ppo_mec.mechanism_evidence_closure_plan.v1",
+  "plan_id": "mechanism_evidence_closure_20261005_v1",
+  "frozen_at": "2026-10-05T00:00:00+08:00",
+  "research_question": "在资源受限、模型底座可共享且工作流跨 RSU 连续执行的条件下，何时值得准备模型、保留执行状态，以及如何利用剩余工作流信息降低完成任务的总代价？",
+  "scope": {
+    "training": false,
+    "formal_or_holdout": false,
+    "new_downloads": false,
+    "large_scale_rl": false,
+    "old_holdout_reopened": false,
+    "alpr_reused_as_new_test": false
+  },
+  "experiment_a": {
+    "input_old_log": "artifacts/analysis/native_typed_cache_replacement_20260930_v1/four_config_old_request_log.jsonl",
+    "input_candidate_log": "artifacts/analysis/native_typed_cache_replacement_20260930_v1/four_config_candidate_request_log.jsonl",
+    "configurations": [
+      "blocked__sharing_on",
+      "interleaved__sharing_on",
+      "blocked__sharing_off",
+      "interleaved__sharing_off"
+    ],
+    "request_count_per_configuration": 72,
+    "capacity_mib": 136,
+    "eviction_policy": "lru",
+    "initial_state": "empty",
+    "cost_model": {
+      "classification": "analytical_simulation_not_wall_clock",
+      "primary_link_mbps": 100.0,
+      "sensitivity_link_mbps": [10.0, 100.0, 1000.0],
+      "successful_service_seconds": 0.03,
+      "rejected_request_seconds": 0.0,
+      "model_load_wait_seconds_formula": "sum(actual_transfer_bytes_by_request) * 8 / (link_mbps * 1000000)",
+      "serial_completion_seconds_formula": "model_load_wait_seconds + successful_service_count * successful_service_seconds",
+      "parameter_source": "pre-frozen analytical design assumptions; not measured network, RSU, model-load, or inference time"
+    }
+  },
+  "experiment_b": {
+    "plan": "configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+    "arms": [
+      "continuous",
+      "interrupted_then_restart_from_n0",
+      "interrupted_then_restore_and_execute_n1_only"
+    ],
+    "planned_generate_calls": 6,
+    "hard_generate_ceiling": 8,
+    "scientific_wall_limit_seconds": 1200,
+    "automatic_retry": false
+  },
+  "experiment_c": {
+    "classification": "bounded_synthetic_native_simulation_design_points",
+    "seed": 7,
+    "action_ids": [0, 1, 2, 3, 4],
+    "maximum_steps": 4,
+    "methods": [
+      "current_request_rule",
+      "existing_two_step_lookahead",
+      "bounded_full_suffix_enumeration"
+    ],
+    "objective_priority": [
+      "maximize_node_completion_count",
+      "maximize_workflow_completion",
+      "minimize_deadline_violation_at_step_cap",
+      "minimize_service_failure_count",
+      "minimize_effective_transfer_bytes",
+      "minimize_step_count",
+      "lexicographically_smallest_action_sequence"
+    ],
+    "state_cost_design_points": {
+      "low": {
+        "bytes": 2040,
+        "source": "observed two_node_workflow_suffix_recovery_20261003_v3 technical state package; not a complete production runtime state"
+      },
+      "high": {
+        "bytes": 167772160,
+        "source": "pre-frozen synthetic 160 MiB stress point; not a measurement"
+      }
+    },
+    "capacity_design_points_mib": {
+      "tight": 136,
+      "ample": 320
+    },
+    "workflow_design_points": {
+      "short": ["b0.a0", "b1.a0"],
+      "long": ["b0.a0", "b0.a1", "b1.a0"]
+    },
+    "scenarios": [
+      {"scenario_id": "s01_on_tight_short_low", "sharing": true, "capacity": "tight", "tail": "short", "state_cost": "low"},
+      {"scenario_id": "s02_on_tight_long_low", "sharing": true, "capacity": "tight", "tail": "long", "state_cost": "low"},
+      {"scenario_id": "s03_on_ample_short_low", "sharing": true, "capacity": "ample", "tail": "short", "state_cost": "low"},
+      {"scenario_id": "s04_on_ample_long_low", "sharing": true, "capacity": "ample", "tail": "long", "state_cost": "low"},
+      {"scenario_id": "s05_off_tight_short_low", "sharing": false, "capacity": "tight", "tail": "short", "state_cost": "low"},
+      {"scenario_id": "s06_off_tight_long_low", "sharing": false, "capacity": "tight", "tail": "long", "state_cost": "low"},
+      {"scenario_id": "s07_off_ample_short_low", "sharing": false, "capacity": "ample", "tail": "short", "state_cost": "low"},
+      {"scenario_id": "s08_off_ample_long_low", "sharing": false, "capacity": "ample", "tail": "long", "state_cost": "low"},
+      {"scenario_id": "s09_on_tight_long_high", "sharing": true, "capacity": "tight", "tail": "long", "state_cost": "high"},
+      {"scenario_id": "s10_on_ample_long_high", "sharing": true, "capacity": "ample", "tail": "long", "state_cost": "high"},
+      {"scenario_id": "s11_off_tight_long_high", "sharing": false, "capacity": "tight", "tail": "long", "state_cost": "high"},
+      {"scenario_id": "s12_off_ample_long_high", "sharing": false, "capacity": "ample", "tail": "long", "state_cost": "high"}
+    ],
+    "scenario_count": 12,
+    "maximum_enumerated_action_sequences_per_scenario": 625,
+    "information_value_ablation": {
+      "method": "bounded_full_suffix_enumeration",
+      "comparison": "full remaining suffix versus current-node-only projection",
+      "reported_separately": true
+    }
+  },
+  "commands": {
+    "a_and_c": "/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_mechanism_evidence_closure.py --plan configs/experiment/mechanism_evidence_closure_v1.json --output-root artifacts/analysis/mechanism_evidence_closure_20261005_v1 --expected-commit <fixed-implementation-commit>",
+    "b": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python scripts/run_two_node_workflow_reexecution_comparison.py --role supervisor --plan configs/acceptance/two_node_workflow_reexecution_comparison_v1.json --run-root artifacts/analysis/two_node_workflow_reexecution_comparison_20261005_v1 --expected-commit <fixed-implementation-commit>"
+  },
+  "wall_limits_seconds": {
+    "a_and_c": 120,
+    "b": 1200
+  }
+}

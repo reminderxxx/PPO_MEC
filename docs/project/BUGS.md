@@ -5,6 +5,72 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-05：机制闭环后的有效边界
+
+- `OPEN / production action 4`：native action 4 只做 prepare/history，未调用已验证 state export/import；独立恢复脚本
+  不能记为 production migration 已实现。
+- `OPEN / state cost identity`：2,040 B 是固定 technical package，160 MiB 是 synthetic stress point；均不是完整
+  production runtime/KV state。没有真实无线传输测量。
+- `OPEN / decision matrix activation`：12 格中 sharing 和 136/320 MiB 没有改变结果，说明该工作流/动作轨迹未激活
+  两个轴，而不是证明它们普遍无效。
+- `NEGATIVE / ALPR adapter`：旧 12 样本 locked-check 与 base 持平，development 更差；不得晋级或重命名为独立测试。
+- `BOUNDARY / algorithm`：完整枚举只在失败数与状态字节间形成 Pareto 交换；差距可由局部 action-4 规则表达，
+  不授权 RL 或扩大模型搜索。
+
+## 2026-10-03: 两节点显式文本状态恢复已技术闭环，production/VEC 语义仍开放（PARTIAL CLOSURE）
+
+- 新 artifact 已证明独立 target 消费 source 的 `n0` 文本并只执行 `n1`；因此“本技术链没有 workflow-state
+  recovery witness”的缺口关闭。历史 9/30 失败校准和 10/3 旧顶层 FAIL 均不改写。
+- 输出 ` 2010 - 2` 没有 ALPR/Helmet 标签且语义质量不佳；任务正确性仍 unavailable。单次同机 CPU 成本不能外推
+  RSU、无线链路、排队、稳态均值或净收益。
+- 状态边界是显式应用文本，不包含 KV/tensor；production action 4 仍未序列化/传输/导入该状态。多 adapter DAG、
+  真实车联网输入、故障恢复和统计重复仍是下一阶段缺口。
+- 详见 `two_node_workflow_suffix_recovery_acceptance_20261003.md`；不得据此晋级算法或论文结论。
+
+## 2026-09-30: 真实 adapter 和独立进程状态恢复仍不可用（OPEN BLOCKER）
+
+- 本地没有与固定 SmolVLM base 配套的真实 adapter；公开 ALPR/Helmet LoRA 共需 164,065,376 bytes 新权重，固定
+  环境也没有 PEFT/accelerate。本轮未授权下载或安装，故没有 A→B→A load/switch/execute 或任务质量证据。
+- 两节点状态 calibration 的 source 写出 3,085-byte 声明状态，但冻结 base 输出为 `lanestatus` 而非 `clear`；
+  target 独立进程在模型加载前按正确性合同拒绝。正式测量为 0，该字节数和预热 save 时间不得作为完整迁移成本。
+- action 4 的 `migration_realized` 只兑现当前 adapter prepare；原账本 0 state bytes 表示缺 payload/object 记账，
+  不是零成本。真实状态、adapter switch、target load/rebuild、waiting 和网络成本未知，104 MiB 合成字节收益仍 conditional。
+- 下一轮需中央复核新增资源授权，并另立预冻结的状态任务；不得在本轮失败后换 prompt 重试或直接进入方法比较。
+  详见 `adapter_state_recovery_calibration_20260930.md`。
+
+## 2026-09-30: 剩余信息见证受状态账本与动作可达性限制（OPEN）
+
+- `semantic_discrete_5` 只能为当前节点adapter做current/next/handoff-target placement；不能直接准备future adapter，
+  ActionAdapter不输出`migrate`，也没有继续旧RSU执行并转发结果的动作。
+- bounded action4 prepare在两个长尾case同完成/失败下少104 MiB synthetic模型传输，但
+  `migration_prepare_realized=true`时`state_migration_size_mb=0`；这是payload未记账，不是零成本迁移。
+- 本机已测SmolVLM base和732-byte显式应用状态，但无真实兼容adapter，且应用payload不是完整runtime/KV state；不得
+  回填native ledger或外推RSU/车辆/无线网络。
+- 两步前瞻在全部预注册实例与full-tail首动作一致；在出现预注册两步不足case、冻结扩展动作合同和完整state成本前，
+  不支持更强oracle或算法修改。详见`remaining_workflow_decision_value_audit_20260930.md`。
+
+## 2026-09-30: native typed 跨底座替换已有 opt-in LRU 候选，正式扩展仍受限（PARTIAL CLOSURE）
+
+- `sequential_dependency_recompute_lru_v1` 已在 shadow state 上逐 victim 重算依赖，固定 microtrace 的合法 action、
+  保护负例、四配置和两节点 `env.step()` 见证通过；旧 `static_dependency_safe_v1` 默认与历史 hash 不变。
+- 候选仅定义原生 LRU；FIFO/LFU/Aging-LFU/Random 显式拒绝。它对所有共享 action/runtime 的算法可用，不是 SA
+  专属能力，但尚未形成五policy公平性合同。
+- 正式 Protocol 2.9、oracle/replay仍使用v1.0静态语义；不得把candidate诊断产物混入formal/canonical或历史解释。
+- callback异常恢复、复杂度/scalability、真实模型I/O与真实联合trace仍未验证。报告见
+  `native_typed_cache_replacement_witness_20260930.md`。
+
+## 2026-09-30: native typed dependency-safe feasible set 与 closure eviction 不同（OPEN DESIGN ISSUE）
+
+- 固定四配置的288请求原生审计确认：当 `b0` base 仍被 resident adapter 依赖时，原生
+  `_typed_evictable_residents()` 把 base 排除在单次静态 victim set 外；选中 adapter 后不会在同一原子事务中重算
+  base eligibility。
+- sharing-on/interleaved 请求1 `b1.a0` 需要释放104 MiB，但原生唯一 eligible victim 只有8 MiB adapter，因而
+  `insufficient_dependency_safe_evictable_capacity`；reference 可用 dependency-closure eviction 删除 adapter+base。
+- 当前规则保持原子拒绝、无 orphan、容量与状态不变量，但使可执行 placement/action space 小于 reference；固定
+  microtrace 中 sharing-on 有36/72服务失败，sharing-off有60/72服务失败。
+- 原审计轮只读且没有修改规则；后续独立任务已实现显式、LRU-only顺序重算候选，但旧规则仍是默认，五policy与
+  oracle/replay正式扩展仍未冻结。不得把旧语义的低传输误写为效率收益。
+
 ## 2026-09-29: DriveLM demo 不提供可直接使用的依赖边（OPEN）
 
 - 单场景引用包已生成但仍无真实推理；DriveBench公开研究提示Q中文字/坐标可能形成猜测线索，

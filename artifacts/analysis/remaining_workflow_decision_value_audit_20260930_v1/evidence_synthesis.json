@@ -1,0 +1,196 @@
+{
+  "action_reachability_key_result": {
+    "continue_old_rsu_and_forward_result": {
+      "reachable": false,
+      "reason": "no action or result-forwarding field exists in semantic_discrete_5"
+    },
+    "explicit_state_migrate": {
+      "reachable": false,
+      "reason": "ActionAdapter emits keep or prepare, never migrate"
+    },
+    "future_adapter_direct_prepare": {
+      "reachable": false,
+      "reason": "all cache actions bind adapter_id to the current workflow node"
+    },
+    "reachable_migration_modes": [
+      "keep",
+      "prepare"
+    ]
+  },
+  "answers": {
+    "change_improves_tradeoff": "bounded_yes_for_native_action4_model_bytes_at_equal_completion_and_failure_count; unverified_after_true_state_and_network_cost",
+    "remaining_workflow_changes_decision": "yes_in_two_long_tail_instances; no_in_two_short_or_nonreuse_instances",
+    "simple_lookahead_sufficient": "yes_for_all_four_pre_registered_instances; full remaining sequence never changed the initial action beyond two-step lookahead",
+    "support_algorithm_change": "no; evidence favors exposing/accounting real state payload and action semantics before algorithm modification"
+  },
+  "artifact_run_id": "remaining_workflow_decision_value_audit_20260930_v1",
+  "evidence_separation": {
+    "assumption_sensitivity": "this file; algebraic thresholds only",
+    "local_host_measurement": "local_model_state_measurements.json",
+    "native_simulation_ledger": "native_four_config_ledger.json and paired_witness_results.json",
+    "substitution_forbidden": true
+  },
+  "local_measurement_key_result": {
+    "adapter_status": "unavailable_no_locally_identified_compatible_adapter",
+    "adapter_switch_time": null,
+    "base_identity": {
+      "actual_bytes": 1015025832,
+      "actual_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+      "expected_bytes": 1015025832,
+      "expected_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+      "match": true,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/model_a7da5b9_20260929/model.safetensors"
+    },
+    "explicit_application_state_bytes": 732,
+    "guard": "local Apple M5 process-first load with uncontrolled OS page cache; not RSU/vehicle/network latency",
+    "minimal_inference_median_ns": 27709250,
+    "minimal_inference_success_count": 3,
+    "process_first_load_median_ns": 445777666,
+    "state_restore_correct": true,
+    "state_restore_median_ns": 25625,
+    "state_save_median_ns": 140375
+  },
+  "native_four_config_key_result": {
+    "blocked_sharing_on_transfer_reduction_vs_interleaved_sharing_on_bytes": 5637144576,
+    "equal_completion_scope": "candidate four configurations, 72 completed requests each",
+    "maximum_transfer": {
+      "adapter_transfer_bytes": 603979776,
+      "base_reuse_request_count": 0,
+      "base_transfer_bytes": 8455716864,
+      "completed_request_count": 72,
+      "config_id": "interleaved__sharing_on",
+      "evicted_bytes_total": 8917090304,
+      "repeated_load_bytes_total": 8774483968,
+      "transfer_bytes_total": 9059696640
+    },
+    "minimum_transfer": {
+      "adapter_transfer_bytes": 603979776,
+      "base_reuse_request_count": 48,
+      "base_transfer_bytes": 2818572288,
+      "completed_request_count": 72,
+      "config_id": "blocked__sharing_on",
+      "evicted_bytes_total": 3279945728,
+      "repeated_load_bytes_total": 3137339392,
+      "transfer_bytes_total": 3422552064
+    },
+    "old_semantics_guard": "old lower transfer is inseparable from 36 or 60 failed services and is not an equal-completion saving"
+  },
+  "paired_witness_key_result": {
+    "decision_change_count": 6,
+    "episode_count": 16,
+    "prefetch_only_guard": "action 1 reduced model transfer only by leaving one fewer node complete and adding one service failure at the fixed horizon; it is not a saving at equal service",
+    "prepare_vs_ablated_long_instances": [
+      {
+        "avoided_native_model_transfer_bytes": 109051904,
+        "byte_break_even_condition": "true_state_payload_bytes < 109051904",
+        "byte_break_even_mib": 104.0,
+        "equal_completion": true,
+        "equal_service_failures": true,
+        "instance_id": "tail_length__long",
+        "interpretation": "prepare is byte-favorable in the native witness only if the unlogged true state payload and any fixed migration overhead stay below the stated break-even; the 732-byte application payload is not a complete runtime state and cannot close that condition",
+        "measured_explicit_application_state_bytes": 732,
+        "measured_state_is_complete_migration_payload": false,
+        "narrow_application_state_net_bytes_if_used_as_an_explicit_assumption": 109051172,
+        "native_state_transfer_availability": "unavailable_prepare_realized_but_no_state_payload_bytes_emitted",
+        "native_state_transfer_bytes_raw": 0,
+        "network_time_formula_without_assumed_throughput": "delta_seconds=(true_state_payload_bytes-avoided_native_model_transfer_bytes)*8/link_bits_per_second; fixed protocol/queue latency unavailable",
+        "prefetch_only_completed_nodes_delta": -1,
+        "prefetch_only_service_failures_delta": 1
+      },
+      {
+        "avoided_native_model_transfer_bytes": 109051904,
+        "byte_break_even_condition": "true_state_payload_bytes < 109051904",
+        "byte_break_even_mib": 104.0,
+        "equal_completion": true,
+        "equal_service_failures": true,
+        "instance_id": "tail_adapter_structure__long",
+        "interpretation": "prepare is byte-favorable in the native witness only if the unlogged true state payload and any fixed migration overhead stay below the stated break-even; the 732-byte application payload is not a complete runtime state and cannot close that condition",
+        "measured_explicit_application_state_bytes": 732,
+        "measured_state_is_complete_migration_payload": false,
+        "narrow_application_state_net_bytes_if_used_as_an_explicit_assumption": 109051172,
+        "native_state_transfer_availability": "unavailable_prepare_realized_but_no_state_payload_bytes_emitted",
+        "native_state_transfer_bytes_raw": 0,
+        "network_time_formula_without_assumed_throughput": "delta_seconds=(true_state_payload_bytes-avoided_native_model_transfer_bytes)*8/link_bits_per_second; fixed protocol/queue latency unavailable",
+        "prefetch_only_completed_nodes_delta": -1,
+        "prefetch_only_service_failures_delta": 1
+      }
+    ],
+    "state_cost_guard": "action-4 prepare realized natively but emitted 0 state bytes; this is missing payload accounting, not a measured zero-cost migration",
+    "two_step_matches_full_remaining_on_all_designed_instances": true
+  },
+  "problem_evidence_limit_next_step_table": [
+    {
+      "evidence": "candidate four-way ledger, 72 successful requests per cell",
+      "limit": "synthetic 96/128/8-MiB objects; no wait/execution/network timing",
+      "next_step": "retain blocked+sharing-on as a mechanism witness; do not promote to deployment claim",
+      "problem": "Does sharing/order change native cost at equal completion?"
+    },
+    {
+      "evidence": "verified SmolVLM bytes/load/inference and 732-byte explicit application-state save/restore",
+      "limit": "no compatible adapter; state is not full runtime/KV state; Apple M5 only",
+      "next_step": "obtain one version-matched real adapter and an explicit complete state export/import contract",
+      "problem": "Are model and state costs real?"
+    },
+    {
+      "evidence": "6 initial-action changes across 16 bounded native episodes",
+      "limit": "future-adapter direct prepare, explicit migrate, and old-RSU result forwarding are unreachable",
+      "next_step": "freeze any expanded action contract before further performance comparison",
+      "problem": "Can remaining workflow information alter a legal decision?"
+    },
+    {
+      "evidence": "action 4 avoided 104 MiB native model transfer in each long instance at equal completion/failures",
+      "limit": "native state bytes missing; wireless time unmeasured; local model identity differs",
+      "next_step": "measure complete state payload and one real transport path before claiming net latency/cost benefit",
+      "problem": "Does the change pay for itself?"
+    },
+    {
+      "evidence": "two-step and full-tail initial decisions match on all pre-registered instances",
+      "limit": "only four deterministic instances and four-step horizon",
+      "next_step": "do not add a stronger oracle/algorithm until a fixed case demonstrates a decision not representable by two-step lookahead",
+      "problem": "Is more than two-step lookahead needed?"
+    }
+  ],
+  "sensitivity_analysis": {
+    "kind": "explicit algebraic assumptions",
+    "link_rate_interval": null,
+    "model_load_time_combination": "not performed because the local 1.015-GB SmolVLM base and the synthetic 96/128-MiB native cache objects are different identities",
+    "network_measurement": null,
+    "reason_no_interval": "no sourced deployment link interval was introduced; the byte break-even sign is reported symbolically for any positive link rate",
+    "rows": [
+      {
+        "avoided_native_model_transfer_bytes": 109051904,
+        "byte_break_even_condition": "true_state_payload_bytes < 109051904",
+        "byte_break_even_mib": 104.0,
+        "equal_completion": true,
+        "equal_service_failures": true,
+        "instance_id": "tail_length__long",
+        "interpretation": "prepare is byte-favorable in the native witness only if the unlogged true state payload and any fixed migration overhead stay below the stated break-even; the 732-byte application payload is not a complete runtime state and cannot close that condition",
+        "measured_explicit_application_state_bytes": 732,
+        "measured_state_is_complete_migration_payload": false,
+        "narrow_application_state_net_bytes_if_used_as_an_explicit_assumption": 109051172,
+        "native_state_transfer_availability": "unavailable_prepare_realized_but_no_state_payload_bytes_emitted",
+        "native_state_transfer_bytes_raw": 0,
+        "network_time_formula_without_assumed_throughput": "delta_seconds=(true_state_payload_bytes-avoided_native_model_transfer_bytes)*8/link_bits_per_second; fixed protocol/queue latency unavailable",
+        "prefetch_only_completed_nodes_delta": -1,
+        "prefetch_only_service_failures_delta": 1
+      },
+      {
+        "avoided_native_model_transfer_bytes": 109051904,
+        "byte_break_even_condition": "true_state_payload_bytes < 109051904",
+        "byte_break_even_mib": 104.0,
+        "equal_completion": true,
+        "equal_service_failures": true,
+        "instance_id": "tail_adapter_structure__long",
+        "interpretation": "prepare is byte-favorable in the native witness only if the unlogged true state payload and any fixed migration overhead stay below the stated break-even; the 732-byte application payload is not a complete runtime state and cannot close that condition",
+        "measured_explicit_application_state_bytes": 732,
+        "measured_state_is_complete_migration_payload": false,
+        "narrow_application_state_net_bytes_if_used_as_an_explicit_assumption": 109051172,
+        "native_state_transfer_availability": "unavailable_prepare_realized_but_no_state_payload_bytes_emitted",
+        "native_state_transfer_bytes_raw": 0,
+        "network_time_formula_without_assumed_throughput": "delta_seconds=(true_state_payload_bytes-avoided_native_model_transfer_bytes)*8/link_bits_per_second; fixed protocol/queue latency unavailable",
+        "prefetch_only_completed_nodes_delta": -1,
+        "prefetch_only_service_failures_delta": 1
+      }
+    ]
+  }
+}

@@ -1,0 +1,1709 @@
+{
+  "candidate": {
+    "fixed_step_cap": 2,
+    "label": "synthetic diagnostic",
+    "reset_action_zero_allowed": true,
+    "same_workload_resource_action_rule_id": "one_vehicle_one_rsu_two_ordered_nodes_action0_v1",
+    "steps": [
+      {
+        "action_id": 0,
+        "action_mask_allowed_before": true,
+        "action_name": "current_rsu_cache_fill",
+        "cache_admission_status": "committed",
+        "cache_event": {
+          "action_id": 0,
+          "action_name": "current_rsu_cache_fill",
+          "adapter_hit": true,
+          "adapter_id": "b0.a0",
+          "adapter_transfer_size_mb": 8.0,
+          "admission_added": true,
+          "admission_reason": "reactive_cache_fill",
+          "admission_requested": true,
+          "admitted_adapter_id": "b0.a0",
+          "admitted_mb_by_type": {
+            "adapter": 8.0,
+            "base_model": 96.0
+          },
+          "admitted_object_id": "adapter:b0.a0",
+          "admitted_size_mb": 8.0,
+          "admitted_typed_objects": [
+            {
+              "adapter_id": null,
+              "base_model_id": "b0",
+              "dependency_ids": [],
+              "evictability": "evictable",
+              "object_id": "base:b0",
+              "object_type": "base_model",
+              "required_base_model_id": null,
+              "resident_size_mb": 96.0,
+              "transfer_size_mb": 96.0,
+              "version": "probe_v0_2"
+            },
+            {
+              "adapter_id": "b0.a0",
+              "base_model_id": null,
+              "dependency_ids": [
+                "base:b0"
+              ],
+              "evictability": "evictable",
+              "object_id": "adapter:b0.a0",
+              "object_type": "adapter",
+              "required_base_model_id": "b0",
+              "resident_size_mb": 8.0,
+              "transfer_size_mb": 8.0,
+              "version": "probe_v0_2"
+            }
+          ],
+          "atomic_transaction_status": "committed",
+          "base_model_hit": true,
+          "cache_capacity_after": 136.0,
+          "cache_capacity_before": 136.0,
+          "cache_capacity_enabled": true,
+          "cache_capacity_unit": "mb",
+          "cache_hit": true,
+          "cache_lookup_performed": true,
+          "cache_remaining_after": 32.0,
+          "cache_remaining_before": 136.0,
+          "cache_strategy": "reactive_cache_fill",
+          "cache_target_rsu_id": "rsu_a",
+          "cache_used_after": 104.0,
+          "cache_used_before": 0.0,
+          "capacity_rejection_reason": null,
+          "compatibility_result": "compatible",
+          "dependency_bundle": {
+            "already_resident_object_ids": [],
+            "missing_object_ids": [
+              "base:b0",
+              "adapter:b0.a0"
+            ],
+            "ordered_object_ids": [
+              "base:b0",
+              "adapter:b0.a0"
+            ],
+            "requested_adapter_id": "b0.a0",
+            "requested_bundle_mb": 104.0,
+            "required_base_model_id": "b0",
+            "transfer_mb_by_type": {
+              "adapter": 8.0,
+              "base_model": 96.0
+            }
+          },
+          "episode_step_index": 1,
+          "event_id": "cache-event-000001",
+          "event_schema_version": "1.3.0",
+          "event_type": "request",
+          "evicted_adapter_id": null,
+          "evicted_adapter_ids": [],
+          "evicted_mb_by_type": {},
+          "evicted_object_id": null,
+          "evicted_object_ids": [],
+          "evicted_size_mb_sum": 0.0,
+          "evicted_sizes_mb": [],
+          "evicted_typed_objects": [],
+          "eviction_count": 0,
+          "eviction_occurred": false,
+          "eviction_planning_trace": null,
+          "eviction_policy": "lru",
+          "eviction_reason": "not_occurred",
+          "full_service_ready": true,
+          "handoff_event_count": 0,
+          "hit_source": "current_rsu",
+          "incompatibility_reason": null,
+          "joint_model_hit": true,
+          "migration_realized": false,
+          "migration_requested": false,
+          "missing_object_types": [],
+          "model_cache_profile_id": "typed_base_adapter_state_v1",
+          "node_id": "n0",
+          "object_id": "adapter:b0.a0",
+          "object_type": "adapter",
+          "offload_mode": "rsu",
+          "orphan_count": 0,
+          "per_object_lookup_results": [
+            {
+              "evidence": "rsu_resident_state",
+              "object_id": "base:b0",
+              "object_type": "base_model",
+              "resident": true
+            },
+            {
+              "evidence": "rsu_resident_state",
+              "object_id": "adapter:b0.a0",
+              "object_type": "adapter",
+              "resident": true
+            }
+          ],
+          "predicted_handoff_target_rsu_id": null,
+          "predicted_next_rsu_id": "rsu_a",
+          "request_rsu_id": "rsu_a",
+          "requested_object_size_mb": 8.0,
+          "requested_typed_objects": [
+            {
+              "adapter_id": null,
+              "base_model_id": "b0",
+              "dependency_ids": [],
+              "evictability": "evictable",
+              "object_id": "base:b0",
+              "object_type": "base_model",
+              "required_base_model_id": null,
+              "resident_size_mb": 96.0,
+              "transfer_size_mb": 96.0,
+              "version": "probe_v0_2"
+            },
+            {
+              "adapter_id": "b0.a0",
+              "base_model_id": null,
+              "dependency_ids": [
+                "base:b0"
+              ],
+              "evictability": "evictable",
+              "object_id": "adapter:b0.a0",
+              "object_type": "adapter",
+              "required_base_model_id": "b0",
+              "resident_size_mb": 8.0,
+              "transfer_size_mb": 8.0,
+              "version": "probe_v0_2"
+            }
+          ],
+          "selected_target_rsu_id": "rsu_a",
+          "served_rsu_id": "rsu_a",
+          "service_success": true,
+          "size_mb": 8.0,
+          "stall_occurred": false,
+          "state_migration_size_mb": 0.0,
+          "time_index": 1,
+          "transfer_mb_by_type": {
+            "adapter": 8.0,
+            "base_model": 96.0
+          },
+          "transfer_source": "typed_catalog_dependency_bundle",
+          "typed_cache_transaction_contract_version": "typed_cache_transaction_contract_v1.1.0",
+          "typed_capacity_snapshot": {
+            "after": {
+              "capacity_mb": 136.0,
+              "remaining_mb": 32.0,
+              "used_mb": 104.0,
+              "used_mb_by_type": {
+                "adapter": 8.0,
+                "base_model": 96.0
+              }
+            },
+            "before": {
+              "cache_capacity": 136.0,
+              "cache_capacity_enabled": true,
+              "cache_capacity_unit": "mb",
+              "cache_occupancy_rate": 0.0,
+              "cache_remaining_size": 136.0,
+              "cache_used_mb_by_object_type": {},
+              "cache_used_size": 0.0,
+              "eviction_policy": "lru",
+              "eviction_policy_seed": null,
+              "eviction_policy_version": "1.0.0",
+              "model_cache_profile_id": "typed_base_adapter_state_v1",
+              "rsu_adapter_slots": 0
+            },
+            "requested_dependency_bundle_mb": 104.0
+          },
+          "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+          "typed_model_cache_contract_version": "1.0.0",
+          "vehicle_id": "diagnostic_vehicle",
+          "was_cached_before": false,
+          "workflow_id": "synthetic_typed_cache_replacement_diagnostic",
+          "workflow_state_ready": true
+        },
+        "cache_rejection_reason": null,
+        "cache_service_available": true,
+        "cache_trace_snapshot_after": {
+          "rsus": [
+            {
+              "capacity": 136.0,
+              "capacity_enabled": true,
+              "capacity_unit": "mb",
+              "model_cache_profile_id": "typed_base_adapter_state_v1",
+              "residents": [
+                {
+                  "adapter_id": null,
+                  "base_model_id": "b0",
+                  "evictability": "evictable",
+                  "object_id": "base:b0",
+                  "object_type": "base_model",
+                  "required_base_model_id": null,
+                  "size_mb": 96.0
+                },
+                {
+                  "adapter_id": "b0.a0",
+                  "base_model_id": null,
+                  "evictability": "evictable",
+                  "object_id": "adapter:b0.a0",
+                  "object_type": "adapter",
+                  "required_base_model_id": "b0",
+                  "size_mb": 8.0
+                }
+              ],
+              "rsu_id": "rsu_a",
+              "typed_model_cache_contract_version": "1.0.0"
+            }
+          ],
+          "snapshot_step_index": 1
+        },
+        "control_action": {
+          "cache_action": {
+            "adapter_id": "b0.a0",
+            "operation": "cache",
+            "prediction_driven": false,
+            "rsu_id": "rsu_a",
+            "strategy": "reactive_cache_fill"
+          },
+          "metadata": {
+            "action_contract": "semantic_discrete_5",
+            "action_id": 0,
+            "action_name": "current_rsu_cache_fill",
+            "current_rsu_id": "rsu_a",
+            "invalid_action": false,
+            "invalid_reason": "none",
+            "primary_vehicle_id": "diagnostic_vehicle",
+            "required_adapter": "b0.a0"
+          },
+          "migration_action": {
+            "mode": "keep",
+            "strategy": "none"
+          },
+          "offload_action": {
+            "mode": "rsu",
+            "strategy": "current_rsu_cache_fill"
+          }
+        },
+        "hit_source": "current_rsu",
+        "node_completed_this_step": [
+          "n0"
+        ],
+        "node_execution_service_success": true,
+        "origin_execution_evidence": false,
+        "resident_before": {
+          "rsus": [
+            {
+              "capacity": 136.0,
+              "capacity_enabled": true,
+              "capacity_unit": "mb",
+              "model_cache_profile_id": "typed_base_adapter_state_v1",
+              "residents": [],
+              "rsu_id": "rsu_a",
+              "typed_model_cache_contract_version": "1.0.0"
+            }
+          ],
+          "snapshot_step_index": 0
+        },
+        "reward": 6.8,
+        "step_index": 1,
+        "terminated": false,
+        "truncated": false,
+        "workflow_after": {
+          "completed_node_ids": [
+            "n0"
+          ],
+          "current_node_id": "n1",
+          "edges": [
+            [
+              "n0",
+              "n1"
+            ]
+          ],
+          "execution_order": [
+            "n0",
+            "n1"
+          ],
+          "is_completed": false,
+          "nodes": [
+            {
+              "input_size": 1,
+              "node_id": "n0",
+              "node_name": "synthetic diagnostic b0 request",
+              "output_size": 1,
+              "predecessors": [],
+              "required_adapter": "b0.a0",
+              "required_base_model": "b0",
+              "successors": [
+                "n1"
+              ]
+            },
+            {
+              "input_size": 1,
+              "node_id": "n1",
+              "node_name": "synthetic diagnostic b1 request",
+              "output_size": 1,
+              "predecessors": [
+                "n0"
+              ],
+              "required_adapter": "b1.a0",
+              "required_base_model": "b1",
+              "successors": []
+            }
+          ],
+          "workflow_id": "synthetic_typed_cache_replacement_diagnostic"
+        },
+        "workflow_before": {
+          "completed_node_ids": [],
+          "current_node_id": "n0",
+          "edges": [
+            [
+              "n0",
+              "n1"
+            ]
+          ],
+          "execution_order": [
+            "n0",
+            "n1"
+          ],
+          "is_completed": false,
+          "nodes": [
+            {
+              "input_size": 1,
+              "node_id": "n0",
+              "node_name": "synthetic diagnostic b0 request",
+              "output_size": 1,
+              "predecessors": [],
+              "required_adapter": "b0.a0",
+              "required_base_model": "b0",
+              "successors": [
+                "n1"
+              ]
+            },
+            {
+              "input_size": 1,
+              "node_id": "n1",
+              "node_name": "synthetic diagnostic b1 request",
+              "output_size": 1,
+              "predecessors": [
+                "n0"
+              ],
+              "required_adapter": "b1.a0",
+              "required_base_model": "b1",
+              "successors": []
+            }
+          ],
+          "workflow_id": "synthetic_typed_cache_replacement_diagnostic"
+        },
+        "workflow_completed": false
+      },
+      {
+        "action_id": 0,
+        "action_mask_allowed_before": true,
+        "action_name": "current_rsu_cache_fill",
+        "cache_admission_status": "committed",
+        "cache_event": {
+          "action_id": 0,
+          "action_name": "current_rsu_cache_fill",
+          "adapter_hit": true,
+          "adapter_id": "b1.a0",
+          "adapter_transfer_size_mb": 8.0,
+          "admission_added": true,
+          "admission_reason": "reactive_cache_fill",
+          "admission_requested": true,
+          "admitted_adapter_id": "b1.a0",
+          "admitted_mb_by_type": {
+            "adapter": 8.0,
+            "base_model": 128.0
+          },
+          "admitted_object_id": "adapter:b1.a0",
+          "admitted_size_mb": 8.0,
+          "admitted_typed_objects": [
+            {
+              "adapter_id": null,
+              "base_model_id": "b1",
+              "dependency_ids": [],
+              "evictability": "evictable",
+              "object_id": "base:b1",
+              "object_type": "base_model",
+              "required_base_model_id": null,
+              "resident_size_mb": 128.0,
+              "transfer_size_mb": 128.0,
+              "version": "probe_v0_2"
+            },
+            {
+              "adapter_id": "b1.a0",
+              "base_model_id": null,
+              "dependency_ids": [
+                "base:b1"
+              ],
+              "evictability": "evictable",
+              "object_id": "adapter:b1.a0",
+              "object_type": "adapter",
+              "required_base_model_id": "b1",
+              "resident_size_mb": 8.0,
+              "transfer_size_mb": 8.0,
+              "version": "probe_v0_2"
+            }
+          ],
+          "atomic_transaction_status": "committed",
+          "base_model_hit": true,
+          "cache_capacity_after": 136.0,
+          "cache_capacity_before": 136.0,
+          "cache_capacity_enabled": true,
+          "cache_capacity_unit": "mb",
+          "cache_hit": true,
+          "cache_lookup_performed": true,
+          "cache_remaining_after": 0.0,
+          "cache_remaining_before": 32.0,
+          "cache_strategy": "reactive_cache_fill",
+          "cache_target_rsu_id": "rsu_a",
+          "cache_used_after": 136.0,
+          "cache_used_before": 104.0,
+          "capacity_rejection_reason": null,
+          "compatibility_result": "compatible",
+          "dependency_bundle": {
+            "already_resident_object_ids": [],
+            "missing_object_ids": [
+              "base:b1",
+              "adapter:b1.a0"
+            ],
+            "ordered_object_ids": [
+              "base:b1",
+              "adapter:b1.a0"
+            ],
+            "requested_adapter_id": "b1.a0",
+            "requested_bundle_mb": 136.0,
+            "required_base_model_id": "b1",
+            "transfer_mb_by_type": {
+              "adapter": 8.0,
+              "base_model": 128.0
+            }
+          },
+          "episode_step_index": 2,
+          "event_id": "cache-event-000002",
+          "event_schema_version": "1.3.0",
+          "event_type": "request",
+          "evicted_adapter_id": "b0.a0",
+          "evicted_adapter_ids": [
+            "b0.a0"
+          ],
+          "evicted_mb_by_type": {
+            "adapter": 8.0,
+            "base_model": 96.0
+          },
+          "evicted_object_id": "adapter:b0.a0",
+          "evicted_object_ids": [
+            "adapter:b0.a0",
+            "base:b0"
+          ],
+          "evicted_size_mb_sum": 104.0,
+          "evicted_sizes_mb": [
+            8.0,
+            96.0
+          ],
+          "evicted_typed_objects": [
+            {
+              "adapter_id": "b0.a0",
+              "base_model_id": null,
+              "dependency_ids": [
+                "base:b0"
+              ],
+              "evictability": "evictable",
+              "object_id": "adapter:b0.a0",
+              "object_type": "adapter",
+              "required_base_model_id": "b0",
+              "resident_size_mb": 8.0,
+              "transfer_size_mb": 8.0,
+              "version": "probe_v0_2"
+            },
+            {
+              "adapter_id": null,
+              "base_model_id": "b0",
+              "dependency_ids": [],
+              "evictability": "evictable",
+              "object_id": "base:b0",
+              "object_type": "base_model",
+              "required_base_model_id": null,
+              "resident_size_mb": 96.0,
+              "transfer_size_mb": 96.0,
+              "version": "probe_v0_2"
+            }
+          ],
+          "eviction_count": 2,
+          "eviction_occurred": true,
+          "eviction_planning_trace": {
+            "actual_freed_mb": 104.0,
+            "ordered_victim_ids": [
+              "adapter:b0.a0",
+              "base:b0"
+            ],
+            "protected_object_ids": [
+              "adapter:b1.a0",
+              "base:b1"
+            ],
+            "real_state_mutated_during_planning": false,
+            "required_free_mb": 104.0,
+            "rounds": [
+              {
+                "eligible_object_ids": [
+                  "adapter:b0.a0"
+                ],
+                "native_lru_plan": {
+                  "candidate_recency": [
+                    {
+                      "admitted_step": 1,
+                      "initial_admission_order": null,
+                      "last_event": "admission",
+                      "last_used_step": 1,
+                      "object_id": "adapter:b0.a0",
+                      "rank": 0,
+                      "selection_key": [
+                        1,
+                        "adapter:b0.a0"
+                      ]
+                    }
+                  ],
+                  "capacity_unit": "mb",
+                  "cumulative_freed_capacity": 8.0,
+                  "ordered_candidates": [
+                    "adapter:b0.a0"
+                  ],
+                  "ordered_victim_ids": [
+                    "adapter:b0.a0"
+                  ],
+                  "policy_name": "lru",
+                  "policy_version": "1.0.0",
+                  "required_free_capacity": 104.0,
+                  "rsu_id": "rsu_a",
+                  "selection_reason": "insufficient_evictable_capacity",
+                  "sufficient": false,
+                  "victim_sizes": [
+                    8.0
+                  ]
+                },
+                "required_free_remaining_mb": 104.0,
+                "round_index": 0,
+                "selected_victim_id": "adapter:b0.a0",
+                "selected_victim_size_mb": 8.0,
+                "shadow_resident_ids_before": [
+                  "base:b0",
+                  "adapter:b0.a0"
+                ],
+                "stop_reason": "selected_then_recompute_dependencies"
+              },
+              {
+                "eligible_object_ids": [
+                  "base:b0"
+                ],
+                "native_lru_plan": {
+                  "candidate_recency": [
+                    {
+                      "admitted_step": 1,
+                      "initial_admission_order": null,
+                      "last_event": "admission",
+                      "last_used_step": 1,
+                      "object_id": "base:b0",
+                      "rank": 0,
+                      "selection_key": [
+                        1,
+                        "base:b0"
+                      ]
+                    }
+                  ],
+                  "capacity_unit": "mb",
+                  "cumulative_freed_capacity": 96.0,
+                  "ordered_candidates": [
+                    "base:b0"
+                  ],
+                  "ordered_victim_ids": [
+                    "base:b0"
+                  ],
+                  "policy_name": "lru",
+                  "policy_version": "1.0.0",
+                  "required_free_capacity": 96.0,
+                  "rsu_id": "rsu_a",
+                  "selection_reason": "lru_minimum_prefix_sufficient",
+                  "sufficient": true,
+                  "victim_sizes": [
+                    96.0
+                  ]
+                },
+                "required_free_remaining_mb": 96.0,
+                "round_index": 1,
+                "selected_victim_id": "base:b0",
+                "selected_victim_size_mb": 96.0,
+                "shadow_resident_ids_before": [
+                  "base:b0"
+                ],
+                "stop_reason": "selected_then_recompute_dependencies"
+              }
+            ],
+            "semantics": "sequential_dependency_recompute_lru_v1",
+            "shadow_only": true,
+            "sufficient": true
+          },
+          "eviction_policy": "lru",
+          "eviction_reason": "capacity_limit",
+          "full_service_ready": true,
+          "handoff_event_count": 0,
+          "hit_source": "current_rsu",
+          "incompatibility_reason": null,
+          "joint_model_hit": true,
+          "migration_realized": false,
+          "migration_requested": false,
+          "missing_object_types": [],
+          "model_cache_profile_id": "typed_base_adapter_state_v1",
+          "node_id": "n1",
+          "object_id": "adapter:b1.a0",
+          "object_type": "adapter",
+          "offload_mode": "rsu",
+          "orphan_count": 0,
+          "per_object_lookup_results": [
+            {
+              "evidence": "rsu_resident_state",
+              "object_id": "base:b1",
+              "object_type": "base_model",
+              "resident": true
+            },
+            {
+              "evidence": "rsu_resident_state",
+              "object_id": "adapter:b1.a0",
+              "object_type": "adapter",
+              "resident": true
+            }
+          ],
+          "predicted_handoff_target_rsu_id": null,
+          "predicted_next_rsu_id": "rsu_a",
+          "request_rsu_id": "rsu_a",
+          "requested_object_size_mb": 8.0,
+          "requested_typed_objects": [
+            {
+              "adapter_id": null,
+              "base_model_id": "b1",
+              "dependency_ids": [],
+              "evictability": "evictable",
+              "object_id": "base:b1",
+              "object_type": "base_model",
+              "required_base_model_id": null,
+              "resident_size_mb": 128.0,
+              "transfer_size_mb": 128.0,
+              "version": "probe_v0_2"
+            },
+            {
+              "adapter_id": "b1.a0",
+              "base_model_id": null,
+              "dependency_ids": [
+                "base:b1"
+              ],
+              "evictability": "evictable",
+              "object_id": "adapter:b1.a0",
+              "object_type": "adapter",
+              "required_base_model_id": "b1",
+              "resident_size_mb": 8.0,
+              "transfer_size_mb": 8.0,
+              "version": "probe_v0_2"
+            }
+          ],
+          "selected_target_rsu_id": "rsu_a",
+          "served_rsu_id": "rsu_a",
+          "service_success": true,
+          "size_mb": 8.0,
+          "stall_occurred": false,
+          "state_migration_size_mb": 0.0,
+          "time_index": 2,
+          "transfer_mb_by_type": {
+            "adapter": 8.0,
+            "base_model": 128.0
+          },
+          "transfer_source": "typed_catalog_dependency_bundle",
+          "typed_cache_transaction_contract_version": "typed_cache_transaction_contract_v1.1.0",
+          "typed_capacity_snapshot": {
+            "after": {
+              "capacity_mb": 136.0,
+              "remaining_mb": 0.0,
+              "used_mb": 136.0,
+              "used_mb_by_type": {
+                "adapter": 8.0,
+                "base_model": 128.0
+              }
+            },
+            "before": {
+              "cache_capacity": 136.0,
+              "cache_capacity_enabled": true,
+              "cache_capacity_unit": "mb",
+              "cache_occupancy_rate": 0.764706,
+              "cache_remaining_size": 32.0,
+              "cache_used_mb_by_object_type": {
+                "adapter": 8.0,
+                "base_model": 96.0
+              },
+              "cache_used_size": 104.0,
+              "eviction_policy": "lru",
+              "eviction_policy_seed": null,
+              "eviction_policy_version": "1.0.0",
+              "model_cache_profile_id": "typed_base_adapter_state_v1",
+              "rsu_adapter_slots": 0
+            },
+            "requested_dependency_bundle_mb": 136.0
+          },
+          "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+          "typed_model_cache_contract_version": "1.0.0",
+          "vehicle_id": "diagnostic_vehicle",
+          "was_cached_before": false,
+          "workflow_id": "synthetic_typed_cache_replacement_diagnostic",
+          "workflow_state_ready": true
+        },
+        "cache_rejection_reason": null,
+        "cache_service_available": true,
+        "cache_trace_snapshot_after": {
+          "rsus": [
+            {
+              "capacity": 136.0,
+              "capacity_enabled": true,
+              "capacity_unit": "mb",
+              "model_cache_profile_id": "typed_base_adapter_state_v1",
+              "residents": [
+                {
+                  "adapter_id": null,
+                  "base_model_id": "b1",
+                  "evictability": "evictable",
+                  "object_id": "base:b1",
+                  "object_type": "base_model",
+                  "required_base_model_id": null,
+                  "size_mb": 128.0
+                },
+                {
+                  "adapter_id": "b1.a0",
+                  "base_model_id": null,
+                  "evictability": "evictable",
+                  "object_id": "adapter:b1.a0",
+                  "object_type": "adapter",
+                  "required_base_model_id": "b1",
+                  "size_mb": 8.0
+                }
+              ],
+              "rsu_id": "rsu_a",
+              "typed_model_cache_contract_version": "1.0.0"
+            }
+          ],
+          "snapshot_step_index": 2
+        },
+        "control_action": {
+          "cache_action": {
+            "adapter_id": "b1.a0",
+            "operation": "cache",
+            "prediction_driven": false,
+            "rsu_id": "rsu_a",
+            "strategy": "reactive_cache_fill"
+          },
+          "metadata": {
+            "action_contract": "semantic_discrete_5",
+            "action_id": 0,
+            "action_name": "current_rsu_cache_fill",
+            "current_rsu_id": "rsu_a",
+            "invalid_action": false,
+            "invalid_reason": "none",
+            "primary_vehicle_id": "diagnostic_vehicle",
+            "required_adapter": "b1.a0"
+          },
+          "migration_action": {
+            "mode": "keep",
+            "strategy": "none"
+          },
+          "offload_action": {
+            "mode": "rsu",
+            "strategy": "current_rsu_cache_fill"
+          }
+        },
+        "hit_source": "current_rsu",
+        "node_completed_this_step": [
+          "n1"
+        ],
+        "node_execution_service_success": true,
+        "origin_execution_evidence": false,
+        "resident_before": {
+          "rsus": [
+            {
+              "capacity": 136.0,
+              "capacity_enabled": true,
+              "capacity_unit": "mb",
+              "model_cache_profile_id": "typed_base_adapter_state_v1",
+              "residents": [
+                {
+                  "adapter_id": null,
+                  "base_model_id": "b0",
+                  "evictability": "evictable",
+                  "object_id": "base:b0",
+                  "object_type": "base_model",
+                  "required_base_model_id": null,
+                  "size_mb": 96.0
+                },
+                {
+                  "adapter_id": "b0.a0",
+                  "base_model_id": null,
+                  "evictability": "evictable",
+                  "object_id": "adapter:b0.a0",
+                  "object_type": "adapter",
+                  "required_base_model_id": "b0",
+                  "size_mb": 8.0
+                }
+              ],
+              "rsu_id": "rsu_a",
+              "typed_model_cache_contract_version": "1.0.0"
+            }
+          ],
+          "snapshot_step_index": 1
+        },
+        "reward": 6.8,
+        "step_index": 2,
+        "terminated": true,
+        "truncated": false,
+        "workflow_after": {
+          "completed_node_ids": [
+            "n0",
+            "n1"
+          ],
+          "current_node_id": null,
+          "edges": [
+            [
+              "n0",
+              "n1"
+            ]
+          ],
+          "execution_order": [
+            "n0",
+            "n1"
+          ],
+          "is_completed": true,
+          "nodes": [
+            {
+              "input_size": 1,
+              "node_id": "n0",
+              "node_name": "synthetic diagnostic b0 request",
+              "output_size": 1,
+              "predecessors": [],
+              "required_adapter": "b0.a0",
+              "required_base_model": "b0",
+              "successors": [
+                "n1"
+              ]
+            },
+            {
+              "input_size": 1,
+              "node_id": "n1",
+              "node_name": "synthetic diagnostic b1 request",
+              "output_size": 1,
+              "predecessors": [
+                "n0"
+              ],
+              "required_adapter": "b1.a0",
+              "required_base_model": "b1",
+              "successors": []
+            }
+          ],
+          "workflow_id": "synthetic_typed_cache_replacement_diagnostic"
+        },
+        "workflow_before": {
+          "completed_node_ids": [
+            "n0"
+          ],
+          "current_node_id": "n1",
+          "edges": [
+            [
+              "n0",
+              "n1"
+            ]
+          ],
+          "execution_order": [
+            "n0",
+            "n1"
+          ],
+          "is_completed": false,
+          "nodes": [
+            {
+              "input_size": 1,
+              "node_id": "n0",
+              "node_name": "synthetic diagnostic b0 request",
+              "output_size": 1,
+              "predecessors": [],
+              "required_adapter": "b0.a0",
+              "required_base_model": "b0",
+              "successors": [
+                "n1"
+              ]
+            },
+            {
+              "input_size": 1,
+              "node_id": "n1",
+              "node_name": "synthetic diagnostic b1 request",
+              "output_size": 1,
+              "predecessors": [
+                "n0"
+              ],
+              "required_adapter": "b1.a0",
+              "required_base_model": "b1",
+              "successors": []
+            }
+          ],
+          "workflow_id": "synthetic_typed_cache_replacement_diagnostic"
+        },
+        "workflow_completed": true
+      }
+    ],
+    "stop_reason": "workflow_completed",
+    "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+    "workflow_completed": true
+  },
+  "old": {
+    "fixed_step_cap": 2,
+    "label": "synthetic diagnostic",
+    "reset_action_zero_allowed": true,
+    "same_workload_resource_action_rule_id": "one_vehicle_one_rsu_two_ordered_nodes_action0_v1",
+    "steps": [
+      {
+        "action_id": 0,
+        "action_mask_allowed_before": true,
+        "action_name": "current_rsu_cache_fill",
+        "cache_admission_status": "committed",
+        "cache_event": {
+          "action_id": 0,
+          "action_name": "current_rsu_cache_fill",
+          "adapter_hit": true,
+          "adapter_id": "b0.a0",
+          "adapter_transfer_size_mb": 8.0,
+          "admission_added": true,
+          "admission_reason": "reactive_cache_fill",
+          "admission_requested": true,
+          "admitted_adapter_id": "b0.a0",
+          "admitted_mb_by_type": {
+            "adapter": 8.0,
+            "base_model": 96.0
+          },
+          "admitted_object_id": "adapter:b0.a0",
+          "admitted_size_mb": 8.0,
+          "admitted_typed_objects": [
+            {
+              "adapter_id": null,
+              "base_model_id": "b0",
+              "dependency_ids": [],
+              "evictability": "evictable",
+              "object_id": "base:b0",
+              "object_type": "base_model",
+              "required_base_model_id": null,
+              "resident_size_mb": 96.0,
+              "transfer_size_mb": 96.0,
+              "version": "probe_v0_2"
+            },
+            {
+              "adapter_id": "b0.a0",
+              "base_model_id": null,
+              "dependency_ids": [
+                "base:b0"
+              ],
+              "evictability": "evictable",
+              "object_id": "adapter:b0.a0",
+              "object_type": "adapter",
+              "required_base_model_id": "b0",
+              "resident_size_mb": 8.0,
+              "transfer_size_mb": 8.0,
+              "version": "probe_v0_2"
+            }
+          ],
+          "atomic_transaction_status": "committed",
+          "base_model_hit": true,
+          "cache_capacity_after": 136.0,
+          "cache_capacity_before": 136.0,
+          "cache_capacity_enabled": true,
+          "cache_capacity_unit": "mb",
+          "cache_hit": true,
+          "cache_lookup_performed": true,
+          "cache_remaining_after": 32.0,
+          "cache_remaining_before": 136.0,
+          "cache_strategy": "reactive_cache_fill",
+          "cache_target_rsu_id": "rsu_a",
+          "cache_used_after": 104.0,
+          "cache_used_before": 0.0,
+          "capacity_rejection_reason": null,
+          "compatibility_result": "compatible",
+          "dependency_bundle": {
+            "already_resident_object_ids": [],
+            "missing_object_ids": [
+              "base:b0",
+              "adapter:b0.a0"
+            ],
+            "ordered_object_ids": [
+              "base:b0",
+              "adapter:b0.a0"
+            ],
+            "requested_adapter_id": "b0.a0",
+            "requested_bundle_mb": 104.0,
+            "required_base_model_id": "b0",
+            "transfer_mb_by_type": {
+              "adapter": 8.0,
+              "base_model": 96.0
+            }
+          },
+          "episode_step_index": 1,
+          "event_id": "cache-event-000001",
+          "event_schema_version": "1.3.0",
+          "event_type": "request",
+          "evicted_adapter_id": null,
+          "evicted_adapter_ids": [],
+          "evicted_mb_by_type": {},
+          "evicted_object_id": null,
+          "evicted_object_ids": [],
+          "evicted_size_mb_sum": 0.0,
+          "evicted_sizes_mb": [],
+          "evicted_typed_objects": [],
+          "eviction_count": 0,
+          "eviction_occurred": false,
+          "eviction_planning_trace": null,
+          "eviction_policy": "lru",
+          "eviction_reason": "not_occurred",
+          "full_service_ready": true,
+          "handoff_event_count": 0,
+          "hit_source": "current_rsu",
+          "incompatibility_reason": null,
+          "joint_model_hit": true,
+          "migration_realized": false,
+          "migration_requested": false,
+          "missing_object_types": [],
+          "model_cache_profile_id": "typed_base_adapter_state_v1",
+          "node_id": "n0",
+          "object_id": "adapter:b0.a0",
+          "object_type": "adapter",
+          "offload_mode": "rsu",
+          "orphan_count": 0,
+          "per_object_lookup_results": [
+            {
+              "evidence": "rsu_resident_state",
+              "object_id": "base:b0",
+              "object_type": "base_model",
+              "resident": true
+            },
+            {
+              "evidence": "rsu_resident_state",
+              "object_id": "adapter:b0.a0",
+              "object_type": "adapter",
+              "resident": true
+            }
+          ],
+          "predicted_handoff_target_rsu_id": null,
+          "predicted_next_rsu_id": "rsu_a",
+          "request_rsu_id": "rsu_a",
+          "requested_object_size_mb": 8.0,
+          "requested_typed_objects": [
+            {
+              "adapter_id": null,
+              "base_model_id": "b0",
+              "dependency_ids": [],
+              "evictability": "evictable",
+              "object_id": "base:b0",
+              "object_type": "base_model",
+              "required_base_model_id": null,
+              "resident_size_mb": 96.0,
+              "transfer_size_mb": 96.0,
+              "version": "probe_v0_2"
+            },
+            {
+              "adapter_id": "b0.a0",
+              "base_model_id": null,
+              "dependency_ids": [
+                "base:b0"
+              ],
+              "evictability": "evictable",
+              "object_id": "adapter:b0.a0",
+              "object_type": "adapter",
+              "required_base_model_id": "b0",
+              "resident_size_mb": 8.0,
+              "transfer_size_mb": 8.0,
+              "version": "probe_v0_2"
+            }
+          ],
+          "selected_target_rsu_id": "rsu_a",
+          "served_rsu_id": "rsu_a",
+          "service_success": true,
+          "size_mb": 8.0,
+          "stall_occurred": false,
+          "state_migration_size_mb": 0.0,
+          "time_index": 1,
+          "transfer_mb_by_type": {
+            "adapter": 8.0,
+            "base_model": 96.0
+          },
+          "transfer_source": "typed_catalog_dependency_bundle",
+          "typed_cache_transaction_contract_version": "typed_cache_transaction_contract_v1.0.0",
+          "typed_capacity_snapshot": {
+            "after": {
+              "capacity_mb": 136.0,
+              "remaining_mb": 32.0,
+              "used_mb": 104.0,
+              "used_mb_by_type": {
+                "adapter": 8.0,
+                "base_model": 96.0
+              }
+            },
+            "before": {
+              "cache_capacity": 136.0,
+              "cache_capacity_enabled": true,
+              "cache_capacity_unit": "mb",
+              "cache_occupancy_rate": 0.0,
+              "cache_remaining_size": 136.0,
+              "cache_used_mb_by_object_type": {},
+              "cache_used_size": 0.0,
+              "eviction_policy": "lru",
+              "eviction_policy_seed": null,
+              "eviction_policy_version": "1.0.0",
+              "model_cache_profile_id": "typed_base_adapter_state_v1",
+              "rsu_adapter_slots": 0
+            },
+            "requested_dependency_bundle_mb": 104.0
+          },
+          "typed_eviction_semantics": "static_dependency_safe_v1",
+          "typed_model_cache_contract_version": "1.0.0",
+          "vehicle_id": "diagnostic_vehicle",
+          "was_cached_before": false,
+          "workflow_id": "synthetic_typed_cache_replacement_diagnostic",
+          "workflow_state_ready": true
+        },
+        "cache_rejection_reason": null,
+        "cache_service_available": true,
+        "cache_trace_snapshot_after": {
+          "rsus": [
+            {
+              "capacity": 136.0,
+              "capacity_enabled": true,
+              "capacity_unit": "mb",
+              "model_cache_profile_id": "typed_base_adapter_state_v1",
+              "residents": [
+                {
+                  "adapter_id": null,
+                  "base_model_id": "b0",
+                  "evictability": "evictable",
+                  "object_id": "base:b0",
+                  "object_type": "base_model",
+                  "required_base_model_id": null,
+                  "size_mb": 96.0
+                },
+                {
+                  "adapter_id": "b0.a0",
+                  "base_model_id": null,
+                  "evictability": "evictable",
+                  "object_id": "adapter:b0.a0",
+                  "object_type": "adapter",
+                  "required_base_model_id": "b0",
+                  "size_mb": 8.0
+                }
+              ],
+              "rsu_id": "rsu_a",
+              "typed_model_cache_contract_version": "1.0.0"
+            }
+          ],
+          "snapshot_step_index": 1
+        },
+        "control_action": {
+          "cache_action": {
+            "adapter_id": "b0.a0",
+            "operation": "cache",
+            "prediction_driven": false,
+            "rsu_id": "rsu_a",
+            "strategy": "reactive_cache_fill"
+          },
+          "metadata": {
+            "action_contract": "semantic_discrete_5",
+            "action_id": 0,
+            "action_name": "current_rsu_cache_fill",
+            "current_rsu_id": "rsu_a",
+            "invalid_action": false,
+            "invalid_reason": "none",
+            "primary_vehicle_id": "diagnostic_vehicle",
+            "required_adapter": "b0.a0"
+          },
+          "migration_action": {
+            "mode": "keep",
+            "strategy": "none"
+          },
+          "offload_action": {
+            "mode": "rsu",
+            "strategy": "current_rsu_cache_fill"
+          }
+        },
+        "hit_source": "current_rsu",
+        "node_completed_this_step": [
+          "n0"
+        ],
+        "node_execution_service_success": true,
+        "origin_execution_evidence": false,
+        "resident_before": {
+          "rsus": [
+            {
+              "capacity": 136.0,
+              "capacity_enabled": true,
+              "capacity_unit": "mb",
+              "model_cache_profile_id": "typed_base_adapter_state_v1",
+              "residents": [],
+              "rsu_id": "rsu_a",
+              "typed_model_cache_contract_version": "1.0.0"
+            }
+          ],
+          "snapshot_step_index": 0
+        },
+        "reward": 6.8,
+        "step_index": 1,
+        "terminated": false,
+        "truncated": false,
+        "workflow_after": {
+          "completed_node_ids": [
+            "n0"
+          ],
+          "current_node_id": "n1",
+          "edges": [
+            [
+              "n0",
+              "n1"
+            ]
+          ],
+          "execution_order": [
+            "n0",
+            "n1"
+          ],
+          "is_completed": false,
+          "nodes": [
+            {
+              "input_size": 1,
+              "node_id": "n0",
+              "node_name": "synthetic diagnostic b0 request",
+              "output_size": 1,
+              "predecessors": [],
+              "required_adapter": "b0.a0",
+              "required_base_model": "b0",
+              "successors": [
+                "n1"
+              ]
+            },
+            {
+              "input_size": 1,
+              "node_id": "n1",
+              "node_name": "synthetic diagnostic b1 request",
+              "output_size": 1,
+              "predecessors": [
+                "n0"
+              ],
+              "required_adapter": "b1.a0",
+              "required_base_model": "b1",
+              "successors": []
+            }
+          ],
+          "workflow_id": "synthetic_typed_cache_replacement_diagnostic"
+        },
+        "workflow_before": {
+          "completed_node_ids": [],
+          "current_node_id": "n0",
+          "edges": [
+            [
+              "n0",
+              "n1"
+            ]
+          ],
+          "execution_order": [
+            "n0",
+            "n1"
+          ],
+          "is_completed": false,
+          "nodes": [
+            {
+              "input_size": 1,
+              "node_id": "n0",
+              "node_name": "synthetic diagnostic b0 request",
+              "output_size": 1,
+              "predecessors": [],
+              "required_adapter": "b0.a0",
+              "required_base_model": "b0",
+              "successors": [
+                "n1"
+              ]
+            },
+            {
+              "input_size": 1,
+              "node_id": "n1",
+              "node_name": "synthetic diagnostic b1 request",
+              "output_size": 1,
+              "predecessors": [
+                "n0"
+              ],
+              "required_adapter": "b1.a0",
+              "required_base_model": "b1",
+              "successors": []
+            }
+          ],
+          "workflow_id": "synthetic_typed_cache_replacement_diagnostic"
+        },
+        "workflow_completed": false
+      },
+      {
+        "action_id": 0,
+        "action_mask_allowed_before": true,
+        "action_name": "current_rsu_cache_fill",
+        "cache_admission_status": "rolled_back_no_mutation",
+        "cache_event": {
+          "action_id": 0,
+          "action_name": "current_rsu_cache_fill",
+          "adapter_hit": false,
+          "adapter_id": "b1.a0",
+          "adapter_transfer_size_mb": 0.0,
+          "admission_added": false,
+          "admission_reason": "insufficient_dependency_safe_evictable_capacity",
+          "admission_requested": true,
+          "admitted_adapter_id": null,
+          "admitted_mb_by_type": {},
+          "admitted_object_id": null,
+          "admitted_size_mb": null,
+          "admitted_typed_objects": [],
+          "atomic_transaction_status": "rolled_back_no_mutation",
+          "base_model_hit": false,
+          "cache_capacity_after": 136.0,
+          "cache_capacity_before": 136.0,
+          "cache_capacity_enabled": true,
+          "cache_capacity_unit": "mb",
+          "cache_hit": false,
+          "cache_lookup_performed": true,
+          "cache_remaining_after": 32.0,
+          "cache_remaining_before": 32.0,
+          "cache_strategy": "reactive_cache_fill",
+          "cache_target_rsu_id": "rsu_a",
+          "cache_used_after": 104.0,
+          "cache_used_before": 104.0,
+          "capacity_rejection_reason": "insufficient_dependency_safe_evictable_capacity",
+          "compatibility_result": "compatible",
+          "dependency_bundle": {
+            "already_resident_object_ids": [],
+            "missing_object_ids": [
+              "base:b1",
+              "adapter:b1.a0"
+            ],
+            "ordered_object_ids": [
+              "base:b1",
+              "adapter:b1.a0"
+            ],
+            "requested_adapter_id": "b1.a0",
+            "requested_bundle_mb": 136.0,
+            "required_base_model_id": "b1",
+            "transfer_mb_by_type": {
+              "adapter": 8.0,
+              "base_model": 128.0
+            }
+          },
+          "episode_step_index": 2,
+          "event_id": "cache-event-000002",
+          "event_schema_version": "1.3.0",
+          "event_type": "request",
+          "evicted_adapter_id": null,
+          "evicted_adapter_ids": [],
+          "evicted_mb_by_type": {},
+          "evicted_object_id": null,
+          "evicted_object_ids": [],
+          "evicted_size_mb_sum": 0.0,
+          "evicted_sizes_mb": [],
+          "evicted_typed_objects": [],
+          "eviction_count": 0,
+          "eviction_occurred": false,
+          "eviction_planning_trace": null,
+          "eviction_policy": "lru",
+          "eviction_reason": "not_occurred",
+          "full_service_ready": false,
+          "handoff_event_count": 0,
+          "hit_source": "unserved",
+          "incompatibility_reason": "missing:base_model,adapter",
+          "joint_model_hit": false,
+          "migration_realized": false,
+          "migration_requested": false,
+          "missing_object_types": [
+            "base_model",
+            "adapter"
+          ],
+          "model_cache_profile_id": "typed_base_adapter_state_v1",
+          "node_id": "n1",
+          "object_id": "adapter:b1.a0",
+          "object_type": "adapter",
+          "offload_mode": "rsu",
+          "orphan_count": 0,
+          "per_object_lookup_results": [
+            {
+              "evidence": "rsu_resident_state",
+              "object_id": "base:b1",
+              "object_type": "base_model",
+              "resident": false
+            },
+            {
+              "evidence": "rsu_resident_state",
+              "object_id": "adapter:b1.a0",
+              "object_type": "adapter",
+              "resident": false
+            }
+          ],
+          "predicted_handoff_target_rsu_id": null,
+          "predicted_next_rsu_id": "rsu_a",
+          "request_rsu_id": "rsu_a",
+          "requested_object_size_mb": 8.0,
+          "requested_typed_objects": [
+            {
+              "adapter_id": null,
+              "base_model_id": "b1",
+              "dependency_ids": [],
+              "evictability": "evictable",
+              "object_id": "base:b1",
+              "object_type": "base_model",
+              "required_base_model_id": null,
+              "resident_size_mb": 128.0,
+              "transfer_size_mb": 128.0,
+              "version": "probe_v0_2"
+            },
+            {
+              "adapter_id": "b1.a0",
+              "base_model_id": null,
+              "dependency_ids": [
+                "base:b1"
+              ],
+              "evictability": "evictable",
+              "object_id": "adapter:b1.a0",
+              "object_type": "adapter",
+              "required_base_model_id": "b1",
+              "resident_size_mb": 8.0,
+              "transfer_size_mb": 8.0,
+              "version": "probe_v0_2"
+            }
+          ],
+          "selected_target_rsu_id": "rsu_a",
+          "served_rsu_id": null,
+          "service_success": false,
+          "size_mb": 8.0,
+          "stall_occurred": true,
+          "state_migration_size_mb": 0.0,
+          "time_index": 2,
+          "transfer_mb_by_type": {},
+          "transfer_source": "typed_catalog_dependency_bundle",
+          "typed_cache_transaction_contract_version": "typed_cache_transaction_contract_v1.0.0",
+          "typed_capacity_snapshot": {
+            "after": {
+              "capacity_mb": 136.0,
+              "remaining_mb": 32.0,
+              "used_mb": 104.0,
+              "used_mb_by_type": {
+                "adapter": 8.0,
+                "base_model": 96.0
+              }
+            },
+            "before": {
+              "cache_capacity": 136.0,
+              "cache_capacity_enabled": true,
+              "cache_capacity_unit": "mb",
+              "cache_occupancy_rate": 0.764706,
+              "cache_remaining_size": 32.0,
+              "cache_used_mb_by_object_type": {
+                "adapter": 8.0,
+                "base_model": 96.0
+              },
+              "cache_used_size": 104.0,
+              "eviction_policy": "lru",
+              "eviction_policy_seed": null,
+              "eviction_policy_version": "1.0.0",
+              "model_cache_profile_id": "typed_base_adapter_state_v1",
+              "rsu_adapter_slots": 0
+            },
+            "requested_dependency_bundle_mb": 136.0
+          },
+          "typed_eviction_semantics": "static_dependency_safe_v1",
+          "typed_model_cache_contract_version": "1.0.0",
+          "vehicle_id": "diagnostic_vehicle",
+          "was_cached_before": false,
+          "workflow_id": "synthetic_typed_cache_replacement_diagnostic",
+          "workflow_state_ready": true
+        },
+        "cache_rejection_reason": "insufficient_dependency_safe_evictable_capacity",
+        "cache_service_available": false,
+        "cache_trace_snapshot_after": {
+          "rsus": [
+            {
+              "capacity": 136.0,
+              "capacity_enabled": true,
+              "capacity_unit": "mb",
+              "model_cache_profile_id": "typed_base_adapter_state_v1",
+              "residents": [
+                {
+                  "adapter_id": null,
+                  "base_model_id": "b0",
+                  "evictability": "evictable",
+                  "object_id": "base:b0",
+                  "object_type": "base_model",
+                  "required_base_model_id": null,
+                  "size_mb": 96.0
+                },
+                {
+                  "adapter_id": "b0.a0",
+                  "base_model_id": null,
+                  "evictability": "evictable",
+                  "object_id": "adapter:b0.a0",
+                  "object_type": "adapter",
+                  "required_base_model_id": "b0",
+                  "size_mb": 8.0
+                }
+              ],
+              "rsu_id": "rsu_a",
+              "typed_model_cache_contract_version": "1.0.0"
+            }
+          ],
+          "snapshot_step_index": 2
+        },
+        "control_action": {
+          "cache_action": {
+            "adapter_id": "b1.a0",
+            "operation": "cache",
+            "prediction_driven": false,
+            "rsu_id": "rsu_a",
+            "strategy": "reactive_cache_fill"
+          },
+          "metadata": {
+            "action_contract": "semantic_discrete_5",
+            "action_id": 0,
+            "action_name": "current_rsu_cache_fill",
+            "current_rsu_id": "rsu_a",
+            "invalid_action": false,
+            "invalid_reason": "none",
+            "primary_vehicle_id": "diagnostic_vehicle",
+            "required_adapter": "b1.a0"
+          },
+          "migration_action": {
+            "mode": "keep",
+            "strategy": "none"
+          },
+          "offload_action": {
+            "mode": "rsu",
+            "strategy": "current_rsu_cache_fill"
+          }
+        },
+        "hit_source": "unserved",
+        "node_completed_this_step": [],
+        "node_execution_service_success": false,
+        "origin_execution_evidence": false,
+        "resident_before": {
+          "rsus": [
+            {
+              "capacity": 136.0,
+              "capacity_enabled": true,
+              "capacity_unit": "mb",
+              "model_cache_profile_id": "typed_base_adapter_state_v1",
+              "residents": [
+                {
+                  "adapter_id": null,
+                  "base_model_id": "b0",
+                  "evictability": "evictable",
+                  "object_id": "base:b0",
+                  "object_type": "base_model",
+                  "required_base_model_id": null,
+                  "size_mb": 96.0
+                },
+                {
+                  "adapter_id": "b0.a0",
+                  "base_model_id": null,
+                  "evictability": "evictable",
+                  "object_id": "adapter:b0.a0",
+                  "object_type": "adapter",
+                  "required_base_model_id": "b0",
+                  "size_mb": 8.0
+                }
+              ],
+              "rsu_id": "rsu_a",
+              "typed_model_cache_contract_version": "1.0.0"
+            }
+          ],
+          "snapshot_step_index": 1
+        },
+        "reward": 1.5499999999999998,
+        "step_index": 2,
+        "terminated": false,
+        "truncated": true,
+        "workflow_after": {
+          "completed_node_ids": [
+            "n0"
+          ],
+          "current_node_id": "n1",
+          "edges": [
+            [
+              "n0",
+              "n1"
+            ]
+          ],
+          "execution_order": [
+            "n0",
+            "n1"
+          ],
+          "is_completed": false,
+          "nodes": [
+            {
+              "input_size": 1,
+              "node_id": "n0",
+              "node_name": "synthetic diagnostic b0 request",
+              "output_size": 1,
+              "predecessors": [],
+              "required_adapter": "b0.a0",
+              "required_base_model": "b0",
+              "successors": [
+                "n1"
+              ]
+            },
+            {
+              "input_size": 1,
+              "node_id": "n1",
+              "node_name": "synthetic diagnostic b1 request",
+              "output_size": 1,
+              "predecessors": [
+                "n0"
+              ],
+              "required_adapter": "b1.a0",
+              "required_base_model": "b1",
+              "successors": []
+            }
+          ],
+          "workflow_id": "synthetic_typed_cache_replacement_diagnostic"
+        },
+        "workflow_before": {
+          "completed_node_ids": [
+            "n0"
+          ],
+          "current_node_id": "n1",
+          "edges": [
+            [
+              "n0",
+              "n1"
+            ]
+          ],
+          "execution_order": [
+            "n0",
+            "n1"
+          ],
+          "is_completed": false,
+          "nodes": [
+            {
+              "input_size": 1,
+              "node_id": "n0",
+              "node_name": "synthetic diagnostic b0 request",
+              "output_size": 1,
+              "predecessors": [],
+              "required_adapter": "b0.a0",
+              "required_base_model": "b0",
+              "successors": [
+                "n1"
+              ]
+            },
+            {
+              "input_size": 1,
+              "node_id": "n1",
+              "node_name": "synthetic diagnostic b1 request",
+              "output_size": 1,
+              "predecessors": [
+                "n0"
+              ],
+              "required_adapter": "b1.a0",
+              "required_base_model": "b1",
+              "successors": []
+            }
+          ],
+          "workflow_id": "synthetic_typed_cache_replacement_diagnostic"
+        },
+        "workflow_completed": false
+      }
+    ],
+    "stop_reason": "fixed_step_cap_reached_before_workflow_completion",
+    "typed_eviction_semantics": "static_dependency_safe_v1",
+    "workflow_completed": false
+  }
+}

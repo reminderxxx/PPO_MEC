@@ -1,0 +1,346 @@
+{
+  "automatic_retry": false,
+  "budget_compliance": "pass",
+  "claims": {
+    "algorithm_comparison": "not_evaluated",
+    "production_action_4_real_migration": "not_implemented_by_this_runner",
+    "restart_comparison": "pass",
+    "wireless_transfer": "formula_only_not_measured",
+    "workflow_suffix_recovery_fidelity": "pass"
+  },
+  "classification": "technical workflow calibration",
+  "comparisons": {
+    "checks": {
+      "active_adapter_equal": true,
+      "all_n0_text_equal": true,
+      "all_n0_token_ids_equal": true,
+      "all_n1_input_hash_equal": true,
+      "all_n1_input_ids_equal": true,
+      "all_n1_prompt_equal": true,
+      "all_n1_rendered_prompt_equal": true,
+      "all_n1_token_ids_equal": true,
+      "continuous_completed_two_nodes": true,
+      "identity_equal": true,
+      "recovery_executed_suffix_only": true,
+      "recovery_target_source_image_access_zero": true,
+      "restart_completed_two_nodes": true,
+      "restart_target_source_image_access_one": true,
+      "target_consumed_source_intermediate": true
+    },
+    "status": "PASS"
+  },
+  "cost_decomposition": {
+    "arms": {
+      "continuous": {
+        "dynamic_transfer_bytes_if_remote": 0,
+        "executed_nodes": [
+          "n0",
+          "n1"
+        ],
+        "generate_calls": 2,
+        "model_load_seconds": 1.509080751,
+        "n0_inference_seconds": 11.514348042,
+        "n1_inference_seconds": 3.828601959,
+        "n1_input_rebuild_seconds": null,
+        "process_elapsed_seconds": 18.763293625,
+        "supervisor_child_wall_seconds": 19.464540292
+      },
+      "interrupted_then_restart_from_n0": {
+        "dynamic_transfer_bytes_if_remote": 192757,
+        "dynamic_transfer_type": "original_input_image",
+        "executed_nodes_after_interrupt": [
+          "n0",
+          "n1"
+        ],
+        "generate_calls_including_shared_prefix": 3,
+        "path_process_elapsed_seconds": 30.951249666,
+        "path_supervisor_child_wall_seconds": 32.503856834,
+        "shared_source_prefix_process_seconds": 13.391591541,
+        "target_model_load_seconds": 1.1991184990000001,
+        "target_n0_inference_seconds": 11.035304084,
+        "target_n1_inference_seconds": 3.827448249999998
+      },
+      "interrupted_then_restore_and_execute_n1_only": {
+        "durable_save_seconds": 0.0006764579999991582,
+        "dynamic_transfer_bytes_if_remote": 2040,
+        "dynamic_transfer_type": "state_package",
+        "executed_nodes_after_interrupt": [
+          "n1"
+        ],
+        "generate_calls_including_shared_prefix": 2,
+        "input_reconstruction_seconds": 0.0026515420000001733,
+        "path_process_elapsed_seconds": 19.831290208,
+        "path_supervisor_child_wall_seconds": 21.3695765,
+        "serialize_seconds": 5.9583000000529296e-05,
+        "shared_source_prefix_process_seconds": 13.391591541,
+        "state_restore_validation_seconds": 0.002763167000000011,
+        "target_model_load_seconds": 1.1731141669999992,
+        "target_n1_inference_seconds": 3.862783417
+      }
+    },
+    "break_even": {
+      "dynamic_network_byte_condition_for_recovery": "state_package_bytes < input_image_bytes (2040 < 192757)",
+      "full_time_condition": "serialize + save + state_transfer + restore + input_rebuild + suffix_execution < input_transfer + prefix_reexecution + suffix_execution",
+      "network_is_measured": false
+    },
+    "byte_classes": {
+      "dynamic_state_file_bytes": 1703,
+      "dynamic_state_manifest_bytes": 337,
+      "dynamic_state_package_bytes": 2040,
+      "dynamic_state_payload_bytes": 1090,
+      "intermediate_n0_record_bytes": 169,
+      "model_weights_and_directories": {
+        "adapter_directory_bytes": 154428630,
+        "adapter_weight_bytes": 154423432,
+        "base_directory_bytes": 1019895869,
+        "base_weight_bytes": 1015025832
+      },
+      "original_input_image_bytes": 192757
+    },
+    "network_sensitivity": [
+      {
+        "fixed_one_way_seconds_assumption": 0.0,
+        "link_mbps_assumption": 10.0,
+        "measured_network": false,
+        "recovery_minus_restart_network_seconds": -0.1525736,
+        "recovery_state_network_seconds": 0.001632,
+        "restart_input_network_seconds": 0.1542056
+      },
+      {
+        "fixed_one_way_seconds_assumption": 0.01,
+        "link_mbps_assumption": 10.0,
+        "measured_network": false,
+        "recovery_minus_restart_network_seconds": -0.1525736,
+        "recovery_state_network_seconds": 0.011632,
+        "restart_input_network_seconds": 0.1642056
+      },
+      {
+        "fixed_one_way_seconds_assumption": 0.05,
+        "link_mbps_assumption": 10.0,
+        "measured_network": false,
+        "recovery_minus_restart_network_seconds": -0.15257359999999998,
+        "recovery_state_network_seconds": 0.051632000000000004,
+        "restart_input_network_seconds": 0.2042056
+      },
+      {
+        "fixed_one_way_seconds_assumption": 0.0,
+        "link_mbps_assumption": 100.0,
+        "measured_network": false,
+        "recovery_minus_restart_network_seconds": -0.01525736,
+        "recovery_state_network_seconds": 0.0001632,
+        "restart_input_network_seconds": 0.01542056
+      },
+      {
+        "fixed_one_way_seconds_assumption": 0.01,
+        "link_mbps_assumption": 100.0,
+        "measured_network": false,
+        "recovery_minus_restart_network_seconds": -0.015257360000000001,
+        "recovery_state_network_seconds": 0.0101632,
+        "restart_input_network_seconds": 0.025420560000000002
+      },
+      {
+        "fixed_one_way_seconds_assumption": 0.05,
+        "link_mbps_assumption": 100.0,
+        "measured_network": false,
+        "recovery_minus_restart_network_seconds": -0.015257359999999998,
+        "recovery_state_network_seconds": 0.050163200000000005,
+        "restart_input_network_seconds": 0.06542056
+      },
+      {
+        "fixed_one_way_seconds_assumption": 0.0,
+        "link_mbps_assumption": 1000.0,
+        "measured_network": false,
+        "recovery_minus_restart_network_seconds": -0.001525736,
+        "recovery_state_network_seconds": 1.632e-05,
+        "restart_input_network_seconds": 0.001542056
+      },
+      {
+        "fixed_one_way_seconds_assumption": 0.01,
+        "link_mbps_assumption": 1000.0,
+        "measured_network": false,
+        "recovery_minus_restart_network_seconds": -0.0015257359999999998,
+        "recovery_state_network_seconds": 0.01001632,
+        "restart_input_network_seconds": 0.011542056
+      },
+      {
+        "fixed_one_way_seconds_assumption": 0.05,
+        "link_mbps_assumption": 1000.0,
+        "measured_network": false,
+        "recovery_minus_restart_network_seconds": -0.0015257359999999998,
+        "recovery_state_network_seconds": 0.05001632,
+        "restart_input_network_seconds": 0.051542056
+      }
+    ],
+    "target_missing_model": {
+      "applies_equally_to_restart_and_recovery": true,
+      "base_plus_adapter_directory_bytes": 1174324499,
+      "measured_path": false,
+      "network_time_formula": "(base_directory_bytes + adapter_directory_bytes + dynamic_bytes) * 8 / link_bits_per_second + fixed_one_way_seconds"
+    },
+    "target_prestaged_model": {
+      "actual_network_transfer_bytes": 0,
+      "measured_local_path": true,
+      "note": "all static resources were already local; process load time is measured but is not network time"
+    }
+  },
+  "finished_at_unix": 1791135265.844605,
+  "fixed_execution_commit": "f323fa2c4a098a6e73b054ed7fc6b4946bec2147",
+  "generate_attempted": 6,
+  "generate_completed": 6,
+  "negative_checks": {
+    "checks": [
+      {
+        "error": "n0_output is required",
+        "name": "missing_intermediate",
+        "rejected": true,
+        "status": "PASS"
+      },
+      {
+        "error": "payload_sha256 mismatch: expected '3e7e4fc733ff12be3de1caf99e0057635301b6d1570fe1172e4a8c54438ca7a5', got '8dacb54bfc22a6e59e209ffa4e419a90864ddfe5d0c2e3e676bc5289fe3f7170'",
+        "name": "tampered_content_stale_hash",
+        "rejected": true,
+        "status": "PASS"
+      },
+      {
+        "error": "next_node mismatch: expected 'n1', got 'n0'",
+        "name": "next_node_conflict",
+        "rejected": true,
+        "status": "PASS"
+      },
+      {
+        "error": "completed_nodes mismatch: expected ['n0'], got []",
+        "name": "completed_nodes_conflict",
+        "rejected": true,
+        "status": "PASS"
+      },
+      {
+        "error": "identity mismatch: expected {'base_weight_sha256': 'd05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2', 'adapter_name': 'adapter_a', 'adapter_weight_sha256': '95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83', 'processor_sha256': 'c829b783c70c179f828dfe65d35546fea55cc5c0efd699abeb0e187f0bbb7ee9'}, got {'base_weight_sha256': 'conflicting-base', 'adapter_name': 'adapter_a', 'adapter_weight_sha256': '95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83', 'processor_sha256': 'c829b783c70c179f828dfe65d35546fea55cc5c0efd699abeb0e187f0bbb7ee9'}",
+        "name": "model_identity_conflict",
+        "rejected": true,
+        "status": "PASS"
+      },
+      {
+        "inputs": [
+          {
+            "description": "a line graph",
+            "prompt": "Upstream visual description: a line graph\nSummarize only that description in one short phrase.",
+            "sha256": "a6750a637d16c7e12d47c223d90c0717a7fbe885c0da8efe3e7a2019ad7b1216"
+          },
+          {
+            "description": "a road intersection",
+            "prompt": "Upstream visual description: a road intersection\nSummarize only that description in one short phrase.",
+            "sha256": "866e6268609a74b8a0469969286f3637e153bed026727719c87216698f68fd43"
+          }
+        ],
+        "name": "two_valid_intermediates_change_n1_input",
+        "status": "PASS"
+      }
+    ],
+    "generate_calls": 0,
+    "model_loaded": false,
+    "status": "PASS"
+  },
+  "phases": [
+    {
+      "command": [
+        "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+        "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/scripts/run_two_node_workflow_reexecution_comparison.py",
+        "--role",
+        "continuous",
+        "--plan",
+        "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+        "--run-root",
+        "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/artifacts/analysis/two_node_workflow_reexecution_comparison_20261005_v1"
+      ],
+      "ended_at_unix": 1791135226.111773,
+      "pid": 13758,
+      "process_startup_overhead_seconds": 0.7012466669999995,
+      "receipt_status": "PASS",
+      "returncode": 0,
+      "role": "continuous",
+      "started_at_unix": 1791135206.6472452,
+      "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+      "stdout": "PASS\n",
+      "timed_out": false,
+      "wall_seconds": 19.464540292
+    },
+    {
+      "command": [
+        "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+        "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/scripts/run_two_node_workflow_reexecution_comparison.py",
+        "--role",
+        "source",
+        "--plan",
+        "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+        "--run-root",
+        "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/artifacts/analysis/two_node_workflow_reexecution_comparison_20261005_v1"
+      ],
+      "ended_at_unix": 1791135240.288363,
+      "pid": 13767,
+      "process_startup_overhead_seconds": 0.7843098759999982,
+      "receipt_status": "PASS",
+      "returncode": 0,
+      "role": "source",
+      "started_at_unix": 1791135226.1124961,
+      "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+      "stdout": "PASS\n",
+      "timed_out": false,
+      "wall_seconds": 14.175901416999999
+    },
+    {
+      "command": [
+        "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+        "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/scripts/run_two_node_workflow_reexecution_comparison.py",
+        "--role",
+        "restart",
+        "--plan",
+        "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+        "--run-root",
+        "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/artifacts/analysis/two_node_workflow_reexecution_comparison_20261005_v1"
+      ],
+      "ended_at_unix": 1791135258.634868,
+      "pid": 13768,
+      "process_startup_overhead_seconds": 0.7682972919999997,
+      "receipt_status": "PASS",
+      "returncode": 0,
+      "role": "restart",
+      "started_at_unix": 1791135240.289,
+      "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+      "stdout": "PASS\n",
+      "timed_out": false,
+      "wall_seconds": 18.327955417
+    },
+    {
+      "command": [
+        "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+        "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/scripts/run_two_node_workflow_reexecution_comparison.py",
+        "--role",
+        "target",
+        "--plan",
+        "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+        "--run-root",
+        "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/artifacts/analysis/two_node_workflow_reexecution_comparison_20261005_v1"
+      ],
+      "ended_at_unix": 1791135265.841014,
+      "pid": 13771,
+      "process_startup_overhead_seconds": 0.7539764160000022,
+      "receipt_status": "PASS",
+      "returncode": 0,
+      "role": "target",
+      "started_at_unix": 1791135258.6368709,
+      "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+      "stdout": "PASS\n",
+      "timed_out": false,
+      "wall_seconds": 7.193675083000002
+    }
+  ],
+  "plan_sha256": "8a0d030bd7ded081738d20c50b36f7b7f687f1bdb3f2d9ab031f240c85622d1d",
+  "process_ids_distinct": true,
+  "process_ordering_pass": true,
+  "production_action_4_state_export_import_called": false,
+  "scientific_wall_seconds": 59.167650333,
+  "started_at_unix": 1791135206.646545,
+  "status": "PASS",
+  "task_correctness": "unavailable",
+  "task_correctness_reason": "technical input has no applicable ALPR/Helmet ground-truth label"
+}

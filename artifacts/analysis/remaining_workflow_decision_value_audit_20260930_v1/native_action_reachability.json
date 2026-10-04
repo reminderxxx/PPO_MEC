@@ -1,0 +1,275 @@
+{
+  "action_contract": "semantic_discrete_5",
+  "bounded_consequence": "performance witnesses requiring an explicit migrate action or old-RSU result forwarding must stop; current-adapter prefetch remains testable",
+  "continue_old_rsu_and_forward_result": {
+    "reachable": false,
+    "reason": "no action or result-forwarding field exists in semantic_discrete_5"
+  },
+  "decoded_actions": [
+    {
+      "action_id": 0,
+      "action_name": "current_rsu_cache_fill",
+      "control_action": {
+        "cache_action": {
+          "adapter_id": "b0.a0",
+          "operation": "cache",
+          "prediction_driven": false,
+          "rsu_id": "rsu_a",
+          "strategy": "reactive_cache_fill"
+        },
+        "metadata": {
+          "action_contract": "semantic_discrete_5",
+          "action_id": 0,
+          "action_name": "current_rsu_cache_fill",
+          "current_rsu_id": "rsu_a",
+          "invalid_action": false,
+          "invalid_reason": "none",
+          "primary_vehicle_id": "veh_1",
+          "required_adapter": "b0.a0"
+        },
+        "migration_action": {
+          "mode": "keep",
+          "strategy": "none"
+        },
+        "offload_action": {
+          "mode": "rsu",
+          "strategy": "current_rsu_cache_fill"
+        }
+      },
+      "mask_allowed": true
+    },
+    {
+      "action_id": 1,
+      "action_name": "predictive_next_rsu_prefetch",
+      "control_action": {
+        "cache_action": {
+          "adapter_id": "b0.a0",
+          "operation": "cache",
+          "prediction_driven": true,
+          "prediction_source": "next_rsu_sequence:first_hop",
+          "rsu_id": "rsu_b",
+          "strategy": "predictive_prefetch"
+        },
+        "metadata": {
+          "action_contract": "semantic_discrete_5",
+          "action_id": 1,
+          "action_name": "predictive_next_rsu_prefetch",
+          "current_rsu_id": "rsu_a",
+          "invalid_action": false,
+          "invalid_reason": "none",
+          "primary_vehicle_id": "veh_1",
+          "required_adapter": "b0.a0"
+        },
+        "migration_action": {
+          "mode": "keep",
+          "strategy": "none"
+        },
+        "offload_action": {
+          "mode": "rsu",
+          "strategy": "steady_current_execution"
+        }
+      },
+      "mask_allowed": true
+    },
+    {
+      "action_id": 2,
+      "action_name": "vehicle_fallback",
+      "control_action": {
+        "cache_action": {},
+        "metadata": {
+          "action_contract": "semantic_discrete_5",
+          "action_id": 2,
+          "action_name": "vehicle_fallback",
+          "current_rsu_id": "rsu_a",
+          "invalid_action": false,
+          "invalid_reason": "none",
+          "primary_vehicle_id": "veh_1",
+          "required_adapter": "b0.a0"
+        },
+        "migration_action": {
+          "mode": "keep",
+          "strategy": "none"
+        },
+        "offload_action": {
+          "mode": "vehicle",
+          "strategy": "vehicle_fallback"
+        }
+      },
+      "mask_allowed": true
+    },
+    {
+      "action_id": 3,
+      "action_name": "current_rsu_steady_offload",
+      "control_action": {
+        "cache_action": {},
+        "metadata": {
+          "action_contract": "semantic_discrete_5",
+          "action_id": 3,
+          "action_name": "current_rsu_steady_offload",
+          "current_rsu_id": "rsu_a",
+          "invalid_action": false,
+          "invalid_reason": "none",
+          "primary_vehicle_id": "veh_1",
+          "required_adapter": "b0.a0"
+        },
+        "migration_action": {
+          "mode": "keep",
+          "strategy": "none"
+        },
+        "offload_action": {
+          "mode": "rsu",
+          "strategy": "current_rsu_steady_offload"
+        }
+      },
+      "mask_allowed": true
+    },
+    {
+      "action_id": 4,
+      "action_name": "handoff_migration_prepare",
+      "control_action": {
+        "cache_action": {
+          "adapter_id": "b0.a0",
+          "operation": "cache",
+          "prediction_driven": true,
+          "prediction_source": "predicted_first_handoff_rsu",
+          "rsu_id": "rsu_b",
+          "strategy": "handoff_prepare_prefetch"
+        },
+        "metadata": {
+          "action_contract": "semantic_discrete_5",
+          "action_id": 4,
+          "action_name": "handoff_migration_prepare",
+          "current_rsu_id": "rsu_a",
+          "invalid_action": false,
+          "invalid_reason": "none",
+          "primary_vehicle_id": "veh_1",
+          "required_adapter": "b0.a0"
+        },
+        "migration_action": {
+          "expected_target_rsu_id": "rsu_b",
+          "mode": "prepare",
+          "strategy": "handoff_migration_prepare"
+        },
+        "offload_action": {
+          "mode": "rsu",
+          "strategy": "current_rsu_steady_offload"
+        }
+      },
+      "mask_allowed": true
+    }
+  ],
+  "evidence_type": "native_action_contract_audit",
+  "explicit_state_migrate": {
+    "reachable": false,
+    "reason": "ActionAdapter emits keep or prepare, never migrate"
+  },
+  "future_adapter_direct_prepare": {
+    "reachable": false,
+    "reason": "all cache actions bind adapter_id to the current workflow node"
+  },
+  "mask_info": {
+    "invalid_reasons": {},
+    "mask": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "semantic_preconditions": {
+      "current_rsu_id": "rsu_a",
+      "distinct_handoff_target": true,
+      "distinct_predicted_next_rsu": true,
+      "handoff_target_adapter_ready": false,
+      "has_workflow_node": true,
+      "next_rsu_sequence_horizon": 1,
+      "predicted_handoff_target_rsu_id": "rsu_b",
+      "predicted_next_rsu_id": "rsu_b",
+      "primary_vehicle": {
+        "associated_rsu_id": "rsu_a",
+        "vehicle_id": "veh_1"
+      },
+      "primary_vehicle_id": "veh_1",
+      "required_adapter": "b0.a0",
+      "target_adapter_ready": false
+    },
+    "valid_action_count": 5
+  },
+  "reachable_cache_adapter_ids": [
+    "b0.a0"
+  ],
+  "reachable_migration_modes": [
+    "keep",
+    "prepare"
+  ],
+  "sample_state": {
+    "current_workflow_node": {
+      "node_id": "n0",
+      "required_adapter": "b0.a0",
+      "required_base_model": "b0"
+    },
+    "predictions": {
+      "next_rsu_sequence": {
+        "veh_1": [
+          "rsu_b"
+        ]
+      },
+      "predicted_first_handoff_rsu_by_vehicle": {
+        "veh_1": "rsu_b"
+      },
+      "predicted_next_rsu_by_vehicle": {
+        "veh_1": "rsu_b"
+      }
+    },
+    "primary_vehicle_id": "veh_1",
+    "rsus": [
+      {
+        "cached_adapter_ids": [],
+        "rsu_id": "rsu_a"
+      },
+      {
+        "cached_adapter_ids": [],
+        "rsu_id": "rsu_b"
+      }
+    ],
+    "vehicles": [
+      {
+        "associated_rsu_id": "rsu_a",
+        "vehicle_id": "veh_1"
+      }
+    ]
+  },
+  "schema": {
+    "actions": [
+      {
+        "action_id": 0,
+        "description": "Cache the required adapter at the currently associated RSU.",
+        "name": "current_rsu_cache_fill"
+      },
+      {
+        "action_id": 1,
+        "description": "Prefetch the required adapter at the predicted next RSU.",
+        "name": "predictive_next_rsu_prefetch"
+      },
+      {
+        "action_id": 2,
+        "description": "Run the current workflow node on the vehicle.",
+        "name": "vehicle_fallback"
+      },
+      {
+        "action_id": 3,
+        "description": "Offload to the currently associated RSU without cache mutation.",
+        "name": "current_rsu_steady_offload"
+      },
+      {
+        "action_id": 4,
+        "description": "Prepare adapter-state migration and prefetch the required adapter at the predicted handoff target.",
+        "name": "handoff_migration_prepare"
+      }
+    ],
+    "continuous_control_blocker": "GymVecEnv currently exposes a five-way semantic discrete action contract; there is no natural low-level continuous or parameterized-continuous control surface for TD3/SAC/MADDPG without changing the action problem definition.",
+    "discrete_action_count": 5,
+    "kind": "semantic_discrete",
+    "supports_continuous_control": false
+  }
+}

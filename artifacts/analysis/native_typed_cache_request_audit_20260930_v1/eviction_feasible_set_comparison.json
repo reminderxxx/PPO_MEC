@@ -1,0 +1,62 @@
+{
+  "comparison_id": "reference_vs_native_dependency_safe_lru_v1",
+  "design_issue": {
+    "audit_boundary": "Recorded only; production eviction/admission rules were not changed.",
+    "implemented_fix": false,
+    "scope": "Whether dependency-closure eviction or sequential eligibility recomputation belongs in the native typed-cache action space.",
+    "status": "OPEN_DESIGN_SEMANTICS_DIFFERENCE"
+  },
+  "native_feasible_set": {
+    "first_difference_actual_plan": {
+      "candidate_recency": [
+        {
+          "admitted_step": 0,
+          "initial_admission_order": null,
+          "last_event": "admission",
+          "last_used_step": 0,
+          "object_id": "adapter:b0.a0",
+          "rank": 0,
+          "selection_key": [
+            0,
+            "adapter:b0.a0"
+          ]
+        }
+      ],
+      "capacity_unit": "mb",
+      "cumulative_freed_capacity": 8.0,
+      "ordered_candidates": [
+        "adapter:b0.a0"
+      ],
+      "ordered_victim_ids": [
+        "adapter:b0.a0"
+      ],
+      "policy_name": "lru",
+      "policy_version": "1.0.0",
+      "required_free_capacity": 104.0,
+      "rsu_id": "rsu_a",
+      "selection_reason": "insufficient_evictable_capacity",
+      "sufficient": false,
+      "victim_sizes": [
+        8.0
+      ]
+    },
+    "first_difference_eligible_victims": [
+      "adapter:b0.a0"
+    ],
+    "initial_order": "-N..-1; runtime admission and hit use request_index/episode_step",
+    "lru_key": "(last_used_step, native_object_id)",
+    "observed_source": "VecWorkflowCoreEnv._typed_evictable_residents + LRUEvictionPolicy.plan_victims",
+    "semantics": "A base is excluded from the single static candidate set while any resident adapter depends on it. The planner selects one minimum LRU prefix from that set and does not recompute eligibility after selecting an adapter."
+  },
+  "reference_feasible_set": {
+    "base_touch": "The reference refreshes the base whenever any dependent adapter is requested.",
+    "first_difference_evictions": [
+      "b0.a0",
+      "b0"
+    ],
+    "lru_key": "(last_touch_clock, adapter_before_base_tie_class, object_id)",
+    "observed_source": "vec_mechanism_probe_v0_2/results/run_002/cache_event_ledger.jsonl",
+    "semantics": "A base candidate expands to the base plus all resident dependent adapters; an adapter and its now-unneeded base may both be removed within the request loop."
+  },
+  "same_lru_label_same_decision_space": false
+}

@@ -5,6 +5,85 @@
 
 ﻿# Progress
 
+## 2026-10-05：最小机制证据闭环完成
+
+- A：复用 576 行原生四配置账本；candidate 四臂均完成 72 请求。blocked+sharing-on 相比
+  interleaved+sharing-on 少 5,376 MiB base 传输；旧语义的低字节伴随 36/60 次拒绝，不计优势。
+- B：continuous/restart/recovery 的固定两节点输入与 token 输出严格一致；6/6 generate，恢复 target 只执行 n1。
+  单次同机 child wall 为 19.465/32.504/21.370 秒；任务正确性与真实网络仍 unavailable，action 4 未接线。
+- C：12 个冻结 design points 全部完成。完整枚举不提高 completion，只用 action 4 将一次服务失败换成 2,040 B
+  或 160 MiB 状态成本；sharing/capacity 在该矩阵未激活。当前不启动 RL。
+- 证据：`artifacts/analysis/mechanism_evidence_closure_20261005_v1/`、
+  `artifacts/analysis/two_node_workflow_reexecution_comparison_20261005_v1/`；完整结果与 claim 边界见
+  `mechanism_evidence_closure_results_20261005.md`。
+
+## 2026-10-03: 真实两节点 technical workflow 后缀恢复通过
+
+- 固定配置 SHA-256=`74b42838…208c`，从已 push 的 clean commit `01c9d97…` 执行 continuous/source/target 三个
+  独立进程；节点调用为 `1/1`、`1/0`、`0/1`，计划 4/4 generate，无科学重试。
+- source 退出后 target 校验 1,090-byte payload / 2,040-byte 状态包，只由保存的 `n0` 文本构造 `n1`；target
+  图片访问 0。continuous/恢复的 `n1` prompt、rendered prompt、input IDs/hash 与输出 token IDs 全部严格一致。
+- 6 项模型加载前负例/数据依赖检查通过；旧 supervisor `loaded_adapters` 汇总缺陷以既有回执和字段缺失/冲突负例回归，
+  不改写旧顶层 FAIL 或旧审计附件。
+- 仅证明本技术工作流的后缀恢复保真性；输出语义不佳且没有标签，任务正确性仍 `unavailable`。没有训练、formal/
+  holdout、production action 4 扩展、无线传输或算法比较。报告与证据见
+  `two_node_workflow_suffix_recovery_acceptance_20261003.md`、
+  `artifacts/analysis/two_node_workflow_suffix_recovery_20261003_v3/`。
+
+## 2026-09-30: 真实 adapter 与工作流恢复校准停止于预注册门禁
+
+- 固定上一轮最终提交 `e6fffb5` 建立隔离 checkout；主工作区七个用户修改的起止文件/hash 单独保护，未改 main、
+  历史 checkpoint、锁、失败记录或 consumed holdout。
+- 本地只有固定 SmolVLM base，没有真实 adapter。公开 ALPR/Helmet LoRA 均声明同一 base，固定 revision 的权重合计
+  164,065,376 bytes；因本轮无新增下载/依赖授权，下载、adapter 加载和调用均为 0，工程兼容性 unavailable。
+- 窄两节点 calibration 在一次预热中由 source 保存 3,085-byte 声明状态；新 target 进程在加载模型前因 base 输出
+  `lanestatus` 不等于冻结标准 `clear` 而 fail-closed。正式测量 0，不能称恢复成功或完整迁移状态成本。
+- action 4 只准备当前 adapter 并记录 handoff prepare，不执行状态序列化/导入；原两长尾实例各少 104 MiB 合成模型
+  字节且完成/失败相同的账本不变，真实净收益仍 `UNVERIFIED`，不具备小规模方法比较条件。报告与机器证据见
+  `adapter_state_recovery_calibration_20260930.md` 和
+  `artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/`。
+
+## 2026-09-30: 剩余工作流信息决策价值审计完成
+
+- 上一轮13个 plumbing setup error 定位为隔离 checkout 的 Alibaba/NGSIM Git LFS pointer；主工作区真实文件
+  size/SHA与pointer oid完全匹配，临时symlink绑定后 `test_typed_runtime_plumbing.py` 34/34通过并已恢复pointer。
+- 不重跑四配置矩阵，直接核算old/candidate各288行原生请求账本。candidate同为72成功时，blocked+sharing on
+  为3,264 MiB，其他三格8,640 MiB；旧语义低传输伴随36/60失败，不作节省解释。
+- 固定SmolVLM base在Apple M5/MPS上3次process-first load中位445.778 ms，最小推理3/3成功；显式732-byte应用
+  状态3/3保存恢复正确。真实兼容adapter、完整迁移状态和网络成本仍unavailable。
+- 动作审计确认future-adapter直接准备、explicit migrate、old-RSU执行后转发均不可达。预注册16 episodes中剩余信息
+  产生6次首动作变化；action4在两个长尾case同完成/失败下少104 MiB模型字节，但状态payload未记账。两步与full-tail
+  在4/4实例首动作相同，不支持算法修改。报告与机器证据见
+  `remaining_workflow_decision_value_audit_20260930.md` 和
+  `artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/`。
+
+## 2026-09-30: 原生 typed-cache 顺序依赖重算 LRU 候选与 `env.step()` 见证完成
+
+- 审计提交 `371159d` 的父提交确认为 audited native `73051ab`；从审计提交建立隔离
+  `codex/typed-cache-replacement`，实现提交 `602f5af` 已推送。主工作区七个用户修改的逐文件与整体diff hash起止一致。
+- 现有五动作没有逐对象删除动作，旧静态 dependency-safe set 不能合法跨底座替换。新增显式
+  `sequential_dependency_recompute_lru_v1` / transaction v1.1候选；旧v1.0配置结构及冻结runtime hash不变。
+- 136 MiB、空cache的 `b0.a0→b1.a0` 可按原生LRU影子规划 adapter→base 并原子准入；pinned adapter/base、
+  non-evictable、超容量及保留adapter依赖均无修改拒绝，多adapter解除正例通过。
+- 四配置old各72请求与已交付审计完全匹配；candidate四配置均72/72服务成功并保留逐请求日志。低传输拒绝不作收益解释。
+- 同一 synthetic diagnostic 真实 reset + action0 + `env.step()`：old在step2拒绝且达到固定cap未完成；candidate在
+  step2完成替换、节点与workflow。无cloud fallback、训练、formal/holdout或算法优势结论。报告与机器证据见
+  `native_typed_cache_replacement_witness_20260930.md`、`artifacts/analysis/native_typed_cache_replacement_20260930_v1/`。
+
+## 2026-09-30: 原生 typed-cache 逐请求一致性与决策空间审计完成
+
+- 在固定 commit `73051ab264aa868e83f2e011b5ced26968eef74b` 的隔离 clean checkout 中，核验原包
+  `vec_mechanism_probe_v0_2.zip` SHA-256=`c0b3325874e7427629af8ed36720ed75db5b292c9658d7f3defd39a9deb44bbe`、
+  ZIP CRC 与 38 个 manifest member hash；partial audit ZIP 未作为启动依赖。
+- 通过原生 `VecWorkflowCoreEnv._apply_typed_cache_action`、LRU、readiness 与 CacheEvent producer 完成固定
+  blocked/interleaved × sharing on/off、136 MiB、空 cache 共 288 请求；未训练、未改 eviction、未扩大矩阵。
+- 首个实测差异位于 sharing-on/interleaved 请求1 `b1.a0`：reference closure eviction 可驱逐
+  `[b0.a0,b0]`，原生静态 dependency-safe feasible set 只有8 MiB adapter，无法释放所需104 MiB，事务原子拒绝。
+  拒绝前后 resident/policy 相同，容量、依赖、字节守恒全通过。
+- 原生 sharing-on 两种次序均为36成功/36失败、120 MiB传输；sharing-off均为12成功/60失败、104 MiB传输。
+  低传输来自准入拒绝，不是cache收益。报告见 `native_typed_cache_request_audit_20260930.md`，机器证据见
+  `artifacts/analysis/native_typed_cache_request_audit_20260930_v1/`。
+
 ## 2026-09-29: 首个驾驶工作流引用包生成
 
 - 公开来源复核后继续复用DriveLM，不宣称没有现成驾驶数据；新增DriveVLM/DriveBench等来源索引。

@@ -9,6 +9,25 @@
 
 ## Live 文档
 
+- `mechanism_evidence_closure_results_20261005.md`：共享缓存公平成本、两节点重跑/恢复和 12 场景决策空间结果；
+  明确 Pareto 边界、ALPR 负结果和不启动 RL 的结论
+- `mechanism_evidence_closure_plan_20261005.md`：本轮命令、调用、墙钟、12 格与状态成本的事前冻结方案
+
+- `two_node_workflow_suffix_recovery_acceptance_20261003.md`：固定 4-generate 三进程见证、状态/输入/token 对照、
+  负例、单次成本分层与严格 claim boundary；任务正确性 unavailable
+
+- `two_node_workflow_suffix_recovery_plan_20261003.md`：真实两节点 technical workflow 的前缀保存、独立进程
+  后缀恢复、负例、目标端读取边界和 4-generate 一次性验收方案；不代表任务正确性或 production action 4
+
+- `adapter_state_recovery_calibration_20260930.md`：同 base 两个公开 adapter 的固定资源清单与授权门槛、
+  独立进程状态恢复失败见证、action 4 语义及原生/敏感性分层；adapter 兼容性和真实净收益均未验证
+
+- `remaining_workflow_decision_value_audit_20260930.md`：原生四配置账本、本机base/应用状态最小实测、动作可达性与
+  16-episode有界配对见证；真实adapter/完整状态/网络成本仍缺，不支持算法晋级
+
+- `native_typed_cache_request_audit_20260930.md`：固定四配置、288请求的原生 typed-cache 逐请求对账、首个
+  dependency-safe feasible-set 差异、LRU 决策空间与 claim boundary；不是机制修复或训练结果
+
 - `driving_workflow_minipackage_20260929.md`：公开来源检索、单场景引用包及成功后扩展条件；不是已运行数据集
 
 - `driving_pilot_resource_setup_20260929.md`：已授权模型下载与隔离安装交接，图像条款待确认；非完成回执
@@ -124,6 +143,7 @@
 - 验证报告：`typed_model_cache_validation_report.md`
 - 机器证据：`../../artifacts/analysis/typed_model_cache_validation_20260819_g13_v1/`
 - 默认继续使用 legacy adapter-only profile；typed profile 必须显式启用。
+- 顺序重算LRU候选：`native_typed_cache_replacement_witness_20260930.md`；仅显式non-formal candidate，旧v1.0默认不变。
 
 ## G14A typed MB runtime plumbing
 

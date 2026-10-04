@@ -1,5 +1,27 @@
 ﻿# Directory Structure
 
+## 2026-10-05 最小机制证据闭环
+
+- `configs/experiment/mechanism_evidence_closure_v1.json`：A/C 冻结矩阵、成本模型、预算和命令。
+- `configs/acceptance/two_node_workflow_reexecution_comparison_v1.json`：B 的模型、输入、三臂、保真判据和预算。
+- `scripts/run_mechanism_evidence_closure.py`：消费既有四配置账本并执行 12 个 bounded native design points。
+- `scripts/run_two_node_workflow_reexecution_comparison.py`：复用两节点执行器，比较 continuous/restart/recovery。
+- `artifacts/analysis/mechanism_evidence_closure_20261005_v1/`：A/C 原始 JSON、CSV、回执和完整性清单。
+- `artifacts/analysis/two_node_workflow_reexecution_comparison_20261005_v1/`：B 四进程 receipt、状态包和终态回执。
+
+2026-09-30 adapter/state calibration：`scripts/calibrate_workflow_state_recovery.py` 只实现明确的两节点 base-only
+calibration 状态边界，`scripts/synthesize_adapter_state_recovery_calibration.py` 只读复算上一轮冻结长尾账本与有限
+敏感性区间，专项测试为 `tests/test_workflow_state_recovery_calibration.py`。报告位于
+`docs/project/adapter_state_recovery_calibration_20260930.md`，机器证据位于
+`artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/`；不修改 production action codec 或冻结实验。
+
+2026-09-30 typed-cache 顺序依赖重算候选：显式配置位于
+`configs/benchmark/typed_model_cache_controlled_lru_sequential_recompute.yaml`，验收入口为
+`scripts/validate_typed_cache_sequential_replacement.py`，专项测试为
+`tests/test_typed_cache_sequential_recompute.py`。审查报告位于
+`docs/project/native_typed_cache_replacement_witness_20260930.md`，机器证据位于
+`artifacts/analysis/native_typed_cache_replacement_20260930_v1/`；该候选不替换默认静态语义或历史正式产物。
+
 单场景引用包入口`scripts/build_driving_workflow_package.py`，产物根`artifacts/datasets/`；不含原图/QA。
 小实验计划见`scripts/prepare_drivelm_pilot.py`、`tests/test_drivelm_pilot_plan.py`，
 模型下载入口为`scripts/download_driving_pilot_model.py`，本地payload位于被忽略的`data/raw/ai_workflow_pilot/`；
@@ -303,3 +325,13 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 ## 2026-09-08 G14R20-A
 
 `src/runtime/fixed_commit_continuation.py`、`scripts/preflight_fixed_commit_continuation.py` 与 `scripts/probe_fixed_commit_continuation.py` 为独立只读合同/入口；schema 位于 `configs/experiment/fixed_commit_continuation_v1/`，新增验收位于 `artifacts/analysis/g14r20_a_continuation_20260908/`。 详见 `fixed_commit_continuation_contract.md`。
+
+## 2026-10-03 technical workflow suffix recovery
+
+- `configs/acceptance/two_node_workflow_suffix_recovery_v1.json`：一次性两节点恢复验收的冻结机器方案。
+- `src/runtime/workflow_suffix_recovery.py`：与模型加载解耦的状态封装、校验和后缀输入合同。
+- `scripts/run_two_node_workflow_suffix_recovery.py`：三进程科学执行与 supervisor 入口。
+- `artifacts/analysis/two_node_workflow_suffix_recovery_20261003_v3/`：一次科学执行的机器证据；v1/v2 均在
+  run-root 创建和模型加载前失败并记录于 companion review，旧 adapter 验收目录和原始 FAIL 回执不覆盖、不改写。
+- `artifacts/analysis/two_node_workflow_suffix_recovery_20261003_review_v1/`：pre-execution 失败、main 七文件保护、
+  旧证据 hash 和独立完整性复算。

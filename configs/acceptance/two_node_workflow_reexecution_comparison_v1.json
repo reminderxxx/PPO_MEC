@@ -1,0 +1,81 @@
+{
+  "schema_version": "ppo_mec.two_node_workflow_reexecution_plan.v1",
+  "plan_id": "two_node_workflow_reexecution_comparison_20261005_v1",
+  "classification": "technical workflow calibration",
+  "workflow": {
+    "workflow_id": "technical_vision_description_suffix_v1",
+    "nodes": ["n0", "n1"],
+    "edges": [["n0", "n1"]],
+    "n0_prompt": "Describe the main subject of this local image in one short phrase.",
+    "n1_prompt_template": "Upstream visual description: {n0_output}\nSummarize only that description in one short phrase."
+  },
+  "identity": {
+    "base": {
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/model_a7da5b9_20260929",
+      "revision": "a7da5b986cb59b408707209984f360a5f4ad7e47",
+      "weight_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2"
+    },
+    "adapter": {
+      "name": "adapter_a",
+      "source_id": "Hirai-Labs/FT-SmolVLM-500M-Instruct-ALPR",
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/adapter_downloads_20260930/alpr_edccd0e",
+      "revision": "edccd0e",
+      "weight_sha256": "95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83"
+    },
+    "processor": {
+      "config_sha256": "e7bff42da73ae9eec9042ef20e066e11f1ee20f025358ff79131e3c0fb549b46",
+      "preprocessor_sha256": "6cb6e36d6fcb88ca1502c4a26750715dc3e7dedddc9a8f17b27d8d167d1457e7",
+      "tokenizer_sha256": "5ece781dc8d2b2f3e2f289ca0ae50b17cfc27dd27bfe7971bb8241e0b964331a",
+      "chat_template_sha256": "a68ad1a42681ae44eacd109ff8dd56a840f761c03d72f4ff4c515d092f882168"
+    }
+  },
+  "source_input_provenance": {
+    "path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/LuSTScenario/LuSTScenario-master/docs/img/TrafficDemands.png",
+    "sha256": "83af09665cd23c87a1d831e6cb47a88bc8d509849712c551b0a9a7965e95c307",
+    "bytes": 192757,
+    "target_reexecution_requires_input": true,
+    "recovery_target_access_allowed": false,
+    "task_label_available": false
+  },
+  "generation": {
+    "n0": {"do_sample": false, "num_beams": 1, "max_new_tokens": 8, "use_cache": true},
+    "n1": {"do_sample": false, "num_beams": 1, "max_new_tokens": 8, "use_cache": true}
+  },
+  "runtime": {
+    "device": "cpu",
+    "dtype": "float32",
+    "batch_size": 1,
+    "local_files_only": true,
+    "trust_remote_code": false,
+    "torch_threads": 1
+  },
+  "criteria": {
+    "all_n0_outputs_equal": "exact decoded text and token IDs",
+    "all_n1_inputs_equal": "exact prompt, rendered prompt, input IDs, and canonical content SHA-256",
+    "all_n1_outputs_equal": "exact token IDs",
+    "completion_count_equal": true,
+    "task_correctness": "unavailable"
+  },
+  "budget": {
+    "planned_generate_calls": 6,
+    "hard_generate_ceiling": 8,
+    "process_timeout_seconds": 300,
+    "scientific_total_timeout_seconds": 1200,
+    "automatic_retry": false
+  },
+  "network_sensitivity": {
+    "link_mbps": [10.0, 100.0, 1000.0],
+    "fixed_one_way_seconds": [0.0, 0.01, 0.05],
+    "classification": "formula_only_not_measured"
+  },
+  "target_modes": {
+    "prestaged_model": "measured local execution path; base, processor, and adapter already present",
+    "missing_model": "byte inventory and formula only; no real transfer measurement"
+  },
+  "target_read_allowlist": {
+    "static_directories": ["base", "adapter"],
+    "dynamic_files": ["state.json", "manifest.json"],
+    "control_files": ["frozen plan", "versioned executor"],
+    "explicitly_denied": ["source image", "source process memory", "undeclared temporary files"]
+  }
+}

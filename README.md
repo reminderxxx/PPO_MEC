@@ -5,6 +5,24 @@
 
 # PPO_MEC
 
+最小机制证据闭环（共享缓存四配置、连续/重跑/后缀恢复、12 个有界决策场景）见
+[results](docs/project/mechanism_evidence_closure_results_20261005.md)；结论是 bounded diagnostic，非 formal、holdout、
+算法优势或 paper-ready 证据。
+
+真实两节点 technical workflow 的前缀保存与独立进程后缀恢复已在固定 commit、4 次 generate 下通过：target
+只执行 `n1`，其输入实际包含 source 保存的 `n0` 文本，并与 continuous 路径逐 input/token 对齐。任务正确性仍为
+`unavailable`，不代表 production action 4、跨 RSU/无线迁移或算法收益。见
+[`docs/project/two_node_workflow_suffix_recovery_acceptance_20261003.md`](docs/project/two_node_workflow_suffix_recovery_acceptance_20261003.md)。
+
+真实 adapter / 状态恢复校准见
+[`docs/project/adapter_state_recovery_calibration_20260930.md`](docs/project/adapter_state_recovery_calibration_20260930.md)：
+本地没有真实 adapter，新增 156.465 MiB 权重未获授权；固定两节点状态链在预热正确性门禁失败，正式测量为 0。
+原生 action 4 的 104 MiB 合成字节见证保留，但完整真实负载净收益仍为 `UNVERIFIED`。
+
+原生 typed-cache 的显式顺序依赖重算 LRU 候选、固定四配置回归与两节点 `env.step()` 见证见
+[`docs/project/native_typed_cache_replacement_witness_20260930.md`](docs/project/native_typed_cache_replacement_witness_20260930.md)。
+该候选为 non-formal diagnostic；旧 transaction v1.0 默认、正式 Protocol、训练与论文结论不变。
+
 首个驾驶工作流引用包：`scripts/build_driving_workflow_package.py`；
 [检索、数据卡与八调用边界](docs/project/driving_workflow_minipackage_20260929.md)。已生成引用包，尚无真实推理结果。
 

@@ -1,0 +1,11 @@
+{
+  "source_receipt": "acceptance_run_20261003_v1/terminal_receipt.json",
+  "source_receipt_sha256": "c47254015ee10213bf95f85c6794707cef58c83829c8d23424e4ceb594242ffa",
+  "expected": ["adapter_a", "adapter_b"],
+  "loaded_status": {
+    "active_adapters": ["adapter_a"],
+    "available_adapters": ["adapter_a", "adapter_b"],
+    "merged_adapters": [],
+    "enabled": true
+  }
+}

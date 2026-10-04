@@ -17,7 +17,13 @@ from src.data.model_catalog.adapter_catalog import (
     TYPED_MODEL_CACHE_PROFILE_ID,
 )
 from src.data.workflow.toy_workflow_generator import ToyWorkflowGenerator
-from src.envs.core.cache_eviction import EvictionPlan, build_eviction_policy
+from src.envs.core.cache_eviction import (
+    EvictionPlan,
+    TYPED_EVICTION_SEMANTICS,
+    TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU,
+    TYPED_EVICTION_SEMANTICS_STATIC,
+    build_eviction_policy,
+)
 from src.envs.core.predictor_manager import PredictorManager
 from src.envs.specs import (
     CACHE_EVENT_SCHEMA_VERSION,
@@ -935,6 +941,7 @@ class VecWorkflowCoreEnv:
             "eviction_policy": "lru",
             "eviction_policy_seed": None,
             "eviction_policy_config": {},
+            "typed_eviction_semantics": TYPED_EVICTION_SEMANTICS_STATIC,
             "telemetry_enabled": True,
         }
         if profile:
@@ -971,12 +978,30 @@ class VecWorkflowCoreEnv:
         if not isinstance(merged.get("eviction_policy_config"), dict):
             raise ValueError("eviction_policy_config must be a mapping")
         merged["eviction_policy_config"] = dict(merged["eviction_policy_config"])
+        merged["typed_eviction_semantics"] = str(
+            merged.get("typed_eviction_semantics") or TYPED_EVICTION_SEMANTICS_STATIC
+        ).strip()
+        if merged["typed_eviction_semantics"] not in TYPED_EVICTION_SEMANTICS:
+            raise ValueError(
+                "unsupported typed_eviction_semantics: "
+                f"{merged['typed_eviction_semantics']!r}"
+            )
         merged["telemetry_enabled"] = bool(merged.get("telemetry_enabled", True))
         if merged["model_cache_profile_id"] == TYPED_MODEL_CACHE_PROFILE_ID:
             if not merged["enabled"] or merged["unit"] != "mb":
                 raise ValueError("typed model cache requires enabled MB capacity")
             if merged.get("count_base_model_separately") is False:
                 merged["count_base_model_separately"] = True
+            if (
+                merged["typed_eviction_semantics"]
+                == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU
+                and merged["eviction_policy"] != "lru"
+            ):
+                raise ValueError(
+                    "sequential_dependency_recompute_lru_v1 requires eviction_policy=lru"
+                )
+        elif merged["typed_eviction_semantics"] != TYPED_EVICTION_SEMANTICS_STATIC:
+            raise ValueError("typed eviction semantics require the typed model-cache profile")
         return merged
 
     def _typed_mode_enabled(self) -> bool:
@@ -1360,11 +1385,24 @@ class VecWorkflowCoreEnv:
             **self._cache_capacity_snapshot(execution_target_rsu_id),
         }
 
-    def _typed_evictable_residents(self, rsu_id: str) -> list[str]:
-        residents = list(self._typed_resident_object_ids.get(rsu_id, []))
+    def _typed_evictable_residents(
+        self,
+        rsu_id: str,
+        *,
+        resident_ids: list[str] | None = None,
+        protected_object_ids: set[str] | None = None,
+    ) -> list[str]:
+        residents = list(
+            self._typed_resident_object_ids.get(rsu_id, [])
+            if resident_ids is None
+            else resident_ids
+        )
         resident_set = set(residents)
+        protected = set(protected_object_ids or set())
         result = []
         for object_id in residents:
+            if object_id in protected:
+                continue
             item = self.adapter_catalog.get_typed_object(object_id)
             if item.evictability != "evictable":
                 continue
@@ -1376,6 +1414,116 @@ class VecWorkflowCoreEnv:
                 continue
             result.append(object_id)
         return result
+
+    def _plan_sequential_typed_lru_evictions(
+        self,
+        *,
+        rsu: RSUState,
+        residents: list[str],
+        required_free_capacity: float,
+        protected_object_ids: set[str],
+    ) -> tuple[EvictionPlan, dict[str, Any]]:
+        if self._eviction_policy.policy_name != "lru":
+            raise RuntimeError(
+                "sequential_dependency_recompute_lru_v1 is only defined for native LRU"
+            )
+        policy_before = self._eviction_policy.export_state()
+        shadow_residents = list(residents)
+        resident_sizes = self._resident_sizes_for_policy(rsu)
+        selected: list[str] = []
+        selected_sizes: list[float] = []
+        rounds: list[dict[str, Any]] = []
+        freed = 0.0
+        while freed + CACHE_CAPACITY_EPSILON < required_free_capacity:
+            eligible = self._typed_evictable_residents(
+                rsu.rsu_id,
+                resident_ids=shadow_residents,
+                protected_object_ids=protected_object_ids,
+            )
+            remaining = max(required_free_capacity - freed, 0.0)
+            if not eligible:
+                rounds.append(
+                    {
+                        "round_index": len(rounds),
+                        "shadow_resident_ids_before": list(shadow_residents),
+                        "eligible_object_ids": [],
+                        "required_free_remaining_mb": remaining,
+                        "native_lru_plan": None,
+                        "selected_victim_id": None,
+                        "stop_reason": "no_dependency_safe_evictable_candidate",
+                    }
+                )
+                break
+            native_plan = self._eviction_policy.plan_victims(
+                rsu_id=rsu.rsu_id,
+                resident_ids=eligible,
+                resident_sizes=resident_sizes,
+                required_free_capacity=remaining,
+                protected_object_id=None,
+                capacity_unit="mb",
+                current_step=self._episode_steps,
+            )
+            if not native_plan.ordered_victim_ids:
+                raise RuntimeError("native LRU returned no victim for a non-empty candidate set")
+            victim_id = native_plan.ordered_victim_ids[0]
+            victim_size = float(resident_sizes[victim_id])
+            rounds.append(
+                {
+                    "round_index": len(rounds),
+                    "shadow_resident_ids_before": list(shadow_residents),
+                    "eligible_object_ids": list(eligible),
+                    "required_free_remaining_mb": remaining,
+                    "native_lru_plan": native_plan.to_dict(),
+                    "selected_victim_id": victim_id,
+                    "selected_victim_size_mb": victim_size,
+                    "stop_reason": "selected_then_recompute_dependencies",
+                }
+            )
+            selected.append(victim_id)
+            selected_sizes.append(victim_size)
+            shadow_residents.remove(victim_id)
+            freed += victim_size
+        sufficient = freed + CACHE_CAPACITY_EPSILON >= required_free_capacity
+        combined_plan = EvictionPlan(
+            rsu_id=rsu.rsu_id,
+            ordered_victim_ids=selected,
+            victim_sizes=selected_sizes,
+            cumulative_freed_capacity=freed,
+            required_free_capacity=required_free_capacity,
+            capacity_unit="mb",
+            policy_name=self._eviction_policy.policy_name,
+            policy_version=self._eviction_policy.policy_version,
+            ordered_candidates=list(selected),
+            candidate_recency=[
+                {
+                    "round_index": row["round_index"],
+                    "object_id": row["selected_victim_id"],
+                    "eligible_object_ids": row["eligible_object_ids"],
+                }
+                for row in rounds
+                if row["selected_victim_id"] is not None
+            ],
+            sufficient=sufficient,
+            selection_reason=(
+                "sequential_dependency_recompute_lru_sufficient"
+                if sufficient
+                else "insufficient_sequential_dependency_safe_evictable_capacity"
+            ),
+        )
+        if self._eviction_policy.export_state() != policy_before:
+            raise RuntimeError("shadow eviction planning mutated native LRU policy state")
+        trace = {
+            "semantics": TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU,
+            "shadow_only": True,
+            "protected_object_ids": sorted(protected_object_ids),
+            "required_free_mb": required_free_capacity,
+            "rounds": rounds,
+            "ordered_victim_ids": list(selected),
+            "actual_freed_mb": freed,
+            "sufficient": sufficient,
+            "real_state_mutated_during_planning": False,
+        }
+        return combined_plan, trace
 
     @staticmethod
     def _typed_rows_by_type(rows: list[dict[str, Any]]) -> dict[str, float]:
@@ -1413,6 +1561,16 @@ class VecWorkflowCoreEnv:
         if control.cache_action.get("operation", "cache") == "noop":
             return self._default_cache_result()
         strategy = str(control.cache_action.get("strategy", "manual_cache"))
+        eviction_semantics = str(
+            self._cache_capacity_profile.get(
+                "typed_eviction_semantics", TYPED_EVICTION_SEMANTICS_STATIC
+            )
+        )
+        transaction_contract_version = (
+            "typed_cache_transaction_contract_v1.1.0"
+            if eviction_semantics == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU
+            else "typed_cache_transaction_contract_v1.0.0"
+        )
         prediction_driven = bool(control.cache_action.get("prediction_driven", False))
         decision_target_rsu_id = control.cache_action.get("rsu_id")
         current_rsu_id = primary_vehicle.associated_rsu_id if primary_vehicle else None
@@ -1430,6 +1588,8 @@ class VecWorkflowCoreEnv:
             "strategy": strategy,
             "prediction_driven": prediction_driven,
             "cache_target_corrected_by_handoff": corrected,
+            "typed_eviction_semantics": eviction_semantics,
+            "typed_cache_transaction_contract_version": transaction_contract_version,
         }
         rsu = self._get_rsu_map().get(target_rsu_id) if target_rsu_id else None
         if rsu is None:
@@ -1446,17 +1606,29 @@ class VecWorkflowCoreEnv:
         capacity_before = self._cache_capacity_snapshot(rsu.rsu_id)
         adapter = self.adapter_catalog.get_typed_adapter(required_adapter)
         adapter_was_resident = adapter.object_id in residents
-        for object_id in placement.already_resident_object_ids:
-            self._eviction_policy.on_hit(
-                rsu_id=rsu.rsu_id, object_id=object_id, current_step=self._episode_steps
-            )
+        defer_hit_updates = (
+            eviction_semantics == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU
+        )
+        if not defer_hit_updates:
+            for object_id in placement.already_resident_object_ids:
+                self._eviction_policy.on_hit(
+                    rsu_id=rsu.rsu_id, object_id=object_id, current_step=self._episode_steps
+                )
         if not placement.missing_object_ids:
+            if defer_hit_updates:
+                for object_id in placement.already_resident_object_ids:
+                    self._eviction_policy.on_hit(
+                        rsu_id=rsu.rsu_id,
+                        object_id=object_id,
+                        current_step=self._episode_steps,
+                    )
             return {
                 **base_result,
                 "was_cached_before": True,
                 "dependency_bundle": placement.to_dict(),
                 "requested_typed_objects": requested_rows,
                 "atomic_transaction_status": "noop_all_resident",
+                "eviction_planning_trace": None,
                 "orphan_count": 0,
                 "capacity_before": capacity_before,
                 **self._cache_capacity_snapshot(rsu.rsu_id),
@@ -1471,18 +1643,29 @@ class VecWorkflowCoreEnv:
         used = float(self._cache_used_value(rsu))
         required_free = max(used + requested_mb - capacity, 0.0)
         eviction_plan: EvictionPlan | None = None
+        eviction_planning_trace: dict[str, Any] | None = None
         victim_ids: list[str] = []
         if rejection_reason is None and required_free > CACHE_CAPACITY_EPSILON:
-            eligible = self._typed_evictable_residents(rsu.rsu_id)
-            eviction_plan = self._eviction_policy.plan_victims(
-                rsu_id=rsu.rsu_id,
-                resident_ids=eligible,
-                resident_sizes=self._resident_sizes_for_policy(rsu),
-                required_free_capacity=required_free,
-                protected_object_id=None,
-                capacity_unit="mb",
-                current_step=self._episode_steps,
-            )
+            if eviction_semantics == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU:
+                eviction_plan, eviction_planning_trace = (
+                    self._plan_sequential_typed_lru_evictions(
+                        rsu=rsu,
+                        residents=residents,
+                        required_free_capacity=required_free,
+                        protected_object_ids=set(placement.ordered_object_ids),
+                    )
+                )
+            else:
+                eligible = self._typed_evictable_residents(rsu.rsu_id)
+                eviction_plan = self._eviction_policy.plan_victims(
+                    rsu_id=rsu.rsu_id,
+                    resident_ids=eligible,
+                    resident_sizes=self._resident_sizes_for_policy(rsu),
+                    required_free_capacity=required_free,
+                    protected_object_id=None,
+                    capacity_unit="mb",
+                    current_step=self._episode_steps,
+                )
             self._validate_eviction_plan(
                 plan=eviction_plan,
                 rsu=rsu,
@@ -1491,7 +1674,12 @@ class VecWorkflowCoreEnv:
             )
             self._last_eviction_plan = eviction_plan.to_dict()
             if not eviction_plan.sufficient:
-                rejection_reason = "insufficient_dependency_safe_evictable_capacity"
+                rejection_reason = (
+                    "insufficient_sequential_dependency_safe_evictable_capacity"
+                    if eviction_semantics
+                    == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU
+                    else "insufficient_dependency_safe_evictable_capacity"
+                )
             else:
                 victim_ids = list(eviction_plan.ordered_victim_ids)
         if rejection_reason is not None:
@@ -1505,6 +1693,7 @@ class VecWorkflowCoreEnv:
                 "atomic_transaction_status": "rolled_back_no_mutation",
                 "orphan_count": 0,
                 "eviction_plan": eviction_plan.to_dict() if eviction_plan else None,
+                "eviction_planning_trace": eviction_planning_trace,
                 "capacity_before": capacity_before,
                 **self._cache_capacity_snapshot(rsu.rsu_id),
             }
@@ -1513,6 +1702,13 @@ class VecWorkflowCoreEnv:
         next_residents = [item for item in residents if item not in set(victim_ids)]
         next_residents.extend(placement.missing_object_ids)
         # All checks precede this commit point; callbacks and resident mutation now form one transaction.
+        if defer_hit_updates:
+            for object_id in placement.already_resident_object_ids:
+                self._eviction_policy.on_hit(
+                    rsu_id=rsu.rsu_id,
+                    object_id=object_id,
+                    current_step=self._episode_steps,
+                )
         for victim_id in victim_ids:
             self._eviction_policy.on_eviction(
                 rsu_id=rsu.rsu_id, object_id=victim_id, current_step=self._episode_steps
@@ -1554,6 +1750,7 @@ class VecWorkflowCoreEnv:
             "atomic_transaction_status": "committed",
             "orphan_count": 0,
             "eviction_plan": eviction_plan.to_dict() if eviction_plan else None,
+            "eviction_planning_trace": eviction_planning_trace,
             "capacity_before": capacity_before,
             **self._cache_capacity_snapshot(rsu.rsu_id),
         }
@@ -2467,6 +2664,31 @@ class VecWorkflowCoreEnv:
                 cache_result.get("atomic_transaction_status") if typed_mode else None
             ),
             orphan_count=(int(cache_result.get("orphan_count", 0)) if typed_mode else None),
+            typed_cache_transaction_contract_version=(
+                str(
+                    cache_result.get("typed_cache_transaction_contract_version")
+                    or (
+                        "typed_cache_transaction_contract_v1.1.0"
+                        if self._cache_capacity_profile.get("typed_eviction_semantics")
+                        == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU
+                        else "typed_cache_transaction_contract_v1.0.0"
+                    )
+                )
+                if typed_mode
+                else None
+            ),
+            typed_eviction_semantics=(
+                str(
+                    cache_result.get("typed_eviction_semantics")
+                    or self._cache_capacity_profile.get("typed_eviction_semantics")
+                    or TYPED_EVICTION_SEMANTICS_STATIC
+                )
+                if typed_mode
+                else None
+            ),
+            eviction_planning_trace=(
+                cache_result.get("eviction_planning_trace") if typed_mode else None
+            ),
         )
 
     def _estimate_backhaul_traffic_cost(

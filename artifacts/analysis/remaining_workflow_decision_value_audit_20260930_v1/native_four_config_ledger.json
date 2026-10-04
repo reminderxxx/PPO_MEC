@@ -1,0 +1,501 @@
+{
+  "artifact_run_id": "remaining_workflow_decision_value_audit_20260930_v1",
+  "evidence_type": "native_simulation_ledger",
+  "input_files": {
+    "candidate": {
+      "path": "artifacts/analysis/native_typed_cache_replacement_20260930_v1/four_config_candidate_request_log.jsonl",
+      "row_count": 288,
+      "sha256": "0dcfd91231d14a0bd34d66db0edf6d2bfaf3ac95bf63cf37c72d4b7e36f9b230"
+    },
+    "old": {
+      "path": "artifacts/analysis/native_typed_cache_replacement_20260930_v1/four_config_old_request_log.jsonl",
+      "row_count": 288,
+      "sha256": "afbec9f57909bc2cafb72e8bc2210010174eae9c4f387ebee2f4da391b56fe2d"
+    }
+  },
+  "ledgers": [
+    {
+      "actual_load_bytes_by_type": {
+        "adapter": 603979776,
+        "base_model": 8455716864
+      },
+      "actual_load_count_by_type": {
+        "adapter": 72,
+        "base_model": 72
+      },
+      "actual_transfer_bytes_by_type": {
+        "adapter": 603979776,
+        "base_model": 8455716864
+      },
+      "actual_transfer_bytes_total": 9059696640,
+      "base_initial_load_request_count": 72,
+      "base_reuse_request_count": 0,
+      "completed_request_count": 72,
+      "config_id": "blocked__sharing_off",
+      "evicted_bytes_by_type": {
+        "adapter": 595591168,
+        "base_model": 8321499136
+      },
+      "evicted_bytes_total": 8917090304,
+      "evicted_object_count_by_type": {
+        "adapter": 71,
+        "base_model": 71
+      },
+      "execution_cost": null,
+      "hardware_measurement": false,
+      "ledger_source": "native CacheEvent/transaction fields under explicit MiB mapping",
+      "repeated_load_bytes_by_type": {
+        "adapter": 553648128,
+        "base_model": 7751073792
+      },
+      "repeated_load_bytes_total": 8304721920,
+      "repeated_load_count_by_type": {
+        "adapter": 66,
+        "base_model": 66
+      },
+      "request_count": 72,
+      "semantics_label": "candidate",
+      "service_failure_count": 0,
+      "service_success_count": 72,
+      "state_migration_applicability": "not_applicable_no_handoff_or_state_request_in_four_config_replay",
+      "state_migration_cost": null,
+      "timing_availability": "unavailable_no_wait_execution_or_transfer_time_fields",
+      "transaction_status_counts": {
+        "committed": 72
+      },
+      "transfer_bytes_per_completed_request": 125829120.0,
+      "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+      "waiting_cost": null,
+      "workflow_completion_availability": "unavailable_request_replay_has_no_workflow_progression",
+      "workflow_completion_count": null
+    },
+    {
+      "actual_load_bytes_by_type": {
+        "adapter": 603979776,
+        "base_model": 2818572288
+      },
+      "actual_load_count_by_type": {
+        "adapter": 72,
+        "base_model": 24
+      },
+      "actual_transfer_bytes_by_type": {
+        "adapter": 603979776,
+        "base_model": 2818572288
+      },
+      "actual_transfer_bytes_total": 3422552064,
+      "base_initial_load_request_count": 24,
+      "base_reuse_request_count": 48,
+      "completed_request_count": 72,
+      "config_id": "blocked__sharing_on",
+      "evicted_bytes_by_type": {
+        "adapter": 595591168,
+        "base_model": 2684354560
+      },
+      "evicted_bytes_total": 3279945728,
+      "evicted_object_count_by_type": {
+        "adapter": 71,
+        "base_model": 23
+      },
+      "execution_cost": null,
+      "hardware_measurement": false,
+      "ledger_source": "native CacheEvent/transaction fields under explicit MiB mapping",
+      "repeated_load_bytes_by_type": {
+        "adapter": 553648128,
+        "base_model": 2583691264
+      },
+      "repeated_load_bytes_total": 3137339392,
+      "repeated_load_count_by_type": {
+        "adapter": 66,
+        "base_model": 22
+      },
+      "request_count": 72,
+      "semantics_label": "candidate",
+      "service_failure_count": 0,
+      "service_success_count": 72,
+      "state_migration_applicability": "not_applicable_no_handoff_or_state_request_in_four_config_replay",
+      "state_migration_cost": null,
+      "timing_availability": "unavailable_no_wait_execution_or_transfer_time_fields",
+      "transaction_status_counts": {
+        "committed": 72
+      },
+      "transfer_bytes_per_completed_request": 47535445.333333336,
+      "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+      "waiting_cost": null,
+      "workflow_completion_availability": "unavailable_request_replay_has_no_workflow_progression",
+      "workflow_completion_count": null
+    },
+    {
+      "actual_load_bytes_by_type": {
+        "adapter": 603979776,
+        "base_model": 8455716864
+      },
+      "actual_load_count_by_type": {
+        "adapter": 72,
+        "base_model": 72
+      },
+      "actual_transfer_bytes_by_type": {
+        "adapter": 603979776,
+        "base_model": 8455716864
+      },
+      "actual_transfer_bytes_total": 9059696640,
+      "base_initial_load_request_count": 72,
+      "base_reuse_request_count": 0,
+      "completed_request_count": 72,
+      "config_id": "interleaved__sharing_off",
+      "evicted_bytes_by_type": {
+        "adapter": 595591168,
+        "base_model": 8321499136
+      },
+      "evicted_bytes_total": 8917090304,
+      "evicted_object_count_by_type": {
+        "adapter": 71,
+        "base_model": 71
+      },
+      "execution_cost": null,
+      "hardware_measurement": false,
+      "ledger_source": "native CacheEvent/transaction fields under explicit MiB mapping",
+      "repeated_load_bytes_by_type": {
+        "adapter": 553648128,
+        "base_model": 7751073792
+      },
+      "repeated_load_bytes_total": 8304721920,
+      "repeated_load_count_by_type": {
+        "adapter": 66,
+        "base_model": 66
+      },
+      "request_count": 72,
+      "semantics_label": "candidate",
+      "service_failure_count": 0,
+      "service_success_count": 72,
+      "state_migration_applicability": "not_applicable_no_handoff_or_state_request_in_four_config_replay",
+      "state_migration_cost": null,
+      "timing_availability": "unavailable_no_wait_execution_or_transfer_time_fields",
+      "transaction_status_counts": {
+        "committed": 72
+      },
+      "transfer_bytes_per_completed_request": 125829120.0,
+      "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+      "waiting_cost": null,
+      "workflow_completion_availability": "unavailable_request_replay_has_no_workflow_progression",
+      "workflow_completion_count": null
+    },
+    {
+      "actual_load_bytes_by_type": {
+        "adapter": 603979776,
+        "base_model": 8455716864
+      },
+      "actual_load_count_by_type": {
+        "adapter": 72,
+        "base_model": 72
+      },
+      "actual_transfer_bytes_by_type": {
+        "adapter": 603979776,
+        "base_model": 8455716864
+      },
+      "actual_transfer_bytes_total": 9059696640,
+      "base_initial_load_request_count": 72,
+      "base_reuse_request_count": 0,
+      "completed_request_count": 72,
+      "config_id": "interleaved__sharing_on",
+      "evicted_bytes_by_type": {
+        "adapter": 595591168,
+        "base_model": 8321499136
+      },
+      "evicted_bytes_total": 8917090304,
+      "evicted_object_count_by_type": {
+        "adapter": 71,
+        "base_model": 71
+      },
+      "execution_cost": null,
+      "hardware_measurement": false,
+      "ledger_source": "native CacheEvent/transaction fields under explicit MiB mapping",
+      "repeated_load_bytes_by_type": {
+        "adapter": 553648128,
+        "base_model": 8220835840
+      },
+      "repeated_load_bytes_total": 8774483968,
+      "repeated_load_count_by_type": {
+        "adapter": 66,
+        "base_model": 70
+      },
+      "request_count": 72,
+      "semantics_label": "candidate",
+      "service_failure_count": 0,
+      "service_success_count": 72,
+      "state_migration_applicability": "not_applicable_no_handoff_or_state_request_in_four_config_replay",
+      "state_migration_cost": null,
+      "timing_availability": "unavailable_no_wait_execution_or_transfer_time_fields",
+      "transaction_status_counts": {
+        "committed": 72
+      },
+      "transfer_bytes_per_completed_request": 125829120.0,
+      "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+      "waiting_cost": null,
+      "workflow_completion_availability": "unavailable_request_replay_has_no_workflow_progression",
+      "workflow_completion_count": null
+    },
+    {
+      "actual_load_bytes_by_type": {
+        "adapter": 8388608,
+        "base_model": 100663296
+      },
+      "actual_load_count_by_type": {
+        "adapter": 1,
+        "base_model": 1
+      },
+      "actual_transfer_bytes_by_type": {
+        "adapter": 8388608,
+        "base_model": 100663296
+      },
+      "actual_transfer_bytes_total": 109051904,
+      "base_initial_load_request_count": 1,
+      "base_reuse_request_count": 11,
+      "completed_request_count": 12,
+      "config_id": "blocked__sharing_off",
+      "evicted_bytes_by_type": {},
+      "evicted_bytes_total": 0,
+      "evicted_object_count_by_type": {},
+      "execution_cost": null,
+      "hardware_measurement": false,
+      "ledger_source": "native CacheEvent/transaction fields under explicit MiB mapping",
+      "repeated_load_bytes_by_type": {},
+      "repeated_load_bytes_total": 0,
+      "repeated_load_count_by_type": {},
+      "request_count": 72,
+      "semantics_label": "old",
+      "service_failure_count": 60,
+      "service_success_count": 12,
+      "state_migration_applicability": "not_applicable_no_handoff_or_state_request_in_four_config_replay",
+      "state_migration_cost": null,
+      "timing_availability": "unavailable_no_wait_execution_or_transfer_time_fields",
+      "transaction_status_counts": {
+        "committed": 1,
+        "noop_all_resident": 11,
+        "rolled_back_no_mutation": 60
+      },
+      "transfer_bytes_per_completed_request": 9087658.666666666,
+      "typed_eviction_semantics": "static_dependency_safe_v1",
+      "waiting_cost": null,
+      "workflow_completion_availability": "unavailable_request_replay_has_no_workflow_progression",
+      "workflow_completion_count": null
+    },
+    {
+      "actual_load_bytes_by_type": {
+        "adapter": 25165824,
+        "base_model": 100663296
+      },
+      "actual_load_count_by_type": {
+        "adapter": 3,
+        "base_model": 1
+      },
+      "actual_transfer_bytes_by_type": {
+        "adapter": 25165824,
+        "base_model": 100663296
+      },
+      "actual_transfer_bytes_total": 125829120,
+      "base_initial_load_request_count": 1,
+      "base_reuse_request_count": 35,
+      "completed_request_count": 36,
+      "config_id": "blocked__sharing_on",
+      "evicted_bytes_by_type": {},
+      "evicted_bytes_total": 0,
+      "evicted_object_count_by_type": {},
+      "execution_cost": null,
+      "hardware_measurement": false,
+      "ledger_source": "native CacheEvent/transaction fields under explicit MiB mapping",
+      "repeated_load_bytes_by_type": {},
+      "repeated_load_bytes_total": 0,
+      "repeated_load_count_by_type": {},
+      "request_count": 72,
+      "semantics_label": "old",
+      "service_failure_count": 36,
+      "service_success_count": 36,
+      "state_migration_applicability": "not_applicable_no_handoff_or_state_request_in_four_config_replay",
+      "state_migration_cost": null,
+      "timing_availability": "unavailable_no_wait_execution_or_transfer_time_fields",
+      "transaction_status_counts": {
+        "committed": 3,
+        "noop_all_resident": 33,
+        "rolled_back_no_mutation": 36
+      },
+      "transfer_bytes_per_completed_request": 3495253.3333333335,
+      "typed_eviction_semantics": "static_dependency_safe_v1",
+      "waiting_cost": null,
+      "workflow_completion_availability": "unavailable_request_replay_has_no_workflow_progression",
+      "workflow_completion_count": null
+    },
+    {
+      "actual_load_bytes_by_type": {
+        "adapter": 8388608,
+        "base_model": 100663296
+      },
+      "actual_load_count_by_type": {
+        "adapter": 1,
+        "base_model": 1
+      },
+      "actual_transfer_bytes_by_type": {
+        "adapter": 8388608,
+        "base_model": 100663296
+      },
+      "actual_transfer_bytes_total": 109051904,
+      "base_initial_load_request_count": 1,
+      "base_reuse_request_count": 11,
+      "completed_request_count": 12,
+      "config_id": "interleaved__sharing_off",
+      "evicted_bytes_by_type": {},
+      "evicted_bytes_total": 0,
+      "evicted_object_count_by_type": {},
+      "execution_cost": null,
+      "hardware_measurement": false,
+      "ledger_source": "native CacheEvent/transaction fields under explicit MiB mapping",
+      "repeated_load_bytes_by_type": {},
+      "repeated_load_bytes_total": 0,
+      "repeated_load_count_by_type": {},
+      "request_count": 72,
+      "semantics_label": "old",
+      "service_failure_count": 60,
+      "service_success_count": 12,
+      "state_migration_applicability": "not_applicable_no_handoff_or_state_request_in_four_config_replay",
+      "state_migration_cost": null,
+      "timing_availability": "unavailable_no_wait_execution_or_transfer_time_fields",
+      "transaction_status_counts": {
+        "committed": 1,
+        "noop_all_resident": 11,
+        "rolled_back_no_mutation": 60
+      },
+      "transfer_bytes_per_completed_request": 9087658.666666666,
+      "typed_eviction_semantics": "static_dependency_safe_v1",
+      "waiting_cost": null,
+      "workflow_completion_availability": "unavailable_request_replay_has_no_workflow_progression",
+      "workflow_completion_count": null
+    },
+    {
+      "actual_load_bytes_by_type": {
+        "adapter": 25165824,
+        "base_model": 100663296
+      },
+      "actual_load_count_by_type": {
+        "adapter": 3,
+        "base_model": 1
+      },
+      "actual_transfer_bytes_by_type": {
+        "adapter": 25165824,
+        "base_model": 100663296
+      },
+      "actual_transfer_bytes_total": 125829120,
+      "base_initial_load_request_count": 1,
+      "base_reuse_request_count": 35,
+      "completed_request_count": 36,
+      "config_id": "interleaved__sharing_on",
+      "evicted_bytes_by_type": {},
+      "evicted_bytes_total": 0,
+      "evicted_object_count_by_type": {},
+      "execution_cost": null,
+      "hardware_measurement": false,
+      "ledger_source": "native CacheEvent/transaction fields under explicit MiB mapping",
+      "repeated_load_bytes_by_type": {},
+      "repeated_load_bytes_total": 0,
+      "repeated_load_count_by_type": {},
+      "request_count": 72,
+      "semantics_label": "old",
+      "service_failure_count": 36,
+      "service_success_count": 36,
+      "state_migration_applicability": "not_applicable_no_handoff_or_state_request_in_four_config_replay",
+      "state_migration_cost": null,
+      "timing_availability": "unavailable_no_wait_execution_or_transfer_time_fields",
+      "transaction_status_counts": {
+        "committed": 3,
+        "noop_all_resident": 33,
+        "rolled_back_no_mutation": 36
+      },
+      "transfer_bytes_per_completed_request": 3495253.3333333335,
+      "typed_eviction_semantics": "static_dependency_safe_v1",
+      "waiting_cost": null,
+      "workflow_completion_availability": "unavailable_request_replay_has_no_workflow_progression",
+      "workflow_completion_count": null
+    }
+  ],
+  "old_low_transfer_interpretation": [
+    {
+      "completed_requests": 12,
+      "config_id": "blocked__sharing_off",
+      "failed_requests": 60,
+      "interpretation": "rejected service suppressed transfer; not an achieved saving at equal completion",
+      "transfer_bytes": 109051904
+    },
+    {
+      "completed_requests": 36,
+      "config_id": "blocked__sharing_on",
+      "failed_requests": 36,
+      "interpretation": "rejected service suppressed transfer; not an achieved saving at equal completion",
+      "transfer_bytes": 125829120
+    },
+    {
+      "completed_requests": 12,
+      "config_id": "interleaved__sharing_off",
+      "failed_requests": 60,
+      "interpretation": "rejected service suppressed transfer; not an achieved saving at equal completion",
+      "transfer_bytes": 109051904
+    },
+    {
+      "completed_requests": 36,
+      "config_id": "interleaved__sharing_on",
+      "failed_requests": 36,
+      "interpretation": "rejected service suppressed transfer; not an achieved saving at equal completion",
+      "transfer_bytes": 125829120
+    }
+  ],
+  "same_completion_comparison": {
+    "guard": "old semantics is excluded because its lower transfer coincides with 36 or 60 failed services",
+    "minimum_transfer_config": "blocked__sharing_on",
+    "rows": [
+      {
+        "adapter_transfer_bytes": 603979776,
+        "base_reuse_request_count": 48,
+        "base_transfer_bytes": 2818572288,
+        "completed_request_count": 72,
+        "config_id": "blocked__sharing_on",
+        "evicted_bytes_total": 3279945728,
+        "repeated_load_bytes_total": 3137339392,
+        "transfer_bytes_total": 3422552064
+      },
+      {
+        "adapter_transfer_bytes": 603979776,
+        "base_reuse_request_count": 0,
+        "base_transfer_bytes": 8455716864,
+        "completed_request_count": 72,
+        "config_id": "blocked__sharing_off",
+        "evicted_bytes_total": 8917090304,
+        "repeated_load_bytes_total": 8304721920,
+        "transfer_bytes_total": 9059696640
+      },
+      {
+        "adapter_transfer_bytes": 603979776,
+        "base_reuse_request_count": 0,
+        "base_transfer_bytes": 8455716864,
+        "completed_request_count": 72,
+        "config_id": "interleaved__sharing_off",
+        "evicted_bytes_total": 8917090304,
+        "repeated_load_bytes_total": 8304721920,
+        "transfer_bytes_total": 9059696640
+      },
+      {
+        "adapter_transfer_bytes": 603979776,
+        "base_reuse_request_count": 0,
+        "base_transfer_bytes": 8455716864,
+        "completed_request_count": 72,
+        "config_id": "interleaved__sharing_on",
+        "evicted_bytes_total": 8917090304,
+        "repeated_load_bytes_total": 8774483968,
+        "transfer_bytes_total": 9059696640
+      }
+    ],
+    "scope": "candidate semantics only; all four configurations complete 72 requests"
+  },
+  "unavailable_fields_are_null_not_zero": [
+    "workflow_completion_count",
+    "waiting_cost",
+    "execution_cost",
+    "state_migration_cost"
+  ]
+}

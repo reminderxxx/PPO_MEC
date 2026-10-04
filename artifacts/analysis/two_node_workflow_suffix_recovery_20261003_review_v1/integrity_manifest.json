@@ -1,0 +1,11 @@
+{
+  "schema_version": "ppo_mec.artifact_integrity.v1",
+  "artifact_run_id": "two_node_workflow_suffix_recovery_20261003_review_v1",
+  "file_count_excluding_manifest": 3,
+  "total_bytes_excluding_manifest": 4779,
+  "files": [
+    {"path": "launch_attempts.json", "bytes": 1568, "sha256": "225aa3a454fcd0e81837f91a6b4ad41d8c1e85f3b5d87807f891f804bfdc913e"},
+    {"path": "main_workspace_protection.json", "bytes": 1885, "sha256": "4d56ab0bcfb80c4fe6b2a0419f6b41d107d0013c3f725dbd3656fb3b0cdf1e80"},
+    {"path": "post_run_audit.json", "bytes": 1326, "sha256": "3712beea8fe2d337a345da22ec9270f3d944f9a71e075537c1278ec6cd71744d"}
+  ]
+}

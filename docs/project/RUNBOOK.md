@@ -5,6 +5,67 @@
 
 # Runbook
 
+## 最小机制证据闭环（2026-10-05）
+
+冻结方案与结果分别见 `mechanism_evidence_closure_plan_20261005.md` 和
+`mechanism_evidence_closure_results_20261005.md`。A/C 入口为
+`scripts/run_mechanism_evidence_closure.py`，B 入口为
+`scripts/run_two_node_workflow_reexecution_comparison.py`；两者都要求 clean worktree、固定 commit 和 create-only
+output root。已交付 run 不得覆盖或重跑冒充独立样本。production action 4 尚未接入状态 export/import。
+
+## 真实 adapter / 状态恢复校准（2026-09-30）
+
+本轮 artifact 已到失败终态，以下命令用于复算测试和原账本合成，不授权重复模型执行或下载 adapter。状态 runner
+create-only；若以后中央复核授权新任务，必须使用新 artifact root 和新冻结 plan，不能覆盖本轮。
+
+```bash
+/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python -m pytest \
+  tests/test_workflow_state_recovery_calibration.py
+
+/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python \
+  scripts/synthesize_adapter_state_recovery_calibration.py \
+  --previous-paired artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/paired_witness_results.json \
+  --measurement artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/workflow_state_recovery_measurements.json \
+  --inventory artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/adapter_resource_inventory.json \
+  --plan artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/measurement_plan.json \
+  --output <new_output.json>
+```
+
+真实 adapter 后续最小资源预算是两个固定 revision 权重合计 164,065,376 bytes，另需隔离 PEFT/accelerate 环境和
+固定许可输入；未获显式授权前不得下载。状态执行原命令和两次版本化失败见机器证据；禁止为改变结果自动重试。
+报告：`adapter_state_recovery_calibration_20260930.md`。
+
+## 原生 typed-cache 顺序重算 LRU 候选见证（2026-09-30）
+
+该入口只运行固定 probe 的两请求/边界例、四配置 old/new 回归和两步 synthetic `env.step()`；不训练、不打开
+formal/holdout、不覆盖旧审计目录。输出目录必须不存在。
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/validate_typed_cache_sequential_replacement.py \
+  --input-zip /Users/howen/Downloads/vec_mechanism_probe_v0_2.zip \
+  --output-root artifacts/analysis/native_typed_cache_replacement_20260930_v1
+```
+
+候选配置为 `configs/benchmark/typed_model_cache_controlled_lru_sequential_recompute.yaml`。只有显式 transaction v1.1 +
+`sequential_dependency_recompute_lru_v1` 才启用；非 LRU fail-fast，旧配置继续使用v1.0静态语义。报告见
+`native_typed_cache_replacement_witness_20260930.md`。
+
+## 原生 typed-cache 逐请求审计（2026-09-30）
+
+该入口只消费固定 probe ZIP 的 blocked/interleaved × sharing on/off、LRU、136 MiB、空 cache 请求；不训练，
+不修改 eviction，不扩大矩阵。输出目录必须不存在，脚本拒绝覆盖。
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/audit_native_typed_cache_probe.py \
+  --input-zip /Users/howen/Downloads/vec_mechanism_probe_v0_2.zip \
+  --output-root artifacts/analysis/native_typed_cache_request_audit_20260930_v1 \
+  --phase full
+```
+
+需要先独立保全 sharing-on/interleaved 前两请求时，使用新临时输出目录并指定 `--phase first-two`。报告见
+`native_typed_cache_request_audit_20260930.md`。原包 hash 或固定 commit 不匹配时 fail-fast。
+
 ## 单场景驾驶工作流引用包
 
 `.venv/bin/python -B scripts/build_driving_workflow_package.py --fetch-official-sample --output <new_package_dir>`
@@ -1472,3 +1533,23 @@ evidence。未来 G14C v13 只能从 pushed、Git-clean、`HEAD == main == origi
 XML 必须包含 `test_benchmark_main_executes_full_envelope_gate` 的全部 16 个正负情形及真实 loader/gate/rollout
 计数 1/1/0。`build_formal_checkpoint_provenance_envelope_artifacts.validate_main_gate_evidence` 验证这些计数；
 不能以旧源码断言替代。该命令仅产生临时 test-only checkpoint，不执行正式训练或 rollout，不授权启动 v16。
+
+## 两节点工作流前缀保存 / 后缀恢复验收
+
+先在项目测试环境运行纯状态合同测试，再从已提交、clean 的隔离 worktree 使用已验收 Python。`<commit>` 必须是
+该 worktree 的实际 `HEAD`，`<new-run-root>` 必须不存在：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest tests/test_workflow_suffix_recovery.py -q
+
+/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python \
+  scripts/run_two_node_workflow_suffix_recovery.py \
+  --role supervisor \
+  --plan configs/acceptance/two_node_workflow_suffix_recovery_v1.json \
+  --run-root <new-run-root> \
+  --expected-commit <commit>
+```
+
+supervisor 固定启动 continuous、source、target 三个进程，计划 4 次 generate、每进程 300 秒、累计 900 秒，
+不自动重试。该入口仅用于 technical workflow calibration；不得用于训练、formal/holdout、算法比较或 action 4
+真实迁移声明。

@@ -12,6 +12,14 @@ from typing import Any, Mapping, Sequence
 CACHE_EVICTION_POLICY_VERSION = "1.0.0"
 CACHE_CAPACITY_UNITS = frozenset({"adapter_slots", "mb"})
 CACHE_CAPACITY_EPSILON = 1.0e-9
+TYPED_EVICTION_SEMANTICS_STATIC = "static_dependency_safe_v1"
+TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU = "sequential_dependency_recompute_lru_v1"
+TYPED_EVICTION_SEMANTICS = frozenset(
+    {
+        TYPED_EVICTION_SEMANTICS_STATIC,
+        TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU,
+    }
+)
 
 
 @dataclass(frozen=True)

@@ -1,0 +1,22 @@
+{
+  "automatic_retry": false,
+  "fixed_execution_commit": "01c9d972243cff0c58d1d597f8d029fc4cc76707",
+  "hard_generate_ceiling": 6,
+  "module_sha256": "44ffd2690be9cf22944c4753522e55d2bf8edc49988b7ee9a961fb6d30ba8256",
+  "plan_path": "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/configs/acceptance/two_node_workflow_suffix_recovery_v1.json",
+  "plan_sha256": "74b428386f785e4942cde2ebcaf1642077ea43f4f6f4743a907b0095120c208c",
+  "planned_generate_calls": 4,
+  "script_path": "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/scripts/run_two_node_workflow_suffix_recovery.py",
+  "script_sha256": "dbe68c4aa65ed39d6669bae599a5aa5ddb60e7a7fbd3347d3a2d65c6deef2416",
+  "started_at_unix": 1791039415.521562,
+  "static_resources": {
+    "adapter_directory_bytes": 154428630,
+    "adapter_weight_bytes": 154423432,
+    "base_directory_bytes": 1019895869,
+    "base_weight_bytes": 1015025832,
+    "missing_target_transfer_required_for_measured_path": false,
+    "target_prestaged": true
+  },
+  "status": "STARTED",
+  "supervisor_pid": 95808
+}

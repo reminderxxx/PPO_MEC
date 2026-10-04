@@ -1,5 +1,45 @@
 ﻿# Decision Log
 
+## 2026-10-05：机制证据优先，不晋级 RL
+
+- 决定：保留原生 typed-cache candidate 作为 opt-in bounded mechanism，正式协议不静默切换。
+- 决定：把完整后缀枚举视为有界参考，不视为可部署算法；其 12 格收益是少一次服务失败、代价为状态字节。
+- 决定：在 production action 4 接入真实状态且完成独立验证前，不启动 RL、不扩大网络、不更新 canonical claim。
+- 理由：旧配对两步与完整首动作一致；新矩阵差距来自确定性 action-4 coverage，而非已证明的长程信息需求。
+
+## 2026-10-03: workflow 动态状态与静态模型资源分层，恢复判据绑定实际后缀输入
+
+- 决定：节点边界状态只封装 `n0` 显式输出、DAG/control/generation/identity 和完整性 hash；base/adapter/processor
+  是 target 预存静态资源，不再把 adapter 权重打入每 workflow 状态包。
+- 决定：恢复成功必须证明 target 的 `n0=0,n1=1`，由保存内容构造的实际 prompt/rendered/input IDs/hash 与
+  continuous 路径一致，并比较 `n1` token IDs；最终只比较输出或把预存最终答案返回均不合格。
+- 决定：应用节点间的显式文本边界不保存 RNG continuation、KV 或 tensor；未来若节点 contract 改为 token/tensor
+  continuation，必须另冻 schema、兼容性和成本，不能沿用本轮 2,040-byte 结果。
+- 边界：technical calibration 与 production action 4、真实 RSU/无线迁移及任务正确性分开；详见
+  `two_node_workflow_suffix_recovery_acceptance_20261003.md`。
+
+## 2026-09-30: adapter 与状态恢复按 fail-closed 门禁，不由合成字节收益反推
+
+- 决定：没有两个真实 adapter 的 A→B→A load/switch/execute 和 active identity 证据时，工程兼容性保持
+  `unavailable`；公开模型卡声明、prompt 或配置文件不替代真实加载。
+- 决定：只有独立 target 进程通过状态合同、任务正确性和最终输出等价，状态字节与 save/restore/load 时间才可进入
+  校准。失败预热的 3,085 bytes 不称完整迁移状态，不为得到成功结果改 prompt 或重试同一方案。
+- 决定：action 4 的 native prepare 与 calibration adapter 分开；原 104 MiB 合成模型账本不覆盖，0 state bytes 按
+  payload 缺失解释。真实净收益只能在完整成本齐备后条件判断，不由综合分数或算法排名替代。
+- 边界：本轮停止于新增资源授权和状态正确性门禁，不训练、不扩 production action、不支持方法比较；详见
+  `adapter_state_recovery_calibration_20260930.md`。
+
+## 2026-09-30: typed-cache 跨底座替换采用显式顺序重算候选
+
+- 决定：`static_dependency_safe_v1` 继续作为默认语义，既有 profile、正式合同与历史产物身份不变；跨底座替换只通过显式
+  `sequential_dependency_recompute_lru_v1` opt-in 启用，并记录 transaction contract `1.1.0`。
+- 决定：候选只支持 typed cache + 原生 LRU。事务在影子 resident 上每选择一个 victim 后重新计算依赖安全集合，完整计划
+  可行后才一次性提交；失败不得更新 resident、LRU 元数据、访问计数或准入状态。
+- 决定：新语义位于共享环境/runtime，而非特定 agent 分支，因此同一合法动作合同下对所有比较算法可用；FIFO、LFU、
+  aging-LFU、random 等未冻结组合显式拒绝，不扩展策略矩阵。
+- 边界：本轮证据是 synthetic diagnostic 和固定 4 配置机制回归，不是算法优势、正式性能或 paper-ready 证据；不升级
+  已冻结 formal protocol、checkpoint 或历史产物。详见 `native_typed_cache_replacement_witness_20260930.md`。
+
 ## 2026-09-29: 驾驶工作流派生与参考答案隔离
 
 - 公开demo关系字段为空，阶段连边明确标为研究者模板，不宣称恢复原始执行DAG。

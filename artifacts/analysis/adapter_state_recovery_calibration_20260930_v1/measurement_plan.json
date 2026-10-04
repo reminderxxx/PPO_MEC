@@ -1,0 +1,227 @@
+{
+  "artifact_run_id": "adapter_state_recovery_calibration_20260930_v1",
+  "frozen_at": "2026-09-30T18:02:04+08:00",
+  "frozen_before_measurement": true,
+  "plan_version": "1.2.0",
+  "correction_history": [
+    {
+      "corrected_before_measurement": true,
+      "from": "1.0.0",
+      "reason": "the initial process-budget arithmetic stated 10 although four paired runs require exactly 12 model processes",
+      "scientific_design_changed": false
+    },
+    {
+      "corrected_after_failed_warmup_attempt": true,
+      "failure_record": "failed_attempt_v1_1.json",
+      "from": "1.1.0",
+      "reason": "the output finalizer used lowercase JSON boolean literals in Python and raised NameError before preserving warmup details",
+      "retained_observation": "no workflow_states directory exists, so no formal measurement pair started",
+      "scientific_design_changed": false,
+      "to": "1.2.0"
+    }
+  ],
+  "execution_baseline": {
+    "repository": "/Users/howen/Projects/PPO_MEC",
+    "previous_branch": "codex/workflow-value-audit",
+    "previous_result_commit": "addd1c5828648e2e3f373f6098f139479cee1849",
+    "previous_final_commit": "e6fffb5099563f66641a33a3ff0b70a33c852859",
+    "fixed_start_commit": "e6fffb5099563f66641a33a3ff0b70a33c852859",
+    "current_branch": "codex/adapter-state-calibration",
+    "isolated_checkout": "/Users/howen/.codex/worktrees/adapter-state-calibration/PPO_MEC"
+  },
+  "scope_guards": {
+    "training_runs": 0,
+    "formal_runs": 0,
+    "holdout_runs": 0,
+    "production_action_codec_changes": 0,
+    "frozen_experiment_changes": 0,
+    "os_cache_flushes": 0,
+    "private_uploads": 0,
+    "scientific_retry_after_result": false
+  },
+  "adapter_measurement": {
+    "status": "unavailable_no_local_pair_and_new_weight_download_not_authorized",
+    "resource_inventory": "adapter_resource_inventory.json",
+    "required_acceptance_if_authorized_later": [
+      "load the real public base through AutoModelForVision2Seq",
+      "load adapter A through a public PEFT interface and execute",
+      "load and activate adapter B and execute",
+      "switch back to A and execute",
+      "verify active adapter identity from named adapter state and loaded parameter keys",
+      "verify A output after switch-back equals A output before switching under fixed greedy input",
+      "verify adapters have distinct immutable identities and nonzero loaded tensors"
+    ],
+    "warmups": 1,
+    "measurements": 3,
+    "timeout_seconds_per_process": 180,
+    "result_chasing_forbidden": true
+  },
+  "base_model": {
+    "repository": "HuggingFaceTB/SmolVLM-500M-Instruct",
+    "revision": "a7da5b986cb59b408707209984f360a5f4ad7e47",
+    "license": "Apache-2.0",
+    "local_path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/model_a7da5b9_20260929",
+    "architecture": "Idefics3ForConditionalGeneration",
+    "text_architecture": "VLlama3ForCausalLM",
+    "weight_file": "model.safetensors",
+    "weight_bytes": 1015025832,
+    "weight_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+    "repository_file_bytes": 1019893574,
+    "remote_code_allowed": false,
+    "offline_only": true
+  },
+  "runtime": {
+    "host": "Apple M5 MacBook Air",
+    "memory_bytes": 25769803776,
+    "os": "macOS 26.6.2 build 25G83",
+    "python_executable": "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python",
+    "python": "3.9.6",
+    "torch": "2.8.0",
+    "transformers": "4.49.0",
+    "safetensors": "0.5.3",
+    "device": "mps",
+    "dtype": "float16",
+    "torch_num_threads": 1,
+    "torch_num_interop_threads": 1,
+    "tokenizers_parallelism": false,
+    "synchronization": "torch.mps.synchronize before timer start and immediately after every load or generate boundary",
+    "memory_observations": [
+      "macOS ru_maxrss per process as a process peak",
+      "torch.mps.current_allocated_memory snapshot",
+      "torch.mps.driver_allocated_memory snapshot"
+    ]
+  },
+  "workflow": {
+    "schema": "vec_text_calibration_workflow_v1",
+    "scope": "narrow_base_only_calibration_not_production_workflow",
+    "reason_existing_workflow_not_used": "the DriveLM package is reference-only/runtime_eligible=false and its six-camera inputs remain unavailable pending nuScenes terms confirmation",
+    "application_role": "non-safety-critical roadside lane-status information normalization and publication",
+    "workflow_id": "lane_status_calibration_v1",
+    "workflow_version": "1.0.0",
+    "nodes": [
+      {
+        "node_id": "normalize_event",
+        "input": "Non-safety-critical roadside information: lane status is clear. Return the lane status as one lowercase word only.",
+        "max_new_tokens": 3,
+        "do_sample": false
+      },
+      {
+        "node_id": "publish_event",
+        "input_template": "The upstream lane-status token is '{normalized_status}'. Return exactly that lowercase token and nothing else.",
+        "max_new_tokens": 3,
+        "do_sample": false
+      }
+    ],
+    "edges": [
+      [
+        "normalize_event",
+        "publish_event"
+      ]
+    ],
+    "stage_boundary": "after normalize_event and before publish_event",
+    "expected_normalized_status": "clear",
+    "normalization": "Unicode lowercase; retain ASCII letters only",
+    "correctness": {
+      "float_rtol": 0.0,
+      "float_atol": 0.0,
+      "intermediate": "continuous and migration-source generated token IDs, decoded text, and normalized status must match exactly",
+      "state": "state canonical bytes, embedded content hash, immutable identities, completed/remaining DAG, and next-node identity must validate exactly",
+      "final": "continuous and restored generated token IDs and decoded text must match exactly; normalized final output must equal clear",
+      "nonempty_output_is_not_sufficient": true
+    }
+  },
+  "state_contract": {
+    "schema": "workflow_recovery_state_v1",
+    "must_transfer": [
+      "workflow identity and version",
+      "source and boundary identities",
+      "completed node IDs",
+      "remaining node IDs and DAG edges",
+      "next node ID and attempt counter",
+      "normalize_event raw decoded output",
+      "normalize_event generated token IDs",
+      "normalized lane-status token",
+      "fixed generation contract",
+      "base model identity",
+      "processor/tokenizer immutable-resource hashes",
+      "state content hash"
+    ],
+    "random_state": {
+      "included": false,
+      "reason": "both stages use greedy do_sample=false generation; no stochastic continuation consumes RNG state",
+      "seed": 7
+    },
+    "kv_cache": {
+      "included": false,
+      "reason": "the chosen node boundary consumes the serialized upstream output, not a token-continuation KV cache; the target rebuilds the stage-2 prompt"
+    },
+    "tensor_state": {
+      "included": false,
+      "reason": "no downstream tensor crosses this application-level node boundary"
+    },
+    "target_preexisting_immutable_resources": [
+      "pinned local base-model repository",
+      "processor/tokenizer/config files under the pinned local model repository",
+      "frozen measurement plan",
+      "calibration runner source"
+    ],
+    "rebuildable": [
+      "stage-2 prompt from normalized upstream output",
+      "stage-2 tokenization tensors",
+      "model runtime allocations"
+    ],
+    "rebuild_cost_accounting": "prompt rebuild and tokenization measured separately; target model load measured separately",
+    "transport_cost": "not measured; same-host file visibility only",
+    "completeness_boundary": "complete for this declared two-node application workflow, not a complete generic model runtime or arbitrary workflow migration state"
+  },
+  "paths": {
+    "continuous": "one independent child process loads the base once and executes both nodes",
+    "recovered": "source child loads base, executes node 1, atomically saves state and exits; a separately spawned target child reads only the declared state plus immutable plan/model/code resources, loads base, rebuilds node 2, and finishes"
+  },
+  "conditions": {
+    "warmup_pairs": 1,
+    "measurement_pairs": 3,
+    "timeout_seconds_per_process": 180,
+    "load_label": "process-first load with unspecified OS page-cache state",
+    "storage_cold_claim_allowed": false,
+    "network_claim_allowed": false,
+    "cross_rsu_claim_allowed": false,
+    "failure_policy": "retain the first configuration or execution failure; only a documented configuration correction may be rerun and must use a versioned output"
+  },
+  "resource_budget": {
+    "maximum_model_processes": 15,
+    "maximum_model_processes_per_v1_2_attempt": 12,
+    "derivation": "up to three unrecoverable v1.1 warmup children plus one warmup and three measurements times one continuous process plus one source process plus one target process in v1.2",
+    "maximum_new_model_calls": 20,
+    "maximum_new_model_calls_per_v1_2_attempt": 16,
+    "maximum_retained_state_files": 3,
+    "wall_clock_minutes": 20,
+    "new_weight_download_bytes": 0,
+    "formal_or_holdout_access": 0
+  },
+  "decision_calibration": {
+    "frozen_instances_source": "artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/paired_witness_results.json",
+    "frozen_long_tail_instances": [
+      "tail_length__long",
+      "tail_adapter_structure__long"
+    ],
+    "avoided_synthetic_model_bytes_per_instance": 109051904,
+    "native_action4_state_bytes_interpretation": "unavailable_missing_payload_accounting_not_zero_cost",
+    "layers": [
+      "preserve native synthetic ledger unchanged",
+      "apply measured application-state save/restore/rebuild/load costs as a bounded calibration with explicit transfer assumptions"
+    ],
+    "link_rate_interval_mbps_assumption": [
+      10.0,
+      100.0,
+      1000.0
+    ],
+    "fixed_one_way_transport_overhead_ms_assumption": [
+      0.0,
+      5.0,
+      20.0
+    ],
+    "assumption_label": "finite sensitivity grid only; not a wireless measurement and not fitted after results",
+    "no_composite_score": true
+  }
+}

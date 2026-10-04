@@ -28,11 +28,19 @@ from src.data.model_catalog.adapter_catalog import (
     TYPED_MODEL_CACHE_PROFILE_ID,
     AdapterCatalog,
 )
+from src.envs.core.cache_eviction import (
+    TYPED_EVICTION_SEMANTICS,
+    TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU,
+    TYPED_EVICTION_SEMANTICS_STATIC,
+)
 
 
 RUNTIME_CONTRACT_VERSION = "typed_model_cache_runtime_contract_v1.0.0"
 CHECKPOINT_PROVENANCE_VERSION = "typed_checkpoint_provenance_v1.0.0"
 TYPED_CACHE_TRANSACTION_CONTRACT_VERSION = "typed_cache_transaction_contract_v1.0.0"
+TYPED_CACHE_TRANSACTION_CANDIDATE_CONTRACT_VERSION = (
+    "typed_cache_transaction_contract_v1.1.0"
+)
 CACHE_EVENT_SCHEMA_VERSION = "1.3.0"
 CACHE_EFFICIENCY_METRICS_CONTRACT_VERSION = "1.2.0"
 CACHE_TRACE_CONTEXT_VERSION = "1.0.0"
@@ -200,9 +208,25 @@ def resolve_model_cache_runtime(
         raise RuntimeContractError(f"unsupported model_cache_profile: {profile}")
     if capacity.get("model_cache_profile_id") not in {None, profile}:
         raise RuntimeContractError("cache capacity profile identity differs from model_cache_profile")
+    declared_transaction = raw.get("transaction_contract") or {}
+    typed_eviction_semantics = str(
+        raw.get("typed_eviction_semantics")
+        or declared_transaction.get("eviction_semantics")
+        or capacity.get("typed_eviction_semantics")
+        or TYPED_EVICTION_SEMANTICS_STATIC
+    ).strip()
+    if typed_eviction_semantics not in TYPED_EVICTION_SEMANTICS:
+        raise RuntimeContractError(
+            f"unsupported typed_eviction_semantics: {typed_eviction_semantics!r}"
+        )
+    resolved_transaction_version = (
+        TYPED_CACHE_TRANSACTION_CANDIDATE_CONTRACT_VERSION
+        if typed_eviction_semantics == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU
+        else TYPED_CACHE_TRANSACTION_CONTRACT_VERSION
+    )
     declared_versions = {
         "typed_model_cache_contract_version": TYPED_MODEL_CACHE_CONTRACT_VERSION,
-        "typed_cache_transaction_contract_version": TYPED_CACHE_TRANSACTION_CONTRACT_VERSION,
+        "typed_cache_transaction_contract_version": resolved_transaction_version,
         "cache_event_schema_version": CACHE_EVENT_SCHEMA_VERSION,
         "cache_efficiency_metrics_contract_version": CACHE_EFFICIENCY_METRICS_CONTRACT_VERSION,
     }
@@ -212,14 +236,18 @@ def resolve_model_cache_runtime(
             raise RuntimeContractError(
                 f"{field} mismatch: {declared_version!r} != {expected_version!r}"
             )
-    declared_transaction = raw.get("transaction_contract") or {}
     expected_transaction_fields = {
         "max_logical_cache_actions_per_step": 1,
         "max_dependency_bundle_objects": 2,
         "admission_order": ["base_model", "adapter"],
         "partial_admission": False,
         "atomic_rollback": True,
-        "dependency_safe_base_eviction": "prohibit_while_resident_adapter_depends",
+        "dependency_safe_base_eviction": (
+            "sequential_shadow_recompute_after_each_planned_removal"
+            if typed_eviction_semantics == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU
+            else "prohibit_while_resident_adapter_depends"
+        ),
+        "eviction_semantics": typed_eviction_semantics,
     }
     for field, expected_value in expected_transaction_fields.items():
         if field in declared_transaction and declared_transaction[field] != expected_value:
@@ -276,7 +304,20 @@ def resolve_model_cache_runtime(
             "eviction_policy_seed": capacity.get("eviction_policy_seed"),
             "telemetry_enabled": True,
         }
+        if typed_eviction_semantics == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU:
+            normalized_capacity["typed_eviction_semantics"] = typed_eviction_semantics
+        if (
+            typed_eviction_semantics == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU
+            and normalized_capacity["eviction_policy"] != "lru"
+        ):
+            raise RuntimeContractError(
+                "sequential_dependency_recompute_lru_v1 requires eviction_policy=lru"
+            )
     else:
+        if typed_eviction_semantics != TYPED_EVICTION_SEMANTICS_STATIC:
+            raise RuntimeContractError(
+                "non-default typed eviction semantics require the typed model-cache profile"
+            )
         if catalog.model_cache_profile_id == TYPED_MODEL_CACHE_PROFILE_ID:
             raise RuntimeContractError("typed catalog cannot be consumed by a legacy runtime")
         unit = str(capacity.get("unit") or "adapter_slots")
@@ -326,7 +367,7 @@ def resolve_model_cache_runtime(
             else "unavailable_legacy_profile"
         ),
         "typed_cache_transaction_contract_version": (
-            TYPED_CACHE_TRANSACTION_CONTRACT_VERSION
+            resolved_transaction_version
             if profile == TYPED_MODEL_CACHE_PROFILE_ID
             else "unavailable_legacy_profile"
         ),
@@ -351,7 +392,21 @@ def resolve_model_cache_runtime(
             "admission_order": ["base_model", "adapter"],
             "partial_admission": False,
             "atomic_rollback": True,
-            "dependency_safe_base_eviction": "prohibit_while_resident_adapter_depends",
+            "dependency_safe_base_eviction": (
+                "sequential_shadow_recompute_after_each_planned_removal"
+                if typed_eviction_semantics
+                == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU
+                else "prohibit_while_resident_adapter_depends"
+            ),
+            **(
+                {
+                    "eviction_semantics": typed_eviction_semantics,
+                    "planning_state": "transaction_shadow_state_no_policy_mutation",
+                }
+                if typed_eviction_semantics
+                == TYPED_EVICTION_SEMANTICS_SEQUENTIAL_LRU
+                else {}
+            ),
         },
         "config_source": config_source,
         "execution_git_commit": _git_commit(root_path),
@@ -413,7 +468,13 @@ def validate_runtime_compatibility(
     ]
     actual_capacity = actual.get("cache_capacity_profile") or {}
     expected_capacity = expected.get("cache_capacity_profile") or {}
-    for field in ("enabled", "unit", "rsu_adapter_slots", "capacity_mb"):
+    for field in (
+        "enabled",
+        "unit",
+        "rsu_adapter_slots",
+        "capacity_mb",
+        "typed_eviction_semantics",
+    ):
         if actual_capacity.get(field) != expected_capacity.get(field):
             mismatches.append(
                 {

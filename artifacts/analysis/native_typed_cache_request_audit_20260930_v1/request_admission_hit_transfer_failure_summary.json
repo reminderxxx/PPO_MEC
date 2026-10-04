@@ -1,0 +1,426 @@
+{
+  "audit_run_id": "native_typed_cache_request_audit_20260930_v1",
+  "configuration_count": 4,
+  "configuration_summaries": [
+    {
+      "config_id": "interleaved__sharing_on",
+      "native": {
+        "admission_rejection_count": 36,
+        "admission_requested_count": 72,
+        "capacity_invariant_all_requests": true,
+        "dependency_invariant_all_requests": true,
+        "evicted_object_count": 0,
+        "origin_execution_count": 0,
+        "post_action_service_success_count": 36,
+        "pre_base_hit_adapter_miss_count": 2,
+        "pre_base_hit_count": 35,
+        "pre_full_hit_count": 33,
+        "rejection_state_unchanged_all_rejections": true,
+        "request_count": 72,
+        "resident_byte_conservation_all_requests": true,
+        "service_failure_count": 36,
+        "total_transfer_bytes_under_explicit_mapping": 125829120,
+        "transaction_status_counts": {
+          "committed": 3,
+          "noop_all_resident": 33,
+          "rolled_back_no_mutation": 36
+        },
+        "transfer_bytes_by_type_under_explicit_mapping": {
+          "adapter": 25165824,
+          "base_model": 100663296
+        }
+      },
+      "reference": {
+        "admission_rejection_count": null,
+        "evicted_object_count": 142,
+        "loaded_adapter_bytes": 603979776,
+        "loaded_base_bytes": 8455716864,
+        "loaded_bytes": 9059696640,
+        "origin_execution_count": null,
+        "post_action_service_success_count": null,
+        "pre_base_hit_adapter_miss_count": 0,
+        "pre_base_hit_count": 0,
+        "pre_full_hit_count": 0,
+        "request_count": 72,
+        "service_failure_count": null
+      },
+      "request_count": 72,
+      "request_rows_with_any_aligned_difference": 71,
+      "sharing_enabled": true,
+      "workload": "interleaved"
+    },
+    {
+      "config_id": "blocked__sharing_on",
+      "native": {
+        "admission_rejection_count": 36,
+        "admission_requested_count": 72,
+        "capacity_invariant_all_requests": true,
+        "dependency_invariant_all_requests": true,
+        "evicted_object_count": 0,
+        "origin_execution_count": 0,
+        "post_action_service_success_count": 36,
+        "pre_base_hit_adapter_miss_count": 2,
+        "pre_base_hit_count": 35,
+        "pre_full_hit_count": 33,
+        "rejection_state_unchanged_all_rejections": true,
+        "request_count": 72,
+        "resident_byte_conservation_all_requests": true,
+        "service_failure_count": 36,
+        "total_transfer_bytes_under_explicit_mapping": 125829120,
+        "transaction_status_counts": {
+          "committed": 3,
+          "noop_all_resident": 33,
+          "rolled_back_no_mutation": 36
+        },
+        "transfer_bytes_by_type_under_explicit_mapping": {
+          "adapter": 25165824,
+          "base_model": 100663296
+        }
+      },
+      "reference": {
+        "admission_rejection_count": null,
+        "evicted_object_count": 94,
+        "loaded_adapter_bytes": 603979776,
+        "loaded_base_bytes": 2818572288,
+        "loaded_bytes": 3422552064,
+        "origin_execution_count": null,
+        "post_action_service_success_count": null,
+        "pre_base_hit_adapter_miss_count": 48,
+        "pre_base_hit_count": 48,
+        "pre_full_hit_count": 0,
+        "request_count": 72,
+        "service_failure_count": null
+      },
+      "request_count": 72,
+      "request_rows_with_any_aligned_difference": 69,
+      "sharing_enabled": true,
+      "workload": "blocked"
+    },
+    {
+      "config_id": "blocked__sharing_off",
+      "native": {
+        "admission_rejection_count": 60,
+        "admission_requested_count": 72,
+        "capacity_invariant_all_requests": true,
+        "dependency_invariant_all_requests": true,
+        "evicted_object_count": 0,
+        "origin_execution_count": 0,
+        "post_action_service_success_count": 12,
+        "pre_base_hit_adapter_miss_count": 0,
+        "pre_base_hit_count": 11,
+        "pre_full_hit_count": 11,
+        "rejection_state_unchanged_all_rejections": true,
+        "request_count": 72,
+        "resident_byte_conservation_all_requests": true,
+        "service_failure_count": 60,
+        "total_transfer_bytes_under_explicit_mapping": 109051904,
+        "transaction_status_counts": {
+          "committed": 1,
+          "noop_all_resident": 11,
+          "rolled_back_no_mutation": 60
+        },
+        "transfer_bytes_by_type_under_explicit_mapping": {
+          "adapter": 8388608,
+          "base_model": 100663296
+        }
+      },
+      "reference": {
+        "admission_rejection_count": null,
+        "evicted_object_count": 142,
+        "loaded_adapter_bytes": 603979776,
+        "loaded_base_bytes": 8455716864,
+        "loaded_bytes": 9059696640,
+        "origin_execution_count": null,
+        "post_action_service_success_count": null,
+        "pre_base_hit_adapter_miss_count": 0,
+        "pre_base_hit_count": 0,
+        "pre_full_hit_count": 0,
+        "request_count": 72,
+        "service_failure_count": null
+      },
+      "request_count": 72,
+      "request_rows_with_any_aligned_difference": 72,
+      "sharing_enabled": false,
+      "workload": "blocked"
+    },
+    {
+      "config_id": "interleaved__sharing_off",
+      "native": {
+        "admission_rejection_count": 60,
+        "admission_requested_count": 72,
+        "capacity_invariant_all_requests": true,
+        "dependency_invariant_all_requests": true,
+        "evicted_object_count": 0,
+        "origin_execution_count": 0,
+        "post_action_service_success_count": 12,
+        "pre_base_hit_adapter_miss_count": 0,
+        "pre_base_hit_count": 11,
+        "pre_full_hit_count": 11,
+        "rejection_state_unchanged_all_rejections": true,
+        "request_count": 72,
+        "resident_byte_conservation_all_requests": true,
+        "service_failure_count": 60,
+        "total_transfer_bytes_under_explicit_mapping": 109051904,
+        "transaction_status_counts": {
+          "committed": 1,
+          "noop_all_resident": 11,
+          "rolled_back_no_mutation": 60
+        },
+        "transfer_bytes_by_type_under_explicit_mapping": {
+          "adapter": 8388608,
+          "base_model": 100663296
+        }
+      },
+      "reference": {
+        "admission_rejection_count": null,
+        "evicted_object_count": 142,
+        "loaded_adapter_bytes": 603979776,
+        "loaded_base_bytes": 8455716864,
+        "loaded_bytes": 9059696640,
+        "origin_execution_count": null,
+        "post_action_service_success_count": null,
+        "pre_base_hit_adapter_miss_count": 0,
+        "pre_base_hit_count": 0,
+        "pre_full_hit_count": 0,
+        "request_count": 72,
+        "service_failure_count": null
+      },
+      "request_count": 72,
+      "request_rows_with_any_aligned_difference": 72,
+      "sharing_enabled": false,
+      "workload": "interleaved"
+    }
+  ],
+  "first_observed_native_difference": {
+    "adapter_id": "b1.a0",
+    "audit_sequence_index": 1,
+    "classification": "independent_design_semantics_issue_no_mechanism_fix_in_this_audit",
+    "config_id": "interleaved__sharing_on",
+    "differing_fields": [
+      "resident_after",
+      "evicted_objects",
+      "loaded_base_bytes",
+      "loaded_adapter_bytes",
+      "loaded_bytes",
+      "resident_bytes_after"
+    ],
+    "interpretation": "The reference evicts an adapter plus its base dependency closure. The native one-shot eligible set excludes a base while a resident adapter depends on it, so the 8 MiB adapter-only plan cannot release the required 104 MiB and the atomic admission is rejected without state mutation.",
+    "native_observed": {
+      "actual_eviction_plan": {
+        "candidate_recency": [
+          {
+            "admitted_step": 0,
+            "initial_admission_order": null,
+            "last_event": "admission",
+            "last_used_step": 0,
+            "object_id": "adapter:b0.a0",
+            "rank": 0,
+            "selection_key": [
+              0,
+              "adapter:b0.a0"
+            ]
+          }
+        ],
+        "capacity_unit": "mb",
+        "cumulative_freed_capacity": 8.0,
+        "ordered_candidates": [
+          "adapter:b0.a0"
+        ],
+        "ordered_victim_ids": [
+          "adapter:b0.a0"
+        ],
+        "policy_name": "lru",
+        "policy_version": "1.0.0",
+        "required_free_capacity": 104.0,
+        "rsu_id": "rsu_a",
+        "selection_reason": "insufficient_evictable_capacity",
+        "sufficient": false,
+        "victim_sizes": [
+          8.0
+        ]
+      },
+      "admission_rejection_reason": "insufficient_dependency_safe_evictable_capacity",
+      "dependency_bundle": {
+        "already_resident_object_ids": [],
+        "missing_object_ids": [
+          "base:b1",
+          "adapter:b1.a0"
+        ],
+        "ordered_object_ids": [
+          "base:b1",
+          "adapter:b1.a0"
+        ],
+        "requested_adapter_id": "b1.a0",
+        "requested_bundle_mb": 136.0,
+        "required_base_model_id": "b1",
+        "transfer_mb_by_type": {
+          "adapter": 8.0,
+          "base_model": 128.0
+        }
+      },
+      "eligible_victim_native_object_ids": [
+        "adapter:b0.a0"
+      ],
+      "missing_native_object_ids": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "origin_execution": false,
+      "policy_state_after": {
+        "lru_order_oldest_first": [
+          "adapter:b0.a0",
+          "base:b0"
+        ],
+        "resident_metadata": {
+          "adapter:b0.a0": {
+            "admitted_step": 0,
+            "initial_admission_order": null,
+            "last_event": "admission",
+            "last_event_sequence": 2,
+            "last_used_step": 0
+          },
+          "base:b0": {
+            "admitted_step": 0,
+            "initial_admission_order": null,
+            "last_event": "admission",
+            "last_event_sequence": 1,
+            "last_used_step": 0
+          }
+        }
+      },
+      "policy_state_before": {
+        "lru_order_oldest_first": [
+          "adapter:b0.a0",
+          "base:b0"
+        ],
+        "resident_metadata": {
+          "adapter:b0.a0": {
+            "admitted_step": 0,
+            "initial_admission_order": null,
+            "last_event": "admission",
+            "last_event_sequence": 2,
+            "last_used_step": 0
+          },
+          "base:b0": {
+            "admitted_step": 0,
+            "initial_admission_order": null,
+            "last_event": "admission",
+            "last_event_sequence": 1,
+            "last_used_step": 0
+          }
+        }
+      },
+      "post_action_service_success": false,
+      "required_free_bytes_under_explicit_mapping": 109051904,
+      "resident_after": {
+        "native_object_ids": [
+          "base:b0",
+          "adapter:b0.a0"
+        ],
+        "objects": [
+          {
+            "adapter_id": null,
+            "base_model_id": "b0",
+            "dependency_ids": [],
+            "evictability": "evictable",
+            "object_id": "base:b0",
+            "object_type": "base_model",
+            "required_base_model_id": null,
+            "resident_size_mb": 96.0,
+            "transfer_size_mb": 96.0,
+            "version": "probe_v0_2"
+          },
+          {
+            "adapter_id": "b0.a0",
+            "base_model_id": null,
+            "dependency_ids": [
+              "base:b0"
+            ],
+            "evictability": "evictable",
+            "object_id": "adapter:b0.a0",
+            "object_type": "adapter",
+            "required_base_model_id": "b0",
+            "resident_size_mb": 8.0,
+            "transfer_size_mb": 8.0,
+            "version": "probe_v0_2"
+          }
+        ],
+        "reference_object_ids": [
+          "b0",
+          "b0.a0"
+        ],
+        "used_bytes_under_explicit_mapping": 109051904,
+        "used_native_mb": 104.0
+      },
+      "resident_before": {
+        "native_object_ids": [
+          "base:b0",
+          "adapter:b0.a0"
+        ],
+        "objects": [
+          {
+            "adapter_id": null,
+            "base_model_id": "b0",
+            "dependency_ids": [],
+            "evictability": "evictable",
+            "object_id": "base:b0",
+            "object_type": "base_model",
+            "required_base_model_id": null,
+            "resident_size_mb": 96.0,
+            "transfer_size_mb": 96.0,
+            "version": "probe_v0_2"
+          },
+          {
+            "adapter_id": "b0.a0",
+            "base_model_id": null,
+            "dependency_ids": [
+              "base:b0"
+            ],
+            "evictability": "evictable",
+            "object_id": "adapter:b0.a0",
+            "object_type": "adapter",
+            "required_base_model_id": "b0",
+            "resident_size_mb": 8.0,
+            "transfer_size_mb": 8.0,
+            "version": "probe_v0_2"
+          }
+        ],
+        "reference_object_ids": [
+          "b0",
+          "b0.a0"
+        ],
+        "used_bytes_under_explicit_mapping": 109051904,
+        "used_native_mb": 104.0
+      },
+      "transaction_status": "rolled_back_no_mutation"
+    },
+    "observation_order": "sharing-on/interleaved was executed first by frozen audit order",
+    "reference_observed": {
+      "evicted_ids": [
+        "b0.a0",
+        "b0"
+      ],
+      "loaded_bytes": 142606336,
+      "loaded_ids": [
+        "b1",
+        "b1.a0"
+      ],
+      "resident_after": [
+        "b1",
+        "b1.a0"
+      ],
+      "resident_before": [
+        "b0",
+        "b0.a0"
+      ]
+    },
+    "request_index": 1
+  },
+  "matrix_expansion": 0,
+  "phase": "full",
+  "policy_changes": 0,
+  "request_count": 288,
+  "safety_stop_triggered": false,
+  "state_invariant_failures": 0,
+  "training_runs": 0
+}

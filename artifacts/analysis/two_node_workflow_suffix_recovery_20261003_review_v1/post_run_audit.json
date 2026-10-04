@@ -1,0 +1,30 @@
+{
+  "schema_version": "ppo_mec.two_node_workflow_suffix_recovery_post_run_audit.v1",
+  "reviewed_at": "2026-10-03",
+  "scientific_run_id": "two_node_workflow_suffix_recovery_20261003_v3",
+  "fixed_execution_commit": "01c9d972243cff0c58d1d597f8d029fc4cc76707",
+  "plan_sha256": "74b428386f785e4942cde2ebcaf1642077ea43f4f6f4743a907b0095120c208c",
+  "terminal_status": "PASS",
+  "independent_integrity_recalculation": {
+    "status": "PASS",
+    "verified_files": 11,
+    "file_set_match": true,
+    "errors": []
+  },
+  "old_evidence_preserved": {
+    "terminal_receipt_sha256": "c47254015ee10213bf95f85c6794707cef58c83829c8d23424e4ceb594242ffa",
+    "post_run_audit_sha256": "7ad7d0766aa24388e93d75bd8a66d02f2c0901f87d7ba4fc1cf9227e468c9505",
+    "integrity_manifest_sha256": "03e153d4322613917a568e34c02e2af337769b661d534df14bd6c7fe91a6be56",
+    "runtime_state_sha256": "23808cf2bb1b99f6edc75bc6310e376d3af6c2f456454639db00ad0d905259d8",
+    "original_terminal_status": "FAIL",
+    "original_terminal_receipt_modified": false
+  },
+  "scope_verdict": {
+    "workflow_suffix_recovery_fidelity": "PASS",
+    "task_correctness": "unavailable",
+    "production_action_4_real_migration": "not_evaluated",
+    "algorithm_comparison": "not_evaluated",
+    "formal_or_holdout": "not_run",
+    "wireless_transfer": "not_measured"
+  }
+}

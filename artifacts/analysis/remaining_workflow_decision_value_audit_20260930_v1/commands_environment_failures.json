@@ -1,0 +1,98 @@
+{
+  "artifact_run_id": "remaining_workflow_decision_value_audit_20260930_v1",
+  "bounded_execution_budget": {
+    "formal_runs": 0,
+    "holdout_runs": 0,
+    "inference_measurements_per_measured_process": 1,
+    "inference_warmups_per_measured_process": 1,
+    "model_load_measurements": 3,
+    "model_load_warmups": 1,
+    "paired_episode_limit": 24,
+    "paired_episodes_executed": 16,
+    "paired_scientific_reruns": 0,
+    "state_measurements": 3,
+    "state_warmups": 1,
+    "training_runs": 0
+  },
+  "branch": "codex/workflow-value-audit",
+  "commands": [
+    {
+      "command": "/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_typed_runtime_plumbing.py",
+      "data_binding_active": true,
+      "result": "34 passed in 7.07s"
+    },
+    {
+      "command": "python scripts/audit_remaining_workflow_decision_value.py --old-log <old> --candidate-log <candidate> --output-root <run>",
+      "result": "8 ledger rows; 4 equal-completion candidate rows; migration modes keep/prepare"
+    },
+    {
+      "command": "driving_pilot_py39_v1/bin/python scripts/measure_local_model_and_state_costs.py --plan <plan> --output <raw>",
+      "result": "3/3 base loads, 3/3 inference, 3/3 state restore passed"
+    },
+    {
+      "command": "python scripts/run_remaining_workflow_paired_witness.py --design <design> --output <raw>",
+      "result": "16 episodes exactly once; 6 decision changes; two-step matched full-tail"
+    },
+    {
+      "command": "python -m pytest -q tests/test_remaining_workflow_decision_value.py tests/test_typed_cache_sequential_recompute.py tests/test_typed_model_cache.py tests/test_typed_model_cache_runtime.py tests/test_cache_event_contract.py tests/test_cache_capacity_mb.py tests/test_cache_eviction_policy.py tests/test_env_contract.py",
+      "result": "80 passed in 1.01s"
+    },
+    {
+      "command": "python scripts/smoke_test.py",
+      "result": "6 nodes completed; terminated=True; truncated=False"
+    },
+    {
+      "command": "python -m compileall -q <four scripts> <test> && git diff --check",
+      "result": "pass"
+    }
+  ],
+  "data_binding": {
+    "alibaba": {
+      "lfs_oid_and_real_sha256": "6346b0726c6e10466a585c67645af807b425b5be091caf410f5e1aff41a270bc",
+      "pointer_bytes": 134,
+      "pointer_sha256": "14d63f5b68fcba83931563b8bff35d6e22df043b470604e233b1811c04027a3f",
+      "real_bytes": 802261444
+    },
+    "copies": 0,
+    "downloads": 0,
+    "method": "temporary_symlink_to_identity-matched_existing_main-workspace_files",
+    "mocks": 0,
+    "ngsim": {
+      "lfs_oid_and_real_sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+      "pointer_bytes": 135,
+      "pointer_sha256": "48c89cbaccd30352e25d7f29e2f2029cd91e95d84aa0821ba1399fdc00e0d054",
+      "real_bytes": 2118175938
+    },
+    "restored_after_test": true
+  },
+  "failure_records": [
+    {
+      "disposition": "minimal schema correction; no scientific episode or measurement consumed",
+      "error": "TypeError: ordered_object_ids was initially read as object dictionaries",
+      "stage": "ledger consumer development before paired/model execution"
+    },
+    {
+      "disposition": "minimal schema correction; no scientific episode or measurement consumed",
+      "error": "KeyError: resident_object_ids; original field is native_object_ids",
+      "stage": "ledger consumer development before paired/model execution"
+    },
+    {
+      "disposition": "parser-only correction; protected hashes and diff never changed",
+      "error": "workspace status parser stripped the leading porcelain column",
+      "stage": "artifact finalizer after all scientific execution"
+    }
+  ],
+  "fixed_start_commit": "58c3a8900152f03e0d655194e1a02afb50f1f727",
+  "head_at_execution": "58c3a8900152f03e0d655194e1a02afb50f1f727",
+  "previous_diagnostic_execution_commit": "ffa10e598feddac99c2557d994ba094692ede99a",
+  "scope_guards": {
+    "no_dataset_expansion": true,
+    "no_download": true,
+    "no_formal_or_holdout": true,
+    "no_model_reselection": true,
+    "no_os_cache_clear": true,
+    "no_public_upload": true,
+    "no_training": true
+  },
+  "worktree": "/Users/howen/.codex/worktrees/workflow-value-audit/PPO_MEC"
+}

@@ -1,0 +1,218 @@
+{
+  "adapter_inventory": {
+    "adapter_config_candidates": [],
+    "adapter_load_or_switch_time": null,
+    "status": "unavailable_no_locally_identified_compatible_adapter"
+  },
+  "artifact_run_id": "remaining_workflow_decision_value_audit_20260930_v1",
+  "base_load_measurements": [
+    {
+      "command": [
+        "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python",
+        "/Users/howen/.codex/worktrees/workflow-value-audit/PPO_MEC/scripts/measure_local_model_and_state_costs.py",
+        "--plan",
+        "artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/measurement_plan.json",
+        "--child",
+        "--run-inference",
+        "yes"
+      ],
+      "decoded_text": " Clear.",
+      "elapsed_seconds": 4.457127809524536,
+      "generated_token_count": 2,
+      "inference_measurement_ns": 26728208,
+      "inference_warmup_ns": 2758871583,
+      "load_ns": 438828792,
+      "mps_current_allocated_bytes_after_inference": 1014973952,
+      "mps_current_allocated_bytes_after_load": 1014973184,
+      "process_max_rss_raw": 2368733184,
+      "returncode": 0,
+      "run_inference": true,
+      "status": "pass",
+      "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n"
+    },
+    {
+      "command": [
+        "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python",
+        "/Users/howen/.codex/worktrees/workflow-value-audit/PPO_MEC/scripts/measure_local_model_and_state_costs.py",
+        "--plan",
+        "artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/measurement_plan.json",
+        "--child",
+        "--run-inference",
+        "yes"
+      ],
+      "decoded_text": " Clear.",
+      "elapsed_seconds": 1.894981861114502,
+      "generated_token_count": 2,
+      "inference_measurement_ns": 28992042,
+      "inference_warmup_ns": 183087125,
+      "load_ns": 452153209,
+      "mps_current_allocated_bytes_after_inference": 1014973952,
+      "mps_current_allocated_bytes_after_load": 1014973184,
+      "process_max_rss_raw": 2369306624,
+      "returncode": 0,
+      "run_inference": true,
+      "status": "pass",
+      "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n"
+    },
+    {
+      "command": [
+        "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python",
+        "/Users/howen/.codex/worktrees/workflow-value-audit/PPO_MEC/scripts/measure_local_model_and_state_costs.py",
+        "--plan",
+        "artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/measurement_plan.json",
+        "--child",
+        "--run-inference",
+        "yes"
+      ],
+      "decoded_text": " Clear.",
+      "elapsed_seconds": 1.862771987915039,
+      "generated_token_count": 2,
+      "inference_measurement_ns": 27709250,
+      "inference_warmup_ns": 150926959,
+      "load_ns": 445777666,
+      "mps_current_allocated_bytes_after_inference": 1014973952,
+      "mps_current_allocated_bytes_after_load": 1014973184,
+      "process_max_rss_raw": 2369503232,
+      "returncode": 0,
+      "run_inference": true,
+      "status": "pass",
+      "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n"
+    }
+  ],
+  "base_load_summary": {
+    "count": 3,
+    "max_ns": 452153209,
+    "mean_ns": 445586555,
+    "median_ns": 445777666,
+    "min_ns": 438828792,
+    "raw_ns": [
+      438828792,
+      452153209,
+      445777666
+    ]
+  },
+  "base_load_warmup": {
+    "command": [
+      "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/bin/python",
+      "/Users/howen/.codex/worktrees/workflow-value-audit/PPO_MEC/scripts/measure_local_model_and_state_costs.py",
+      "--plan",
+      "artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/measurement_plan.json",
+      "--child",
+      "--run-inference",
+      "no"
+    ],
+    "decoded_text": null,
+    "elapsed_seconds": 2.5546271800994873,
+    "generated_token_count": null,
+    "inference_measurement_ns": null,
+    "inference_warmup_ns": null,
+    "load_ns": 699693959,
+    "mps_current_allocated_bytes_after_load": 1014973184,
+    "process_max_rss_raw": 2369290240,
+    "returncode": 0,
+    "run_inference": false,
+    "status": "pass",
+    "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/driving_pilot_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n"
+  },
+  "evidence_type": "local_host_measurement",
+  "host": {
+    "machine": "arm64",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python_orchestrator": "3.9.6 (default, May 22 2026, 11:13:45) \n[Clang 21.0.0 (clang-2100.1.1.101)]"
+  },
+  "measured_at_unix": 1790760271.5291011,
+  "measurement_boundaries": {
+    "deployment": "Apple M5 local host only; not representative of vehicle/RSU/wireless deployment",
+    "load": "process-first; OS page-cache state uncontrolled and not cleared",
+    "memory": "per-process ru_maxrss raw value plus PyTorch MPS current allocation; neither is whole-system peak memory",
+    "network": "not measured",
+    "workflow_state": "explicit application payload only; not KV cache or complete runtime migration state"
+  },
+  "minimal_inference_success_count": 3,
+  "minimal_inference_summary": {
+    "count": 3,
+    "max_ns": 28992042,
+    "mean_ns": 27809833,
+    "median_ns": 27709250,
+    "min_ns": 26728208,
+    "raw_ns": [
+      26728208,
+      28992042,
+      27709250
+    ]
+  },
+  "plan_path": "artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/measurement_plan.json",
+  "plan_sha256": "5836c30c0446d4c1fdd19c0c50511d99f6128cb4be04107b38e68010b9289336",
+  "state_measurements": [
+    {
+      "canonical_payload_equal": true,
+      "continuation_key_equal": true,
+      "file_bytes": 732,
+      "index": 0,
+      "next_node_key_after": "fdd8bec363a61299584ea60151ba04a89173ef3f627d9068a22ea37f2db841a5",
+      "next_node_key_before": "fdd8bec363a61299584ea60151ba04a89173ef3f627d9068a22ea37f2db841a5",
+      "restore_ns": 27000,
+      "save_ns": 140375,
+      "serialized_bytes": 732
+    },
+    {
+      "canonical_payload_equal": true,
+      "continuation_key_equal": true,
+      "file_bytes": 732,
+      "index": 1,
+      "next_node_key_after": "fdd8bec363a61299584ea60151ba04a89173ef3f627d9068a22ea37f2db841a5",
+      "next_node_key_before": "fdd8bec363a61299584ea60151ba04a89173ef3f627d9068a22ea37f2db841a5",
+      "restore_ns": 24375,
+      "save_ns": 128875,
+      "serialized_bytes": 732
+    },
+    {
+      "canonical_payload_equal": true,
+      "continuation_key_equal": true,
+      "file_bytes": 732,
+      "index": 2,
+      "next_node_key_after": "fdd8bec363a61299584ea60151ba04a89173ef3f627d9068a22ea37f2db841a5",
+      "next_node_key_before": "fdd8bec363a61299584ea60151ba04a89173ef3f627d9068a22ea37f2db841a5",
+      "restore_ns": 25625,
+      "save_ns": 141166,
+      "serialized_bytes": 732
+    }
+  ],
+  "state_payload_schema": "explicit_application_workflow_state_v1",
+  "state_restore_correct": true,
+  "state_restore_summary": {
+    "count": 3,
+    "max_ns": 27000,
+    "mean_ns": 25666,
+    "median_ns": 25625,
+    "min_ns": 24375,
+    "raw_ns": [
+      27000,
+      24375,
+      25625
+    ]
+  },
+  "state_save_summary": {
+    "count": 3,
+    "max_ns": 141166,
+    "mean_ns": 136805,
+    "median_ns": 140375,
+    "min_ns": 128875,
+    "raw_ns": [
+      140375,
+      128875,
+      141166
+    ]
+  },
+  "state_serialized_bytes": [
+    732
+  ],
+  "weight_identity": {
+    "actual_bytes": 1015025832,
+    "actual_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+    "expected_bytes": 1015025832,
+    "expected_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+    "match": true,
+    "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/model_a7da5b9_20260929/model.safetensors"
+  }
+}

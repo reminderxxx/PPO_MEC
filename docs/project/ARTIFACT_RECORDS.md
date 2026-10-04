@@ -5,6 +5,91 @@
 
 # Artifact Records
 
+## 2026-10-05 minimal mechanism evidence closure
+
+- `artifacts/analysis/mechanism_evidence_closure_20261005_v1/`：固定 commit `f323fa2...`，A/C wall 34.193 s，
+  真实模型调用0；A 复算576行账本，C 保留12场景×3方法=36行与每场景625条枚举计数。
+- `artifacts/analysis/two_node_workflow_reexecution_comparison_20261005_v1/`：固定 commit `f323fa2...`，B wall
+  59.168 s、generate 6/6、四进程独立且有序，continuous/restart/recovery 保真检查全部通过。
+- 两个 integrity manifest 独立复算通过。证据仅为 bounded native/technical workflow；非 formal/holdout、算法优势、
+  任务正确性、真实 RSU 网络或 paper-ready 结果。
+
+## 2026-10-03 two-node workflow suffix recovery acceptance
+
+- run：`two_node_workflow_suffix_recovery_20261003_v3`
+- path：`artifacts/analysis/two_node_workflow_suffix_recovery_20261003_v3/`
+- execution commit：`01c9d972243cff0c58d1d597f8d029fc4cc76707`；plan SHA-256=`74b42838…208c`
+- scope：continuous `n0,n1`；source `n0`+save+exit；target validate+`n1`，共 3 个 PID、4/4 generate
+- result：target n0 call=0、n1 call=1、image access=0；continuous/source n0 完全一致，continuous/target n1 实际
+  prompt/rendered/input IDs/hash/token IDs 完全一致；6 项负例/数据依赖检查通过
+- state/cost：payload 1,090 B，state file 1,703 B，manifest 337 B，package 2,040 B；target child wall
+  6.864620 s，三进程总墙钟 41.606533 s；仅为单次同机见证
+- integrity：11 files / 33,290 B 独立复算通过；companion review 保存两次 0-generate preflight failure、main 七文件
+  起止保护与旧证据 hash
+- boundary：`E2_ARTIFACT_AUDITED` technical calibration only；任务正确性 unavailable，不是 production action 4、
+  跨 RSU/无线、训练、算法优势、formal/holdout 或论文净收益证据。报告：
+  `docs/project/two_node_workflow_suffix_recovery_acceptance_20261003.md`
+
+## 2026-09-30 adapter/state recovery calibration
+
+- run：`adapter_state_recovery_calibration_20260930_v1`
+- path：`artifacts/analysis/adapter_state_recovery_calibration_20260930_v1/`
+- fixed execution baseline：`e6fffb5099563f66641a33a3ff0b70a33c852859`；runner content SHA-256=
+  `3418b1b063afaa0ce08ee3acf0fb75e0d347eeea6e0aeecd0c5ccc680e3e03e9`
+- result commit：`0b1c4eb55a3dd00a231671f0d3a5d418122e8d43`
+- resource result：本地 adapter 0；两个同 base 公开候选需 164,065,376 bytes 新权重，未获授权，下载/加载/调用 0。
+- recovery result：一次预热的 source 保存 3,085-byte 状态，target 独立进程因冻结任务正确性失败而在模型加载前拒绝；
+  正式测量 0，independent-process recovery witness=false。
+- decision result：原生两个长尾实例各少 104 MiB 合成模型字节且完成/失败相同的账本不变；没有 validated state、
+  adapter switch/load 或网络成本，真实净收益 `UNVERIFIED`，小规模方法比较 not ready。
+- boundary：`E1_BOUNDED_FAILED_CALIBRATION_WITH_NATIVE_LEDGER_REUSE`；不是 adapter 工程兼容性、任务质量、跨 RSU
+  实测、机制收益或算法优势。报告：`docs/project/adapter_state_recovery_calibration_20260930.md`。
+
+## 2026-09-30 remaining-workflow decision-value audit
+
+- run：`remaining_workflow_decision_value_audit_20260930_v1`
+- path：`artifacts/analysis/remaining_workflow_decision_value_audit_20260930_v1/`
+- fixed base：`58c3a8900152f03e0d655194e1a02afb50f1f727`；上一轮execution commit=`ffa10e5`
+- result commit：`addd1c5828648e2e3f373f6098f139479cee1849`
+- inputs：上一轮old/candidate四配置各288 request rows；本机SmolVLM
+  `a7da5b986cb59b408707209984f360a5f4ad7e47`；预注册2 pair×4 rules=16 episodes
+- result：candidate equal-completion下blocked+sharing on 3,264 MiB、其余8,640 MiB；SmolVLM process-first load
+  中位445.778 ms、minimal inference中位27.709 ms；732-byte显式状态3/3恢复正确；action4长尾同完成/失败少
+  104 MiB模型字节但真实状态payload unavailable；两步与full-tail 4/4首动作相同。
+- boundary：原生仿真、本机测量、符号敏感性严格分开；无真实adapter/network/complete state，无训练、formal/holdout、
+  algorithm advantage或paper-ready结论。报告：`docs/project/remaining_workflow_decision_value_audit_20260930.md`。
+
+## 2026-09-30 native typed-cache sequential replacement witness
+
+- run：`native_typed_cache_replacement_20260930_v1`
+- path：`artifacts/analysis/native_typed_cache_replacement_20260930_v1/`
+- execution commit：`602f5af374726485f5c2c3759cd6540d2e2e9f2b`，clean
+  `codex/typed-cache-replacement`；审计提交/父提交=`371159d`/`73051ab`
+- input：`vec_mechanism_probe_v0_2.zip`，351,734 bytes，SHA-256=`c0b332...bbe`；CRC、38 member hash和旧审计
+  artifact hash/size均通过
+- scope：显式 transaction v1.1、`sequential_dependency_recompute_lru_v1`、原生LRU；两请求/正负例、固定四配置
+  old/new各288请求、同规则两步synthetic `env.step()`；无训练、formal/holdout或矩阵扩张
+- result：`b0.a0→b1.a0`按adapter→base影子顺序释放104 MiB并原子准入；所有保护负例无修改拒绝；old四配置与
+  已交付审计匹配；candidate四配置服务72/72。old低传输来自拒绝，非收益。
+- workflow witness：old在固定step cap=2时未完成；candidate经两个合法action0完成两节点workflow；无cloud回源。
+- boundary：`E2_BOUNDED_NATIVE_IMPLEMENTATION_DIAGNOSTIC`，不是算法优势、reference等价、真实模型、formal或
+  paper-ready证据。报告：`native_typed_cache_replacement_witness_20260930.md`。
+
+## 2026-09-30 native typed-cache per-request consistency audit
+
+- run：`native_typed_cache_request_audit_20260930_v1`
+- path：`artifacts/analysis/native_typed_cache_request_audit_20260930_v1/`
+- input：`vec_mechanism_probe_v0_2.zip`，SHA-256
+  `c0b3325874e7427629af8ed36720ed75db5b292c9658d7f3defd39a9deb44bbe`；39 files CRC pass，38 manifest hashes pass
+- scope：固定 LRU / 136 MiB / 空 cache 的 blocked/interleaved × sharing on/off，各72请求，共288；无训练、无
+  formal/holdout、无 eviction rule 修改
+- result：首个差异为 sharing-on/interleaved `b1.a0`；reference closure eviction 可切换 family，原生单次静态
+  dependency-safe set 不可释放足够容量并原子拒绝。全部请求 capacity/dependency/byte invariants通过，所有拒绝保持
+  resident/policy不变。
+- evidence boundary：`E2_ARTIFACT_AUDITED_FOR_BOUNDED_NATIVE_MICROTRACE_ONLY`；不是低传输收益、算法排名、真实模型
+  测量、formal 或 paper-ready 证据。
+- report：`docs/project/native_typed_cache_request_audit_20260930.md`
+
 ## 2026-09-06 G14R18 checkpoint provenance envelope closure
 
 - path：`artifacts/analysis/typed_model_cache_formal_provenance_envelope_repair_20260906_g14r18_v1/`；active config：

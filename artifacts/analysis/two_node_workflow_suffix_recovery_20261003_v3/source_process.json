@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+    "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/scripts/run_two_node_workflow_suffix_recovery.py",
+    "--role",
+    "source",
+    "--plan",
+    "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/configs/acceptance/two_node_workflow_suffix_recovery_v1.json",
+    "--run-root",
+    "/Users/howen/.codex/worktrees/workflow-suffix-recovery/PPO_MEC/artifacts/analysis/two_node_workflow_suffix_recovery_20261003_v3"
+  ],
+  "ended_at_unix": 1791039450.262079,
+  "pid": 95837,
+  "process_startup_overhead_seconds": 0.687846583999999,
+  "receipt_status": "PASS",
+  "returncode": 0,
+  "role": "source",
+  "started_at_unix": 1791039434.592551,
+  "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+  "stdout": "PASS\n",
+  "timed_out": false,
+  "wall_seconds": 15.669852041999999
+}

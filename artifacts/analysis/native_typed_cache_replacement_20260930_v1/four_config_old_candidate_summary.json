@@ -1,0 +1,231 @@
+{
+  "candidate_semantics": [
+    {
+      "actual_evicted_object_count": 142,
+      "admission_rejection_count": 0,
+      "admission_requested_count": 72,
+      "capacity_invariant_all_requests": true,
+      "config_id": "interleaved__sharing_on",
+      "dependency_invariant_all_requests": true,
+      "origin_execution_count": 0,
+      "rejection_state_unchanged_all_rejections": true,
+      "request_count": 72,
+      "service_failure_count": 0,
+      "service_success_count": 72,
+      "total_transfer_bytes_under_explicit_mapping": 9059696640,
+      "transaction_status_counts": {
+        "committed": 72
+      },
+      "transfer_bytes_by_type_under_explicit_mapping": {
+        "adapter": 603979776,
+        "base_model": 8455716864
+      },
+      "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1"
+    },
+    {
+      "actual_evicted_object_count": 94,
+      "admission_rejection_count": 0,
+      "admission_requested_count": 72,
+      "capacity_invariant_all_requests": true,
+      "config_id": "blocked__sharing_on",
+      "dependency_invariant_all_requests": true,
+      "origin_execution_count": 0,
+      "rejection_state_unchanged_all_rejections": true,
+      "request_count": 72,
+      "service_failure_count": 0,
+      "service_success_count": 72,
+      "total_transfer_bytes_under_explicit_mapping": 3422552064,
+      "transaction_status_counts": {
+        "committed": 72
+      },
+      "transfer_bytes_by_type_under_explicit_mapping": {
+        "adapter": 603979776,
+        "base_model": 2818572288
+      },
+      "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1"
+    },
+    {
+      "actual_evicted_object_count": 142,
+      "admission_rejection_count": 0,
+      "admission_requested_count": 72,
+      "capacity_invariant_all_requests": true,
+      "config_id": "blocked__sharing_off",
+      "dependency_invariant_all_requests": true,
+      "origin_execution_count": 0,
+      "rejection_state_unchanged_all_rejections": true,
+      "request_count": 72,
+      "service_failure_count": 0,
+      "service_success_count": 72,
+      "total_transfer_bytes_under_explicit_mapping": 9059696640,
+      "transaction_status_counts": {
+        "committed": 72
+      },
+      "transfer_bytes_by_type_under_explicit_mapping": {
+        "adapter": 603979776,
+        "base_model": 8455716864
+      },
+      "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1"
+    },
+    {
+      "actual_evicted_object_count": 142,
+      "admission_rejection_count": 0,
+      "admission_requested_count": 72,
+      "capacity_invariant_all_requests": true,
+      "config_id": "interleaved__sharing_off",
+      "dependency_invariant_all_requests": true,
+      "origin_execution_count": 0,
+      "rejection_state_unchanged_all_rejections": true,
+      "request_count": 72,
+      "service_failure_count": 0,
+      "service_success_count": 72,
+      "total_transfer_bytes_under_explicit_mapping": 9059696640,
+      "transaction_status_counts": {
+        "committed": 72
+      },
+      "transfer_bytes_by_type_under_explicit_mapping": {
+        "adapter": 603979776,
+        "base_model": 8455716864
+      },
+      "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1"
+    }
+  ],
+  "configuration_count_per_semantics": 4,
+  "interpretation_guard": "Lower transfer caused by rejected service is not a benefit; service success/failure and rejection counts must be read with transfer.",
+  "old_matches_delivered_audit": {
+    "blocked__sharing_off": {
+      "actual_evicted_object_count": true,
+      "admission_rejection_count": true,
+      "request_count": true,
+      "service_failure_count": true,
+      "service_success_count": true,
+      "transaction_status_counts": true,
+      "transfer_bytes_by_type": true
+    },
+    "blocked__sharing_on": {
+      "actual_evicted_object_count": true,
+      "admission_rejection_count": true,
+      "request_count": true,
+      "service_failure_count": true,
+      "service_success_count": true,
+      "transaction_status_counts": true,
+      "transfer_bytes_by_type": true
+    },
+    "interleaved__sharing_off": {
+      "actual_evicted_object_count": true,
+      "admission_rejection_count": true,
+      "request_count": true,
+      "service_failure_count": true,
+      "service_success_count": true,
+      "transaction_status_counts": true,
+      "transfer_bytes_by_type": true
+    },
+    "interleaved__sharing_on": {
+      "actual_evicted_object_count": true,
+      "admission_rejection_count": true,
+      "request_count": true,
+      "service_failure_count": true,
+      "service_success_count": true,
+      "transaction_status_counts": true,
+      "transfer_bytes_by_type": true
+    }
+  },
+  "old_semantics": [
+    {
+      "actual_evicted_object_count": 0,
+      "admission_rejection_count": 36,
+      "admission_requested_count": 72,
+      "capacity_invariant_all_requests": true,
+      "config_id": "interleaved__sharing_on",
+      "dependency_invariant_all_requests": true,
+      "origin_execution_count": 0,
+      "rejection_state_unchanged_all_rejections": true,
+      "request_count": 72,
+      "service_failure_count": 36,
+      "service_success_count": 36,
+      "total_transfer_bytes_under_explicit_mapping": 125829120,
+      "transaction_status_counts": {
+        "committed": 3,
+        "noop_all_resident": 33,
+        "rolled_back_no_mutation": 36
+      },
+      "transfer_bytes_by_type_under_explicit_mapping": {
+        "adapter": 25165824,
+        "base_model": 100663296
+      },
+      "typed_eviction_semantics": "static_dependency_safe_v1"
+    },
+    {
+      "actual_evicted_object_count": 0,
+      "admission_rejection_count": 36,
+      "admission_requested_count": 72,
+      "capacity_invariant_all_requests": true,
+      "config_id": "blocked__sharing_on",
+      "dependency_invariant_all_requests": true,
+      "origin_execution_count": 0,
+      "rejection_state_unchanged_all_rejections": true,
+      "request_count": 72,
+      "service_failure_count": 36,
+      "service_success_count": 36,
+      "total_transfer_bytes_under_explicit_mapping": 125829120,
+      "transaction_status_counts": {
+        "committed": 3,
+        "noop_all_resident": 33,
+        "rolled_back_no_mutation": 36
+      },
+      "transfer_bytes_by_type_under_explicit_mapping": {
+        "adapter": 25165824,
+        "base_model": 100663296
+      },
+      "typed_eviction_semantics": "static_dependency_safe_v1"
+    },
+    {
+      "actual_evicted_object_count": 0,
+      "admission_rejection_count": 60,
+      "admission_requested_count": 72,
+      "capacity_invariant_all_requests": true,
+      "config_id": "blocked__sharing_off",
+      "dependency_invariant_all_requests": true,
+      "origin_execution_count": 0,
+      "rejection_state_unchanged_all_rejections": true,
+      "request_count": 72,
+      "service_failure_count": 60,
+      "service_success_count": 12,
+      "total_transfer_bytes_under_explicit_mapping": 109051904,
+      "transaction_status_counts": {
+        "committed": 1,
+        "noop_all_resident": 11,
+        "rolled_back_no_mutation": 60
+      },
+      "transfer_bytes_by_type_under_explicit_mapping": {
+        "adapter": 8388608,
+        "base_model": 100663296
+      },
+      "typed_eviction_semantics": "static_dependency_safe_v1"
+    },
+    {
+      "actual_evicted_object_count": 0,
+      "admission_rejection_count": 60,
+      "admission_requested_count": 72,
+      "capacity_invariant_all_requests": true,
+      "config_id": "interleaved__sharing_off",
+      "dependency_invariant_all_requests": true,
+      "origin_execution_count": 0,
+      "rejection_state_unchanged_all_rejections": true,
+      "request_count": 72,
+      "service_failure_count": 60,
+      "service_success_count": 12,
+      "total_transfer_bytes_under_explicit_mapping": 109051904,
+      "transaction_status_counts": {
+        "committed": 1,
+        "noop_all_resident": 11,
+        "rolled_back_no_mutation": 60
+      },
+      "transfer_bytes_by_type_under_explicit_mapping": {
+        "adapter": 8388608,
+        "base_model": 100663296
+      },
+      "typed_eviction_semantics": "static_dependency_safe_v1"
+    }
+  ],
+  "request_count_per_semantics": 288
+}
