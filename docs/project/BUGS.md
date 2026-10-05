@@ -814,3 +814,16 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - `OPEN / external validity`：A/B/C 使用 contract-legal synthetic audit objects，不是真实模型权重；100 Mbps、同机 state overhead 和 technical-workload recompute 是冻结估计，非真实无线测量。
 - `RESOLVED WITH BOUNDED WITNESS / within-episode state coupling`：C 已证明合法 action 4 可经有限容量 LRU 改变后续 resident set、reload bytes 和 action mask；这不是不同 `restore_cost` 造成。但仅为 E2 bounded，不授权 RL、formal/holdout 或 paper-ready claim。
 - `CORRECTED / method identity`：frozen runner 将 resident-aware estimate 标为 `current_simple_threshold`，与 workload-v0.1 原方法信息权限不一致。原规则按预存冻结输入复算仍在 A/B/C 全选 action 4，故 native outcome 不变；原 frozen decision record 只保留审计，不可用作方法权限证明。
+
+## 2026-10-06 SA-GHMAPPO v2 remaining blockers
+
+- `OPEN / policy and aggregation collapse`：full SA 三 seed 中 seed 29 completion 仅 0.25；另两 seed 退化到与 MAPPO
+  相同的高 transfer/high recompute 行为。raw evaluation action 0/3/4=`180/10/120`，未学出正确规则的 0/2/4 条件切换。
+- `NEGATIVE / dependency-message hypothesis`：同信息 no-dependency completion 0.917，高于 full 0.750；paired delta
+  `-0.167 [-0.250,-0.083]`。不得把 DAG message passing 写成已验证贡献，也不得用更少的截断 elapsed 掩盖未完成。
+- `OPEN / external validity`：link rate/error、deadline、adapter mapping 和 trajectory-workflow pairing 是合成因素；没有真实
+  adapter request trace、共享 queue/bandwidth/compute、跨 workflow cache 或真实 RSU。
+- `OPEN / statistical maturity`：只有 3 seeds、12 evaluation windows、percentile bootstrap；没有 formal/hidden holdout、
+  support、BCa/Holm、收敛证明或独立复现，paper-ready 维持 `Unverifiable`。
+- `BOUNDARY / historical v1`：192-episode v1 早于 action-4 commit 与 actual/estimated link 修正，只保留审计，不得与 v2
+  checkpoint、逐行结果或 aggregate 混用。

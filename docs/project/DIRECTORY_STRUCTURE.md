@@ -14,6 +14,18 @@
   12 rule rows、aggregate、paper table、receipt 与 integrity。
 - `docs/project/calibrated_continuous_workflow_pilot_20261006.md`：负向结果、论文实验表、审查元数据与 claim 边界。
 
+### v2 纠正版与公平训练
+
+- `configs/experiment/calibrated_continuous_workflow_pilot_v2.json` / `_manifest.json`：128-episode 限额、
+  actual/estimated link error strata、dev checkpoint selection、同信息消融与 12/4/12 frozen instances。
+- `scripts/diagnose_calibrated_continuous_workflow_v2.py`：depth-4 可达状态、对称计费、信息泄漏与规则分歧的 create-only 诊断。
+- `scripts/run_calibrated_continuous_workflow_pilot_v2.py`：SA/PPO/controller-MAPPO/no-dependency 训练、两条正确规则、dev
+  选模、evaluation-window outer CI、分层、曲线与 completion receipt。
+- `artifacts/calibrated_continuous_workflow_{non_degeneracy,pilot_v2}_20261006/`：诊断、checkpoint、全部 seed/window 结果、
+  曲线、分层、日志指针与 integrity。
+- `docs/project/sa_ghmappo_innovation_fair_training_v2_20261006.md` 与
+  `manuscript_experiment_section_sa_ghmappo_pilot_v2_20261006.md`：最近邻矩阵、负向消融和待合并论文实验章节。
+
 ## 2026-10-06 symmetric recovery cost correction
 
 - `src/runtime/symmetric_recovery_cost.py`：双方 event ledger 的纯函数 scorer 与三种在线决策。

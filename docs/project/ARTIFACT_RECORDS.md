@@ -5,6 +5,19 @@
 
 # Artifact Records
 
+## 2026-10-06 calibrated continuous-workflow v2 fair-training pilot
+
+- root：`artifacts/calibrated_continuous_workflow_pilot_v2_20261006/`；run source commit `b418eb4…`，纠正祖先
+  `d67575b…`；12 learned checkpoints selected from 48 candidates，168 evaluation rows，完整曲线、分层、receipt 与 integrity。
+- 冻结 3 seeds × 128 episodes；主/消融/总上限 `27,648/9,216/36,864` steps，实际
+  `8,154/2,873/11,027`。real-model generate/download/old-holdout 均 0。
+- SA/no-dependency/MAPPO/PPO/immediate/two-step completion=`0.750/0.917/1/1/1/1`。单因素 full-minus-ablation
+  completion=`-0.167 [-0.250,-0.083]`，候选机制为负；最终决策 C。
+- 诊断 root：`artifacts/calibrated_continuous_workflow_non_degeneracy_20261006/`；首次 initial-only fail 与纠正后的
+  depth-4 pass 都保留，split raw-frame overlap 为 0。
+- 证据等级 `E1_DOCUMENTED_WITH_AUDITED_NONFORMAL_PILOT`；不是 formal/holdout、真实无线/RSU、算法优势或 paper-ready。
+  报告见 `sa_ghmappo_innovation_fair_training_v2_20261006.md`。
+
 ## 2026-10-06 calibrated continuous-workflow matched pilot
 
 - root：`artifacts/benchmarks/calibrated_continuous_workflow_pilot_20261006_v1/`；执行 commit

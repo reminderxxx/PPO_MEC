@@ -1225,3 +1225,12 @@ claim map 必须报告 `UNAVAILABLE`。
 - 边界：耦合只在同一环境 episode 的跨 request/node 路径兑现；跨 workflow persistence 和共享无线/计算资源尚未实现。
 - 后续：只提出 eviction-externality-aware threshold 的最小设计，另轮独立冻结/验证；本轮不实现、不调参、不训练 RL。
 - 证据：`shared_cache_recovery_coupling_audit_20261005.md` 与 run `shared_cache_recovery_coupling_20261005_v1`。
+
+## 2026-10-06 — SA-GHMAPPO 小预算创新决策 C
+
+- 只保留并检验一个候选：DAG-node adapter-residency relation message passing；不把 MAPPO、图编码、shared base、
+  adapter prefetch 或 checkpoint recovery 作为原创组件。
+- 同信息单因素消融显示 full SA completion/coverage/reward 均更差；强规则、PPO 和 controller-level MAPPO completion
+  均为 1.0。故本轮选择 C：保留负结果、定位 policy/aggregation collapse，不调数据或预算制造胜出。
+- 论文边界：候选机制不进入正向贡献；v2 只可作为 measurement-calibrated synthetic negative pilot。任何未来修复必须
+  另立预注册任务和 run ID，保留 v2 evaluation 与 failure receipts，不得在本轮自动改算法。

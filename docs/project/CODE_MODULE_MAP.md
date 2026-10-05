@@ -10,6 +10,15 @@
   独立两步规则只 clone 当前可见状态，输出 window-outer aggregate、checkpoint hash 和完整性清单。
 - `tests/test_calibrated_continuous_workflow.py`：校验共同 action/cache/state 能力，而不测试或修改各算法内部。
 
+v2 职责增量：
+
+- environment 将 decision-time estimated link 与 execution-time actual link 分离，action 4 的 state 只在当前节点成功后提交，
+  reward 分项进入逐 episode ledger；不扩展 live production environment。
+- freeze script 只把事前模板中的 link/prediction profile 写入 frozen instance，不读取任何方法结果。
+- diagnostic script 只做可达状态与权限检查；runner 只有在 pass receipt 后训练，且用 dev 而非 evaluation 选 checkpoint。
+- `sa_ghmappo_no_dependency` 不进入 live registry；runner 仍构建 `sa_ghmappo`，仅将
+  `use_dependency_aware=False` 作为局部单因素消融，避免污染算法注册 contract。
+
 ## Real PEFT adapter cache lifecycle witness
 
 - `src/runtime/peft_adapter_lifecycle.py`：把 native typed-cache 已预览的 adapter-only victim/admission 实体化为 PEFT

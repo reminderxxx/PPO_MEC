@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-05
+更新日期：2026-10-06
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -38,6 +38,15 @@
 5. 信息不完整时保守记录：venue、年份、DOI、页码、acceptance status 或结论没核实时，写 `待核验`；不要为了补齐表格编造。
 6. 更新日期：新增或大幅修订本表后，同步更新文件顶部 `更新日期`。
 7. 范围控制：无关论文不加入；边缘相关但可能影响审稿回应的论文可以加入，并在 `论文写作位置` 中标注为 `Discussion / reviewer response`。
+
+## 2026-10-06 连续迁移与服务缓存增量近邻
+
+本轮公开检索只使用论文标题、问题关键词和一手出版页面，不上传 manuscript、artifact、checkpoint 或真实数据。以下论文
+为本表新增项；其结论只用于压缩 novelty claim，不是 PPO_MEC 性能证据。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---:|---|---|---|
+| service-cache-assisted task migration | [A service cache-based dynamic collaborative task migration technology](https://doi.org/10.1186/s13638-026-02623-8) | EURASIP Journal on Wireless Communications and Networking, 2026, article 85；Springer 开放全文已核验 | 构建动态协作边缘集群和 migration prediction radius，以 edge service pre-caching 支撑任务迁移；用 C-DDQN 决策缓存，并比较 FIFO/LRU/LFU/Random/GDS/DQN 的 hit、cost、delay 与 migration success。 | 该文已覆盖“预测迁移 + service pre-cache + DRL”，因此这组组件不能作为 PPO_MEC 首创。PPO_MEC 当前候选只缩到跨 RSU 连续 DAG 节点、typed base/adapter 驻留与 application-state 连续性的关系决策；其独特性和有效性仍须同信息单因素消融，且本轮小预算结果为负。 | 最近邻差异矩阵 / Related Work / negative-result discussion；该文采用低速行人移动与稳定预测，不能直接外推高速 VEC。 |
 
 ## 2026-10-05 驱逐与模型重载成本窄范围核对
 

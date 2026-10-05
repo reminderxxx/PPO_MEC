@@ -1,5 +1,9 @@
 # 实测校准连续工作流匹配训练（2026-10-06）
 
+> 历史状态：本文件记录 v1 192-episode pilot，保留用于审计，不是当前比较证据。v2 已修正 action-4 state commit、
+> actual/estimated link 信息边界，并按 128-episode 上限加入同信息消融；当前结论见
+> `sa_ghmappo_innovation_fair_training_v2_20261006.md`。不得混合 v1/v2 数值或 checkpoint。
+
 ## 审查元数据与边界
 
 - `reviewed_at`: `2026-10-06`

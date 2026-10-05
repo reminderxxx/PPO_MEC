@@ -2129,3 +2129,19 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 研究决定为 3：另轮只验证带 resident eviction externality 的最小机制规则；本轮不实现新算法、不训练 RL。跨 workflow 持久缓存、共享带宽/计算/队列仍未实现，证据保持 E2 bounded。
 - 报告：`shared_cache_recovery_coupling_audit_20261005.md`；机器证据：`../../artifacts/shared_cache_recovery_coupling_20261005_v1/`。
 - 事后方法身份核对发现 frozen runner 的 `current_simple_threshold` 错把 resident-aware estimate 标成原 workload-v0.1 阈值；保留原产物并追加 correction。按原冻结参数复算仍在 A/B/C 全选 action 4，因此 branch/数值不变，但 frozen decision record 不作为原方法信息权限证据。
+
+## 2026-10-06 SA-GHMAPPO 创新候选与纠正版公平小预算训练
+
+- 在 `d67575b…` 纠正提交祖先上冻结 v2：action 4 只在当前节点成功后提交迁移 state，决策只见 estimated link，
+  环境执行使用 actual link；旧 scorer/action-0/offline reference 未进入新结论。
+- 最近邻压缩到六篇一手论文；新增 JWCN 2026 service-cache-assisted migration 条目。DAG/service cache、workflow
+  model loading、shared base/adapter prefetch、trajectory migration 和 MAPPO 均已有直接重叠，独特性未建立。
+- 唯一候选为 DAG-node adapter-residency relation message passing；同信息消融只关闭 `use_dependency_aware`。
+- depth-4 诊断检查 1,183 states / 4,962 state-actions；对称传输误差 0、actual cost 泄漏 0、两规则 406 次分歧。
+  首次仅初始状态诊断的 fail receipt 保留，未静默覆盖。
+- 一次正式小预算执行完成：3 seeds × 128 episodes；actual main/ablation/total steps=`8,154/2,873/11,027`，
+  无 generate/download/旧 holdout/搜索/补跑。
+- evaluation completion：SA 0.750、no-dependency 0.917、PPO 1.000、controller-level MAPPO 1.000、两规则 1.000；
+  full-minus-ablation completion=`-0.167 [-0.250,-0.083]`。最终决策 C，候选机制不进入正向贡献。
+- artifact：`artifacts/calibrated_continuous_workflow_pilot_v2_20261006/`；报告：
+  `sa_ghmappo_innovation_fair_training_v2_20261006.md`；paper-ready 仍为 `Unverifiable`。

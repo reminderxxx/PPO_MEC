@@ -5,12 +5,16 @@
 
 # PPO_MEC
 
-实测校准连续工作流小规模匹配训练已完成：SA-GHMAPPO、PPO、controller-level MAPPO 均使用相同五动作、
-依赖安全 typed cache、action 4 状态恢复和冻结的 12-window evaluation；强对照为同信息 two-step cost rule。
-结果不支持 SA-GHMAPPO 优势：规则完成率为 1.000，SA-GHMAPPO 为 0.528，PPO/MAPPO 虽均为 1.000，但产生更多
-传输与 prefix recompute。该结果是 non-formal calibrated pilot，不是无线/真实 RSU、formal/holdout 或 paper-ready 证据。
-实验表、失败模式和 claim 边界见
-[匹配训练报告](docs/project/calibrated_continuous_workflow_pilot_20261006.md)。
+纠正版实测校准连续工作流 v2 小预算训练已完成：SA-GHMAPPO、PPO、controller-level MAPPO、同信息
+no-dependency 消融和 immediate/two-step correct cost rules 共用五动作、奖励、依赖安全 typed cache 与信息权限；
+3 seeds × 128 episodes，不用 evaluation 选模。结果不支持算法优势或候选机制：SA completion 为 0.750，消融为
+0.917，PPO/MAPPO/两规则均为 1.000；最终决策 C，保留负结果。详见
+[创新与公平训练报告](docs/project/sa_ghmappo_innovation_fair_training_v2_20261006.md)及
+[待合并论文实验章节](docs/project/manuscript_experiment_section_sa_ghmappo_pilot_v2_20261006.md)。
+
+此前 192-episode v1 pilot 及其报告保留为历史证据，但它不满足本轮 128-episode 上限，且早于 action-4 state commit 与
+actual/estimated link 信息边界修正，不得用于当前算法比较；历史入口仍见
+[v1 匹配训练报告](docs/project/calibrated_continuous_workflow_pilot_20261006.md)。
 
 真实 adapter cache victim→reload 的 12-call 最小实测已完成：两臂共用同一 native typed-cache 与 PEFT lifecycle
 接线，ALPR 合法驱逐后从 780 个 runtime tensors 降为 0，并在后续节点前由保留本地文件真实重载；base+双 adapter
