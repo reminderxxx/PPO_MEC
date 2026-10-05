@@ -9,6 +9,7 @@
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `run_source_git_commit`: `b418eb4dbfa012e271cb97880693c714e6abf79e`
 - `delivery_git_commit`: `be4c3d1bbd9f74d5af8032215e36dc280d480013`（训练后源代码与报告首次提交）
+- `safe_delivery_git_commit`: `fecd930`（不含 checkpoint 的发布历史；完整 hash 见该提交后继记录）
 - `corrected_cost_ancestor`: `d67575bc94652f7a6e12c97315ae19c7cd42415e`
 - `evidence_level`: `E1_DOCUMENTED_WITH_AUDITED_NONFORMAL_PILOT`
 - `paper_ready_verdict`: `Unverifiable`
