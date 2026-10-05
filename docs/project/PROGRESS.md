@@ -7,6 +7,8 @@
 
 ## 2026-10-05：独立事前成本检查完成并停止扩展
 
+后续编辑交付：主稿 v1.1 补全 RQ—证据对应及完整路径成本口径，保留旧冻结公式和全部正负结果；新增 `manuscript_evidence_progress_20261005.md` 维护成果/问题/下一步。无新增模型调用、实验或算法变更。下一任务限于生产端双方计费与真实 victim→later reload，尚未执行。
+
 - 从解析基线 `de70d572…` 先冻结计划/预测，再以 clean commit `b7c8c4d…` 一次执行 2 条合法条件×3 次配对；
   24/24 `generate`、6/6 输出保真、无重试/训练/下载/旧 holdout，scientific wall `243.001998 s`。
 - prepared 条件 restart/recovery 中位 local wall 为 `15.268257/3.910952 s`；需本地准备条件为

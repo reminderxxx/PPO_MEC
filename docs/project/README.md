@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `manuscript_evidence_progress_20261005.md`：论文 v1.1 的成果、未解决问题与后续追加记录规范；无新增实验。
+
 - `independent_recovery_cost_measurement_plan_20261005.md`：独立成本检查的实例、随机顺序、既有校准、事前预测、
   24-call 硬预算、评分和未覆盖条件；模型输出产生前冻结
 - `independent_recovery_cost_measurement_results_20261005.md`：24/24 调用、6 次逐项误差/动作/原始重复、输出保真、

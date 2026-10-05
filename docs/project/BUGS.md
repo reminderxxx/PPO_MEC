@@ -7,6 +7,8 @@
 
 ## 2026-10-05：独立检查同侧通过但未触及驱逐项和决策边界（OPEN SCIENTIFIC BLOCKER）
 
+文稿 v1.1 追加口径风险：冻结开发公式仅显式向 recovery 写入当前依赖准备项，rerun 路径仍从 C 投影；泛化应用前必须核对两条实际路径的准备与缓存转移，不能默认共同成本相等。当前仅识别文稿适用边界，未据此判定代码错误或重算结果。见 `manuscript_evidence_progress_20261005.md` P01/P02。
+
 - 新测量 6/6 方向匹配，但全部是 recovery，不能据此声称阈值校准、分类稳定性或泛化；不追加条件制造翻转。
 - 绝对成本统一偏高，prepared/recovery 相对误差达 `45.9%--49.7%`，说明旧 child-wall calibration 与新 action-window
   边界之间仍有固定开销差异；方向正确不能替代成本校准。

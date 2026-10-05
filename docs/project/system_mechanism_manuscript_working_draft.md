@@ -1,6 +1,6 @@
 # Cost-Accounted Recovery for Stateful AI Workflows at the Vehicular Edge
 
-> Internal working draft — revised 2026-10-05. This is a complete but non-submission-ready mechanism/empirical draft. It separates new real-model measurements, an estimated cost model, and synthetic development cases. It does not claim a new cache-replacement algorithm, a decision-boundary test, or deployment generality.
+> Internal working draft v1.1 — revised 2026-10-05. This is a complete but non-submission-ready mechanism/empirical draft. It separates real-model measurements, an estimated cost model, and synthetic development cases. This editorial revision adds no experiment or validated algorithm. References are inherited from the preceding review, not independently reverified in this revision.
 
 ## Abstract
 
@@ -14,7 +14,9 @@ Finite caches make readiness stateful. Preparing the current model can evict a b
 
 This paper asks one narrow question: **can an ex-ante cost estimate predict rerun-versus-recovery cost and action on a new execution of the implemented workflow path?** We do not study cross-workflow scheduling, link or compute queues, real radio allocation, or full vehicle/RSU-level multi-agent reinforcement learning. We add no neural network and no new action.
 
-The contribution is deliberately system-oriented. First, we connect a validated node-boundary state package to typed base/adapter readiness and a dependency-safe native victim preview. Second, we state auditable incremental costs and preserve conservative fallback when inputs are missing. Third, we freeze estimates and test them on new executions without feeding realized costs back into the decision. The evaluation also preserves unfavorable evidence: the analytical rule ties correct two-step lookahead, absolute predictions are biased high, synthetic estimator errors cause wrong actions, and the corrected rule can increase recomputation.
+The contribution is deliberately system-oriented. First, we implement validated node-boundary state recovery with explicit model-readiness checks; dependency-safe victim effects are evaluated separately in the native synthetic path. Second, we expose the incremental costs needed for a recovery decision and preserve conservative fallback when inputs are missing. Third, we freeze estimates and test them on new executions without feeding realized costs back into the decision. These are implementation and empirical contributions, not a claim that their underlying ideas are new. The evaluation preserves unfavorable evidence: the analytical rule ties correct two-step lookahead, absolute predictions are biased high, synthetic estimator errors cause wrong actions, and the corrected rule can increase recomputation.
+
+We distinguish three questions: whether state recovery preserves the suffix computation (RQ1); whether frozen estimates predict new same-host action costs (RQ2); and whether cache eviction changes the preferable recovery action (RQ3). RQ1 has real-model fidelity evidence, RQ2 has a same-side directional check, and RQ3 currently has synthetic native-transition evidence only. No single experiment closes all three questions.
 
 ## 2. Related Work and Attribution
 
@@ -48,7 +50,23 @@ Measured quantities are single-host action wall, model-load time, node inference
 
 ## 4. Cost Accounting and Decision Rule
 
-Let (C'=(C\setminus V)\cup D_0) be the projected post-recovery resident set. For declared near-term nodes (H), let (U=\bigcup_{v\in H}D_v), deduplicated by object identity. With transfer-time estimate (T(\cdot)), the frozen incremental costs are
+### 4.1 Full-path accounting and comparison boundary
+
+For each action \(a\in\{\mathrm{rerun},\mathrm{recover}\}\), an auditable serial-path decomposition is
+
+\[
+\widehat J_a=\widehat P_a+\widehat X_a+\widehat S_a+\widehat E_a+\widehat L_a.
+\]
+
+Here \(P_a\) is preparation of the models actually required on that path, \(X_a\) is dynamic input/state transfer, \(S_a\) is state handling, \(E_a\) is computation, and \(L_a\) is additional preparation caused by cache changes at later nodes. Model download and local loading must be separately identified within preparation; they are not both implied by a local-load measurement. Each event is counted once. This additive decomposition applies to the serial path evaluated here, not to an overlapping or queued execution system.
+
+Only terms demonstrated equal on the two paths may be cancelled. In the real two-node check both paths use the same model, but rerun executes the prefix and suffix whereas recovery executes only the suffix. In a general workflow the prefix and suffix can require different objects; preparation must therefore be resolved independently for each path, rather than assumed to be common. The same accounting applies to later reloads: they must follow the action-specific resident-state transitions, not merely a union of model names.
+
+This is a clarification of the reporting contract, not a new validated estimator. The following frozen development equations and their results are retained without retroactive alteration.
+
+### 4.2 Frozen development rule and its scope
+
+Let \(C'=(C\setminus V)\cup D_0\) be the projected post-recovery resident set. For declared near-term nodes \(H\), let \(U=\bigcup_{v\in H}D_v\), deduplicated by object identity. With transfer-time estimate \(T(\cdot)\), the frozen development costs were
 
 \[
 J_{\mathrm{rerun}}=\hat C_{\mathrm{recompute}}+T(\mathrm{input})+T(U\setminus C),
@@ -58,13 +76,19 @@ J_{\mathrm{rerun}}=\hat C_{\mathrm{recompute}}+T(\mathrm{input})+T(U\setminus C)
 J_{\mathrm{recover}}=T(D_0\setminus C)+T(\mathrm{state})+\hat C_{\mathrm{restore}}+T(U\setminus C').
 \]
 
-The induced reload set is ((U\setminus C')\setminus(U\setminus C)). Every induced object must be explained by the legal victim plan; otherwise the rule falls back to rerun. Objects missing on both paths remain in both totals and cancel only in the comparison. When restart and recovery require the same base/adapter, local model preparation is likewise recorded on both full paths and is not charged asymmetrically.
+The induced reload set is \((U\setminus C')\setminus(U\setminus C)\). Every induced object must be explained by the legal victim plan; otherwise the rule falls back to rerun. Objects missing on both paths remain in both totals and cancel only in the comparison. These equations project the rerun path from \(C\) and write \(D_0\) preparation explicitly only on recovery. They must not be presented as a general full-path formula: applying them to real victim/reload execution requires demonstrating the rerun preparation and cache transitions as well. That equation-to-production correspondence remains an open check; this editorial revision neither proves a code defect nor changes the frozen scores. The new same-model real measurements record preparation on both paths separately and do not exercise victim-induced reload.
 
 The rule selects recovery only when action 4 is legal, the native preview is feasible, all costs are valid, and (J_{\mathrm{recover}}<J_{\mathrm{rerun}}). Its post-preview bookkeeping is linear in the current dependencies, victims, and near-term dependency union. Native sequential victim planning remains worst-case quadratic in resident objects. Correct two-step lookahead evaluates the same two totals with the same information; for two actions and one future node it is the same decision, not a weaker baseline.
 
 ## 5. Evaluation
 
 ### 5.1 Evidence layers
+
+| Research question | Evidence available | What remains untested |
+|---|---|---|
+| RQ1: suffix fidelity | New real-model calls, identity and exact token/input checks | Traffic-task correctness, other model/task families |
+| RQ2: cost prediction | Six new same-host pairs with frozen predictions | Decision boundary, other hosts and workloads |
+| RQ3: eviction externality | Native legal-state synthetic development cases | Real victim followed by a measured model reload |
 
 We separate three evidence sources. First, an earlier three-pair same-host run supplies calibration only. Second, the new check executes fresh model calls after all predictions are frozen. Third, 12 synthetic development cases exercise cache victims and estimator errors using native state transitions plus modeled time. The 12 cases are development/mechanism evidence, not unseen validation.
 
@@ -129,3 +153,4 @@ The implemented path can export validated workflow state and resume a suffix wit
 - Strongest safe claim: ex-ante cost direction selected the lower-cost recovery path in six new same-host pairs across two legal model-residency conditions, with exact suffix fidelity; absolute prediction and boundary validity remain unsupported.
 - Prohibited claims: novelty of cost-aware eviction, superiority to correct two-step lookahead, calibrated decision boundary, statistical generalization, real wireless gain, real victim-reload benefit, cross-workflow scheduling, shared queues, task-quality gain, full MARL, or TMC-ready status.
 - Remaining submission-critical gaps (maximum two): (1) legal real victim→later reload with independently frozen cases on both decision sides; (2) remote/shared-resource measurement and labeled independent workflow evidence.
+- Editorial revision v1.1: based on delivery commit `510bc43bb4e67cf72803e54c4b391a4518b2b821`; no new inference or numerical experiment. Full-path accounting above is explanatory, not a replacement for the frozen implementation. Progress and unresolved questions are maintained in `manuscript_evidence_progress_20261005.md`.
