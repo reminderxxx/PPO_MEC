@@ -30,3 +30,4 @@ data/** filter=lfs diff=lfs merge=lfs -text
 artifacts/analysis/measurement_calibrated_vec_workload_20261005_v1/all_method_results.csv -text
 artifacts/analysis/measurement_calibrated_vec_workload_20261005_v2/all_method_results.csv -text
 artifacts/analysis/measurement_calibrated_vec_workload_20261005_v3/all_method_results.csv -text
+artifacts/analysis/independent_recovery_cost_measurement_20261005_v1/all_measurements.csv -text
