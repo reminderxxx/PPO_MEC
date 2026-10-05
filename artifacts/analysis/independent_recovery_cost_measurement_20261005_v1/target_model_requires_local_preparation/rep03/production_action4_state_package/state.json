@@ -1,0 +1,73 @@
+{
+  "payload": {
+    "completed_nodes": [
+      "n0"
+    ],
+    "execution_rights": {
+      "source_rsu_id": "technical_source_process",
+      "status": "pending_target_validation",
+      "target_rsu_id": "technical_target_process"
+    },
+    "identity": {
+      "adapter_name": "adapter_a",
+      "adapter_weight_sha256": "95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83",
+      "base_weight_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+      "processor_sha256": "c829b783c70c179f828dfe65d35546fea55cc5c0efd699abeb0e187f0bbb7ee9"
+    },
+    "input_identity": {
+      "bytes": 192757,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/LuSTScenario/LuSTScenario-master/docs/img/TrafficDemands.png",
+      "sha256": "83af09665cd23c87a1d831e6cb47a88bc8d509849712c551b0a9a7965e95c307"
+    },
+    "next_node": "n1",
+    "node_outputs": {
+      "n0": {
+        "raw_text": " The image is a line graph depicting the",
+        "token_ids": [
+          378,
+          2443,
+          314,
+          253,
+          1761,
+          3670,
+          17691,
+          260
+        ]
+      }
+    },
+    "remaining_nodes": [
+      "n1"
+    ],
+    "workflow": {
+      "edges": [
+        [
+          "n0",
+          "n1"
+        ]
+      ],
+      "execution_order": [
+        "n0",
+        "n1"
+      ],
+      "nodes": [
+        {
+          "node_id": "n0",
+          "predecessors": [],
+          "successors": [
+            "n1"
+          ]
+        },
+        {
+          "node_id": "n1",
+          "predecessors": [
+            "n0"
+          ],
+          "successors": []
+        }
+      ],
+      "workflow_id": "technical_vision_description_suffix_v1"
+    }
+  },
+  "payload_sha256": "b74d4ad1cd991c30e922421f500b59a9700ed7659c49cd8d4db085f1171e59b0",
+  "schema_version": "ppo_mec.workflow_state.v2"
+}

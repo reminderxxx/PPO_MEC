@@ -8,7 +8,10 @@
   新进程配对测量及原始值/误差/决策回执生成器。
 - `tests/test_independent_recovery_cost_measurement.py`：预算、预测、共同模型准备成本和未覆盖真实 reload 的静态合同。
 - `docs/project/independent_recovery_cost_measurement_plan_20261005.md`：模型输出前冻结的人工可读计划。
-- `artifacts/analysis/independent_recovery_cost_measurement_20261005_v1/`：计划执行后才允许创建的 create-only 结果根。
+- `artifacts/analysis/independent_recovery_cost_measurement_20261005_v1/`：已完成的 create-only 结果根，含 6 次配对、
+  18 个进程回执、raw JSON/CSV、aggregate、terminal 与 72-file integrity manifest。
+- `docs/project/independent_recovery_cost_measurement_results_20261005.md`：逐项误差、动作一致性、全部原始重复、
+  同侧无边界结论与投稿边界。
 
 ## 2026-10-05 eviction-aware recovery
 

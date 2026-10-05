@@ -5,6 +5,18 @@
 
 ﻿# Progress
 
+## 2026-10-05：独立事前成本检查完成并停止扩展
+
+- 从解析基线 `de70d572…` 先冻结计划/预测，再以 clean commit `b7c8c4d…` 一次执行 2 条合法条件×3 次配对；
+  24/24 `generate`、6/6 输出保真、无重试/训练/下载/旧 holdout，scientific wall `243.001998 s`。
+- prepared 条件 restart/recovery 中位 local wall 为 `15.268257/3.910952 s`；需本地准备条件为
+  `17.429127/6.111050 s`。事前均预测 recovery，事后 6/6 也均为 recovery，wrong-choice cost 全 0。
+- 四组中位绝对误差为 `1.390432/1.943712/0.369208/0.889423 s`；prepared recovery 相对绝对误差
+  `45.9%--49.7%`。全部点落在 recovery 一侧，明确未检验决策边界。
+- 原 12 点改称开发/机制验证；新规则与正确两步持平、d10/d11 负结果及 `+53.641216 s` 重算权衡继续保留。
+  真实 victim→later reload、无线/queue、任务正确性未覆盖。报告与修订稿见
+  `independent_recovery_cost_measurement_results_20261005.md`、`system_mechanism_manuscript_working_draft.md`。
+
 ## 2026-10-05：驱逐代价感知恢复规则完成最小冻结验证与论文工作稿
 
 - 从 `1a999287…` 隔离基线冻结 12 个 synthetic validation instances；单次执行 24 条 native branch，

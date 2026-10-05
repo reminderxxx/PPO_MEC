@@ -1,5 +1,14 @@
 ﻿# Decision Log
 
+## 2026-10-05：冻结现有方法，独立检查后收缩为机制/经验性研究
+
+- 决定：原 12 个 d01--d12 只作开发/机制验证，不再称未观察测试；本轮先冻结全部预测和 24-call 预算，再读取新输出。
+- 决定：目标模型已准备和需本地准备均按合法生产路径测量；共同 model preparation 双边记账并在动作比较中抵消。
+  无法真实执行的 victim→later reload、无线和 queue 保持 uncovered，不手动删缓存或合成实测。
+- 结果：6/6 方向匹配但同属 recovery 一侧，绝对预测偏高且未测试边界；不追加条件、不训练、不扩系统。
+- 定位：成本感知 eviction/loading 已有 GreedyDual-Size、ICC 2022 model caching 和 TMC 2026 unloading 先例；最强主张
+  是已实现状态恢复、成本分解和有界同机经验结果，不是原创算法或优于两步前瞻。
+
 ## 2026-10-05：恢复成本修正保持 opt-in，并以正确两步为上限对照
 
 - 决定：不新增动作/网络/RL；只在显式 opt-in 下比较完整 rerun/recovery increment，victim 必须来自现有 native

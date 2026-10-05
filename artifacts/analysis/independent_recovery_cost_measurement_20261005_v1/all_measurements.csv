@@ -1,0 +1,7 @@
+sequence,condition_id,repeat_id,predicted_action,measured_action,decision_match,wrong_choice_cost_seconds,restart_predicted_seconds,restart_measured_seconds,restart_signed_error_seconds,recovery_predicted_seconds,recovery_measured_seconds,recovery_signed_error_seconds,output_fidelity
+1,target_model_requires_local_preparation,rep01,recovery,recovery,True,0.0,17.833755518,17.464547852,0.3692076660000012,7.020647425000001,6.138927550000001,0.8817198749999999,PASS
+2,target_model_prepared,rep01,recovery,recovery,True,0.0,16.69410881,15.15037206,1.543736749999999,5.874839383,3.9232831749999995,1.9515562080000008,PASS
+3,target_model_prepared,rep02,recovery,recovery,True,0.0,16.69410881,15.303677185000002,1.390431624999998,5.874839383,3.9311271329999995,1.9437122500000008,PASS
+4,target_model_requires_local_preparation,rep03,recovery,recovery,True,0.0,17.833755518,17.537554935,0.29620058300000096,7.020647425000001,6.131224675,0.8894227500000005,PASS
+5,target_model_requires_local_preparation,rep02,recovery,recovery,True,0.0,17.833755518,17.348279559999998,0.4854759580000021,7.020647425000001,5.828561925,1.192085500000001,PASS
+6,target_model_prepared,rep03,recovery,recovery,True,0.0,16.69410881,15.673568685000001,1.0205401249999984,5.874839383,4.027137592000001,1.8477017909999995,PASS

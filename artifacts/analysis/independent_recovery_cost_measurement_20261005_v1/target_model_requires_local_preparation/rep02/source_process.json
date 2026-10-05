@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+    "/Users/howen/.codex/worktrees/cost-validation/PPO_MEC/scripts/run_independent_recovery_cost_measurement.py",
+    "--role",
+    "source",
+    "--condition-id",
+    "target_model_requires_local_preparation",
+    "--plan",
+    "/Users/howen/.codex/worktrees/cost-validation/PPO_MEC/configs/acceptance/independent_recovery_cost_measurement_v1.json",
+    "--run-root",
+    "/Users/howen/.codex/worktrees/cost-validation/PPO_MEC/artifacts/analysis/independent_recovery_cost_measurement_20261005_v1/target_model_requires_local_preparation/rep02"
+  ],
+  "condition_id": "target_model_requires_local_preparation",
+  "ended_at_unix": 1791196841.8328278,
+  "pid": 29638,
+  "receipt_status": "PASS",
+  "returncode": 0,
+  "role": "source",
+  "started_at_unix": 1791196827.571028,
+  "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+  "stdout": "PASS\n",
+  "timed_out": false,
+  "wall_seconds": 14.261779625000003
+}

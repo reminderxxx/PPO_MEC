@@ -1,0 +1,147 @@
+{
+  "adapter_status": {
+    "active_adapters": [
+      "adapter_a"
+    ],
+    "adapter_model_type": "LoraModel",
+    "available_adapters": [
+      "adapter_a"
+    ],
+    "base_model_type": "Idefics3ForConditionalGeneration",
+    "devices": {
+      "adapter_a": [
+        "cpu"
+      ]
+    },
+    "enabled": true,
+    "merged_adapters": [],
+    "num_adapter_layers": 260,
+    "peft_types": {
+      "adapter_a": "LORA"
+    },
+    "requires_grad": {
+      "adapter_a": true
+    },
+    "total_params": 546059456,
+    "trainable_params": 38577152
+  },
+  "condition_id": "target_model_requires_local_preparation",
+  "executed_nodes": [
+    "n0"
+  ],
+  "generate_attempted": 1,
+  "generate_completed": 1,
+  "identity": {
+    "adapter_name": "adapter_a",
+    "adapter_weight_sha256": "95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83",
+    "base_weight_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+    "processor_sha256": "c829b783c70c179f828dfe65d35546fea55cc5c0efd699abeb0e187f0bbb7ee9"
+  },
+  "model_load_timings": {
+    "adapter_load_seconds": 0.803087917,
+    "base_load_seconds": 0.26397537500000023,
+    "processor_load_seconds": 0.07381491699999998
+  },
+  "n0_input": {
+    "image_access_count": 1,
+    "image_size": [
+      1200,
+      900
+    ],
+    "input_ids_sha256": "283065519f9c60703fd98587652f746a70830acf31d54e2c9000639fe9543de4",
+    "prompt": "Describe the main subject of this local image in one short phrase.",
+    "rendered_prompt": "<|im_start|>User:<image>Describe the main subject of this local image in one short phrase.<end_of_utterance>\nAssistant:"
+  },
+  "n0_output": {
+    "decoded_text": " The image is a line graph depicting the",
+    "inference_seconds": 11.041371417,
+    "new_token_count": 8,
+    "token_ids": [
+      378,
+      2443,
+      314,
+      253,
+      1761,
+      3670,
+      17691,
+      260
+    ]
+  },
+  "node_call_counts": {
+    "n0": 1,
+    "n1": 0
+  },
+  "pid": 29629,
+  "plan_path": "/Users/howen/.codex/worktrees/cost-validation/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+  "plan_sha256": "8a0d030bd7ded081738d20c50b36f7b7f687f1bdb3f2d9ab031f240c85622d1d",
+  "process_elapsed_seconds": 13.680502958,
+  "production_action4_state_export": {
+    "completed_nodes": [
+      "n0"
+    ],
+    "execution_right_transferred": false,
+    "files": [
+      "state.json",
+      "manifest.json"
+    ],
+    "manifest_bytes": 337,
+    "manifest_sha256": "209be80137ca66897746c26786d6e4d374f02ef2104500b6e59614d596d6a585",
+    "migration_success": false,
+    "next_node": "n1",
+    "package_bytes": 2185,
+    "package_dir": "/Users/howen/.codex/worktrees/cost-validation/PPO_MEC/artifacts/analysis/independent_recovery_cost_measurement_20261005_v1/target_model_requires_local_preparation/rep03/production_action4_state_package",
+    "payload_bytes": 1114,
+    "payload_sha256": "b74d4ad1cd991c30e922421f500b59a9700ed7659c49cd8d4db085f1171e59b0",
+    "serialize_and_save_seconds": 0.000517374999999376,
+    "source_rsu_id": "technical_source_process",
+    "state_file_bytes": 1848,
+    "state_file_sha256": "4e36c04466cd901d1b7d902676e71f8ceff956c01fdb8ad1e892d45afa9fe044",
+    "status": "EXPORTED_PENDING_IMPORT",
+    "target_rsu_id": "technical_target_process"
+  },
+  "role": "source",
+  "runtime": {
+    "accelerate": "1.2.1",
+    "module_origins": {
+      "peft": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/peft/__init__.py",
+      "torch": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/torch/__init__.py",
+      "transformers": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/transformers/__init__.py"
+    },
+    "peft": "0.14.0",
+    "psutil": "7.2.2",
+    "python": "3.9.6",
+    "python_executable": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+    "safetensors": "0.5.3",
+    "torch": "2.8.0",
+    "transformers": "4.49.0"
+  },
+  "started_at_unix": 1791196787.790716,
+  "state": {
+    "durable_save_seconds": 0.0009017500000005896,
+    "files": [
+      "state.json",
+      "manifest.json"
+    ],
+    "manifest_bytes": 337,
+    "manifest_sha256": "362123e41c78f9fe53cd7b36faf8337d18133caf3e9040175d4e1f520dd14839",
+    "package_bytes": 2040,
+    "payload_bytes": 1090,
+    "payload_sha256": "6abd23d47807f3be97833f1a611660c5d86506127286ddd8c2eeef1346f8d22f",
+    "serialize_seconds": 6.245800000037605e-05,
+    "serialized_state_bytes": 1703,
+    "state_file_bytes": 1703,
+    "state_file_sha256": "53c4f94fa8b50025a2ae4e532d31e211996e49eb302859f37561ef93e66409c9"
+  },
+  "static_resource_hashes": {
+    "adapter_weight_sha256": "95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83",
+    "base_weight_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+    "chat_template_sha256": "a68ad1a42681ae44eacd109ff8dd56a840f761c03d72f4ff4c515d092f882168",
+    "preprocessor_config_sha256": "6cb6e36d6fcb88ca1502c4a26750715dc3e7dedddc9a8f17b27d8d167d1457e7",
+    "processor_config_sha256": "e7bff42da73ae9eec9042ef20e066e11f1ee20f025358ff79131e3c0fb549b46",
+    "source_image_sha256": "83af09665cd23c87a1d831e6cb47a88bc8d509849712c551b0a9a7965e95c307",
+    "tokenizer_sha256": "5ece781dc8d2b2f3e2f289ca0ae50b17cfc27dd27bfe7971bb8241e0b964331a"
+  },
+  "status": "PASS",
+  "task_correctness": "unavailable",
+  "task_correctness_reason": "technical input has no applicable ALPR/Helmet ground-truth label"
+}

@@ -1,0 +1,186 @@
+{
+  "action_wall_seconds": 4.006962792,
+  "adapter_status": {
+    "active_adapters": [
+      "adapter_a"
+    ],
+    "adapter_model_type": "LoraModel",
+    "available_adapters": [
+      "adapter_a"
+    ],
+    "base_model_type": "Idefics3ForConditionalGeneration",
+    "devices": {
+      "adapter_a": [
+        "cpu"
+      ]
+    },
+    "enabled": true,
+    "merged_adapters": [],
+    "num_adapter_layers": 260,
+    "peft_types": {
+      "adapter_a": "LORA"
+    },
+    "requires_grad": {
+      "adapter_a": true
+    },
+    "total_params": 546059456,
+    "trainable_params": 38577152
+  },
+  "automatic_retry": false,
+  "child_process_wall_seconds": 6.59989,
+  "condition_id": "target_model_prepared",
+  "dynamic_transfer_bytes_if_remote": 2185,
+  "generate_attempted": 1,
+  "generate_completed": 1,
+  "identity": {
+    "adapter_name": "adapter_a",
+    "adapter_weight_sha256": "95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83",
+    "base_weight_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+    "processor_sha256": "c829b783c70c179f828dfe65d35546fea55cc5c0efd699abeb0e187f0bbb7ee9"
+  },
+  "model_load_in_action_window": false,
+  "model_load_seconds": 1.1814534590000003,
+  "model_load_timings": {
+    "adapter_load_seconds": 0.8101176670000001,
+    "base_load_seconds": 0.2963283750000003,
+    "processor_load_seconds": 0.07500741699999991
+  },
+  "n0_input": null,
+  "n0_output": null,
+  "n1_input": {
+    "contains_n0_output": true,
+    "content_sha256": "9a036ce8cbca2be001622c4b75c3e9dff11d3a3a4848e145efa2cc13ca567d14",
+    "input_ids": [
+      1,
+      11126,
+      42,
+      5445,
+      5172,
+      3145,
+      5410,
+      42,
+      216,
+      378,
+      2443,
+      314,
+      253,
+      1761,
+      3670,
+      17691,
+      260,
+      198,
+      13764,
+      3298,
+      836,
+      805,
+      338,
+      5410,
+      281,
+      582,
+      1890,
+      8715,
+      30,
+      49279,
+      198,
+      9519,
+      9531,
+      42
+    ],
+    "prompt": "Upstream visual description:  The image is a line graph depicting the\nSummarize only that description in one short phrase.",
+    "rendered_prompt": "<|im_start|>User: Upstream visual description:  The image is a line graph depicting the\nSummarize only that description in one short phrase.<end_of_utterance>\nAssistant:",
+    "source_image_access_count": 0
+  },
+  "n1_output": {
+    "decoded_text": " 2010 - 2",
+    "inference_seconds": 4.001439625,
+    "new_token_count": 8,
+    "token_ids": [
+      216,
+      34,
+      32,
+      33,
+      32,
+      731,
+      216,
+      34
+    ]
+  },
+  "node_call_counts": {
+    "n0": 0,
+    "n1": 1
+  },
+  "pid": 29660,
+  "restore": {
+    "input_reconstruction_seconds": 0.002615249999999847,
+    "production_action4_state_import": {
+      "completed_nodes": [
+        "n0"
+      ],
+      "execution_right_transferred": true,
+      "files": [
+        "manifest.json",
+        "state.json"
+      ],
+      "manifest_sha256": "209be80137ca66897746c26786d6e4d374f02ef2104500b6e59614d596d6a585",
+      "migration_success": true,
+      "missing_model_preparation": false,
+      "next_node": "n1",
+      "node_outputs": {
+        "n0": {
+          "raw_text": " The image is a line graph depicting the",
+          "token_ids": [
+            378,
+            2443,
+            314,
+            253,
+            1761,
+            3670,
+            17691,
+            260
+          ]
+        }
+      },
+      "package_bytes": 2185,
+      "payload_sha256": "b74d4ad1cd991c30e922421f500b59a9700ed7659c49cd8d4db085f1171e59b0",
+      "remaining_nodes": [
+        "n1"
+      ],
+      "restore_validation_seconds": 0.0027650830000003346,
+      "state_file_sha256": "4e36c04466cd901d1b7d902676e71f8ceff956c01fdb8ad1e892d45afa9fe044",
+      "status": "IMPORTED_COMMITTED",
+      "target_rsu_id": "technical_target_process"
+    },
+    "state_restore_validation_seconds": 0.0027650830000003346
+  },
+  "restored_n0_output": {
+    "raw_text": " The image is a line graph depicting the",
+    "token_ids": [
+      378,
+      2443,
+      314,
+      253,
+      1761,
+      3670,
+      17691,
+      260
+    ]
+  },
+  "role": "recovery",
+  "setup_model_load_wall_seconds": 2.174467,
+  "started_at_unix": 1791196900.983574,
+  "static_resource_hashes": {
+    "adapter_weight_sha256": "95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83",
+    "base_weight_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+    "chat_template_sha256": "a68ad1a42681ae44eacd109ff8dd56a840f761c03d72f4ff4c515d092f882168",
+    "preprocessor_config_sha256": "6cb6e36d6fcb88ca1502c4a26750715dc3e7dedddc9a8f17b27d8d167d1457e7",
+    "processor_config_sha256": "e7bff42da73ae9eec9042ef20e066e11f1ee20f025358ff79131e3c0fb549b46",
+    "tokenizer_sha256": "5ece781dc8d2b2f3e2f289ca0ae50b17cfc27dd27bfe7971bb8241e0b964331a"
+  },
+  "status": "PASS",
+  "target_access": {
+    "saved_state_package_access": true,
+    "source_image_access_count": 0,
+    "source_process_memory_access": false
+  },
+  "task_correctness": "unavailable"
+}

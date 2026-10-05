@@ -1,6 +1,6 @@
 # Literature Reference Table
 
-更新日期：2026-10-04
+更新日期：2026-10-05
 
 用途：记录与 PPO_MEC 顶刊路线最相关的顶刊/顶会论文，以及可用于 Discussion / reviewer response 的近邻论文；并明确每篇论文能为论文写作提供的参考点，以及 PPO_MEC 相对它的优化点和 claim 边界。
 
@@ -38,6 +38,18 @@
 5. 信息不完整时保守记录：venue、年份、DOI、页码、acceptance status 或结论没核实时，写 `待核验`；不要为了补齐表格编造。
 6. 更新日期：新增或大幅修订本表后，同步更新文件顶部 `更新日期`。
 7. 范围控制：无关论文不加入；边缘相关但可能影响审稿回应的论文可以加入，并在 `论文写作位置` 中标注为 `Discussion / reviewer response`。
+
+## 2026-10-05 驱逐与模型重载成本窄范围核对
+
+本轮只用公开标题/关键词检索一手出版页面，不上传 manuscript、artifact、checkpoint 或真实数据。结论是“成本感知驱逐”和
+“模型加载/重载成本”均已有直接先例；PPO_MEC 不能把这一思想包装为首创，只能主张已实现 workflow-state 恢复路径与 typed
+victim plan 的系统组合及其有界实证边界。
+
+| 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
+|---|---|---:|---|---|---|
+| retrieval-cost-aware eviction | [Cost-Aware WWW Proxy Caching Algorithms](https://www.usenix.org/legacy/publications/library/proceedings/usits97/cao.html) | USENIX Symposium on Internet Technologies and Systems, 1997；官方页面核验 | GreedyDual-Size 把 locality、取回成本与对象大小结合到 replacement priority；说明 eviction/miss 的未来取回代价是成熟思想。 | PPO_MEC 不主张发明 cost-aware eviction；当前差异仅是对同一连续 AI workflow 的合法 typed victim、状态恢复和下一声明节点 reload 做显式账本，且真实 victim→reload 尚未测到。 | Related Work / novelty attribution / prohibited first-use claim。 |
+| loading-cost-aware edge model cache | [Loading Cost-Aware Model Caching and Request Routing for Cooperative Edge Inference](https://doi.org/10.1109/ICC45855.2022.9838823) | IEEE ICC, 2022, pp. 2327--2332；DOI 与机构出版记录核验 | 直接考虑 DNN service loading time 与动态请求，联合 model caching/request routing，并给出在线近似算法。 | “考虑模型加载成本”不是 PPO_MEC 新意；本项目当前只在固定 workflow recovery/restart 二选一中分开 state、input、model readiness 和 recompute，不做 routing、batching 或多请求 throughput 优化。 | 最近邻成本模型；Related Work / contribution shrinkage。 |
+| model unloading/reload trade-off | [Efficient Layer-Granularity Unloading for LLMs in Edge Computing](https://doi.org/10.1109/TMC.2026.3697118) | IEEE TMC, 25(9):15221--15233, 2026；IEEE 页面核验 | 在 edge LLM 中以 layer granularity 权衡 idle memory cost、reload delay 与 QoS，并实现真实系统。 | 进一步排除“内存/驱逐代价与 reload delay 权衡”为原创；PPO_MEC 不做 layer unloading，当前可守对象是 application-node state recovery 与 typed base/adapter readiness 的组合，且证据仅 same-host technical path。 | A-Core novelty-risk；Related Work / limitations / reviewer response。 |
 
 ## 2026-06-21 文献质量审计摘要
 

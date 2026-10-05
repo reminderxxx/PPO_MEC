@@ -5,6 +5,15 @@
 
 # Artifact Records
 
+## 2026-10-05 independent recovery cost measurement
+
+- root：`artifacts/analysis/independent_recovery_cost_measurement_20261005_v1/`；解析基线 `de70d572…`，冻结执行
+  commit `b7c8c4d…`，2 conditions×3 paired repeats、24/24 generate、243.001998 s、无重试/训练/下载/旧 holdout。
+- 6/6 completion/input/token/identity/state-consumption checks 通过；事前/事后动作均为 recovery，wrong-choice cost 全 0，
+  但 decision boundary 未观察到。prepared 与 local-preparation 两条件均保留全部三次原始值。
+- 72/72 manifest files 独立 size/SHA-256 复算一致；network time 为冻结假设，queue/task correctness unavailable，
+  真实 victim→reload 未覆盖。证据等级 `E2_ARTIFACT_AUDITED` bounded same-host technical execution。
+
 ## 2026-10-05 eviction-aware recovery validation
 
 - root：`artifacts/analysis/eviction_aware_recovery_validation_20261005_v1/`；冻结执行 commit

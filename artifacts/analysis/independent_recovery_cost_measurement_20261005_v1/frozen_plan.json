@@ -1,0 +1,231 @@
+{
+  "base_plan_path": "configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+  "budget": {
+    "automatic_retry": false,
+    "conditions": 2,
+    "generate_calls_per_repeat": {
+      "recovery": 1,
+      "restart": 2,
+      "source": 1
+    },
+    "hard_generate_ceiling": 24,
+    "planned_generate_calls": 24,
+    "process_timeout_seconds": 300,
+    "repeats_per_condition": 3,
+    "scientific_total_timeout_seconds": 600
+  },
+  "calibration_evidence": {
+    "artifact_path": "artifacts/analysis/production_action4_independent_repeat_20261005_v1",
+    "artifact_run_id": "production_action4_independent_repeat_20261005_v1",
+    "execution_commit": "4a6d670605b624eb6aac4fbaf3c05868ab11c8c4",
+    "recovery_child_wall_seconds_raw": [
+      7.0495419159999955,
+      7.0004726250000004,
+      6.94600475
+    ],
+    "recovery_model_load_seconds_raw": [
+      1.1526712919999997,
+      1.1458080420000003,
+      1.1407108340000005
+    ],
+    "recovery_n1_inference_seconds_raw": [
+      3.796372833,
+      3.8320695000000002,
+      3.807233042
+    ],
+    "repeat_count": 3,
+    "restart_child_wall_seconds_raw": [
+      17.917637292000002,
+      17.650437250000003,
+      17.798334957999998
+    ],
+    "restart_model_load_seconds_raw": [
+      1.1566702509999998,
+      1.151946709,
+      1.1396467079999997
+    ],
+    "restart_n0_inference_seconds_raw": [
+      10.741790458,
+      10.845277583,
+      10.729573041999998
+    ],
+    "restart_n1_inference_seconds_raw": [
+      3.7965265830000003,
+      3.7934899999999985,
+      3.793989500000002
+    ],
+    "state_package_bytes_raw": [
+      2185,
+      2185,
+      2185
+    ],
+    "use": "ex_ante_cost_calibration_only"
+  },
+  "conditions": [
+    {
+      "condition_id": "target_model_prepared",
+      "description": "The legal base and adapter are loaded before the measured action window and remain resident for that one arm.",
+      "local_process_state": "new child process; model is prepared before action timing",
+      "model_load_in_action_window": false,
+      "predictions": {
+        "eviction_aware_recovery_incremental_seconds": 0.0263258,
+        "eviction_aware_restart_incremental_seconds": 11.07072456,
+        "predicted_cheaper_action": "recovery",
+        "recovery_dynamic_network_seconds_assumption": 0.0201748,
+        "recovery_local_action_wall_seconds": 5.854664583,
+        "recovery_scored_completion_seconds": 5.874839383,
+        "restart_dynamic_network_seconds_assumption": 0.035420560000000004,
+        "restart_local_action_wall_seconds": 16.658688249999997,
+        "restart_scored_completion_seconds": 16.69410881
+      }
+    },
+    {
+      "condition_id": "target_model_requires_local_preparation",
+      "description": "The legal base and adapter exist locally but are not process-resident; model loading is included in the measured action window for both arms.",
+      "local_process_state": "new child process; model is loaded from existing local files inside action timing",
+      "model_load_in_action_window": true,
+      "predictions": {
+        "common_model_preparation_reason": "The same base and adapter are required by restart and recovery, so preparation is recorded in both full costs and cancels in the action comparison.",
+        "eviction_aware_recovery_incremental_seconds": 0.0263258,
+        "eviction_aware_restart_incremental_seconds": 11.07072456,
+        "predicted_cheaper_action": "recovery",
+        "recovery_dynamic_network_seconds_assumption": 0.0201748,
+        "recovery_local_action_wall_seconds": 7.0004726250000004,
+        "recovery_scored_completion_seconds": 7.020647425000001,
+        "restart_dynamic_network_seconds_assumption": 0.035420560000000004,
+        "restart_local_action_wall_seconds": 17.798334957999998,
+        "restart_scored_completion_seconds": 17.833755518
+      }
+    }
+  ],
+  "execution_order": [
+    {
+      "arm_order": [
+        "recovery",
+        "restart"
+      ],
+      "condition_id": "target_model_requires_local_preparation",
+      "repeat_id": "rep01",
+      "sequence": 1
+    },
+    {
+      "arm_order": [
+        "recovery",
+        "restart"
+      ],
+      "condition_id": "target_model_prepared",
+      "repeat_id": "rep01",
+      "sequence": 2
+    },
+    {
+      "arm_order": [
+        "recovery",
+        "restart"
+      ],
+      "condition_id": "target_model_prepared",
+      "repeat_id": "rep02",
+      "sequence": 3
+    },
+    {
+      "arm_order": [
+        "recovery",
+        "restart"
+      ],
+      "condition_id": "target_model_requires_local_preparation",
+      "repeat_id": "rep03",
+      "sequence": 4
+    },
+    {
+      "arm_order": [
+        "restart",
+        "recovery"
+      ],
+      "condition_id": "target_model_requires_local_preparation",
+      "repeat_id": "rep02",
+      "sequence": 5
+    },
+    {
+      "arm_order": [
+        "restart",
+        "recovery"
+      ],
+      "condition_id": "target_model_prepared",
+      "repeat_id": "rep03",
+      "sequence": 6
+    }
+  ],
+  "frozen_at": "2026-10-05T18:20:00+08:00",
+  "frozen_cost_estimates": {
+    "effective_link_mbps_assumption": 100.0,
+    "model_static_bytes": {
+      "adapter_directory_bytes": 154428630,
+      "base_directory_bytes": 1019895869
+    },
+    "network_classification": "assumption_only_not_measured",
+    "positive_dynamic_transfer_fixed_latency_seconds_assumption": 0.02,
+    "prefix_recompute_seconds": 11.035304,
+    "recovery_model_load_seconds": 1.1458080420000003,
+    "recovery_suffix_inference_seconds": 3.807233042,
+    "rerun_input_bytes": 192757,
+    "restart_model_load_seconds": 1.151946709,
+    "restart_suffix_inference_seconds": 3.793989500000002,
+    "state_package_bytes": 2185,
+    "state_serialize_restore_rebuild_seconds": 0.006151
+  },
+  "parsed_baseline_commit": "de70d5721ea5ccf07ce6325c92cb4ac833b68efc",
+  "plan_id": "independent_recovery_cost_measurement_20261005_v1",
+  "randomization": {
+    "arm_order": "precomputed_and_frozen",
+    "condition_repeat_order": "precomputed_and_frozen",
+    "generator": "python_random_mt19937",
+    "seed": 20261005
+  },
+  "research_question": "Can the frozen ex-ante eviction-aware recovery cost estimate predict restart versus recovery cost and the cheaper action in new fixed-implementation executions?",
+  "runtime_state": {
+    "child_process_state": "new_process_per_source_or_arm; do not call this a disk-cold start",
+    "model_residency_scope": "within_one_arm_process_only",
+    "operating_system_file_cache": "uncontrolled_not_flushed",
+    "same_host": true,
+    "same_model_input_and_generation_config": true
+  },
+  "schema_version": "ppo_mec.independent_recovery_cost_measurement.v1",
+  "scope": {
+    "automatic_retry": false,
+    "cross_workflow_forbidden": true,
+    "downloads_forbidden": true,
+    "new_algorithm_or_system_feature_forbidden": true,
+    "old_holdout_read_forbidden": true,
+    "post_result_retuning_forbidden": true,
+    "queue_synthesis_forbidden": true,
+    "training_forbidden": true,
+    "wireless_measurement_claim_forbidden": true
+  },
+  "scoring": {
+    "all_raw_repeats_required": true,
+    "components": [
+      "local_action_wall_seconds",
+      "model_load_seconds",
+      "prefix_recompute_seconds",
+      "state_serialize_restore_rebuild_seconds",
+      "suffix_inference_seconds",
+      "dynamic_transfer_bytes",
+      "simulated_dynamic_network_seconds"
+    ],
+    "cost_error": "Report signed, absolute, and relative error for each arm and repeat using frozen scored completion prediction versus measured local action wall plus frozen simulated dynamic-transfer time.",
+    "descriptive_only": true,
+    "primary_action_check": "At equal completion and exact output fidelity, compare the predicted cheaper action with the action having lower measured local action wall plus the same frozen simulated dynamic-transfer time.",
+    "wrong_choice_cost": "Measured scored completion of the predicted action minus the minimum measured scored completion among restart and recovery in the same repeat."
+  },
+  "uncovered_conditions": [
+    {
+      "condition": "legal cache replacement followed by real later model reload",
+      "reason": "The existing real-model technical path has one base/adapter family and no production executor that can create a dependency-safe victim and later reload without adding system behavior or manually deleting cache state.",
+      "treatment": "uncovered; retain the prior native synthetic witness only"
+    },
+    {
+      "condition": "real wireless transfer or shared queue cost",
+      "reason": "No legal measured RSU network or shared queue path exists in this environment.",
+      "treatment": "network time remains an explicit assumption and queue time remains unavailable"
+    }
+  ]
+}

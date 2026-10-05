@@ -1,5 +1,8 @@
 # 驱逐代价感知恢复规则：冻结计划
 
+> 2026-10-05 后续定性勘误：本计划的 12 个设计点现统一归类为开发/机制验证证据，不再称未观察或独立测试；机器冻结内容和
+> 历史执行不改写。独立事前成本检查见 `independent_recovery_cost_measurement_{plan,results}_20261005.md`。
+
 ## 基线、范围与停止规则
 
 - 解析基线：`codex/shared-cache-coupling` 最终提交

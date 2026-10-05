@@ -5,6 +5,16 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-05：独立检查同侧通过但未触及驱逐项和决策边界（OPEN SCIENTIFIC BLOCKER）
+
+- 新测量 6/6 方向匹配，但全部是 recovery，不能据此声称阈值校准、分类稳定性或泛化；不追加条件制造翻转。
+- 绝对成本统一偏高，prepared/recovery 相对误差达 `45.9%--49.7%`，说明旧 child-wall calibration 与新 action-window
+  边界之间仍有固定开销差异；方向正确不能替代成本校准。
+- 真实模型生产路径没有可合法构造的 dependency-safe victim→later reload；中央“驱逐代价”项仍只有 native synthetic
+  witness，未获独立真实执行支持。
+- 网络为 100 Mbps/0.02 s 假设，queue/task quality unavailable；证据只支持同机机制/经验性研究。若仍以算法创新投稿，
+  与正确两步 12/12 等价和既有 cost-aware caching 文献共同构成 blocker。
+
 ## 2026-10-05：驱逐代价修正受估计误差和两步等价限制（OPEN SCIENTIFIC BLOCKER）
 
 - 新规则与同信息、正确计 victim cost 的两步前瞻在 12/12 点动作/成本完全相同，纯函数中位开销仅

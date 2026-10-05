@@ -15,13 +15,16 @@
   --role supervisor \
   --plan configs/acceptance/independent_recovery_cost_measurement_v1.json \
   --run-root artifacts/analysis/independent_recovery_cost_measurement_20261005_v1 \
-  --expected-commit <frozen-measurement-commit>
+  --expected-commit b7c8c4dadf7a10944ebff8405b5faa56666aeaa0
 ```
 
 计划固定 2 个条件 × 3 次配对；每次 source/restart/recovery 分别调用 1/2/1 次，共 24 次 `generate`，恰等于硬上限。
 失败不重试、不补跑。每个 role 是新进程，OS 文件缓存不清空，不能称磁盘冷启动。100 Mbps 与 0.02 s 是模拟动态传输
 假设；模型权重来自既有本地目录，不是网络下载。真实 victim 后续重载、无线和 queue 未覆盖。完整事前边界见
 `independent_recovery_cost_measurement_plan_20261005.md`。
+
+该 run 已完成且不得覆盖或按结果补跑；终态为 24/24 calls、6/6 fidelity、72/72 integrity，结果边界见
+`independent_recovery_cost_measurement_results_20261005.md`。
 
 ## 驱逐代价感知恢复规则（2026-10-05）
 
