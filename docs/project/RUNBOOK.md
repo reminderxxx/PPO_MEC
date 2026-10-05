@@ -5,6 +5,56 @@
 
 # Runbook
 
+## 纠正版连续工作流 v2（2026-10-06；interface-blocked，已停止）
+
+实际冻结、诊断和单次训练命令：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/freeze_calibrated_continuous_workflow_pilot.py \
+  --config configs/experiment/calibrated_continuous_workflow_pilot_v2.json \
+  --data_root /Users/howen/Projects/PPO_MEC/data \
+  --output configs/experiment/calibrated_continuous_workflow_pilot_v2_manifest.json
+
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/diagnose_calibrated_continuous_workflow_v2.py \
+  --output artifacts/calibrated_continuous_workflow_non_degeneracy_20261006/diagnostic_reachable_depth4.json
+
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_calibrated_continuous_workflow_pilot_v2.py \
+  --diagnostic artifacts/calibrated_continuous_workflow_non_degeneracy_20261006/diagnostic_reachable_depth4.json \
+  --output_root artifacts/calibrated_continuous_workflow_pilot_v2_20261006
+```
+
+首次 initial-state-only diagnostic fail 保留为同目录 `diagnostic.json`，不得删除或冒充科学失败；纠正版 depth-4 receipt
+才是当时的 runner 门禁。run 完成后的独立审计确认 executed-action likelihood、failure-time mobility、encoder feature
+consumption 和 planner capability 不匹配；因此该 runner/结果不得用于方法排名，也不得继续训练。不允许按 SA 排名调参、
+补点、扩大预算或覆盖。日志为
+`artifacts/calibrated_continuous_workflow_pilot_v2_20261006.log`，completion receipt 在 output root。v1 192-episode run
+保持历史只读，不能与 v2 混用。专项回归：
+`python -m pytest -q tests/test_calibrated_continuous_workflow.py tests/test_checkpoint_compat.py`。
+
+## 实测校准连续工作流 pilot（2026-10-06；已完成，不得覆盖）
+
+workload manifest 由下列命令从既有 window plan 和主工作区真实 Alibaba 文件一次冻结；输出已提交，不得覆盖：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/freeze_calibrated_continuous_workflow_pilot.py \
+  --data_root /Users/howen/Projects/PPO_MEC/data
+```
+
+训练从 clean `0dbb0c1c91e0fac6740bb6e4220a92d014f1fd9d` 执行，create-only output root 为
+`artifacts/benchmarks/calibrated_continuous_workflow_pilot_20261006_v1/`：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/run_calibrated_continuous_workflow_pilot.py \
+  --output_root artifacts/benchmarks/calibrated_continuous_workflow_pilot_20261006_v1
+```
+
+该 run 已完成 3 agents × 3 seeds × 192 episodes、9 checkpoints 和 120 evaluation rows；不得因 SA-GHMAPPO 负向结果
+覆盖、补点或调参重跑。后续算法修复必须另立 config、commit 和 run ID。最小回归为
+`python -m pytest -q tests/test_calibrated_continuous_workflow.py tests/test_symmetric_recovery_cost.py tests/test_production_action4_state.py tests/test_real_cache_victim_reload.py`。
+完整表与边界见 `calibrated_continuous_workflow_pilot_20261006.md`。
+
 ## 对称恢复成本复算（2026-10-06；已完成，不得覆盖）
 
 `scripts/run_symmetric_recovery_cost_validation.py` 只接受 clean、精确 expected commit 和不存在的 output root；失败原件保留，

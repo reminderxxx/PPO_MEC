@@ -1,0 +1,24 @@
+{
+  "schema_version": "calibrated_workflow_interface_diagnosis_v1",
+  "created_at": "2026-10-05T18:39:46.053069+00:00",
+  "status": "complete",
+  "historical_git_commit": "b418eb4dbfa012e271cb97880693c714e6abf79e",
+  "config": {
+    "path": "configs/experiment/calibrated_continuous_workflow_pilot_v1.json",
+    "sha256": "3a6737f3b440ddea6d4b096dd9e05f1082baac58d9accdbb6a4d9a1dfe2ad2ac"
+  },
+  "manifest": {
+    "path": "configs/experiment/calibrated_continuous_workflow_pilot_v1_manifest.json",
+    "sha256": "7c47246ee45953859c3116106b47ec48813eb99976c6c1bcd932a393a7f29f7a"
+  },
+  "checkpoint": {
+    "path": "artifacts/benchmarks/calibrated_continuous_workflow_pilot_20261006_v1/checkpoints/sa_ghmappo_seed7.pt",
+    "sha256": "b6aeaa3ac5cbe05f440c487f0d383e7d8855244285a5363e7e088dbcd57f01f1"
+  },
+  "downloads": 0,
+  "real_model_calls": 0,
+  "holdout_calls": 0,
+  "training_episodes": 0,
+  "fixed_failure_instance": "evaluation_00",
+  "fixed_stochastic_repetitions": 16
+}

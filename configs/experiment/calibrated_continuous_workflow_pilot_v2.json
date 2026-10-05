@@ -1,0 +1,106 @@
+{
+  "schema_version": "calibrated_continuous_workflow_pilot_v2",
+  "experiment_scope": "small_matched_nonformal_pilot",
+  "selection_protocol": {
+    "train_window_plan": "configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719/train_window_plan.json",
+    "evaluation_window_plan": "configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719/dev_window_plan.json",
+    "workflow_source": "data/processed/sampled_vec_dags/sampled_vec_dags.jsonl",
+    "train_windows": {"low_indices": [0, 1], "high_indices": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13]},
+    "dev_windows": {"low_indices": [2, 3], "high_indices": [14, 15]},
+    "evaluation_indices": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    "workflow_node_range": [5, 12],
+    "workflow_count": 28,
+    "outcome_blind": true
+  },
+  "measured_identity": {
+    "base_model": "HuggingFaceTB/SmolVLM-256M-Instruct@a7da5b9",
+    "adapter_large": "ALPR_LoRA@local_frozen",
+    "adapter_small": "Helmet_LoRA@local_frozen"
+  },
+  "object_catalog": {
+    "base:family_a": {"object_type": "base_model", "resident_bytes": 1015025832, "transfer_bytes": 1015025832, "load_seconds": 0.281637, "dependency_ids": [], "adapter_id": null},
+    "base:family_b": {"object_type": "base_model", "resident_bytes": 1015025832, "transfer_bytes": 1015025832, "load_seconds": 0.281637, "dependency_ids": [], "adapter_id": null},
+    "adapter:alpr": {"object_type": "adapter", "resident_bytes": 154423432, "transfer_bytes": 154423432, "load_seconds": 0.711175, "dependency_ids": ["base:family_a"], "adapter_id": "alpr"},
+    "adapter:helmet_shared": {"object_type": "adapter", "resident_bytes": 9641944, "transfer_bytes": 9641944, "load_seconds": 0.288584, "dependency_ids": ["base:family_a"], "adapter_id": "helmet_shared"},
+    "adapter:helmet_distinct": {"object_type": "adapter", "resident_bytes": 9641944, "transfer_bytes": 9641944, "load_seconds": 0.288584, "dependency_ids": ["base:family_b"], "adapter_id": "helmet_distinct"}
+  },
+  "adapter_to_bundle": {
+    "alpr": ["base:family_a", "adapter:alpr"],
+    "helmet_shared": ["base:family_a", "adapter:helmet_shared"],
+    "helmet_distinct": ["base:family_b", "adapter:helmet_distinct"]
+  },
+  "capacity_bytes": {
+    "shared_tight": 1169449264,
+    "shared_ample": 1179091208,
+    "distinct_tight": 1169449264,
+    "distinct_ample": 2194117040
+  },
+  "measured_bytes": {"state_package": 2195, "input": 192757},
+  "measured_time_seconds": {"node_compute_reference": 3.807234, "prefix_recompute_reference": 10.789533, "state_restore_overhead": 0.004412},
+  "link": {"mbps": 1000.0, "fixed_seconds": 0.02, "source_type": "artificial_assumption_not_wireless_measurement"},
+  "vehicle": {"fallback_seconds": 8.0},
+  "mobility_abstraction": {"decision_step_seconds": 5.0, "source_type": "artificial_time_scale_applied_to_trace_derived_handoff_pressure"},
+  "prediction_horizon": 4,
+  "objective": {
+    "node_completion_reward": 2.0,
+    "workflow_completion_reward": 4.0,
+    "time_weight": 0.08,
+    "transfer_gib_weight": 0.5,
+    "failure_penalty": 3.0,
+    "deadline_penalty": 4.0,
+    "failed_service_seconds": 2.0
+  },
+  "training": {
+    "agents": ["sa_ghmappo", "ppo", "mappo"],
+    "ablation": "sa_ghmappo_no_dependency",
+    "comparison_rules": ["immediate_cost_rule", "two_step_cost_rule"],
+    "seeds": [7, 17, 29],
+    "episodes": 128,
+    "checkpoint_episode_candidates": [32, 64, 96, 128],
+    "update_every_episodes": 8,
+    "learning_rate": 0.0003,
+    "clip_ratio": 0.2,
+    "entropy_coef": 0.01,
+    "value_coef": 0.5,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "budget": {
+      "episode_max_steps": 24,
+      "main_training_step_cap": 36864,
+      "ablation_step_cap": 12288,
+      "total_training_step_cap": 49152
+    },
+    "checkpoint_selection": {
+      "split": "dev",
+      "order": [
+        "workflow_completion_rate_desc",
+        "deadline_violation_rate_asc",
+        "service_failure_rate_asc",
+        "handoff_failure_rate_asc",
+        "modeled_completion_seconds_asc",
+        "total_transfer_bytes_asc",
+        "reward_desc"
+      ],
+      "final_check_split_used": false
+    }
+  },
+  "design_templates": [
+    {"sharing": "shared_base", "capacity": "tight", "state_scale": 1, "initial_target": "competitor", "actual_mbps": 1000.0, "estimated_mbps": 1000.0, "prediction_quality": "matched", "prediction_confidence": 0.9, "prediction_uncertainty": 0.1},
+    {"sharing": "shared_base", "capacity": "ample", "state_scale": 64, "initial_target": "competitor", "actual_mbps": 200.0, "estimated_mbps": 1000.0, "prediction_quality": "optimistic", "prediction_confidence": 0.55, "prediction_uncertainty": 0.45},
+    {"sharing": "distinct_base", "capacity": "tight", "state_scale": 1, "initial_target": "competitor", "actual_mbps": 1000.0, "estimated_mbps": 200.0, "prediction_quality": "pessimistic", "prediction_confidence": 0.55, "prediction_uncertainty": 0.45},
+    {"sharing": "distinct_base", "capacity": "ample", "state_scale": 64, "initial_target": "competitor", "actual_mbps": 1000.0, "estimated_mbps": 1000.0, "prediction_quality": "matched", "prediction_confidence": 0.9, "prediction_uncertainty": 0.1},
+    {"sharing": "shared_base", "capacity": "tight", "state_scale": 1000000, "initial_target": "competitor", "actual_mbps": 200.0, "estimated_mbps": 200.0, "prediction_quality": "matched_slow", "prediction_confidence": 0.9, "prediction_uncertainty": 0.1},
+    {"sharing": "shared_base", "capacity": "ample", "state_scale": 1, "initial_target": "all_ready", "actual_mbps": 1000.0, "estimated_mbps": 1000.0, "prediction_quality": "matched", "prediction_confidence": 0.9, "prediction_uncertainty": 0.1},
+    {"sharing": "distinct_base", "capacity": "ample", "state_scale": 1000000, "initial_target": "competitor", "actual_mbps": 1000.0, "estimated_mbps": 200.0, "prediction_quality": "pessimistic", "prediction_confidence": 0.55, "prediction_uncertainty": 0.45},
+    {"sharing": "shared_base", "capacity": "ample", "state_scale": 64, "initial_target": "empty", "actual_mbps": 200.0, "estimated_mbps": 1000.0, "prediction_quality": "optimistic", "prediction_confidence": 0.55, "prediction_uncertainty": 0.45}
+  ],
+  "claim_boundary": {
+    "formal": false,
+    "holdout": false,
+    "real_model_calls_per_training_step": 0,
+    "wireless_measurement": false,
+    "adapter_assignment_source": "artificial_deterministic_mapping_from_alibaba_task_name",
+    "base_family_b_source": "artificial_distinct_identity_reusing_measured_base_footprint",
+    "state_scaling_source": "artificial_stress_factor_anchored_to_measured_2195_byte_package"
+  }
+}

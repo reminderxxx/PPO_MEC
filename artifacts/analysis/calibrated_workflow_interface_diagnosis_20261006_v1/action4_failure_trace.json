@@ -1,0 +1,1299 @@
+{
+  "instance": {
+    "design_id": "evaluation_00",
+    "window_id": "window_lankershim_off4000_len24_t1118936085200_1118936087500",
+    "workflow_id": "j_1066618",
+    "max_steps": 10
+  },
+  "checkpoint": "artifacts/benchmarks/calibrated_continuous_workflow_pilot_20261006_v1/checkpoints/sa_ghmappo_seed7.pt",
+  "trace": [
+    {
+      "step": 0,
+      "node_id": "1",
+      "required_base_model": "base:family_a",
+      "required_adapter": "helmet_shared",
+      "current_rsu_id": "rsu_0",
+      "target_rsu_id": "rsu_1",
+      "before": {
+        "node_index": 0,
+        "step_index": 0,
+        "clock_seconds": 0.0,
+        "completed_node_ids": [],
+        "current_bundle_ready": true,
+        "target_bundle_ready": false
+      },
+      "action_mask": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "raw_actor_logits": {
+        "slow": [
+          0.063358,
+          0.391584,
+          -0.622502
+        ],
+        "fast": [
+          0.960459,
+          -1.450919
+        ],
+        "event": [
+          0.24489,
+          -0.380386
+        ]
+      },
+      "raw_head_probabilities": {
+        "slow": [
+          0.345762,
+          0.480092,
+          0.174146
+        ],
+        "fast": [
+          0.917691,
+          0.082309
+        ],
+        "event": [
+          0.651417,
+          0.348583
+        ]
+      },
+      "independent_head_argmax": {
+        "slow": 1,
+        "fast": 0,
+        "event": 0
+      },
+      "independent_head_argmax_action": 0,
+      "independent_head_argmax_reason": "slow_head_cache_fill",
+      "aggregated_env_action_probabilities": [
+        0.31274,
+        0.113441,
+        0.018539,
+        0.206697,
+        0.348583
+      ],
+      "reported_raw_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "reported_projected_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "raw_env_action": 4,
+      "projected_env_action": 4,
+      "executed_action": 4,
+      "aggregation_reason": "event_head_prepare",
+      "projection_applied": false,
+      "head_log_prob": -2.201778,
+      "env_action_log_prob": -1.05388,
+      "cache_events": [
+        {
+          "rsu_id": "rsu_1",
+          "adapter_id": "helmet_shared",
+          "committed": true,
+          "reason": "committed",
+          "victims": [
+            "adapter:alpr"
+          ],
+          "admitted": [
+            "adapter:helmet_shared"
+          ],
+          "transfer_bytes": 9641944,
+          "load_seconds": 0.288584,
+          "before_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "after_residents": [
+            "base:family_a",
+            "adapter:helmet_shared"
+          ],
+          "before_last_used": {
+            "base:family_a": 0,
+            "adapter:alpr": 0
+          }
+        }
+      ],
+      "state_transfer": {
+        "status": "prepared",
+        "target_rsu_id": "rsu_1",
+        "bytes": 2195
+      },
+      "service_completed": true,
+      "migration_success": true,
+      "reward": 1.8408656488582853,
+      "after": {
+        "node_index": 1,
+        "step_index": 1,
+        "clock_seconds": 1.933043112,
+        "completed_node_ids": [
+          "1"
+        ]
+      }
+    },
+    {
+      "step": 1,
+      "node_id": "4",
+      "required_base_model": "base:family_a",
+      "required_adapter": "helmet_shared",
+      "current_rsu_id": "rsu_0",
+      "target_rsu_id": "rsu_1",
+      "before": {
+        "node_index": 1,
+        "step_index": 1,
+        "clock_seconds": 1.933043112,
+        "completed_node_ids": [
+          "1"
+        ],
+        "current_bundle_ready": true,
+        "target_bundle_ready": true
+      },
+      "action_mask": [
+        true,
+        false,
+        true,
+        true,
+        true
+      ],
+      "raw_actor_logits": {
+        "slow": [
+          -0.06059,
+          0.799352,
+          -0.809688
+        ],
+        "fast": [
+          1.082768,
+          -1.613794
+        ],
+        "event": [
+          0.369707,
+          -0.710159
+        ]
+      },
+      "raw_head_probabilities": {
+        "slow": [
+          0.260701,
+          0.616042,
+          0.123257
+        ],
+        "fast": [
+          0.936823,
+          0.063177
+        ],
+        "event": [
+          0.746469,
+          0.253531
+        ]
+      },
+      "independent_head_argmax": {
+        "slow": 1,
+        "fast": 0,
+        "event": 0
+      },
+      "independent_head_argmax_action": 0,
+      "independent_head_argmax_reason": "slow_head_cache_fill",
+      "aggregated_env_action_probabilities": [
+        0.506454,
+        0.0,
+        0.01354,
+        0.200784,
+        0.279222
+      ],
+      "reported_raw_head_actions": {
+        "slow": 1,
+        "fast": 0,
+        "event": 0
+      },
+      "reported_projected_head_actions": {
+        "slow": 1,
+        "fast": 0,
+        "event": 0
+      },
+      "raw_env_action": 0,
+      "projected_env_action": 0,
+      "executed_action": 0,
+      "aggregation_reason": "slow_head_cache_fill",
+      "projection_applied": false,
+      "head_log_prob": -0.842102,
+      "env_action_log_prob": -0.680323,
+      "cache_events": [],
+      "state_transfer": null,
+      "service_completed": true,
+      "migration_success": false,
+      "reward": 1.3122416000000001,
+      "after": {
+        "node_index": 2,
+        "step_index": 2,
+        "clock_seconds": 10.530023112,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ]
+      }
+    },
+    {
+      "step": 2,
+      "node_id": "2",
+      "required_base_model": "base:family_a",
+      "required_adapter": "alpr",
+      "current_rsu_id": "rsu_0",
+      "target_rsu_id": "rsu_1",
+      "before": {
+        "node_index": 2,
+        "step_index": 2,
+        "clock_seconds": 10.530023112,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ],
+        "current_bundle_ready": false,
+        "target_bundle_ready": false
+      },
+      "action_mask": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "raw_actor_logits": {
+        "slow": [
+          0.03775,
+          0.480323,
+          -0.633515
+        ],
+        "fast": [
+          0.718148,
+          -1.06843
+        ],
+        "event": [
+          0.17929,
+          -0.368037
+        ]
+      },
+      "raw_head_probabilities": {
+        "slow": [
+          0.32597,
+          0.50744,
+          0.166591
+        ],
+        "fast": [
+          0.856507,
+          0.143493
+        ],
+        "event": [
+          0.633515,
+          0.366485
+        ]
+      },
+      "independent_head_argmax": {
+        "slow": 1,
+        "fast": 0,
+        "event": 0
+      },
+      "independent_head_argmax_action": 0,
+      "independent_head_argmax_reason": "slow_head_cache_fill",
+      "aggregated_env_action_probabilities": [
+        0.321471,
+        0.105538,
+        0.029632,
+        0.176875,
+        0.366485
+      ],
+      "reported_raw_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "reported_projected_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "raw_env_action": 4,
+      "projected_env_action": 4,
+      "executed_action": 4,
+      "aggregation_reason": "event_head_prepare",
+      "projection_applied": false,
+      "head_log_prob": -2.279641,
+      "env_action_log_prob": -1.003798,
+      "cache_events": [
+        {
+          "rsu_id": "rsu_1",
+          "adapter_id": "alpr",
+          "committed": true,
+          "reason": "committed",
+          "victims": [
+            "adapter:helmet_shared"
+          ],
+          "admitted": [
+            "adapter:alpr"
+          ],
+          "transfer_bytes": 154423432,
+          "load_seconds": 0.711175,
+          "before_residents": [
+            "base:family_a",
+            "adapter:helmet_shared"
+          ],
+          "after_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "before_last_used": {
+            "base:family_a": 0,
+            "adapter:helmet_shared": 0
+          }
+        }
+      ],
+      "state_transfer": {
+        "status": "prepared",
+        "target_rsu_id": "rsu_1",
+        "bytes": 2744
+      },
+      "service_completed": false,
+      "migration_success": true,
+      "reward": -3.3911900045501717,
+      "after": {
+        "node_index": 2,
+        "step_index": 3,
+        "clock_seconds": 14.52101952,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ]
+      }
+    },
+    {
+      "step": 3,
+      "node_id": "2",
+      "required_base_model": "base:family_a",
+      "required_adapter": "alpr",
+      "current_rsu_id": "rsu_0",
+      "target_rsu_id": "rsu_1",
+      "before": {
+        "node_index": 2,
+        "step_index": 3,
+        "clock_seconds": 14.52101952,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ],
+        "current_bundle_ready": false,
+        "target_bundle_ready": true
+      },
+      "action_mask": [
+        true,
+        false,
+        true,
+        true,
+        true
+      ],
+      "raw_actor_logits": {
+        "slow": [
+          0.062498,
+          0.47151,
+          -0.656658
+        ],
+        "fast": [
+          0.845368,
+          -1.323979
+        ],
+        "event": [
+          0.071431,
+          -0.24789
+        ]
+      },
+      "raw_head_probabilities": {
+        "slow": [
+          0.33417,
+          0.503035,
+          0.162795
+        ],
+        "fast": [
+          0.897463,
+          0.102537
+        ],
+        "event": [
+          0.579159,
+          0.420841
+        ]
+      },
+      "independent_head_argmax": {
+        "slow": 1,
+        "fast": 0,
+        "event": 0
+      },
+      "independent_head_argmax_action": 0,
+      "independent_head_argmax_reason": "slow_head_cache_fill",
+      "aggregated_env_action_probabilities": [
+        0.321665,
+        0.0,
+        0.021911,
+        0.191774,
+        0.46465
+      ],
+      "reported_raw_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "reported_projected_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "raw_env_action": 4,
+      "projected_env_action": 4,
+      "executed_action": 4,
+      "aggregation_reason": "event_head_prepare",
+      "projection_applied": false,
+      "head_log_prob": -2.06979,
+      "env_action_log_prob": -0.76647,
+      "cache_events": [
+        {
+          "rsu_id": "rsu_1",
+          "adapter_id": "alpr",
+          "committed": true,
+          "reason": "noop_all_resident",
+          "victims": [],
+          "admitted": [],
+          "transfer_bytes": 0,
+          "load_seconds": 0.0,
+          "before_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "after_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "before_last_used": {
+            "base:family_a": 0,
+            "adapter:alpr": 2
+          }
+        }
+      ],
+      "state_transfer": {
+        "status": "prepared",
+        "target_rsu_id": "rsu_1",
+        "bytes": 2744
+      },
+      "service_completed": false,
+      "migration_success": true,
+      "reward": -3.1619559939345723,
+      "after": {
+        "node_index": 2,
+        "step_index": 4,
+        "clock_seconds": 16.545453472,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ]
+      }
+    },
+    {
+      "step": 4,
+      "node_id": "2",
+      "required_base_model": "base:family_a",
+      "required_adapter": "alpr",
+      "current_rsu_id": "rsu_0",
+      "target_rsu_id": "rsu_1",
+      "before": {
+        "node_index": 2,
+        "step_index": 4,
+        "clock_seconds": 16.545453472,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ],
+        "current_bundle_ready": false,
+        "target_bundle_ready": true
+      },
+      "action_mask": [
+        true,
+        false,
+        true,
+        true,
+        true
+      ],
+      "raw_actor_logits": {
+        "slow": [
+          0.062498,
+          0.47151,
+          -0.656658
+        ],
+        "fast": [
+          0.845368,
+          -1.323979
+        ],
+        "event": [
+          0.071431,
+          -0.24789
+        ]
+      },
+      "raw_head_probabilities": {
+        "slow": [
+          0.33417,
+          0.503035,
+          0.162795
+        ],
+        "fast": [
+          0.897463,
+          0.102537
+        ],
+        "event": [
+          0.579159,
+          0.420841
+        ]
+      },
+      "independent_head_argmax": {
+        "slow": 1,
+        "fast": 0,
+        "event": 0
+      },
+      "independent_head_argmax_action": 0,
+      "independent_head_argmax_reason": "slow_head_cache_fill",
+      "aggregated_env_action_probabilities": [
+        0.321665,
+        0.0,
+        0.021911,
+        0.191774,
+        0.46465
+      ],
+      "reported_raw_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "reported_projected_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "raw_env_action": 4,
+      "projected_env_action": 4,
+      "executed_action": 4,
+      "aggregation_reason": "event_head_prepare",
+      "projection_applied": false,
+      "head_log_prob": -2.06979,
+      "env_action_log_prob": -0.76647,
+      "cache_events": [
+        {
+          "rsu_id": "rsu_1",
+          "adapter_id": "alpr",
+          "committed": true,
+          "reason": "noop_all_resident",
+          "victims": [],
+          "admitted": [],
+          "transfer_bytes": 0,
+          "load_seconds": 0.0,
+          "before_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "after_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "before_last_used": {
+            "base:family_a": 3,
+            "adapter:alpr": 3
+          }
+        }
+      ],
+      "state_transfer": {
+        "status": "prepared",
+        "target_rsu_id": "rsu_1",
+        "bytes": 2744
+      },
+      "service_completed": false,
+      "migration_success": true,
+      "reward": -3.1619559939345723,
+      "after": {
+        "node_index": 2,
+        "step_index": 5,
+        "clock_seconds": 18.569887423999997,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ]
+      }
+    },
+    {
+      "step": 5,
+      "node_id": "2",
+      "required_base_model": "base:family_a",
+      "required_adapter": "alpr",
+      "current_rsu_id": "rsu_0",
+      "target_rsu_id": "rsu_1",
+      "before": {
+        "node_index": 2,
+        "step_index": 5,
+        "clock_seconds": 18.569887423999997,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ],
+        "current_bundle_ready": false,
+        "target_bundle_ready": true
+      },
+      "action_mask": [
+        true,
+        false,
+        true,
+        true,
+        true
+      ],
+      "raw_actor_logits": {
+        "slow": [
+          0.062498,
+          0.47151,
+          -0.656658
+        ],
+        "fast": [
+          0.845368,
+          -1.323979
+        ],
+        "event": [
+          0.071431,
+          -0.24789
+        ]
+      },
+      "raw_head_probabilities": {
+        "slow": [
+          0.33417,
+          0.503035,
+          0.162795
+        ],
+        "fast": [
+          0.897463,
+          0.102537
+        ],
+        "event": [
+          0.579159,
+          0.420841
+        ]
+      },
+      "independent_head_argmax": {
+        "slow": 1,
+        "fast": 0,
+        "event": 0
+      },
+      "independent_head_argmax_action": 0,
+      "independent_head_argmax_reason": "slow_head_cache_fill",
+      "aggregated_env_action_probabilities": [
+        0.321665,
+        0.0,
+        0.021911,
+        0.191774,
+        0.46465
+      ],
+      "reported_raw_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "reported_projected_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "raw_env_action": 4,
+      "projected_env_action": 4,
+      "executed_action": 4,
+      "aggregation_reason": "event_head_prepare",
+      "projection_applied": false,
+      "head_log_prob": -2.06979,
+      "env_action_log_prob": -0.76647,
+      "cache_events": [
+        {
+          "rsu_id": "rsu_1",
+          "adapter_id": "alpr",
+          "committed": true,
+          "reason": "noop_all_resident",
+          "victims": [],
+          "admitted": [],
+          "transfer_bytes": 0,
+          "load_seconds": 0.0,
+          "before_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "after_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "before_last_used": {
+            "base:family_a": 4,
+            "adapter:alpr": 4
+          }
+        }
+      ],
+      "state_transfer": {
+        "status": "prepared",
+        "target_rsu_id": "rsu_1",
+        "bytes": 2744
+      },
+      "service_completed": false,
+      "migration_success": true,
+      "reward": -3.1619559939345723,
+      "after": {
+        "node_index": 2,
+        "step_index": 6,
+        "clock_seconds": 20.594321375999996,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ]
+      }
+    },
+    {
+      "step": 6,
+      "node_id": "2",
+      "required_base_model": "base:family_a",
+      "required_adapter": "alpr",
+      "current_rsu_id": "rsu_0",
+      "target_rsu_id": "rsu_1",
+      "before": {
+        "node_index": 2,
+        "step_index": 6,
+        "clock_seconds": 20.594321375999996,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ],
+        "current_bundle_ready": false,
+        "target_bundle_ready": true
+      },
+      "action_mask": [
+        true,
+        false,
+        true,
+        true,
+        true
+      ],
+      "raw_actor_logits": {
+        "slow": [
+          0.062498,
+          0.47151,
+          -0.656658
+        ],
+        "fast": [
+          0.845368,
+          -1.323979
+        ],
+        "event": [
+          0.071431,
+          -0.24789
+        ]
+      },
+      "raw_head_probabilities": {
+        "slow": [
+          0.33417,
+          0.503035,
+          0.162795
+        ],
+        "fast": [
+          0.897463,
+          0.102537
+        ],
+        "event": [
+          0.579159,
+          0.420841
+        ]
+      },
+      "independent_head_argmax": {
+        "slow": 1,
+        "fast": 0,
+        "event": 0
+      },
+      "independent_head_argmax_action": 0,
+      "independent_head_argmax_reason": "slow_head_cache_fill",
+      "aggregated_env_action_probabilities": [
+        0.321665,
+        0.0,
+        0.021911,
+        0.191774,
+        0.46465
+      ],
+      "reported_raw_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "reported_projected_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "raw_env_action": 4,
+      "projected_env_action": 4,
+      "executed_action": 4,
+      "aggregation_reason": "event_head_prepare",
+      "projection_applied": false,
+      "head_log_prob": -2.06979,
+      "env_action_log_prob": -0.76647,
+      "cache_events": [
+        {
+          "rsu_id": "rsu_1",
+          "adapter_id": "alpr",
+          "committed": true,
+          "reason": "noop_all_resident",
+          "victims": [],
+          "admitted": [],
+          "transfer_bytes": 0,
+          "load_seconds": 0.0,
+          "before_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "after_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "before_last_used": {
+            "base:family_a": 5,
+            "adapter:alpr": 5
+          }
+        }
+      ],
+      "state_transfer": {
+        "status": "prepared",
+        "target_rsu_id": "rsu_1",
+        "bytes": 2744
+      },
+      "service_completed": false,
+      "migration_success": true,
+      "reward": -3.1619559939345723,
+      "after": {
+        "node_index": 2,
+        "step_index": 7,
+        "clock_seconds": 22.618755327999995,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ]
+      }
+    },
+    {
+      "step": 7,
+      "node_id": "2",
+      "required_base_model": "base:family_a",
+      "required_adapter": "alpr",
+      "current_rsu_id": "rsu_0",
+      "target_rsu_id": "rsu_1",
+      "before": {
+        "node_index": 2,
+        "step_index": 7,
+        "clock_seconds": 22.618755327999995,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ],
+        "current_bundle_ready": false,
+        "target_bundle_ready": true
+      },
+      "action_mask": [
+        true,
+        false,
+        true,
+        true,
+        true
+      ],
+      "raw_actor_logits": {
+        "slow": [
+          0.062498,
+          0.47151,
+          -0.656658
+        ],
+        "fast": [
+          0.845368,
+          -1.323979
+        ],
+        "event": [
+          0.071431,
+          -0.24789
+        ]
+      },
+      "raw_head_probabilities": {
+        "slow": [
+          0.33417,
+          0.503035,
+          0.162795
+        ],
+        "fast": [
+          0.897463,
+          0.102537
+        ],
+        "event": [
+          0.579159,
+          0.420841
+        ]
+      },
+      "independent_head_argmax": {
+        "slow": 1,
+        "fast": 0,
+        "event": 0
+      },
+      "independent_head_argmax_action": 0,
+      "independent_head_argmax_reason": "slow_head_cache_fill",
+      "aggregated_env_action_probabilities": [
+        0.321665,
+        0.0,
+        0.021911,
+        0.191774,
+        0.46465
+      ],
+      "reported_raw_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "reported_projected_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "raw_env_action": 4,
+      "projected_env_action": 4,
+      "executed_action": 4,
+      "aggregation_reason": "event_head_prepare",
+      "projection_applied": false,
+      "head_log_prob": -2.06979,
+      "env_action_log_prob": -0.76647,
+      "cache_events": [
+        {
+          "rsu_id": "rsu_1",
+          "adapter_id": "alpr",
+          "committed": true,
+          "reason": "noop_all_resident",
+          "victims": [],
+          "admitted": [],
+          "transfer_bytes": 0,
+          "load_seconds": 0.0,
+          "before_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "after_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "before_last_used": {
+            "base:family_a": 6,
+            "adapter:alpr": 6
+          }
+        }
+      ],
+      "state_transfer": {
+        "status": "prepared",
+        "target_rsu_id": "rsu_1",
+        "bytes": 2744
+      },
+      "service_completed": false,
+      "migration_success": true,
+      "reward": -3.1619559939345723,
+      "after": {
+        "node_index": 2,
+        "step_index": 8,
+        "clock_seconds": 24.643189279999994,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ]
+      }
+    },
+    {
+      "step": 8,
+      "node_id": "2",
+      "required_base_model": "base:family_a",
+      "required_adapter": "alpr",
+      "current_rsu_id": "rsu_0",
+      "target_rsu_id": "rsu_1",
+      "before": {
+        "node_index": 2,
+        "step_index": 8,
+        "clock_seconds": 24.643189279999994,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ],
+        "current_bundle_ready": false,
+        "target_bundle_ready": true
+      },
+      "action_mask": [
+        true,
+        false,
+        true,
+        true,
+        true
+      ],
+      "raw_actor_logits": {
+        "slow": [
+          0.062498,
+          0.47151,
+          -0.656658
+        ],
+        "fast": [
+          0.845368,
+          -1.323979
+        ],
+        "event": [
+          0.071431,
+          -0.24789
+        ]
+      },
+      "raw_head_probabilities": {
+        "slow": [
+          0.33417,
+          0.503035,
+          0.162795
+        ],
+        "fast": [
+          0.897463,
+          0.102537
+        ],
+        "event": [
+          0.579159,
+          0.420841
+        ]
+      },
+      "independent_head_argmax": {
+        "slow": 1,
+        "fast": 0,
+        "event": 0
+      },
+      "independent_head_argmax_action": 0,
+      "independent_head_argmax_reason": "slow_head_cache_fill",
+      "aggregated_env_action_probabilities": [
+        0.321665,
+        0.0,
+        0.021911,
+        0.191774,
+        0.46465
+      ],
+      "reported_raw_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "reported_projected_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "raw_env_action": 4,
+      "projected_env_action": 4,
+      "executed_action": 4,
+      "aggregation_reason": "event_head_prepare",
+      "projection_applied": false,
+      "head_log_prob": -2.06979,
+      "env_action_log_prob": -0.76647,
+      "cache_events": [
+        {
+          "rsu_id": "rsu_1",
+          "adapter_id": "alpr",
+          "committed": true,
+          "reason": "noop_all_resident",
+          "victims": [],
+          "admitted": [],
+          "transfer_bytes": 0,
+          "load_seconds": 0.0,
+          "before_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "after_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "before_last_used": {
+            "base:family_a": 7,
+            "adapter:alpr": 7
+          }
+        }
+      ],
+      "state_transfer": {
+        "status": "prepared",
+        "target_rsu_id": "rsu_1",
+        "bytes": 2744
+      },
+      "service_completed": false,
+      "migration_success": true,
+      "reward": -3.1619559939345723,
+      "after": {
+        "node_index": 2,
+        "step_index": 9,
+        "clock_seconds": 26.667623231999993,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ]
+      }
+    },
+    {
+      "step": 9,
+      "node_id": "2",
+      "required_base_model": "base:family_a",
+      "required_adapter": "alpr",
+      "current_rsu_id": "rsu_0",
+      "target_rsu_id": "rsu_1",
+      "before": {
+        "node_index": 2,
+        "step_index": 9,
+        "clock_seconds": 26.667623231999993,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ],
+        "current_bundle_ready": false,
+        "target_bundle_ready": true
+      },
+      "action_mask": [
+        true,
+        false,
+        true,
+        true,
+        true
+      ],
+      "raw_actor_logits": {
+        "slow": [
+          0.062498,
+          0.47151,
+          -0.656658
+        ],
+        "fast": [
+          0.845368,
+          -1.323979
+        ],
+        "event": [
+          0.071431,
+          -0.24789
+        ]
+      },
+      "raw_head_probabilities": {
+        "slow": [
+          0.33417,
+          0.503035,
+          0.162795
+        ],
+        "fast": [
+          0.897463,
+          0.102537
+        ],
+        "event": [
+          0.579159,
+          0.420841
+        ]
+      },
+      "independent_head_argmax": {
+        "slow": 1,
+        "fast": 0,
+        "event": 0
+      },
+      "independent_head_argmax_action": 0,
+      "independent_head_argmax_reason": "slow_head_cache_fill",
+      "aggregated_env_action_probabilities": [
+        0.321665,
+        0.0,
+        0.021911,
+        0.191774,
+        0.46465
+      ],
+      "reported_raw_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "reported_projected_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "raw_env_action": 4,
+      "projected_env_action": 4,
+      "executed_action": 4,
+      "aggregation_reason": "event_head_prepare",
+      "projection_applied": false,
+      "head_log_prob": -2.06979,
+      "env_action_log_prob": -0.76647,
+      "cache_events": [
+        {
+          "rsu_id": "rsu_1",
+          "adapter_id": "alpr",
+          "committed": true,
+          "reason": "noop_all_resident",
+          "victims": [],
+          "admitted": [],
+          "transfer_bytes": 0,
+          "load_seconds": 0.0,
+          "before_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "after_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "before_last_used": {
+            "base:family_a": 8,
+            "adapter:alpr": 8
+          }
+        }
+      ],
+      "state_transfer": {
+        "status": "prepared",
+        "target_rsu_id": "rsu_1",
+        "bytes": 2744
+      },
+      "service_completed": false,
+      "migration_success": true,
+      "reward": -3.1619559939345723,
+      "after": {
+        "node_index": 2,
+        "step_index": 10,
+        "clock_seconds": 28.692057183999992,
+        "completed_node_ids": [
+          "1",
+          "4"
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "reward": -22.371774713233894,
+    "completed_nodes": 2,
+    "workflow_completed": 0,
+    "deadline_violations": 0,
+    "service_failures": 8,
+    "handoff_count": 0,
+    "handoff_failures": 0,
+    "migration_attempts": 9,
+    "migration_successes": 9,
+    "model_transfer_bytes": 164065376,
+    "state_transfer_bytes": 24147,
+    "input_transfer_bytes": 0,
+    "recompute_seconds": 0.0,
+    "model_load_seconds": 0.9997590000000001,
+    "state_restore_seconds": 0.039708,
+    "transfer_seconds": 1.532716184,
+    "modeled_completion_seconds": 28.692057183999992,
+    "cache_evictions": 2,
+    "cache_rejections": 0,
+    "vehicle_fallback_count": 0,
+    "invalid_action_count": 0,
+    "workflow_id": "j_1066618",
+    "window_id": "window_lankershim_off4000_len24_t1118936085200_1118936087500",
+    "design_id": "evaluation_00",
+    "split": "evaluation",
+    "node_count": 5,
+    "total_transfer_bytes": 164089523,
+    "terminated": false,
+    "steps": 10,
+    "deadline_seconds": 68.178196
+  }
+}

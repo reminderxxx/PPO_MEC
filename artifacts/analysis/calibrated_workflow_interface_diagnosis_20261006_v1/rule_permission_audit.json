@@ -1,0 +1,15 @@
+{
+  "two_step_rule_capability": "explicit model-based planner with environment clone access",
+  "public_inputs": [
+    "full DAG and current node",
+    "predicted RSU sequence and confidence",
+    "typed cache residents and object catalog",
+    "estimated link and measured cost parameters"
+  ],
+  "additional_computational_capability": [
+    "enumerates legal actions by executing exact environment transition clones",
+    "observes modeled completion, failure, transfer and completion outcomes for candidate branches",
+    "uses a lexicographic objective rather than the scalar RL reward"
+  ],
+  "leakage_judgment": "The historical v1 clone used the same configured link because no actual/estimated split existed. It did not open holdout truth, but its exact transition-model and lexicographic planning capability is stronger than the learned policies' encoder. It must be labeled a strong model-based rule, not equal information-use capacity."
+}

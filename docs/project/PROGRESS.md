@@ -5,6 +5,21 @@
 
 ﻿# Progress
 
+## 2026-10-06：实测校准连续工作流小规模匹配训练完成，未观察到 SA-GHMAPPO 优势
+
+- 从成本纠错 clean `d67575b…` 建立隔离工作区；主工作区七个用户修改未暂存、覆盖、stash 或提交。冻结
+  train/dev/evaluation=`12/4/12`，覆盖共享/不同 base、紧张/宽裕 cache、低/高 handoff、三档状态量和简单规则区。
+- 新 pilot 环境只复用共同五动作、依赖安全 bundle cache、真实 state prepare/recompute 语义及 A 线测量；不在 step
+  调用真实模型。NGSIM/Alibaba 为 trace-derived，1 Gbps link、deadline、adapter mapping 和配对均明确为人工假设。
+- 完成 SA-GHMAPPO/PPO/controller-level MAPPO 各 3 seeds × 192 episodes；两步规则不训练。9 checkpoint 均为
+  24 updates；120 evaluation rows、receipt、integrity 和窗口外层 percentile CI 齐全。
+- 12-window 结果：SA/PPO/MAPPO/rule completion=`0.528/1.000/1.000/1.000`，return=
+  `-10.299/6.517/6.517/13.218`。rule modeled elapsed=`45.655 s`、transfer=`279.151 MB`、recompute=`3.297 s`，
+  均优于完整完成的 PPO/MAPPO；SA 的 elapsed 含未完成截断，不能作更快解释。
+- SA 评估共 action-4 `243` 次、service failure `191`，出现 prepare over-activation；负结果不调参、不覆盖。
+  报告与论文表见 `calibrated_continuous_workflow_pilot_20261006.md`；证据仍是 non-formal pilot，paper-ready 为
+  `Unverifiable`。
+
 ## 2026-10-06：恢复成本不对称已纠错，历史方法优势撤销
 
 - 从 `codex/manuscript-evidence-v1` 的 `b3a00b…` 起步，主工作区七个用户修改保持不变；只读缺陷报告先以独立提交
@@ -2114,3 +2129,20 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 研究决定为 3：另轮只验证带 resident eviction externality 的最小机制规则；本轮不实现新算法、不训练 RL。跨 workflow 持久缓存、共享带宽/计算/队列仍未实现，证据保持 E2 bounded。
 - 报告：`shared_cache_recovery_coupling_audit_20261005.md`；机器证据：`../../artifacts/shared_cache_recovery_coupling_20261005_v1/`。
 - 事后方法身份核对发现 frozen runner 的 `current_simple_threshold` 错把 resident-aware estimate 标成原 workload-v0.1 阈值；保留原产物并追加 correction。按原冻结参数复算仍在 A/B/C 全选 action 4，因此 branch/数值不变，但 frozen decision record 不作为原方法信息权限证据。
+
+## 2026-10-06 SA-GHMAPPO 创新候选与纠正版小预算训练尝试
+
+- 在 `d67575b…` 纠正提交祖先上冻结 v2：action 4 只在当前节点成功后提交迁移 state，决策只见 estimated link，
+  环境执行使用 actual link；旧 scorer/action-0/offline reference 未进入新结论。
+- 最近邻压缩到六篇一手论文；新增 JWCN 2026 service-cache-assisted migration 条目。DAG/service cache、workflow
+  model loading、shared base/adapter prefetch、trajectory migration 和 MAPPO 均已有直接重叠，独特性未建立。
+- 唯一候选为 DAG-node adapter-residency relation message passing；敏感性臂只关闭 `use_dependency_aware`。
+- depth-4 诊断检查 1,183 states / 4,962 state-actions；对称传输误差 0、actual cost 泄漏 0、两规则 406 次分歧。
+  首次仅初始状态诊断的 fail receipt 保留，未静默覆盖。
+- 一次正式小预算执行完成：3 seeds × 128 episodes；actual main/ablation/total steps=`8,154/2,873/11,027`，
+  无 generate/download/旧 holdout/搜索/补跑。
+- evaluation 观测 completion：SA 0.750、no-dependency 0.917、PPO 1.000、controller-level MAPPO 1.000、两 planner
+  1.000；full-minus-ablation=`-0.167 [-0.250,-0.083]`。事后审计确认 executed-action likelihood、mobility、encoder 与
+  planner capability 不匹配，方法排名失效；最终决策 D，停止且不重训。
+- artifact：`artifacts/calibrated_continuous_workflow_pilot_v2_20261006/`；报告：
+  `sa_ghmappo_innovation_fair_training_v2_20261006.md`；paper-ready 仍为 `Unverifiable`。

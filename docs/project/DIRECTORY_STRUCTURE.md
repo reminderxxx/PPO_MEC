@@ -1,5 +1,31 @@
 ﻿# Directory Structure
 
+## 2026-10-06 calibrated continuous-workflow pilot
+
+- `src/envs/core/calibrated_continuous_workflow_env.py`：独立的小型 event-driven 校准仿真；共享五动作、依赖安全
+  bundle cache、原子 rollback、state prepare/import 与 DAG predecessor recompute。
+- `configs/experiment/calibrated_continuous_workflow_pilot_v1.json`：实测/轨迹/人工来源分离、八个分层模板和共同训练预算。
+- `configs/experiment/calibrated_continuous_workflow_pilot_v1_manifest.json`：结果盲冻结的 12/4/12 train/dev/evaluation 实例。
+- `scripts/freeze_calibrated_continuous_workflow_pilot.py`：从既有 NGSIM window plans 和 Alibaba JSONL create-only 冻结 workload。
+- `scripts/run_calibrated_continuous_workflow_pilot.py`：SA-GHMAPPO/PPO/MAPPO 匹配训练、two-step rule、window-outer CI、
+  checkpoint 与论文表入口。
+- `tests/test_calibrated_continuous_workflow.py`：action 4 恢复、DAG 重算、依赖安全替换、失败 rollback 和 rule side-effect 回归。
+- `artifacts/benchmarks/calibrated_continuous_workflow_pilot_20261006_v1/`：9 个 checkpoint、108 learned evaluation rows、
+  12 rule rows、aggregate、paper table、receipt 与 integrity。
+- `docs/project/calibrated_continuous_workflow_pilot_20261006.md`：负向结果、论文实验表、审查元数据与 claim 边界。
+
+### v2 纠正版与 interface-blocked 训练尝试
+
+- `configs/experiment/calibrated_continuous_workflow_pilot_v2.json` / `_manifest.json`：128-episode 限额、
+  actual/estimated link error strata、dev checkpoint selection、同信息消融与 12/4/12 frozen instances。
+- `scripts/diagnose_calibrated_continuous_workflow_v2.py`：depth-4 可达状态、对称计费、信息泄漏与规则分歧的 create-only 诊断。
+- `scripts/run_calibrated_continuous_workflow_pilot_v2.py`：SA/PPO/controller-MAPPO/no-dependency 训练、两条 model-based planner、dev
+  选模、evaluation-window outer CI、分层、曲线与 completion receipt。
+- `artifacts/calibrated_continuous_workflow_{non_degeneracy,pilot_v2}_20261006/`：诊断、checkpoint、全部 seed/window 结果、
+  曲线、分层、日志指针与 integrity。
+- `docs/project/sa_ghmappo_innovation_fair_training_v2_20261006.md` 与
+  `manuscript_experiment_section_sa_ghmappo_pilot_v2_20261006.md`：最近邻矩阵、事后接口失效边界和待合并诊断章节。
+
 ## 2026-10-06 symmetric recovery cost correction
 
 - `src/runtime/symmetric_recovery_cost.py`：双方 event ledger 的纯函数 scorer 与三种在线决策。

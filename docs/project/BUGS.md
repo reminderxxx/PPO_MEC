@@ -5,6 +5,18 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-06：校准 pilot 中 SA-GHMAPPO action-4 过度激活（OPEN ALGORITHM CLAIM BLOCKER）
+
+- `NEGATIVE`：冻结匹配训练不支持主方法优势。SA-GHMAPPO 12-window completion `0.528`，相对 two-step rule 差
+  `-0.472`，窗口 bootstrap 95% CI `[-0.722,-0.250]`；不得进入支持优势的论文主表。
+- `OBSERVED`：SA 的 36 个 seed-window run 共 action-4 `243` 次、service failure `191`；handoff prepare 在当前
+  bundle 未 ready 时仍为 contract-legal action，策略未学会先恢复当前服务，导致截断。PPO/MAPPO 完成但主要 action-0，
+  每次 handoff 重算，亦未兑现状态迁移机制。
+- `BOUNDARY`：这是固定 192-episode、3-seed non-formal pilot 的策略行为，不等于实现 bug；同一审查轮不修改 reward、
+  mask、guard 或预算。若修复，必须先另立诊断/实现任务，再用新结果盲 protocol 验证并保留本轮负结果。
+- `OPEN`：formal/holdout/support、BCa/sign/Holm、跨数据组合、共享资源争用、compute accounting 和真实无线均缺失；
+  paper-ready 仍为 `Unverifiable`。证据见 `calibrated_continuous_workflow_pilot_20261006.md`。
+
 ## 2026-10-06：路径不对称已修复；算法增量价值缺口确认（RESOLVED IMPLEMENTATION / OPEN CLAIM BLOCKER）
 
 - `RESOLVED`：新 v2 ledger 为 restart/recovery 分别建立 cache state，双方都执行 current→next 合法 transaction；每个 model
@@ -802,3 +814,21 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - `OPEN / external validity`：A/B/C 使用 contract-legal synthetic audit objects，不是真实模型权重；100 Mbps、同机 state overhead 和 technical-workload recompute 是冻结估计，非真实无线测量。
 - `RESOLVED WITH BOUNDED WITNESS / within-episode state coupling`：C 已证明合法 action 4 可经有限容量 LRU 改变后续 resident set、reload bytes 和 action mask；这不是不同 `restore_cost` 造成。但仅为 E2 bounded，不授权 RL、formal/holdout 或 paper-ready claim。
 - `CORRECTED / method identity`：frozen runner 将 resident-aware estimate 标为 `current_simple_threshold`，与 workload-v0.1 原方法信息权限不一致。原规则按预存冻结输入复算仍在 A/B/C 全选 action 4，故 native outcome 不变；原 frozen decision record 只保留审计，不可用作方法权限证明。
+
+## 2026-10-06 SA-GHMAPPO v2 remaining blockers
+
+- `OPEN / policy and aggregation collapse`：full SA 三 seed 中 seed 29 completion 仅 0.25；另两 seed 退化到与 MAPPO
+  相同的高 transfer/high recompute 行为。raw evaluation action 0/3/4=`180/10/120`，未学出正确规则的 0/2/4 条件切换。
+- `INTERFACE-BLOCKED / dependency-message hypothesis`：no-dependency completion 0.917，高于 full 0.750；paired delta
+  `-0.167 [-0.250,-0.083]`，但 optimized/executed action likelihood 错配使其只能作为负向敏感性信号。不得把 DAG
+  message passing 写成已验证贡献或已证伪机制，也不得用更少的截断 elapsed 掩盖未完成。
+- `OPEN / matched feature contract`：flat actor 不消费 cache readiness/occupancy，flat critic occupancy 单位错误，graph/flat
+  未对等消费 typed base、byte occupancy、link/state/model cost；规则另有 exact transition clone + lexicographic objective。
+- `OPEN / failure-time mobility`：失败只推进 step/clock，RSU/vehicle/prediction 仍由 node index 派生，会冻结 mobility 并形成
+  重复失败状态；在修复前不得把 v2 称为公平序列控制 benchmark。
+- `OPEN / external validity`：link rate/error、deadline、adapter mapping 和 trajectory-workflow pairing 是合成因素；没有真实
+  adapter request trace、共享 queue/bandwidth/compute、跨 workflow cache 或真实 RSU。
+- `OPEN / statistical maturity`：只有 3 seeds、12 evaluation windows、percentile bootstrap；没有 formal/hidden holdout、
+  support、BCa/Holm、收敛证明或独立复现，paper-ready 维持 `Unverifiable`。
+- `BOUNDARY / historical v1`：192-episode v1 早于 action-4 commit 与 actual/estimated link 修正，只保留审计，不得与 v2
+  checkpoint、逐行结果或 aggregate 混用。

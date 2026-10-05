@@ -5,6 +5,18 @@
 
 # PPO_MEC
 
+纠正版实测校准连续工作流 v2 小预算执行已完成：SA-GHMAPPO、PPO、controller-level MAPPO、no-dependency
+敏感性臂和 immediate/two-step planners 共用五动作、奖励与依赖安全 typed cache；3 seeds × 128 episodes，不用
+evaluation 选模。训练后只读审计确认 executed-action likelihood、失败时 mobility、encoder 字段消费和 model-based planner
+能力不匹配，故观测的 SA/消融/PPO/MAPPO/规则 completion=`0.750/0.917/1/1/1` 不能作为公平方法排名。最终决策 D，
+保留原件并停止，不重训或调参。详见
+[创新与公平训练报告](docs/project/sa_ghmappo_innovation_fair_training_v2_20261006.md)及
+[待合并论文实验章节](docs/project/manuscript_experiment_section_sa_ghmappo_pilot_v2_20261006.md)。
+
+此前 192-episode v1 pilot 及其报告保留为历史证据，但它不满足本轮 128-episode 上限，且早于 action-4 state commit 与
+actual/estimated link 信息边界修正，不得用于当前算法比较；历史入口仍见
+[v1 匹配训练报告](docs/project/calibrated_continuous_workflow_pilot_20261006.md)。
+
 真实 adapter cache victim→reload 的 12-call 最小实测已完成：两臂共用同一 native typed-cache 与 PEFT lifecycle
 接线，ALPR 合法驱逐后从 780 个 runtime tensors 降为 0，并在后续节点前由保留本地文件真实重载；base+双 adapter
 对照无 action load/unload。两条件仍均选择 recovery，真实 lifecycle 对两臂是共同成本，不构成决策翻转或算法优势。

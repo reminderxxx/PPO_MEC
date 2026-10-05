@@ -20,6 +20,9 @@
 | E11 | 原 12 点公平复算后还剩多少方法优势 | 四方法 12/12 动作、成本、完成和 reference gap 相同；旧 10/12 vs 7/12 优势完全撤销 | `recovery_cost_corrected_matrix_results_20261006.md` 与对应 artifact | synthetic development correction，非独立验证 |
 | E12 | 正确规则是否新增能力或只与简单规则持平 | 新 6 点三在线方法 6/6 相同；在 2 个冻结 link 误差边界共同错选 | `recovery_cost_boundary_check_results_20261006.md` 与对应 artifact | analytic boundary check，不是现实误差分布 |
 | E13 | 共享 base、当前 resident、无驱逐是否正确记账 | b02/b03/b04 全部逐事件通过；共同 lifecycle 在两路各计一次且 6/6 相同 | 同上 `all_method_results.json` | 没有 action-specific cache 差异或算法收益 |
+| E14 | 纠正版小型连续 workflow 是否存在非退化序列决策 | depth-4 检查 1,183 个可达状态、4,962 个合法状态—动作；对称传输误差 0、actual link 泄漏 0、两规则 406 次分歧 | `artifacts/calibrated_continuous_workflow_non_degeneracy_20261006/` | 只证明非明显退化，不证明 RL 优势或最优策略复杂性 |
+| E15 | 当前 SA-GHMAPPO 是否在公平小预算下优于强基线 | `Unverifiable`；虽观测到 SA completion 0.750、PPO/MAPPO/两 planner 为 1.000，但 executed-action likelihood、mobility、encoder 与 planner capability 不匹配 | `artifacts/calibrated_continuous_workflow_pilot_v2_20261006/` 与 `calibrated_workflow_interface_defect_report_20261006.md` | 执行结果保留为 interface diagnostic，不作方法排名 |
+| E16 | DAG dependency message passing 是否有单因素贡献 | 未建立；当前 defective contract 下 full minus no-dependency completion `-0.167 [-0.250,-0.083]`，coverage `-0.120 [-0.192,-0.050]`，reward `-6.375 [-10.336,-2.596]` | `sa_ghmappo_innovation_fair_training_v2_20261006.md` 与逐行 artifact | 负向敏感性信号，不是 paper-grade 因果消融 |
 
 ## 正在解决和未解决的问题
 
@@ -28,6 +31,9 @@
 - P03，PARTIAL / BOUNDED：6 点边界检查覆盖两侧并保留两个估计错选，但只来自 analytic link mismatch，不是独立真实分布；不得包装为校准性能。
 - P04，OPEN：远端成本、任务标签及外部代表性。暂不建设共享队列或跨 workflow 平台；是否需要由最终主张决定。
 - P05，OPEN：系统组合的新颖性及投稿定位；引用已有成本感知思想，不用润色填补增量价值缺口。
+- P06，INTERFACE BLOCKED：当前唯一候选 relation message passing 在同架构敏感性臂中为负，但 hierarchical PPO
+  canonical-head log-prob 与 executed action 不一致，失败时 mobility 冻结，encoder 信息消费不对等。按审查规则不自动
+  修复/重训/调参；论文贡献收紧，最终决策 D。
 
 ## 本轮收口结论
 
@@ -77,3 +83,21 @@
   `artifact_run_id=eviction_aware_recovery_corrected_20261006_v2 + recovery_cost_boundary_check_20261006_v1`，
   `policy_version=tmc_review_policy_v3_20260621`，`evidence_level=E2_ARTIFACT_AUDITED`（bounded synthetic correction；
   network modeled）。
+
+## v1.4 SA-GHMAPPO 创新候选与小预算训练尝试记录
+
+- 执行 source commit `b418eb4…`，确认 `d67575b…` 为祖先；旧不对称 scorer、旧 action 0、旧 offline reference 未用于
+  新结论。live remote 在执行前不可验证，cached `origin/codex/manuscript-evidence-v1=b3a00b6…` 不含纠正提交。
+- 唯一候选：DAG 节点的 current/predicted/target-RSU adapter-residency feature 沿依赖边消息传递；不把 MAPPO、GNN、
+  shared base、adapter prefetch 或 checkpoint recovery 当原创。
+- frozen config/manifest 为 v2；train/dev/evaluation=`12/4/12`，跨 split 原始 frame interval overlap=`0/0/0`；预算上限
+  main/ablation/total=`27,648/9,216/36,864`，实际=`8,154/2,873/11,027`。
+- 方法：SA-GHMAPPO、PPO、controller-level MAPPO、immediate/two-step model-based planners，以及只关闭
+  `use_dependency_aware` 的同架构敏感性臂；3 seeds × 128 episodes，不做搜索，不用 evaluation 选模。
+- 观测：SA completion 0.750；no-dependency 0.917；PPO、MAPPO 和两 planner 均 1.000；full minus ablation
+  completion `-0.167 [-0.250,-0.083]`。事后接口审计使公平排名与机制因果结论 `Unverifiable`；最终决策 D。
+- 原件：`artifacts/calibrated_continuous_workflow_pilot_v2_20261006/`；日志：同名 `.log`；直接论文补丁：
+  `manuscript_experiment_section_sa_ghmappo_pilot_v2_20261006.md`。
+- review identity：`reviewed_at=2026-10-06`，`literature_cutoff=2026-10-06`，`target_venue=IEEE TMC`，
+  `artifact_run_id=calibrated_continuous_workflow_pilot_v2_20261006`，`policy_version=tmc_review_policy_v3_20260621`，
+  `evidence_level=E1_DOCUMENTED_WITH_AUDITED_NONFORMAL_PILOT`；paper-ready 仍为 `Unverifiable`。

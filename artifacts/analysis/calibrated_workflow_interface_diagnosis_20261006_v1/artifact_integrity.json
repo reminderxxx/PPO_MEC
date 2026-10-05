@@ -1,0 +1,35 @@
+{
+  "schema_version": "artifact_integrity_v1",
+  "files": [
+    {
+      "path": "action4_failure_trace.json",
+      "sha256": "8f6778974353438c6f5b8551bd9255d1f7a2a22abb2b73107dd8e6465c72ad1c",
+      "bytes": 29989
+    },
+    {
+      "path": "checkpoint_compatibility.json",
+      "sha256": "ac841aae750186431bc7d2ae06eb5a539a679f465ed907eb8bcbbb56b4b631fa",
+      "bytes": 791
+    },
+    {
+      "path": "completion_receipt.json",
+      "sha256": "69099371129021f2acda2efce7f10f606f62be1f905083f2b5c26ce9e4fdb4cb",
+      "bytes": 980
+    },
+    {
+      "path": "feature_perturbation_audit.json",
+      "sha256": "e0ceb926739ed82ce1f58f0c5902a20915e2a164b4b657dc6017fd8e48adf8c3",
+      "bytes": 2137
+    },
+    {
+      "path": "rule_permission_audit.json",
+      "sha256": "13dc16023287081b5fd2c0531c009d5238f11d57f151ceeb8f2271d32482075e",
+      "bytes": 949
+    },
+    {
+      "path": "sampling_mode_diagnosis.json",
+      "sha256": "4688cc64bf3334367a468ef19b6339976e02abc3308e78e250496e69acc8dc42",
+      "bytes": 5358
+    }
+  ]
+}

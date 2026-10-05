@@ -55,7 +55,14 @@ class CalibratedContinuousWorkflowEnv:
     def clone(self) -> "CalibratedContinuousWorkflowEnv":
         return deepcopy(self)
 
+    def clone_for_decision_model(self) -> "CalibratedContinuousWorkflowEnv":
+        """Clone state while forcing previews to use decision-time estimates."""
+        clone = deepcopy(self)
+        clone._decision_model_mode = True
+        return clone
+
     def reset(self) -> tuple[np.ndarray, dict[str, Any]]:
+        self._decision_model_mode = False
         self.nodes = deepcopy(self.instance["nodes"])
         self.node_map = {str(node["node_id"]): node for node in self.nodes}
         self.execution_order = [str(node_id) for node_id in self.instance["execution_order"]]
@@ -87,6 +94,12 @@ class CalibratedContinuousWorkflowEnv:
             "cache_rejections": 0,
             "vehicle_fallback_count": 0,
             "invalid_action_count": 0,
+            "reward_node_completion": 0.0,
+            "reward_workflow_completion": 0.0,
+            "reward_time_penalty": 0.0,
+            "reward_transfer_penalty": 0.0,
+            "reward_failure_penalty": 0.0,
+            "reward_deadline_penalty": 0.0,
         }
         capacity = int(self.instance["cache_capacity_bytes"])
         self.caches = {
@@ -149,6 +162,7 @@ class CalibratedContinuousWorkflowEnv:
         state_restore_seconds = 0.0
         failure = False
         migration_success = False
+        staged_migration: dict[str, Any] | None = None
 
         if action == 1 and next_rsu:
             cache_event = self._admit_bundle(next_rsu, str(node["required_adapter"]))
@@ -171,27 +185,19 @@ class CalibratedContinuousWorkflowEnv:
             model_prepare_seconds = self._model_transfer_seconds(cache_event)
             state_prepare_seconds = _network_seconds(
                 package_bytes,
-                float(self.config["link"]["mbps"]),
+                self._effective_link_mbps(),
                 float(self.config["link"]["fixed_seconds"]),
             ) + float(self.config["measured_time_seconds"]["state_restore_overhead"])
             if cache_event["committed"] and model_prepare_seconds + state_prepare_seconds <= self._contact_budget_seconds():
                 model_bytes += int(cache_event["transfer_bytes"])
                 model_load_seconds += float(cache_event["load_seconds"])
-                state_bytes += package_bytes
-                state_restore_seconds += float(
-                    self.config["measured_time_seconds"]["state_restore_overhead"]
-                )
-                migration_success = True
-                self.prepared_state[str(next_rsu)] = {
-                    "completed_node_ids": list(self.completed) + [str(node["node_id"])],
-                    "workflow_id": self.instance["workflow_id"],
-                    "package_bytes": package_bytes,
-                }
-                self.metrics["migration_successes"] += 1
-                event["state_transfer"] = {
-                    "status": "prepared",
-                    "target_rsu_id": next_rsu,
+                staged_migration = {
+                    "target_rsu_id": str(next_rsu),
                     "bytes": package_bytes,
+                }
+                event["state_transfer"] = {
+                    "status": "staged_pending_current_node_completion",
+                    **staged_migration,
                 }
             else:
                 if cache_event["committed"]:
@@ -245,11 +251,28 @@ class CalibratedContinuousWorkflowEnv:
             self.metrics["completed_nodes"] += 1
             self.last_execution_rsu = current_rsu if service_rsu else self.last_execution_rsu
             self._touch_bundle(current_rsu, str(node["required_adapter"])) if service_rsu else None
+            if staged_migration is not None:
+                migration_success = True
+                state_bytes += int(staged_migration["bytes"])
+                state_restore_seconds += float(
+                    self.config["measured_time_seconds"]["state_restore_overhead"]
+                )
+                target_rsu = str(staged_migration["target_rsu_id"])
+                self.prepared_state[target_rsu] = {
+                    "completed_node_ids": list(self.completed),
+                    "workflow_id": self.instance["workflow_id"],
+                    "package_bytes": int(staged_migration["bytes"]),
+                }
+                self.metrics["migration_successes"] += 1
+                event["state_transfer"] = {
+                    "status": "prepared_after_current_node_completion",
+                    **staged_migration,
+                }
 
         transfer_seconds = sum(
             _network_seconds(
                 byte_count,
-                float(self.config["link"]["mbps"]),
+                self._effective_link_mbps(),
                 float(self.config["link"]["fixed_seconds"]),
             )
             for byte_count in (model_bytes, state_bytes, input_bytes)
@@ -271,7 +294,7 @@ class CalibratedContinuousWorkflowEnv:
             if self.clock_seconds > float(self.instance["deadline_seconds"]):
                 self.metrics["deadline_violations"] = 1
 
-        reward = self._reward(
+        reward, reward_components = self._reward(
             completed=not failure,
             step_cost=step_cost,
             transfer_bytes=model_bytes + state_bytes + input_bytes,
@@ -279,6 +302,8 @@ class CalibratedContinuousWorkflowEnv:
             terminal=self.terminated,
         )
         self.metrics["reward"] += reward
+        for key, value in reward_components.items():
+            self.metrics[key] += value
         event.update(
             {
                 "service_completed": not failure,
@@ -293,6 +318,7 @@ class CalibratedContinuousWorkflowEnv:
                 "transfer_seconds": transfer_seconds,
                 "step_cost_seconds": step_cost,
                 "reward": reward,
+                "reward_components": reward_components,
             }
         )
         info = self._info()
@@ -331,7 +357,7 @@ class CalibratedContinuousWorkflowEnv:
         return str(sequence[min(self.node_index, len(sequence) - 1)])
 
     def _predicted_sequence(self) -> list[str]:
-        sequence = self.instance["rsu_sequence"]
+        sequence = self.instance.get("predicted_rsu_sequence", self.instance["rsu_sequence"])
         horizon = int(self.config["prediction_horizon"])
         start = min(self.node_index, len(sequence) - 1)
         values = [str(item) for item in sequence[start + 1 : start + 1 + horizon]]
@@ -502,9 +528,15 @@ class CalibratedContinuousWorkflowEnv:
             return float("inf")
         return _network_seconds(
             int(event["transfer_bytes"]),
-            float(self.config["link"]["mbps"]),
+            self._effective_link_mbps(),
             float(self.config["link"]["fixed_seconds"]),
         ) + float(event["load_seconds"])
+
+    def _effective_link_mbps(self) -> float:
+        profile = self.instance.get("link_profile", {})
+        if self._decision_model_mode:
+            return float(profile.get("estimated_mbps", self.config["link"]["mbps"]))
+        return float(profile.get("actual_mbps", self.config["link"]["mbps"]))
 
     def _validate_cache(self, cache: _RSUCache) -> None:
         residents = set(cache.residents)
@@ -529,18 +561,23 @@ class CalibratedContinuousWorkflowEnv:
         transfer_bytes: int,
         failure: bool,
         terminal: bool,
-    ) -> float:
+    ) -> tuple[float, dict[str, float]]:
         objective = self.config["objective"]
-        reward = float(objective["node_completion_reward"]) if completed else 0.0
-        reward -= float(objective["time_weight"]) * float(step_cost)
-        reward -= float(objective["transfer_gib_weight"]) * float(transfer_bytes) / float(1024**3)
-        if failure:
-            reward -= float(objective["failure_penalty"])
-        if terminal:
-            reward += float(objective["workflow_completion_reward"])
-            if self.clock_seconds > float(self.instance["deadline_seconds"]):
-                reward -= float(objective["deadline_penalty"])
-        return float(reward)
+        components = {
+            "reward_node_completion": float(objective["node_completion_reward"]) if completed else 0.0,
+            "reward_workflow_completion": float(objective["workflow_completion_reward"]) if terminal else 0.0,
+            "reward_time_penalty": -float(objective["time_weight"]) * float(step_cost),
+            "reward_transfer_penalty": -float(objective["transfer_gib_weight"])
+            * float(transfer_bytes)
+            / float(1024**3),
+            "reward_failure_penalty": -float(objective["failure_penalty"]) if failure else 0.0,
+            "reward_deadline_penalty": (
+                -float(objective["deadline_penalty"])
+                if terminal and self.clock_seconds > float(self.instance["deadline_seconds"])
+                else 0.0
+            ),
+        }
+        return float(sum(components.values())), components
 
     def _observation(self) -> np.ndarray:
         if self.terminated:
@@ -595,8 +632,12 @@ class CalibratedContinuousWorkflowEnv:
             "predicted_first_handoff_rsu_by_vehicle": {"veh_pilot": target},
             "predicted_handoff_target_rsu_id_by_vehicle": {"veh_pilot": target},
             "predicted_handoff_vehicle_ids": ["veh_pilot"] if target else [],
-            "prediction_confidence_by_vehicle": {"veh_pilot": 0.9},
-            "prediction_uncertainty_by_vehicle": {"veh_pilot": 0.1},
+            "prediction_confidence_by_vehicle": {
+                "veh_pilot": float(self.instance.get("prediction_profile", {}).get("confidence", 0.9))
+            },
+            "prediction_uncertainty_by_vehicle": {
+                "veh_pilot": float(self.instance.get("prediction_profile", {}).get("uncertainty", 0.1))
+            },
             "dwell_time": {"veh_pilot": self._contact_budget_seconds()},
             "future_load": {
                 str(rsu_id): float(self._resident_bytes(self.caches[str(rsu_id)]))
@@ -637,7 +678,15 @@ class CalibratedContinuousWorkflowEnv:
                 "contact_budget_seconds": self._contact_budget_seconds(),
                 "cache_capacity_bytes": self.instance["cache_capacity_bytes"],
                 "state_bytes": node.get("state_bytes", 0) if node else 0,
-                "link": deepcopy(self.config["link"]),
+                "link": {
+                    "estimated_mbps": float(
+                        self.instance.get("link_profile", {}).get(
+                            "estimated_mbps", self.config["link"]["mbps"]
+                        )
+                    ),
+                    "fixed_seconds": float(self.config["link"]["fixed_seconds"]),
+                    "source_type": self.config["link"]["source_type"],
+                },
                 "object_catalog": deepcopy(self._object_catalog),
                 "adapter_to_bundle": deepcopy(self._adapter_to_bundle),
                 "measured_time_seconds": deepcopy(self.config["measured_time_seconds"]),
@@ -663,7 +712,7 @@ class TwoStepCostRule:
     def select_action(self, env: CalibratedContinuousWorkflowEnv) -> int:
         candidates: list[tuple[tuple[Any, ...], int]] = []
         for first_action in env.valid_actions():
-            first_env = env.clone()
+            first_env = env.clone_for_decision_model()
             _, _, terminated, truncated, _ = first_env.step(first_action)
             if terminated or truncated:
                 candidates.append((self._objective(first_env), first_action))
@@ -686,3 +735,17 @@ class TwoStepCostRule:
             float(metrics["modeled_completion_seconds"]),
             int(metrics["model_transfer_bytes"] + metrics["state_transfer_bytes"] + metrics["input_transfer_bytes"]),
         )
+
+
+class ImmediateCostRule(TwoStepCostRule):
+    """Information-matched one-step rule using the estimated decision model."""
+
+    method_name = "immediate_cost_rule"
+
+    def select_action(self, env: CalibratedContinuousWorkflowEnv) -> int:
+        candidates: list[tuple[tuple[Any, ...], int]] = []
+        for action in env.valid_actions():
+            preview = env.clone_for_decision_model()
+            preview.step(action)
+            candidates.append((self._objective(preview), action))
+        return min(candidates, key=lambda item: (item[0], item[1]))[1]

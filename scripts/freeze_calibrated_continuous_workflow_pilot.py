@@ -146,6 +146,11 @@ def _build_instance(
     block = 2 if pressure == "high" else max(3, len(nodes) // 2)
     rsu_ids = ["rsu_0", "rsu_1", "rsu_2"]
     rsu_sequence = [rsu_ids[(index // block) % len(rsu_ids)] for index in range(len(nodes))]
+    actual_mbps = float(template.get("actual_mbps", config["link"]["mbps"]))
+    estimated_mbps = float(template.get("estimated_mbps", config["link"]["mbps"]))
+    prediction_quality = str(template.get("prediction_quality", "matched"))
+    prediction_confidence = float(template.get("prediction_confidence", 0.9))
+    prediction_uncertainty = float(template.get("prediction_uncertainty", 0.1))
     capacity_key = f"{'shared' if sharing == 'shared_base' else 'distinct'}_{template['capacity']}"
     capacity = int(config["capacity_bytes"][capacity_key])
     first_adapter = next(node["required_adapter"] for node_id in execution_order for node in nodes if node["node_id"] == node_id)
@@ -192,6 +197,16 @@ def _build_instance(
         "factors": dict(template),
         "rsu_ids": rsu_ids,
         "rsu_sequence": rsu_sequence,
+        "link_profile": {
+            "actual_mbps": actual_mbps,
+            "estimated_mbps": estimated_mbps,
+            "error_class": prediction_quality,
+        },
+        "prediction_profile": {
+            "confidence": prediction_confidence,
+            "uncertainty": prediction_uncertainty,
+            "quality": prediction_quality,
+        },
         "cache_capacity_bytes": capacity,
         "initial_residents": initial,
         "nodes": nodes,

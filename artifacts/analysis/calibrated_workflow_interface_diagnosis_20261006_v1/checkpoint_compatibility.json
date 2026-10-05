@@ -1,0 +1,8 @@
+{
+  "historical_checkpoint": "artifacts/benchmarks/calibrated_continuous_workflow_pilot_20261006_v1/checkpoints/sa_ghmappo_seed7.pt",
+  "historical_observation_contract": "semantic_state_info_v1 with graph/flat encoder v1",
+  "structural_load_into_current_code": true,
+  "semantic_comparability_after_encoder_profile_fix": false,
+  "reason": "A calibrated encoder profile changes the meaning of existing fixed-size features to consume byte occupancy, typed bundle readiness, model/state sizes and estimated link/contact cost. A historical checkpoint may still deserialize by tensor shape, but its weights were never trained for those semantics and must not be compared as a compatible repaired policy.",
+  "required_action": "retrain all learned methods under the frozen repaired profile"
+}

@@ -1,0 +1,99 @@
+{
+  "state": {
+    "design_id": "evaluation_00",
+    "node_id": "2",
+    "step_index": 3
+  },
+  "results": {
+    "cache_used_bytes_only": {
+      "flat": {
+        "max_abs_delta": 0.0,
+        "l2_delta": 0.0
+      },
+      "graph": {
+        "max_abs_delta": 0.0,
+        "l2_delta": 0.0
+      }
+    },
+    "cache_capacity_bytes_only": {
+      "flat": {
+        "max_abs_delta": 1.4251722024738456e-10,
+        "l2_delta": 1.4251722024738456e-10
+      },
+      "graph": {
+        "max_abs_delta": 0.0,
+        "l2_delta": 0.0
+      }
+    },
+    "typed_resident_identity_only": {
+      "flat": {
+        "max_abs_delta": 0.0,
+        "l2_delta": 0.0
+      },
+      "graph": {
+        "max_abs_delta": 0.0,
+        "l2_delta": 0.0
+      }
+    },
+    "calibrated_link_only": {
+      "flat": {
+        "max_abs_delta": 0.0,
+        "l2_delta": 0.0
+      },
+      "graph": {
+        "max_abs_delta": 0.0,
+        "l2_delta": 0.0
+      }
+    },
+    "calibrated_state_bytes_only": {
+      "flat": {
+        "max_abs_delta": 0.0,
+        "l2_delta": 0.0
+      },
+      "graph": {
+        "max_abs_delta": 0.0,
+        "l2_delta": 0.0
+      }
+    },
+    "node_required_base_only": {
+      "flat": {
+        "max_abs_delta": 0.0,
+        "l2_delta": 0.0
+      },
+      "graph": {
+        "max_abs_delta": 0.0,
+        "l2_delta": 0.0
+      }
+    },
+    "current_cached_adapter_remove": {
+      "flat": {
+        "max_abs_delta": 2.850344404947691e-10,
+        "l2_delta": 2.850344404947691e-10
+      },
+      "graph": {
+        "max_abs_delta": 0.18464511632919312,
+        "l2_delta": 0.770896852016449
+      }
+    },
+    "target_cached_adapter_remove": {
+      "flat": {
+        "max_abs_delta": 2.850344404947691e-10,
+        "l2_delta": 2.850344404947691e-10
+      },
+      "graph": {
+        "max_abs_delta": 0.3291381001472473,
+        "l2_delta": 1.0202311277389526
+      }
+    },
+    "public_dwell_time": {
+      "flat": {
+        "max_abs_delta": 0.699999988079071,
+        "l2_delta": 0.699999988079071
+      },
+      "graph": {
+        "max_abs_delta": 0.02837395668029785,
+        "l2_delta": 0.13636018335819244
+      }
+    }
+  }
+}

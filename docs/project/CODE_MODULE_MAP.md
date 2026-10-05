@@ -1,5 +1,25 @@
 # Code Module Map
 
+## Calibrated continuous-workflow pilot
+
+- `src/envs/core/calibrated_continuous_workflow_env.py`：只服务 non-formal pilot 的共同仿真边界；typed base/adapter bundle
+  admission、dependency-safe LRU、contact-bounded action 4、状态包、DAG ancestor recompute 和成本/奖励在这里统一执行。
+- `scripts/freeze_calibrated_continuous_workflow_pilot.py`：消费已提交的 NGSIM window plan 与外部 Alibaba 数据，按结果盲
+  分层模板冻结 manifest；不训练、不调用模型、不修改原始数据。
+- `scripts/run_calibrated_continuous_workflow_pilot.py`：通过 live registry 构建三种现有 agent，共用 rollout/GAE 与环境；
+  独立两步规则只 clone 当前可见状态，输出 window-outer aggregate、checkpoint hash 和完整性清单。
+- `tests/test_calibrated_continuous_workflow.py`：校验共同 action/cache/state 能力，而不测试或修改各算法内部。
+
+v2 职责增量：
+
+- environment 将 decision-time estimated link 与 execution-time actual link 分离，action 4 的 state 只在当前节点成功后提交，
+  reward 分项进入逐 episode ledger；不扩展 live production environment。
+- freeze script 只把事前模板中的 link/prediction profile 写入 frozen instance，不读取任何方法结果。
+- diagnostic script 只做可达状态与权限检查；runner 只有在 pass receipt 后训练，且用 dev 而非 evaluation 选 checkpoint。
+- `sa_ghmappo_no_dependency` 不进入 live registry；runner 仍构建 `sa_ghmappo`，仅将
+  `use_dependency_aware=False` 作为局部敏感性臂。事后接口审计确认 hierarchical action likelihood、failure-time
+  mobility 与 encoder feature profile 未匹配，v2 runner 不得再用于方法排名或继续训练。
+
 ## Real PEFT adapter cache lifecycle witness
 
 - `src/runtime/peft_adapter_lifecycle.py`：把 native typed-cache 已预览的 adapter-only victim/admission 实体化为 PEFT

@@ -8,6 +8,7 @@ import pytest
 
 from src.envs.core.calibrated_continuous_workflow_env import (
     CalibratedContinuousWorkflowEnv,
+    ImmediateCostRule,
     TwoStepCostRule,
 )
 
@@ -128,3 +129,54 @@ def test_two_step_rule_is_valid_and_side_effect_free() -> None:
     action = rule.select_action(env)
     assert action in env.valid_actions()
     assert env.summary() == before
+
+
+def test_decision_preview_uses_estimated_link_without_exposing_actual_link() -> None:
+    config = _config()
+    instance = _instance(target_ready=False)
+    instance["link_profile"] = {
+        "actual_mbps": 200.0,
+        "estimated_mbps": 1000.0,
+        "error_class": "optimistic",
+    }
+    env = CalibratedContinuousWorkflowEnv(config, instance)
+    semantic = env._info()["semantic_state"]
+    assert semantic["calibrated_context"]["link"]["estimated_mbps"] == 1000.0
+    assert "actual_mbps" not in semantic["calibrated_context"]["link"]
+    execution = env.clone()
+    preview = env.clone_for_decision_model()
+    execution.step(2)
+    preview.step(2)
+    assert execution.summary()["modeled_completion_seconds"] > preview.summary()[
+        "modeled_completion_seconds"
+    ]
+
+
+def test_failed_current_service_does_not_commit_staged_migration_state() -> None:
+    config = _config()
+    instance = _instance(target_ready=True)
+    instance["initial_residents"]["rsu_0"] = []
+    env = CalibratedContinuousWorkflowEnv(config, instance)
+    _, _, _, _, info = env.step(4)
+    assert info["transition"]["service_completed"] is False
+    assert info["transition"]["migration_success"] is False
+    assert env.prepared_state == {}
+    assert env.summary()["state_transfer_bytes"] == 0
+    assert env.summary()["migration_successes"] == 0
+
+
+def test_reward_components_sum_to_step_reward() -> None:
+    env = CalibratedContinuousWorkflowEnv(_config(), _instance())
+    _, reward, _, _, info = env.step(3)
+    components = info["transition"]["reward_components"]
+    assert reward == pytest.approx(sum(components.values()))
+    assert env.summary()["reward"] == pytest.approx(
+        sum(env.summary()[key] for key in components)
+    )
+
+
+@pytest.mark.parametrize("rule", [ImmediateCostRule(), TwoStepCostRule()])
+def test_information_matched_rules_return_legal_actions(rule: object) -> None:
+    env = CalibratedContinuousWorkflowEnv(_config(), _instance())
+    action = rule.select_action(env)
+    assert action in env.valid_actions()
