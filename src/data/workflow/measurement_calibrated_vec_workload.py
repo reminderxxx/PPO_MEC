@@ -230,7 +230,9 @@ def _simulate(
             transfers["input"] += input_bytes
             restart_prefix = prefix
             repeated_compute += prefix
-        clock = max(clock, float(workflow["arrival_seconds"]))
+        arrival = float(workflow["arrival_seconds"])
+        queue_wait = max(0.0, clock - arrival)
+        clock = max(clock, arrival)
         elapsed = prefix + model_prepare_seconds + incremental + suffix
         clock += elapsed
         end_to_end = clock - float(workflow["arrival_seconds"])
@@ -244,6 +246,7 @@ def _simulate(
                 "completed": True,
                 "completion_seconds": clock,
                 "end_to_end_seconds": end_to_end,
+                "queue_wait_seconds": queue_wait,
                 "deadline_seconds": deadline,
                 "deadline_violation": clock > deadline,
                 "model_was_ready": not missing,
@@ -263,6 +266,7 @@ def _simulate(
         "deadline_violations": sum(item["deadline_violation"] for item in results),
         "total_completion_seconds": sum(item["end_to_end_seconds"] for item in results),
         "makespan_seconds": clock,
+        "total_queue_wait_seconds": sum(item["queue_wait_seconds"] for item in results),
         "transfer_bytes_by_type": transfers,
         "total_transfer_bytes": sum(transfers.values()),
         "repeated_compute_seconds": repeated_compute,

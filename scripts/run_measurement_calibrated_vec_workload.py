@@ -53,6 +53,7 @@ def flatten(row: dict[str, Any]) -> dict[str, Any]:
         "completed_workflows": row["completed_workflows"],
         "total_completion_seconds": row["total_completion_seconds"],
         "makespan_seconds": row["makespan_seconds"],
+        "total_queue_wait_seconds": row["total_queue_wait_seconds"],
         "base_transfer_bytes": transfer["base"],
         "adapter_transfer_bytes": transfer["adapter"],
         "input_transfer_bytes": transfer["input"],

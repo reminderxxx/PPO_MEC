@@ -121,6 +121,8 @@ def cost_decomposition(
             "process_elapsed_seconds": continuous["process_elapsed_seconds"],
             "supervisor_child_wall_seconds": phase_by_role["continuous"]["wall_seconds"],
             "dynamic_transfer_bytes_if_remote": 0,
+            "queue_wait_seconds": None,
+            "queue_wait_status": "unavailable_single_process_technical_run_no_rsu_queue_model",
         },
         "interrupted_then_restart_from_n0": {
             "executed_nodes_after_interrupt": ["n0", "n1"],
@@ -133,6 +135,8 @@ def cost_decomposition(
             "path_supervisor_child_wall_seconds": phase_by_role["source"]["wall_seconds"] + phase_by_role["restart"]["wall_seconds"],
             "dynamic_transfer_bytes_if_remote": image_bytes,
             "dynamic_transfer_type": "original_input_image",
+            "queue_wait_seconds": None,
+            "queue_wait_status": "unavailable_single_process_technical_run_no_rsu_queue_model",
         },
         "interrupted_then_restore_and_execute_n1_only": {
             "executed_nodes_after_interrupt": ["n1"],
@@ -147,6 +151,8 @@ def cost_decomposition(
             "path_supervisor_child_wall_seconds": phase_by_role["source"]["wall_seconds"] + phase_by_role["target"]["wall_seconds"],
             "dynamic_transfer_bytes_if_remote": state["package_bytes"],
             "dynamic_transfer_type": "state_package",
+            "queue_wait_seconds": None,
+            "queue_wait_status": "unavailable_single_process_technical_run_no_rsu_queue_model",
         },
     }
     sensitivity = []
