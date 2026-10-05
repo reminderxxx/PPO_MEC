@@ -1,0 +1,348 @@
+{
+  "instance": "evaluation_00",
+  "fixed_stochastic_seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "stochastic_completion_rate": 0.0,
+  "stochastic_rows": [
+    {
+      "sample_seed": 0,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 1,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 2,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 3,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 4,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 5,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 6,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 7,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 8,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 9,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 10,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 11,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 12,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 13,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 14,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    },
+    {
+      "sample_seed": 15,
+      "deterministic": false,
+      "workflow_completed": 0,
+      "completed_nodes": 2,
+      "service_failures": 8,
+      "actions": [
+        3,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3,
+        4,
+        4
+      ]
+    }
+  ],
+  "deterministic_row": {
+    "sample_seed": 7,
+    "deterministic": true,
+    "workflow_completed": 0,
+    "completed_nodes": 2,
+    "service_failures": 8,
+    "actions": [
+      4,
+      0,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4
+    ]
+  },
+  "interpretation_boundary": "Checkpoint diagnosis only. The repeated stochastic samples are not independent episodes, not a new method score, and not a final evaluation."
+}
