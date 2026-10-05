@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `real_cache_victim_reload_plan_20261005.md`：真实 SmolVLM base + Helmet/ALPR adapter 的 12-call 事前冻结方案；
+  对称核算 restart/recovery、合法 adapter-only victim、后续 reload 与无驱逐对照，尚未读取新模型输出
+
 - `manuscript_evidence_progress_20261005.md`：论文 v1.1 的成果、未解决问题与后续追加记录规范；无新增实验。
 
 - `independent_recovery_cost_measurement_plan_20261005.md`：独立成本检查的实例、随机顺序、既有校准、事前预测、

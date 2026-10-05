@@ -5,10 +5,16 @@
 
 # PPO_MEC
 
+真实 adapter cache victim→reload 的 12-call 最小方案已在读取新输出前冻结：两臂共用同一 native typed-cache 与
+PEFT lifecycle 接线，比较 adapter-only 合法驱逐条件和 base+双 adapter 无驱逐对照；不删除权重、不清 OS cache、
+不训练或下载。执行前方案见
+[`docs/project/real_cache_victim_reload_plan_20261005.md`](docs/project/real_cache_victim_reload_plan_20261005.md)。
+
 独立恢复成本检查的[事前冻结方案](docs/project/independent_recovery_cost_measurement_plan_20261005.md)与
 [结果](docs/project/independent_recovery_cost_measurement_results_20261005.md)已完成。固定实现一次执行 24/24 次
 `generate`，两条合法条件各 3 次配对，事前/事后均选择 recovery，但全部条件落在同一决策侧，未检验决策边界；绝对成本
-预测仍明显偏高。原 12 个设计点明确降回开发/机制验证证据。真实 victim 后续重载、无线和队列仍未覆盖。
+预测仍明显偏高。原 12 个设计点明确降回开发/机制验证证据。该记录是上一轮边界；新的 victim→reload 方案尚待固定
+clean commit 一次执行，无线和队列仍未覆盖。
 
 驱逐代价感知恢复规则的 12 点冻结验证与证据绑定论文工作稿见
 [`docs/project/eviction_aware_recovery_results_20261005.md`](docs/project/eviction_aware_recovery_results_20261005.md) 和

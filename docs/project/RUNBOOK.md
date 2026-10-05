@@ -5,6 +5,25 @@
 
 # Runbook
 
+## 真实 adapter victim→reload 最小实测（2026-10-05）
+
+计划、执行器和局部测试先提交，再从该 clean commit 对不存在的结果目录只启动一次：
+
+```bash
+/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python \
+  scripts/run_real_cache_victim_reload.py \
+  --role supervisor \
+  --plan configs/acceptance/real_cache_victim_reload_v1.json \
+  --run-root artifacts/analysis/real_cache_victim_reload_20261005_v1 \
+  --expected-commit <frozen-implementation-commit>
+```
+
+固定调用量是两个 condition ×（source 1 + restart 3 + recovery 2）=`12`，等于硬上限；无自动重试。victim 条件
+容量来自 `base+ALPR` 真实权重字节，对照容量来自 `base+ALPR+Helmet`。本地权重不删除，OS cache 不清，100 Mbps/
+20 ms 仅为模拟网络项。专项回归：
+`python -m pytest -q tests/test_real_cache_victim_reload.py tests/test_production_action4_state.py tests/test_eviction_aware_recovery.py`。
+完整冻结边界见 `real_cache_victim_reload_plan_20261005.md`。
+
 ## 独立恢复成本测量（2026-10-05）
 
 先提交并固定计划/执行器；随后只允许从 clean fixed commit 对不存在的 output root 启动一次：

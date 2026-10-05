@@ -1,5 +1,13 @@
 ﻿# Directory Structure
 
+## 2026-10-05 real adapter victim→reload
+
+- `configs/acceptance/real_cache_victim_reload_v1.json`：真实资源 identity/字节容量、两条件、逐臂成本和 12-call 上限。
+- `src/runtime/peft_adapter_lifecycle.py`：显式 opt-in、adapter-only 的 PEFT unload/load bridge；不提交 logical ledger。
+- `scripts/run_real_cache_victim_reload.py`：native preview→runtime unload/load→native commit 的 create-only 测量入口。
+- `tests/test_real_cache_victim_reload.py`：预算、真实字节 victim、无驱逐、缺模型/非法 base victim 与 commit 顺序合同。
+- `docs/project/real_cache_victim_reload_plan_20261005.md`：读取新输出前冻结的人工方案与历史公式缺陷边界。
+
 ## 2026-10-05 independent recovery cost measurement
 
 - `configs/acceptance/independent_recovery_cost_measurement_v1.json`：两条件、六次配对、随机种子、事前成本/动作和

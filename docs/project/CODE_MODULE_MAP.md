@@ -1,5 +1,15 @@
 # Code Module Map
 
+## Real PEFT adapter cache lifecycle witness
+
+- `src/runtime/peft_adapter_lifecycle.py`：把 native typed-cache 已预览的 adapter-only victim/admission 实体化为 PEFT
+  tuner `delete_adapter` / local `load_adapter`；以注册对象和 tensor count/bytes 证明 unload/reload，不清 OS cache、
+  不删除文件，也不提前提交 logical resident。
+- `scripts/run_real_cache_victim_reload.py`：两臂共享同一 bridge；每个请求先用现有 native transaction path 做 shadow
+  preview，runtime 成功后才提交同一 native action并核对结果；生产 action-4 state import 仅在当前模型两层都 ready 后提交。
+- `tests/test_real_cache_victim_reload.py`：12-call freeze、真实字节容量、合法 adapter victim、无驱逐对照、缺模型与
+  unsupported base victim 的 fail-closed 回归。
+
 ## Eviction-aware recovery bounded rule
 
 - `src/runtime/eviction_aware_recovery.py`：消费 detached decision inputs，按 object ID 去重并比较完整 rerun/recovery

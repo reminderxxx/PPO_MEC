@@ -5,6 +5,17 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-05：历史 recovery 公式对当前模型准备存在路径不对称（FROZEN SCIENTIFIC DEFECT）
+
+- `eviction_aware_recovery.py` 的 frozen development rule 从原 resident 集 `C` 计算 rerun 的未来缺失，却只在 recovery
+  显式计 `D0\C` 与 victim 后 `C'`；它不是一般 restart/recovery 全路径公式。
+- 既有 12 点是按该已冻结方法定义和评分，原 artifact、动作和数值不重算、不覆盖；这项缺陷限制其可解释范围，而不是
+  授权事后换公式改善历史结果。
+- 既有 real-model runner 的两臂各自新进程加载相同模型，但没有真实 typed resident→PEFT object 生命周期，因此也不能
+  证明 victim 成本只属于 recovery 或已由“共同成本”抵消。
+- 新的 `real_cache_victim_reload_v1` 只用逐事件全路径账本补最小真实见证；两臂共享同一 lifecycle 能力，并仅抵消对象、
+  时点和调用均实际相同的 setup。该接线不包装为原创算法，也不改变正确两步前瞻等价结论。
+
 ## 2026-10-05：独立检查同侧通过但未触及驱逐项和决策边界（OPEN SCIENTIFIC BLOCKER）
 
 文稿 v1.1 追加口径风险：冻结开发公式仅显式向 recovery 写入当前依赖准备项，rerun 路径仍从 C 投影；泛化应用前必须核对两条实际路径的准备与缓存转移，不能默认共同成本相等。当前仅识别文稿适用边界，未据此判定代码错误或重算结果。见 `manuscript_evidence_progress_20261005.md` P01/P02。
