@@ -5,14 +5,18 @@
 
 ﻿# Progress
 
-## 2026-10-05：真实 adapter victim→reload 事前方案已冻结、尚未执行
+## 2026-10-05：真实 adapter victim→reload 已完成
 
 - 解析起点为 `54b5cfb754cf5c3b3191172704f6e74df3f90ec9`；确认并保护主工作区七个用户修改。
 - 核对历史公式后登记 frozen scientific defect：当前依赖准备仅显式进入 recovery，不能直接外推为一般全路径公式；
   旧 12 点及 artifact 不改写。
 - 复用本地 SmolVLM、Helmet 与 ALPR；按真实权重字节冻结 base+ALPR victim 容量和 base+双 adapter 对照容量。
-- 两个条件各 source/restart/recovery=`1/3/2` 次 generate，总计 12 次，等于硬上限；预测均为 recovery，无边界翻转目标。
-- 新输出尚未读取；先完成实现/合同局部回归，再提交 clean execution commit，一次执行、无重试。
+- clean commit `f31024d957bd07718c4087fa55d8f7bb707e0f6e` 唯一执行两个条件各
+  source/restart/recovery=`1/3/2` 次 generate，总计 12/12，scientific wall `64.309679 s`，无重试。
+- victim 条件中 ALPR 780 tensors 实际卸载为 0，Helmet 加载后执行 n1；后续合法驱逐 Helmet 并重载 ALPR 780 tensors
+  执行 n2。control 当前/未来请求均 `noop_all_resident`，action load/unload=0。
+- restart/recovery lifecycle=`1.022245/1.026997 s`，两条件预测/实测都选 recovery；未翻转、未跨边界。22/22 artifact
+  integrity 通过。见 `real_cache_victim_reload_results_20261005.md`。
 
 ## 2026-10-05：独立事前成本检查完成并停止扩展
 

@@ -1,0 +1,130 @@
+{
+  "condition_id": "no_eviction_control",
+  "generate_attempted": 1,
+  "generate_completed": 1,
+  "n0_input": {
+    "image_access_count": 1,
+    "image_size": [
+      1200,
+      900
+    ],
+    "input_ids_sha256": "283065519f9c60703fd98587652f746a70830acf31d54e2c9000639fe9543de4",
+    "prompt": "Describe the main subject of this local image in one short phrase.",
+    "rendered_prompt": "<|im_start|>User:<image>Describe the main subject of this local image in one short phrase.<end_of_utterance>\nAssistant:"
+  },
+  "n0_output": {
+    "decoded_text": " A line graph depicting running vehicles over time",
+    "inference_seconds": 6.968562041999999,
+    "new_token_count": 8,
+    "token_ids": [
+      330,
+      1761,
+      3670,
+      17691,
+      4108,
+      6110,
+      690,
+      655
+    ]
+  },
+  "node_call_counts": {
+    "n0": 1,
+    "n1": 0,
+    "n2": 0
+  },
+  "pid": 33558,
+  "process_wall_seconds": 9.127317333,
+  "production_action4_state_export": {
+    "completed_nodes": [
+      "n0"
+    ],
+    "execution_right_transferred": false,
+    "files": [
+      "state.json",
+      "manifest.json"
+    ],
+    "manifest_bytes": 337,
+    "manifest_sha256": "d3fd891ef645f3f74c3ea2c5683a838633126149ef6126232068432816be03f1",
+    "migration_success": false,
+    "next_node": "n1",
+    "package_bytes": 2195,
+    "package_dir": "/Users/howen/.codex/worktrees/cost-validation/PPO_MEC/artifacts/analysis/real_cache_victim_reload_20261005_v1/no_eviction_control/production_action4_state_package",
+    "payload_bytes": 1118,
+    "payload_sha256": "94aa9e33db65468cb5faced3d1aa58c9bf82f3e801bfaad97fb24210c7bbe605",
+    "serialize_and_save_seconds": 0.0008780420000000788,
+    "source_rsu_id": "technical_source",
+    "state_file_bytes": 1858,
+    "state_file_sha256": "1baa3bf831d0fb0d6ace3729b2c4760eb3c8f692ac3c3806deeedd9c1e93e60e",
+    "status": "EXPORTED_PENDING_IMPORT",
+    "target_rsu_id": "rsu_target"
+  },
+  "role": "source",
+  "runtime": {
+    "active_adapter_names": [
+      "helmet"
+    ],
+    "adapter_objects": {
+      "alpr": {
+        "adapter_name": "alpr",
+        "registered": false,
+        "tensor_bytes": 0,
+        "tensor_count": 0,
+        "tensor_name_examples": [],
+        "tensor_name_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "tensor_numel": 0
+      },
+      "helmet": {
+        "adapter_name": "helmet",
+        "registered": true,
+        "tensor_bytes": 9568256,
+        "tensor_count": 520,
+        "tensor_name_examples": [
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_A.helmet.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_B.helmet.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_A.helmet.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_B.helmet.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.q_proj.lora_A.helmet.weight"
+        ],
+        "tensor_name_sha256": "f3d55ddec6d12941d8e1742bc6047d4ffa6ef3137514461d4549018a88e5c65b",
+        "tensor_numel": 2392064
+      }
+    },
+    "registered_adapter_names": [
+      "helmet"
+    ]
+  },
+  "setup": {
+    "adapter_load_calls": [
+      {
+        "adapter_name": "helmet",
+        "phase": "setup",
+        "seconds": 0.3720272499999999
+      }
+    ],
+    "base_load_seconds": 0.26612433300000005,
+    "processor_load_seconds": 0.07379316700000005
+  },
+  "static_resources": {
+    "alpr_weight": {
+      "bytes": 154423432,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/adapter_downloads_20260930/alpr_edccd0e/adapter_model.safetensors",
+      "sha256": "95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83"
+    },
+    "base_weight": {
+      "bytes": 1015025832,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/model_a7da5b9_20260929/model.safetensors",
+      "sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2"
+    },
+    "helmet_weight": {
+      "bytes": 9641944,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/adapter_downloads_20260930/helmet_96794cb/adapter_model.safetensors",
+      "sha256": "e899c9c13b53bf80bcfc86048f5678a727e8c1838dc824156b521d5cdaafdd2d"
+    },
+    "source_input": {
+      "bytes": 192757,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/LuSTScenario/LuSTScenario-master/docs/img/TrafficDemands.png",
+      "sha256": "83af09665cd23c87a1d831e6cb47a88bc8d509849712c551b0a9a7965e95c307"
+    }
+  },
+  "status": "PASS"
+}

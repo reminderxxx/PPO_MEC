@@ -5,6 +5,19 @@
 
 # Artifact Records
 
+## 2026-10-05 real adapter cache victim→reload
+
+- root：`artifacts/analysis/real_cache_victim_reload_20261005_v1/`；解析起点 `54b5cfb…`，固定执行 commit
+  `f31024d957bd07718c4087fa55d8f7bb707e0f6e`；2 conditions、6 processes、12/12 generate、64.309679 s、无重试。
+- victim 条件的 restart/recovery 均完成 ALPR `780 tensors / 154,308,608 B → 0`、Helmet load、Helmet
+  `520 tensors / 9,568,256 B → 0`、ALPR local-file reload 和 n2 execution；base 保持 resident。
+- no-eviction control 的当前/未来请求均 `noop_all_resident`，两臂 action load/unload=0。两 condition 的 n0/n1/n2
+  保真和 node calls 全通过，预测/实测均选 recovery；未跨决策边界。
+- 直接 lifecycle restart/recovery=`1.022245/1.026997 s`，是相同依赖下的共同成本；不能作为 recovery-only penalty。
+  网络只为 100 Mbps+20 ms 假设，task quality/queue unavailable，OS cache 未清。
+- 22/22 manifest files 独立 size/SHA-256 复算通过。证据等级 `E2_ARTIFACT_AUDITED` bounded same-host
+  real-adapter lifecycle；非 formal/holdout、无线、统计泛化、算法优势或 paper-ready。
+
 ## 2026-10-05 independent recovery cost measurement
 
 - root：`artifacts/analysis/independent_recovery_cost_measurement_20261005_v1/`；解析基线 `de70d572…`，冻结执行

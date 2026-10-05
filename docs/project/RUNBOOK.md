@@ -15,7 +15,7 @@
   --role supervisor \
   --plan configs/acceptance/real_cache_victim_reload_v1.json \
   --run-root artifacts/analysis/real_cache_victim_reload_20261005_v1 \
-  --expected-commit <frozen-implementation-commit>
+  --expected-commit f31024d957bd07718c4087fa55d8f7bb707e0f6e
 ```
 
 固定调用量是两个 condition ×（source 1 + restart 3 + recovery 2）=`12`，等于硬上限；无自动重试。victim 条件
@@ -23,6 +23,9 @@
 20 ms 仅为模拟网络项。专项回归：
 `python -m pytest -q tests/test_real_cache_victim_reload.py tests/test_production_action4_state.py tests/test_eviction_aware_recovery.py`。
 完整冻结边界见 `real_cache_victim_reload_plan_20261005.md`。
+
+该 run 已完成且不得覆盖或按结果补跑：12/12 calls、两个 condition fidelity PASS、22/22 integrity。结果与 claim
+边界见 `real_cache_victim_reload_results_20261005.md`。
 
 ## 独立恢复成本测量（2026-10-05）
 

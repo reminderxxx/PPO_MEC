@@ -10,9 +10,11 @@
 ## Live 文档
 
 - `real_cache_victim_reload_plan_20261005.md`：真实 SmolVLM base + Helmet/ALPR adapter 的 12-call 事前冻结方案；
-  对称核算 restart/recovery、合法 adapter-only victim、后续 reload 与无驱逐对照，尚未读取新模型输出
+  对称核算 restart/recovery、合法 adapter-only victim、后续 reload 与无驱逐对照
+- `real_cache_victim_reload_results_20261005.md`：12/12 调用、逐事件 runtime tensor unload/reload、无驱逐对照、
+  全路径成本/预测误差、共同外部代价与论文 claim 收缩
 
-- `manuscript_evidence_progress_20261005.md`：论文 v1.1 的成果、未解决问题与后续追加记录规范；无新增实验。
+- `manuscript_evidence_progress_20261005.md`：论文 v1.2 的成果、真实 lifecycle 新证据、未解决问题与追加记录规范。
 
 - `independent_recovery_cost_measurement_plan_20261005.md`：独立成本检查的实例、随机顺序、既有校准、事前预测、
   24-call 硬预算、评分和未覆盖条件；模型输出产生前冻结
@@ -64,7 +66,8 @@
 
 - `vec_ai_workload_dataset_design_20260928.md`：车联网AI工作流/缓存数据集贡献候选，提出依据、校准生成方案、D01–D12证据池和验收边界；尚未生成或发布
 
-- `system_mechanism_manuscript_working_draft.md`：系统机制主线英文工作稿，含问题、模型、方法正确性边界、开发结果、限制与独立证据映射；不是投稿终稿
+- `system_mechanism_manuscript_working_draft.md`：系统机制主线英文工作稿 v1.2，含真实 adapter victim→reload、
+  对称成本边界、开发结果、限制与独立证据映射；不是投稿终稿
 
 - `problem_literature_traceability_20260928.md`：P01–P07问题、L01–L10论文、官方出处/等级边界、补证与失败判据的固定追溯索引
 

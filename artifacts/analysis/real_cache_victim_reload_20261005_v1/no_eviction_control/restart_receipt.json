@@ -1,0 +1,915 @@
+{
+  "action_wall_seconds": 10.557728,
+  "condition_id": "no_eviction_control",
+  "current_request_event": {
+    "legal_native_preview": {
+      "adapter_id": "helmet",
+      "added_new_adapter": false,
+      "admitted_mb_by_type": {},
+      "admitted_typed_objects": [],
+      "atomic_transaction_status": "noop_all_resident",
+      "cache_admission_added_new_adapter": false,
+      "cache_capacity": 1124.4690017700195,
+      "cache_capacity_enabled": true,
+      "cache_capacity_unit": "mb",
+      "cache_eviction": false,
+      "cache_occupancy_rate": 1.0,
+      "cache_remaining_size": 0.0,
+      "cache_target_corrected_by_handoff": false,
+      "cache_used_mb_by_object_type": {
+        "adapter": 156.464935,
+        "base_model": 968.004066
+      },
+      "cache_used_size": 1124.4690017700195,
+      "capacity_before": {
+        "cache_capacity": 1124.4690017700195,
+        "cache_capacity_enabled": true,
+        "cache_capacity_unit": "mb",
+        "cache_occupancy_rate": 1.0,
+        "cache_remaining_size": 0.0,
+        "cache_used_mb_by_object_type": {
+          "adapter": 156.464935,
+          "base_model": 968.004066
+        },
+        "cache_used_size": 1124.4690017700195,
+        "eviction_policy": "lru",
+        "eviction_policy_seed": null,
+        "eviction_policy_version": "1.0.0",
+        "model_cache_profile_id": "typed_base_adapter_state_v1",
+        "rsu_adapter_slots": 0
+      },
+      "decision_target_rsu_id": "rsu_target",
+      "dependency_bundle": {
+        "already_resident_object_ids": [
+          "base:smolvlm_500m",
+          "adapter:helmet"
+        ],
+        "missing_object_ids": [],
+        "ordered_object_ids": [
+          "base:smolvlm_500m",
+          "adapter:helmet"
+        ],
+        "requested_adapter_id": "helmet",
+        "requested_bundle_mb": 0,
+        "required_base_model_id": "smolvlm_500m",
+        "transfer_mb_by_type": {}
+      },
+      "evicted_adapter_count": 0,
+      "evicted_adapter_id": null,
+      "evicted_adapter_ids": [],
+      "evicted_mb_by_type": {},
+      "evicted_object_ids": [],
+      "evicted_typed_objects": [],
+      "eviction_count": 0,
+      "eviction_planning_trace": null,
+      "eviction_policy": "lru",
+      "eviction_policy_seed": null,
+      "eviction_policy_version": "1.0.0",
+      "model_cache_profile_id": "typed_base_adapter_state_v1",
+      "orphan_count": 0,
+      "prediction_driven": false,
+      "requested": true,
+      "requested_typed_objects": [
+        {
+          "adapter_id": null,
+          "base_model_id": "smolvlm_500m",
+          "dependency_ids": [],
+          "evictability": "evictable",
+          "object_id": "base:smolvlm_500m",
+          "object_type": "base_model",
+          "required_base_model_id": null,
+          "resident_size_mb": 968.0040664672852,
+          "transfer_size_mb": 968.0040664672852,
+          "version": "a7da5b986cb59b408707209984f360a5f4ad7e47"
+        },
+        {
+          "adapter_id": "helmet",
+          "base_model_id": null,
+          "dependency_ids": [
+            "base:smolvlm_500m"
+          ],
+          "evictability": "evictable",
+          "object_id": "adapter:helmet",
+          "object_type": "adapter",
+          "required_base_model_id": "smolvlm_500m",
+          "resident_size_mb": 9.195274353027344,
+          "transfer_size_mb": 9.195274353027344,
+          "version": "96794cb"
+        }
+      ],
+      "rsu_adapter_slots": 0,
+      "strategy": "real_lifecycle_opt_in",
+      "target_rsu_id": "rsu_target",
+      "transfer_mb_by_type": {},
+      "typed_cache_transaction_contract_version": "typed_cache_transaction_contract_v1.1.0",
+      "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+      "was_cached_before": true
+    },
+    "logical_resident_after": [
+      "base:smolvlm_500m",
+      "adapter:alpr",
+      "adapter:helmet"
+    ],
+    "logical_resident_before": [
+      "base:smolvlm_500m",
+      "adapter:alpr",
+      "adapter:helmet"
+    ],
+    "native_commit": {
+      "adapter_id": "helmet",
+      "added_new_adapter": false,
+      "admitted_mb_by_type": {},
+      "admitted_typed_objects": [],
+      "atomic_transaction_status": "noop_all_resident",
+      "cache_admission_added_new_adapter": false,
+      "cache_capacity": 1124.4690017700195,
+      "cache_capacity_enabled": true,
+      "cache_capacity_unit": "mb",
+      "cache_eviction": false,
+      "cache_occupancy_rate": 1.0,
+      "cache_remaining_size": 0.0,
+      "cache_target_corrected_by_handoff": false,
+      "cache_used_mb_by_object_type": {
+        "adapter": 156.464935,
+        "base_model": 968.004066
+      },
+      "cache_used_size": 1124.4690017700195,
+      "capacity_before": {
+        "cache_capacity": 1124.4690017700195,
+        "cache_capacity_enabled": true,
+        "cache_capacity_unit": "mb",
+        "cache_occupancy_rate": 1.0,
+        "cache_remaining_size": 0.0,
+        "cache_used_mb_by_object_type": {
+          "adapter": 156.464935,
+          "base_model": 968.004066
+        },
+        "cache_used_size": 1124.4690017700195,
+        "eviction_policy": "lru",
+        "eviction_policy_seed": null,
+        "eviction_policy_version": "1.0.0",
+        "model_cache_profile_id": "typed_base_adapter_state_v1",
+        "rsu_adapter_slots": 0
+      },
+      "decision_target_rsu_id": "rsu_target",
+      "dependency_bundle": {
+        "already_resident_object_ids": [
+          "base:smolvlm_500m",
+          "adapter:helmet"
+        ],
+        "missing_object_ids": [],
+        "ordered_object_ids": [
+          "base:smolvlm_500m",
+          "adapter:helmet"
+        ],
+        "requested_adapter_id": "helmet",
+        "requested_bundle_mb": 0,
+        "required_base_model_id": "smolvlm_500m",
+        "transfer_mb_by_type": {}
+      },
+      "evicted_adapter_count": 0,
+      "evicted_adapter_id": null,
+      "evicted_adapter_ids": [],
+      "evicted_mb_by_type": {},
+      "evicted_object_ids": [],
+      "evicted_typed_objects": [],
+      "eviction_count": 0,
+      "eviction_planning_trace": null,
+      "eviction_policy": "lru",
+      "eviction_policy_seed": null,
+      "eviction_policy_version": "1.0.0",
+      "model_cache_profile_id": "typed_base_adapter_state_v1",
+      "orphan_count": 0,
+      "prediction_driven": false,
+      "requested": true,
+      "requested_typed_objects": [
+        {
+          "adapter_id": null,
+          "base_model_id": "smolvlm_500m",
+          "dependency_ids": [],
+          "evictability": "evictable",
+          "object_id": "base:smolvlm_500m",
+          "object_type": "base_model",
+          "required_base_model_id": null,
+          "resident_size_mb": 968.0040664672852,
+          "transfer_size_mb": 968.0040664672852,
+          "version": "a7da5b986cb59b408707209984f360a5f4ad7e47"
+        },
+        {
+          "adapter_id": "helmet",
+          "base_model_id": null,
+          "dependency_ids": [
+            "base:smolvlm_500m"
+          ],
+          "evictability": "evictable",
+          "object_id": "adapter:helmet",
+          "object_type": "adapter",
+          "required_base_model_id": "smolvlm_500m",
+          "resident_size_mb": 9.195274353027344,
+          "transfer_size_mb": 9.195274353027344,
+          "version": "96794cb"
+        }
+      ],
+      "rsu_adapter_slots": 0,
+      "strategy": "real_lifecycle_opt_in",
+      "target_rsu_id": "rsu_target",
+      "transfer_mb_by_type": {},
+      "typed_cache_transaction_contract_version": "typed_cache_transaction_contract_v1.1.0",
+      "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+      "was_cached_before": true
+    },
+    "requested_adapter": "helmet",
+    "runtime_after": {
+      "active_adapter_names": [
+        "helmet"
+      ],
+      "adapter_objects": {
+        "alpr": {
+          "adapter_name": "alpr",
+          "registered": true,
+          "tensor_bytes": 154308608,
+          "tensor_count": 780,
+          "tensor_name_examples": [
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_A.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_B.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_magnitude_vector.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_A.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_B.alpr.weight"
+          ],
+          "tensor_name_sha256": "b2525419938802aa96a4efdadaa71ffa1290a78b6675efb55b149fc1e93f018c",
+          "tensor_numel": 38577152
+        },
+        "helmet": {
+          "adapter_name": "helmet",
+          "registered": true,
+          "tensor_bytes": 9568256,
+          "tensor_count": 520,
+          "tensor_name_examples": [
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_A.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_B.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_A.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_B.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.q_proj.lora_A.helmet.weight"
+          ],
+          "tensor_name_sha256": "f3d55ddec6d12941d8e1742bc6047d4ffa6ef3137514461d4549018a88e5c65b",
+          "tensor_numel": 2392064
+        }
+      },
+      "registered_adapter_names": [
+        "alpr",
+        "helmet"
+      ]
+    },
+    "runtime_application": {
+      "admitted_adapter_names": [],
+      "events": [],
+      "native_transaction_status": "noop_all_resident",
+      "requested_adapter": "helmet",
+      "status": "RUNTIME_APPLIED_PENDING_LOGICAL_COMMIT",
+      "victim_adapter_names": []
+    },
+    "runtime_before": {
+      "active_adapter_names": [
+        "alpr"
+      ],
+      "adapter_objects": {
+        "alpr": {
+          "adapter_name": "alpr",
+          "registered": true,
+          "tensor_bytes": 154308608,
+          "tensor_count": 780,
+          "tensor_name_examples": [
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_A.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_B.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_magnitude_vector.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_A.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_B.alpr.weight"
+          ],
+          "tensor_name_sha256": "b2525419938802aa96a4efdadaa71ffa1290a78b6675efb55b149fc1e93f018c",
+          "tensor_numel": 38577152
+        },
+        "helmet": {
+          "adapter_name": "helmet",
+          "registered": true,
+          "tensor_bytes": 9568256,
+          "tensor_count": 520,
+          "tensor_name_examples": [
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_A.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_B.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_A.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_B.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.q_proj.lora_A.helmet.weight"
+          ],
+          "tensor_name_sha256": "f3d55ddec6d12941d8e1742bc6047d4ffa6ef3137514461d4549018a88e5c65b",
+          "tensor_numel": 2392064
+        }
+      },
+      "registered_adapter_names": [
+        "alpr",
+        "helmet"
+      ]
+    }
+  },
+  "final_logical_residents": [
+    "base:smolvlm_500m",
+    "adapter:alpr",
+    "adapter:helmet"
+  ],
+  "final_runtime": {
+    "active_adapter_names": [
+      "alpr"
+    ],
+    "adapter_objects": {
+      "alpr": {
+        "adapter_name": "alpr",
+        "registered": true,
+        "tensor_bytes": 154308608,
+        "tensor_count": 780,
+        "tensor_name_examples": [
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_A.alpr.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_B.alpr.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_magnitude_vector.alpr.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_A.alpr.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_B.alpr.weight"
+        ],
+        "tensor_name_sha256": "b2525419938802aa96a4efdadaa71ffa1290a78b6675efb55b149fc1e93f018c",
+        "tensor_numel": 38577152
+      },
+      "helmet": {
+        "adapter_name": "helmet",
+        "registered": true,
+        "tensor_bytes": 9568256,
+        "tensor_count": 520,
+        "tensor_name_examples": [
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_A.helmet.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_B.helmet.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_A.helmet.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_B.helmet.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.q_proj.lora_A.helmet.weight"
+        ],
+        "tensor_name_sha256": "f3d55ddec6d12941d8e1742bc6047d4ffa6ef3137514461d4549018a88e5c65b",
+        "tensor_numel": 2392064
+      }
+    },
+    "registered_adapter_names": [
+      "alpr",
+      "helmet"
+    ]
+  },
+  "future_request_event": {
+    "legal_native_preview": {
+      "adapter_id": "alpr",
+      "added_new_adapter": false,
+      "admitted_mb_by_type": {},
+      "admitted_typed_objects": [],
+      "atomic_transaction_status": "noop_all_resident",
+      "cache_admission_added_new_adapter": false,
+      "cache_capacity": 1124.4690017700195,
+      "cache_capacity_enabled": true,
+      "cache_capacity_unit": "mb",
+      "cache_eviction": false,
+      "cache_occupancy_rate": 1.0,
+      "cache_remaining_size": 0.0,
+      "cache_target_corrected_by_handoff": false,
+      "cache_used_mb_by_object_type": {
+        "adapter": 156.464935,
+        "base_model": 968.004066
+      },
+      "cache_used_size": 1124.4690017700195,
+      "capacity_before": {
+        "cache_capacity": 1124.4690017700195,
+        "cache_capacity_enabled": true,
+        "cache_capacity_unit": "mb",
+        "cache_occupancy_rate": 1.0,
+        "cache_remaining_size": 0.0,
+        "cache_used_mb_by_object_type": {
+          "adapter": 156.464935,
+          "base_model": 968.004066
+        },
+        "cache_used_size": 1124.4690017700195,
+        "eviction_policy": "lru",
+        "eviction_policy_seed": null,
+        "eviction_policy_version": "1.0.0",
+        "model_cache_profile_id": "typed_base_adapter_state_v1",
+        "rsu_adapter_slots": 0
+      },
+      "decision_target_rsu_id": "rsu_target",
+      "dependency_bundle": {
+        "already_resident_object_ids": [
+          "base:smolvlm_500m",
+          "adapter:alpr"
+        ],
+        "missing_object_ids": [],
+        "ordered_object_ids": [
+          "base:smolvlm_500m",
+          "adapter:alpr"
+        ],
+        "requested_adapter_id": "alpr",
+        "requested_bundle_mb": 0,
+        "required_base_model_id": "smolvlm_500m",
+        "transfer_mb_by_type": {}
+      },
+      "evicted_adapter_count": 0,
+      "evicted_adapter_id": null,
+      "evicted_adapter_ids": [],
+      "evicted_mb_by_type": {},
+      "evicted_object_ids": [],
+      "evicted_typed_objects": [],
+      "eviction_count": 0,
+      "eviction_planning_trace": null,
+      "eviction_policy": "lru",
+      "eviction_policy_seed": null,
+      "eviction_policy_version": "1.0.0",
+      "model_cache_profile_id": "typed_base_adapter_state_v1",
+      "orphan_count": 0,
+      "prediction_driven": false,
+      "requested": true,
+      "requested_typed_objects": [
+        {
+          "adapter_id": null,
+          "base_model_id": "smolvlm_500m",
+          "dependency_ids": [],
+          "evictability": "evictable",
+          "object_id": "base:smolvlm_500m",
+          "object_type": "base_model",
+          "required_base_model_id": null,
+          "resident_size_mb": 968.0040664672852,
+          "transfer_size_mb": 968.0040664672852,
+          "version": "a7da5b986cb59b408707209984f360a5f4ad7e47"
+        },
+        {
+          "adapter_id": "alpr",
+          "base_model_id": null,
+          "dependency_ids": [
+            "base:smolvlm_500m"
+          ],
+          "evictability": "evictable",
+          "object_id": "adapter:alpr",
+          "object_type": "adapter",
+          "required_base_model_id": "smolvlm_500m",
+          "resident_size_mb": 147.26966094970703,
+          "transfer_size_mb": 147.26966094970703,
+          "version": "edccd0e"
+        }
+      ],
+      "rsu_adapter_slots": 0,
+      "strategy": "real_lifecycle_opt_in",
+      "target_rsu_id": "rsu_target",
+      "transfer_mb_by_type": {},
+      "typed_cache_transaction_contract_version": "typed_cache_transaction_contract_v1.1.0",
+      "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+      "was_cached_before": true
+    },
+    "logical_resident_after": [
+      "base:smolvlm_500m",
+      "adapter:alpr",
+      "adapter:helmet"
+    ],
+    "logical_resident_before": [
+      "base:smolvlm_500m",
+      "adapter:alpr",
+      "adapter:helmet"
+    ],
+    "native_commit": {
+      "adapter_id": "alpr",
+      "added_new_adapter": false,
+      "admitted_mb_by_type": {},
+      "admitted_typed_objects": [],
+      "atomic_transaction_status": "noop_all_resident",
+      "cache_admission_added_new_adapter": false,
+      "cache_capacity": 1124.4690017700195,
+      "cache_capacity_enabled": true,
+      "cache_capacity_unit": "mb",
+      "cache_eviction": false,
+      "cache_occupancy_rate": 1.0,
+      "cache_remaining_size": 0.0,
+      "cache_target_corrected_by_handoff": false,
+      "cache_used_mb_by_object_type": {
+        "adapter": 156.464935,
+        "base_model": 968.004066
+      },
+      "cache_used_size": 1124.4690017700195,
+      "capacity_before": {
+        "cache_capacity": 1124.4690017700195,
+        "cache_capacity_enabled": true,
+        "cache_capacity_unit": "mb",
+        "cache_occupancy_rate": 1.0,
+        "cache_remaining_size": 0.0,
+        "cache_used_mb_by_object_type": {
+          "adapter": 156.464935,
+          "base_model": 968.004066
+        },
+        "cache_used_size": 1124.4690017700195,
+        "eviction_policy": "lru",
+        "eviction_policy_seed": null,
+        "eviction_policy_version": "1.0.0",
+        "model_cache_profile_id": "typed_base_adapter_state_v1",
+        "rsu_adapter_slots": 0
+      },
+      "decision_target_rsu_id": "rsu_target",
+      "dependency_bundle": {
+        "already_resident_object_ids": [
+          "base:smolvlm_500m",
+          "adapter:alpr"
+        ],
+        "missing_object_ids": [],
+        "ordered_object_ids": [
+          "base:smolvlm_500m",
+          "adapter:alpr"
+        ],
+        "requested_adapter_id": "alpr",
+        "requested_bundle_mb": 0,
+        "required_base_model_id": "smolvlm_500m",
+        "transfer_mb_by_type": {}
+      },
+      "evicted_adapter_count": 0,
+      "evicted_adapter_id": null,
+      "evicted_adapter_ids": [],
+      "evicted_mb_by_type": {},
+      "evicted_object_ids": [],
+      "evicted_typed_objects": [],
+      "eviction_count": 0,
+      "eviction_planning_trace": null,
+      "eviction_policy": "lru",
+      "eviction_policy_seed": null,
+      "eviction_policy_version": "1.0.0",
+      "model_cache_profile_id": "typed_base_adapter_state_v1",
+      "orphan_count": 0,
+      "prediction_driven": false,
+      "requested": true,
+      "requested_typed_objects": [
+        {
+          "adapter_id": null,
+          "base_model_id": "smolvlm_500m",
+          "dependency_ids": [],
+          "evictability": "evictable",
+          "object_id": "base:smolvlm_500m",
+          "object_type": "base_model",
+          "required_base_model_id": null,
+          "resident_size_mb": 968.0040664672852,
+          "transfer_size_mb": 968.0040664672852,
+          "version": "a7da5b986cb59b408707209984f360a5f4ad7e47"
+        },
+        {
+          "adapter_id": "alpr",
+          "base_model_id": null,
+          "dependency_ids": [
+            "base:smolvlm_500m"
+          ],
+          "evictability": "evictable",
+          "object_id": "adapter:alpr",
+          "object_type": "adapter",
+          "required_base_model_id": "smolvlm_500m",
+          "resident_size_mb": 147.26966094970703,
+          "transfer_size_mb": 147.26966094970703,
+          "version": "edccd0e"
+        }
+      ],
+      "rsu_adapter_slots": 0,
+      "strategy": "real_lifecycle_opt_in",
+      "target_rsu_id": "rsu_target",
+      "transfer_mb_by_type": {},
+      "typed_cache_transaction_contract_version": "typed_cache_transaction_contract_v1.1.0",
+      "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+      "was_cached_before": true
+    },
+    "requested_adapter": "alpr",
+    "runtime_after": {
+      "active_adapter_names": [
+        "alpr"
+      ],
+      "adapter_objects": {
+        "alpr": {
+          "adapter_name": "alpr",
+          "registered": true,
+          "tensor_bytes": 154308608,
+          "tensor_count": 780,
+          "tensor_name_examples": [
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_A.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_B.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_magnitude_vector.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_A.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_B.alpr.weight"
+          ],
+          "tensor_name_sha256": "b2525419938802aa96a4efdadaa71ffa1290a78b6675efb55b149fc1e93f018c",
+          "tensor_numel": 38577152
+        },
+        "helmet": {
+          "adapter_name": "helmet",
+          "registered": true,
+          "tensor_bytes": 9568256,
+          "tensor_count": 520,
+          "tensor_name_examples": [
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_A.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_B.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_A.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_B.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.q_proj.lora_A.helmet.weight"
+          ],
+          "tensor_name_sha256": "f3d55ddec6d12941d8e1742bc6047d4ffa6ef3137514461d4549018a88e5c65b",
+          "tensor_numel": 2392064
+        }
+      },
+      "registered_adapter_names": [
+        "alpr",
+        "helmet"
+      ]
+    },
+    "runtime_application": {
+      "admitted_adapter_names": [],
+      "events": [],
+      "native_transaction_status": "noop_all_resident",
+      "requested_adapter": "alpr",
+      "status": "RUNTIME_APPLIED_PENDING_LOGICAL_COMMIT",
+      "victim_adapter_names": []
+    },
+    "runtime_before": {
+      "active_adapter_names": [
+        "helmet"
+      ],
+      "adapter_objects": {
+        "alpr": {
+          "adapter_name": "alpr",
+          "registered": true,
+          "tensor_bytes": 154308608,
+          "tensor_count": 780,
+          "tensor_name_examples": [
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_A.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_B.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_magnitude_vector.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_A.alpr.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_B.alpr.weight"
+          ],
+          "tensor_name_sha256": "b2525419938802aa96a4efdadaa71ffa1290a78b6675efb55b149fc1e93f018c",
+          "tensor_numel": 38577152
+        },
+        "helmet": {
+          "adapter_name": "helmet",
+          "registered": true,
+          "tensor_bytes": 9568256,
+          "tensor_count": 520,
+          "tensor_name_examples": [
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_A.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_B.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_A.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_B.helmet.weight",
+            "base_model.model.model.vision_model.encoder.layers.0.self_attn.q_proj.lora_A.helmet.weight"
+          ],
+          "tensor_name_sha256": "f3d55ddec6d12941d8e1742bc6047d4ffa6ef3137514461d4549018a88e5c65b",
+          "tensor_numel": 2392064
+        }
+      },
+      "registered_adapter_names": [
+        "alpr",
+        "helmet"
+      ]
+    }
+  },
+  "generate_attempted": 3,
+  "generate_completed": 3,
+  "initial_logical_residents": [
+    "base:smolvlm_500m",
+    "adapter:alpr",
+    "adapter:helmet"
+  ],
+  "initial_runtime": {
+    "active_adapter_names": [
+      "alpr"
+    ],
+    "adapter_objects": {
+      "alpr": {
+        "adapter_name": "alpr",
+        "registered": true,
+        "tensor_bytes": 154308608,
+        "tensor_count": 780,
+        "tensor_name_examples": [
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_A.alpr.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_B.alpr.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_magnitude_vector.alpr.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_A.alpr.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_B.alpr.weight"
+        ],
+        "tensor_name_sha256": "b2525419938802aa96a4efdadaa71ffa1290a78b6675efb55b149fc1e93f018c",
+        "tensor_numel": 38577152
+      },
+      "helmet": {
+        "adapter_name": "helmet",
+        "registered": true,
+        "tensor_bytes": 9568256,
+        "tensor_count": 520,
+        "tensor_name_examples": [
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_A.helmet.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.k_proj.lora_B.helmet.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_A.helmet.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.v_proj.lora_B.helmet.weight",
+          "base_model.model.model.vision_model.encoder.layers.0.self_attn.q_proj.lora_A.helmet.weight"
+        ],
+        "tensor_name_sha256": "f3d55ddec6d12941d8e1742bc6047d4ffa6ef3137514461d4549018a88e5c65b",
+        "tensor_numel": 2392064
+      }
+    },
+    "registered_adapter_names": [
+      "alpr",
+      "helmet"
+    ]
+  },
+  "n0_input": {
+    "image_access_count": 1,
+    "image_size": [
+      1200,
+      900
+    ],
+    "input_ids_sha256": "283065519f9c60703fd98587652f746a70830acf31d54e2c9000639fe9543de4",
+    "prompt": "Describe the main subject of this local image in one short phrase.",
+    "rendered_prompt": "<|im_start|>User:<image>Describe the main subject of this local image in one short phrase.<end_of_utterance>\nAssistant:"
+  },
+  "n0_output": {
+    "decoded_text": " A line graph depicting running vehicles over time",
+    "inference_seconds": 7.299023625,
+    "new_token_count": 8,
+    "token_ids": [
+      330,
+      1761,
+      3670,
+      17691,
+      4108,
+      6110,
+      690,
+      655
+    ]
+  },
+  "n1_input": {
+    "contains_n0_output": true,
+    "content_sha256": "8c62a09669ee5ec13a9ffb7e287ece38fe3230d1fb708fd984b176c57d8ef7d7",
+    "input_ids": [
+      1,
+      11126,
+      42,
+      5445,
+      5172,
+      3145,
+      5410,
+      42,
+      216,
+      330,
+      1761,
+      3670,
+      17691,
+      4108,
+      6110,
+      690,
+      655,
+      198,
+      13764,
+      3298,
+      836,
+      805,
+      338,
+      5410,
+      281,
+      582,
+      1890,
+      8715,
+      30,
+      49279,
+      198,
+      9519,
+      9531,
+      42
+    ],
+    "prompt": "Upstream visual description:  A line graph depicting running vehicles over time\nSummarize only that description in one short phrase.",
+    "rendered_prompt": "<|im_start|>User: Upstream visual description:  A line graph depicting running vehicles over time\nSummarize only that description in one short phrase.<end_of_utterance>\nAssistant:",
+    "source_image_access_count": 0
+  },
+  "n1_output": {
+    "decoded_text": " Time Series.",
+    "inference_seconds": 0.13776241599999928,
+    "new_token_count": 4,
+    "token_ids": [
+      5885,
+      13123,
+      30,
+      49279
+    ]
+  },
+  "n2_input": {
+    "contains_n0_output": null,
+    "contains_n1_output": true,
+    "content_sha256": "159ec8f0074c1ccc969b2ce66c9d822afca184156a3d7e893cb98a095016d2a2",
+    "input_ids": [
+      1,
+      11126,
+      42,
+      5445,
+      5172,
+      7127,
+      42,
+      216,
+      5885,
+      13123,
+      30,
+      198,
+      14362,
+      582,
+      1890,
+      8715,
+      8314,
+      338,
+      7127,
+      30,
+      49279,
+      198,
+      9519,
+      9531,
+      42
+    ],
+    "prompt": "Upstream summary:  Time Series.\nReturn one short phrase preserving that summary.",
+    "rendered_prompt": "<|im_start|>User: Upstream summary:  Time Series.\nReturn one short phrase preserving that summary.<end_of_utterance>\nAssistant:"
+  },
+  "n2_output": {
+    "decoded_text": " Daily Weather Forecast.",
+    "inference_seconds": 2.9111114580000006,
+    "new_token_count": 6,
+    "token_ids": [
+      13001,
+      17127,
+      5266,
+      4288,
+      30,
+      49279
+    ]
+  },
+  "node_call_counts": {
+    "n0": 1,
+    "n1": 1,
+    "n2": 1
+  },
+  "os_file_cache": "uncontrolled_not_flushed",
+  "pid": 33559,
+  "process_wall_seconds": 13.530947917,
+  "restored_n0_output": null,
+  "role": "restart",
+  "setup_excluded_from_action_window": {
+    "adapter_load_calls": [
+      {
+        "adapter_name": "alpr",
+        "phase": "setup",
+        "seconds": 0.8125062089999999
+      },
+      {
+        "adapter_name": "helmet",
+        "phase": "setup",
+        "seconds": 0.27876120800000015
+      }
+    ],
+    "base_load_seconds": 0.2692557500000001,
+    "processor_load_seconds": 0.07455512500000006
+  },
+  "state_restore": null,
+  "static_resources_after": {
+    "alpr_weight": {
+      "bytes": 154423432,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/adapter_downloads_20260930/alpr_edccd0e/adapter_model.safetensors",
+      "sha256": "95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83"
+    },
+    "base_weight": {
+      "bytes": 1015025832,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/model_a7da5b9_20260929/model.safetensors",
+      "sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2"
+    },
+    "helmet_weight": {
+      "bytes": 9641944,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/adapter_downloads_20260930/helmet_96794cb/adapter_model.safetensors",
+      "sha256": "e899c9c13b53bf80bcfc86048f5678a727e8c1838dc824156b521d5cdaafdd2d"
+    },
+    "source_input": {
+      "bytes": 192757,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/LuSTScenario/LuSTScenario-master/docs/img/TrafficDemands.png",
+      "sha256": "83af09665cd23c87a1d831e6cb47a88bc8d509849712c551b0a9a7965e95c307"
+    }
+  },
+  "static_resources_before": {
+    "alpr_weight": {
+      "bytes": 154423432,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/adapter_downloads_20260930/alpr_edccd0e/adapter_model.safetensors",
+      "sha256": "95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83"
+    },
+    "base_weight": {
+      "bytes": 1015025832,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/model_a7da5b9_20260929/model.safetensors",
+      "sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2"
+    },
+    "helmet_weight": {
+      "bytes": 9641944,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/adapter_downloads_20260930/helmet_96794cb/adapter_model.safetensors",
+      "sha256": "e899c9c13b53bf80bcfc86048f5678a727e8c1838dc824156b521d5cdaafdd2d"
+    },
+    "source_input": {
+      "bytes": 192757,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/LuSTScenario/LuSTScenario-master/docs/img/TrafficDemands.png",
+      "sha256": "83af09665cd23c87a1d831e6cb47a88bc8d509849712c551b0a9a7965e95c307"
+    }
+  },
+  "status": "PASS",
+  "task_correctness": "unavailable_technical_input"
+}

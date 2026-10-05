@@ -7,6 +7,9 @@
 - `scripts/run_real_cache_victim_reload.py`：native preview→runtime unload/load→native commit 的 create-only 测量入口。
 - `tests/test_real_cache_victim_reload.py`：预算、真实字节 victim、无驱逐、缺模型/非法 base victim 与 commit 顺序合同。
 - `docs/project/real_cache_victim_reload_plan_20261005.md`：读取新输出前冻结的人工方案与历史公式缺陷边界。
+- `artifacts/analysis/real_cache_victim_reload_20261005_v1/`：create-only 12-call 结果、6 进程回执、两 condition
+  lifecycle、negative checks、terminal 与 22-file integrity manifest。
+- `docs/project/real_cache_victim_reload_results_20261005.md`：逐事件卸载/加载、全路径成本、误差和 claim 边界。
 
 ## 2026-10-05 independent recovery cost measurement
 

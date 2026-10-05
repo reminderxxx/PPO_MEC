@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+    "/Users/howen/.codex/worktrees/cost-validation/PPO_MEC/scripts/run_real_cache_victim_reload.py",
+    "--role",
+    "source",
+    "--condition-id",
+    "adapter_victim_reload",
+    "--plan",
+    "/Users/howen/.codex/worktrees/cost-validation/PPO_MEC/configs/acceptance/real_cache_victim_reload_v1.json",
+    "--run-root",
+    "/Users/howen/.codex/worktrees/cost-validation/PPO_MEC/artifacts/analysis/real_cache_victim_reload_20261005_v1/adapter_victim_reload"
+  ],
+  "condition_id": "adapter_victim_reload",
+  "ended_at_unix": 1791211402.870364,
+  "pid": 33548,
+  "receipt_status": "PASS",
+  "returncode": 0,
+  "role": "source",
+  "started_at_unix": 1791211392.128105,
+  "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+  "stdout": "PASS\n",
+  "timed_out": false,
+  "wall_seconds": 10.742217375000001
+}

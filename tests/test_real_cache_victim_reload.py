@@ -141,3 +141,23 @@ def test_runtime_bridge_rejects_base_victim_before_mutation() -> None:
             opt_in_enabled=True,
         )
     assert loaded_adapter_names(model) == [FUTURE_ADAPTER]
+
+
+def test_runtime_bridge_rejects_unmapped_victim_before_mutation() -> None:
+    model = _Model([FUTURE_ADAPTER])
+    with pytest.raises(PeftAdapterLifecycleError, match="unmapped legal victim"):
+        apply_previewed_adapter_transaction(
+            model,
+            preview={
+                "atomic_transaction_status": "committed",
+                "adapter_id": CURRENT_ADAPTER,
+                "evicted_typed_objects": [
+                    {"object_id": "adapter:illegal", "object_type": "adapter"}
+                ],
+                "admitted_typed_objects": [],
+            },
+            adapter_paths={},
+            object_to_adapter={},
+            opt_in_enabled=True,
+        )
+    assert loaded_adapter_names(model) == [FUTURE_ADAPTER]

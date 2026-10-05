@@ -1,0 +1,76 @@
+{
+  "payload": {
+    "completed_nodes": [
+      "n0"
+    ],
+    "execution_rights": {
+      "source_rsu_id": "technical_source",
+      "status": "pending_target_validation",
+      "target_rsu_id": "rsu_target"
+    },
+    "identity": {
+      "base_weight_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2",
+      "current_adapter": "helmet",
+      "current_adapter_weight_sha256": "e899c9c13b53bf80bcfc86048f5678a727e8c1838dc824156b521d5cdaafdd2d",
+      "future_adapter": "alpr",
+      "future_adapter_weight_sha256": "95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83",
+      "next_node": "n1"
+    },
+    "input_identity": {
+      "bytes": 192757,
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/LuSTScenario/LuSTScenario-master/docs/img/TrafficDemands.png",
+      "sha256": "83af09665cd23c87a1d831e6cb47a88bc8d509849712c551b0a9a7965e95c307"
+    },
+    "next_node": "n1",
+    "node_outputs": {
+      "n0": {
+        "raw_text": " A line graph depicting running vehicles over time",
+        "token_ids": [
+          330,
+          1761,
+          3670,
+          17691,
+          4108,
+          6110,
+          690,
+          655
+        ]
+      }
+    },
+    "remaining_nodes": [
+      "n1",
+      "n2"
+    ],
+    "workflow": {
+      "edges": [
+        [
+          "n0",
+          "n1"
+        ],
+        [
+          "n1",
+          "n2"
+        ]
+      ],
+      "execution_order": [
+        "n0",
+        "n1",
+        "n2"
+      ],
+      "nodes": [
+        {
+          "node_id": "n0"
+        },
+        {
+          "node_id": "n1"
+        },
+        {
+          "node_id": "n2"
+        }
+      ],
+      "workflow_id": "real_adapter_victim_reload_v1"
+    }
+  },
+  "payload_sha256": "94aa9e33db65468cb5faced3d1aa58c9bf82f3e801bfaad97fb24210c7bbe605",
+  "schema_version": "ppo_mec.workflow_state.v2"
+}

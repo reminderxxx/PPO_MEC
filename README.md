@@ -5,16 +5,17 @@
 
 # PPO_MEC
 
-真实 adapter cache victim→reload 的 12-call 最小方案已在读取新输出前冻结：两臂共用同一 native typed-cache 与
-PEFT lifecycle 接线，比较 adapter-only 合法驱逐条件和 base+双 adapter 无驱逐对照；不删除权重、不清 OS cache、
-不训练或下载。执行前方案见
-[`docs/project/real_cache_victim_reload_plan_20261005.md`](docs/project/real_cache_victim_reload_plan_20261005.md)。
+真实 adapter cache victim→reload 的 12-call 最小实测已完成：两臂共用同一 native typed-cache 与 PEFT lifecycle
+接线，ALPR 合法驱逐后从 780 个 runtime tensors 降为 0，并在后续节点前由保留本地文件真实重载；base+双 adapter
+对照无 action load/unload。两条件仍均选择 recovery，真实 lifecycle 对两臂是共同成本，不构成决策翻转或算法优势。
+见[方案](docs/project/real_cache_victim_reload_plan_20261005.md)与
+[结果](docs/project/real_cache_victim_reload_results_20261005.md)。
 
 独立恢复成本检查的[事前冻结方案](docs/project/independent_recovery_cost_measurement_plan_20261005.md)与
 [结果](docs/project/independent_recovery_cost_measurement_results_20261005.md)已完成。固定实现一次执行 24/24 次
 `generate`，两条合法条件各 3 次配对，事前/事后均选择 recovery，但全部条件落在同一决策侧，未检验决策边界；绝对成本
-预测仍明显偏高。原 12 个设计点明确降回开发/机制验证证据。该记录是上一轮边界；新的 victim→reload 方案尚待固定
-clean commit 一次执行，无线和队列仍未覆盖。
+预测仍明显偏高。原 12 个设计点明确降回开发/机制验证证据。该记录是上一轮边界；后续 victim→reload 已由上面的
+独立 bounded witness 补齐，但无线和队列仍未覆盖。
 
 驱逐代价感知恢复规则的 12 点冻结验证与证据绑定论文工作稿见
 [`docs/project/eviction_aware_recovery_results_20261005.md`](docs/project/eviction_aware_recovery_results_20261005.md) 和
@@ -41,7 +42,8 @@ v0.1 的冻结 RQ、8 点覆盖设计、数据卡、全部 72 行结果和结论
 
 真实 adapter / 状态恢复校准见
 [`docs/project/adapter_state_recovery_calibration_20260930.md`](docs/project/adapter_state_recovery_calibration_20260930.md)：
-本地没有真实 adapter，新增 156.465 MiB 权重未获授权；固定两节点状态链在预热正确性门禁失败，正式测量为 0。
+该 2026-09-30 记录在当时本地没有真实 adapter，新增 156.465 MiB 权重未获授权；固定两节点状态链在预热正确性门禁失败，正式测量为 0。
+后续已存在的两个 adapter 只用于上面的 2026-10-05 bounded lifecycle witness；不改写该历史失败记录。
 原生 action 4 的 104 MiB 合成字节见证保留，但完整真实负载净收益仍为 `UNVERIFIED`。
 
 原生 typed-cache 的显式顺序依赖重算 LRU 候选、固定四配置回归与两节点 `env.step()` 见证见

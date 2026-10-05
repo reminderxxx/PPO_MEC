@@ -1,0 +1,27 @@
+{
+  "checks": [
+    {
+      "error": "runtime bridge supports adapter-only victims; base unload is unsupported",
+      "name": "dependency_or_base_victim_rejected",
+      "status": "PASS"
+    },
+    {
+      "error": "typed adapter must resolve uniquely: missing_adapter",
+      "name": "missing_model_rejected",
+      "status": "PASS"
+    },
+    {
+      "after": [
+        "base:smolvlm_500m",
+        "adapter:alpr"
+      ],
+      "before": [
+        "base:smolvlm_500m",
+        "adapter:alpr"
+      ],
+      "name": "failed_requests_do_not_commit_logical_state",
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS"
+}

@@ -1,0 +1,203 @@
+{
+  "acceptance": {
+    "disk_weight_hash_unchanged": true,
+    "exact_n0_source_restart": true,
+    "exact_n1_input_and_tokens_restart_recovery": true,
+    "exact_n2_input_and_tokens_restart_recovery": true,
+    "exact_node_call_counts": true,
+    "legal_native_preview_before_runtime_mutation": true,
+    "logical_commit_only_after_runtime_success": true,
+    "runtime_adapter_tensor_absence_after_unload": true,
+    "runtime_adapter_tensor_presence_after_reload": true,
+    "task_correctness": "unavailable"
+  },
+  "budget": {
+    "automatic_retry": false,
+    "generate_calls_per_condition": {
+      "recovery": 2,
+      "restart": 3,
+      "source": 1
+    },
+    "hard_generate_ceiling": 12,
+    "planned_generate_calls": 12,
+    "process_timeout_seconds": 300,
+    "scientific_total_timeout_seconds": 600
+  },
+  "conditions": [
+    {
+      "capacity_bytes": 1169449264,
+      "condition_id": "adapter_victim_reload",
+      "expected_current_victims": [
+        "adapter:alpr"
+      ],
+      "expected_future_victims": [
+        "adapter:helmet"
+      ],
+      "expected_post_setup_adapter_load_calls_per_arm": 2,
+      "initial_resident_adapters": [
+        "alpr"
+      ],
+      "prediction": {
+        "basis": "Prior ALPR load 0.817814 s plus Helmet weight-size-scaled 0.051082 s; both arms receive the same lifecycle estimate. Prefix/state/suffix estimates are inherited from the prior independent check; n2 uses the prior n1 estimate.",
+        "predicted_cheaper_action": "recovery",
+        "recovery_completion_seconds": 8.509755,
+        "restart_completion_seconds": 19.553682
+      }
+    },
+    {
+      "capacity_bytes": 1179091208,
+      "condition_id": "no_eviction_control",
+      "expected_current_victims": [],
+      "expected_future_victims": [],
+      "expected_post_setup_adapter_load_calls_per_arm": 0,
+      "initial_resident_adapters": [
+        "alpr",
+        "helmet"
+      ],
+      "prediction": {
+        "basis": "Both adapters are real setup residents; the action window contains no adapter unload/load. Prefix/state/suffix estimates are inherited from the prior independent check; n2 uses the prior n1 estimate.",
+        "predicted_cheaper_action": "recovery",
+        "recovery_completion_seconds": 7.640859,
+        "restart_completion_seconds": 18.684786
+      }
+    }
+  ],
+  "cost_accounting": {
+    "common_setup": "Processor, shared base, and frozen initial resident adapters are prepared before each arm action window and recorded separately. The two arms use identical setup for a condition.",
+    "model_network_transfer": "unavailable; local-file adapter load time and bytes are reported separately",
+    "no_cancellation_without_identity": true,
+    "recovery": [
+      "current legal adapter transaction",
+      "state serialize/save",
+      "state validation/rebuild",
+      "n1 suffix",
+      "future legal adapter transaction",
+      "n2 future execution"
+    ],
+    "restart": [
+      "current legal adapter transaction",
+      "original input",
+      "n0 prefix recompute",
+      "n1 suffix",
+      "future legal adapter transaction",
+      "n2 future execution"
+    ]
+  },
+  "execution_order": [
+    {
+      "arm_order": [
+        "recovery",
+        "restart"
+      ],
+      "condition_id": "adapter_victim_reload",
+      "sequence": 1
+    },
+    {
+      "arm_order": [
+        "restart",
+        "recovery"
+      ],
+      "condition_id": "no_eviction_control",
+      "sequence": 2
+    }
+  ],
+  "frozen_at": "2026-10-05T21:30:00+08:00",
+  "generation": {
+    "n0": {
+      "do_sample": false,
+      "max_new_tokens": 8,
+      "num_beams": 1,
+      "use_cache": true
+    },
+    "n1": {
+      "do_sample": false,
+      "max_new_tokens": 8,
+      "num_beams": 1,
+      "use_cache": true
+    },
+    "n2": {
+      "do_sample": false,
+      "max_new_tokens": 8,
+      "num_beams": 1,
+      "use_cache": true
+    }
+  },
+  "network_assumption": {
+    "classification": "simulation_only_not_wireless_measurement",
+    "effective_link_mbps": 100.0,
+    "positive_transfer_fixed_latency_seconds": 0.02
+  },
+  "parsed_baseline_commit": "54b5cfb754cf5c3b3191172704f6e74df3f90ec9",
+  "plan_id": "real_cache_victim_reload_20261005_v1",
+  "research_question": "After a dependency-safe legal adapter eviction, does the later workflow node cause a real local-file adapter reload, and how does the same lifecycle affect restart and recovery full-path cost?",
+  "resources": {
+    "adapters": {
+      "alpr": {
+        "directory_bytes": 154428630,
+        "name": "Hirai-Labs/FT-SmolVLM-500M-Instruct-ALPR",
+        "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/adapter_downloads_20260930/alpr_edccd0e",
+        "revision": "edccd0e",
+        "weight_bytes": 154423432,
+        "weight_sha256": "95103f5d6547c194770b03ee0ac24fe6fc125eb8890e992977be8dcbfea10f83"
+      },
+      "helmet": {
+        "directory_bytes": 9650522,
+        "name": "revitotan/FT-SmolVLM-500M-Instruct-Helmet",
+        "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/adapter_downloads_20260930/helmet_96794cb",
+        "revision": "96794cb",
+        "weight_bytes": 9641944,
+        "weight_sha256": "e899c9c13b53bf80bcfc86048f5678a727e8c1838dc824156b521d5cdaafdd2d"
+      }
+    },
+    "base": {
+      "directory_bytes": 1019895869,
+      "name": "HuggingFaceTB/SmolVLM-500M-Instruct",
+      "path": "/Users/howen/Projects/PPO_MEC/data/raw/ai_workflow_pilot/model_a7da5b9_20260929",
+      "revision": "a7da5b986cb59b408707209984f360a5f4ad7e47",
+      "weight_bytes": 1015025832,
+      "weight_sha256": "d05b567eeaf534e83d375551f068ed57b5f52d37c657197f644af5ef9db091a2"
+    },
+    "capacity_basis": "Exact existing model.safetensors and adapter_model.safetensors bytes mapped to MiB in the native typed-cache ledger; no dummy state or padding."
+  },
+  "schema_version": "ppo_mec.real_cache_victim_reload.v1",
+  "scope": {
+    "automatic_retry": false,
+    "downloads_forbidden": true,
+    "explicit_opt_in_required": true,
+    "old_holdout_read_forbidden": true,
+    "os_file_cache_flush_forbidden": true,
+    "training_forbidden": true,
+    "weight_file_deletion_forbidden": true
+  },
+  "source_input_provenance": {
+    "bytes": 192757,
+    "path": "/Users/howen/Projects/PPO_MEC/data/raw/mobility/LuSTScenario/LuSTScenario-master/docs/img/TrafficDemands.png",
+    "sha256": "83af09665cd23c87a1d831e6cb47a88bc8d509849712c551b0a9a7965e95c307",
+    "task_label_available": false
+  },
+  "workflow": {
+    "edges": [
+      [
+        "n0",
+        "n1"
+      ],
+      [
+        "n1",
+        "n2"
+      ]
+    ],
+    "n0_prompt": "Describe the main subject of this local image in one short phrase.",
+    "n1_prompt_template": "Upstream visual description: {n0_output}\nSummarize only that description in one short phrase.",
+    "n2_prompt_template": "Upstream summary: {n1_output}\nReturn one short phrase preserving that summary.",
+    "nodes": [
+      "n0",
+      "n1",
+      "n2"
+    ],
+    "requirements": {
+      "n0": "helmet",
+      "n1": "helmet",
+      "n2": "alpr"
+    }
+  }
+}

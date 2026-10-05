@@ -1,0 +1,118 @@
+{
+  "file_count": 22,
+  "files": [
+    {
+      "bytes": 108802,
+      "path": "adapter_victim_reload/condition_receipt.json",
+      "sha256": "80300d531d4ff14653d223d7ef808390ed33b13687fa6c8af2fa498a8c61cf4a"
+    },
+    {
+      "bytes": 337,
+      "path": "adapter_victim_reload/production_action4_state_package/manifest.json",
+      "sha256": "d3fd891ef645f3f74c3ea2c5683a838633126149ef6126232068432816be03f1"
+    },
+    {
+      "bytes": 1858,
+      "path": "adapter_victim_reload/production_action4_state_package/state.json",
+      "sha256": "1baa3bf831d0fb0d6ace3729b2c4760eb3c8f692ac3c3806deeedd9c1e93e60e"
+    },
+    {
+      "bytes": 1227,
+      "path": "adapter_victim_reload/recovery_process.json",
+      "sha256": "14c484c1a889fbfe3a7255128baef59722f5ca07a39ff11244eaab4fbd732e1a"
+    },
+    {
+      "bytes": 51789,
+      "path": "adapter_victim_reload/recovery_receipt.json",
+      "sha256": "68a9a0c22874e2dc1ed76284740fb362503fb480e6f28ac84dbe6cf54a524f9a"
+    },
+    {
+      "bytes": 1227,
+      "path": "adapter_victim_reload/restart_process.json",
+      "sha256": "ae12f018adc4116d58bdd9f50a5b81302b3d90408224dba77fc1e7a7fdc67ef5"
+    },
+    {
+      "bytes": 51771,
+      "path": "adapter_victim_reload/restart_receipt.json",
+      "sha256": "736ad4a58f5c262614a5e37b0e512566fe1e7d1612ce2f619af5d4b5c6f8255e"
+    },
+    {
+      "bytes": 1223,
+      "path": "adapter_victim_reload/source_process.json",
+      "sha256": "2d9f8397399a920d9aeb3892fb4842b16b8fbce415c2cacfc06f90afdbbc8c74"
+    },
+    {
+      "bytes": 4624,
+      "path": "adapter_victim_reload/source_receipt.json",
+      "sha256": "2f27848e44b50cf0ea7a6dcbc1f47befb0859883057eebab5402c755ba576999"
+    },
+    {
+      "bytes": 192794,
+      "path": "all_measurements.json",
+      "sha256": "0524f162194d42374a45b77dab543d47a664e01bf5bf400c53a982998f399910"
+    },
+    {
+      "bytes": 7031,
+      "path": "frozen_plan.json",
+      "sha256": "c32c369c49e160d9f75c9156567fb3b83672ba4739448aac58ec4b3b28f84056"
+    },
+    {
+      "bytes": 66563,
+      "path": "no_eviction_control/condition_receipt.json",
+      "sha256": "9069b60b78fe66e9ce1b2e5c9d87c9fe768bfe56666eaeb5fbb1fdf754b74a74"
+    },
+    {
+      "bytes": 337,
+      "path": "no_eviction_control/production_action4_state_package/manifest.json",
+      "sha256": "d3fd891ef645f3f74c3ea2c5683a838633126149ef6126232068432816be03f1"
+    },
+    {
+      "bytes": 1858,
+      "path": "no_eviction_control/production_action4_state_package/state.json",
+      "sha256": "1baa3bf831d0fb0d6ace3729b2c4760eb3c8f692ac3c3806deeedd9c1e93e60e"
+    },
+    {
+      "bytes": 1220,
+      "path": "no_eviction_control/recovery_process.json",
+      "sha256": "2b64b7ac63cdeafa6ccdc9d88e564eb78ac77d1c5f8b1d6ca629d84b7ae9478a"
+    },
+    {
+      "bytes": 33263,
+      "path": "no_eviction_control/recovery_receipt.json",
+      "sha256": "99908d1a7c4457efec0b534a02e087e5e49e662c77d7e996a7849c178a7194b6"
+    },
+    {
+      "bytes": 1219,
+      "path": "no_eviction_control/restart_process.json",
+      "sha256": "69d1771aa1e1ea3ac0c7e5505a6c16407cc2e5dcbf5c8d875fcbd4a78259c105"
+    },
+    {
+      "bytes": 33259,
+      "path": "no_eviction_control/restart_receipt.json",
+      "sha256": "374d7eb29f0a7b31d0e3cfa0ab3add2dee267a5175693c7a9d31608d74c2b094"
+    },
+    {
+      "bytes": 1216,
+      "path": "no_eviction_control/source_process.json",
+      "sha256": "b6d7fb74b5d40d3e9056eccad948b703806f5b38b670e7e71b87143ace59b28f"
+    },
+    {
+      "bytes": 4620,
+      "path": "no_eviction_control/source_receipt.json",
+      "sha256": "d65893a0c77b7d2896bacdef85e38e8de18cae751e908b7c7b68ce2c5650f95b"
+    },
+    {
+      "bytes": 621,
+      "path": "preflight_negative_checks.json",
+      "sha256": "f4636b77018f02d69a5516f934c3bcca41f93fe212869bc5bece21d6f6f4320f"
+    },
+    {
+      "bytes": 194161,
+      "path": "terminal_receipt.json",
+      "sha256": "260be09256452ca6c22cd6ee8849b851482970ff80894fa95dce748fd3b3aab9"
+    }
+  ],
+  "run_root": "/Users/howen/.codex/worktrees/cost-validation/PPO_MEC/artifacts/analysis/real_cache_victim_reload_20261005_v1",
+  "schema_version": "ppo_mec.artifact_integrity.v1",
+  "total_bytes_excluding_manifest": 761020
+}

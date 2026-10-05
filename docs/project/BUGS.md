@@ -5,6 +5,16 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-05：真实 victim→reload 已闭环，但不是差异化决策证据（RESOLVED BOUNDED / OPEN CLAIM BOUNDARY）
+
+- fixed commit `f31024d…` 的 12/12-call witness 已确认 native 合法 ALPR victim、PEFT tensor/object 实际卸载、后续
+  local-file reload 和 n2 执行；无驱逐对照 action load/unload=0。
+- restart/recovery 请求相同当前/未来 adapter，故各自实测 lifecycle `1.022245/1.026997 s` 是共同路径成本；旧公式
+  若只向 recovery 收费会制造不对称，不能用于真实 action reversal claim。
+- 两条件均继续选择 recovery，且预测明显偏高；决策边界、真实无线/queue、任务正确性和统计泛化仍 OPEN。
+- 结果：`real_cache_victim_reload_results_20261005.md`；artifact：
+  `artifacts/analysis/real_cache_victim_reload_20261005_v1/`。
+
 ## 2026-10-05：历史 recovery 公式对当前模型准备存在路径不对称（FROZEN SCIENTIFIC DEFECT）
 
 - `eviction_aware_recovery.py` 的 frozen development rule 从原 resident 集 `C` 计算 rerun 的未来缺失，却只在 recovery
