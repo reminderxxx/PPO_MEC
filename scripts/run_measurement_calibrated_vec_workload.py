@@ -111,7 +111,9 @@ def main() -> None:
     write_json(output / "all_method_results.json", rows)
     csv_rows = [flatten(row) for row in rows]
     with (output / "all_method_results.csv").open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(csv_rows[0]))
+        writer = csv.DictWriter(
+            handle, fieldnames=list(csv_rows[0]), lineterminator="\n"
+        )
         writer.writeheader()
         writer.writerows(csv_rows)
     write_json(

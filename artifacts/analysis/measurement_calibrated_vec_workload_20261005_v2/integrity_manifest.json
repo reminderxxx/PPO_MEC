@@ -1,0 +1,31 @@
+{
+  "file_count": 5,
+  "files": [
+    {
+      "bytes": 15525,
+      "path": "all_method_results.csv",
+      "sha256": "965bacb15e558ef6a88b0995bc680183a922fa30a38e1e19c041cb078c6c6147"
+    },
+    {
+      "bytes": 210418,
+      "path": "all_method_results.json",
+      "sha256": "edd9d18f1a9527f52b6350d9ddef9e1d6381bd29db40fcebf2d7b749211a477a"
+    },
+    {
+      "bytes": 558,
+      "path": "completion_receipt.json",
+      "sha256": "4918d1fa92ba6d8ad9cbefe52bca70d0c1ff37c27ce93ef036534496c7406d28"
+    },
+    {
+      "bytes": 4779,
+      "path": "data_card.json",
+      "sha256": "b621907c7965ec59df92c623f3ed5fb0d0be18a5d08cb0810ab34c894a9fbf4d"
+    },
+    {
+      "bytes": 117908,
+      "path": "workload_instances.jsonl",
+      "sha256": "fc05e7a50437dc1ae7595c2cca3b19edab71b4cefed9dcc1d3262a8b3dd16a72"
+    }
+  ],
+  "status": "PASS"
+}

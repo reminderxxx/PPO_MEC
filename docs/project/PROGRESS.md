@@ -5,6 +5,19 @@
 
 ﻿# Progress
 
+## 2026-10-05：production action 4 与 workload v0.1 第一轮完成
+
+- action 4 显式 opt-in 已接入正常 reset/action/step 和真实 technical source/target；默认行为不变。final real v2
+  6/6 generate，target model 先加载、state 后校验，只执行 n1；missing-model 负例不转移执行权、不推进 DAG。
+- 最终 production v2 package 2,185 B；recovery/restart child wall 21.651/32.858 s。单次同机、queue unavailable，
+  不是无线或统计结论。两次 real run 总 generate 12/12；无下载、训练、formal/holdout、自动重试。
+- workload v0.1 冻结 8 点×3 seed×3 方法，final v3 72/72 行，全部方法完成 3/3 workflows。low restore 时 local
+  与 exact 均 recover，较 current 少 33.133 s makespan、572,151 B dynamic transfer；high restore 三者均 restart。
+- local 与 offline exact 在 24/24 instances 决策和主指标相同；唯一下一步为系统机制与外部有效性验证，不启动 RL。
+- final evidence：`artifacts/analysis/production_action4_workflow_20261005_v2/`、
+  `artifacts/analysis/measurement_calibrated_vec_workload_20261005_v3/`；claim 边界见
+  `measurement_calibrated_vec_workload_v0_1.md`。
+
 ## 2026-10-05：最小机制证据闭环完成
 
 - A：复用 576 行原生四配置账本；candidate 四臂均完成 72 请求。blocked+sharing-on 相比

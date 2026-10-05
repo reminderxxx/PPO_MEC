@@ -5,6 +5,20 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-05：action 4 / workload v0.1 后的剩余边界
+
+- `RESOLVED / production technical state path`：显式 opt-in action 4 已实际 export/import、校验 target model 与
+  workflow/model/input/next-node identity，正例只执行后缀；缺模型负例 fail-closed。默认/正式 Protocol 不变。
+- `OPEN / production state completeness`：2,185 B 仍是 explicit-text technical package，不是 KV/tensor 或完整应用状态；
+  task quality unavailable，不能外推任意 DAG/model。
+- `OPEN / system realism`：没有无线、RSU queue、丢包/重传或多租户测量；100 Mbps、容量、deadline 和 high restore
+  都是 synthetic，单机 load/I/O 不称 VEC deployment latency。
+- `BOUNDARY / workload evidence`：8 点半分数和 3 seed 是 bounded development diagnostic，不是独立现实测试或最终
+  统计；公开价值、许可、代表性和独立复现未完成，旧 holdout 未使用且仍永久不可复用。
+- `NEGATIVE / high restore`：高恢复点下 local/exact 都选择 restart；恢复并非普遍有益。`ALPR adapter` 负结果不变。
+- `BOUNDARY / algorithm`：local=exact 于 24/24；当前不授权 RL。未来只有外部有效性出现可解释、公平 gap 才可另立
+  最小方法任务。
+
 ## 2026-10-05：机制闭环后的有效边界
 
 - `OPEN / production action 4`：native action 4 只做 prepare/history，未调用已验证 state export/import；独立恢复脚本

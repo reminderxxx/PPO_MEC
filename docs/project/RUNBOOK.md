@@ -15,13 +15,13 @@ workflow（硬上限 12，无自动重试），再运行 0-call 半合成矩阵�
   scripts/run_two_node_workflow_reexecution_comparison.py \
   --role supervisor \
   --plan configs/acceptance/two_node_workflow_reexecution_comparison_v1.json \
-  --run-root artifacts/analysis/production_action4_workflow_20261005_v1 \
+  --run-root artifacts/analysis/production_action4_workflow_20261005_v2 \
   --expected-commit <fixed-implementation-commit>
 
 /Users/howen/Projects/PPO_MEC/.venv/bin/python \
   scripts/run_measurement_calibrated_vec_workload.py \
   --config configs/experiment/measurement_calibrated_vec_workload_v0_1.json \
-  --output-root artifacts/analysis/measurement_calibrated_vec_workload_20261005_v1 \
+  --output-root artifacts/analysis/measurement_calibrated_vec_workload_20261005_v3 \
   --expected-commit <fixed-implementation-commit>
 ```
 

@@ -1,0 +1,8 @@
+{
+  "execution_right_transferred": false,
+  "migration_success": false,
+  "missing_model_preparation": true,
+  "restore_validation_seconds": 0.0,
+  "status": "BLOCKED_MISSING_TARGET_MODEL",
+  "target_rsu_id": "technical_target_process"
+}

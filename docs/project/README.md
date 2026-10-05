@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `measurement_calibrated_vec_workload_v0_1.md`：production action 4 technical 正负链、RQ—机制—假设—指标、
+  workload v0.1 数据卡/来源表、全部 72 方法行、收益/无收益/交换区和唯一下一步
+
 - `mechanism_evidence_closure_results_20261005.md`：共享缓存公平成本、两节点重跑/恢复和 12 场景决策空间结果；
   明确 Pareto 边界、ALPR 负结果和不启动 RL 的结论
 - `mechanism_evidence_closure_plan_20261005.md`：本轮命令、调用、墙钟、12 格与状态成本的事前冻结方案

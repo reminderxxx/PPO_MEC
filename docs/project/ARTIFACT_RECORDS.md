@@ -5,6 +5,18 @@
 
 # Artifact Records
 
+## 2026-10-05 production action 4 / workload v0.1
+
+- final real：`artifacts/analysis/production_action4_workflow_20261005_v2/`，commit `94600de...`，6/6 generate，
+  4 个独立进程、58.825 s；production export/import true，2,185 B package，restart/recovery child wall
+  32.858/21.651 s，missing-model 负例不提交执行权。15/15 files 独立完整性复算通过。
+- final matrix：`artifacts/analysis/measurement_calibrated_vec_workload_20261005_v3/`，同 commit，8 points×3 seeds×
+  3 methods=72 rows、0 generate、0.0083 s；local=offline exact 24/24，全部完成量相同。5/5 files 独立复算通过。
+- 非最终保留：real v1 成功但缺显式 wait 字段；workload v1 的 decision overhead 计时边界错误，v2 缺显式 wait；
+  均不得用于主表。一次 wrong-expected-SHA prelaunch 在 output 创建前停止，调用和结果为0。
+- 总真实新增 generate 12/12；无下载、训练、formal/holdout 或旧 holdout 消费。证据等级仅
+  `E2_BOUNDED_TECHNICAL_AND_SEMI_SYNTHETIC_ARTIFACT_AUDITED`，非 paper-ready。
+
 ## 2026-10-05 minimal mechanism evidence closure
 
 - `artifacts/analysis/mechanism_evidence_closure_20261005_v1/`：固定 commit `f323fa2...`，A/C wall 34.193 s，

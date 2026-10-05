@@ -6,9 +6,10 @@
 # PPO_MEC
 
 Production action 4 的显式 opt-in 状态导出/导入合同，以及 measurement-calibrated semi-synthetic VEC workload
-v0.1 的冻结 RQ、8 点覆盖设计、数据卡和预算见
+v0.1 的冻结 RQ、8 点覆盖设计、数据卡、全部 72 行结果和结论边界见
 [`docs/project/measurement_calibrated_vec_workload_v0_1.md`](docs/project/measurement_calibrated_vec_workload_v0_1.md)。
-默认五动作行为不变；该轮是 development mechanism diagnostic，不使用旧 holdout、不训练 RL，也不宣称新真实数据集。
+默认五动作行为不变；局部规则在本矩阵与 offline exact 一致，下一步是外部有效性验证，不启动 RL。该轮是 development
+mechanism diagnostic，不使用旧 holdout，也不宣称新真实数据集。
 
 最小机制证据闭环（共享缓存四配置、连续/重跑/后缀恢复、12 个有界决策场景）见
 [results](docs/project/mechanism_evidence_closure_results_20261005.md)；结论是 bounded diagnostic，非 formal、holdout、

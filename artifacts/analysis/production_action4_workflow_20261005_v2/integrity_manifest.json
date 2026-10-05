@@ -1,0 +1,83 @@
+{
+  "file_count": 15,
+  "files": [
+    {
+      "bytes": 1217,
+      "path": "continuous_process.json",
+      "sha256": "f1feba97fe10fcd18de163b71980ce064eaab2bf88f7480c9c3c3d6fbe76f697"
+    },
+    {
+      "bytes": 5097,
+      "path": "continuous_receipt.json",
+      "sha256": "323a901afdef5dea6483dd3cf6c0255ef3bc72d1e15173ac84f5c800cd01d304"
+    },
+    {
+      "bytes": 2226,
+      "path": "preflight_negative_checks.json",
+      "sha256": "820e9785dae8db5f7d7dd2206aebcc624bd3ba25bcbf214c6a7fc7405b0675bd"
+    },
+    {
+      "bytes": 238,
+      "path": "production_action4_missing_model_negative.json",
+      "sha256": "1abc28f3b980e4f84780d338f77d279ef2218deb81e2fba2d5202a297f5f6056"
+    },
+    {
+      "bytes": 337,
+      "path": "production_action4_state_package/manifest.json",
+      "sha256": "209be80137ca66897746c26786d6e4d374f02ef2104500b6e59614d596d6a585"
+    },
+    {
+      "bytes": 1848,
+      "path": "production_action4_state_package/state.json",
+      "sha256": "4e36c04466cd901d1b7d902676e71f8ceff956c01fdb8ad1e892d45afa9fe044"
+    },
+    {
+      "bytes": 1217,
+      "path": "restart_process.json",
+      "sha256": "aacc22d4e80b56d8d3b59382805243ffbb3d71d58c7ee86d16bb69f4c5747667"
+    },
+    {
+      "bytes": 5346,
+      "path": "restart_receipt.json",
+      "sha256": "45d8d84a0794137f538633b5d009fd4c2790ea7c39286bc4bbd2e75c98bca0b3"
+    },
+    {
+      "bytes": 1215,
+      "path": "source_process.json",
+      "sha256": "c0fcc08f72ce0d08cefd1e4e3da4c2d84750ee11ed1f5a0751c38a773f60da45"
+    },
+    {
+      "bytes": 5511,
+      "path": "source_receipt.json",
+      "sha256": "a399e9affc11640982d520aff7dd539683956aefefe9d51dd8c03f7518e9dccd"
+    },
+    {
+      "bytes": 337,
+      "path": "state_package/manifest.json",
+      "sha256": "362123e41c78f9fe53cd7b36faf8337d18133caf3e9040175d4e1f520dd14839"
+    },
+    {
+      "bytes": 1703,
+      "path": "state_package/state.json",
+      "sha256": "53c4f94fa8b50025a2ae4e532d31e211996e49eb302859f37561ef93e66409c9"
+    },
+    {
+      "bytes": 1215,
+      "path": "target_process.json",
+      "sha256": "82b9217ea56fb6611cc9974038f6148c728697cc96255a9c394cd7a6de34c1c2"
+    },
+    {
+      "bytes": 6675,
+      "path": "target_receipt.json",
+      "sha256": "7329b50311fd09c53ff8ce12faa5fdd7371a1a8cdbc5922717d758b7ec1e9d19"
+    },
+    {
+      "bytes": 16367,
+      "path": "terminal_receipt.json",
+      "sha256": "377bf66981f99e9f08ac83c5dfbd66cfc9f4faf293add9731ef9f4a5283080e1"
+    }
+  ],
+  "run_root": "/Users/howen/.codex/worktrees/action4-vec-workload/PPO_MEC/artifacts/analysis/production_action4_workflow_20261005_v2",
+  "schema_version": "ppo_mec.artifact_integrity.v1",
+  "total_bytes_excluding_manifest": 50549
+}

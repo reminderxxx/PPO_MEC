@@ -5,11 +5,16 @@
 
 ﻿# Context
 
-更新日期：2026-09-06
+更新日期：2026-10-05
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
 ## 项目状态
+
+- production action 4 已有显式 opt-in technical state export/import：target model 门禁、workflow/model/input/next-node
+  校验和执行权提交已进入正常 reset/action/step；默认五动作与 formal Protocol 不变。measurement-calibrated
+  semi-synthetic workload v0.1 的 8 点×3 seed×3 方法完成；local=offline exact 于 24/24，当前不启动 RL，下一步只做
+  系统机制与外部有效性验证。该证据非真实无线、真实数据集、formal/holdout 或 paper-ready。
 
 - 当前唯一 live typed model-cache execution contract 为 Protocol 2.9.0；active index 位于
   `configs/experiment/typed_model_cache_formal_protocol_v2_9_20260906/protocol_index.json`，Readiness v21=
