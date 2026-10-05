@@ -1,5 +1,15 @@
 ﻿# Decision Log
 
+## 2026-10-05：恢复成本修正保持 opt-in，并以正确两步为上限对照
+
+- 决定：不新增动作/网络/RL；只在显式 opt-in 下比较完整 rerun/recovery increment，victim 必须来自现有 native
+  dependency-safe plan，近期依赖按 object ID 去重。
+- 决定：两路共同的未来 model load 与成功服务时间保留在两路完整成本并解释其抵消；缺输入、非法 action、不可行
+  preview 或 unexplained reload 一律保守重跑，不回落 oracle。
+- 决定：正确计 victim cost 的同信息两步前瞻是必要对照。12/12 持平后，将本实现定位为成本修正/组合，不包装成
+  新算法；d10/d11 误差负结果保留，不调整冻结参数。
+- 边界：正式协议、训练、旧 holdout 和 canonical 结果不变；详见 `eviction_aware_recovery_results_20261005.md`。
+
 ## 2026-10-05：action 4 只在目标模型门禁后提交状态与执行权
 
 - 决定：保持 `semantic_discrete_5` 和默认 prepare 行为；production state transfer 通过显式 profile opt-in，不升级

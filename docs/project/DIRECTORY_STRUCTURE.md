@@ -1,5 +1,14 @@
 ﻿# Directory Structure
 
+## 2026-10-05 eviction-aware recovery
+
+- `src/runtime/eviction_aware_recovery.py`：纯函数 opt-in 成本规则、原阈值与同信息两步对照；不增加动作/网络。
+- `scripts/run_eviction_aware_recovery_validation.py`：当前 native victim preview、两条 action branch、四方法和证据输出。
+- `configs/experiment/eviction_aware_recovery_v1.json`：12 点、事前成本、误差和 claim boundary freeze。
+- `tests/test_eviction_aware_recovery.py`：对象去重、保守 fallback、合法 victim 与 native action transition 回归。
+- `artifacts/analysis/eviction_aware_recovery_validation_20261005_v1/`：48 行结果、逐事件证据、汇总、回执与完整性清单。
+- `docs/project/eviction_aware_recovery_plan_20261005.md` / `eviction_aware_recovery_results_20261005.md`：计划与审查。
+
 ## 2026-10-05 production action 4 / workload v0.1
 
 - `configs/experiment/workload_v0_1_cost_mismatch_robustness_v1.json`：固定事前估计与 12 个独立实现成本点。

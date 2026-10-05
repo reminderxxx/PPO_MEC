@@ -5,6 +5,17 @@
 
 # Artifact Records
 
+## 2026-10-05 eviction-aware recovery validation
+
+- root：`artifacts/analysis/eviction_aware_recovery_validation_20261005_v1/`；冻结执行 commit
+  `f5033c1b10f8c323f2247a09b1f5ab73a8621387`，12 points、24 native branches、48 method rows、0 RL/model
+  call/download/holdout，wall `0.635429 s`；30/30 manifest files 独立 size/SHA-256 通过。
+- 全部方法 24/24 节点且 0 deadline violation。原阈值/新规则/两步/离线参考总时间
+  `174.096793/156.103518/156.103518/144.675011 s`，transfer
+  `2,038,648,604/1,066,522,920/1,066,522,920/923,916,580 B`。
+- 新规则和两步 action/cost agreement `12/12`，匹配离线参考 `10/12`；原阈值 `7/12`。d10/d11 科学负结果
+  未删除。证据等级 `E2_BOUNDED_SYNTHETIC_NATIVE_TRANSITION_ARTIFACT_AUDITED`，非 formal/holdout/paper-ready。
+
 ## 2026-10-05 production action 4 / workload v0.1
 
 - independent audit robustness：`artifacts/analysis/workload_v0_1_cost_mismatch_robustness_20261005_v1/`，执行 commit

@@ -1,0 +1,15 @@
+{
+  "all_actions_legal": true,
+  "all_methods_equal_completion": true,
+  "design_point_count": 12,
+  "downloads": 0,
+  "elapsed_wall_seconds": 0.6354285420000001,
+  "eviction_aware_two_step_action_agreement_count": 12,
+  "model_calls": 0,
+  "native_branch_execution_count": 24,
+  "old_holdout_operations": 0,
+  "rl_started": false,
+  "run_id": "eviction_aware_recovery_validation_20261005_v1",
+  "single_execution": true,
+  "status": "COMPLETED"
+}

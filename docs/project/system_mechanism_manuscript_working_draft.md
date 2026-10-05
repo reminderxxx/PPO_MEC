@@ -1,167 +1,189 @@
-# Dependency-Aware Model and Execution-State Preparation for Mobile Edge Workflows
+# Eviction-Cost-Aware Recovery for Stateful AI Workflows at the Vehicular Edge
 
-> Internal working draft — 2026-09-28. Not submission-ready. This draft describes the implemented system abstraction and the scope of available evidence; it does not establish a novel algorithm or independent generalization. Editorial notes are excluded from the proposed manuscript body. No positive result is reserved in advance.
+> Internal working draft — 2026-10-05. This is a complete but non-submission-ready draft. It reports a bounded synthetic validation and same-host calibration, not an independent real-world evaluation. The implemented rule is classified as a combination/implementation correction unless broader evidence establishes an additional contribution.
 
 ## Abstract
 
-Executing a dependent workflow across roadside units requires more than locating a cached model. The destination must also have the appropriate adapter and compatible execution state, while preparation consumes storage and communication resources before its benefit is realized. We study this preparation problem in a trace-driven vehicular edge simulator with explicitly typed model dependencies and workflow state. Our analysis separates the physical effects of sharing and migration from the contribution of the controller that selects preparation actions. Development experiments illustrate why aggregate communication savings are insufficient evidence of efficiency: a controller can transfer less data while completing fewer workflows. They also expose an inconsistency between hierarchical action sampling and the corresponding policy update. These findings motivate controlled mechanism ablations and a distribution-consistent learning formulation. The current evidence characterizes implementation and development behavior; it does not establish superior performance on independent test data.
+Recovering a stateful AI workflow after a roadside-unit handoff can avoid recomputing completed nodes, but recovery also prepares model objects at the destination. Under finite cache capacity, that preparation can evict objects needed by the workflow's next declared node and cause an additional reload. We study this narrow coupling within one continuous workflow. Starting from an existing typed base/adapter cache and state-package mechanism, we implement an explicit opt-in rule that compares the full estimated increments of rerun and recovery. The rule uses the native dependency-safe victim plan, deduplicates shared objects, and charges the signed change in model preparation for the next declared node. It does not observe realized future links, hits, or completion times, and falls back to rerun when required inputs are unavailable. In 12 pre-frozen synthetic validation instances, all four compared methods complete 24/24 nodes with no modeled deadline violation. The proposed rule and an information-matched two-step lookahead make identical decisions in all 12 instances and match a post-hoc offline reference in 10, compared with 7 for the original threshold. Their aggregate modeled times are both 156.104 s, versus 174.097 s for the original threshold and 144.675 s for the offline reference. Two cost-estimation cases remain wrong, and the proposed rule has no demonstrated advantage over correct two-step lookahead. These results support an auditable cost-accounting correction in the implemented setting; they do not establish a new general scheduling algorithm, real wireless benefit, cross-workflow cache scheduling, or statistical generalization.
 
 ## 1. Introduction
 
-Vehicle-associated workflows can remain active while their execution context moves between roadside units (RSUs). A later task may depend on an earlier result, a particular model adapter, and state produced before a handoff. Consequently, the availability of an individual cached object does not imply that the next task is executable, and immediate task readiness does not imply completion of the remaining workflow.
+Vehicle-associated AI applications increasingly resemble workflows rather than isolated inference calls. A perception or reasoning stage produces intermediate state that a later stage consumes, while vehicle mobility may move execution from one roadside unit (RSU) to another. At a handoff, the system can rerun the completed prefix at the destination or transfer validated execution state and resume the suffix. The second option appears attractive when the state package is small relative to recomputation.
 
-Sharing a base model across adapters reduces duplicated storage, but it also couples admission decisions: the incremental cost of an adapter depends on which related objects are already resident. Multi-adapter serving systems demonstrate the practical relevance of this shared-base organization [R2, R3]. Their GPU-memory abstractions, however, should not be equated with roadside placement or workflow-state migration. In the setting considered here, preparing a destination involves both typed model dependencies and continuity of execution.
+That comparison is incomplete when model preparation changes the destination cache. A recovered suffix still requires compatible model objects. Preparing the current model at a finite-capacity RSU may evict a base model or adapter already required by the next declared node. The recovery decision therefore affects not only the immediate state-transfer cost but also a later model reload inside the same workflow. Shared base models make the accounting object-dependent: evicting one adapter need not evict or reload a base that is shared by another adapter.
 
-Proactive preparation introduces a second tension. Preparing early may avoid a cold destination at handoff, but occupies capacity and incurs transfer even when the predicted destination is not used. Preparing only after demand is observed can avoid speculative work yet leave the workflow unprepared during a transition. A useful controller must therefore distinguish preparation that enables subsequent execution from preparation that merely increases local readiness or cache occupancy.
+This paper asks one narrow question: **within a declared continuous AI workflow, when should a controller recover execution state after accounting for the cache and loading cost that the recovery itself induces for the next node?** We do not study cross-workflow scheduling, link or compute queues, real radio allocation, or full vehicle/RSU-level multi-agent reinforcement learning. We add no neural network and no new action. The decision remains a choice between the existing rerun action and the existing recovery/prepare action.
 
-Relevant work already addresses dependency-aware service caching and offloading [R1], adapter caching and routing [R4], mobility-assisted migration [R5], and cache-aware edge workflow scheduling [R6]. These are direct antecedents, not missing research areas. Our question is narrower: **when shared model dependencies and execution-state readiness interact during a mobile workflow, what preparation decisions are necessary, and when does coordinating those decisions improve completion relative to treating them separately?** Establishing this distinction requires explicit resource semantics and controlled comparisons; combining familiar modules is insufficient.
-
-We organize the investigation around three questions. First, how does shared dependency residency change the incremental cost of making a task executable? Second, when does destination preparation compensate for its communication and occupancy costs? Third, does a structured controller exploit these effects better than a simpler controller with the same information and execution authority? The third question is conditional on demonstrating the first two, rather than assuming that a more complex policy is inherently preferable.
-
-The current study provides an executable typed-resource abstraction and a development diagnosis. Its remaining contribution claims require matched mechanism and controller experiments. We distinguish the system mechanism, the correctness of its learning implementation, and the eventual performance of a proposed algorithm throughout the paper.
-
-A further contribution under development is a calibrated workload dataset and generator for vehicle-associated AI workflows and typed caching. Rather than treating task labels on a batch DAG as observed AI behavior, this resource is intended to separate measured mobility, workflow structure, compatible model families, reusable data, and transferable execution state, with explicit provenance for each constructed relationship. Its contribution will depend on calibration, validation and reuse, not on whether a particular controller wins. The dataset has not yet been released or validated.
+The work has three parts. First, it specifies full incremental costs for rerun and recovery over typed model dependencies and a legal native victim plan. Second, it implements the comparison as an opt-in deterministic rule with conservative behavior under missing inputs. Third, it evaluates the rule against the preserved threshold, an information-matched two-step lookahead, and a post-hoc offline reference on 12 pre-frozen synthetic instances. The evidence supports a small implementation correction and exposes its sensitivity to estimation error. It does not yet support an algorithmic novelty claim.
 
 ## 2. Related Work
 
-### 2.1 Dependency-aware caching and workflow execution
+### 2.1 Shared model and adapter caching
 
-Dual-dependency-aware VEC caching and offloading already combines task/service dependencies, service criticality, and PPO-based decisions [R1]. Edge workflow scheduling also incorporates model-loading and memory effects [R6]. Accordingly, dependency awareness or applying PPO is not, by itself, a contribution of this work. The relevant comparison concerns the decision objects, the treatment of execution state across RSUs, and the consequences for the remaining workflow. An exhaustive claim that no earlier work models this combination is not made.
+SLoRA [1] and Punica [2] show that multiple LoRA adapters can share one base model in multi-tenant serving. POLAR [3] studies joint adapter caching and routing for edge LLM serving. In vehicular edge computing (VEC), dual-dependency-aware caching and offloading [4] jointly reasons about task and service dependencies. These works establish that shared bases, adapter placement, dependency-aware caching, and online control are existing techniques. Our narrower distinction is the cost effect of a recovery-triggered legal victim plan on the next node of the same mobile workflow. We do not claim to invent shared-base caching or adapter routing.
 
-### 2.2 Shared model resources and mobile preparation
+### 2.2 Workflow execution and recovery
 
-SLoRA and Punica support multiple adapters using shared base-model resources [R2, R3]. POLAR studies coupled adapter caching and routing on two timescales [R4]. These works motivate explicit accounting for shared resources and rule out treating adapter caching or two-timescale learning alone as novel. Mobility-assisted task migration provides another close line of work [R5]. Our evaluation must therefore distinguish the benefit of physical sharing or migration from any additional benefit of coordinating them.
+WfCommons [5] provides a methodology for representing and generating scientific workflow instances, while recent edge workflow scheduling work such as AWTO [6] includes model-loading effects for agentic workflows. These systems motivate explicit workflow and loading models but do not by themselves validate state recovery across moving RSUs. In our implementation, recovery uses a validated node-boundary state package and resumes a fixed suffix. This is an existing mechanism assembled with typed cache accounting; it is not a new checkpointing theory.
 
-### 2.3 Learning and delayed preparation benefits
+### 2.3 Edge migration and mobility
 
-Preparation decisions can incur cost before their service benefit becomes observable. Return decomposition is an established approach to delayed reward attribution [R7], while PPO-based cooperative controllers can be strong baselines without specialized architectures [R8]. These observations motivate two safeguards: the update must correspond to the policy that actually generated actions, and any proposed attribution mechanism must be compared against the same system controlled by a strong simpler method. The present implementation does not implement RUDDER or inherit its theoretical guarantees.
+Trajectory-prediction-assisted task migration in VEC [7] and service-migration/resource-allocation work [8] demonstrate that mobility-aware migration and continuity are established research directions. Proactive service reservation and service fetching provide related destination-preparation abstractions. Our scope differs in the migrated object boundary: execution state and typed base/adapter readiness are represented separately, and we examine how one legal preparation affects a declared subsequent node. We do not model real wireless scheduling, shared resource queues, arbitrary service placement, or unfinished-task migration across multiple workflows.
 
-### 2.4 Workload construction and data contribution boundary
+## 3. System Model
 
-WfCommons connects workflow execution instances, synthetic generation and evaluation [R9], providing a methodological precedent rather than a vehicular AI dataset. Dual-dependency cooperative edge computing also has direct antecedents [R10]. Our proposed resource must therefore justify application semantics, model compatibility, state costs and mobility coupling; a new file format or a larger number of generated DAGs is not sufficient evidence of novelty. Neither a literature-supported marginal distribution nor a measured traffic trace establishes their joint distribution with AI requests.
+### 3.1 Implemented workflow and cache state
 
-## 3. System Model and Research Objective
+A workflow is a directed acyclic graph (G=(V,E)) with a declared execution order in the bounded experiment. Each node (v\in V) requires an adapter and its compatible base-model dependency set (D_v). The target RSU has a finite typed resident set (C) and capacity (K). Objects are identified explicitly as base models or adapters; workflow state is migration-only and does not consume the model-cache capacity in the current contract.
 
-### 3.1 Workflow and resource state
+The implemented cache uses deterministic sequential dependency-safe LRU. For a proposed current-node dependency bundle (D_0), the native read-only preview resolves missing objects, required free capacity, and an ordered legal victim plan (V). A base is not evictable while a resident adapter still depends on it. The recovery transaction is atomic: it either commits all required objects after legal eviction or performs no cache mutation.
 
-Represent a workflow as a DAG \(G=(V,E)\). An edge represents a prerequisite, and the completed-node set determines the currently eligible frontier. The model catalog distinguishes base models and adapters, including their compatibility relations. Workflow execution state is a separate typed resource; it is not assumed to be an LLM key–value cache. A vehicle is associated with a serving RSU, which may change along the mobility trace.
+The environment exposes five historical actions, but this study uses the same feasible first-action set ({0,4}) for every method. Action 0 serves reactively and, when execution state is unavailable after handoff, incurs one modeled prefix rerun before retrying. Action 4 prepares the target model and exports a create-only workflow-state package. No additional object-selection or scheduling authority is introduced.
 
-Let \(C_r(t)\) denote resident resources at RSU \(r\), with capacity \(K_r\). For a task \(v\), let \(D_v\) be the compatible model dependency set and \(z_v(t)\) the required execution state, when applicable. Model readiness requires the relevant members of \(D_v\) to be available. Execution readiness additionally requires prerequisites, compatible state, and the applicable service conditions. Thus model readiness is necessary in the modeled edge-service path, but is not sufficient for workflow completion.
+### 3.2 Information boundary
 
-### 3.2 Incremental preparation accounting
+The online rules observe the current legal-action mask, target residency and capacity, typed catalog dependencies and sizes, native LRU policy state, the submitted workflow graph, and ex-ante link/recompute/restore estimates. They do not receive future realized link rate, cache hit, victim outcome beyond the deterministic current-action preview, service success, or post-hoc completion time. The offline reference is explicitly different: it chooses only after both complete action-0 and action-4 branches have been realized.
 
-For a proposed set of resource objects \(B\), its missing storage at a destination is
+### 3.3 Objective and common costs
 
-\[
-\Delta M(B,r,t)=\sum_{o\in B\setminus C_r(t)} \operatorname{size}(o).
-\]
+The lexicographic evaluation objective first maximizes completed nodes, then minimizes deadline violations, modeled completion time, total transfer, recomputation, service failures, and finally action ID. Cost comparisons are interpreted only at equal completion. Successful service time is identical across the two branches and is excluded from the decision difference. Future objects missing on both paths are retained in both full totals and cancel; they are not selectively omitted from one path.
 
-The sum is over unique objects: a shared base appearing in multiple task dependency sets is counted once. A non-sharing intervention instead uses its corresponding replicated-object representation. This distinction must be reflected in the actual resident set and transfer accounting, rather than introduced solely through a reward term. Any admission must respect capacity and compatibility after the applicable eviction operation.
+## 4. Method
 
-This expression is an accounting definition, not a claim of a new optimization algorithm. State transfer, backhaul volume, and occupancy costs must retain their distinct units; an abstract migration penalty is not automatically a measurement of transferred state bytes.
+### 4.1 Omission in the original threshold
 
-### 3.3 Causal information and action authority
+The preserved simple threshold compares state transfer plus restore against input transfer plus prefix recomputation. Its original workload contract treated target-model preparation as common to rerun and recovery. That is correct only when the current decision does not change the relevant resident set or when model costs are genuinely equal. It omits both recovery-specific current model preparation and the additional reload caused by evicting near-term dependencies.
 
-The controller observes the submitted DAG, completed progress, current typed residency and capacity, and predictions computed from causally available mobility observations. It does not receive future service outcomes. The current prototype exposes five actions: fill the current RSU, prefetch to a predicted destination, use vehicle fallback, offload without a cache change, and prepare for handoff. Legal-action masking constrains execution.
+### 4.2 Full incremental costs
 
-These actions determine preparation timing and mode. They do not permit arbitrary selection of future critical-node object bundles or unrestricted joint allocation across RSUs. Such extensions require a different action interface and must give baselines equivalent authority. The controller is a system-level policy; its multiple heads are not separate vehicle or RSU agents.
-
-### 3.4 Evaluation objective
-
-The principal scientific outcome is completion of the submitted workflow within the specified observation horizon. A horizon is not relabeled as an application deadline without a corresponding timing contract. Communication and migration costs include unsuccessful workflows. We report completion, failures, transfer volume, actual state-transfer volume, and delay together with its availability coverage, rather than selecting a post-hoc weighted score.
-
-A possible future constrained formulation maximizes completion subject to a transfer budget in addition to storage constraints. The current prototype does not enforce a hard transfer-budget constraint, so it cannot be described as already solving that formulation. Cost–completion comparisons currently characterize trade-offs, not constrained optimality.
-
-## 4. Controller Computation and Correctness Boundary
-
-The current mechanism-aware input adds 28 features concerning model dependencies, capacity, remaining workflow progress, predicted destination, and execution-state readiness. Controllers share the mechanism information in the matched development comparison. Additional information alone does not establish an algorithmic contribution.
-
-For the hierarchical controller, let \(e\), \(s\), and \(f\) denote event, slow, and fast head probabilities. The unmasked five-action probabilities are
+Let (C) be the current target resident set, (D_0) the current dependency set, and (V) the legal native victim plan. The projected post-recovery resident set is
 
 \[
-p=(e_0s_1,\ e_0s_2,\ e_0s_0f_1,\ e_0s_0f_0,\ e_1).
+C'=(C\setminus V)\cup D_0.
 \]
 
-With legal-action mask \(m\), the behavior distribution is
+Let (H) contain declared near-term nodes and let
 
 \[
-\pi_m(a\mid x)=\frac{m_a p_a(x)}{\sum_j m_jp_j(x)}.
+U=\bigcup_{v\in H}D_v
 \]
 
-If PPO is used for this behavior distribution, its importance ratio must be computed from the old and new masked environment-action probabilities. Independently clipping ratios for canonical head labels is not generally equivalent to clipping the ratio of the action actually sampled. With only one legal action, the conditional distribution is constant and its direct actor gradient is zero.
+be their dependency union. The union is over object IDs, so a shared base is charged once even if several adapters require it. For a unique object set (B), (T(B)) converts estimated transfer bytes to time using the declared rate and one positive-transfer fixed latency. The full estimated increments are
 
-The current legacy implementation fails this consistency criterion in controlled mathematical checks. The corrected update remains an implementation specification rather than a validated performance result. Fixing it is a prerequisite for evaluating the hierarchical method, not a novelty claim. Neither convergence nor superior completion follows from consistency alone.
+\[
+J_{\mathrm{rerun}}=\hat C_{\mathrm{recompute}}+T(\mathrm{input})+T(U\setminus C),
+\]
 
-Algorithmic complexity claims are deferred until the final decision interface and implementation are fixed. In particular, graph encoding, candidate construction, masking, dependency lookups, and policy inference must be accounted for separately; no unsupported polynomial-time or optimality guarantee is asserted.
+\[
+J_{\mathrm{recover}}=T(D_0\setminus C)+T(\mathrm{state})+\hat C_{\mathrm{restore}}+T(U\setminus C').
+\]
 
-## 5. Evaluation Design
+The signed future cache effect is
 
-### 5.1 Data and interpretation
+\[
+\Delta_{\mathrm{future}}=T(U\setminus C')-T(U\setminus C).
+\]
 
-The prototype combines NGSIM mobility traces and Alibaba workflow DAGs with a controlled mapping to model requirements. This is a trace-driven simulation, not a joint measurement of vehicles running the specified AI workflows. The catalog, model mapping, transfer assumptions, and state semantics require explicit reporting and sensitivity analysis. Development windows reused for training or design are not an independent test set.
+The induced reload set is ((U\setminus C')\setminus(U\setminus C)). Every such object must be explained by the legal victim plan; otherwise the implementation fails conservatively to rerun. The rule selects recovery only if action 4 is legal, all required inputs are valid, the native preview is feasible, and (J_{\mathrm{recover}}<J_{\mathrm{rerun}}).
 
-The proposed dataset upgrade distinguishes model weights, compatible adapters, reusable inputs/intermediates, and workflow state. It will document whether each field is measured, literature-supported, derived or assumed. A small executable application template and local resource profiling are required before expanding synthetic scenarios. Calibration-aligned cases, explicit stress cases and negative controls will be reported separately. New random seeds drawn from a development-tuned generator are not a substitute for unused real traces, and generated repeats of a mobility window do not create independent mobility clusters. These are prospective requirements; no new dataset results are reported here.
+### 4.3 Pseudocode and complexity
 
-### 5.2 Mechanism and controller comparisons
+```text
+if opt_in is disabled:
+    return original_threshold(inputs)
+if action4 is illegal or native_preview is infeasible:
+    return rerun
+V = native_dependency_safe_victim_plan(C, D0, capacity)
+C_after = (C - V) union D0
+U = unique_objects(dependencies(declared_near_term_nodes))
+before = U - C
+after = U - C_after
+if a required cost is missing or (after - before) is unexplained by V:
+    return rerun
+J_rerun = recompute_est + transfer(input) + transfer(before)
+J_recover = transfer(D0 - C) + transfer(state) + restore_est + transfer(after)
+return recover if J_recover < J_rerun else rerun
+```
 
-The planned mechanism study crosses shared-base representation and execution-state migration. A common fixed controller first isolates the physical interventions; separately trained matched arms then measure adaptation to those interventions. Independent, sequential, and coordinated preparation policies are needed to distinguish joint decision value from the sum of two useful modules. Merely enabling both modules is not evidence of coordination.
+After the native preview, the rule requires (O(|D_0|+|V|+|U|)) time and (O(|C|+|U|)) auxiliary space. The existing sequential LRU preview recomputes dependency-safe candidates after each victim and has worst-case (O(|C|^2)) time. The two-step baseline receives the same fields and explicitly scores the two paths. In the fixed two-action, one-future-node setting, it is algebraically equivalent to the proposed rule.
 
-Comparisons include strong dependency-aware heuristics and flat PPO with equivalent observable information, legal actions, training budget, and checkpoint rules. Graph and hierarchical contributions require separate ablations. Negative controls include no sharing opportunity, no handoff, ample capacity, unreliable predictions, and costly migration. Workload eligibility is determined without inspecting the candidate's performance.
+## 5. Evaluation
 
-### 5.3 Statistical and cost reporting
+### 5.1 Protocol and evidence sources
 
-Outer sampling units are original mobility windows or appropriately grouped capture runs. Seeds and scenario variants within a window are repeated measurements, not additional independent windows. Completion and all incurred costs are reported together. Delay conditional on completion must not be interpreted as unconditional latency. The protocol for a future confirmatory comparison must freeze estimands, multiplicity, selection rules, and data independence before evaluation.
+The implementation and 12 design points were committed before the result artifact was created. The frozen execution commit is `f5033c1b10f8c323f2247a09b1f5ab73a8621387`; the parsed baseline is `1a999287c172b8f34d64680aaaa3d8eb6be23508`. The run executed 24 native branches in 0.635 s with zero training, model calls, downloads, or old-holdout operations. All 30 files in the integrity manifest independently match their recorded sizes and SHA-256 values [A1].
 
-## 6. Available Development Evidence
+The 12 instances are synthetic validation instances that were not selected after seeing their outputs. Existing native object sizes are 96/128 MiB for the two bases and 8 MiB per adapter. Measured technical-workflow inputs include a 11.035304 s prefix, 192,757-byte rerun input, approximately 2.1 KiB state package, and 0.006151 s same-host serialize/restore/rebuild estimate. Link rates of 70/100/200 Mbps, a 14 s high-restore stress, a 9.5 s recompute sensitivity, and estimator multipliers are explicit assumptions, not new measurements [A2].
 
-The completed development matrix contains 12 trained models and 156 evaluation episodes across three original windows. The learned comparisons have 36 episodes per condition; the deterministic heuristic has 12 and is not expanded through duplicate seeds. An independent derivation verified 1,056 source-file hashes and sizes and recomputed the following quantities from the raw episode records.
+Earlier same-host calibration executed three fixed restart/recovery pairs. Recovery avoided the prefix and was 10.650--10.868 s faster in those runs, but they shared one host and uncontrolled operating-system file cache and are not independent deployment measurements [A3]. An earlier equal-completion native cache ledger showed 3,264 MiB for blocked requests with sharing versus 8,640 MiB for interleaved sharing, confirming only that request order and shared-base reuse can change bytes in the synthetic cache [A4]. These prior results calibrate the question; they are not independent validation of the new rule.
 
-| Controller | Completed workflows | Total transfer (MB) | Total transfer / completed workflow (MB) |
-|---|---:|---:|---:|
-| Full SA | 18/36 | 7,432 | 412.889 |
-| Signal-off SA | 14/36 | 9,410 | 672.143 |
-| Full MAPPO | 18/36 | 7,432 | 412.889 |
-| Full PPO | 27/36 | 10,224 | 378.667 |
-| Critical-path heuristic | 6/12 | 3,268 | 544.667 |
+### 5.2 Compared methods and metrics
 
-The ratios retain transfer incurred by failed workflows. Full SA transfers less overall than PPO but completes fewer workflows and incurs more transfer per completed workflow. Normalizing by successful requests instead gives a different ordering, showing why no unconditional efficiency claim follows from choosing a favorable denominator. These are retrospective descriptive diagnostics, not new confirmatory endpoints.
+We compare (i) the original simple threshold, (ii) the eviction-cost-aware rule, (iii) an information-matched two-step lookahead that correctly charges eviction effects, and (iv) a same-feasible-set offline reference with post-hoc access to both realized branches. We report completion, modeled completion time, transfer decomposition, recomputation, deadline violations, service failures, and pure decision-function overhead. The offline selection overhead is not online-comparable because it excludes the prerequisite realization of both branches.
 
-The completion counts across the three training seeds are 9, 9, and 0 for full SA, versus 9, 9, and 9 for PPO. The nominal 280-MB and 360-MB capacity scenarios produce identical primary outcomes and no eviction or capacity rejection in the audited traces. They therefore do not establish robustness to binding capacity constraints. Only three outer windows and development reuse preclude interpreting these results as independent superiority evidence.
+### 5.3 Aggregate results at equal completion
 
-Separately, a mathematical audit enumerated 31 nonempty masks, all legal actions, four fixed logit probes, and both advantage signs. The resulting 640 cases show objective or gradient disagreement between the legacy equal-weight head surrogate and the masked environment-action PPO reference. This controlled slice falsifies their general equivalence; it does not quantify how much of the observed completion gap a correction would remove.
+All methods complete 24/24 nodes and incur zero modeled deadline violations [A1].
 
-## 7. Limitations and Conclusion Boundary
+| Method | Offline matches | Recoveries | Failures | Time (s) | Total bytes | Base | Adapter | State | Rerun input | Recompute (s) | Decision median (µs) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Original threshold | 7/12 | 11 | 1 | 174.096793 | 2,038,648,604 | 1,879,048,192 | 159,383,552 | 24,103 | 192,757 | 11.035304 | 2.438 |
+| Eviction-aware | 10/12 | 6 | 6 | 156.103518 | 1,066,522,920 | 973,078,528 | 92,274,688 | 13,162 | 1,156,542 | 64.676520 | 7.875 |
+| Two-step lookahead | 10/12 | 6 | 6 | 156.103518 | 1,066,522,920 | 973,078,528 | 92,274,688 | 13,162 | 1,156,542 | 64.676520 | 7.896 |
+| Offline reference | 12/12 | 6 | 6 | 144.675011 | 923,916,580 | 838,860,800 | 83,886,080 | 13,158 | 1,156,542 | 64.676520 | post-hoc |
 
-The evidence does not yet establish a new algorithm's superiority, a benefit from joint preparation beyond additive mechanisms, or generalization to unused data. Capacity stress, causal mechanism effects, the cost of more complex control, and the workload-to-model mapping remain evaluation obligations. The previous one-time test opening failed without usable performance results and cannot supply independent validation. A new confirmatory study requires eligible data and an independently fixed evaluation protocol, not reuse of a consumed test set.
+The eviction-aware rule reduces the heterogeneous 12-point sum by 17.993274 s and 972,125,684 bytes relative to the original threshold, but it uses five more reruns and 53.641216 additional recomputation seconds. The time-priority objective prefers avoiding several large model transfers even when this adds a modeled retry. This is a trade-off over constructed instances, not evidence that every system metric improves. The eviction-aware and two-step methods are identical in all outcomes. Their 0.021 µs overhead difference is too small and uncontrolled to support an efficiency claim; the analytical rule's only present advantage is a direct object-level explanation of induced reload.
 
-The present conclusion is therefore limited: typed dependencies and execution state provide an explicit setting in which to investigate mobile workflow preparation, while current development results expose important accounting and learning-consistency pitfalls. Establishing a publishable system-mechanism contribution requires demonstrating when coordinated preparation improves meaningful service outcomes, and whether the proposed controller contributes beyond simpler alternatives.
+### 5.4 Complete per-instance results and factorized ablation
+
+The table reports first action and modeled completion time for all four methods; `4` denotes recovery and `0` rerun [A1].
+
+| Instance / factor | Original | Eviction-aware | Two-step | Offline | Event-level interpretation |
+|---|---:|---:|---:|---:|---|
+| d01 no externality, shared base | 4 / 0.777415 | 4 / 0.777415 | 4 / 0.777415 | 4 / 0.777415 | No victim; only the current 8 MiB adapter is missing. |
+| d02 common future load, tight | 4 / 20.258986 | 4 / 20.258986 | 4 / 20.258986 | 4 / 20.258986 | The same b1 bundle is missing on both paths and cancels. |
+| d03 common future load, exact fit | 4 / 20.258987 | 4 / 20.258987 | 4 / 20.258987 | 4 / 20.258987 | b0+b1 exactly fit without a current victim. |
+| d04 full b1 reload | 4 / 20.258985 | 0 / 11.130725 | 0 / 11.130725 | 0 / 11.130725 | Recovery evicts and reloads 136 MiB b1 base+adapter. |
+| d05 shared-base adapter reload | 4 / 1.468504 | 4 / 1.468504 | 4 / 1.468504 | 4 / 1.468504 | Dependency protection retains the shared base; reload is 8 MiB. |
+| d06 reverse full b0 reload | 4 / 20.258985 | 0 / 11.130725 | 0 / 11.130725 | 0 / 11.130725 | Object identity, not a hard-coded family, drives the 104 MiB reload. |
+| d07 recovery unprofitable at 70 Mbps | 4 / 28.887342 | 0 / 27.455200 | 0 / 27.455200 | 0 / 27.455200 | Current preparation alone reverses the decision. |
+| d08 14 s restore stress | 0 / 11.130725 | 0 / 11.130725 | 0 / 11.130725 | 0 / 11.130725 | Recovery is intrinsically unprofitable. |
+| d09 both models ready | 4 / 0.086326 | 4 / 0.086326 | 4 / 0.086326 | 4 / 0.086326 | State-only recovery; no cache mutation. |
+| d10 recompute underestimated 50% | 4 / 20.258984 | 0 / 22.559231 | 0 / 22.559231 | 4 / 20.258984 | Negative result: richer accounting rejects a beneficial recovery. |
+| d11 recompute overestimated 2× | 4 / 20.258985 | 4 / 20.258985 | 4 / 20.258985 | 0 / 11.130725 | Negative result: even correct reload accounting is overturned by cost error. |
+| d12 reload underestimated 10% | 4 / 10.192569 | 0 / 9.587710 | 0 / 9.587710 | 0 / 9.587710 | The moderate error does not flip the corrected decision. |
+
+The factorized comparisons isolate the intended mechanisms without claiming statistical effects. d01--d03 and d09 show no externality; d04/d06 exercise full-bundle eviction; d05 shows base-sharing deduplication; d07/d08 make recovery itself unprofitable; and d10--d12 test estimator error. The actual state package varies from 2,175 to 2,215 bytes with instance identity, while every online rule uses the frozen 2,185-byte prior estimate. No method reads the realized package size before acting.
+
+## 6. Limitations
+
+The validation uses one process-local simulator, two RSUs, two model families, two-node workflows, a deterministic cache policy, and 12 constructed instances. It is semi-synthetic: object transitions are executed by the native cache and state machinery, but link time, deadlines, and several stress values are modeled. The technical workflow has no task-quality label. Same-host timing does not represent radio transfer, remote storage, packet loss, queuing, or competing compute.
+
+The cache persists only within one environment episode. We do not implement or evaluate cross-workflow shared scheduling, a shared bandwidth or compute queue, real wireless resource allocation, arbitrary multi-RSU placement, or full MARL. The offline reference has future-information access unavailable online. There are no independent mobility clusters, seeds representing cost uncertainty, confidence intervals, or formal/holdout results for this rule.
+
+Most importantly, the proposed rule is identical to correct two-step lookahead over the tested horizon and has no demonstrated computational advantage. Its two errors under d10/d11 show that improved structural accounting cannot replace calibrated uncertainty. A paper centered on algorithmic novelty would require a capability or evidence beyond this equivalence.
+
+## 7. Conclusion
+
+Recovery and rerun cannot always be compared using state bytes and recomputation alone. In the implemented typed-cache path, a legal recovery can evict model objects required by the next declared workflow node; shared bases determine whether the later reload is a full bundle or only an adapter. An explicit opt-in rule can account for this effect using only current state, the declared graph, a native legal victim preview, and ex-ante costs. In the frozen 12-instance validation, the rule corrects three structural misses of the original threshold and matches the offline reference in 10 cases, but it ties information-matched two-step lookahead exactly and fails in two estimation-error cases. The current evidence therefore supports a transparent implementation correction, not a general new scheduling algorithm or deployment claim.
 
 ## References
 
-- [R1] [Dual Dependency-Aware Collaborative Service Caching and Task Offloading in Vehicular Edge Computing](https://doi.org/10.1109/TMC.2025.3573379). IEEE TMC, 2025.
-- [R2] [SLoRA: Scalable Serving of Thousands of LoRA Adapters](https://proceedings.mlsys.org/paper_files/paper/2024/hash/906419cd502575b617cc489a1a696a67-Abstract-Conference.html). MLSys, 2024.
-- [R3] [Punica: Multi-Tenant LoRA Serving](https://proceedings.mlsys.org/paper_files/paper/2024/hash/054de805fcceb78a201f5e9d53c85908-Abstract-Conference.html). MLSys, 2024.
-- [R4] [POLAR: Online Learning for LoRA Adapter Caching and Routing in Edge LLM Serving](https://arxiv.org/abs/2604.16583). Preprint, 2026; publication status requires final verification.
-- [R5] [Mobility-Aware Assisted Deep Reinforcement Learning for Collaborative Task Migration and Resource Allocation in Vehicular Edge Computing](https://doi.org/10.1109/TVT.2026.3660321). IEEE TVT, 2026.
-- [R6] [AWTO: A latency-optimized task offloading scheme for LLM-driven agentic workflows on heterogeneous edge](https://doi.org/10.1016/j.future.2026.108415). FGCS, 2026.
-- [R7] [RUDDER: Return Decomposition for Delayed Rewards](https://papers.neurips.cc/paper_files/paper/2019/hash/16105fb9cc614fc29e1bda00dab60d41-Abstract.html). NeurIPS, 2019.
-- [R8] [The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games](https://proceedings.neurips.cc/paper_files/paper/2022/hash/9c1535a02f0ce079433344e14d910597-Abstract.html). NeurIPS Datasets and Benchmarks Track, 2022.
-- [R9] [WfCommons: A framework for enabling scientific workflow research and development](https://doi.org/10.1016/j.future.2021.09.043). FGCS, 128:16–27, 2022.
-- [R10] [Intelligent Cooperative Computation Offloading and Resource Allocation for Dual-Dependency Tasks in Edge Computing](https://doi.org/10.1109/TSC.2026.3709905). IEEE TSC, 19(4):2843–2856, 2026.
+[1] Y. Sheng et al., “SLoRA: Scalable Serving of Thousands of LoRA Adapters,” *MLSys*, 2024.
+[2] G. Chen et al., “Punica: Multi-Tenant LoRA Serving,” *MLSys*, 2024.
+[3] “POLAR: Online Learning for LoRA Adapter Caching and Routing in Edge LLM Serving,” arXiv:2604.16583, 2026; publication status not verified in this draft.
+[4] “Dual Dependency-Aware Collaborative Service Caching and Task Offloading in Vehicular Edge Computing,” *IEEE TMC*, 2025, doi:10.1109/TMC.2025.3573379.
+[5] R. Ferreira da Silva et al., “WfCommons: A Framework for Enabling Scientific Workflow Research and Development,” *FGCS*, vol. 128, pp. 16–27, 2022.
+[6] “AWTO: A Latency-Optimized Task Offloading Scheme for LLM-Driven Agentic Workflows on Heterogeneous Edge,” *FGCS*, 2026, doi:10.1016/j.future.2026.108415.
+[7] “Multi-Agent Deep Reinforcement Learning With Trajectory Prediction for Task Migration-Assisted Computation Offloading,” *IEEE TMC*, 2025, doi:10.1109/TMC.2025.3539945.
+[8] “Service Satisfaction-Aware Adaptive Service Migration and Resource Allocation in Vehicular Edge Computing,” *IEEE TMC*, 2026, doi:10.1109/TMC.2025.3596342.
 
----
+## Artifact and claim ledger (not manuscript body)
 
-## Editorial evidence map — not manuscript body
-
-- reviewed_at / literature_cutoff: 2026-09-28; target_venue: IEEE TMC; policy_version: tmc_review_policy_v3_20260621.
-- drafting_base: eaeb1e9; artifact_run_id: crdcm_performance_matrix_v2_20260928.
-- Evidence: numerical re-aggregation E3 within observed-data development; math audit cited E2, not independently rerun here; novelty UNVERIFIED; submission readiness Not ready. No paper-level score assigned.
-- Sections 1–3: candidate question and implemented abstraction; see `research_problem_and_evidence_plan_20260928.md` and `problem_literature_traceability_20260928.md`. Final physical/state equations must be cross-checked against the frozen implementation before submission.
-- Section 4: current decision contract plus corrected-update specification, not an implemented new algorithm. Source: `/Users/howen/.codex/worktrees/1aed/PPO_MEC/docs/project/hierarchical_credit_consistency_e0_20260928.md`, delivery commit `aacf95e8ab9dd202b13fac330e293a30482ee915`.
-- Section 5: prospective design, not completed experiments. No invented power, runtime upper bound or significance threshold.
-- Section 6 table: `artifacts/analysis/research_problem_evidence_20260928/failure_inclusive_cost_audit.json`; immutable source experiment commit `4dc5adb6f6e436983745a0cf485f5221ba4caf0a`.
-- Section 6 math counts: `/Users/howen/.codex/worktrees/1aed/PPO_MEC/artifacts/analysis/hierarchical_credit_consistency_e0_20260928/summary.json`.
-- Older formal results are a separate method/workload lineage: see `g14a01_formal_results_independent_review_20260921.md` and subsequent corrected statistics. Do not merge their 8,100 rows with this development matrix.
-- Do not claim first/unique, full vehicle-level MARL, a corrected controller's superiority, an enforced transfer budget, or a real deployed LoRA service.
-- Before submission: freeze the actual new mechanism/algorithm; complete matched evidence and independent evaluation; replace the abstract and contribution paragraph with supported findings; complete exact bibliography and full-text nearest-neighbor comparison.
-- Dataset candidate addition (2026-09-28): `vec_ai_workload_dataset_design_20260928.md`, P07/L09/L10/D01–D12. Status is design only; no release, measured calibration or new performance claim. Data contribution must pass its own validation independently of algorithm ranking.
+- [A1] `artifacts/analysis/eviction_aware_recovery_validation_20261005_v1/`: `all_method_results.json/csv`, `aggregate_summary.json`, `event_explanations.json`, `completion_receipt.json`, `frozen_protocol.json`, and `integrity_manifest.json`.
+- [A2] `configs/experiment/eviction_aware_recovery_v1.json` and `docs/project/eviction_aware_recovery_plan_20261005.md`: pre-result parameter, method, information, and claim freeze.
+- [A3] `artifacts/analysis/production_action4_independent_repeat_20261005_v1/` and `docs/project/workload_v0_1_self_consistency_audit_20261005.md`: three same-host paired technical runs.
+- [A4] `artifacts/analysis/mechanism_evidence_closure_20261005_v1/experiment_a_shared_cache_cost.json`: equal-completion native cache byte ledger.
+- Review identity: `reviewed_at=2026-10-05`; `literature_cutoff=2026-09-30`; `target_venue=IEEE TMC`; `artifact_run_id=eviction_aware_recovery_validation_20261005_v1`; `policy_version=tmc_review_policy_v3_20260621`; `git_commit=f5033c1b10f8c323f2247a09b1f5ab73a8621387`; `evidence_level=E2_ARTIFACT_AUDITED (bounded synthetic native transition only)`.
+- Safe claim: an object-deduplicated, legal-victim-plan-aware cost correction changes decisions on bounded native instances and exposes exact reload objects.
+- Prohibited claims: superiority to correct two-step lookahead, online optimality, statistical generalization, real wireless gain, cross-workflow sharing, shared resource queues, real task-quality benefit, full MARL, or TMC-ready status.

@@ -1,0 +1,156 @@
+{
+  "files": [
+    {
+      "path": "aggregate_summary.json",
+      "sha256": "1703b4f7a5a3541f65539985cef3dbd1eb5acc020825ffed7c7faaf483096251",
+      "size_bytes": 2714
+    },
+    {
+      "path": "all_method_results.csv",
+      "sha256": "0f1a1624e16ca3283d60b668600a0b73c2c6b8f57e91c08e845961c5ffae405c",
+      "size_bytes": 8578
+    },
+    {
+      "path": "all_method_results.json",
+      "sha256": "9388d5656ce48bc8e9cc1cd2ae62180eb0f2b1f3a6f0157315e0351eed7db0bb",
+      "size_bytes": 1861787
+    },
+    {
+      "path": "completion_receipt.json",
+      "sha256": "3761cf5585642505755f2d5ee568b99d90b9bfaced70dc39738fb2f8b7a1d034",
+      "size_bytes": 448
+    },
+    {
+      "path": "event_explanations.json",
+      "sha256": "35579bb0fcdadbf7bdc8da162efec4b7b427a43497c900cc689195cce4f854fd",
+      "size_bytes": 134725
+    },
+    {
+      "path": "frozen_protocol.json",
+      "sha256": "0db54b916936436f46ea64a33deb706708c8e4a4c7ecea3d8abe385f4cea0fa6",
+      "size_bytes": 11775
+    },
+    {
+      "path": "runtime_state_packages/d01_shared_base_ample_no_externality/first_action_4/shared_cache_recovery::d01_shared_base_ample_no_externality__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "625ada57c6d15df83d7e83139bc1e202bf081ecedc770a30018426e5cc27c6f9",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/d01_shared_base_ample_no_externality/first_action_4/shared_cache_recovery::d01_shared_base_ample_no_externality__veh_coupling_witness__step_000001/state.json",
+      "sha256": "74064785132f9faf059e5e89f5a9d9ba72c8b0b6d9b32f55a711afe614573a45",
+      "size_bytes": 1856
+    },
+    {
+      "path": "runtime_state_packages/d02_cross_family_tight_common_future_load/first_action_4/shared_cache_recovery::d02_cross_family_tight_common_future_load__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "b73df6cd241e6ee49df36e643e9b36c09ebf424f0be5e3204fb9b87e0e217d77",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/d02_cross_family_tight_common_future_load/first_action_4/shared_cache_recovery::d02_cross_family_tight_common_future_load__veh_coupling_witness__step_000001/state.json",
+      "sha256": "f7cd62db741813cfad3aaa9de14e8e0ee4c8aaee0f48faa5a029b525ebea970d",
+      "size_bytes": 1866
+    },
+    {
+      "path": "runtime_state_packages/d03_cross_family_exact_fit_common_future_load/first_action_4/shared_cache_recovery::d03_cross_family_exact_fit_common_future_load__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "bd1b5d6c61a3c2d24985739fa17916d09ab6f081b86b0c17510c98564de0f805",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/d03_cross_family_exact_fit_common_future_load/first_action_4/shared_cache_recovery::d03_cross_family_exact_fit_common_future_load__veh_coupling_witness__step_000001/state.json",
+      "sha256": "b9f1f885a39653a63ee14b850695d34031fe203418a29cff50232d3406571ea4",
+      "size_bytes": 1874
+    },
+    {
+      "path": "runtime_state_packages/d04_full_bundle_reload_b0_to_b1/first_action_4/shared_cache_recovery::d04_full_bundle_reload_b0_to_b1__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "0c4939413c53972da3b935c23e45f8cf9851115b7e7e910d60b81428f77c50d9",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/d04_full_bundle_reload_b0_to_b1/first_action_4/shared_cache_recovery::d04_full_bundle_reload_b0_to_b1__veh_coupling_witness__step_000001/state.json",
+      "sha256": "a72b2cef38f84d0a8350ac5ae779eb72a2299648ee786e467346156099d1a462",
+      "size_bytes": 1846
+    },
+    {
+      "path": "runtime_state_packages/d05_shared_base_adapter_only_reload/first_action_4/shared_cache_recovery::d05_shared_base_adapter_only_reload__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "43530dd7cb14651d1d278a9a8e19a84afb8e94c7231d7b9dff1f3f8fd8d08eea",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/d05_shared_base_adapter_only_reload/first_action_4/shared_cache_recovery::d05_shared_base_adapter_only_reload__veh_coupling_witness__step_000001/state.json",
+      "sha256": "26716ab5802f008b0a32f864fdb56ab9708b31966c0811aeed4d1b12d673c189",
+      "size_bytes": 1854
+    },
+    {
+      "path": "runtime_state_packages/d06_full_bundle_reload_b1_to_b0/first_action_4/shared_cache_recovery::d06_full_bundle_reload_b1_to_b0__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "ced8c33b963d1d1e01ddd0df32475e64c57956ba17031396d38e8b8cd4489569",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/d06_full_bundle_reload_b1_to_b0/first_action_4/shared_cache_recovery::d06_full_bundle_reload_b1_to_b0__veh_coupling_witness__step_000001/state.json",
+      "sha256": "fbfd2b3bff504f3c5672845c1383e619d47cde6050a2cdb3ffe9217dd56bc355",
+      "size_bytes": 1846
+    },
+    {
+      "path": "runtime_state_packages/d07_recovery_unprofitable_70mbps/first_action_4/shared_cache_recovery::d07_recovery_unprofitable_70mbps__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "0af5a92adfef6b4b999ba390defd5609c680f20d781f75ea72eb8d186a4c92f8",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/d07_recovery_unprofitable_70mbps/first_action_4/shared_cache_recovery::d07_recovery_unprofitable_70mbps__veh_coupling_witness__step_000001/state.json",
+      "sha256": "b0578b310651f961067fd8029f948f7a703ef3d803d57102589ce11e44521a3d",
+      "size_bytes": 1848
+    },
+    {
+      "path": "runtime_state_packages/d08_recovery_unprofitable_high_restore/first_action_4/shared_cache_recovery::d08_recovery_unprofitable_high_restore__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "0580bec6886ab816f91c7828a769b8e2a64d24350a4b52e6e311425d0239d172",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/d08_recovery_unprofitable_high_restore/first_action_4/shared_cache_recovery::d08_recovery_unprofitable_high_restore__veh_coupling_witness__step_000001/state.json",
+      "sha256": "f407f08a77579055c48fd40ac516a89c1693f37a281aea68d5120f018eb95994",
+      "size_bytes": 1860
+    },
+    {
+      "path": "runtime_state_packages/d09_both_models_ready_state_only/first_action_4/shared_cache_recovery::d09_both_models_ready_state_only__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "38ccfc605bf802537e9d38e646d166c36f0f73c6a5601ab8d04967eb56e5bfa5",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/d09_both_models_ready_state_only/first_action_4/shared_cache_recovery::d09_both_models_ready_state_only__veh_coupling_witness__step_000001/state.json",
+      "sha256": "13e3e7962151edd7bceccf130ab3935e54cf214b0fee2eb448b6f935f0dc48a0",
+      "size_bytes": 1848
+    },
+    {
+      "path": "runtime_state_packages/d10_recompute_estimate_half/first_action_4/shared_cache_recovery::d10_recompute_estimate_half__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "9731dd6e58a3d72b8671fa61244988cb45e868ca1574a83738391af0541f5a1d",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/d10_recompute_estimate_half/first_action_4/shared_cache_recovery::d10_recompute_estimate_half__veh_coupling_witness__step_000001/state.json",
+      "sha256": "e8b00d48f423e4232c7c15fffc359cedadfbf7c81a815d79f7ababefcf7cb7c6",
+      "size_bytes": 1838
+    },
+    {
+      "path": "runtime_state_packages/d11_recompute_estimate_double/first_action_4/shared_cache_recovery::d11_recompute_estimate_double__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "e231220a0108341f233b9a5b1b0d1c96f9b8ab435cde7da7dbb0250732a2d132",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/d11_recompute_estimate_double/first_action_4/shared_cache_recovery::d11_recompute_estimate_double__veh_coupling_witness__step_000001/state.json",
+      "sha256": "a2767b22ea748702fab368cf1f8da4f2ba737f17391714f9862d9154d49bf1cc",
+      "size_bytes": 1842
+    },
+    {
+      "path": "runtime_state_packages/d12_moderate_reload_underestimate_near_boundary/first_action_4/shared_cache_recovery::d12_moderate_reload_underestimate_near_boundary__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "c76677418937cf7eaa8439278c08af6154d4183db8cf4002ced4dd821bc49f20",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/d12_moderate_reload_underestimate_near_boundary/first_action_4/shared_cache_recovery::d12_moderate_reload_underestimate_near_boundary__veh_coupling_witness__step_000001/state.json",
+      "sha256": "a4d5938875601d42a355c54279d79f8160220ffa76e153b371c0e26e0c78dfab",
+      "size_bytes": 1878
+    }
+  ],
+  "hash_algorithm": "sha256",
+  "run_id": "eviction_aware_recovery_validation_20261005_v1"
+}

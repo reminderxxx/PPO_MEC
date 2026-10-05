@@ -5,6 +5,19 @@
 
 ﻿# Progress
 
+## 2026-10-05：驱逐代价感知恢复规则完成最小冻结验证与论文工作稿
+
+- 从 `1a999287…` 隔离基线冻结 12 个 synthetic validation instances；单次执行 24 条 native branch，
+  RL/model call/download/old holdout 均为 0，30/30 artifact 文件完整性复算通过。
+- 四方法全部完成 24/24 节点、deadline violation=0。原阈值/新规则/两步/离线参考总时间为
+  174.096793/156.103518/156.103518/144.675011 s；新规则和两步 12/12 完全一致，匹配离线参考 10/12，
+  原阈值为 7/12。
+- d04/d06 证明完整 bundle victim reload 可翻转选择；d05 的共享 base 只产生 8 MiB adapter reload。
+  d10/d11 因事前成本误差选错，负结果保留；不因结果调参。
+- 结论限于 object-deduplicated legal-victim-plan 成本修正/组合；不支持优于正确两步、在线最优、真实无线、
+  跨 workflow persistent cache、full MARL 或 paper-ready。报告和稿件见
+  `eviction_aware_recovery_results_20261005.md`、`system_mechanism_manuscript_working_draft.md`。
+
 ## 2026-10-05：workload v0.1 自证循环审查与最小独立复测完成
 
 - 源码确认 local 不读逐事件 cache/target-ready，却直接消费与执行模拟器相同的 `restore_cost` 真值；exact 的 8 组合在

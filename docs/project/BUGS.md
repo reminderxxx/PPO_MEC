@@ -5,6 +5,16 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-05：驱逐代价修正受估计误差和两步等价限制（OPEN SCIENTIFIC BLOCKER）
+
+- 新规则与同信息、正确计 victim cost 的两步前瞻在 12/12 点动作/成本完全相同，纯函数中位开销仅
+  `7.875` vs `7.896 µs`；当前没有算法或效率优势。
+- d10 将 recompute 低估 50% 时，新规则错误重跑并多 `2.300247 s`；d11 高估 2× 时错误恢复并多
+  `9.128260 s`。结构成本修正不能替代独立校准和 uncertainty/margin contract。
+- 12 点是 synthetic validation instances，不是独立现实数据；没有无线、共享链路/计算队列、跨 workflow cache
+  生命周期、任务质量或统计区间。aggregate 只能作 bounded diagnostic。
+- 当前 paper claim 只能是实现修正/组合；若投稿主张算法创新，缺少相对正确两步前瞻的新增能力或证据是 blocker。
+
 ## 2026-10-05：workload v0.1 原 local/exact 证据存在自证循环（FROZEN SCIENTIFIC DEFECT）
 
 - local 直接读取与执行模拟器相同的 low/high `restore_cost` 真值，不读取逐事件 cache 或 target-ready；exact 的动作不改变

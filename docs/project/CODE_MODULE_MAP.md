@@ -1,5 +1,13 @@
 # Code Module Map
 
+## Eviction-aware recovery bounded rule
+
+- `src/runtime/eviction_aware_recovery.py`：消费 detached decision inputs，按 object ID 去重并比较完整 rerun/recovery
+  增量；必要输入缺失或 victim 无法解释 reload 时 fail-conservative。无环境写入、未来 outcome 或 agent dependency。
+- `scripts/run_eviction_aware_recovery_validation.py`：只在实验边界调用现有 native sequential-LRU shadow planner，构造
+  read-only preview；执行 action 0/4 正常状态转移，输出四方法与逐事件证据。
+- `tests/test_eviction_aware_recovery.py`：纯规则与 native preview/action transition 的局部合同；不训练、不加载模型。
+
 ## Production action 4 与半合成 VEC workload v0.1
 
 - `src/runtime/workflow_suffix_recovery.py`：保留 v1 technical witness，新增通用 DAG boundary v2 seal/validate/read。

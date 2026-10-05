@@ -1,0 +1,4112 @@
+{
+  "instances": [
+    {
+      "classification": "no_eviction_externality",
+      "current_missing_objects": [
+        "adapter:b0.a0"
+      ],
+      "frozen_reason": "ample capacity; shared b0 base and declared next adapter remain resident",
+      "initial_residents": [
+        "base:b0",
+        "adapter:b0.a1"
+      ],
+      "instance_id": "d01_shared_base_ample_no_externality",
+      "legal_victim_ids": [],
+      "method_decisions": {
+        "eviction_aware_recovery": {
+          "avoided_future_load_object_ids": [],
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 8388608,
+          "current_prepare_object_ids": [
+            "adapter:b0.a0"
+          ],
+          "decision": "recover",
+          "formula": "recover iff J_recovery < J_rerun",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 0,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "eviction_aware_recovery",
+          "near_term_dependency_ids": [
+            "base:b0",
+            "adapter:b0.a1"
+          ],
+          "near_term_missing_after_ids": [],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 0.7174144400000001,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 4,
+          "state_transfer_seconds": 0.0201748
+        },
+        "offline_reference": {
+          "candidate_first_actions": [
+            0,
+            4
+          ],
+          "candidate_objective_keys": {
+            "0": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "4": [
+              -2,
+              0,
+              0.7774150800000001,
+              8390801,
+              0.0,
+              0,
+              4
+            ]
+          },
+          "decision": "recover",
+          "information_advantage": "selects after both complete native branches and realized modeled outcomes are available",
+          "method": "offline_reference",
+          "realized_future_used": true,
+          "selected_first_action": 4
+        },
+        "original_simple_threshold": {
+          "conservative_fallback": false,
+          "decision": "recover",
+          "excluded_model_prepare_reason": "preserved baseline treats target-model preparation as common to both paths",
+          "method": "original_simple_threshold",
+          "opt_in_enabled": false,
+          "recovery_incremental_seconds": 0.0263258,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 4
+        },
+        "two_step_lookahead": {
+          "avoided_future_load_object_ids": [],
+          "candidate_paths": {
+            "recover_then_declared_next": 0.7174144400000001,
+            "rerun_then_declared_next": 11.07072456
+          },
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 8388608,
+          "current_prepare_object_ids": [
+            "adapter:b0.a0"
+          ],
+          "decision": "recover",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 0,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "two_step_lookahead",
+          "near_term_dependency_ids": [
+            "base:b0",
+            "adapter:b0.a1"
+          ],
+          "near_term_missing_after_ids": [],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 0.7174144400000001,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 4,
+          "state_transfer_seconds": 0.0201748
+        }
+      },
+      "near_term_missing_after": [],
+      "near_term_missing_before": [],
+      "realized_branches": {
+        "0": {
+          "events": [
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 1,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "service_success": false,
+              "state_package_bytes": 0,
+              "step_index": 2,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 3,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              0,
+              0,
+              0
+            ],
+            "branch_id": "first_action_0",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 0,
+            "instance_id": "d01_shared_base_ample_no_externality",
+            "modeled_completion_seconds": 11.13072456,
+            "modeled_recompute_seconds": 11.035304,
+            "modeled_state_overhead_seconds": 0.0,
+            "modeled_transfer_seconds": 0.035420560000000004,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "service_failure_count": 1,
+            "simulator_step_count": 3,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 192757,
+            "transfer_bytes_by_type": {
+              "rerun_input": 192757
+            },
+            "wall_clock_network_measurement": false
+          }
+        },
+        "4": {
+          "events": [
+            {
+              "action_id": 4,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2193,
+              "step_index": 1,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2193,
+              "step_index": 2,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              4,
+              0
+            ],
+            "branch_id": "first_action_4",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 4,
+            "instance_id": "d01_shared_base_ample_no_externality",
+            "modeled_completion_seconds": 0.7774150800000001,
+            "modeled_recompute_seconds": 0.0,
+            "modeled_state_overhead_seconds": 0.006150999999999999,
+            "modeled_transfer_seconds": 0.7112640800000001,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              0.7774150800000001,
+              8390801,
+              0.0,
+              0,
+              4
+            ],
+            "service_failure_count": 0,
+            "simulator_step_count": 2,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 8390801,
+            "transfer_bytes_by_type": {
+              "adapter": 8388608,
+              "workflow_state": 2193
+            },
+            "wall_clock_network_measurement": false
+          }
+        }
+      }
+    },
+    {
+      "classification": "no_eviction_externality",
+      "current_missing_objects": [
+        "base:b0",
+        "adapter:b0.a0"
+      ],
+      "frozen_reason": "both paths must load b1 later; the future load is common and cancels",
+      "initial_residents": [],
+      "instance_id": "d02_cross_family_tight_common_future_load",
+      "legal_victim_ids": [],
+      "method_decisions": {
+        "eviction_aware_recovery": {
+          "avoided_future_load_object_ids": [],
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 109051904,
+          "current_prepare_object_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "decision": "recover",
+          "formula": "recover iff J_recovery < J_rerun",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 142606336,
+          "future_prepare_before_bytes": 142606336,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "eviction_aware_recovery",
+          "near_term_dependency_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_before_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 20.198984999999997,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 22.49923144,
+          "selected_first_action": 4,
+          "state_transfer_seconds": 0.0201748
+        },
+        "offline_reference": {
+          "candidate_first_actions": [
+            0,
+            4
+          ],
+          "candidate_objective_keys": {
+            "0": [
+              -2,
+              0,
+              22.559231439999998,
+              142799093,
+              11.035304,
+              1,
+              0
+            ],
+            "4": [
+              -2,
+              0,
+              20.258986439999997,
+              251660443,
+              0.0,
+              0,
+              4
+            ]
+          },
+          "decision": "recover",
+          "information_advantage": "selects after both complete native branches and realized modeled outcomes are available",
+          "method": "offline_reference",
+          "realized_future_used": true,
+          "selected_first_action": 4
+        },
+        "original_simple_threshold": {
+          "conservative_fallback": false,
+          "decision": "recover",
+          "excluded_model_prepare_reason": "preserved baseline treats target-model preparation as common to both paths",
+          "method": "original_simple_threshold",
+          "opt_in_enabled": false,
+          "recovery_incremental_seconds": 0.0263258,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 4
+        },
+        "two_step_lookahead": {
+          "avoided_future_load_object_ids": [],
+          "candidate_paths": {
+            "recover_then_declared_next": 20.198984999999997,
+            "rerun_then_declared_next": 22.49923144
+          },
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 109051904,
+          "current_prepare_object_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "decision": "recover",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 142606336,
+          "future_prepare_before_bytes": 142606336,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "two_step_lookahead",
+          "near_term_dependency_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_before_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 20.198984999999997,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 22.49923144,
+          "selected_first_action": 4,
+          "state_transfer_seconds": 0.0201748
+        }
+      },
+      "near_term_missing_after": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "near_term_missing_before": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "realized_branches": {
+        "0": {
+          "events": [
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [],
+              "pre_target_residents": [],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 1,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [],
+              "service_success": false,
+              "state_package_bytes": 0,
+              "step_index": 2,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 134217728
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 3,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              0,
+              0,
+              0
+            ],
+            "branch_id": "first_action_0",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 0,
+            "instance_id": "d02_cross_family_tight_common_future_load",
+            "modeled_completion_seconds": 22.559231439999998,
+            "modeled_recompute_seconds": 11.035304,
+            "modeled_state_overhead_seconds": 0.0,
+            "modeled_transfer_seconds": 11.463927439999999,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              22.559231439999998,
+              142799093,
+              11.035304,
+              1,
+              0
+            ],
+            "service_failure_count": 1,
+            "simulator_step_count": 3,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 142799093,
+            "transfer_bytes_by_type": {
+              "adapter": 8388608,
+              "base_model": 134217728,
+              "rerun_input": 192757
+            },
+            "wall_clock_network_measurement": false
+          }
+        },
+        "4": {
+          "events": [
+            {
+              "action_id": 4,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [],
+              "service_success": true,
+              "state_package_bytes": 2203,
+              "step_index": 1,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 100663296
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [
+                "adapter:b0.a0",
+                "base:b0"
+              ],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2203,
+              "step_index": 2,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 134217728
+              }
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              4,
+              0
+            ],
+            "branch_id": "first_action_4",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 4,
+            "instance_id": "d02_cross_family_tight_common_future_load",
+            "modeled_completion_seconds": 20.258986439999997,
+            "modeled_recompute_seconds": 0.0,
+            "modeled_state_overhead_seconds": 0.006150999999999999,
+            "modeled_transfer_seconds": 20.19283544,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              20.258986439999997,
+              251660443,
+              0.0,
+              0,
+              4
+            ],
+            "service_failure_count": 0,
+            "simulator_step_count": 2,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 251660443,
+            "transfer_bytes_by_type": {
+              "adapter": 16777216,
+              "base_model": 234881024,
+              "workflow_state": 2203
+            },
+            "wall_clock_network_measurement": false
+          }
+        }
+      }
+    },
+    {
+      "classification": "no_eviction_externality",
+      "current_missing_objects": [
+        "base:b0",
+        "adapter:b0.a0"
+      ],
+      "frozen_reason": "104 MiB b0 and 136 MiB b1 exactly fit; no victim is required",
+      "initial_residents": [],
+      "instance_id": "d03_cross_family_exact_fit_common_future_load",
+      "legal_victim_ids": [],
+      "method_decisions": {
+        "eviction_aware_recovery": {
+          "avoided_future_load_object_ids": [],
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 109051904,
+          "current_prepare_object_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "decision": "recover",
+          "formula": "recover iff J_recovery < J_rerun",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 142606336,
+          "future_prepare_before_bytes": 142606336,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "eviction_aware_recovery",
+          "near_term_dependency_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_before_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 20.198984999999997,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 22.49923144,
+          "selected_first_action": 4,
+          "state_transfer_seconds": 0.0201748
+        },
+        "offline_reference": {
+          "candidate_first_actions": [
+            0,
+            4
+          ],
+          "candidate_objective_keys": {
+            "0": [
+              -2,
+              0,
+              22.559231439999998,
+              142799093,
+              11.035304,
+              1,
+              0
+            ],
+            "4": [
+              -2,
+              0,
+              20.258987079999997,
+              251660451,
+              0.0,
+              0,
+              4
+            ]
+          },
+          "decision": "recover",
+          "information_advantage": "selects after both complete native branches and realized modeled outcomes are available",
+          "method": "offline_reference",
+          "realized_future_used": true,
+          "selected_first_action": 4
+        },
+        "original_simple_threshold": {
+          "conservative_fallback": false,
+          "decision": "recover",
+          "excluded_model_prepare_reason": "preserved baseline treats target-model preparation as common to both paths",
+          "method": "original_simple_threshold",
+          "opt_in_enabled": false,
+          "recovery_incremental_seconds": 0.0263258,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 4
+        },
+        "two_step_lookahead": {
+          "avoided_future_load_object_ids": [],
+          "candidate_paths": {
+            "recover_then_declared_next": 20.198984999999997,
+            "rerun_then_declared_next": 22.49923144
+          },
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 109051904,
+          "current_prepare_object_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "decision": "recover",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 142606336,
+          "future_prepare_before_bytes": 142606336,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "two_step_lookahead",
+          "near_term_dependency_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_before_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 20.198984999999997,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 22.49923144,
+          "selected_first_action": 4,
+          "state_transfer_seconds": 0.0201748
+        }
+      },
+      "near_term_missing_after": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "near_term_missing_before": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "realized_branches": {
+        "0": {
+          "events": [
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [],
+              "pre_target_residents": [],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 1,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [],
+              "service_success": false,
+              "state_package_bytes": 0,
+              "step_index": 2,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 134217728
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 3,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              0,
+              0,
+              0
+            ],
+            "branch_id": "first_action_0",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 0,
+            "instance_id": "d03_cross_family_exact_fit_common_future_load",
+            "modeled_completion_seconds": 22.559231439999998,
+            "modeled_recompute_seconds": 11.035304,
+            "modeled_state_overhead_seconds": 0.0,
+            "modeled_transfer_seconds": 11.463927439999999,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              22.559231439999998,
+              142799093,
+              11.035304,
+              1,
+              0
+            ],
+            "service_failure_count": 1,
+            "simulator_step_count": 3,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 142799093,
+            "transfer_bytes_by_type": {
+              "adapter": 8388608,
+              "base_model": 134217728,
+              "rerun_input": 192757
+            },
+            "wall_clock_network_measurement": false
+          }
+        },
+        "4": {
+          "events": [
+            {
+              "action_id": 4,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [],
+              "service_success": true,
+              "state_package_bytes": 2211,
+              "step_index": 1,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 100663296
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0",
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2211,
+              "step_index": 2,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 134217728
+              }
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              4,
+              0
+            ],
+            "branch_id": "first_action_4",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 4,
+            "instance_id": "d03_cross_family_exact_fit_common_future_load",
+            "modeled_completion_seconds": 20.258987079999997,
+            "modeled_recompute_seconds": 0.0,
+            "modeled_state_overhead_seconds": 0.006150999999999999,
+            "modeled_transfer_seconds": 20.19283608,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              20.258987079999997,
+              251660451,
+              0.0,
+              0,
+              4
+            ],
+            "service_failure_count": 0,
+            "simulator_step_count": 2,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 251660451,
+            "transfer_bytes_by_type": {
+              "adapter": 16777216,
+              "base_model": 234881024,
+              "workflow_state": 2211
+            },
+            "wall_clock_network_measurement": false
+          }
+        }
+      }
+    },
+    {
+      "classification": "recovery_causes_future_reload",
+      "current_missing_objects": [
+        "base:b0",
+        "adapter:b0.a0"
+      ],
+      "frozen_reason": "preparing b0 legally evicts the resident b1 base and adapter needed next",
+      "initial_residents": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "instance_id": "d04_full_bundle_reload_b0_to_b1",
+      "legal_victim_ids": [
+        "adapter:b1.a0",
+        "base:b1"
+      ],
+      "method_decisions": {
+        "eviction_aware_recovery": {
+          "avoided_future_load_object_ids": [],
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 109051904,
+          "current_prepare_object_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "decision": "rerun",
+          "formula": "recover iff J_recovery < J_rerun",
+          "future_model_cost_delta_seconds": 11.428506879999999,
+          "future_prepare_after_bytes": 142606336,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 142606336,
+          "induced_reload_object_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "induced_reload_seconds_unscaled": 11.428506879999999,
+          "legal_victim_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "method": "eviction_aware_recovery",
+          "near_term_dependency_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 20.198984999999997,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 0,
+          "state_transfer_seconds": 0.0201748
+        },
+        "offline_reference": {
+          "candidate_first_actions": [
+            0,
+            4
+          ],
+          "candidate_objective_keys": {
+            "0": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "4": [
+              -2,
+              0,
+              20.258984839999997,
+              251660423,
+              0.0,
+              0,
+              4
+            ]
+          },
+          "decision": "rerun",
+          "information_advantage": "selects after both complete native branches and realized modeled outcomes are available",
+          "method": "offline_reference",
+          "realized_future_used": true,
+          "selected_first_action": 0
+        },
+        "original_simple_threshold": {
+          "conservative_fallback": false,
+          "decision": "recover",
+          "excluded_model_prepare_reason": "preserved baseline treats target-model preparation as common to both paths",
+          "method": "original_simple_threshold",
+          "opt_in_enabled": false,
+          "recovery_incremental_seconds": 0.0263258,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 4
+        },
+        "two_step_lookahead": {
+          "avoided_future_load_object_ids": [],
+          "candidate_paths": {
+            "recover_then_declared_next": 20.198984999999997,
+            "rerun_then_declared_next": 11.07072456
+          },
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 109051904,
+          "current_prepare_object_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "decision": "rerun",
+          "future_model_cost_delta_seconds": 11.428506879999999,
+          "future_prepare_after_bytes": 142606336,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 142606336,
+          "induced_reload_object_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "induced_reload_seconds_unscaled": 11.428506879999999,
+          "legal_victim_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "method": "two_step_lookahead",
+          "near_term_dependency_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 20.198984999999997,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 0,
+          "state_transfer_seconds": 0.0201748
+        }
+      },
+      "near_term_missing_after": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "near_term_missing_before": [],
+      "realized_branches": {
+        "0": {
+          "events": [
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 1,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": false,
+              "state_package_bytes": 0,
+              "step_index": 2,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 3,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              0,
+              0,
+              0
+            ],
+            "branch_id": "first_action_0",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 0,
+            "instance_id": "d04_full_bundle_reload_b0_to_b1",
+            "modeled_completion_seconds": 11.13072456,
+            "modeled_recompute_seconds": 11.035304,
+            "modeled_state_overhead_seconds": 0.0,
+            "modeled_transfer_seconds": 0.035420560000000004,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "service_failure_count": 1,
+            "simulator_step_count": 3,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 192757,
+            "transfer_bytes_by_type": {
+              "rerun_input": 192757
+            },
+            "wall_clock_network_measurement": false
+          }
+        },
+        "4": {
+          "events": [
+            {
+              "action_id": 4,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [
+                "adapter:b1.a0",
+                "base:b1"
+              ],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2183,
+              "step_index": 1,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 100663296
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [
+                "adapter:b0.a0",
+                "base:b0"
+              ],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2183,
+              "step_index": 2,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 134217728
+              }
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              4,
+              0
+            ],
+            "branch_id": "first_action_4",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 4,
+            "instance_id": "d04_full_bundle_reload_b0_to_b1",
+            "modeled_completion_seconds": 20.258984839999997,
+            "modeled_recompute_seconds": 0.0,
+            "modeled_state_overhead_seconds": 0.006150999999999999,
+            "modeled_transfer_seconds": 20.19283384,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              20.258984839999997,
+              251660423,
+              0.0,
+              0,
+              4
+            ],
+            "service_failure_count": 0,
+            "simulator_step_count": 2,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 251660423,
+            "transfer_bytes_by_type": {
+              "adapter": 16777216,
+              "base_model": 234881024,
+              "workflow_state": 2183
+            },
+            "wall_clock_network_measurement": false
+          }
+        }
+      }
+    },
+    {
+      "classification": "shared_base_changes_reload_cost",
+      "current_missing_objects": [
+        "adapter:b0.a0"
+      ],
+      "frozen_reason": "the shared b0 base is protected; only the 8 MiB next adapter is evicted and reloaded",
+      "initial_residents": [
+        "base:b0",
+        "adapter:b0.a1"
+      ],
+      "instance_id": "d05_shared_base_adapter_only_reload",
+      "legal_victim_ids": [
+        "adapter:b0.a1"
+      ],
+      "method_decisions": {
+        "eviction_aware_recovery": {
+          "avoided_future_load_object_ids": [],
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 8388608,
+          "current_prepare_object_ids": [
+            "adapter:b0.a0"
+          ],
+          "decision": "recover",
+          "formula": "recover iff J_recovery < J_rerun",
+          "future_model_cost_delta_seconds": 0.69108864,
+          "future_prepare_after_bytes": 8388608,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 8388608,
+          "induced_reload_object_ids": [
+            "adapter:b0.a1"
+          ],
+          "induced_reload_seconds_unscaled": 0.69108864,
+          "legal_victim_ids": [
+            "adapter:b0.a1"
+          ],
+          "method": "eviction_aware_recovery",
+          "near_term_dependency_ids": [
+            "base:b0",
+            "adapter:b0.a1"
+          ],
+          "near_term_missing_after_ids": [
+            "adapter:b0.a1"
+          ],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 1.40850308,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 4,
+          "state_transfer_seconds": 0.0201748
+        },
+        "offline_reference": {
+          "candidate_first_actions": [
+            0,
+            4
+          ],
+          "candidate_objective_keys": {
+            "0": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "4": [
+              -2,
+              0,
+              1.46850356,
+              16779407,
+              0.0,
+              0,
+              4
+            ]
+          },
+          "decision": "recover",
+          "information_advantage": "selects after both complete native branches and realized modeled outcomes are available",
+          "method": "offline_reference",
+          "realized_future_used": true,
+          "selected_first_action": 4
+        },
+        "original_simple_threshold": {
+          "conservative_fallback": false,
+          "decision": "recover",
+          "excluded_model_prepare_reason": "preserved baseline treats target-model preparation as common to both paths",
+          "method": "original_simple_threshold",
+          "opt_in_enabled": false,
+          "recovery_incremental_seconds": 0.0263258,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 4
+        },
+        "two_step_lookahead": {
+          "avoided_future_load_object_ids": [],
+          "candidate_paths": {
+            "recover_then_declared_next": 1.40850308,
+            "rerun_then_declared_next": 11.07072456
+          },
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 8388608,
+          "current_prepare_object_ids": [
+            "adapter:b0.a0"
+          ],
+          "decision": "recover",
+          "future_model_cost_delta_seconds": 0.69108864,
+          "future_prepare_after_bytes": 8388608,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 8388608,
+          "induced_reload_object_ids": [
+            "adapter:b0.a1"
+          ],
+          "induced_reload_seconds_unscaled": 0.69108864,
+          "legal_victim_ids": [
+            "adapter:b0.a1"
+          ],
+          "method": "two_step_lookahead",
+          "near_term_dependency_ids": [
+            "base:b0",
+            "adapter:b0.a1"
+          ],
+          "near_term_missing_after_ids": [
+            "adapter:b0.a1"
+          ],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 1.40850308,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 4,
+          "state_transfer_seconds": 0.0201748
+        }
+      },
+      "near_term_missing_after": [
+        "adapter:b0.a1"
+      ],
+      "near_term_missing_before": [],
+      "realized_branches": {
+        "0": {
+          "events": [
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 1,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "service_success": false,
+              "state_package_bytes": 0,
+              "step_index": 2,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 3,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              0,
+              0,
+              0
+            ],
+            "branch_id": "first_action_0",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 0,
+            "instance_id": "d05_shared_base_adapter_only_reload",
+            "modeled_completion_seconds": 11.13072456,
+            "modeled_recompute_seconds": 11.035304,
+            "modeled_state_overhead_seconds": 0.0,
+            "modeled_transfer_seconds": 0.035420560000000004,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "service_failure_count": 1,
+            "simulator_step_count": 3,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 192757,
+            "transfer_bytes_by_type": {
+              "rerun_input": 192757
+            },
+            "wall_clock_network_measurement": false
+          }
+        },
+        "4": {
+          "events": [
+            {
+              "action_id": 4,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [
+                "adapter:b0.a1"
+              ],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2191,
+              "step_index": 1,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [
+                "adapter:b0.a0"
+              ],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2191,
+              "step_index": 2,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608
+              }
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              4,
+              0
+            ],
+            "branch_id": "first_action_4",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 4,
+            "instance_id": "d05_shared_base_adapter_only_reload",
+            "modeled_completion_seconds": 1.46850356,
+            "modeled_recompute_seconds": 0.0,
+            "modeled_state_overhead_seconds": 0.006150999999999999,
+            "modeled_transfer_seconds": 1.40235256,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              1.46850356,
+              16779407,
+              0.0,
+              0,
+              4
+            ],
+            "service_failure_count": 0,
+            "simulator_step_count": 2,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 16779407,
+            "transfer_bytes_by_type": {
+              "adapter": 16777216,
+              "workflow_state": 2191
+            },
+            "wall_clock_network_measurement": false
+          }
+        }
+      }
+    },
+    {
+      "classification": "recovery_causes_future_reload",
+      "current_missing_objects": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "frozen_reason": "reverse family order checks that object identity, not a hard-coded family, drives reload accounting",
+      "initial_residents": [
+        "base:b0",
+        "adapter:b0.a0"
+      ],
+      "instance_id": "d06_full_bundle_reload_b1_to_b0",
+      "legal_victim_ids": [
+        "adapter:b0.a0",
+        "base:b0"
+      ],
+      "method_decisions": {
+        "eviction_aware_recovery": {
+          "avoided_future_load_object_ids": [],
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 142606336,
+          "current_prepare_object_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "decision": "rerun",
+          "formula": "recover iff J_recovery < J_rerun",
+          "future_model_cost_delta_seconds": 8.74415232,
+          "future_prepare_after_bytes": 109051904,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 109051904,
+          "induced_reload_object_ids": [
+            "adapter:b0.a0",
+            "base:b0"
+          ],
+          "induced_reload_seconds_unscaled": 8.74415232,
+          "legal_victim_ids": [
+            "adapter:b0.a0",
+            "base:b0"
+          ],
+          "method": "eviction_aware_recovery",
+          "near_term_dependency_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 20.198984999999997,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 0,
+          "state_transfer_seconds": 0.0201748
+        },
+        "offline_reference": {
+          "candidate_first_actions": [
+            0,
+            4
+          ],
+          "candidate_objective_keys": {
+            "0": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "4": [
+              -2,
+              0,
+              20.258984839999997,
+              251660423,
+              0.0,
+              0,
+              4
+            ]
+          },
+          "decision": "rerun",
+          "information_advantage": "selects after both complete native branches and realized modeled outcomes are available",
+          "method": "offline_reference",
+          "realized_future_used": true,
+          "selected_first_action": 0
+        },
+        "original_simple_threshold": {
+          "conservative_fallback": false,
+          "decision": "recover",
+          "excluded_model_prepare_reason": "preserved baseline treats target-model preparation as common to both paths",
+          "method": "original_simple_threshold",
+          "opt_in_enabled": false,
+          "recovery_incremental_seconds": 0.0263258,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 4
+        },
+        "two_step_lookahead": {
+          "avoided_future_load_object_ids": [],
+          "candidate_paths": {
+            "recover_then_declared_next": 20.198984999999997,
+            "rerun_then_declared_next": 11.07072456
+          },
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 142606336,
+          "current_prepare_object_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "decision": "rerun",
+          "future_model_cost_delta_seconds": 8.74415232,
+          "future_prepare_after_bytes": 109051904,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 109051904,
+          "induced_reload_object_ids": [
+            "adapter:b0.a0",
+            "base:b0"
+          ],
+          "induced_reload_seconds_unscaled": 8.74415232,
+          "legal_victim_ids": [
+            "adapter:b0.a0",
+            "base:b0"
+          ],
+          "method": "two_step_lookahead",
+          "near_term_dependency_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 20.198984999999997,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 0,
+          "state_transfer_seconds": 0.0201748
+        }
+      },
+      "near_term_missing_after": [
+        "base:b0",
+        "adapter:b0.a0"
+      ],
+      "near_term_missing_before": [],
+      "realized_branches": {
+        "0": {
+          "events": [
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 1,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": false,
+              "state_package_bytes": 0,
+              "step_index": 2,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 3,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              0,
+              0,
+              0
+            ],
+            "branch_id": "first_action_0",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 0,
+            "instance_id": "d06_full_bundle_reload_b1_to_b0",
+            "modeled_completion_seconds": 11.13072456,
+            "modeled_recompute_seconds": 11.035304,
+            "modeled_state_overhead_seconds": 0.0,
+            "modeled_transfer_seconds": 0.035420560000000004,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "service_failure_count": 1,
+            "simulator_step_count": 3,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 192757,
+            "transfer_bytes_by_type": {
+              "rerun_input": 192757
+            },
+            "wall_clock_network_measurement": false
+          }
+        },
+        "4": {
+          "events": [
+            {
+              "action_id": 4,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [
+                "adapter:b0.a0",
+                "base:b0"
+              ],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2183,
+              "step_index": 1,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 134217728
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [
+                "adapter:b1.a0",
+                "base:b1"
+              ],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2183,
+              "step_index": 2,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 100663296
+              }
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              4,
+              0
+            ],
+            "branch_id": "first_action_4",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 4,
+            "instance_id": "d06_full_bundle_reload_b1_to_b0",
+            "modeled_completion_seconds": 20.258984839999997,
+            "modeled_recompute_seconds": 0.0,
+            "modeled_state_overhead_seconds": 0.006150999999999999,
+            "modeled_transfer_seconds": 20.19283384,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              20.258984839999997,
+              251660423,
+              0.0,
+              0,
+              4
+            ],
+            "service_failure_count": 0,
+            "simulator_step_count": 2,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 251660423,
+            "transfer_bytes_by_type": {
+              "adapter": 16777216,
+              "base_model": 234881024,
+              "workflow_state": 2183
+            },
+            "wall_clock_network_measurement": false
+          }
+        }
+      }
+    },
+    {
+      "classification": "recovery_itself_unprofitable",
+      "current_missing_objects": [
+        "base:b0",
+        "adapter:b0.a0"
+      ],
+      "frozen_reason": "70 Mbps is inside the existing 50/100/200 Mbps sensitivity range; current model preparation can exceed rerun cost even without eviction externality",
+      "initial_residents": [],
+      "instance_id": "d07_recovery_unprofitable_70mbps",
+      "legal_victim_ids": [],
+      "method_decisions": {
+        "eviction_aware_recovery": {
+          "avoided_future_load_object_ids": [],
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 109051904,
+          "current_prepare_object_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "decision": "rerun",
+          "formula": "recover iff J_recovery < J_rerun",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 142606336,
+          "future_prepare_before_bytes": 142606336,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "eviction_aware_recovery",
+          "near_term_dependency_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_before_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 28.827342428571427,
+          "rerun_input_transfer_seconds": 0.042029371428571424,
+          "restart_incremental_seconds": 27.395200342857144,
+          "selected_first_action": 0,
+          "state_transfer_seconds": 0.020249714285714288
+        },
+        "offline_reference": {
+          "candidate_first_actions": [
+            0,
+            4
+          ],
+          "candidate_objective_keys": {
+            "0": [
+              -2,
+              0,
+              27.45520034285714,
+              142799093,
+              11.035304,
+              1,
+              0
+            ],
+            "4": [
+              -2,
+              0,
+              28.887342428571426,
+              251660425,
+              0.0,
+              0,
+              4
+            ]
+          },
+          "decision": "rerun",
+          "information_advantage": "selects after both complete native branches and realized modeled outcomes are available",
+          "method": "offline_reference",
+          "realized_future_used": true,
+          "selected_first_action": 0
+        },
+        "original_simple_threshold": {
+          "conservative_fallback": false,
+          "decision": "recover",
+          "excluded_model_prepare_reason": "preserved baseline treats target-model preparation as common to both paths",
+          "method": "original_simple_threshold",
+          "opt_in_enabled": false,
+          "recovery_incremental_seconds": 0.026400714285714288,
+          "restart_incremental_seconds": 11.07733337142857,
+          "selected_first_action": 4
+        },
+        "two_step_lookahead": {
+          "avoided_future_load_object_ids": [],
+          "candidate_paths": {
+            "recover_then_declared_next": 28.827342428571427,
+            "rerun_then_declared_next": 27.395200342857144
+          },
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 109051904,
+          "current_prepare_object_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "decision": "rerun",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 142606336,
+          "future_prepare_before_bytes": 142606336,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "two_step_lookahead",
+          "near_term_dependency_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_before_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 28.827342428571427,
+          "rerun_input_transfer_seconds": 0.042029371428571424,
+          "restart_incremental_seconds": 27.395200342857144,
+          "selected_first_action": 0,
+          "state_transfer_seconds": 0.020249714285714288
+        }
+      },
+      "near_term_missing_after": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "near_term_missing_before": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "realized_branches": {
+        "0": {
+          "events": [
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [],
+              "pre_target_residents": [],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 1,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [],
+              "service_success": false,
+              "state_package_bytes": 0,
+              "step_index": 2,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 134217728
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 3,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              0,
+              0,
+              0
+            ],
+            "branch_id": "first_action_0",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 0,
+            "instance_id": "d07_recovery_unprofitable_70mbps",
+            "modeled_completion_seconds": 27.45520034285714,
+            "modeled_recompute_seconds": 11.035304,
+            "modeled_state_overhead_seconds": 0.0,
+            "modeled_transfer_seconds": 16.35989634285714,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              27.45520034285714,
+              142799093,
+              11.035304,
+              1,
+              0
+            ],
+            "service_failure_count": 1,
+            "simulator_step_count": 3,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 142799093,
+            "transfer_bytes_by_type": {
+              "adapter": 8388608,
+              "base_model": 134217728,
+              "rerun_input": 192757
+            },
+            "wall_clock_network_measurement": false
+          }
+        },
+        "4": {
+          "events": [
+            {
+              "action_id": 4,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [],
+              "service_success": true,
+              "state_package_bytes": 2185,
+              "step_index": 1,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 100663296
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0",
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2185,
+              "step_index": 2,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 134217728
+              }
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              4,
+              0
+            ],
+            "branch_id": "first_action_4",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 4,
+            "instance_id": "d07_recovery_unprofitable_70mbps",
+            "modeled_completion_seconds": 28.887342428571426,
+            "modeled_recompute_seconds": 0.0,
+            "modeled_state_overhead_seconds": 0.006150999999999999,
+            "modeled_transfer_seconds": 28.821191428571428,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              28.887342428571426,
+              251660425,
+              0.0,
+              0,
+              4
+            ],
+            "service_failure_count": 0,
+            "simulator_step_count": 2,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 251660425,
+            "transfer_bytes_by_type": {
+              "adapter": 16777216,
+              "base_model": 234881024,
+              "workflow_state": 2185
+            },
+            "wall_clock_network_measurement": false
+          }
+        }
+      }
+    },
+    {
+      "classification": "recovery_itself_unprofitable",
+      "current_missing_objects": [
+        "adapter:b0.a0"
+      ],
+      "frozen_reason": "14 s is the already-registered synthetic high-restore stress above measured prefix recomputation",
+      "initial_residents": [
+        "base:b0",
+        "adapter:b0.a1"
+      ],
+      "instance_id": "d08_recovery_unprofitable_high_restore",
+      "legal_victim_ids": [],
+      "method_decisions": {
+        "eviction_aware_recovery": {
+          "avoided_future_load_object_ids": [],
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 8388608,
+          "current_prepare_object_ids": [
+            "adapter:b0.a0"
+          ],
+          "decision": "rerun",
+          "formula": "recover iff J_recovery < J_rerun",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 0,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "eviction_aware_recovery",
+          "near_term_dependency_ids": [
+            "base:b0",
+            "adapter:b0.a1"
+          ],
+          "near_term_missing_after_ids": [],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 14.71126344,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 0,
+          "state_transfer_seconds": 0.0201748
+        },
+        "offline_reference": {
+          "candidate_first_actions": [
+            0,
+            4
+          ],
+          "candidate_objective_keys": {
+            "0": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "4": [
+              -2,
+              0,
+              14.7712644,
+              8390805,
+              0.0,
+              0,
+              4
+            ]
+          },
+          "decision": "rerun",
+          "information_advantage": "selects after both complete native branches and realized modeled outcomes are available",
+          "method": "offline_reference",
+          "realized_future_used": true,
+          "selected_first_action": 0
+        },
+        "original_simple_threshold": {
+          "conservative_fallback": false,
+          "decision": "rerun",
+          "excluded_model_prepare_reason": "preserved baseline treats target-model preparation as common to both paths",
+          "method": "original_simple_threshold",
+          "opt_in_enabled": false,
+          "recovery_incremental_seconds": 14.0201748,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 0
+        },
+        "two_step_lookahead": {
+          "avoided_future_load_object_ids": [],
+          "candidate_paths": {
+            "recover_then_declared_next": 14.71126344,
+            "rerun_then_declared_next": 11.07072456
+          },
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 8388608,
+          "current_prepare_object_ids": [
+            "adapter:b0.a0"
+          ],
+          "decision": "rerun",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 0,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "two_step_lookahead",
+          "near_term_dependency_ids": [
+            "base:b0",
+            "adapter:b0.a1"
+          ],
+          "near_term_missing_after_ids": [],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 14.71126344,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 0,
+          "state_transfer_seconds": 0.0201748
+        }
+      },
+      "near_term_missing_after": [],
+      "near_term_missing_before": [],
+      "realized_branches": {
+        "0": {
+          "events": [
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 1,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "service_success": false,
+              "state_package_bytes": 0,
+              "step_index": 2,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 3,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              0,
+              0,
+              0
+            ],
+            "branch_id": "first_action_0",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 0,
+            "instance_id": "d08_recovery_unprofitable_high_restore",
+            "modeled_completion_seconds": 11.13072456,
+            "modeled_recompute_seconds": 11.035304,
+            "modeled_state_overhead_seconds": 0.0,
+            "modeled_transfer_seconds": 0.035420560000000004,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "service_failure_count": 1,
+            "simulator_step_count": 3,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 192757,
+            "transfer_bytes_by_type": {
+              "rerun_input": 192757
+            },
+            "wall_clock_network_measurement": false
+          }
+        },
+        "4": {
+          "events": [
+            {
+              "action_id": 4,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2197,
+              "step_index": 1,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a1",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a1",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2197,
+              "step_index": 2,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              4,
+              0
+            ],
+            "branch_id": "first_action_4",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 4,
+            "instance_id": "d08_recovery_unprofitable_high_restore",
+            "modeled_completion_seconds": 14.7712644,
+            "modeled_recompute_seconds": 0.0,
+            "modeled_state_overhead_seconds": 14.0,
+            "modeled_transfer_seconds": 0.7112644,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              14.7712644,
+              8390805,
+              0.0,
+              0,
+              4
+            ],
+            "service_failure_count": 0,
+            "simulator_step_count": 2,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 8390805,
+            "transfer_bytes_by_type": {
+              "adapter": 8388608,
+              "workflow_state": 2197
+            },
+            "wall_clock_network_measurement": false
+          }
+        }
+      }
+    },
+    {
+      "classification": "no_eviction_externality",
+      "current_missing_objects": [],
+      "frozen_reason": "both declared adapters share one resident base; recovery adds only state transfer and no cache mutation",
+      "initial_residents": [
+        "base:b0",
+        "adapter:b0.a0",
+        "adapter:b0.a1"
+      ],
+      "instance_id": "d09_both_models_ready_state_only",
+      "legal_victim_ids": [],
+      "method_decisions": {
+        "eviction_aware_recovery": {
+          "avoided_future_load_object_ids": [],
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 0,
+          "current_prepare_object_ids": [],
+          "decision": "recover",
+          "formula": "recover iff J_recovery < J_rerun",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 0,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "eviction_aware_recovery",
+          "near_term_dependency_ids": [
+            "base:b0",
+            "adapter:b0.a1"
+          ],
+          "near_term_missing_after_ids": [],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 0.0263258,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 4,
+          "state_transfer_seconds": 0.0201748
+        },
+        "offline_reference": {
+          "candidate_first_actions": [
+            0,
+            4
+          ],
+          "candidate_objective_keys": {
+            "0": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "4": [
+              -2,
+              0,
+              0.0863258,
+              2185,
+              0.0,
+              0,
+              4
+            ]
+          },
+          "decision": "recover",
+          "information_advantage": "selects after both complete native branches and realized modeled outcomes are available",
+          "method": "offline_reference",
+          "realized_future_used": true,
+          "selected_first_action": 4
+        },
+        "original_simple_threshold": {
+          "conservative_fallback": false,
+          "decision": "recover",
+          "excluded_model_prepare_reason": "preserved baseline treats target-model preparation as common to both paths",
+          "method": "original_simple_threshold",
+          "opt_in_enabled": false,
+          "recovery_incremental_seconds": 0.0263258,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 4
+        },
+        "two_step_lookahead": {
+          "avoided_future_load_object_ids": [],
+          "candidate_paths": {
+            "recover_then_declared_next": 0.0263258,
+            "rerun_then_declared_next": 11.07072456
+          },
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 0,
+          "current_prepare_object_ids": [],
+          "decision": "recover",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 0,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "two_step_lookahead",
+          "near_term_dependency_ids": [
+            "base:b0",
+            "adapter:b0.a1"
+          ],
+          "near_term_missing_after_ids": [],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 0.0263258,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 11.07072456,
+          "selected_first_action": 4,
+          "state_transfer_seconds": 0.0201748
+        }
+      },
+      "near_term_missing_after": [],
+      "near_term_missing_before": [],
+      "realized_branches": {
+        "0": {
+          "events": [
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0",
+                "adapter:b0.a1"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 1,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0",
+                "adapter:b0.a1"
+              ],
+              "service_success": false,
+              "state_package_bytes": 0,
+              "step_index": 2,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0",
+                "adapter:b0.a1"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 3,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              0,
+              0,
+              0
+            ],
+            "branch_id": "first_action_0",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 0,
+            "instance_id": "d09_both_models_ready_state_only",
+            "modeled_completion_seconds": 11.13072456,
+            "modeled_recompute_seconds": 11.035304,
+            "modeled_state_overhead_seconds": 0.0,
+            "modeled_transfer_seconds": 0.035420560000000004,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "service_failure_count": 1,
+            "simulator_step_count": 3,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 192757,
+            "transfer_bytes_by_type": {
+              "rerun_input": 192757
+            },
+            "wall_clock_network_measurement": false
+          }
+        },
+        "4": {
+          "events": [
+            {
+              "action_id": 4,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0",
+                "adapter:b0.a1"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2185,
+              "step_index": 1,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0",
+                "adapter:b0.a1"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0",
+                "adapter:b0.a1"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2185,
+              "step_index": 2,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              4,
+              0
+            ],
+            "branch_id": "first_action_4",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 4,
+            "instance_id": "d09_both_models_ready_state_only",
+            "modeled_completion_seconds": 0.0863258,
+            "modeled_recompute_seconds": 0.0,
+            "modeled_state_overhead_seconds": 0.006150999999999999,
+            "modeled_transfer_seconds": 0.0201748,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              0.0863258,
+              2185,
+              0.0,
+              0,
+              4
+            ],
+            "service_failure_count": 0,
+            "simulator_step_count": 2,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 2185,
+            "transfer_bytes_by_type": {
+              "workflow_state": 2185
+            },
+            "wall_clock_network_measurement": false
+          }
+        }
+      }
+    },
+    {
+      "classification": "cost_estimation_error",
+      "current_missing_objects": [
+        "base:b0",
+        "adapter:b0.a0"
+      ],
+      "frozen_reason": "a 50% low recompute estimate can reject a recovery that is beneficial under the measured realized prefix time",
+      "initial_residents": [],
+      "instance_id": "d10_recompute_estimate_half",
+      "legal_victim_ids": [],
+      "method_decisions": {
+        "eviction_aware_recovery": {
+          "avoided_future_load_object_ids": [],
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 109051904,
+          "current_prepare_object_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "decision": "rerun",
+          "formula": "recover iff J_recovery < J_rerun",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 142606336,
+          "future_prepare_before_bytes": 142606336,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "eviction_aware_recovery",
+          "near_term_dependency_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_before_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 20.198984999999997,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 16.981579439999997,
+          "selected_first_action": 0,
+          "state_transfer_seconds": 0.0201748
+        },
+        "offline_reference": {
+          "candidate_first_actions": [
+            0,
+            4
+          ],
+          "candidate_objective_keys": {
+            "0": [
+              -2,
+              0,
+              22.559231439999998,
+              142799093,
+              11.035304,
+              1,
+              0
+            ],
+            "4": [
+              -2,
+              0,
+              20.258984199999997,
+              251660415,
+              0.0,
+              0,
+              4
+            ]
+          },
+          "decision": "recover",
+          "information_advantage": "selects after both complete native branches and realized modeled outcomes are available",
+          "method": "offline_reference",
+          "realized_future_used": true,
+          "selected_first_action": 4
+        },
+        "original_simple_threshold": {
+          "conservative_fallback": false,
+          "decision": "recover",
+          "excluded_model_prepare_reason": "preserved baseline treats target-model preparation as common to both paths",
+          "method": "original_simple_threshold",
+          "opt_in_enabled": false,
+          "recovery_incremental_seconds": 0.0263258,
+          "restart_incremental_seconds": 5.55307256,
+          "selected_first_action": 4
+        },
+        "two_step_lookahead": {
+          "avoided_future_load_object_ids": [],
+          "candidate_paths": {
+            "recover_then_declared_next": 20.198984999999997,
+            "rerun_then_declared_next": 16.981579439999997
+          },
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 109051904,
+          "current_prepare_object_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "decision": "rerun",
+          "future_model_cost_delta_seconds": 0.0,
+          "future_prepare_after_bytes": 142606336,
+          "future_prepare_before_bytes": 142606336,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 0,
+          "induced_reload_object_ids": [],
+          "induced_reload_seconds_unscaled": 0.0,
+          "legal_victim_ids": [],
+          "method": "two_step_lookahead",
+          "near_term_dependency_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_before_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 20.198984999999997,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 16.981579439999997,
+          "selected_first_action": 0,
+          "state_transfer_seconds": 0.0201748
+        }
+      },
+      "near_term_missing_after": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "near_term_missing_before": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "realized_branches": {
+        "0": {
+          "events": [
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [],
+              "pre_target_residents": [],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 1,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [],
+              "service_success": false,
+              "state_package_bytes": 0,
+              "step_index": 2,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 134217728
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 3,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              0,
+              0,
+              0
+            ],
+            "branch_id": "first_action_0",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 0,
+            "instance_id": "d10_recompute_estimate_half",
+            "modeled_completion_seconds": 22.559231439999998,
+            "modeled_recompute_seconds": 11.035304,
+            "modeled_state_overhead_seconds": 0.0,
+            "modeled_transfer_seconds": 11.463927439999999,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              22.559231439999998,
+              142799093,
+              11.035304,
+              1,
+              0
+            ],
+            "service_failure_count": 1,
+            "simulator_step_count": 3,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 142799093,
+            "transfer_bytes_by_type": {
+              "adapter": 8388608,
+              "base_model": 134217728,
+              "rerun_input": 192757
+            },
+            "wall_clock_network_measurement": false
+          }
+        },
+        "4": {
+          "events": [
+            {
+              "action_id": 4,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [],
+              "service_success": true,
+              "state_package_bytes": 2175,
+              "step_index": 1,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 100663296
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0",
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2175,
+              "step_index": 2,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 134217728
+              }
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              4,
+              0
+            ],
+            "branch_id": "first_action_4",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 4,
+            "instance_id": "d10_recompute_estimate_half",
+            "modeled_completion_seconds": 20.258984199999997,
+            "modeled_recompute_seconds": 0.0,
+            "modeled_state_overhead_seconds": 0.006150999999999999,
+            "modeled_transfer_seconds": 20.1928332,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              20.258984199999997,
+              251660415,
+              0.0,
+              0,
+              4
+            ],
+            "service_failure_count": 0,
+            "simulator_step_count": 2,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 251660415,
+            "transfer_bytes_by_type": {
+              "adapter": 16777216,
+              "base_model": 234881024,
+              "workflow_state": 2175
+            },
+            "wall_clock_network_measurement": false
+          }
+        }
+      }
+    },
+    {
+      "classification": "cost_estimation_error",
+      "current_missing_objects": [
+        "base:b0",
+        "adapter:b0.a0"
+      ],
+      "frozen_reason": "a 2x high recompute estimate can make recovery appear cheaper despite a full induced b1 reload",
+      "initial_residents": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "instance_id": "d11_recompute_estimate_double",
+      "legal_victim_ids": [
+        "adapter:b1.a0",
+        "base:b1"
+      ],
+      "method_decisions": {
+        "eviction_aware_recovery": {
+          "avoided_future_load_object_ids": [],
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 109051904,
+          "current_prepare_object_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "decision": "recover",
+          "formula": "recover iff J_recovery < J_rerun",
+          "future_model_cost_delta_seconds": 11.428506879999999,
+          "future_prepare_after_bytes": 142606336,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 142606336,
+          "induced_reload_object_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "induced_reload_seconds_unscaled": 11.428506879999999,
+          "legal_victim_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "method": "eviction_aware_recovery",
+          "near_term_dependency_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 20.198984999999997,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 22.10602856,
+          "selected_first_action": 4,
+          "state_transfer_seconds": 0.0201748
+        },
+        "offline_reference": {
+          "candidate_first_actions": [
+            0,
+            4
+          ],
+          "candidate_objective_keys": {
+            "0": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "4": [
+              -2,
+              0,
+              20.258984519999995,
+              251660419,
+              0.0,
+              0,
+              4
+            ]
+          },
+          "decision": "rerun",
+          "information_advantage": "selects after both complete native branches and realized modeled outcomes are available",
+          "method": "offline_reference",
+          "realized_future_used": true,
+          "selected_first_action": 0
+        },
+        "original_simple_threshold": {
+          "conservative_fallback": false,
+          "decision": "recover",
+          "excluded_model_prepare_reason": "preserved baseline treats target-model preparation as common to both paths",
+          "method": "original_simple_threshold",
+          "opt_in_enabled": false,
+          "recovery_incremental_seconds": 0.0263258,
+          "restart_incremental_seconds": 22.10602856,
+          "selected_first_action": 4
+        },
+        "two_step_lookahead": {
+          "avoided_future_load_object_ids": [],
+          "candidate_paths": {
+            "recover_then_declared_next": 20.198984999999997,
+            "rerun_then_declared_next": 22.10602856
+          },
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 109051904,
+          "current_prepare_object_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "decision": "recover",
+          "future_model_cost_delta_seconds": 11.428506879999999,
+          "future_prepare_after_bytes": 142606336,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 1.0,
+          "induced_reload_bytes": 142606336,
+          "induced_reload_object_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "induced_reload_seconds_unscaled": 11.428506879999999,
+          "legal_victim_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "method": "two_step_lookahead",
+          "near_term_dependency_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 20.198984999999997,
+          "rerun_input_transfer_seconds": 0.035420560000000004,
+          "restart_incremental_seconds": 22.10602856,
+          "selected_first_action": 4,
+          "state_transfer_seconds": 0.0201748
+        }
+      },
+      "near_term_missing_after": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "near_term_missing_before": [],
+      "realized_branches": {
+        "0": {
+          "events": [
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 1,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": false,
+              "state_package_bytes": 0,
+              "step_index": 2,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 3,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              0,
+              0,
+              0
+            ],
+            "branch_id": "first_action_0",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 0,
+            "instance_id": "d11_recompute_estimate_double",
+            "modeled_completion_seconds": 11.13072456,
+            "modeled_recompute_seconds": 11.035304,
+            "modeled_state_overhead_seconds": 0.0,
+            "modeled_transfer_seconds": 0.035420560000000004,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              11.13072456,
+              192757,
+              11.035304,
+              1,
+              0
+            ],
+            "service_failure_count": 1,
+            "simulator_step_count": 3,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 192757,
+            "transfer_bytes_by_type": {
+              "rerun_input": 192757
+            },
+            "wall_clock_network_measurement": false
+          }
+        },
+        "4": {
+          "events": [
+            {
+              "action_id": 4,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [
+                "adapter:b1.a0",
+                "base:b1"
+              ],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2179,
+              "step_index": 1,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 100663296
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [
+                "adapter:b0.a0",
+                "base:b0"
+              ],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2179,
+              "step_index": 2,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 134217728
+              }
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              4,
+              0
+            ],
+            "branch_id": "first_action_4",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 4,
+            "instance_id": "d11_recompute_estimate_double",
+            "modeled_completion_seconds": 20.258984519999995,
+            "modeled_recompute_seconds": 0.0,
+            "modeled_state_overhead_seconds": 0.006150999999999999,
+            "modeled_transfer_seconds": 20.192833519999997,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              20.258984519999995,
+              251660419,
+              0.0,
+              0,
+              4
+            ],
+            "service_failure_count": 0,
+            "simulator_step_count": 2,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 251660419,
+            "transfer_bytes_by_type": {
+              "adapter": 16777216,
+              "base_model": 234881024,
+              "workflow_state": 2179
+            },
+            "wall_clock_network_measurement": false
+          }
+        }
+      }
+    },
+    {
+      "classification": "cost_estimation_error",
+      "current_missing_objects": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "frozen_reason": "200 Mbps is an existing sensitivity point; 9.5 s and a 10% reload underestimate form an explicitly assumed near-boundary error case",
+      "initial_residents": [
+        "base:b0",
+        "adapter:b0.a0"
+      ],
+      "instance_id": "d12_moderate_reload_underestimate_near_boundary",
+      "legal_victim_ids": [
+        "adapter:b0.a0",
+        "base:b0"
+      ],
+      "method_decisions": {
+        "eviction_aware_recovery": {
+          "avoided_future_load_object_ids": [],
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 142606336,
+          "current_prepare_object_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "decision": "rerun",
+          "formula": "recover iff J_recovery < J_rerun",
+          "future_model_cost_delta_seconds": 3.943868544,
+          "future_prepare_after_bytes": 109051904,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 0.9,
+          "induced_reload_bytes": 109051904,
+          "induced_reload_object_ids": [
+            "adapter:b0.a0",
+            "base:b0"
+          ],
+          "induced_reload_seconds_unscaled": 4.3820761599999996,
+          "legal_victim_ids": [
+            "adapter:b0.a0",
+            "base:b0"
+          ],
+          "method": "eviction_aware_recovery",
+          "near_term_dependency_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 9.694360384,
+          "rerun_input_transfer_seconds": 0.02771028,
+          "restart_incremental_seconds": 9.52771028,
+          "selected_first_action": 0,
+          "state_transfer_seconds": 0.020087400000000002
+        },
+        "offline_reference": {
+          "candidate_first_actions": [
+            0,
+            4
+          ],
+          "candidate_objective_keys": {
+            "0": [
+              -2,
+              0,
+              9.587710280000001,
+              192757,
+              9.5,
+              1,
+              0
+            ],
+            "4": [
+              -2,
+              0,
+              10.1925692,
+              251660455,
+              0.0,
+              0,
+              4
+            ]
+          },
+          "decision": "rerun",
+          "information_advantage": "selects after both complete native branches and realized modeled outcomes are available",
+          "method": "offline_reference",
+          "realized_future_used": true,
+          "selected_first_action": 0
+        },
+        "original_simple_threshold": {
+          "conservative_fallback": false,
+          "decision": "recover",
+          "excluded_model_prepare_reason": "preserved baseline treats target-model preparation as common to both paths",
+          "method": "original_simple_threshold",
+          "opt_in_enabled": false,
+          "recovery_incremental_seconds": 0.026238400000000002,
+          "restart_incremental_seconds": 9.52771028,
+          "selected_first_action": 4
+        },
+        "two_step_lookahead": {
+          "avoided_future_load_object_ids": [],
+          "candidate_paths": {
+            "recover_then_declared_next": 9.694360384,
+            "rerun_then_declared_next": 9.52771028
+          },
+          "common_cost_exclusion_reason": "objects missing on both paths and successful service time are identical; they are retained in both full totals and cancel in the comparison",
+          "common_future_object_ids": [],
+          "conservative_fallback": false,
+          "current_prepare_bytes": 142606336,
+          "current_prepare_object_ids": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "decision": "rerun",
+          "future_model_cost_delta_seconds": 3.943868544,
+          "future_prepare_after_bytes": 109051904,
+          "future_prepare_before_bytes": 0,
+          "future_reload_cost_scale": 0.9,
+          "induced_reload_bytes": 109051904,
+          "induced_reload_object_ids": [
+            "adapter:b0.a0",
+            "base:b0"
+          ],
+          "induced_reload_seconds_unscaled": 4.3820761599999996,
+          "legal_victim_ids": [
+            "adapter:b0.a0",
+            "base:b0"
+          ],
+          "method": "two_step_lookahead",
+          "near_term_dependency_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "near_term_missing_after_ids": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "near_term_missing_before_ids": [],
+          "opt_in_enabled": true,
+          "recovery_incremental_seconds": 9.694360384,
+          "rerun_input_transfer_seconds": 0.02771028,
+          "restart_incremental_seconds": 9.52771028,
+          "selected_first_action": 0,
+          "state_transfer_seconds": 0.020087400000000002
+        }
+      },
+      "near_term_missing_after": [
+        "base:b0",
+        "adapter:b0.a0"
+      ],
+      "near_term_missing_before": [],
+      "realized_branches": {
+        "0": {
+          "events": [
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 1,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": false,
+              "state_package_bytes": 0,
+              "step_index": 2,
+              "transfer_bytes_by_type": {}
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 0,
+              "step_index": 3,
+              "transfer_bytes_by_type": {}
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              0,
+              0,
+              0
+            ],
+            "branch_id": "first_action_0",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 0,
+            "instance_id": "d12_moderate_reload_underestimate_near_boundary",
+            "modeled_completion_seconds": 9.587710280000001,
+            "modeled_recompute_seconds": 9.5,
+            "modeled_state_overhead_seconds": 0.0,
+            "modeled_transfer_seconds": 0.02771028,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              9.587710280000001,
+              192757,
+              9.5,
+              1,
+              0
+            ],
+            "service_failure_count": 1,
+            "simulator_step_count": 3,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 192757,
+            "transfer_bytes_by_type": {
+              "rerun_input": 192757
+            },
+            "wall_clock_network_measurement": false
+          }
+        },
+        "4": {
+          "events": [
+            {
+              "action_id": 4,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0"
+              ],
+              "evicted_object_ids": [
+                "adapter:b0.a0",
+                "base:b0"
+              ],
+              "post_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "pre_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2215,
+              "step_index": 1,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 134217728
+              }
+            },
+            {
+              "action_id": 0,
+              "admitted_object_ids": [],
+              "completed_node_ids": [
+                "n0",
+                "n1"
+              ],
+              "evicted_object_ids": [
+                "adapter:b1.a0",
+                "base:b1"
+              ],
+              "post_target_residents": [
+                "base:b0",
+                "adapter:b0.a0"
+              ],
+              "pre_target_residents": [
+                "base:b1",
+                "adapter:b1.a0"
+              ],
+              "service_success": true,
+              "state_package_bytes": 2215,
+              "step_index": 2,
+              "transfer_bytes_by_type": {
+                "adapter": 8388608,
+                "base_model": 100663296
+              }
+            }
+          ],
+          "summary": {
+            "actions_executed": [
+              4,
+              0
+            ],
+            "branch_id": "first_action_4",
+            "completed_node_count": 2,
+            "completed_node_ids": [
+              "n0",
+              "n1"
+            ],
+            "deadline_seconds": 30.0,
+            "deadline_violation_count": 0,
+            "first_action_id": 4,
+            "instance_id": "d12_moderate_reload_underestimate_near_boundary",
+            "modeled_completion_seconds": 10.1925692,
+            "modeled_recompute_seconds": 0.0,
+            "modeled_state_overhead_seconds": 0.006150999999999999,
+            "modeled_transfer_seconds": 10.1264182,
+            "native_completion": true,
+            "objective_key": [
+              -2,
+              0,
+              10.1925692,
+              251660455,
+              0.0,
+              0,
+              4
+            ],
+            "service_failure_count": 0,
+            "simulator_step_count": 2,
+            "successful_request_count": 2,
+            "total_transfer_bytes": 251660455,
+            "transfer_bytes_by_type": {
+              "adapter": 16777216,
+              "base_model": 234881024,
+              "workflow_state": 2215
+            },
+            "wall_clock_network_measurement": false
+          }
+        }
+      }
+    }
+  ],
+  "scope": "all frozen instances; native events preserved without filtering negative results"
+}

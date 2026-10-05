@@ -1,0 +1,14 @@
+{
+  "allowed_files": [
+    "state.json",
+    "manifest.json"
+  ],
+  "contains_final_output": false,
+  "contains_model_weights": false,
+  "schema_version": "ppo_mec.workflow_state_package.v1",
+  "state": {
+    "bytes": 1874,
+    "path": "state.json",
+    "sha256": "b9f1f885a39653a63ee14b850695d34031fe203418a29cff50232d3406571ea4"
+  }
+}

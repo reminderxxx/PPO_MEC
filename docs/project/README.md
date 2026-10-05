@@ -9,6 +9,10 @@
 
 ## Live 文档
 
+- `eviction_aware_recovery_results_20261005.md`：12 点四方法完整结果、逐事件解释、主张—实验—原件—限制表与
+  投稿关键缺口；新规则与正确两步前瞻持平，证据仅为 bounded implementation correction
+- `eviction_aware_recovery_plan_20261005.md`：事前冻结公式、字段、复杂度、伪代码、12 点与执行边界
+
 - `workload_v0_1_self_consistency_audit_20261005.md`：workload v0.1 自证循环、seed 有效输入、sharing 语义、
   version-specific real run 审查，以及 12 点成本失配与 12-call 固定实现复测结果；保留简单阈值，不启动 RL
 

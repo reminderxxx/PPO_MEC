@@ -1,0 +1,79 @@
+{
+  "all_methods_equal_completion": true,
+  "eviction_aware_two_step_action_agreement_count": 12,
+  "eviction_aware_two_step_cost_agreement_count": 12,
+  "methods": {
+    "eviction_aware_recovery": {
+      "completed_node_count": 24,
+      "deadline_violation_count": 0,
+      "decision_overhead_median_of_instance_medians_nanoseconds": 7875.0,
+      "instance_count": 12,
+      "modeled_completion_seconds": 156.10351822285713,
+      "modeled_recompute_seconds": 64.67652,
+      "oracle_information_advantage": false,
+      "recover_decision_count": 6,
+      "service_failure_count": 6,
+      "total_transfer_bytes": 1066522920,
+      "transfer_bytes_by_type": {
+        "adapter": 92274688,
+        "base_model": 973078528,
+        "rerun_input": 1156542,
+        "workflow_state": 13162
+      }
+    },
+    "offline_reference": {
+      "completed_node_count": 24,
+      "deadline_violation_count": 0,
+      "decision_overhead_median_of_instance_medians_nanoseconds": null,
+      "instance_count": 12,
+      "modeled_completion_seconds": 144.67501102285715,
+      "modeled_recompute_seconds": 64.67652,
+      "oracle_information_advantage": true,
+      "recover_decision_count": 6,
+      "service_failure_count": 6,
+      "total_transfer_bytes": 923916580,
+      "transfer_bytes_by_type": {
+        "adapter": 83886080,
+        "base_model": 838860800,
+        "rerun_input": 1156542,
+        "workflow_state": 13158
+      }
+    },
+    "original_simple_threshold": {
+      "completed_node_count": 24,
+      "deadline_violation_count": 0,
+      "decision_overhead_median_of_instance_medians_nanoseconds": 2437.5,
+      "instance_count": 12,
+      "modeled_completion_seconds": 174.09679254857141,
+      "modeled_recompute_seconds": 11.035304,
+      "oracle_information_advantage": false,
+      "recover_decision_count": 11,
+      "service_failure_count": 1,
+      "total_transfer_bytes": 2038648604,
+      "transfer_bytes_by_type": {
+        "adapter": 159383552,
+        "base_model": 1879048192,
+        "rerun_input": 192757,
+        "workflow_state": 24103
+      }
+    },
+    "two_step_lookahead": {
+      "completed_node_count": 24,
+      "deadline_violation_count": 0,
+      "decision_overhead_median_of_instance_medians_nanoseconds": 7896.0,
+      "instance_count": 12,
+      "modeled_completion_seconds": 156.10351822285713,
+      "modeled_recompute_seconds": 64.67652,
+      "oracle_information_advantage": false,
+      "recover_decision_count": 6,
+      "service_failure_count": 6,
+      "total_transfer_bytes": 1066522920,
+      "transfer_bytes_by_type": {
+        "adapter": 92274688,
+        "base_model": 973078528,
+        "rerun_input": 1156542,
+        "workflow_state": 13162
+      }
+    }
+  }
+}

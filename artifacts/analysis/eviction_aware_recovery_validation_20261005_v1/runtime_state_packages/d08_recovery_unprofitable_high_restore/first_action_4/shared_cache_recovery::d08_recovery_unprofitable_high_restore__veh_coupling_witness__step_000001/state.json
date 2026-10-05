@@ -1,0 +1,76 @@
+{
+  "payload": {
+    "completed_nodes": [
+      "n0"
+    ],
+    "execution_rights": {
+      "source_rsu_id": "rsu_a",
+      "status": "pending_target_validation",
+      "target_rsu_id": "rsu_b"
+    },
+    "identity": {
+      "adapter": "b0.a1",
+      "base": "b0",
+      "next_node": "n1"
+    },
+    "input_identity": {
+      "kind": "frozen_controlled_witness",
+      "sha256": "ab71ef60b2b87b1ec4ba86cb4608bef75a7e14138310c91b36301a611286d930"
+    },
+    "next_node": "n1",
+    "node_outputs": {
+      "n0": {
+        "kind": "abstract_typed_node_output",
+        "node_id": "n0",
+        "value": "prefix::d08_recovery_unprofitable_high_restore"
+      }
+    },
+    "remaining_nodes": [
+      "n1"
+    ],
+    "workflow": {
+      "completed_node_ids": [],
+      "current_node_id": "n0",
+      "edges": [
+        [
+          "n0",
+          "n1"
+        ]
+      ],
+      "execution_order": [
+        "n0",
+        "n1"
+      ],
+      "is_completed": false,
+      "nodes": [
+        {
+          "input_size": 1,
+          "node_id": "n0",
+          "node_name": "frozen coupling witness b0.a0",
+          "output_size": 1,
+          "predecessors": [],
+          "required_adapter": "b0.a0",
+          "required_base_model": "b0",
+          "successors": [
+            "n1"
+          ]
+        },
+        {
+          "input_size": 1,
+          "node_id": "n1",
+          "node_name": "frozen coupling witness b0.a1",
+          "output_size": 1,
+          "predecessors": [
+            "n0"
+          ],
+          "required_adapter": "b0.a1",
+          "required_base_model": "b0",
+          "successors": []
+        }
+      ],
+      "workflow_id": "shared_cache_recovery::d08_recovery_unprofitable_high_restore"
+    }
+  },
+  "payload_sha256": "a736ae83145f76b7be6a57494871dfa5f0d6b64c101f29c5cfe759fa269b5c77",
+  "schema_version": "ppo_mec.workflow_state.v2"
+}

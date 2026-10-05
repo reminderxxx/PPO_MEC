@@ -5,6 +5,22 @@
 
 # Runbook
 
+## 驱逐代价感知恢复规则（2026-10-05）
+
+只允许从冻结 clean commit 一次性执行；output root 必须不存在，不启动训练、模型、下载或 holdout：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/run_eviction_aware_recovery_validation.py \
+  --config configs/experiment/eviction_aware_recovery_v1.json \
+  --output-root artifacts/analysis/eviction_aware_recovery_validation_20261005_v1 \
+  --expected-git-commit f5033c1b10f8c323f2247a09b1f5ab73a8621387
+```
+
+该 run 已完成，不得覆盖或按结果重跑调参。局部回归只需
+`python -m pytest -q tests/test_eviction_aware_recovery.py tests/test_shared_cache_recovery_coupling.py tests/test_cache_capacity_mb.py tests/test_cache_eviction_policy.py`。
+公式/字段见 `eviction_aware_recovery_plan_20261005.md`，结果边界见 `eviction_aware_recovery_results_20261005.md`。
+
 ## Production action 4 与 workload v0.1（2026-10-05）
 
 冻结合同与数据卡见 `measurement_calibrated_vec_workload_v0_1.md`。必须先在 clean fixed commit 运行 6-call technical

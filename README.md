@@ -5,6 +5,12 @@
 
 # PPO_MEC
 
+驱逐代价感知恢复规则的 12 点冻结验证与证据绑定论文工作稿见
+[`docs/project/eviction_aware_recovery_results_20261005.md`](docs/project/eviction_aware_recovery_results_20261005.md) 和
+[`docs/project/system_mechanism_manuscript_working_draft.md`](docs/project/system_mechanism_manuscript_working_draft.md)。
+新规则与同信息两步前瞻 12/12 持平、匹配事后参考 10/12，原阈值为 7/12；这是 bounded synthetic
+implementation correction，不是新算法、真实无线、跨 workflow 共享或 paper-ready 证据。
+
 Production action 4 的显式 opt-in 状态导出/导入合同，以及 measurement-calibrated semi-synthetic VEC workload
 v0.1 的冻结 RQ、8 点覆盖设计、数据卡、全部 72 行结果和结论边界见
 [`docs/project/measurement_calibrated_vec_workload_v0_1.md`](docs/project/measurement_calibrated_vec_workload_v0_1.md)。
