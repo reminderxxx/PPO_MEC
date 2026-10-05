@@ -21,7 +21,7 @@ workflow（硬上限 12，无自动重试），再运行 0-call 半合成矩阵�
 /Users/howen/Projects/PPO_MEC/.venv/bin/python \
   scripts/run_measurement_calibrated_vec_workload.py \
   --config configs/experiment/measurement_calibrated_vec_workload_v0_1.json \
-  --output-root artifacts/analysis/measurement_calibrated_vec_workload_20261005_v3 \
+  --output-root artifacts/analysis/measurement_calibrated_vec_workload_20261005_v4 \
   --expected-commit <fixed-implementation-commit>
 ```
 

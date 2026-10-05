@@ -1,0 +1,15 @@
+{
+  "config_path": "/Users/howen/.codex/worktrees/action4-vec-workload/PPO_MEC/configs/experiment/measurement_calibrated_vec_workload_v0_1.json",
+  "config_sha256": "4daa5f052a514289e10568452c3b08d360e6819d9ae33dd57e138e0495383022",
+  "design_point_count": 8,
+  "formal_runs": 0,
+  "git_commit": "472d064a431fe97e1c94063a42aea0811425310d",
+  "holdout_runs": 0,
+  "method_result_count": 72,
+  "real_model_generate_calls": 0,
+  "seed_count": 3,
+  "status": "PASS",
+  "training_runs": 0,
+  "wall_seconds": 0.008409209000000008,
+  "workload_instance_count": 24
+}

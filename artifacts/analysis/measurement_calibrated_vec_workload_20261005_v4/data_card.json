@@ -1,0 +1,183 @@
+{
+  "calibration": {
+    "dynamic": {
+      "input_bytes": {
+        "source_type": "measured",
+        "value": 192757
+      },
+      "intermediate_record_bytes": {
+        "source_type": "measured",
+        "value": 169
+      },
+      "state_package_bytes": {
+        "source_type": "measured",
+        "value": 2040
+      }
+    },
+    "model": {
+      "adapter_file_bytes": {
+        "source_type": "measured",
+        "value": 154423432
+      },
+      "adapter_network_directory_bytes": {
+        "source_type": "measured",
+        "value": 154428630
+      },
+      "base_file_bytes": {
+        "source_type": "measured",
+        "value": 1015025832
+      },
+      "base_network_directory_bytes": {
+        "source_type": "measured",
+        "value": 1019895869
+      },
+      "single_process_peak_runtime_memory_bytes": {
+        "source_type": "measured",
+        "value": 2379005952
+      }
+    },
+    "source_artifact_run_id": "two_node_workflow_reexecution_comparison_20261005_v1",
+    "source_report": "docs/project/mechanism_evidence_closure_results_20261005.md",
+    "time_seconds": {
+      "high_restore_stress": {
+        "range": [
+          11.5,
+          16.0
+        ],
+        "reason": "Preserve a recovery-not-worthwhile control above measured prefix recomputation; not a measured runtime.",
+        "source_type": "synthetic",
+        "value": 14.0
+      },
+      "prefix_compute": {
+        "source_type": "measured",
+        "value": 11.035304
+      },
+      "state_restore_validation": {
+        "source_type": "measured",
+        "value": 0.002763
+      },
+      "state_serialize_save": {
+        "source_type": "measured",
+        "value": 0.000736
+      },
+      "suffix_compute": {
+        "source_type": "measured",
+        "value": 3.827448
+      },
+      "suffix_input_rebuild": {
+        "source_type": "measured",
+        "value": 0.002652
+      },
+      "target_model_load": {
+        "source_type": "measured",
+        "value": 1.173114
+      }
+    },
+    "unavailable": [
+      "real_wireless_state_migration_latency",
+      "RSU_queueing_delay",
+      "packet_loss_and_retransmission",
+      "task_output_quality",
+      "production_KV_or_tensor_state_bytes"
+    ]
+  },
+  "classification": "development mechanism diagnostic",
+  "design": {
+    "kind": "balanced_half_fraction_2_to_the_4_minus_1",
+    "point_count": 8,
+    "points": [
+      {
+        "capacity": "tight",
+        "design_id": "d01",
+        "initial_target_model": "ready",
+        "restore_cost": "low",
+        "sharing": true
+      },
+      {
+        "capacity": "tight",
+        "design_id": "d02",
+        "initial_target_model": "missing",
+        "restore_cost": "high",
+        "sharing": true
+      },
+      {
+        "capacity": "ample",
+        "design_id": "d03",
+        "initial_target_model": "ready",
+        "restore_cost": "high",
+        "sharing": true
+      },
+      {
+        "capacity": "ample",
+        "design_id": "d04",
+        "initial_target_model": "missing",
+        "restore_cost": "low",
+        "sharing": true
+      },
+      {
+        "capacity": "tight",
+        "design_id": "d05",
+        "initial_target_model": "ready",
+        "restore_cost": "high",
+        "sharing": false
+      },
+      {
+        "capacity": "tight",
+        "design_id": "d06",
+        "initial_target_model": "missing",
+        "restore_cost": "low",
+        "sharing": false
+      },
+      {
+        "capacity": "ample",
+        "design_id": "d07",
+        "initial_target_model": "ready",
+        "restore_cost": "low",
+        "sharing": false
+      },
+      {
+        "capacity": "ample",
+        "design_id": "d08",
+        "initial_target_model": "missing",
+        "restore_cost": "high",
+        "sharing": false
+      }
+    ]
+  },
+  "name": "measurement-calibrated semi-synthetic VEC workload",
+  "not_a_new_real_dataset": true,
+  "public_value_representativeness_license_independent_reproduction": "unavailable",
+  "scope": {
+    "automatic_retry": false,
+    "formal_or_holdout": false,
+    "new_downloads": false,
+    "old_holdout_reused": false,
+    "real_model_generate_ceiling": 12,
+    "rl_execution": false,
+    "training": false
+  },
+  "seeds": [
+    17,
+    29,
+    43
+  ],
+  "synthetic_assumptions": {
+    "access_handoff_event": "synthetic_association_change_rsu_source_to_rsu_target",
+    "ample_capacity_bytes": 2400000000,
+    "arrival_jitter_seconds": [
+      0.0,
+      2.0
+    ],
+    "compute_migration_event": "synthetic_handoff_after_prefix_node",
+    "deadline_seconds_from_arrival": 60.0,
+    "fixed_one_way_seconds": 0.02,
+    "link_mbps": 100.0,
+    "request_order": [
+      "family_a_adapter_0",
+      "family_b_adapter_0",
+      "family_a_adapter_1"
+    ],
+    "tight_capacity_bytes": 1200000000
+  },
+  "version": "0.1.0"
+}

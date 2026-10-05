@@ -7,8 +7,8 @@
 - `configs/experiment/measurement_calibrated_vec_workload_v0_1.json`：RQ、测量校准、8 点、3 seed、方法、目标与预算冻结。
 - `scripts/run_measurement_calibrated_vec_workload.py`：生成 24 个实例并一次性输出 72 方法行和完整性回执。
 - `artifacts/analysis/production_action4_workflow_20261005_v2/`：最终 real technical 正负链与成本分解。
-- `artifacts/analysis/measurement_calibrated_vec_workload_20261005_v3/`：最终 24 实例、72 方法行、数据卡和完整性证据。
-- 同名 real v1、workload v1/v2 保留为非最终执行/代码失败证据，不覆盖、不冒充独立样本。
+- `artifacts/analysis/measurement_calibrated_vec_workload_20261005_v4/`：最终 24 实例、72 方法行、数据卡和完整性证据。
+- 同名 real v1、workload v1/v2/v3 保留为非最终执行/代码失败证据，不覆盖、不冒充独立样本。
 - `tests/test_production_action4_state.py`、`tests/test_measurement_calibrated_vec_workload.py`：正负接线与矩阵合同。
 
 ## 2026-10-05 最小机制证据闭环

@@ -8,8 +8,8 @@
 - `literature_cutoff`: `2026-09-30`（本轮不评价 novelty，不新增文献）
 - `reviewed_at`: `2026-10-05`
 - `status`: `COMPLETE_BOUNDED_MECHANISM_DIAGNOSTIC`
-- `artifact_run_id`: `production_action4_workflow_20261005_v2` + `measurement_calibrated_vec_workload_20261005_v3`
-- `git_commit`: `94600ded7752a548de74384f17ab4e0ebabf916c`
+- `artifact_run_id`: `production_action4_workflow_20261005_v2` + `measurement_calibrated_vec_workload_20261005_v4`
+- `git_commit`: action 4 `94600ded7752a548de74384f17ab4e0ebabf916c`; workload `472d064a431fe97e1c94063a42aea0811425310d`
 - `evidence_level`: `E2_BOUNDED_TECHNICAL_AND_SEMI_SYNTHETIC_ARTIFACT_AUDITED`
 - `verdict`: `LOCAL_RULE_SUFFICIENT_IN_FROZEN_MATRIX / NOT_PAPER_READY`
 
@@ -106,8 +106,8 @@ wait。模型准备、状态传输、恢复校验、输入重建、后缀计算�
 
 ## 全部方法、全部设计点结果
 
-最终矩阵 `measurement_calibrated_vec_workload_20261005_v3` 在相同 commit 上生成 24 instances、72 方法行，wall
-0.0083 s，真实模型调用 0。下表时间是三个固定 seed 的均值；每个 seed 的完成量、deadline count、动作与字节相同。
+最终矩阵 `measurement_calibrated_vec_workload_20261005_v4` 在 clean workload commit 上生成 24 instances、72 方法行，
+wall 0.0084 s，真实模型调用 0。下表时间是三个固定 seed 的均值；每个 seed 的完成量、deadline count、动作与字节相同。
 `A/B/C` 分别为 current restart、local incremental cost、offline exact。每个单元格式为
 `决策×3 / 完成workflow / deadline违约 / makespan秒 / 总传输字节`。
 
@@ -127,7 +127,7 @@ d01/d04/d06/d07 均选择三次 recovery，相对 A 每实例少 33.133231 s mak
 33.133231 s synthetic queue wait、572,151 B dynamic transfer 和 33.105912 s 重复计算；只有 d01 的 deadline
 violation 从 2 降到 1，其余 low 点 deadline 不变。high restore 的 B/C 都选择 restart，与 A 完全一致。
 
-决策开销均值/最大值：A `0.080/0.167 µs`，B `1.273/2.625 µs`，C `74.203/106.209 µs`。C 读取完整冻结实例并
+决策开销均值/最大值：A `0.075/0.125 µs`，B `1.375/2.750 µs`，C `82.175/112.917 µs`。C 读取完整冻结实例并
 枚举 8 个组合，只是 offline reference；B 不读取未来实现值。
 
 ## 收益区、无收益区与代价交换区
@@ -155,9 +155,10 @@ validated suffix recovery 只在完整增量成本低于 restart 时有益；目
 ## 执行偏差与预算账本
 
 - real workflow v1 在 commit `6c07005...` 成功 6/6 generate，但 receipt 未显式列 queue wait；保留为非最终 run。
-- workload v1 的 `decision_overhead_seconds` 错包 episode replay；v2 修复计时但未显式列 queue wait；两者均保留为
-  非最终代码结果，不用于上表。
-- v2 首次命令因手工写错 expected full SHA 在 output 创建前 fail-fast，调用/结果为 0；随后读取 Git 实际 SHA 启动。
+- workload v1 的 `decision_overhead_seconds` 错包 episode replay；v2 修复计时但未显式列 queue wait；v3 科学字段完整，
+  但 CSV 默认 CRLF 与仓库 LF 属性冲突。三者均保留原字节和 manifest，不用于上表；v4 显式写 LF。
+- v2 与 v4 各有一次命令因手工写错 expected full SHA 在 output 创建前 fail-fast，调用/结果为 0；随后读取 Git 实际
+  SHA 启动。
 - final real v2 再执行 6/6 generate；三次 workload run 均为 0-call。真实模型新增调用总计 `12/12`，无自动重试、
   无下载、训练、formal 或 holdout。
 
@@ -173,6 +174,6 @@ validated suffix recovery 只在完整增量成本低于 restart 时有益；目
 最终机器证据：
 
 - `artifacts/analysis/production_action4_workflow_20261005_v2/`
-- `artifacts/analysis/measurement_calibrated_vec_workload_20261005_v3/`
+- `artifacts/analysis/measurement_calibrated_vec_workload_20261005_v4/`
 - 非最终但保留：`production_action4_workflow_20261005_v1/`、`measurement_calibrated_vec_workload_20261005_v1/`、
-  `measurement_calibrated_vec_workload_20261005_v2/`
+  `measurement_calibrated_vec_workload_20261005_v2/`、`measurement_calibrated_vec_workload_20261005_v3/`
