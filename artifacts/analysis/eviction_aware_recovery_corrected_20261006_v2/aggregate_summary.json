@@ -1,0 +1,60 @@
+{
+  "equal_lifecycle_event_count": 12,
+  "methods": {
+    "eviction_aware_recovery": {
+      "completed_node_count": 24,
+      "deadline_violation_count": 0,
+      "dynamic_transfer_bytes": 216792,
+      "instance_count": 12,
+      "match_offline_count": 12,
+      "model_transfer_bytes": 2046820352,
+      "modeled_completion_seconds": 174.7878769485714,
+      "recompute_seconds": 11.035304,
+      "recover_decision_count": 11,
+      "service_failure_count": 0,
+      "total_transfer_bytes": 2047037144
+    },
+    "offline_reference": {
+      "completed_node_count": 24,
+      "deadline_violation_count": 0,
+      "dynamic_transfer_bytes": 216792,
+      "instance_count": 12,
+      "match_offline_count": 12,
+      "model_transfer_bytes": 2046820352,
+      "modeled_completion_seconds": 174.7878769485714,
+      "recompute_seconds": 11.035304,
+      "recover_decision_count": 11,
+      "service_failure_count": 0,
+      "total_transfer_bytes": 2047037144
+    },
+    "original_simple_threshold": {
+      "completed_node_count": 24,
+      "deadline_violation_count": 0,
+      "dynamic_transfer_bytes": 216792,
+      "instance_count": 12,
+      "match_offline_count": 12,
+      "model_transfer_bytes": 2046820352,
+      "modeled_completion_seconds": 174.7878769485714,
+      "recompute_seconds": 11.035304,
+      "recover_decision_count": 11,
+      "service_failure_count": 0,
+      "total_transfer_bytes": 2047037144
+    },
+    "two_step_lookahead": {
+      "completed_node_count": 24,
+      "deadline_violation_count": 0,
+      "dynamic_transfer_bytes": 216792,
+      "instance_count": 12,
+      "match_offline_count": 12,
+      "model_transfer_bytes": 2046820352,
+      "modeled_completion_seconds": 174.7878769485714,
+      "recompute_seconds": 11.035304,
+      "recover_decision_count": 11,
+      "service_failure_count": 0,
+      "total_transfer_bytes": 2047037144
+    }
+  },
+  "proposed_offline_action_agreement_count": 12,
+  "proposed_two_step_action_agreement_count": 12,
+  "simple_proposed_action_agreement_count": 12
+}

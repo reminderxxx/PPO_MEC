@@ -1,0 +1,41 @@
+{
+  "files": [
+    {
+      "path": "aggregate_summary.json",
+      "sha256": "118d947439cba0f708889e7849e0721e1806b85b5b0837edbaf077464dd19603",
+      "size_bytes": 2029
+    },
+    {
+      "path": "all_method_results.csv",
+      "sha256": "a438521602461a7f8485179fdb24e9e6858524b4b69d6e2502f5559f4d5087a0",
+      "size_bytes": 10788
+    },
+    {
+      "path": "all_method_results.json",
+      "sha256": "487b09814fed7137ed822b0832ed267608194036fa29eb4a4e6a333bdf0ea9b8",
+      "size_bytes": 854627
+    },
+    {
+      "path": "completion_receipt.json",
+      "sha256": "c691e839b41242cf1cb21441200c657fd0fa56dfdb4ff49590fe2ddc4832ec47",
+      "size_bytes": 342
+    },
+    {
+      "path": "frozen_protocol.json",
+      "sha256": "1d837b3bdefcaf989171481d1f736c0f81b776290885972d4cac7ab2d972f5a7",
+      "size_bytes": 12609
+    },
+    {
+      "path": "old_to_new_point_comparison.csv",
+      "sha256": "1172e8fd306f340515693d4ea0f413ee1ecadc8dbb27d7a07fbbc6f1efdacd35",
+      "size_bytes": 11749
+    },
+    {
+      "path": "old_to_new_point_comparison.json",
+      "sha256": "e2c0fcdd6fdb7a75c3c2745a2585880959f6e9d6285c1475d4abf9ae92d9ebcb",
+      "size_bytes": 39521
+    }
+  ],
+  "hash_algorithm": "sha256",
+  "run_id": "eviction_aware_recovery_corrected_20261006_v2"
+}
