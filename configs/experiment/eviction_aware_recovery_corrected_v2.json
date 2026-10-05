@@ -1,0 +1,78 @@
+{
+  "schema_version": "2.0.0",
+  "run_id": "eviction_aware_recovery_corrected_20261006_v2",
+  "frozen_at": "2026-10-06",
+  "inherits_frozen_design": {
+    "path": "configs/experiment/eviction_aware_recovery_v1.json",
+    "sha256": "6f0b9a5cdca4c3e72373e1d8bd595ce5fd637cbd236a57dbb14f88e960671b10",
+    "inherited_fields": [
+      "seed",
+      "native_contract",
+      "cost_model",
+      "design_points",
+      "near_term_horizon_nodes",
+      "decision_overhead_repetitions"
+    ]
+  },
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "evidence_level": "E2_bounded_synthetic_development_correction",
+  "maximum_design_points": 12,
+  "actual_design_points": 12,
+  "execution_constraints": {
+    "rl_training_forbidden": true,
+    "model_calls_forbidden": true,
+    "downloads_forbidden": true,
+    "old_holdout_operations_forbidden": true,
+    "single_execution": true,
+    "retuning_after_results_forbidden": true,
+    "negative_result_deletion_forbidden": true
+  },
+  "accounting_contract": {
+    "version": "symmetric_event_lifecycle_v2",
+    "restart_current_model_preparation_required": true,
+    "recovery_current_model_preparation_required": true,
+    "path_state_isolation_required": true,
+    "model_event_counting": "each legal admission transfer is charged once on the path that executes it",
+    "dynamic_bytes": "rerun input and recovery state remain separate from local model bytes",
+    "common_cost_cancellation": "allowed only after isolated paths produce equal lifecycle events",
+    "network_scope": "modeled from frozen Mbps and fixed latency; never reported as measured wall time",
+    "decision_score_separation": "online methods use detached previews and estimates; offline reference alone uses realized branch scores"
+  },
+  "methods": {
+    "original_simple_threshold": {
+      "online": true,
+      "information_scope": "state/input bytes and restore/recompute estimates",
+      "lifecycle_handling": "ignored simple baseline; cancellation is interpreted only after event equality audit"
+    },
+    "eviction_aware_recovery": {
+      "online": true,
+      "information_scope": "initial residents, declared current/next dependencies, legal native previews, ex-ante estimates",
+      "rule": "compare symmetric full path ledgers"
+    },
+    "two_step_lookahead": {
+      "online": true,
+      "information_scope": "identical to eviction_aware_recovery",
+      "rule": "explicitly compare restart-current-next and recover-current-next ledgers without realized scores"
+    },
+    "offline_reference": {
+      "online": false,
+      "oracle": true,
+      "future_information_advantage": "selects after two isolated legal native paths are scored"
+    }
+  },
+  "design_source": {
+    "classification": "corrected replay of the original development matrix, not independent validation",
+    "unchanged": "all 12 instance definitions, order, cache capacities, workflow adapters, residents, cost parameters and estimate multipliers are inherited byte-identified from v1",
+    "changed_only": "symmetric lifecycle execution, decision/score separation and create-only output schema"
+  },
+  "objective_priority": [
+    "maximize_completed_nodes",
+    "minimize_deadline_violations",
+    "minimize_modeled_completion_seconds",
+    "minimize_total_transfer_bytes",
+    "minimize_recompute_seconds",
+    "minimize_service_failures",
+    "stable_action_tiebreak"
+  ]
+}
