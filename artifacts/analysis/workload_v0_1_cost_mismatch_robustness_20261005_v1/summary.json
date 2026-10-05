@@ -1,0 +1,11 @@
+{
+  "design_point_count": 12,
+  "local_oracle_match_count": 8,
+  "local_oracle_mismatch_count": 4,
+  "maximum_local_completion_time_penalty_seconds": 17.69670144,
+  "maximum_local_makespan_penalty_seconds": 8.848350719999985,
+  "maximum_local_recompute_penalty_seconds": 0.0,
+  "maximum_local_transfer_penalty_bytes": 0,
+  "method_result_count": 36,
+  "post_hoc_oracle_is_information_fair_online_baseline": false
+}

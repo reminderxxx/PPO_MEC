@@ -1,0 +1,14 @@
+{
+  "baseline_config_sha256": "4daa5f052a514289e10568452c3b08d360e6819d9ae33dd57e138e0495383022",
+  "config_path": "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/configs/experiment/workload_v0_1_cost_mismatch_robustness_v1.json",
+  "config_sha256": "2fe49c6845de24e92fc1cef26214ded5a40b0b607a965d0e551d0f64a0fb7e5f",
+  "design_point_count": 12,
+  "formal_runs": 0,
+  "git_commit": "3bf08e6bd2e430212181438bf53839f953dcabe3",
+  "holdout_runs": 0,
+  "method_result_count": 36,
+  "real_model_generate_calls": 0,
+  "status": "PASS",
+  "training_runs": 0,
+  "wall_seconds": 0.005971833999999995
+}

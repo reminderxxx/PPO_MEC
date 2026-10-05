@@ -1,0 +1,26 @@
+{
+  "file_count": 4,
+  "files": [
+    {
+      "bytes": 12077,
+      "path": "all_method_results.csv",
+      "sha256": "c66d3e23da5ad61beef781fc0ea0cddaa4687c947af1ae64405a869688374252"
+    },
+    {
+      "bytes": 142958,
+      "path": "all_method_results.json",
+      "sha256": "21ddf25466342d16b9ed059e2ed29ecd610cfdee8eb852faf530f2f1e79523b9"
+    },
+    {
+      "bytes": 603,
+      "path": "completion_receipt.json",
+      "sha256": "831a6f8bb0e1cfea656a9bfecaec801316627d2fd75e089e1af45744d873d04f"
+    },
+    {
+      "bytes": 415,
+      "path": "summary.json",
+      "sha256": "b5a7fd7fa164b195a4e9ab9dd753670d72ef54ecd41e2eb136b142ba4b172854"
+    }
+  ],
+  "status": "PASS"
+}
