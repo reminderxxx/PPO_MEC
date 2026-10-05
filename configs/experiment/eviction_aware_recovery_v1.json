@@ -1,0 +1,214 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "eviction_aware_recovery_validation_20261005_v1",
+  "frozen_at": "2026-10-05",
+  "baseline_commit": "1a999287c172b8f34d64680aaaa3d8eb6be23508",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "evidence_level": "E2_bounded_synthetic_native_transition_validation",
+  "seed": 7,
+  "maximum_design_points": 12,
+  "actual_design_points": 12,
+  "near_term_horizon_nodes": 1,
+  "decision_overhead_repetitions": 2000,
+  "execution_constraints": {
+    "rl_training_forbidden": true,
+    "model_calls_forbidden": true,
+    "downloads_forbidden": true,
+    "old_holdout_operations_forbidden": true,
+    "single_execution": true,
+    "retuning_after_results_forbidden": true,
+    "negative_result_deletion_forbidden": true
+  },
+  "native_contract": {
+    "catalog_factory": "scripts.audit_native_typed_cache_probe.build_audit_catalog(sharing_enabled=True)",
+    "catalog_scope": "synthetic_probe_package_non_formal_native_audit_only",
+    "cache_profile": "typed_base_adapter_state_v1",
+    "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+    "rsu_ids": ["rsu_a", "rsu_b"],
+    "rsu_positions": [0.0, 100.0],
+    "coverage_radius": 55.0,
+    "vehicle_positions": [0.0, 20.0, 80.0, 100.0],
+    "maximum_steps": 3,
+    "source_rsu": "rsu_a",
+    "handoff_target_rsu": "rsu_b"
+  },
+  "cost_model": {
+    "scope": "measured technical-workflow values plus explicitly labeled link assumptions over native cache events",
+    "effective_link_mbps": 100.0,
+    "positive_transfer_fixed_latency_seconds": 0.02,
+    "successful_request_service_seconds": 0.03,
+    "prefix_recompute_seconds": 11.035304,
+    "prefix_recompute_source": "measurement_calibrated_vec_workload_20261005_v4_same_host_technical_workload",
+    "rerun_input_bytes": 192757,
+    "rerun_input_source": "two_node_workflow_reexecution_comparison_20261005_v1",
+    "state_package_bytes_reference": 2185,
+    "state_package_source": "production_action4_independent_repeat_20261005_v1",
+    "state_serialize_seconds_reference": 0.000736,
+    "state_restore_seconds_reference": 0.005415,
+    "state_restore_scope": "serialize plus validation and rebuild estimate; same-host only",
+    "deadline_seconds": 30.0
+  },
+  "methods": {
+    "original_simple_threshold": {
+      "online": true,
+      "rule": "recover iff estimated state transfer plus restore is below estimated input transfer plus prefix recomputation; model preparation is treated as common",
+      "eviction_externality_included": false
+    },
+    "eviction_aware_recovery": {
+      "online": true,
+      "explicit_opt_in": true,
+      "rule": "compare full rerun and recovery increments; use the native legal victim plan and add the signed future preparation delta for unique objects required by the declared near-term node",
+      "missing_input_rule": "rerun conservatively"
+    },
+    "two_step_lookahead": {
+      "online": true,
+      "information_scope": "identical to eviction_aware_recovery",
+      "rule": "explicitly score rerun-then-next and recover-then-next with the same native preview and ex-ante estimates"
+    },
+    "offline_reference": {
+      "online": false,
+      "oracle": true,
+      "feasible_first_actions": [0, 4],
+      "future_information_advantage": "post-hoc access to both fully realized native branches and modeled outcomes"
+    }
+  },
+  "design_source": {
+    "independence_status": "synthetic validation instances not used to design the method after output inspection",
+    "native_object_sizes": "existing b0/b1 typed audit catalog: b0 base 96 MiB, b1 base 128 MiB, adapters 8 MiB",
+    "measured_inputs": "prefix time, input/state bytes, state overhead references",
+    "assumed_inputs": "70/100/200 Mbps effective link, 14 s high restore stress, 9.5 s recompute sensitivity, and declared estimator multipliers",
+    "not_claimed": "real independent traffic data, wireless measurement, cross-workflow persistence, shared queues, or external validity"
+  },
+  "design_points": [
+    {
+      "instance_id": "d01_shared_base_ample_no_externality",
+      "classification": "no_eviction_externality",
+      "capacity_mib": 320.0,
+      "workflow_adapters": ["b0.a0", "b0.a1"],
+      "source_initial_adapters": ["b0.a0"],
+      "target_initial_adapters": ["b0.a1"],
+      "frozen_reason": "ample capacity; shared b0 base and declared next adapter remain resident"
+    },
+    {
+      "instance_id": "d02_cross_family_tight_common_future_load",
+      "classification": "no_eviction_externality",
+      "capacity_mib": 136.0,
+      "workflow_adapters": ["b0.a0", "b1.a0"],
+      "source_initial_adapters": ["b0.a0"],
+      "target_initial_adapters": [],
+      "frozen_reason": "both paths must load b1 later; the future load is common and cancels"
+    },
+    {
+      "instance_id": "d03_cross_family_exact_fit_common_future_load",
+      "classification": "no_eviction_externality",
+      "capacity_mib": 240.0,
+      "workflow_adapters": ["b0.a0", "b1.a0"],
+      "source_initial_adapters": ["b0.a0"],
+      "target_initial_adapters": [],
+      "frozen_reason": "104 MiB b0 and 136 MiB b1 exactly fit; no victim is required"
+    },
+    {
+      "instance_id": "d04_full_bundle_reload_b0_to_b1",
+      "classification": "recovery_causes_future_reload",
+      "capacity_mib": 136.0,
+      "workflow_adapters": ["b0.a0", "b1.a0"],
+      "source_initial_adapters": ["b0.a0"],
+      "target_initial_adapters": ["b1.a0"],
+      "frozen_reason": "preparing b0 legally evicts the resident b1 base and adapter needed next"
+    },
+    {
+      "instance_id": "d05_shared_base_adapter_only_reload",
+      "classification": "shared_base_changes_reload_cost",
+      "capacity_mib": 104.0,
+      "workflow_adapters": ["b0.a0", "b0.a1"],
+      "source_initial_adapters": ["b0.a0"],
+      "target_initial_adapters": ["b0.a1"],
+      "frozen_reason": "the shared b0 base is protected; only the 8 MiB next adapter is evicted and reloaded"
+    },
+    {
+      "instance_id": "d06_full_bundle_reload_b1_to_b0",
+      "classification": "recovery_causes_future_reload",
+      "capacity_mib": 136.0,
+      "workflow_adapters": ["b1.a0", "b0.a0"],
+      "source_initial_adapters": ["b1.a0"],
+      "target_initial_adapters": ["b0.a0"],
+      "frozen_reason": "reverse family order checks that object identity, not a hard-coded family, drives reload accounting"
+    },
+    {
+      "instance_id": "d07_recovery_unprofitable_70mbps",
+      "classification": "recovery_itself_unprofitable",
+      "capacity_mib": 240.0,
+      "workflow_adapters": ["b0.a0", "b1.a0"],
+      "source_initial_adapters": ["b0.a0"],
+      "target_initial_adapters": [],
+      "realized_cost_overrides": {"effective_link_mbps": 70.0},
+      "frozen_reason": "70 Mbps is inside the existing 50/100/200 Mbps sensitivity range; current model preparation can exceed rerun cost even without eviction externality"
+    },
+    {
+      "instance_id": "d08_recovery_unprofitable_high_restore",
+      "classification": "recovery_itself_unprofitable",
+      "capacity_mib": 320.0,
+      "workflow_adapters": ["b0.a0", "b0.a1"],
+      "source_initial_adapters": ["b0.a0"],
+      "target_initial_adapters": ["b0.a1"],
+      "realized_cost_overrides": {
+        "state_serialize_seconds_reference": 0.0,
+        "state_restore_seconds_reference": 14.0
+      },
+      "frozen_reason": "14 s is the already-registered synthetic high-restore stress above measured prefix recomputation"
+    },
+    {
+      "instance_id": "d09_both_models_ready_state_only",
+      "classification": "no_eviction_externality",
+      "capacity_mib": 112.0,
+      "workflow_adapters": ["b0.a0", "b0.a1"],
+      "source_initial_adapters": ["b0.a0"],
+      "target_initial_adapters": ["b0.a0", "b0.a1"],
+      "frozen_reason": "both declared adapters share one resident base; recovery adds only state transfer and no cache mutation"
+    },
+    {
+      "instance_id": "d10_recompute_estimate_half",
+      "classification": "cost_estimation_error",
+      "capacity_mib": 240.0,
+      "workflow_adapters": ["b0.a0", "b1.a0"],
+      "source_initial_adapters": ["b0.a0"],
+      "target_initial_adapters": [],
+      "decision_estimate": {"prefix_recompute_scale": 0.5},
+      "frozen_reason": "a 50% low recompute estimate can reject a recovery that is beneficial under the measured realized prefix time"
+    },
+    {
+      "instance_id": "d11_recompute_estimate_double",
+      "classification": "cost_estimation_error",
+      "capacity_mib": 136.0,
+      "workflow_adapters": ["b0.a0", "b1.a0"],
+      "source_initial_adapters": ["b0.a0"],
+      "target_initial_adapters": ["b1.a0"],
+      "decision_estimate": {"prefix_recompute_scale": 2.0},
+      "frozen_reason": "a 2x high recompute estimate can make recovery appear cheaper despite a full induced b1 reload"
+    },
+    {
+      "instance_id": "d12_moderate_reload_underestimate_near_boundary",
+      "classification": "cost_estimation_error",
+      "capacity_mib": 136.0,
+      "workflow_adapters": ["b1.a0", "b0.a0"],
+      "source_initial_adapters": ["b1.a0"],
+      "target_initial_adapters": ["b0.a0"],
+      "realized_cost_overrides": {
+        "effective_link_mbps": 200.0,
+        "prefix_recompute_seconds": 9.5
+      },
+      "decision_estimate": {"future_reload_cost_scale": 0.9},
+      "frozen_reason": "200 Mbps is an existing sensitivity point; 9.5 s and a 10% reload underestimate form an explicitly assumed near-boundary error case"
+    }
+  ],
+  "objective_priority": [
+    "maximize_completed_nodes",
+    "minimize_deadline_violations",
+    "minimize_modeled_completion_seconds",
+    "minimize_total_transfer_bytes",
+    "minimize_modeled_recompute_seconds",
+    "minimize_service_failures",
+    "stable_action_tiebreak"
+  ]
+}
