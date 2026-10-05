@@ -17,11 +17,14 @@
 预测仍明显偏高。原 12 个设计点明确降回开发/机制验证证据。该记录是上一轮边界；后续 victim→reload 已由上面的
 独立 bounded witness 补齐，但无线和队列仍未覆盖。
 
-驱逐代价感知恢复规则的 12 点冻结验证与证据绑定论文工作稿见
-[`docs/project/eviction_aware_recovery_results_20261005.md`](docs/project/eviction_aware_recovery_results_20261005.md) 和
-[`docs/project/system_mechanism_manuscript_working_draft.md`](docs/project/system_mechanism_manuscript_working_draft.md)。
-新规则与同信息两步前瞻 12/12 持平、匹配事后参考 10/12，原阈值为 7/12；这是 bounded synthetic
-implementation correction，不是新算法、真实无线、跨 workflow 共享或 paper-ready 证据。
+驱逐恢复成本的只读缺陷审查与公平复算已完成：旧 12 点的 decision scorer、action-0 branch 和 offline reference 都漏掉
+restart 当前模型准备，历史 `10/12 vs 7/12` 比较优势已撤销。对称纠正版中原简单阈值、驱逐代价感知规则、正确信息权限
+两步前瞻和微型离线参考在 12/12 点动作与成本相同；追加 6 点边界检查中三在线规则仍 6/6 相同，并共同保留两个 link
+estimate 错选。见[缺陷报告](docs/project/recovery_cost_defect_impact_report_20261006.md)、
+[纠正版结果](docs/project/recovery_cost_corrected_matrix_results_20261006.md)、
+[边界检查](docs/project/recovery_cost_boundary_check_results_20261006.md)与
+[论文工作稿 v1.3](docs/project/system_mechanism_manuscript_working_draft.md)。当前贡献限于系统机制、可复现成本审计和失效条件，
+不支持优于正确简单基线/两步前瞻、真实无线、跨 workflow 共享或 paper-ready。
 
 Production action 4 的显式 opt-in 状态导出/导入合同，以及 measurement-calibrated semi-synthetic VEC workload
 v0.1 的冻结 RQ、8 点覆盖设计、数据卡、全部 72 行结果和结论边界见

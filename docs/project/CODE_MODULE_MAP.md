@@ -10,7 +10,18 @@
 - `tests/test_real_cache_victim_reload.py`：12-call freeze、真实字节容量、合法 adapter victim、无驱逐对照、缺模型与
   unsupported base victim 的 fail-closed 回归。
 
-## Eviction-aware recovery bounded rule
+## Symmetric recovery lifecycle cost correction
+
+- `src/runtime/symmetric_recovery_cost.py`：消费双方 detached lifecycle event ledger，逐 event 计 model/dynamic bytes、
+  restore/recompute/service，提供简单阈值、完整规则和正确信息权限两步比较；不读 realized branch outcome。
+- `scripts/run_symmetric_recovery_cost_validation.py`：每点建立两条 decision preview 与两条 realized-score 独立 native cache
+  状态，分别执行 current→next dependency-safe transaction；offline reference 仅在实际评分后选择，并输出 old→new 全量对照。
+- `configs/experiment/eviction_aware_recovery_corrected_v2.json`：按 SHA 继承旧 12 点场景/参数，只冻结对称核算变化；
+  `recovery_cost_boundary_check_v1.json` 冻结 6 点机制边界。
+- `tests/test_symmetric_recovery_cost.py`：共同成本、分支隔离、非法/依赖不安全拒绝、完整 bundle reload 不漏计/不重复计、
+  completion 对齐和 estimate/score 权限分离。
+
+## Eviction-aware recovery bounded rule（historical asymmetric v1）
 
 - `src/runtime/eviction_aware_recovery.py`：消费 detached decision inputs，按 object ID 去重并比较完整 rerun/recovery
   增量；必要输入缺失或 victim 无法解释 reload 时 fail-conservative。无环境写入、未来 outcome 或 agent dependency。

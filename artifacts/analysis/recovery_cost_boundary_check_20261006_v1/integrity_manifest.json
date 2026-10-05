@@ -1,0 +1,31 @@
+{
+  "files": [
+    {
+      "path": "aggregate_summary.json",
+      "sha256": "e4a50953abfe14e44d38ae17962f11e1fcf763761f7b6747755c2209c34be238",
+      "size_bytes": 1981
+    },
+    {
+      "path": "all_method_results.csv",
+      "sha256": "2181495d9066280f97da87bacd288ade742902e2e286e0749c801d726885e6b9",
+      "size_bytes": 5693
+    },
+    {
+      "path": "all_method_results.json",
+      "sha256": "404b50c4be767f3bd98b731ce7bee4a589dd19c3821e00ab8b8f53bde4e0c26a",
+      "size_bytes": 386981
+    },
+    {
+      "path": "completion_receipt.json",
+      "sha256": "12ac15c76db7396b8bff6768dd3819e2c46ef8f81831c27e40dfd8bbf5bfec7f",
+      "size_bytes": 344
+    },
+    {
+      "path": "frozen_protocol.json",
+      "sha256": "151b31fdc9b0dc956c36bab19e8165bcff688cbcd549bcbd16f06a5499ecf201",
+      "size_bytes": 9856
+    }
+  ],
+  "hash_algorithm": "sha256",
+  "run_id": "recovery_cost_boundary_check_20261006_v1"
+}

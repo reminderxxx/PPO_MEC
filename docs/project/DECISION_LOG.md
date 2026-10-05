@@ -1,5 +1,16 @@
 ﻿# Decision Log
 
+## 2026-10-06：撤销历史方法优势，论文收敛为系统机制与经验性边界
+
+- 决定：旧 12 点 action-0/current-model 路径不对称影响 online、branch score 和 offline reference；保留原件但撤销全部
+  比较性优势，不用文档勘误代替公平复算。
+- 决定：v2 每条路径独立执行 current→next native transaction，只有逐事件相同的 lifecycle 才可抵消；estimate preview 与
+  realized score 分环境，offline truth 不回流在线规则。
+- 结果：原 12 点四方法 12/12 相同，新 6 点三在线方法 6/6 相同且共同出现两个 estimate 错选；不再投入算法工程寻找微小
+  差异，也不把工程正确性包装为通用算法。
+- 论文取舍：保留真实 state recovery/PEFT adapter lifecycle 一体化、可复现成本账本和失效条件；删除优于正确简单阈值/
+  两步前瞻的主张。除非未来另有外部动机充分的 action-specific lifecycle 问题，本线停止扩展。
+
 ## 2026-10-05：论文 v1.1 保留冻结公式，明确全路径映射缺口
 
 - 文稿补全双方成本项目，不用编辑后的通用分解替代历史冻结公式或重新解释数值。

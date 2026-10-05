@@ -9,12 +9,18 @@
 
 ## Live 文档
 
+- `recovery_cost_defect_impact_report_20261006.md`：修复前独立只读审查，追踪 decision、branch execution、cache
+  终态、汇总和 claim 的路径不对称影响，并列明仍有效证据
+- `recovery_cost_corrected_matrix_results_20261006.md`：原 12 点对称公平复算、四方法完整旧→新对照及历史优势撤销
+- `recovery_cost_boundary_check_results_20261006.md`：事前冻结 6 点生成规则、信息权限、停止条件与全量正负结果
+- `recovery_cost_correction_execution_record_20261006.md`：提交/命令/测试/预算/artifact 完整性和主工作区保护记录
+
 - `real_cache_victim_reload_plan_20261005.md`：真实 SmolVLM base + Helmet/ALPR adapter 的 12-call 事前冻结方案；
   对称核算 restart/recovery、合法 adapter-only victim、后续 reload 与无驱逐对照
 - `real_cache_victim_reload_results_20261005.md`：12/12 调用、逐事件 runtime tensor unload/reload、无驱逐对照、
   全路径成本/预测误差、共同外部代价与论文 claim 收缩
 
-- `manuscript_evidence_progress_20261005.md`：论文 v1.2 的成果、真实 lifecycle 新证据、未解决问题与追加记录规范。
+- `manuscript_evidence_progress_20261005.md`：论文 v1.3 的成果、成本纠错、真实 lifecycle、未解决问题与追加记录规范。
 
 - `independent_recovery_cost_measurement_plan_20261005.md`：独立成本检查的实例、随机顺序、既有校准、事前预测、
   24-call 硬预算、评分和未覆盖条件；模型输出产生前冻结
@@ -66,8 +72,8 @@
 
 - `vec_ai_workload_dataset_design_20260928.md`：车联网AI工作流/缓存数据集贡献候选，提出依据、校准生成方案、D01–D12证据池和验收边界；尚未生成或发布
 
-- `system_mechanism_manuscript_working_draft.md`：系统机制主线英文工作稿 v1.2，含真实 adapter victim→reload、
-  对称成本边界、开发结果、限制与独立证据映射；不是投稿终稿
+- `system_mechanism_manuscript_working_draft.md`：系统机制主线英文工作稿 v1.3，含真实 adapter victim→reload、
+  对称事件核算、历史优势撤销、边界错选、限制与独立证据映射；不是投稿终稿
 
 - `problem_literature_traceability_20260928.md`：P01–P07问题、L01–L10论文、官方出处/等级边界、补证与失败判据的固定追溯索引
 

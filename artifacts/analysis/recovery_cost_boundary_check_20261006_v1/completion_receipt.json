@@ -1,0 +1,13 @@
+{
+  "all_paths_feasible": true,
+  "design_point_count": 6,
+  "downloads": 0,
+  "elapsed_wall_seconds": 0.23287283300000006,
+  "isolated_native_path_count": 24,
+  "model_calls": 0,
+  "old_holdout_operations": 0,
+  "rl_started": false,
+  "run_id": "recovery_cost_boundary_check_20261006_v1",
+  "single_execution": true,
+  "status": "COMPLETED"
+}

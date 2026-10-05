@@ -5,6 +5,19 @@
 
 ﻿# Progress
 
+## 2026-10-06：恢复成本不对称已纠错，历史方法优势撤销
+
+- 从 `codex/manuscript-evidence-v1` 的 `b3a00b…` 起步，主工作区七个用户修改保持不变；只读缺陷报告先以独立提交
+  `4e897bf…` 落盘，再由 `800f0a1…` 承接实现。
+- 确认旧公式并非只影响文字：action 0 没有在 target cache 执行当前模型 transaction，导致 decision scorer、实际 branch
+  成本/终态和 offline reference 同时路径不对称；旧 30-file manifest 在 Git checkout 中另有 1 个 CSV CRLF→LF 规范化差异。
+- 原 12 点按相同场景/顺序/容量/估计倍率一次复算：48 个隔离 native path 全合法，四方法 12/12 动作、成本和 reference
+  gap 相同；除 d08 外均 recover。旧 `10/12 vs 7/12`、`-17.993 s` 和 `-972,125,684 B` 方法优势全部撤销。
+- 事前冻结的 6 点边界检查一次完成 24 path；三在线规则 6/6 相同、匹配参考 4/6。两个 reciprocal link estimate mismatch
+  分别产生 `+0.001472/+0.004626 s` gap，保留为估计风险，不是网络实测。
+- 两轮均 0 RL/model call/download/old holdout；原矩阵 7/7、边界 5/5 artifact integrity byte-exact。主稿更新为 v1.3；
+  最强贡献收敛为状态恢复与 adapter lifecycle 一体化、事件级成本审计和失效条件，不再主张算法优势。
+
 ## 2026-10-05：真实 adapter victim→reload 已完成
 
 - 解析起点为 `54b5cfb754cf5c3b3191172704f6e74df3f90ec9`；确认并保护主工作区七个用户修改。

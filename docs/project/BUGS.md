@@ -5,6 +5,18 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-06：路径不对称已修复；算法增量价值缺口确认（RESOLVED IMPLEMENTATION / OPEN CLAIM BLOCKER）
+
+- `RESOLVED`：新 v2 ledger 为 restart/recovery 分别建立 cache state，双方都执行 current→next 合法 transaction；每个 model
+  admission、dynamic transfer、restore/recompute 只计一次。decision preview 与 realized score 使用 4 个独立环境。
+- `WITHDRAWN`：旧 action 0 跳过 target 当前准备，旧 `two_step` 又复用同一 scorer，offline reference 也比较不匹配分支；
+  因此 `10/12 vs 7/12`、17.993 s / 972,125,684 B 优势及 d10/d11 原归因不能作为纠正后证据。
+- `NEGATIVE`：纠正后四方法 12/12 全同；新边界三在线规则 6/6 全同，并共同在两个固定 link estimate mismatch 点错选。
+  新方法相对正确简单阈值和两步前瞻没有新增能力。
+- `OPEN BLOCKER`：若论文坚持算法创新，需要外部动机充分且真正 action-specific 的 lifecycle 差异及独立现实证据；本轮不扩建
+  跨 workflow 平台、共享队列、RL 或模型测量。当前只能定位为系统机制与经验性失败边界研究。
+- `BOUNDARY`：synthetic 时间来自 Mbps/fixed-latency 模型，不是网络实测；6 点边界不是现实误差分布或统计泛化。
+
 ## 2026-10-05：真实 victim→reload 已闭环，但不是差异化决策证据（RESOLVED BOUNDED / OPEN CLAIM BOUNDARY）
 
 - fixed commit `f31024d…` 的 12/12-call witness 已确认 native 合法 ALPR victim、PEFT tensor/object 实际卸载、后续

@@ -1,5 +1,17 @@
 ﻿# Directory Structure
 
+## 2026-10-06 symmetric recovery cost correction
+
+- `src/runtime/symmetric_recovery_cost.py`：双方 event ledger 的纯函数 scorer 与三种在线决策。
+- `scripts/run_symmetric_recovery_cost_validation.py`：四环境隔离的 preview/score runner、offline reference 和 old→new 输出。
+- `configs/experiment/eviction_aware_recovery_corrected_v2.json`：按旧 config SHA 继承原 12 点的纠正版。
+- `configs/experiment/recovery_cost_boundary_check_v1.json`：最多 6 点的一次性机制边界冻结配置。
+- `tests/test_symmetric_recovery_cost.py`：共同成本、分支隔离、依赖安全、reload 守恒和权限边界。
+- `artifacts/analysis/eviction_aware_recovery_corrected_20261006_v2/`：12 点、48 path、old→new 48 行与 7-file manifest。
+- `artifacts/analysis/recovery_cost_boundary_check_20261006_v1/`：6 点、24 path、全量结果与 5-file manifest。
+- `docs/project/recovery_cost_{defect_impact_report,corrected_matrix_results,boundary_check_results,correction_execution_record}_20261006.md`：
+  只读缺陷、复算、边界和交付记录。
+
 ## 2026-10-05 real adapter victim→reload
 
 - `configs/acceptance/real_cache_victim_reload_v1.json`：真实资源 identity/字节容量、两条件、逐臂成本和 12-call 上限。

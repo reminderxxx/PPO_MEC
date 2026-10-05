@@ -5,6 +5,18 @@
 
 # Runbook
 
+## 对称恢复成本复算（2026-10-06；已完成，不得覆盖）
+
+`scripts/run_symmetric_recovery_cost_validation.py` 只接受 clean、精确 expected commit 和不存在的 output root；失败原件保留，
+不自动重试。原 12 点和 6 点边界的实际命令、commit 与 preflight SHA 误写记录见
+`recovery_cost_correction_execution_record_20261006.md`。两项 run 均已完成，禁止覆盖或按结果补点：
+
+- `artifacts/analysis/eviction_aware_recovery_corrected_20261006_v2/`：12 点、48 path、0 model call；
+- `artifacts/analysis/recovery_cost_boundary_check_20261006_v1/`：6 点、24 path、0 model call。
+
+后续只允许读这些 artifact 或在新任务中另立新 run ID；不得把 synthetic Mbps 时间称为网络实测，也不得复用旧对称矩阵
+继续调参。
+
 ## 真实 adapter victim→reload 最小实测（2026-10-05）
 
 计划、执行器和局部测试先提交，再从该 clean commit 对不存在的结果目录只启动一次：

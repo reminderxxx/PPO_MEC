@@ -1,7 +1,7 @@
 # 论文成果与问题台账
 
-更新：2026-10-05。主稿：`system_mechanism_manuscript_working_draft.md` v1.2。
-本次新增一次事前冻结的 12-call 真实 adapter lifecycle witness；不训练 RL、不下载资源、不读取旧 holdout，也不改写历史 artifact。
+更新：2026-10-06。主稿：`system_mechanism_manuscript_working_draft.md` v1.3。
+本次新增独立缺陷影响报告、原 12 点对称纠正版和 6 点冻结机制边界检查；不训练 RL、不调用模型、不下载资源、不读取旧 holdout，也不改写历史 artifact。
 
 ## 已完成成果及可用范围
 
@@ -16,20 +16,25 @@
 | E07 | 合法 victim 是否导致真实后续重载 | native 合法驱逐 ALPR 后，PEFT 780 tensors→0；后续从本地文件重载为 780 tensors 并执行 n2；两臂均通过 | `real_cache_victim_reload_results_20261005.md` 与 `artifacts/analysis/real_cache_victim_reload_20261005_v1/` | 单主机、单实例、OS cache 未清、网络模拟 |
 | E08 | 无驱逐时是否确实无外部代价 | base+双 adapter 对照的当前/未来请求均 `noop_all_resident`，两臂 action load/unload=0 | 同上 | 仅一个对照，不做统计外推 |
 | E09 | 驱逐是否改变 restart/recovery 相对选择 | 两臂 lifecycle 为 1.022245/1.026997 s，因节点依赖相同而共同计费；两条件仍都选 recovery | 同上 | 未跨决策边界，不支持 action reversal |
+| E10 | 历史公式是否影响实际比较而非只影响文字 | 旧 action 0 未执行 target 当前模型 transaction，online scorer、实际 branch score 和 offline reference 同时受影响 | `recovery_cost_defect_impact_report_20261006.md` | 只读缺陷报告，不把修复预判为通过 |
+| E11 | 原 12 点公平复算后还剩多少方法优势 | 四方法 12/12 动作、成本、完成和 reference gap 相同；旧 10/12 vs 7/12 优势完全撤销 | `recovery_cost_corrected_matrix_results_20261006.md` 与对应 artifact | synthetic development correction，非独立验证 |
+| E12 | 正确规则是否新增能力或只与简单规则持平 | 新 6 点三在线方法 6/6 相同；在 2 个冻结 link 误差边界共同错选 | `recovery_cost_boundary_check_results_20261006.md` 与对应 artifact | analytic boundary check，不是现实误差分布 |
+| E13 | 共享 base、当前 resident、无驱逐是否正确记账 | b02/b03/b04 全部逐事件通过；共同 lifecycle 在两路各计一次且 6/6 相同 | 同上 `all_method_results.json` | 没有 action-specific cache 差异或算法收益 |
 
 ## 正在解决和未解决的问题
 
-- P01，RESOLVED FOR THIS INSTANCE / HISTORICAL DEFECT FROZEN：已逐路径列出模型准备、输入/状态、前缀/后缀和后续重载；旧公式的 recovery-only `D0` 口径登记为 frozen scientific defect，不重算旧结果。
+- P01，RESOLVED / HISTORICAL CLAIM WITHDRAWN：已确认旧公式、旧 action-0 branch 和旧 offline reference 同时路径不对称；旧 artifact 保留，比较性结论撤销，并由 create-only 纠正版替代。
 - P02，RESOLVED BOUNDED：合法 victim→实际 PEFT object/tensor 卸载→后续本地文件重载→n2 执行已闭环；logical resident、runtime 对象、磁盘文件和未控制 OS cache 四层分开。
-- P03，OPEN：独立条件是否覆盖恢复/重跑两侧；不得无意义填充状态或 sleep 制造翻转。
+- P03，PARTIAL / BOUNDED：6 点边界检查覆盖两侧并保留两个估计错选，但只来自 analytic link mismatch，不是独立真实分布；不得包装为校准性能。
 - P04，OPEN：远端成本、任务标签及外部代表性。暂不建设共享队列或跨 workflow 平台；是否需要由最终主张决定。
 - P05，OPEN：系统组合的新颖性及投稿定位；引用已有成本感知思想，不用润色填补增量价值缺口。
 
 ## 本轮收口结论
 
-最小真实生命周期已经得到验证，无需继续同侧重复。若论文只主张 lifecycle 与成本可追溯，P02 已闭环；若主张 eviction 改变
-restart/recovery 决策，则必须先证明两条合法路径为何产生不同 resident 转移。不得靠旧公式的不对称计费制造翻转，也不据此扩建
-多租户平台、启动 RL 或搜集新模型。
+最小真实生命周期与对称事件核算已经得到验证，无需继续同侧重复。修正后旧方法优势为 0，正确简单阈值、完整规则与正确两步
+前瞻持平。当前最强贡献收敛为 state recovery 与 adapter lifecycle 一体化实现、可复现成本审计及失效条件。若仍主张 eviction
+改变动作，必须先有外部动机充分且真正 action-specific 的合法 resident 转移；不得靠不对称计费制造翻转，也不据此扩建多租户
+平台、启动 RL 或追加模型测量。
 
 ## 后续追加格式
 
@@ -57,3 +62,18 @@ restart/recovery 决策，则必须先证明两条合法路径为何产生不同
 - review identity：`reviewed_at=2026-10-05`，`literature_cutoff=2026-10-05`，`target_venue=IEEE TMC`，
   `artifact_run_id=real_cache_victim_reload_20261005_v1`，`policy_version=tmc_review_policy_v3_20260621`，
   `evidence_level=E2_ARTIFACT_AUDITED`（bounded same-host lifecycle；network assumed）。
+
+## v1.3 成本纠错与公平复算记录
+
+- 只读缺陷提交 `4e897bf…`；实现冻结 `800f0a1…`；原 12 点执行提交 `800f0a1…`；边界执行提交 `3069117…`。
+- 原矩阵 artifact：`eviction_aware_recovery_corrected_20261006_v2`，12 点、48 隔离 path、0 model call；四方法
+  12/12 动作和成本相同，历史新增正确动作 `5→0`。
+- 边界 artifact：`recovery_cost_boundary_check_20261006_v1`，6 点、24 隔离 path、0 model call；三在线规则 6/6
+  相同、匹配参考 4/6；两个固定 link estimate mismatch 的 gap 为 `0.001472/0.004626 s`。
+- 保留：production state fidelity、真实 PEFT victim→reload、shared-base dependency safety、负面边界和估计误差风险。
+- 撤销：10/12 vs 7/12、相对简单阈值 17.993 s / 972,125,684 B 优势、d10/d11 作为纠正后错选证据，以及任何
+  优于正确两步前瞻的暗示。
+- review identity：`reviewed_at=2026-10-06`，`literature_cutoff=2026-10-05`，`target_venue=IEEE TMC`，
+  `artifact_run_id=eviction_aware_recovery_corrected_20261006_v2 + recovery_cost_boundary_check_20261006_v1`，
+  `policy_version=tmc_review_policy_v3_20260621`，`evidence_level=E2_ARTIFACT_AUDITED`（bounded synthetic correction；
+  network modeled）。

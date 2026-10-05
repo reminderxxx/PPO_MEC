@@ -5,6 +5,18 @@
 
 # Artifact Records
 
+## 2026-10-06 symmetric recovery cost correction and boundary check
+
+- corrected root：`artifacts/analysis/eviction_aware_recovery_corrected_20261006_v2/`；执行 commit `800f0a1…`；原 12 点、
+  48 隔离 native paths、0 model call/RL/download/old holdout，wall `0.502246 s`；7/7 manifest files byte-exact。
+- 四方法均完成 24/24 节点、0 failure/violation，动作与成本 12/12 相同；总时间 `174.787877 s`、总 bytes
+  `2,047,037,144`、recompute `11.035304 s`。旧 `10/12 vs 7/12` 优势撤销。
+- boundary root：`artifacts/analysis/recovery_cost_boundary_check_20261006_v1/`；执行 commit `3069117…`；事前冻结 6 点、
+  24 paths、0 model call，wall `0.232873 s`；5/5 files byte-exact。三在线规则 6/6 相同、匹配参考 4/6；两个固定
+  link estimate mismatch gap `0.001472/0.004626 s`。
+- 历史 v1 原件不覆盖；完整 48 行 old→new 对照随 corrected root 保存。证据等级仅
+  `E2_BOUNDED_SYNTHETIC_CORRECTION_AND_BOUNDARY_ARTIFACT_AUDITED`，非独立现实、无线、统计泛化或算法优势。
+
 ## 2026-10-05 real adapter cache victim→reload
 
 - root：`artifacts/analysis/real_cache_victim_reload_20261005_v1/`；解析起点 `54b5cfb…`，固定执行 commit
@@ -31,7 +43,8 @@
 
 - root：`artifacts/analysis/eviction_aware_recovery_validation_20261005_v1/`；冻结执行 commit
   `f5033c1b10f8c323f2247a09b1f5ab73a8621387`，12 points、24 native branches、48 method rows、0 RL/model
-  call/download/holdout，wall `0.635429 s`；30/30 manifest files 独立 size/SHA-256 通过。
+  call/download/holdout，wall `0.635429 s`。历史执行时 30/30 manifest 通过；2026-10-06 当前 Git checkout 复核为
+  29/30 byte-exact，唯一差异是 CSV 被 `.gitattributes` 从 CRLF 规范为 LF，恢复 CRLF 后与 manifest hash/size 一致。
 - 全部方法 24/24 节点且 0 deadline violation。原阈值/新规则/两步/离线参考总时间
   `174.096793/156.103518/156.103518/144.675011 s`，transfer
   `2,038,648,604/1,066,522,920/1,066,522,920/923,916,580 B`。

@@ -1,0 +1,60 @@
+{
+  "equal_lifecycle_event_count": 6,
+  "methods": {
+    "eviction_aware_recovery": {
+      "completed_node_count": 12,
+      "deadline_violation_count": 0,
+      "dynamic_transfer_bytes": 203682,
+      "instance_count": 6,
+      "match_offline_count": 4,
+      "model_transfer_bytes": 662700032,
+      "modeled_completion_seconds": 53.67518451999999,
+      "recompute_seconds": 0.0,
+      "recover_decision_count": 5,
+      "service_failure_count": 0,
+      "total_transfer_bytes": 662903714
+    },
+    "offline_reference": {
+      "completed_node_count": 12,
+      "deadline_violation_count": 0,
+      "dynamic_transfer_bytes": 203682,
+      "instance_count": 6,
+      "match_offline_count": 6,
+      "model_transfer_bytes": 662700032,
+      "modeled_completion_seconds": 53.66908621599999,
+      "recompute_seconds": 0.0,
+      "recover_decision_count": 5,
+      "service_failure_count": 0,
+      "total_transfer_bytes": 662903714
+    },
+    "original_simple_threshold": {
+      "completed_node_count": 12,
+      "deadline_violation_count": 0,
+      "dynamic_transfer_bytes": 203682,
+      "instance_count": 6,
+      "match_offline_count": 4,
+      "model_transfer_bytes": 662700032,
+      "modeled_completion_seconds": 53.67518451999999,
+      "recompute_seconds": 0.0,
+      "recover_decision_count": 5,
+      "service_failure_count": 0,
+      "total_transfer_bytes": 662903714
+    },
+    "two_step_lookahead": {
+      "completed_node_count": 12,
+      "deadline_violation_count": 0,
+      "dynamic_transfer_bytes": 203682,
+      "instance_count": 6,
+      "match_offline_count": 4,
+      "model_transfer_bytes": 662700032,
+      "modeled_completion_seconds": 53.67518451999999,
+      "recompute_seconds": 0.0,
+      "recover_decision_count": 5,
+      "service_failure_count": 0,
+      "total_transfer_bytes": 662903714
+    }
+  },
+  "proposed_offline_action_agreement_count": 4,
+  "proposed_two_step_action_agreement_count": 6,
+  "simple_proposed_action_agreement_count": 6
+}
