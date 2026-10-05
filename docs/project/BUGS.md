@@ -739,3 +739,11 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
   claim-to-artifact 映射，故 TMC-ready 只能判为 `Unverifiable`。
 - 后续必须保持 controller-level MARL、`semantic_discrete_5`、受控 adapter mapping、policy guard 和 learned predictor
   的归因边界；不得把 `NGSIM + Alibaba` 写成真实 adapter request trace，或把 readiness/checkpoint inventory 写成性能证据。
+
+## 2026-10-05 shared cache × recovery remaining blockers
+
+- `OPEN / cross-workflow cache lifecycle`：原生 typed resident set 只在同一 env episode 内持续；`reset()` 和当前逐-workflow benchmark 实例化会恢复 template resident，尚无跨 workflow 共享缓存生产生命周期。
+- `OPEN / shared resource contention`：当前 bytes/time 是 accounting；action 不会消耗共享无线带宽、compute queue 或 waiting-time resource。不得把本轮结果写成多请求无线/计算争用收益。
+- `OPEN / external validity`：A/B/C 使用 contract-legal synthetic audit objects，不是真实模型权重；100 Mbps、同机 state overhead 和 technical-workload recompute 是冻结估计，非真实无线测量。
+- `RESOLVED WITH BOUNDED WITNESS / within-episode state coupling`：C 已证明合法 action 4 可经有限容量 LRU 改变后续 resident set、reload bytes 和 action mask；这不是不同 `restore_cost` 造成。但仅为 E2 bounded，不授权 RL、formal/holdout 或 paper-ready claim。
+- `CORRECTED / method identity`：frozen runner 将 resident-aware estimate 标为 `current_simple_threshold`，与 workload-v0.1 原方法信息权限不一致。原规则按预存冻结输入复算仍在 A/B/C 全选 action 4，故 native outcome 不变；原 frozen decision record 只保留审计，不可用作方法权限证明。

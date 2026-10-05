@@ -1,0 +1,61 @@
+{
+  "files": [
+    {
+      "path": "all_method_results.csv",
+      "sha256": "67d48b97ba58d50d29aa941b2d8e05a211896d67d511dbedde5b97ec6f1300b6",
+      "size_bytes": 1843
+    },
+    {
+      "path": "all_method_results.json",
+      "sha256": "1c21037abfd17096543a1dd29de5e3a5bffc556cb45b0f860ffdf62a6c4d331b",
+      "size_bytes": 1056017
+    },
+    {
+      "path": "completion_receipt.json",
+      "sha256": "2a47697a172d57d290ceef1e3dce5fb4f29c451905328ce9757b2fdf22801f48",
+      "size_bytes": 873
+    },
+    {
+      "path": "event_witness.json",
+      "sha256": "4327648cecb9581b982793b1fd40ffe3f7a095a9e52585fd35c0879ecf0f3774",
+      "size_bytes": 6770
+    },
+    {
+      "path": "frozen_protocol.json",
+      "sha256": "cea5a6d57a62c47c20126bdb0a9e6c98bf544732950ea3ee2fb1866ec0981885",
+      "size_bytes": 7302
+    },
+    {
+      "path": "runtime_state_packages/A_no_competition_shared_base/first_action_4/shared_cache_recovery::A_no_competition_shared_base__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "f4c272237f96a32e288dae501739f1c9d8db945508cb2491ebcf806f8ab4e03d",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/A_no_competition_shared_base/first_action_4/shared_cache_recovery::A_no_competition_shared_base__veh_coupling_witness__step_000001/state.json",
+      "sha256": "a13b2fcc9d40a285f1935e60adcf84860a24bc86ddf39c61db0300ea9d20a98d",
+      "size_bytes": 1840
+    },
+    {
+      "path": "runtime_state_packages/B_competition_no_future_cost_effect/first_action_4/shared_cache_recovery::B_competition_no_future_cost_effect__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "76c30cb638e9a40144ea555ebff6f23dfb6c50b8a9055d08920b2694438a20e9",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/B_competition_no_future_cost_effect/first_action_4/shared_cache_recovery::B_competition_no_future_cost_effect__veh_coupling_witness__step_000001/state.json",
+      "sha256": "b349165330cd47390edbc8fea3c636395bc977e20e3445f2acebbdc75146fb4e",
+      "size_bytes": 1854
+    },
+    {
+      "path": "runtime_state_packages/C_competition_future_residency_effect/first_action_4/shared_cache_recovery::C_competition_future_residency_effect__veh_coupling_witness__step_000001/manifest.json",
+      "sha256": "f92288c03f6b2697345ea733da1deff92b1c10f6606e0fa7b853a019a3bcbf15",
+      "size_bytes": 337
+    },
+    {
+      "path": "runtime_state_packages/C_competition_future_residency_effect/first_action_4/shared_cache_recovery::C_competition_future_residency_effect__veh_coupling_witness__step_000001/state.json",
+      "sha256": "6ad011b3242adf5c573e16d35d463169aa773db0ebb3eb523a2a70794c21d0dd",
+      "size_bytes": 1858
+    }
+  ],
+  "hash_algorithm": "sha256",
+  "run_id": "shared_cache_recovery_coupling_20261005_v1"
+}

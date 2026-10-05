@@ -352,3 +352,11 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
   run-root 创建和模型加载前失败并记录于 companion review，旧 adapter 验收目录和原始 FAIL 回执不覆盖、不改写。
 - `artifacts/analysis/two_node_workflow_suffix_recovery_20261003_review_v1/`：pre-execution 失败、main 七文件保护、
   旧证据 hash 和独立完整性复算。
+
+## 2026-10-05 shared cache × recovery coupling additions
+
+- `configs/experiment/shared_cache_recovery_coupling_v1.json`：A/B/C 三点、方法权限、成本目标、命令和输出清单的事前冻结协议。
+- `scripts/run_shared_cache_recovery_coupling.py`：只走正常 `GymVecEnv.step` 的两分支原生见证入口；不训练 RL。
+- `tests/test_shared_cache_recovery_coupling.py`：A/B/C later-load 差异与 `reset()` 切断跨 workflow resident state 的局部合同测试。
+- `artifacts/shared_cache_recovery_coupling_20261005_v1/`：单次执行 JSON/CSV、逐事件 C witness、create-only state packages、receipt 与 integrity manifest。
+- `docs/project/shared_cache_recovery_coupling_{plan,audit}_20261005.md`：事前冻结和事后审查。

@@ -539,3 +539,7 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 `docs/project/formal_request_subject_lifecycle_contract.md`、
 `docs/project/formal_exogenous_request_execution_contract.md` 与
 `docs/project/formal_environment_identity_projection_contract.md`。
+
+## Shared cache × recovery bounded witness
+
+`docs/project/shared_cache_recovery_coupling_audit_20261005.md` 记录一次不训练的原生状态转移核验。结论是：同一 episode 内 action 4 可通过有限容量 typed-cache transaction 改变后续 reload cost 和 action mask；当前 benchmark 的 `reset()`/逐 workflow 环境仍切断跨 workflow 共享，且没有共享带宽/计算队列。该 E2 witness 不是 formal、holdout、真实无线或 RL 收益证据。

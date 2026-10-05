@@ -1,0 +1,30 @@
+{
+  "all_actions_legal": true,
+  "all_branches_completed_equal_work": true,
+  "coupling_instances": [
+    "C_competition_future_residency_effect"
+  ],
+  "design_point_count": 3,
+  "method_first_actions": {
+    "A_no_competition_shared_base": {
+      "current_simple_threshold": 4,
+      "existing_two_step_rule": 0,
+      "offline_enumeration_reference": 4
+    },
+    "B_competition_no_future_cost_effect": {
+      "current_simple_threshold": 4,
+      "existing_two_step_rule": 0,
+      "offline_enumeration_reference": 4
+    },
+    "C_competition_future_residency_effect": {
+      "current_simple_threshold": 4,
+      "existing_two_step_rule": 0,
+      "offline_enumeration_reference": 0
+    }
+  },
+  "native_branch_execution_count": 6,
+  "rl_started": false,
+  "run_id": "shared_cache_recovery_coupling_20261005_v1",
+  "single_execution": true,
+  "status": "COMPLETED"
+}

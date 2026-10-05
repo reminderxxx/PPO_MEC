@@ -1,0 +1,50 @@
+{
+  "schema_version": "1.0.0",
+  "status": "POST_RUN_METHOD_IDENTITY_CORRECTION",
+  "corrected_at": "2026-10-05",
+  "run_id": "shared_cache_recovery_coupling_20261005_v1",
+  "original_execution_git_commit": "23e0aa94e8359ed87093ac86f23aa3c8deb9097a",
+  "preservation": {
+    "original_frozen_protocol_modified": false,
+    "original_results_modified": false,
+    "native_environment_rerun": false,
+    "result_selection_changed": false
+  },
+  "issue": "The frozen runner labeled its resident-aware preparation estimate as current_simple_threshold. The preserved workload-v0.1 method mechanism_aware_local_incremental_cost did not read per-event resident state or target-model readiness for discrimination; target-model preparation was a common term in restart and recovery.",
+  "source": {
+    "audit": "docs/project/workload_v0_1_self_consistency_audit_20261005.md",
+    "config": "configs/experiment/workload_v0_1_cost_mismatch_robustness_v1.json",
+    "implementation": "scripts/run_workload_v0_1_cost_mismatch_robustness.py::_estimated_costs"
+  },
+  "original_ex_ante_parameters": {
+    "prefix_recompute_seconds": 11.035304,
+    "recovery_overhead_seconds": 0.006151,
+    "input_bytes": 192757,
+    "estimated_state_bytes": 2040,
+    "link_mbps": 100.0,
+    "fixed_one_way_seconds": 0.02,
+    "target_model_prepare_role": "common_to_both_actions_and_cancels"
+  },
+  "recomputed_original_threshold": {
+    "restart_incremental_seconds": 11.07072456,
+    "recovery_incremental_seconds": 0.0263142,
+    "rule": "recover iff estimated_recovery_incremental_seconds < estimated_restart_incremental_seconds",
+    "choice_for_all_frozen_points": "action_4_recover_prepare"
+  },
+  "action_equivalence": {
+    "A_no_competition_shared_base": {
+      "frozen_runner_choice": 4,
+      "preserved_original_threshold_choice": 4
+    },
+    "B_competition_no_future_cost_effect": {
+      "frozen_runner_choice": 4,
+      "preserved_original_threshold_choice": 4
+    },
+    "C_competition_future_residency_effect": {
+      "frozen_runner_choice": 4,
+      "preserved_original_threshold_choice": 4
+    }
+  },
+  "effect_on_results": "The native branch and all recorded outcomes for the current simple threshold remain action-equivalent and numerically unchanged. The frozen decision_record is not faithful evidence of the preserved method's information usage and must be read together with this correction.",
+  "claim_boundary": "This correction does not turn the online threshold into a resident-aware method. The proposed eviction-externality-aware rule remains a future design requiring a separately frozen validation."
+}

@@ -1606,3 +1606,15 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 七个用户修改文件 SHA-256 未变且未纳入任何提交。Protocol 2.9、Readiness v21、科学配置及旧 invalid-run
 限制均未改变。v16 仍未创建、未消耗、未执行；这是启动授权暂缓，不是运行失败。main 测试使用受控数据
 准备，public preflight 不等于完整正式评估；无正式训练、formal performance、holdout、G14D/G15 或论文结论。
+
+## 2026-10-05 shared cache × recovery coupling witness
+
+- run id：`shared_cache_recovery_coupling_20261005_v1`
+- root：`artifacts/shared_cache_recovery_coupling_20261005_v1/`
+- baseline / audit / execution commits：`3881271a...` / `5fd8096...` / `23e0aa94...`
+- scope：3 frozen design points × 2 native first-action branches；single execution；RL/model call/download/network simulator/holdout 均未启动。
+- receipt：3/3 points、6 native branches、全部合法、全部同完成量；唯一 later-transfer coupling 点为 C。
+- manifest：11 listed files independently verified（CSV 按 repository LF 规范化）；manifest SHA-256=`c1683dafc80c4e7b97c89e0fa2904696f7f18e0aaff1547eb752a0377a91b971`。
+- evidence：`E2_bounded_native_transition_witness`；non-formal synthetic typed identities；不能替代真实无线、cross-workflow persistence、统计覆盖或 formal/holdout。
+- report：`docs/project/shared_cache_recovery_coupling_audit_20261005.md`。
+- correction：`post_run_method_identity_correction.json` 记录 frozen label/observation-scope defect；原 workload-v0.1 阈值复算与 frozen runner 在 A/B/C action-equivalent，未重跑 native env。`post_run_correction_integrity_manifest.json` 绑定原 manifest 与 correction。

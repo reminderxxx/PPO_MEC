@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "shared_cache_recovery_coupling_20261005_v1",
+  "purpose": "bind the immutable original run manifest to the post-run method-identity correction",
+  "hash_algorithm": "sha256",
+  "files": [
+    {
+      "path": "integrity_manifest.json",
+      "sha256": "c1683dafc80c4e7b97c89e0fa2904696f7f18e0aaff1547eb752a0377a91b971"
+    },
+    {
+      "path": "post_run_method_identity_correction.json",
+      "sha256": "8b5cf6fbb651954711a227fd9ca0427cc1f15532e08be4e5195a252f7d433644"
+    }
+  ]
+}

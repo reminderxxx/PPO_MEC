@@ -228,3 +228,10 @@
 - 机器证据：`../../artifacts/analysis/typed_model_cache_formal_nullable_metric_repair_20260903_g14r12_v1/`
 - 状态：v12 永久 invalid；exact 256-episode 与 13-phase non-formal rehearsal 已闭环，正式
   training/checkpoint/performance仍为0，holdout sealed/unopened，未启动G14C v13/G14D/G15。
+
+## 2026-10-05 shared cache × recovery coupling
+
+- 事前冻结：`shared_cache_recovery_coupling_plan_20261005.md`
+- 事后审查：`shared_cache_recovery_coupling_audit_20261005.md`
+- 机器证据：`../../artifacts/shared_cache_recovery_coupling_20261005_v1/`
+- 当前边界：同一 episode 内有限容量 resident-state 耦合成立；跨 workflow 持久缓存及共享无线/计算资源未实现；研究决定 3，不启动 RL。

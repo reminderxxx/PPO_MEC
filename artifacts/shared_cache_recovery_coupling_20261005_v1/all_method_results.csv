@@ -1,0 +1,10 @@
+instance_id,classification,method,online,oracle,first_action_id,actions_executed,completed_node_count,simulator_step_count,service_failure_count,total_transfer_bytes,modeled_recompute_seconds,modeled_completion_seconds,deadline_violation_count,changes_later_model_transfer
+A_no_competition_shared_base,no_competition_local_rule_sufficient,current_simple_threshold,True,False,4,4 0,2,2,0,8390785,0.0,0.7747618000000001,0,False
+A_no_competition_shared_base,no_competition_local_rule_sufficient,existing_two_step_rule,True,False,0,0 0 0,2,3,1,0,11.035304,11.095304,0,False
+A_no_competition_shared_base,no_competition_local_rule_sufficient,offline_enumeration_reference,False,True,4,4 0,2,2,0,8390785,0.0,0.7747618000000001,0,False
+B_competition_no_future_cost_effect,competition_but_current_action_does_not_change_later_required_model_load,current_simple_threshold,True,False,4,4 0,2,2,0,251660431,0.0,20.25633348,0,False
+B_competition_no_future_cost_effect,competition_but_current_action_does_not_change_later_required_model_load,existing_two_step_rule,True,False,0,0 0 0,2,3,1,142606336,11.035304,22.523810879999996,0,False
+B_competition_no_future_cost_effect,competition_but_current_action_does_not_change_later_required_model_load,offline_enumeration_reference,False,True,4,4 0,2,2,0,251660431,0.0,20.25633348,0,False
+C_competition_future_residency_effect,current_action_may_change_later_legal_state_and_cost,current_simple_threshold,True,False,4,4 0,2,2,0,251660435,0.0,20.2563338,0,True
+C_competition_future_residency_effect,current_action_may_change_later_legal_state_and_cost,existing_two_step_rule,True,False,0,0 0 0,2,3,1,0,11.035304,11.095304,0,True
+C_competition_future_residency_effect,current_action_may_change_later_legal_state_and_cost,offline_enumeration_reference,False,True,0,0 0 0,2,3,1,0,11.035304,11.095304,0,True

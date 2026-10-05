@@ -2051,3 +2051,13 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - `docs/project/literature_reference_table.md` 新增 10 篇相关近邻，包含 TMC delay-reliability/cache-assisted offloading、TITS multi-edge/multi-vehicle orchestration、IoTJ DAG meta-RL、FGCS DT dual-timescale cache/offload、JSA agentic workflow scheduling 等；查重审计为 119 entries、title/DOI/URL duplicate 均为 0。
 - 新增 `docs/project/top_journal_paper_structure_gap_review_20260928.md`，逐段拆解 Introduction、全文论证链、可模仿写法和 PPO_MEC 缺口，并给出 9 段 Introduction 模板。
 - 当前 TMC-ready verdict 仍为 `Unverifiable / E1_DOCUMENTED`：G14C v16 formal/holdout/support 未闭环，仓库未发现 integrated manuscript；本轮没有修改算法、配置或实验结果。
+
+## 2026-10-05 shared cache × recovery 原生耦合核验
+
+- 基线 `main=3881271a...`；完整保留 workload-v0.1 原审查及修正历史，结论 commit=`5fd8096...`。原 `local/exact` 共用真值、24/24 非独立证据、三 seed 非独立测量及同机低成本边界均未改写。
+- 在冻结 commit `23e0aa94...` 上执行一次、6 个原生 branch、0 RL。A/B/C 共 3 个设计点全部使用正常 `GymVecEnv.step`、合法 action 和同一 typed-cache transaction；15 项专项/相邻测试通过。
+- 确认 episode 内有限容量驻留集是真实耦合：C 中 action 4 把目标 b1 整包换为 b0，下一请求必须重载 b1，且下一步 action mask 从 `[0,2,3,4]` 变为 `[0,1,2,3,4]`。
+- A/B 当前阈值与离线参考一致；C 当前阈值出现反向收益：同完成量、0 违约下为 `20.256334 s`，action 0/离线参考为 `11.095304 s`，差 `+9.161030 s`（均为冻结模型时间，不是无线实测）。
+- 研究决定为 3：另轮只验证带 resident eviction externality 的最小机制规则；本轮不实现新算法、不训练 RL。跨 workflow 持久缓存、共享带宽/计算/队列仍未实现，证据保持 E2 bounded。
+- 报告：`shared_cache_recovery_coupling_audit_20261005.md`；机器证据：`../../artifacts/shared_cache_recovery_coupling_20261005_v1/`。
+- 事后方法身份核对发现 frozen runner 的 `current_simple_threshold` 错把 resident-aware estimate 标成原 workload-v0.1 阈值；保留原产物并追加 correction。按原冻结参数复算仍在 A/B/C 全选 action 4，因此 branch/数值不变，但 frozen decision record 不作为原方法信息权限证据。

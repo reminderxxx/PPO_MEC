@@ -1,0 +1,181 @@
+{
+  "command": "scripts/run_shared_cache_recovery_coupling.py --config configs/experiment/shared_cache_recovery_coupling_v1.json --output-root artifacts/shared_cache_recovery_coupling_20261005_v1 --expected-git-commit 23e0aa94e8359ed87093ac86f23aa3c8deb9097a",
+  "config": {
+    "actual_design_points": 3,
+    "baseline_main_commit": "3881271a2c740cbcb86cff9bc023b2cf9b134118",
+    "cost_model": {
+      "deadline_seconds": 30.0,
+      "effective_link_mbps": 100.0,
+      "objective": [
+        "maximize_completed_nodes",
+        "minimize_deadline_violations",
+        "minimize_modeled_completion_seconds",
+        "minimize_transfer_bytes",
+        "minimize_modeled_recompute_seconds",
+        "minimize_service_failures",
+        "stable_action_tiebreak"
+      ],
+      "positive_transfer_fixed_latency_seconds": 0.02,
+      "prefix_recompute_seconds": 11.035304,
+      "prefix_recompute_source": "measurement_calibrated_vec_workload_20261005_v4_same_host_technical_workload",
+      "scope": "modeled_counterfactual_over_native_events_not_wall_clock_network_measurement",
+      "state_measurement_scope": "same_host_low_cost_only_not_wireless_deployment",
+      "state_package_bytes_reference": 2185,
+      "state_rebuild_seconds_reference": 0.002652,
+      "state_restore_seconds_reference": 0.002763,
+      "state_serialize_seconds_reference": 0.000736,
+      "successful_request_service_seconds": 0.03
+    },
+    "design_points": [
+      {
+        "capacity_mib": 320.0,
+        "classification": "no_competition_local_rule_sufficient",
+        "frozen_reason": "shared b0 base already resides at target and capacity is ample",
+        "instance_id": "A_no_competition_shared_base",
+        "source_initial_adapters": [
+          "b0.a0"
+        ],
+        "target_initial_adapters": [
+          "b0.a1"
+        ],
+        "workflow_adapters": [
+          "b0.a0",
+          "b0.a1"
+        ]
+      },
+      {
+        "capacity_mib": 136.0,
+        "classification": "competition_but_current_action_does_not_change_later_required_model_load",
+        "frozen_reason": "both branches must prepare b1 at the later request; action 4 changes only the intermediate target contents",
+        "instance_id": "B_competition_no_future_cost_effect",
+        "source_initial_adapters": [
+          "b0.a0"
+        ],
+        "target_initial_adapters": [],
+        "workflow_adapters": [
+          "b0.a0",
+          "b1.a0"
+        ]
+      },
+      {
+        "capacity_mib": 136.0,
+        "classification": "current_action_may_change_later_legal_state_and_cost",
+        "frozen_reason": "action 4 must replace the resident b1 bundle with b0 under the legal 136 MiB capacity, so the later b1 request may reload",
+        "instance_id": "C_competition_future_residency_effect",
+        "source_initial_adapters": [
+          "b0.a0"
+        ],
+        "target_initial_adapters": [
+          "b1.a0"
+        ],
+        "workflow_adapters": [
+          "b0.a0",
+          "b1.a0"
+        ]
+      }
+    ],
+    "evidence_level": "E2_bounded_native_transition_witness",
+    "execution": {
+      "command_template": "/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_shared_cache_recovery_coupling.py --config configs/experiment/shared_cache_recovery_coupling_v1.json --output-root artifacts/shared_cache_recovery_coupling_20261005_v1 --expected-git-commit ${FREEZE_COMMIT}",
+      "freeze_commit_resolution": "FREEZE_COMMIT is resolved once to git rev-parse HEAD immediately after the freeze commit; this changes no scientific parameter",
+      "required_outputs": [
+        "frozen_protocol.json",
+        "all_method_results.json",
+        "all_method_results.csv",
+        "event_witness.json",
+        "completion_receipt.json",
+        "integrity_manifest.json",
+        "runtime_state_packages/"
+      ]
+    },
+    "execution_constraints": {
+      "downloads_forbidden": true,
+      "model_calls_forbidden": true,
+      "network_simulator_forbidden": true,
+      "old_holdout_operations_forbidden": true,
+      "retuning_after_results_forbidden": true,
+      "rl_training_forbidden": true,
+      "single_execution": true
+    },
+    "frozen_at": "2026-10-05",
+    "maximum_design_points": 6,
+    "methods": {
+      "current_simple_threshold": {
+        "future_realizations_visible": false,
+        "observation_scope": "current semantic state, current action mask, current target residency, frozen ex_ante cost parameters",
+        "online": true,
+        "rule": "choose action 4 only when legal and current-model preparation plus state transfer estimate is below prefix recompute estimate; otherwise action 0"
+      },
+      "existing_two_step_rule": {
+        "future_realizations_visible": false,
+        "observation_scope": "current declared workflow graph, current action mask, current and next declared adapter identity",
+        "online": true,
+        "rule": "choose action 1 only when the declared next node uses the same adapter and action 1 is legal; otherwise action 0",
+        "source": "scripts.run_mechanism_evidence_closure.two_step_selector"
+      },
+      "offline_enumeration_reference": {
+        "claim_boundary": "reference only; not an online method and not evidence of combinatorial complexity",
+        "future_realizations_visible": true,
+        "observation_scope": "post-hoc realized native traces for first action 0 versus 4; action 0 thereafter",
+        "online": false,
+        "oracle": true
+      }
+    },
+    "native_contract": {
+      "cache_profile": "typed_base_adapter_state_v1",
+      "catalog_factory": "scripts.audit_native_typed_cache_probe.build_audit_catalog(sharing_enabled=True)",
+      "catalog_scope": "synthetic_probe_package_non_formal_native_audit_only",
+      "coverage_radius": 55.0,
+      "handoff_target_rsu": "rsu_b",
+      "maximum_steps": 3,
+      "model_families": {
+        "b0": {
+          "adapter_size_mib": 8.0,
+          "adapters": [
+            "b0.a0",
+            "b0.a1"
+          ],
+          "base_object": "base:b0",
+          "base_size_mib": 96.0,
+          "shared_base_relation": true
+        },
+        "b1": {
+          "adapter_size_mib": 8.0,
+          "adapters": [
+            "b1.a0"
+          ],
+          "base_object": "base:b1",
+          "base_size_mib": 128.0,
+          "shared_base_relation": false
+        }
+      },
+      "rsu_ids": [
+        "rsu_a",
+        "rsu_b"
+      ],
+      "rsu_positions": [
+        0.0,
+        100.0
+      ],
+      "source_rsu": "rsu_a",
+      "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+      "vehicle_positions": [
+        0.0,
+        20.0,
+        80.0,
+        100.0
+      ]
+    },
+    "policy_version": "tmc_review_policy_v3_20260621",
+    "preserved_workload_audit_commit": "5fd8096d0f3d419e976831bc199aa0f407a456df",
+    "run_id": "shared_cache_recovery_coupling_20261005_v1",
+    "schema_version": "1.0.0",
+    "seed": 7,
+    "target_venue": "IEEE Transactions on Mobile Computing (TMC)"
+  },
+  "config_path": "configs/experiment/shared_cache_recovery_coupling_v1.json",
+  "config_sha256": "cbccb8fb2adb037af14b81d3142369cb8c7cc7cd7223e31644a607c8cf66b91b",
+  "executed_at": "2026-10-05T07:31:20.513535+00:00",
+  "execution_git_commit": "23e0aa94e8359ed87093ac86f23aa3c8deb9097a",
+  "git_branch": "codex/shared-cache-coupling"
+}

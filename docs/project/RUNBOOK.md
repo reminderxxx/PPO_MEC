@@ -1595,3 +1595,19 @@ XML 必须包含 `test_benchmark_main_executes_full_envelope_gate` 的全部 16 
 supervisor 固定启动 continuous、source、target 三个进程，计划 4 次 generate、每进程 300 秒、累计 900 秒，
 不自动重试。该入口仅用于 technical workflow calibration；不得用于训练、formal/holdout、算法比较或 action 4
 真实迁移声明。
+
+## Shared cache × recovery coupling witness（已执行一次，默认只读）
+
+冻结协议：`configs/experiment/shared_cache_recovery_coupling_v1.json`。已完成 run：
+`artifacts/shared_cache_recovery_coupling_20261005_v1/`。不要覆盖、续跑或改参数复跑该目录。
+
+未来若另立全新验证任务，必须使用新 run id、不存在的新 output root 和当时已提交的 clean commit：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_shared_cache_recovery_coupling.py \
+  --config configs/experiment/shared_cache_recovery_coupling_v1.json \
+  --output-root artifacts/<new_shared_cache_recovery_run_id> \
+  --expected-git-commit <clean-commit>
+```
+
+该入口只允许 non-formal native transition witness；禁止训练、formal/holdout 和无线部署收益表述。现有 v1 结果的读取入口为 `completion_receipt.json`、`event_witness.json` 与 `integrity_manifest.json`。

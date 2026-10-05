@@ -1,0 +1,228 @@
+{
+  "answer": "the legal action-4 transaction commits a different finite-capacity target resident set, which the next native request consumes under the same LRU/dependency contract",
+  "branches": {
+    "0": {
+      "first_action": 0,
+      "initial_target_residents": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "step_events": [
+        {
+          "action_id": 0,
+          "admitted_object_ids": [],
+          "completed_node_ids_this_step": [
+            "n0"
+          ],
+          "evicted_object_ids": [],
+          "migration_realized": false,
+          "post_target_residents": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "pre_target_residents": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "service_success": true,
+          "state_package_bytes": 0,
+          "state_transfer_status": "NOT_ATTEMPTED",
+          "step_index": 1,
+          "transfer_bytes_by_type": {}
+        },
+        {
+          "action_id": 0,
+          "admitted_object_ids": [],
+          "completed_node_ids_this_step": [],
+          "evicted_object_ids": [],
+          "migration_realized": false,
+          "post_target_residents": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "pre_target_residents": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "service_success": false,
+          "state_package_bytes": 0,
+          "state_transfer_status": "NO_EXPORTED_STATE",
+          "step_index": 2,
+          "transfer_bytes_by_type": {}
+        },
+        {
+          "action_id": 0,
+          "admitted_object_ids": [],
+          "completed_node_ids_this_step": [
+            "n1"
+          ],
+          "evicted_object_ids": [],
+          "migration_realized": false,
+          "post_target_residents": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "pre_target_residents": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "service_success": true,
+          "state_package_bytes": 0,
+          "state_transfer_status": "NOT_ATTEMPTED",
+          "step_index": 3,
+          "transfer_bytes_by_type": {}
+        }
+      ],
+      "summary": {
+        "actions_executed": [
+          0,
+          0,
+          0
+        ],
+        "branch_id": "first_action_0",
+        "completed_node_count": 2,
+        "completed_node_ids": [
+          "n0",
+          "n1"
+        ],
+        "deadline_seconds": 30.0,
+        "deadline_violation_count": 0,
+        "first_action_id": 0,
+        "instance_id": "C_competition_future_residency_effect",
+        "modeled_completion_seconds": 11.095304,
+        "modeled_recompute_seconds": 11.035304,
+        "modeled_state_overhead_seconds": 0.0,
+        "modeled_transfer_seconds": 0.0,
+        "native_completion": true,
+        "objective_key": [
+          -2,
+          0,
+          11.095304,
+          0,
+          11.035304,
+          1,
+          0
+        ],
+        "service_failure_count": 1,
+        "simulator_step_count": 3,
+        "successful_request_count": 2,
+        "total_transfer_bytes": 0,
+        "transfer_bytes_by_type": {},
+        "wall_clock_network_measurement": false
+      }
+    },
+    "4": {
+      "first_action": 4,
+      "initial_target_residents": [
+        "base:b1",
+        "adapter:b1.a0"
+      ],
+      "step_events": [
+        {
+          "action_id": 4,
+          "admitted_object_ids": [],
+          "completed_node_ids_this_step": [
+            "n0"
+          ],
+          "evicted_object_ids": [
+            "adapter:b1.a0",
+            "base:b1"
+          ],
+          "migration_realized": false,
+          "post_target_residents": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "pre_target_residents": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "service_success": true,
+          "state_package_bytes": 2195,
+          "state_transfer_status": "EXPORTED_PENDING_IMPORT",
+          "step_index": 1,
+          "transfer_bytes_by_type": {
+            "adapter": 8388608,
+            "base_model": 100663296
+          }
+        },
+        {
+          "action_id": 0,
+          "admitted_object_ids": [],
+          "completed_node_ids_this_step": [
+            "n1"
+          ],
+          "evicted_object_ids": [
+            "adapter:b0.a0",
+            "base:b0"
+          ],
+          "migration_realized": true,
+          "post_target_residents": [
+            "base:b1",
+            "adapter:b1.a0"
+          ],
+          "pre_target_residents": [
+            "base:b0",
+            "adapter:b0.a0"
+          ],
+          "service_success": true,
+          "state_package_bytes": 2195,
+          "state_transfer_status": "IMPORTED_COMMITTED",
+          "step_index": 2,
+          "transfer_bytes_by_type": {
+            "adapter": 8388608,
+            "base_model": 134217728
+          }
+        }
+      ],
+      "summary": {
+        "actions_executed": [
+          4,
+          0
+        ],
+        "branch_id": "first_action_4",
+        "completed_node_count": 2,
+        "completed_node_ids": [
+          "n0",
+          "n1"
+        ],
+        "deadline_seconds": 30.0,
+        "deadline_violation_count": 0,
+        "first_action_id": 4,
+        "instance_id": "C_competition_future_residency_effect",
+        "modeled_completion_seconds": 20.2563338,
+        "modeled_recompute_seconds": 0.0,
+        "modeled_state_overhead_seconds": 0.003499,
+        "modeled_transfer_seconds": 20.1928348,
+        "native_completion": true,
+        "objective_key": [
+          -2,
+          0,
+          20.2563338,
+          251660435,
+          0.0,
+          0,
+          4
+        ],
+        "service_failure_count": 0,
+        "simulator_step_count": 2,
+        "successful_request_count": 2,
+        "total_transfer_bytes": 251660435,
+        "transfer_bytes_by_type": {
+          "adapter": 16777216,
+          "base_model": 234881024,
+          "workflow_state": 2195
+        },
+        "wall_clock_network_measurement": false
+      }
+    }
+  },
+  "claim_boundary": {
+    "modeled_facts": "100 Mbps transfer time, same-host state overhead, technical-workload recompute time, deadline",
+    "native_facts": "legal actions, cache commits, residents, evictions, bytes, service success, node completion",
+    "not_claimed": "real wireless gain, shared bandwidth/compute contention, cross-workflow persistence, online oracle availability"
+  },
+  "instance_id": "C_competition_future_residency_effect",
+  "question": "why does the current decision affect a later cost?",
+  "recompute_rule": "sum native transfer bytes from cache_event.transfer_mb_by_type, use exact package_bytes for successful workflow-state import, then apply the frozen cost_model"
+}

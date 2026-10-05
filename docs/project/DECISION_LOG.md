@@ -1181,3 +1181,11 @@ claim map 必须报告 `UNAVAILABLE`。
 ## 2026-09-08 G14R20-A
 
 固定提交 continuation 被定义为独立待批准的新规则；新 run 发布门禁不变。proposal/结构/资格/批准/执行分离，本轮真实执行权限恒为 false。保护快照是验收基线而非原始授权凭据。 详见 `fixed_commit_continuation_contract.md`。
+
+## 2026-10-05 — Shared cache × recovery research decision 3
+
+- 决定：采用“有耦合且存在公平、可解释策略差距”，不采用“无耦合”或“现有简单策略已足够”。
+- 依据：冻结 C 点中 action 4 的合法容量 transaction 驱逐已驻留 b1，导致下一请求重载 136 MiB；当前 threshold 比相同完成量的 action 0 慢 `9.161030 s`（冻结模型口径）。
+- 边界：耦合只在同一环境 episode 的跨 request/node 路径兑现；跨 workflow persistence 和共享无线/计算资源尚未实现。
+- 后续：只提出 eviction-externality-aware threshold 的最小设计，另轮独立冻结/验证；本轮不实现、不调参、不训练 RL。
+- 证据：`shared_cache_recovery_coupling_audit_20261005.md` 与 run `shared_cache_recovery_coupling_20261005_v1`。
