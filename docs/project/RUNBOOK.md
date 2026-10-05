@@ -5,7 +5,7 @@
 
 # Runbook
 
-## 纠正版连续工作流 v2（2026-10-06；已完成，不得覆盖或补跑）
+## 纠正版连续工作流 v2（2026-10-06；interface-blocked，已停止）
 
 实际冻结、诊断和单次训练命令：
 
@@ -24,7 +24,9 @@
 ```
 
 首次 initial-state-only diagnostic fail 保留为同目录 `diagnostic.json`，不得删除或冒充科学失败；纠正版 depth-4 receipt
-才是 runner 门禁。run 已完成，不允许按 SA 排名调参、补点、扩大预算或覆盖。日志为
+才是当时的 runner 门禁。run 完成后的独立审计确认 executed-action likelihood、failure-time mobility、encoder feature
+consumption 和 planner capability 不匹配；因此该 runner/结果不得用于方法排名，也不得继续训练。不允许按 SA 排名调参、
+补点、扩大预算或覆盖。日志为
 `artifacts/calibrated_continuous_workflow_pilot_v2_20261006.log`，completion receipt 在 output root。v1 192-episode run
 保持历史只读，不能与 v2 混用。专项回归：
 `python -m pytest -q tests/test_calibrated_continuous_workflow.py tests/test_checkpoint_compat.py`。

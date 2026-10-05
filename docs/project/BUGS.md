@@ -819,8 +819,13 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 
 - `OPEN / policy and aggregation collapse`：full SA 三 seed 中 seed 29 completion 仅 0.25；另两 seed 退化到与 MAPPO
   相同的高 transfer/high recompute 行为。raw evaluation action 0/3/4=`180/10/120`，未学出正确规则的 0/2/4 条件切换。
-- `NEGATIVE / dependency-message hypothesis`：同信息 no-dependency completion 0.917，高于 full 0.750；paired delta
-  `-0.167 [-0.250,-0.083]`。不得把 DAG message passing 写成已验证贡献，也不得用更少的截断 elapsed 掩盖未完成。
+- `INTERFACE-BLOCKED / dependency-message hypothesis`：no-dependency completion 0.917，高于 full 0.750；paired delta
+  `-0.167 [-0.250,-0.083]`，但 optimized/executed action likelihood 错配使其只能作为负向敏感性信号。不得把 DAG
+  message passing 写成已验证贡献或已证伪机制，也不得用更少的截断 elapsed 掩盖未完成。
+- `OPEN / matched feature contract`：flat actor 不消费 cache readiness/occupancy，flat critic occupancy 单位错误，graph/flat
+  未对等消费 typed base、byte occupancy、link/state/model cost；规则另有 exact transition clone + lexicographic objective。
+- `OPEN / failure-time mobility`：失败只推进 step/clock，RSU/vehicle/prediction 仍由 node index 派生，会冻结 mobility 并形成
+  重复失败状态；在修复前不得把 v2 称为公平序列控制 benchmark。
 - `OPEN / external validity`：link rate/error、deadline、adapter mapping 和 trajectory-workflow pairing 是合成因素；没有真实
   adapter request trace、共享 queue/bandwidth/compute、跨 workflow cache 或真实 RSU。
 - `OPEN / statistical maturity`：只有 3 seeds、12 evaluation windows、percentile bootstrap；没有 formal/hidden holdout、

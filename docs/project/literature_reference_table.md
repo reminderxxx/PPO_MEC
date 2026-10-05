@@ -46,7 +46,7 @@
 
 | 方向 | 论文 | Venue / Year | 可提供的参考点 | PPO_MEC 的优化点 / 差异点 | 论文写作位置 |
 |---|---|---:|---|---|---|
-| service-cache-assisted task migration | [A service cache-based dynamic collaborative task migration technology](https://doi.org/10.1186/s13638-026-02623-8) | EURASIP Journal on Wireless Communications and Networking, 2026, article 85；Springer 开放全文已核验 | 构建动态协作边缘集群和 migration prediction radius，以 edge service pre-caching 支撑任务迁移；用 C-DDQN 决策缓存，并比较 FIFO/LRU/LFU/Random/GDS/DQN 的 hit、cost、delay 与 migration success。 | 该文已覆盖“预测迁移 + service pre-cache + DRL”，因此这组组件不能作为 PPO_MEC 首创。PPO_MEC 当前候选只缩到跨 RSU 连续 DAG 节点、typed base/adapter 驻留与 application-state 连续性的关系决策；其独特性和有效性仍须同信息单因素消融，且本轮小预算结果为负。 | 最近邻差异矩阵 / Related Work / negative-result discussion；该文采用低速行人移动与稳定预测，不能直接外推高速 VEC。 |
+| service-cache-assisted task migration | [A service cache-based dynamic collaborative task migration technology](https://doi.org/10.1186/s13638-026-02623-8) | EURASIP Journal on Wireless Communications and Networking, 2026, article 85；Springer 开放全文已核验 | 构建动态协作边缘集群和 migration prediction radius，以 edge service pre-caching 支撑任务迁移；用 C-DDQN 决策缓存，并比较 FIFO/LRU/LFU/Random/GDS/DQN 的 hit、cost、delay 与 migration success。 | 该文已覆盖“预测迁移 + service pre-cache + DRL”，因此这组组件不能作为 PPO_MEC 首创。PPO_MEC 当前候选只缩到跨 RSU 连续 DAG 节点、typed base/adapter 驻留与 application-state 连续性的关系决策；其独特性和有效性仍须公平单因素消融，本轮因学习/执行接口错配未建立。 | 最近邻差异矩阵 / Related Work / interface-blocked discussion；该文采用低速行人移动与稳定预测，不能直接外推高速 VEC。 |
 
 ## 2026-10-05 驱逐与模型重载成本窄范围核对
 

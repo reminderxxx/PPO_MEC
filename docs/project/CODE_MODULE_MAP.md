@@ -17,7 +17,8 @@ v2 职责增量：
 - freeze script 只把事前模板中的 link/prediction profile 写入 frozen instance，不读取任何方法结果。
 - diagnostic script 只做可达状态与权限检查；runner 只有在 pass receipt 后训练，且用 dev 而非 evaluation 选 checkpoint。
 - `sa_ghmappo_no_dependency` 不进入 live registry；runner 仍构建 `sa_ghmappo`，仅将
-  `use_dependency_aware=False` 作为局部单因素消融，避免污染算法注册 contract。
+  `use_dependency_aware=False` 作为局部敏感性臂。事后接口审计确认 hierarchical action likelihood、failure-time
+  mobility 与 encoder feature profile 未匹配，v2 runner 不得再用于方法排名或继续训练。
 
 ## Real PEFT adapter cache lifecycle witness
 

@@ -5,10 +5,11 @@
 
 # PPO_MEC
 
-纠正版实测校准连续工作流 v2 小预算训练已完成：SA-GHMAPPO、PPO、controller-level MAPPO、同信息
-no-dependency 消融和 immediate/two-step correct cost rules 共用五动作、奖励、依赖安全 typed cache 与信息权限；
-3 seeds × 128 episodes，不用 evaluation 选模。结果不支持算法优势或候选机制：SA completion 为 0.750，消融为
-0.917，PPO/MAPPO/两规则均为 1.000；最终决策 C，保留负结果。详见
+纠正版实测校准连续工作流 v2 小预算执行已完成：SA-GHMAPPO、PPO、controller-level MAPPO、no-dependency
+敏感性臂和 immediate/two-step planners 共用五动作、奖励与依赖安全 typed cache；3 seeds × 128 episodes，不用
+evaluation 选模。训练后只读审计确认 executed-action likelihood、失败时 mobility、encoder 字段消费和 model-based planner
+能力不匹配，故观测的 SA/消融/PPO/MAPPO/规则 completion=`0.750/0.917/1/1/1` 不能作为公平方法排名。最终决策 D，
+保留原件并停止，不重训或调参。详见
 [创新与公平训练报告](docs/project/sa_ghmappo_innovation_fair_training_v2_20261006.md)及
 [待合并论文实验章节](docs/project/manuscript_experiment_section_sa_ghmappo_pilot_v2_20261006.md)。
 
