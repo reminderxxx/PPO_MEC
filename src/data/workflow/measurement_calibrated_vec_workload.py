@@ -289,10 +289,20 @@ def _local_decisions(workload: dict[str, Any], config: dict[str, Any]) -> list[s
 
 def compare_methods(workload: dict[str, Any], config: dict[str, Any]) -> list[dict[str, Any]]:
     count = len(workload["workflows"])
+    decision_overheads: dict[str, float] = {}
+    started = time.perf_counter()
+    current_decisions = ["restart"] * count
+    decision_overheads["current_restart_rule"] = time.perf_counter() - started
+    started = time.perf_counter()
+    local_decisions = _local_decisions(workload, config)
+    decision_overheads["mechanism_aware_local_incremental_cost"] = (
+        time.perf_counter() - started
+    )
     method_decisions = {
-        "current_restart_rule": ["restart"] * count,
-        "mechanism_aware_local_incremental_cost": _local_decisions(workload, config),
+        "current_restart_rule": current_decisions,
+        "mechanism_aware_local_incremental_cost": local_decisions,
     }
+    started = time.perf_counter()
     candidates = [
         _simulate(workload, config, list(decisions))
         for decisions in product(("restart", "recover"), repeat=count)
@@ -300,11 +310,10 @@ def compare_methods(workload: dict[str, Any], config: dict[str, Any]) -> list[di
     method_decisions["offline_exact_enumeration"] = min(
         candidates, key=lambda item: (_objective(item["summary"]), tuple(item["decisions"]))
     )["decisions"]
+    decision_overheads["offline_exact_enumeration"] = time.perf_counter() - started
     rows = []
     for method in config["methods"]:
-        started = time.perf_counter()
         result = _simulate(workload, config, list(method_decisions[method]))
-        decision_seconds = time.perf_counter() - started
         rows.append(
             {
                 "design_id": workload["design_id"],
@@ -315,7 +324,7 @@ def compare_methods(workload: dict[str, Any], config: dict[str, Any]) -> list[di
                 "restore_cost": workload["factors"]["restore_cost"],
                 "method": method,
                 "decisions": list(result["decisions"]),
-                "decision_overhead_seconds": decision_seconds,
+                "decision_overhead_seconds": decision_overheads[method],
                 **result["summary"],
                 "workflow_results": result["workflow_results"],
                 "offline_future_information": method == "offline_exact_enumeration",
