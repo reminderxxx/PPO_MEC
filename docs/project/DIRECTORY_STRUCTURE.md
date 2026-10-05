@@ -12,6 +12,8 @@
 - `scripts/run_measurement_calibrated_vec_workload.py`：生成 24 个实例并一次性输出 72 方法行和完整性回执。
 - `artifacts/analysis/production_action4_workflow_20261005_v2/`：最终 real technical 正负链与成本分解。
 - `artifacts/analysis/measurement_calibrated_vec_workload_20261005_v4/`：最终 24 实例、72 方法行、数据卡和完整性证据。
+- `artifacts/analysis/workload_v0_1_cost_mismatch_robustness_20261005_v1/`：12 点、36 行估计/实现分离结果。
+- `artifacts/analysis/production_action4_independent_repeat_20261005_v1/`：三次交错同版本配对复测及逐进程原始回执。
 - 同名 real v1、workload v1/v2/v3 保留为非最终执行/代码失败证据，不覆盖、不冒充独立样本。
 - `tests/test_production_action4_state.py`、`tests/test_measurement_calibrated_vec_workload.py`：正负接线与矩阵合同。
 

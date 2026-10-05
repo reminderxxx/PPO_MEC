@@ -1,5 +1,11 @@
 # Measurement-calibrated semi-synthetic VEC workload v0.1
 
+> **2026-10-05 独立审查附注**：下文原始 72 行和结果不改写，但 `local=offline exact 24/24` 不能作为独立方法证据。
+> local 直接消费与模拟实现相同的 `restore_cost` 真值，且不读取逐事件 cache/target-ready；exact 的三次二选一在当前
+> cache/model 演化下结构性可分。12 点独立成本失配中 local 只在 8/12 点匹配事后 oracle。固定实现三次同机配对复测
+> 仍支持低成本区间的简单阈值，不支持 RL。完整审查与结果见
+> [`workload_v0_1_self_consistency_audit_20261005.md`](workload_v0_1_self_consistency_audit_20261005.md)。
+
 ## 审查元数据与边界
 
 - `frozen_at`: `2026-10-05T00:00:00+08:00`
@@ -11,7 +17,7 @@
 - `artifact_run_id`: `production_action4_workflow_20261005_v2` + `measurement_calibrated_vec_workload_20261005_v4`
 - `git_commit`: action 4 `94600ded7752a548de74384f17ab4e0ebabf916c`; workload `472d064a431fe97e1c94063a42aea0811425310d`
 - `evidence_level`: `E2_BOUNDED_TECHNICAL_AND_SEMI_SYNTHETIC_ARTIFACT_AUDITED`
-- `verdict`: `LOCAL_RULE_SUFFICIENT_IN_FROZEN_MATRIX / NOT_PAPER_READY`
+- `verdict`: `HISTORICAL_FROZEN_MATRIX / SELF_CONFIRMING_LOCAL_EXACT_COMPARISON / NOT_PAPER_READY`
 
 该工作负载只用于第一轮机制诊断。它不是新的真实数据集，不使用旧 holdout，不训练 RL，不下载数据或权重。
 公开价值、代表性、许可和独立复现均未完成。三类 typed-model ID 是抽象对象，不能写成三个真实任务模型；两节点 DAG

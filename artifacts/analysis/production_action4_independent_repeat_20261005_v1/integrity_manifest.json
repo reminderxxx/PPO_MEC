@@ -1,0 +1,183 @@
+{
+  "file_count": 35,
+  "files": [
+    {
+      "bytes": 2226,
+      "path": "preflight_negative_checks.json",
+      "sha256": "820e9785dae8db5f7d7dd2206aebcc624bd3ba25bcbf214c6a7fc7405b0675bd"
+    },
+    {
+      "bytes": 337,
+      "path": "rep01/production_action4_state_package/manifest.json",
+      "sha256": "209be80137ca66897746c26786d6e4d374f02ef2104500b6e59614d596d6a585"
+    },
+    {
+      "bytes": 1848,
+      "path": "rep01/production_action4_state_package/state.json",
+      "sha256": "4e36c04466cd901d1b7d902676e71f8ceff956c01fdb8ad1e892d45afa9fe044"
+    },
+    {
+      "bytes": 6152,
+      "path": "rep01/repeat_receipt.json",
+      "sha256": "a7923e0e922ea7fd9cb9f05bafa383f920705393729104bf475eff11441f4b76"
+    },
+    {
+      "bytes": 1226,
+      "path": "rep01/restart_process.json",
+      "sha256": "e7c388c9639aac33f8f8c4cb2b7595348ba127e6b3af37eade378aec0e510954"
+    },
+    {
+      "bytes": 5330,
+      "path": "rep01/restart_receipt.json",
+      "sha256": "dc7c3352fd7a1178e5dd53ee4ec62521215d105a2061314eeb757f9c265708e7"
+    },
+    {
+      "bytes": 1219,
+      "path": "rep01/source_process.json",
+      "sha256": "bb53df8299a6b82f02b14d72c7aeb14667b13f65dfb0b250b9e06290a4d46dc8"
+    },
+    {
+      "bytes": 5526,
+      "path": "rep01/source_receipt.json",
+      "sha256": "b831bb4f31d2887b0b54b6a699aee375c0c22215a3f34f609e9cdd054a337485"
+    },
+    {
+      "bytes": 337,
+      "path": "rep01/state_package/manifest.json",
+      "sha256": "362123e41c78f9fe53cd7b36faf8337d18133caf3e9040175d4e1f520dd14839"
+    },
+    {
+      "bytes": 1703,
+      "path": "rep01/state_package/state.json",
+      "sha256": "53c4f94fa8b50025a2ae4e532d31e211996e49eb302859f37561ef93e66409c9"
+    },
+    {
+      "bytes": 1224,
+      "path": "rep01/target_process.json",
+      "sha256": "70ce022e3a81b119e080c6ec41063bba48f7b79df92415fba003ac70a91e7203"
+    },
+    {
+      "bytes": 6664,
+      "path": "rep01/target_receipt.json",
+      "sha256": "43f2f366e7fbb23c6842c9e81783e7f1921d47ea0129980f2f438a57070d1721"
+    },
+    {
+      "bytes": 337,
+      "path": "rep02/production_action4_state_package/manifest.json",
+      "sha256": "209be80137ca66897746c26786d6e4d374f02ef2104500b6e59614d596d6a585"
+    },
+    {
+      "bytes": 1848,
+      "path": "rep02/production_action4_state_package/state.json",
+      "sha256": "4e36c04466cd901d1b7d902676e71f8ceff956c01fdb8ad1e892d45afa9fe044"
+    },
+    {
+      "bytes": 6149,
+      "path": "rep02/repeat_receipt.json",
+      "sha256": "eec30eae1a31f78c4b8b182901f09ce54b7f7e9f97b443871f0fe4b8b0aa062e"
+    },
+    {
+      "bytes": 1227,
+      "path": "rep02/restart_process.json",
+      "sha256": "e627c4c86decc487c34ad5329cfa51927da136b8a7f95a85fb48b1a80a75755c"
+    },
+    {
+      "bytes": 5340,
+      "path": "rep02/restart_receipt.json",
+      "sha256": "313a671d2f9dd483497145bc6c3e8e23536365d8ed23690cc75aa082647227d6"
+    },
+    {
+      "bytes": 1219,
+      "path": "rep02/source_process.json",
+      "sha256": "8af0ae1647e55bd2ea71b6382208e2d506d03ac4ff25c7fd224465df44f6b9f8"
+    },
+    {
+      "bytes": 5528,
+      "path": "rep02/source_receipt.json",
+      "sha256": "61aab8ca45334c1a083271ecb0ba63078d3a754a049657a803b68cbdc47e5542"
+    },
+    {
+      "bytes": 337,
+      "path": "rep02/state_package/manifest.json",
+      "sha256": "362123e41c78f9fe53cd7b36faf8337d18133caf3e9040175d4e1f520dd14839"
+    },
+    {
+      "bytes": 1703,
+      "path": "rep02/state_package/state.json",
+      "sha256": "53c4f94fa8b50025a2ae4e532d31e211996e49eb302859f37561ef93e66409c9"
+    },
+    {
+      "bytes": 1225,
+      "path": "rep02/target_process.json",
+      "sha256": "a48c52c8ba5a672c40ad34a6a2c26a7940f9dd7b51b8616b26d64e8e8c649f9d"
+    },
+    {
+      "bytes": 6663,
+      "path": "rep02/target_receipt.json",
+      "sha256": "5721e129f8a790ee02d1cd2985a107b739dd5b1257c10b0b4287e112877d991f"
+    },
+    {
+      "bytes": 337,
+      "path": "rep03/production_action4_state_package/manifest.json",
+      "sha256": "209be80137ca66897746c26786d6e4d374f02ef2104500b6e59614d596d6a585"
+    },
+    {
+      "bytes": 1848,
+      "path": "rep03/production_action4_state_package/state.json",
+      "sha256": "4e36c04466cd901d1b7d902676e71f8ceff956c01fdb8ad1e892d45afa9fe044"
+    },
+    {
+      "bytes": 6162,
+      "path": "rep03/repeat_receipt.json",
+      "sha256": "54bbc9248c12f3facd15f75efe49324af3af4164f8d680e881c3ce718efc7146"
+    },
+    {
+      "bytes": 1227,
+      "path": "rep03/restart_process.json",
+      "sha256": "e99aec6a0318391aefdcbc6a3e55f3106c437185c0c5445aad37ede1d5c28899"
+    },
+    {
+      "bytes": 5344,
+      "path": "rep03/restart_receipt.json",
+      "sha256": "bb7cfb034c77d79096b520fed8522e249eae2eaca8af2bfc41e98072f84ce3b8"
+    },
+    {
+      "bytes": 1226,
+      "path": "rep03/source_process.json",
+      "sha256": "6952f2df1733c954d47778c8f4685887c35cbc68da69ae43ff2c9fd2dc385cd8"
+    },
+    {
+      "bytes": 5527,
+      "path": "rep03/source_receipt.json",
+      "sha256": "94713a44cdfbf7eac19b7f052bc28eb1ace5e7a2c6b2f088c1a57a9a111064c8"
+    },
+    {
+      "bytes": 337,
+      "path": "rep03/state_package/manifest.json",
+      "sha256": "362123e41c78f9fe53cd7b36faf8337d18133caf3e9040175d4e1f520dd14839"
+    },
+    {
+      "bytes": 1703,
+      "path": "rep03/state_package/state.json",
+      "sha256": "53c4f94fa8b50025a2ae4e532d31e211996e49eb302859f37561ef93e66409c9"
+    },
+    {
+      "bytes": 1217,
+      "path": "rep03/target_process.json",
+      "sha256": "1f22e95bb6294b1d30ec412813bd88102a7fde395ffa5a992aa6a06d8c4e879e"
+    },
+    {
+      "bytes": 6664,
+      "path": "rep03/target_receipt.json",
+      "sha256": "cf0b55cac7938552b200045a3d112ca07cd53b8db55b6e9deb450ee0de28edbd"
+    },
+    {
+      "bytes": 21196,
+      "path": "terminal_receipt.json",
+      "sha256": "91a3a6a6c5eda19fd9de232a8d5dd992d751812729c926152aeb7272c378f08e"
+    }
+  ],
+  "run_root": "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/artifacts/analysis/production_action4_independent_repeat_20261005_v1",
+  "schema_version": "ppo_mec.artifact_integrity.v1",
+  "total_bytes_excluding_manifest": 118156
+}

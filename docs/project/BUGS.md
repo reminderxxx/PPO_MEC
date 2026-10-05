@@ -5,6 +5,17 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-05：workload v0.1 原 local/exact 证据存在自证循环（FROZEN SCIENTIFIC DEFECT）
+
+- local 直接读取与执行模拟器相同的 low/high `restore_cost` 真值，不读取逐事件 cache 或 target-ready；exact 的动作不改变
+  后续模型/cache 状态，三次二选一主要由同一阈值决定。原 24/24 一致性不是独立在线方法证据。
+- seed 只改变 arrival jitter 和派生 ID；按决策有效输入仅 low/high 两类，不能把 3 seed 称为成本独立复测。
+- sharing-off 实际是 `base_a→base_b→base_a` 两组 family identity，A0/A1 仍共享 base_a；不得写成三个完全不兼容 base。
+- 12 点成本失配出现 4/12 local/oracle 分歧；边界/高恢复点最大时间代价 17.696701 s。target-ready 错误在当前共同
+  model-prepare 合同下不改变动作，只改变绝对完成时间。
+- 三次固定实现同机复测都支持 recovery，但 OS cache 未控制、没有真实网络/队列/任务质量，不能升级为部署稳定性结论。
+- 当前保留简单阈值且不启动 RL；外部独立成本校准前，RL 必要性和复杂方法优势均为 unsupported。
+
 ## 2026-10-05：action 4 / workload v0.1 后的剩余边界
 
 - `RESOLVED / production technical state path`：显式 opt-in action 4 已实际 export/import、校验 target model 与

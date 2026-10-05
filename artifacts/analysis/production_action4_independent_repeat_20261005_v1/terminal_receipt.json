@@ -1,0 +1,426 @@
+{
+  "all_process_ids_distinct": true,
+  "automatic_retry": false,
+  "base_plan_sha256": "8a0d030bd7ded081738d20c50b36f7b7f687f1bdb3f2d9ab031f240c85622d1d",
+  "budget_compliance": "pass",
+  "classification": "fixed-implementation paired local-host repeat",
+  "finished_at_unix": 1791183122.166306,
+  "fixed_execution_commit": "4a6d670605b624eb6aac4fbaf3c05868ab11c8c4",
+  "generate_attempted": 12,
+  "generate_completed": 12,
+  "plan_sha256": "0abafd36b7d5d1c4d9f298ecca09489894d79fb8823a87adadf6d08d49a3c89b",
+  "repetitions": [
+    {
+      "arm_order": [
+        "restart",
+        "target"
+      ],
+      "comparison": {
+        "checks": {
+          "identity_equal": true,
+          "recovery_calls_exact": true,
+          "recovery_source_image_access_zero": true,
+          "restart_calls_exact": true,
+          "restart_target_n1_hash_equal": true,
+          "restart_target_n1_input_ids_equal": true,
+          "restart_target_n1_prompt_equal": true,
+          "restart_target_n1_rendered_prompt_equal": true,
+          "restart_target_n1_tokens_equal": true,
+          "source_restart_n0_text_equal": true,
+          "source_restart_n0_tokens_equal": true,
+          "target_consumed_source_n0": true
+        },
+        "status": "PASS"
+      },
+      "costs": {
+        "queue_wait_seconds": null,
+        "queue_wait_status": "unavailable_single_host_no_rsu_queue_model",
+        "recovery": {
+          "child_wall_seconds": 7.0495419159999955,
+          "dynamic_transfer_bytes_if_remote": 2185,
+          "input_reconstruction_seconds": 0.0026378750000000117,
+          "interrupted_path_wall_seconds": 22.269450749999997,
+          "model_load_seconds": 1.1526712919999997,
+          "n1_inference_seconds": 3.796372833,
+          "restore_validation_seconds": 0.0005380829999999115
+        },
+        "recovery_minus_restart_path_wall_seconds": -10.868095376000007,
+        "restart": {
+          "child_wall_seconds": 17.917637292000002,
+          "dynamic_transfer_bytes_if_remote": 192757,
+          "interrupted_path_wall_seconds": 33.137546126000004,
+          "model_load_seconds": 1.1566702509999998,
+          "n0_inference_seconds": 10.741790458,
+          "n1_inference_seconds": 3.7965265830000003
+        },
+        "source": {
+          "child_wall_seconds": 15.219908834,
+          "model_load_seconds": 1.4408520829999998,
+          "n0_inference_seconds": 11.4627045,
+          "serialize_and_save_seconds": 0.0005072919999999925
+        }
+      },
+      "generate_attempted": 4,
+      "generate_completed": 4,
+      "phases": [
+        {
+          "command": [
+            "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/scripts/run_two_node_workflow_reexecution_comparison.py",
+            "--role",
+            "source",
+            "--plan",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+            "--run-root",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/artifacts/analysis/production_action4_independent_repeat_20261005_v1/rep01"
+          ],
+          "ended_at_unix": 1791183020.010968,
+          "pid": 23776,
+          "process_startup_overhead_seconds": 0.7087082509999991,
+          "receipt_status": "PASS",
+          "returncode": 0,
+          "role": "source",
+          "started_at_unix": 1791183004.791452,
+          "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+          "stdout": "PASS\n",
+          "timed_out": false,
+          "wall_seconds": 15.219908834
+        },
+        {
+          "command": [
+            "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/scripts/run_two_node_workflow_reexecution_comparison.py",
+            "--role",
+            "restart",
+            "--plan",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+            "--run-root",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/artifacts/analysis/production_action4_independent_repeat_20261005_v1/rep01"
+          ],
+          "ended_at_unix": 1791183037.929224,
+          "pid": 23788,
+          "process_startup_overhead_seconds": 0.751285333000002,
+          "receipt_status": "PASS",
+          "returncode": 0,
+          "role": "restart",
+          "started_at_unix": 1791183020.011841,
+          "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+          "stdout": "PASS\n",
+          "timed_out": false,
+          "wall_seconds": 17.917637292000002
+        },
+        {
+          "command": [
+            "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/scripts/run_two_node_workflow_reexecution_comparison.py",
+            "--role",
+            "target",
+            "--plan",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+            "--run-root",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/artifacts/analysis/production_action4_independent_repeat_20261005_v1/rep01"
+          ],
+          "ended_at_unix": 1791183044.97917,
+          "pid": 23789,
+          "process_startup_overhead_seconds": 0.7283979159999951,
+          "receipt_status": "PASS",
+          "returncode": 0,
+          "role": "target",
+          "started_at_unix": 1791183037.929877,
+          "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+          "stdout": "PASS\n",
+          "timed_out": false,
+          "wall_seconds": 7.0495419159999955
+        }
+      ],
+      "process_ids_distinct_within_repeat": true,
+      "repeat_id": "rep01",
+      "runtime_state": {
+        "arm_order": "pre_frozen_interleaving",
+        "child_process_state": "cold_new_process_for_source_restart_and_target",
+        "model_resident_between_processes": false,
+        "operating_system_file_cache": "uncontrolled_not_flushed",
+        "same_model_input_and_generation_config": true
+      }
+    },
+    {
+      "arm_order": [
+        "target",
+        "restart"
+      ],
+      "comparison": {
+        "checks": {
+          "identity_equal": true,
+          "recovery_calls_exact": true,
+          "recovery_source_image_access_zero": true,
+          "restart_calls_exact": true,
+          "restart_target_n1_hash_equal": true,
+          "restart_target_n1_input_ids_equal": true,
+          "restart_target_n1_prompt_equal": true,
+          "restart_target_n1_rendered_prompt_equal": true,
+          "restart_target_n1_tokens_equal": true,
+          "source_restart_n0_text_equal": true,
+          "source_restart_n0_tokens_equal": true,
+          "target_consumed_source_n0": true
+        },
+        "status": "PASS"
+      },
+      "costs": {
+        "queue_wait_seconds": null,
+        "queue_wait_status": "unavailable_single_host_no_rsu_queue_model",
+        "recovery": {
+          "child_wall_seconds": 7.0004726250000004,
+          "dynamic_transfer_bytes_if_remote": 2185,
+          "input_reconstruction_seconds": 0.002507915999999888,
+          "interrupted_path_wall_seconds": 20.725827791,
+          "model_load_seconds": 1.1458080420000003,
+          "n1_inference_seconds": 3.8320695000000002,
+          "restore_validation_seconds": 0.0002649579999998153
+        },
+        "recovery_minus_restart_path_wall_seconds": -10.649964625000003,
+        "restart": {
+          "child_wall_seconds": 17.650437250000003,
+          "dynamic_transfer_bytes_if_remote": 192757,
+          "interrupted_path_wall_seconds": 31.375792416000003,
+          "model_load_seconds": 1.151946709,
+          "n0_inference_seconds": 10.845277583,
+          "n1_inference_seconds": 3.7934899999999985
+        },
+        "source": {
+          "child_wall_seconds": 13.725355166,
+          "model_load_seconds": 1.1237690820000001,
+          "n0_inference_seconds": 10.745947833,
+          "serialize_and_save_seconds": 0.0004820839999997162
+        }
+      },
+      "generate_attempted": 4,
+      "generate_completed": 4,
+      "phases": [
+        {
+          "command": [
+            "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/scripts/run_two_node_workflow_reexecution_comparison.py",
+            "--role",
+            "source",
+            "--plan",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+            "--run-root",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/artifacts/analysis/production_action4_independent_repeat_20261005_v1/rep02"
+          ],
+          "ended_at_unix": 1791183058.707155,
+          "pid": 23790,
+          "process_startup_overhead_seconds": 0.6496009580000006,
+          "receipt_status": "PASS",
+          "returncode": 0,
+          "role": "source",
+          "started_at_unix": 1791183044.982035,
+          "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+          "stdout": "PASS\n",
+          "timed_out": false,
+          "wall_seconds": 13.725355166
+        },
+        {
+          "command": [
+            "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/scripts/run_two_node_workflow_reexecution_comparison.py",
+            "--role",
+            "target",
+            "--plan",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+            "--run-root",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/artifacts/analysis/production_action4_independent_repeat_20261005_v1/rep02"
+          ],
+          "ended_at_unix": 1791183065.707971,
+          "pid": 23793,
+          "process_startup_overhead_seconds": 0.7268387080000007,
+          "receipt_status": "PASS",
+          "returncode": 0,
+          "role": "target",
+          "started_at_unix": 1791183058.707746,
+          "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+          "stdout": "PASS\n",
+          "timed_out": false,
+          "wall_seconds": 7.0004726250000004
+        },
+        {
+          "command": [
+            "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/scripts/run_two_node_workflow_reexecution_comparison.py",
+            "--role",
+            "restart",
+            "--plan",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+            "--run-root",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/artifacts/analysis/production_action4_independent_repeat_20261005_v1/rep02"
+          ],
+          "ended_at_unix": 1791183083.358966,
+          "pid": 23796,
+          "process_startup_overhead_seconds": 0.6422415000000044,
+          "receipt_status": "PASS",
+          "returncode": 0,
+          "role": "restart",
+          "started_at_unix": 1791183065.708763,
+          "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+          "stdout": "PASS\n",
+          "timed_out": false,
+          "wall_seconds": 17.650437250000003
+        }
+      ],
+      "process_ids_distinct_within_repeat": true,
+      "repeat_id": "rep02",
+      "runtime_state": {
+        "arm_order": "pre_frozen_interleaving",
+        "child_process_state": "cold_new_process_for_source_restart_and_target",
+        "model_resident_between_processes": false,
+        "operating_system_file_cache": "uncontrolled_not_flushed",
+        "same_model_input_and_generation_config": true
+      }
+    },
+    {
+      "arm_order": [
+        "restart",
+        "target"
+      ],
+      "comparison": {
+        "checks": {
+          "identity_equal": true,
+          "recovery_calls_exact": true,
+          "recovery_source_image_access_zero": true,
+          "restart_calls_exact": true,
+          "restart_target_n1_hash_equal": true,
+          "restart_target_n1_input_ids_equal": true,
+          "restart_target_n1_prompt_equal": true,
+          "restart_target_n1_rendered_prompt_equal": true,
+          "restart_target_n1_tokens_equal": true,
+          "source_restart_n0_text_equal": true,
+          "source_restart_n0_tokens_equal": true,
+          "target_consumed_source_n0": true
+        },
+        "status": "PASS"
+      },
+      "costs": {
+        "queue_wait_seconds": null,
+        "queue_wait_status": "unavailable_single_host_no_rsu_queue_model",
+        "recovery": {
+          "child_wall_seconds": 6.94600475,
+          "dynamic_transfer_bytes_if_remote": 2185,
+          "input_reconstruction_seconds": 0.002495249999999949,
+          "interrupted_path_wall_seconds": 21.004043957999997,
+          "model_load_seconds": 1.1407108340000005,
+          "n1_inference_seconds": 3.807233042,
+          "restore_validation_seconds": 0.002795167000000376
+        },
+        "recovery_minus_restart_path_wall_seconds": -10.852330207999998,
+        "restart": {
+          "child_wall_seconds": 17.798334957999998,
+          "dynamic_transfer_bytes_if_remote": 192757,
+          "interrupted_path_wall_seconds": 31.856374165999995,
+          "model_load_seconds": 1.1396467079999997,
+          "n0_inference_seconds": 10.729573041999998,
+          "n1_inference_seconds": 3.793989500000002
+        },
+        "source": {
+          "child_wall_seconds": 14.058039207999997,
+          "model_load_seconds": 1.1322399180000002,
+          "n0_inference_seconds": 10.792813749999999,
+          "serialize_and_save_seconds": 0.0005002499999999799
+        }
+      },
+      "generate_attempted": 4,
+      "generate_completed": 4,
+      "phases": [
+        {
+          "command": [
+            "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/scripts/run_two_node_workflow_reexecution_comparison.py",
+            "--role",
+            "source",
+            "--plan",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+            "--run-root",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/artifacts/analysis/production_action4_independent_repeat_20261005_v1/rep03"
+          ],
+          "ended_at_unix": 1791183097.4183118,
+          "pid": 23799,
+          "process_startup_overhead_seconds": 0.7718638329999976,
+          "receipt_status": "PASS",
+          "returncode": 0,
+          "role": "source",
+          "started_at_unix": 1791183083.360511,
+          "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+          "stdout": "PASS\n",
+          "timed_out": false,
+          "wall_seconds": 14.058039207999997
+        },
+        {
+          "command": [
+            "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/scripts/run_two_node_workflow_reexecution_comparison.py",
+            "--role",
+            "restart",
+            "--plan",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+            "--run-root",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/artifacts/analysis/production_action4_independent_repeat_20261005_v1/rep03"
+          ],
+          "ended_at_unix": 1791183115.216948,
+          "pid": 23800,
+          "process_startup_overhead_seconds": 0.760175916999998,
+          "receipt_status": "PASS",
+          "returncode": 0,
+          "role": "restart",
+          "started_at_unix": 1791183097.4188778,
+          "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+          "stdout": "PASS\n",
+          "timed_out": false,
+          "wall_seconds": 17.798334957999998
+        },
+        {
+          "command": [
+            "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/scripts/run_two_node_workflow_reexecution_comparison.py",
+            "--role",
+            "target",
+            "--plan",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/configs/acceptance/two_node_workflow_reexecution_comparison_v1.json",
+            "--run-root",
+            "/Users/howen/.codex/worktrees/workload-v01-audit/PPO_MEC/artifacts/analysis/production_action4_independent_repeat_20261005_v1/rep03"
+          ],
+          "ended_at_unix": 1791183122.163351,
+          "pid": 23801,
+          "process_startup_overhead_seconds": 0.7351704579999998,
+          "receipt_status": "PASS",
+          "returncode": 0,
+          "role": "target",
+          "started_at_unix": 1791183115.217581,
+          "stderr": "/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/lib/python3.9/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020\n  warnings.warn(\n",
+          "stdout": "PASS\n",
+          "timed_out": false,
+          "wall_seconds": 6.94600475
+        }
+      ],
+      "process_ids_distinct_within_repeat": true,
+      "repeat_id": "rep03",
+      "runtime_state": {
+        "arm_order": "pre_frozen_interleaving",
+        "child_process_state": "cold_new_process_for_source_restart_and_target",
+        "model_resident_between_processes": false,
+        "operating_system_file_cache": "uncontrolled_not_flushed",
+        "same_model_input_and_generation_config": true
+      }
+    }
+  ],
+  "role_script_sha256": "f48637a80ee7710567c0dac1cfa3c003c9c08feaa6f96aa6550ba5ef7bc1a5b7",
+  "runtime_state": {
+    "arm_order": "pre_frozen_interleaving",
+    "child_process_state": "cold_new_process_for_source_restart_and_target",
+    "model_resident_between_processes": false,
+    "operating_system_file_cache": "uncontrolled_not_flushed",
+    "same_model_input_and_generation_config": true
+  },
+  "same_host_not_real_rsu_network_measurement": true,
+  "scientific_wall_seconds": 117.37542170799999,
+  "started_at_unix": 1791183004.790782,
+  "status": "PASS",
+  "task_correctness": "unavailable"
+}

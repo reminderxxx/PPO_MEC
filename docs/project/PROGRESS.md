@@ -5,6 +5,19 @@
 
 ﻿# Progress
 
+## 2026-10-05：workload v0.1 自证循环审查与最小独立复测完成
+
+- 源码确认 local 不读逐事件 cache/target-ready，却直接消费与执行模拟器相同的 `restore_cost` 真值；exact 的 8 组合在
+  当前 cache/model 演化下结构性可分。原 `local=exact 24/24` 保留为历史结果，但不再作为独立方法证据。
+- 12 点独立成本失配、36/36 方法行完成，local 与事后 oracle 为 8/12；4 个跨 break-even 点的最大总完成时间/
+  makespan 代价为 17.696701/8.848351 s，同时仍少 571,716 B dynamic transfer、少约 33 s 重算。
+- 固定 commit `4a6d670…` 三次交错配对复测完成 12/12 generate，无重试、输出一致；restart/recovery path wall 为
+  33.138/22.269、31.376/20.726、31.856/21.004 s。冷新进程、模型不驻留，OS cache 未控制，不称 RSU 网络测量。
+- 简单阈值在同机低成本区间足够；改进空间限于独立成本校准、margin/uncertainty guard 与 readiness contract，不启动 RL。
+- 证据：`workload_v0_1_self_consistency_audit_20261005.md`、
+  `artifacts/analysis/workload_v0_1_cost_mismatch_robustness_20261005_v1/`、
+  `artifacts/analysis/production_action4_independent_repeat_20261005_v1/`。
+
 ## 2026-10-05：production action 4 与 workload v0.1 第一轮完成
 
 - action 4 显式 opt-in 已接入正常 reset/action/step 和真实 technical source/target；默认行为不变。final real v2

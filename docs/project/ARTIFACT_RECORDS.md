@@ -7,12 +7,17 @@
 
 ## 2026-10-05 production action 4 / workload v0.1
 
+- independent audit robustness：`artifacts/analysis/workload_v0_1_cost_mismatch_robustness_20261005_v1/`，执行 commit
+  `3bf08e6…`，12 points×3 methods=36 rows、0 generate、local=post-hoc oracle 8/12；4 个跨 break-even 点全部保留。
+- fixed-implementation repeat：`artifacts/analysis/production_action4_independent_repeat_20261005_v1/`，执行 commit
+  `4a6d670…`，三次交错配对共 12/12 generate、无重试、35/35 files 完整性通过；restart/recovery path wall 差值为
+  −10.868/−10.650/−10.852 s。冷进程、OS cache 未控制、无真实网络。
 - final real：`artifacts/analysis/production_action4_workflow_20261005_v2/`，commit `94600de...`，6/6 generate，
   4 个独立进程、58.825 s；production export/import true，2,185 B package，restart/recovery child wall
   32.858/21.651 s，missing-model 负例不提交执行权。15/15 files 独立完整性复算通过。
 - final matrix：`artifacts/analysis/measurement_calibrated_vec_workload_20261005_v4/`，commit `472d064...`，
   8 points×3 seeds×3 methods=72 rows、0 generate、0.0084 s；local=offline exact 24/24，全部完成量相同。
-  5/5 files 独立复算通过。
+  5/5 files 独立复算通过；后续审查确认该一致性共享实现成本真值且结构可分，不作为独立方法证据。
 - 非最终保留：real v1 成功但缺显式 wait 字段；workload v1 的 decision overhead 计时边界错误，v2 缺显式 wait；
   v3 含完整 wait 字段但 CSV writer 仍用 CRLF，原字节与 manifest 被精确保留；均不得用于主表。两次
   wrong-expected-SHA prelaunch 在 output 创建前停止，调用和结果为0。
