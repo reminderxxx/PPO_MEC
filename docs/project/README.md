@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `independent_recovery_cost_measurement_plan_20261005.md`：独立成本检查的实例、随机顺序、既有校准、事前预测、
+  24-call 硬预算、评分和未覆盖条件；模型输出产生前冻结
+
 - `eviction_aware_recovery_results_20261005.md`：12 点四方法完整结果、逐事件解释、主张—实验—原件—限制表与
   投稿关键缺口；新规则与正确两步前瞻持平，证据仅为 bounded implementation correction
 - `eviction_aware_recovery_plan_20261005.md`：事前冻结公式、字段、复杂度、伪代码、12 点与执行边界

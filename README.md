@@ -5,6 +5,11 @@
 
 # PPO_MEC
 
+独立恢复成本检查的事前冻结方案见
+[`docs/project/independent_recovery_cost_measurement_plan_20261005.md`](docs/project/independent_recovery_cost_measurement_plan_20261005.md)。
+它只复用现有真实模型、技术输入、production action-4 状态路径和固定实现，计划 2 条可执行条件、各 3 次配对重复，真实
+`generate` 硬上限 24；原 12 个设计点明确降回开发/机制验证证据。真实 victim 后续重载、无线和队列仍未覆盖。
+
 驱逐代价感知恢复规则的 12 点冻结验证与证据绑定论文工作稿见
 [`docs/project/eviction_aware_recovery_results_20261005.md`](docs/project/eviction_aware_recovery_results_20261005.md) 和
 [`docs/project/system_mechanism_manuscript_working_draft.md`](docs/project/system_mechanism_manuscript_working_draft.md)。

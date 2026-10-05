@@ -1,5 +1,15 @@
 ﻿# Directory Structure
 
+## 2026-10-05 independent recovery cost measurement
+
+- `configs/acceptance/independent_recovery_cost_measurement_v1.json`：两条件、六次配对、随机种子、事前成本/动作和
+  24-call 硬预算的机器冻结方案。
+- `scripts/run_independent_recovery_cost_measurement.py`：只复用既有模型、输入、状态包与 production action-4 路径的
+  新进程配对测量及原始值/误差/决策回执生成器。
+- `tests/test_independent_recovery_cost_measurement.py`：预算、预测、共同模型准备成本和未覆盖真实 reload 的静态合同。
+- `docs/project/independent_recovery_cost_measurement_plan_20261005.md`：模型输出前冻结的人工可读计划。
+- `artifacts/analysis/independent_recovery_cost_measurement_20261005_v1/`：计划执行后才允许创建的 create-only 结果根。
+
 ## 2026-10-05 eviction-aware recovery
 
 - `src/runtime/eviction_aware_recovery.py`：纯函数 opt-in 成本规则、原阈值与同信息两步对照；不增加动作/网络。

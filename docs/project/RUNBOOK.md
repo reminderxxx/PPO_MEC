@@ -5,6 +5,24 @@
 
 # Runbook
 
+## 独立恢复成本测量（2026-10-05）
+
+先提交并固定计划/执行器；随后只允许从 clean fixed commit 对不存在的 output root 启动一次：
+
+```bash
+/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python \
+  scripts/run_independent_recovery_cost_measurement.py \
+  --role supervisor \
+  --plan configs/acceptance/independent_recovery_cost_measurement_v1.json \
+  --run-root artifacts/analysis/independent_recovery_cost_measurement_20261005_v1 \
+  --expected-commit <frozen-measurement-commit>
+```
+
+计划固定 2 个条件 × 3 次配对；每次 source/restart/recovery 分别调用 1/2/1 次，共 24 次 `generate`，恰等于硬上限。
+失败不重试、不补跑。每个 role 是新进程，OS 文件缓存不清空，不能称磁盘冷启动。100 Mbps 与 0.02 s 是模拟动态传输
+假设；模型权重来自既有本地目录，不是网络下载。真实 victim 后续重载、无线和 queue 未覆盖。完整事前边界见
+`independent_recovery_cost_measurement_plan_20261005.md`。
+
 ## 驱逐代价感知恢复规则（2026-10-05）
 
 只允许从冻结 clean commit 一次性执行；output root 必须不存在，不启动训练、模型、下载或 holdout：
