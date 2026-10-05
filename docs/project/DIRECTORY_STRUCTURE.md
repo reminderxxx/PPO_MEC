@@ -2,6 +2,10 @@
 
 ## 2026-10-05 production action 4 / workload v0.1
 
+- `configs/experiment/workload_v0_1_cost_mismatch_robustness_v1.json`：固定事前估计与 12 个独立实现成本点。
+- `scripts/run_workload_v0_1_cost_mismatch_robustness.py`：0-call 成本失配评估，exact 明确为事后 oracle。
+- `configs/acceptance/production_action4_independent_repeat_v1.json`、
+  `scripts/run_production_action4_independent_repeat.py`：三次交错 restart/recovery、总 12-call 的固定实现复测。
 - `src/runtime/production_action4_state.py`：create-only 状态导出、目标模型门禁、完整校验和执行权提交。
 - `src/data/workflow/measurement_calibrated_vec_workload.py`：v0.1 生成器与三方法 bounded evaluator。
 - `configs/experiment/measurement_calibrated_vec_workload_v0_1.json`：RQ、测量校准、8 点、3 seed、方法、目标与预算冻结。

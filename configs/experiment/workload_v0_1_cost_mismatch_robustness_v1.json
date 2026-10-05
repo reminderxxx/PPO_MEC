@@ -1,0 +1,177 @@
+{
+  "schema_version": "ppo_mec.workload_v0_1_cost_mismatch_robustness.v1",
+  "run_id": "workload_v0_1_cost_mismatch_robustness_20261005_v1",
+  "frozen_at": "2026-10-05T16:30:00+08:00",
+  "audited_baseline_commit": "f6aa3d7da86a2f2e05a052cf32c33eddf7a7e3e8",
+  "baseline_workload_config": "configs/experiment/measurement_calibrated_vec_workload_v0_1.json",
+  "baseline_design_id": "d01",
+  "baseline_seed": 17,
+  "status": "FROZEN_BEFORE_EXECUTION",
+  "scope": {
+    "rl_execution": false,
+    "training": false,
+    "model_generate_calls": 0,
+    "formal_or_holdout": false,
+    "old_holdout_reused": false,
+    "maximum_design_points": 12
+  },
+  "decision_time_estimate": {
+    "prefix_recompute_seconds": 11.035304,
+    "recovery_overhead_seconds": 0.006151,
+    "target_model_load_seconds": 1.173114,
+    "input_bytes": 192757,
+    "state_bytes": 2040,
+    "link_mbps": 100.0,
+    "fixed_one_way_seconds": 0.02,
+    "source": "workload v0.1 pre-action-4 calibration; fixed for every local decision",
+    "target_ready_information_role": "included in estimated total cost but common to restart and recovery, so it cancels from the binary choice"
+  },
+  "execution_constants": {
+    "input_bytes": 192757,
+    "state_bytes": 2185,
+    "fixed_one_way_seconds": 0.02,
+    "state_bytes_source": "production_action4_workflow_20261005_v2",
+    "wireless_measurement": false
+  },
+  "design_points": [
+    {
+      "design_id": "r01",
+      "label": "observed_v2_low_cost",
+      "actual_prefix_recompute_seconds": 11.066553709,
+      "actual_recovery_overhead_seconds": 0.005851209,
+      "actual_link_mbps": 100.0,
+      "actual_target_model": "ready",
+      "estimated_target_model": "ready",
+      "actual_target_model_load_seconds": 1.18614504,
+      "source_type": "measured_version_specific"
+    },
+    {
+      "design_id": "r02",
+      "label": "observed_v1_low_cost",
+      "actual_prefix_recompute_seconds": 11.295001417,
+      "actual_recovery_overhead_seconds": 0.005875042,
+      "actual_link_mbps": 100.0,
+      "actual_target_model": "ready",
+      "estimated_target_model": "ready",
+      "actual_target_model_load_seconds": 1.196799791,
+      "source_type": "measured_version_specific"
+    },
+    {
+      "design_id": "r03",
+      "label": "missing_correctly_observed",
+      "actual_prefix_recompute_seconds": 11.035304,
+      "actual_recovery_overhead_seconds": 0.006151,
+      "actual_link_mbps": 100.0,
+      "actual_target_model": "missing",
+      "estimated_target_model": "missing",
+      "actual_target_model_load_seconds": 1.196799791,
+      "source_type": "measured_load_envelope_plus_synthetic_readiness"
+    },
+    {
+      "design_id": "r04",
+      "label": "ready_false_positive",
+      "actual_prefix_recompute_seconds": 11.035304,
+      "actual_recovery_overhead_seconds": 0.006151,
+      "actual_link_mbps": 100.0,
+      "actual_target_model": "missing",
+      "estimated_target_model": "ready",
+      "actual_target_model_load_seconds": 1.196799791,
+      "source_type": "explicit_hypothesis"
+    },
+    {
+      "design_id": "r05",
+      "label": "ready_false_negative",
+      "actual_prefix_recompute_seconds": 11.035304,
+      "actual_recovery_overhead_seconds": 0.006151,
+      "actual_link_mbps": 100.0,
+      "actual_target_model": "ready",
+      "estimated_target_model": "missing",
+      "actual_target_model_load_seconds": 1.148209083,
+      "source_type": "explicit_hypothesis"
+    },
+    {
+      "design_id": "r06",
+      "label": "boundary_50_mbps",
+      "actual_prefix_recompute_seconds": 11.035304,
+      "actual_recovery_overhead_seconds": 11.05,
+      "actual_link_mbps": 50.0,
+      "actual_target_model": "ready",
+      "estimated_target_model": "ready",
+      "actual_target_model_load_seconds": 1.173114,
+      "source_type": "break_even_hypothesis"
+    },
+    {
+      "design_id": "r07",
+      "label": "boundary_100_mbps",
+      "actual_prefix_recompute_seconds": 11.035304,
+      "actual_recovery_overhead_seconds": 11.05,
+      "actual_link_mbps": 100.0,
+      "actual_target_model": "ready",
+      "estimated_target_model": "ready",
+      "actual_target_model_load_seconds": 1.173114,
+      "source_type": "break_even_hypothesis"
+    },
+    {
+      "design_id": "r08",
+      "label": "boundary_200_mbps",
+      "actual_prefix_recompute_seconds": 11.035304,
+      "actual_recovery_overhead_seconds": 11.05,
+      "actual_link_mbps": 200.0,
+      "actual_target_model": "ready",
+      "estimated_target_model": "ready",
+      "actual_target_model_load_seconds": 1.173114,
+      "source_type": "break_even_hypothesis"
+    },
+    {
+      "design_id": "r09",
+      "label": "recovery_worth_near_boundary",
+      "actual_prefix_recompute_seconds": 11.035304,
+      "actual_recovery_overhead_seconds": 11.0,
+      "actual_link_mbps": 100.0,
+      "actual_target_model": "ready",
+      "estimated_target_model": "ready",
+      "actual_target_model_load_seconds": 1.173114,
+      "source_type": "break_even_hypothesis"
+    },
+    {
+      "design_id": "r10",
+      "label": "restart_worth_near_boundary",
+      "actual_prefix_recompute_seconds": 11.035304,
+      "actual_recovery_overhead_seconds": 11.1,
+      "actual_link_mbps": 100.0,
+      "actual_target_model": "ready",
+      "estimated_target_model": "ready",
+      "actual_target_model_load_seconds": 1.173114,
+      "source_type": "break_even_hypothesis"
+    },
+    {
+      "design_id": "r11",
+      "label": "high_restore_control",
+      "actual_prefix_recompute_seconds": 11.035304,
+      "actual_recovery_overhead_seconds": 14.0,
+      "actual_link_mbps": 100.0,
+      "actual_target_model": "ready",
+      "estimated_target_model": "ready",
+      "actual_target_model_load_seconds": 1.173114,
+      "source_type": "pre_registered_synthetic_control"
+    },
+    {
+      "design_id": "r12",
+      "label": "faster_recompute_adverse_case",
+      "actual_prefix_recompute_seconds": 10.8,
+      "actual_recovery_overhead_seconds": 11.0,
+      "actual_link_mbps": 100.0,
+      "actual_target_model": "ready",
+      "estimated_target_model": "ready",
+      "actual_target_model_load_seconds": 1.148209083,
+      "source_type": "explicit_hypothesis_within_small_relative_perturbation"
+    }
+  ],
+  "interpretation": {
+    "local_policy": "uses decision_time_estimate only",
+    "execution": "uses actual_* values only",
+    "exact": "post_hoc_oracle_using_actual_values_not_an_information_fair_online_baseline",
+    "selection_rule": "same lexicographic objective as workload v0.1",
+    "all_results_retained": true
+  }
+}

@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `workload_v0_1_self_consistency_audit_20261005.md`：workload v0.1 自证循环、seed 有效输入、sharing 语义、
+  version-specific real run 审查，以及 12 点成本失配与 12-call 固定实现复测冻结计划
+
 - `measurement_calibrated_vec_workload_v0_1.md`：production action 4 technical 正负链、RQ—机制—假设—指标、
   workload v0.1 数据卡/来源表、全部 72 方法行、收益/无收益/交换区和唯一下一步
 

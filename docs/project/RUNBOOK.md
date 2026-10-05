@@ -25,6 +25,25 @@ workflow（硬上限 12，无自动重试），再运行 0-call 半合成矩阵�
   --expected-commit <fixed-implementation-commit>
 ```
 
+自证循环审查后的最小稳健性与固定实现复测使用独立 output root；先提交并固定实现，再以该 clean commit 执行：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/run_workload_v0_1_cost_mismatch_robustness.py \
+  --config configs/experiment/workload_v0_1_cost_mismatch_robustness_v1.json \
+  --output-root artifacts/analysis/workload_v0_1_cost_mismatch_robustness_20261005_v1 \
+  --expected-commit <fixed-implementation-commit>
+
+/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python \
+  scripts/run_production_action4_independent_repeat.py \
+  --plan configs/acceptance/production_action4_independent_repeat_v1.json \
+  --run-root artifacts/analysis/production_action4_independent_repeat_20261005_v1 \
+  --expected-commit <fixed-implementation-commit>
+```
+
+第二个命令固定 3 次配对复测、12 次 generate、无自动重试；每个 role 使用新进程，OS 文件缓存不清空。不得称真实
+RSU 网络测量。完整边界见 `workload_v0_1_self_consistency_audit_20261005.md`。
+
 本地 package I/O 与 100 Mbps 公式不是无线测量；real runner 的 target 先加载并核验模型，再导入状态。缺模型负例只
 验证 fail-closed，不触发下载或 generate。旧 run root、旧 holdout 和历史状态包不得覆盖或复用为新独立样本。
 
