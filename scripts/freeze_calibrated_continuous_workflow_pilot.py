@@ -28,6 +28,33 @@ def _load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
+def _deep_merge(base: dict[str, Any], overlay: dict[str, Any]) -> dict[str, Any]:
+    merged = dict(base)
+    for key, value in overlay.items():
+        if key == "extends":
+            continue
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key] = _deep_merge(dict(merged[key]), value)
+        else:
+            merged[key] = value
+    return merged
+
+
+def _load_experiment_config(path: Path) -> tuple[dict[str, Any], Path | None]:
+    overlay = _load_json(path)
+    extends = overlay.get("extends")
+    if not extends:
+        return overlay, None
+    base_path = ROOT_DIR / str(extends)
+    return _deep_merge(_load_json(base_path), overlay), base_path
+
+
+def _canonical_sha256(payload: dict[str, Any]) -> str:
+    return hashlib.sha256(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+
+
 def _load_workflows(path: Path, node_min: int, node_max: int) -> list[dict[str, Any]]:
     rows = []
     with path.open("r", encoding="utf-8-sig") as handle:
@@ -145,7 +172,17 @@ def _build_instance(
     pressure = "high" if int(window["estimated_handoff_count"]) > 0 else "low"
     block = 2 if pressure == "high" else max(3, len(nodes) // 2)
     rsu_ids = ["rsu_0", "rsu_1", "rsu_2"]
-    rsu_sequence = [rsu_ids[(index // block) % len(rsu_ids)] for index in range(len(nodes))]
+    max_steps = len(nodes) * 2
+    sequence_length = (
+        max_steps
+        if str(config.get("mobility_progression", "completed_node_index"))
+        == "decision_step_index"
+        else len(nodes)
+    )
+    rsu_sequence = [
+        rsu_ids[(index // block) % len(rsu_ids)]
+        for index in range(sequence_length)
+    ]
     actual_mbps = float(template.get("actual_mbps", config["link"]["mbps"]))
     estimated_mbps = float(template.get("estimated_mbps", config["link"]["mbps"]))
     prediction_quality = str(template.get("prediction_quality", "matched"))
@@ -213,7 +250,7 @@ def _build_instance(
         "edges": edges,
         "execution_order": execution_order,
         "deadline_seconds": round(deadline, 6),
-        "max_steps": len(nodes) * 2,
+        "max_steps": max_steps,
         "source_classes": {
             "measured": ["base/adapter bytes", "local load time", "state/input bytes", "state restore overhead"],
             "trace_derived": ["NGSIM window handoff pressure", "Alibaba DAG topology/duration/memory"],
@@ -233,7 +270,7 @@ def main() -> None:
     output_path = ROOT_DIR / args.output
     if output_path.exists():
         raise FileExistsError(f"create-only manifest already exists: {output_path}")
-    config = _load_json(config_path)
+    config, base_config_path = _load_experiment_config(config_path)
     selection = config["selection_protocol"]
     train_plan_path = ROOT_DIR / selection["train_window_plan"]
     eval_plan_path = ROOT_DIR / selection["evaluation_window_plan"]
@@ -241,7 +278,14 @@ def main() -> None:
     eval_plan = _load_json(eval_plan_path)["selected_window_plan"]
     train_windows = _select_windows(train_plan, selection["train_windows"])
     dev_windows = _select_windows(train_plan, selection["dev_windows"])
-    evaluation_windows = [eval_plan[index] for index in selection["evaluation_indices"]]
+    final_split_specs = (
+        [
+            ("regression", selection["regression_indices"]),
+            ("frozen_check", selection["frozen_check_indices"]),
+        ]
+        if "regression_indices" in selection
+        else [("evaluation", selection["evaluation_indices"])]
+    )
     workflow_path = Path(args.data_root).resolve() / Path(selection["workflow_source"]).relative_to("data")
     workflows = _load_workflows(
         workflow_path,
@@ -252,7 +296,11 @@ def main() -> None:
         raise RuntimeError("not enough eligible Alibaba workflows")
     instances = []
     cursor = 0
-    for split, windows in (("train", train_windows), ("dev", dev_windows), ("evaluation", evaluation_windows)):
+    split_windows = [("train", train_windows), ("dev", dev_windows)] + [
+        (split, [eval_plan[index] for index in indices])
+        for split, indices in final_split_specs
+    ]
+    for split, windows in split_windows:
         for ordinal, window in enumerate(windows):
             template = config["design_templates"][ordinal % len(config["design_templates"])]
             instances.append(
@@ -270,13 +318,22 @@ def main() -> None:
         "schema_version": config["schema_version"],
         "config_path": args.config,
         "config_sha256": _sha256(config_path),
+        "resolved_config_sha256": _canonical_sha256(config),
+        "base_config": (
+            {"path": str(base_config_path.relative_to(ROOT_DIR)), "sha256": _sha256(base_config_path)}
+            if base_config_path is not None
+            else None
+        ),
         "source_files": {
             "train_window_plan": {"path": selection["train_window_plan"], "sha256": _sha256(train_plan_path)},
             "evaluation_window_plan": {"path": selection["evaluation_window_plan"], "sha256": _sha256(eval_plan_path)},
             "workflow_source": {"path": selection["workflow_source"], "sha256": _sha256(workflow_path)},
         },
         "selection_outcome_blind": True,
-        "split_counts": {split: sum(item["split"] == split for item in instances) for split in ("train", "dev", "evaluation")},
+        "split_counts": {
+            split: sum(item["split"] == split for item in instances)
+            for split, _ in split_windows
+        },
         "instances": instances,
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)

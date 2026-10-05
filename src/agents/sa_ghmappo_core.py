@@ -833,6 +833,8 @@ class 分层PPO基类(BaseAgent):
         digital_twin_policy_prior_prepare_not_ready_scale: float = 1.0,
         env_action_ppo_enabled: bool = False,
         env_action_ppo_coef: float = 0.0,
+        executed_action_ppo_only: bool = False,
+        hierarchical_action_contract: str = "legacy_env_marginal_argmax_v1",
         env_action_ppo_advantage_blend: float = 0.65,
         env_action_ppo_teacher_coef: float = 0.0,
         env_action_ppo_mechanism_focus: float = 0.0,
@@ -1548,6 +1550,23 @@ class 分层PPO基类(BaseAgent):
         )
         self._env_action_ppo_enabled = bool(env_action_ppo_enabled)
         self._env_action_ppo_coef = max(float(env_action_ppo_coef), 0.0)
+        self._executed_action_ppo_only = bool(executed_action_ppo_only)
+        self._hierarchical_action_contract = str(hierarchical_action_contract)
+        if self._hierarchical_action_contract not in {
+            "legacy_env_marginal_argmax_v1",
+            "independent_heads_executed_env_v2",
+        }:
+            raise ValueError(
+                "unsupported hierarchical_action_contract: "
+                f"{self._hierarchical_action_contract}"
+            )
+        if self._executed_action_ppo_only and (
+            not self._env_action_ppo_enabled or self._env_action_ppo_coef <= 0.0
+        ):
+            raise ValueError(
+                "executed_action_ppo_only requires env_action_ppo_enabled=true "
+                "and env_action_ppo_coef>0"
+            )
         self._env_action_ppo_advantage_blend = max(
             0.0,
             min(float(env_action_ppo_advantage_blend), 1.0),
@@ -3033,6 +3052,9 @@ class 分层PPO基类(BaseAgent):
                 head_entropies=head_entropies,
                 head_credit_weights=head_credit_weights,
             )
+            if self._use_hierarchy and self._executed_action_ppo_only:
+                log_prob = env_action_log_prob
+                entropy = env_action_entropy
             if option_entropy_tensor is not None:
                 entropy = 0.5 * (entropy + option_entropy_tensor)
             value = float(policy_output["value"].item())
@@ -3065,6 +3087,9 @@ class 分层PPO基类(BaseAgent):
             "action_mask_applied": bool(self._action_mask_has_valid_action(action_mask)),
             "valid_action_count": self._valid_action_count(action_mask),
             "raw_head_actions": dict(action_projection_info.get("raw_head_actions", projected_head_actions)),
+            "raw_head_actions_source": str(
+                action_projection_info.get("raw_head_actions_source", "unspecified")
+            ),
             "projected_head_actions": projected_head_actions,
             "head_actions": selected_actions,
             "head_action_labels": self._head_action_labels(selected_actions),
@@ -3081,6 +3106,8 @@ class 分层PPO基类(BaseAgent):
             "env_action_log_prob": round(float(env_action_log_prob.item()), 6),
             "env_action_entropy": round(float(env_action_entropy.item()), 6),
             "env_action_probs": env_action_probs,
+            "hierarchical_action_contract": self._hierarchical_action_contract,
+            "executed_action_ppo_only": self._executed_action_ppo_only,
             "env_action_model_critic": env_action_model_critic_info,
             "env_action_model_rollout_enabled": bool(
                 self._env_action_model_rollout_enabled
@@ -4035,6 +4062,27 @@ class 分层PPO基类(BaseAgent):
                         event_advantage=event_advantage_tensor[batch_indices],
                         batch_rows=batch_rows,
                     )
+                    if self._executed_action_ppo_only:
+                        env_scores = torch.stack(
+                            [
+                                self._masked_flat_logits(
+                                    self._hierarchical_env_action_scores(output),
+                                    action_mask,
+                                )
+                                for output, action_mask in zip(
+                                    batch_outputs, batch_action_masks
+                                )
+                            ],
+                            dim=0,
+                        )
+                        executed_distribution = Categorical(logits=env_scores)
+                        new_log_prob = executed_distribution.log_prob(
+                            action_tensor[batch_indices]
+                        )
+                        entropy = executed_distribution.entropy().mean()
+                        actor_loss = torch.zeros(
+                            (), dtype=torch.float32, device=self._device
+                        )
                     env_action_counterfactual_margin_loss = self._compute_env_action_counterfactual_margin_loss(
                         batch_outputs=batch_outputs,
                         batch_action_masks=batch_action_masks,
@@ -4877,6 +4925,8 @@ class 分层PPO基类(BaseAgent):
             "event_advantage_mean_raw": round(event_advantage_mean, 6),
             "event_advantage_std_raw": round(event_advantage_std, 6),
             "env_action_ppo_enabled": self._env_action_ppo_enabled,
+            "executed_action_ppo_only": self._executed_action_ppo_only,
+            "hierarchical_action_contract": self._hierarchical_action_contract,
             "env_action_ppo_coef": round(self._env_action_ppo_coef, 6),
             "env_action_ppo_advantage_blend": round(self._env_action_ppo_advantage_blend, 6),
             "env_action_ppo_teacher_coef": round(self._env_action_ppo_teacher_coef, 6),
@@ -7149,6 +7199,55 @@ class 分层PPO基类(BaseAgent):
                 projection_info,
             )
 
+        if (
+            deterministic
+            and self._hierarchical_action_contract
+            == "independent_heads_executed_env_v2"
+        ):
+            raw_actions: dict[str, int] = {}
+            for head_name in ["slow", "fast", "event"]:
+                logits = policy_output[f"{head_name}_logits"]
+                raw_actions[head_name] = int(torch.argmax(logits, dim=-1).item())
+            raw_env_action, raw_aggregation_reason = 聚合层级动作(
+                head_actions=raw_actions,
+                use_hierarchy=self._use_hierarchy,
+                event_head_enabled=self._event_head_enabled,
+                adapter_prefetch_enabled=self._adapter_prefetch_enabled,
+            )
+            projected_actions = self._project_head_actions_to_valid_env_action(
+                selected_actions=dict(raw_actions),
+                policy_output=policy_output,
+                action_mask=action_mask,
+            )
+            projected_env_action, projected_aggregation_reason = 聚合层级动作(
+                head_actions=projected_actions,
+                use_hierarchy=self._use_hierarchy,
+                event_head_enabled=self._event_head_enabled,
+                adapter_prefetch_enabled=self._adapter_prefetch_enabled,
+            )
+            head_log_probs, head_entropies, action_prob_payload = self._selected_action_statistics(
+                policy_output=policy_output,
+                selected_actions=projected_actions,
+                action_mask=action_mask,
+            )
+            projection_info = self._build_action_projection_info(
+                raw_actions=raw_actions,
+                projected_actions=projected_actions,
+                raw_env_action=raw_env_action,
+                raw_aggregation_reason=raw_aggregation_reason,
+                projected_env_action=projected_env_action,
+                projected_aggregation_reason=projected_aggregation_reason,
+                action_mask=action_mask,
+            )
+            projection_info["raw_head_actions_source"] = "independent_head_argmax"
+            return (
+                projected_actions,
+                head_log_probs,
+                head_entropies,
+                action_prob_payload,
+                projection_info,
+            )
+
         if self._action_mask_has_valid_action(action_mask):
             assert action_mask is not None
             env_scores = self._masked_flat_logits(
@@ -7183,6 +7282,11 @@ class 分层PPO基类(BaseAgent):
                 action_mask=action_mask,
             )
             projection_info["masked_hierarchical_env_action_sampling"] = True
+            projection_info["raw_head_actions_source"] = (
+                "canonical_inverse_of_sampled_env_action"
+                if not deterministic
+                else "canonical_inverse_of_env_marginal_argmax"
+            )
             projection_info["masked_env_action_log_prob"] = round(
                 float(distribution.log_prob(env_action_tensor).item()),
                 6,
@@ -7240,6 +7344,7 @@ class 分层PPO基类(BaseAgent):
             projected_aggregation_reason=projected_aggregation_reason,
             action_mask=action_mask,
         )
+        projection_info["raw_head_actions_source"] = "independent_head_selection"
         return projected_actions, head_log_probs, head_entropies, action_prob_payload, projection_info
 
     def _build_action_projection_info(
@@ -15402,6 +15507,8 @@ class 分层PPO基类(BaseAgent):
                 self._digital_twin_policy_prior_prepare_not_ready_scale
             ),
             "env_action_ppo_enabled": self._env_action_ppo_enabled,
+            "executed_action_ppo_only": self._executed_action_ppo_only,
+            "hierarchical_action_contract": self._hierarchical_action_contract,
             "env_action_ppo_coef": self._env_action_ppo_coef,
             "env_action_ppo_advantage_blend": self._env_action_ppo_advantage_blend,
             "env_action_ppo_teacher_coef": self._env_action_ppo_teacher_coef,

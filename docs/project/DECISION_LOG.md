@@ -1234,3 +1234,13 @@ claim map 必须报告 `UNAVAILABLE`。
   failure-time mobility、flat/graph feature consumption 和 model-based planner capability 不匹配，公平方法排名不成立。
 - 故选择 D：保留 run 作为 interface-blocked diagnostic，停止且不自动修复或重训。候选机制不进入正向贡献；任何未来修复
   必须另立预注册任务和 run ID，保留 v2 evaluation 与 failure receipts，不得以本轮结果筛选场景。
+
+## 2026-10-06 — Calibrated workflow repair 使用显式新接口，不回写历史语义
+
+- 决定：新建 `calibrated_workflow_interface_v2` 与 `independent_heads_executed_env_v2`，不改变 legacy profile。
+- executed-action PPO 同时用于 SA 与 controller-level MAPPO；PPO 保持其原生五动作 likelihood。所有 learned methods 消费
+  同一 public calibrated feature contract；不增加 SA 专属能力或缺模型强制 action 0。
+- failure-time mobility 按 decision step 推进，workflow node 仍按成功推进；这是环境时钟/移动合同纠正，不是 reward shaping。
+- two-step rule 保留 exact decision clone 和 lexicographic model-based planning，明确标注 capability 差异，不削弱以制造 SA 胜出。
+- 历史 checkpoint 虽可按 tensor shape 加载，但在新语义下不可比较；本轮固定全量重训。旧 evaluation 仅回归，新 8-window
+  检查仍为开发证据。收益若出现先归因于实现纠正，不宣称算法原创性。

@@ -8,6 +8,16 @@ from typing import Any
 import torch
 from torch import nn
 
+from src.encoders.calibrated_workflow_features import (
+    bundle_ready,
+    bundle_resident_bytes,
+    cache_occupancy,
+    log_scale,
+    predicted_target_rsu_id,
+    rsu_by_id,
+    uses_calibrated_workflow_interface_v2,
+)
+
 from src.encoders.dag_graph_encoder import DAGGraphEncoder
 from src.encoders.rsu_state_encoder import RSUStateEncoder
 
@@ -306,6 +316,35 @@ class FlatSemanticEncoder(nn.Module):
         confidence = float(predictions.get("prediction_confidence_by_vehicle", {}).get(vehicle_id, 0.0))
         uncertainty = float(predictions.get("prediction_uncertainty_by_vehicle", {}).get(vehicle_id, 1.0))
         dwell_time = float(predictions.get("dwell_time", {}).get(vehicle_id, 0.0))
+        if uses_calibrated_workflow_interface_v2(semantic_state):
+            current_rsu_id = primary_vehicle.get("associated_rsu_id")
+            target_rsu_id = predicted_target_rsu_id(semantic_state)
+            current_rsu = rsu_by_id(semantic_state, current_rsu_id)
+            target_rsu = rsu_by_id(semantic_state, target_rsu_id)
+            context = semantic_state.get("calibrated_context", {}) or {}
+            link = context.get("link", {}) or {}
+            capacity = max(float(context.get("cache_capacity_bytes", 0.0) or 0.0), 1.0)
+            feature_list = [
+                progress,
+                1.0 - progress,
+                log_scale(float(current_node.get("input_bytes", current_node.get("input_size", 0.0)) or 0.0), 5_000_000.0),
+                log_scale(float(current_node.get("state_bytes", current_node.get("output_size", 0.0)) or 0.0), 3_000_000_000.0),
+                min(float(current_node.get("compute_seconds", 0.0) or 0.0) / 10.0, 1.0),
+                min(float(context.get("contact_budget_seconds", 0.0) or 0.0) / 20.0, 1.0),
+                min(float(link.get("estimated_mbps", 0.0) or 0.0) / 1000.0, 1.0),
+                min(float(link.get("fixed_seconds", 0.0) or 0.0) / 0.1, 1.0),
+                bundle_ready(semantic_state, current_rsu, current_node),
+                bundle_ready(semantic_state, target_rsu, current_node),
+                cache_occupancy(current_rsu),
+                cache_occupancy(target_rsu),
+                min(float(bundle_resident_bytes(semantic_state, current_node)) / capacity, 1.0),
+                min(float(len(current_node.get("predecessors", []))) / 4.0, 1.0),
+                min(float(len(current_node.get("successors", []))) / 4.0, 1.0),
+                1.0 if target_rsu_id is not None and str(target_rsu_id) != str(current_rsu_id) else 0.0,
+                confidence,
+                uncertainty,
+            ]
+            return torch.tensor(feature_list, dtype=torch.float32)
         feature_list = [
             float(semantic_state.get("time_index", 0.0)) / 10000.0,
             float(len(vehicles)) / 20.0,
@@ -348,6 +387,11 @@ class FlatSemanticEncoder(nn.Module):
             predecessors = set(node.get("predecessors", []))
             if predecessors.issubset(completed_node_ids):
                 frontier_count += 1
+        if uses_calibrated_workflow_interface_v2(semantic_state):
+            # The repaired profile intentionally gives actor and critic the same
+            # public mechanism features; CTDE differs in optimization scope, not
+            # in access to hidden execution truth.
+            return self._build_feature_tensor(semantic_state)
         cache_occupancies = []
         for rsu in rsus:
             capacity = max(float(rsu.get("cache_capacity", rsu.get("adapter_cache_capacity", 1.0)) or 1.0), 1.0)
@@ -611,6 +655,27 @@ class SurrogateFusionEncoder(nn.Module):
         dwell_time = float(predictions.get("dwell_time", {}).get(vehicle_id, 0.0))
         confidence = float(predictions.get("prediction_confidence_by_vehicle", {}).get(vehicle_id, 0.0))
         uncertainty = float(predictions.get("prediction_uncertainty_by_vehicle", {}).get(vehicle_id, 1.0))
+        if uses_calibrated_workflow_interface_v2(semantic_state):
+            target_rsu_id = predicted_target_rsu_id(semantic_state)
+            current_rsu = rsu_by_id(semantic_state, current_rsu_id)
+            target_rsu = rsu_by_id(semantic_state, target_rsu_id)
+            context = semantic_state.get("calibrated_context", {}) or {}
+            link = context.get("link", {}) or {}
+            return torch.tensor(
+                [
+                    log_scale(float(current_node.get("input_bytes", current_node.get("input_size", 0.0)) or 0.0), 5_000_000.0),
+                    log_scale(float(current_node.get("state_bytes", current_node.get("output_size", 0.0)) or 0.0), 3_000_000_000.0),
+                    min(float(current_node.get("compute_seconds", 0.0) or 0.0) / 10.0, 1.0),
+                    min(float(context.get("contact_budget_seconds", 0.0) or 0.0) / 20.0, 1.0),
+                    min(float(link.get("estimated_mbps", 0.0) or 0.0) / 1000.0, 1.0),
+                    min(float(bundle_resident_bytes(semantic_state, current_node)) / 2_500_000_000.0, 1.0),
+                    bundle_ready(semantic_state, current_rsu, current_node),
+                    bundle_ready(semantic_state, target_rsu, current_node),
+                    confidence,
+                    uncertainty,
+                ],
+                dtype=torch.float32,
+            )
         return torch.tensor(
             [
                 float(primary_vehicle.get("position_x", 0.0)) / 1000.0,
@@ -658,6 +723,29 @@ class SurrogateFusionEncoder(nn.Module):
             float(temporal_features["service_pressure"]),
             float(temporal_features["temporal_urgency"]),
         ]
+        if uses_calibrated_workflow_interface_v2(semantic_state):
+            current_node = semantic_state.get("current_workflow_node") or {}
+            current_rsu_id = primary_vehicle.get("associated_rsu_id")
+            target_rsu_id = predicted_target_rsu_id(semantic_state)
+            current_rsu = rsu_by_id(semantic_state, current_rsu_id)
+            target_rsu = rsu_by_id(semantic_state, target_rsu_id)
+            context = semantic_state.get("calibrated_context", {}) or {}
+            link = context.get("link", {}) or {}
+            prediction_feature_values = [
+                1.0 if target_rsu_id is not None else 0.0,
+                1.0 if target_rsu_id is not None and str(target_rsu_id) != str(current_rsu_id) else 0.0,
+                float(temporal_features["countdown_norm"]),
+                float(temporal_features["temporal_urgency"]),
+                float(temporal_features["prepare_window_score"]),
+                progress,
+                confidence,
+                uncertainty,
+                bundle_ready(semantic_state, current_rsu, current_node),
+                bundle_ready(semantic_state, target_rsu, current_node),
+                cache_occupancy(current_rsu),
+                min(float(link.get("estimated_mbps", 0.0) or 0.0) / 1000.0, 1.0),
+                log_scale(float(current_node.get("state_bytes", 0.0) or 0.0), 3_000_000_000.0),
+            ]
         if self._prediction_feature_dim <= len(prediction_feature_values):
             prediction_feature_values = prediction_feature_values[: self._prediction_feature_dim]
         else:

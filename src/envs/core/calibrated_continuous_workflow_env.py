@@ -115,6 +115,14 @@ class CalibratedContinuousWorkflowEnv:
         self._validate_all_caches()
         return self._observation(), self._info()
 
+    def _mobility_index(self) -> int:
+        progression = str(
+            self.config.get("mobility_progression", "completed_node_index")
+        )
+        if progression == "decision_step_index":
+            return int(self.step_index)
+        return int(self.node_index)
+
     @property
     def terminated(self) -> bool:
         return self.node_index >= len(self.execution_order)
@@ -354,12 +362,12 @@ class CalibratedContinuousWorkflowEnv:
 
     def _current_rsu_id(self) -> str:
         sequence = self.instance["rsu_sequence"]
-        return str(sequence[min(self.node_index, len(sequence) - 1)])
+        return str(sequence[min(self._mobility_index(), len(sequence) - 1)])
 
     def _predicted_sequence(self) -> list[str]:
         sequence = self.instance.get("predicted_rsu_sequence", self.instance["rsu_sequence"])
         horizon = int(self.config["prediction_horizon"])
-        start = min(self.node_index, len(sequence) - 1)
+        start = min(self._mobility_index(), len(sequence) - 1)
         values = [str(item) for item in sequence[start + 1 : start + 1 + horizon]]
         if not values:
             values = [str(sequence[-1])]
@@ -646,13 +654,30 @@ class CalibratedContinuousWorkflowEnv:
             },
             "cache_demand": {"demand_score_by_rsu": {}},
         }
+        interface_profile = str(
+            self.config.get("interface_profile", "legacy_calibrated_workflow_v1")
+        )
+        current_bundle_ready = bool(
+            node and self._bundle_ready(current_rsu, str(node["required_adapter"]))
+        )
+        target_bundle_ready = bool(
+            node and target and self._bundle_ready(target, str(node["required_adapter"]))
+        )
+        bundle_ids = self._bundle_ids(str(node["required_adapter"])) if node else []
+        bundle_resident_bytes = sum(
+            int(self._object_catalog[item]["resident_bytes"]) for item in bundle_ids
+        )
         return {
+            "interface_profile": interface_profile,
+            "mobility_progression": str(
+                self.config.get("mobility_progression", "completed_node_index")
+            ),
             "time_index": self.step_index,
             "primary_vehicle_id": "veh_pilot",
             "vehicles": [
                 {
                     "vehicle_id": "veh_pilot",
-                    "position_x": float(self.node_index * 10),
+                    "position_x": float(self._mobility_index() * 10),
                     "position_y": 0.0,
                     "speed": float(self.instance["trace_features"]["mean_speed_proxy"]),
                     "base_model_id": node.get("required_base_model") if node else "none",
@@ -678,6 +703,13 @@ class CalibratedContinuousWorkflowEnv:
                 "contact_budget_seconds": self._contact_budget_seconds(),
                 "cache_capacity_bytes": self.instance["cache_capacity_bytes"],
                 "state_bytes": node.get("state_bytes", 0) if node else 0,
+                "input_bytes": node.get("input_bytes", 0) if node else 0,
+                "compute_seconds": node.get("compute_seconds", 0.0) if node else 0.0,
+                "required_bundle_ids": bundle_ids,
+                "required_bundle_resident_bytes": bundle_resident_bytes,
+                "current_bundle_ready": current_bundle_ready,
+                "target_bundle_ready": target_bundle_ready,
+                "cache_capacity_unit": "bytes",
                 "link": {
                     "estimated_mbps": float(
                         self.instance.get("link_profile", {}).get(

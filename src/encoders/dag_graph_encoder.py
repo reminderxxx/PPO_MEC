@@ -7,6 +7,11 @@ from typing import Any
 import torch
 from torch import nn
 
+from src.encoders.calibrated_workflow_features import (
+    bundle_ready,
+    uses_calibrated_workflow_interface_v2,
+)
+
 
 def _计算_frontier节点(
     nodes: list[dict[str, Any]],
@@ -126,10 +131,24 @@ class DAGGraphEncoder(nn.Module):
 
         feature_rows: list[list[float]] = []
         node_ids: list[str] = []
+        calibrated_v2 = uses_calibrated_workflow_interface_v2(semantic_state)
         for node in nodes:
             node_id = str(node.get("node_id"))
             node_ids.append(node_id)
             required_adapter = node.get("required_adapter")
+            readiness = (
+                [
+                    bundle_ready(semantic_state, current_rsu, node),
+                    bundle_ready(semantic_state, predicted_rsu, node),
+                    bundle_ready(semantic_state, handoff_target_rsu, node),
+                ]
+                if calibrated_v2
+                else [
+                    1.0 if required_adapter in current_rsu.get("cached_adapter_ids", []) else 0.0,
+                    1.0 if required_adapter in predicted_rsu.get("cached_adapter_ids", []) else 0.0,
+                    1.0 if required_adapter in handoff_target_rsu.get("cached_adapter_ids", []) else 0.0,
+                ]
+            )
             feature_rows.append(
                 [
                     float(node.get("input_size", 0.0)) / max(max_input_size, 1.0),
@@ -139,9 +158,7 @@ class DAGGraphEncoder(nn.Module):
                     1.0 if node_id == current_node_id else 0.0,
                     1.0 if node_id in completed_node_ids else 0.0,
                     1.0 if node_id in frontier_node_ids else 0.0,
-                    1.0 if required_adapter in current_rsu.get("cached_adapter_ids", []) else 0.0,
-                    1.0 if required_adapter in predicted_rsu.get("cached_adapter_ids", []) else 0.0,
-                    1.0 if required_adapter in handoff_target_rsu.get("cached_adapter_ids", []) else 0.0,
+                    *readiness,
                 ]
             )
         return torch.tensor(feature_rows, dtype=torch.float32), node_ids

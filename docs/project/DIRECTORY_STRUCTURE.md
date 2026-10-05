@@ -26,6 +26,17 @@
 - `docs/project/sa_ghmappo_innovation_fair_training_v2_20261006.md` 与
   `manuscript_experiment_section_sa_ghmappo_pilot_v2_20261006.md`：最近邻矩阵、事后接口失效边界和待合并诊断章节。
 
+### v3 interface repair（独立新 profile）
+
+- `src/encoders/calibrated_workflow_features.py`：typed bundle、byte occupancy、模型大小和公共 calibrated context 的共享特征函数。
+- `configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json` / `_manifest.json`：继承 v2 数值配置，冻结
+  12/4/12/8 train/dev/regression/frozen-check、3 seeds × 192 episodes 和 41,472-step 上限。
+- `scripts/preflight_calibrated_workflow_interface_repair.py`：hash、split interval、预算、权限与三方法最小更新门禁。
+- `scripts/run_calibrated_workflow_interface_repair.py`：一次性 bounded retrain、dev 选模、已暴露 regression、新冻结开发检查、
+  raw-head/action 对账、分层和 checkpoint-free 交付入口。
+- `tests/test_calibrated_workflow_interface_repair.py`：单位/字段消费、动作聚合与 likelihood、action 0/4、重复 prepare 和
+  failure-time mobility 回归。
+
 ## 2026-10-06 symmetric recovery cost correction
 
 - `src/runtime/symmetric_recovery_cost.py`：双方 event ledger 的纯函数 scorer 与三种在线决策。

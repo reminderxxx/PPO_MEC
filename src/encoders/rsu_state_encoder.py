@@ -7,6 +7,14 @@ from typing import Any
 import torch
 from torch import nn
 
+from src.encoders.calibrated_workflow_features import (
+    adapter_ready,
+    base_ready,
+    bundle_ready,
+    cache_occupancy,
+    uses_calibrated_workflow_interface_v2,
+)
+
 
 def _resolve_primary_vehicle_from_semantic_state(semantic_state: dict[str, Any]) -> dict[str, Any]:
     vehicles = list(semantic_state.get("vehicles", []))
@@ -84,6 +92,7 @@ class RSUStateEncoder(nn.Module):
 
         feature_rows: list[list[float]] = []
         rsu_ids: list[str] = []
+        calibrated_v2 = uses_calibrated_workflow_interface_v2(semantic_state)
         for rsu in rsus:
             rsu_id = str(rsu.get("rsu_id"))
             rsu_ids.append(rsu_id)
@@ -91,6 +100,22 @@ class RSUStateEncoder(nn.Module):
             demand_score = 0.0
             if required_adapter is not None:
                 demand_score = float(demand_scores.get(rsu_id, {}).get(required_adapter, 0.0))
+            if calibrated_v2:
+                feature_rows.append(
+                    [
+                        cache_occupancy(rsu),
+                        bundle_ready(semantic_state, rsu, current_node),
+                        base_ready(semantic_state, rsu, current_node),
+                        adapter_ready(rsu, current_node),
+                        1.0 if rsu_id == current_rsu_id else 0.0,
+                        1.0 if rsu_id == predicted_next_rsu_id else 0.0,
+                        1.0 if rsu_id == predicted_handoff_target_rsu_id else 0.0,
+                        rsu_future_load / 10.0,
+                        mean_future_load / 10.0,
+                        demand_score / 5.0,
+                    ]
+                )
+                continue
             feature_rows.append(
                 [
                     float(rsu.get("coverage_radius", 0.0)) / 100.0,

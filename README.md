@@ -5,6 +5,11 @@
 
 # PPO_MEC
 
+Calibrated workflow 的 v3 interface repair 已单独冻结：新 profile 修正 byte-capacity 编码、typed bundle/链路/状态字段消费、
+failure-time mobility 和 executed-action PPO 对账；旧 v1/v2 结果与接口保持只读。协议、预算与 claim 边界见
+[interface repair 冻结协议](docs/project/calibrated_workflow_interface_repair_protocol_20261006.md)。新 run 不是算法贡献验收，
+旧 evaluation 只作 regression，新 8-window 检查仍是开发验证。
+
 纠正版实测校准连续工作流 v2 小预算执行已完成：SA-GHMAPPO、PPO、controller-level MAPPO、no-dependency
 敏感性臂和 immediate/two-step planners 共用五动作、奖励与依赖安全 typed cache；3 seeds × 128 episodes，不用
 evaluation 选模。训练后只读审计确认 executed-action likelihood、失败时 mobility、encoder 字段消费和 model-based planner

@@ -5,6 +5,30 @@
 
 # Runbook
 
+## Calibrated workflow interface repair v3（2026-10-06；单次有界执行）
+
+新 profile 不覆盖 v1/v2。冻结、预检和唯一一次后台执行命令如下；output root 必须不存在：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/freeze_calibrated_continuous_workflow_pilot.py \
+  --config configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json \
+  --data_root /Users/howen/Projects/PPO_MEC/data \
+  --output configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json
+
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/preflight_calibrated_workflow_interface_repair.py \
+  --output_root artifacts/analysis/calibrated_workflow_interface_repair_preflight_20261006_v2
+
+nohup /Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/run_calibrated_workflow_interface_repair.py \
+  --output_root artifacts/benchmarks/calibrated_continuous_workflow_interface_repair_20261006_v1 \
+  > artifacts/benchmarks/calibrated_continuous_workflow_interface_repair_20261006_v1.log 2>&1 &
+```
+
+后台任务只启动一次，不自动重试。`run_status.json` 和 `completion_receipt.json` 是状态/完成回执；checkpoint 仅保留本地、
+不得 Git add。旧 evaluation 是已暴露 regression；新 indices 12–19 只称 frozen development check，不称独立 holdout。
+最小回归：
+`python -m pytest -q tests/test_calibrated_workflow_interface_repair.py tests/test_calibrated_continuous_workflow.py tests/test_production_action4_state.py`。
+
 ## 纠正版连续工作流 v2（2026-10-06；interface-blocked，已停止）
 
 实际冻结、诊断和单次训练命令：

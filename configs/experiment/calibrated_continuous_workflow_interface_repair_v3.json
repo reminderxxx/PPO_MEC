@@ -1,0 +1,60 @@
+{
+  "extends": "configs/experiment/calibrated_continuous_workflow_pilot_v2.json",
+  "schema_version": "calibrated_continuous_workflow_interface_repair_v3",
+  "experiment_scope": "bounded_nonformal_interface_repair_validation",
+  "interface_profile": "calibrated_workflow_interface_v2",
+  "mobility_progression": "decision_step_index",
+  "selection_protocol": {
+    "regression_indices": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    "frozen_check_indices": [12, 13, 14, 15, 16, 17, 18, 19],
+    "workflow_count": 36,
+    "outcome_blind": true
+  },
+  "training": {
+    "agents": ["sa_ghmappo", "ppo", "mappo"],
+    "comparison_rules": ["two_step_cost_rule"],
+    "seeds": [7, 17, 29],
+    "episodes": 192,
+    "checkpoint_episode_candidates": [48, 96, 144, 192],
+    "update_every_episodes": 8,
+    "wall_clock_cap_seconds": 1800,
+    "budget": {
+      "episode_max_steps": 24,
+      "main_training_step_cap": 41472,
+      "total_training_step_cap": 41472
+    },
+    "checkpoint_selection": {
+      "split": "dev",
+      "order": [
+        "workflow_completion_rate_desc",
+        "deadline_violation_rate_asc",
+        "service_failure_rate_asc",
+        "handoff_failure_rate_asc",
+        "modeled_completion_seconds_asc",
+        "total_transfer_bytes_asc",
+        "reward_desc"
+      ],
+      "regression_split_used": false,
+      "frozen_check_split_used": false
+    }
+  },
+  "learning_interface": {
+    "hierarchical_action_contract": "independent_heads_executed_env_v2",
+    "executed_action_ppo_only": true,
+    "env_action_ppo_enabled": true,
+    "env_action_ppo_coef": 1.0,
+    "shared_public_feature_profile": "calibrated_workflow_interface_v2",
+    "reward_changed": false,
+    "sa_event_ablation": null
+  },
+  "claim_boundary": {
+    "formal": false,
+    "holdout": false,
+    "independent_final_check": false,
+    "regression_split_previously_exposed": true,
+    "frozen_check_source_group_previously_unused": true,
+    "real_model_calls_per_training_step": 0,
+    "wireless_measurement": false,
+    "interface_repair_not_algorithm_contribution": true
+  }
+}

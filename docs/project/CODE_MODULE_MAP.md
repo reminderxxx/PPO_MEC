@@ -728,6 +728,17 @@ v2 职责增量：
 - `scripts/repair_typed_model_cache_formal_bundle_resources.py`：生成Protocol v1.9、Readiness v11与唯一无旧顶层
   compatibility mapping的active index。
 - `tests/test_active_bundle_resource_resolution_v19.py`：v1.8失败复现、18类fail-closed负例和历史执行拒绝。
+# 2026-10-06 calibrated workflow interface repair modules
+
+- `src/envs/core/calibrated_continuous_workflow_env.py`：新 profile 下按 decision step 推进 mobility，生产 public semantic state；
+  node 只按 service success 推进，decision clone 只用 estimated link。
+- `src/encoders/calibrated_workflow_features.py`：统一解析 typed bundle、byte occupancy、current/target readiness 和大小特征。
+- `src/encoders/{fusion_encoder,dag_graph_encoder,rsu_state_encoder}.py`：仅在显式 v2 interface profile 下消费新公共字段；
+  历史编码语义保持兼容。
+- `src/agents/sa_ghmappo_core.py`：新 hierarchical action contract 与 executed-action PPO；SA/MAPPO 共用，不含 SA 专属环境能力。
+- `scripts/freeze_calibrated_continuous_workflow_pilot.py`：兼容继承配置、dynamic final splits 与 decision-step mobility sequence。
+- `scripts/{preflight,run}_calibrated_workflow_interface_repair.py`：预检和 bounded retrain/evaluation consumers。
+
 # G14R9 request execution modules
 
 - `src/runtime/formal_exogenous_request_execution.py`：request exposure producer、strict schema/canonical SHA-256、CacheEvent alignment、outcome audit 和 Endpoint 2.0 reducer。
