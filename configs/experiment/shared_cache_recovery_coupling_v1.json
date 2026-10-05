@@ -1,0 +1,138 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "shared_cache_recovery_coupling_20261005_v1",
+  "frozen_at": "2026-10-05",
+  "baseline_main_commit": "3881271a2c740cbcb86cff9bc023b2cf9b134118",
+  "preserved_workload_audit_commit": "5fd8096d0f3d419e976831bc199aa0f407a456df",
+  "target_venue": "IEEE Transactions on Mobile Computing (TMC)",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "evidence_level": "E2_bounded_native_transition_witness",
+  "seed": 7,
+  "maximum_design_points": 6,
+  "actual_design_points": 3,
+  "execution_constraints": {
+    "rl_training_forbidden": true,
+    "model_calls_forbidden": true,
+    "downloads_forbidden": true,
+    "network_simulator_forbidden": true,
+    "old_holdout_operations_forbidden": true,
+    "single_execution": true,
+    "retuning_after_results_forbidden": true
+  },
+  "native_contract": {
+    "catalog_factory": "scripts.audit_native_typed_cache_probe.build_audit_catalog(sharing_enabled=True)",
+    "catalog_scope": "synthetic_probe_package_non_formal_native_audit_only",
+    "cache_profile": "typed_base_adapter_state_v1",
+    "typed_eviction_semantics": "sequential_dependency_recompute_lru_v1",
+    "rsu_ids": ["rsu_a", "rsu_b"],
+    "rsu_positions": [0.0, 100.0],
+    "coverage_radius": 55.0,
+    "vehicle_positions": [0.0, 20.0, 80.0, 100.0],
+    "maximum_steps": 3,
+    "source_rsu": "rsu_a",
+    "handoff_target_rsu": "rsu_b",
+    "model_families": {
+      "b0": {
+        "base_object": "base:b0",
+        "base_size_mib": 96.0,
+        "adapters": ["b0.a0", "b0.a1"],
+        "adapter_size_mib": 8.0,
+        "shared_base_relation": true
+      },
+      "b1": {
+        "base_object": "base:b1",
+        "base_size_mib": 128.0,
+        "adapters": ["b1.a0"],
+        "adapter_size_mib": 8.0,
+        "shared_base_relation": false
+      }
+    }
+  },
+  "cost_model": {
+    "scope": "modeled_counterfactual_over_native_events_not_wall_clock_network_measurement",
+    "effective_link_mbps": 100.0,
+    "positive_transfer_fixed_latency_seconds": 0.02,
+    "successful_request_service_seconds": 0.03,
+    "prefix_recompute_seconds": 11.035304,
+    "prefix_recompute_source": "measurement_calibrated_vec_workload_20261005_v4_same_host_technical_workload",
+    "state_package_bytes_reference": 2185,
+    "state_serialize_seconds_reference": 0.000736,
+    "state_restore_seconds_reference": 0.002763,
+    "state_rebuild_seconds_reference": 0.002652,
+    "state_measurement_scope": "same_host_low_cost_only_not_wireless_deployment",
+    "deadline_seconds": 30.0,
+    "objective": [
+      "maximize_completed_nodes",
+      "minimize_deadline_violations",
+      "minimize_modeled_completion_seconds",
+      "minimize_transfer_bytes",
+      "minimize_modeled_recompute_seconds",
+      "minimize_service_failures",
+      "stable_action_tiebreak"
+    ]
+  },
+  "methods": {
+    "current_simple_threshold": {
+      "online": true,
+      "observation_scope": "current semantic state, current action mask, current target residency, frozen ex_ante cost parameters",
+      "future_realizations_visible": false,
+      "rule": "choose action 4 only when legal and current-model preparation plus state transfer estimate is below prefix recompute estimate; otherwise action 0"
+    },
+    "existing_two_step_rule": {
+      "online": true,
+      "source": "scripts.run_mechanism_evidence_closure.two_step_selector",
+      "observation_scope": "current declared workflow graph, current action mask, current and next declared adapter identity",
+      "future_realizations_visible": false,
+      "rule": "choose action 1 only when the declared next node uses the same adapter and action 1 is legal; otherwise action 0"
+    },
+    "offline_enumeration_reference": {
+      "online": false,
+      "oracle": true,
+      "observation_scope": "post-hoc realized native traces for first action 0 versus 4; action 0 thereafter",
+      "future_realizations_visible": true,
+      "claim_boundary": "reference only; not an online method and not evidence of combinatorial complexity"
+    }
+  },
+  "design_points": [
+    {
+      "instance_id": "A_no_competition_shared_base",
+      "classification": "no_competition_local_rule_sufficient",
+      "capacity_mib": 320.0,
+      "workflow_adapters": ["b0.a0", "b0.a1"],
+      "source_initial_adapters": ["b0.a0"],
+      "target_initial_adapters": ["b0.a1"],
+      "frozen_reason": "shared b0 base already resides at target and capacity is ample"
+    },
+    {
+      "instance_id": "B_competition_no_future_cost_effect",
+      "classification": "competition_but_current_action_does_not_change_later_required_model_load",
+      "capacity_mib": 136.0,
+      "workflow_adapters": ["b0.a0", "b1.a0"],
+      "source_initial_adapters": ["b0.a0"],
+      "target_initial_adapters": [],
+      "frozen_reason": "both branches must prepare b1 at the later request; action 4 changes only the intermediate target contents"
+    },
+    {
+      "instance_id": "C_competition_future_residency_effect",
+      "classification": "current_action_may_change_later_legal_state_and_cost",
+      "capacity_mib": 136.0,
+      "workflow_adapters": ["b0.a0", "b1.a0"],
+      "source_initial_adapters": ["b0.a0"],
+      "target_initial_adapters": ["b1.a0"],
+      "frozen_reason": "action 4 must replace the resident b1 bundle with b0 under the legal 136 MiB capacity, so the later b1 request may reload"
+    }
+  ],
+  "execution": {
+    "command_template": "/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_shared_cache_recovery_coupling.py --config configs/experiment/shared_cache_recovery_coupling_v1.json --output-root artifacts/shared_cache_recovery_coupling_20261005_v1 --expected-git-commit ${FREEZE_COMMIT}",
+    "freeze_commit_resolution": "FREEZE_COMMIT is resolved once to git rev-parse HEAD immediately after the freeze commit; this changes no scientific parameter",
+    "required_outputs": [
+      "frozen_protocol.json",
+      "all_method_results.json",
+      "all_method_results.csv",
+      "event_witness.json",
+      "completion_receipt.json",
+      "integrity_manifest.json",
+      "runtime_state_packages/"
+    ]
+  }
+}
