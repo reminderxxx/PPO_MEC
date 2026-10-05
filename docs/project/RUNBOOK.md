@@ -7,7 +7,7 @@
 
 ## Calibrated workflow interface repair v3（2026-10-06；单次有界执行）
 
-新 profile 不覆盖 v1/v2。冻结、预检和唯一一次后台执行命令如下；output root 必须不存在：
+新 profile 不覆盖 v1/v2。下列 frozen run 已一次完成，不得重跑或覆盖；output root 原先要求不存在：
 
 ```bash
 /Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/freeze_calibrated_continuous_workflow_pilot.py \
@@ -16,7 +16,7 @@
   --output configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json
 
 /Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/preflight_calibrated_workflow_interface_repair.py \
-  --output_root artifacts/analysis/calibrated_workflow_interface_repair_preflight_20261006_v2
+  --output_root artifacts/analysis/calibrated_workflow_interface_repair_preflight_20261006_v3
 
 nohup /Users/howen/Projects/PPO_MEC/.venv/bin/python \
   scripts/run_calibrated_workflow_interface_repair.py \
@@ -24,8 +24,18 @@ nohup /Users/howen/Projects/PPO_MEC/.venv/bin/python \
   > artifacts/benchmarks/calibrated_continuous_workflow_interface_repair_20261006_v1.log 2>&1 &
 ```
 
-后台任务只启动一次，不自动重试。`run_status.json` 和 `completion_receipt.json` 是状态/完成回执；checkpoint 仅保留本地、
-不得 Git add。旧 evaluation 是已暴露 regression；新 indices 12–19 只称 frozen development check，不称独立 holdout。
+科学 run 只执行一次，未自动重试。完成 root/log 为
+`artifacts/benchmarks/calibrated_continuous_workflow_interface_repair_20261006_v1/` 与同名 `.log`；
+`run_status.json`、`completion_receipt.json` 均为 complete，最终 integrity 65/65。checkpoint 仅保留本地、不得 Git add。
+旧 evaluation 是已暴露 regression；新 indices 12–19 只称 frozen development check，不称独立 holdout。完成后只读重建命令：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/analyze_calibrated_workflow_interface_repair.py \
+  --run_root artifacts/benchmarks/calibrated_continuous_workflow_interface_repair_20261006_v1
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/reconcile_calibrated_workflow_action_heads.py \
+  --run_root artifacts/benchmarks/calibrated_continuous_workflow_interface_repair_20261006_v1
+```
+
 最小回归：
 `python -m pytest -q tests/test_calibrated_workflow_interface_repair.py tests/test_calibrated_continuous_workflow.py tests/test_production_action4_state.py`。
 

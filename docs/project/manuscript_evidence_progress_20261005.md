@@ -1,7 +1,7 @@
 # 论文成果与问题台账
 
 更新：2026-10-06。主稿：`system_mechanism_manuscript_working_draft.md` v1.3。
-本次新增独立缺陷影响报告、原 12 点对称纠正版和 6 点冻结机制边界检查；不训练 RL、不调用模型、不下载资源、不读取旧 holdout，也不改写历史 artifact。
+本次新增 calibrated workflow interface v3 有界重训与冻结开发检查；不调用模型、不下载资源、不读取旧 holdout，也不改写历史 artifact。
 
 ## 已完成成果及可用范围
 
@@ -23,6 +23,7 @@
 | E14 | 纠正版小型连续 workflow 是否存在非退化序列决策 | depth-4 检查 1,183 个可达状态、4,962 个合法状态—动作；对称传输误差 0、actual link 泄漏 0、两规则 406 次分歧 | `artifacts/calibrated_continuous_workflow_non_degeneracy_20261006/` | 只证明非明显退化，不证明 RL 优势或最优策略复杂性 |
 | E15 | 当前 SA-GHMAPPO 是否在公平小预算下优于强基线 | `Unverifiable`；虽观测到 SA completion 0.750、PPO/MAPPO/两 planner 为 1.000，但 executed-action likelihood、mobility、encoder 与 planner capability 不匹配 | `artifacts/calibrated_continuous_workflow_pilot_v2_20261006/` 与 `calibrated_workflow_interface_defect_report_20261006.md` | 执行结果保留为 interface diagnostic，不作方法排名 |
 | E16 | DAG dependency message passing 是否有单因素贡献 | 未建立；当前 defective contract 下 full minus no-dependency completion `-0.167 [-0.250,-0.083]`，coverage `-0.120 [-0.192,-0.050]`，reward `-6.375 [-10.336,-2.596]` | `sa_ghmappo_innovation_fair_training_v2_20261006.md` 与逐行 artifact | 负向敏感性信号，不是 paper-grade 因果消融 |
+| E17 | 修复接口后 SA 是否有公平相对收益 | 没有；regression / frozen-development completion 为 SA `0.944/0.958`，PPO/MAPPO/rule 均 `1.000`；1,340-row head replay 全匹配 | `calibrated_workflow_interface_repair_results_20261006.md` 与 v3 artifact | 只支持 interface recovery；新检查不是独立 holdout，event 偏置未做消融 |
 
 ## 正在解决和未解决的问题
 
@@ -31,9 +32,9 @@
 - P03，PARTIAL / BOUNDED：6 点边界检查覆盖两侧并保留两个估计错选，但只来自 analytic link mismatch，不是独立真实分布；不得包装为校准性能。
 - P04，OPEN：远端成本、任务标签及外部代表性。暂不建设共享队列或跨 workflow 平台；是否需要由最终主张决定。
 - P05，OPEN：系统组合的新颖性及投稿定位；引用已有成本感知思想，不用润色填补增量价值缺口。
-- P06，INTERFACE BLOCKED：当前唯一候选 relation message passing 在同架构敏感性臂中为负，但 hierarchical PPO
-  canonical-head log-prob 与 executed action 不一致，失败时 mobility 冻结，encoder 信息消费不对等。按审查规则不自动
-  修复/重训/调参；论文贡献收紧，最终决策 D。
+- P06，INTERFACE RESOLVED / METHOD BLOCKED：hierarchical likelihood、failure-time mobility、byte/typed feature consumption
+  已在显式 v3 profile 中修复并有界重训；旧冻结循环消失。SA 仍在 current-missing 时约一半选择 action 4，且没有相对
+  PPO/MAPPO/rule 收益。事件增强缺少单因素消融，新检查不是独立 holdout；论文贡献继续收紧，最终决策仍 D。
 
 ## 本轮收口结论
 
@@ -41,6 +42,18 @@
 前瞻持平。当前最强贡献收敛为 state recovery 与 adapter lifecycle 一体化实现、可复现成本审计及失效条件。若仍主张 eviction
 改变动作，必须先有外部动机充分且真正 action-specific 的合法 resident 转移；不得靠不对称计费制造翻转，也不据此扩建多租户
 平台、启动 RL 或追加模型测量。
+
+## v1.5 calibrated workflow interface repair 追加记录
+
+- 执行 source commit：`f00d212d681af2215062e0cb47e6bec0a5e49240`；唯一科学 run 为
+  `calibrated_continuous_workflow_interface_repair_20261006_v1`，实际 12,478 steps、216 updates、51.70 s，无重试。
+- 修复前只读证据：旧 action-4 循环由边缘概率聚合、likelihood 错位和 node-index mobility 冻结共同造成；flat/graph
+  encoder 另有单位与关键字段消费缺陷。旧结果、checkpoint 与 integrity 保持不变。
+- 修复后结果：SA/PPO/MAPPO/rule 在 regression 为 `0.944/1/1/1`，frozen development 为 `0.958/1/1/1`；旧状态冻结
+  消失，但 SA current-missing action-4 rate 仍约 50%。不支持 SA 相对收益或单一 event 机制归因。
+- review identity：`reviewed_at=2026-10-06`，`literature_cutoff=2026-10-06`，`target_venue=IEEE TMC`，
+  `artifact_run_id=calibrated_continuous_workflow_interface_repair_20261006_v1`，`policy_version=tmc_review_policy_v3_20260621`，
+  `evidence_level=E1_DOCUMENTED_WITH_AUDITED_NONFORMAL_DEVELOPMENT_VALIDATION`；paper-ready=`Unverifiable`。
 
 ## 后续追加格式
 

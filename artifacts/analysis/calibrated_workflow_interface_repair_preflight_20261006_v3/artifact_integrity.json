@@ -1,0 +1,15 @@
+{
+  "schema_version": "artifact_integrity_v1",
+  "files": [
+    {
+      "path": "preflight.json",
+      "sha256": "6daf513340f64d20370bbda1a872c2ab3c97afb4dbd9decfe1be047f9b25eb9a",
+      "bytes": 1239
+    },
+    {
+      "path": "completion_receipt.json",
+      "sha256": "5def85989a60a7a8485bfe59c2c388e2a614bda9a6e019776ca4dd7af4067972",
+      "bytes": 57
+    }
+  ]
+}

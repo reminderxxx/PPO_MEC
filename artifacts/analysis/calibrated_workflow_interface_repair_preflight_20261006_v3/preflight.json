@@ -1,0 +1,44 @@
+{
+  "status": "pass",
+  "config_hash_match": true,
+  "resolved_config_hash_match": true,
+  "interface_profile": "calibrated_workflow_interface_v2",
+  "mobility_progression": "decision_step_index",
+  "episodes_within_bound": true,
+  "seed_count": 3,
+  "no_sa_ablation": true,
+  "reward_changed": false,
+  "formal_access": false,
+  "holdout_access": false,
+  "raw_interval_overlap_counts": {
+    "train__dev": 0,
+    "train__regression": 0,
+    "train__frozen_check": 0,
+    "dev__regression": 0,
+    "dev__frozen_check": 0,
+    "regression__frozen_check": 0
+  },
+  "learning_smoke": {
+    "sa_ghmappo": {
+      "steps": 10,
+      "workflow_completed": 1,
+      "update_skipped": false,
+      "executed_action_ppo_only": true,
+      "hierarchical_action_contract": "independent_heads_executed_env_v2"
+    },
+    "ppo": {
+      "steps": 6,
+      "workflow_completed": 1,
+      "update_skipped": false,
+      "executed_action_ppo_only": false,
+      "hierarchical_action_contract": "legacy_env_marginal_argmax_v1"
+    },
+    "mappo": {
+      "steps": 10,
+      "workflow_completed": 1,
+      "update_skipped": false,
+      "executed_action_ppo_only": true,
+      "hierarchical_action_contract": "independent_heads_executed_env_v2"
+    }
+  }
+}

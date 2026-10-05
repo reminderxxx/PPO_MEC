@@ -5,6 +5,21 @@
 
 ﻿# Progress
 
+## 2026-10-06：calibrated workflow v3 接口修复与有界重训完成，SA 仅恢复正常
+
+- 独立只读审计先确认旧 action-4 冻结循环由确定性边缘概率聚合、executed/optimized log-prob 错位和 failure-time
+  mobility 按 `node_index` 冻结共同造成；action 4 只准备目标 RSU 是合法合同语义，不是应屏蔽的动作。
+- 新 `calibrated_workflow_interface_v2` / `independent_heads_executed_env_v2` 同时纠正 byte occupancy、typed bundle/大小/
+  link/state/contact 特征消费、decision-step mobility、独立 head 聚合和 executed-action PPO；reward、workload 与 SA 四项增强未改。
+- 一次有界执行完成 SA/PPO/controller-MAPPO 各 3 seeds × 192 episodes，实际 `12,478/41,472` steps、216 updates、
+  51.70 s；训练 completion=`0.983/0.998/0.991`，checkpoint 仅本地保留。
+- 已暴露 regression 的 completion 为 `0.944/1/1/1`，新冻结开发检查为 `0.958/1/1/1`（SA/PPO/MAPPO/rule）。
+  SA 从旧 v2 的 0.750 恢复只能称 interface repair recovery；没有相对公平对照收益。
+- 1,340 个 learned decisions 的 raw head→aggregate→projection→executed replay 全匹配，policy/executed log-prob 最大差为 0；
+  旧同状态冻结链消失。SA 在 current bundle missing 时仍约 50% 选择 action 4，支持合法但低效的 event-policy 偏置。
+- frozen check 复用既有 template family，只是 development validation；two-step rule 的 exact clone/lexicographic planning 是更强
+  model-based capability。最终 integrity 65/65；不追加训练、seed、reward、网络或数据。
+
 ## 2026-10-06：实测校准连续工作流小规模匹配训练完成，未观察到 SA-GHMAPPO 优势
 
 - 从成本纠错 clean `d67575b…` 建立隔离工作区；主工作区七个用户修改未暂存、覆盖、stash 或提交。冻结

@@ -1,0 +1,10 @@
+{
+  "historical_checkpoint_state_dict_structurally_loadable": true,
+  "historical_checkpoint_semantically_comparable_under_new_profile": false,
+  "reason": [
+    "encoder input semantics changed under an explicit profile",
+    "hierarchical deterministic selection changed from env-marginal argmax to independent-head argmax",
+    "PPO actor likelihood changed from canonical heads to executed environment action"
+  ],
+  "required_action": "retrain_all_learned_methods_under_repaired_profile"
+}

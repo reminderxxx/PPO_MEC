@@ -1,0 +1,24 @@
+{
+  "available": true,
+  "interpretation": "descriptive_only_interface_changed",
+  "sa_ghmappo": {
+    "historical_v2_completion": 0.75,
+    "repaired_regression_completion": 0.9444444444444443,
+    "descriptive_delta": 0.1944444444444443
+  },
+  "ppo": {
+    "historical_v2_completion": 1.0,
+    "repaired_regression_completion": 1.0,
+    "descriptive_delta": 0.0
+  },
+  "mappo": {
+    "historical_v2_completion": 1.0,
+    "repaired_regression_completion": 1.0,
+    "descriptive_delta": 0.0
+  },
+  "two_step_cost_rule": {
+    "historical_v2_completion": 1.0,
+    "repaired_regression_completion": 1.0,
+    "descriptive_delta": 0.0
+  }
+}

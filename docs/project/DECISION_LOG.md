@@ -1244,3 +1244,12 @@ claim map 必须报告 `UNAVAILABLE`。
 - two-step rule 保留 exact decision clone 和 lexicographic model-based planning，明确标注 capability 差异，不削弱以制造 SA 胜出。
 - 历史 checkpoint 虽可按 tensor shape 加载，但在新语义下不可比较；本轮固定全量重训。旧 evaluation 仅回归，新 8-window
   检查仍为开发证据。收益若出现先归因于实现纠正，不宣称算法原创性。
+
+## 2026-10-06 — Calibrated workflow v3 停止于接口恢复，不晋级算法结论
+
+- 一次冻结 run 后，SA 在 exposed regression / frozen development 的 completion 恢复为 `0.944/0.958`，但 PPO、
+  controller-MAPPO、two-step rule 均为 `1.000`；决定将收益全部标为 interface repair recovery，不晋级 SA 贡献。
+- 旧同状态 action-4 循环已由 replay 证实消失；剩余 current-missing 时约 50% action 4 是合法 policy choice。没有 event
+  单因素消融，不对 event boost、sharpening、temporal 或 auxiliary 中任一项作因果声明。
+- two-step rule 的 exact clone/lexicographic planning 明确视为更强 model-based capability，并作为强基线保留；不削弱规则，
+  不按排名追加训练、seed、网络、reward 或数据。最终结论是当前 workload 下规则足够且 SA 设计仍不稳。

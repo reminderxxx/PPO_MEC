@@ -5,6 +5,22 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-06：action-4 实现循环已修复，SA 事件策略偏置仍开放（RESOLVED INTERFACE / OPEN METHOD BLOCKER）
+
+- `RESOLVED`：旧确定性路径把 event-prepare 全部概率集中给 action 4，却把 event-keep 分摊到 action 0--3；再叠加
+  canonical-head/executed-action likelihood 错位与 failure-time mobility 冻结，形成相同状态下的 action-4 循环。v3 的独立
+  head argmax→aggregate→mask projection、executed-action PPO 和 decision-step mobility 已由测试及 1,340-row replay 闭环。
+- `RESOLVED`：flat encoder 的 adapter-count/byte-capacity 单位错误，以及 flat/graph 对 typed base、bundle/model/state/input
+  bytes、estimated link、contact budget 等公共字段的漏用，已在显式新 profile 中修复；旧 profile/checkpoint/结果不改写。
+- `NEGATIVE`：修复后 SA completion 仅恢复到 regression `0.944`、frozen development `0.958`，PPO/MAPPO/rule 均为
+  `1.000`。SA 在 current bundle missing 时仍约 50% 选择 action 4，并有最多 4-step 的短暂无进展；这已不是状态冻结，
+  而是合法但低效的 policy 行为。未做 event 消融，不能把因果归给某个单独增强。
+- `CAPABILITY BOUNDARY`：two-step rule 不读 execution-time actual link，但拥有 exact decision transition clone 与字典序目标；
+  learned actor 只优化标量 reward。它是应保留的强 model-based baseline，但不能称与 learned policy 具有相同信息使用能力。
+- `OPEN`：固定预算下学习不足不能排除；不过三 seed 均完成 192 episodes、训练 completion 为 0.983，且规则更省时省流量。
+  当前证据更支持 SA policy/event design 不稳且该 workload 下两步规划已足够。新检查不是独立 holdout，paper-ready 仍
+  `Unverifiable`；不得自动追加训练或调参。
+
 ## 2026-10-06：校准 pilot 中 SA-GHMAPPO action-4 过度激活（OPEN ALGORITHM CLAIM BLOCKER）
 
 - `NEGATIVE`：冻结匹配训练不支持主方法优势。SA-GHMAPPO 12-window completion `0.528`，相对 two-step rule 差

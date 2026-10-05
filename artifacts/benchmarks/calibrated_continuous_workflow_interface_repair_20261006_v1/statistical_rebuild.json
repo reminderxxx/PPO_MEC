@@ -1,0 +1,888 @@
+{
+  "regression": {
+    "outer_unit": "source_window",
+    "seed_handling": "averaged_within_window_before_bootstrap",
+    "bootstrap_draws": 5000,
+    "methods": {
+      "mappo": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0,
+          "outer_n": 12
+        },
+        "node_coverage_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0,
+          "outer_n": 12
+        },
+        "deadline_violation_rate": {
+          "mean": 0.4166666666666667,
+          "ci95_low": 0.16666666666666666,
+          "ci95_high": 0.6944444444444443,
+          "outer_n": 12
+        },
+        "service_failure_rate": {
+          "mean": 0.19444444444444442,
+          "ci95_low": 0.05555555555555555,
+          "ci95_high": 0.3611111111111111,
+          "outer_n": 12
+        },
+        "modeled_completion_seconds": {
+          "mean": 72.07163618673498,
+          "ci95_low": 45.01827721953912,
+          "ci95_high": 107.86552908779079,
+          "outer_n": 12
+        },
+        "total_transfer_mb": {
+          "mean": 1211.8249273333333,
+          "ci95_low": 450.90091740624996,
+          "ci95_high": 2198.7087631666654,
+          "outer_n": 12
+        },
+        "model_prepare_mb": {
+          "mean": 1211.0360148888888,
+          "ci95_low": 448.50385197222215,
+          "ci95_high": 2173.0329840388886,
+          "outer_n": 12
+        },
+        "state_transfer_mb": {
+          "mean": 0.4355246666666666,
+          "ci95_low": 0.13642234236111112,
+          "ci95_high": 0.7730580631944444,
+          "outer_n": 12
+        },
+        "recompute_seconds": {
+          "mean": 23.308740241179425,
+          "ci95_low": 8.231497001584904,
+          "ci95_high": 43.175401745046436,
+          "outer_n": 12
+        },
+        "reward": {
+          "mean": 8.503302482740887,
+          "ci95_low": 4.912356128576082,
+          "ci95_high": 12.02072878834771,
+          "outer_n": 12
+        }
+      },
+      "ppo": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0,
+          "outer_n": 12
+        },
+        "node_coverage_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0,
+          "outer_n": 12
+        },
+        "deadline_violation_rate": {
+          "mean": 0.7777777777777777,
+          "ci95_low": 0.5277777777777778,
+          "ci95_high": 1.0,
+          "outer_n": 12
+        },
+        "service_failure_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 12
+        },
+        "modeled_completion_seconds": {
+          "mean": 101.32149219042294,
+          "ci95_low": 72.3156713551975,
+          "ci95_high": 135.5466949249311,
+          "outer_n": 12
+        },
+        "total_transfer_mb": {
+          "mean": 760.2842410555555,
+          "ci95_low": 305.07256292777777,
+          "ci95_high": 1319.6706791999998,
+          "outer_n": 12
+        },
+        "model_prepare_mb": {
+          "mean": 759.2048022222222,
+          "ci95_low": 293.92360885,
+          "ci95_high": 1315.5789762555546,
+          "outer_n": 12
+        },
+        "state_transfer_mb": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 12
+        },
+        "recompute_seconds": {
+          "mean": 42.22007600931182,
+          "ci95_low": 26.865537164219138,
+          "ci95_high": 59.48827075005365,
+          "outer_n": 12
+        },
+        "reward": {
+          "mean": 6.095801241912004,
+          "ci95_low": 3.9676402680265714,
+          "ci95_high": 8.377380524224817,
+          "outer_n": 12
+        }
+      },
+      "sa_ghmappo": {
+        "workflow_completion_rate": {
+          "mean": 0.9444444444444443,
+          "ci95_low": 0.861111111111111,
+          "ci95_high": 1.0,
+          "outer_n": 12
+        },
+        "node_coverage_rate": {
+          "mean": 0.9914021164021164,
+          "ci95_low": 0.978835978835979,
+          "ci95_high": 1.0,
+          "outer_n": 12
+        },
+        "deadline_violation_rate": {
+          "mean": 0.49999999999999994,
+          "ci95_low": 0.25,
+          "ci95_high": 0.7499999999999999,
+          "outer_n": 12
+        },
+        "service_failure_rate": {
+          "mean": 0.3888888888888889,
+          "ci95_low": 0.2222222222222222,
+          "ci95_high": 0.5555555555555556,
+          "outer_n": 12
+        },
+        "modeled_completion_seconds": {
+          "mean": 77.86699312354095,
+          "ci95_low": 57.21723170567001,
+          "ci95_high": 105.24288086926263,
+          "outer_n": 12
+        },
+        "total_transfer_mb": {
+          "mean": 717.7688503888888,
+          "ci95_low": 235.5336763208333,
+          "ci95_high": 1296.5114214173605,
+          "outer_n": 12
+        },
+        "model_prepare_mb": {
+          "mean": 717.0222564444445,
+          "ci95_low": 254.39744816666666,
+          "ci95_high": 1270.7090450388878,
+          "outer_n": 12
+        },
+        "state_transfer_mb": {
+          "mean": 0.3053946944444444,
+          "ci95_low": 0.09643616527777779,
+          "ci95_high": 0.5379298388888888,
+          "outer_n": 12
+        },
+        "recompute_seconds": {
+          "mean": 32.57664402731873,
+          "ci95_low": 20.129635772606377,
+          "ci95_high": 45.17954901894745,
+          "outer_n": 12
+        },
+        "reward": {
+          "mean": 4.464181161033015,
+          "ci95_low": -0.30984830901454735,
+          "ci95_high": 9.209490612481838,
+          "outer_n": 12
+        }
+      },
+      "two_step_cost_rule": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0,
+          "outer_n": 12
+        },
+        "node_coverage_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0,
+          "outer_n": 12
+        },
+        "deadline_violation_rate": {
+          "mean": 0.16666666666666666,
+          "ci95_low": 0.0,
+          "ci95_high": 0.4166666666666667,
+          "outer_n": 12
+        },
+        "service_failure_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 12
+        },
+        "modeled_completion_seconds": {
+          "mean": 52.29968250176004,
+          "ci95_low": 36.10812404457325,
+          "ci95_high": 73.08608326782891,
+          "outer_n": 12
+        },
+        "total_transfer_mb": {
+          "mean": 169.03401008333336,
+          "ci95_low": 29.500238237499993,
+          "ci95_high": 376.91608598333335,
+          "outer_n": 12
+        },
+        "model_prepare_mb": {
+          "mean": 168.22516466666667,
+          "ci95_low": 28.951220000000003,
+          "ci95_high": 376.0019946666667,
+          "outer_n": 12
+        },
+        "state_transfer_mb": {
+          "mean": 0.05066791666666667,
+          "ci95_low": 0.000503,
+          "ci95_high": 0.13805633333333334,
+          "outer_n": 12
+        },
+        "recompute_seconds": {
+          "mean": 4.016104375093375,
+          "ci95_low": 1.9780810972325975,
+          "ci95_high": 6.295393719647255,
+          "outer_n": 12
+        },
+        "reward": {
+          "mean": 12.737312805125006,
+          "ci95_low": 10.912725119545081,
+          "ci95_high": 14.595071475834835,
+          "outer_n": 12
+        }
+      }
+    },
+    "paired_delta_vs_two_step_rule": {
+      "mappo": {
+        "workflow_completion_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 12
+        },
+        "node_coverage_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 12
+        },
+        "deadline_violation_rate": {
+          "mean": 0.25,
+          "ci95_low": -4.625929269271485e-18,
+          "ci95_high": 0.5006944444444344,
+          "outer_n": 12
+        },
+        "service_failure_rate": {
+          "mean": 0.19444444444444442,
+          "ci95_low": 0.05555555555555555,
+          "ci95_high": 0.3611111111111111,
+          "outer_n": 12
+        },
+        "modeled_completion_seconds": {
+          "mean": 19.771953684974946,
+          "ci95_low": 4.749430475647266,
+          "ci95_high": 40.4560260124257,
+          "outer_n": 12
+        },
+        "total_transfer_mb": {
+          "mean": 1042.7909172500001,
+          "ci95_low": 267.6318336958334,
+          "ci95_high": 2081.6086184361093,
+          "outer_n": 12
+        },
+        "model_prepare_mb": {
+          "mean": 1042.8108502222221,
+          "ci95_low": 282.97550977777775,
+          "ci95_high": 2081.075256016667,
+          "outer_n": 12
+        },
+        "state_transfer_mb": {
+          "mean": 0.38485674999999997,
+          "ci95_low": 0.13532682847222224,
+          "ci95_high": 0.6800178812499998,
+          "outer_n": 12
+        },
+        "recompute_seconds": {
+          "mean": 19.292635866086055,
+          "ci95_low": 4.094827688773967,
+          "ci95_high": 40.26963886807306,
+          "outer_n": 12
+        },
+        "reward": {
+          "mean": -4.2340103223841155,
+          "ci95_low": -7.038585653901353,
+          "ci95_high": -1.890592473059589,
+          "outer_n": 12
+        }
+      },
+      "ppo": {
+        "workflow_completion_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 12
+        },
+        "node_coverage_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 12
+        },
+        "deadline_violation_rate": {
+          "mean": 0.611111111111111,
+          "ci95_low": 0.3333333333333333,
+          "ci95_high": 0.861111111111111,
+          "outer_n": 12
+        },
+        "service_failure_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 12
+        },
+        "modeled_completion_seconds": {
+          "mean": 49.02180968866289,
+          "ci95_low": 34.07105829134585,
+          "ci95_high": 65.24617586756179,
+          "outer_n": 12
+        },
+        "total_transfer_mb": {
+          "mean": 591.2502309722221,
+          "ci95_low": 138.22761875347223,
+          "ci95_high": 1126.0055239041665,
+          "outer_n": 12
+        },
+        "model_prepare_mb": {
+          "mean": 590.9796375555555,
+          "ci95_low": 132.97194960555558,
+          "ci95_high": 1156.6681368166667,
+          "outer_n": 12
+        },
+        "state_transfer_mb": {
+          "mean": -0.05066791666666667,
+          "ci95_low": -0.13755333333333333,
+          "ci95_high": -0.000503,
+          "outer_n": 12
+        },
+        "recompute_seconds": {
+          "mean": 38.20397163421845,
+          "ci95_low": 22.543462264022274,
+          "ci95_high": 55.80593129778377,
+          "outer_n": 12
+        },
+        "reward": {
+          "mean": -6.641511563213,
+          "ci95_low": -8.273753799792695,
+          "ci95_high": -4.898359836948569,
+          "outer_n": 12
+        }
+      },
+      "sa_ghmappo": {
+        "workflow_completion_rate": {
+          "mean": -0.05555555555555556,
+          "ci95_low": -0.13888888888888892,
+          "ci95_high": 0.0,
+          "outer_n": 12
+        },
+        "node_coverage_rate": {
+          "mean": -0.008597883597883585,
+          "ci95_low": -0.021164021164021135,
+          "ci95_high": 0.0,
+          "outer_n": 12
+        },
+        "deadline_violation_rate": {
+          "mean": 0.3333333333333333,
+          "ci95_low": 0.08333333333333333,
+          "ci95_high": 0.611111111111111,
+          "outer_n": 12
+        },
+        "service_failure_rate": {
+          "mean": 0.3888888888888889,
+          "ci95_low": 0.2222222222222222,
+          "ci95_high": 0.5555555555555556,
+          "outer_n": 12
+        },
+        "modeled_completion_seconds": {
+          "mean": 25.567310621780905,
+          "ci95_low": 14.16599803715032,
+          "ci95_high": 37.660404974848134,
+          "outer_n": 12
+        },
+        "total_transfer_mb": {
+          "mean": 548.7348403055556,
+          "ci95_low": 111.94978797083333,
+          "ci95_high": 1088.296846315277,
+          "outer_n": 12
+        },
+        "model_prepare_mb": {
+          "mean": 548.7970917777778,
+          "ci95_low": 115.19113400000002,
+          "ci95_high": 1113.1520477944446,
+          "outer_n": 12
+        },
+        "state_transfer_mb": {
+          "mean": 0.2547267777777778,
+          "ci95_low": 0.09234169027777779,
+          "ci95_high": 0.4272628347222222,
+          "outer_n": 12
+        },
+        "recompute_seconds": {
+          "mean": 28.560539652225355,
+          "ci95_low": 15.461145003467617,
+          "ci95_high": 42.0632775292978,
+          "outer_n": 12
+        },
+        "reward": {
+          "mean": -8.273131644091988,
+          "ci95_low": -12.464037700545779,
+          "ci95_high": -4.631652671451382,
+          "outer_n": 12
+        }
+      }
+    }
+  },
+  "frozen_check": {
+    "outer_unit": "source_window",
+    "seed_handling": "averaged_within_window_before_bootstrap",
+    "bootstrap_draws": 5000,
+    "methods": {
+      "mappo": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0,
+          "outer_n": 8
+        },
+        "node_coverage_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0,
+          "outer_n": 8
+        },
+        "deadline_violation_rate": {
+          "mean": 0.7083333333333333,
+          "ci95_low": 0.375,
+          "ci95_high": 1.0,
+          "outer_n": 8
+        },
+        "service_failure_rate": {
+          "mean": 0.16666666666666666,
+          "ci95_low": 0.041666666666666664,
+          "ci95_high": 0.3333333333333333,
+          "outer_n": 8
+        },
+        "modeled_completion_seconds": {
+          "mean": 91.22866811825855,
+          "ci95_low": 56.32937523239559,
+          "ci95_high": 130.56520053269853,
+          "outer_n": 8
+        },
+        "total_transfer_mb": {
+          "mean": 1084.4805445833333,
+          "ci95_low": 416.870238,
+          "ci95_high": 1873.5707118781252,
+          "outer_n": 8
+        },
+        "model_prepare_mb": {
+          "mean": 1083.574685,
+          "ci95_low": 406.1185804666667,
+          "ci95_high": 1858.051237225,
+          "outer_n": 8
+        },
+        "state_transfer_mb": {
+          "mean": 0.28100575,
+          "ci95_low": 0.028946500000000003,
+          "ci95_high": 0.6138799249999999,
+          "outer_n": 8
+        },
+        "recompute_seconds": {
+          "mean": 39.55698996192522,
+          "ci95_low": 15.242356345282563,
+          "ci95_high": 72.76089250184468,
+          "outer_n": 8
+        },
+        "reward": {
+          "mean": 5.9883726107551105,
+          "ci95_low": 2.22437074330084,
+          "ci95_high": 10.29936830604023,
+          "outer_n": 8
+        }
+      },
+      "ppo": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0,
+          "outer_n": 8
+        },
+        "node_coverage_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0,
+          "outer_n": 8
+        },
+        "deadline_violation_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0,
+          "outer_n": 8
+        },
+        "service_failure_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 8
+        },
+        "modeled_completion_seconds": {
+          "mean": 107.70189752629685,
+          "ci95_low": 83.23613928161714,
+          "ci95_high": 133.1583989032785,
+          "outer_n": 8
+        },
+        "total_transfer_mb": {
+          "mean": 676.4103954583334,
+          "ci95_low": 292.96557102500003,
+          "ci95_high": 1079.4238443291665,
+          "outer_n": 8
+        },
+        "model_prepare_mb": {
+          "mean": 674.8634293333334,
+          "ci95_low": 279.27018497499995,
+          "ci95_high": 1084.5204923333336,
+          "outer_n": 8
+        },
+        "state_transfer_mb": {
+          "mean": 9.145833333333332e-05,
+          "ci95_low": 0.0,
+          "ci95_high": 0.000274375,
+          "outer_n": 8
+        },
+        "recompute_seconds": {
+          "mean": 46.43659593029684,
+          "ci95_low": 29.37375047936485,
+          "ci95_high": 64.36999278408585,
+          "outer_n": 8
+        },
+        "reward": {
+          "mean": 4.818870062398788,
+          "ci95_low": 3.8750297800944535,
+          "ci95_high": 5.782303781263548,
+          "outer_n": 8
+        }
+      },
+      "sa_ghmappo": {
+        "workflow_completion_rate": {
+          "mean": 0.9583333333333333,
+          "ci95_low": 0.875,
+          "ci95_high": 1.0,
+          "outer_n": 8
+        },
+        "node_coverage_rate": {
+          "mean": 0.9916666666666667,
+          "ci95_low": 0.9749999999999999,
+          "ci95_high": 1.0,
+          "outer_n": 8
+        },
+        "deadline_violation_rate": {
+          "mean": 0.8333333333333333,
+          "ci95_low": 0.7083333333333333,
+          "ci95_high": 0.9583333333333333,
+          "outer_n": 8
+        },
+        "service_failure_rate": {
+          "mean": 0.41666666666666663,
+          "ci95_low": 0.3333333333333333,
+          "ci95_high": 0.5416666666666666,
+          "outer_n": 8
+        },
+        "modeled_completion_seconds": {
+          "mean": 104.53419810194762,
+          "ci95_low": 74.79106940763184,
+          "ci95_high": 136.31096734272856,
+          "outer_n": 8
+        },
+        "total_transfer_mb": {
+          "mean": 670.6845216250001,
+          "ci95_low": 267.5145601666666,
+          "ci95_high": 1113.9743784166667,
+          "outer_n": 8
+        },
+        "model_prepare_mb": {
+          "mean": 669.6343626666667,
+          "ci95_low": 269.6967466666667,
+          "ci95_high": 1125.7068090249984,
+          "outer_n": 8
+        },
+        "state_transfer_mb": {
+          "mean": 0.20925666666666665,
+          "ci95_low": 0.007887104166666667,
+          "ci95_high": 0.4644711666666666,
+          "outer_n": 8
+        },
+        "recompute_seconds": {
+          "mean": 57.18874917094763,
+          "ci95_low": 32.47796740134871,
+          "ci95_high": 87.66822644988405,
+          "outer_n": 8
+        },
+        "reward": {
+          "mean": 0.658285667460249,
+          "ci95_low": -2.5182649320249992,
+          "ci95_high": 4.131410687327238,
+          "outer_n": 8
+        }
+      },
+      "two_step_cost_rule": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0,
+          "outer_n": 8
+        },
+        "node_coverage_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0,
+          "outer_n": 8
+        },
+        "deadline_violation_rate": {
+          "mean": 0.375,
+          "ci95_low": 0.125,
+          "ci95_high": 0.75,
+          "outer_n": 8
+        },
+        "service_failure_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 8
+        },
+        "modeled_completion_seconds": {
+          "mean": 51.667736182395586,
+          "ci95_low": 39.18261924684023,
+          "ci95_high": 66.7777293811303,
+          "outer_n": 8
+        },
+        "total_transfer_mb": {
+          "mean": 65.028221875,
+          "ci95_low": 20.625018656250003,
+          "ci95_high": 121.905063040625,
+          "outer_n": 8
+        },
+        "model_prepare_mb": {
+          "mean": 63.935002,
+          "ci95_low": 20.508172,
+          "ci95_high": 120.63854599999999,
+          "outer_n": 8
+        },
+        "state_transfer_mb": {
+          "mean": 0.06317475,
+          "ci95_low": 0.00123475,
+          "ci95_high": 0.14487,
+          "outer_n": 8
+        },
+        "recompute_seconds": {
+          "mean": 2.4276452083955835,
+          "ci95_low": 0.5394767916977917,
+          "ci95_high": 5.125028458395583,
+          "outer_n": 8
+        },
+        "reward": {
+          "mean": 12.086299979898708,
+          "ci95_low": 10.105893957523378,
+          "ci95_high": 14.001919811576348,
+          "outer_n": 8
+        }
+      }
+    },
+    "paired_delta_vs_two_step_rule": {
+      "mappo": {
+        "workflow_completion_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 8
+        },
+        "node_coverage_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 8
+        },
+        "deadline_violation_rate": {
+          "mean": 0.3333333333333333,
+          "ci95_low": 0.08333333333333333,
+          "ci95_high": 0.6666666666666666,
+          "outer_n": 8
+        },
+        "service_failure_rate": {
+          "mean": 0.16666666666666666,
+          "ci95_low": 0.041666666666666664,
+          "ci95_high": 0.3333333333333333,
+          "outer_n": 8
+        },
+        "modeled_completion_seconds": {
+          "mean": 39.56093193586297,
+          "ci95_low": 15.252956203279757,
+          "ci95_high": 68.0370140552881,
+          "outer_n": 8
+        },
+        "total_transfer_mb": {
+          "mean": 1019.4523227083332,
+          "ci95_low": 331.14242765833336,
+          "ci95_high": 1843.0044787916665,
+          "outer_n": 8
+        },
+        "model_prepare_mb": {
+          "mean": 1019.6396830000001,
+          "ci95_low": 330.30683048333333,
+          "ci95_high": 1803.546650308332,
+          "outer_n": 8
+        },
+        "state_transfer_mb": {
+          "mean": 0.217831,
+          "ci95_low": 0.007310712500000004,
+          "ci95_high": 0.4571253281249998,
+          "outer_n": 8
+        },
+        "recompute_seconds": {
+          "mean": 37.12934475352964,
+          "ci95_low": 13.05529627484245,
+          "ci95_high": 71.73541523105892,
+          "outer_n": 8
+        },
+        "reward": {
+          "mean": -6.097927369143598,
+          "ci95_low": -9.032728148100347,
+          "ci95_high": -2.604979862008184,
+          "outer_n": 8
+        }
+      },
+      "ppo": {
+        "workflow_completion_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 8
+        },
+        "node_coverage_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 8
+        },
+        "deadline_violation_rate": {
+          "mean": 0.625,
+          "ci95_low": 0.25,
+          "ci95_high": 1.0,
+          "outer_n": 8
+        },
+        "service_failure_rate": {
+          "mean": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0,
+          "outer_n": 8
+        },
+        "modeled_completion_seconds": {
+          "mean": 56.03416134390126,
+          "ci95_low": 35.3388136182466,
+          "ci95_high": 76.18806631722461,
+          "outer_n": 8
+        },
+        "total_transfer_mb": {
+          "mean": 611.3821735833334,
+          "ci95_low": 201.19896745833336,
+          "ci95_high": 1013.8580534062493,
+          "outer_n": 8
+        },
+        "model_prepare_mb": {
+          "mean": 610.9284273333333,
+          "ci95_low": 220.45268161666675,
+          "ci95_high": 1013.678277,
+          "outer_n": 8
+        },
+        "state_transfer_mb": {
+          "mean": -0.06308329166666668,
+          "ci95_low": -0.14488314791666665,
+          "ci95_high": -0.0014403749999999998,
+          "outer_n": 8
+        },
+        "recompute_seconds": {
+          "mean": 44.00895072190126,
+          "ci95_low": 24.570092742264634,
+          "ci95_high": 63.427070881393135,
+          "outer_n": 8
+        },
+        "reward": {
+          "mean": -7.2674299174999195,
+          "ci95_low": -9.42293971255032,
+          "ci95_high": -4.9896000415405055,
+          "outer_n": 8
+        }
+      },
+      "sa_ghmappo": {
+        "workflow_completion_rate": {
+          "mean": -0.04166666666666667,
+          "ci95_low": -0.125,
+          "ci95_high": 0.0,
+          "outer_n": 8
+        },
+        "node_coverage_rate": {
+          "mean": -0.008333333333333345,
+          "ci95_low": -0.025000000000000036,
+          "ci95_high": 0.0,
+          "outer_n": 8
+        },
+        "deadline_violation_rate": {
+          "mean": 0.45833333333333326,
+          "ci95_low": 0.12499999999999997,
+          "ci95_high": 0.75,
+          "outer_n": 8
+        },
+        "service_failure_rate": {
+          "mean": 0.41666666666666663,
+          "ci95_low": 0.3333333333333333,
+          "ci95_high": 0.5416666666666666,
+          "outer_n": 8
+        },
+        "modeled_completion_seconds": {
+          "mean": 52.86646191955205,
+          "ci95_low": 29.40502961429157,
+          "ci95_high": 80.09572125407036,
+          "outer_n": 8
+        },
+        "total_transfer_mb": {
+          "mean": 605.65629975,
+          "ci95_low": 188.98240051458333,
+          "ci95_high": 1056.3514275833334,
+          "outer_n": 8
+        },
+        "model_prepare_mb": {
+          "mean": 605.6993606666667,
+          "ci95_low": 188.07215333333335,
+          "ci95_high": 1048.7332150000002,
+          "outer_n": 8
+        },
+        "state_transfer_mb": {
+          "mean": 0.14608191666666664,
+          "ci95_low": 0.0026982083333333333,
+          "ci95_high": 0.3019959885416666,
+          "outer_n": 8
+        },
+        "recompute_seconds": {
+          "mean": 54.761103962552056,
+          "ci95_low": 29.048852970884827,
+          "ci95_high": 86.85500664658326,
+          "outer_n": 8
+        },
+        "reward": {
+          "mean": -11.42801431243846,
+          "ci95_low": -14.537202926428485,
+          "ci95_high": -8.441578949910951,
+          "outer_n": 8
+        }
+      }
+    }
+  }
+}

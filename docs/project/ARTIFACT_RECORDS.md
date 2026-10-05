@@ -5,6 +5,23 @@
 
 # Artifact Records
 
+## 2026-10-06 calibrated workflow interface repair v3
+
+- root：`artifacts/benchmarks/calibrated_continuous_workflow_interface_repair_20261006_v1/`；执行 source commit
+  `f00d212d681af2215062e0cb47e6bec0a5e49240`；SA/PPO/controller-MAPPO 各 3 seeds × 192 episodes，two-step rule 不训练。
+- 上限/实际为 `41,472/12,478` environment steps、216 updates、51.70 s；selected checkpoint episodes 为
+  SA `96/48/96`、PPO `144/48/192`、MAPPO `192/192/144`。checkpoint 只保留本地，不进入 Git artifact。
+- 已暴露 12-window regression completion=`0.944/1/1/1`；新 8-window frozen development completion=
+  `0.958/1/1/1`（SA/PPO/MAPPO/rule）。新组复用 template family，不是独立 holdout。
+- 200 evaluation rows、1,477 action-ledger rows、1,340 raw-head replay rows；replay action mismatch=0，executed/policy
+  log-prob 最大差=0。最终本地 root 65/65 files 独立 size/SHA-256 复算通过，其中 45 个 checkpoint 仅本地保留；
+  Git 只交付其余 20 个结果/元数据文件与 integrity 中的 checkpoint hash 记录。
+- SA frozen-check action 4 成功/尝试=`53/110`，current bundle missing 时 action 4=`33/66`，最大无进展 streak=4；
+  旧 frozen-state loop 已消失，但 event-policy 偏置仍在。证据等级
+  `E1_DOCUMENTED_WITH_AUDITED_NONFORMAL_DEVELOPMENT_VALIDATION`；不是算法优势、formal/holdout 或 paper-ready。
+- 预检 root：`artifacts/analysis/calibrated_workflow_interface_repair_preflight_20261006_v3/`；split=`12/4/12/8`，
+  原始 interval overlap 全 0。报告见 `calibrated_workflow_interface_repair_results_20261006.md`。
+
 ## 2026-10-06 calibrated continuous-workflow v2 fair-training pilot
 
 - root：`artifacts/calibrated_continuous_workflow_pilot_v2_20261006/`；run source commit `b418eb4…`，纠正祖先

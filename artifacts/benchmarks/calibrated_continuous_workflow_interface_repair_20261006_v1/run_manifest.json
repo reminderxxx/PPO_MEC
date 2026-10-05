@@ -1,0 +1,77 @@
+{
+  "schema_version": "calibrated_continuous_workflow_interface_repair_run_v3",
+  "created_at": "2026-10-05T19:10:05.617055+00:00",
+  "git_commit": "f00d212d681af2215062e0cb47e6bec0a5e49240",
+  "config": {
+    "path": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json",
+    "sha256": "20e82b0ea4ff5c7caf597d987bcef1f7523dc0c1c7ece21deba32aa7d47af923"
+  },
+  "base_config": {
+    "path": "configs/experiment/calibrated_continuous_workflow_pilot_v2.json",
+    "sha256": "97602564854e5e69e4f6c30566c1b9522ac45c1e17e6b2ad28da1a1b721c0526"
+  },
+  "workload_manifest": {
+    "path": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+    "sha256": "b7efe5d6e50ad17b744230c03a126370656d0196b60c7f7e6b5a86bb702effbc"
+  },
+  "interface_profile": "calibrated_workflow_interface_v2",
+  "mobility_progression": "decision_step_index",
+  "methods": [
+    "sa_ghmappo",
+    "ppo",
+    "mappo"
+  ],
+  "rules": [
+    "two_step_cost_rule"
+  ],
+  "seeds": [
+    7,
+    17,
+    29
+  ],
+  "episodes_per_method_seed": 192,
+  "episode_max_steps": 24,
+  "training_step_ceiling": 41472,
+  "actual_training_steps": 12478,
+  "actual_updates": 216,
+  "elapsed_seconds": 51.700664958,
+  "wall_clock_cap_seconds": 1800.0,
+  "checkpoint_selection": {
+    "split": "dev",
+    "order": [
+      "workflow_completion_rate_desc",
+      "deadline_violation_rate_asc",
+      "service_failure_rate_asc",
+      "handoff_failure_rate_asc",
+      "modeled_completion_seconds_asc",
+      "total_transfer_bytes_asc",
+      "reward_desc"
+    ],
+    "final_check_split_used": false,
+    "regression_split_used": false,
+    "frozen_check_split_used": false
+  },
+  "regression_outer_n": 12,
+  "frozen_check_outer_n": 8,
+  "regression_previously_exposed": true,
+  "frozen_check_independence": "development_validation_only_unused_dev_plan_source_group",
+  "claim_boundary": {
+    "formal": false,
+    "holdout": false,
+    "real_model_calls_per_training_step": 0,
+    "wireless_measurement": false,
+    "adapter_assignment_source": "artificial_deterministic_mapping_from_alibaba_task_name",
+    "base_family_b_source": "artificial_distinct_identity_reusing_measured_base_footprint",
+    "state_scaling_source": "artificial_stress_factor_anchored_to_measured_2195_byte_package",
+    "independent_final_check": false,
+    "regression_split_previously_exposed": true,
+    "frozen_check_source_group_previously_unused": true,
+    "interface_repair_not_algorithm_contribution": true
+  },
+  "real_model_generate_calls": 0,
+  "downloads": 0,
+  "old_holdout_calls": 0,
+  "reward_changed": false,
+  "sa_ablation": null,
+  "command": "scripts/run_calibrated_workflow_interface_repair.py --output_root artifacts/benchmarks/calibrated_continuous_workflow_interface_repair_20261006_v1"
+}

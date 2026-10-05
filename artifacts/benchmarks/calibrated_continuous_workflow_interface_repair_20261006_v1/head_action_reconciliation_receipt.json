@@ -1,0 +1,9 @@
+{
+  "status": "complete",
+  "mode": "read_only_deterministic_replay_no_selection_no_training",
+  "row_count": 1340,
+  "preserved_action_mismatch_count": 0,
+  "final_check_used_for_tuning": false,
+  "raw_logits_recorded": true,
+  "raw_probabilities_recorded": true
+}

@@ -34,8 +34,15 @@
 - `scripts/preflight_calibrated_workflow_interface_repair.py`：hash、split interval、预算、权限与三方法最小更新门禁。
 - `scripts/run_calibrated_workflow_interface_repair.py`：一次性 bounded retrain、dev 选模、已暴露 regression、新冻结开发检查、
   raw-head/action 对账、分层和 checkpoint-free 交付入口。
+- `scripts/analyze_calibrated_workflow_interface_repair.py`：从已完成 artifact 重建 window-outer bootstrap、分层、训练曲线、
+  历史 regression 对照与 integrity；不训练、不选择 checkpoint。
+- `scripts/reconcile_calibrated_workflow_action_heads.py`：只读重放 selected checkpoints，逐步保存 raw logits/probs、head actions、
+  aggregate、projection 与 executed action，并验证原 action ledger 不变。
 - `tests/test_calibrated_workflow_interface_repair.py`：单位/字段消费、动作聚合与 likelihood、action 0/4、重复 prepare 和
   failure-time mobility 回归。
+- `artifacts/benchmarks/calibrated_continuous_workflow_interface_repair_20261006_v1/`：完成的 3-seed bounded run、200-row
+  evaluation、1,477-row action ledger、1,340-row head reconciliation、曲线、统计、回执与 65-file integrity；checkpoint 不提交。
+- `docs/project/calibrated_workflow_interface_repair_results_20261006.md`：缺陷、修复、负向公平比较与 claim 边界。
 
 ## 2026-10-06 symmetric recovery cost correction
 

@@ -1,0 +1,854 @@
+{
+  "regression": {
+    "mappo": {
+      "outer_unit": "source_window",
+      "outer_n": 12,
+      "metrics": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "node_coverage_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "unfinished_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "deadline_violation_rate": {
+          "mean": 0.4166666666666667,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "service_failure_rate": {
+          "mean": 0.19444444444444442,
+          "min": 0.0,
+          "max": 0.6666666666666666
+        },
+        "handoff_failure_rate": {
+          "mean": 0.43595679012345673,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "modeled_completion_seconds": {
+          "mean": 72.07163618673498,
+          "min": 20.393349456,
+          "max": 197.1259701279117
+        },
+        "total_transfer_mb": {
+          "mean": 1211.8249273333333,
+          "min": 0.38551399999999997,
+          "max": 5558.597453333333
+        },
+        "model_prepare_mb": {
+          "mean": 1211.0360148888888,
+          "min": 0.0,
+          "max": 5557.683344
+        },
+        "state_transfer_mb": {
+          "mean": 0.4355246666666666,
+          "min": 0.0,
+          "max": 1.54528
+        },
+        "recompute_seconds": {
+          "mean": 23.308740241179425,
+          "min": 0.0,
+          "max": 113.29010216791168
+        },
+        "decision_overhead_ms": {
+          "mean": 2.3754465555555555,
+          "min": 1.616874,
+          "max": 4.362902
+        },
+        "reward": {
+          "mean": 8.503302482740887,
+          "min": -4.3585012559776555,
+          "max": 17.851315488679973
+        },
+        "action4_attempts": {
+          "mean": 5.222222222222222,
+          "min": 2.6666666666666665,
+          "max": 9.0
+        },
+        "action4_successes": {
+          "mean": 3.805555555555556,
+          "min": 0.0,
+          "max": 9.0
+        },
+        "action4_failures": {
+          "mean": 1.4166666666666667,
+          "min": 0.0,
+          "max": 5.0
+        },
+        "max_consecutive_no_progress_steps": {
+          "mean": 0.3055555555555555,
+          "min": 0.0,
+          "max": 1.3333333333333333
+        },
+        "current_model_missing_decisions": {
+          "mean": 1.8888888888888886,
+          "min": 0.0,
+          "max": 7.333333333333333
+        },
+        "completed_sample_elapsed_coverage": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "completed_sample_elapsed_seconds": {
+          "mean": 72.07163618673499,
+          "sample_n": 36,
+          "episode_n": 36
+        }
+      }
+    },
+    "ppo": {
+      "outer_unit": "source_window",
+      "outer_n": 12,
+      "metrics": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "node_coverage_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "unfinished_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "deadline_violation_rate": {
+          "mean": 0.7777777777777777,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "service_failure_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "handoff_failure_rate": {
+          "mean": 0.6648148148148147,
+          "min": 0.4444444444444444,
+          "max": 1.0
+        },
+        "modeled_completion_seconds": {
+          "mean": 101.32149219042294,
+          "min": 44.78213139516466,
+          "max": 252.48364169324586
+        },
+        "total_transfer_mb": {
+          "mean": 760.2842410555555,
+          "min": 3.7922523333333333,
+          "max": 2927.0635686666665
+        },
+        "model_prepare_mb": {
+          "mean": 759.2048022222222,
+          "min": 3.2139813333333334,
+          "max": 2925.4893866666666
+        },
+        "state_transfer_mb": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "recompute_seconds": {
+          "mean": 42.22007600931182,
+          "min": 8.631628667164668,
+          "max": 107.25044634657918
+        },
+        "decision_overhead_ms": {
+          "mean": 1.4447013888888887,
+          "min": 1.0471113333333333,
+          "max": 2.522486333333333
+        },
+        "reward": {
+          "mean": 6.095801241912004,
+          "min": 1.1385139487856104,
+          "max": 14.25740155664817
+        },
+        "action4_attempts": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "action4_successes": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "action4_failures": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "max_consecutive_no_progress_steps": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "current_model_missing_decisions": {
+          "mean": 1.8611111111111107,
+          "min": 0.0,
+          "max": 6.0
+        },
+        "completed_sample_elapsed_coverage": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "completed_sample_elapsed_seconds": {
+          "mean": 101.32149219042293,
+          "sample_n": 36,
+          "episode_n": 36
+        }
+      }
+    },
+    "sa_ghmappo": {
+      "outer_unit": "source_window",
+      "outer_n": 12,
+      "metrics": {
+        "workflow_completion_rate": {
+          "mean": 0.9444444444444443,
+          "min": 0.6666666666666666,
+          "max": 1.0
+        },
+        "node_coverage_rate": {
+          "mean": 0.9914021164021164,
+          "min": 0.9444444444444445,
+          "max": 1.0
+        },
+        "unfinished_rate": {
+          "mean": 0.05555555555555555,
+          "min": 0.0,
+          "max": 0.3333333333333333
+        },
+        "deadline_violation_rate": {
+          "mean": 0.49999999999999994,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "service_failure_rate": {
+          "mean": 0.3888888888888889,
+          "min": 0.0,
+          "max": 0.6666666666666666
+        },
+        "handoff_failure_rate": {
+          "mean": 0.5416666666666666,
+          "min": 0.1111111111111111,
+          "max": 1.0
+        },
+        "modeled_completion_seconds": {
+          "mean": 77.86699312354095,
+          "min": 21.742494978666667,
+          "max": 195.27288132438613
+        },
+        "total_transfer_mb": {
+          "mean": 717.7688503888888,
+          "min": 0.38551399999999997,
+          "max": 2974.2953533333334
+        },
+        "model_prepare_mb": {
+          "mean": 717.0222564444445,
+          "min": 0.0,
+          "max": 2973.749882666667
+        },
+        "state_transfer_mb": {
+          "mean": 0.3053946944444444,
+          "min": 0.0,
+          "max": 1.0887200000000001
+        },
+        "recompute_seconds": {
+          "mean": 32.57664402731873,
+          "min": 0.0,
+          "max": 64.78312697752543
+        },
+        "decision_overhead_ms": {
+          "mean": 5.6141934722222215,
+          "min": 3.062777666666667,
+          "max": 13.728193333333332
+        },
+        "reward": {
+          "mean": 4.464181161033015,
+          "min": -9.938340348823514,
+          "max": 17.16565802536429
+        },
+        "action4_attempts": {
+          "mean": 4.833333333333333,
+          "min": 2.6666666666666665,
+          "max": 10.333333333333334
+        },
+        "action4_successes": {
+          "mean": 2.75,
+          "min": 0.0,
+          "max": 6.0
+        },
+        "action4_failures": {
+          "mean": 2.083333333333333,
+          "min": 0.0,
+          "max": 8.0
+        },
+        "max_consecutive_no_progress_steps": {
+          "mean": 0.8611111111111108,
+          "min": 0.0,
+          "max": 2.0
+        },
+        "current_model_missing_decisions": {
+          "mean": 2.305555555555556,
+          "min": 0.0,
+          "max": 8.0
+        },
+        "completed_sample_elapsed_coverage": {
+          "mean": 0.9444444444444443,
+          "min": 0.6666666666666666,
+          "max": 1.0
+        },
+        "completed_sample_elapsed_seconds": {
+          "mean": 74.72770250254345,
+          "sample_n": 34,
+          "episode_n": 36
+        }
+      }
+    },
+    "two_step_cost_rule": {
+      "outer_unit": "source_window",
+      "outer_n": 12,
+      "metrics": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "node_coverage_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "unfinished_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "deadline_violation_rate": {
+          "mean": 0.16666666666666666,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "service_failure_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "handoff_failure_rate": {
+          "mean": 0.3244047619047619,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "modeled_completion_seconds": {
+          "mean": 52.29968250176004,
+          "min": 19.958766392,
+          "max": 147.23181565358232
+        },
+        "total_transfer_mb": {
+          "mean": 169.03401008333336,
+          "min": 0.385514,
+          "max": 1171.714158
+        },
+        "model_prepare_mb": {
+          "mean": 168.22516466666667,
+          "min": 0.0,
+          "max": 1169.449264
+        },
+        "state_transfer_mb": {
+          "mean": 0.05066791666666667,
+          "min": 0.0,
+          "max": 0.45656
+        },
+        "recompute_seconds": {
+          "mean": 4.016104375093375,
+          "min": 0.0,
+          "max": 10.789533
+        },
+        "decision_overhead_ms": {
+          "mean": 83.55989941666667,
+          "min": 47.665291,
+          "max": 202.680626
+        },
+        "reward": {
+          "mean": 12.737312805125006,
+          "min": 6.328504388141727,
+          "max": 18.617738091857525
+        },
+        "action4_attempts": {
+          "mean": 0.8333333333333334,
+          "min": 0.0,
+          "max": 4.0
+        },
+        "action4_successes": {
+          "mean": 0.6666666666666666,
+          "min": 0.0,
+          "max": 3.0
+        },
+        "action4_failures": {
+          "mean": 0.16666666666666666,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "max_consecutive_no_progress_steps": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "current_model_missing_decisions": {
+          "mean": 1.75,
+          "min": 0.0,
+          "max": 7.0
+        },
+        "completed_sample_elapsed_coverage": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "completed_sample_elapsed_seconds": {
+          "mean": 52.29968250176004,
+          "sample_n": 12,
+          "episode_n": 12
+        }
+      }
+    }
+  },
+  "frozen_check": {
+    "mappo": {
+      "outer_unit": "source_window",
+      "outer_n": 8,
+      "metrics": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "node_coverage_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "unfinished_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "deadline_violation_rate": {
+          "mean": 0.7083333333333333,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "service_failure_rate": {
+          "mean": 0.16666666666666666,
+          "min": 0.0,
+          "max": 0.6666666666666666
+        },
+        "handoff_failure_rate": {
+          "mean": 0.46111111111111114,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "modeled_completion_seconds": {
+          "mean": 91.22866811825855,
+          "min": 27.954400352000004,
+          "max": 189.3567156983021
+        },
+        "total_transfer_mb": {
+          "mean": 1084.4805445833333,
+          "min": 28.942294,
+          "max": 3219.261461
+        },
+        "model_prepare_mb": {
+          "mean": 1083.574685,
+          "min": 28.925832,
+          "max": 3218.784816
+        },
+        "state_transfer_mb": {
+          "mean": 0.28100575,
+          "min": 0.0,
+          "max": 1.2292
+        },
+        "recompute_seconds": {
+          "mean": 39.55698996192522,
+          "min": 0.0,
+          "max": 144.19689573830215
+        },
+        "decision_overhead_ms": {
+          "mean": 2.3716490833333337,
+          "min": 1.6308610000000001,
+          "max": 3.735236
+        },
+        "reward": {
+          "mean": 5.9883726107551105,
+          "min": -1.29737474494013,
+          "max": 15.750170665958322
+        },
+        "action4_attempts": {
+          "mean": 4.958333333333333,
+          "min": 3.0,
+          "max": 7.0
+        },
+        "action4_successes": {
+          "mean": 3.25,
+          "min": 0.0,
+          "max": 7.0
+        },
+        "action4_failures": {
+          "mean": 1.708333333333333,
+          "min": 0.0,
+          "max": 4.0
+        },
+        "max_consecutive_no_progress_steps": {
+          "mean": 0.25,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "current_model_missing_decisions": {
+          "mean": 2.166666666666667,
+          "min": 0.0,
+          "max": 6.666666666666667
+        },
+        "completed_sample_elapsed_coverage": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "completed_sample_elapsed_seconds": {
+          "mean": 91.22866811825854,
+          "sample_n": 24,
+          "episode_n": 24
+        }
+      }
+    },
+    "ppo": {
+      "outer_unit": "source_window",
+      "outer_n": 8,
+      "metrics": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "node_coverage_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "unfinished_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "deadline_violation_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "service_failure_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "handoff_failure_rate": {
+          "mean": 0.6041666666666667,
+          "min": 0.4166666666666667,
+          "max": 0.8888888888888888
+        },
+        "modeled_completion_seconds": {
+          "mean": 107.70189752629685,
+          "min": 61.27041402664622,
+          "max": 167.44171323446358
+        },
+        "total_transfer_mb": {
+          "mean": 676.4103954583334,
+          "min": 14.879873333333334,
+          "max": 1670.1139796666669
+        },
+        "model_prepare_mb": {
+          "mean": 674.8634293333334,
+          "min": 12.855925333333333,
+          "max": 1668.6426026666668
+        },
+        "state_transfer_mb": {
+          "mean": 9.145833333333332e-05,
+          "min": 0.0,
+          "max": 0.0007316666666666666
+        },
+        "recompute_seconds": {
+          "mean": 46.43659593029684,
+          "min": 14.386044,
+          "max": 87.515101
+        },
+        "decision_overhead_ms": {
+          "mean": 1.444123,
+          "min": 1.044847,
+          "max": 2.1095273333333333
+        },
+        "reward": {
+          "mean": 4.818870062398788,
+          "min": 3.2013978736253406,
+          "max": 6.620632333553858
+        },
+        "action4_attempts": {
+          "mean": 0.041666666666666664,
+          "min": 0.0,
+          "max": 0.3333333333333333
+        },
+        "action4_successes": {
+          "mean": 0.041666666666666664,
+          "min": 0.0,
+          "max": 0.3333333333333333
+        },
+        "action4_failures": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "max_consecutive_no_progress_steps": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "current_model_missing_decisions": {
+          "mean": 2.2083333333333335,
+          "min": 0.6666666666666666,
+          "max": 5.333333333333333
+        },
+        "completed_sample_elapsed_coverage": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "completed_sample_elapsed_seconds": {
+          "mean": 107.70189752629683,
+          "sample_n": 24,
+          "episode_n": 24
+        }
+      }
+    },
+    "sa_ghmappo": {
+      "outer_unit": "source_window",
+      "outer_n": 8,
+      "metrics": {
+        "workflow_completion_rate": {
+          "mean": 0.9583333333333333,
+          "min": 0.6666666666666666,
+          "max": 1.0
+        },
+        "node_coverage_rate": {
+          "mean": 0.9916666666666667,
+          "min": 0.9333333333333332,
+          "max": 1.0
+        },
+        "unfinished_rate": {
+          "mean": 0.041666666666666664,
+          "min": 0.0,
+          "max": 0.3333333333333333
+        },
+        "deadline_violation_rate": {
+          "mean": 0.8333333333333333,
+          "min": 0.6666666666666666,
+          "max": 1.0
+        },
+        "service_failure_rate": {
+          "mean": 0.41666666666666663,
+          "min": 0.3333333333333333,
+          "max": 0.6666666666666666
+        },
+        "handoff_failure_rate": {
+          "mean": 0.5998015873015873,
+          "min": 0.24444444444444446,
+          "max": 0.8666666666666667
+        },
+        "modeled_completion_seconds": {
+          "mean": 104.53419810194762,
+          "min": 53.29030961333334,
+          "max": 177.29566852019238
+        },
+        "total_transfer_mb": {
+          "mean": 670.6845216250001,
+          "min": 23.147868333333335,
+          "max": 1720.9234960000001
+        },
+        "model_prepare_mb": {
+          "mean": 669.6343626666667,
+          "min": 22.497869333333337,
+          "max": 1720.11708
+        },
+        "state_transfer_mb": {
+          "mean": 0.20925666666666665,
+          "min": 0.0,
+          "max": 0.7492266666666666
+        },
+        "recompute_seconds": {
+          "mean": 57.18874917094763,
+          "min": 21.579066,
+          "max": 131.24945462685903
+        },
+        "decision_overhead_ms": {
+          "mean": 5.66376025,
+          "min": 3.8926103333333337,
+          "max": 10.195500000000001
+        },
+        "reward": {
+          "mean": 0.658285667460249,
+          "min": -6.309488854862583,
+          "max": 9.059329498100135
+        },
+        "action4_attempts": {
+          "mean": 4.583333333333334,
+          "min": 2.6666666666666665,
+          "max": 7.0
+        },
+        "action4_successes": {
+          "mean": 2.2083333333333335,
+          "min": 0.0,
+          "max": 5.0
+        },
+        "action4_failures": {
+          "mean": 2.375,
+          "min": 0.0,
+          "max": 6.0
+        },
+        "max_consecutive_no_progress_steps": {
+          "mean": 0.9166666666666665,
+          "min": 0.6666666666666666,
+          "max": 1.3333333333333333
+        },
+        "current_model_missing_decisions": {
+          "mean": 2.75,
+          "min": 1.3333333333333333,
+          "max": 6.666666666666667
+        },
+        "completed_sample_elapsed_coverage": {
+          "mean": 0.9583333333333333,
+          "min": 0.6666666666666666,
+          "max": 1.0
+        },
+        "completed_sample_elapsed_seconds": {
+          "mean": 106.53215174638014,
+          "sample_n": 23,
+          "episode_n": 24
+        }
+      }
+    },
+    "two_step_cost_rule": {
+      "outer_unit": "source_window",
+      "outer_n": 8,
+      "metrics": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "node_coverage_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "unfinished_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "deadline_violation_rate": {
+          "mean": 0.375,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "service_failure_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "handoff_failure_rate": {
+          "mean": 0.16666666666666666,
+          "min": 0.0,
+          "max": 0.5
+        },
+        "modeled_completion_seconds": {
+          "mean": 51.667736182395586,
+          "min": 27.495383336,
+          "max": 95.26917911999999
+        },
+        "total_transfer_mb": {
+          "mean": 65.028221875,
+          "min": 1.12011,
+          "max": 174.088135
+        },
+        "model_prepare_mb": {
+          "mean": 63.935002,
+          "min": 0.0,
+          "max": 173.70732
+        },
+        "state_transfer_mb": {
+          "mean": 0.06317475,
+          "min": 0.0,
+          "max": 0.31608
+        },
+        "recompute_seconds": {
+          "mean": 2.4276452083955835,
+          "min": 0.0,
+          "max": 10.789533
+        },
+        "decision_overhead_ms": {
+          "mean": 87.21262525,
+          "min": 54.269083,
+          "max": 170.943375
+        },
+        "reward": {
+          "mean": 12.086299979898708,
+          "min": 7.878420159557672,
+          "max": 15.791385484969181
+        },
+        "action4_attempts": {
+          "mean": 1.125,
+          "min": 0.0,
+          "max": 3.0
+        },
+        "action4_successes": {
+          "mean": 1.0,
+          "min": 0.0,
+          "max": 3.0
+        },
+        "action4_failures": {
+          "mean": 0.125,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "max_consecutive_no_progress_steps": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "current_model_missing_decisions": {
+          "mean": 2.125,
+          "min": 1.0,
+          "max": 7.0
+        },
+        "completed_sample_elapsed_coverage": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0
+        },
+        "completed_sample_elapsed_seconds": {
+          "mean": 51.667736182395586,
+          "sample_n": 8,
+          "episode_n": 8
+        }
+      }
+    }
+  }
+}

@@ -20,6 +20,16 @@ v2 职责增量：
   `use_dependency_aware=False` 作为局部敏感性臂。事后接口审计确认 hierarchical action likelihood、failure-time
   mobility 与 encoder feature profile 未匹配，v2 runner 不得再用于方法排名或继续训练。
 
+v3 interface-repair 职责增量：
+
+- `src/encoders/calibrated_workflow_features.py` 是三种 learned methods 共用的公开 calibrated feature contract；flat/graph
+  encoder 在各自结构内消费相同 typed readiness、byte、link/contact/state 信息，不向 SA 增加专属环境能力。
+- environment 在新 profile 下按 decision step 推进 mobility，node 只在服务成功后推进；legacy profile 保持历史语义。
+- `src/agents/sa_ghmappo_core.py` 的新 action contract 以独立 head 决策聚合后再投影，SA/MAPPO rollout 只优化 executed
+  environment-action likelihood；raw head 与 canonical inverse 分开审计。
+- `scripts/run_calibrated_workflow_interface_repair.py` 只负责冻结训练/评估执行；`analyze_...` 只做完成后统计重建，
+  `reconcile_...` 只做 selected-checkpoint 确定性 replay。后二者不得改变 action 序列、选模或训练。
+
 ## Real PEFT adapter cache lifecycle witness
 
 - `src/runtime/peft_adapter_lifecycle.py`：把 native typed-cache 已预览的 adapter-only victim/admission 实体化为 PEFT
