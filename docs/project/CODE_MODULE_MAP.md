@@ -1,5 +1,18 @@
 # Code Module Map
 
+## Production action 4 与半合成 VEC workload v0.1
+
+- `src/runtime/workflow_suffix_recovery.py`：保留 v1 technical witness，新增通用 DAG boundary v2 seal/validate/read。
+- `src/runtime/production_action4_state.py`：source export 与 target import 的共享事务边界；模型未就绪或 identity/hash/DAG
+  冲突时不提交执行权。
+- `src/envs/core/vec_workflow_core_env.py`：仅在 `workflow_state_migration.enabled=true` 时把共享事务接入正常
+  reset/action/step；默认抽象 prepare 行为不变。
+- `scripts/run_two_node_workflow_suffix_recovery.py`、`run_two_node_workflow_reexecution_comparison.py`：真实 technical
+  source/target 使用同一 production coordinator，保留 continuous/restart 和 missing-model 负例。
+- `src/data/workflow/measurement_calibrated_vec_workload.py`：生成抽象 typed-model 三请求 `A→B→A` 实例，分离
+  measured/synthetic/unavailable，并执行 restart/local/exact 三方法。
+- `scripts/run_measurement_calibrated_vec_workload.py`：clean commit/create-only 执行、CSV/JSON/data card/manifest 输出。
+
 ## 2026-10-05 bounded mechanism evidence
 
 - `scripts/run_mechanism_evidence_closure.py`：只读复用 native request ledgers，构建 A 的公平成本表；通过正常

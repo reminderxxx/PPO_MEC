@@ -1,0 +1,102 @@
+{
+  "schema_version": "ppo_mec.measurement_calibrated_semi_synthetic_vec_workload.v0.1",
+  "workload_version": "0.1.0",
+  "frozen_at": "2026-10-05T00:00:00+08:00",
+  "status": "FROZEN_BEFORE_COMPARISON",
+  "research_questions": {
+    "RQ1": "At equal service completion, under which request-order and capacity conditions does base sharing reduce repeated transfer and loading?",
+    "RQ2": "When does validated suffix recovery beat restart, and how does missing target-model readiness change the result?",
+    "RQ3": "Can a local rule using only current cache, target-model readiness, and calibrated remaining cost improve completion time, transfer, or deadline violations?"
+  },
+  "scope": {
+    "training": false,
+    "rl_execution": false,
+    "formal_or_holdout": false,
+    "old_holdout_reused": false,
+    "new_downloads": false,
+    "real_model_generate_ceiling": 12,
+    "automatic_retry": false
+  },
+  "calibration": {
+    "source_artifact_run_id": "two_node_workflow_reexecution_comparison_20261005_v1",
+    "source_report": "docs/project/mechanism_evidence_closure_results_20261005.md",
+    "model": {
+      "base_file_bytes": {"value": 1015025832, "source_type": "measured"},
+      "base_network_directory_bytes": {"value": 1019895869, "source_type": "measured"},
+      "adapter_file_bytes": {"value": 154423432, "source_type": "measured"},
+      "adapter_network_directory_bytes": {"value": 154428630, "source_type": "measured"},
+      "single_process_peak_runtime_memory_bytes": {"value": 2379005952, "source_type": "measured"}
+    },
+    "dynamic": {
+      "input_bytes": {"value": 192757, "source_type": "measured"},
+      "state_package_bytes": {"value": 2040, "source_type": "measured"},
+      "intermediate_record_bytes": {"value": 169, "source_type": "measured"}
+    },
+    "time_seconds": {
+      "prefix_compute": {"value": 11.035304, "source_type": "measured"},
+      "suffix_compute": {"value": 3.827448, "source_type": "measured"},
+      "target_model_load": {"value": 1.173114, "source_type": "measured"},
+      "state_serialize_save": {"value": 0.000736, "source_type": "measured"},
+      "state_restore_validation": {"value": 0.002763, "source_type": "measured"},
+      "suffix_input_rebuild": {"value": 0.002652, "source_type": "measured"},
+      "high_restore_stress": {
+        "value": 14.0,
+        "source_type": "synthetic",
+        "range": [11.5, 16.0],
+        "reason": "Preserve a recovery-not-worthwhile control above measured prefix recomputation; not a measured runtime."
+      }
+    },
+    "unavailable": [
+      "real_wireless_state_migration_latency",
+      "RSU_queueing_delay",
+      "packet_loss_and_retransmission",
+      "task_output_quality",
+      "production_KV_or_tensor_state_bytes"
+    ]
+  },
+  "synthetic_assumptions": {
+    "link_mbps": 100.0,
+    "fixed_one_way_seconds": 0.02,
+    "deadline_seconds_from_arrival": 60.0,
+    "arrival_jitter_seconds": [0.0, 2.0],
+    "request_order": ["family_a_adapter_0", "family_b_adapter_0", "family_a_adapter_1"],
+    "tight_capacity_bytes": 1200000000,
+    "ample_capacity_bytes": 2400000000,
+    "compute_migration_event": "synthetic_handoff_after_prefix_node",
+    "access_handoff_event": "synthetic_association_change_rsu_source_to_rsu_target"
+  },
+  "seeds": [17, 29, 43],
+  "methods": [
+    "current_restart_rule",
+    "mechanism_aware_local_incremental_cost",
+    "offline_exact_enumeration"
+  ],
+  "objective_priority": [
+    "maximize_completed_workflows",
+    "minimize_deadline_violations",
+    "minimize_total_completion_seconds",
+    "minimize_total_transfer_bytes",
+    "minimize_repeated_compute_seconds"
+  ],
+  "design": {
+    "kind": "balanced_half_fraction_2_to_the_4_minus_1",
+    "point_count": 8,
+    "points": [
+      {"design_id": "d01", "sharing": true, "capacity": "tight", "initial_target_model": "ready", "restore_cost": "low"},
+      {"design_id": "d02", "sharing": true, "capacity": "tight", "initial_target_model": "missing", "restore_cost": "high"},
+      {"design_id": "d03", "sharing": true, "capacity": "ample", "initial_target_model": "ready", "restore_cost": "high"},
+      {"design_id": "d04", "sharing": true, "capacity": "ample", "initial_target_model": "missing", "restore_cost": "low"},
+      {"design_id": "d05", "sharing": false, "capacity": "tight", "initial_target_model": "ready", "restore_cost": "high"},
+      {"design_id": "d06", "sharing": false, "capacity": "tight", "initial_target_model": "missing", "restore_cost": "low"},
+      {"design_id": "d07", "sharing": false, "capacity": "ample", "initial_target_model": "ready", "restore_cost": "low"},
+      {"design_id": "d08", "sharing": false, "capacity": "ample", "initial_target_model": "missing", "restore_cost": "high"}
+    ]
+  },
+  "integrity": {
+    "all_design_points_must_be_output": true,
+    "all_failures_must_be_output": true,
+    "common_random_numbers_across_methods": true,
+    "seed_selection_after_results_forbidden": true,
+    "deterministic_repeats_not_independent_samples": true
+  }
+}

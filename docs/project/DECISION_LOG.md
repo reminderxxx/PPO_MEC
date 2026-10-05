@@ -1,5 +1,15 @@
 ﻿# Decision Log
 
+## 2026-10-05：action 4 只在目标模型门禁后提交状态与执行权
+
+- 决定：保持 `semantic_discrete_5` 和默认 prepare 行为；production state transfer 通过显式 profile opt-in，不升级
+  formal Protocol，不增加算法专属能力。
+- 决定：source 只在节点完成后导出 completed prefix；target 先验证 base+adapter ready，再验证 workflow/model/input/
+  next-node identity，最后一次提交执行权。失败不推进 DAG，状态包不替代权重。
+- 决定：workload v0.1 使用 8 点平衡半分数和 3 个固定 seed；低恢复来自既有测量，高恢复/arrival/capacity/link/
+  deadline 是显式 synthetic，未知无线与任务质量保持 unavailable。
+- 决定：只比较 current restart、局部完整增量成本和 offline exact；结果前不改矩阵，且不因 exact gap 启动 RL。
+
 ## 2026-10-05：机制证据优先，不晋级 RL
 
 - 决定：保留原生 typed-cache candidate 作为 opt-in bounded mechanism，正式协议不静默切换。

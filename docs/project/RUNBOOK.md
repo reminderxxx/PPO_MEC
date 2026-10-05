@@ -5,6 +5,29 @@
 
 # Runbook
 
+## Production action 4 与 workload v0.1（2026-10-05）
+
+冻结合同与数据卡见 `measurement_calibrated_vec_workload_v0_1.md`。必须先在 clean fixed commit 运行 6-call technical
+workflow（硬上限 12，无自动重试），再运行 0-call 半合成矩阵；两个 output root 都必须不存在：
+
+```bash
+/Users/howen/Projects/PPO_MEC/artifacts/environments/adapter_state_acceptance_py39_v1/bin/python \
+  scripts/run_two_node_workflow_reexecution_comparison.py \
+  --role supervisor \
+  --plan configs/acceptance/two_node_workflow_reexecution_comparison_v1.json \
+  --run-root artifacts/analysis/production_action4_workflow_20261005_v1 \
+  --expected-commit <fixed-implementation-commit>
+
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/run_measurement_calibrated_vec_workload.py \
+  --config configs/experiment/measurement_calibrated_vec_workload_v0_1.json \
+  --output-root artifacts/analysis/measurement_calibrated_vec_workload_20261005_v1 \
+  --expected-commit <fixed-implementation-commit>
+```
+
+本地 package I/O 与 100 Mbps 公式不是无线测量；real runner 的 target 先加载并核验模型，再导入状态。缺模型负例只
+验证 fail-closed，不触发下载或 generate。旧 run root、旧 holdout 和历史状态包不得覆盖或复用为新独立样本。
+
 ## 最小机制证据闭环（2026-10-05）
 
 冻结方案与结果分别见 `mechanism_evidence_closure_plan_20261005.md` 和

@@ -42,6 +42,10 @@ from src.runtime.formal_exogenous_request_execution import (
     formal_request_vehicle_step_is_physical,
     validate_formal_request_exposure_trace,
 )
+from src.runtime.production_action4_state import (
+    export_action4_state,
+    import_action4_state,
+)
 
 
 PRIMARY_VEHICLE_SELECTION_CHOICES = {"stable_first", "handoff_pressure"}
@@ -67,6 +71,7 @@ class VecWorkflowCoreEnv:
         cache_capacity_profile: dict[str, Any] | None = None,
         primary_vehicle_selection: str = "stable_first",
         formal_request_exposure_trace: dict[str, Any] | None = None,
+        workflow_state_migration: dict[str, Any] | None = None,
     ) -> None:
         self._mobility_provider = mobility_provider or ReplayProvider()
         self._mobility_source = str(mobility_source or "ngsim").strip().lower()
@@ -90,6 +95,9 @@ class VecWorkflowCoreEnv:
             deepcopy(formal_request_exposure_trace)
             if formal_request_exposure_trace is not None
             else None
+        )
+        self._workflow_state_migration = self._normalize_workflow_state_migration(
+            workflow_state_migration
         )
         if self._formal_request_exposure_trace is not None:
             validate_formal_request_exposure_trace(self._formal_request_exposure_trace)
@@ -116,6 +124,7 @@ class VecWorkflowCoreEnv:
         self._typed_resident_object_ids: dict[str, list[str]] = {}
         self._typed_workflow_state_ready: dict[str, set[str]] = {}
         self._formal_request_exposure_index = 0
+        self._last_action4_state_transfer: dict[str, Any] = self._default_action4_state_transfer()
 
     @property
     def reward_positive_offset(self) -> float:
@@ -209,6 +218,7 @@ class VecWorkflowCoreEnv:
         self._mapper.update_rsus(self.rsu_states)
         vehicles = self._mobility_provider.reset()
         self._formal_request_exposure_index = 0
+        self._last_action4_state_transfer = self._default_action4_state_transfer()
         if self._formal_request_exposure_trace is not None:
             lifecycle = self._formal_request_exposure_trace["subject_lifecycle"]
             self._primary_vehicle_id = str(lifecycle["selected_primary_vehicle_id"])
@@ -392,10 +402,33 @@ class VecWorkflowCoreEnv:
                 realized_prepare.get("realized", False)
                 or (mobility_transfer_count > 0 and migration_mode == "migrate")
             )
+            if self._workflow_state_migration["enabled"] and state_required:
+                model_readiness = self._typed_service_readiness(
+                    current_node=current_node,
+                    primary_vehicle=primary_vehicle,
+                    offload_mode=offload_mode,
+                    service_rsu_id=offload_target_rsu_id,
+                    state_required=False,
+                    state_ready=True,
+                )
+                self._last_action4_state_transfer = self._import_prepared_action4_state(
+                    realized_prepare=realized_prepare,
+                    target_rsu_id=offload_target_rsu_id,
+                    target_model_ready=bool(model_readiness["joint_base_adapter_hit"]),
+                )
+                migration_realized_now = bool(
+                    self._last_action4_state_transfer.get("migration_success", False)
+                )
+                realized_prepare["state_migration_realized"] = migration_realized_now
+                realized_prepare["state_transfer_status"] = self._last_action4_state_transfer.get(
+                    "status"
+                )
+            elif not state_required:
+                self._last_action4_state_transfer = self._default_action4_state_transfer()
             if migration_realized_now and offload_target_rsu_id:
-                self._typed_workflow_state_ready.setdefault(
-                    offload_target_rsu_id, set()
-                ).add(continuity_identity)
+                self._typed_workflow_state_ready.setdefault(offload_target_rsu_id, set()).add(
+                    continuity_identity
+                )
             state_ready = bool(
                 not state_required
                 or continuity_identity
@@ -533,6 +566,7 @@ class VecWorkflowCoreEnv:
         if not cache_hit:
             cache_miss_penalty = 1.2
 
+        service_completed = False
         stall_occurred = not (primary_vehicle and base_model_ok and cache_hit and offload_target_rsu_id)
         if stall_occurred:
             delay_penalty += 0.8
@@ -543,6 +577,12 @@ class VecWorkflowCoreEnv:
                 service_completed = self._advance_current_node_service(current_node)
             if service_completed:
                 service_reward += 1.15
+
+        if service_completed and prepare_action_context is not None:
+            self._last_action4_state_transfer = self._export_prepared_action4_state(
+                prepare_action_context=prepare_action_context,
+                source_rsu_id=pre_action_associated_rsu_id,
+            )
 
         if cache_result["added_new_adapter"] and cache_hit:
             continuity_bonus += 0.15
@@ -2048,7 +2088,7 @@ class VecWorkflowCoreEnv:
             return self._default_prepare_realization()
 
         self._prepare_history.pop(matched_index)
-        return {
+        result = {
             "realized": True,
             "source": "history",
             "vehicle_id": vehicle_id,
@@ -2059,6 +2099,15 @@ class VecWorkflowCoreEnv:
             "prepared_at_step": matched_entry["prepared_at_step"],
             "prepare_age": self._episode_steps - int(matched_entry["prepared_at_step"]),
         }
+        for key in (
+            "workflow_state_package_dir",
+            "workflow_state_export",
+            "source_rsu_id",
+            "next_node",
+        ):
+            if key in matched_entry:
+                result[key] = deepcopy(matched_entry[key])
+        return result
 
     def _prune_prepare_history(self) -> None:
         self._prepare_history = [
@@ -2079,6 +2128,121 @@ class VecWorkflowCoreEnv:
             "prepared_at_step": None,
             "prepare_age": None,
         }
+
+    def _normalize_workflow_state_migration(
+        self, profile: dict[str, Any] | None
+    ) -> dict[str, Any]:
+        value = deepcopy(profile or {})
+        enabled = bool(value.get("enabled", False))
+        if enabled:
+            required = ("package_root", "identity", "input_identity")
+            missing = [field for field in required if not value.get(field)]
+            if missing:
+                raise ValueError(
+                    "workflow_state_migration missing required fields: " + ", ".join(missing)
+                )
+        return {
+            "enabled": enabled,
+            "package_root": value.get("package_root"),
+            "identity": deepcopy(value.get("identity") or {}),
+            "input_identity": deepcopy(value.get("input_identity") or {}),
+            "node_outputs": deepcopy(value.get("node_outputs") or {}),
+            "contract_version": "production_action4_state_transfer_v1",
+        }
+
+    def _default_action4_state_transfer(self) -> dict[str, Any]:
+        return {
+            "status": "DISABLED" if not self._workflow_state_migration["enabled"] else "NOT_ATTEMPTED",
+            "migration_success": False,
+            "execution_right_transferred": False,
+            "missing_model_preparation": False,
+            "contract_version": self._workflow_state_migration["contract_version"],
+        }
+
+    def _export_prepared_action4_state(
+        self,
+        *,
+        prepare_action_context: dict[str, Any],
+        source_rsu_id: str | None,
+    ) -> dict[str, Any]:
+        if not self._workflow_state_migration["enabled"]:
+            return self._default_action4_state_transfer()
+        completed = list(self.workflow_state.completed_node_ids)
+        node_outputs = {
+            node_id: deepcopy(
+                self._workflow_state_migration["node_outputs"].get(
+                    node_id,
+                    {
+                        "kind": "abstract_typed_node_output",
+                        "node_id": node_id,
+                        "provenance": "synthetic_identity_only_no_runtime_tensor",
+                    },
+                )
+            )
+            for node_id in completed
+        }
+        package_root = Path(str(self._workflow_state_migration["package_root"]))
+        package_dir = package_root / (
+            f"{self.workflow_state.workflow_id}__{prepare_action_context['vehicle_id']}__"
+            f"step_{self._episode_steps:06d}"
+        )
+        result = export_action4_state(
+            package_dir=package_dir,
+            workflow=self._workflow_template.to_dict(),
+            completed_nodes=completed,
+            node_outputs=node_outputs,
+            identity=self._workflow_state_migration["identity"],
+            input_identity=self._workflow_state_migration["input_identity"],
+            source_rsu_id=str(source_rsu_id),
+            target_rsu_id=str(prepare_action_context["target_rsu_id"]),
+        )
+        result["contract_version"] = self._workflow_state_migration["contract_version"]
+        prepare_action_context.update(
+            workflow_state_package_dir=str(package_dir),
+            workflow_state_export=deepcopy(result),
+            source_rsu_id=str(source_rsu_id),
+            next_node=result["next_node"],
+        )
+        return result
+
+    def _import_prepared_action4_state(
+        self,
+        *,
+        realized_prepare: dict[str, Any],
+        target_rsu_id: str | None,
+        target_model_ready: bool,
+    ) -> dict[str, Any]:
+        package_dir = realized_prepare.get("workflow_state_package_dir")
+        if not package_dir or target_rsu_id is None:
+            return {
+                **self._default_action4_state_transfer(),
+                "status": "NO_EXPORTED_STATE",
+            }
+        result = import_action4_state(
+            package_dir=Path(str(package_dir)),
+            expected_workflow=self._workflow_template.to_dict(),
+            expected_identity=self._workflow_state_migration["identity"],
+            expected_input_identity=self._workflow_state_migration["input_identity"],
+            target_model_ready=target_model_ready,
+            target_rsu_id=str(target_rsu_id),
+        )
+        result["contract_version"] = self._workflow_state_migration["contract_version"]
+        if result.get("migration_success"):
+            if result.get("next_node") != self.workflow_state.current_node_id:
+                return {
+                    **result,
+                    "status": "REJECTED_NEXT_NODE_IDENTITY",
+                    "migration_success": False,
+                    "execution_right_transferred": False,
+                }
+            if result.get("completed_nodes") != self.workflow_state.completed_node_ids:
+                return {
+                    **result,
+                    "status": "REJECTED_COMPLETED_PREFIX_IDENTITY",
+                    "migration_success": False,
+                    "execution_right_transferred": False,
+                }
+        return result
 
     def _build_dag_evidence_metrics(self, current_node: Any) -> dict[str, float | int | str | None]:
         completed = {str(node_id) for node_id in self.workflow_state.completed_node_ids}
@@ -2245,8 +2409,9 @@ class VecWorkflowCoreEnv:
             or mechanism_exploration_action
         )
         mechanism_success_strict = bool(
-            migration_prepare_realized
-            or handoff_ready
+            self._last_action4_state_transfer.get("migration_success", False)
+            if self._workflow_state_migration["enabled"] and handoff_count > 0
+            else migration_prepare_realized or handoff_ready
         )
         mechanism_success_gate_pending = bool(
             predictive_prefetch_requested and not mechanism_success_strict
@@ -2340,6 +2505,17 @@ class VecWorkflowCoreEnv:
             "migration_prepare_required_adapter_match": bool(realized_prepare.get("required_adapter_match", False)),
             "migration_prepare_prepared_required_adapter": realized_prepare.get("prepared_required_adapter"),
             "migration_prepare_window": self._handoff_prepare_window,
+            "production_action4_state_transfer_enabled": self._workflow_state_migration["enabled"],
+            "production_action4_state_transfer_status": self._last_action4_state_transfer.get("status"),
+            "production_action4_migration_success": bool(
+                self._last_action4_state_transfer.get("migration_success", False)
+            ),
+            "production_action4_execution_right_transferred": bool(
+                self._last_action4_state_transfer.get("execution_right_transferred", False)
+            ),
+            "production_action4_missing_model_preparation": bool(
+                self._last_action4_state_transfer.get("missing_model_preparation", False)
+            ),
             "migration_during_handoff": migration_during_handoff,
             "mechanism_exploration_action_selected": mechanism_exploration_action,
             "mechanism_exploration_bonus_awarded": bool(reward.mechanism_exploration_bonus > 0.0),
@@ -2414,6 +2590,7 @@ class VecWorkflowCoreEnv:
             "cache_applied": bool(cache_result.get("requested", False)),
             "metrics_protocol": metrics_protocol,
             "cache_event": cache_event.to_dict(),
+            "production_action4_state_transfer": deepcopy(self._last_action4_state_transfer),
         }
 
     def _build_cache_event(
@@ -2519,12 +2696,20 @@ class VecWorkflowCoreEnv:
             or control.migration_action.get("mode") == "migrate"
         )
         if typed_mode:
-            state_object = self.adapter_catalog.resolve_workflow_state_object()
-            migration_transfer_size = (
-                float(state_object.transfer_size_mb)
-                if state_object and migration_requested_flag
-                else 0.0
-            )
+            if self._workflow_state_migration["enabled"]:
+                migration_transfer_size = (
+                    float(self._last_action4_state_transfer.get("package_bytes", 0.0))
+                    / (1024.0 * 1024.0)
+                    if self._last_action4_state_transfer.get("migration_success", False)
+                    else 0.0
+                )
+            else:
+                state_object = self.adapter_catalog.resolve_workflow_state_object()
+                migration_transfer_size = (
+                    float(state_object.transfer_size_mb)
+                    if state_object and migration_requested_flag
+                    else 0.0
+                )
         else:
             migration_transfer_size = (
                 float(self.adapter_catalog.estimate_bundle_transfer_size_mb(adapter_id))
@@ -2570,7 +2755,12 @@ class VecWorkflowCoreEnv:
             state_migration_size_mb=float(migration_transfer_size),
             transfer_source=transfer_source,
             migration_requested=migration_requested_flag,
-            migration_realized=bool(migration_prepare_realized or (handoff_count > 0 and control.migration_action.get("mode") == "migrate")),
+            migration_realized=bool(
+                self._last_action4_state_transfer.get("migration_success", False)
+                if self._workflow_state_migration["enabled"]
+                else migration_prepare_realized
+                or (handoff_count > 0 and control.migration_action.get("mode") == "migrate")
+            ),
             cache_capacity_enabled=capacity_enabled,
             cache_capacity_unit=str(cache_result.get("cache_capacity_unit", "adapter_slots")),
             cache_capacity_before=capacity_before.get("cache_capacity") if capacity_enabled else None,
@@ -2714,7 +2904,14 @@ class VecWorkflowCoreEnv:
             )
         migration_cost = 0.0
         if handoff_count > 0 and (migration_mode in {"prepare", "migrate"} or realized_prepare.get("realized", False)):
-            if self._typed_mode_enabled():
+            if self._workflow_state_migration["enabled"]:
+                migration_cost = (
+                    float(self._last_action4_state_transfer.get("package_bytes", 0.0))
+                    / (1024.0 * 1024.0)
+                    if self._last_action4_state_transfer.get("migration_success", False)
+                    else 0.0
+                )
+            elif self._typed_mode_enabled():
                 state_object = self.adapter_catalog.resolve_workflow_state_object()
                 migration_cost = float(state_object.transfer_size_mb) if state_object else 0.0
             else:

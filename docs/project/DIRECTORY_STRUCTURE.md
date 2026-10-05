@@ -1,5 +1,14 @@
 ﻿# Directory Structure
 
+## 2026-10-05 production action 4 / workload v0.1
+
+- `src/runtime/production_action4_state.py`：create-only 状态导出、目标模型门禁、完整校验和执行权提交。
+- `src/data/workflow/measurement_calibrated_vec_workload.py`：v0.1 生成器与三方法 bounded evaluator。
+- `configs/experiment/measurement_calibrated_vec_workload_v0_1.json`：RQ、测量校准、8 点、3 seed、方法、目标与预算冻结。
+- `scripts/run_measurement_calibrated_vec_workload.py`：生成 24 个实例并一次性输出 72 方法行和完整性回执。
+- `artifacts/analysis/measurement_calibrated_vec_workload_20261005_v1/`：执行后 create-only 机器产物根。
+- `tests/test_production_action4_state.py`、`tests/test_measurement_calibrated_vec_workload.py`：正负接线与矩阵合同。
+
 ## 2026-10-05 最小机制证据闭环
 
 - `configs/experiment/mechanism_evidence_closure_v1.json`：A/C 冻结矩阵、成本模型、预算和命令。

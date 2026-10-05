@@ -28,9 +28,13 @@ from scripts.run_two_node_workflow_suffix_recovery import (  # noqa: E402
     run_child,
     run_negative_checks,
     sha256_file,
+    production_action4_input_identity,
+    production_action4_workflow,
+    state_identity,
     write_json,
 )
 from src.runtime.workflow_suffix_recovery import canonical_json_bytes  # noqa: E402
+from src.runtime.production_action4_state import import_action4_state  # noqa: E402
 
 
 def execute_restart(plan_path: Path, run_root: Path) -> dict[str, Any]:
@@ -91,7 +95,8 @@ def cost_decomposition(
     phases: list[dict[str, Any]],
 ) -> dict[str, Any]:
     phase_by_role = {item["role"]: item for item in phases}
-    state = source["state"]
+    legacy_state = source["state"]
+    state = source["production_action4_state_export"]
     image_bytes = int(plan["source_input_provenance"]["bytes"])
     actual_image_bytes = Path(plan["source_input_provenance"]["path"]).stat().st_size
     if actual_image_bytes != image_bytes:
@@ -133,8 +138,7 @@ def cost_decomposition(
             "executed_nodes_after_interrupt": ["n1"],
             "generate_calls_including_shared_prefix": 2,
             "shared_source_prefix_process_seconds": source["process_elapsed_seconds"],
-            "serialize_seconds": state["serialize_seconds"],
-            "durable_save_seconds": state["durable_save_seconds"],
+            "serialize_and_save_seconds": state["serialize_and_save_seconds"],
             "state_restore_validation_seconds": target["state_restore_validation_seconds"],
             "input_reconstruction_seconds": target["input_reconstruction_seconds"],
             "target_model_load_seconds": _sum_load(target),
@@ -168,6 +172,7 @@ def cost_decomposition(
             "intermediate_n0_record_bytes": n0_intermediate_bytes,
             "original_input_image_bytes": image_bytes,
             "model_weights_and_directories": static,
+            "legacy_v1_technical_package_bytes_not_consumed_by_target": legacy_state["package_bytes"],
         },
         "target_prestaged_model": {
             "measured_local_path": True,
@@ -215,6 +220,19 @@ def execute_supervisor(plan_path: Path, run_root: Path, expected_commit: str) ->
             write_json(run_root / f"{role}_process.json", phase)
             if phase["returncode"] != 0 or phase["timed_out"] or phase["receipt_status"] != "PASS":
                 raise RuntimeError(f"{role} failed; no retry: {phase}")
+            if role == "source":
+                missing_model_negative = import_action4_state(
+                    package_dir=run_root / "production_action4_state_package",
+                    expected_workflow=production_action4_workflow(),
+                    expected_identity=state_identity(plan),
+                    expected_input_identity=production_action4_input_identity(plan),
+                    target_model_ready=False,
+                    target_rsu_id="technical_target_process",
+                )
+                write_json(
+                    run_root / "production_action4_missing_model_negative.json",
+                    missing_model_negative,
+                )
         continuous = read_json(run_root / "continuous_receipt.json")
         source = read_json(run_root / "source_receipt.json")
         restart = read_json(run_root / "restart_receipt.json")
@@ -250,13 +268,14 @@ def execute_supervisor(plan_path: Path, run_root: Path, expected_commit: str) ->
             "comparisons": comparison,
             "cost_decomposition": costs,
             "negative_checks": negative,
+            "production_action4_missing_model_negative": missing_model_negative,
             "task_correctness": "unavailable",
             "task_correctness_reason": "technical input has no applicable ALPR/Helmet ground-truth label",
-            "production_action_4_state_export_import_called": False,
+            "production_action_4_state_export_import_called": True,
             "claims": {
                 "workflow_suffix_recovery_fidelity": comparison["status"].lower(),
                 "restart_comparison": comparison["status"].lower(),
-                "production_action_4_real_migration": "not_implemented_by_this_runner",
+                "production_action_4_real_migration": "validated technical state transfer through shared production action-4 coordinator",
                 "wireless_transfer": "formula_only_not_measured",
                 "algorithm_comparison": "not_evaluated",
             },

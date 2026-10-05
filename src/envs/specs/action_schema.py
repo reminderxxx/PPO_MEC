@@ -51,7 +51,7 @@ class ActionSchema:
                 DiscreteActionSpec(
                     4,
                     "handoff_migration_prepare",
-                    "Prepare adapter-state migration and prefetch the required adapter at the predicted handoff target.",
+                    "Prepare the target model and, when explicitly enabled, export workflow state for validated suffix recovery at the predicted handoff target.",
                 ),
             ]
         )

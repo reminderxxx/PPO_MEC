@@ -8,6 +8,7 @@ from typing import Any, Mapping
 
 
 STATE_SCHEMA_VERSION = "ppo_mec.two_node_workflow_state.v1"
+PRODUCTION_STATE_SCHEMA_VERSION = "ppo_mec.workflow_state.v2"
 PACKAGE_SCHEMA_VERSION = "ppo_mec.workflow_state_package.v1"
 EXPECTED_WORKFLOW_ID = "technical_vision_description_suffix_v1"
 EXPECTED_NODES = ["n0", "n1"]
@@ -46,6 +47,74 @@ def seal_state_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         "payload": copied,
         "payload_sha256": sha256_bytes(canonical_json_bytes(copied)),
     }
+
+
+def seal_production_state_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
+    """Seal a generic DAG-boundary state without weakening the v1 witness."""
+    copied = json.loads(json.dumps(payload, ensure_ascii=False))
+    return {
+        "schema_version": PRODUCTION_STATE_SCHEMA_VERSION,
+        "payload": copied,
+        "payload_sha256": sha256_bytes(canonical_json_bytes(copied)),
+    }
+
+
+def validate_production_state_envelope(
+    envelope: Mapping[str, Any],
+    *,
+    expected_workflow: Mapping[str, Any],
+    expected_identity: Mapping[str, Any],
+    expected_input_identity: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Validate a production action-4 boundary before execution ownership moves."""
+    _require_equal(
+        envelope.get("schema_version"),
+        PRODUCTION_STATE_SCHEMA_VERSION,
+        "schema_version",
+    )
+    payload = envelope.get("payload")
+    if not isinstance(payload, dict):
+        raise StateValidationError("payload must be an object")
+    _require_equal(
+        envelope.get("payload_sha256"),
+        sha256_bytes(canonical_json_bytes(payload)),
+        "payload_sha256",
+    )
+
+    workflow = payload.get("workflow")
+    if not isinstance(workflow, dict):
+        raise StateValidationError("workflow must be an object")
+    normalized_expected_workflow = json.loads(json.dumps(expected_workflow, ensure_ascii=False))
+    for field in ("workflow_id", "nodes", "edges", "execution_order"):
+        _require_equal(
+            workflow.get(field),
+            normalized_expected_workflow.get(field),
+            f"workflow.{field}",
+        )
+    completed = list(payload.get("completed_nodes") or [])
+    remaining = list(payload.get("remaining_nodes") or [])
+    next_node = payload.get("next_node")
+    order = list(expected_workflow.get("execution_order") or [])
+    if len(completed) != len(set(completed)) or any(item not in order for item in completed):
+        raise StateValidationError("completed_nodes are not a unique workflow prefix")
+    expected_completed = order[: len(completed)]
+    _require_equal(completed, expected_completed, "completed_nodes")
+    _require_equal(remaining, order[len(completed) :], "remaining_nodes")
+    _require_equal(next_node, remaining[0] if remaining else None, "next_node")
+    if not completed or not remaining:
+        raise StateValidationError("action 4 requires a completed prefix and a remaining suffix")
+    _require_equal(payload.get("identity"), dict(expected_identity), "identity")
+    _require_equal(
+        payload.get("input_identity"),
+        dict(expected_input_identity),
+        "input_identity",
+    )
+    node_outputs = payload.get("node_outputs")
+    if not isinstance(node_outputs, dict) or set(node_outputs) != set(completed):
+        raise StateValidationError("node_outputs must cover exactly the completed prefix")
+    if any(value in payload for value in ("final_output", "suffix_output")):
+        raise StateValidationError("state must not contain a precomputed suffix result")
+    return payload
 
 
 def serialize_state_envelope(envelope: Mapping[str, Any]) -> bytes:
@@ -189,6 +258,13 @@ def write_state_package(package_dir: Path, envelope: Mapping[str, Any]) -> dict[
 
 
 def read_state_package(package_dir: Path, *, expected_identity: Mapping[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    envelope, package = read_state_package_envelope(package_dir)
+    payload = validate_state_envelope(envelope, expected_identity=expected_identity)
+    return payload, package
+
+
+def read_state_package_envelope(package_dir: Path) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Read and integrity-check a package before schema-specific validation."""
     actual_files = sorted(path.name for path in package_dir.iterdir() if path.is_file())
     manifest_path = package_dir / "manifest.json"
     state_path = package_dir / "state.json"
@@ -201,11 +277,27 @@ def read_state_package(package_dir: Path, *, expected_identity: Mapping[str, Any
     _require_equal(manifest.get("contains_model_weights"), False, "contains_model_weights")
     _require_equal(manifest.get("contains_final_output"), False, "contains_final_output")
     envelope = json.loads(state_bytes)
-    payload = validate_state_envelope(envelope, expected_identity=expected_identity)
-    return payload, {
+    return envelope, {
         "state_file_sha256": sha256_bytes(state_bytes),
         "manifest_sha256": sha256_file(manifest_path),
         "package_bytes": len(state_bytes) + manifest_path.stat().st_size,
         "payload_sha256": envelope["payload_sha256"],
         "files": actual_files,
     }
+
+
+def read_production_state_package(
+    package_dir: Path,
+    *,
+    expected_workflow: Mapping[str, Any],
+    expected_identity: Mapping[str, Any],
+    expected_input_identity: Mapping[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    envelope, package = read_state_package_envelope(package_dir)
+    payload = validate_production_state_envelope(
+        envelope,
+        expected_workflow=expected_workflow,
+        expected_identity=expected_identity,
+        expected_input_identity=expected_input_identity,
+    )
+    return payload, package

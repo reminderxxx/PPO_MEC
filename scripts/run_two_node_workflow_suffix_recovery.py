@@ -34,6 +34,10 @@ from src.runtime.workflow_suffix_recovery import (
     validate_state_envelope,
     write_state_package,
 )
+from src.runtime.production_action4_state import (
+    export_action4_state,
+    import_action4_state,
+)
 
 
 def jsonable(value: Any) -> Any:
@@ -237,6 +241,27 @@ def make_state_payload(plan: dict[str, Any], n0: dict[str, Any]) -> dict[str, An
     }
 
 
+def production_action4_workflow() -> dict[str, Any]:
+    return {
+        "workflow_id": EXPECTED_WORKFLOW_ID,
+        "nodes": [
+            {"node_id": "n0", "predecessors": [], "successors": ["n1"]},
+            {"node_id": "n1", "predecessors": ["n0"], "successors": []},
+        ],
+        "edges": EXPECTED_EDGES,
+        "execution_order": EXPECTED_NODES,
+    }
+
+
+def production_action4_input_identity(plan: dict[str, Any]) -> dict[str, Any]:
+    source = plan["source_input_provenance"]
+    return {
+        "path": source["path"],
+        "bytes": source["bytes"],
+        "sha256": source["sha256"],
+    }
+
+
 def base_receipt(role: str, started_wall: float, started: float, plan_path: Path, plan: dict[str, Any]) -> dict[str, Any]:
     return {
         "status": "PASS",
@@ -294,6 +319,18 @@ def execute_source(plan_path: Path, run_root: Path) -> dict[str, Any]:
     mark = time.monotonic()
     package = write_state_package(run_root / "state_package", envelope)
     save_seconds = time.monotonic() - mark
+    production_export = export_action4_state(
+        package_dir=run_root / "production_action4_state_package",
+        workflow=production_action4_workflow(),
+        completed_nodes=["n0"],
+        node_outputs={
+            "n0": {"raw_text": n0["decoded_text"], "token_ids": n0["token_ids"]}
+        },
+        identity=state_identity(plan),
+        input_identity=production_action4_input_identity(plan),
+        source_rsu_id="technical_source_process",
+        target_rsu_id="technical_target_process",
+    )
     receipt = base_receipt("source", started_wall, started, plan_path, plan)
     receipt.update({
         "process_elapsed_seconds": time.monotonic() - started,
@@ -312,6 +349,7 @@ def execute_source(plan_path: Path, run_root: Path) -> dict[str, Any]:
             "serialized_state_bytes": serialized_state_bytes,
             **package,
         },
+        "production_action4_state_export": production_export,
     })
     return receipt
 
@@ -322,12 +360,21 @@ def execute_target(plan_path: Path, run_root: Path) -> dict[str, Any]:
     mark = time.monotonic()
     checked = verify_static_resources(plan, include_source_image=False)
     static_validation_seconds = time.monotonic() - mark
-    mark = time.monotonic()
-    payload, package = read_state_package(run_root / "state_package", expected_identity=state_identity(plan))
-    restore_validation_seconds = time.monotonic() - mark
     processor, model, timings, status = load_runtime(plan)
+    production_import = import_action4_state(
+        package_dir=run_root / "production_action4_state_package",
+        expected_workflow=production_action4_workflow(),
+        expected_identity=state_identity(plan),
+        expected_input_identity=production_action4_input_identity(plan),
+        target_model_ready=True,
+        target_rsu_id="technical_target_process",
+    )
+    if not production_import.get("migration_success", False):
+        raise RuntimeError(f"production action 4 import failed: {production_import}")
+    restore_validation_seconds = float(production_import["restore_validation_seconds"])
     mark = time.monotonic()
-    n1_inputs, n1_input = prepare_n1(plan, processor, payload["suffix_input_material"])
+    restored_n0 = production_import["node_outputs"]["n0"]
+    n1_inputs, n1_input = prepare_n1(plan, processor, restored_n0["raw_text"])
     input_reconstruction_seconds = time.monotonic() - mark
     n1 = generate(model, processor, n1_inputs, plan["generation"]["n1"])
     receipt = base_receipt("target", started_wall, started, plan_path, plan)
@@ -343,8 +390,12 @@ def execute_target(plan_path: Path, run_root: Path) -> dict[str, Any]:
         "node_call_counts": {"n0": 0, "n1": 1},
         "generate_attempted": 1,
         "generate_completed": 1,
-        "restored_state": package,
-        "restored_n0_output": payload["n0_output"],
+        "restored_state": {
+            key: production_import[key]
+            for key in ("state_file_sha256", "manifest_sha256", "package_bytes", "payload_sha256", "files")
+        },
+        "restored_n0_output": restored_n0,
+        "production_action4_state_import": production_import,
         "n1_input": n1_input,
         "n1_output": n1,
         "target_access": {
