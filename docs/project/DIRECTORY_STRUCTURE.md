@@ -1,5 +1,19 @@
 ﻿# Directory Structure
 
+## 2026-10-06 calibrated continuous-workflow pilot
+
+- `src/envs/core/calibrated_continuous_workflow_env.py`：独立的小型 event-driven 校准仿真；共享五动作、依赖安全
+  bundle cache、原子 rollback、state prepare/import 与 DAG predecessor recompute。
+- `configs/experiment/calibrated_continuous_workflow_pilot_v1.json`：实测/轨迹/人工来源分离、八个分层模板和共同训练预算。
+- `configs/experiment/calibrated_continuous_workflow_pilot_v1_manifest.json`：结果盲冻结的 12/4/12 train/dev/evaluation 实例。
+- `scripts/freeze_calibrated_continuous_workflow_pilot.py`：从既有 NGSIM window plans 和 Alibaba JSONL create-only 冻结 workload。
+- `scripts/run_calibrated_continuous_workflow_pilot.py`：SA-GHMAPPO/PPO/MAPPO 匹配训练、two-step rule、window-outer CI、
+  checkpoint 与论文表入口。
+- `tests/test_calibrated_continuous_workflow.py`：action 4 恢复、DAG 重算、依赖安全替换、失败 rollback 和 rule side-effect 回归。
+- `artifacts/benchmarks/calibrated_continuous_workflow_pilot_20261006_v1/`：9 个 checkpoint、108 learned evaluation rows、
+  12 rule rows、aggregate、paper table、receipt 与 integrity。
+- `docs/project/calibrated_continuous_workflow_pilot_20261006.md`：负向结果、论文实验表、审查元数据与 claim 边界。
+
 ## 2026-10-06 symmetric recovery cost correction
 
 - `src/runtime/symmetric_recovery_cost.py`：双方 event ledger 的纯函数 scorer 与三种在线决策。

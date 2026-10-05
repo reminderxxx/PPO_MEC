@@ -5,6 +5,19 @@
 
 # Artifact Records
 
+## 2026-10-06 calibrated continuous-workflow matched pilot
+
+- root：`artifacts/benchmarks/calibrated_continuous_workflow_pilot_20261006_v1/`；执行 commit
+  `0dbb0c1c91e0fac6740bb6e4220a92d014f1fd9d`；train/dev/evaluation=`12/4/12`，SA/PPO/MAPPO 各 3 seeds ×
+  192 episodes、24 updates，9 checkpoints、120 evaluation rows。
+- SA/PPO/MAPPO/two-step rule completion=`0.528/1.000/1.000/1.000`，return=
+  `-10.299/6.517/6.517/13.218`。rule 的 modeled elapsed/transfer/recompute=`45.655 s/279.151 MB/3.297 s`；
+  SA 发生 action-4 `243` 次、service failure `191`，负向结果保留。
+- 16/16 manifest entries byte/SHA-256 复算通过，9 checkpoints 可读且 agent/update=`expected/24`。输入来源按
+  measured/trace-derived/literature/artificial 分离；训练 step 0 real-model call/download/generate。
+- 证据等级 `E1_DOCUMENTED_WITH_AUDITED_NONFORMAL_PILOT`；缺 formal/holdout/support，不是无线、真实 RSU、canonical、
+  算法优势或 paper-ready 证据。表与边界见 `calibrated_continuous_workflow_pilot_20261006.md`。
+
 ## 2026-10-06 symmetric recovery cost correction and boundary check
 
 - corrected root：`artifacts/analysis/eviction_aware_recovery_corrected_20261006_v2/`；执行 commit `800f0a1…`；原 12 点、

@@ -1,0 +1,11 @@
+{
+  "status": "complete",
+  "methods": [
+    "sa_ghmappo",
+    "ppo",
+    "mappo",
+    "two_step_cost_rule"
+  ],
+  "evaluation_rows": 120,
+  "paper_table": "paper_table.md"
+}

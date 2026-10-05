@@ -1,5 +1,15 @@
 # Code Module Map
 
+## Calibrated continuous-workflow pilot
+
+- `src/envs/core/calibrated_continuous_workflow_env.py`：只服务 non-formal pilot 的共同仿真边界；typed base/adapter bundle
+  admission、dependency-safe LRU、contact-bounded action 4、状态包、DAG ancestor recompute 和成本/奖励在这里统一执行。
+- `scripts/freeze_calibrated_continuous_workflow_pilot.py`：消费已提交的 NGSIM window plan 与外部 Alibaba 数据，按结果盲
+  分层模板冻结 manifest；不训练、不调用模型、不修改原始数据。
+- `scripts/run_calibrated_continuous_workflow_pilot.py`：通过 live registry 构建三种现有 agent，共用 rollout/GAE 与环境；
+  独立两步规则只 clone 当前可见状态，输出 window-outer aggregate、checkpoint hash 和完整性清单。
+- `tests/test_calibrated_continuous_workflow.py`：校验共同 action/cache/state 能力，而不测试或修改各算法内部。
+
 ## Real PEFT adapter cache lifecycle witness
 
 - `src/runtime/peft_adapter_lifecycle.py`：把 native typed-cache 已预览的 adapter-only victim/admission 实体化为 PEFT

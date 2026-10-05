@@ -1,0 +1,37 @@
+{
+  "schema_version": "calibrated_continuous_workflow_pilot_run_v1",
+  "created_at": "2026-10-05T17:54:42.348225+00:00",
+  "git_commit": "0dbb0c1c91e0fac6740bb6e4220a92d014f1fd9d",
+  "config": {
+    "path": "configs/experiment/calibrated_continuous_workflow_pilot_v1.json",
+    "sha256": "3a6737f3b440ddea6d4b096dd9e05f1082baac58d9accdbb6a4d9a1dfe2ad2ac"
+  },
+  "workload_manifest": {
+    "path": "configs/experiment/calibrated_continuous_workflow_pilot_v1_manifest.json",
+    "sha256": "7c47246ee45953859c3116106b47ec48813eb99976c6c1bcd932a393a7f29f7a"
+  },
+  "episodes_per_method_seed": 192,
+  "agents": [
+    "sa_ghmappo",
+    "ppo",
+    "mappo"
+  ],
+  "seeds": [
+    7,
+    17,
+    29
+  ],
+  "rule": "two_step_cost_rule",
+  "evaluation_outer_unit": "evaluation_window",
+  "evaluation_outer_n": 12,
+  "claim_boundary": {
+    "formal": false,
+    "holdout": false,
+    "real_model_calls_per_training_step": 0,
+    "wireless_measurement": false,
+    "adapter_assignment_source": "artificial_deterministic_mapping_from_alibaba_task_name",
+    "base_family_b_source": "artificial_distinct_identity_reusing_measured_base_footprint",
+    "state_scaling_source": "artificial_stress_factor_anchored_to_measured_2195_byte_package"
+  },
+  "command": "scripts/run_calibrated_continuous_workflow_pilot.py --output_root artifacts/benchmarks/calibrated_continuous_workflow_pilot_20261006_v1"
+}

@@ -5,6 +5,21 @@
 
 ﻿# Progress
 
+## 2026-10-06：实测校准连续工作流小规模匹配训练完成，未观察到 SA-GHMAPPO 优势
+
+- 从成本纠错 clean `d67575b…` 建立隔离工作区；主工作区七个用户修改未暂存、覆盖、stash 或提交。冻结
+  train/dev/evaluation=`12/4/12`，覆盖共享/不同 base、紧张/宽裕 cache、低/高 handoff、三档状态量和简单规则区。
+- 新 pilot 环境只复用共同五动作、依赖安全 bundle cache、真实 state prepare/recompute 语义及 A 线测量；不在 step
+  调用真实模型。NGSIM/Alibaba 为 trace-derived，1 Gbps link、deadline、adapter mapping 和配对均明确为人工假设。
+- 完成 SA-GHMAPPO/PPO/controller-level MAPPO 各 3 seeds × 192 episodes；两步规则不训练。9 checkpoint 均为
+  24 updates；120 evaluation rows、receipt、integrity 和窗口外层 percentile CI 齐全。
+- 12-window 结果：SA/PPO/MAPPO/rule completion=`0.528/1.000/1.000/1.000`，return=
+  `-10.299/6.517/6.517/13.218`。rule modeled elapsed=`45.655 s`、transfer=`279.151 MB`、recompute=`3.297 s`，
+  均优于完整完成的 PPO/MAPPO；SA 的 elapsed 含未完成截断，不能作更快解释。
+- SA 评估共 action-4 `243` 次、service failure `191`，出现 prepare over-activation；负结果不调参、不覆盖。
+  报告与论文表见 `calibrated_continuous_workflow_pilot_20261006.md`；证据仍是 non-formal pilot，paper-ready 为
+  `Unverifiable`。
+
 ## 2026-10-06：恢复成本不对称已纠错，历史方法优势撤销
 
 - 从 `codex/manuscript-evidence-v1` 的 `b3a00b…` 起步，主工作区七个用户修改保持不变；只读缺陷报告先以独立提交

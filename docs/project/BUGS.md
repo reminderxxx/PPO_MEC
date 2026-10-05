@@ -5,6 +5,18 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-06：校准 pilot 中 SA-GHMAPPO action-4 过度激活（OPEN ALGORITHM CLAIM BLOCKER）
+
+- `NEGATIVE`：冻结匹配训练不支持主方法优势。SA-GHMAPPO 12-window completion `0.528`，相对 two-step rule 差
+  `-0.472`，窗口 bootstrap 95% CI `[-0.722,-0.250]`；不得进入支持优势的论文主表。
+- `OBSERVED`：SA 的 36 个 seed-window run 共 action-4 `243` 次、service failure `191`；handoff prepare 在当前
+  bundle 未 ready 时仍为 contract-legal action，策略未学会先恢复当前服务，导致截断。PPO/MAPPO 完成但主要 action-0，
+  每次 handoff 重算，亦未兑现状态迁移机制。
+- `BOUNDARY`：这是固定 192-episode、3-seed non-formal pilot 的策略行为，不等于实现 bug；同一审查轮不修改 reward、
+  mask、guard 或预算。若修复，必须先另立诊断/实现任务，再用新结果盲 protocol 验证并保留本轮负结果。
+- `OPEN`：formal/holdout/support、BCa/sign/Holm、跨数据组合、共享资源争用、compute accounting 和真实无线均缺失；
+  paper-ready 仍为 `Unverifiable`。证据见 `calibrated_continuous_workflow_pilot_20261006.md`。
+
 ## 2026-10-06：路径不对称已修复；算法增量价值缺口确认（RESOLVED IMPLEMENTATION / OPEN CLAIM BLOCKER）
 
 - `RESOLVED`：新 v2 ledger 为 restart/recovery 分别建立 cache state，双方都执行 current→next 合法 transaction；每个 model

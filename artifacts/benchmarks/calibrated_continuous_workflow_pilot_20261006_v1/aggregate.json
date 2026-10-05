@@ -1,0 +1,247 @@
+{
+  "methods": {
+    "mappo": {
+      "outer_unit": "evaluation_window",
+      "outer_n": 12,
+      "metrics": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0
+        },
+        "modeled_completion_seconds": {
+          "mean": 97.06900145448077,
+          "ci95_low": 67.30082601367843,
+          "ci95_high": 131.91305162504364
+        },
+        "total_transfer_mb": {
+          "mean": 825.2778634166666,
+          "ci95_low": 227.6889488625,
+          "ci95_high": 1514.8239741687498
+        },
+        "recompute_seconds": {
+          "mean": 60.03469629714743,
+          "ci95_low": 35.29498658095189,
+          "ci95_high": 87.7430479347982
+        },
+        "handoff_failure_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0
+        },
+        "reward": {
+          "mean": 6.516846598043021,
+          "ci95_low": 3.61240575579548,
+          "ci95_high": 9.686759318551807
+        }
+      }
+    },
+    "ppo": {
+      "outer_unit": "evaluation_window",
+      "outer_n": 12,
+      "metrics": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0
+        },
+        "modeled_completion_seconds": {
+          "mean": 97.06900145448077,
+          "ci95_low": 67.52657431899245,
+          "ci95_high": 133.1502399105295
+        },
+        "total_transfer_mb": {
+          "mean": 825.2778634166666,
+          "ci95_low": 240.49098692500004,
+          "ci95_high": 1526.9325803874997
+        },
+        "recompute_seconds": {
+          "mean": 60.03469629714743,
+          "ci95_low": 35.39330981656565,
+          "ci95_high": 87.80926076226434
+        },
+        "handoff_failure_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0
+        },
+        "reward": {
+          "mean": 6.516846598043021,
+          "ci95_low": 3.632820014124919,
+          "ci95_high": 9.704740543159813
+        }
+      }
+    },
+    "sa_ghmappo": {
+      "outer_unit": "evaluation_window",
+      "outer_n": 12,
+      "metrics": {
+        "workflow_completion_rate": {
+          "mean": 0.5277777777777778,
+          "ci95_low": 0.2777777777777778,
+          "ci95_high": 0.75
+        },
+        "modeled_completion_seconds": {
+          "mean": 56.2022677495728,
+          "ci95_low": 40.573669451768964,
+          "ci95_high": 73.93906346065238
+        },
+        "total_transfer_mb": {
+          "mean": 589.79886475,
+          "ci95_low": 174.3237890493056,
+          "ci95_high": 1087.161176806944
+        },
+        "recompute_seconds": {
+          "mean": 20.00065249823947,
+          "ci95_low": 9.470477090257612,
+          "ci95_high": 31.112696103483504
+        },
+        "handoff_failure_rate": {
+          "mean": 0.3194444444444445,
+          "ci95_low": 0.15277777777777776,
+          "ci95_high": 0.5277777777777778
+        },
+        "reward": {
+          "mean": -10.298605696355729,
+          "ci95_low": -20.894822084700145,
+          "ci95_high": -0.23896959491571976
+        }
+      }
+    },
+    "two_step_cost_rule": {
+      "outer_unit": "evaluation_window",
+      "outer_n": 12,
+      "metrics": {
+        "workflow_completion_rate": {
+          "mean": 1.0,
+          "ci95_low": 1.0,
+          "ci95_high": 1.0
+        },
+        "modeled_completion_seconds": {
+          "mean": 45.6545599656593,
+          "ci95_low": 34.32896111508247,
+          "ci95_high": 60.828858218509296
+        },
+        "total_transfer_mb": {
+          "mean": 279.1511345833333,
+          "ci95_low": 57.473121733333336,
+          "ci95_high": 557.9945523624996
+        },
+        "recompute_seconds": {
+          "mean": 3.2968022223259723,
+          "ci95_low": 1.318720888930389,
+          "ci95_high": 5.454708916791167
+        },
+        "handoff_failure_rate": {
+          "mean": 0.3020833333333333,
+          "ci95_low": 0.09375,
+          "ci95_high": 0.5315104166666629
+        },
+        "reward": {
+          "mean": 13.217645326063765,
+          "ci95_low": 11.262160054902159,
+          "ci95_high": 15.108725349033453
+        }
+      }
+    }
+  },
+  "paired_vs_two_step_rule": {
+    "mappo": {
+      "workflow_completion_rate": {
+        "mean_delta_vs_rule": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.0
+      },
+      "modeled_completion_seconds": {
+        "mean_delta_vs_rule": 51.414441488821446,
+        "ci95_low": 28.613097738981505,
+        "ci95_high": 76.59837748389322
+      },
+      "total_transfer_mb": {
+        "mean_delta_vs_rule": 546.1267288333333,
+        "ci95_low": 83.6842805625,
+        "ci95_high": 1082.6492111874998
+      },
+      "recompute_seconds": {
+        "mean_delta_vs_rule": 56.73789407482146,
+        "ci95_low": 31.077379727695714,
+        "ci95_high": 83.69366082668633
+      },
+      "handoff_failure_rate": {
+        "mean_delta_vs_rule": 0.6979166666666666,
+        "ci95_low": 0.4791666666666667,
+        "ci95_high": 0.8958333333333334
+      },
+      "reward": {
+        "mean_delta_vs_rule": -6.700798728020744,
+        "ci95_low": -9.204299620278729,
+        "ci95_high": -4.121165972350722
+      }
+    },
+    "ppo": {
+      "workflow_completion_rate": {
+        "mean_delta_vs_rule": 0.0,
+        "ci95_low": 0.0,
+        "ci95_high": 0.0
+      },
+      "modeled_completion_seconds": {
+        "mean_delta_vs_rule": 51.414441488821446,
+        "ci95_low": 27.730807359971166,
+        "ci95_high": 76.70879920632267
+      },
+      "total_transfer_mb": {
+        "mean_delta_vs_rule": 546.1267288333333,
+        "ci95_low": 93.609845425,
+        "ci95_high": 1037.1693568604167
+      },
+      "recompute_seconds": {
+        "mean_delta_vs_rule": 56.73789407482146,
+        "ci95_low": 31.551513722271995,
+        "ci95_high": 84.50518201590205
+      },
+      "handoff_failure_rate": {
+        "mean_delta_vs_rule": 0.6979166666666666,
+        "ci95_low": 0.4895833333333333,
+        "ci95_high": 0.90625
+      },
+      "reward": {
+        "mean_delta_vs_rule": -6.700798728020744,
+        "ci95_low": -9.345386276205144,
+        "ci95_high": -4.190004451288841
+      }
+    },
+    "sa_ghmappo": {
+      "workflow_completion_rate": {
+        "mean_delta_vs_rule": -0.47222222222222227,
+        "ci95_low": -0.7222222222222222,
+        "ci95_high": -0.25
+      },
+      "modeled_completion_seconds": {
+        "mean_delta_vs_rule": 10.5477077839135,
+        "ci95_low": 0.6645568440887942,
+        "ci95_high": 20.795605083843252
+      },
+      "total_transfer_mb": {
+        "mean_delta_vs_rule": 310.6477301666667,
+        "ci95_low": 38.934138482638886,
+        "ci95_high": 594.9464993701387
+      },
+      "recompute_seconds": {
+        "mean_delta_vs_rule": 16.7038502759135,
+        "ci95_low": 5.336770060309745,
+        "ci95_high": 28.684301146488117
+      },
+      "handoff_failure_rate": {
+        "mean_delta_vs_rule": 0.017361111111111095,
+        "ci95_low": -0.3055555555555556,
+        "ci95_high": 0.28480902777777656
+      },
+      "reward": {
+        "mean_delta_vs_rule": -23.516251022419493,
+        "ci95_low": -34.55337480495589,
+        "ci95_high": -13.619775882162566
+      }
+    }
+  },
+  "bootstrap_draws": 5000
+}
