@@ -5,6 +5,19 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-06：SA-GHMAPPO 执行动作 likelihood 身份错误（CONFIRMED FIRST-FIX BLOCKER）
+
+- `CONFIRMED`：真实采样是 mask 后五动作 env distribution；3×2×2 pushforward 守恒且与采样 log-prob 一致。
+  rollout/PPO 却保存并更新单一 canonical head tuple；142/147 诊断步不一致，最大概率差 `.405241`。
+- `DIRECT LOOP`：失败只推进 `step_index/clock`，mobility 由未变化的 `node_index` 派生；60 个 failure 步 position、contact
+  和未来 RSU 不推进。首个见证连续两次 action 4，只把 target 准备好，current node 仍无法服务。
+- `SECONDARY`：deadline 只在完成时结算，外部截断未完成无终局代价；flat occupancy 还存在 adapter-count/byte-capacity
+  单位错误，graph encoder 不消费 byte occupancy。两者是明确 blocker，但未量化为历史 completion gap 主因。
+- `NOT SUPPORTED`：四个冻结 DAG 配对在深度 3 合法枚举、立即/两步规则和 SA 上均无首动作翻转；当前不以扩 DAG、
+  增加节点或新算法作为修复。
+- `NEXT`：只修 executed env-action identity、summed likelihood 和 PPO ratio/entropy；不同时改 reward、网络、数据或 guard。
+  修后重训须另立冻结任务。证据见 `sa_ghmappo_completion_root_cause_diagnosis_20261006.md`。
+
 ## 2026-10-06：校准 pilot 中 SA-GHMAPPO action-4 过度激活（OPEN ALGORITHM CLAIM BLOCKER）
 
 - `NEGATIVE`：冻结匹配训练不支持主方法优势。SA-GHMAPPO 12-window completion `0.528`，相对 two-step rule 差

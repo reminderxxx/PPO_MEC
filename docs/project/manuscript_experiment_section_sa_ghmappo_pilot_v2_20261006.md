@@ -32,9 +32,10 @@ legal state--action pairs. Every checked state had at least two different one-st
 numerical discrepancy, the semantic state contained no actual-rate field, and the immediate and two-step rules disagreed in 406 states. This
 diagnostic establishes only that the pilot is not trivially action-invariant; it does not establish an RL advantage.
 
-A post-run, read-only interface audit found that the intended matching was not achieved. The hierarchical PPO loss uses canonical controller-head
-log probabilities, whereas the executed action is sampled or selected from a masked five-action distribution. The deterministic aggregation also
-concentrates the event-prepare probability on action 4 while distributing event-keep probability across actions 0--3. In addition, mobility remains
+A post-run, read-only interface audit found that the intended matching was not achieved. A subsequent exhaustive 3-by-2-by-2 action audit showed
+that the masked five-action pushforward distribution is normalized and matches the sampler; deterministic environment-action argmax is therefore
+valid for the declared environment-action policy. The defect is instead that the hierarchical PPO loss and rollout buffer use one canonical
+controller-head tuple probability rather than the summed likelihood of the executed environment action. In addition, mobility remains
 derived from completed-node index and therefore freezes after a service failure. Finally, the flat and graph encoders do not consume the exposed
 byte-capacity, typed-base dependency, link, state-size, and model-size fields on an equal basis; the flat occupancy feature divides an adapter count
 by a byte capacity. The cost rules do not read the actual future rate, but they do possess an exact transition clone and a lexicographic objective,
@@ -90,3 +91,20 @@ intervals. It lacks formal/hidden holdout and support runs, BCa or multiplicity-
 persistent cache, a real adapter-request trace, and real-RSU deployment. Any future experiment must first pre-register and validate a minimal
 executed-action PPO contract, decision-step mobility progression, and equal public-feature profile for all learned baselines. It must preserve this
 artifact and must not select scenarios using the present evaluation outcomes.
+
+### 2026-10-06 root-cause diagnostic amendment
+
+A bounded follow-up used the three selected checkpoints on three manifest-order train instances, three seeds, and deterministic/stochastic policy
+modes (18 episodes, 147 steps; no training or retry). The enumerated pushforward probability matched the implementation within `5.75e-8`, and the
+reported environment-action log probability matched the sampled action within `2.77e-7`. By contrast, the buffer's canonical-head probability
+differed from the executed-action probability in 142/147 steps, with a maximum absolute error of `0.405241`. The first failure witness sampled
+action 4 with executed probability `0.226404` but stored `0.049746`; the target adapter became ready while the current-node bundle remained missing,
+and the next decision repeated action 4 with position and contact budget unchanged. Across the diagnostic, 60 service-failure steps did not advance
+mobility. This establishes an execution-identity/credit-assignment defect plus a failure-loop condition, not their post-retraining effect size.
+
+The reward recomputation was exact, but deadline cost is applied only on completed workflows and an externally truncated incomplete workflow has no
+terminal incomplete/deadline cost. Six fixed scoring cases therefore rank a low-transfer 4/5-node incomplete path (`6.4`) above a complete path with
+two interruptions (`3.0`) and a late complete path (`-0.6`). Four frozen remaining-dependency pairs consumed 1,277 depth-three branches and produced
+no first-action change for the exact bounded enumerator, immediate rule, two-step rule, or SA policy. Thus the present contract does not establish
+incremental DAG-reasoning value. Full evidence and limits are recorded in
+`sa_ghmappo_completion_root_cause_diagnosis_20261006.md`; the pilot remains descriptive and paper-ready remains `Unverifiable`.

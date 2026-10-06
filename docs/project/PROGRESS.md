@@ -5,6 +5,20 @@
 
 ﻿# Progress
 
+## 2026-10-06：SA-GHMAPPO 完成率根因已作有界只读定位
+
+- 在 `728040c…` 的独立 worktree 中复用 v2 原 checkpoint；按 manifest 顺序固定 3 个 train 实例、3 seeds 和两种
+  sampling mode，完成 18 episode/147 step，无训练、重试、模型调用、下载、formal/holdout。
+- 3×2×2 枚举确认 env-action pushforward 与采样概率一致；真正接口错误是 buffer/PPO 使用 canonical head tuple
+  likelihood。142/147 步与执行动作概率不一致，最大差 `.405241`；不能再把 deterministic env argmax 本身记为概率 bug。
+- 首个失败见证中 action 4 只准备 target，current bundle 仍缺失；`node_index` 不变使 position/contact/RSU sequence
+  冻结，下一步重复 action 4。诊断中 60 个 service-failure 步没有 mobility 推进。
+- 六个 reward 案例确认 incomplete/timeout 终局缺口；四对 DAG 诊断、深度 3、1,277 branches 均无合理首动作翻转，
+  当前不支持优先扩 DAG/新算法。下一轮只允许先修 executed-action likelihood/identity 接口。
+- 报告：`sa_ghmappo_completion_root_cause_diagnosis_20261006.md`；artifact：
+  `artifacts/analysis/sa_ghmappo_completion_root_cause_20261006_v1/`。证据仍是 non-formal diagnostic，paper-ready
+  为 `Unverifiable`。
+
 ## 2026-10-06：实测校准连续工作流小规模匹配训练完成，未观察到 SA-GHMAPPO 优势
 
 - 从成本纠错 clean `d67575b…` 建立隔离工作区；主工作区七个用户修改未暂存、覆盖、stash 或提交。冻结

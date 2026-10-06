@@ -5,6 +5,18 @@
 
 # Artifact Records
 
+## 2026-10-06 SA-GHMAPPO completion root-cause diagnosis
+
+- root：`artifacts/analysis/sa_ghmappo_completion_root_cause_20261006_v1/`；诊断基线 commit `728040c…`，原 pilot
+  source commit `b418eb4…`；三个 selected checkpoint/config/manifest 均按原 integrity hash 校验。
+- 固定 3 manifest-order train instances × 3 seeds × deterministic/stochastic=`18` episodes、147 steps；reward cases=`6`，
+  DAG pairs=`4`、depth=`3`、branches=`1,277/2,048`；training/model generate/download/old holdout/retry 均 0。
+- env pushforward/sampled log-prob 正确；canonical buffer probability 在 142/147 步与执行动作概率不符。60 个 service
+  failures 无 mobility progress。奖励有 incomplete/deadline truncation 缺口；4/4 DAG pairs 无合理首动作变化。
+- integrity manifest SHA-256=`40d2a95a9cf6df24bbccf55b2f82c39283d81bf1470cb810355f852085349994`；不含
+  checkpoint、原始数据或权重。Evidence level=`E1_DOCUMENTED_WITH_REPRODUCIBLE_NONFORMAL_DIAGNOSIS`，非排名、
+  formal/holdout、修复后验证或 paper-ready。报告见 `sa_ghmappo_completion_root_cause_diagnosis_20261006.md`。
+
 ## 2026-10-06 calibrated continuous-workflow v2 fair-training pilot
 
 - root：`artifacts/calibrated_continuous_workflow_pilot_v2_20261006/`；run source commit `b418eb4…`，纠正祖先

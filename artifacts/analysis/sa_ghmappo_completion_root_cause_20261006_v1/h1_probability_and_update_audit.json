@@ -1,0 +1,784 @@
+{
+  "episode_count": 18,
+  "step_count": 147,
+  "max_episode_budget": 18,
+  "max_step_budget": 24,
+  "max_pushforward_probability_error": 5.74953190612959e-08,
+  "max_env_log_prob_error": 2.7723178153138406e-07,
+  "max_buffer_log_prob_error": 0.4052411305906327,
+  "buffer_log_prob_mismatch_step_count": 142,
+  "head_argmax_vs_env_argmax_step_count": 55,
+  "failure_without_mobility_progress_count": 60,
+  "first_failure_witness": {
+    "episode_identity": {
+      "category": "current_model_ready",
+      "design_id": "train_00",
+      "split": "train",
+      "seed": 7,
+      "sampling_seed": 7002,
+      "mode": "fixed_env_sample"
+    },
+    "step": {
+      "step": 2,
+      "node_id": "2",
+      "completed_node_ids_before": [
+        "1",
+        "4"
+      ],
+      "current_rsu_id": "rsu_0",
+      "target_rsu_id": "rsu_1",
+      "required_base_model": "base:family_a",
+      "required_adapter": "alpr",
+      "current_bundle_ready": false,
+      "target_bundle_ready_before": false,
+      "action_mask": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "policy_snapshot": {
+        "raw_head_logits": {
+          "slow": [
+            0.17518778145313263,
+            0.5062112212181091,
+            -1.024696707725525
+          ],
+          "fast": [
+            0.16846147179603577,
+            -0.2031630277633667
+          ],
+          "event": [
+            0.558775007724762,
+            -0.6699525117874146
+          ]
+        },
+        "raw_head_probabilities": {
+          "slow": [
+            0.37124741077423096,
+            0.516922116279602,
+            0.11183050274848938
+          ],
+          "fast": [
+            0.5918514728546143,
+            0.40814855694770813
+          ],
+          "event": [
+            0.7735957503318787,
+            0.22640419006347656
+          ]
+        },
+        "independent_head_argmax": {
+          "slow": 1,
+          "fast": 0,
+          "event": 0
+        },
+        "independent_head_argmax_action": 0,
+        "independent_head_argmax_reason": "slow_head_cache_fill",
+        "pushforward": {
+          "unmasked_env_probabilities": [
+            0.3998887643240749,
+            0.0865116042619555,
+            0.11721839594792309,
+            0.16997703190782576,
+            0.2264042035582181
+          ],
+          "masked_env_probabilities": [
+            0.39988876432407594,
+            0.08651160426195574,
+            0.11721839594792341,
+            0.1699770319078262,
+            0.22640420355821872
+          ],
+          "contributions": {
+            "0": [
+              {
+                "head_actions": {
+                  "slow": 1,
+                  "fast": 0,
+                  "event": 0
+                },
+                "probability": 0.23667474708975833,
+                "reason": "slow_head_cache_fill"
+              },
+              {
+                "head_actions": {
+                  "slow": 1,
+                  "fast": 1,
+                  "event": 0
+                },
+                "probability": 0.16321401723431656,
+                "reason": "slow_head_cache_fill"
+              }
+            ],
+            "1": [
+              {
+                "head_actions": {
+                  "slow": 2,
+                  "fast": 0,
+                  "event": 0
+                },
+                "probability": 0.051202018875514815,
+                "reason": "slow_head_prefetch"
+              },
+              {
+                "head_actions": {
+                  "slow": 2,
+                  "fast": 1,
+                  "event": 0
+                },
+                "probability": 0.03530958538644069,
+                "reason": "slow_head_prefetch"
+              }
+            ],
+            "2": [
+              {
+                "head_actions": {
+                  "slow": 0,
+                  "fast": 1,
+                  "event": 0
+                },
+                "probability": 0.11721839594792309,
+                "reason": "fast_head_vehicle_fallback"
+              }
+            ],
+            "3": [
+              {
+                "head_actions": {
+                  "slow": 0,
+                  "fast": 0,
+                  "event": 0
+                },
+                "probability": 0.16997703190782576,
+                "reason": "fast_head_steady_offload"
+              }
+            ],
+            "4": [
+              {
+                "head_actions": {
+                  "slow": 0,
+                  "fast": 0,
+                  "event": 1
+                },
+                "probability": 0.049746281855833976,
+                "reason": "event_head_prepare"
+              },
+              {
+                "head_actions": {
+                  "slow": 0,
+                  "fast": 1,
+                  "event": 1
+                },
+                "probability": 0.03430568999861246,
+                "reason": "event_head_prepare"
+              },
+              {
+                "head_actions": {
+                  "slow": 1,
+                  "fast": 0,
+                  "event": 1
+                },
+                "probability": 0.06926635054593677,
+                "reason": "event_head_prepare"
+              },
+              {
+                "head_actions": {
+                  "slow": 1,
+                  "fast": 1,
+                  "event": 1
+                },
+                "probability": 0.047766986004109904,
+                "reason": "event_head_prepare"
+              },
+              {
+                "head_actions": {
+                  "slow": 2,
+                  "fast": 0,
+                  "event": 1
+                },
+                "probability": 0.01498502494119514,
+                "reason": "event_head_prepare"
+              },
+              {
+                "head_actions": {
+                  "slow": 2,
+                  "fast": 1,
+                  "event": 1
+                },
+                "probability": 0.01033387021252984,
+                "reason": "event_head_prepare"
+              }
+            ]
+          }
+        },
+        "declared_env_action_probabilities": [
+          0.3998887538909912,
+          0.08651161193847656,
+          0.11721840500831604,
+          0.16997705399990082,
+          0.22640419006347656
+        ],
+        "declared_env_action_argmax": 0,
+        "max_pushforward_error": 2.209207461412177e-08
+      },
+      "reported_raw_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "reported_projected_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "reported_final_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "raw_env_action": 4,
+      "projected_env_action": 4,
+      "executed_env_action": 4,
+      "aggregation_reason": "event_head_prepare",
+      "projection_applied": false,
+      "guard_action_delta": false,
+      "buffer_log_prob": -3.000819,
+      "env_action_log_prob": -1.485433,
+      "declared_executed_action_probability": 0.22640419006347656,
+      "exp_buffer_log_prob": 0.049746309451925035,
+      "exp_env_action_log_prob": 0.2264042863932402,
+      "buffer_vs_executed_probability_error": 0.17665788061155152,
+      "env_log_prob_vs_executed_probability_error": 9.63297636380478e-08,
+      "ppo_update_identity": {
+        "stored_action": 4,
+        "stored_head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "stored_log_prob_source": "weighted_canonical_head_log_prob",
+        "stored_env_action_log_prob_available": true,
+        "env_action_ppo_enabled": false,
+        "env_action_ppo_coef": 0.0
+      },
+      "reward": -3.389234010615599,
+      "value": -1.3494352102279663,
+      "terminated": false,
+      "truncated": false,
+      "transition": {
+        "step_index": 2,
+        "node_id": "2",
+        "action": 4,
+        "action_name": "handoff_migration_prepare",
+        "current_rsu_id": "rsu_0",
+        "predicted_handoff_target_rsu_id": "rsu_1",
+        "handoff": false,
+        "cache_events": [
+          {
+            "rsu_id": "rsu_1",
+            "adapter_id": "alpr",
+            "committed": true,
+            "reason": "committed",
+            "victims": [
+              "adapter:helmet_shared"
+            ],
+            "admitted": [
+              "adapter:alpr"
+            ],
+            "transfer_bytes": 154423432,
+            "load_seconds": 0.711175,
+            "before_residents": [
+              "base:family_a",
+              "adapter:helmet_shared"
+            ],
+            "after_residents": [
+              "base:family_a",
+              "adapter:alpr"
+            ],
+            "before_last_used": {
+              "base:family_a": 0,
+              "adapter:helmet_shared": 1
+            }
+          }
+        ],
+        "state_transfer": {
+          "status": "staged_pending_current_node_completion",
+          "target_rsu_id": "rsu_1",
+          "bytes": 2744
+        },
+        "service_completed": false,
+        "state_ready": true,
+        "migration_success": false,
+        "model_transfer_bytes": 154423432,
+        "state_transfer_bytes": 0,
+        "input_transfer_bytes": 0,
+        "recompute_seconds": 0.0,
+        "model_load_seconds": 0.711175,
+        "state_restore_seconds": 0.0,
+        "transfer_seconds": 1.255387456,
+        "step_cost_seconds": 3.966562456,
+        "reward": -3.389234010615599,
+        "reward_components": {
+          "reward_node_completion": 0.0,
+          "reward_workflow_completion": 0.0,
+          "reward_time_penalty": -0.31732499648,
+          "reward_transfer_penalty": -0.07190901413559914,
+          "reward_failure_penalty": -3.0,
+          "reward_deadline_penalty": 0.0
+        }
+      },
+      "outcomes": {
+        "node_completed": false,
+        "state_ready": true,
+        "state_restored_seconds": 0.0,
+        "service_failure": true,
+        "migration_success": false
+      },
+      "exogenous_progress": {
+        "step_index_before": 2,
+        "step_index_after": 3,
+        "node_index_before": 2,
+        "node_index_after": 2,
+        "clock_seconds_before": 8.024617112,
+        "clock_seconds_after": 11.991179568,
+        "contact_budget_seconds_before": 5.0,
+        "contact_budget_seconds_after": 5.0,
+        "vehicle_position_before": 20.0,
+        "vehicle_position_after": 20.0,
+        "predicted_sequence_before": [
+          "rsu_1",
+          "rsu_1",
+          "rsu_1",
+          "rsu_1"
+        ],
+        "predicted_sequence_after": [
+          "rsu_1",
+          "rsu_1",
+          "rsu_1",
+          "rsu_1"
+        ],
+        "mobility_advanced": false
+      },
+      "advantage": -9.32249167035267,
+      "return": -10.671926880580637
+    },
+    "next_step": {
+      "step": 3,
+      "node_id": "2",
+      "completed_node_ids_before": [
+        "1",
+        "4"
+      ],
+      "current_rsu_id": "rsu_0",
+      "target_rsu_id": "rsu_1",
+      "required_base_model": "base:family_a",
+      "required_adapter": "alpr",
+      "current_bundle_ready": false,
+      "target_bundle_ready_before": true,
+      "action_mask": [
+        true,
+        false,
+        true,
+        true,
+        true
+      ],
+      "policy_snapshot": {
+        "raw_head_logits": {
+          "slow": [
+            0.17767854034900665,
+            0.5075967311859131,
+            -1.02519690990448
+          ],
+          "fast": [
+            0.17660221457481384,
+            -0.20584993064403534
+          ],
+          "event": [
+            0.559673547744751,
+            -0.6697652339935303
+          ]
+        },
+        "raw_head_probabilities": {
+          "slow": [
+            0.3715837299823761,
+            0.5168188214302063,
+            0.11159751564264297
+          ],
+          "fast": [
+            0.5944643616676331,
+            0.40553557872772217
+          ],
+          "event": [
+            0.773720383644104,
+            0.22627967596054077
+          ]
+        },
+        "independent_head_argmax": {
+          "slow": 1,
+          "fast": 0,
+          "event": 0
+        },
+        "independent_head_argmax_action": 0,
+        "independent_head_argmax_reason": "slow_head_cache_fill",
+        "pushforward": {
+          "unmasked_env_probabilities": [
+            0.3998732329571695,
+            0.08634526747017532,
+            0.11659225188283413,
+            0.17090963709858806,
+            0.2262796776464548
+          ],
+          "masked_env_probabilities": [
+            0.4376633638205364,
+            0.0,
+            0.12761083500659842,
+            0.18706149978767678,
+            0.2476643013851883
+          ],
+          "contributions": {
+            "0": [
+              {
+                "head_actions": {
+                  "slow": 1,
+                  "fast": 0,
+                  "event": 0
+                },
+                "probability": 0.23771040034650046,
+                "reason": "slow_head_cache_fill"
+              },
+              {
+                "head_actions": {
+                  "slow": 1,
+                  "fast": 1,
+                  "event": 0
+                },
+                "probability": 0.16216283261066902,
+                "reason": "slow_head_cache_fill"
+              }
+            ],
+            "1": [
+              {
+                "head_actions": {
+                  "slow": 2,
+                  "fast": 0,
+                  "event": 0
+                },
+                "probability": 0.05132918736913679,
+                "reason": "slow_head_prefetch"
+              },
+              {
+                "head_actions": {
+                  "slow": 2,
+                  "fast": 1,
+                  "event": 0
+                },
+                "probability": 0.03501608010103853,
+                "reason": "slow_head_prefetch"
+              }
+            ],
+            "2": [
+              {
+                "head_actions": {
+                  "slow": 0,
+                  "fast": 1,
+                  "event": 0
+                },
+                "probability": 0.11659225188283413,
+                "reason": "fast_head_vehicle_fallback"
+              }
+            ],
+            "3": [
+              {
+                "head_actions": {
+                  "slow": 0,
+                  "fast": 0,
+                  "event": 0
+                },
+                "probability": 0.17090963709858806,
+                "reason": "fast_head_steady_offload"
+              }
+            ],
+            "4": [
+              {
+                "head_actions": {
+                  "slow": 0,
+                  "fast": 0,
+                  "event": 1
+                },
+                "probability": 0.049983660917729045,
+                "reason": "event_head_prepare"
+              },
+              {
+                "head_actions": {
+                  "slow": 0,
+                  "fast": 1,
+                  "event": 1
+                },
+                "probability": 0.03409818008322353,
+                "reason": "event_head_prepare"
+              },
+              {
+                "head_actions": {
+                  "slow": 1,
+                  "fast": 0,
+                  "event": 1
+                },
+                "probability": 0.06951998874518268,
+                "reason": "event_head_prepare"
+              },
+              {
+                "head_actions": {
+                  "slow": 1,
+                  "fast": 1,
+                  "event": 1
+                },
+                "probability": 0.047425599727852305,
+                "reason": "event_head_prepare"
+              },
+              {
+                "head_actions": {
+                  "slow": 2,
+                  "fast": 0,
+                  "event": 1
+                },
+                "probability": 0.015011562485277253,
+                "reason": "event_head_prepare"
+              },
+              {
+                "head_actions": {
+                  "slow": 2,
+                  "fast": 1,
+                  "event": 1
+                },
+                "probability": 0.010240685687190007,
+                "reason": "event_head_prepare"
+              }
+            ]
+          }
+        },
+        "declared_env_action_probabilities": [
+          0.43766340613365173,
+          0.0,
+          0.12761083245277405,
+          0.18706148862838745,
+          0.24766431748867035
+        ],
+        "declared_env_action_argmax": 0,
+        "max_pushforward_error": 4.231311534486082e-08
+      },
+      "reported_raw_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "reported_projected_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "reported_final_head_actions": {
+        "slow": 0,
+        "fast": 0,
+        "event": 1
+      },
+      "raw_env_action": 4,
+      "projected_env_action": 4,
+      "executed_env_action": 4,
+      "aggregation_reason": "event_head_prepare",
+      "projection_applied": false,
+      "guard_action_delta": false,
+      "buffer_log_prob": -2.996059,
+      "env_action_log_prob": -1.395681,
+      "declared_executed_action_probability": 0.24766431748867035,
+      "exp_buffer_log_prob": 0.0499836663461632,
+      "exp_env_action_log_prob": 0.24766431952406814,
+      "buffer_vs_executed_probability_error": 0.19768065114250716,
+      "env_log_prob_vs_executed_probability_error": 2.0353977947529245e-09,
+      "ppo_update_identity": {
+        "stored_action": 4,
+        "stored_head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "stored_log_prob_source": "weighted_canonical_head_log_prob",
+        "stored_env_action_log_prob_available": true,
+        "env_action_ppo_enabled": false,
+        "env_action_ppo_coef": 0.0
+      },
+      "reward": -3.16,
+      "value": -1.346886157989502,
+      "terminated": false,
+      "truncated": false,
+      "transition": {
+        "step_index": 3,
+        "node_id": "2",
+        "action": 4,
+        "action_name": "handoff_migration_prepare",
+        "current_rsu_id": "rsu_0",
+        "predicted_handoff_target_rsu_id": "rsu_1",
+        "handoff": false,
+        "cache_events": [
+          {
+            "rsu_id": "rsu_1",
+            "adapter_id": "alpr",
+            "committed": true,
+            "reason": "noop_all_resident",
+            "victims": [],
+            "admitted": [],
+            "transfer_bytes": 0,
+            "load_seconds": 0.0,
+            "before_residents": [
+              "base:family_a",
+              "adapter:alpr"
+            ],
+            "after_residents": [
+              "base:family_a",
+              "adapter:alpr"
+            ],
+            "before_last_used": {
+              "base:family_a": 0,
+              "adapter:alpr": 2
+            }
+          }
+        ],
+        "state_transfer": {
+          "status": "staged_pending_current_node_completion",
+          "target_rsu_id": "rsu_1",
+          "bytes": 2744
+        },
+        "service_completed": false,
+        "state_ready": true,
+        "migration_success": false,
+        "model_transfer_bytes": 0,
+        "state_transfer_bytes": 0,
+        "input_transfer_bytes": 0,
+        "recompute_seconds": 0.0,
+        "model_load_seconds": 0.0,
+        "state_restore_seconds": 0.0,
+        "transfer_seconds": 0.0,
+        "step_cost_seconds": 2.0,
+        "reward": -3.16,
+        "reward_components": {
+          "reward_node_completion": 0.0,
+          "reward_workflow_completion": 0.0,
+          "reward_time_penalty": -0.16,
+          "reward_transfer_penalty": -0.0,
+          "reward_failure_penalty": -3.0,
+          "reward_deadline_penalty": 0.0
+        }
+      },
+      "outcomes": {
+        "node_completed": false,
+        "state_ready": true,
+        "state_restored_seconds": 0.0,
+        "service_failure": true,
+        "migration_success": false
+      },
+      "exogenous_progress": {
+        "step_index_before": 3,
+        "step_index_after": 4,
+        "node_index_before": 2,
+        "node_index_after": 2,
+        "clock_seconds_before": 11.991179568,
+        "clock_seconds_after": 13.991179568,
+        "contact_budget_seconds_before": 5.0,
+        "contact_budget_seconds_after": 5.0,
+        "vehicle_position_before": 20.0,
+        "vehicle_position_after": 20.0,
+        "predicted_sequence_before": [
+          "rsu_1",
+          "rsu_1",
+          "rsu_1",
+          "rsu_1"
+        ],
+        "predicted_sequence_after": [
+          "rsu_1",
+          "rsu_1",
+          "rsu_1",
+          "rsu_1"
+        ],
+        "mobility_advanced": false
+      },
+      "advantage": -6.325651859176428,
+      "return": -7.67253801716593
+    }
+  },
+  "negative_advantage_update_witness": {
+    "available": true,
+    "episode_identity": {
+      "category": "current_model_ready",
+      "design_id": "train_00",
+      "split": "train",
+      "seed": 7,
+      "sampling_seed": 7002,
+      "mode": "fixed_env_sample"
+    },
+    "step": 2,
+    "diagnostic_advantage": -9.32249167035267,
+    "executed_env_action": 4,
+    "canonical_head_targets": {
+      "slow": 0,
+      "fast": 0,
+      "event": 1
+    },
+    "learning_rate_for_local_sign_check": 0.05,
+    "before_env_probabilities": [
+      0.39988875109749117,
+      0.08651159552146553,
+      0.11721839901651768,
+      0.16997703719045504,
+      0.22640421717407055
+    ],
+    "canonical_head_loss": {
+      "gradients": {
+        "slow": [
+          0.628752582960246,
+          -0.5169220928747903,
+          -0.1118304900854558
+        ],
+        "fast": [
+          0.4081485436002612,
+          -0.4081485436002613
+        ],
+        "event": [
+          -0.7735957828259294,
+          0.7735957828259294
+        ]
+      },
+      "after_env_probabilities": [
+        0.4162815665337859,
+        0.08825226532179965,
+        0.11802367540342909,
+        0.16430014187452663,
+        0.21314235086645866
+      ]
+    },
+    "executed_env_action_loss": {
+      "gradients": {
+        "slow": [
+          0.0,
+          5.551115123125783e-17,
+          -1.3877787807814457e-17
+        ],
+        "fast": [
+          5.551115123125783e-17,
+          0.0
+        ],
+        "event": [
+          -0.7735957828259294,
+          0.7735957828259294
+        ]
+      },
+      "after_env_probabilities": [
+        0.4067441027846476,
+        0.08799467653009357,
+        0.11922789127469764,
+        0.17289097854410257,
+        0.21314235086645864
+      ]
+    },
+    "interpretation": "The configured PPO loss uses the canonical reverse-mapped head tuple. An executed-action loss uses the summed pushforward probability instead."
+  }
+}

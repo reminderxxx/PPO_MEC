@@ -1,0 +1,12 @@
+{
+  "status": "complete",
+  "diagnostic_only": true,
+  "episode_count": 18,
+  "reward_case_count": 6,
+  "dag_pair_count": 4,
+  "new_training": 0,
+  "real_model_generate": 0,
+  "downloads": 0,
+  "old_holdout": 0,
+  "automatic_retries": 0
+}

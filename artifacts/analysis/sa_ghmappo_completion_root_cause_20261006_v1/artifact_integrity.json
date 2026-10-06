@@ -1,0 +1,45 @@
+{
+  "schema_version": "artifact_integrity_v1",
+  "files": [
+    {
+      "path": "metadata.json",
+      "sha256": "7aa71e294369234c6422b03a38d5ae5e9dbf1c15407b03a01112ed1a8052aa0e",
+      "bytes": 3207
+    },
+    {
+      "path": "h1_episode_traces.json",
+      "sha256": "51593b31f9cbe3d29a25165b7090c0cc9c5be78e9566cd987798f4edddde50ba",
+      "bytes": 1555673
+    },
+    {
+      "path": "h1_probability_and_update_audit.json",
+      "sha256": "6e91b25b74b8ea905b32094ed306d49e53f1af4c279a652690ac63d32fe6a6c1",
+      "bytes": 22501
+    },
+    {
+      "path": "h2_reward_audit.json",
+      "sha256": "f28d18f5b0f021ee9114715d256492abc82d88430b5b71271813a244e29df47b",
+      "bytes": 4739
+    },
+    {
+      "path": "h3_dag_information_value_audit.json",
+      "sha256": "49d78ed6fd6e3f4fc73f99d681109a8eb771d7ed2073c3f34476c12d78230a16",
+      "bytes": 41168
+    },
+    {
+      "path": "encoder_unit_adaptation_audit.json",
+      "sha256": "0c3f285bc39fdd215870ea48667de462958dc89d304de885beae2d9b2a442228",
+      "bytes": 894
+    },
+    {
+      "path": "planner_permission_audit.json",
+      "sha256": "2ad008248214e9261f4c7fc708d7ceac0697e200c62df45304ff9eca7b1fa75b",
+      "bytes": 1383
+    },
+    {
+      "path": "completion_receipt.json",
+      "sha256": "29c4384ec31df7bd7115b4b3e850e6f9402bf69855449fe72017647d11e64611",
+      "bytes": 239
+    }
+  ]
+}

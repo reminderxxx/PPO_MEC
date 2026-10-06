@@ -1,0 +1,75 @@
+{
+  "schema_version": "sa_ghmappo_completion_root_cause_diagnosis_v1",
+  "diagnosis_git_commit": "728040c55866a3dd27e5091fd8f2186050179e2d",
+  "input_verification": {
+    "run_source_git_commit": "b418eb4dbfa012e271cb97880693c714e6abf79e",
+    "config": {
+      "path": "/Users/howen/.codex/worktrees/sa-ghmappo-root-cause/PPO_MEC/configs/experiment/calibrated_continuous_workflow_pilot_v2.json",
+      "sha256": "97602564854e5e69e4f6c30566c1b9522ac45c1e17e6b2ad28da1a1b721c0526"
+    },
+    "manifest": {
+      "path": "/Users/howen/.codex/worktrees/sa-ghmappo-root-cause/PPO_MEC/configs/experiment/calibrated_continuous_workflow_pilot_v2_manifest.json",
+      "sha256": "f6aaea9aeb864409e42baf5a4c501634874fa8d547b207bd81e176871df5026b"
+    },
+    "pilot_artifact_root": "/Users/howen/.codex/worktrees/calibrated-workflow-training/PPO_MEC/artifacts/calibrated_continuous_workflow_pilot_v2_20261006",
+    "selected_checkpoints": {
+      "7": {
+        "path": "/Users/howen/.codex/worktrees/calibrated-workflow-training/PPO_MEC/artifacts/calibrated_continuous_workflow_pilot_v2_20261006/checkpoints/sa_ghmappo_seed7_selected.pt",
+        "sha256": "4ceae4388052faf43f1d7702b5763185e965e3ecb93e3f56462d11006239c8bb",
+        "bytes": 2090667
+      },
+      "17": {
+        "path": "/Users/howen/.codex/worktrees/calibrated-workflow-training/PPO_MEC/artifacts/calibrated_continuous_workflow_pilot_v2_20261006/checkpoints/sa_ghmappo_seed17_selected.pt",
+        "sha256": "43b12fd097a1687e98437b3b86156f3b0b44a8edbbe1eb9cdc49026a7ab4f64b",
+        "bytes": 2090913
+      },
+      "29": {
+        "path": "/Users/howen/.codex/worktrees/calibrated-workflow-training/PPO_MEC/artifacts/calibrated_continuous_workflow_pilot_v2_20261006/checkpoints/sa_ghmappo_seed29_selected.pt",
+        "sha256": "c5dc06fca114542deb1c421a59e25b89fd0149aff5c603a8ff260b21e2e6b994",
+        "bytes": 2090913
+      }
+    }
+  },
+  "selected_instances": [
+    {
+      "category": "current_model_ready",
+      "design_id": "train_00",
+      "split": "train",
+      "current_ready": true,
+      "contact_budget_seconds": 15.0,
+      "target_rsu_id": "rsu_1",
+      "selection_rule": "first manifest-order match; imminent uses first minimum-contact distinct instance"
+    },
+    {
+      "category": "current_model_missing",
+      "design_id": "train_05",
+      "split": "train",
+      "current_ready": false,
+      "contact_budget_seconds": 10.0,
+      "target_rsu_id": "rsu_1",
+      "selection_rule": "first manifest-order match; imminent uses first minimum-contact distinct instance"
+    },
+    {
+      "category": "imminent_handoff_min_contact",
+      "design_id": "train_02",
+      "split": "train",
+      "current_ready": true,
+      "contact_budget_seconds": 10.0,
+      "target_rsu_id": "rsu_1",
+      "selection_rule": "first manifest-order match; imminent uses first minimum-contact distinct instance"
+    }
+  ],
+  "budgets": {
+    "new_training": 0,
+    "real_model_generate": 0,
+    "downloads": 0,
+    "old_holdout": 0,
+    "diagnostic_episodes": 18,
+    "episode_step_cap": 24,
+    "reward_unit_cases": 6,
+    "dag_pair_count": 4,
+    "dag_enumeration_depth": 3,
+    "dag_branch_cap": 2048,
+    "automatic_retries": 0
+  }
+}

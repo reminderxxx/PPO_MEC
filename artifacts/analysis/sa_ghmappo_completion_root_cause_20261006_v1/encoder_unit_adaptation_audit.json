@@ -1,0 +1,30 @@
+{
+  "design_id": "train_00",
+  "current_rsu_id": "rsu_0",
+  "cache_capacity_value": 1169449264.0,
+  "cache_capacity_unit": "bytes",
+  "cache_used_bytes_value": 1024667776,
+  "cache_used_bytes_unit": "bytes",
+  "adapter_count": 1,
+  "true_used_fraction": 0.8761968625258804,
+  "flat_critic_implemented_fraction": 8.551033642789997e-10,
+  "observation_used_fraction": 0.8761968612670898,
+  "single_field_perturbation_max_abs_diff": {
+    "cache_capacity_x2": {
+      "flat_actor": 0.0,
+      "flat_centralized": 1.4251722024738456e-10,
+      "graph_shared": 0.0
+    },
+    "cache_used_bytes_half": {
+      "flat_actor": 0.0,
+      "flat_centralized": 0.0,
+      "graph_shared": 0.0
+    },
+    "adapter_count_plus_one": {
+      "flat_actor": 0.0,
+      "flat_centralized": 8.551033769954586e-10,
+      "graph_shared": 0.0011725425720214844
+    }
+  },
+  "agent_consumes_array_observation": false
+}

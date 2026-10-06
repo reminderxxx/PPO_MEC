@@ -9,6 +9,11 @@
 
 ## Live 文档
 
+- `sa_ghmappo_completion_root_cause_diagnosis_20261006.md`：18-episode 冻结 checkpoint 失败循环、环境动作
+  likelihood/PPO 身份、6 个奖励计分案例、4 对 DAG 信息价值、encoder 单位与 planner 权限审计；只读 non-formal 诊断
+- `sa_ghmappo_innovation_fair_training_v2_20261006.md`：校准连续工作流 v2 公平训练原件、负结果、接口 blocker 与
+  paper-ready 边界
+
 - `recovery_cost_defect_impact_report_20261006.md`：修复前独立只读审查，追踪 decision、branch execution、cache
   终态、汇总和 claim 的路径不对称影响，并列明仍有效证据
 - `recovery_cost_corrected_matrix_results_20261006.md`：原 12 点对称公平复算、四方法完整旧→新对照及历史优势撤销

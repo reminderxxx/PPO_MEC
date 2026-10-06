@@ -1,0 +1,28 @@
+{
+  "clone_primitive": "deepcopy of full CalibratedContinuousWorkflowEnv internal state",
+  "retained_internal_state": [
+    "full frozen instance including all future nodes, edges, execution_order and rsu_sequence",
+    "all typed-cache residents/LRU stamps/capacities",
+    "completed set, node_index, step_index, clock, last execution RSU and prepared state",
+    "exact deterministic transition and cost implementation"
+  ],
+  "decision_time_estimate_boundary": {
+    "link_rate": "estimated_mbps via clone_for_decision_model",
+    "actual_mbps_used_by_preview": false,
+    "mobility": "exact frozen future rsu_sequence is retained; no separate estimated sequence is present",
+    "future_workflow_demand": "full exact frozen DAG, order, model demands and costs are retained"
+  },
+  "objective": [
+    "maximize completed nodes",
+    "minimize service failures",
+    "minimize deadline violations",
+    "minimize elapsed time",
+    "minimize transferred bytes"
+  ],
+  "learning_method_difference": {
+    "transition_model": "model-free actor; no exact clone rollout in the frozen profile",
+    "objective": "scalar reward rather than planner lexicographic tuple",
+    "consumed_input": "semantic encoder drops some public byte/typed/link fields"
+  },
+  "classification": "strong model-based baseline with different model capability and objective; retain, label, do not weaken"
+}
