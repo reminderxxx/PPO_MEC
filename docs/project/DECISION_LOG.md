@@ -1,5 +1,13 @@
 ﻿# Decision Log
 
+## 2026-10-06：拒绝 `service_aligned_v1`，停止进入 auxiliary-target 消融
+
+- 决定：保留 reward 公式、单元验收、全量训练和负结果，但不把 candidate 设为默认，不继续搜索系数。
+- 依据：候选在三个 learned 方法上都降低 completion；SA 的成本/prepare 指标改善伴随服务覆盖下降，MAPPO/PPO 出现更多
+  failed attempts 与 invalid prepare。two-step 行为不变说明 return 尺度变化不能作为行为收益。
+- 后果：当前论文只报告目标设计负结果；不执行“原 event target vs 机制一致 target”，避免把 reward 与 label 混杂。
+- 边界：若未来重开，必须是新任务、新冻结协议和独立证据，不能补本轮 seed、预算或选择性保留 strata。
+
 ## 2026-10-06：保留原 auxiliary 配置，拒绝整体删除作为 prepare-balance 修复
 
 - 决定：四项机制只选一个训练因素；因 margin/sharpening 在 raw-policy 路径 dormant、temperature 不改变 deterministic

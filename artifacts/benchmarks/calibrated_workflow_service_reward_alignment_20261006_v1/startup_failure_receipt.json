@@ -1,0 +1,8 @@
+{
+  "status": "STARTUP_FAILED_ZERO_STEP",
+  "actual_training_steps": 0,
+  "checkpoints_created": 0,
+  "automatic_retry": false,
+  "replacement_of_scientific_results": false,
+  "follow_up_run_id": "calibrated_workflow_service_reward_alignment_20261006_v2"
+}

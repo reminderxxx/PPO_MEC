@@ -26,6 +26,9 @@ ACTION_NAMES = {
     4: "handoff_migration_prepare",
 }
 
+ORIGINAL_REWARD_PROFILE = "original_reward_v1"
+SERVICE_ALIGNED_REWARD_PROFILE = "service_aligned_v1"
+
 
 def _network_seconds(byte_count: int, mbps: float, fixed_seconds: float) -> float:
     if byte_count <= 0:
@@ -77,7 +80,12 @@ class CalibratedContinuousWorkflowEnv:
             "completed_nodes": 0,
             "workflow_completed": 0,
             "deadline_violations": 0,
+            "deadline_missed": 0,
+            "on_time_workflow_completed": 0,
+            "late_workflow_completed": 0,
+            "unfinished_after_deadline": 0,
             "service_failures": 0,
+            "failed_service_attempt_seconds_proxy": 0.0,
             "handoff_count": 0,
             "handoff_failures": 0,
             "migration_attempts": 0,
@@ -100,6 +108,15 @@ class CalibratedContinuousWorkflowEnv:
             "reward_transfer_penalty": 0.0,
             "reward_failure_penalty": 0.0,
             "reward_deadline_penalty": 0.0,
+            "reward_service_operation_time_penalty": 0.0,
+            "reward_recompute_penalty": 0.0,
+            "reward_on_time_completion": 0.0,
+        }
+        self._deadline_miss_recorded = False
+        self._reward_totals_by_profile = {
+            profile: 0.0
+            for profile in (ORIGINAL_REWARD_PROFILE, SERVICE_ALIGNED_REWARD_PROFILE)
+            if self._reward_profile_available(profile)
         }
         capacity = int(self.instance["cache_capacity_bytes"])
         self.caches = {
@@ -166,6 +183,7 @@ class CalibratedContinuousWorkflowEnv:
         state_bytes = 0
         input_bytes = 0
         recompute_seconds = 0.0
+        service_operation_seconds = 0.0
         model_load_seconds = 0.0
         state_restore_seconds = 0.0
         failure = False
@@ -222,7 +240,8 @@ class CalibratedContinuousWorkflowEnv:
         if action == 2:
             self.metrics["vehicle_fallback_count"] += 1
             input_bytes += int(node["input_bytes"])
-            step_cost += float(self.config["vehicle"]["fallback_seconds"])
+            service_operation_seconds += float(self.config["vehicle"]["fallback_seconds"])
+            step_cost += service_operation_seconds
         else:
             bundle_ready = self._bundle_ready(current_rsu, str(node["required_adapter"]))
             if action == 0 and not bundle_ready:
@@ -253,6 +272,7 @@ class CalibratedContinuousWorkflowEnv:
             step_cost += float(self.config["objective"]["failed_service_seconds"])
         else:
             compute_seconds = float(node["compute_seconds"])
+            service_operation_seconds += compute_seconds
             step_cost += compute_seconds + recompute_seconds
             self.completed.append(str(node["node_id"]))
             self.node_index += 1
@@ -286,6 +306,7 @@ class CalibratedContinuousWorkflowEnv:
             for byte_count in (model_bytes, state_bytes, input_bytes)
         )
         step_cost += transfer_seconds + model_load_seconds + state_restore_seconds
+        service_operation_seconds += model_load_seconds + state_restore_seconds
         self.clock_seconds += step_cost
         self.step_index += 1
 
@@ -297,18 +318,59 @@ class CalibratedContinuousWorkflowEnv:
         self.metrics["state_restore_seconds"] += state_restore_seconds
         self.metrics["transfer_seconds"] += transfer_seconds
         self.metrics["modeled_completion_seconds"] = self.clock_seconds
+        deadline_miss_event = bool(
+            not self._deadline_miss_recorded
+            and self.clock_seconds > float(self.instance["deadline_seconds"])
+        )
+        if deadline_miss_event:
+            self._deadline_miss_recorded = True
+            self.metrics["deadline_missed"] = 1
+            self.metrics["deadline_violations"] = 1
         if self.terminated:
             self.metrics["workflow_completed"] = 1
-            if self.clock_seconds > float(self.instance["deadline_seconds"]):
-                self.metrics["deadline_violations"] = 1
+            if self._deadline_miss_recorded:
+                self.metrics["late_workflow_completed"] = 1
+            else:
+                self.metrics["on_time_workflow_completed"] = 1
+        elif self._deadline_miss_recorded:
+            self.metrics["unfinished_after_deadline"] = 1
+        self.metrics["failed_service_attempt_seconds_proxy"] = float(
+            self.metrics["service_failures"]
+        ) * float(self.config["objective"]["failed_service_seconds"])
 
-        reward, reward_components = self._reward(
-            completed=not failure,
-            step_cost=step_cost,
-            transfer_bytes=model_bytes + state_bytes + input_bytes,
-            failure=failure,
-            terminal=self.terminated,
+        reward_components_by_profile = {
+            profile: self._reward_components(
+                profile=profile,
+                completed=not failure,
+                step_cost=step_cost,
+                transfer_bytes=model_bytes + state_bytes + input_bytes,
+                failure=failure,
+                terminal=self.terminated,
+                deadline_miss_event=deadline_miss_event,
+                service_operation_seconds=service_operation_seconds,
+                recompute_seconds=recompute_seconds,
+            )
+            for profile in (ORIGINAL_REWARD_PROFILE, SERVICE_ALIGNED_REWARD_PROFILE)
+            if self._reward_profile_available(profile)
+        }
+        active_reward_profile = str(
+            self.config.get("reward_profile", ORIGINAL_REWARD_PROFILE)
         )
+        if active_reward_profile not in reward_components_by_profile:
+            raise ValueError(f"unknown reward profile: {active_reward_profile}")
+        reward_components = reward_components_by_profile[active_reward_profile]
+        reward = float(sum(reward_components.values()))
+        for profile, components in reward_components_by_profile.items():
+            self._reward_totals_by_profile[profile] += float(sum(components.values()))
+        legacy_reward_components = {
+            key: float(value)
+            for key, value in reward_components.items()
+            if key in self.metrics
+        }
+        for key in self.metrics:
+            if key.startswith("reward_") and key not in legacy_reward_components:
+                legacy_reward_components[key] = 0.0
+        reward_components = legacy_reward_components
         self.metrics["reward"] += reward
         for key, value in reward_components.items():
             self.metrics[key] += value
@@ -325,8 +387,14 @@ class CalibratedContinuousWorkflowEnv:
                 "state_restore_seconds": state_restore_seconds,
                 "transfer_seconds": transfer_seconds,
                 "step_cost_seconds": step_cost,
+                "service_operation_seconds": service_operation_seconds,
+                "clock_seconds_after": self.clock_seconds,
+                "deadline_seconds": float(self.instance["deadline_seconds"]),
+                "deadline_miss_event": deadline_miss_event,
+                "active_reward_profile": active_reward_profile,
                 "reward": reward,
                 "reward_components": reward_components,
+                "reward_components_by_profile": reward_components_by_profile,
             }
         )
         info = self._info()
@@ -353,6 +421,12 @@ class CalibratedContinuousWorkflowEnv:
                 "terminated": self.terminated,
                 "steps": self.step_index,
                 "deadline_seconds": float(self.instance["deadline_seconds"]),
+                "reward_profile": str(
+                    self.config.get("reward_profile", ORIGINAL_REWARD_PROFILE)
+                ),
+                "reward_totals_by_profile": deepcopy(
+                    self._reward_totals_by_profile
+                ),
             }
         )
         return result
@@ -561,31 +635,84 @@ class CalibratedContinuousWorkflowEnv:
         for cache in self.caches.values():
             self._validate_cache(cache)
 
-    def _reward(
+    def _reward_profile_available(self, profile: str) -> bool:
+        if profile == ORIGINAL_REWARD_PROFILE:
+            return True
+        return profile in self.config["objective"].get("reward_profiles", {})
+
+    def _reward_components(
         self,
         *,
+        profile: str,
         completed: bool,
         step_cost: float,
         transfer_bytes: int,
         failure: bool,
         terminal: bool,
-    ) -> tuple[float, dict[str, float]]:
+        deadline_miss_event: bool,
+        service_operation_seconds: float,
+        recompute_seconds: float,
+    ) -> dict[str, float]:
         objective = self.config["objective"]
-        components = {
-            "reward_node_completion": float(objective["node_completion_reward"]) if completed else 0.0,
-            "reward_workflow_completion": float(objective["workflow_completion_reward"]) if terminal else 0.0,
-            "reward_time_penalty": -float(objective["time_weight"]) * float(step_cost),
-            "reward_transfer_penalty": -float(objective["transfer_gib_weight"])
+        if profile == ORIGINAL_REWARD_PROFILE:
+            return {
+                "reward_node_completion": float(objective["node_completion_reward"])
+                if completed
+                else 0.0,
+                "reward_workflow_completion": float(
+                    objective["workflow_completion_reward"]
+                )
+                if terminal
+                else 0.0,
+                "reward_time_penalty": -float(objective["time_weight"])
+                * float(step_cost),
+                "reward_transfer_penalty": -float(objective["transfer_gib_weight"])
+                * float(transfer_bytes)
+                / float(1024**3),
+                "reward_failure_penalty": -float(objective["failure_penalty"])
+                if failure
+                else 0.0,
+                "reward_deadline_penalty": (
+                    -float(objective["deadline_penalty"])
+                    if terminal
+                    and self.clock_seconds > float(self.instance["deadline_seconds"])
+                    else 0.0
+                ),
+            }
+        if profile != SERVICE_ALIGNED_REWARD_PROFILE:
+            raise ValueError(f"unknown reward profile: {profile}")
+        aligned = objective["reward_profiles"][profile]
+        return {
+            "reward_node_completion": float(aligned["node_completion_reward"])
+            if completed
+            else 0.0,
+            "reward_workflow_completion": float(
+                aligned["workflow_completion_reward"]
+            )
+            if terminal
+            else 0.0,
+            "reward_time_penalty": 0.0,
+            "reward_service_operation_time_penalty": -float(
+                aligned["service_operation_second_weight"]
+            )
+            * float(service_operation_seconds),
+            "reward_transfer_penalty": -float(aligned["transfer_gib_weight"])
             * float(transfer_bytes)
             / float(1024**3),
-            "reward_failure_penalty": -float(objective["failure_penalty"]) if failure else 0.0,
-            "reward_deadline_penalty": (
-                -float(objective["deadline_penalty"])
-                if terminal and self.clock_seconds > float(self.instance["deadline_seconds"])
-                else 0.0
-            ),
+            "reward_recompute_penalty": -float(
+                aligned["recompute_second_weight"]
+            )
+            * float(recompute_seconds),
+            "reward_failure_penalty": -float(
+                aligned["failed_service_attempt_penalty"]
+            )
+            if failure
+            else 0.0,
+            "reward_deadline_penalty": -float(aligned["deadline_miss_penalty"])
+            if deadline_miss_event
+            else 0.0,
+            "reward_on_time_completion": 0.0,
         }
-        return float(sum(components.values())), components
 
     def _observation(self) -> np.ndarray:
         if self.terminated:

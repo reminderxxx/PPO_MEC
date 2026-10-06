@@ -41,3 +41,11 @@ artifacts/benchmarks/calibrated_workflow_prepare_balance_ablation_20261006_v1/co
 artifacts/benchmarks/calibrated_workflow_prepare_balance_ablation_20261006_v1/evaluation_rows.csv -text -eol
 artifacts/benchmarks/calibrated_workflow_prepare_balance_ablation_20261006_v1/stratified_ablation.csv -text -eol
 artifacts/benchmarks/calibrated_workflow_prepare_balance_ablation_20261006_v1/training_curves.csv -text -eol
+artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2/behavior_ledger.csv -text -eol -diff
+artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2/evaluation_rows.csv -text -eol -diff
+artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2/negative_regions.csv -text -eol -diff
+artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2/reward_decomposition.csv -text -eol -diff
+artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2/seed_summary.csv -text -eol -diff
+artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2/service_metric_summary.csv -text -eol -diff
+artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2/stratified_results.csv -text -eol -diff
+artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2/training_curves.csv -text -eol -diff

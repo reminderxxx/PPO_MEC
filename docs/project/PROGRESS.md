@@ -5,6 +5,19 @@
 
 ﻿# Progress
 
+## 2026-10-06：服务目标对齐奖励匹配训练完成，分类 D，不进入 auxiliary-target 消融
+
+- H2 只读审计确认旧 reward 的终局目标缺口；唯一 `service_aligned_v1` 以 workflow completion 为主项，在 deadline
+  首次错过时一次计费，并把 failed attempt、operation time、transfer 与 recompute 分开，不奖励 action 4/prepare/handoff。
+- 7 项 reward 排序、同动作转移不变、truncation bootstrap 和接口/identity 局部测试通过后，A/B 的 SA/MAPPO/PPO
+  全部重跑 3×192 episodes；实际 `24,952/82,944` steps、432 updates、107.96 s，90 checkpoints 本地保留。
+- regression completion A→B：SA `.889→.806`、MAPPO `.972→.833`、PPO `1→.944`；frozen development：
+  `.917→.833`、`.958→.875`、`1→.958`。PPO on-time 改善与 completion/failure 退化并存，不能称服务改善。
+- SA 的 transfer、action 4 和 invalid prepare 降低，但连续无进展与未完成增加；MAPPO/PPO 的 failed-service proxy 和
+  invalid prepare 稳定增加。two-step 行为完全不变，同轨迹重评分只改变 return 尺度。
+- 首次 shell-background v1 为 `STARTUP_FAILED_ZERO_STEP`，0 step/checkpoint 现场保留；唯一科学 run 是持久会话 v2。
+- 最终分类 D。奖励目标设计得到公式级证据，但没有行为收益或 SA 独有贡献；不执行 auxiliary-target 下一轮消融。
+
 ## 2026-10-06：SA prepare/execution 单因素闭环完成，拒绝整体删除 auxiliary
 
 - 四项机制定位确认：本轮 `raw_policy` rollout、PPO 重算和确定性评价都跳过 event margin/sharpening；temperature 生效且

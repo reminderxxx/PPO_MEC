@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `calibrated_workflow_service_reward_alignment_20261006.md`：原/候选公式、终止与截断语义、分项单元验收、两奖励×三方法
+  匹配训练、同轨迹重评分、负向 strata 与 D 类停止决定；不进入 auxiliary-target 消融。
+
 - `sa_prepare_balance_localization_20261006.md`：四项机制训练/推理路径、12-state 分层 logit trace、反例、唯一候选与预算冻结。
 - `sa_prepare_balance_ablation_results_20261006.md`：A 历史复用/B 单因素重训、服务/行为/成本/strata、负结果与唯一后续。
 - `manuscript_experiment_section_sa_prepare_balance_20261006.md`：可独立合并的论文实验负结果章节；主工作稿已同步到 v1.4。

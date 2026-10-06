@@ -1,0 +1,30 @@
+{
+  "schema_version": "calibrated_workflow_service_reward_alignment_v1",
+  "git_commit": "cc1ecb44d998465c86350ebf4c216e13600f52e2",
+  "interface_profile": "calibrated_workflow_interface_v2",
+  "hierarchical_action_contract": "independent_heads_executed_env_v2",
+  "original_formula": "2*completed_nodes + 4*workflow_complete - 0.08*elapsed_seconds - 0.5*transfer_GiB - 3*failed_service_attempts - 4*late_complete",
+  "candidate_formula": "completed_nodes + 100*workflow_complete - 25*first_deadline_miss - 2*failed_service_attempts - 0.02*service_operation_seconds - 0.25*transfer_GiB - 0.05*recompute_seconds",
+  "candidate_weights": {
+    "node_completion_reward": 1.0,
+    "workflow_completion_reward": 100.0,
+    "deadline_miss_penalty": 25.0,
+    "failed_service_attempt_penalty": 2.0,
+    "service_operation_second_weight": 0.02,
+    "transfer_gib_weight": 0.25,
+    "recompute_second_weight": 0.05,
+    "weight_rationale": {
+      "workflow_completion_reward": "Primary service utility. It dominates the at-most-12 dense node rewards and separates complete service from partial progress without using method rankings.",
+      "deadline_miss_penalty": "One-time SLA penalty at the first observed deadline crossing; it applies to late completion and unfinished service, but never merely because the trainer stops a non-terminal rollout.",
+      "failed_service_attempt_penalty": "Penalty per observable current-node service attempt that cannot execute because the required bundle is absent. This is a failed-attempt proxy, not measured interruption duration.",
+      "service_operation_second_weight": "Applies only to compute/fallback/model-load/state-restore seconds; transfer time, recomputation, and the modeled failed-service delay are excluded to prevent double charging.",
+      "transfer_gib_weight": "Charges transferred model/state/input bytes once in GiB; no action, prepare-call, or migration-log bonus is present.",
+      "recompute_second_weight": "Charges prefix recomputation seconds once; an ordinary handoff has no separate penalty."
+    }
+  },
+  "service_interruption_measurement": "unavailable",
+  "used_proxy": "failed_service_attempt_seconds_proxy = service_failures * failed_service_seconds",
+  "ordinary_handoff_penalty": false,
+  "prepare_or_action4_bonus": false,
+  "trainer_truncation_penalty": false
+}

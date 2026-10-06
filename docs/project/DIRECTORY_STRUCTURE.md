@@ -1,5 +1,20 @@
 ﻿# Directory Structure
 
+## 2026-10-06 service-reward alignment
+
+- `configs/experiment/calibrated_workflow_service_reward_alignment_v1.json`：两套 reward、单一候选权重理由、3×192 身份、
+  `82,944` 理论 step cap 和 reward-free checkpoint selection。
+- `scripts/audit_calibrated_workflow_service_reward.py`：公式分项案例、transition invariance、truncation bootstrap 的 create-only
+  训练前门禁。
+- `scripts/run_calibrated_workflow_service_reward_alignment.py`：两奖励×SA/MAPPO/PPO 一次性训练、dev 选模、规则对照、
+  双公式同轨迹重评分和完整行为账本。
+- `scripts/analyze_calibrated_workflow_service_reward_alignment.py`：source-window paired bootstrap、全 seed/strata、负区域、
+  reward decomposition 和 paper table。
+- `tests/test_calibrated_workflow_service_reward.py`：reward 排序、转移不变、bootstrap、selection 与 frozen identity。
+- `artifacts/analysis/calibrated_workflow_service_reward_preflight_20261006_v1/`：训练前冻结原件。
+- `artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v1/`：零步启动失败现场。
+- `artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2/`：唯一科学结果；checkpoint 本地保留。
+
 ## 2026-10-06 SA prepare-balance single-factor ablation
 
 - `configs/experiment/calibrated_workflow_prepare_balance_ablation_v1.json`：A 历史复用、B `auxiliary_coef=0.0`、

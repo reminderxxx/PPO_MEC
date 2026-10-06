@@ -5,6 +5,35 @@
 
 # Runbook
 
+## 服务目标对齐奖励匹配训练（2026-10-06；已完成，不得覆盖）
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/audit_calibrated_workflow_service_reward.py \
+  --output_root artifacts/analysis/calibrated_workflow_service_reward_preflight_20261006_v1
+
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/run_calibrated_workflow_service_reward_alignment.py \
+  --output_root artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2
+
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/analyze_calibrated_workflow_service_reward_alignment.py \
+  --run_root artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2
+```
+
+第一次 shell-background `v1` 在 0 step/0 checkpoint 时被宿主回收，保留为 `STARTUP_FAILED_ZERO_STEP`，不得覆盖。
+唯一科学执行是持久后台会话的 `v2`；已完成且不得重跑、补 seed 或追加预算。checkpoint 留本地且已写入 integrity，
+不得 Git add。专项回归：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q \
+  tests/test_calibrated_workflow_service_reward.py \
+  tests/test_calibrated_workflow_interface_repair.py \
+  tests/test_calibrated_workflow_prepare_balance.py
+```
+
+结果分类 D，候选已拒绝；本入口不授权 auxiliary-target 修改或新训练。
+
 ## SA prepare-balance 单因素闭环（2026-10-06；已完成，不得覆盖）
 
 诊断、候选和结果目录均 create-only；以下命令已经一次完成，不得因负结果重跑、补 seed 或覆盖：

@@ -1,0 +1,29 @@
+{
+  "files": [
+    {
+      "path": "completion_receipt.json",
+      "sha256": "7b0da289a8dff8cfff64f9eabdb5096de620458e50af8fdf48f329f680dd28c4",
+      "bytes": 97
+    },
+    {
+      "path": "reward_freeze.json",
+      "sha256": "8eb77c344af2910f14ddc92f5be4eac0cb5b8404da68a0f93b052205a29ff5cc",
+      "bytes": 2336
+    },
+    {
+      "path": "reward_unit_cases.json",
+      "sha256": "a26dbd1b76c6961c9dd7bf3f2be7e3f86bf1ab74cd03e7f829637a6718d071e1",
+      "bytes": 11585
+    },
+    {
+      "path": "transition_invariance.json",
+      "sha256": "5857ced6175cedd9aa9adba0cc2f047e729434efaf8bd71b92af2af24f4257d2",
+      "bytes": 72
+    },
+    {
+      "path": "truncation_bootstrap.json",
+      "sha256": "bc0c828c9d674048daa86c86bb83466f3e86258480258e52907c81956ae56f6b",
+      "bytes": 132
+    }
+  ]
+}

@@ -201,8 +201,21 @@ def _base_evaluation_row(
         "unfinished_rate": float(not completed_workflow),
         "truncated_rate": float(not bool(summary["terminated"])),
         "deadline_violation_rate": float(summary["deadline_violations"]),
+        "deadline_missed_rate": float(summary.get("deadline_missed", 0)),
+        "on_time_workflow_completion_rate": float(
+            summary.get("on_time_workflow_completed", 0)
+        ),
+        "late_workflow_completion_rate": float(
+            summary.get("late_workflow_completed", 0)
+        ),
+        "unfinished_after_deadline_rate": float(
+            summary.get("unfinished_after_deadline", 0)
+        ),
         "service_failure_rate": float(summary["service_failures"] > 0),
         "service_failures": int(summary["service_failures"]),
+        "failed_service_attempt_seconds_proxy": float(
+            summary.get("failed_service_attempt_seconds_proxy", 0.0)
+        ),
         "handoff_failure_rate": float(summary["handoff_failures"])
         / max(int(summary["handoff_count"]), 1),
         "handoff_failures": int(summary["handoff_failures"]),
@@ -233,7 +246,19 @@ def _base_evaluation_row(
         "reward_transfer_penalty": float(summary["reward_transfer_penalty"]),
         "reward_failure_penalty": float(summary["reward_failure_penalty"]),
         "reward_deadline_penalty": float(summary["reward_deadline_penalty"]),
+        "reward_service_operation_time_penalty": float(
+            summary.get("reward_service_operation_time_penalty", 0.0)
+        ),
+        "reward_recompute_penalty": float(
+            summary.get("reward_recompute_penalty", 0.0)
+        ),
+        "reward_on_time_completion": float(
+            summary.get("reward_on_time_completion", 0.0)
+        ),
+        "reward_profile": summary.get("reward_profile", "original_reward_v1"),
     }
+    for profile, value in dict(summary.get("reward_totals_by_profile", {})).items():
+        row[f"rescored_return_{profile}"] = float(value)
     for action_id in range(5):
         row[f"action_{action_id}"] = int(counts[action_id])
         row[f"current_missing_action_{action_id}"] = int(
@@ -257,6 +282,8 @@ def _run_evaluation_episode(
     counts: Counter[int] = Counter()
     missing_counts: Counter[int] = Counter()
     action4_attempts = action4_successes = 0
+    safe_prepare_attempts = invalid_prepare_attempts = 0
+    feasible_target_prepare_attempts = infeasible_target_prepare_attempts = 0
     no_progress_streak = max_no_progress_streak = 0
     decision_ns = 0
     ledger: list[dict[str, Any]] = []
@@ -272,6 +299,23 @@ def _run_evaluation_episode(
         target_ready = bool(
             bundle_ready(semantic, rsu_by_id(semantic, target_rsu_id), node)
         )
+        action_mask = list(info["action_mask"])
+        target_prepare_feasible = False
+        prepare_feasibility_reason = "action_4_masked_missing_distinct_target"
+        if len(action_mask) > 4 and action_mask[4]:
+            preview = env.clone_for_decision_model()
+            _, _, _, _, preview_info = preview.step(4)
+            preview_transition = dict(preview_info.get("transition", {}) or {})
+            preview_events = list(preview_transition.get("cache_events", []) or [])
+            if preview_events:
+                prepare_feasibility_reason = str(
+                    preview_events[0].get("reason", "unknown")
+                )
+                target_prepare_feasible = (
+                    prepare_feasibility_reason != "contact_budget_exceeded"
+                )
+            else:
+                prepare_feasibility_reason = "action_4_no_cache_event"
         before_completed = len(env.completed)
         started = time.perf_counter_ns()
         if agent is not None:
@@ -297,6 +341,11 @@ def _run_evaluation_episode(
         transition = dict(next_info.get("transition", {}))
         if int(action) == 4:
             action4_attempts += 1
+            feasible_target_prepare_attempts += int(target_prepare_feasible)
+            infeasible_target_prepare_attempts += int(not target_prepare_feasible)
+            service_safe_prepare = bool(current_ready and target_prepare_feasible)
+            safe_prepare_attempts += int(service_safe_prepare)
+            invalid_prepare_attempts += int(not service_safe_prepare)
             action4_successes += int(
                 bool(transition.get("service_completed"))
                 and bool(transition.get("migration_success"))
@@ -316,6 +365,8 @@ def _run_evaluation_episode(
                 "target_rsu_id": target_rsu_id,
                 "current_bundle_ready": current_ready,
                 "target_bundle_ready": target_ready,
+                "target_prepare_feasible": target_prepare_feasible,
+                "prepare_feasibility_reason": prepare_feasibility_reason,
                 "raw_head_actions": json.dumps(
                     action_info.get("raw_head_actions", {}), sort_keys=True
                 ),
@@ -352,13 +403,28 @@ def _run_evaluation_episode(
                 "recompute_seconds": float(
                     transition.get("recompute_seconds", 0.0) or 0.0
                 ),
+                "service_operation_seconds": float(
+                    transition.get("service_operation_seconds", 0.0) or 0.0
+                ),
+                "clock_seconds_after": float(
+                    transition.get("clock_seconds_after", 0.0) or 0.0
+                ),
+                "deadline_miss_event": bool(
+                    transition.get("deadline_miss_event", False)
+                ),
+                "reward_components": json.dumps(
+                    transition.get("reward_components", {}), sort_keys=True
+                ),
+                "reward_components_by_profile": json.dumps(
+                    transition.get("reward_components_by_profile", {}),
+                    sort_keys=True,
+                ),
             }
         )
         info = next_info
         if terminated or truncated:
             break
-    return (
-        _base_evaluation_row(
+    row = _base_evaluation_row(
             split=instance["split"],
             method=method,
             seed=seed,
@@ -369,9 +435,20 @@ def _run_evaluation_episode(
             action4_successes=action4_successes,
             missing_current_counts=missing_counts,
             max_no_progress_streak=max_no_progress_streak,
-        ),
-        ledger,
+        )
+    row.update(
+        {
+            "safe_prepare_attempts": safe_prepare_attempts,
+            "invalid_prepare_attempts": invalid_prepare_attempts,
+            "feasible_target_prepare_attempts": feasible_target_prepare_attempts,
+            "infeasible_target_prepare_attempts": infeasible_target_prepare_attempts,
+            "realized_prepare_rate": float(action4_successes)
+            / max(action4_attempts, 1),
+            "current_missing_action4_rate": float(missing_counts[4])
+            / max(sum(missing_counts.values()), 1),
+        }
     )
+    return row, ledger
 
 
 def _evaluate_agent(

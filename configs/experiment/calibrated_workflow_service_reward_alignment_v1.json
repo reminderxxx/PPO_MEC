@@ -1,0 +1,85 @@
+{
+  "schema_version": "calibrated_workflow_service_reward_alignment_v1",
+  "experiment_scope": "bounded_nonformal_reward_objective_alignment",
+  "base_config": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json",
+  "workload_manifest": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+  "interface_profile": "calibrated_workflow_interface_v2",
+  "hierarchical_action_contract": "independent_heads_executed_env_v2",
+  "reward_arms": [
+    {
+      "arm": "original_reward_v1",
+      "reward_profile": "original_reward_v1",
+      "identity": "historical_formula_rerun_under_current_experiment_code"
+    },
+    {
+      "arm": "service_aligned_v1",
+      "reward_profile": "service_aligned_v1",
+      "identity": "single_frozen_service_objective_candidate"
+    }
+  ],
+  "service_aligned_reward": {
+    "node_completion_reward": 1.0,
+    "workflow_completion_reward": 100.0,
+    "deadline_miss_penalty": 25.0,
+    "failed_service_attempt_penalty": 2.0,
+    "service_operation_second_weight": 0.02,
+    "transfer_gib_weight": 0.25,
+    "recompute_second_weight": 0.05,
+    "weight_rationale": {
+      "workflow_completion_reward": "Primary service utility. It dominates the at-most-12 dense node rewards and separates complete service from partial progress without using method rankings.",
+      "deadline_miss_penalty": "One-time SLA penalty at the first observed deadline crossing; it applies to late completion and unfinished service, but never merely because the trainer stops a non-terminal rollout.",
+      "failed_service_attempt_penalty": "Penalty per observable current-node service attempt that cannot execute because the required bundle is absent. This is a failed-attempt proxy, not measured interruption duration.",
+      "service_operation_second_weight": "Applies only to compute/fallback/model-load/state-restore seconds; transfer time, recomputation, and the modeled failed-service delay are excluded to prevent double charging.",
+      "transfer_gib_weight": "Charges transferred model/state/input bytes once in GiB; no action, prepare-call, or migration-log bonus is present.",
+      "recompute_second_weight": "Charges prefix recomputation seconds once; an ordinary handoff has no separate penalty."
+    }
+  },
+  "training": {
+    "agents": ["sa_ghmappo", "mappo", "ppo"],
+    "rules": ["two_step_cost_rule"],
+    "seeds": [7, 17, 29],
+    "episodes": 192,
+    "episode_max_steps": 24,
+    "checkpoint_episode_candidates": [48, 96, 144, 192],
+    "update_every_episodes": 8,
+    "theoretical_total_step_cap": 82944,
+    "automatic_retry": false,
+    "wall_clock_cap_seconds": 1800,
+    "checkpoint_selection": {
+      "split": "dev",
+      "order": [
+        "on_time_workflow_completion_rate_desc",
+        "workflow_completion_rate_desc",
+        "unfinished_after_deadline_rate_asc",
+        "service_failure_rate_asc",
+        "handoff_failure_rate_asc",
+        "completed_sample_elapsed_seconds_asc",
+        "total_transfer_mb_asc",
+        "recompute_seconds_asc",
+        "invalid_prepare_attempts_asc"
+      ],
+      "reward_value_used": false,
+      "regression_split_used": false,
+      "frozen_check_split_used": false
+    }
+  },
+  "evaluation": {
+    "splits": ["regression", "frozen_check"],
+    "trajectory_rescoring_profiles": ["original_reward_v1", "service_aligned_v1"],
+    "regression_previously_exposed": true,
+    "frozen_check_is_development_validation": true
+  },
+  "claim_boundary": {
+    "formal": false,
+    "holdout": false,
+    "independent_final_check": false,
+    "real_model_calls": 0,
+    "downloads": 0,
+    "old_holdout_reads": 0,
+    "reward_adjustment_is_not_algorithm_innovation": true,
+    "auxiliary_target_changed": false,
+    "network_changed": false,
+    "action_semantics_changed": false,
+    "data_generation_changed": false
+  }
+}

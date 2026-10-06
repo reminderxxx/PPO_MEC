@@ -1,0 +1,8 @@
+{
+  "status": "complete",
+  "all_seeds_preserved": true,
+  "all_instances_preserved": true,
+  "bootstrap_outer_unit": "source_window",
+  "bootstrap_draws": 5000,
+  "reward_returns_compared_only_by_trajectory_rescoring": true
+}

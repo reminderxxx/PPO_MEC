@@ -5,6 +5,20 @@
 
 # Artifact Records
 
+## 2026-10-06 calibrated workflow service-reward alignment
+
+- preflight root：`artifacts/analysis/calibrated_workflow_service_reward_preflight_20261006_v1/`；原/新公式、权重理由、10 个
+  分项案例、7 项排序、transition invariance、truncation bootstrap、receipt 与 integrity 齐全。
+- startup-failure root：`artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v1/`；
+  `STARTUP_FAILED_ZERO_STEP`，0 step、0 checkpoint、空 log，原样保留。
+- scientific root：`artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2/`；两 rewards ×
+  3 methods × 3 seeds ×192 episodes，实际 24,952 steps、432 updates、107.96 s；400 evaluation rows、3,435 behavior
+  rows、90 local checkpoints、全部 seed/instance 与 41 个 completion-decrease strata 保留。
+- 只读分析含 `service_metric_summary.csv`、`seed_summary.csv`、`paired_reward_arm_deltas.json`、
+  `reward_decomposition.csv`、`negative_regions.csv`、`paper_table.md`；checkpoint hashes 纳入 112-file integrity。
+- evidence level=`E2_ARTIFACT_AUDITED_NONFORMAL_DEVELOPMENT_EXPERIMENT`；verdict=`Unverifiable`；decision=D，不进入
+  auxiliary-target 消融。
+
 ## 2026-10-06 SA prepare-balance diagnosis and no-auxiliary ablation
 
 - 诊断 root：`artifacts/analysis/calibrated_workflow_prepare_balance_diagnosis_20261006_v1/`；3 个历史 selected SA

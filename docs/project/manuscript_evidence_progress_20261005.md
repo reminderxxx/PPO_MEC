@@ -1,8 +1,22 @@
 # 论文成果与问题台账
 
-更新：2026-10-06。主稿：`system_mechanism_manuscript_working_draft.md` v1.4。
-本次新增 calibrated workflow interface v3 有界重训、SA prepare/execution 单因素负结果与冻结开发检查；不调用模型、
-不下载资源、不读取旧 holdout，也不改写历史 artifact。
+更新：2026-10-06。主稿：`system_mechanism_manuscript_working_draft.md` v1.5。
+本次新增 calibrated workflow 服务目标对齐奖励的两奖励匹配训练与负结果；不调用模型、不下载资源、不读取旧 holdout，
+也不改写历史 artifact。
+
+## 2026-10-06 服务目标对齐奖励闭环
+
+- 奖励 preflight 冻结 original 与唯一 `service_aligned_v1`；7 项排序、同动作转移不变和 truncation bootstrap 均通过。
+- A/B 的 SA、MAPPO、PPO 全部新训练 3 seeds×192 episodes；理论/实际 steps=`82,944/24,952`，432 updates，
+  90 checkpoints 本地保留；选模不读取 reward 数值。
+- 候选使 regression completion 的 SA/MAPPO/PPO 从 `.889/.972/1.000` 变为 `.806/.833/.944`；frozen development
+  从 `.917/.958/1.000` 变为 `.833/.875/.958`。PPO on-time 有描述性改善，但 failed-service/invalid prepare 新增。
+- SA transfer/invalid prepare 下降，但连续无进展和未完成增加；不是服务改善。two-step 行为与 completion 完全不变，
+  同轨迹双公式 return 只反映换评分尺。
+- 最终分类 D；不进入 event auxiliary target 重设计消融。奖励调整不构成算法创新或 SA 机制证据。
+- 原件：`artifacts/analysis/calibrated_workflow_service_reward_preflight_20261006_v1/`、零步启动失败 v1、唯一科学 run
+  `artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2/`；完整报告见
+  `calibrated_workflow_service_reward_alignment_20261006.md`。
 
 ## 2026-10-06 SA prepare/execution 单因素闭环
 

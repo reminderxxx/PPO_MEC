@@ -1,0 +1,14 @@
+{
+  "files": [
+    {
+      "path": "run_status.json",
+      "sha256": "4de71055e949c2b0c2de85daa8c432b64b4158e2a69ba63aef685f95cf7f9653",
+      "bytes": 320
+    },
+    {
+      "path": "startup_failure_receipt.json",
+      "sha256": "2e6041ba3b0db0c13e3e8ceb70252c1d668c7a21117f7611fc1e6010a699c5b7",
+      "bytes": 257
+    }
+  ]
+}

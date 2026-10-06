@@ -1,0 +1,83 @@
+{
+  "schema_version": "calibrated_workflow_service_reward_alignment_run_v1",
+  "created_at": "2026-10-06T06:55:47.082180+00:00",
+  "git_commit": "cc1ecb44d998465c86350ebf4c216e13600f52e2",
+  "experiment_config": {
+    "path": "configs/experiment/calibrated_workflow_service_reward_alignment_v1.json",
+    "sha256": "cafe0a687baeb9c09d1b6e76de38821e07c6ad923e1fe54a519f4c6f62f55b9c"
+  },
+  "base_config": {
+    "path": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json",
+    "sha256": "20e82b0ea4ff5c7caf597d987bcef1f7523dc0c1c7ece21deba32aa7d47af923"
+  },
+  "workload_manifest": {
+    "path": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+    "sha256": "b7efe5d6e50ad17b744230c03a126370656d0196b60c7f7e6b5a86bb702effbc"
+  },
+  "interface_profile": "calibrated_workflow_interface_v2",
+  "hierarchical_action_contract": "independent_heads_executed_env_v2",
+  "reward_arms": [
+    {
+      "arm": "original_reward_v1",
+      "reward_profile": "original_reward_v1",
+      "identity": "historical_formula_rerun_under_current_experiment_code"
+    },
+    {
+      "arm": "service_aligned_v1",
+      "reward_profile": "service_aligned_v1",
+      "identity": "single_frozen_service_objective_candidate"
+    }
+  ],
+  "methods": [
+    "sa_ghmappo",
+    "mappo",
+    "ppo"
+  ],
+  "rules": [
+    "two_step_cost_rule"
+  ],
+  "seeds": [
+    7,
+    17,
+    29
+  ],
+  "episodes_per_method_seed": 192,
+  "episode_max_steps": 24,
+  "theoretical_training_step_cap": 82944,
+  "actual_training_steps": 24952,
+  "actual_updates": 432,
+  "elapsed_seconds": 107.961749709,
+  "checkpoint_selection": {
+    "split": "dev",
+    "order": [
+      "on_time_workflow_completion_rate_desc",
+      "workflow_completion_rate_desc",
+      "unfinished_after_deadline_rate_asc",
+      "service_failure_rate_asc",
+      "handoff_failure_rate_asc",
+      "completed_sample_elapsed_seconds_asc",
+      "total_transfer_mb_asc",
+      "recompute_seconds_asc",
+      "invalid_prepare_attempts_asc"
+    ],
+    "reward_value_used": false,
+    "regression_split_used": false,
+    "frozen_check_split_used": false
+  },
+  "claim_boundary": {
+    "formal": false,
+    "holdout": false,
+    "independent_final_check": false,
+    "real_model_calls": 0,
+    "downloads": 0,
+    "old_holdout_reads": 0,
+    "reward_adjustment_is_not_algorithm_innovation": true,
+    "auxiliary_target_changed": false,
+    "network_changed": false,
+    "action_semantics_changed": false,
+    "data_generation_changed": false
+  },
+  "original_reward_reused": false,
+  "automatic_retry": false,
+  "command": "scripts/run_calibrated_workflow_service_reward_alignment.py --output_root artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2"
+}

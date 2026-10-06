@@ -5,6 +5,11 @@
 
 # PPO_MEC
 
+服务目标对齐奖励已完成一次冻结匹配实验。唯一候选在公式单元案例中正确排序按期完成、逾期完成与未完成，并保留外部截断
+bootstrap；但 3 seeds×192 episodes 下，SA/MAPPO/PPO 的 regression completion 均下降（`.889→.806`、
+`.972→.833`、`1→.944`），frozen development 也同向下降。最终分类 D，不进入 auxiliary-target 消融；奖励调整不是
+算法创新。详见 [奖励闭环报告](docs/project/calibrated_workflow_service_reward_alignment_20261006.md)。
+
 SA prepare/execution 单因素闭环已完成。源码对账和 12-state trace 证明当前 `raw_policy` 执行路径实际跳过配置的 event
 margin/sharpening；auxiliary target 确有不检查 current readiness 的冲突，但唯一候选 `auxiliary_coef=0.1→0.0` 在固定
 3 seeds×192 episodes 后没有提高 completion，并把 frozen-check action 4 从 54.7% 增至 71.6%、invalid prepare 从

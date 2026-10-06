@@ -1,0 +1,8 @@
+{
+  "status": "complete",
+  "actual_training_steps": 24952,
+  "actual_updates": 432,
+  "evaluation_rows": 400,
+  "behavior_ledger_rows": 3435,
+  "elapsed_seconds": 107.961749709
+}

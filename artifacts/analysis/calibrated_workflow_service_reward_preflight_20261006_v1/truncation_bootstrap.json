@@ -1,0 +1,7 @@
+{
+  "external_truncation_bootstraps": true,
+  "return": 2.8,
+  "expected_return": 2.8,
+  "terminated": false,
+  "truncated": true
+}

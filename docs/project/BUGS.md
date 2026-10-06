@@ -5,6 +5,17 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-06：服务对齐 reward 公式通过但策略退化（VERIFIED FORMULA / REJECTED CANDIDATE）
+
+- `RESOLVED FORMULA GAP`：candidate 对按期/逾期/未完成、成本和 truncation 的单元排序通过；deadline 不再只在完成时可见，
+  外部截断仍 bootstrap。reward profile 不改变状态、动作、数据或网络。
+- `NEGATIVE BEHAVIOR`：候选使三个 learned 方法在 regression/frozen 的 completion 全部下降；MAPPO/PPO 的 service
+  failure、invalid prepare 和 no-progress 显著增加。PPO on-time 单项上升不能抵消总完成和可靠性退化。
+- `TRADE-OFF`：SA transfer/invalid prepare 下降，但 completion/coverage 降低且无进展上升；禁止写成成本—服务共同改善。
+- `OPEN`：大终局效用与 PPO 稀疏 credit、不同 policy parameterization 的交互尚未因果分离；本轮禁止按结果搜索权重、
+  加 seed 或延长预算。候选已拒绝，不进入 auxiliary-target 消融。
+- `BOUNDARY`：regression 已暴露，frozen check 仍是开发验证；无 formal/holdout/真实无线。paper-ready 继续 `Unverifiable`。
+
 ## 2026-10-06：删除 auxiliary 未修复过度准备，训练 target 设计仍开放（REJECTED FIX / OPEN METHOD BLOCKER）
 
 - `DIAGNOSED`：`event_prepare_margin_boost` 与 sharpening 在当前 `raw_policy` 训练/评价路径实际 dormant；temperature 不改变

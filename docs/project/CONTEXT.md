@@ -5,11 +5,16 @@
 
 ﻿# Context
 
-更新日期：2026-10-05
+更新日期：2026-10-06
 
 用途：记录 PPO_MEC 当前稳定上下文。这里写长期有效事实，不写单次运行细节。
 
 ## 项目状态
+
+- `service_aligned_v1` 已完成唯一冻结匹配训练并被拒绝：SA/MAPPO/PPO 的 regression 与 frozen-development completion
+  均低于原 reward；SA 的成本下降伴随 coverage/no-progress 退化，PPO on-time 上升伴随 failure/completion 退化。分类 D，
+  不进入 auxiliary-target 消融。唯一科学 run 为
+  `artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2/`；paper-ready 仍为 `Unverifiable`。
 
 - calibrated workflow repaired-interface 的 SA prepare-balance 单因素闭环已完成：当前 raw-policy 路径实际跳过 event
   margin/sharpening；auxiliary target 有 current-readiness 缺口，但 `auxiliary_coef=0.1→0.0` 的 3×192 有界重训没有提高

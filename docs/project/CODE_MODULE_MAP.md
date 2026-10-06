@@ -1,5 +1,14 @@
 # Code Module Map
 
+## 2026-10-06 service-reward alignment additions
+
+- `src/envs/core/calibrated_continuous_workflow_env.py`：在保持 action/state transition 不变的前提下支持显式 reward profile、
+  first-deadline-miss raw metric、failed-attempt proxy 和同轨迹多公式分解；外部 truncation 仍非 terminal。
+- `scripts/audit_calibrated_workflow_service_reward.py` → env reward profiles / `PPORolloutBuffer`：训练前公式与 bootstrap 门禁。
+- `scripts/run_calibrated_workflow_service_reward_alignment.py` → repaired-interface runner helpers / agents / env：冻结匹配训练、
+  common service checkpoint selection、rule evaluation 和 artifact publication。
+- `scripts/analyze_calibrated_workflow_service_reward_alignment.py` → completed run rows：只读统计、负向 strata 与论文表。
+
 ## SA prepare-balance single-factor ablation
 
 - `scripts/diagnose_calibrated_workflow_prepare_balance.py` 只读取 repaired-interface selected checkpoint 与 dev instances，

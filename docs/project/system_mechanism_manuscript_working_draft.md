@@ -1,6 +1,6 @@
 # Cost-Accounted Recovery for Stateful AI Workflows at the Vehicular Edge
 
-> Internal working draft v1.4 — revised 2026-10-06. This is a complete but non-submission-ready mechanism/empirical draft. It separates real-model measurements, modeled network time, and synthetic development checks. Revision v1.3 corrected path-asymmetric lifecycle accounting and withdrew the historical method advantage. Revision v1.4 adds a repaired-interface SA policy-mechanism diagnosis and one frozen single-factor negative ablation. It adds no validated algorithm. References are inherited from the preceding review and were not independently reverified in this revision.
+> Internal working draft v1.5 — revised 2026-10-06. This is a complete but non-submission-ready mechanism/empirical draft. It separates real-model measurements, modeled network time, and synthetic development checks. Revision v1.3 corrected path-asymmetric lifecycle accounting and withdrew the historical method advantage. Revision v1.4 added a repaired-interface SA policy-mechanism diagnosis and one frozen single-factor negative ablation. Revision v1.5 adds a matched two-reward experiment whose service-aligned candidate passed unit ordering but degraded workflow completion in all learned methods. It adds no validated algorithm. References are inherited from the preceding review and were not independently reverified in this revision.
 
 ## Abstract
 
@@ -187,7 +187,28 @@ does not repair the imbalance and is rejected. It also does not collapse to alwa
 action 4 increased. The result is a configuration-specific negative finding, not proof that the auxiliary loss is generally beneficial or that
 one component universally causes the behavior.
 
-## 9. Contribution logic closure
+## 9. Service-objective alignment side study
+
+The original scalar return could rank partial service above an interrupted but completed workflow because deadline cost was checked only after
+completion and a truncated unfinished path had no service-outcome term. We froze one replacement before reading method rankings. It gives a
+large workflow-completion utility, a one-time deadline-miss cost, and separate non-overlapping charges for failed current-node attempts,
+operation time, transferred GiB, and prefix recomputation. It does not reward action 4, prepare calls, handoff events, or migration logs.
+External truncation remains non-terminal and bootstraps the value function.
+
+Both rewards trained SA-GHMAPPO, controller-MAPPO, and PPO for the same three seeds, 192 episodes, and 24-step cap. Checkpoint selection used
+only common service metrics. The candidate did not improve SA: completion changed from 0.889 to 0.806 on the exposed regression split and
+from 0.917 to 0.833 on the frozen development check. It reduced SA transfer and invalid prepare, but increased consecutive no-progress steps
+and reduced completed-sample coverage. MAPPO completion changed from 0.972/0.958 to 0.833/0.875, with more failed-service episodes and
+invalid prepares. PPO on-time completion improved descriptively, but total completion fell from 1.000/1.000 to 0.944/0.958 and new service
+failures appeared. The unchanged two-step planner remained at 1.000 completion under both scoring formulas.
+
+This is a negative objective-design result. Rescoring an unchanged trajectory under the two formulas changes the numeric return without
+changing service behavior, so cross-formula return magnitude is not treated as evidence. The learned-policy behavior did change, but it
+introduced completion and reliability trade-offs rather than a common service improvement. We therefore classify the result as category D
+and do not proceed to the proposed event-auxiliary-target ablation. Reward alignment is neither an algorithmic contribution nor evidence for
+an SA-specific mechanism.
+
+## 10. Contribution logic closure
 
 | Research question | Existing-method gap | Our implemented design | Required evidence | Current result | Defensible claim |
 |---|---|---|---|---|---|
@@ -195,6 +216,7 @@ one component universally causes the behavior.
 | Does adapter-cache state participate in recovery cost? | Shared-base and adapter-serving work does not expose this workflow's legal victim→runtime unload→reload path | Native typed dependency-safe preview/commit connected to PEFT removal/load | Runtime tensor counts/bytes, legal cache events, later node execution, no-eviction control | Real ALPR→Helmet→ALPR lifecycle executed; cost was common to both arms | Real adapter lifecycle is integrated and auditable; no eviction-driven action advantage |
 | Does SA role coordination outperform matched alternatives after interface repair? | PPO/MAPPO, graph encoders, recovery and cost-aware control already exist; composition alone is not novelty | Slow/fast/event heads with executed-action PPO under the repaired semantic interface | Matched budgets, checkpoints, full behavior ledger, strong rule and learned controls | SA completion 0.944/0.958; PPO, MAPPO and rule 1.000 | Interface correctness and residual policy gap only; no SA superiority claim |
 | Does removing current-readiness-blind auxiliary supervision fix over-preparation? | A training target can conflict with service return, but deletion is not automatically a method | One-factor `auxiliary_coef: 0.1→0.0` ablation | Fixed 3×192 retrain, paired dev states, current-missing action 4, valid/invalid prepare, completion/cost | Completion unchanged; action 4 and invalid prepare increased | Reject wholesale deletion; retain as negative design evidence, not innovation |
+| Does the service-aligned scalar objective improve behavior? | A corrected score does not guarantee stable policy learning | One frozen completion/deadline-first reward with non-overlapping observable cost terms | Two rewards × three methods × three seeds, service-only checkpoint selection, raw metrics and same-trajectory rescoring | Completion decreased for SA, MAPPO, and PPO; planner behavior was unchanged | Formula-level alignment is verified, behavioral benefit is rejected; do not advance auxiliary-target ablation |
 | What does the calibrated simulator establish? | Simulated reward alone cannot prove real model or wireless behavior | NGSIM+Alibaba-derived bounded workload with measured size/time inputs and typed cache semantics | Provenance, frozen instances, raw episodes, interface audit | Supports controlled development comparison only | Empirically calibrated simulation evidence, not real deployment or independent generalization |
 | What do real-model measurements establish? | Synthetic bytes cannot prove adapter lifecycle or suffix fidelity | Same-host real base/adapters, fixed calls, exact token/input checks | Pre-frozen plans, raw timings, tensor lifecycle, hashes, receipts | Mechanism paths executed; wireless/queue/task quality unavailable | Real mechanism realization and local cost components only |
 
@@ -229,8 +251,9 @@ subsequent independent evidence; this revision does not provide it.
 - [A7] `artifacts/analysis/recovery_cost_boundary_check_20261006_v1/`: pre-frozen six-point mechanism-boundary check, 24 isolated paths, complete rows, aggregate, completion receipt, and 5-file integrity manifest.
 - [A8] `artifacts/analysis/calibrated_workflow_prepare_balance_diagnosis_20261006_v1/`: fixed 12-state logit/probability trace, 100-state dev-path target summary, checkpoint hashes, and diagnostic receipt.
 - [A9] `artifacts/benchmarks/calibrated_workflow_prepare_balance_ablation_20261006_v1/`: historical A reuse, 3×192 no-auxiliary training, complete curves, evaluation/behavior rows, paired comparison, strata, receipts, and integrity manifest; checkpoints remain local.
+- [A10] `artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2/`: both rewards rerun for SA/MAPPO/PPO at 3×192 episodes, 24,952 actual steps, 90 local checkpoints, complete learning/evaluation/behavior rows, same-trajectory rescoring, 5,000-draw window-outer deltas, 41 unfavorable completion strata, receipts, and integrity manifest.
 - Review identity: `reviewed_at=2026-10-06`; `literature_cutoff=2026-10-05`; `target_venue=IEEE TMC`; `artifact_run_id=eviction_aware_recovery_corrected_20261006_v2 + recovery_cost_boundary_check_20261006_v1`; `policy_version=tmc_review_policy_v3_20260621`; `git_commit=800f0a12f13e34d7de19aee375124813b8817e3a / 30691177bcac540ec1650d14494fe48326805a8c`; `evidence_level=E2_ARTIFACT_AUDITED (bounded synthetic correction and boundary check; network modeled)`.
 - Strongest safe claim: native state export/import and exact suffix recovery are integrated with a dependency-safe adapter victim/removal/reload lifecycle; event-level accounting is reproducible, and equal lifecycles are shown to cancel rather than manufacture an action benefit.
 - Prohibited claims: superiority to a correct simple threshold or two-step lookahead, novelty of cost-aware eviction, calibrated deployment boundary, eviction-driven decision reversal, statistical generalization, real wireless gain, cross-workflow scheduling, shared queues, task-quality gain, full MARL, or TMC-ready status.
 - Remaining submission-critical gaps (maximum two): (1) an externally motivated workflow with a legitimate action-specific lifecycle difference, if an algorithmic claim is retained; (2) remote/shared-resource measurement and labeled independent workflow evidence.
-- Revision v1.4: retains the v1.3 systems correction, adds a repaired-interface SA diagnosis and the negative no-auxiliary result, rejects deletion as a prepare-balance fix, and keeps the paper centered on systems/mechanism evidence and transparent learning limitations. Progress is maintained in `manuscript_evidence_progress_20261005.md`.
+- Revision v1.5: retains the v1.3 systems correction and v1.4 negative no-auxiliary result, adds the negative matched reward experiment, classifies it as a service trade-off/degeneration result, and explicitly stops before auxiliary-target redesign. Progress is maintained in `manuscript_evidence_progress_20261005.md`.

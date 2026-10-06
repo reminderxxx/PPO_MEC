@@ -1,0 +1,13 @@
+{
+  "base_git_commit": "cc1ecb44d998465c86350ebf4c216e13600f52e2",
+  "run_started_with_task_changes_uncommitted": true,
+  "critical_file_sha256": {
+    "src/envs/core/calibrated_continuous_workflow_env.py": "d789e6088e6a6a859de2fc720f78c94410179d2cc6a5a57a9751a9b89fed68bc",
+    "scripts/run_calibrated_workflow_interface_repair.py": "393bd7cbf57ae369276c2ded199038314e6ba513f3ca30ff8b4e6afe430c843c",
+    "scripts/run_calibrated_workflow_service_reward_alignment.py": "da02bf5c3091d585c4da68e97935b0ded32a254cb2c241fd7a5d522cbd6dcac8",
+    "configs/experiment/calibrated_workflow_service_reward_alignment_v1.json": "cafe0a687baeb9c09d1b6e76de38821e07c6ad923e1fe54a519f4c6f62f55b9c",
+    "scripts/audit_calibrated_workflow_service_reward.py": "427b5eef3cea8ae177a7c1104ee82e909f7f236469a48f4657d1b0999abc7a3a",
+    "tests/test_calibrated_workflow_service_reward.py": "20dc76b4dda9569d041039607f1c8fe568f3dd9e4912bd139d0809603a764a3f"
+  },
+  "note": "The final delivery commit must contain these exact critical-file hashes. Documentation and post-run analysis files may be added afterward."
+}
