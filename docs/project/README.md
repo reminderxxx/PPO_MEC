@@ -9,6 +9,10 @@
 
 ## Live 文档
 
+- `sa_prepare_balance_localization_20261006.md`：四项机制训练/推理路径、12-state 分层 logit trace、反例、唯一候选与预算冻结。
+- `sa_prepare_balance_ablation_results_20261006.md`：A 历史复用/B 单因素重训、服务/行为/成本/strata、负结果与唯一后续。
+- `manuscript_experiment_section_sa_prepare_balance_20261006.md`：可独立合并的论文实验负结果章节；主工作稿已同步到 v1.4。
+
 - `recovery_cost_defect_impact_report_20261006.md`：修复前独立只读审查，追踪 decision、branch execution、cache
   终态、汇总和 claim 的路径不对称影响，并列明仍有效证据
 - `recovery_cost_corrected_matrix_results_20261006.md`：原 12 点对称公平复算、四方法完整旧→新对照及历史优势撤销

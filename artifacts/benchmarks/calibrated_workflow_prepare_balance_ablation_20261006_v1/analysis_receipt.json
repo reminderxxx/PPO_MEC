@@ -1,0 +1,7 @@
+{
+  "status": "complete",
+  "bootstrap_samples": 5000,
+  "bootstrap_seed": 7,
+  "outer_unit": "source_window",
+  "decision_category": "存在其他未定位问题"
+}

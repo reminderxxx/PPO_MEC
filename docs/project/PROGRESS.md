@@ -5,6 +5,19 @@
 
 ﻿# Progress
 
+## 2026-10-06：SA prepare/execution 单因素闭环完成，拒绝整体删除 auxiliary
+
+- 四项机制定位确认：本轮 `raw_policy` rollout、PPO 重算和确定性评价都跳过 event margin/sharpening；temperature 生效且
+  语义一致；auxiliary/temporal 只进入训练 loss。100-state dev replay 的 17 个 current-missing 状态中，12 个 hard event
+  target=1，提示 target 与 current service readiness 冲突，但不是充分根因。
+- 事前只冻结 `auxiliary_coef=0.1→0.0`。A 精确复用原 3-seed checkpoint/曲线/结果；B 新 3 seeds×192 episodes，
+  理论/实际 steps=`13,824/4,214`、72 updates、35.67 s，selected episodes=`144/192/96`，没有重试或扩预算。
+- regression/frozen completion 都与 A 相同（`0.944/0.958`）；失败 seed 由 17 转移到 29。frozen current-missing action 4
+  `50.0%→57.7%`，总 action 4 `54.7%→71.6%`，invalid prepare `56→86`，service failure `0.417→0.583`。
+- 候选 action 0 反而下降，不是保守执行退化；成本点估计下降与更多无效准备、服务失败并存，不能称服务权衡改善。
+- 最终分类 `存在其他未定位问题`。不做文献近邻检索、不增加候选；完整报告见
+  `sa_prepare_balance_ablation_results_20261006.md`，论文工作稿更新为 v1.4。
+
 ## 2026-10-06：calibrated workflow v3 接口修复与有界重训完成，SA 仅恢复正常
 
 - 独立只读审计先确认旧 action-4 冻结循环由确定性边缘概率聚合、executed/optimized log-prob 错位和 failure-time

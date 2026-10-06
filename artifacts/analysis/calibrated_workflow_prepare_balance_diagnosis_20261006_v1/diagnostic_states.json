@@ -1,0 +1,3218 @@
+[
+  {
+    "seed": 17,
+    "design_id": "dev_02",
+    "step_index": 6,
+    "current_rsu_id": "rsu_0",
+    "target_rsu_id": "rsu_1",
+    "current_bundle_ready": false,
+    "near_handoff": true,
+    "target_prepare_feasible": false,
+    "prepare_feasibility_reason": "contact_budget_exceeded",
+    "action_mask": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "executed_raw_policy_action": 4,
+    "executed_raw_policy_event_prepare_prob": 0.504962,
+    "executed_raw_policy_event_margin": 0.019849,
+    "raw_policy_evaluation": true,
+    "runtime_event_sharpening_info": {},
+    "pseudo_targets": {
+      "slow_target": 1,
+      "fast_target": 0,
+      "event_target": 0,
+      "confidence_weight": 0.55,
+      "event_soft_target": 0.0,
+      "latency_fallback_candidate": 0.0,
+      "steady_rsu_candidate": 0.0,
+      "temporal_urgency": 0.6625,
+      "prepare_window_score": 0.7517628745886166,
+      "handoff_countdown_steps": 2.0
+    },
+    "stages": {
+      "raw_untempered": {
+        "slow_logits": [
+          0.266478,
+          -0.068043,
+          -0.307677
+        ],
+        "fast_logits": [
+          -0.043809,
+          0.160522
+        ],
+        "event_logits": [
+          0.061894,
+          0.081495
+        ],
+        "head_probs": {
+          "slow": [
+            0.438816,
+            0.314052,
+            0.247133
+          ],
+          "fast": [
+            0.449094,
+            0.550906
+          ],
+          "event": [
+            0.4951,
+            0.5049
+          ]
+        },
+        "env_action_probs": [
+          0.155487,
+          0.122355,
+          0.119688,
+          0.097569,
+          0.5049
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 1,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "temperature_only": {
+        "slow_logits": [
+          0.266478,
+          -0.068043,
+          -0.307677
+        ],
+        "fast_logits": [
+          -0.043809,
+          0.160522
+        ],
+        "event_logits": [
+          0.062678,
+          0.082527
+        ],
+        "head_probs": {
+          "slow": [
+            0.438816,
+            0.314052,
+            0.247133
+          ],
+          "fast": [
+            0.449094,
+            0.550906
+          ],
+          "event": [
+            0.495038,
+            0.504962
+          ]
+        },
+        "env_action_probs": [
+          0.155468,
+          0.12234,
+          0.119673,
+          0.097557,
+          0.504962
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 1,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "before_event_enhancement": {
+        "slow_logits": [
+          0.266478,
+          -0.068043,
+          -0.307677
+        ],
+        "fast_logits": [
+          -0.043809,
+          0.160522
+        ],
+        "event_logits": [
+          0.062678,
+          0.082527
+        ],
+        "head_probs": {
+          "slow": [
+            0.438816,
+            0.314052,
+            0.247133
+          ],
+          "fast": [
+            0.449094,
+            0.550906
+          ],
+          "event": [
+            0.495038,
+            0.504962
+          ]
+        },
+        "env_action_probs": [
+          0.155468,
+          0.12234,
+          0.119673,
+          0.097557,
+          0.504962
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 1,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_no_margin": {
+        "slow_logits": [
+          0.266478,
+          -0.068043,
+          -0.307677
+        ],
+        "fast_logits": [
+          -0.043809,
+          0.160522
+        ],
+        "event_logits": [
+          0.046818,
+          0.098386
+        ],
+        "head_probs": {
+          "slow": [
+            0.438816,
+            0.314052,
+            0.247133
+          ],
+          "fast": [
+            0.449094,
+            0.550906
+          ],
+          "event": [
+            0.487111,
+            0.512889
+          ]
+        },
+        "env_action_probs": [
+          0.152978,
+          0.120381,
+          0.117757,
+          0.095995,
+          0.512889
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 1,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_and_margin": {
+        "slow_logits": [
+          0.266478,
+          -0.068043,
+          -0.307677
+        ],
+        "fast_logits": [
+          -0.043809,
+          0.160522
+        ],
+        "event_logits": [
+          -0.007265,
+          0.31472
+        ],
+        "head_probs": {
+          "slow": [
+            0.438816,
+            0.314052,
+            0.247133
+          ],
+          "fast": [
+            0.449094,
+            0.550906
+          ],
+          "event": [
+            0.420192,
+            0.579808
+          ]
+        },
+        "env_action_probs": [
+          0.131962,
+          0.103843,
+          0.10158,
+          0.082807,
+          0.579808
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 1,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "stage_parameters": {
+        "active_temperature": 0.9875,
+        "sharpen_scale": 2.598023,
+        "margin_boost": 0.216334
+      }
+    },
+    "diagnostic_state_id": "dev_state_00"
+  },
+  {
+    "seed": 17,
+    "design_id": "dev_02",
+    "step_index": 7,
+    "current_rsu_id": "rsu_0",
+    "target_rsu_id": "rsu_1",
+    "current_bundle_ready": false,
+    "near_handoff": true,
+    "target_prepare_feasible": false,
+    "prepare_feasibility_reason": "contact_budget_exceeded",
+    "action_mask": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "executed_raw_policy_action": 4,
+    "executed_raw_policy_event_prepare_prob": 0.508572,
+    "executed_raw_policy_event_margin": 0.034292,
+    "raw_policy_evaluation": true,
+    "runtime_event_sharpening_info": {},
+    "pseudo_targets": {
+      "slow_target": 2,
+      "fast_target": 0,
+      "event_target": 0,
+      "confidence_weight": 0.55,
+      "event_soft_target": 0.0,
+      "latency_fallback_candidate": 0.0,
+      "steady_rsu_candidate": 0.0,
+      "temporal_urgency": 0.925,
+      "prepare_window_score": 0.46667372540162283,
+      "handoff_countdown_steps": 1.0
+    },
+    "stages": {
+      "raw_untempered": {
+        "slow_logits": [
+          0.245353,
+          -0.067502,
+          -0.290939
+        ],
+        "fast_logits": [
+          -0.045251,
+          0.158363
+        ],
+        "event_logits": [
+          0.055558,
+          0.089422
+        ],
+        "head_probs": {
+          "slow": [
+            0.431729,
+            0.315747,
+            0.252524
+          ],
+          "fast": [
+            0.449272,
+            0.550728
+          ],
+          "event": [
+            0.491535,
+            0.508465
+          ]
+        },
+        "env_action_probs": [
+          0.155201,
+          0.124124,
+          0.11687,
+          0.09534,
+          0.508465
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 1,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "temperature_only": {
+        "slow_logits": [
+          0.245353,
+          -0.067502,
+          -0.290939
+        ],
+        "fast_logits": [
+          -0.045251,
+          0.158363
+        ],
+        "event_logits": [
+          0.056261,
+          0.090553
+        ],
+        "head_probs": {
+          "slow": [
+            0.431729,
+            0.315747,
+            0.252524
+          ],
+          "fast": [
+            0.449272,
+            0.550728
+          ],
+          "event": [
+            0.491428,
+            0.508572
+          ]
+        },
+        "env_action_probs": [
+          0.155167,
+          0.124097,
+          0.116844,
+          0.095319,
+          0.508572
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 1,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "before_event_enhancement": {
+        "slow_logits": [
+          0.245353,
+          -0.067502,
+          -0.290939
+        ],
+        "fast_logits": [
+          -0.045251,
+          0.158363
+        ],
+        "event_logits": [
+          0.056261,
+          0.090553
+        ],
+        "head_probs": {
+          "slow": [
+            0.431729,
+            0.315747,
+            0.252524
+          ],
+          "fast": [
+            0.449272,
+            0.550728
+          ],
+          "event": [
+            0.491428,
+            0.508572
+          ]
+        },
+        "env_action_probs": [
+          0.155167,
+          0.124097,
+          0.116844,
+          0.095319,
+          0.508572
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 1,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_no_margin": {
+        "slow_logits": [
+          0.245353,
+          -0.067502,
+          -0.290939
+        ],
+        "fast_logits": [
+          -0.045251,
+          0.158363
+        ],
+        "event_logits": [
+          0.0264,
+          0.120415
+        ],
+        "head_probs": {
+          "slow": [
+            0.431729,
+            0.315747,
+            0.252524
+          ],
+          "fast": [
+            0.449272,
+            0.550728
+          ],
+          "event": [
+            0.476513,
+            0.523487
+          ]
+        },
+        "env_action_probs": [
+          0.150458,
+          0.120331,
+          0.113298,
+          0.092426,
+          0.523487
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 1,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_and_margin": {
+        "slow_logits": [
+          0.245353,
+          -0.067502,
+          -0.290939
+        ],
+        "fast_logits": [
+          -0.045251,
+          0.158363
+        ],
+        "event_logits": [
+          -0.051004,
+          0.43003
+        ],
+        "head_probs": {
+          "slow": [
+            0.431729,
+            0.315747,
+            0.252524
+          ],
+          "fast": [
+            0.449272,
+            0.550728
+          ],
+          "event": [
+            0.382008,
+            0.617992
+          ]
+        },
+        "env_action_probs": [
+          0.120618,
+          0.096466,
+          0.090828,
+          0.074096,
+          0.617992
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 1,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "stage_parameters": {
+        "active_temperature": 0.9875,
+        "sharpen_scale": 2.741594,
+        "margin_boost": 0.309615
+      }
+    },
+    "diagnostic_state_id": "dev_state_01"
+  },
+  {
+    "seed": 7,
+    "design_id": "dev_00",
+    "step_index": 2,
+    "current_rsu_id": "rsu_0",
+    "target_rsu_id": "rsu_1",
+    "current_bundle_ready": false,
+    "near_handoff": true,
+    "target_prepare_feasible": true,
+    "prepare_feasibility_reason": "noop_all_resident",
+    "action_mask": [
+      true,
+      false,
+      true,
+      true,
+      true
+    ],
+    "executed_raw_policy_action": 4,
+    "executed_raw_policy_event_prepare_prob": 0.552088,
+    "executed_raw_policy_event_margin": 0.209112,
+    "raw_policy_evaluation": true,
+    "runtime_event_sharpening_info": {},
+    "pseudo_targets": {
+      "slow_target": 0,
+      "fast_target": 0,
+      "event_target": 1,
+      "confidence_weight": 0.9,
+      "event_soft_target": 0.43320950780437484,
+      "latency_fallback_candidate": 0.0,
+      "steady_rsu_candidate": 0.0,
+      "temporal_urgency": 0.8,
+      "prepare_window_score": 0.43320950780437484,
+      "handoff_countdown_steps": 1.0
+    },
+    "stages": {
+      "raw_untempered": {
+        "slow_logits": [
+          0.283937,
+          -0.188221,
+          -0.308125
+        ],
+        "fast_logits": [
+          0.377081,
+          -0.609262
+        ],
+        "event_logits": [
+          -0.1988,
+          -0.021055
+        ],
+        "head_probs": {
+          "slow": [
+            0.459382,
+            0.286495,
+            0.254123
+          ],
+          "fast": [
+            0.728365,
+            0.271635
+          ],
+          "event": [
+            0.45568,
+            0.54432
+          ]
+        },
+        "env_action_probs": [
+          0.147648,
+          0.0,
+          0.064309,
+          0.172438,
+          0.615606
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "temperature_only": {
+        "slow_logits": [
+          0.283937,
+          -0.188221,
+          -0.308125
+        ],
+        "fast_logits": [
+          0.377081,
+          -0.609262
+        ],
+        "event_logits": [
+          -0.233883,
+          -0.024771
+        ],
+        "head_probs": {
+          "slow": [
+            0.459382,
+            0.286495,
+            0.254123
+          ],
+          "fast": [
+            0.728365,
+            0.271635
+          ],
+          "event": [
+            0.447912,
+            0.552088
+          ]
+        },
+        "env_action_probs": [
+          0.144807,
+          0.0,
+          0.063071,
+          0.16912,
+          0.623001
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "before_event_enhancement": {
+        "slow_logits": [
+          0.283937,
+          -0.188221,
+          -0.308125
+        ],
+        "fast_logits": [
+          0.377081,
+          -0.609262
+        ],
+        "event_logits": [
+          -0.233883,
+          -0.024771
+        ],
+        "head_probs": {
+          "slow": [
+            0.459382,
+            0.286495,
+            0.254123
+          ],
+          "fast": [
+            0.728365,
+            0.271635
+          ],
+          "event": [
+            0.447912,
+            0.552088
+          ]
+        },
+        "env_action_probs": [
+          0.144807,
+          0.0,
+          0.063071,
+          0.16912,
+          0.623001
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_no_margin": {
+        "slow_logits": [
+          0.283937,
+          -0.188221,
+          -0.308125
+        ],
+        "fast_logits": [
+          0.377081,
+          -0.609262
+        ],
+        "event_logits": [
+          -0.462233,
+          0.203579
+        ],
+        "head_probs": {
+          "slow": [
+            0.459382,
+            0.286495,
+            0.254123
+          ],
+          "fast": [
+            0.728365,
+            0.271635
+          ],
+          "event": [
+            0.339435,
+            0.660565
+          ]
+        },
+        "env_action_probs": [
+          0.106427,
+          0.0,
+          0.046355,
+          0.124296,
+          0.722923
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_and_margin": {
+        "slow_logits": [
+          0.283937,
+          -0.188221,
+          -0.308125
+        ],
+        "fast_logits": [
+          0.377081,
+          -0.609262
+        ],
+        "event_logits": [
+          -0.52281,
+          0.445887
+        ],
+        "head_probs": {
+          "slow": [
+            0.459382,
+            0.286495,
+            0.254123
+          ],
+          "fast": [
+            0.728365,
+            0.271635
+          ],
+          "event": [
+            0.27514,
+            0.72486
+          ]
+        },
+        "env_action_probs": [
+          0.084752,
+          0.0,
+          0.036914,
+          0.098982,
+          0.779351
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "stage_parameters": {
+        "active_temperature": 0.85,
+        "sharpen_scale": 3.184,
+        "margin_boost": 0.242308
+      }
+    },
+    "diagnostic_state_id": "dev_state_02"
+  },
+  {
+    "seed": 7,
+    "design_id": "dev_01",
+    "step_index": 3,
+    "current_rsu_id": "rsu_0",
+    "target_rsu_id": "rsu_1",
+    "current_bundle_ready": false,
+    "near_handoff": true,
+    "target_prepare_feasible": true,
+    "prepare_feasibility_reason": "noop_all_resident",
+    "action_mask": [
+      true,
+      false,
+      true,
+      true,
+      true
+    ],
+    "executed_raw_policy_action": 4,
+    "executed_raw_policy_event_prepare_prob": 0.512579,
+    "executed_raw_policy_event_margin": 0.050328,
+    "raw_policy_evaluation": true,
+    "runtime_event_sharpening_info": {},
+    "pseudo_targets": {
+      "slow_target": 0,
+      "fast_target": 0,
+      "event_target": 1,
+      "confidence_weight": 0.55,
+      "event_soft_target": 0.43990235132382444,
+      "latency_fallback_candidate": 0.0,
+      "steady_rsu_candidate": 0.0,
+      "temporal_urgency": 0.825,
+      "prepare_window_score": 0.43990235132382444,
+      "handoff_countdown_steps": 1.0
+    },
+    "stages": {
+      "raw_untempered": {
+        "slow_logits": [
+          0.257812,
+          -0.163113,
+          -0.312933
+        ],
+        "fast_logits": [
+          0.365129,
+          -0.593786
+        ],
+        "event_logits": [
+          -0.120708,
+          -0.07793
+        ],
+        "head_probs": {
+          "slow": [
+            0.450138,
+            0.295488,
+            0.254375
+          ],
+          "fast": [
+            0.722905,
+            0.277095
+          ],
+          "event": [
+            0.489307,
+            0.510693
+          ]
+        },
+        "env_action_probs": [
+          0.165139,
+          0.0,
+          0.069708,
+          0.181859,
+          0.583294
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "temperature_only": {
+        "slow_logits": [
+          0.257812,
+          -0.163113,
+          -0.312933
+        ],
+        "fast_logits": [
+          0.365129,
+          -0.593786
+        ],
+        "event_logits": [
+          -0.14201,
+          -0.091682
+        ],
+        "head_probs": {
+          "slow": [
+            0.450138,
+            0.295488,
+            0.254375
+          ],
+          "fast": [
+            0.722905,
+            0.277095
+          ],
+          "event": [
+            0.487421,
+            0.512579
+          ]
+        },
+        "env_action_probs": [
+          0.164412,
+          0.0,
+          0.069401,
+          0.181059,
+          0.585128
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "before_event_enhancement": {
+        "slow_logits": [
+          0.257812,
+          -0.163113,
+          -0.312933
+        ],
+        "fast_logits": [
+          0.365129,
+          -0.593786
+        ],
+        "event_logits": [
+          -0.14201,
+          -0.091682
+        ],
+        "head_probs": {
+          "slow": [
+            0.450138,
+            0.295488,
+            0.254375
+          ],
+          "fast": [
+            0.722905,
+            0.277095
+          ],
+          "event": [
+            0.487421,
+            0.512579
+          ]
+        },
+        "env_action_probs": [
+          0.164412,
+          0.0,
+          0.069401,
+          0.181059,
+          0.585128
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_no_margin": {
+        "slow_logits": [
+          0.257812,
+          -0.163113,
+          -0.312933
+        ],
+        "fast_logits": [
+          0.365129,
+          -0.593786
+        ],
+        "event_logits": [
+          -0.197663,
+          -0.036028
+        ],
+        "head_probs": {
+          "slow": [
+            0.450138,
+            0.295488,
+            0.254375
+          ],
+          "fast": [
+            0.722905,
+            0.277095
+          ],
+          "event": [
+            0.459679,
+            0.540321
+          ]
+        },
+        "env_action_probs": [
+          0.153815,
+          0.0,
+          0.064928,
+          0.169389,
+          0.611867
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_and_margin": {
+        "slow_logits": [
+          0.257812,
+          -0.163113,
+          -0.312933
+        ],
+        "fast_logits": [
+          0.365129,
+          -0.593786
+        ],
+        "event_logits": [
+          -0.261606,
+          0.219741
+        ],
+        "head_probs": {
+          "slow": [
+            0.450138,
+            0.295488,
+            0.254375
+          ],
+          "fast": [
+            0.722905,
+            0.277095
+          ],
+          "event": [
+            0.381934,
+            0.618066
+          ]
+        },
+        "env_action_probs": [
+          0.125001,
+          0.0,
+          0.052765,
+          0.137658,
+          0.684575
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "stage_parameters": {
+        "active_temperature": 0.85,
+        "sharpen_scale": 3.211625,
+        "margin_boost": 0.255769
+      }
+    },
+    "diagnostic_state_id": "dev_state_03"
+  },
+  {
+    "seed": 17,
+    "design_id": "dev_02",
+    "step_index": 8,
+    "current_rsu_id": "rsu_1",
+    "target_rsu_id": null,
+    "current_bundle_ready": false,
+    "near_handoff": false,
+    "target_prepare_feasible": false,
+    "prepare_feasibility_reason": "action_4_masked_missing_distinct_target",
+    "action_mask": [
+      true,
+      false,
+      true,
+      true,
+      false
+    ],
+    "executed_raw_policy_action": 0,
+    "executed_raw_policy_event_prepare_prob": 0.513973,
+    "executed_raw_policy_event_margin": 0.055905,
+    "raw_policy_evaluation": true,
+    "runtime_event_sharpening_info": {},
+    "pseudo_targets": {
+      "slow_target": 1,
+      "fast_target": 0,
+      "event_target": 0,
+      "confidence_weight": 0.55,
+      "event_soft_target": 0.0,
+      "latency_fallback_candidate": 0.0,
+      "steady_rsu_candidate": 0.0,
+      "temporal_urgency": 0.04999999999999999,
+      "prepare_window_score": 0.0,
+      "handoff_countdown_steps": 5.0
+    },
+    "stages": {
+      "raw_untempered": {
+        "slow_logits": [
+          0.212298,
+          -0.072091,
+          -0.223348
+        ],
+        "fast_logits": [
+          -0.044861,
+          0.162405
+        ],
+        "event_logits": [
+          0.03946,
+          0.094667
+        ],
+        "head_probs": {
+          "slow": [
+            0.416784,
+            0.31362,
+            0.269596
+          ],
+          "fast": [
+            0.448368,
+            0.551632
+          ],
+          "event": [
+            0.486202,
+            0.513798
+          ]
+        },
+        "env_action_probs": [
+          0.429378,
+          0.0,
+          0.314773,
+          0.255849,
+          0.0
+        ],
+        "head_actions": {
+          "slow": 1,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 0,
+        "aggregation_reason": "slow_head_cache_fill",
+        "projection_applied": true
+      },
+      "temperature_only": {
+        "slow_logits": [
+          0.212298,
+          -0.072091,
+          -0.223348
+        ],
+        "fast_logits": [
+          -0.044861,
+          0.162405
+        ],
+        "event_logits": [
+          0.03996,
+          0.095865
+        ],
+        "head_probs": {
+          "slow": [
+            0.416784,
+            0.31362,
+            0.269596
+          ],
+          "fast": [
+            0.448368,
+            0.551632
+          ],
+          "event": [
+            0.486027,
+            0.513973
+          ]
+        },
+        "env_action_probs": [
+          0.429378,
+          0.0,
+          0.314773,
+          0.255849,
+          0.0
+        ],
+        "head_actions": {
+          "slow": 1,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 0,
+        "aggregation_reason": "slow_head_cache_fill",
+        "projection_applied": true
+      },
+      "before_event_enhancement": {
+        "slow_logits": [
+          0.212298,
+          -0.072091,
+          -0.223348
+        ],
+        "fast_logits": [
+          -0.044861,
+          0.162405
+        ],
+        "event_logits": [
+          0.03996,
+          0.095865
+        ],
+        "head_probs": {
+          "slow": [
+            0.416784,
+            0.31362,
+            0.269596
+          ],
+          "fast": [
+            0.448368,
+            0.551632
+          ],
+          "event": [
+            0.486027,
+            0.513973
+          ]
+        },
+        "env_action_probs": [
+          0.429378,
+          0.0,
+          0.314773,
+          0.255849,
+          0.0
+        ],
+        "head_actions": {
+          "slow": 1,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 0,
+        "aggregation_reason": "slow_head_cache_fill",
+        "projection_applied": true
+      },
+      "after_sharpening_no_margin": {
+        "slow_logits": [
+          0.212298,
+          -0.072091,
+          -0.223348
+        ],
+        "fast_logits": [
+          -0.044861,
+          0.162405
+        ],
+        "event_logits": [
+          0.011548,
+          0.124277
+        ],
+        "head_probs": {
+          "slow": [
+            0.416784,
+            0.31362,
+            0.269596
+          ],
+          "fast": [
+            0.448368,
+            0.551632
+          ],
+          "event": [
+            0.471847,
+            0.528153
+          ]
+        },
+        "env_action_probs": [
+          0.429378,
+          0.0,
+          0.314773,
+          0.255849,
+          0.0
+        ],
+        "head_actions": {
+          "slow": 1,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 0,
+        "aggregation_reason": "slow_head_cache_fill",
+        "projection_applied": true
+      },
+      "after_sharpening_and_margin": {
+        "slow_logits": [
+          0.212298,
+          -0.072091,
+          -0.223348
+        ],
+        "fast_logits": [
+          -0.044861,
+          0.162405
+        ],
+        "event_logits": [
+          0.011548,
+          0.124277
+        ],
+        "head_probs": {
+          "slow": [
+            0.416784,
+            0.31362,
+            0.269596
+          ],
+          "fast": [
+            0.448368,
+            0.551632
+          ],
+          "event": [
+            0.471847,
+            0.528153
+          ]
+        },
+        "env_action_probs": [
+          0.429378,
+          0.0,
+          0.314773,
+          0.255849,
+          0.0
+        ],
+        "head_actions": {
+          "slow": 1,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 0,
+        "aggregation_reason": "slow_head_cache_fill",
+        "projection_applied": true
+      },
+      "stage_parameters": {
+        "active_temperature": 0.9875,
+        "sharpen_scale": 2.016437,
+        "margin_boost": 0.0
+      }
+    },
+    "diagnostic_state_id": "dev_state_04"
+  },
+  {
+    "seed": 7,
+    "design_id": "dev_02",
+    "step_index": 0,
+    "current_rsu_id": "rsu_0",
+    "target_rsu_id": "rsu_1",
+    "current_bundle_ready": true,
+    "near_handoff": true,
+    "target_prepare_feasible": false,
+    "prepare_feasibility_reason": "contact_budget_exceeded",
+    "action_mask": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "executed_raw_policy_action": 3,
+    "executed_raw_policy_event_prepare_prob": 0.481434,
+    "executed_raw_policy_event_margin": -0.074298,
+    "raw_policy_evaluation": true,
+    "runtime_event_sharpening_info": {},
+    "pseudo_targets": {
+      "slow_target": 0,
+      "fast_target": 0,
+      "event_target": 0,
+      "confidence_weight": 0.55,
+      "event_soft_target": 0.0,
+      "latency_fallback_candidate": 0.0,
+      "steady_rsu_candidate": 0.0,
+      "temporal_urgency": 0.5125000000000001,
+      "prepare_window_score": 0.6756057760117191,
+      "handoff_countdown_steps": 2.0
+    },
+    "stages": {
+      "raw_untempered": {
+        "slow_logits": [
+          0.26114,
+          -0.264846,
+          -0.207286
+        ],
+        "fast_logits": [
+          0.52613,
+          -0.903173
+        ],
+        "event_logits": [
+          -0.071182,
+          -0.134336
+        ],
+        "head_probs": {
+          "slow": [
+            0.451068,
+            0.266569,
+            0.282363
+          ],
+          "fast": [
+            0.806793,
+            0.193207
+          ],
+          "event": [
+            0.515783,
+            0.484217
+          ]
+        },
+        "env_action_probs": [
+          0.137492,
+          0.145638,
+          0.04495,
+          0.187703,
+          0.484217
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "temperature_only": {
+        "slow_logits": [
+          0.26114,
+          -0.264846,
+          -0.207286
+        ],
+        "fast_logits": [
+          0.52613,
+          -0.903173
+        ],
+        "event_logits": [
+          -0.083744,
+          -0.158042
+        ],
+        "head_probs": {
+          "slow": [
+            0.451068,
+            0.266569,
+            0.282363
+          ],
+          "fast": [
+            0.806793,
+            0.193207
+          ],
+          "event": [
+            0.518566,
+            0.481434
+          ]
+        },
+        "env_action_probs": [
+          0.138234,
+          0.146424,
+          0.045193,
+          0.188716,
+          0.481434
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "before_event_enhancement": {
+        "slow_logits": [
+          0.26114,
+          -0.264846,
+          -0.207286
+        ],
+        "fast_logits": [
+          0.52613,
+          -0.903173
+        ],
+        "event_logits": [
+          -0.083744,
+          -0.158042
+        ],
+        "head_probs": {
+          "slow": [
+            0.451068,
+            0.266569,
+            0.282363
+          ],
+          "fast": [
+            0.806793,
+            0.193207
+          ],
+          "event": [
+            0.518566,
+            0.481434
+          ]
+        },
+        "env_action_probs": [
+          0.138234,
+          0.146424,
+          0.045193,
+          0.188716,
+          0.481434
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "after_sharpening_no_margin": {
+        "slow_logits": [
+          0.26114,
+          -0.264846,
+          -0.207286
+        ],
+        "fast_logits": [
+          0.52613,
+          -0.903173
+        ],
+        "event_logits": [
+          -0.007717,
+          -0.234069
+        ],
+        "head_probs": {
+          "slow": [
+            0.451068,
+            0.266569,
+            0.282363
+          ],
+          "fast": [
+            0.806793,
+            0.193207
+          ],
+          "event": [
+            0.556348,
+            0.443652
+          ]
+        },
+        "env_action_probs": [
+          0.148305,
+          0.157092,
+          0.048486,
+          0.202465,
+          0.443652
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "after_sharpening_and_margin": {
+        "slow_logits": [
+          0.26114,
+          -0.264846,
+          -0.207286
+        ],
+        "fast_logits": [
+          0.52613,
+          -0.903173
+        ],
+        "event_logits": [
+          -0.051548,
+          -0.058743
+        ],
+        "head_probs": {
+          "slow": [
+            0.451068,
+            0.266569,
+            0.282363
+          ],
+          "fast": [
+            0.806793,
+            0.193207
+          ],
+          "event": [
+            0.501799,
+            0.498201
+          ]
+        },
+        "env_action_probs": [
+          0.133764,
+          0.141689,
+          0.043732,
+          0.182614,
+          0.498201
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "stage_parameters": {
+        "active_temperature": 0.85,
+        "sharpen_scale": 3.046544,
+        "margin_boost": 0.175326
+      }
+    },
+    "diagnostic_state_id": "dev_state_05"
+  },
+  {
+    "seed": 7,
+    "design_id": "dev_02",
+    "step_index": 1,
+    "current_rsu_id": "rsu_0",
+    "target_rsu_id": "rsu_1",
+    "current_bundle_ready": true,
+    "near_handoff": true,
+    "target_prepare_feasible": false,
+    "prepare_feasibility_reason": "contact_budget_exceeded",
+    "action_mask": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "executed_raw_policy_action": 3,
+    "executed_raw_policy_event_prepare_prob": 0.468596,
+    "executed_raw_policy_event_margin": -0.12578,
+    "raw_policy_evaluation": true,
+    "runtime_event_sharpening_info": {},
+    "pseudo_targets": {
+      "slow_target": 2,
+      "fast_target": 0,
+      "event_target": 0,
+      "confidence_weight": 0.55,
+      "event_soft_target": 0.0,
+      "latency_fallback_candidate": 0.0,
+      "steady_rsu_candidate": 0.0,
+      "temporal_urgency": 0.7750000000000001,
+      "prepare_window_score": 0.4265166642849253,
+      "handoff_countdown_steps": 1.0
+    },
+    "stages": {
+      "raw_untempered": {
+        "slow_logits": [
+          0.248644,
+          -0.202277,
+          -0.242456
+        ],
+        "fast_logits": [
+          0.442101,
+          -0.776747
+        ],
+        "event_logits": [
+          -0.036435,
+          -0.143348
+        ],
+        "head_probs": {
+          "slow": [
+            0.444643,
+            0.283256,
+            0.272101
+          ],
+          "fast": [
+            0.771861,
+            0.228139
+          ],
+          "event": [
+            0.526703,
+            0.473297
+          ]
+        },
+        "env_action_probs": [
+          0.149192,
+          0.143316,
+          0.053429,
+          0.180766,
+          0.473297
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "temperature_only": {
+        "slow_logits": [
+          0.248644,
+          -0.202277,
+          -0.242456
+        ],
+        "fast_logits": [
+          0.442101,
+          -0.776747
+        ],
+        "event_logits": [
+          -0.042865,
+          -0.168645
+        ],
+        "head_probs": {
+          "slow": [
+            0.444643,
+            0.283256,
+            0.272101
+          ],
+          "fast": [
+            0.771861,
+            0.228139
+          ],
+          "event": [
+            0.531403,
+            0.468596
+          ]
+        },
+        "env_action_probs": [
+          0.150523,
+          0.144595,
+          0.053906,
+          0.182379,
+          0.468596
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "before_event_enhancement": {
+        "slow_logits": [
+          0.248644,
+          -0.202277,
+          -0.242456
+        ],
+        "fast_logits": [
+          0.442101,
+          -0.776747
+        ],
+        "event_logits": [
+          -0.042865,
+          -0.168645
+        ],
+        "head_probs": {
+          "slow": [
+            0.444643,
+            0.283256,
+            0.272101
+          ],
+          "fast": [
+            0.771861,
+            0.228139
+          ],
+          "event": [
+            0.531403,
+            0.468596
+          ]
+        },
+        "env_action_probs": [
+          0.150523,
+          0.144595,
+          0.053906,
+          0.182379,
+          0.468596
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "after_sharpening_no_margin": {
+        "slow_logits": [
+          0.248644,
+          -0.202277,
+          -0.242456
+        ],
+        "fast_logits": [
+          0.442101,
+          -0.776747
+        ],
+        "event_logits": [
+          0.092749,
+          -0.304259
+        ],
+        "head_probs": {
+          "slow": [
+            0.444643,
+            0.283256,
+            0.272101
+          ],
+          "fast": [
+            0.771861,
+            0.228139
+          ],
+          "event": [
+            0.597968,
+            0.402032
+          ]
+        },
+        "env_action_probs": [
+          0.169378,
+          0.162708,
+          0.060658,
+          0.205224,
+          0.402032
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "after_sharpening_and_margin": {
+        "slow_logits": [
+          0.248644,
+          -0.202277,
+          -0.242456
+        ],
+        "fast_logits": [
+          0.442101,
+          -0.776747
+        ],
+        "event_logits": [
+          0.035537,
+          -0.075413
+        ],
+        "head_probs": {
+          "slow": [
+            0.444643,
+            0.283256,
+            0.272101
+          ],
+          "fast": [
+            0.771861,
+            0.228139
+          ],
+          "event": [
+            0.527709,
+            0.472291
+          ]
+        },
+        "env_action_probs": [
+          0.149477,
+          0.14359,
+          0.053531,
+          0.181111,
+          0.472291
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "stage_parameters": {
+        "active_temperature": 0.85,
+        "sharpen_scale": 3.156375,
+        "margin_boost": 0.228846
+      }
+    },
+    "diagnostic_state_id": "dev_state_06"
+  },
+  {
+    "seed": 7,
+    "design_id": "dev_00",
+    "step_index": 1,
+    "current_rsu_id": "rsu_0",
+    "target_rsu_id": "rsu_1",
+    "current_bundle_ready": true,
+    "near_handoff": true,
+    "target_prepare_feasible": true,
+    "prepare_feasibility_reason": "committed",
+    "action_mask": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "executed_raw_policy_action": 3,
+    "executed_raw_policy_event_prepare_prob": 0.470566,
+    "executed_raw_policy_event_margin": -0.117871,
+    "raw_policy_evaluation": true,
+    "runtime_event_sharpening_info": {},
+    "pseudo_targets": {
+      "slow_target": 0,
+      "fast_target": 0,
+      "event_target": 0,
+      "confidence_weight": 0.9,
+      "event_soft_target": 0.0,
+      "latency_fallback_candidate": 0.0,
+      "steady_rsu_candidate": 0.0,
+      "temporal_urgency": 0.5375,
+      "prepare_window_score": 0.6882986257745353,
+      "handoff_countdown_steps": 2.0
+    },
+    "stages": {
+      "raw_untempered": {
+        "slow_logits": [
+          0.241818,
+          -0.145539,
+          -0.334299
+        ],
+        "fast_logits": [
+          0.53673,
+          -0.890065
+        ],
+        "event_logits": [
+          -0.052233,
+          -0.152424
+        ],
+        "head_probs": {
+          "slow": [
+            0.446244,
+            0.302932,
+            0.250823
+          ],
+          "fast": [
+            0.806402,
+            0.193598
+          ],
+          "event": [
+            0.525027,
+            0.474973
+          ]
+        },
+        "env_action_probs": [
+          0.159048,
+          0.131689,
+          0.045358,
+          0.188932,
+          0.474973
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "temperature_only": {
+        "slow_logits": [
+          0.241818,
+          -0.145539,
+          -0.334299
+        ],
+        "fast_logits": [
+          0.53673,
+          -0.890065
+        ],
+        "event_logits": [
+          -0.061451,
+          -0.179322
+        ],
+        "head_probs": {
+          "slow": [
+            0.446244,
+            0.302932,
+            0.250823
+          ],
+          "fast": [
+            0.806402,
+            0.193598
+          ],
+          "event": [
+            0.529434,
+            0.470566
+          ]
+        },
+        "env_action_probs": [
+          0.160383,
+          0.132794,
+          0.045739,
+          0.190518,
+          0.470566
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "before_event_enhancement": {
+        "slow_logits": [
+          0.241818,
+          -0.145539,
+          -0.334299
+        ],
+        "fast_logits": [
+          0.53673,
+          -0.890065
+        ],
+        "event_logits": [
+          -0.061451,
+          -0.179322
+        ],
+        "head_probs": {
+          "slow": [
+            0.446244,
+            0.302932,
+            0.250823
+          ],
+          "fast": [
+            0.806402,
+            0.193598
+          ],
+          "event": [
+            0.529434,
+            0.470566
+          ]
+        },
+        "env_action_probs": [
+          0.160383,
+          0.132794,
+          0.045739,
+          0.190518,
+          0.470566
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "after_sharpening_no_margin": {
+        "slow_logits": [
+          0.241818,
+          -0.145539,
+          -0.334299
+        ],
+        "fast_logits": [
+          0.53673,
+          -0.890065
+        ],
+        "event_logits": [
+          0.05999,
+          -0.300763
+        ],
+        "head_probs": {
+          "slow": [
+            0.446244,
+            0.302932,
+            0.250823
+          ],
+          "fast": [
+            0.806402,
+            0.193598
+          ],
+          "event": [
+            0.589222,
+            0.410778
+          ]
+        },
+        "env_action_probs": [
+          0.178495,
+          0.147791,
+          0.050904,
+          0.212033,
+          0.410778
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "after_sharpening_and_margin": {
+        "slow_logits": [
+          0.241818,
+          -0.145539,
+          -0.334299
+        ],
+        "fast_logits": [
+          0.53673,
+          -0.890065
+        ],
+        "event_logits": [
+          0.014449,
+          -0.118602
+        ],
+        "head_probs": {
+          "slow": [
+            0.446244,
+            0.302932,
+            0.250823
+          ],
+          "fast": [
+            0.806402,
+            0.193598
+          ],
+          "event": [
+            0.533214,
+            0.466786
+          ]
+        },
+        "env_action_probs": [
+          0.161528,
+          0.133742,
+          0.046066,
+          0.191878,
+          0.466786
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "stage_parameters": {
+        "active_temperature": 0.85,
+        "sharpen_scale": 3.06057,
+        "margin_boost": 0.182161
+      }
+    },
+    "diagnostic_state_id": "dev_state_07"
+  },
+  {
+    "seed": 7,
+    "design_id": "dev_00",
+    "step_index": 4,
+    "current_rsu_id": "rsu_1",
+    "target_rsu_id": "rsu_2",
+    "current_bundle_ready": true,
+    "near_handoff": true,
+    "target_prepare_feasible": true,
+    "prepare_feasibility_reason": "noop_all_resident",
+    "action_mask": [
+      true,
+      false,
+      true,
+      true,
+      true
+    ],
+    "executed_raw_policy_action": 4,
+    "executed_raw_policy_event_prepare_prob": 0.624037,
+    "executed_raw_policy_event_margin": 0.506721,
+    "raw_policy_evaluation": true,
+    "runtime_event_sharpening_info": {},
+    "pseudo_targets": {
+      "slow_target": 0,
+      "fast_target": 0,
+      "event_target": 1,
+      "confidence_weight": 0.9,
+      "event_soft_target": 0.7517628745886166,
+      "latency_fallback_candidate": 0.0,
+      "steady_rsu_candidate": 0.0,
+      "temporal_urgency": 0.6625,
+      "prepare_window_score": 0.7517628745886166,
+      "handoff_countdown_steps": 2.0
+    },
+    "stages": {
+      "raw_untempered": {
+        "slow_logits": [
+          0.343734,
+          -0.390861,
+          -0.109758
+        ],
+        "fast_logits": [
+          0.422811,
+          -0.796559
+        ],
+        "event_logits": [
+          -0.348669,
+          0.082044
+        ],
+        "head_probs": {
+          "slow": [
+            0.47279,
+            0.226797,
+            0.300413
+          ],
+          "fast": [
+            0.771953,
+            0.228047
+          ],
+          "event": [
+            0.393956,
+            0.606044
+          ]
+        },
+        "env_action_probs": [
+          0.101342,
+          0.0,
+          0.048178,
+          0.163084,
+          0.687397
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "temperature_only": {
+        "slow_logits": [
+          0.343734,
+          -0.390861,
+          -0.109758
+        ],
+        "fast_logits": [
+          0.422811,
+          -0.796559
+        ],
+        "event_logits": [
+          -0.410198,
+          0.096522
+        ],
+        "head_probs": {
+          "slow": [
+            0.47279,
+            0.226797,
+            0.300413
+          ],
+          "fast": [
+            0.771953,
+            0.228047
+          ],
+          "event": [
+            0.375963,
+            0.624037
+          ]
+        },
+        "env_action_probs": [
+          0.096124,
+          0.0,
+          0.045697,
+          0.154687,
+          0.703493
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "before_event_enhancement": {
+        "slow_logits": [
+          0.343734,
+          -0.390861,
+          -0.109758
+        ],
+        "fast_logits": [
+          0.422811,
+          -0.796559
+        ],
+        "event_logits": [
+          -0.410198,
+          0.096522
+        ],
+        "head_probs": {
+          "slow": [
+            0.47279,
+            0.226797,
+            0.300413
+          ],
+          "fast": [
+            0.771953,
+            0.228047
+          ],
+          "event": [
+            0.375963,
+            0.624037
+          ]
+        },
+        "env_action_probs": [
+          0.096124,
+          0.0,
+          0.045697,
+          0.154687,
+          0.703493
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_no_margin": {
+        "slow_logits": [
+          0.343734,
+          -0.390861,
+          -0.109758
+        ],
+        "fast_logits": [
+          0.422811,
+          -0.796559
+        ],
+        "event_logits": [
+          -0.950033,
+          0.636357
+        ],
+        "head_probs": {
+          "slow": [
+            0.47279,
+            0.226797,
+            0.300413
+          ],
+          "fast": [
+            0.771953,
+            0.228047
+          ],
+          "event": [
+            0.169893,
+            0.830108
+          ]
+        },
+        "env_action_probs": [
+          0.040603,
+          0.0,
+          0.019303,
+          0.065341,
+          0.874753
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_and_margin": {
+        "slow_logits": [
+          0.343734,
+          -0.390861,
+          -0.109758
+        ],
+        "fast_logits": [
+          0.422811,
+          -0.796559
+        ],
+        "event_logits": [
+          -1.004116,
+          0.85269
+        ],
+        "head_probs": {
+          "slow": [
+            0.47279,
+            0.226797,
+            0.300413
+          ],
+          "fast": [
+            0.771953,
+            0.228047
+          ],
+          "event": [
+            0.135076,
+            0.864924
+          ]
+        },
+        "env_action_probs": [
+          0.03193,
+          0.0,
+          0.01518,
+          0.051384,
+          0.901506
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "stage_parameters": {
+        "active_temperature": 0.85,
+        "sharpen_scale": 3.130698,
+        "margin_boost": 0.216334
+      }
+    },
+    "diagnostic_state_id": "dev_state_08"
+  },
+  {
+    "seed": 7,
+    "design_id": "dev_00",
+    "step_index": 0,
+    "current_rsu_id": "rsu_0",
+    "target_rsu_id": "rsu_1",
+    "current_bundle_ready": true,
+    "near_handoff": false,
+    "target_prepare_feasible": true,
+    "prepare_feasibility_reason": "committed",
+    "action_mask": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "executed_raw_policy_action": 3,
+    "executed_raw_policy_event_prepare_prob": 0.497036,
+    "executed_raw_policy_event_margin": -0.011856,
+    "raw_policy_evaluation": true,
+    "runtime_event_sharpening_info": {},
+    "pseudo_targets": {
+      "slow_target": 0,
+      "fast_target": 0,
+      "event_target": 0,
+      "confidence_weight": 0.9,
+      "event_soft_target": 0.0,
+      "latency_fallback_candidate": 0.0,
+      "steady_rsu_candidate": 0.0,
+      "temporal_urgency": 0.3416666666666667,
+      "prepare_window_score": 0.5888713026324748,
+      "handoff_countdown_steps": 3.0
+    },
+    "stages": {
+      "raw_untempered": {
+        "slow_logits": [
+          0.275143,
+          -0.259315,
+          -0.230059
+        ],
+        "fast_logits": [
+          0.536192,
+          -0.917988
+        ],
+        "event_logits": [
+          -0.106167,
+          -0.116244
+        ],
+        "head_probs": {
+          "slow": [
+            0.456752,
+            0.267651,
+            0.275597
+          ],
+          "fast": [
+            0.810641,
+            0.189359
+          ],
+          "event": [
+            0.502519,
+            0.497481
+          ]
+        },
+        "env_action_probs": [
+          0.1345,
+          0.138493,
+          0.043463,
+          0.186064,
+          0.497481
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "temperature_only": {
+        "slow_logits": [
+          0.275143,
+          -0.259315,
+          -0.230059
+        ],
+        "fast_logits": [
+          0.536192,
+          -0.917988
+        ],
+        "event_logits": [
+          -0.124903,
+          -0.136758
+        ],
+        "head_probs": {
+          "slow": [
+            0.456752,
+            0.267651,
+            0.275597
+          ],
+          "fast": [
+            0.810641,
+            0.189359
+          ],
+          "event": [
+            0.502964,
+            0.497036
+          ]
+        },
+        "env_action_probs": [
+          0.134619,
+          0.138615,
+          0.043501,
+          0.186228,
+          0.497036
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "before_event_enhancement": {
+        "slow_logits": [
+          0.275143,
+          -0.259315,
+          -0.230059
+        ],
+        "fast_logits": [
+          0.536192,
+          -0.917988
+        ],
+        "event_logits": [
+          -0.124903,
+          -0.136758
+        ],
+        "head_probs": {
+          "slow": [
+            0.456752,
+            0.267651,
+            0.275597
+          ],
+          "fast": [
+            0.810641,
+            0.189359
+          ],
+          "event": [
+            0.502964,
+            0.497036
+          ]
+        },
+        "env_action_probs": [
+          0.134619,
+          0.138615,
+          0.043501,
+          0.186228,
+          0.497036
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "after_sharpening_no_margin": {
+        "slow_logits": [
+          0.275143,
+          -0.259315,
+          -0.230059
+        ],
+        "fast_logits": [
+          0.536192,
+          -0.917988
+        ],
+        "event_logits": [
+          -0.113339,
+          -0.148321
+        ],
+        "head_probs": {
+          "slow": [
+            0.456752,
+            0.267651,
+            0.275597
+          ],
+          "fast": [
+            0.810641,
+            0.189359
+          ],
+          "event": [
+            0.508745,
+            0.491255
+          ]
+        },
+        "env_action_probs": [
+          0.136166,
+          0.140208,
+          0.044001,
+          0.188369,
+          0.491255
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 0
+        },
+        "selected_action": 3,
+        "aggregation_reason": "fast_head_steady_offload",
+        "projection_applied": false
+      },
+      "after_sharpening_and_margin": {
+        "slow_logits": [
+          0.275143,
+          -0.259315,
+          -0.230059
+        ],
+        "fast_logits": [
+          0.536192,
+          -0.917988
+        ],
+        "event_logits": [
+          -0.145495,
+          -0.019698
+        ],
+        "head_probs": {
+          "slow": [
+            0.456752,
+            0.267651,
+            0.275597
+          ],
+          "fast": [
+            0.810641,
+            0.189359
+          ],
+          "event": [
+            0.468592,
+            0.531408
+          ]
+        },
+        "env_action_probs": [
+          0.125419,
+          0.129143,
+          0.040529,
+          0.173502,
+          0.531408
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "stage_parameters": {
+        "active_temperature": 0.85,
+        "sharpen_scale": 2.950703,
+        "margin_boost": 0.128623
+      }
+    },
+    "diagnostic_state_id": "dev_state_09"
+  },
+  {
+    "seed": 7,
+    "design_id": "dev_00",
+    "step_index": 3,
+    "current_rsu_id": "rsu_1",
+    "target_rsu_id": "rsu_2",
+    "current_bundle_ready": true,
+    "near_handoff": false,
+    "target_prepare_feasible": true,
+    "prepare_feasibility_reason": "noop_all_resident",
+    "action_mask": [
+      true,
+      false,
+      true,
+      true,
+      true
+    ],
+    "executed_raw_policy_action": 4,
+    "executed_raw_policy_event_prepare_prob": 0.619468,
+    "executed_raw_policy_event_margin": 0.487291,
+    "raw_policy_evaluation": true,
+    "runtime_event_sharpening_info": {},
+    "pseudo_targets": {
+      "slow_target": 0,
+      "fast_target": 0,
+      "event_target": 1,
+      "confidence_weight": 0.9,
+      "event_soft_target": 0.6777212509721885,
+      "latency_fallback_candidate": 0.0,
+      "steady_rsu_candidate": 0.0,
+      "temporal_urgency": 0.5166666666666667,
+      "prepare_window_score": 0.6777212509721885,
+      "handoff_countdown_steps": 3.0
+    },
+    "stages": {
+      "raw_untempered": {
+        "slow_logits": [
+          0.338948,
+          -0.38739,
+          -0.108351
+        ],
+        "fast_logits": [
+          0.423243,
+          -0.789232
+        ],
+        "event_logits": [
+          -0.338722,
+          0.075475
+        ],
+        "head_probs": {
+          "slow": [
+            0.471025,
+            0.227824,
+            0.301151
+          ],
+          "fast": [
+            0.770737,
+            0.229263
+          ],
+          "event": [
+            0.397906,
+            0.602094
+          ]
+        },
+        "env_action_probs": [
+          0.102994,
+          0.0,
+          0.048819,
+          0.164121,
+          0.684065
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "temperature_only": {
+        "slow_logits": [
+          0.338948,
+          -0.38739,
+          -0.108351
+        ],
+        "fast_logits": [
+          0.423243,
+          -0.789232
+        ],
+        "event_logits": [
+          -0.398497,
+          0.088794
+        ],
+        "head_probs": {
+          "slow": [
+            0.471025,
+            0.227824,
+            0.301151
+          ],
+          "fast": [
+            0.770737,
+            0.229263
+          ],
+          "event": [
+            0.380532,
+            0.619468
+          ]
+        },
+        "env_action_probs": [
+          0.097915,
+          0.0,
+          0.046412,
+          0.156027,
+          0.699646
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "before_event_enhancement": {
+        "slow_logits": [
+          0.338948,
+          -0.38739,
+          -0.108351
+        ],
+        "fast_logits": [
+          0.423243,
+          -0.789232
+        ],
+        "event_logits": [
+          -0.398497,
+          0.088794
+        ],
+        "head_probs": {
+          "slow": [
+            0.471025,
+            0.227824,
+            0.301151
+          ],
+          "fast": [
+            0.770737,
+            0.229263
+          ],
+          "event": [
+            0.380532,
+            0.619468
+          ]
+        },
+        "env_action_probs": [
+          0.097915,
+          0.0,
+          0.046412,
+          0.156027,
+          0.699646
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_no_margin": {
+        "slow_logits": [
+          0.338948,
+          -0.38739,
+          -0.108351
+        ],
+        "fast_logits": [
+          0.423243,
+          -0.789232
+        ],
+        "event_logits": [
+          -0.897697,
+          0.587995
+        ],
+        "head_probs": {
+          "slow": [
+            0.471025,
+            0.227824,
+            0.301151
+          ],
+          "fast": [
+            0.770737,
+            0.229263
+          ],
+          "event": [
+            0.184569,
+            0.815431
+          ]
+        },
+        "env_action_probs": [
+          0.044524,
+          0.0,
+          0.021104,
+          0.070949,
+          0.863423
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_and_margin": {
+        "slow_logits": [
+          0.338948,
+          -0.38739,
+          -0.108351
+        ],
+        "fast_logits": [
+          0.423243,
+          -0.789232
+        ],
+        "event_logits": [
+          -0.941814,
+          0.76446
+        ],
+        "head_probs": {
+          "slow": [
+            0.471025,
+            0.227824,
+            0.301151
+          ],
+          "fast": [
+            0.770737,
+            0.229263
+          ],
+          "event": [
+            0.153648,
+            0.846352
+          ]
+        },
+        "env_action_probs": [
+          0.036703,
+          0.0,
+          0.017397,
+          0.058486,
+          0.887414
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "stage_parameters": {
+        "active_temperature": 0.85,
+        "sharpen_scale": 3.048882,
+        "margin_boost": 0.176465
+      }
+    },
+    "diagnostic_state_id": "dev_state_10"
+  },
+  {
+    "seed": 7,
+    "design_id": "dev_00",
+    "step_index": 5,
+    "current_rsu_id": "rsu_1",
+    "target_rsu_id": "rsu_2",
+    "current_bundle_ready": true,
+    "near_handoff": true,
+    "target_prepare_feasible": true,
+    "prepare_feasibility_reason": "noop_all_resident",
+    "action_mask": [
+      true,
+      false,
+      true,
+      true,
+      true
+    ],
+    "executed_raw_policy_action": 4,
+    "executed_raw_policy_event_prepare_prob": 0.641792,
+    "executed_raw_policy_event_margin": 0.583152,
+    "raw_policy_evaluation": true,
+    "runtime_event_sharpening_info": {},
+    "pseudo_targets": {
+      "slow_target": 0,
+      "fast_target": 0,
+      "event_target": 1,
+      "confidence_weight": 0.9,
+      "event_soft_target": 0.4532880383627237,
+      "latency_fallback_candidate": 0.0,
+      "steady_rsu_candidate": 0.0,
+      "temporal_urgency": 0.875,
+      "prepare_window_score": 0.4532880383627237,
+      "handoff_countdown_steps": 1.0
+    },
+    "stages": {
+      "raw_untempered": {
+        "slow_logits": [
+          0.366094,
+          -0.429437,
+          -0.065766
+        ],
+        "fast_logits": [
+          0.257759,
+          -0.457796
+        ],
+        "event_logits": [
+          -0.380065,
+          0.115614
+        ],
+        "head_probs": {
+          "slow": [
+            0.476045,
+            0.214859,
+            0.309096
+          ],
+          "fast": [
+            0.671628,
+            0.328372
+          ],
+          "event": [
+            0.378557,
+            0.621443
+          ]
+        },
+        "env_action_probs": [
+          0.092115,
+          0.0,
+          0.067018,
+          0.137073,
+          0.703795
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "temperature_only": {
+        "slow_logits": [
+          0.366094,
+          -0.429437,
+          -0.065766
+        ],
+        "fast_logits": [
+          0.257759,
+          -0.457796
+        ],
+        "event_logits": [
+          -0.447135,
+          0.136017
+        ],
+        "head_probs": {
+          "slow": [
+            0.476045,
+            0.214859,
+            0.309096
+          ],
+          "fast": [
+            0.671628,
+            0.328372
+          ],
+          "event": [
+            0.358208,
+            0.641792
+          ]
+        },
+        "env_action_probs": [
+          0.086547,
+          0.0,
+          0.062967,
+          0.128787,
+          0.721699
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "before_event_enhancement": {
+        "slow_logits": [
+          0.366094,
+          -0.429437,
+          -0.065766
+        ],
+        "fast_logits": [
+          0.257759,
+          -0.457796
+        ],
+        "event_logits": [
+          -0.447135,
+          0.136017
+        ],
+        "head_probs": {
+          "slow": [
+            0.476045,
+            0.214859,
+            0.309096
+          ],
+          "fast": [
+            0.671628,
+            0.328372
+          ],
+          "event": [
+            0.358208,
+            0.641792
+          ]
+        },
+        "env_action_probs": [
+          0.086547,
+          0.0,
+          0.062967,
+          0.128787,
+          0.721699
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_no_margin": {
+        "slow_logits": [
+          0.366094,
+          -0.429437,
+          -0.065766
+        ],
+        "fast_logits": [
+          0.257759,
+          -0.457796
+        ],
+        "event_logits": [
+          -1.108101,
+          0.796983
+        ],
+        "head_probs": {
+          "slow": [
+            0.476045,
+            0.214859,
+            0.309096
+          ],
+          "fast": [
+            0.671628,
+            0.328372
+          ],
+          "event": [
+            0.129534,
+            0.870466
+          ]
+        },
+        "env_action_probs": [
+          0.028992,
+          0.0,
+          0.021093,
+          0.043143,
+          0.906772
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "after_sharpening_and_margin": {
+        "slow_logits": [
+          0.366094,
+          -0.429437,
+          -0.065766
+        ],
+        "fast_logits": [
+          0.257759,
+          -0.457796
+        ],
+        "event_logits": [
+          -1.178774,
+          1.079675
+        ],
+        "head_probs": {
+          "slow": [
+            0.476045,
+            0.214859,
+            0.309096
+          ],
+          "fast": [
+            0.671628,
+            0.328372
+          ],
+          "event": [
+            0.094623,
+            0.905377
+          ]
+        },
+        "env_action_probs": [
+          0.020943,
+          0.0,
+          0.015237,
+          0.031165,
+          0.932655
+        ],
+        "head_actions": {
+          "slow": 0,
+          "fast": 0,
+          "event": 1
+        },
+        "selected_action": 4,
+        "aggregation_reason": "event_head_prepare",
+        "projection_applied": false
+      },
+      "stage_parameters": {
+        "active_temperature": 0.85,
+        "sharpen_scale": 3.266875,
+        "margin_boost": 0.282692
+      }
+    },
+    "diagnostic_state_id": "dev_state_11"
+  }
+]

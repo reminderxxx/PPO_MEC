@@ -1,5 +1,14 @@
 ﻿# Decision Log
 
+## 2026-10-06：保留原 auxiliary 配置，拒绝整体删除作为 prepare-balance 修复
+
+- 决定：四项机制只选一个训练因素；因 margin/sharpening 在 raw-policy 路径 dormant、temperature 不改变 deterministic
+  argmax，而 auxiliary target 不感知 current readiness，冻结唯一候选 `auxiliary_coef=0.1→0.0`。
+- 结果：completion 不变，action 4 与 invalid prepare 增加，失败 seed 只发生转移。删除没有兑现事前服务行为判据。
+- 取舍：保留原 SA 配置作为历史基线，拒绝 no-auxiliary 候选；不命名新方法、不搜近邻、不扩训练。
+- 唯一后续：如获新任务，仅设计同时满足 current service readiness 与 target prepare feasibility 的 event target，并重新冻结；
+  不强制 action 0、不改 reward、不把 interface correctness 或组件删除写成创新。
+
 ## 2026-10-06：撤销历史方法优势，论文收敛为系统机制与经验性边界
 
 - 决定：旧 12 点 action-0/current-model 路径不对称影响 online、branch score 和 offline reference；保留原件但撤销全部

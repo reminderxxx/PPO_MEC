@@ -1,0 +1,15 @@
+{
+  "status": "complete",
+  "candidate": "sa_ghmappo_no_auxiliary",
+  "historical_baseline": "sa_ghmappo_original",
+  "candidate_seeds": [
+    7,
+    17,
+    29
+  ],
+  "actual_new_training_steps": 4214,
+  "actual_new_updates": 72,
+  "evaluation_rows": 260,
+  "behavior_ledger_rows": 1001,
+  "elapsed_seconds": 35.666617875
+}

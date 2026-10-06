@@ -1,0 +1,55 @@
+{
+  "schema_version": "calibrated_workflow_prepare_balance_ablation_v1",
+  "experiment_scope": "bounded_nonformal_single_factor_development_ablation",
+  "base_config": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json",
+  "workload_manifest": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+  "historical_baseline_root": "artifacts/benchmarks/calibrated_continuous_workflow_interface_repair_20261006_v1",
+  "interface_profile": "calibrated_workflow_interface_v2",
+  "hierarchical_action_contract": "independent_heads_executed_env_v2",
+  "arms": {
+    "A": {
+      "method": "sa_ghmappo_original",
+      "source": "historical_exact_match_reuse",
+      "auxiliary_coef": 0.1
+    },
+    "B": {
+      "method": "sa_ghmappo_no_auxiliary",
+      "source": "new_bounded_training",
+      "auxiliary_coef": 0.0
+    }
+  },
+  "frozen_factor": {
+    "name": "auxiliary_loss",
+    "implementation_parameter": "auxiliary_coef",
+    "baseline_value": 0.1,
+    "candidate_value": 0.0,
+    "other_algorithm_parameters_changed": false
+  },
+  "training": {
+    "seeds": [7, 17, 29],
+    "episodes": 192,
+    "episode_max_steps": 24,
+    "checkpoint_episode_candidates": [48, 96, 144, 192],
+    "update_every_episodes": 8,
+    "new_training_step_cap": 13824,
+    "wall_clock_cap_seconds": 900,
+    "automatic_retry": false
+  },
+  "evaluation": {
+    "splits": ["regression", "frozen_check"],
+    "development_only": true,
+    "replay_original_sa_for_extended_behavior_fields": true,
+    "reuse_matching_controls": ["ppo", "mappo", "two_step_cost_rule"]
+  },
+  "claim_boundary": {
+    "formal": false,
+    "holdout": false,
+    "independent_generalization": false,
+    "algorithm_innovation": false,
+    "single_factor_configuration_specific": true,
+    "real_model_generate_calls": 0,
+    "downloads": 0,
+    "reward_changed": false,
+    "environment_changed": false
+  }
+}

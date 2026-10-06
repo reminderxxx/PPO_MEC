@@ -5,6 +5,34 @@
 
 # Runbook
 
+## SA prepare-balance 单因素闭环（2026-10-06；已完成，不得覆盖）
+
+诊断、候选和结果目录均 create-only；以下命令已经一次完成，不得因负结果重跑、补 seed 或覆盖：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/diagnose_calibrated_workflow_prepare_balance.py \
+  --output_root artifacts/analysis/calibrated_workflow_prepare_balance_diagnosis_20261006_v1
+
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/run_calibrated_workflow_prepare_balance_ablation.py \
+  --output_root artifacts/benchmarks/calibrated_workflow_prepare_balance_ablation_20261006_v1
+
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/analyze_calibrated_workflow_prepare_balance_ablation.py \
+  --run_root artifacts/benchmarks/calibrated_workflow_prepare_balance_ablation_20261006_v1
+```
+
+执行日志为 `artifacts/benchmarks/calibrated_workflow_prepare_balance_ablation_20261006_v1.log`；run/analysis receipt 均为
+complete。A 原 SA 复用原修复版 checkpoint/曲线/结果，B 只改 `auxiliary_coef=0.0` 并新训练 3×192 episodes；checkpoint
+留本地，不 Git add。结果为 completion 不变且 invalid prepare 增加，候选已拒绝。专项回归：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q \
+  tests/test_calibrated_workflow_prepare_balance.py \
+  tests/test_calibrated_workflow_interface_repair.py
+```
+
 ## Calibrated workflow interface repair v3（2026-10-06；单次有界执行）
 
 新 profile 不覆盖 v1/v2。下列 frozen run 已一次完成，不得重跑或覆盖；output root 原先要求不存在：

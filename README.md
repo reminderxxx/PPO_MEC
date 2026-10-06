@@ -5,6 +5,14 @@
 
 # PPO_MEC
 
+SA prepare/execution 单因素闭环已完成。源码对账和 12-state trace 证明当前 `raw_policy` 执行路径实际跳过配置的 event
+margin/sharpening；auxiliary target 确有不检查 current readiness 的冲突，但唯一候选 `auxiliary_coef=0.1→0.0` 在固定
+3 seeds×192 episodes 后没有提高 completion，并把 frozen-check action 4 从 54.7% 增至 71.6%、invalid prepare 从
+56 增至 86。结论为“存在其他未定位问题”，拒绝删除整个 auxiliary 作为修复；不做创新包装或追加调参。详见
+[定位](docs/project/sa_prepare_balance_localization_20261006.md)、
+[结果](docs/project/sa_prepare_balance_ablation_results_20261006.md)和
+[论文章节](docs/project/manuscript_experiment_section_sa_prepare_balance_20261006.md)。
+
 Calibrated workflow 的 v3 interface repair 已按冻结预算一次完成：新 profile 修正 byte-capacity 编码、typed bundle/链路/状态
 字段消费、failure-time mobility 和 executed-action PPO 对账；旧 v1/v2 结果与接口保持只读。SA-GHMAPPO 在已暴露 regression / 新冻结
 开发检查的 completion 为 `0.944/0.958`，PPO、controller-MAPPO 与 two-step rule 均为 `1.000`。这只证明接口异常后的恢复，

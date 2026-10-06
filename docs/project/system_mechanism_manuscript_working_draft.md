@@ -1,6 +1,6 @@
 # Cost-Accounted Recovery for Stateful AI Workflows at the Vehicular Edge
 
-> Internal working draft v1.3 — revised 2026-10-06. This is a complete but non-submission-ready mechanism/empirical draft. It separates real-model measurements, modeled network time, and synthetic development checks. Revision v1.3 corrects path-asymmetric lifecycle accounting, withdraws the historical method advantage, and adds one pre-frozen six-point boundary check. It adds no validated algorithm. References are inherited from the preceding review and were not independently reverified in this revision.
+> Internal working draft v1.4 — revised 2026-10-06. This is a complete but non-submission-ready mechanism/empirical draft. It separates real-model measurements, modeled network time, and synthetic development checks. Revision v1.3 corrected path-asymmetric lifecycle accounting and withdrew the historical method advantage. Revision v1.4 adds a repaired-interface SA policy-mechanism diagnosis and one frozen single-factor negative ablation. It adds no validated algorithm. References are inherited from the preceding review and were not independently reverified in this revision.
 
 ## Abstract
 
@@ -166,6 +166,44 @@ The rule is not algorithmically superior to either the correct simple threshold 
 
 The implemented path can export validated workflow state and resume a suffix without rereading the original input or rerunning the prefix. The real lifecycle witness proves legal adapter eviction, actual PEFT object removal, later local-file reload, and future-node execution, but the cost is common to matched restart and recovery paths. Once both synthetic actions execute that lifecycle symmetrically, the historical method advantage disappears: the simple threshold, full rule, two-step lookahead, and offline reference tie on all 12 original points. The boundary check adds two transparent estimator-error failures but no algorithmic separation. The strongest defensible contribution is therefore an integrated and auditable state-recovery/adapter-lifecycle system plus an empirical account of when recovery helps, ties, or fails—not a new scheduling algorithm.
 
+## 8. Repaired-interface learning side study
+
+The continuous-workflow learning interface was separately repaired before this revision: actors now consume typed bundle readiness, sizes,
+estimated links, contact, and state fields; mobility advances on decision steps; deterministic evaluation uses independent head argmax followed by
+mask projection; and PPO optimizes the executed environment-action likelihood. This correction restored SA-GHMAPPO from an interface-induced
+failure loop, but it did not create a performance contribution. On the repaired development checks, PPO, controller-MAPPO, and an
+information-matched two-step planner still completed every workflow, whereas SA did not.
+
+We then inspected four SA mechanisms without reopening the interface audit. Event temperature was active in rollout, training recomputation, and
+deterministic evaluation. Configured event-margin and sharpening adjustments were dormant because the frozen workload selected `raw_policy` in
+all three paths. Auxiliary event targets were active only in the training loss and did not require current-node bundle readiness. A fixed
+12-state logit trace and the complete 100-state development replay motivated one bounded hypothesis: this supervision could overemphasize future
+preparation.
+
+The only candidate set `auxiliary_coef` from 0.1 to 0.0 and retrained three fixed seeds for 192 episodes. Completion was unchanged at 0.944 on
+the exposed regression split and 0.958 on the frozen development check. On the latter, current-missing action 4 increased from 50.0% to 57.7%,
+all action 4 from 54.7% to 71.6%, and invalid prepares from 56 to 86. The failing seed moved rather than disappeared. The deletion therefore
+does not repair the imbalance and is rejected. It also does not collapse to always-action-0 behavior; action 0 decreased while action 2 and
+action 4 increased. The result is a configuration-specific negative finding, not proof that the auxiliary loss is generally beneficial or that
+one component universally causes the behavior.
+
+## 9. Contribution logic closure
+
+| Research question | Existing-method gap | Our implemented design | Required evidence | Current result | Defensible claim |
+|---|---|---|---|---|---|
+| Can a workflow resume a dependency-safe suffix after RSU handoff? | Generic migration/checkpointing does not by itself prove this implementation preserves DAG inputs and execution ownership | Validated node-boundary package, target model gate, exact suffix input reconstruction, single execution-right commit | Cross-process node counts, input/token identity, negative identity tests | Passed on the bounded technical workflow | The implemented mechanism resumes the fixed suffix without rereading the source input; no universal recovery theory claim |
+| Does adapter-cache state participate in recovery cost? | Shared-base and adapter-serving work does not expose this workflow's legal victim→runtime unload→reload path | Native typed dependency-safe preview/commit connected to PEFT removal/load | Runtime tensor counts/bytes, legal cache events, later node execution, no-eviction control | Real ALPR→Helmet→ALPR lifecycle executed; cost was common to both arms | Real adapter lifecycle is integrated and auditable; no eviction-driven action advantage |
+| Does SA role coordination outperform matched alternatives after interface repair? | PPO/MAPPO, graph encoders, recovery and cost-aware control already exist; composition alone is not novelty | Slow/fast/event heads with executed-action PPO under the repaired semantic interface | Matched budgets, checkpoints, full behavior ledger, strong rule and learned controls | SA completion 0.944/0.958; PPO, MAPPO and rule 1.000 | Interface correctness and residual policy gap only; no SA superiority claim |
+| Does removing current-readiness-blind auxiliary supervision fix over-preparation? | A training target can conflict with service return, but deletion is not automatically a method | One-factor `auxiliary_coef: 0.1→0.0` ablation | Fixed 3×192 retrain, paired dev states, current-missing action 4, valid/invalid prepare, completion/cost | Completion unchanged; action 4 and invalid prepare increased | Reject wholesale deletion; retain as negative design evidence, not innovation |
+| What does the calibrated simulator establish? | Simulated reward alone cannot prove real model or wireless behavior | NGSIM+Alibaba-derived bounded workload with measured size/time inputs and typed cache semantics | Provenance, frozen instances, raw episodes, interface audit | Supports controlled development comparison only | Empirically calibrated simulation evidence, not real deployment or independent generalization |
+| What do real-model measurements establish? | Synthetic bytes cannot prove adapter lifecycle or suffix fidelity | Same-host real base/adapters, fixed calls, exact token/input checks | Pre-frozen plans, raw timings, tensor lifecycle, hashes, receipts | Mechanism paths executed; wireless/queue/task quality unavailable | Real mechanism realization and local cost components only |
+
+The logical boundary is explicit. Combining MAPPO, graph representations, state recovery, and cost signals does not itself establish novelty.
+Interface repair is correctness work, not performance innovation. Removing a harmful-looking enhancement is an algorithm simplification only if it
+improves the declared service trade-off; this ablation did not. The paper therefore retains system-mechanism evidence and the negative learning
+result without renaming either as a new algorithm. A learning-method claim would require a separately frozen service-feasible event target and
+subsequent independent evidence; this revision does not provide it.
+
 ## References
 
 [1] P. Cao and S. Irani, “Cost-Aware WWW Proxy Caching Algorithms,” USENIX Symposium on Internet Technologies and Systems, 1997.
@@ -189,8 +227,10 @@ The implemented path can export validated workflow state and resume a suffix wit
 - [A5] `artifacts/analysis/real_cache_victim_reload_20261005_v1/`: pre-frozen 12-call real Helmet/ALPR victim→reload and no-eviction control, six process receipts, raw rows, terminal, negative checks, and 22-file integrity manifest.
 - [A6] `artifacts/analysis/eviction_aware_recovery_corrected_20261006_v2/`: corrected original 12-point matrix, 48 isolated paths, complete old-to-new point ledger, aggregate, completion receipt, and 7-file integrity manifest.
 - [A7] `artifacts/analysis/recovery_cost_boundary_check_20261006_v1/`: pre-frozen six-point mechanism-boundary check, 24 isolated paths, complete rows, aggregate, completion receipt, and 5-file integrity manifest.
+- [A8] `artifacts/analysis/calibrated_workflow_prepare_balance_diagnosis_20261006_v1/`: fixed 12-state logit/probability trace, 100-state dev-path target summary, checkpoint hashes, and diagnostic receipt.
+- [A9] `artifacts/benchmarks/calibrated_workflow_prepare_balance_ablation_20261006_v1/`: historical A reuse, 3×192 no-auxiliary training, complete curves, evaluation/behavior rows, paired comparison, strata, receipts, and integrity manifest; checkpoints remain local.
 - Review identity: `reviewed_at=2026-10-06`; `literature_cutoff=2026-10-05`; `target_venue=IEEE TMC`; `artifact_run_id=eviction_aware_recovery_corrected_20261006_v2 + recovery_cost_boundary_check_20261006_v1`; `policy_version=tmc_review_policy_v3_20260621`; `git_commit=800f0a12f13e34d7de19aee375124813b8817e3a / 30691177bcac540ec1650d14494fe48326805a8c`; `evidence_level=E2_ARTIFACT_AUDITED (bounded synthetic correction and boundary check; network modeled)`.
 - Strongest safe claim: native state export/import and exact suffix recovery are integrated with a dependency-safe adapter victim/removal/reload lifecycle; event-level accounting is reproducible, and equal lifecycles are shown to cancel rather than manufacture an action benefit.
 - Prohibited claims: superiority to a correct simple threshold or two-step lookahead, novelty of cost-aware eviction, calibrated deployment boundary, eviction-driven decision reversal, statistical generalization, real wireless gain, cross-workflow scheduling, shared queues, task-quality gain, full MARL, or TMC-ready status.
 - Remaining submission-critical gaps (maximum two): (1) an externally motivated workflow with a legitimate action-specific lifecycle difference, if an algorithmic claim is retained; (2) remote/shared-resource measurement and labeled independent workflow evidence.
-- Revision v1.3: withdraws the historical 10/12-versus-7/12 advantage, adds symmetric branch execution and a six-point frozen boundary check, and converges the paper toward an honest systems/mechanism and empirical-failure study. Progress is maintained in `manuscript_evidence_progress_20261005.md`.
+- Revision v1.4: retains the v1.3 systems correction, adds a repaired-interface SA diagnosis and the negative no-auxiliary result, rejects deletion as a prepare-balance fix, and keeps the paper centered on systems/mechanism evidence and transparent learning limitations. Progress is maintained in `manuscript_evidence_progress_20261005.md`.

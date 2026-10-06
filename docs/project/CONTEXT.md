@@ -11,6 +11,11 @@
 
 ## 项目状态
 
+- calibrated workflow repaired-interface 的 SA prepare-balance 单因素闭环已完成：当前 raw-policy 路径实际跳过 event
+  margin/sharpening；auxiliary target 有 current-readiness 缺口，但 `auxiliary_coef=0.1→0.0` 的 3×192 有界重训没有提高
+  completion，反而增加 action 4 与 invalid prepare。候选已拒绝，结论为“存在其他未定位问题”；不扩 seed/预算，唯一可能
+  后续是另立任务重设同时感知 current service readiness 与 target feasibility 的 event target。
+
 - bounded recovery-cost baseline：从 `1a999287…` 冻结的 12 点 synthetic validation 中，显式 opt-in
   驱逐代价感知规则使用 native dependency-safe victim plan、object-ID 去重和已声明下一节点，匹配离线参考 10/12；
   原简单阈值为 7/12。该规则与同信息正确两步前瞻 12/12 完全一致，d10/d11 受成本估计误差影响。当前身份仅为

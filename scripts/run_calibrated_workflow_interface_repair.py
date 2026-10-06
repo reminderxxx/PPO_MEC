@@ -82,7 +82,12 @@ def _git_commit() -> str:
     ).stdout.strip()
 
 
-def _build_agent(method: str, seed: int, config: dict[str, Any]) -> Any:
+def _build_agent(
+    method: str,
+    seed: int,
+    config: dict[str, Any],
+    agent_overrides: dict[str, Any] | None = None,
+) -> Any:
     training = config["training"]
     kwargs: dict[str, Any] = {
         "random_seed": seed,
@@ -108,6 +113,7 @@ def _build_agent(method: str, seed: int, config: dict[str, Any]) -> Any:
                 "env_action_ppo_coef": float(interface["env_action_ppo_coef"]),
             }
         )
+    kwargs.update(dict(agent_overrides or {}))
     return build_agent(method, **kwargs)
 
 

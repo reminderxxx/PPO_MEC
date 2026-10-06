@@ -5,6 +5,18 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-06：删除 auxiliary 未修复过度准备，训练 target 设计仍开放（REJECTED FIX / OPEN METHOD BLOCKER）
+
+- `DIAGNOSED`：`event_prepare_margin_boost` 与 sharpening 在当前 `raw_policy` 训练/评价路径实际 dormant；temperature 不改变
+  deterministic binary argmax。不得继续把这两项写成当前 action-4 过多的直接原因。
+- `CONFIRMED DESIGN CONFLICT`：auxiliary hard event target 不检查 current bundle readiness；17 个 current-missing dev
+  状态中 12 个 target=1。但 target=0 的 current-missing/infeasible 状态也会选 action 4，故该冲突不是充分根因。
+- `REJECTED FIX`：中性化整个 auxiliary 后，completion 不变，frozen action 4 `110→149`、invalid prepare `56→86`、
+  target-infeasible prepare `34→59`；source-window CI 也指向无效准备增加。不得把删除项作为保留候选。
+- `OPEN`：event hard target、temporal soft target、temperature、executed-action PPO 与有限训练的交互尚未因果分离。
+  本轮停止。若另立任务，唯一合理方向是把 current service readiness 与 target feasibility 写进 event auxiliary target，
+  不能用 SA 专属强制 action 0、reward 调整或追加预算代替。
+
 ## 2026-10-06：action-4 实现循环已修复，SA 事件策略偏置仍开放（RESOLVED INTERFACE / OPEN METHOD BLOCKER）
 
 - `RESOLVED`：旧确定性路径把 event-prepare 全部概率集中给 action 4，却把 event-keep 分摊到 action 0--3；再叠加

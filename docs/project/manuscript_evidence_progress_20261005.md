@@ -1,7 +1,21 @@
 # 论文成果与问题台账
 
-更新：2026-10-06。主稿：`system_mechanism_manuscript_working_draft.md` v1.3。
-本次新增 calibrated workflow interface v3 有界重训与冻结开发检查；不调用模型、不下载资源、不读取旧 holdout，也不改写历史 artifact。
+更新：2026-10-06。主稿：`system_mechanism_manuscript_working_draft.md` v1.4。
+本次新增 calibrated workflow interface v3 有界重训、SA prepare/execution 单因素负结果与冻结开发检查；不调用模型、
+不下载资源、不读取旧 holdout，也不改写历史 artifact。
+
+## 2026-10-06 SA prepare/execution 单因素闭环
+
+- 定位 artifact：`artifacts/analysis/calibrated_workflow_prepare_balance_diagnosis_20261006_v1/`。12 个事前规则选取 dev
+  状态覆盖 current ready/missing、near/far 和 target feasible/infeasible；完整 dev replay 100 状态。确认本轮 raw-policy
+  rollout/eval 实际跳过 margin/sharpening，temperature 生效，auxiliary/temporal 只进入训练 loss。
+- 冻结候选：只把 `auxiliary_coef=0.1→0.0`；A 精确复用，B 新 3 seeds×192 episodes，理论/实际新 steps=
+  `13,824/4,214`，72 updates，无重试、扩 seed、改 reward/环境/数据/网络。
+- 结果 artifact：`artifacts/benchmarks/calibrated_workflow_prepare_balance_ablation_20261006_v1/`。regression/frozen
+  completion 均与 A 相同（0.944/0.958）；frozen current-missing action 4 `50.0%→57.7%`，invalid prepare `56→86`，
+  action 4 `54.7%→71.6%`。失败 seed 从 17 转到 29，没有消失。
+- 结论：`存在其他未定位问题`；拒绝删除整个 auxiliary 作为修复。该负结果不支持算法创新或 auxiliary 普遍有益。
+- 唯一后续：若另立任务，只重新设计同时感知 current service readiness 与 target feasibility 的 event auxiliary target；本轮不实现。
 
 ## 已完成成果及可用范围
 

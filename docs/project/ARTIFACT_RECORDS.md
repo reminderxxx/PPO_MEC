@@ -5,6 +5,19 @@
 
 # Artifact Records
 
+## 2026-10-06 SA prepare-balance diagnosis and no-auxiliary ablation
+
+- 诊断 root：`artifacts/analysis/calibrated_workflow_prepare_balance_diagnosis_20261006_v1/`；3 个历史 selected SA
+  checkpoints、4 个 dev instances、100-state replay、事前分层选 12 states，0 training/model call/download/holdout。
+- 重训 root：`artifacts/benchmarks/calibrated_workflow_prepare_balance_ablation_20261006_v1/`；A 历史精确复用，B 新
+  seeds `7/17/29`×192 episodes，实际 `4,214` steps、72 updates、35.67 s；15 个 candidate checkpoint 仅本地。
+- evaluation/behavior=`260/1,001` rows；全部 A/B executed/policy log-prob 差为 0。regression/frozen completion A=B=
+  `0.944/0.958`；frozen invalid prepare `56→86`、current-missing action 4 `50.0%→57.7%`。
+- 分析 root 内 `comparison_report.json`、`comparison_summary.csv`、`stratified_ablation.csv`、完整曲线、全 seed 失败、
+  receipt 与 31-file local integrity 齐全；其中 15 checkpoint 不提交，Git 交付 16 个结果/元数据文件和 checkpoint hashes。
+- evidence level=`E2_ARTIFACT_AUDITED_NONFORMAL_DEVELOPMENT_ABLATION`；决策为 `存在其他未定位问题`，不是 formal、
+  holdout、创新、普遍因果或 paper-ready。
+
 ## 2026-10-06 calibrated workflow interface repair v3
 
 - root：`artifacts/benchmarks/calibrated_continuous_workflow_interface_repair_20261006_v1/`；执行 source commit

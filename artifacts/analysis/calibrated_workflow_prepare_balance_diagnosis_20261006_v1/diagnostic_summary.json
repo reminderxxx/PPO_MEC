@@ -1,0 +1,114 @@
+{
+  "pool_state_count": 100,
+  "selected_state_count": 12,
+  "selection_rule": {
+    "source_split": "dev",
+    "iteration_order": "seed_7_17_29_then_manifest_instance_order_then_step_index",
+    "stratum_key": [
+      "current_bundle_ready",
+      "near_handoff_countdown_le_2_5",
+      "target_prepare_feasible_by_action4_clone"
+    ],
+    "stratum_order": [
+      [
+        false,
+        true,
+        false
+      ],
+      [
+        false,
+        true,
+        true
+      ],
+      [
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        true
+      ],
+      [
+        true,
+        true,
+        false
+      ],
+      [
+        true,
+        true,
+        true
+      ],
+      [
+        true,
+        false,
+        false
+      ],
+      [
+        true,
+        false,
+        true
+      ]
+    ],
+    "per_stratum_quota": 2,
+    "quota_shortfall_fill": "earliest_unselected_state_in_iteration_order",
+    "maximum_states": 12,
+    "logit_or_outcome_blind": true
+  },
+  "pool_strata": {
+    "(False, False, False)": 1,
+    "(False, True, False)": 2,
+    "(False, True, True)": 14,
+    "(True, False, True)": 23,
+    "(True, True, False)": 17,
+    "(True, True, True)": 43
+  },
+  "selected_strata": {
+    "(False, False, False)": 1,
+    "(False, True, False)": 2,
+    "(False, True, True)": 2,
+    "(True, False, True)": 2,
+    "(True, True, False)": 2,
+    "(True, True, True)": 3
+  },
+  "runtime_path": {
+    "all_selected_states_use_raw_policy_evaluation": true,
+    "all_runtime_event_sharpening_info_empty": true,
+    "event_margin_and_sharpening_active_in_rollout_or_deterministic_eval": false,
+    "event_temperature_active": true,
+    "auxiliary_and_temporal_consistency_training_only": true
+  },
+  "selected_action_counts": {
+    "actual_raw_policy": {
+      "0": 1,
+      "3": 4,
+      "4": 7
+    },
+    "counterfactual_full_event_enhancement": {
+      "0": 1,
+      "3": 3,
+      "4": 8
+    },
+    "counterfactual_no_margin": {
+      "0": 1,
+      "3": 4,
+      "4": 7
+    }
+  },
+  "current_missing_prepare_targets": {
+    "state_count": 5,
+    "hard_event_target_1_count": 2,
+    "actual_action4_count": 4
+  },
+  "full_dev_trajectory_prepare_targets": {
+    "current_missing_state_count": 17,
+    "current_missing_hard_event_target_1_count": 12,
+    "current_missing_temporal_soft_target_gt_0_5_count": 5,
+    "current_missing_action4_count": 10,
+    "current_missing_infeasible_action4_count": 2,
+    "current_ready_state_count": 83,
+    "current_ready_hard_event_target_1_count": 43,
+    "current_ready_action4_count": 64
+  }
+}

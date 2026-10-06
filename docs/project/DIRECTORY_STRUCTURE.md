@@ -1,5 +1,21 @@
 ﻿# Directory Structure
 
+## 2026-10-06 SA prepare-balance single-factor ablation
+
+- `configs/experiment/calibrated_workflow_prepare_balance_ablation_v1.json`：A 历史复用、B `auxiliary_coef=0.0`、
+  3×192 与 13,824-step 上限的冻结身份。
+- `scripts/diagnose_calibrated_workflow_prepare_balance.py`：最多 12 个 dev 状态的 raw→temperature→sharpen→margin
+  logits/prob/action trace；只诊断，不训练或计性能。
+- `scripts/run_calibrated_workflow_prepare_balance_ablation.py`：只训练候选，重放 A 扩展行为字段，复用匹配 controls，保存
+  完整曲线、checkpoint selection、readiness/feasibility ledger 与回执。
+- `scripts/analyze_calibrated_workflow_prepare_balance_ablation.py`：只读重建 source-window paired bootstrap、行为计数、
+  seed/strata 与完整性。
+- `tests/test_calibrated_workflow_prepare_balance.py`：单因素、旧调用兼容、executed likelihood、环境/reward identity 和
+  readiness logging 回归。
+- `artifacts/analysis/calibrated_workflow_prepare_balance_diagnosis_20261006_v1/` 与
+  `artifacts/benchmarks/calibrated_workflow_prepare_balance_ablation_20261006_v1/`：诊断和有界负结果；checkpoint 本地保留。
+- `docs/project/sa_prepare_balance_{localization,ablation_results}_20261006.md`：事前定位/候选和完整结果边界。
+
 ## 2026-10-06 calibrated continuous-workflow pilot
 
 - `src/envs/core/calibrated_continuous_workflow_env.py`：独立的小型 event-driven 校准仿真；共享五动作、依赖安全

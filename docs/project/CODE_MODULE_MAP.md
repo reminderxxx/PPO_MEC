@@ -1,5 +1,16 @@
 # Code Module Map
 
+## SA prepare-balance single-factor ablation
+
+- `scripts/diagnose_calibrated_workflow_prepare_balance.py` 只读取 repaired-interface selected checkpoint 与 dev instances，
+  用 environment clone 标注 target feasibility，并记录各 logit stage；不得用诊断状态作性能分数或 checkpoint selection。
+- `scripts/run_calibrated_workflow_prepare_balance_ablation.py` 复用 v3 rollout/environment contract，只通过 `_build_agent(...,
+  agent_overrides={"auxiliary_coef": 0.0})` 创建候选；A 不重训，controls 不重放训练。
+- `scripts/analyze_calibrated_workflow_prepare_balance_ablation.py` 只消费 complete artifact，source window 是 bootstrap outer
+  unit；completed elapsed 排除任一未完成 pair，不能作为无条件速度优势。
+- `scripts/run_calibrated_workflow_interface_repair.py::_build_agent` 新增可选 `agent_overrides`，默认 `None` 时旧入口和参数完全
+  不变；回归测试锁定 executed-action likelihood 与旧接口兼容。
+
 ## Calibrated continuous-workflow pilot
 
 - `src/envs/core/calibrated_continuous_workflow_env.py`：只服务 non-formal pilot 的共同仿真边界；typed base/adapter bundle
