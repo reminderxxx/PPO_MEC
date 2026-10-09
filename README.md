@@ -213,6 +213,8 @@ G06 cache-efficiency contract 通过 `scripts/audit_cache_efficiency_metrics.py`
 
 ## 2026-07-29 v70 sparse-tail option MAPPO 正式结果
 
+> **2026-10-09 勘误**：下列数值是原包的历史描述性结果，不能再用其 48-window CI/Holm p 作独立窗口推断，也不能据此声称同预算强基线优势。计划窗口为 Peachtree、实际 rows 为 Lankershim，且 full 有 177 对重叠区间；详见 `docs/project/cscwd_2027_baseline_contribution_audit_20261009.md`。本勘误不改写旧产物。
+
 v70 `top_journal_mechanism_v70_sparse_tail_option_mappo` 已按 3 seed、12-agent、frozen mixed/full 窗口完成全量 benchmark，并首次在当前 offset-free formal-min full_stratified 协议下让 SA-GHMAPPO 同时高于 DT 规则/专项对照、popularity heuristic、PPO 和 MAPPO。关键 artifact：
 
 - mixed: `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730/benchmarks/mixed_informative_config_loaded/main_results_mixed_informative_20260730_010306_535310/aggregate_summary.json`

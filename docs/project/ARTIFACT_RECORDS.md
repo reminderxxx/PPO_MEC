@@ -430,6 +430,8 @@
 
 ## 2026-07-29 v70 sparse-tail option MAPPO formal-min all-baseline winner
 
+> **2026-10-09 审查勘误**：本节保留原始运行记录和当时的统计值，不再把 CI/Holm p 或“winner”标签当作可用于投稿的独立窗口、同预算算法证据。mixed/full 冻结计划与实际窗口身份不一致，full 48 窗口有 177 对区间重叠；SA 与继承基线的 update 数及 checkpoint 选择规则不同。原始证据和重新实验门槛见 `cscwd_2027_baseline_contribution_audit_20261009.md`。
+
 状态：`[offset-free]` `[formal-min]` `[multi-seed]` `[all-baseline-reward-winner]` `[not-tmc-ready]`
 
 路径：
