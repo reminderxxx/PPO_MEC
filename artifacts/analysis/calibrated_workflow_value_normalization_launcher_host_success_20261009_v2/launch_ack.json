@@ -1,0 +1,20 @@
+{
+  "acknowledged_at": "2026-10-09T05:20:47.392287+00:00",
+  "automatic_retry": false,
+  "child_pid": 77224,
+  "child_started_at": "2026-10-09T05:20:47.340889+00:00",
+  "entered_runner_at": "2026-10-09T05:20:47.363214+00:00",
+  "entry_payload": {
+    "entered_at": "2026-10-09T05:20:47.363214+00:00",
+    "exit_code": 0,
+    "pid": 77224,
+    "status": "entered"
+  },
+  "entry_receipt": "/Users/howen/.codex/worktrees/service-reward-learning-diagnosis/PPO_MEC/artifacts/analysis/calibrated_workflow_value_normalization_launcher_host_success_20261009_v2/probe_entered.json",
+  "interpreter": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "kind": "host_acceptance",
+  "run_id": "persistent_supervisor_success",
+  "schema_version": "persistent_ab_launch_ack_v1",
+  "status": "entered_child",
+  "supervisor_pid": 77221
+}

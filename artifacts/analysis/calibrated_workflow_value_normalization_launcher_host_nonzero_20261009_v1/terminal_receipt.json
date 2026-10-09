@@ -1,0 +1,16 @@
+{
+  "automatic_retry": false,
+  "child_pid": 77238,
+  "child_receipt": null,
+  "classification": "HOST_ACCEPTANCE_EXPECTED_EXIT_OBSERVED",
+  "entry_acknowledged": true,
+  "expected_exit_code": 7,
+  "finished_at": "2026-10-09T05:20:52.487442+00:00",
+  "kind": "host_acceptance",
+  "return_code": 7,
+  "run_id": "persistent_supervisor_nonzero",
+  "schema_version": "persistent_ab_terminal_receipt_v1",
+  "status": "PASS",
+  "supervisor_pid": 77235,
+  "timed_out": false
+}

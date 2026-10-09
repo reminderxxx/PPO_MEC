@@ -1,0 +1,1 @@
+probe stdout pid=77238 exit=7

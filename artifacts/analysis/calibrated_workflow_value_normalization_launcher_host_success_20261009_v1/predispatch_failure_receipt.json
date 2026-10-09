@@ -1,0 +1,12 @@
+{
+  "schema_version": "persistent_ab_predispatch_failure_v1",
+  "status": "rejected_before_supervisor_root_and_child_creation",
+  "classification": "OPERATOR_EXPECTED_COMMIT_TYPO",
+  "requested_expected_commit": "f9d9efb8c3390942a091210724b4e2a3fb8fc4b7",
+  "observed_commit": "f9d9efbc9ba6bf11593ce3cb9f39fc3522920543",
+  "child_started": false,
+  "host_acceptance_started": false,
+  "scientific_training_started": false,
+  "automatic_retry": false,
+  "note": "Preserved separately; the two authorized host acceptances use new create-only roots."
+}

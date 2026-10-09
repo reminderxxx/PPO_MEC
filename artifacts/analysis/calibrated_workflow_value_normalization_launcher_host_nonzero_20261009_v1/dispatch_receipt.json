@@ -1,0 +1,10 @@
+{
+  "automatic_retry": false,
+  "dispatched_at": "2026-10-09T05:20:52.143039+00:00",
+  "interpreter": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "plan_sha256": "b55a555fb6c8636a566c0b0ec4b13015799c152805a709efeb46a9628e4217ce",
+  "run_id": "persistent_supervisor_nonzero",
+  "schema_version": "persistent_ab_dispatch_v1",
+  "status": "dispatched",
+  "supervisor_pid": 77235
+}

@@ -1,0 +1,11 @@
+{
+  "automatic_retry": false,
+  "child_pid": 77224,
+  "expected_exit_code": 0,
+  "recorded_at": "2026-10-09T05:20:47.632454+00:00",
+  "return_code": 0,
+  "run_id": "persistent_supervisor_success",
+  "schema_version": "persistent_ab_exit_sidecar_v1",
+  "timed_out": false,
+  "wall_seconds": 0.314098
+}

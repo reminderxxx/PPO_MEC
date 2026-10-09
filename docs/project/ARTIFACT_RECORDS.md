@@ -1742,6 +1742,14 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 - expected scientific run root 未创建，日志 0 bytes；steps/updates/optimizer steps/checkpoints/evaluation rows=`0/0/0/0/0`。未 retry、resume、formal、holdout、download 或 model generate。
 - evidence boundary：implementation + preflight + failure receipt；没有 A/B 性能或机制结果，不能支持 PopArt、SA 优势、formal 或 paper-ready claim。
 
+## 2026-10-09 persistent launcher host acceptance
+
+- implementation commit：`f9d9efbc9ba6bf11593ce3cb9f39fc3522920543`；PopArt、reward、data、budget 与 gates 未变。
+- success：`artifacts/analysis/calibrated_workflow_value_normalization_launcher_host_success_20261009_v2/`，child return 0，stdout/stderr=`30/30` bytes，terminal=`PASS`。
+- expected nonzero：`artifacts/analysis/calibrated_workflow_value_normalization_launcher_host_nonzero_20261009_v1/`，child return 7，stdout/stderr=`30/30` bytes，terminal=`PASS`。
+- 两项均由原 launch 调用后的独立 verify 核对 entry ACK、child PID、exit sidecar、terminal receipt 和 artifact integrity；无训练、模型、数据或网络调用。
+- 错误完整 commit SHA 的首次 pre-dispatch 调用在 child/root 前被拒绝，保留于 `calibrated_workflow_value_normalization_launcher_host_success_20261009_v1/`，不冒充宿主验收。
+
 ## 2026-10-05 shared cache × recovery coupling witness
 
 - run id：`shared_cache_recovery_coupling_20261005_v1`

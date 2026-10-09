@@ -1,0 +1,10 @@
+{
+  "schema_version": "persistent_ab_predispatch_failure_integrity_v1",
+  "files": [
+    {
+      "path": "predispatch_failure_receipt.json",
+      "sha256": "ab814b4c7c6bf38c7248bf869bfdc0b8b31eeed0ef541d8265e3d3aa27431e8f",
+      "bytes": 550
+    }
+  ]
+}

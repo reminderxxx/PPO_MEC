@@ -2226,3 +2226,5 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 算法、奖励、数据、预算和否证门保持冻结；只新增 detached supervisor 与 child-owned runner-entry ACK。
 - launcher 固定原 venv path，独立保存 child stdout/stderr、exit sidecar 和 terminal receipt；科学 child 不自动 retry。
 - 新 run ID 为 `calibrated_workflow_value_normalization_ab_20261009_v2`。必须先通过恰好两次无训练宿主验收（成功/非零退出）和一次低成本 preflight 核对，才可单次启动。
+
+宿主验收已完成且不再增加：成功 probe=`return 0`，非零 probe=`return 7`；二者均在原 launch 调用退出后由独立 verify 确认 child-entry、stdout/stderr、exit sidecar 与 terminal `PASS`。一次错误 expected-commit 的 pre-dispatch 调用未创建 child，独立保留为操作错误回执，不计入两次验收。

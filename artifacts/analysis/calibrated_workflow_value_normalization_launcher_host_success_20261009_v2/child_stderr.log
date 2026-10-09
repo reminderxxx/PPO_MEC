@@ -1,0 +1,1 @@
+probe stderr pid=77224 exit=0
