@@ -1,6 +1,6 @@
 {
   "schema_version": "calibrated_workflow_strong_baselines_budget_extension_analysis_v1",
-  "analysis_run_id": "cscwd_causal_strong_baselines_budget_extension_analysis_20261009_v1",
+  "analysis_run_id": "cscwd_causal_strong_baselines_budget_extension_analysis_20261009_v2",
   "scientific_run_id": "cscwd_causal_strong_baselines_budget_extension_20261009_v1",
   "scientific_commit": "d25ebcded6b43b69b82bae825b035adc1d6f19c4",
   "source_files": {

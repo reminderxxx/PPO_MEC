@@ -30,9 +30,10 @@ PAIR_KEYS = (
 )
 SIGNAL_KEYS = ("method", "seed", "global_cell_step")
 TRAJECTORY_FIELDS = (
-    "training_episode_index", "rollout_segment_index", "action", "reward",
+    "training_episode_index", "rollout_segment_index", "action",
     "terminated", "truncated", "current_bundle_ready", "prediction_provenance",
 )
+NUMERIC_EQUIVALENCE_TOLERANCE = 1e-12
 PAIR_METRICS = (
     "on_time_workflow_completion_rate", "workflow_completion_rate",
     "unfinished_after_deadline_rate", "service_failure_rate", "service_failures",
@@ -110,6 +111,24 @@ def _canonical_rows_sha256(rows: Sequence[dict[str, Any]], fields: Sequence[str]
     ordered = sorted(rows, key=lambda row: _key(row, fields, "canonical"))
     payload = json.dumps(ordered, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def _row_difference(left: dict[str, Any], right: dict[str, Any]) -> tuple[float, int]:
+    """Return maximum numeric difference and non-numeric mismatch count."""
+    max_numeric_difference = 0.0
+    nonnumeric_mismatches = 0
+    for field in sorted(set(left) | set(right)):
+        if field not in left or field not in right:
+            nonnumeric_mismatches += 1
+        elif left[field] != right[field]:
+            try:
+                max_numeric_difference = max(
+                    max_numeric_difference,
+                    abs(float(left[field]) - float(right[field])),
+                )
+            except (TypeError, ValueError):
+                nonnumeric_mismatches += 1
+    return max_numeric_difference, nonnumeric_mismatches
 
 
 def _verify_inventory(root: Path) -> int:
@@ -210,8 +229,16 @@ def _prefix_identity(
     prefix_rows = []
     for (method, seed), cell_pairs in sorted(by_cell.items()):
         exact_mismatches = sum(short != long for short, long in cell_pairs)
+        differences = [_row_difference(short, long) for short, long in cell_pairs]
+        max_numeric_difference = max((item[0] for item in differences), default=0.0)
+        nonnumeric_mismatches = sum(item[1] for item in differences)
+        numerically_equivalent = (
+            nonnumeric_mismatches == 0
+            and max_numeric_difference <= NUMERIC_EQUIVALENCE_TOLERANCE
+        )
         trajectory_mismatches = sum(
             any(short[field] != long[field] for field in TRAJECTORY_FIELDS)
+            or abs(float(short["reward"]) - float(long["reward"])) > NUMERIC_EQUIVALENCE_TOLERANCE
             for short, long in cell_pairs
         )
         short_rows = [short for short, _ in cell_pairs]
@@ -221,12 +248,17 @@ def _prefix_identity(
             "short_prefix_sha256": _canonical_rows_sha256(short_rows, SIGNAL_KEYS),
             "long_prefix_sha256": _canonical_rows_sha256(long_rows, SIGNAL_KEYS),
             "exact_row_mismatches": exact_mismatches,
+            "maximum_numeric_absolute_difference": max_numeric_difference,
+            "nonnumeric_field_mismatches": nonnumeric_mismatches,
+            "numerically_equivalent_at_1e_12": numerically_equivalent,
             "trajectory_mismatches": trajectory_mismatches,
             "exact_prefix_match": exact_mismatches == 0,
             "trajectory_match": trajectory_mismatches == 0,
             "interpretation": (
                 "identical_training_prefix"
                 if exact_mismatches == 0
+                else "numerically_equivalent_serialization_difference"
+                if numerically_equivalent and trajectory_mismatches == 0
                 else "same_trajectory_different_learning_state"
                 if trajectory_mismatches == 0
                 else "trajectory_diverged_possible_rng_or_dev_evaluation_timing"
@@ -427,6 +459,8 @@ def analyze(
 
     prefix_rows, checkpoint_24_rows = _prefix_identity(source_root, short_root)
     prefix_exact = all(row["exact_prefix_match"] for row in prefix_rows)
+    prefix_numerically_equivalent = all(row["numerically_equivalent_at_1e_12"] for row in prefix_rows)
+    prefix_trajectory_match = all(row["trajectory_match"] for row in prefix_rows)
     checkpoints_exact = all(row["checkpoint_bytes_identical"] for row in checkpoint_24_rows)
     reused = _load_json(source_root / "reused_nonlearned_reference.json")
     if reused.get("rows") != 40 or reused.get("reuse_mode") != "read_only_reference_no_reevaluation":
@@ -447,6 +481,8 @@ def analyze(
         "common_completed_rows": len(common_instance_rows),
         "fixed_endpoint_dev_rows": len(fixed),
         "training_prefix_exact": prefix_exact,
+        "training_prefix_numerically_equivalent_at_1e_12": prefix_numerically_equivalent,
+        "training_prefix_trajectory_match": prefix_trajectory_match,
         "update24_checkpoint_bytes_identical": checkpoints_exact,
         "sa_combined_development": sa_combined,
         "nonlearned_reference": reused,

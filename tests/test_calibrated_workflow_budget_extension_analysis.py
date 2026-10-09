@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import pytest
 
-from scripts.analyze_calibrated_workflow_budget_extension import PAIR_METRICS, _pair_rows
+from scripts.analyze_calibrated_workflow_budget_extension import (
+    PAIR_METRICS,
+    _pair_rows,
+    _row_difference,
+)
 
 
 def test_pair_rows_matches_by_identity_when_inputs_are_reordered() -> None:
@@ -29,3 +33,16 @@ def test_pair_rows_rejects_duplicate_identity() -> None:
 
 def test_unconditional_metrics_exclude_completed_only_elapsed() -> None:
     assert "completed_sample_elapsed_seconds" not in PAIR_METRICS
+
+
+def test_row_difference_distinguishes_roundoff_from_identity_drift() -> None:
+    numeric, nonnumeric = _row_difference(
+        {"reward": "1.0000000000000002", "action": "3"},
+        {"reward": "1.0", "action": "3"},
+    )
+    assert 0 < numeric < 1e-12 and nonnumeric == 0
+    numeric, nonnumeric = _row_difference(
+        {"reward": "1.0", "action": "3"},
+        {"reward": "1.0", "action": "4"},
+    )
+    assert numeric == 1.0 and nonnumeric == 0
