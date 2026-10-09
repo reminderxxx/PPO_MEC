@@ -12,6 +12,10 @@
 先冻结科学 commit、同信息/同预算基线、原始窗口互斥、checkpoint 与逐行结果，并核对主稿方法和结果
 来自同一版本。此文档更新不授权启动新实验，也不改变已有 artifact。
 
+强基线与独立窗口的只读预备清单见 `cscwd_2027_baseline_data_readiness_20261009.md`：先补 DT/Popularity
+完整 service runner/原件消费链，再按原始 segment/frame/time 与全历史消费并集盲选新 split。旧 calibrated 36 实例只作
+development，I-80 旧候选库存不能直接转成新 evaluation，旧 holdout 不重开。
+
 ## 对称恢复成本复算（2026-10-06；已完成，不得覆盖）
 
 `scripts/run_symmetric_recovery_cost_validation.py` 只接受 clean、精确 expected commit 和不存在的 output root；失败原件保留，

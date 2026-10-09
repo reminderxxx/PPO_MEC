@@ -11,6 +11,7 @@
 
 - `cscwd_2027_manuscript_working_draft.md`：唯一当前 CSCWD 作者审阅英文主稿；算法版本和结果保留显式待填项。
 - `cscwd_2027_claim_evidence_register_20261009.md`：主张—原件—限制、主比较/两项消融、历史优势撤销与 B 线接口清单。
+- `cscwd_2027_baseline_data_readiness_20261009.md`：拟用接口、强基线实际接线缺口、历史区间并集与未核证的新数据范围。
 - `cscwd_2027_baseline_contribution_audit_20261009.md`：旧 v70 窗口身份、重叠和基线预算的独立审查记录。
 
 - `recovery_cost_defect_impact_report_20261006.md`：修复前独立只读审查，追踪 decision、branch execution、cache

@@ -7,7 +7,8 @@
 
 ## 2026-10-09：CSCWD 作者审阅主稿与主张台账
 
-- 当前唯一主稿改为 `cscwd_2027_manuscript_working_draft.md`；v1.3 保留作历史稿。主稿完整陈述问题、机制、成本纠错和限制，算法公式、版本与结果留待 B 线冻结，不拼接旧 v70 公式和新结果。
+- 续轮将唯一主稿的方法边界写到拟用三元接口、五动作、service reward 与执行动作 PPO；方法的最终科学提交、有效特征和 PopArt A/B 仍待 B 冻结。新增 `cscwd_2027_baseline_data_readiness_20261009.md`：DT/Popularity 未接入完整 service runner，two-step 的 exact-transition 能力单列；现有 36 实例全已消费，新确认性原始区间当前认证数为 0。
+- 当前唯一主稿为 `cscwd_2027_manuscript_working_draft.md`；v1.3 保留作历史稿。主稿陈述问题、机制、成本纠错、拟用训练目标和限制，最终算法有效结构/参数、科学版本与主比较结果留待 B 线冻结，不拼接旧 v70 公式和新结果。
 - `cscwd_2027_claim_evidence_register_20261009.md` 将三项候选贡献、主比较和最多两项消融逐一绑定原件及限制；四个有界 artifact 的 manifest 逐文件核验通过，旧恢复规则优势撤销。
 - 旧 v70 的计划与实际 NGSIM 窗口身份不符，full 窗口存在重叠，算法预算与 checkpoint 选择不匹配；其 CI 与算法领先主张不进入新主稿。详见 `cscwd_2027_baseline_contribution_audit_20261009.md`。
 - 本轮只读证据并编辑文档，无新增训练、模型调用或 benchmark；算法贡献仍为 `UNVERIFIED`，投稿状态为 `NOT_SUBMISSION_READY`。

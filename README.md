@@ -7,6 +7,7 @@
 
 当前 CSCWD 2027 作者审阅主稿为[英文正文](docs/project/cscwd_2027_manuscript_working_draft.md)，
 [主张—原件台账](docs/project/cscwd_2027_claim_evidence_register_20261009.md)记录证据边界、主比较、最多两项消融和待冻结的算法接口。
+当前[强基线与数据可用性清单](docs/project/cscwd_2027_baseline_data_readiness_20261009.md)说明 DT/Popularity 的接线缺口及新独立区间尚未核证。
 算法对照结果尚未补齐，不能据此判断投稿就绪。旧 v1.3 是历史机制稿。
 
 真实 adapter cache victim→reload 的 12-call 最小实测已完成：两臂共用同一 native typed-cache 与 PEFT lifecycle

@@ -30,15 +30,15 @@ Workflow research provides methods for representing and replaying dependent exec
 
 ### 3.1 Workflow and resource state
 
-Let a submitted workflow be a directed acyclic graph \(G=(V,E)\). A node becomes eligible only when its predecessors have completed. A node \(v\) requests a compatible base-and-adapter dependency set \(D_v\). For RSU \(r\), \(C_r(t)\) is the resident set under capacity \(K_r\). A shared base is counted once even when multiple adapters depend on it; an adapter cannot remain resident without its required base. The application state \(z_v\) needed by a suffix is distinct from a model weight, an adapter file, and an unspecified key-value cache.
+Let a submitted workflow be a directed acyclic graph \(G=(V,E)\). A node becomes eligible only when its predecessors have completed. A node \(v\) requests a compatible base-and-adapter dependency set \(D_v\). For RSU \(r\), \(C_r(t)\) is the resident set under capacity \(K_r\), measured in bytes. A shared base is counted once even when multiple adapters depend on it; an adapter cannot remain resident without its required base. The application state \(z_v\) needed by a suffix is distinct from a model weight, an adapter file, and an unspecified key-value cache. Node input, state, and model transfer sizes are bytes; compute, load, restore, recompute, and modeled service times are seconds. A link rate in Mbit/s and fixed latency in seconds produce an analytic transfer term, not a wireless measurement.
 
-We distinguish model readiness from execution readiness. Model readiness requires \(D_v\) to be usable at the selected service location. Execution readiness also requires the graph frontier, the relevant saved state, and the service conditions. The observable outcome is whether the declared workflow completes within its stated evaluation horizon. That horizon is not called an application deadline unless an application timing contract is provided.
+We distinguish model readiness from execution readiness. Model readiness requires \(D_v\) to be usable at the selected service location. Execution readiness also requires the graph frontier, the relevant saved state, and the service conditions. The simulator records an instance-level modeled deadline and a finite step limit separately: a workflow can finish late, while an unfinished rollout can stop at the step limit. These are evaluation constructs, not a measured application service-level agreement. Completion, on-time completion, failed service attempts, and completed-sample delay therefore have different denominators.
 
 ### 3.2 Available action and information
 
-The prototype's environment exposes five discrete actions: fill the current RSU, prefetch toward a predicted destination, use vehicle fallback, offload without changing the cache, and prepare a handoff. A legal-action mask limits which actions can execute. A controller may use the submitted workflow, current residency and capacity, and causally available mobility observations. It may not use the actual future service location, realized branch cost, or an offline reference when choosing an action.
+At each decision step the environment exposes five masked actions, \(a_t\in\{0,1,2,3,4\}\): (0) admit the current node's bundle at the current RSU, (1) prefetch it to the predicted next RSU, (2) serve through vehicle fallback, (3) attempt current-RSU service without a cache change, or (4) prepare the predicted target and a node-boundary state package while attempting current service. A failed current-bundle service attempt is recorded and can be followed by another step; it is not an episode failure. A controller sees a normalized nine-value numeric observation together with causal semantic state: the declared workflow and current node, typed cache residency/capacity, current vehicle association, and predicted RSU sequence, dwell, confidence, uncertainty, and load. Prediction fields are estimates, not the realized future trajectory. Neither realized branch cost nor an offline reference enters the online decision.
 
-This action interface is a single controller with several decision heads. It is not a vehicle/RSU multi-agent joint-action system, and it does not allow arbitrary future-node object placement. Any controller comparison must preserve this authority and disclose any additional information used by a planning baseline.
+This action interface is a single controller with slow cache, fast execution, and handoff-event decision heads that aggregate to one executed environment action. It is not a vehicle/RSU multi-agent joint-action system, and it does not allow arbitrary future-node object placement. A baseline may encode the same causal state differently; its actual information and model access must be disclosed. In particular, an exact-transition planner has stronger model-based capability than a learned actor even when both start from the same visible state.
 
 ### 3.3 Symmetric cost comparison
 
@@ -60,9 +60,19 @@ The source completes a declared prefix node and exports a node-boundary package 
 
 When capacity is binding, an adapter admission may require legal victim selection. The native transaction checks the base dependency and records pre- and post-residents, selected victims, admitted objects, and bytes. An opt-in runtime bridge then removes the selected adapter from the PEFT runtime, loads the requested adapter from retained local files, and commits the logical cache state only after the runtime operation succeeds. A later node can cause another legal eviction and reload. This is evidence of local runtime lifecycle execution; it does not measure transfer of model weights between RSUs.
 
-### 4.3 Candidate workflow-aware controller
+### 4.3 Candidate workflow-aware controller and learning objective
 
-The research controller combines graph-related workflow state, typed cache context, predicted handoff context, and cache/execution/event decisions. Its exact formula, observation projection, action aggregation, checkpoint, and training objective for the conference comparison are **[B-FREEZE: method identity and scientific commit]**. We do not insert an older policy formula into this section while citing a newer calibrated result. Once frozen, this section must state the implemented policy distribution, legal mask handling, learning update, inference-time computation, and parameter count. If that version cannot be matched to the evidence below, the controller remains a system component rather than an independently validated contribution.
+The proposed comparison version uses `calibrated_workflow_interface_v2` and `independent_heads_executed_env_v2`: graph-related state, typed cache context, and predicted handoff context feed one controller with slow cache, fast execution, and event heads. The heads aggregate under the five-action legal mask to a single executed action. The current training interface records that executed action and applies clipped PPO to its action probability (`executed_action_ppo_only=true`, `env_action_ppo_coef=1`); the critic estimates discounted return with episode-local generalized advantage estimation. A completed workflow terminates the episode. A nonterminal step-limit truncation retains a value bootstrap from the final, unreset observation. The exact active feature projection, policy distribution, auxiliary terms, parameter count, and inference-time computation must be reported from **[B-FREEZE: integrated scientific commit, checkpoint, and resolved config]**; a v70 sparse-tail prior or reliability gate is not presumed active.
+
+The proposed `service_aligned_v1` per-step training reward is
+
+\[
+r_t=I_{\rm node}+100I_{\rm workflow}-25I_{\rm first\ deadline\ miss}
+-2I_{\rm failed\ attempt}-0.02t_{\rm op}-0.25B_{\rm transferred}/\mathrm{GiB}
+-0.05t_{\rm recompute}.
+\]
+
+Here \(t_{\rm op}\) includes node compute or vehicle fallback, model loading, and state restore, but excludes network transfer, recomputation, and the modeled failed-service delay. \(B_{\rm transferred}\) counts model, state, and input bytes once. The deadline penalty occurs only on the first modeled crossing; a late workflow can still complete. This is an optimization objective, whereas the paper comparison ranks service completion and failures before cost and reports reward as a secondary diagnostic. A bounded service-reward development test found that formula-level ranking did not translate into better learned completion for SA, controller-level MAPPO, or PPO. PopArt value normalization has a separately frozen stability A/B design, with no result yet available to this draft; it is established training machinery rather than a claimed new algorithm. Neither the reward formula nor that A/B establishes policy superiority.
 
 ## 5. Experimental Method
 
@@ -70,11 +80,15 @@ The research controller combines graph-related workflow state, typed cache conte
 
 We use three noninterchangeable evidence layers. The first runs a fixed two-node technical workflow with real model generation in separate processes, comparing prefix restart with state recovery. The second runs one three-node, two-adapter local victim/reload witness and one no-eviction control. The third uses native cache transactions and analytic network terms for corrected development and boundary matrices. The last layer is synthetic and is not counted as additional independent real-model trials. Each layer retains its frozen inputs, command or completion receipt, raw outputs, and file integrity inventory.
 
-The pending controller comparison has a different statistical unit: nonoverlapping original mobility intervals. Repeated seeds and workflows within one interval are nested observations. Before any confirmatory run, the code and all baselines must consume the same frozen source/window identity, request stream, legal actions, observation information, interaction budget, checkpoint selection opportunities, and endpoint definitions. The primary endpoints are workflow completion and failure, continuity, and complete-workflow cost; reward is reported as a secondary controller diagnostic. Transfer and recomputation are retained even for failed workflows. Delay is reported with its availability and conditioning rule.
+The controller layer is a calibrated simulation: NGSIM supplies mobility intervals and handoff-pressure features, and Alibaba supplies batch-DAG topology and task resource fields. Their pairing, adapter assignment, state scale, link, and modeled deadline are not jointly observed real VEC requests. Its statistical unit is a nonoverlapping original mobility interval; repeated seeds and workflows within one interval are nested observations. The current 36-instance development manifest (12 train, 4 dev, 12 regression, 8 frozen check) has been fully consumed and cannot become a confirmatory split. A historical registry contains 668 distinct consumed interval records, 418 with unresolved identity; an earlier I-80 inventory of 579 eligible windows is only an eligibility pool, not proof of unused data. Before any confirmatory run, source hashes, original frame/time intervals, and history must establish disjoint train/dev/evaluation windows. No old holdout is reopened.
+
+All methods must consume the same frozen request stream, legal actions, causal information, interaction budget when trained, and checkpoint selection opportunities. The primary endpoints are on-time and total workflow completion, unfinished-after-deadline, failed-service attempts and episodes, continuity/no-progress, and complete-workflow cost. Model, state, and input transfer and recomputation are retained even for failed workflows; reward is a secondary controller diagnostic. Delay is reported only for completed samples together with coverage, never with missing values treated as zero.
 
 ### 5.2 Required controller comparison and ablations
 
-The main comparison is **[B-RESULT: frozen candidate versus same-information PPO, DT handoff control, popularity, and a correct two-step planner]**. The plan must identify all checkpoints, seeds, original intervals, training/update budgets, and paired rows. The first bounded ablation disables state recovery while keeping model requests symmetric, testing whether suffix restoration avoids repeated prefix work. The second, conditional on the final policy interface, disables its workflow-sensitive preparation signal under matched training and selection budgets: **[B-ABLATION: exact toggle and checkpoint identities]**. No additional component ablation is promoted without a new prespecified question.
+The intended learned comparison is SA-GHMAPPO against single-controller PPO, controller-level MAPPO, and the project-native DT handoff DRL baseline. The DT implementation is literature-inspired, not an exact reproduction of one published method, and its prediction features require an explicit information-parity audit. Popularity is a stateful heuristic that counts adapter demand and uses predicted next RSU/handoff target; its memory lifetime and prediction ability must be disclosed. A two-step rule clones exact environment transitions and orders candidates lexicographically by completed nodes, service failures, deadline violations, elapsed seconds, and bytes. It is reported as a separate model-based capability comparator, not a matched-capacity learned controller. The present service runner trains/selects only SA, MAPPO, and PPO and evaluates the two-step rule; DT and Popularity still lack the full runner, checkpoint/artifact, and analysis chain. **[B-FREEZE: integrated method identities, capability parity, and scientific commit]**.
+
+The main table will pair every method on the same new raw intervals and list training steps, optimizer updates, selection opportunities, model information, and cost to decide. The current frozen *design*, not an executed strong-baseline result, assigns learned methods seeds 7/17/29/43/61, 1,440 environment steps, 24 update opportunities, 192 optimizer steps and four dev checkpoint choices. Deterministic rules are evaluated once per interval/workflow and are not copied across training seeds. The first bounded ablation compares state recovery with symmetric restart to test avoided prefix work. A second paper ablation may be chosen only after the final scientific version identifies an independently active mechanism and a prespecified falsifiable question; v70 sparse-tail and reliability switches are not assumed active. PopArt control/treatment is a learning-stability test, not an SA-specific novelty ablation. No result-dependent extra ablation is promoted.
 
 ## 6. Results
 
@@ -92,21 +106,33 @@ An earlier development comparison omitted current-model preparation from restart
 
 ### 6.4 Controller comparison
 
-**[RESULT PENDING: B must supply a frozen implementation, matched baseline package, nonoverlapping interval audit, raw endpoint rows, and prespecified statistics. No historical reward ranking or confidence interval is inserted here.]**
+A separate, nonformal development test on the consumed 36-instance manifest found that the service-aligned reward passed its formula-level ordering checks but lowered total completion for SA-GHMAPPO, controller-level MAPPO, and PPO relative to their original-reward counterparts. In the associated offline diagnosis, the service-reward critic had near-zero last-update explained variance and a value-to-policy gradient-norm ratio of 539–7,907 on fixed development samples. This motivates a single pending PopArt stability test; it is neither causal proof of the failure mechanism nor a successful controller comparison. No result from that exposed manifest is promoted to the table below.
 
-| Method | Workflow completion | Continuity | Complete-workflow delay and coverage | Model/state transfer | Reward, secondary |
+**[RESULT PENDING: integrated scientific commit, DT/Popularity runner integration, independent intervals, matched raw rows and budgets, complete manifests/checkpoint hashes, and prespecified statistics. No historical reward ranking or confidence interval is inserted here.]**
+
+| Method | On-time / total completion | Unfinished after deadline | Failed attempts / episodes | Handoff failure / no-progress streak | Completed delay, s (coverage) |
 | --- | --- | --- | --- | --- | --- |
 | Frozen workflow-aware controller | [B] | [B] | [B] | [B] | [B] |
-| Matched PPO | [B] | [B] | [B] | [B] | [B] |
-| Matched DT handoff controller | [B] | [B] | [B] | [B] | [B] |
-| Popularity control | [B] | [B] | [B] | [B] | [B] |
-| Same-information two-step rule | [B] | [B] | [B] | [B] | [B] |
+| PPO | [B] | [B] | [B] | [B] | [B] |
+| Controller-level MAPPO | [B] | [B] | [B] | [B] | [B] |
+| Project-native DT handoff DRL | [B] | [B] | [B] | [B] | [B] |
+| Popularity, stateful heuristic | [B] | [B] | [B] | [B] | [B] |
+| Two-step exact-transition rule, model-based | [B] | [B] | [B] | [B] | [B] |
+
+| Method | Model / state / input transfer, B | Recompute, s | Cache misses / evictions | Training / inference cost | Reward, secondary |
+| --- | --- | --- | --- | --- | --- |
+| Frozen workflow-aware controller | [B] | [B] | [B-METRIC] | [B] | [B] |
+| PPO | [B] | [B] | [B-METRIC] | [B] | [B] |
+| Controller-level MAPPO | [B] | [B] | [B-METRIC] | [B] | [B] |
+| Project-native DT handoff DRL | [B] | [B] | [B-METRIC] | [B] | [B] |
+| Popularity, stateful heuristic | [B] | [B] | [B-METRIC] | [B] | [B] |
+| Two-step exact-transition rule, model-based | [B] | [B] | [B-METRIC] | [B] | [B] |
 
 ## 7. Discussion and Limitations
 
 The verified mechanism addresses one continuous technical workflow, one host, one shared base, and two adapters. It does not establish correct traffic-task answers, remote RSU transfer time, queueing behavior, cold disk performance, multiple competing workflows, or performance under a real request distribution. Dynamic state bytes, local adapter weight bytes, and simulated network time remain separate. The corrected rule ties a correct simple baseline in the tested equal-lifecycle paths; a more complex controller is justified only by a future matched result on a problem where its information or decision structure can matter.
 
-The older controller development package cannot fill that gap. Its recorded frozen-window plan and actual evaluation rows refer to different NGSIM source segments; many windows overlap, and the controller and inherited baselines used different update counts and checkpoint selection rules. Its reward means may describe those stored runs, but its original independent-window confidence intervals and claims of matched algorithmic superiority are not used here. No holdout, broader representativeness, or submission-readiness statement is inferred from the system witnesses.
+Earlier controller development comparisons are excluded from the main table because their source-window identity, independent sampling units, and training/selection budgets do not satisfy this protocol. Failed workflows remain in completion, failure, transfer, and recomputation denominators; delay describes completed workflows only and always carries its coverage. No holdout, broader representativeness, or submission-readiness statement is inferred from the system witnesses.
 
 ## 8. Conclusion
 
