@@ -1,5 +1,11 @@
 ﻿# Decision Log
 
+## 2026-10-09：冻结窗口必须绑定实际 source 与原始区间
+
+- 决定：普通 frozen-plan 路径同 formal 路径一样 fail-fast 核对实际窗口身份；计划与实际不同直接拒绝，不把 frame offset 相同视为同一窗口。
+- 理由：v70 mixed/full 原始结果与所记 Peachtree 计划分别落在 Lankershim，导致 provenance 和独立窗口统计不能直接用于会议主张。
+- 旧产物保持只读；修复仅保护未来执行。新强基线仍需独立窗口、匹配训练/selection 预算和预注册主表。
+
 ## 2026-10-05：机制证据优先，不晋级 RL
 
 - 决定：保留原生 typed-cache candidate 作为 opt-in bounded mechanism，正式协议不静默切换。

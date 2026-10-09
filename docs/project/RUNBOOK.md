@@ -5,6 +5,15 @@
 
 # Runbook
 
+## CSCWD 强基线前置身份检查（2026-10-09）
+
+`benchmark_main_results.py`、`train_algo_pool_real_sample.py` 和 `train_sa_ghmappo_real_sample.py`
+消费窗口计划时，实际 mobility 的 ID、source segment、frame/time 区间必须与计划相同；不一致会在
+rollout 前抛出 `frozen window identity mismatch`。重新生成计划须使用将要执行的相同数据源、
+`max_mobility_rows`、窗口长度和预处理身份，不能只改旧 JSON 的 ID。旧 v70 计划与结果不一致，
+不得将其重跑或改写为独立会议证据。审查与强基线实验门槛见
+`cscwd_2027_baseline_contribution_audit_20261009.md`。
+
 ## 最小机制证据闭环（2026-10-05）
 
 冻结方案与结果分别见 `mechanism_evidence_closure_plan_20261005.md` 和

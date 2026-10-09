@@ -7,6 +7,8 @@
 
 ## 2026-10-09：v70 窗口身份与强基线可比性（OPEN）
 
+- `RESOLVED_FOR_FUTURE_RUNS`：普通 frozen-plan loader 的身份缺口已以 fail-fast 检查封闭，覆盖主 benchmark、算法池及 SA 训练入口；旧 v70 身份错配和重叠统计不因代码修复而消失。新独立数据及同预算强基线仍 `OPEN`。
+
 - v70 mixed/full 的 `selected_window_plan` 是 Peachtree，原始 rows/episode receipt 是 Lankershim，ID 交集为 0；普通 frozen-plan 路径传入的 `expected_window_id` 未被普通 mobility loader 校验。需要独立实现任务修复身份链和 rollout 前错段负例。
 - full 48 个窗口存在 177 对原始 frame 区间重叠，mixed 20 个窗口有 61 对；原 window-outer CI 与 Holm p 不可按独立窗口解释。
 - SA 与 PPO/DT 继承池的更新计数及 checkpoint 选择规则不同。新数据、同条件重训和可审计命令是下一轮门槛；详见 `cscwd_2027_baseline_contribution_audit_20261009.md`。

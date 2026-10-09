@@ -1,5 +1,10 @@
 # Code Module Map
 
+## 2026-10-09 冻结窗口身份边界
+
+- `src/evaluators/main_results_support.py::load_window_bundle`：普通真实 mobility 加载后、任何训练或评估 rollout 前，比较调用者的冻结窗口 ID、source segment、frame/time 区间；formal contract loader 保持既有专用校验。
+- 主 benchmark、算法池训练和 SA 训练负责传入原计划记录；共享 loader 不从实际结果回填计划身份。
+
 ## 2026-10-05 bounded mechanism evidence
 
 - `scripts/run_mechanism_evidence_closure.py`：只读复用 native request ledgers，构建 A 的公平成本表；通过正常

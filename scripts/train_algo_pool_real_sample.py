@@ -762,6 +762,7 @@ def main() -> None:
             formal_window_consumption_contract_path=args.formal_window_consumption_contract_path,
             formal_window_split=args.formal_window_split,
             expected_window_id=str(window_candidate.get("window_id", "")),
+            expected_window_identity=window_candidate,
         )
         mobility_bundle.rsu_metadata["window_rank"] = window_candidate.get("window_rank")
         mobility_bundle.rsu_metadata["window_class"] = window_candidate.get("window_class")

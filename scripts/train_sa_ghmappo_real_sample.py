@@ -7553,6 +7553,7 @@ def evaluate_checkpoint_protocol(
             frame_offset=int(eval_window["frame_offset"]),
             window_length=int(eval_window["window_length"]),
             random_seed=args.random_seed,
+            expected_window_identity=eval_window,
         )
         mobility_bundle.rsu_metadata["window_class"] = eval_window.get("window_class", "unknown")
         for workflow_state in selected_workflows:
@@ -9895,6 +9896,7 @@ def main() -> None:
             frame_offset=int(selected_window["frame_offset"]),
             window_length=int(selected_window["window_length"]),
             random_seed=args.random_seed + episode_index - 1,
+            expected_window_identity=selected_window,
         )
         mobility_bundle.rsu_metadata["window_class"] = selected_window.get("window_class", "unknown")
         recorder = EpisodeRecorder(prefetch_validation_window=6)

@@ -5,6 +5,11 @@
 
 # PPO_MEC
 
+2026-10-09 起，主结果 benchmark、SA-GHMAPPO 与算法池训练在按冻结窗口计划加载 mobility 时，
+会对实际 `window_id`、source segment 和原始 frame/time 区间做 fail-fast 校验；旧 v70 结果不会被原地修复。
+CSCWD 强基线审查与后续实验边界见
+[`docs/project/cscwd_2027_baseline_contribution_audit_20261009.md`](docs/project/cscwd_2027_baseline_contribution_audit_20261009.md)。
+
 最小机制证据闭环（共享缓存四配置、连续/重跑/后缀恢复、12 个有界决策场景）见
 [results](docs/project/mechanism_evidence_closure_results_20261005.md)；结论是 bounded diagnostic，非 formal、holdout、
 算法优势或 paper-ready 证据。
