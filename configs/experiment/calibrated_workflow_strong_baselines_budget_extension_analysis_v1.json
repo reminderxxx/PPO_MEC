@@ -1,0 +1,50 @@
+{
+  "schema_version": "calibrated_workflow_strong_baselines_budget_extension_analysis_v1",
+  "analysis_run_id": "cscwd_causal_strong_baselines_budget_extension_analysis_20261009_v1",
+  "scientific_run_id": "cscwd_causal_strong_baselines_budget_extension_20261009_v1",
+  "scientific_commit": "d25ebcded6b43b69b82bae825b035adc1d6f19c4",
+  "source_files": {
+    "run_manifest.json": "f1340e25865e6fcaeb23ef6d177836db2613e04419a3b3ce68f57e5d8edadb33",
+    "completion_receipt.json": "9543049440c71857c79ccd267bd25f2a10aa8a696ae60b03ba24295ce247ea49",
+    "artifact_integrity.json": "86594a03472b06fb3e92522fd0ee4131c0e190b9ec28fb69a9041ab712b3be83",
+    "evaluation_rows.csv": "6e20b84f3f08672ea0bd072c3c2f1b1dd7c1e40bd8d654375d744a5582774bce",
+    "training_signal_rows.csv": "d4da50889fbad90cb75b99a8d38513ef6cb25264b9c01b71746214e308f232a2",
+    "checkpoint_selection.json": "27e36308d1b33586e9458236c1f16d74a953faeb8c0d543775725730fa72659b",
+    "training_summary.json": "d9ca64404cb2d104a36b693729b72eb8ced9396b5cff24769a5acad14eccc255",
+    "fixed_endpoint_dev_rows.csv": "56ccfa7e807820e408ecb7015db2b41d6d6f77eac4c2015203a2d28a5e532006",
+    "fixed_endpoint_checkpoint_identity.json": "b50bb438798d3c292241d483193152c5162c5be9ecae1fe9ded66a40501f6603",
+    "optimizer_step_records.csv": "c582ad15b103518ebdfd98cb0c7784ac18fc7eaba9c49d7cffc70483138b3668",
+    "behavior_ledger.csv": "61084eacca52c22cbc0cb35a2969464737b4e367a6dcde1971ca83cfc3b92aa4",
+    "reused_nonlearned_reference.json": "9a9c48c25e6c61130d80cbcca312956d54946ace10dc7944aeb05ab964e052fc"
+  },
+  "short_budget_reference": {
+    "run_id": "cscwd_causal_strong_baselines_dev_20261009_v1",
+    "scientific_commit": "a08869388f9962149198054b5f8a0d6dd4d07eae",
+    "run_manifest_sha256": "462f7c001a5384693b6dfc9f6f8a3533b97949f448128cf8385979698d7f5164",
+    "evaluation_rows_sha256": "62438befe510da39c9e5cdc1d5b5d88c0ffbca5c7dd7e31fa10de66449b2322f",
+    "training_signal_rows_sha256": "49aaacbe1569b86321548b55082191f8fd680a399a87b18421c1e771a19f93dd",
+    "checkpoint_selection_sha256": "40d883ff106fc7f81e9bc2751af6d9561ea0ba3fa7f590259179fa787a85f9fa"
+  },
+  "pairing_keys": [
+    "split",
+    "method",
+    "seed",
+    "design_id",
+    "window_id",
+    "workflow_id",
+    "source_segment_id",
+    "source_frame_offset",
+    "source_window_length",
+    "source_time_start",
+    "source_time_end"
+  ],
+  "claim_boundary": {
+    "development_only": true,
+    "formal": false,
+    "holdout": false,
+    "new_training": false,
+    "new_evaluation": false,
+    "checkpoint_reselection": false,
+    "paper_edit": false
+  }
+}

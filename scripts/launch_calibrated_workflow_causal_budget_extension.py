@@ -27,6 +27,7 @@ from scripts.launch_calibrated_workflow_value_normalization_ab import (  # noqa:
 CONFIG = "configs/experiment/calibrated_workflow_strong_baselines_budget_extension_v1.json"
 RUN_ID = "cscwd_causal_strong_baselines_budget_extension_20261009_v1"
 RUN_ROOT = ROOT_DIR / "artifacts/experiments" / RUN_ID
+ANALYSIS_ROOT = ROOT_DIR / "artifacts/analysis" / f"{RUN_ID}_analysis_v1"
 SUPERVISOR_ROOT = ROOT_DIR / "artifacts/experiments" / f"{RUN_ID}_supervisor"
 DEFAULT_SHORT_BUDGET_ROOT = Path(
     "/Users/howen/.codex/worktrees/cscwd-window-identity/PPO_MEC/artifacts/experiments/"
@@ -52,7 +53,13 @@ def _job(expected_commit: str, short_budget_root: Path) -> int:
     if result.returncode:
         return result.returncode
     try:
-        analyze(RUN_ROOT, short_budget_root)
+        analyze(
+            RUN_ROOT,
+            short_budget_root,
+            ANALYSIS_ROOT,
+            config_path=ROOT_DIR / "configs/experiment/calibrated_workflow_strong_baselines_budget_extension_analysis_v1.json",
+            expected_analysis_commit=expected_commit,
+        )
     except Exception as error:
         _write_json(RUN_ROOT / "analysis_failure_receipt.json", {
             "status": "failed",
