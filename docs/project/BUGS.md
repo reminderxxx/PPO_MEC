@@ -905,13 +905,16 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - `BOUNDARY / historical v1`：192-episode v1 早于 action-4 commit 与 actual/estimated link 修正，只保留审计，不得与 v2
   checkpoint、逐行结果或 aggregate 混用。
 
-## OPEN / causal learned baseline budget sufficiency
+## PARTIALLY RESOLVED / causal learned baseline budget sufficiency; selection generalization remains open
 
-- `cscwd_causal_strong_baselines_dev_20261009_v1` 每个 learned cell 只有 1,440 环境步；是否仅因共同训练曝光不足而限制
-  SA/PPO/MAPPO/DT 尚不能区分。
-- 已预注册统一 4× budget + 等比例选模时点的联合干预；这不是 SA 专属追加预算，也不能把二者效应拆开解释。
-- 现有 36 个实例全部已消费为 development；即便改善也不构成 independent/formal 证据。若 SA 不改善，本轮停止，
-  不自动搜索新算法或奖励。
+- 统一 4× budget + 等比例选模时点已完整执行。SA completion `.87→.99`，PPO `.95→1`，说明短预算确实限制部分
+  completion；但该设计不能拆分训练步数与 candidate schedule 的效应。
+- `OPEN / service tradeoff`：SA frozen on-time 不变，common-completed frozen latency/recompute 上升，seed 7 failure/return
+  退化；不能把 completion 改善写成全面服务改善或 SA 领先。
+- `OPEN / selection evidence`：4-window dev 上 selected SA on-time 全为 `.75`，frozen development 仅 `0--.25`。现有 36
+  实例均已消费，下一步须先取得 source-disjoint selection evidence，不得用已暴露检查集重选。
+- 后处理 Python 3.9 `zip(strict=True)` 失败已在独立 analysis commit 修复；原 supervisor `FAIL` 与 failure receipt 保留，
+  v2 create-only analysis 完整。该故障不属于训练失败。
 
 ## OPEN / calibrated workflow critic scale candidate 仍只是假设
 

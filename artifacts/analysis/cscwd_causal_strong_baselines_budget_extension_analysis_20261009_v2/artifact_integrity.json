@@ -1,0 +1,90 @@
+{
+  "schema_version": "artifact_integrity_v1",
+  "files": [
+    {
+      "path": "analysis_completion_receipt.json",
+      "sha256": "c0ccf50c00112022f100c6e2ad55e54ce46639cc1ed4cb10e65a7806ee24b984",
+      "bytes": 347
+    },
+    {
+      "path": "analysis_manifest.json",
+      "sha256": "639968234da4b9a848e95e2bc8e8f2f4ae498cf09e0925bea4ae731a751441ed",
+      "bytes": 1357
+    },
+    {
+      "path": "analysis_summary.json",
+      "sha256": "9425f8c21833a1f1c7ada1fa1eb7c78d344dd84a41e17c31da9382991d791c11",
+      "bytes": 11425
+    },
+    {
+      "path": "checkpoint_selection_curve.csv",
+      "sha256": "338abf2b242698b6f8c26714605b37bc9106c073ea758c53d7939ff553c8d686",
+      "bytes": 21822
+    },
+    {
+      "path": "common_completed_instance_diagnostics.csv",
+      "sha256": "91befee40b11d86c198a7f7ca919e4abac4a906ef205269c0462d253cb4566f8",
+      "bytes": 130708
+    },
+    {
+      "path": "conditional_completed_summary.csv",
+      "sha256": "b7b1fffc35f31dc1abb891bc4cdd4a136a804346edafc888b638839a509a9092",
+      "bytes": 6444
+    },
+    {
+      "path": "fixed_endpoint_dev_diagnostics.csv",
+      "sha256": "693d09fe24deda51cb379b7fa3223d49b9c714d8e1c27821d3228da3ce9f5f10",
+      "bytes": 9410
+    },
+    {
+      "path": "method_budget_effect_summary.csv",
+      "sha256": "2b5521ccb516c2cef7c5076b9296dfeb7d7d2a715ec21e49e8e81470035c3bbd",
+      "bytes": 12261
+    },
+    {
+      "path": "optimizer_update_diagnostics.csv",
+      "sha256": "d5fb6f12707ee5d28ec2bc08a57305246e60f78c7ef931b05f2e4b51fdb24f73",
+      "bytes": 449248
+    },
+    {
+      "path": "paired_all_instance_diagnostics.csv",
+      "sha256": "a249ec73f5fc39235c102009064885b65da0c24efd503170238d652180ddfbcb",
+      "bytes": 229198
+    },
+    {
+      "path": "paired_method_seed_diagnostics.csv",
+      "sha256": "6d4e62e6fe7dea0ce338a007cab0df29b29de38f669cb4f3072923684df5e204",
+      "bytes": 43040
+    },
+    {
+      "path": "reused_nonlearned_reference.json",
+      "sha256": "9a9c48c25e6c61130d80cbcca312956d54946ace10dc7944aeb05ab964e052fc",
+      "bytes": 3430
+    },
+    {
+      "path": "selected_checkpoint_service_diagnostics.csv",
+      "sha256": "8eb3eecd51534f2d092da3971f00a1748e1d723da49f02828bffd4f8de0150f5",
+      "bytes": 14346
+    },
+    {
+      "path": "selection_vs_exposed_development.csv",
+      "sha256": "60c4a3982aa25164ab4f70ec39e073551c6f327d4e644be69a0879940a53dbef",
+      "bytes": 6392
+    },
+    {
+      "path": "training_cost_diagnostics.csv",
+      "sha256": "a9b4106741f6ff378384de415b12a50233239ccf4474902a514dbca076f1d9ea",
+      "bytes": 1131
+    },
+    {
+      "path": "training_prefix_identity.csv",
+      "sha256": "5f35a2ac7d1662e104dccab22c697e241abff375e5dd448f923e7024692f2f46",
+      "bytes": 5079
+    },
+    {
+      "path": "update24_checkpoint_identity.csv",
+      "sha256": "988855e1cb5f203052181df472212c7de3322d8602b39f6e2ea6da883cce5faf",
+      "bytes": 3095
+    }
+  ]
+}

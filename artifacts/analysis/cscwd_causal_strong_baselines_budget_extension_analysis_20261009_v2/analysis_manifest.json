@@ -1,0 +1,26 @@
+{
+  "schema_version": "calibrated_workflow_strong_baselines_budget_extension_analysis_v1",
+  "analysis_run_id": "cscwd_causal_strong_baselines_budget_extension_analysis_20261009_v2",
+  "created_at": "2026-10-09T09:22:10.576600+00:00",
+  "analysis_commit": "1ab26cfbb3485ae5242d46c000d6e7e3eeed8d0e",
+  "scientific_commit": "d25ebcded6b43b69b82bae825b035adc1d6f19c4",
+  "source_run_id": "cscwd_causal_strong_baselines_budget_extension_20261009_v1",
+  "source_manifest_sha256": "f1340e25865e6fcaeb23ef6d177836db2613e04419a3b3ce68f57e5d8edadb33",
+  "config": {
+    "path": "configs/experiment/calibrated_workflow_strong_baselines_budget_extension_analysis_v1.json",
+    "sha256": "6018c6da9b2118deb3031208931e5f757158de870a6ef750a7bb1425ac8c825d"
+  },
+  "command": [
+    "scripts/analyze_calibrated_workflow_budget_extension.py",
+    "--source_root",
+    "artifacts/experiments/cscwd_causal_strong_baselines_budget_extension_20261009_v1",
+    "--short_budget_root",
+    "/Users/howen/.codex/worktrees/cscwd-window-identity/PPO_MEC/artifacts/experiments/cscwd_causal_strong_baselines_dev_20261009_v1",
+    "--analysis_root",
+    "artifacts/analysis/cscwd_causal_strong_baselines_budget_extension_analysis_20261009_v2",
+    "--expected_analysis_commit",
+    "1ab26cfbb3485ae5242d46c000d6e7e3eeed8d0e"
+  ],
+  "new_training_steps": 0,
+  "new_evaluation_rows": 0
+}

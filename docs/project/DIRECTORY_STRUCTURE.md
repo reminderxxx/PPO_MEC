@@ -5,6 +5,9 @@
 - `configs/experiment/calibrated_workflow_strong_baselines_budget_extension_v1.json`：4× learned 预算、固定端点和短预算哈希身份。
 - `scripts/analyze_calibrated_workflow_budget_extension.py`、`scripts/launch_calibrated_workflow_causal_budget_extension.py`：配对诊断与一次性持久启动；规则方法只读复用。
 - `docs/project/cscwd_causal_budget_extension_protocol_20261009.md`：统一预算干预、分析输出和停止边界。
+- `artifacts/analysis/cscwd_causal_strong_baselines_budget_extension_analysis_20261009_v2/`：不含 checkpoint 的 create-only
+  配对表、固定端点、选模差、训练前缀身份、optimizer 曲线与独立 integrity。
+- `docs/project/cscwd_causal_budget_extension_analysis_20261009.md`：实验结论；对应 claim-change 文件只供论文线只读消费。
 
 - `src/envs/core/causal_rsu_predictor.py`：训练拟合的低容量前缀 RSU 预测器。
 - `configs/experiment/calibrated_workflow_strong_baselines_development_v2_prefix_only.json`：一次开发执行的 hash、方法、预算和权限冻结。

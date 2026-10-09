@@ -5,6 +5,21 @@
 
 # Artifact Records
 
+## 2026-10-09 causal strong-baseline 4× budget extension
+
+- scientific root：`artifacts/experiments/cscwd_causal_strong_baselines_budget_extension_20261009_v1/`；commit=`d25ebcd`，
+  completion=`20 cells / 115,200 steps / 15,360 optimizer steps / 400 rows`，原 integrity 119 files。
+- supervisor 历史 terminal=`FAIL` 是完成训练后的 Python 3.9 `zip(strict=True)` 后处理异常；scientific completion receipt、
+  failure receipt 和 terminal receipt 均原样保留，不重训、不重评。
+- canonical analysis root：`artifacts/analysis/cscwd_causal_strong_baselines_budget_extension_analysis_20261009_v2/`；
+  analysis commit=`1ab26cf`，0 training/evaluation/reselection，400 paired-all-instance、382 common-completed、60
+  method×seed×split、1,920 optimizer-update rows。
+- analysis completion SHA-256=`c0ccf50c00112022f100c6e2ad55e54ce46639cc1ed4cb10e65a7806ee24b984`；manifest=
+  `639968234da4b9a848e95e2bc8e8f2f4ae498cf09e0925bea4ae731a751441ed`；integrity=
+  `047ac9878b877741f2026d3d15efa26780d0c559ed3a7818724e82e335539356`。
+- evidence level=`L2_complete_development_artifact_no_independent_test`；结论为 budget-sensitive completion，非 SA 领先、
+  非 formal/holdout/paper-ready。报告见 `cscwd_causal_budget_extension_analysis_20261009.md`。
+
 ## 2026-10-09 calibrated workflow service-reward learning diagnosis
 
 - root：`artifacts/analysis/calibrated_workflow_service_reward_learning_diagnosis_20261009_v1/`；只读消费 10 月 6 日

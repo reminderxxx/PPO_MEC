@@ -1,0 +1,13 @@
+{
+  "status": "complete",
+  "paired_all_instance_rows": 400,
+  "paired_method_seed_rows": 60,
+  "common_completed_rows": 382,
+  "fixed_endpoint_dev_rows": 160,
+  "optimizer_update_rows": 1920,
+  "training_prefix_cells": 20,
+  "update24_checkpoint_cells": 20,
+  "new_training_steps": 0,
+  "new_evaluation_rows": 0,
+  "formal_or_holdout_reads": 0
+}

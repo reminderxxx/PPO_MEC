@@ -7,6 +7,11 @@
 
 ## 因果强基线统一 4× 预算延长（2026-10-09；一次性）
 
+本 run 已完成，不得重跑。原 supervisor `FAIL` 是训练完成后的 Python 3.9 后处理异常；保留原失败现场。兼容修复只读
+现有 source artifact，并输出到
+`artifacts/analysis/cscwd_causal_strong_baselines_budget_extension_analysis_20261009_v2/`；禁止覆盖 source run、旧部分分析
+或用 regression/frozen 重选 checkpoint。最终报告见 `cscwd_causal_budget_extension_analysis_20261009.md`。
+
 协议见 `cscwd_causal_budget_extension_protocol_20261009.md`。先只读验证配置、36-instance 身份及短预算原件：
 
 ```bash

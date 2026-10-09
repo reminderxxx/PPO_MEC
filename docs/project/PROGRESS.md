@@ -5,7 +5,19 @@
 
 ﻿# Progress
 
-## 2026-10-09：因果强基线统一 4× 预算延长已预注册，尚未启动
+## 2026-10-09：因果强基线统一 4× 预算延长完成；改善 completion，不支持 SA 领先
+
+- 科学 run 在 `d25ebcd` 完成 20 cells、115,200 environment steps、1,920 updates、15,360 optimizer steps 与
+  400 learned evaluation rows；119-file integrity 通过。外层历史 `FAIL` 仅因 Python 3.9 不支持 `zip(strict=True)`，
+  训练 receipt=`complete`，现场未覆盖。
+- 修复提交 `1ab26cf` 只做显式 pairing-key 后处理；create-only v2 分析为 0 training/evaluation/reselection。20/20 update-24
+  checkpoint byte-identical，前 1,440-step 离散轨迹一致，最大浮点文本差 `3.55e-15`。
+- combined SA completion `.87→.99`（seed `3+/2=`），但 frozen on-time `.125→.125`，failure `.43→.17` 仍高于
+  PPO/DT，common-completed recompute `+8.10 s`。PPO/MAPPO/DT 亦改善不同指标，未形成 SA 独有优势。
+- 结论为“训练曝光不足部分解释 completion，服务质量与选模泛化仍未定位”。不启动新算法；下一优先级是新的
+  source-disjoint checkpoint-selection cohort。报告见 `cscwd_causal_budget_extension_analysis_20261009.md`。
+
+## 2026-10-09：因果强基线统一 4× 预算延长预注册（历史）
 
 - 基线实现固定为 `a08869388f9962149198054b5f8a0d6dd4d07eae`；单一联合变量是四 learned method 全部从
   1,440/24/192 延长到 5,760 环境步/96 updates/768 optimizer steps，并把候选等比例移到 `[24,48,72,96]`。
