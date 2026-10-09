@@ -1,5 +1,7 @@
 ﻿# Directory Structure
 
+- `docs/project/cscwd_2027_strong_baseline_prediction_permission_blocker_20261009.md`：当前 36-instance 公共预测回退的科学权限阻断；无 run artifact。
+
 ## 2026-10-09 CSCWD 强基线开发链接线
 
 - `scripts/run_calibrated_workflow_strong_baselines.py`：复用冻结 service/PPO 采样及评价消费者的 guarded 开发比较入口；默认仅可只读 preflight。

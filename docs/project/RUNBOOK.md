@@ -5,6 +5,14 @@
 
 # Runbook
 
+## 强基线预测权限阻断（2026-10-09）
+
+当前 36-instance manifest 的 36 项均缺独立 `predicted_rsu_sequence`；环境将实际未来 RSU 序列回退为
+公共预测。`scripts/run_calibrated_workflow_strong_baselines.py --preflight` 必须以
+`PREDICTION_FUTURE_LEAK_BLOCKER` 非零退出。不得授权/启动 28,800-step 开发比较、复制原序列伪装预测
+或使用旧 holdout。恢复条件见 `cscwd_2027_strong_baseline_prediction_permission_blocker_20261009.md`。
+
+
 ## CSCWD 强基线开发链接线（2026-10-09；未授权科学执行）
 
 公共入口与能力/预算边界见 `cscwd_2027_strong_baseline_wiring_20261009.md`。`--preflight` 只读既有

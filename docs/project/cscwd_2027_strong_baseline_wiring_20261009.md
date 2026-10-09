@@ -9,14 +9,19 @@
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `git_commit_at_review`: 实现基线 `858bc797e23b4e56051663f28d6fd7681f5ee77d`；本轮实现提交见 Git
 - `evidence_level`: `E1_INTERFACE_IMPLEMENTED_SYNTHETIC_SMOKE_ONLY`
-- `verdict`: `DEVELOPMENT_COMPARISON_PREPARED / SCIENTIFIC_EXECUTION_NOT_AUTHORIZED / ALGORITHM_ADVANTAGE_UNVERIFIED`
+- `verdict`: `INTERFACE_WIRED / PREDICTION_PERMISSION_PREFLIGHT_BLOCKED / ALGORITHM_ADVANTAGE_UNVERIFIED`
+
+**后续预检勘误（同日）**：完整预测权限审计发现当前 36/36 实例把实际未来 `rsu_sequence` 回退为公共预测；
+新增 fail-closed 门阻止本设计启动。下文预算与命令只保留为未执行草案，结论以
+`cscwd_2027_strong_baseline_prediction_permission_blocker_20261009.md` 为准。
 
 本轮在独立分支以 B 的 `858bc79` 为基线，保留原有冻结两奖励 runner 和 PopArt A/B runner。新增
 `scripts/run_calibrated_workflow_strong_baselines.py` 作为一次开发比较的公共入口，默认配置
 `configs/experiment/calibrated_workflow_strong_baselines_development_v1.json` 中 `execution_authorized=false` 且
 `scientific_execution_authorized=false`，所以 `--run` 在创建 output root 前拒绝。只读 `--preflight` 检查既有
 36-instance manifest 与 base config 的 hash、原始 segment/frame/time 身份、互斥区间和 12/4/12/8 split 数量；
-这 36 项已用于开发，不能当独立确认性测试或新 holdout。
+这 36 项已用于开发，不能当独立确认性测试或新 holdout。来源区间门通过之后，新增预测权限门会拒绝
+这些实例；接线验收不等于科学可执行。
 
 ## 能力与公平性矩阵
 
@@ -52,7 +57,7 @@ development evaluation 预计 learned 400 行、Popularity 20 行、two-step 20 
 非 raw 仅留显式 opt-in，须先有另行冻结的晋级决定。本轮不选 PopArt，也不把它写成有效贡献。
 B 的开发 A/B 已执行完，本分支尚未独立审查其科学原件或将其结果并入主稿。
 
-只读检查命令（已执行）：
+只读检查命令（现预期因预测权限非零退出）：
 
 ```bash
 /Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_calibrated_workflow_strong_baselines.py --preflight
@@ -75,5 +80,5 @@ B 的开发 A/B 已执行完，本分支尚未独立审查其科学原件或将�
   checkpoint save/load/hash；**科学训练步数为 0**，不产生算法比较。
 - Popularity 在两个不同合成实例独立执行，重跑动作分布一致；规则的训练 step/checkpoint 计数为 0。
 - 原三学习方法的旧 service/PopArt 局部测试与新测试共同通过；旧 runner 输出和科学历史未覆盖或改写。
-- 尚无真实开发比较、DT 与其他策略的完整预测字段权限审计、训练/推理耗时实测表、跨 run/车辆独立确认性
+- 尚无真实开发比较；完整预测字段权限审计已发现阻断，训练/推理耗时实测表、跨 run/车辆独立确认性
   split、正式 checkpoint/command/manifest 或论文主表统计。它们是下一次科学执行与投稿的独立门。

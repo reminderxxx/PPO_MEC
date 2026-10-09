@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-09：公共预测含实际未来迁移序列（OPEN SCIENTIFIC CONTRACT BLOCKER）
+
+- `BLOCKED`：36/36 已消费 development 实例没有独立 `predicted_rsu_sequence`；`_predicted_sequence` 回退到环境将执行的 `rsu_sequence` 后缀，继而公开 next/target/dwell/contact。DT 与 Popularity 明确消费这些字段，其他 learned 方法也可访问；同信息不等于无未来泄漏。本轮科学比较在 run root 前停止。
+- `REQUIRED`：另行冻结因果 prefix-only 预测来源、生成时点、source hash 与逐步消费测试；不能只复制实际序列。现有原始区间独立性缺口和 B PopArt 不晋级结论均不因此改变。详见 `cscwd_2027_strong_baseline_prediction_permission_blocker_20261009.md`。
+
 ## 2026-10-09：强基线工程已接通，科学公平性和独立数据仍开放
 
 - `OPEN / method fairness`：仅完成 synthetic fixture 的公共输入、mask、DT checkpoint 与 Popularity 逐实例 reset 验收；尚无四 learned 方法完整开发比较、逐字段预测权限核对、完整计算成本或基线排序。默认 `--run` 禁止，不能从接线成功推断算法优势。

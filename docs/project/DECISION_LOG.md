@@ -1,5 +1,9 @@
 ﻿# Decision Log
 
+## 2026-10-09：预测权限先于强基线训练门
+
+- 决定：对当前 36-instance manifest，实际未来 `rsu_sequence` 回退为公共预测违反本次无未来执行信息授权条件；停止科学 freeze/launch，仅提交 fail-closed preflight 与独立阻断报告。保持原 actor、reward、environment、模型结构及历史 artifact 不变；因果预测合同须另立任务冻结后才可再决定单次 development 比较。
+
 ## 2026-10-09：强基线接线与科学执行分开
 
 - 决定：DT/Popularity 使用新 guarded 开发入口与旧公共 env/registry/evaluator；原 service/PopArt 冻结实验入口不改变。DT 是项目原生、受文献启发的 PPO，不称精确复现；Popularity 每实例重置计数且无训练 seed/checkpoint；two-step 保留 exact-transition 能力标签。

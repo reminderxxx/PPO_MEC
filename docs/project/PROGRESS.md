@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-09：强基线完整开发比较在预测权限预检停止
+
+- 用户授权 4 learned×5 seeds、28,800 环境步的单次 development 比较；执行前查明 36/36 实例缺独立 `predicted_rsu_sequence`，环境把将执行的 `rsu_sequence` 未来后缀作为公共预测和 contact budget。共享该输入仍违反无真实未来信息泄漏要求，故未冻结科学提交、未创建 run root 或启动 supervisor；训练/评价/主表行均为 0。
+- 新 runner 加 fail-closed `PREDICTION_FUTURE_LEAK_BLOCKER`；后续须另立 prefix-only 预测来源合同与 producer/consumer 验证，不能通过改名原始序列或在两个 reward 中挑结果绕过。审查见 `cscwd_2027_strong_baseline_prediction_permission_blocker_20261009.md`。
+
 ## 2026-10-09：DT/Popularity 强基线开发链已接通，未运行科学比较
 
 - B 的 PopArt 开发 A/B 已执行完；本分支只保留 raw/disabled 默认与 opt-in 接口，等待 B 独立审查结论，不据训练完成推断机制有效或方法晋级。

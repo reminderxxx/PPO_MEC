@@ -368,6 +368,19 @@ def _load_inputs(design: dict[str, Any]) -> tuple[dict[str, Any], dict[str, list
     }
     if {name: len(rows) for name, rows in splits.items()} != {"train": 12, "dev": 4, "regression": 12, "frozen_check": 8}:
         raise RuntimeError("consumed development split identity drift")
+    missing_forecast = [
+        str(row["design_id"])
+        for row in manifest["instances"]
+        if "predicted_rsu_sequence" not in row
+    ]
+    if missing_forecast:
+        raise RuntimeError(
+            "PREDICTION_FUTURE_LEAK_BLOCKER: "
+            f"{len(missing_forecast)}/{len(manifest['instances'])} instances omit "
+            "predicted_rsu_sequence; the environment then exposes future "
+            "actual rsu_sequence as public predictions/contact budget. "
+            "A separately audited causal forecast contract is required."
+        )
     if design["reward_profile"] == "service_aligned_v1":
         reward = _load_json(ROOT_DIR / "configs/experiment/calibrated_workflow_service_reward_alignment_v1.json")["service_aligned_reward"]
         config["objective"].setdefault("reward_profiles", {})["service_aligned_v1"] = reward

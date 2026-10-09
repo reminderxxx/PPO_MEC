@@ -13,6 +13,7 @@ from scripts.run_calibrated_workflow_strong_baselines import (
     _annotate_rows,
     _build_learned,
     _evaluate_popularity,
+    _load_inputs,
     _run_learned_cell,
     _validate_protocol,
     _write_csv,
@@ -198,3 +199,9 @@ def test_development_protocol_is_unapproved_and_raw_by_default() -> None:
     promoted["critic_target_normalization"] = "popart_running_mean_std"
     with pytest.raises(RuntimeError, match="separately frozen"):
         _validate_protocol(promoted)
+
+
+def test_current_manifest_fails_before_future_mobility_is_exposed() -> None:
+    design = json.loads((ROOT / "configs/experiment/calibrated_workflow_strong_baselines_development_v1.json").read_text())
+    with pytest.raises(RuntimeError, match="PREDICTION_FUTURE_LEAK_BLOCKER: 36/36"):
+        _load_inputs(design)
