@@ -4,7 +4,8 @@
 
 - `scripts/diagnose_calibrated_workflow_service_reward_learning.py`：create-only 只读重放、value/GAE 重算、固定 dev 梯度尺度与
   checkpoint probability trace；不训练或评价。
-- `configs/experiment/calibrated_workflow_value_normalization_ab_v1.json`：未实现、未授权的单变量 PopArt A/B 冻结协议。
+- `configs/experiment/calibrated_workflow_value_normalization_ab_v1.json`：单变量 PopArt A/B 冻结协议；执行授权由独立文件绑定，
+  completed v2 结果不回写设计原件。
 - `artifacts/analysis/calibrated_workflow_service_reward_learning_diagnosis_20261009_v1/`：18-cell matrix、状态分组、GAE/
   truncation/gradient/checkpoint 见证、身份回执与 integrity；不含 checkpoint。
 - `docs/project/calibrated_workflow_service_reward_{learning_diagnosis,claim_change}_20261009.md`：独立诊断与 A 线主张边界。
@@ -507,14 +508,21 @@ scripts/preflight_calibrated_workflow_value_normalization_ab.py
 scripts/run_calibrated_workflow_value_normalization_ab.py
 scripts/launch_calibrated_workflow_value_normalization_ab.py
 scripts/analyze_calibrated_workflow_value_normalization_ab.py
+scripts/analyze_calibrated_workflow_selected_checkpoint_alignment.py
 tests/test_popart_value_normalization.py
 tests/test_calibrated_workflow_value_normalization_ab.py
 tests/test_calibrated_workflow_value_normalization_launcher.py
+tests/test_selected_checkpoint_alignment.py
 docs/project/calibrated_workflow_value_normalization_ab_execution_protocol_20261009.md
+docs/project/calibrated_workflow_selected_checkpoint_alignment_20261009.md
+docs/project/calibrated_workflow_popart_paper_supplement_20261009.md
+docs/project/calibrated_workflow_strong_baseline_comparison_boundary_20261009.md
 artifacts/analysis/calibrated_workflow_value_normalization_ab_preflight_20261009_v1/
 artifacts/analysis/calibrated_workflow_value_normalization_ab_preflight_20261009_v2/
 artifacts/benchmarks/calibrated_workflow_value_normalization_ab_20261009_v2/
 artifacts/analysis/calibrated_workflow_value_normalization_ab_review_20261009_v3/
+artifacts/analysis/calibrated_workflow_selected_checkpoint_states_20261009_v1/
+artifacts/analysis/calibrated_workflow_selected_checkpoint_alignment_20261009_v1/
 ```
 
 artifact root 均为 create-only；scientific run 的 `checkpoints/` 只本地保存，禁止提交或上传。

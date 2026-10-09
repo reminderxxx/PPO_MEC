@@ -914,3 +914,15 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - PopArt 改善 raw-unit critic RMSE 和 gradient scale，却未通过共同 behavior/service gates；不能声称 critic 修复足以改善服务。
 - `OPEN / mechanism consumer alignment`：机制门消费 update-24 training batch，service/behavior 消费 dev-selected checkpoint；28/30 selected update 早于 24。原结果保留，不修改后补跑。
 - `BOUNDARY / development only`：36 实例已暴露，5 seeds 不是独立 workload；没有 formal/holdout 支撑。
+
+## RESOLVED / selected-checkpoint consumer identity；OPEN / action-4 local credit
+
+- 原 `mechanism consumer alignment` 已通过 30 个 actual selected checkpoint × 48 个预先冻结公共状态的无更新前向关闭；
+  28/30 早于 update 24 的身份现已显式消费，参数、optimizer、PopArt state 和 update count 均未改变。
+- `BOUNDARY / fixed-behavior target`：共同 continuation return 是完整、合法的固定 probe，但不是各 checkpoint 的无偏
+  `V^π`，不能支持 GAE、exact historical update 或 policy-value calibration 的强 claim。
+- `OPEN / selection-mediated comparison`：只有 6/15 control/candidate method-seed pair 选择相同 update；selected 表覆盖
+  实际 service consumer，却混合预注册 selection pathway，不是同 update 的纯 normalization effect。
+- `OPEN / non-committing failed action-4 credit`：PopArt 在 720/720 配对降低 probe value error，但 SA/PPO 的 action-4
+  probability 均值仍上升；下一轮候选只针对失败、无进展且未提交 migration 的 action 4 限制 actor positive advantage。
+  该候选尚未实现或训练，不得写成有效算法、SA 优势或 paper-ready 结果。

@@ -1299,3 +1299,14 @@ claim map 必须报告 `UNAVAILABLE`。
 - 结果：critic raw RMSE、EV 和 value:policy gradient scale 改善，但 behavior probability conjunction 与 PPO on-time no-harm 失败，overall=`FALSIFIED_OR_NOT_PROMOTED`。
 - 决定：不把 PopArt 写成服务优势或原创贡献；raw critic 继续作 canonical 参照，PopArt 仅作为有限训练稳定性设置。
 - 不自动切换到 auxiliary/reward/新结构。若未来继续定位，只先补 selected-checkpoint、共同冻结状态上的 value error + action probability/margin + advantage 对齐证据。
+
+## 2026-10-09 — selected-checkpoint 闭环后只冻结局部 credit 候选
+
+- 结果：30 个 actual selected checkpoint 在 48 个 outcome-blind 公共 dev 状态上完成无更新对齐；PopArt 对固定行为
+  return 的绝对 value error 在 720/720 配对下降，但 action-4 probability 在 SA/PPO 上升、MAPPO 下降，服务仍不一致。
+- 决定：关闭 mechanism consumer identity blocker，不修改原 gate 或晋级结论。固定行为 target 只作 scale probe，
+  不称为 `V^π`、GAE 或原 update 重现；raw critic 仍是 canonical。
+- 若另轮获授权，唯一候选为 non-committing failed-action advantage cap：仅对失败、无节点进展、未提交 migration 的
+  executed action 4 限制 actor advantage 不为正。critic/reward/PopArt/auxiliary/mask/权限不变；本轮不实现、不训练。
+- 候选若不能降低相关状态 probability/margin，或任一方法 on-time/total completion 下降，即否定并停止；不切换到
+  auxiliary sweep、追加 seed、重选 checkpoint 或 reward 搜索。

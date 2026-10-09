@@ -13,6 +13,11 @@
   advantage、梯度与 checkpoint 只读诊断；冻结唯一 PopArt value-normalization A/B，不授权训练。
 - `calibrated_workflow_service_reward_claim_change_20261009.md`：给 CSCWD 2027 A 线的独立主张收缩、统一版本、强基线能力
   边界和 confirmatory 晋级门；不修改主论文稿。
+- `calibrated_workflow_selected_checkpoint_alignment_20261009.md`：30 个实际 selected checkpoint × 48 个预冻结公共状态的
+  无更新 critic/policy 对齐、action probability/aggregation/projection 区分、唯一下一轮 credit-assignment 候选与否证条件。
+- `calibrated_workflow_popart_paper_supplement_20261009.md`：供 A 线人工合并的独立 Methods/Results 边界文本；不编辑主论文。
+- `calibrated_workflow_strong_baseline_comparison_boundary_20261009.md`：对 commit `d18e7bf...` 的只读 capability/config
+  核查，禁止把 original-reward strong-baseline 表与 service-aligned PopArt A/B 合并排名。
 
 - `calibrated_workflow_service_reward_alignment_20261006.md`：原/候选公式、终止与截断语义、分项单元验收、两奖励×三方法
   匹配训练、同轨迹重评分、负向 strata 与 D 类停止决定；不进入 auxiliary-target 消融。

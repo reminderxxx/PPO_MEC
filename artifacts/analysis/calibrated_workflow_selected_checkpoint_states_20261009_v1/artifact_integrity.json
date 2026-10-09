@@ -1,0 +1,15 @@
+{
+  "files": [
+    {
+      "bytes": 233,
+      "path": "freeze_receipt.json",
+      "sha256": "708fbcd9bd01a0d136390d8e91235a4522d856e4b9368dbe2d1a6f043eada73f"
+    },
+    {
+      "bytes": 799995,
+      "path": "state_manifest.json",
+      "sha256": "f026bf71fcbd9e38832a990367576afae9a5e2c0af7a4291600c7d3073b18c89"
+    }
+  ],
+  "schema_version": "calibrated_workflow_selected_checkpoint_state_integrity_v1"
+}

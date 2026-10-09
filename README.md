@@ -7,9 +7,9 @@
 
 服务奖励学习环节的只读诊断已完成：当前版本未发现 termination、reset observation 或跨 episode GAE 实现错误；
 service-aligned 三种 learned method 的 critic explained variance 近 0，固定 dev 中 value:policy 梯度比与全局裁剪尺度一致异常。
-唯一后续候选冻结为 critic target/output 的 PopArt normalization，尚未实现或训练，也不构成算法创新。见
+该候选随后完成固定 development A/B：PopArt 改善 critic 尺度但未稳定改善服务，最终未晋级，也不构成算法创新。见
 [诊断报告](docs/project/calibrated_workflow_service_reward_learning_diagnosis_20261009.md)与
-[A 线主张变更说明](docs/project/calibrated_workflow_service_reward_claim_change_20261009.md)。
+[selected-checkpoint 对齐复核](docs/project/calibrated_workflow_selected_checkpoint_alignment_20261009.md)。
 
 服务目标对齐奖励已完成一次冻结匹配实验。唯一候选在公式单元案例中正确排序按期完成、逾期完成与未完成，并保留外部截断
 bootstrap；但 3 seeds×192 episodes 下，SA/MAPPO/PPO 的 regression completion 均下降（`.889→.806`、
@@ -613,3 +613,8 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 服务奖励学习信号诊断将下一步唯一候选冻结为三种 learned method 共用的 critic PopArt target/output normalization。执行协议、固定预算、开发数据边界与 falsification gates 见 `docs/project/calibrated_workflow_value_normalization_ab_execution_protocol_20261009.md`。该候选不是 SA 专属能力或算法创新；`regression` / `frozen_check` 仍是暴露的开发 split，不是 formal/holdout。
 
 该 A/B 已在固定预算下完成，结果为 `FALSIFIED_OR_NOT_PROMOTED`：critic raw RMSE/gradient scale 改善，但 behavior probability gate 与 PPO on-time no-harm gate 失败。PopArt 只保留为有限稳定性设置，不宣称服务优势；详见 `docs/project/calibrated_workflow_value_normalization_ab_results_20261009.md`。
+
+补充的 selected-checkpoint 对齐在预先冻结的 48 个公共 dev 状态上复核全部 30 个实际被评价 checkpoint：固定行为
+return probe 的 value error 全部下降，但 action-4 probability 在 SA/PPO 上升、MAPPO 下降，进一步确认 critic 稳定不等于
+服务策略改善。机器表、机制图和下一轮单一 credit-assignment 候选见
+`docs/project/calibrated_workflow_selected_checkpoint_alignment_20261009.md`。

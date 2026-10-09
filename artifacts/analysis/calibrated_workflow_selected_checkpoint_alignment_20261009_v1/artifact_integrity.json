@@ -1,0 +1,40 @@
+{
+  "files": [
+    {
+      "bytes": 5210,
+      "path": "alignment_summary.json",
+      "sha256": "3a1f1c277d66360f75169834afafedc1ba83223bef130cc5e6bf9bc1e68907ae"
+    },
+    {
+      "bytes": 16437,
+      "path": "checkpoint_identity.csv",
+      "sha256": "ed2ef0784d1e3197fa9b2928351287eb5d4e4dfa6c2b5e6c0d1b671fb5569eac"
+    },
+    {
+      "bytes": 629219,
+      "path": "fixed_state_forward_rows.csv",
+      "sha256": "f7cabe553ab8597faae774c5f099dd990bcb2afb8a6ec8372fbd7c754d83c4c6"
+    },
+    {
+      "bytes": 289078,
+      "path": "fixed_state_pair_rows.csv",
+      "sha256": "70735a2a65957d96c9ea515c2dea3c352bb9c9e7c4569d64c03ee4cf59d2d078"
+    },
+    {
+      "bytes": 6214,
+      "path": "method_seed_summary.csv",
+      "sha256": "69f56f17c1469d04a517716094799cbc4eb508921e9945cb3163be2a4d03770e"
+    },
+    {
+      "bytes": 1585,
+      "path": "method_summary.csv",
+      "sha256": "6fa31e66dfd9a6e9db445a9f16eb91a6831bbaf24f95b1800339000eda1a97f9"
+    },
+    {
+      "bytes": 5021,
+      "path": "selected_checkpoint_alignment_mechanism.svg",
+      "sha256": "1b39ec3c82f3b8b6e78c0bd38cab7d819b0bae70594c7168fedcee6e8e8323f0"
+    }
+  ],
+  "schema_version": "calibrated_workflow_selected_checkpoint_alignment_integrity_v1"
+}

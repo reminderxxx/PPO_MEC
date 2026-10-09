@@ -1759,6 +1759,20 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 - report：`docs/project/calibrated_workflow_value_normalization_ab_results_20261009.md`；A-line input：`calibrated_workflow_value_normalization_ab_claim_change_20261009.md`。
 - boundary：E2 artifact-audited development evidence；不是 formal/holdout/paper-ready，不支持 PopArt 服务优势或 SA 稳定领先。
 
+## 2026-10-09 calibrated workflow selected-checkpoint alignment
+
+- frozen state root：`artifacts/analysis/calibrated_workflow_selected_checkpoint_states_20261009_v1/`；48 个公共 dev 状态，
+  manifest SHA-256=`f026bf71fcbd9e38832a990367576afae9a5e2c0af7a4291600c7d3073b18c89`，state freeze commit=`1c85bea...`。
+- alignment root：`artifacts/analysis/calibrated_workflow_selected_checkpoint_alignment_20261009_v1/`；30 checkpoint、
+  1,440 forward rows、720 paired rows、30 identity rows、method×seed/method summaries 与 SVG 机制图。
+- identity：source selected checkpoint SHA-256 全匹配；network/optimizer/PopArt state/update count 前后全不变；
+  training/optimizer update/evaluation/holdout/download/model-generate=`0`。
+- evidence：selected-consumer critic scale tracking closure；fixed-behavior return 不是 `V^π`。PopArt service sufficiency
+  仍被否定，raw canonical 不变，SA 局部收益不晋级。
+- reports：`docs/project/calibrated_workflow_selected_checkpoint_alignment_20261009.md`、
+  `calibrated_workflow_popart_paper_supplement_20261009.md`、
+  `calibrated_workflow_strong_baseline_comparison_boundary_20261009.md`。
+
 ## 2026-10-05 shared cache × recovery coupling witness
 
 - run id：`shared_cache_recovery_coupling_20261005_v1`

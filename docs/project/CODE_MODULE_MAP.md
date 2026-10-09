@@ -5,8 +5,8 @@
 - `scripts/diagnose_calibrated_workflow_service_reward_learning.py` → service-reward v2 rows / local checkpoints / calibrated env：
   只读校验代码和 checkpoint identity，按 recorded executed action 重放，重算 GAE/value，做固定 dev 全批梯度尺度与候选
   checkpoint 概率 trace；禁止 optimizer step、评价选模和输出覆盖。
-- `configs/experiment/calibrated_workflow_value_normalization_ab_v1.json`：冻结下一轮单变量 PopArt critic contract、等交互/
-  更新预算、否证门和数据边界；是未实现且 `execution_authorized=false` 的设计，不是 runner 配置。
+- `configs/experiment/calibrated_workflow_value_normalization_ab_v1.json`：冻结单变量 PopArt critic contract、等交互/
+  更新预算、否证门和数据边界；设计文件自身保持 `execution_authorized=false`，科学执行由独立 authorization 绑定。
 
 ## 2026-10-06 service-reward alignment additions
 
@@ -864,3 +864,8 @@ v3 interface-repair 职责增量：
 - `scripts/launch_calibrated_workflow_value_normalization_ab.py`：create-only detached supervisor；冻结解释器路径，child-owned runner-entry ACK，stdout/stderr、exit sidecar、terminal receipt、timeout 与无重试合同。
 - `tests/test_calibrated_workflow_value_normalization_launcher.py`：run ID、解释器字符串、成功/非零宿主 outcome 与无 retry plan 回归。
 - `scripts/analyze_calibrated_workflow_value_normalization_ab.py`：只读核验 source integrity/预算/selection，并生成 completed-only cost、service/behavior/mechanism method×seed 配对复核包。
+- `scripts/analyze_calibrated_workflow_selected_checkpoint_alignment.py`：先以 outcome-blind BFS 冻结 4×12 个公共 dev
+  状态，再对 30 个实际 selected checkpoint 做无更新前向；分离 probability argmax、head aggregation、mask projection、
+  executed action，并用前后 hash 证明 network/optimizer/PopArt state 未变。固定 continuation return 明确不是 `V^π`。
+- `tests/test_selected_checkpoint_alignment.py`：冻结状态数量/唯一性、实际未来链路不泄漏、完整 fixed-behavior target、
+  无 `.learn()` 调用和递归 state hash 回归。

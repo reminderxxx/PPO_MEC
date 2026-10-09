@@ -2235,3 +2235,15 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - mechanism gate 通过：raw critic RMSE 与 value:policy scale 显著改善；behavior gate 因总体 action-4 mean probability 略升失败；service gate 因 PPO on-time `.29→.19` 失败。
 - SA completion `.87→1.00`，MAPPO `.88→.88`，PPO `.93→.97`；不能把 overall fail 简化成所有方法无改善。
 - 最终决策：PopArt 只保留为有限稳定性设置、不宣称服务优势；raw critic 保持 canonical 参照。不自动补跑或进入 auxiliary/reward/新结构搜索。
+
+### selected-checkpoint 机制—服务身份闭环
+
+- 在 commit `1c85bea...` 先结果盲冻结 4 个既有 dev instance × 12 个公共状态；未读取 checkpoint、evaluation、error
+  或 advantage，未暴露实际未来链路。48/48 固定行为 continuation 在 24-step 内闭合。
+- 对 source run 的 30 个实际 selected checkpoint 完成 1,440 次无更新前向；文件 hash 匹配，network/optimizer/PopArt
+  state/update count 前后 hash 全部不变。28/30 selected update 早于 24，只有 6/15 arm-pair 选择相同 update。
+- fixed-behavior return probe 的绝对 value error 在 720/720 状态配对下降；该 probe 不是无偏 `V^π`，不用于 GAE claim。
+- action-4 mean probability delta 为 SA `+.0341`、MAPPO `-.0690`、PPO `+.0268`；argmax、head aggregation、projection
+  与 executed action 已分列。critic 机制在 service consumer checkpoint 上兑现，但不足以稳定改善 policy/service。
+- 下一轮至多冻结一个 credit-assignment 候选：只对失败、无进展、未提交 migration 的 executed action 4 将 actor
+  normalized advantage 上限设为 0；本轮未实现、未训练，不进入 auxiliary-target 消融。
