@@ -75,3 +75,7 @@ transitions、4 PPO epochs、batch 32、192 optimizer steps，以及 updates `6/
 任一 identity/hash/interval gate 失败、预算不等、缺 command log/manifest/checkpoint hash/raw rows，或开发 A/B 未同时通过
 机制和服务否证门，即停止 paper-ready 晋级。不得用最终检查集选 checkpoint，也不得靠新增 seed、调 reward 或 auxiliary
 消融寻找 SA 获胜。
+
+## 2026-10-09 启动状态追加
+
+PopArt scientific commit `5ee9f1e8071ad8d9e1992e91564ea32801e3d7a7` 和 create-only preflight 已完成；唯一授权后台启动在 run root 创建前结束，日志为空，scientific steps/updates/checkpoints/evaluation rows 均为 0。未重试。因此 A 论文线没有获得新的 A/B 性能、机制或排名证据；上述 `UNVERIFIED_FOR_CONFIRMATORY_BASELINE_CLAIM` 不变。独立状态报告为 `calibrated_workflow_value_normalization_ab_launch_status_20261009.md`，未编辑主论文稿。

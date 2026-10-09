@@ -1,0 +1,15 @@
+{
+  "schema_version": "calibrated_workflow_value_normalization_ab_launch_attempt_integrity_v1",
+  "files": [
+    {
+      "path": "failure_receipt.json",
+      "sha256": "0fd37e30fb20d5e6ee88e47a4ec8928ece5e6dbca411aa6bfee7b5fa12727f43",
+      "bytes": 2090
+    },
+    {
+      "path": "preflight_reference.json",
+      "sha256": "68a019af57ed87f4a9f86a49d049780a7b3930234f9f0baf14979922192abf11",
+      "bytes": 793
+    }
+  ]
+}

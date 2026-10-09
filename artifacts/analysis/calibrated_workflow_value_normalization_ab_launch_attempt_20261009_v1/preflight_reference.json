@@ -1,0 +1,16 @@
+{
+  "schema_version": "calibrated_workflow_value_normalization_ab_preflight_reference_v1",
+  "preflight_root": "artifacts/analysis/calibrated_workflow_value_normalization_ab_preflight_20261009_v1",
+  "preflight_status": "pass",
+  "preflight_json_sha256": "d3dc60c5dfdda4d6f25267db421f6db85125cc413c2a1811c9eb49c294d477cd",
+  "preflight_integrity_sha256": "aa36754655c1c6cf576d6b6f57be374b92329d5b58d6fb001f2eb0144203a496",
+  "authorization_sha256": "212cdcf0f880963780fe8ad2cf0fd523f90d5f0574c267f110f63a9fed01db3a",
+  "frozen_design_sha256": "9630d97d56e8192b6278694980132cc942a67cc87794eb8ddc4b67d97f3cc606",
+  "budget": {
+    "training_cells": 30,
+    "environment_steps": 43200,
+    "update_opportunities": 720,
+    "optimizer_steps": 5760
+  },
+  "preflight_is_scientific_result": false
+}

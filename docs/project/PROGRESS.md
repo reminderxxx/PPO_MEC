@@ -2214,3 +2214,9 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 固定 30 cells、43,200 steps、720 updates、5,760 optimizer steps；checkpoint 只按 update 6/12/18/24 在 dev 选择，reward 不参与。
 - 36 个实例全部标为 development；raw source interval 两两不重叠是启动硬门槛。`regression` / `frozen_check` 不得称为 holdout。
 - 当前状态：实现与执行协议已冻结，科学训练尚未启动；必须先通过 clean-commit create-only preflight，然后只允许单次、无重试、最长 2 小时后台启动。
+
+### 启动结局
+
+- commit `5ee9f1e...` 已推送；preflight 通过，六个 method×arm 最小更新及身份、预算、raw interval 门槛均通过。
+- 唯一后台启动在 create-only run root 前结束；预期日志为 0 bytes，runner status/receipt 不存在，科学 steps/updates/checkpoints/evaluation rows=`0/0/0/0`。
+- 按无重试授权停止。没有 PopArt A/B 科学结果，不能改变诊断候选、论文 claim 或 paper-ready 状态。

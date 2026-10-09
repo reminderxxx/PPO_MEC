@@ -1,0 +1,17 @@
+{
+  "files": [
+    {
+      "bytes": 97,
+      "checkpoint": false,
+      "path": "completion_receipt.json",
+      "sha256": "c690f934c352c8c80554940a2a8c2fe70f4a5e51c28a4949b4ed43fe93091055"
+    },
+    {
+      "bytes": 3944,
+      "checkpoint": false,
+      "path": "preflight.json",
+      "sha256": "d3dc60c5dfdda4d6f25267db421f6db85125cc413c2a1811c9eb49c294d477cd"
+    }
+  ],
+  "schema_version": "calibrated_workflow_value_normalization_ab_integrity_v1"
+}

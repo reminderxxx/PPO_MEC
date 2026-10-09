@@ -1734,6 +1734,14 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 限制均未改变。v16 仍未创建、未消耗、未执行；这是启动授权暂缓，不是运行失败。main 测试使用受控数据
 准备，public preflight 不等于完整正式评估；无正式训练、formal performance、holdout、G14D/G15 或论文结论。
 
+## 2026-10-09 calibrated workflow critic PopArt A/B preflight 与启动失败
+
+- scientific commit：`5ee9f1e8071ad8d9e1992e91564ea32801e3d7a7`，分支 `codex/service-reward-popart-ab`，已 push。
+- preflight：`artifacts/analysis/calibrated_workflow_value_normalization_ab_preflight_20261009_v1/`；status=`pass`，六个 method×arm batch 均为 60 transitions / 8 optimizer steps，identity/hash/interval/budget gate 全通过。
+- launch receipt：`artifacts/analysis/calibrated_workflow_value_normalization_ab_launch_attempt_20261009_v1/`；classification=`PRE-RUN LAUNCH FAILURE / NO SCIENTIFIC EVIDENCE`。
+- expected scientific run root 未创建，日志 0 bytes；steps/updates/optimizer steps/checkpoints/evaluation rows=`0/0/0/0/0`。未 retry、resume、formal、holdout、download 或 model generate。
+- evidence boundary：implementation + preflight + failure receipt；没有 A/B 性能或机制结果，不能支持 PopArt、SA 优势、formal 或 paper-ready claim。
+
 ## 2026-10-05 shared cache × recovery coupling witness
 
 - run id：`shared_cache_recovery_coupling_20261005_v1`

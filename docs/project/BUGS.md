@@ -895,3 +895,9 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - PopArt 实现只能检验“critic scale 干扰共享更新”这一机制；它不修复 reward 设计、样本不足、auxiliary target 或任务局部可分性。
 - 当前 36 个实例无独立 holdout，任何正结果最多是 development candidate；任一机制、行为或服务 gate 失败即不得晋级。
 - checkpoint 含本地训练权重，禁止提交或上传；科学 run 不允许 retry、追加 seed、改预算或用最终评价反选方案。
+
+## OPEN / PopArt A/B pre-run launch failure
+
+- 2026-10-09 唯一授权后台启动报告 PID 后，在即时快照前结束；runner 未创建 run root，stderr/stdout 日志为 0 bytes，OS 级原因不可恢复。
+- 这不是算法失败，也不是训练结果；可观测 scientific steps/updates/checkpoints/evaluation rows 均为 0。
+- one-launch/no-retry 已耗尽，本轮禁止以 foreground、resume、新 PID 或新 output root 补跑。未来必须获得新的显式授权和新的 create-only run id。
