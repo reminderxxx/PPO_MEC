@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from scripts.analyze_calibrated_workflow_budget_extension import _pair_rows
+from scripts.analyze_calibrated_workflow_budget_extension import PAIR_METRICS, _pair_rows
 
 
 def test_pair_rows_matches_by_identity_when_inputs_are_reordered() -> None:
@@ -25,3 +25,7 @@ def test_pair_rows_rejects_missing_identity_field() -> None:
 def test_pair_rows_rejects_duplicate_identity() -> None:
     with pytest.raises(RuntimeError, match="duplicate pairing key"):
         _pair_rows([{"id": "a"}, {"id": "a"}], [{"id": "a"}], ("id",))
+
+
+def test_unconditional_metrics_exclude_completed_only_elapsed() -> None:
+    assert "completed_sample_elapsed_seconds" not in PAIR_METRICS

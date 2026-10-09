@@ -37,7 +37,7 @@ PAIR_METRICS = (
     "on_time_workflow_completion_rate", "workflow_completion_rate",
     "unfinished_after_deadline_rate", "service_failure_rate", "service_failures",
     "failed_service_attempt_seconds_proxy", "node_coverage_rate",
-    "modeled_completion_seconds", "completed_sample_elapsed_seconds",
+    "modeled_completion_seconds",
     "total_transfer_mb", "model_prepare_mb", "state_transfer_mb", "input_transfer_mb",
     "recompute_seconds", "invalid_prepare_attempts", "max_consecutive_no_progress_steps",
     "action_0", "action_1", "action_2", "action_3", "action_4", "reward",
