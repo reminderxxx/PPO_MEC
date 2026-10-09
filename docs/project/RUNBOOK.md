@@ -16,6 +16,11 @@
 完整 service runner/原件消费链，再按原始 segment/frame/time 与全历史消费并集盲选新 split。旧 calibrated 36 实例只作
 development，I-80 旧候选库存不能直接转成新 evaluation，旧 holdout 不重开。
 
+I-80 来源边界见 `cscwd_2027_i80_source_scope_audit_20261009.md`。后续只增量核对 G14R23（2026-09-27）
+之后新增 artifact 的窗口引用与原始 source identity，优先处理可能指向 I-80 的记录；复用既有 3,957 个
+metadata 文件审计，不重扫 1,185 万行车辆源或重算 2.1 GB CSV。新 split 必须先满足车辆/run 相关性门，
+519 个仅时间隔离候选不得直接当独立测试；旧 sealed holdout 永久不再使用。
+
 ## 对称恢复成本复算（2026-10-06；已完成，不得覆盖）
 
 `scripts/run_symmetric_recovery_cost_validation.py` 只接受 clean、精确 expected commit 和不存在的 output root；失败原件保留，

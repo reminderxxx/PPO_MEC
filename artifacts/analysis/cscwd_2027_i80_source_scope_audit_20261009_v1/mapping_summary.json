@@ -1,0 +1,104 @@
+{
+  "schema_version": "cscwd_2027_i80_source_scope_audit_v1",
+  "reviewed_at": "2026-10-09",
+  "scope": "metadata_only_no_sealed_performance_no_new_split",
+  "source_identity": {
+    "ngsim_recorded_sha256": "ddacb7a0391c6ab80fd4085d1380096733b17882081ae83b40174b8ec662d10c",
+    "ngsim_recorded_size_bytes": 2118175938,
+    "candidate_inventory_semantic_sha256": "8b2f406a4d3ff969e96b9baf694606e808e6fb3dbe47c8d70ab8c2f6c1d29612",
+    "historical_registry_semantic_sha256": "09ee3109f6789cada996870bcb6a3dac9496a4d98f8373c11cb99f61f55beaae",
+    "g14r23_report_semantic_sha256": "57fd1aa8d5606b2876be2e655222e84b916e6cda7090bcba502092e506944e11",
+    "g14r23_commit": "5173234666ddbbb53df977a2d3a95a04f7166300",
+    "calibrated_manifest_sha256": "b7efe5d6e50ad17b744230c03a126370656d0196b60c7f7e6b5a86bb702effbc",
+    "calibrated_manifest_source_files": {
+      "train_window_plan": {
+        "path": "configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719/train_window_plan.json",
+        "sha256": "1bc37e452f41f3b8233daf5f88c56e0d15869977c2beea02f25e6cd29a11090a"
+      },
+      "evaluation_window_plan": {
+        "path": "configs/experiment/top_journal_v28_executable_handoff_strict_split_20260719/dev_window_plan.json",
+        "sha256": "5efcb9068bbbd712e0f7bf9a1af2c4f910f0cad145f90b5ed6f77daa62aabcfa"
+      },
+      "workflow_source": {
+        "path": "data/processed/sampled_vec_dags/sampled_vec_dags.jsonl",
+        "sha256": "7163a2b46261eaeed4a6254d000d3aefed3b2323d91a023ea38ef166bfe71bd7"
+      }
+    }
+  },
+  "mapping_evidence": {
+    "candidate_inventory_path": "artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/candidate_window_inventory.json",
+    "provider_inventory_path": "artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/available_interval_inventory.json",
+    "registry_path": "artifacts/analysis/typed_model_cache_formal_protocol_freeze_20260820_g14b_v1/historical_window_usage_registry.json",
+    "g14r23_report_git_path": "5173234666ddbbb53df977a2d3a95a04f7166300:artifacts/analysis/g14r23_holdout_interface_and_independent_test_20260927/new_independent_test_feasibility.json",
+    "calibrated_manifest_git_path": "f8baf30f8d6ed37898804f570d8ebfcbeaa50ad9:configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+    "i80_run_mappings": [
+      {
+        "source_segment_run_id": "i_80_run_001",
+        "candidate_count": 208,
+        "raw_frame_min": 12,
+        "raw_frame_max": 9971,
+        "raw_time_min": 1113433136100,
+        "raw_time_max": 1113434132000
+      },
+      {
+        "source_segment_run_id": "i_80_run_002",
+        "candidate_count": 166,
+        "raw_frame_min": 27,
+        "raw_frame_max": 7970,
+        "raw_time_min": 1113436769600,
+        "raw_time_max": 1113437563900
+      },
+      {
+        "source_segment_run_id": "i_80_run_003",
+        "candidate_count": 205,
+        "raw_frame_min": 1813,
+        "raw_frame_max": 11628,
+        "raw_time_min": 1113437746200,
+        "raw_time_max": 1113438727700
+      }
+    ],
+    "mapped_selected_i80_counts_by_split": {
+      "train": 24,
+      "dev": 12,
+      "formal": 12,
+      "sealed_holdout": 12
+    },
+    "mapped_selected_i80_counts_by_run": {
+      "i_80_run_001": 19,
+      "i_80_run_002": 14,
+      "i_80_run_003": 27
+    },
+    "calibrated_instance_count": 36,
+    "calibrated_segments": {
+      "lankershim": 6,
+      "peachtree": 2,
+      "us_101": 28
+    },
+    "calibrated_i80_interval_intersection_count": 0
+  },
+  "classification": {
+    "i80_inventory_total": 579,
+    "known_used_or_allocated_i80": 60,
+    "history_identity_unknown_total": 418,
+    "history_identity_unknown_by_conservative_scope": {
+      "lankershim|peachtree|us_101": 224,
+      "peachtree": 181,
+      "us_101": 13
+    },
+    "history_identity_unknown_potential_i80_blockers": 0,
+    "g14r23_later_unresolved_potential_i80_blockers": 0,
+    "g14r23_later_unresolved_known_non_i80": 3,
+    "temporally_disjoint_from_used_i80_as_of_g14r23": 519,
+    "excluded_by_observed_vehicle_recurrence_after_temporal_gate": 505,
+    "zero_observed_vehicle_recurrence_same_run_only": 14,
+    "pairwise_vehicle_disjoint_preview_same_run_only": 2,
+    "qualified_cross_run_confirmatory_window_count": 0
+  },
+  "limits": [
+    "G14R23 metadata audit is frozen at 2026-09-27; this addendum checks the later calibrated 36-instance manifest and changed experiment plan/manifest paths on the A branch, not every post-G14R23 artifact.",
+    "A-branch changed experiment plan/manifest metadata paths since 2026-09-27: zero; B calibrated manifest contains no I-80 source interval.",
+    "Unresolved historical intervals cannot be mapped to frame/time/run without trustworthy source metadata; their recorded conservative scopes exclude I-80 but still block claims for Lankershim/Peachtree/US-101.",
+    "Temporal disjointness and zero observed Vehicle_ID recurrence do not establish new road, capture session, or workflow-source independence.",
+    "No selected/sealed window IDs or performance data are copied into this audit."
+  ]
+}

@@ -5,6 +5,11 @@
 
 # Artifact Records
 
+## 2026-10-09 CSCWD I-80 source-scope metadata audit
+
+- root：`artifacts/analysis/cscwd_2027_i80_source_scope_audit_20261009_v1/`；`mapping_summary.json` 记录 G14B/G14R23 来源指针、I-80 三 run 映射、418 条未知记录的非 I-80 保守范围、60 个已分配窗口和 B 的 36-instance 零交集。
+- G14R23 范围内 519 个只达到 24-frame 时间隔离，505 个观察到历史车辆复现，14 个均属同一 run，两两零复现预览只剩 2 个同 run；跨 run 新确认性 split 合格数为 0。9 月 27 日后全部 artifact 未重新遍历；无 sealed ID、性能结果、训练或新 split。证据级别 `E2_METADATA_SCOPE_AUDITED`。
+
 ## 2026-10-06 symmetric recovery cost correction and boundary check
 
 - corrected root：`artifacts/analysis/eviction_aware_recovery_corrected_20261006_v2/`；执行 commit `800f0a1…`；原 12 点、

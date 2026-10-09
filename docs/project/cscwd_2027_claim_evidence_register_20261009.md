@@ -13,7 +13,7 @@
 
 唯一当前主稿：`cscwd_2027_manuscript_working_draft.md`（作者审阅版 2026-10-09）。旧 `system_mechanism_manuscript_working_draft.md` v1.3 是机制与成本纠错阶段工作稿，不与新主稿拼成两套结果。正文避免内部轮次标签；本台账保留 artifact 和版本细节。
 
-强基线接线、能力披露与原始区间并集见 `cscwd_2027_baseline_data_readiness_20261009.md`。拟用接口为 `calibrated_workflow_interface_v2 + service_aligned_v1 + independent_heads_executed_env_v2`，但 scientific commit 未冻结。PopArt 仅为已有 critic normalization 技术的单变量开发 A/B 方案；截至所读 B 交付只有冻结设计，本稿尚无可审查结果，不能写作原创算法或已改善服务。
+强基线接线、能力披露与原始区间并集见 `cscwd_2027_baseline_data_readiness_20261009.md`；I-80 的来源范围、418 unknown 排除作用和 G14R23 车辆复现边界见 `cscwd_2027_i80_source_scope_audit_20261009.md`。拟用接口为 `calibrated_workflow_interface_v2 + service_aligned_v1 + independent_heads_executed_env_v2`，但可用于论文结果的 scientific commit 未冻结。PopArt 仅为已有 critic normalization 技术的单变量开发 A/B；B 的首次启动在 run root 前失败，没有科学结果，不能写作原创算法或已改善服务。
 
 ## 原件完整性核对
 
@@ -27,6 +27,7 @@
 | 六点边界 | `artifacts/analysis/recovery_cost_boundary_check_20261006_v1/{frozen_protocol.json,all_method_results.json,aggregate_summary.json,completion_receipt.json,integrity_manifest.json}` | 执行 `3069117`；6 点、24 隔离路径；5/5 文件核验 | analytic link-estimate stress，不是无线测量或现实误差分布 |
 | 旧控制器奖励包 | `artifacts/experiments/top_journal_closed_loop/top_journal_mechanism_v70_sparse_tail_option_formal_min_20260730/`，审查见 `cscwd_2027_baseline_contribution_audit_20261009.md` | 数值可作归档开发描述 | 计划/实际窗口 ID 交集 0、full 177 对重叠、训练更新和选模预算不同；CI/Holm 和同预算领先主张停用 |
 | 服务奖励学习诊断 | `artifacts/analysis/calibrated_workflow_service_reward_learning_diagnosis_20261009_v1/`、`docs/project/calibrated_workflow_service_reward_learning_diagnosis_20261009.md`（B 分支只读） | 360 episode/3,161 step 转移/奖励零 mismatch；九个 service learned cell 的 critic EV 近零、固定 dev V:P 梯度比 539–7,907 | 非正式离线诊断；缺原训练 minibatch 更新序列，不能推出 PopArt 因果改善或 SA 优势 |
+| PopArt 启动状态 | B 提交 `8ebaf9ce` 中 `calibrated_workflow_value_normalization_ab_launch_attempt_20261009_v1/failure_receipt.json` | 授权尝试在 run root 前结束；科学 steps/updates/checkpoints/评价行均为 0 | `E1_PREFLIGHT_AND_PRE_RUN_FAILURE_RECEIPT`；不产生 A/B 效果结论，后续新 root 仍须独立冻结与审查 |
 
 ## 主张—证据—待补实验
 

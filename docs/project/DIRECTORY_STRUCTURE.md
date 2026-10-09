@@ -5,6 +5,8 @@
 - `docs/project/cscwd_2027_manuscript_working_draft.md`：唯一当前英文主稿，待填算法版本和主比较结果。
 - `docs/project/cscwd_2027_claim_evidence_register_20261009.md`：主张、原件、限制、研究问题和 B 线接口。
 - `docs/project/cscwd_2027_baseline_data_readiness_20261009.md`：强基线能力/接线与历史消费区间可用性清单。
+- `docs/project/cscwd_2027_i80_source_scope_audit_20261009.md`：I-80 原始来源映射、历史区间分类与新测试独立性门。
+- `artifacts/analysis/cscwd_2027_i80_source_scope_audit_20261009_v1/mapping_summary.json`：元数据审计机器汇总；不含 sealed 窗口 ID 或效果结果。
 - `docs/project/cscwd_2027_baseline_contribution_audit_20261009.md`：旧 v70 基线公平性与窗口独立性审查。
 - `docs/project/system_mechanism_manuscript_working_draft.md`：保留的历史 v1.3 机制稿。
 

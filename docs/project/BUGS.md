@@ -8,7 +8,7 @@
 ## 2026-10-09：CSCWD 算法主张缺少匹配原件（OPEN CLAIM BLOCKER）
 
 - `OPEN / baseline wiring`：DT/Popularity 有 registry/单步构建，但现有 service runner 的训练、dev 选模与 artifact 链仍只覆盖 SA/MAPPO/PPO 和 two-step；必须独立接入并审计信息/记忆边界。
-- `OPEN / independent data`：历史登记 668 个区间中 418 个身份不明；当前 calibrated 36 实例全已用于开发。I-80 的 579 窗口仅是旧候选库存，未核证历史并集后不能当新确认性数据。见 `cscwd_2027_baseline_data_readiness_20261009.md`。
+- `OPEN / independent data`：历史登记 668 个区间中 418 个身份不明，但其保守来源范围均不含 I-80；当前 calibrated 36 实例全已用于开发。I-80 的 579 个旧候选中 60 已分配，G14R23 范围内 519 只满足时间隔离；车辆复现和单 run 集中使当前跨 run 确认性 split 合格数仍为 0。9 月 27 日后完整 artifact 历史尚未增量核对，不能把 519 当作永久未消费。见 `cscwd_2027_i80_source_scope_audit_20261009.md`。
 - 旧 v70 的冻结计划与实际窗口来源不一致，full 窗口重叠，SA 与 PPO/DT 的更新量和选模机会不同；历史独立窗口 CI 与算法领先主张停用。原始审查见 `cscwd_2027_baseline_contribution_audit_20261009.md`。
 - 新投稿控制器的科学版本、同信息/同预算基线、互斥原始区间、checkpoint/command/manifest 与逐行结果尚未冻结并交付；算法贡献为 `UNVERIFIED`，主稿只留 `[B-*]` 待填项。
 - 真实后缀和 victim/reload 仅为单主机有界机制证据；无线、队列、交通任务正确性和总体泛化仍未覆盖。完整 claim 边界见 `cscwd_2027_claim_evidence_register_20261009.md`。

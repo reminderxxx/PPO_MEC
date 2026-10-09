@@ -7,6 +7,8 @@
 
 ## 2026-10-09：CSCWD 作者审阅主稿与主张台账
 
+- I-80 有界元数据审计确认：G14B 的 418 条未知历史身份保守范围均不含 I-80；579 候选中 60 已分配，G14R23 范围内 519 与已用区间保持 24-frame 时间隔离，但 505 观察到历史车辆复现，余 14 均在同一 run，可两两无复现的预览仅 2 个同 run。现有跨 run 确认性 split 合格数为 0；519 不是截至本日的完整永久未消费证明。见 `cscwd_2027_i80_source_scope_audit_20261009.md`。
+- PopArt A/B 首次启动在创建正式 run root 前失败，科学训练步数、checkpoint 和效果结果均为 0；稳定性与算法收益仍为 `UNVERIFIED`。
 - 续轮将唯一主稿的方法边界写到拟用三元接口、五动作、service reward 与执行动作 PPO；方法的最终科学提交、有效特征和 PopArt A/B 仍待 B 冻结。新增 `cscwd_2027_baseline_data_readiness_20261009.md`：DT/Popularity 未接入完整 service runner，two-step 的 exact-transition 能力单列；现有 36 实例全已消费，新确认性原始区间当前认证数为 0。
 - 当前唯一主稿为 `cscwd_2027_manuscript_working_draft.md`；v1.3 保留作历史稿。主稿陈述问题、机制、成本纠错、拟用训练目标和限制，最终算法有效结构/参数、科学版本与主比较结果留待 B 线冻结，不拼接旧 v70 公式和新结果。
 - `cscwd_2027_claim_evidence_register_20261009.md` 将三项候选贡献、主比较和最多两项消融逐一绑定原件及限制；四个有界 artifact 的 manifest 逐文件核验通过，旧恢复规则优势撤销。
