@@ -1,5 +1,7 @@
 # Code Module Map
 
+`scripts/diagnose_cscwd_sa_long_budget_cost.py` 只读 B 长预算原件，用 A 的相同因果环境代码重放已记录动作并分解 node/fallback/failure/load/三类网络传输/restore/recompute；同实例 seed 配对但不将首次分叉之后的不同状态当作单动作因果。`scripts/audit_cscwd_long_budget_state_alias.py` 只读上述重放和原 ledger，核验未公开的 prepared-state 有效性造成的同公开状态别名；两者均不训练、不修改 B 或论文。
+
 `scripts/diagnose_cscwd_sa_behavior.py` 仅消费已完成的因果强基线原件与 selected checkpoint：先重放已记录动作校验物理/缓存账本，再按事前规则从 train/dev 采共同状态，只读前向并核对参数不变；不调用训练、选模或新正式评价，也不写原 run。
 
 `src/envs/core/causal_rsu_predictor.py` 只实现训练序列计数拟合、前缀推理与模型哈希；

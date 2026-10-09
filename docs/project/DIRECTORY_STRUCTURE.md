@@ -2,6 +2,9 @@
 
 ## 2026-10-09 因果前缀强基线版本
 
+- `scripts/diagnose_cscwd_sa_long_budget_cost.py` 与 `scripts/audit_cscwd_long_budget_state_alias.py`：只读 B 长预算原件，分别生成本地 `artifacts/analysis/cscwd_sa_long_budget_cost_diagnosis_20261009_v1/` 和 `cscwd_sa_long_budget_state_alias_20261009_v2/`；v1 别名审计的过滤错误原件保留，结论以 v2 为准。
+- `docs/project/cscwd_sa_long_budget_cost_diagnosis_plan_20261009.md`、`cscwd_sa_long_budget_cost_diagnosis_20261009.md` 与 `cscwd_sa_long_budget_cost_summary_20261009.json`：事前规则、只读报告和小型机器摘要。
+
 - `scripts/diagnose_cscwd_sa_behavior.py`：固定科学原件的只读重放、train/dev 共同状态前向和预测误差分层；本地 create-only 诊断根为 `artifacts/analysis/cscwd_sa_behavior_diagnosis_20261009_v1/`。
 - `docs/project/cscwd_sa_behavior_diagnosis_plan_20261009.md`、`cscwd_sa_behavior_diagnosis_20261009.md` 与 `cscwd_sa_behavior_diagnosis_summary_20261009.json`：事前规则、独立报告和小型机器摘要。
 

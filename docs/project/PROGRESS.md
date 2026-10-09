@@ -5,7 +5,13 @@
 
 ﻿# Progress
 
-## 2026-10-09：因果强基线只读行为诊断完成；SA 无服务优势
+## 2026-10-09：长预算 SA 完成改善，但逾期/成本由重算主导；公共 prepared-state 不可辨识
+
+- B 长预算科学原件完成 `115,200` 步、400 episode/2,811 决策；后处理 Python 兼容故障使 supervisor terminal FAIL，科学完成回执仍为 complete，B 已单独修复后处理。本 A 分支只读重放 400/2,811 并逐步把九项代价加回原 step/episode，总计 200 个 SA−PPO/DT 配对；0 新训练、0 额外 checkpoint 前向/局部分支。
+- frozen SA `39/40` 完成、`5/40` 按期，PPO `40/40`、`4/40`，DT `40/40`、`11/40`；39 个双方完成配对上，SA−PPO 时延 `+28.39 s`（重算 `+39.15 s`，model network `+10.99 s`，fallback `−23.18 s`），SA−DT `+22.63 s`（重算 `+24.48 s`）。SA 97/121 个非 fallback handoff state 未就绪；重复模型准备和预测目标不匹配均非主导项。
+- 同一公开状态+action 的 10 组 handoff 记录出现不同 state readiness，含 1 组 SA 自身不同 seed；`prepared_state` 有效性未公开。唯一后续候选是所有 learned 方法共享的 prepared-state prefix validity/freshness 观察合同纠错，尚未实现/训练，不称创新。完整诊断见 `cscwd_sa_long_budget_cost_diagnosis_20261009.md`；论文与论文表未动。
+
+## 2026-10-09：因果强基线只读行为诊断完成；SA 无服务优势（短预算历史结论）
 
 - 固定 `a088693` 科学 run 的 440 episode/3,308 决策逐步重放一致；train/dev 的 60 个共同状态对 20 selected checkpoint 完成 1,200 次只读前向，网络/optimizer/归一化不变，0 训练/新正式评估/旧 holdout。诊断小摘要见 `cscwd_sa_behavior_diagnosis_summary_20261009.json`。
 - SA 五 seed 完成为 `20/15/18/15/19`，PPO `15/20/20/20/20`，MAPPO/DT 各 `20/20/20/20/20`。SA 的 13 个未完成 episode 首次失败均在当前 bundle 缺失时选择 action 3（8）或 4（5），失败 episode 投影为 0；策略动作是近端定位，seed 敏感明显，但不称架构/选模因果已证明。

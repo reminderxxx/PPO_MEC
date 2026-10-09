@@ -5,7 +5,13 @@
 
 ﻿# Bugs And Risks
 
-## 2026-10-09：SA 近端策略决策和 seed 敏感仍为方法 blocker
+## 2026-10-09：长预算主 blocker 转为逾期重算与隐藏 prepared-state
+
+- `OBSERVED`：长预算 SA frozen `39/40` 完成但仅 `5/40` 按期；与 PPO/DT 的 39 个共同完成配对分别慢 `28.39/22.63 s`，额外 DAG 重算是主要分量。SA 少用 vehicle fallback，但 97/121 次非 fallback handoff 的 state 未就绪。模型重复准备/预测目标错位不是当前主因。
+- `CONTRACT GAP`：公共 `semantic_state` 不含 prepared-state 有效性；同公开状态+同 action 出现不同重算成本，含 SA 内部跨 seed 反例。所有 learned 方法受同一信息边界影响；该缺口不能单独解释方法差距。下一任务若修复应共享字段并固定公平 A/B，不能把接口纠错包装创新。
+- `BOUNDARY`：B 科学 complete 与 supervisor 后处理 FAIL 应分列；本轮只读原件，不修 B、不改论文、不新增训练。36 实例全为开发，独立确认/真实无线仍缺，paper-ready=`Unverifiable`。见 `cscwd_sa_long_budget_cost_diagnosis_20261009.md`。
+
+## 2026-10-09：SA 近端策略决策和 seed 敏感仍为方法 blocker（短预算历史定位）
 
 - `OBSERVED`：源 run 的 SA 完成 `87/100`，PPO `95/100`、MAPPO/DT 各 `100/100`（同一已消费实例×五 seed）；13 个 SA 未完成 episode 的首次失败都在当前 bundle 缺失时选 action 3/4，且失败 episode 无投影。共同状态前向仍频繁选择当前步不服务动作，支持策略决策近端定位，不证明架构或 checkpoint selection 单因果。
 - `BOUNDARY`：失败 action 4 仍可改变目标 resident；后续复用/重载存在，简单以“失败且无 migration”封禁会忽略副作用。成本比较必须报告共同完成 coverage。预测目标 100% 来自重叠的人工路由开发决策点，不能外推真实 mobility；无独立确认/真实无线，paper-ready=`Unverifiable`。详见 `cscwd_sa_behavior_diagnosis_20261009.md`。

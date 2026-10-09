@@ -5,6 +5,15 @@
 
 # Runbook
 
+## 长预算 SA 逾期/成本只读诊断（2026-10-09；已完成）
+
+事前规则和唯一完整报告在 `cscwd_sa_long_budget_cost_diagnosis_plan_20261009.md`、
+`cscwd_sa_long_budget_cost_diagnosis_20261009.md`。只读命令
+`scripts/diagnose_cscwd_sa_long_budget_cost.py --preflight` 与唯一 `--run` 已对 B 完成 400 episode/
+2,811 step 重放；`scripts/audit_cscwd_long_budget_state_alias.py` 的结论使用 create-only v2。
+本地两个诊断目录保留完整机器表/回执和 hash，不覆盖、不提交 checkpoint/大账本，不在 A 分支修 B。
+因已有轨迹足以定位，可选 checkpoint 前向 `0/1200`、局部分支 `0/12`；本入口不授权再训练或写论文。
+
 ## 因果强基线只读行为诊断（2026-10-09；已完成）
 
 事前规则、唯一执行及原件路径见 `cscwd_sa_behavior_diagnosis_plan_20261009.md` 和
