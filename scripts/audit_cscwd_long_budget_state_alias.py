@@ -17,7 +17,7 @@ from scripts.run_calibrated_workflow_interface_repair import _sha256, _write_jso
 
 DIAG = ROOT / "artifacts/analysis/cscwd_sa_long_budget_cost_diagnosis_20261009_v1"
 B_SOURCE = Path("/Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC/artifacts/experiments/cscwd_causal_strong_baselines_budget_extension_20261009_v1")
-OUTPUT = ROOT / "artifacts/analysis/cscwd_sa_long_budget_state_alias_20261009_v1"
+OUTPUT = ROOT / "artifacts/analysis/cscwd_sa_long_budget_state_alias_20261009_v2"
 
 
 def _read_csv(path: Path) -> list[dict[str, str]]:
@@ -92,7 +92,7 @@ def audit() -> dict:
                 prepared = {rsu: (step, progressed + 1) for rsu, (step, progressed) in prepared.items()}
             if event["migration_prepare_committed"] and event["target_rsu"]:
                 prepared[event["target_rsu"]] = (event["step_index"], 0)
-    sa_only = [row for row in aliases if set(row["methods"]) == {"sa_ghmappo"}]
+    sa_only = [row for row in aliases if len({item["state_ready"] for item in row["outcomes"] if item["method"] == "sa_ghmappo"}) > 1]
     result = {"schema_version": "cscwd_long_budget_state_alias_audit_v1",
         "source_run_id": B_SOURCE.name, "scientific_commit": "d25ebcded6b43b69b82bae825b035adc1d6f19c4",
         "same_public_state_and_action_mixed_state_ready_groups": len(aliases),
