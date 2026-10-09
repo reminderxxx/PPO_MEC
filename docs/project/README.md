@@ -9,6 +9,11 @@
 
 ## Live 文档
 
+- `calibrated_workflow_service_reward_learning_diagnosis_20261009.md`：两奖励×三方法×三 seed 的 termination/GAE、critic、
+  advantage、梯度与 checkpoint 只读诊断；冻结唯一 PopArt value-normalization A/B，不授权训练。
+- `calibrated_workflow_service_reward_claim_change_20261009.md`：给 CSCWD 2027 A 线的独立主张收缩、统一版本、强基线能力
+  边界和 confirmatory 晋级门；不修改主论文稿。
+
 - `calibrated_workflow_service_reward_alignment_20261006.md`：原/候选公式、终止与截断语义、分项单元验收、两奖励×三方法
   匹配训练、同轨迹重评分、负向 strata 与 D 类停止决定；不进入 auxiliary-target 消融。
 

@@ -1,0 +1,20 @@
+{
+  "direct_logs": [
+    "per-episode training reward/completion/steps/service_failures",
+    "all candidate dev summaries and selected checkpoint hashes",
+    "selected evaluation behavior ledger and reward components",
+    "last update loss/KL/clip/entropy/explained-variance record per cell",
+    "selected and candidate checkpoint network/optimizer states"
+  ],
+  "offline_recomputed": [
+    "selected-ledger value predictions, GAE targets/advantages and gamma-lambda variants",
+    "state-conditioned advantage/action-probability summaries",
+    "episode-48 deterministic dev full-batch component gradient norms"
+  ],
+  "unrecoverable_for_exact_original_update": [
+    "training transition/action ledger and per-step reward decomposition",
+    "all 24 update records (only the last record was persisted)",
+    "original minibatch permutations and transient old-policy snapshots",
+    "pre-clip and post-clip gradient norms from the original optimizer steps"
+  ]
+}

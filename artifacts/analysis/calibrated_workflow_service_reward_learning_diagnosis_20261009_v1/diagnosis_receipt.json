@@ -1,0 +1,19 @@
+{
+  "baseline_commit": "70a83afb5d3d3b3fb40fcaeaf825a82e4b74c416",
+  "candidate_policy_trace_row_count": 144,
+  "checkpoint_files_copied_or_uploaded": 0,
+  "diagnostic_cell_count": 18,
+  "downloads": 0,
+  "evaluation_metric_runs": 0,
+  "execution_commit": "cc1ecb44d998465c86350ebf4c216e13600f52e2",
+  "gradient_probe_cell_count": 18,
+  "holdout_reads": 0,
+  "parameter_updates": 0,
+  "read_only_model_analysis": true,
+  "replayed_episode_count": 360,
+  "replayed_step_count": 3161,
+  "run_id": "calibrated_workflow_service_reward_learning_diagnosis_20261009_v1",
+  "schema_version": "service_reward_learning_diagnosis_v1",
+  "source_run_id": "calibrated_workflow_service_reward_alignment_20261006_v2",
+  "training_runs": 0
+}

@@ -5,6 +5,19 @@
 
 ﻿# Progress
 
+## 2026-10-09：服务奖励退化定位到 critic 尺度/共享裁剪候选；未确认实现错误
+
+- 以 `70a83af` 和 service-reward v2 原件为基线，核验 90 个本地 checkpoint hash，按 committed executed-action ledger
+  重放 360 episodes / 3,161 steps，transition/reward mismatch=0；0 training、0 evaluation、0 holdout、0 parameter update。
+- 当前版本的 complete termination、final non-reset observation bootstrap 和 episode-local GAE 未发现实现错误。训练对
+  truncation bootstrap、评价在同预算计未完成，存在语义边界，但训练 incidence 仅 0--3.65%，不足以判为主因。
+- service-aligned 九个 learned cell 的 last value loss=`3,123--4,591`、EV 近 0；事前固定 dev 梯度的 value:policy
+  ratio=`539--7,907`、estimated clip scale=`.00116--.00147`。原奖励分别为 `30--184` 和 `.00914--.08726`。
+- 无效 action 4 常有正 raw advantage，但完整 cell normalization 可翻转符号；SA policy/aux cosine 跨 seed 不一致，既有
+  no-aux 也失败，因此不进入 auxiliary-target 消融。
+- 唯一后续冻结为 critic target/output 的 PopArt normalization；reward/actor/aux/network/action/clip 均不变。协议
+  `execution_authorized=false`，不自动训练。报告见 `calibrated_workflow_service_reward_learning_diagnosis_20261009.md`。
+
 ## 2026-10-06：服务目标对齐奖励匹配训练完成，分类 D，不进入 auxiliary-target 消融
 
 - H2 只读审计确认旧 reward 的终局目标缺口；唯一 `service_aligned_v1` 以 workflow completion 为主项，在 deadline

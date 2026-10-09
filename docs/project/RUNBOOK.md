@@ -5,6 +5,21 @@
 
 # Runbook
 
+## 服务奖励学习环节只读诊断（2026-10-09；已完成，不得覆盖）
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/diagnose_calibrated_workflow_service_reward_learning.py \
+  --checkpoint-root \
+  /Users/howen/.codex/worktrees/calibrated-workflow-training/PPO_MEC/artifacts/benchmarks/calibrated_workflow_service_reward_alignment_20261006_v2
+```
+
+输出为 create-only
+`artifacts/analysis/calibrated_workflow_service_reward_learning_diagnosis_20261009_v1/`。命令只加载 hash-verified checkpoint，
+重放 committed action ledger，并做无参数更新 forward/GAE/gradient probe；不得用它选择新 checkpoint 或生成评价结果。
+唯一下一轮协议在 `configs/experiment/calibrated_workflow_value_normalization_ab_v1.json`，当前
+`execution_authorized=false`，本入口不授权实现或训练。
+
 ## 服务目标对齐奖励匹配训练（2026-10-06；已完成，不得覆盖）
 
 ```bash

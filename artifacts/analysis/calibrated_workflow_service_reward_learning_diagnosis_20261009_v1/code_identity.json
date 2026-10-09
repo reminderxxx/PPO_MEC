@@ -1,0 +1,69 @@
+{
+  "agent_and_buffer_files_recovered_from_execution_commit": {
+    "src/agents/mappo_agent.py": {
+      "current_sha256": "362697d69fca19fd53fd3f193dd4b6c912a2099aaa327e29d2a27a053fdbe773",
+      "execution_commit_sha256": "362697d69fca19fd53fd3f193dd4b6c912a2099aaa327e29d2a27a053fdbe773",
+      "match": true
+    },
+    "src/agents/ppo_agent.py": {
+      "current_sha256": "4c63e44dd024f1b7dfe7e3d24543473fc4a0ec20d069af4e1ae3affc3b037d27",
+      "execution_commit_sha256": "4c63e44dd024f1b7dfe7e3d24543473fc4a0ec20d069af4e1ae3affc3b037d27",
+      "match": true
+    },
+    "src/agents/registry.py": {
+      "current_sha256": "5a60004f748ad82757db7545230d9bc245e65924d626ac4a705046df6c83992b",
+      "execution_commit_sha256": "5a60004f748ad82757db7545230d9bc245e65924d626ac4a705046df6c83992b",
+      "match": true
+    },
+    "src/agents/sa_ghmappo_agent.py": {
+      "current_sha256": "99da9ec0a95c02c7727b58f39db2fe99212fd0e6ab772c8d734678e8b043a180",
+      "execution_commit_sha256": "99da9ec0a95c02c7727b58f39db2fe99212fd0e6ab772c8d734678e8b043a180",
+      "match": true
+    },
+    "src/agents/sa_ghmappo_core.py": {
+      "current_sha256": "5f67268290807caef0c581073ab82ea41d53e59be2cb8645957963860f1ad408",
+      "execution_commit_sha256": "5f67268290807caef0c581073ab82ea41d53e59be2cb8645957963860f1ad408",
+      "match": true
+    },
+    "src/trainers/ppo_buffer.py": {
+      "current_sha256": "928957e332023b73db612a051290dc7823e8c750eebe1a49ca8f2a17df8d7bdf",
+      "execution_commit_sha256": "928957e332023b73db612a051290dc7823e8c750eebe1a49ca8f2a17df8d7bdf",
+      "match": true
+    }
+  },
+  "critical_execution_files": {
+    "configs/experiment/calibrated_workflow_service_reward_alignment_v1.json": {
+      "actual": "cafe0a687baeb9c09d1b6e76de38821e07c6ad923e1fe54a519f4c6f62f55b9c",
+      "expected": "cafe0a687baeb9c09d1b6e76de38821e07c6ad923e1fe54a519f4c6f62f55b9c",
+      "match": true
+    },
+    "scripts/audit_calibrated_workflow_service_reward.py": {
+      "actual": "427b5eef3cea8ae177a7c1104ee82e909f7f236469a48f4657d1b0999abc7a3a",
+      "expected": "427b5eef3cea8ae177a7c1104ee82e909f7f236469a48f4657d1b0999abc7a3a",
+      "match": true
+    },
+    "scripts/run_calibrated_workflow_interface_repair.py": {
+      "actual": "393bd7cbf57ae369276c2ded199038314e6ba513f3ca30ff8b4e6afe430c843c",
+      "expected": "393bd7cbf57ae369276c2ded199038314e6ba513f3ca30ff8b4e6afe430c843c",
+      "match": true
+    },
+    "scripts/run_calibrated_workflow_service_reward_alignment.py": {
+      "actual": "da02bf5c3091d585c4da68e97935b0ded32a254cb2c241fd7a5d522cbd6dcac8",
+      "expected": "da02bf5c3091d585c4da68e97935b0ded32a254cb2c241fd7a5d522cbd6dcac8",
+      "match": true
+    },
+    "src/envs/core/calibrated_continuous_workflow_env.py": {
+      "actual": "d789e6088e6a6a859de2fc720f78c94410179d2cc6a5a57a9751a9b89fed68bc",
+      "expected": "d789e6088e6a6a859de2fc720f78c94410179d2cc6a5a57a9751a9b89fed68bc",
+      "match": true
+    },
+    "tests/test_calibrated_workflow_service_reward.py": {
+      "actual": "20dc76b4dda9569d041039607f1c8fe568f3dd9e4912bd139d0809603a764a3f",
+      "expected": "20dc76b4dda9569d041039607f1c8fe568f3dd9e4912bd139d0809603a764a3f",
+      "match": true
+    }
+  },
+  "delivery_baseline_commit": "70a83afb5d3d3b3fb40fcaeaf825a82e4b74c416",
+  "expected_execution_commit": "cc1ecb44d998465c86350ebf4c216e13600f52e2",
+  "recorded_execution_commit": "cc1ecb44d998465c86350ebf4c216e13600f52e2"
+}

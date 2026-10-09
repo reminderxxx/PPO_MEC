@@ -5,6 +5,17 @@
 
 # Artifact Records
 
+## 2026-10-09 calibrated workflow service-reward learning diagnosis
+
+- root：`artifacts/analysis/calibrated_workflow_service_reward_learning_diagnosis_20261009_v1/`；只读消费 10 月 6 日
+  service-reward v2 committed rows 与本地 checkpoints，0 training/evaluation/holdout/download/parameter update。
+- 90/90 checkpoint 与原 integrity、18/18 selected summary hash 一致；360 episodes / 3,161 executed-action steps 精确重放，
+  transition/reward mismatch=0。checkpoint 未复制、未上传。
+- `diagnostic_matrix.*` 覆盖两 rewards × 三 methods × 三 seeds；另有状态分组、四候选固定状态概率、GAE sensitivity、
+  truncation/minimal witness、固定 dev gradient probe、字段可恢复性、receipt 和 19-file integrity。
+- verdict=`UNVERIFIED_FOR_ALGORITHM_OR_PAPER_CLAIM`；唯一冻结候选为 PopArt critic target/output normalization，尚未实现、
+  未训练，`execution_authorized=false`。报告见 `calibrated_workflow_service_reward_learning_diagnosis_20261009.md`。
+
 ## 2026-10-06 calibrated workflow service-reward alignment
 
 - preflight root：`artifacts/analysis/calibrated_workflow_service_reward_preflight_20261006_v1/`；原/新公式、权重理由、10 个

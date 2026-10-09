@@ -1,5 +1,14 @@
 ﻿# Directory Structure
 
+## 2026-10-09 service-reward learning diagnosis
+
+- `scripts/diagnose_calibrated_workflow_service_reward_learning.py`：create-only 只读重放、value/GAE 重算、固定 dev 梯度尺度与
+  checkpoint probability trace；不训练或评价。
+- `configs/experiment/calibrated_workflow_value_normalization_ab_v1.json`：未实现、未授权的单变量 PopArt A/B 冻结协议。
+- `artifacts/analysis/calibrated_workflow_service_reward_learning_diagnosis_20261009_v1/`：18-cell matrix、状态分组、GAE/
+  truncation/gradient/checkpoint 见证、身份回执与 integrity；不含 checkpoint。
+- `docs/project/calibrated_workflow_service_reward_{learning_diagnosis,claim_change}_20261009.md`：独立诊断与 A 线主张边界。
+
 ## 2026-10-06 service-reward alignment
 
 - `configs/experiment/calibrated_workflow_service_reward_alignment_v1.json`：两套 reward、单一候选权重理由、3×192 身份、

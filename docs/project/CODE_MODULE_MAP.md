@@ -1,5 +1,13 @@
 # Code Module Map
 
+## 2026-10-09 service-reward learning diagnosis
+
+- `scripts/diagnose_calibrated_workflow_service_reward_learning.py` → service-reward v2 rows / local checkpoints / calibrated env：
+  只读校验代码和 checkpoint identity，按 recorded executed action 重放，重算 GAE/value，做固定 dev 全批梯度尺度与候选
+  checkpoint 概率 trace；禁止 optimizer step、评价选模和输出覆盖。
+- `configs/experiment/calibrated_workflow_value_normalization_ab_v1.json`：冻结下一轮单变量 PopArt critic contract、等交互/
+  更新预算、否证门和数据边界；是未实现且 `execution_authorized=false` 的设计，不是 runner 配置。
+
 ## 2026-10-06 service-reward alignment additions
 
 - `src/envs/core/calibrated_continuous_workflow_env.py`：在保持 action/state transition 不变的前提下支持显式 reward profile、

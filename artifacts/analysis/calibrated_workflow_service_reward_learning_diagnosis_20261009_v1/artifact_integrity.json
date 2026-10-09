@@ -1,0 +1,96 @@
+{
+  "files": [
+    {
+      "bytes": 43864,
+      "path": "behavior_groups.csv",
+      "sha256": "7eea9150d9bcc5de9610991fcbad77112d584c8c26e3be7da6b701a6c1d4edee"
+    },
+    {
+      "bytes": 26623,
+      "path": "candidate_policy_trace.csv",
+      "sha256": "6401656b4ad7d0df6bbfba64798e7494d57e13dd6d49d413fe3f697469e3047d"
+    },
+    {
+      "bytes": 96683,
+      "path": "candidate_policy_trace_protocol.json",
+      "sha256": "559583127c4c9201ec681fdd43e789c0774f292de0fae8811824084ac0af79e1"
+    },
+    {
+      "bytes": 8304,
+      "path": "checkpoint_curves.csv",
+      "sha256": "47c555d603b7c73ca8dae0cf65f3f65a9c63381cf1bb06b44269a74faf57adaf"
+    },
+    {
+      "bytes": 25009,
+      "path": "checkpoint_identity.json",
+      "sha256": "4a6f2c19a4e8aaf0cbf936549d67f2db1a6fb7a17358d6066415bbf1c9d2aee6"
+    },
+    {
+      "bytes": 3437,
+      "path": "code_identity.json",
+      "sha256": "374cb9b991bd4c9d4f7124d0494ad5ea22816d0386b09728da16adf564645952"
+    },
+    {
+      "bytes": 425,
+      "path": "command_log.txt",
+      "sha256": "a23c3e9d8701d95316d4b444f1541b49d2b7f7a9038ea3cb60622794b10f5925"
+    },
+    {
+      "bytes": 726,
+      "path": "diagnosis_receipt.json",
+      "sha256": "156186bedc208b669a4cc8a199049176839e3e857a087f2dc409f80e02751c69"
+    },
+    {
+      "bytes": 7907,
+      "path": "diagnostic_matrix.csv",
+      "sha256": "1166aef24eba86f1f699ed167813d242a6c69b8b389f606c5bf699c062180d14"
+    },
+    {
+      "bytes": 29852,
+      "path": "diagnostic_matrix.json",
+      "sha256": "41dfcfb3044a36a8aa6a4fe30d8bc815d43d719d466d8072d352f2972f20d00d"
+    },
+    {
+      "bytes": 6250,
+      "path": "gae_sensitivity.csv",
+      "sha256": "10bae78753a2f0f1f6ce29bc110f0614765658a6b6edde3836f1bf99a82f2bb9"
+    },
+    {
+      "bytes": 7667,
+      "path": "gradient_probe.csv",
+      "sha256": "bfd6db5709b957cfa7fa99dcd465ed545482e947d741e0b075e43d19dd117a08"
+    },
+    {
+      "bytes": 25648,
+      "path": "gradient_probe_protocol.json",
+      "sha256": "08f07c8b7dae0cf730e5c2a0db757d91136e44caaebdb2668cbdf80194fb16e4"
+    },
+    {
+      "bytes": 1574,
+      "path": "minimal_witness.json",
+      "sha256": "4ff385420163a25d582b577fc4b8cee34f1976b53bd1280df646b472ed744bc1"
+    },
+    {
+      "bytes": 326,
+      "path": "replay_receipt.json",
+      "sha256": "0ec0ed3d6a17c6a33a39749e64b19420aad1f0571cabc5e9d26bf826c349fbef"
+    },
+    {
+      "bytes": 3637,
+      "path": "reward_contributions.csv",
+      "sha256": "f03d4af688e74f24201c7d955b7a0a7252125722ef7935f313dd3235fab2a55a"
+    },
+    {
+      "bytes": 969,
+      "path": "source_field_availability.json",
+      "sha256": "50dfa51fb969c0e1021774521460a3e7b1ab498855cd44653fc05601ca756072"
+    },
+    {
+      "bytes": 1446,
+      "path": "truncation_witness.json",
+      "sha256": "5ecc0095c75b8018f6936399211d138984c44a6476b11f3af8f3585c6c97a1ae"
+    }
+  ],
+  "run_id": "calibrated_workflow_service_reward_learning_diagnosis_20261009_v1",
+  "schema_version": "service_reward_learning_diagnosis_integrity_v1"
+}

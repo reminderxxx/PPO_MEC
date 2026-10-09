@@ -1,0 +1,8 @@
+{
+  "action_source": "committed behavior_ledger.csv executed_action",
+  "gae_source": "offline recomputation; not original training minibatches",
+  "replayed_episode_count": 360,
+  "replayed_step_count": 3161,
+  "transition_or_reward_mismatch_count": 0,
+  "value_source": "hash-verified selected checkpoint offline forward"
+}

@@ -5,6 +5,12 @@
 
 # PPO_MEC
 
+服务奖励学习环节的只读诊断已完成：当前版本未发现 termination、reset observation 或跨 episode GAE 实现错误；
+service-aligned 三种 learned method 的 critic explained variance 近 0，固定 dev 中 value:policy 梯度比与全局裁剪尺度一致异常。
+唯一后续候选冻结为 critic target/output 的 PopArt normalization，尚未实现或训练，也不构成算法创新。见
+[诊断报告](docs/project/calibrated_workflow_service_reward_learning_diagnosis_20261009.md)与
+[A 线主张变更说明](docs/project/calibrated_workflow_service_reward_claim_change_20261009.md)。
+
 服务目标对齐奖励已完成一次冻结匹配实验。唯一候选在公式单元案例中正确排序按期完成、逾期完成与未完成，并保留外部截断
 bootstrap；但 3 seeds×192 episodes 下，SA/MAPPO/PPO 的 regression completion 均下降（`.889→.806`、
 `.972→.833`、`1→.944`），frozen development 也同向下降。最终分类 D，不进入 auxiliary-target 消融；奖励调整不是

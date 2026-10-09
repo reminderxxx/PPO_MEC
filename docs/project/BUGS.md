@@ -5,6 +5,18 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-09：critic 尺度与共享裁剪为首选候选，因果仍待匹配 A/B（OPEN LEARNING BLOCKER）
+
+- `NO IMPLEMENTATION DEFECT CONFIRMED`：当前 hash-matched 版本的 termination、bootstrap observation、episode GAE 和
+  executed-action loss 接线通过只读核对；不以旧分支缺陷代替当前证据，也不提交算法修复。
+- `SUPPORTED CANDIDATE`：service-aligned 下三方法的 critic value loss/EV、value:policy gradient ratio 与 clip scale
+  一致异常；尺度归一化的无更新梯度 probe 显著降低 ratio。该证据支持最小 PopArt A/B，不证明因果或创新。
+- `UNRESOLVED`：训练/评价 truncation 目标边界、小 dev 早选和固定 episode 导致 steps 不等仍是混杂；没有现成 later
+  checkpoint evaluation，禁止事后补评选最好模型。
+- `REJECTED PRIORITY`：policy/aux 梯度冲突不跨 seed 一致，no-aux 已失败；不得自动进入 auxiliary-target 消融。
+- `DATA/CLAIM BOUNDARY`：当前 36-instance manifest 已全部消费，只能作 development；confirmatory 需新 interval ledger、
+  原始 frame/time 互斥 split 和窗口身份校验。PopArt 配置尚未实现、未授权执行、paper-ready=`Unverifiable`。
+
 ## 2026-10-06：服务对齐 reward 公式通过但策略退化（VERIFIED FORMULA / REJECTED CANDIDATE）
 
 - `RESOLVED FORMULA GAP`：candidate 对按期/逾期/未完成、成本和 truncation 的单元排序通过；deadline 不再只在完成时可见，

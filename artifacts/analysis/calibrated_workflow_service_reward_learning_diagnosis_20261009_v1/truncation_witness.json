@@ -1,0 +1,21 @@
+{
+  "actual_semantics": {
+    "bootstrap_observation": "the final non-reset observation returned by the last env.step; reset is not called before evaluate_value",
+    "failed_service_attempt": "recoverable step event; it does not terminate the episode",
+    "gae_episode_boundary": "one PPORolloutBuffer is finalized per episode before rows are concatenated",
+    "instance_horizon": "env.step returns truncated=true when instance.max_steps is reached before completion",
+    "runner_outer_cap": "runner also stops at step_cap=24; all frozen instances have max_steps<=24",
+    "workflow_complete": "terminated=true"
+  },
+  "bootstrap_first_step_target_delta_max": 3.9680655052415847,
+  "bootstrap_first_step_target_delta_mean": 1.1187215758631726,
+  "bootstrap_first_step_target_delta_min": -0.1759524045932146,
+  "bootstrap_value_mean": 2.9630638067760775,
+  "evaluation_budget_alignment": {
+    "checkpoint_selection_and_evaluation": "completion is zero when the same finite horizon expires",
+    "training": "non-terminated truncations bootstrap continuation value",
+    "verdict": "semantic objective mismatch, but low training incidence prevents assigning it as the primary cause"
+  },
+  "replayed_truncated_episode_count": 31,
+  "systematic_overestimate_verdict": "not established: selected critics are globally low versus completed targets; truncation bootstrap is positive, but the true beyond-budget continuation return is unobserved"
+}

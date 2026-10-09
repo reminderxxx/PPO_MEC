@@ -1,0 +1,127 @@
+{
+  "schema_version": "calibrated_workflow_value_normalization_ab_v1",
+  "status": "frozen_design_not_implemented_not_authorized",
+  "execution_authorized": false,
+  "diagnostic_source_run": "calibrated_workflow_service_reward_alignment_20261006_v2",
+  "diagnostic_artifact_run": "calibrated_workflow_service_reward_learning_diagnosis_20261009_v1",
+  "baseline_commit": "70a83afb5d3d3b3fb40fcaeaf825a82e4b74c416",
+  "base_config": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json",
+  "workload_manifest": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+  "interface_profile": "calibrated_workflow_interface_v2",
+  "hierarchical_action_contract": "independent_heads_executed_env_v2",
+  "reward_profile": "service_aligned_v1",
+  "single_variable": "critic_target_popart_normalization",
+  "arms": [
+    {
+      "arm": "control_raw_critic_target",
+      "critic_target_normalization": "disabled"
+    },
+    {
+      "arm": "candidate_popart_critic_target",
+      "critic_target_normalization": "popart_running_mean_std"
+    }
+  ],
+  "candidate_contract": {
+    "scope": "critic target and critic output only",
+    "normalized_target": "(gae_return - running_mean) / running_std",
+    "bootstrap_value": "denormalize critic output before GAE",
+    "statistic_update": "adjust only the final value-head affine parameters so denormalized predictions are invariant",
+    "reward_unchanged": true,
+    "actor_loss_unchanged": true,
+    "advantage_normalization_unchanged": true,
+    "value_coef_unchanged": true,
+    "global_gradient_clip_unchanged": true,
+    "auxiliary_loss_unchanged": true,
+    "network_topology_unchanged": true,
+    "action_and_observation_contract_unchanged": true
+  },
+  "development_ab": {
+    "learned_methods": ["sa_ghmappo", "mappo", "ppo"],
+    "seeds": [7, 17, 29, 43, 61],
+    "environment_steps_per_cell": 1440,
+    "update_opportunities_per_cell": 24,
+    "transitions_per_update": 60,
+    "ppo_epochs_per_update": 4,
+    "minibatch_size": 32,
+    "optimizer_steps_per_cell": 192,
+    "episode_max_steps": 24,
+    "checkpoint_update_candidates": [6, 12, 18, 24],
+    "hyperparameter_search_trials_per_arm": 0,
+    "automatic_retry": false,
+    "paired_initialization_and_instance_order": true,
+    "selection_split": "dev",
+    "selection_order": [
+      "on_time_workflow_completion_rate_desc",
+      "workflow_completion_rate_desc",
+      "unfinished_after_deadline_rate_asc",
+      "service_failure_rate_asc",
+      "consecutive_no_progress_rate_asc",
+      "completed_sample_elapsed_seconds_asc_with_coverage",
+      "total_transfer_mb_asc",
+      "recompute_seconds_asc",
+      "invalid_prepare_attempts_asc"
+    ],
+    "reward_value_used_for_selection": false,
+    "evaluation_or_holdout_used_for_selection": false
+  },
+  "required_metrics": {
+    "primary_service": [
+      "on_time_workflow_completion_rate",
+      "workflow_completion_rate",
+      "unfinished_after_deadline_rate",
+      "service_failure_attempt_rate",
+      "service_failure_episode_rate",
+      "consecutive_no_progress_rate"
+    ],
+    "mechanism": [
+      "value_target_mean_std",
+      "denormalized_value_prediction_mean_std",
+      "denormalized_critic_rmse",
+      "explained_variance",
+      "advantage_before_and_after_normalization",
+      "policy_value_auxiliary_gradient_norms",
+      "global_gradient_clip_scale_and_fraction",
+      "kl_entropy",
+      "current_missing_action4_probability_and_argmax_rate"
+    ],
+    "conditional_with_coverage": [
+      "completed_elapsed_seconds",
+      "transfer_mb",
+      "recompute_seconds"
+    ]
+  },
+  "falsification": {
+    "implementation_gate": "PopArt statistic updates must preserve every probed denormalized value prediction within 1e-6 and all cells must have identical interaction/update/optimizer-step counts.",
+    "mechanism_gate": "Reject the candidate if the treatment does not reduce the paired median value-to-policy gradient-norm ratio and improve paired median explained variance on the development split.",
+    "behavior_gate": "Reject the candidate if current-missing unwise-action probability/argmax does not decrease without increasing service failures or consecutive no-progress.",
+    "service_gate": "Do not promote if total completion or on-time completion decreases, or if neither completion nor failed-service metrics improve under the fixed paired development protocol."
+  },
+  "stop_conditions": [
+    "identity_or_hash_gate_failure",
+    "raw_frame_or_time_interval_overlap_across_frozen_splits",
+    "nonfinite_value_or_normalization_statistics",
+    "any_interaction_update_or_optimizer_step_budget_mismatch",
+    "checkpoint_selection_reads_regression_evaluation_or_holdout",
+    "candidate_fails_any_preregistered_falsification_gate"
+  ],
+  "data_boundary": {
+    "current_36_instance_manifest_is_fully_consumed_development_data": true,
+    "regression_and_frozen_check_are_not_holdout": true,
+    "confirmatory_run_requires_new_interval_ledger_and_nonoverlapping_frozen_splits": true,
+    "existing_holdout_reuse_forbidden": true
+  },
+  "integration_prerequisites": [
+    "implement and unit-test the single PopArt critic contract",
+    "integrate the frozen-window identity validation from commit 6efdde1 or its audited descendant",
+    "publish exact scientific commit and manifest hashes before execution"
+  ],
+  "claim_boundary": {
+    "algorithm_innovation": false,
+    "formal": false,
+    "holdout": false,
+    "paper_ready": false,
+    "sa_advantage_target": false,
+    "auxiliary_target_ablation": false,
+    "training_started": false
+  }
+}

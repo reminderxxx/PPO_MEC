@@ -1,5 +1,16 @@
 ﻿# Decision Log
 
+## 2026-10-09：不作实现修复，只冻结 PopArt critic 单变量候选
+
+- 决定：termination、final observation bootstrap、episode-local GAE 和 executed-action loss 在实际执行版本未发现缺陷，
+  因而本轮保持只读，不修改算法或旧实验定义。
+- 依据：service-aligned 三方法的 value loss/EV、value:policy gradient ratio 和全局 clip scale 跨 seed 同向异常；固定样本
+  尺度归一化 probe 可降低该 ratio。truncation incidence 低，auxiliary cosine 不一致且 no-aux 已失败。
+- 唯一候选：只对 critic target/output 使用 PopArt，bootstrap 反归一化；reward、actor、advantage normalization、auxiliary、
+  network、action 和 clip 不变。先通过 prediction-invariance 单测，再以等交互/更新预算作 development A/B。
+- 否证：机制指标不改善、无效 action 不降或服务指标恶化/无改善即停止；不得转入 reward 搜索、auxiliary 消融、追加 seed
+  或以最终检查选模。当前配置 `execution_authorized=false`，不是创新或 paper-ready 证据。
+
 ## 2026-10-06：拒绝 `service_aligned_v1`，停止进入 auxiliary-target 消融
 
 - 决定：保留 reward 公式、单元验收、全量训练和负结果，但不把 candidate 设为默认，不继续搜索系数。
