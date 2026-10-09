@@ -5,6 +5,27 @@
 
 # Runbook
 
+## 因果强基线统一 4× 预算延长（2026-10-09；一次性）
+
+协议见 `cscwd_causal_budget_extension_protocol_20261009.md`。先只读验证配置、36-instance 身份及短预算原件：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_calibrated_workflow_strong_baselines.py \
+  --preflight \
+  --config configs/experiment/calibrated_workflow_strong_baselines_budget_extension_v1.json \
+  --short_budget_root /Users/howen/.codex/worktrees/cscwd-window-identity/PPO_MEC/artifacts/experiments/cscwd_causal_strong_baselines_dev_20261009_v1
+```
+
+协议和测试提交、push 且 checkout clean 后，只允许以下一次启动；不追加 seed、retry 或用 evaluation 提前停止：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/launch_calibrated_workflow_causal_budget_extension.py \
+  --mode launch --expected-commit <FROZEN_COMMIT>
+```
+
+run root 为 `artifacts/experiments/cscwd_causal_strong_baselines_budget_extension_20261009_v1/`；supervisor 同名加
+`_supervisor`。规则方法引用短预算结果而不重跑。ACK 只表示 child 已进入；terminal receipt 才表示完成或失败。
+
 ## 因果前缀强基线开发版本（2026-10-09）
 
 新版本协议见 `cscwd_causal_strong_baseline_protocol_20261009.md`。旧 v1 配置继续阻断；仅新 v2 配置允许一次

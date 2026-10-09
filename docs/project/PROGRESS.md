@@ -5,6 +5,15 @@
 
 ﻿# Progress
 
+## 2026-10-09：因果强基线统一 4× 预算延长已预注册，尚未启动
+
+- 基线实现固定为 `a08869388f9962149198054b5f8a0d6dd4d07eae`；单一联合变量是四 learned method 全部从
+  1,440/24/192 延长到 5,760 环境步/96 updates/768 optimizer steps，并把候选等比例移到 `[24,48,72,96]`。
+- 固定 20 cells、115,200 环境步、15,360 optimizer steps；reward/raw critic、数据、seed、网络、optimizer 和评价实例不变。
+  update 24/96 dev 诊断与 selected checkpoint 分表；最终评价不参与选模或停止。
+- 短预算原件与规则结果必须通过预注册哈希只读复用；Popularity/two-step 不重跑。当前 0 新训练步、0 新评价行，
+  无算法或论文主张变更。协议见 `cscwd_causal_budget_extension_protocol_20261009.md`。
+
 ## 2026-10-09：因果前缀强基线新版本已冻结，待一次开发执行
 
 - 新 `calibrated_workflow_interface_v3_prefix_only` 使用 train-only 转移计数，训练实例 leave-one-out；36 个原始实例的 474 个前缀通过实际未来后缀篡改的公共 observation/semantic/mask 不变验收。物理接触窗口仅 real step 使用实际轨迹，规则 preview 使用预测窗口。新旧环境语义版本分列。

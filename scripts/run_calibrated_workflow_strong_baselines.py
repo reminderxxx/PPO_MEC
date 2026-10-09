@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 from copy import deepcopy
+import csv
 import json
 import math
 import random
@@ -60,10 +61,90 @@ DEFAULT_CONFIG = (
 LEARNED_METHODS = ("sa_ghmappo", "mappo", "ppo", "dt_handoff_drl")
 HEURISTIC_METHOD = "popularity_cache_heuristic"
 MODEL_BASED_METHOD = "two_step_cost_rule"
+BUDGET_EXTENSION_VERSION = "calibrated_workflow_strong_baselines_budget_extension_v1"
 
 
 def _load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8-sig"))
+
+
+def _read_csv(path: Path) -> list[dict[str, str]]:
+    with path.open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
+def _is_causal_protocol(version: str) -> bool:
+    return version.endswith("v2_prefix_only") or version == BUDGET_EXTENSION_VERSION
+
+
+def _is_budget_extension(design: dict[str, Any]) -> bool:
+    return design["schema_version"] == BUDGET_EXTENSION_VERSION
+
+
+def _validate_short_budget_reference(design: dict[str, Any], source_root: Path) -> dict[str, Any]:
+    """Validate the frozen short-budget artifact without evaluating it again."""
+    if not _is_budget_extension(design):
+        raise RuntimeError("short-budget reference is only valid for the budget extension")
+    frozen = design["short_budget_reference"]
+    required_hashes = {
+        "completion_receipt.json": frozen["completion_receipt_sha256"],
+        "run_manifest.json": frozen["run_manifest_sha256"],
+        "evaluation_rows.csv": frozen["evaluation_rows_sha256"],
+        "training_summary.json": frozen["training_summary_sha256"],
+        "artifact_integrity.json": frozen["artifact_integrity_sha256"],
+    }
+    for name, expected in required_hashes.items():
+        path = source_root / name
+        if not path.is_file() or _sha256(path) != expected:
+            raise RuntimeError(f"short-budget source identity mismatch: {name}")
+    receipt = _load_json(source_root / "completion_receipt.json")
+    manifest = _load_json(source_root / "run_manifest.json")
+    training = _load_json(source_root / "training_summary.json")
+    rows = _read_csv(source_root / "evaluation_rows.csv")
+    if (
+        source_root.name != frozen["run_id"]
+        or manifest.get("git_commit") != frozen["scientific_commit"]
+        or receipt.get("status") != "complete"
+        or receipt.get("learned_cells") != 20
+        or receipt.get("learned_environment_steps") != 28800
+        or receipt.get("learned_optimizer_steps") != 3840
+        or receipt.get("evaluation_rows") != 440
+    ):
+        raise RuntimeError("short-budget completion identity drift")
+    if (
+        manifest.get("interface_profile") != "calibrated_workflow_interface_v3_prefix_only"
+        or manifest.get("reward_profile") != design["reward_profile"]
+        or manifest.get("critic_target_normalization") != design["critic_target_normalization"]
+        or tuple(manifest.get("learned_methods", [])) != LEARNED_METHODS
+        or manifest.get("seeds") != design["seeds"]
+        or manifest.get("base_config", {}).get("path") != design["base_config"]
+        or manifest.get("workload_manifest", {}).get("sha256") != design["workload_manifest_sha256"]
+    ):
+        raise RuntimeError("short-budget scientific identity drift")
+    short = design["budget_intervention"]
+    source_budget = manifest.get("training_budget", {})
+    if (
+        source_budget.get("environment_steps_per_method_seed") != short["short_environment_steps_per_cell"]
+        or source_budget.get("checkpoint_update_candidates") != short["short_checkpoint_updates"]
+        or len(training) != 20
+        or any(int(row["environment_steps"]) != 1440 or int(row["optimizer_steps"]) != 192 for row in training)
+    ):
+        raise RuntimeError("short-budget training identity drift")
+    learned_rows = [row for row in rows if row["method"] in LEARNED_METHODS]
+    nonlearned_rows = [row for row in rows if row["method"] in {HEURISTIC_METHOD, MODEL_BASED_METHOD}]
+    if len(learned_rows) != 400 or len(nonlearned_rows) != 40:
+        raise RuntimeError("short-budget evaluation identity drift")
+    return {
+        "run_id": frozen["run_id"],
+        "scientific_commit": frozen["scientific_commit"],
+        "source_root": str(source_root),
+        "file_sha256": required_hashes,
+        "learned_selected_rows": len(learned_rows),
+        "reused_nonlearned_rows": len(nonlearned_rows),
+        "reused_nonlearned_methods": frozen["reuse_nonlearned_methods"],
+        "reused_nonlearned_summary": _summary_rows(nonlearned_rows),
+        "reuse_mode": "read_only_reference_no_reevaluation",
+    }
 
 
 class PublicContractAgent:
@@ -199,6 +280,8 @@ def _run_learned_cell(
     updates: list[dict[str, Any]] = []
     optimizer_rows: list[dict[str, Any]] = []
     candidate_rows: list[dict[str, Any]] = []
+    fixed_endpoint_rows: list[dict[str, Any]] = []
+    fixed_endpoint_checkpoints: list[dict[str, Any]] = []
     training_episodes: list[dict[str, Any]] = []
     training_signals: list[dict[str, Any]] = []
     environment_steps = 0
@@ -264,17 +347,33 @@ def _run_learned_cell(
             dev_rows, _ = _evaluate_agent(
                 agent, method, seed, config, splits["dev"], int(protocol["episode_max_steps"])
             )
-            candidate_rows.append({
+            annotated_dev_rows = _annotate_rows(dev_rows, [], splits["dev"], reward_profile)[0]
+            candidate = {
                 "method": method,
                 "seed": seed,
                 "update_index": update_index,
                 "score": list(_selection_score(dev_rows)),
                 "checkpoint": str(Path(checkpoints.name) / path.name),
                 "checkpoint_sha256": _sha256(path),
-                "dev_rows": _annotate_rows(dev_rows, [], splits["dev"], reward_profile)[0],
+                "dev_rows": annotated_dev_rows,
                 "reward_used_for_selection": False,
                 "evaluation_split_used_for_selection": False,
-            })
+            }
+            candidate_rows.append(candidate)
+            if update_index in protocol.get("fixed_endpoint_diagnostic_updates", []):
+                fixed_endpoint_checkpoints.append({
+                    "method": method,
+                    "seed": seed,
+                    "update_index": update_index,
+                    "checkpoint": candidate["checkpoint"],
+                    "checkpoint_sha256": candidate["checkpoint_sha256"],
+                    "role": "fixed_dev_diagnostic_not_checkpoint_selection",
+                })
+                fixed_endpoint_rows.extend({
+                    **row,
+                    "endpoint_update": update_index,
+                    "diagnostic_role": "fixed_dev_diagnostic_not_checkpoint_selection",
+                } for row in annotated_dev_rows)
     expected_steps = int(protocol["environment_steps_per_method_seed"])
     if environment_steps != expected_steps:
         raise RuntimeError("environment-step budget drift")
@@ -316,6 +415,8 @@ def _run_learned_cell(
         "updates": updates,
         "optimizer_rows": optimizer_rows,
         "candidates": candidate_rows,
+        "fixed_endpoint_rows": fixed_endpoint_rows,
+        "fixed_endpoint_checkpoints": fixed_endpoint_checkpoints,
         "training_episodes": training_episodes,
         "training_signals": training_signals,
         "evaluation_rows": evaluation_rows,
@@ -326,7 +427,11 @@ def _run_learned_cell(
 def _validate_protocol(design: dict[str, Any]) -> None:
     protocol = design["training"]
     version = design["schema_version"]
-    if version not in {"calibrated_workflow_strong_baselines_development_v1", "calibrated_workflow_strong_baselines_development_v2_prefix_only"}:
+    if version not in {
+        "calibrated_workflow_strong_baselines_development_v1",
+        "calibrated_workflow_strong_baselines_development_v2_prefix_only",
+        BUDGET_EXTENSION_VERSION,
+    }:
         raise RuntimeError("baseline protocol version drift")
     if design["scope"] != "consumed_36_instance_development_only":
         raise RuntimeError("development-only scope drift")
@@ -342,7 +447,7 @@ def _validate_protocol(design: dict[str, Any]) -> None:
         raise RuntimeError("unexpected normalization profile")
     if design["critic_target_normalization"] != "raw_disabled" and not design["claim_boundary"]["popart_promoted"]:
         raise RuntimeError("PopArt requires a separately frozen promotion decision")
-    if version.endswith("v2_prefix_only"):
+    if _is_causal_protocol(version):
         if design["reward_profile"] != "original_reward_v1" or design["critic_target_normalization"] != "raw_disabled":
             raise RuntimeError("prefix-only development arm is frozen to original reward and raw critic")
         predictor = design["causal_predictor"]
@@ -352,10 +457,15 @@ def _validate_protocol(design: dict[str, Any]) -> None:
             raise RuntimeError("source manifest identity drift")
     if int(protocol["environment_steps_per_method_seed"]) != int(protocol["transitions_per_update"]) * int(protocol["update_opportunities_per_method_seed"]):
         raise RuntimeError("step/update budget mismatch")
+    expected_budget = (
+        (5760, 96, [24, 48, 72, 96])
+        if version == BUDGET_EXTENSION_VERSION
+        else (1440, 24, [6, 12, 18, 24])
+    )
     if (
-        int(protocol["environment_steps_per_method_seed"]) != 1440
+        int(protocol["environment_steps_per_method_seed"]) != expected_budget[0]
         or int(protocol["transitions_per_update"]) != 60
-        or int(protocol["update_opportunities_per_method_seed"]) != 24
+        or int(protocol["update_opportunities_per_method_seed"]) != expected_budget[1]
         or int(protocol["ppo_epochs_per_update"]) != 4
         or int(protocol["minibatch_size"]) != 32
         or int(protocol["episode_max_steps"]) != 24
@@ -365,8 +475,28 @@ def _validate_protocol(design: dict[str, Any]) -> None:
     if expected_optimizer != int(protocol["expected_optimizer_steps_per_method_seed"]):
         raise RuntimeError("optimizer-step budget mismatch")
     candidates = list(protocol["checkpoint_update_candidates"])
-    if candidates != [6, 12, 18, 24]:
+    if candidates != expected_budget[2]:
         raise RuntimeError("invalid checkpoint opportunities")
+    if version == BUDGET_EXTENSION_VERSION:
+        if design.get("causal_implementation_commit") != "a08869388f9962149198054b5f8a0d6dd4d07eae":
+            raise RuntimeError("causal implementation baseline drift")
+        if protocol.get("fixed_endpoint_diagnostic_updates") != [24, 96]:
+            raise RuntimeError("fixed endpoint diagnostic identity drift")
+        intervention = design["budget_intervention"]
+        if (
+            intervention.get("single_variable") != "uniform_learned_method_training_budget_and_proportionally_scaled_selection_schedule"
+            or intervention.get("short_environment_steps_per_cell") != 1440
+            or intervention.get("long_environment_steps_per_cell") != 5760
+            or intervention.get("budget_multiplier") != 4
+            or intervention.get("short_checkpoint_updates") != [6, 12, 18, 24]
+            or intervention.get("long_checkpoint_updates") != [24, 48, 72, 96]
+            or not intervention.get("all_learned_methods_restart_from_initialization")
+            or intervention.get("method_specific_extension")
+            or intervention.get("ranking_based_extension")
+        ):
+            raise RuntimeError("budget intervention identity drift")
+        if design["claim_boundary"].get("algorithm_search"):
+            raise RuntimeError("budget extension cannot be an algorithm search")
     if int(protocol["hyperparameter_search_trials_per_method"]) != 0 or bool(protocol["automatic_retry"]):
         raise RuntimeError("search/retry is forbidden")
     if protocol["evaluation_splits"] != ["regression", "frozen_check"]:
@@ -403,7 +533,7 @@ def _audit_public_prefix_invariance(config: dict[str, Any], splits: dict[str, li
 def _load_inputs(design: dict[str, Any]) -> tuple[dict[str, Any], dict[str, list[dict[str, Any]]], dict[str, Any]]:
     base_path = ROOT_DIR / design["base_config"]
     manifest_path = ROOT_DIR / design["workload_manifest"]
-    causal = design["schema_version"].endswith("v2_prefix_only")
+    causal = _is_causal_protocol(design["schema_version"])
     if causal and _sha256(manifest_path) != design["workload_manifest_sha256"]:
         raise RuntimeError("causal source manifest hash mismatch")
     config, _ = _load_experiment_config(base_path)
@@ -468,11 +598,23 @@ def _load_inputs(design: dict[str, Any]) -> tuple[dict[str, Any], dict[str, list
     return config, splits, identity
 
 
-def _execute(design: dict[str, Any], output_root: Path, *, design_path: Path, command: list[str]) -> None:
+def _execute(
+    design: dict[str, Any],
+    output_root: Path,
+    *,
+    design_path: Path,
+    command: list[str],
+    short_budget_root: Path | None = None,
+) -> None:
     _validate_protocol(design)
     if not design["execution_authorized"] or not design["claim_boundary"]["scientific_execution_authorized"]:
         raise RuntimeError("scientific development execution is not authorized")
     config, splits, identity = _load_inputs(design)
+    short_reference = None
+    if _is_budget_extension(design):
+        if short_budget_root is None:
+            raise RuntimeError("budget extension requires the frozen short-budget artifact")
+        short_reference = _validate_short_budget_reference(design, short_budget_root)
     protocol = design["training"]
     profile = design["reward_profile"]
     popart_enabled = design["critic_target_normalization"] == "popart_running_mean_std"
@@ -492,18 +634,19 @@ def _execute(design: dict[str, Any], output_root: Path, *, design_path: Path, co
             ))
     evaluation_rows = [row for cell in cell_results for row in cell["evaluation_rows"]]
     behavior_rows = [row for cell in cell_results for row in cell["behavior_rows"]]
-    for split in protocol["evaluation_splits"]:
-        heuristic_rows, heuristic_ledger = _evaluate_popularity(
-            config, splits[split], int(protocol["episode_max_steps"]), profile
-        )
-        evaluation_rows.extend(heuristic_rows)
-        behavior_rows.extend(heuristic_ledger)
-        rule_rows, rule_ledger = _evaluate_rule(
-            config, splits[split], int(protocol["episode_max_steps"])
-        )
-        rule_rows, rule_ledger = _annotate_rows(rule_rows, rule_ledger, splits[split], profile)
-        evaluation_rows.extend(rule_rows)
-        behavior_rows.extend(rule_ledger)
+    if not _is_budget_extension(design):
+        for split in protocol["evaluation_splits"]:
+            heuristic_rows, heuristic_ledger = _evaluate_popularity(
+                config, splits[split], int(protocol["episode_max_steps"]), profile
+            )
+            evaluation_rows.extend(heuristic_rows)
+            behavior_rows.extend(heuristic_ledger)
+            rule_rows, rule_ledger = _evaluate_rule(
+                config, splits[split], int(protocol["episode_max_steps"])
+            )
+            rule_rows, rule_ledger = _annotate_rows(rule_rows, rule_ledger, splits[split], profile)
+            evaluation_rows.extend(rule_rows)
+            behavior_rows.extend(rule_ledger)
     if len({(row["split"], row["method"], row["seed"], row["design_id"]) for row in evaluation_rows}) != len(evaluation_rows):
         raise RuntimeError("duplicate evaluation row identity")
     if not evaluation_rows or not behavior_rows:
@@ -512,8 +655,20 @@ def _execute(design: dict[str, Any], output_root: Path, *, design_path: Path, co
     _write_json(output_root / "update_records.json", [row for cell in cell_results for row in cell["updates"]])
     _write_csv(output_root / "optimizer_step_records.csv", [row for cell in cell_results for row in cell["optimizer_rows"]])
     _write_json(output_root / "checkpoint_selection.json", [row for cell in cell_results for row in cell["candidates"]])
+    if _is_budget_extension(design):
+        _write_csv(output_root / "fixed_endpoint_dev_rows.csv", [row for cell in cell_results for row in cell["fixed_endpoint_rows"]])
+        _write_json(output_root / "fixed_endpoint_checkpoint_identity.json", [row for cell in cell_results for row in cell["fixed_endpoint_checkpoints"]])
+        _write_json(output_root / "short_budget_reference.json", short_reference)
+        _write_json(output_root / "reused_nonlearned_reference.json", {
+            "source_run_id": short_reference["run_id"],
+            "source_evaluation_rows_sha256": short_reference["file_sha256"]["evaluation_rows.csv"],
+            "methods": short_reference["reused_nonlearned_methods"],
+            "rows": short_reference["reused_nonlearned_rows"],
+            "summary": short_reference["reused_nonlearned_summary"],
+            "reuse_mode": short_reference["reuse_mode"],
+        })
     _write_json(output_root / "training_episode_rows.json", [row for cell in cell_results for row in cell["training_episodes"]])
-    if design["schema_version"].endswith("v2_prefix_only"):
+    if _is_causal_protocol(design["schema_version"]):
         _write_csv(output_root / "training_signal_rows.csv", [row for cell in cell_results for row in cell["training_signals"]])
     _write_json(output_root / "evaluation_rows.json", evaluation_rows)
     _write_csv(output_root / "evaluation_rows.csv", evaluation_rows)
@@ -521,7 +676,7 @@ def _execute(design: dict[str, Any], output_root: Path, *, design_path: Path, co
     _write_csv(output_root / "service_metric_summary.csv", _summary_rows(evaluation_rows))
     _write_csv(output_root / "seed_summary.csv", _seed_rows(evaluation_rows))
     _write_json(output_root / "run_manifest.json", {
-        "schema_version": "calibrated_workflow_strong_baselines_run_v1",
+        "schema_version": "calibrated_workflow_strong_baselines_budget_extension_run_v1" if _is_budget_extension(design) else "calibrated_workflow_strong_baselines_run_v1",
         "created_at": datetime.now(timezone.utc).isoformat(),
         "git_commit": _git_commit(),
         "design_config": {"path": str(design_path.relative_to(ROOT_DIR)), "sha256": _sha256(design_path)},
@@ -535,8 +690,12 @@ def _execute(design: dict[str, Any], output_root: Path, *, design_path: Path, co
         "model_based_methods": [MODEL_BASED_METHOD],
         "seeds": design["seeds"],
         "training_budget": protocol,
+        "causal_implementation_commit": design.get("causal_implementation_commit"),
+        "budget_intervention": design.get("budget_intervention"),
+        "short_budget_reference": short_reference,
         "capability_labels": design["capability_labels"],
         "heuristic_memory_scope": "fresh_per_instance_no_checkpoint_no_training_seed",
+        "nonlearned_evaluation_mode": "reused_short_budget_reference_no_reevaluation" if _is_budget_extension(design) else "evaluated_in_run",
         "claim_boundary": design["claim_boundary"],
         "interface_profile": config["interface_profile"],
         "command": command,
@@ -563,6 +722,7 @@ def main() -> None:
     parser.add_argument("--run", action="store_true")
     parser.add_argument("--output_root")
     parser.add_argument("--expected_git_commit")
+    parser.add_argument("--short_budget_root")
     args = parser.parse_args()
     if args.preflight == args.run:
         raise RuntimeError("select exactly one of --preflight or --run")
@@ -570,12 +730,17 @@ def main() -> None:
     design = _load_json(design_path)
     _validate_protocol(design)
     _, splits, identity = _load_inputs(design)
+    short_budget_root = Path(args.short_budget_root).resolve() if args.short_budget_root else None
+    short_reference = _validate_short_budget_reference(design, short_budget_root) if _is_budget_extension(design) and short_budget_root else None
+    if _is_budget_extension(design) and short_budget_root is None:
+        raise RuntimeError("budget extension requires --short_budget_root")
     if args.preflight:
         print(json.dumps({
             "status": "preflight_only",
             "execution_authorized": bool(design["execution_authorized"]),
             "split_counts": {key: len(value) for key, value in splits.items()},
             "source_identity": identity,
+            "short_budget_reference": short_reference,
             "scientific_steps": 0,
         }))
         return
@@ -600,7 +765,13 @@ def main() -> None:
     })
     _write_json(output_root / "run_status.json", {"status": "running", "started_at": datetime.now(timezone.utc).isoformat()})
     try:
-        _execute(design, output_root, design_path=design_path, command=list(sys.argv))
+        _execute(
+            design,
+            output_root,
+            design_path=design_path,
+            command=list(sys.argv),
+            short_budget_root=short_budget_root,
+        )
     except Exception as exc:
         _write_json(output_root / "failure_receipt.json", {
             "status": "failed", "error_type": type(exc).__name__, "error": str(exc),

@@ -2,6 +2,10 @@
 
 ## 2026-10-09 因果前缀强基线版本
 
+- `configs/experiment/calibrated_workflow_strong_baselines_budget_extension_v1.json`：4× learned 预算、固定端点和短预算哈希身份。
+- `scripts/analyze_calibrated_workflow_budget_extension.py`、`scripts/launch_calibrated_workflow_causal_budget_extension.py`：配对诊断与一次性持久启动；规则方法只读复用。
+- `docs/project/cscwd_causal_budget_extension_protocol_20261009.md`：统一预算干预、分析输出和停止边界。
+
 - `src/envs/core/causal_rsu_predictor.py`：训练拟合的低容量前缀 RSU 预测器。
 - `configs/experiment/calibrated_workflow_strong_baselines_development_v2_prefix_only.json`：一次开发执行的 hash、方法、预算和权限冻结。
 - `scripts/run_calibrated_workflow_strong_baselines.py`、`scripts/analyze_calibrated_workflow_strong_baselines.py`、`scripts/launch_calibrated_workflow_strong_baselines.py`：预检/训练、自动分析、持久单次监督。

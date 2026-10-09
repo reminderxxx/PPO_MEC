@@ -10,6 +10,7 @@
 ## Live 文档
 
 - `cscwd_causal_strong_baseline_protocol_20261009.md`：新版本前缀预测、物理接触分离、冻结开发预算、自动分析与贡献边界。
+- `cscwd_causal_budget_extension_protocol_20261009.md`：四 learned×五 seed 的统一 4× 预算延长、等比例选模、短预算身份复用与停止边界。
 
 - `cscwd_2027_strong_baseline_wiring_20261009.md`：DT/Popularity 最小接线、能力矩阵、开发比较预算草案、验收与禁行边界。
 - `cscwd_2027_strong_baseline_prediction_permission_blocker_20261009.md`：36/36 实例实际未来 RSU 序列进入公共预测的预检阻断与恢复条件；没有科学 run。

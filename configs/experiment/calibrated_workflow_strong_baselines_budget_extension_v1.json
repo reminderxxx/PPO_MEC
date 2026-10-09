@@ -1,0 +1,92 @@
+{
+  "schema_version": "calibrated_workflow_strong_baselines_budget_extension_v1",
+  "execution_authorized": true,
+  "scope": "consumed_36_instance_development_only",
+  "causal_implementation_commit": "a08869388f9962149198054b5f8a0d6dd4d07eae",
+  "base_config": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json",
+  "workload_manifest": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+  "reward_profile": "original_reward_v1",
+  "critic_target_normalization": "raw_disabled",
+  "learned_methods": [
+    "sa_ghmappo",
+    "mappo",
+    "ppo",
+    "dt_handoff_drl"
+  ],
+  "heuristic_methods": [
+    "popularity_cache_heuristic"
+  ],
+  "model_based_methods": [
+    "two_step_cost_rule"
+  ],
+  "seeds": [7, 17, 29, 43, 61],
+  "training": {
+    "environment_steps_per_method_seed": 5760,
+    "transitions_per_update": 60,
+    "update_opportunities_per_method_seed": 96,
+    "ppo_epochs_per_update": 4,
+    "minibatch_size": 32,
+    "expected_optimizer_steps_per_method_seed": 768,
+    "checkpoint_update_candidates": [24, 48, 72, 96],
+    "fixed_endpoint_diagnostic_updates": [24, 96],
+    "hyperparameter_search_trials_per_method": 0,
+    "episode_max_steps": 24,
+    "evaluation_splits": [
+      "regression",
+      "frozen_check"
+    ],
+    "automatic_retry": false
+  },
+  "budget_intervention": {
+    "single_variable": "uniform_learned_method_training_budget_and_proportionally_scaled_selection_schedule",
+    "short_environment_steps_per_cell": 1440,
+    "long_environment_steps_per_cell": 5760,
+    "budget_multiplier": 4,
+    "short_checkpoint_updates": [6, 12, 18, 24],
+    "long_checkpoint_updates": [24, 48, 72, 96],
+    "joint_effect_warning": "budget_plus_proportionally_scaled_selection_schedule",
+    "all_learned_methods_restart_from_initialization": true,
+    "method_specific_extension": false,
+    "ranking_based_extension": false
+  },
+  "short_budget_reference": {
+    "run_id": "cscwd_causal_strong_baselines_dev_20261009_v1",
+    "scientific_commit": "a08869388f9962149198054b5f8a0d6dd4d07eae",
+    "completion_receipt_sha256": "eb44fecae6855f73045003ba156e02372abd002aee90ca6a3d7f191eecc57f43",
+    "run_manifest_sha256": "462f7c001a5384693b6dfc9f6f8a3533b97949f448128cf8385979698d7f5164",
+    "evaluation_rows_sha256": "62438befe510da39c9e5cdc1d5b5d88c0ffbca5c7dd7e31fa10de66449b2322f",
+    "training_summary_sha256": "c827872c0e64e8da2e63e2151dcbdf484d29af341d94191188981baa40a82730",
+    "artifact_integrity_sha256": "1c323e978547030f1593ad076883b6d56ff1f818ea10de01a0f80bacc76b42b1",
+    "reuse_nonlearned_methods": [
+      "popularity_cache_heuristic",
+      "two_step_cost_rule"
+    ]
+  },
+  "capability_labels": {
+    "dt_handoff_drl": "project_native_literature_inspired_digital_twin_ppo_not_exact_paper_reproduction",
+    "popularity_cache_heuristic": "prediction_aware_stateful_nonlearning_heuristic_reset_per_instance_reused_from_short_budget_run",
+    "two_step_cost_rule": "exact_transition_model_based_two_step_planner_reused_from_short_budget_run"
+  },
+  "claim_boundary": {
+    "formal": false,
+    "holdout": false,
+    "independent_test": false,
+    "scientific_execution_authorized": true,
+    "popart_promoted": false,
+    "old_holdout_reads": 0,
+    "real_model_calls": 0,
+    "downloads": 0,
+    "paper_or_manuscript_write_authorized": false,
+    "algorithm_search": false
+  },
+  "workload_manifest_sha256": "b7efe5d6e50ad17b744230c03a126370656d0196b60c7f7e6b5a86bb702effbc",
+  "causal_predictor": {
+    "schema_version": "prefix_transition_counts_v1",
+    "training_fit": "train_only_leave_one_instance_out_for_train",
+    "train_source_projection_sha256": "c386f0b55a3b82788b9a1792e5841face968516fc725a9d4ca3d6558088034ec",
+    "full_model_sha256": "f382b8de8ee8ed8ee3bb60c39acd485fb67d16c4e43bf2f5db6a38c03a37765b",
+    "model_bundle_sha256": "e3de9c40580427abc493bb2e58beddc044d9eb5690477b24c2ed9307b7a6dd75",
+    "unknown_forecast": "empty_sequence_zero_confidence_zero_public_contact_budget",
+    "physical_contact": "actual_route_in_real_step_only_forecast_in_decision_clone"
+  }
+}

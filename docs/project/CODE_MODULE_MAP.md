@@ -1,5 +1,10 @@
 # Code Module Map
 
+`scripts/run_calibrated_workflow_strong_baselines.py` 的 budget-extension 分支只扩大所有 learned cell 的共同预算，保存
+update 24/96 固定 dev 诊断，并以预注册 SHA-256 只读验证短预算 artifact；不会再次执行 Popularity/two-step。
+`scripts/analyze_calibrated_workflow_budget_extension.py` 生成短→长配对、选模/固定端点分表、optimizer 曲线和共同完成样本
+elapsed 覆盖；`scripts/launch_calibrated_workflow_causal_budget_extension.py` 负责单次 2 小时、无重试的持久任务。
+
 `src/envs/core/causal_rsu_predictor.py` 只实现训练序列计数拟合、前缀推理与模型哈希；
 `calibrated_continuous_workflow_env.py` 在显式 v3 profile 消费它生成公共预测，real step 独立执行实际接触判定，
 decision clone 用预测判定。`run_calibrated_workflow_strong_baselines.py` 验证 source/model hash、逐前缀后缀不变、

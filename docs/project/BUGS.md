@@ -905,6 +905,14 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - `BOUNDARY / historical v1`：192-episode v1 早于 action-4 commit 与 actual/estimated link 修正，只保留审计，不得与 v2
   checkpoint、逐行结果或 aggregate 混用。
 
+## OPEN / causal learned baseline budget sufficiency
+
+- `cscwd_causal_strong_baselines_dev_20261009_v1` 每个 learned cell 只有 1,440 环境步；是否仅因共同训练曝光不足而限制
+  SA/PPO/MAPPO/DT 尚不能区分。
+- 已预注册统一 4× budget + 等比例选模时点的联合干预；这不是 SA 专属追加预算，也不能把二者效应拆开解释。
+- 现有 36 个实例全部已消费为 development；即便改善也不构成 independent/formal 证据。若 SA 不改善，本轮停止，
+  不自动搜索新算法或奖励。
+
 ## OPEN / calibrated workflow critic scale candidate 仍只是假设
 
 - 诊断见 `calibrated_workflow_service_reward_learning_diagnosis_20261009.md`：service reward 下 raw critic loss 和 value-to-policy gradient ratio 异常大，但尚无 development A/B 因果证据。

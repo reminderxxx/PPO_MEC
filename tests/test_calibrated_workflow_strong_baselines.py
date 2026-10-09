@@ -11,10 +11,12 @@ from scripts.analyze_calibrated_workflow_service_reward_alignment import _seed_r
 from scripts.analyze_calibrated_workflow_strong_baselines import METRICS
 from scripts.freeze_calibrated_continuous_workflow_pilot import _load_experiment_config
 from scripts.run_calibrated_workflow_strong_baselines import (
+    BUDGET_EXTENSION_VERSION,
     _annotate_rows,
     _build_learned,
     _evaluate_popularity,
     _load_inputs,
+    _is_budget_extension,
     _run_learned_cell,
     _validate_protocol,
     _write_csv,
@@ -165,6 +167,7 @@ def test_dt_one_synthetic_update_through_common_artifact_chain(config: dict, tmp
         "minibatch_size": 32,
         "expected_optimizer_steps_per_method_seed": 4,
         "checkpoint_update_candidates": [1],
+        "fixed_endpoint_diagnostic_updates": [1],
         "episode_max_steps": 8,
         "evaluation_splits": ["regression", "frozen_check"],
     }
@@ -178,6 +181,9 @@ def test_dt_one_synthetic_update_through_common_artifact_chain(config: dict, tmp
     assert result["summary"]["selected_update"] == 1
     assert result["summary"]["value_normalization_enabled"] is False
     assert len(result["candidates"]) == 1 and len(result["evaluation_rows"]) == 2
+    assert len(result["fixed_endpoint_rows"]) == 1
+    assert len(result["fixed_endpoint_checkpoints"]) == 1
+    assert result["fixed_endpoint_rows"][0]["endpoint_update"] == 1
     assert result["summary"]["selected_checkpoint_sha256"]
     assert (tmp_path / result["candidates"][0]["checkpoint"]).is_file()
     assert (tmp_path / result["summary"]["selected_checkpoint"]).is_file()
@@ -257,3 +263,33 @@ def test_current_manifest_fails_before_future_mobility_is_exposed() -> None:
     design = json.loads((ROOT / "configs/experiment/calibrated_workflow_strong_baselines_development_v1.json").read_text())
     with pytest.raises(RuntimeError, match="PREDICTION_FUTURE_LEAK_BLOCKER: 36/36"):
         _load_inputs(design)
+
+
+def test_budget_extension_protocol_freezes_one_uniform_intervention() -> None:
+    path = ROOT / "configs/experiment/calibrated_workflow_strong_baselines_budget_extension_v1.json"
+    design = json.loads(path.read_text())
+    _validate_protocol(design)
+    assert design["schema_version"] == BUDGET_EXTENSION_VERSION
+    assert _is_budget_extension(design)
+    assert design["training"] == {
+        "environment_steps_per_method_seed": 5760,
+        "transitions_per_update": 60,
+        "update_opportunities_per_method_seed": 96,
+        "ppo_epochs_per_update": 4,
+        "minibatch_size": 32,
+        "expected_optimizer_steps_per_method_seed": 768,
+        "checkpoint_update_candidates": [24, 48, 72, 96],
+        "fixed_endpoint_diagnostic_updates": [24, 96],
+        "hyperparameter_search_trials_per_method": 0,
+        "episode_max_steps": 24,
+        "evaluation_splits": ["regression", "frozen_check"],
+        "automatic_retry": False,
+    }
+    changed = deepcopy(design)
+    changed["training"]["checkpoint_update_candidates"] = [6, 12, 18, 24]
+    with pytest.raises(RuntimeError, match="invalid checkpoint opportunities"):
+        _validate_protocol(changed)
+    changed = deepcopy(design)
+    changed["budget_intervention"]["method_specific_extension"] = True
+    with pytest.raises(RuntimeError, match="budget intervention identity drift"):
+        _validate_protocol(changed)
