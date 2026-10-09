@@ -51,3 +51,9 @@
 - 实际 Git commit、配置 SHA-256、Python/Torch/NumPy identity 和真实预算由 run manifest 固化。
 
 预检通过后仅允许一次后台科学启动。若启动后仍在运行，执行方只交付 PID、日志和 create-only run root，不持续轮询；若已结束，只读一次 completion/failure receipt。
+
+### v2 持久启动补充
+
+首个授权尝试在 run root 创建前结束且日志为空，永久保留为 pre-run failure，不算科学 A/B。后续新授权使用 `scripts/launch_calibrated_workflow_value_normalization_ab.py` 的 detached supervisor；禁止再次使用一行 shell background。冻结解释器字符串为 `/Users/howen/Projects/PPO_MEC/.venv/bin/python`，不以 realpath 替换。
+
+launcher 必须在原调用返回前观察 child 写出的 `runner_entered.json`，并在 `launch_ack.json` 中记录 run ID、解释器、supervisor/child PID 和进入 runner 时间。supervisor 独立持有 child stdout/stderr，完成后写 `exit_sidecar.json`、`terminal_receipt.json` 和 integrity；不 retry。科学启动前只允许两个无训练宿主验收：预期 exit 0 与预期 nonzero 各一次，且须由原调用退出后的独立 verify 调用确认。

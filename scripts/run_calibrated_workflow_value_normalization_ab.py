@@ -6,6 +6,7 @@ import argparse
 import csv
 import hashlib
 import json
+import os
 import random
 import subprocess
 import sys
@@ -677,6 +678,8 @@ def _run(
     started_at: float,
 ) -> None:
     authorization = _load_json(authorization_path)
+    if output_root.name != str(authorization["output_run_id"]):
+        raise RuntimeError("authorization output_run_id does not match output root")
     design_path = ROOT_DIR / authorization["design_config"]
     if _sha256(design_path) != authorization["design_config_sha256"]:
         raise RuntimeError("authorized design config hash mismatch")
@@ -1066,8 +1069,23 @@ def main() -> None:
     output_root = Path(args.output_root).resolve()
     if output_root.exists():
         raise FileExistsError(f"create-only output already exists: {output_root}")
+    authorization = _load_json(authorization_path)
+    if output_root.name != str(authorization["output_run_id"]):
+        raise ValueError("authorization output_run_id does not match output root")
     output_root.mkdir(parents=True)
     started_at = time.monotonic()
+    _write_json(
+        output_root / "runner_entered.json",
+        {
+            "schema_version": "calibrated_workflow_value_normalization_ab_runner_entry_v1",
+            "status": "entered",
+            "entered_at": datetime.now(timezone.utc).isoformat(),
+            "run_id": authorization["output_run_id"],
+            "pid": os.getpid(),
+            "interpreter": sys.executable,
+            "git_commit": _git_commit(),
+        },
+    )
     _write_json(
         output_root / "run_status.json",
         {

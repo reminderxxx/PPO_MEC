@@ -1866,3 +1866,27 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 ```
 
 输出目录 create-only；不得 retry/resume。checkpoint 仅本地保留，不加入 Git。`regression` 与 `frozen_check` 是 development falsification split，不得标为 formal/holdout。完整固定预算和停止条件见 `calibrated_workflow_value_normalization_ab_execution_protocol_20261009.md`。
+
+首个 v1 shell-background 尝试为零科学执行的 pre-run failure，不得恢复。新的 v2 授权只能经持久 supervisor 启动：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/launch_calibrated_workflow_value_normalization_ab.py \
+  --mode launch-scientific \
+  --expected-commit <clean-scientific-commit> \
+  --authorization-config configs/experiment/calibrated_workflow_value_normalization_ab_authorized_v2.json \
+  --output-root artifacts/benchmarks/calibrated_workflow_value_normalization_ab_20261009_v2 \
+  --supervisor-root artifacts/analysis/calibrated_workflow_value_normalization_ab_launcher_20261009_v2
+```
+
+原调用必须返回包含 `run_id/interpreter/child_pid/entered_runner_at` 的 ACK。随后只做一次独立状态读取：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python \
+  scripts/launch_calibrated_workflow_value_normalization_ab.py \
+  --mode verify \
+  --supervisor-root artifacts/analysis/calibrated_workflow_value_normalization_ab_launcher_20261009_v2 \
+  --allow-running
+```
+
+若返回 `running`，交接 `child_stdout.log`、`child_stderr.log` 与 `terminal_receipt.json` 路径后停止，不持续轮询。

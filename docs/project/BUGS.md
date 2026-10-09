@@ -901,3 +901,9 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - 2026-10-09 唯一授权后台启动报告 PID 后，在即时快照前结束；runner 未创建 run root，stderr/stdout 日志为 0 bytes，OS 级原因不可恢复。
 - 这不是算法失败，也不是训练结果；可观测 scientific steps/updates/checkpoints/evaluation rows 均为 0。
 - one-launch/no-retry 已耗尽，本轮禁止以 foreground、resume、新 PID 或新 output root 补跑。未来必须获得新的显式授权和新的 create-only run id。
+
+## IN REPAIR / persistent launcher v2
+
+- 新授权允许以新 run ID 独立执行，不恢复 v1；旧空日志和 failure receipt 保持不变，OS 退出原因仍为 unknown。
+- 风险控制改为 child-owned entry receipt + detached supervisor + exit/terminal sidecars。两次宿主验收任一未通过即停止，不以训练任务测试 launcher。
+- 此修复不改变 PopArt、reward、data、budget 或科学 gate；若 diff 出现科学变量变化，启动授权失效。

@@ -861,3 +861,5 @@ v3 interface-repair 职责增量：
 - `scripts/preflight_calibrated_workflow_value_normalization_ab.py`：clean tree、hash、raw interval、固定预算和六个 method×arm 最小更新验收。
 - `scripts/run_calibrated_workflow_value_normalization_ab.py`：唯一授权 development A/B；精确 interaction/update/optimizer 预算、dev-only checkpoint selection、暴露 split falsification 和 receipts。
 - `tests/test_popart_value_normalization.py`、`tests/test_calibrated_workflow_value_normalization_ab.py`：数值稳定、prediction invariance、checkpoint 兼容、预算、选模与 gate 回归。
+- `scripts/launch_calibrated_workflow_value_normalization_ab.py`：create-only detached supervisor；冻结解释器路径，child-owned runner-entry ACK，stdout/stderr、exit sidecar、terminal receipt、timeout 与无重试合同。
+- `tests/test_calibrated_workflow_value_normalization_launcher.py`：run ID、解释器字符串、成功/非零宿主 outcome 与无 retry plan 回归。

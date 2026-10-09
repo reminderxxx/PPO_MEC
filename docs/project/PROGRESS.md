@@ -2220,3 +2220,9 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - commit `5ee9f1e...` 已推送；preflight 通过，六个 method×arm 最小更新及身份、预算、raw interval 门槛均通过。
 - 唯一后台启动在 create-only run root 前结束；预期日志为 0 bytes，runner status/receipt 不存在，科学 steps/updates/checkpoints/evaluation rows=`0/0/0/0`。
 - 按无重试授权停止。没有 PopArt A/B 科学结果，不能改变诊断候选、论文 claim 或 paper-ready 状态。
+
+### v2 独立授权的 launcher 修复
+
+- 算法、奖励、数据、预算和否证门保持冻结；只新增 detached supervisor 与 child-owned runner-entry ACK。
+- launcher 固定原 venv path，独立保存 child stdout/stderr、exit sidecar 和 terminal receipt；科学 child 不自动 retry。
+- 新 run ID 为 `calibrated_workflow_value_normalization_ab_20261009_v2`。必须先通过恰好两次无训练宿主验收（成功/非零退出）和一次低成本 preflight 核对，才可单次启动。
