@@ -10,6 +10,12 @@
 - 在单独 A 工作树加入显式 opt-in `calibrated_workflow_interface_v4_prepared_state_prefix`；当前/公开预测目标的 state 存在、已完成前缀有效性和缺失比例均进入 PPO/MAPPO/DT flat 与 SA RSU 编码，旧 profile/旧 checkpoint 保持原语义，跨 profile load 显式拒绝。
 - B 原 `regression_08` SA 跨 seed 同公开 hash、同 action 的 `0/30.2107 s` 重算反例在新状态动作前分离；旧新相同动作序列的物理 transition、奖励、成本一致。目标链 21 test、smoke、语法及 diff 检查通过；0 训练、0 科学比较、0 旧 holdout 读取。参数量与本机推理计时见 `cscwd_prepared_state_prefix_interface_20261010.md`。B 需独立 preflight；SA 优势仍未验证。
 
+## 2026-10-09：长预算 SA 完成改善，但逾期/成本由重算主导；公共 prepared-state 不可辨识
+
+- B 长预算科学原件完成 `115,200` 步、400 episode/2,811 决策；后处理 Python 兼容故障使 supervisor terminal FAIL，科学完成回执仍为 complete，B 已单独修复后处理。本 A 分支只读重放 400/2,811 并逐步把九项代价加回原 step/episode，总计 200 个 SA−PPO/DT 配对；0 新训练、0 额外 checkpoint 前向/局部分支。
+- frozen SA `39/40` 完成、`5/40` 按期，PPO `40/40`、`4/40`，DT `40/40`、`11/40`；39 个双方完成配对上，SA−PPO 时延 `+28.39 s`（重算 `+39.15 s`，model network `+10.99 s`，fallback `−23.18 s`），SA−DT `+22.63 s`（重算 `+24.48 s`）。SA 97/121 个非 fallback handoff state 未就绪；重复模型准备和预测目标不匹配均非主导项。
+- 同一公开状态+action 的 10 组 handoff 记录出现不同 state readiness，含 1 组 SA 自身不同 seed；`prepared_state` 有效性未公开。唯一后续候选是所有 learned 方法共享的 prepared-state prefix validity/freshness 观察合同纠错，尚未实现/训练，不称创新。完整诊断见 `cscwd_sa_long_budget_cost_diagnosis_20261009.md`；论文与论文表未动。
+
 ## 2026-10-10：共同 prepared-state 可见性匹配训练协议冻结，等待独立验收
 
 - A 的长预算成本诊断确认共同公共状态别名：相同 observation/semantic/mask 与相同动作可能对应不同 state readiness/

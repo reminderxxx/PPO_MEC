@@ -9,6 +9,15 @@
 
 原 base config `configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json` 和 manifest 先照旧 hash 核验；仅新实验显式设置运行时 `interface_profile=calibrated_workflow_interface_v4_prepared_state_prefix`，由现有 `_build_agent` 同时给四 learned 方法启用匹配编码宽度。字段合同、参数量、旧新 checkpoint 拒绝和验收命令见 `cscwd_prepared_state_prefix_interface_20261010.md`。A 仅实现接口和合成测试；B 负责独立 preflight/匹配训练，此入口自身不启动训练、不读旧 holdout。
 
+## 长预算 SA 逾期/成本只读诊断（2026-10-09；已完成）
+
+事前规则和唯一完整报告在 `cscwd_sa_long_budget_cost_diagnosis_plan_20261009.md`、
+`cscwd_sa_long_budget_cost_diagnosis_20261009.md`。只读命令
+`scripts/diagnose_cscwd_sa_long_budget_cost.py --preflight` 与唯一 `--run` 已对 B 完成 400 episode/
+2,811 step 重放；`scripts/audit_cscwd_long_budget_state_alias.py` 的结论使用 create-only v2。
+本地两个诊断目录保留完整机器表/回执和 hash，不覆盖、不提交 checkpoint/大账本，不在 A 分支修 B。
+因已有轨迹足以定位，可选 checkpoint 前向 `0/1200`、局部分支 `0/12`；本入口不授权再训练或写论文。
+
 ## 因果强基线统一 4× 预算延长（2026-10-09；一次性）
 
 本 run 已完成，不得重跑。原 supervisor `FAIL` 是训练完成后的 Python 3.9 后处理异常；保留原失败现场。兼容修复只读

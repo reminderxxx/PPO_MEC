@@ -1,0 +1,579 @@
+{
+  "alias_summary_sha256": "86c77e1bc2fef95037f2ee3e2458173a2b87ef8082dbbfd0617c05ee9143f9ec",
+  "boundary": "consumed_development_only_no_paper_table_no_causal_rank_after_state_divergence",
+  "cost_machine_summary_sha256": "3845593ac4304b76620fa0065c16a9ffbfd1e8edca2e0440e66e08f6999a1483",
+  "cost_replay": {
+    "decisions": 2811,
+    "episodes": 400,
+    "local_branch_states": 0,
+    "new_policy_forward": 0,
+    "paired_rows": 200,
+    "training_steps": 0
+  },
+  "frozen_paired_summary": [
+    {
+      "both_completed": 39,
+      "both_completed_coverage": 0.975,
+      "comparator": "ppo",
+      "mean_delta_dag_recompute_all": 37.092794587517794,
+      "mean_delta_dag_recompute_both_completed": 39.1505106538644,
+      "mean_delta_failed_service_wait_all": 1.5,
+      "mean_delta_failed_service_wait_both_completed": 0.8205128205128205,
+      "mean_delta_input_network_all": -0.0522991202,
+      "mean_delta_input_network_both_completed": -0.051868376410256406,
+      "mean_delta_input_transfer_bytes_all": -749101.825,
+      "mean_delta_input_transfer_bytes_both_completed": -739148.8974358974,
+      "mean_delta_model_load_all": 0.5981051000000001,
+      "mean_delta_model_load_both_completed": 0.6282403076923078,
+      "mean_delta_model_network_all": 10.706401008,
+      "mean_delta_model_network_both_completed": 10.985905421128205,
+      "mean_delta_model_transfer_bytes_all": 487560923.6,
+      "mean_delta_model_transfer_bytes_both_completed": 500556944.4102564,
+      "mean_delta_modeled_completion_seconds_all": 26.418779012517792,
+      "mean_delta_modeled_completion_seconds_both_completed": 28.39488378801825,
+      "mean_delta_node_compute_all": -0.66626595,
+      "mean_delta_node_compute_both_completed": 0.0,
+      "mean_delta_state_network_all": 0.0333150872,
+      "mean_delta_state_network_both_completed": 0.0341693202051282,
+      "mean_delta_state_restore_all": 0.0067283,
+      "mean_delta_state_restore_both_completed": 0.006900820512820513,
+      "mean_delta_state_transfer_bytes_all": 127117.9,
+      "mean_delta_state_transfer_bytes_both_completed": 130377.33333333333,
+      "mean_delta_vehicle_fallback_all": -22.8,
+      "mean_delta_vehicle_fallback_both_completed": -23.17948717948718,
+      "pairs": 40,
+      "peer_completed": 40,
+      "peer_on_time": 4,
+      "sa_completed": 39,
+      "sa_on_time": 5,
+      "split": "frozen_check"
+    },
+    {
+      "both_completed": 39,
+      "both_completed_coverage": 0.975,
+      "comparator": "dt_handoff_drl",
+      "mean_delta_dag_recompute_all": 22.789746455668507,
+      "mean_delta_dag_recompute_both_completed": 24.480717698121545,
+      "mean_delta_failed_service_wait_all": 1.45,
+      "mean_delta_failed_service_wait_both_completed": 0.7692307692307693,
+      "mean_delta_input_network_all": 0.0138790304,
+      "mean_delta_input_network_both_completed": 0.016006649846153846,
+      "mean_delta_input_transfer_bytes_all": 204563.3,
+      "mean_delta_input_transfer_bytes_both_completed": 238969.1794871795,
+      "mean_delta_model_load_all": -0.36785515,
+      "mean_delta_model_load_both_completed": -0.36248815384615385,
+      "mean_delta_model_network_all": -1.8078672271999998,
+      "mean_delta_model_network_both_completed": -1.8492414867692306,
+      "mean_delta_model_transfer_bytes_all": -173924596.2,
+      "mean_delta_model_transfer_bytes_both_completed": -177889742.56410256,
+      "mean_delta_modeled_completion_seconds_all": 20.79783361786851,
+      "mean_delta_modeled_completion_seconds_both_completed": 22.629811588377958,
+      "mean_delta_node_compute_all": -0.66626595,
+      "mean_delta_node_compute_both_completed": 0.0,
+      "mean_delta_state_network_all": -0.011707840999999998,
+      "mean_delta_state_network_both_completed": -0.01200804205128205,
+      "mean_delta_state_restore_all": -0.0020957,
+      "mean_delta_state_restore_both_completed": -0.002149435897435897,
+      "mean_delta_state_transfer_bytes_all": -51212.125,
+      "mean_delta_state_transfer_bytes_both_completed": -52525.256410256414,
+      "mean_delta_vehicle_fallback_all": -0.6,
+      "mean_delta_vehicle_fallback_both_completed": -0.41025641025641024,
+      "pairs": 40,
+      "peer_completed": 40,
+      "peer_on_time": 11,
+      "sa_completed": 39,
+      "sa_on_time": 5,
+      "split": "frozen_check"
+    }
+  ],
+  "frozen_seed_results": [
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 8,
+      "frozen_on_time": 0,
+      "mean_dag_recompute_seconds": 66.50795562655723,
+      "mean_model_network_seconds": 0.0,
+      "mean_vehicle_fallback_seconds": 14.0,
+      "method": "sa_ghmappo",
+      "seed": "7"
+    },
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 6,
+      "frozen_on_time": 2,
+      "mean_dag_recompute_seconds": 56.191048525633185,
+      "mean_model_network_seconds": 18.369724520000002,
+      "mean_vehicle_fallback_seconds": 0.0,
+      "method": "sa_ghmappo",
+      "seed": "17"
+    },
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 7,
+      "frozen_on_time": 1,
+      "mean_dag_recompute_seconds": 72.24047900483097,
+      "mean_model_network_seconds": 16.600715104000002,
+      "mean_vehicle_fallback_seconds": 0.0,
+      "method": "sa_ghmappo",
+      "seed": "29"
+    },
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 6,
+      "frozen_on_time": 2,
+      "mean_dag_recompute_seconds": 56.191048525633185,
+      "mean_model_network_seconds": 18.369724520000002,
+      "mean_vehicle_fallback_seconds": 0.0,
+      "method": "sa_ghmappo",
+      "seed": "43"
+    },
+    {
+      "frozen_completed": 7,
+      "frozen_incomplete": 1,
+      "frozen_late_completed": 7,
+      "frozen_on_time": 0,
+      "mean_dag_recompute_seconds": 68.5095198264699,
+      "mean_model_network_seconds": 20.61955128,
+      "mean_vehicle_fallback_seconds": 7.0,
+      "method": "sa_ghmappo",
+      "seed": "61"
+    },
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 7,
+      "frozen_on_time": 1,
+      "mean_dag_recompute_seconds": 8.496757520895583,
+      "mean_model_network_seconds": 0.012141944,
+      "mean_vehicle_fallback_seconds": 36.0,
+      "method": "ppo",
+      "seed": "7"
+    },
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 8,
+      "frozen_on_time": 0,
+      "mean_dag_recompute_seconds": 79.08406752003837,
+      "mean_model_network_seconds": 18.369724520000002,
+      "mean_vehicle_fallback_seconds": 0.0,
+      "method": "ppo",
+      "seed": "17"
+    },
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 7,
+      "frozen_on_time": 1,
+      "mean_dag_recompute_seconds": 1.348691625,
+      "mean_model_network_seconds": 0.024283888,
+      "mean_vehicle_fallback_seconds": 40.0,
+      "method": "ppo",
+      "seed": "29"
+    },
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 7,
+      "frozen_on_time": 1,
+      "mean_dag_recompute_seconds": 19.376203437593375,
+      "mean_model_network_seconds": 0.0,
+      "mean_vehicle_fallback_seconds": 38.0,
+      "method": "ppo",
+      "seed": "43"
+    },
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 7,
+      "frozen_on_time": 1,
+      "mean_dag_recompute_seconds": 25.870358468008174,
+      "mean_model_network_seconds": 2.021560032,
+      "mean_vehicle_fallback_seconds": 21.0,
+      "method": "ppo",
+      "seed": "61"
+    },
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 6,
+      "frozen_on_time": 2,
+      "mean_dag_recompute_seconds": 40.40902055418935,
+      "mean_model_network_seconds": 21.777216656,
+      "mean_vehicle_fallback_seconds": 2.0,
+      "method": "dt_handoff_drl",
+      "seed": "7"
+    },
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 5,
+      "frozen_on_time": 3,
+      "mean_dag_recompute_seconds": 42.25865496494365,
+      "mean_model_network_seconds": 18.60164156,
+      "mean_vehicle_fallback_seconds": 0.0,
+      "method": "dt_handoff_drl",
+      "seed": "17"
+    },
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 7,
+      "frozen_on_time": 1,
+      "mean_dag_recompute_seconds": 53.618316822925784,
+      "mean_model_network_seconds": 20.8007586,
+      "mean_vehicle_fallback_seconds": 0.0,
+      "method": "dt_handoff_drl",
+      "seed": "29"
+    },
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 5,
+      "frozen_on_time": 3,
+      "mean_dag_recompute_seconds": 43.817824489623575,
+      "mean_model_network_seconds": 18.770706936,
+      "mean_vehicle_fallback_seconds": 0.0,
+      "method": "dt_handoff_drl",
+      "seed": "43"
+    },
+    {
+      "frozen_completed": 8,
+      "frozen_incomplete": 0,
+      "frozen_late_completed": 6,
+      "frozen_on_time": 2,
+      "mean_dag_recompute_seconds": 25.587502399099584,
+      "mean_model_network_seconds": 3.0487278079999998,
+      "mean_vehicle_fallback_seconds": 22.0,
+      "method": "dt_handoff_drl",
+      "seed": "61"
+    }
+  ],
+  "sa_selection": [
+    {
+      "candidate_dev_on_time": [
+        0.75,
+        0.75,
+        0.75,
+        0.75
+      ],
+      "candidate_updates": [
+        24,
+        48,
+        72,
+        96
+      ],
+      "method": "sa_ghmappo",
+      "seed": "7",
+      "selected_dev_completion": 1.0,
+      "selected_dev_elapsed": 56.64726312685192,
+      "selected_dev_on_time": 0.75,
+      "selected_dev_transfer_mb": 0.780857,
+      "selected_update": 48
+    },
+    {
+      "candidate_dev_on_time": [
+        0.25,
+        0.75,
+        0.75,
+        0.5
+      ],
+      "candidate_updates": [
+        24,
+        48,
+        72,
+        96
+      ],
+      "method": "sa_ghmappo",
+      "seed": "17",
+      "selected_dev_completion": 1.0,
+      "selected_dev_elapsed": 54.80817508445634,
+      "selected_dev_on_time": 0.75,
+      "selected_dev_transfer_mb": 587.86037775,
+      "selected_update": 72
+    },
+    {
+      "candidate_dev_on_time": [
+        0.25,
+        0.75,
+        0.75,
+        0.5
+      ],
+      "candidate_updates": [
+        24,
+        48,
+        72,
+        96
+      ],
+      "method": "sa_ghmappo",
+      "seed": "29",
+      "selected_dev_completion": 1.0,
+      "selected_dev_elapsed": 57.084579547456336,
+      "selected_dev_on_time": 0.75,
+      "selected_dev_transfer_mb": 587.8641825,
+      "selected_update": 48
+    },
+    {
+      "candidate_dev_on_time": [
+        0.5,
+        0.75,
+        0.75,
+        0.75
+      ],
+      "candidate_updates": [
+        24,
+        48,
+        72,
+        96
+      ],
+      "method": "sa_ghmappo",
+      "seed": "43",
+      "selected_dev_completion": 1.0,
+      "selected_dev_elapsed": 54.52827558445634,
+      "selected_dev_on_time": 0.75,
+      "selected_dev_transfer_mb": 626.4180465,
+      "selected_update": 48
+    },
+    {
+      "candidate_dev_on_time": [
+        0.75,
+        0.5,
+        0.75,
+        0.75
+      ],
+      "candidate_updates": [
+        24,
+        48,
+        72,
+        96
+      ],
+      "method": "sa_ghmappo",
+      "seed": "61",
+      "selected_dev_completion": 1.0,
+      "selected_dev_elapsed": 57.815296540950385,
+      "selected_dev_on_time": 0.75,
+      "selected_dev_transfer_mb": 1474.708925,
+      "selected_update": 24
+    }
+  ],
+  "schema_version": "cscwd_sa_long_budget_cost_small_summary_v1",
+  "scientific_commit": "d25ebcded6b43b69b82bae825b035adc1d6f19c4",
+  "source_run_id": "cscwd_causal_strong_baselines_budget_extension_20261009_v1",
+  "split_results": [
+    {
+      "completed": 60,
+      "completed_coverage": 1.0,
+      "component_mean_seconds_all": {
+        "dag_recompute": 30.78646583674412,
+        "failed_service_wait": 0.7666666666666667,
+        "input_network": 0.0529229308,
+        "model_load": 0.7881968333333333,
+        "model_network": 10.888940918400001,
+        "node_compute": 29.3250245,
+        "state_network": 0.04739163506666667,
+        "state_restore": 0.008971066666666668,
+        "vehicle_fallback": 3.2
+      },
+      "episodes": 60,
+      "input_mb_mean_all": 0.5835716833333333,
+      "mean_elapsed_all_seconds": 75.86458038767745,
+      "mean_elapsed_completed_seconds": 75.86458038767745,
+      "method": "sa_ghmappo",
+      "model_mb_mean_all": 645.4158809333333,
+      "on_time": 31,
+      "split": "regression",
+      "state_mb_mean_all": 0.22953305
+    },
+    {
+      "completed": 39,
+      "completed_coverage": 0.975,
+      "component_mean_seconds_all": {
+        "dag_recompute": 63.9280103018249,
+        "failed_service_wait": 1.5,
+        "input_network": 0.0750263352,
+        "model_load": 0.9191488,
+        "model_network": 14.791943084800002,
+        "node_compute": 28.2184518,
+        "state_network": 0.0333150872,
+        "state_restore": 0.0067283,
+        "vehicle_fallback": 4.2
+      },
+      "episodes": 40,
+      "input_mb_mean_all": 0.9934212,
+      "mean_elapsed_all_seconds": 113.67262370902489,
+      "mean_elapsed_completed_seconds": 115.86935765028194,
+      "method": "sa_ghmappo",
+      "model_mb_mean_all": 681.7953368,
+      "on_time": 5,
+      "split": "frozen_check",
+      "state_mb_mean_all": 0.1271179
+    },
+    {
+      "completed": 60,
+      "completed_coverage": 1.0,
+      "component_mean_seconds_all": {
+        "dag_recompute": 16.586374635416973,
+        "failed_service_wait": 0.0,
+        "input_network": 0.1028139676,
+        "model_load": 0.3298572,
+        "model_network": 3.5704365397333335,
+        "node_compute": 29.3250245,
+        "state_network": 0.0,
+        "state_restore": 0.0,
+        "vehicle_fallback": 25.466666666666665
+      },
+      "episodes": 60,
+      "input_mb_mean_all": 1.16216375,
+      "mean_elapsed_all_seconds": 75.38117350941697,
+      "mean_elapsed_completed_seconds": 75.38117350941697,
+      "method": "ppo",
+      "model_mb_mean_all": 265.92535626666665,
+      "on_time": 23,
+      "split": "regression",
+      "state_mb_mean_all": 0.0
+    },
+    {
+      "completed": 40,
+      "completed_coverage": 1.0,
+      "component_mean_seconds_all": {
+        "dag_recompute": 26.8352157143071,
+        "failed_service_wait": 0.0,
+        "input_network": 0.1273254554,
+        "model_load": 0.3210437,
+        "model_network": 4.0855420768,
+        "node_compute": 28.88471775,
+        "state_network": 0.0,
+        "state_restore": 0.0,
+        "vehicle_fallback": 27.0
+      },
+      "episodes": 40,
+      "input_mb_mean_all": 1.742523025,
+      "mean_elapsed_all_seconds": 87.2538446965071,
+      "mean_elapsed_completed_seconds": 87.2538446965071,
+      "method": "ppo",
+      "model_mb_mean_all": 194.23441319999998,
+      "on_time": 4,
+      "split": "frozen_check",
+      "state_mb_mean_all": 0.0
+    },
+    {
+      "completed": 60,
+      "completed_coverage": 1.0,
+      "component_mean_seconds_all": {
+        "dag_recompute": 24.14409217679883,
+        "failed_service_wait": 0.1,
+        "input_network": 0.046715766,
+        "model_load": 1.1850429500000002,
+        "model_network": 13.48134984,
+        "node_compute": 29.3250245,
+        "state_network": 0.05452308426666667,
+        "state_restore": 0.010294666666666667,
+        "vehicle_fallback": 4.666666666666667
+      },
+      "episodes": 60,
+      "input_mb_mean_all": 0.51931935,
+      "mean_elapsed_all_seconds": 73.01370965039882,
+      "mean_elapsed_completed_seconds": 73.01370965039882,
+      "method": "dt_handoff_drl",
+      "model_mb_mean_all": 963.8602185333333,
+      "on_time": 34,
+      "split": "regression",
+      "state_mb_mean_all": 0.26092153333333334
+    },
+    {
+      "completed": 40,
+      "completed_coverage": 1.0,
+      "component_mean_seconds_all": {
+        "dag_recompute": 41.138263846156384,
+        "failed_service_wait": 0.05,
+        "input_network": 0.061147304799999996,
+        "model_load": 1.2870039500000001,
+        "model_network": 16.599810312,
+        "node_compute": 28.88471775,
+        "state_network": 0.0450229282,
+        "state_restore": 0.008824,
+        "vehicle_fallback": 4.8
+      },
+      "episodes": 40,
+      "input_mb_mean_all": 0.7888579,
+      "mean_elapsed_all_seconds": 92.87479009115638,
+      "mean_elapsed_completed_seconds": 92.87479009115638,
+      "method": "dt_handoff_drl",
+      "model_mb_mean_all": 855.719933,
+      "on_time": 11,
+      "split": "frozen_check",
+      "state_mb_mean_all": 0.178330025
+    },
+    {
+      "completed": 60,
+      "completed_coverage": 1.0,
+      "component_mean_seconds_all": {
+        "dag_recompute": 25.895838257886318,
+        "failed_service_wait": 0.4,
+        "input_network": 0.032741898,
+        "model_load": 1.54105745,
+        "model_network": 17.946088005333333,
+        "node_compute": 29.3250245,
+        "state_network": 0.07604631013333334,
+        "state_restore": 0.014486066666666667,
+        "vehicle_fallback": 0.0
+      },
+      "episodes": 60,
+      "input_mb_mean_all": 0.3572429166666667,
+      "mean_elapsed_all_seconds": 75.23128248801966,
+      "mean_elapsed_completed_seconds": 75.23128248801966,
+      "method": "mappo",
+      "model_mb_mean_all": 1341.448278,
+      "on_time": 35,
+      "split": "regression",
+      "state_mb_mean_all": 0.34453276666666666
+    },
+    {
+      "completed": 40,
+      "completed_coverage": 1.0,
+      "component_mean_seconds_all": {
+        "dag_recompute": 47.10822305811783,
+        "failed_service_wait": 0.45,
+        "input_network": 0.0467493506,
+        "model_load": 1.6502932000000001,
+        "model_network": 21.656305896,
+        "node_compute": 28.88471775,
+        "state_network": 0.0667920984,
+        "state_restore": 0.013236,
+        "vehicle_fallback": 0.2
+      },
+      "episodes": 40,
+      "input_mb_mean_all": 0.592968625,
+      "mean_elapsed_all_seconds": 100.07631735311783,
+      "mean_elapsed_completed_seconds": 100.07631735311783,
+      "method": "mappo",
+      "model_mb_mean_all": 1202.208221,
+      "on_time": 8,
+      "split": "frozen_check",
+      "state_mb_mean_all": 0.23792429999999998
+    }
+  ],
+  "state_alias": {
+    "mixed_public_state_action_groups": 10,
+    "sa_frozen_handoff": {
+      "no_prior_state_prepare": 91,
+      "offloaded_handoffs": 121,
+      "positive_recompute": 85,
+      "stale_after_node_progress": 6,
+      "state_not_ready": 97,
+      "state_ready": 24
+    },
+    "sa_frozen_immediate_prior_opportunity": {
+      "matching_prior_target": 79,
+      "prior_action_0": 5,
+      "prior_action_2": 2,
+      "prior_action_3": 15,
+      "prior_publicly_ready_and_preview_committed": 22
+    },
+    "within_sa_groups": 1
+  }
+}
