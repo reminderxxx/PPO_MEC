@@ -1,0 +1,41 @@
+{
+  "schema_version": "calibrated_workflow_strong_baselines_development_v1",
+  "execution_authorized": false,
+  "scope": "consumed_36_instance_development_only",
+  "base_config": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json",
+  "workload_manifest": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+  "reward_profile": "original_reward_v1",
+  "critic_target_normalization": "raw_disabled",
+  "learned_methods": ["sa_ghmappo", "mappo", "ppo", "dt_handoff_drl"],
+  "heuristic_methods": ["popularity_cache_heuristic"],
+  "model_based_methods": ["two_step_cost_rule"],
+  "seeds": [7, 17, 29, 43, 61],
+  "training": {
+    "environment_steps_per_method_seed": 1440,
+    "transitions_per_update": 60,
+    "update_opportunities_per_method_seed": 24,
+    "ppo_epochs_per_update": 4,
+    "minibatch_size": 32,
+    "expected_optimizer_steps_per_method_seed": 192,
+    "checkpoint_update_candidates": [6, 12, 18, 24],
+    "hyperparameter_search_trials_per_method": 0,
+    "episode_max_steps": 24,
+    "evaluation_splits": ["regression", "frozen_check"],
+    "automatic_retry": false
+  },
+  "capability_labels": {
+    "dt_handoff_drl": "project_native_literature_inspired_digital_twin_ppo_not_exact_paper_reproduction",
+    "popularity_cache_heuristic": "prediction_aware_stateful_nonlearning_heuristic_reset_per_instance",
+    "two_step_cost_rule": "exact_transition_model_based_two_step_planner"
+  },
+  "claim_boundary": {
+    "formal": false,
+    "holdout": false,
+    "independent_test": false,
+    "scientific_execution_authorized": false,
+    "popart_promoted": false,
+    "old_holdout_reads": 0,
+    "real_model_calls": 0,
+    "downloads": 0
+  }
+}

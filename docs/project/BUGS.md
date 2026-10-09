@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-09：强基线工程已接通，科学公平性和独立数据仍开放
+
+- `OPEN / method fairness`：仅完成 synthetic fixture 的公共输入、mask、DT checkpoint 与 Popularity 逐实例 reset 验收；尚无四 learned 方法完整开发比较、逐字段预测权限核对、完整计算成本或基线排序。默认 `--run` 禁止，不能从接线成功推断算法优势。
+- `OPEN / data independence`：36-instance manifest 全部已消费为开发，尚无跨 run/车辆独立的新确认性 split；旧 holdout 不重开。详见 `cscwd_2027_strong_baseline_wiring_20261009.md`。
+- `BOUNDARY / PopArt`：下文“尚未实现/未训练”保留为当时诊断记录；B 的开发 A/B 后续已执行，本分支未审查其科学原件或把 PopArt 晋级。raw/disabled 仍为新基线草案默认。
+
 ## 2026-10-09：critic 尺度与共享裁剪为首选候选，因果仍待匹配 A/B（OPEN LEARNING BLOCKER）
 
 - `NO IMPLEMENTATION DEFECT CONFIRMED`：当前 hash-matched 版本的 termination、bootstrap observation、episode GAE 和

@@ -5,6 +5,13 @@
 
 # Runbook
 
+## CSCWD 强基线开发链接线（2026-10-09；未授权科学执行）
+
+公共入口与能力/预算边界见 `cscwd_2027_strong_baseline_wiring_20261009.md`。`--preflight` 只读既有
+config/manifest 的 hash 与区间身份；默认设计 `execution_authorized=false`。`--run` 必须在另行冻结
+scientific commit、同能力/预算、B 结果取舍和唯一新 output root 后明确授权。当前不得用于正式训练、
+真实开发比较或新 holdout；只允许合成 fixture 的局部验收。旧 service 和 PopArt runner 保持原身份。
+
 ## 服务奖励学习环节只读诊断（2026-10-09；已完成，不得覆盖）
 
 ```bash

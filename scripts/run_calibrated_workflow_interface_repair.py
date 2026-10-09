@@ -99,7 +99,7 @@ def _build_agent(
         "train_epochs": 4,
         "deterministic_action": False,
     }
-    if method in {"sa_ghmappo", "mappo"}:
+    if method in {"sa_ghmappo", "mappo", "dt_handoff_drl"}:
         interface = config["learning_interface"]
         kwargs.update(
             {
@@ -454,7 +454,7 @@ def _run_evaluation_episode(
 def _evaluate_agent(
     agent: Any,
     method: str,
-    seed: int,
+    seed: int | None,
     config: dict[str, Any],
     instances: list[dict[str, Any]],
     step_cap: int,

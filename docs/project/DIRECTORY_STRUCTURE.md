@@ -1,5 +1,12 @@
 ﻿# Directory Structure
 
+## 2026-10-09 CSCWD 强基线开发链接线
+
+- `scripts/run_calibrated_workflow_strong_baselines.py`：复用冻结 service/PPO 采样及评价消费者的 guarded 开发比较入口；默认仅可只读 preflight。
+- `configs/experiment/calibrated_workflow_strong_baselines_development_v1.json`：未授权的 raw critic、同预算草案；仅指向已消费的 36-instance 开发 manifest。
+- `tests/test_calibrated_workflow_strong_baselines.py`：完全合成实例的 DT 训练/选模/checkpoint 与 Popularity 逐实例重置验收。
+- `docs/project/cscwd_2027_strong_baseline_wiring_20261009.md`：能力标签、预算、开发命令草案与 claim 边界。
+
 ## 2026-10-09 service-reward learning diagnosis
 
 - `scripts/diagnose_calibrated_workflow_service_reward_learning.py`：create-only 只读重放、value/GAE 重算、固定 dev 梯度尺度与

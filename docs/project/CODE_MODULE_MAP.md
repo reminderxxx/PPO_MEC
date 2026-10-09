@@ -1,5 +1,10 @@
 # Code Module Map
 
+`scripts/run_calibrated_workflow_strong_baselines.py` 作为 CSCWD 开发比较的 guarded 编排层，复用
+`run_calibrated_workflow_interface_repair.py` 的构建/评价、`run_calibrated_workflow_value_normalization_ab.py`
+的精确 transition 采样/区间验证，以及现有 service analyzer 的通用 summary/seed 消费函数；
+`src/agents/` 的算法职责与 `src/envs/` 的动作/奖励职责不变。
+
 ## 2026-10-09 service-reward learning diagnosis
 
 - `scripts/diagnose_calibrated_workflow_service_reward_learning.py` → service-reward v2 rows / local checkpoints / calibrated env：

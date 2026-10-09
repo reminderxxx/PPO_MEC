@@ -1,5 +1,10 @@
 ﻿# Decision Log
 
+## 2026-10-09：强基线接线与科学执行分开
+
+- 决定：DT/Popularity 使用新 guarded 开发入口与旧公共 env/registry/evaluator；原 service/PopArt 冻结实验入口不改变。DT 是项目原生、受文献启发的 PPO，不称精确复现；Popularity 每实例重置计数且无训练 seed/checkpoint；two-step 保留 exact-transition 能力标签。
+- 四种 learned PPO 仅在同一环境步数、更新机会、选模机会下提出待批准草案，实际 optimizer steps、参数量和耗时逐方法留证。PopArt 默认 raw/disabled，另行审查前不晋级。旧 36 实例只作开发；本轮不授权真实训练或评价矩阵。
+
 ## 2026-10-09：不作实现修复，只冻结 PopArt critic 单变量候选
 
 - 决定：termination、final observation bootstrap、episode-local GAE 和 executed-action loss 在实际执行版本未发现缺陷，

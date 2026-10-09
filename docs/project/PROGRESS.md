@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-09：DT/Popularity 强基线开发链已接通，未运行科学比较
+
+- B 的 PopArt 开发 A/B 已执行完；本分支只保留 raw/disabled 默认与 opt-in 接口，等待 B 独立审查结论，不据训练完成推断机制有效或方法晋级。
+- 以 B 的 `858bc79` 冻结接口为基线，新增 guarded runner 与未授权配置；DT 接入与 SA/MAPPO 同一 `independent_heads_executed_env_v2` 构造参数，复用精确 transition 采样、dev 选模、checkpoint/hash 和公共评价链；Popularity 每个独立实例新建 agent，只有规则结果和行为原件，无训练 seed/checkpoint。two-step 能力标签保留。
+- 完全合成 fixture 仅执行 4 个 DT 验收 transition/1 次更新/4 个 optimizer-step receipt；旧 service/PopArt 局部测试共同通过。只读 preflight 确认现有 manifest 12/4/12/8、区间身份齐全且内部无重叠；科学新 run、真实评估、holdout 均为 0。预算与限制见 `cscwd_2027_strong_baseline_wiring_20261009.md`。
+
 ## 2026-10-09：服务奖励退化定位到 critic 尺度/共享裁剪候选；未确认实现错误
 
 - 以 `70a83af` 和 service-reward v2 原件为基线，核验 90 个本地 checkpoint hash，按 committed executed-action ledger
