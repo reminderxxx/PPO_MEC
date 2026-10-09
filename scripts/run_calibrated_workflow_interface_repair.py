@@ -363,6 +363,15 @@ def _run_evaluation_episode(
                 "node_id": transition.get("node_id"),
                 "current_rsu_id": current_rsu_id,
                 "target_rsu_id": target_rsu_id,
+                "prediction_provenance": json.dumps(
+                    semantic.get("predictions", {}).get("causal_provenance", {}), sort_keys=True
+                ),
+                "predicted_next_rsu_id": semantic.get("predictions", {}).get("predicted_next_rsu_by_vehicle", {}).get("veh_pilot"),
+                "actual_next_rsu_id": (
+                    instance["rsu_sequence"][min(int(transition.get("step_index", 0)) + 1, len(instance["rsu_sequence"]) - 1)]
+                    if semantic.get("interface_profile") == "calibrated_workflow_interface_v3_prefix_only"
+                    else None
+                ),
                 "current_bundle_ready": current_ready,
                 "target_bundle_ready": target_ready,
                 "target_prepare_feasible": target_prepare_feasible,

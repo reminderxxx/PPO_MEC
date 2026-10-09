@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from scripts.analyze_calibrated_workflow_service_reward_alignment import _seed_rows, _summary_rows
+from scripts.analyze_calibrated_workflow_strong_baselines import METRICS
 from scripts.freeze_calibrated_continuous_workflow_pilot import _load_experiment_config
 from scripts.run_calibrated_workflow_strong_baselines import (
     _annotate_rows,
@@ -20,6 +21,7 @@ from scripts.run_calibrated_workflow_strong_baselines import (
 )
 from scripts.run_calibrated_workflow_interface_repair import _evaluate_rule
 from src.envs.core.calibrated_continuous_workflow_env import CalibratedContinuousWorkflowEnv
+from src.envs.core.causal_rsu_predictor import fit_predictor, forecast
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -103,6 +105,31 @@ def config() -> dict:
     return resolved
 
 
+def test_prefix_only_forecast_is_suffix_invariant_and_unknown_explicit(config: dict) -> None:
+    model = fit_predictor([
+        ["rsu_0", "rsu_0", "rsu_1", "rsu_1"],
+        ["rsu_0", "rsu_0", "rsu_1", "rsu_0"],
+    ])
+    assert forecast(["rsu_0"], model, 3)["sequence"][:2] == ["rsu_0", "rsu_1"]
+    assert forecast(["unseen"], model, 3)["status"] == "unknown"
+    config["interface_profile"] = "calibrated_workflow_interface_v3_prefix_only"
+    left = _synthetic_instance("train", 1)
+    right = deepcopy(left)
+    left["causal_predictor_model"] = model
+    right["causal_predictor_model"] = model
+    right["rsu_sequence"][1:] = ["rsu_1"] * 7
+    left_env = CalibratedContinuousWorkflowEnv(config, left)
+    right_env = CalibratedContinuousWorkflowEnv(config, right)
+    left_obs, left_info = left_env.reset()
+    right_obs, right_info = right_env.reset()
+    assert left_obs.tolist() == right_obs.tolist()
+    assert left_info["semantic_state"] == right_info["semantic_state"]
+    assert left_info["action_mask"] == right_info["action_mask"]
+    assert left_info["semantic_state"]["predictions"]["causal_provenance"]["prefix_end_index"] == 0
+    assert left_env._physical_contact_budget_seconds() != right_env._physical_contact_budget_seconds()
+    assert left_env.clone_for_decision_model()._physical_contact_budget_seconds() == right_env.clone_for_decision_model()._physical_contact_budget_seconds()
+
+
 def test_dt_shared_observation_mask_and_checkpoint(config: dict, tmp_path: Path) -> None:
     instance = _synthetic_instance("train", 1)
     env = CalibratedContinuousWorkflowEnv(config, instance)
@@ -172,6 +199,31 @@ def test_dt_one_synthetic_update_through_common_artifact_chain(config: dict, tmp
     assert all(row["source_time_start"] and row["source_time_end"] for row in saved)
     assert len(_summary_rows(combined)) == 4
     assert len(_seed_rows(combined)) == 2
+
+
+def test_prefix_only_dt_cell_records_train_and_eval_provenance(config: dict, tmp_path: Path) -> None:
+    config["interface_profile"] = "calibrated_workflow_interface_v3_prefix_only"
+    model = fit_predictor([_synthetic_instance("train", index)["rsu_sequence"] for index in (1, 2)])
+    splits = {
+        split: [{**_synthetic_instance(split, index), "causal_predictor_model": model}]
+        for split, index in (("train", 1), ("dev", 2), ("regression", 3), ("frozen_check", 4))
+    }
+    protocol = {
+        "transitions_per_update": 4, "update_opportunities_per_method_seed": 1,
+        "environment_steps_per_method_seed": 4, "ppo_epochs_per_update": 4,
+        "minibatch_size": 32, "expected_optimizer_steps_per_method_seed": 4,
+        "checkpoint_update_candidates": [1], "episode_max_steps": 8,
+        "evaluation_splits": ["regression", "frozen_check"],
+    }
+    result = _run_learned_cell(
+        method="dt_handoff_drl", seed=7, config=config, splits=splits,
+        protocol=protocol, checkpoints=tmp_path / "checkpoints",
+        reward_profile="original_reward_v1", popart_enabled=False,
+    )
+    assert len(result["training_signals"]) == 4
+    assert all(json.loads(row["prediction_provenance"])["predictor_sha256"] == model["sha256"] for row in result["training_signals"])
+    assert all(json.loads(row["prediction_provenance"])["predictor_sha256"] == model["sha256"] for row in result["behavior_rows"])
+    assert set(METRICS).issubset(result["evaluation_rows"][0])
 
 
 def test_popularity_resets_for_every_synthetic_instance(config: dict) -> None:

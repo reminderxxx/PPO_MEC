@@ -16,6 +16,7 @@ from typing import Any
 import numpy as np
 
 from src.envs.specs.action_schema import ActionMaskBuilder
+from src.envs.core.causal_rsu_predictor import forecast
 
 
 ACTION_NAMES = {
@@ -195,7 +196,7 @@ class CalibratedContinuousWorkflowEnv:
             event["cache_events"].append(cache_event)
             if cache_event["committed"]:
                 transfer_seconds = self._model_transfer_seconds(cache_event)
-                if transfer_seconds <= self._contact_budget_seconds():
+                if transfer_seconds <= self._physical_contact_budget_seconds():
                     model_bytes += int(cache_event["transfer_bytes"])
                     model_load_seconds += float(cache_event["load_seconds"])
                 else:
@@ -214,7 +215,7 @@ class CalibratedContinuousWorkflowEnv:
                 self._effective_link_mbps(),
                 float(self.config["link"]["fixed_seconds"]),
             ) + float(self.config["measured_time_seconds"]["state_restore_overhead"])
-            if cache_event["committed"] and model_prepare_seconds + state_prepare_seconds <= self._contact_budget_seconds():
+            if cache_event["committed"] and model_prepare_seconds + state_prepare_seconds <= self._physical_contact_budget_seconds():
                 model_bytes += int(cache_event["transfer_bytes"])
                 model_load_seconds += float(cache_event["load_seconds"])
                 staged_migration = {
@@ -439,6 +440,8 @@ class CalibratedContinuousWorkflowEnv:
         return str(sequence[min(self._mobility_index(), len(sequence) - 1)])
 
     def _predicted_sequence(self) -> list[str]:
+        if self._causal_prediction_enabled():
+            return list(self._causal_forecast()["sequence"])
         sequence = self.instance.get("predicted_rsu_sequence", self.instance["rsu_sequence"])
         horizon = int(self.config["prediction_horizon"])
         start = min(self._mobility_index(), len(sequence) - 1)
@@ -449,6 +452,20 @@ class CalibratedContinuousWorkflowEnv:
             values.append(values[-1])
         return values
 
+    def _causal_prediction_enabled(self) -> bool:
+        return self.config.get("interface_profile") == "calibrated_workflow_interface_v3_prefix_only"
+
+    def _causal_forecast(self) -> dict[str, Any]:
+        if not self._causal_prediction_enabled():
+            raise RuntimeError("causal forecast requested outside v3 profile")
+        if "causal_predictor_model" not in self.instance:
+            raise RuntimeError("causal predictor model is missing")
+        index = self._mobility_index()
+        # A decision after the trajectory ends may see its current RSU but
+        # cannot infer the trajectory length or its suffix from this input.
+        prefix = self.instance["rsu_sequence"][: index + 1]
+        return forecast(prefix, self.instance["causal_predictor_model"], int(self.config["prediction_horizon"]))
+
     def _predicted_handoff_target(self) -> str | None:
         current = self._current_rsu_id()
         for candidate in self._predicted_sequence():
@@ -457,11 +474,26 @@ class CalibratedContinuousWorkflowEnv:
         return None
 
     def _contact_budget_seconds(self) -> float:
+        if self._causal_prediction_enabled() and not self._predicted_sequence():
+            return 0.0
         current = self._current_rsu_id()
         countdown = 1
         for index, candidate in enumerate(self._predicted_sequence(), start=1):
             if candidate != current:
                 countdown = index
+                break
+        return float(countdown) * float(self.config["mobility_abstraction"]["decision_step_seconds"])
+
+    def _physical_contact_budget_seconds(self) -> float:
+        if not self._causal_prediction_enabled() or self._decision_model_mode:
+            return self._contact_budget_seconds()
+        sequence = self.instance["rsu_sequence"]
+        index = min(self._mobility_index(), len(sequence) - 1)
+        current = str(sequence[index])
+        countdown = 1
+        for offset, candidate in enumerate(sequence[index + 1 : index + 1 + int(self.config["prediction_horizon"])], start=1):
+            if str(candidate) != current:
+                countdown = offset
                 break
         return float(countdown) * float(self.config["mobility_abstraction"]["decision_step_seconds"])
 
@@ -763,15 +795,15 @@ class CalibratedContinuousWorkflowEnv:
             )
         predictions = {
             "next_rsu_sequence": {"veh_pilot": predicted_sequence},
-            "predicted_next_rsu_by_vehicle": {"veh_pilot": predicted_sequence[0]},
+            "predicted_next_rsu_by_vehicle": {"veh_pilot": predicted_sequence[0] if predicted_sequence else None},
             "predicted_first_handoff_rsu_by_vehicle": {"veh_pilot": target},
             "predicted_handoff_target_rsu_id_by_vehicle": {"veh_pilot": target},
             "predicted_handoff_vehicle_ids": ["veh_pilot"] if target else [],
             "prediction_confidence_by_vehicle": {
-                "veh_pilot": float(self.instance.get("prediction_profile", {}).get("confidence", 0.9))
+                "veh_pilot": self._causal_forecast()["confidence"] if self._causal_prediction_enabled() else float(self.instance.get("prediction_profile", {}).get("confidence", 0.9))
             },
             "prediction_uncertainty_by_vehicle": {
-                "veh_pilot": float(self.instance.get("prediction_profile", {}).get("uncertainty", 0.1))
+                "veh_pilot": 1.0 - self._causal_forecast()["confidence"] if self._causal_prediction_enabled() else float(self.instance.get("prediction_profile", {}).get("uncertainty", 0.1))
             },
             "dwell_time": {"veh_pilot": self._contact_budget_seconds()},
             "future_load": {
@@ -781,6 +813,8 @@ class CalibratedContinuousWorkflowEnv:
             },
             "cache_demand": {"demand_score_by_rsu": {}},
         }
+        if self._causal_prediction_enabled():
+            predictions["causal_provenance"] = self._causal_forecast()
         interface_profile = str(
             self.config.get("interface_profile", "legacy_calibrated_workflow_v1")
         )
@@ -806,7 +840,7 @@ class CalibratedContinuousWorkflowEnv:
                     "vehicle_id": "veh_pilot",
                     "position_x": float(self._mobility_index() * 10),
                     "position_y": 0.0,
-                    "speed": float(self.instance["trace_features"]["mean_speed_proxy"]),
+                    "speed": 0.0 if self._causal_prediction_enabled() else float(self.instance["trace_features"]["mean_speed_proxy"]),
                     "base_model_id": node.get("required_base_model") if node else "none",
                     "associated_rsu_id": current_rsu,
                     "active_workflow_id": self.instance["workflow_id"],

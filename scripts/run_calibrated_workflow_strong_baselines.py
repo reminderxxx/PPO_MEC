@@ -7,6 +7,7 @@ synthetic instances through the small cell helpers below.
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 import json
 import math
 import random
@@ -45,9 +46,12 @@ from scripts.run_calibrated_workflow_interface_repair import (  # noqa: E402
 from scripts.run_calibrated_workflow_value_normalization_ab import (  # noqa: E402
     _collect_exact_update_batch,
     _selection_score,
+    _training_signal_row,
     _validate_intervals,
 )
 from src.agents.registry import ALGO_REGISTRY, build_agent  # noqa: E402
+from src.envs.core.causal_rsu_predictor import canonical_hash, fit_predictor  # noqa: E402
+from src.envs.core.calibrated_continuous_workflow_env import CalibratedContinuousWorkflowEnv  # noqa: E402
 
 
 DEFAULT_CONFIG = (
@@ -196,6 +200,7 @@ def _run_learned_cell(
     optimizer_rows: list[dict[str, Any]] = []
     candidate_rows: list[dict[str, Any]] = []
     training_episodes: list[dict[str, Any]] = []
+    training_signals: list[dict[str, Any]] = []
     environment_steps = 0
     started_at = time.monotonic()
     transition_count = int(protocol["transitions_per_update"])
@@ -219,6 +224,19 @@ def _run_learned_cell(
             gae_lambda=float(config["training"]["gae_lambda"]),
         )
         environment_steps += len(batch)
+        if config.get("interface_profile") == "calibrated_workflow_interface_v3_prefix_only":
+            training_signals.extend(
+                {**_training_signal_row(
+                    arm="original_reward_v1", method=method, seed=seed,
+                    update_index=update_index,
+                    global_step=environment_steps - len(batch) + offset,
+                    row=row,
+                ), "prediction_provenance": json.dumps(
+                    row["decision_info"]["semantic_state"]["predictions"]["causal_provenance"],
+                    sort_keys=True,
+                )}
+                for offset, row in enumerate(batch, start=1)
+            )
         train_by_design = {str(instance["design_id"]): instance for instance in splits["train"]}
         training_episodes.extend(
             {"method": method, "seed": seed, **row, **_source_fields(train_by_design[str(row["design_id"])])}
@@ -299,6 +317,7 @@ def _run_learned_cell(
         "optimizer_rows": optimizer_rows,
         "candidates": candidate_rows,
         "training_episodes": training_episodes,
+        "training_signals": training_signals,
         "evaluation_rows": evaluation_rows,
         "behavior_rows": behavior_rows,
     }
@@ -306,7 +325,8 @@ def _run_learned_cell(
 
 def _validate_protocol(design: dict[str, Any]) -> None:
     protocol = design["training"]
-    if design["schema_version"] != "calibrated_workflow_strong_baselines_development_v1":
+    version = design["schema_version"]
+    if version not in {"calibrated_workflow_strong_baselines_development_v1", "calibrated_workflow_strong_baselines_development_v2_prefix_only"}:
         raise RuntimeError("baseline protocol version drift")
     if design["scope"] != "consumed_36_instance_development_only":
         raise RuntimeError("development-only scope drift")
@@ -322,6 +342,14 @@ def _validate_protocol(design: dict[str, Any]) -> None:
         raise RuntimeError("unexpected normalization profile")
     if design["critic_target_normalization"] != "raw_disabled" and not design["claim_boundary"]["popart_promoted"]:
         raise RuntimeError("PopArt requires a separately frozen promotion decision")
+    if version.endswith("v2_prefix_only"):
+        if design["reward_profile"] != "original_reward_v1" or design["critic_target_normalization"] != "raw_disabled":
+            raise RuntimeError("prefix-only development arm is frozen to original reward and raw critic")
+        predictor = design["causal_predictor"]
+        if predictor["schema_version"] != "prefix_transition_counts_v1" or predictor["training_fit"] != "train_only_leave_one_instance_out_for_train":
+            raise RuntimeError("causal predictor protocol drift")
+        if design["workload_manifest_sha256"] != "b7efe5d6e50ad17b744230c03a126370656d0196b60c7f7e6b5a86bb702effbc":
+            raise RuntimeError("source manifest identity drift")
     if int(protocol["environment_steps_per_method_seed"]) != int(protocol["transitions_per_update"]) * int(protocol["update_opportunities_per_method_seed"]):
         raise RuntimeError("step/update budget mismatch")
     if (
@@ -352,9 +380,32 @@ def _validate_protocol(design: dict[str, Any]) -> None:
             raise RuntimeError(f"registry support-level drift: {method}")
 
 
+def _audit_public_prefix_invariance(config: dict[str, Any], splits: dict[str, list[dict[str, Any]]]) -> int:
+    comparisons = 0
+    for rows in splits.values():
+        for instance in rows:
+            sequence = list(instance["rsu_sequence"])
+            for index in range(min(len(sequence), int(instance["max_steps"]))):
+                altered = deepcopy(instance)
+                alternative = next((item for item in instance["rsu_ids"] if item != sequence[index]), sequence[index])
+                altered["rsu_sequence"][index + 1 :] = [alternative] * (len(sequence) - index - 1)
+                original_env = CalibratedContinuousWorkflowEnv(config, instance)
+                altered_env = CalibratedContinuousWorkflowEnv(config, altered)
+                original_env.step_index = altered_env.step_index = index
+                original_observation, altered_observation = original_env._observation(), altered_env._observation()
+                original_info, altered_info = original_env._info(), altered_env._info()
+                if not np.array_equal(original_observation, altered_observation) or original_info != altered_info:
+                    raise RuntimeError(f"PREDICTION_PREFIX_PERMISSION_BLOCKER: {instance['design_id']} at step {index}")
+                comparisons += 1
+    return comparisons
+
+
 def _load_inputs(design: dict[str, Any]) -> tuple[dict[str, Any], dict[str, list[dict[str, Any]]], dict[str, Any]]:
     base_path = ROOT_DIR / design["base_config"]
     manifest_path = ROOT_DIR / design["workload_manifest"]
+    causal = design["schema_version"].endswith("v2_prefix_only")
+    if causal and _sha256(manifest_path) != design["workload_manifest_sha256"]:
+        raise RuntimeError("causal source manifest hash mismatch")
     config, _ = _load_experiment_config(base_path)
     manifest = _load_json(manifest_path)
     if manifest["config_sha256"] != _sha256(base_path) or manifest["resolved_config_sha256"] != _canonical_sha256(config):
@@ -373,7 +424,7 @@ def _load_inputs(design: dict[str, Any]) -> tuple[dict[str, Any], dict[str, list
         for row in manifest["instances"]
         if "predicted_rsu_sequence" not in row
     ]
-    if missing_forecast:
+    if missing_forecast and not causal:
         raise RuntimeError(
             "PREDICTION_FUTURE_LEAK_BLOCKER: "
             f"{len(missing_forecast)}/{len(manifest['instances'])} instances omit "
@@ -381,6 +432,35 @@ def _load_inputs(design: dict[str, Any]) -> tuple[dict[str, Any], dict[str, list
             "actual rsu_sequence as public predictions/contact budget. "
             "A separately audited causal forecast contract is required."
         )
+    if causal:
+        predictor = design["causal_predictor"]
+        ordered_train = sorted(splits["train"], key=lambda row: str(row["design_id"]))
+        source = [{"design_id": row["design_id"], "rsu_sequence": row["rsu_sequence"]} for row in ordered_train]
+        if canonical_hash(source) != predictor["train_source_projection_sha256"]:
+            raise RuntimeError("train-only predictor source identity mismatch")
+        full = fit_predictor([row["rsu_sequence"] for row in ordered_train])
+        if full["sha256"] != predictor["full_model_sha256"]:
+            raise RuntimeError("causal predictor fitted hash mismatch")
+        loo = {
+            str(row["design_id"]): fit_predictor([other["rsu_sequence"] for other in ordered_train if other["design_id"] != row["design_id"]])
+            for row in ordered_train
+        }
+        bundle_hash = canonical_hash({"full": full["sha256"], "loo": {key: value["sha256"] for key, value in loo.items()}})
+        if bundle_hash != predictor["model_bundle_sha256"]:
+            raise RuntimeError("causal predictor leave-one-out bundle hash mismatch")
+        splits = {
+            name: [{**deepcopy(row), "causal_predictor_model": loo[str(row["design_id"])] if name == "train" else full} for row in rows]
+            for name, rows in splits.items()
+        }
+        config["interface_profile"] = "calibrated_workflow_interface_v3_prefix_only"
+        identity["causal_predictor"] = {
+            "train_source_projection_sha256": predictor["train_source_projection_sha256"],
+            "full_model_sha256": full["sha256"],
+            "model_bundle_sha256": bundle_hash,
+            "train_instance_predictions": "leave_one_instance_out",
+            "dev_and_evaluation_predictions": "train_only_full_fit",
+        }
+        identity["public_prefix_suffix_tamper_comparisons"] = _audit_public_prefix_invariance(config, splits)
     if design["reward_profile"] == "service_aligned_v1":
         reward = _load_json(ROOT_DIR / "configs/experiment/calibrated_workflow_service_reward_alignment_v1.json")["service_aligned_reward"]
         config["objective"].setdefault("reward_profiles", {})["service_aligned_v1"] = reward
@@ -433,6 +513,8 @@ def _execute(design: dict[str, Any], output_root: Path, *, design_path: Path, co
     _write_csv(output_root / "optimizer_step_records.csv", [row for cell in cell_results for row in cell["optimizer_rows"]])
     _write_json(output_root / "checkpoint_selection.json", [row for cell in cell_results for row in cell["candidates"]])
     _write_json(output_root / "training_episode_rows.json", [row for cell in cell_results for row in cell["training_episodes"]])
+    if design["schema_version"].endswith("v2_prefix_only"):
+        _write_csv(output_root / "training_signal_rows.csv", [row for cell in cell_results for row in cell["training_signals"]])
     _write_json(output_root / "evaluation_rows.json", evaluation_rows)
     _write_csv(output_root / "evaluation_rows.csv", evaluation_rows)
     _write_csv(output_root / "behavior_ledger.csv", behavior_rows)
@@ -456,6 +538,7 @@ def _execute(design: dict[str, Any], output_root: Path, *, design_path: Path, co
         "capability_labels": design["capability_labels"],
         "heuristic_memory_scope": "fresh_per_instance_no_checkpoint_no_training_seed",
         "claim_boundary": design["claim_boundary"],
+        "interface_profile": config["interface_profile"],
         "command": command,
     })
     _write_json(output_root / "completion_receipt.json", {
@@ -468,6 +551,7 @@ def _execute(design: dict[str, Any], output_root: Path, *, design_path: Path, co
         "evaluation_rows": len(evaluation_rows),
         "behavior_rows": len(behavior_rows),
         "formal_or_holdout_reads": 0,
+        "scientific_execution_complete": True,
     })
     _integrity(output_root)
 
@@ -509,6 +593,11 @@ def main() -> None:
         raise FileExistsError(f"create-only output already exists: {output_root}")
     output_root.mkdir(parents=True)
     started = time.monotonic()
+    _write_json(output_root / "runner_entered.json", {
+        "status": "entered", "entered_at": datetime.now(timezone.utc).isoformat(),
+        "git_commit": _git_commit(), "design_sha256": _sha256(design_path),
+        "scientific_steps_at_entry": 0,
+    })
     _write_json(output_root / "run_status.json", {"status": "running", "started_at": datetime.now(timezone.utc).isoformat()})
     try:
         _execute(design, output_root, design_path=design_path, command=list(sys.argv))

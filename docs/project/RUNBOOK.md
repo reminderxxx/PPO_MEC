@@ -5,11 +5,34 @@
 
 # Runbook
 
-## 强基线预测权限阻断（2026-10-09）
+## 因果前缀强基线开发版本（2026-10-09）
 
-当前 36-instance manifest 的 36 项均缺独立 `predicted_rsu_sequence`；环境将实际未来 RSU 序列回退为
-公共预测。`scripts/run_calibrated_workflow_strong_baselines.py --preflight` 必须以
-`PREDICTION_FUTURE_LEAK_BLOCKER` 非零退出。不得授权/启动 28,800-step 开发比较、复制原序列伪装预测
+新版本协议见 `cscwd_causal_strong_baseline_protocol_20261009.md`。旧 v1 配置继续阻断；仅新 v2 配置允许一次
+28,800-step 开发比较。运行前先以 v2 配置执行 `scripts/run_calibrated_workflow_strong_baselines.py --preflight`，
+检查 source/model hash、12/4/12/8 split、区间互斥及 474 个逐前缀公共字段后缀篡改不变。合成验收命令：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_calibrated_workflow_strong_baselines.py
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_calibrated_workflow_strong_baselines.py --preflight --config configs/experiment/calibrated_workflow_strong_baselines_development_v2_prefix_only.json
+```
+
+代码/协议提交并 push 后，在干净的冻结 commit 上只启动一次：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/launch_calibrated_workflow_strong_baselines.py --mode launch --expected-commit <FROZEN_COMMIT>
+```
+
+启动器使用固定本地解释器、唯一 `artifacts/experiments/cscwd_causal_strong_baselines_dev_20261009_v1/`
+和同名 `_supervisor/`，等子进程写出 `runner_entered.json` 后返回 ACK。后台负责 2 小时上限、无重试、
+exit/terminal receipt；科学进程完成后自动做开发分析和完整性清单。查看状态仅用
+`scripts/launch_calibrated_workflow_strong_baselines.py --mode verify`；无 terminal 时不可把 ACK 当科学完成。
+不可覆盖或重跑该 run，不复制 checkpoint/真实数据到 Git。
+
+## 强基线预测权限阻断（旧版，2026-10-09）
+
+旧 v1 配置所用 36-instance manifest 的 36 项均缺独立 `predicted_rsu_sequence`；旧接口将实际未来 RSU 序列回退为
+公共预测。`scripts/run_calibrated_workflow_strong_baselines.py --preflight` 默认配置必须以
+`PREDICTION_FUTURE_LEAK_BLOCKER` 非零退出。不得用旧 v1 配置启动 28,800-step 开发比较、复制原序列伪装预测
 或使用旧 holdout。恢复条件见 `cscwd_2027_strong_baseline_prediction_permission_blocker_20261009.md`。
 
 

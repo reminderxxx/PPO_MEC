@@ -1,6 +1,13 @@
 ﻿# Directory Structure
 
-- `docs/project/cscwd_2027_strong_baseline_prediction_permission_blocker_20261009.md`：当前 36-instance 公共预测回退的科学权限阻断；无 run artifact。
+## 2026-10-09 因果前缀强基线版本
+
+- `src/envs/core/causal_rsu_predictor.py`：训练拟合的低容量前缀 RSU 预测器。
+- `configs/experiment/calibrated_workflow_strong_baselines_development_v2_prefix_only.json`：一次开发执行的 hash、方法、预算和权限冻结。
+- `scripts/run_calibrated_workflow_strong_baselines.py`、`scripts/analyze_calibrated_workflow_strong_baselines.py`、`scripts/launch_calibrated_workflow_strong_baselines.py`：预检/训练、自动分析、持久单次监督。
+- `artifacts/experiments/cscwd_causal_strong_baselines_dev_20261009_v1/`：create-only 开发原件，忽略 Git；checkpoint 与真实数据不上传。
+- `docs/project/cscwd_causal_strong_baseline_protocol_20261009.md`：事前协议和贡献边界。
+- `docs/project/cscwd_2027_strong_baseline_prediction_permission_blocker_20261009.md`：旧版公共预测回退的科学权限阻断；无 run artifact。
 
 ## 2026-10-09 CSCWD 强基线开发链接线
 

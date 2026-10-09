@@ -1,5 +1,11 @@
 ﻿# Decision Log
 
+## 2026-10-09：新版本以训练前缀预测修复信息权限
+
+- 用户已另行授权在旧阻断报告之后开新版本。冻结低容量、训练 split 拟合的 RSU 转移计数；训练实例留一，其他实例只用 12 个 train 拟合模型。未知预测显式为空、confidence/contact 为零，不用真实未来回退。
+- 物理接触判定与公共预测窗口分离，decision clone 仍按公开估计；这是单独的接口语义变更，不将旧新版本差异归因于算法。旧 v1 fail-closed 规则和全部历史结果保持原身份。
+- 只允许 raw critic、原奖励、固定四 learned×五 seed 与两规则的单次已消费数据开发比较；two-step 保留精确转移模型能力标签。贡献先收敛为机制/信息边界与失败条件，方法优势和 paper-ready 均待证。
+
 ## 2026-10-09：预测权限先于强基线训练门
 
 - 决定：对当前 36-instance manifest，实际未来 `rsu_sequence` 回退为公共预测违反本次无未来执行信息授权条件；停止科学 freeze/launch，仅提交 fail-closed preflight 与独立阻断报告。保持原 actor、reward、environment、模型结构及历史 artifact 不变；因果预测合同须另立任务冻结后才可再决定单次 development 比较。

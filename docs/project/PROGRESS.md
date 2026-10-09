@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-09：因果前缀强基线新版本已冻结，待一次开发执行
+
+- 新 `calibrated_workflow_interface_v3_prefix_only` 使用 train-only 转移计数，训练实例 leave-one-out；36 个原始实例的 474 个前缀通过实际未来后缀篡改的公共 observation/semantic/mask 不变验收。物理接触窗口仅 real step 使用实际轨迹，规则 preview 使用预测窗口。新旧环境语义版本分列。
+- 新 v2 配置固定原奖励/raw critic、四 learned×五 seed×1,440 步、Popularity 和 two-step 各 20 个实例一次；总预算 28,800 步、440 评估行。运行前预检通过，但本条记录尚无科学结果或算法晋级。协议见 `cscwd_causal_strong_baseline_protocol_20261009.md`。
+- B 的 PopArt 开发 A/B 为 `FALSIFIED_OR_NOT_PROMOTED`；本轮不采用 PopArt、切换 reward 或从已消费 split 宣称独立性。
+
 ## 2026-10-09：强基线完整开发比较在预测权限预检停止
 
 - 用户授权 4 learned×5 seeds、28,800 环境步的单次 development 比较；执行前查明 36/36 实例缺独立 `predicted_rsu_sequence`，环境把将执行的 `rsu_sequence` 未来后缀作为公共预测和 contact budget。共享该输入仍违反无真实未来信息泄漏要求，故未冻结科学提交、未创建 run root 或启动 supervisor；训练/评价/主表行均为 0。

@@ -7,10 +7,14 @@ from typing import Any
 
 
 CALIBRATED_WORKFLOW_INTERFACE_V2 = "calibrated_workflow_interface_v2"
+CALIBRATED_WORKFLOW_INTERFACE_V3_PREFIX_ONLY = "calibrated_workflow_interface_v3_prefix_only"
 
 
 def uses_calibrated_workflow_interface_v2(semantic_state: dict[str, Any]) -> bool:
-    return str(semantic_state.get("interface_profile", "")) == CALIBRATED_WORKFLOW_INTERFACE_V2
+    return str(semantic_state.get("interface_profile", "")) in {
+        CALIBRATED_WORKFLOW_INTERFACE_V2,
+        CALIBRATED_WORKFLOW_INTERFACE_V3_PREFIX_ONLY,
+    }
 
 
 def primary_vehicle(semantic_state: dict[str, Any]) -> dict[str, Any]:

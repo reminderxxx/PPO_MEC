@@ -5,7 +5,12 @@
 
 ﻿# Bugs And Risks
 
-## 2026-10-09：公共预测含实际未来迁移序列（OPEN SCIENTIFIC CONTRACT BLOCKER）
+## 2026-10-09：新前缀版本已消除公共实际后缀回退；确认性证据仍缺
+
+- `RESOLVED IN V3 PREFIX-ONLY PROFILE`：新版本对 36 实例的 474 个决策前缀篡改未来后缀，公共观察、语义、mask 均不变；旧版本的阻断继续有效。物理接触判定版本已独立分离，因此旧/新结果不能作算法因果比较。
+- `OPEN`：训练数据拟合的小计数预测器与人工轨迹规则可能相关，预测误差、unknown 与误差分层须由逐步原件报告。two-step 精确 clone 能力高于 learned/Popularity；36 实例全已消费，跨 run/车辆独立确认与真实无线仍缺，paper-ready=`Unverifiable`。
+
+## 2026-10-09：公共预测含实际未来迁移序列（旧版 OPEN SCIENTIFIC CONTRACT BLOCKER）
 
 - `BLOCKED`：36/36 已消费 development 实例没有独立 `predicted_rsu_sequence`；`_predicted_sequence` 回退到环境将执行的 `rsu_sequence` 后缀，继而公开 next/target/dwell/contact。DT 与 Popularity 明确消费这些字段，其他 learned 方法也可访问；同信息不等于无未来泄漏。本轮科学比较在 run root 前停止。
 - `REQUIRED`：另行冻结因果 prefix-only 预测来源、生成时点、source hash 与逐步消费测试；不能只复制实际序列。现有原始区间独立性缺口和 B PopArt 不晋级结论均不因此改变。详见 `cscwd_2027_strong_baseline_prediction_permission_blocker_20261009.md`。

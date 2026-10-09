@@ -1,5 +1,11 @@
 # Code Module Map
 
+`src/envs/core/causal_rsu_predictor.py` 只实现训练序列计数拟合、前缀推理与模型哈希；
+`calibrated_continuous_workflow_env.py` 在显式 v3 profile 消费它生成公共预测，real step 独立执行实际接触判定，
+decision clone 用预测判定。`run_calibrated_workflow_strong_baselines.py` 验证 source/model hash、逐前缀后缀不变、
+固定预算并保存训练和行为原件；`analyze_calibrated_workflow_strong_baselines.py` 只读计算开发表，
+`launch_calibrated_workflow_strong_baselines.py` 复用持久监督器。v2 encoder 特征分支兼容 v3 profile；算法模块不改。
+
 `scripts/run_calibrated_workflow_strong_baselines.py` 作为 CSCWD 开发比较的 guarded 编排层，复用
 `run_calibrated_workflow_interface_repair.py` 的构建/评价、`run_calibrated_workflow_value_normalization_ab.py`
 的精确 transition 采样/区间验证，以及现有 service analyzer 的通用 summary/seed 消费函数；
