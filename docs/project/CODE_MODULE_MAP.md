@@ -869,3 +869,8 @@ v3 interface-repair 职责增量：
   executed action，并用前后 hash 证明 network/optimizer/PopArt state 未变。固定 continuation return 明确不是 `V^π`。
 - `tests/test_selected_checkpoint_alignment.py`：冻结状态数量/唯一性、实际未来链路不泄漏、完整 fixed-behavior target、
   无 `.learn()` 调用和递归 state hash 回归。
+- `scripts/audit_calibrated_workflow_failed_action4_credit.py`：只读重放既有 behavior ledger，恢复 action-4 target cache
+  before/after、admission/victim/prepared-state 与 episode 内 future reuse；另执行六个固定 synthetic env.step 语义见证。
+  不构建 agent、不读 checkpoint、不调用 optimizer。
+- `tests/test_failed_action4_credit_audit.py`：锁定 committed+reuse、atomic rollback、unused warm+victim reload、noop/LRU
+  touch、capacity rejection 和 1,143-trigger 全账本分类。

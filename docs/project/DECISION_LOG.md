@@ -1310,3 +1310,14 @@ claim map 必须报告 `UNAVAILABLE`。
   executed action 4 限制 actor advantage 不为正。critic/reward/PopArt/auxiliary/mask/权限不变；本轮不实现、不训练。
 - 候选若不能降低相关状态 probability/margin，或任一方法 on-time/total completion 下降，即否定并停止；不切换到
   auxiliary sweep、追加 seed、重选 checkpoint 或 reward 搜索。
+
+## 2026-10-09 — 撤销 failed-action-4 advantage cap predicate
+
+- 后续源码核对确认 action 4 先提交可行的 target model-cache admission，current service failure 只阻止
+  `prepared_state`/workflow migration commit，不自动回滚 cache admission。
+- 既有 1,143 个拟触发样本包含 118 个 committed admission 后续 reuse、333 个 rollback、688 个无新准入及带 victim
+  cost 的混合语义；六个局部见证同时给出 reuse 与 eviction 反例。
+- 决定：前一条记录中的 advantage-cap 候选保留为历史 proposal，状态改为 `NOT_READY`，不得实现或训练；撤销
+  “predicate 内 action 4 不应获正 credit”的强断言。该修正不改变 PopArt 未晋级、raw canonical 与 development-only 边界。
+- 不自动提出替代 predicate。actor credit 仍为未定位项，须先有同时核算 cache reuse、transfer 和 victim externality 的
+  可识别目标；否则不修改 policy objective。

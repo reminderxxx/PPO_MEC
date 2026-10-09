@@ -616,5 +616,7 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 
 补充的 selected-checkpoint 对齐在预先冻结的 48 个公共 dev 状态上复核全部 30 个实际被评价 checkpoint：固定行为
 return probe 的 value error 全部下降，但 action-4 probability 在 SA/PPO 上升、MAPPO 下降，进一步确认 critic 稳定不等于
-服务策略改善。机器表、机制图和下一轮单一 credit-assignment 候选见
-`docs/project/calibrated_workflow_selected_checkpoint_alignment_20261009.md`。
+服务策略改善。后续语义审查又确认原 failed-action-4 advantage-cap predicate 混合 target cache reuse、rollback 与
+eviction externality，状态为 `NOT_READY`，未实现或训练。见
+`docs/project/calibrated_workflow_selected_checkpoint_alignment_20261009.md` 与
+`docs/project/calibrated_workflow_failed_action4_credit_semantic_audit_20261009.md`。

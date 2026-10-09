@@ -2245,5 +2245,17 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - fixed-behavior return probe 的绝对 value error 在 720/720 状态配对下降；该 probe 不是无偏 `V^π`，不用于 GAE claim。
 - action-4 mean probability delta 为 SA `+.0341`、MAPPO `-.0690`、PPO `+.0268`；argmax、head aggregation、projection
   与 executed action 已分列。critic 机制在 service consumer checkpoint 上兑现，但不足以稳定改善 policy/service。
-- 下一轮至多冻结一个 credit-assignment 候选：只对失败、无进展、未提交 migration 的 executed action 4 将 actor
-  normalized advantage 上限设为 0；本轮未实现、未训练，不进入 auxiliary-target 消融。
+- 当时冻结的 failed-action-4 advantage cap 经后续语义反例审查判为 predicate 不充分、`NOT_READY`；未实现或训练。
+
+### failed-action-4 credit 语义反例审查
+
+- 科学执行环境文件与当前版本 SHA-256 一致；action 4 在 current service 检查前先执行 target `_admit_bundle()`，
+  `migration_success=false` 不能证明 target cache admission 已回滚。
+- 既有 5,293 行/600 episode 行为账本以 recorded executed action 精确重放，记录字段 mismatch=`0`；固定 predicate
+  触发 1,143 次。688 次无新准入、333 次 contact-budget rollback、122 次新准入。
+- 122 次新准入中 118 次在 episode 内观察到 same-bundle reuse；36 次同时观察 victim reload/failure；4 次到 episode
+  结束未观察 reuse。counterfactual avoided loading 不可由 factual ledger 识别，保持 unknown。
+- 六个事前 synthetic env.step 见证分别覆盖 committed+reuse、rollback、unused warm+victim reload、committed-unused、
+  noop/LRU touch 和 capacity rejection；全部合法、无 agent/model/optimizer/training。
+- 决定：撤销“该 predicate 下 positive advantage 应被统一截断”的强断言，原候选标为 `NOT_READY`；不自动换 predicate、
+  不实现、不训练、不进入 auxiliary/reward sweep。

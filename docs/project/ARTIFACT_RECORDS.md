@@ -1773,6 +1773,20 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
   `calibrated_workflow_popart_paper_supplement_20261009.md`、
   `calibrated_workflow_strong_baseline_comparison_boundary_20261009.md`。
 
+## 2026-10-09 failed-action-4 credit semantic audit
+
+- root：`artifacts/analysis/calibrated_workflow_failed_action4_credit_audit_20261009_v1/`；source behavior ledger
+  SHA-256=`99639fbfe08522979f0002cdd1f485bfc3ecd2fa4694caa823762dc966496d96`。
+- identity：source commit `858bc797...` 与 audit commit `d0795da...` 的 environment file SHA-256 均为
+  `d789e6088e6a6a859de2fc720f78c94410179d2cc6a5a57a9751a9b89fed68bc`。
+- evidence：5,293 behavior rows / 600 episodes exact replay，recorded-field mismatch=0；1,143 predicate triggers 全量分类，
+  122 committed admissions、118 observed future reuse、36 observed victim reload/failure；六个预声明 synthetic env.step 见证。
+- boundary：direct ledger 缺 cache before/after、victims 与 future reuse，相关值来自 deterministic replay；counterfactual
+  avoided loading=unknown。training/optimizer/checkpoint/model calls=`0/0/0/0`。
+- decision：`CAP_PREDICATE_INSUFFICIENT_NOT_READY`；不实现 advantage cap，不自动提出替代算法。
+- report：`docs/project/calibrated_workflow_failed_action4_credit_semantic_audit_20261009.md`；A 线输入：
+  `calibrated_workflow_failed_action4_credit_claim_change_20261009.md`。
+
 ## 2026-10-05 shared cache × recovery coupling witness
 
 - run id：`shared_cache_recovery_coupling_20261005_v1`

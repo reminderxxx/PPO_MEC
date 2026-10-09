@@ -1,0 +1,1809 @@
+[
+  {
+    "cache_event": {
+      "adapter_id": "alpr",
+      "admitted": [
+        "adapter:alpr"
+      ],
+      "after_residents": [
+        "base:family_a",
+        "adapter:alpr"
+      ],
+      "before_last_used": {
+        "base:family_a": 0
+      },
+      "before_residents": [
+        "base:family_a"
+      ],
+      "committed": true,
+      "load_seconds": 0.711175,
+      "reason": "committed",
+      "rsu_id": "rsu_1",
+      "transfer_bytes": 154423432,
+      "victims": []
+    },
+    "cap_predicate_triggered": true,
+    "case_id": "committed_warm_then_reuse",
+    "final_summary": {
+      "cache_evictions": 0,
+      "cache_rejections": 0,
+      "completed_nodes": 1,
+      "deadline_missed": 0,
+      "deadline_seconds": 60.0,
+      "deadline_violations": 0,
+      "design_id": "synthetic_committed_warm_then_reuse",
+      "failed_service_attempt_seconds_proxy": 2.0,
+      "handoff_count": 1,
+      "handoff_failures": 1,
+      "input_transfer_bytes": 192757,
+      "invalid_action_count": 0,
+      "late_workflow_completed": 0,
+      "migration_attempts": 1,
+      "migration_successes": 0,
+      "model_load_seconds": 0.711175,
+      "model_transfer_bytes": 154423432,
+      "modeled_completion_seconds": 7.795338512,
+      "node_count": 1,
+      "on_time_workflow_completed": 1,
+      "recompute_seconds": 0.0,
+      "reward": 98.87363243319582,
+      "reward_deadline_penalty": 0.0,
+      "reward_failure_penalty": -2.0,
+      "reward_node_completion": 1.0,
+      "reward_on_time_completion": 0.0,
+      "reward_profile": "service_aligned_v1",
+      "reward_recompute_penalty": 0.0,
+      "reward_service_operation_time_penalty": -0.09036817999999999,
+      "reward_time_penalty": 0.0,
+      "reward_totals_by_profile": {
+        "original_reward_v1": 2.304374145431643,
+        "service_aligned_v1": 98.87363243319582
+      },
+      "reward_transfer_penalty": -0.03599938680417836,
+      "reward_workflow_completion": 100.0,
+      "service_failures": 1,
+      "split": "synthetic_semantic_witness",
+      "state_restore_seconds": 0.0,
+      "state_transfer_bytes": 0,
+      "steps": 2,
+      "terminated": true,
+      "total_transfer_bytes": 154616189,
+      "transfer_seconds": 1.276929512,
+      "unfinished_after_deadline": 0,
+      "vehicle_fallback_count": 0,
+      "window_id": "synthetic_committed_warm_then_reuse",
+      "workflow_completed": 1,
+      "workflow_id": "wf_committed_warm_then_reuse"
+    },
+    "future": [
+      {
+        "action": 3,
+        "cache_before": {
+          "rsu_0": {
+            "last_used": {
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a"
+            ]
+          },
+          "rsu_1": {
+            "last_used": {
+              "adapter:alpr": 0,
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a",
+              "adapter:alpr"
+            ]
+          },
+          "rsu_2": {
+            "last_used": {
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a"
+            ]
+          }
+        },
+        "node_id": "n0",
+        "required_adapter": "alpr",
+        "terminated": true,
+        "transition": {
+          "action": 3,
+          "action_name": "current_rsu_steady_offload",
+          "active_reward_profile": "service_aligned_v1",
+          "cache_events": [],
+          "clock_seconds_after": 7.795338512,
+          "current_rsu_id": "rsu_1",
+          "deadline_miss_event": false,
+          "deadline_seconds": 60.0,
+          "handoff": true,
+          "input_transfer_bytes": 192757,
+          "migration_success": false,
+          "model_load_seconds": 0.0,
+          "model_transfer_bytes": 0,
+          "node_id": "n0",
+          "predicted_handoff_target_rsu_id": null,
+          "recompute_seconds": 0.0,
+          "reward": 100.92381044026362,
+          "reward_components": {
+            "reward_deadline_penalty": 0.0,
+            "reward_failure_penalty": 0.0,
+            "reward_node_completion": 1.0,
+            "reward_on_time_completion": 0.0,
+            "reward_recompute_penalty": -0.0,
+            "reward_service_operation_time_penalty": -0.07614467999999999,
+            "reward_time_penalty": 0.0,
+            "reward_transfer_penalty": -4.487973637878895e-05,
+            "reward_workflow_completion": 100.0
+          },
+          "reward_components_by_profile": {
+            "original_reward_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 2.0,
+              "reward_time_penalty": -0.30630208447999996,
+              "reward_transfer_penalty": -8.97594727575779e-05,
+              "reward_workflow_completion": 4.0
+            },
+            "service_aligned_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 1.0,
+              "reward_on_time_completion": 0.0,
+              "reward_recompute_penalty": -0.0,
+              "reward_service_operation_time_penalty": -0.07614467999999999,
+              "reward_time_penalty": 0.0,
+              "reward_transfer_penalty": -4.487973637878895e-05,
+              "reward_workflow_completion": 100.0
+            }
+          },
+          "service_completed": true,
+          "service_operation_seconds": 3.807234,
+          "state_ready": false,
+          "state_restore_seconds": 0.0,
+          "state_transfer": null,
+          "state_transfer_bytes": 0,
+          "step_cost_seconds": 3.8287760559999997,
+          "step_index": 1,
+          "transfer_seconds": 0.021542056
+        },
+        "truncated": false
+      }
+    ],
+    "predeclared_kind": "reuse",
+    "prefix_actions": [],
+    "prepared_state_after": {},
+    "prepared_state_before": {},
+    "probe_action": 4,
+    "public_state_exposes_actual_mbps": false,
+    "purpose": "current service fails, target admission commits, next actual arrival reuses the bundle",
+    "suffix_actions": [
+      3
+    ],
+    "target_cache_after": {
+      "last_used": {
+        "adapter:alpr": 0,
+        "base:family_a": 0
+      },
+      "residents": [
+        "base:family_a",
+        "adapter:alpr"
+      ]
+    },
+    "target_cache_before": {
+      "last_used": {
+        "base:family_a": 0
+      },
+      "residents": [
+        "base:family_a"
+      ]
+    },
+    "transition": {
+      "action": 4,
+      "action_name": "handoff_migration_prepare",
+      "active_reward_profile": "service_aligned_v1",
+      "cache_events": [
+        {
+          "adapter_id": "alpr",
+          "admitted": [
+            "adapter:alpr"
+          ],
+          "after_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "before_last_used": {
+            "base:family_a": 0
+          },
+          "before_residents": [
+            "base:family_a"
+          ],
+          "committed": true,
+          "load_seconds": 0.711175,
+          "reason": "committed",
+          "rsu_id": "rsu_1",
+          "transfer_bytes": 154423432,
+          "victims": []
+        }
+      ],
+      "clock_seconds_after": 3.966562456,
+      "current_rsu_id": "rsu_0",
+      "deadline_miss_event": false,
+      "deadline_seconds": 60.0,
+      "handoff": false,
+      "input_transfer_bytes": 0,
+      "migration_success": false,
+      "model_load_seconds": 0.711175,
+      "model_transfer_bytes": 154423432,
+      "node_id": "n0",
+      "predicted_handoff_target_rsu_id": "rsu_1",
+      "recompute_seconds": 0.0,
+      "reward": -2.0501780070677995,
+      "reward_components": {
+        "reward_deadline_penalty": 0.0,
+        "reward_failure_penalty": -2.0,
+        "reward_node_completion": 0.0,
+        "reward_on_time_completion": 0.0,
+        "reward_recompute_penalty": -0.0,
+        "reward_service_operation_time_penalty": -0.0142235,
+        "reward_time_penalty": 0.0,
+        "reward_transfer_penalty": -0.03595450706779957,
+        "reward_workflow_completion": 0.0
+      },
+      "reward_components_by_profile": {
+        "original_reward_v1": {
+          "reward_deadline_penalty": 0.0,
+          "reward_failure_penalty": -3.0,
+          "reward_node_completion": 0.0,
+          "reward_time_penalty": -0.31732499648,
+          "reward_transfer_penalty": -0.07190901413559914,
+          "reward_workflow_completion": 0.0
+        },
+        "service_aligned_v1": {
+          "reward_deadline_penalty": 0.0,
+          "reward_failure_penalty": -2.0,
+          "reward_node_completion": 0.0,
+          "reward_on_time_completion": 0.0,
+          "reward_recompute_penalty": -0.0,
+          "reward_service_operation_time_penalty": -0.0142235,
+          "reward_time_penalty": 0.0,
+          "reward_transfer_penalty": -0.03595450706779957,
+          "reward_workflow_completion": 0.0
+        }
+      },
+      "service_completed": false,
+      "service_operation_seconds": 0.711175,
+      "state_ready": true,
+      "state_restore_seconds": 0.0,
+      "state_transfer": {
+        "bytes": 2195,
+        "status": "staged_pending_current_node_completion",
+        "target_rsu_id": "rsu_1"
+      },
+      "state_transfer_bytes": 0,
+      "step_cost_seconds": 3.966562456,
+      "step_index": 0,
+      "transfer_seconds": 1.255387456
+    }
+  },
+  {
+    "cache_event": {
+      "adapter_id": "alpr",
+      "admitted": [
+        "base:family_a",
+        "adapter:alpr"
+      ],
+      "after_residents": [
+        "base:family_a",
+        "adapter:alpr"
+      ],
+      "before_last_used": {},
+      "before_residents": [],
+      "committed": false,
+      "load_seconds": 0.992812,
+      "reason": "contact_budget_exceeded",
+      "rsu_id": "rsu_1",
+      "transfer_bytes": 1169449264,
+      "victims": []
+    },
+    "cap_predicate_triggered": true,
+    "case_id": "contact_budget_rollback",
+    "final_summary": {
+      "cache_evictions": 0,
+      "cache_rejections": 0,
+      "completed_nodes": 1,
+      "deadline_missed": 0,
+      "deadline_seconds": 60.0,
+      "deadline_violations": 0,
+      "design_id": "synthetic_contact_budget_rollback",
+      "failed_service_attempt_seconds_proxy": 2.0,
+      "handoff_count": 1,
+      "handoff_failures": 0,
+      "input_transfer_bytes": 192757,
+      "invalid_action_count": 0,
+      "late_workflow_completed": 0,
+      "migration_attempts": 1,
+      "migration_successes": 0,
+      "model_load_seconds": 0.0,
+      "model_transfer_bytes": 0,
+      "modeled_completion_seconds": 13.828776055999999,
+      "node_count": 1,
+      "on_time_workflow_completed": 1,
+      "recompute_seconds": 0.0,
+      "reward": 98.76381044026363,
+      "reward_deadline_penalty": 0.0,
+      "reward_failure_penalty": -2.0,
+      "reward_node_completion": 1.0,
+      "reward_on_time_completion": 0.0,
+      "reward_profile": "service_aligned_v1",
+      "reward_recompute_penalty": 0.0,
+      "reward_service_operation_time_penalty": -0.23614468,
+      "reward_time_penalty": 0.0,
+      "reward_totals_by_profile": {
+        "original_reward_v1": 1.8936081560472422,
+        "service_aligned_v1": 98.76381044026363
+      },
+      "reward_transfer_penalty": -4.487973637878895e-05,
+      "reward_workflow_completion": 100.0,
+      "service_failures": 1,
+      "split": "synthetic_semantic_witness",
+      "state_restore_seconds": 0.0,
+      "state_transfer_bytes": 0,
+      "steps": 2,
+      "terminated": true,
+      "total_transfer_bytes": 192757,
+      "transfer_seconds": 0.021542056,
+      "unfinished_after_deadline": 0,
+      "vehicle_fallback_count": 1,
+      "window_id": "synthetic_contact_budget_rollback",
+      "workflow_completed": 1,
+      "workflow_id": "wf_contact_budget_rollback"
+    },
+    "future": [
+      {
+        "action": 2,
+        "cache_before": {
+          "rsu_0": {
+            "last_used": {
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a"
+            ]
+          },
+          "rsu_1": {
+            "last_used": {},
+            "residents": []
+          },
+          "rsu_2": {
+            "last_used": {
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a"
+            ]
+          }
+        },
+        "node_id": "n0",
+        "required_adapter": "alpr",
+        "terminated": true,
+        "transition": {
+          "action": 2,
+          "action_name": "vehicle_fallback",
+          "active_reward_profile": "service_aligned_v1",
+          "cache_events": [],
+          "clock_seconds_after": 13.828776055999999,
+          "current_rsu_id": "rsu_1",
+          "deadline_miss_event": false,
+          "deadline_seconds": 60.0,
+          "handoff": true,
+          "input_transfer_bytes": 192757,
+          "migration_success": false,
+          "model_load_seconds": 0.0,
+          "model_transfer_bytes": 0,
+          "node_id": "n0",
+          "predicted_handoff_target_rsu_id": null,
+          "recompute_seconds": 0.0,
+          "reward": 100.76381044026363,
+          "reward_components": {
+            "reward_deadline_penalty": 0.0,
+            "reward_failure_penalty": 0.0,
+            "reward_node_completion": 1.0,
+            "reward_on_time_completion": 0.0,
+            "reward_recompute_penalty": -0.0,
+            "reward_service_operation_time_penalty": -0.23614468,
+            "reward_time_penalty": 0.0,
+            "reward_transfer_penalty": -4.487973637878895e-05,
+            "reward_workflow_completion": 100.0
+          },
+          "reward_components_by_profile": {
+            "original_reward_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 2.0,
+              "reward_time_penalty": -0.94630208448,
+              "reward_transfer_penalty": -8.97594727575779e-05,
+              "reward_workflow_completion": 4.0
+            },
+            "service_aligned_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 1.0,
+              "reward_on_time_completion": 0.0,
+              "reward_recompute_penalty": -0.0,
+              "reward_service_operation_time_penalty": -0.23614468,
+              "reward_time_penalty": 0.0,
+              "reward_transfer_penalty": -4.487973637878895e-05,
+              "reward_workflow_completion": 100.0
+            }
+          },
+          "service_completed": true,
+          "service_operation_seconds": 11.807234,
+          "state_ready": true,
+          "state_restore_seconds": 0.0,
+          "state_transfer": null,
+          "state_transfer_bytes": 0,
+          "step_cost_seconds": 11.828776055999999,
+          "step_index": 1,
+          "transfer_seconds": 0.021542056
+        },
+        "truncated": false
+      }
+    ],
+    "predeclared_kind": "rollback",
+    "prefix_actions": [],
+    "prepared_state_after": {},
+    "prepared_state_before": {},
+    "probe_action": 4,
+    "public_state_exposes_actual_mbps": false,
+    "purpose": "temporary admission exceeds contact budget and is atomically rolled back",
+    "suffix_actions": [
+      2
+    ],
+    "target_cache_after": {
+      "last_used": {},
+      "residents": []
+    },
+    "target_cache_before": {
+      "last_used": {},
+      "residents": []
+    },
+    "transition": {
+      "action": 4,
+      "action_name": "handoff_migration_prepare",
+      "active_reward_profile": "service_aligned_v1",
+      "cache_events": [
+        {
+          "adapter_id": "alpr",
+          "admitted": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "after_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "before_last_used": {},
+          "before_residents": [],
+          "committed": false,
+          "load_seconds": 0.992812,
+          "reason": "contact_budget_exceeded",
+          "rsu_id": "rsu_1",
+          "transfer_bytes": 1169449264,
+          "victims": []
+        }
+      ],
+      "clock_seconds_after": 2.0,
+      "current_rsu_id": "rsu_0",
+      "deadline_miss_event": false,
+      "deadline_seconds": 60.0,
+      "handoff": false,
+      "input_transfer_bytes": 0,
+      "migration_success": false,
+      "model_load_seconds": 0.0,
+      "model_transfer_bytes": 0,
+      "node_id": "n0",
+      "predicted_handoff_target_rsu_id": "rsu_1",
+      "recompute_seconds": 0.0,
+      "reward": -2.0,
+      "reward_components": {
+        "reward_deadline_penalty": 0.0,
+        "reward_failure_penalty": -2.0,
+        "reward_node_completion": 0.0,
+        "reward_on_time_completion": 0.0,
+        "reward_recompute_penalty": -0.0,
+        "reward_service_operation_time_penalty": -0.0,
+        "reward_time_penalty": 0.0,
+        "reward_transfer_penalty": -0.0,
+        "reward_workflow_completion": 0.0
+      },
+      "reward_components_by_profile": {
+        "original_reward_v1": {
+          "reward_deadline_penalty": 0.0,
+          "reward_failure_penalty": -3.0,
+          "reward_node_completion": 0.0,
+          "reward_time_penalty": -0.16,
+          "reward_transfer_penalty": -0.0,
+          "reward_workflow_completion": 0.0
+        },
+        "service_aligned_v1": {
+          "reward_deadline_penalty": 0.0,
+          "reward_failure_penalty": -2.0,
+          "reward_node_completion": 0.0,
+          "reward_on_time_completion": 0.0,
+          "reward_recompute_penalty": -0.0,
+          "reward_service_operation_time_penalty": -0.0,
+          "reward_time_penalty": 0.0,
+          "reward_transfer_penalty": -0.0,
+          "reward_workflow_completion": 0.0
+        }
+      },
+      "service_completed": false,
+      "service_operation_seconds": 0.0,
+      "state_ready": true,
+      "state_restore_seconds": 0.0,
+      "state_transfer": {
+        "bytes": 2195,
+        "status": "not_ready_before_handoff",
+        "target_rsu_id": "rsu_1"
+      },
+      "state_transfer_bytes": 0,
+      "step_cost_seconds": 2.0,
+      "step_index": 0,
+      "transfer_seconds": 0.0
+    }
+  },
+  {
+    "cache_event": {
+      "adapter_id": "alpr",
+      "admitted": [
+        "adapter:alpr"
+      ],
+      "after_residents": [
+        "base:family_a",
+        "adapter:alpr"
+      ],
+      "before_last_used": {
+        "adapter:helmet_shared": 0,
+        "base:family_a": 0
+      },
+      "before_residents": [
+        "base:family_a",
+        "adapter:helmet_shared"
+      ],
+      "committed": true,
+      "load_seconds": 0.711175,
+      "reason": "committed",
+      "rsu_id": "rsu_1",
+      "transfer_bytes": 154423432,
+      "victims": [
+        "adapter:helmet_shared"
+      ]
+    },
+    "cap_predicate_triggered": true,
+    "case_id": "unused_warm_with_victim_reload",
+    "final_summary": {
+      "cache_evictions": 2,
+      "cache_rejections": 0,
+      "completed_nodes": 2,
+      "deadline_missed": 0,
+      "deadline_seconds": 60.0,
+      "deadline_violations": 0,
+      "design_id": "synthetic_unused_warm_with_victim_reload",
+      "failed_service_attempt_seconds_proxy": 2.0,
+      "handoff_count": 2,
+      "handoff_failures": 1,
+      "input_transfer_bytes": 385514,
+      "invalid_action_count": 0,
+      "late_workflow_completed": 0,
+      "migration_attempts": 1,
+      "migration_successes": 0,
+      "model_load_seconds": 0.9997590000000001,
+      "model_transfer_bytes": 164065376,
+      "modeled_completion_seconds": 30.79936712,
+      "node_count": 2,
+      "on_time_workflow_completed": 1,
+      "recompute_seconds": 10.789533,
+      "reward": 99.08994960343186,
+      "reward_deadline_penalty": 0.0,
+      "reward_failure_penalty": -2.0,
+      "reward_node_completion": 2.0,
+      "reward_on_time_completion": 0.0,
+      "reward_profile": "service_aligned_v1",
+      "reward_recompute_penalty": -0.53947665,
+      "reward_service_operation_time_penalty": -0.33228453999999996,
+      "reward_time_penalty": 0.0,
+      "reward_totals_by_profile": {
+        "original_reward_v1": 2.4594722172636967,
+        "service_aligned_v1": 99.08994960343186
+      },
+      "reward_transfer_penalty": -0.03828920656815171,
+      "reward_workflow_completion": 100.0,
+      "service_failures": 1,
+      "split": "synthetic_semantic_witness",
+      "state_restore_seconds": 0.0,
+      "state_transfer_bytes": 0,
+      "steps": 3,
+      "terminated": true,
+      "total_transfer_bytes": 164450890,
+      "transfer_seconds": 1.39560712,
+      "unfinished_after_deadline": 0,
+      "vehicle_fallback_count": 1,
+      "window_id": "synthetic_unused_warm_with_victim_reload",
+      "workflow_completed": 1,
+      "workflow_id": "wf_unused_warm_with_victim_reload"
+    },
+    "future": [
+      {
+        "action": 2,
+        "cache_before": {
+          "rsu_0": {
+            "last_used": {
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a"
+            ]
+          },
+          "rsu_1": {
+            "last_used": {
+              "adapter:alpr": 0,
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a",
+              "adapter:alpr"
+            ]
+          },
+          "rsu_2": {
+            "last_used": {
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a"
+            ]
+          }
+        },
+        "node_id": "n0",
+        "required_adapter": "alpr",
+        "terminated": false,
+        "transition": {
+          "action": 2,
+          "action_name": "vehicle_fallback",
+          "active_reward_profile": "service_aligned_v1",
+          "cache_events": [],
+          "clock_seconds_after": 15.795338511999999,
+          "current_rsu_id": "rsu_2",
+          "deadline_miss_event": false,
+          "deadline_seconds": 60.0,
+          "handoff": true,
+          "input_transfer_bytes": 192757,
+          "migration_success": false,
+          "model_load_seconds": 0.0,
+          "model_transfer_bytes": 0,
+          "node_id": "n0",
+          "predicted_handoff_target_rsu_id": "rsu_1",
+          "recompute_seconds": 0.0,
+          "reward": 0.7638104402636212,
+          "reward_components": {
+            "reward_deadline_penalty": 0.0,
+            "reward_failure_penalty": 0.0,
+            "reward_node_completion": 1.0,
+            "reward_on_time_completion": 0.0,
+            "reward_recompute_penalty": -0.0,
+            "reward_service_operation_time_penalty": -0.23614468,
+            "reward_time_penalty": 0.0,
+            "reward_transfer_penalty": -4.487973637878895e-05,
+            "reward_workflow_completion": 0.0
+          },
+          "reward_components_by_profile": {
+            "original_reward_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 2.0,
+              "reward_time_penalty": -0.94630208448,
+              "reward_transfer_penalty": -8.97594727575779e-05,
+              "reward_workflow_completion": 0.0
+            },
+            "service_aligned_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 1.0,
+              "reward_on_time_completion": 0.0,
+              "reward_recompute_penalty": -0.0,
+              "reward_service_operation_time_penalty": -0.23614468,
+              "reward_time_penalty": 0.0,
+              "reward_transfer_penalty": -4.487973637878895e-05,
+              "reward_workflow_completion": 0.0
+            }
+          },
+          "service_completed": true,
+          "service_operation_seconds": 11.807234,
+          "state_ready": true,
+          "state_restore_seconds": 0.0,
+          "state_transfer": null,
+          "state_transfer_bytes": 0,
+          "step_cost_seconds": 11.828776055999999,
+          "step_index": 1,
+          "transfer_seconds": 0.021542056
+        },
+        "truncated": false
+      },
+      {
+        "action": 0,
+        "cache_before": {
+          "rsu_0": {
+            "last_used": {
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a"
+            ]
+          },
+          "rsu_1": {
+            "last_used": {
+              "adapter:alpr": 0,
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a",
+              "adapter:alpr"
+            ]
+          },
+          "rsu_2": {
+            "last_used": {
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a"
+            ]
+          }
+        },
+        "node_id": "n1",
+        "required_adapter": "helmet_shared",
+        "terminated": true,
+        "transition": {
+          "action": 0,
+          "action_name": "current_rsu_cache_fill",
+          "active_reward_profile": "service_aligned_v1",
+          "cache_events": [
+            {
+              "adapter_id": "helmet_shared",
+              "admitted": [
+                "adapter:helmet_shared"
+              ],
+              "after_residents": [
+                "base:family_a",
+                "adapter:helmet_shared"
+              ],
+              "before_last_used": {
+                "adapter:alpr": 0,
+                "base:family_a": 0
+              },
+              "before_residents": [
+                "base:family_a",
+                "adapter:alpr"
+              ],
+              "committed": true,
+              "load_seconds": 0.288584,
+              "reason": "committed",
+              "rsu_id": "rsu_1",
+              "transfer_bytes": 9641944,
+              "victims": [
+                "adapter:alpr"
+              ]
+            }
+          ],
+          "clock_seconds_after": 30.79936712,
+          "current_rsu_id": "rsu_1",
+          "deadline_miss_event": false,
+          "deadline_seconds": 60.0,
+          "handoff": true,
+          "input_transfer_bytes": 192757,
+          "migration_success": false,
+          "model_load_seconds": 0.288584,
+          "model_transfer_bytes": 9641944,
+          "node_id": "n1",
+          "predicted_handoff_target_rsu_id": null,
+          "recompute_seconds": 10.789533,
+          "reward": 100.37631717023604,
+          "reward_components": {
+            "reward_deadline_penalty": 0.0,
+            "reward_failure_penalty": 0.0,
+            "reward_node_completion": 1.0,
+            "reward_on_time_completion": 0.0,
+            "reward_recompute_penalty": -0.53947665,
+            "reward_service_operation_time_penalty": -0.08191636,
+            "reward_time_penalty": 0.0,
+            "reward_transfer_penalty": -0.0022898197639733553,
+            "reward_workflow_completion": 100.0
+          },
+          "reward_components_by_profile": {
+            "original_reward_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 2.0,
+              "reward_time_penalty": -1.20032228864,
+              "reward_transfer_penalty": -0.004579639527946711,
+              "reward_workflow_completion": 4.0
+            },
+            "service_aligned_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 1.0,
+              "reward_on_time_completion": 0.0,
+              "reward_recompute_penalty": -0.53947665,
+              "reward_service_operation_time_penalty": -0.08191636,
+              "reward_time_penalty": 0.0,
+              "reward_transfer_penalty": -0.0022898197639733553,
+              "reward_workflow_completion": 100.0
+            }
+          },
+          "service_completed": true,
+          "service_operation_seconds": 4.0958179999999995,
+          "state_ready": false,
+          "state_restore_seconds": 0.0,
+          "state_transfer": null,
+          "state_transfer_bytes": 0,
+          "step_cost_seconds": 15.004028608,
+          "step_index": 2,
+          "transfer_seconds": 0.118677608
+        },
+        "truncated": false
+      }
+    ],
+    "predeclared_kind": "eviction",
+    "prefix_actions": [],
+    "prepared_state_after": {},
+    "prepared_state_before": {},
+    "probe_action": 4,
+    "public_state_exposes_actual_mbps": false,
+    "purpose": "wrong target warm is unused, evicts a bundle, and the victim is later reloaded",
+    "suffix_actions": [
+      2,
+      0
+    ],
+    "target_cache_after": {
+      "last_used": {
+        "adapter:alpr": 0,
+        "base:family_a": 0
+      },
+      "residents": [
+        "base:family_a",
+        "adapter:alpr"
+      ]
+    },
+    "target_cache_before": {
+      "last_used": {
+        "adapter:helmet_shared": 0,
+        "base:family_a": 0
+      },
+      "residents": [
+        "base:family_a",
+        "adapter:helmet_shared"
+      ]
+    },
+    "transition": {
+      "action": 4,
+      "action_name": "handoff_migration_prepare",
+      "active_reward_profile": "service_aligned_v1",
+      "cache_events": [
+        {
+          "adapter_id": "alpr",
+          "admitted": [
+            "adapter:alpr"
+          ],
+          "after_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "before_last_used": {
+            "adapter:helmet_shared": 0,
+            "base:family_a": 0
+          },
+          "before_residents": [
+            "base:family_a",
+            "adapter:helmet_shared"
+          ],
+          "committed": true,
+          "load_seconds": 0.711175,
+          "reason": "committed",
+          "rsu_id": "rsu_1",
+          "transfer_bytes": 154423432,
+          "victims": [
+            "adapter:helmet_shared"
+          ]
+        }
+      ],
+      "clock_seconds_after": 3.966562456,
+      "current_rsu_id": "rsu_0",
+      "deadline_miss_event": false,
+      "deadline_seconds": 60.0,
+      "handoff": false,
+      "input_transfer_bytes": 0,
+      "migration_success": false,
+      "model_load_seconds": 0.711175,
+      "model_transfer_bytes": 154423432,
+      "node_id": "n0",
+      "predicted_handoff_target_rsu_id": "rsu_1",
+      "recompute_seconds": 0.0,
+      "reward": -2.0501780070677995,
+      "reward_components": {
+        "reward_deadline_penalty": 0.0,
+        "reward_failure_penalty": -2.0,
+        "reward_node_completion": 0.0,
+        "reward_on_time_completion": 0.0,
+        "reward_recompute_penalty": -0.0,
+        "reward_service_operation_time_penalty": -0.0142235,
+        "reward_time_penalty": 0.0,
+        "reward_transfer_penalty": -0.03595450706779957,
+        "reward_workflow_completion": 0.0
+      },
+      "reward_components_by_profile": {
+        "original_reward_v1": {
+          "reward_deadline_penalty": 0.0,
+          "reward_failure_penalty": -3.0,
+          "reward_node_completion": 0.0,
+          "reward_time_penalty": -0.31732499648,
+          "reward_transfer_penalty": -0.07190901413559914,
+          "reward_workflow_completion": 0.0
+        },
+        "service_aligned_v1": {
+          "reward_deadline_penalty": 0.0,
+          "reward_failure_penalty": -2.0,
+          "reward_node_completion": 0.0,
+          "reward_on_time_completion": 0.0,
+          "reward_recompute_penalty": -0.0,
+          "reward_service_operation_time_penalty": -0.0142235,
+          "reward_time_penalty": 0.0,
+          "reward_transfer_penalty": -0.03595450706779957,
+          "reward_workflow_completion": 0.0
+        }
+      },
+      "service_completed": false,
+      "service_operation_seconds": 0.711175,
+      "state_ready": true,
+      "state_restore_seconds": 0.0,
+      "state_transfer": {
+        "bytes": 2195,
+        "status": "staged_pending_current_node_completion",
+        "target_rsu_id": "rsu_1"
+      },
+      "state_transfer_bytes": 0,
+      "step_cost_seconds": 3.966562456,
+      "step_index": 0,
+      "transfer_seconds": 1.255387456
+    }
+  },
+  {
+    "cache_event": {
+      "adapter_id": "alpr",
+      "admitted": [
+        "adapter:alpr"
+      ],
+      "after_residents": [
+        "base:family_a",
+        "adapter:alpr"
+      ],
+      "before_last_used": {
+        "base:family_a": 0
+      },
+      "before_residents": [
+        "base:family_a"
+      ],
+      "committed": true,
+      "load_seconds": 0.711175,
+      "reason": "committed",
+      "rsu_id": "rsu_1",
+      "transfer_bytes": 154423432,
+      "victims": []
+    },
+    "cap_predicate_triggered": true,
+    "case_id": "committed_warm_never_reused",
+    "final_summary": {
+      "cache_evictions": 0,
+      "cache_rejections": 0,
+      "completed_nodes": 1,
+      "deadline_missed": 0,
+      "deadline_seconds": 60.0,
+      "deadline_violations": 0,
+      "design_id": "synthetic_committed_warm_never_reused",
+      "failed_service_attempt_seconds_proxy": 2.0,
+      "handoff_count": 1,
+      "handoff_failures": 0,
+      "input_transfer_bytes": 192757,
+      "invalid_action_count": 0,
+      "late_workflow_completed": 0,
+      "migration_attempts": 1,
+      "migration_successes": 0,
+      "model_load_seconds": 0.711175,
+      "model_transfer_bytes": 154423432,
+      "modeled_completion_seconds": 15.795338511999999,
+      "node_count": 1,
+      "on_time_workflow_completed": 1,
+      "recompute_seconds": 0.0,
+      "reward": 98.71363243319583,
+      "reward_deadline_penalty": 0.0,
+      "reward_failure_penalty": -2.0,
+      "reward_node_completion": 1.0,
+      "reward_on_time_completion": 0.0,
+      "reward_profile": "service_aligned_v1",
+      "reward_recompute_penalty": 0.0,
+      "reward_service_operation_time_penalty": -0.25036818,
+      "reward_time_penalty": 0.0,
+      "reward_totals_by_profile": {
+        "original_reward_v1": 1.6643741454316432,
+        "service_aligned_v1": 98.71363243319583
+      },
+      "reward_transfer_penalty": -0.03599938680417836,
+      "reward_workflow_completion": 100.0,
+      "service_failures": 1,
+      "split": "synthetic_semantic_witness",
+      "state_restore_seconds": 0.0,
+      "state_transfer_bytes": 0,
+      "steps": 2,
+      "terminated": true,
+      "total_transfer_bytes": 154616189,
+      "transfer_seconds": 1.276929512,
+      "unfinished_after_deadline": 0,
+      "vehicle_fallback_count": 1,
+      "window_id": "synthetic_committed_warm_never_reused",
+      "workflow_completed": 1,
+      "workflow_id": "wf_committed_warm_never_reused"
+    },
+    "future": [
+      {
+        "action": 2,
+        "cache_before": {
+          "rsu_0": {
+            "last_used": {
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a"
+            ]
+          },
+          "rsu_1": {
+            "last_used": {
+              "adapter:alpr": 0,
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a",
+              "adapter:alpr"
+            ]
+          },
+          "rsu_2": {
+            "last_used": {
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a"
+            ]
+          }
+        },
+        "node_id": "n0",
+        "required_adapter": "alpr",
+        "terminated": true,
+        "transition": {
+          "action": 2,
+          "action_name": "vehicle_fallback",
+          "active_reward_profile": "service_aligned_v1",
+          "cache_events": [],
+          "clock_seconds_after": 15.795338511999999,
+          "current_rsu_id": "rsu_2",
+          "deadline_miss_event": false,
+          "deadline_seconds": 60.0,
+          "handoff": true,
+          "input_transfer_bytes": 192757,
+          "migration_success": false,
+          "model_load_seconds": 0.0,
+          "model_transfer_bytes": 0,
+          "node_id": "n0",
+          "predicted_handoff_target_rsu_id": "rsu_1",
+          "recompute_seconds": 0.0,
+          "reward": 100.76381044026363,
+          "reward_components": {
+            "reward_deadline_penalty": 0.0,
+            "reward_failure_penalty": 0.0,
+            "reward_node_completion": 1.0,
+            "reward_on_time_completion": 0.0,
+            "reward_recompute_penalty": -0.0,
+            "reward_service_operation_time_penalty": -0.23614468,
+            "reward_time_penalty": 0.0,
+            "reward_transfer_penalty": -4.487973637878895e-05,
+            "reward_workflow_completion": 100.0
+          },
+          "reward_components_by_profile": {
+            "original_reward_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 2.0,
+              "reward_time_penalty": -0.94630208448,
+              "reward_transfer_penalty": -8.97594727575779e-05,
+              "reward_workflow_completion": 4.0
+            },
+            "service_aligned_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 1.0,
+              "reward_on_time_completion": 0.0,
+              "reward_recompute_penalty": -0.0,
+              "reward_service_operation_time_penalty": -0.23614468,
+              "reward_time_penalty": 0.0,
+              "reward_transfer_penalty": -4.487973637878895e-05,
+              "reward_workflow_completion": 100.0
+            }
+          },
+          "service_completed": true,
+          "service_operation_seconds": 11.807234,
+          "state_ready": true,
+          "state_restore_seconds": 0.0,
+          "state_transfer": null,
+          "state_transfer_bytes": 0,
+          "step_cost_seconds": 11.828776055999999,
+          "step_index": 1,
+          "transfer_seconds": 0.021542056
+        },
+        "truncated": false
+      }
+    ],
+    "predeclared_kind": "unused",
+    "prefix_actions": [],
+    "prepared_state_after": {},
+    "prepared_state_before": {},
+    "probe_action": 4,
+    "public_state_exposes_actual_mbps": false,
+    "purpose": "target admission commits but the fixed future never visits that target",
+    "suffix_actions": [
+      2
+    ],
+    "target_cache_after": {
+      "last_used": {
+        "adapter:alpr": 0,
+        "base:family_a": 0
+      },
+      "residents": [
+        "base:family_a",
+        "adapter:alpr"
+      ]
+    },
+    "target_cache_before": {
+      "last_used": {
+        "base:family_a": 0
+      },
+      "residents": [
+        "base:family_a"
+      ]
+    },
+    "transition": {
+      "action": 4,
+      "action_name": "handoff_migration_prepare",
+      "active_reward_profile": "service_aligned_v1",
+      "cache_events": [
+        {
+          "adapter_id": "alpr",
+          "admitted": [
+            "adapter:alpr"
+          ],
+          "after_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "before_last_used": {
+            "base:family_a": 0
+          },
+          "before_residents": [
+            "base:family_a"
+          ],
+          "committed": true,
+          "load_seconds": 0.711175,
+          "reason": "committed",
+          "rsu_id": "rsu_1",
+          "transfer_bytes": 154423432,
+          "victims": []
+        }
+      ],
+      "clock_seconds_after": 3.966562456,
+      "current_rsu_id": "rsu_0",
+      "deadline_miss_event": false,
+      "deadline_seconds": 60.0,
+      "handoff": false,
+      "input_transfer_bytes": 0,
+      "migration_success": false,
+      "model_load_seconds": 0.711175,
+      "model_transfer_bytes": 154423432,
+      "node_id": "n0",
+      "predicted_handoff_target_rsu_id": "rsu_1",
+      "recompute_seconds": 0.0,
+      "reward": -2.0501780070677995,
+      "reward_components": {
+        "reward_deadline_penalty": 0.0,
+        "reward_failure_penalty": -2.0,
+        "reward_node_completion": 0.0,
+        "reward_on_time_completion": 0.0,
+        "reward_recompute_penalty": -0.0,
+        "reward_service_operation_time_penalty": -0.0142235,
+        "reward_time_penalty": 0.0,
+        "reward_transfer_penalty": -0.03595450706779957,
+        "reward_workflow_completion": 0.0
+      },
+      "reward_components_by_profile": {
+        "original_reward_v1": {
+          "reward_deadline_penalty": 0.0,
+          "reward_failure_penalty": -3.0,
+          "reward_node_completion": 0.0,
+          "reward_time_penalty": -0.31732499648,
+          "reward_transfer_penalty": -0.07190901413559914,
+          "reward_workflow_completion": 0.0
+        },
+        "service_aligned_v1": {
+          "reward_deadline_penalty": 0.0,
+          "reward_failure_penalty": -2.0,
+          "reward_node_completion": 0.0,
+          "reward_on_time_completion": 0.0,
+          "reward_recompute_penalty": -0.0,
+          "reward_service_operation_time_penalty": -0.0142235,
+          "reward_time_penalty": 0.0,
+          "reward_transfer_penalty": -0.03595450706779957,
+          "reward_workflow_completion": 0.0
+        }
+      },
+      "service_completed": false,
+      "service_operation_seconds": 0.711175,
+      "state_ready": true,
+      "state_restore_seconds": 0.0,
+      "state_transfer": {
+        "bytes": 2195,
+        "status": "staged_pending_current_node_completion",
+        "target_rsu_id": "rsu_1"
+      },
+      "state_transfer_bytes": 0,
+      "step_cost_seconds": 3.966562456,
+      "step_index": 0,
+      "transfer_seconds": 1.255387456
+    }
+  },
+  {
+    "cache_event": {
+      "adapter_id": "alpr",
+      "admitted": [],
+      "after_residents": [
+        "base:family_a",
+        "adapter:alpr"
+      ],
+      "before_last_used": {
+        "adapter:alpr": 0,
+        "base:family_a": 0
+      },
+      "before_residents": [
+        "base:family_a",
+        "adapter:alpr"
+      ],
+      "committed": true,
+      "load_seconds": 0.0,
+      "reason": "noop_all_resident",
+      "rsu_id": "rsu_1",
+      "transfer_bytes": 0,
+      "victims": []
+    },
+    "cap_predicate_triggered": true,
+    "case_id": "target_ready_noop_lru_touch",
+    "final_summary": {
+      "cache_evictions": 0,
+      "cache_rejections": 0,
+      "completed_nodes": 2,
+      "deadline_missed": 0,
+      "deadline_seconds": 60.0,
+      "deadline_violations": 0,
+      "design_id": "synthetic_target_ready_noop_lru_touch",
+      "failed_service_attempt_seconds_proxy": 2.0,
+      "handoff_count": 1,
+      "handoff_failures": 0,
+      "input_transfer_bytes": 385514,
+      "invalid_action_count": 0,
+      "late_workflow_completed": 0,
+      "migration_attempts": 1,
+      "migration_successes": 0,
+      "model_load_seconds": 0.0,
+      "model_transfer_bytes": 0,
+      "modeled_completion_seconds": 25.657552111999998,
+      "node_count": 2,
+      "on_time_workflow_completed": 1,
+      "recompute_seconds": 0.0,
+      "reward": 99.52762088052725,
+      "reward_deadline_penalty": 0.0,
+      "reward_failure_penalty": -2.0,
+      "reward_node_completion": 2.0,
+      "reward_on_time_completion": 0.0,
+      "reward_profile": "service_aligned_v1",
+      "reward_recompute_penalty": 0.0,
+      "reward_service_operation_time_penalty": -0.47228936,
+      "reward_time_penalty": 0.0,
+      "reward_totals_by_profile": {
+        "original_reward_v1": 2.9472163120944845,
+        "service_aligned_v1": 99.52762088052725
+      },
+      "reward_transfer_penalty": -8.97594727575779e-05,
+      "reward_workflow_completion": 100.0,
+      "service_failures": 1,
+      "split": "synthetic_semantic_witness",
+      "state_restore_seconds": 0.0,
+      "state_transfer_bytes": 0,
+      "steps": 3,
+      "terminated": true,
+      "total_transfer_bytes": 385514,
+      "transfer_seconds": 0.043084112,
+      "unfinished_after_deadline": 0,
+      "vehicle_fallback_count": 2,
+      "window_id": "synthetic_target_ready_noop_lru_touch",
+      "workflow_completed": 1,
+      "workflow_id": "wf_target_ready_noop_lru_touch"
+    },
+    "future": [
+      {
+        "action": 2,
+        "cache_before": {
+          "rsu_0": {
+            "last_used": {
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a"
+            ]
+          },
+          "rsu_1": {
+            "last_used": {
+              "adapter:alpr": 1,
+              "base:family_a": 1
+            },
+            "residents": [
+              "base:family_a",
+              "adapter:alpr"
+            ]
+          },
+          "rsu_2": {
+            "last_used": {
+              "base:family_a": 0
+            },
+            "residents": [
+              "base:family_a"
+            ]
+          }
+        },
+        "node_id": "n1",
+        "required_adapter": "alpr",
+        "terminated": true,
+        "transition": {
+          "action": 2,
+          "action_name": "vehicle_fallback",
+          "active_reward_profile": "service_aligned_v1",
+          "cache_events": [],
+          "clock_seconds_after": 25.657552111999998,
+          "current_rsu_id": "rsu_2",
+          "deadline_miss_event": false,
+          "deadline_seconds": 60.0,
+          "handoff": true,
+          "input_transfer_bytes": 192757,
+          "migration_success": false,
+          "model_load_seconds": 0.0,
+          "model_transfer_bytes": 0,
+          "node_id": "n1",
+          "predicted_handoff_target_rsu_id": "rsu_1",
+          "recompute_seconds": 0.0,
+          "reward": 100.76381044026363,
+          "reward_components": {
+            "reward_deadline_penalty": 0.0,
+            "reward_failure_penalty": 0.0,
+            "reward_node_completion": 1.0,
+            "reward_on_time_completion": 0.0,
+            "reward_recompute_penalty": -0.0,
+            "reward_service_operation_time_penalty": -0.23614468,
+            "reward_time_penalty": 0.0,
+            "reward_transfer_penalty": -4.487973637878895e-05,
+            "reward_workflow_completion": 100.0
+          },
+          "reward_components_by_profile": {
+            "original_reward_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 2.0,
+              "reward_time_penalty": -0.94630208448,
+              "reward_transfer_penalty": -8.97594727575779e-05,
+              "reward_workflow_completion": 4.0
+            },
+            "service_aligned_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 1.0,
+              "reward_on_time_completion": 0.0,
+              "reward_recompute_penalty": -0.0,
+              "reward_service_operation_time_penalty": -0.23614468,
+              "reward_time_penalty": 0.0,
+              "reward_transfer_penalty": -4.487973637878895e-05,
+              "reward_workflow_completion": 100.0
+            }
+          },
+          "service_completed": true,
+          "service_operation_seconds": 11.807234,
+          "state_ready": true,
+          "state_restore_seconds": 0.0,
+          "state_transfer": null,
+          "state_transfer_bytes": 0,
+          "step_cost_seconds": 11.828776055999999,
+          "step_index": 2,
+          "transfer_seconds": 0.021542056
+        },
+        "truncated": false
+      }
+    ],
+    "predeclared_kind": "noop",
+    "prefix_actions": [
+      2
+    ],
+    "prepared_state_after": {},
+    "prepared_state_before": {},
+    "probe_action": 4,
+    "public_state_exposes_actual_mbps": false,
+    "purpose": "target bundle is already resident; action 4 changes no resident set but touches LRU metadata",
+    "suffix_actions": [
+      2
+    ],
+    "target_cache_after": {
+      "last_used": {
+        "adapter:alpr": 1,
+        "base:family_a": 1
+      },
+      "residents": [
+        "base:family_a",
+        "adapter:alpr"
+      ]
+    },
+    "target_cache_before": {
+      "last_used": {
+        "adapter:alpr": 0,
+        "base:family_a": 0
+      },
+      "residents": [
+        "base:family_a",
+        "adapter:alpr"
+      ]
+    },
+    "transition": {
+      "action": 4,
+      "action_name": "handoff_migration_prepare",
+      "active_reward_profile": "service_aligned_v1",
+      "cache_events": [
+        {
+          "adapter_id": "alpr",
+          "admitted": [],
+          "after_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "before_last_used": {
+            "adapter:alpr": 0,
+            "base:family_a": 0
+          },
+          "before_residents": [
+            "base:family_a",
+            "adapter:alpr"
+          ],
+          "committed": true,
+          "load_seconds": 0.0,
+          "reason": "noop_all_resident",
+          "rsu_id": "rsu_1",
+          "transfer_bytes": 0,
+          "victims": []
+        }
+      ],
+      "clock_seconds_after": 13.828776055999999,
+      "current_rsu_id": "rsu_0",
+      "deadline_miss_event": false,
+      "deadline_seconds": 60.0,
+      "handoff": false,
+      "input_transfer_bytes": 0,
+      "migration_success": false,
+      "model_load_seconds": 0.0,
+      "model_transfer_bytes": 0,
+      "node_id": "n1",
+      "predicted_handoff_target_rsu_id": "rsu_1",
+      "recompute_seconds": 0.0,
+      "reward": -2.0,
+      "reward_components": {
+        "reward_deadline_penalty": 0.0,
+        "reward_failure_penalty": -2.0,
+        "reward_node_completion": 0.0,
+        "reward_on_time_completion": 0.0,
+        "reward_recompute_penalty": -0.0,
+        "reward_service_operation_time_penalty": -0.0,
+        "reward_time_penalty": 0.0,
+        "reward_transfer_penalty": -0.0,
+        "reward_workflow_completion": 0.0
+      },
+      "reward_components_by_profile": {
+        "original_reward_v1": {
+          "reward_deadline_penalty": 0.0,
+          "reward_failure_penalty": -3.0,
+          "reward_node_completion": 0.0,
+          "reward_time_penalty": -0.16,
+          "reward_transfer_penalty": -0.0,
+          "reward_workflow_completion": 0.0
+        },
+        "service_aligned_v1": {
+          "reward_deadline_penalty": 0.0,
+          "reward_failure_penalty": -2.0,
+          "reward_node_completion": 0.0,
+          "reward_on_time_completion": 0.0,
+          "reward_recompute_penalty": -0.0,
+          "reward_service_operation_time_penalty": -0.0,
+          "reward_time_penalty": 0.0,
+          "reward_transfer_penalty": -0.0,
+          "reward_workflow_completion": 0.0
+        }
+      },
+      "service_completed": false,
+      "service_operation_seconds": 0.0,
+      "state_ready": true,
+      "state_restore_seconds": 0.0,
+      "state_transfer": {
+        "bytes": 2195,
+        "status": "staged_pending_current_node_completion",
+        "target_rsu_id": "rsu_1"
+      },
+      "state_transfer_bytes": 0,
+      "step_cost_seconds": 2.0,
+      "step_index": 1,
+      "transfer_seconds": 0.0
+    }
+  },
+  {
+    "cache_event": {
+      "adapter_id": "alpr",
+      "admitted": [],
+      "after_residents": [],
+      "before_last_used": {},
+      "before_residents": [],
+      "committed": false,
+      "load_seconds": 0.0,
+      "reason": "dependency_bundle_exceeds_total_capacity",
+      "rsu_id": "rsu_1",
+      "transfer_bytes": 0,
+      "victims": []
+    },
+    "cap_predicate_triggered": true,
+    "case_id": "capacity_rejection_no_change",
+    "final_summary": {
+      "cache_evictions": 0,
+      "cache_rejections": 1,
+      "completed_nodes": 1,
+      "deadline_missed": 0,
+      "deadline_seconds": 60.0,
+      "deadline_violations": 0,
+      "design_id": "synthetic_capacity_rejection_no_change",
+      "failed_service_attempt_seconds_proxy": 2.0,
+      "handoff_count": 1,
+      "handoff_failures": 0,
+      "input_transfer_bytes": 192757,
+      "invalid_action_count": 0,
+      "late_workflow_completed": 0,
+      "migration_attempts": 1,
+      "migration_successes": 0,
+      "model_load_seconds": 0.0,
+      "model_transfer_bytes": 0,
+      "modeled_completion_seconds": 13.828776055999999,
+      "node_count": 1,
+      "on_time_workflow_completed": 1,
+      "recompute_seconds": 0.0,
+      "reward": 98.76381044026363,
+      "reward_deadline_penalty": 0.0,
+      "reward_failure_penalty": -2.0,
+      "reward_node_completion": 1.0,
+      "reward_on_time_completion": 0.0,
+      "reward_profile": "service_aligned_v1",
+      "reward_recompute_penalty": 0.0,
+      "reward_service_operation_time_penalty": -0.23614468,
+      "reward_time_penalty": 0.0,
+      "reward_totals_by_profile": {
+        "original_reward_v1": 1.8936081560472422,
+        "service_aligned_v1": 98.76381044026363
+      },
+      "reward_transfer_penalty": -4.487973637878895e-05,
+      "reward_workflow_completion": 100.0,
+      "service_failures": 1,
+      "split": "synthetic_semantic_witness",
+      "state_restore_seconds": 0.0,
+      "state_transfer_bytes": 0,
+      "steps": 2,
+      "terminated": true,
+      "total_transfer_bytes": 192757,
+      "transfer_seconds": 0.021542056,
+      "unfinished_after_deadline": 0,
+      "vehicle_fallback_count": 1,
+      "window_id": "synthetic_capacity_rejection_no_change",
+      "workflow_completed": 1,
+      "workflow_id": "wf_capacity_rejection_no_change"
+    },
+    "future": [
+      {
+        "action": 2,
+        "cache_before": {
+          "rsu_0": {
+            "last_used": {},
+            "residents": []
+          },
+          "rsu_1": {
+            "last_used": {},
+            "residents": []
+          },
+          "rsu_2": {
+            "last_used": {},
+            "residents": []
+          }
+        },
+        "node_id": "n0",
+        "required_adapter": "alpr",
+        "terminated": true,
+        "transition": {
+          "action": 2,
+          "action_name": "vehicle_fallback",
+          "active_reward_profile": "service_aligned_v1",
+          "cache_events": [],
+          "clock_seconds_after": 13.828776055999999,
+          "current_rsu_id": "rsu_1",
+          "deadline_miss_event": false,
+          "deadline_seconds": 60.0,
+          "handoff": true,
+          "input_transfer_bytes": 192757,
+          "migration_success": false,
+          "model_load_seconds": 0.0,
+          "model_transfer_bytes": 0,
+          "node_id": "n0",
+          "predicted_handoff_target_rsu_id": null,
+          "recompute_seconds": 0.0,
+          "reward": 100.76381044026363,
+          "reward_components": {
+            "reward_deadline_penalty": 0.0,
+            "reward_failure_penalty": 0.0,
+            "reward_node_completion": 1.0,
+            "reward_on_time_completion": 0.0,
+            "reward_recompute_penalty": -0.0,
+            "reward_service_operation_time_penalty": -0.23614468,
+            "reward_time_penalty": 0.0,
+            "reward_transfer_penalty": -4.487973637878895e-05,
+            "reward_workflow_completion": 100.0
+          },
+          "reward_components_by_profile": {
+            "original_reward_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 2.0,
+              "reward_time_penalty": -0.94630208448,
+              "reward_transfer_penalty": -8.97594727575779e-05,
+              "reward_workflow_completion": 4.0
+            },
+            "service_aligned_v1": {
+              "reward_deadline_penalty": 0.0,
+              "reward_failure_penalty": 0.0,
+              "reward_node_completion": 1.0,
+              "reward_on_time_completion": 0.0,
+              "reward_recompute_penalty": -0.0,
+              "reward_service_operation_time_penalty": -0.23614468,
+              "reward_time_penalty": 0.0,
+              "reward_transfer_penalty": -4.487973637878895e-05,
+              "reward_workflow_completion": 100.0
+            }
+          },
+          "service_completed": true,
+          "service_operation_seconds": 11.807234,
+          "state_ready": true,
+          "state_restore_seconds": 0.0,
+          "state_transfer": null,
+          "state_transfer_bytes": 0,
+          "step_cost_seconds": 11.828776055999999,
+          "step_index": 1,
+          "transfer_seconds": 0.021542056
+        },
+        "truncated": false
+      }
+    ],
+    "predeclared_kind": "rejection",
+    "prefix_actions": [],
+    "prepared_state_after": {},
+    "prepared_state_before": {},
+    "probe_action": 4,
+    "public_state_exposes_actual_mbps": false,
+    "purpose": "bundle exceeds total capacity and admission is rejected without resident change",
+    "suffix_actions": [
+      2
+    ],
+    "target_cache_after": {
+      "last_used": {},
+      "residents": []
+    },
+    "target_cache_before": {
+      "last_used": {},
+      "residents": []
+    },
+    "transition": {
+      "action": 4,
+      "action_name": "handoff_migration_prepare",
+      "active_reward_profile": "service_aligned_v1",
+      "cache_events": [
+        {
+          "adapter_id": "alpr",
+          "admitted": [],
+          "after_residents": [],
+          "before_last_used": {},
+          "before_residents": [],
+          "committed": false,
+          "load_seconds": 0.0,
+          "reason": "dependency_bundle_exceeds_total_capacity",
+          "rsu_id": "rsu_1",
+          "transfer_bytes": 0,
+          "victims": []
+        }
+      ],
+      "clock_seconds_after": 2.0,
+      "current_rsu_id": "rsu_0",
+      "deadline_miss_event": false,
+      "deadline_seconds": 60.0,
+      "handoff": false,
+      "input_transfer_bytes": 0,
+      "migration_success": false,
+      "model_load_seconds": 0.0,
+      "model_transfer_bytes": 0,
+      "node_id": "n0",
+      "predicted_handoff_target_rsu_id": "rsu_1",
+      "recompute_seconds": 0.0,
+      "reward": -2.0,
+      "reward_components": {
+        "reward_deadline_penalty": 0.0,
+        "reward_failure_penalty": -2.0,
+        "reward_node_completion": 0.0,
+        "reward_on_time_completion": 0.0,
+        "reward_recompute_penalty": -0.0,
+        "reward_service_operation_time_penalty": -0.0,
+        "reward_time_penalty": 0.0,
+        "reward_transfer_penalty": -0.0,
+        "reward_workflow_completion": 0.0
+      },
+      "reward_components_by_profile": {
+        "original_reward_v1": {
+          "reward_deadline_penalty": 0.0,
+          "reward_failure_penalty": -3.0,
+          "reward_node_completion": 0.0,
+          "reward_time_penalty": -0.16,
+          "reward_transfer_penalty": -0.0,
+          "reward_workflow_completion": 0.0
+        },
+        "service_aligned_v1": {
+          "reward_deadline_penalty": 0.0,
+          "reward_failure_penalty": -2.0,
+          "reward_node_completion": 0.0,
+          "reward_on_time_completion": 0.0,
+          "reward_recompute_penalty": -0.0,
+          "reward_service_operation_time_penalty": -0.0,
+          "reward_time_penalty": 0.0,
+          "reward_transfer_penalty": -0.0,
+          "reward_workflow_completion": 0.0
+        }
+      },
+      "service_completed": false,
+      "service_operation_seconds": 0.0,
+      "state_ready": true,
+      "state_restore_seconds": 0.0,
+      "state_transfer": {
+        "bytes": 2195,
+        "status": "not_ready_before_handoff",
+        "target_rsu_id": "rsu_1"
+      },
+      "state_transfer_bytes": 0,
+      "step_cost_seconds": 2.0,
+      "step_index": 0,
+      "transfer_seconds": 0.0
+    }
+  }
+]

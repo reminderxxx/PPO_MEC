@@ -1,0 +1,30 @@
+{
+  "files": [
+    {
+      "bytes": 2027,
+      "path": "audit_summary.json",
+      "sha256": "6413701b26efe7562b9a1330a74212bcd06543bb0c475ba7ec0407918200c0a4"
+    },
+    {
+      "bytes": 1531,
+      "path": "field_coverage.json",
+      "sha256": "c1b7f80bf4915de544836ee41e9a2ad98c8807a4fb5a55e642817feed94712ca"
+    },
+    {
+      "bytes": 58418,
+      "path": "synthetic_witnesses.json",
+      "sha256": "4830616e013be7edf0f53861c71c90221f6765b41c7369c0bf7746969eb00ac1"
+    },
+    {
+      "bytes": 271,
+      "path": "trigger_classification_summary.csv",
+      "sha256": "b6bb9547b07de875aeb500fb9c565a085a2fc6dce9c4c1d8949b46c565a79145"
+    },
+    {
+      "bytes": 551135,
+      "path": "trigger_samples.csv",
+      "sha256": "e7280205a93d75515a998410a6a9f2d1d4731c4cb2cd3502fed5761c80633107"
+    }
+  ],
+  "schema_version": "calibrated_workflow_failed_action4_credit_audit_integrity_v1"
+}

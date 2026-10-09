@@ -1,0 +1,6 @@
+classification,trigger_count
+committed_warm_not_reused_unresolved_victim_externality,4
+committed_warm_reused_no_observed_victim_cost,82
+committed_warm_reused_with_observed_victim_cost,36
+noop_resident_set_no_new_admission,688
+rollback_or_rejection_no_resident_change,333

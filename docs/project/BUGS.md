@@ -923,6 +923,8 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
   `V^π`，不能支持 GAE、exact historical update 或 policy-value calibration 的强 claim。
 - `OPEN / selection-mediated comparison`：只有 6/15 control/candidate method-seed pair 选择相同 update；selected 表覆盖
   实际 service consumer，却混合预注册 selection pathway，不是同 update 的纯 normalization effect。
-- `OPEN / non-committing failed action-4 credit`：PopArt 在 720/720 配对降低 probe value error，但 SA/PPO 的 action-4
-  probability 均值仍上升；下一轮候选只针对失败、无进展且未提交 migration 的 action 4 限制 actor positive advantage。
-  该候选尚未实现或训练，不得写成有效算法、SA 优势或 paper-ready 结果。
+- `REJECTED / over-broad failed-action-4 predicate`：后续 1,143-trigger 全账本重放发现 122 次 durable target admission，
+  其中 118 次观察到后续 reuse；36 次同时有 victim reload/failure。`migration_success=false` 只约束 state migration，
+  不约束 model-cache commit。原 advantage-cap 候选为 `NOT_READY`，不得实现或写成有效算法。
+- `OPEN / actor credit localization`：critic scale 改善不足以稳定改善 service 的结论仍成立，但 cache benefit、transfer cost、
+  LRU touch 与 eviction externality 尚未形成可识别的 policy-credit target；反事实 avoided loading 仍 unknown。

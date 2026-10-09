@@ -1,0 +1,42 @@
+{
+  "all_trigger_future_same_bundle_reuse_count": 951,
+  "automatic_replacement_candidate_authorized": false,
+  "cache_event_reason_counts": {
+    "committed": 122,
+    "contact_budget_exceeded": 333,
+    "noop_all_resident": 688
+  },
+  "cap_predicate": "executed_action==4 AND service_completed==false AND progressed==false AND migration_success==false",
+  "checkpoint_reads": 0,
+  "classification_counts": {
+    "committed_warm_not_reused_unresolved_victim_externality": 4,
+    "committed_warm_reused_no_observed_victim_cost": 82,
+    "committed_warm_reused_with_observed_victim_cost": 36,
+    "noop_resident_set_no_new_admission": 688,
+    "rollback_or_rejection_no_resident_change": 333
+  },
+  "committed_new_admission_count": 122,
+  "committed_new_admission_future_reuse_count": 118,
+  "committed_new_admission_no_observed_reuse_count": 4,
+  "created_at": "2026-10-09T08:06:23.969714+00:00",
+  "current_environment_sha256": "d789e6088e6a6a859de2fc720f78c94410179d2cc6a5a57a9751a9b89fed68bc",
+  "decision": "CAP_PREDICATE_INSUFFICIENT_NOT_READY",
+  "existing_replay": {
+    "behavior_row_count": 5293,
+    "episode_count": 600,
+    "replay_validation_mismatch_count": 0,
+    "trigger_count": 1143
+  },
+  "git_commit": "d0795da929322d353af76805b2350b7eefdf796b",
+  "model_calls": 0,
+  "observed_victim_reload_or_failure_count": 36,
+  "optimizer_updates": 0,
+  "reason": "migration_success=false does not imply no durable cache side effect or no later value; committed target warming and eviction externalities both occur",
+  "schema_version": "calibrated_workflow_failed_action4_credit_audit_v1",
+  "source_behavior_ledger_sha256": "99639fbfe08522979f0002cdd1f485bfc3ecd2fa4694caa823762dc966496d96",
+  "source_environment_sha256": "d789e6088e6a6a859de2fc720f78c94410179d2cc6a5a57a9751a9b89fed68bc",
+  "source_run": "artifacts/benchmarks/calibrated_workflow_value_normalization_ab_20261009_v2",
+  "source_scientific_commit": "858bc797e23b4e56051663f28d6fd7681f5ee77d",
+  "synthetic_witness_count": 6,
+  "training_steps": 0
+}

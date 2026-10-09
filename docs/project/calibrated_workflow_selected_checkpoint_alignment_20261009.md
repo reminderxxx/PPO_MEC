@@ -1,5 +1,10 @@
 # Calibrated workflow selected-checkpoint 机制—服务对齐复核
 
+> **后续语义审查勘误（2026-10-09）**：本报告原先冻结的 `non-committing failed-action advantage cap`
+> predicate 不充分，状态已改为 `NOT_READY`。action 4 可在当前服务失败前提交 target model-cache admission；
+> `migration_success=false` 不等于没有持久 cache side effect 或后续 reuse。以
+> `calibrated_workflow_failed_action4_credit_semantic_audit_20261009.md` 为准；下文 selected-checkpoint 数值保持有效。
+
 ## 身份与裁决
 
 - `reviewed_at`: `2026-10-09`（Asia/Shanghai）
@@ -86,29 +91,25 @@ aggregation 和 mask projection 共同决定执行动作，单看 action-4 次�
 
 1. termination/truncation/bootstrap：仍未发现当前实现错误；本轮没有新增证据支持终局罚。
 2. critic scale：selected checkpoint 上仍强支持 PopArt 跟踪回报尺度；但 probe 不是 `V^π`，claim 限于 scale tracking。
-3. 无效动作：critic 改善没有使 action-4 probability 跨方法同向下降，说明最接近服务退化的剩余环节是 actor 的局部
-   信用方向，而不是 critic 数值尺度本身。既有见证中，失败、无进展且未提交 migration 的 action 4 仍可取得正 raw
-   advantage；本轮不把它夸大为原 minibatch 的精确更新方向。
+3. 无效动作：critic 改善没有使 action-4 probability 跨方法同向下降，说明 actor credit 仍需定位，但不能据此把
+   “失败、无进展且未提交 migration”直接等同为无长期价值。后续全账本重放已确认其中包含 durable target cache admission
+   与后续 reuse；原 minibatch 的精确更新方向仍不可恢复。
 4. 选模：共同 dev 字典序没有读最终评价，但 28/30 早选且 9/15 arm-pair 的 selected update 不同。该事实解释了为何
    update-24 与 service consumer 不能逐 cell 直接相连；本轮已按实际 consumer 身份补齐，而未另选 checkpoint。
 
-## 唯一下一轮候选（仅冻结，不实现）
+## 历史候选勘误：`NOT_READY`，不得实现
 
-优先候选从 critic normalization 转为 **non-committing failed-action advantage cap**：仅当训练 transition 同时满足
+本报告最初提出 **non-committing failed-action advantage cap**：仅当训练 transition 同时满足
 `executed_action==4`、`service_completed=false`、完成节点数未增加且 `migration_success=false` 时，actor 使用的 normalized
 advantage 取 `min(A_t, 0)`；critic return/value target、reward、PopArt、auxiliary、网络、mask、观察、动作权限和其他 transition
-全部不变。该条件只使用训练后可观测 transition，不向 policy 提供实际未来链路或额外推理权限，并对 SA/MAPPO/PPO 对称。
+全部不变。该 proposal 未实现、未训练。
 
-机制依据是：这种 action 4 在当前环境中既未服务当前节点，也未提交迁移，延迟 completion credit 不应把它局部正向强化；
-PopArt 已证明单纯修 value 尺度不会稳定修正其概率。它是待证的 credit-assignment 约束，不是算法创新，也不是
-auxiliary-target 消融。
+后续源码与 1,143 个触发样本审查否定了其 predicate 充分性：action 4 会先尝试 target bundle admission，再检查当前
+service；122 个触发样本改变 target residents，其中 118 个观察到后续 same-bundle reuse。另有 victim reload/failure，
+说明正负长期效应并存。`migration_success=false` 只表示 workflow state 未提交，不能抹去 model-cache commit。
 
-下一轮若获独立授权，A 固定为本轮 PopArt；B 只增加上述 advantage cap。沿用 5 seeds、每 cell 1,440 steps、24 updates、
-192 optimizer steps、同一四 dev checkpoint selection 和既有暴露 evaluation splits。主要指标为 on-time/total completion、
-service-failure attempt、连续无进展；机制指标为冻结 common states 上的 action-4 probability/margin/argmax，并单列 cap
-触发覆盖率。出现任一条件即否定并停止：cap 触发样本为零或身份/预算不等；相关状态 P(action 4)/margin 不降；任一方法
-on-time 或 total completion 下降；failure/no-progress 不改善；或收益只来自改变 action mask/奖励/额外信息。不得补 seed、调 cap、
-切 checkpoint 或转入 auxiliary sweep。
+因此原 A/B 设计撤销，候选状态为 `CAP_PREDICATE_INSUFFICIENT_NOT_READY`。本轮不自动换新 predicate 或提出替代训练；
+只有未来能同时归因 target reuse、已支付 transfer/load 和 victim externality，才可另轮定义 policy objective。
 
 ## 产物
 
@@ -119,6 +120,6 @@ on-time 或 total completion 下降；failure/no-progress 不改善；或收益�
 - 身份：`checkpoint_identity.csv`、`alignment_summary.json`、`artifact_integrity.json`
 - 论文机制图：`selected_checkpoint_alignment_mechanism.svg`
 
-最终回答：**当前最值得补足的是 actor 对“失败且未提交迁移的 action 4”的局部信用分配。** selected checkpoint 证据表明
-PopArt 已把共同固定行为 probe 的 value error 在 720/720 配对中降低，却没有让 action-4 probability 或服务指标共同改善；
-下一轮只加入上述 advantage cap。只要相关概率/margin 不降，或任一方法的 on-time/total completion 受损，即否定该改进。
+最终回答（经后续勘误）：selected checkpoint 证据仍表明 critic scale 改善不足以稳定改善服务，但当前不能把剩余问题
+收缩为上述 advantage cap。该 predicate 混合有益 reuse、原子 rollback、noop/LRU touch 与 eviction externality，故方案
+`NOT_READY`；本轮没有可实施的新算法候选。
