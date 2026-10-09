@@ -5,6 +5,13 @@
 
 # Runbook
 
+## CSCWD 作者审阅主稿（2026-10-09）
+
+当前唯一主稿为 `cscwd_2027_manuscript_working_draft.md`；数值与待补原件的映射见
+`cscwd_2027_claim_evidence_register_20261009.md`。旧 v1.3 只作历史机制稿。填入控制器方法或结果前，
+先冻结科学 commit、同信息/同预算基线、原始窗口互斥、checkpoint 与逐行结果，并核对主稿方法和结果
+来自同一版本。此文档更新不授权启动新实验，也不改变已有 artifact。
+
 ## 对称恢复成本复算（2026-10-06；已完成，不得覆盖）
 
 `scripts/run_symmetric_recovery_cost_validation.py` 只接受 clean、精确 expected commit 和不存在的 output root；失败原件保留，

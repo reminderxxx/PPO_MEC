@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-09：CSCWD 算法主张缺少匹配原件（OPEN CLAIM BLOCKER）
+
+- 旧 v70 的冻结计划与实际窗口来源不一致，full 窗口重叠，SA 与 PPO/DT 的更新量和选模机会不同；历史独立窗口 CI 与算法领先主张停用。原始审查见 `cscwd_2027_baseline_contribution_audit_20261009.md`。
+- 新投稿控制器的科学版本、同信息/同预算基线、互斥原始区间、checkpoint/command/manifest 与逐行结果尚未冻结并交付；算法贡献为 `UNVERIFIED`，主稿只留 `[B-*]` 待填项。
+- 真实后缀和 victim/reload 仅为单主机有界机制证据；无线、队列、交通任务正确性和总体泛化仍未覆盖。完整 claim 边界见 `cscwd_2027_claim_evidence_register_20261009.md`。
+
 ## 2026-10-06：路径不对称已修复；算法增量价值缺口确认（RESOLVED IMPLEMENTATION / OPEN CLAIM BLOCKER）
 
 - `RESOLVED`：新 v2 ledger 为 restart/recovery 分别建立 cache state，双方都执行 current→next 合法 transaction；每个 model

@@ -1,5 +1,12 @@
 ﻿# Directory Structure
 
+## 2026-10-09 CSCWD 作者审阅文档
+
+- `docs/project/cscwd_2027_manuscript_working_draft.md`：唯一当前英文主稿，待填算法版本和主比较结果。
+- `docs/project/cscwd_2027_claim_evidence_register_20261009.md`：主张、原件、限制、研究问题和 B 线接口。
+- `docs/project/cscwd_2027_baseline_contribution_audit_20261009.md`：旧 v70 基线公平性与窗口独立性审查。
+- `docs/project/system_mechanism_manuscript_working_draft.md`：保留的历史 v1.3 机制稿。
+
 ## 2026-10-06 symmetric recovery cost correction
 
 - `src/runtime/symmetric_recovery_cost.py`：双方 event ledger 的纯函数 scorer 与三种在线决策。

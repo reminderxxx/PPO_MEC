@@ -9,6 +9,10 @@
 
 ## Live 文档
 
+- `cscwd_2027_manuscript_working_draft.md`：唯一当前 CSCWD 作者审阅英文主稿；算法版本和结果保留显式待填项。
+- `cscwd_2027_claim_evidence_register_20261009.md`：主张—原件—限制、主比较/两项消融、历史优势撤销与 B 线接口清单。
+- `cscwd_2027_baseline_contribution_audit_20261009.md`：旧 v70 窗口身份、重叠和基线预算的独立审查记录。
+
 - `recovery_cost_defect_impact_report_20261006.md`：修复前独立只读审查，追踪 decision、branch execution、cache
   终态、汇总和 claim 的路径不对称影响，并列明仍有效证据
 - `recovery_cost_corrected_matrix_results_20261006.md`：原 12 点对称公平复算、四方法完整旧→新对照及历史优势撤销
@@ -72,7 +76,7 @@
 
 - `vec_ai_workload_dataset_design_20260928.md`：车联网AI工作流/缓存数据集贡献候选，提出依据、校准生成方案、D01–D12证据池和验收边界；尚未生成或发布
 
-- `system_mechanism_manuscript_working_draft.md`：系统机制主线英文工作稿 v1.3，含真实 adapter victim→reload、
+- `system_mechanism_manuscript_working_draft.md`：历史系统机制英文工作稿 v1.3，含真实 adapter victim→reload、
   对称事件核算、历史优势撤销、边界错选、限制与独立证据映射；不是投稿终稿
 
 - `problem_literature_traceability_20260928.md`：P01–P07问题、L01–L10论文、官方出处/等级边界、补证与失败判据的固定追溯索引

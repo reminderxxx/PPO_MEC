@@ -5,6 +5,10 @@
 
 # PPO_MEC
 
+当前 CSCWD 2027 作者审阅主稿为[英文正文](docs/project/cscwd_2027_manuscript_working_draft.md)，
+[主张—原件台账](docs/project/cscwd_2027_claim_evidence_register_20261009.md)记录证据边界、主比较、最多两项消融和待冻结的算法接口。
+算法对照结果尚未补齐，不能据此判断投稿就绪。旧 v1.3 是历史机制稿。
+
 真实 adapter cache victim→reload 的 12-call 最小实测已完成：两臂共用同一 native typed-cache 与 PEFT lifecycle
 接线，ALPR 合法驱逐后从 780 个 runtime tensors 降为 0，并在后续节点前由保留本地文件真实重载；base+双 adapter
 对照无 action load/unload。两条件仍均选择 recovery，真实 lifecycle 对两臂是共同成本，不构成决策翻转或算法优势。
@@ -23,7 +27,7 @@ restart 当前模型准备，历史 `10/12 vs 7/12` 比较优势已撤销。对�
 estimate 错选。见[缺陷报告](docs/project/recovery_cost_defect_impact_report_20261006.md)、
 [纠正版结果](docs/project/recovery_cost_corrected_matrix_results_20261006.md)、
 [边界检查](docs/project/recovery_cost_boundary_check_results_20261006.md)与
-[论文工作稿 v1.3](docs/project/system_mechanism_manuscript_working_draft.md)。当前贡献限于系统机制、可复现成本审计和失效条件，
+[历史机制稿 v1.3](docs/project/system_mechanism_manuscript_working_draft.md)。当前贡献限于系统机制、可审计成本账本和失效条件，
 不支持优于正确简单基线/两步前瞻、真实无线、跨 workflow 共享或 paper-ready。
 
 Production action 4 的显式 opt-in 状态导出/导入合同，以及 measurement-calibrated semi-synthetic VEC workload
