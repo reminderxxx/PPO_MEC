@@ -73,6 +73,11 @@
 - 决定：workload v0.1 使用 8 点平衡半分数和 3 个固定 seed；低恢复来自既有测量，高恢复/arrival/capacity/link/
   deadline 是显式 synthetic，未知无线与任务质量保持 unavailable。
 - 决定：只比较 current restart、局部完整增量成本和 offline exact；结果前不改矩阵，且不因 exact gap 启动 RL。
+## 2026-10-09：冻结窗口必须绑定实际 source 与原始区间
+
+- 决定：普通 frozen-plan 路径同 formal 路径一样 fail-fast 核对实际窗口身份；计划与实际不同直接拒绝，不把 frame offset 相同视为同一窗口。
+- 理由：v70 mixed/full 原始结果与所记 Peachtree 计划分别落在 Lankershim，导致 provenance 和独立窗口统计不能直接用于会议主张。
+- 旧产物保持只读；修复仅保护未来执行。新强基线仍需独立窗口、匹配训练/selection 预算和预注册主表。
 
 ## 2026-10-05：机制证据优先，不晋级 RL
 

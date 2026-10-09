@@ -145,6 +145,12 @@
 - `artifacts/analysis/production_action4_independent_repeat_20261005_v1/`：三次交错同版本配对复测及逐进程原始回执。
 - 同名 real v1、workload v1/v2/v3 保留为非最终执行/代码失败证据，不覆盖、不冒充独立样本。
 - `tests/test_production_action4_state.py`、`tests/test_measurement_calibrated_vec_workload.py`：正负接线与矩阵合同。
+## 2026-10-09 冻结窗口身份校验
+
+- `src/evaluators/main_results_support.py`：普通 frozen-plan mobility loader 在返回 bundle 前比较计划与实际窗口身份。
+- `scripts/benchmark_main_results.py`、`scripts/train_algo_pool_real_sample.py`、`scripts/train_sa_ghmappo_real_sample.py`：把计划身份传到共享 loader。
+- `tests/test_frozen_window_loader_identity.py`：覆盖同 offset 错 source 与原始区间错位的 rollout 前拒绝。
+- `docs/project/cscwd_2027_baseline_contribution_audit_20261009.md`：记录旧 v70 审查与新基线实验边界；旧 artifact 原样保留。
 
 ## 2026-10-05 最小机制证据闭环
 

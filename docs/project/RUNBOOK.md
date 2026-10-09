@@ -273,6 +273,14 @@ RSU 网络测量。完整边界见 `workload_v0_1_self_consistency_audit_2026100
 
 本地 package I/O 与 100 Mbps 公式不是无线测量；real runner 的 target 先加载并核验模型，再导入状态。缺模型负例只
 验证 fail-closed，不触发下载或 generate。旧 run root、旧 holdout 和历史状态包不得覆盖或复用为新独立样本。
+## CSCWD 强基线前置身份检查（2026-10-09）
+
+`benchmark_main_results.py`、`train_algo_pool_real_sample.py` 和 `train_sa_ghmappo_real_sample.py`
+消费窗口计划时，实际 mobility 的 ID、source segment、frame/time 区间必须与计划相同；不一致会在
+rollout 前抛出 `frozen window identity mismatch`。重新生成计划须使用将要执行的相同数据源、
+`max_mobility_rows`、窗口长度和预处理身份，不能只改旧 JSON 的 ID。旧 v70 计划与结果不一致，
+不得将其重跑或改写为独立会议证据。审查与强基线实验门槛见
+`cscwd_2027_baseline_contribution_audit_20261009.md`。
 
 ## 最小机制证据闭环（2026-10-05）
 

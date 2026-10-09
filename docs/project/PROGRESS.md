@@ -152,6 +152,12 @@
 - final evidence：`artifacts/analysis/production_action4_workflow_20261005_v2/`、
   `artifacts/analysis/measurement_calibrated_vec_workload_20261005_v4/`；claim 边界见
   `measurement_calibrated_vec_workload_v0_1.md`。
+- 后续独立实现任务已给普通 frozen-plan loader 增加 ID/source/frame/time 校验，并将主 benchmark、算法池及 SA 训练计划传入；专项正反例验证见本次提交。该修复不追认旧 v70 数值。
+
+- 已从 v70 mixed/full 原始 rows、episode receipt、checkpoint manifest 和统计包复核旧奖励均值；这些仍是开发协议描述性结果。
+- mixed/full 冻结计划的 Peachtree 窗口与实际 Lankershim rows 的 ID 交集均为 0；full 有 177 对原始区间重叠，原 48-window CI 不能作为独立窗口推断。
+- SA/DT/PPO checkpoint update count 为 16/12/12，SA 使用 best-by-reward、基线使用 latest；现有包不是同预算强基线实验。full 完成率三者均为 0.958333，SA 对 DT 的连续性和 backhaul 不构成全面优势。
+- 本轮只读审查、未修改旧结果。贡献与新实验边界见 `cscwd_2027_baseline_contribution_audit_20261009.md`；confirmatory claim 仍为 `UNVERIFIED`。
 
 ## 2026-10-05：最小机制证据闭环完成
 

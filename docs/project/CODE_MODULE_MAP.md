@@ -99,6 +99,10 @@ v3 interface-repair 职责增量：
 - `src/data/workflow/measurement_calibrated_vec_workload.py`：生成抽象 typed-model 三请求 `A→B→A` 实例，分离
   measured/synthetic/unavailable，并执行 restart/local/exact 三方法。
 - `scripts/run_measurement_calibrated_vec_workload.py`：clean commit/create-only 执行、CSV/JSON/data card/manifest 输出。
+## 2026-10-09 冻结窗口身份边界
+
+- `src/evaluators/main_results_support.py::load_window_bundle`：普通真实 mobility 加载后、任何训练或评估 rollout 前，比较调用者的冻结窗口 ID、source segment、frame/time 区间；formal contract loader 保持既有专用校验。
+- 主 benchmark、算法池训练和 SA 训练负责传入原计划记录；共享 loader 不从实际结果回填计划身份。
 
 ## 2026-10-05 bounded mechanism evidence
 

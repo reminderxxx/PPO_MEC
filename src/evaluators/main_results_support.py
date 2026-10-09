@@ -9,7 +9,7 @@ from copy import deepcopy
 from math import dist, isfinite
 from pathlib import Path
 from statistics import fmean, pstdev
-from typing import Any
+from typing import Any, Mapping
 
 import torch
 
@@ -2425,6 +2425,7 @@ def load_window_bundle(
     formal_window_consumption_contract_path: str = "",
     formal_window_split: str = "",
     expected_window_id: str = "",
+    expected_window_identity: Mapping[str, Any] | None = None,
 ) -> Any:
     if formal_window_consumption_contract_path:
         if mobility_source != "ngsim":
@@ -2443,7 +2444,7 @@ def load_window_bundle(
             window_id=expected_window_id,
             rsu_layout=rsu_layout,
         )
-    return load_real_mobility_bundle(
+    bundle = load_real_mobility_bundle(
         root_dir=root_dir,
         mobility_source=mobility_source,
         mobility_csv_path=mobility_csv_path,
@@ -2455,6 +2456,32 @@ def load_window_bundle(
         window_selector="ordered",
         random_seed=random_seed,
     )
+    expected = dict(expected_window_identity or {})
+    if expected_window_id:
+        if "window_id" in expected and str(expected["window_id"]) != expected_window_id:
+            raise ValueError("expected window identity conflicts with expected_window_id")
+        expected["window_id"] = expected_window_id
+    identity_fields = (
+        "window_id",
+        "source_segment_id",
+        "source_location",
+        "frame_offset",
+        "window_length",
+        "segment_frame_start",
+        "segment_frame_end",
+        "time_index_start",
+        "time_index_end",
+    )
+    for field in identity_fields:
+        if field not in expected or expected[field] is None:
+            continue
+        observed = bundle.rsu_metadata.get(field)
+        if observed != expected[field]:
+            raise ValueError(
+                f"frozen window identity mismatch for {field}: "
+                f"expected {expected[field]!r}, observed {observed!r}"
+            )
+    return bundle
 
 
 def build_rsu_layout_proxy(base_bundle: RealMobilityBundle, rsu_count: int, rsu_coverage_radius: float) -> tuple[str, dict[str, Any]]:
