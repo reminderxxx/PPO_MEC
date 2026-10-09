@@ -1,0 +1,30 @@
+{
+  "budget": {
+    "behavior_rows": 5293,
+    "cells": 30,
+    "environment_steps": 43200,
+    "evaluation_rows": 600,
+    "optimizer_steps": 5760,
+    "updates": 720
+  },
+  "checkpoint_candidates": 120,
+  "claim_boundary": "exposed development data only",
+  "created_at": "2026-10-09T06:05:23.976303+00:00",
+  "evaluation_or_holdout_used_for_selection": false,
+  "reward_used_for_selection": false,
+  "schema_version": "calibrated_workflow_value_normalization_review_v1",
+  "selected_update_counts": {
+    "12": 6,
+    "18": 6,
+    "24": 2,
+    "6": 16
+  },
+  "source_artifact_integrity_sha256": "f09cfcec161bd057821367e9b8bed23bf922b4fa0e4a8a9e6eca73933b0995b6",
+  "source_completion_receipt_sha256": "c4f016d6e7c4db6ab2bfe41ec14d8c3ba1d2780eaa0c60fabcfbc17b919ff88b",
+  "source_gate_sha256": "ae757ad8b01ae7b722e57028f89804090660143a4576db372dbbf678e18d840d",
+  "source_git_commit": "858bc797e23b4e56051663f28d6fd7681f5ee77d",
+  "source_integrity_file_count": 166,
+  "source_integrity_verified": true,
+  "source_run": "calibrated_workflow_value_normalization_ab_20261009_v2",
+  "source_run_manifest_sha256": "ddcfe336a913185a5743fbafc4de2aae46e1a420df79a04ebb5e17b940b52503"
+}

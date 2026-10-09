@@ -611,3 +611,5 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 ## Calibrated workflow critic PopArt development A/B
 
 服务奖励学习信号诊断将下一步唯一候选冻结为三种 learned method 共用的 critic PopArt target/output normalization。执行协议、固定预算、开发数据边界与 falsification gates 见 `docs/project/calibrated_workflow_value_normalization_ab_execution_protocol_20261009.md`。该候选不是 SA 专属能力或算法创新；`regression` / `frozen_check` 仍是暴露的开发 split，不是 formal/holdout。
+
+该 A/B 已在固定预算下完成，结果为 `FALSIFIED_OR_NOT_PROMOTED`：critic raw RMSE/gradient scale 改善，但 behavior probability gate 与 PPO on-time no-harm gate 失败。PopArt 只保留为有限稳定性设置，不宣称服务优势；详见 `docs/project/calibrated_workflow_value_normalization_ab_results_20261009.md`。

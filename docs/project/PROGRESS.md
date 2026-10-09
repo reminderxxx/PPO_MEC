@@ -2228,3 +2228,10 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 新 run ID 为 `calibrated_workflow_value_normalization_ab_20261009_v2`。必须先通过恰好两次无训练宿主验收（成功/非零退出）和一次低成本 preflight 核对，才可单次启动。
 
 宿主验收已完成且不再增加：成功 probe=`return 0`，非零 probe=`return 7`；二者均在原 launch 调用退出后由独立 verify 确认 child-entry、stdout/stderr、exit sidecar 与 terminal `PASS`。一次错误 expected-commit 的 pre-dispatch 调用未创建 child，独立保留为操作错误回执，不计入两次验收。
+
+### v2 科学 A/B 完成与停止
+
+- fixed commit `858bc797...` 完成 30 cells、43,200 steps、720 updates、5,760 optimizer steps；600 evaluation rows、5,293 behavior rows，wall `293.159 s`，无 retry/formal/holdout/download/model-generate。
+- mechanism gate 通过：raw critic RMSE 与 value:policy scale 显著改善；behavior gate 因总体 action-4 mean probability 略升失败；service gate 因 PPO on-time `.29→.19` 失败。
+- SA completion `.87→1.00`，MAPPO `.88→.88`，PPO `.93→.97`；不能把 overall fail 简化成所有方法无改善。
+- 最终决策：PopArt 只保留为有限稳定性设置、不宣称服务优势；raw critic 保持 canonical 参照。不自动补跑或进入 auxiliary/reward/新结构搜索。

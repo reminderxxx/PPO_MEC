@@ -1,0 +1,23 @@
+{
+  "acknowledged_at": "2026-10-09T05:21:37.895617+00:00",
+  "automatic_retry": false,
+  "child_pid": 77344,
+  "child_started_at": "2026-10-09T05:21:37.292713+00:00",
+  "entered_runner_at": "2026-10-09T05:21:37.829415+00:00",
+  "entry_payload": {
+    "entered_at": "2026-10-09T05:21:37.829415+00:00",
+    "git_commit": "858bc797e23b4e56051663f28d6fd7681f5ee77d",
+    "interpreter": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "pid": 77344,
+    "run_id": "calibrated_workflow_value_normalization_ab_20261009_v2",
+    "schema_version": "calibrated_workflow_value_normalization_ab_runner_entry_v1",
+    "status": "entered"
+  },
+  "entry_receipt": "/Users/howen/.codex/worktrees/service-reward-learning-diagnosis/PPO_MEC/artifacts/benchmarks/calibrated_workflow_value_normalization_ab_20261009_v2/runner_entered.json",
+  "interpreter": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "kind": "scientific",
+  "run_id": "calibrated_workflow_value_normalization_ab_20261009_v2",
+  "schema_version": "persistent_ab_launch_ack_v1",
+  "status": "entered_child",
+  "supervisor_pid": 77341
+}

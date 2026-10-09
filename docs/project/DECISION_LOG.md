@@ -1293,3 +1293,9 @@ claim map 必须报告 `UNAVAILABLE`。
 - 依据：既有 service-reward 记录显示 critic error 与共享梯度压制显著，但 termination/GAE/reset-observation 和 auxiliary 冲突没有形成一致实现缺陷证据。
 - 约束：training-only statistics；raw-unit bootstrap/GAE；output-preserving affine compensation；旧 reward、actor、auxiliary、预算、instance order 与选模指标不变。
 - 否证：mechanism、current-missing action-4 probability/raw argmax、service completion/failure 三类 gate 任一不通过即停止；不追加 seed、不延长预算、不转做 auxiliary-target 或其他候选。
+
+## 2026-10-09 — PopArt 只保留为有限稳定性设置
+
+- 结果：critic raw RMSE、EV 和 value:policy gradient scale 改善，但 behavior probability conjunction 与 PPO on-time no-harm 失败，overall=`FALSIFIED_OR_NOT_PROMOTED`。
+- 决定：不把 PopArt 写成服务优势或原创贡献；raw critic 继续作 canonical 参照，PopArt 仅作为有限训练稳定性设置。
+- 不自动切换到 auxiliary/reward/新结构。若未来继续定位，只先补 selected-checkpoint、共同冻结状态上的 value error + action probability/margin + advantage 对齐证据。

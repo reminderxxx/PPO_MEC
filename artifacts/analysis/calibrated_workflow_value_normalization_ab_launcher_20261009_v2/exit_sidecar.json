@@ -1,0 +1,11 @@
+{
+  "automatic_retry": false,
+  "child_pid": 77344,
+  "expected_exit_code": 0,
+  "recorded_at": "2026-10-09T05:26:31.802866+00:00",
+  "return_code": 0,
+  "run_id": "calibrated_workflow_value_normalization_ab_20261009_v2",
+  "schema_version": "persistent_ab_exit_sidecar_v1",
+  "timed_out": false,
+  "wall_seconds": 294.53143320799995
+}

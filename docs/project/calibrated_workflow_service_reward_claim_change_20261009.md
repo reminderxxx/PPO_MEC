@@ -79,3 +79,5 @@ transitions、4 PPO epochs、batch 32、192 optimizer steps，以及 updates `6/
 ## 2026-10-09 启动状态追加
 
 PopArt scientific commit `5ee9f1e8071ad8d9e1992e91564ea32801e3d7a7` 和 create-only preflight 已完成；唯一授权后台启动在 run root 创建前结束，日志为空，scientific steps/updates/checkpoints/evaluation rows 均为 0。未重试。因此 A 论文线没有获得新的 A/B 性能、机制或排名证据；上述 `UNVERIFIED_FOR_CONFIRMATORY_BASELINE_CLAIM` 不变。独立状态报告为 `calibrated_workflow_value_normalization_ab_launch_status_20261009.md`，未编辑主论文稿。
+
+后续新授权 v2 已完整结束；本段只保留 v1 历史。最新 A-line 输入以 `calibrated_workflow_value_normalization_ab_claim_change_20261009.md` 为准，overall=`FALSIFIED_OR_NOT_PROMOTED`，仍不支持 formal/paper-ready 或 PopArt 服务优势。

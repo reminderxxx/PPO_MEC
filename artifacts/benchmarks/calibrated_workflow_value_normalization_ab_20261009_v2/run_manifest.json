@@ -1,0 +1,118 @@
+{
+  "actual_environment_steps": 43200,
+  "actual_optimizer_steps": 5760,
+  "actual_updates": 720,
+  "arms": [
+    {
+      "arm": "control_raw_critic_target",
+      "critic_target_normalization": "disabled"
+    },
+    {
+      "arm": "candidate_popart_critic_target",
+      "critic_target_normalization": "popart_running_mean_std"
+    }
+  ],
+  "authorization_config": {
+    "path": "configs/experiment/calibrated_workflow_value_normalization_ab_authorized_v2.json",
+    "sha256": "c76a63784d5d4ebebf5413bf45598fcbbc74879d1c2fda4797de8985cba6952e"
+  },
+  "automatic_retry": false,
+  "base_config": {
+    "path": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json",
+    "sha256": "20e82b0ea4ff5c7caf597d987bcef1f7523dc0c1c7ece21deba32aa7d47af923"
+  },
+  "budget": {
+    "automatic_retry": false,
+    "checkpoint_update_candidates": [
+      6,
+      12,
+      18,
+      24
+    ],
+    "environment_steps_per_cell": 1440,
+    "episode_max_steps": 24,
+    "evaluation_or_holdout_used_for_selection": false,
+    "hyperparameter_search_trials_per_arm": 0,
+    "learned_methods": [
+      "sa_ghmappo",
+      "mappo",
+      "ppo"
+    ],
+    "minibatch_size": 32,
+    "optimizer_steps_per_cell": 192,
+    "paired_initialization_and_instance_order": true,
+    "ppo_epochs_per_update": 4,
+    "reward_value_used_for_selection": false,
+    "seeds": [
+      7,
+      17,
+      29,
+      43,
+      61
+    ],
+    "selection_order": [
+      "on_time_workflow_completion_rate_desc",
+      "workflow_completion_rate_desc",
+      "unfinished_after_deadline_rate_asc",
+      "service_failure_rate_asc",
+      "consecutive_no_progress_rate_asc",
+      "completed_sample_elapsed_seconds_asc_with_coverage",
+      "total_transfer_mb_asc",
+      "recompute_seconds_asc",
+      "invalid_prepare_attempts_asc"
+    ],
+    "selection_split": "dev",
+    "transitions_per_update": 60,
+    "update_opportunities_per_cell": 24
+  },
+  "claim_boundary": {
+    "algorithm_innovation": false,
+    "development_only": true,
+    "formal": false,
+    "holdout": false,
+    "paper_ready": false,
+    "strong_baseline_paper_table": false
+  },
+  "command": "/Users/howen/.codex/worktrees/service-reward-learning-diagnosis/PPO_MEC/scripts/run_calibrated_workflow_value_normalization_ab.py --authorization-config configs/experiment/calibrated_workflow_value_normalization_ab_authorized_v2.json --output-root /Users/howen/.codex/worktrees/service-reward-learning-diagnosis/PPO_MEC/artifacts/benchmarks/calibrated_workflow_value_normalization_ab_20261009_v2",
+  "created_at": "2026-10-09T05:26:30.989947+00:00",
+  "design_config": {
+    "path": "configs/experiment/calibrated_workflow_value_normalization_ab_v1.json",
+    "sha256": "9630d97d56e8192b6278694980132cc942a67cc87794eb8ddc4b67d97f3cc606"
+  },
+  "downloads": 0,
+  "elapsed_seconds": 293.15925875000005,
+  "formal_or_holdout_reads": 0,
+  "git_commit": "858bc797e23b4e56051663f28d6fd7681f5ee77d",
+  "hyperparameter_search_trials": 0,
+  "launch_count": 1,
+  "methods": [
+    "sa_ghmappo",
+    "mappo",
+    "ppo"
+  ],
+  "python_identity": {
+    "executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "numpy": "2.0.2",
+    "torch": "2.8.0",
+    "version": "3.9.6 (default, May 22 2026, 11:13:45) \n[Clang 21.0.0 (clang-2100.1.1.101)]"
+  },
+  "real_model_generate_calls": 0,
+  "schema_version": "calibrated_workflow_value_normalization_ab_run_v1",
+  "seeds": [
+    7,
+    17,
+    29,
+    43,
+    61
+  ],
+  "window_identity_validation": {
+    "all_identity_fields_present": true,
+    "all_intervals_pairwise_disjoint": true,
+    "raw_interval_overlap_pairs": [],
+    "required_identity_missing": []
+  },
+  "workload_manifest": {
+    "path": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+    "sha256": "b7efe5d6e50ad17b744230c03a126370656d0196b60c7f7e6b5a86bb702effbc"
+  }
+}

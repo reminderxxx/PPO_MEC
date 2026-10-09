@@ -1750,6 +1750,15 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 - 两项均由原 launch 调用后的独立 verify 核对 entry ACK、child PID、exit sidecar、terminal receipt 和 artifact integrity；无训练、模型、数据或网络调用。
 - 错误完整 commit SHA 的首次 pre-dispatch 调用在 child/root 前被拒绝，保留于 `calibrated_workflow_value_normalization_launcher_host_success_20261009_v1/`，不冒充宿主验收。
 
+## 2026-10-09 calibrated workflow PopArt development A/B v2
+
+- source run：`artifacts/benchmarks/calibrated_workflow_value_normalization_ab_20261009_v2/`；scientific commit=`858bc797e23b4e56051663f28d6fd7681f5ee77d`。
+- receipt：30 cells、43,200 steps、720 updates、5,760 optimizer steps、600 evaluation rows、5,293 behavior rows、293.159 s；`FALSIFIED_OR_NOT_PROMOTED`。
+- integrity：166 registered files size/SHA-256 全部通过；120 checkpoint candidates 坐标/hash 匹配。checkpoint/权重仅本地，未提交或上传。
+- compact review：`artifacts/analysis/calibrated_workflow_value_normalization_ab_review_20261009_v3/`；含 service/behavior/mechanism method×seed 配对表、selection、gate review 与独立 integrity。
+- report：`docs/project/calibrated_workflow_value_normalization_ab_results_20261009.md`；A-line input：`calibrated_workflow_value_normalization_ab_claim_change_20261009.md`。
+- boundary：E2 artifact-audited development evidence；不是 formal/holdout/paper-ready，不支持 PopArt 服务优势或 SA 稳定领先。
+
 ## 2026-10-05 shared cache × recovery coupling witness
 
 - run id：`shared_cache_recovery_coupling_20261005_v1`

@@ -863,3 +863,4 @@ v3 interface-repair 职责增量：
 - `tests/test_popart_value_normalization.py`、`tests/test_calibrated_workflow_value_normalization_ab.py`：数值稳定、prediction invariance、checkpoint 兼容、预算、选模与 gate 回归。
 - `scripts/launch_calibrated_workflow_value_normalization_ab.py`：create-only detached supervisor；冻结解释器路径，child-owned runner-entry ACK，stdout/stderr、exit sidecar、terminal receipt、timeout 与无重试合同。
 - `tests/test_calibrated_workflow_value_normalization_launcher.py`：run ID、解释器字符串、成功/非零宿主 outcome 与无 retry plan 回归。
+- `scripts/analyze_calibrated_workflow_value_normalization_ab.py`：只读核验 source integrity/预算/selection，并生成 completed-only cost、service/behavior/mechanism method×seed 配对复核包。

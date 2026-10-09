@@ -1,0 +1,50 @@
+{
+  "files": [
+    {
+      "bytes": 1559,
+      "path": "behavior_method_summary.csv",
+      "sha256": "8eb2f04bfff0f2399e08dc4a64b401b3db8f3365ee814e3409e60098632cba7c"
+    },
+    {
+      "bytes": 2901,
+      "path": "behavior_seed_pairs.csv",
+      "sha256": "361b3a3c77d78b2b50619145483fb2450fc308a3617db1117e232e27fbcc06d5"
+    },
+    {
+      "bytes": 4302,
+      "path": "checkpoint_selection_summary.csv",
+      "sha256": "08f7c49bf53028090404e7e221c85206cd22a269d0830db244ced1e5e33b5fbe"
+    },
+    {
+      "bytes": 7194,
+      "path": "gate_review.json",
+      "sha256": "87730a74be524cff8d0867a782a221501d312f6a11038b6c122e295556eb8d8f"
+    },
+    {
+      "bytes": 2458,
+      "path": "mechanism_method_summary.csv",
+      "sha256": "bfd2d6a53f660e937648d01b0d98b461e90265a6c4c1f7b7c7ab2f57a85a08e8"
+    },
+    {
+      "bytes": 9976,
+      "path": "mechanism_seed_pairs.csv",
+      "sha256": "b2952521195905c636a47ebd1ff23f3719e8ad8f03b27af6152ac852ddccdd08"
+    },
+    {
+      "bytes": 1181,
+      "path": "review_manifest.json",
+      "sha256": "2f95968bef15cf3432bfd0783a3409bb900b892a063a4d8b51bb8c1059eef5e3"
+    },
+    {
+      "bytes": 3940,
+      "path": "service_method_summary.csv",
+      "sha256": "f5ef30b9e43fa912d99438cc9d7ff8d193116bd15dff4442d2281024be56e044"
+    },
+    {
+      "bytes": 8047,
+      "path": "service_seed_pairs.csv",
+      "sha256": "ced6b6b0dec3fd195d761381df78877a4b76e2474cdb4c24fa558954a1acc30f"
+    }
+  ],
+  "schema_version": "calibrated_workflow_value_normalization_review_integrity_v1"
+}

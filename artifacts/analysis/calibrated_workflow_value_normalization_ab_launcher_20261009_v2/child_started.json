@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "/Users/howen/.codex/worktrees/service-reward-learning-diagnosis/PPO_MEC/scripts/run_calibrated_workflow_value_normalization_ab.py",
+    "--authorization-config",
+    "configs/experiment/calibrated_workflow_value_normalization_ab_authorized_v2.json",
+    "--output-root",
+    "/Users/howen/.codex/worktrees/service-reward-learning-diagnosis/PPO_MEC/artifacts/benchmarks/calibrated_workflow_value_normalization_ab_20261009_v2"
+  ],
+  "automatic_retry": false,
+  "child_pid": 77344,
+  "interpreter": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "started_at": "2026-10-09T05:21:37.292713+00:00",
+  "status": "started"
+}

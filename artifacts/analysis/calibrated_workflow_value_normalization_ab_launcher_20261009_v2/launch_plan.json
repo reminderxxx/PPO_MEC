@@ -1,0 +1,27 @@
+{
+  "authorization_config": "configs/experiment/calibrated_workflow_value_normalization_ab_authorized_v2.json",
+  "authorization_sha256": "c76a63784d5d4ebebf5413bf45598fcbbc74879d1c2fda4797de8985cba6952e",
+  "automatic_retry": false,
+  "child_argv": [
+    "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+    "/Users/howen/.codex/worktrees/service-reward-learning-diagnosis/PPO_MEC/scripts/run_calibrated_workflow_value_normalization_ab.py",
+    "--authorization-config",
+    "configs/experiment/calibrated_workflow_value_normalization_ab_authorized_v2.json",
+    "--output-root",
+    "/Users/howen/.codex/worktrees/service-reward-learning-diagnosis/PPO_MEC/artifacts/benchmarks/calibrated_workflow_value_normalization_ab_20261009_v2"
+  ],
+  "created_at": "2026-10-09T05:21:37.222174+00:00",
+  "cwd": "/Users/howen/.codex/worktrees/service-reward-learning-diagnosis/PPO_MEC",
+  "entry_receipt": "/Users/howen/.codex/worktrees/service-reward-learning-diagnosis/PPO_MEC/artifacts/benchmarks/calibrated_workflow_value_normalization_ab_20261009_v2/runner_entered.json",
+  "entry_timeout_seconds": 30.0,
+  "expected_commit": "858bc797e23b4e56051663f28d6fd7681f5ee77d",
+  "expected_exit_code": 0,
+  "formal_or_holdout_reads": 0,
+  "interpreter": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "kind": "scientific",
+  "output_root": "/Users/howen/.codex/worktrees/service-reward-learning-diagnosis/PPO_MEC/artifacts/benchmarks/calibrated_workflow_value_normalization_ab_20261009_v2",
+  "run_id": "calibrated_workflow_value_normalization_ab_20261009_v2",
+  "schema_version": "persistent_ab_supervisor_plan_v1",
+  "supervisor_root": "/Users/howen/.codex/worktrees/service-reward-learning-diagnosis/PPO_MEC/artifacts/analysis/calibrated_workflow_value_normalization_ab_launcher_20261009_v2",
+  "wall_clock_cap_seconds": 7200.0
+}

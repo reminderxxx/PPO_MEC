@@ -1,0 +1,12 @@
+{
+  "actual_environment_steps": 43200,
+  "actual_optimizer_steps": 5760,
+  "actual_updates": 720,
+  "behavior_rows": 5293,
+  "checkpoint_files_committed_or_uploaded": false,
+  "elapsed_seconds": 293.15925875000005,
+  "evaluation_rows": 600,
+  "falsification_verdict": "FALSIFIED_OR_NOT_PROMOTED",
+  "scientific_execution_complete": true,
+  "status": "complete"
+}

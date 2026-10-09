@@ -907,3 +907,10 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - 新授权允许以新 run ID 独立执行，不恢复 v1；旧空日志和 failure receipt 保持不变，OS 退出原因仍为 unknown。
 - 风险控制改为 child-owned entry receipt + detached supervisor + exit/terminal sidecars。两次宿主验收任一未通过即停止，不以训练任务测试 launcher。
 - 此修复不改变 PopArt、reward、data、budget 或科学 gate；若 diff 出现科学变量变化，启动授权失效。
+
+## RESOLVED / persistent launcher；OPEN / PopArt service sufficiency 被否定
+
+- v2 supervisor 完成且 terminal=`SCIENTIFIC_CHILD_COMPLETE`，旧 pre-run 空日志原因仍 unknown，但不再阻塞本次固定执行。
+- PopArt 改善 raw-unit critic RMSE 和 gradient scale，却未通过共同 behavior/service gates；不能声称 critic 修复足以改善服务。
+- `OPEN / mechanism consumer alignment`：机制门消费 update-24 training batch，service/behavior 消费 dev-selected checkpoint；28/30 selected update 早于 24。原结果保留，不修改后补跑。
+- `BOUNDARY / development only`：36 实例已暴露，5 seeds 不是独立 workload；没有 formal/holdout 支撑。

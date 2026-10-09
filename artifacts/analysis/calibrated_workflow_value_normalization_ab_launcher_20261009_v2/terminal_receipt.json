@@ -1,0 +1,27 @@
+{
+  "automatic_retry": false,
+  "child_pid": 77344,
+  "child_receipt": {
+    "actual_environment_steps": 43200,
+    "actual_optimizer_steps": 5760,
+    "actual_updates": 720,
+    "behavior_rows": 5293,
+    "checkpoint_files_committed_or_uploaded": false,
+    "elapsed_seconds": 293.15925875000005,
+    "evaluation_rows": 600,
+    "falsification_verdict": "FALSIFIED_OR_NOT_PROMOTED",
+    "scientific_execution_complete": true,
+    "status": "complete"
+  },
+  "classification": "SCIENTIFIC_CHILD_COMPLETE",
+  "entry_acknowledged": true,
+  "expected_exit_code": 0,
+  "finished_at": "2026-10-09T05:26:31.803398+00:00",
+  "kind": "scientific",
+  "return_code": 0,
+  "run_id": "calibrated_workflow_value_normalization_ab_20261009_v2",
+  "schema_version": "persistent_ab_terminal_receipt_v1",
+  "status": "PASS",
+  "supervisor_pid": 77341,
+  "timed_out": false
+}

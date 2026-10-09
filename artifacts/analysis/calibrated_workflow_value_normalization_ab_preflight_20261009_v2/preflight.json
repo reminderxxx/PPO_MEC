@@ -1,0 +1,134 @@
+{
+  "aggregate_budget": {
+    "cells": 30,
+    "environment_steps": 43200,
+    "optimizer_steps": 5760,
+    "updates": 720
+  },
+  "authorization_enabled": true,
+  "base_hash_match": true,
+  "design_hash_match": true,
+  "downloads": 0,
+  "formal_or_holdout_reads": 0,
+  "frozen_design_still_not_authorized": true,
+  "git_clean": true,
+  "git_status": [],
+  "interval_identity": {
+    "all_identity_fields_present": true,
+    "all_intervals_pairwise_disjoint": true,
+    "raw_interval_overlap_pairs": [],
+    "required_identity_missing": []
+  },
+  "real_model_generate_calls": 0,
+  "resolved_base_hash_match": true,
+  "schema_version": "calibrated_workflow_value_normalization_ab_preflight_v1",
+  "single_launch": true,
+  "smoke": [
+    {
+      "active_partial_episode": true,
+      "all_optimizer_metrics_finite": true,
+      "critic_rmse_denormalized_before_update": 64.280502,
+      "episodes_completed_or_truncated": 7,
+      "episodes_started": 8,
+      "method": "sa_ghmappo",
+      "optimizer_steps": 8,
+      "policy_update_skipped": false,
+      "popart_enabled": false,
+      "popart_state": null,
+      "transitions": 60,
+      "value_loss": 4110.449585
+    },
+    {
+      "active_partial_episode": true,
+      "all_optimizer_metrics_finite": true,
+      "critic_rmse_denormalized_before_update": 64.280502,
+      "episodes_completed_or_truncated": 7,
+      "episodes_started": 8,
+      "method": "sa_ghmappo",
+      "optimizer_steps": 8,
+      "policy_update_skipped": false,
+      "popart_enabled": true,
+      "popart_state": {
+        "count": 60,
+        "m2": 51114.21719659316,
+        "max_abs_target": 1e+20,
+        "mean": 57.21837033381065,
+        "min_std": 1.0,
+        "schema_version": "scalar_popart_v1"
+      },
+      "transitions": 60,
+      "value_loss": 4.800319
+    },
+    {
+      "active_partial_episode": true,
+      "all_optimizer_metrics_finite": true,
+      "critic_rmse_denormalized_before_update": 68.491844,
+      "episodes_completed_or_truncated": 7,
+      "episodes_started": 8,
+      "method": "mappo",
+      "optimizer_steps": 8,
+      "policy_update_skipped": false,
+      "popart_enabled": false,
+      "popart_state": null,
+      "transitions": 60,
+      "value_loss": 4670.085358
+    },
+    {
+      "active_partial_episode": true,
+      "all_optimizer_metrics_finite": true,
+      "critic_rmse_denormalized_before_update": 68.491844,
+      "episodes_completed_or_truncated": 7,
+      "episodes_started": 8,
+      "method": "mappo",
+      "optimizer_steps": 8,
+      "policy_update_skipped": false,
+      "popart_enabled": true,
+      "popart_state": {
+        "count": 60,
+        "m2": 45881.2134531032,
+        "max_abs_target": 1e+20,
+        "mean": 62.42513236204783,
+        "min_std": 1.0,
+        "schema_version": "scalar_popart_v1"
+      },
+      "transitions": 60,
+      "value_loss": 6.079604
+    },
+    {
+      "active_partial_episode": false,
+      "all_optimizer_metrics_finite": true,
+      "critic_rmse_denormalized_before_update": 73.644524,
+      "episodes_completed_or_truncated": 9,
+      "episodes_started": 9,
+      "method": "ppo",
+      "optimizer_steps": 8,
+      "policy_update_skipped": false,
+      "popart_enabled": false,
+      "popart_state": null,
+      "transitions": 60,
+      "value_loss": 5437.382874
+    },
+    {
+      "active_partial_episode": false,
+      "all_optimizer_metrics_finite": true,
+      "critic_rmse_denormalized_before_update": 73.644524,
+      "episodes_completed_or_truncated": 9,
+      "episodes_started": 9,
+      "method": "ppo",
+      "optimizer_steps": 8,
+      "policy_update_skipped": false,
+      "popart_enabled": true,
+      "popart_state": {
+        "count": 60,
+        "m2": 22712.62683326607,
+        "max_abs_target": 1e+20,
+        "mean": 71.20202293395997,
+        "min_std": 1.0,
+        "schema_version": "scalar_popart_v1"
+      },
+      "transitions": 60,
+      "value_loss": 14.313506
+    }
+  ],
+  "status": "pass"
+}

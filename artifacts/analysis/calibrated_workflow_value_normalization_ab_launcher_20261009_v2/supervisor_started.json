@@ -1,0 +1,8 @@
+{
+  "interpreter": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+  "plan_sha256": "b60ce0dcc5137d64a00dc57ae65cbb544f2c4d4d3d92b311c3c84a98d7b6a86f",
+  "run_id": "calibrated_workflow_value_normalization_ab_20261009_v2",
+  "started_at": "2026-10-09T05:21:37.291457+00:00",
+  "status": "started",
+  "supervisor_pid": 77341
+}
