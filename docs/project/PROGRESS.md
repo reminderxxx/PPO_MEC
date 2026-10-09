@@ -5,7 +5,13 @@
 
 ﻿# Progress
 
-## 2026-10-09：因果前缀强基线新版本已冻结，待一次开发执行
+## 2026-10-09：因果强基线只读行为诊断完成；SA 无服务优势
+
+- 固定 `a088693` 科学 run 的 440 episode/3,308 决策逐步重放一致；train/dev 的 60 个共同状态对 20 selected checkpoint 完成 1,200 次只读前向，网络/optimizer/归一化不变，0 训练/新正式评估/旧 holdout。诊断小摘要见 `cscwd_sa_behavior_diagnosis_summary_20261009.json`。
+- SA 五 seed 完成为 `20/15/18/15/19`，PPO `15/20/20/20/20`，MAPPO/DT 各 `20/20/20/20/20`。SA 的 13 个未完成 episode 首次失败均在当前 bundle 缺失时选择 action 3（8）或 4（5），失败 episode 投影为 0；策略动作是近端定位，seed 敏感明显，但不称架构/选模因果已证明。
+- action 4 即使失败且无 migration 仍可能改变目标缓存；已观察后续复用与 victim reload，因此不采纳简单封禁。共同完成配对成本必须并列 coverage。预测 known 下一步正确率 `91.09%`、handoff 时间 `85.57%`，目标 ID `100%` 仅限人工路由的重叠开发决策点。无论文或 paper-ready 晋级。
+
+## 2026-10-09：因果前缀强基线新版本已冻结，待一次开发执行（历史冻结时状态）
 
 - 新 `calibrated_workflow_interface_v3_prefix_only` 使用 train-only 转移计数，训练实例 leave-one-out；36 个原始实例的 474 个前缀通过实际未来后缀篡改的公共 observation/semantic/mask 不变验收。物理接触窗口仅 real step 使用实际轨迹，规则 preview 使用预测窗口。新旧环境语义版本分列。
 - 新 v2 配置固定原奖励/raw critic、四 learned×五 seed×1,440 步、Popularity 和 two-step 各 20 个实例一次；总预算 28,800 步、440 评估行。运行前预检通过，但本条记录尚无科学结果或算法晋级。协议见 `cscwd_causal_strong_baseline_protocol_20261009.md`。

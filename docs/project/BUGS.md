@@ -5,6 +5,11 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-09：SA 近端策略决策和 seed 敏感仍为方法 blocker
+
+- `OBSERVED`：源 run 的 SA 完成 `87/100`，PPO `95/100`、MAPPO/DT 各 `100/100`（同一已消费实例×五 seed）；13 个 SA 未完成 episode 的首次失败都在当前 bundle 缺失时选 action 3/4，且失败 episode 无投影。共同状态前向仍频繁选择当前步不服务动作，支持策略决策近端定位，不证明架构或 checkpoint selection 单因果。
+- `BOUNDARY`：失败 action 4 仍可改变目标 resident；后续复用/重载存在，简单以“失败且无 migration”封禁会忽略副作用。成本比较必须报告共同完成 coverage。预测目标 100% 来自重叠的人工路由开发决策点，不能外推真实 mobility；无独立确认/真实无线，paper-ready=`Unverifiable`。详见 `cscwd_sa_behavior_diagnosis_20261009.md`。
+
 ## 2026-10-09：新前缀版本已消除公共实际后缀回退；确认性证据仍缺
 
 - `RESOLVED IN V3 PREFIX-ONLY PROFILE`：新版本对 36 实例的 474 个决策前缀篡改未来后缀，公共观察、语义、mask 均不变；旧版本的阻断继续有效。物理接触判定版本已独立分离，因此旧/新结果不能作算法因果比较。

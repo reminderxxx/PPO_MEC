@@ -2,6 +2,9 @@
 
 ## 2026-10-09 因果前缀强基线版本
 
+- `scripts/diagnose_cscwd_sa_behavior.py`：固定科学原件的只读重放、train/dev 共同状态前向和预测误差分层；本地 create-only 诊断根为 `artifacts/analysis/cscwd_sa_behavior_diagnosis_20261009_v1/`。
+- `docs/project/cscwd_sa_behavior_diagnosis_plan_20261009.md`、`cscwd_sa_behavior_diagnosis_20261009.md` 与 `cscwd_sa_behavior_diagnosis_summary_20261009.json`：事前规则、独立报告和小型机器摘要。
+
 - `src/envs/core/causal_rsu_predictor.py`：训练拟合的低容量前缀 RSU 预测器。
 - `configs/experiment/calibrated_workflow_strong_baselines_development_v2_prefix_only.json`：一次开发执行的 hash、方法、预算和权限冻结。
 - `scripts/run_calibrated_workflow_strong_baselines.py`、`scripts/analyze_calibrated_workflow_strong_baselines.py`、`scripts/launch_calibrated_workflow_strong_baselines.py`：预检/训练、自动分析、持久单次监督。

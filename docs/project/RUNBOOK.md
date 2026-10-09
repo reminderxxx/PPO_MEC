@@ -5,6 +5,14 @@
 
 # Runbook
 
+## 因果强基线只读行为诊断（2026-10-09；已完成）
+
+事前规则、唯一执行及原件路径见 `cscwd_sa_behavior_diagnosis_plan_20261009.md` 和
+`cscwd_sa_behavior_diagnosis_20261009.md`。独立脚本
+`scripts/diagnose_cscwd_sa_behavior.py --preflight` 只核验固定科学 run 身份；唯一 `--run`
+已在 `artifacts/analysis/cscwd_sa_behavior_diagnosis_20261009_v1/` 完成 440 episode 重放与 1,200 次只读前向。
+该目录 create-only，不要覆盖、重跑或将大账本/checkpoint 加入 Git。后续只读取回执、机器摘要和报告；不生成论文表。
+
 ## 因果前缀强基线开发版本（2026-10-09）
 
 新版本协议见 `cscwd_causal_strong_baseline_protocol_20261009.md`。旧 v1 配置继续阻断；仅新 v2 配置允许一次

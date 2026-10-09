@@ -1,5 +1,7 @@
 # Code Module Map
 
+`scripts/diagnose_cscwd_sa_behavior.py` 仅消费已完成的因果强基线原件与 selected checkpoint：先重放已记录动作校验物理/缓存账本，再按事前规则从 train/dev 采共同状态，只读前向并核对参数不变；不调用训练、选模或新正式评价，也不写原 run。
+
 `src/envs/core/causal_rsu_predictor.py` 只实现训练序列计数拟合、前缀推理与模型哈希；
 `calibrated_continuous_workflow_env.py` 在显式 v3 profile 消费它生成公共预测，real step 独立执行实际接触判定，
 decision clone 用预测判定。`run_calibrated_workflow_strong_baselines.py` 验证 source/model hash、逐前缀后缀不变、

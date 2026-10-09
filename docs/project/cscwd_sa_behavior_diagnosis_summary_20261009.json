@@ -1,0 +1,337 @@
+{
+  "boundary": "consumed_development_only_no_paper_table_no_independent_confirmation",
+  "common_state_current_missing": {
+    "nonserving_action_1_3_4_per_method": {
+      "dt_handoff_drl": 10,
+      "mappo": 12,
+      "ppo": 21,
+      "sa_ghmappo": 51
+    },
+    "sa_by_seed": {
+      "17": 21,
+      "29": 10,
+      "43": 11,
+      "61": 5,
+      "7": 4
+    },
+    "states_per_checkpoint": 25
+  },
+  "diagnosis_machine_summary_sha256": "fa4dadeb3171bbf2a1fef59d124364dcc7f3ec715a103b6b5e035861926fc429",
+  "evidence_level": "E2_DEVELOPMENT_ARTIFACT_REPLAYED",
+  "first_divergence": {
+    "dt_handoff_drl": {
+      "no_divergence": 6,
+      "pairs": 100,
+      "same_public_state_at_first_divergence": 94
+    },
+    "mappo": {
+      "no_divergence": 0,
+      "pairs": 100,
+      "same_public_state_at_first_divergence": 100
+    },
+    "ppo": {
+      "no_divergence": 0,
+      "pairs": 100,
+      "same_public_state_at_first_divergence": 100
+    }
+  },
+  "paired": [
+    {
+      "both_completed": 82,
+      "both_completed_coverage": 0.82,
+      "comparator": "ppo",
+      "mean_elapsed_seconds_sa_minus_peer_both_completed": -1.6542124205488669,
+      "mean_recompute_seconds_sa_minus_peer_both_completed": 0.34379841418283946,
+      "mean_transfer_mb_sa_minus_peer_all_instances": 117.20310022999999,
+      "mean_transfer_mb_sa_minus_peer_both_completed": 211.34606925609754,
+      "pairs": 100,
+      "peer_completed": 95,
+      "sa_completed": 87
+    },
+    {
+      "both_completed": 87,
+      "both_completed_coverage": 0.87,
+      "comparator": "mappo",
+      "mean_elapsed_seconds_sa_minus_peer_both_completed": -11.847093541118634,
+      "mean_recompute_seconds_sa_minus_peer_both_completed": -14.263844117670358,
+      "mean_transfer_mb_sa_minus_peer_all_instances": -371.7558398,
+      "mean_transfer_mb_sa_minus_peer_both_completed": -352.9243983908046,
+      "pairs": 100,
+      "peer_completed": 100,
+      "sa_completed": 87
+    },
+    {
+      "both_completed": 87,
+      "both_completed_coverage": 0.87,
+      "comparator": "dt_handoff_drl",
+      "mean_elapsed_seconds_sa_minus_peer_both_completed": 5.635988598118194,
+      "mean_recompute_seconds_sa_minus_peer_both_completed": 9.619156506348078,
+      "mean_transfer_mb_sa_minus_peer_all_instances": -444.92460194,
+      "mean_transfer_mb_sa_minus_peer_both_completed": -362.95250947126436,
+      "pairs": 100,
+      "peer_completed": 100,
+      "sa_completed": 87
+    }
+  ],
+  "per_seed": [
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 0,
+      "method": "dt_handoff_drl",
+      "on_time_of_20": 9,
+      "prepared_target_reuses": 25,
+      "seed": "17",
+      "victim_reloads": 17
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 2,
+      "method": "dt_handoff_drl",
+      "on_time_of_20": 9,
+      "prepared_target_reuses": 27,
+      "seed": "29",
+      "victim_reloads": 17
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 2,
+      "method": "dt_handoff_drl",
+      "on_time_of_20": 9,
+      "prepared_target_reuses": 30,
+      "seed": "43",
+      "victim_reloads": 13
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 0,
+      "method": "dt_handoff_drl",
+      "on_time_of_20": 4,
+      "prepared_target_reuses": 0,
+      "seed": "61",
+      "victim_reloads": 0
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 0,
+      "method": "dt_handoff_drl",
+      "on_time_of_20": 10,
+      "prepared_target_reuses": 22,
+      "seed": "7",
+      "victim_reloads": 17
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 0,
+      "method": "mappo",
+      "on_time_of_20": 3,
+      "prepared_target_reuses": 0,
+      "seed": "17",
+      "victim_reloads": 5
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 0,
+      "method": "mappo",
+      "on_time_of_20": 3,
+      "prepared_target_reuses": 0,
+      "seed": "29",
+      "victim_reloads": 5
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 3,
+      "method": "mappo",
+      "on_time_of_20": 8,
+      "prepared_target_reuses": 44,
+      "seed": "43",
+      "victim_reloads": 18
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 0,
+      "method": "mappo",
+      "on_time_of_20": 3,
+      "prepared_target_reuses": 0,
+      "seed": "61",
+      "victim_reloads": 5
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 0,
+      "method": "mappo",
+      "on_time_of_20": 9,
+      "prepared_target_reuses": 25,
+      "seed": "7",
+      "victim_reloads": 17
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 0,
+      "method": "ppo",
+      "on_time_of_20": 3,
+      "prepared_target_reuses": 0,
+      "seed": "17",
+      "victim_reloads": 5
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 0,
+      "method": "ppo",
+      "on_time_of_20": 3,
+      "prepared_target_reuses": 0,
+      "seed": "29",
+      "victim_reloads": 5
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 0,
+      "method": "ppo",
+      "on_time_of_20": 4,
+      "prepared_target_reuses": 0,
+      "seed": "43",
+      "victim_reloads": 0
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 0,
+      "method": "ppo",
+      "on_time_of_20": 8,
+      "prepared_target_reuses": 23,
+      "seed": "61",
+      "victim_reloads": 1
+    },
+    {
+      "completed_of_20": 15,
+      "failed_episodes": 5,
+      "max_no_progress_streak": 5,
+      "method": "ppo",
+      "on_time_of_20": 7,
+      "prepared_target_reuses": 43,
+      "seed": "7",
+      "victim_reloads": 5
+    },
+    {
+      "completed_of_20": 15,
+      "failed_episodes": 5,
+      "max_no_progress_streak": 5,
+      "method": "sa_ghmappo",
+      "on_time_of_20": 7,
+      "prepared_target_reuses": 43,
+      "seed": "17",
+      "victim_reloads": 5
+    },
+    {
+      "completed_of_20": 18,
+      "failed_episodes": 2,
+      "max_no_progress_streak": 14,
+      "method": "sa_ghmappo",
+      "on_time_of_20": 4,
+      "prepared_target_reuses": 8,
+      "seed": "29",
+      "victim_reloads": 2
+    },
+    {
+      "completed_of_20": 15,
+      "failed_episodes": 5,
+      "max_no_progress_streak": 14,
+      "method": "sa_ghmappo",
+      "on_time_of_20": 4,
+      "prepared_target_reuses": 19,
+      "seed": "43",
+      "victim_reloads": 10
+    },
+    {
+      "completed_of_20": 19,
+      "failed_episodes": 1,
+      "max_no_progress_streak": 14,
+      "method": "sa_ghmappo",
+      "on_time_of_20": 6,
+      "prepared_target_reuses": 21,
+      "seed": "61",
+      "victim_reloads": 16
+    },
+    {
+      "completed_of_20": 20,
+      "failed_episodes": 0,
+      "max_no_progress_streak": 2,
+      "method": "sa_ghmappo",
+      "on_time_of_20": 7,
+      "prepared_target_reuses": 14,
+      "seed": "7",
+      "victim_reloads": 0
+    }
+  ],
+  "prediction": {
+    "counts": {
+      "actual_handoff_within_observed_horizon": 3091,
+      "actual_next_handoff": 1337,
+      "actual_next_stay": 1950,
+      "handoff_target_correct": 3091,
+      "handoff_time_correct": 2645,
+      "handoff_time_wrong": 446,
+      "horizon_censored": 105,
+      "known": 3155,
+      "known_actual_handoff": 1249,
+      "known_actual_stay": 1906,
+      "known_handoff_correct": 1249,
+      "known_next_correct": 2874,
+      "known_next_wrong": 281,
+      "known_stay_correct": 1625,
+      "known_stay_wrong": 281,
+      "next_step_censored": 21,
+      "next_step_evaluable": 3287,
+      "predicted_handoff_when_actual": 3091,
+      "recorded_decisions": 3308,
+      "target_and_time_correct": 2645,
+      "target_or_time_wrong": 446,
+      "unknown": 132
+    },
+    "handoff_target_accuracy_when_predicted": 1.0,
+    "handoff_time_accuracy_when_predicted": 0.8557101261727597,
+    "known_coverage_evaluable": 0.9598418010343779,
+    "known_handoff_accuracy": 1.0,
+    "known_next_accuracy": 0.9109350237717908,
+    "known_stay_accuracy": 0.8525708289611752
+  },
+  "replay": {
+    "checkpoint_states_unchanged": true,
+    "common_train_dev_states": 60,
+    "decisions": 3308,
+    "episodes": 440,
+    "read_only_forward_calls": 1200,
+    "selected_checkpoints": 20,
+    "synthetic_counterexamples": 0,
+    "training_steps": 0
+  },
+  "reviewed_at": "2026-10-09",
+  "sa_failed_episode_mechanism": {
+    "all_sa_failed_service_action4_steps": 89,
+    "all_sa_failed_service_action4_target_changed": 11,
+    "failed_action4_target_resident_changed": 2,
+    "failed_service_steps_in_incomplete_episodes": 136,
+    "first_failure_action_3": 8,
+    "first_failure_action_4": 5,
+    "first_failure_projection_applied": 0,
+    "incomplete_episodes": 13,
+    "no_progress_steps_in_incomplete_episodes": 136,
+    "prepared_target_reuses_in_incomplete_episodes": 13,
+    "victim_reloads_in_incomplete_episodes": 4
+  },
+  "schema_version": "cscwd_sa_behavior_diagnosis_small_summary_v1",
+  "source_commit": "a08869388f9962149198054b5f8a0d6dd4d07eae",
+  "source_run_id": "cscwd_causal_strong_baselines_dev_20261009_v1"
+}
