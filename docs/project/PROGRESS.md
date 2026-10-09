@@ -2206,3 +2206,11 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
   planner capability 不匹配，方法排名失效；最终决策 D，停止且不重训。
 - artifact：`artifacts/calibrated_continuous_workflow_pilot_v2_20261006/`；报告：
   `sa_ghmappo_innovation_fair_training_v2_20261006.md`；paper-ready 仍为 `Unverifiable`。
+
+## 2026-10-09 服务奖励 critic PopArt 开发 A/B 实现冻结
+
+- 承接独立只读诊断，只实现一个三方法对称候选：critic target/output PopArt；bootstrap/GAE、actor advantage、reward、auxiliary 与 action/observation contract 保持不变。
+- 加入 output-preserving affine compensation、Adam moment 变换、非有限输入拒绝、checkpoint save/restore 和旧 disabled checkpoint 兼容测试；value clipping 明确关闭。
+- 固定 30 cells、43,200 steps、720 updates、5,760 optimizer steps；checkpoint 只按 update 6/12/18/24 在 dev 选择，reward 不参与。
+- 36 个实例全部标为 development；raw source interval 两两不重叠是启动硬门槛。`regression` / `frozen_check` 不得称为 holdout。
+- 当前状态：实现与执行协议已冻结，科学训练尚未启动；必须先通过 clean-commit create-only preflight，然后只允许单次、无重试、最长 2 小时后台启动。

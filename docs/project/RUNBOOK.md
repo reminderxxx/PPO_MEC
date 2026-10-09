@@ -1846,3 +1846,23 @@ supervisor 固定启动 continuous、source、target 三个进程，计划 4 次
 ```
 
 该入口只允许 non-formal native transition witness；禁止训练、formal/holdout 和无线部署收益表述。现有 v1 结果的读取入口为 `completion_receipt.json`、`event_witness.json` 与 `integrity_manifest.json`。
+
+## Calibrated workflow critic PopArt development A/B
+
+先在 clean scientific commit 上执行 create-only preflight：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/preflight_calibrated_workflow_value_normalization_ab.py \
+  --authorization-config configs/experiment/calibrated_workflow_value_normalization_ab_authorized_v1.json \
+  --output-root artifacts/analysis/calibrated_workflow_value_normalization_ab_preflight_20261009_v1
+```
+
+只有 `preflight.json.status=pass` 才能单次启动：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_calibrated_workflow_value_normalization_ab.py \
+  --authorization-config configs/experiment/calibrated_workflow_value_normalization_ab_authorized_v1.json \
+  --output-root artifacts/benchmarks/calibrated_workflow_value_normalization_ab_20261009_v1
+```
+
+输出目录 create-only；不得 retry/resume。checkpoint 仅本地保留，不加入 Git。`regression` 与 `frozen_check` 是 development falsification split，不得标为 formal/holdout。完整固定预算和停止条件见 `calibrated_workflow_value_normalization_ab_execution_protocol_20261009.md`。

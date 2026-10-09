@@ -853,3 +853,11 @@ v3 interface-repair 职责增量：
 - `configs/acceptance/two_node_workflow_suffix_recovery_v1.json`：DAG、prompt、模型资源 hash、生成参数、判据、
   目标读取白名单与 4-generate 预算。
 - `tests/test_workflow_suffix_recovery.py`：状态依赖、篡改/冲突拒绝、旧 PEFT 回执字段与汇总负例。
+
+## Calibrated workflow value normalization A/B
+
+- `src/trainers/popart.py`：scalar critic running moments、target normalize/value denormalize、最后 affine head output-preserving compensation 与 optimizer moment 变换。
+- `src/agents/sa_ghmappo_core.py`：SA-GHMAPPO、controller-level MAPPO、PPO 共享的可选 PopArt 接入；raw-unit bootstrap/GAE，normalized critic loss，checkpoint state 与逐 optimizer-step 信号记录。
+- `scripts/preflight_calibrated_workflow_value_normalization_ab.py`：clean tree、hash、raw interval、固定预算和六个 method×arm 最小更新验收。
+- `scripts/run_calibrated_workflow_value_normalization_ab.py`：唯一授权 development A/B；精确 interaction/update/optimizer 预算、dev-only checkpoint selection、暴露 split falsification 和 receipts。
+- `tests/test_popart_value_normalization.py`、`tests/test_calibrated_workflow_value_normalization_ab.py`：数值稳定、prediction invariance、checkpoint 兼容、预算、选模与 gate 回归。

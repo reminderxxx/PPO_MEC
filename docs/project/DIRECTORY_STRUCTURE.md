@@ -495,3 +495,20 @@ Protocol v2.2 及更早目录只作 historical audit；live execution 只接受 
 - `tests/test_shared_cache_recovery_coupling.py`：A/B/C later-load 差异与 `reset()` 切断跨 workflow resident state 的局部合同测试。
 - `artifacts/shared_cache_recovery_coupling_20261005_v1/`：单次执行 JSON/CSV、逐事件 C witness、create-only state packages、receipt 与 integrity manifest。
 - `docs/project/shared_cache_recovery_coupling_{plan,audit}_20261005.md`：事前冻结和事后审查。
+
+## 2026-10-09 critic PopArt development A/B additions
+
+```text
+src/trainers/popart.py
+configs/experiment/calibrated_workflow_value_normalization_ab_v1.json
+configs/experiment/calibrated_workflow_value_normalization_ab_authorized_v1.json
+scripts/preflight_calibrated_workflow_value_normalization_ab.py
+scripts/run_calibrated_workflow_value_normalization_ab.py
+tests/test_popart_value_normalization.py
+tests/test_calibrated_workflow_value_normalization_ab.py
+docs/project/calibrated_workflow_value_normalization_ab_execution_protocol_20261009.md
+artifacts/analysis/calibrated_workflow_value_normalization_ab_preflight_20261009_v1/
+artifacts/benchmarks/calibrated_workflow_value_normalization_ab_20261009_v1/
+```
+
+后两个 artifact root 为 create-only runtime 产物；其中 `checkpoints/` 只本地保存，禁止提交或上传。

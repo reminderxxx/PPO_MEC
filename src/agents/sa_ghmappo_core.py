@@ -26,6 +26,7 @@ from src.encoders.fusion_encoder import (
 from src.models.uncertainty_transition_ensemble import (
     UncertaintyTransitionEnsemble,
 )
+from src.trainers.popart import ScalarPopArt
 
 
 控制头动作空间 = {
@@ -702,6 +703,9 @@ class 分层PPO基类(BaseAgent):
         clip_ratio: float = 0.2,
         entropy_coef: float = 0.01,
         value_coef: float = 0.5,
+        value_normalization_enabled: bool = False,
+        popart_min_std: float = 1.0,
+        popart_max_abs_target: float = 1.0e20,
         auxiliary_coef: float = 0.0,
         head_credit_enabled: bool = False,
         head_credit_protocol: str = "aggregation_reason_weighted_ppo_v2",
@@ -1258,6 +1262,15 @@ class 分层PPO基类(BaseAgent):
         self._clip_ratio = float(clip_ratio)
         self._entropy_coef = float(entropy_coef)
         self._value_coef = float(value_coef)
+        self._value_normalization_enabled = bool(value_normalization_enabled)
+        self._popart = (
+            ScalarPopArt(
+                min_std=float(popart_min_std),
+                max_abs_target=float(popart_max_abs_target),
+            )
+            if self._value_normalization_enabled
+            else None
+        )
         self._auxiliary_coef = float(auxiliary_coef)
         self._head_credit_enabled = bool(head_credit_enabled)
         self._head_credit_protocol = str(head_credit_protocol or "aggregation_reason_weighted_ppo_v2")
@@ -2766,6 +2779,57 @@ class 分层PPO基类(BaseAgent):
         ).to(self._device)
         self._optimizer = torch.optim.Adam(self._network.parameters(), lr=self._learning_rate)
 
+    def _value_output_layer(self) -> nn.Linear:
+        if not self._use_hierarchy:
+            layer = self._network.flat_critic.net[-1]
+        elif self._centralized_critic:
+            layer = self._network.central_critic.net[-1]
+        else:
+            raise RuntimeError("PopArt is not defined for the multi-critic value average")
+        if not isinstance(layer, nn.Linear) or layer.out_features != 1:
+            raise RuntimeError("value output layer must be a scalar nn.Linear")
+        return layer
+
+    def _attach_value_units(self, policy_output: dict[str, Any]) -> dict[str, Any]:
+        output = dict(policy_output)
+        normalized_value = output["value"]
+        if self._popart is not None:
+            critic = (
+                self._network.flat_critic
+                if not self._use_hierarchy
+                else self._network.central_critic
+            )
+            critic_context_key = str(output["critic_context_key"])
+            critic_context = output["encoded"].get(
+                critic_context_key, output["encoded"]["critic_context"]
+            )
+            hidden = critic.net[:-1](critic_context.unsqueeze(0))
+            normalized_value = self._popart.linear_output(
+                hidden, self._value_output_layer()
+            ).squeeze(0).squeeze(-1)
+        output["value_normalized"] = normalized_value
+        if self._popart is not None:
+            output["value"] = self._popart.denormalize_tensor(normalized_value)
+        return output
+
+    def _loss_gradient_norm(self, loss: torch.Tensor) -> float:
+        if not loss.requires_grad:
+            return 0.0
+        parameters = [
+            parameter for parameter in self._network.parameters() if parameter.requires_grad
+        ]
+        gradients = torch.autograd.grad(
+            loss,
+            parameters,
+            retain_graph=True,
+            allow_unused=True,
+        )
+        squared_norm = torch.zeros((), dtype=torch.float32, device=self._device)
+        for gradient in gradients:
+            if gradient is not None:
+                squared_norm = squared_norm + torch.sum(gradient.detach() ** 2)
+        return float(torch.sqrt(squared_norm).item())
+
     def _apply_env_action_model_critic_improvement(
         self,
         *,
@@ -3839,6 +3903,16 @@ class 分层PPO基类(BaseAgent):
             else returns
         )
         return_tensor = torch.as_tensor(returns, dtype=torch.float32, device=self._device)
+        popart_update = None
+        if self._popart is not None:
+            popart_update = self._popart.update(
+                returns,
+                output_layer=self._value_output_layer(),
+                optimizer=self._optimizer,
+            )
+            critic_return_tensor = self._popart.normalize_tensor(return_tensor)
+        else:
+            critic_return_tensor = return_tensor
         option_return_tensor = torch.as_tensor(
             normalized_option_returns,
             dtype=torch.float32,
@@ -3962,8 +4036,9 @@ class 分层PPO基类(BaseAgent):
         update_steps = 0
         executed_epochs = 0
         early_stop_triggered = False
+        optimizer_step_records: list[dict[str, Any]] = []
 
-        for _ in range(self._train_epochs):
+        for epoch_index in range(self._train_epochs):
             permutation = torch.randperm(len(rollout), device=self._device)
             epoch_kl_values: list[float] = []
             for start_index in range(0, len(rollout), batch_size):
@@ -4149,9 +4224,19 @@ class 分层PPO基类(BaseAgent):
                     )
                     env_action_model_teacher_distillation_batch_support = 0
 
-                value_prediction = torch.stack([output["value"] for output in batch_outputs], dim=0)
+                value_prediction = torch.stack(
+                    [
+                        output["value_normalized"]
+                        if self._value_normalization_enabled
+                        else output["value"]
+                        for output in batch_outputs
+                    ],
+                    dim=0,
+                )
                 ratio = torch.exp(new_log_prob - old_log_prob_tensor[batch_indices])
-                value_loss = torch.mean((return_tensor[batch_indices] - value_prediction) ** 2)
+                value_loss = torch.mean(
+                    (critic_return_tensor[batch_indices] - value_prediction) ** 2
+                )
                 auxiliary_loss = self._compute_auxiliary_loss(batch_states=batch_states, batch_outputs=batch_outputs)
                 heuristic_imitation_loss = self._compute_heuristic_imitation_loss(
                     batch_outputs=batch_outputs,
@@ -4229,14 +4314,97 @@ class 分层PPO基类(BaseAgent):
                     * env_action_model_teacher_distillation_loss
                 )
 
+                policy_component = (
+                    actor_loss + self._env_action_ppo_coef * env_action_ppo_loss
+                )
+                weighted_value_component = self._value_coef * value_loss
+                weighted_auxiliary_component = self._auxiliary_coef * auxiliary_loss
+                policy_grad_norm = self._loss_gradient_norm(policy_component)
+                value_grad_norm = self._loss_gradient_norm(weighted_value_component)
+                auxiliary_grad_norm = self._loss_gradient_norm(
+                    weighted_auxiliary_component
+                )
                 self._optimizer.zero_grad()
                 total_loss.backward()
-                nn.utils.clip_grad_norm_(self._network.parameters(), max_norm=self._max_grad_norm)
+                pre_clip_grad_norm = float(
+                    nn.utils.clip_grad_norm_(
+                        self._network.parameters(), max_norm=self._max_grad_norm
+                    ).item()
+                )
+                clip_scale = min(
+                    1.0,
+                    self._max_grad_norm / max(pre_clip_grad_norm, 1e-12),
+                )
                 self._optimizer.step()
 
                 with torch.no_grad():
                     approx_kl = torch.mean(old_log_prob_tensor[batch_indices] - new_log_prob)
                     clip_fraction = torch.mean((torch.abs(ratio - 1.0) > self._clip_ratio).float())
+
+                optimizer_step_records.append(
+                    {
+                        "optimizer_step_index": update_steps + 1,
+                        "epoch_index": epoch_index + 1,
+                        "minibatch_start": start_index,
+                        "minibatch_size": len(batch_index_list),
+                        "actor_loss": float(actor_loss.item()),
+                        "env_action_ppo_loss": float(env_action_ppo_loss.item()),
+                        "value_loss": float(value_loss.item()),
+                        "auxiliary_loss": float(auxiliary_loss.item()),
+                        "total_loss": float(total_loss.item()),
+                        "heuristic_imitation_loss": float(
+                            heuristic_imitation_loss.item()
+                        ),
+                        "mechanism_aux_loss": float(mechanism_aux_loss.item()),
+                        "mechanism_entropy_bonus": float(
+                            mechanism_entropy_bonus.item()
+                        ),
+                        "digital_twin_policy_prior_loss": float(
+                            digital_twin_policy_prior_loss.item()
+                        ),
+                        "env_action_counterfactual_margin_loss": float(
+                            env_action_counterfactual_margin_loss.item()
+                        ),
+                        "argmax_margin_loss": float(argmax_margin_loss.item()),
+                        "advantage_weighted_behavior_loss": float(
+                            advantage_weighted_behavior_loss.item()
+                        ),
+                        "option_gate_loss": float(option_gate_loss.item()),
+                        "option_gate_entropy": float(option_gate_entropy.item()),
+                        "option_gate_prior_loss": float(
+                            option_gate_prior_loss.item()
+                        ),
+                        "option_counterfactual_value_loss": float(
+                            option_counterfactual_value_loss.item()
+                        ),
+                        "env_action_model_critic_loss": float(
+                            env_action_model_critic_loss.item()
+                        ),
+                        "env_action_model_policy_improvement_loss": float(
+                            env_action_model_policy_improvement_loss.item()
+                        ),
+                        "counterfactual_head_policy_improvement_loss": float(
+                            counterfactual_head_policy_improvement_loss.item()
+                        ),
+                        "counterfactual_factorized_policy_improvement_loss": float(
+                            counterfactual_factorized_policy_improvement_loss.item()
+                        ),
+                        "env_action_model_teacher_distillation_loss": float(
+                            env_action_model_teacher_distillation_loss.item()
+                        ),
+                        "entropy": float(entropy.item()),
+                        "approx_kl": float(approx_kl.item()),
+                        "clip_fraction": float(clip_fraction.item()),
+                        "policy_grad_norm": policy_grad_norm,
+                        "weighted_value_grad_norm": value_grad_norm,
+                        "weighted_auxiliary_grad_norm": auxiliary_grad_norm,
+                        "pre_clip_total_grad_norm": pre_clip_grad_norm,
+                        "post_clip_total_grad_norm_upper_bound": min(
+                            pre_clip_grad_norm, self._max_grad_norm
+                        ),
+                        "global_clip_scale": clip_scale,
+                    }
+                )
 
                 actor_loss_total += float(actor_loss.item())
                 value_loss_total += float(value_loss.item())
@@ -4361,10 +4529,52 @@ class 分层PPO基类(BaseAgent):
             "clip_ratio": self._clip_ratio,
             "entropy_coef": self._entropy_coef,
             "value_coef": self._value_coef,
+            "value_normalization_enabled": self._value_normalization_enabled,
+            "value_clipping_enabled": False,
+            "critic_target_mean_raw": round(float(return_tensor.mean().item()), 6),
+            "critic_target_std_raw": round(float(return_tensor.std(unbiased=False).item()), 6),
+            "critic_target_mean_normalized": round(
+                float(critic_return_tensor.mean().item()), 6
+            ),
+            "critic_target_std_normalized": round(
+                float(critic_return_tensor.std(unbiased=False).item()), 6
+            ),
+            "critic_rmse_denormalized_before_update": round(
+                float(np.sqrt(np.mean((returns - values) ** 2))), 6
+            ),
+            "value_prediction_mean_denormalized": round(float(values.mean()), 6),
+            "value_prediction_std_denormalized": round(float(values.std()), 6),
+            "advantage_mean_raw": round(float(advantages.mean()), 6),
+            "advantage_std_raw": round(float(advantages.std()), 6),
+            "advantage_mean_normalized": round(
+                float(normalized_advantages.mean()), 6
+            ),
+            "advantage_std_normalized": round(
+                float(normalized_advantages.std()), 6
+            ),
+            "old_log_prob_mean": round(float(old_log_probs.mean()), 6),
+            "old_log_prob_std": round(float(old_log_probs.std()), 6),
+            "popart_state": (
+                self._popart.state_dict() if self._popart is not None else None
+            ),
+            "popart_update": (
+                {
+                    "old_mean": popart_update.old_mean,
+                    "old_std": popart_update.old_std,
+                    "new_mean": popart_update.new_mean,
+                    "new_std": popart_update.new_std,
+                    "sample_count": popart_update.sample_count,
+                    "affine_scale": popart_update.affine_scale,
+                }
+                if popart_update is not None
+                else None
+            ),
             "auxiliary_coef": self._auxiliary_coef,
             "actor_loss": round(actor_loss_total / denominator, 6),
             "value_loss": round(value_loss_total / denominator, 6),
             "auxiliary_loss": round(auxiliary_loss_total / denominator, 6),
+            "optimizer_step_count": len(optimizer_step_records),
+            "optimizer_step_records": optimizer_step_records,
             "heuristic_imitation_coef": round(self._heuristic_imitation_coef, 6),
             "effective_heuristic_imitation_coef": round(effective_imitation_coef, 6),
             "heuristic_imitation_loss": round(heuristic_imitation_loss_total / denominator, 6),
@@ -5365,6 +5575,9 @@ class 分层PPO基类(BaseAgent):
             "config": self._checkpoint_config(),
             "network_state_dict": self._network.state_dict(),
             "optimizer_state_dict": self._optimizer.state_dict(),
+            "popart_state": (
+                self._popart.state_dict() if self._popart is not None else None
+            ),
             "learned_transition_model_state": (
                 self._learned_transition_model.state_dict()
                 if self._learned_transition_model is not None
@@ -5404,6 +5617,13 @@ class 分层PPO基类(BaseAgent):
             self._network.load_state_dict(network_state)
         if checkpoint.get("optimizer_state_dict") is not None and not additive_head_warm_start:
             self._optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        popart_state = checkpoint.get("popart_state")
+        if self._popart is not None:
+            if not isinstance(popart_state, dict):
+                raise ValueError("PopArt-enabled agent requires PopArt checkpoint state")
+            self._popart.load_state_dict(popart_state)
+        elif popart_state is not None:
+            raise ValueError("cannot load a PopArt checkpoint with value normalization disabled")
         learned_model_state = checkpoint.get("learned_transition_model_state")
         if self._learned_transition_model is not None and isinstance(learned_model_state, dict):
             self._learned_transition_model.load_state_dict(learned_model_state)
@@ -6451,13 +6671,13 @@ class 分层PPO基类(BaseAgent):
             semantic_state,
             event_logit_temperature=self._current_event_logit_temperature(),
         )
-        if self._is_raw_policy_evaluation(run_metadata):
-            return dict(policy_output)
-        return self._apply_policy_adjustments(
-            policy_output,
-            semantic_state,
-            run_metadata=run_metadata,
-        )
+        if not self._is_raw_policy_evaluation(run_metadata):
+            policy_output = self._apply_policy_adjustments(
+                policy_output,
+                semantic_state,
+                run_metadata=run_metadata,
+            )
+        return self._attach_value_units(policy_output)
 
     @staticmethod
     def _is_raw_policy_evaluation(run_metadata: dict[str, Any] | None) -> bool:
@@ -16165,6 +16385,13 @@ class 分层PPO基类(BaseAgent):
             "clip_ratio": self._clip_ratio,
             "entropy_coef": self._entropy_coef,
             "value_coef": self._value_coef,
+            "value_normalization_enabled": self._value_normalization_enabled,
+            "popart_min_std": (
+                self._popart.min_std if self._popart is not None else None
+            ),
+            "popart_max_abs_target": (
+                self._popart.max_abs_target if self._popart is not None else None
+            ),
             "auxiliary_coef": self._auxiliary_coef,
             "train_epochs": self._train_epochs,
             "target_kl": self._target_kl,

@@ -607,3 +607,7 @@ retry、finalize、salvage、选择、冻结或进入 formal consumer。Protocol
 ## Shared cache × recovery bounded witness
 
 `docs/project/shared_cache_recovery_coupling_audit_20261005.md` 记录一次不训练的原生状态转移核验。结论是：同一 episode 内 action 4 可通过有限容量 typed-cache transaction 改变后续 reload cost 和 action mask；当前 benchmark 的 `reset()`/逐 workflow 环境仍切断跨 workflow 共享，且没有共享带宽/计算队列。该 E2 witness 不是 formal、holdout、真实无线或 RL 收益证据。
+
+## Calibrated workflow critic PopArt development A/B
+
+服务奖励学习信号诊断将下一步唯一候选冻结为三种 learned method 共用的 critic PopArt target/output normalization。执行协议、固定预算、开发数据边界与 falsification gates 见 `docs/project/calibrated_workflow_value_normalization_ab_execution_protocol_20261009.md`。该候选不是 SA 专属能力或算法创新；`regression` / `frozen_check` 仍是暴露的开发 split，不是 formal/holdout。

@@ -1,0 +1,32 @@
+{
+  "schema_version": "calibrated_workflow_value_normalization_ab_authorized_v1",
+  "authorization_recorded_at": "2026-10-09T00:00:00+08:00",
+  "authorization_scope": "single bounded development PopArt A/B execution",
+  "execution_authorized": true,
+  "design_config": "configs/experiment/calibrated_workflow_value_normalization_ab_v1.json",
+  "design_config_sha256": "9630d97d56e8192b6278694980132cc942a67cc87794eb8ddc4b67d97f3cc606",
+  "output_run_id": "calibrated_workflow_value_normalization_ab_20261009_v1",
+  "scientific_wall_clock_cap_seconds": 7200,
+  "launch_count": 1,
+  "automatic_retry": false,
+  "training_cell_count": 30,
+  "total_environment_steps": 43200,
+  "total_update_opportunities": 720,
+  "total_optimizer_steps": 5760,
+  "checkpoint_files_committed_or_uploaded": false,
+  "real_model_generate_calls": 0,
+  "downloads": 0,
+  "formal_or_holdout_reads": 0,
+  "hyperparameter_search_trials": 0,
+  "checkpoint_selection_split": "dev",
+  "falsification_evaluation_splits": ["regression", "frozen_check"],
+  "falsification_requires_no_method_level_completion_harm": true,
+  "claim_boundary": {
+    "development_only": true,
+    "algorithm_innovation": false,
+    "strong_baseline_paper_table": false,
+    "formal": false,
+    "holdout": false,
+    "paper_ready": false
+  }
+}

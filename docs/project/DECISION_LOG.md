@@ -1286,3 +1286,10 @@ claim map 必须报告 `UNAVAILABLE`。
   单因素消融，不对 event boost、sharpening、temporal 或 auxiliary 中任一项作因果声明。
 - two-step rule 的 exact clone/lexicographic planning 明确视为更强 model-based capability，并作为强基线保留；不削弱规则，
   不按排名追加训练、seed、网络、reward 或数据。最终结论是当前 workload 下规则足够且 SA 设计仍不稳。
+
+## 2026-10-09 — 只检验共享 critic PopArt，不自动进入 auxiliary 消融
+
+- 决定：下一轮唯一变量是三种 learned method 对称的 critic target/output PopArt normalization；这属于 value 学习尺度纠错候选，不是算法创新或 SA 专属能力。
+- 依据：既有 service-reward 记录显示 critic error 与共享梯度压制显著，但 termination/GAE/reset-observation 和 auxiliary 冲突没有形成一致实现缺陷证据。
+- 约束：training-only statistics；raw-unit bootstrap/GAE；output-preserving affine compensation；旧 reward、actor、auxiliary、预算、instance order 与选模指标不变。
+- 否证：mechanism、current-missing action-4 probability/raw argmax、service completion/failure 三类 gate 任一不通过即停止；不追加 seed、不延长预算、不转做 auxiliary-target 或其他候选。

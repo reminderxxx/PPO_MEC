@@ -888,3 +888,10 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
   support、BCa/Holm、收敛证明或独立复现，paper-ready 维持 `Unverifiable`。
 - `BOUNDARY / historical v1`：192-episode v1 早于 action-4 commit 与 actual/estimated link 修正，只保留审计，不得与 v2
   checkpoint、逐行结果或 aggregate 混用。
+
+## OPEN / calibrated workflow critic scale candidate 仍只是假设
+
+- 诊断见 `calibrated_workflow_service_reward_learning_diagnosis_20261009.md`：service reward 下 raw critic loss 和 value-to-policy gradient ratio 异常大，但尚无 development A/B 因果证据。
+- PopArt 实现只能检验“critic scale 干扰共享更新”这一机制；它不修复 reward 设计、样本不足、auxiliary target 或任务局部可分性。
+- 当前 36 个实例无独立 holdout，任何正结果最多是 development candidate；任一机制、行为或服务 gate 失败即不得晋级。
+- checkpoint 含本地训练权重，禁止提交或上传；科学 run 不允许 retry、追加 seed、改预算或用最终评价反选方案。
