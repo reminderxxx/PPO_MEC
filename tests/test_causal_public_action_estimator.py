@@ -10,6 +10,7 @@ from src.agents.causal_public_action_estimator import (
     CausalPublicImmediateRule,
     CausalPublicTwoStepRule,
     NO,
+    SCHEMA_VERSION,
     UNKNOWN,
     YES,
     estimate_public_actions,
@@ -138,6 +139,8 @@ def test_public_estimate_is_pure_and_ignores_private_future_fields() -> None:
     state = _state()
     before = _hash(state)
     estimate = estimate_public_actions(state)
+    assert estimate["schema_version"] == "causal_public_action_estimator_v2"
+    assert estimate["schema_version"] == SCHEMA_VERSION
     assert _hash(state) == before
     assert estimate["actions"]["4"]["current_service"] == YES
     assert estimate["actions"]["4"]["target_prepare"] == YES
@@ -179,7 +182,21 @@ def test_private_eviction_order_is_unknown_not_fabricated_infeasible() -> None:
     estimate = estimate_public_actions(state)
     assert estimate["target_bundle"]["admission"] == UNKNOWN
     assert estimate["actions"]["4"]["target_prepare"] == UNKNOWN
+    assert estimate["actions"]["4"]["estimated_total_seconds"] is None
+    assert estimate["actions"]["4"]["deadline_fit"] == UNKNOWN
     assert public_prepare_advantage_label(state)["decision"] == "abstain"
+
+
+def test_raw_full_step_contact_failure_abstains_without_future_truth() -> None:
+    state = _state()
+    state["calibrated_context"]["contact_budget_seconds"] = 0.9
+    label = public_prepare_advantage_label(state)
+    action4 = label["estimate"]["actions"]["4"]
+    assert action4["target_prepare_contact_fit"] == YES
+    assert action4["raw_full_step_contact_fit"] == NO
+    assert action4["raw_trace_fit"] == UNKNOWN
+    assert label["decision"] == "abstain"
+    assert label["reason"] == "raw_full_step_contact_insufficient"
 
 
 class _PublicOnlySource:

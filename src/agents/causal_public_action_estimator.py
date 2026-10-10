@@ -17,8 +17,9 @@ from src.envs.specs.action_schema import ActionMaskBuilder
 YES = "yes"
 NO = "no"
 UNKNOWN = "unknown"
-SCHEMA_VERSION = "causal_public_action_estimator_v1"
-EVENT_LABEL_SCHEMA_VERSION = "causal_public_prepare_advantage_v1"
+NOT_APPLICABLE = "not_applicable"
+SCHEMA_VERSION = "causal_public_action_estimator_v2"
+EVENT_LABEL_SCHEMA_VERSION = "causal_public_prepare_advantage_v2"
 
 
 def _finite(value: Any) -> float | None:
@@ -237,6 +238,9 @@ def estimate_public_actions(
     time_contract = dict(context.get("time_contract", {}) or {})
     remaining_deadline = _nonnegative(time_contract.get("remaining_deadline_seconds"))
     recompute, recompute_reason = _known_recompute_seconds(state)
+    raw_full_step_contact_contract = (
+        str(state.get("interface_profile", "")) == "raw_ngsim_event_time_v1"
+    )
 
     current_model_network = _network_seconds(current_bundle["transfer_bytes"], mbps, fixed)
     current_model_prepare = _sum_known([current_model_network, current_bundle["load_seconds"]])
@@ -252,11 +256,20 @@ def estimate_public_actions(
         service = _service_status(action, current_bundle) if legal else NO
         target_prepare = "not_applicable"
         target_state_commit = "not_applicable"
-        model_bytes = 0
-        transfer_state_bytes = 0
-        transfer_input_bytes = 0
+        model_bytes: int | None = 0
+        transfer_state_bytes: int | None = 0
+        transfer_input_bytes: int | None = 0
         known_parts: list[float | None] = []
         unknown_reasons: list[str] = []
+        phase_status = {
+            "current_model_prepare": NOT_APPLICABLE,
+            "target_model_prepare": NOT_APPLICABLE,
+            "current_service": NOT_APPLICABLE,
+            "target_state_commit": NOT_APPLICABLE,
+        }
+        phase_seconds: dict[str, float | None] = {
+            key: None for key in phase_status
+        }
 
         if not legal:
             unknown_reasons.append("action_masked")
@@ -266,24 +279,41 @@ def estimate_public_actions(
                 if current_bundle["admission"] == YES:
                     known_parts.append(current_model_prepare)
                     model_bytes = int(current_bundle["transfer_bytes"] or 0)
+                    phase_status["current_model_prepare"] = "known_estimate"
+                    phase_seconds["current_model_prepare"] = current_model_prepare
                 else:
                     unknown_reasons.append(str(current_bundle["reason"]))
+                    known_parts.append(None)
+                    model_bytes = None
+                    phase_status["current_model_prepare"] = "unknown"
             if action in {1, 4}:
                 prepare_seconds = target_model_prepare if action == 1 else target_state_prepare
                 if target_rsu_id is None:
                     target_prepare = NO
+                    phase_status["target_model_prepare"] = "skipped_no_target"
                 elif target_bundle["admission"] != YES:
                     target_prepare = UNKNOWN
                     unknown_reasons.append(str(target_bundle["reason"]))
+                    known_parts.append(None)
+                    model_bytes = None
+                    phase_status["target_model_prepare"] = "unknown"
                 else:
                     target_prepare = _tri_leq(prepare_seconds, contact)
                     if target_prepare == YES:
-                        known_parts.append(prepare_seconds)
+                        # Native action 4 only commits model staging before the
+                        # current service. State transfer/restore is charged
+                        # after that service succeeds.
+                        known_parts.append(target_model_prepare)
                         model_bytes = int(target_bundle["transfer_bytes"] or 0)
-                        if action == 4:
-                            transfer_state_bytes = int(state_bytes or 0)
+                        phase_status["target_model_prepare"] = "known_estimate"
+                        phase_seconds["target_model_prepare"] = target_model_prepare
+                    elif target_prepare == NO:
+                        phase_status["target_model_prepare"] = "rolled_back_contact"
                     elif target_prepare == UNKNOWN:
                         unknown_reasons.append("missing_public_contact_or_prepare_time")
+                        known_parts.append(None)
+                        model_bytes = None
+                        phase_status["target_model_prepare"] = "unknown"
                 if action == 4:
                     if service == YES and target_prepare == YES:
                         target_state_commit = YES
@@ -294,21 +324,104 @@ def estimate_public_actions(
 
             if service == NO:
                 known_parts.append(failure)
+                phase_seconds["current_service"] = failure
                 if failure is None:
                     unknown_reasons.append("missing_public_failed_service_seconds")
+                    phase_status["current_service"] = "unknown"
+                else:
+                    phase_status["current_service"] = "known_failure_estimate"
             elif service == YES:
                 if action == 2:
                     known_parts.extend([fallback, compute, input_network])
-                    transfer_input_bytes = int(input_bytes or 0)
+                    phase_seconds["current_service"] = _sum_known(
+                        [fallback, compute, input_network]
+                    )
+                    transfer_input_bytes = (
+                        int(input_bytes) if input_bytes is not None else None
+                    )
                     if fallback is None:
                         unknown_reasons.append("missing_public_vehicle_fallback_seconds")
+                    if compute is None:
+                        unknown_reasons.append("missing_public_compute_seconds")
+                    if input_network is None:
+                        unknown_reasons.append("missing_public_input_transfer_time")
                 else:
                     known_parts.extend([compute, recompute])
+                    phase_seconds["current_service"] = _sum_known(
+                        [compute, recompute]
+                    )
+                    if compute is None:
+                        unknown_reasons.append("missing_public_compute_seconds")
                     if recompute is None:
                         unknown_reasons.append(recompute_reason)
+                phase_status["current_service"] = (
+                    "known_estimate"
+                    if phase_seconds["current_service"] is not None
+                    else "unknown"
+                )
             else:
                 unknown_reasons.append("current_service_feasibility_unknown")
+                known_parts.append(None)
+                phase_status["current_service"] = "unknown"
+
+            if action == 4:
+                if target_prepare == YES and service == YES:
+                    known_parts.extend([state_network, restore])
+                    phase_seconds["target_state_commit"] = _sum_known(
+                        [state_network, restore]
+                    )
+                    phase_status["target_state_commit"] = (
+                        "known_estimate"
+                        if phase_seconds["target_state_commit"] is not None
+                        else "unknown"
+                    )
+                    if phase_seconds["target_state_commit"] is None:
+                        unknown_reasons.append(
+                            "missing_public_state_commit_time"
+                        )
+                    transfer_state_bytes = (
+                        int(state_bytes) if state_bytes is not None else None
+                    )
+                elif target_prepare == YES and service == NO:
+                    phase_status["target_state_commit"] = (
+                        "skipped_current_service_failed"
+                    )
+                    transfer_state_bytes = 0
+                elif target_prepare == YES:
+                    known_parts.append(None)
+                    phase_status["target_state_commit"] = "conditional_unknown"
+                    transfer_state_bytes = None
+                elif target_prepare == UNKNOWN:
+                    phase_status["target_state_commit"] = "conditional_unknown"
+                    transfer_state_bytes = None
+                else:
+                    phase_status["target_state_commit"] = (
+                        "skipped_target_prepare"
+                    )
+                    transfer_state_bytes = 0
             total = _sum_known(known_parts)
+
+        if legal and raw_full_step_contact_contract and action != 2:
+            raw_full_step_contact_fit = _tri_leq(total, contact)
+        else:
+            raw_full_step_contact_fit = NOT_APPLICABLE
+        if legal and raw_full_step_contact_contract:
+            raw_trace_fit = UNKNOWN
+            raw_execution_fit = (
+                NO if raw_full_step_contact_fit == NO else UNKNOWN
+            )
+        else:
+            raw_trace_fit = NOT_APPLICABLE
+            raw_execution_fit = NOT_APPLICABLE
+        cost_status = (
+            "not_executed"
+            if not legal
+            else (
+                "known_conditional_estimate"
+                if total is not None
+                else "unknown_required_phase"
+            )
+        )
 
         readiness_gain = "none"
         if legal and action == 0 and service == YES and current_bundle["readiness"] == NO:
@@ -325,8 +438,19 @@ def estimate_public_actions(
             "target_prepare": target_prepare,
             "target_state_commit": target_state_commit,
             "future_readiness_gain": readiness_gain,
+            "cost_status": cost_status,
+            "cost_basis": "public_conditional_estimate_not_realized_cost",
+            "estimated_conditional_seconds": total,
             "estimated_total_seconds": total,
+            "actual_executed_seconds": None,
+            "actual_execution_cost_status": "unavailable_online",
             "deadline_fit": _tri_leq(total, remaining_deadline),
+            "target_prepare_contact_fit": target_prepare,
+            "raw_full_step_contact_fit": raw_full_step_contact_fit,
+            "raw_trace_fit": raw_trace_fit,
+            "raw_execution_fit": raw_execution_fit,
+            "phase_status": phase_status,
+            "estimated_phase_seconds": phase_seconds,
             "model_transfer_bytes": model_bytes,
             "state_transfer_bytes": transfer_state_bytes,
             "input_transfer_bytes": transfer_input_bytes,
@@ -391,6 +515,8 @@ def public_prepare_advantage_label(
         decision, reason = "serve", "action4_fails_current_service"
     elif action4["target_prepare"] == NO:
         decision, reason = "serve", "target_prepare_infeasible"
+    elif action4["raw_full_step_contact_fit"] == NO:
+        decision, reason = "abstain", "raw_full_step_contact_insufficient"
     elif action4["deadline_fit"] == NO and service_fit:
         decision, reason = "serve", "prepare_misses_deadline_while_service_fits"
     elif (
@@ -425,7 +551,12 @@ def _score(row: dict[str, Any]) -> tuple[Any, ...]:
     }.get(str(row["future_readiness_gain"]), 0)
     known = row["estimated_total_seconds"] is not None
     total = float(row["estimated_total_seconds"] or 0.0)
-    bytes_total = int(row["model_transfer_bytes"]) + int(row["state_transfer_bytes"]) + int(row["input_transfer_bytes"])
+    byte_fields = (
+        row["model_transfer_bytes"],
+        row["state_transfer_bytes"],
+        row["input_transfer_bytes"],
+    )
+    bytes_total = sum(int(value) for value in byte_fields if value is not None)
     return service_rank, deadline_rank, int(known), gain_rank, -total, -bytes_total
 
 
