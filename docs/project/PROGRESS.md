@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-10：MIXED 反例时间合同与条件弃权候选独立门禁 PASS
+
+- A 对旧 96 个分支文件、9 份完整状态和 463 条轨迹对账，0 额外 env.step；两个事前反例的 action4 首步均是 2 s 失败等待，无 state commit/模型传输。冻结 `decision_step_index` 与 modeled clock 分离，合同自洽，但人工 5 s 接触尺度不能代表逐帧 NGSIM 物理时间。旧 hard-zero target 门禁继续 `MIXED`。
+- B 候选固定 commit `46a68f11c289ccc304b88cdfed01c34ba5f61c3d` 后，A 在原 30 个状态独立验收：6/6 current-ready 辅助梯度逐项相同、24/24 current-missing event 辅助梯度归零；raw 动作概率/value 30/30 相同，PPO/MAPPO/DT 开关不泄漏、checkpoint 语义隔离。审计样本 event 有效监督 `6/30`，非训练比例。门禁 `PASS` 只允许 B 按另行绑定的协议考虑一次科学执行；A 未训练、未访问 formal/holdout，方法优势与论文贡献仍 `Unverifiable`。详见 `cscwd_conditional_abstention_independent_gate_20261010.md`。
+
 ## 2026-10-10：prepared-state 公共观测 v4 最小修复通过接口验收
 
 - 在单独 A 工作树加入显式 opt-in `calibrated_workflow_interface_v4_prepared_state_prefix`；当前/公开预测目标的 state 存在、已完成前缀有效性和缺失比例均进入 PPO/MAPPO/DT flat 与 SA RSU 编码，旧 profile/旧 checkpoint 保持原语义，跨 profile load 显式拒绝。

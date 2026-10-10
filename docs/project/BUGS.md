@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-10：条件弃权通过接口门禁；人工决策时间尺度为开放外推风险
+
+- `RESOLVED FOR CANDIDATE CONTRACT`：B 的 event 辅助监督条件弃权只对 current-missing 样本屏蔽 event CE 与 temporal margin，保留 PPO 和 slow/fast 信号；A 对 30 个冻结状态、checkpoint/profile、三种基线与共同环境身份独立验收 `PASS`。旧 hard-zero target 的多步反例及 `MIXED` 不撤销。
+- `OPEN / model time realism`：RSU 序列由 NGSIM handoff pressure 合成，环境每次决策（失败也包含）推进一个位置，接触预算用人工 5 s/决策，而 deadline 用实际 modeled action cost；0 新重放的 463 条旧轨迹与代码合同一致，但不能外推逐帧真实车速、接触窗口或线上 deadline。准备接触预算也不校验完整节点计算时长。见 `cscwd_conditional_abstention_independent_gate_20261010.md`。
+- `OPEN / scientific outcome`：本门禁 0 新训练、0 formal/holdout/support；有效监督 `6/30` 仅属于审计抽样，优秀 baseline 结果、独立数据及 paper-ready 仍 `Unverifiable`。
+
 ## 2026-10-10：prepared-state 别名接口已修；学习收益仍待匹配实验
 
 - `RESOLVED IN OPT-IN V4`：原同公开状态+同动作、prepared-state 不同的具体反例可辨识，四方法共同消费；旧 profile 原样保留。

@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `cscwd_conditional_abstention_independent_gate_20261010.md`：旧 `MIXED` 分支的时间合同与两处反例对账、B 条件弃权实现的独立无训练 PASS 门禁；不代表科学效果或论文晋级。
+- `cscwd_conditional_abstention_audit_plan_20261010.md`：本轮事前冻结的 A 审计范围、样本、预算与判定边界。
+
 - `cscwd_prepared_state_prefix_interface_20261010.md`：新 prepared-state v4 共同观测字段、四方法映射、参数/推理开销、旧新物理等价和 B 独立 preflight 交接；非论文结果。
 
 - `cscwd_sa_long_budget_cost_diagnosis_plan_20261009.md`、`cscwd_sa_long_budget_cost_diagnosis_20261009.md` 与 `cscwd_sa_long_budget_cost_summary_20261009.json`：B 长预算完成后的只读逐事件成本、配对覆盖、隐藏 prepared-state 反例与唯一公平候选；不含论文表。
