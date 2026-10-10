@@ -5,10 +5,15 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：raw 相位合同未定义，公开规则未消费已知整步不可行标签
+
+- `CONFIRMED / phase contract blocker`：冻结两条长 trace 的 12 次 action 4 中，4 次模型+状态准备自身超过当前 RSU 接触；8 次准备可放入接触，其中 4 次 native 预览在当前节点服务后可迁移，但完整服务超出当前接触，因此 raw 全部原子回滚。直接只放宽 full-step gate 会允许未建模的跨接触服务；需先定义逐相位目标/当前 RSU、跨界执行、部分传输与 commit/rollback 合同，而非把 0 字节视为算法失效。
+- `CONFIRMED / public consumer defect`：公开一阶/两步规则在同一 US101 `dev_01` 起点各选一次 action 4，虽其 estimator 的 `raw_full_step_contact_fit=no`。B 线可按相同公开输入最小修 rule scorer/验收；只避免明显不可行选择，不解除迁移物理门。另 6 次 action 0/3 的公开预测可完成、实际拒绝为恒速 contact 预测误差，不能用隐藏实际未来修规则。证据见 `cscwd_new_development_contact_phase_diagnosis_20261011.md`。
+
 ## 2026-10-11：长原始来源可执行完整 DAG，但迁移机制受当前整步接触合同阻断
 
 - `CONFIRMED / bounded development mechanism limit`：两段新冻结轨迹各 118.8 s，40/40 workflow 最终完成且 4/40 按期；但 12/12 执行 action4 在 `current_rsu_contact_expires_before_commit` 拒绝，68 次同类拒绝，0 模型/状态字节和成功迁移。源时间不足已非本轮主因，当前 RSU 几何与整步（准备+节点计算）接触准入共同限制机制可达性。不能把零迁移归因于算法决策质量，也不能直接放宽正式科学合同。
-- `OPEN / phase semantics`：已知旧 raw 整步门可回滚本可在接触内完成的准备阶段，但本轮尚未逐项分解 12 次 action4 的准备/计算/目标接触、几何与预测误差。因此具体占比及最小修复路径未验证；下一步只能在原 40 episode ledger 上做预登记的有界阶段诊断，另立物理语义决策后才可修环境或训练。详见 `cscwd_new_development_source_reachability_20261011.md`。
+- `RESOLVED DIAGNOSTIC / semantics open`：后续 0/20 步账本/阶段诊断已分解 12 次 action 4 与模拟几何，详见上节；但逐相位跨界执行的正式物理合同仍未冻结，不能直接修环境或训练。
 
 ## 2026-10-11：授权原始 development 区间不足以承载完整 DAG
 

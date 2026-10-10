@@ -32,6 +32,22 @@
 
 `actual_contact_budget_seconds_privileged_diagnostic` 仅进只读逐步 ledger，不传给公共规则；`preview_count_upper_bound` 包含 raw executor 的 native 预览与公共估计器调用上界。实验上限固定为 60 episode/1,440 实际 step/5,000 preview。
 
+固定父原件的接触/阶段诊断见 `cscwd_new_development_contact_diagnosis_plan_20261011.md` 与 `cscwd_new_development_contact_phase_diagnosis_20261011.md`。只读账本脚本新增 0 环境步；action4 阶段脚本只重建两条父来源轨迹，原 12 个起点前缀加 native 预览实际新增 20 步，禁止修改输入 hash、选择新窗口或在原输出 root 上覆盖执行：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/audit_cscwd_new_development_contact_ledger.py \
+  --reachability-manifest artifacts/analysis/cscwd_new_development_reachability_20261011_v1/reachability_manifest.json \
+  --output-root artifacts/analysis/cscwd_new_development_contact_ledger_20261011_v1
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/audit_cscwd_new_development_action4_phases.py \
+  --raw-csv-path '/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv' \
+  --source-manifest artifacts/analysis/cscwd_new_development_source_20261011_v2/source_manifest.json \
+  --reachability-manifest artifacts/analysis/cscwd_new_development_reachability_20261011_v1/reachability_manifest.json \
+  --public-estimator-path /Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC/src/agents/causal_public_action_estimator.py \
+  --output-root artifacts/analysis/cscwd_new_development_action4_phases_20261011_v1
+```
+
+两命令仅是已完成的 create-only 记录，不得在现有 root 重跑。阶段原件包含实际接触和 native preview，属 privileged 诊断，不喂在线规则。物理跨界合同与 B 的公开规则 consumer 修复均另立任务，当前不授权训练。
+
 ## CSCWD 已授权 development 原始区间资格（2026-10-11；已完成）
 
 事前规则见 `cscwd_development_window_eligibility_plan_20261011.md`；只读命令见 `cscwd_development_window_eligibility_20261011.md`。脚本 `scripts/audit_cscwd_development_window_eligibility.py` 校验父 workload、strict split、train/dev plan 和本机已有 NGSIM CSV 的 SHA，创建独立 `artifacts/analysis/cscwd_development_window_eligibility_20261011_v1/`。40 个已授权区间合格 0；不得因这一结论自行扫描未授权长区间、拼接窗口或启动训练。合成资格测试：

@@ -4,6 +4,8 @@
 
 `scripts/audit_cscwd_new_development_reachability.py` 消费来源 manifest、冻结 workload、现有 `RawNGSIMEventTimeEnv` 与 B 分支按 SHA 锁定的 public immediate/two-step 方法；不改算法或训练器。真实未来接触只写入明确 privileged 的本地诊断字段，规则入口仅接收环境公开 `_info()`。`tests/test_cscwd_new_development_reachability.py` 检查精确源车帧重建及动作 mask fallback。
 
+`scripts/audit_cscwd_new_development_contact_ledger.py` 仅按 SHA 锁定父 reachability manifest/320 行 ledger，复算 contact 拒绝与 public/actual 预算差，不重载原始 CSV 或执行环境。`scripts/audit_cscwd_new_development_action4_phases.py` 只重建父来源的两条原始轨迹并重放固定 12 个 action4 起点；公开估计器仅消费 `_info()`，隐藏实际 contact 和 native preview 仅写诊断字段，20 额外环境 step 不构成策略实验。
+
 `scripts/audit_cscwd_development_window_eligibility.py` 只读冻结 workload/split/train/dev 计划及原始 NGSIM CSV，按来源时间、选定车辆连续性和静态成本下界生成资格清单；formal/hidden 仅用 split manifest 的区间 ID 排除，不读 sealed 结果或调用环境/训练器。`tests/test_cscwd_development_window_eligibility.py` 用合成帧检查时长、跨 split 重叠和禁止拼接。
 
 `scripts/diagnose_cscwd_raw_time_root_cause.py` 仅依赖冻结 v4 manifest/summary、本机已授权三个 NGSIM 原始区间和现有环境实现，重放原 147 步并拆分 native 计算/模型/状态/输入/加载/失败阶段，核验 raw trace/contact 门与公共 decision clone；写独立小型诊断 JSON，不修改 producer、consumer、训练器或原件。`tests/test_cscwd_raw_time_root_cause.py` 使用合成轨迹锁定阶段门及未来后缀反例，不把缺陷修复混入本审查轮。

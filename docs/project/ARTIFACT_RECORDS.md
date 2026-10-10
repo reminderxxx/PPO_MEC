@@ -5,6 +5,12 @@
 
 # Artifact Records
 
+## 2026-10-11 CSCWD long raw contact and action-4 phase diagnosis
+
+- 本地 create-only `artifacts/analysis/cscwd_new_development_contact_ledger_20261011_v1/contact_ledger_audit.json` SHA-256 `f35fe1ded86663488568864790c523a24a62ae66ad517c592d7aa75481d76b93`：父 40 episode/320 step 只读复算，68 contact 拒绝/43 去重，12 action4/10 去重，0 新环境 step。
+- 本地 create-only `artifacts/analysis/cscwd_new_development_action4_phases_20261011_v1/action4_phase_audit.json` SHA-256 `b3f0634ad0c305fdd9f0cb5780c3b0120c94aa8b4e3600ce175f5fd601d44554`：相同 12 action4 起点的 20 额外前缀/native 预览步，8 次 native 准备可在 contact 内完成、4 次 native 预览迁移可成，但 12/12 raw 整步拒绝。报告 `cscwd_new_development_contact_phase_diagnosis_20261011.md`；未改原件或训练。
+- 本地 create-only `artifacts/analysis/cscwd_public_action4_state_20261011_v1/public_info.json` SHA-256 `4036254c97db4bad48936d8b5f8276931ca2985523250a6385e697b1ab8e8f98`：唯一 US101 `dev_01` step0 的纯公开输入三元组；与 phase 原件两公开规则行的完整 `_info()` SHA 一致，供 B 独立回归，不含隐藏实际接触/未来位置/预览。
+
 ## 2026-10-11 CSCWD frozen long development source and bounded reachability
 
 - 本地 create-only 来源 root `artifacts/analysis/cscwd_new_development_source_20261011_v2/`：`source_manifest.json` SHA-256 `34eee3a8d16f2dfe89f3a8d8dcd27f20159c0488e2f1a9ebc77be3aac747abde`，`candidate_fragments.jsonl` SHA-256 `560cd95930b6b558b84ddb0e8b4d7973c63f889302219ec3b4a21b720f3f8c08`。全 CSV 11,850,526 行，2 个入选长窗；formal/hidden 原始区间及 24 帧 embargo 外。失败的 `v1` 只留部分原件，不引用。

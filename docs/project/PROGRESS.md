@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-11：长原始来源 action 4 接触/阶段根因定位完成；训练门仍关闭
+
+- 对冻结 40 episode/320 step 的 68 次 contact 拒绝做 0 步账本复算：43 个去重尝试，68/68 起点有正 contact 且 trace 剩余足够；6 次 action 0/3 公开 contact 预测可行而真实拒绝，action 4 无此类预测误判。12 次 action 4 对应 10 个去重尝试，planned 整步 1.523–6.121 s 全部超过 public/actual 当前 RSU contact；账本 SHA-256 `f35fe1ded86663488568864790c523a24a62ae66ad517c592d7aa75481d76b93`。
+- 固定 12 次 action 4 前缀与 native preview 仅新增 20 env.step：4 次准备阶段自身超 contact，8 次准备可完成；其中 4 次 native preview 会成功迁移（仅 2 个去重状态），但完整当前服务跨出接触，raw 门统一回滚为 0 模型/状态字节。不能直接放宽整步门。public immediate/two-step 各在同一 `raw_full_step_contact_fit=no` 状态选 action 4，B 线应独立修 consumer，不能据此开启训练。阶段原件 SHA-256 `b3f0634ad0c305fdd9f0cb5780c3b0120c94aa8b4e3600ce175f5fd601d44554`；完整归因见 `cscwd_new_development_contact_phase_diagnosis_20261011.md`。
+
 ## 2026-10-11：新长原始 development 来源合格，固定可达性未兑现迁移
 
 - 事前冻结 Lankershim/US101 最多 3 个来源，扫描 NGSIM 11,850,526 行后只得到两个 1,189 帧/118.8 s 连续窗口；与 strict formal/hidden 的原始时间区间及 24 帧 embargo 零重叠，最近保护端点间隔 68,100/2,500 ms。两窗各有既有 train/dev 暴露 1/2，故仅为开发来源，不是独立确认性 split。来源清单 SHA-256 `34eee3a8d16f2dfe89f3a8d8dcd27f20159c0488e2f1a9ebc77be3aac747abde`。

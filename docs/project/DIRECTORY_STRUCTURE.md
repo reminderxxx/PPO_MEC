@@ -4,6 +4,7 @@
 
 - `scripts/freeze_cscwd_new_development_source.py`、`tests/test_cscwd_new_development_source.py`：冻结后仅按原始来源/时间/车/帧/坐标有效性和历史隔离边界选最多 3 个开发来源窗口；不运行算法。
 - `scripts/audit_cscwd_new_development_reachability.py`、`tests/test_cscwd_new_development_reachability.py`：消费上述 create-only 来源 manifest，在冻结 raw 环境以固定公共合法规则做最多 60 episode 的可达性；逐步诊断实际接触只写本地原件，不喂规则。
+- `scripts/audit_cscwd_new_development_contact_ledger.py`、`scripts/audit_cscwd_new_development_action4_phases.py`：在父可达性原件上分别做零步账本复算和固定 12 次 action4 的有界 native 阶段诊断；输出于各自 create-only `artifacts/analysis/cscwd_new_development_*_20261011_v1/`。
 - `docs/project/cscwd_new_development_source_plan_20261011.md`：选择前固定的成本、embargo、匿名旧来源隔离和可达性预算；完整机器清单位于 create-only `artifacts/analysis/cscwd_new_development_source_20261011_v2/`，v1 是未完成序列化失败记录。
 
 ## 2026-10-11 CSCWD 已授权开发窗口资格
