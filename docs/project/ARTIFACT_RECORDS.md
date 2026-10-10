@@ -5,6 +5,18 @@
 
 # Artifact Records
 
+## 2026-10-10 CSCWD 状态条件动作证据
+
+- Root：`artifacts/analysis/cscwd_state_condition_action_evidence_20261010_v1/`；frozen plan SHA-256=
+  `5ad92451b29ba2bb5204e8cb6597ac2c6b34f4268caf914da81222f3b02aa936`；source branch manifest SHA-256=
+  `859abe71b5465cceeb20787a429ec932274177311d181a724f47e404cc35c4b7`。
+- 11 个 source states、26 个既有 branches、19 个 deterministic prefix replay steps；new action branches/new branch
+  steps/training/formal/holdout=`0/0/0/0/0`。analysis manifest SHA-256=
+  `978b94cc4446dcd1ede3c3db017d804d70afd0e28c9a7ba9a7a43568fa835b37`。
+- 分类为 strict avoidable/Pareto/unknown=`1/8/2`；action2 有一正一反见证，action4 current-missing 首步服务 `0/5`、
+  后缀按期 `3/5`。结论 `NO_TRAINING_CANDIDATE`，`MIXED_STOPPED` 不变；报告：
+  `docs/project/cscwd_state_condition_action_evidence_20261010.md`。
+
 ## 2026-10-10 abstention cost causal audit 与 training-signal correction
 
 - A audit commit/tree=`7734d5807feaa66ac3f40e89ca8ff86f911f0783`/

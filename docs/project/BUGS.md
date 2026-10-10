@@ -5,6 +5,16 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-10：状态条件动作信用仍为未定位学习风险
+
+- `OBSERVED`：11 个冻结状态中只有 1 个候选动作严格被支配；action2 在两个公开状态给出相反方向，差异与 readiness、prefix
+  和连续 deadline slack 一致，但只覆盖已暴露 development 见证，不能形成跨 seed/视角监督规则。
+- `PARETO BLOCKER`：8/11 状态为服务、elapsed、bytes、recompute 的 Pareto 交换；协议没有外部 SLA 时不得事后选择权重或
+  阈值来制造候选。action4 首步失败也不等于 workflow 失败，5 条现有分支中仍有 3 条按期。
+- `STOPPED`：不启动 action-conditioned auxiliary/critic、guard 或 fast/event 消融。独立 opt-in elapsed-time profile 已使
+  四 learned fixed policy 的结果方向混合，而 5s/slot、原子跨界与末端钳位无真实时段支持；优先补 source-grounded 环境
+  时间合同。见 `cscwd_state_condition_action_evidence_20261010.md`。
+
 ## 2026-10-10：training signal readiness 错误已修生产者；历史字段保持无效
 
 - `RESOLVED PRODUCER`：`_training_signal_row` 现从 primary vehicle 的 `associated_rsu_id` 解析当前 RSU；ready/missing 和 primary

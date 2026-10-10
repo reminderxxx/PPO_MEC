@@ -5,6 +5,17 @@
 
 ﻿# Progress
 
+## 2026-10-10：状态条件 action 证据不足以授权新训练
+
+- 事前冻结后消费既有 11 个共同状态、26 条合法分支；只重放 19 个共同前缀 step，新增 action branch、训练、更新、选模、
+  formal/holdout 均为 0。独立临时目录重算与四个内容文件 hash 一致。
+- 只有 `1/11` 候选动作被完整服务—资源向量严格支配；`8/11` 是 Pareto 交换，`2/11` unknown。action2 有公开状态下的
+  一正一反见证；action4 在 5 个 current-missing 状态均首步失败，但仍有 `3/5` 后缀按期。
+- 当前优先缺口是 state-conditioned action credit，不是全局屏蔽 action2/4 或再删 auxiliary；样本不足以冻结 loss/guard/
+  网络候选。独立 elapsed-time sensitivity（A commit `ad483610…`）已显示四 learned fixed policy 方向混合且 5s/slot
+  无物理真值依据，进一步触发 `NO_TRAINING_CANDIDATE`；先闭合 source-grounded 时间合同，不自动训练。报告见
+  `cscwd_state_condition_action_evidence_20261010.md`。
+
 ## 2026-10-10：training signal current readiness 生产者错误已最小修复
 
 - A 独立执行 4,203 记录动作成本重放及 11 起点/26 分支/105 新分支步，逐对象模型字节和 clock 守恒；新增字节主要被后续

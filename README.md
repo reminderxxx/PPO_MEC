@@ -5,6 +5,12 @@
 
 # PPO_MEC
 
+2026-10-10 的[状态条件动作证据审查](docs/project/cscwd_state_condition_action_evidence_20261010.md)复用 11 个共同状态和
+26 条既有合法分支：仅 1 个候选动作严格被支配，8 个属于服务—资源 Pareto 交换；action2 存在一正一反公开见证，
+action4 首步失败也不等同终局失败。后续 elapsed-time 敏感性又显示 fixed-policy 方向混合且缺真实时间依据；当前不授权新
+loss/guard/训练，先闭合环境时间合同。论文线边界见
+[主张与证据变更说明](docs/project/cscwd_state_condition_action_claim_change_20261010.md)。
+
 2026-10-10 已修复 training signal 日志的 current-RSU 地址错误：历史候选 28,800 行和 v4 115,200 行
 `current_bundle_ready` 全 False，现只标记为无效、不覆盖原件；agent 训练和 event candidate 的 `MIXED_STOPPED` 未见受影响。
 见[纠错报告](docs/project/cscwd_training_signal_readiness_correction_20261010.md)。
