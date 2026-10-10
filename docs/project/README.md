@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `cscwd_public_action_advantage_{plan,candidate,claim_change}_20261010.md`：共同 public action estimator、唯一
+  `prepare/serve/abstain` event auxiliary 候选和 A 论文线边界；raw NGSIM 2.2 s 窗口未通过可达性门，0 候选训练。
+
 - `cscwd_per_head_gradient_acceptance_20261010.md`：fast/slow/event CE 与实际执行动作 PPO 的独立消费链验收；
   fast CE 对 action2 的局部作用成立，但候选冲突跨 seed 不稳定，loss 改动与新 A/B 均不获本轮授权。
 

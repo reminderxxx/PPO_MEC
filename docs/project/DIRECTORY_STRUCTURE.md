@@ -1,5 +1,13 @@
 ﻿# Directory Structure
 
+## 2026-10-10 causal public action advantage
+
+- `src/agents/causal_public_action_estimator.py`：共同 public action 成本/可行性估计、public immediate/two-step rules 与
+  `prepare/serve/abstain` 标签；不读取 env clone、实际未来或 outcome。
+- `tests/test_causal_public_action_estimator.py`、`tests/test_causal_public_prepare_advantage_auxiliary.py`：未来扰动、unknown、成本、
+  无副作用规则、event-only 梯度、基线/checkpoint 语义合同。
+- `docs/project/cscwd_public_action_advantage_{plan,candidate,claim_change}_20261010.md`：事前冻结、停止裁决和论文线只读边界。
+
 ## 2026-10-10 training signal readiness 日志纠错
 
 - `scripts/audit_calibrated_workflow_training_signal_readiness_correction.py`：核验两个冻结原件及历史字段缺陷，生成不覆盖原件的

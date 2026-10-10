@@ -5,6 +5,16 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-10：公共动作优势监督可审计，但 source-grounded 可达性阻断训练
+
+- `IMPLEMENTED DEFAULT-OFF`：公共估计器与 `prepare/serve/abstain` event supervision 已实现；unknown 不伪造标签，候选不做
+  action mask/guard，不改 slow/fast、network、reward、PPO 或基线权限。新旧相邻 torch 梯度/checkpoint 回归共 `27 passed`；
+  这不等于性能或因果验收。
+- `SOURCE-GROUNDED BLOCKER`：现有三个冻结 raw NGSIM 窗口仅 2.2 s，15/15 truncated、0 workflow、0 成功 prepare；无法同时
+  支持 prepare/serve 学习覆盖。匹配 pilot 在训练前停止，不允许据本批结果扩窗或换实例。
+- `OPEN`：需要另立结果盲、与 formal/holdout 原始区间互斥的较长 development window 协议，先只验证双标签与成功 prepare
+  可达性。若仍失败，应否定候选，而不是延长预算、扫阈值或转入其他 auxiliary 消融。
+
 ## 2026-10-10：状态条件动作信用仍为未定位学习风险
 
 - `OBSERVED`：11 个冻结状态中只有 1 个候选动作严格被支配；action2 在两个公开状态给出相反方向，差异与 readiness、prefix

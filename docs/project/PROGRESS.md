@@ -5,6 +5,17 @@
 
 ﻿# Progress
 
+## 2026-10-10：公共动作优势候选已 default-off 实现；raw 时间门失败，训练前停止
+
+- 新增共同、只读、无副作用的 public action estimator；缺公共成本、需要私有 eviction 顺序或重算身份不明时返回
+  `unknown`。公共 immediate/two-step rule 不 clone/step；原 exact two-step 继续明确为 privileged model-based reference。
+- 唯一候选 `causal_public_prepare_advantage_v1` 只替换 SA event CE/temporal-margin 的 target/weight，unknown abstain；
+  slow/fast、confidence、固定分母、网络、reward、PPO、选模和推理 adjustment 不变，默认关闭并绑定 checkpoint 语义。
+- A source-grounded v2 的 15 个 raw episode 全部 truncated，合计仅 2 nodes、0 workflow、28 failures、0 成功 prepare；三个
+  冻结窗口每个只有 2.2 s 决策余量。prepare/serve 可达性门不成立，故 0 候选训练/评价，不扩窗、不换实例。
+- estimator/causal auxiliary 与既有相邻回归共 `27 passed`，smoke 完成 6/6 toy DAG nodes，语法/diff 检查通过；这只验证实现
+  合同，不能据此晋级算法结论。见 `cscwd_public_action_advantage_candidate_20261010.md`。
+
 ## 2026-10-10：状态条件 action 证据不足以授权新训练
 
 - 事前冻结后消费既有 11 个共同状态、26 条合法分支；只重放 19 个共同前缀 step，新增 action branch、训练、更新、选模、

@@ -5,6 +5,11 @@
 
 # PPO_MEC
 
+2026-10-10 的[公共动作优势候选](docs/project/cscwd_public_action_advantage_candidate_20261010.md)已 default-off 实现：共同
+public estimator 只使用因果观测，生成 `prepare/serve/abstain` event supervision，unknown 时不施加 event CE/temporal
+梯度。raw NGSIM 三个冻结开发窗口均只有 2.2 s，15/15 截断且 0 成功 prepare，故匹配 pilot 在训练前停止；不扩窗、不换
+实例、不宣称算法收益。论文线边界见[独立变更说明](docs/project/cscwd_public_action_advantage_claim_change_20261010.md)。
+
 2026-10-10 的[状态条件动作证据审查](docs/project/cscwd_state_condition_action_evidence_20261010.md)复用 11 个共同状态和
 26 条既有合法分支：仅 1 个候选动作严格被支配，8 个属于服务—资源 Pareto 交换；action2 存在一正一反公开见证，
 action4 首步失败也不等同终局失败。后续 elapsed-time 敏感性又显示 fixed-policy 方向混合且缺真实时间依据；当前不授权新

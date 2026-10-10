@@ -1,5 +1,14 @@
 ﻿# Decision Log
 
+## 2026-10-10：只冻结因果 public event supervision；raw 可达性失败即停止
+
+- 现有 action-conditioned 证据支持比较当前服务、目标 readiness gain、公开成本与 deadline，但不支持统一禁用 action2/4、
+  删除 auxiliary 或使用 exact future clone。唯一候选因此为公共 `prepare/serve/abstain` event supervision，unknown abstain。
+- 候选只改变 SA event CE/temporal target/weight，默认关闭；原 privileged two-step 保留并明确能力差异。该项是可证伪学习设计，
+  不是实现纠错、性能证据或算法创新。
+- raw NGSIM 三个冻结窗口均仅 2.2 s，0 成功 prepare；按预冻门取消本轮匹配训练。后续若继续，先另立结果盲的较长开发窗口
+  资格协议，只验双标签/成功 prepare，不同时改算法或预算。
+
 ## 2026-10-10：只修训练信号日志地址，不修改成本或算法
 
 - A 原生事件账证明 object bytes、step clock 和 action2 fallback 计费守恒；可靠性—成本交换是合法 Pareto 结果，不作为 bug。

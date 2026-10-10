@@ -5,6 +5,20 @@
 
 # Artifact Records
 
+## 2026-10-10 public action advantage 候选（无 scientific run）
+
+- B 计划 commit=`86b54ede54be7d9be9201a0d2cb2615b5aa1a5e4`；default-off implementation commit=
+  `5f88785ae4c2951e3826a468d3c17e389365f39c`。本条只登记代码/合同，不登记候选 checkpoint 或性能结果。
+- A source-grounded final run commit=`0704937742ec9218094f380a1b541c4bd2159bcb`；本地 root=
+  `artifacts/analysis/cscwd_raw_ngsim_event_time_20261010_v4/`。source manifest SHA-256=
+  `c0b64fd64c602ef5351c5686d2f315bbd5784e63ebbd08902b297fc5bacc883f`，summary SHA-256=
+  `62c1f4c2c7fbb2e2763f6946c0fad29b4cd6a3705ebf01501a7d905d8b1fe30f`。
+- fixed-action sensitivity=`30 episodes/147 steps`；raw arm=`15/15 truncated, 2 nodes, 0 workflows, 28 failures, 10/30
+  requested actions mask-projected, 2 executed action4, 0 successful prepare`。candidate training/evaluation/formal/holdout=
+  `0/0/0/0`；verdict=`PILOT_STOPPED_PRE_TRAINING`。早期 v1/v2/v3 不作结论。
+- 报告：`docs/project/cscwd_public_action_advantage_candidate_20261010.md`；A 论文线只读变更：
+  `cscwd_public_action_advantage_claim_change_20261010.md`。raw CSV、checkpoint 和权重不上传。
+
 ## 2026-10-10 CSCWD 状态条件动作证据
 
 - Root：`artifacts/analysis/cscwd_state_condition_action_evidence_20261010_v1/`；frozen plan SHA-256=

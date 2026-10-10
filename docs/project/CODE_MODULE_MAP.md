@@ -1,5 +1,12 @@
 # Code Module Map
 
+`src/agents/causal_public_action_estimator.py` 从共同 public semantic state/action mask 估算 action 0–4 的服务、准备、deadline 与
+字节/时间成本；不可识别时返回 unknown，不访问 env/instance/实际未来/结果。它同时提供 public immediate/two-step rules 和
+`causal_public_prepare_advantage_v1` 三态标签。`src/agents/sa_ghmappo_core.py` 的 default-off
+`mechanism_aux_causal_public_prepare_advantage_enabled` 只在 auxiliary loss 内替换 event hard/soft target 与 supervision weight；
+slow/fast、固定分母和 raw inference path 不变。`scripts/run_calibrated_workflow_interface_repair.py` 只向 SA 传该 flag，PPO/MAPPO
+身份不变；相关合同见 `tests/test_causal_public_action_estimator.py` 与 `test_causal_public_prepare_advantage_auxiliary.py`。
+
 `scripts/run_calibrated_workflow_value_normalization_ab.py::_training_signal_row` 通过 primary vehicle 的 `associated_rsu_id` 计算
 current bundle readiness；它只生产训练行为日志，不参与 agent loss。`scripts/audit_calibrated_workflow_training_signal_readiness_correction.py`
 核验候选/旧 v4 integrity 与历史全 False 见证，并发布 create-only invalid-field correction sidecar，不重放环境或改旧行。
