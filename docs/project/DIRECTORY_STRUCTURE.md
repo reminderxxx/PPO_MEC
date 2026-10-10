@@ -7,6 +7,11 @@
 - `docs/project/cscwd_prepared_state_visibility_matched_protocol_20261010.md`：A 交接前门禁、匹配预算、selected/update-96
   双视角及拒绝条件。
 
+- `docs/project/cscwd_prepared_state_prefix_interface_20261010.md` 与 `tests/test_calibrated_workflow_prepared_state_prefix.py`：显式 v4 公共观测接口交接和合成验收；B runner/protocol 与实验原件不在本 A 分支改动。
+
+- `scripts/diagnose_cscwd_sa_long_budget_cost.py` 与 `scripts/audit_cscwd_long_budget_state_alias.py`：只读 B 长预算原件，分别生成本地 `artifacts/analysis/cscwd_sa_long_budget_cost_diagnosis_20261009_v1/` 和 `cscwd_sa_long_budget_state_alias_20261009_v2/`；v1 别名审计的过滤错误原件保留，结论以 v2 为准。
+- `docs/project/cscwd_sa_long_budget_cost_diagnosis_plan_20261009.md`、`cscwd_sa_long_budget_cost_diagnosis_20261009.md` 与 `cscwd_sa_long_budget_cost_summary_20261009.json`：事前规则、只读报告和小型机器摘要。
+
 - `configs/experiment/calibrated_workflow_strong_baselines_budget_extension_v1.json`：4× learned 预算、固定端点和短预算哈希身份。
 - `scripts/analyze_calibrated_workflow_budget_extension.py`、`scripts/launch_calibrated_workflow_causal_budget_extension.py`：配对诊断与一次性持久启动；规则方法只读复用。
 - `docs/project/cscwd_causal_budget_extension_protocol_20261009.md`：统一预算干预、分析输出和停止边界。

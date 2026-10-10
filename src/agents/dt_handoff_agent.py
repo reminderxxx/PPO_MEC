@@ -116,9 +116,13 @@ class _DTHandoffPolicyNetwork(nn.Module):
         *,
         hidden_dim: int = 64,
         hidden_dims: tuple[int, int] = (64, 64),
+        prepared_state_features_enabled: bool = False,
     ) -> None:
         super().__init__()
-        self.encoder = FlatSemanticEncoder(hidden_dim=hidden_dim)
+        self.encoder = FlatSemanticEncoder(
+            hidden_dim=hidden_dim,
+            prepared_state_features_enabled=prepared_state_features_enabled,
+        )
         self.dt_projection = nn.Sequential(
             nn.Linear(14, hidden_dim),
             nn.Tanh(),
@@ -231,6 +235,7 @@ class DTHandoffDRLAgent(PPOBaseAgent):
         self._network = _DTHandoffPolicyNetwork(
             hidden_dim=self._hidden_dim,
             hidden_dims=self._hidden_dims,
+            prepared_state_features_enabled=self._prepared_state_features_enabled,
         ).to(self._device)
         self._optimizer = torch.optim.Adam(self._network.parameters(), lr=self._learning_rate)
         self.baseline_config = {

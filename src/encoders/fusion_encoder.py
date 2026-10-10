@@ -9,11 +9,13 @@ import torch
 from torch import nn
 
 from src.encoders.calibrated_workflow_features import (
+    CALIBRATED_WORKFLOW_INTERFACE_V4_PREPARED_STATE_PREFIX,
     bundle_ready,
     bundle_resident_bytes,
     cache_occupancy,
     log_scale,
     predicted_target_rsu_id,
+    prepared_state_prefix_features,
     rsu_by_id,
     uses_calibrated_workflow_interface_v2,
 )
@@ -273,9 +275,11 @@ def build_graph_continuity_critic_features(
 class FlatSemanticEncoder(nn.Module):
     """flat baseline encoder。"""
 
-    def __init__(self, input_dim: int = 18, hidden_dim: int = 64) -> None:
+    def __init__(self, input_dim: int = 18, hidden_dim: int = 64,
+                 prepared_state_features_enabled: bool = False) -> None:
         super().__init__()
-        self._input_dim = int(input_dim)
+        self._prepared_state_features_enabled = bool(prepared_state_features_enabled)
+        self._input_dim = int(input_dim) + (7 if self._prepared_state_features_enabled else 0)
         self._hidden_dim = int(hidden_dim)
         self._projection = nn.Sequential(
             nn.Linear(self._input_dim, self._hidden_dim),
@@ -301,6 +305,8 @@ class FlatSemanticEncoder(nn.Module):
         }
 
     def _build_feature_tensor(self, semantic_state: dict[str, Any]) -> torch.Tensor:
+        if (semantic_state.get("interface_profile") == CALIBRATED_WORKFLOW_INTERFACE_V4_PREPARED_STATE_PREFIX) != self._prepared_state_features_enabled:
+            raise ValueError("flat encoder prepared-state profile mismatch")
         predictions = semantic_state.get("predictions", {})
         vehicles = semantic_state.get("vehicles", [])
         rsus = semantic_state.get("rsus", [])
@@ -344,6 +350,8 @@ class FlatSemanticEncoder(nn.Module):
                 confidence,
                 uncertainty,
             ]
+            if self._prepared_state_features_enabled:
+                feature_list.extend(prepared_state_prefix_features(semantic_state))
             return torch.tensor(feature_list, dtype=torch.float32)
         feature_list = [
             float(semantic_state.get("time_index", 0.0)) / 10000.0,
@@ -459,6 +467,7 @@ class SurrogateFusionEncoder(nn.Module):
         prediction_gate_min_leak: float = 0.0,
         graph_continuity_critic_enabled: bool = False,
         uncertainty_aware_critic_enabled: bool = False,
+        prepared_state_features_enabled: bool = False,
     ) -> None:
         super().__init__()
         self._hidden_dim = int(hidden_dim)
@@ -468,11 +477,15 @@ class SurrogateFusionEncoder(nn.Module):
         self._prediction_gate_min_leak = max(0.0, min(float(prediction_gate_min_leak), 1.0))
         self._graph_continuity_critic_enabled = bool(graph_continuity_critic_enabled)
         self._uncertainty_aware_critic_enabled = bool(uncertainty_aware_critic_enabled)
+        self._prepared_state_features_enabled = bool(prepared_state_features_enabled)
         self._dag_encoder = DAGGraphEncoder(
             hidden_dim=self._hidden_dim,
             use_dependency_aware=use_dependency_aware,
         )
-        self._rsu_encoder = RSUStateEncoder(hidden_dim=self._hidden_dim)
+        self._rsu_encoder = RSUStateEncoder(
+            hidden_dim=self._hidden_dim,
+            prepared_state_features_enabled=self._prepared_state_features_enabled,
+        )
         self._vehicle_projection = nn.Sequential(
             nn.Linear(10, self._hidden_dim),
             nn.ReLU(),

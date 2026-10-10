@@ -5,7 +5,12 @@
 
 ﻿# Progress
 
-## 2026-10-10：共同 prepared-state 可见性匹配训练协议冻结，等待 A 实现交接
+## 2026-10-10：prepared-state 公共观测 v4 最小修复通过接口验收
+
+- 在单独 A 工作树加入显式 opt-in `calibrated_workflow_interface_v4_prepared_state_prefix`；当前/公开预测目标的 state 存在、已完成前缀有效性和缺失比例均进入 PPO/MAPPO/DT flat 与 SA RSU 编码，旧 profile/旧 checkpoint 保持原语义，跨 profile load 显式拒绝。
+- B 原 `regression_08` SA 跨 seed 同公开 hash、同 action 的 `0/30.2107 s` 重算反例在新状态动作前分离；旧新相同动作序列的物理 transition、奖励、成本一致。目标链 21 test、smoke、语法及 diff 检查通过；0 训练、0 科学比较、0 旧 holdout 读取。参数量与本机推理计时见 `cscwd_prepared_state_prefix_interface_20261010.md`。B 需独立 preflight；SA 优势仍未验证。
+
+## 2026-10-10：共同 prepared-state 可见性匹配训练协议冻结，等待独立验收
 
 - A 的长预算成本诊断确认共同公共状态别名：相同 observation/semantic/mask 与相同动作可能对应不同 state readiness/
   recompute；本轮优先级由 selection-cohort 建议调整为共享 observation contract 纠错。

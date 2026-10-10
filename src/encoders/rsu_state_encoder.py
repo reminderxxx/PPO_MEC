@@ -8,10 +8,12 @@ import torch
 from torch import nn
 
 from src.encoders.calibrated_workflow_features import (
+    CALIBRATED_WORKFLOW_INTERFACE_V4_PREPARED_STATE_PREFIX,
     adapter_ready,
     base_ready,
     bundle_ready,
     cache_occupancy,
+    prepared_state_prefix_features,
     uses_calibrated_workflow_interface_v2,
 )
 
@@ -30,9 +32,11 @@ def _resolve_primary_vehicle_from_semantic_state(semantic_state: dict[str, Any])
 class RSUStateEncoder(nn.Module):
     """编码 RSU 集合、cache 状态与预测负载。"""
 
-    def __init__(self, input_dim: int = 10, hidden_dim: int = 64) -> None:
+    def __init__(self, input_dim: int = 10, hidden_dim: int = 64,
+                 prepared_state_features_enabled: bool = False) -> None:
         super().__init__()
-        self._input_dim = int(input_dim)
+        self._prepared_state_features_enabled = bool(prepared_state_features_enabled)
+        self._input_dim = int(input_dim) + (3 if self._prepared_state_features_enabled else 0)
         self._hidden_dim = int(hidden_dim)
         self._rsu_projection = nn.Sequential(
             nn.Linear(self._input_dim, self._hidden_dim),
@@ -76,6 +80,8 @@ class RSUStateEncoder(nn.Module):
         semantic_state: dict[str, Any],
         rsus: list[dict[str, Any]],
     ) -> tuple[torch.Tensor, list[str]]:
+        if (semantic_state.get("interface_profile") == CALIBRATED_WORKFLOW_INTERFACE_V4_PREPARED_STATE_PREFIX) != self._prepared_state_features_enabled:
+            raise ValueError("RSU encoder prepared-state profile mismatch")
         predictions = semantic_state.get("predictions", {})
         current_node = semantic_state.get("current_workflow_node") or {}
         primary_vehicle = _resolve_primary_vehicle_from_semantic_state(semantic_state)
@@ -93,6 +99,7 @@ class RSUStateEncoder(nn.Module):
         feature_rows: list[list[float]] = []
         rsu_ids: list[str] = []
         calibrated_v2 = uses_calibrated_workflow_interface_v2(semantic_state)
+        state_features = prepared_state_prefix_features(semantic_state) if self._prepared_state_features_enabled else None
         for rsu in rsus:
             rsu_id = str(rsu.get("rsu_id"))
             rsu_ids.append(rsu_id)
@@ -101,8 +108,7 @@ class RSUStateEncoder(nn.Module):
             if required_adapter is not None:
                 demand_score = float(demand_scores.get(rsu_id, {}).get(required_adapter, 0.0))
             if calibrated_v2:
-                feature_rows.append(
-                    [
+                row = [
                         cache_occupancy(rsu),
                         bundle_ready(semantic_state, rsu, current_node),
                         base_ready(semantic_state, rsu, current_node),
@@ -114,7 +120,14 @@ class RSUStateEncoder(nn.Module):
                         mean_future_load / 10.0,
                         demand_score / 5.0,
                     ]
-                )
+                if state_features is not None:
+                    if rsu_id == current_rsu_id:
+                        row.extend(state_features[:3])
+                    elif state_features[6] and rsu_id == predicted_handoff_target_rsu_id:
+                        row.extend(state_features[3:6])
+                    else:
+                        row.extend((0.0, 0.0, 0.0))
+                feature_rows.append(row)
                 continue
             feature_rows.append(
                 [

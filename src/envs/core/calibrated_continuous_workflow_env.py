@@ -29,6 +29,7 @@ ACTION_NAMES = {
 
 ORIGINAL_REWARD_PROFILE = "original_reward_v1"
 SERVICE_ALIGNED_REWARD_PROFILE = "service_aligned_v1"
+PREPARED_STATE_PREFIX_PROFILE = "calibrated_workflow_interface_v4_prepared_state_prefix"
 
 
 def _network_seconds(byte_count: int, mbps: float, fixed_seconds: float) -> float:
@@ -453,11 +454,14 @@ class CalibratedContinuousWorkflowEnv:
         return values
 
     def _causal_prediction_enabled(self) -> bool:
-        return self.config.get("interface_profile") == "calibrated_workflow_interface_v3_prefix_only"
+        return self.config.get("interface_profile") in {
+            "calibrated_workflow_interface_v3_prefix_only",
+            PREPARED_STATE_PREFIX_PROFILE,
+        }
 
     def _causal_forecast(self) -> dict[str, Any]:
         if not self._causal_prediction_enabled():
-            raise RuntimeError("causal forecast requested outside v3 profile")
+            raise RuntimeError("causal forecast requested outside causal-prefix profile")
         if "causal_predictor_model" not in self.instance:
             raise RuntimeError("causal predictor model is missing")
         index = self._mobility_index()
@@ -824,11 +828,33 @@ class CalibratedContinuousWorkflowEnv:
         target_bundle_ready = bool(
             node and target and self._bundle_ready(target, str(node["required_adapter"]))
         )
+        prepared_state_public = None
+        if interface_profile == PREPARED_STATE_PREFIX_PROFILE:
+            def public_prepare_status(rsu_id: str | None) -> dict[str, Any]:
+                if rsu_id is None:
+                    return {"known": False, "exists": False, "valid": False,
+                            "missing_completed_count": 0, "missing_completed_fraction": 0.0}
+                prepared = self.prepared_state.get(str(rsu_id))
+                exists = prepared is not None
+                same_workflow = bool(exists and prepared.get("workflow_id") == self.instance["workflow_id"])
+                missing = len(set(self.completed) - set(prepared.get("completed_node_ids", []))) if same_workflow else len(self.completed)
+                return {
+                    "known": True,
+                    "exists": exists,
+                    "valid": bool(same_workflow and missing == 0),
+                    "missing_completed_count": missing,
+                    "missing_completed_fraction": float(missing) / max(len(self.execution_order), 1),
+                }
+            prepared_state_public = {
+                "schema_version": "prepared_state_prefix_v1",
+                "current": public_prepare_status(current_rsu),
+                "predicted_target": public_prepare_status(target),
+            }
         bundle_ids = self._bundle_ids(str(node["required_adapter"])) if node else []
         bundle_resident_bytes = sum(
             int(self._object_catalog[item]["resident_bytes"]) for item in bundle_ids
         )
-        return {
+        semantic_state = {
             "interface_profile": interface_profile,
             "mobility_progression": str(
                 self.config.get("mobility_progression", "completed_node_index")
@@ -886,6 +912,9 @@ class CalibratedContinuousWorkflowEnv:
                 "source_classes": deepcopy(self.instance["source_classes"]),
             },
         }
+        if prepared_state_public is not None:
+            semantic_state["calibrated_context"]["prepared_state_prefix"] = prepared_state_public
+        return semantic_state
 
     def _info(self) -> dict[str, Any]:
         semantic_state = self._semantic_state()

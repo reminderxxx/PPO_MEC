@@ -9,6 +9,12 @@
 
 ## Live 文档
 
+- `cscwd_prepared_state_prefix_interface_20261010.md`：新 prepared-state v4 共同观测字段、四方法映射、参数/推理开销、旧新物理等价和 B 独立 preflight 交接；非论文结果。
+
+- `cscwd_sa_long_budget_cost_diagnosis_plan_20261009.md`、`cscwd_sa_long_budget_cost_diagnosis_20261009.md` 与 `cscwd_sa_long_budget_cost_summary_20261009.json`：B 长预算完成后的只读逐事件成本、配对覆盖、隐藏 prepared-state 反例与唯一公平候选；不含论文表。
+
+- `cscwd_sa_behavior_diagnosis_plan_20261009.md`、`cscwd_sa_behavior_diagnosis_20261009.md` 与 `cscwd_sa_behavior_diagnosis_summary_20261009.json`：只读行为诊断的事前规则、全 seed 失败链/预测口径/成本边界和小型机器摘要；不含论文表。
+
 - `cscwd_causal_strong_baseline_protocol_20261009.md`：新版本前缀预测、物理接触分离、冻结开发预算、自动分析与贡献边界。
 - `cscwd_causal_budget_extension_protocol_20261009.md`：四 learned×五 seed 的统一 4× 预算延长、等比例选模、短预算身份复用与停止边界。
 - `cscwd_causal_budget_extension_{analysis,claim_change}_20261009.md`：完成后的配对诊断、服务 tradeoff、选模边界与 A 线只读主张变更。

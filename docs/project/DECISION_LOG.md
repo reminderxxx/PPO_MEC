@@ -1,5 +1,19 @@
 ﻿# Decision Log
 
+## 2026-10-10：共同 prepared-state prefix 观测作为显式 v4 接口修复
+
+- 决定：只公开当前与因果预测目标 RSU 上已提交状态的存在、与已完成 DAG 前缀的有效性及缺失比例；未知目标显式 mask。四 learned 方法同权消费，旧 profile/旧 checkpoint 不自动迁移。增加的输入投影参数单列；不改 reward、transition、mask、action guard 或核心 actor/critic。该项属于共同接口纠错，收益由 B 独立匹配训练判定，不作 SA 独有贡献。见 `cscwd_prepared_state_prefix_interface_20261010.md`。
+
+## 2026-10-09：长预算后仅提出共享 prepared-state 可观测性纠错候选
+
+- 决定：完整原轨迹的成本差距由 DAG 重算主导；SA 少用 fallback，却有更多未准备的非 fallback handoff。公开状态同 hash+同 action 仍能产生不同 state readiness/重算，因此只冻结一个所有 learned 方法共享的 prepared-state freshness 字段候选；属于接口可观测性纠错，不自动实施、训练或称创新。
+- A/B 必须保持四 learned 方法、五 seed、等长预算与 dev 选模机会，报告完成覆盖、按期、重算与字节联合指标；若字段未消除别名或成本/服务不改善即拒绝。B 后处理错误不借本轮改写；论文/论文表保持原样。
+
+## 2026-10-09：只读定位后不推广 SA，不修改论文或重训
+
+- 决定：按冻结行为计划只读重放和共同状态前向；把当前 bundle 缺失时的策略动作选择定位为本 run 的近端失败机制，同时保留 seed/选模/内部表示的因果不确定性。不把动作投影、action 4 总量或低字节单指标当根因。
+- action 4 即使失败且无迁移仍可留下目标缓存副作用，拒绝简单 cap。若未来另立任务，最多测试“当前缺失时 action 3 偏好”一个因素，保持 action 4 和资源副作用；必须用预冻结联合服务/成本/复用条件证伪。本轮不实施、不训练、不写论文。
+
 ## 2026-10-09：新版本以训练前缀预测修复信息权限
 
 - 用户已另行授权在旧阻断报告之后开新版本。冻结低容量、训练 split 拟合的 RSU 转移计数；训练实例留一，其他实例只用 12 个 train 拟合模型。未知预测显式为空、confidence/contact 为零，不用真实未来回退。

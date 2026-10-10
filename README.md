@@ -5,6 +5,8 @@
 
 # PPO_MEC
 
+2026-10-10 的 CSCWD prepared-state 公共观测修复见 [A 线接口交接](docs/project/cscwd_prepared_state_prefix_interface_20261010.md)：新 profile 显式启用，四 learned 方法共同消费；当前仅通过接口验收，尚无新训练或方法优势结论。
+
 CSCWD 2027 的 DT/Popularity [强基线开发链接线](docs/project/cscwd_2027_strong_baseline_wiring_20261009.md)已完成合成验收。旧版预检发现[预测权限阻断](docs/project/cscwd_2027_strong_baseline_prediction_permission_blocker_20261009.md)：36/36 实例把实际未来 RSU 序列回退为公共预测，因此旧版没有科学训练。另立的[因果前缀版本协议](docs/project/cscwd_causal_strong_baseline_protocol_20261009.md)已冻结训练来源、公共信息边界、独立物理判定和一次性开发预算；实验结果以新 run 原件为准，不把旧新版差异当算法增益。
 
 因果强基线的[统一 4× 预算延长协议](docs/project/cscwd_causal_budget_extension_protocol_20261009.md)固定四种 learned method、五个 seed、raw critic 与等比例选模时点；它只检验开发预算敏感性，规则结果按哈希复用，不搜索到 SA 获胜。
