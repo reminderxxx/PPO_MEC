@@ -2262,3 +2262,10 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 新 run ID 为 `calibrated_workflow_value_normalization_ab_20261009_v2`。必须先通过恰好两次无训练宿主验收（成功/非零退出）和一次低成本 preflight 核对，才可单次启动。
 
 宿主验收已完成且不再增加：成功 probe=`return 0`，非零 probe=`return 7`；二者均在原 launch 调用退出后由独立 verify 确认 child-entry、stdout/stderr、exit sidecar 与 terminal `PASS`。一次错误 expected-commit 的 pre-dispatch 调用未创建 child，独立保留为操作错误回执，不计入两次验收。
+
+## 2026-10-10 prepared-state v4 matched run 的 A 侧只读事件链诊断
+
+- 科学 run `cscwd_causal_prepared_state_visibility_matched_20261010_v1` terminal=`PASS`，119/119 artifact SHA/size 一致；仅对 new selected/new update96 共 800 个 development episode、5,632 个记录动作逐步重放，结果与原始 ledger/episode 指标一致。未读 formal/holdout。
+- SA 首次服务失败 selected `32/100`、update96 `26/100`，全部为当前 bundle 缺失而选择未修复当前 bundle 的合法动作；action4 占 `28/32` 与 `23/26`。成功目标准备须待当前节点完成才提交 state，此链路不是已确认实现 bug。车辆 fallback 的 `state_ready=True` 已从有效 state 复用口径剔除。
+- 有界 24 条首次失败伪标签探测中，`22/24` 给 `event_target=1`；SA 训练 `3840/3840` optimizer step 的辅助损失/加权梯度均非零，raw evaluation 无运行时机制 logit bias。标签未检验当前服务可行性是机制疑点，尚无因果消融。
+- 冻结 `frozen_check` 中 selected SA 的按期完成 `5/40→9/40`，但有服务失败 `8/40→13/40`；fixed96 按期 `11/40→11/40`、失败 `9/40→9/40`。双视图不支持晋级或固定论文贡献。完整报告：`cscwd_prepared_state_event_chain_diagnosis_20261010.md`；paper-ready 仍为 `Unverifiable`。
