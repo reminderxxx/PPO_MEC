@@ -5,6 +5,8 @@
 
 # PPO_MEC
 
+2026-10-11 新增 [CSCWD 长原始 development 来源事前方案](docs/project/cscwd_new_development_source_plan_20261011.md)：在新授权下按原始车/帧/时间连续性筛选，隔离既有 formal/hidden 与匿名早期来源，固定最多 3 个来源窗口和可达性预算。资格扫描与实验结果以新独立原件为准；不改旧 split 或正式论文结论。
+
 2026-10-11 的 CSCWD [开发原始窗口资格审计](docs/project/cscwd_development_window_eligibility_20261011.md)按事前冻结规则核验现有 40 个授权 train/dev 区间：最长连续源时长 2.3 秒，短于最短 DAG 的 16.298588 秒纯计算下界，合格 0。未扩展数据区间、执行训练或形成基线名次；后续长区间须另行授权。
 
 2026-10-11 的 CSCWD [原始时间与动作阶段只读根因审计](docs/project/cscwd_raw_time_root_cause_audit_20261011.md)复算既有 147 步：固定 24 帧窗口的完整 DAG 计算下界已超过可执行轨迹时间；同时定位 raw 整步接触门偏保守及决策 clone 未来接触泄漏。结论只用于定位，尚未修环境或训练基线。

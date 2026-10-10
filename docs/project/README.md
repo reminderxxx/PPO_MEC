@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `cscwd_new_development_source_plan_20261011.md`：新授权的 NGSIM 长轨迹 development 来源资格、历史 sealed/匿名区间隔离及固定公共可达性预算；不改变旧 split。
+
 - `cscwd_development_window_eligibility_plan_20261011.md`、`cscwd_development_window_eligibility_20261011.md`：事前冻结的授权原始区间/静态成本资格与 40 窗只读审计；0 个合格窗口，后续数据扩展需另行授权。
 
 - `cscwd_raw_time_root_cause_audit_20261011.md`：冻结 raw v4 的源时间/单位、逐动作阶段、严格 workflow 下界、整步接触门与公共决策 clone 泄漏的只读根因审计；环境和论文未改。

@@ -1,5 +1,7 @@
 # Code Module Map
 
+`scripts/freeze_cscwd_new_development_source.py` 只读已提交 split/future-validation 来源元数据和本机 NGSIM CSV，对 v27/v28/v71 formal/hidden 原始时间作带 embargo 排除，对 v8/v17/v20 匿名计划的原始读取前缀整体隔离；输出不含坐标或算法结果的来源 manifest 与候选理由。`tests/test_cscwd_new_development_source.py` 用合成车辆帧锁定禁区切分和同时间车辆选择。
+
 `scripts/audit_cscwd_development_window_eligibility.py` 只读冻结 workload/split/train/dev 计划及原始 NGSIM CSV，按来源时间、选定车辆连续性和静态成本下界生成资格清单；formal/hidden 仅用 split manifest 的区间 ID 排除，不读 sealed 结果或调用环境/训练器。`tests/test_cscwd_development_window_eligibility.py` 用合成帧检查时长、跨 split 重叠和禁止拼接。
 
 `scripts/diagnose_cscwd_raw_time_root_cause.py` 仅依赖冻结 v4 manifest/summary、本机已授权三个 NGSIM 原始区间和现有环境实现，重放原 147 步并拆分 native 计算/模型/状态/输入/加载/失败阶段，核验 raw trace/contact 门与公共 decision clone；写独立小型诊断 JSON，不修改 producer、consumer、训练器或原件。`tests/test_cscwd_raw_time_root_cause.py` 使用合成轨迹锁定阶段门及未来后缀反例，不把缺陷修复混入本审查轮。

@@ -1,5 +1,10 @@
 ﻿# Directory Structure
 
+## 2026-10-11 CSCWD 新授权长来源资格
+
+- `scripts/freeze_cscwd_new_development_source.py`、`tests/test_cscwd_new_development_source.py`：冻结后仅按原始来源/时间/车/帧/坐标有效性和历史隔离边界选最多 3 个开发来源窗口；不运行算法。
+- `docs/project/cscwd_new_development_source_plan_20261011.md`：选择前固定的成本、embargo、匿名旧来源隔离和可达性预算；机器清单位于 create-only `artifacts/analysis/cscwd_new_development_source_20261011_v1/`。
+
 ## 2026-10-11 CSCWD 已授权开发窗口资格
 
 - `scripts/audit_cscwd_development_window_eligibility.py`、`tests/test_cscwd_development_window_eligibility.py`：只读来源/车辆/时间/成本门与合成边界；不调用算法。

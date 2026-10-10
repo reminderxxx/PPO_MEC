@@ -5,6 +5,19 @@
 
 # Runbook
 
+## CSCWD 新 development 长轨迹来源资格（2026-10-11；结果盲）
+
+先核对事前冻结的 `cscwd_new_development_source_plan_20261011.md`。仅使用本机原始 NGSIM CSV；输出 root 必须不存在，脚本只写不含坐标/结果的来源清单与候选拒绝 ledger，不启动 agent：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/freeze_cscwd_new_development_source.py \
+  --raw-csv-path '/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv' \
+  --output-root artifacts/analysis/cscwd_new_development_source_20261011_v1
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_cscwd_new_development_source.py
+```
+
+只有 `source_manifest.json` 给出合格窗口且后续可达性与公共 planner 门独立通过，才允许 B 的一次条件训练。旧 formal/hidden/sealed 结果和匿名计划均不读作筛选依据。
+
 ## CSCWD 已授权 development 原始区间资格（2026-10-11；已完成）
 
 事前规则见 `cscwd_development_window_eligibility_plan_20261011.md`；只读命令见 `cscwd_development_window_eligibility_20261011.md`。脚本 `scripts/audit_cscwd_development_window_eligibility.py` 校验父 workload、strict split、train/dev plan 和本机已有 NGSIM CSV 的 SHA，创建独立 `artifacts/analysis/cscwd_development_window_eligibility_20261011_v1/`。40 个已授权区间合格 0；不得因这一结论自行扫描未授权长区间、拼接窗口或启动训练。合成资格测试：
