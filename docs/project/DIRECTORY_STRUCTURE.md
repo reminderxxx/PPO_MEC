@@ -2,6 +2,12 @@
 
 ## 2026-10-09 因果前缀强基线版本
 
+- `scripts/diagnose_cscwd_prepared_state_event_chain.py`、`probe_cscwd_prepared_state_auxiliary.py`、
+  `summarize_cscwd_prepared_state_event_chain.py`、`stratify_cscwd_prepared_state_event_chain.py`：只读记录动作重放、prepared
+  chain 修正口径、实际 auxiliary label 探测和分层；不训练、不执行 action branch。
+- `docs/project/cscwd_prepared_state_event_chain_diagnosis_20261010.md`：A 侧正式只读诊断；
+  `cscwd_service_feasible_aux_target_candidate_20261010.md`：B 冻结的唯一 target-only 候选与未满足门禁。
+
 - `configs/experiment/calibrated_workflow_prepared_state_visibility_matched_protocol_v1.json`：prepared-state 共同信息修复的
   冻结协议、A 实现身份与历史原件 hashes；已在 frozen runner push 后通过独立配置提交授权一次启动。
 - `scripts/run_calibrated_workflow_prepared_state_visibility_matched.py`：只读复用历史 selected/rule，训练新 v4 四方法，并只对

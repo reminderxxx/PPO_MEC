@@ -5,6 +5,16 @@
 
 ﻿# Progress
 
+## 2026-10-10：事件链定位到合法策略次优与 auxiliary 标签语义缺口；训练未授权
+
+- A 对 new selected/update-96 的 800 episode、5,632 step 做确定性记录动作重放，原账本完全一致；SA 首次失败
+  `32/100`、`26/100` 全为当前 bundle missing 时选择非修复动作，未确认 env/ledger 实现 bug。
+- 3,840/3,840 SA optimizer step 的 auxiliary loss/weighted gradient 非零；有界 24 条首次失败探测中 22 条现有
+  `event_target=1`，但 24 条当前 bundle 均缺失。该方向支持机制候选，不构成因果消融。
+- 已冻结唯一 service-feasible event target 候选及 action0/2/4 对称反事实门禁；A 未执行 action branch（0/24），因此本轮不
+  实现、不训练。见 `cscwd_prepared_state_event_chain_diagnosis_20261010.md` 与
+  `cscwd_service_feasible_aux_target_candidate_20261010.md`。
+
 ## 2026-10-10：prepared-state v4 匹配实验完成；接口接受，性能候选拒绝
 
 - 单次 scientific run terminal=`PASS`：20 cells、115,200 steps、15,360 optimizer steps、1,200 新评价；119/119 files

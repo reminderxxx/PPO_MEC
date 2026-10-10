@@ -23,6 +23,10 @@
 接口纠错可保留；性能候选按预注册双视角 gate 拒绝。下一算法候选必须来自独立只读失败链诊断；尚无证据授权删除整个
 auxiliary loss、改变 reward、强制 action、追加 seed 或扫描超参数。
 
+后续只读事件链已把近端失败定位为 current bundle missing 时选择不修复当前服务的合法动作；没有确认 env/ledger bug。
+实际生效 event auxiliary label 未检查 action4 的当前服务可行性，但只有 7 个不同公开失败状态且 action branch=`0/24`。
+因此只能记录一个 service-feasible target 候选，不能写成已验证算法改进、消融结论或论文贡献。
+
 `reviewed_at=2026-10-10`；`literature_cutoff=2026-10-10`；`target_venue=CSCWD 2027`；
 `artifact_run_id=cscwd_causal_prepared_state_visibility_matched_20261010_v1_analysis_v2`；
 `policy_version=docs/project/top_journal_review_policy.md@f46ec72`；

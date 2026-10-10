@@ -9,6 +9,10 @@
 
 ## Live 文档
 
+- `cscwd_prepared_state_event_chain_diagnosis_20261010.md` 与
+  `cscwd_service_feasible_aux_target_candidate_20261010.md`：v4 失败链重放、辅助标签实际生效证据和唯一 target-only 候选；
+  无实现 bug，反事实门禁未完成，训练未授权。
+
 - `cscwd_prepared_state_visibility_matched_results_20261010.md` 与
   `cscwd_prepared_state_visibility_matched_claim_change_20261010.md`：v4 匹配实验的双视角结果、预注册 gate 裁决和 A 论文线
   只读主张边界；接口接受、性能候选拒绝。

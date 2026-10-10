@@ -5,6 +5,15 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-10：action4 合法副作用与 event target 当前服务条件仍未做反事实闭环
+
+- `NO IMPLEMENTATION BUG`：记录动作重放与环境一致；失败 action4 可成功 stage 目标 model，却因当前 bundle 缺失无法完成
+  当前节点或 commit state。不能把它错误写成迁移成功，也不能简单 mask/删除 action4。
+- `SUPPORTED MECHANISM CANDIDATE`：实际生效 event auxiliary target 不含 current full-bundle readiness；24 条有界失败探测
+  22 条给 target=1。但只有 7 个不同公开状态，且 action branch=0，不能宣称因果或直接训练。
+- `REQUIRED`：先完成 action0/2/4 对称分支和正例不变性；若立即失败的 action4 在预声明 suffix 代价上仍占优，则否定 hard
+  target 置 0。门禁前不得自动进入 auxiliary-target A/B。
+
 ## 2026-10-10：v4 修复状态别名，但未形成稳定服务收益
 
 - `RESOLVED CONTRACT`：prepared-state prefix 状态别名已由共享 v4 字段消除；因果性、四方法消费、旧 profile 隔离和同动作

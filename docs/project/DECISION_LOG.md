@@ -1,5 +1,12 @@
 ﻿# Decision Log
 
+## 2026-10-10：只冻结 service-feasible event target，不直接实现或训练
+
+- 事件链没有确认环境/账本 bug；失败来自当前 bundle 缺失时选择 action1/3/4。辅助 event label 确实生效且不检查 action4
+  当前服务可行性，支持唯一 target-only 候选，但 0/24 action branch 意味着尚无反事实授权。
+- 决定先冻结 action0/2/4 成本语义、对称正负例和 target-only 变量；门禁通过前 `execution_authorized=false`。禁止删除整个
+  auxiliary、强制 action0、隐藏 action4、改 reward/guard 或立即启动 SA 训练。
+
 ## 2026-10-10：保留 v4 接口纠错，拒绝其稳定性能候选身份
 
 - 决定：接口正确性与性能收益分开裁决。v4 因消除可复现公共状态别名而保留；但 SA on-time 未同时在 selected/fixed-96

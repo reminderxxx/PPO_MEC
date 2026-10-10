@@ -5,6 +5,18 @@
 
 # Artifact Records
 
+## 2026-10-10 prepared-state event-chain read-only diagnosis
+
+- A 诊断 commit=`855d67f`；机器 root=
+  `/Users/howen/.codex/worktrees/cscwd-window-identity/PPO_MEC/artifacts/analysis/cscwd_prepared_state_event_chain_diagnosis_20261010_v1/`。
+- 只读重放 new selected/update-96 共 800 episode / 5,632 step，与原 ledger/episode 完全一致；0 action branch、0 新 policy
+  forward、0 formal/holdout。119-file scientific source 通过。
+- `analysis_manifest.json` SHA-256=`50c3abdf1e0fa4f4b584d83cb8cfedf0ba88208323d8a38f5c73cb8807fa8436`；其中登记的
+  7 个输出文件 hash 独立复核通过。报告 SHA-256=`a3ae914bcd73d4f3bc547f09d99096a9420377b2258d2f37a2fce6128c43d6e0`。
+- 结论：无 env/ledger 实现 bug；合法但次优策略与 event label/current-service feasibility 缺口获得机制证据，但没有动作分支
+  或消融因果。唯一 target-only 候选保持 `execution_authorized=false`，见
+  `cscwd_service_feasible_aux_target_candidate_20261010.md`。
+
 ## 2026-10-10 prepared-state visibility matched development run
 
 - scientific root：`artifacts/experiments/cscwd_causal_prepared_state_visibility_matched_20261010_v1/`；commit=`f46ec72`，
