@@ -5,6 +5,16 @@
 
 # Artifact Records
 
+## 2026-10-10 event auxiliary abstention pending-gate preflight（无 scientific run）
+
+- 协议：`configs/experiment/calibrated_workflow_event_aux_abstention_ab_v1.json`；run ID 仅预留为
+  `cscwd_event_aux_abstention_ab_20261010_v1`，当前 scientific/supervisor/analysis root 均未创建。
+- 预检直接复用并核验 v4 control：selected/update96/rule=`400/400/40` rows，36 个 split instance、raw interval 互斥、474
+  public-prefix tamper；候选/control 网络=`165,512` 参数、60 state keys、seed 7 初始化完全相同。
+- 回执：`authorization_state=awaiting_independent_interface_time_contract_gate`、gate=`pending_a_review`、
+  `scientific_steps=0`、`new_evaluation_episodes=0`。A report/manifest/time/abstention receipts 尚未绑定。
+- 本条只登记源码/协议预检，不登记 checkpoint、训练结果或性能 artifact；implementation commit/tree 待 clean commit 后补齐。
+
 ## 2026-10-10 service-feasible action-branch gate（MIXED，无候选训练）
 
 - 协议：`configs/experiment/calibrated_workflow_service_feasible_event_target_ab_v1.json`；当前

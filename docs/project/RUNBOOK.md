@@ -5,6 +5,29 @@
 
 # Runbook
 
+## Event auxiliary abstention 条件执行（2026-10-10；当前等待 A 门禁）
+
+只读预检：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/run_calibrated_workflow_event_aux_abstention_ab.py --preflight
+```
+
+当前必须显示 `execution_authorized=false`、`authorization_state=awaiting_independent_interface_time_contract_gate`、
+`independent_gate_status=pending_a_review`、0 scientific step 和 0 新评价。不得执行 `--run` 或 launcher，不得创建预留 run root。
+A PASS 必须绑定 full commit/tree 和 report/manifest/time-contract/abstention receipt 的路径与 SHA-256；runner 会逐文件和逐字段复核，
+文字 PASS 无效。
+
+只有 A PASS、B 独立预检、协议授权提交已 push 且 checkout clean 后，才允许一次：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/launch_calibrated_workflow_event_aux_abstention_ab.py \
+  --mode launch --expected-commit <FROZEN_AUTHORIZED_COMMIT>
+```
+
+run/analysis/supervisor 固定为 `cscwd_event_aux_abstention_ab_20261010_v1` 及其 `_analysis_v1`/`_supervisor`；一小时上限、
+无 retry。不得启动 rejected hard-zero 候选、追加 seed、调整 event 权重或用最终评价重选 checkpoint。
+
 ## Service-feasible event target 条件执行（2026-10-10；MIXED 后停止）
 
 先运行只读预检：

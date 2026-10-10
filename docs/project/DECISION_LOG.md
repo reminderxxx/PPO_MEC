@@ -1,5 +1,14 @@
 ﻿# Decision Log
 
+## 2026-10-10：hard-zero MIXED 后只冻结 event-supervision abstention
+
+- 多步反例否定 current-missing 一律重标为 0，但不要求继续保留短期 event 伪标签监督。唯一候选因此改为 current-missing
+  样本对 event CE/temporal-margin abstain；不重标 target，并保留 PPO 对 action4 长期缓存收益的信用分配。
+- 旧分母、current-ready 梯度、slow/fast、value、reward、网络、动作权限和 raw inference 不变；只允许 SA 消费该开关。
+  这是学习设计候选，不是实现纠错或算法创新。
+- 科学执行取决于 clean commit 上的独立接口/时间合同 PASS；PASS 前保持 `execution_authorized=false`。若后续双视角服务门
+  FAIL/MIXED，立即停止，不找第二候选、不扫权重、不扩 seed/预算。
+
 ## 2026-10-10：MIXED 反事实门禁否决统一 current-ready target 收紧训练
 
 - 对称 action0/2/4 证明局部当前服务语义成立并保留 6/6 正例，但冻结策略后缀出现 action4 的多步严格更优服务反例；因此

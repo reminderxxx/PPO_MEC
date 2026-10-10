@@ -99,13 +99,24 @@ def _build_agent(
         "train_epochs": 4,
         "deterministic_action": False,
         "prepared_state_features_enabled": config.get("interface_profile") == "calibrated_workflow_interface_v4_prepared_state_prefix",
-        "mechanism_aux_current_service_feasibility_gate_enabled": bool(
-            config.get(
-                "mechanism_aux_current_service_feasibility_gate_enabled",
-                False,
-            )
-        ),
     }
+    if method == "sa_ghmappo":
+        kwargs.update(
+            {
+                "mechanism_aux_current_service_feasibility_gate_enabled": bool(
+                    config.get(
+                        "mechanism_aux_current_service_feasibility_gate_enabled",
+                        False,
+                    )
+                ),
+                "mechanism_aux_missing_current_event_abstention_enabled": bool(
+                    config.get(
+                        "mechanism_aux_missing_current_event_abstention_enabled",
+                        False,
+                    )
+                ),
+            }
+        )
     if method in {"sa_ghmappo", "mappo", "dt_handoff_drl"}:
         interface = config["learning_interface"]
         kwargs.update(

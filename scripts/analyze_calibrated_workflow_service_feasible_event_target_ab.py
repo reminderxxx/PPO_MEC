@@ -64,19 +64,24 @@ def _validate_source(source_root: Path) -> tuple[dict[str, Any], list[dict[str, 
     return manifest, rows
 
 
-def _pair(rows: list[dict[str, str]]) -> list[dict[str, Any]]:
+def _pair(
+    rows: list[dict[str, str]],
+    *,
+    control_arm: str = CONTROL_ARM,
+    candidate_arm: str = CANDIDATE_ARM,
+) -> list[dict[str, Any]]:
     result = []
     for view in ("selected", "update96"):
         old = {
             tuple(row[key] for key in PAIR_KEYS): row
             for row in rows
-            if row["event_target_arm"] == CONTROL_ARM
+            if row["event_target_arm"] == control_arm
             and row["checkpoint_view"] == view and row["method"] == "sa_ghmappo"
         }
         new = {
             tuple(row[key] for key in PAIR_KEYS): row
             for row in rows
-            if row["event_target_arm"] == CANDIDATE_ARM
+            if row["event_target_arm"] == candidate_arm
             and row["checkpoint_view"] == view and row["method"] == "sa_ghmappo"
         }
         if old.keys() != new.keys() or len(old) != 100:
@@ -256,12 +261,24 @@ def _verdict(summary: list[dict[str, Any]], seed_rows: list[dict[str, Any]]) -> 
     }
 
 
-def analyze(source_root: Path, control_root: Path, analysis_root: Path) -> None:
+def analyze(
+    source_root: Path,
+    control_root: Path,
+    analysis_root: Path,
+    *,
+    control_arm: str = CONTROL_ARM,
+    candidate_arm: str = CANDIDATE_ARM,
+    analysis_schema: str = "calibrated_workflow_service_feasible_event_target_ab_analysis_v1",
+) -> None:
     manifest, rows = _validate_source(source_root)
     if analysis_root.exists():
         raise FileExistsError(f"create-only analysis root exists: {analysis_root}")
     analysis_root.mkdir(parents=True)
-    pairs = _pair(rows)
+    pairs = _pair(
+        rows,
+        control_arm=control_arm,
+        candidate_arm=candidate_arm,
+    )
     summary = _paired_summary(pairs)
     seed_rows = _seed_summary(pairs)
     control_selected = _read_csv(control_root / "new_selected_behavior_ledger.csv")
@@ -269,10 +286,10 @@ def analyze(source_root: Path, control_root: Path, analysis_root: Path) -> None:
     candidate_selected = _read_csv(source_root / "candidate_selected_behavior_ledger.csv")
     candidate_fixed = _read_csv(source_root / "candidate_update96_behavior_ledger.csv")
     behavior = [
-        _behavior_summary(control_selected, CONTROL_ARM, "selected"),
-        _behavior_summary(control_fixed, CONTROL_ARM, "update96"),
-        _behavior_summary(candidate_selected, CANDIDATE_ARM, "selected"),
-        _behavior_summary(candidate_fixed, CANDIDATE_ARM, "update96"),
+        _behavior_summary(control_selected, control_arm, "selected"),
+        _behavior_summary(control_fixed, control_arm, "update96"),
+        _behavior_summary(candidate_selected, candidate_arm, "selected"),
+        _behavior_summary(candidate_fixed, candidate_arm, "update96"),
     ]
     verdict = _verdict(summary, seed_rows)
     _write_csv(analysis_root / "paired_episode_rows.csv", pairs)
@@ -281,11 +298,11 @@ def analyze(source_root: Path, control_root: Path, analysis_root: Path) -> None:
     _write_csv(analysis_root / "behavior_summary.csv", behavior)
     _write_csv(
         analysis_root / "strong_baseline_reference.csv",
-        [row for row in rows if row["event_target_arm"] in {CONTROL_ARM, "historical_rule_reference"} and row["method"] != "sa_ghmappo"],
+        [row for row in rows if row["event_target_arm"] in {control_arm, "historical_rule_reference"} and row["method"] != "sa_ghmappo"],
     )
     _write_json(analysis_root / "gate_verdict.json", verdict)
     _write_json(analysis_root / "analysis_manifest.json", {
-        "schema_version": "calibrated_workflow_service_feasible_event_target_ab_analysis_v1",
+        "schema_version": analysis_schema,
         "source_run_id": source_root.name,
         "source_run_manifest_sha256": _sha256(source_root / "run_manifest.json"),
         "source_artifact_integrity_sha256": _sha256(source_root / "artifact_integrity.json"),

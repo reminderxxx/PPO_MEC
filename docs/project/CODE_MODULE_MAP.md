@@ -1,5 +1,11 @@
 # Code Module Map
 
+`src/agents/sa_ghmappo_core.py` 的 opt-in `mechanism_aux_missing_current_event_abstention_enabled` 只给 current-missing 样本的
+event CE/temporal-margin 乘 0 权重，保留 legacy confidence-eligible 分母，并把 eligible/supervised/abstained 计数写入 optimizer
+日志与 update summary；checkpoint 记录 `missing_current_event_abstention_v1`。`scripts/run_calibrated_workflow_interface_repair.py`
+只对 SA 传入该开关，避免基线身份漂移。`scripts/run_calibrated_workflow_event_aux_abstention_ab.py` 负责历史 hash、固定预算和 A 门禁
+artifact 的 fail-closed 核验；对应 analyzer 输出配对服务表和 supervision fraction，launcher 只允许一次一小时无重试执行。
+
 `scripts/run_calibrated_workflow_strong_baselines.py` 的 budget-extension 分支只扩大所有 learned cell 的共同预算，保存
 update 24/96 固定 dev 诊断，并以预注册 SHA-256 只读验证短预算 artifact；不会再次执行 Popularity/two-step。
 `scripts/analyze_calibrated_workflow_budget_extension.py` 生成短→长配对、选模/固定端点分表、optimizer 曲线和共同完成样本

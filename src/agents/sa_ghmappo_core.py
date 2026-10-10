@@ -722,6 +722,7 @@ class 分层PPO基类(BaseAgent):
         mechanism_logit_bias_strength: float = 0.0,
         mechanism_confidence_floor: float = 0.0,
         mechanism_aux_current_service_feasibility_gate_enabled: bool = False,
+        mechanism_aux_missing_current_event_abstention_enabled: bool = False,
         prediction_feature_dim: int = 13,
         prepared_state_features_enabled: bool = False,
         prediction_gate_min_leak: float = 0.0,
@@ -1291,6 +1292,16 @@ class 分层PPO基类(BaseAgent):
         self._mechanism_aux_current_service_feasibility_gate_enabled = bool(
             mechanism_aux_current_service_feasibility_gate_enabled
         )
+        self._mechanism_aux_missing_current_event_abstention_enabled = bool(
+            mechanism_aux_missing_current_event_abstention_enabled
+        )
+        if (
+            self._mechanism_aux_current_service_feasibility_gate_enabled
+            and self._mechanism_aux_missing_current_event_abstention_enabled
+        ):
+            raise ValueError(
+                "event-target hard gate and event-supervision abstention are mutually exclusive"
+            )
         self._prediction_feature_dim = int(prediction_feature_dim)
         self._prepared_state_features_enabled = bool(prepared_state_features_enabled)
         self._prediction_gate_min_leak = max(0.0, min(float(prediction_gate_min_leak), 1.0))
@@ -3987,6 +3998,9 @@ class 分层PPO基类(BaseAgent):
         approx_kl_total = 0.0
         clip_fraction_total = 0.0
         auxiliary_loss_total = 0.0
+        event_aux_supervision_eligible_total = 0
+        event_aux_supervision_supervised_total = 0
+        event_aux_supervision_abstained_total = 0
         heuristic_imitation_loss_total = 0.0
         mechanism_aux_loss_total = 0.0
         mechanism_entropy_bonus_total = 0.0
@@ -4255,6 +4269,9 @@ class 分层PPO基类(BaseAgent):
                     (critic_return_tensor[batch_indices] - value_prediction) ** 2
                 )
                 auxiliary_loss = self._compute_auxiliary_loss(batch_states=batch_states, batch_outputs=batch_outputs)
+                event_aux_supervision_stats = (
+                    self._auxiliary_event_supervision_stats(batch_states)
+                )
                 heuristic_imitation_loss = self._compute_heuristic_imitation_loss(
                     batch_outputs=batch_outputs,
                     batch_rows=batch_rows,
@@ -4415,6 +4432,18 @@ class 分层PPO基类(BaseAgent):
                         "policy_grad_norm": policy_grad_norm,
                         "weighted_value_grad_norm": value_grad_norm,
                         "weighted_auxiliary_grad_norm": auxiliary_grad_norm,
+                        "event_aux_supervision_eligible_count": int(
+                            event_aux_supervision_stats["eligible_count"]
+                        ),
+                        "event_aux_supervision_supervised_count": int(
+                            event_aux_supervision_stats["supervised_count"]
+                        ),
+                        "event_aux_supervision_abstained_count": int(
+                            event_aux_supervision_stats["abstained_count"]
+                        ),
+                        "event_aux_supervision_supervised_fraction": float(
+                            event_aux_supervision_stats["supervised_fraction"]
+                        ),
                         "pre_clip_total_grad_norm": pre_clip_grad_norm,
                         "post_clip_total_grad_norm_upper_bound": min(
                             pre_clip_grad_norm, self._max_grad_norm
@@ -4429,6 +4458,15 @@ class 分层PPO基类(BaseAgent):
                 approx_kl_total += float(approx_kl.item())
                 clip_fraction_total += float(clip_fraction.item())
                 auxiliary_loss_total += float(auxiliary_loss.item())
+                event_aux_supervision_eligible_total += int(
+                    event_aux_supervision_stats["eligible_count"]
+                )
+                event_aux_supervision_supervised_total += int(
+                    event_aux_supervision_stats["supervised_count"]
+                )
+                event_aux_supervision_abstained_total += int(
+                    event_aux_supervision_stats["abstained_count"]
+                )
                 heuristic_imitation_loss_total += float(heuristic_imitation_loss.item())
                 mechanism_aux_loss_total += float(mechanism_aux_loss.item())
                 mechanism_entropy_bonus_total += float(mechanism_entropy_bonus.item())
@@ -4590,6 +4628,23 @@ class 分层PPO基类(BaseAgent):
             "actor_loss": round(actor_loss_total / denominator, 6),
             "value_loss": round(value_loss_total / denominator, 6),
             "auxiliary_loss": round(auxiliary_loss_total / denominator, 6),
+            "event_aux_supervision_abstention_enabled": (
+                self._mechanism_aux_missing_current_event_abstention_enabled
+            ),
+            "event_aux_supervision_eligible_count": (
+                event_aux_supervision_eligible_total
+            ),
+            "event_aux_supervision_supervised_count": (
+                event_aux_supervision_supervised_total
+            ),
+            "event_aux_supervision_abstained_count": (
+                event_aux_supervision_abstained_total
+            ),
+            "event_aux_supervision_supervised_fraction": round(
+                float(event_aux_supervision_supervised_total)
+                / max(event_aux_supervision_eligible_total, 1),
+                6,
+            ),
             "optimizer_step_count": len(optimizer_step_records),
             "optimizer_step_records": optimizer_step_records,
             "heuristic_imitation_coef": round(self._heuristic_imitation_coef, 6),
@@ -5620,10 +5675,27 @@ class 分层PPO基类(BaseAgent):
             != self._mechanism_aux_current_service_feasibility_gate_enabled
         ):
             raise ValueError("mechanism auxiliary event-target semantics checkpoint mismatch")
+        saved_event_abstention = bool(
+            saved_config.get(
+                "mechanism_aux_missing_current_event_abstention_enabled",
+                False,
+            )
+        )
+        if saved_service_feasible_target and saved_event_abstention:
+            raise ValueError("checkpoint enables mutually exclusive event auxiliary semantics")
+        if (
+            saved_event_abstention
+            != self._mechanism_aux_missing_current_event_abstention_enabled
+        ):
+            raise ValueError("mechanism auxiliary event-supervision abstention checkpoint mismatch")
         expected_event_target_semantics = (
             "current_complete_bundle_ready_v1"
             if self._mechanism_aux_current_service_feasibility_gate_enabled
-            else "legacy_target_timing_v1"
+            else (
+                "missing_current_event_abstention_v1"
+                if self._mechanism_aux_missing_current_event_abstention_enabled
+                else "legacy_target_timing_v1"
+            )
         )
         saved_event_target_semantics = str(
             saved_config.get(
@@ -5631,7 +5703,11 @@ class 分层PPO基类(BaseAgent):
                 (
                     "current_complete_bundle_ready_v1"
                     if saved_service_feasible_target
-                    else "legacy_target_timing_v1"
+                    else (
+                        "missing_current_event_abstention_v1"
+                        if saved_event_abstention
+                        else "legacy_target_timing_v1"
+                    )
                 ),
             )
         )
@@ -14637,6 +14713,18 @@ class 分层PPO基类(BaseAgent):
         del batch_outputs
         return torch.tensor(0.0, dtype=torch.float32, device=self._device)
 
+    def _auxiliary_event_supervision_stats(
+        self,
+        batch_states: list[dict[str, Any]],
+    ) -> dict[str, float | int]:
+        del batch_states
+        return {
+            "eligible_count": 0,
+            "supervised_count": 0,
+            "abstained_count": 0,
+            "supervised_fraction": 0.0,
+        }
+
     def _effective_digital_twin_policy_prior_distill_coef(self) -> float:
         if (
             not self._digital_twin_policy_prior_enabled
@@ -15622,10 +15710,17 @@ class 分层PPO基类(BaseAgent):
             "mechanism_aux_current_service_feasibility_gate_enabled": (
                 self._mechanism_aux_current_service_feasibility_gate_enabled
             ),
+            "mechanism_aux_missing_current_event_abstention_enabled": (
+                self._mechanism_aux_missing_current_event_abstention_enabled
+            ),
             "mechanism_aux_event_target_semantics": (
                 "current_complete_bundle_ready_v1"
                 if self._mechanism_aux_current_service_feasibility_gate_enabled
-                else "legacy_target_timing_v1"
+                else (
+                    "missing_current_event_abstention_v1"
+                    if self._mechanism_aux_missing_current_event_abstention_enabled
+                    else "legacy_target_timing_v1"
+                )
             ),
             "prediction_feature_dim": self._prediction_feature_dim,
             "prepared_state_features_enabled": self._prepared_state_features_enabled,
@@ -16467,6 +16562,61 @@ class 分层PPO基类(BaseAgent):
 class SAGHMAPPOBaseAgent(分层PPO基类):
     """? surrogate 控制头动作语义控制头动作语义??"""
 
+    def _event_auxiliary_supervision_weight(
+        self,
+        semantic_state: dict[str, Any],
+    ) -> float:
+        if not self._mechanism_aux_missing_current_event_abstention_enabled:
+            return 1.0
+        if (
+            semantic_state.get("interface_profile")
+            != CALIBRATED_WORKFLOW_INTERFACE_V4_PREPARED_STATE_PREFIX
+        ):
+            raise ValueError(
+                "event-supervision abstention requires the v4 public observation profile"
+            )
+        current_node = semantic_state.get("current_workflow_node") or {}
+        primary_vehicle, _ = _resolve_primary_vehicle_from_semantic_state(
+            semantic_state
+        )
+        current_rsu_id = primary_vehicle.get("associated_rsu_id")
+        current_rsu = next(
+            (
+                rsu
+                for rsu in semantic_state.get("rsus", [])
+                if rsu.get("rsu_id") == current_rsu_id
+            ),
+            {},
+        )
+        return float(bool(bundle_ready(semantic_state, current_rsu, current_node)))
+
+    def _auxiliary_event_supervision_stats(
+        self,
+        batch_states: list[dict[str, Any]],
+    ) -> dict[str, float | int]:
+        if not self._use_hierarchy:
+            return super()._auxiliary_event_supervision_stats(batch_states)
+        eligible_count = 0
+        supervised_count = 0
+        for semantic_state in batch_states:
+            pseudo_targets = self._build_mechanism_targets(semantic_state)
+            if float(pseudo_targets["confidence_weight"]) <= 1e-6:
+                continue
+            eligible_count += 1
+            supervised_count += int(
+                self._event_auxiliary_supervision_weight(semantic_state) > 0.0
+            )
+        return {
+            "eligible_count": eligible_count,
+            "supervised_count": supervised_count,
+            "abstained_count": eligible_count - supervised_count,
+            "supervised_fraction": (
+                float(supervised_count) / eligible_count
+                if eligible_count
+                else 0.0
+            ),
+        }
+
     def _compute_auxiliary_loss(
         self,
         batch_states: list[dict[str, Any]],
@@ -16486,6 +16636,9 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
             slow_loss = nn.functional.cross_entropy(policy_output["slow_logits"].unsqueeze(0), slow_target)
             fast_loss = nn.functional.cross_entropy(policy_output["fast_logits"].unsqueeze(0), fast_target)
             event_loss = nn.functional.cross_entropy(policy_output["event_logits"].unsqueeze(0), event_target)
+            event_supervision_weight = self._event_auxiliary_supervision_weight(
+                semantic_state
+            )
             temporal_consistency_loss = torch.tensor(0.0, dtype=torch.float32, device=self._device)
             if self._temporal_consistency_coef > 0.0:
                 prepare_margin = (policy_output["event_logits"][1] - policy_output["event_logits"][0]).unsqueeze(0)
@@ -16501,8 +16654,12 @@ class SAGHMAPPOBaseAgent(分层PPO基类):
             weighted_loss = (
                 self._auxiliary_slow_weight * slow_loss
                 + self._auxiliary_fast_weight * fast_loss
-                + self._auxiliary_event_weight * event_loss
-                + self._temporal_consistency_coef * temporal_consistency_loss
+                + event_supervision_weight
+                * self._auxiliary_event_weight
+                * event_loss
+                + event_supervision_weight
+                * self._temporal_consistency_coef
+                * temporal_consistency_loss
             )
             loss_terms.append(weighted_loss * confidence)
         if not loss_terms:

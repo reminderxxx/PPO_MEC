@@ -5,6 +5,17 @@
 
 ﻿# Progress
 
+## 2026-10-10：event auxiliary abstention 已 default-off 实现；等待独立门禁
+
+- hard-zero predecessor 保持 `MIXED_STOPPED`。新候选不把 current-missing event target 改成 0，只令 event CE 和依赖同一
+  label 的 temporal-margin 样本权重为 0；current-ready 的 label/系数/逐张量梯度不变，PPO 仍可学习 action4 长期 return。
+- slow/fast、value、entropy、reward、network、optimizer、action guard 和 raw inference 不变；旧 loss 分母保留，不按
+  supervised count 重归一化。开关只传 SA，PPO/MAPPO/DT 的初始化、动作概率/mask 和旧 checkpoint 兼容通过。
+- 相关 45 项回归、smoke、语法和 diff 检查通过；预检核验 400 selected + 400 update96 + 40 rule 历史行、36 split identity、
+  474 prefix tamper、165,512 参数/60 state keys，并回执 `scientific_steps=0`、`new_evaluation_episodes=0`。
+- 当前 `execution_authorized=false`，A 必须对 clean implementation commit 独立生成带 hash 的接口、时间和 abstention PASS。
+  时间模型仍是 decision-step + synthetic RSU block/人工 5 秒尺度，非逐帧真实轨迹。未启动训练、评价、formal/holdout。
+
 ## 2026-10-10：action0/2/4 对称分支门禁为 MIXED；target-only 训练停止
 
 - A 按事前计划 `eefc4a2` 完整复用 24 条失败源并按冻结顺序加入 6 条 current-ready 正例；9 个完整环境状态、30 个

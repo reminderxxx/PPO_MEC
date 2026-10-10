@@ -1,5 +1,15 @@
 ﻿# Directory Structure
 
+## 2026-10-10 event auxiliary abstention 候选
+
+- `configs/experiment/calibrated_workflow_event_aux_abstention_ab_v1.json`：唯一变量、旧 MIXED predecessor、v4 control hashes、
+  A 不可变门禁、5×5,760-step/200-evaluation cap 和停止条件；当前未授权。
+- `scripts/run_calibrated_workflow_event_aux_abstention_ab.py`、`analyze_calibrated_workflow_event_aux_abstention_ab.py`、
+  `launch_calibrated_workflow_event_aux_abstention_ab.py`：fail-closed 预检/条件训练、配对及辅助监督日志分析、一次性监督。
+- `tests/test_calibrated_workflow_event_aux_abstention{,_ab}.py`：精确梯度、固定分母、PPO 长期梯度、公共 readiness、checkpoint、
+  SA-only baseline identity、0-step pending gate 和文字 PASS 拒绝。
+- `docs/project/cscwd_event_aux_abstention_{candidate,claim_change}_20261010.md`：候选冻结、时间模型边界、唯一 A/B 与论文线禁行主张。
+
 ## 2026-10-09 因果前缀强基线版本
 
 - `scripts/diagnose_cscwd_prepared_state_event_chain.py`、`probe_cscwd_prepared_state_auxiliary.py`、

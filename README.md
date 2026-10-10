@@ -5,6 +5,11 @@
 
 # PPO_MEC
 
+2026-10-10 新冻结的 [event auxiliary abstention 候选](docs/project/cscwd_event_aux_abstention_candidate_20261010.md)
+只在 SA current-missing 样本上令 event CE/temporal-margin 监督权重为 0，不重标 target，保留 PPO 对 action4 长期收益的学习。
+它与已被 MIXED 否决的 hard-zero 候选分离，当前 `execution_authorized=false`，等待 A 在 clean implementation commit 上独立
+接口/时间合同审计；0 候选训练、0 新评价。论文边界见[主张变更说明](docs/project/cscwd_event_aux_abstention_claim_change_20261010.md)。
+
 2026-10-10 的 SA service-feasible event auxiliary target 已完成 default-off 实现和 action0/2/4 对称分支门禁。门禁为
 `MIXED`：局部当前服务语义成立，但存在 action4 多步严格更优反例，因此 `execution_authorized=false`，候选训练未启动且本轮停止。
 见[候选与停止裁决](docs/project/cscwd_service_feasible_aux_target_candidate_20261010.md)及
