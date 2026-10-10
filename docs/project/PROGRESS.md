@@ -2358,3 +2358,8 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - SA 首次服务失败 selected `32/100`、update96 `26/100`，全部为当前 bundle 缺失而选择未修复当前 bundle 的合法动作；action4 占 `28/32` 与 `23/26`。成功目标准备须待当前节点完成才提交 state，此链路不是已确认实现 bug。车辆 fallback 的 `state_ready=True` 已从有效 state 复用口径剔除。
 - 有界 24 条首次失败伪标签探测中，`22/24` 给 `event_target=1`；SA 训练 `3840/3840` optimizer step 的辅助损失/加权梯度均非零，raw evaluation 无运行时机制 logit bias。标签未检验当前服务可行性是机制疑点，尚无因果消融。
 - 冻结 `frozen_check` 中 selected SA 的按期完成 `5/40→9/40`，但有服务失败 `8/40→13/40`；fixed96 按期 `11/40→11/40`、失败 `9/40→9/40`。双视图不支持晋级或固定论文贡献。完整报告：`cscwd_prepared_state_event_chain_diagnosis_20261010.md`；paper-ready 仍为 `Unverifiable`。
+# 2026-10-10 CSCWD per-head 梯度探针独立验收
+
+- 独立接受 `cscwd_fast_aux_gradient_probe_20261010_v1` 为 fixed-policy new development probe：20 checkpoint 文件、13 个唯一网络参数状态、1,200 train transition、0 optimizer step，实际动作 old/new logprob 最大误差 `5.07e-7`，参数前后 hash 全同。
+- fast target `1,200/1,200=0` 且 action2 对 fast logit 的 autograd/中央差分均为正，说明 fast CE 会局部压低实际 action2；但 event-abstention 候选的 PPO/fast CE 负点积仅 encoder selected/update96=`3/5,3/5` seed、fast actor=`3/5,2/5`，跨 seed 不稳定。
+- 结论为 `FAST-LOSS CHANGE UNSUPPORTED`：不改 loss、不训练、不重选 checkpoint。历史 minibatch 冲突、clip 后更新及 bytes/deadline/contact bin 内方向仍 `UNVERIFIED`；`MIXED_STOPPED` 与 paper-ready=`Unverifiable` 不变。报告见 `cscwd_per_head_gradient_acceptance_20261010.md`。

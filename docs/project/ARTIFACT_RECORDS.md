@@ -1857,3 +1857,9 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 - evidence：`E2_bounded_native_transition_witness`；non-formal synthetic typed identities；不能替代真实无线、cross-workflow persistence、统计覆盖或 formal/holdout。
 - report：`docs/project/shared_cache_recovery_coupling_audit_20261005.md`。
 - correction：`post_run_method_identity_correction.json` 记录 frozen label/observation-scope defect；原 workload-v0.1 阈值复算与 frozen runner 在 A/B/C action-equivalent，未重跑 native env。`post_run_correction_integrity_manifest.json` 绑定原 manifest 与 correction。
+# 2026-10-10 CSCWD fast auxiliary gradient probe 独立验收
+
+- Source artifact：`/Users/howen/.codex/worktrees/cscwd-window-identity/PPO_MEC/artifacts/analysis/cscwd_fast_aux_gradient_probe_20261010_v1/`；producer commit `9376403bc3d059505054682016fdd8258dfef2e7`，事前计划 `900c79e`。
+- Identity：20 checkpoint file SHA、13 unique loaded-network SHA、20 × 60 = 1,200 fresh train transitions、0 optimizer step、0 parameter mutation、0 formal/holdout/support。
+- Integrity：manifest SHA `74665bb92708c94a17978fb6f4ebb32af95002cb3b75601a282d871c001cbb20`；aggregate SHA `b71c36da5d12e41fb933dd85157695866e6ba3435339e00ca40178a536e7f98e`；action2 autograd/finite-difference sidecar SHA `4bf26b08ba45abca68780a092856dfdc3a0fb9c9bf670bce6022b65f62d5c29f`。
+- Evidence boundary：`E2_ARTIFACT_AUDITED / fixed-policy new development probe`。支持 fast CE 可影响实际 action2 概率；不支持历史训练伤害、删除 fast CE 的收益、算法优势或论文贡献。独立报告：`docs/project/cscwd_per_head_gradient_acceptance_20261010.md`。

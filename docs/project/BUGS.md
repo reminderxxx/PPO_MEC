@@ -1017,3 +1017,8 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - 新 matched development run 的 selected/update96 SA 首次服务失败分别 `32/100`、`26/100` episode，全部在当前 bundle 缺失时选择 action1/3/4；action4 目标可准备时也可能因当前节点服务失败而无法 state commit。环境与原 ledger 的 5,632 步重放一致，暂不标实现 bug。
 - SA 辅助 `event_target` 的代码条件不含当前 bundle readiness；24 条有界首次失败探测中 `22/24` 给 prepare 目标，且训练辅助损失确实参与更新。缺少独立消融，不能断言此标签是性能差距的唯一或充分原因。
 - selected 冻结视图失败 episode 从历史 `8/40` 升至 `13/40`，fixed96 仍为 `9/40`，按期完成 fixed96 仍为 `11/40`；双视图和无 formal/holdout 边界下不得晋级或固定论文 claim。详见 `cscwd_prepared_state_event_chain_diagnosis_20261010.md`。
+# OPEN / fast auxiliary 历史因果与跨 seed 一致性不足
+
+- 新 fixed-policy probe 证明 fast target 恒 0 会局部压低可执行 action2，但候选臂 PPO/fast CE 冲突未跨 seed 或 selected/update96 稳定，不能认定为服务退化根因。
+- 历史 training minibatch、当时 optimizer state/顺序和 clip 后合成更新未保留；公开 bytes/deadline/contact 只保存计数，bin 内梯度方向未重算，均保持 `UNVERIFIED`。
+- 删除 fast CE 当前不获授权；若未来另立唯一变量 `.5→0`，必须固定 event abstention、其他 loss、数据/预算/选模并以跨 seed 服务与成本共同门禁否证。见 `cscwd_per_head_gradient_acceptance_20261010.md`。

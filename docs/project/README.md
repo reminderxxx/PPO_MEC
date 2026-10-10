@@ -9,6 +9,9 @@
 
 ## Live 文档
 
+- `cscwd_per_head_gradient_acceptance_20261010.md`：fast/slow/event CE 与实际执行动作 PPO 的独立消费链验收；
+  fast CE 对 action2 的局部作用成立，但候选冲突跨 seed 不稳定，loss 改动与新 A/B 均不获本轮授权。
+
 - `cscwd_training_signal_readiness_correction_20261010.md`：训练信号日志 current RSU 地址纠错、历史 144,000 行无效字段标记、
   消费者影响与 0-training correction sidecar；不改变 event candidate 的 `MIXED_STOPPED`。
 
