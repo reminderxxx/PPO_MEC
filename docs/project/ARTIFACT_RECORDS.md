@@ -13,7 +13,10 @@
 - 对象级 `110,983,569,096` bytes 与 transition 汇总守恒，step clock 逐项守恒；PPO 762 个 action2 均支付 8s fallback、
   node compute 与 input。未确认加载/计费 bug，candidate verdict 仍 `MIXED_STOPPED`。
 - 确认日志生产者缺陷：candidate 28,800/28,800 与旧 v4 115,200/115,200 training-signal rows 的 readiness 全 False。
-  旧原件不覆盖；correction sidecar 在生产者修复 commit 后 create-only 生成并另行登记 hash。
+  旧原件不覆盖；producer fix commit=`52500c6715bb84930670b7a101f999fab81b0a17`。create-only correction root=
+  `artifacts/analysis/cscwd_training_signal_readiness_correction_20261010_v1/`，receipt/integrity SHA-256=
+  `982bfda7b12b26e6efc8bb8d1830b4c1aef72aa20a8edf7136130b69925b4890`/
+  `77bfa08d616b91c418d0b1c6be26c6cbf0999e68964bd86c400156d67f18af5e`；0 training/evaluation/reselection。
 
 ## 2026-10-10 event auxiliary abstention independent-gate preflight（无 scientific run）
 

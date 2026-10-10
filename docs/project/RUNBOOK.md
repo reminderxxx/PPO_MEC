@@ -7,12 +7,12 @@
 
 ## Training signal readiness correction sidecar（2026-10-10）
 
-先提交并 push 生产者修复，再在 clean commit 上运行一次：
+以下命令已在修复 commit 上运行一次，只作历史记录，不得重跑或覆盖：
 
 ```bash
 /Users/howen/Projects/PPO_MEC/.venv/bin/python \
   scripts/audit_calibrated_workflow_training_signal_readiness_correction.py \
-  --expected-git-commit <FIX_COMMIT>
+  --expected-git-commit 52500c6715bb84930670b7a101f999fab81b0a17
 ```
 
 输出固定为 `artifacts/analysis/cscwd_training_signal_readiness_correction_20261010_v1/`，create-only。不得覆盖候选/v4 的旧

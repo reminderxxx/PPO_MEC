@@ -12,7 +12,8 @@
 - 唯一确定实现缺陷是 `_training_signal_row` 读取不存在的 `semantic_state.current_rsu_id`，令候选 28,800 行和旧 v4
   115,200 行 `current_bundle_ready` 全 False。修复为 primary vehicle `associated_rsu_id`，并覆盖 ready/missing 与非首位 primary。
 - 该字段未进入 agent abstention、loss、optimizer receipt、selection、评价或 event candidate finalizer，故不改变 checkpoint 和
-  `MIXED_STOPPED`。旧 CSV 保留；create-only sidecar 只标记字段无效，0 training/evaluation/reselection。
+  `MIXED_STOPPED`。修复 commit=`52500c6…`；旧 CSV 保留，create-only sidecar 只标记字段无效，0
+  training/evaluation/reselection。
 
 ## 2026-10-10：event auxiliary abstention 科学 run 完成；MIXED 后停止
 

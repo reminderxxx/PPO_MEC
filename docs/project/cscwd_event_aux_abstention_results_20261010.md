@@ -66,6 +66,9 @@ total transfer 分别增加 `2.358 s`、`1.781 s`、`112.669 MB/episode`。这�
 对原生加载/重算事件链、fallback 权限与计费对称性的独立报告；只有固定合同/数学定义与代码执行明确不一致才可称 bug。若只有
 合法 Pareto 权衡，则无需“修复”，下一步只能另立预注册多目标设计，而非继续找 SA 优势。
 
+后续 A 审计已确认成本/计费守恒；唯一缺陷是 training-signal 日志 current RSU 地址错误。该字段未进入本报告的 optimizer/
+evaluation 配对或 gate verdict，故 `MIXED_STOPPED` 不变。生产者已在 `52500c6…` 修复，旧 144,000 行只标记无效、不覆盖。
+
 机器证据：`artifacts/analysis/cscwd_event_aux_abstention_ab_20261010_v1_analysis_v2/`，其中
 `arm_view_split_seed_summary.csv` 72 行覆盖两 arm×两视角×全部 split/seed，`paired_episode_rows.csv` 为完整 200 对，
 `event_supervision_summary.csv` 为五 seed+combined，`final_verdict.json` 固定 `MIXED_STOPPED`。

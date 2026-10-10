@@ -34,3 +34,8 @@ fallback 计费守恒；新增传输主要是后续实际使用的跨 RSU base/m
 A 独立报告 commit=`7734d5807feaa66ac3f40e89ca8ff86f911f0783`、tree=
 `210c1727c7947ba80dce6066fc158f969b6496f5`；报告/摘要/两份机器 manifest SHA-256 分别为
 `3354ee27…`、`45498f30…`、`859abe71…`、`ee49c70b…`。本纠错属于 logging correction，不是算法创新或性能证据。
+
+生产者修复 commit=`52500c6715bb84930670b7a101f999fab81b0a17`。create-only sidecar 位于
+`artifacts/analysis/cscwd_training_signal_readiness_correction_20261010_v1/`；receipt/integrity SHA-256=
+`982bfda7b12b26e6efc8bb8d1830b4c1aef72aa20a8edf7136130b69925b4890`/
+`77bfa08d616b91c418d0b1c6be26c6cbf0999e68964bd86c400156d67f18af5e`。
