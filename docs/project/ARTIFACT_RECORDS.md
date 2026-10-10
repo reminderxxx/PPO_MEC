@@ -17,6 +17,8 @@
 - report/manifest/time/abstention SHA-256=`f3e5849c…`/`b3d19245…`/`6a788a74…`/`a7d73b58…`；B 独立复算并以
   runner 消费端验证 `PASS/artifacts_verified=true`。本条不登记 checkpoint、训练结果或性能 artifact；scientific steps/new
   evaluation 仍为 `0/0`。
+- 首次 launcher 调用在 dispatch 前 `NameError`；run/analysis/supervisor root 均未创建，因此无 run ID、entry receipt、
+  checkpoint 或可恢复状态。该操作错误不消耗协议中的唯一 scientific launch。
 
 ## 2026-10-10 service-feasible action-branch gate（MIXED，无候选训练）
 

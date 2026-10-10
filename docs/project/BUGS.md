@@ -15,6 +15,8 @@
   commit/tree 和四类 artifact hash/语义复核通过；该 PASS 仅授权一次冻结开发 A/B，不是性能或论文 PASS。
 - `MODEL LIMITATION`：mobility 按 decision step 推进，RSU sequence 是 NGSIM handoff-pressure synthetic block，5 秒接触尺度
   为人工设定；结果不得外推为 frame-time realism 或真实无线时空行为。
+- `RESOLVED PRE-DISPATCH`：首次 launcher 调用引用未定义 `expected_commit`，在 `_dispatch` 前失败；三个目标 root 不存在、0
+  scientific work。修正为 `args.expected_commit` 并加入 child argv 回归；算法、协议、预算和唯一 scientific launch 未改变。
 
 ## 2026-10-10：对称分支发现 action4 多步反例；统一 target 收紧被 MIXED 门禁阻断
 

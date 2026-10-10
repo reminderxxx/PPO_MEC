@@ -16,6 +16,8 @@
 - A 在 implementation commit `46a68f1…` 上确认 30/30 raw forward、6 ready 梯度精确不变、24 missing event 梯度为零；
   B 独立复核 gate commit/tree、report/manifest/time/abstention receipt hashes 后授权唯一冻结 A/B。时间模型仍是 decision-step +
   synthetic RSU block/人工 5 秒尺度，非逐帧真实轨迹。截至本条仍未启动训练、评价、formal/holdout。
+- 首次 launch 调用在 dispatch 前因 child argv 的局部变量名错误抛出 `NameError`；run/analysis/supervisor 三目录均未创建，
+  scientific steps/updates/evaluation=`0/0/0`，不计已进入 scientific launch。只修正该引用并加入无副作用 launcher 回归。
 
 ## 2026-10-10：action0/2/4 对称分支门禁为 MIXED；target-only 训练停止
 

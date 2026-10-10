@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import sys
 
 import pytest
 
+from scripts import launch_calibrated_workflow_event_aux_abstention_ab as launcher
 from scripts.run_calibrated_workflow_event_aux_abstention_ab import (
     DEFAULT_CONTROL_ROOT,
     DEFAULT_PROTOCOL,
@@ -16,6 +18,27 @@ from scripts.run_calibrated_workflow_event_aux_abstention_ab import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_launcher_passes_frozen_commit_to_child_without_dispatch_side_effects(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: dict = {}
+    monkeypatch.setattr(launcher, "_frozen_interpreter", lambda _: "/python")
+    monkeypatch.setattr(
+        launcher,
+        "_dispatch",
+        lambda plan: captured.setdefault("plan", plan) or {"status": "unused"},
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["launcher", "--mode", "launch", "--expected-commit", "frozen-commit"],
+    )
+    assert launcher.main() == 0
+    plan = captured["plan"]
+    index = plan["child_argv"].index("--expected-commit")
+    assert plan["child_argv"][index + 1] == "frozen-commit"
 
 
 def test_verified_independent_gate_preflight_does_no_scientific_work() -> None:

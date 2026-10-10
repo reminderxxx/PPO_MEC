@@ -106,7 +106,7 @@ def main() -> int:
             "--mode",
             "job",
             "--expected-commit",
-            expected_commit,
+            args.expected_commit,
             "--control-root",
             str(control_root),
         ],
