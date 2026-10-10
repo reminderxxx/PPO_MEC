@@ -5,6 +5,19 @@
 
 # Runbook
 
+## CSCWD 原始 NGSIM 事件时间开发检查（2026-10-10）
+
+冻结合同见 `cscwd_raw_ngsim_event_time_contract_20261010.md`。从仓库根目录运行；`--raw-csv-path` 指向本机已有 NGSIM CSV，不下载或覆盖。输出目录必须不存在：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_raw_ngsim_event_time_env.py
+/Users/howen/Projects/PPO_MEC/.venv/bin/python scripts/audit_cscwd_raw_ngsim_event_time.py \
+  --raw-csv-path '/Users/howen/Projects/PPO_MEC/data/raw/mobility/ngsim/Next_Generation_Simulation_(NGSIM)_Vehicle_Trajectories_and_Supporting_Data_20260329.csv' \
+  --output-root artifacts/analysis/cscwd_raw_ngsim_event_time_20261010_v2
+```
+
+入口核验原 manifest/config hash 与精确原始时间/帧，最多 30 episode、720 真实步、10,000 预览步；输出 `source_manifest.json` 和 `summary.json`，不含原始坐标。`truncated=True` 表示轨迹结束，value learner 应 bootstrap。本检查不生成 checkpoint，不训练，不读取封存 holdout；短轨迹结果不作算法排名。若需要可检验的 prepare/service 两类状态，须另行冻结较长且时间互斥的开发窗口协议，不能本轮换窗口。
+
 ## CSCWD prepared-state v4 公共观测接口（2026-10-10）
 
 原 base config `configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json` 和 manifest 先照旧 hash 核验；仅新实验显式设置运行时 `interface_profile=calibrated_workflow_interface_v4_prepared_state_prefix`，由现有 `_build_agent` 同时给四 learned 方法启用匹配编码宽度。字段合同、参数量、旧新 checkpoint 拒绝和验收命令见 `cscwd_prepared_state_prefix_interface_20261010.md`。A 仅实现接口和合成测试；B 负责独立 preflight/匹配训练，此入口自身不启动训练、不读旧 holdout。

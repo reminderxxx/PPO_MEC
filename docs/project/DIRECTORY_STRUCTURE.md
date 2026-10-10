@@ -1,5 +1,12 @@
 ﻿# Directory Structure
 
+## 2026-10-10 CSCWD 原始 NGSIM 事件时间开发剖面
+
+- `src/data/mobility/ngsim_event_trace.py`：只读取冻结的三个已暴露窗口，核验原始 100 ms 时间/车辆帧身份和单位；不保存坐标。
+- `src/envs/core/raw_ngsim_event_time_env.py`：独立 opt-in 时间、位置、几何接触及保守原子准入；公共观测只用轨迹前缀。
+- `scripts/audit_cscwd_raw_ngsim_event_time.py`：create-only 固定动作、双时间剖面有界开发检查；原件保存在忽略 Git 的 `artifacts/analysis/cscwd_raw_ngsim_event_time_20261010_v*/`。
+- `tests/test_raw_ngsim_event_time_env.py` 与 `docs/project/cscwd_raw_ngsim_event_time_contract_20261010.md`：边界/时间/因果验收和事前合同。
+
 ## 2026-10-09 因果前缀强基线版本
 
 - `docs/project/cscwd_prepared_state_prefix_interface_20261010.md` 与 `tests/test_calibrated_workflow_prepared_state_prefix.py`：显式 v4 公共观测接口交接和合成验收；B runner/protocol 与实验原件不在本 A 分支改动。

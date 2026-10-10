@@ -5,6 +5,8 @@
 
 # PPO_MEC
 
+2026-10-10 新增 CSCWD [原始 NGSIM 事件时间 opt-in 开发检查](docs/project/cscwd_raw_ngsim_event_time_contract_20261010.md)：冻结三个已暴露窗口，以累计秒数读取真实位置并按模拟 RSU 几何限制服务提交。现有 24 帧窗口最长仅 2.3 秒；该入口只执行固定动作敏感性，不训练或形成算法优劣/论文主张。用法见 [RUNBOOK](docs/project/RUNBOOK.md)。
+
 2026-10-10 的 CSCWD prepared-state 公共观测修复见 [A 线接口交接](docs/project/cscwd_prepared_state_prefix_interface_20261010.md)：新 profile 显式启用，四 learned 方法共同消费；当前仅通过接口验收，尚无新训练或方法优势结论。
 
 CSCWD 2027 的 DT/Popularity [强基线开发链接线](docs/project/cscwd_2027_strong_baseline_wiring_20261009.md)已完成合成验收。旧版预检发现[预测权限阻断](docs/project/cscwd_2027_strong_baseline_prediction_permission_blocker_20261009.md)：36/36 实例把实际未来 RSU 序列回退为公共预测，因此旧版没有科学训练。另立的[因果前缀版本协议](docs/project/cscwd_causal_strong_baseline_protocol_20261009.md)已冻结训练来源、公共信息边界、独立物理判定和一次性开发预算；实验结果以新 run 原件为准，不把旧新版差异当算法增益。
