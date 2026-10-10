@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-11：原始短轨迹根因审计完成；复算工作负载失配与两处合同限制
+
+- 对 `cscwd_raw_ngsim_event_time_20261010_v4` 的 30 episode/147 步只读重放，逐 episode 全字段 0 mismatch；3 窗均 24 连续 100 ms 帧，首决策剩 2.2 s，DAG compute-only 严格下界分别 38.739782/24.968087/19.138455 s，因此当前末帧截断合同内完整 workflow 对任意策略不可达。旧 80/50 s 来自人工 5 s×合成 RSU 序列，不是原始轨迹时长；三窗未发现时间/传输单位 bug。
+- 30 raw 决策中 28 被拒绝、2 准入；v4 优先标签 trace24/contact4 中有 8 次两者同时超限，先到边界为 trace20/contact8。dev_01 action1/4 准备阶段 .694/.724 s 可落入 .728 s 接触，整步仍被 raw 新增门回滚；零准备字节不能判算法无效。合成后缀反例证明公共 decision clone 仍读未来真实接触，是下一轮实现 blocker。本轮 0 新策略 episode、0 训练/holdout/环境修复；详细阶段表与哈希见 `cscwd_raw_time_root_cause_audit_20261011.md`。论文贡献/paper-ready 仍 `Unverifiable`。
+
 ## 2026-10-10：原始 NGSIM 事件时间合同落地，旧短窗口不足以训练优秀基线
 
 - 冻结合同 `79ce5ab`、环境实现 `ade1561`、最终运行代码 `0704937`；本地 `cscwd_raw_ngsim_event_time_20261010_v4` 只读核验 11,850,526 原始行、3 个已暴露且原始时间互斥的 development 窗口，各 24 帧/2.3 s。公共 actor 只见前缀位置/恒速预测及共同 clock/deadline/fallback/failure 字段；轨迹终点仅在环境诊断，继承自合成路由的预测 confidence 被固定的未校准 0.5 取代。B 已独立指出并促成移除公共剩余轨迹时长。

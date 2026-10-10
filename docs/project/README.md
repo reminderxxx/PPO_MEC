@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `cscwd_raw_time_root_cause_audit_20261011.md`：冻结 raw v4 的源时间/单位、逐动作阶段、严格 workflow 下界、整步接触门与公共决策 clone 泄漏的只读根因审计；环境和论文未改。
+
 - `cscwd_raw_ngsim_event_time_contract_20261010.md`、`cscwd_raw_ngsim_event_time_development_check_20261010.md`：冻结 NGSIM 原始时间/位置、共同因果公共状态和接触准入；3 个短开发窗口的固定动作检查因全部截断而停止匹配训练，非算法或论文结果。
 
 - `cscwd_mobility_elapsed_sensitivity_plan_20261010.md`、`cscwd_mobility_elapsed_sensitivity_20261010.md`：旧决策步时间合同与独立 opt-in 5s 合成 elapsed/原子动作敏感性，固定 checkpoint 80 episode、逐步成本、失败等待反例与真实物理/规则能力边界；非论文或公平新排名。

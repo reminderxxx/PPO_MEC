@@ -1,5 +1,10 @@
 ﻿# Directory Structure
 
+## 2026-10-11 CSCWD 原始时间只读根因审计
+
+- `scripts/diagnose_cscwd_raw_time_root_cause.py`、`tests/test_cscwd_raw_time_root_cause.py`：只读重放冻结 v4 147 步、各阶段/接触门账本和合成决策 clone 后缀泄漏见证；不改变环境。
+- `artifacts/analysis/cscwd_raw_time_root_cause_20261011_v2/diagnosis.json`：本地 create-only 轻量机器证据，忽略 Git；`docs/project/cscwd_raw_time_root_cause_audit_20261011.md` 是审查台账。
+
 ## 2026-10-10 CSCWD 原始 NGSIM 事件时间开发剖面
 
 - `src/data/mobility/ngsim_event_trace.py`：只读取冻结的三个已暴露窗口，核验原始 100 ms 时间/车辆帧身份和单位；不保存坐标。

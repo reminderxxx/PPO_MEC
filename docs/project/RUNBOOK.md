@@ -5,6 +5,16 @@
 
 # Runbook
 
+## CSCWD 原始时间/阶段只读根因审计（2026-10-11；已完成）
+
+唯一诊断使用已存在的 `cscwd_raw_ngsim_event_time_20261010_v4` 原件及本机只读 NGSIM CSV；输出 root 为 create-only `artifacts/analysis/cscwd_raw_time_root_cause_20261011_v2/`，不可覆盖重跑。已执行命令和报告见 `cscwd_raw_time_root_cause_audit_20261011.md`；脚本参数为 `--raw-csv-path`、`--v4-root`、`--output-root`，执行前按内置 SHA 校验父原件。它只复算既有 30 episode/147 步与 56 次 native 阶段预览，未启动训练或读取 holdout。合成回归可执行：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_cscwd_raw_time_root_cause.py tests/test_raw_ngsim_event_time_env.py
+```
+
+本轮仅诊断：raw 未来接触决策 clone 缺陷及新整步准入过严必须在独立修复任务处理；不得据此改窗口/参数或生成新性能矩阵。
+
 ## CSCWD 原始 NGSIM 事件时间开发检查（2026-10-10）
 
 冻结合同见 `cscwd_raw_ngsim_event_time_contract_20261010.md`。从仓库根目录运行；`--raw-csv-path` 指向本机已有 NGSIM CSV，不下载或覆盖。输出目录必须不存在：

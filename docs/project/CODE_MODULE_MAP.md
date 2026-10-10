@@ -1,5 +1,7 @@
 # Code Module Map
 
+`scripts/diagnose_cscwd_raw_time_root_cause.py` 仅依赖冻结 v4 manifest/summary、本机已授权三个 NGSIM 原始区间和现有环境实现，重放原 147 步并拆分 native 计算/模型/状态/输入/加载/失败阶段，核验 raw trace/contact 门与公共 decision clone；写独立小型诊断 JSON，不修改 producer、consumer、训练器或原件。`tests/test_cscwd_raw_time_root_cause.py` 使用合成轨迹锁定阶段门及未来后缀反例，不把缺陷修复混入本审查轮。
+
 `src/data/mobility/ngsim_event_trace.py` 从只读 NGSIM CSV 按三个冻结 development 区间加载单车连续轨迹并产出不含坐标的 provenance；`src/envs/core/raw_ngsim_event_time_env.py` 继承 calibrated env 的 DAG/cache/奖励账本，仅在 opt-in 类内以真实时间/位置计算接触、前缀公共预测和保守整步准入，失败时零缓存/传输提交并推进时钟；`scripts/audit_cscwd_raw_ngsim_event_time.py` 只执行固定动作敏感性，不构建或训练 agent。旧 calibrated 默认环境、manifest、checkpoint 不经这条链改变。
 
 `src/envs/core/calibrated_continuous_workflow_env.py` 在 opt-in v4 profile 从已提交 `prepared_state` 与当前已完成 DAG prefix 产生公共状态摘要，继续沿用 v3 因果前缀预测；`src/encoders/calibrated_workflow_features.py` 冻结七维 flat 映射，`fusion_encoder.py`/`rsu_state_encoder.py` 分别让三 flat 方法与 SA graph 方法读入；`sa_ghmappo_core.py`/`dt_handoff_agent.py` 绑定网络宽度与 checkpoint 身份，`scripts/run_calibrated_workflow_interface_repair.py` 仅按显式 profile 构造共同 agent。合成合同见 `tests/test_calibrated_workflow_prepared_state_prefix.py`。

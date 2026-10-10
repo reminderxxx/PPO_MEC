@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：raw 公共决策 clone 泄漏未来接触；整步门混合准备与计算
+
+- `CONFIRMED / decision-information defect`：raw `_physical_contact_budget_seconds()` 忽略 `_decision_model_mode`。同公开首两帧/几何/任务、只改未来轨迹，`clone_for_decision_model().step(3)` 分别成功与接触拒绝；未经修复的 two-step/raw public estimator 不能参与公平基线比较。既有 v4 固定动作原件未调用外部 two-step，147 步重放一致。本轮只读报告，不在审查轮修环境。
+- `CONFIRMED / conservative contract limitation`：native action1/4 仅对模型/状态准备比较接触；raw opt-in 额外以完整服务总时长比较当前接触和轨迹。具体 dev_01 目标准备 .694/.724 s 小于 .728 s 接触却整步拒绝；zero prepare 不能归因于准备阶段物理不可达。没有部分传输/跨界远端服务实现，不能直接放宽科学主张。
+- `CONFIRMED / data-workload mismatch`：三冻结窗口首决策余 2.2 s，workflow compute-only 下界 19.14–38.74 s，当前末帧截断合同内任意策略均无法完成；其他长轨迹/任务 `UNKNOWN`。v4 失败优先标签 trace24/contact4 非互斥：8 次同时超限。见 `cscwd_raw_time_root_cause_audit_20261011.md`。
+
 ## 2026-10-10：原始事件时间开发窗口过短，准备/服务联合标签不可达
 
 - `OBSERVED / open experimental blocker`：冻结三窗口各仅 2.3 s，首帧作历史后可执行源区间 2.2 s；原始剖面 15/15 轨迹截断，28 拒绝中 24 个因 trace end、4 个因 current-RSU 接触，0 次成功模型/状态准备。当前固定策略检查不能支持新 learned/强规则公平训练或优秀基线排序，不能从本轮挑更长窗口替换。

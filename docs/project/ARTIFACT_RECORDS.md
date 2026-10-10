@@ -5,6 +5,11 @@
 
 # Artifact Records
 
+## 2026-10-11 CSCWD raw-time root-cause replay
+
+- 本地 create-only root `artifacts/analysis/cscwd_raw_time_root_cause_20261011_v2/`；只读核验父 v4 两文件 SHA 与原始 CSV 身份，原 30 episode/147 step 完整重放、56 native 阶段预览、0 episode mismatch、0 新策略实验/训练/holdout。
+- `diagnosis.json` SHA-256 `2aba8413253a1a0be1868b62c639f9f7754f76293b4c78aed5109444ad6756fc`；含首状态合法动作实际/估计阶段、30 条 raw 门槛 ledger、合成后缀泄漏反例。原 `v1` 输出仅为诊断脚本加严前复算，结论以 `v2` 为准。只读报告 `cscwd_raw_time_root_cause_audit_20261011.md`；不移动旧科学原件。
+
 ## 2026-10-10 CSCWD raw NGSIM event-time development check
 
 - 本地 create-only root：`artifacts/analysis/cscwd_raw_ngsim_event_time_20261010_v4/`；运行代码 `0704937742ec9218094f380a1b541c4bd2159bcb`，只读原始 NGSIM 3 个已暴露窗口、30 固定动作 episode/147 step，0 训练/正式/holdout/checkpoint。
