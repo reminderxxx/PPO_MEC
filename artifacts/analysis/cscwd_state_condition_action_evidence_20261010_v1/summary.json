@@ -1,0 +1,69 @@
+{
+  "action_counts": {
+    "0": {
+      "first_service_completed": 5,
+      "observed": 5,
+      "on_time": 4,
+      "service_failures": 1,
+      "workflow_completed": 5
+    },
+    "1": {
+      "first_service_completed": 1,
+      "observed": 1,
+      "on_time": 1,
+      "service_failures": 0,
+      "workflow_completed": 1
+    },
+    "2": {
+      "first_service_completed": 11,
+      "observed": 11,
+      "on_time": 5,
+      "service_failures": 1,
+      "workflow_completed": 11
+    },
+    "3": {
+      "first_service_completed": 4,
+      "observed": 4,
+      "on_time": 3,
+      "service_failures": 0,
+      "workflow_completed": 4
+    },
+    "4": {
+      "first_service_completed": 0,
+      "observed": 5,
+      "on_time": 3,
+      "service_failures": 10,
+      "workflow_completed": 5
+    }
+  },
+  "category_counts": {
+    "resource_pareto_exchange": 8,
+    "strictly_dominated_avoidable": 1,
+    "unknown": 2
+  },
+  "current_bundle_counts": {
+    "missing": 7,
+    "ready": 4
+  },
+  "decision": "pending_evidence_review_no_training_authorization",
+  "existing_branches": 26,
+  "new_action_branches": 0,
+  "new_branch_env_steps": 0,
+  "prefix_replay_steps": 19,
+  "prepared_prefix_counts": {
+    "current": {
+      "missing": 10,
+      "valid": 1
+    },
+    "target": {
+      "missing": 11
+    }
+  },
+  "schema_version": "cscwd_state_condition_action_evidence_v1",
+  "source_states": 11,
+  "target_bundle_counts": {
+    "missing": 5,
+    "ready": 6
+  },
+  "training_steps": 0
+}
