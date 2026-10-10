@@ -5,6 +5,10 @@
 
 # Artifact Records
 
+## 2026-10-11 CSCWD authorized development-window eligibility
+
+- 本地 create-only root `artifacts/analysis/cscwd_development_window_eligibility_20261011_v1/`；`eligibility_manifest.json` SHA-256 `e0e3dfdbeb35da5f99a4aa00f985983273efe364c5daa`。核验原始 NGSIM CSV 11,850,526 行、20 train+20 dev 授权区间、formal/hidden 仅区间元数据；40/40 为 2.3 s，0 合格，0 episode/训练/holdout 结果。事前方案和解释见 `cscwd_development_window_eligibility_plan_20261011.md`、`cscwd_development_window_eligibility_20261011.md`；清单不进入 Git。
+
 ## 2026-10-11 CSCWD raw-time root-cause replay
 
 - 本地 create-only root `artifacts/analysis/cscwd_raw_time_root_cause_20261011_v2/`；只读核验父 v4 两文件 SHA 与原始 CSV 身份，原 30 episode/147 step 完整重放、56 native 阶段预览、0 episode mismatch、0 新策略实验/训练/holdout。

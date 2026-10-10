@@ -5,6 +5,14 @@
 
 # Runbook
 
+## CSCWD 已授权 development 原始区间资格（2026-10-11；已完成）
+
+事前规则见 `cscwd_development_window_eligibility_plan_20261011.md`；只读命令见 `cscwd_development_window_eligibility_20261011.md`。脚本 `scripts/audit_cscwd_development_window_eligibility.py` 校验父 workload、strict split、train/dev plan 和本机已有 NGSIM CSV 的 SHA，创建独立 `artifacts/analysis/cscwd_development_window_eligibility_20261011_v1/`。40 个已授权区间合格 0；不得因这一结论自行扫描未授权长区间、拼接窗口或启动训练。合成资格测试：
+
+```bash
+/Users/howen/Projects/PPO_MEC/.venv/bin/python -m pytest -q tests/test_cscwd_development_window_eligibility.py
+```
+
 ## CSCWD 原始时间/阶段只读根因审计（2026-10-11；已完成）
 
 唯一诊断使用已存在的 `cscwd_raw_ngsim_event_time_20261010_v4` 原件及本机只读 NGSIM CSV；输出 root 为 create-only `artifacts/analysis/cscwd_raw_time_root_cause_20261011_v2/`，不可覆盖重跑。已执行命令和报告见 `cscwd_raw_time_root_cause_audit_20261011.md`；脚本参数为 `--raw-csv-path`、`--v4-root`、`--output-root`，执行前按内置 SHA 校验父原件。它只复算既有 30 episode/147 步与 56 次 native 阶段预览，未启动训练或读取 holdout。合成回归可执行：

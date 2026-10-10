@@ -5,6 +5,8 @@
 
 # PPO_MEC
 
+2026-10-11 的 CSCWD [开发原始窗口资格审计](docs/project/cscwd_development_window_eligibility_20261011.md)按事前冻结规则核验现有 40 个授权 train/dev 区间：最长连续源时长 2.3 秒，短于最短 DAG 的 16.298588 秒纯计算下界，合格 0。未扩展数据区间、执行训练或形成基线名次；后续长区间须另行授权。
+
 2026-10-11 的 CSCWD [原始时间与动作阶段只读根因审计](docs/project/cscwd_raw_time_root_cause_audit_20261011.md)复算既有 147 步：固定 24 帧窗口的完整 DAG 计算下界已超过可执行轨迹时间；同时定位 raw 整步接触门偏保守及决策 clone 未来接触泄漏。结论只用于定位，尚未修环境或训练基线。
 
 2026-10-10 新增 CSCWD [原始 NGSIM 事件时间 opt-in 开发检查](docs/project/cscwd_raw_ngsim_event_time_contract_20261010.md)：冻结三个已暴露窗口，以累计秒数读取真实位置并按模拟 RSU 几何限制服务提交。现有 24 帧窗口最长仅 2.3 秒；该入口只执行固定动作敏感性，不训练或形成算法优劣/论文主张。用法见 [RUNBOOK](docs/project/RUNBOOK.md)。

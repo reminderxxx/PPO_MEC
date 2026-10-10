@@ -5,6 +5,10 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：授权原始 development 区间不足以承载完整 DAG
+
+- v28 strict split 已授权的 40 个 train/dev 区间各仅 24 帧/2.3 s，首帧后可决策 2.2 s；最短 workload 纯计算和 16.298588 s。结果盲资格 0/40，不能用任意算法胜负或放松时间/成本合同绕过，也不能自行延长到未授权 NGSIM 行。需先另行批准隔离的长 development 原始区间，并独立关闭公共未来接触 clone 与 phase 估计一致性门，再考虑可达性/匹配训练。证据见 `cscwd_development_window_eligibility_20261011.md`。
+
 ## 2026-10-11：raw 公共决策 clone 泄漏未来接触；整步门混合准备与计算
 
 - `CONFIRMED / decision-information defect`：raw `_physical_contact_budget_seconds()` 忽略 `_decision_model_mode`。同公开首两帧/几何/任务、只改未来轨迹，`clone_for_decision_model().step(3)` 分别成功与接触拒绝；未经修复的 two-step/raw public estimator 不能参与公平基线比较。既有 v4 固定动作原件未调用外部 two-step，147 步重放一致。本轮只读报告，不在审查轮修环境。

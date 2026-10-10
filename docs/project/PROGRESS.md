@@ -5,6 +5,11 @@
 
 ﻿# Progress
 
+## 2026-10-11：授权 development 原始区间资格为 0/40；后续原始时间训练暂停
+
+- 事前方案 `1c18b43` 仅授权 v28 strict split 的 20 train+20 dev 原始区间。只读扫描 NGSIM 11,850,526 行及 formal/hidden 的 split manifest 区间元数据，40/40 有 24 个 100 ms 时间戳、最长授权连续源时长 2.3 s，首帧后 2.2 s，短于 36 个 workload 中最短纯计算和 16.298588 s；0 合格、0 formal/hidden 重叠。工程目标 118.8 s/1,189 帧仅用于另行授权方案，不是服务保证。
+- 本轮 0 可达性 episode、0 训练、0 新 split、0 sealed 结果读取；B 条件训练门关闭。机器清单 SHA-256 `e0e3dfdbeb35da5f99a4aa00f985983273efe364c5daa`，报告 `cscwd_development_window_eligibility_20261011.md`。论文贡献、强基线名次及 paper-ready 仍 `Unverifiable`。
+
 ## 2026-10-11：原始短轨迹根因审计完成；复算工作负载失配与两处合同限制
 
 - 对 `cscwd_raw_ngsim_event_time_20261010_v4` 的 30 episode/147 步只读重放，逐 episode 全字段 0 mismatch；3 窗均 24 连续 100 ms 帧，首决策剩 2.2 s，DAG compute-only 严格下界分别 38.739782/24.968087/19.138455 s，因此当前末帧截断合同内完整 workflow 对任意策略不可达。旧 80/50 s 来自人工 5 s×合成 RSU 序列，不是原始轨迹时长；三窗未发现时间/传输单位 bug。

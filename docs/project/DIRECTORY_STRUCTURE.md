@@ -1,5 +1,10 @@
 ﻿# Directory Structure
 
+## 2026-10-11 CSCWD 已授权开发窗口资格
+
+- `scripts/audit_cscwd_development_window_eligibility.py`、`tests/test_cscwd_development_window_eligibility.py`：只读来源/车辆/时间/成本门与合成边界；不调用算法。
+- `artifacts/analysis/cscwd_development_window_eligibility_20261011_v1/eligibility_manifest.json`：本地 create-only 资格清单，忽略 Git；规则和报告见 `docs/project/cscwd_development_window_eligibility_plan_20261011.md`、`docs/project/cscwd_development_window_eligibility_20261011.md`。
+
 ## 2026-10-11 CSCWD 原始时间只读根因审计
 
 - `scripts/diagnose_cscwd_raw_time_root_cause.py`、`tests/test_cscwd_raw_time_root_cause.py`：只读重放冻结 v4 147 步、各阶段/接触门账本和合成决策 clone 后缀泄漏见证；不改变环境。

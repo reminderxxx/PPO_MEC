@@ -1,5 +1,7 @@
 # Code Module Map
 
+`scripts/audit_cscwd_development_window_eligibility.py` 只读冻结 workload/split/train/dev 计划及原始 NGSIM CSV，按来源时间、选定车辆连续性和静态成本下界生成资格清单；formal/hidden 仅用 split manifest 的区间 ID 排除，不读 sealed 结果或调用环境/训练器。`tests/test_cscwd_development_window_eligibility.py` 用合成帧检查时长、跨 split 重叠和禁止拼接。
+
 `scripts/diagnose_cscwd_raw_time_root_cause.py` 仅依赖冻结 v4 manifest/summary、本机已授权三个 NGSIM 原始区间和现有环境实现，重放原 147 步并拆分 native 计算/模型/状态/输入/加载/失败阶段，核验 raw trace/contact 门与公共 decision clone；写独立小型诊断 JSON，不修改 producer、consumer、训练器或原件。`tests/test_cscwd_raw_time_root_cause.py` 使用合成轨迹锁定阶段门及未来后缀反例，不把缺陷修复混入本审查轮。
 
 `src/data/mobility/ngsim_event_trace.py` 从只读 NGSIM CSV 按三个冻结 development 区间加载单车连续轨迹并产出不含坐标的 provenance；`src/envs/core/raw_ngsim_event_time_env.py` 继承 calibrated env 的 DAG/cache/奖励账本，仅在 opt-in 类内以真实时间/位置计算接触、前缀公共预测和保守整步准入，失败时零缓存/传输提交并推进时钟；`scripts/audit_cscwd_raw_ngsim_event_time.py` 只执行固定动作敏感性，不构建或训练 agent。旧 calibrated 默认环境、manifest、checkpoint 不经这条链改变。
