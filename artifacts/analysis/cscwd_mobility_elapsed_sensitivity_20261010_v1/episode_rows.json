@@ -1,0 +1,4874 @@
+[
+  {
+    "action_counts": {
+      "2": 1,
+      "3": 4,
+      "4": 3
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_01",
+    "elapsed_seconds": 59.74333227957742,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 568633,
+    "method": "old_sa",
+    "migration_successes": 3,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "4",
+        "2",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "prepared_state": {
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "4",
+            "2",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 245840,
+          "workflow_id": "j_1042998"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 667280,
+    "steps": 8
+  },
+  {
+    "action_counts": {
+      "2": 2,
+      "3": 5,
+      "4": 6
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_01",
+    "elapsed_seconds": 77.70395615957743,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 761390,
+    "method": "old_sa",
+    "migration_successes": 1,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "4",
+        "2",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "prepared_state": {
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "4",
+            "2",
+            "5"
+          ],
+          "package_bytes": 210720,
+          "workflow_id": "j_1042998"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 5,
+    "split": "dev",
+    "state_transfer_bytes": 210720,
+    "steps": 13
+  },
+  {
+    "action_counts": {
+      "2": 2,
+      "3": 3,
+      "4": 3
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_01",
+    "elapsed_seconds": 67.77104255957742,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 761390,
+    "method": "event_abstention_sa",
+    "migration_successes": 3,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "4",
+        "2",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "prepared_state": {
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "4",
+            "2",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 245840,
+          "workflow_id": "j_1042998"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 667280,
+    "steps": 8
+  },
+  {
+    "action_counts": {
+      "0": 1,
+      "2": 1,
+      "3": 4,
+      "4": 2
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "dev_01",
+    "elapsed_seconds": 109.61689214875682,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 568633,
+    "method": "event_abstention_sa",
+    "migration_successes": 2,
+    "model_transfer_bytes": 154423432,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "4",
+        "2",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "4",
+            "2",
+            "5"
+          ],
+          "package_bytes": 210720,
+          "workflow_id": "j_1042998"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "4",
+            "2",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 245840,
+          "workflow_id": "j_1042998"
+        }
+      }
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 456560,
+    "steps": 8
+  },
+  {
+    "action_counts": {
+      "0": 4,
+      "2": 4
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_01",
+    "elapsed_seconds": 77.78070968,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 1320385,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 154423432,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "4",
+        "2",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 0,
+    "steps": 8
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "2": 5
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_01",
+    "elapsed_seconds": 78.90030768,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 1513142,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "4",
+        "2",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 0,
+    "steps": 8
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "4": 6
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_01",
+    "elapsed_seconds": 59.40808963957742,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 375876,
+    "method": "mappo",
+    "migration_successes": 6,
+    "model_transfer_bytes": 164065376,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "4",
+        "2",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "4"
+          ],
+          "package_bytes": 140480,
+          "workflow_id": "j_1042998"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "4",
+            "2",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 245840,
+          "workflow_id": "j_1042998"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 1088720,
+    "steps": 8
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "4": 11
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_01",
+    "elapsed_seconds": 69.40808963957741,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 375876,
+    "method": "mappo",
+    "migration_successes": 6,
+    "model_transfer_bytes": 164065376,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "4",
+        "2",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "prepared_state": {
+        "rsu_0": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "4",
+            "2",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 245840,
+          "workflow_id": "j_1042998"
+        },
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "4"
+          ],
+          "package_bytes": 140480,
+          "workflow_id": "j_1042998"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "4",
+            "2",
+            "5"
+          ],
+          "package_bytes": 210720,
+          "workflow_id": "j_1042998"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 5,
+    "split": "dev",
+    "state_transfer_bytes": 1088720,
+    "steps": 13
+  },
+  {
+    "action_counts": {
+      "0": 8
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_01",
+    "elapsed_seconds": 58.52380707957742,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 375876,
+    "method": "two_step",
+    "migration_successes": 0,
+    "model_transfer_bytes": 154423432,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "4",
+        "2",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 150,
+    "profile": "decision_step_original",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 0,
+    "steps": 8
+  },
+  {
+    "action_counts": {
+      "0": 6,
+      "2": 2
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_01",
+    "elapsed_seconds": 61.7106396,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 568633,
+    "method": "two_step",
+    "migration_successes": 0,
+    "model_transfer_bytes": 154423432,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "4",
+        "2",
+        "5",
+        "6",
+        "7",
+        "8"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 153,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 0,
+    "steps": 8
+  },
+  {
+    "action_counts": {
+      "2": 2,
+      "3": 2,
+      "4": 1
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "regression_00",
+    "elapsed_seconds": 84.8447046880679,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 944509,
+    "method": "old_sa",
+    "migration_successes": 1,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "4",
+        "2",
+        "3",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "4",
+            "2",
+            "3",
+            "5"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1066618"
+        }
+      }
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 3292,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "2": 2,
+      "3": 3
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "regression_00",
+    "elapsed_seconds": 84.8202663520679,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 944509,
+    "method": "old_sa",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "4",
+        "2",
+        "3",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "2": 1,
+      "3": 2
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_00",
+    "elapsed_seconds": 43.99801169116466,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 751752,
+    "method": "event_abstention_sa",
+    "migration_successes": 0,
+    "model_transfer_bytes": 164065376,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "4",
+        "2",
+        "3",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "3": 3
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "regression_00",
+    "elapsed_seconds": 71.1279992960679,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 375876,
+    "method": "event_abstention_sa",
+    "migration_successes": 0,
+    "model_transfer_bytes": 164065376,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "4",
+        "2",
+        "3",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "2": 3
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_00",
+    "elapsed_seconds": 49.035643072,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 944509,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "4",
+        "2",
+        "3",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "2": 3
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_00",
+    "elapsed_seconds": 49.035643072,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 944509,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "4",
+        "2",
+        "3",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 1,
+      "4": 6
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_00",
+    "elapsed_seconds": 42.42501809916466,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 375876,
+    "method": "mappo",
+    "migration_successes": 4,
+    "model_transfer_bytes": 328130752,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "4",
+        "2",
+        "3",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_0": {
+          "completed_node_ids": [
+            "1",
+            "4",
+            "2",
+            "3",
+            "5"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1066618"
+        },
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "4"
+          ],
+          "package_bytes": 2195,
+          "workflow_id": "j_1066618"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "4",
+            "2",
+            "3"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1066618"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 2,
+    "split": "regression",
+    "state_transfer_bytes": 10426,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "4": 2
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "regression_00",
+    "elapsed_seconds": 73.5291404240679,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 375876,
+    "method": "mappo",
+    "migration_successes": 2,
+    "model_transfer_bytes": 328130752,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "4",
+        "2",
+        "3",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "4"
+          ],
+          "package_bytes": 2195,
+          "workflow_id": "j_1066618"
+        }
+      }
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 4390,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 5
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_00",
+    "elapsed_seconds": 37.94156713916466,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 375876,
+    "method": "two_step",
+    "migration_successes": 0,
+    "model_transfer_bytes": 318488808,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "4",
+        "2",
+        "3",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 115,
+    "profile": "decision_step_original",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 4,
+      "2": 1
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_00",
+    "elapsed_seconds": 35.34337601599999,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 375876,
+    "method": "two_step",
+    "migration_successes": 0,
+    "model_transfer_bytes": 164065376,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "4",
+        "2",
+        "3",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 109,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "2": 3,
+      "4": 2
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "regression_05",
+    "elapsed_seconds": 69.01104445935624,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 1233644,
+    "method": "old_sa",
+    "migration_successes": 2,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_0": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1054473"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "package_bytes": 3841,
+          "workflow_id": "j_1054473"
+        }
+      }
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 6585,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "2": 3,
+      "4": 2
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_05",
+    "elapsed_seconds": 43.255658776,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 1040887,
+    "method": "old_sa",
+    "migration_successes": 2,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1054473"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 6585,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "3": 1,
+      "4": 2
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_05",
+    "elapsed_seconds": 30.609580157773905,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 289135,
+    "method": "event_abstention_sa",
+    "migration_successes": 2,
+    "model_transfer_bytes": 19283888,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_0": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1054473"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "package_bytes": 3841,
+          "workflow_id": "j_1054473"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 6585,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 1,
+      "3": 2,
+      "4": 2
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_05",
+    "elapsed_seconds": 19.573051231999997,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 0,
+    "method": "event_abstention_sa",
+    "migration_successes": 2,
+    "model_transfer_bytes": 9641944,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "package_bytes": 3841,
+          "workflow_id": "j_1054473"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1054473"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 6585,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "2": 2
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "regression_05",
+    "elapsed_seconds": 46.6037875897739,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 674649,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 19283888,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "2": 2
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_05",
+    "elapsed_seconds": 35.56725866399999,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 385514,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 9641944,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 1,
+      "4": 4
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_05",
+    "elapsed_seconds": 20.393349456,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 0,
+    "method": "mappo",
+    "migration_successes": 4,
+    "model_transfer_bytes": 28925832,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_0": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1054473"
+        },
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2"
+          ],
+          "package_bytes": 2195,
+          "workflow_id": "j_1054473"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "package_bytes": 3841,
+          "workflow_id": "j_1054473"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 10975,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 1,
+      "4": 4
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_05",
+    "elapsed_seconds": 20.007629904,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 0,
+    "method": "mappo",
+    "migration_successes": 4,
+    "model_transfer_bytes": 19283888,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "package_bytes": 3841,
+          "workflow_id": "j_1054473"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1054473"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 10975,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "4": 2
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_05",
+    "elapsed_seconds": 19.958766392,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 0,
+    "method": "two_step",
+    "migration_successes": 2,
+    "model_transfer_bytes": 19283888,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2"
+          ],
+          "package_bytes": 2195,
+          "workflow_id": "j_1054473"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "package_bytes": 3841,
+          "workflow_id": "j_1054473"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 107,
+    "profile": "decision_step_original",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 6036,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 4,
+      "4": 1
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "regression_05",
+    "elapsed_seconds": 19.54861728,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 0,
+    "method": "two_step",
+    "migration_successes": 1,
+    "model_transfer_bytes": 9641944,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "package_bytes": 3841,
+          "workflow_id": "j_1054473"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 105,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "regression",
+    "state_transfer_bytes": 3841,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "2": 3,
+      "4": 4
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_05",
+    "elapsed_seconds": 72.41893688,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 1436038,
+    "method": "old_sa",
+    "migration_successes": 4,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_0": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1067730"
+        },
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1067730"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1067730"
+        }
+      }
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 12072,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "2": 3,
+      "4": 4
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "frozen_check_05",
+    "elapsed_seconds": 50.81532181599999,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 867405,
+    "method": "old_sa",
+    "migration_successes": 4,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1067730"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1067730"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 12072,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "3": 1,
+      "4": 4
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "frozen_check_05",
+    "elapsed_seconds": 38.331667759999995,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 289135,
+    "method": "event_abstention_sa",
+    "migration_successes": 4,
+    "model_transfer_bytes": 19283888,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_0": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1067730"
+        },
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1067730"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1067730"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 12072,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 1,
+      "3": 2,
+      "4": 4
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_05",
+    "elapsed_seconds": 81.130094232,
+    "handoff_failures": 2,
+    "input_transfer_bytes": 1040888,
+    "method": "event_abstention_sa",
+    "migration_successes": 4,
+    "model_transfer_bytes": 9641944,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1067730"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1067730"
+        }
+      }
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 12072,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 4,
+      "2": 3
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_05",
+    "elapsed_seconds": 62.304486272,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 1609521,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 19283888,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "2": 4
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_05",
+    "elapsed_seconds": 59.131469704,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 1889019,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 9641944,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 1,
+      "4": 6
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "frozen_check_05",
+    "elapsed_seconds": 27.954400352,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 0,
+    "method": "mappo",
+    "migration_successes": 6,
+    "model_transfer_bytes": 28925832,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_0": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1067730"
+        },
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1067730"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1067730"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 16462,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 1,
+      "4": 6
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "frozen_check_05",
+    "elapsed_seconds": 27.5686808,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 0,
+    "method": "mappo",
+    "migration_successes": 6,
+    "model_transfer_bytes": 19283888,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_0": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1067730"
+        },
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3"
+          ],
+          "package_bytes": 2195,
+          "workflow_id": "j_1067730"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1067730"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 16462,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 4,
+      "4": 3
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "frozen_check_05",
+    "elapsed_seconds": 27.495383336,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 0,
+    "method": "two_step",
+    "migration_successes": 3,
+    "model_transfer_bytes": 19283888,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_0": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1067730"
+        },
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2"
+          ],
+          "package_bytes": 2195,
+          "workflow_id": "j_1067730"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1067730"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 147,
+    "profile": "decision_step_original",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 8779,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 5,
+      "4": 2
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "frozen_check_05",
+    "elapsed_seconds": 27.470945000000004,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 0,
+    "method": "two_step",
+    "migration_successes": 2,
+    "model_transfer_bytes": 19283888,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "adapter:alpr",
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_2": [
+          "adapter:alpr",
+          "base:family_a"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3"
+          ],
+          "package_bytes": 2195,
+          "workflow_id": "j_1067730"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1067730"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 145,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 5487,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "3": 4,
+      "4": 4
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_00",
+    "elapsed_seconds": 53.64635777999999,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 472255,
+    "method": "old_sa",
+    "migration_successes": 3,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "2",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "2",
+            "4",
+            "5"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1055964"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 1,
+    "split": "dev",
+    "state_transfer_bytes": 8780,
+    "steps": 8
+  },
+  {
+    "action_counts": {
+      "2": 1,
+      "3": 3,
+      "4": 7
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "dev_00",
+    "elapsed_seconds": 154.610363,
+    "handoff_failures": 2,
+    "input_transfer_bytes": 1513143,
+    "method": "old_sa",
+    "migration_successes": 3,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "2",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "2",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1055964"
+        }
+      }
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 4,
+    "split": "dev",
+    "state_transfer_bytes": 8232,
+    "steps": 11
+  },
+  {
+    "action_counts": {
+      "0": 1,
+      "3": 2,
+      "4": 4
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_00",
+    "elapsed_seconds": 43.447239688,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 472255,
+    "method": "event_abstention_sa",
+    "migration_successes": 4,
+    "model_transfer_bytes": 154423432,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "2",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_0": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "2",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1055964"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "2",
+            "4",
+            "5",
+            "6"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1055964"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 11524,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 1,
+      "3": 2,
+      "4": 4
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_00",
+    "elapsed_seconds": 43.447239688,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 472255,
+    "method": "event_abstention_sa",
+    "migration_successes": 4,
+    "model_transfer_bytes": 154423432,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "2",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_0": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "2",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1055964"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "2",
+            "4",
+            "5"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1055964"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 11524,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 4,
+      "2": 3
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_00",
+    "elapsed_seconds": 67.42083360800001,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 1889019,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 154423432,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "2",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 0,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 4,
+      "2": 3
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_00",
+    "elapsed_seconds": 67.42083360800001,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 1889019,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 154423432,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "2",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 0,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "4": 5
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_00",
+    "elapsed_seconds": 45.823946864,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 472255,
+    "method": "mappo",
+    "migration_successes": 5,
+    "model_transfer_bytes": 318488808,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "2",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_0": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "2",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1055964"
+        },
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "3"
+          ],
+          "package_bytes": 2195,
+          "workflow_id": "j_1055964"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "2",
+            "4",
+            "5",
+            "6"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1055964"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 13170,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "4": 4
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "dev_00",
+    "elapsed_seconds": 192.705368132,
+    "handoff_failures": 3,
+    "input_transfer_bytes": 1513143,
+    "method": "mappo",
+    "migration_successes": 4,
+    "model_transfer_bytes": 318488808,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "2",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "3"
+          ],
+          "package_bytes": 2195,
+          "workflow_id": "j_1055964"
+        },
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "2",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1055964"
+        }
+      }
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 9878,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 6,
+      "4": 1
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_00",
+    "elapsed_seconds": 43.373933448,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 472255,
+    "method": "two_step",
+    "migration_successes": 1,
+    "model_transfer_bytes": 154423432,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "2",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "2",
+            "4",
+            "5",
+            "6"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1055964"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 139,
+    "profile": "decision_step_original",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 2744,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 6,
+      "4": 1
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "dev_00",
+    "elapsed_seconds": 43.373937831999996,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 472255,
+    "method": "two_step",
+    "migration_successes": 1,
+    "model_transfer_bytes": 154423432,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "3",
+        "2",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "3",
+            "2",
+            "4",
+            "5"
+          ],
+          "package_bytes": 3292,
+          "workflow_id": "j_1055964"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 139,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "dev",
+    "state_transfer_bytes": 3292,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "2": 1,
+      "3": 3,
+      "4": 1
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_02",
+    "elapsed_seconds": 73.98923524716467,
+    "handoff_failures": 2,
+    "input_transfer_bytes": 1137266,
+    "method": "old_sa",
+    "migration_successes": 1,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1101642"
+        }
+      }
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 2744,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "2": 1,
+      "3": 3,
+      "4": 3
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_02",
+    "elapsed_seconds": 77.98923524716467,
+    "handoff_failures": 2,
+    "input_transfer_bytes": 1137266,
+    "method": "old_sa",
+    "migration_successes": 1,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1101642"
+        }
+      }
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 2,
+    "split": "frozen_check",
+    "state_transfer_bytes": 2744,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 1,
+      "2": 1,
+      "3": 2,
+      "4": 1
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "frozen_check_02",
+    "elapsed_seconds": 44.27181654158233,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 848131,
+    "method": "event_abstention_sa",
+    "migration_successes": 1,
+    "model_transfer_bytes": 1024667776,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_2": {
+          "completed_node_ids": [
+            "1",
+            "2",
+            "3"
+          ],
+          "package_bytes": 2744,
+          "workflow_id": "j_1101642"
+        }
+      }
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 2744,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "2": 1,
+      "3": 2
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_02",
+    "elapsed_seconds": 60.00986127358233,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 761390,
+    "method": "event_abstention_sa",
+    "migration_successes": 0,
+    "model_transfer_bytes": 2194117040,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "2": 3
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "frozen_check_02",
+    "elapsed_seconds": 47.166318128,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 1137266,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "2": 3
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "frozen_check_02",
+    "elapsed_seconds": 47.166318128,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 1137266,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "4": 2
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_02",
+    "elapsed_seconds": 89.59605852158234,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 472255,
+    "method": "mappo",
+    "migration_successes": 2,
+    "model_transfer_bytes": 3218784816,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1",
+            "2"
+          ],
+          "package_bytes": 2195,
+          "workflow_id": "j_1101642"
+        }
+      }
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 4390,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "4": 3
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_02",
+    "elapsed_seconds": 99.30452287516468,
+    "handoff_failures": 2,
+    "input_transfer_bytes": 761390,
+    "method": "mappo",
+    "migration_successes": 1,
+    "model_transfer_bytes": 3218784816,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {
+        "rsu_1": {
+          "completed_node_ids": [
+            "1"
+          ],
+          "package_bytes": 2195,
+          "workflow_id": "j_1101642"
+        }
+      }
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 2195,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "2": 2
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "frozen_check_02",
+    "elapsed_seconds": 43.48213246158234,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 1137266,
+    "method": "two_step",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 111,
+    "profile": "decision_step_original",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "2": 3
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": false,
+    "design_id": "frozen_check_02",
+    "elapsed_seconds": 47.166318128,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 1137266,
+    "method": "two_step",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": true,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 111,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 5
+  },
+  {
+    "action_counts": {
+      "2": 2,
+      "3": 2,
+      "4": 5
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_04",
+    "elapsed_seconds": 186.2885259511375,
+    "handoff_failures": 3,
+    "input_transfer_bytes": 1985397,
+    "method": "old_sa",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 2,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 9
+  },
+  {
+    "action_counts": {
+      "2": 1,
+      "3": 2,
+      "4": 11
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": false,
+    "deadline_missed": true,
+    "design_id": "frozen_check_04",
+    "elapsed_seconds": 139.0337157039728,
+    "handoff_failures": 2,
+    "input_transfer_bytes": 1233645,
+    "method": "old_sa",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 8,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 14
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "3": 2,
+      "4": 2
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_04",
+    "elapsed_seconds": 189.35671569830214,
+    "handoff_failures": 3,
+    "input_transfer_bytes": 1137266,
+    "method": "event_abstention_sa",
+    "migration_successes": 0,
+    "model_transfer_bytes": 318488808,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "3": 1,
+      "4": 3
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_04",
+    "elapsed_seconds": 151.976203461494,
+    "handoff_failures": 3,
+    "input_transfer_bytes": 1137266,
+    "method": "event_abstention_sa",
+    "migration_successes": 0,
+    "model_transfer_bytes": 318488808,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "2": 4
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_04",
+    "elapsed_seconds": 100.92101799358234,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 1985397,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 154423432,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "2": 4
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_04",
+    "elapsed_seconds": 100.92101799358234,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 1985397,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 154423432,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 4,
+      "4": 3
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_04",
+    "elapsed_seconds": 189.35671569830214,
+    "handoff_failures": 3,
+    "input_transfer_bytes": 1137266,
+    "method": "mappo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 318488808,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 4,
+      "4": 3
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_04",
+    "elapsed_seconds": 151.976203461494,
+    "handoff_failures": 3,
+    "input_transfer_bytes": 1137266,
+    "method": "mappo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 318488808,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "2": 4
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_04",
+    "elapsed_seconds": 69.59633612,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 1609521,
+    "method": "two_step",
+    "migration_successes": 0,
+    "model_transfer_bytes": 154423432,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 141,
+    "profile": "decision_step_original",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "2": 4
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_04",
+    "elapsed_seconds": 70.29406752,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 1696262,
+    "method": "two_step",
+    "migration_successes": 0,
+    "model_transfer_bytes": 164065376,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_a",
+          "adapter:helmet_shared"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 142,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 7
+  },
+  {
+    "action_counts": {
+      "2": 1,
+      "3": 4,
+      "4": 1
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_06",
+    "elapsed_seconds": 54.824333830387,
+    "handoff_failures": 2,
+    "input_transfer_bytes": 1320386,
+    "method": "old_sa",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 6
+  },
+  {
+    "action_counts": {
+      "2": 2,
+      "3": 4
+    },
+    "checkpoint_sha256": "6fca5f2dac35671b445fa1439e71585d3625a293dc7a5d6d414cb25a9f247feb",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_06",
+    "elapsed_seconds": 58.50851949680466,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 1320386,
+    "method": "old_sa",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "5f9420bb81dbc4280c45a54554320c148eb602244a93bd3876aa974dd2672e9c",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 6
+  },
+  {
+    "action_counts": {
+      "0": 1,
+      "2": 1,
+      "3": 4
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_06",
+    "elapsed_seconds": 63.611897038387,
+    "handoff_failures": 2,
+    "input_transfer_bytes": 1320386,
+    "method": "event_abstention_sa",
+    "migration_successes": 0,
+    "model_transfer_bytes": 1024667776,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr",
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 6
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "3": 4
+    },
+    "checkpoint_sha256": "9fdd94cd72227c171b23a686163e47631e46158a0d8dfe791c1dabf2472301fe",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_06",
+    "elapsed_seconds": 50.910534027164665,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 472255,
+    "method": "event_abstention_sa",
+    "migration_successes": 0,
+    "model_transfer_bytes": 2194117040,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct",
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr",
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "2eef2119b1c326e029933e5b0f90a850ab6c25229cdc7bc2897ad3d9f0bce120",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 6
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "2": 4
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_06",
+    "elapsed_seconds": 55.193499128,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 1792641,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 6
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "2": 4
+    },
+    "checkpoint_sha256": "f93ad95a22a066995bf0deea6f12efe04f6ced2a5f62b021ce082561a531547d",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_06",
+    "elapsed_seconds": 55.193499128,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 1792641,
+    "method": "ppo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "9a4e068a1588b74aedeab890b712c3aa98c1b00a6d761d00b5d00503cfda58de",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 6
+  },
+  {
+    "action_counts": {
+      "0": 6
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_06",
+    "elapsed_seconds": 55.588118998386996,
+    "handoff_failures": 2,
+    "input_transfer_bytes": 848131,
+    "method": "mappo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 1024667776,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr",
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "decision_step_original",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 6
+  },
+  {
+    "action_counts": {
+      "0": 6
+    },
+    "checkpoint_sha256": "5ef457a8403f2b7c83ce299ba9ddc323f9aa949f81ad42e85a2f7ea093d259ce",
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_06",
+    "elapsed_seconds": 50.910534027164665,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 472255,
+    "method": "mappo",
+    "migration_successes": 0,
+    "model_transfer_bytes": 2194117040,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct",
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr",
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": "fb393b854a88c5ce422f06cba7831576b13d3aa39915ec1118017dbf0d48da5b",
+    "preview_model_steps": 0,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": 7,
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 6
+  },
+  {
+    "action_counts": {
+      "0": 3,
+      "2": 3
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_06",
+    "elapsed_seconds": 51.50931346158234,
+    "handoff_failures": 1,
+    "input_transfer_bytes": 1792641,
+    "method": "two_step",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 141,
+    "profile": "decision_step_original",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 6
+  },
+  {
+    "action_counts": {
+      "0": 2,
+      "2": 4
+    },
+    "checkpoint_sha256": null,
+    "completed": true,
+    "deadline_missed": true,
+    "design_id": "frozen_check_06",
+    "elapsed_seconds": 55.193499128,
+    "handoff_failures": 0,
+    "input_transfer_bytes": 1792641,
+    "method": "two_step",
+    "migration_successes": 0,
+    "model_transfer_bytes": 0,
+    "native_state": {
+      "cache_residents": {
+        "rsu_0": [
+          "base:family_b",
+          "adapter:helmet_distinct"
+        ],
+        "rsu_1": [
+          "base:family_a",
+          "adapter:alpr"
+        ],
+        "rsu_2": [
+          "base:family_a",
+          "adapter:alpr"
+        ]
+      },
+      "completed_node_ids": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "prepared_state": {}
+    },
+    "on_time": false,
+    "parameter_sha256_before_after": null,
+    "preview_model_steps": 139,
+    "profile": "synthetic_elapsed_5s_atomic_v1",
+    "seed": "rule",
+    "service_failures": 0,
+    "split": "frozen_check",
+    "state_transfer_bytes": 0,
+    "steps": 6
+  }
+]

@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-10：移动 modeled-clock 合成时间敏感性完成；不改科学 verdict
+
+- 事前计划 commit `428cdc4`，固定 8 个已消费开发实例、seed7 的旧 SA/条件弃权 SA/PPO/MAPPO selected checkpoint 与额外权限 two-step；旧默认 vs opt-in `synthetic_elapsed_5s_atomic_v1` 共 80 episode、528 真实 step、2,094 two-step 模型预览 step，0 训练/选模/正式 split。旧 profile 与原 selected ledger 24 episode/144 step 全字段 0 mismatch；全部真实动作 mask 合法、逐步成本/clock 与 episode bytes 守恒。
+- 旧 profile 的 4 个纯 2s 失败后 RSU 切换中 3 个未跨 modeled 5s 边界；新 profile 没有未跨边界切换。旧 SA `dev_00` 在 7.826→9.826s 失败即换 RSU 并按期完成，新 profile 原位等待后逾期；但另两个初始缺 bundle 实例新 profile 反而按期，方向混合。条件弃权 SA on-time 6→2/8，PPO 4→5/8，MAPPO 5→3/8，仅为固定策略合成敏感性，不能排新 baseline 名次。
+- 新 profile 的 5s slot、跨边界原子起点 RSU 结算和序列末尾驻留均无真实接触时段支持；273 次新决策有 22 次开始于合成序列完整时长之后。two-step 原第二步 clone 仍能预览实际未来 RSU，权限高于 learned，单列且不参与公平方法比较。报告 `cscwd_mobility_elapsed_sensitivity_20261010.md`；原 `MIXED_STOPPED`、paper-ready=`Unverifiable`，不自动重训。
+
 ## 2026-10-10：fast auxiliary 冻结策略梯度探针完成，学习根因仍未证实
 
 - 事前计划 commit `900c79e`；旧 v4/条件弃权 SA 各 5 seed×selected/update96，每 checkpoint 一批 60 个 train transition，共 20 槽/1,200 env.step、13 个唯一网络参数状态、0 训练/参数更新/正式 split。实际执行动作新旧 logprob 最大差 `5.07e-7`，参数前后 SHA 全同；固定公开 reset 状态的 action2 fast-logit 偏导与有限差分 20/20 同向。

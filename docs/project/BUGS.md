@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-10：决策步移动与 modeled elapsed 分离是开放物理合同风险
+
+- `OBSERVED / not implementation bug`：旧合同每决策推进 RSU，4 个纯 2s 失败后换 RSU 中有 3 个未跨对应 modeled 5s 边界；opt-in 合成 elapsed 语义使这类切换为 0。固定策略后果正负混合，不能以一次旧 SA `dev_00` 反例宣称总体收益失效或新语义是真实物理。
+- `OPEN / source and actor contract`：冻结 `rsu_sequence` 没有逐决策真实接触起止时刻；新 profile 的每元素 5s、跨界原子旧 RSU 服务、起点 current-RSU 准备预算、轨迹末端钳位都是显式敏感性假设。新 273 决策中 22 次在合成序列时长之后；未来需实测时段、跨边界/target contact 语义和共同重新匹配训练，不得直接替换 live 环境。
+- `CAPABILITY GAP`：two-step 第二步 clone 仍消费实际未来 RSU 路由位置，只把 contact 预算换成预测；高于 learned 公共观测权限，不能用本轮 two-step 行做公平排名。见 `cscwd_mobility_elapsed_sensitivity_20261010.md`。
+
 ## 2026-10-10：fast target 固定零的局部梯度压力已确认，训练因果未证实
 
 - `OBSERVED / fixed-policy probe`：20 槽 1,200 个新 train transition 的 fast target 全 0，fast CE 的 fast_actor 梯度非零，action2 概率对 fast_logit[1] 的局部偏导为正；候选 fast CE/PPO encoder 负点积 selected/fixed96 各仅 3/5 seed。旧/新 checkpoint 文件虽有 20 个，网络参数只有 13 个唯一 SHA。

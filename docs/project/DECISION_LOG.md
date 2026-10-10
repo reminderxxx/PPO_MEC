@@ -1,5 +1,10 @@
 ﻿# Decision Log
 
+## 2026-10-10：合成 elapsed 移动敏感性不替换 live 决策步合同
+
+- 决定：保留旧 `decision_step_index` 与全部历史原件；新每序列元素 5s、阻塞原子起点 RSU 的 `synthetic_elapsed_5s_atomic_v1` 仅为独立 opt-in 开发诊断，不并入训练/正式评价默认。它识别 2s 失败可在旧合同未跨 modeled 5s 边界时换 RSU，但方向跨固定方法/实例混合，且没有原始逐决策接触时段证明新语义更真实。
+- 后续若建立物理时间合同，先冻结跨界服务、目标接触、末端驻留与共同公共时间字段，再在同一新环境重新匹配 learned 训练；原 two-step 第二步实际未来路由预览权限需单独处理。见 `cscwd_mobility_elapsed_sensitivity_20261010.md`。
+
 ## 2026-10-10：共同 prepared-state prefix 观测作为显式 v4 接口修复
 
 - 决定：只公开当前与因果预测目标 RSU 上已提交状态的存在、与已完成 DAG 前缀的有效性及缺失比例；未知目标显式 mask。四 learned 方法同权消费，旧 profile/旧 checkpoint 不自动迁移。增加的输入投影参数单列；不改 reward、transition、mask、action guard 或核心 actor/critic。该项属于共同接口纠错，收益由 B 独立匹配训练判定，不作 SA 独有贡献。见 `cscwd_prepared_state_prefix_interface_20261010.md`。

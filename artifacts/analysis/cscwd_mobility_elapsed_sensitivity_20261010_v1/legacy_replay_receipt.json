@@ -1,0 +1,37 @@
+{
+  "matched_episodes": 24,
+  "matched_steps": 144,
+  "methods": [
+    {
+      "matched_steps": 37,
+      "method": "old_sa",
+      "mismatches": [],
+      "source_ledger": "cscwd_causal_prepared_state_visibility_matched_20261010_v1/new_selected_behavior_ledger.csv",
+      "source_ledger_sha256": "26866cf0d0b28a40850dd605008242c582ad8bd78e71661d681e2493f892c862"
+    },
+    {
+      "matched_steps": 35,
+      "method": "ppo",
+      "mismatches": [],
+      "source_ledger": "cscwd_causal_prepared_state_visibility_matched_20261010_v1/new_selected_behavior_ledger.csv",
+      "source_ledger_sha256": "26866cf0d0b28a40850dd605008242c582ad8bd78e71661d681e2493f892c862"
+    },
+    {
+      "matched_steps": 37,
+      "method": "mappo",
+      "mismatches": [],
+      "source_ledger": "cscwd_causal_prepared_state_visibility_matched_20261010_v1/new_selected_behavior_ledger.csv",
+      "source_ledger_sha256": "26866cf0d0b28a40850dd605008242c582ad8bd78e71661d681e2493f892c862"
+    },
+    {
+      "matched_steps": 35,
+      "method": "event_abstention_sa",
+      "mismatches": [],
+      "source_ledger": "cscwd_event_aux_abstention_ab_20261010_v1/candidate_selected_behavior_ledger.csv",
+      "source_ledger_sha256": "818aa5802e18dccf7b64a293f6bf3cd5abdfec4fa6b11f8e359194f367b9c9d6"
+    }
+  ],
+  "schema_version": "cscwd_mobility_legacy_replay_receipt_v1",
+  "source_seed": 7,
+  "source_view": "selected"
+}

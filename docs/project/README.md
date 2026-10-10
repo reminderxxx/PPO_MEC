@@ -9,6 +9,8 @@
 
 ## Live 文档
 
+- `cscwd_mobility_elapsed_sensitivity_plan_20261010.md`、`cscwd_mobility_elapsed_sensitivity_20261010.md`：旧决策步时间合同与独立 opt-in 5s 合成 elapsed/原子动作敏感性，固定 checkpoint 80 episode、逐步成本、失败等待反例与真实物理/规则能力边界；非论文或公平新排名。
+
 - `cscwd_fast_aux_gradient_probe_plan_20261010.md`、`cscwd_fast_aux_gradient_probe_20261010.md`：事前冻结的 20 checkpoint/1,200 步 fast/slow/event CE 与执行动作 PPO 同状态梯度探针；历史训练冲突和科学晋级仍未验证。
 
 - `cscwd_abstention_cost_causal_audit_plan_20261010.md`、`cscwd_abstention_cost_causal_audit_20261010.md` 与 `cscwd_abstention_cost_causal_summary_20261010.json`：候选 `MIXED_STOPPED` 后的事前选择、11 起点/26 分支、模型字节守恒、PPO fallback 对称成本与训练日志 ready 字段缺陷；无新训练或论文结论。

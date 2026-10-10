@@ -1,0 +1,131 @@
+{
+  "actual_environment_steps": 528,
+  "all_step_calls_excluding_local_tests": 2622,
+  "decision_model_preview_steps": 2094,
+  "episodes": 80,
+  "legacy_replay_matched_episodes": 24,
+  "legacy_replay_matched_steps": 144,
+  "legacy_replay_mismatches": 0,
+  "meaning": "synthetic_fixed_policy_development_sensitivity_not_fair_method_ranking",
+  "methods": {
+    "event_abstention_sa": {
+      "decision_step_original": {
+        "completed": 8,
+        "elapsed_mean_seconds_all_episodes": 65.17474639184843,
+        "episodes": 8,
+        "model_transfer_bytes_total": 2724880944,
+        "on_time": 6,
+        "preview_steps": 0,
+        "service_failures": 0
+      },
+      "synthetic_elapsed_5s_atomic_v1": {
+        "completed": 8,
+        "elapsed_mean_seconds_all_episodes": 73.47398441988321,
+        "episodes": 8,
+        "model_transfer_bytes_total": 5198919016,
+        "on_time": 2,
+        "preview_steps": 0,
+        "service_failures": 0
+      }
+    },
+    "mappo": {
+      "decision_step_original": {
+        "completed": 8,
+        "elapsed_mean_seconds_all_episodes": 66.3182122036267,
+        "episodes": 8,
+        "model_transfer_bytes_total": 5430478000,
+        "on_time": 5,
+        "preview_steps": 0,
+        "service_failures": 2
+      },
+      "synthetic_elapsed_5s_atomic_v1": {
+        "completed": 8,
+        "elapsed_mean_seconds_all_episodes": 85.67627115793358,
+        "episodes": 8,
+        "model_transfer_bytes_total": 6580643376,
+        "on_time": 3,
+        "preview_steps": 0,
+        "service_failures": 5
+      }
+    },
+    "old_sa": {
+      "decision_step_original": {
+        "completed": 8,
+        "elapsed_mean_seconds_all_episodes": 81.84580888946134,
+        "episodes": 8,
+        "model_transfer_bytes_total": 0,
+        "on_time": 2,
+        "preview_steps": 0,
+        "service_failures": 3
+      },
+      "synthetic_elapsed_5s_atomic_v1": {
+        "completed": 7,
+        "elapsed_mean_seconds_all_episodes": 85.84212956894844,
+        "episodes": 8,
+        "model_transfer_bytes_total": 0,
+        "on_time": 3,
+        "preview_steps": 0,
+        "service_failures": 19
+      }
+    },
+    "ppo": {
+      "decision_step_original": {
+        "completed": 8,
+        "elapsed_mean_seconds_all_episodes": 63.30328693391953,
+        "episodes": 8,
+        "model_transfer_bytes_total": 501838072,
+        "on_time": 4,
+        "preview_steps": 0,
+        "service_failures": 0
+      },
+      "synthetic_elapsed_5s_atomic_v1": {
+        "completed": 8,
+        "elapsed_mean_seconds_all_episodes": 61.667043497197795,
+        "episodes": 8,
+        "model_transfer_bytes_total": 328130752,
+        "on_time": 5,
+        "preview_steps": 0,
+        "service_failures": 0
+      }
+    },
+    "two_step": {
+      "decision_step_original": {
+        "completed": 8,
+        "elapsed_mean_seconds_all_episodes": 43.98515492973834,
+        "episodes": 8,
+        "model_transfer_bytes_total": 820326880,
+        "on_time": 6,
+        "preview_steps": 1051,
+        "service_failures": 0
+      },
+      "synthetic_elapsed_5s_atomic_v1": {
+        "completed": 8,
+        "elapsed_mean_seconds_all_episodes": 45.012675062999996,
+        "episodes": 8,
+        "model_transfer_bytes_total": 665903448,
+        "on_time": 6,
+        "preview_steps": 1043,
+        "service_failures": 0
+      }
+    }
+  },
+  "schema_version": "cscwd_mobility_elapsed_sensitivity_summary_v1",
+  "time_events": {
+    "decision_step_original": {
+      "actions_crossing_two_or_more_5s_slots": 122,
+      "actual_steps": 255,
+      "decisions_starting_after_full_synthetic_sequence_duration": 11,
+      "failed_2s_rsu_change_without_modeled_5s_boundary": 3,
+      "failed_2s_rsu_changes": 4,
+      "failed_2s_steps": 4
+    },
+    "synthetic_elapsed_5s_atomic_v1": {
+      "actions_crossing_two_or_more_5s_slots": 122,
+      "actual_steps": 273,
+      "decisions_starting_after_full_synthetic_sequence_duration": 22,
+      "failed_2s_rsu_change_without_modeled_5s_boundary": 0,
+      "failed_2s_rsu_changes": 3,
+      "failed_2s_steps": 24
+    }
+  }
+}
