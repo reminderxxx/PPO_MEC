@@ -5,16 +5,18 @@
 
 ﻿# Progress
 
-## 2026-10-10：service-feasible event target 已 default-off 实现；等待 A 对称分支门禁
+## 2026-10-10：action0/2/4 对称分支门禁为 MIXED；target-only 训练停止
 
-- 后续条件授权允许先实现唯一 target-only 候选，但科学训练仍以 A 的 action0/2/4 有界后缀门禁明确 `PASS` 为前置；A 已提交
-  事前计划 `eefc4a2`，当前尚未交付 verdict/manifest/report hash。
+- A 按事前计划 `eefc4a2` 完整复用 24 条失败源并按冻结顺序加入 6 条 current-ready 正例；9 个完整环境状态、30 个
+  checkpoint-aware 分支状态执行 action0/2/4 共 90 个合法分支，463 env step/373 次冻结 raw-policy forward。
+- 一步语义通过：24/24 失败源上 action4 当前服务失败而 action0/2 成功；6/6 正例 action4 服务与 state commit 成功且候选
+  标签保持 1。但 22 个受影响分支中，action4 有 11 个 Pareto 非支配，3 个（2 个完整环境状态）终局服务排序严格优于 0/2。
+- 最清楚反例 `regression_00` seed17 step2：action4 首步失败但后缀按期、耗时 29.257s；action0/2 首步成功却逾期、耗时
+  68.670/74.725s。按预冻规则总体 `MIXED`，不是 PASS，条件 target-only 训练不得启动。
 - B 新增默认关闭开关；打开后只把 `current_complete_bundle_ready` 合取到 event hard/soft target。slow/fast target、auxiliary
   系数、网络、reward、critic、action、optimizer、数据和推理路径不变；checkpoint 显式区分 target 语义并拒绝跨语义加载。
-- 冻结 SA-only 5 seed×5,760 step、selected + fixed-96、最多 200 新评价的单变量协议和一次性 launcher；历史 v4 控制按 hash
-  复用。预检确认参数量均为 165,512、60 个 state keys 初始化逐张量相同，0 scientific step/0 新评价。
-- 当前配置仍为 `execution_authorized=false`；未训练、未创建候选 run、未读 formal/holdout。A 若 FAIL/MIXED 则停止，若 PASS
-  仍须独立核验其对称正例、冻结策略后缀及完整性后才可单次启动。
+- B 独立核验 A 的 96 个分析文件、9 个快照及报告/manifest hash 一致；协议更新为
+  `stopped_after_symmetric_branch_mixed`、`execution_authorized=false`。0 候选训练、0 新评价、0 formal/holdout。
 
 ## 2026-10-10：事件链定位到合法策略次优与 auxiliary 标签语义缺口；训练未授权
 
@@ -33,8 +35,8 @@
 - SA frozen selected 为 completion `39→40/40`、on-time `5→9/40`、failure episode `8→13/40`；fixed-96 为
   `39→40/40`、`11→11/40`、`9→9/40`。重算与传输在两视角下降，但时效改善未双视角兑现，且 selected 服务失败
   episode 恶化；按原门禁拒绝性能候选。
-- v4 继续作为共享 observation contract 纠错保留，不作 SA 创新/领先证据。下一步等待 A 的独立只读失败链交接；不自动
-  删除 auxiliary、不重训、不改 reward/guard/动作能力。报告与 A 线只读说明分别为
+- v4 继续作为共享 observation contract 纠错保留，不作 SA 创新/领先证据。后续 A 独立失败链及 action-branch 门禁已经完成并
+  以 MIXED 停止 target-only 训练；不自动删除 auxiliary、不重训、不改 reward/guard/动作能力。报告与 A 线只读说明分别为
   `cscwd_prepared_state_visibility_matched_{results,claim_change}_20261010.md`。
 
 ## 2026-10-10：prepared-state 公共观测 v4 最小修复通过接口验收

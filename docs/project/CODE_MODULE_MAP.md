@@ -18,7 +18,8 @@ fail-closed，并将 create-only analysis 与只读 scientific root 分离。`sc
 `src/agents/sa_ghmappo_core.py` 的 opt-in `mechanism_aux_current_service_feasibility_gate_enabled` 只收紧 event auxiliary hard/soft
 label，并把 target 语义写入 checkpoint；`scripts/run_calibrated_workflow_service_feasible_event_target_ab.py` 负责 fail-closed 预检、
 历史 v4 hash 复用和候选 SA-only 训练，`scripts/analyze_calibrated_workflow_service_feasible_event_target_ab.py` 负责双视图显式配对、
-逐 seed 服务门禁和行为指标，`scripts/launch_calibrated_workflow_service_feasible_event_target_ab.py` 只允许一次无重试持久启动。
+逐 seed 服务门禁和行为指标，`scripts/launch_calibrated_workflow_service_feasible_event_target_ab.py` 原设计仅允许一次无重试持久
+启动；当前协议记录 action-branch gate=`MIXED` 并在执行入口 fail-closed，因此不得启动。
 
 `scripts/diagnose_cscwd_sa_long_budget_cost.py` 只读 B 长预算原件，用 A 的相同因果环境代码重放已记录动作并分解 node/fallback/failure/load/三类网络传输/restore/recompute；同实例 seed 配对但不将首次分叉之后的不同状态当作单动作因果。`scripts/audit_cscwd_long_budget_state_alias.py` 只读上述重放和原 ledger，核验未公开的 prepared-state 有效性造成的同公开状态别名；两者均不训练、不修改 B 或论文。
 

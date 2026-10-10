@@ -1,6 +1,15 @@
 ﻿# Decision Log
 
-## 2026-10-10：条件实现 service-feasible target，门禁 PASS 前 fail-closed
+## 2026-10-10：MIXED 反事实门禁否决统一 current-ready target 收紧训练
+
+- 对称 action0/2/4 证明局部当前服务语义成立并保留 6/6 正例，但冻结策略后缀出现 action4 的多步严格更优服务反例；因此
+  “current missing 时 event hard/soft 一律置零”不能作为当前证据支持的统一训练规则。
+- 按事前规则把门禁判为 `MIXED`，不是用局部语义 PASS 覆盖多步反例。决定不启动已准备的五 seed A/B，不改权重、样本、
+  门槛或寻找第二候选；default-off 实现仅作为可审计历史保留。
+- 当前可确认的是辅助标签存在局部语义缺口，但尚不能确定一个不损害未来准备收益的可干预学习环节。论文线继续记录负结果与
+  action4 的目标缓存副作用，不形成算法改进或稳定领先主张。
+
+## 2026-10-10：条件实现 service-feasible target，门禁 PASS 前 fail-closed（历史条件）
 
 - 新条件授权只扩大到 default-off 实现与协议冻结；科学训练仍取决于 A 的对称 action0/2/4 冻结策略后缀门禁，不以即时
   action4 失败或单步 reward 决定。

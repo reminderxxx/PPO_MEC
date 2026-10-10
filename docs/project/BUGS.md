@@ -5,23 +5,23 @@
 
 ﻿# Bugs And Risks
 
-## 2026-10-10：target-only 实现已就绪，科学执行仍受对称分支门禁阻断
+## 2026-10-10：对称分支发现 action4 多步反例；统一 target 收紧被 MIXED 门禁阻断
 
 - `IMPLEMENTED DEFAULT-OFF`：event hard/soft target 可选合取当前完整 bundle readiness；旧行为默认不变，checkpoint target
   语义显式且跨语义 load fail-closed。局部梯度验收只改变 event head 的方向，slow/fast 梯度不变。
-- `OPEN CAUSAL GATE`：A 的 action0/2/4 分支门禁仍在执行，尚无 PASS/FAIL/MIXED 与不可变 artifact hash。不能从 24 条失败
-  探测或代码可运行性推断 target 修正有益；若冻结策略后缀显示 action4 存在明确更优服务结局/代价反例，必须停止训练。
-- `FAIL-CLOSED`：协议保持 `execution_authorized=false`，runner 在缺少 PASS 和 manifest/report hash 时拒绝科学执行。即使未来
-  A/B PASS，也仅是已暴露 development 的机制证据，不是 formal/holdout、SA 稳定领先或算法 novelty。
+- `MIXED CAUSAL GATE`：一步语义与正例不变性通过，但 22 个受影响分支中 action4 有 11 个 Pareto 非支配、3 个严格更优
+  终局服务排序。失败 action4 的目标缓存副作用可改变后续状态，不能把“当前失败”直接推广为“多步应给零标签”。
+- `FAIL-CLOSED`：协议保持 `execution_authorized=false` 并记录 `stopped_after_symmetric_branch_mixed`；不得启动已准备的五 seed
+  A/B、改门槛或从本批已消费 development 反例调新标签。formal/holdout、SA 稳定领先和算法 novelty 仍不可验证。
 
 ## 2026-10-10：action4 合法副作用与 event target 当前服务条件仍未做反事实闭环
 
 - `NO IMPLEMENTATION BUG`：记录动作重放与环境一致；失败 action4 可成功 stage 目标 model，却因当前 bundle 缺失无法完成
   当前节点或 commit state。不能把它错误写成迁移成功，也不能简单 mask/删除 action4。
 - `SUPPORTED MECHANISM CANDIDATE`：实际生效 event auxiliary target 不含 current full-bundle readiness；24 条有界失败探测
-  22 条给 target=1。但只有 7 个不同公开状态；后续分支门禁尚未交付结果，不能宣称因果或直接训练。
-- `REQUIRED`：先完成 action0/2/4 对称分支和正例不变性；若立即失败的 action4 在预声明 suffix 代价上仍占优，则否定 hard
-  target 置 0。门禁前不得自动进入 auxiliary-target A/B。
+  22 条给 target=1。但只有 7 个不同公开状态；后续分支门禁已交付 MIXED，不能宣称因果或直接训练。
+- `RESOLVED MIXED`：action0/2/4 对称分支和正例不变性已完成；立即失败的 action4 在预声明 suffix 中存在严格更优服务结局，
+  因而否定把全部 current-missing hard/soft target 统一置零作为本轮可训练候选。
 
 ## 2026-10-10：v4 修复状态别名，但未形成稳定服务收益
 

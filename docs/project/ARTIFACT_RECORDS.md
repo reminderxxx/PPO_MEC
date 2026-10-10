@@ -5,15 +5,20 @@
 
 # Artifact Records
 
-## 2026-10-10 service-feasible event-target 条件执行预检（无科学 run）
+## 2026-10-10 service-feasible action-branch gate（MIXED，无候选训练）
 
 - 协议：`configs/experiment/calibrated_workflow_service_feasible_event_target_ab_v1.json`；当前
-  `execution_authorized=false`、`symmetric_branch_gate.status=pending_a_handoff`，未绑定 A manifest/report hash。
-- runner/analyzer/launcher 已冻结本地实现；预检只读复核历史 v4 scientific control 的 119-file integrity、400 selected、400
-  fixed-96、40 rule rows，以及 474 个因果前缀扰动点。0 training、0 evaluation、0 formal/holdout。
+  `execution_authorized=false`、`authorization_state=stopped_after_symmetric_branch_mixed`。
+- A gate commit=`c8aecf19b39c83debf57d20f44a90f6ebb650e68`、tree=`e9b3e51b`；analysis manifest=
+  `2505b8deb8e243b62c4589117cd55fbd03434f462c163e5670fd5fd1b2213bb2`、snapshot manifest=
+  `3116731c1beed972a07a43d2f3227f1e8773a36c1bdf67067a460ccdba5a507f`、gate report=
+  `eb72b68b7fac4d9a7838fcdb701c142a039d34b8e6c50465f31a9272a94316eb`、人类报告=
+  `26eb003e52dd963ee67156012bc1364e3b9433eccefe09499d5369ec39409a17`。
+- B 独立复核 96 个分析文件和 9 个状态快照 hash；30 source rows、90 legal branches、463 env steps、373 policy forwards。
+  gate=`MIXED`：22 个受影响分支中 action4 11 个 Pareto 非支配、3 个严格更优终局服务排序（2 个完整环境状态）。
 - target flag 默认关闭；候选与旧版均 165,512 参数、60 state keys，固定 seed 初始化张量完全相同。无候选 checkpoint、run
-  artifact 或结果可登记；implementation commit=`d17c374911b4fdcad1c37b11b4087be0f7fa0e22`、tree=`31e9d438`；A 门禁
-  PASS 前不得创建 scientific run root。
+  artifact 或结果可登记；implementation commit=`d17c374911b4fdcad1c37b11b4087be0f7fa0e22`、tree=`31e9d438`。0 候选
+  training/evaluation、0 formal/holdout；不得创建 scientific run root。
 
 ## 2026-10-10 prepared-state event-chain read-only diagnosis
 

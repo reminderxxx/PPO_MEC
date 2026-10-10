@@ -49,12 +49,12 @@ def _seeds(on_time: float = 0.1, failure: float = -0.1) -> list[dict]:
     ]
 
 
-def test_pending_preflight_is_target_only_and_does_no_scientific_work() -> None:
+def test_mixed_gate_preflight_is_target_only_and_does_no_scientific_work() -> None:
     receipt = preflight(ROOT / DEFAULT_PROTOCOL, DEFAULT_CONTROL_ROOT)
     assert receipt["status"] == "preflight_passed"
     assert receipt["execution_authorized"] is False
-    assert receipt["authorization_state"] == "awaiting_symmetric_action_branch_gate"
-    assert receipt["branch_gate_status"] == "pending_a_handoff"
+    assert receipt["authorization_state"] == "stopped_after_symmetric_branch_mixed"
+    assert receipt["branch_gate_status"] == "MIXED"
     assert receipt["scientific_steps"] == receipt["new_evaluation_episodes"] == 0
     assert receipt["control_rows"] == {"selected": 400, "update96": 400, "rules": 40}
     assert receipt["network_identity"] == {
@@ -65,7 +65,7 @@ def test_pending_preflight_is_target_only_and_does_no_scientific_work() -> None:
     }
 
 
-def test_pending_protocol_refuses_scientific_execution(tmp_path: Path) -> None:
+def test_mixed_gate_protocol_refuses_scientific_execution(tmp_path: Path) -> None:
     with pytest.raises(RuntimeError, match="not authorized by a PASS branch gate"):
         execute(ROOT / DEFAULT_PROTOCOL, DEFAULT_CONTROL_ROOT, tmp_path / "run", ["test"])
     assert not (tmp_path / "run").exists()

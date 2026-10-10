@@ -6,13 +6,14 @@
   `summarize_cscwd_prepared_state_event_chain.py`、`stratify_cscwd_prepared_state_event_chain.py`：只读记录动作重放、prepared
   chain 修正口径、实际 auxiliary label 探测和分层；不训练、不执行 action branch。
 - `docs/project/cscwd_prepared_state_event_chain_diagnosis_20261010.md`：A 侧正式只读诊断；
-  `cscwd_service_feasible_aux_target_candidate_20261010.md`：B 冻结的唯一 target-only 候选、条件授权和未满足门禁；
+  `cscwd_service_feasible_aux_target_candidate_20261010.md`：B 冻结的唯一 target-only 候选与 MIXED 停止裁决；
   `cscwd_service_feasible_event_target_claim_change_20261010.md`：供 A 论文线只读消费的主张边界。
 - `configs/experiment/calibrated_workflow_service_feasible_event_target_ab_v1.json`：SA-only target 单变量、历史 control hash、预算、
   A 门禁身份和 fail-closed 授权状态；当前未授权训练。
 - `scripts/run_calibrated_workflow_service_feasible_event_target_ab.py`、
   `analyze_calibrated_workflow_service_feasible_event_target_ab.py`、
-  `launch_calibrated_workflow_service_feasible_event_target_ab.py`：预检/单次候选训练、双视图分析和一小时无重试监督。
+  `launch_calibrated_workflow_service_feasible_event_target_ab.py`：预检/候选训练、双视图分析和一小时无重试监督；当前配置因
+  MIXED gate fail-closed，训练与 launcher 均不得执行。
 - `tests/test_calibrated_workflow_service_feasible_event_target{,_ab}.py`：target 字段/梯度/checkpoint 语义、授权拒绝、网络身份与
   PASS/MIXED/FAIL 判定回归。
 

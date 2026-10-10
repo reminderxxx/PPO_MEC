@@ -11,9 +11,9 @@
 
 - `cscwd_prepared_state_event_chain_diagnosis_20261010.md` 与
   `cscwd_service_feasible_aux_target_candidate_20261010.md`：v4 失败链重放、辅助标签实际生效证据和唯一 target-only 候选；
-  候选已 default-off 实现，反事实门禁未完成，训练未授权。
+  候选已 default-off 实现，但 action0/2/4 多步门禁为 MIXED，训练停止。
 - `cscwd_service_feasible_event_target_claim_change_20261010.md`：给 A 论文线的独立证据/禁行主张说明；当前只有预检和开发诊断，
-  没有候选性能 artifact。
+  没有候选性能 artifact，统一 target 收紧未获训练授权。
 
 - `cscwd_prepared_state_visibility_matched_results_20261010.md` 与
   `cscwd_prepared_state_visibility_matched_claim_change_20261010.md`：v4 匹配实验的双视角结果、预注册 gate 裁决和 A 论文线
@@ -28,7 +28,7 @@
 - `cscwd_causal_strong_baseline_protocol_20261009.md`：新版本前缀预测、物理接触分离、冻结开发预算、自动分析与贡献边界。
 - `cscwd_causal_budget_extension_protocol_20261009.md`：四 learned×五 seed 的统一 4× 预算延长、等比例选模、短预算身份复用与停止边界。
 - `cscwd_causal_budget_extension_{analysis,claim_change}_20261009.md`：完成后的配对诊断、服务 tradeoff、选模边界与 A 线只读主张变更。
-- `cscwd_prepared_state_visibility_matched_protocol_20261010.md`：共同 prepared-state prefix validity/freshness 的独立验收、匹配训练预算、selected/update-96 双视角与停止边界；当前等待 A 交接。
+- `cscwd_prepared_state_visibility_matched_protocol_20261010.md`：共同 prepared-state prefix validity/freshness 的独立验收、匹配训练预算、selected/update-96 双视角与停止边界；后续 action-branch 交接已按 MIXED 停止 target-only 训练。
 
 - `cscwd_2027_strong_baseline_wiring_20261009.md`：DT/Popularity 最小接线、能力矩阵、开发比较预算草案、验收与禁行边界。
 - `cscwd_2027_strong_baseline_prediction_permission_blocker_20261009.md`：36/36 实例实际未来 RSU 序列进入公共预测的预检阻断与恢复条件；没有科学 run。

@@ -2,10 +2,8 @@
 
 ## 状态
 
-`IMPLEMENTED_DEFAULT_OFF / execution_authorized=false / awaiting symmetric branch gate`。中央后续给出条件授权：B 可先实现并冻结
-target-only 协议；只有 A 的 action0/2/4 对称分支门禁明确 `PASS` 且 B 独立核验后，才能执行一次已冻结 SA-only A/B。
-截至当前，A 门禁仍在执行中，因此没有启动训练。本文件的旧 candidate-only 结论保留为历史阶段，不再表示“不得实现”，但仍
-表示“不得绕过门禁训练”。
+`REJECTED_BY_MIXED_ACTION_BRANCH_GATE / execution_authorized=false`。候选已 default-off 实现，但 A 的 action0/2/4 对称分支
+门禁明确为 `MIXED`，B 已独立核验其完整性和关键反例。因此条件 SA-only A/B 不得启动；实现只作可审计历史保留。
 
 ## 已确认的近端失败机制
 
@@ -50,10 +48,14 @@ optimizer、数据或预算；不得移除整个 auxiliary loss。该候选只�
    显示“立即失败的 action4”仍稳定具有更低预声明多步服务代价，则否定把 hard target 置 0 的候选。
 5. feature flag 关闭时 target 与 checkpoint 行为 byte-equivalent；打开时除 event hard/soft target 外的训练字段逐项相同。
 
-A 已在独立工作树预注册门禁计划（commit=`eefc4a2`）并开始生成状态映射；尚未交付 PASS/FAIL/MIXED、manifest 或报告 hash。
-因此训练保持未授权。
+A 按预注册 `eefc4a2` 完整执行 24 条失败源与 6 条排序正例：9 个完整环境状态、30 个 checkpoint-aware 状态、90 个合法
+action0/2/4 分支、463 env step、373 次冻结 raw-policy forward。一步语义和 6/6 正例不变性通过；但 22 个受影响分支中
+action4 有 11 个 Pareto 非支配，3 个（2 个完整环境状态）终局服务排序严格优于 action0/2，因此总体为 `MIXED`。
 
-## 门禁通过后的唯一 A/B 协议（已实现、条件未满足）
+决定性反例 `regression_00` seed17 step2 中，action4 首步失败但后缀按期完成、耗时 `29.257 s`；action0/2 首步成功却逾期，
+耗时 `68.670/74.725 s`。这否定“当前服务失败即可统一把 event hard/soft target 置零”的多步充分性，不证明旧标签最优。
+
+## 已冻结但被门禁阻断的 A/B 协议
 
 - 只训练 SA：seeds `[7,17,29,43,61]` × 5,760 steps=`28,800`，96 updates，候选 updates `[24,48,72,96]`。
 - 精确复用本轮 v4 原 SA 为 control，以及同 v4 PPO/MAPPO/DT/规则结果；不得重训其他方法。
@@ -67,6 +69,7 @@ A 已在独立工作树预注册门禁计划（commit=`eefc4a2`）并开始生�
 bundle readiness 合取到 event hard/soft target。checkpoint 显式记录 `mechanism_aux_event_target_semantics`，跨语义加载拒绝；
 网络结构、参数量与初始化张量不变，推理仍为 `raw_policy`。配置
 `configs/experiment/calibrated_workflow_service_feasible_event_target_ab_v1.json` 绑定 implementation commit=`d17c374`，当前保持
-`execution_authorized=false`。
+`execution_authorized=false` 与 `authorization_state=stopped_after_symmetric_branch_mixed`。不得用本批已消费 development
+反例调新 target、改权重或寻找第二候选。
 
-全部实例仍为已暴露 development；即使未来 A/B 通过，也不能直接形成 formal/holdout、稳定领先、novelty 或 paper-ready 主张。
+全部实例仍为已暴露 development；本轮没有候选训练、formal/holdout、稳定领先、novelty 或 paper-ready 证据。

@@ -5,9 +5,9 @@
 
 # PPO_MEC
 
-2026-10-10 的 SA service-feasible event auxiliary target 已完成 default-off 实现和 fail-closed 预检；只改变 event hard/soft
-监督标签，网络、奖励、动作权限和推理不变。当前仍等待独立 action0/2/4 对称分支门禁，`execution_authorized=false`，没有启动
-候选训练或评价。见[候选与条件授权](docs/project/cscwd_service_feasible_aux_target_candidate_20261010.md)及
+2026-10-10 的 SA service-feasible event auxiliary target 已完成 default-off 实现和 action0/2/4 对称分支门禁。门禁为
+`MIXED`：局部当前服务语义成立，但存在 action4 多步严格更优反例，因此 `execution_authorized=false`，候选训练未启动且本轮停止。
+见[候选与停止裁决](docs/project/cscwd_service_feasible_aux_target_candidate_20261010.md)及
 [A 论文线主张边界](docs/project/cscwd_service_feasible_event_target_claim_change_20261010.md)。
 
 2026-10-10 的 CSCWD prepared-state 公共观测修复见 [A 线接口交接](docs/project/cscwd_prepared_state_prefix_interface_20261010.md)：新 profile 显式启用，四 learned 方法共同消费；当前仅通过接口验收，尚无新训练或方法优势结论。

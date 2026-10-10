@@ -11,25 +11,28 @@
   target 保持，slow/fast target、网络、reward、critic、动作权限、推理与预算不变；checkpoint target 语义显式隔离。
 - 预检和局部测试只证明实现范围与 fail-closed 权限正确：固定 seed 下候选/旧版均为 165,512 参数、60 个 state keys 且初始
   张量相同；当前为 0 scientific training、0 new evaluation。
+- A 对 24 条冻结失败源和 6 条排序正例执行了 90 个 action0/2/4 分支与冻结策略后缀；一步可服务性和正例不变性成立，但
+  22 个受影响分支中 action4 有 11 个 Pareto 非支配，3 个终局服务排序严格优于 action0/2。门禁因此为 `MIXED`。
 
 ## 尚不能新增的主张
 
-- A 的 action0/2/4 对称分支仍在执行，尚无 PASS/FAIL/MIXED、manifest 或 report hash；因此不能写“标签修正已验证”、
-  “辅助监督是根因”或“action4 应在 current-missing 状态一律避免”。
+- 不能写“标签修正已验证”“辅助监督是根因”或“action4 应在 current-missing 状态一律避免”；多步反例已经否定最后一种
+  统一规则的充分性。
 - 不得把代码默认关闭、单元测试或梯度方向改变写成性能证据；不得省略 action4 的目标缓存副作用和可能的多步收益。
 - 不得写 SA 稳定领先、算法创新、formal/holdout 有效或 paper-ready。two-step 继续标注 exact-transition model-based 能力与
   lexicographic objective 权限。
 
-## 后续证据如何改变主张
+## 最终主张边界
 
-- A 门禁 `FAIL/MIXED`：候选不训练；论文线只保留“发现标签/动作语义疑点但反事实不支持统一收紧”的负结果。
-- A 门禁 `PASS`：仅授权一次已冻结 development A/B，不直接授权论文主张。候选还须同时满足 completion 不降、selected 与
-  fixed-96 的 on-time/failure 边界，以及两视图至少 3/5 seed 改善且至多 1/5 恶化；trade-off 记 MIXED。
-- 即使 A/B `PASS`，也只能写成已暴露 development 上的辅助监督机制证据；独立 source/formal/holdout 仍需另立冻结任务。
+- 候选不训练；论文线只保留“发现标签/动作语义疑点，但反事实不支持统一收紧”的负结果。
+- 可报告 action4 的双重作用：它可能牺牲当前服务，却通过目标缓存改变冻结策略的后续状态并改善按期/失败结局；这只是有界
+  development 反例，不能外推为 action4 或旧辅助标签普遍最优。
+- 若未来提出区分短期服务与未来准备价值的新信用分配候选，必须另立事前计划和新证据，不能在本批反例上调权重或选样本。
 
-`reviewed_at=2026-10-10`；`literature_cutoff=2026-10-10`；`target_venue=IEEE TMC`；
-`artifact_run_id=none_preflight_only_awaiting_action_branch_gate`；
+`reviewed_at=2026-10-10`；`literature_cutoff=2026-09-28`（本轮未做 novelty 检索）；`target_venue=IEEE TMC`；
+`artifact_run_id=cscwd_service_feasible_action_branches_20261010_v1`；
 `policy_version=tmc_review_policy_v3_20260621`；
-`git_commit=d17c374911b4fdcad1c37b11b4087be0f7fa0e22`；
-`evidence_level=E1_IMPLEMENTATION_AND_DEVELOPMENT_DIAGNOSIS_NO_CANDIDATE_RUN`；
-`verdict=Unverifiable_for_performance_or_paper_claim`。
+`git_commit=c8aecf19b39c83debf57d20f44a90f6ebb650e68`（gate），
+`d17c374911b4fdcad1c37b11b4087be0f7fa0e22`（candidate implementation）；
+`evidence_level=E2_ARTIFACT_AUDITED_BOUNDED_DEVELOPMENT_GATE_NO_CANDIDATE_RUN`；
+`verdict=MIXED_gate_stop / Unverifiable_for_performance_or_paper_claim`。
