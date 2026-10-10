@@ -5,6 +5,12 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-10：训练 current-bundle-ready 信号记录恒假（确定日志缺陷）
+
+- `CONFIRMED / logging producer`：`_training_signal_row` 用缺失的 `semantic_state.current_rsu_id` 查 RSU，而 v4 公开合同以 primary vehicle 的 `associated_rsu_id` 表示当前 RSU。候选 28,800 行及旧 v4 四 learned 115,200 行训练信号 `current_bundle_ready` 均为 `False`；实际 ready 状态最小见证为 `True` 而记录 `False`。这使历史训练行为按 ready 分层不可用；不能依据该日志推断全体训练状态都缺模型。
+- `SCOPE`：当前 SA event 弃权解析 primary vehicle 正确，optimizer supervised 计数非零；B v2 verdict 使用 optimizer/评价 ledger，不消费错误字段。没有确认 checkpoint、loss、评价或 `MIXED_STOPPED` 结论受影响。需另轮最小修生产者并补 ready/missing 测试，新增侧车分析，禁止覆写原科学 artifact。
+- `OPEN / science`：candidate selected 的传输增加主要伴随跨 RSU base 放置及实际服务使用，固定96 seed17/29/61 时效下降；26 个分支呈正反例，fast/slow 与 PPO 的实际 per-head 梯度方向尚无同 minibatch 原件。车辆 fallback 免模型加载与决策步人工时间尺度均为公开模拟假设，真实物理成立性待验证。详见 `cscwd_abstention_cost_causal_audit_20261010.md`。
+
 ## 2026-10-10：条件弃权通过接口门禁；人工决策时间尺度为开放外推风险
 
 - `RESOLVED FOR CANDIDATE CONTRACT`：B 的 event 辅助监督条件弃权只对 current-missing 样本屏蔽 event CE 与 temporal margin，保留 PPO 和 slow/fast 信号；A 对 30 个冻结状态、checkpoint/profile、三种基线与共同环境身份独立验收 `PASS`。旧 hard-zero target 的多步反例及 `MIXED` 不撤销。

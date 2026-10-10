@@ -5,6 +5,12 @@
 
 ﻿# Progress
 
+## 2026-10-10：条件弃权后加载与时效退化已做有界因果定位
+
+- 事前选择计划 commit `5102b48`；B candidate 与旧 v4 SA/PPO 原件分别 40/40、119/119 hash+size 通过。相同 episode 双视角配对并重放 600 episode/4,203 记录动作；对象模型字节与每步 clock 分项全守恒。11 个确定顺序首次共同状态起点实际执行 26 条合法 clone 分支、105 额外 env.step，低于 36/864 上限；0 新训练、0 formal/holdout。
+- selected on-time `38→45/100`、model `129.700→300.948 MB/episode`、elapsed `75.499→73.922s`；fixed96 `43→44/100`、model `176.557→289.254MB`、elapsed `73.456→75.814s`，seed17/29/61 on-time 下降。新增模型字节主要是跨 RSU base 放置并被后续服务使用；未用准备不是 selected 增量主因。PPO 通过更多合法 action2 fallback 减少模型加载，8s 固定 fallback、node compute 和 input network 均已计费；其车辆模型预置能力是公开合同假设。
+- 同快照分支既见 fallback 避免重算而按期，也见 fallback 相对 action3 多 8.023s 越 deadline；固定96 seed29 首分叉无法单独解释旧策略按期，不能当全局单步因果。确认训练信号日志 `current_bundle_ready` 错读不存在的顶层 key，使新 SA 28,800 行和旧 v4 四方法 115,200 行全 False；尚无训练 loss/评价被该字段改变的证据，旧原件不覆盖。fast/slow 实际梯度冲突缺 per-head 同 minibatch 原件，当前科学 verdict 仍 `MIXED_STOPPED`。完整报告 `cscwd_abstention_cost_causal_audit_20261010.md`、机器摘要同名前缀 JSON；论文/优秀 baseline 稳定优势 `Unverifiable`。
+
 ## 2026-10-10：MIXED 反例时间合同与条件弃权候选独立门禁 PASS
 
 - A 对旧 96 个分支文件、9 份完整状态和 463 条轨迹对账，0 额外 env.step；两个事前反例的 action4 首步均是 2 s 失败等待，无 state commit/模型传输。冻结 `decision_step_index` 与 modeled clock 分离，合同自洽，但人工 5 s 接触尺度不能代表逐帧 NGSIM 物理时间。旧 hard-zero target 门禁继续 `MIXED`。
