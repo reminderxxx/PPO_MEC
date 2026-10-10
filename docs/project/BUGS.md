@@ -11,8 +11,8 @@
   slow/fast 精确保持。checkpoint 语义 fail-closed，且与 rejected hard-zero 开关互斥。
 - `OPEN CAUSALITY`：候选解决的是 hard-zero 多步反例暴露出的短期伪标签/长期缓存信用冲突，但尚无 matched performance
   证据；不能宣称辅助监督是根因或 abstention 必然改善服务。
-- `PENDING INDEPENDENT GATE`：A 的接口/时间/SA-only/无未来信息审计未绑定 clean implementation commit；任何 FAIL/MIXED、
-  缺 commit/tree 或 artifact hash 的文字 PASS 都不得授权训练。
+- `RESOLVED INDEPENDENT GATE`：A 的接口/时间/SA-only/无未来信息审计已绑定 clean implementation commit，B 对 full
+  commit/tree 和四类 artifact hash/语义复核通过；该 PASS 仅授权一次冻结开发 A/B，不是性能或论文 PASS。
 - `MODEL LIMITATION`：mobility 按 decision step 推进，RSU sequence 是 NGSIM handoff-pressure synthetic block，5 秒接触尺度
   为人工设定；结果不得外推为 frame-time realism 或真实无线时空行为。
 

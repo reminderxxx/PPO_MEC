@@ -5,15 +5,18 @@
 
 # Artifact Records
 
-## 2026-10-10 event auxiliary abstention pending-gate preflight（无 scientific run）
+## 2026-10-10 event auxiliary abstention independent-gate preflight（无 scientific run）
 
 - 协议：`configs/experiment/calibrated_workflow_event_aux_abstention_ab_v1.json`；run ID 仅预留为
   `cscwd_event_aux_abstention_ab_20261010_v1`，当前 scientific/supervisor/analysis root 均未创建。
 - 预检直接复用并核验 v4 control：selected/update96/rule=`400/400/40` rows，36 个 split instance、raw interval 互斥、474
   public-prefix tamper；候选/control 网络=`165,512` 参数、60 state keys、seed 7 初始化完全相同。
-- 回执：`authorization_state=awaiting_independent_interface_time_contract_gate`、gate=`pending_a_review`、
-  `scientific_steps=0`、`new_evaluation_episodes=0`。A report/manifest/time/abstention receipts 尚未绑定。
-- 本条只登记源码/协议预检，不登记 checkpoint、训练结果或性能 artifact；implementation commit/tree 待 clean commit 后补齐。
+- implementation commit/tree=`46a68f11c289ccc304b88cdfed01c34ba5f61c3d`/
+  `a197c7d7c5fd80619747f34f9c4416babb023d8e`；A gate commit/tree=`e9b19f6ad2ec432487a0fa7fbdc6542dfb742dc1`/
+  `572689ba84a884a04ed2c8083c3d629e44a5cf22`。
+- report/manifest/time/abstention SHA-256=`f3e5849c…`/`b3d19245…`/`6a788a74…`/`a7d73b58…`；B 独立复算并以
+  runner 消费端验证 `PASS/artifacts_verified=true`。本条不登记 checkpoint、训练结果或性能 artifact；scientific steps/new
+  evaluation 仍为 `0/0`。
 
 ## 2026-10-10 service-feasible action-branch gate（MIXED，无候选训练）
 

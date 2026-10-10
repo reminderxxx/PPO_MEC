@@ -10,7 +10,7 @@
 ## Live 文档
 
 - `cscwd_event_aux_abstention_{candidate,claim_change}_20261010.md`：hard-zero MIXED 后冻结的唯一弱干预；只在 current-missing
-  样本 abstain event CE/temporal-margin，保留旧分母和 PPO 长期信用。当前等待独立接口/时间门禁，0 scientific run。
+  样本 abstain event CE/temporal-margin，保留旧分母和 PPO 长期信用。独立接口/时间/监督门禁已 PASS，当前 0 scientific run。
 
 - `cscwd_prepared_state_event_chain_diagnosis_20261010.md` 与
   `cscwd_service_feasible_aux_target_candidate_20261010.md`：v4 失败链重放、辅助标签实际生效证据和唯一 target-only 候选；

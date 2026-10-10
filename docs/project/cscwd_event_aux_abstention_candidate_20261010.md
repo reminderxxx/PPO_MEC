@@ -8,9 +8,10 @@
 - `artifact_run_id`: `cscwd_event_aux_abstention_ab_20261010_v1`（预留，尚未创建 scientific root）
 - `policy_version`: `tmc_review_policy_v3_20260621`
 - `source_science_commit`: `f46ec72b15f534ac44768a83ef6316c1cfcb6b58`
-- `implementation_commit`: 待本候选 clean commit 后绑定
-- `evidence_level`: `E1_IMPLEMENTED_AND_LOCALLY_VERIFIED_NO_SCIENTIFIC_RUN`
-- `verdict`: `AWAITING_INDEPENDENT_INTERFACE_TIME_CONTRACT_GATE / execution_authorized=false`
+- `implementation_commit`: `46a68f11c289ccc304b88cdfed01c34ba5f61c3d`
+- `independent_gate_commit`: `e9b19f6ad2ec432487a0fa7fbdc6542dfb742dc1`
+- `evidence_level`: `E2_INDEPENDENT_INTERFACE_CONTRACT_AUDITED_NO_SCIENTIFIC_RUN`
+- `verdict`: `INDEPENDENT_GATE_PASS / execution_authorized=true / performance_unverified`
 
 旧的 service-feasible hard-zero 候选保持 `MIXED_STOPPED`：不得覆盖、放宽门槛或启动其五 seed 训练。本文件冻结一个不同的、
 更弱的单变量候选。当前只有实现、合成梯度验收、历史原件 hash 预检和 0-step 回执；没有候选训练、评价、formal/holdout、
@@ -53,7 +54,9 @@ temporal_margin_loss = weight * existing_event_soft_target_BCE
 环境移动口径为 `mobility_progression=decision_step_index`；`decision_step_seconds=5` 是人工接触尺度，deadline 则累积 modeled action
 cost。既有 90 分支/463 row 与该实现合同一致，未发现确定性接线 bug；但不能据此主张真实时空外推、真实无线接触或 frame-time
 realism。A 必须在本实现 clean commit 上独立确认接口、时间、SA-only、当前 ready/missing 梯度和无未来信息后，形成带 commit/tree、
-report/manifest/time receipt/abstention receipt SHA-256 的 PASS。任何 FAIL/MIXED 或仅文字 PASS 都在训练前停止。
+report/manifest/time receipt/abstention receipt SHA-256 的 PASS。A 已在上述 implementation commit 上完成该门禁：30/30 raw-policy
+forward 相同，6/6 current-ready 梯度精确相同，24/24 current-missing event 梯度为零，0 replay/training step；B 已独立复核
+A commit/tree、四个文件 SHA-256 和全部 runner 消费字段。此 PASS 只授权冻结 A/B，不是性能或论文 PASS。
 
 ## 条件 A/B（尚未授权）
 

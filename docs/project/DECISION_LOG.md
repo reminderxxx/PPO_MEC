@@ -6,8 +6,8 @@
   样本对 event CE/temporal-margin abstain；不重标 target，并保留 PPO 对 action4 长期缓存收益的信用分配。
 - 旧分母、current-ready 梯度、slow/fast、value、reward、网络、动作权限和 raw inference 不变；只允许 SA 消费该开关。
   这是学习设计候选，不是实现纠错或算法创新。
-- 科学执行取决于 clean commit 上的独立接口/时间合同 PASS；PASS 前保持 `execution_authorized=false`。若后续双视角服务门
-  FAIL/MIXED，立即停止，不找第二候选、不扫权重、不扩 seed/预算。
+- A 已在 clean implementation commit 上给出独立接口/时间合同 PASS，B 逐 hash 复核后只授权一次冻结 A/B；该 PASS 不预判
+  性能。若后续双视角服务门 FAIL/MIXED，立即停止，不找第二候选、不扫权重、不扩 seed/预算。
 
 ## 2026-10-10：MIXED 反事实门禁否决统一 current-ready target 收紧训练
 

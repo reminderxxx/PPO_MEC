@@ -9,7 +9,8 @@
   current-ready 梯度逐张量不变，PPO actor 仍可从长期 return 学 action4。
 - slow/fast、value、entropy、PPO、网络、reward、动作权限和 raw inference 不变；候选只传给 SA，三种强基线的初始化、动作概率、
   mask 和旧 checkpoint 语义保持一致。
-- 预检只核验历史控制 hashes、36-instance 区间、474 个公共前缀 tamper、网络身份与待审计状态；scientific steps 和新评价均为 0。
+- 预检核验历史控制 hashes、36-instance 区间、474 个公共前缀 tamper 和网络身份；A 又独立确认 30/30 raw forward、
+  6 ready 梯度不变、24 missing event 梯度为零，且 B 已逐 hash 复核不可变 PASS；scientific steps 和新评价仍为 0。
 - 现有 mobility/time 是 decision-step 仿真：RSU sequence 为 NGSIM handoff-pressure synthetic block，5 秒为人工接触尺度，
   不是逐 frame 真实轨迹。这是外部有效性限制，不是已确认实现 bug。
 
@@ -22,12 +23,13 @@
 
 ## 冻结边界
 
-A 仅在 B clean implementation commit 上做独立接口/时间/监督审计，并发布不可变 PASS/FAIL/MIXED 收据。只有 PASS 且 B 再次
-逐 hash 验证后，才可能授权一次固定 5-seed、28,800-step、200-new-evaluation development A/B；否则保持 0 training。
+A 已在 B clean implementation commit 上发布不可变 PASS 收据，B 逐 hash 验证通过；因此只授权一次固定 5-seed、
+28,800-step、200-new-evaluation development A/B，不改变性能门槛或 claim 边界。
 候选结果若未同时通过 selected/update96 completion/on-time/failure 与 seed 方向门，则停止，不产生第二候选。
 
 `reviewed_at=2026-10-10`；`literature_cutoff=2026-09-28`；`target_venue=IEEE TMC`；
 `artifact_run_id=cscwd_event_aux_abstention_ab_20261010_v1 (not created)`；
-`policy_version=tmc_review_policy_v3_20260621`；`git_commit=pending clean implementation commit`；
-`evidence_level=E1_IMPLEMENTED_AND_LOCALLY_VERIFIED_NO_SCIENTIFIC_RUN`；
-`verdict=UNVERIFIED / awaiting independent gate`。
+`policy_version=tmc_review_policy_v3_20260621`；`git_commit=46a68f11c289ccc304b88cdfed01c34ba5f61c3d`（实现），
+`e9b19f6ad2ec432487a0fa7fbdc6542dfb742dc1`（独立门禁）；
+`evidence_level=E2_INDEPENDENT_INTERFACE_CONTRACT_AUDITED_NO_SCIENTIFIC_RUN`；
+`verdict=interface gate PASS / performance and paper claim UNVERIFIED`。
