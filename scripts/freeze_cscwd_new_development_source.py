@@ -132,36 +132,51 @@ def allowed_fragments(start: int, end: int, blocks: list[tuple[int, int]]) -> li
     return result
 
 
-def load_source(path: Path) -> tuple[pd.DataFrame, dict, int]:
+def load_source(path: Path) -> tuple[pd.DataFrame, dict, int, int]:
     pieces = []
     prefix: dict[str, list[int]] = {}
     scanned = 0
+    invalid_identity_rows = 0
     for chunk in pd.read_csv(
         path,
         usecols=["Vehicle_ID", "Frame_ID", "Global_Time", "Local_X", "Local_Y", "Location"],
+        dtype=str,
+        keep_default_na=False,
         chunksize=500_000,
     ):
         chunk["source_segment_id"] = chunk["Location"].map(segment)
         relevant = chunk[chunk["source_segment_id"].isin(SOURCE_SEGMENTS)].copy()
+        for column in ("Vehicle_ID", "Frame_ID", "Global_Time", "Local_X", "Local_Y"):
+            relevant[column] = pd.to_numeric(
+                relevant[column].str.replace(",", "", regex=False), errors="coerce"
+            )
         if scanned < 200_000:
             prefix_chunk = chunk.iloc[: max(0, 200_000 - scanned)]
             prefix_rows = prefix_chunk[prefix_chunk["source_segment_id"].isin(SOURCE_SEGMENTS)]
             for source, group in prefix_rows.groupby("source_segment_id"):
-                bounds = prefix.setdefault(source, [int(group["Global_Time"].min()), int(group["Global_Time"].max())])
-                bounds[0] = min(bounds[0], int(group["Global_Time"].min()))
-                bounds[1] = max(bounds[1], int(group["Global_Time"].max()))
+                times = pd.to_numeric(group["Global_Time"].str.replace(",", "", regex=False), errors="coerce")
+                if times.isna().any():
+                    raise RuntimeError("anonymous prefix contains unknown source time")
+                bounds = prefix.setdefault(source, [int(times.min()), int(times.max())])
+                bounds[0] = min(bounds[0], int(times.min()))
+                bounds[1] = max(bounds[1], int(times.max()))
         scanned += len(chunk)
         if len(relevant):
             relevant["source_csv_row"] = np.arange(scanned - len(chunk), scanned, dtype=np.int64)[
                 chunk["source_segment_id"].isin(SOURCE_SEGMENTS).to_numpy()
             ]
+            missing_identity = relevant[["Vehicle_ID", "Frame_ID", "Global_Time"]].isna().any(axis=1)
+            invalid_identity_rows += int(missing_identity.sum())
+            relevant = relevant.loc[~missing_identity].copy()
+            for column in ("Vehicle_ID", "Frame_ID", "Global_Time"):
+                relevant[column] = relevant[column].astype(np.int64)
             pieces.append(relevant.drop(columns="Location"))
     if not pieces:
         raise RuntimeError("no source rows in frozen segments")
     data = pd.concat(pieces, ignore_index=True)
     data.sort_values(["source_segment_id", "Vehicle_ID", "Global_Time", "Frame_ID"],
                      kind="mergesort", inplace=True, ignore_index=True)
-    return data, prefix, scanned
+    return data, prefix, scanned, invalid_identity_rows
 
 
 def qualify(data: pd.DataFrame, blocks_by_segment: dict[str, list[tuple[int, int]]],
@@ -257,7 +272,7 @@ def main() -> None:
         raise RuntimeError("raw NGSIM identity mismatch")
     forbidden, exposed, strict = strict_metadata()
     anonymous = anonymous_metadata()
-    data, prefix, scanned = load_source(args.raw_csv_path)
+    data, prefix, scanned, invalid_identity_rows = load_source(args.raw_csv_path)
     blocks: dict[str, list[tuple[int, int]]] = {}
     for seg in SOURCE_SEGMENTS:
         source_blocks = [(row["time_start"] - EMBARGO_MS, row["time_end"] + EMBARGO_MS)
@@ -280,6 +295,7 @@ def main() -> None:
                 "script_sha256": sha(Path(__file__)), "plan_sha256": PLAN_SHA,
                 "raw_source_sha256": RAW_SHA, "parent_workload_manifest_sha256": PARENT_SHA,
                 "raw_rows_scanned": scanned, "included_source_rows": len(data),
+                "unidentifiable_source_rows_excluded": invalid_identity_rows,
                 "source_segments": sorted(SOURCE_SEGMENTS), "excluded_source_segments": ["peachtree", "i_80"],
                 "anonymous_prefix_rows_quarantined": 200_000,
                 "anonymous_prefix_time_bounds": prefix,
