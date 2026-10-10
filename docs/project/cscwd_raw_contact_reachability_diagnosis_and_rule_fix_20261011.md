@@ -15,6 +15,12 @@
 本轮先完成独立只读原因分类，再按授权只修 public rule consumer。没有修改 Raw 环境、action mask、reward、学习方法、
 物理 contact 语义、数据窗口、训练预算或旧 artifact。
 
+> **2026-10-11 候选身份勘误**：当前冻结、尚未科学检验的算法候选是
+> `causal_public_prepare_advantage_v2`，即只使用公共因果状态的 `prepare/serve/abstain` 三态 event auxiliary supervision。
+> 2026-10-09 的 PopArt 只属于历史 service-reward critic 尺度诊断及其后续开发 A/B 记录，不能重新表述为本轮未测候选。
+> `causal_public_rule_selection_v2` 是 deterministic public baseline 的正确性修复，不是算法候选；下文 phase-split 仅为待应用依据
+> 与独立批准的物理合同提案。训练 STOP、候选 `UNTESTED` 和 paper-ready=`Unverifiable` 均不变。
+
 ## 合并原因分类
 
 ### 1. 生产端、mask 与执行动作
@@ -74,9 +80,9 @@ Exact 公共状态 SHA=`049de83dba0218565999c821d7b053391f9ae1f32f45e4c01079358e
 SHA=`4036254c97db4bad48936d8b5f8276931ca2985523250a6385e697b1ab8e8f98`。修复前 immediate/two-step 均选 4；
 修复后 action 0/1/3/4 全部明确 `no` 并被排除，两规则均选 2，输入 hash 不变，未读取隐藏未来。
 
-## 若后续需要机制可达：仅冻结语义候选，不实现
+## 若后续需要机制可达：物理合同提案（待批准，不是本轮算法候选）
 
-当前问题不是继续调 PPO，而是明确跨边界执行状态机。最小候选是 phase-split asynchronous prepare：
+当前问题不是继续调 PPO，而是明确跨边界执行状态机。待论证的最小合同提案是 phase-split asynchronous prepare：
 
 1. target model transfer/load 是否走 RSU 间 backhaul，是否需要车辆仍在 current-RSU contact，必须显式建模；
 2. current node 若在无线离开后仍由原 RSU 完成，需要 `in_flight_service` 状态、结果路由和失败语义；

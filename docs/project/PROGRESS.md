@@ -5,6 +5,14 @@
 
 ﻿# Progress
 
+## 2026-10-11：当前候选身份勘误（不改变训练 STOP）
+
+- 当前唯一冻结算法候选是 `causal_public_prepare_advantage_v2`：基于公共因果状态的 `prepare/serve/abstain` 三态 event
+  auxiliary supervision；它已 default-off 实现，但因 raw development 可达性门失败而保持 `UNTESTED`。
+- PopArt 是 2026-10-09 service-reward critic 尺度诊断及其开发 A/B 的历史候选，不是本轮当前候选；历史记录与负结果原样保留。
+- `causal_public_rule_selection_v2` 仅是 deterministic public baseline 的 correctness fix；phase-split asynchronous prepare 仅是
+  待应用依据和独立批准的物理合同提案。二者都不替代当前算法候选，也不授权训练、扩窗或新评价。
+
 ## 2026-10-11：public estimator fail-closed phase accounting 已最小修复
 
 - `causal_public_action_estimator_v2` 按 target model staging→current service→成功后 state commit 拆分 action4；必需阶段

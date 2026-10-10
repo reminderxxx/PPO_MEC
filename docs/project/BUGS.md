@@ -5,6 +5,13 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：候选身份混淆风险
+
+- `CORRECTED`：当前冻结算法候选为 `causal_public_prepare_advantage_v2` 三态 event supervision，状态为 `UNTESTED`；
+  PopArt 仅是 2026-10-09 的历史 critic 尺度候选，不能因后续总结重新成为本轮候选。
+- public rule v2 是基线正确性修复，phase-split 是待批准物理合同提案；不得把二者写成已验证算法收益或用来绕过当前
+  raw 可达性门。训练 STOP 不变。
+
 ## 2026-10-11：公共估计器阶段聚合缺陷与 raw preview 权限风险
 
 - `RESOLVED IMPLEMENTATION DEFECT`：commit `ce20727e…` 已令必需 target phase unknown 时完整 total/deadline/contact

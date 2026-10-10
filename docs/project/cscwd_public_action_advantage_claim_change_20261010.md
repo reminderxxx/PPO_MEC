@@ -9,6 +9,9 @@
 > 学习候选失败；raw exact decision clone 会读取未来物理接触，只能保持 privileged reference 能力标签。
 > 2026-10-11 后续状态：public estimator `v2` 已完成阶段核算纠错和合成验收；既有合法 development 区间资格为 `0/40`，
 > 因此训练仍未启动，论文线只能记录接口纠错与 `UNTESTED`，不得写算法收益。
+> **2026-10-11 候选身份勘误**：当前冻结算法候选随 estimator contract 升级为
+> `causal_public_prepare_advantage_v2` 三态 event supervision。PopArt 仅是 2026-10-09 历史 critic 诊断候选；public rule v2
+> 仅是基线正确性修复；phase-split 仅是待批准物理合同提案。A 论文线不得把三者互换，也不得据此新增算法收益主张。
 
 - 新增可写入内部研究记录的事实：共同、因果、无副作用的 public action estimator 与 default-off
   `causal_public_prepare_advantage_v1` event auxiliary 已实现；未知状态 abstain，不做 action mask，不改变 slow/fast、reward、

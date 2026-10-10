@@ -5,6 +5,13 @@
 
 # Artifact Records
 
+## 2026-10-11 candidate identity correction（无新 artifact / scientific run）
+
+- 当前冻结算法候选是 `causal_public_prepare_advantage_v2` 的 public-causal `prepare/serve/abstain` 三态 event supervision，
+  状态仍为 `UNTESTED`；本条只纠正文档中的候选身份，不新增性能、因果或 paper-ready 证据。
+- 下文 2026-10-09 PopArt 条目保留其历史时点含义，不是本轮当前候选。public rule v2 仍是 baseline correctness fix，
+  phase-split 仍是待批准的物理合同提案；训练/评价/checkpoint selection 新增量均为 0。
+
 ## 2026-10-11 public estimator phase-accounting conformance（无 scientific run）
 
 - implementation commit=`ce20727ee29cfbb02f992204065c5da853fef5ae`；schema=
