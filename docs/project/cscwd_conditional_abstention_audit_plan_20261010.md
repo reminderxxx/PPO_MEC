@@ -1,0 +1,8 @@
+# MIXED 反例解释与条件弃权候选：审查前冻结范围
+
+- `frozen_at`: 2026-10-10 Asia/Shanghai。新授权只允许 A 在空闲隔离 worktree 做只读机制审查、至多两个既有完整环境反例各三动作的对账重放（总计不超过 144 个额外 env.step）；不得训练、调参、下载、访问 holdout、修改 B 实现或覆盖历史 artifact。本轮默认以已保存的 90 条分支逐步原件为准，若其事件字段足够则重放 `0` 步。
+- 原件固定为科学 run `cscwd_causal_prepared_state_visibility_matched_20261010_v1`、A `cscwd_service_feasible_action_branches_20261010_v1`；先校验两层 manifest、96 个分支文件、9 个完整状态快照与 30 行 source 映射。只解释事前已经点名的 `regression_00/seed17/step2` 和 `frozen_check_00/seed29/step5`，不得另选有利样本。
+- 逐分支区分：首步目标模型 admission/stage、prepared-state commit、当前节点是否进展、下一步 RSU/预测、后续原 SA 策略动作、recompute/bytes/elapsed/deadline；不同首动作的后续状态各异，不把单条路径称全局最优。action4 当步失败如充当低成本 wait，应明确标成 simulator 内生效果。
+- 时间专项审计必须逐代码核对 `_mobility_index`、`_current_rsu_id`、`_physical_contact_budget_seconds`、`clock_seconds`、deadline、原始 `source_interval` 与 `mobility_abstraction.decision_step_seconds`。明确 decision index 与物理 modeled seconds 的关系及不同动作 duration 是否改变 RSU/contact；检查费用分解是否重复计费，并与冻结 config/既有合同对照。若已冻合同自洽但物理简化，记模型限制；若违反既有合同或原始 frame/time 绑定，给具体 blocker 并告知 B 停止科学执行，不修改环境。
+- B 新候选是 **event 辅助监督条件弃权**：current complete bundle 缺失时，对该样本的 event CE 与 temporal margin 辅助项梯度均为零；不把目标强改为 keep/prepare，不屏蔽 action4，不删除全体辅助损失。current-ready 样本的 event 监督与原值逐项一致，slow/fast 监督和其它 auxiliary 项不变。固定原 batch 分母，不按 ready 数重归一。审查训练 loss 生产端、target 消费端、checkpoint/profile、PPO executed-env logprob/ratio/entropy、value loss 与运行时 mask/概率；记录有效监督比例。
+- 门禁只审 **身份、梯度选择性、无未来泄漏、共同环境不变、时间合同无确定阻断**。不再要求每个反事实分支优于旧策略；原 MIXED 与所有反例必须保留。B 提供已冻结实现后做独立无训练测试与源码审查；不能用 evaluation 结果筛选、扩大样本或偷偷改变原 90 分支门槛。输出 `PASS` 或具体 blocker，并交 B full commit/tree、报告与 manifest 路径。任何通过也仅授权 B 按其独立协议判断下一步，不构成算法优势或论文证据。
