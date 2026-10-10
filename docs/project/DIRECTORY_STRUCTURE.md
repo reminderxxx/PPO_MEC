@@ -2,6 +2,11 @@
 
 ## 2026-10-09 因果前缀强基线版本
 
+- `configs/experiment/calibrated_workflow_prepared_state_visibility_matched_protocol_v1.json`：2026-10-10 prepared-state 共同
+  信息修复的未授权冻结协议与历史原件 hashes。
+- `docs/project/cscwd_prepared_state_visibility_matched_protocol_20261010.md`：A 交接前门禁、匹配预算、selected/update-96
+  双视角及拒绝条件。
+
 - `configs/experiment/calibrated_workflow_strong_baselines_budget_extension_v1.json`：4× learned 预算、固定端点和短预算哈希身份。
 - `scripts/analyze_calibrated_workflow_budget_extension.py`、`scripts/launch_calibrated_workflow_causal_budget_extension.py`：配对诊断与一次性持久启动；规则方法只读复用。
 - `docs/project/cscwd_causal_budget_extension_protocol_20261009.md`：统一预算干预、分析输出和停止边界。

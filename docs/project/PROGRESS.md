@@ -5,6 +5,17 @@
 
 ﻿# Progress
 
+## 2026-10-10：共同 prepared-state 可见性匹配训练协议冻结，等待 A 实现交接
+
+- A 的长预算成本诊断确认共同公共状态别名：相同 observation/semantic/mask 与相同动作可能对应不同 state readiness/
+  recompute；本轮优先级由 selection-cohort 建议调整为共享 observation contract 纠错。
+- B 已独立复核 `d25ebcd` 科学包 119/119 files、100 checkpoints、80 candidates、20 cells，以及 `c276929` 后处理
+  17/17 files；没有新增训练或评价。
+- 新协议固定四 learned×五 seed×5,760 steps、同 reward/raw critic/optimizer/dev selector，主 selected 与辅助 update-96
+  两个预声明视角，新增评价上限 1,200 episodes。当前 `execution_authorized=false`，等待 A 的确切 commit/config/hash 和
+  独立门禁；未收到交接不得启动。
+- 协议见 `cscwd_prepared_state_visibility_matched_protocol_20261010.md`；本轮不修改论文。
+
 ## 2026-10-09：因果强基线统一 4× 预算延长完成；改善 completion，不支持 SA 领先
 
 - 科学 run 在 `d25ebcd` 完成 20 cells、115,200 environment steps、1,920 updates、15,360 optimizer steps 与

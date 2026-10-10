@@ -905,6 +905,15 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - `BOUNDARY / historical v1`：192-episode v1 早于 action-4 commit 与 actual/estimated link 修正，只保留审计，不得与 v2
   checkpoint、逐行结果或 aggregate 混用。
 
+## OPEN / shared prepared-state public-state alias
+
+- 长预算只读重放确认：相同公开 observation/semantic/mask 与相同合法 action 可对应不同 prepared-state readiness 和
+  DAG recompute；所有 feedforward learned methods 共享该信息缺口。
+- 已冻结共同 current/公开预测目标 RSU prefix validity/freshness 匹配训练协议，但 A 的实现 commit/config/hash 尚未交接，
+  B 的独立 causality/negative-case/encoder-consumption/old-profile-equivalence 门禁尚未执行；当前禁止科学启动。
+- 该缺口不自动解释 SA 相对 PPO/MAPPO/DT 的全部差距；若修复后别名未消除、recompute/逾期不改善或任一方法边界恶化，
+  必须拒绝，不改 reward/selection 追胜。
+
 ## PARTIALLY RESOLVED / causal learned baseline budget sufficiency; selection generalization remains open
 
 - 统一 4× budget + 等比例选模时点已完整执行。SA completion `.87→.99`，PPO `.95→1`，说明短预算确实限制部分

@@ -1,0 +1,135 @@
+{
+  "schema_version": "calibrated_workflow_prepared_state_visibility_matched_protocol_v1",
+  "execution_authorized": false,
+  "authorization_state": "awaiting_a_implementation_handoff_and_independent_preflight",
+  "run_id": "cscwd_causal_prepared_state_visibility_matched_20261010_v1",
+  "scope": "consumed_36_instance_development_only",
+  "historical_arm": {
+    "label": "prepared_state_hidden_v1",
+    "scientific_run_id": "cscwd_causal_strong_baselines_budget_extension_20261009_v1",
+    "scientific_commit": "d25ebcded6b43b69b82bae825b035adc1d6f19c4",
+    "run_manifest_sha256": "f1340e25865e6fcaeb23ef6d177836db2613e04419a3b3ce68f57e5d8edadb33",
+    "completion_receipt_sha256": "9543049440c71857c79ccd267bd25f2a10aa8a696ae60b03ba24295ce247ea49",
+    "artifact_integrity_sha256": "86594a03472b06fb3e92522fd0ee4131c0e190b9ec28fb69a9041ab712b3be83",
+    "evaluation_rows_sha256": "6e20b84f3f08672ea0bd072c3c2f1b1dd7c1e40bd8d654375d744a5582774bce",
+    "checkpoint_selection_sha256": "27e36308d1b33586e9458236c1f16d74a953faeb8c0d543775725730fa72659b",
+    "training_summary_sha256": "d9ca64404cb2d104a36b693729b72eb8ced9396b5cff24769a5acad14eccc255",
+    "selected_evaluation_mode": "reuse_exact_hash_no_reevaluation",
+    "fixed_update96_evaluation_mode": "read_only_local_checkpoint_new_evaluation"
+  },
+  "historical_analysis": {
+    "analysis_commit": "c27692966b643a9a6f908951ed9636fa42db427d",
+    "analysis_run_id": "cscwd_causal_strong_baselines_budget_extension_analysis_20261009_v2",
+    "analysis_manifest_sha256": "639968234da4b9a848e95e2bc8e8f2f4ae498cf09e0925bea4ae731a751441ed",
+    "artifact_integrity_sha256": "047ac9878b877741f2026d3d15efa26780d0c559ed3a7818724e82e335539356"
+  },
+  "diagnostic_basis": {
+    "document": "docs/project/cscwd_sa_long_budget_cost_diagnosis_20261009.md",
+    "document_sha256": "5e26f74493673344fb07f19b8cbdb4f23447dca9d80e68579326cea5fc86e1f9",
+    "confirmed_failure": "shared_public_state_alias_for_prepared_state_validity_and_recompute_cost",
+    "diagnostic_claim_boundary": "does_not_prove_alias_alone_causes_sa_vs_baseline_gap"
+  },
+  "intervention": {
+    "single_shared_contract_change": "current_and_public_predicted_target_rsu_prepared_state_prefix_validity_and_freshness",
+    "all_learned_methods_receive_same_fields": true,
+    "past_and_current_information_only": true,
+    "future_actual_rsu_suffix_forbidden": true,
+    "old_profile_unchanged": true,
+    "implementation_commit": null,
+    "implementation_config_sha256": null,
+    "parameter_count_change_must_be_reported": true,
+    "strict_pure_information_single_variable_claim_allowed": false
+  },
+  "frozen_scientific_identity": {
+    "reward_profile": "original_reward_v1",
+    "critic_target_normalization": "raw_disabled",
+    "base_config": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3.json",
+    "base_config_sha256": "20e82b0ea4ff5c7caf597d987bcef1f7523dc0c1c7ece21deba32aa7d47af923",
+    "workload_manifest": "configs/experiment/calibrated_continuous_workflow_interface_repair_v3_manifest.json",
+    "workload_manifest_sha256": "b7efe5d6e50ad17b744230c03a126370656d0196b60c7f7e6b5a86bb702effbc",
+    "learned_methods": ["sa_ghmappo", "mappo", "ppo", "dt_handoff_drl"],
+    "seeds": [7, 17, 29, 43, 61],
+    "selection_split": "dev",
+    "selection_score_implementation": "scripts.run_calibrated_workflow_value_normalization_ab._selection_score",
+    "evaluation_splits": ["regression", "frozen_check"],
+    "strong_rules": ["popularity_cache_heuristic", "two_step_cost_rule"],
+    "strong_rule_mode": "reuse_historical_40_rows_no_reevaluation"
+  },
+  "optimizer_identity": {
+    "learning_rate": 0.0003,
+    "clip_ratio": 0.2,
+    "entropy_coef": 0.01,
+    "value_coef": 0.5,
+    "gamma": 0.99,
+    "gae_lambda": 0.95,
+    "ppo_epochs_per_update": 4,
+    "minibatch_size": 32,
+    "sa_auxiliary_coef": 0.1,
+    "non_sa_auxiliary_coef": 0.0,
+    "popart_enabled": false
+  },
+  "training_budget": {
+    "environment_steps_per_method_seed": 5760,
+    "transitions_per_update": 60,
+    "update_opportunities_per_method_seed": 96,
+    "expected_optimizer_steps_per_method_seed": 768,
+    "checkpoint_update_candidates": [24, 48, 72, 96],
+    "learned_cells": 20,
+    "total_environment_steps": 115200,
+    "total_update_opportunities": 1920,
+    "total_optimizer_steps": 15360,
+    "episode_max_steps": 24,
+    "wall_clock_cap_seconds": 7200,
+    "automatic_retry": false,
+    "scientific_launches": 1
+  },
+  "evaluation_budget": {
+    "historical_selected_reused_episodes": 400,
+    "historical_update96_new_episodes": 400,
+    "new_selected_new_episodes": 400,
+    "new_update96_new_episodes": 400,
+    "total_new_evaluation_episode_cap": 1200,
+    "selected_view_role": "primary_same_selection_rule",
+    "fixed_update96_view_role": "secondary_predeclared_endpoint",
+    "evaluation_results_used_for_selection_or_stopping": false
+  },
+  "preflight_gates": {
+    "field_source_is_past_or_current": true,
+    "future_suffix_tamper_invariant": true,
+    "same_action_transition_and_cost_unchanged": true,
+    "all_four_methods_encode_fields": true,
+    "old_profile_byte_equivalent": true,
+    "missing_expired_new_prefix_prepare_failure_rsu_switch_negative_cases": true,
+    "exact_optimizer_and_budget_receipt": true,
+    "implementation_identity_frozen": false
+  },
+  "primary_metrics": [
+    "workflow_completion_rate",
+    "on_time_workflow_completion_rate",
+    "service_failure_rate"
+  ],
+  "joint_diagnostics": [
+    "paired_completion_coverage",
+    "common_completed_elapsed_seconds",
+    "dag_recompute_seconds",
+    "model_prepare_mb",
+    "state_transfer_mb",
+    "input_transfer_mb",
+    "vehicle_fallback_actions",
+    "prepared_state_valid_handoffs",
+    "prepared_state_invalid_handoffs",
+    "prepare_validity_and_freshness_breakdown",
+    "reward_separate_non_primary"
+  ],
+  "claim_boundary": {
+    "development_only": true,
+    "all_36_instances_previously_exposed": true,
+    "formal": false,
+    "holdout": false,
+    "independent_test": false,
+    "paper_or_manuscript_write_authorized": false,
+    "ranking_targeted_search": false,
+    "real_model_calls": 0,
+    "downloads": 0
+  }
+}
