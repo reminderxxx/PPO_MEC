@@ -74,3 +74,12 @@ auxiliary loss、数据窗口、训练预算或 checkpoint 选择，也没有读
 
 raw `clone_for_decision_model().step()` 读取实际未来 contact 的权限缺陷不在本修复范围；exact clone 继续只能列为 privileged
 reference。public estimator/rule 不调用 clone/step，本修复没有引入该泄漏。
+
+## 后续公平基线审计补充
+
+`cscwd_public_rule_raw_fairness_20261011_v1` 已用实际 `RawNGSIMEventTimeEnv._info()` 完成隐藏未来后缀反例：公共
+immediate/two-step 的输入、mask、动作和冻结 PPO 数值概率保持不变，且选择过程不改 cache/prepared/clock/RNG；旧
+exact-clone immediate/two-step 的动作和 action3 preview 会随隐藏 contact 改变。因此旧规则正式降级为 privileged
+reference，公共规则才是下一轮信息权限匹配候选。为保持既有 prepared-state 协议的源码 hash，没有改写旧环境文件；能力
+标签集中在 `PRIVILEGED_REFERENCE_PROFILES`。完整主张变更见
+`docs/project/cscwd_public_baseline_fairness_change_note_20261011.md`。本补充仍无训练或性能结论。

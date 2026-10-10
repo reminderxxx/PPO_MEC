@@ -1,0 +1,34 @@
+{
+  "artifact_run_id": "cscwd_public_rule_raw_fairness_20261011_v1",
+  "claim_boundary": {
+    "checkpoint_selection": false,
+    "evaluation_matrix_runs": 0,
+    "raw_data_exported": false,
+    "scientific_performance_claim": false,
+    "training_runs": 0
+  },
+  "created_at": "2026-10-10T18:27:57.727622+00:00",
+  "evidence_level": "L2_bounded_actual_environment_contract_audit",
+  "files": {
+    "audit.json": "45f398ee16708bcae256be7fb8a300d380a9933b839243d69260ab70767e0e7b",
+    "scripts/audit_cscwd_public_rule_raw_fairness.py": "b709e6efdef8127775c0c5524c43c5a36d82e7977520468e10f190589dcd2599",
+    "src/agents/causal_public_action_estimator.py": "ee6873d9b16e5b1e4ac0dcfab1eacce915d50aeeff8bf8d9a862093202984828",
+    "src/envs/core/calibrated_continuous_workflow_env.py": "c6ded6ce84230519160a40f29e276b5823eb204a35e31c35f914d1c6bfee3a59",
+    "src/envs/core/raw_ngsim_event_time_env.py": "30666d7c874717d8464a64702c811116e96b931a5db6b57287c6c11d2dcc6575"
+  },
+  "git_commits": {
+    "public_rule_source": "6bf5d0b0ba9af2460cdc736f14909b0692126a48",
+    "raw_environment_source": "14fa246d4ece3cb35d5e38100e3024c96e42d2bc"
+  },
+  "inputs": {
+    "public_rule_source_root": "/Users/howen/.codex/worktrees/causal-budget-extension/PPO_MEC",
+    "raw_source_root": "/Users/howen/.codex/worktrees/cscwd-window-identity/PPO_MEC",
+    "real_ngsim_rows": 0,
+    "synthetic_trace_only": true
+  },
+  "literature_cutoff": "2026-10-11",
+  "policy_version": "tmc_review_policy_v3_20260621",
+  "reviewed_at": "2026-10-10T18:27:57.727746+00:00",
+  "schema_version": "cscwd_public_rule_raw_fairness_audit_v1",
+  "target_venue": "top-journal-methodology-support"
+}

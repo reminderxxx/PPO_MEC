@@ -1057,3 +1057,14 @@ cwd 猜测、无 registry 的正式命令、旧 run checkpoint reference 或 hol
 - 新 fixed-policy probe 证明 fast target 恒 0 会局部压低可执行 action2，但候选臂 PPO/fast CE 冲突未跨 seed 或 selected/update96 稳定，不能认定为服务退化根因。
 - 历史 training minibatch、当时 optimizer state/顺序和 clip 后合成更新未保留；公开 bytes/deadline/contact 只保存计数，bin 内梯度方向未重算，均保持 `UNVERIFIED`。
 - 删除 fast CE 当前不获授权；若未来另立唯一变量 `.5→0`，必须固定 event abstention、其他 loss、数据/预算/选模并以跨 seed 服务与成本共同门禁否证。见 `cscwd_per_head_gradient_acceptance_20261010.md`。
+
+## 2026-10-11 RESOLVED / 旧两步规则信息权限误标；OPEN / objective mismatch
+
+- `RESOLVED`：旧 `immediate_cost_rule` / `two_step_cost_rule` 调用 exact clone/step，实际 Raw 隐藏后缀可令两者动作从
+  0 变 2；不得再称为 information-matched。canonical registry 与审计将其固定为 privileged reference，public causal
+  immediate/two-step 才是公开输入候选。
+- `RESOLVED`：同一 Raw 公共前缀下，public 两规则及冻结 PPO 数值概率保持不变；规则选择不修改 cache/prepared/clock/RNG，
+  mask 与 executed action 一致。
+- `OPEN`：public 规则使用 service/deadline/readiness/cost lexicographic objective，learned methods 使用冻结 reward；输入权限
+  已匹配不等于目标函数完全匹配。后续表格必须显式列此差异，不能把 privileged 或 objective-mismatched 结果写成公平性能优势。
+- 数据资格仍由 A 线独立门控制；本修复无训练、checkpoint selection 或性能证据。

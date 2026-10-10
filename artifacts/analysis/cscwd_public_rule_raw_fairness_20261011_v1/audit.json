@@ -1,0 +1,188 @@
+{
+  "actual_info_method_used": true,
+  "audit_scope": "synthetic_hidden_suffix_actual_raw_env_no_training_no_selection",
+  "claim_boundary": {
+    "checkpoint_selection": false,
+    "evaluation_matrix_runs": 0,
+    "raw_data_exported": false,
+    "scientific_performance_claim": false,
+    "training_runs": 0
+  },
+  "design_id": "dev_01",
+  "executed_action_consistency": {
+    "causal_public_immediate_rule": {
+      "fast_hidden_suffix": {
+        "action_projection_applied": false,
+        "admission_rejection_reason": "current_rsu_contact_expires_before_commit",
+        "executed_action": 0,
+        "requested_action": 0,
+        "requested_action_legal": true,
+        "service_completed": false,
+        "terminated": false,
+        "truncated": false
+      },
+      "slow_hidden_suffix": {
+        "action_projection_applied": false,
+        "admission_rejection_reason": null,
+        "executed_action": 0,
+        "requested_action": 0,
+        "requested_action_legal": true,
+        "service_completed": true,
+        "terminated": false,
+        "truncated": false
+      }
+    },
+    "causal_public_two_step_rule": {
+      "fast_hidden_suffix": {
+        "action_projection_applied": false,
+        "admission_rejection_reason": "current_rsu_contact_expires_before_commit",
+        "executed_action": 0,
+        "requested_action": 0,
+        "requested_action_legal": true,
+        "service_completed": false,
+        "terminated": false,
+        "truncated": false
+      },
+      "slow_hidden_suffix": {
+        "action_projection_applied": false,
+        "admission_rejection_reason": null,
+        "executed_action": 0,
+        "requested_action": 0,
+        "requested_action_legal": true,
+        "service_completed": true,
+        "terminated": false,
+        "truncated": false
+      }
+    }
+  },
+  "hidden_suffix_variants": [
+    "slow_hidden_suffix",
+    "fast_hidden_suffix"
+  ],
+  "observed_prefix_samples": 2,
+  "ppo_probability_consistency": {
+    "checkpoint_loaded": false,
+    "claim_boundary": "input identity is confirmed; numerical probability equality is claimed only when numeric_check_status is passed",
+    "numeric_check_reason": null,
+    "numeric_check_status": "passed",
+    "numeric_hidden_suffix_invariant": true,
+    "parameter_updates": 0,
+    "public_policy_input_identity": true,
+    "rows": {
+      "fast_hidden_suffix": {
+        "action": 0,
+        "entropy": 1.0975220203399658,
+        "probabilities": [
+          0.313354,
+          0.0,
+          0.3354,
+          0.351246,
+          0.0
+        ],
+        "selected_action_log_probability": -1.1604218482971191
+      },
+      "slow_hidden_suffix": {
+        "action": 0,
+        "entropy": 1.0975220203399658,
+        "probabilities": [
+          0.313354,
+          0.0,
+          0.3354,
+          0.351246,
+          0.0
+        ],
+        "selected_action_log_probability": -1.1604218482971191
+      }
+    },
+    "runtime_identity": {
+      "python_executable": "/Users/howen/Projects/PPO_MEC/.venv/bin/python",
+      "sys_prefix": "/Users/howen/Projects/PPO_MEC/.venv",
+      "torch_module_path": "/Users/howen/Projects/PPO_MEC/.venv/lib/python3.9/site-packages/torch/__init__.py",
+      "torch_version": "2.8.0"
+    },
+    "seed": 7,
+    "selected_public_action": 0
+  },
+  "privileged_action3_preview_contrast": {
+    "changed": true,
+    "interpretation": "exact transition preview reads hidden realized contact; selected privileged actions need not differ for the capability contrast to be present",
+    "rows": {
+      "fast_hidden_suffix": {
+        "action": 3,
+        "admission_rejection_reason": "current_rsu_contact_expires_before_commit",
+        "clock_seconds_after": 2.1,
+        "physical_contact_budget_seconds": 0.009981996399279852,
+        "service_completed": false,
+        "step_cost_seconds": 2.0,
+        "terminated": false,
+        "truncated": false
+      },
+      "slow_hidden_suffix": {
+        "action": 3,
+        "admission_rejection_reason": null,
+        "clock_seconds_after": 1.622894,
+        "physical_contact_budget_seconds": 9.9,
+        "service_completed": true,
+        "step_cost_seconds": 1.522894,
+        "terminated": false,
+        "truncated": false
+      }
+    }
+  },
+  "privileged_references": {
+    "immediate_cost_rule": {
+      "actions": {
+        "fast_hidden_suffix": 2,
+        "slow_hidden_suffix": 0
+      },
+      "capability_profile": "privileged_exact_transition_clone_v1",
+      "hidden_suffix_invariant": false,
+      "objective_profile": "lexicographic_completed_failures_deadline_elapsed_transfer_v1",
+      "public_information_matched": false,
+      "uses_environment_preview": true
+    },
+    "two_step_cost_rule": {
+      "actions": {
+        "fast_hidden_suffix": 2,
+        "slow_hidden_suffix": 0
+      },
+      "capability_profile": "privileged_exact_transition_clone_v1",
+      "hidden_suffix_invariant": false,
+      "objective_profile": "lexicographic_completed_failures_deadline_elapsed_transfer_v1",
+      "public_information_matched": false,
+      "uses_environment_preview": true
+    }
+  },
+  "public_action_masks_equal": true,
+  "public_prefix_equal": true,
+  "public_rules": {
+    "causal_public_immediate_rule": {
+      "actions": {
+        "fast_hidden_suffix": 0,
+        "slow_hidden_suffix": 0
+      },
+      "capability_profile": "public_causal_semantic_state_only_v1",
+      "hidden_suffix_invariant": true,
+      "objective_profile": "lexicographic_service_deadline_known_readiness_cost_v1",
+      "source_state_unchanged": {
+        "fast_hidden_suffix": true,
+        "slow_hidden_suffix": true
+      }
+    },
+    "causal_public_two_step_rule": {
+      "actions": {
+        "fast_hidden_suffix": 0,
+        "slow_hidden_suffix": 0
+      },
+      "capability_profile": "public_causal_semantic_state_only_v1",
+      "hidden_suffix_invariant": true,
+      "objective_profile": "lexicographic_service_deadline_known_readiness_cost_v1",
+      "source_state_unchanged": {
+        "fast_hidden_suffix": true,
+        "slow_hidden_suffix": true
+      }
+    }
+  },
+  "raw_environment": "RawNGSIMEventTimeEnv",
+  "schema_version": "cscwd_public_rule_raw_fairness_audit_v1"
+}

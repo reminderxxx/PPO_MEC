@@ -1914,3 +1914,17 @@ metadata-only，未读取性能字段；smoke、compile/import、git diff --chec
 - Identity：20 checkpoint file SHA、13 unique loaded-network SHA、20 × 60 = 1,200 fresh train transitions、0 optimizer step、0 parameter mutation、0 formal/holdout/support。
 - Integrity：manifest SHA `74665bb92708c94a17978fb6f4ebb32af95002cb3b75601a282d871c001cbb20`；aggregate SHA `b71c36da5d12e41fb933dd85157695866e6ba3435339e00ca40178a536e7f98e`；action2 autograd/finite-difference sidecar SHA `4bf26b08ba45abca68780a092856dfdc3a0fb9c9bf670bce6022b65f62d5c29f`。
 - Evidence boundary：`E2_ARTIFACT_AUDITED / fixed-policy new development probe`。支持 fast CE 可影响实际 action2 概率；不支持历史训练伤害、删除 fast CE 的收益、算法优势或论文贡献。独立报告：`docs/project/cscwd_per_head_gradient_acceptance_20261010.md`。
+
+## 2026-10-11 CSCWD public baseline raw fairness audit
+
+- Root：`artifacts/analysis/cscwd_public_rule_raw_fairness_20261011_v1/`
+- Public source commit：`6bf5d0b0ba9af2460cdc736f14909b0692126a48`；raw source commit：
+  `14fa246d4ece3cb35d5e38100e3024c96e42d2bc`。
+- Integrity：`manifest.json` SHA-256=`21ffc41ac51e16fa58f4e6e5dd0c0ecc5bb9f8bf5f802399499e5230232992b5`；
+  `audit.json` SHA-256=`45f398ee16708bcae256be7fb8a300d380a9933b839243d69260ab70767e0e7b`。
+- Scope：actual Raw env `_info()`、2 synthetic hidden suffix variants、2 public rules、2 privileged references、1 frozen
+  untrained PPO seed；training/evaluation/checkpoint selection/raw rows=`0/0/0/0`。
+- Result：public state/mask/action/PPO probabilities invariant；public selectors side-effect-free；privileged clone actions/previews
+  change with hidden future. Evidence level=`E2_ARTIFACT_AUDITED / bounded actual-environment contract audit`；不是性能、formal、
+  holdout、SA 优势或 paper-ready 证据。
+- Report：`docs/project/cscwd_public_baseline_fairness_change_note_20261011.md`。

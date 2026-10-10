@@ -2408,3 +2408,15 @@ compile/import 通过。后续记录提交仅发布独立补充包及文档；�
 - 独立接受 `cscwd_fast_aux_gradient_probe_20261010_v1` 为 fixed-policy new development probe：20 checkpoint 文件、13 个唯一网络参数状态、1,200 train transition、0 optimizer step，实际动作 old/new logprob 最大误差 `5.07e-7`，参数前后 hash 全同。
 - fast target `1,200/1,200=0` 且 action2 对 fast logit 的 autograd/中央差分均为正，说明 fast CE 会局部压低实际 action2；但 event-abstention 候选的 PPO/fast CE 负点积仅 encoder selected/update96=`3/5,3/5` seed、fast actor=`3/5,2/5`，跨 seed 不稳定。
 - 结论为 `FAST-LOSS CHANGE UNSUPPORTED`：不改 loss、不训练、不重选 checkpoint。历史 minibatch 冲突、clip 后更新及 bytes/deadline/contact bin 内方向仍 `UNVERIFIED`；`MIXED_STOPPED` 与 paper-ready=`Unverifiable` 不变。报告见 `cscwd_per_head_gradient_acceptance_20261010.md`。
+
+## 2026-10-11 CSCWD 公共规则与 privileged reference 公平性修复
+
+- 新增 canonical capability registry：public immediate/two-step 只读公共 semantic state 与 causal prediction；旧
+  immediate/two-step 因 exact clone/step 读取隐藏实际 contact，降级为 privileged reference。动作逻辑、reward、mask、旧
+  environment 文件与历史协议 hash 均未修改。
+- 实际 `RawNGSIMEventTimeEnv._info()` 隐藏后缀反例通过：公开输入/mask 相同，public 两规则动作均为 0，且 cache、prepared
+  state、clock、RNG 不变；privileged 两规则随后缀从 0 变 2，action3 preview 成功/拒绝分叉。
+- 冻结 `.venv`、seed 7、0 update PPO 数值概率两侧完全相同；41 项专项/相邻测试及 6-node smoke 通过。
+- artifact：`artifacts/analysis/cscwd_public_rule_raw_fairness_20261011_v1/`；报告：
+  `cscwd_public_baseline_fairness_change_note_20261011.md`。训练仍等待 A 线新 development source 可达性最终门，不以公平性
+  合同通过代替数据资格或性能证据。
