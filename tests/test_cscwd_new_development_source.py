@@ -1,5 +1,7 @@
 """Synthetic source interval and provenance boundaries for new development data."""
 
+import json
+
 import pandas as pd
 
 from scripts.freeze_cscwd_new_development_source import (
@@ -44,6 +46,7 @@ def test_same_time_vehicles_select_smallest_eligible_id_once() -> None:
     assert len(selected) == 1
     assert selected[0]["vehicle_id"] == 7
     assert selected[0]["contiguous_frame_count"] == WINDOW_FRAMES
+    json.dumps(candidates)
     assert next(row for row in candidates if row["vehicle_id"] == 9)["rejection_reasons"] == [
         "frozen_segment_quota_reached"
     ]

@@ -209,7 +209,7 @@ def qualify(data: pd.DataFrame, blocks_by_segment: dict[str, list[tuple[int, int
         for fragment_start, fragment_end in fragments:
             first = lo + max(0, (fragment_start - run_start + 99) // 100)
             last = min(hi - 1, lo + (fragment_end - run_start) // 100)
-            count = last - first + 1
+            count = int(last - first + 1)
             if count <= 0:
                 continue
             start = int(time[first])
