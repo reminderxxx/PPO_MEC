@@ -11,6 +11,18 @@
 - `evidence_level`: `E1_DOCUMENTED` 对算法效果；公共估计器合同有局部可复现测试，但无本候选训练、checkpoint 或匹配评价
 - `verdict`: `IMPLEMENTED_DEFAULT_OFF / PILOT_STOPPED_PRE_TRAINING`
 
+## 2026-10-11 追加澄清：停止是执行资格不足，不是候选否证
+
+后续逐消费者审查确认，三个 2.2 s raw 窗口对完整 workflow 本身不可达，且 fixed-action 探针的 30 个请求中有 10 个被
+action mask 改写；因此本报告中“无 prepare/serve 即否定候选”与“下一步必须扩为较长窗口”的表述不再作为当前实施结论。
+正确状态是 `UNTESTED / EXECUTION_QUALIFICATION_INSUFFICIENT`：短窗口不能验证，也不能否定学习候选；本轮仍禁止训练、扩窗、
+调标签或 reward。历史 v4 原件与本报告原文保留，详细勘误和最小实现优先级见
+`cscwd_public_estimator_executor_consistency_20261011.md`。
+
+只读阶段表进一步确认：`dev_01` action1/action4 的 prepare `0.694262/0.724293 s` 均短于当时 `0.728088 s`
+current contact，但加入当前 node 服务后整步超过 `2.2 s` raw trace 并被回滚。因此历史“0 成功 prepare”同时受 raw
+整步原子准入语义约束，不能解释为候选没有生成可行准备动作。
+
 ## 结论
 
 当前最值得补足的是 **event head 的 action-conditioned 信用分配**：现有 timing-only event auxiliary 并不比较 action 4
@@ -78,7 +90,7 @@ elapsed、model/state/input bytes、recompute 和 `prepare/serve/abstain` 覆盖
 source-grounded `prepare` 与一个 `serve` 标签以及成功 prepare 可达性。只改变窗口协议来完成资格检查，不能同时训练候选。
 资格通过后才允许原计划 4 methods × 5 seeds × 1,152 environment steps/cell 的一次性 pilot。
 
-以下任一项否定该改进：
+以下原预注册项保留为历史设计；2026-10-11 澄清后，第 1 项只构成 execution qualification 不足，不再单独否定候选：
 
 1. 较长 source-grounded development 状态仍不能同时形成 prepare/serve 标签或成功 prepare；
 2. candidate 的 event 梯度方向与公共标签不一致，或 slow/fast 梯度、固定分母、网络/基线身份发生变化；

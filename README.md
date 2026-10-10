@@ -5,6 +5,12 @@
 
 # PPO_MEC
 
+2026-10-11 的[action mask／公共估计器—执行端一致性审查](docs/project/cscwd_public_estimator_executor_consistency_20261011.md)
+确认：三个 2.2 s raw 窗口不足以完成 workflow，且 30 个 fixed request 中 10 个被 mask 回退；存在 prepare 可在接触内完成、
+但 full-step atomic gate 回滚的见证。因此零 prepare 只表示执行资格不足，公共动作优势候选仍为 `UNTESTED`。同时确认 public
+estimator 的 unknown/conditional phase accounting 实现缺陷；唯一下一变量冻结为 fail-closed phase contract，本轮 0 训练、
+0 扩窗、0 reward/label 修改。
+
 2026-10-10 的[公共动作优势候选](docs/project/cscwd_public_action_advantage_candidate_20261010.md)已 default-off 实现：共同
 public estimator 只使用因果观测，生成 `prepare/serve/abstain` event supervision，unknown 时不施加 event CE/temporal
 梯度。raw NGSIM 三个冻结开发窗口均只有 2.2 s，15/15 截断且 0 成功 prepare，故匹配 pilot 在训练前停止；不扩窗、不换

@@ -5,15 +5,27 @@
 
 ﻿# Bugs And Risks
 
+## 2026-10-11：公共估计器阶段聚合缺陷与 raw preview 权限风险
+
+- `CONFIRMED IMPLEMENTATION DEFECT`：public estimator 在必需 target phase unknown 时仍输出有限 partial total/deadline fit；
+  current service 失败时还会计入 executor 不提交的 state bytes/restore。该缺陷未参与 v4 fixed-policy 执行，不能归因 28 次
+  raw rejection 或任何历史训练结果。
+- `EXECUTION CONTRACT MISMATCH`：raw profile 对 full coupled step 做 current-contact/trace 原子准入，而 native prepare 合同可在
+  current contact 内完成目标阶段。短窗口因此只能判执行资格不足，不能把零 prepare 作为算法否证或扩窗依据。
+- `PERMISSION RISK`：raw `clone_for_decision_model().step()` 的物理 contact 仍会读取真实未来轨迹；public estimator/rule 不调用
+  该路径。exact clone 必须标为 privileged reference，在另立修复前不得用于同权限方法排名。
+- `NEXT ONE CHANGE`：只把 public estimator 改为 fail-closed phase accounting 并做 estimator↔native 合成 conformance；不同时
+  修改 raw 环境、mask、窗口、reward、标签或训练。
+
 ## 2026-10-10：公共动作优势监督可审计，但 source-grounded 可达性阻断训练
 
 - `IMPLEMENTED DEFAULT-OFF`：公共估计器与 `prepare/serve/abstain` event supervision 已实现；unknown 不伪造标签，候选不做
   action mask/guard，不改 slow/fast、network、reward、PPO 或基线权限。新旧相邻 torch 梯度/checkpoint 回归共 `27 passed`；
   这不等于性能或因果验收。
-- `SOURCE-GROUNDED BLOCKER`：现有三个冻结 raw NGSIM 窗口仅 2.2 s，15/15 truncated、0 workflow、0 成功 prepare；无法同时
-  支持 prepare/serve 学习覆盖。匹配 pilot 在训练前停止，不允许据本批结果扩窗或换实例。
-- `OPEN`：需要另立结果盲、与 formal/holdout 原始区间互斥的较长 development window 协议，先只验证双标签与成功 prepare
-  可达性。若仍失败，应否定候选，而不是延长预算、扫阈值或转入其他 auxiliary 消融。
+- `SOURCE-GROUNDED BLOCKER（2026-10-11 勘误）`：三个 raw NGSIM 窗口仅 2.2 s，15/15 truncated、0 workflow、0 成功
+  prepare；只说明执行资格不足，候选状态为 `UNTESTED`，不能据此否定算法或自动扩窗。
+- `OPEN`：先闭合 estimator/executor phase contract。是否另立结果盲、与 formal/holdout 区间互斥的数据资格协议须单独预注册，
+  不由本批结果自动触发。
 
 ## 2026-10-10：状态条件动作信用仍为未定位学习风险
 

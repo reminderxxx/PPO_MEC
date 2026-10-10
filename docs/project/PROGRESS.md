@@ -5,6 +5,17 @@
 
 ﻿# Progress
 
+## 2026-10-11：raw action mask／公共估计器与执行端只读一致性审查完成
+
+- v4 的 30 个 raw 决策中有 10 个 fixed request 被 mask 回退为 action2；执行 action0/1/2/3/4=`5/2/16/5/2`，没有
+  learned policy、logprob 或 PPO 更新，因此这些行不能解释为策略动作概率。
+- 三窗口首决策后 trace 均仅 2.2 s，而 workflow compute-only 下界为 `38.739782/24.968087/19.138455 s`；按 v4
+  优先标签为 trace/contact/accepted=`24/4/2`，按最早物理边界为 `20/8/2`。存在 prepare 小于 current contact、但整步
+  原子准入回滚的直接见证；历史零 prepare 改判为 `UNTESTED / EXECUTION_QUALIFICATION_INSUFFICIENT`，不否定候选，也不授权扩窗。
+- 已确认 public estimator 的 phase accounting 缺陷：unknown target phase 仍产生有限 partial total，current-service 失败路径仍
+  计 state phase，且未表示 raw full-step contact gate。唯一下一实现候选是 fail-closed phase accounting；本轮没有改环境、
+  mask、算法、reward、标签或训练。详见 `cscwd_public_estimator_executor_consistency_20261011.md`。
+
 ## 2026-10-10：公共动作优势候选已 default-off 实现；raw 时间门失败，训练前停止
 
 - 新增共同、只读、无副作用的 public action estimator；缺公共成本、需要私有 eviction 顺序或重算身份不明时返回

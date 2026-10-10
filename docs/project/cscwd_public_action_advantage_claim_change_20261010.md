@@ -2,6 +2,12 @@
 
 本文件供 A 论文线只读消费；不修改主论文稿。
 
+> 2026-10-11 追加澄清：2.2 s raw 窗口的零 prepare 只说明执行资格不足，候选状态为 `UNTESTED`，不构成算法否证；不得据此
+> 推荐结果驱动扩窗。当前优先补公共 estimator 与 executor 的 fail-closed phase accounting，详见
+> `cscwd_public_estimator_executor_consistency_20261011.md`。
+> 只读阶段表还确认存在“prepare 可在 current contact 内完成、但整步原子准入回滚”的见证，故历史零 prepare 不能被写成
+> 学习候选失败；raw exact decision clone 会读取未来物理接触，只能保持 privileged reference 能力标签。
+
 - 新增可写入内部研究记录的事实：共同、因果、无副作用的 public action estimator 与 default-off
   `causal_public_prepare_advantage_v1` event auxiliary 已实现；未知状态 abstain，不做 action mask，不改变 slow/fast、reward、
   network、PPO 或 baseline 权限。
@@ -12,8 +18,8 @@
   model-based reference，不能与 public rule 做同能力排名。
 - 禁止新增主张：不得把 estimator 合同测试写成性能收益，不得把 default-off 实现写成创新已验证，不得用 24-frame raw 结果
   宣称真实 VEC 不可完成，也不得从当前零 prepare 事后扩窗或挑实例。
-- 下一证据门：先冻结结果盲、原始区间互斥的较长 development window，只验 prepare/serve 可达性；通过后才允许单变量匹配
-  pilot。若仍无双标签/成功 prepare，候选被否定而不是继续延长预算。
+- 原“较长窗口双标签门”保留为历史设想，不是当前自动下一步。先修复并验收 estimator/executor phase contract；之后是否另立
+  数据协议须独立预注册，不能由本批零 prepare 结果驱动。
 
 证据入口：`cscwd_public_action_advantage_candidate_20261010.md`；A 原件 run ID=
 `cscwd_raw_ngsim_event_time_20261010_v4`，最终运行 commit=`0704937742ec9218094f380a1b541c4bd2159bcb`，B default-off commit=

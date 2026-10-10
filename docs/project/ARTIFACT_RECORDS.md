@@ -5,6 +5,17 @@
 
 # Artifact Records
 
+## 2026-10-11 raw time root-cause 与 estimator/executor 一致性审查（无 scientific run）
+
+- 上游只读账本：`artifacts/analysis/cscwd_raw_time_root_cause_20261011_v2/diagnosis.json`，SHA-256=
+  `2aba8413253a1a0be1868b62c639f9f7754f76293b4c78aed5109444ad6756fc`；父 v4 commit/source/summary identity 分别为
+  `0704937742ec9218094f380a1b541c4bd2159bcb`、`c0b64fd…883f`、`62c1f4…e30f`。
+- 账本只读重放既有 `30 episodes/147 real steps`，生成 30 条 raw 决策 ledger 与 56 个 native preview；
+  `summary_mismatches=0`、`additional_policy_episodes=0`。没有扩窗、训练、checkpoint 选择、formal 或 holdout。
+- B 最小合同见证为 `tests/test_cscwd_public_estimator_executor_diagnosis.py`；报告：
+  `docs/project/cscwd_public_estimator_executor_consistency_20261011.md`。结论为 public estimator phase-accounting defect、raw
+  execution qualification insufficient、候选仍 `UNTESTED`；不登记性能结果或算法晋级。
+
 ## 2026-10-10 public action advantage 候选（无 scientific run）
 
 - B 计划 commit=`86b54ede54be7d9be9201a0d2cb2615b5aa1a5e4`；default-off implementation commit=

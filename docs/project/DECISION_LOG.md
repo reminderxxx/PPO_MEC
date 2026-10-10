@@ -1,13 +1,23 @@
 ﻿# Decision Log
 
+## 2026-10-11：先修公共 estimator 的 fail-closed phase accounting，不扩窗或训练
+
+- 只读账本确认 raw 短窗与 full-step atomic gate 足以解释当前零 workflow/零成功 prepare；prepare 阶段本身存在 contact 内可行
+  见证。因此撤回“零 prepare 即否定候选”和“自动进入较长窗口”的解释，保留候选为 `UNTESTED`。
+- 唯一下一实现变量是 public estimator 的阶段合同：必需阶段 unknown 则 full total/deadline/contact fit 均 unknown；action4
+  state phase 仅在 current service 成功分支计入，并显式区分 prepare-contact 与 full coupled-step contact。先做合成
+  estimator↔native conformance，不改 raw 环境、窗口、mask、标签、reward 或训练。
+- raw decision clone 的未来 contact 读取另列权限缺陷；因本轮限制至多一个下一改动，只保留 blocker，不同时修复。exact clone
+  继续标为 privileged reference，不进入同权限排名。
+
 ## 2026-10-10：只冻结因果 public event supervision；raw 可达性失败即停止
 
 - 现有 action-conditioned 证据支持比较当前服务、目标 readiness gain、公开成本与 deadline，但不支持统一禁用 action2/4、
   删除 auxiliary 或使用 exact future clone。唯一候选因此为公共 `prepare/serve/abstain` event supervision，unknown abstain。
 - 候选只改变 SA event CE/temporal target/weight，默认关闭；原 privileged two-step 保留并明确能力差异。该项是可证伪学习设计，
   不是实现纠错、性能证据或算法创新。
-- raw NGSIM 三个冻结窗口均仅 2.2 s，0 成功 prepare；按预冻门取消本轮匹配训练。后续若继续，先另立结果盲的较长开发窗口
-  资格协议，只验双标签/成功 prepare，不同时改算法或预算。
+- raw NGSIM 三个冻结窗口均仅 2.2 s，0 成功 prepare；按预冻门取消本轮匹配训练。2026-10-11 只读阶段审查已将该结果
+  勘误为 execution qualification 不足，不再单独否定候选或自动触发较长窗口协议。
 
 ## 2026-10-10：只修训练信号日志地址，不修改成本或算法
 
